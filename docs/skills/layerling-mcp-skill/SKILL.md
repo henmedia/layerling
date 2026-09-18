@@ -1,6 +1,6 @@
 ---
 name: layerling-mcp-skill
-description: Control a live local layerling editor through its MCP server. Use when Codex needs to list currently open layerling editor tabs, target a tab by editorNumber/projectName, read the current scene, list or select objects, create boxes/cubes/cylinders/sketch extrusions, update dimensions/position/rotation, align objects, group/ungroup/cut/separate parts, list exact CAD edge ids, apply chamfer/fillet to specific edges, inspect editor errors, or capture viewport images from view-cube angles.
+description: Control a live local layerling editor through its MCP server. Use when the assistant needs to list currently open layerling editor tabs, target a tab by editorNumber/projectName, read the current scene, list or select objects, create boxes/cubes/cylinders/sketch extrusions, update dimensions/position/rotation, align objects, group/ungroup/cut/separate parts, list exact CAD edge ids, apply chamfer/fillet to specific edges, inspect editor errors, or capture viewport images from view-cube angles.
 ---
 
 # layerling MCP
