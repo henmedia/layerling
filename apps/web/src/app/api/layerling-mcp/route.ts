@@ -23,7 +23,14 @@ function isLocalRequest(request: Request) {
   if (origin) {
     try {
       const originUrl = new URL(origin);
-      if (originUrl.origin !== requestUrl.origin || !LOCAL_HOSTS.has(originUrl.hostname)) {
+      // localhost and 127.0.0.1 are the same machine but not the same origin
+      // string, and the dev server reports whichever name it bound to. Require a
+      // local hostname on the same port rather than a byte-identical origin.
+      if (
+        originUrl.protocol !== requestUrl.protocol ||
+        originUrl.port !== requestUrl.port ||
+        !LOCAL_HOSTS.has(originUrl.hostname)
+      ) {
         return false;
       }
     } catch {
