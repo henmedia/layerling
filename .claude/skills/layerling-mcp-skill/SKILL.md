@@ -1,0 +1,1 @@
+../../../docs/skills/layerling-mcp-skill/SKILL.md
