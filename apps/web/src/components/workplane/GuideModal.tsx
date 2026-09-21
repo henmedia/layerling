@@ -25,6 +25,10 @@ function guideSections(sharedStore: boolean): GuideSection[] {
       lines: ["guide.view.orbit", "guide.view.touch", "guide.view.cube", "guide.view.projection"],
     },
     {
+      title: "guide.group.workplane",
+      lines: ["guide.workplane.place", "guide.workplane.reset", "guide.workplane.grid"],
+    },
+    {
       title: "guide.group.shapes",
       lines: ["guide.shapes.add", "guide.shapes.inspector", "guide.shapes.handles"],
     },

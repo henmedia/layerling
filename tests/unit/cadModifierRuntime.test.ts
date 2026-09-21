@@ -21,7 +21,9 @@ import {
   selectableCadModifierEdge,
   CAD_MODIFIER_KERNEL_RESTART_MESSAGE,
   SKETCH_CAD_DEFLECTION,
+  cadModifierUserErrorMessage,
 } from "@/lib/cadModifierRuntime";
+import { setLanguage } from "@/lib/i18n";
 
 describe("CAD modifier runtime state", () => {
   it("uses the build-managed OCCT runtime", () => {
@@ -179,6 +181,36 @@ describe("Kernel am Ende oder nur die Aufgabe?", () => {
   it("meldet den Neustart mit einem Satz, der den Anwender nicht ratlos laesst", () => {
     expect(CAD_MODIFIER_KERNEL_RESTART_MESSAGE).toContain("restarted");
     expect(isCadModifierKernelExhausted(CAD_MODIFIER_KERNEL_RESTART_MESSAGE)).toBe(false);
+  });
+});
+
+describe("cadModifierUserErrorMessage", () => {
+  it("translates overlapping geometry error into helpful German message", () => {
+    setLanguage("de", false);
+    const raw = "The chosen size creates invalid or overlapping edge geometry";
+    const msg = cadModifierUserErrorMessage(raw);
+    expect(msg).toContain("kleineren Wert");
+  });
+
+  it("translates overlapping geometry error into helpful English message", () => {
+    setLanguage("en", false);
+    const raw = "The chosen size creates invalid or overlapping edge geometry";
+    const msg = cadModifierUserErrorMessage(raw);
+    expect(msg).toContain("smaller value");
+  });
+
+  it("translates timeout and worker errors", () => {
+    setLanguage("de", false);
+    expect(cadModifierUserErrorMessage("The edge preview timed out. Cancel the tool and try again.")).toContain("Vorschau-Berechnung");
+    expect(cadModifierUserErrorMessage("Edge preparation timed out. This mesh needs more CAD processing than the interactive limit allows. Try a repaired or lower-detail STL.")).toContain("Vorbereitung der Kanten");
+    expect(cadModifierUserErrorMessage("The group has no solid body to modify")).toContain("keinen festen Körper");
+    expect(cadModifierUserErrorMessage("The CAD worker could not start. Update to Firefox 121+, Chrome/Brave 114+, or Safari 17.2+, then try again.")).toContain("CAD-Rechenkern");
+  });
+
+  it("passes through unknown errors and handles nullish values", () => {
+    expect(cadModifierUserErrorMessage(null)).toBeNull();
+    expect(cadModifierUserErrorMessage(undefined)).toBeNull();
+    expect(cadModifierUserErrorMessage("Some unexpected error")).toBe("Some unexpected error");
   });
 });
 

@@ -218,3 +218,32 @@ export function cadModifierTimeoutMessage(phase: CadModifierRequestPhase) {
 export function cadModifierWorkerFailureMessage() {
   return "The CAD worker could not start. Update to Firefox 121+, Chrome/Brave 114+, or Safari 17.2+, then try again.";
 }
+
+/**
+ * Wandelt rohe Fehlermeldungen des CAD-Workers (z. B. geometrische Kollisionen
+ * bei OpenCASCADE, Timeouts oder Worker-Ausfälle) in verständliche, lokalisierte
+ * Hinweistexte für die Benutzeroberfläche um.
+ */
+export function cadModifierUserErrorMessage(rawError: string | null | undefined): string | null {
+  if (!rawError) return null;
+  if (rawError.includes("creates invalid or overlapping edge geometry")) {
+    return t("edge.errorOverlappingGeometry");
+  }
+  if (rawError.includes("The group has no solid body to modify")) {
+    return t("edge.errorNoSolidBody");
+  }
+  if (rawError.includes("Edge preparation timed out")) {
+    return t("edge.errorPrepareTimeout");
+  }
+  if (rawError.includes("The edge preview timed out")) {
+    return t("edge.errorPreviewTimeout");
+  }
+  if (
+    rawError.includes("The CAD worker could not start") ||
+    rawError.includes("The CAD worker was closed") ||
+    rawError.includes("CAD worker could not start")
+  ) {
+    return t("edge.errorWorkerFailed");
+  }
+  return rawError;
+}

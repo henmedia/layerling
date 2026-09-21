@@ -102,6 +102,7 @@ import {
   CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT,
   cadModifierPrepareTimeoutMs,
   cadModifierTimeoutMessage,
+  cadModifierUserErrorMessage,
   cadModifierWorkerFailureMessage,
   cadModifierCandidateEdge,
   defaultCadModifierTangentChain,
@@ -6179,10 +6180,10 @@ export function LayerlingEditor({
           cadModifierBaseFingerprintRef.current = "";
           cadModifierSourcePartsRef.current = [];
           setEdgeModifier(null);
-          setNotice(message.message);
+          setNotice(cadModifierUserErrorMessage(message.message) ?? message.message);
           return;
         }
-        setEdgeModifier((current) => current ? { ...current, busy: false, preview: null, error: message.message } : current);
+        setEdgeModifier((current) => current ? { ...current, busy: false, preview: null, error: cadModifierUserErrorMessage(message.message) ?? message.message } : current);
         // Ein zu grosser Radius scheitert - der inzwischen gewaehlte kleinere darf es trotzdem versuchen.
         if (cadPreviewQueueRef.current.settle(message.requestId).status !== "sent") {
           setNotice(t("status.edgeNeedsAdjustment"), true);
