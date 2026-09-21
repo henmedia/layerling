@@ -276,7 +276,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "guide.files.project": "LYL ist layerlings eigenes Entwurfsformat: der ganze Entwurf samt Verlauf in einer Datei. Ältere .skf-Dateien öffnen weiterhin.",
   "guide.files.export": "STL und OBJ für den Slicer, STEP für ein vollwertiges CAD, SVG für flache Umrisse.",
   "guide.files.import": "STL, OBJ, STEP und SVG lassen sich importieren und darum herum weiterbauen.",
-  "guide.files.storeOff": "Auf dem eigenen Server legst du neben der index.html einen Ordner „store\" an - dann liegen die Entwürfe dort statt im Browser. Dafür muss der Server PHP können.",
+  "guide.files.storeOff": "Auf dem eigenen Server legst du neben der index.html einen Ordner „store\" an - dann lassen sich Entwürfe zusätzlich zum Browser auch auf dem Server ablegen. Dafür muss der Server PHP können.",
   "guide.files.storeOn": "Diese Installation legt Entwürfe auch auf dem Server ab. Die Startseite zeigt den Ordner neben deinen Browser-Entwürfen: zieh Entwürfe hinein, leg dort Unterordner an oder starte neue gleich darin - gesichert wird von selbst.",
   "guide.group.settings": "Einstellungen",
   "guide.settings.workspace": "Das Zahnrad öffnet Maßeinheiten, Raster, Plattengröße, Farben und die Länge des Verlaufs.",

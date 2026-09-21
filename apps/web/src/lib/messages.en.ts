@@ -277,7 +277,7 @@ export const MESSAGES_EN = {
   "guide.files.project": "LYL is layerling's own design format: the whole design including history in one file. Older .skf files still open.",
   "guide.files.export": "STL and OBJ for the slicer, STEP for a full CAD program, SVG for flat outlines.",
   "guide.files.import": "STL, OBJ, STEP and SVG can be imported and built around.",
-  "guide.files.storeOff": "On your own server, create a folder called \"store\" next to index.html and the designs are kept there instead of in the browser. That needs PHP.",
+  "guide.files.storeOff": "On your own server, create a folder called \"store\" next to index.html to store designs on the server in addition to the browser. That needs PHP.",
   "guide.files.storeOn": "This installation keeps designs on the server as well. The start page shows that folder beside your browser designs: drag designs into it, make subfolders, or start a new design right there - it saves itself.",
   "guide.group.settings": "Settings",
   "guide.settings.workspace": "The gear opens units, grid, plate size, colours and how much history is kept.",
