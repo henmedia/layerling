@@ -1,4 +1,4 @@
-﻿/*
+/*
   Basis-Zurücksetzung.
 
   Übernommen aus Tailwind CSS 4.3.0 (preflight.css, MIT-Lizenz,
@@ -4094,15 +4094,15 @@ button {
   max-width: min(520px, calc(100vw - 400px));
   margin: 0;
   padding: 7px 14px;
-  overflow: hidden;
   color: #5c442b;
   font-size: 13px;
   font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.4;
+  white-space: normal;
+  word-break: break-word;
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid #ded0c2;
-  border-radius: 999px;
+  border-radius: 12px;
   box-shadow: 0 2px 12px rgba(68, 49, 28, 0.16);
   pointer-events: none;
 }
@@ -8465,6 +8465,12 @@ html[data-theme="dark"] .edge-modifier-field select {
 html[data-theme="dark"] .edge-modifier-history-actions {
   background: #2a2015;
   border-color: #53412f;
+}
+
+html[data-theme="dark"] .edge-modifier-error {
+  color: #ff9da5;
+  background: rgba(85, 23, 30, 0.85);
+  border-color: #9f3842;
 }
 
 html[data-theme="dark"] .edge-modifier-history-actions button {

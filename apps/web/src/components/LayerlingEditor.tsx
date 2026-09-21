@@ -10373,7 +10373,7 @@ export function LayerlingEditor({
       ) : null}
       {guideOpen ? <GuideModal sharedStore={sharedProjectsEnabled} onClose={() => setGuideOpen(false)} /> : null}
       {notice ? (
-        <p className="editor-status" role="status" aria-live="polite">
+        <p className="editor-status" role="status" aria-live="polite" title={notice}>
           {notice}
         </p>
       ) : null}
