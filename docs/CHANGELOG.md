@@ -4,6 +4,10 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
+## 1.12.1
+
+- layerling now notices on its own when a newer version has been published on GitHub. When running a self-hosted instance or returning to the browser app, it was easy to miss recent fixes and new features unless someone checked the repository by hand. A quiet check against GitHub's public releases API now runs in the background on start: if the latest published release carries a higher semver version than the running build, a dismissible banner appears at the top of the dashboard, and the version label in the footer gains a small badge linking straight to the release notes. The check is strictly throttled - caching results in the browser for an hour so GitHub's rate limits are never hit, and failing completely silently if working offline - and dismissing the banner with its × remembers that choice for the current session so it never interrupts working on designs. A URL parameter (`?simulateUpdate=...`) allows testing the appearance without waiting for a real release.
+
 ## 1.12.0
 
 - A box- or cylinder-style extrusion can now be twisted and leaned, next to its existing taper: **Twist** rotates the top face relative to the base by up to 720°, and **Width Offset**/**Length Offset** shift it up to 80 mm sideways along either axis - in the properties panel, in shape defaults and through the MCP bridge, everywhere taper already reaches. Contributed from outside the project; reviewing it turned up several places that already gate on taper alone and needed the same treatment for the new deformation to take effect there too, most importantly chamfering or filleting a twisted body, which was silently dropping the twist and working from a plain, undeformed copy instead - fixed before it ever shipped.

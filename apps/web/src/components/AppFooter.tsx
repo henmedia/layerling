@@ -1,12 +1,13 @@
 "use client";
 
-import { Heart } from "lucide-react";
+import { Heart, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { t, type Language } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
+import { SOURCE_CODE_URL, type AppUpdateInfo } from "@/lib/appUpdate";
+import { useAppUpdate } from "@/lib/useAppUpdate";
 
-export const SOURCE_CODE_URL =
-  process.env.NEXT_PUBLIC_SOURCE_CODE_URL?.trim() || "https://github.com/henmedia/layerling";
+export { SOURCE_CODE_URL };
 
 /** Der Verweis in der Fußzeile zeigt auf die Anleitung in der gewählten Sprache. */
 function readmeUrl(language: Language) {
@@ -88,8 +89,19 @@ function joinWithDots(items: ReactNode[]) {
  * liegt sie als schmales Band am unteren Rand, deshalb bekommt sie dort eine
  * zweite Klasse statt einer eigenen Kopie des Markups.
  */
-export function AppFooter({ variant = "dashboard", version }: { variant?: "dashboard" | "editor"; version: string }) {
+export function AppFooter({
+  variant = "dashboard",
+  version,
+  updateInfo,
+}: {
+  variant?: "dashboard" | "editor";
+  version: string;
+  updateInfo?: AppUpdateInfo | null;
+}) {
   const language = useLanguage();
+  const { update: hookUpdate } = useAppUpdate(version);
+  const update = updateInfo !== undefined ? updateInfo : hookUpdate;
+
   return (
     <footer className={variant === "editor" ? "dashboard-legal editor-legal" : "dashboard-legal"}>
       <div className="dashboard-legal-group">
@@ -125,6 +137,19 @@ export function AppFooter({ variant = "dashboard", version }: { variant?: "dashb
           <span className="dashboard-legal-version" key="version">
             {t("dashboard.version", { version })}
           </span>,
+          update ? (
+            <a
+              className="dashboard-legal-update"
+              href={update.releaseUrl}
+              target="_blank"
+              rel="noreferrer"
+              key="update-available"
+              title={t("dashboard.updateAvailable", { version: update.latestVersion })}
+            >
+              <Sparkles size={13} aria-hidden="true" />
+              <span>{t("dashboard.updateAvailable", { version: update.latestVersion })}</span>
+            </a>
+          ) : null,
         ])}
       </div>
     </footer>

@@ -1069,6 +1069,83 @@ button {
   text-decoration: none;
 }
 
+.dashboard-legal a.dashboard-legal-update {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-block: -5px;
+  padding: 4px 10px;
+  border: 1px solid #7bc882;
+  border-radius: 999px;
+  background: #eef8ef;
+  color: #23742b;
+  font-weight: 700;
+}
+
+.dashboard-legal a.dashboard-legal-update:hover {
+  border-color: #278130;
+  background: #e0f4e2;
+  color: #1a5c21;
+  text-decoration: none;
+}
+
+.dashboard-update-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 10px 16px;
+  border: 1px solid #b7e2bc;
+  border-radius: 10px;
+  background: #f1f9f2;
+  color: #1e5927;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dashboard-update-notice-content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.dashboard-update-icon {
+  flex-shrink: 0;
+  color: #2a8334;
+}
+
+.dashboard-update-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #1a6424;
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+.dashboard-update-link:hover {
+  color: #0f4016;
+}
+
+.dashboard-update-dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  background: transparent;
+  color: #4a7a51;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dashboard-update-dismiss:hover {
+  background: #d8eedb;
+  color: #194a20;
+}
+
 .dashboard-legal a {
   color: #7a6650;
   text-decoration: none;
@@ -8356,6 +8433,45 @@ html[data-theme="dark"] .dashboard-legal a.dashboard-legal-sponsor:hover {
   border-color: #f3a452;
   background: #4a3820;
   color: #f7b978;
+}
+
+html[data-theme="dark"] .dashboard-legal a.dashboard-legal-update {
+  border-color: #2e6634;
+  background: #17311b;
+  color: #78d482;
+}
+
+html[data-theme="dark"] .dashboard-legal a.dashboard-legal-update:hover {
+  border-color: #78d482;
+  background: #1f4224;
+  color: #93e69b;
+}
+
+html[data-theme="dark"] .dashboard-update-notice {
+  border-color: #2e6634;
+  background: #152918;
+  color: #a4e5ab;
+}
+
+html[data-theme="dark"] .dashboard-update-icon {
+  color: #78d482;
+}
+
+html[data-theme="dark"] .dashboard-update-link {
+  color: #78d482;
+}
+
+html[data-theme="dark"] .dashboard-update-link:hover {
+  color: #9eedab;
+}
+
+html[data-theme="dark"] .dashboard-update-dismiss {
+  color: #6fa675;
+}
+
+html[data-theme="dark"] .dashboard-update-dismiss:hover {
+  background: #204025;
+  color: #a4e5ab;
 }
 
 html[data-theme="dark"] .store-move-targets button {

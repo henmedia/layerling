@@ -1,9 +1,10 @@
 "use client";
 
-import { Clock3, Copy, EllipsisVertical, FileUp, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Trash2, X } from "lucide-react";
+import { Clock3, Copy, EllipsisVertical, FileUp, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { useAppUpdate } from "@/lib/useAppUpdate";
 import { sharedProjectSaveTarget } from "@/lib/sharedProjectTarget";
 import { storeFolderNameProblem, suggestStoreFolderName } from "@/lib/storeFolderName";
 import { LayerlingEditor, importedShapeFromObj, importedShapeFromStl, importedShapeFromSvg } from "@/components/LayerlingEditor";
@@ -1991,6 +1992,7 @@ function Dashboard({
   onWorkspace: () => void;
 }) {
   const language = useLanguage();
+  const { update, isDismissed, dismiss: dismissUpdate } = useAppUpdate(LYL_CREATED_WITH_VERSION);
   const [openProjectMenuId, setOpenProjectMenuId] = useState<string | null>(null);
   const [openSharedProjectMenuKey, setOpenSharedProjectMenuKey] = useState<string | null>(null);
   const [projectPendingDeleteId, setProjectPendingDeleteId] = useState<string | null>(null);
@@ -2148,6 +2150,30 @@ function Dashboard({
 
       <div className="dashboard-layout">
         <section className="dashboard-main" aria-label={dashboardSection === "shared" ? t("shared.title") : t("dashboard.projects")}>
+          {update && !isDismissed ? (
+            <aside
+              className="dashboard-update-notice"
+              role="status"
+              aria-label={t("dashboard.updateAvailable", { version: update.latestVersion })}
+            >
+              <div className="dashboard-update-notice-content">
+                <Sparkles size={18} className="dashboard-update-icon" aria-hidden="true" />
+                <span>{t("dashboard.updateBannerText", { current: LYL_CREATED_WITH_VERSION, latest: update.latestVersion })}</span>
+                <a href={update.releaseUrl} target="_blank" rel="noreferrer" className="dashboard-update-link">
+                  {t("dashboard.updateBannerLink")}
+                </a>
+              </div>
+              <button
+                type="button"
+                className="dashboard-update-dismiss"
+                onClick={dismissUpdate}
+                aria-label={t("dashboard.updateDismiss")}
+                title={t("dashboard.updateDismiss")}
+              >
+                <X size={16} />
+              </button>
+            </aside>
+          ) : null}
           {dashboardSection === "shared" ? (
             <>
               {dashboardNotice ? <div className="dashboard-import-notice" role="status">{dashboardNotice}</div> : null}
@@ -2650,7 +2676,7 @@ function Dashboard({
               </details>
             </>
           )}
-          <AppFooter version={LYL_CREATED_WITH_VERSION} />
+          <AppFooter version={LYL_CREATED_WITH_VERSION} updateInfo={update} />
         </section>
       </div>
 
