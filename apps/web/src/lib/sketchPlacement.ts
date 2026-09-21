@@ -6,7 +6,7 @@ import {
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
-export function placeSketchExtrusion(
+export function placeSketchShape(
   shape: WorkplaneShape,
   workplane: PlacementWorkplane,
   existing?: WorkplaneShape | null,
@@ -34,3 +34,6 @@ export function placeSketchExtrusion(
     ...placementPatchForNewShape(shape, workplane, basePoint),
   });
 }
+
+export const placeSketchExtrusion = placeSketchShape;
+

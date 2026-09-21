@@ -131,7 +131,7 @@ export type LylProjectDocumentV1 = {
   sceneStateId: string;
   states: LylStateV1[];
   history: {
-    entries: Array<{ stateId: string; selectedObjectIds: string[] }>;
+    entries: Array<{ stateId: string; selectedObjectIds: string[]; workplane?: PlacementWorkplane }>;
     index: number;
   };
   sketches: Array<{ id: string; nodeId: string; objectId: string; operation?: SketchOperation; extrusionDepth: number; revolve?: SketchRevolveSettings }>;
@@ -816,14 +816,16 @@ function unzipAsync(bytes: Uint8Array) {
 }
 
 export async function exportLylProject(input: LylProjectExportInput) {
-  const hydrated = hydrateEditorHistoryState(input.shapes, input.history, input.historyIndex, "unlimited", normalizeNotes(input.notes));
+  const placementElevation = Number.isFinite(input.placementElevation) ? input.placementElevation : 0;
+  const placementWorkplane = normalizePlacementWorkplane(input.placementWorkplane, placementElevation);
+  const hydrated = hydrateEditorHistoryState(input.shapes, input.history, input.historyIndex, "unlimited", normalizeNotes(input.notes), placementWorkplane);
   if (hydrated.entries.length > LYL_LIMITS.states) throw new Error("Project has too many undo states for the project format");
   const exportEntries = hydrated.entries.map((entry) => {
     const repaired = repairDuplicateGroupedObjectIds(entry.shapes);
     // `hydrated` entries are already canonical and fingerprinted; only a state that
     // needed an ID repair has to be measured again.
     const idsWereRepaired = repaired.some((shape, index) => shape !== entry.shapes[index]);
-    return idsWereRepaired ? editorHistoryEntry(repaired, entry.selectedIds, normalizeNotes(entry.notes)) : entry;
+    return idsWereRepaired ? editorHistoryEntry(repaired, entry.selectedIds, normalizeNotes(entry.notes), entry.placementWorkplane) : entry;
   });
   const builder = new LylArchiveBuilder();
   const stateShapes = exportEntries.map((entry) => entry.shapes);
@@ -840,7 +842,11 @@ export async function exportLylProject(input: LylProjectExportInput) {
       states.push(await serializeState(stateId, entry.shapes, builder, sourceAssetsByArchiveId, normalizeNotes(entry.notes)));
       stateIdByFingerprint.set(entry.fingerprint, stateId);
     }
-    historyEntries.push({ stateId, selectedObjectIds: [...entry.selectedIds] });
+    historyEntries.push({
+      stateId,
+      selectedObjectIds: [...entry.selectedIds],
+      ...(entry.placementWorkplane ? { workplane: entry.placementWorkplane } : {}),
+    });
   }
 
   const sceneStateId = historyEntries[hydrated.index]?.stateId;
@@ -848,8 +854,6 @@ export async function exportLylProject(input: LylProjectExportInput) {
   if (!activeState) throw new Error("Could not identify the active project state");
   const indexes = activeProjectIndexes(activeState);
   const now = Date.now();
-  const placementElevation = Number.isFinite(input.placementElevation) ? input.placementElevation : 0;
-  const placementWorkplane = normalizePlacementWorkplane(input.placementWorkplane, placementElevation);
   const sketchPlacementWorkplane = normalizePlacementWorkplane(input.sketchPlacementWorkplane);
   const selectedWorkplaneId = placementWorkplaneIsBase(placementWorkplane) ? "workplane-base" : "workplane-active";
   const document: LylProjectDocumentV1 = {
@@ -1436,10 +1440,12 @@ async function restoreV1(document: LylProjectDocumentV1, assetById: Map<string, 
     restoredStates.get(entry.stateId) ?? [],
     entry.selectedObjectIds,
     restoredNotes.get(entry.stateId) ?? [],
+    entry.workplane,
   ));
   const shapes = restoredStates.get(document.sceneStateId) ?? [];
   const notes = restoredNotes.get(document.sceneStateId) ?? [];
-  const hydrated = hydrateEditorHistoryState(shapes, history, document.history.index, "unlimited", notes);
+  const placementWorkplane = normalizePlacementWorkplane(document.editor.placementWorkplane, document.editor.placementElevation);
+  const hydrated = hydrateEditorHistoryState(shapes, history, document.history.index, "unlimited", notes, placementWorkplane);
   if (hydrated.entries.length !== history.length || hydrated.index !== document.history.index) throw new Error("Undo history could not be restored without data loss");
   return {
     sourceProjectId: document.metadata.projectId,
@@ -1467,7 +1473,12 @@ function migrateV0(raw: Record<string, unknown>): LylRestoredProject {
   shapes.forEach((shape, index) => validateLegacyRuntimeShape(shape, `shapes[${index}]`));
   const historyRaw = Array.isArray(raw.history) ? raw.history as EditorHistoryEntry[] : undefined;
   const requestedIndex = typeof raw.historyIndex === "number" ? raw.historyIndex : undefined;
-  const hydrated = hydrateEditorHistoryState(shapes.map(canonicalizeShape), historyRaw, requestedIndex);
+  const placementElevation = typeof raw.placementElevation === "number" && Number.isFinite(raw.placementElevation) ? raw.placementElevation : 0;
+  const placementWorkplane = normalizePlacementWorkplane(
+    raw.placementWorkplane,
+    placementElevation,
+  );
+  const hydrated = hydrateEditorHistoryState(shapes.map(canonicalizeShape), historyRaw, requestedIndex, "unlimited", [], placementWorkplane);
   const now = Date.now();
   return {
     sourceProjectId: typeof project.id === "string" ? project.id : undefined,
@@ -1480,11 +1491,8 @@ function migrateV0(raw: Record<string, unknown>): LylRestoredProject {
     assets: [],
     workspace: normalizeWorkspaceSettings(raw.workspace),
     snapGrid: normalizeSnapGrid(raw.snapGrid),
-    placementElevation: typeof raw.placementElevation === "number" && Number.isFinite(raw.placementElevation) ? raw.placementElevation : 0,
-    placementWorkplane: normalizePlacementWorkplane(
-      raw.placementWorkplane,
-      typeof raw.placementElevation === "number" && Number.isFinite(raw.placementElevation) ? raw.placementElevation : 0,
-    ),
+    placementElevation,
+    placementWorkplane,
     sketchPlacementWorkplane: normalizePlacementWorkplane(raw.sketchPlacementWorkplane),
     migratedFromVersion: 0,
   };

@@ -108,7 +108,7 @@ import {
 } from "@/lib/cadModifierRuntime";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, restoreShapeBeforeEdgeTreatment } from "@/lib/edgeTreatmentHistory";
-import { appendEditorHistorySnapshot, boundedEditorHistoryState, editorHistoryEntry, editorHistoryForExport, hydrateEditorHistoryState, notesForHistoryIndex, projectSceneFingerprint, projectShapesFingerprint, type EditorHistoryEntry, type EditorHistoryExportLimit, type EditorHistoryState } from "@/lib/editorHistory";
+import { appendEditorHistorySnapshot, boundedEditorHistoryState, editorHistoryEntry, editorHistoryForExport, hydrateEditorHistoryState, notesForHistoryIndex, projectSceneFingerprint, projectShapesFingerprint, workplaneForHistoryIndex, type EditorHistoryEntry, type EditorHistoryExportLimit, type EditorHistoryState } from "@/lib/editorHistory";
 import { snapShapeFootprintToVisibleGrid, visibleGridStep } from "@/lib/gridSnap";
 import { composedShapeRotation, geometryRotationDegreesForShortcut, geometryRotationDelta, rotatedGeometryShapePatch } from "@/lib/geometryRotation";
 import { createLocalId } from "@/lib/localIds";
@@ -138,13 +138,14 @@ import {
   normalizePlacementWorkplane,
   placementPatchForNewShape,
   placementWorkplaneCoordinates,
+  placementWorkplaneFingerprint,
   placementWorkplaneFromSurface,
   placementWorkplaneIsBase,
   translationToWorkplane,
   type PlacementPoint,
   type PlacementWorkplane,
 } from "@/lib/placementWorkplane";
-import { placeSketchExtrusion } from "@/lib/sketchPlacement";
+import { placeSketchExtrusion, placeSketchShape } from "@/lib/sketchPlacement";
 import {
   LAYERLING_MCP_HEARTBEAT_MS,
   LAYERLING_MCP_POLL_RETRY_MS,
@@ -5831,6 +5832,7 @@ export function LayerlingEditor({
   if (initialSceneRef.current === null) {
     initialSceneRef.current = initialShapes.map(canonicalizeShape);
   }
+  const initialNormalizedWorkplane = normalizePlacementWorkplane(initialPlacementWorkplane, initialPlacementElevation);
   const initialHistoryStateRef = useRef<EditorHistoryState | null>(null);
   if (initialHistoryStateRef.current === null) {
     initialHistoryStateRef.current = hydrateEditorHistoryState(
@@ -5839,6 +5841,7 @@ export function LayerlingEditor({
       initialHistoryIndex,
       normalizeWorkspaceSettings(initialWorkspace).historyLimit,
       notesForHistoryIndex(initialHistory, initialHistoryIndex),
+      initialNormalizedWorkplane,
     );
   }
   const [shapes, setShapes] = useState<WorkplaneShape[]>(() => initialSceneRef.current as WorkplaneShape[]);
@@ -5853,10 +5856,17 @@ export function LayerlingEditor({
   const [systemClipboardSupported, setSystemClipboardSupported] = useState(false);
   const [history, setHistory] = useState<EditorHistoryEntry[]>(() => (initialHistoryStateRef.current as EditorHistoryState).entries);
   const [historyIndex, setHistoryIndex] = useState(() => (initialHistoryStateRef.current as EditorHistoryState).index);
-  const [placementElevation, setPlacementElevation] = useState(() => Number.isFinite(initialPlacementElevation) ? initialPlacementElevation : 0);
   const [placementWorkplane, setPlacementWorkplane] = useState<PlacementWorkplane>(
-    () => normalizePlacementWorkplane(initialPlacementWorkplane, initialPlacementElevation),
+    () => workplaneForHistoryIndex(initialHistory, initialHistoryIndex, initialNormalizedWorkplane) ?? initialNormalizedWorkplane,
   );
+  const [placementElevation, setPlacementElevation] = useState(() => {
+    const resolved = workplaneForHistoryIndex(initialHistory, initialHistoryIndex, initialNormalizedWorkplane) ?? initialNormalizedWorkplane;
+    return Math.abs(resolved.normal.x) < 1e-6
+      && Math.abs(resolved.normal.y - 1) < 1e-6
+      && Math.abs(resolved.normal.z) < 1e-6
+      ? resolved.origin.y
+      : Number.isFinite(initialPlacementElevation) ? initialPlacementElevation : 0;
+  });
   const [workspaceSettings, setWorkspaceSettings] = useState<WorkplaneWorkspaceSettings>(() => normalizeWorkspaceSettings(initialWorkspace));
   const [snapGrid, setSnapGrid] = useState<GridSize>(() => normalizeSnapGrid(initialSnap));
   const [workplaneMode, setWorkplaneMode] = useState(false);
@@ -6591,8 +6601,13 @@ export function LayerlingEditor({
   }, []);
 
   const appendHistorySnapshot = useCallback(
-    (nextShapes: WorkplaneShape[], nextSelection: string[], nextNotes: WorkplaneNote[] = notesRef.current) =>
-      appendHistoryEntry(editorHistoryEntry(nextShapes, nextSelection, nextNotes)),
+    (
+      nextShapes: WorkplaneShape[],
+      nextSelection: string[],
+      nextNotes: WorkplaneNote[] = notesRef.current,
+      nextWorkplane: PlacementWorkplane = placementWorkplaneRef.current,
+    ) =>
+      appendHistoryEntry(editorHistoryEntry(nextShapes, nextSelection, nextNotes, nextWorkplane)),
     [appendHistoryEntry],
   );
 
@@ -6605,7 +6620,7 @@ export function LayerlingEditor({
       return;
     }
 
-    const entry = editorHistoryEntry(shapesRef.current, selectedIdsRef.current, notesRef.current);
+    const entry = editorHistoryEntry(shapesRef.current, selectedIdsRef.current, notesRef.current, placementWorkplaneRef.current);
     if (!startFingerprint || startFingerprint === entry.fingerprint) {
       return;
     }
@@ -6631,7 +6646,7 @@ export function LayerlingEditor({
           finalizeInteractionHistory();
         }
         if (!projectInteractionActiveRef.current) {
-          interactionHistoryStartRef.current = projectSceneFingerprint(shapesRef.current, notesRef.current);
+          interactionHistoryStartRef.current = projectSceneFingerprint(shapesRef.current, notesRef.current, placementWorkplaneRef.current);
           interactionHistoryChangedRef.current = false;
         }
         projectInteractionActiveRef.current = true;
@@ -6727,7 +6742,7 @@ export function LayerlingEditor({
       const normalized = normalizeNotes(next);
       notesRef.current = normalized;
       setNotes(normalized);
-      const changed = appendHistoryEntry(editorHistoryEntry(shapesRef.current, selectedIdsRef.current, normalized));
+      const changed = appendHistoryEntry(editorHistoryEntry(shapesRef.current, selectedIdsRef.current, normalized, placementWorkplaneRef.current));
       if (message) setNotice(message);
       // Der Abgleich mit dem Projektspeicher vergleicht Koerper. Eine Notiz
       // aendert daran nichts, also muss er hier ausdruecklich laufen.
@@ -6942,6 +6957,20 @@ export function LayerlingEditor({
         .addScaledVector(normal, -selectedShape.height / 2)
         .addScaledVector(xAxis, -profileCenterX)
         .addScaledVector(zAxis, -profileCenterZ);
+      editWorkplane = placementWorkplaneFromSurface(
+        { x: origin.x, y: origin.y, z: origin.z },
+        { x: normal.x, y: normal.y, z: normal.z },
+        { x: xAxis.x, y: xAxis.y, z: xAxis.z },
+      );
+    } else if (operation === "revolve") {
+      const quaternion = quaternionForShape(selectedShape);
+      const normal = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).normalize();
+      const xAxis = new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize();
+      const origin = new THREE.Vector3(
+        selectedShape.x,
+        (selectedShape.elevation ?? 0) + selectedShape.height / 2,
+        selectedShape.z,
+      ).addScaledVector(normal, -selectedShape.height / 2);
       editWorkplane = placementWorkplaneFromSurface(
         { x: origin.x, y: origin.y, z: origin.z },
         { x: normal.x, y: normal.y, z: normal.z },
@@ -7371,11 +7400,13 @@ export function LayerlingEditor({
     let resolved: WorkplaneShape | null;
     try {
       if (sketchOperation === "revolve") {
-        resolved = await shapeFromRevolvedSketchProfile(sketchProfile, sketchRevolveSettings, existing);
+        setNotice(t("status.buildingSketch"), true);
+        const revolved = await shapeFromRevolvedSketchProfile(sketchProfile, sketchRevolveSettings, existing);
+        resolved = placeSketchShape(revolved, activeSketchWorkplane, existing);
       } else {
         setNotice(t("status.buildingSketch"), true);
         const extrusion = await cadShapeFromSketchProfile(sketchProfile, height, existing);
-        resolved = placeSketchExtrusion(extrusion, activeSketchWorkplane, existing);
+        resolved = placeSketchShape(extrusion, activeSketchWorkplane, existing);
       }
     } catch (error) {
       setNotice(error instanceof Error ? error.message : `The sketch profile cannot be ${sketchOperation === "revolve" ? "revolved" : "extruded"} to 3D`);
@@ -7714,14 +7745,24 @@ export function LayerlingEditor({
     const nextShapes = (entry?.shapes ?? []).map(canonicalizeShape);
     const nextSelection = (entry?.selectedIds ?? []).filter((id) => nextShapes.some((shape) => shape.id === id));
     const nextNotes = normalizeNotes(entry?.notes);
+    const nextWorkplane = normalizePlacementWorkplane(entry?.placementWorkplane);
+    const nextElevation = Math.abs(nextWorkplane.normal.x) < 1e-6
+      && Math.abs(nextWorkplane.normal.y - 1) < 1e-6
+      && Math.abs(nextWorkplane.normal.z) < 1e-6
+      ? nextWorkplane.origin.y
+      : 0;
     historyIndexRef.current = nextIndex;
     shapesRef.current = nextShapes;
     selectedIdsRef.current = nextSelection;
     notesRef.current = nextNotes;
+    placementWorkplaneRef.current = nextWorkplane;
+    placementElevationRef.current = nextElevation;
     setHistoryIndex(nextIndex);
     setShapes(nextShapes);
     setNotes(nextNotes);
     setSelectedIds(nextSelection);
+    setPlacementWorkplane(nextWorkplane);
+    setPlacementElevation(nextElevation);
     syncProjectShapes(nextShapes);
     setNotice(modifierCancelled ? t("status.edgeCancelledUndo") : t("status.undo"));
   }, [invalidateCadModifierSession, syncProjectShapes]);
@@ -7743,14 +7784,24 @@ export function LayerlingEditor({
     const nextShapes = (entry?.shapes ?? []).map(canonicalizeShape);
     const nextSelection = (entry?.selectedIds ?? []).filter((id) => nextShapes.some((shape) => shape.id === id));
     const nextNotes = normalizeNotes(entry?.notes);
+    const nextWorkplane = normalizePlacementWorkplane(entry?.placementWorkplane);
+    const nextElevation = Math.abs(nextWorkplane.normal.x) < 1e-6
+      && Math.abs(nextWorkplane.normal.y - 1) < 1e-6
+      && Math.abs(nextWorkplane.normal.z) < 1e-6
+      ? nextWorkplane.origin.y
+      : 0;
     historyIndexRef.current = nextIndex;
     shapesRef.current = nextShapes;
     selectedIdsRef.current = nextSelection;
     notesRef.current = nextNotes;
+    placementWorkplaneRef.current = nextWorkplane;
+    placementElevationRef.current = nextElevation;
     setHistoryIndex(nextIndex);
     setShapes(nextShapes);
     setNotes(nextNotes);
     setSelectedIds(nextSelection);
+    setPlacementWorkplane(nextWorkplane);
+    setPlacementElevation(nextElevation);
     syncProjectShapes(nextShapes);
     setNotice(modifierCancelled ? t("status.edgeCancelledRedo") : t("status.redo"));
   }, [invalidateCadModifierSession, syncProjectShapes]);
@@ -8474,18 +8525,25 @@ export function LayerlingEditor({
   }, []);
 
   const setActivePlacementWorkplane = useCallback((next: PlacementWorkplane, source: "shape" | "base") => {
-    placementWorkplaneRef.current = next;
-    setPlacementWorkplane(next);
-    const horizontalElevation = Math.abs(next.normal.x) < 1e-6
-      && Math.abs(next.normal.y - 1) < 1e-6
-      && Math.abs(next.normal.z) < 1e-6
-      ? next.origin.y
+    const previous = placementWorkplaneRef.current;
+    const normalizedNext = normalizePlacementWorkplane(next);
+    placementWorkplaneRef.current = normalizedNext;
+    setPlacementWorkplane(normalizedNext);
+    const horizontalElevation = Math.abs(normalizedNext.normal.x) < 1e-6
+      && Math.abs(normalizedNext.normal.y - 1) < 1e-6
+      && Math.abs(normalizedNext.normal.z) < 1e-6
+      ? normalizedNext.origin.y
       : 0;
+    placementElevationRef.current = horizontalElevation;
     setPlacementElevation(horizontalElevation);
+    if (placementWorkplaneFingerprint(normalizedNext) !== placementWorkplaneFingerprint(previous)) {
+      appendHistoryEntry(editorHistoryEntry(shapesRef.current, selectedIdsRef.current, notesRef.current, normalizedNext));
+      syncProjectShapes(shapesRef.current, true);
+    }
     setNotice(source === "shape"
       ? t("status.workplaneFromFace")
-      : placementWorkplaneIsBase(next) ? t("status.workplaneReset") : t("status.workplaneUpdated"));
-  }, []);
+      : placementWorkplaneIsBase(normalizedNext) ? t("status.workplaneReset") : t("status.workplaneUpdated"));
+  }, [appendHistoryEntry, syncProjectShapes]);
 
   const setViewportPlacementWorkplane = useCallback((next: PlacementWorkplane, source: "shape" | "base") => {
     setActivePlacementWorkplane(next, source);

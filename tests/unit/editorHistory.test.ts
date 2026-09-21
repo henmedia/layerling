@@ -154,6 +154,29 @@ describe("editor history snapshots", () => {
     expect(branch.entries.at(-1)?.shapes[0].x).toBe(5);
   });
 
+  it("records placement workplane changes in history fingerprints and snapshots", () => {
+    const baseEntry = editorHistoryEntry([box()], []);
+    const elevatedEntry = editorHistoryEntry(
+      [box()],
+      [],
+      [],
+      {
+        origin: { x: 0, y: 25, z: 0 },
+        normal: { x: 0, y: 1, z: 0 },
+        xAxis: { x: 1, y: 0, z: 0 },
+        yAxis: { x: 0, y: 0, z: -1 },
+      },
+    );
+
+    expect(elevatedEntry.fingerprint).not.toBe(baseEntry.fingerprint);
+    expect(elevatedEntry.placementWorkplane?.origin.y).toBe(25);
+
+    const snapshot = appendEditorHistorySnapshot([baseEntry], 0, elevatedEntry);
+    expect(snapshot.changed).toBe(true);
+    expect(snapshot.entries).toHaveLength(2);
+    expect(snapshot.entries[1].placementWorkplane?.origin.y).toBe(25);
+  });
+
   it("restores a persisted undo and redo stack at its saved index", () => {
     const entries = [0, 5, 10].map((x) => editorHistoryEntry([box({ x })], []));
     const restored = hydrateEditorHistoryState([box({ x: 5 })], entries, 1);

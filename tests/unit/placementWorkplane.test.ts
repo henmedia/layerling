@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   horizontalPlacementWorkplane,
+  normalizePlacementWorkplane,
   placementPatchForNewShape,
   placementWorkplaneCoordinates,
+  placementWorkplaneFingerprint,
   placementWorkplaneFromSurface,
   placementWorkplanePoint,
   snapPlacementWorkplaneOrigin,
@@ -106,5 +108,20 @@ describe("placement workplanes", () => {
     ]);
 
     expect(translation).toEqual({ x: 0, y: -5, z: 0 });
+  });
+
+  it("normalizes malformed workplane descriptors to horizontal base fallback", () => {
+    expect(normalizePlacementWorkplane(null, 15).origin.y).toBe(15);
+    expect(normalizePlacementWorkplane({}, 8).origin.y).toBe(8);
+    expect(normalizePlacementWorkplane({ origin: { x: 0, y: "bad", z: 0 } }, 4).origin.y).toBe(4);
+  });
+
+  it("produces consistent fingerprints and distinguishes different workplanes", () => {
+    const planeA = horizontalPlacementWorkplane(0);
+    const planeB = horizontalPlacementWorkplane(10);
+    const planeC = horizontalPlacementWorkplane(0);
+
+    expect(placementWorkplaneFingerprint(planeA)).toBe(placementWorkplaneFingerprint(planeC));
+    expect(placementWorkplaneFingerprint(planeA)).not.toBe(placementWorkplaneFingerprint(planeB));
   });
 });

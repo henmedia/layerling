@@ -1,6 +1,12 @@
 import type { WorkplaneNote, WorkplaneShape } from "@/types/layerling";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import { normalizeNotes, notesSignature } from "@/lib/workplaneNotes";
+import {
+  normalizePlacementWorkplane,
+  placementWorkplaneFingerprint,
+  placementWorkplaneIsBase,
+  type PlacementWorkplane,
+} from "@/lib/placementWorkplane";
 
 export const MAX_EDITOR_HISTORY_ENTRIES = 5000;
 export type EditorHistoryExportLimit = "unlimited" | number;
@@ -14,6 +20,11 @@ export type EditorHistoryEntry = {
    * traegt - Projektspeicher, Paketformat -, sie ohne Zutun mittraegt.
    */
   notes?: WorkplaneNote[];
+  /**
+   * Die Arbeitsebene dieses Standes, damit auch das Setzen oder Zuruecksetzen
+   * einer Arbeitsebene rueckgaengig gemacht werden kann.
+   */
+  placementWorkplane?: PlacementWorkplane;
   fingerprint: string;
   estimatedBytes: number;
 };
@@ -245,26 +256,40 @@ export function projectShapesFingerprint(shapes: WorkplaneShape[]) {
   return serializedSceneSignature(shapes).fingerprint;
 }
 
-/** Koerper und Notizen in einem Fingerabdruck - ein Stand ist beides. */
-function sceneFingerprint(shapeFingerprint: string, notes: WorkplaneNote[]) {
+/** Koerper, Notizen und Arbeitsebene in einem Fingerabdruck - ein Stand ist alles zusammen. */
+function sceneFingerprint(shapeFingerprint: string, notes: WorkplaneNote[], workplane?: PlacementWorkplane) {
   const text = notesSignature(notes);
-  return text ? `${shapeFingerprint}#${signatureFromSerialized(text).fingerprint}` : shapeFingerprint;
+  const base = text ? `${shapeFingerprint}#${signatureFromSerialized(text).fingerprint}` : shapeFingerprint;
+  if (!workplane || placementWorkplaneIsBase(workplane)) {
+    return base;
+  }
+  return `${base}@${placementWorkplaneFingerprint(workplane)}`;
 }
 
 /**
  * Der Fingerabdruck dessen, was in einem Entwurf steht. Wer nur wissen will, ob
  * sich die Koerper geaendert haben, nimmt `projectShapesFingerprint`; wer
  * entscheidet, **ob gespeichert werden muss**, nimmt diesen hier - eine getippte
- * Notiz ist eine Aenderung.
+ * Notiz oder gewechselte Arbeitsebene ist eine Aenderung.
  */
-export function projectSceneFingerprint(shapes: WorkplaneShape[], notes: WorkplaneNote[] = []) {
-  return sceneFingerprint(projectShapesFingerprint(shapes), normalizeNotes(notes));
+export function projectSceneFingerprint(shapes: WorkplaneShape[], notes: WorkplaneNote[] = [], workplane?: PlacementWorkplane) {
+  return sceneFingerprint(
+    projectShapesFingerprint(shapes),
+    normalizeNotes(notes),
+    workplane ? normalizePlacementWorkplane(workplane) : undefined,
+  );
 }
 
-export function editorHistoryEntry(shapes: WorkplaneShape[], selectedIds: string[], notes: WorkplaneNote[] = []): EditorHistoryEntry {
+export function editorHistoryEntry(
+  shapes: WorkplaneShape[],
+  selectedIds: string[],
+  notes: WorkplaneNote[] = [],
+  workplane?: PlacementWorkplane,
+): EditorHistoryEntry {
   const canonicalShapes = shapes.map(canonicalizeShape);
   const validSelection = selectedIds.filter((id, index) => selectedIds.indexOf(id) === index && canonicalShapes.some((shape) => shape.id === id));
   const canonicalNotes = normalizeNotes(notes);
+  const normalizedWorkplane = workplane ? normalizePlacementWorkplane(workplane) : undefined;
   const signature = serializedSceneSignature(canonicalShapes);
   // Die Notizen gehen in den Fingerabdruck ein, sonst haelt das Paketformat
   // zwei Staende, die sich nur in einer Notiz unterscheiden, fuer denselben und
@@ -273,10 +298,13 @@ export function editorHistoryEntry(shapes: WorkplaneShape[], selectedIds: string
   const entry: EditorHistoryEntry = {
     shapes: canonicalShapes,
     selectedIds: validSelection,
-    fingerprint: sceneFingerprint(signature.fingerprint, canonicalNotes),
-    estimatedBytes: signature.estimatedBytes + noteText.length * 2,
+    fingerprint: sceneFingerprint(signature.fingerprint, canonicalNotes, normalizedWorkplane),
+    estimatedBytes: signature.estimatedBytes + noteText.length * 2 + (normalizedWorkplane ? 96 : 0),
   };
   if (canonicalNotes.length > 0) entry.notes = canonicalNotes;
+  if (normalizedWorkplane && !placementWorkplaneIsBase(normalizedWorkplane)) {
+    entry.placementWorkplane = normalizedWorkplane;
+  }
   return entry;
 }
 
@@ -291,6 +319,20 @@ export function notesForHistoryIndex(entries: EditorHistoryEntry[] | undefined, 
   if (!Array.isArray(entries) || entries.length === 0) return [];
   const bounded = Number.isInteger(index) ? Math.min(Math.max(0, index as number), entries.length - 1) : entries.length - 1;
   return normalizeNotes(entries[bounded]?.notes);
+}
+
+/**
+ * Die Arbeitsebene des Standes, auf den ein Verlauf gerade zeigt.
+ */
+export function workplaneForHistoryIndex(
+  entries: EditorHistoryEntry[] | undefined,
+  index: number | undefined,
+  fallback?: PlacementWorkplane,
+): PlacementWorkplane | undefined {
+  if (!Array.isArray(entries) || entries.length === 0) return fallback;
+  const bounded = Number.isInteger(index) ? Math.min(Math.max(0, index as number), entries.length - 1) : entries.length - 1;
+  const found = entries[bounded]?.placementWorkplane;
+  return found ? normalizePlacementWorkplane(found) : fallback;
 }
 
 export function boundedEditorHistory(entries: EditorHistoryEntry[], limit: EditorHistoryExportLimit = "unlimited") {
@@ -343,8 +385,9 @@ export function hydrateEditorHistoryState(
   requestedIndex: number | undefined,
   limit: EditorHistoryExportLimit = "unlimited",
   currentNotes: WorkplaneNote[] = [],
+  currentWorkplane?: PlacementWorkplane,
 ): EditorHistoryState {
-  const fallback = editorHistoryEntry(currentShapes, [], currentNotes);
+  const fallback = editorHistoryEntry(currentShapes, [], currentNotes, currentWorkplane);
   if (!Array.isArray(storedEntries) || storedEntries.length === 0) {
     return { entries: [fallback], index: 0 };
   }
@@ -355,6 +398,7 @@ export function hydrateEditorHistoryState(
         Array.isArray(entry?.shapes) ? entry.shapes : [],
         Array.isArray(entry?.selectedIds) ? entry.selectedIds.filter((id): id is string => typeof id === "string") : [],
         normalizeNotes(entry?.notes),
+        entry?.placementWorkplane ?? currentWorkplane,
       ),
     );
     const index = Number.isInteger(requestedIndex)
