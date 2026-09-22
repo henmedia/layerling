@@ -56,6 +56,35 @@ self.onmessage = async (event: MessageEvent<SketchCadBuildRequest>) => {
   try {
     cad = await kernel();
     cad.releaseAll();
+    if (request.type === "sweep") {
+      if (request.points.length < 2) throw new Error("A bend needs at least two points");
+      // Connecting the control points with plain straight spine segments and
+      // sweeping the whole thing in Frenet mode (a profile that stays
+      // genuinely perpendicular to the spine at every point) is the simple,
+      // reliable combination: it keeps a uniform, correctly round cross-
+      // section on every bend actually reachable through the turtle-style
+      // panel (up to 179 degrees per segment). pipe() is a fallback for the
+      // rare topology OpenCascade's own smooth mode can't resolve - it
+      // still closes the solid, just with a visibly mitred corner there
+      // instead of a rounded one.
+      const buildSpine = () => cad!.makeWire(request.points.slice(1).map((point, index) => cad!.makeLineEdge(request.points[index], point)));
+      const buildProfile = () => cad!.makeWire([cad!.makeCircleEdge(request.points[0], { x: 0, y: 1, z: 0 }, Math.max(0.05, request.radius))]);
+      let result: ShapeHandle;
+      try {
+        result = cad.sweepPipeShell(buildProfile(), buildSpine(), true, true);
+        if (!cad.isValid(result)) throw new Error("invalid topology from smooth sweep");
+      } catch {
+        result = cad.pipe(buildProfile(), buildSpine());
+        if (!cad.isValid(result)) throw new Error("OpenCascade produced invalid sweep topology");
+      }
+      const mesh = cad.tessellate(result, { linearDeflection: SKETCH_CAD_DEFLECTION.linear, angularDeflection: SKETCH_CAD_DEFLECTION.angular });
+      const positions = new Float32Array(mesh.positions);
+      const normals = new Float32Array(mesh.normals);
+      const indices = new Uint32Array(mesh.indices);
+      const brep = cad.toBREP(result);
+      post({ type: "swept", requestId: request.requestId, positions, normals, indices, triangleCount: mesh.triangleCount, brep }, [positions.buffer, normals.buffer, indices.buffer]);
+      return;
+    }
     const regions = cadSketchRegions(request.profile);
     if (regions.length === 0) throw new Error("No closed profile found. Draw at least one closed loop and ensure it has no degenerate (zero-area) geometry.");
     const solids: ShapeHandle[] = regions.map((region) => {

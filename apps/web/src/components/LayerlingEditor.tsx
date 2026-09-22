@@ -23,11 +23,6 @@ import { manifoldModuleSource } from "@/generated/manifoldModuleSource";
 import { manifoldWasmBase64 } from "@/generated/manifoldWasmBase64";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { createGearGeometry } from "@/lib/gearGeometry";
-import { createStarGeometry } from "@/lib/starGeometry";
-import { createHeartGeometry } from "@/lib/heartGeometry";
-import { createCrescentGeometry } from "@/lib/crescentGeometry";
-import { createSlotGeometry } from "@/lib/slotGeometry";
-import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
 import { createPrismGeometry } from "@/lib/prismGeometry";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { roundSideCount } from "@/lib/roundSideCount";
@@ -95,12 +90,11 @@ import {
   shapeTaperScaleAt,
   shapeWidth,
   shapeWithParametricSource,
-  patchTouchesBodyParameters,
   withHoleMode,
   workplaneShapesEqual,
 } from "@/lib/workplaneShapes";
 import { workplaneCenteringOffset } from "@/lib/workplaneCentering";
-import { bakeCadMetadataForShapeTransform, cadBrepTransformForShape, cadModifierPrimitiveForAnalyticBox, cadModifierPrimitiveForAnalyticShape, cadModifierPrimitiveForBakedShape } from "@/lib/cadBakeMetadata";
+import { bakeCadMetadataForShapeTransform, cadBrepTransformForShape, cadModifierPrimitiveForAnalyticBox, cadModifierPrimitiveForBakedShape } from "@/lib/cadBakeMetadata";
 import { hasOneToOneCadComponentMapping } from "@/lib/cadModifierGroups";
 import {
   CAD_MODIFIER_MAX_SHARP_ANGLE,
@@ -108,7 +102,6 @@ import {
   CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT,
   cadModifierPrepareTimeoutMs,
   cadModifierTimeoutMessage,
-  cadModifierUserErrorMessage,
   cadModifierWorkerFailureMessage,
   cadModifierCandidateEdge,
   defaultCadModifierTangentChain,
@@ -181,7 +174,7 @@ type ToolbarMode = "geometry" | "sketch";
 type Vec3 = [number, number, number];
 type MeshData = { name: string; vertices: Vec3[]; faces: [number, number, number][] };
 type Cuboid = { minX: number; maxX: number; minY: number; maxY: number; minZ: number; maxZ: number };
-type ShapeUpdatePatch = Partial<WorkplaneShape> & { bakeTransform?: boolean };
+type ShapeUpdatePatch = Partial<WorkplaneShape> & { bakeTransform?: boolean; finalizeSweepSetPath?: boolean; pendingSweepFullPath?: { x: number; y: number; z: number }[] };
 type WithoutRequestId<T> = T extends unknown ? Omit<T, "requestId"> : never;
 type CadModifierWorkerPayload = WithoutRequestId<CadModifierWorkerRequest>;
 type CadPreviewPayload = Extract<CadModifierWorkerPayload, { type: "preview" }>;
@@ -671,6 +664,61 @@ async function cadShapeFromSketchProfile(profile: SketchProfile, height: number,
   const shape = shapeFromCadMesh(source, response.positions, response.normals, response.indices, response.brep, SKETCH_CAD_DEFLECTION);
   if (!shape) throw new Error("OpenCascade returned an empty sketch solid");
   return { ...shape, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const };
+}
+
+/**
+ * Sweeps a bend's control-point path into a solid, round tube of the given
+ * radius - the geometry behind the turtle-style Bend panel. See the worker's
+ * own comment for why the spine stays plain straight segments and the sweep
+ * stays in Frenet mode rather than something more elaborate: it is the
+ * simple combination that reliably stays round on every bend the panel can
+ * actually produce.
+ */
+async function shapeFromSweptPath(radius: number, points: { x: number; y: number; z: number }[], existing: WorkplaneShape) {
+  const worker = ensureSketchCadWorker();
+  const requestId = ++sketchCadRequestId;
+  const response = await new Promise<SketchCadBuildResponse>((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      sketchCadPending.delete(requestId);
+      reject(new Error("OpenCascade timed out while sweeping the bend"));
+    }, 30_000);
+    sketchCadPending.set(requestId, { resolve, reject, timer });
+    worker.postMessage({ type: "sweep", requestId, points, radius });
+  });
+  if (response.type === "error") throw new Error(response.message);
+  if (response.type !== "swept") throw new Error("Unexpected sweep response");
+  let minY = Number.POSITIVE_INFINITY;
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let minZ = Number.POSITIVE_INFINITY;
+  let maxZ = Number.NEGATIVE_INFINITY;
+  for (let index = 0; index < response.positions.length; index += 3) {
+    minX = Math.min(minX, response.positions[index]);
+    minY = Math.min(minY, response.positions[index + 1]);
+    minZ = Math.min(minZ, response.positions[index + 2]);
+    maxX = Math.max(maxX, response.positions[index]);
+    maxZ = Math.max(maxZ, response.positions[index + 2]);
+  }
+  const centerX = (minX + maxX) / 2;
+  const centerZ = (minZ + maxZ) / 2;
+  // The path is kept in the same local frame shapeFromCadMesh recenters the
+  // mesh into (X/Z centered on the bounding box, Y measured up from its
+  // floor), so a later re-bend can read back where each point in the
+  // already-committed tube actually sits.
+  const adjustedPath = points.map((point) => ({ x: point.x - centerX, y: point.y - minY, z: point.z - centerZ }));
+  const source = canonicalizeShape({
+    ...existing,
+    kind: "mesh" as const,
+    sketchProfile: undefined,
+    sketchOperation: undefined,
+    edgeTreatments: undefined,
+    edgeTreatmentHistory: undefined,
+    cadDisplayEdges: undefined,
+    cadDisplayEdgesVersion: undefined,
+  });
+  const shape = shapeFromCadMesh(source, response.positions, response.normals, response.indices, response.brep, SKETCH_CAD_DEFLECTION);
+  if (!shape) throw new Error("OpenCascade returned an empty swept solid");
+  return { shape: { ...shape, extrudeSweepPath: adjustedPath, extrudeSweepRadius: radius }, path: adjustedPath };
 }
 
 async function shapeFromRevolvedSketchProfile(
@@ -2344,45 +2392,6 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
     case "tube":
       geometry = createBooleanHollowCylinderGeometry(width, height, depth, shape.bevel ?? 4, roundSideCount(shape.sides, width, depth));
       break;
-    case "star":
-      geometry = createStarGeometry({
-        width,
-        depth,
-        height,
-        starPoints: shape.starPoints,
-        starInnerSize: shape.starInnerSize,
-        starOuterFillet: shape.starOuterFillet,
-        starInnerFillet: shape.starInnerFillet,
-        starQuality: shape.starQuality,
-      });
-      break;
-    case "heart":
-      geometry = createHeartGeometry({
-        width,
-        depth,
-        height,
-        heartTipFillet: shape.heartTipFillet,
-        heartQuality: shape.heartQuality,
-      });
-      break;
-    case "crescent":
-      geometry = createCrescentGeometry({
-        width,
-        depth,
-        height,
-        crescentThickness: shape.crescentThickness,
-        crescentTipFillet: shape.crescentTipFillet,
-        crescentQuality: shape.crescentQuality,
-      });
-      break;
-    case "slot":
-      geometry = createSlotGeometry({
-        width,
-        depth,
-        height,
-        sides: shape.sides,
-      });
-      break;
     case "gear":
       geometry = createGearGeometry({
         width,
@@ -2395,16 +2404,6 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gearType: shape.gearType,
         helixAngle: shape.helixAngle,
         helixQuality: shape.helixQuality,
-      });
-      break;
-    case "honeycomb":
-      geometry = createHoneycombGeometry({
-        width,
-        depth,
-        height,
-        honeycombCellSize: shape.honeycombCellSize,
-        honeycombWallThickness: shape.honeycombWallThickness,
-        honeycombFrameWidth: shape.honeycombFrameWidth,
       });
       break;
     case "thread":
@@ -2599,7 +2598,7 @@ function cadModifierPrimitiveForShape(shape: WorkplaneShape): CadModifierPrimiti
   // matches the viewport exactly.
   if (shapeHasShapeDeform(shape)) return null;
   return cadModifierPrimitiveForBakedShape(shape)
-    ?? cadModifierPrimitiveForAnalyticShape(shape);
+    ?? (shapeHasTransformToBake(shape) ? cadModifierPrimitiveForAnalyticBox(shape) : null);
 }
 
 /**
@@ -2679,15 +2678,16 @@ function rebuiltParametricShape(shape: WorkplaneShape, patch: Partial<WorkplaneS
     ...bauwerte,
   });
   const gebacken = canonicalizeShape(bakeShapeTransformIntoMesh(canonicalizeShape({ ...urform, ...gesamt })));
-  const targetX = patch.x ?? (drehtMit ? gebacken.x : shape.x);
-  const targetZ = patch.z ?? (drehtMit ? gebacken.z : shape.z);
-  const targetElevation = patch.elevation ?? (drehtMit ? gebacken.elevation : (shape.elevation ?? 0));
-  return canonicalizeShape({
-    ...gebacken,
-    x: targetX,
-    z: targetZ,
-    elevation: targetElevation,
-  });
+  // Wer nur einen Bauwert aendert, will den Koerper nicht verrueckt sehen.
+  // Wer dagegen dreht, bewegt ihn - dann gilt, was das Backen ausrechnet.
+  return drehtMit
+    ? gebacken
+    : canonicalizeShape({ ...gebacken, x: shape.x, z: shape.z, elevation: shape.elevation ?? 0 });
+}
+
+/** Aendert dieser Patch einen Bauwert des Koerpers - oder nur seinen Rahmen? */
+function patchTouchesBodyParameters(patch: Partial<WorkplaneShape>) {
+  return MCP_SHAPE_SETTING_KEYS.some((key) => key in patch);
 }
 
 function bakeShapeTransformIntoMesh(shape: WorkplaneShape): WorkplaneShape {
@@ -6048,6 +6048,23 @@ export function LayerlingEditor({
   const [sketchRevolvePreview, setSketchRevolvePreview] = useState<SketchRevolveMesh | null>(null);
   const sketchRevolvePreviewRequestRef = useRef(0);
   const sketchRevolveUpdateRequestRef = useRef(new Map<string, number>());
+  const sweepPreviewRequestCounterRef = useRef(0);
+  const sweepPreviewQueueRef = useRef(
+    createCadPreviewQueue<{ points: { x: number; y: number; z: number }[]; radius: number; shapeId: string; existing: WorkplaneShape }>((payload) => {
+      const requestId = ++sweepPreviewRequestCounterRef.current;
+      void shapeFromSweptPath(payload.radius, payload.points, payload.existing)
+        .then(({ shape: swept }) => {
+          sweepPreviewQueueRef.current.settle(requestId);
+          if (!shapesRef.current.some((shape) => shape.id === payload.shapeId)) return;
+          commitShapes(shapesRef.current.map((shape) => shape.id === payload.shapeId ? swept : shape), payload.shapeId, "Adjusted bend");
+        })
+        .catch((error) => {
+          sweepPreviewQueueRef.current.settle(requestId);
+          setNotice(error instanceof Error ? error.message : "Could not adjust this bend");
+        });
+      return requestId;
+    }),
+  );
   const sketchRevolveUpdateTimerRef = useRef(new Map<string, number>());
   const [sketchTool, setSketchTool] = useState<SketchTool>("line");
   const [sketchProfile, setSketchProfile] = useState<SketchProfile>(() => emptySketchProfile());
@@ -6234,10 +6251,10 @@ export function LayerlingEditor({
           cadModifierBaseFingerprintRef.current = "";
           cadModifierSourcePartsRef.current = [];
           setEdgeModifier(null);
-          setNotice(cadModifierUserErrorMessage(message.message) ?? message.message);
+          setNotice(message.message);
           return;
         }
-        setEdgeModifier((current) => current ? { ...current, busy: false, preview: null, error: cadModifierUserErrorMessage(message.message) ?? message.message } : current);
+        setEdgeModifier((current) => current ? { ...current, busy: false, preview: null, error: message.message } : current);
         // Ein zu grosser Radius scheitert - der inzwischen gewaehlte kleinere darf es trotzdem versuchen.
         if (cadPreviewQueueRef.current.settle(message.requestId).status !== "sent") {
           setNotice(t("status.edgeNeedsAdjustment"), true);
@@ -7673,6 +7690,15 @@ export function LayerlingEditor({
 
   const updateShape = useCallback(
     (id: string, patch: ShapeUpdatePatch) => {
+      if (patch.finalizeSweepSetPath) {
+        const source = shapesRef.current.find((shape) => shape.id === id);
+        const fullPath = patch.pendingSweepFullPath;
+        if (source && fullPath && fullPath.length >= 2) {
+          const radius = source.extrudeSweepRadius ?? shapeWidth(source) / 2;
+          sweepPreviewQueueRef.current.request({ points: fullPath, radius, shapeId: id, existing: source });
+        }
+        return;
+      }
       const bakeTransform = Boolean(patch.bakeTransform);
       const cleanedPatch = cleanShapePatch(patch);
       if (cleanedPatch.sketchRevolve) {

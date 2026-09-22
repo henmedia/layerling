@@ -1,7 +1,6 @@
 export type ShapeKind =
   | "box"
   | "cylinder"
-  | "slot"
   | "ellipse"
   | "sphere"
   | "sketch"
@@ -14,11 +13,7 @@ export type ShapeKind =
   | "halfSphere"
   | "torus"
   | "tube"
-  | "star"
-  | "heart"
-  | "crescent"
   | "gear"
-  | "honeycomb"
   | "thread"
   | "spring"
   | "ring"
@@ -87,19 +82,6 @@ export type ShapeCustomization = {
   springTurns?: number;
   springWire?: number;
   springQuality?: number;
-  starPoints?: number;
-  starInnerSize?: number;
-  starOuterFillet?: number;
-  starInnerFillet?: number;
-  starQuality?: number;
-  heartTipFillet?: number;
-  heartQuality?: number;
-  crescentThickness?: number;
-  crescentTipFillet?: number;
-  crescentQuality?: number;
-  honeycombCellSize?: number;
-  honeycombWallThickness?: number;
-  honeycombFrameWidth?: number;
   text?: string;
   font?: string;
 };
@@ -264,13 +246,10 @@ export type ParametricSource = {
 };
 
 export type CadPrimitiveFrame = {
-  kind: "box" | "cylinder" | "cone";
+  kind: "box";
   width: number;
   depth: number;
   height: number;
-  radius?: number;
-  baseRadius?: number;
-  topRadius?: number;
   frame: CadBrepFrame;
 };
 
@@ -336,19 +315,6 @@ export type WorkplaneShape = {
   springTurns?: number;
   springWire?: number;
   springQuality?: number;
-  starPoints?: number;
-  starInnerSize?: number;
-  starOuterFillet?: number;
-  starInnerFillet?: number;
-  starQuality?: number;
-  heartTipFillet?: number;
-  heartQuality?: number;
-  crescentThickness?: number;
-  crescentTipFillet?: number;
-  crescentQuality?: number;
-  honeycombCellSize?: number;
-  honeycombWallThickness?: number;
-  honeycombFrameWidth?: number;
   text?: string;
   font?: string;
   importedMesh?: {
@@ -399,6 +365,8 @@ export type WorkplaneShape = {
   groupedBaseDepth?: number;
   groupedBaseHeight?: number;
   groupOperation?: "group" | "intersection";
+  extrudeSweepPath?: { x: number; y: number; z: number }[];
+  extrudeSweepRadius?: number;
   locked?: boolean;
   hidden?: boolean;
 };

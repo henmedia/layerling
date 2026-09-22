@@ -54,46 +54,6 @@ import {
   threadsPerInchToPitch,
   type ThreadSettings,
 } from "@/lib/threadGeometry";
-import {
-  DEFAULT_STAR_INNER_SIZE,
-  DEFAULT_STAR_INNER_FILLET,
-  DEFAULT_STAR_OUTER_FILLET,
-  DEFAULT_STAR_POINTS,
-  DEFAULT_STAR_QUALITY,
-  MIN_STAR_QUALITY,
-  MAX_STAR_QUALITY,
-  normalizeStarFillet,
-  normalizeStarInnerSize,
-  normalizeStarPoints,
-  normalizeStarQuality,
-  starMaxFilletRadii,
-} from "@/lib/starGeometry";
-import {
-  DEFAULT_HEART_TIP_FILLET,
-  DEFAULT_HEART_QUALITY,
-  MIN_HEART_QUALITY,
-  MAX_HEART_QUALITY,
-  normalizeHeartTipFillet,
-  normalizeHeartQuality,
-} from "@/lib/heartGeometry";
-import {
-  DEFAULT_CRESCENT_THICKNESS,
-  DEFAULT_CRESCENT_TIP_FILLET,
-  DEFAULT_CRESCENT_QUALITY,
-  MIN_CRESCENT_QUALITY,
-  MAX_CRESCENT_QUALITY,
-  normalizeCrescentThickness,
-  normalizeCrescentTipFillet,
-  normalizeCrescentQuality,
-} from "@/lib/crescentGeometry";
-import {
-  DEFAULT_HONEYCOMB_CELL_SIZE,
-  DEFAULT_HONEYCOMB_WALL_THICKNESS,
-  DEFAULT_HONEYCOMB_FRAME_WIDTH,
-  normalizeHoneycombCellSize,
-  normalizeHoneycombWallThickness,
-  normalizeHoneycombFrameWidth,
-} from "@/lib/honeycombGeometry";
 import { displayStepFromMillimeters, displayToMillimeters, formatMeasurementNumber, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -220,7 +180,13 @@ type SelectPropertyConfig = {
 
 type ShapePropertyConfig = RangePropertyConfig | TextPropertyConfig | SelectPropertyConfig | TogglePropertyConfig;
 export type ShapeInspectorUpdateOptions = { resizeAxis?: "width" | "depth" | "height" };
-type ShapeInspectorUpdate = (patch: Partial<WorkplaneShape>, options?: ShapeInspectorUpdateOptions) => void;
+type ShapeInspectorUpdate = (
+  patch: Partial<WorkplaneShape> & {
+    finalizeSweepSetPath?: boolean;
+    pendingSweepFullPath?: { x: number; y: number; z: number }[];
+  },
+  options?: ShapeInspectorUpdateOptions,
+) => void;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -232,7 +198,7 @@ function formatPropertyNumber(value: number, accuracy: MeasurementAccuracy, step
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "centerHole", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth"].includes(key);
+  return ["radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "centerHole", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire"].includes(key);
 }
 
 /**
@@ -345,197 +311,6 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     return [
       ...roundSideProperties(shape, width, depth, onUpdate),
       { id: "diameter", label: t("prop.diameter"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setCylinderDiameter },
-      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
-    ];
-  }
-
-  if (shape.kind === "star") {
-    const starPoints = shape.starPoints ?? DEFAULT_STAR_POINTS;
-    const starInnerSize = shape.starInnerSize ?? DEFAULT_STAR_INNER_SIZE;
-    const starOuterFillet = shape.starOuterFillet ?? DEFAULT_STAR_OUTER_FILLET;
-    const starInnerFillet = shape.starInnerFillet ?? DEFAULT_STAR_INNER_FILLET;
-    const starQuality = shape.starQuality ?? DEFAULT_STAR_QUALITY;
-    const maxLimits = starMaxFilletRadii(width, starInnerSize, starPoints);
-    const outerFilletMax = Math.max(1, Math.min(40, Math.ceil(maxLimits.maxOuterRadius * 10) / 10));
-    const innerFilletMax = Math.max(1, Math.min(40, Math.ceil(maxLimits.maxInnerRadius * 10) / 10));
-    const setStarOuterSize = (value: number) => {
-      onUpdate({ width: value, depth: value, size: value }, { resizeAxis: "width" });
-    };
-    return [
-      {
-        id: "starPoints",
-        label: t("prop.starPoints"),
-        value: starPoints,
-        min: 3,
-        max: 32,
-        step: 1,
-        onChange: (value) => onUpdate({ starPoints: Math.round(value) }),
-      },
-      {
-        id: "starOuterSize",
-        label: t("prop.starOuterSize"),
-        value: width,
-        min: Math.max(MIN_SHAPE_SIZE, starInnerSize + 0.1),
-        max: 160,
-        onChange: setStarOuterSize,
-      },
-      {
-        id: "starInnerSize",
-        label: t("prop.starInnerSize"),
-        value: starInnerSize,
-        min: 0.1,
-        max: Math.max(0.1, width - 0.1),
-        step: 0.1,
-        onChange: (value) => onUpdate({ starInnerSize: value }),
-      },
-      {
-        id: "starOuterFillet",
-        label: t("prop.starOuterFillet"),
-        value: starOuterFillet,
-        min: 0,
-        max: outerFilletMax,
-        step: 0.05,
-        onChange: (value) => onUpdate({ starOuterFillet: value }),
-      },
-      {
-        id: "starInnerFillet",
-        label: t("prop.starInnerFillet"),
-        value: starInnerFillet,
-        min: 0,
-        max: innerFilletMax,
-        step: 0.05,
-        onChange: (value) => onUpdate({ starInnerFillet: value }),
-      },
-      {
-        id: "starQuality",
-        label: t("prop.quality"),
-        value: starQuality,
-        min: MIN_STAR_QUALITY,
-        max: MAX_STAR_QUALITY,
-        step: 2,
-        onChange: (value) => onUpdate({ starQuality: normalizeStarQuality(value) }),
-      },
-      {
-        id: "height",
-        label: t("prop.height"),
-        value: shape.height,
-        min: MIN_SHAPE_SIZE,
-        max: 160,
-        onChange: setHeight,
-      },
-    ];
-  }
-
-  if (shape.kind === "heart") {
-    const heartTipFillet = shape.heartTipFillet ?? DEFAULT_HEART_TIP_FILLET;
-    const heartQuality = shape.heartQuality ?? DEFAULT_HEART_QUALITY;
-    return [
-      {
-        id: "heartTipFillet",
-        label: t("prop.heartTipFillet"),
-        value: heartTipFillet,
-        min: 0,
-        max: 20,
-        step: 0.1,
-        onChange: (value) => onUpdate({ heartTipFillet: normalizeHeartTipFillet(value) }),
-      },
-      {
-        id: "heartQuality",
-        label: t("prop.quality"),
-        value: heartQuality,
-        min: MIN_HEART_QUALITY,
-        max: MAX_HEART_QUALITY,
-        step: 2,
-        onChange: (value) => onUpdate({ heartQuality: normalizeHeartQuality(value) }),
-      },
-      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
-      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
-      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
-    ];
-  }
-
-  if (shape.kind === "crescent") {
-    const crescentThickness = shape.crescentThickness ?? DEFAULT_CRESCENT_THICKNESS;
-    const crescentTipFillet = shape.crescentTipFillet ?? DEFAULT_CRESCENT_TIP_FILLET;
-    const crescentQuality = shape.crescentQuality ?? DEFAULT_CRESCENT_QUALITY;
-    const maxThickness = Math.max(2, width * 0.85);
-    return [
-      {
-        id: "crescentThickness",
-        label: t("prop.crescentThickness"),
-        value: crescentThickness,
-        min: 1,
-        max: maxThickness,
-        step: 0.1,
-        onChange: (value) => onUpdate({ crescentThickness: normalizeCrescentThickness(value, width) }),
-      },
-      {
-        id: "crescentTipFillet",
-        label: t("prop.crescentTipFillet"),
-        value: crescentTipFillet,
-        min: 0,
-        max: 8,
-        step: 0.05,
-        onChange: (value) => onUpdate({ crescentTipFillet: normalizeCrescentTipFillet(value) }),
-      },
-      {
-        id: "crescentQuality",
-        label: t("prop.quality"),
-        value: crescentQuality,
-        min: MIN_CRESCENT_QUALITY,
-        max: MAX_CRESCENT_QUALITY,
-        step: 2,
-        onChange: (value) => onUpdate({ crescentQuality: normalizeCrescentQuality(value) }),
-      },
-      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
-      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
-      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
-    ];
-  }
-
-  if (shape.kind === "honeycomb") {
-    const honeycombCellSize = shape.honeycombCellSize ?? DEFAULT_HONEYCOMB_CELL_SIZE;
-    const honeycombWallThickness = shape.honeycombWallThickness ?? DEFAULT_HONEYCOMB_WALL_THICKNESS;
-    const honeycombFrameWidth = shape.honeycombFrameWidth ?? DEFAULT_HONEYCOMB_FRAME_WIDTH;
-    return [
-      {
-        id: "honeycombCellSize",
-        label: t("prop.honeycombCellSize"),
-        value: honeycombCellSize,
-        min: 3,
-        max: 25,
-        step: 0.5,
-        onChange: (value) => onUpdate({ honeycombCellSize: normalizeHoneycombCellSize(value) }),
-      },
-      {
-        id: "honeycombWallThickness",
-        label: t("prop.honeycombWallThickness"),
-        value: honeycombWallThickness,
-        min: 0.8,
-        max: 5,
-        step: 0.1,
-        onChange: (value) => onUpdate({ honeycombWallThickness: normalizeHoneycombWallThickness(value) }),
-      },
-      {
-        id: "honeycombFrameWidth",
-        label: t("prop.honeycombFrameWidth"),
-        value: honeycombFrameWidth,
-        min: 0,
-        max: 15,
-        step: 0.5,
-        onChange: (value) => onUpdate({ honeycombFrameWidth: normalizeHoneycombFrameWidth(value) }),
-      },
-      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 200, onChange: setDepth },
-      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 200, onChange: setWidth },
-      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
-    ];
-  }
-
-  if (shape.kind === "slot") {
-    return [
-      ...roundSideProperties(shape, Math.min(width, depth), Math.min(width, depth), onUpdate),
-      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
-      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
       { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
     ];
   }
@@ -1210,12 +985,79 @@ export function ShapeInspector({
   const [propertiesOpen, setPropertiesOpen] = useState(true);
   const [taperOpen, setTaperOpen] = useState(false);
   const [twistOpen, setTwistOpen] = useState(false);
+  const canAddSweepSegment = shape.kind === "cylinder" || (shape.kind === "mesh" && Boolean(shape.extrudeSweepPath?.length));
+  const [bendOpen, setBendOpen] = useState(true);
+  const [sweepLength, setSweepLength] = useState(0);
+  const [sweepBendAngle, setSweepBendAngle] = useState(0);
+  const [sweepBendRoll, setSweepBendRoll] = useState(0);
+  const sweepLengthRef = useRef(0);
+  const sweepBendAngleRef = useRef(0);
+  const sweepBendRollRef = useRef(0);
+  const sweepBasePathRef = useRef<{ x: number; y: number; z: number }[] | null>(null);
   const [gearTeethOpen, setGearTeethOpen] = useState(true);
   const [threadOpen, setThreadOpen] = useState(true);
   const [gearHelixOpen, setGearHelixOpen] = useState(true);
   const [colorOpen, setColorOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const customColorInputRef = useRef<HTMLInputElement>(null);
+
+  /*
+   * "Turtle" style: bend angle and roll are relative to the tube's current
+   * heading, not an absolute world direction, so "90°" always means a clean
+   * right-angle turn from wherever it is currently pointing. No debounce is
+   * needed here - LayerlingEditor's own sweep preview queue already keeps at
+   * most one bend computation in flight and at most one waiting, so every
+   * slider move can call onUpdate directly.
+   */
+  const scheduleLiveSweepUpdate = (length: number, bendAngleDeg: number, bendRollDeg: number) => {
+    if (!sweepBasePathRef.current) {
+      sweepBasePathRef.current = shape.extrudeSweepPath?.length ? shape.extrudeSweepPath : [{ x: 0, y: 0, z: 0 }];
+    }
+    const basePath = sweepBasePathRef.current;
+    if (!basePath || length <= 0) return;
+    const last = basePath[basePath.length - 1];
+    // A fresh cylinder has only its base point committed yet - its own
+    // vertical axis is the natural "currently facing" direction. Once a
+    // real segment exists, derive the heading from the last two points.
+    const forward = basePath.length >= 2
+      ? (() => {
+          const prev = basePath[basePath.length - 2];
+          const raw = { x: last.x - prev.x, y: last.y - prev.y, z: last.z - prev.z };
+          const len = Math.hypot(raw.x, raw.y, raw.z) || 1;
+          return { x: raw.x / len, y: raw.y / len, z: raw.z / len };
+        })()
+      : { x: 0, y: 1, z: 0 };
+    const referenceUp = Math.abs(forward.y) > 0.98 ? { x: 0, y: 0, z: 1 } : { x: 0, y: 1, z: 0 };
+    const rightRaw = {
+      x: forward.y * referenceUp.z - forward.z * referenceUp.y,
+      y: forward.z * referenceUp.x - forward.x * referenceUp.z,
+      z: forward.x * referenceUp.y - forward.y * referenceUp.x,
+    };
+    const rightLen = Math.hypot(rightRaw.x, rightRaw.y, rightRaw.z) || 1;
+    const right = { x: rightRaw.x / rightLen, y: rightRaw.y / rightLen, z: rightRaw.z / rightLen };
+    const up = {
+      x: right.y * forward.z - right.z * forward.y,
+      y: right.z * forward.x - right.x * forward.z,
+      z: right.x * forward.y - right.y * forward.x,
+    };
+    const theta = (bendAngleDeg * Math.PI) / 180;
+    const phi = (bendRollDeg * Math.PI) / 180;
+    const cosPhi = Math.cos(phi);
+    const sinPhi = Math.sin(phi);
+    const bendDir = { x: up.x * cosPhi + right.x * sinPhi, y: up.y * cosPhi + right.y * sinPhi, z: up.z * cosPhi + right.z * sinPhi };
+    const cosTheta = Math.cos(theta);
+    const sinTheta = Math.sin(theta);
+    const newForward = {
+      x: forward.x * cosTheta + bendDir.x * sinTheta,
+      y: forward.y * cosTheta + bendDir.y * sinTheta,
+      z: forward.z * cosTheta + bendDir.z * sinTheta,
+    };
+    const pendingPoint = { x: last.x + newForward.x * length, y: last.y + newForward.y * length, z: last.z + newForward.z * length };
+    onUpdate({
+      finalizeSweepSetPath: true,
+      pendingSweepFullPath: [...basePath, pendingPoint],
+    });
+  };
 
   useEffect(() => () => onInteractionActiveChange?.(false), [onInteractionActiveChange]);
   useEffect(() => {
@@ -1235,6 +1077,10 @@ export function ShapeInspector({
   }, [colorOpen, onUpdate]);
   useLayoutEffect(() => {
     inspectorRef.current?.scrollTo({ top: 0, left: 0 });
+    sweepBasePathRef.current = null;
+    setSweepLength(0);
+    setSweepBendAngle(0);
+    setSweepBendRoll(0);
   }, [isSketchRevolve, shape.id]);
 
   return (
@@ -1395,6 +1241,59 @@ export function ShapeInspector({
           </div>
         ) : null}
       </div>
+      {canAddSweepSegment ? (
+        <div className={`property-card ${bendOpen ? "" : "collapsed"}`}>
+          <button
+            className="property-card-header"
+            type="button"
+            aria-expanded={bendOpen}
+            aria-controls={`bend-${shape.id}`}
+            onClick={() => setBendOpen((open) => !open)}
+          >
+            <span>{t("inspector.bend")}</span>
+            <ChevronUp className={bendOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+          </button>
+          {bendOpen ? (
+            <div className="property-list" id={`bend-${shape.id}`}>
+              <ShapePropertyRows
+                properties={[
+                  {
+                    id: "sweepLength", label: t("prop.segmentLength"), value: sweepLength, min: 0, max: 160, step: 0.5,
+                    onChange: (value: number) => { sweepLengthRef.current = value; setSweepLength(value); scheduleLiveSweepUpdate(value, sweepBendAngleRef.current, sweepBendRollRef.current); },
+                  },
+                  {
+                    id: "sweepBendAngle", label: t("prop.bendAngle"), value: sweepBendAngle, min: 0, max: 179, step: 1,
+                    onChange: (value: number) => { sweepBendAngleRef.current = value; setSweepBendAngle(value); scheduleLiveSweepUpdate(sweepLengthRef.current, value, sweepBendRollRef.current); },
+                  },
+                  {
+                    id: "sweepBendRoll", label: t("prop.bendRoll"), value: sweepBendRoll, min: -180, max: 180, step: 1,
+                    onChange: (value: number) => { sweepBendRollRef.current = value; setSweepBendRoll(value); scheduleLiveSweepUpdate(sweepLengthRef.current, sweepBendAngleRef.current, value); },
+                  },
+                ]}
+                workspace={workspace}
+                disabled={locked}
+                onInteractionActiveChange={onInteractionActiveChange}
+              />
+            </div>
+          ) : null}
+          <button
+            className="inspector-action-button"
+            type="button"
+            disabled={locked || sweepLength <= 0}
+            onClick={() => {
+              sweepBasePathRef.current = null;
+              sweepLengthRef.current = 0;
+              sweepBendAngleRef.current = 0;
+              sweepBendRollRef.current = 0;
+              setSweepLength(0);
+              setSweepBendAngle(0);
+              setSweepBendRoll(0);
+            }}
+          >
+            <span>{t("action.lockInBend")}</span>
+          </button>
+        </div>
+      ) : null}
       {!shapeIgnoresTaper ? (
         <div className={`property-card ${taperOpen ? "" : "collapsed"}`}>
           <button
@@ -1574,7 +1473,7 @@ function RangeProperty({
   onChange,
   onInteractionActiveChange,
 }: RangePropertyConfig & { workspace: WorkplaneWorkspaceSettings; disabled?: boolean; onInteractionActiveChange?: (active: boolean) => void }) {
-  const allowsAboveSliderMax = ["length", "width", "height", "starOuterSize", "starInnerSize", "crescentThickness", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
+  const allowsAboveSliderMax = ["length", "width", "height"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
   const isLength = propertyUsesLengthUnit(id);
   const accuracy = workspace.accuracy;
   const actualValue = Math.max(min, Number.isFinite(value) ? value : min);
