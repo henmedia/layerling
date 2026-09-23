@@ -674,6 +674,61 @@ async function cadShapeFromSketchProfile(profile: SketchProfile, height: number,
   return { ...shape, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const };
 }
 
+/**
+ * Sweeps a bend's control-point path into a solid, round tube of the given
+ * radius - the geometry behind the turtle-style Bend panel. See the worker's
+ * own comment for why the spine stays plain straight segments and the sweep
+ * stays in Frenet mode rather than something more elaborate: it is the
+ * simple combination that reliably stays round on every bend the panel can
+ * actually produce.
+ */
+async function shapeFromSweptPath(radius: number, points: { x: number; y: number; z: number }[], existing: WorkplaneShape) {
+  const worker = ensureSketchCadWorker();
+  const requestId = ++sketchCadRequestId;
+  const response = await new Promise<SketchCadBuildResponse>((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      sketchCadPending.delete(requestId);
+      reject(new Error("OpenCascade timed out while sweeping the bend"));
+    }, 30_000);
+    sketchCadPending.set(requestId, { resolve, reject, timer });
+    worker.postMessage({ type: "sweep", requestId, points, radius });
+  });
+  if (response.type === "error") throw new Error(response.message);
+  if (response.type !== "swept") throw new Error("Unexpected sweep response");
+  let minY = Number.POSITIVE_INFINITY;
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let minZ = Number.POSITIVE_INFINITY;
+  let maxZ = Number.NEGATIVE_INFINITY;
+  for (let index = 0; index < response.positions.length; index += 3) {
+    minX = Math.min(minX, response.positions[index]);
+    minY = Math.min(minY, response.positions[index + 1]);
+    minZ = Math.min(minZ, response.positions[index + 2]);
+    maxX = Math.max(maxX, response.positions[index]);
+    maxZ = Math.max(maxZ, response.positions[index + 2]);
+  }
+  const centerX = (minX + maxX) / 2;
+  const centerZ = (minZ + maxZ) / 2;
+  // The path is kept in the same local frame shapeFromCadMesh recenters the
+  // mesh into (X/Z centered on the bounding box, Y measured up from its
+  // floor), so a later re-bend can read back where each point in the
+  // already-committed tube actually sits.
+  const adjustedPath = points.map((point) => ({ x: point.x - centerX, y: point.y - minY, z: point.z - centerZ }));
+  const source = canonicalizeShape({
+    ...existing,
+    kind: "mesh" as const,
+    sketchProfile: undefined,
+    sketchOperation: undefined,
+    edgeTreatments: undefined,
+    edgeTreatmentHistory: undefined,
+    cadDisplayEdges: undefined,
+    cadDisplayEdgesVersion: undefined,
+  });
+  const shape = shapeFromCadMesh(source, response.positions, response.normals, response.indices, response.brep, SKETCH_CAD_DEFLECTION);
+  if (!shape) throw new Error("OpenCascade returned an empty swept solid");
+  return { shape: { ...shape, extrudeSweepPath: adjustedPath, extrudeSweepRadius: radius }, path: adjustedPath };
+}
+
 async function shapeFromRevolvedSketchProfile(
   profile: SketchProfile,
   settings: Partial<SketchRevolveSettings>,
@@ -6836,6 +6891,41 @@ export function LayerlingEditor({
     [appendHistorySnapshot, notes, selectedIds, syncProjectShapes],
   );
 
+  const sweepPreviewRequestCounterRef = useRef(0);
+  /**
+   * A dedicated callback for the turtle-style Bend panel, kept separate from
+   * updateShape/ShapeUpdatePatch on purpose - a bend re-sweeps the whole
+   * path through OpenCascade, which is a different kind of operation than an
+   * ordinary field patch. Reuses the tested cadPreviewQueue utility (the
+   * same one edge treatment uses) so rapid slider drags never stack up more
+   * than one bend computation in flight.
+   */
+  const sweepPreviewQueueRef = useRef(
+    createCadPreviewQueue<{ points: { x: number; y: number; z: number }[]; shapeId: string; existing: WorkplaneShape }>((payload) => {
+      const requestId = ++sweepPreviewRequestCounterRef.current;
+      const radius = payload.existing.extrudeSweepRadius ?? shapeWidth(payload.existing) / 2;
+      void shapeFromSweptPath(radius, payload.points, payload.existing)
+        .then(({ shape: swept }) => {
+          sweepPreviewQueueRef.current.settle(requestId);
+          if (!shapesRef.current.some((shape) => shape.id === payload.shapeId)) return;
+          commitShapes(shapesRef.current.map((shape) => shape.id === payload.shapeId ? swept : shape), payload.shapeId, "Adjusted bend");
+        })
+        .catch((error) => {
+          sweepPreviewQueueRef.current.settle(requestId);
+          setNotice(error instanceof Error ? error.message : "Could not adjust this bend");
+        });
+      return requestId;
+    }),
+  );
+  const applySweepBend = useCallback(
+    (id: string, points: { x: number; y: number; z: number }[]) => {
+      const source = shapesRef.current.find((shape) => shape.id === id);
+      if (!source || points.length < 2) return;
+      sweepPreviewQueueRef.current.request({ points, shapeId: id, existing: source });
+    },
+    [],
+  );
+
   /**
    * Notizen aendern sich wie Koerper: ueber den Verlauf. Deshalb liegt hier
    * alles, was sie anfasst - anlegen, tippen, verschieben, loeschen -, und jeder
@@ -10407,6 +10497,7 @@ export function LayerlingEditor({
           canSeparateParts={canSeparateSelectedParts}
           onSeparateParts={separateSelectedParts}
           onUpdateShape={updateShape}
+          onSweepBendShape={applySweepBend}
           onDuplicateShapeAt={duplicateShapeAt}
           notes={notes}
           notesVisible={notesVisible}

@@ -1141,6 +1141,7 @@ export function ShapeInspector({
   onUpdate,
   onSnapChange,
   onSnapOpenChange,
+  onSweepBend,
   onEditSketch,
   canSeparateParts = false,
   onSeparateParts,
@@ -1153,6 +1154,8 @@ export function ShapeInspector({
   onUpdate: ShapeInspectorUpdate;
   onSnapChange: Dispatch<SetStateAction<GridSize>>;
   onSnapOpenChange: Dispatch<SetStateAction<boolean>>;
+  /** Dedicated callback for the Bend panel - see WorkplaneViewport's onSweepBendShape for why this is kept apart from onUpdate. */
+  onSweepBend?: (points: { x: number; y: number; z: number }[]) => void;
   onEditSketch?: () => void;
   canSeparateParts?: boolean;
   onSeparateParts?: () => void;
@@ -1261,12 +1264,77 @@ export function ShapeInspector({
   const [propertiesOpen, setPropertiesOpen] = useState(true);
   const [taperOpen, setTaperOpen] = useState(false);
   const [twistOpen, setTwistOpen] = useState(false);
+  const canAddSweepSegment = Boolean(onSweepBend) && (shape.kind === "cylinder" || (shape.kind === "mesh" && Boolean(shape.extrudeSweepPath?.length)));
+  const [bendOpen, setBendOpen] = useState(true);
+  const [sweepLength, setSweepLength] = useState(0);
+  const [sweepBendAngle, setSweepBendAngle] = useState(0);
+  const [sweepBendRoll, setSweepBendRoll] = useState(0);
+  const sweepLengthRef = useRef(0);
+  const sweepBendAngleRef = useRef(0);
+  const sweepBendRollRef = useRef(0);
+  const sweepBasePathRef = useRef<{ x: number; y: number; z: number }[] | null>(null);
   const [gearTeethOpen, setGearTeethOpen] = useState(true);
   const [threadOpen, setThreadOpen] = useState(true);
   const [gearHelixOpen, setGearHelixOpen] = useState(true);
   const [colorOpen, setColorOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const customColorInputRef = useRef<HTMLInputElement>(null);
+
+  /*
+   * "Turtle" style: bend angle and roll are relative to the tube's current
+   * heading, not an absolute world direction, so "90°" always means a clean
+   * right-angle turn from wherever it is currently pointing. No debounce is
+   * needed here - the sweep preview queue on the other end of onSweepBend
+   * already keeps at most one bend computation in flight and at most one
+   * waiting, so every slider move can call it directly.
+   */
+  const scheduleLiveSweepUpdate = (length: number, bendAngleDeg: number, bendRollDeg: number) => {
+    if (!onSweepBend) return;
+    if (!sweepBasePathRef.current) {
+      sweepBasePathRef.current = shape.extrudeSweepPath?.length ? shape.extrudeSweepPath : [{ x: 0, y: 0, z: 0 }];
+    }
+    const basePath = sweepBasePathRef.current;
+    if (!basePath || length <= 0) return;
+    const last = basePath[basePath.length - 1];
+    // A fresh cylinder has only its base point committed yet - its own
+    // vertical axis is the natural "currently facing" direction. Once a
+    // real segment exists, derive the heading from the last two points.
+    const forward = basePath.length >= 2
+      ? (() => {
+          const prev = basePath[basePath.length - 2];
+          const raw = { x: last.x - prev.x, y: last.y - prev.y, z: last.z - prev.z };
+          const len = Math.hypot(raw.x, raw.y, raw.z) || 1;
+          return { x: raw.x / len, y: raw.y / len, z: raw.z / len };
+        })()
+      : { x: 0, y: 1, z: 0 };
+    const referenceUp = Math.abs(forward.y) > 0.98 ? { x: 0, y: 0, z: 1 } : { x: 0, y: 1, z: 0 };
+    const rightRaw = {
+      x: forward.y * referenceUp.z - forward.z * referenceUp.y,
+      y: forward.z * referenceUp.x - forward.x * referenceUp.z,
+      z: forward.x * referenceUp.y - forward.y * referenceUp.x,
+    };
+    const rightLen = Math.hypot(rightRaw.x, rightRaw.y, rightRaw.z) || 1;
+    const right = { x: rightRaw.x / rightLen, y: rightRaw.y / rightLen, z: rightRaw.z / rightLen };
+    const up = {
+      x: right.y * forward.z - right.z * forward.y,
+      y: right.z * forward.x - right.x * forward.z,
+      z: right.x * forward.y - right.y * forward.x,
+    };
+    const theta = (bendAngleDeg * Math.PI) / 180;
+    const phi = (bendRollDeg * Math.PI) / 180;
+    const cosPhi = Math.cos(phi);
+    const sinPhi = Math.sin(phi);
+    const bendDir = { x: up.x * cosPhi + right.x * sinPhi, y: up.y * cosPhi + right.y * sinPhi, z: up.z * cosPhi + right.z * sinPhi };
+    const cosTheta = Math.cos(theta);
+    const sinTheta = Math.sin(theta);
+    const newForward = {
+      x: forward.x * cosTheta + bendDir.x * sinTheta,
+      y: forward.y * cosTheta + bendDir.y * sinTheta,
+      z: forward.z * cosTheta + bendDir.z * sinTheta,
+    };
+    const pendingPoint = { x: last.x + newForward.x * length, y: last.y + newForward.y * length, z: last.z + newForward.z * length };
+    onSweepBend([...basePath, pendingPoint]);
+  };
 
   useEffect(() => () => onInteractionActiveChange?.(false), [onInteractionActiveChange]);
   useEffect(() => {
@@ -1286,6 +1354,10 @@ export function ShapeInspector({
   }, [colorOpen, onUpdate]);
   useLayoutEffect(() => {
     inspectorRef.current?.scrollTo({ top: 0, left: 0 });
+    sweepBasePathRef.current = null;
+    setSweepLength(0);
+    setSweepBendAngle(0);
+    setSweepBendRoll(0);
   }, [isSketchRevolve, shape.id]);
 
   return (
@@ -1446,6 +1518,59 @@ export function ShapeInspector({
           </div>
         ) : null}
       </div>
+      {canAddSweepSegment ? (
+        <div className={`property-card ${bendOpen ? "" : "collapsed"}`}>
+          <button
+            className="property-card-header"
+            type="button"
+            aria-expanded={bendOpen}
+            aria-controls={`bend-${shape.id}`}
+            onClick={() => setBendOpen((open) => !open)}
+          >
+            <span>{t("inspector.bend")}</span>
+            <ChevronUp className={bendOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+          </button>
+          {bendOpen ? (
+            <div className="property-list" id={`bend-${shape.id}`}>
+              <ShapePropertyRows
+                properties={[
+                  {
+                    id: "sweepLength", label: t("prop.segmentLength"), value: sweepLength, min: 0, max: 160, step: 0.5,
+                    onChange: (value: number) => { sweepLengthRef.current = value; setSweepLength(value); scheduleLiveSweepUpdate(value, sweepBendAngleRef.current, sweepBendRollRef.current); },
+                  },
+                  {
+                    id: "sweepBendAngle", label: t("prop.bendAngle"), value: sweepBendAngle, min: 0, max: 179, step: 1,
+                    onChange: (value: number) => { sweepBendAngleRef.current = value; setSweepBendAngle(value); scheduleLiveSweepUpdate(sweepLengthRef.current, value, sweepBendRollRef.current); },
+                  },
+                  {
+                    id: "sweepBendRoll", label: t("prop.bendRoll"), value: sweepBendRoll, min: -180, max: 180, step: 1,
+                    onChange: (value: number) => { sweepBendRollRef.current = value; setSweepBendRoll(value); scheduleLiveSweepUpdate(sweepLengthRef.current, sweepBendAngleRef.current, value); },
+                  },
+                ]}
+                workspace={workspace}
+                disabled={locked}
+                onInteractionActiveChange={onInteractionActiveChange}
+              />
+            </div>
+          ) : null}
+          <button
+            className="inspector-action-button"
+            type="button"
+            disabled={locked || sweepLength <= 0}
+            onClick={() => {
+              sweepBasePathRef.current = null;
+              sweepLengthRef.current = 0;
+              sweepBendAngleRef.current = 0;
+              sweepBendRollRef.current = 0;
+              setSweepLength(0);
+              setSweepBendAngle(0);
+              setSweepBendRoll(0);
+            }}
+          >
+            <span>{t("action.lockInBend")}</span>
+          </button>
+        </div>
+      ) : null}
       {!shapeIgnoresTaper ? (
         <div className={`property-card ${taperOpen ? "" : "collapsed"}`}>
           <button

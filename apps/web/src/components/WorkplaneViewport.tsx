@@ -248,6 +248,12 @@ type WorkplaneViewportProps = {
   canSeparateParts?: boolean;
   onSeparateParts?: () => void;
   onUpdateShape: (id: string, patch: ShapeUpdatePatch) => void;
+  /**
+   * Kept separate from onUpdateShape/ShapeUpdatePatch on purpose: a bend is a
+   * full CAD re-sweep of the whole path, not a plain field patch, and giving
+   * it its own callback keeps that distinct from ordinary shape edits.
+   */
+  onSweepBendShape?: (id: string, points: { x: number; y: number; z: number }[]) => void;
   onDuplicateShapeAt?: (id: string, position: { x: number; z: number }) => void;
   notes?: WorkplaneNote[];
   notesVisible?: boolean;
@@ -3458,6 +3464,7 @@ export function WorkplaneViewport({
   canSeparateParts = false,
   onSeparateParts,
   onUpdateShape,
+  onSweepBendShape,
   onDuplicateShapeAt,
   notes = EMPTY_NOTES,
   notesVisible = true,
@@ -7176,6 +7183,7 @@ export function WorkplaneViewport({
           }}
           onSnapChange={chooseSnapGrid}
           onSnapOpenChange={setSnapOpen}
+          onSweepBend={onSweepBendShape ? (points) => onSweepBendShape(selectedShape.id, points) : undefined}
           onEditSketch={selectedShape.sketchProfile ? onEditSketch : undefined}
           canSeparateParts={canSeparateParts}
           onSeparateParts={onSeparateParts}

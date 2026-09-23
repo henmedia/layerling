@@ -406,6 +406,8 @@ export type WorkplaneShape = {
   groupedBaseDepth?: number;
   groupedBaseHeight?: number;
   groupOperation?: "group" | "intersection";
+  extrudeSweepPath?: { x: number; y: number; z: number }[];
+  extrudeSweepRadius?: number;
   locked?: boolean;
   hidden?: boolean;
 };
