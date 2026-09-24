@@ -8,6 +8,7 @@ services:
     environment:
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
+      NEXT_TELEMETRY_DISABLED: "1"
       # LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"
     # volumes:
-    #   - ./shared-projects:/shared-projects
+    #   - ./shared-projects:/shared-projects:z

@@ -213,6 +213,23 @@ http://127.0.0.1:3000/
 
 Leave the terminal open while you use the app. To stop the development server, press `Ctrl+C` in the terminal.
 
+### Developing in a container
+
+Prefer not to install Node.js? Develop in a container instead. You need a container engine with
+compose — `docker compose` or `podman compose` (works with rootless podman on SELinux; the `:z`
+flag in the compose file handles the file labels):
+
+```bash
+docker compose -f docker/compose.dev.yml up
+```
+
+Open `http://127.0.0.1:3000/`. The first start installs dependencies; later starts go straight to
+the dev server with hot reload. Stop it with `Ctrl+C`. If you update dependencies and something
+looks stale, delete `node_modules/` in the project folder and start again.
+
+Running the production container from `docker/compose.yml` at the same time? It uses port 3000 as
+well — change the host-side port on one of them (e.g. `"3100:3000"`).
+
 ### Shared Designs on a Network
 
 If you run layerling with `npm run dev` or `npm run start` on a machine other people open in their browser, it can offer a

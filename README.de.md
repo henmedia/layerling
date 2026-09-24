@@ -217,6 +217,24 @@ http://127.0.0.1:3000/
 
 Lass das Terminal offen, solange du die App benutzt. Zum Beenden des Entwicklungsservers `Strg+C` drücken.
 
+### Entwickeln in einem Container
+
+Du möchtest Node.js lieber nicht installieren? Entwickle stattdessen in einem Container. Du brauchst
+eine Container-Engine mit compose — `docker compose` oder `podman compose` (funktioniert auch mit
+rootless podman unter SELinux; das `:z` im Compose-File übernimmt die Dateimarkierungen):
+
+```bash
+docker compose -f docker/compose.dev.yml up
+```
+
+Öffne `http://127.0.0.1:3000/`. Der erste Start installiert die Abhängigkeiten; bei späteren Starts
+geht es direkt in den Entwicklungsserver mit Hot Reload. Zum Beenden `Strg+C` drücken. Wenn du
+Abhängigkeiten aktualisierst und etwas veraltet wirkt, lösche `node_modules/` im Projektordner und
+starte neu.
+
+Betreibst du gleichzeitig den Produktionscontainer aus `docker/compose.yml`? Der benutzt ebenfalls
+Port 3000 — ändere den Host-Port bei einem der beiden (z. B. `"3100:3000"`).
+
 ### Gemeinsame Entwürfe im Netz
 
 Betreibst du layerling mit `npm run dev` oder `npm run start` auf einem Rechner, den andere im Browser öffnen, kann es

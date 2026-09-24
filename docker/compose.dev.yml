@@ -1,0 +1,13 @@
+services:
+  layerling-dev:
+    image: node:24-bookworm-slim
+    working_dir: /workspace
+    command: ["sh", "-c", "test -d node_modules || npm ci; exec npm run dev"]
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - ..:/workspace:z
