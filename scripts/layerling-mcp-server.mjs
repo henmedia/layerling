@@ -131,6 +131,8 @@ function sendError(id, code, message) {
 async function handleMessage(message) {
   if (!message || typeof message !== "object") return;
   const { id, method, params } = message;
+  // A message without an id is a notification; JSON-RPC forbids answering it.
+  if (id === undefined || id === null) return;
   try {
     if (method === "initialize") {
       sendResult(id, {
@@ -138,9 +140,6 @@ async function handleMessage(message) {
         capabilities: { tools: {} },
         serverInfo: { name: "layerling-mcp", version: "0.1.0" },
       });
-      return;
-    }
-    if (method === "notifications/initialized") {
       return;
     }
     if (method === "ping") {

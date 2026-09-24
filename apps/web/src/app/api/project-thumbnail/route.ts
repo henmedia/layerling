@@ -8,6 +8,10 @@ const THUMBNAIL_DIR = path.join(process.cwd(), ".codex", "project-thumbnails");
 const PNG_DATA_URL_PREFIX = "data:image/png;base64,";
 const MAX_THUMBNAIL_BYTES = 5 * 1024 * 1024;
 const MAX_THUMBNAIL_REQUEST_BYTES = Math.ceil((MAX_THUMBNAIL_BYTES * 4) / 3) + PNG_DATA_URL_PREFIX.length + 2048;
+// The route has no login, so anyone who can reach it can upload pictures under
+// new ids. Past this total the oldest thumbnails are dropped; the dashboard
+// already falls back to the plain card when one is missing.
+const MAX_THUMBNAIL_DIR_BYTES = 256 * 1024 * 1024;
 
 function safeProjectId(projectId: string) {
   const clean = projectId.replace(/[^a-zA-Z0-9_-]/g, "");
@@ -20,6 +24,29 @@ function thumbnailPath(projectId: string) {
     return null;
   }
   return path.join(THUMBNAIL_DIR, `${safeId}.png`);
+}
+
+/** Deletes the least recently written thumbnails until the folder fits again. */
+async function pruneThumbnails(keep: string) {
+  const entries = await fs.readdir(THUMBNAIL_DIR);
+  const files = await Promise.all(
+    entries
+      .filter((name) => name.endsWith(".png"))
+      .map(async (name) => {
+        const filePath = path.join(THUMBNAIL_DIR, name);
+        const stat = await fs.stat(filePath).catch(() => null);
+        return stat?.isFile() ? { filePath, size: stat.size, mtimeMs: stat.mtimeMs } : null;
+      }),
+  );
+  const existing = files.filter((file): file is NonNullable<typeof file> => file !== null);
+  let total = existing.reduce((sum, file) => sum + file.size, 0);
+  existing.sort((a, b) => a.mtimeMs - b.mtimeMs);
+  for (const file of existing) {
+    if (total <= MAX_THUMBNAIL_DIR_BYTES) break;
+    if (file.filePath === keep) continue;
+    await fs.rm(file.filePath, { force: true });
+    total -= file.size;
+  }
 }
 
 function isSameOriginRequest(request: Request) {
@@ -113,6 +140,7 @@ export async function POST(request: Request) {
     await fs.mkdir(THUMBNAIL_DIR, { recursive: true });
     await fs.rm(filePath, { force: true });
     await fs.writeFile(filePath, Buffer.from(encodedImage, "base64"));
+    await pruneThumbnails(filePath).catch(() => undefined);
 
     return NextResponse.json({ version: Date.now() });
   } catch (error) {

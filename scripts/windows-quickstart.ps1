@@ -63,12 +63,11 @@ function Install-WithWinget([string]$id, [string]$displayName) {
 Write-Host "layerling - Windows quickstart" -ForegroundColor Green
 Write-Host "Installs what is missing, gets the app, and starts it." -ForegroundColor Green
 
+# No "exit" anywhere in this script: run through "irm ... | iex" it would close the
+# user's PowerShell window before they could read why. "throw" stops just the script.
 if (-not (Test-CommandExists "winget")) {
-    Write-Host ""
-    Write-Host "winget was not found. It ships with current Windows 10 and 11 as the 'App" -ForegroundColor Red
-    Write-Host "Installer' app. Install it from the Microsoft Store, then run this script again:" -ForegroundColor Red
-    Write-Host "https://apps.microsoft.com/detail/9nblggh4nns1" -ForegroundColor Red
-    exit 1
+    throw ("winget was not found. It ships with current Windows 10 and 11 as the 'App Installer' app. " +
+        "Install it from the Microsoft Store, then run this script again: https://apps.microsoft.com/detail/9nblggh4nns1")
 }
 
 if (Test-CommandExists "git") {
@@ -85,11 +84,8 @@ if (Test-CommandExists "node") {
 
 Update-SessionPath
 if (-not (Test-CommandExists "git") -or -not (Test-CommandExists "node")) {
-    Write-Host ""
-    Write-Host "Git and/or Node.js were just installed, but this window cannot see them yet." -ForegroundColor Yellow
-    Write-Host "Close this PowerShell window, open a new one, and run this script again - it" -ForegroundColor Yellow
-    Write-Host "will pick up right where it left off." -ForegroundColor Yellow
-    exit 1
+    throw ("Git and/or Node.js were just installed, but this window cannot see them yet. " +
+        "Close this PowerShell window, open a new one, and run this script again - it will pick up right where it left off.")
 }
 
 if (Test-Path (Join-Path $InstallPath ".git")) {
