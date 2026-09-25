@@ -671,8 +671,8 @@ function handle_save(string $root, string $folder): void
 
     $currentStat = regular_file_stat($filePath);
     $currentRevision = $currentStat === null ? null : revision_for($currentStat);
-        $expectedRevision = unquote_etag($_SERVER['HTTP_IF_MATCH'] ?? null);
-        $createOnly = ($_SERVER['HTTP_IF_NONE_MATCH'] ?? '') === '*';
+    $expectedRevision = unquote_etag($_SERVER['HTTP_IF_MATCH'] ?? null);
+    $createOnly = ($_SERVER['HTTP_IF_NONE_MATCH'] ?? '') === '*';
 
     if ($currentStat !== null && ($createOnly || $expectedRevision === null || $expectedRevision !== $currentRevision)) {
         fail('The shared project changed after you opened it. Reload it or save under a different name.', 409, ['currentRevision' => $currentRevision]);
@@ -694,13 +694,19 @@ function handle_save(string $root, string $folder): void
         if (!is_dir($thumbnailsRoot)) {
             @mkdir($thumbnailsRoot, 0775, true);
         }
-        @file_put_contents(thumbnail_path($folder, $fileName, $savedRevision), $thumbnailBytes);
+        $pendingThumbnail = thumbnail_path($folder, $fileName, $savedRevision);
+        // Removed again unless the project below makes it into place.
+        cleanup_later($pendingThumbnail);
+        @file_put_contents($pendingThumbnail, $thumbnailBytes);
     }
 
     if (!@rename($temporaryPath, $filePath)) {
         fail('The finished project could not be moved into place', 500);
     }
     cleanup_now($temporaryPath);
+    if ($thumbnailBytes !== null) {
+        cleanup_now(thumbnail_path($folder, $fileName, $savedRevision));
+    }
 
     $savedStat = regular_file_stat($filePath);
     if ($savedStat === null) {
@@ -930,6 +936,14 @@ function handle_copy(string $root, string $folder, string $requestedName): void
 }
 
 // --------------------------------------------------------------------- entry
+
+// `name[]=...` arrives as an array, which every handler below would turn into
+// the string "Array" with a warning. Nothing here takes one, so refuse it.
+foreach ($_GET as $value) {
+    if (!is_string($value)) {
+        fail('Invalid request parameter', 400);
+    }
+}
 
 $root = store_root();
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';

@@ -10,8 +10,26 @@ function bridgeUrl() {
   return new URL(MCP_ROUTE, baseUrl);
 }
 
+/**
+ * fetch() against a dev server that is not running only says "fetch failed".
+ * Name what is missing instead, and never wait forever on a server that hangs.
+ */
+async function bridgeFetch(options, timeoutMs) {
+  try {
+    return await fetch(bridgeUrl(), { ...options, signal: AbortSignal.timeout(timeoutMs) });
+  } catch (error) {
+    if (error?.name === "TimeoutError") {
+      throw new Error(`Layerling at ${baseUrl} did not answer within ${Math.round(timeoutMs / 1000)} s.`);
+    }
+    throw new Error(
+      `Cannot reach Layerling at ${baseUrl}. Start it with "npm run dev" and open an editor tab` +
+        ` (set LAYERLING_URL if it runs elsewhere).`,
+    );
+  }
+}
+
 async function bridgeGet() {
-  const response = await fetch(bridgeUrl());
+  const response = await bridgeFetch({}, 10000);
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
     throw new Error(payload?.error || `Layerling bridge returned HTTP ${response.status}`);
@@ -33,7 +51,8 @@ async function bridgeCommand(action, args = {}, defaultTimeoutMs = 15000) {
     }
   }
 
-  const response = await fetch(bridgeUrl(), {
+  const commandTimeoutMs = typeof timeoutMs === "number" ? timeoutMs : defaultTimeoutMs;
+  const response = await bridgeFetch({
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -42,9 +61,9 @@ async function bridgeCommand(action, args = {}, defaultTimeoutMs = 15000) {
       editorId: targetId,
       action,
       params,
-      timeoutMs: typeof timeoutMs === "number" ? timeoutMs : defaultTimeoutMs,
+      timeoutMs: commandTimeoutMs,
     }),
-  });
+  }, commandTimeoutMs + 10000);
   const payload = await response.json().catch(() => null);
   if (!payload?.ok) {
     throw new Error(payload?.error || `Layerling command failed with HTTP ${response.status}`);

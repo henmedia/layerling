@@ -32,10 +32,10 @@
   "dependencies": {
     "@types/three": "^0.184.1",
     "brepjs": "^18.118.0",
-    "fflate": "^0.8.2",
+    "fflate": "^0.8.3",
     "lucide-react": "^0.511.0",
     "manifold-3d": "^3.5.0",
-    "next": "^15.3.2",
+    "next": "^15.5.26",
     "occt-wasm": "^3.6.1",
     "react": "^19.1.0",
     "react-colorful": "^5.8.0",
@@ -49,6 +49,6 @@
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
     "typescript": "^5.8.3",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.11"
   }
 }
