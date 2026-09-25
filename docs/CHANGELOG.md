@@ -4,6 +4,11 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
+## 1.17.5
+
+- **Ground shadow of rotated shapes:** A shape turned by 90° and placed away from the workplane origin no longer shows an upright grey plane beside it that could not be removed. The shadow that marks a lifted selection now measures its height along the workplane normal, like the lift handle since 1.17.4, and lies flat on the workplane under the shape. Reported by @gogades in #19.
+- **Release workflow:** Releases are now published by a manually started GitHub Actions workflow that takes the version from `package.json` and the text from this changelog.
+
 ## 1.17.4
 
 - **Theme switcher in topbar & editor:** Quick theme switching (System, Light, Dark, Graphite) is now available directly in the topbar on the home dashboard and in the editor toolbar title row, placed alongside the language switcher with a dedicated palette icon. Switching is instant and synchronized across all views without requiring a page reload. In the workspace settings dialog, the appearance section has been streamlined with a divider line replacing the note.
