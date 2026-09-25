@@ -8,19 +8,11 @@ import { ADDITION, Brush, Evaluator, HOLLOW_INTERSECTION, HOLLOW_SUBTRACTION, IN
 import * as THREE from "three";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import { FontLoader, type Font, type FontData } from "three/examples/jsm/loaders/FontLoader.js";
-import droidMonoFontJson from "three/examples/fonts/droid/droid_sans_mono_regular.typeface.json";
-import droidSansBoldFontJson from "three/examples/fonts/droid/droid_sans_bold.typeface.json";
-import droidSerifBoldFontJson from "three/examples/fonts/droid/droid_serif_bold.typeface.json";
-import gentilisBoldFontJson from "three/examples/fonts/gentilis_bold.typeface.json";
-import helvetikerBoldFontJson from "three/examples/fonts/helvetiker_bold.typeface.json";
-import optimerBoldFontJson from "three/examples/fonts/optimer_bold.typeface.json";
+import { textFont } from "@/lib/textFonts";
 import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
 import type { ComponentType, SVGProps } from "react";
 import { getLanguage, t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
-import { manifoldModuleSource } from "@/generated/manifoldModuleSource";
-import { manifoldWasmBase64 } from "@/generated/manifoldWasmBase64";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
@@ -298,16 +290,6 @@ const COPLANAR_BOOLEAN_RESCUE_DEGREES = 0.02;
 const NORMAL_SELECTION_CAD_EDGE_MIN_ANGLE = 60;
 const MIN_EDGE_MODIFIER_AMOUNT = 0.001;
 const SEPARATE_PARTS_VERTEX_TOLERANCE = 0.0005;
-const booleanFontLoader = new FontLoader();
-const booleanTextFonts: Record<string, Font> = {
-  Multilanguage: booleanFontLoader.parse(helvetikerBoldFontJson as FontData),
-  Sans: booleanFontLoader.parse(droidSansBoldFontJson as FontData),
-  Serif: booleanFontLoader.parse(droidSerifBoldFontJson as FontData),
-  Script: booleanFontLoader.parse(gentilisBoldFontJson as FontData),
-  Monospace: booleanFontLoader.parse(droidMonoFontJson as FontData),
-  Rounded: booleanFontLoader.parse(optimerBoldFontJson as FontData),
-  Stencil: booleanFontLoader.parse(helvetikerBoldFontJson as FontData),
-};
 let manifoldRuntimePromise: Promise<ManifoldToplevel> | null = null;
 
 function emptySketchProfile(): SketchProfile {
@@ -805,42 +787,16 @@ function writeSharedClipboard(shapes: WorkplaneShape[]) {
   }
 }
 
-function base64ToUint8Array(value: string) {
-  const binary = window.atob(value);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
-}
-
-async function importBundledManifoldModule() {
-  const blobUrl = URL.createObjectURL(new Blob([manifoldModuleSource], { type: "text/javascript" }));
-  try {
-    return (await import(/* webpackIgnore: true */ blobUrl)) as { default: typeof manifoldModule };
-  } finally {
-    URL.revokeObjectURL(blobUrl);
-  }
-}
-
 function getManifoldRuntime() {
   const assetBase = typeof window === "undefined" ? "/" : new URL(".", window.location.href).href;
-  const isFileBuild = typeof window !== "undefined" && window.location.protocol === "file:";
   const manifoldScriptUrl = new URL("manifold.js", assetBase).href;
-  const runtimeModule = isFileBuild
-    ? importBundledManifoldModule().then((module) => module.default)
-    : import(/* webpackIgnore: true */ manifoldScriptUrl).then((module) => (module as { default: typeof manifoldModule }).default);
+  const runtimeModule = import(/* webpackIgnore: true */ manifoldScriptUrl).then((module) => (module as { default: typeof manifoldModule }).default);
   // Drop a rejected attempt so a transient failure (e.g. a network blip
   // fetching the manifold wasm) can be retried on the next call instead of
   // poisoning every boolean operation for the rest of the session - same fix
   // as brepKernel.ts's loadBrepWithOcct.
   manifoldRuntimePromise ??= runtimeModule
     .then((module) => {
-      if (isFileBuild) {
-        return (module as unknown as (config: { wasmBinary: Uint8Array }) => Promise<ManifoldToplevel>)({
-          wasmBinary: base64ToUint8Array(manifoldWasmBase64),
-        });
-      }
       return module({
         locateFile: ((file: string) => (file.endsWith(".wasm") ? new URL("manifold.wasm", assetBase).href : new URL(file, assetBase).href)) as () => string,
       });
@@ -2261,7 +2217,7 @@ function createBooleanTextGeometry(shape: WorkplaneShape) {
   const bevel = clampNumber(shape.bevel ?? 0, 0, 8);
   const fontName = shape.font ?? "Multilanguage";
   const geometry = new TextGeometry(text, {
-    font: booleanTextFonts[fontName] ?? booleanTextFonts.Multilanguage,
+    font: textFont(fontName),
     size: 20,
     depth: shape.height,
     curveSegments: fontName === "Stencil" ? 1 : 8,

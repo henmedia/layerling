@@ -8,7 +8,11 @@ import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { useAppUpdate } from "@/lib/useAppUpdate";
 import { sharedProjectSaveTarget } from "@/lib/sharedProjectTarget";
 import { storeFolderNameProblem, suggestStoreFolderName } from "@/lib/storeFolderName";
-import { LayerlingEditor, importedShapeFromObj, importedShapeFromStl, importedShapeFromSvg } from "@/components/LayerlingEditor";
+import dynamic from "next/dynamic";
+import { importedShapeFromObj } from "@/lib/objImport";
+import { importedShapeFromStl } from "@/lib/stlImport";
+import { importedShapeFromSvg } from "@/lib/svgImport";
+import { loadTextFonts } from "@/lib/textFonts";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
 import { applyAppTheme, getAppThemePreference, readStoredAppTheme, resolveAppTheme, setAppTheme, storeAppTheme, subscribeToAppTheme, type AppThemePreference, type ResolvedAppTheme } from "@/lib/appTheme";
 import { hydrateEditorHistoryState, notesForHistoryIndex, type EditorHistoryEntry } from "@/lib/editorHistory";
@@ -176,6 +180,30 @@ const STATIC_EXPORT_BUILD = process.env.NEXT_PUBLIC_STATIC_EXPORT === "true";
 // served from a sub-directory.
 const SHARED_PROJECTS_ENDPOINT = STATIC_EXPORT_BUILD ? "store.php" : "/api/shared-projects";
 const EDITOR_SKELETON_MIN_DURATION_MS = 320;
+
+/**
+ * The editor - three.js, CSG, the CAD tooling and the text typefaces - is its
+ * own chunk, so the dashboard does not download and parse it before it can
+ * show a single project card. The typefaces are awaited with it because text
+ * geometry is built synchronously inside the editor. A failed attempt is
+ * dropped so the next one fetches again.
+ */
+let editorModulePromise: Promise<typeof import("@/components/LayerlingEditor")> | null = null;
+
+function loadEditorModule() {
+  editorModulePromise ??= Promise.all([import("@/components/LayerlingEditor"), loadTextFonts()])
+    .then(([editorModule]) => editorModule)
+    .catch((error) => {
+      editorModulePromise = null;
+      throw error;
+    });
+  return editorModulePromise;
+}
+
+const LayerlingEditor = dynamic(() => loadEditorModule().then((editorModule) => editorModule.LayerlingEditor), {
+  ssr: false,
+  loading: () => <EditorLoadingSkeleton />,
+});
 const knownProjectResourceKeys = new Map<string, Set<string>>();
 
 function formatUpdated(timestamp: number, language: Language) {
@@ -688,6 +716,18 @@ export default function Home() {
   const nextProjectRevisionRef = useRef(0);
   const projectShapeSaveQueuesRef = useRef<Record<string, Promise<void>>>({});
   const editorLoadingStartedAtRef = useRef(0);
+
+  // Warm the editor chunk once the dashboard is idle, so opening a project
+  // does not wait for the download the first page load skipped.
+  useEffect(() => {
+    const warm = () => void loadEditorModule().catch(() => undefined);
+    if ("requestIdleCallback" in window) {
+      const handle = window.requestIdleCallback(warm, { timeout: 4000 });
+      return () => window.cancelIdleCallback(handle);
+    }
+    const timer = globalThis.setTimeout(warm, 1500);
+    return () => globalThis.clearTimeout(timer);
+  }, []);
 
   const startEditorTransition = useCallback(() => {
     editorLoadingStartedAtRef.current = Date.now();
