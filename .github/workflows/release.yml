@@ -1,0 +1,80 @@
+name: Release
+
+# Started by hand (Actions tab -> Release -> Run workflow). Publishes the
+# version in package.json as a GitHub release: tag vX.Y.Z on the chosen commit,
+# title vX.Y.Z, and the "## X.Y.Z" section of docs/CHANGELOG.md as the text.
+# Nothing else is published - no npm package, no deployment.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish GitHub release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Read version and release notes
+        id: meta
+        run: |
+          version=$(node -p "require('./package.json').version")
+          lock_version=$(node -p "require('./package-lock.json').version")
+          lyl_version=$(sed -n 's/^export const LYL_CREATED_WITH_VERSION = "\(.*\)";$/\1/p' apps/web/src/lib/lylProject.ts)
+          if [ "$lock_version" != "$version" ] || [ "$lyl_version" != "$version" ]; then
+            echo "::error::Versions disagree: package.json $version, package-lock.json $lock_version, lylProject.ts $lyl_version"
+            exit 1
+          fi
+
+          tag="v$version"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+            echo "::error::Tag $tag already exists. Raise the version before releasing again."
+            exit 1
+          fi
+
+          # The section from "## X.Y.Z" up to the next "## " heading.
+          awk -v heading="## $version" '
+            $0 == heading { found = 1; print; next }
+            found && /^## / { exit }
+            found { print }
+          ' docs/CHANGELOG.md > "$RUNNER_TEMP/release-notes.md"
+          if [ "$(grep -cv '^[[:space:]]*$' "$RUNNER_TEMP/release-notes.md")" -le 1 ]; then
+            echo "::error::docs/CHANGELOG.md has no entries under \"## $version\"."
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --notes-file "$RUNNER_TEMP/release-notes.md"
