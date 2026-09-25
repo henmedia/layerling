@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
+import { groundFootprintForFrame, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { horizontalPlacementWorkplane, type PlacementWorkplane } from "@/lib/placementWorkplane";
 
 function createSelectionFrame(overrides: Partial<SelectionFrame> = {}): SelectionFrame {
@@ -205,5 +205,103 @@ describe("liftGeometryForFrame", () => {
     expect(lift.elevation).toBeCloseTo(5);
     expect(lift.pointAt(0)).toEqual(new THREE.Vector3(10, 10, 50));
     expect(lift.pointAt(lift.elevation)).toEqual(new THREE.Vector3(10, 10, 55));
+  });
+});
+
+describe("groundFootprintForFrame", () => {
+  const basePlane = horizontalPlacementWorkplane(0);
+  // rotationX 90: the shape's own y axis lies flat along world z.
+  const turnedX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  const turnedAxes = {
+    quaternion: turnedX,
+    xAxis: new THREE.Vector3(1, 0, 0).applyQuaternion(turnedX),
+    yAxis: new THREE.Vector3(0, 1, 0).applyQuaternion(turnedX),
+    zAxis: new THREE.Vector3(0, 0, 1).applyQuaternion(turnedX),
+  };
+
+  function bounds(points: THREE.Vector3[]) {
+    return new THREE.Box3().setFromPoints(points);
+  }
+
+  it("draws nothing for a shape standing on the workplane", () => {
+    const frame = createSelectionFrame({ center: new THREE.Vector3(0, 10, 0) });
+    expect(groundFootprintForFrame(frame, basePlane)).toBeNull();
+  });
+
+  it("draws the frame's own rectangle under a lifted unrotated shape", () => {
+    const frame = createSelectionFrame({ center: new THREE.Vector3(5, 25, -3) });
+    const footprint = groundFootprintForFrame(frame, basePlane);
+
+    expect(footprint).toHaveLength(4);
+    const box = bounds(footprint!);
+    expect(box.min.x).toBeCloseTo(0);
+    expect(box.max.x).toBeCloseTo(10);
+    expect(box.min.z).toBeCloseTo(-18);
+    expect(box.max.z).toBeCloseTo(12);
+    expect(box.min.y).toBeCloseTo(0.04);
+    expect(box.max.y).toBeCloseTo(0.04);
+  });
+
+  it("draws nothing for a 90 degree turned shape lying on the workplane away from the origin", () => {
+    // Regression (#19 comment): the footprint was measured along the shape's
+    // own y axis, read the 40 mm sideways offset as a height and stood upright.
+    const frame = createSelectionFrame({
+      ...turnedAxes,
+      width: 20,
+      height: 20,
+      depth: 20,
+      center: new THREE.Vector3(0, 10, 40),
+    });
+
+    expect(groundFootprintForFrame(frame, basePlane)).toBeNull();
+  });
+
+  it("lays the footprint of a lifted 90 degree turned shape flat on the workplane", () => {
+    const frame = createSelectionFrame({
+      ...turnedAxes,
+      width: 20,
+      height: 30,
+      depth: 20,
+      center: new THREE.Vector3(0, 25, 40),
+    });
+    const footprint = groundFootprintForFrame(frame, basePlane);
+
+    expect(footprint).toHaveLength(4);
+    const box = bounds(footprint!);
+    expect(box.min.y).toBeCloseTo(0.04);
+    expect(box.max.y).toBeCloseTo(0.04);
+    expect(box.min.x).toBeCloseTo(-10);
+    expect(box.max.x).toBeCloseTo(10);
+    // The turned height (30) now runs along world z.
+    expect(box.min.z).toBeCloseTo(25);
+    expect(box.max.z).toBeCloseTo(55);
+  });
+
+  it("wraps a 45 degree turned shape in the outline of its projection", () => {
+    const turned = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 4);
+    const frame = createSelectionFrame({
+      quaternion: turned,
+      xAxis: new THREE.Vector3(1, 0, 0).applyQuaternion(turned),
+      yAxis: new THREE.Vector3(0, 1, 0).applyQuaternion(turned),
+      zAxis: new THREE.Vector3(0, 0, 1).applyQuaternion(turned),
+      width: 10,
+      height: 10,
+      depth: 10,
+      center: new THREE.Vector3(0, 30, 0),
+    });
+    const footprint = groundFootprintForFrame(frame, basePlane);
+
+    expect(footprint).toHaveLength(4);
+    const box = bounds(footprint!);
+    const halfDiagonal = Math.SQRT2 * 5;
+    expect(box.min.z).toBeCloseTo(-halfDiagonal);
+    expect(box.max.z).toBeCloseTo(halfDiagonal);
+    expect(box.min.x).toBeCloseTo(-5);
+    expect(box.max.x).toBeCloseTo(5);
+  });
+
+  it("draws a footprint for a shape below the workplane", () => {
+    const frame = createSelectionFrame({ center: new THREE.Vector3(0, -20, 0) });
+    expect(groundFootprintForFrame(frame, basePlane)).toHaveLength(4);
   });
 });

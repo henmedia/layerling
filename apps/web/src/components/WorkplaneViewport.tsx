@@ -63,7 +63,7 @@ import {
   type PlacementPoint,
   type PlacementWorkplane,
 } from "@/lib/placementWorkplane";
-import { liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
+import { groundFootprintForFrame, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
@@ -9153,9 +9153,8 @@ function createSelectedGroundFootprint(shape: WorkplaneShape, workplane: Placeme
     return null;
   }
 
-  const planeY = workplaneYForFrame(frame, workplane);
-  const nearestFaceY = clamp(planeY, frame.min.y, frame.max.y);
-  if (Math.abs(nearestFaceY - planeY) <= 0.08) {
+  const footprint = groundFootprintForFrame(frame, workplane);
+  if (!footprint) {
     return null;
   }
 
@@ -9163,28 +9162,13 @@ function createSelectedGroundFootprint(shape: WorkplaneShape, workplane: Placeme
   group.name = "SelectedGroundFootprint";
   group.userData.shapeId = shape.id;
 
-  const shadowY = planeY + 0.04;
-  const footprint = [
-    framePoint(frame, frame.min.x, shadowY, frame.min.z),
-    framePoint(frame, frame.max.x, shadowY, frame.min.z),
-    framePoint(frame, frame.max.x, shadowY, frame.max.z),
-    framePoint(frame, frame.min.x, shadowY, frame.max.z),
-  ];
+  // The footprint is convex, so a fan from its first corner fills it.
+  const fillPositions: number[] = [];
+  for (let index = 1; index < footprint.length - 1; index += 1) {
+    [footprint[0], footprint[index], footprint[index + 1]].forEach((point) => fillPositions.push(point.x, point.y, point.z));
+  }
   const fillGeometry = new THREE.BufferGeometry();
-  fillGeometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(
-      new Float32Array([
-        footprint[0].x, footprint[0].y, footprint[0].z,
-        footprint[1].x, footprint[1].y, footprint[1].z,
-        footprint[2].x, footprint[2].y, footprint[2].z,
-        footprint[0].x, footprint[0].y, footprint[0].z,
-        footprint[2].x, footprint[2].y, footprint[2].z,
-        footprint[3].x, footprint[3].y, footprint[3].z,
-      ]),
-      3,
-    ),
-  );
+  fillGeometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(fillPositions), 3));
   fillGeometry.computeVertexNormals();
   const fill = new THREE.Mesh(
     fillGeometry,
