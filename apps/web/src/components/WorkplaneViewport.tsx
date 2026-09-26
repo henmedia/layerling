@@ -7657,9 +7657,12 @@ function rebuildWorkplane(
         opacity: muted ? (theme === "dark" ? 0.17 : 0.22) : palette.surface.opacity,
         roughness: 0.92,
         side: THREE.DoubleSide,
+        // A face-on orthographic view interpolates this large coplanar quad
+        // slightly in front of the grid, so part of the grid fails the depth
+        // test. Sixteen depth units holds the plate behind those lines.
         polygonOffset: true,
         polygonOffsetFactor: 1,
-        polygonOffsetUnits: 1,
+        polygonOffsetUnits: 16,
       }),
     );
     surface.name = muted ? "WorkplaneBaseReference" : "WorkplaneBase";
