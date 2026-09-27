@@ -6078,6 +6078,9 @@ export function LayerlingEditor({
   // turns around its own centre again.
   const [rotationPivot, setRotationPivot] = useState<{ selectionKey: string; point: PivotPoint } | null>(null);
   const [pivotPickMode, setPivotPickMode] = useState(false);
+  const [cruiseAsset, setCruiseAsset] = useState<ShapeAsset | null>(null);
+  const cruiseAssetRef = useRef<ShapeAsset | null>(null);
+  cruiseAssetRef.current = cruiseAsset;
   const [arrayTool, setArrayTool] = useState<ArraySettings | null>(null);
   const [activeMode, setActiveMode] = useState("3D Design");
   const editorLanguage = useLanguage();
@@ -6112,6 +6115,10 @@ export function LayerlingEditor({
   useEffect(() => {
     setNotice("");
   }, [editorLanguage, setNotice]);
+  useEffect(() => {
+    if (!cruiseAsset) return;
+    setNotice(t("status.cruisePlace", { name: cruiseAsset.name }), true);
+  }, [cruiseAsset, editorLanguage, setNotice]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const projectFileInputRef = useRef<HTMLInputElement | null>(null);
   const sketchImageInputRef = useRef<HTMLInputElement | null>(null);
@@ -6947,6 +6954,10 @@ export function LayerlingEditor({
     (settings: { workspace: WorkplaneWorkspaceSettings; snap: GridSize }) => {
       const nextWorkspace = normalizeWorkspaceSettings(settings.workspace);
       workspaceSettingsRef.current = nextWorkspace;
+      if (!nextWorkspace.cruiseShapes && cruiseAssetRef.current) {
+        setCruiseAsset(null);
+        setNotice("");
+      }
       snapGridRef.current = settings.snap;
       setWorkspaceSettings((current) => (
         workplaneSettingsFingerprint(current, settings.snap) === workplaneSettingsFingerprint(nextWorkspace, settings.snap)
@@ -7182,6 +7193,7 @@ export function LayerlingEditor({
     workplaneOverride?: PlacementWorkplane,
   ) => {
     const initial = cloneSketchProfile(profile ?? emptySketchProfile());
+    setCruiseAsset(null);
     setWorkplaneMode(false);
     setActiveSketchWorkplane(normalizePlacementWorkplane(workplaneOverride ?? placementWorkplaneRef.current));
     setToolbarMode("sketch");
@@ -7789,6 +7801,7 @@ export function LayerlingEditor({
 
   const addShape = useCallback(
     (asset: ShapeAsset, point?: PlacementPoint) => {
+      setCruiseAsset(null);
       const shape = makeShapeFromAsset(asset, undefined, workspaceSettingsRef.current.shapeCustomizations[asset.kind]);
       const nextShape = {
         ...shape,
@@ -10435,6 +10448,12 @@ export function LayerlingEditor({
       if (event.key === "Escape") {
         // Erst das Werkzeug ablegen, dann die Auswahl - wer ein Werkzeug in der
         // Hand hat, meint mit Escape das Werkzeug.
+        if (cruiseAssetRef.current) {
+          event.preventDefault();
+          setCruiseAsset(null);
+          setNotice(t("status.cruiseCancelled"));
+          return;
+        }
         if (noteMode) {
           setNoteMode(false);
           setNotice("");
@@ -10633,6 +10652,10 @@ export function LayerlingEditor({
         showProjectNameInToolbar={showProjectNameInToolbar}
         onToolbarModeChange={(mode) => {
           setToolbarMode(mode);
+          if (mode !== "geometry") {
+            if (cruiseAssetRef.current) setNotice("");
+            setCruiseAsset(null);
+          }
           setWorkplaneMode(false);
           setTopPanel(null);
           setMenuOpen(false);
@@ -10709,9 +10732,13 @@ export function LayerlingEditor({
           setMenuOpen(false);
         }}
         onAddShape={(shape) => {
-          addShape(shape);
           setTopPanel(null);
           setMenuOpen(false);
+          if (workspaceSettings.cruiseShapes) {
+            setCruiseAsset(shape);
+            return;
+          }
+          addShape(shape);
         }}
       />
       <div className="editor-body">
@@ -10777,6 +10804,7 @@ export function LayerlingEditor({
           workspaceSettingsKey={projectId ?? "local-workplane"}
           showProjectNameInToolbar={showProjectNameInToolbar}
           onShowProjectNameInToolbarChange={onShowProjectNameInToolbarChange}
+          cruiseAsset={cruiseAsset}
           onAddShape={addShape}
           onAlignAnchorChange={chooseAlignAnchor}
           onAlignPreview={previewAlignSelection}

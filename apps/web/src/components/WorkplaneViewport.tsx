@@ -48,6 +48,7 @@ import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionO
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
 import {
   horizontalPlacementWorkplane,
+  placementPatchForNewShape,
   placementWorkplaneCoordinates,
   placementWorkplaneFromSurface,
   placementWorkplaneIsBase,
@@ -63,6 +64,7 @@ import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { projectThumbnailDimensions } from "@/lib/projectThumbnail";
+import { makeShapeFromAsset } from "@/lib/shapeCatalog";
 import { canBeginShapeDrag, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeSnapGrid, normalizeWorkspaceSettings, readWorkspaceDefault, saveWorkspaceDefault, shapeDimensionLimit, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceHydrationSyncDecision } from "@/lib/workplaneSettings";
 import { interiorWorkplaneGridCoordinates, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, WORKPLANE_MAJOR_GRID_INTERVAL } from "@/lib/workplaneGrid";
 import { cleanNearZero, cleanRotationDegrees, isNonSolidShapeKind, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, proportionalResizeScale, resizedImportedCoordinates, resizedImportedMeshPositions, resizedShapeSize, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeOverallFootprintDimensions, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth, shapeWithParametricSource } from "@/lib/workplaneShapes";
@@ -227,6 +229,8 @@ type WorkplaneViewportProps = {
   showProjectNameInToolbar?: boolean;
   onShowProjectNameInToolbarChange?: (show: boolean) => void;
   onAddShape: (shape: ShapeAsset, point?: PlacementPoint) => void;
+  /** Shape following the cursor until a click drops it. Null places immediately. */
+  cruiseAsset?: ShapeAsset | null;
   onAlignAnchorChange: (id: string) => void;
   onAlignPreview: (axis: AlignAxis, target: AlignTarget) => void;
   onAlignPreviewClear: () => void;
@@ -3450,6 +3454,7 @@ export function WorkplaneViewport({
   showProjectNameInToolbar = true,
   onShowProjectNameInToolbarChange,
   onAddShape,
+  cruiseAsset = null,
   onAlignAnchorChange,
   onAlignPreview,
   onAlignPreviewClear,
@@ -3604,6 +3609,10 @@ export function WorkplaneViewport({
   const [hoverModifierEdgeId, setHoverModifierEdgeId] = useState<number | null>(null);
   const selectedIdsKeyRef = useRef(selectedIds.join("|"));
   const placementWorkplaneRef = useRef(placementWorkplane);
+  const cruiseAssetRef = useRef<ShapeAsset | null>(cruiseAsset);
+  const cruisePreviewRef = useRef<{ object: THREE.Group; shape: WorkplaneShape } | null>(null);
+  const cruisePointerRef = useRef<{ x: number; y: number } | null>(null);
+  cruiseAssetRef.current = cruiseAsset;
   const projectNameRef = useRef(projectName);
   const workplaneModeRef = useRef(workplaneMode);
   placementWorkplaneRef.current = placementWorkplane;
@@ -4426,6 +4435,70 @@ export function WorkplaneViewport({
       clamp(snapValue(local.z, step), -bounds.depth / 2 + 6, bounds.depth / 2 - 6),
     );
   }, [toRawPlanePoint]);
+
+  const toFreePlacementWorkplanePoint = useCallback((clientX: number, clientY: number, workplane = placementWorkplaneRef.current) => {
+    const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
+    const origin = new THREE.Vector3(workplane.origin.x, workplane.origin.y, workplane.origin.z);
+    const raw = toRawPlanePoint(clientX, clientY, new THREE.Plane(normal, -normal.dot(origin)));
+    if (!raw) return null;
+    const local = placementWorkplaneCoordinates(workplane, raw);
+    const step = snapStep(snapRef.current);
+    return placementWorkplanePoint(workplane, snapValue(local.x, step), snapValue(local.z, step));
+  }, [toRawPlanePoint]);
+
+  const moveCruiseGhost = useCallback((clientX: number, clientY: number) => {
+    const preview = cruisePreviewRef.current;
+    const state = threeRef.current;
+    if (!preview || !state) return;
+    cruisePointerRef.current = { x: clientX, y: clientY };
+    const point = toFreePlacementWorkplanePoint(clientX, clientY);
+    if (!point) return;
+    const next = {
+      ...preview.shape,
+      ...placementPatchForNewShape(preview.shape, placementWorkplaneRef.current, point),
+    };
+    preview.shape = next;
+    updateShapeObjectTransform(preview.object, next);
+    preview.object.visible = true;
+    state.needsRender = true;
+  }, [toFreePlacementWorkplanePoint]);
+
+  useEffect(() => {
+    if (!cruiseAsset) {
+      cruisePointerRef.current = null;
+      return;
+    }
+    const state = threeRef.current;
+    if (!state) return;
+    const customization = workspaceRef.current.shapeCustomizations[cruiseAsset.kind];
+    const base = makeShapeFromAsset(cruiseAsset, undefined, customization);
+    const workplane = placementWorkplaneRef.current;
+    const shape = {
+      ...base,
+      ...placementPatchForNewShape(base, workplane, workplane.origin),
+    };
+    const object = createShapeObject(shape, false, () => {
+      if (threeRef.current) threeRef.current.needsRender = true;
+    }, false);
+    prepareCruiseGhost(object);
+    object.visible = false;
+    state.scene.add(object);
+    cruisePreviewRef.current = { object, shape };
+    state.needsRender = true;
+    return () => {
+      const latest = threeRef.current;
+      latest?.scene.remove(object);
+      disposeObject(object);
+      if (cruisePreviewRef.current?.object === object) cruisePreviewRef.current = null;
+      if (latest) latest.needsRender = true;
+    };
+  }, [cruiseAsset, cruiseAsset ? workspace.shapeCustomizations[cruiseAsset.kind] : undefined]);
+
+  useEffect(() => {
+    const pointer = cruisePointerRef.current;
+    if (!cruiseAsset || !pointer) return;
+    moveCruiseGhost(pointer.x, pointer.y);
+  }, [cruiseAsset, moveCruiseGhost, placementWorkplane]);
 
   const storeTapeModel = useCallback((next: TapeModel) => {
     tapeModelRef.current = next;
@@ -5985,6 +6058,13 @@ export function WorkplaneViewport({
         return;
       }
 
+      if (cruiseAssetRef.current) {
+        event.preventDefault();
+        const point = toFreePlacementWorkplanePoint(event.clientX, event.clientY);
+        if (point) onAddShape(cruiseAssetRef.current, point);
+        return;
+      }
+
       const handle = pickTransformHandle(event.clientX, event.clientY);
       if (handle) {
         const shape = shapesRef.current.find((entry) => entry.id === handle.id);
@@ -6259,7 +6339,9 @@ export function WorkplaneViewport({
       toPlanePoint,
       toPlanePointAtY,
       toPlacementWorkplanePoint,
+      toFreePlacementWorkplanePoint,
       toRawPlanePoint,
+      onAddShape,
     ],
   );
 
@@ -6268,6 +6350,7 @@ export function WorkplaneViewport({
       // Gehoert die Flaeche gerade der Kamera, hat hier niemand etwas zu
       // schweben oder zu ziehen - die Finger bewegen die Ansicht.
       if (cameraTouchRef.current) return;
+      if (cruiseAssetRef.current) moveCruiseGhost(event.clientX, event.clientY);
       if (workplaneModeRef.current) {
         const surface = pickPlacementSurface(event.clientX, event.clientY, event.shiftKey);
         let preview = surface?.workplane ?? null;
@@ -6384,7 +6467,7 @@ export function WorkplaneViewport({
         threeRef.current.needsRender = true;
       }
     },
-    [pickPlacementSurface, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, updateModifierEdgeHover, updateTapeHover, updateTransform],
+    [pickPlacementSurface, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateTapeHover, updateTransform],
   );
 
   useEffect(() => {
@@ -7065,7 +7148,7 @@ export function WorkplaneViewport({
         )}
       </div>
 
-      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${pivotPickMode ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""}`} aria-label={t("aria.workplane")}>
+      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${cruiseAsset ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${pivotPickMode ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""}`} aria-label={t("aria.workplane")}>
         <div className="workplane-plane">
           <div
             className="three-workplane-host"
@@ -10462,6 +10545,27 @@ function disposeChildren(group: THREE.Group) {
       disposeObject(child);
     }
   }
+}
+
+function prepareCruiseGhost(object: THREE.Object3D) {
+  object.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    child.raycast = () => {};
+    child.castShadow = false;
+    child.receiveShadow = false;
+    const sources = Array.isArray(child.material) ? child.material : [child.material];
+    const clones = sources.map((material) => {
+      const clone = material.clone();
+      clone.userData = { ...material.userData, cached: false };
+      delete clone.userData.sharedShapeMaterialKey;
+      clone.transparent = true;
+      clone.opacity = Math.min(clone.opacity, 0.65);
+      return clone;
+    });
+    releaseSharedShapeMaterials(child);
+    child.material = clones.length === 1 ? clones[0] : clones;
+    child.userData.sharedShapeMaterialKeys = [];
+  });
 }
 
 function disposeObject(object: THREE.Object3D) {

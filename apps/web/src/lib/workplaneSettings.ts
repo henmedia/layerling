@@ -24,7 +24,7 @@ export const DEFAULT_WORKPLANE_WORKSPACE: WorkplaneWorkspaceSettings = {
   background: "#fbf8f0",
   showShadows: true,
   showGrid: true,
-  cruiseShapes: true,
+  cruiseShapes: false,
   selectBeforeMove: false,
   dimensionsAlwaysVisible: true,
   zoomSpeed: 5,

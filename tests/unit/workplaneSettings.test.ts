@@ -66,6 +66,10 @@ describe("workplane settings helpers", () => {
     expect(normalizeWorkspaceSettings({}).dimensionsAlwaysVisible).toBe(true);
     expect(normalizeWorkspaceSettings({ dimensionsAlwaysVisible: false }).dimensionsAlwaysVisible).toBe(false);
     expect(normalizeWorkspaceSettings({ dimensionsAlwaysVisible: "yes" }).dimensionsAlwaysVisible).toBe(true);
+    expect(DEFAULT_WORKPLANE_WORKSPACE.cruiseShapes).toBe(false);
+    expect(normalizeWorkspaceSettings({}).cruiseShapes).toBe(false);
+    expect(normalizeWorkspaceSettings({ cruiseShapes: true }).cruiseShapes).toBe(true);
+    expect(normalizeWorkspaceSettings({ cruiseShapes: "yes" }).cruiseShapes).toBe(false);
   });
 
   it("keeps app limits until a shape receives an explicit customization", () => {

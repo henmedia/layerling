@@ -614,6 +614,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.sketchSelectedMany": "{count} Skizzenelemente ausgewählt",
   "status.sketchSelectionCleared": "Skizzenauswahl aufgehoben",
 
+  "status.cruisePlace": "Klick, um {name} abzulegen. Esc bricht ab.",
+  "status.cruiseCancelled": "Ablegen abgebrochen",
   "status.shapeAdded": "{name} hinzugefügt",
   "status.shapeAddedMcp": "{name} von MCP hinzugefügt",
   "status.shapeImportedMcp": "{name} von MCP importiert",

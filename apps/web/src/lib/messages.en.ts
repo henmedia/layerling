@@ -615,6 +615,8 @@ export const MESSAGES_EN = {
   "status.sketchSelectedMany": "Selected {count} sketch items",
   "status.sketchSelectionCleared": "Sketch selection cleared",
 
+  "status.cruisePlace": "Click to place {name}. Esc to cancel.",
+  "status.cruiseCancelled": "Placement cancelled",
   "status.shapeAdded": "{name} added",
   "status.shapeAddedMcp": "{name} added by MCP",
   "status.shapeImportedMcp": "{name} imported by MCP",
