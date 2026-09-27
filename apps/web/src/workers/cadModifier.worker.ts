@@ -2,7 +2,8 @@
 
 import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { orientedFaceNormal, shellSolid } from "@/lib/cadShell";
-import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierQuality, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
+import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
+import { cadProfileSolidMismatch, profileExtrusionSolid } from "@/lib/cadProfileSolid";
 import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, cadTransformRequiresGeneralTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 
 const HASH_UPPER_BOUND = 2_147_483_647;
@@ -223,9 +224,48 @@ function reconstructPrimitiveSolid(cad: OcctKernel, primitive: CadModifierPrimit
   return transformed;
 }
 
+/**
+ * Only a memory fault leaves the kernel unfit for another attempt. Everything
+ * else the exact path can throw - an OCCT error, even a raw
+ * WebAssembly.Exception - still leaves the mesh path to try; if that runs out
+ * of room too, the handler below restarts the kernel exactly as before.
+ */
+function isFatalKernelFault(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  const name = error instanceof Error ? error.name : "";
+  return isCadModifierWasmMemoryFault(message, name);
+}
+
+/** Exact profile bodies the current prepare attempt has actually used. */
+let exactProfileBodiesUsed = 0;
+
+function reconstructProfileSolid(cad: OcctKernel, profile: CadModifierProfilePart) {
+  const local = profileExtrusionSolid(cad, profile);
+  const placed = applyCadTransform(cad, local, profile.transform);
+  if (!cad.isSolid(placed) || !cadShapeIsValid(cad, placed)) throw new Error("The exact profile body is not a valid solid after placing it");
+  const mismatch = cadProfileSolidMismatch(cad, placed, profile.expected);
+  if (mismatch) throw new Error(`The exact profile body does not match the shape (${mismatch})`);
+  return placed;
+}
+
 function reconstructSolid(cad: OcctKernel, part: CadModifierMeshPart) {
   if (part.primitive) {
     return reconstructPrimitiveSolid(cad, part.primitive);
+  }
+  if (part.profile) {
+    try {
+      const solid = reconstructProfileSolid(cad, part.profile);
+      exactProfileBodiesUsed += 1;
+      return solid;
+    } catch (error) {
+      // Without its mesh (too dense to send) there is nothing to fall back on;
+      // with it, the part goes the way it always went.
+      if (isFatalKernelFault(error)) throw error;
+      if (!part.positions || !part.indices) {
+        const reason = error instanceof Error ? error.message : String(error ?? "");
+        throw new Error(`This shape could not be rebuilt as an exact CAD body, and its mesh is too dense for edge treatment. ${reason}`.trim());
+      }
+    }
   }
   if (part.brep) {
     let exact = cad.fromBREP(part.brep);
@@ -298,6 +338,29 @@ function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
   result = cad.unifySameDomain(result);
   if (!cadShapeIsValid(cad, result)) throw new Error("The grouped solid could not be repaired into valid topology");
   return result;
+}
+
+/**
+ * Exact profile bodies first; if the group cannot be combined from them, the
+ * whole group again from the display meshes - the way it was built before
+ * exact profiles existed - as long as an exact body was in play and every
+ * profile part brought its mesh. Called right after releaseSession, so the
+ * failed attempt's handles are all that is in the arena and can go.
+ */
+function reconstructPartsWithFallback(cad: OcctKernel, parts: CadModifierMeshPart[]) {
+  exactProfileBodiesUsed = 0;
+  try {
+    return reconstructParts(cad, parts);
+  } catch (error) {
+    const profileParts = parts.filter((part) => part.profile);
+    if (
+      isFatalKernelFault(error) ||
+      exactProfileBodiesUsed === 0 ||
+      profileParts.some((part) => !part.positions || !part.indices)
+    ) throw error;
+    releaseSession(cad);
+    return reconstructParts(cad, parts.map((part) => (part.profile ? { ...part, profile: undefined } : part)));
+  }
 }
 
 function isDisplayCadEdge(edge: CollectedCadEdgeGeometry) {
@@ -457,7 +520,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
   }
   if (request.type === "prepare") {
     releaseSession(activeCad);
-    baseShape = reconstructParts(activeCad, request.parts);
+    baseShape = reconstructPartsWithFallback(activeCad, request.parts);
     const collected = collectEdges(activeCad, baseShape, request.sharpAngle, Boolean(request.suppressTreatmentDetailEdges), true);
     edgeHandles = collected.handles;
     baseSolids = activeCad.isSolid(baseShape) ? [baseShape] : activeCad.getSubShapes(baseShape, "solid");

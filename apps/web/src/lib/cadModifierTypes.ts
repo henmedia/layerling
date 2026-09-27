@@ -62,12 +62,49 @@ export type CadModifierPrimitivePart =
       transform?: number[];
     };
 
+/**
+ * One piece of a flat outline in the shape's local X/Z plane, running from the
+ * end of the previous piece (or the loop's start point) to (x, z). An arc is a
+ * piece of the ellipse (cx + rx cos t, cz + rz sin t) from t = start to
+ * t = end; with rx === rz it is a circular arc.
+ */
+export type CadModifierProfileSegment =
+  | { kind: "line"; x: number; z: number }
+  | { kind: "arc"; x: number; z: number; cx: number; cz: number; rx: number; rz: number; start: number; end: number };
+
+export type CadModifierProfileLoop = {
+  x: number;
+  z: number;
+  segments: CadModifierProfileSegment[];
+};
+
+/**
+ * A catalog shape whose body is its outline pushed straight up: the CAD worker
+ * builds it as an exact solid (lines, arcs, flat caps) from the shape's own
+ * parameters instead of sewing the display mesh back together.
+ */
+export type CadModifierProfilePart = {
+  kind: "extrusion";
+  /** The first loop is the outer boundary, any further loops are holes. */
+  loops: CadModifierProfileLoop[];
+  height: number;
+  transform?: number[];
+  /**
+   * World bounds [minX, minY, minZ, maxX, maxY, maxZ] and volume of the
+   * display mesh - the exact body has to agree with them, or the worker falls
+   * back to the mesh.
+   */
+  expected?: { bounds: number[]; volume: number };
+};
+
 export type CadModifierMeshPart = {
   positions?: Float32Array;
   indices?: Uint32Array;
   brep?: string;
   brepTransform?: number[];
   primitive?: CadModifierPrimitivePart;
+  /** When set, positions/indices (if any) are only the fallback if the exact body fails. */
+  profile?: CadModifierProfilePart;
   hole: boolean;
 };
 

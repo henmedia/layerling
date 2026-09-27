@@ -217,7 +217,32 @@ export function cadModifierPrepareCostMs(meshTriangleCount: number) {
  */
 export const CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT = 4_000;
 
-export function cadModifierPrepareTimeoutMs(meshTriangleCount: number) {
+/**
+ * Exact profile bodies (star, honeycomb, ...) are built quickly, but a group of
+ * many of them is fused and cut one by one, and the kernel needs a while to
+ * map the edges of a big one. Measured in Chromium on a 2-core machine
+ * (prepare, then a fillet on 12 edges, which maps the edges once more):
+ * honeycomb 80 mm, 306 outline pieces: 3.6 s + 0.7 s; 100 mm, 610 pieces:
+ * 4.8 s + 6.3 s; 120 mm, 898 pieces: 8.8 s + 13.7 s; 150 mm, 1,550 pieces:
+ * 26 s, and the fillet no longer fits the 30 s preview timeout.
+ *
+ * So up to 700 pieces per request the exact body is used - its preview stays
+ * near 9 s there, over three times inside the timeout - and above that the
+ * parts go the way they always went, through their display meshes and the
+ * triangle limit. Each part and each piece gets room on top of the normal
+ * minute, with the same 2.5x margin for slower computers as the mesh budget.
+ */
+export const CAD_MODIFIER_EXACT_SEGMENT_LIMIT = 700;
+export const CAD_MODIFIER_EXACT_PART_BUDGET_MS = 2_000;
+export const CAD_MODIFIER_EXACT_SEGMENT_BUDGET_MS = 45;
+
+export function cadModifierPrepareTimeoutMs(meshTriangleCount: number, exactPartCount = 0, exactSegmentCount = 0): number {
+  if (Number.isFinite(exactPartCount) && exactPartCount > 0) {
+    const segments = Number.isFinite(exactSegmentCount) && exactSegmentCount > 0 ? Math.ceil(exactSegmentCount) : 0;
+    const exactBudget = 60_000 + Math.ceil(exactPartCount) * CAD_MODIFIER_EXACT_PART_BUDGET_MS + segments * CAD_MODIFIER_EXACT_SEGMENT_BUDGET_MS;
+    const meshBudget = Number.isFinite(meshTriangleCount) && meshTriangleCount > 0 ? cadModifierPrepareTimeoutMs(meshTriangleCount) : 0;
+    return Math.min(CAD_MODIFIER_MAX_PREPARE_TIMEOUT_MS, Math.max(exactBudget, meshBudget));
+  }
   if (!Number.isFinite(meshTriangleCount) || meshTriangleCount <= 0) {
     return CAD_MODIFIER_REQUEST_TIMEOUT_MS;
   }

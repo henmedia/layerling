@@ -104,6 +104,7 @@ import {
 import { workplaneCenteringOffset } from "@/lib/workplaneCentering";
 import { bakeCadMetadataForShapeTransform, cadBrepTransformForShape, cadModifierPrimitiveForAnalyticBox, cadModifierPrimitiveForAnalyticShape, cadModifierPrimitiveForBakedShape } from "@/lib/cadBakeMetadata";
 import { hasOneToOneCadComponentMapping } from "@/lib/cadModifierGroups";
+import { cadModifierProfileForShape, cadProfileExpectation, cadProfileSegmentCount, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
 import {
   CAD_MODIFIER_MAX_SHARP_ANGLE,
   CAD_MODIFIER_REQUEST_TIMEOUT_MS,
@@ -172,7 +173,7 @@ import {
   type LayerlingMcpShapeSummary,
   type LayerlingMcpViewFace,
 } from "@/lib/layerlingMcpProtocol";
-import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierQuality, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
+import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import type { SketchCadBuildResponse } from "@/lib/sketchCadTypes";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, GridSize, ParametricSource, ProjectAsset, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
@@ -1375,6 +1376,22 @@ function meshDataToCadTransfer(mesh: MeshData) {
   const indices = new Uint32Array(mesh.faces.length * 3);
   mesh.faces.forEach((face, index) => indices.set(face, index * 3));
   return { positions, indices };
+}
+
+/**
+ * An exact profile part for the CAD worker. The display mesh always goes along
+ * as the yardstick the exact body is checked against; its triangles go along
+ * as the fallback body only while the whole request stays within the limit
+ * that has always applied to meshes - so anything that worked before still
+ * has its old way through.
+ */
+function cadModifierProfileMeshPart(profile: CadModifierProfilePart, mesh: MeshData | undefined, sendMesh: boolean, hole: boolean): CadModifierMeshPart {
+  const expected = mesh && mesh.faces.length > 0 ? cadProfileExpectation(mesh.vertices, mesh.faces) : undefined;
+  return {
+    profile: expected ? { ...profile, expected } : profile,
+    ...(sendMesh && mesh ? meshDataToCadTransfer(mesh) : {}),
+    hole,
+  };
 }
 
 function shapeFromCadMesh(
@@ -8269,7 +8286,7 @@ export function LayerlingEditor({
     const sourceParts = (selectedShape.groupedShapes?.length && !hasAppliedEdgeTreatment && !shapeHasShapeDeform(selectedShape)
       ? restoreGroupedChildren(selectedShape)
       : [selectedShape]).flatMap(cadModifierSourceParts);
-    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; brepTransform?: number[]; primitive?: CadModifierPrimitivePart }> = sourceParts.map((shape) => {
+    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((shape) => {
       const frame = shape.cadBrepFrame;
       const preserveNeedsRetessellation = preservesEdgeTreatmentSize(shape) && Boolean(frame) && (
         Math.abs(shapeWidth(shape) - (frame?.width ?? shapeWidth(shape))) > 1e-6 ||
@@ -8279,12 +8296,19 @@ export function LayerlingEditor({
       if (shapeHasShapeDeform(shape)) return { shape, mesh: meshForShape(shape) };
       const primitive = cadModifierPrimitiveForShape(shape);
       if (primitive) return { shape, primitive };
+      const profile = cadModifierProfileForShape(shape);
+      if (profile) return { shape, profile, profileMesh: meshForShape(shape) };
       return shape.cadBrep && frame && !preserveNeedsRetessellation
         ? { shape, brep: shape.cadBrep, brepTransform: cadBrepTransformForShape(shape) }
         : { shape, mesh: meshForShape(shape) };
-    });
+    }));
     const triangleCount = partInputs.reduce((total, part) => total + (part.mesh?.faces.length ?? 0), 0);
-    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.primitive)) {
+    const profileTriangleCount = partInputs.reduce((total, part) => total + (part.profileMesh?.faces.length ?? 0), 0);
+    const profilePartCount = partInputs.filter((part) => part.profile).length;
+    const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0), 0);
+    const sendProfileMeshes = triangleCount + profileTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
+    const prepareTimeoutMs = cadModifierPrepareTimeoutMs(triangleCount + (sendProfileMeshes ? profileTriangleCount : 0), profilePartCount, profileSegmentCount);
+    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.primitive && !part.profile)) {
       setNotice(t("status.noPrintableSurface"));
       return;
     }
@@ -8325,6 +8349,7 @@ export function LayerlingEditor({
     const parts: CadModifierMeshPart[] = partInputs.map((part) => {
       if (part.brep) return { brep: part.brep, brepTransform: part.brepTransform, hole: Boolean(part.shape.hole) };
       if (part.primitive) return { primitive: part.primitive, hole: Boolean(part.shape.hole) };
+      if (part.profile) return cadModifierProfileMeshPart(part.profile, part.profileMesh, sendProfileMeshes, Boolean(part.shape.hole));
       return { ...meshDataToCadTransfer(part.mesh as MeshData), hole: Boolean(part.shape.hole) };
     });
     const prepareRequestId = postCadModifierRequest({
@@ -8340,7 +8365,7 @@ export function LayerlingEditor({
       return;
     }
     cadModifierPrepareRef.current = prepareRequestId;
-    armCadModifierWatchdog(prepareRequestId, "prepare", cadModifierPrepareTimeoutMs(triangleCount));
+    armCadModifierWatchdog(prepareRequestId, "prepare", prepareTimeoutMs);
   }, [armCadModifierWatchdog, invalidateCadModifierSession, postCadModifierRequest, selectedShape, selectedShapes.length]);
 
   const prepareCadModifierForMcp = useCallback(async (shape: WorkplaneShape, sharpAngle: number) => {
@@ -8352,7 +8377,7 @@ export function LayerlingEditor({
     const sourceParts = (shape.groupedShapes?.length && !hasAppliedEdgeTreatment && !shapeHasShapeDeform(shape)
       ? restoreGroupedChildren(shape)
       : [shape]).flatMap(cadModifierSourceParts);
-    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; brepTransform?: number[]; primitive?: CadModifierPrimitivePart }> = sourceParts.map((partShape) => {
+    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((partShape) => {
       const frame = partShape.cadBrepFrame;
       const preserveNeedsRetessellation = preservesEdgeTreatmentSize(partShape) && Boolean(frame) && (
         Math.abs(shapeWidth(partShape) - (frame?.width ?? shapeWidth(partShape))) > 1e-6 ||
@@ -8362,12 +8387,19 @@ export function LayerlingEditor({
       if (shapeHasShapeDeform(partShape)) return { shape: partShape, mesh: meshForShape(partShape) };
       const primitive = cadModifierPrimitiveForShape(partShape);
       if (primitive) return { shape: partShape, primitive };
+      const profile = cadModifierProfileForShape(partShape);
+      if (profile) return { shape: partShape, profile, profileMesh: meshForShape(partShape) };
       return partShape.cadBrep && frame && !preserveNeedsRetessellation
         ? { shape: partShape, brep: partShape.cadBrep, brepTransform: cadBrepTransformForShape(partShape) }
         : { shape: partShape, mesh: meshForShape(partShape) };
-    });
+    }));
     const triangleCount = partInputs.reduce((total, part) => total + (part.mesh?.faces.length ?? 0), 0);
-    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.primitive)) {
+    const profileTriangleCount = partInputs.reduce((total, part) => total + (part.profileMesh?.faces.length ?? 0), 0);
+    const profilePartCount = partInputs.filter((part) => part.profile).length;
+    const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0), 0);
+    const sendProfileMeshes = triangleCount + profileTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
+    const prepareTimeoutMs = cadModifierPrepareTimeoutMs(triangleCount + (sendProfileMeshes ? profileTriangleCount : 0), profilePartCount, profileSegmentCount);
+    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.primitive && !part.profile)) {
       throw new Error("The selected object has no printable surface");
     }
     if (triangleCount > CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT) {
@@ -8376,6 +8408,7 @@ export function LayerlingEditor({
     const parts: CadModifierMeshPart[] = partInputs.map((part) => {
       if (part.brep) return { brep: part.brep, brepTransform: part.brepTransform, hole: Boolean(part.shape.hole) };
       if (part.primitive) return { primitive: part.primitive, hole: Boolean(part.shape.hole) };
+      if (part.profile) return cadModifierProfileMeshPart(part.profile, part.profileMesh, sendProfileMeshes, Boolean(part.shape.hole));
       return { ...meshDataToCadTransfer(part.mesh as MeshData), hole: Boolean(part.shape.hole) };
     });
     const transfer = parts.flatMap((part) => part.positions && part.indices ? [part.positions.buffer as Transferable, part.indices.buffer as Transferable] : []);
@@ -8384,7 +8417,7 @@ export function LayerlingEditor({
       parts,
       sharpAngle,
       suppressTreatmentDetailEdges: appliedEdgeTreatmentCount > 0,
-    }, transfer, cadModifierPrepareTimeoutMs(triangleCount));
+    }, transfer, prepareTimeoutMs);
     if (response.type !== "ready") {
       throw new Error("The CAD worker did not return an edge list");
     }
