@@ -7406,7 +7406,8 @@ button {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   column-gap: 16px;
-  padding-bottom: 16px;
+  margin: -8px 0 0;
+  padding-bottom: 10px;
   border-bottom: 1px solid #f0eae0;
 }
 
@@ -7414,6 +7415,9 @@ button {
   display: grid;
   min-width: 0;
   gap: 5px;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
 }
 
 .workspace-toggle-copy small {
