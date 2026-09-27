@@ -117,7 +117,7 @@ import {
   minBentTubeBendRadius,
   normalizedBentTubeFields,
 } from "@/lib/bentTubeGeometry";
-import { displayStepFromMillimeters, displayToMillimeters, formatMeasurementNumber, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
+import { displayStepFromMillimeters, displayToMillimeters, formatMeasurementNumber, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseMeasurementInput, resolveMeasurementInput } from "@/lib/measurementUnits";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { isNonSolidShapeKind, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
@@ -259,6 +259,8 @@ function formatPropertyNumber(value: number, accuracy: MeasurementAccuracy, step
   if (step >= 1) return String(Math.round(value));
   return formatMeasurementNumber(value, accuracy, step);
 }
+
+const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diameter", "starOuterSize"]);
 
 function propertyUsesLengthUnit(key: string) {
   return ["radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "centerHole", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius"].includes(key);
@@ -1854,7 +1856,9 @@ function RangeProperty({
   const unit = isLength ? lengthDisplayUnit(workspace).label : null;
   const toModelValue = (nextValue: number) => isLength ? displayToMillimeters(nextValue, workspace) : nextValue;
   const commitDraft = () => {
-    const next = parseMeasurementInput(draft);
+    const next = RELATIVE_SIZE_PROPERTY_IDS.has(id)
+      ? resolveMeasurementInput(draft, controlValue)
+      : parseMeasurementInput(draft);
     const finiteNext = Number.isFinite(next) ? next : controlValue;
     const nextModelValue = toModelValue(finiteNext);
     onChange(allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));

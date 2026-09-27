@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
-import { formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, normalizeScaleForUnits, parseMeasurementInput, scaleOptionsForUnits } from "@/lib/measurementUnits";
+import { formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, normalizeScaleForUnits, parseMeasurementInput, resolveMeasurementInput, scaleOptionsForUnits } from "@/lib/measurementUnits";
 import { canBeginShapeDrag, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, shapeDimensionLimit, workplaneSettingsFingerprint, workspaceHydrationSyncDecision } from "@/lib/workplaneSettings";
 import { toolbarShapeAssets } from "@/lib/shapeCatalog";
 
@@ -142,6 +142,18 @@ describe("workplane settings helpers", () => {
     expect(parseMeasurementInput("1.234,5")).toBe(1234.5);
     expect(parseMeasurementInput("1,234.5")).toBe(1234.5);
     expect(parseMeasurementInput("not a measurement")).toBeNaN();
+  });
+
+  it("scales the current value when the input is a percentage", () => {
+    expect(resolveMeasurementInput("50%", 200)).toBe(100);
+    expect(resolveMeasurementInput("120%", 200)).toBe(240);
+    expect(resolveMeasurementInput("50,5%", 200)).toBe(101);
+    expect(resolveMeasurementInput("50 %", 200)).toBe(100);
+    expect(resolveMeasurementInput("100", 200)).toBe(100);
+    expect(resolveMeasurementInput("66", 33)).toBe(21.78);
+    expect(resolveMeasurementInput("%", 200)).toBeNaN();
+    expect(resolveMeasurementInput("abc%", 200)).toBeNaN();
+    expect(resolveMeasurementInput("50%", Number.NaN)).toBeNaN();
   });
 
   it("fingerprints workspace and snap settings together", () => {

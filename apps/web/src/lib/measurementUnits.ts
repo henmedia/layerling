@@ -96,6 +96,19 @@ export function parseMeasurementInput(value: string | number) {
   return Number.isFinite(parsed) ? parsed : Number.NaN;
 }
 
+/**
+ * A trailing percent scales the field's current value. `50%` of 200 is 100.
+ * Anything else is an absolute measurement in the field's own units.
+ */
+export function resolveMeasurementInput(raw: string | number, current: number) {
+  if (typeof raw !== "string") return parseMeasurementInput(raw);
+  const compact = raw.trim().replace(/[\s\u00a0]/g, "");
+  if (!compact.endsWith("%")) return parseMeasurementInput(raw);
+  const percent = parseMeasurementInput(compact.slice(0, -1));
+  if (!Number.isFinite(percent) || !Number.isFinite(current)) return Number.NaN;
+  return current * (percent / 100);
+}
+
 export function formatMeasurementNumber(value: number, accuracy: MeasurementAccuracy, _step?: number) {
   let decimals = accuracy;
   while (decimals < 6 && value !== 0 && Math.abs(value) < 0.5 * 10 ** -decimals) {

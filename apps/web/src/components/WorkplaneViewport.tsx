@@ -32,7 +32,7 @@ import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createBentTubeGeometry } from "@/lib/bentTubeGeometry";
 import { createThreadGeometry } from "@/lib/threadGeometry";
 import { createSpringGeometry } from "@/lib/springGeometry";
-import { parseMeasurementInput } from "@/lib/measurementUnits";
+import { parseMeasurementInput, resolveMeasurementInput } from "@/lib/measurementUnits";
 import {
   computeCornerRulerRelativeCoordinates,
   computeCornerRulerShift,
@@ -3519,7 +3519,7 @@ export function WorkplaneViewport({
   const [rulerDimensionOverlay, setRulerDimensionOverlay] = useState<RulerDimensionOverlayState | null>(null);
   const [cornerRulerMode, setCornerRulerMode] = useState(false);
   const [cornerRulerOverlay, setCornerRulerOverlay] = useState<CornerRulerOverlayState | null>(null);
-  const [rulerDimensionEditing, setRulerDimensionEditing] = useState<{ shapeId: string; field: RulerDimensionField; x: number; y: number; value: string } | null>(null);
+  const [rulerDimensionEditing, setRulerDimensionEditing] = useState<{ shapeId: string; field: RulerDimensionField; x: number; y: number; value: string; base: number } | null>(null);
   const [rulerDuplicatePreview, setRulerDuplicatePreview] = useState<{ x: number; y: number; label: string } | null>(null);
   const [rulerDuplicateEditing, setRulerDuplicateEditing] = useState<{ rulerId: string; shapeId: string; baseAlong: number; x: number; y: number; value: string } | null>(null);
   const [rulerCoordinateEditing, setRulerCoordinateEditing] = useState<{ rulerId: string; shapeId: string; axis: "x" | "z" | "elevation"; x: number; y: number; value: string } | null>(null);
@@ -5231,7 +5231,18 @@ export function WorkplaneViewport({
       setEditingDimension(null);
       return;
     }
-    const value = parseMeasurementInput(edit.value);
+    const isSizeAxis = edit.axis === "width" || edit.axis === "depth" || edit.axis === "height";
+    const sizeFrame = isSizeAxis ? selectionFrameForShapes([shape], [shape.id]) : null;
+    const currentExtent = edit.axis === "width"
+      ? sizeFrame?.width ?? shapeWidth(shape)
+      : edit.axis === "depth"
+        ? sizeFrame?.depth ?? shapeDepth(shape)
+        : edit.axis === "height"
+          ? sizeFrame?.height ?? shape.height
+          : Number.NaN;
+    const value = isSizeAxis
+      ? resolveMeasurementInput(edit.value, currentExtent)
+      : parseMeasurementInput(edit.value);
     if (edit.axis === "elevation") {
       if (Number.isFinite(value)) {
         const activeWorkplane = placementWorkplaneRef.current;
@@ -5265,7 +5276,7 @@ export function WorkplaneViewport({
       const nextValue = Math.min(customLimit ?? Number.POSITIVE_INFINITY, Math.max(MIN_SHAPE_SIZE, value));
       const anchor = isCornerRulerMidpoint ? null : lastResizeAnchorRef.current;
       if (edit.axis === "width") {
-        const frame = selectionFrameForShapes([shape], [shape.id]);
+        const frame = sizeFrame;
         if (shapeHasTaper(shape) && frame) {
           const scaleX = nextValue / Math.max(MIN_SHAPE_SIZE, frame.width);
           const signs = anchor?.shapeId === shape.id ? resizeSignsForDimension(anchor.signs, "width") : { x: 0, z: 0 };
@@ -5290,7 +5301,7 @@ export function WorkplaneViewport({
           onUpdateShape(id, patchWithResizeAnchor(shape, patch, edit.axis, anchor));
         }
       } else if (edit.axis === "depth") {
-        const frame = selectionFrameForShapes([shape], [shape.id]);
+        const frame = sizeFrame;
         if (shapeHasTaper(shape) && frame) {
           const scaleZ = nextValue / Math.max(MIN_SHAPE_SIZE, frame.depth);
           const signs = anchor?.shapeId === shape.id ? resizeSignsForDimension(anchor.signs, "depth") : { x: 0, z: 0 };
@@ -5335,7 +5346,7 @@ export function WorkplaneViewport({
 
   const beginRulerDimensionEdit = useCallback((item: RulerDimensionOverlayItem) => {
     if (!item.field) return;
-    setRulerDimensionEditing({ shapeId: item.shapeId, field: item.field, x: item.labelX, y: item.labelY, value: formatMeasure(item.value, workspaceRef.current.accuracy) });
+    setRulerDimensionEditing({ shapeId: item.shapeId, field: item.field, x: item.labelX, y: item.labelY, value: formatMeasure(item.value, workspaceRef.current.accuracy), base: item.value });
   }, []);
 
   const commitRulerDimensionEdit = useCallback(() => {
@@ -5343,7 +5354,7 @@ export function WorkplaneViewport({
     setRulerDimensionEditing(null);
     if (!edit) return;
     const shape = shapesRef.current.find((entry) => entry.id === edit.shapeId);
-    const value = parseMeasurementInput(edit.value);
+    const value = resolveMeasurementInput(edit.value, edit.base);
     if (shape && Number.isFinite(value) && value > 0) {
       const nextValue = Math.max(MIN_SHAPE_SIZE, value);
       if (edit.field === "width") {
