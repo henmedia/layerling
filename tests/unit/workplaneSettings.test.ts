@@ -150,7 +150,7 @@ describe("workplane settings helpers", () => {
     expect(resolveMeasurementInput("50,5%", 200)).toBe(101);
     expect(resolveMeasurementInput("50 %", 200)).toBe(100);
     expect(resolveMeasurementInput("100", 200)).toBe(100);
-    expect(resolveMeasurementInput("66", 33)).toBe(21.78);
+    expect(resolveMeasurementInput("33%", 66)).toBe(21.78);
     expect(resolveMeasurementInput("%", 200)).toBeNaN();
     expect(resolveMeasurementInput("abc%", 200)).toBeNaN();
     expect(resolveMeasurementInput("50%", Number.NaN)).toBeNaN();
