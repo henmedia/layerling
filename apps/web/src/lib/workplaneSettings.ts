@@ -35,6 +35,33 @@ export const DEFAULT_WORKPLANE_WORKSPACE: WorkplaneWorkspaceSettings = {
   shapeCustomizations: {},
 };
 
+const ZOOM_SPEED_SLIDER_MIN = 1;
+const ZOOM_SPEED_SLIDER_MAX = 10;
+const ZOOM_SPEED_FAST_TO_SLOW = 20;
+// OrbitControls.zoomSpeed at the default slider position. The old mapping was
+// 0.28 + slider * 0.09, which left the fast end only about three times the slow end.
+export const DEFAULT_ORBIT_ZOOM_SPEED = 0.73;
+
+/**
+ * Maps the 1–10 zoom slider onto OrbitControls.zoomSpeed.
+ * Each wheel event scales camera distance by 0.95^(zoomSpeed * |deltaY| / 100),
+ * so this value is the zoom rate. The curve is geometric: the fast end is
+ * twenty times the slow end, and the default slider position keeps the old rate.
+ */
+export function orbitControlsZoomSpeed(slider: number): number {
+  const span = ZOOM_SPEED_SLIDER_MAX - ZOOM_SPEED_SLIDER_MIN;
+  const position = Number.isFinite(slider)
+    ? Math.min(ZOOM_SPEED_SLIDER_MAX, Math.max(ZOOM_SPEED_SLIDER_MIN, slider))
+    : DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed;
+  const slowest = DEFAULT_ORBIT_ZOOM_SPEED / ZOOM_SPEED_FAST_TO_SLOW ** ((DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed - ZOOM_SPEED_SLIDER_MIN) / span);
+  return slowest * ZOOM_SPEED_FAST_TO_SLOW ** ((position - ZOOM_SPEED_SLIDER_MIN) / span);
+}
+
+/** Raises a fixed distance multiplier by the slider's rate, so buttons match the wheel. */
+export function zoomDistanceScale(step: number, slider: number): number {
+  return step ** (orbitControlsZoomSpeed(slider) / DEFAULT_ORBIT_ZOOM_SPEED);
+}
+
 const snapGridOptions: GridSize[] = ["Off", "0.1 mm", "0.25 mm", "0.5 mm", "1.0 mm", "2.0 mm", "5.0 mm", "Brick"];
 const customizableShapeKinds: ShapeKind[] = [
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",

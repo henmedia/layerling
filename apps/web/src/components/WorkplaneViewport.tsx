@@ -65,7 +65,7 @@ import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { projectThumbnailDimensions } from "@/lib/projectThumbnail";
 import { makeShapeFromAsset } from "@/lib/shapeCatalog";
-import { canBeginShapeDrag, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeSnapGrid, normalizeWorkspaceSettings, readWorkspaceDefault, saveWorkspaceDefault, shapeDimensionLimit, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceHydrationSyncDecision } from "@/lib/workplaneSettings";
+import { canBeginShapeDrag, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsZoomSpeed, readWorkspaceDefault, saveWorkspaceDefault, shapeDimensionLimit, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceHydrationSyncDecision, zoomDistanceScale } from "@/lib/workplaneSettings";
 import { interiorWorkplaneGridCoordinates, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, WORKPLANE_MAJOR_GRID_INTERVAL } from "@/lib/workplaneGrid";
 import { cleanNearZero, cleanRotationDegrees, isNonSolidShapeKind, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, proportionalResizeScale, resizedImportedCoordinates, resizedImportedMeshPositions, resizedShapeSize, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeOverallFootprintDimensions, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth, shapeWithParametricSource } from "@/lib/workplaneShapes";
 import { sphereTessellation } from "@/lib/sphereTessellation";
@@ -6799,11 +6799,12 @@ export function WorkplaneViewport({
       return;
     }
 
+    const scaled = zoomDistanceScale(scale, workspaceRef.current.zoomSpeed);
     if (state.camera instanceof THREE.OrthographicCamera) {
-      state.camera.zoom = clamp(state.camera.zoom / scale, 0.02, 100);
+      state.camera.zoom = clamp(state.camera.zoom / scaled, 0.02, 100);
     } else {
       const offset = state.camera.position.clone().sub(state.controls.target);
-      const distance = clamp(offset.length() * scale, 22, 4200);
+      const distance = clamp(offset.length() * scaled, 22, 4200);
       offset.setLength(distance);
       state.camera.position.copy(state.controls.target).add(offset);
     }
@@ -7423,7 +7424,7 @@ function createThreeScene(host: HTMLDivElement): ThreeState {
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.rotateSpeed = 0.58;
-  controls.zoomSpeed = 0.72;
+  controls.zoomSpeed = orbitControlsZoomSpeed(DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed);
   controls.panSpeed = 0.65;
   controls.screenSpacePanning = true;
   controls.zoomToCursor = true;
@@ -7760,7 +7761,7 @@ function rebuildWorkplane(
   disposeChildren(state.workplaneLayer);
   state.scene.background = new THREE.Color(palette.sceneBackground);
   state.renderer.shadowMap.enabled = workspace.showShadows;
-  state.controls.zoomSpeed = 0.28 + workspace.zoomSpeed * 0.09;
+  state.controls.zoomSpeed = orbitControlsZoomSpeed(workspace.zoomSpeed);
 
   const activeIsBase = placementWorkplaneIsBase(placementWorkplane);
   const addPlane = (workplane: PlacementWorkplane, muted: boolean, showMarker: boolean) => {

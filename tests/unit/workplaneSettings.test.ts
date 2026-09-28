@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, normalizeScaleForUnits, parseMeasurementInput, resolveMeasurementInput, scaleOptionsForUnits } from "@/lib/measurementUnits";
-import { canBeginShapeDrag, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, shapeDimensionLimit, workplaneSettingsFingerprint, workspaceHydrationSyncDecision } from "@/lib/workplaneSettings";
+import { canBeginShapeDrag, DEFAULT_ORBIT_ZOOM_SPEED, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsZoomSpeed, shapeDimensionLimit, workplaneSettingsFingerprint, workspaceHydrationSyncDecision, zoomDistanceScale } from "@/lib/workplaneSettings";
 import { toolbarShapeAssets } from "@/lib/shapeCatalog";
 
 describe("workplane settings helpers", () => {
@@ -72,6 +72,23 @@ describe("workplane settings helpers", () => {
     expect(normalizeWorkspaceSettings({ clickToPlaceShapes: "no" }).clickToPlaceShapes).toBe(true);
     // Projects saved by 1.18.7 carry click placement as "off" by default.
     expect(normalizeWorkspaceSettings({ placeShapesByClick: false }).clickToPlaceShapes).toBe(true);
+  });
+
+  it("makes the fastest zoom twenty times the slowest", () => {
+    const slow = orbitControlsZoomSpeed(1);
+    const middle = orbitControlsZoomSpeed(DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed);
+    const fast = orbitControlsZoomSpeed(10);
+
+    expect(middle).toBeCloseTo(DEFAULT_ORBIT_ZOOM_SPEED);
+    expect(fast / slow).toBeCloseTo(20);
+    expect(orbitControlsZoomSpeed(Number.NaN)).toBeCloseTo(DEFAULT_ORBIT_ZOOM_SPEED);
+    expect(orbitControlsZoomSpeed(-4)).toBeCloseTo(slow);
+    expect(orbitControlsZoomSpeed(40)).toBeCloseTo(fast);
+
+    const slowStep = zoomDistanceScale(0.7, 1);
+    const fastStep = zoomDistanceScale(0.7, 10);
+    expect(zoomDistanceScale(0.7, 5)).toBeCloseTo(0.7);
+    expect(Math.log(fastStep) / Math.log(slowStep)).toBeCloseTo(20);
   });
 
   it("keeps app limits until a shape receives an explicit customization", () => {
