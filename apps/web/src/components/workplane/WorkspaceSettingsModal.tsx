@@ -580,6 +580,11 @@ export function WorkspaceSettingsModal({
                     onChange={(dimensionsAlwaysVisible) => patchWorkspace({ dimensionsAlwaysVisible })}
                   />
                   <WorkspaceToggle
+                    label={t("workspace.startInPerspective")}
+                    checked={workspace.startInPerspective}
+                    onChange={(startInPerspective) => patchWorkspace({ startInPerspective })}
+                  />
+                  <WorkspaceToggle
                     label={t("workspace.selectBeforeMoving")}
                     checked={workspace.selectBeforeMove}
                     onChange={(selectBeforeMove) => patchWorkspace({ selectBeforeMove })}

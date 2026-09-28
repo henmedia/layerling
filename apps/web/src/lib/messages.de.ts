@@ -924,6 +924,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.showMoveDimensions": "Maße beim Verschieben zeigen",
   "workspace.showOriginDimensions": "Abstände zum Nullpunkt zeigen",
   "workspace.dimensionsAlwaysVisible": "Maße immer sichtbar",
+  "workspace.startInPerspective": "Editor in perspektivischer Ansicht starten",
   "workspace.selectBeforeMoving": "Erst auswählen, dann verschieben",
   "workspace.showShadows": "Schatten zeigen",
   "workspace.showGrid": "Gitter zeigen",

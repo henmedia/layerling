@@ -4374,6 +4374,22 @@ export function WorkplaneViewport({
   }, []);
 
   useEffect(() => {
+    // Each design opens in the projection its settings ask for. The editor
+    // stays mounted between designs, so this follows the settings key rather
+    // than the mount; later toggles within the design are left alone.
+    const state = threeRef.current;
+    if (!state) {
+      return;
+    }
+    const wantsOrthographic = !workspaceRef.current.startInPerspective;
+    if ((state.camera instanceof THREE.OrthographicCamera) !== wantsOrthographic) {
+      toggleCameraProjection(state);
+      syncViewCube(state, viewCubeRef.current);
+    }
+    setOrthographicView(state.camera instanceof THREE.OrthographicCamera);
+  }, [workspaceSettingsKey]);
+
+  useEffect(() => {
     const state = threeRef.current;
     if (!state) {
       return;

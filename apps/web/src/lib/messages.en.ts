@@ -925,6 +925,7 @@ export const MESSAGES_EN = {
   "workspace.showMoveDimensions": "Show movement dimensions",
   "workspace.showOriginDimensions": "Show origin distances",
   "workspace.dimensionsAlwaysVisible": "Dimensions always visible",
+  "workspace.startInPerspective": "Start editor in perspective view",
   "workspace.selectBeforeMoving": "Select before moving",
   "workspace.showShadows": "Show shadows",
   "workspace.showGrid": "Show grid",

@@ -66,6 +66,10 @@ describe("workplane settings helpers", () => {
     expect(normalizeWorkspaceSettings({}).dimensionsAlwaysVisible).toBe(true);
     expect(normalizeWorkspaceSettings({ dimensionsAlwaysVisible: false }).dimensionsAlwaysVisible).toBe(false);
     expect(normalizeWorkspaceSettings({ dimensionsAlwaysVisible: "yes" }).dimensionsAlwaysVisible).toBe(true);
+    expect(DEFAULT_WORKPLANE_WORKSPACE.startInPerspective).toBe(true);
+    expect(normalizeWorkspaceSettings({}).startInPerspective).toBe(true);
+    expect(normalizeWorkspaceSettings({ startInPerspective: false }).startInPerspective).toBe(false);
+    expect(normalizeWorkspaceSettings({ startInPerspective: "no" }).startInPerspective).toBe(true);
     expect(DEFAULT_WORKPLANE_WORKSPACE.clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({}).clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({ clickToPlaceShapes: false }).clickToPlaceShapes).toBe(false);

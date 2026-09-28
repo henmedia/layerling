@@ -153,6 +153,8 @@ export type WorkplaneWorkspaceSettings = {
   clickToPlaceShapes: boolean;
   selectBeforeMove: boolean;
   dimensionsAlwaysVisible: boolean;
+  /** Open the 3D editor with a perspective camera; false opens it orthographic. */
+  startInPerspective: boolean;
   zoomSpeed: number;
   units: string;
   scale: string;
