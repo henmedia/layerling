@@ -13,6 +13,7 @@ import { createCrescentGeometry } from "@/lib/crescentGeometry";
 import { createSlotGeometry } from "@/lib/slotGeometry";
 import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
 import { createPrismGeometry } from "@/lib/prismGeometry";
+import { createGearGeometry } from "@/lib/gearGeometry";
 
 /*
  * Exact profile bodies against the real kernel: each catalog shape becomes a
@@ -63,6 +64,9 @@ function localMesh(source: WorkplaneShape) {
       break;
     case "honeycomb":
       geometry = createHoneycombGeometry({ width, depth, height, honeycombCellSize: source.honeycombCellSize, honeycombWallThickness: source.honeycombWallThickness, honeycombFrameWidth: source.honeycombFrameWidth });
+      break;
+    case "gear":
+      geometry = createGearGeometry({ width, depth, height, teeth: source.teeth, toothSize: source.toothSize, toothWidth: source.toothWidth, centerHoleSize: source.centerHoleSize, gearType: source.gearType });
       break;
     default:
       throw new Error(`no mesh for ${source.kind}`);
@@ -213,6 +217,25 @@ describe("exact profile extrusions with the real OCCT kernel", () => {
     expect(profile.loops.length).toBeGreaterThan(10);
     const solid = expectExactBody(source, 4 + 2 + holeEdges);
     expectFilletOnTop(solid, 3, 0.4, 4);
+  });
+
+  it("builds a spur gear with straight teeth and a round bore, and takes a fillet on every sharp edge", () => {
+    // 12 teeth x 4 flat sides, 2 half cylinders for the bore, top and bottom.
+    const gear = expectExactBody(shape("gear", { width: 40, depth: 40, height: 8 }), 52);
+    expectFilletOnTop(gear, 8, 1, 6);
+    // Everything but the two seams inside the bore, where its halves meet smoothly:
+    // the display mesh refuses this at 1 mm (all 240 edges in the UI's "All sharp edges").
+    const sharp = cad.getSubShapes(gear, "edge").filter((edge) => {
+      if (cad.curveType(edge) !== "line") return true;
+      const box = cad.getBoundingBox(edge);
+      return Math.hypot((box.xmin + box.xmax) / 2, (box.zmin + box.zmax) / 2) > 5;
+    });
+    expect(sharp.length).toBe(148);
+    const rounded = cad.fillet(gear, sharp, 1);
+    expect(cad.isValid(rounded)).toBe(true);
+    expectExactBody(shape("gear", { width: 60, depth: 40, teeth: 20, toothSize: 4 }), 84);
+    expectExactBody(shape("gear", { width: 40, depth: 40, centerHoleSize: 0 }), 50);
+    expect(cadModifierProfileForShape(shape("gear", { gearType: "helical" }))).toBeNull();
   });
 
   it("puts a turned, mirrored and lifted star exactly where the display mesh is", () => {

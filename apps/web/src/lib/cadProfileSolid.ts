@@ -3,7 +3,7 @@ import type { CadModifierProfileLoop, CadModifierProfilePart, CadModifierProfile
 
 /*
  * Exact solids for catalog shapes that are an outline pushed straight up
- * (star, heart, crescent, slot, polygon, honeycomb). The outline arrives as
+ * (star, heart, crescent, slot, polygon, honeycomb, spur gear). The outline arrives as
  * lines and circular or elliptical arcs; the kernel gets real arcs and flat
  * caps, so a star is 22 faces instead of one face per display triangle, and
  * fillets and chamfers on it cost milliseconds instead of seconds.

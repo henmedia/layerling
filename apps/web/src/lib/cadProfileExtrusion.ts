@@ -10,6 +10,7 @@ import { normalizeStarInnerFillet, normalizeStarInnerSize, normalizeStarOuterFil
 import { normalizeHeartTipFillet } from "@/lib/heartGeometry";
 import { buildCrescentContourPoints, normalizeCrescentQuality, normalizeCrescentThickness, normalizeCrescentTipFillet } from "@/lib/crescentGeometry";
 import { buildHoneycombHoles, normalizeHoneycombCellSize, normalizeHoneycombFrameWidth, normalizeHoneycombWallThickness } from "@/lib/honeycombGeometry";
+import { gearToothPitch, normalizeGearCenterHoleSize, normalizeGearToothSize, normalizeGearToothWidth, normalizeGearTeeth, normalizeGearType } from "@/lib/gearGeometry";
 
 /*
  * The outlines below follow the display geometry of each shape
@@ -23,7 +24,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -411,6 +412,74 @@ export function honeycombProfileLoops(
   return [outer, ...holes.map((hole) => polygonLoop(hole.map((point) => ({ x: point.x, z: point.y }))))];
 }
 
+/** Shortest distance from the origin to the segment a-b. */
+function originDistanceToSegment(a: Point, b: Point) {
+  const dx = b.x - a.x;
+  const dz = b.z - a.z;
+  const lengthSquared = dx * dx + dz * dz;
+  const t = lengthSquared > 0 ? Math.max(0, Math.min(1, -(a.x * dx + a.z * dz) / lengthSquared)) : 0;
+  return Math.hypot(a.x + t * dx, a.z + t * dz);
+}
+
+/**
+ * createGearGeometry for the spur gear: four corners per tooth (root, tip,
+ * tip, root) on the root and tip ellipses, the ring then stretched to exactly
+ * width x depth - all straight lines, as on screen. The bore is a true circle
+ * of the centre hole's diameter, where the display draws it as a polygon of
+ * teeth x 4 sides (at 12 teeth the polygon lies 0.2 % inside the circle) - one
+ * round face to fillet or chamfer instead of dozens of flat ones, like the
+ * exact cylinder the edge tool already uses for a faceted cylinder.
+ * Helical and bevel gears change their outline along the height and keep the
+ * mesh path.
+ */
+export function gearProfileLoops(
+  width: number,
+  depth: number,
+  options: Pick<WorkplaneShape, "teeth" | "toothSize" | "toothWidth" | "centerHoleSize">,
+) {
+  const safeWidth = Math.max(0.01, width);
+  const safeDepth = Math.max(0.01, depth);
+  const teeth = normalizeGearTeeth(options.teeth);
+  const toothSize = normalizeGearToothSize(options.toothSize, safeWidth, safeDepth);
+  const toothPitch = gearToothPitch(safeWidth, safeDepth, teeth);
+  const toothWidth = normalizeGearToothWidth(options.toothWidth, safeWidth, safeDepth, teeth);
+  const toothFraction = toothWidth / toothPitch;
+  const centerHoleSize = normalizeGearCenterHoleSize(options.centerHoleSize, safeWidth, safeDepth, toothSize);
+  const outerX = safeWidth / 2;
+  const outerZ = safeDepth / 2;
+  const rootX = Math.max(outerX * 0.34, outerX - toothSize);
+  const rootZ = Math.max(outerZ * 0.34, outerZ - toothSize);
+  const toothPhases = [0.05, (1 - toothFraction) / 2, (1 + toothFraction) / 2, 0.95];
+  const raw: Point[] = [];
+  for (let tooth = 0; tooth < teeth; tooth += 1) {
+    toothPhases.forEach((phase, phaseIndex) => {
+      const angle = ((tooth + phase) / teeth) * Math.PI * 2;
+      const isOuter = phaseIndex === 1 || phaseIndex === 2;
+      raw.push({ x: Math.cos(angle) * (isOuter ? outerX : rootX), z: Math.sin(angle) * (isOuter ? outerZ : rootZ) });
+    });
+  }
+  // The display stretches the ring about the origin until it spans width x depth.
+  const xs = raw.map((point) => point.x);
+  const zs = raw.map((point) => point.z);
+  const scaleX = safeWidth / Math.max(Number.EPSILON, Math.max(...xs) - Math.min(...xs));
+  const scaleZ = safeDepth / Math.max(Number.EPSILON, Math.max(...zs) - Math.min(...zs));
+  const outline = raw.map((point) => ({ x: point.x * scaleX, z: point.z * scaleZ }));
+  const loops = [polygonLoop(outline)];
+  if (centerHoleSize > 0) {
+    const radius = centerHoleSize / 2;
+    // A bore reaching the teeth cuts the outline; the display mesh then folds
+    // over itself and the shape stays on its old path.
+    const clearance = Math.min(...outline.map((point, index) => originDistanceToSegment(point, outline[(index + 1) % outline.length])));
+    if (!(radius < clearance * 0.999)) throw new Error("The gear's centre hole reaches its teeth");
+    const half = (start: number): Corner => {
+      const arc: Arc = { cx: 0, cz: 0, rx: radius, rz: radius, start, end: start + Math.PI };
+      return { start: profileArcPoint(arc, arc.start), end: profileArcPoint(arc, arc.end), arc };
+    };
+    loops.push(loopFromCorners([half(0), half(Math.PI)]));
+  }
+  return loops;
+}
+
 /** Outline loops (and horn roundings) of a supported shape in its local frame, or null. */
 export function cadProfileForShapeKind(shape: WorkplaneShape) {
   const width = shapeWidth(shape);
@@ -428,6 +497,8 @@ export function cadProfileForShapeKind(shape: WorkplaneShape) {
       return { loops: slotProfileLoops(width, depth) };
     case "honeycomb":
       return { loops: honeycombProfileLoops(width, depth, shape) };
+    case "gear":
+      return normalizeGearType(shape.gearType) === "spur" ? { loops: gearProfileLoops(width, depth, shape) } : null;
     default:
       return null;
   }

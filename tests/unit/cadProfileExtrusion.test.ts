@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import type { WorkplaneShape } from "@/types/layerling";
 import type { CadModifierProfileLoop } from "@/lib/cadModifierTypes";
-import { cadModifierProfileForShape, cadProfileExpectation, cadProfileSegmentCount, closedMeshVolume, withinExactProfileLimit, crescentProfile, heartProfileLoops, honeycombProfileLoops, polygonProfileLoops, slotProfileLoops, starProfileLoops } from "@/lib/cadProfileExtrusion";
+import { cadModifierProfileForShape, cadProfileExpectation, cadProfileSegmentCount, closedMeshVolume, withinExactProfileLimit, crescentProfile, gearProfileLoops, heartProfileLoops, honeycombProfileLoops, polygonProfileLoops, slotProfileLoops, starProfileLoops } from "@/lib/cadProfileExtrusion";
 import { profileLoopBounds, validateCadProfile } from "@/lib/cadProfileSolid";
 import { cadModifierPrepareTimeoutMs, CAD_MODIFIER_EXACT_SEGMENT_LIMIT, CAD_MODIFIER_MAX_PREPARE_TIMEOUT_MS } from "@/lib/cadModifierRuntime";
 import { createStarGeometry } from "@/lib/starGeometry";
@@ -11,6 +11,7 @@ import { buildCrescentContourPoints, createCrescentGeometry } from "@/lib/cresce
 import { createSlotGeometry } from "@/lib/slotGeometry";
 import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
 import { createPrismGeometry } from "@/lib/prismGeometry";
+import { createGearGeometry, normalizeGearCenterHoleSize, normalizeGearTeeth } from "@/lib/gearGeometry";
 
 type Vec3 = [number, number, number];
 
@@ -173,6 +174,32 @@ describe("exact profiles for catalog shapes", () => {
     });
   });
 
+  it("builds spur gears on the display's tooth corners, with a round bore", () => {
+    const cases: Array<Partial<WorkplaneShape> & { width: number; depth: number }> = [
+      { width: 40, depth: 40 },
+      { width: 40, depth: 40, teeth: 6 },
+      { width: 80, depth: 80, teeth: 64 },
+      { width: 60, depth: 40, teeth: 20, toothSize: 4 },
+      { width: 40, depth: 40, centerHoleSize: 0 },
+      { width: 30, depth: 30, teeth: 9, toothWidth: 1, centerHoleSize: 100 },
+    ];
+    cases.forEach((options) => {
+      const loops = gearProfileLoops(options.width, options.depth, options);
+      const teeth = normalizeGearTeeth(options.teeth);
+      expect(loops[0].segments).toHaveLength(teeth * 4);
+      expect(loops[0].segments.every((segment) => segment.kind === "line")).toBe(true);
+      const bore = normalizeGearCenterHoleSize(options.centerHoleSize, options.width, options.depth, options.toothSize);
+      if (bore > 0) {
+        expect(loops).toHaveLength(2);
+        expect(loops[1].segments.every((segment) => segment.kind === "arc" && Math.abs(segment.rx - bore / 2) < 1e-12)).toBe(true);
+      } else {
+        expect(loops).toHaveLength(1);
+      }
+      // The display draws the bore as a polygon of teeth x 4 sides; the round bore takes a hair more.
+      expectMatchesMesh(loops, createGearGeometry({ height: 8, ...options }), 8, 0.005);
+    });
+  });
+
   it("measures closed meshes whatever way their triangles are wound", () => {
     // Crescent caps are wound the other way round from its walls.
     const crescent = meshOf(createCrescentGeometry({ width: 40, depth: 40, height: 10, crescentTipFillet: 0, crescentQuality: 32 }));
@@ -186,8 +213,8 @@ describe("exact profiles for catalog shapes", () => {
 });
 
 describe("which shapes get an exact profile", () => {
-  it("covers the six extruded catalog shapes and places them like the display mesh", () => {
-    ["polygon", "star", "heart", "crescent", "slot", "honeycomb"].forEach((kind) => {
+  it("covers the extruded catalog shapes and the spur gear, placed like the display mesh", () => {
+    ["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear"].forEach((kind) => {
       const profile = cadModifierProfileForShape(shape(kind as WorkplaneShape["kind"], { x: 5, z: -3, elevation: 2, rotation: 30 }));
       expect(profile?.kind).toBe("extrusion");
       expect(profile?.height).toBe(10);
@@ -203,7 +230,9 @@ describe("which shapes get an exact profile", () => {
 
   it("leaves everything else on its old path", () => {
     expect(cadModifierProfileForShape(shape("box"))).toBeNull();
-    expect(cadModifierProfileForShape(shape("gear"))).toBeNull();
+    // Helical and bevel gears change their outline along the height.
+    expect(cadModifierProfileForShape(shape("gear", { gearType: "helical" }))).toBeNull();
+    expect(cadModifierProfileForShape(shape("gear", { gearType: "bevel" }))).toBeNull();
     expect(cadModifierProfileForShape(shape("text"))).toBeNull();
     // Only the polygon can be tapered, twisted or leaned; that stays on the mesh.
     expect(cadModifierProfileForShape(shape("polygon", { extrudeTwist: 45 }))).toBeNull();
