@@ -315,13 +315,11 @@ export function WorkspaceSettingsModal({
   themePreference,
   moveDimensionsEnabled,
   originDimensionsEnabled,
-  showProjectNameInToolbar,
   onWorkspaceChange,
   onSnapChange,
   onThemePreferenceChange,
   onMoveDimensionsEnabledChange,
   onOriginDimensionsEnabledChange,
-  onShowProjectNameInToolbarChange,
   onMakeDefault,
   onClose,
 }: {
@@ -330,13 +328,11 @@ export function WorkspaceSettingsModal({
   themePreference: AppThemePreference;
   moveDimensionsEnabled: boolean;
   originDimensionsEnabled: boolean;
-  showProjectNameInToolbar: boolean;
   onWorkspaceChange: (next: WorkspaceSettings) => void;
   onSnapChange: (next: GridSize) => void;
   onThemePreferenceChange?: (preference: AppThemePreference) => void;
   onMoveDimensionsEnabledChange: (enabled: boolean) => void;
   onOriginDimensionsEnabledChange: (enabled: boolean) => void;
-  onShowProjectNameInToolbarChange?: (show: boolean) => void;
   onMakeDefault: () => void;
   onClose: () => void;
 }) {
@@ -559,11 +555,6 @@ export function WorkspaceSettingsModal({
                     </select>
                   </label>
                   <hr className="workspace-divider" />
-                  <WorkspaceToggle
-                    label={t("workspace.showProjectName")}
-                    checked={showProjectNameInToolbar}
-                    onChange={(show) => onShowProjectNameInToolbarChange?.(show)}
-                  />
                   <WorkspaceToggle
                     label={t("workspace.showMoveDimensions")}
                     checked={moveDimensionsEnabled}

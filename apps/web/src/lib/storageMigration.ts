@@ -10,7 +10,6 @@ const RENAMED_KEYS = [
   "projects",
   "downloadMode",
   "downloadFolder",
-  "showProjectNameInToolbar",
   "clipboard",
   "theme",
   "language",

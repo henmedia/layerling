@@ -6004,13 +6004,11 @@ export function LayerlingEditor({
   onProjectSnapshot,
   onProjectWorkspaceChange,
   onProjectNameChange,
-  onShowProjectNameInToolbarChange,
   projectId,
   projectName = "Layerling design",
   projectCreatedAt = Date.now(),
   projectModifiedAt = Date.now(),
   projectRevision = 0,
-  showProjectNameInToolbar = true,
   sharedProjectsEnabled = false,
   themePreference = "system",
   resolvedTheme = "light",
@@ -6045,7 +6043,6 @@ export function LayerlingEditor({
   }) => void;
   onProjectSnapshot?: (snapshot: { image: string; projectId: string; shapes: number }, signal?: AbortSignal) => Promise<void> | void;
   onProjectNameChange?: (name: string) => void;
-  onShowProjectNameInToolbarChange?: (show: boolean) => void;
   onProjectWorkspaceChange?: (snapshot: {
     projectId: string;
     workspace: WorkplaneWorkspaceSettings;
@@ -6059,7 +6056,6 @@ export function LayerlingEditor({
   projectCreatedAt?: number;
   projectModifiedAt?: number;
   projectRevision?: number;
-  showProjectNameInToolbar?: boolean;
   sharedProjectsEnabled?: boolean;
   themePreference?: AppThemePreference;
   resolvedTheme?: ResolvedAppTheme;
@@ -10833,7 +10829,6 @@ export function LayerlingEditor({
         toolbarMode={toolbarMode}
         projectName={projectName}
         onProjectNameChange={onProjectNameChange}
-        showProjectNameInToolbar={showProjectNameInToolbar}
         onToolbarModeChange={(mode) => {
           setToolbarMode(mode);
           if (mode !== "geometry") {
@@ -10988,8 +10983,6 @@ export function LayerlingEditor({
           initialSnap={snapGrid}
           initialWorkspace={workspaceSettings}
           workspaceSettingsKey={projectId ?? "local-workplane"}
-          showProjectNameInToolbar={showProjectNameInToolbar}
-          onShowProjectNameInToolbarChange={onShowProjectNameInToolbarChange}
           cruiseAsset={cruiseAsset}
           onAddShape={addShape}
           onAlignAnchorChange={chooseAlignAnchor}
@@ -11254,7 +11247,6 @@ function SecondaryToolbar({
   toolbarMode,
   projectName,
   onProjectNameChange,
-  showProjectNameInToolbar,
   onToolbarModeChange,
   alignMode,
   canAlign,
@@ -11325,7 +11317,6 @@ function SecondaryToolbar({
   toolbarMode: ToolbarMode;
   projectName: string;
   onProjectNameChange?: (name: string) => void;
-  showProjectNameInToolbar: boolean;
   onToolbarModeChange: (mode: ToolbarMode) => void;
   alignMode: boolean;
   canAlign: boolean;
@@ -12038,36 +12029,34 @@ function SecondaryToolbar({
             {t("editor.modeSketch")}
           </button>
         </div>
-        {showProjectNameInToolbar ? (
-          <div className="toolbar-project-name">
-            <label ref={projectNameFieldRef} className="toolbar-project-name-field" title={t("editor.renameProject")}>
-              <input
-                ref={projectNameInputRef}
-                aria-label={t("confirm.projectName")}
-                value={projectNameDraft}
-                maxLength={80}
-                spellCheck={false}
-                onChange={(event) => setProjectNameDraft(event.target.value)}
-                onBlur={(event) => {
-                  if (cancelProjectNameEditRef.current) {
-                    cancelProjectNameEditRef.current = false;
-                    setProjectNameDraft(projectName);
-                    return;
-                  }
-                  commitProjectName(event.currentTarget.value);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") event.currentTarget.blur();
-                  if (event.key === "Escape") {
-                    cancelProjectNameEditRef.current = true;
-                    event.currentTarget.blur();
-                  }
-                }}
-              />
-              <Pencil size={13} strokeWidth={2.4} aria-hidden="true" />
-            </label>
-          </div>
-        ) : null}
+        <div className="toolbar-project-name">
+          <label ref={projectNameFieldRef} className="toolbar-project-name-field" title={t("editor.renameProject")}>
+            <input
+              ref={projectNameInputRef}
+              aria-label={t("confirm.projectName")}
+              value={projectNameDraft}
+              maxLength={80}
+              spellCheck={false}
+              onChange={(event) => setProjectNameDraft(event.target.value)}
+              onBlur={(event) => {
+                if (cancelProjectNameEditRef.current) {
+                  cancelProjectNameEditRef.current = false;
+                  setProjectNameDraft(projectName);
+                  return;
+                }
+                commitProjectName(event.currentTarget.value);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.currentTarget.blur();
+                if (event.key === "Escape") {
+                  cancelProjectNameEditRef.current = true;
+                  event.currentTarget.blur();
+                }
+              }}
+            />
+            <Pencil size={13} strokeWidth={2.4} aria-hidden="true" />
+          </label>
+        </div>
         <div className="toolbar-title-row-actions">
           <ThemeSwitch />
           <LanguageSwitch />

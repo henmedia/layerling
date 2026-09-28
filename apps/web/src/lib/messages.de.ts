@@ -920,7 +920,6 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.themeLight": "Hell",
   "workspace.themeDark": "Dunkel",
   "workspace.themeGraphite": "Graphit (neutral dunkel)",
-  "workspace.showProjectName": "Entwurfsnamen in der Werkzeugleiste zeigen",
   "workspace.showMoveDimensions": "Maße beim Verschieben zeigen",
   "workspace.showOriginDimensions": "Abstände zum Nullpunkt zeigen",
   "workspace.dimensionsAlwaysVisible": "Maße immer sichtbar",

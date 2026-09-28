@@ -229,8 +229,6 @@ type WorkplaneViewportProps = {
   initialSnap?: GridSize;
   initialWorkspace?: WorkplaneWorkspaceSettings;
   workspaceSettingsKey?: string | null;
-  showProjectNameInToolbar?: boolean;
-  onShowProjectNameInToolbarChange?: (show: boolean) => void;
   onAddShape: (shape: ShapeAsset, point?: PlacementPoint) => void;
   /** Shape following the cursor until a click drops it. Null places immediately. */
   cruiseAsset?: ShapeAsset | null;
@@ -3465,8 +3463,6 @@ export function WorkplaneViewport({
   initialSnap,
   initialWorkspace,
   workspaceSettingsKey,
-  showProjectNameInToolbar = true,
-  onShowProjectNameInToolbarChange,
   onAddShape,
   cruiseAsset = null,
   onAlignAnchorChange,
@@ -7397,13 +7393,11 @@ export function WorkplaneViewport({
           themePreference={themePreference}
           moveDimensionsEnabled={moveDimensionsEnabled}
           originDimensionsEnabled={originDimensionsEnabled}
-          showProjectNameInToolbar={showProjectNameInToolbar}
           onWorkspaceChange={setWorkspace}
           onSnapChange={chooseSnapGrid}
           onThemePreferenceChange={onThemePreferenceChange}
           onMoveDimensionsEnabledChange={changeMoveDimensionsEnabled}
           onOriginDimensionsEnabledChange={changeOriginDimensionsEnabled}
-          onShowProjectNameInToolbarChange={onShowProjectNameInToolbarChange}
           onMakeDefault={makeWorkspaceDefault}
           onClose={() => setSettingsOpen(false)}
         />

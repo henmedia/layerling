@@ -174,7 +174,6 @@ const PROJECT_NAME_LIMIT = 80;
 const SHARED_PROJECT_NAME_LIMIT = 115;
 const PROJECT_SHAPES_STORE_NAME = "projectShapes";
 const PROJECT_SHAPE_RESOURCES_STORE_NAME = "projectShapeResources";
-const PROJECT_NAME_TOOLBAR_STORAGE_KEY = "layerling.showProjectNameInToolbar";
 const PROJECT_ACCENTS: DashboardProject["accent"][] = ["cyan", "green", "gold", "red"];
 const STATIC_EXPORT_BUILD = process.env.NEXT_PUBLIC_STATIC_EXPORT === "true";
 // Two ways to the same shared folder. The Node build answers on its own route;
@@ -701,7 +700,6 @@ export default function Home() {
   const [sortMode, setSortMode] = useState("recent");
   const [themePreference, setThemePreference] = useState<AppThemePreference>("system");
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedAppTheme>("light");
-  const [showProjectNameInToolbar, setShowProjectNameInToolbar] = useState(true);
   const [dashboardNotice, setDashboardNotice] = useState("");
   const [sharedProjects, setSharedProjects] = useState<SharedProject[]>([]);
   const [sharedFolders, setSharedFolders] = useState<SharedFolder[]>([]);
@@ -819,6 +817,8 @@ export default function Home() {
     setLanguage(detectLanguage(), false);
     // Left behind by the retired Challenges tutorials; nothing reads it now.
     window.localStorage.removeItem("layerling.activeChallengeTutorial");
+    // The design name stays in the toolbar; the old switch is gone.
+    window.localStorage.removeItem("layerling.showProjectNameInToolbar");
     const storedTheme = readStoredAppTheme(window.localStorage);
     setAppTheme(storedTheme, false);
     setThemePreference(storedTheme);
@@ -836,7 +836,6 @@ export default function Home() {
         });
       });
     }
-    setShowProjectNameInToolbar(window.localStorage.getItem(PROJECT_NAME_TOOLBAR_STORAGE_KEY) !== "false");
 
     const params = new URLSearchParams(window.location.search);
     if (params.has("codexBooleanCase") || params.get("editor") === "1") {
@@ -997,11 +996,6 @@ export default function Home() {
     }, remaining);
     return () => window.clearTimeout(timer);
   }, [activeProjectId, editorLoading, projectShapesById, projects, view]);
-
-  useEffect(() => {
-    if (!mounted) return;
-    window.localStorage.setItem(PROJECT_NAME_TOOLBAR_STORAGE_KEY, String(showProjectNameInToolbar));
-  }, [mounted, showProjectNameInToolbar]);
 
   const visibleProjects = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -1977,8 +1971,6 @@ export default function Home() {
             }}
             projectId={activeProjectId}
             projectName={activeProject?.name}
-            showProjectNameInToolbar={showProjectNameInToolbar}
-            onShowProjectNameInToolbarChange={setShowProjectNameInToolbar}
             projectCreatedAt={activeProject?.createdAt}
             projectModifiedAt={activeProject?.updatedAt}
             projectRevision={activeProjectShapeEntry?.revision ?? activeProject?.revision ?? 0}
