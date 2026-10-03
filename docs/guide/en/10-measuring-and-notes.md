@@ -1,6 +1,6 @@
 ---
 title: Measuring and notes
-summary: Tape measure, ruler and corner ruler, distances to the origin, and notes that stay attached to a part.
+summary: Tape measure, ruler and framing square, distances to the origin, and notes that stay attached to a part.
 ---
 
 To build a part exactly, you need to measure. layerling has several tools for that. None of them ends up in an export.
@@ -21,17 +21,17 @@ The tape measure sits at the lower end of the camera bar on the left edge ({{ui:
 
 You fetch the {{ui:shape.ruler}} from the shape library. It is purely a measuring tool: it appears in no export and can neither be grouped nor cut. For every body that touches or overlaps the ruler, it shows the extent as a floating number right in the view. You can change that number right there, and the body follows. The floating plus symbol creates a copy of the measured shape.
 
-## The corner ruler
+## The framing square
 
-Sometimes you measure better at a right angle. Click {{ui:camera.cornerRulerTool}} in the camera bar and then the workplane. A corner ruler with two arms at a right angle, with tick marks like a try square, is placed there. It has no body of its own either.
+Sometimes you measure better at a right angle. Click {{ui:camera.cornerRulerTool}} in the camera bar and then the workplane. A framing square with two arms at a right angle, with tick marks like a try square, is placed there. It has no body of its own either.
 
 - **Dragging the handle** moves it.
 - **A short click on the handle** turns it by 90°.
 - **The ×** beside it removes it.
 
-If bodies stand at one of the arms, the corner ruler shows their dimensions automatically.
+If bodies stand at one of the arms, the framing square shows their dimensions automatically.
 
-When you select a body, the corner ruler shows in green how far it is from the corner, along both arms and in height. Click a green number to type a distance, and the body moves exactly there. With several bodies selected, they count as one: the ruler measures their shared outline, and a typed value moves them all together without changing their positions relative to each other.
+When you select a body, the framing square shows in green how far it is from the corner, along both arms and in height. Click a green number to type a distance, and the body moves exactly there. With several bodies selected, they count as one: the ruler measures their shared outline, and a typed value moves them all together without changing their positions relative to each other.
 
 ## Distances to the origin and while moving
 

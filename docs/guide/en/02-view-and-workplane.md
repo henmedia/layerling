@@ -30,7 +30,7 @@ At the left edge is a narrow bar. From the top:
 - {{ui:camera.focusSelection}} zooms to the selection ([[Shift]]+[[F]]).
 - {{ui:camera.zoomIn}} and {{ui:camera.zoomOut}} zoom step by step.
 - {{ui:camera.orthographic}} switches to a flat view in which parallel edges stay parallel. For measuring and lining up edges that is often more comfortable than the perspective view. [[O]] switches back and forth, and a second click returns.
-- {{ui:camera.placeWorkplane}}, the tape measure and the corner ruler are tools of their own, covered below and in [Measuring and notes](chapter:measuring-and-notes).
+- {{ui:camera.placeWorkplane}}, the tape measure and the framing square are tools of their own, covered below and in [Measuring and notes](chapter:measuring-and-notes).
 
 The small arrow at the very top of the bar hides it if it gets in the way.
 

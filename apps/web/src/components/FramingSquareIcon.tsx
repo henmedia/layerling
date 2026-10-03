@@ -24,11 +24,11 @@ export function FramingSquareIcon({ size = 24, strokeWidth = 2, ...props }: Fram
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M4.5 2H10v13h9.5v7h-15Z" />
-      <path d="M10 6H7.5" />
-      <path d="M10 10.5H7.5" />
-      <path d="M13 15v2.5" />
-      <path d="M16.5 15v2.5" />
+      <path d="M3 2h8v12h10v8H3Z" />
+      <path d="M11 6H7.5" />
+      <path d="M11 10H8.5" />
+      <path d="M15 14v3.5" />
+      <path d="M18.5 14v2" />
     </svg>
   );
 }
