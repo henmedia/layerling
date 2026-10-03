@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Minus, MousePointer2, PanelsTopLeft, Plus, Rotate3d, RotateCcw, Rows3, Ruler, RulerDimensionLine, Slice, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Minus, MousePointer2, PanelsTopLeft, Plus, Rotate3d, RotateCcw, Rows3, RulerDimensionLine, Slice, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MouseEvent as ReactMouseEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { objectSnapOffset, shiftSnapBox, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -15,6 +15,7 @@ import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { textFont } from "@/lib/textFonts";
+import { FramingSquareIcon } from "@/components/FramingSquareIcon";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
@@ -7855,7 +7856,7 @@ export function WorkplaneViewport({
                 aria-pressed={cornerRulerMode}
                 onClick={toggleCornerRulerTool}
               >
-                <Ruler size={24} strokeWidth={2.15} aria-hidden="true" />
+                <FramingSquareIcon size={24} strokeWidth={2.15} aria-hidden="true" />
               </button>
             </div>
             <div className="section-control-group">
