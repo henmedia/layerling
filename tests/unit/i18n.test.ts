@@ -7,13 +7,24 @@ import {
   isLanguage,
   languageFromTag,
   LANGUAGES,
+  messageText,
   setLanguage,
   translate,
+  type Language,
+  type Messages,
 } from "@/lib/i18n";
 import { MESSAGES_DE } from "@/lib/messages.de";
 import { MESSAGES_EN } from "@/lib/messages.en";
+import { MESSAGES_RU } from "@/lib/messages.ru";
 
-const CATALOGUES = { en: MESSAGES_EN, de: MESSAGES_DE } as const;
+const CATALOGUES: Record<Language, Messages> = { en: MESSAGES_EN, de: MESSAGES_DE, ru: MESSAGES_RU };
+
+/** Only what a language really carries; a key it left out is shown in English. */
+function translated(language: Language): [string, string][] {
+  return Object.entries(CATALOGUES[language]).filter(
+    (entry): entry is [string, string] => typeof entry[1] === "string",
+  );
+}
 
 function placeholders(value: string) {
   return [...value.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).sort();
@@ -27,16 +38,19 @@ function alleBauteile(wurzel: string) {
 }
 
 describe("message catalogues", () => {
-  it("covers every key in every language", () => {
-    const keys = Object.keys(MESSAGES_EN).sort();
+  it("names no key that English does not have", () => {
+    // English defines the keys. What a language leaves out is shown in English
+    // rather than becoming a hole, so only an invented key is wrong here.
+    const english = new Set(Object.keys(MESSAGES_EN));
     for (const language of LANGUAGES) {
-      expect(Object.keys(CATALOGUES[language]).sort()).toEqual(keys);
+      const unknown = translated(language).map(([key]) => key).filter((key) => !english.has(key));
+      expect(unknown, `${language}: keys English does not have`).toEqual([]);
     }
   });
 
   it("leaves no message empty", () => {
     for (const language of LANGUAGES) {
-      for (const [key, value] of Object.entries(CATALOGUES[language])) {
+      for (const [key, value] of translated(language)) {
         expect(value.trim(), `${language}:${key}`).not.toBe("");
       }
     }
@@ -45,8 +59,11 @@ describe("message catalogues", () => {
   it("keeps the same placeholders in every translation", () => {
     for (const [key, english] of Object.entries(MESSAGES_EN)) {
       for (const language of LANGUAGES) {
-        const translated = CATALOGUES[language][key as keyof typeof MESSAGES_EN];
-        expect(placeholders(translated), `${language}:${key}`).toEqual(placeholders(english));
+        const own = CATALOGUES[language][key as keyof typeof MESSAGES_EN];
+        // A key a language has not translated yet is shown in English, so there
+        // is nothing to compare for it.
+        if (own === undefined) continue;
+        expect(placeholders(own), `${language}:${key}`).toEqual(placeholders(english));
       }
     }
   });
@@ -73,10 +90,12 @@ describe("translation", () => {
   });
 
   it("falls back to English when a catalogue misses a key", () => {
-    const broken = { ...MESSAGES_DE } as Record<string, string>;
-    delete broken["common.save"];
-    // The catalogue itself is type-checked; this guards the runtime path.
-    expect(translate("en", "common.save")).toBe("Save");
+    // Leaving a key out is allowed - it is how a language trails behind without
+    // stopping anybody else from adding a text.
+    const partial: Messages = { ...MESSAGES_RU };
+    delete partial["common.save"];
+    expect(messageText(partial, "common.save")).toBe("Save");
+    expect(messageText(partial, "common.cancel")).toBe("Отмена");
   });
 });
 

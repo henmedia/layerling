@@ -64,8 +64,13 @@ export function withFallbackGlyphs(data: FontData, fallback: FontData): FontData
   return { ...data, glyphs } as FontData;
 }
 
-/** Faces that miss common letters borrow them from Sans. */
-const BORROWS_FROM_SANS = new Set(["Multilanguage", "Stencil", "Rounded"]);
+/**
+ * Faces that miss common letters borrow them from Sans.
+ *
+ * Script (gentilis) is the only one without Cyrillic: it has 704 glyphs and not
+ * one of them is а-я, so Russian lettering came out as question marks.
+ */
+const BORROWS_FROM_SANS = new Set(["Multilanguage", "Stencil", "Rounded", "Script"]);
 
 export function loadTextFonts(): Promise<void> {
   if (loadedFonts) return Promise.resolve();

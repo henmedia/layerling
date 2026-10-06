@@ -2,8 +2,12 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  chaptersFor,
+  GUIDE_LANGUAGES,
+  imageDirectories,
   loadMessages,
   loadValues,
+  messagesFor,
   parseEnv,
   parseFrontMatter,
   renderFooter,
@@ -15,15 +19,29 @@ import {
   webpSize,
 } from "../../scripts/build-guide.mjs";
 import { tools } from "../../scripts/layerling-mcp-tools.mjs";
-import { GUIDE_CHAPTERS, GUIDE_SECTIONS, guideChapterForShape, guideHref, guideSectionForShape } from "@/lib/guideLinks";
+import {
+  chapterFile,
+  GUIDE_CHAPTERS,
+  GUIDE_DIRECTORIES,
+  GUIDE_SECTIONS,
+  guideChapterForShape,
+  guideHref,
+  guideSectionForShape,
+  sectionId,
+  type GuideChapter,
+  type GuideSection,
+} from "@/lib/guideLinks";
 
 const root = join(__dirname, "..", "..");
-const LANGUAGES = ["de", "en"] as const;
+const LANGUAGES = ["de", "en", "ru"] as const;
+type TestLanguage = (typeof LANGUAGES)[number];
 
-async function contextFor(language: "de" | "en") {
+async function contextFor(language: TestLanguage) {
   return {
     language,
-    messages: await loadMessages(language),
+    // The rule the interface itself follows: a text a language has not
+    // translated yet is shown in English.
+    messages: await messagesFor(language),
     values: await loadValues(),
     imageSize: () => null,
     references: { uiKeys: new Set<string>(), shots: new Set<string>(), chapters: new Set<string>() },
@@ -119,19 +137,27 @@ describe("guide footer", () => {
 });
 
 describe("guide content", () => {
-  it("has the same chapters in both languages", async () => {
-    const [de, en] = await Promise.all(LANGUAGES.map((language) => readChapters(language)));
-    expect(de.length).toBeGreaterThan(10);
-    expect(en.map((chapter: { number: string }) => chapter.number)).toEqual(de.map((chapter: { number: string }) => chapter.number));
-    for (const chapter of [...de, ...en]) {
-      expect(chapter.title, chapter.file).not.toBe(chapter.slug);
-      expect(chapter.summary, chapter.file).not.toBe("");
+  it("offers every English chapter in every language, and no chapter of its own", async () => {
+    const english = await chaptersFor("en");
+    expect(english.length).toBeGreaterThan(10);
+    const numbers = english.map((chapter: { number: string }) => chapter.number);
+    for (const language of LANGUAGES) {
+      // A language that has not translated a chapter yet reads the English one,
+      // but must not add a chapter English does not have.
+      const own = await readChapters(language);
+      for (const chapter of own) expect(numbers, `${language}/${chapter.file}`).toContain(chapter.number);
+      const chapters = await chaptersFor(language);
+      expect(chapters.map((chapter: { number: string }) => chapter.number), language).toEqual(numbers);
+      for (const chapter of chapters) {
+        expect(chapter.title, chapter.file).not.toBe(chapter.slug);
+        expect(chapter.summary, chapter.file).not.toBe("");
+      }
     }
   });
 
   it("uses only interface names, chapters and pictures that exist", async () => {
     for (const language of LANGUAGES) {
-      const chapters = await readChapters(language);
+      const chapters = await chaptersFor(language);
       const slugs = new Set(chapters.map((chapter: { slug: string }) => chapter.slug));
       for (const chapter of chapters) {
         const context = await contextFor(language);
@@ -140,21 +166,24 @@ describe("guide content", () => {
         expect(html, where).not.toMatch(/\{\{|\}\}/);
         for (const target of context.references.chapters) expect(slugs.has(target), `${where}: chapter ${target}`).toBe(true);
         for (const shot of context.references.shots) {
-          expect(existsSync(join(root, "docs", "guide", "images", language, `${shot}.webp`)), `${where}: picture ${shot}`).toBe(true);
+          // A picture of its own, or the English one standing in for it.
+          const picture = imageDirectories(language).find((directory) => existsSync(join(directory, `${shot}.webp`)));
+          expect(picture, `${where}: picture ${shot}`).toBeTruthy();
         }
       }
     }
   });
 
-  it("shows the same pictures in both languages", async () => {
-    const shots = async (language: "de" | "en") => {
+  it("shows the same pictures in every language", async () => {
+    const shots = async (language: TestLanguage) => {
       const names = new Set<string>();
-      for (const chapter of await readChapters(language)) {
+      for (const chapter of await chaptersFor(language)) {
         for (const match of chapter.body.matchAll(/\(shot:([\w-]+)\)/g)) names.add(match[1]);
       }
       return [...names].sort();
     };
-    expect(await shots("en")).toEqual(await shots("de"));
+    const english = await shots("en");
+    for (const language of LANGUAGES) expect(await shots(language), language).toEqual(english);
   });
 
   it("has a scene for every picture", async () => {
@@ -167,9 +196,10 @@ describe("guide content", () => {
     }
   });
 
-  it("names every MCP tool in the AI chapter, in both languages", async () => {
+  it("names every MCP tool in the AI chapter, in every language", async () => {
     for (const language of LANGUAGES) {
-      const chapter = (await readChapters(language)).find((entry: { slug: string }) => entry.slug === (language === "de" ? "ki-mit-mcp" : "ai-with-mcp"));
+      const slug = chapterFile(language, "ai");
+      const chapter = (await chaptersFor(language)).find((entry: { slug: string }) => entry.slug === slug);
       expect(chapter, language).toBeDefined();
       for (const tool of tools) expect(chapter.body, `${language}: ${tool.name}`).toContain(`\`${tool.name}\``);
     }
@@ -183,24 +213,30 @@ describe("guide content", () => {
 
   it("has a chapter behind every question mark in the program", async () => {
     for (const language of LANGUAGES) {
-      const slugs = new Set((await readChapters(language)).map((chapter: { slug: string }) => chapter.slug));
-      for (const [name, files] of Object.entries(GUIDE_CHAPTERS)) {
-        expect(slugs.has(files[language]), `${language}: ${name} -> ${files[language]}`).toBe(true);
+      const slugs = new Set((await chaptersFor(language)).map((chapter: { slug: string }) => chapter.slug));
+      for (const name of Object.keys(GUIDE_CHAPTERS) as GuideChapter[]) {
+        const file = chapterFile(language, name);
+        expect(slugs.has(file), `${language}: ${name} -> ${file}`).toBe(true);
       }
     }
   });
 
-  it("has a heading behind every question mark that jumps into a chapter", () => {
+  it("has a heading behind every question mark that jumps into a chapter", async () => {
     for (const language of LANGUAGES) {
-      const directory = join(root, "docs", "guide", language);
-      for (const [name, section] of Object.entries(GUIDE_SECTIONS)) {
-        const file = readdirSync(directory).find((entry) => entry.endsWith(`-${GUIDE_CHAPTERS[section.chapter][language]}.md`));
-        expect(file, `${language}: ${name}`).toBeTruthy();
-        const ids = readFileSync(join(directory, file!), "utf8").split(/\r?\n/).filter((line) => line.startsWith("## ")).map((line) => slugify(line.slice(3).trim()));
-        expect(ids, `${language}: ${name}`).toContain(section[language]);
+      const chapters = await chaptersFor(language);
+      for (const name of Object.keys(GUIDE_SECTIONS) as GuideSection[]) {
+        const section = GUIDE_SECTIONS[name];
+        const chapter = chapters.find((entry: { slug: string }) => entry.slug === chapterFile(language, section.chapter));
+        expect(chapter, `${language}: ${name}`).toBeTruthy();
+        // The headings of the file the reader really gets: its own, or English.
+        const ids = chapter!.body.split(/\r?\n/).filter((line: string) => line.startsWith("## ")).map((line: string) => slugify(line.slice(3).trim()));
+        expect(ids, `${language}: ${name}`).toContain(sectionId(language, name));
       }
     }
     expect(guideHref("en", undefined, "sectionView")).toBe("/guide/view-and-workplane.html#looking-inside-the-section-view");
+    // Russian has a folder of its own, as German does.
+    expect(guideHref("ru", undefined, "sectionView")).toBe("/ru/view-and-workplane.html#zaglyanut-vnutr-vid-v-razreze");
+    expect(guideHref("ru")).toBe("/ru/index.html");
     // A shape's question mark lands on its own heading, in the chapter it belongs to.
     expect(guideHref("de", guideChapterForShape({ kind: "hinge" }), guideSectionForShape({ kind: "hinge" }))).toBe("/anleitung/gewinde-und-mechanik.html#scharnier");
     expect(guideHref("de", guideChapterForShape({ kind: "knurl" }), guideSectionForShape({ kind: "knurl" }))).toBe("/anleitung/gewinde-und-mechanik.html#raendelung");
@@ -215,10 +251,19 @@ describe("guide content", () => {
 
   it("opens the chapter that fits a shape", () => {
     expect(guideHref("de", "solids")).toBe("/anleitung/koerper-und-aussparungen.html");
+    expect(guideHref("ru", "solids")).toBe("/ru/solids-and-holes.html");
     expect(guideHref("en")).toBe("/guide/index.html");
     expect(guideChapterForShape({ kind: "text" })).toBe("text");
     expect(guideChapterForShape({ kind: "thread" })).toBe("threads");
     expect(guideChapterForShape({ kind: "box", groupedShapes: [{}] })).toBe("solids");
     expect(guideChapterForShape({ kind: "cylinder" })).toBe("shapes");
+  });
+
+  it("writes every language where the program looks for it", () => {
+    // guideLinks answers the question marks, build-guide writes the pages. The
+    // two tables have to name the same folder, or every link leaves the guide.
+    for (const language of LANGUAGES) {
+      expect(GUIDE_DIRECTORIES[language], language).toBe(GUIDE_LANGUAGES[language].dir);
+    }
   });
 });

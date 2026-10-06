@@ -58,6 +58,26 @@ export const GUIDE_LANGUAGES = {
     forum: "discussions",
     forumUrl: "https://github.com/henmedia/layerling/discussions",
   },
+  ru: {
+    dir: "ru",
+    htmlLang: "ru",
+    quotes: ["«", "»"],
+    site: "Руководство layerling",
+    home: "Руководство",
+    openEditor: "Открыть редактор",
+    backToEditor: "Вернуться в редактор",
+    editorElsewhere: "Редактор уже открыт в другой вкладке — просто переключитесь туда.",
+    chapters: "Главы",
+    onThisPage: "На этой странице",
+    previous: "Предыдущая глава",
+    next: "Следующая глава",
+    switchLanguage: "English",
+    switchTitle: "Read this in English",
+    overviewLead: "Всё, что умеет layerling, шаг за шагом. Картинки сняты с работающей программы и обновляются с каждой версией.",
+    sourceNote: "Это руководство растёт вместе с программой. Если чего-то не хватает или что-то не так — напишите в",
+    forum: "обсуждениях",
+    forumUrl: "https://github.com/henmedia/layerling/discussions",
+  },
 };
 
 /** KEY=VALUE lines of an env file; comments and empty lines are skipped. */
@@ -112,10 +132,19 @@ export function escapeHtml(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+const CYRILLIC_TRANSLITERATION = {
+  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z", и: "i",
+  й: "y", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t",
+  у: "u", ф: "f", х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch", ъ: "", ы: "y",
+  ь: "", э: "e", ю: "yu", я: "ya",
+};
+
+
 export function slugify(text) {
   return text
     .toLowerCase()
     .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+    .replace(/[а-яё]/g, (letter) => CYRILLIC_TRANSLITERATION[letter] ?? letter)
     .replace(/<[^>]*>/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
@@ -429,7 +458,7 @@ function editorButtonScript(strings) {
 
 const THEME_SCRIPT = `try{var t=localStorage.getItem("layerling.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;else if(t==="graphite")document.documentElement.dataset.theme="dark"}catch(e){}`;
 
-function pageShell({ language, title, description, path, alternates, chapters, current, body, switchHref, footer }) {
+function pageShell({ language, title, description, path, alternates, chapters, current, body, switchHref, switchLanguage, footer }) {
   const strings = GUIDE_LANGUAGES[language];
   const nav = chapters
     .map((chapter) => `<li><a href="/${strings.dir}/${chapter.slug}.html"${chapter.slug === current ? ' aria-current="page"' : ""}>${escapeHtml(chapter.title)}</a></li>`)
@@ -456,7 +485,7 @@ function pageShell({ language, title, description, path, alternates, chapters, c
   <body>
     <header class="bar"><div class="bar-inner">
       <a class="brand" href="/${strings.dir}/index.html"><img src="/assets/layerling/layerling-logo.svg" alt=""><span class="brand-text"><b>layerling</b><span class="brand-note">${escapeHtml(strings.home)}</span></span></a>
-      <a class="lang" href="${switchHref}" hreflang="${language === "de" ? "en" : "de"}" title="${escapeHtml(strings.switchTitle)}">${strings.switchLanguage}</a>
+      <a class="lang" href="${switchHref}" hreflang="${switchLanguage}" title="${escapeHtml(strings.switchTitle)}">${strings.switchLanguage}</a>
       <a class="button" id="open-editor" href="/">${escapeHtml(strings.openEditor)}</a>
     </div><p class="editor-elsewhere" id="editor-elsewhere" role="status" hidden>${escapeHtml(strings.editorElsewhere)}</p></header>
     <div class="shell">
@@ -487,6 +516,20 @@ export async function readChapters(language) {
   return chapters;
 }
 
+/**
+ * The chapters of one language with English standing in for what it has not
+ * translated yet: the English chapters in their order, each replaced by the
+ * language's own file of the same number where there is one. A language is an
+ * addition its maintainer keeps up, so a chapter that is still English must not
+ * stop anybody else from adding one.
+ */
+export async function chaptersFor(language) {
+  const english = await readChapters("en");
+  if (language === "en") return english;
+  const own = new Map((await readChapters(language)).map((chapter) => [chapter.number, chapter]));
+  return english.map((chapter) => own.get(chapter.number) ?? chapter);
+}
+
 /** The numbers a chapter may quote with {{value:NAME}}: every numeric export of roundness.ts. */
 export async function loadValues() {
   const module = await import(pathToFileURL(join(root, "apps", "web", "src", "lib", "roundness.ts")).href);
@@ -495,7 +538,27 @@ export async function loadValues() {
 
 export async function loadMessages(language) {
   const module = await import(pathToFileURL(join(root, "apps", "web", "src", "lib", `messages.${language}.ts`)).href);
-  return language === "de" ? module.MESSAGES_DE : module.MESSAGES_EN;
+  return module[`MESSAGES_${language.toUpperCase()}`];
+}
+
+/**
+ * The wording of one language with English filling the gaps - the same rule the
+ * interface itself follows (messageText in apps/web/src/lib/i18n.ts). The guide
+ * quotes the interface's own button names, so it has to read the same texts.
+ */
+export async function messagesFor(language) {
+  const english = await loadMessages("en");
+  if (language === "en") return english;
+  return { ...english, ...(await loadMessages(language)) };
+}
+
+/**
+ * Where the pictures of one language may come from: its own folder first,
+ * English second. A language without pictures of its own then needs no second
+ * copy of every screenshot in the repository - it keeps its own as they arrive.
+ */
+export function imageDirectories(language) {
+  return [join(guideSource, "images", language), join(guideSource, "images", "en")];
 }
 
 export async function buildGuide({ log = console.log } = {}) {
@@ -504,13 +567,15 @@ export async function buildGuide({ log = console.log } = {}) {
   const environment = await readEnvironment();
   const version = JSON.parse(await readFile(join(root, "package.json"), "utf8")).version;
   const chaptersByLanguage = {};
-  for (const language of Object.keys(GUIDE_LANGUAGES)) chaptersByLanguage[language] = await readChapters(language);
+  for (const language of Object.keys(GUIDE_LANGUAGES)) chaptersByLanguage[language] = await chaptersFor(language);
 
   for (const [language, strings] of Object.entries(GUIDE_LANGUAGES)) {
     const chapters = chaptersByLanguage[language];
-    const otherLanguage = language === "de" ? "en" : "de";
+    // Every chapter exists in English, so Russian points there; German and English
+    // are each other's other language.
+    const otherLanguage = language === "en" ? "de" : "en";
     const otherStrings = GUIDE_LANGUAGES[otherLanguage];
-    const messages = await loadMessages(language);
+    const messages = await messagesFor(language);
     const values = await loadValues();
     const shortcutsHtml = renderShortcuts(shortcutGroups, messages, language);
     const footer = renderFooter({ language, messages, environment, version });
@@ -518,13 +583,15 @@ export async function buildGuide({ log = console.log } = {}) {
     await rm(outputRoot, { recursive: true, force: true });
     await mkdir(join(outputRoot, "img"), { recursive: true });
 
-    const imageDirectory = join(guideSource, "images", language);
     const imageSizes = new Map();
-    if (existsSync(imageDirectory)) {
-      for (const file of await readdir(imageDirectory)) {
+    for (const directory of imageDirectories(language)) {
+      if (!existsSync(directory)) continue;
+      for (const file of await readdir(directory)) {
         if (!file.endsWith(".webp")) continue;
-        await copyFile(join(imageDirectory, file), join(outputRoot, "img", file));
-        imageSizes.set(file.slice(0, -5), webpSize(await readFile(join(imageDirectory, file))));
+        const name = file.slice(0, -5);
+        if (imageSizes.has(name)) continue;
+        await copyFile(join(directory, file), join(outputRoot, "img", file));
+        imageSizes.set(name, webpSize(await readFile(join(directory, file))));
       }
     }
 
@@ -560,7 +627,8 @@ export async function buildGuide({ log = console.log } = {}) {
       const body = `<h1>${escapeHtml(chapter.title)}</h1>\n<p class="lead">${escapeHtml(chapter.summary)}</p>\n${toc}\n${rendered.html}\n${pager}`;
       const page = pageShell({
         language, title: `${chapter.title} - ${strings.site}`, description: chapter.summary, path, alternates, chapters,
-        current: chapter.slug, body, footer, switchHref: other ? `/${otherStrings.dir}/${other.slug}.html` : `/${otherStrings.dir}/index.html`,
+        current: chapter.slug, body, footer, switchLanguage: otherLanguage,
+        switchHref: other ? `/${otherStrings.dir}/${other.slug}.html` : `/${otherStrings.dir}/index.html`,
       });
       await writeFile(join(outputRoot, `${chapter.slug}.html`), page);
       result.pages.push({ path, alternates });
@@ -575,6 +643,7 @@ export async function buildGuide({ log = console.log } = {}) {
       alternates: { [language]: indexPath, [otherLanguage]: `/${otherStrings.dir}/index.html` }, chapters, current: "", footer,
       body: `<h1>${escapeHtml(strings.site)}</h1>\n<p class="lead">${escapeHtml(strings.overviewLead)}</p>\n<ul class="cards">${cards}</ul>`,
       switchHref: `/${otherStrings.dir}/index.html`,
+      switchLanguage: otherLanguage,
     });
     await writeFile(join(outputRoot, "index.html"), indexPage);
     result.pages.unshift({ path: indexPath, alternates: { [language]: indexPath, [otherLanguage]: `/${otherStrings.dir}/index.html` } });

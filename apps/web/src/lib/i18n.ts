@@ -1,20 +1,45 @@
 import { MESSAGES_DE } from "@/lib/messages.de";
 import { MESSAGES_EN, type MessageKey } from "@/lib/messages.en";
+import { MESSAGES_RU } from "@/lib/messages.ru";
 
-export const LANGUAGES = ["en", "de"] as const;
+export const LANGUAGES = ["en", "de", "ru"] as const;
 export type Language = (typeof LANGUAGES)[number];
 export const DEFAULT_LANGUAGE: Language = "en";
 export const LANGUAGE_STORAGE_KEY = "layerling.language";
 
-const CATALOGUE: Record<Language, Record<MessageKey, string>> = {
+/**
+ * What one language has to say. English defines the keys; every other language
+ * may leave one out and let English speak, so a language is an addition its
+ * maintainer keeps up rather than a gate every new text has to pass.
+ */
+export type Messages = Partial<Record<MessageKey, string>>;
+
+const CATALOGUE: Record<Language, Messages> = {
   en: MESSAGES_EN,
   de: MESSAGES_DE,
+  ru: MESSAGES_RU,
 };
 
 export const LANGUAGE_NAMES: Record<Language, string> = {
   en: "English",
   de: "Deutsch",
+  ru: "Русский",
 };
+
+/**
+ * How a language writes numbers and dates. A new language that is missing here
+ * would silently format as American English, so this table is typed by Language.
+ */
+export const LANGUAGE_LOCALES: Record<Language, string> = {
+  en: "en-US",
+  de: "de-DE",
+  ru: "ru-RU",
+};
+
+/** The locale of the language that is current right now. */
+export function currentLocale(): string {
+  return LANGUAGE_LOCALES[current];
+}
 
 export function isLanguage(value: unknown): value is Language {
   return typeof value === "string" && (LANGUAGES as readonly string[]).includes(value);
@@ -88,12 +113,21 @@ export function detectLanguage(): Language {
   return DEFAULT_LANGUAGE;
 }
 
+/**
+ * The text one catalogue has for a key: its own wording, else the English one,
+ * else the key itself. A language that has not translated a text yet shows the
+ * English one instead of a hole in the interface.
+ */
+export function messageText(catalogue: Messages, key: MessageKey): string {
+  return catalogue[key] ?? MESSAGES_EN[key] ?? key;
+}
+
 export function translate(
   language: Language,
   key: MessageKey,
   values?: Record<string, string | number>,
 ): string {
-  const template = CATALOGUE[language][key] ?? MESSAGES_EN[key] ?? key;
+  const template = messageText(CATALOGUE[language], key);
   if (!values) return template;
   return template.replace(/\{(\w+)\}/g, (match, name: string) =>
     Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match,

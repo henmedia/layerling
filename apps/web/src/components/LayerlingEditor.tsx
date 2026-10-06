@@ -13,7 +13,7 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { textFont } from "@/lib/textFonts";
 import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
 import type { ComponentType, ReactNode, SVGProps } from "react";
-import { getLanguage, t, type MessageKey } from "@/lib/i18n";
+import { currentLocale, getLanguage, t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { createGearGeometry } from "@/lib/gearGeometry";
@@ -2665,7 +2665,7 @@ function shapeHasTransformToBake(shape: WorkplaneShape) {
 
 /** Tausender trennen, in der gerade eingestellten Sprache. */
 function formatTriangleCount(count: number) {
-  return count.toLocaleString(getLanguage() === "de" ? "de-DE" : "en-US");
+  return count.toLocaleString(currentLocale());
 }
 
 function cadModifierPrimitiveForShape(shape: WorkplaneShape): CadModifierPrimitivePart | null {
@@ -5084,7 +5084,7 @@ type ExportSolidVolume = Awaited<ReturnType<typeof exportSolidVolume>>;
 const PRINT_MATERIAL_STORAGE_KEY = "layerling.printMaterial";
 
 function formatEstimateNumber(value: number, digits: number) {
-  return value.toLocaleString(getLanguage() === "de" ? "de-DE" : "en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return value.toLocaleString(currentLocale(), { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
 /**

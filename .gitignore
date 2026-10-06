@@ -19,8 +19,10 @@ apps/web/public/datenschutz.html
 apps/web/public/kontakt.php
 
 # The user guide is built from docs/guide by scripts/build-guide.mjs.
+# One line per language - the folder is GUIDE_LANGUAGES.<language>.dir.
 apps/web/public/anleitung/
 apps/web/public/guide/
+apps/web/public/ru/
 
 # Environment files
 .env

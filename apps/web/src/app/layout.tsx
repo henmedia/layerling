@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { LANGUAGES } from "@/lib/i18n";
 
 const NAME = "layerling";
 const TITLE = "layerling - Free 3D CAD for 3D printing in your browser";
@@ -16,7 +17,7 @@ const STRUCTURED_DATA = {
   description: DESCRIPTION,
   applicationCategory: "DesignApplication",
   operatingSystem: "Any (web browser)",
-  inLanguage: ["en", "de"],
+  inLanguage: [...LANGUAGES],
   isAccessibleForFree: true,
   offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
   image: "https://layerling.com/assets/layerling/layerling-social.png",

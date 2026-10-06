@@ -13,7 +13,7 @@ import { importFailureSummary, importModelFiles } from "@/lib/modelImport";
 import { loadTextFonts } from "@/lib/textFonts";
 import { applyAppTheme, getAppThemePreference, readStoredAppTheme, resolveAppTheme, setAppTheme, storeAppTheme, subscribeToAppTheme, type AppThemePreference, type ResolvedAppTheme } from "@/lib/appTheme";
 import { hydrateEditorHistoryState, notesForHistoryIndex, type EditorHistoryEntry } from "@/lib/editorHistory";
-import { detectLanguage, setLanguage, t, translate, type Language } from "@/lib/i18n";
+import { detectLanguage, LANGUAGES, setLanguage, t, translate, type Language } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { WelcomeGuideBody } from "@/components/WelcomeGuide";
 import { InstallAppHint } from "@/components/InstallAppHint";
@@ -3061,7 +3061,7 @@ function StaticIntro() {
   return (
     <main className="visually-hidden">
       <h1>layerling - Free 3D CAD for 3D printing in your browser</h1>
-      {(["en", "de"] as const).map((language) => (
+      {LANGUAGES.map((language) => (
         <section key={language} lang={language}>
           <h2>{translate(language, "welcome.teaserTitle")}</h2>
           <WelcomeGuideBody tr={(key) => translate(language, key)} />

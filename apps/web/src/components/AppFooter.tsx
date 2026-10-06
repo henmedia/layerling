@@ -40,12 +40,12 @@ const LEGAL_LINK_SOURCES = [
   {
     url: process.env.NEXT_PUBLIC_IMPRINT_URL,
     label: process.env.NEXT_PUBLIC_IMPRINT_LABEL,
-    fallbackLabel: { de: "Impressum", en: "Imprint" },
+    fallbackLabel: { de: "Impressum", en: "Imprint", ru: "Выходные данные" },
   },
   {
     url: process.env.NEXT_PUBLIC_PRIVACY_URL,
     label: process.env.NEXT_PUBLIC_PRIVACY_LABEL,
-    fallbackLabel: { de: "Datenschutz", en: "Privacy Policy" },
+    fallbackLabel: { de: "Datenschutz", en: "Privacy Policy", ru: "Политика конфиденциальности" },
   },
 ] as const;
 

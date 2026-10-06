@@ -4,6 +4,11 @@
     <loc>https://layerling.com/</loc>
   </url>
   <url>
+    <loc>https://layerling.com/ru/index.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/index.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/index.html"/>
+  </url>
+  <url>
     <loc>https://layerling.com/guide/index.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/index.html"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://layerling.com/anleitung/index.html"/>
@@ -172,5 +177,85 @@
     <loc>https://layerling.com/guide/videos.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/videos.html"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://layerling.com/anleitung/videos.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/getting-started.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/getting-started.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/getting-started.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/view-and-workplane.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/view-and-workplane.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/view-and-workplane.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/shapes.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/shapes.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/shapes.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/select-and-arrange.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/select-and-arrange.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/select-and-arrange.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/solids-and-holes.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/solids-and-holes.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/solids-and-holes.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/edges-and-hollowing.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/edges-and-hollowing.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/edges-and-hollowing.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/sketches.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/sketches.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/sketches.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/text.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/text.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/text.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/threads-and-mechanics.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/threads-and-mechanics.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/threads-and-mechanics.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/measuring-and-notes.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/measuring-and-notes.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/measuring-and-notes.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/printing.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/printing.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/printing.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/files-and-saving.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/files-and-saving.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/files-and-saving.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/shortcuts.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/shortcuts.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/shortcuts.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/ai-with-mcp.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/ai-with-mcp.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/ai-with-mcp.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/offline-and-install.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/offline-and-install.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/offline-and-install.html"/>
+  </url>
+  <url>
+    <loc>https://layerling.com/ru/videos.html</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://layerling.com/ru/videos.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://layerling.com/guide/videos.html"/>
   </url>
 </urlset>
