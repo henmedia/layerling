@@ -4,6 +4,10 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
+## Unreleased
+
+- **A resized group keeps its new size:** A group of solids resized after grouping was still split, exported to STL, 3MF and OBJ, aligned and snapped at the size it had when it was grouped. Splitting it also turned the halves back to that size, and the split plane could not go past the old height. All of these now use the size the group shows.
+
 ## 1.41.0
 
 - **The cut of a hole is drawn by the graphics card:** The dark shade that shows where a hole will cut into a body was computed on the processor with real geometry, so a plate with many holes froze the editor while you dragged something, and the shade disappeared during the drag. It is now drawn from depth images on the graphics card: no waiting, and it stays visible while a shape moves. The shape that comes out when the parts are joined is unchanged. The shade is an approximation: for a hollow body or two bodies with a gap, it can also show in the empty part. By @CjCrash in #125.

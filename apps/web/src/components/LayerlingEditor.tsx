@@ -88,6 +88,7 @@ import { shellMaxThickness } from "@/lib/shellLimits";
 import { circleStepDegrees, clampArrayCount, rotateAroundVertical, rowOffset, type ArraySettings } from "@/lib/shapeArray";
 import { bedOverhangs, printerPresetById, type BedOverhang } from "@/lib/printBed";
 import { SplitPanel } from "./workplane/SplitPanel";
+import { groupedContentScale, scaleGroupedVertices } from "@/lib/groupScale";
 import { unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { NO_SPLIT_ROTATION, modelSplitPlane, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, splitRotationAxes, splitShapeFromWorldPositions, type ModelSplitPlane, type SplitRotation } from "@/lib/modelSplit";
 import { GuideModal } from "./workplane/GuideModal";
@@ -2549,7 +2550,10 @@ function meshForShape(shape: WorkplaneShape): MeshData {
       const childMesh = meshForShape(child);
       appendMeshData(vertices, faces, childMesh);
     });
-    return transformMesh({ name: sanitizeName(shape.name), vertices, faces }, shape);
+    // Without the stretch, split, export and alignment would see a resized
+    // group at the size it had when it was grouped.
+    const scaled = scaleGroupedVertices(vertices, groupedContentScale(shape, localGroupBounds(shape.groupedShapes)));
+    return transformMesh({ name: sanitizeName(shape.name), vertices: scaled, faces }, shape);
   }
 
   const raw =
@@ -6015,13 +6019,7 @@ function restoreGroupedChildren(group: WorkplaneShape): WorkplaneShape[] {
     return [];
   }
 
-  const bounds = localGroupBounds(children);
-  const baseWidth = group.groupedBaseWidth ?? Math.max(0.001, bounds.maxX - bounds.minX);
-  const baseHeight = group.groupedBaseHeight ?? Math.max(0.001, bounds.maxY - bounds.minY);
-  const baseDepth = group.groupedBaseDepth ?? Math.max(0.001, bounds.maxZ - bounds.minZ);
-  const sx = shapeWidth(group) / Math.max(0.001, baseWidth);
-  const sy = group.height / Math.max(0.001, baseHeight);
-  const sz = shapeDepth(group) / Math.max(0.001, baseDepth);
+  const [sx, sy, sz] = groupedContentScale(group, localGroupBounds(children));
   const groupQuaternion = quaternionForShape(group);
   const groupReflection = new THREE.Matrix4().makeScale(mirrorSign(group.mirrorX), mirrorSign(group.mirrorY), mirrorSign(group.mirrorZ));
   const groupCenter = new THREE.Vector3(group.x, (group.elevation ?? 0) + group.height / 2, group.z);
