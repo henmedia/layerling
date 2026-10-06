@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SPLIT_AXIS_DISPLAY_ORDER, modelSplitPlane, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, splitRotationAxes, splitShapeFromWorldPositions } from "@/lib/modelSplit";
+import { SPLIT_AXIS_DISPLAY_ORDER, modelSplitPlane, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, snapSplitPositionToVertices, splitOrientationForNormal, splitRotationAxes, splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import type { WorkplaneShape } from "@/types/layerling";
 
 const source: WorkplaneShape = {
@@ -69,6 +69,48 @@ describe("model split helpers", () => {
     expect(normal[1]).toBeCloseTo(Math.SQRT1_2, 8);
     expect(normal[2]).toBeCloseTo(-0.5, 8);
     expect(Math.hypot(...normal)).toBeCloseTo(1, 8);
+  });
+
+  it("lays the plane on a face square to the axes without turning it", () => {
+    expect(splitOrientationForNormal([0, 1, 0])).toEqual({ axis: "y", rotation: [0, 0] });
+    expect(splitOrientationForNormal([0, -1, 0])).toEqual({ axis: "y", rotation: [0, 0] });
+    expect(splitOrientationForNormal([-1, 0, 0])).toEqual({ axis: "x", rotation: [0, 0] });
+    expect(splitOrientationForNormal([0, 0, 2])).toEqual({ axis: "z", rotation: [0, 0] });
+    expect(splitOrientationForNormal([0, 0, 0])).toBeNull();
+  });
+
+  it("finds the turns that lay the plane on a slanted face", () => {
+    const points: Array<[number, number, number]> = [[-4, 2, -6], [8, 12, 10]];
+    const faces: Array<[number, number, number]> = [
+      [0.3, 0.8, -0.2], [-0.9, 0.2, 0.4], [0.1, -0.5, 0.85], [0.6, 0.6, 0.53], [-0.4, -0.7, -0.6],
+    ];
+    for (const face of faces) {
+      const orientation = splitOrientationForNormal(face);
+      expect(orientation).not.toBeNull();
+      const plane = modelSplitPlane(points, orientation!.axis, undefined, orientation!.rotation);
+      const length = Math.hypot(...face);
+      const alignment = plane!.normal.reduce((sum, value, index) => sum + value * face[index] / length, 0);
+      expect(Math.abs(alignment)).toBeCloseTo(1, 6);
+      orientation!.rotation.forEach((angle) => expect(Math.abs(angle)).toBeLessThanOrEqual(90));
+    }
+  });
+
+  it("keeps an odd face angle exact and rounds only float noise", () => {
+    const angle = Math.atan2(1, 3);
+    const odd = splitOrientationForNormal([Math.sin(angle), Math.cos(angle), 0]);
+    expect(odd?.axis).toBe("y");
+    const [tilt, other] = [...odd!.rotation].map(Math.abs).sort((a, b) => b - a);
+    expect(Math.abs(tilt - angle * 180 / Math.PI)).toBeLessThan(1e-12);
+    expect(other).toBe(0);
+    const thirty = 30 * Math.PI / 180;
+    const noisy = splitOrientationForNormal([Math.sin(thirty) + 1e-13, Math.cos(thirty), 0]);
+    expect(noisy?.rotation.map(Math.abs)).toContain(30);
+  });
+
+  it("snaps a picked position onto a vertex just beside it", () => {
+    const points: Array<[number, number, number]> = [[0, 0, 0], [0, 10, 0], [5, 20, 0]];
+    expect(snapSplitPositionToVertices(points, [0, 1, 0], 10 - 3e-7)).toBe(10);
+    expect(snapSplitPositionToVertices(points, [0, 1, 0], 10.4)).toBe(10.4);
   });
 
   it("only reports a cut when vertices exist on both sides", () => {

@@ -1,12 +1,11 @@
 "use client";
 
-import { Check, LoaderCircle, X } from "lucide-react";
+import { Check, LoaderCircle, MousePointerClick, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { displayStepFromMillimeters, displayToMillimeters, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
 import { SPLIT_AXIS_DISPLAY_ORDER, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { ToolbarDropToWorkplaneIcon } from "@/components/toolbarIcons";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { selectWholeValue } from "@/lib/numberField";
@@ -142,12 +141,12 @@ export function SplitPanel({
               type="button"
               className={`split-position-pick ${picking ? "active" : ""}`}
               aria-pressed={picking}
-              aria-label={t("split.dropToWorkplane")}
-              title={t("split.dropToWorkplaneHint")}
+              aria-label={t("split.pickFace")}
+              title={t("split.pickFaceHint")}
               disabled={busy}
               onClick={onPickToggle}
             >
-              <ToolbarDropToWorkplaneIcon width={20} height={20} />
+              <MousePointerClick size={17} />
             </button>
           </span>
         </span>

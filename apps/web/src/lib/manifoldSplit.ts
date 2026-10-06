@@ -50,3 +50,25 @@ export function unionSplitManifoldComponents(runtime: ManifoldToplevel, source: 
     created,
   };
 }
+
+/** Thinner than this (in mm, roughly volume over half the surface) a piece is a skin, not a body. */
+const SLIVER_THICKNESS = 1e-5;
+
+/**
+ * Drops the zero-thickness skins a cut leaves behind. A plane lying exactly on
+ * a face - as one laid on a picked face does - hands that face to one half as
+ * a flat sheet of its own. Cavities count by their size too, so a hollowed
+ * half keeps them.
+ */
+export function dropSplitSlivers(runtime: ManifoldToplevel, half: ManifoldSolid) {
+  const components = half.decompose();
+  const kept = components.filter((component) => Math.abs(component.volume()) * 2 > component.surfaceArea() * SLIVER_THICKNESS);
+  if (kept.length === components.length) {
+    return { solid: half, created: components };
+  }
+  if (kept.length === 0) {
+    return { solid: null, created: components };
+  }
+  const solid = runtime.Manifold.compose(kept);
+  return { solid, created: [...components, solid] };
+}

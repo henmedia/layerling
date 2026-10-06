@@ -89,8 +89,8 @@ import { circleStepDegrees, clampArrayCount, rotateAroundVertical, rowOffset, ty
 import { bedOverhangs, printerPresetById, type BedOverhang } from "@/lib/printBed";
 import { SplitPanel } from "./workplane/SplitPanel";
 import { groupedContentScale, scaleGroupedVertices } from "@/lib/groupScale";
-import { unionSplitManifoldComponents } from "@/lib/manifoldSplit";
-import { NO_SPLIT_ROTATION, modelSplitPlane, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, splitRotationAxes, splitShapeFromWorldPositions, type ModelSplitPlane, type SplitRotation } from "@/lib/modelSplit";
+import { dropSplitSlivers, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitOrientationForNormal, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, splitRotationAxes, splitShapeFromWorldPositions, type ModelSplitPlane, type SplitRotation } from "@/lib/modelSplit";
 import { GuideModal } from "./workplane/GuideModal";
 import { ShortcutsModal } from "./workplane/ShortcutsModal";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
@@ -4844,10 +4844,16 @@ async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<ModelSplitPl
       return { parts: null, error: t("split.error.overlapping") };
     }
     solid = normalized.solid;
-    const [positive, negative] = solid.splitByPlane(plane.normal, plane.position);
-    created.push(positive, negative);
+    const [rawPositive, rawNegative] = solid.splitByPlane(plane.normal, plane.position);
+    created.push(rawPositive, rawNegative);
+    const trimmedPositive = dropSplitSlivers(runtime, rawPositive);
+    const trimmedNegative = dropSplitSlivers(runtime, rawNegative);
+    created.push(...trimmedPositive.created, ...trimmedNegative.created);
+    const positive = trimmedPositive.solid;
+    const negative = trimmedNegative.solid;
     if (
-      positive.status() !== "NoError" || negative.status() !== "NoError"
+      !positive || !negative
+      || positive.status() !== "NoError" || negative.status() !== "NoError"
       || positive.numTri() < 1 || negative.numTri() < 1
     ) {
       return { parts: null, error: t("split.error.emptyHalf") };
@@ -9126,15 +9132,18 @@ export function LayerlingEditor({
     setNotice(t(picking ? "status.splitPick" : "status.splitReady"));
   }, [splitSession]);
 
-  // The plane keeps its turn and passes through the point that was clicked.
-  const pickSplitSurface = useCallback((point: [number, number, number]) => {
+  // The plane lies down on the face that was clicked: its turn, through the clicked point.
+  const pickSplitSurface = useCallback((point: [number, number, number], normal: [number, number, number]) => {
+    const orientation = splitOrientationForNormal(normal);
+    if (!orientation) return;
     setSplitSession((current) => {
       if (!current || current.busy || !current.picking) return current;
-      const centeredPlane = modelSplitPlane(splitTargetPoints, current.axis, undefined, current.rotation);
+      const centeredPlane = modelSplitPlane(splitTargetPoints, orientation.axis, undefined, orientation.rotation);
       if (!centeredPlane) return current;
-      const position = centeredPlane.normal[0] * point[0] + centeredPlane.normal[1] * point[1] + centeredPlane.normal[2] * point[2];
-      const plane = modelSplitPlane(splitTargetPoints, current.axis, position, current.rotation);
-      return plane ? { ...current, position: plane.position, pivot: plane.origin, picking: false, error: null } : current;
+      const picked = centeredPlane.normal[0] * point[0] + centeredPlane.normal[1] * point[1] + centeredPlane.normal[2] * point[2];
+      const position = snapSplitPositionToVertices(splitTargetPoints, centeredPlane.normal, picked);
+      const plane = modelSplitPlane(splitTargetPoints, orientation.axis, position, orientation.rotation);
+      return plane ? { ...current, axis: plane.axis, rotation: plane.rotation, position: plane.position, pivot: plane.origin, picking: false, error: null } : current;
     });
     setNotice(t("status.splitReady"));
   }, [splitTargetPoints]);

@@ -64,6 +64,46 @@ function rotatedSplitNormal(axis: AlignAxis, rotation: SplitRotation): [number, 
   return rotateAboutAxis(rotateAboutAxis(splitAxisNormal(axis), first, rotation[0]), second, rotation[1]);
 }
 
+const AXIS_INDEX: Record<AlignAxis, 0 | 1 | 2> = { x: 0, y: 1, z: 2 };
+
+function crossComponent(left: AlignAxis, right: AlignAxis, along: AlignAxis) {
+  const a = splitAxisNormal(left);
+  const b = splitAxisNormal(right);
+  const cross = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  return cross[AXIS_INDEX[along]];
+}
+
+/**
+ * The axis and the two turns that lay the plane on a face with this normal -
+ * the inverse of `rotatedSplitNormal`. The axis is the one the normal leans
+ * on most, so a face square to the axes gets no turn at all; the side the
+ * normal points to does not matter for a cut.
+ */
+export function splitOrientationForNormal(normal: Point3): { axis: AlignAxis; rotation: SplitRotation } | null {
+  const length = Math.hypot(normal[0], normal[1], normal[2]);
+  if (!Number.isFinite(length) || length < 1e-9) return null;
+  const axis: AlignAxis = (["x", "y", "z"] as const).reduce((best, candidate) =>
+    Math.abs(normal[AXIS_INDEX[candidate]]) > Math.abs(normal[AXIS_INDEX[best]]) ? candidate : best);
+  const sign = normal[AXIS_INDEX[axis]] < 0 ? -1 : 1;
+  const unit = normal.map((value) => (value * sign) / length) as [number, number, number];
+  const [first, second] = splitRotationAxes(axis);
+  // Turning about the first axis lifts the normal towards the second axis;
+  // turning about the second then swings it towards the first.
+  const towardsSecond = crossComponent(first, axis, second);
+  const towardsFirst = crossComponent(second, axis, first);
+  const firstAngle = Math.asin(Math.max(-1, Math.min(1, towardsSecond * unit[AXIS_INDEX[second]])));
+  const secondAngle = Math.cos(firstAngle) < 1e-9 ? 0 : Math.atan2(towardsFirst * unit[AXIS_INDEX[first]], unit[AXIS_INDEX[axis]]);
+  // Only float noise is rounded away: a face at an odd angle keeps it exactly,
+  // or the plane would tilt against the face and cut a wedge-thin skin off it.
+  const degrees = (radians: number) => {
+    const exact = radians * 180 / Math.PI;
+    const round = Math.round(exact * 1e4) / 1e4;
+    const value = Math.abs(exact - round) < 1e-6 ? round : exact;
+    return Object.is(value, -0) || Math.abs(value) < 1e-9 ? 0 : value;
+  };
+  return { axis, rotation: [degrees(firstAngle), degrees(secondAngle)] };
+}
+
 function pointProjection(point: Point3, normal: Point3) {
   return point[0] * normal[0] + point[1] * normal[1] + point[2] * normal[2];
 }
@@ -116,6 +156,25 @@ export function modelSplitPlane(points: readonly Point3[], axis: AlignAxis, requ
     max,
     size: Math.max(10, Math.hypot(maxs[0] - mins[0], maxs[1] - mins[1], maxs[2] - mins[2]) * 1.1),
   };
+}
+
+/**
+ * A picked point is only as exact as the screen mesh it was read from. When a
+ * vertex of the target lies within `tolerance` of the plane, the plane goes
+ * through it exactly - so it lies on the face, not a hair beside it.
+ */
+export function snapSplitPositionToVertices(points: readonly Point3[], normal: Point3, position: number, tolerance = 1e-3) {
+  let snapped = position;
+  let nearest = tolerance;
+  for (const point of points) {
+    const projection = pointProjection(point, normal);
+    const distance = Math.abs(projection - position);
+    if (distance <= nearest) {
+      nearest = distance;
+      snapped = projection;
+    }
+  }
+  return snapped;
 }
 
 export function splitPlaneIntersectsPoints(points: readonly Point3[], normal: Point3, position: number, tolerance = 1e-5) {

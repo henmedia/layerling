@@ -274,7 +274,7 @@ type WorkplaneViewportProps = {
   onSplitPositionChange?: (position: number) => void;
   /** The next click on a face sets the split plane there; a blue plane follows the faces under the pointer. */
   splitSurfacePick?: boolean;
-  onSplitSurfacePick?: (point: [number, number, number]) => void;
+  onSplitSurfacePick?: (point: [number, number, number], normal: [number, number, number]) => void;
   placementWorkplane: PlacementWorkplane;
   /** Die gesetzte Arbeitsebene gilt weiter, wird aber nicht gezeichnet. */
   workplaneHidden?: boolean;
@@ -6714,6 +6714,7 @@ export function WorkplaneViewport({
     return {
       shapeId,
       point: hit.point.clone(),
+      normal,
       workplane: snapPlacementWorkplaneOrigin(workplane, snapStep(snapRef.current)),
     };
   }, []);
@@ -7066,7 +7067,10 @@ export function WorkplaneViewport({
           const surface = pickPlacementSurface(event.clientX, event.clientY, false);
           if (!surface) return;
           event.preventDefault();
-          onSplitSurfacePickRef.current?.([surface.point.x, surface.point.y, surface.point.z]);
+          onSplitSurfacePickRef.current?.(
+            [surface.point.x, surface.point.y, surface.point.z],
+            [surface.normal.x, surface.normal.y, surface.normal.z],
+          );
           return;
         }
         const plane = splitPlaneRef.current;
