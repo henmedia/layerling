@@ -3219,6 +3219,14 @@ button {
   cursor: crosshair;
 }
 
+.workplane-wrap.split-mode.split-handle-hover .three-workplane-host {
+  cursor: grab;
+}
+
+.workplane-wrap.split-mode.split-handle-drag .three-workplane-host {
+  cursor: grabbing;
+}
+
 .toolbar-mode-content {
   position: absolute;
   top: var(--editor-toolbar-title-height);

@@ -13334,6 +13334,7 @@ export function LayerlingEditor({
           mirrorReferenceShapes={shapes}
           splitActive={Boolean(splitSession)}
           splitPlane={splitPlane}
+          onSplitPositionChange={changeSplitPosition}
           placementWorkplane={placementWorkplane}
           workplaneHidden={workplaneHidden}
           onToggleWorkplaneHidden={() => {
