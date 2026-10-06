@@ -1151,6 +1151,18 @@ html:where([data-theme="dark"][data-palette="graphite"]),
   color: #5c5c5c;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .split-position-pick {
+  color: #515151;
+  background: #f8f8f8;
+  border: 1px solid #c8c8c8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .split-position-pick.active {
+  color: #fff;
+  background: #079bc6;
+  border-color: #067fa3;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .split-position-control > input[type="range"] {
   accent-color: #d07313;
 }
@@ -4769,6 +4781,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-footer .
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-field select,
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-axis-control button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-position-value input,
+html[data-theme="dark"]:where([data-palette="graphite"]) .split-position-pick:not(.active),
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-panel-footer .secondary {
   color: #cbcbcb;
   background: #2d2d2d;

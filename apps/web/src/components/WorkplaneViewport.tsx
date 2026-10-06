@@ -272,6 +272,9 @@ type WorkplaneViewportProps = {
   splitPlane?: ModelSplitPlane | null;
   /** Dragging the plane's arrow head moves the plane along its normal. */
   onSplitPositionChange?: (position: number) => void;
+  /** The next click on a face sets the split plane there; a blue plane follows the faces under the pointer. */
+  splitSurfacePick?: boolean;
+  onSplitSurfacePick?: (point: [number, number, number]) => void;
   placementWorkplane: PlacementWorkplane;
   /** Die gesetzte Arbeitsebene gilt weiter, wird aber nicht gezeichnet. */
   workplaneHidden?: boolean;
@@ -3995,6 +3998,8 @@ export function WorkplaneViewport({
   splitActive = false,
   splitPlane = null,
   onSplitPositionChange,
+  splitSurfacePick = false,
+  onSplitSurfacePick,
   placementWorkplane,
   workplaneHidden = false,
   onToggleWorkplaneHidden,
@@ -4223,6 +4228,11 @@ export function WorkplaneViewport({
   splitPlaneRef.current = splitPlane;
   const onSplitPositionChangeRef = useRef(onSplitPositionChange);
   onSplitPositionChangeRef.current = onSplitPositionChange;
+  const splitSurfacePickRef = useRef(splitSurfacePick);
+  splitSurfacePickRef.current = splitSurfacePick;
+  const onSplitSurfacePickRef = useRef(onSplitSurfacePick);
+  onSplitSurfacePickRef.current = onSplitSurfacePick;
+  const [splitPickOverFace, setSplitPickOverFace] = useState(false);
   const splitDragRef = useRef<SplitPlaneDragState | null>(null);
   const [splitHandleState, setSplitHandleState] = useState<"hover" | "drag" | null>(null);
   const perfRef = useRef({
@@ -4853,6 +4863,17 @@ export function WorkplaneViewport({
     if (threeRef.current) threeRef.current.controls.enabled = true;
     onInteractionActiveChange?.(false);
   }, [onInteractionActiveChange, splitActive]);
+
+  useEffect(() => {
+    if (splitSurfacePick) {
+      setSplitHandleState(null);
+      return;
+    }
+    setSplitPickOverFace(false);
+    if (!workplaneModeRef.current) {
+      syncWorkplaneHoverPreview(threeRef.current, null, workspaceRef.current, resolvedThemeRef.current);
+    }
+  }, [splitSurfacePick]);
 
   useEffect(() => {
     syncSplitPlane(threeRef.current, splitPlane, splitHandleState !== null);
@@ -6692,6 +6713,7 @@ export function WorkplaneViewport({
 
     return {
       shapeId,
+      point: hit.point.clone(),
       workplane: snapPlacementWorkplaneOrigin(workplane, snapStep(snapRef.current)),
     };
   }, []);
@@ -7040,6 +7062,13 @@ export function WorkplaneViewport({
         return;
       }
       if (splitActiveRef.current) {
+        if (splitSurfacePickRef.current) {
+          const surface = pickPlacementSurface(event.clientX, event.clientY, false);
+          if (!surface) return;
+          event.preventDefault();
+          onSplitSurfacePickRef.current?.([surface.point.x, surface.point.y, surface.point.z]);
+          return;
+        }
         const plane = splitPlaneRef.current;
         if (!plane || !pickSplitPlaneHandle(state, event.clientX, event.clientY)) return;
         const axisOrigin = new THREE.Vector3(...plane.origin);
@@ -7464,6 +7493,12 @@ export function WorkplaneViewport({
       if (splitActiveRef.current) {
         const state = threeRef.current;
         if (!state) return;
+        if (splitSurfacePickRef.current) {
+          const surface = pickPlacementSurface(event.clientX, event.clientY, false);
+          syncWorkplaneHoverPreview(state, surface?.workplane ?? null, workspaceRef.current, resolvedThemeRef.current);
+          setSplitPickOverFace(Boolean(surface));
+          return;
+        }
         const drag = splitDragRef.current;
         if (drag) {
           if (drag.pointerId !== event.pointerId) return;
@@ -7719,6 +7754,10 @@ export function WorkplaneViewport({
       syncWorkplaneHoverPreview(threeRef.current, null, workspaceRef.current, resolvedThemeRef.current);
     }
     if (modifierActiveRef.current) clearModifierEdgeHover();
+    if (splitSurfacePickRef.current) {
+      syncWorkplaneHoverPreview(threeRef.current, null, workspaceRef.current, resolvedThemeRef.current);
+      setSplitPickOverFace(false);
+    }
   }, [clearModifierEdgeHover]);
 
   const finishDrag = useCallback(
@@ -8833,7 +8872,7 @@ export function WorkplaneViewport({
         )}
       </div>
 
-      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${cruiseAsset ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${pivotPickMode || layFlatPickMode ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""}`} aria-label={t("aria.workplane")}>
+      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${pivotPickMode || layFlatPickMode ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""}`} aria-label={t("aria.workplane")}>
         <div className="workplane-plane">
           <div
             className="three-workplane-host"

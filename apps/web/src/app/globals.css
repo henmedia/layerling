@@ -3152,6 +3152,31 @@ button {
   font-weight: 800;
 }
 
+.split-position-pick {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-left: 2px;
+  padding: 0;
+  color: #6d5133;
+  background: #fbf8f4;
+  border: 1px solid #d8c8b7;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.split-position-pick.active {
+  color: #fff;
+  background: #079bc6;
+  border-color: #067fa3;
+}
+
+.split-position-pick:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 .split-position-control > input[type="range"] {
   width: 100%;
   accent-color: #d07313;
@@ -3225,6 +3250,11 @@ button {
 
 .workplane-wrap.split-mode.split-handle-drag .three-workplane-host {
   cursor: grabbing;
+}
+
+/* The blue plane under the pointer is the cursor while a face is picked. */
+.workplane-wrap.split-mode.split-picking.split-pick-over-face .three-workplane-host {
+  cursor: none;
 }
 
 .toolbar-mode-content {
@@ -10931,6 +10961,7 @@ html[data-theme="dark"] .edge-modifier-footer .secondary,
 html[data-theme="dark"] .edge-modifier-field select,
 html[data-theme="dark"] .split-axis-control button,
 html[data-theme="dark"] .split-position-value input,
+html[data-theme="dark"] .split-position-pick:not(.active),
 html[data-theme="dark"] .split-panel-footer .secondary {
   color: #ddccb9;
   background: #35281b;

@@ -6,6 +6,7 @@ import { displayStepFromMillimeters, displayToMillimeters, formatMeasurementNumb
 import { SPLIT_AXIS_DISPLAY_ORDER, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
+import { ToolbarDropToWorkplaneIcon } from "@/components/toolbarIcons";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { selectWholeValue } from "@/lib/numberField";
@@ -21,6 +22,8 @@ export function SplitPanel({
   workspace,
   busy,
   error,
+  picking,
+  onPickToggle,
   onAxisChange,
   onRotationChange,
   onPositionChange,
@@ -36,6 +39,9 @@ export function SplitPanel({
   workspace: WorkplaneWorkspaceSettings;
   busy: boolean;
   error: string | null;
+  /** The next click on a face moves the plane there. */
+  picking: boolean;
+  onPickToggle: () => void;
   onAxisChange: (axis: AlignAxis) => void;
   onRotationChange: (index: 0 | 1, rotation: number) => void;
   onPositionChange: (position: number) => void;
@@ -132,6 +138,17 @@ export function SplitPanel({
               }}
             />
             <small id="split-position-unit">{unit}</small>
+            <button
+              type="button"
+              className={`split-position-pick ${picking ? "active" : ""}`}
+              aria-pressed={picking}
+              aria-label={t("split.dropToWorkplane")}
+              title={t("split.dropToWorkplaneHint")}
+              disabled={busy}
+              onClick={onPickToggle}
+            >
+              <ToolbarDropToWorkplaneIcon width={20} height={20} />
+            </button>
           </span>
         </span>
         <input
