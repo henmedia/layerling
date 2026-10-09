@@ -12,7 +12,7 @@ const STEPS = [
 
 /**
  * Everything beyond the first steps. New features belong here, in both
- * languages - the same text is what search engines read (see StaticIntro).
+ * languages - the English text is what search engines read (see StaticIntro).
  */
 const MORE = [
   ["welcome.moreHollowTitle", "welcome.moreHollowBody"],

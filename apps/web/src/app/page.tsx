@@ -3185,23 +3185,22 @@ function ProjectPreview({ accent, thumbnailUrl }: { accent: DashboardProject["ac
 }
 
 /**
- * What the exported HTML holds before the app starts: the welcome guide in
- * both languages. The start page draws nothing until it has read the browser's
- * storage, so without this a search engine or link preview that does not run
- * JavaScript found nothing but the title. It is the same text a first-time
- * visitor sees open on the page, kept out of sight only for the moment until
- * the app replaces it.
+ * What the exported HTML holds before the app starts: the welcome guide. The
+ * start page draws nothing until it has read the browser's storage, so without
+ * this a search engine or link preview that does not run JavaScript found
+ * nothing but the title. It is the same text a first-time visitor sees open on
+ * the page, kept out of sight only for the moment until the app replaces it.
+ *
+ * English only, like the page's lang: with the German guide next to it, Chrome
+ * took the page for partly German and translated it on every load - and
+ * Translate's class on <html> then broke hydration.
  */
 function StaticIntro() {
   return (
     <main className="visually-hidden">
       <h1>layerling - Free 3D CAD for 3D printing in your browser</h1>
-      {(["en", "de"] as const).map((language) => (
-        <section key={language} lang={language}>
-          <h2>{translate(language, "welcome.teaserTitle")}</h2>
-          <WelcomeGuideBody tr={(key) => translate(language, key)} />
-        </section>
-      ))}
+      <h2>{translate("en", "welcome.teaserTitle")}</h2>
+      <WelcomeGuideBody tr={(key) => translate("en", key)} />
     </main>
   );
 }
