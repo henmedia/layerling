@@ -4,7 +4,7 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
-## Unreleased
+## 1.61.0
 
 - **Reference image in sketch mode: turn, centre, calibrate, crop:** A photo laid under a sketch could only be moved and scaled. Its settings now have an **Align** card: a **Rotation** in degrees, with a round handle above the frame (Shift snaps to 15°), so a photo taken at a slant lines up with the revolve axis; **Centre on X = 0** and **Y = 0**, X = 0 being the axis of a revolve; **Calibrate** as in Fusion - click two points in the picture whose distance you know, type the real distance, and the picture scales to match with the first point staying put; and **Crop**, where the frame's handles cut the picture down instead of scaling it, the cut-away part staying stored and coming back on request. The picture keeps its pixels throughout. Asked for by @ucito in #216.
 - **The dimension boxes keep the calculation too:** A calculation such as "(140+2)/2" typed into one of the boxes drawn round the selected body - width, depth, height and the height above the plate - was worked out but forgotten; only the fields of the Properties panel kept it (1.59.0). The boxes now keep it as well and open on the formula again, as long as it still gives the size, and the Properties panel shows the same formula for the same value, and the other way round. The corner pair of width and depth does the same, and the guide says where the formulas work. Asked about by @prmod3d in #180.

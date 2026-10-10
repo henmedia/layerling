@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.61.0",
+    "items": [
+      {
+        "title": {
+          "de": "Vorlagenbild drehen, kalibrieren, zuschneiden",
+          "en": "Turn, calibrate and crop the reference image"
+        },
+        "body": {
+          "de": "Ein Foto unter der Skizze lässt sich jetzt drehen, auf die Achse zentrieren, über zwei Punkte mit bekanntem Abstand kalibrieren und auf den wichtigen Ausschnitt zuschneiden.",
+          "en": "A photo under a sketch can now be turned, centred on the axis, calibrated by two points of known distance and cropped to the part that matters."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.60.0",
     "items": [
       {
