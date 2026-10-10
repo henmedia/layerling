@@ -1155,7 +1155,9 @@ function syncTransformGuideWorldLines(
     gapSize: 0.625,
     transparent: true,
     opacity: theme === "dark" ? 0.86 : 0.72,
-    depthTest: false,
+    // Bodies hide the guides: the footprint lies under the selected body and must not shine
+    // through it or through its neighbours (#219).
+    depthTest: true,
     depthWrite: false,
     alphaToCoverage: false,
   });
