@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import type { Font } from "three/examples/jsm/loaders/FontLoader.js";
+import { normalizeSketchStroke } from "@/lib/sketchStroke";
 import { customFontRevision, textFont } from "@/lib/textFonts";
 import { shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -59,6 +60,44 @@ function curvedRadius(shape: WorkplaneShape) {
 
 function curvedSize(shape: WorkplaneShape) {
   return Math.max(0.5, shape.textSize ?? DEFAULT_TEXT_SIZE);
+}
+
+/**
+ * How far a fill mode (#215) reaches out beyond the letters: a stroke outside or the widened
+ * letters by the line width, a centred stroke by half of it. The shape's box is the box of the
+ * whole body, so the letters are fitted into the box less this reach all round.
+ */
+export function textFillExtent(shape: Pick<WorkplaneShape, "textStroke">): number {
+  const stroke = normalizeSketchStroke(shape.textStroke);
+  if (!stroke) return 0;
+  return stroke.align === "outside" || stroke.align === "grow" ? stroke.width : stroke.align === "center" ? stroke.width / 2 : 0;
+}
+
+/** The box the letters themselves are laid out in: the shape's box less the fill's reach. */
+export function textLetterBox(shape: WorkplaneShape) {
+  const extent = textFillExtent(shape);
+  return { width: Math.max(1, shapeWidth(shape) - 2 * extent), depth: Math.max(1, shapeDepth(shape) - 2 * extent) };
+}
+
+/** The letters' footprint with the fill's reach added: what the shape's width and depth hold. */
+function withFillReach(shape: Pick<WorkplaneShape, "textStroke">, footprint: { width: number; depth: number }) {
+  const extent = textFillExtent(shape);
+  return { width: footprint.width + 2 * extent, depth: footprint.depth + 2 * extent };
+}
+
+/**
+ * A change of the fill keeps the letters as they are and moves the box instead: a stroke of
+ * 1.5 mm outside makes the body 3 mm wider and deeper, back to an area takes it away again.
+ */
+export function textFillPatch(shape: WorkplaneShape, patch: Partial<WorkplaneShape>): Partial<WorkplaneShape> {
+  if (!("textStroke" in patch)) return patch;
+  const before = textFillExtent(shape);
+  const after = textFillExtent({ textStroke: patch.textStroke });
+  if (Math.abs(after - before) < 1e-9) return patch;
+  const letters = textLetterBox(shape);
+  const width = letters.width + 2 * after;
+  const depth = letters.depth + 2 * after;
+  return { ...patch, width, depth, size: Math.max(width, depth) };
 }
 
 /**
@@ -162,7 +201,8 @@ function symmetricExtent(geometry: THREE.BufferGeometry) {
 export function curvedTextFitScale(shape: WorkplaneShape, curved: THREE.BufferGeometry): number {
   const extent = symmetricExtent(curved);
   if (!extent) return 1;
-  const scale = Math.min(shapeWidth(shape) / extent.width, shapeDepth(shape) / extent.depth);
+  const letters = textLetterBox(shape);
+  const scale = Math.min(letters.width / extent.width, letters.depth / extent.depth);
   return Number.isFinite(scale) && Math.abs(scale - 1) > 1e-3 ? scale : 1;
 }
 
@@ -193,7 +233,7 @@ function straightTextExtent(shape: WorkplaneShape) {
   return extent;
 }
 
-const CURVE_KEYS = ["textCurved", "textRadius", "textInward", "textFlipped", "textSize", "text", "font", "bevel"] as const;
+const CURVE_KEYS = ["textCurved", "textRadius", "textInward", "textFlipped", "textSize", "text", "font", "bevel", "textStroke"] as const;
 
 /**
  * Keeps curved text and its box in step. Straight text simply fills its box;
@@ -210,29 +250,32 @@ export function curvedTextPatch(shape: WorkplaneShape, patch: Partial<WorkplaneS
   if (next.kind !== "text") return patch;
   const wasCurved = Boolean(shape.textCurved);
   const isCurved = Boolean(next.textCurved);
-  if (!wasCurved && !isCurved) return patch;
+  // Straight text: only a changed fill moves the box (textFillPatch); the letters fill the rest.
+  if (!wasCurved && !isCurved) return textFillPatch(shape, patch);
+  const boxOf = (footprint: { width: number; depth: number }) => {
+    const box = withFillReach(next, footprint);
+    return { ...box, size: Math.max(box.width, box.depth) };
+  };
 
   if (!wasCurved && isCurved) {
     const extent = straightTextExtent(shape);
-    const scale = Math.min(shapeWidth(shape) / extent.width, shapeDepth(shape) / extent.depth);
+    const letters = textLetterBox(shape);
+    const scale = Math.min(letters.width / extent.width, letters.depth / extent.depth);
     const textSize = Number((patch.textSize ?? LAYOUT_SIZE * scale).toFixed(2));
     const textRadius = patch.textRadius ?? shape.textRadius ?? Math.max(MIN_TEXT_RADIUS, Math.round(shapeWidth(shape) / Math.PI));
-    const footprint = curvedTextFootprint({ ...next, textSize, textRadius });
-    return { ...patch, textSize, textRadius, ...footprint, size: Math.max(footprint.width, footprint.depth) };
+    return { ...patch, textSize, textRadius, ...boxOf(curvedTextFootprint({ ...next, textSize, textRadius })) };
   }
 
   if (wasCurved && !isCurved) {
     const extent = straightTextExtent(next);
     const scale = curvedSize(next) / LAYOUT_SIZE;
-    const width = extent.width * scale;
-    const depth = extent.depth * scale;
-    return { ...patch, width, depth, size: Math.max(width, depth) };
+    return { ...patch, ...boxOf({ width: extent.width * scale, depth: extent.depth * scale }) };
   }
 
   const touchesCurve = CURVE_KEYS.some((key) => key in patch);
   const resized = patch.width !== undefined || patch.depth !== undefined || patch.size !== undefined;
   if (resized && !touchesCurve) {
-    const current = curvedTextFootprint(shape);
+    const current = withFillReach(shape, curvedTextFootprint(shape));
     const factors = [
       patch.width !== undefined ? patch.width / current.width : null,
       patch.depth !== undefined ? patch.depth / current.depth : null,
@@ -242,15 +285,66 @@ export function curvedTextPatch(shape: WorkplaneShape, patch: Partial<WorkplaneS
     const factor = factors.length ? Math.min(...factors) : 1;
     const textSize = Number((curvedSize(shape) * factor).toFixed(2));
     const textRadius = Number(clamp(curvedRadius(shape) * factor, MIN_TEXT_RADIUS, MAX_TEXT_RADIUS).toFixed(2));
-    const footprint = curvedTextFootprint({ ...next, textSize, textRadius });
-    return { ...patch, textSize, textRadius, ...footprint, size: Math.max(footprint.width, footprint.depth) };
+    return { ...patch, textSize, textRadius, ...boxOf(curvedTextFootprint({ ...next, textSize, textRadius })) };
   }
 
   if (touchesCurve) {
-    const footprint = curvedTextFootprint(next);
-    return { ...patch, ...footprint, size: Math.max(footprint.width, footprint.depth) };
+    return { ...patch, ...boxOf(curvedTextFootprint(next)) };
   }
   return patch;
+}
+
+export type TextGlyphShape = { glyph: THREE.Shape; map: (point: THREE.Vector2) => { x: number; z: number } };
+
+/**
+ * The glyphs of a text as the font's outlines, each with the map that takes its points to the
+ * workplane (x/z, in mm, about the shape's own centre) - straight text scaled and centred the
+ * way createTextGeometry fits it into the letter box, curved text through the matrix that
+ * places its display glyph on the circle and the same fit. The exact outlines for the edge
+ * tool and the fill modes (#215) both start from these. Null when nothing is drawn.
+ */
+export function textGlyphShapes(shape: WorkplaneShape): { glyphs: TextGlyphShape[]; curveSegments: number } | null {
+  const fontName = shape.font ?? "Multilanguage";
+  const curveSegments = fontName === "Stencil" ? 1 : 8;
+  const glyphs: TextGlyphShape[] = [];
+  if (shape.textCurved) {
+    const display = buildCurvedText(shape);
+    if (!display) return null;
+    const fit = curvedTextFitScale(shape, display);
+    display.dispose();
+    const { options, glyphs: placed } = curvedTextLayout(shape);
+    placed.forEach(({ char, matrix }) => {
+      const map = (point: THREE.Vector2) => {
+        const world = new THREE.Vector3(point.x, point.y, 0).applyMatrix4(matrix);
+        return { x: fit * world.x, z: fit * world.z };
+      };
+      options.font.generateShapes(char, options.size).forEach((glyph) => glyphs.push({ glyph, map }));
+    });
+  } else {
+    const shapes = textFont(fontName).generateShapes(textOf(shape), LAYOUT_SIZE);
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    shapes.forEach((glyph) => {
+      const sampled = glyph.extractPoints(curveSegments);
+      [sampled.shape, ...sampled.holes].forEach((points) => points.forEach((point) => {
+        minX = Math.min(minX, point.x);
+        maxX = Math.max(maxX, point.x);
+        minY = Math.min(minY, point.y);
+        maxY = Math.max(maxY, point.y);
+      }));
+    });
+    const letters = textLetterBox(shape);
+    const scale = Math.min(letters.width / Math.max(1, maxX - minX), letters.depth / Math.max(1, maxY - minY));
+    // Scaled, turned flat (font y becomes -z) and centred, as the display does.
+    const map = (point: THREE.Vector2) => ({
+      x: scale * point.x - (scale * (minX + maxX)) / 2,
+      z: -scale * point.y + (scale * (minY + maxY)) / 2,
+    });
+    shapes.forEach((glyph) => glyphs.push({ glyph, map }));
+  }
+  return glyphs.length ? { glyphs, curveSegments } : null;
 }
 
 export function createTextGeometry(shape: WorkplaneShape): THREE.BufferGeometry {
@@ -271,7 +365,8 @@ export function createTextGeometry(shape: WorkplaneShape): THREE.BufferGeometry 
   if (box) {
     const textWidth = Math.max(1, box.max.x - box.min.x);
     const textDepth = Math.max(1, box.max.y - box.min.y);
-    const scale = Math.min(shapeWidth(shape) / textWidth, shapeDepth(shape) / textDepth);
+    const letters = textLetterBox(shape);
+    const scale = Math.min(letters.width / textWidth, letters.depth / textDepth);
     geometry.scale(scale, scale, 1);
   }
 

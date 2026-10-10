@@ -83,7 +83,7 @@ Die Skizze behält die gezeichnete Linie. Öffnest du sie wieder, änderst du Li
 
 ## Füllung und Silhouette
 
-Die Kontur stellst du auch ein, ohne die Skizze zu öffnen: In den Eigenschaften eines Skizzenkörpers wählst du unter {{ui:prop.sketchFill}} {{ui:prop.sketchFill.area}}, {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} oder {{ui:prop.sketchFill.center}}, dazu {{ui:prop.sketchLineWidth}} und {{ui:sketch.strokeJoin}}. Der Körper wird gleich neu gebaut, an seinem Platz. Das entspricht den Füllarten beim SVG-Import in Tinkercad: Standard, Außenlinie und Innenlinie.
+Die Kontur stellst du auch ein, ohne die Skizze zu öffnen: In den Eigenschaften eines Skizzenkörpers wählst du unter {{ui:prop.sketchFill}} {{ui:prop.sketchFill.area}}, {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} oder {{ui:prop.sketchFill.center}}, dazu {{ui:prop.sketchLineWidth}} und {{ui:sketch.strokeJoin}}. Der Körper wird gleich neu gebaut, an seinem Platz. Das entspricht den Füllarten beim SVG-Import in Tinkercad: Standard, Außenlinie und Innenlinie. {{ui:prop.sketchFill.grow}} lässt die Fläche gefüllt und vergrößert sie rundum um die Linienbreite, mit spitzen, runden oder abgeschrägten Ecken: eine Grundschicht unter einem Logo für den Mehrfarbdruck, die Kontur außen allein nur als Ring ergäbe.
 
 {{ui:prop.sketchSilhouette}} lässt alle Umrisse weg, die in einem anderen liegen: Löcher und was in ihnen liegt. Übrig bleibt nur der äußere Umriss. Zusammen mit {{ui:prop.sketchFill.outside}} wird daraus ein Ausstecher: Importiere ein SVG zweimal, einmal mit Silhouette als Fläche für den Boden und einmal mit Silhouette und 1 bis 2 mm Kontur außen als Wand. Den Schalter gibt es auch in der Tafel {{ui:sketch.stroke}} im Skizzenmodus.
 

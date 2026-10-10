@@ -36,7 +36,9 @@ import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createThreadGeometry, DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { createSpringGeometry } from "@/lib/springGeometry";
-import { createTextGeometry, curvedTextPatch } from "@/lib/textGeometry";
+import { curvedTextPatch } from "@/lib/textGeometry";
+import { textDisplayGeometry } from "@/lib/textFill";
+import { onManifoldReady, rememberManifoldRuntime, setManifoldLoader } from "@/lib/manifoldHandle";
 import { canApplySketchCornerTreatment } from "@/lib/sketchFilletChamfer";
 import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
 import { cloneSketchProfile, orderedSketchPaths, withSegmentHandles, withSmoothSketchHandles } from "@/lib/sketchSmoothHandles";
@@ -772,6 +774,8 @@ function getManifoldRuntime() {
     })
     .then((runtime) => {
       runtime.setup();
+      // Text fills (#215) build on the spot and need the runtime without awaiting it.
+      rememberManifoldRuntime(runtime);
       return runtime;
     })
     .catch((error) => {
@@ -780,6 +784,7 @@ function getManifoldRuntime() {
     });
   return manifoldRuntimePromise;
 }
+setManifoldLoader(getManifoldRuntime);
 function stlBoxTrianglePositions(width: number, depth: number, height: number) {
   const x = width / 2;
   const z = depth / 2;
@@ -2129,7 +2134,7 @@ function createBooleanTorusGeometry(width: number, height: number, depth: number
 }
 
 function createBooleanTextGeometry(shape: WorkplaneShape) {
-  return createTextGeometry(shape);
+  return textDisplayGeometry(shape);
 }
 
 function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
@@ -5903,6 +5908,8 @@ function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary {
     ...(shape.sketchProfile && shape.sketchOperation !== "revolve"
       ? { sketchStroke: shape.sketchProfile.stroke ?? null, silhouette: Boolean(shape.sketchProfile.silhouette) }
       : {}),
+    // A text's fill (#215) reads like a sketch body's: its stroke, and whether the counters are left out.
+    ...(shape.kind === "text" ? { textStroke: shape.textStroke ?? null, textSilhouette: Boolean(shape.textSilhouette) } : {}),
     children: shape.groupedShapes?.map(mcpShapeSummary),
   };
 }
@@ -6542,6 +6549,8 @@ export function LayerlingEditor({
   const [, setCustomFontRound] = useState(0);
   useEffect(() => onFontManagerRequested(() => setFontManagerOpen(true)), []);
   useEffect(() => onCustomFontsChanged(() => setCustomFontRound((round) => round + 1)), []);
+  // A text with a fill mode draws plain until the 2D kernel is there, then again properly (#215).
+  useEffect(() => onManifoldReady(() => setCustomFontRound((round) => round + 1)), []);
   const edgeModifierRef = useRef<EdgeModifierSession | null>(null);
   const cadModifierWorkerRef = useRef<Worker | null>(null);
   const cadModifierPendingRef = useRef(new Map<number, {
@@ -11515,6 +11524,20 @@ export function LayerlingEditor({
           if (typeof params.hole !== "boolean" && threaded.threadRole !== target.threadRole) {
             patch.hole = threaded.threadRole === "bore";
           }
+        }
+        // A text's fill (#215) takes the same words as a sketch body's: `stroke` as an object or
+        // null, `silhouette` true or false. The box follows the fill in curvedTextPatch.
+        if (target.kind === "text") {
+          if (params.stroke !== undefined) {
+            if (params.stroke === null || params.stroke === false) {
+              patch.textStroke = undefined;
+            } else {
+              const stroke = normalizeSketchStroke({ ...DEFAULT_SKETCH_STROKE, ...target.textStroke, ...(params.stroke as object) });
+              if (!stroke) throw new Error("stroke needs a width above 0, or null for the filled letters");
+              patch.textStroke = stroke;
+            }
+          }
+          if (typeof params.silhouette === "boolean") patch.textSilhouette = params.silhouette || undefined;
         }
         const pivotRequest = mcpPivotRequest(params.rotationPivot);
         const withPivotRequest = (shape: WorkplaneShape) => pivotRequest === undefined

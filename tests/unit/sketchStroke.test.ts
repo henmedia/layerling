@@ -65,6 +65,15 @@ describe("sketch stroke (#154)", () => {
     expect(bent("round")).toBeCloseTo(40 - 1 + Math.PI / 4, 1);
   });
 
+  it("'Wider' keeps the area and grows it by the width all round (#215)", () => {
+    // A 10 x 10 square widened by 1 with sharp corners is a 12 x 12 square; with round corners the corners are quarter circles.
+    expect(area(strokedSketchProfile(runtime, square({ width: 1, align: "grow", join: "miter" })))).toBeCloseTo(144, 4);
+    expect(area(strokedSketchProfile(runtime, square({ width: 1, align: "grow", join: "round" })))).toBeCloseTo(100 + 40 + Math.PI, 1);
+    // An open line widened is the same as a centred stroke of that width.
+    const open = (align: SketchStroke["align"]) => Math.abs(area(strokedSketchProfile(runtime, polyline([[0, 0], [10, 0]], false, { width: 2, align }))));
+    expect(open("grow")).toBeCloseTo(open("center"), 6);
+  });
+
   it("keeps a stroke's settings within range", () => {
     expect(normalizeSketchStroke({ width: -1 })).toBeUndefined();
     expect(normalizeSketchStroke({ width: 0.2, align: "sideways" })).toEqual({ width: 0.2, align: "center", join: "miter", cap: "flat" });

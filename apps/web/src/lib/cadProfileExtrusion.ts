@@ -20,8 +20,9 @@ import { loftProfileLoops } from "@/lib/loftGeometry";
 import { teardropExactSection } from "@/lib/teardropGeometry";
 import { screwHoleProfile } from "@/lib/screwHoleGeometry";
 import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
-import { textFont } from "@/lib/textFonts";
-import { buildCurvedText, curvedTextFitScale, curvedTextLayout } from "@/lib/textGeometry";
+import { textGlyphShapes } from "@/lib/textGeometry";
+import { textFillComponents, textFillPieceGeometry, textHasFill } from "@/lib/textFill";
+import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { threadBuildPlan, WHITWORTH_PROFILE_CONSTANTS } from "@/lib/threadGeometry";
 import { springBuildPlan, springRingSectionShare } from "@/lib/springGeometry";
 import { knurlCorners, knurlSettings, roundKnurlWave } from "@/lib/knurlGeometry";
@@ -677,8 +678,6 @@ function loftShapeProfile(shape: WorkplaneShape): CadModifierProfilePart {
   return part;
 }
 
-const TEXT_GLYPH_SIZE = 20;
-
 type GlyphPath = { curves: Array<THREE.Curve<THREE.Vector2>> };
 
 /**
@@ -747,50 +746,36 @@ export function textGlyphProfiles(shape: WorkplaneShape) {
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const fontName = shape.font ?? "Multilanguage";
-  const curveSegments = fontName === "Stencil" ? 1 : 8;
-  const glyphs: Array<{ glyph: THREE.Shape; map: (point: THREE.Vector2) => Point }> = [];
-  if (shape.textCurved) {
-    // Curved text: every character through the very matrix that places its
-    // display glyph on the circle, then the same fit into the box.
-    const display = buildCurvedText(shape);
-    if (!display) return null;
-    const fit = curvedTextFitScale(shape, display);
-    display.dispose();
-    const { options, glyphs: placed } = curvedTextLayout(shape);
-    placed.forEach(({ char, matrix }) => {
-      const map = (point: THREE.Vector2): Point => {
-        const world = new THREE.Vector3(point.x, point.y, 0).applyMatrix4(matrix);
-        return { x: fit * world.x, z: fit * world.z };
-      };
-      options.font.generateShapes(char, options.size).forEach((glyph) => glyphs.push({ glyph, map }));
-    });
-  } else {
-    const text = (shape.text ?? "TEXT").trim() || " ";
-    const shapes = textFont(fontName).generateShapes(text, TEXT_GLYPH_SIZE);
-    let minX = Infinity;
-    let maxX = -Infinity;
-    let minY = Infinity;
-    let maxY = -Infinity;
-    shapes.forEach((glyph) => {
-      const sampled = glyph.extractPoints(curveSegments);
-      [sampled.shape, ...sampled.holes].forEach((points) => points.forEach((point) => {
-        minX = Math.min(minX, point.x);
-        maxX = Math.max(maxX, point.x);
-        minY = Math.min(minY, point.y);
-        maxY = Math.max(maxY, point.y);
-      }));
-    });
-    const scale = Math.min(width / Math.max(1, maxX - minX), depth / Math.max(1, maxY - minY));
-    // Scaled, turned flat (font y becomes -z) and centred, as the display does.
-    const map = (point: THREE.Vector2): Point => ({
-      x: scale * point.x - (scale * (minX + maxX)) / 2,
-      z: -scale * point.y + (scale * (minY + maxY)) / 2,
-    });
-    shapes.forEach((glyph) => glyphs.push({ glyph, map }));
-  }
-  if (glyphs.length === 0) return null;
   const transform = profileTransformForShape(shape);
+  // A text with a fill mode (#215) is the loose pieces its stroke or widening left - letters
+  // that run together are one piece - each with its outline as straight lines, as drawn.
+  if (textHasFill(shape)) {
+    const runtime = loadedManifoldRuntime();
+    if (!runtime) return null;
+    const components = textFillComponents(runtime, shape);
+    if (!components) return null;
+    const pointLoop = (points: Point[]): CadModifierProfileLoop => ({
+      ...points[0],
+      segments: [...points.slice(1), points[0]].map((point) => ({ kind: "line", x: point.x, z: point.z })),
+    });
+    return components.map((component) => {
+      const geometry = textFillPieceGeometry(component, shape.height);
+      const triangleCount = geometry.getAttribute("position").count / 3;
+      geometry.dispose();
+      let profile: CadModifierProfilePart | null = null;
+      try {
+        const candidate: CadModifierProfilePart = { kind: "extrusion", loops: [component.outer, ...component.holes].map(pointLoop), height: shape.height, transform };
+        validateCadProfile(candidate);
+        profile = candidate;
+      } catch {
+        profile = null;
+      }
+      return { profile, triangleCount };
+    });
+  }
+  const shapes = textGlyphShapes(shape);
+  if (!shapes) return null;
+  const { glyphs, curveSegments } = shapes;
   return glyphs.map(({ glyph, map }) => {
     const extruded = new THREE.ExtrudeGeometry(glyph, { depth: shape.height, curveSegments, bevelEnabled: false });
     const triangleCount = extruded.getAttribute("position").count / 3;

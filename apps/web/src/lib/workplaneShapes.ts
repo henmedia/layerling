@@ -3,7 +3,7 @@ import { fieldFormulasEqual } from "@/lib/fieldFormulas";
 import { threadFootprintPatch } from "@/lib/threadGeometry";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
-import type { WorkplaneShape } from "@/types/layerling";
+import type { SketchStroke, WorkplaneShape } from "@/types/layerling";
 
 /** Aendert dieser Patch einen Bauwert des Koerpers - oder nur seinen Rahmen? */
 export function patchTouchesBodyParameters(patch: Partial<WorkplaneShape>) {
@@ -460,6 +460,13 @@ export function canonicalizeShape(shape: WorkplaneShape): WorkplaneShape {
   return next;
 }
 
+/** Two strokes (#154/#215) with the same width, position, corners and ends. */
+export function sketchStrokesEqual(a: SketchStroke | undefined, b: SketchStroke | undefined) {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return a.width === b.width && a.align === b.align && a.join === b.join && a.cap === b.cap;
+}
+
 export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
   return (
     a.id === b.id &&
@@ -593,6 +600,8 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.textSize === b.textSize &&
     a.textInward === b.textInward &&
     a.textFlipped === b.textFlipped &&
+    sketchStrokesEqual(a.textStroke, b.textStroke) &&
+    Boolean(a.textSilhouette) === Boolean(b.textSilhouette) &&
     a.importedMesh === b.importedMesh &&
     a.imagePlate === b.imagePlate &&
     a.sketchProfile === b.sketchProfile &&

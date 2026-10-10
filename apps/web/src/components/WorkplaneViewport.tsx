@@ -62,7 +62,8 @@ import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createBentTubeGeometry, createBentTubeSegmentGeometry } from "@/lib/bentTubeGeometry";
 import { createThreadGeometry } from "@/lib/threadGeometry";
 import { createSpringGeometry } from "@/lib/springGeometry";
-import { createTextGeometry } from "@/lib/textGeometry";
+import { textDisplayGeometry } from "@/lib/textFill";
+import { manifoldRevision } from "@/lib/manifoldHandle";
 import { customFontRevision } from "@/lib/textFonts";
 import { displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
 import {
@@ -1288,6 +1289,10 @@ function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     font: shape.font,
     // A font of one's own can gain letters (a design's few, then the whole file): draw again then.
     fontRevision: customFontRevision(shape.font),
+    textStroke: shape.textStroke,
+    textSilhouette: shape.textSilhouette,
+    // A fill is built by the 2D kernel; until it has loaded the text is drawn plain (#215).
+    fillKernel: shape.textStroke || shape.textSilhouette ? manifoldRevision() : undefined,
     textCurved: shape.textCurved,
     textRadius: shape.textRadius,
     textSize: shape.textSize,
@@ -1522,6 +1527,10 @@ function shapeGeometrySignature(shape: WorkplaneShape): string {
     font: shape.font,
     // A font of one's own can gain letters (a design's few, then the whole file): draw again then.
     fontRevision: customFontRevision(shape.font),
+    textStroke: shape.textStroke,
+    textSilhouette: shape.textSilhouette,
+    // A fill is built by the 2D kernel; until it has loaded the text is drawn plain (#215).
+    fillKernel: shape.textStroke || shape.textSilhouette ? manifoldRevision() : undefined,
     textCurved: shape.textCurved,
     textRadius: shape.textRadius,
     textSize: shape.textSize,
@@ -13789,7 +13798,7 @@ function setComplexEdgeVisibility(object: THREE.Object3D, visible: boolean) {
 }
 
 function addTextShape(group: THREE.Group, material: THREE.MeshStandardMaterial, shape: WorkplaneShape, geometryCacheKey: string) {
-  const geometry = sharedShapeGeometry(geometryCacheKey, () => createTextGeometry(shape));
+  const geometry = sharedShapeGeometry(geometryCacheKey, () => textDisplayGeometry(shape));
   addMesh(group, geometry, material, shape);
 }
 

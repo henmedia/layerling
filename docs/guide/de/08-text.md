@@ -65,6 +65,12 @@ Daraus folgt:
 
 Für Beschriftungen auf einer Seitenfläche legst du vorher die Arbeitsebene auf diese Fläche, siehe [Ansicht und Arbeitsebene](chapter:ansicht-und-arbeitsebene).
 
+## Kontur, Silhouette und breiter
+
+Ein Text muss nicht als gefüllte Buchstaben gebaut werden. Unter {{ui:prop.sketchFill}} in den Eigenschaften wählst du wie bei Skizzen und SVG {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} oder {{ui:prop.sketchFill.center}}, dazu {{ui:prop.sketchLineWidth}} und {{ui:sketch.strokeJoin}}: Dann wird nur eine Linie dieser Breite um die Buchstaben gebaut, außen, innen oder mittig auf ihrem Umriss. {{ui:prop.sketchFill.grow}} lässt die Buchstaben gefüllt und macht sie rundum um die Linienbreite dicker; Buchstaben, die sich dabei berühren, wachsen zu einem Stück zusammen. {{ui:prop.sketchSilhouette}} lässt die Löcher in O, A oder e weg.
+
+Der Kasten des Texts wächst mit einer Kontur außen, mittig oder mit „Breiter“ mit, die Buchstaben behalten dabei ihre Größe. So entsteht ein Namensschild für den Mehrfarbdruck aus drei Kopien eines Texts, alle an derselben Stelle: die Buchstaben selbst, derselbe Text 1,5 mm breiter in der zweiten Farbe und noch einmal 3 mm breiter mit Silhouette als Grundplatte in der dritten. Jede Schicht ist ein eigener Körper mit eigener Farbe und Höhe; Fasen und Verrundungen an den Kanten gehen auf jeder. {{ui:prop.bevel}} und {{ui:prop.segments}} gibt es nur für gefüllte Buchstaben.
+
 ## Text auf dem Kreisbogen
 
 Soll die Beschriftung nicht gerade laufen, sondern dem Rand einer Münze, eines Deckels oder eines Rings folgen? Dafür gibt es die Einstellung {{ui:prop.textCurved}}.

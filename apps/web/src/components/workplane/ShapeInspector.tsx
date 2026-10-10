@@ -154,6 +154,7 @@ import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, normalizeScrewHoleAngle, no
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
 import { MAX_DOVETAIL_CLEARANCE, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
+import { textHasFill } from "@/lib/textFill";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { MIN_SLOT_END_RATIO, normalizeSlotEndRatio, taperedSlotOutline } from "@/lib/slotGeometry";
@@ -179,7 +180,7 @@ import {
 } from "@/lib/springGeometry";
 import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, customSnapGridLabel, shapeDimensionLimit, snapGridOptions } from "@/lib/workplaneSettings";
-import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStrokeAlign, SketchStrokeJoin, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { selectWholeValue } from "@/lib/numberField";
 import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFormulas } from "@/lib/fieldFormulas";
 import { useRecentColors } from "@/lib/recentColors";
@@ -1679,8 +1680,12 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       },
       textFontProperty(shape, onUpdate),
       { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 40, onChange: setHeight },
-      { id: "bevel", label: t("prop.bevel"), value: shape.bevel ?? 0, min: 0, max: 8, onChange: (bevel) => onUpdate({ bevel }) },
-      { id: "segments", label: t("prop.segments"), value: shape.segments ?? 0, min: 0, max: 24, step: 1, onChange: (segments) => onUpdate({ segments: Math.round(segments) }) },
+      ...textFillProperties(shape, onUpdate),
+      // A fill mode or the silhouette draws the letters flat; bevel and segments belong to the filled letters.
+      ...(textHasFill(shape) ? [] : [
+        { id: "bevel", label: t("prop.bevel"), value: shape.bevel ?? 0, min: 0, max: 8, onChange: (bevel: number) => onUpdate({ bevel }) },
+        { id: "segments", label: t("prop.segments"), value: shape.segments ?? 0, min: 0, max: 24, step: 1, onChange: (segments: number) => onUpdate({ segments: Math.round(segments) }) },
+      ] satisfies ShapePropertyConfig[]),
       {
         type: "toggle",
         id: "textCurved",
@@ -1737,6 +1742,60 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 }
 
 /**
+ * How a text is filled (#215, as Tinkercad's text fill modes): the letters, a stroke outside,
+ * inside or centred on their outline, the letters widened by the line width, and the silhouette
+ * without the counters. The box follows the fill (textFillPatch), the letters stay as they are.
+ */
+function textFillProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate): ShapePropertyConfig[] {
+  const stroke = normalizeSketchStroke(shape.textStroke);
+  const setStroke = (textStroke: SketchStroke | undefined) => onUpdate({ textStroke });
+  const fill: ShapePropertyConfig = {
+    type: "select",
+    id: "textFill",
+    label: t("prop.sketchFill"),
+    value: stroke ? stroke.align : "area",
+    options: [
+      { value: "area", label: t("prop.sketchFill.area") },
+      { value: "outside", label: t("prop.sketchFill.outside") },
+      { value: "inside", label: t("prop.sketchFill.inside") },
+      { value: "center", label: t("prop.sketchFill.center") },
+      { value: "grow", label: t("prop.sketchFill.grow") },
+    ],
+    hint: stroke?.align === "grow" ? t("prop.sketchFill.growHint") : (stroke || shape.textSilhouette) && (shape.bevel ?? 0) > 0 ? t("prop.textFillHint") : undefined,
+    onChange: (value) => setStroke(value === "area" ? undefined : { ...(stroke ?? DEFAULT_SKETCH_STROKE), align: value as SketchStrokeAlign }),
+  };
+  const silhouette: ShapePropertyConfig = {
+    type: "toggle",
+    id: "textSilhouette",
+    label: t("prop.sketchSilhouette"),
+    value: Boolean(shape.textSilhouette),
+    onChange: (value) => onUpdate({ textSilhouette: value || undefined }),
+  };
+  if (!stroke) return [fill, silhouette];
+  return [
+    fill,
+    {
+      id: "textLineWidth",
+      label: t("prop.sketchLineWidth"),
+      value: stroke.width,
+      min: MIN_SKETCH_STROKE_WIDTH,
+      max: 50,
+      step: 0.1,
+      onChange: (width) => setStroke({ ...stroke, width: Math.min(MAX_SKETCH_STROKE_WIDTH, Math.max(MIN_SKETCH_STROKE_WIDTH, width)) }),
+    },
+    {
+      type: "select",
+      id: "textCorners",
+      label: t("sketch.strokeJoin"),
+      value: stroke.join,
+      options: SKETCH_STROKE_JOINS.map((join) => ({ value: join, label: t(`sketch.strokeJoin.${join}`) })),
+      onChange: (join) => setStroke({ ...stroke, join: join as SketchStrokeJoin }),
+    },
+    silhouette,
+  ];
+}
+
+/**
  * How an extruded sketch body is filled, without opening the sketch (#197, as Tinkercad's SVG
  * fill modes): the area, a stroke outside, inside or centred on its lines with a width and
  * corners, and the silhouette that leaves its holes out. The editor builds the body again.
@@ -1759,7 +1818,9 @@ function sketchFillProperties(profile: SketchProfile, onUpdate: ShapeInspectorUp
       { value: "outside", label: t("prop.sketchFill.outside") },
       { value: "inside", label: t("prop.sketchFill.inside") },
       { value: "center", label: t("prop.sketchFill.center") },
+      { value: "grow", label: t("prop.sketchFill.grow") },
     ],
+    hint: stroke?.align === "grow" ? t("prop.sketchFill.growHint") : undefined,
     onChange: (value) => update({
       stroke: value === "area" ? undefined : { ...(stroke ?? DEFAULT_SKETCH_STROKE), align: value as SketchStrokeAlign },
     }),

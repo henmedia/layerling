@@ -662,14 +662,14 @@ export function rackOutlinePoints(measures: RackMeasures) {
   return points;
 }
 
-type OutlinePoint = { x: number; z: number };
+export type OutlinePoint = { x: number; z: number };
 
 /**
  * A body from an outline and the holes in it, all running the same way round, its foot at y = 0:
  * the walls, and both ends filled as the outline with its holes - a ring gear's many close corners
  * would fold a fan of spokes over.
  */
-function extrudeOutline(contour: OutlinePoint[], holes: OutlinePoint[][], height: number) {
+export function extrudeOutline(contour: OutlinePoint[], holes: OutlinePoint[][], height: number) {
   const rings = [contour, ...holes];
   const flat = rings.flat();
   // Where each ring's points start in the flat list, as the triangulation numbers them.

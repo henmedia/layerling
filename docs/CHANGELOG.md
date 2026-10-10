@@ -4,6 +4,9 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
+## Unreleased
+
+- **Fill modes for the Text shape, and "Wider":** A text can now be drawn as sketches and SVGs are since 1.47: **Stroke Outside**, **Inside** or **Centred** with a line width and corner style, and as a **Silhouette** without the counters of its letters. New for text, sketches and SVG alike is the fill mode **Wider**: the filled shape grown outwards by the line width all round, with sharp, round or bevelled corners - the piece that was missing for a filled base layer under a text or logo. A name tag for a multicolour print is three copies of one text: the letters, the same text 1.5 mm wider in a second colour, and 3 mm wider as a silhouette (no holes) carrying the key ring. The box of the text grows with an outside, centred or wider stroke, so the letters keep their size and the layers line up; the letters are exact bodies for the edge tool and STEP in every mode, and letters that run together become one piece. The MCP bridge takes `stroke` (with `align: "grow"`) and `silhouette` on a text as on a sketch body. Asked for by @plazmabokor in #215, who also asked for a layer tool that builds all layers at once and takes a list of names - that comes next.
 ## 1.59.0
 
 - **A number field remembers its calculation:** Typing "(140+2)/2" into a field left only 71 behind. The field now keeps the calculation with the body: click into it again and the formula is back for editing, as long as the value still equals it - a value changed by a handle, the slider or scaling shows the number again, and a plain number clears the formula. Value and formula change together, so undo takes both back, and the formulas are saved in the design. No variables, no tables. Asked for by @prmod3d in #180.

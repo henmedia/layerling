@@ -6,6 +6,7 @@ import { normalizePlacementWorkplane, placementWorkplaneIsBase, type PlacementWo
 import { importedShapeFromObj } from "@/lib/objImport";
 import { normalizeProjectAsset, sha256Hex } from "@/lib/projectAssets";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
+import { normalizeSketchStroke } from "@/lib/sketchStroke";
 import { normalizeNotes } from "@/lib/workplaneNotes";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
@@ -1229,6 +1230,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     for (const [field, text] of Object.entries(formulas)) {
       if (typeof text !== "string" || text.length > 80) throw new Error(`${label}.formulas.${field} must be a short text`);
     }
+  }
+  // A text's fill mode (#215): a stroke like a sketch's, and the silhouette switch.
+  if (definition.textStroke !== undefined && !normalizeSketchStroke(definition.textStroke)) {
+    throw new Error(`${label}.textStroke must be a stroke with a width above 0`);
+  }
+  if (definition.textSilhouette !== undefined && typeof definition.textSilhouette !== "boolean") {
+    throw new Error(`${label}.textSilhouette must be true or false`);
   }
   if (definition.parametricSource !== undefined) {
     // Was der Koerper vor dem Drehen war. Fehlt oder stimmt hier etwas nicht,

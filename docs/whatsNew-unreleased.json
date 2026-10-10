@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Text als Kontur, Silhouette oder breiter",
+      "en": "Text as outline, silhouette or wider"
+    },
+    "body": {
+      "de": "Die Textform hat jetzt Füllmodi wie Skizzen und SVG: Kontur außen, innen oder mittig, Silhouette ohne Löcher und neu „Breiter“ – die Fläche rundum vergrößert, auch für Skizzen und SVG. Drei Kopien eines Texts, 0, 1,5 und 3 mm breiter, ergeben ein Namensschild für den Mehrfarbdruck.",
+      "en": "The Text shape now has fill modes like sketches and SVG: stroke outside, inside or centred, silhouette without holes and the new \"Wider\" - the shape grown all round, for sketches and SVG too. Three copies of one text, 0, 1.5 and 3 mm wider, make a name tag for a multicolour print."
+    }
+  }
+]

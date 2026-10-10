@@ -343,8 +343,8 @@ export type SketchImage = {
   locked?: boolean;
 };
 
-/** Where the wall of a stroked closed outline lies against the drawn line. */
-export type SketchStrokeAlign = "center" | "inside" | "outside";
+/** Where the wall of a stroked closed outline lies against the drawn line; "grow" keeps the area and widens it by the width (#215). */
+export type SketchStrokeAlign = "center" | "inside" | "outside" | "grow";
 export type SketchStrokeJoin = "miter" | "round" | "bevel";
 export type SketchStrokeCap = "flat" | "square" | "round";
 /** A sketch drawn as a line of this width instead of a filled area (#154). */
@@ -648,6 +648,14 @@ export type WorkplaneShape = {
   textInward?: boolean;
   /** Curved text: same place on the circle, letters turned upside down (read from the other side). */
   textFlipped?: boolean;
+  /**
+   * Text only (#215): drawn as a line of this width round the letters - outside, inside or
+   * centred on their outline - or widened by it ("grow"), instead of the filled letters.
+   * Width and depth stay the box of the whole body; the letters are fitted inside it.
+   */
+  textStroke?: SketchStroke;
+  /** Text only (#215): the letters without their counters (the holes in O, A, e), as Tinkercad's Silhouette. */
+  textSilhouette?: boolean;
   /**
    * Set on a body made by wrapping around a cylinder (#106): its box is
    * centred on the cylinder's axis, and aligning, snapping and centring use

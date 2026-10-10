@@ -65,6 +65,12 @@ So:
 
 For lettering on a side face, first put the workplane on that face, see [View and workplane](chapter:view-and-workplane).
 
+## Outline, silhouette and wider
+
+A text need not be built as filled letters. Under {{ui:prop.sketchFill}} in the properties you choose, as for sketches and SVG, {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} or {{ui:prop.sketchFill.center}}, with {{ui:prop.sketchLineWidth}} and {{ui:sketch.strokeJoin}}: only a line of that width is built round the letters, outside, inside or centred on their outline. {{ui:prop.sketchFill.grow}} keeps the letters filled and makes them thicker by the line width all round; letters that touch grow into one piece. {{ui:prop.sketchSilhouette}} leaves out the holes in O, A or e.
+
+The box of the text grows with a stroke outside, centred or with "Wider", while the letters keep their size. That makes a name tag for a multicolour print from three copies of one text, all in the same place: the letters themselves, the same text 1.5 mm wider in the second colour, and once more 3 mm wider with the silhouette as the base plate in the third. Each layer is a body of its own with its own colour and height; chamfers and fillets on the edges work on every one. {{ui:prop.bevel}} and {{ui:prop.segments}} exist for filled letters only.
+
 ## Text on a circular arc
 
 Should the lettering not run straight but follow the edge of a coin, a lid or a ring? For that there is the setting {{ui:prop.textCurved}}.

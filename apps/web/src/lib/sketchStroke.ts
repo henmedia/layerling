@@ -10,7 +10,7 @@ import type { SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeCap, S
  * drawn line; the stroked outline is worked out when the body is built.
  */
 
-export const SKETCH_STROKE_ALIGNS: readonly SketchStrokeAlign[] = ["center", "inside", "outside"];
+export const SKETCH_STROKE_ALIGNS: readonly SketchStrokeAlign[] = ["center", "inside", "outside", "grow"];
 export const SKETCH_STROKE_JOINS: readonly SketchStrokeJoin[] = ["miter", "round", "bevel"];
 export const SKETCH_STROKE_CAPS: readonly SketchStrokeCap[] = ["flat", "square", "round"];
 export const DEFAULT_SKETCH_STROKE: SketchStroke = { width: 2, align: "center", join: "miter", cap: "flat" };
@@ -70,7 +70,7 @@ const toPolygon = (points: Vec[]) => points.map((point) => [point.x, point.z] as
  * Every CrossSection lives in Manifold's WebAssembly memory until it is deleted; the preview
  * builds the stroke again on every edit, so each one is kept here and freed at the end.
  */
-type Keep = <T extends CrossSection>(section: T) => T;
+export type Keep = <T extends CrossSection>(section: T) => T;
 
 function circleAt(runtime: ManifoldToplevel, keep: Keep, center: Vec, radius: number) {
   return keep(keep(runtime.CrossSection.circle(radius, 48)).translate([center.x, center.z]));
@@ -147,18 +147,28 @@ function strokeOpenPath(runtime: ManifoldToplevel, keep: Keep, points: Vec[], st
   return keep(runtime.CrossSection.union(pieces));
 }
 
-/** The closed outlines as a frame of `width`: inside, outside or centred on the drawn line. */
-function strokeClosedPaths(runtime: ManifoldToplevel, keep: Keep, loops: Vec[][], stroke: SketchStroke): CrossSection | null {
-  if (!loops.length) return null;
-  const region = keep(new runtime.CrossSection(loops.map(toPolygon), "EvenOdd"));
+/**
+ * A filled region as the stroke asks: a frame of `width` inside, outside or centred on its
+ * edge, or ("grow", #215) the region itself widened by `width` - a filled base layer under a
+ * text or logo for a multicolour print. Text fills (textFill.ts) use this for their letters.
+ */
+export function strokeRegion(runtime: ManifoldToplevel, keep: Keep, region: CrossSection, stroke: SketchStroke): CrossSection {
   const joinType = stroke.join === "round" ? "Round" : stroke.join === "bevel" ? "Square" : "Miter";
   const grow = (delta: number) => (delta === 0 ? region : keep(region.offset(delta, joinType, MITER_LIMIT, 48)));
+  if (stroke.align === "grow") return grow(stroke.width);
   const [outerDelta, innerDelta] = stroke.align === "inside"
     ? [0, -stroke.width]
     : stroke.align === "outside"
       ? [stroke.width, 0]
       : [stroke.width / 2, -stroke.width / 2];
   return keep(grow(outerDelta).subtract(grow(innerDelta)));
+}
+
+/** The closed outlines as a frame of `width`: inside, outside or centred on the drawn line, or widened. */
+function strokeClosedPaths(runtime: ManifoldToplevel, keep: Keep, loops: Vec[][], stroke: SketchStroke): CrossSection | null {
+  if (!loops.length) return null;
+  const region = keep(new runtime.CrossSection(loops.map(toPolygon), "EvenOdd"));
+  return strokeRegion(runtime, keep, region, stroke);
 }
 
 /**

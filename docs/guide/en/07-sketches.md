@@ -83,7 +83,7 @@ The sketch keeps the drawn line. Open it again and you go on changing line and s
 
 ## Fill and silhouette
 
-You can set the stroke without opening the sketch too: in the properties of a sketch body, choose {{ui:prop.sketchFill.area}}, {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} or {{ui:prop.sketchFill.center}} under {{ui:prop.sketchFill}}, with {{ui:prop.sketchLineWidth}} and {{ui:sketch.strokeJoin}}. The body is built again straight away, where it stands. These match the fill modes of Tinkercad's SVG import: default, outer line and inner line.
+You can set the stroke without opening the sketch too: in the properties of a sketch body, choose {{ui:prop.sketchFill.area}}, {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} or {{ui:prop.sketchFill.center}} under {{ui:prop.sketchFill}}, with {{ui:prop.sketchLineWidth}} and {{ui:sketch.strokeJoin}}. The body is built again straight away, where it stands. These match the fill modes of Tinkercad's SVG import: default, outer line and inner line. {{ui:prop.sketchFill.grow}} keeps the area filled and grows it by the line width all round, with sharp, round or bevelled corners: a base layer under a logo for a multicolour print, which the stroke outside alone would only give as a ring.
 
 {{ui:prop.sketchSilhouette}} leaves out every outline lying inside another: holes and whatever lies in them. Only the outer outline stays. Together with {{ui:prop.sketchFill.outside}} it makes a cookie cutter: import an SVG twice, once with the silhouette as an area for the base and once with the silhouette and 1 to 2 mm of stroke outside as the wall. The switch is in the {{ui:sketch.stroke}} panel in sketch mode as well.
 
