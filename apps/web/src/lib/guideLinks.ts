@@ -110,9 +110,12 @@ type GuideShape = {
   sketchProfile?: unknown;
   sketchOperation?: string;
   importedMesh?: { sourceFormat?: string };
+  layeredText?: boolean;
 };
 
 export function guideSectionForShape(shape: GuideShape): GuideSection | undefined {
+  // A name tag (#215) is a bundle, but its panel is explained with the text.
+  if (shape.layeredText && shape.groupedShapes?.length) return "textLayers";
   if (shape.groupedShapes?.length) {
     if (shape.groupOperation === "bundle") return "bundling";
     if (shape.groupOperation === "intersection") return "intersection";

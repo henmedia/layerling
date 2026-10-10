@@ -3,7 +3,7 @@
 import { displayY, displayYTurn, insideZ, insideZTurn } from "@/lib/displayAxes";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
-import { ChevronDown, ChevronUp, Cylinder, Eye, EyeOff, Layers, Lock, Pencil, RotateCcw, Split, Tags, Unlock } from "lucide-react";
+import { ChevronDown, ChevronUp, Cylinder, Eye, EyeOff, Layers, Lock, Minus, Pencil, Plus, RotateCcw, Split, Tags, Unlock } from "lucide-react";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
   DEFAULT_GEAR_HELIX_ANGLE,
@@ -155,7 +155,9 @@ import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAng
 import { MAX_DOVETAIL_CLEARANCE, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { textHasFill } from "@/lib/textFill";
-import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, namesFromList, textLayersOf, type TextLayer } from "@/lib/textLayers";
+import { TEXT_FILL_CHOICES, textFillChoice, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
+import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, namesFromList, type TextLayer } from "@/lib/textLayers";
+import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, removeTextLayer, textLetterSize, type NameTagStack } from "@/lib/nameTag";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { MIN_SLOT_END_RATIO, normalizeSlotEndRatio, taperedSlotOutline } from "@/lib/slotGeometry";
@@ -332,7 +334,7 @@ const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diamet
 const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ"]);
 
 function propertyUsesLengthUnit(key: string) {
-  return ["positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "boltClearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall"].includes(key);
+  return ["textLineWidth", "letterSize", "tagGap", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "boltClearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall"].includes(key);
 }
 
 /**
@@ -1743,56 +1745,61 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 }
 
 /**
- * How a text is filled (#215, as Tinkercad's text fill modes): the letters, a stroke outside,
- * inside or centred on their outline, the letters widened by the line width, and the silhouette
- * without the counters. The box follows the fill (textFillPatch), the letters stay as they are.
+ * How a text is filled (#215), as Tinkercad lists it: one list - filled, outline, outer line,
+ * inner line - and the line width next to it. Corners, the silhouette and "Wider" (the filled
+ * letters grown by the line width) are rarer and sit under "More" (TEXT_FILL_MORE_IDS). The box
+ * follows the fill (textFillPatch), the letters stay as they are.
  */
+const TEXT_FILL_MORE_IDS = new Set(["textCorners", "textSilhouette", "textWider"]);
+
 function textFillProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate): ShapePropertyConfig[] {
   const stroke = normalizeSketchStroke(shape.textStroke);
   const setStroke = (textStroke: SketchStroke | undefined) => onUpdate({ textStroke });
+  const wider = stroke?.align === "grow";
   const fill: ShapePropertyConfig = {
     type: "select",
     id: "textFill",
-    label: t("prop.sketchFill"),
-    value: stroke ? stroke.align : "area",
-    options: [
-      { value: "area", label: t("prop.sketchFill.area") },
-      { value: "outside", label: t("prop.sketchFill.outside") },
-      { value: "inside", label: t("prop.sketchFill.inside") },
-      { value: "center", label: t("prop.sketchFill.center") },
-      { value: "grow", label: t("prop.sketchFill.grow") },
-    ],
-    hint: stroke?.align === "grow" ? t("prop.sketchFill.growHint") : (stroke || shape.textSilhouette) && (shape.bevel ?? 0) > 0 ? t("prop.textFillHint") : undefined,
-    onChange: (value) => setStroke(value === "area" ? undefined : { ...(stroke ?? DEFAULT_SKETCH_STROKE), align: value as SketchStrokeAlign }),
+    label: t("prop.textFill"),
+    value: textFillChoice(stroke),
+    options: TEXT_FILL_CHOICES.map(({ choice }) => ({ value: choice, label: t(`prop.textFill.${choice}`) })),
+    hint: wider ? t("prop.sketchFill.growHint") : (stroke || shape.textSilhouette) && (shape.bevel ?? 0) > 0 ? t("prop.textFillHint") : undefined,
+    onChange: (value) => setStroke(textStrokeForChoice(value as TextFillChoice, stroke)),
   };
-  const silhouette: ShapePropertyConfig = {
-    type: "toggle",
-    id: "textSilhouette",
-    label: t("prop.sketchSilhouette"),
-    value: Boolean(shape.textSilhouette),
-    onChange: (value) => onUpdate({ textSilhouette: value || undefined }),
-  };
-  if (!stroke) return [fill, silhouette];
+  const lineWidth: ShapePropertyConfig[] = stroke ? [{
+    id: "textLineWidth",
+    label: t(wider ? "textLayers.grow" : "prop.sketchLineWidth"),
+    value: stroke.width,
+    min: MIN_SKETCH_STROKE_WIDTH,
+    max: 50,
+    step: 0.1,
+    onChange: (width) => setStroke({ ...stroke, width: Math.min(MAX_SKETCH_STROKE_WIDTH, Math.max(MIN_SKETCH_STROKE_WIDTH, width)) }),
+  }] : [];
+  const corners: ShapePropertyConfig[] = stroke ? [{
+    type: "select",
+    id: "textCorners",
+    label: t("sketch.strokeJoin"),
+    value: stroke.join,
+    options: SKETCH_STROKE_JOINS.map((join) => ({ value: join, label: t(`sketch.strokeJoin.${join}`) })),
+    onChange: (join) => setStroke({ ...stroke, join: join as SketchStrokeJoin }),
+  }] : [];
   return [
     fill,
+    ...lineWidth,
+    ...corners,
     {
-      id: "textLineWidth",
-      label: t("prop.sketchLineWidth"),
-      value: stroke.width,
-      min: MIN_SKETCH_STROKE_WIDTH,
-      max: 50,
-      step: 0.1,
-      onChange: (width) => setStroke({ ...stroke, width: Math.min(MAX_SKETCH_STROKE_WIDTH, Math.max(MIN_SKETCH_STROKE_WIDTH, width)) }),
+      type: "toggle",
+      id: "textSilhouette",
+      label: t("prop.sketchSilhouette"),
+      value: Boolean(shape.textSilhouette),
+      onChange: (value) => onUpdate({ textSilhouette: value || undefined }),
     },
     {
-      type: "select",
-      id: "textCorners",
-      label: t("sketch.strokeJoin"),
-      value: stroke.join,
-      options: SKETCH_STROKE_JOINS.map((join) => ({ value: join, label: t(`sketch.strokeJoin.${join}`) })),
-      onChange: (join) => setStroke({ ...stroke, join: join as SketchStrokeJoin }),
+      type: "toggle",
+      id: "textWider",
+      label: t("prop.textWider"),
+      value: wider,
+      onChange: (value) => setStroke(textStrokeWider(value, stroke)),
     },
-    silhouette,
   ];
 }
 
@@ -1913,6 +1920,7 @@ export function ShapeInspector({
   onWrapAroundCylinder,
   onLayerText,
   onTextTags,
+  textLayerStack: nameTagStack,
   onInteractionActiveChange,
   onSnapGridAwayChange,
   proportionLock = false,
@@ -1939,6 +1947,8 @@ export function ShapeInspector({
   onLayerText?: (patch: TextLayerPatch) => void;
   /** One tag like this text or stack per name, laid out in rows (#215). */
   onTextTags?: (names: string[], gap: number) => void;
+  /** The selected name tag's words, font and layers, read from its layers as they stand (#215). */
+  textLayerStack?: NameTagStack | null;
   onInteractionActiveChange?: (active: boolean) => void;
   /** The snap control lives in the expanded panel; collapsed, the workplane shows its own. */
   /** Called with true while the inspector does not carry the snap grid control (collapsed, or floating), so the workplane shows it. */
@@ -1989,7 +1999,10 @@ export function ShapeInspector({
     ? properties.filter((property) => ["centerHole", "length", "width", "height"].includes(property.id))
     : isThread
       ? properties.filter((property) => ["threadSize", "diameter", "threadLength", "headHeight", "headChamfer"].includes(property.id))
-      : properties;
+      : properties.filter((property) => shape.kind !== "text" || !TEXT_FILL_MORE_IDS.has(property.id));
+  // A text's fill (#215): the list and the line width in view, the rest under "More" right below them.
+  const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
+  const textFillEnd = primaryProperties.findIndex((property) => property.id === "textFill") + (primaryProperties.some((property) => property.id === "textLineWidth") ? 2 : 1);
   const threadProperties = isThread
     ? properties.filter((property) => ["pitch", "threadsPerInch", "threadHand", "threadProfile", "clearance", "boltClearance", "chamfer", "quality"].includes(property.id))
     : [];
@@ -2123,6 +2136,7 @@ export function ShapeInspector({
   const movable = useMovablePanel<HTMLElement>("layerling.editor.inspectorPosition", INSPECTOR_PANEL);
   const inspectorRef = movable.panelRef;
   const [propertiesOpen, setPropertiesOpen] = useState(true);
+  const [textFillMoreOpen, setTextFillMoreOpen] = useState(false);
   const [positionOpen, setPositionOpen] = useState(false);
   const [rotationOpen, setRotationOpen] = useState(false);
   const [taperOpen, setTaperOpen] = useState(false);
@@ -2217,8 +2231,22 @@ export function ShapeInspector({
 
       {!minimized ? (
         <>
+      {/* A name tag (#215): its card first and open; for a plain text the way there first. */}
+      {nameTagStack && onLayerText && onTextTags ? (
+        <NameTagCard
+          key={`name-tag-${shape.id}`}
+          shapeId={shape.id}
+          stack={nameTagStack}
+          workspace={workspace}
+          disabled={locked}
+          onLayerText={onLayerText}
+          onTextTags={onTextTags}
+          onInteractionActiveChange={onInteractionActiveChange}
+        />
+      ) : null}
+      {shape.kind === "text" && onLayerText ? <MakeLayersButton disabled={locked} onLayerText={onLayerText} /> : null}
       {shape.groupOperation === "bundle" ? (
-        <p className="inspector-bundle-note">{t("inspector.bundleNote")}</p>
+        <p className="inspector-bundle-note">{t(nameTagStack ? "nameTag.bundleNote" : "inspector.bundleNote")}</p>
       ) : !isNonSolidShapeKind(shape.kind) ? (
       <div className="shape-state-card" role="group" aria-label={t("inspector.shapeMode")}>
         <button
@@ -2356,16 +2384,8 @@ export function ShapeInspector({
         />
       ) : null}
 
-      {onLayerText && onTextTags && (shape.kind === "text" || (shape.layeredText && shape.groupedShapes?.length)) ? (
-        <TextLayersCard
-          key={`layers-${shape.id}`}
-          shape={shape}
-          workspace={workspace}
-          disabled={locked}
-          onLayerText={onLayerText}
-          onTextTags={onTextTags}
-          onInteractionActiveChange={onInteractionActiveChange}
-        />
+      {onTextTags && shape.kind === "text" ? (
+        <NameListCard key={`names-${shape.id}`} shapeId={shape.id} workspace={workspace} disabled={locked} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
       ) : null}
 
       <div className={`property-card ${propertiesOpen ? "" : "collapsed"}`}>
@@ -2442,7 +2462,22 @@ export function ShapeInspector({
                 onChange={onProportionLockChange}
               />
             ) : null}
-            <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            {textFillMore.length ? (
+              <>
+                <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(0, textFillEnd)} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                {/* A text's rarer fill settings (#215) fold away under "More". */}
+                <button className="name-tag-more" type="button" aria-expanded={textFillMoreOpen} onClick={() => setTextFillMoreOpen((open) => !open)}>
+                  <ChevronDown className={textFillMoreOpen ? "open" : ""} size={15} strokeWidth={2.6} />
+                  <span>{t(textFillMoreOpen ? "inspector.less" : "inspector.more")}</span>
+                </button>
+                {textFillMoreOpen ? (
+                  <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={textFillMore} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                ) : null}
+                <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(textFillEnd)} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              </>
+            ) : (
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            )}
             {onShapeDefaultsChange && propertyDefaults ? (
               <div className="property-defaults-actions">
                 <button type="button" disabled={locked || sameDefaults} title={t("inspector.saveDefaultsHint")} onClick={() => onShapeDefaultsChange(shape.kind, defaultsToSave)}>
@@ -2622,154 +2657,252 @@ export function ShapeInspector({
  * sliders are the same range rows as everywhere else, so a drag shows a live
  * preview and ends in a single undo step.
  */
-/**
- * Wrapping a flat body around a cylinder (#106): the diameter of the wall,
- * outward or into the wall, and the button. Folded away until asked for, as
- * it is a step one takes once rather than a setting one tunes.
- */
-export type TextLayerPatch = { text?: string; font?: string; layers?: TextLayer[] };
+export type TextLayerPatch = { text?: string; font?: string; letterSize?: number; layers?: TextLayer[] };
 
 /**
- * Layered text (#215): a text gets "Split into layers"; a stack - a bundle flagged as layered
- * text - edits its words, font and layers here, each change building the stack again. Both
- * take a list of names and make a tag per name.
+ * A plain text's way to a name tag (#215), first in its settings so a beginner finds it: one
+ * click splits it into the default layers.
  */
-function TextLayersCard({
-  shape,
-  workspace,
-  disabled,
-  onLayerText,
-  onTextTags,
-  onInteractionActiveChange,
-}: {
-  shape: WorkplaneShape;
+function MakeLayersButton({ disabled, onLayerText }: { disabled: boolean; onLayerText: (patch: TextLayerPatch) => void }) {
+  return (
+    <div className="name-tag-start">
+      <button className="inspector-action-button name-tag-start-button" type="button" disabled={disabled} onClick={() => onLayerText({ layers: [...DEFAULT_TEXT_LAYERS] })}>
+        <Layers size={17} strokeWidth={2.5} />
+        <span>{t("nameTag.makeLayers")}</span>
+      </button>
+      <p className="name-tag-hint">
+        {t("nameTag.makeLayersHint")}
+        <GuideHelpLink chapter="text" section="textLayers" className="inspector-help-link" />
+      </p>
+    </div>
+  );
+}
+
+/**
+ * A measure in a narrow table cell (#215): a text field read as the other measure fields are, in
+ * the chosen unit, set on Enter or on leaving it; the arrow keys step it by a tenth at once.
+ */
+function CompactMeasureField({ label, value, min, max, workspace, disabled, onChange, onInteractionActiveChange }: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled?: boolean;
+  onChange: (value: number) => void;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const holdInteraction = useInteractionHold(onInteractionActiveChange);
+  const step = displayStepFromMillimeters(0.1, workspace);
+  const shown = formatPropertyNumber(millimetersToDisplay(value, workspace), workspace.accuracy, step);
+  const [draft, setDraft] = useState<string | null>(null);
+  const set = (display: number) => onChange(clamp(displayToMillimeters(display, workspace), min, max));
+  const commit = () => {
+    holdInteraction(false);
+    if (draft === null) return;
+    setDraft(null);
+    const parsed = parseMeasurementInput(draft);
+    if (draft !== shown && Number.isFinite(parsed)) set(parsed);
+  };
+  return (
+    <input
+      className="name-tag-measure"
+      type="text"
+      inputMode="decimal"
+      aria-label={label}
+      title={label}
+      value={draft ?? shown}
+      disabled={disabled}
+      onFocus={(event) => {
+        holdInteraction(true);
+        setDraft(shown);
+        selectWholeValue(event.currentTarget);
+      }}
+      onChange={(event) => setDraft(event.currentTarget.value)}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.currentTarget.blur();
+        } else if (event.key === "Escape") {
+          setDraft(shown);
+          event.currentTarget.blur();
+        } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+          event.preventDefault();
+          const next = millimetersToDisplay(value, workspace) + (event.key === "ArrowUp" ? step : -step);
+          set(next);
+          setDraft(formatPropertyNumber(millimetersToDisplay(clamp(displayToMillimeters(next, workspace), min, max), workspace), workspace.accuracy, step));
+        }
+      }}
+    />
+  );
+}
+
+/** The name list (#215): one name per line, up to 100, and the button that makes a tag of each. */
+function NameListFields({ workspace, disabled, onTextTags, onInteractionActiveChange }: {
   workspace: WorkplaneWorkspaceSettings;
   disabled: boolean;
-  onLayerText: (patch: TextLayerPatch) => void;
   onTextTags: (names: string[], gap: number) => void;
   onInteractionActiveChange?: (active: boolean) => void;
 }) {
-  const stack = shape.layeredText && shape.groupedShapes?.length ? textLayersOf(shape.groupedShapes) : null;
-  const [open, setOpen] = useState(Boolean(stack));
-  const [selected, setSelected] = useState(0);
   const [names, setNames] = useState("");
   const [gap, setGap] = useState(5);
-  useEffect(() => setSelected(0), [shape.id]);
-  const layers = stack?.layers ?? null;
-  const index = layers ? Math.min(selected, layers.length - 1) : 0;
-  const layer = layers?.[index];
-  const source = stack?.source ?? shape;
+  const [moreOpen, setMoreOpen] = useState(false);
   const nameList = namesFromList(names);
+  return (
+    <>
+      <label className="text-layers-names">
+        <span>{t("textLayers.names")}</span>
+        <textarea
+          value={names}
+          rows={4}
+          placeholder={t("textLayers.namesPlaceholder")}
+          disabled={disabled}
+          onChange={(event) => setNames(event.currentTarget.value)}
+          onFocus={() => onInteractionActiveChange?.(true)}
+          onBlur={() => onInteractionActiveChange?.(false)}
+        />
+        <small>{t("textLayers.namesHint")}</small>
+      </label>
+      <button className="inspector-action-button" type="button" disabled={disabled || nameList.length === 0} onClick={() => onTextTags(nameList, gap)}>
+        <Tags size={17} strokeWidth={2.5} />
+        <span>{nameList.length === 0 ? t("nameTag.makeTagsNone") : nameList.length === 1 ? t("nameTag.makeTagsOne") : t("nameTag.makeTags", { count: nameList.length })}</span>
+      </button>
+      <button className="name-tag-more" type="button" aria-expanded={moreOpen} onClick={() => setMoreOpen((open) => !open)}>
+        <ChevronDown className={moreOpen ? "open" : ""} size={15} strokeWidth={2.6} />
+        <span>{t(moreOpen ? "inspector.less" : "inspector.more")}</span>
+      </button>
+      {moreOpen ? (
+        <RangeProperty id="tagGap" label={t("textLayers.gap")} value={gap} min={0} max={50} step={1} workspace={workspace} disabled={disabled} onChange={setGap} onInteractionActiveChange={onInteractionActiveChange} />
+      ) : null}
+    </>
+  );
+}
 
-  const writeLayers = (next: TextLayer[]) => onLayerText({ layers: next });
-  const changeLayer = (changes: Partial<TextLayer>) => {
-    if (!layers) return;
-    writeLayers(layers.map((entry, position) => (position === index ? { ...entry, ...changes } : entry)));
-  };
-  const setCount = (count: number) => {
-    if (!layers) return;
-    const wanted = Math.round(clamp(count, 1, MAX_TEXT_LAYERS));
-    if (wanted === layers.length) return;
-    if (wanted < layers.length) {
-      writeLayers(layers.slice(0, wanted));
-      setSelected(Math.min(index, wanted - 1));
-      return;
-    }
-    // A new layer goes under the lowest one, as much wider again as that one was over its neighbour.
-    const next = [...layers];
-    while (next.length < wanted) {
-      const last = next[next.length - 1];
-      const step = next.length >= 2 ? Math.max(0.5, last.grow - next[next.length - 2].grow) : 1.5;
-      next.push({ ...last, grow: Math.min(MAX_TEXT_LAYER_GROW, last.grow + step), silhouette: last.silhouette });
-    }
-    writeLayers(next);
-  };
-  const layerLabel = (position: number) => t(position === 0 ? "textLayers.top" : position === (layers?.length ?? 1) - 1 ? "textLayers.bottom" : "textLayers.layer", { number: position + 1 });
-
-  const properties: ShapePropertyConfig[] = layers && layer
-    ? [
-      {
-        type: "text",
-        id: "layersText",
-        label: t("prop.text"),
-        value: source.text ?? "TEXT",
-        onChange: (text) => onLayerText({ text: text.slice(0, 24) || " " }),
-      },
-      textFontProperty(source, (patch) => { if (typeof patch.font === "string") onLayerText({ font: patch.font }); }),
-      { id: "layersCount", label: t("textLayers.count"), value: layers.length, min: 1, max: MAX_TEXT_LAYERS, step: 1, onChange: setCount },
-      {
-        type: "select",
-        id: "layersIndex",
-        label: t("textLayers.layer", { number: "" }).trim(),
-        value: String(index),
-        options: layers.map((_entry, position) => ({ value: String(position), label: layerLabel(position) })),
-        onChange: (value) => setSelected(Number(value)),
-      },
-      { id: "layerGrow", label: t("textLayers.grow"), value: layer.grow, min: 0, max: MAX_TEXT_LAYER_GROW, step: 0.1, disabled: index === 0, onChange: (grow) => changeLayer({ grow }) },
-      { id: "layerHeight", label: t("textLayers.height"), value: layer.height, min: MIN_TEXT_LAYER_HEIGHT, max: 40, step: 0.1, onChange: (height) => changeLayer({ height }) },
-      { type: "toggle", id: "layerSilhouette", label: t("textLayers.silhouette"), value: Boolean(layer.silhouette), onChange: (silhouette) => changeLayer({ silhouette: silhouette || undefined }) },
-    ]
-    : [];
-
+/** A plain text keeps the name list (#215): a tag of the text per name, folded away below. */
+function NameListCard({ shapeId, workspace, disabled, onTextTags, onInteractionActiveChange }: {
+  shapeId: string;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onTextTags: (names: string[], gap: number) => void;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const [open, setOpen] = useState(false);
   return (
     <div className={`property-card ${open ? "" : "collapsed"}`}>
-      <button
-        className="property-card-header"
-        type="button"
-        aria-expanded={open}
-        aria-controls={`text-layers-${shape.id}`}
-        onClick={() => setOpen((current) => !current)}
-      >
-        <span>{t("textLayers.title")}</span>
+      <button className="property-card-header" type="button" aria-expanded={open} aria-controls={`name-list-${shapeId}`} onClick={() => setOpen((current) => !current)}>
+        <span>{t("textLayers.names")}</span>
         <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
       </button>
       {open ? (
-        <div className="property-list text-layers-body" id={`text-layers-${shape.id}`}>
-          {layers && layer ? (
-            <>
-              <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
-              <label className="text-layers-color">
-                <span>{t("textLayers.color")}</span>
-                <span className="text-layers-swatch" style={{ "--swatch": layer.color } as CSSProperties} />
-                <CustomColorInput color={layer.color} disabled={disabled} onCommit={(color) => changeLayer({ color })} onInteractionActiveChange={onInteractionActiveChange} />
-              </label>
-            </>
-          ) : (
-            <>
-              <p className="cylinder-wrap-hint">
-                {t("textLayers.hint")}
-                <GuideHelpLink chapter="text" section="textLayers" className="inspector-help-link" />
-              </p>
-              <button className="inspector-action-button" type="button" disabled={disabled} onClick={() => onLayerText({ layers: [...DEFAULT_TEXT_LAYERS] })}>
-                <Layers size={17} strokeWidth={2.5} />
-                <span>{t("textLayers.split")}</span>
-              </button>
-            </>
-          )}
-          <label className="text-layers-names">
-            <span>{t("textLayers.names")}</span>
-            <textarea
-              value={names}
-              rows={4}
-              placeholder={t("textLayers.namesPlaceholder")}
-              disabled={disabled}
-              onChange={(event) => setNames(event.currentTarget.value)}
-              onFocus={() => onInteractionActiveChange?.(true)}
-              onBlur={() => onInteractionActiveChange?.(false)}
-            />
-            <small>{t("textLayers.namesHint")}</small>
-          </label>
-          <RangeProperty id="tagGap" label={t("textLayers.gap")} value={gap} min={0} max={50} step={1} workspace={workspace} disabled={disabled} onChange={setGap} onInteractionActiveChange={onInteractionActiveChange} />
-          <button className="inspector-action-button" type="button" disabled={disabled || nameList.length === 0} onClick={() => onTextTags(nameList, gap)}>
-            <Tags size={17} strokeWidth={2.5} />
-            <span>{t("textLayers.makeTags", { count: nameList.length })}</span>
-          </button>
+        <div className="property-list text-layers-body" id={`name-list-${shapeId}`}>
+          <NameListFields workspace={workspace} disabled={disabled} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
         </div>
       ) : null}
     </div>
   );
 }
 
+/**
+ * The name tag (#215): a layered text's card, open and first. Words, font and letter size; every
+ * layer in a row of its own - colour, how much wider than the letters, height, without holes -
+ * with "+" and "–"; the name list. Every change builds the stack again.
+ */
+function NameTagCard({
+  shapeId,
+  stack,
+  workspace,
+  disabled,
+  onLayerText,
+  onTextTags,
+  onInteractionActiveChange,
+}: {
+  shapeId: string;
+  stack: NameTagStack;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onLayerText: (patch: TextLayerPatch) => void;
+  onTextTags: (names: string[], gap: number) => void;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const { source, layers } = stack;
+  const unit = lengthDisplayUnit(workspace).label;
+  const writeLayers = (next: TextLayer[]) => onLayerText({ layers: next });
+  const changeLayer = (index: number, changes: Partial<TextLayer>) => writeLayers(layers.map((entry, position) => (position === index ? { ...entry, ...changes } : entry)));
+  const layerName = (index: number) => (index === 0 ? t("nameTag.letters") : t("textLayers.layer", { number: index + 1 }));
+  const properties: ShapePropertyConfig[] = [
+    { type: "text", id: "nameTagText", label: t("prop.text"), value: source.text ?? "TEXT", onChange: (text) => onLayerText({ text: text.slice(0, 24) || " " }) },
+    textFontProperty(source, (patch) => { if (typeof patch.font === "string") onLayerText({ font: patch.font }); }),
+    { id: "letterSize", label: t("nameTag.letterSize"), value: textLetterSize(source), min: MIN_LETTER_SIZE, max: 60, step: 0.5, onChange: (letterSize) => onLayerText({ letterSize }) },
+  ];
+
+  return (
+    <div className={`property-card name-tag-card ${open ? "" : "collapsed"}`}>
+      <button className="property-card-header" type="button" aria-expanded={open} aria-controls={`name-tag-${shapeId}`} onClick={() => setOpen((current) => !current)}>
+        <span>{t("nameTag.title")}</span>
+        <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+      </button>
+      {open ? (
+        <p className="name-tag-hint">
+          {t("nameTag.cardHint")}
+          <GuideHelpLink chapter="text" section="textLayers" className="inspector-help-link" />
+        </p>
+      ) : null}
+      {open ? (
+        <div className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
+          <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+          <div className="name-tag-layers-heading">
+            <span>{t("nameTag.layers")}</span>
+            <span className="name-tag-stepper">
+              <button type="button" aria-label={t("nameTag.removeLayer")} title={t("nameTag.removeLayer")} disabled={disabled || layers.length <= MIN_NAME_TAG_LAYERS} onClick={() => writeLayers(removeTextLayer(layers))}>
+                <Minus size={16} strokeWidth={2.8} />
+              </button>
+              <output aria-label={t("nameTag.layers")}>{layers.length}</output>
+              <button type="button" aria-label={t("nameTag.addLayer")} title={t("nameTag.addLayer")} disabled={disabled || layers.length >= MAX_TEXT_LAYERS} onClick={() => writeLayers(addTextLayer(layers))}>
+                <Plus size={16} strokeWidth={2.8} />
+              </button>
+            </span>
+          </div>
+          <div className="name-tag-layers" role="table" aria-label={t("nameTag.layers")}>
+            <div className="name-tag-layer name-tag-layer-head" role="row">
+              <span role="columnheader">{t("nameTag.color")}</span>
+              <span role="columnheader">{t("nameTag.wider", { unit })}</span>
+              <span role="columnheader">{t("nameTag.height", { unit })}</span>
+              <span role="columnheader">{t("nameTag.noHoles")}</span>
+            </div>
+            {layers.map((layer, index) => (
+              <div className="name-tag-layer" role="row" key={index} data-layer={index + 1}>
+                <label className="name-tag-swatch" role="cell" style={{ "--swatch": layer.color } as CSSProperties} title={`${layerName(index)}: ${t("nameTag.color")}`}>
+                  <CustomColorInput color={layer.color} disabled={disabled} onCommit={(color) => changeLayer(index, { color })} onInteractionActiveChange={onInteractionActiveChange} />
+                </label>
+                <span role="cell">
+                  {index === 0 ? (
+                    <span className="name-tag-letters">{t("nameTag.letters")}</span>
+                  ) : (
+                    <CompactMeasureField label={`${layerName(index)}: ${t("nameTag.wider", { unit })}`} value={layer.grow} min={0} max={MAX_TEXT_LAYER_GROW} workspace={workspace} disabled={disabled} onChange={(grow) => changeLayer(index, { grow })} onInteractionActiveChange={onInteractionActiveChange} />
+                  )}
+                </span>
+                <span role="cell">
+                  <CompactMeasureField label={`${layerName(index)}: ${t("nameTag.height", { unit })}`} value={layer.height} min={MIN_TEXT_LAYER_HEIGHT} max={40} workspace={workspace} disabled={disabled} onChange={(height) => changeLayer(index, { height })} onInteractionActiveChange={onInteractionActiveChange} />
+                </span>
+                <span role="cell" className="name-tag-check">
+                  <input type="checkbox" aria-label={`${layerName(index)}: ${t("nameTag.noHoles")}`} checked={Boolean(layer.silhouette)} disabled={disabled} onChange={(event) => changeLayer(index, { silhouette: event.currentTarget.checked || undefined })} />
+                </span>
+              </div>
+            ))}
+          </div>
+          <NameListFields workspace={workspace} disabled={disabled} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Wrapping a flat body around a cylinder (#106): the diameter of the wall,
+ * outward or into the wall, and the button. Folded away until asked for, as
+ * it is a step one takes once rather than a setting one tunes.
+ */
 function CylinderWrapCard({
   shape,
   workspace,

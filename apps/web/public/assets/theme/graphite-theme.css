@@ -4118,6 +4118,107 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .text-layers-body .text
   color: #e7e7e7;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .name-tag-start .name-tag-start-button {
+  color: #ffffff;
+  background: #e0821f;
+  border-color: #c96f12;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .name-tag-start .name-tag-start-button:hover:not(:disabled) {
+  color: #ffffff;
+  background: #c96f12;
+  border-color: #a85b0c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-inspector .name-tag-hint {
+  color: #6c6c6c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-layers-heading {
+  border-top: 1px solid rgba(94, 94, 94, 0.22);
+  color: #5e5e5e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-stepper button {
+  color: #4c4c4c;
+  background: #ffffff;
+  border: 1px solid #c4c4c4;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-stepper button:hover:not(:disabled) {
+  color: #98540d;
+  border-color: #d1995e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-layer-head {
+  color: #6c6c6c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-swatch {
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: var(--swatch);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.55);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-measure {
+  color: #575757;
+  background: #fff;
+  border: 1px solid #cccccc;
+  outline: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-measure:focus {
+  border-color: #ea953d;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-letters {
+  color: #6c6c6c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-check input {
+  accent-color: #e0821f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-more {
+  color: #98540d;
+  background: transparent;
+  border: 0;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-inspector .name-tag-hint,
+html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-layer-head,
+html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-letters {
+  color: #adadad;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-layers-heading {
+  color: #c8c8c8;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-stepper button,
+html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-measure {
+  color: #e0e0e0;
+  background: #202020;
+  border-color: #4c4c4c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-more {
+  color: #f0a65a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-inspector .name-tag-start .name-tag-start-button {
+  color: #ffffff;
+  background: #c96f12;
+  border-color: #e0821f;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-inspector .name-tag-start .name-tag-start-button:hover:not(:disabled) {
+  color: #ffffff;
+  background: #e0821f;
+  border-color: #f0a65a;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .select-property-hint {
   color: #6c6c6c;
 }

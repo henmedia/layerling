@@ -202,6 +202,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   pyramid: "shape.pyramid",
   wedge: "shape.wedge",
   text: "shape.text",
+  nameTag: "shape.nameTag",
   "round-roof": "shape.roundRoof",
   "half-sphere": "shape.halfSphere",
   torus: "shape.torus",
@@ -260,6 +261,23 @@ export const toolbarShapeAssets: ToolbarShapeAsset[] = [
   { id: "crescent", name: "Crescent", src: "assets/editor/shape-icons-gray/crescent.png", menuIcon: "assets/editor/shape-icons-gray/crescent.png", kind: "crescent", color: "#f5c518" },
   { id: "ruler", name: "Ruler", src: "assets/editor/shape-icons-gray/ruler.png", menuIcon: "assets/editor/shape-icons-gray/ruler.png", kind: "ruler", color: "#f2e4b8" },
 ];
+/**
+ * The name tag (#215): a text the editor splits into coloured layers as it places it. Its own
+ * entry in the library, right after Text, so a beginner finds it; it is a text, not a kind of
+ * its own, so the catalogue of kinds above stays one entry per kind.
+ */
+export const nameTagAsset: ToolbarShapeAsset = {
+  id: "nameTag",
+  name: "Name tag",
+  src: "assets/editor/shape-icons-gray/nameTag.png",
+  menuIcon: "assets/editor/shape-icons-gray/nameTag.png",
+  kind: "text",
+  color: "#ffffff",
+};
+
+/** What the shape library lists: the catalogue, with the name tag after the text. */
+export const libraryShapeAssets: ToolbarShapeAsset[] = toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset] : [asset]));
+
 /**
  * Kinds a shape dragged from the library may have. Taken from the library
  * itself: a hand-kept list here missed the rounded box and the ruler, and
