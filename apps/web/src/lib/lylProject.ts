@@ -11,6 +11,7 @@ import { normalizeNotes } from "@/lib/workplaneNotes";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
+import { normalizeDesignView, readDesignView, type DesignView } from "@/lib/designView";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { normalizeSnapGrid, normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 import type { CadDisplayEdge, GridSize, ProjectAsset, ProjectAssetSourceFormat, SketchOperation, SketchRevolveSettings, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -202,6 +203,8 @@ export type LylProjectDocumentV1 = {
     placementElevation: number;
     placementWorkplane?: PlacementWorkplane;
     sketchPlacementWorkplane?: PlacementWorkplane;
+    /** Where the camera looked when the design was saved (#220); older readers pass over it. */
+    view?: DesignView;
   };
 };
 
@@ -220,6 +223,8 @@ export type LylProjectExportInput = {
   placementElevation: number;
   placementWorkplane?: PlacementWorkplane;
   sketchPlacementWorkplane?: PlacementWorkplane;
+  /** The camera's view; when left out, the one the browser keeps for this design goes in. */
+  view?: DesignView | null;
   compressionLevel?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   /** Weitere Dateien im Paket, etwa der Fehlerbericht; ein Leser uebergeht sie. */
   extraFiles?: Record<string, Uint8Array>;
@@ -240,6 +245,8 @@ export type LylRestoredProject = {
   placementElevation: number;
   placementWorkplane: PlacementWorkplane;
   sketchPlacementWorkplane: PlacementWorkplane;
+  /** The view the design was saved in, when the file has one. */
+  view?: DesignView;
   migratedFromVersion?: number;
   /** Set when a newer layerling saved the design: its version, for a hint that an update helps. */
   savedWithNewerVersion?: string;
@@ -1013,6 +1020,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
   const indexes = activeProjectIndexes(activeState);
   const now = Date.now();
   const sketchPlacementWorkplane = normalizePlacementWorkplane(input.sketchPlacementWorkplane);
+  const view = input.view === undefined ? readDesignView(input.projectId) : normalizeDesignView(input.view);
   const selectedWorkplaneId = placementWorkplaneIsBase(placementWorkplane) ? "workplane-base" : "workplane-active";
   const document: Omit<LylProjectDocumentV1, "states"> & { states: typeof STATES_PLACEHOLDER } = {
     schema: LYL_SCHEMA_ID,
@@ -1046,6 +1054,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
       placementElevation,
       placementWorkplane,
       sketchPlacementWorkplane,
+      ...(view ? { view } : {}),
     },
   };
   // The states are already text; put them in where the placeholder stands. The
@@ -1874,6 +1883,7 @@ async function restoreV1(document: LylProjectDocumentV1, assetById: Map<string, 
   const notes = restoredNotes.get(document.sceneStateId) ?? [];
   const placementWorkplane = normalizePlacementWorkplane(document.editor.placementWorkplane, document.editor.placementElevation);
   const hydrated = hydrateEditorHistoryState(shapes, history, document.history.index, "unlimited", notes, placementWorkplane);
+  const restoredView = normalizeDesignView(document.editor.view);
   if (hydrated.entries.length !== history.length || hydrated.index !== document.history.index) throw new Error("Undo history could not be restored without data loss");
   return {
     sourceProjectId: document.metadata.projectId,
@@ -1890,6 +1900,7 @@ async function restoreV1(document: LylProjectDocumentV1, assetById: Map<string, 
     placementElevation: document.editor.placementElevation,
     placementWorkplane: normalizePlacementWorkplane(document.editor.placementWorkplane, document.editor.placementElevation),
     sketchPlacementWorkplane: normalizePlacementWorkplane(document.editor.sketchPlacementWorkplane),
+    ...(restoredView ? { view: restoredView } : {}),
     ...(document.formatVersion < LYL_FORMAT_VERSION ? { migratedFromVersion: document.formatVersion } : {}),
   } satisfies LylRestoredProject;
 }

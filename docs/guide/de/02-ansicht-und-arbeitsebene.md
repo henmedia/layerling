@@ -38,6 +38,8 @@ Am linken Rand liegt eine schmale Leiste. Von oben nach unten:
 
 Über den kleinen Pfeil ganz oben in der Leiste kannst du sie ausblenden, wenn sie stört.
 
+Ein Entwurf öffnet sich so, wie du ihn verlassen hast: Blickwinkel, Zoom und Ausschnitt der Ansicht bleiben mit ihm in diesem Browser erhalten, du machst also dort weiter, wo du aufgehört hast, auch nach „Home“ oder dem Schließen der Seite. Eine gespeicherte Datei (.lyl) nimmt die Ansicht mit, sie öffnet sich also auch anderswo darin. Die Ansicht gehört nicht zum Rückgängig-Verlauf.
+
 ## Ins Innere schauen: die Schnittansicht
 
 {{ui:camera.sectionView}}, der letzte Knopf der Leiste (das Schnittwerkzeug), schneidet die Ansicht entlang einer Ebene auf. So prüfst du Wände, Hohlräume und Teile, die ineinandergreifen. Geschnitten wird nur die Ansicht: Entwurf, Dateien und jeder Export bleiben vollständig.

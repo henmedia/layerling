@@ -37,6 +37,7 @@ import {
 } from "@/lib/placementWorkplane";
 import { dedupeProjectAssets } from "@/lib/projectAssets";
 import { hydrateProjectShapeState, reconcileLoadedProjectShapeCacheEntry, type ImportedMeshResource } from "@/lib/projectShapePersistence";
+import { writeDesignView } from "@/lib/designView";
 import { exportLylProject, importLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE } from "@/lib/lylProject";
 import { backupEntryNames, backupFileName, isBackupFileName, packBackup, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
 import { customShapesBackupEntries, restoreCustomShapesFromBackup } from "@/lib/myShapes";
@@ -1292,6 +1293,8 @@ export default function Home() {
       };
       const entry = projectShapeCacheEntry(now, restored.shapes, restored.history, restored.historyIndex, restored.assets);
       await saveProjectShapes(project.id, entry, projectShapeSaveContext(project));
+      // A file saved with a view opens in it; the working copy of a server design keeps its own.
+      if (restored.view && !existing) writeDesignView(project.id, restored.view);
       setProjectShapesById((current) => ({ ...current, [project.id]: entry }));
       setProjects((current) => existing
         ? current.map((entryProject) => (entryProject.id === project.id ? project : entryProject))
@@ -1720,6 +1723,7 @@ export default function Home() {
         };
         const entry = projectShapeCacheEntry(now, restored.shapes, restored.history, restored.historyIndex, restored.assets);
         await saveProjectShapes(project.id, entry, projectShapeSaveContext(project));
+        if (restored.view) writeDesignView(project.id, restored.view);
         restoredProjects.push(project);
         restoredEntries[project.id] = entry;
       } catch {

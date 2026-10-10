@@ -38,6 +38,8 @@ At the left edge is a narrow bar. From the top:
 
 The small arrow at the very top of the bar hides it if it gets in the way.
 
+A design opens the way you left it: the angle, zoom and position of the view are kept with it in this browser, so you continue where you stopped, also after going Home or closing the page. A saved file (.lyl) carries the view along, so it opens in it elsewhere too. The view is not part of the undo history.
+
 ## Looking inside: the section view
 
 {{ui:camera.sectionView}}, the last button in the bar (the cut tool), cuts the view open along a plane so you can check walls, cavities and parts that fit into each other. Nothing is cut for real: the design, its files and every export stay whole.

@@ -65,6 +65,7 @@ import { createSpringGeometry } from "@/lib/springGeometry";
 import { textDisplayGeometry } from "@/lib/textFill";
 import { manifoldRevision } from "@/lib/manifoldHandle";
 import { customFontRevision } from "@/lib/textFonts";
+import { readDesignView, writeDesignView } from "@/lib/designView";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
 import {
@@ -4629,6 +4630,8 @@ export function WorkplaneViewport({
   const projectNameRef = useRef(projectName);
   const projectIdRef = useRef(projectId);
   projectIdRef.current = projectId;
+  const designViewRestoredRef = useRef(false);
+  const designViewReadyRef = useRef(false);
   const workplaneModeRef = useRef(workplaneMode);
   const splitActiveRef = useRef(splitActive);
   const splitPlaneRef = useRef(splitPlane);
@@ -5717,25 +5720,62 @@ export function WorkplaneViewport({
     const perspective = readStartInPerspective();
     setStartInPerspective(perspective);
     const wantsOrthographic = !perspective;
-    if ((state.camera instanceof THREE.OrthographicCamera) !== wantsOrthographic) {
+    if (!designViewRestoredRef.current && (state.camera instanceof THREE.OrthographicCamera) !== wantsOrthographic) {
       toggleCameraProjection(state);
       syncViewCube(state, viewCubeRef.current);
     }
     setOrthographicView(state.camera instanceof THREE.OrthographicCamera);
   }, [workspaceSettingsKey]);
 
-  // Back from the sketch view: the camera looks where it looked before (#150).
+  // Back from the sketch view: the camera looks where it looked before (#150). A design opens the
+  // way it was left, too: its view is kept in the browser and in a saved file (#220).
   useEffect(() => {
     const state = threeRef.current;
     const key = projectIdRef.current ?? "";
-    const view = rememberedCameraViews.get(key);
-    if (!state || !view) return;
+    const view = rememberedCameraViews.get(key) ?? readDesignView(projectIdRef.current);
     rememberedCameraViews.delete(key);
-    if ((state.camera instanceof THREE.OrthographicCamera) !== view.orthographic) toggleCameraProjection(state);
-    applyCameraView(state, view);
-    syncViewCube(state, viewCubeRef.current);
-    setOrthographicView(state.camera instanceof THREE.OrthographicCamera);
+    if (state && view) {
+      if ((state.camera instanceof THREE.OrthographicCamera) !== view.orthographic) toggleCameraProjection(state);
+      applyCameraView(state, view);
+      syncViewCube(state, viewCubeRef.current);
+      setOrthographicView(state.camera instanceof THREE.OrthographicCamera);
+      designViewRestoredRef.current = true;
+    }
+    // Only now may the camera's own movements be written down: before, the standard view
+    // the viewport starts in would overwrite the one the design was left in.
+    designViewReadyRef.current = true;
+    if (!state) return;
+    let timer = 0;
+    const save = () => {
+      window.clearTimeout(timer);
+      writeDesignView(projectIdRef.current, cameraViewOf(state));
+    };
+    const saveSoon = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(save, 500);
+    };
+    const saveWhenHidden = () => {
+      if (document.visibilityState === "hidden") save();
+    };
+    state.controls.addEventListener("change", saveSoon);
+    window.addEventListener("pagehide", save);
+    document.addEventListener("visibilitychange", saveWhenHidden);
+    return () => {
+      state.controls.removeEventListener("change", saveSoon);
+      window.removeEventListener("pagehide", save);
+      document.removeEventListener("visibilitychange", saveWhenHidden);
+      window.clearTimeout(timer);
+      // The viewport is taken down when the design is left (or a sketch opens): its view stays.
+      save();
+    };
   }, []);
+
+  // The projection switch moves no control, so it asks for the view to be kept itself.
+  useEffect(() => {
+    if (!designViewReadyRef.current) return;
+    const state = threeRef.current;
+    if (state) writeDesignView(projectIdRef.current, cameraViewOf(state));
+  }, [orthographicView]);
 
   useEffect(() => {
     const state = threeRef.current;

@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **A design opens in the view you left it in:** The angle, zoom and position of the camera, and whether it was perspective or flat, are kept with the design in the browser and written again a moment after every move of the view, when the page is hidden or closed and when you go Home. Opening the design puts the camera back there; a new design opens in the standard view as before. The view is not part of the undo history and a move of the camera never saves the design. A saved `.lyl` file carries it as optional `editor.view`, so it opens in it elsewhere; older versions pass over it. Asked for by @prmod3d in #220.
 - **`npm install` reports no vulnerabilities:** Next.js 15 ships an old PostCSS, and `npm audit` flagged it as one high and one moderate vulnerability, whose suggested fix `npm audit fix --force` would have moved the app to Next.js 16. `package.json` now pins PostCSS 8.5.28 through `overrides`; Next.js stays at 15.5.27, the audit finds nothing, and typecheck and static export run as before. Reported by @ARSoderberg in #221, who also tested the fix.
 
 ## 1.61.0

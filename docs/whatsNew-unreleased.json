@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "title": {
+      "de": "Ein Entwurf öffnet sich in der Ansicht, in der du ihn verlassen hast",
+      "en": "A design opens in the view you left it in"
+    },
+    "body": {
+      "de": "Blickwinkel, Zoom und Ausschnitt bleiben mit dem Entwurf erhalten, auch nach Home oder dem Schließen der Seite. Eine gespeicherte Datei nimmt die Ansicht mit.",
+      "en": "The angle, zoom and position of the view stay with the design, also after Home or closing the page. A saved file carries the view along."
+    }
+  },
+  {
+    "title": {
+      "de": "Führungslinien der Auswahl scheinen nicht mehr durch Körper",
+      "en": "The selection's guides no longer shine through bodies"
+    },
+    "body": {
+      "de": "Der gestrichelte Fußabdruck und die Mittellinie eines markierten Körpers werden jetzt von Körpern verdeckt, statt darüber zu schweben.",
+      "en": "The dashed footprint and centre line of a selected body are now hidden by bodies instead of floating over them."
+    }
+  },
+  {
+    "title": {
+      "de": "npm install ohne Sicherheitswarnungen",
+      "en": "npm install without security warnings"
+    },
+    "body": {
+      "de": "Wer layerling selbst aus dem Quelltext baut, bekommt bei npm install keine Meldung über Schwachstellen mehr; Next.js bleibt bei Version 15.",
+      "en": "If you build layerling from the source yourself, npm install no longer reports vulnerabilities; Next.js stays on version 15."
+    }
+  }
+]
