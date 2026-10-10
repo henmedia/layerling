@@ -602,6 +602,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.textFlipped === b.textFlipped &&
     sketchStrokesEqual(a.textStroke, b.textStroke) &&
     Boolean(a.textSilhouette) === Boolean(b.textSilhouette) &&
+    JSON.stringify(a.textKeyring ?? null) === JSON.stringify(b.textKeyring ?? null) &&
     a.importedMesh === b.importedMesh &&
     a.imagePlate === b.imagePlate &&
     a.sketchProfile === b.sketchProfile &&

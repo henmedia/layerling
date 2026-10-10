@@ -108,4 +108,26 @@ describe("a name tag from the panel as exact bodies (#215, real OCCT kernel)", (
       }
     });
   });
+
+  it.each(["left", "right", "top"] as const)("the bottom layer with a key ring hole on the %s is one valid solid with the hole through it", (side) => {
+    const parts = textLayerShapes(sized(text({ x: 6, z: -4, rotation: 20 }), 12), DEFAULT_TEXT_LAYERS, [], { side, diameter: 4 });
+    const pieces = layerPieces(parts[2]);
+    expect(pieces).toHaveLength(1);
+    const solid = pieces[0];
+    expect(cad.isSolid(solid)).toBe(true);
+    // Where the hole is, in the world: from the plate's centre, the side's direction, turned with the tag.
+    const letters = textLayerShapes(sized(text({ x: 6, z: -4, rotation: 20 }), 12), DEFAULT_TEXT_LAYERS)[0];
+    const half = side === "top" ? letters.depth / 2 : letters.width / 2;
+    const reach = half + 3 + 4.5;
+    const local = side === "left" ? { x: -reach, z: 0 } : side === "right" ? { x: reach, z: 0 } : { x: 0, z: -reach };
+    const angle = (20 * Math.PI) / 180;
+    const at = (x: number, z: number) => ({ x: letters.x + x * Math.cos(angle) + z * Math.sin(angle), z: letters.z - x * Math.sin(angle) + z * Math.cos(angle) });
+    const middle = at(local.x, local.z);
+    const y = (parts[2].elevation ?? 0) + parts[2].height / 2;
+    expect(cad.containsPoint(solid, { x: middle.x, y, z: middle.z })).toBe(false);
+    // 3.3 mm from the hole's middle, away from the letters: inside the ear's 2.5 mm wall.
+    const out = side === "left" ? { x: -reach - 3.3, z: 0 } : side === "right" ? { x: reach + 3.3, z: 0 } : { x: 0, z: -reach - 3.3 };
+    const ear = at(out.x, out.z);
+    expect(cad.containsPoint(solid, { x: ear.x, y, z: ear.z })).toBe(true);
+  });
 });

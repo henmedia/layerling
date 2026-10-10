@@ -38,7 +38,7 @@ import { createThreadGeometry, DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, 
 import { createSpringGeometry } from "@/lib/springGeometry";
 import { curvedTextPatch } from "@/lib/textGeometry";
 import { textDisplayGeometry } from "@/lib/textFill";
-import { DEFAULT_TEXT_LAYERS, nameTagOffsets, normalizeTextLayers, textLayerShapes, textLayersOf, type TextLayer } from "@/lib/textLayers";
+import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, nameTagOffsets, normalizeTextLayers, textLayerShapes, textLayersOf, type NameTagKeyring, type TextLayer, type TextLayerStack } from "@/lib/textLayers";
 import { NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch } from "@/lib/nameTag";
 import type { TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import { onManifoldReady, rememberManifoldRuntime, setManifoldLoader } from "@/lib/manifoldHandle";
@@ -3630,7 +3630,7 @@ function offersTextLayers(shape: WorkplaneShape | null | undefined) {
  * The text and layers a shape stands for: a plain text is one layer of itself; a layered-text
  * bundle is read from its parts as they stand in the world. Null for anything else.
  */
-function textLayerStack(shape: WorkplaneShape): { source: WorkplaneShape; layers: TextLayer[]; ids: string[] } | null {
+function textLayerStack(shape: WorkplaneShape): TextLayerStack | null {
   if (shape.kind === "text") {
     return textLayersOf([shape]);
   }
@@ -3642,11 +3642,11 @@ function textLayerStack(shape: WorkplaneShape): { source: WorkplaneShape; layers
  * A text's layers as one shape: a bundle flagged as layered text, or, with one layer only, that
  * text itself. `keepId` and `name` carry over from the shape it replaces.
  */
-function layeredTextShape(source: WorkplaneShape, layers: readonly TextLayer[], ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, previousText?: string): WorkplaneShape {
+function layeredTextShape(source: WorkplaneShape, layers: readonly TextLayer[], ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, previousText?: string, keyring: NameTagKeyring | null = null): WorkplaneShape {
   const words = (source.text ?? "TEXT").trim() || "Text";
   // The stack is named after its words unless somebody gave it a name of its own.
   const name = !keep.name || keep.name === "Bundle" || keep.name === "Text" || keep.name === previousText ? words : keep.name;
-  const parts = textLayerShapes(source, layers, ids);
+  const parts = textLayerShapes(source, layers, ids, keyring);
   if (parts.length === 1) return canonicalizeShape({ ...parts[0], id: keepId, name, locked: keep.locked, hidden: keep.hidden });
   const group = groupedShape(parts);
   if (!group) throw new Error("Could not build the text layers");
@@ -3667,7 +3667,7 @@ function nameTagSource(source: WorkplaneShape, change: { text?: string; font?: s
  * The panel's name list (#215): one tag per name like the given stack, at its letter size, in
  * rows and columns from the place of the first, which takes `first`'s id and its layers' ids.
  */
-function nameTagsFor(stack: { source: WorkplaneShape; layers: readonly TextLayer[] }, names: readonly string[], gap: number, first: { id: string; ids: string[] }): WorkplaneShape[] {
+function nameTagsFor(stack: { source: WorkplaneShape; layers: readonly TextLayer[]; keyring: NameTagKeyring | null }, names: readonly string[], gap: number, first: { id: string; ids: string[] }): WorkplaneShape[] {
   const tags = names.map((name, index) => layeredTextShape(
     nameTagSource(stack.source, { text: name }),
     stack.layers,
@@ -3675,6 +3675,7 @@ function nameTagsFor(stack: { source: WorkplaneShape; layers: readonly TextLayer
     index === 0 ? first.id : createLocalId("text-tag"),
     { locked: false, hidden: false, name },
     stack.source.text,
+    stack.keyring,
   ));
   // Every tag is as wide as its name; the rows take the widest and deepest.
   const width = Math.max(...tags.map(shapeWidth));
@@ -5986,6 +5987,8 @@ function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary {
       : {}),
     // A text's fill (#215) reads like a sketch body's: its stroke, and whether the counters are left out.
     ...(shape.kind === "text" ? { textStroke: shape.textStroke ?? null, textSilhouette: Boolean(shape.textSilhouette) } : {}),
+    // A name tag's key ring hole (#215), on the layers it goes through; the bottom one carries the ear.
+    ...(shape.kind === "text" && shape.textKeyring ? { textKeyring: shape.textKeyring } : {}),
     ...(shape.layeredText ? { layeredText: true } : {}),
     children: shape.groupedShapes?.map(mcpShapeSummary),
   };
@@ -10917,7 +10920,9 @@ export function LayerlingEditor({
     // The panel keeps the letter size through new words and fonts, and sets it for all layers at once.
     const source = nameTagSource(stack.source, patch);
     const layers = patch.layers ?? (wasText ? [...DEFAULT_TEXT_LAYERS] : stack.layers);
-    const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, selectedShape.id, selectedShape, stack.source.text);
+    // The key ring hole (#215) follows the letters: it is laid out from them on every build.
+    const keyring = patch.keyring !== undefined ? patch.keyring : stack.keyring;
+    const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, selectedShape.id, selectedShape, stack.source.text, keyring);
     commitShapes(
       shapesRef.current.map((shape) => (shape.id === selectedShape.id ? next : shape)),
       [next.id],
@@ -11906,10 +11911,14 @@ export function LayerlingEditor({
         const requested = params.layers !== undefined ? normalizeTextLayers(params.layers) : null;
         if (params.layers !== undefined && !requested) throw new Error("layers must be 1 to 6 entries with grow, height, color and silhouette");
         const layers = requested ?? (wasText ? [...DEFAULT_TEXT_LAYERS] : stack.layers);
+        // The key ring hole (#215): left out it stays as the stack has it.
+        const keyringArgument = layerTextKeyringArgument(params.keyring);
+        if (keyringArgument && "error" in keyringArgument) throw new Error(keyringArgument.error);
+        const keyring = keyringArgument ? keyringArgument.keyring : stack.keyring;
         const names = Array.isArray(params.names) ? mcpStringArray(params.names).map((name) => name.trim()).filter(Boolean).slice(0, 100) : [];
         if (names.length) {
           const gap = typeof params.gap === "number" && Number.isFinite(params.gap) ? Math.max(0, params.gap) : 5;
-          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text);
+          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text, keyring);
           const width = shapeWidth(probe);
           const depth = shapeDepth(probe);
           const columns = Math.max(1, Math.round(Math.sqrt((names.length * (depth + gap)) / (width + gap))));
@@ -11921,13 +11930,14 @@ export function LayerlingEditor({
             index === 0 ? target.id : createLocalId("text-tag"),
             { locked: false, hidden: false, name },
             stack.source.text,
+            keyring,
           ));
           commitShapes([...currentShapes().filter((shape) => shape.id !== target.id), ...tags], tags.map((tag) => tag.id), t("status.mcpTextTagsMade", { count: tags.length }));
           return { objects: tags.map(mcpShapeSummary) };
         }
-        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text);
+        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text, keyring);
         commitShapes(currentShapes().map((shape) => (shape.id === target.id ? next : shape)), next.id, t("status.mcpTextLayered", { count: layers.length }));
-        return { object: mcpShapeSummary(next), layers };
+        return { object: mcpShapeSummary(next), layers, keyring };
       }
 
       if (command.action === "intersect_objects") {

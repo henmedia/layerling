@@ -720,7 +720,7 @@ export const tools = [
   },
   {
     name: "layerling_layer_text",
-    description: "Layered text for a multicolour print (#215): one text as a stack of bodies - the letters on top, under them the same letters a little wider in another colour, at the bottom a plate wider still, usually as a silhouette without the holes in the letters. Every layer is an ordinary text with a 'Wider' fill (so each has its own colour, height and edge treatments) and the stack is a bundle flagged as layered text, whose properties panel edits words, font and layers together. Pass the id of a text (it is replaced by the stack) or of such a bundle (it is built again); layers top to bottom, each with grow (mm wider than the letters, 0 for the letters), height, color and silhouette. Left out, the layers stay as they are, or a new stack takes the classic three: white letters, a red rim 1.5 mm wider, a dark plate 3 mm wider without holes. With names, one stack per name is made instead, laid out in rows under the first, each as its own object - a list of name tags in one go.",
+    description: "Layered text for a multicolour print (#215): one text as a stack of bodies - the letters on top, under them the same letters a little wider in another colour, at the bottom a plate wider still, usually as a silhouette without the holes in the letters. Every layer is an ordinary text with a 'Wider' fill (so each has its own colour, height and edge treatments) and the stack is a bundle flagged as layered text, whose properties panel edits words, font and layers together. Pass the id of a text (it is replaced by the stack) or of such a bundle (it is built again); layers top to bottom, each with grow (mm wider than the letters, 0 for the letters), height, color and silhouette. Left out, the layers stay as they are, or a new stack takes the classic three: white letters, a red rim 1.5 mm wider, a dark plate 3 mm wider without holes. keyring { side, diameter } gives the bottom layer a round ear with a key ring hole on the left, right or top, cut through every layer it reaches; it follows the words and the font, true puts a 4 mm hole on the left, false takes it off, and left out it stays as it is. With names, one stack per name is made instead, laid out in rows under the first, each as its own object - a list of name tags in one go.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -741,6 +741,19 @@ export const tools = [
               silhouette: { type: "boolean", description: "Without the holes in the letters - for the base plate." },
             },
           },
+        },
+        keyring: {
+          description: "A key ring hole: { side, diameter } puts it on (an ear on the bottom layer, the hole through every layer it reaches), true puts a 4 mm hole on the left, false takes it off. Left out, it stays as it is. A side other than left, right or top, or a diameter outside 1 to 20 mm, is refused.",
+          anyOf: [
+            {
+              type: "object",
+              properties: {
+                side: { type: "string", enum: ["left", "right", "top"], description: "Where the ear sits, seen from above (default left)." },
+                diameter: { type: "number", minimum: 1, maximum: 20, description: "The hole's diameter in mm (default 4)." },
+              },
+            },
+            { type: "boolean" },
+          ],
         },
         names: { type: "array", items: { type: "string" }, maxItems: 100, description: "One tag per name, laid out in rows under the first; the text of each stack is its name." },
         gap: { type: "number", description: "Space between the tags of a list in mm (default 5)." },

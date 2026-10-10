@@ -156,7 +156,8 @@ import { MAX_DOVETAIL_CLEARANCE, normalizeDovetailClearance, normalizeDovetailNe
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { textHasFill } from "@/lib/textFill";
 import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
-import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, namesFromList, type TextLayer } from "@/lib/textLayers";
+import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, namesFromList, type NameTagKeyring, type TextLayer } from "@/lib/textLayers";
+import { DEFAULT_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES } from "@/lib/textGeometry";
 import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, removeTextLayer, textLetterSize, type NameTagStack } from "@/lib/nameTag";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -334,7 +335,7 @@ const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diamet
 const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ"]);
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "letterSize", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "boltClearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall"].includes(key);
+  return ["textLineWidth", "letterSize", "keyringDiameter", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "boltClearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall"].includes(key);
 }
 
 /**
@@ -2661,7 +2662,7 @@ export function ShapeInspector({
  * sliders are the same range rows as everywhere else, so a drag shows a live
  * preview and ends in a single undo step.
  */
-export type TextLayerPatch = { text?: string; font?: string; letterSize?: number; layers?: TextLayer[] };
+export type TextLayerPatch = { text?: string; font?: string; letterSize?: number; layers?: TextLayer[]; keyring?: NameTagKeyring | null };
 
 /**
  * A plain text's way to a name tag (#215), first in its settings so a beginner finds it: one
@@ -2801,7 +2802,7 @@ function NameListCard({ shapeId, disabled, onTextTags, onInteractionActiveChange
 /**
  * The name tag (#215): a layered text's card, open and first. Words, font and letter size; every
  * layer in a row of its own - colour, how much wider than the letters, height, without holes -
- * with "+" and "–"; the name list. Every change builds the stack again.
+ * with "+" and "–"; the key ring hole; the name list. Every change builds the stack again.
  */
 function NameTagCard({
   shapeId,
@@ -2821,7 +2822,7 @@ function NameTagCard({
   onInteractionActiveChange?: (active: boolean) => void;
 }) {
   const [open, setOpen] = useState(true);
-  const { source, layers } = stack;
+  const { source, layers, keyring } = stack;
   const unit = lengthDisplayUnit(workspace).label;
   const writeLayers = (next: TextLayer[]) => onLayerText({ layers: next });
   const changeLayer = (index: number, changes: Partial<TextLayer>) => writeLayers(layers.map((entry, position) => (position === index ? { ...entry, ...changes } : entry)));
@@ -2889,6 +2890,25 @@ function NameTagCard({
               </div>
             ))}
           </div>
+          <ToggleProperty
+            label={t("nameTag.keyring")}
+            value={Boolean(keyring)}
+            disabled={disabled || Boolean(source.textCurved)}
+            onChange={(on) => onLayerText({ keyring: on ? { side: "left", diameter: DEFAULT_KEYRING_DIAMETER } : null })}
+          />
+          {keyring ? (
+            <>
+              <RangeProperty id="keyringDiameter" label={t("nameTag.keyringDiameter")} value={keyring.diameter} min={MIN_KEYRING_DIAMETER} max={10} step={0.5} workspace={workspace} disabled={disabled} onChange={(diameter) => onLayerText({ keyring: { ...keyring, diameter } })} onInteractionActiveChange={onInteractionActiveChange} />
+              <div className="name-tag-sides" role="radiogroup" aria-label={t("nameTag.keyringSide")}>
+                <span>{t("nameTag.keyringSide")}</span>
+                {TEXT_KEYRING_SIDES.map((side) => (
+                  <button key={side} type="button" role="radio" aria-checked={keyring.side === side} className={keyring.side === side ? "active" : ""} disabled={disabled} onClick={() => onLayerText({ keyring: { ...keyring, side } })}>
+                    {t(`nameTag.side.${side}`)}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : null}
           <NameListFields disabled={disabled} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
         </div>
       ) : null}

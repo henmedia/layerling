@@ -4,7 +4,7 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { extrudeOutline, type OutlinePoint } from "@/lib/gearGeometry";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, strokeRegion, type Keep } from "@/lib/sketchStroke";
-import { createTextGeometry, textGlyphShapes } from "@/lib/textGeometry";
+import { createTextGeometry, keyringEarRadius, textGlyphShapes, textKeyringCenter, textKeyringOf } from "@/lib/textGeometry";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /**
@@ -18,9 +18,9 @@ import type { WorkplaneShape } from "@/types/layerling";
 
 export type TextFillComponent = { outer: OutlinePoint[]; holes: OutlinePoint[][] };
 
-/** Whether this text is drawn through the fill path at all. */
+/** Whether this text is drawn through the fill path at all - a key ring hole (#215) is cut there too. */
 export function textHasFill(shape: WorkplaneShape) {
-  return shape.kind === "text" && (Boolean(normalizeSketchStroke(shape.textStroke)) || Boolean(shape.textSilhouette));
+  return shape.kind === "text" && (Boolean(normalizeSketchStroke(shape.textStroke)) || Boolean(shape.textSilhouette) || Boolean(textKeyringOf(shape)));
 }
 
 const signedArea = (points: OutlinePoint[]) => points.reduce((sum, point, index) => {
@@ -55,7 +55,7 @@ export function textFillComponents(runtime: ManifoldToplevel, shape: WorkplaneSh
     if (!letters.length) return null;
     const region = keep(runtime.CrossSection.union(letters));
     const filled = stroke ? strokeRegion(runtime, keep, region, stroke) : region;
-    const result = keep(filled.simplify(1e-6));
+    const result = keep(withKeyring(runtime, keep, shape, filled).simplify(1e-6));
     if (result.area() <= 1e-9) return null;
     const components: TextFillComponent[] = [];
     for (const piece of result.decompose().map(keep)) {
@@ -70,6 +70,32 @@ export function textFillComponents(runtime: ManifoldToplevel, shape: WorkplaneSh
   } finally {
     new Set(made).forEach((section) => section.delete());
   }
+}
+
+/**
+ * A key ring hole (#215) through the outline, and on the bottom layer the ear round it: a disc
+ * the hole's radius plus the wall, joined to the outline by the hull of the disc and the strip
+ * of the outline nearest to it, so it holds on however the letters end on that side.
+ */
+function withKeyring(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape, filled: CrossSection): CrossSection {
+  const keyring = textKeyringOf(shape);
+  const center = textKeyringCenter(shape);
+  if (!keyring || !center) return filled;
+  const disc = (radius: number) => keep(keep(runtime.CrossSection.circle(radius, 64)).translate([center.x, center.z]));
+  let outline = filled;
+  if (keyring.ear && !filled.isEmpty()) {
+    const radius = keyringEarRadius(keyring.diameter);
+    const { min, max } = filled.bounds();
+    const strip = keyring.side === "top"
+      ? [[min[0], min[1]], [max[0], min[1]], [max[0], min[1] + radius], [min[0], min[1] + radius]]
+      : keyring.side === "right"
+        ? [[max[0] - radius, min[1]], [max[0], min[1]], [max[0], max[1]], [max[0] - radius, max[1]]]
+        : [[min[0], min[1]], [min[0] + radius, min[1]], [min[0] + radius, max[1]], [min[0], max[1]]];
+    const nearest = keep(filled.intersect(keep(new runtime.CrossSection([strip as [number, number][]], "Positive"))));
+    const ear = keep(keep(nearest.add(disc(radius))).hull());
+    outline = keep(filled.add(ear));
+  }
+  return keep(outline.subtract(disc(keyring.diameter / 2)));
 }
 
 /** One piece as a body: the pieces are merged in order, so a piece's triangles stay together. */

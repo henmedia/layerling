@@ -90,12 +90,13 @@ Alle Einstellungen des Schilds stehen in der Karte {{ui:nameTag.title}}, ganz ob
 - **{{ui:prop.text}}** und **{{ui:prop.font}}**, auch eigene Schriften. Das Schild wächst mit den Wörtern.
 - **{{ui:nameTag.letterSize}}:** wie hoch die Großbuchstaben sind, in mm. Alle Schichten gehen mit und bleiben deckungsgleich.
 - **{{ui:nameTag.layers}}:** eine Zeile je Schicht, von oben nach unten. Jede Zeile hat die Farbe (klicke auf das farbige Feld), um wie viel die Schicht breiter ist als die Buchstaben, ihre Höhe und {{ui:nameTag.noHoles}}, das die Löcher in Buchstaben wie O und A füllt. Die oberste Zeile sind die Buchstaben selbst. **+** fügt unten eine Schicht an, **–** nimmt die unterste weg. Ein Schild hat zwei bis sechs Schichten.
+- **{{ui:nameTag.keyring}}:** gibt der untersten Schicht eine runde Öse mit einem Loch für einen Schlüsselring. Wähle den {{ui:nameTag.keyringDiameter}} und die {{ui:nameTag.keyringSide}}: {{ui:nameTag.side.left}}, {{ui:nameTag.side.right}} oder {{ui:nameTag.side.top}}. Das Loch geht durch jede Schicht, die es berührt, und die Öse wandert mit, wenn du die Wörter, die Buchstabengröße oder die Schrift änderst.
 
 Jede Änderung siehst du sofort. Das Schild ist ein Bündel: Es bewegt sich als Ganzes, und jede Schicht bleibt ein eigener Körper in eigener Farbe, so wie der Slicer sie für den Mehrfarbdruck braucht. Um die Kanten einer Schicht abzurunden oder abzuschrägen, klicke auf {{ui:group.editBundle}} und wähle die Schicht, siehe [Kanten brechen und Körper aushöhlen](chapter:kanten-und-aushoehlen).
 
 ### Viele Namensschilder auf einmal
 
-Tippe die Namen in die {{ui:textLayers.names}}, einen je Zeile, bis zu hundert. Der Knopf darunter sagt, wie viele Schilder er macht, etwa „12 Namensschilder machen“. Jedes Schild bekommt dieselben Schichten und dieselbe Buchstabengröße und ist ein eigenes Objekt; sie liegen in Reihen unter dem ersten, 5 mm auseinander. Auch ein einfacher Text hat die Namensliste, weiter unten in seinen Einstellungen.
+Tippe die Namen in die {{ui:textLayers.names}}, einen je Zeile, bis zu hundert. Der Knopf darunter sagt, wie viele Schilder er macht, etwa „12 Namensschilder machen“. Jedes Schild bekommt dieselben Schichten, dieselbe Buchstabengröße und dasselbe Loch und ist ein eigenes Objekt; sie liegen in Reihen unter dem ersten, 5 mm auseinander. Auch ein einfacher Text hat die Namensliste, weiter unten in seinen Einstellungen.
 
 ## Text auf dem Kreisbogen
 

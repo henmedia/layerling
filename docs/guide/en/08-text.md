@@ -90,12 +90,13 @@ All settings of the tag are in the card {{ui:nameTag.title}}, at the top of the 
 - **{{ui:prop.text}}** and **{{ui:prop.font}}**, fonts of your own too. The tag grows with the words.
 - **{{ui:nameTag.letterSize}}:** how tall the capital letters are, in mm. All layers follow and stay lined up.
 - **{{ui:nameTag.layers}}:** one row per layer, from the top down. Each row has the colour (click the coloured square), how much wider the layer is than the letters, its height and {{ui:nameTag.noHoles}}, which fills the holes in letters such as O and A. The top row is the letters themselves. **+** adds a layer at the bottom, **–** takes the bottom layer away. A tag has two to six layers.
+- **{{ui:nameTag.keyring}}:** gives the bottom layer a round ear with a hole for a key ring. Choose the {{ui:nameTag.keyringDiameter}} and the {{ui:nameTag.keyringSide}}: {{ui:nameTag.side.left}}, {{ui:nameTag.side.right}} or {{ui:nameTag.side.top}}. The hole goes through every layer it touches, and the ear moves along when you change the words, the letter size or the font.
 
 Every change shows at once. The tag is a bundle: it moves as one, and each layer stays a body of its own in its own colour, the way a slicer needs them for a multicolour print. To round or bevel the edges of one layer, click {{ui:group.editBundle}} and pick the layer, see [Breaking edges and hollowing bodies](chapter:edges-and-hollowing).
 
 ### Many name tags at once
 
-Type the names into {{ui:textLayers.names}}, one per line, up to a hundred. The button below says how many tags it will make, for example "Make 12 name tags". Every tag gets the same layers and letter size and is an object of its own; they are laid out in rows below the first, 5 mm apart. A plain text has the name list too, further down in its settings.
+Type the names into {{ui:textLayers.names}}, one per line, up to a hundred. The button below says how many tags it will make, for example "Make 12 name tags". Every tag gets the same layers, letter size and key ring hole and is an object of its own; they are laid out in rows below the first, 5 mm apart. A plain text has the name list too, further down in its settings.
 
 ## Text on a circular arc
 

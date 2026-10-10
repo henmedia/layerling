@@ -9962,7 +9962,7 @@ html[data-theme="dark"] .text-layers-body .text-layers-names textarea {
   color: #f1e9dc;
 }
 
-/* Name tag (#215): the way in for a plain text, the layers as a table, "More". */
+/* Name tag (#215): the way in for a plain text, the layers as a table, the key ring side, "More". */
 .shape-inspector .name-tag-start {
   display: grid;
   gap: 6px;
@@ -10127,6 +10127,33 @@ html[data-theme="dark"] .name-tag-field-hint {
   opacity: 0.52;
 }
 
+.name-tag-sides {
+  display: grid;
+  grid-template-columns: 92px repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 6px;
+  color: #867563;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.name-tag-sides button {
+  height: 30px;
+  padding: 0 6px;
+  color: #746352;
+  background: #fff;
+  border: 1px solid #daccbe;
+  border-radius: 999px;
+  font: 650 13px/1 var(--font-ui);
+  cursor: pointer;
+}
+
+.name-tag-sides button.active {
+  color: #ffffff;
+  background: #e0821f;
+  border-color: #c96f12;
+}
+
 .name-tag-letters {
   display: block;
   overflow: hidden;
@@ -10172,15 +10199,23 @@ html[data-theme="dark"] .name-tag-letters {
   color: #bfae9a;
 }
 
-html[data-theme="dark"] .name-tag-layers-heading {
+html[data-theme="dark"] .name-tag-layers-heading,
+html[data-theme="dark"] .name-tag-sides {
   color: #d8ccb8;
 }
 
 html[data-theme="dark"] .name-tag-stepper button,
-html[data-theme="dark"] .name-tag-measure {
+html[data-theme="dark"] .name-tag-measure,
+html[data-theme="dark"] .name-tag-sides button {
   color: #ede3d2;
   background: #231a11;
   border-color: #5c4b3a;
+}
+
+html[data-theme="dark"] .name-tag-sides button.active {
+  color: #ffffff;
+  background: #c96f12;
+  border-color: #e0821f;
 }
 
 html[data-theme="dark"] .name-tag-more {

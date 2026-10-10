@@ -353,6 +353,15 @@ export type SketchStrokeJoin = "miter" | "round" | "bevel";
 export type SketchStrokeCap = "flat" | "square" | "round";
 /** A sketch drawn as a line of this width instead of a filled area (#154). */
 export type SketchStroke = { width: number; align: SketchStrokeAlign; join: SketchStrokeJoin; cap: SketchStrokeCap };
+/** Where a name tag's key ring hole sits, seen from above (#215). */
+export type TextKeyringSide = "left" | "right" | "top";
+/**
+ * A key ring hole on a text (#215): a round hole `offset` mm beyond the letters' box on `side`,
+ * centred on that side. With `ear` the text also grows a round ear round the hole that joins
+ * its outline - the bottom layer of a name tag; the layers above only get the hole where it
+ * reaches them. The box grows by the ear on that side; the letters keep their size.
+ */
+export type TextKeyring = { side: TextKeyringSide; diameter: number; offset: number; ear?: boolean };
 
 export type SketchProfile = {
   points: SketchPoint[];
@@ -660,6 +669,8 @@ export type WorkplaneShape = {
   textStroke?: SketchStroke;
   /** Text only (#215): the letters without their counters (the holes in O, A, e), as Tinkercad's Silhouette. */
   textSilhouette?: boolean;
+  /** Text only (#215): a key ring hole, with the ear round it on the bottom layer of a name tag. Straight text only. */
+  textKeyring?: TextKeyring;
   /**
    * A bundle that is one text as a stack of layers (#215): texts of the same words, each wider
    * than the one above, in their own colours. Its properties panel edits text, font and layers
