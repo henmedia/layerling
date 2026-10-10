@@ -7704,8 +7704,9 @@ export function WorkplaneViewport({
         }
       }
       // The right button turns the view; only a press that is let go where it
-      // started opens the menu (finishDrag).
-      if (event.pointerType === "mouse" && event.button === 2) {
+      // started opens the menu (finishDrag). A pen's barrel button reports as
+      // button 2 of a "pen" pointer and counts the same (#213).
+      if (event.pointerType !== "touch" && event.button === 2) {
         rightPressRef.current = { x: event.clientX, y: event.clientY };
       }
       if (event.button !== 0 || event.ctrlKey || event.metaKey) {
@@ -10095,7 +10096,8 @@ function createThreeScene(host: HTMLDivElement): ThreeState {
     [...cameraPointers.keys()].forEach(endCameraDrag);
   };
   const configureLayerlingMouseButtons = (event: PointerEvent) => {
-    if (event.pointerType === "mouse" && (event.button === 1 || event.button === 2 || (event.button === 0 && (event.ctrlKey || event.metaKey)))) {
+    // A pen (graphics tablet) steers the camera like a mouse: its barrel button is button 2.
+    if (event.pointerType !== "touch" && (event.button === 1 || event.button === 2 || (event.button === 0 && (event.ctrlKey || event.metaKey)))) {
       cameraPointers.set(event.pointerId, event);
     }
     controls.mouseButtons.LEFT = event.button === 0 && (event.ctrlKey || event.metaKey) ? THREE.MOUSE.PAN : null;

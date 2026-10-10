@@ -17,6 +17,8 @@ With the mouse:
 
 On a tablet or phone, two fingers zoom (spread and pinch) and move the view (slide together). One finger works on the design, just like the left mouse button. To rotate with one finger, switch on {{ui:camera.touchRotate}} in the camera bar. That switch only shows on devices with a touch screen.
 
+A graphics tablet with a pen behaves like a mouse: the tip is the left button, the barrel button on the pen the right one, for turning the view and for the menu. The tablet's hotkeys can be set in its driver to layerling's [keyboard shortcuts](chapter:shortcuts).
+
 ### The view cube
 
 The cube in the top left shows where you are looking. A click on one of its sides jumps to the straight view from top, bottom, front, back, left or right. A click on a corner of the cube looks at the model diagonally from that corner, and a click near an edge looks from that edge, between two sides; the spot lights up while the pointer is on it. The number keys [[1]] to [[6]] give the straight views too. Hold [[Shift]] with them and the view also zooms to the selection, as [[Shift]]+[[F]] does.

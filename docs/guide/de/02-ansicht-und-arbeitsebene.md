@@ -17,6 +17,8 @@ Mit der Maus:
 
 Auf einem Tablet oder Handy zoomen zwei Finger (spreizen und zusammenziehen) und verschieben die Ansicht (gemeinsam schieben). Ein Finger arbeitet am Entwurf, so wie die linke Maustaste. Wer mit einem Finger drehen möchte, schaltet in der Kameraleiste {{ui:camera.touchRotate}} ein. Der Schalter erscheint nur auf Geräten mit Touchscreen.
 
+Ein Grafiktablett mit Stift verhält sich wie eine Maus: Die Spitze ist die linke Taste, die Seitentaste am Stift die rechte, zum Drehen der Ansicht und für das Menü. Die Schnelltasten des Tabletts belegst du in dessen Treiber mit layerlings [Tastenkürzeln](chapter:tastenkuerzel).
+
 ### Der Ansichtswürfel
 
 Der Würfel links oben zeigt, wohin du gerade schaust. Ein Klick auf eine seiner Seiten springt in die gerade Ansicht von oben, unten, vorn, hinten, links oder rechts. Ein Klick auf eine Ecke des Würfels schaut schräg von dieser Ecke auf das Modell, ein Klick nahe einer Kante von dieser Kante, also zwischen zwei Seiten hindurch; die Stelle färbt sich, sobald der Zeiger darüber steht. Die geraden Ansichten gehen auch mit den Zifferntasten [[1]] bis [[6]]. Hältst du dabei [[Umschalt]] gedrückt, zoomt die Ansicht zugleich auf die Auswahl, wie mit [[Umschalt]]+[[F]].
