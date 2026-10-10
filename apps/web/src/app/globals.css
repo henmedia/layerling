@@ -10000,6 +10000,18 @@ html[data-theme="dark"] .text-layers-body .text-layers-names textarea {
   margin: -2px 14px 10px;
 }
 
+.name-tag-field-hint {
+  margin: -8px 0 0;
+  color: #8d7b68;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+html[data-theme="dark"] .name-tag-field-hint {
+  color: #bfae9a;
+}
+
 .name-tag-layers-heading {
   display: flex;
   align-items: center;

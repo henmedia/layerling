@@ -2847,6 +2847,8 @@ function NameTagCard({
       {open ? (
         <div className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
           <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+          {/* The letter size is the last row above: what it measures, in a word. */}
+          <p className="name-tag-field-hint">{t("nameTag.letterSizeHint")}</p>
           <div className="name-tag-layers-heading">
             <span>{t("nameTag.layers")}</span>
             <span className="name-tag-stepper">

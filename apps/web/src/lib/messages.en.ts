@@ -1332,6 +1332,7 @@ export const MESSAGES_EN = {
   "nameTag.makeLayersHint": "Turns the text into a name tag: the letters on top, coloured layers below, each a little wider.",
   "nameTag.cardHint": "The letters on top, each row below is one layer in its own colour. Every change shows at once.",
   "nameTag.letterSize": "Letter size",
+  "nameTag.letterSizeHint": "How tall the capital letters are on the plate, seen from above.",
   "nameTag.layers": "Layers",
   "nameTag.addLayer": "Add a layer at the bottom",
   "nameTag.removeLayer": "Remove the bottom layer",

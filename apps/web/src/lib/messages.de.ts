@@ -1331,6 +1331,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "nameTag.makeLayersHint": "Macht aus dem Text ein Namensschild: oben die Buchstaben, darunter farbige Schichten, jede etwas breiter.",
   "nameTag.cardHint": "Oben die Buchstaben, jede Zeile darunter ist eine Schicht in eigener Farbe. Jede Änderung siehst du sofort.",
   "nameTag.letterSize": "Buchstabengröße",
+  "nameTag.letterSizeHint": "Wie hoch die Großbuchstaben auf der Platte sind, von oben gesehen.",
   "nameTag.layers": "Schichten",
   "nameTag.addLayer": "Unten eine Schicht anfügen",
   "nameTag.removeLayer": "Unterste Schicht entfernen",

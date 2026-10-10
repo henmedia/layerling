@@ -4134,6 +4134,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .text-layers-body .text
   color: #6c6c6c;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-field-hint {
+  color: #6c6c6c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-field-hint {
+  color: #adadad;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-layers-heading {
   border-top: 1px solid rgba(94, 94, 94, 0.22);
   color: #5e5e5e;
