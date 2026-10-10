@@ -1356,7 +1356,6 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "textLayers.names": "Namensliste",
   "textLayers.namesHint": "Ein Name je Zeile, bis zu 100: für jeden ein Schild wie dieses, in Reihen darunter.",
   "textLayers.namesPlaceholder": "Anna\nBen\nCarla",
-  "textLayers.gap": "Abstand",
   "status.textLayered": "Text in {count} Schichten aufgeteilt",
   "status.textLayersUpdated": "Schichten aktualisiert",
   "status.textTagsMade": "{count} Schilder erzeugt",

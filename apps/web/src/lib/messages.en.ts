@@ -1357,7 +1357,6 @@ export const MESSAGES_EN = {
   "textLayers.names": "Name list",
   "textLayers.namesHint": "One name per line, up to 100: a tag like this one for each, laid out in rows below.",
   "textLayers.namesPlaceholder": "Anna\nBen\nCarla",
-  "textLayers.gap": "Gap",
   "status.textLayered": "Text split into {count} layers",
   "status.textLayersUpdated": "Layers updated",
   "status.textTagsMade": "{count} tags made",

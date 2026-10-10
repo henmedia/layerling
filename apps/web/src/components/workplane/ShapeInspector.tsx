@@ -155,9 +155,9 @@ import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAng
 import { MAX_DOVETAIL_CLEARANCE, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { textHasFill } from "@/lib/textFill";
-import { TEXT_FILL_CHOICES, textFillChoice, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
+import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
 import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, namesFromList, type TextLayer } from "@/lib/textLayers";
-import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, removeTextLayer, textLetterSize, type NameTagStack } from "@/lib/nameTag";
+import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, removeTextLayer, textLetterSize, type NameTagStack } from "@/lib/nameTag";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { MIN_SLOT_END_RATIO, normalizeSlotEndRatio, taperedSlotOutline } from "@/lib/slotGeometry";
@@ -334,7 +334,7 @@ const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diamet
 const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ"]);
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "letterSize", "tagGap", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "boltClearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall"].includes(key);
+  return ["textLineWidth", "letterSize", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "boltClearance", "threadLength", "headHeight", "chamfer", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall"].includes(key);
 }
 
 /**
@@ -1746,11 +1746,13 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 
 /**
  * How a text is filled (#215), as Tinkercad lists it: one list - filled, outline, outer line,
- * inner line - and the line width next to it. Corners, the silhouette and "Wider" (the filled
- * letters grown by the line width) are rarer and sit under "More" (TEXT_FILL_MORE_IDS). The box
- * follows the fill (textFillPatch), the letters stay as they are.
+ * inner line - and, for a line, its width and corners right under it. The silhouette and "Wider"
+ * (the filled letters grown by the line width, its corners beside it) are rarer and sit under
+ * "More" (TEXT_FILL_MORE_IDS). The box follows the fill (textFillPatch), the letters stay as
+ * they are.
  */
-const TEXT_FILL_MORE_IDS = new Set(["textCorners", "textSilhouette", "textWider"]);
+const TEXT_FILL_MORE_IDS = new Set(["textWiderCorners", "textSilhouette", "textWider"]);
+const TEXT_FILL_IN_VIEW_IDS = new Set(["textFill", "textLineWidth", "textCorners"]);
 
 function textFillProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate): ShapePropertyConfig[] {
   const stroke = normalizeSketchStroke(shape.textStroke);
@@ -1776,7 +1778,8 @@ function textFillProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
   }] : [];
   const corners: ShapePropertyConfig[] = stroke ? [{
     type: "select",
-    id: "textCorners",
+    // A line's corners stand under the list; "Wider"'s go with its switch under "More".
+    id: textLineSettingsInView(stroke) ? "textCorners" : "textWiderCorners",
     label: t("sketch.strokeJoin"),
     value: stroke.join,
     options: SKETCH_STROKE_JOINS.map((join) => ({ value: join, label: t(`sketch.strokeJoin.${join}`) })),
@@ -1785,7 +1788,7 @@ function textFillProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
   return [
     fill,
     ...lineWidth,
-    ...corners,
+    ...(wider ? [] : corners),
     {
       type: "toggle",
       id: "textSilhouette",
@@ -1800,6 +1803,7 @@ function textFillProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
       value: wider,
       onChange: (value) => setStroke(textStrokeWider(value, stroke)),
     },
+    ...(wider ? corners : []),
   ];
 }
 
@@ -2002,7 +2006,7 @@ export function ShapeInspector({
       : properties.filter((property) => shape.kind !== "text" || !TEXT_FILL_MORE_IDS.has(property.id));
   // A text's fill (#215): the list and the line width in view, the rest under "More" right below them.
   const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
-  const textFillEnd = primaryProperties.findIndex((property) => property.id === "textFill") + (primaryProperties.some((property) => property.id === "textLineWidth") ? 2 : 1);
+  const textFillEnd = primaryProperties.reduce((end, property, index) => (TEXT_FILL_IN_VIEW_IDS.has(property.id) ? index + 1 : end), 0);
   const threadProperties = isThread
     ? properties.filter((property) => ["pitch", "threadsPerInch", "threadHand", "threadProfile", "clearance", "boltClearance", "chamfer", "quality"].includes(property.id))
     : [];
@@ -2385,7 +2389,7 @@ export function ShapeInspector({
       ) : null}
 
       {onTextTags && shape.kind === "text" ? (
-        <NameListCard key={`names-${shape.id}`} shapeId={shape.id} workspace={workspace} disabled={locked} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
+        <NameListCard key={`names-${shape.id}`} shapeId={shape.id} disabled={locked} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
       ) : null}
 
       <div className={`property-card ${propertiesOpen ? "" : "collapsed"}`}>
@@ -2737,16 +2741,16 @@ function CompactMeasureField({ label, value, min, max, workspace, disabled, onCh
   );
 }
 
-/** The name list (#215): one name per line, up to 100, and the button that makes a tag of each. */
-function NameListFields({ workspace, disabled, onTextTags, onInteractionActiveChange }: {
-  workspace: WorkplaneWorkspaceSettings;
+/**
+ * The name list (#215): one name per line, up to 100, and the button that makes a tag of each,
+ * NAME_TAG_GAP apart - no gap to set, one field less.
+ */
+function NameListFields({ disabled, onTextTags, onInteractionActiveChange }: {
   disabled: boolean;
   onTextTags: (names: string[], gap: number) => void;
   onInteractionActiveChange?: (active: boolean) => void;
 }) {
   const [names, setNames] = useState("");
-  const [gap, setGap] = useState(5);
-  const [moreOpen, setMoreOpen] = useState(false);
   const nameList = namesFromList(names);
   return (
     <>
@@ -2763,25 +2767,17 @@ function NameListFields({ workspace, disabled, onTextTags, onInteractionActiveCh
         />
         <small>{t("textLayers.namesHint")}</small>
       </label>
-      <button className="inspector-action-button" type="button" disabled={disabled || nameList.length === 0} onClick={() => onTextTags(nameList, gap)}>
+      <button className="inspector-action-button" type="button" disabled={disabled || nameList.length === 0} onClick={() => onTextTags(nameList, NAME_TAG_GAP)}>
         <Tags size={17} strokeWidth={2.5} />
         <span>{nameList.length === 0 ? t("nameTag.makeTagsNone") : nameList.length === 1 ? t("nameTag.makeTagsOne") : t("nameTag.makeTags", { count: nameList.length })}</span>
       </button>
-      <button className="name-tag-more" type="button" aria-expanded={moreOpen} onClick={() => setMoreOpen((open) => !open)}>
-        <ChevronDown className={moreOpen ? "open" : ""} size={15} strokeWidth={2.6} />
-        <span>{t(moreOpen ? "inspector.less" : "inspector.more")}</span>
-      </button>
-      {moreOpen ? (
-        <RangeProperty id="tagGap" label={t("textLayers.gap")} value={gap} min={0} max={50} step={1} workspace={workspace} disabled={disabled} onChange={setGap} onInteractionActiveChange={onInteractionActiveChange} />
-      ) : null}
     </>
   );
 }
 
 /** A plain text keeps the name list (#215): a tag of the text per name, folded away below. */
-function NameListCard({ shapeId, workspace, disabled, onTextTags, onInteractionActiveChange }: {
+function NameListCard({ shapeId, disabled, onTextTags, onInteractionActiveChange }: {
   shapeId: string;
-  workspace: WorkplaneWorkspaceSettings;
   disabled: boolean;
   onTextTags: (names: string[], gap: number) => void;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -2795,7 +2791,7 @@ function NameListCard({ shapeId, workspace, disabled, onTextTags, onInteractionA
       </button>
       {open ? (
         <div className="property-list text-layers-body" id={`name-list-${shapeId}`}>
-          <NameListFields workspace={workspace} disabled={disabled} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
+          <NameListFields disabled={disabled} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
         </div>
       ) : null}
     </div>
@@ -2891,7 +2887,7 @@ function NameTagCard({
               </div>
             ))}
           </div>
-          <NameListFields workspace={workspace} disabled={disabled} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
+          <NameListFields disabled={disabled} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
         </div>
       ) : null}
     </div>

@@ -74,7 +74,7 @@ A text need not be built as filled letters. {{ui:prop.textFill}} in the properti
 - **{{ui:prop.textFill.outer}}:** a line round the outside of the letters.
 - **{{ui:prop.textFill.inner}}:** a line on the inside of the letters.
 
-{{ui:prop.sketchLineWidth}} next to it sets how thick the line is. The rarer settings are under {{ui:inspector.more}}: {{ui:sketch.strokeJoin}} sets how the line goes round the corners, {{ui:prop.sketchSilhouette}} leaves out the holes in O, A or e, and {{ui:prop.textWider}} keeps the letters filled and makes them thicker by the line width all round; letters that touch grow into one piece.
+With a line chosen, two settings appear right under the list: {{ui:prop.sketchLineWidth}} sets how thick the line is, {{ui:sketch.strokeJoin}} how it goes round the corners ({{ui:sketch.strokeJoin.round}}, {{ui:sketch.strokeJoin.bevel}} or {{ui:sketch.strokeJoin.miter}}). The rarer settings are under {{ui:inspector.more}}: {{ui:prop.sketchSilhouette}} leaves out the holes in O, A or e, and {{ui:prop.textWider}} keeps the letters filled and makes them thicker by the line width all round; letters that touch grow into one piece.
 
 With a line outside, a centred line or "Wider" the box of the text grows, while the letters keep their size. {{ui:prop.bevel}} and {{ui:prop.segments}} exist for filled letters only.
 
@@ -95,7 +95,7 @@ Every change shows at once. The tag is a bundle: it moves as one, and each layer
 
 ### Many name tags at once
 
-Type the names into {{ui:textLayers.names}}, one per line, up to a hundred. The button below says how many tags it will make, for example "Make 12 name tags". Every tag gets the same layers and letter size and is an object of its own; they are laid out in rows below the first. Under {{ui:inspector.more}} you set the {{ui:textLayers.gap}} between them. A plain text has the name list too, further down in its settings.
+Type the names into {{ui:textLayers.names}}, one per line, up to a hundred. The button below says how many tags it will make, for example "Make 12 name tags". Every tag gets the same layers and letter size and is an object of its own; they are laid out in rows below the first, 5 mm apart. A plain text has the name list too, further down in its settings.
 
 ## Text on a circular arc
 

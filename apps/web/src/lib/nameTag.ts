@@ -16,6 +16,8 @@ export type NameTagStack = NonNullable<ReturnType<typeof textLayersOf>>;
 export const MIN_NAME_TAG_LAYERS = 2;
 export const MIN_LETTER_SIZE = 1;
 export const MAX_LETTER_SIZE = 200;
+/** The space between the tags of a name list, in mm: the panel has no field for it, as layer_text's default. */
+export const NAME_TAG_GAP = 5;
 /** How tall the capitals of a name tag from the shape library stand, in mm. */
 export const NAME_TAG_LETTER_SIZE = 12;
 

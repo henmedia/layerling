@@ -74,7 +74,7 @@ Ein Text muss nicht als gefüllte Buchstaben gebaut werden. {{ui:prop.textFill}}
 - **{{ui:prop.textFill.outer}}:** eine Linie außen um die Buchstaben.
 - **{{ui:prop.textFill.inner}}:** eine Linie innen in den Buchstaben.
 
-{{ui:prop.sketchLineWidth}} daneben bestimmt, wie dick die Linie ist. Die selteneren Einstellungen stehen unter {{ui:inspector.more}}: {{ui:sketch.strokeJoin}} bestimmt, wie die Linie um die Ecken läuft, {{ui:prop.sketchSilhouette}} lässt die Löcher in O, A oder e weg, und {{ui:prop.textWider}} lässt die Buchstaben gefüllt und macht sie rundum um die Linienbreite dicker; Buchstaben, die sich dabei berühren, wachsen zu einem Stück zusammen.
+Ist eine Linie gewählt, erscheinen direkt unter der Liste zwei Einstellungen: {{ui:prop.sketchLineWidth}} bestimmt, wie dick die Linie ist, {{ui:sketch.strokeJoin}}, wie sie um die Ecken läuft ({{ui:sketch.strokeJoin.round}}, {{ui:sketch.strokeJoin.bevel}} oder {{ui:sketch.strokeJoin.miter}}). Die selteneren Einstellungen stehen unter {{ui:inspector.more}}: {{ui:prop.sketchSilhouette}} lässt die Löcher in O, A oder e weg, und {{ui:prop.textWider}} lässt die Buchstaben gefüllt und macht sie rundum um die Linienbreite dicker; Buchstaben, die sich dabei berühren, wachsen zu einem Stück zusammen.
 
 Mit einer Linie außen, einer mittigen Linie oder „Breiter“ wächst der Kasten des Texts mit, die Buchstaben behalten ihre Größe. {{ui:prop.bevel}} und {{ui:prop.segments}} gibt es nur für gefüllte Buchstaben.
 
@@ -95,7 +95,7 @@ Jede Änderung siehst du sofort. Das Schild ist ein Bündel: Es bewegt sich als 
 
 ### Viele Namensschilder auf einmal
 
-Tippe die Namen in die {{ui:textLayers.names}}, einen je Zeile, bis zu hundert. Der Knopf darunter sagt, wie viele Schilder er macht, etwa „12 Namensschilder machen“. Jedes Schild bekommt dieselben Schichten und dieselbe Buchstabengröße und ist ein eigenes Objekt; sie liegen in Reihen unter dem ersten. Unter {{ui:inspector.more}} stellst du den {{ui:textLayers.gap}} zwischen ihnen ein. Auch ein einfacher Text hat die Namensliste, weiter unten in seinen Einstellungen.
+Tippe die Namen in die {{ui:textLayers.names}}, einen je Zeile, bis zu hundert. Der Knopf darunter sagt, wie viele Schilder er macht, etwa „12 Namensschilder machen“. Jedes Schild bekommt dieselben Schichten und dieselbe Buchstabengröße und ist ein eigenes Objekt; sie liegen in Reihen unter dem ersten, 5 mm auseinander. Auch ein einfacher Text hat die Namensliste, weiter unten in seinen Einstellungen.
 
 ## Text auf dem Kreisbogen
 

@@ -1,13 +1,13 @@
 import manifoldModule, { type CrossSection, type ManifoldToplevel } from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
 import { guideChapterForShape, guideHref, guideSectionForShape } from "@/lib/guideLinks";
-import { addTextLayer, MIN_NAME_TAG_LAYERS, removeTextLayer, textLetterSize, textLetterSizePatch } from "@/lib/nameTag";
+import { addTextLayer, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, removeTextLayer, textLetterSize, textLetterSizePatch } from "@/lib/nameTag";
 import { libraryShapeAssets, nameTagAsset, parseDroppedShapeAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { textFillComponents, textHasFill } from "@/lib/textFill";
-import { TEXT_FILL_CHOICES, textFillChoice, textStrokeForChoice, textStrokeWider } from "@/lib/textFillChoice";
+import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider } from "@/lib/textFillChoice";
 import { loadTextFonts } from "@/lib/textFonts";
 import { textGlyphShapes } from "@/lib/textGeometry";
-import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, textLayerShapes, textLayersOf, type TextLayer } from "@/lib/textLayers";
+import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, nameTagOffsets, textLayerShapes, textLayersOf, type TextLayer } from "@/lib/textLayers";
 import type { SketchStroke, WorkplaneShape } from "@/types/layerling";
 
 // #215: the name tag panel - letter size, "+" / "–" and the Tinkercad fill list - on top of the layers of textLayers.
@@ -172,6 +172,15 @@ describe("the fill list of a plain text, as Tinkercad's (#215)", () => {
     expect(textStrokeWider(false, stroke("grow", 3))).toBeUndefined();
   });
 
+  it("shows a line's width and corners right under the list for the three line entries only", () => {
+    expect(textLineSettingsInView(textStrokeForChoice("filled", undefined))).toBe(false);
+    expect(textLineSettingsInView(textStrokeForChoice("outline", undefined))).toBe(true);
+    expect(textLineSettingsInView(textStrokeForChoice("outer", undefined))).toBe(true);
+    expect(textLineSettingsInView(textStrokeForChoice("inner", undefined))).toBe(true);
+    // "Wider" reads as filled: its corners go with its switch under "More".
+    expect(textLineSettingsInView(stroke("grow"))).toBe(false);
+  });
+
   it("each entry builds the outline it names: outer and centred lines reach past the letters, the inner one stays inside", () => {
     const made: CrossSection[] = [];
     const letters = text({ text: "O", width: 20, depth: 20 });
@@ -187,6 +196,13 @@ describe("the fill list of a plain text, as Tinkercad's (#215)", () => {
     expect(widths.outline - letterWidth).toBeCloseTo(1, 1);
     expect(widths.inner - letterWidth).toBeCloseTo(0, 1);
     made.forEach((section) => section.delete());
+  });
+});
+
+describe("the name list (#215)", () => {
+  it("lays the tags out 5 mm apart, the gap layer_text takes when none is given", () => {
+    expect(NAME_TAG_GAP).toBe(5);
+    expect(nameTagOffsets(3, 50, 20, NAME_TAG_GAP)).toEqual([{ x: 0, z: 0 }, { x: 0, z: 25 }, { x: 0, z: 50 }]);
   });
 });
 

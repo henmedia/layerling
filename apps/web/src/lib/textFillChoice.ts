@@ -33,3 +33,12 @@ export function textStrokeForChoice(choice: TextFillChoice, textStroke: unknown)
 export function textStrokeWider(wider: boolean, textStroke: unknown): SketchStroke | undefined {
   return wider ? { ...(normalizeSketchStroke(textStroke) ?? DEFAULT_SKETCH_STROKE), align: "grow" } : undefined;
 }
+
+/**
+ * Whether a line's settings - its width and its corners - stand right under the list, as in
+ * Tinkercad: for Outline, Outer line and Inner line. Filled has no line; "Wider" keeps its
+ * width there and its corners under "More", next to its switch.
+ */
+export function textLineSettingsInView(textStroke: unknown): boolean {
+  return textFillChoice(textStroke) !== "filled";
+}
