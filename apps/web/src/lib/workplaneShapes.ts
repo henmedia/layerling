@@ -1,4 +1,5 @@
 import { createLocalId } from "@/lib/localIds";
+import { fieldFormulasEqual } from "@/lib/fieldFormulas";
 import { threadFootprintPatch } from "@/lib/threadGeometry";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
@@ -612,6 +613,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.groupOperation === b.groupOperation &&
     a.multicolor === b.multicolor &&
     a.rotationPivot === b.rotationPivot &&
+    fieldFormulasEqual(a.formulas, b.formulas) &&
     a.locked === b.locked &&
     a.hidden === b.hidden &&
     a.transparent === b.transparent

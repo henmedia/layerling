@@ -173,6 +173,13 @@ function looksLikeArithmetic(compact: string) {
   return /[*\u00d7\u00f7()+xX]/.test(compact) || /.[-\u2212\u2013/]/.test(compact);
 }
 
+/** Whether typed text is a calculation worth remembering (#180): arithmetic that works out, not a plain number, fraction or percentage. */
+export function isArithmeticInput(text: string) {
+  const compact = text.trim().replace(/[\s\u00a0]/g, "");
+  if (!compact || compact.endsWith("%") || parseFractionInput(compact) !== null || !looksLikeArithmetic(compact)) return false;
+  return Number.isFinite(evaluateArithmetic(compact));
+}
+
 export function parseMeasurementInput(value: string | number) {
   if (typeof value === "number") return Number.isFinite(value) ? value : Number.NaN;
   const fraction = parseFractionInput(value);

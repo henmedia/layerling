@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Felder merken sich die Rechnung",
+      "en": "Fields remember the calculation"
+    },
+    "body": {
+      "de": "Tippst du eine Rechnung wie (140+2)/2 in ein Zahlenfeld, steht sie beim nächsten Klick ins Feld wieder da und lässt sich ändern.",
+      "en": "Type a calculation such as (140+2)/2 into a number field and it is back the next time you click into the field, ready to change."
+    }
+  }
+]

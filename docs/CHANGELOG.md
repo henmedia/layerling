@@ -4,6 +4,9 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
+## Unreleased
+
+- **A number field remembers its calculation:** Typing "(140+2)/2" into a field left only 71 behind. The field now keeps the calculation with the body: click into it again and the formula is back for editing, as long as the value still equals it - a value changed by a handle, the slider or scaling shows the number again, and a plain number clears the formula. Value and formula change together, so undo takes both back, and the formulas are saved in the design. No variables, no tables. Asked for by @prmod3d in #180.
 ## 1.58.1
 
 - **Ring gear and rack:** The gear has two more types. The **Ring gear** has its teeth pointing in - the outer wheel of a planetary set - and is set by teeth, module and backlash like an involute gear, plus the rim round the teeth; its outside is module × (teeth + 2.5) plus twice the rim, with round teeth module × (teeth + 1.7). A pinion of the same module runs in it at a centre distance of module × (ring teeth − pinion teeth) / 2, which the properties panel gives for the selected pair; ring teeth = sun teeth + 2 × planet teeth makes a planetary set. The **Rack** is the gear of endless radius, its involute flanks straight lines at the pressure angle: a bar as long as teeth × π × module, so racks of one module line up end to end, its depth free; a gear of the same module rolls on it with its centre teeth × module / 2 in front of the pitch line, a module behind the tooth tips. Both take round teeth too, both are exact bodies for the edge tool and STEP, and switching the type keeps the module. The MCP bridge takes `gearType: "internal"` with `gearRim`, and `"rack"`. Promised to @prmod3d and @luk-saw in #201.

@@ -1223,6 +1223,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.importedMesh || definition.groupedShapes || definition.edgeTreatmentHistory || definition.cadBrep) {
     throw new Error(`${label} contains inline package-only geometry fields`);
   }
+  if (definition.formulas !== undefined) {
+    // The calculations typed into number fields (#180): short texts by field id, nothing else.
+    const formulas = objectRecord(definition.formulas, `${label}.formulas`);
+    for (const [field, text] of Object.entries(formulas)) {
+      if (typeof text !== "string" || text.length > 80) throw new Error(`${label}.formulas.${field} must be a short text`);
+    }
+  }
   if (definition.parametricSource !== undefined) {
     // Was der Koerper vor dem Drehen war. Fehlt oder stimmt hier etwas nicht,
     // ist der Koerper immer noch da - nur seine Bauwerte waeren nicht mehr zu

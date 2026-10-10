@@ -181,6 +181,7 @@ import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, customSnapGridLabel, shapeDimensionLimit, snapGridOptions } from "@/lib/workplaneSettings";
 import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStrokeAlign, SketchStrokeJoin, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { selectWholeValue } from "@/lib/numberField";
+import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFormulas } from "@/lib/fieldFormulas";
 import { useRecentColors } from "@/lib/recentColors";
 import { canToggleGroupColors, groupShowsPartColors } from "@/lib/groupColors";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
@@ -1839,7 +1840,7 @@ export function ShapeInspector({
   snap,
   snapOpen,
   workspace,
-  onUpdate,
+  onUpdate: onUpdateShape,
   onSnapChange,
   onSnapOpenChange,
   onObjectSnapChange,
@@ -1887,6 +1888,18 @@ export function ShapeInspector({
   // Picking one colour for a group means one colour for all of it, as in Tinkercad.
   const singleColorPatch: Partial<WorkplaneShape> = canToggleGroupColors(shape) ? { multicolor: false } : {};
   const locked = Boolean(shape.locked);
+  // A calculation typed into a field (#180) is noted just before the field's change and rides
+  // along in that one change, so undo takes value and formula back together. A note nobody
+  // picks up is dropped again right after.
+  const pendingFormulaRef = useRef<{ id: string; text: string | null } | null>(null);
+  const noteFormula = (id: string, text: string | null | undefined) => {
+    pendingFormulaRef.current = text === undefined ? null : { id, text };
+  };
+  const onUpdate: ShapeInspectorUpdate = (patch, options) => {
+    const pending = pendingFormulaRef.current;
+    pendingFormulaRef.current = null;
+    onUpdateShape(pending ? { ...patch, formulas: withFieldFormula(shape.formulas, pending.id, pending.text) } : patch, options);
+  };
   const properties = getShapeProperties(shape, onUpdate, workspace);
   // What each value would be on a shape of this kind made new, with the saved defaults: the
   // small arrow next to a changed value takes it back there.
@@ -2349,7 +2362,7 @@ export function ShapeInspector({
                 onChange={onProportionLockChange}
               />
             ) : null}
-            <ShapePropertyRows properties={primaryProperties} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             {onShapeDefaultsChange && propertyDefaults ? (
               <div className="property-defaults-actions">
                 <button type="button" disabled={locked || sameDefaults} title={t("inspector.saveDefaultsHint")} onClick={() => onShapeDefaultsChange(shape.kind, defaultsToSave)}>
@@ -2376,7 +2389,7 @@ export function ShapeInspector({
         </button>
         {positionOpen ? (
           <div className="property-list" id={`position-${shape.id}`}>
-            <ShapePropertyRows properties={positionProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={positionProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             {pivot ? (
               <>
                 <div className="property-subheading">
@@ -2385,7 +2398,7 @@ export function ShapeInspector({
                     {t("inspector.pivotRemove")}
                   </button>
                 </div>
-                <ShapePropertyRows properties={pivotProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={pivotProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
               </>
             ) : null}
           </div>
@@ -2404,7 +2417,7 @@ export function ShapeInspector({
         </button>
         {rotationOpen ? (
           <div className="property-list" id={`rotation-${shape.id}`}>
-            <ShapePropertyRows properties={rotationProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={rotationProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
           </div>
         ) : null}
       </div>
@@ -2432,7 +2445,7 @@ export function ShapeInspector({
           </button>
           {taperOpen ? (
             <div className="property-list" id={`taper-${shape.id}`}>
-              <ShapePropertyRows properties={taperProperties} defaults={propertyDefaults?.taper} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={taperProperties} defaults={propertyDefaults?.taper} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -2451,7 +2464,7 @@ export function ShapeInspector({
           </button>
           {twistOpen ? (
             <div className="property-list" id={`twist-${shape.id}`}>
-              <ShapePropertyRows properties={twistProperties} defaults={propertyDefaults?.twist} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={twistProperties} defaults={propertyDefaults?.twist} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -2470,7 +2483,7 @@ export function ShapeInspector({
           </button>
           {threadOpen ? (
             <div className="property-list" id={`thread-${shape.id}`}>
-              <ShapePropertyRows properties={threadProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={threadProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -2489,7 +2502,7 @@ export function ShapeInspector({
           </button>
           {gearTeethOpen ? (
             <div className="property-list" id={`gear-teeth-${shape.id}`}>
-              <ShapePropertyRows properties={gearTeethProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={gearTeethProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -2508,7 +2521,7 @@ export function ShapeInspector({
           </button>
           {gearHelixOpen ? (
             <div className="property-list" id={`gear-helix-${shape.id}`}>
-              <ShapePropertyRows properties={gearHelixProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={gearHelixProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -2767,6 +2780,8 @@ function ShapePropertyRows({
   defaults,
   workspace,
   disabled,
+  formulas,
+  onFormula,
   onInteractionActiveChange,
 }: {
   properties: ShapePropertyConfig[];
@@ -2774,6 +2789,9 @@ function ShapePropertyRows({
   defaults?: PropertyDefaultValues | null;
   workspace: WorkplaneWorkspaceSettings;
   disabled?: boolean;
+  /** The calculations the body's fields remember (#180), and where a field reports the one it was just set from. */
+  formulas?: FieldFormulas;
+  onFormula?: (id: string, text: string | null | undefined) => void;
   onInteractionActiveChange?: (active: boolean) => void;
 }) {
   return properties.map((property) => {
@@ -2791,7 +2809,7 @@ function ShapePropertyRows({
     }
     const differs = typeof fallback === "number" && Math.abs(fallback - property.value) > Math.max(1e-6, (property.step ?? 0.01) / 10);
     const onReset = differs ? () => property.onChange(fallback as number) : undefined;
-    return <RangeProperty {...property} key={property.id} workspace={workspace} disabled={disabled || property.disabled} onReset={onReset} onInteractionActiveChange={onInteractionActiveChange} />;
+    return <RangeProperty {...property} key={property.id} workspace={workspace} disabled={disabled || property.disabled} onReset={onReset} formula={formulas?.[property.id]} onFormula={onFormula ? (text) => onFormula(property.id, text) : undefined} onInteractionActiveChange={onInteractionActiveChange} />;
   });
 }
 
@@ -2944,8 +2962,10 @@ function RangeProperty({
   disabled,
   onChange,
   onReset,
+  formula,
+  onFormula,
   onInteractionActiveChange,
-}: RangePropertyConfig & { workspace: WorkplaneWorkspaceSettings; disabled?: boolean; onReset?: () => void; onInteractionActiveChange?: (active: boolean) => void }) {
+}: RangePropertyConfig & { workspace: WorkplaneWorkspaceSettings; disabled?: boolean; onReset?: () => void; formula?: string; onFormula?: (text: string | null | undefined) => void; onInteractionActiveChange?: (active: boolean) => void }) {
   const holdInteraction = useInteractionHold(onInteractionActiveChange);
   const allowsAboveSliderMax = ["length", "width", "height", "starOuterSize", "starInnerSize", "crescentThickness", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "bentTubeSize", "bentTubeBendRadius"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
   const isLength = propertyUsesLengthUnit(id);
@@ -2963,9 +2983,14 @@ function RangeProperty({
   // Inches read as fractions (1⅝), like Tinkercad; the slider and typed decimals stay exact.
   const formatShown = (shown: number) => (unit === "in" && showsInchFractions(workspace) ? formatFractionalInches(shown) : formatPropertyNumber(shown, accuracy, controlStep));
   const toModelValue = (nextValue: number) => isLength ? displayToMillimeters(nextValue, workspace) : nextValue;
+  // The calculation the field was last set from comes back when it is entered (#180), as long as
+  // the value still equals it; a value changed by a handle or the slider shows the number again.
+  const shownFormula = formulaMatchesValue(formula, controlValue) ? formula : undefined;
+  const openingDraft = () => shownFormula ?? formatShown(controlValue);
+  const openedWithRef = useRef<string | null>(null);
   const commitDraft = () => {
-    // Leaving the field untouched keeps the exact value, not its rounded reading.
-    if (draft === formatShown(controlValue)) {
+    // Leaving the field untouched keeps the exact value, not its rounded reading - and its formula.
+    if (draft === (openedWithRef.current ?? formatShown(controlValue))) {
       setEditing(false);
       holdInteraction(false);
       return;
@@ -2975,7 +3000,10 @@ function RangeProperty({
       : parseMeasurementInput(draft);
     const finiteNext = Number.isFinite(next) ? next : controlValue;
     const nextModelValue = toModelValue(finiteNext);
+    // The formula rides along with the value it set, in the same change; a plain number clears it.
+    onFormula?.(Number.isFinite(next) ? formulaToRemember(draft) : null);
     onChange(allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
+    onFormula?.(undefined);
     setEditing(false);
     holdInteraction(false);
   };
@@ -2994,9 +3022,13 @@ function RangeProperty({
             value={editing ? draft : formatShown(controlValue)}
             disabled={disabled}
             inputMode={unit === "in" ? "text" : "decimal"}
+            title={shownFormula ? `= ${shownFormula}` : undefined}
+            data-formula={shownFormula ? "" : undefined}
             onFocus={(event) => {
               holdInteraction(true);
-              setDraft(formatShown(controlValue));
+              const opening = openingDraft();
+              openedWithRef.current = opening;
+              setDraft(opening);
               setEditing(true);
               selectWholeValue(event.currentTarget);
             }}
@@ -3006,7 +3038,7 @@ function RangeProperty({
               if (event.key === "Enter") {
                 event.currentTarget.blur();
               } else if (event.key === "Escape") {
-                setDraft(formatShown(controlValue));
+                setDraft(openingDraft());
                 setEditing(false);
               }
             }}

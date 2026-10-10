@@ -49,7 +49,7 @@ Taper and twist work on almost every shape. Only the gear, thread, spring, knurl
 
 A tapered or leaning box, cylinder, ellipse, polygon, tube or ring keeps its exact shape, and so do the capsule, star, heart, crescent, honeycomb, dovetail and a rounded box without rounded top and bottom edges: chamfers and fillets work on it as on the plain shape, and the STEP export writes it. The same holds for a twisted shape: its section turns exactly as it rises, and the sides wind evenly from bottom to top.
 
-Typing is more exact than dragging. All number fields take millimetres, but also percentages: type "50 %" into a width of 40 mm and you get 20 mm. They calculate too: "15*3", "120-2*4" or "(40+2)/2" give 45, 112 and 21; x works instead of *.
+Typing is more exact than dragging. All number fields take millimetres, but also percentages: type "50 %" into a width of 40 mm and you get 20 mm. They calculate too: "15*3", "120-2*4" or "(40+2)/2" give 45, 112 and 21; x works instead of *. The field remembers the calculation: click into it again later and the formula stands there instead of the number, as long as the value still matches it, and you change it in place, "(140+2)/2" becoming "(40+6)/2". Drag the body by a handle or scale it and the formula no longer fits, so the field shows just the number again.
 
 ## How round is round? The side count
 

@@ -714,6 +714,12 @@ export type WorkplaneShape = {
    */
   rotationPivot?: [number, number, number];
   /**
+   * The calculation last typed into a number field, by the field's id (#180): "(140+2)/2" under
+   * `width`. Shown again when the field is entered, as long as the value still equals it. See
+   * lib/fieldFormulas.
+   */
+  formulas?: Record<string, string>;
+  /**
    * A group shows each part in its own colour, like Tinkercad's "Multicolor".
    * Left out, see groupShowsPartColors() for what a group shows.
    */
