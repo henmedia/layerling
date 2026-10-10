@@ -67,17 +67,35 @@ For lettering on a side face, first put the workplane on that face, see [View an
 
 ## Outline, silhouette and wider
 
-A text need not be built as filled letters. Under {{ui:prop.sketchFill}} in the properties you choose, as for sketches and SVG, {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} or {{ui:prop.sketchFill.center}}, with {{ui:prop.sketchLineWidth}} and {{ui:sketch.strokeJoin}}: only a line of that width is built round the letters, outside, inside or centred on their outline. {{ui:prop.sketchFill.grow}} keeps the letters filled and makes them thicker by the line width all round; letters that touch grow into one piece. {{ui:prop.sketchSilhouette}} leaves out the holes in O, A or e.
+A text need not be built as filled letters. {{ui:prop.textFill}} in the properties offers the same choice as Tinkercad:
 
-The box of the text grows with a stroke outside, centred or with "Wider", while the letters keep their size. That makes a name tag for a multicolour print from three copies of one text, all in the same place: the letters themselves, the same text 1.5 mm wider in the second colour, and once more 3 mm wider with the silhouette as the base plate in the third. Each layer is a body of its own with its own colour and height; chamfers and fillets on the edges work on every one. {{ui:prop.bevel}} and {{ui:prop.segments}} exist for filled letters only.
+- **{{ui:prop.textFill.filled}}:** the letters as they are.
+- **{{ui:prop.textFill.outline}}:** a line along the outline of the letters, half inside and half outside it.
+- **{{ui:prop.textFill.outer}}:** a line round the outside of the letters.
+- **{{ui:prop.textFill.inner}}:** a line on the inside of the letters.
+
+{{ui:prop.sketchLineWidth}} next to it sets how thick the line is. The rarer settings are under {{ui:inspector.more}}: {{ui:sketch.strokeJoin}} sets how the line goes round the corners, {{ui:prop.sketchSilhouette}} leaves out the holes in O, A or e, and {{ui:prop.textWider}} keeps the letters filled and makes them thicker by the line width all round; letters that touch grow into one piece.
+
+With a line outside, a centred line or "Wider" the box of the text grows, while the letters keep their size. {{ui:prop.bevel}} and {{ui:prop.segments}} exist for filled letters only.
 
 ## Layers and name tags
 
-layerling also builds the three copies of the previous section in one step. The properties of a text hold the card {{ui:textLayers.title}}; {{ui:textLayers.split}} turns it into a stack: the white letters on top, under them the same text 1.5 mm wider in red, at the bottom 3 mm wider as a dark plate without holes. The stack is a bundle, so it moves as one, and every layer stays a text of its own with its own colour and height, the way a slicer needs them for a multicolour print.
+A name tag for a multicolour print is a text in layers: the letters on top, under them the same text a little wider in a second colour, at the bottom a plate without holes in a third. layerling makes it in one click:
 
-With the stack selected, the same card shows text, font and the layers: {{ui:textLayers.count}} (up to six), and for each layer {{ui:textLayers.grow}}, {{ui:textLayers.height}}, {{ui:textLayers.color}} and {{ui:textLayers.silhouette}}. Every change builds the stack again at once, and new words run through all layers. {{ui:group.editBundle}} gets you to the single layers, say to fillet their edges; the stack becomes a plain bundle without the layers card as soon as one layer is no longer a text.
+- **A new name tag:** choose {{ui:shape.nameTag}} in the shape library and place it. It says "Name" in white letters on a red rim and a dark plate.
+- **From a text:** select the text and click {{ui:nameTag.makeLayers}} at the top of its settings.
 
-Under {{ui:textLayers.names}} you type a list, one name per line, up to a hundred. "Make tags" makes a tag per name from the selected text or stack, all the same size, in rows below with the chosen {{ui:textLayers.gap}}; the first takes the original's place. Each tag is an object of its own afterwards.
+All settings of the tag are in the card {{ui:nameTag.title}}, at the top of the settings:
+
+- **{{ui:prop.text}}** and **{{ui:prop.font}}**, fonts of your own too. The tag grows with the words.
+- **{{ui:nameTag.letterSize}}:** how tall the capital letters are, in mm. All layers follow and stay lined up.
+- **{{ui:nameTag.layers}}:** one row per layer, from the top down. Each row has the colour (click the coloured square), how much wider the layer is than the letters, its height and {{ui:nameTag.noHoles}}, which fills the holes in letters such as O and A. The top row is the letters themselves. **+** adds a layer at the bottom, **–** takes the bottom layer away. A tag has two to six layers.
+
+Every change shows at once. The tag is a bundle: it moves as one, and each layer stays a body of its own in its own colour, the way a slicer needs them for a multicolour print. To round or bevel the edges of one layer, click {{ui:group.editBundle}} and pick the layer, see [Breaking edges and hollowing bodies](chapter:edges-and-hollowing).
+
+### Many name tags at once
+
+Type the names into {{ui:textLayers.names}}, one per line, up to a hundred. The button below says how many tags it will make, for example "Make 12 name tags". Every tag gets the same layers and letter size and is an object of its own; they are laid out in rows below the first. Under {{ui:inspector.more}} you set the {{ui:textLayers.gap}} between them. A plain text has the name list too, further down in its settings.
 
 ## Text on a circular arc
 
