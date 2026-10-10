@@ -4,7 +4,7 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
-## Unreleased
+## 1.59.0
 
 - **A number field remembers its calculation:** Typing "(140+2)/2" into a field left only 71 behind. The field now keeps the calculation with the body: click into it again and the formula is back for editing, as long as the value still equals it - a value changed by a handle, the slider or scaling shows the number again, and a plain number clears the formula. Value and formula change together, so undo takes both back, and the formulas are saved in the design. No variables, no tables. Asked for by @prmod3d in #180.
 - **Pen tablets:** The barrel button of a graphics tablet's pen now counts as the right mouse button in the editor: a short press opens the body's menu, and a drag that ends elsewhere still only turns the view. Before, only a mouse opened the menu. Asked about by @whanner11-cpu in #213.
