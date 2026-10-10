@@ -38,5 +38,15 @@
       "de": "Einstellungen, Anleitung und Tastenkürzel öffneten sich nach dem Verschieben nach links und oben versetzt, teils aus dem Bild. Jetzt stehen sie genau an der gemerkten Stelle.",
       "en": "Settings, guide and shortcuts opened shifted to the left and up after being moved, partly out of view. They now stand exactly where they were dropped."
     }
+  },
+  {
+    "title": {
+      "de": "Gleiches Symbol für den Import",
+      "en": "The same picture for import"
+    },
+    "body": {
+      "de": "Die Kachel „Entwurf öffnen oder Geometrie importieren“ auf der Startseite zeigt jetzt dasselbe Symbol wie der Import-Knopf im Editor.",
+      "en": "The start page's tile for opening a design or importing geometry now shows the same picture as the import button in the editor."
+    }
   }
 ]
