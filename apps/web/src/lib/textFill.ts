@@ -55,7 +55,13 @@ export function textFillComponents(runtime: ManifoldToplevel, shape: WorkplaneSh
     if (!letters.length) return null;
     const region = keep(runtime.CrossSection.union(letters));
     const filled = stroke ? strokeRegion(runtime, keep, region, stroke) : region;
-    const result = keep(withKeyring(runtime, keep, shape, filled).simplify(1e-6));
+    const eared = withKeyringEar(runtime, keep, shape, filled);
+    // The silhouette has no holes at all: dropping each letter's counters is not enough once a
+    // wider outline makes neighbouring letters touch and close a pocket between them (#215,
+    // "Arany" 1.5 mm wider kept one between n and y). Only the outer rings stay - before the
+    // key ring hole is cut, which stays.
+    const closed = shape.textSilhouette ? withoutHoles(runtime, keep, eared) : eared;
+    const result = keep(withKeyringHole(runtime, keep, shape, closed).simplify(1e-6));
     if (result.area() <= 1e-9) return null;
     const components: TextFillComponent[] = [];
     for (const piece of result.decompose().map(keep)) {
@@ -72,18 +78,40 @@ export function textFillComponents(runtime: ManifoldToplevel, shape: WorkplaneSh
   }
 }
 
+/** The outline with only its outer rings: every hole filled, whatever made it. */
+function withoutHoles(runtime: ManifoldToplevel, keep: Keep, section: CrossSection): CrossSection {
+  const area = (ring: [number, number][]) => ring.reduce((sum, [x, z], index) => {
+    const [nextX, nextZ] = ring[(index + 1) % ring.length];
+    return sum + x * nextZ - nextX * z;
+  }, 0) / 2;
+  const outers = section.toPolygons().filter((ring) => area(ring as [number, number][]) > 0);
+  return outers.length ? keep(new runtime.CrossSection(outers, "Positive")) : section;
+}
+
+/** A key ring hole's disc of this radius round its middle (#215). */
+function keyringDisc(runtime: ManifoldToplevel, keep: Keep, center: { x: number; z: number }, radius: number) {
+  return keep(keep(runtime.CrossSection.circle(radius, 64)).translate([center.x, center.z]));
+}
+
+/** The key ring hole (#215) through the outline, on every layer that has one. */
+function withKeyringHole(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape, outline: CrossSection): CrossSection {
+  const keyring = textKeyringOf(shape);
+  const center = textKeyringCenter(shape);
+  if (!keyring || !center) return outline;
+  return keep(outline.subtract(keyringDisc(runtime, keep, center, keyring.diameter / 2)));
+}
+
 /**
- * A key ring hole (#215) through the outline, and on the bottom layer the ear round it: a
- * straight-sided tab sticking straight out from the middle of its side, 2.35 hole diameters wide,
- * its far end a half circle round the hole. Inwards the tab runs on until it overlaps the outline
- * by half its width, wherever the letters end on that side, so the two are one piece; outside
- * the plate it stays a clean tab.
+ * The ear of a key ring hole (#215), on the bottom layer: a straight-sided tab sticking straight
+ * out from the middle of its side, 2.35 hole diameters wide, its far end a half circle round the
+ * hole. Inwards the tab runs on until it overlaps the outline by half its width, wherever the
+ * letters end on that side, so the two are one piece; outside the plate it stays a clean tab.
  */
-function withKeyring(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape, filled: CrossSection): CrossSection {
+function withKeyringEar(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape, filled: CrossSection): CrossSection {
   const keyring = textKeyringOf(shape);
   const center = textKeyringCenter(shape);
   if (!keyring || !center) return filled;
-  const disc = (radius: number) => keep(keep(runtime.CrossSection.circle(radius, 64)).translate([center.x, center.z]));
+  const disc = (radius: number) => keyringDisc(runtime, keep, center, radius);
   let outline = filled;
   if (keyring.ear && !filled.isEmpty()) {
     const radius = keyringEarRadius(keyring.diameter);
@@ -106,7 +134,7 @@ function withKeyring(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShap
     const tab = top ? rectangle(center.x - radius, inner, center.x + radius, center.z) : rectangle(inner, center.z - radius, center.x, center.z + radius);
     outline = keep(keep(filled.add(tab)).add(disc(radius)));
   }
-  return keep(outline.subtract(disc(keyring.diameter / 2)));
+  return outline;
 }
 
 /** One piece as a body: the pieces are merged in order, so a piece's triangles stay together. */
