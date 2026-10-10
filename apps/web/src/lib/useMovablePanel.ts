@@ -74,14 +74,21 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
       top: base.top + panel.offsetTop * scale - (areaRect.top + areaElement.clientTop),
     };
     const computed = window.getComputedStyle(panel);
+    // Floating, the panel is placed absolutely: its left/top count from the offset parent's corner.
+    // A panel the stylesheet only sets in the flow - the settings window is centred by its
+    // container and is `position: relative` - stands somewhere else when docked, and taking that
+    // spot for the corner pushed a remembered position off by that much each time it opened (#219).
+    const placed = computed.position === "absolute" || computed.position === "fixed";
+    const leftValue = placed ? Number.parseFloat(computed.left) : Number.NaN;
+    const topValue = placed ? Number.parseFloat(computed.top) : Number.NaN;
     return {
       panel,
       area: areaElement,
       current,
       scale,
       origin: {
-        left: current.left - (Number.parseFloat(computed.left) || 0) * scale,
-        top: current.top - (Number.parseFloat(computed.top) || 0) * scale,
+        left: current.left - (Number.isFinite(leftValue) ? leftValue : panel.offsetLeft) * scale,
+        top: current.top - (Number.isFinite(topValue) ? topValue : panel.offsetTop) * scale,
       },
     };
   }, []);
