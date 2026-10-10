@@ -42,7 +42,8 @@ describe("text layers (#215)", () => {
   it("a text with a fill of its own is one layer of itself; mixed parts are no stack", () => {
     const wide = text({ width: 64, depth: 24, textStroke: { width: 2, align: "grow", join: "miter", cap: "flat" } });
     const read = textLayersOf([wide]);
-    expect(read!.layers).toEqual([{ grow: 2, height: 5, color: "#cf101b" }]);
+    // Its corners come along since each layer has its own (round is the default and left out).
+    expect(read!.layers).toEqual([{ grow: 2, height: 5, color: "#cf101b", join: "miter" }]);
     expect(read!.source).toMatchObject({ width: 60, depth: 20 });
     expect(textLayersOf([text(), text({ text: "Other" })])).toBeNull();
     expect(textLayersOf([text(), { ...text(), kind: "box" }])).toBeNull();

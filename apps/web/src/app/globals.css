@@ -9962,7 +9962,7 @@ html[data-theme="dark"] .text-layers-body .text-layers-names textarea {
   color: #f1e9dc;
 }
 
-/* Name tag (#215): the way in for a plain text, the layers as a table, the key ring side, "More". */
+/* Name tag (#215): the way in for a plain text, the layers as a table with their corners, the key ring side, "More". */
 .shape-inspector .name-tag-start {
   display: grid;
   gap: 6px;
@@ -10067,9 +10067,9 @@ html[data-theme="dark"] .name-tag-field-hint {
 
 .name-tag-layer {
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) minmax(0, 1fr) 58px;
+  grid-template-columns: 38px minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr) 32px;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
 }
 
 .name-tag-layer-head {
@@ -10087,7 +10087,7 @@ html[data-theme="dark"] .name-tag-field-hint {
 .name-tag-swatch {
   position: relative;
   display: block;
-  width: 34px;
+  width: 30px;
   height: 30px;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.25);
@@ -10109,7 +10109,7 @@ html[data-theme="dark"] .name-tag-field-hint {
 .name-tag-measure {
   width: 100%;
   height: 30px;
-  padding: 0 10px;
+  padding: 0 8px;
   color: #746352;
   font: 600 14px/1 var(--font-ui);
   background: #fff;
@@ -10125,6 +10125,28 @@ html[data-theme="dark"] .name-tag-field-hint {
 
 .name-tag-measure:disabled {
   opacity: 0.52;
+}
+
+.name-tag-corner {
+  width: 100%;
+  height: 30px;
+  padding: 0 2px;
+  color: #746352;
+  font: 600 12px/1 var(--font-ui);
+  text-align: center;
+  text-align-last: center;
+  appearance: none;
+  background: #fff;
+  border: 1px solid #daccbe;
+  border-radius: 8px;
+  cursor: pointer;
+  color-scheme: light;
+}
+
+.name-tag-corner:focus {
+  border-color: #ea953d;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
 }
 
 .name-tag-sides {
@@ -10206,6 +10228,7 @@ html[data-theme="dark"] .name-tag-sides {
 
 html[data-theme="dark"] .name-tag-stepper button,
 html[data-theme="dark"] .name-tag-measure,
+html[data-theme="dark"] .name-tag-corner,
 html[data-theme="dark"] .name-tag-sides button {
   color: #ede3d2;
   background: #231a11;

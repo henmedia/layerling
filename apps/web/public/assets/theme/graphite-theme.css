@@ -4180,6 +4180,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-field-hint {
   box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-corner {
+  color: #575757;
+  background: #fff;
+  border: 1px solid #cccccc;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-corner:focus {
+  border-color: #ea953d;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-sides {
   color: #676767;
 }
@@ -4223,6 +4235,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-sides {
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-stepper button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-measure,
+html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-corner,
 html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-sides button {
   color: #e0e0e0;
   background: #202020;

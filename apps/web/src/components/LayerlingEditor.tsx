@@ -38,7 +38,7 @@ import { createThreadGeometry, DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, 
 import { createSpringGeometry } from "@/lib/springGeometry";
 import { curvedTextPatch } from "@/lib/textGeometry";
 import { textDisplayGeometry } from "@/lib/textFill";
-import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, nameTagOffsets, normalizeTextLayers, textLayerShapes, textLayersOf, type NameTagKeyring, type TextLayer, type TextLayerStack } from "@/lib/textLayers";
+import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, layerTextLayersError, nameTagOffsets, normalizeTextLayers, textLayerShapes, textLayersOf, type NameTagKeyring, type TextLayer, type TextLayerStack } from "@/lib/textLayers";
 import { NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch } from "@/lib/nameTag";
 import type { TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import { onManifoldReady, rememberManifoldRuntime, setManifoldLoader } from "@/lib/manifoldHandle";
@@ -11910,6 +11910,8 @@ export function LayerlingEditor({
         const source = { ...stack.source, ...(typeof params.text === "string" ? { text: params.text.slice(0, 24) || " " } : {}), ...(font ? { font } : {}) };
         const requested = params.layers !== undefined ? normalizeTextLayers(params.layers) : null;
         if (params.layers !== undefined && !requested) throw new Error("layers must be 1 to 6 entries with grow, height, color and silhouette");
+        const badCorner = layerTextLayersError(params.layers);
+        if (badCorner) throw new Error(badCorner);
         const layers = requested ?? (wasText ? [...DEFAULT_TEXT_LAYERS] : stack.layers);
         // The key ring hole (#215): left out it stays as the stack has it.
         const keyringArgument = layerTextKeyringArgument(params.keyring);

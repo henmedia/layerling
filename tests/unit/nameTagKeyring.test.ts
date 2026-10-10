@@ -8,13 +8,13 @@ import { textLetterSizePatch } from "@/lib/nameTag";
 import { textFillComponents, textHasFill } from "@/lib/textFill";
 import { loadTextFonts } from "@/lib/textFonts";
 import { textGlyphShapes } from "@/lib/textGeometry";
-import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, textLayerShapes, textLayersOf, type NameTagKeyring, type TextLayer } from "@/lib/textLayers";
+import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, layerTextLayersError, normalizeTextLayers, textLayerShapes, textLayersOf, type NameTagKeyring, type TextLayer } from "@/lib/textLayers";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import type { TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 
-// #215: the key ring hole, in the layer code, the MCP action and the .lyl check.
+// #215: the key ring hole and the corners of each layer, in the layer code, the MCP action and the .lyl check.
 let runtime: ManifoldToplevel;
 
 beforeAll(async () => {
@@ -144,6 +144,50 @@ describe("the key ring hole (#215)", () => {
   });
 });
 
+describe("the corners of each layer (#215)", () => {
+  const plate = (join?: TextLayer["join"]): TextLayer[] => [{ grow: 0, height: 1, color: "#ffffff" }, { grow: 3, height: 2, color: "#2b2b2b", ...(join ? { join } : {}) }];
+
+  it("round, bevel and sharp give different outlines, measured at a corner of the letters", () => {
+    const made: CrossSection[] = [];
+    const corner = (join?: TextLayer["join"]) => {
+      const parts = textLayerShapes(sized(text({ text: "H" }), 12), plate(join));
+      const wide = outline(parts[1], made);
+      const box = boundsOf(wide);
+      // A 0.4 mm square right in the corner of the box the 3 mm widening reaches.
+      const square = runtime.CrossSection.square([0.4, 0.4]).translate([box.minX, box.minZ]);
+      made.push(square);
+      return { area: wide.area(), inCorner: covered(wide, square, made), stroke: parts[1].textStroke };
+    };
+    const round = corner();
+    const bevel = corner("bevel");
+    const sharp = corner("miter");
+    expect(round.stroke?.join).toBe("round");
+    expect(bevel.stroke?.join).toBe("bevel");
+    expect(sharp.stroke?.join).toBe("miter");
+    // Only the sharp corner reaches into the corner of the box; the round one passes it by 3 mm × (√2 - 1).
+    expect(sharp.inCorner).toBeGreaterThan(0.99);
+    expect(round.inCorner).toBeLessThan(1e-6);
+    expect(bevel.inCorner).toBeLessThan(1e-6);
+    // The bevel is cut square a full widening off the corner (Manifold's Square join), so it keeps more
+    // than the round corner and less than the sharp one: the areas in that order.
+    expect(sharp.area).toBeGreaterThan(bevel.area + 1);
+    expect(bevel.area).toBeGreaterThan(round.area + 1);
+    made.forEach((section) => section.delete());
+  });
+
+  it("old layers without a corner come out exactly as before: round", () => {
+    const parts = textLayerShapes(sized(text(), 12), DEFAULT_TEXT_LAYERS);
+    expect(parts[0].textStroke).toBeUndefined();
+    expect(parts[1].textStroke).toEqual({ width: 1.5, align: "grow", join: "round", cap: "flat" });
+    expect(parts[2].textStroke).toEqual({ width: 3, align: "grow", join: "round", cap: "flat" });
+    parts.forEach((part) => expect(part.textKeyring).toBeUndefined());
+    // Read back, a round layer stays without the field, so a stack saved before reads as it did.
+    expect(textLayersOf(parts)!.layers).toEqual(DEFAULT_TEXT_LAYERS);
+    expect(normalizeTextLayers([{ grow: 2, height: 1, color: "#ffffff", join: "round" }])).toEqual([{ grow: 2, height: 1, color: "#ffffff" }]);
+    expect(textLayersOf(textLayerShapes(sized(text(), 12), plate("bevel")))!.layers[1].join).toBe("bevel");
+  });
+});
+
 describe("layerling_layer_text's new arguments (#215)", () => {
   it("takes a key ring hole, keeps it when left out, refuses bad values", () => {
     expect(layerTextKeyringArgument(undefined)).toBeUndefined();
@@ -159,15 +203,25 @@ describe("layerling_layer_text's new arguments (#215)", () => {
     expect(layerTextKeyringArgument("left")).toHaveProperty("error");
   });
 
+  it("takes a corner per layer, old layer lists the same as before, refuses an unknown corner", () => {
+    const old = [{ grow: 0, height: 1.2, color: "#ffffff" }, { grow: 1.5, height: 1.2, color: "#d41721" }, { grow: 3, height: 2, color: "#2b2b2b", silhouette: true }];
+    expect(layerTextLayersError(old)).toBeNull();
+    expect(normalizeTextLayers(old)).toEqual(DEFAULT_TEXT_LAYERS);
+    expect(normalizeTextLayers([{ grow: 0, height: 1, color: "#ffffff" }, { grow: 2, height: 2, color: "#d41721", join: "miter" }])![1].join).toBe("miter");
+    expect(layerTextLayersError([{ grow: 0 }, { grow: 2, join: "pointy" }])).toBe("layers[1].join must be round, bevel or miter");
+    expect(layerTextLayersError(undefined)).toBeNull();
+  });
+
   it("are in the tool's schema", () => {
     const tool = (tools as { name: string; inputSchema: { properties: Record<string, { items?: { properties: Record<string, { enum?: string[] }> } }> } }[]).find((entry) => entry.name === "layerling_layer_text")!;
     expect(tool.inputSchema.properties.keyring).toBeDefined();
+    expect(tool.inputSchema.properties.layers.items!.properties.join.enum).toEqual(["round", "bevel", "miter"]);
     // Everything it took before is still there.
     expect(Object.keys(tool.inputSchema.properties)).toEqual(expect.arrayContaining(["id", "text", "font", "layers", "names", "gap"]));
   });
 });
 
-describe(".lyl: the key ring hole (#215)", () => {
+describe(".lyl: the key ring hole and the corners (#215)", () => {
   function input(shapes: WorkplaneShape[]): LylProjectExportInput {
     return {
       projectId: "p", projectName: "Name tags", createdAt: 1_700_000_000_000, modifiedAt: 1_700_000_100_000,
@@ -183,7 +237,7 @@ describe(".lyl: the key ring hole (#215)", () => {
     files["project.json"] = strToU8(JSON.stringify(document));
     return zipSync(files);
   }
-  const layers: TextLayer[] = [...DEFAULT_TEXT_LAYERS];
+  const layers: TextLayer[] = [{ grow: 0, height: 1.2, color: "#ffffff" }, { grow: 1.5, height: 1.2, color: "#d41721", join: "bevel" }, { grow: 3, height: 2, color: "#2b2b2b", silhouette: true, join: "miter" }];
   const keyring: NameTagKeyring = { side: "right", diameter: 4 };
 
   it("keeps them through saving and opening", async () => {
@@ -192,6 +246,7 @@ describe(".lyl: the key ring hole (#215)", () => {
     expect(restored.shapes).toEqual(parts.map(canonicalizeShape));
     const read = textLayersOf(restored.shapes)!;
     expect(read.keyring).toEqual(keyring);
+    expect(read.layers.map((layer) => layer.join)).toEqual([undefined, "bevel", "miter"]);
   });
 
   it("opens a file without them as before", async () => {
@@ -201,10 +256,11 @@ describe(".lyl: the key ring hole (#215)", () => {
     expect(textLayersOf(restored.shapes)!.keyring).toBeNull();
   });
 
-  it("refuses an unknown side and a diameter out of range", async () => {
+  it("refuses an unknown side, an unknown corner and a diameter out of range", async () => {
     const saved = await exportLylProject(input(textLayerShapes(sized(text(), 12), layers, [], keyring)));
     await expect(importLylProject(mutate(saved, (definition) => { (definition.textKeyring as Record<string, unknown>).side = "bottom"; }))).rejects.toThrow("textKeyring must be a side");
     await expect(importLylProject(mutate(saved, (definition) => { (definition.textKeyring as Record<string, unknown>).diameter = 30; }))).rejects.toThrow("textKeyring must be a side");
     await expect(importLylProject(mutate(saved, (definition) => { (definition.textKeyring as Record<string, unknown>).diameter = 0.2; }))).rejects.toThrow("textKeyring must be a side");
+    await expect(importLylProject(mutate(saved, (definition) => { (definition.textStroke as Record<string, unknown>).join = "pointy"; }))).rejects.toThrow("textStroke.join must be miter, round or bevel");
   });
 });

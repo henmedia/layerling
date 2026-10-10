@@ -720,7 +720,7 @@ export const tools = [
   },
   {
     name: "layerling_layer_text",
-    description: "Layered text for a multicolour print (#215): one text as a stack of bodies - the letters on top, under them the same letters a little wider in another colour, at the bottom a plate wider still, usually as a silhouette without the holes in the letters. Every layer is an ordinary text with a 'Wider' fill (so each has its own colour, height and edge treatments) and the stack is a bundle flagged as layered text, whose properties panel edits words, font and layers together. Pass the id of a text (it is replaced by the stack) or of such a bundle (it is built again); layers top to bottom, each with grow (mm wider than the letters, 0 for the letters), height, color and silhouette. Left out, the layers stay as they are, or a new stack takes the classic three: white letters, a red rim 1.5 mm wider, a dark plate 3 mm wider without holes. keyring { side, diameter } gives the bottom layer a round ear with a key ring hole on the left, right or top, cut through every layer it reaches; it follows the words and the font, true puts a 4 mm hole on the left, false takes it off, and left out it stays as it is. With names, one stack per name is made instead, laid out in rows under the first, each as its own object - a list of name tags in one go.",
+    description: "Layered text for a multicolour print (#215): one text as a stack of bodies - the letters on top, under them the same letters a little wider in another colour, at the bottom a plate wider still, usually as a silhouette without the holes in the letters. Every layer is an ordinary text with a 'Wider' fill (so each has its own colour, height and edge treatments) and the stack is a bundle flagged as layered text, whose properties panel edits words, font and layers together. Pass the id of a text (it is replaced by the stack) or of such a bundle (it is built again); layers top to bottom, each with grow (mm wider than the letters, 0 for the letters), height, color and silhouette. Left out, the layers stay as they are, or a new stack takes the classic three: white letters, a red rim 1.5 mm wider, a dark plate 3 mm wider without holes. A layer may take join (round, bevel or miter): how it goes round the corners of the letters; left out it is round, as before. keyring { side, diameter } gives the bottom layer a round ear with a key ring hole on the left, right or top, cut through every layer it reaches; it follows the words and the font, true puts a 4 mm hole on the left, false takes it off, and left out it stays as it is. With names, one stack per name is made instead, laid out in rows under the first, each as its own object - a list of name tags in one go.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -739,6 +739,7 @@ export const tools = [
               height: { type: "number", description: "The layer's height in mm." },
               color: { type: "string", description: "Hex colour such as #d41721." },
               silhouette: { type: "boolean", description: "Without the holes in the letters - for the base plate." },
+              join: { type: "string", enum: ["round", "bevel", "miter"], description: "How a wider layer goes round the corners of the letters: round (default), bevel or miter (sharp)." },
             },
           },
         },

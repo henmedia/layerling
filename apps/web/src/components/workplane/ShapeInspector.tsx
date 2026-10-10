@@ -2802,7 +2802,8 @@ function NameListCard({ shapeId, disabled, onTextTags, onInteractionActiveChange
 /**
  * The name tag (#215): a layered text's card, open and first. Words, font and letter size; every
  * layer in a row of its own - colour, how much wider than the letters, height, without holes -
- * with "+" and "–"; the key ring hole; the name list. Every change builds the stack again.
+ * with "+" and "–" and, for a wider layer, its corners; the key ring hole; the name list. Every
+ * change builds the stack again.
  */
 function NameTagCard({
   shapeId,
@@ -2866,6 +2867,7 @@ function NameTagCard({
             <div className="name-tag-layer name-tag-layer-head" role="row">
               <span role="columnheader">{t("nameTag.color")}</span>
               <span role="columnheader">{t("nameTag.wider", { unit })}</span>
+              <span role="columnheader">{t("nameTag.corners")}</span>
               <span role="columnheader">{t("nameTag.height", { unit })}</span>
               <span role="columnheader">{t("nameTag.noHoles")}</span>
             </div>
@@ -2879,6 +2881,26 @@ function NameTagCard({
                     <span className="name-tag-letters">{t("nameTag.letters")}</span>
                   ) : (
                     <CompactMeasureField label={`${layerName(index)}: ${t("nameTag.wider", { unit })}`} value={layer.grow} min={0} max={MAX_TEXT_LAYER_GROW} workspace={workspace} disabled={disabled} onChange={(grow) => changeLayer(index, { grow })} onInteractionActiveChange={onInteractionActiveChange} />
+                  )}
+                </span>
+                <span role="cell">
+                  {/* How the wider outline goes round the corners of the letters; the letters themselves have none. */}
+                  {index === 0 ? null : (
+                    <select
+                      className="name-tag-corner"
+                      aria-label={`${layerName(index)}: ${t("nameTag.corners")}`}
+                      title={`${layerName(index)}: ${t("nameTag.corners")}`}
+                      value={layer.join ?? "round"}
+                      disabled={disabled}
+                      onChange={(event) => {
+                        const join = event.currentTarget.value;
+                        changeLayer(index, { join: join === "bevel" || join === "miter" ? join : undefined });
+                      }}
+                    >
+                      {(["round", "bevel", "miter"] as const).map((join) => (
+                        <option key={join} value={join}>{t(`nameTag.corner.${join}`)}</option>
+                      ))}
+                    </select>
                   )}
                 </span>
                 <span role="cell">

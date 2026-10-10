@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import { normalizeSketchStroke } from "@/lib/sketchStroke";
+import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { DEFAULT_KEYRING_DIAMETER, keyringEarRadius, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES, textFillExtent, textKeyringOf, textKeyringReach, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
 import { shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
-import type { SketchStroke, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
+import type { SketchStroke, SketchStrokeJoin, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
 /**
  * Layered text (#215): one text as a stack of bodies for a multicolour print - the letters on
@@ -19,6 +19,11 @@ export type TextLayer = {
   color: string;
   /** Without the counters of the letters - the base plate. */
   silhouette?: boolean;
+  /**
+   * How a wider layer goes round the corners of the letters (#215): bevelled or sharp. Left out
+   * it is round, as every layer was before, so older stacks come out the same.
+   */
+  join?: Exclude<SketchStrokeJoin, "round">;
 };
 
 export const MAX_TEXT_LAYERS = 6;
@@ -42,7 +47,13 @@ export function normalizeTextLayer(layer: Partial<TextLayer>, fallback: TextLaye
     height: round(Number.isFinite(height) ? Math.max(MIN_TEXT_LAYER_HEIGHT, height) : fallback.height),
     color: typeof layer.color === "string" && /^#[0-9a-f]{6}$/i.test(layer.color) ? layer.color.toLowerCase() : fallback.color,
     ...(layer.silhouette ? { silhouette: true } : {}),
+    ...(isTextLayerJoin(layer.join as unknown) && (layer.join as unknown) !== "round" ? { join: layer.join } : {}),
   };
+}
+
+/** A corner a layer may take: round, bevel or miter (sharp), as a stroke's join. */
+export function isTextLayerJoin(value: unknown): value is SketchStrokeJoin {
+  return SKETCH_STROKE_JOINS.includes(value as SketchStrokeJoin);
 }
 
 export function normalizeTextLayers(layers: unknown): TextLayer[] | null {
@@ -83,6 +94,13 @@ export function layerTextKeyringArgument(value: unknown): { keyring: NameTagKeyr
   return { keyring: { side: side as TextKeyringSide, diameter } };
 }
 
+/** layerling_layer_text's `layers` (#215): a corner other than round, bevel or miter is refused; null when they are fine. */
+export function layerTextLayersError(value: unknown): string | null {
+  if (!Array.isArray(value)) return null;
+  const bad = value.findIndex((layer) => layer && typeof layer === "object" && (layer as { join?: unknown }).join !== undefined && !isTextLayerJoin((layer as { join?: unknown }).join));
+  return bad >= 0 ? `layers[${bad}].join must be round, bevel or miter` : null;
+}
+
 /** A shape's own (x, y, z) offset in the world: its turn applied, as the scene turns it. */
 function turned(shape: WorkplaneShape, offset: { x: number; z: number }) {
   const euler = new THREE.Euler(
@@ -113,7 +131,7 @@ export function textLayerSource(text: WorkplaneShape): WorkplaneShape {
   };
 }
 
-const growStroke = (grow: number): SketchStroke | undefined => (grow > 0 ? { width: grow, align: "grow", join: "round", cap: "flat" } : undefined);
+const growStroke = (grow: number, join: SketchStrokeJoin = "round"): SketchStroke | undefined => (grow > 0 ? { width: grow, align: "grow", join, cap: "flat" } : undefined);
 
 /**
  * The key ring hole (#215) of each layer, top to bottom: the bottom layer carries the ear, the hole
@@ -145,7 +163,7 @@ export function textLayerShapes(source: WorkplaneShape, layers: readonly TextLay
   let elevation = base;
   const shapes = bottomUp.map((layer, fromBottom) => {
     const index = layers.length - 1 - fromBottom;
-    const stroke = growStroke(layer.grow);
+    const stroke = growStroke(layer.grow, layer.join);
     const extent = textFillExtent({ textStroke: stroke });
     const layerKeyring = keyrings[index];
     let shape: WorkplaneShape = {
@@ -201,6 +219,8 @@ export function textLayersOf(shapes: WorkplaneShape[]): TextLayerStack | null {
       height: shape.height,
       color: shape.color,
       silhouette: shape.textSilhouette,
+      // A wider layer's corners (#215); round is the default and is left out.
+      ...(stroke?.align === "grow" && stroke.join !== "round" ? { join: stroke.join } : {}),
     }, DEFAULT_TEXT_LAYERS[0]);
   });
   // The letters are the same in every layer; the top one is as good a source as any.
