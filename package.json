@@ -60,6 +60,7 @@
   "overrides": {
     "brepjs": {
       "occt-wasm": "$occt-wasm"
-    }
+    },
+    "postcss": "8.5.28"
   }
 }

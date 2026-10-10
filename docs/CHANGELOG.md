@@ -4,6 +4,10 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
+## Unreleased
+
+- **`npm install` reports no vulnerabilities:** Next.js 15 ships an old PostCSS, and `npm audit` flagged it as one high and one moderate vulnerability, whose suggested fix `npm audit fix --force` would have moved the app to Next.js 16. `package.json` now pins PostCSS 8.5.28 through `overrides`; Next.js stays at 15.5.27, the audit finds nothing, and typecheck and static export run as before. Reported by @ARSoderberg in #221, who also tested the fix.
+
 ## 1.61.0
 
 - **Reference image in sketch mode: turn, centre, calibrate, crop:** A photo laid under a sketch could only be moved and scaled. Its settings now have an **Align** card: a **Rotation** in degrees, with a round handle above the frame (Shift snaps to 15°), so a photo taken at a slant lines up with the revolve axis; **Centre on X = 0** and **Y = 0**, X = 0 being the axis of a revolve; **Calibrate** as in Fusion - click two points in the picture whose distance you know, type the real distance, and the picture scales to match with the first point staying put; and **Crop**, where the frame's handles cut the picture down instead of scaling it, the cut-away part staying stored and coming back on request. The picture keeps its pixels throughout. Asked for by @ucito in #216.
