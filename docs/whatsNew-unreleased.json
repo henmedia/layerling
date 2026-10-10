@@ -11,16 +11,6 @@
   },
   {
     "title": {
-      "de": "Führungslinien der Auswahl scheinen nicht mehr durch Körper",
-      "en": "The selection's guides no longer shine through bodies"
-    },
-    "body": {
-      "de": "Der gestrichelte Fußabdruck und die Mittellinie eines markierten Körpers werden jetzt von Körpern verdeckt, statt darüber zu schweben.",
-      "en": "The dashed footprint and centre line of a selected body are now hidden by bodies instead of floating over them."
-    }
-  },
-  {
-    "title": {
       "de": "npm install ohne Sicherheitswarnungen",
       "en": "npm install without security warnings"
     },
