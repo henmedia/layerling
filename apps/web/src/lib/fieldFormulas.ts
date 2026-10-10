@@ -40,3 +40,16 @@ export function fieldFormulasEqual(a: FieldFormulas | undefined, b: FieldFormula
   const keysB = Object.keys(b ?? {});
   return keysA.length === keysB.length && keysA.every((key) => a?.[key] === b?.[key]);
 }
+
+/**
+ * The inspector field each dimension box on the work area stands for, so a calculation typed
+ * into a box (#180) comes back in the same field of the Properties panel and the other way round.
+ */
+export const DIMENSION_FORMULA_FIELDS = { width: "width", depth: "length", height: "height", elevation: "positionZ" } as const;
+
+/** Whether a remembered formula still gives `valueMm`, read in the editor's current unit. */
+export function formulaMatchesMillimeters(formula: string | undefined, valueMm: number, parse: (text: string) => number) {
+  if (!formula) return false;
+  const result = parse(formula);
+  return Number.isFinite(result) && Math.abs(result - valueMm) <= 1e-6 * Math.max(1, Math.abs(valueMm));
+}

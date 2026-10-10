@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fieldFormulasEqual, formulaMatchesValue, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
+import { DIMENSION_FORMULA_FIELDS, fieldFormulasEqual, formulaMatchesMillimeters, formulaMatchesValue, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { isArithmeticInput } from "@/lib/measurementUnits";
 import { workplaneShapesEqual } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -46,5 +46,19 @@ describe("field formulas (#180)", () => {
     expect(workplaneShapesEqual(shape, { ...shape })).toBe(true);
     expect(workplaneShapesEqual(shape, { ...shape, formulas: { width: "(40+2)/2" } })).toBe(false);
     expect(workplaneShapesEqual({ ...shape, formulas: { width: "(40+2)/2" } }, { ...shape, formulas: { width: "(40+2)/2" } })).toBe(true);
+  });
+});
+
+// #180: the dimension boxes on the work area keep a calculation too, so the saved formula has to be checked in millimetres.
+describe("formulas of the dimension boxes (#180)", () => {
+  it("shows a formula only while it still gives the body's size", () => {
+    expect(formulaMatchesMillimeters("(40+6)/2", 23, () => 23)).toBe(true);
+    expect(formulaMatchesMillimeters("(40+6)/2", 24, () => 23)).toBe(false);
+    expect(formulaMatchesMillimeters(undefined, 23, () => 23)).toBe(false);
+    expect(formulaMatchesMillimeters("bad", 23, () => Number.NaN)).toBe(false);
+  });
+
+  it("names the inspector fields the boxes share their formulas with", () => {
+    expect(DIMENSION_FORMULA_FIELDS).toEqual({ width: "width", depth: "length", height: "height", elevation: "positionZ" });
   });
 });
