@@ -93,6 +93,15 @@ Verrundungen und Fasen an den Kanten gehen beim Neubau verloren, wie beim Bearbe
 
 Mit {{ui:sketch.addImage}} legst du ein Foto oder eine Zeichnung unter die Skizze und zeichnest sie nach. Du kannst die Größe, die Deckkraft und die Lage einstellen. Sobald das Bild richtig liegt, sperrst du es mit [[L]], damit du es beim Zeichnen nicht versehentlich verschiebst. Ein gesperrtes Bild ist aus dem Weg: Klicks gehen durch es hindurch, du wählst also Linien und Punkte darauf an und ziehst einen Rahmen darüber. Um es wieder auszuwählen, etwa zum Entsperren, klickst du mit [[Alt]] darauf. Verdecken seine Einstellungen am rechten Rand das Bild, ziehst du sie an ihrer Titelleiste weg; ein Doppelklick darauf dockt sie wieder an.
 
+Unter {{ui:sketch.imageAlign}} richtest du ein Foto aus, das nicht gerade aufgenommen wurde:
+
+- **{{ui:sketch.imageRotation}}:** Drehe das Bild um seine Mitte, mit dem runden Griff über dem Rahmen oder als Zahl in Grad. Mit [[Umschalt]] rastet der Griff in 15°-Schritten ein.
+- **{{ui:sketch.centreImageX}}** und **{{ui:sketch.centreImageY}}:** setzen die Bildmitte auf X = 0 beziehungsweise Y = 0. Beim Drehkörper ist X = 0 die Drehachse, das Bild liegt dann symmetrisch darüber.
+- **{{ui:sketch.calibrateImage}}:** Klicke zwei Punkte im Bild, deren Abstand du kennst, etwa die Enden eines Lineals oder einen bekannten Durchmesser, und tippe den wirklichen Abstand ein. Das Bild wird gleichmäßig so skaliert, dass die Strecke stimmt; der erste Punkt bleibt, wo er war.
+- **{{ui:sketch.cropImage}}:** Die Griffe am Rahmen schneiden das Bild zu statt es zu skalieren; was wegfällt, bleibt gespeichert und kommt mit {{ui:sketch.uncropImage}} oder beim Herausziehen eines Griffs zurück.
+
+Alle vier wirken nur auf die Vorlage, nie auf die Skizze.
+
 ## Tasten im Skizzenmodus
 
 | Taste | Wirkung |

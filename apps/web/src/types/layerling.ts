@@ -341,6 +341,10 @@ export type SketchImage = {
   opacity?: number;
   lockAspect?: boolean;
   locked?: boolean;
+  /** Turned on the plate by this many degrees, counter-clockwise (#216). */
+  rotation?: number;
+  /** The shares of the picture cut away on each side (#216); width and depth are the part that is shown. */
+  crop?: { left: number; top: number; right: number; bottom: number };
 };
 
 /** Where the wall of a stroked closed outline lies against the drawn line; "grow" keeps the area and widens it by the width (#215). */

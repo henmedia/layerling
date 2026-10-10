@@ -6164,6 +6164,75 @@ html[data-theme="dark"] .shell-openings-summary {
   cursor: ew-resize;
 }
 
+/* Reference image (#216): crop handles, the turning handle and the calibration marks. */
+.sketch-image-selection-box.cropping {
+  stroke: #2f7f9e;
+}
+
+.sketch-image-resize-handle.crop {
+  fill: #e7f4f9;
+  stroke: #2f7f9e;
+}
+
+.sketch-image-resize-handle.crop:hover {
+  fill: #9fd3e8;
+}
+
+.sketch-image-rotate line {
+  stroke: #da7409;
+  stroke-width: 1.4;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.sketch-image-rotate-handle {
+  fill: #ffffff;
+  stroke: #a3590b;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  cursor: grab;
+}
+
+.sketch-image-rotate-handle:hover {
+  fill: #ffb24b;
+}
+
+.sketch-image-calibration circle {
+  fill: rgba(255, 255, 255, 0.85);
+  stroke: #2f7f9e;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.sketch-image-calibration line {
+  stroke: #2f7f9e;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.sketch-image-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.sketch-image-hint {
+  margin: -2px 0 0;
+  color: #8d7b68;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.sketch-image-calibrate-field {
+  display: grid;
+  gap: 6px;
+}
+
+html[data-theme="dark"] .sketch-image-hint {
+  color: #b7a992;
+}
+
 .sketch-image-dimension rect {
   fill: rgba(255, 255, 255, 0.97);
   stroke: rgba(139, 118, 95, 0.9);

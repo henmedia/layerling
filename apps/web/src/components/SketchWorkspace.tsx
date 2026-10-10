@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronUp, CornerDownRight, Crosshair, Home, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Minus, Plus, Ruler, RulerDimensionLine, Slash, Spline, Split, Trash2, Waves, X } from "lucide-react";
+import { AlignCenterHorizontal, AlignCenterVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, Home, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Minus, Plus, Ruler, RulerDimensionLine, Slash, Spline, Split, Trash2, Waves, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent as ReactFocusEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
 import { SnapGridControl } from "@/components/workplane/ShapeInspector";
 import { SketchRevolvePreview } from "@/components/SketchRevolvePreview";
@@ -19,6 +19,7 @@ import { isSketchPrimitive, type SketchPrimitive } from "@/lib/sketchPrimitives"
 import { mirrorSign, resizedImportedMeshPositions } from "@/lib/workplaneShapes";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeStep, normalizeSnapGrid, normalizeWorkspaceSettings, snapGridStep as snapStep, orbitControlsZoomSpeed, zoomDistanceScale } from "@/lib/workplaneSettings";
 import type { GridSize, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchSegment, SketchStroke, SketchStrokeAlign, SketchStrokeCap, SketchStrokeJoin, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, imageRotateHandle, imageToWorld, normalizeImageRotation, resizeImage, rotateImage, uncropImage } from "@/lib/sketchImageTransform";
 import { DEFAULT_SKETCH_STROKE, SKETCH_STROKE_ALIGNS, SKETCH_STROKE_CAPS, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { selectWholeValue } from "@/lib/numberField";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -91,7 +92,9 @@ type PointerAction =
   | { kind: "pan"; pointerId: number; clientX: number; clientY: number }
   | { kind: "marquee"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number }; clientX: number; clientY: number }
   | { kind: "move-image"; pointerId: number; imageId: string; origin: { x: number; z: number }; current: { x: number; z: number }; start: SketchImage }
-  | { kind: "resize-image"; pointerId: number; imageId: string; handle: ResizeHandle; current: { x: number; z: number }; start: SketchImage };
+  | { kind: "resize-image"; pointerId: number; imageId: string; handle: ResizeHandle; current: { x: number; z: number }; start: SketchImage }
+  | { kind: "rotate-image"; pointerId: number; imageId: string; startAngle: number; current: { x: number; z: number }; start: SketchImage; snap: boolean }
+  | { kind: "crop-image"; pointerId: number; imageId: string; handle: ResizeHandle; current: { x: number; z: number }; start: SketchImage };
 
 type ResizeHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 type SelectionBounds = { minX: number; maxX: number; minZ: number; maxZ: number; width: number; depth: number; cx: number; cz: number };
@@ -104,57 +107,6 @@ function snapValue(value: number, step: number) {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
-}
-
-function resizeSketchImage(start: SketchImage, handle: ResizeHandle, point: { x: number; z: number }): Partial<SketchImage> {
-  const minimum = 0.5;
-  const startsWest = handle.includes("w");
-  const startsEast = handle.includes("e");
-  const startsNorth = handle.includes("n");
-  const startsSouth = handle.includes("s");
-  const minX = start.x - start.width / 2;
-  const maxX = start.x + start.width / 2;
-  const minZ = start.z - start.depth / 2;
-  const maxZ = start.z + start.depth / 2;
-  const aspect = start.width / Math.max(minimum, start.depth);
-
-  if (start.lockAspect !== false) {
-    if ((startsWest || startsEast) && (startsNorth || startsSouth)) {
-      const fixedX = startsWest ? maxX : minX;
-      const fixedZ = startsNorth ? maxZ : minZ;
-      const widthScale = Math.abs(point.x - fixedX) / Math.max(minimum, start.width);
-      const depthScale = Math.abs(point.z - fixedZ) / Math.max(minimum, start.depth);
-      const scale = Math.max(minimum / Math.min(start.width, start.depth), widthScale, depthScale);
-      const width = Math.max(minimum, start.width * scale);
-      const depth = Math.max(minimum, start.depth * scale);
-      const xDirection = startsWest ? -1 : 1;
-      const zDirection = startsNorth ? -1 : 1;
-      return { width, depth, x: fixedX + xDirection * width / 2, z: fixedZ + zDirection * depth / 2 };
-    }
-    if (startsWest || startsEast) {
-      const fixedX = startsWest ? maxX : minX;
-      const width = Math.max(minimum, Math.abs(point.x - fixedX));
-      return { width, depth: Math.max(minimum, width / aspect), x: fixedX + (startsWest ? -1 : 1) * width / 2 };
-    }
-    const fixedZ = startsNorth ? maxZ : minZ;
-    const depth = Math.max(minimum, Math.abs(point.z - fixedZ));
-    return { depth, width: Math.max(minimum, depth * aspect), z: fixedZ + (startsNorth ? -1 : 1) * depth / 2 };
-  }
-
-  let nextMinX = minX;
-  let nextMaxX = maxX;
-  let nextMinZ = minZ;
-  let nextMaxZ = maxZ;
-  if (startsWest) nextMinX = Math.min(point.x, maxX - minimum);
-  if (startsEast) nextMaxX = Math.max(point.x, minX + minimum);
-  if (startsNorth) nextMinZ = Math.min(point.z, maxZ - minimum);
-  if (startsSouth) nextMaxZ = Math.max(point.z, minZ + minimum);
-  return {
-    x: (nextMinX + nextMaxX) / 2,
-    z: (nextMinZ + nextMaxZ) / 2,
-    width: nextMaxX - nextMinX,
-    depth: nextMaxZ - nextMinZ,
-  };
 }
 
 function boundsForSketchPoints(points: SketchPoint[]): SelectionBounds | null {
@@ -581,6 +533,9 @@ export function SketchWorkspace({
   const lastPointerRef = useRef<{ clientX: number; clientY: number } | null>(null);
   const [refinePreview, setRefinePreview] = useState<{ segmentId: string; placement: SketchSegmentPlacement } | null>(null);
   const [pointerAction, setPointerAction] = useState<PointerAction | null>(null);
+  // The reference image's crop mode and calibration (#216): both belong to the selected image.
+  const [cropMode, setCropMode] = useState(false);
+  const [calibration, setCalibration] = useState<{ imageId: string; points: Array<{ x: number; z: number }> } | null>(null);
   const [showMeasurements, setShowMeasurements] = useState(true);
   useEffect(() => {
     try {
@@ -695,7 +650,13 @@ export function SketchWorkspace({
       return images.map((image) => image.id === pointerAction.imageId ? { ...image, x: pointerAction.start.x + deltaX, z: pointerAction.start.z + deltaZ } : image);
     }
     if (pointerAction?.kind === "resize-image") {
-      return images.map((image) => image.id === pointerAction.imageId ? { ...image, ...resizeSketchImage(pointerAction.start, pointerAction.handle, pointerAction.current) } : image);
+      return images.map((image) => image.id === pointerAction.imageId ? { ...image, ...resizeImage(pointerAction.start, pointerAction.handle, pointerAction.current) } : image);
+    }
+    if (pointerAction?.kind === "rotate-image") {
+      return images.map((image) => image.id === pointerAction.imageId ? { ...image, ...rotateImage(pointerAction.start, pointerAction.startAngle, pointerAction.current, pointerAction.snap) } : image);
+    }
+    if (pointerAction?.kind === "crop-image") {
+      return images.map((image) => image.id === pointerAction.imageId ? { ...image, ...cropImage(pointerAction.start, pointerAction.handle, pointerAction.current) } : image);
     }
     return images;
   }, [pointerAction, profile.images]);
@@ -720,6 +681,21 @@ export function SketchWorkspace({
   const selectedSegment = selected?.kind === "segment" ? displayProfile.segments.find((segment) => segment.id === selected.id) ?? null : null;
   const selectedSegmentCurved = selectedSegment ? isSegmentCurved(displayProfile, selectedSegment) : false;
   const selectedImage = selected?.kind === "image" ? displayImages.find((image) => image.id === selected.id) ?? null : null;
+  const selectedImageId = selectedImage?.id ?? null;
+  useEffect(() => {
+    setCropMode(false);
+    setCalibration(null);
+  }, [selectedImageId]);
+  useEffect(() => {
+    if (!cropMode && !calibration) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setCalibration(null);
+      setCropMode(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [calibration, cropMode]);
   const selectedGeometryPoints = selected?.kind === "multiple"
     ? selected.pointIds.map((id) => pointById.get(id)).filter((point): point is SketchPoint => Boolean(point))
     : [];
@@ -1011,6 +987,7 @@ export function SketchWorkspace({
         ...pointerAction,
         current: event.shiftKey && lockOrigin ? constrainToAxis(lockOrigin, point) : point,
         ...(pointerAction.kind === "resize-selection" ? { proportional: event.shiftKey } : {}),
+        ...(pointerAction.kind === "rotate-image" ? { snap: event.shiftKey } : {}),
       } as PointerAction);
     }
   };
@@ -1077,7 +1054,11 @@ export function SketchWorkspace({
         z: action.start.z + action.current.z - action.origin.z,
       }, t("sketch.imageMoved"));
     } else if (action.kind === "resize-image") {
-      onUpdateImage(action.imageId, resizeSketchImage(action.start, action.handle, action.current), t("sketch.imageResized"));
+      onUpdateImage(action.imageId, resizeImage(action.start, action.handle, action.current), t("sketch.imageResized"));
+    } else if (action.kind === "rotate-image") {
+      onUpdateImage(action.imageId, rotateImage(action.start, action.startAngle, action.current, action.snap), t("sketch.imageRotated"));
+    } else if (action.kind === "crop-image") {
+      onUpdateImage(action.imageId, cropImage(action.start, action.handle, action.current), t("sketch.imageCropped"));
     }
     setPointerAction(null);
   };
@@ -1244,22 +1225,18 @@ export function SketchWorkspace({
   const hoverPointRadius = 5 * screenUnit;
   const handleSize = 12 * screenUnit;
   const handleRadius = 2 * screenUnit;
-  const selectedImageBounds = selectedImage ? {
-    minX: selectedImage.x - selectedImage.width / 2,
-    maxX: selectedImage.x + selectedImage.width / 2,
-    minZ: selectedImage.z - selectedImage.depth / 2,
-    maxZ: selectedImage.z + selectedImage.depth / 2,
+  // A turned picture (#216): its frame is the turned rectangle, the box round it only places the labels.
+  const selectedImageCorners = selectedImage ? imageCorners(selectedImage) : null;
+  const selectedImageBounds = selectedImageCorners ? {
+    minX: Math.min(...selectedImageCorners.map((corner) => corner.x)),
+    maxX: Math.max(...selectedImageCorners.map((corner) => corner.x)),
+    minZ: Math.min(...selectedImageCorners.map((corner) => corner.z)),
+    maxZ: Math.max(...selectedImageCorners.map((corner) => corner.z)),
   } : null;
-  const imageResizeHandles: Array<{ id: ResizeHandle; x: number; z: number }> = selectedImage && selectedImageBounds && !selectedImage.locked ? [
-    { id: "nw", x: selectedImageBounds.minX, z: selectedImageBounds.minZ },
-    { id: "n", x: selectedImage.x, z: selectedImageBounds.minZ },
-    { id: "ne", x: selectedImageBounds.maxX, z: selectedImageBounds.minZ },
-    { id: "e", x: selectedImageBounds.maxX, z: selectedImage.z },
-    { id: "se", x: selectedImageBounds.maxX, z: selectedImageBounds.maxZ },
-    { id: "s", x: selectedImage.x, z: selectedImageBounds.maxZ },
-    { id: "sw", x: selectedImageBounds.minX, z: selectedImageBounds.maxZ },
-    { id: "w", x: selectedImageBounds.minX, z: selectedImage.z },
-  ] : [];
+  const imageResizeHandles: Array<{ id: ResizeHandle; x: number; z: number }> = selectedImage && !selectedImage.locked ? imageHandlePositions(selectedImage) : [];
+  const imageRotateHandlePoint = selectedImage && !selectedImage.locked && !cropMode ? imageRotateHandle(selectedImage, 22 * screenUnit) : null;
+  const imageTopMiddle = selectedImage ? imageToWorld(selectedImage, { x: 0, z: -selectedImage.depth / 2 }) : null;
+  const imageCalibration = calibration && selectedImage && calibration.imageId === selectedImage.id ? calibration : null;
   // The frame stands a little off the shape, so a corner handle never sits on the
   // corner point of a rectangle and hides behind it (#168).
   const selectionFrameGap = handleSize;
@@ -1533,20 +1510,39 @@ export function SketchWorkspace({
           ) : null}
           <g className="sketch-reference-images">
             {displayImages.map((image) => (
-              <image
-                key={image.id}
-                data-sketch-entity={image.locked ? undefined : "image"}
-                className={image.locked ? "locked" : undefined}
-                aria-label={image.name}
-                href={image.dataUrl}
+              // Turned about its centre and, when cropped, shown through a window onto the part that is left (#216).
+              <g key={image.id} transform={image.rotation ? `rotate(${-image.rotation} ${image.x} ${image.z})` : undefined}>
+              <svg
                 x={image.x - image.width / 2}
                 y={image.z - image.depth / 2}
                 width={image.width}
                 height={image.depth}
+                viewBox={imageCropViewBox(image).join(" ")}
+                preserveAspectRatio="none"
+                overflow="hidden"
+                pointerEvents="none"
+              >
+              <image
+                data-sketch-entity={image.locked ? undefined : "image"}
+                className={image.locked ? "locked" : undefined}
+                aria-label={image.name}
+                href={image.dataUrl}
+                x={0}
+                y={0}
+                width={Math.max(1, image.pixelWidth)}
+                height={Math.max(1, image.pixelHeight)}
                 opacity={image.opacity ?? 0.55}
                 preserveAspectRatio="none"
                 pointerEvents={tool === "select" ? "auto" : "none"}
                 onPointerDown={(event) => {
+                  // Calibrating (#216): the next two clicks on the picture mark the distance to type.
+                  if (calibration && calibration.imageId === image.id && event.button === 0 && tool === "select") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const mark = unsnappedPointFromEvent(event);
+                    if (mark && calibration.points.length < 2) setCalibration({ ...calibration, points: [...calibration.points, mark] });
+                    return;
+                  }
                   // A locked image is out of the way: a click goes through to the plate
                   // below, so lines and points on it can be picked and a frame can be
                   // dragged. Alt+click still selects it, to unlock it again.
@@ -1572,6 +1568,8 @@ export function SketchWorkspace({
                   });
                 }}
               />
+              </svg>
+              </g>
             ))}
           </g>
           <g className="sketch-reference-shapes" pointerEvents="none">
@@ -1967,12 +1965,9 @@ export function SketchWorkspace({
           </g>
           {selectedImage && selectedImageBounds && tool === "select" ? (
             <g className="sketch-image-selection">
-              <rect
-                className="sketch-image-selection-box"
-                x={selectedImageBounds.minX}
-                y={selectedImageBounds.minZ}
-                width={selectedImage.width}
-                height={selectedImage.depth}
+              <polygon
+                className={`sketch-image-selection-box ${cropMode ? "cropping" : ""}`}
+                points={(selectedImageCorners ?? []).map((corner) => `${corner.x},${corner.z}`).join(" ")}
                 pointerEvents="none"
               />
               <g className="sketch-image-dimension width" display={showMeasurements ? undefined : "none"} pointerEvents="none" transform={`translate(${selectedImage.x} ${selectedImageBounds.minZ - labelOffset})`}>
@@ -2003,12 +1998,14 @@ export function SketchWorkspace({
                 <rect
                   key={handle.id}
                   data-sketch-entity="image-handle"
-                  className={`sketch-image-resize-handle handle-${handle.id}`}
+                  className={`sketch-image-resize-handle handle-${handle.id} ${cropMode ? "crop" : ""}`}
+                  // The handles sit on the turned frame; their cursors stay the plain ones, the picture shows the direction.
+                  transform={selectedImage.rotation ? `rotate(${-selectedImage.rotation} ${handle.x} ${handle.z})` : undefined}
                   x={handle.x - handleSize / 2}
                   y={handle.z - handleSize / 2}
                   width={handleSize}
                   height={handleSize}
-                  rx={handleRadius}
+                  rx={cropMode ? 0 : handleRadius}
                   onPointerDown={(event) => {
                     if (event.button === 1) {
                       beginPan(event);
@@ -2018,7 +2015,7 @@ export function SketchWorkspace({
                     const point = pointFromEvent(event);
                     if (!point) return;
                     beginEntityDrag(event, {
-                      kind: "resize-image",
+                      kind: cropMode ? "crop-image" : "resize-image",
                       pointerId: event.pointerId,
                       imageId: selectedImage.id,
                       handle: handle.id,
@@ -2028,6 +2025,50 @@ export function SketchWorkspace({
                   }}
                 />
               ))}
+              {imageRotateHandlePoint && imageTopMiddle ? (
+                <g className="sketch-image-rotate">
+                  <line x1={imageTopMiddle.x} y1={imageTopMiddle.z} x2={imageRotateHandlePoint.x} y2={imageRotateHandlePoint.z} pointerEvents="none" />
+                  <circle
+                    data-sketch-entity="image-handle"
+                    className="sketch-image-rotate-handle"
+                    cx={imageRotateHandlePoint.x}
+                    cy={imageRotateHandlePoint.z}
+                    r={handleSize / 2}
+                    onPointerDown={(event) => {
+                      if (event.button === 1) {
+                        beginPan(event);
+                        return;
+                      }
+                      if (event.button !== 0) return;
+                      const point = unsnappedPointFromEvent(event);
+                      if (!point) return;
+                      beginEntityDrag(event, {
+                        kind: "rotate-image",
+                        pointerId: event.pointerId,
+                        imageId: selectedImage.id,
+                        startAngle: imageAngleTo(selectedImage, point),
+                        current: point,
+                        start: { ...selectedImage },
+                        snap: event.shiftKey,
+                      });
+                    }}
+                  />
+                </g>
+              ) : null}
+              {imageCalibration ? (
+                <g className="sketch-image-calibration" pointerEvents="none">
+                  {imageCalibration.points.length === 2 ? (
+                    <line x1={imageCalibration.points[0].x} y1={imageCalibration.points[0].z} x2={imageCalibration.points[1].x} y2={imageCalibration.points[1].z} />
+                  ) : null}
+                  {imageCalibration.points.map((mark, index) => (
+                    <g key={index} transform={`translate(${mark.x} ${mark.z})`}>
+                      <circle r={6 * screenUnit} />
+                      <line x1={-9 * screenUnit} x2={9 * screenUnit} y1={0} y2={0} />
+                      <line y1={-9 * screenUnit} y2={9 * screenUnit} x1={0} x2={0} />
+                    </g>
+                  ))}
+                </g>
+              ) : null}
             </g>
           ) : null}
           {hover && ["line", "bezier", "smooth", "measure"].includes(tool) ? <circle className="sketch-cursor-point" cx={hover.x} cy={hover.z} r={hoverPointRadius} pointerEvents="none" /> : null}
@@ -2210,6 +2251,22 @@ export function SketchWorkspace({
         <SketchImageInspector
           image={selectedImage}
           accuracy={workspace.accuracy}
+          revolve={operation === "revolve"}
+          cropMode={cropMode}
+          onCropMode={(on) => { setCropMode(on); if (on) setCalibration(null); }}
+          calibration={imageCalibration}
+          onCalibrate={(step) => {
+            if (step.type === "start") {
+              setCropMode(false);
+              setCalibration({ imageId: selectedImage.id, points: [] });
+            } else if (step.type === "cancel") {
+              setCalibration(null);
+            } else if (imageCalibration?.points.length === 2) {
+              const patch = calibrateImage(selectedImage, imageCalibration.points[0], imageCalibration.points[1], step.length);
+              if (patch) onUpdateImage(selectedImage.id, patch, t("sketch.imageCalibrated"));
+              setCalibration(null);
+            }
+          }}
           onClose={() => onSelectMany([], [], [])}
           onUpdate={(patch, message) => onUpdateImage(selectedImage.id, patch, message)}
           onDelete={() => onDeleteImage(selectedImage.id)}
@@ -2308,20 +2365,40 @@ export function SketchWorkspace({
   );
 }
 
+type ImageCalibrationStep = { type: "start" } | { type: "cancel" } | { type: "apply"; length: number };
+
 function SketchImageInspector({
   image,
   accuracy,
+  revolve,
+  cropMode,
+  onCropMode,
+  calibration,
+  onCalibrate,
   onClose,
   onUpdate,
   onDelete,
 }: {
   image: SketchImage;
   accuracy: 1 | 2 | 3;
+  /** Revolving: x = 0 is the axis, so centring on it is the point. */
+  revolve: boolean;
+  cropMode: boolean;
+  onCropMode: (on: boolean) => void;
+  calibration: { points: Array<{ x: number; z: number }> } | null;
+  onCalibrate: (step: ImageCalibrationStep) => void;
   onClose: () => void;
   onUpdate: (patch: Partial<SketchImage>, message?: string) => void;
   onDelete: () => void;
 }) {
   useLanguage();
+  const measured = calibration?.points.length === 2 ? Math.hypot(calibration.points[1].x - calibration.points[0].x, calibration.points[1].z - calibration.points[0].z) : 0;
+  const [calibrateDraft, setCalibrateDraft] = useState("");
+  useEffect(() => setCalibrateDraft(measured > 0 ? formatDimension(measured, accuracy) : ""), [accuracy, measured]);
+  const applyCalibration = () => {
+    const length = parseMeasurementInput(calibrateDraft);
+    if (Number.isFinite(length) && length > 0) onCalibrate({ type: "apply", length });
+  };
   const aspect = image.width / Math.max(0.5, image.depth);
   const updateWidth = (width: number) => onUpdate({
     width,
@@ -2381,6 +2458,62 @@ function SketchImageInspector({
             {image.lockAspect !== false ? <Link size={17} /> : <Link2Off size={17} />}
             <span>{image.lockAspect !== false ? t("sketch.aspectLocked") : t("sketch.aspectUnlocked")}</span>
           </button>
+        </div>
+      </div>
+      <div className="property-card">
+        <div className="property-card-header static"><span>{t("sketch.imageAlign")}</span></div>
+        <div className="property-list sketch-image-align">
+          <SketchImageRange label={t("sketch.imageRotation")} value={image.rotation ?? 0} min={-180} max={180} accuracy={1} suffix="°" disabled={image.locked} onChange={(rotation) => onUpdate({ rotation: normalizeImageRotation(rotation) }, t("sketch.imageRotated"))} />
+          <div className="sketch-image-action-row">
+            <button className="sketch-image-aspect-toggle" type="button" disabled={image.locked} title={revolve ? t("sketch.centreImageAxisHint") : undefined} onClick={() => onUpdate(centreImage("x"), t("sketch.imageCentred"))}>
+              <AlignCenterVertical size={17} />
+              <span>{t("sketch.centreImageX")}</span>
+            </button>
+            <button className="sketch-image-aspect-toggle" type="button" disabled={image.locked} onClick={() => onUpdate(centreImage("z"), t("sketch.imageCentred"))}>
+              <AlignCenterHorizontal size={17} />
+              <span>{t("sketch.centreImageY")}</span>
+            </button>
+          </div>
+          {revolve ? <p className="sketch-image-hint">{t("sketch.centreImageAxisHint")}</p> : null}
+          <button className={`sketch-image-aspect-toggle ${calibration ? "active" : ""}`} type="button" disabled={image.locked} onClick={() => onCalibrate({ type: calibration ? "cancel" : "start" })}>
+            <Ruler size={17} />
+            <span>{calibration ? t("sketch.calibrateCancel") : t("sketch.calibrateImage")}</span>
+          </button>
+          {calibration && calibration.points.length < 2 ? (
+            <p className="sketch-image-hint">{t(calibration.points.length === 0 ? "sketch.calibrateFirst" : "sketch.calibrateSecond")}</p>
+          ) : null}
+          {calibration && calibration.points.length === 2 ? (
+            <label className="sketch-image-position-field sketch-image-calibrate-field">
+              <span>{t("sketch.calibrateLength")}</span>
+              <div className="sketch-image-range-row">
+                <input
+                  className="sketch-image-number-input"
+                  type="text"
+                  inputMode="decimal"
+                  autoFocus
+                  value={calibrateDraft}
+                  onFocus={(event) => selectWholeValue(event.currentTarget)}
+                  onChange={(event) => setCalibrateDraft(event.currentTarget.value)}
+                  onKeyDown={(event) => { if (event.key === "Enter") applyCalibration(); if (event.key === "Escape") onCalibrate({ type: "cancel" }); }}
+                />
+                <span>mm</span>
+              </div>
+              <button className="sketch-image-aspect-toggle active" type="button" onClick={applyCalibration}>
+                <Check size={17} />
+                <span>{t("sketch.calibrateApply")}</span>
+              </button>
+            </label>
+          ) : null}
+          <button className={`sketch-image-aspect-toggle ${cropMode ? "active" : ""}`} type="button" disabled={image.locked} onClick={() => onCropMode(!cropMode)}>
+            <Crop size={17} />
+            <span>{cropMode ? t("sketch.cropImageDone") : t("sketch.cropImage")}</span>
+          </button>
+          {cropMode ? <p className="sketch-image-hint">{t("sketch.cropImageHint")}</p> : null}
+          {image.crop ? (
+            <button className="sketch-image-aspect-toggle" type="button" disabled={image.locked} onClick={() => onUpdate(uncropImage(image), t("sketch.imageUncropped"))}>
+              <span>{t("sketch.uncropImage")}</span>
+            </button>
+          ) : null}
         </div>
       </div>
     </aside>

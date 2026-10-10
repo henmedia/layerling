@@ -2453,6 +2453,49 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   stroke: #9d4d00;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-selection-box.cropping {
+  stroke: #2f7f9e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-resize-handle.crop {
+  fill: #e7f4f9;
+  stroke: #2f7f9e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-resize-handle.crop:hover {
+  fill: #9fd3e8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-rotate line {
+  stroke: #da7409;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-rotate-handle {
+  fill: #ffffff;
+  stroke: #a3590b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-rotate-handle:hover {
+  fill: #ffb24b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-calibration circle {
+  fill: rgba(255, 255, 255, 0.85);
+  stroke: #2f7f9e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-calibration line {
+  stroke: #2f7f9e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-hint {
+  color: #6c6c6c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-image-hint {
+  color: #919191;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-image-dimension rect {
   fill: rgba(255, 255, 255, 0.97);
   stroke: rgba(103, 103, 103, 0.9);

@@ -93,6 +93,15 @@ Fillets and chamfers on the edges go when the body is built again, as when the s
 
 With {{ui:sketch.addImage}} you put a photo or a drawing under the sketch and trace it. You can set its size, opacity and position. Once the picture sits right, lock it with [[L]] so you do not move it by accident while drawing. A locked image is out of the way: clicks go through it, so you can pick lines and points on top of it and drag a frame over them. To select it again, for example to unlock it, [[Alt]]+click it. If its settings at the right edge cover the picture, drag them away by their title bar; a double-click on it docks them again.
 
+Under {{ui:sketch.imageAlign}} you line up a photo that was not taken straight:
+
+- **{{ui:sketch.imageRotation}}:** Turn the picture about its centre, with the round handle above its frame or as a number in degrees. With [[Shift]] the handle snaps in 15° steps.
+- **{{ui:sketch.centreImageX}}** and **{{ui:sketch.centreImageY}}:** put the picture's centre on X = 0 or Y = 0. For a revolve, X = 0 is the axis, so the picture then lies symmetric about it.
+- **{{ui:sketch.calibrateImage}}:** Click two points in the picture whose distance you know, the ends of a ruler or a known diameter, and type the real distance. The picture is scaled evenly so that distance is right; the first point stays where it was.
+- **{{ui:sketch.cropImage}}:** The handles on the frame now crop the picture instead of scaling it; what is cut away stays stored and comes back with {{ui:sketch.uncropImage}} or when a handle is pulled out again.
+
+All four touch the reference only, never the sketch.
+
 ## Keys in sketch mode
 
 | Key | Effect |
