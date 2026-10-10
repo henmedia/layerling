@@ -70,6 +70,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_hollow_object` | höhlt einen Körper mit gleichmäßiger Wand aus |
 | `layerling_array_objects` | vervielfältigt in einer Reihe oder auf einem Kreis |
 | `layerling_bundle_objects` | bündelt Objekte wie Strg+B: sie bewegen sich zusammen, behalten Farbe und Art und gehen einzeln in den Export |
+| `layerling_layer_text` | macht aus einem Text einen Stapel aus Schichten für den Mehrfarbdruck (Buchstaben, breitere Ränder, Platte ohne Löcher) oder baut einen Stapel neu; mit einer Namensliste ein Schild je Name |
 | `layerling_measure_section` | misst auf einer Schnittebene zwischen zwei Punkten, die am Umriss einrasten – Wandstärken, Spalte, Passungen |
 | `layerling_show_overhangs` | schaltet die Überhang-Schraffur ein oder aus, setzt den Winkel und nennt je Körper die Fläche, die Stützen bräuchte |
 | `layerling_estimate_print` | schätzt Volumen, Gewicht und Filament für die Auswahl oder den ganzen Entwurf, massiv gerechnet wie im Exportfenster |
