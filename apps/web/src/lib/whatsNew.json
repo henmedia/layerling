@@ -1,5 +1,50 @@
 [
   {
+    "version": "1.61.1",
+    "items": [
+      {
+        "title": {
+          "de": "Ein Entwurf öffnet sich in der Ansicht, in der du ihn verlassen hast",
+          "en": "A design opens in the view you left it in"
+        },
+        "body": {
+          "de": "Blickwinkel, Zoom und Ausschnitt bleiben mit dem Entwurf erhalten, auch nach Home oder dem Schließen der Seite. Eine gespeicherte Datei nimmt die Ansicht mit.",
+          "en": "The angle, zoom and position of the view stay with the design, also after Home or closing the page. A saved file carries the view along."
+        }
+      },
+      {
+        "title": {
+          "de": "npm install ohne Sicherheitswarnungen",
+          "en": "npm install without security warnings"
+        },
+        "body": {
+          "de": "Wer layerling selbst aus dem Quelltext baut, bekommt bei npm install keine Meldung über Schwachstellen mehr; Next.js bleibt bei Version 15.",
+          "en": "If you build layerling from the source yourself, npm install no longer reports vulnerabilities; Next.js stays on version 15."
+        }
+      },
+      {
+        "title": {
+          "de": "Verschobene Fenster öffnen sich wieder dort, wo du sie abgelegt hast",
+          "en": "Moved windows open where you dropped them"
+        },
+        "body": {
+          "de": "Einstellungen, Anleitung und Tastenkürzel öffneten sich nach dem Verschieben nach links und oben versetzt, teils aus dem Bild. Jetzt stehen sie genau an der gemerkten Stelle.",
+          "en": "Settings, guide and shortcuts opened shifted to the left and up after being moved, partly out of view. They now stand exactly where they were dropped."
+        }
+      },
+      {
+        "title": {
+          "de": "STL-Dateien lassen sich auf dem iPad auswählen",
+          "en": "STL files can be picked on an iPad"
+        },
+        "body": {
+          "de": "Auf iPad und iPhone waren STL-, 3MF-, STEP- und .lyl-Dateien in der Dateiauswahl ausgegraut. Dort zeigt die Auswahl jetzt alle Dateien.",
+          "en": "On iPad and iPhone, STL, 3MF, STEP and .lyl files were greyed out in the file picker. There it now shows all files."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.61.0",
     "items": [
       {

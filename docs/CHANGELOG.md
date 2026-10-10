@@ -4,7 +4,7 @@ layerling started over at 1.0.0 when it was forked from SketchForge-3D 1.0.9.
 Everything from 1.0.9 downwards is SketchForge's history, kept here because the
 code still carries it - so a lower number further down is older, not newer.
 
-## Unreleased
+## 1.61.1
 
 - **STL files can be picked on an iPad:** In the file picker of an iPad or iPhone the STL, 3MF, STEP and `.lyl` files were greyed out and could not be selected, while ZIP files worked: iOS greys out every ending it does not know as a type, and the picker asked for exactly those. On these devices the pickers now show all files, and layerling checks what it is given, as it always did; elsewhere the list narrows the picker as before. Not tried on an iPad yet. Reported by @andrej-cds in #219.
 - **The start page's import tile shows the editor's import picture:** "Open a design or import geometry" had a different symbol (a sheet with an arrow) than the import button in the editor (a cube with an arrow pointing at it). Both show the editor's picture now.
