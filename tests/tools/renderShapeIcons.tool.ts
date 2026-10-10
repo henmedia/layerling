@@ -21,6 +21,14 @@ import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createThreadGeometry } from "@/lib/threadGeometry";
 import { bentTubeNaturalDimensions, createBentTubeGeometry } from "@/lib/bentTubeGeometry";
 import { createGearGeometry } from "@/lib/gearGeometry";
+import manifoldModule from "manifold-3d";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
+import { textLetterSizePatch } from "@/lib/nameTag";
+import { textDisplayGeometry } from "@/lib/textFill";
+import { loadTextFonts } from "@/lib/textFonts";
+import { DEFAULT_TEXT_LAYERS, textLayerShapes } from "@/lib/textLayers";
+import type { WorkplaneShape } from "@/types/layerling";
 
 /*
  * Zeichnet die Symbole fuer die Formenliste aus genau der Geometrie, die der
@@ -516,5 +524,34 @@ describe("palette icons", () => {
         build: () => createBentTubeGeometry({ ...fields, ...natural }),
       });
     }
+  });
+});
+
+describe("palette icon of the name tag (#215)", () => {
+  it("renders the default layers of a short word", async () => {
+    const runtime = await manifoldModule();
+    runtime.setup();
+    rememberManifoldRuntime(runtime);
+    await loadTextFonts();
+    const words: WorkplaneShape = { id: "icon", name: "Text", kind: "text", color: "#ffffff", x: 0, z: 0, elevation: 0, rotation: 0, width: 40, depth: 20, height: 1, size: 40, text: "Ab", font: "Sans" };
+    const layers = textLayerShapes({ ...words, ...textLetterSizePatch(words, 12) }, DEFAULT_TEXT_LAYERS);
+    const pieces = layers.map((layer) => {
+      const piece = textDisplayGeometry(layer);
+      const flat = piece.index ? piece.toNonIndexed() : piece;
+      Object.keys(flat.attributes).filter((name) => name !== "position").forEach((name) => flat.deleteAttribute(name));
+      flat.translate(0, layer.elevation ?? 0, 0);
+      return flat;
+    });
+    const stack = mergeGeometries(pieces, false);
+    stack.computeVertexNormals();
+    const height = Math.max(...layers.map((layer) => (layer.elevation ?? 0) + layer.height));
+    render({
+      name: "apps/web/public/assets/editor/shape-icons-gray/nameTag.png",
+      height,
+      lay: false,
+      azimuth: 30,
+      elevation: 42,
+      build: () => stack,
+    });
   });
 });

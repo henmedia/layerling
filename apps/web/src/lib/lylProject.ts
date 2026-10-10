@@ -6,7 +6,8 @@ import { normalizePlacementWorkplane, placementWorkplaneIsBase, type PlacementWo
 import { importedShapeFromObj } from "@/lib/objImport";
 import { normalizeProjectAsset, sha256Hex } from "@/lib/projectAssets";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
-import { normalizeSketchStroke } from "@/lib/sketchStroke";
+import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
+import { isTextKeyring } from "@/lib/textGeometry";
 import { normalizeNotes } from "@/lib/workplaneNotes";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
@@ -1249,6 +1250,16 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (definition.layeredText !== undefined && typeof definition.layeredText !== "boolean") {
     throw new Error(`${label}.layeredText must be true or false`);
+  }
+  // The corners of a text's line (#215): a layer of a name tag can be bevelled or sharp now, so an
+  // unknown corner is refused rather than read as sharp.
+  const textJoin = (definition.textStroke as { join?: unknown } | undefined)?.join;
+  if (textJoin !== undefined && !SKETCH_STROKE_JOINS.includes(textJoin as never)) {
+    throw new Error(`${label}.textStroke.join must be miter, round or bevel`);
+  }
+  // A name tag's key ring hole (#215): a known side, a diameter within range, how far beyond the letters it sits.
+  if (definition.textKeyring !== undefined && !isTextKeyring(definition.textKeyring)) {
+    throw new Error(`${label}.textKeyring must be a side (left, right or top), a diameter of 1 to 20 mm and an offset`);
   }
   if (definition.parametricSource !== undefined) {
     // Was der Koerper vor dem Drehen war. Fehlt oder stimmt hier etwas nicht,

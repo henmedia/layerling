@@ -22,6 +22,7 @@ import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlay
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
 import { SelectionInspector, ShapeInspector, SnapGridControl, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
+import type { NameTagStack } from "@/lib/nameTag";
 import { WorkspaceSettingsModal } from "@/components/workplane/WorkspaceSettingsModal";
 import { appThemePalette, type AppThemePalette, type AppThemePreference, type ResolvedAppTheme } from "@/lib/appTheme";
 import { cadModifierPrimitiveForBakedShape, cadTransformFromMatrix, cadTransformToMatrix } from "@/lib/cadBakeMetadata";
@@ -353,6 +354,10 @@ type WorkplaneViewportProps = {
   onWrapAroundCylinder?: (diameter: number, inward: boolean) => void;
   onLayerText?: (patch: TextLayerPatch) => void;
   onTextTags?: (names: string[], gap: number) => void;
+  /** The selected name tag as its card shows it (#215). */
+  textLayerStack?: NameTagStack | null;
+  /** Turns a shape fresh from the library into what it places - a name tag's layers (#215) - for the ghost that follows the pointer too. */
+  prepareNewShape?: (asset: ShapeAsset, shape: WorkplaneShape) => WorkplaneShape;
   onUpdateShape: (id: string, patch: ShapeUpdatePatch) => void;
   onDuplicateShapeAt?: (id: string, position: { x: number; z: number }) => void;
   /** A drag begun with Alt held: copies of these shapes land this far from them, the shapes themselves stay. */
@@ -1297,8 +1302,9 @@ function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     fontRevision: customFontRevision(shape.font),
     textStroke: shape.textStroke,
     textSilhouette: shape.textSilhouette,
+    textKeyring: shape.textKeyring,
     // A fill is built by the 2D kernel; until it has loaded the text is drawn plain (#215).
-    fillKernel: shape.textStroke || shape.textSilhouette ? manifoldRevision() : undefined,
+    fillKernel: shape.textStroke || shape.textSilhouette || shape.textKeyring ? manifoldRevision() : undefined,
     textCurved: shape.textCurved,
     textRadius: shape.textRadius,
     textSize: shape.textSize,
@@ -1535,8 +1541,9 @@ function shapeGeometrySignature(shape: WorkplaneShape): string {
     fontRevision: customFontRevision(shape.font),
     textStroke: shape.textStroke,
     textSilhouette: shape.textSilhouette,
+    textKeyring: shape.textKeyring,
     // A fill is built by the 2D kernel; until it has loaded the text is drawn plain (#215).
-    fillKernel: shape.textStroke || shape.textSilhouette ? manifoldRevision() : undefined,
+    fillKernel: shape.textStroke || shape.textSilhouette || shape.textKeyring ? manifoldRevision() : undefined,
     textCurved: shape.textCurved,
     textRadius: shape.textRadius,
     textSize: shape.textSize,
@@ -4377,6 +4384,8 @@ export function WorkplaneViewport({
   onWrapAroundCylinder,
   onLayerText,
   onTextTags,
+  textLayerStack,
+  prepareNewShape,
   onUpdateShape,
   onDuplicateShapeAt,
   onDuplicateShapesMoved,
@@ -4614,6 +4623,8 @@ export function WorkplaneViewport({
   const [hoverModifierEdgeId, setHoverModifierEdgeId] = useState<number | null>(null);
   const selectedIdsKeyRef = useRef(selectedIds.join("|"));
   const placementWorkplaneRef = useRef(placementWorkplane);
+  const prepareNewShapeRef = useRef(prepareNewShape);
+  prepareNewShapeRef.current = prepareNewShape;
   const cruiseAssetRef = useRef<ShapeAsset | null>(cruiseAsset);
   const carryIdsRef = useRef<string[] | null>(carryIds);
   carryIdsRef.current = carryIds;
@@ -5983,10 +5994,11 @@ export function WorkplaneViewport({
     const customization = workspaceRef.current.shapeCustomizations[cruiseAsset.kind];
     const base = makeShapeFromAsset(cruiseAsset, undefined, customization);
     const workplane = placementWorkplaneRef.current;
-    const shape = {
+    const placed = {
       ...base,
       ...placementPatchForNewShape(base, workplane, workplane.origin),
     };
+    const shape = prepareNewShapeRef.current ? prepareNewShapeRef.current(cruiseAsset, placed) : placed;
     const object = createShapeObject(shape, false, () => {
       if (threeRef.current) threeRef.current.needsRender = true;
     }, false);
@@ -9915,6 +9927,7 @@ export function WorkplaneViewport({
           onWrapAroundCylinder={onWrapAroundCylinder}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
+          textLayerStack={textLayerStack}
           onInteractionActiveChange={onInteractionActiveChange}
           onSnapGridAwayChange={setInspectorSnapGridAway}
         />

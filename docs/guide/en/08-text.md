@@ -8,6 +8,7 @@ summary: Raised or engraved lettering in seven typefaces or one of your own, and
 Choose {{ui:shape.text}} in the shape library and place it. In the {{ui:prop.text}} field on the right, type what it should say. The settings below:
 
 - **{{ui:prop.font}}:** Seven typefaces are available: Multilanguage, Sans, Serif, Script, Monospace, Rounded and Stencil (letters made of straight lines). New text starts in Sans. Accented letters such as ä, ö, ü, é and the € sign are in every typeface. Fonts of your own come on top, see [Your own fonts](#your-own-fonts) below.
+- **{{ui:nameTag.letterSize}}:** How big the letters are, seen from above; {{ui:prop.height}} sets how thick they are.
 - **{{ui:prop.height}}:** How far the lettering stands out from the surface.
 - **{{ui:prop.bevel}}:** Rounds the letter edges so they look softer. With {{ui:prop.segments}} you decide in how many steps.
 - **Size:** You set the length and width of the line as with any shape. Drag the handles or type the dimensions.
@@ -67,17 +68,36 @@ For lettering on a side face, first put the workplane on that face, see [View an
 
 ## Outline, silhouette and wider
 
-A text need not be built as filled letters. Under {{ui:prop.sketchFill}} in the properties you choose, as for sketches and SVG, {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} or {{ui:prop.sketchFill.center}}, with {{ui:prop.sketchLineWidth}} and {{ui:sketch.strokeJoin}}: only a line of that width is built round the letters, outside, inside or centred on their outline. {{ui:prop.sketchFill.grow}} keeps the letters filled and makes them thicker by the line width all round; letters that touch grow into one piece. {{ui:prop.sketchSilhouette}} leaves out the holes in O, A or e.
+A text need not be built as filled letters. {{ui:prop.textFill}} in the properties offers the same choice as Tinkercad:
 
-The box of the text grows with a stroke outside, centred or with "Wider", while the letters keep their size. That makes a name tag for a multicolour print from three copies of one text, all in the same place: the letters themselves, the same text 1.5 mm wider in the second colour, and once more 3 mm wider with the silhouette as the base plate in the third. Each layer is a body of its own with its own colour and height; chamfers and fillets on the edges work on every one. {{ui:prop.bevel}} and {{ui:prop.segments}} exist for filled letters only.
+- **{{ui:prop.textFill.filled}}:** the letters as they are.
+- **{{ui:prop.textFill.outline}}:** a line along the outline of the letters, half inside and half outside it.
+- **{{ui:prop.textFill.outer}}:** a line round the outside of the letters.
+- **{{ui:prop.textFill.inner}}:** a line on the inside of the letters.
+
+With a line chosen, two settings appear right under the list: {{ui:prop.sketchLineWidth}} sets how thick the line is, {{ui:sketch.strokeJoin}} how it goes round the corners ({{ui:sketch.strokeJoin.round}}, {{ui:sketch.strokeJoin.bevel}} or {{ui:sketch.strokeJoin.miter}}). The rarer settings are under {{ui:inspector.more}}: {{ui:prop.sketchSilhouette}} leaves out the holes in O, A or e, and {{ui:prop.textWider}} keeps the letters filled and makes them thicker by the line width all round; letters that touch grow into one piece.
+
+With a line outside, a centred line or "Wider" the box of the text grows, while the letters keep their size. {{ui:prop.bevel}} and {{ui:prop.segments}} exist for filled letters only.
 
 ## Layers and name tags
 
-layerling also builds the three copies of the previous section in one step. The properties of a text hold the card {{ui:textLayers.title}}; {{ui:textLayers.split}} turns it into a stack: the white letters on top, under them the same text 1.5 mm wider in red, at the bottom 3 mm wider as a dark plate without holes. The stack is a bundle, so it moves as one, and every layer stays a text of its own with its own colour and height, the way a slicer needs them for a multicolour print.
+A name tag for a multicolour print is a text in layers: the letters on top, under them the same text a little wider in a second colour, at the bottom a plate without holes in a third. layerling makes it in one click:
 
-With the stack selected, the same card shows text, font and the layers: {{ui:textLayers.count}} (up to six), and for each layer {{ui:textLayers.grow}}, {{ui:textLayers.height}}, {{ui:textLayers.color}} and {{ui:textLayers.silhouette}}. Every change builds the stack again at once, and new words run through all layers. {{ui:group.editBundle}} gets you to the single layers, say to fillet their edges; the stack becomes a plain bundle without the layers card as soon as one layer is no longer a text.
+- **A new name tag:** choose {{ui:shape.nameTag}} in the shape library and place it. It says "Name" in white letters on a red rim and a dark plate.
+- **From a text:** select the text and click {{ui:nameTag.makeLayers}} at the top of its settings.
 
-Under {{ui:textLayers.names}} you type a list, one name per line, up to a hundred. "Make tags" makes a tag per name from the selected text or stack, all the same size, in rows below with the chosen {{ui:textLayers.gap}}; the first takes the original's place. Each tag is an object of its own afterwards.
+All settings of the tag are in the card {{ui:nameTag.title}}, at the top of the settings:
+
+- **{{ui:prop.text}}** and **{{ui:prop.font}}**, fonts of your own too. The tag grows with the words.
+- **{{ui:nameTag.letterSize}}:** how tall the capital letters are, in mm. All layers follow and stay lined up.
+- **{{ui:nameTag.layers}}:** one row per layer, from the top down. Each row has the colour (click the coloured square), how much wider the layer is than the letters, its height and {{ui:nameTag.noHoles}}, which fills the holes in letters such as O and A. {{ui:nameTag.corners}} sets how a wider layer goes round the corners of the letters: {{ui:nameTag.corner.round}}, {{ui:nameTag.corner.bevel}} or {{ui:nameTag.corner.miter}}. The top row is the letters themselves. **+** adds a layer at the bottom, **–** takes the bottom layer away. A tag has two to six layers.
+- **{{ui:nameTag.keyring}}:** gives the bottom layer a straight tab with a round end and a hole for a key ring; the tab grows with the hole, and the hole's edge stays 2.5 mm from the edge of the bottom layer. Choose the {{ui:nameTag.keyringDiameter}} and the {{ui:nameTag.keyringSide}}: {{ui:nameTag.side.left}}, {{ui:nameTag.side.right}} or {{ui:nameTag.side.top}}. The hole goes through every layer it touches, and the tab moves along when you change the words, the letter size or the font.
+
+Every change shows at once. The tag is a bundle: it moves as one, and each layer stays a body of its own in its own colour, the way a slicer needs them for a multicolour print. To round or bevel the edges of one layer, click {{ui:group.editBundle}} and pick the layer, see [Breaking edges and hollowing bodies](chapter:edges-and-hollowing).
+
+### Many name tags at once
+
+Type the names into {{ui:textLayers.names}}, one per line, up to a hundred. The button below says how many tags it will make, for example "Make 12 name tags". Every tag gets the same layers, letter size and key ring hole and is an object of its own; they are laid out in rows below the first, 5 mm apart. A plain text has the name list too, further down in its settings.
 
 ## Text on a circular arc
 
@@ -88,7 +108,7 @@ Should the lettering not run straight but follow the edge of a coin, a lid or a 
 Once you switch it on, the text runs along the circle. All letters stand on the same baseline, as evenly as with normal text. There are four settings:
 
 - **{{ui:prop.textRadius}}** (5 to 500 mm): The radius of the circle the letters' baseline runs on.
-- **{{ui:prop.textSize}}:** How tall the letters are. It no longer depends on the width of the shape.
+- **{{ui:nameTag.letterSize}}:** How tall the letters are. It no longer depends on the width of the shape.
 - **{{ui:prop.textInward}}:** Moves the text from the top of the circle to its bottom. The letters then point with their heads to the centre.
 - **{{ui:prop.textFlipped}}:** Turns only the letters over so you can read them from the other side. The text stays in its place on the circle.
 

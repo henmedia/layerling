@@ -8,6 +8,7 @@ summary: Beschriftungen erhaben oder vertieft, mit sieben Schriftarten oder eine
 Wähle in der Formenbibliothek {{ui:shape.text}} und setze ihn ab. Im Feld {{ui:prop.text}} rechts tippst du, was da stehen soll. Die Einstellungen darunter:
 
 - **{{ui:prop.font}}:** Sieben Schriftarten stehen bereit: Multilanguage, Sans, Serif, Script, Monospace, Rounded und Stencil (Buchstaben aus geraden Linien). Neuer Text beginnt in Sans. Umlaute, ß und € gibt es in jeder Schrift. Eigene Schriften kommen dazu, siehe [Eigene Schriften](#eigene-schriften) weiter unten.
+- **{{ui:nameTag.letterSize}}:** Wie groß die Buchstaben sind, von oben gesehen; {{ui:prop.height}} bestimmt, wie dick sie sind.
 - **{{ui:prop.height}}:** Wie hoch die Schrift aus der Fläche ragt.
 - **{{ui:prop.bevel}}:** Rundet die Buchstabenkanten ab, damit sie weicher wirken. Mit {{ui:prop.segments}} bestimmst du, in wie vielen Stufen.
 - **Größe:** Länge und Breite der Zeile stellst du wie bei jeder Form ein. Zieh an den Griffen oder tippe die Maße ein.
@@ -67,17 +68,36 @@ Für Beschriftungen auf einer Seitenfläche legst du vorher die Arbeitsebene auf
 
 ## Kontur, Silhouette und breiter
 
-Ein Text muss nicht als gefüllte Buchstaben gebaut werden. Unter {{ui:prop.sketchFill}} in den Eigenschaften wählst du wie bei Skizzen und SVG {{ui:prop.sketchFill.outside}}, {{ui:prop.sketchFill.inside}} oder {{ui:prop.sketchFill.center}}, dazu {{ui:prop.sketchLineWidth}} und {{ui:sketch.strokeJoin}}: Dann wird nur eine Linie dieser Breite um die Buchstaben gebaut, außen, innen oder mittig auf ihrem Umriss. {{ui:prop.sketchFill.grow}} lässt die Buchstaben gefüllt und macht sie rundum um die Linienbreite dicker; Buchstaben, die sich dabei berühren, wachsen zu einem Stück zusammen. {{ui:prop.sketchSilhouette}} lässt die Löcher in O, A oder e weg.
+Ein Text muss nicht als gefüllte Buchstaben gebaut werden. {{ui:prop.textFill}} in den Eigenschaften bietet dieselbe Auswahl wie Tinkercad:
 
-Der Kasten des Texts wächst mit einer Kontur außen, mittig oder mit „Breiter“ mit, die Buchstaben behalten dabei ihre Größe. So entsteht ein Namensschild für den Mehrfarbdruck aus drei Kopien eines Texts, alle an derselben Stelle: die Buchstaben selbst, derselbe Text 1,5 mm breiter in der zweiten Farbe und noch einmal 3 mm breiter mit Silhouette als Grundplatte in der dritten. Jede Schicht ist ein eigener Körper mit eigener Farbe und Höhe; Fasen und Verrundungen an den Kanten gehen auf jeder. {{ui:prop.bevel}} und {{ui:prop.segments}} gibt es nur für gefüllte Buchstaben.
+- **{{ui:prop.textFill.filled}}:** die Buchstaben, wie sie sind.
+- **{{ui:prop.textFill.outline}}:** eine Linie entlang des Umrisses der Buchstaben, halb innen und halb außen.
+- **{{ui:prop.textFill.outer}}:** eine Linie außen um die Buchstaben.
+- **{{ui:prop.textFill.inner}}:** eine Linie innen in den Buchstaben.
+
+Ist eine Linie gewählt, erscheinen direkt unter der Liste zwei Einstellungen: {{ui:prop.sketchLineWidth}} bestimmt, wie dick die Linie ist, {{ui:sketch.strokeJoin}}, wie sie um die Ecken läuft ({{ui:sketch.strokeJoin.round}}, {{ui:sketch.strokeJoin.bevel}} oder {{ui:sketch.strokeJoin.miter}}). Die selteneren Einstellungen stehen unter {{ui:inspector.more}}: {{ui:prop.sketchSilhouette}} lässt die Löcher in O, A oder e weg, und {{ui:prop.textWider}} lässt die Buchstaben gefüllt und macht sie rundum um die Linienbreite dicker; Buchstaben, die sich dabei berühren, wachsen zu einem Stück zusammen.
+
+Mit einer Linie außen, einer mittigen Linie oder „Breiter“ wächst der Kasten des Texts mit, die Buchstaben behalten ihre Größe. {{ui:prop.bevel}} und {{ui:prop.segments}} gibt es nur für gefüllte Buchstaben.
 
 ## Schichten und Namensschilder
 
-Die drei Kopien aus dem vorigen Abschnitt baut layerling auch in einem Schritt. In den Eigenschaften eines Texts steht die Karte {{ui:textLayers.title}}; {{ui:textLayers.split}} macht daraus einen Stapel: oben die weißen Buchstaben, darunter derselbe Text 1,5 mm breiter in Rot, zuunterst 3 mm breiter als dunkle Platte ohne Löcher. Der Stapel ist ein Bündel, bewegt sich also als Ganzes, und jede Schicht bleibt ein eigener Text mit eigener Farbe und Höhe, so wie der Slicer sie für den Mehrfarbdruck braucht.
+Ein Namensschild für den Mehrfarbdruck ist ein Text in Schichten: oben die Buchstaben, darunter derselbe Text etwas breiter in einer zweiten Farbe, zuunterst eine Platte ohne Löcher in einer dritten. layerling macht es mit einem Klick:
 
-Ist der Stapel ausgewählt, zeigt dieselbe Karte Text, Schriftart und die Schichten: {{ui:textLayers.count}} (bis zu sechs), und je Schicht {{ui:textLayers.grow}}, {{ui:textLayers.height}}, {{ui:textLayers.color}} und {{ui:textLayers.silhouette}}. Jede Änderung baut den Stapel sofort neu, auch ein neuer Text läuft durch alle Schichten. Mit {{ui:group.editBundle}} kommst du an die einzelnen Schichten, etwa um Kanten zu verrunden; ein Bündel ohne Schichten-Karte wird es, sobald eine Schicht kein Text mehr ist.
+- **Ein neues Namensschild:** Wähle in der Formenbibliothek {{ui:shape.nameTag}} und setze es ab. Darauf steht „Name“ in weißen Buchstaben auf einem roten Rand und einer dunklen Platte.
+- **Aus einem Text:** Wähle den Text aus und klicke oben in seinen Einstellungen auf {{ui:nameTag.makeLayers}}.
 
-Unter {{ui:textLayers.names}} tippst du eine Liste, ein Name je Zeile, bis zu hundert. „Schilder erzeugen“ macht aus dem ausgewählten Text oder Stapel ein Schild je Name, alle gleich groß, in Reihen mit dem gewählten {{ui:textLayers.gap}} darunter; das erste nimmt den Platz des Originals ein. Jedes Schild ist danach ein eigenes Objekt.
+Alle Einstellungen des Schilds stehen in der Karte {{ui:nameTag.title}}, ganz oben in den Einstellungen:
+
+- **{{ui:prop.text}}** und **{{ui:prop.font}}**, auch eigene Schriften. Das Schild wächst mit den Wörtern.
+- **{{ui:nameTag.letterSize}}:** wie hoch die Großbuchstaben sind, in mm. Alle Schichten gehen mit und bleiben deckungsgleich.
+- **{{ui:nameTag.layers}}:** eine Zeile je Schicht, von oben nach unten. Jede Zeile hat die Farbe (klicke auf das farbige Feld), um wie viel die Schicht breiter ist als die Buchstaben, ihre Höhe und {{ui:nameTag.noHoles}}, das die Löcher in Buchstaben wie O und A füllt. {{ui:nameTag.corners}} bestimmt, wie eine breitere Schicht um die Ecken der Buchstaben läuft: {{ui:nameTag.corner.round}}, {{ui:nameTag.corner.bevel}} oder {{ui:nameTag.corner.miter}}. Die oberste Zeile sind die Buchstaben selbst. **+** fügt unten eine Schicht an, **–** nimmt die unterste weg. Ein Schild hat zwei bis sechs Schichten.
+- **{{ui:nameTag.keyring}}:** gibt der untersten Schicht eine gerade Lasche mit rundem Ende und einem Loch für einen Schlüsselring; die Lasche wächst mit dem Loch, und der Rand des Lochs bleibt 2,5 mm vom Rand der untersten Schicht entfernt. Wähle den {{ui:nameTag.keyringDiameter}} und die {{ui:nameTag.keyringSide}}: {{ui:nameTag.side.left}}, {{ui:nameTag.side.right}} oder {{ui:nameTag.side.top}}. Das Loch geht durch jede Schicht, die es berührt, und die Lasche wandert mit, wenn du die Wörter, die Buchstabengröße oder die Schrift änderst.
+
+Jede Änderung siehst du sofort. Das Schild ist ein Bündel: Es bewegt sich als Ganzes, und jede Schicht bleibt ein eigener Körper in eigener Farbe, so wie der Slicer sie für den Mehrfarbdruck braucht. Um die Kanten einer Schicht abzurunden oder abzuschrägen, klicke auf {{ui:group.editBundle}} und wähle die Schicht, siehe [Kanten brechen und Körper aushöhlen](chapter:kanten-und-aushoehlen).
+
+### Viele Namensschilder auf einmal
+
+Tippe die Namen in die {{ui:textLayers.names}}, einen je Zeile, bis zu hundert. Der Knopf darunter sagt, wie viele Schilder er macht, etwa „12 Namensschilder machen“. Jedes Schild bekommt dieselben Schichten, dieselbe Buchstabengröße und dasselbe Loch und ist ein eigenes Objekt; sie liegen in Reihen unter dem ersten, 5 mm auseinander. Auch ein einfacher Text hat die Namensliste, weiter unten in seinen Einstellungen.
 
 ## Text auf dem Kreisbogen
 
@@ -88,7 +108,7 @@ Soll die Beschriftung nicht gerade laufen, sondern dem Rand einer Münze, eines 
 Sobald du sie einschaltest, läuft der Text am Kreis entlang. Alle Buchstaben stehen auf derselben Grundlinie, so gleichmäßig wie bei normalem Text. Dazu gibt es vier Einstellungen:
 
 - **{{ui:prop.textRadius}}** (5 bis 500 mm): Der Radius des Kreises, auf dem die Grundlinie der Buchstaben läuft.
-- **{{ui:prop.textSize}}:** Wie hoch die Buchstaben sind. Sie hängt nicht mehr an der Breite der Form.
+- **{{ui:nameTag.letterSize}}:** Wie hoch die Buchstaben sind. Sie hängt nicht mehr an der Breite der Form.
 - **{{ui:prop.textInward}}:** Schaltet den Text von der Oberseite des Kreises auf die Unterseite. Die Buchstaben zeigen dann mit dem Kopf zur Mitte.
 - **{{ui:prop.textFlipped}}:** Dreht nur die Buchstaben um, damit du sie von der anderen Seite lesen kannst. Der Text bleibt dabei an seiner Stelle auf dem Kreis.
 

@@ -10,6 +10,10 @@ export default defineConfig({
       "@": path.resolve(rootDir, "apps/web/src"),
     },
   },
+  // As in the unit config: an e2e test that renders a panel needs its JSX compiled.
+  oxc: {
+    jsx: { runtime: "automatic" },
+  },
   test: {
     environment: "node",
     include: ["tests/e2e/**/*.e2e.ts"],
