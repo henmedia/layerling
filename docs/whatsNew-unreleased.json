@@ -1,12 +1,12 @@
 [
   {
     "title": {
-      "de": "Text als Kontur, Silhouette oder breiter",
-      "en": "Text as outline, silhouette or wider"
+      "de": "Text als Kontur, Silhouette, breiter oder in Schichten",
+      "en": "Text as outline, silhouette, wider or in layers"
     },
     "body": {
-      "de": "Die Textform hat jetzt Füllmodi wie Skizzen und SVG: Kontur außen, innen oder mittig, Silhouette ohne Löcher und neu „Breiter“ – die Fläche rundum vergrößert, auch für Skizzen und SVG. Drei Kopien eines Texts, 0, 1,5 und 3 mm breiter, ergeben ein Namensschild für den Mehrfarbdruck.",
-      "en": "The Text shape now has fill modes like sketches and SVG: stroke outside, inside or centred, silhouette without holes and the new \"Wider\" - the shape grown all round, for sketches and SVG too. Three copies of one text, 0, 1.5 and 3 mm wider, make a name tag for a multicolour print."
+      "de": "Die Textform hat jetzt Füllmodi wie Skizzen und SVG: Kontur außen, innen oder mittig, Silhouette ohne Löcher und neu „Breiter“, auch für Skizzen und SVG. Die Karte „Schichten“ macht aus einem Text in einem Schritt ein Namensschild für den Mehrfarbdruck, live einstellbar, und aus einer Namensliste ein Schild je Name.",
+      "en": "The Text shape now has fill modes like sketches and SVG: stroke outside, inside or centred, silhouette without holes and the new \"Wider\", for sketches and SVG too. The Layers card turns a text into a name tag for a multicolour print in one step, adjustable live, and a name list into a tag per name."
     }
   }
 ]

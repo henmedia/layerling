@@ -1238,6 +1238,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.textSilhouette !== undefined && typeof definition.textSilhouette !== "boolean") {
     throw new Error(`${label}.textSilhouette must be true or false`);
   }
+  if (definition.layeredText !== undefined && typeof definition.layeredText !== "boolean") {
+    throw new Error(`${label}.layeredText must be true or false`);
+  }
   if (definition.parametricSource !== undefined) {
     // Was der Koerper vor dem Drehen war. Fehlt oder stimmt hier etwas nicht,
     // ist der Koerper immer noch da - nur seine Bauwerte waeren nicht mehr zu

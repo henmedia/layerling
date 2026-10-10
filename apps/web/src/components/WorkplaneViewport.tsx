@@ -21,7 +21,7 @@ import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
-import { SelectionInspector, ShapeInspector, SnapGridControl, type ShapeInspectorUpdateOptions } from "@/components/workplane/ShapeInspector";
+import { SelectionInspector, ShapeInspector, SnapGridControl, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import { WorkspaceSettingsModal } from "@/components/workplane/WorkspaceSettingsModal";
 import { appThemePalette, type AppThemePalette, type AppThemePreference, type ResolvedAppTheme } from "@/lib/appTheme";
 import { cadModifierPrimitiveForBakedShape, cadTransformFromMatrix, cadTransformToMatrix } from "@/lib/cadBakeMetadata";
@@ -349,6 +349,8 @@ type WorkplaneViewportProps = {
   onSelectionLock?: () => void;
   /** Wraps the selected body around a cylinder of this diameter (#106). */
   onWrapAroundCylinder?: (diameter: number, inward: boolean) => void;
+  onLayerText?: (patch: TextLayerPatch) => void;
+  onTextTags?: (names: string[], gap: number) => void;
   onUpdateShape: (id: string, patch: ShapeUpdatePatch) => void;
   onDuplicateShapeAt?: (id: string, position: { x: number; z: number }) => void;
   /** A drag begun with Alt held: copies of these shapes land this far from them, the shapes themselves stay. */
@@ -4369,6 +4371,8 @@ export function WorkplaneViewport({
   onSelectionColor,
   onSelectionLock,
   onWrapAroundCylinder,
+  onLayerText,
+  onTextTags,
   onUpdateShape,
   onDuplicateShapeAt,
   onDuplicateShapesMoved,
@@ -9836,6 +9840,8 @@ export function WorkplaneViewport({
           canSeparateParts={canSeparateParts}
           onSeparateParts={onSeparateParts}
           onWrapAroundCylinder={onWrapAroundCylinder}
+          onLayerText={onLayerText}
+          onTextTags={onTextTags}
           onInteractionActiveChange={onInteractionActiveChange}
           onSnapGridAwayChange={setInspectorSnapGridAway}
         />

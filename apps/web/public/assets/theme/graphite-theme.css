@@ -4037,6 +4037,44 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .mesh-compare-actions .
   color: #6c6c6c;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .text-layers-body .text-layers-names {
+  color: #595959;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .text-layers-body .text-layers-names textarea {
+  border: 1px solid #c4c4c4;
+  background: #fcfcfc;
+  color: #2b2b2b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .text-layers-body .text-layers-names textarea:focus {
+  outline: 2px solid #e58a2a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .text-layers-body .text-layers-names small {
+  color: #6c6c6c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .text-layers-body .text-layers-color {
+  color: #595959;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .text-layers-body .text-layers-swatch {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: var(--swatch);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .text-layers-body .text-layers-names,
+html[data-theme="dark"]:where([data-palette="graphite"]) .text-layers-body .text-layers-color {
+  color: #c8c8c8;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .text-layers-body .text-layers-names textarea {
+  border-color: #4d4d4d;
+  background: #2a2a2a;
+  color: #e7e7e7;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .select-property-hint {
   color: #6c6c6c;
 }

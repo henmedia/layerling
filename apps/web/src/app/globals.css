@@ -9826,6 +9826,73 @@ html[data-theme="dark"] .mesh-compare-actions .secondary {
   line-height: 1.4;
 }
 
+/* Layered text (#215): the names list and the layer colour in the layers card. */
+.text-layers-body .text-layers-names {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c5a46;
+}
+
+.text-layers-body .text-layers-names textarea {
+  width: 100%;
+  min-height: 72px;
+  resize: vertical;
+  padding: 8px 10px;
+  border: 1px solid #d9c9b0;
+  border-radius: 10px;
+  background: #fffdf8;
+  color: #2f271d;
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.text-layers-body .text-layers-names textarea:focus {
+  outline: 2px solid #e58a2a;
+  outline-offset: 1px;
+}
+
+.text-layers-body .text-layers-names small {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8d7b68;
+  line-height: 1.4;
+}
+
+.text-layers-body .text-layers-color {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c5a46;
+}
+
+.text-layers-body .text-layers-color > span:first-child {
+  flex: 1;
+}
+
+.text-layers-body .text-layers-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: var(--swatch);
+}
+
+html[data-theme="dark"] .text-layers-body .text-layers-names,
+html[data-theme="dark"] .text-layers-body .text-layers-color {
+  color: #d8ccb8;
+}
+
+html[data-theme="dark"] .text-layers-body .text-layers-names textarea {
+  border-color: #5a4d3d;
+  background: #2a2520;
+  color: #f1e9dc;
+}
+
 .select-property-hint {
   grid-column: 2;
   margin-top: -5px;

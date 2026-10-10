@@ -124,6 +124,7 @@ export type LayerlingMcpCommandName =
   | "show_overhangs"
   | "measure_section"
   | "bundle_objects"
+  | "layer_text"
   | "set_section_view"
   | "set_history_view"
   | "show_workplane"

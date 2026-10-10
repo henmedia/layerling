@@ -719,6 +719,36 @@ export const tools = [
     },
   },
   {
+    name: "layerling_layer_text",
+    description: "Layered text for a multicolour print (#215): one text as a stack of bodies - the letters on top, under them the same letters a little wider in another colour, at the bottom a plate wider still, usually as a silhouette without the holes in the letters. Every layer is an ordinary text with a 'Wider' fill (so each has its own colour, height and edge treatments) and the stack is a bundle flagged as layered text, whose properties panel edits words, font and layers together. Pass the id of a text (it is replaced by the stack) or of such a bundle (it is built again); layers top to bottom, each with grow (mm wider than the letters, 0 for the letters), height, color and silhouette. Left out, the layers stay as they are, or a new stack takes the classic three: white letters, a red rim 1.5 mm wider, a dark plate 3 mm wider without holes. With names, one stack per name is made instead, laid out in rows under the first, each as its own object - a list of name tags in one go.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "A text, or a layered-text bundle to build again." },
+        text: { type: "string", description: "New words for every layer." },
+        font: { type: "string", description: "New font for every layer: a built-in name or a font of one's own by name or id." },
+        layers: {
+          type: "array",
+          maxItems: 6,
+          description: "The layers top to bottom.",
+          items: {
+            type: "object",
+            properties: {
+              grow: { type: "number", description: "How much wider than the letters, in mm all round. 0 is the letters themselves." },
+              height: { type: "number", description: "The layer's height in mm." },
+              color: { type: "string", description: "Hex colour such as #d41721." },
+              silhouette: { type: "boolean", description: "Without the holes in the letters - for the base plate." },
+            },
+          },
+        },
+        names: { type: "array", items: { type: "string" }, maxItems: 100, description: "One tag per name, laid out in rows under the first; the text of each stack is its name." },
+        gap: { type: "number", description: "Space between the tags of a list in mm (default 5)." },
+      },
+      required: ["id"],
+    },
+  },
+  {
     name: "layerling_measure_section",
     description: "Measure on a cut through the design, like \"Measure\" in the editor's section view: wall thickness, a gap, a clearance. Both points snap to the outline of the cut (within snapRadius mm, default 1): first to the nearest wall, then the second one preferably square to its wall as seen from the first - give it a point near the opposite wall and it returns the true thickness. Points are in the editor's coordinates (x, z, elevation); the one along the axis is set to the plane. axis and offset work like layerling_export_section_svg and default to the section view or the middle of the design. Returns the snapped points with their snap kind (perpendicular, corner, outline or free), distance and deltaX, deltaZ, deltaElevation. The section view itself is left as it is.",
     inputSchema: {

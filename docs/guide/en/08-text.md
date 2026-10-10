@@ -71,6 +71,14 @@ A text need not be built as filled letters. Under {{ui:prop.sketchFill}} in the 
 
 The box of the text grows with a stroke outside, centred or with "Wider", while the letters keep their size. That makes a name tag for a multicolour print from three copies of one text, all in the same place: the letters themselves, the same text 1.5 mm wider in the second colour, and once more 3 mm wider with the silhouette as the base plate in the third. Each layer is a body of its own with its own colour and height; chamfers and fillets on the edges work on every one. {{ui:prop.bevel}} and {{ui:prop.segments}} exist for filled letters only.
 
+## Layers and name tags
+
+layerling also builds the three copies of the previous section in one step. The properties of a text hold the card {{ui:textLayers.title}}; {{ui:textLayers.split}} turns it into a stack: the white letters on top, under them the same text 1.5 mm wider in red, at the bottom 3 mm wider as a dark plate without holes. The stack is a bundle, so it moves as one, and every layer stays a text of its own with its own colour and height, the way a slicer needs them for a multicolour print.
+
+With the stack selected, the same card shows text, font and the layers: {{ui:textLayers.count}} (up to six), and for each layer {{ui:textLayers.grow}}, {{ui:textLayers.height}}, {{ui:textLayers.color}} and {{ui:textLayers.silhouette}}. Every change builds the stack again at once, and new words run through all layers. {{ui:group.editBundle}} gets you to the single layers, say to fillet their edges; the stack becomes a plain bundle without the layers card as soon as one layer is no longer a text.
+
+Under {{ui:textLayers.names}} you type a list, one name per line, up to a hundred. "Make tags" makes a tag per name from the selected text or stack, all the same size, in rows below with the chosen {{ui:textLayers.gap}}; the first takes the original's place. Each tag is an object of its own afterwards.
+
 ## Text on a circular arc
 
 Should the lettering not run straight but follow the edge of a coin, a lid or a ring? For that there is the setting {{ui:prop.textCurved}}.

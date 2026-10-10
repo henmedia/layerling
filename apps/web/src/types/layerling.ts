@@ -657,6 +657,12 @@ export type WorkplaneShape = {
   /** Text only (#215): the letters without their counters (the holes in O, A, e), as Tinkercad's Silhouette. */
   textSilhouette?: boolean;
   /**
+   * A bundle that is one text as a stack of layers (#215): texts of the same words, each wider
+   * than the one above, in their own colours. Its properties panel edits text, font and layers
+   * together and builds the stack again.
+   */
+  layeredText?: boolean;
+  /**
    * Set on a body made by wrapping around a cylinder (#106): its box is
    * centred on the cylinder's axis, and aligning, snapping and centring use
    * that box rather than the arc the mesh actually covers.

@@ -25,7 +25,12 @@ function run(args, extraEnvironment = {}) {
 
 run(["scripts/copy-occt-wasm.mjs"]);
 run(["scripts/build-guide.mjs"]);
-run([nextBin, "build", "apps/web"], { STATIC_EXPORT: "true" });
+// Next.js 16 builds with Turbopack unless told otherwise. The CAD worker is
+// bundled by webpack, and the check below looks for its webpack runtime, so
+// the export asks for webpack there. Next.js 15 builds with webpack already
+// and does not know the flag (#217, #218).
+const nextMajor = Number(createRequire(import.meta.url)("next/package.json").version.split(".")[0]);
+run([nextBin, "build", "apps/web", ...(nextMajor >= 16 ? ["--webpack"] : [])], { STATIC_EXPORT: "true" });
 run(["scripts/verify-static-worker-assets.mjs"]);
 run(["scripts/generate-service-worker.mjs"]);
 

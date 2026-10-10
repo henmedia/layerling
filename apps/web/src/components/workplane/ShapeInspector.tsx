@@ -3,7 +3,7 @@
 import { displayY, displayYTurn, insideZ, insideZTurn } from "@/lib/displayAxes";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
-import { ChevronDown, ChevronUp, Cylinder, Eye, EyeOff, Lock, Pencil, RotateCcw, Split, Unlock } from "lucide-react";
+import { ChevronDown, ChevronUp, Cylinder, Eye, EyeOff, Layers, Lock, Pencil, RotateCcw, Split, Tags, Unlock } from "lucide-react";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
   DEFAULT_GEAR_HELIX_ANGLE,
@@ -155,6 +155,7 @@ import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAng
 import { MAX_DOVETAIL_CLEARANCE, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { textHasFill } from "@/lib/textFill";
+import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, namesFromList, textLayersOf, type TextLayer } from "@/lib/textLayers";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { MIN_SLOT_END_RATIO, normalizeSlotEndRatio, taperedSlotOutline } from "@/lib/slotGeometry";
@@ -1910,6 +1911,8 @@ export function ShapeInspector({
   canSeparateParts = false,
   onSeparateParts,
   onWrapAroundCylinder,
+  onLayerText,
+  onTextTags,
   onInteractionActiveChange,
   onSnapGridAwayChange,
   proportionLock = false,
@@ -1932,6 +1935,10 @@ export function ShapeInspector({
   onSeparateParts?: () => void;
   /** Wraps this body around a cylinder of the given diameter (#106). */
   onWrapAroundCylinder?: (diameter: number, inward: boolean) => void;
+  /** Splits a text into layers, or builds a layered text again with new words, font or layers (#215). */
+  onLayerText?: (patch: TextLayerPatch) => void;
+  /** One tag like this text or stack per name, laid out in rows (#215). */
+  onTextTags?: (names: string[], gap: number) => void;
   onInteractionActiveChange?: (active: boolean) => void;
   /** The snap control lives in the expanded panel; collapsed, the workplane shows its own. */
   /** Called with true while the inspector does not carry the snap grid control (collapsed, or floating), so the workplane shows it. */
@@ -2349,6 +2356,18 @@ export function ShapeInspector({
         />
       ) : null}
 
+      {onLayerText && onTextTags && (shape.kind === "text" || (shape.layeredText && shape.groupedShapes?.length)) ? (
+        <TextLayersCard
+          key={`layers-${shape.id}`}
+          shape={shape}
+          workspace={workspace}
+          disabled={locked}
+          onLayerText={onLayerText}
+          onTextTags={onTextTags}
+          onInteractionActiveChange={onInteractionActiveChange}
+        />
+      ) : null}
+
       <div className={`property-card ${propertiesOpen ? "" : "collapsed"}`}>
         <button
           className="property-card-header"
@@ -2608,6 +2627,149 @@ export function ShapeInspector({
  * outward or into the wall, and the button. Folded away until asked for, as
  * it is a step one takes once rather than a setting one tunes.
  */
+export type TextLayerPatch = { text?: string; font?: string; layers?: TextLayer[] };
+
+/**
+ * Layered text (#215): a text gets "Split into layers"; a stack - a bundle flagged as layered
+ * text - edits its words, font and layers here, each change building the stack again. Both
+ * take a list of names and make a tag per name.
+ */
+function TextLayersCard({
+  shape,
+  workspace,
+  disabled,
+  onLayerText,
+  onTextTags,
+  onInteractionActiveChange,
+}: {
+  shape: WorkplaneShape;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onLayerText: (patch: TextLayerPatch) => void;
+  onTextTags: (names: string[], gap: number) => void;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const stack = shape.layeredText && shape.groupedShapes?.length ? textLayersOf(shape.groupedShapes) : null;
+  const [open, setOpen] = useState(Boolean(stack));
+  const [selected, setSelected] = useState(0);
+  const [names, setNames] = useState("");
+  const [gap, setGap] = useState(5);
+  useEffect(() => setSelected(0), [shape.id]);
+  const layers = stack?.layers ?? null;
+  const index = layers ? Math.min(selected, layers.length - 1) : 0;
+  const layer = layers?.[index];
+  const source = stack?.source ?? shape;
+  const nameList = namesFromList(names);
+
+  const writeLayers = (next: TextLayer[]) => onLayerText({ layers: next });
+  const changeLayer = (changes: Partial<TextLayer>) => {
+    if (!layers) return;
+    writeLayers(layers.map((entry, position) => (position === index ? { ...entry, ...changes } : entry)));
+  };
+  const setCount = (count: number) => {
+    if (!layers) return;
+    const wanted = Math.round(clamp(count, 1, MAX_TEXT_LAYERS));
+    if (wanted === layers.length) return;
+    if (wanted < layers.length) {
+      writeLayers(layers.slice(0, wanted));
+      setSelected(Math.min(index, wanted - 1));
+      return;
+    }
+    // A new layer goes under the lowest one, as much wider again as that one was over its neighbour.
+    const next = [...layers];
+    while (next.length < wanted) {
+      const last = next[next.length - 1];
+      const step = next.length >= 2 ? Math.max(0.5, last.grow - next[next.length - 2].grow) : 1.5;
+      next.push({ ...last, grow: Math.min(MAX_TEXT_LAYER_GROW, last.grow + step), silhouette: last.silhouette });
+    }
+    writeLayers(next);
+  };
+  const layerLabel = (position: number) => t(position === 0 ? "textLayers.top" : position === (layers?.length ?? 1) - 1 ? "textLayers.bottom" : "textLayers.layer", { number: position + 1 });
+
+  const properties: ShapePropertyConfig[] = layers && layer
+    ? [
+      {
+        type: "text",
+        id: "layersText",
+        label: t("prop.text"),
+        value: source.text ?? "TEXT",
+        onChange: (text) => onLayerText({ text: text.slice(0, 24) || " " }),
+      },
+      textFontProperty(source, (patch) => { if (typeof patch.font === "string") onLayerText({ font: patch.font }); }),
+      { id: "layersCount", label: t("textLayers.count"), value: layers.length, min: 1, max: MAX_TEXT_LAYERS, step: 1, onChange: setCount },
+      {
+        type: "select",
+        id: "layersIndex",
+        label: t("textLayers.layer", { number: "" }).trim(),
+        value: String(index),
+        options: layers.map((_entry, position) => ({ value: String(position), label: layerLabel(position) })),
+        onChange: (value) => setSelected(Number(value)),
+      },
+      { id: "layerGrow", label: t("textLayers.grow"), value: layer.grow, min: 0, max: MAX_TEXT_LAYER_GROW, step: 0.1, disabled: index === 0, onChange: (grow) => changeLayer({ grow }) },
+      { id: "layerHeight", label: t("textLayers.height"), value: layer.height, min: MIN_TEXT_LAYER_HEIGHT, max: 40, step: 0.1, onChange: (height) => changeLayer({ height }) },
+      { type: "toggle", id: "layerSilhouette", label: t("textLayers.silhouette"), value: Boolean(layer.silhouette), onChange: (silhouette) => changeLayer({ silhouette: silhouette || undefined }) },
+    ]
+    : [];
+
+  return (
+    <div className={`property-card ${open ? "" : "collapsed"}`}>
+      <button
+        className="property-card-header"
+        type="button"
+        aria-expanded={open}
+        aria-controls={`text-layers-${shape.id}`}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span>{t("textLayers.title")}</span>
+        <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+      </button>
+      {open ? (
+        <div className="property-list text-layers-body" id={`text-layers-${shape.id}`}>
+          {layers && layer ? (
+            <>
+              <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
+              <label className="text-layers-color">
+                <span>{t("textLayers.color")}</span>
+                <span className="text-layers-swatch" style={{ "--swatch": layer.color } as CSSProperties} />
+                <CustomColorInput color={layer.color} disabled={disabled} onCommit={(color) => changeLayer({ color })} onInteractionActiveChange={onInteractionActiveChange} />
+              </label>
+            </>
+          ) : (
+            <>
+              <p className="cylinder-wrap-hint">
+                {t("textLayers.hint")}
+                <GuideHelpLink chapter="text" section="textLayers" className="inspector-help-link" />
+              </p>
+              <button className="inspector-action-button" type="button" disabled={disabled} onClick={() => onLayerText({ layers: [...DEFAULT_TEXT_LAYERS] })}>
+                <Layers size={17} strokeWidth={2.5} />
+                <span>{t("textLayers.split")}</span>
+              </button>
+            </>
+          )}
+          <label className="text-layers-names">
+            <span>{t("textLayers.names")}</span>
+            <textarea
+              value={names}
+              rows={4}
+              placeholder={t("textLayers.namesPlaceholder")}
+              disabled={disabled}
+              onChange={(event) => setNames(event.currentTarget.value)}
+              onFocus={() => onInteractionActiveChange?.(true)}
+              onBlur={() => onInteractionActiveChange?.(false)}
+            />
+            <small>{t("textLayers.namesHint")}</small>
+          </label>
+          <RangeProperty id="tagGap" label={t("textLayers.gap")} value={gap} min={0} max={50} step={1} workspace={workspace} disabled={disabled} onChange={setGap} onInteractionActiveChange={onInteractionActiveChange} />
+          <button className="inspector-action-button" type="button" disabled={disabled || nameList.length === 0} onClick={() => onTextTags(nameList, gap)}>
+            <Tags size={17} strokeWidth={2.5} />
+            <span>{t("textLayers.makeTags", { count: nameList.length })}</span>
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function CylinderWrapCard({
   shape,
   workspace,

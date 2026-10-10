@@ -71,6 +71,14 @@ Ein Text muss nicht als gefüllte Buchstaben gebaut werden. Unter {{ui:prop.sket
 
 Der Kasten des Texts wächst mit einer Kontur außen, mittig oder mit „Breiter“ mit, die Buchstaben behalten dabei ihre Größe. So entsteht ein Namensschild für den Mehrfarbdruck aus drei Kopien eines Texts, alle an derselben Stelle: die Buchstaben selbst, derselbe Text 1,5 mm breiter in der zweiten Farbe und noch einmal 3 mm breiter mit Silhouette als Grundplatte in der dritten. Jede Schicht ist ein eigener Körper mit eigener Farbe und Höhe; Fasen und Verrundungen an den Kanten gehen auf jeder. {{ui:prop.bevel}} und {{ui:prop.segments}} gibt es nur für gefüllte Buchstaben.
 
+## Schichten und Namensschilder
+
+Die drei Kopien aus dem vorigen Abschnitt baut layerling auch in einem Schritt. In den Eigenschaften eines Texts steht die Karte {{ui:textLayers.title}}; {{ui:textLayers.split}} macht daraus einen Stapel: oben die weißen Buchstaben, darunter derselbe Text 1,5 mm breiter in Rot, zuunterst 3 mm breiter als dunkle Platte ohne Löcher. Der Stapel ist ein Bündel, bewegt sich also als Ganzes, und jede Schicht bleibt ein eigener Text mit eigener Farbe und Höhe, so wie der Slicer sie für den Mehrfarbdruck braucht.
+
+Ist der Stapel ausgewählt, zeigt dieselbe Karte Text, Schriftart und die Schichten: {{ui:textLayers.count}} (bis zu sechs), und je Schicht {{ui:textLayers.grow}}, {{ui:textLayers.height}}, {{ui:textLayers.color}} und {{ui:textLayers.silhouette}}. Jede Änderung baut den Stapel sofort neu, auch ein neuer Text läuft durch alle Schichten. Mit {{ui:group.editBundle}} kommst du an die einzelnen Schichten, etwa um Kanten zu verrunden; ein Bündel ohne Schichten-Karte wird es, sobald eine Schicht kein Text mehr ist.
+
+Unter {{ui:textLayers.names}} tippst du eine Liste, ein Name je Zeile, bis zu hundert. „Schilder erzeugen“ macht aus dem ausgewählten Text oder Stapel ein Schild je Name, alle gleich groß, in Reihen mit dem gewählten {{ui:textLayers.gap}} darunter; das erste nimmt den Platz des Originals ein. Jedes Schild ist danach ein eigenes Objekt.
+
 ## Text auf dem Kreisbogen
 
 Soll die Beschriftung nicht gerade laufen, sondern dem Rand einer Münze, eines Deckels oder eines Rings folgen? Dafür gibt es die Einstellung {{ui:prop.textCurved}}.

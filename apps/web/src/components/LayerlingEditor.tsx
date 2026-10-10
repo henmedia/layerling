@@ -38,6 +38,8 @@ import { createThreadGeometry, DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, 
 import { createSpringGeometry } from "@/lib/springGeometry";
 import { curvedTextPatch } from "@/lib/textGeometry";
 import { textDisplayGeometry } from "@/lib/textFill";
+import { DEFAULT_TEXT_LAYERS, nameTagOffsets, normalizeTextLayers, textLayerShapes, textLayersOf, type TextLayer } from "@/lib/textLayers";
+import type { TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import { onManifoldReady, rememberManifoldRuntime, setManifoldLoader } from "@/lib/manifoldHandle";
 import { canApplySketchCornerTreatment } from "@/lib/sketchFilletChamfer";
 import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
@@ -3615,6 +3617,40 @@ function canWrapAroundCylinder(shape: WorkplaneShape | null | undefined) {
  * box, a cylinder or a gear the card was only in the way; through MCP any
  * body can still be wrapped.
  */
+/** A text, or a stack of text layers, that the layers card (#215) can work on. */
+function offersTextLayers(shape: WorkplaneShape | null | undefined) {
+  if (!shape || shape.locked || shape.importedMesh || shape.cadBrep) return false;
+  if (shape.kind === "text") return !shape.cylinderWrap;
+  return Boolean(shape.layeredText && shape.groupOperation === "bundle" && shape.groupedShapes?.length);
+}
+
+/**
+ * The text and layers a shape stands for: a plain text is one layer of itself; a layered-text
+ * bundle is read from its parts as they stand in the world. Null for anything else.
+ */
+function textLayerStack(shape: WorkplaneShape): { source: WorkplaneShape; layers: TextLayer[]; ids: string[] } | null {
+  if (shape.kind === "text") {
+    return textLayersOf([shape]);
+  }
+  if (!shape.layeredText || !shape.groupedShapes?.length) return null;
+  return textLayersOf(restoreGroupedChildren(shape));
+}
+
+/**
+ * A text's layers as one shape: a bundle flagged as layered text, or, with one layer only, that
+ * text itself. `keepId` and `name` carry over from the shape it replaces.
+ */
+function layeredTextShape(source: WorkplaneShape, layers: readonly TextLayer[], ids: (string | undefined)[], keepId: string, keep: Pick<WorkplaneShape, "locked" | "hidden" | "name">, previousText?: string): WorkplaneShape {
+  const words = (source.text ?? "TEXT").trim() || "Text";
+  // The stack is named after its words unless somebody gave it a name of its own.
+  const name = !keep.name || keep.name === "Bundle" || keep.name === "Text" || keep.name === previousText ? words : keep.name;
+  const parts = textLayerShapes(source, layers, ids);
+  if (parts.length === 1) return canonicalizeShape({ ...parts[0], id: keepId, name, locked: keep.locked, hidden: keep.hidden });
+  const group = groupedShape(parts);
+  if (!group) throw new Error("Could not build the text layers");
+  return canonicalizeShape({ ...group, id: keepId, name, groupOperation: "bundle", layeredText: true, locked: keep.locked, hidden: keep.hidden });
+}
+
 function offersCylinderWrap(shape: WorkplaneShape | null | undefined) {
   if (!canWrapAroundCylinder(shape) || !shape) return false;
   return Boolean(shape.importedMesh && !shape.groupedShapes?.length) || shape.kind === "text" || Boolean(shape.sketchProfile);
@@ -5910,6 +5946,7 @@ function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary {
       : {}),
     // A text's fill (#215) reads like a sketch body's: its stroke, and whether the counters are left out.
     ...(shape.kind === "text" ? { textStroke: shape.textStroke ?? null, textSilhouette: Boolean(shape.textSilhouette) } : {}),
+    ...(shape.layeredText ? { layeredText: true } : {}),
     children: shape.groupedShapes?.map(mcpShapeSummary),
   };
 }
@@ -10821,6 +10858,43 @@ export function LayerlingEditor({
     );
   }, [commitShapes, cylinderWrapErrorText, selectedShape, selectedShapes.length, shapes]);
 
+  /** Splits the selected text into layers, or builds the selected stack again with new words, font or layers (#215). */
+  const layerSelectedText = useCallback((patch: TextLayerPatch) => {
+    if (selectedShapes.length !== 1 || !selectedShape || !offersTextLayers(selectedShape)) return;
+    const stack = textLayerStack(selectedShape);
+    if (!stack) return;
+    const wasText = selectedShape.kind === "text";
+    const source = { ...stack.source, ...(patch.text !== undefined ? { text: patch.text } : {}), ...(patch.font !== undefined ? { font: patch.font } : {}) };
+    const layers = patch.layers ?? (wasText ? [...DEFAULT_TEXT_LAYERS] : stack.layers);
+    const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, selectedShape.id, selectedShape, stack.source.text);
+    commitShapes(
+      shapesRef.current.map((shape) => (shape.id === selectedShape.id ? next : shape)),
+      [next.id],
+      t(wasText ? "status.textLayered" : "status.textLayersUpdated", { count: layers.length }),
+    );
+  }, [commitShapes, selectedShape, selectedShapes.length]);
+
+  /** One tag like the selected text or stack per name, in rows under it; the first takes its place (#215). */
+  const makeTextTags = useCallback((names: string[], gap: number) => {
+    if (selectedShapes.length !== 1 || !selectedShape || !offersTextLayers(selectedShape) || names.length === 0) return;
+    const stack = textLayerStack(selectedShape);
+    if (!stack) return;
+    const width = shapeWidth(selectedShape);
+    const depth = shapeDepth(selectedShape);
+    const columns = Math.max(1, Math.round(Math.sqrt((names.length * (depth + gap)) / (width + gap))));
+    const offsets = nameTagOffsets(names.length, width, depth, gap, columns);
+    const tags = names.map((name, index) => {
+      const id = index === 0 ? selectedShape.id : createLocalId("text-tag");
+      const source = { ...stack.source, text: name, x: stack.source.x + offsets[index].x, z: stack.source.z + offsets[index].z };
+      return layeredTextShape(source, stack.layers, index === 0 && selectedShape.kind !== "text" ? stack.ids : [], id, { locked: false, hidden: false, name: name }, stack.source.text);
+    });
+    commitShapes(
+      [...shapesRef.current.filter((shape) => shape.id !== selectedShape.id), ...tags],
+      tags.map((tag) => tag.id),
+      t("status.textTagsMade", { count: tags.length }),
+    );
+  }, [commitShapes, selectedShape, selectedShapes.length]);
+
   const simplifyToolShape = simplifyToolId && selectedShapes.length === 1 && selectedShape?.id === simplifyToolId && offersMeshSimplify(selectedShape)
     ? selectedShape
     : null;
@@ -11772,6 +11846,45 @@ export function LayerlingEditor({
         const bundle = canonicalizeShape({ ...group, name: "Bundle", groupOperation: "bundle" });
         commitShapes([...currentShapes().filter((shape) => !ids.has(shape.id)), bundle], bundle.id, t("status.mcpBundled", { count: parts.length }));
         return { object: mcpShapeSummary(bundle) };
+      }
+
+      if (command.action === "layer_text") {
+        const id = typeof params.id === "string" ? params.id : null;
+        const target = id ? currentShapes().find((shape) => shape.id === id) : null;
+        if (!target) throw new Error("layer_text needs the id of a text or a layered-text bundle");
+        if (target.locked) throw new Error("Unlock the object first");
+        if (!offersTextLayers(target)) throw new Error("Only a text, or a bundle made by layer_text, can be layered");
+        const stack = textLayerStack(target);
+        if (!stack) throw new Error("Could not read the text's layers");
+        const wasText = target.kind === "text";
+        // A font by name as update_object takes it: a font of one's own becomes its id, a built-in name stays.
+        const font = typeof params.font === "string" ? mcpTextFont(params.font) ?? params.font : undefined;
+        const source = { ...stack.source, ...(typeof params.text === "string" ? { text: params.text.slice(0, 24) || " " } : {}), ...(font ? { font } : {}) };
+        const requested = params.layers !== undefined ? normalizeTextLayers(params.layers) : null;
+        if (params.layers !== undefined && !requested) throw new Error("layers must be 1 to 6 entries with grow, height, color and silhouette");
+        const layers = requested ?? (wasText ? [...DEFAULT_TEXT_LAYERS] : stack.layers);
+        const names = Array.isArray(params.names) ? mcpStringArray(params.names).map((name) => name.trim()).filter(Boolean).slice(0, 100) : [];
+        if (names.length) {
+          const gap = typeof params.gap === "number" && Number.isFinite(params.gap) ? Math.max(0, params.gap) : 5;
+          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text);
+          const width = shapeWidth(probe);
+          const depth = shapeDepth(probe);
+          const columns = Math.max(1, Math.round(Math.sqrt((names.length * (depth + gap)) / (width + gap))));
+          const offsets = nameTagOffsets(names.length, width, depth, gap, columns);
+          const tags = names.map((name, index) => layeredTextShape(
+            { ...source, text: name, x: source.x + offsets[index].x, z: source.z + offsets[index].z },
+            layers,
+            [],
+            index === 0 ? target.id : createLocalId("text-tag"),
+            { locked: false, hidden: false, name },
+            stack.source.text,
+          ));
+          commitShapes([...currentShapes().filter((shape) => shape.id !== target.id), ...tags], tags.map((tag) => tag.id), t("status.mcpTextTagsMade", { count: tags.length }));
+          return { objects: tags.map(mcpShapeSummary) };
+        }
+        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text);
+        commitShapes(currentShapes().map((shape) => (shape.id === target.id ? next : shape)), next.id, t("status.mcpTextLayered", { count: layers.length }));
+        return { object: mcpShapeSummary(next), layers };
       }
 
       if (command.action === "intersect_objects") {
@@ -14106,6 +14219,8 @@ export function LayerlingEditor({
           onSelectionColor={setSelectionColor}
           onSelectionLock={toggleLocked}
           onWrapAroundCylinder={selectedShapes.length === 1 && offersCylinderWrap(selectedShape) ? wrapSelectionAroundCylinder : undefined}
+          onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
+          onTextTags={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? makeTextTags : undefined}
           onUpdateShape={updateShape}
           onDuplicateShapeAt={duplicateShapeAt}
           onDuplicateShapesMoved={duplicateShapesMoved}
