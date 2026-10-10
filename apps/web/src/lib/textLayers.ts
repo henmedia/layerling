@@ -1,6 +1,8 @@
 import * as THREE from "three";
+import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
-import { DEFAULT_KEYRING_DIAMETER, keyringHoleDistance, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES, textFillExtent, textKeyringOf, textKeyringReach, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
+import { textOutlineClearance } from "@/lib/textFill";
+import { DEFAULT_KEYRING_DIAMETER, KEYRING_EDGE_GAP, keyringEarRadius, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES, textFillExtent, textKeyringOf, textKeyringReach, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
 import { shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import type { SketchStroke, SketchStrokeJoin, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
@@ -134,18 +136,33 @@ export function textLayerSource(text: WorkplaneShape): WorkplaneShape {
 const growStroke = (grow: number, join: SketchStrokeJoin = "round"): SketchStroke | undefined => (grow > 0 ? { width: grow, align: "grow", join, cap: "flat" } : undefined);
 
 /**
- * The key ring hole (#215) of each layer, top to bottom: the bottom layer carries the ear, the hole
- * sits 2.41 diameters beyond the bottom layer's edge, and a layer above gets the hole only where
- * it reaches that far itself.
+ * The key ring hole (#215) of each layer, top to bottom: the bottom layer carries the ear. The
+ * hole's edge stays KEYRING_EDGE_GAP clear of the bottom layer's outline in the band the tab
+ * runs in (its width, across the middle of its side) - its real outline when the 2D kernel is
+ * there, else its box. A layer above gets the hole only where it reaches into it.
  */
-function layerKeyrings(layers: readonly TextLayer[], keyring: NameTagKeyring | null): (TextKeyring | undefined)[] {
+function layerKeyrings(letters: WorkplaneShape, layers: readonly TextLayer[], keyring: NameTagKeyring | null): (TextKeyring | undefined)[] {
   if (!keyring || !layers.length) return layers.map(() => undefined);
+  const { side, diameter } = keyring;
+  const half = side === "top" ? (letters.depth ?? 0) / 2 : (letters.width ?? 0) / 2;
+  const runtime = loadedManifoldRuntime();
+  // From the letters' middle, how far out a point stands `clearance` clear of a layer's outline in the band; null where none of it is in the band.
+  const clearOf = (layer: TextLayer, clearance: number) => {
+    const stroke = growStroke(layer.grow, layer.join);
+    const extent = textFillExtent({ textStroke: stroke });
+    if (!runtime) return half + extent + clearance;
+    const { textStroke: _stroke, textSilhouette: _silhouette, textKeyring: _keyring, ...plain } = letters;
+    const shape: WorkplaneShape = { ...plain, width: (letters.width ?? 0) + 2 * extent, depth: (letters.depth ?? 0) + 2 * extent, ...(stroke ? { textStroke: stroke } : {}) };
+    return textOutlineClearance(runtime, shape, side, keyringEarRadius(diameter), clearance);
+  };
   const bottom = layers[layers.length - 1];
-  const offset = round(textFillExtent({ textStroke: growStroke(bottom.grow, bottom.join) }) + keyringHoleDistance(keyring.diameter));
+  const hole = clearOf(bottom, KEYRING_EDGE_GAP + diameter / 2) ?? half + textFillExtent({ textStroke: growStroke(bottom.grow, bottom.join) }) + KEYRING_EDGE_GAP + diameter / 2;
+  const offset = round(hole - half);
   return layers.map((layer, index) => {
-    if (index === layers.length - 1) return { side: keyring.side, diameter: keyring.diameter, offset, ear: true };
-    const reach = textFillExtent({ textStroke: growStroke(layer.grow) });
-    return offset - keyring.diameter / 2 < reach ? { side: keyring.side, diameter: keyring.diameter, offset } : undefined;
+    if (index === layers.length - 1) return { side, diameter, offset, ear: true };
+    // A layer reaches into the hole where a hole's edge would have to stand further out to clear it.
+    const reach = clearOf(layer, diameter / 2);
+    return reach !== null && reach > hole + 1e-6 ? { side, diameter, offset } : undefined;
   });
 }
 
@@ -158,7 +175,7 @@ export function textLayerShapes(source: WorkplaneShape, layers: readonly TextLay
   const letters = textLayerSource(source);
   const base = letters.elevation ?? 0;
   // Curved text has no key ring hole.
-  const keyrings = layerKeyrings(layers, letters.textCurved ? null : keyring);
+  const keyrings = layerKeyrings(letters, layers, letters.textCurved ? null : keyring);
   const bottomUp = [...layers].reverse();
   let elevation = base;
   const shapes = bottomUp.map((layer, fromBottom) => {

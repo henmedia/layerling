@@ -41,7 +41,7 @@ import { textDisplayGeometry } from "@/lib/textFill";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, layerTextLayersError, nameTagOffsets, normalizeTextLayers, textLayerShapes, textLayersOf, type NameTagKeyring, type TextLayer, type TextLayerStack } from "@/lib/textLayers";
 import { NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch } from "@/lib/nameTag";
 import type { TextLayerPatch } from "@/components/workplane/ShapeInspector";
-import { onManifoldReady, rememberManifoldRuntime, setManifoldLoader } from "@/lib/manifoldHandle";
+import { loadedManifoldRuntime, onManifoldReady, rememberManifoldRuntime, setManifoldLoader } from "@/lib/manifoldHandle";
 import { canApplySketchCornerTreatment } from "@/lib/sketchFilletChamfer";
 import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
 import { cloneSketchProfile, orderedSketchPaths, withSegmentHandles, withSmoothSketchHandles } from "@/lib/sketchSmoothHandles";
@@ -789,6 +789,10 @@ function getManifoldRuntime() {
   return manifoldRuntimePromise;
 }
 setManifoldLoader(getManifoldRuntime);
+/** A key ring hole (#215) is placed from the plate's real outline: the 2D kernel loads first. */
+async function keyringRuntimeReady(keyring: NameTagKeyring | null) {
+  if (keyring && !loadedManifoldRuntime()) await getManifoldRuntime().catch(() => null);
+}
 function stlBoxTrianglePositions(width: number, depth: number, height: number) {
   const x = width / 2;
   const z = depth / 2;
@@ -10912,7 +10916,7 @@ export function LayerlingEditor({
   );
 
   /** Splits the selected text into layers, or builds the selected stack again with new words, font or layers (#215). */
-  const layerSelectedText = useCallback((patch: TextLayerPatch) => {
+  const layerSelectedText = useCallback(async (patch: TextLayerPatch) => {
     if (selectedShapes.length !== 1 || !selectedShape || !offersTextLayers(selectedShape)) return;
     const stack = textLayerStack(selectedShape);
     if (!stack) return;
@@ -10922,6 +10926,7 @@ export function LayerlingEditor({
     const layers = patch.layers ?? (wasText ? [...DEFAULT_TEXT_LAYERS] : stack.layers);
     // The key ring hole (#215) follows the letters: it is laid out from them on every build.
     const keyring = patch.keyring !== undefined ? patch.keyring : stack.keyring;
+    await keyringRuntimeReady(keyring);
     const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, selectedShape.id, selectedShape, stack.source.text, keyring);
     commitShapes(
       shapesRef.current.map((shape) => (shape.id === selectedShape.id ? next : shape)),
@@ -10931,10 +10936,11 @@ export function LayerlingEditor({
   }, [commitShapes, selectedShape, selectedShapes.length]);
 
   /** One tag like the selected text or stack per name, in rows under it; the first takes its place (#215). */
-  const makeTextTags = useCallback((names: string[], gap: number) => {
+  const makeTextTags = useCallback(async (names: string[], gap: number) => {
     if (selectedShapes.length !== 1 || !selectedShape || !offersTextLayers(selectedShape) || names.length === 0) return;
     const stack = textLayerStack(selectedShape);
     if (!stack) return;
+    await keyringRuntimeReady(stack.keyring);
     const tags = nameTagsFor(stack, names, gap, { id: selectedShape.id, ids: selectedShape.kind !== "text" ? stack.ids : [] });
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== selectedShape.id), ...tags],
@@ -11917,6 +11923,7 @@ export function LayerlingEditor({
         const keyringArgument = layerTextKeyringArgument(params.keyring);
         if (keyringArgument && "error" in keyringArgument) throw new Error(keyringArgument.error);
         const keyring = keyringArgument ? keyringArgument.keyring : stack.keyring;
+        await keyringRuntimeReady(keyring);
         const names = Array.isArray(params.names) ? mcpStringArray(params.names).map((name) => name.trim()).filter(Boolean).slice(0, 100) : [];
         if (names.length) {
           const gap = typeof params.gap === "number" && Number.isFinite(params.gap) ? Math.max(0, params.gap) : 5;

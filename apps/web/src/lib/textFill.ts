@@ -5,7 +5,7 @@ import { extrudeOutline, type OutlinePoint } from "@/lib/gearGeometry";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, strokeRegion, type Keep } from "@/lib/sketchStroke";
 import { createTextGeometry, keyringEarRadius, textGlyphShapes, textKeyringCenter, textKeyringOf, textLetterOffset } from "@/lib/textGeometry";
-import type { WorkplaneShape } from "@/types/layerling";
+import type { TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
 /**
  * Fill modes for the Text shape (#215, as Tinkercad's): instead of the filled letters, a line
@@ -35,26 +35,14 @@ const signedArea = (points: OutlinePoint[]) => points.reduce((sum, point, index)
  */
 export function textFillComponents(runtime: ManifoldToplevel, shape: WorkplaneShape): TextFillComponent[] | null {
   if (!textHasFill(shape)) return null;
-  const stroke = normalizeSketchStroke(shape.textStroke);
-  const glyphs = textGlyphShapes(shape);
-  if (!glyphs) return null;
   const made: CrossSection[] = [];
   const keep: Keep = (section) => {
     made.push(section);
     return section;
   };
   try {
-    const letters = glyphs.glyphs.map(({ glyph, map }) => {
-      const sampled = glyph.extractPoints(glyphs.curveSegments);
-      const rings = (shape.textSilhouette ? [sampled.shape] : [sampled.shape, ...sampled.holes])
-        .map((ring) => ring.map((point) => map(point)))
-        .map((ring) => ring.map((point) => [point.x, point.z] as [number, number]))
-        .filter((ring) => ring.length >= 3);
-      return rings.length ? keep(new runtime.CrossSection(rings, "EvenOdd")) : null;
-    }).filter((letter): letter is CrossSection => Boolean(letter));
-    if (!letters.length) return null;
-    const region = keep(runtime.CrossSection.union(letters));
-    const filled = stroke ? strokeRegion(runtime, keep, region, stroke) : region;
+    const filled = textRegion(runtime, keep, shape);
+    if (!filled) return null;
     const eared = withKeyringEar(runtime, keep, shape, filled);
     // The silhouette has no holes at all: dropping each letter's counters is not enough once a
     // wider outline makes neighbouring letters touch and close a pocket between them (#215,
@@ -73,6 +61,87 @@ export function textFillComponents(runtime: ManifoldToplevel, shape: WorkplaneSh
       components.push({ outer, holes });
     }
     return components.length ? components : null;
+  } finally {
+    new Set(made).forEach((section) => section.delete());
+  }
+}
+
+/** The letters with the fill's line or widening, before any key ring: null without letters. */
+function textRegion(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape): CrossSection | null {
+  const stroke = normalizeSketchStroke(shape.textStroke);
+  const glyphs = textGlyphShapes(shape);
+  if (!glyphs) return null;
+  const letters = glyphs.glyphs.map(({ glyph, map }) => {
+    const sampled = glyph.extractPoints(glyphs.curveSegments);
+    const rings = (shape.textSilhouette ? [sampled.shape] : [sampled.shape, ...sampled.holes])
+      .map((ring) => ring.map((point) => map(point)))
+      .map((ring) => ring.map((point) => [point.x, point.z] as [number, number]))
+      .filter((ring) => ring.length >= 3);
+    return rings.length ? keep(new runtime.CrossSection(rings, "EvenOdd")) : null;
+  }).filter((letter): letter is CrossSection => Boolean(letter));
+  if (!letters.length) return null;
+  const region = keep(runtime.CrossSection.union(letters));
+  return stroke ? strokeRegion(runtime, keep, region, stroke) : region;
+}
+
+/**
+ * Where a key ring hole's middle (#215) stands `clearance` clear of the text's outline - the
+ * letters with the fill's line or widening, no key ring - on the line through the letters'
+ * middle towards a side: its distance from that middle. Only the outline within `halfBand`
+ * either side of that line counts, the band the tab runs in. Null when none of it is there.
+ */
+export function textOutlineClearance(runtime: ManifoldToplevel, shape: WorkplaneShape, side: TextKeyringSide, halfBand: number, clearance: number): number | null {
+  const made: CrossSection[] = [];
+  const keep: Keep = (section) => {
+    made.push(section);
+    return section;
+  };
+  try {
+    const region = textRegion(runtime, keep, shape);
+    if (!region || region.isEmpty()) return null;
+    const { min, max } = region.bounds();
+    const middle = textLetterOffset(shape);
+    const top = side === "top";
+    const [x0, z0, x1, z1] = top ? [middle.x - halfBand, min[1], middle.x + halfBand, max[1]] : [min[0], middle.z - halfBand, max[0], middle.z + halfBand];
+    const band = keep(new runtime.CrossSection([[[x0, z0], [x1, z0], [x1, z1], [x0, z1]]], "Positive"));
+    const near = keep(region.intersect(band));
+    if (near.isEmpty()) return null;
+    // Along the side (s, outwards) and across it (v), from the letters' middle; seen from above
+    // the letters read along +x with their tops towards -z.
+    const along = ([x, z]: readonly number[]) => (side === "right" ? x - middle.x : side === "left" ? middle.x - x : middle.z - z);
+    const across = ([x, z]: readonly number[]) => (top ? x - middle.x : z - middle.z);
+    // A point of the outline at (s, v) keeps the middle clear from s + sqrt(c² - v²) on; the
+    // furthest such place over the outline's edges is where the middle goes. Along an edge that
+    // is a concave function, so a ternary search finds its top.
+    let furthest = -Infinity;
+    for (const ring of near.toPolygons()) {
+      ring.forEach((start, index) => {
+        const end = ring[(index + 1) % ring.length];
+        const [s0, v0, s1, v1] = [along(start), across(start), along(end), across(end)];
+        // Only the part of the edge within the clearance across the line can come that close.
+        let low = 0;
+        let high = 1;
+        if (v1 !== v0) {
+          const a = (-clearance - v0) / (v1 - v0);
+          const b = (clearance - v0) / (v1 - v0);
+          low = Math.max(low, Math.min(a, b));
+          high = Math.min(high, Math.max(a, b));
+        } else if (Math.abs(v0) > clearance) return;
+        if (low > high) return;
+        const reach = (t: number) => {
+          const v = v0 + t * (v1 - v0);
+          return s0 + t * (s1 - s0) + Math.sqrt(Math.max(0, clearance * clearance - v * v));
+        };
+        for (let step = 0; step < 60 && high - low > 1e-9; step += 1) {
+          const left = low + (high - low) / 3;
+          const right = high - (high - low) / 3;
+          if (reach(left) < reach(right)) low = left;
+          else high = right;
+        }
+        furthest = Math.max(furthest, reach((low + high) / 2));
+      });
+    }
+    return Number.isFinite(furthest) ? furthest : null;
   } finally {
     new Set(made).forEach((section) => section.delete());
   }

@@ -118,7 +118,8 @@ describe("a name tag from the panel as exact bodies (#215, real OCCT kernel)", (
     // Where the hole is, in the world: from the plate's centre, the side's direction, turned with the tag.
     const letters = textLayerShapes(sized(text({ x: 6, z: -4, rotation: 20 }), 12), DEFAULT_TEXT_LAYERS)[0];
     const half = side === "top" ? letters.depth / 2 : letters.width / 2;
-    const reach = half + 3 + 2.41 * 4;
+    // The hole's middle as the layer stores it, beyond the letters' box (the unit tests measure that it is 2.5 mm clear of the plate).
+    const reach = half + parts[2].textKeyring!.offset;
     const local = side === "left" ? { x: -reach, z: 0 } : side === "right" ? { x: reach, z: 0 } : { x: 0, z: -reach };
     const angle = (20 * Math.PI) / 180;
     const at = (x: number, z: number) => ({ x: letters.x + x * Math.cos(angle) + z * Math.sin(angle), z: letters.z - x * Math.sin(angle) + z * Math.cos(angle) });

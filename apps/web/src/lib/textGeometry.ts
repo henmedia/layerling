@@ -77,14 +77,16 @@ export const TEXT_KEYRING_SIDES: readonly TextKeyringSide[] = ["left", "right", 
 /**
  * The ear of a name tag's key ring hole (#215), in the proportions of a tab plazmabokor measured
  * from a printed one: a straight-sided tab 2.35 times the hole wide (a 1.85 mm hole in a 4.34 mm
- * tab), its far end a half circle round the hole, the hole 2.41 times its diameter beyond the
- * bottom layer's edge (4.45 mm for 1.85 mm). They scale with the hole's diameter.
+ * tab), its far end a half circle round the hole. The hole's edge stays 2.5 mm clear of the
+ * bottom layer: of its real outline in the tab's band, not of its box.
  */
 export const DEFAULT_KEYRING_DIAMETER = 1.85;
 export const MIN_KEYRING_DIAMETER = 1;
 export const MAX_KEYRING_DIAMETER = 20;
 export const KEYRING_TAB_WIDTH_RATIO = 2.35;
-export const KEYRING_HOLE_DISTANCE_RATIO = 2.41;
+export const KEYRING_EDGE_GAP = 2.5;
+/** A hole sits off the letters' box by up to this much either way: inside it where the letters are thin in the tab's band. */
+export const MAX_KEYRING_OFFSET = 1000;
 
 export function normalizeTextKeyring(value: unknown): TextKeyring | undefined {
   if (!value || typeof value !== "object") return undefined;
@@ -95,15 +97,15 @@ export function normalizeTextKeyring(value: unknown): TextKeyring | undefined {
   return {
     side: TEXT_KEYRING_SIDES.includes(candidate.side as TextKeyringSide) ? candidate.side as TextKeyringSide : "left",
     diameter: clamp(diameter, MIN_KEYRING_DIAMETER, MAX_KEYRING_DIAMETER),
-    offset: clamp(offset, 0, 200),
+    offset: clamp(offset, -MAX_KEYRING_OFFSET, MAX_KEYRING_OFFSET),
     ...(candidate.ear ? { ear: true } : {}),
   };
 }
 
 /**
  * Whether a stored key ring hole is one layerling writes (#215): a known side, a diameter within
- * range, an offset of 0 to 200 mm and the ear switch. A file with anything else is refused rather
- * than read as something else.
+ * range, an offset within MAX_KEYRING_OFFSET mm either way and the ear switch. A file with
+ * anything else is refused rather than read as something else.
  */
 export function isTextKeyring(value: unknown): value is TextKeyring {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
@@ -111,7 +113,7 @@ export function isTextKeyring(value: unknown): value is TextKeyring {
   const finite = (entry: unknown): entry is number => typeof entry === "number" && Number.isFinite(entry);
   return TEXT_KEYRING_SIDES.includes(candidate.side as TextKeyringSide)
     && finite(candidate.diameter) && candidate.diameter >= MIN_KEYRING_DIAMETER && candidate.diameter <= MAX_KEYRING_DIAMETER
-    && finite(candidate.offset) && candidate.offset >= 0 && candidate.offset <= 200
+    && finite(candidate.offset) && Math.abs(candidate.offset) <= MAX_KEYRING_OFFSET
     && (candidate.ear === undefined || typeof candidate.ear === "boolean");
 }
 
@@ -123,11 +125,6 @@ export function textKeyringOf(shape: Pick<WorkplaneShape, "textKeyring" | "textC
 /** The radius of the ear's half circle round a key ring hole of this diameter: half the tab's width. */
 export function keyringEarRadius(diameter: number) {
   return (KEYRING_TAB_WIDTH_RATIO * diameter) / 2;
-}
-
-/** How far beyond the bottom layer's edge the middle of a key ring hole of this diameter sits. */
-export function keyringHoleDistance(diameter: number) {
-  return KEYRING_HOLE_DISTANCE_RATIO * diameter;
 }
 
 /**
