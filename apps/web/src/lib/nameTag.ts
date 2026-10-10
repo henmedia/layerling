@@ -1,4 +1,4 @@
-import { curvedTextPatch, DEFAULT_TEXT_SIZE, textFillExtent, textLetterBox } from "@/lib/textGeometry";
+import { curvedTextPatch, DEFAULT_TEXT_SIZE, textBoxAroundLetters, textLetterBox } from "@/lib/textGeometry";
 import { customFontRevision, textFont } from "@/lib/textFonts";
 import { MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, type TextLayer, type textLayersOf } from "@/lib/textLayers";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -100,7 +100,7 @@ export function textLetterSize(shape: WorkplaneShape): number {
 
 /**
  * The change that makes the capitals of a text `size` mm tall: a straight text gets the box its
- * line needs at that size, the fill's reach added, so other words or another font keep the
+ * line needs at that size, the fill's and an ear's reach added, so other words or another font keep the
  * size; curved text takes it as its letter size.
  */
 export function textLetterSizePatch(shape: WorkplaneShape, size: number): Partial<WorkplaneShape> {
@@ -108,8 +108,6 @@ export function textLetterSizePatch(shape: WorkplaneShape, size: number): Partia
   if (shape.textCurved) return curvedTextPatch(shape, { textSize: letterSize });
   const measures = layoutMeasures(shape);
   const scale = letterSize / measures.cap;
-  const reach = 2 * textFillExtent(shape);
-  const width = measures.width * scale + reach;
-  const depth = measures.depth * scale + reach;
-  return { width, depth, size: Math.max(width, depth) };
+  // Round the letters the fill's reach all round, and a key ring's ear on its side.
+  return textBoxAroundLetters(shape, { width: measures.width * scale, depth: measures.depth * scale });
 }

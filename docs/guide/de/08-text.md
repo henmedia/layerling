@@ -8,6 +8,7 @@ summary: Beschriftungen erhaben oder vertieft, mit sieben Schriftarten oder eine
 Wähle in der Formenbibliothek {{ui:shape.text}} und setze ihn ab. Im Feld {{ui:prop.text}} rechts tippst du, was da stehen soll. Die Einstellungen darunter:
 
 - **{{ui:prop.font}}:** Sieben Schriftarten stehen bereit: Multilanguage, Sans, Serif, Script, Monospace, Rounded und Stencil (Buchstaben aus geraden Linien). Neuer Text beginnt in Sans. Umlaute, ß und € gibt es in jeder Schrift. Eigene Schriften kommen dazu, siehe [Eigene Schriften](#eigene-schriften) weiter unten.
+- **{{ui:nameTag.letterSize}}:** Wie groß die Buchstaben sind, von oben gesehen; {{ui:prop.height}} bestimmt, wie dick sie sind.
 - **{{ui:prop.height}}:** Wie hoch die Schrift aus der Fläche ragt.
 - **{{ui:prop.bevel}}:** Rundet die Buchstabenkanten ab, damit sie weicher wirken. Mit {{ui:prop.segments}} bestimmst du, in wie vielen Stufen.
 - **Größe:** Länge und Breite der Zeile stellst du wie bei jeder Form ein. Zieh an den Griffen oder tippe die Maße ein.
@@ -107,7 +108,7 @@ Soll die Beschriftung nicht gerade laufen, sondern dem Rand einer Münze, eines 
 Sobald du sie einschaltest, läuft der Text am Kreis entlang. Alle Buchstaben stehen auf derselben Grundlinie, so gleichmäßig wie bei normalem Text. Dazu gibt es vier Einstellungen:
 
 - **{{ui:prop.textRadius}}** (5 bis 500 mm): Der Radius des Kreises, auf dem die Grundlinie der Buchstaben läuft.
-- **{{ui:prop.textSize}}:** Wie hoch die Buchstaben sind. Sie hängt nicht mehr an der Breite der Form.
+- **{{ui:nameTag.letterSize}}:** Wie hoch die Buchstaben sind. Sie hängt nicht mehr an der Breite der Form.
 - **{{ui:prop.textInward}}:** Schaltet den Text von der Oberseite des Kreises auf die Unterseite. Die Buchstaben zeigen dann mit dem Kopf zur Mitte.
 - **{{ui:prop.textFlipped}}:** Dreht nur die Buchstaben um, damit du sie von der anderen Seite lesen kannst. Der Text bleibt dabei an seiner Stelle auf dem Kreis.
 

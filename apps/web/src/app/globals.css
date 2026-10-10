@@ -10000,7 +10000,7 @@ html[data-theme="dark"] .text-layers-body .text-layers-names textarea {
   margin: -2px 14px 10px;
 }
 
-.name-tag-field-hint {
+.property-hint {
   margin: -8px 0 0;
   color: #8d7b68;
   font-size: 12px;
@@ -10008,7 +10008,7 @@ html[data-theme="dark"] .text-layers-body .text-layers-names textarea {
   line-height: 1.4;
 }
 
-html[data-theme="dark"] .name-tag-field-hint {
+html[data-theme="dark"] .property-hint {
   color: #bfae9a;
 }
 

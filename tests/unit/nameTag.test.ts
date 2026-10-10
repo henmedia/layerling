@@ -6,7 +6,7 @@ import { libraryShapeAssets, nameTagAsset, parseDroppedShapeAsset, toolbarShapeA
 import { textFillComponents, textHasFill } from "@/lib/textFill";
 import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider } from "@/lib/textFillChoice";
 import { loadTextFonts } from "@/lib/textFonts";
-import { textGlyphShapes } from "@/lib/textGeometry";
+import { createTextGeometry, textGlyphShapes } from "@/lib/textGeometry";
 import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, nameTagOffsets, textLayerShapes, textLayersOf, type TextLayer } from "@/lib/textLayers";
 import type { SketchStroke, WorkplaneShape } from "@/types/layerling";
 
@@ -82,6 +82,32 @@ describe("letter size (#215)", () => {
     const shape = text({ text: "HI", width: 60, depth: 20 });
     expect(textLetterSize(shape)).toBeCloseTo(bounds(outline(shape, made)).depth, 2);
     made.forEach((section) => section.delete());
+  });
+});
+
+describe("letter size on a plain text (#215)", () => {
+  it("30 makes the capital H 30 mm from above and leaves the height alone", () => {
+    const made: CrossSection[] = [];
+    const plain = text({ text: "HI", width: 86, depth: 28, height: 10 });
+    const patch = textLetterSizePatch(plain, 30);
+    expect(patch.height).toBeUndefined();
+    const next = { ...plain, ...patch };
+    expect(next.height).toBe(10);
+    expect(bounds(outline(next, made)).depth).toBeCloseTo(30, 2);
+    // The display body too: 30 mm deep from above, 10 mm thick.
+    const geometry = createTextGeometry(next);
+    geometry.computeBoundingBox();
+    expect(geometry.boundingBox!.max.z - geometry.boundingBox!.min.z).toBeCloseTo(30, 2);
+    expect(geometry.boundingBox!.max.y - geometry.boundingBox!.min.y).toBeCloseTo(10, 6);
+    made.forEach((section) => section.delete());
+  });
+
+  it("on curved text it is the letter size of the arc", () => {
+    const curved = { ...text({ text: "HI" }), textCurved: true, textRadius: 40, textSize: 8 };
+    const next = { ...curved, ...textLetterSizePatch(curved, 30) };
+    expect(next.textSize).toBe(30);
+    expect(textLetterSize(next)).toBe(30);
+    expect(next.height).toBe(curved.height);
   });
 });
 

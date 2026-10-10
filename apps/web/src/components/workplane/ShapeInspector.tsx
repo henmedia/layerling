@@ -158,7 +158,7 @@ import { textHasFill } from "@/lib/textFill";
 import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
 import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, namesFromList, type NameTagKeyring, type TextLayer } from "@/lib/textLayers";
 import { DEFAULT_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES } from "@/lib/textGeometry";
-import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, removeTextLayer, textLetterSize, type NameTagStack } from "@/lib/nameTag";
+import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, removeTextLayer, textLetterSize, textLetterSizePatch, type NameTagStack } from "@/lib/nameTag";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { MIN_SLOT_END_RATIO, normalizeSlotEndRatio, taperedSlotOutline } from "@/lib/slotGeometry";
@@ -276,6 +276,8 @@ type RangePropertyConfig = {
   step?: number;
   /** Zusaetzlich zur Sperre des ganzen Objekts, etwa bei automatischen Werten. */
   disabled?: boolean;
+  /** A line under the row saying what the value measures (#215). */
+  hint?: string;
   onChange: (value: number) => void;
 };
 
@@ -1683,7 +1685,9 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         },
       },
       textFontProperty(shape, onUpdate),
-      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 40, onChange: setHeight },
+      // The letter size (#215): how big the letters are seen from above, as on a name tag; Height is the thickness.
+      { id: "letterSize", label: t("nameTag.letterSize"), value: textLetterSize(shape), min: MIN_LETTER_SIZE, max: 60, step: 0.5, hint: t("nameTag.letterSizeHint"), onChange: (size) => onUpdate(textLetterSizePatch(shape, size)) },
+      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 40, hint: t("prop.textHeightHint"), onChange: setHeight },
       ...textFillProperties(shape, onUpdate),
       // A fill mode or the silhouette draws the letters flat; bevel and segments belong to the filled letters.
       ...(textHasFill(shape) ? [] : [
@@ -1709,15 +1713,6 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           max: 500,
           step: 1,
           onChange: (textRadius) => onUpdate({ textRadius }),
-        },
-        {
-          id: "textSize",
-          label: t("prop.textSize"),
-          value: shape.textSize ?? 10,
-          min: 0.5,
-          max: 200,
-          step: 0.5,
-          onChange: (textSize) => onUpdate({ textSize }),
         },
         {
           type: "toggle",
@@ -2831,7 +2826,7 @@ function NameTagCard({
   const properties: ShapePropertyConfig[] = [
     { type: "text", id: "nameTagText", label: t("prop.text"), value: source.text ?? "TEXT", onChange: (text) => onLayerText({ text: text.slice(0, 24) || " " }) },
     textFontProperty(source, (patch) => { if (typeof patch.font === "string") onLayerText({ font: patch.font }); }),
-    { id: "letterSize", label: t("nameTag.letterSize"), value: textLetterSize(source), min: MIN_LETTER_SIZE, max: 60, step: 0.5, onChange: (letterSize) => onLayerText({ letterSize }) },
+    { id: "letterSize", label: t("nameTag.letterSize"), value: textLetterSize(source), min: MIN_LETTER_SIZE, max: 60, step: 0.5, hint: t("nameTag.letterSizeHint"), onChange: (letterSize) => onLayerText({ letterSize }) },
   ];
 
   return (
@@ -2849,8 +2844,6 @@ function NameTagCard({
       {open ? (
         <div className="property-list text-layers-body name-tag-body" id={`name-tag-${shapeId}`}>
           <ShapePropertyRows properties={properties} workspace={workspace} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />
-          {/* The letter size is the last row above: what it measures, in a word. */}
-          <p className="name-tag-field-hint">{t("nameTag.letterSizeHint")}</p>
           <div className="name-tag-layers-heading">
             <span>{t("nameTag.layers")}</span>
             <span className="name-tag-stepper">
@@ -3354,6 +3347,7 @@ function RangeProperty({
   min,
   max,
   step = 0.01,
+  hint,
   workspace,
   disabled,
   onChange,
@@ -3408,7 +3402,7 @@ function RangeProperty({
     onChange(clamp(toModelValue(next), min, max));
     setDraft(formatShown(next));
   };
-  return (
+  const row = (
     <label className="range-property" style={{ "--slider-pos": `${position}%` } as CSSProperties}>
       <span className="range-property-header">
         <span className="range-property-name">{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
@@ -3460,6 +3454,8 @@ function RangeProperty({
       </div>
     </label>
   );
+  // Outside the label, so a click on the words does not jump into the field.
+  return hint ? <>{row}<p className="property-hint">{hint}</p></> : row;
 }
 
 function TextProperty({ label, value, disabled, onChange, onInteractionActiveChange }: Omit<TextPropertyConfig, "id"> & { id?: string } & { disabled?: boolean; onInteractionActiveChange?: (active: boolean) => void }) {

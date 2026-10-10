@@ -4134,11 +4134,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .text-layers-body .text
   color: #6c6c6c;
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .name-tag-field-hint {
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-hint {
   color: #6c6c6c;
 }
 
-html[data-theme="dark"]:where([data-palette="graphite"]) .name-tag-field-hint {
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-hint {
   color: #adadad;
 }
 
