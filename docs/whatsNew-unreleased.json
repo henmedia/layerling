@@ -38,5 +38,15 @@
       "de": "Einstellungen, Anleitung und Tastenkürzel öffneten sich nach dem Verschieben nach links und oben versetzt, teils aus dem Bild. Jetzt stehen sie genau an der gemerkten Stelle.",
       "en": "Settings, guide and shortcuts opened shifted to the left and up after being moved, partly out of view. They now stand exactly where they were dropped."
     }
+  },
+  {
+    "title": {
+      "de": "STL-Dateien lassen sich auf dem iPad auswählen",
+      "en": "STL files can be picked on an iPad"
+    },
+    "body": {
+      "de": "Auf iPad und iPhone waren STL-, 3MF-, STEP- und .lyl-Dateien in der Dateiauswahl ausgegraut. Dort zeigt die Auswahl jetzt alle Dateien.",
+      "en": "On iPad and iPhone, STL, 3MF, STEP and .lyl files were greyed out in the file picker. There it now shows all files."
+    }
   }
 ]

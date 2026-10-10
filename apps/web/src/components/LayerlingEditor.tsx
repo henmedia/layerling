@@ -203,6 +203,7 @@ import { buildSketchRevolveMesh, DEFAULT_SKETCH_REVOLVE_SETTINGS, normalizeSketc
 import { AppFooter } from "@/components/AppFooter";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
+import { useFileAccept } from "@/lib/fileAccept";
 import { exportLylProject, importLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE } from "@/lib/lylProject";
 import { simplifyTrianglePositions } from "@/lib/meshSimplify";
 import { displayShapeName, makeShapeFromAsset, sceneShape, shapeAssetLabel, shapeAssetMenuLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
@@ -6501,6 +6502,10 @@ export function LayerlingEditor({
     setNotice(t("status.cruisePlace", { name: shapeAssetLabel(cruiseAsset) }), true);
   }, [cruiseAsset, editorLanguage, setNotice]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // Left open on an iPad, which greys out files of types it does not know (#219).
+  const projectFileAccept = useFileAccept(".lyl,.skf");
+  const myShapesFileAccept = useFileAccept(".zip,.lyl,.skf");
+  const importFileAccept = useFileAccept(".stl,.obj,.mtl,.zip,.3mf,.step,.stp,.svg,image/svg+xml");
   const projectFileInputRef = useRef<HTMLInputElement | null>(null);
   const insertProjectFileInputRef = useRef<HTMLInputElement | null>(null);
   const sketchImageInputRef = useRef<HTMLInputElement | null>(null);
@@ -14512,7 +14517,7 @@ export function LayerlingEditor({
         ref={projectFileInputRef}
         className="hidden-file-input"
         type="file"
-        accept=".lyl,.skf"
+        accept={projectFileAccept}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
           if (file) selectFiles([file]);
@@ -14524,7 +14529,7 @@ export function LayerlingEditor({
         className="hidden-file-input"
         type="file"
         multiple
-        accept=".zip,.lyl,.skf"
+        accept={myShapesFileAccept}
         onChange={(event) => {
           const files = Array.from(event.currentTarget.files ?? []);
           event.currentTarget.value = "";
@@ -14535,7 +14540,7 @@ export function LayerlingEditor({
         ref={insertProjectFileInputRef}
         className="hidden-file-input"
         type="file"
-        accept=".lyl,.skf"
+        accept={projectFileAccept}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
           if (file) void insertLylDesign(file);
@@ -14547,7 +14552,7 @@ export function LayerlingEditor({
         className="hidden-file-input"
         type="file"
         multiple
-        accept=".stl,.obj,.mtl,.zip,.3mf,.step,.stp,.svg,image/svg+xml"
+        accept={importFileAccept}
         onChange={(event) => {
           if (event.currentTarget.files) {
             selectFiles(event.currentTarget.files);
