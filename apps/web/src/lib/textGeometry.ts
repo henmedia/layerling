@@ -74,11 +74,17 @@ export function textFillExtent(shape: Pick<WorkplaneShape, "textStroke">): numbe
 }
 
 export const TEXT_KEYRING_SIDES: readonly TextKeyringSide[] = ["left", "right", "top"];
-export const DEFAULT_KEYRING_DIAMETER = 4;
+/**
+ * The ear of a name tag's key ring hole (#215), in the proportions of a tab plazmabokor measured
+ * from a printed one: a straight-sided tab 2.35 times the hole wide (a 1.85 mm hole in a 4.34 mm
+ * tab), its far end a half circle round the hole, the hole 2.41 times its diameter beyond the
+ * bottom layer's edge (4.45 mm for 1.85 mm). They scale with the hole's diameter.
+ */
+export const DEFAULT_KEYRING_DIAMETER = 1.85;
 export const MIN_KEYRING_DIAMETER = 1;
 export const MAX_KEYRING_DIAMETER = 20;
-/** The wall the ear keeps round a key ring hole, in mm: the ear's radius is the hole's plus this. */
-export const KEYRING_WALL = 2.5;
+export const KEYRING_TAB_WIDTH_RATIO = 2.35;
+export const KEYRING_HOLE_DISTANCE_RATIO = 2.41;
 
 export function normalizeTextKeyring(value: unknown): TextKeyring | undefined {
   if (!value || typeof value !== "object") return undefined;
@@ -114,9 +120,14 @@ export function textKeyringOf(shape: Pick<WorkplaneShape, "textKeyring" | "textC
   return shape.textCurved ? undefined : normalizeTextKeyring(shape.textKeyring);
 }
 
-/** The radius of the ear round a key ring hole of this diameter. */
+/** The radius of the ear's half circle round a key ring hole of this diameter: half the tab's width. */
 export function keyringEarRadius(diameter: number) {
-  return diameter / 2 + KEYRING_WALL;
+  return (KEYRING_TAB_WIDTH_RATIO * diameter) / 2;
+}
+
+/** How far beyond the bottom layer's edge the middle of a key ring hole of this diameter sits. */
+export function keyringHoleDistance(diameter: number) {
+  return KEYRING_HOLE_DISTANCE_RATIO * diameter;
 }
 
 /**

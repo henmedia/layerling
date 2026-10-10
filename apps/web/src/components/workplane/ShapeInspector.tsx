@@ -2913,7 +2913,7 @@ function NameTagCard({
           />
           {keyring ? (
             <>
-              <RangeProperty id="keyringDiameter" label={t("nameTag.keyringDiameter")} value={keyring.diameter} min={MIN_KEYRING_DIAMETER} max={10} step={0.5} workspace={workspace} disabled={disabled} onChange={(diameter) => onLayerText({ keyring: { ...keyring, diameter } })} onInteractionActiveChange={onInteractionActiveChange} />
+              <RangeProperty id="keyringDiameter" label={t("nameTag.keyringDiameter")} value={keyring.diameter} min={MIN_KEYRING_DIAMETER} max={10} step={0.05} workspace={workspace} disabled={disabled} onChange={(diameter) => onLayerText({ keyring: { ...keyring, diameter } })} onInteractionActiveChange={onInteractionActiveChange} />
               <div className="name-tag-sides" role="radiogroup" aria-label={t("nameTag.keyringSide")}>
                 <span>{t("nameTag.keyringSide")}</span>
                 {TEXT_KEYRING_SIDES.map((side) => (

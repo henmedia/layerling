@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
-import { DEFAULT_KEYRING_DIAMETER, keyringEarRadius, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES, textFillExtent, textKeyringOf, textKeyringReach, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
+import { DEFAULT_KEYRING_DIAMETER, keyringHoleDistance, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES, textFillExtent, textKeyringOf, textKeyringReach, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
 import { shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import type { SketchStroke, SketchStrokeJoin, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
@@ -135,13 +135,13 @@ const growStroke = (grow: number, join: SketchStrokeJoin = "round"): SketchStrok
 
 /**
  * The key ring hole (#215) of each layer, top to bottom: the bottom layer carries the ear, the hole
- * sits as far beyond the letters as the bottom layer reaches plus the ear's radius, and a layer
- * above gets the hole only where it reaches that far itself.
+ * sits 2.41 diameters beyond the bottom layer's edge, and a layer above gets the hole only where
+ * it reaches that far itself.
  */
 function layerKeyrings(layers: readonly TextLayer[], keyring: NameTagKeyring | null): (TextKeyring | undefined)[] {
   if (!keyring || !layers.length) return layers.map(() => undefined);
   const bottom = layers[layers.length - 1];
-  const offset = round(textFillExtent({ textStroke: growStroke(bottom.grow) }) + keyringEarRadius(keyring.diameter));
+  const offset = round(textFillExtent({ textStroke: growStroke(bottom.grow, bottom.join) }) + keyringHoleDistance(keyring.diameter));
   return layers.map((layer, index) => {
     if (index === layers.length - 1) return { side: keyring.side, diameter: keyring.diameter, offset, ear: true };
     const reach = textFillExtent({ textStroke: growStroke(layer.grow) });

@@ -4,7 +4,7 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { extrudeOutline, type OutlinePoint } from "@/lib/gearGeometry";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, strokeRegion, type Keep } from "@/lib/sketchStroke";
-import { createTextGeometry, keyringEarRadius, textGlyphShapes, textKeyringCenter, textKeyringOf } from "@/lib/textGeometry";
+import { createTextGeometry, keyringEarRadius, textGlyphShapes, textKeyringCenter, textKeyringOf, textLetterOffset } from "@/lib/textGeometry";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /**
@@ -73,9 +73,11 @@ export function textFillComponents(runtime: ManifoldToplevel, shape: WorkplaneSh
 }
 
 /**
- * A key ring hole (#215) through the outline, and on the bottom layer the ear round it: a disc
- * the hole's radius plus the wall, joined to the outline by the hull of the disc and the strip
- * of the outline nearest to it, so it holds on however the letters end on that side.
+ * A key ring hole (#215) through the outline, and on the bottom layer the ear round it: a
+ * straight-sided tab sticking straight out from the middle of its side, 2.35 hole diameters wide,
+ * its far end a half circle round the hole. Inwards the tab runs on until it overlaps the outline
+ * by half its width, wherever the letters end on that side, so the two are one piece; outside
+ * the plate it stays a clean tab.
  */
 function withKeyring(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape, filled: CrossSection): CrossSection {
   const keyring = textKeyringOf(shape);
@@ -85,15 +87,24 @@ function withKeyring(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShap
   let outline = filled;
   if (keyring.ear && !filled.isEmpty()) {
     const radius = keyringEarRadius(keyring.diameter);
+    const rectangle = (x0: number, z0: number, x1: number, z1: number) => keep(new runtime.CrossSection([[
+      [Math.min(x0, x1), Math.min(z0, z1)], [Math.max(x0, x1), Math.min(z0, z1)], [Math.max(x0, x1), Math.max(z0, z1)], [Math.min(x0, x1), Math.max(z0, z1)],
+    ]], "Positive"));
     const { min, max } = filled.bounds();
-    const strip = keyring.side === "top"
-      ? [[min[0], min[1]], [max[0], min[1]], [max[0], min[1] + radius], [min[0], min[1] + radius]]
-      : keyring.side === "right"
-        ? [[max[0] - radius, min[1]], [max[0], min[1]], [max[0], max[1]], [max[0] - radius, max[1]]]
-        : [[min[0], min[1]], [min[0] + radius, min[1]], [min[0] + radius, max[1]], [min[0], max[1]]];
-    const nearest = keep(filled.intersect(keep(new runtime.CrossSection([strip as [number, number][]], "Positive"))));
-    const ear = keep(keep(nearest.add(disc(radius))).hull());
-    outline = keep(filled.add(ear));
+    const top = keyring.side === "top";
+    // The band the tab runs in, across the whole outline; where the outline reaches furthest
+    // towards the tab inside it, the tab starts half its width further in.
+    const band = top ? rectangle(center.x - radius, min[1], center.x + radius, max[1]) : rectangle(min[0], center.z - radius, max[0], center.z + radius);
+    const near = keep(filled.intersect(band));
+    const middle = textLetterOffset(shape);
+    let inner: number;
+    if (near.isEmpty()) inner = top ? middle.z : middle.x;
+    else {
+      const reach = near.bounds();
+      inner = keyring.side === "right" ? reach.max[0] - radius : keyring.side === "left" ? reach.min[0] + radius : reach.min[1] + radius;
+    }
+    const tab = top ? rectangle(center.x - radius, inner, center.x + radius, center.z) : rectangle(inner, center.z - radius, center.x, center.z + radius);
+    outline = keep(keep(filled.add(tab)).add(disc(radius)));
   }
   return keep(outline.subtract(disc(keyring.diameter / 2)));
 }
