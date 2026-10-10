@@ -8,6 +8,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **A number field remembers its calculation:** Typing "(140+2)/2" into a field left only 71 behind. The field now keeps the calculation with the body: click into it again and the formula is back for editing, as long as the value still equals it - a value changed by a handle, the slider or scaling shows the number again, and a plain number clears the formula. Value and formula change together, so undo takes both back, and the formulas are saved in the design. No variables, no tables. Asked for by @prmod3d in #180.
 - **Pen tablets:** The barrel button of a graphics tablet's pen now counts as the right mouse button in the editor: a short press opens the body's menu, and a drag that ends elsewhere still only turns the view. Before, only a mouse opened the menu. Asked about by @whanner11-cpu in #213.
+- **Grouping with grouped holes froze the page:** Grouping an imported mesh with a group of holes - three countersunk screws in one group, say - could block the browser for many minutes. The check that counts which triangles a cutter touches asked for the group's bounding box once per sampled point, and each time rebuilt the whole group from its children, thread geometry included. The box is now computed once per cutter. Reported by @MiniCoop8 in #214.
 
 ## 1.58.1
 

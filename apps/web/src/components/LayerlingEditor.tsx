@@ -3853,9 +3853,26 @@ function pointInsideCuboid(point: Vec3, cuboid: Cuboid, inset = -POINT_TOLERANCE
   );
 }
 
+/*
+ * The box round a mesh or group cutter, kept per shape object. The checks below ask
+ * for it once per sampled point, and for a group the mesh is rebuilt from its
+ * children on every ask - three grouped threads against a 15,000-triangle import
+ * meant minutes on the main thread, the page "unresponsive" (#214). Shapes are
+ * never changed in place, so the box stays right for as long as the object lives.
+ */
+const holeShapeBoundsCache = new WeakMap<WorkplaneShape, Cuboid>();
+
+function holeShapeBounds(shape: WorkplaneShape): Cuboid {
+  const cached = holeShapeBoundsCache.get(shape);
+  if (cached) return cached;
+  const bounds = meshAabb(shape);
+  holeShapeBoundsCache.set(shape, bounds);
+  return bounds;
+}
+
 function pointInsideHoleShape(point: Vec3, shape: WorkplaneShape, strictInterior = false) {
   if (shape.importedMesh || shape.groupedShapes?.length) {
-    return pointInsideCuboid(point, meshAabb(shape), strictInterior ? CUTTER_RESIDUAL_INSET : -POINT_TOLERANCE);
+    return pointInsideCuboid(point, holeShapeBounds(shape), strictInterior ? CUTTER_RESIDUAL_INSET : -POINT_TOLERANCE);
   }
 
   const centerY = shape.height / 2;
