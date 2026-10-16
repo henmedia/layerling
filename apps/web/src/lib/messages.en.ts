@@ -921,6 +921,7 @@ export const MESSAGES_EN = {
   "status.deletedOne": "Deleted 1 shape",
   "status.deletedMany": "Deleted {count} shapes",
   "status.cutTooComplex": "This geometry is too complex to cut: {triangles} triangles, the limit is {limit}. Decimate (simplify) the mesh first, or raise the limit in the workspace settings.",
+  "status.groupNotMerged": "Grouped, but not merged into one solid: together the parts have {triangles} triangles, more than the limit of {limit}. An export keeps them overlapping, which slicers report as errors (non-manifold edges). Raise the limit in the workspace settings or simplify the mesh, then group again.",
   "status.cutNotWatertightTooComplex": "This mesh is not watertight, and with {triangles} triangles it is too complex for the fallback cut (limit {limit}). Repair or decimate (simplify) the mesh first.",
   "status.cutOne": "Cut 1 shape",
   "status.cutMany": "Cut {count} shapes",

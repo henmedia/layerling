@@ -713,6 +713,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.deletedOne": "Izbrisana 1 oblika",
   "status.deletedMany": "Izbrisanih oblik: {count}",
   "status.cutTooComplex": "Ta geometrija je prezapletena za rezanje: {triangles} trikotnikov, omejitev je {limit}. Najprej poenostavi mrežo ali povečaj omejitev v nastavitvah delovnega prostora.",
+  "status.groupNotMerged": "Združeno, a ne zliti v eno telo: deli imajo skupaj {triangles} trikotnikov, več od omejitve {limit}. Izvoz jih pusti prekrivajoče se, kar rezalniki javijo kot napake (non-manifold robovi). Povečaj omejitev v nastavitvah delovnega prostora ali poenostavi mrežo in nato znova združi.",
   "status.cutNotWatertightTooComplex": "Ta mreža ni zaprta, s {triangles} trikotniki pa je prezapletena za nadomestno rezanje (omejitev {limit}). Najprej popravi ali poenostavi mrežo.",
   "status.cutOne": "Izrezana 1 oblika",
   "status.cutMany": "Izrezanih oblik: {count}",

@@ -910,6 +910,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.deletedOne": "1 forme supprimée",
   "status.deletedMany": "{count} formes supprimées",
   "status.cutTooComplex": "Cette géométrie est trop complexe à découper : {triangles} triangles, la limite est {limit}. Décimez (simplifiez) d'abord le maillage ou augmentez la limite dans les paramètres de l'espace de travail.",
+  "status.groupNotMerged": "Groupé, mais pas fusionné en un seul solide : ensemble, les pièces ont {triangles} triangles, plus que la limite de {limit}. Un export les garde superposées, ce que les trancheurs signalent comme des erreurs (arêtes non-manifold). Augmentez la limite dans les paramètres de l'espace de travail ou simplifiez le maillage, puis groupez à nouveau.",
   "status.cutNotWatertightTooComplex": "Ce maillage n'est pas étanche, et avec les triangles {triangles} il est trop complexe pour la coupe de repli (limite {limit}). Réparez ou décimez (simplifiez) le maillage en premier.",
   "status.cutOne": "1 forme coupée",
   "status.cutMany": "{count} formes coupées",

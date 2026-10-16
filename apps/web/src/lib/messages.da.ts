@@ -857,6 +857,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.deletedOne": "Slettede 1 form",
   "status.deletedMany": "Slettede {count} former",
   "status.cutTooComplex": "Denne geometri er for kompleks at skære: {triangles} trekanter, grænsen er {limit}. Decimér (forenkl) meshet først, eller hæv grænsen i arbejdsområdeindstillingerne.",
+
+  "status.groupNotMerged": "Grupperet, men ikke lagt sammen til ét legeme: delene har tilsammen {triangles} trekanter, mere end grænsen på {limit}. En eksport beholder dem overlappende, hvilket slicere melder som fejl (ikke-manifold kanter). Hæv grænsen i arbejdsområdeindstillingerne eller forenkl meshet, og gruppér så igen.",
   "status.cutNotWatertightTooComplex": "Dette mesh er ikke vandtæt, og med {triangles} trekanter er det for komplekst for reserve-skæringen (grænse {limit}). Reparér eller decimér (forenkl) meshet først.",
   "status.cutOne": "Skar 1 form",
   "status.cutMany": "Skar {count} former",

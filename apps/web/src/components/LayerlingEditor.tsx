@@ -7350,7 +7350,7 @@ export function LayerlingEditor({
     commitShapes(
       [...shapesRef.current.filter((shape) => !selected.has(shape.id)), editableGroup],
       editableGroup.id,
-      result.openGapEdges ? t("status.cutLeftOpen", { count: result.openGapEdges }) : t("status.groupedMany", { count: selectedShapes.length }),
+      result.openGapEdges ? t("status.cutLeftOpen", { count: result.openGapEdges }) : result.mergeWarning ?? t("status.groupedMany", { count: selectedShapes.length }),
     );
   }, [refuseLockedSelection, commitShapes, selectedIds, selectedShapes]);
 
@@ -7593,7 +7593,7 @@ export function LayerlingEditor({
         hidden: original.hidden,
       }, Boolean(original.hole)));
       const partIds = new Set(parts.map((shape) => shape.id));
-      const message = t("status.groupClosed", { name: displayShapeName(regrouped) });
+      const message = "mergeWarning" in result && result.mergeWarning ? result.mergeWarning : t("status.groupClosed", { name: displayShapeName(regrouped) });
       commitOpenGroupTransition(
         openGroupsRef.current.slice(0, -1),
         [...shapesRef.current.filter((shape) => !partIds.has(shape.id)), regrouped],
@@ -8933,8 +8933,10 @@ export function LayerlingEditor({
           throw new Error(result.failureNotice);
         }
         const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
-        commitShapes([...currentShapes().filter((shape) => !ids.has(shape.id)), editableGroup], editableGroup.id, t("status.mcpGrouped", { count: groupable.length }));
-        return { object: mcpShapeSummary(editableGroup) };
+        commitShapes([...currentShapes().filter((shape) => !ids.has(shape.id)), editableGroup], editableGroup.id, result.mergeWarning ?? t("status.mcpGrouped", { count: groupable.length }));
+        return result.mergeWarning
+          ? { object: mcpShapeSummary(editableGroup), warning: result.mergeWarning }
+          : { object: mcpShapeSummary(editableGroup) };
       }
 
       if (command.action === "bundle_objects") {

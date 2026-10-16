@@ -920,6 +920,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.deletedOne": "1 vorm verwijderd",
   "status.deletedMany": "{count} vormen verwijderd",
   "status.cutTooComplex": "Deze geometrie is te complex om te snijden: {triangles} driehoeken, de limiet is {limit}. Vereenvoudig de mesh eerst, of verhoog de limiet in de werkruimte-instellingen.",
+  "status.groupNotMerged": "Gegroepeerd, maar niet samengevoegd tot één lichaam: de delen hebben samen {triangles} driehoeken, meer dan de limiet van {limit}. Een export houdt ze overlappend, wat slicers als fouten melden (niet-manifold randen). Verhoog de limiet in de werkruimte-instellingen of vereenvoudig de mesh, en groepeer dan opnieuw.",
   "status.cutNotWatertightTooComplex": "Deze mesh is niet waterdicht, en met {triangles} driehoeken te complex voor de reservesnede (limiet {limit}). Repareer of vereenvoudig de mesh eerst.",
   "status.cutOne": "1 vorm geknipt",
   "status.cutMany": "{count} vormen geknipt",

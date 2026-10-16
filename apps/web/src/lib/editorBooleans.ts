@@ -30,6 +30,11 @@ export type GroupBuildResult = {
    * solid's surface has gaps: how many open edges it has. 0 when the cut is closed (#346).
    */
   openGapEdges?: number;
+  /**
+   * The solids were grouped by laying their meshes together, not merged into one, because they have
+   * more triangles than the limit: what to tell the user, since an export keeps them overlapping.
+   */
+  mergeWarning?: string;
 };
 
 type IntersectionAttempt =
@@ -2083,9 +2088,17 @@ export async function buildGroupedShapeFromSelection(groupable: WorkplaneShape[]
   const openGapEdges = group && hasImportedMesh && hasSolid && hasHole && OPEN_CUT_ID.test(group.id)
     ? openSurfaceEdgeCount(booleanSelection.filter((shape) => !shape.hole && !shape.locked))
     : 0;
+  // Above the limit the solids are only laid together, not merged: an export keeps them overlapping.
+  const unmergedTriangles = group && group === bakedImportedMerge && !manifoldImportedMerge && hasSolid
+    ? group.importedMesh?.triangleCount ?? 0
+    : 0;
+  const mergeWarning = unmergedTriangles > triangleLimit
+    ? t("status.groupNotMerged", { triangles: formatTriangleCount(unmergedTriangles), limit: formatTriangleCount(triangleLimit) })
+    : undefined;
   return {
     group,
     openGapEdges,
+    mergeWarning,
     booleanSelection,
     hasSolid,
     hasHole,

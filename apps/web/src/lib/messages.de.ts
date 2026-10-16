@@ -920,6 +920,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.deletedOne": "1 Form gelöscht",
   "status.deletedMany": "{count} Formen gelöscht",
   "status.cutTooComplex": "Diese Geometrie ist zum Ausschneiden zu komplex: {triangles} Dreiecke, die Grenze liegt bei {limit}. Vereinfache (dezimiere) das Netz zuerst oder erhöhe die Grenze in den Arbeitsbereich-Einstellungen.",
+  "status.groupNotMerged": "Gruppiert, aber nicht zu einem Körper vereinigt: Die Teile haben zusammen {triangles} Dreiecke, mehr als die Grenze von {limit}. Ein Export behält sie überlappend, und Slicer melden das als Fehler (nicht-mannigfaltige Kanten). Erhöhe die Grenze in den Arbeitsbereich-Einstellungen oder vereinfache das Netz und gruppiere dann erneut.",
   "status.cutNotWatertightTooComplex": "Dieses Netz ist nicht wasserdicht und mit {triangles} Dreiecken zu komplex für den Ersatzschnitt (Grenze {limit}). Repariere oder vereinfache (dezimiere) das Netz zuerst.",
   "status.cutOne": "1 Form ausgeschnitten",
   "status.cutMany": "{count} Formen ausgeschnitten",

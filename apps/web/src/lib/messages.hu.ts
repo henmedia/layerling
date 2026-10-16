@@ -911,6 +911,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "status.deletedOne": "1 alakzat törölve",
   "status.deletedMany": "{count} alakzat törölve",
   "status.cutTooComplex": "Ez a geometria túl összetett a vágáshoz: {triangles} háromszög, a határ {limit}. Előbb egyszerűsítsd a hálót, vagy emeld a határt a munkaterület beállításaiban.",
+  "status.groupNotMerged": "Csoportosítva, de nem olvadt egy testté: a részeknek együtt {triangles} háromszögük van, több a(z) {limit} határnál. Exportáláskor egymásba lógva maradnak, amit a szeletelők hibaként jeleznek (non-manifold élek). Emeld a határt a munkaterület beállításaiban, vagy egyszerűsítsd a hálót, majd csoportosíts újra.",
   "status.cutNotWatertightTooComplex": "Ez a háló nem zárt, és {triangles} háromszöggel túl összetett a tartalék vágáshoz (határ: {limit}). Előbb javítsd vagy egyszerűsítsd a hálót.",
   "status.cutOne": "1 alakzat kivágva",
   "status.cutMany": "{count} alakzat kivágva",
