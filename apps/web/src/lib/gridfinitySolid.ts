@@ -11,8 +11,14 @@ import {
   GRIDFINITY_MAGNET_DEPTH,
   GRIDFINITY_MAGNET_DIAMETER,
   GRIDFINITY_SOCKET,
+  type GridfinityLabelCornerShape,
+  type GridfinityLabelPieces,
+  type GridfinityLabelProfile,
   type GridfinityPlan,
   type GridfinityStep,
+  gridfinityLabelCornerOutline,
+  gridfinityLabelPieces,
+  gridfinityLabelProfileEnds,
   gridfinityPlan,
   gridfinityWallProfile,
 } from "@/lib/gridfinityGeometry";
@@ -26,7 +32,10 @@ import {
  * the magnet holes drilled into the feet. The baseplate is a slab with the
  * sockets cut through it.
  *
- * Built with z up (the kernel's loft frame) and stood up on y at the end.
+ * Built with z up (the kernel's loft frame) and stood up on y at the end. The
+ * label shelves are joined after that, in the shape's own frame, from the same
+ * pieces as the display mesh (gridfinityLabelPieces): each a prism cut to the
+ * bin's inside, the corner pieces trimmed to lie under the shelves they join.
  */
 
 /** z up to y up: (x, y, z) -> (x, z, -y). */
@@ -100,10 +109,44 @@ function baseplateSolid(cad: OcctKernel, plan: GridfinityPlan) {
   return oneSolid(cad, cad.cutAll(slab, sockets), "baseplate");
 }
 
+/** A closed polygon of points (x, y, z) as a face. */
+function polygonFace(cad: OcctKernel, points: Array<{ x: number; y: number; z: number }>) {
+  return cad.makeFace(cad.makeWire(points.map((p, i) => cad.makeLineEdge(p, points[(i + 1) % points.length]))));
+}
+
+/** The label shelves and their corner pieces, in the shape's own frame (y up), each cut to the bin's inside. */
+function labelSolids(cad: OcctKernel, pieces: GridfinityLabelPieces) {
+  const { hx, hz, radius } = pieces.inside;
+  const y0 = pieces.floor;
+  const y1 = pieces.top;
+  // The inside: the inner wall's rounded rectangle from the floor up to the shelves' top.
+  const inside = cad.transform(prism(cad, hx, hz, radius, y0, y1), Z_TO_Y_UP);
+  const profile = (p: GridfinityLabelProfile) => {
+    const { start, end } = gridfinityLabelProfileEnds(pieces, p);
+    const face = polygonFace(cad, start.map(([x, y, z]) => ({ x, y, z })));
+    return cad.extrude(face, end[0][0] - start[0][0], 0, end[0][2] - start[0][2]);
+  };
+  const cornerShape = (c: GridfinityLabelCornerShape) => {
+    const { outline, circle } = gridfinityLabelCornerOutline(c);
+    const block = cad.extrude(polygonFace(cad, outline.map((p) => ({ x: p.x, y: y0 - PAST, z: p.z }))), 0, y1 - y0 + 2 * PAST, 0);
+    if (!circle) return block;
+    const post = cad.translate(cad.transform(cad.makeCylinder(circle.radius, y1 - y0 + 4 * PAST), Z_TO_Y_UP), circle.centre.x, y0 - 2 * PAST, circle.centre.z);
+    return cad.cut(block, post);
+  };
+  const shelves = pieces.shelves.map(({ profile: p, notches }) => cad.common(notches.reduce((solid, notch) => cad.cut(solid, cornerShape(notch)), profile(p)), inside));
+  const corners = pieces.corners.map((c) => cad.common(cad.common(cornerShape(c), c.under.length === 1 ? profile(c.under[0]) : cad.fuseAll(c.under.map(profile))), inside));
+  return [...shelves, ...corners];
+}
+
 /** The Gridfinity part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */
 export function gridfinityPartSolid(cad: OcctKernel, part: CadModifierGridfinityPart): ShapeHandle {
   const plan = gridfinityPlan(part);
   const solid = plan.type === "bin" ? binSolid(cad, plan) : baseplateSolid(cad, plan);
   if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The Gridfinity body is not a valid solid");
-  return cad.transform(solid, Z_TO_Y_UP);
+  const standing = cad.transform(solid, Z_TO_Y_UP);
+  const pieces = gridfinityLabelPieces(part);
+  if (!pieces) return standing;
+  const labelled = oneSolid(cad, cad.fuseAll([standing, ...labelSolids(cad, pieces)]), "bin with label shelves");
+  if (!cad.isValid(labelled)) throw new Error("The Gridfinity body is not a valid solid");
+  return labelled;
 }

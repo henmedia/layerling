@@ -175,6 +175,42 @@ export type ShapeCustomization = {
   gridfinityLip?: boolean;
   /** Gridfinity bin: holes for 6 x 2 mm magnets under each foot. */
   gridfinityMagnets?: boolean;
+  /** Gridfinity bin: a label shelf along the back wall. */
+  gridfinityLabelBack?: boolean;
+  /** Gridfinity bin: a label shelf along the front wall. */
+  gridfinityLabelFront?: boolean;
+  /** Gridfinity bin: a label shelf along the left wall. */
+  gridfinityLabelLeft?: boolean;
+  /** Gridfinity bin: a label shelf along the right wall. */
+  gridfinityLabelRight?: boolean;
+  /** Gridfinity bin: how far the back wall's label shelf reaches out from it, in mm. */
+  gridfinityLabelBackWidth?: number;
+  /** Gridfinity bin: the back wall's label shelf length in mm; missing or 0 runs it from wall to wall. */
+  gridfinityLabelBackLength?: number;
+  /** Gridfinity bin: the back wall's label shelf of a set length moved along the wall from the middle, in mm, towards +x. */
+  gridfinityLabelBackOffset?: number;
+  /** Gridfinity bin: how far the front wall's label shelf reaches out from it, in mm. */
+  gridfinityLabelFrontWidth?: number;
+  /** Gridfinity bin: the front wall's label shelf length in mm; missing or 0 runs it from wall to wall. */
+  gridfinityLabelFrontLength?: number;
+  /** Gridfinity bin: the front wall's label shelf of a set length moved along the wall from the middle, in mm, towards +x. */
+  gridfinityLabelFrontOffset?: number;
+  /** Gridfinity bin: how far the left wall's label shelf reaches out from it, in mm. */
+  gridfinityLabelLeftWidth?: number;
+  /** Gridfinity bin: the left wall's label shelf length in mm; missing or 0 runs it from wall to wall. */
+  gridfinityLabelLeftLength?: number;
+  /** Gridfinity bin: the left wall's label shelf of a set length moved along the wall from the middle, in mm, towards +z (the front). */
+  gridfinityLabelLeftOffset?: number;
+  /** Gridfinity bin: how far the right wall's label shelf reaches out from it, in mm. */
+  gridfinityLabelRightWidth?: number;
+  /** Gridfinity bin: the right wall's label shelf length in mm; missing or 0 runs it from wall to wall. */
+  gridfinityLabelRightLength?: number;
+  /** Gridfinity bin: the right wall's label shelf of a set length moved along the wall from the middle, in mm, towards +z (the front). */
+  gridfinityLabelRightOffset?: number;
+  /** Gridfinity bin: where a label shelf meets a wall or another shelf, the corner rounded or chamfered. */
+  gridfinityLabelCorner?: GridfinityLabelCorner;
+  /** Gridfinity bin: the size of that rounding or chamfer in mm; 0 leaves the corner sharp. */
+  gridfinityLabelCornerSize?: number;
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */
@@ -422,6 +458,8 @@ export type GearProfile = "involute" | "round" | "simple";
 
 /** A Gridfinity bin, or the baseplate bins stand in. */
 export type GridfinityType = "bin" | "baseplate";
+/** How a label shelf's corners are finished where it meets a wall or another shelf. */
+export type GridfinityLabelCorner = "round" | "chamfer";
 
 /** Was aus dem Gewinde wird: Stange, Schraube, Mutter oder das Loch dafuer. */
 export type ThreadRole = "rod" | "screw" | "nut" | "bore";
@@ -661,6 +699,42 @@ export type WorkplaneShape = {
   gridfinityLip?: boolean;
   /** Gridfinity bin: holes for 6 x 2 mm magnets under each foot. */
   gridfinityMagnets?: boolean;
+  /** Gridfinity bin: a label shelf along the back wall. */
+  gridfinityLabelBack?: boolean;
+  /** Gridfinity bin: a label shelf along the front wall. */
+  gridfinityLabelFront?: boolean;
+  /** Gridfinity bin: a label shelf along the left wall. */
+  gridfinityLabelLeft?: boolean;
+  /** Gridfinity bin: a label shelf along the right wall. */
+  gridfinityLabelRight?: boolean;
+  /** Gridfinity bin: how far the back wall's label shelf reaches out from it, in mm. */
+  gridfinityLabelBackWidth?: number;
+  /** Gridfinity bin: the back wall's label shelf length in mm; missing or 0 runs it from wall to wall. */
+  gridfinityLabelBackLength?: number;
+  /** Gridfinity bin: the back wall's label shelf of a set length moved along the wall from the middle, in mm, towards +x. */
+  gridfinityLabelBackOffset?: number;
+  /** Gridfinity bin: how far the front wall's label shelf reaches out from it, in mm. */
+  gridfinityLabelFrontWidth?: number;
+  /** Gridfinity bin: the front wall's label shelf length in mm; missing or 0 runs it from wall to wall. */
+  gridfinityLabelFrontLength?: number;
+  /** Gridfinity bin: the front wall's label shelf of a set length moved along the wall from the middle, in mm, towards +x. */
+  gridfinityLabelFrontOffset?: number;
+  /** Gridfinity bin: how far the left wall's label shelf reaches out from it, in mm. */
+  gridfinityLabelLeftWidth?: number;
+  /** Gridfinity bin: the left wall's label shelf length in mm; missing or 0 runs it from wall to wall. */
+  gridfinityLabelLeftLength?: number;
+  /** Gridfinity bin: the left wall's label shelf of a set length moved along the wall from the middle, in mm, towards +z (the front). */
+  gridfinityLabelLeftOffset?: number;
+  /** Gridfinity bin: how far the right wall's label shelf reaches out from it, in mm. */
+  gridfinityLabelRightWidth?: number;
+  /** Gridfinity bin: the right wall's label shelf length in mm; missing or 0 runs it from wall to wall. */
+  gridfinityLabelRightLength?: number;
+  /** Gridfinity bin: the right wall's label shelf of a set length moved along the wall from the middle, in mm, towards +z (the front). */
+  gridfinityLabelRightOffset?: number;
+  /** Gridfinity bin: where a label shelf meets a wall or another shelf, the corner rounded or chamfered. */
+  gridfinityLabelCorner?: GridfinityLabelCorner;
+  /** Gridfinity bin: the size of that rounding or chamfer in mm; 0 leaves the corner sharp. */
+  gridfinityLabelCornerSize?: number;
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */

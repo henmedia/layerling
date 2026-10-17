@@ -1,4 +1,4 @@
-import type { GridfinityType, ShellEdges, ShellOpenings } from "@/types/layerling";
+import type { GridfinityLabelCorner, GridfinityType, ShellEdges, ShellOpenings } from "@/types/layerling";
 
 export type CadModifierKind = "chamfer" | "fillet" | "shell" | "deleteFace";
 
@@ -278,6 +278,24 @@ export type CadModifierGridfinityPart = {
   gridfinityType: GridfinityType;
   gridfinityLip: boolean;
   gridfinityMagnets: boolean;
+  gridfinityLabelBack?: boolean;
+  gridfinityLabelFront?: boolean;
+  gridfinityLabelLeft?: boolean;
+  gridfinityLabelRight?: boolean;
+  gridfinityLabelBackWidth?: number;
+  gridfinityLabelBackLength?: number;
+  gridfinityLabelBackOffset?: number;
+  gridfinityLabelFrontWidth?: number;
+  gridfinityLabelFrontLength?: number;
+  gridfinityLabelFrontOffset?: number;
+  gridfinityLabelLeftWidth?: number;
+  gridfinityLabelLeftLength?: number;
+  gridfinityLabelLeftOffset?: number;
+  gridfinityLabelRightWidth?: number;
+  gridfinityLabelRightLength?: number;
+  gridfinityLabelRightOffset?: number;
+  gridfinityLabelCorner?: GridfinityLabelCorner;
+  gridfinityLabelCornerSize?: number;
   transform?: number[];
   expected?: { bounds: number[]; volume: number };
 };

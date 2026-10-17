@@ -480,7 +480,32 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       });
       break;
     case "gridfinity":
-      geometry = createGridfinityGeometry({ width, depth, height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets });
+      geometry = createGridfinityGeometry({
+        width,
+        depth,
+        height,
+        gridfinityType: shape.gridfinityType,
+        gridfinityLip: shape.gridfinityLip,
+        gridfinityMagnets: shape.gridfinityMagnets,
+        gridfinityLabelBack: shape.gridfinityLabelBack,
+        gridfinityLabelFront: shape.gridfinityLabelFront,
+        gridfinityLabelLeft: shape.gridfinityLabelLeft,
+        gridfinityLabelRight: shape.gridfinityLabelRight,
+        gridfinityLabelBackWidth: shape.gridfinityLabelBackWidth,
+        gridfinityLabelBackLength: shape.gridfinityLabelBackLength,
+        gridfinityLabelBackOffset: shape.gridfinityLabelBackOffset,
+        gridfinityLabelFrontWidth: shape.gridfinityLabelFrontWidth,
+        gridfinityLabelFrontLength: shape.gridfinityLabelFrontLength,
+        gridfinityLabelFrontOffset: shape.gridfinityLabelFrontOffset,
+        gridfinityLabelLeftWidth: shape.gridfinityLabelLeftWidth,
+        gridfinityLabelLeftLength: shape.gridfinityLabelLeftLength,
+        gridfinityLabelLeftOffset: shape.gridfinityLabelLeftOffset,
+        gridfinityLabelRightWidth: shape.gridfinityLabelRightWidth,
+        gridfinityLabelRightLength: shape.gridfinityLabelRightLength,
+        gridfinityLabelRightOffset: shape.gridfinityLabelRightOffset,
+        gridfinityLabelCorner: shape.gridfinityLabelCorner,
+        gridfinityLabelCornerSize: shape.gridfinityLabelCornerSize,
+      });
       break;
     case "loft":
       geometry = createLoftGeometry({ ...shape, width, depth, height });

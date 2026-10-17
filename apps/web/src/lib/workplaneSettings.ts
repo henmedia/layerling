@@ -372,6 +372,24 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityType = source.gridfinityType === "bin" || source.gridfinityType === "baseplate" ? source.gridfinityType : fallbackEntry?.gridfinityType;
       entry.gridfinityLip = typeof source.gridfinityLip === "boolean" ? source.gridfinityLip : fallbackEntry?.gridfinityLip;
       entry.gridfinityMagnets = typeof source.gridfinityMagnets === "boolean" ? source.gridfinityMagnets : fallbackEntry?.gridfinityMagnets;
+      entry.gridfinityLabelBack = typeof source.gridfinityLabelBack === "boolean" ? source.gridfinityLabelBack : fallbackEntry?.gridfinityLabelBack;
+      entry.gridfinityLabelFront = typeof source.gridfinityLabelFront === "boolean" ? source.gridfinityLabelFront : fallbackEntry?.gridfinityLabelFront;
+      entry.gridfinityLabelLeft = typeof source.gridfinityLabelLeft === "boolean" ? source.gridfinityLabelLeft : fallbackEntry?.gridfinityLabelLeft;
+      entry.gridfinityLabelRight = typeof source.gridfinityLabelRight === "boolean" ? source.gridfinityLabelRight : fallbackEntry?.gridfinityLabelRight;
+      entry.gridfinityLabelBackWidth = optionalShapeNumber(source.gridfinityLabelBackWidth, fallbackEntry?.gridfinityLabelBackWidth, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelBackLength = optionalShapeNumber(source.gridfinityLabelBackLength, fallbackEntry?.gridfinityLabelBackLength, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelBackOffset = optionalShapeNumber(source.gridfinityLabelBackOffset, fallbackEntry?.gridfinityLabelBackOffset, -MAX_CUSTOM_SHAPE_DIMENSION, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelFrontWidth = optionalShapeNumber(source.gridfinityLabelFrontWidth, fallbackEntry?.gridfinityLabelFrontWidth, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelFrontLength = optionalShapeNumber(source.gridfinityLabelFrontLength, fallbackEntry?.gridfinityLabelFrontLength, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelFrontOffset = optionalShapeNumber(source.gridfinityLabelFrontOffset, fallbackEntry?.gridfinityLabelFrontOffset, -MAX_CUSTOM_SHAPE_DIMENSION, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelLeftWidth = optionalShapeNumber(source.gridfinityLabelLeftWidth, fallbackEntry?.gridfinityLabelLeftWidth, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelLeftLength = optionalShapeNumber(source.gridfinityLabelLeftLength, fallbackEntry?.gridfinityLabelLeftLength, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelLeftOffset = optionalShapeNumber(source.gridfinityLabelLeftOffset, fallbackEntry?.gridfinityLabelLeftOffset, -MAX_CUSTOM_SHAPE_DIMENSION, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelRightWidth = optionalShapeNumber(source.gridfinityLabelRightWidth, fallbackEntry?.gridfinityLabelRightWidth, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelRightLength = optionalShapeNumber(source.gridfinityLabelRightLength, fallbackEntry?.gridfinityLabelRightLength, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelRightOffset = optionalShapeNumber(source.gridfinityLabelRightOffset, fallbackEntry?.gridfinityLabelRightOffset, -MAX_CUSTOM_SHAPE_DIMENSION, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelCorner = source.gridfinityLabelCorner === "round" || source.gridfinityLabelCorner === "chamfer" ? source.gridfinityLabelCorner : fallbackEntry?.gridfinityLabelCorner;
+      entry.gridfinityLabelCornerSize = optionalShapeNumber(source.gridfinityLabelCornerSize, fallbackEntry?.gridfinityLabelCornerSize, 0, MAX_CUSTOM_SHAPE_DIMENSION);
     }
     if (kind === "knurl") {
       entry.knurlPattern = source.knurlPattern === "straight" || source.knurlPattern === "diamond" || source.knurlPattern === "round" ? source.knurlPattern : fallbackEntry?.knurlPattern;

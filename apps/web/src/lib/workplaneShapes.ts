@@ -588,6 +588,24 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityType === b.gridfinityType &&
     a.gridfinityLip === b.gridfinityLip &&
     a.gridfinityMagnets === b.gridfinityMagnets &&
+    a.gridfinityLabelBack === b.gridfinityLabelBack &&
+    a.gridfinityLabelFront === b.gridfinityLabelFront &&
+    a.gridfinityLabelLeft === b.gridfinityLabelLeft &&
+    a.gridfinityLabelRight === b.gridfinityLabelRight &&
+    a.gridfinityLabelBackWidth === b.gridfinityLabelBackWidth &&
+    a.gridfinityLabelBackLength === b.gridfinityLabelBackLength &&
+    a.gridfinityLabelBackOffset === b.gridfinityLabelBackOffset &&
+    a.gridfinityLabelFrontWidth === b.gridfinityLabelFrontWidth &&
+    a.gridfinityLabelFrontLength === b.gridfinityLabelFrontLength &&
+    a.gridfinityLabelFrontOffset === b.gridfinityLabelFrontOffset &&
+    a.gridfinityLabelLeftWidth === b.gridfinityLabelLeftWidth &&
+    a.gridfinityLabelLeftLength === b.gridfinityLabelLeftLength &&
+    a.gridfinityLabelLeftOffset === b.gridfinityLabelLeftOffset &&
+    a.gridfinityLabelRightWidth === b.gridfinityLabelRightWidth &&
+    a.gridfinityLabelRightLength === b.gridfinityLabelRightLength &&
+    a.gridfinityLabelRightOffset === b.gridfinityLabelRightOffset &&
+    a.gridfinityLabelCorner === b.gridfinityLabelCorner &&
+    a.gridfinityLabelCornerSize === b.gridfinityLabelCornerSize &&
     a.dovetailNeckWidth === b.dovetailNeckWidth &&
     a.dovetailClearance === b.dovetailClearance &&
     a.loftBottomOutline === b.loftBottomOutline &&

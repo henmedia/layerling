@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Etikettenleisten für Gridfinity-Behälter",
+      "en": "Label shelves for Gridfinity bins"
+    },
+    "body": {
+      "de": "Ein Gridfinity-Behälter ab 3 Höheneinheiten kann jetzt an jeder Innenwand eine Leiste für ein Etikett bekommen, auch an mehreren zugleich. Sie liegt knapp unter dem Stapelrand, und du stellst Breite, Länge und die verrundeten oder gefasten Ecken im Eigenschaften-Fenster ein.",
+      "en": "A Gridfinity bin of 3 height units or more can now have a shelf for a label along any of its inner walls, several at once. It sits just under the stacking lip, and you set its width, length and the rounded or chamfered corners in the Properties panel."
+    }
+  }
+]

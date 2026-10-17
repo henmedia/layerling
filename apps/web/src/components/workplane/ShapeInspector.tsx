@@ -177,7 +177,24 @@ import { customFontList, textFontLabel } from "@/lib/textFonts";
 import { MIN_SLOT_END_RATIO, normalizeSlotEndRatio, taperedSlotOutline } from "@/lib/slotGeometry";
 import { loftMeasures, loftShapePatch, loftTiltLimit, maxLoftWall, MAX_LOFT_SIDES, MAX_LOFT_TWIST, MIN_LOFT_SIDES, MIN_LOFT_SIZE, normalizeLoftOutline, type LoftMeasures } from "@/lib/loftGeometry";
 import { MAX_KNURL_ANGLE, MIN_KNURL_ANGLE, MIN_KNURL_COUNT, MIN_KNURL_DEPTH, knurlSettings, maxKnurlChamfer, maxKnurlCount, maxKnurlDepth, maxRoundKnurlDepth, normalizeKnurlAngle, normalizeKnurlChamfer, normalizeKnurlCount, normalizeKnurlDepth, normalizeKnurlPattern } from "@/lib/knurlGeometry";
-import { MAX_GRIDFINITY_HEIGHT_UNITS, MAX_GRIDFINITY_UNITS, MIN_GRIDFINITY_UNITS, gridfinityPlan, gridfinityShapePatch, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
+import {
+  DEFAULT_GRIDFINITY_LABEL_CORNER,
+  DEFAULT_GRIDFINITY_LABEL_CORNER_SIZE,
+  GRIDFINITY_LABEL_WALL_KEYS,
+  MAX_GRIDFINITY_HEIGHT_UNITS,
+  MAX_GRIDFINITY_LABEL_CORNER_SIZE,
+  MAX_GRIDFINITY_UNITS,
+  MIN_GRIDFINITY_LABEL_HEIGHT_UNITS,
+  MIN_GRIDFINITY_LABEL_WIDTH,
+  MIN_GRIDFINITY_UNITS,
+  gridfinityLabelLength,
+  gridfinityLabelLimits,
+  gridfinityLabelMaxWidth,
+  gridfinityLabelWidth,
+  gridfinityPlan,
+  gridfinityShapePatch,
+  normalizeGridfinityType,
+} from "@/lib/gridfinityGeometry";
 import { MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, hingePlan, minimumHingeDepth, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -358,7 +375,7 @@ const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diamet
 const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ"]);
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "innerDiameter", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall"].includes(key);
+  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "innerDiameter", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize"].includes(key);
 }
 
 /**
@@ -928,6 +945,47 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         { type: "toggle", id: "gridfinityLip", label: t("prop.gridfinityLip"), value: plan.lip, onChange: (value) => apply({ lip: value }) },
         { type: "toggle", id: "gridfinityMagnets", label: t("prop.gridfinityMagnets"), value: plan.magnets, onChange: (value) => onUpdate({ gridfinityMagnets: value }) },
       );
+    }
+    if (plan.type === "bin" && plan.count.y >= MIN_GRIDFINITY_LABEL_HEIGHT_UNITS) {
+      // Label shelves (#455): each wall's switch with its own width, length and position under it, then the corners they share.
+      const walls = [
+        { wall: "back", label: "prop.gridfinityLabelBack" },
+        { wall: "front", label: "prop.gridfinityLabelFront" },
+        { wall: "left", label: "prop.gridfinityLabelLeft" },
+        { wall: "right", label: "prop.gridfinityLabelRight" },
+      ] as const;
+      const fields = { ...shape, depth };
+      walls.forEach(({ wall, label }) => {
+        const keys = GRIDFINITY_LABEL_WALL_KEYS[wall];
+        const { on } = keys;
+        properties.push({ type: "toggle", id: on, label: t(label), value: shape[on] === true, onChange: (value) => onUpdate({ [on]: value }) });
+        if (shape[on] !== true) return;
+        const maxWidth = gridfinityLabelMaxWidth(fields, wall);
+        const limits = gridfinityLabelLimits(fields, wall);
+        // What the geometry builds: 0 for wall to wall, else at least the shortest shelf. A typed length is kept within the wall,
+        // a typed width within the bin across it.
+        const length = gridfinityLabelLength(fields, wall);
+        properties.push(
+          { id: keys.width, label: t("prop.gridfinityLabelWidth"), value: gridfinityLabelWidth(fields, wall), min: MIN_GRIDFINITY_LABEL_WIDTH, max: Math.max(MIN_GRIDFINITY_LABEL_WIDTH, maxWidth), step: 0.5, onChange: (value) => onUpdate({ [keys.width]: clamp(value, MIN_GRIDFINITY_LABEL_WIDTH, limits.across) }) },
+          { id: keys.length, label: t("prop.gridfinityLabelLength"), value: Math.min(length, limits.length), min: 0, max: limits.length, step: 1, hint: t("gridfinity.labelLengthHint"), onChange: (value) => onUpdate({ [keys.length]: clamp(value, 0, limits.length) }) },
+        );
+        if (limits.offset > 0) {
+          properties.push({ id: keys.offset, label: t("prop.gridfinityLabelOffset"), value: clamp(shape[keys.offset] ?? 0, -limits.offset, limits.offset), min: -limits.offset, max: limits.offset, step: 1, onChange: (value) => onUpdate({ [keys.offset]: value }) });
+        }
+      });
+      if (walls.some(({ wall }) => shape[GRIDFINITY_LABEL_WALL_KEYS[wall].on] === true)) {
+        properties.push(
+          {
+            type: "select",
+            id: "gridfinityLabelCorner",
+            label: t("prop.gridfinityLabelCorner"),
+            value: shape.gridfinityLabelCorner ?? DEFAULT_GRIDFINITY_LABEL_CORNER,
+            options: [{ value: "round", label: t("gridfinity.labelRound") }, { value: "chamfer", label: t("gridfinity.labelChamfer") }],
+            onChange: (value) => onUpdate({ gridfinityLabelCorner: value === "chamfer" ? "chamfer" : "round" }),
+          },
+          { id: "gridfinityLabelCornerSize", label: t("prop.gridfinityLabelCornerSize"), value: clamp(shape.gridfinityLabelCornerSize ?? DEFAULT_GRIDFINITY_LABEL_CORNER_SIZE, 0, MAX_GRIDFINITY_LABEL_CORNER_SIZE), min: 0, max: MAX_GRIDFINITY_LABEL_CORNER_SIZE, step: 0.5, onChange: (value) => onUpdate({ gridfinityLabelCornerSize: value }) },
+        );
+      }
     }
     return properties;
   }

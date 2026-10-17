@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Label shelves for Gridfinity bins (#455):** A Gridfinity bin had plain inner walls with no place for a label. A bin of 3 height units or more can now have a label shelf along any of its four walls, several at once: **Label shelf at the back**, **Label shelf at the front**, **Label shelf on the left** and **Label shelf on the right**. A shelf is flat on top, with a 1.2 mm strip down at the front and an underside rising at 36 degrees, and sits 0.5 mm under the feet of a bin stacked on the lip. Each shelf has its own **Shelf width** (14 mm), **Shelf length** (0 runs it from wall to wall) and, when it is shorter, **Shelf position** along its wall. Two shelves that meet in a corner join into one, and where a shelf meets a wall or another shelf, **Shelf corners** rounds or chamfers the corner by **Corner size** (2 mm; 0 leaves it sharp). The bin stays an exact body for the STEP export. Also through the MCP action `layerling_create_shape` with `gridfinityLabelBack` and the other `gridfinityLabel` settings. Suggested by @9ballrider. Contributed by @mlugo-apx.
+
 ## 1.87.0
 
 - **Turkish interface (#511):** The interface is available in Türkçe, translated by @murartdursun25 with the help of Claude and read by him as a native speaker: 2547 of 2562 sentences; the others and the chapters of the guide show in English until they are translated.
