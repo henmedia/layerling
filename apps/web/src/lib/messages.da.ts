@@ -1385,6 +1385,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {  "align.alrea
   "prop.textHeightHint": "Tykkelse, fra pladen og op",
   "prop.textInward": "Langs bunden",
   "prop.textRadius": "Bueradius",
+  "prop.textSpacing": "Bogstavafstand (%)",
+  "prop.textSpacingHint": "Afstanden mellem bogstaverne oven på skrifttypens egen, i procent af bogstavstørrelsen; under 0 tættere. Bogstaverne beholder deres størrelse, feltet følger med.",
   "prop.textStretch": "Stræk bogstaver til rammen",
   "prop.textWider": "Bredere (basis for flerfarvet print)",
   "prop.thickness": "Tykkelse",
