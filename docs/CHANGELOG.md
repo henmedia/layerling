@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The zoom buttons and keys no longer follow the zoom speed:** The zoom speed in the settings set the wheel and the trackpad, but also the step of the zoom buttons in the toolbar and of the keys + and −, up to 10. A trackpad wants the slider high, around 10 on a MacBook, and there one press jumped from too far to too close in three steps; with the slider at its slowest the keys were right but the trackpad crawled. The buttons and keys now always step at the slowest rate of the slider, in the 3D editor and in the sketch; the slider sets the wheel, the trackpad and the pinch only. Guide (EN/DE) updated. Not tried on screen.
+
 ## 1.93.0
 
 - **A traced picture with many touching outlines comes in whole (#584):** A black-and-white drawing traced from a picture (the guitarist of a second file) came in as a handful of pieces, about a fifth of its area. The kernel built the body well, but at a few corners where outlines meet it was left with an edge of four triangles, so the check threw the body away and the plain build, which leaves out any outline it cannot close, put in only fragments. When the first closing (0.05) leaves such an edge, the kernel now tries 0.1, 0.2 and 0.35 and takes the first body that is clean; the drawing keeps its 345 x 277 mm and all its outlines. Reported by @stefaanl on GitHub.

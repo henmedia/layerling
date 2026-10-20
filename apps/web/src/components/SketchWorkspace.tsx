@@ -1382,9 +1382,9 @@ export function SketchWorkspace({
     return () => names.forEach((name) => wrap.removeEventListener(name, onGesture));
   }, [workspace]);
 
-  // Matches the 3D editor's buttons: a fixed step raised by the configured zoom speed.
+  // Matches the 3D editor's buttons: a fixed step at the slowest zoom speed, whatever the slider says.
   const zoomByButton = (distanceStep: number) => {
-    const scaled = zoomDistanceScale(distanceStep, workspace.zoomSpeed);
+    const scaled = zoomDistanceScale(distanceStep);
     setView((current) => ({ ...current, zoom: clamp(current.zoom / scaled, SKETCH_MIN_ZOOM, SKETCH_MANUAL_MAX_ZOOM) }));
   };
 
@@ -1527,7 +1527,7 @@ export function SketchWorkspace({
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [activePoint, focusSelection, onMoveHandle, onSelectTool, onTransformPoints, onUpdateImage, pendingMeasurementStart, pointerAction, profile, resetView, selected, selectedHandle, snap, tool, workspace.depth, workspace.width, workspace.zoomSpeed]);
+  }, [activePoint, focusSelection, onMoveHandle, onSelectTool, onTransformPoints, onUpdateImage, pendingMeasurementStart, pointerAction, profile, resetView, selected, selectedHandle, snap, tool, workspace.depth, workspace.width]);
 
   const beginEntityDrag = (event: ReactPointerEvent<SVGElement>, action: PointerAction) => {
     if (event.button !== 0) return;

@@ -8387,7 +8387,7 @@ export function WorkplaneViewport({
       return;
     }
 
-    const scaled = zoomDistanceScale(scale, workspaceRef.current.zoomSpeed);
+    const scaled = zoomDistanceScale(scale);
     if (scaled < 1) movePivotToDepthUnder(state, 0, 0);
     if (state.camera instanceof THREE.OrthographicCamera) {
       const range = orthographicZoomRange(state.camera);
