@@ -113,11 +113,19 @@ export function orbitControlsZoomSpeed(slider: number): number {
 }
 
 /**
- * Raises a fixed distance multiplier by the slowest slider rate. The buttons and keys +/- do not
- * follow the slider: a trackpad wants it high, and there a single step jumped too far.
+ * The slider position the buttons and keys +/- always step at. They do not follow the slider:
+ * a trackpad wants it high, and there a single step jumped too far. At the default position a
+ * step is the button's own multiplier, as it was for anyone who never moved the slider.
  */
+const ZOOM_BUTTON_SLIDER_POSITION = DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed;
+
+/** The distance multipliers of one zoom step, shared by the toolbar buttons and the keys +/-. */
+export const ZOOM_STEP_IN = 0.72;
+export const ZOOM_STEP_OUT = 1.28;
+
+/** Raises a fixed distance multiplier by the rate at ZOOM_BUTTON_SLIDER_POSITION. */
 export function zoomDistanceScale(step: number): number {
-  return step ** (orbitControlsZoomSpeed(ZOOM_SPEED_SLIDER_MIN) / DEFAULT_ORBIT_ZOOM_SPEED);
+  return step ** (orbitControlsZoomSpeed(ZOOM_BUTTON_SLIDER_POSITION) / DEFAULT_ORBIT_ZOOM_SPEED);
 }
 
 const METRIC_SNAP_GRIDS: GridSize[] = ["Off", "0.1 mm", "0.25 mm", "0.5 mm", "1.0 mm", "2.0 mm", "5.0 mm", "Brick"];

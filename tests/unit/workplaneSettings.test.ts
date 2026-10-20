@@ -97,8 +97,8 @@ describe("workplane settings helpers", () => {
     expect(top / fast).toBeCloseTo((20 ** (1 / 9)) ** (ZOOM_SPEED_SLIDER_MAX - 10));
     expect(orbitControlsZoomSpeed(40)).toBeCloseTo(top);
 
-    // The buttons and keys +/- always step at the slowest rate, whatever the slider says.
-    expect(Math.log(zoomDistanceScale(0.7)) / Math.log(0.7)).toBeCloseTo(slow / DEFAULT_ORBIT_ZOOM_SPEED);
+    // The buttons and keys +/- always step at the default rate, whatever the slider says.
+    expect(zoomDistanceScale(0.7)).toBeCloseTo(0.7);
   });
 
   it("keeps app limits until a shape receives an explicit customization", () => {

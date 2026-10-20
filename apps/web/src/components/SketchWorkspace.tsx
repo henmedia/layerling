@@ -22,7 +22,7 @@ import { pickTouchTarget, type TouchCandidate } from "@/lib/sketchTouch";
 import { isSketchPrimitive, type SketchPrimitive } from "@/lib/sketchPrimitives";
 import { meshForShape } from "@/lib/editorMeshCore";
 import { mirrorSign, resizedImportedMeshPositions } from "@/lib/workplaneShapes";
-import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeSnapGrid, normalizeWorkspaceSettings, snapGridStep as snapStep, orbitControlsZoomSpeed, zoomDistanceScale } from "@/lib/workplaneSettings";
+import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeSnapGrid, normalizeWorkspaceSettings, snapGridStep as snapStep, orbitControlsZoomSpeed, zoomDistanceScale, ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
 import type { GridSize, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchSegment, SketchStroke, SketchStrokeAlign, SketchStrokeCap, SketchStrokeJoin, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { resizePointerOnGrid } from "@/lib/sketchFrameResize";
 import { dragRotationDegrees, rotateSketchPointsAbout, sketchPointsPivot } from "@/lib/sketchRotation";
@@ -1470,10 +1470,10 @@ export function SketchWorkspace({
       } else if (event.key === "+" || event.key === "=") {
         // The 3D view's key steps; with Ctrl or Cmd (returned above) they stay the browser's page zoom.
         event.preventDefault();
-        zoomByButton(0.72);
+        zoomByButton(ZOOM_STEP_IN);
       } else if (event.key === "-" || event.key === "_") {
         event.preventDefault();
-        zoomByButton(1.28);
+        zoomByButton(ZOOM_STEP_OUT);
       } else if (onSelectTool && !activePoint && !pointerAction && SKETCH_TOOL_KEYS[event.key]) {
         // 1 to 4 pick the drawing tools, as in Tinkercad (#347). While a line is being drawn the digits
         // are its length (above), so they only come here when no line is in progress.
@@ -1799,8 +1799,8 @@ export function SketchWorkspace({
         >
           <Crosshair size={28} />
         </button>
-        <button aria-label={t("sketch.zoomIn")} aria-keyshortcuts="+" title={t("camera.shortcut", { label: t("sketch.zoomIn"), keys: "+" })} onClick={() => zoomByButton(0.8)}><Plus size={33} /></button>
-        <button aria-label={t("sketch.zoomOut")} aria-keyshortcuts="-" title={t("camera.shortcut", { label: t("sketch.zoomOut"), keys: "−" })} onClick={() => zoomByButton(1.25)}><Minus size={33} /></button>
+        <button aria-label={t("sketch.zoomIn")} aria-keyshortcuts="+" title={t("camera.shortcut", { label: t("sketch.zoomIn"), keys: "+" })} onClick={() => zoomByButton(ZOOM_STEP_IN)}><Plus size={33} /></button>
+        <button aria-label={t("sketch.zoomOut")} aria-keyshortcuts="-" title={t("camera.shortcut", { label: t("sketch.zoomOut"), keys: "−" })} onClick={() => zoomByButton(ZOOM_STEP_OUT)}><Minus size={33} /></button>
         <button
           className={tool === "measure" ? "active" : ""}
           aria-label={t("camera.tapeTools")}

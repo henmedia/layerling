@@ -107,7 +107,7 @@ import { displayYTurn, insideZ } from "@/lib/displayAxes";
 import { positionsForTwist, twistBandCount } from "@/lib/heightSlices";
 import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { boundsInsideRect, marqueeMode } from "@/lib/marqueeSelection";
-import { canBeginShapeDrag, handleDimensionLimit, POSITION_TYPED_LIMIT, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsZoomSpeed, readWorkspaceDefault, saveShapeDefaultsForNewDesigns, saveWorkspaceDefault, snapGridForUnits, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceForUnits, workspaceHydrationSyncDecision, zoomDistanceScale } from "@/lib/workplaneSettings";
+import { canBeginShapeDrag, handleDimensionLimit, POSITION_TYPED_LIMIT, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsZoomSpeed, readWorkspaceDefault, saveShapeDefaultsForNewDesigns, saveWorkspaceDefault, snapGridForUnits, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceForUnits, workspaceHydrationSyncDecision, zoomDistanceScale, ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
 import { withShapeDefaults } from "@/lib/shapeDefaults";
 import { workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, DEFAULT_EDGE_LINE_COLOR, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
 import { cleanNearZero, deformsAboutOrigin, cleanRotationDegrees, isNonSolidShapeKind, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, proportionalResizeScale, resizedImportedCoordinates, resizedImportedMeshPositions, resizedShapeSize, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeSupportsTaper, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth, shapeWithParametricSource } from "@/lib/workplaneShapes";
@@ -8849,10 +8849,10 @@ export function WorkplaneViewport({
       } else if ((event.key === "+" || event.key === "=") && !event.ctrlKey && !event.metaKey && !event.altKey) {
         // With Ctrl or Cmd these are the browser's own page zoom, which the page must not swallow.
         event.preventDefault();
-        zoomCamera(0.72);
+        zoomCamera(ZOOM_STEP_IN);
       } else if ((event.key === "-" || event.key === "_") && !event.ctrlKey && !event.metaKey && !event.altKey) {
         event.preventDefault();
-        zoomCamera(1.28);
+        zoomCamera(ZOOM_STEP_OUT);
       }
     };
 
@@ -8904,10 +8904,10 @@ export function WorkplaneViewport({
             >
               <Crosshair size={24} strokeWidth={2.25} />
             </button>
-            <button className="camera-zoom-button" aria-label={t("camera.zoomIn")} aria-keyshortcuts="+" title={t("camera.shortcut", { label: t("camera.zoomIn"), keys: "+" })} onClick={() => zoomCamera(0.7)}>
+            <button className="camera-zoom-button" aria-label={t("camera.zoomIn")} aria-keyshortcuts="+" title={t("camera.shortcut", { label: t("camera.zoomIn"), keys: "+" })} onClick={() => zoomCamera(ZOOM_STEP_IN)}>
               <Plus size={28} strokeWidth={2.15} />
             </button>
-            <button className="camera-zoom-button" aria-label={t("camera.zoomOut")} aria-keyshortcuts="-" title={t("camera.shortcut", { label: t("camera.zoomOut"), keys: "−" })} onClick={() => zoomCamera(1.35)}>
+            <button className="camera-zoom-button" aria-label={t("camera.zoomOut")} aria-keyshortcuts="-" title={t("camera.shortcut", { label: t("camera.zoomOut"), keys: "−" })} onClick={() => zoomCamera(ZOOM_STEP_OUT)}>
               <Minus size={28} strokeWidth={2.15} />
             </button>
             {/* Zwei Finger zoomen und schieben von selbst. Zum Drehen fehlt die

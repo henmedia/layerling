@@ -6,7 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
-- **The zoom buttons and keys no longer follow the zoom speed:** The zoom speed in the settings set the wheel and the trackpad, but also the step of the zoom buttons in the toolbar and of the keys + and −, up to 10. A trackpad wants the slider high, around 10 on a MacBook, and there one press jumped from too far to too close in three steps; with the slider at its slowest the keys were right but the trackpad crawled. The buttons and keys now always step at the slowest rate of the slider, in the 3D editor and in the sketch; the slider sets the wheel, the trackpad and the pinch only. Guide (EN/DE) updated. Not tried on screen.
+- **The zoom buttons and keys no longer follow the zoom speed:** The zoom speed in the settings set the wheel and the trackpad, but also the step of the zoom buttons in the toolbar and of the keys + and −, up to 10. A trackpad wants the slider high, around 10 on a MacBook, and there one press jumped from too far to too close in three steps; with the slider at its slowest the keys were right but the trackpad crawled. The buttons and keys now always step as they did at the default position of the slider (5), in the 3D editor and in the sketch, so nothing changes for anyone who never moved it. The toolbar buttons now take the same step as the keys (they stepped ×0.7/×1.35 in the 3D view and ×0.8/×1.25 in the sketch, the keys ×0.72/×1.28); the slider sets the wheel, the trackpad and the pinch only. Guide (EN/DE) updated. Not tried on screen.
 
 ## 1.93.0
 
