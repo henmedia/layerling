@@ -99,7 +99,7 @@ export const GUIDE_SECTIONS = {
   sketchCurve: { chapter: "sketches", de: "eine-gerade-seite-kruemmen", en: "curving-a-straight-side", nl: "een-rechte-zijde-buigen", ru: "izgib-pryamoy-storony", cs: "prohnuti-prime-strany", sl: "ukrivljanje-ravne-stranice", hu: "egyenes-oldal-goerbitese", es: "curvar-un-lado-recto" },
   commandSearch: { chapter: "shortcuts", de: "befehlssuche", en: "command-search", nl: "opdrachten-zoeken", ru: "poisk-komand", cs: "vyhledavani-prikazu", sl: "iskanje-ukazov", hu: "parancskereso", es: "busqueda-de-comandos" },
   interactiveHelp: { chapter: "shortcuts", de: "interaktive-hilfe", en: "interactive-help", nl: "interactieve-hulp", fr: "aide-interactive", ru: "interaktivnaya-spravka", cs: "interaktivni-napoveda", sl: "interaktivna-pomoc", es: "ayuda-interactiva" },
-  whatsNew: { chapter: "start", de: "neu-seit-deinem-letzten-besuch", en: "new-since-your-last-visit", nl: "nieuw-sinds-je-laatste-bezoek", ru: "novoe-s-vashego-poslednego-vizita", cs: "novinky-od-posledni-navstevy", sl: "novo-od-tvojega-zadnjega-obiska", hu: "ujdonsagok-a-legutobbi-latogatasod-ota", es: "novedades-desde-tu-ultima-visita" },
+  whatsNew: { chapter: "start", de: "neu-seit-deinem-letzten-besuch", en: "new-since-your-last-visit", nl: "nieuw-sinds-je-laatste-bezoek", "pt-br": "novidades-desde-a-sua-ultima-visita", ru: "novoe-s-vashego-poslednego-vizita", cs: "novinky-od-posledni-navstevy", sl: "novo-od-tvojega-zadnjega-obiska", hu: "ujdonsagok-a-legutobbi-latogatasod-ota", es: "novedades-desde-tu-ultima-visita" },
 } as const satisfies Record<string, { chapter: GuideChapter; en: string } & Partial<Record<Language, string>>>;
 
 export type GuideSection = keyof typeof GUIDE_SECTIONS;

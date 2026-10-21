@@ -1,6 +1,7 @@
 import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { GUIDE_SECTIONS, guideHref, type GuideSection } from "@/lib/guideLinks";
 // @ts-expect-error the guide build is a plain .mjs module
 import { effectiveChapters, headingIds, loadMessages, loadValues, readChapters, renderBlocks } from "../../scripts/build-guide.mjs";
 // @ts-expect-error the tool list is a plain .mjs module
@@ -16,7 +17,7 @@ const root = join(__dirname, "..", "..");
 const guideRoot = join(root, "docs", "guide");
 const LANGUAGES = readdirSync(guideRoot).filter((name) => name !== "images" && statSync(join(guideRoot, name)).isDirectory());
 
-type Chapter = { file: string; number: string; body: string };
+type Chapter = { file: string; number: string; slug: string; body: string };
 
 const AI_CHAPTER_NUMBER = "14";
 
@@ -58,6 +59,16 @@ describe("the guide in every language", () => {
       const builtAiChapter = (effectiveChapters(language, chaptersByLanguage) as Chapter[]).find((entry) => entry.number === AI_CHAPTER_NUMBER);
       expect(builtAiChapter, language).toBeDefined();
       for (const tool of tools as { name: string }[]) expect(builtAiChapter!.body, `${language}: ${tool.name}`).toContain(`\`${tool.name}\``);
+    }
+  });
+
+  it("lands every question mark on a heading of the Brazilian Portuguese chapters translated so far", async () => {
+    const translatedChapters = (await readChapters("pt-br")) as Chapter[];
+    for (const sectionName of Object.keys(GUIDE_SECTIONS) as GuideSection[]) {
+      const [page, anchor] = guideHref("pt-br", undefined, sectionName).split("#");
+      const translatedChapter = translatedChapters.find((chapter) => page.endsWith(`/${chapter.slug}.html`));
+      if (!translatedChapter) continue;
+      expect(headingIds(translatedChapter.body), sectionName).toContain(anchor);
     }
   });
 
