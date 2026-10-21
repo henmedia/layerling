@@ -694,7 +694,6 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "shortcuts.click": "Kattintás",
   "shortcuts.rightClick": "Jobb kattintás",
   "shortcuts.drag": "Húzás",
-  "shortcuts.footer": "Macen a Ctrl helyett mindenhol a Cmd-t használd.",
   "shortcuts.group.selection": "Kijelölés",
   "shortcuts.group.clipboard": "Vágólap",
   "shortcuts.group.history": "Előzmények",

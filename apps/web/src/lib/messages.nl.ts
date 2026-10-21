@@ -730,7 +730,6 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "shortcuts.click": "Klik",
   "shortcuts.rightClick": "Rechtsklik",
   "shortcuts.drag": "Slepen",
-  "shortcuts.footer": "Gebruik op een Mac Cmd overal waar Ctrl staat.",
   "shortcuts.group.selection": "Selectie",
   "shortcuts.group.clipboard": "Klembord",
   "shortcuts.group.history": "Geschiedenis",

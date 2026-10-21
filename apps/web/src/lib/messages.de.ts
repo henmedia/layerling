@@ -730,7 +730,6 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "shortcuts.click": "Klick",
   "shortcuts.rightClick": "Rechtsklick",
   "shortcuts.drag": "Ziehen",
-  "shortcuts.footer": "Auf dem Mac gilt überall dort Cmd, wo Ctrl steht.",
   "shortcuts.group.selection": "Auswahl",
   "shortcuts.group.clipboard": "Zwischenablage",
   "shortcuts.group.history": "Verlauf",

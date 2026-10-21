@@ -715,7 +715,6 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "shortcuts.click": "Klik",
   "shortcuts.rightClick": "Højreklik",
   "shortcuts.drag": "Træk",
-  "shortcuts.footer": "På en Mac, brug Cmd hvor end der står Ctrl.",
   "shortcuts.group.selection": "Markering",
   "shortcuts.group.clipboard": "Udklipsholder",
   "shortcuts.group.history": "Historik",

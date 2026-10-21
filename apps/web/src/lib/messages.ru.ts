@@ -727,7 +727,6 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "shortcuts.click": "Щелчок",
   "shortcuts.rightClick": "Правый щелчок",
   "shortcuts.drag": "Перетаскивание",
-  "shortcuts.footer": "На Mac используйте Cmd везде, где указан Ctrl.",
   "shortcuts.group.selection": "Выделение",
   "shortcuts.group.clipboard": "Буфер обмена",
   "shortcuts.group.history": "История",

@@ -721,7 +721,6 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "shortcuts.click": "クリック",
   "shortcuts.rightClick": "右クリック",
   "shortcuts.drag": "ドラッグ",
-  "shortcuts.footer": "Macでは、Ctrlと書かれている箇所でCmdを使ってください。",
   "shortcuts.group.selection": "選択",
   "shortcuts.group.clipboard": "クリップボード",
   "shortcuts.group.history": "履歴",

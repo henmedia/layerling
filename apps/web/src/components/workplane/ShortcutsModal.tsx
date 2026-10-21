@@ -185,7 +185,27 @@ function comboKeys(combo: string) {
   return parts.length > 0 ? parts : [combo];
 }
 
-function ShortcutKeys({ combos }: { combos: string[] }) {
+/**
+ * Whether the keyboard is an Apple one - a Mac, or an iPad with a keyboard,
+ * which reports itself as a Mac. Browsers do not say "Darwin"; the user agent
+ * says Macintosh. The editor takes Cmd wherever it takes Ctrl, and Option is
+ * Alt, so the list shows the keys under the names on that keyboard.
+ */
+function appleKeyboard() {
+  return typeof navigator !== "undefined" && /Macintosh|Mac OS X|iPhone|iPad|iPod/.test(navigator.userAgent);
+}
+
+const APPLE_KEY_NAMES: Record<string, string> = { Ctrl: "Cmd", Alt: "Option" };
+
+function keyLabel(key: string, apple: boolean) {
+  if (key === "Click") return t("shortcuts.click");
+  if (key === "RightClick") return t("shortcuts.rightClick");
+  if (key === "Drag") return t("shortcuts.drag");
+  if (key === "Wheel") return t("shortcuts.wheel");
+  return apple ? APPLE_KEY_NAMES[key] ?? key : key;
+}
+
+function ShortcutKeys({ combos, apple }: { combos: string[]; apple: boolean }) {
   return (
     <>
       {combos.map((combo, comboIndex) => (
@@ -195,7 +215,7 @@ function ShortcutKeys({ combos }: { combos: string[] }) {
             {comboKeys(combo).map((key, keyIndex) => (
               <Fragment key={key}>
                 {keyIndex > 0 ? <span className="shortcuts-plus" aria-hidden="true">+</span> : null}
-                <kbd>{key === "Click" ? t("shortcuts.click") : key === "RightClick" ? t("shortcuts.rightClick") : key === "Drag" ? t("shortcuts.drag") : key === "Wheel" ? t("shortcuts.wheel") : key}</kbd>
+                <kbd>{keyLabel(key, apple)}</kbd>
               </Fragment>
             ))}
           </span>
@@ -207,6 +227,7 @@ function ShortcutKeys({ combos }: { combos: string[] }) {
 
 /** The groups with their rows, the same markup in the window and on the printed sheet. */
 function ShortcutGroups({ groups }: { groups: ShortcutGroup[] }) {
+  const apple = appleKeyboard();
   return (
     <div className="shortcuts-groups">
       {groups.map((group) => (
@@ -217,7 +238,7 @@ function ShortcutGroups({ groups }: { groups: ShortcutGroup[] }) {
               <div className="shortcuts-row" key={`${group.title}:${shortcut.label}`}>
                 <dt>{t(shortcut.label)}</dt>
                 <dd>
-                  <ShortcutKeys combos={shortcut.combos} />
+                  <ShortcutKeys combos={shortcut.combos} apple={apple} />
                 </dd>
               </div>
             ))}
@@ -308,9 +329,6 @@ export function ShortcutsModal({ sketchMode, onClose }: { sketchMode: boolean; o
           <div className="workspace-modal-body shortcuts-modal-body">
             <p className="shortcuts-intro">{t("shortcuts.intro")}</p>
             <ShortcutGroups groups={groups} />
-          </div>
-          <div className="workspace-modal-footer">
-            <span>{t("shortcuts.footer")}</span>
           </div>
         </div>
       </div>

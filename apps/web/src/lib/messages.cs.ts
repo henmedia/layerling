@@ -809,7 +809,6 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "shortcuts.click": "Kliknutí",
   "shortcuts.rightClick": "Pravé tlačítko",
   "shortcuts.drag": "Tažení",
-  "shortcuts.footer": "Na Macu použijte Cmd místo uvedeného Ctrl.",
   "shortcuts.group.selection": "Výběr",
   "shortcuts.group.clipboard": "Schránka",
   "shortcuts.group.history": "Historie",

@@ -739,7 +739,6 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "shortcuts.click": "نقرة",
   "shortcuts.rightClick": "نقرة بالزر الأيمن",
   "shortcuts.drag": "سحب",
-  "shortcuts.footer": "على أجهزة Mac، استخدم Cmd أينما كُتب Ctrl.",
   "shortcuts.group.selection": "التحديد",
   "shortcuts.group.clipboard": "الحافظة",
   "shortcuts.group.history": "السجل",

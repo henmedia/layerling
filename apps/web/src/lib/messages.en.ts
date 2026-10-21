@@ -731,7 +731,6 @@ export const MESSAGES_EN = {
   "shortcuts.click": "Click",
   "shortcuts.rightClick": "Right click",
   "shortcuts.drag": "Drag",
-  "shortcuts.footer": "On a Mac, use Cmd wherever Ctrl is listed.",
   "shortcuts.group.selection": "Selection",
   "shortcuts.group.clipboard": "Clipboard",
   "shortcuts.group.history": "History",

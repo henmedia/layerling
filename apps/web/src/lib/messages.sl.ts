@@ -620,7 +620,6 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "shortcuts.click": "Klik",
   "shortcuts.rightClick": "Desni klik",
   "shortcuts.drag": "Vleci",
-  "shortcuts.footer": "Na Macu uporabi Cmd povsod, kjer je navedeno Ctrl.",
   "shortcuts.group.selection": "Izbor",
   "shortcuts.group.clipboard": "Odložišče",
   "shortcuts.group.history": "Zgodovina",

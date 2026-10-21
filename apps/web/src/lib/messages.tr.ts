@@ -703,7 +703,6 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "shortcuts.click": "Tık",
   "shortcuts.rightClick": "Sağ tık",
   "shortcuts.drag": "Sürükle",
-  "shortcuts.footer": "Mac'te Ctrl yazan her yerde Cmd kullan.",
   "shortcuts.group.selection": "Seçim",
   "shortcuts.group.clipboard": "Pano",
   "shortcuts.group.history": "Geçmiş",
