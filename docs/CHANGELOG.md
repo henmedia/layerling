@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Boolean Intersection and Show common part grey out on the dark grounds:** With fewer than two parts selected the two buttons were disabled but looked live in the dark and graphite themes.
+
 ## 1.99.0
 
 - **Rounded box radii to 0.01 mm (#705):** `normalizeCornerFillet` and `normalizeTopBottomFillet` rounded to a tenth of a millimetre, so a corner fillet of 0.25 mm came back as 0.3 mm. They round to a hundredth now, and the fields (the shape's properties and the defaults in the workspace settings) step by 0.05. The CAD solid reads the same functions, so it follows. Unit test in `roundedBoxGeometry.test.ts` (0.25 stays 0.25, 7.336 becomes 7.34). Reported by @Algotz on GitHub.
