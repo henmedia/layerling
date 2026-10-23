@@ -68,6 +68,18 @@ Una nota registra informazioni che la geometria non può esprimere: “Questa vi
 
 Le note vengono salvate nel progetto, non compaiono nelle esportazioni e possono essere mostrate o nascoste con {{ui:visibility.notes}} (in {{ui:editor.visibilityOptions}}, la freccia accanto all’icona dell’occhio).
 
+## Immagini di riferimento
+
+Un’immagine di riferimento è una fotografia da usare per allineare le parti: puoi appoggiare, per esempio, la foto di una scheda elettronica sul fondo del suo contenitore e posizionare direttamente su di essa i distanziatori, i fori e le aperture per i connettori. È una guida, non un corpo: non viene mai stampata né esportata (STL, 3MF, OBJ, STEP, SVG), non entra in un gruppo, un insieme o un taglio e non viene conteggiata nella stima di stampa.
+
+- Apri {{ui:editor.import}}, scegli {{ui:import.referenceImage}} e seleziona un’immagine PNG, JPG, WebP, GIF o BMP. Viene posizionata sul piano di lavoro, sulla piastra oppure sulla faccia su cui hai disposto il piano, con il lato più lungo di 100 mm e una trasparenza del 50%.
+- Spostala, ruotala e ridimensionala con le maniglie, come qualsiasi forma. Se davanti all’immagine c’è un corpo, viene selezionato prima quello: lavorando sopra la foto non la afferrerai per sbaglio.
+- {{ui:referenceImage.seeThrough}} nelle sue impostazioni ne regola la trasparenza, da completamente opaca a appena visibile.
+- {{ui:referenceImage.calibrate}} imposta la dimensione reale, come nello schizzo: fai clic su due punti dell’immagine di cui conosci la distanza reale, per esempio due fori di fissaggio della scheda, poi inseriscila in {{ui:referenceImage.distance}}. L’immagine mantiene le proporzioni e il centro.
+- Blocca l’immagine con il lucchetto nell’intestazione delle sue impostazioni: resterà ferma e i clic passeranno attraverso di essa fino alla piastra. Per sbloccarla, selezionala nell’elenco degli oggetti.
+- L’immagine viene salvata una sola volta nel file del progetto, anche se la copi o annulli l’operazione più volte. Un’immagine grande aumenta il file della stessa quantità; il messaggio che appare quando la aggiungi ne indica la dimensione.
+- Un sistema di IA può aggiungere, spostare, calibrare, rendere trasparente e bloccare un’immagine con `layerling_reference_image`.
+
 ## Punti di riferimento
 
 Un punto di riferimento è un semplice segno nello spazio, come una tacca fatta a matita o un punto di tracciatura in officina: non appartiene a un corpo, non viene mai stampato e permette agli altri oggetti di agganciarsi. Fai clic destro su un corpo e scegli {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} o {{ui:contextMenu.markMidpoints}}: i punti vengono posizionati sulla faccia superiore del corpo o, se hai selezionato più corpi, dell’intera selezione.
