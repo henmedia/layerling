@@ -417,6 +417,8 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityOpenRight = typeof source.gridfinityOpenRight === "boolean" ? source.gridfinityOpenRight : fallbackEntry?.gridfinityOpenRight;
       entry.gridfinityLipChamfer = optionalShapeNumber(source.gridfinityLipChamfer, fallbackEntry?.gridfinityLipChamfer, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityWallThickness = optionalShapeNumber(source.gridfinityWallThickness, fallbackEntry?.gridfinityWallThickness, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityOpeningCorner = source.gridfinityOpeningCorner === "round" || source.gridfinityOpeningCorner === "chamfer" ? source.gridfinityOpeningCorner : fallbackEntry?.gridfinityOpeningCorner;
+      entry.gridfinityOpeningCornerSize = optionalShapeNumber(source.gridfinityOpeningCornerSize, fallbackEntry?.gridfinityOpeningCornerSize, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityPaddingBack = optionalShapeNumber(source.gridfinityPaddingBack, fallbackEntry?.gridfinityPaddingBack, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityPaddingFront = optionalShapeNumber(source.gridfinityPaddingFront, fallbackEntry?.gridfinityPaddingFront, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityPaddingLeft = optionalShapeNumber(source.gridfinityPaddingLeft, fallbackEntry?.gridfinityPaddingLeft, 0, MAX_CUSTOM_SHAPE_DIMENSION);

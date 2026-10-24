@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Gridfinity-Seiten zum Teil öffnen",
+      "en": "Open a Gridfinity side partly"
+    },
+    "body": {
+      "de": "Eine offen geschaltete Seite eines Gridfinity-Behälters muss nicht mehr ganz offen sein: Im Eigenschaften-Fenster hat jede offene Seite die Zeilen „Tiefe“, „Breite“ und „Position“ für ihre Öffnung, für einen Schlitz zum Hineingreifen oder eine niedrigere Wand. Die Ecken und der Stapelrand neben der Öffnung bleiben, Behälter lassen sich also weiter darauf stapeln. Mit „Ecken der Öffnung“ und „Größe der Öffnungsecken“ lassen sich die Ecken der Öffnung selbst verrunden oder fasen.",
+      "en": "A Gridfinity bin's open side no longer has to be open in full: in the Properties panel each open side has \"Depth\", \"Width\" and \"Position\" rows for its opening, for a slot to reach into or a lower wall. The corners and the lip beside the opening stay, so bins still stack on it. \"Opening corners\" and \"Opening corner size\" round or chamfer the opening's own corners."
+    }
+  }
+]

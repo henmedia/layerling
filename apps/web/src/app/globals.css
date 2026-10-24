@@ -9679,6 +9679,40 @@ html[data-theme="dark"] .rotation-angle-badge {
   cursor: default;
 }
 
+/* A bin's four open sides as a cross seen from above: the back on top, the
+   front at the bottom, left and right between. Each switch is placed by its
+   side's class, named rather than counted. The columns take what room the
+   panel gives, so a long label may wrap to a second line. */
+.property-layout-sides {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  grid-template-areas:
+    "back back"
+    "left right"
+    "front front";
+  gap: 8px 12px;
+}
+
+.property-layout-sides > .check-property-back {
+  grid-area: back;
+  justify-self: center;
+}
+
+.property-layout-sides > .check-property-left {
+  grid-area: left;
+}
+
+.property-layout-sides > .check-property-right {
+  grid-area: right;
+  justify-self: end;
+}
+
+.property-layout-sides > .check-property-front {
+  grid-area: front;
+  justify-self: center;
+}
+
 .range-property {
   display: grid;
   gap: 7px;

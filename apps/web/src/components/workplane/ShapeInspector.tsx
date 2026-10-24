@@ -208,6 +208,7 @@ import {
   gridfinityCompartmentCount,
   gridfinityCompartmentCountPatch,
   gridfinityCompartmentLabel,
+  gridfinityCompartmentLabelLeftOut,
   gridfinityCompartmentLabelMaxWidth,
   gridfinityCompartmentMax,
   gridfinityCompartments,
@@ -231,6 +232,12 @@ import {
   gridfinityLipChamfer,
   gridfinityMaxUnits,
   gridfinityOpenFits,
+  gridfinityOpening,
+  gridfinityOpeningCornerSize,
+  gridfinityOpeningFits,
+  gridfinityOpeningLimits,
+  gridfinityOpeningMaxCornerSize,
+  gridfinityOpeningPatch,
   gridfinityPaddingPatch,
   gridfinityPlan,
   gridfinityScoopFits,
@@ -373,6 +380,10 @@ type TogglePropertyConfig = {
   id: string;
   label: string;
   value: boolean;
+  /** Switches next to each other with the same layout, such as a bin's four open sides (#455), are drawn together in it. */
+  layout?: "sides";
+  /** Its place in that layout, named rather than counted: the row takes the class check-property-{area}. */
+  area?: GridfinityWall;
   onChange: (value: boolean) => void;
 };
 
@@ -424,7 +435,7 @@ const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diamet
 const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ"]);
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth"].includes(key);
+  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight"].includes(key);
 }
 
 /**
@@ -1050,19 +1061,51 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       const maxFloor = gridfinityFloorMaxHeight(fields);
       properties.push({ id: "gridfinityFloorHeight", label: t("prop.gridfinityFloorHeight"), value: gridfinityFloorHeight(fields), min: MIN_GRIDFINITY_FLOOR_HEIGHT, max: maxFloor, step: 0.05, hint: t("gridfinity.floorHeightHint"), onChange: (value) => onUpdate({ gridfinityFloorHeight: clamp(value, MIN_GRIDFINITY_FLOOR_HEIGHT, maxFloor) }) });
     }
-    const { open } = plan;
+    const { switched } = plan;
     if (gridfinityOpenFits(fields)) {
-      // Open sides (#682): a switch for each side; an open side's shelf and scoop go with its wall.
+      // Open sides (#682): a switch for each side, drawn as a cross seen from above; a side switched open has no shelf or scoop (#455).
+      // In the order they are seen, the back on top and the front at the bottom, so Tab goes through them in that order.
       const walls = [
         { wall: "back", label: "prop.gridfinityOpenBack" },
-        { wall: "front", label: "prop.gridfinityOpenFront" },
         { wall: "left", label: "prop.gridfinityOpenLeft" },
         { wall: "right", label: "prop.gridfinityOpenRight" },
+        { wall: "front", label: "prop.gridfinityOpenFront" },
       ] as const;
       walls.forEach(({ wall, label }) => {
         const key = GRIDFINITY_OPEN_WALL_KEYS[wall];
-        properties.push({ type: "toggle", id: key, label: t(label), value: shape[key] === true, onChange: (value) => onUpdate({ [key]: value }) });
+        properties.push({ type: "toggle", id: key, label: t(label), value: shape[key] === true, layout: "sides", area: wall, onChange: (value) => onUpdate({ [key]: value }) });
       });
+      // How far each side switched open is opened (#455): its depth from the lip's top, its width, and where along the side it sits.
+      // The rows of each side keep the panel's order, as the padding, shelf and scoop rows do.
+      (["back", "front", "left", "right"] as const).filter((wall) => gridfinityOpeningFits(fields, wall)).forEach((wall, k) => {
+        const keys = GRIDFINITY_OPENING_KEYS[wall];
+        const opening = gridfinityOpening(fields, wall);
+        const limits = gridfinityOpeningLimits(fields, wall);
+        const update = (changes: Parameters<typeof gridfinityOpeningPatch>[2]) => onUpdate(gridfinityOpeningPatch(fields, wall, changes));
+        const places = GRIDFINITY_LABEL_ALIGN_OPTIONS[wall === "back" || wall === "front" ? "across" : "deep"];
+        properties.push(
+          { id: keys.depth, label: t(keys.depthLabel), value: opening.depth, min: limits.depth.min, max: limits.depth.max, step: 0.5, hint: k === 0 ? t("gridfinity.openingHint") : undefined, onChange: (value) => update({ depth: clamp(value, limits.depth.min, limits.depth.max) }) },
+          { id: keys.width, label: t(keys.widthLabel), value: opening.width, min: limits.width.min, max: limits.width.max, step: 0.5, onChange: (value) => update({ width: clamp(value, limits.width.min, limits.width.max) }) },
+          { type: "select", id: keys.position, label: t(keys.positionLabel), value: opening.align, options: places.map((option) => ({ value: option.value, label: t(option.label) })), onChange: (value) => update({ align: places.find((option) => option.value === value)?.value ?? "middle" }) },
+        );
+        if (opening.align !== "middle" && limits.distance > 0) {
+          properties.push({ id: keys.distance, label: t(keys.distanceLabel), value: opening.distance, min: 0, max: limits.distance, step: 0.5, onChange: (value) => update({ distance: clamp(value, 0, limits.distance) }) });
+        }
+      });
+      // The notches' corners seen from outside the wall, one setting for every side opened partly, as the shelves share theirs.
+      if (plan.notches.length > 0) {
+        properties.push(
+          {
+            type: "select",
+            id: "gridfinityOpeningCorner",
+            label: t("prop.gridfinityOpeningCorner"),
+            value: shape.gridfinityOpeningCorner ?? DEFAULT_GRIDFINITY_LABEL_CORNER,
+            options: [{ value: "round", label: t("gridfinity.labelRound") }, { value: "chamfer", label: t("gridfinity.labelChamfer") }],
+            onChange: (value) => onUpdate({ gridfinityOpeningCorner: value === "chamfer" ? "chamfer" : "round" }),
+          },
+          { id: "gridfinityOpeningCornerSize", label: t("prop.gridfinityOpeningCornerSize"), value: gridfinityOpeningCornerSize(fields), min: 0, max: gridfinityOpeningMaxCornerSize(fields), step: 0.5, hint: t("gridfinity.openingCornerHint"), onChange: (value) => onUpdate({ gridfinityOpeningCornerSize: value }) },
+        );
+      }
     }
     const compartments = gridfinityCompartments(fields);
     if (gridfinityLabelFits(fields)) {
@@ -1075,7 +1118,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         { wall: "right", label: "prop.gridfinityLabelRight" },
       ] as const;
       walls.forEach(({ wall, label }) => {
-        if (compartments || open[wall]) return;
+        if (compartments || switched[wall]) return;
         const keys = GRIDFINITY_LABEL_WALL_KEYS[wall];
         const { on } = keys;
         properties.push({ type: "toggle", id: on, label: t(label), value: shape[on] === true, onChange: (value) => onUpdate({ [on]: value }) });
@@ -1095,7 +1138,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       });
       const shelves = compartments
         ? compartments.cells.some((cell) => gridfinityCompartmentLabel(fields, cell.column, cell.row))
-        : walls.some(({ wall }) => shape[GRIDFINITY_LABEL_WALL_KEYS[wall].on] === true && !open[wall]);
+        : walls.some(({ wall }) => shape[GRIDFINITY_LABEL_WALL_KEYS[wall].on] === true && !switched[wall]);
       if (shelves) {
         properties.push(
           {
@@ -1119,11 +1162,11 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         { wall: "right", label: "prop.gridfinityScoopRight" },
       ] as const;
       walls.forEach(({ wall, label }) => {
-        if (open[wall]) return;
+        if (switched[wall]) return;
         const key = GRIDFINITY_SCOOP_WALL_KEYS[wall];
         properties.push({ type: "toggle", id: key, label: t(label), value: shape[key] === true, onChange: (value) => onUpdate({ [key]: value }) });
       });
-      if (walls.some(({ wall }) => shape[GRIDFINITY_SCOOP_WALL_KEYS[wall]] === true && !open[wall])) {
+      if (walls.some(({ wall }) => shape[GRIDFINITY_SCOOP_WALL_KEYS[wall]] === true && !switched[wall])) {
         const max = Math.max(MIN_GRIDFINITY_SCOOP_RADIUS, gridfinityScoopMaxRadius(fields));
         properties.push({ id: "gridfinityScoopRadius", label: t("prop.gridfinityScoopRadius"), value: gridfinityScoopRadius(fields), min: MIN_GRIDFINITY_SCOOP_RADIUS, max, step: 0.5, hint: gridfinityScoopsLeftOut(fields) ? t("gridfinity.scoopsLeftOutHint") : undefined, onChange: (value) => onUpdate({ gridfinityScoopRadius: clamp(value, MIN_GRIDFINITY_SCOOP_RADIUS, max) }) });
       }
@@ -4115,6 +4158,15 @@ const GRIDFINITY_LABEL_ALIGN_OPTIONS: Record<"across" | "deep", Array<{ value: N
   across: [{ value: "start", label: "gridfinity.alignLeft" }, { value: "middle", label: "gridfinity.alignMiddle" }, { value: "end", label: "gridfinity.alignRight" }],
   deep: [{ value: "start", label: "gridfinity.alignBack" }, { value: "middle", label: "gridfinity.alignMiddle" }, { value: "end", label: "gridfinity.alignFront" }],
 };
+/** A side's opening rows (#455): their ids and their names. */
+const GRIDFINITY_OPENING_KEYS: Record<GridfinityWall, { depth: string; width: string; position: string; distance: string; depthLabel: MessageKey; widthLabel: MessageKey; positionLabel: MessageKey; distanceLabel: MessageKey }> = {
+  back: { depth: "gridfinityOpeningDepthBack", width: "gridfinityOpeningWidthBack", position: "gridfinityOpeningPositionBack", distance: "gridfinityOpeningDistanceBack", depthLabel: "prop.gridfinityOpeningDepthBack", widthLabel: "prop.gridfinityOpeningWidthBack", positionLabel: "prop.gridfinityOpeningPositionBack", distanceLabel: "prop.gridfinityOpeningDistanceBack" },
+  front: { depth: "gridfinityOpeningDepthFront", width: "gridfinityOpeningWidthFront", position: "gridfinityOpeningPositionFront", distance: "gridfinityOpeningDistanceFront", depthLabel: "prop.gridfinityOpeningDepthFront", widthLabel: "prop.gridfinityOpeningWidthFront", positionLabel: "prop.gridfinityOpeningPositionFront", distanceLabel: "prop.gridfinityOpeningDistanceFront" },
+  left: { depth: "gridfinityOpeningDepthLeft", width: "gridfinityOpeningWidthLeft", position: "gridfinityOpeningPositionLeft", distance: "gridfinityOpeningDistanceLeft", depthLabel: "prop.gridfinityOpeningDepthLeft", widthLabel: "prop.gridfinityOpeningWidthLeft", positionLabel: "prop.gridfinityOpeningPositionLeft", distanceLabel: "prop.gridfinityOpeningDistanceLeft" },
+  right: { depth: "gridfinityOpeningDepthRight", width: "gridfinityOpeningWidthRight", position: "gridfinityOpeningPositionRight", distance: "gridfinityOpeningDistanceRight", depthLabel: "prop.gridfinityOpeningDepthRight", widthLabel: "prop.gridfinityOpeningWidthRight", positionLabel: "prop.gridfinityOpeningPositionRight", distanceLabel: "prop.gridfinityOpeningDistanceRight" },
+};
+/** Why a compartment's label shelf is left out (#455): its side open in full, or switched open with a partial opening. */
+const COMPARTMENT_LABEL_LEFT_OUT_HINTS: Record<"open" | "switched", MessageKey> = { open: "gridfinity.compartmentLabelOpenHint", switched: "gridfinity.compartmentLabelSwitchedHint" };
 const GRIDFINITY_LABEL_SIDE_OPTIONS: Array<{ value: GridfinityWall; label: MessageKey }> = [
   { value: "back", label: "gridfinity.labelSideBack" },
   { value: "front", label: "gridfinity.labelSideFront" },
@@ -4213,6 +4265,7 @@ function GridfinityCompartmentsCard({
         onUpdate({ gridfinityCompartmentLabels: all.length > 0 ? all : undefined });
       };
       // A side is offered when a label 4 mm wide still leaves 6 mm open, and the side already set always is.
+      const leftOut = stored ? gridfinityCompartmentLabelLeftOut(cell, stored.side) : null;
       const sides = GRIDFINITY_LABEL_SIDE_OPTIONS.filter(({ value }) => value === stored?.side || gridfinityCompartmentLabelMaxWidth(fields, cell, value) >= MIN_GRIDFINITY_LABEL_WIDTH);
       properties.push({
         type: "select",
@@ -4220,7 +4273,7 @@ function GridfinityCompartmentsCard({
         label: t("prop.gridfinityCompartmentLabel"),
         value: stored?.side ?? "none",
         options: [{ value: "none", label: t("gridfinity.labelNone") }, ...sides.map(({ value, label }) => ({ value, label: t(label) }))],
-        hint: stored && cell.open[stored.side] ? t("gridfinity.compartmentLabelOpenHint") : undefined,
+        hint: leftOut ? t(COMPARTMENT_LABEL_LEFT_OUT_HINTS[leftOut]) : undefined,
         onChange: (value) => {
           const side = GRIDFINITY_LABEL_SIDE_OPTIONS.find((option) => option.value === value)?.value;
           writeLabel(side ? { ...stored, column, row, side } : null);
@@ -4336,7 +4389,7 @@ function ShapePropertyRows({
   onFormula?: (id: string, text: string | null | undefined) => void;
   onInteractionActiveChange?: (active: boolean) => void;
 }) {
-  return properties.map((property) => {
+  const rows = properties.map((property) => {
     if (property.type === "text") {
       return <TextProperty {...property} key={property.id} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />;
     }
@@ -4354,6 +4407,16 @@ function ShapePropertyRows({
     // A double click on the slider goes back to the default, also when the first click of it has just moved the value.
     const onDefault = typeof fallback === "number" ? () => property.onChange(fallback) : undefined;
     return <RangeProperty {...property} key={property.id} workspace={workspace} disabled={disabled || property.disabled} onReset={onReset} onDefault={onDefault} formula={formulas?.[property.id]} onFormula={onFormula ? (text) => onFormula(property.id, text) : undefined} onInteractionActiveChange={onInteractionActiveChange} />;
+  });
+  // Toggles with a layout are pushed together, back to back, and drawn in one box of it.
+  const layoutOf = (property: ShapePropertyConfig | undefined) => (property?.type === "toggle" ? property.layout : undefined);
+  return rows.flatMap((row, index) => {
+    const layout = layoutOf(properties[index]);
+    if (!layout) return [row];
+    if (layoutOf(properties[index - 1]) === layout) return [];
+    let end = index;
+    while (layoutOf(properties[end + 1]) === layout) end += 1;
+    return [<div className={`property-layout-${layout}`} key={`layout-${properties[index].id}`}>{rows.slice(index, end + 1)}</div>];
   });
 }
 
@@ -4822,9 +4885,9 @@ function SelectProperty({ label, value, options, hint, disabled, onChange, onRes
   );
 }
 
-function ToggleProperty({ label, value, disabled, onChange, onReset }: Omit<TogglePropertyConfig, "id" | "type"> & { disabled?: boolean; onReset?: () => void }) {
+function ToggleProperty({ label, value, area, disabled, onChange, onReset }: Omit<TogglePropertyConfig, "id" | "type"> & { disabled?: boolean; onReset?: () => void }) {
   return (
-    <label className="check-property">
+    <label className={area ? `check-property check-property-${area}` : "check-property"}>
       <input type="checkbox" checked={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.checked)} />
       <span>{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
     </label>

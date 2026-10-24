@@ -241,7 +241,7 @@ export type ShapeCustomization = {
   gridfinityScoopRadius?: number;
   /** Gridfinity bin: the floor's height inside in mm, measured from the underside; missing is 5.95, and at the highest the bin is solid up to the lip's support, or to the top without the lip. */
   gridfinityFloorHeight?: number;
-  /** Gridfinity bin: no wall and no stacking lip along the back above the floor; the walls beside it run out to the outline (#682). */
+  /** Gridfinity bin: no wall and no stacking lip along the back above the floor; the walls beside it run out to the outline (#682). Opened only partly with gridfinityOpenings (#455). */
   gridfinityOpenBack?: boolean;
   /** Gridfinity bin: no wall and no stacking lip along the front. */
   gridfinityOpenFront?: boolean;
@@ -253,6 +253,10 @@ export type ShapeCustomization = {
   gridfinityLipChamfer?: number;
   /** Gridfinity bin: the wall's thickness in mm, set in from an outline that never changes; missing is 0.95, at least 0.8, at most where the walls meet, which builds the bin solid (#455). */
   gridfinityWallThickness?: number;
+  /** Gridfinity bin: the corners of its partly open sides' notches, seen from outside the wall, rounded or chamfered; missing is rounded (#455). */
+  gridfinityOpeningCorner?: GridfinityLabelCorner;
+  /** Gridfinity bin: the size of that rounding or chamfer in mm; missing, 0 or under 0.5 leaves them square. */
+  gridfinityOpeningCornerSize?: number;
   /** Gridfinity baseplate: a solid border at the plate's height along the back, in mm, outside the grid and inside the box; missing is none, at most 41 (#455). */
   gridfinityPaddingBack?: number;
   /** Gridfinity baseplate: the border along the front. */
@@ -574,6 +578,20 @@ export type GridfinityCompartmentLabel = {
   width?: number;
 };
 
+/**
+ * A Gridfinity bin's side switched open, opened only partly (#455): a notch from the lip's top down `depth` mm, `width`
+ * mm wide, at its place along the side's straight part: `align` start (towards -x on a back or front side, towards -z on
+ * a left or right one), middle or end, and `distance` mm from that end; a missing value is the full depth, the full
+ * wall, the middle or 0. At the full depth and the full wall the side is open as before.
+ */
+export type GridfinityOpening = {
+  side: "back" | "front" | "left" | "right";
+  depth?: number;
+  width?: number;
+  align?: "start" | "middle" | "end";
+  distance?: number;
+};
+
 /** Was aus dem Gewinde wird: Stange, Schraube, Mutter oder das Loch dafuer. */
 export type ThreadRole = "rod" | "screw" | "nut" | "bore";
 export type ThreadHead = "cylinder" | "countersunk" | "hex";
@@ -872,7 +890,7 @@ export type WorkplaneShape = {
   gridfinityScoopRadius?: number;
   /** Gridfinity bin: the floor's height inside in mm, measured from the underside; missing is 5.95, and at the highest the bin is solid up to the lip's support, or to the top without the lip. */
   gridfinityFloorHeight?: number;
-  /** Gridfinity bin: no wall and no stacking lip along the back above the floor; the walls beside it run out to the outline (#682). */
+  /** Gridfinity bin: no wall and no stacking lip along the back above the floor; the walls beside it run out to the outline (#682). Opened only partly with gridfinityOpenings (#455). */
   gridfinityOpenBack?: boolean;
   /** Gridfinity bin: no wall and no stacking lip along the front. */
   gridfinityOpenFront?: boolean;
@@ -904,6 +922,12 @@ export type WorkplaneShape = {
   gridfinityDividerPositionsZ?: number[];
   /** Gridfinity bin with dividers: the compartments' labels, one for each compartment that has one. */
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];
+  /** Gridfinity bin: how far each side switched open is opened (#455), one entry a side; missing is the whole side. */
+  gridfinityOpenings?: GridfinityOpening[];
+  /** Gridfinity bin: the corners of its partly open sides' notches, seen from outside the wall, rounded or chamfered; missing is rounded (#455). */
+  gridfinityOpeningCorner?: GridfinityLabelCorner;
+  /** Gridfinity bin: the size of that rounding or chamfer in mm; missing, 0 or under 0.5 leaves them square. */
+  gridfinityOpeningCornerSize?: number;
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */

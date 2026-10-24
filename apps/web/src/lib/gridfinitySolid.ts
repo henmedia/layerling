@@ -17,6 +17,8 @@ import {
   type GridfinityLabelCornerShape,
   type GridfinityLabelPieces,
   type GridfinityLabelProfile,
+  type GridfinityNotch,
+  type GridfinityOpeningInside,
   type GridfinityPlan,
   type GridfinityScoopPieces,
   type GridfinityStep,
@@ -29,6 +31,11 @@ import {
   gridfinityLabelProfileEnds,
   gridfinityOpenCorners,
   gridfinityOpenGrown,
+  gridfinityOpeningFloorCut,
+  gridfinityOpeningFrame,
+  gridfinityOpeningInside,
+  gridfinityOpeningOutline,
+  gridfinityOpeningSection,
   gridfinityPlan,
   gridfinityScoopPieces,
   gridfinityScoopPoint,
@@ -174,6 +181,10 @@ function binSolid(cad: OcctKernel, plan: GridfinityPlan, scoops: GridfinityScoop
   }
   if (scoops) cutter = scoopedCutter(cad, cutter, scoops);
   if (upper) cutter = oneSolid(cad, cad.fuse(cutter, upper), "bin's inside");
+  // A side opened partly has its notch cut with the inside, in the one cut (#455).
+  const opening = gridfinityOpeningInside(plan, compartments);
+  const notches = plan.notches.map((notch) => notchSolid(cad, plan, notch, opening));
+  if (notches.length > 0) cutter = oneSolid(cad, cad.fuseAll([cutter, ...notches]), "bin's inside");
   // The whole inside without the compartments, the floor's rounding or the scoops, for the dividers' check.
   const loft = upper ? oneSolid(cad, cad.fuse(below, upper), "bin's inside") : below;
   const block = body;
@@ -183,9 +194,9 @@ function binSolid(cad: OcctKernel, plan: GridfinityPlan, scoops: GridfinityScoop
   if (compartments) {
     const [inset] = inside[inside.length - 1];
     const over = (4 * (hx - inset) * (hz - inset) - (4 - Math.PI) * Math.max(0, GRIDFINITY_BIN_RADIUS - inset) ** 2) * PAST;
-    const bound = gridfinityDividerBound(plan, compartments) + gridfinityCompartmentFloorBound(plan, compartments);
-    // Through an open side the inside runs on past the block, so what it would leave is measured by cutting it.
-    const plain = opened ? cad.getVolume(cad.cut(block, loft)) : cad.getVolume(block) - cad.getVolume(loft) + over;
+    const bound = gridfinityDividerBound(plan, compartments) + gridfinityCompartmentFloorBound(plan, compartments) - gridfinityOpeningFloorCut(plan, compartments);
+    // Through an open side the inside runs on past the block, and a notch takes the wall, so what they would leave is measured by cutting it.
+    const plain = notches.length > 0 ? cad.getVolume(cad.cut(block, cad.fuseAll([loft, ...notches]))) : opened ? cad.getVolume(cad.cut(block, loft)) : cad.getVolume(block) - cad.getVolume(loft) + over;
     if (cad.getVolume(body) < plain + bound - PIECE_MISSED) throw new Error("The Gridfinity bin's dividers could not be cut");
   }
   if (plan.lipChamfer > 0) body = oneSolid(cad, cad.common(body, lipChamferKeeper(cad, plan, hx, hz, wallTop)), "bin");
@@ -194,6 +205,21 @@ function binSolid(cad: OcctKernel, plan: GridfinityPlan, scoops: GridfinityScoop
     body = oneSolid(cad, cad.cutAll(body, holes), "bin");
   }
   return body;
+}
+
+/** A notch's section (#455) run along it, in the kernel's frame: x as the shape's, y as its -z, z up. */
+function notchSolid(cad: OcctKernel, plan: GridfinityPlan, notch: GridfinityNotch, inside: GridfinityOpeningInside) {
+  const outline = gridfinityOpeningOutline(plan, notch, inside);
+  const cut = outline ? outline.notch : notch;
+  const { origin, inward, along, length } = gridfinityOpeningFrame(plan, cut);
+  const points = gridfinityOpeningSection(plan, cut, inside.rounding).map(([u, y]) => ({ x: origin.x + u * inward.x, y: -(origin.z + u * inward.z), z: y }));
+  const section = cad.extrude(polygonFace(cad, points), along.x * length, -along.z * length, 0);
+  if (!outline) return section;
+  // Its rounded or chamfered corners: the outline seen from outside the wall, with true arcs, run across the wall.
+  const [u0, u1] = outline.across;
+  const at = ([t, y]: [number, number]) => ({ x: origin.x + u1 * inward.x + t * along.x, y: -(origin.z + u1 * inward.z + t * along.z), z: y });
+  const edges = outline.segments.map(({ from, to, middle }) => (middle ? cad.makeArcEdge(at(from), at(middle), at(to)) : cad.makeLineEdge(at(from), at(to))));
+  return oneSolid(cad, cad.common(section, cad.extrude(cad.makeFace(cad.makeWire(edges)), -inward.x * (u1 - u0), inward.z * (u1 - u0), 0)), "notch");
 }
 
 /**

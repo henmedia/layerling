@@ -537,6 +537,9 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gridfinityDividerPositionsX: shape.gridfinityDividerPositionsX,
         gridfinityDividerPositionsZ: shape.gridfinityDividerPositionsZ,
         gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels,
+        gridfinityOpenings: shape.gridfinityOpenings,
+        gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
+        gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
       });
       break;
     case "loft":

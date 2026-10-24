@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import type { ManifoldToplevel } from "manifold-3d";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
-import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityType, WorkplaneShape } from "@/types/layerling";
+import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityType, WorkplaneShape } from "@/types/layerling";
 
 /*
  * Gridfinity (#381), the open storage system by Zack Freedman: bins on a 42 mm grid
@@ -176,6 +176,21 @@ export const MIN_GRIDFINITY_DIVIDER_THICKNESS = 0.8;
 export const MAX_GRIDFINITY_DIVIDER_THICKNESS = 3;
 /** The largest chamfer on the lip's top: it takes the top 1 mm of the 2.69 mm slope a stacked bin's feet rest on. */
 export const MAX_GRIDFINITY_LIP_CHAMFER = 1;
+/** The shallowest and the narrowest partial opening of a side (#455), in mm. */
+export const MIN_GRIDFINITY_OPENING_DEPTH = 2;
+export const MIN_GRIDFINITY_OPENING_WIDTH = 5;
+/** A notch's corner (#455) smaller than this (mm) is built square, as the panel's smallest step. */
+const OPENING_CORNER_MIN = 0.5;
+/** A corner set this close (mm) under the room the notch leaves takes all of that room, so no sliver of wall is left beside it. */
+const OPENING_CORNER_SNAP = 0.01;
+/** How far (mm) what a corner makes stays from another edge of the wall, more than this: the shortest edge the kernel keeps. */
+const OPENING_CORNER_CLEAR = 0.01;
+/** The most (mm) a corner comes down to keep that clear; with nothing clear within it, it keeps its size. */
+const OPENING_CORNER_GIVE = 0.5;
+/** An opening this close to the full wall or to the floor (mm) opens it fully, so no sliver of wall is left beside it. */
+const OPENING_SNAP = 0.5;
+/** An opening's bottom this close to the ledge and the dividers' top (mm) moves off it, so their faces never meet. */
+const OPENING_LEDGE_CLEAR = 0.05;
 /** The narrowest compartment: the kernel's cut fails below about 5.6 mm and leaves slivers up to 5.65. */
 export const MIN_GRIDFINITY_COMPARTMENT = 6;
 /** The most compartments a grid unit of 42 mm takes each way. */
@@ -246,6 +261,9 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityDividerPositionsX?: number[];
   gridfinityDividerPositionsZ?: number[];
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];
+  gridfinityOpenings?: GridfinityOpening[];
+  gridfinityOpeningCorner?: GridfinityLabelCorner;
+  gridfinityOpeningCornerSize?: number;
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -423,21 +441,107 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
   const top = count.y * GRIDFINITY_HEIGHT_UNIT;
   // The wall's inside face, set in from the outline; the outside never changes. Walls that leave an inside narrower
   // than MIN_GRIDFINITY_INSIDE make the bin solid: the floor goes up to the highest it takes.
-  // A bin open on every side has no wall to set, nor walls left to meet.
-  const walled = LABEL_WALLS.some((wall) => shape[GRIDFINITY_OPEN_WALL_KEYS[wall]] !== true);
+  // A bin open on every side has no wall to set, nor walls left to meet; a side opened only partly keeps one (#455).
+  const openings = normalizeGridfinityOpenings(shape.gridfinityOpenings) ?? [];
+  // To 0.01 mm: a chamfer of a millionth of a millimetre left the exact body's cut with no solid.
+  const lipChamfer = lip ? Math.round(clampLabel(shape.gridfinityLipChamfer, 0, 0, MAX_GRIDFINITY_LIP_CHAMFER) * 100) / 100 : 0;
+  const closedSide = LABEL_WALLS.some((wall) => shape[GRIDFINITY_OPEN_WALL_KEYS[wall]] !== true);
+  const walled = closedSide || partlyOpen(shape, { type, top, lip, size, openings, lipChamfer });
   const wallThickness = type === "bin" && walled ? clampLabel(shape.gridfinityWallThickness, DEFAULT_GRIDFINITY_WALL_THICKNESS, MIN_GRIDFINITY_WALL_THICKNESS, wallMaxThickness(size)) : DEFAULT_GRIDFINITY_WALL_THICKNESS;
-  const solid = type === "bin" && Math.min(size.width, size.depth) / 2 - wallThickness < MIN_GRIDFINITY_INSIDE / 2;
+  // Only a side switched shut makes walls meet: a bin switched open on all four sides never goes solid, as a wall too
+  // thick for its opening leaves that side open in full.
+  const solid = type === "bin" && closedSide && Math.min(size.width, size.depth) / 2 - wallThickness < MIN_GRIDFINITY_INSIDE / 2;
   const floor = solid ? floorMaxHeight({ type, top, lip, wallThickness }) : floorHeight(shape.gridfinityFloorHeight, { type, top, lip, wallThickness });
   // Any bin but a solid block can be open on a side (#682), with no wall there above the floor.
   const fits = openFits({ type, top, lip, floor });
-  const open = Object.fromEntries(LABEL_WALLS.map((wall) => [wall, fits && shape[GRIDFINITY_OPEN_WALL_KEYS[wall]] === true])) as Record<GridfinityWall, boolean>;
+  // A side switched open is open in full, or partly with a notch cut out of its wall (#455); shelves and scoops follow the switch.
+  const switched = Object.fromEntries(LABEL_WALLS.map((wall) => [wall, fits && shape[GRIDFINITY_OPEN_WALL_KEYS[wall]] === true])) as Record<GridfinityWall, boolean>;
+  const { open, notches } = openingStates({ switched, openings, size, top, lip, floor, wallThickness, lipChamfer, solid });
   // A bin with a finger scoop has every inner floor edge rounded, and the scoop is the rounding made large on its wall.
-  const scooped = scoopFits({ type, top, lip, floor, wallThickness }) && LABEL_WALLS.some((wall) => shape[GRIDFINITY_SCOOP_WALL_KEYS[wall]] === true && !open[wall]);
+  const scooped = scoopFits({ type, top, lip, floor, wallThickness }) && LABEL_WALLS.some((wall) => shape[GRIDFINITY_SCOOP_WALL_KEYS[wall]] === true && !switched[wall]);
   const innerRadius = gridfinityInnerRadius(wallThickness);
   const floorRounding = scooped ? innerRadius : 0;
-  // To 0.01 mm: a chamfer of a millionth of a millimetre left the exact body's cut with no solid.
-  const lipChamfer = lip ? Math.round(clampLabel(shape.gridfinityLipChamfer, 0, 0, MAX_GRIDFINITY_LIP_CHAMFER) * 100) / 100 : 0;
-  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, pitch, size, cells, magnetHoles, top, floor, floorRounding, open, padding, centre, lipChamfer, wallThickness, innerRadius, solid, reach: gridfinityOpenReach(wallThickness) };
+  // The notches' corners, seen from outside the wall: each takes as much of the size as it has room for (gridfinityOpeningCorners).
+  const openingCorner: GridfinityLabelCorner = shape.gridfinityOpeningCorner === "chamfer" ? "chamfer" : DEFAULT_GRIDFINITY_LABEL_CORNER;
+  const openingCornerSize = Math.round(clampLabel(shape.gridfinityOpeningCornerSize, 0, 0, MAX_GRIDFINITY_LABEL_CORNER_SIZE) * 100) / 100;
+  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, pitch, size, cells, magnetHoles, top, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, lipChamfer, wallThickness, innerRadius, solid, reach: gridfinityOpenReach(wallThickness) };
+}
+
+/** A notch cut out of a side's wall, partly open (#455): from and to along the side (x across, z deep), its bottom's height. */
+export type GridfinityNotch = { side: GridfinityWall; from: number; to: number; bottom: number };
+
+/** The walls at a side's two ends: towards -x on a back or front side, towards -z on a left or right one, first. */
+const OPENING_ENDS: Record<GridfinityWall, [GridfinityWall, GridfinityWall]> = { back: ["left", "right"], front: ["left", "right"], left: ["back", "front"], right: ["back", "front"] };
+
+/** To a millionth of a millimetre, so an opening's numbers read as they are typed. */
+function openingRound(value: number) {
+  return Math.round(value * 1e6) / 1e6;
+}
+
+/** Where an opening's depth is measured from: the lip's top after its chamfer, or the bin's top without the lip. */
+function openingTop({ top, lip, lipChamfer }: { top: number; lip: boolean; lipChamfer: number }) {
+  return lip ? top + GRIDFINITY_LIP_HEIGHT - lipChamfer * Math.SQRT1_2 : top;
+}
+
+/**
+ * Which sides switched open are open in full, as before (#682), and the notches of those opened only partly (#455). A
+ * side's straight part runs between its corners, kept as wide as the wall is thick, or to the outline beside a side
+ * open in full. Whether a set width is the full wall is judged with the corners kept, so it does not change with its
+ * neighbours, and a side whose straight part has no room for the narrowest opening is open in full. A bin built solid
+ * takes no notch.
+ */
+function openingStates(plan: { switched: Record<GridfinityWall, boolean>; openings: GridfinityOpening[]; size: { width: number; depth: number }; top: number; lip: boolean; floor: number; wallThickness: number; lipChamfer: number; solid: boolean }) {
+  const corner = Math.max(GRIDFINITY_BIN_RADIUS, plan.wallThickness);
+  const shut: Record<GridfinityWall, boolean> = { back: false, front: false, left: false, right: false };
+  const straight = (side: GridfinityWall, open: Record<GridfinityWall, boolean>) => {
+    const half = (side === "back" || side === "front" ? plan.size.width : plan.size.depth) / 2;
+    const [start, end] = OPENING_ENDS[side];
+    return [-half + (open[start] ? 0 : corner), half - (open[end] ? 0 : corner)];
+  };
+  const entryOf = (side: GridfinityWall) => plan.openings.find((entry) => entry.side === side);
+  const fullWidth = (side: GridfinityWall) => {
+    const width = entryOf(side)?.width;
+    const [a0, a1] = straight(side, shut);
+    return width === undefined || a1 - a0 < MIN_GRIDFINITY_OPENING_WIDTH || width >= a1 - a0 - OPENING_SNAP;
+  };
+  const room = (side: GridfinityWall) => {
+    const [a0, a1] = straight(side, shut);
+    return a1 - a0 >= MIN_GRIDFINITY_OPENING_WIDTH;
+  };
+  const bottomOf = (side: GridfinityWall) => {
+    const depth = entryOf(side)?.depth;
+    if (depth === undefined) return plan.floor;
+    const height = openingTop(plan);
+    const bottom = height - clamp(depth, MIN_GRIDFINITY_OPENING_DEPTH, Math.max(MIN_GRIDFINITY_OPENING_DEPTH, height - plan.floor));
+    if (bottom <= plan.floor + OPENING_SNAP) return plan.floor;
+    const ledge = plan.top - LABEL_DROP;
+    if (Math.abs(bottom - ledge) >= OPENING_LEDGE_CLEAR) return openingRound(bottom);
+    return Math.max(plan.floor, openingRound(bottom < ledge - 1e-9 ? ledge - OPENING_LEDGE_CLEAR : ledge + OPENING_LEDGE_CLEAR));
+  };
+  const open = Object.fromEntries(LABEL_WALLS.map((side) => [side, plan.switched[side] && (plan.solid || !room(side) || (fullWidth(side) && bottomOf(side) === plan.floor))])) as Record<GridfinityWall, boolean>;
+  const notches = plan.solid ? [] : LABEL_WALLS.filter((side) => plan.switched[side] && !open[side]).flatMap((side): GridfinityNotch[] => {
+    const entry = entryOf(side)!;
+    const [a0, a1] = straight(side, open);
+    const length = a1 - a0;
+    const width = fullWidth(side) ? length : clamp(entry.width!, MIN_GRIDFINITY_OPENING_WIDTH, length);
+    const distance = clamp(entry.distance ?? 0, 0, length - width);
+    const from = entry.align === "start" ? a0 + distance : entry.align === "end" ? a1 - distance - width : (a0 + a1) / 2 - width / 2;
+    return [{ side, from: openingRound(from), to: openingRound(from + width), bottom: bottomOf(side) }];
+  });
+  return { open, notches };
+}
+
+/**
+ * Whether a bin switched open on every side still has a wall, a side opened only partly: judged with the wall's own
+ * 0.95 mm, as the wall's setting is what this decides.
+ */
+function partlyOpen(shape: GridfinityShapeFields, plan: { type: GridfinityType; top: number; lip: boolean; size: { width: number; depth: number }; openings: GridfinityOpening[]; lipChamfer: number }) {
+  if (plan.type !== "bin" || plan.openings.length === 0) return false;
+  const wallThickness = DEFAULT_GRIDFINITY_WALL_THICKNESS;
+  const floor = floorHeight(shape.gridfinityFloorHeight, { ...plan, wallThickness });
+  if (!openFits({ ...plan, floor })) return false;
+  const switched = Object.fromEntries(LABEL_WALLS.map((wall) => [wall, shape[GRIDFINITY_OPEN_WALL_KEYS[wall]] === true])) as Record<GridfinityWall, boolean>;
+  return openingStates({ ...plan, switched, floor, wallThickness, solid: false }).notches.length > 0;
 }
 
 /** The radius of the inside's corners: the outline's, set in by the wall with its centres kept; square from a wall of 3.75 mm. */
@@ -642,8 +746,8 @@ export function gridfinityLabelMaxWidth(shape: GridfinityShapeFields, wall: Grid
   const { hx, hz } = labelInside(plan);
   const size = gridfinityLabelCornerSize(shape);
   const max = labelFloorWidth(plan);
-  // A shelf set on an open side is not built, so it faces nothing.
-  const on = (side: GridfinityWall) => shape[GRIDFINITY_LABEL_WALL_KEYS[side].on] === true && !plan.open[side];
+  // A shelf set on a side switched open is not built, so it faces nothing.
+  const on = (side: GridfinityWall) => shape[GRIDFINITY_LABEL_WALL_KEYS[side].on] === true && !plan.switched[side];
   const [half, facing] = wall === "back" || wall === "front" ? [hz, on(wall === "back" ? "front" : "back")] : [hx, on(wall === "left" ? "right" : "left")];
   return Math.min(max, facing ? half - 1 - size : 2 * half - 2 - size);
 }
@@ -700,8 +804,8 @@ export function gridfinityLabelPieces(shape: GridfinityShapeFields): GridfinityL
   // A bin with dividers has labels in its compartments instead (#554); its shelves' settings are kept for a bin without.
   if (!gridfinityLabelFits(shape) || gridfinityCompartments(shape)) return null;
   const plan = gridfinityPlan(shape);
-  // An open side has no wall for a shelf (#682); its setting is kept for when it is closed again.
-  const walls = LABEL_WALLS.filter((wall) => shape[GRIDFINITY_LABEL_WALL_KEYS[wall].on] === true && !plan.open[wall]);
+  // A side switched open has no shelf, its wall gone (#682) or only notched (#455); the setting is kept for when it is closed again.
+  const walls = LABEL_WALLS.filter((wall) => shape[GRIDFINITY_LABEL_WALL_KEYS[wall].on] === true && !plan.switched[wall]);
   if (walls.length === 0) return null;
   const size = gridfinityLabelCornerSize(shape);
   const round = (shape.gridfinityLabelCorner ?? DEFAULT_GRIDFINITY_LABEL_CORNER) !== "chamfer";
@@ -911,7 +1015,7 @@ function scoopFits(plan: { type: GridfinityType; top: number; lip: boolean; floo
  */
 export function gridfinityScoopMaxRadius(shape: GridfinityShapeFields) {
   const plan = gridfinityPlan(shape);
-  const on = (wall: GridfinityWall) => shape[GRIDFINITY_SCOOP_WALL_KEYS[wall]] === true && !plan.open[wall];
+  const on = (wall: GridfinityWall) => shape[GRIDFINITY_SCOOP_WALL_KEYS[wall]] === true && !plan.switched[wall];
   const rooms = LABEL_WALLS.filter(on).map((wall) => scoopRoom(plan, on, wall)).filter((room) => room >= MIN_GRIDFINITY_SCOOP_RADIUS - 1e-9);
   return Math.min(scoopDepth(plan) - SCOOP_WALL_ABOVE, ...rooms);
 }
@@ -953,10 +1057,10 @@ export function gridfinityScoopPieces(shape: GridfinityShapeFields): GridfinityS
   if (!gridfinityScoopFits(shape)) return null;
   const plan = gridfinityPlan(shape);
   const { open } = plan;
-  // An open side has no wall for a scoop (#682); its setting is kept for when it is closed again.
+  // A side switched open has no scoop, its wall gone (#682) or only notched (#455); the setting is kept for when it is closed again.
   const { hx, hz } = labelInside(plan);
   // A wall whose scoop would leave less than 2 mm of floor even at the smallest radius has none, as in a compartment.
-  const on = (wall: GridfinityWall) => shape[GRIDFINITY_SCOOP_WALL_KEYS[wall]] === true && !open[wall];
+  const on = (wall: GridfinityWall) => shape[GRIDFINITY_SCOOP_WALL_KEYS[wall]] === true && !plan.switched[wall];
   const walls = LABEL_WALLS.filter((wall) => on(wall) && scoopRoom(plan, on, wall) >= MIN_GRIDFINITY_SCOOP_RADIUS - 1e-9);
   if (walls.length === 0) return null;
   const floor = plan.floor;
@@ -1149,6 +1253,8 @@ export type GridfinityCompartment = {
   onWall: Record<GridfinityWall, boolean>;
   /** The bin's open sides it lies against (#682). */
   open: Record<GridfinityWall, boolean>;
+  /** The bin's sides switched open it lies against, in full or partly (#455): no label there. */
+  switched: Record<GridfinityWall, boolean>;
 };
 
 /**
@@ -1178,6 +1284,7 @@ export function gridfinityCompartments(shape: GridfinityShapeFields) {
         hz: (z1 - z0) / 2,
         onWall: { back: row === 0, front: row === counts.z - 1, left: column === 0, right: column === counts.x - 1 },
         open: { back: row === 0 && plan.open.back, front: row === counts.z - 1 && plan.open.front, left: column === 0 && plan.open.left, right: column === counts.x - 1 && plan.open.right },
+        switched: { back: row === 0 && plan.switched.back, front: row === counts.z - 1 && plan.switched.front, left: column === 0 && plan.switched.left, right: column === counts.x - 1 && plan.switched.right },
       });
     }
   }
@@ -1243,10 +1350,10 @@ export function gridfinityCompartmentCornerSize(shape: GridfinityShapeFields, ce
 
 /**
  * The widest label a compartment takes on a side: its underside above the floor, and 6 mm of the compartment left open
- * in front of it and its corner. None on the bin's open side, which has no wall for it.
+ * in front of it and its corner. None on a side switched open, in full or in part, as on the bin's other shelves.
  */
-export function gridfinityCompartmentLabelMaxWidth(shape: GridfinityShapeFields, cell: { hx: number; hz: number; open?: Record<GridfinityWall, boolean> }, side: GridfinityWall) {
-  if (cell.open?.[side]) return 0;
+export function gridfinityCompartmentLabelMaxWidth(shape: GridfinityShapeFields, cell: { hx: number; hz: number; switched?: Record<GridfinityWall, boolean> }, side: GridfinityWall) {
+  if (cell.switched?.[side]) return 0;
   const across = 2 * (side === "back" || side === "front" ? cell.hz : cell.hx);
   return Math.min(labelFloorWidth(gridfinityPlan(shape)), across - COMPARTMENT_LABEL_OPEN - gridfinityCompartmentCornerSize(shape, cell));
 }
@@ -1384,6 +1491,15 @@ export function gridfinityDividerBound(plan: GridfinityPlan, pieces: GridfinityC
   return area * (Math.min(pieces.top, support) - plan.floor) + clear * lean;
 }
 
+/**
+ * What notches down near the floor take of a divided bin's floor rounding (#455), at most its whole section along each
+ * notch, along the wall and at the dividers' ends alike; the bound for the dividers' check is lowered by it.
+ */
+export function gridfinityOpeningFloorCut(plan: GridfinityPlan, pieces: GridfinityCompartmentPieces) {
+  const r = pieces.floorRounding;
+  return plan.notches.reduce((sum, notch) => sum + (notch.bottom < pieces.floor + r ? filletUnder(r, r) * (notch.to - notch.from) : 0), 0);
+}
+
 /** How much of a floor fillet's section of radius r lies under the height h above the floor. */
 function filletUnder(r: number, h: number) {
   if (r <= 0) return 0;
@@ -1489,8 +1605,8 @@ export function normalizeGridfinityCompartmentLabels(value: unknown): Gridfinity
  * A count it gives is written as the settings window writes it, at most the 24 the largest bin builds, which puts
  * that axis's dividers back evenly spaced unless the same action places them.
  */
-export function gridfinityListPatch(params: Record<string, unknown>): Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels"> {
-  const patch: Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels"> = {};
+export function gridfinityListPatch(params: Record<string, unknown>): Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityOpenings"> {
+  const patch: Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityOpenings"> = {};
   for (const [axis, key] of [["x", "gridfinityCompartmentsX"], ["z", "gridfinityCompartmentsZ"]] as const) {
     const count = params[key];
     if (typeof count === "number" && Number.isFinite(count)) Object.assign(patch, gridfinityCompartmentCountPatch(axis, clamp(Math.round(count), 1, MAX_GRIDFINITY_DIVIDERS + 1)));
@@ -1501,6 +1617,8 @@ export function gridfinityListPatch(params: Record<string, unknown>): Pick<Gridf
   }
   const labels = normalizeGridfinityCompartmentLabels(params.gridfinityCompartmentLabels);
   if (labels) patch.gridfinityCompartmentLabels = labels.length > 0 ? labels : undefined;
+  const openings = normalizeGridfinityOpenings(params.gridfinityOpenings);
+  if (openings) patch.gridfinityOpenings = openings.length > 0 ? openings : undefined;
   return patch;
 }
 
@@ -1508,6 +1626,303 @@ export function gridfinityDividerPositionsEqual(a: readonly number[] | undefined
   if (a === b) return true;
   if (!a || !b || a.length !== b.length) return false;
   return a.every((p, i) => p === b[i]);
+}
+
+/**
+ * Partial openings from outside (#455): one for each known side, the first counting, with its depth, width and distance
+ * where they are numbers, kept within what a saved project takes, and its place where it is a known word; the plan
+ * keeps them on the wall.
+ */
+export function normalizeGridfinityOpenings(value: unknown): GridfinityOpening[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const number = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
+  const openings: GridfinityOpening[] = [];
+  (value as unknown[]).forEach((entry) => {
+    if (!entry || typeof entry !== "object") return;
+    const { side, depth, width, align, distance } = entry as Record<string, unknown>;
+    if (!LABEL_WALLS.includes(side as GridfinityWall) || openings.some((opening) => opening.side === side)) return;
+    const opening: GridfinityOpening = { side: side as GridfinityWall };
+    if (number(depth)) opening.depth = clamp(depth, 0, MAX_SAVED_SETTING);
+    if (number(width)) opening.width = clamp(width, 0, MAX_SAVED_SETTING);
+    if (align === "start" || align === "middle" || align === "end") opening.align = align;
+    if (number(distance)) opening.distance = clamp(distance, 0, MAX_SAVED_SETTING);
+    openings.push(opening);
+  });
+  return openings;
+}
+
+export function gridfinityOpeningsEqual(a: readonly GridfinityOpening[] | undefined, b: readonly GridfinityOpening[] | undefined) {
+  if (a === b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((opening, i) => {
+    const other = b[i];
+    return opening.side === other.side && opening.depth === other.depth && opening.width === other.width && opening.align === other.align && opening.distance === other.distance;
+  });
+}
+
+/**
+ * A side's opening as the settings window shows it (#455): its depth from the lip's top, its width, its place and its
+ * distance from that end, as built; the full depth and the full wall for a side open in full.
+ */
+export function gridfinityOpening(shape: GridfinityShapeFields, side: GridfinityWall) {
+  const plan = gridfinityPlan(shape);
+  const entry = normalizeGridfinityOpenings(shape.gridfinityOpenings)?.find((opening) => opening.side === side);
+  const notch = plan.notches.find((n) => n.side === side);
+  const { depth, width, distance } = gridfinityOpeningLimits(shape, side);
+  return {
+    depth: notch ? openingRound(openingTop(plan) - notch.bottom) : depth.max,
+    // The whole wall reads as the row's highest, also where it runs out beside a side open in full.
+    width: notch ? Math.min(openingRound(notch.to - notch.from), width.max) : width.max,
+    align: entry?.align ?? "middle",
+    // Clamped as the plan clamps it, to the straight part that runs out to the outline beside a side open in full.
+    distance: notch && entry?.align && entry.align !== "middle" ? clamp(entry.distance ?? 0, 0, distance) : 0,
+  };
+}
+
+/**
+ * What a side's opening takes: its depth down to the floor, its width along the wall's straight part between its two
+ * corners (the whole side within 0.5 mm of it, as the plan judges it), and how far it can move, out to the outline
+ * beside a side open in full.
+ */
+export function gridfinityOpeningLimits(shape: GridfinityShapeFields, side: GridfinityWall) {
+  const plan = gridfinityPlan(shape);
+  const notch = plan.notches.find((n) => n.side === side);
+  const corner = Math.max(GRIDFINITY_BIN_RADIUS, plan.wallThickness);
+  const half = (side === "back" || side === "front" ? plan.size.width : plan.size.depth) / 2;
+  const [start, end] = OPENING_ENDS[side];
+  const length = 2 * half - (plan.open[start] ? 0 : corner) - (plan.open[end] ? 0 : corner);
+  return {
+    depth: { min: MIN_GRIDFINITY_OPENING_DEPTH, max: Math.max(MIN_GRIDFINITY_OPENING_DEPTH, openingRound(openingTop(plan) - plan.floor)) },
+    width: { min: MIN_GRIDFINITY_OPENING_WIDTH, max: Math.max(MIN_GRIDFINITY_OPENING_WIDTH, openingRound(2 * half - 2 * corner)) },
+    distance: notch ? openingRound(length - (notch.to - notch.from)) : 0,
+  };
+}
+
+/** Whether a side switched open takes a partial opening (#455): not on a bin built solid, nor where the straight part between its corners has no room for the narrowest. */
+export function gridfinityOpeningFits(shape: GridfinityShapeFields, side: GridfinityWall) {
+  const plan = gridfinityPlan(shape);
+  const corner = Math.max(GRIDFINITY_BIN_RADIUS, plan.wallThickness);
+  const length = (side === "back" || side === "front" ? plan.size.width : plan.size.depth) - 2 * corner;
+  return plan.type === "bin" && plan.switched[side] && !plan.solid && length >= MIN_GRIDFINITY_OPENING_WIDTH;
+}
+
+/**
+ * Why a compartment's label shelf on a side is left out (#455): the side is open in full and has no wall, or it is only
+ * switched open, a partial opening that keeps its wall; nothing when the shelf is built.
+ */
+export function gridfinityCompartmentLabelLeftOut(cell: { open: Record<GridfinityWall, boolean>; switched: Record<GridfinityWall, boolean> }, side: GridfinityWall): "open" | "switched" | null {
+  if (cell.open[side]) return "open";
+  return cell.switched[side] ? "switched" : null;
+}
+
+/** What a change to one side's opening writes (#455): that side's entry with the change, the other sides' as they are. */
+export function gridfinityOpeningPatch(shape: GridfinityShapeFields, side: GridfinityWall, changes: Partial<Omit<GridfinityOpening, "side">>) {
+  const openings = normalizeGridfinityOpenings(shape.gridfinityOpenings) ?? [];
+  const entry = { ...openings.find((opening) => opening.side === side), ...changes, side };
+  return { gridfinityOpenings: [...openings.filter((opening) => opening.side !== side), entry] };
+}
+
+/**
+ * A notch's section across its wall (#455), in insets from the outline and heights: from 2 mm outside up to the wall's
+ * own inside, the lip, its support or the ledge, above the notch's bottom, then out over the top. With the floor's
+ * rounding the inside follows it, so a notch down to the floor leaves no rounding standing across it. Both the display
+ * mesh and the exact body cut this section along the notch, so they agree.
+ */
+export function gridfinityOpeningSection(plan: GridfinityPlan, notch: GridfinityNotch, rounding: number): Array<[number, number]> {
+  // The inside from the floor up to the top, the highest point reached first: the lip's apex, its chamfer or the flat top.
+  const inside = gridfinityWallProfile(plan, rounding).slice(1).reverse();
+  const highest = inside.reduce((best, [, y], i) => (y > inside[best][1] + 1e-9 ? i : best), 0);
+  const rising = inside.slice(0, highest + 1);
+  const bottom = notch.bottom;
+  let at = rising[0][0];
+  for (let i = 0; i + 1 < rising.length; i += 1) {
+    const [[u0, y0], [u1, y1]] = [rising[i], rising[i + 1]];
+    if (y0 <= bottom && bottom <= y1 && y1 > y0) {
+      at = u0 + ((u1 - u0) * (bottom - y0)) / (y1 - y0);
+      break;
+    }
+  }
+  const [uTop, yTop] = rising[highest];
+  return [[-OPEN_CLEAR, bottom], [at, bottom], ...rising.filter(([, y]) => y > bottom + 1e-9), [uTop, yTop + 1], [-OPEN_CLEAR, yTop + 1]];
+}
+
+/**
+ * Where a notch's section stands and runs (#455), in the shape's frame: its corner at the outline and the notch's start,
+ * the way in from the wall and the way along it, turned so the three make a right-handed frame with up.
+ */
+export function gridfinityOpeningFrame(plan: GridfinityPlan, notch: GridfinityNotch) {
+  const hx = plan.size.width / 2;
+  const hz = plan.size.depth / 2;
+  const across = notch.side === "back" || notch.side === "front";
+  const inward = { back: { x: 0, z: 1 }, front: { x: 0, z: -1 }, left: { x: 1, z: 0 }, right: { x: -1, z: 0 } }[notch.side];
+  const along = across ? { x: 1, z: 0 } : { x: 0, z: 1 };
+  // inward x up . along > 0 keeps a mirror out of the transform: up x along is (along.z, 0, -along.x).
+  const flip = inward.x * along.z - inward.z * along.x < 0;
+  const start = flip ? notch.to : notch.from;
+  const wallAt = { back: { x: 0, z: -hz }, front: { x: 0, z: hz }, left: { x: -hx, z: 0 }, right: { x: hx, z: 0 } }[notch.side];
+  const origin = across ? { x: start, z: wallAt.z } : { x: wallAt.x, z: start };
+  return { origin, inward, along: flip ? { x: -along.x, z: -along.z } : along, length: notch.to - notch.from };
+}
+
+/** What a notch's section and corners follow inside the bin (#455): the floor's rounding, a divided bin's, a scooped bin's, or none. */
+export function gridfinityOpeningInside(plan: GridfinityPlan, compartments: GridfinityCompartmentPieces | null) {
+  return { rounding: compartments ? compartments.floorRounding : plan.floorRounding };
+}
+
+export type GridfinityOpeningInside = ReturnType<typeof gridfinityOpeningInside>;
+
+/**
+ * How far a notch's corners are rounded or chamfered (#455), seen from outside the wall, at the end it starts from and
+ * the one it runs to. The top corners take the size first, at most the straight part of the wall beyond that end and
+ * the depth, and stay above the floor's rounding where the section has one, which the dividers' check counts on; the
+ * bottom ones then take at most half the width and what the depth leaves. A wall lowered between the corners has no top
+ * corners, and a notch run out to the outline beside a side open in full has no corners at that end. A corner set
+ * OPENING_CORNER_SNAP under what the notch leaves takes all of it. Where a corner would end within OPENING_CORNER_CLEAR
+ * of another corner or of the wall's end, or a crease of the wall's section would cross it that close to one of them,
+ * it comes down 0.01 mm at a time, at most OPENING_CORNER_GIVE, and keeps its size if nothing within that is clear.
+ * Under 0.5 mm a corner is square.
+ */
+export function gridfinityOpeningCorners(plan: GridfinityPlan, notch: GridfinityNotch, inside: GridfinityOpeningInside, size = plan.openingCornerSize) {
+  const corner = Math.max(GRIDFINITY_BIN_RADIUS, plan.wallThickness);
+  const half = (notch.side === "back" || notch.side === "front" ? plan.size.width : plan.size.depth) / 2;
+  const [start, end] = OPENING_ENDS[notch.side];
+  const top = openingTop(plan);
+  const { bottom } = notch;
+  const depth = top - bottom;
+  const reach = depth - (bottom < plan.floor + inside.rounding ? inside.rounding : 0);
+  const round = plan.openingCorner !== "chamfer";
+  // A crease that close to the notch's bottom or top leaves a sliver with square corners as well, so it is not counted.
+  const creases = gridfinityWallProfile(plan, inside.rounding).map(([, y]) => y).filter((y) => y - bottom > OPENING_CORNER_CLEAR && top - y > OPENING_CORNER_CLEAR);
+  const ends = [
+    { at: notch.from, out: -1, wall: start, room: notch.from + half - (plan.open[start] ? 0 : corner) },
+    { at: notch.to, out: 1, wall: end, room: half - (plan.open[end] ? 0 : corner) - notch.to },
+  ];
+  // Where the wall's straight part ends beyond each end of the notch.
+  const marks = ends.map(({ at, out, room }) => at + out * room);
+  type Feature = { s: number; y: number; ours: boolean };
+  // An end's corners: their ends, and where each crease of the section crosses them, the arcs or chamfers being ours.
+  const features = ({ at, out }: (typeof ends)[number], upper: number, lower: number, ours: boolean) => {
+    // How far from the end a corner of size r runs at dy from its centre's height: its arc, or its chamfer at 45 degrees.
+    const offset = (r: number, dy: number) => (round ? r - Math.sqrt(Math.max(0, r * r - dy * dy)) : dy);
+    const points: Feature[] = [];
+    // A square corner is the one point where the end meets the top or the bottom.
+    points.push(...(upper > 0 ? [{ s: at, y: top - upper, ours }, { s: at + out * upper, y: top, ours }] : [{ s: at, y: top, ours: false }]));
+    points.push(...(lower > 0 ? [{ s: at, y: bottom + lower, ours }, { s: at - out * lower, y: bottom, ours }] : [{ s: at, y: bottom, ours: false }]));
+    const crossings = creases.flatMap((h): Feature[] => {
+      if (upper > 0 && h > top - upper + 1e-9 && h < top - 1e-9) return [{ s: at + out * offset(upper, h - top + upper), y: h, ours }];
+      if (lower > 0 && h > bottom + 1e-9 && h < bottom + lower - 1e-9) return [{ s: at - out * offset(lower, bottom + lower - h), y: h, ours }];
+      // Up the notch's straight end between them, as with square corners.
+      return h >= bottom + lower - 1e-9 && h <= top - upper + 1e-9 ? [{ s: at, y: h, ours: false }] : [];
+    });
+    return { points, crossings };
+  };
+  type Drawn = ReturnType<typeof features>;
+  const clash = (fixed: Drawn[], tried: Drawn) => {
+    const points = [...fixed.flatMap((f) => f.points), ...tried.points];
+    const crossings = [...fixed.flatMap((f) => f.crossings), ...tried.crossings];
+    // Exactly the limit is too close too: the kernel measures it a hair under.
+    const near = (d: number) => d > 1e-9 && d < OPENING_CORNER_CLEAR + 1e-6;
+    return tried.points.some((p) => points.some((q) => q !== p && near(Math.hypot(p.s - q.s, p.y - q.y))) || marks.some((m) => near(Math.abs(p.s - m))))
+      || crossings.some((c) => (c.ours && marks.some((m) => near(Math.abs(c.s - m))))
+        || points.some((p) => (c.ours || p.ours) && near(Math.hypot(c.s - p.s, c.y - p.y)))
+        || crossings.some((d) => d !== c && d.y === c.y && (c.ours || d.ours) && near(Math.abs(c.s - d.s))));
+  };
+  // The largest size within OPENING_CORNER_GIVE under what the corner takes that clashes with nothing, or that size.
+  const fit = (build: (r: number) => Drawn, fixed: Drawn[], ...limits: number[]) => {
+    const least = openingRound(Math.min(...limits));
+    const largest = least - size > 0 && least - size < OPENING_CORNER_SNAP ? least : Math.min(size, least);
+    if (largest < OPENING_CORNER_MIN - 1e-9) return 0;
+    const lowest = Math.max(OPENING_CORNER_MIN, largest - OPENING_CORNER_GIVE) - 1e-9;
+    for (let k = 0, r = largest; r >= lowest; k += 1, r = (Math.ceil(largest * 100 - 1e-6) - k) / 100) {
+      if (!clash(fixed, build(r))) return r;
+    }
+    return largest;
+  };
+  const fixed: Drawn[] = [];
+  const [first, last] = ends.map((e) => {
+    if (plan.open[e.wall] && e.room < 1e-9) return { top: 0, bottom: 0 };
+    const upper = e.room > 1e-9 ? fit((r) => features(e, r, 0, true), fixed, e.room, reach) : 0;
+    const lower = fit((r) => features(e, upper, r, true), fixed, (notch.to - notch.from) / 2, depth - upper);
+    fixed.push(features(e, upper, lower, false));
+    return { top: upper, bottom: lower };
+  });
+  return { fromTop: first.top, fromBottom: first.bottom, toTop: last.top, toBottom: last.bottom };
+}
+
+/** The largest rounding or chamfer any corner of the bin's notches takes (#455), what the settings window offers. */
+export function gridfinityOpeningMaxCornerSize(shape: GridfinityShapeFields) {
+  const plan = gridfinityPlan(shape);
+  const inside = gridfinityOpeningInside(plan, gridfinityCompartmentPieces(shape));
+  return plan.notches.reduce((most, notch) => Math.max(most, ...Object.values(gridfinityOpeningCorners(plan, notch, inside, MAX_GRIDFINITY_LABEL_CORNER_SIZE))), 0);
+}
+
+/** The size set on the notches' corners, in mm to 0.01, within what the largest of them takes. */
+export function gridfinityOpeningCornerSize(shape: GridfinityShapeFields) {
+  return Math.min(gridfinityPlan(shape).openingCornerSize, gridfinityOpeningMaxCornerSize(shape));
+}
+
+/**
+ * A notch with rounded or chamfered corners (#455), seen from outside the wall: the notch run on past the ends its top
+ * corners reach, and the outline that cuts it, in its frame (along the notch from its start, and up), counter-clockwise,
+ * with how far across the wall to run it. `outline` is the mesh's polygon; `segments` is the same outline for the
+ * exact body, one line or one true arc (through its middle) each. Both kernels take the section along the longer notch
+ * where it meets this outline run across the wall. Nothing for square corners, so a bin without them is built as
+ * before. With the lip, the top corners are rounded or chamfered in full on the outer wall only (a little less under a
+ * chamfered lip); further in, where the lip slopes down, less.
+ */
+export function gridfinityOpeningOutline(plan: GridfinityPlan, notch: GridfinityNotch, inside: GridfinityOpeningInside) {
+  const { fromTop, fromBottom, toTop, toBottom } = gridfinityOpeningCorners(plan, notch, inside);
+  if (fromTop + fromBottom + toTop + toBottom === 0) return null;
+  const round = plan.openingCorner !== "chamfer";
+  // A quarter about (cx, cy) from one angle to the other in `steps` straight pieces: a chamfer is its two ends, a square
+  // corner its centre.
+  const point = (r: number, cx: number, cy: number, angle: number): [number, number] => [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+  const arc = (steps: number, r: number, cx: number, cy: number, a0: number, a1: number) => Array.from({ length: r > 0 ? steps + 1 : 1 }, (_, k) => point(r, cx, cy, a0 + ((a1 - a0) * k) / steps));
+  const top = openingTop(plan);
+  const over = top + 2;
+  const { from, to, bottom } = notch;
+  const longer: GridfinityNotch = { ...notch, from: from - fromTop, to: to + toTop };
+  // A top corner that takes all the depth the bottom one leaves, rounded to 1e-6 as the notch is, may reach a hair past
+  // it: it is drawn that hair smaller, so the outline never dips under the notch's bottom nor rises over the top.
+  const [upperFrom, upperTo] = [Math.min(fromTop, top - bottom - fromBottom), Math.min(toTop, top - bottom - toBottom)];
+  const corners = [
+    ...(fromTop > 0 ? [[upperFrom, from - upperFrom, top - upperFrom, Math.PI / 2, 0]] : []),
+    [fromBottom, from + fromBottom, bottom + fromBottom, Math.PI, 1.5 * Math.PI],
+    [toBottom, to - toBottom, bottom + toBottom, 1.5 * Math.PI, 2 * Math.PI],
+    ...(toTop > 0 ? [[upperTo, to + upperTo, top - upperTo, Math.PI, Math.PI / 2]] : []),
+  ] as Array<[number, number, number, number, number]>;
+  // Corners that meet, the top's arc ending where the bottom's starts, give one point: closer than openingRound keeps.
+  const apart = (a: [number, number], b: [number, number]) => Math.hypot(a[0] - b[0], a[1] - b[1]) > 1e-6;
+  const polygon = [[longer.from, over] as [number, number], ...corners.flatMap(([r, cx, cy, a0, a1]) => arc(round ? CORNER_STEPS : 1, r, cx, cy, a0, a1)), [longer.to, over] as [number, number]]
+    .filter((at, i, all) => i === 0 || apart(at, all[i - 1]));
+  // For the exact body: lines between the corners, a rounded corner as one arc through its middle.
+  type Segment = { from: [number, number]; to: [number, number]; middle?: [number, number] };
+  const segments: Segment[] = [];
+  let last: [number, number] = [longer.from, over];
+  // A point as good as the last one is left out, so the next piece starts exactly where the last one ended.
+  const lineTo = (at: [number, number]) => {
+    if (!apart(at, last)) return;
+    segments.push({ from: last, to: at });
+    last = at;
+  };
+  corners.forEach(([r, cx, cy, a0, a1]) => {
+    if (r > 0 && round) {
+      lineTo(point(r, cx, cy, a0));
+      segments.push({ from: last, middle: point(r, cx, cy, (a0 + a1) / 2), to: point(r, cx, cy, a1) });
+      last = point(r, cx, cy, a1);
+    } else arc(1, r, cx, cy, a0, a1).forEach(lineTo);
+  });
+  lineTo([longer.to, over]);
+  lineTo([longer.from, over]);
+  // A side whose frame runs against the side's own direction has the outline turned round, still counter-clockwise.
+  const frame = gridfinityOpeningFrame(plan, longer);
+  const reversed = frame.along.x + frame.along.z < 0;
+  const place = ([t, y]: [number, number]): [number, number] => [reversed ? longer.to - t : t - longer.from, y];
+  const outline = polygon.map(place);
+  const placed = segments.map(({ from, to, middle }) => (reversed ? { from: place(to), to: place(from), middle: middle && place(middle) } : { from: place(from), to: place(to), middle: middle && place(middle) }));
+  const section = gridfinityOpeningSection(plan, longer, inside.rounding);
+  const across = Math.max(...section.map(([u]) => u)) + 1;
+  return { notch: longer, outline: reversed ? outline.reverse() : outline, segments: reversed ? placed.reverse() : placed, across: [-OPEN_CLEAR - 1, across] as [number, number] };
 }
 
 export function gridfinityCompartmentLabelsEqual(a: readonly GridfinityCompartmentLabel[] | undefined, b: readonly GridfinityCompartmentLabel[] | undefined) {
@@ -1524,9 +1939,9 @@ export function gridfinityCompartmentLabelsEqual(a: readonly GridfinityCompartme
   });
 }
 
-/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, which need Manifold for the display mesh. */
+/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, which need Manifold for the display mesh. */
 export function gridfinityHasPieces(shape: GridfinityShapeFields) {
-  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape));
+  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || gridfinityPlan(shape).notches.length > 0);
 }
 
 /**
@@ -1868,6 +2283,11 @@ const LABEL_INSIDE_OVERLAP = 0.05;
  */
 const LABEL_MESH_NUDGE: Vec3 = [1.1e-3, -1.7e-3, 0.5e-3];
 /**
+ * A notch's section follows the bin's own inside, ledge and corners exactly, so in the display mesh it is moved in from
+ * the wall, up and along it by this much (#455), into the air: faces lying on the bin's leave degenerate slivers.
+ */
+const OPENING_MESH_NUDGE: Vec3 = [1.3e-3, 0.9e-3, 0.7e-3];
+/**
  * At an open side (#682) the pieces are cut off this far inside the outline: cut exactly at it, a moved piece's end
  * lies in the plane of the bin's open end and Manifold leaves a sliver between them.
  */
@@ -1887,7 +2307,8 @@ export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: Gr
   const compartments = gridfinityCompartmentPieces(shape);
   // A bin with dividers has its scoops in its compartments.
   const scoopPieces = compartments ? null : gridfinityScoopPieces(shape);
-  if (!pieces && !scoopPieces && !compartments) return base;
+  const { notches } = gridfinityPlan(shape);
+  if (!pieces && !scoopPieces && !compartments && notches.length === 0) return base;
   const { Manifold } = runtime;
   const made: Array<{ delete: () => void }> = [];
   const keep = <T extends { delete: () => void }>(value: T) => {
@@ -1911,7 +2332,7 @@ export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: Gr
     mesh.merge();
     const bin = keep(new Manifold(mesh));
     // The shelves, the scoops and the dividers are cut to the same inside, from the floor up past the highest of them.
-    const { floor, inside: { hx, hz, radius } } = pieces ?? scoopPieces ?? { floor: compartments!.floor, inside: { ...labelInside(gridfinityPlan(shape)), radius: gridfinityPlan(shape).innerRadius } };
+    const { floor, inside: { hx, hz, radius } } = pieces ?? scoopPieces ?? { floor: compartments?.floor ?? gridfinityPlan(shape).floor, inside: { ...labelInside(gridfinityPlan(shape)), radius: gridfinityPlan(shape).innerRadius } };
     const y0 = floor - LABEL_INSIDE_OVERLAP;
     const height = Math.max(pieces?.top ?? 0, scoopPieces?.centre[1] ?? 0, compartments?.top ?? 0) - y0 + LABEL_INSIDE_OVERLAP;
     // A cylinder standing on y = y0 at (x, z).
@@ -1983,7 +2404,25 @@ export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: Gr
       const kept = keep(keep(part.intersect(inside)).translate(LABEL_MESH_NUDGE));
       return trim ? keep(kept.intersect(trim)) : kept;
     });
-    const result = keep(keep(Manifold.union([bin, ...parts])).simplify(LABEL_SLIVER));
+    // A side opened partly has its notch's section cut out along it, as the exact body has (#455).
+    const plan = gridfinityPlan(shape);
+    const opening = gridfinityOpeningInside(plan, compartments);
+    const notchPrisms = notches.map((notch) => {
+      const outline = gridfinityOpeningOutline(plan, notch, opening);
+      const cut = outline ? outline.notch : notch;
+      const { origin, inward, along, length } = gridfinityOpeningFrame(plan, cut);
+      let section = keep(Manifold.extrude(gridfinityOpeningSection(plan, cut, opening.rounding), length));
+      if (outline) {
+        // Its rounded or chamfered corners: the outline seen from outside the wall, run across the wall in the section's frame.
+        const [u0, u1] = outline.across;
+        section = keep(section.intersect(keep(keep(Manifold.extrude(outline.outline, u1 - u0)).transform([0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0, u1, 0, 0, 1]))));
+      }
+      const prism = keep(section.translate(OPENING_MESH_NUDGE));
+      return keep(prism.transform([inward.x, 0, inward.z, 0, 0, 1, 0, 0, along.x, 0, along.z, 0, origin.x, 0, origin.z, 1]));
+    });
+    const joined = keep(Manifold.union([bin, ...parts]));
+    const notched = notchPrisms.length > 0 ? keep(joined.subtract(keep(Manifold.union(notchPrisms)))) : joined;
+    const result = keep(notched.simplify(LABEL_SLIVER));
     if (result.status() !== "NoError") return base;
     const out = result.getMesh();
     const triangles: Vec3[][] = [];
@@ -1995,7 +2434,7 @@ export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: Gr
     }
     return triangles;
   } catch {
-    // The bin is drawn without its shelves and scoops rather than not at all.
+    // The bin is drawn without its shelves, scoops and notches rather than not at all.
     return base;
   } finally {
     new Set(made).forEach((value) => value.delete());

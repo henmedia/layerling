@@ -1606,7 +1606,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     for (const key of ["gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "hingePinless"] as const) {
       if (definition[key] !== undefined && typeof definition[key] !== "boolean") throw new Error(`${label}.${key} must be true or false`);
     }
-    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness"] as const) {
+    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       // Only an offset runs both ways along a wall.
@@ -1614,6 +1614,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     }
     if (definition.gridfinityLabelCorner !== undefined && definition.gridfinityLabelCorner !== "round" && definition.gridfinityLabelCorner !== "chamfer") {
       throw new Error(`${label}.gridfinityLabelCorner is invalid`);
+    }
+    if (definition.gridfinityOpeningCorner !== undefined && definition.gridfinityOpeningCorner !== "round" && definition.gridfinityOpeningCorner !== "chamfer") {
+      throw new Error(`${label}.gridfinityOpeningCorner is invalid`);
     }
     for (const key of ["gridfinityDividerPositionsX", "gridfinityDividerPositionsZ"] as const) {
       if (definition[key] === undefined) continue;
@@ -1638,6 +1641,25 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
         }
         if (entry.side !== "back" && entry.side !== "front" && entry.side !== "left" && entry.side !== "right") throw new Error(`${entryLabel}.side is invalid`);
         for (const key of ["length", "width"] as const) {
+          if (entry[key] === undefined) continue;
+          const value = finiteNumber(entry[key], `${entryLabel}.${key}`);
+          if (value < 0 || value > 1e6) throw new Error(`${entryLabel}.${key} is outside the supported range`);
+        }
+        if (entry.align !== undefined && entry.align !== "start" && entry.align !== "middle" && entry.align !== "end") throw new Error(`${entryLabel}.align is invalid`);
+      });
+    }
+    if (definition.gridfinityOpenings !== undefined) {
+      if (!Array.isArray(definition.gridfinityOpenings)) throw new Error(`${label}.gridfinityOpenings must be an array`);
+      const openings = definition.gridfinityOpenings as unknown[];
+      if (openings.length > 4) throw new Error(`${label}.gridfinityOpenings has an unsupported number of openings`);
+      const sides = new Set<unknown>();
+      openings.forEach((raw, index) => {
+        const entryLabel = `${label}.gridfinityOpenings[${index}]`;
+        const entry = objectRecord(raw, entryLabel);
+        if (entry.side !== "back" && entry.side !== "front" && entry.side !== "left" && entry.side !== "right") throw new Error(`${entryLabel}.side is invalid`);
+        if (sides.has(entry.side)) throw new Error(`${entryLabel}.side is given twice`);
+        sides.add(entry.side);
+        for (const key of ["depth", "width", "distance"] as const) {
           if (entry[key] === undefined) continue;
           const value = finiteNumber(entry[key], `${entryLabel}.${key}`);
           if (value < 0 || value > 1e6) throw new Error(`${entryLabel}.${key} is outside the supported range`);

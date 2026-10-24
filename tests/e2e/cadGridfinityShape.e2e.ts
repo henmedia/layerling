@@ -908,3 +908,220 @@ describe("exact Gridfinity bins with a lip chamfer on a set wall", () => {
     expect(overlap(lower, cad.translate(upper, 0, 21 - 0.5, 0))).toBeGreaterThan(1);
   });
 });
+
+/** One valid solid with the mesh's volume and box, and no edge shorter than the kernel keeps. */
+function expectBuilt(part: CadModifierGridfinityPart, tolerance = 0.002) {
+  const context = JSON.stringify(part);
+  const solid = gridfinityPartSolid(cad, part);
+  expect(cad.isValid(solid), context).toBe(true);
+  expect(cad.isSolid(solid) ? 1 : cad.getSubShapes(solid, "solid").length, context).toBe(1);
+  const exact = Math.abs(cad.getVolume(solid));
+  expect(Math.abs(exact - meshVolume(part)) / exact, context).toBeLessThan(tolerance);
+  const box = cad.getBoundingBox(solid);
+  const { min, max } = meshBounds(part);
+  [box.xmin - min[0], box.ymin - min[1], box.zmin - min[2], box.xmax - max[0], box.ymax - max[1], box.zmax - max[2]].forEach((d) => expect(Math.abs(d), context).toBeLessThan(0.01));
+  expect(cad.getSubShapes(solid, "edge").filter((edge) => cad.getLength(edge) > 1e-9 && cad.getLength(edge) < 0.01), context).toHaveLength(0);
+  return solid;
+}
+
+describe("exact Gridfinity bins opened partly", () => {
+  const front = (opening: Record<string, unknown>, extra: Partial<CadModifierGridfinityPart> = {}) => bin({ gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", ...opening }], ...extra });
+
+  it("builds notches, slots and lowered walls as one valid solid with the mesh's volume and box", () => {
+    for (const part of [
+      front({ width: 30, depth: 10 }),
+      front({ width: 20 }, { gridfinityWallThickness: 2.5, gridfinityMagnets: true }),
+      front({ depth: 8 }, { gridfinityWallThickness: 4, gridfinityLipChamfer: 0.5 }),
+      front({ width: 20, depth: 10 }, { gridfinityLip: false, height: 21 }),
+      bin({ width: 41.5, depth: 41.5, height: 7 + GRIDFINITY_LIP_HEIGHT, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 10 }] }),
+      bin({ gridfinityHalfGrid: true, width: 20.5, depth: 41.5, gridfinityOpenLeft: true, gridfinityOpenings: [{ side: "left", width: 12, depth: 6, align: "start", distance: 1.4 }] }),
+      bin({ gridfinityOpenLeft: true, gridfinityOpenFront: true, gridfinityOpenBack: true, gridfinityScoopRight: true, gridfinityOpenings: [{ side: "front", width: 30, depth: 10, align: "end", distance: 3 }, { side: "back", depth: 5 }] }),
+    ]) expectBuilt(part);
+  });
+
+  it("cuts a notch to the floor of a divided bin, under a ledge and with square corners", () => {
+    for (const part of [
+      front({ width: 40 }, { gridfinityCompartmentsX: 3 }),
+      front({ width: 20, depth: 12 }, { gridfinityWallThickness: 2.5, gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopBack: true }),
+      front({ width: 40 }, { gridfinityWallThickness: 4, gridfinityCompartmentsX: 3 }),
+    ]) expectBuilt(part);
+  });
+
+  it("takes out only the wall over the notch: the wall under it and beside it stays", () => {
+    const solid = expectBuilt(front({ width: 30, depth: 10 }));
+    const wall = 41.5 / 2 - 0.5;
+    expect(material(solid, 0, wall, 15.5, 26)).toBeLessThan(1e-6);
+    expect(material(solid, 0, wall, 8, 15.3)).toBeGreaterThan(0.3 * 0.3 * 7.3 * 0.99);
+    expect(material(solid, -16, wall, 15.5, 21)).toBeGreaterThan(0.3 * 0.3 * 5.5 * 0.99);
+  });
+
+  it("leaves no ridge of the floor's rounding across a slot to the floor", () => {
+    // 1 mm in from the wall, inside the 2.8 mm rounding of a divided bin's floor.
+    const at = 41.5 / 2 - 0.95 - 1;
+    expect(material(gridfinityPartSolid(cad, bin({ gridfinityCompartmentsX: 3 })), 0, at, 5.96, 20)).toBeGreaterThan(1e-3);
+    expect(material(expectBuilt(front({ width: 20 }, { gridfinityCompartmentsX: 3 })), 0, at, 5.96, 20)).toBeLessThan(1e-6);
+  });
+
+  it("stacks a bin 0.35 mm on one with a notch half its width or a lowered wall, and it does not drop", () => {
+    const upper = gridfinityPartSolid(cad, bin({ width: 41.5, depth: 41.5 }));
+    for (const opening of [{ width: 17, depth: 10 }, { depth: 10 }]) {
+      const lower = gridfinityPartSolid(cad, bin({ width: 41.5, depth: 41.5, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", ...opening }] }));
+      expect(overlap(lower, cad.translate(upper, 0, 21 - 0.34, 0)), JSON.stringify(opening)).toBeLessThan(0.01);
+      expect(overlap(lower, cad.translate(upper, 0, 21 - 0.5, 0)), JSON.stringify(opening)).toBeGreaterThan(1);
+    }
+  });
+
+  it("refuses a notched bin whose dividers the kernel lost instead of building it without them", () => {
+    const common = vi.spyOn(cad, "common").mockImplementationOnce((_, inside) => inside);
+    try {
+      expect(() => gridfinityPartSolid(cad, front({ width: 40 }, { gridfinityCompartmentsX: 3 }))).toThrow("The Gridfinity bin's dividers could not be cut");
+    } finally {
+      common.mockRestore();
+    }
+  });
+
+  it("builds the same solid as an open side with an entry for the whole side", () => {
+    const open = gridfinityPartSolid(cad, bin({ gridfinityOpenFront: true }));
+    for (const part of [front({}), front({ width: 76, depth: 19.45 })]) {
+      const solid = gridfinityPartSolid(cad, part);
+      expect(Math.abs(cad.getVolume(solid) - cad.getVolume(open))).toBeLessThan(1e-6);
+      expect(cad.getSubShapes(solid, "face")).toHaveLength(cad.getSubShapes(open, "face").length);
+    }
+  });
+});
+
+describe("exact Gridfinity bins with notch corners", () => {
+  const front = (opening: Record<string, unknown>, extra: Partial<CadModifierGridfinityPart> = {}) => bin({ gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", ...opening }], gridfinityOpeningCornerSize: 2, ...extra });
+
+  it("builds rounded and chamfered notch corners as one valid solid with the mesh's volume and box", () => {
+    for (const gridfinityOpeningCorner of ["round", "chamfer"] as const) {
+      for (const part of [
+        front({ width: 30, depth: 10 }),
+        front({ width: 20 }, { gridfinityWallThickness: 2.5, gridfinityMagnets: true, gridfinityOpeningCornerSize: 3 }),
+        front({ depth: 8 }, { gridfinityWallThickness: 4, gridfinityLipChamfer: 0.5 }),
+        front({ width: 20, depth: 10 }, { gridfinityLip: false, height: 21 }),
+        front({ width: 20, depth: 10, align: "start", distance: 1 }, { gridfinityOpenLeft: true }),
+        front({ width: 20, depth: 10, align: "end", distance: 0.5 }, { gridfinityLipChamfer: 1 }),
+        // The top corner at the start takes 9.5 of the 10 mm depth and the bottom one the rest: the two meet.
+        front({ width: 20, depth: 10, align: "end", distance: 3 }, { gridfinityLipChamfer: 1, gridfinityOpeningCornerSize: 9.5 }),
+        bin({ width: 41.5, depth: 41.5, height: 7 + GRIDFINITY_LIP_HEIGHT, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 10, depth: 2 }], gridfinityOpeningCornerSize: 3 }),
+        bin({ gridfinityHalfGrid: true, width: 20.5, depth: 41.5, gridfinityOpenLeft: true, gridfinityOpenings: [{ side: "left", width: 12, depth: 6, align: "start", distance: 1.4 }], gridfinityOpeningCornerSize: 1 }),
+        bin({ gridfinityOpenBack: true, gridfinityOpenRight: true, gridfinityOpenings: [{ side: "back", width: 20, depth: 10 }, { side: "right", width: 10, depth: 6 }], gridfinityOpeningCornerSize: 1 }),
+      ]) expectBuilt({ ...part, gridfinityOpeningCorner });
+    }
+  });
+
+  it("builds notch corners on a divided bin's slot to the floor, under a ledge, its dividers checked", () => {
+    for (const part of [
+      front({ width: 40 }, { gridfinityCompartmentsX: 3, gridfinityOpeningCornerSize: 10 }),
+      front({ width: 20, depth: 12 }, { gridfinityWallThickness: 2.5, gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopBack: true }),
+      front({ width: 40 }, { gridfinityWallThickness: 4, gridfinityCompartmentsX: 3, gridfinityOpeningCorner: "chamfer" }),
+    ]) expectBuilt(part);
+    // A slot at the right end with its corner there, built clean (the unit test checks it is at the size set).
+    for (const gridfinityOpeningCornerSize of [1, 2, 3.5]) {
+      for (const gridfinityOpeningCorner of ["round", "chamfer"] as const) expectBuilt(front({ width: 20, align: "end", distance: 0 }, { gridfinityCompartmentsX: 3, gridfinityOpeningCorner, gridfinityOpeningCornerSize }));
+    }
+  });
+
+  it("takes the wall off at a top corner and keeps it in a bottom corner, rounded or chamfered", () => {
+    // A notch from -15 to 15 down to 15.4, its corners 2 mm; 0.5 mm in from the outside, the lip's top is at 24.9.
+    const wall = 41.5 / 2 - 0.5;
+    const sharp = expectBuilt(front({ width: 30, depth: 10 }, { gridfinityOpeningCornerSize: 0 }));
+    expect(material(sharp, -15.3, wall, 24.7, 26)).toBeGreaterThan(1e-3);
+    expect(material(sharp, -14.7, wall, 15.5, 16)).toBeLessThan(1e-6);
+    for (const gridfinityOpeningCorner of ["round", "chamfer"] as const) {
+      const solid = expectBuilt(front({ width: 30, depth: 10 }, { gridfinityOpeningCorner }));
+      expect(material(solid, -15.3, wall, 24.7, 26), gridfinityOpeningCorner).toBeLessThan(1e-6);
+      expect(material(solid, -14.7, wall, 15.5, 16), gridfinityOpeningCorner).toBeGreaterThan(1e-3);
+      // Away from the corners the notch and the wall are as before.
+      expect(material(solid, 0, wall, 15.5, 26), gridfinityOpeningCorner).toBeLessThan(1e-6);
+      expect(material(solid, -20, wall, 15.5, 21), gridfinityOpeningCorner).toBeGreaterThan(0.3 * 0.3 * 5.5 * 0.99);
+    }
+  });
+
+  it("puts each corner at its own end on a side that runs the other way, the back", () => {
+    // A notch from 16 to 36 down to 15.4, 2 mm from the back's right end: its top corner there takes 2 mm, the others 3.
+    const wall = -(41.5 / 2 - 0.5);
+    const solid = expectBuilt(bin({ gridfinityOpenBack: true, gridfinityOpenings: [{ side: "back", width: 20, depth: 10, align: "end", distance: 2 }], gridfinityOpeningCornerSize: 3 }));
+    // Just inside the notch at its right end, over the bottom corner's rounding; just outside it at its left end.
+    expect(material(solid, 35.5, wall, 17.5, 20)).toBeLessThan(1e-6);
+    expect(material(solid, 15.5, wall, 17.5, 20)).toBeGreaterThan(0.3 * 0.3 * 2.5 * 0.99);
+  });
+
+  it("leaves no edge under 0.01 mm where a corner nearly meets the wall's end or a crease of its section", () => {
+    for (const gridfinityOpeningCorner of ["round", "chamfer"] as const) {
+      // The top corner 0.005 mm short of the straight part's end, and with a size of 4 just under the lip's crease.
+      expectBuilt(front({ width: 20, depth: 10, align: "end", distance: 1.905 }, { gridfinityOpeningCorner }));
+      expectBuilt(front({ width: 20, depth: 10, align: "end", distance: 3.705 }, { gridfinityOpeningCorner, gridfinityOpeningCornerSize: 4 }));
+    }
+    // A wall lowered across the side: the bottom corners' arcs end on the corners' seams, crossing the support's foot just short of them.
+    for (const side of ["front", "back"] as const) {
+      expectBuilt(bin({ width: 41.5, depth: 41.5, height: 28 + GRIDFINITY_LIP_HEIGHT, [GRIDFINITY_OPEN_WALL_KEYS[side]]: true, gridfinityOpenings: [{ side, depth: 16 }], gridfinityOpeningCornerSize: 10 }));
+    }
+  });
+
+  it("builds forty notches of any size, place and corner on any bin as one valid solid, no edge under 0.01 mm", () => {
+    // The same forty each run: a small generator with a fixed seed (mulberry32).
+    let seed = 455;
+    const random = () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const pick = <T,>(options: readonly T[]) => options[Math.floor(random() * options.length)];
+    const on = (low: number, high: number, step: number) => Math.round((low + random() * (high - low)) / step) * step;
+    let built = 0;
+    for (let i = 0; i < 40; i += 1) {
+      const side = pick(["back", "front", "left", "right"] as const);
+      const [width, depth] = pick([[41.5, 41.5], [83.5, 41.5], [41.5, 83.5]]);
+      const units = pick([2, 3, 4]);
+      const lip = random() < 0.85;
+      const part = bin({
+        width, depth, height: 7 * units + (lip ? GRIDFINITY_LIP_HEIGHT : 0), gridfinityLip: lip, [GRIDFINITY_OPEN_WALL_KEYS[side]]: true,
+        ...(lip && random() < 0.3 ? { gridfinityLipChamfer: pick([0.25, 0.5, 1]) } : {}),
+        ...(random() < 0.4 ? { gridfinityWallThickness: pick([0.8, 1.75, 2.5, 4]) } : {}),
+        ...(random() < 0.2 ? { gridfinityScoopBack: true } : {}),
+        gridfinityOpenings: [{ side, width: on(5, 60, 0.5), depth: on(2, 7 * units, 0.5), align: pick(["start", "middle", "end"] as const), distance: on(0, 8, 0.005) }],
+        gridfinityOpeningCorner: pick(["round", "chamfer"] as const),
+        gridfinityOpeningCornerSize: on(0.5, 10, 0.01),
+      });
+      if (gridfinityPlan(part).notches.length === 0) continue;
+      expectBuilt(part);
+      built += 1;
+    }
+    expect(built).toBeGreaterThan(30);
+  });
+
+  it("rounds the corners alike in the mesh and the exact body: within 3 % on a lowered wall, 0.01 mm³ at 1 mm", () => {
+    // What the corners change in each, against the same notch with square corners.
+    const change = (part: CadModifierGridfinityPart) => {
+      const square = { ...part, gridfinityOpeningCornerSize: 0 };
+      return [cad.getVolume(gridfinityPartSolid(cad, part)) - cad.getVolume(gridfinityPartSolid(cad, square)), meshVolume(part) - meshVolume(square)];
+    };
+    // A wall lowered across a 1 x 1 bin has bottom corners only, which keep wall.
+    for (const gridfinityOpeningCorner of ["round", "chamfer"] as const) {
+      const [exact, mesh] = change(bin({ width: 41.5, depth: 41.5, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", depth: 10 }], gridfinityOpeningCorner, gridfinityOpeningCornerSize: 3 }));
+      expect(exact, gridfinityOpeningCorner).toBeGreaterThan(1);
+      expect(Math.abs(exact - mesh) / exact, gridfinityOpeningCorner).toBeLessThan(0.03);
+    }
+    const [exact, mesh] = change(front({ width: 20, depth: 10 }, { gridfinityOpeningCornerSize: 1 }));
+    expect(Math.abs(exact - mesh)).toBeLessThan(0.01);
+  });
+
+  it("still stacks a bin 0.35 mm on one with rounded notch corners", () => {
+    const upper = gridfinityPartSolid(cad, bin({ width: 41.5, depth: 41.5 }));
+    const lower = gridfinityPartSolid(cad, bin({ width: 41.5, depth: 41.5, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 17, depth: 10 }], gridfinityOpeningCornerSize: 3 }));
+    expect(overlap(lower, cad.translate(upper, 0, 21 - 0.34, 0))).toBeLessThan(0.01);
+    expect(overlap(lower, cad.translate(upper, 0, 21 - 0.5, 0))).toBeGreaterThan(1);
+  });
+
+  it("builds the same solid as before with square corners", () => {
+    const sharp = gridfinityPartSolid(cad, front({ width: 30, depth: 10 }, { gridfinityOpeningCornerSize: undefined }));
+    for (const part of [front({ width: 30, depth: 10 }, { gridfinityOpeningCornerSize: 0 }), front({ width: 30, depth: 10 }, { gridfinityOpeningCornerSize: 0.45, gridfinityOpeningCorner: "chamfer" })]) {
+      const solid = gridfinityPartSolid(cad, part);
+      expect(Math.abs(cad.getVolume(solid) - cad.getVolume(sharp))).toBeLessThan(1e-9);
+      expect(cad.getSubShapes(solid, "face")).toHaveLength(cad.getSubShapes(sharp, "face").length);
+    }
+  });
+});
