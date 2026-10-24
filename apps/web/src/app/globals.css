@@ -7749,6 +7749,53 @@ html[data-theme="dark"] .inspector-bundle-note {
   height: 100%;
 }
 
+/* The round Select multiple button of a touch screen (#337): it stands in the lower left while a
+   body is picked with a finger. Tapped, it locks Select multiple and every further tap adds a body
+   to the selection; tapped again, it ends the mode and goes away. */
+.touch-multi-select {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 30;
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  box-shadow: 0 6px 18px rgba(75, 56, 35, 0.22);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.touch-multi-select:hover,
+.touch-multi-select:focus-visible {
+  background: var(--tile-hover);
+  border-color: var(--active-tab);
+}
+
+.touch-multi-select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.touch-multi-select.active {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: scale(0.94);
+}
+
+html[data-theme="dark"] .touch-multi-select {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
 .selection-counter {
   position: fixed;
   top: 0;

@@ -3165,6 +3165,33 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .inspector-bundle-note 
   background: #fafafa;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .touch-multi-select {
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 6px 18px rgba(58, 58, 58, 0.22);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .touch-multi-select:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .touch-multi-select:focus-visible {
+  background: var(--tile-hover);
+  border-color: var(--active-tab);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .touch-multi-select:focus-visible {
+  outline: 2px solid var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .touch-multi-select.active {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .selection-counter {
   color: #fff;
   background: #bf6508;
