@@ -104,6 +104,7 @@
   --group-home: var(--filament-cobalt);
   --group-clipboard: var(--filament-aqua);
   --group-history: var(--filament-mint);
+  --group-assistant: var(--filament-violet);
   --group-shapes: var(--filament-sun);
   --group-visibility: var(--group-neutral);
   --group-combine: var(--filament-violet);
@@ -1611,6 +1612,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="history"] {
   --group-color: var(--group-history);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="assistant"] {
+  --group-color: var(--group-assistant);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="shapes"] {

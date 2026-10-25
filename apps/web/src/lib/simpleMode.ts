@@ -25,6 +25,9 @@ export function simpleModeFromParameter(value: unknown): SimpleModeChoice | null
 /** Ribbon tools the simple mode keeps, by their ids in the toolbar. */
 export const SIMPLE_MODE_TOOLS: ReadonlySet<string> = new Set([
   "copy", "paste", "duplicate", "delete", "undo", "redo",
+  // Describing a shape in words is the shortest path for someone who has never
+  // opened a CAD program, which is exactly whom the simple mode is for.
+  "ai",
   "group", "ungroup",
   "mirror", "chamfer", "fillet", "hollow",
   "align",

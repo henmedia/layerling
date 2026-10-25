@@ -2,7 +2,7 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
-import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Rotate3d, Route as RouteIcon, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Rotate3d, Route as RouteIcon, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { useWheelField } from "@/lib/useWheelField";
 import { wheelNextValue } from "@/lib/wheelValueStep";
@@ -146,6 +146,8 @@ export function SecondaryToolbar({
   onToolbarModeChange,
   outlinerOpen,
   onToggleOutliner,
+  aiOpen,
+  onToggleAi,
   alignMode,
   canAlign,
   canModifySelection,
@@ -270,6 +272,9 @@ export function SecondaryToolbar({
   onToolbarModeChange: (mode: ToolbarMode) => void;
   outlinerOpen: boolean;
   onToggleOutliner: () => void;
+  /** The built-in assistant panel is open; its button closes it again. */
+  aiOpen: boolean;
+  onToggleAi: () => void;
   alignMode: boolean;
   canAlign: boolean;
   /** Something is selected and none of it is locked: the Modify and Arrange tools may act on it. */
@@ -607,6 +612,9 @@ export function SecondaryToolbar({
     { id: "redo", label: t("editor.tool.redo"), icon: ToolbarRedoIcon, action: onRedo, enabled: canRedo },
     { id: "history", label: t("editor.tool.history"), icon: ToolbarHistoryIcon, action: onHistoryView, enabled: canHistoryView, active: historyViewActive },
   ];
+  // Its own group rather than a fifth button inside History: people look for an
+  // assistant, not for a kind of undo (the star next to it read as a sparkle of the history view).
+  const aiTool = { id: "ai", label: t("editor.tool.ai"), icon: Sparkles, action: onToggleAi, enabled: true, active: aiOpen };
   const visibilityTools = [
     {
       id: "outliner",
@@ -664,7 +672,7 @@ export function SecondaryToolbar({
     { id: "sketch-duplicate", label: t("editor.tool.duplicate"), icon: ToolbarDuplicateIcon, action: onSketchDuplicate, enabled: sketchHasSelection },
     { id: "sketch-delete", label: t("editor.tool.delete"), icon: ToolbarTrashIcon, action: onSketchDelete, enabled: sketchHasSelection },
   ];
-  const renderToolButton = (tool: (typeof leftTools)[number] | (typeof visibilityTools)[number] | (typeof combineTools)[number] | (typeof modifyTools)[number] | (typeof arrangeTools)[number]) => {
+  const renderToolButton = (tool: (typeof leftTools)[number] | typeof aiTool | (typeof visibilityTools)[number] | (typeof combineTools)[number] | (typeof modifyTools)[number] | (typeof arrangeTools)[number]) => {
     const { id, icon: Icon, action, label } = tool;
     // Im Verlaufsblick schlaeft jedes Werkzeug ausser dem, das ihn beendet -
     // wirklich, nicht nur im Aussehen: eine Auswahl aus der Zeit davor darf
@@ -777,6 +785,7 @@ export function SecondaryToolbar({
     return [
       ...leftTools.slice(0, 4).map((tool) => fromTool(tool, t("editor.group.clipboard"))),
       ...leftTools.slice(4).map((tool) => fromTool(tool, t("editor.group.history"))),
+      fromTool(aiTool, t("editor.group.ai")),
       ...libraryShapeAssets.map((shape) => plain(
         `shape-${shape.id}`,
         t("palette.addShape", { shape: shapeAssetMenuLabel(shape) }),
@@ -844,6 +853,10 @@ export function SecondaryToolbar({
         <div className="toolbar-section" data-group="history">
           <div className="toolbar-section-label">{t("editor.group.history")}</div>
           <div className="toolbar-section-tools">{inSimpleMode(leftTools.slice(4)).map(renderToolButton)}</div>
+        </div>
+        <div className="toolbar-section" data-group="assistant">
+          <div className="toolbar-section-label">{t("editor.group.ai")}</div>
+          <div className="toolbar-section-tools">{inSimpleMode([aiTool]).map(renderToolButton)}</div>
         </div>
         <div className="toolbar-section toolbar-shapes-section" data-group="shapes" ref={shapesMenuRef} inert={historyViewActive}>
           <div className="toolbar-section-label">{t("editor.group.shapes")}</div>

@@ -13,6 +13,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   history: ["history", "look back", "earlier state", "previous version", "timeline", "verlauf", "zurueckschauen", "zurückschauen", "frueherer stand", "früherer stand", "version", "stand"],
   undo: ["undo", "back", "rueckgaengig", "zurueck", "zurück"],
   redo: ["redo", "wiederholen", "wiederherstellen", "vor"],
+  ai: ["ai", "assistant", "chat", "natural language", "describe", "model", "ki", "ki assistent", "kuenstliche intelligenz", "künstliche intelligenz", "assistent", "helfer"],
   outliner: ["outliner", "object list", "objektliste", "liste", "ebenen", "layers"],
   "toggle-hidden": ["hide", "show", "visible", "ausblenden", "einblenden", "verstecken", "sichtbar"],
   "show-hidden": ["show all", "unhide", "alles zeigen", "alles einblenden", "versteckte"],

@@ -242,6 +242,16 @@ For a class or a workshop with children, `LAYERLING_SIMPLE_MODE` starts layerlin
 
 With the shared folder on, `LAYERLING_NEW_DESIGNS_ON_SERVER` makes new designs start on the server: `true` is the start for people who have not chosen (they can untick **New designs on the server** on the start page), `always` holds for everyone and locks the tick. It is set the same way, and a copy served as plain files has no server to read it.
 
+The built-in assistant (the **AI assistant** in the toolbar) can be pointed at a model for everyone at once, so nobody has to type an address and a key into the page. Set `MODEL_ID` and `BASE_URL` in the environment of the Node build, or in `apps/web/.env` (the folder `next dev` and `next start` are told to serve; a `.env` in the repository root is not read), plus `API_KEY` when the provider wants one:
+
+```
+BASE_URL="https://api.example.com/v1"
+API_KEY="sk-..."
+MODEL_ID="the-model-name"
+```
+
+The page then asks this app's own `/api/ai-chat` route instead of the model server: the key stays on the server and never reaches the browser, and there is no cross-origin request for a hosted provider to refuse - most of them answer a request that carries a browser Origin with a CORS error. `LAYERLING_AI_BASE_URL`, `LAYERLING_AI_API_KEY` and `LAYERLING_AI_MODEL` do the same and win when both names are set, which is what you want on a host where a bare `API_KEY` belongs to something else. Without any of them the assistant falls back to the endpoint each visitor types in its own settings, which are kept in that browser; a copy served as plain files has no route to read the environment, so there only the typed settings work. `npm run dev` picks up a changed `apps/web/.env` by itself (its log says `Reload env: .env`); a production `npm run start` reads it as it comes up, so restart it after an edit.
+
 Behind a reverse proxy with a domain, the proxy has to pass on the original `Host` and `X-Forwarded-Proto` (nginx: `proxy_set_header Host $host;` and `proxy_set_header X-Forwarded-Proto $scheme;`), otherwise saving to the server is refused with "Shared projects only accept requests from this site.". If the proxy rewrites the host and you cannot change that, list the address people use in `LAYERLING_ALLOWED_ORIGINS` (comma-separated, for example `https://layerling.example.com`).
 
 ### Static Hosting: Plain Files on a Web Server

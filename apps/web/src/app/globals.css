@@ -448,6 +448,7 @@ input:where([type='button'], [type='reset'], [type='submit']),
   --group-home: var(--filament-cobalt);
   --group-clipboard: var(--filament-aqua);
   --group-history: var(--filament-mint);
+  --group-assistant: var(--filament-violet);
   --group-shapes: var(--filament-sun);
   --group-visibility: var(--group-neutral);
   --group-combine: var(--filament-violet);
@@ -4232,6 +4233,7 @@ html[data-theme="dark"] .shell-openings-summary {
 .toolbar-section[data-group="home"] { --group-color: var(--group-home); }
 .toolbar-section[data-group="clipboard"] { --group-color: var(--group-clipboard); }
 .toolbar-section[data-group="history"] { --group-color: var(--group-history); }
+.toolbar-section[data-group="assistant"] { --group-color: var(--group-assistant); }
 .toolbar-section[data-group="shapes"] { --group-color: var(--group-shapes); }
 .toolbar-section[data-group="visibility"] { --group-color: var(--group-visibility); }
 .toolbar-section[data-group="combine"] { --group-color: var(--group-combine); }

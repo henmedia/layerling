@@ -1,5 +1,6 @@
 "use client";
 import { AlertTriangle, X } from "lucide-react";
+import dynamic from "next/dynamic";
 import { ObjectListPanel } from "@/components/workplane/ObjectListPanel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SAVED_VIEW_KEYS } from "@/lib/designView";
@@ -158,7 +159,7 @@ import { BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportE
 import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
 import { screenAlignedNudge } from "@/lib/keyboardNudge";
-import { LAYERLING_MCP_HEARTBEAT_MS, LAYERLING_MCP_POLL_RETRY_MS, LAYERLING_MCP_ROUTE, type LayerlingMcpCommand, type LayerlingMcpSceneSummary, type LayerlingMcpViewFace } from "@/lib/layerlingMcpProtocol";
+import { LAYERLING_MCP_HEARTBEAT_MS, LAYERLING_MCP_POLL_RETRY_MS, LAYERLING_MCP_ROUTE, type LayerlingMcpCommand, type LayerlingMcpCommandName, type LayerlingMcpSceneSummary, type LayerlingMcpViewFace } from "@/lib/layerlingMcpProtocol";
 import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { getSectionBounds, sectionAxisLetter, sectionMeshInFrame, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
 import { footprintCutOffset, projectSectionPoint, SECTION_VIEW_FACE, sectionSvgDocument, sliceMeshContours } from "@/lib/sectionSvg";
@@ -183,6 +184,9 @@ import { ToolbarMode, SketchShapeOptions, SecondaryToolbar } from "./workplane/S
 
 
 export { importedShapeFromObj, importedShapeFromStl, importedShapeFromSvg };
+
+/** The built-in assistant, tool catalogue and all, loads with the panel - not with every editor open. */
+const AiAssistantPanel = dynamic(() => import("@/components/ai/AiAssistantPanel").then((module) => module.AiAssistantPanel), { ssr: false, loading: () => null });
 
 /** MCP actions that only read or change the view, so they still work while the history view is open. */
 const HISTORY_VIEW_MCP_ACTIONS = new Set([
@@ -2668,6 +2672,8 @@ export function LayerlingEditor({
   const [guideOpen, setGuideOpen] = useState(false);
   // The object list stays open or closed as it was left, in this browser, for every design (#356).
   const [outlinerOpen, setOutlinerOpen] = useRememberedFlag("layerling.editor.objectListOpen");
+  // The built-in assistant panel, remembered the same way.
+  const [aiOpen, setAiOpen] = useRememberedFlag("layerling.editor.aiAssistantOpen");
   /**
    * The groups being edited, outermost first; each next one is a part of the
    * one before. A group's parts lie loose on the workplane until "Done" groups
@@ -10898,6 +10904,16 @@ export function LayerlingEditor({
     executeMcpCommandRef.current = executeMcpCommand;
   }, [executeMcpCommand]);
 
+  /**
+   * One assistant command, run through the same executor the MCP bridge
+   * drives - the assistant works in the page, so no bridge is between it.
+   */
+  const runAiCommand = useCallback(async (action: LayerlingMcpCommandName, params: Record<string, unknown>): Promise<unknown> => {
+    const executor = executeMcpCommandRef.current;
+    if (!executor) throw new Error("The editor is not ready yet.");
+    return executor({ id: createLocalId("ai-command"), action, params, createdAt: Date.now() });
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
@@ -12692,6 +12708,8 @@ export function LayerlingEditor({
         }}
         outlinerOpen={outlinerOpen}
         onToggleOutliner={toggleOutliner}
+        aiOpen={aiOpen}
+        onToggleAi={() => setAiOpen((open) => !open)}
         canUndo={!splitSession && !projectInteractionActive && historyViewIndex === null && (historyIndex > 0 || Boolean(edgeModifier))}
         canRedo={!splitSession && !projectInteractionActive && historyViewIndex === null && historyIndex < history.length - 1}
         canHistoryView={historyViewIndex !== null || (!splitSession && !projectInteractionActive && !edgeModifier && !deleteFaceTool && !openGroup && history.length > 1)}
@@ -12884,6 +12902,13 @@ export function LayerlingEditor({
             onOpenGroup={openGroupForEditing}
             openGroupPartIds={openGroup?.childIds}
             onClose={() => setOutlinerOpen(false)}
+          />
+        ) : null}
+        {aiOpen ? (
+          <AiAssistantPanel
+            inert={historyViewState !== null}
+            runCommand={runAiCommand}
+            onClose={() => setAiOpen(false)}
           />
         ) : null}
         {toolbarMode === "sketch" && sketchActive ? (
