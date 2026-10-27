@@ -403,20 +403,25 @@ html[data-theme="dark"] .dashboard-welcome-guide-link:focus-visible {
   display: none;
 }
 
-/* The designs of this browser live nowhere else: one quiet line under them says so. */
+/* The designs of this browser live nowhere else: one quiet line over them says so, in the
+   footer's trademark type, a size larger. */
 .browser-backup-note {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 4px 6px;
-  margin: 18px 0 0;
-  color: #a8968a;
-  font-size: 12.5px;
-  line-height: 1.5;
+  margin: 0 0 12px;
+  color: #988672;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  text-align: center;
 }
 
 .browser-backup-note > svg {
   flex: none;
+  color: #d9730d;
 }
 
 .browser-backup-help {
@@ -477,5 +482,9 @@ html[data-theme="dark"] .design-tab.drop-target {
 }
 
 html[data-theme="dark"] .browser-backup-note {
-  color: #9c8a78;
+  color: #b3a48d;
+}
+
+html[data-theme="dark"] .browser-backup-note > svg {
+  color: #f3a452;
 }

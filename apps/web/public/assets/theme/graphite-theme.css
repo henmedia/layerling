@@ -7308,7 +7308,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-guid
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note {
-  color: #878787;
+  color: #757575;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note > svg {
+  color: #d9730d;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-help {
@@ -7354,7 +7358,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .design-tab.drop-target
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note {
-  color: #797979;
+  color: #8d8d8d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note > svg {
+  color: #f3a452;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-bar {

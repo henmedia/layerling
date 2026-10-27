@@ -57,7 +57,7 @@ export function DesignTabs<Id extends string>({ tabs, active, onSelect, children
   );
 }
 
-/** Under the browser's designs: they live nowhere else, so one quiet line says so. */
+/** Over the browser's designs: they live nowhere else, so one quiet line says so. */
 export function BrowserBackupNote() {
   return (
     <p className="browser-backup-note">

@@ -3943,6 +3943,7 @@ function Dashboard({
             </>
           ) : (
             <>
+              {localDesigns.length > 0 ? <BrowserBackupNote /> : null}
               <div className="design-tab-trail">
                 {/* Inside a folder the line under the tabs is the way back: every step a
                     button, and a place to drop a design or a folder on (#496). */}
@@ -4213,7 +4214,6 @@ function Dashboard({
                   <span>{t("dashboard.folderEmptyHint")}</span>
                 </div>
               ) : null}
-              {localDesigns.length > 0 ? <BrowserBackupNote /> : null}
             </>
           )}
           <AppFooter version={LYL_CREATED_WITH_VERSION} updateInfo={update} onShowWelcome={welcome.hidden && !simpleMode ? showWelcome : undefined} />
