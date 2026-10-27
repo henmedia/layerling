@@ -1059,7 +1059,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     }
     if (vase.twistMode === "kurve" || vase.twist !== 0 || vase.swayAngle > 0) properties.push(choice("twistAlong", "prop.vaseTwistAlong"));
     properties.push(choice("body", "prop.vaseBody", vase.body === "voll" ? "vase.bodySolidHint" : "vase.bodyHollowHint"));
-    if (vase.body === "hohl") properties.push(range("wall", "prop.vaseWall", 0.1), range("bottom", "prop.vaseBottom", 0.1), choice("innerShape", "prop.vaseInner"));
+    if (vase.body === "hohl") properties.push(range("wall", "prop.vaseWall", 0.1), range("bottom", "prop.vaseBottom", 0.1, "vase.bottomHint"), choice("innerShape", "prop.vaseInner"));
     properties.push(choice("effect", "prop.vaseEffect", "vase.effectHint"));
     if (vase.effect === "rillen") {
       properties.push(range("ribCount", "prop.vaseGrooveCount", 1), range("ribDepth", "prop.vaseGrooveDepth", 0.1), percent("grooveWidth", "prop.vaseGrooveWidth"), choice("ribShape", "prop.vaseGrooveShape"), range("waveAmplitude", "prop.vaseGrooveWave", 0.5));
@@ -1080,7 +1080,9 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       value: vase.watertight === "ja",
       onChange: (value) => setVase({ watertight: value ? "ja" : "nein" }),
     }));
-    if (hollow) {
+    // Without a bottom (0 mm and no lamp) there are no drain holes and no foot.
+    const open = hollow && vase.lamp === "keine" && vase.bottom === 0;
+    if (hollow && !open) {
       properties.push(floor(range("drainHoles", "prop.vaseDrainHoles", 1, "vase.floorHint")));
       if (vase.drainHoles > 0) properties.push(floor(range("drainDiameter", "prop.vaseDrainDiameter", 0.5)), floor(range("floorSlope", "prop.vaseFloorSlope", 0.1)));
       if (vase.lamp !== "puck") properties.push(floor(range("footHeight", "prop.vaseFootHeight", 1)));

@@ -103,6 +103,8 @@ describe("the vase as a shape", () => {
       ["a double wall for vase mode", { body: "voll", effect: "keine", reinforce: "doppelwand", reinforceCount: 8 }],
       ["a cross-section that turns into a hexagon", { section2: "vieleck", section2Sides: 6, effect: "keine" }],
       ["winding grooves", { effect: "rillen", waveAmplitude: 4, waveCount: 3 }],
+      ["no bottom", { body: "hohl", effect: "keine", bottom: 0 }],
+      ["no bottom, with grooves and legs moulded on", { body: "hohl", effect: "rillen", bottom: 0, legMode: "angeformt" }],
     ];
     for (const [name, settings] of variants) {
       const analysis = analyzeTriangleSoup(soupOf(vase(settings, { width: 70, depth: 70, size: 70, height: 110 })));
@@ -115,6 +117,37 @@ describe("the vase as a shape", () => {
     const settings = normalizeVaseSettings({ body: "hohl", wall: 0.8, bottom: 1, watertight: "ja" });
     expect(settings.wall).toBeGreaterThanOrEqual(1.6);
     expect(settings.bottom).toBeGreaterThanOrEqual(1.6);
+  });
+
+  it("can have no bottom: a tube open at both ends, for a bell or a mouthpiece", () => {
+    expect(normalizeVaseSettings({ body: "hohl", bottom: 0 }).bottom).toBe(0);
+    // Thinner than a layer pair is no bottom; from 0.2 mm on, at least 0.4 mm.
+    expect(normalizeVaseSettings({ body: "hohl", bottom: 0.1 }).bottom).toBe(0);
+    expect(normalizeVaseSettings({ body: "hohl", bottom: 0.3 }).bottom).toBe(0.4);
+    // Holding water wins: it needs a bottom.
+    expect(normalizeVaseSettings({ body: "hohl", bottom: 0, watertight: "ja" }).bottom).toBeGreaterThanOrEqual(1.6);
+    // Looking down the axis: a vase with a bottom has it in the way, one without has nothing (its top is open too).
+    const across = (soup: number[]) => {
+      const box = bounds(soup);
+      const [px, pz] = [(box.minX + box.maxX) / 2, (box.minZ + box.maxZ) / 2];
+      let count = 0;
+      for (let i = 0; i < soup.length; i += 9) {
+        const [ax, , az, bx, , bz, cx, , cz] = soup.slice(i, i + 9);
+        const d1 = (px - bx) * (az - bz) - (ax - bx) * (pz - bz), d2 = (px - cx) * (bz - cz) - (bx - cx) * (pz - cz), d3 = (px - ax) * (cz - az) - (cx - ax) * (pz - az);
+        if (!((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0))) count += 1;
+      }
+      return count;
+    };
+    const frame = { width: 40, depth: 40, size: 40, height: 80 };
+    const settings = { profile: "zylinder", effect: "keine", body: "hohl", wall: 2, footHeight: 10 };
+    const floored = soupOf(vase({ ...settings, bottom: 2 }, frame));
+    const open = soupOf(vase({ ...settings, bottom: 0 }, frame));
+    expect(across(floored)).toBeGreaterThan(0);
+    expect(across(open)).toBe(0);
+    // Without the bottom and the hollow foot, only the wall is left.
+    expect(volume(open)).toBeLessThan(volume(floored));
+    expect(bounds(open).minY).toBeCloseTo(0, 6);
+    expect(bounds(open).maxY - bounds(open).minY).toBeCloseTo(80, 3);
   });
 
   it("is solid for the slicer's vase mode, or hollow with a wall", () => {
