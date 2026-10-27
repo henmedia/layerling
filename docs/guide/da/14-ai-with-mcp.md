@@ -55,7 +55,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_import_file` | importerer en fil som importvinduet gør, en farvet OBJ eller 3MF som én form pr. farve, en 3MF med flere objekter som én form pr. objekt |
 | `layerling_add_font` | tilføjer en font du selv har til tekst fra en TrueType-, OpenType- eller WOFF-fil; den bliver i browseren, et design beholder kun de bogstaver det bruger |
 | `layerling_list_fonts` | lister de indbyggede fonte og dine egne fonte, med id og navn |
-| `layerling_import_mesh` | bringer et trekantnet ind i designet |
+| `layerling_import_mesh` | bringer et trekantsmesh ind i designet |
 | `layerling_update_object` | ændrer dimensioner, position, farve, navn, solid eller hul og alt andet der udgør formen, en teksts bogstavkant inkluderet |
 | `layerling_align_objects` | justerer objekter med hinanden |
 | `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet |
@@ -63,8 +63,8 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_place_on_face` | sætter objekter ned på en flade af en anden, også skrå, som C-tasten |
 | `layerling_perforate_face` | skærer et hulmønster ind i en flad flade; hullerne bliver som huller grupperet med formen |
 | `layerling_sweep_sketch` | trækker et rektangulært eller rundt tværsnit langs en sti af punkter som ét eksakt legeme; en lukket sti giver en ring |
-| `layerling_push_face` | skubber en flad flade ud eller skærer en lomme ind i den, med en indrykning fra kanten og en hjørneradius; den nye del er en skitseform grupperet med formen |
-| `layerling_mate_faces` | bringer en flade på et objekt mod en flade på et andet, flade mod flade eller flugtende |
+| `layerling_push_face` | skubber en flad flade ud eller skærer en lomme ind i den, med en indrykning fra kanten og en hjørneradius; den nye del er en skitseform grupperet med formen, eller et frit legeme for sig med `separate` |
+| `layerling_mate_faces` | bringer en flade på et objekt mod en flade på et andet, flade mod flade eller flugtende, eller lægger to runde flader på én akse |
 | `layerling_open_group` | åbner en gruppe så dens dele kan ændres én ad gangen, også en gruppe inden i en åben |
 | `layerling_close_group` | lukker den igen ("Udført") eller annullerer |
 | `layerling_group_objects` | grupperer objekter |
@@ -84,7 +84,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_array_objects` | mangfoldiggør i en række eller på en cirkel |
 | `layerling_bundle_objects` | bundter objekter som Ctrl+B: de flytter sammen, beholder deres farve og slags og går ud hver for sig i en eksport |
 | `layerling_layer_text` | laver en tekst om til en stak lag til et flerfarvet print (bogstaver, bredere kanter, en plade uden huller) eller bygger en stak igen, med et nøgleringshul, hjørnerne pr. lag og en rundet eller faset bogstavkant; med en navneliste, ét tag pr. navn |
-| `layerling_layer_icon` | laver et SVG-ikon (filens tekst, eller en ekstraheret skitseform) til et lagdelt ikon-tag til et flerfarvet print - ikonet, bredere kanter, en plade uden huller - eller bygger et igen med en ny bredde eller lag; med et antal fylder den pladen med kopier |
+| `layerling_layer_icon` | laver et SVG-ikon (filens tekst, eller en udtrukket skitseform) til et lagdelt ikon-tag til et flerfarvet print - ikonet, bredere kanter, en plade uden huller - eller bygger et igen med en ny bredde eller lag; med et antal fylder den pladen med kopier |
 | `layerling_create_qr_code` | laver en QR-kode af en tekst eller webadresse som {{ui:shape.qrCode}} i formbiblioteket - koden alene, hævet på en plade eller graveret, med fejlkorrektion, bredde, højde, stillezone og som hul, hvis du vil; advarer, når et modul kommer under 0,8 mm |
 | `layerling_reference_image` | tilføjer et referencebillede fra et billede som {{ui:import.referenceImage}}, eller flytter, drejer, kalibrerer (to punkter på billedet og deres virkelige afstand), toner eller låser et - en hjælp, der aldrig eksporteres eller printes |
 | `layerling_measure_section` | måler på et skæreplan mellem to punkter der snapper til omridset - vægtykkelse, mellemrum, pasninger |
@@ -96,11 +96,11 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_inspect_errors` | viser den seneste besked og den seneste fejl, plus sessionens beskeder og fejl |
 | `layerling_wrap_around_cylinder` | vikler en form der ligger fladt, for eksempel en SVG eller tekst, rundt om en cylinder, udad eller indad som gravering |
 | `layerling_texture_surface` | lægger en overfladestruktur på en form: riller, riflinger, bikager eller knopper, for bedre greb eller for udseendet, og ændrer eller fjerner den senere |
-| `layerling_simplify_mesh` | reducerer et importeret meshes trekantsantal, til en andel i procent eller til et antal trekanter |
-| `layerling_save_custom_shape` | beholder former som en egne form, på serveren eller i browseren, for at indsætte dem i andre designs |
+| `layerling_simplify_mesh` | reducerer trekantsantallet i et importeret mesh, til en andel i procent eller til et antal trekanter |
+| `layerling_save_custom_shape` | beholder former som en egen form, på serveren eller i browseren, for at indsætte dem i andre designs |
 | `layerling_list_custom_shapes` | lister de egne former på serveren og i browseren |
-| `layerling_insert_custom_shape` | indsætter en egne form i det åbne design, evt. på en position x/z |
-| `layerling_delete_custom_shape` | fjerner en egne form; indsatte former bevares |
+| `layerling_insert_custom_shape` | indsætter en egen form i det åbne design, evt. på en position x/z |
+| `layerling_delete_custom_shape` | fjerner en egen form; indsatte former bevares |
 | `layerling_show_workplane` | skjuler og viser pladen med sit gitter, for et billede af undersiden for eksempel (kun visningen) |
 | `layerling_set_section_view` | skærer visningen op langs et plan for at kigge indeni (kun visningen, intet skæres fra hinanden) |
 | `layerling_measurements` | viser eller skjuler målebåndets målinger og viser dem med deres længder |

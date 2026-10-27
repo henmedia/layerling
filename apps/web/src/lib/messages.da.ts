@@ -2261,7 +2261,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.myShapeMovedToFolder": "\"{name}\" er flyttet til \"{folder}\"",
   "status.myShapeMovedOutOfFolder": "\"{name}\" ligger ikke længere i en mappe",
   "status.myShapeNameTakenInFolder": "Der er allerede en egen form ved navn \"{name}\" i \"{folder}\"; omdøb en af dem først",
-  "status.myShapeNameTaken": "Der er allerede en egne form kaldet \"{name}\" på serveren; vælg et andet navn",
+  "status.myShapeNameTaken": "Der er allerede en egen form kaldet \"{name}\" på serveren; vælg et andet navn",
   "status.myShapeGone": "Denne form er der ikke længere; listen er opdateret",
   "status.myShapeInserted": "\"{name}\" indsat",
   "status.myShapeDeleted": "\"{name}\" fjernet fra de egne former",
