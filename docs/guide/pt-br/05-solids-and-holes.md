@@ -28,6 +28,8 @@ Selecione os sólidos e o(s) orifício(s) e clique em {{ui:editor.tool.group}} (
 
 Se houver vários sólidos no grupo de união, eles se juntam. Dois sólidos que se tocam viram uma única peça.
 
+Com malhas grandes, como um STL importado com centenas de milhares de triângulos, o corte leva alguns segundos. layerling então trabalha em segundo plano e mostra "{{ui:status.computing}}"; enquanto isso, você pode girar a vista e usar a interface. Se você alterar o modelo nesse meio-tempo, o resultado é descartado e layerling avisa. O mesmo vale para {{ui:editor.tool.split}}.
+
 Um grupo de união pode ser tratado como uma forma: mover, girar, mudar a cor, agrupar de novo. {{ui:editor.tool.ungroup}} ([[Ctrl]]+[[Shift]]+[[G]]) desfaz o grupo de união, e as peças voltam a ficar separadas.
 
 ### Transformando um grupo de união em orifício
@@ -41,7 +43,7 @@ Um grupo de união inteiro também pode ser um sólido ou um orifício. Vale uma
 
 Às vezes as peças só devem ficar juntas, sem virar uma só, por exemplo um logotipo branco sobre uma placa preta para uma impressão multicolorida. É para isso que serve {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), como no Tinkercad. Um conjunto se move, gira e muda de tamanho como uma forma, mas nada é fundido:
 
-- Cada peça mantém a sua cor e continua sendo um sólido ou um orifício.
+- Cada peça mantém a sua cor e continua sendo um sólido ou um orifício. No painel de propriedades, o conjunto tem os mesmos cartões de um grupo de união: {{ui:inspector.solid}} e {{ui:inspector.hole}} para o conjunto inteiro (que mantêm as cores das peças), {{ui:inspector.transparent}} ([[T]]) e {{ui:inspector.multicolor}} ([[Shift]]+[[M]]); com {{ui:inspector.multicolor}} desligado, o conjunto aparece e é exportado numa cor só. {{ui:inspector.separateParts}} desfaz o conjunto, como [[Ctrl]]+[[Shift]]+[[G]].
 - Os orifícios não cortam nada. Quando você agrupa o conjunto com outras peças, os orifícios dele cortam essas peças, mas continuam sem cortar os sólidos do próprio conjunto, como no Tinkercad. Assim, por exemplo, um pino com o seu orifício ao lado pode ser usado de novo e de novo como conjunto.
 - Ao exportar em STL, 3MF ou OBJ, cada peça é um sólido separado; em 3MF e OBJ, com a sua cor.
 
@@ -51,9 +53,11 @@ Um grupo de união inteiro também pode ser um sólido ou um orifício. Vale uma
 
 {{ui:editor.tool.intersect}} mantém só o que dois ou mais sólidos têm em comum. Coloque duas formas uma sobre a outra, sobrepostas, selecione as duas e clique em {{ui:editor.tool.intersect}}. Assim um cilindro e uma caixa viram uma peça com um lado redondo e um lado reto. Um grupo de união entra na interseção do jeito que aparece, com os orifícios já recortados. Se um orifício também estiver selecionado, o que sobra é o que todos os sólidos têm em comum com todos os orifícios. Se as formas não têm nada em comum, uma mensagem informa que nada foi alterado. Ao lado de {{ui:editor.tool.intersect}}, o botão {{ui:editor.tool.intersectPreview}} exibe a parte em comum antes de você aplicá-la: as formas selecionadas ficam transparentes, e o que elas têm em comum aparece em verde. Selecione e mova cada forma separadamente, e a parte verde acompanha; {{ui:editor.tool.intersect}} aplica, [[Esc]] fecha a prévia.
 
-## Recortando um corpo de outro
+{{ui:editor.tool.hull}} envolve as formas selecionadas em um único sólido convexo, como se fossem embaladas a vácuo: o menor sólido sem reentrâncias que contém todas elas. Uma meia esfera sobre um cilindro vira uma cúpula sem degrau, quatro cilindros nos cantos viram uma caixa de cantos arredondados, e duas esferas, uma cápsula. Os orifícios da seleção são recortados da envoltória depois. A envoltória guarda as peças: {{ui:group.edit}} a abre como um grupo de união, e se você mover uma peça ali e clicar em {{ui:group.done}}, a envoltória é reconstruída. A envoltória é uma malha, então formas redondas mostram facetas, e as ferramentas de aresta funcionam nela como em qualquer malha.
 
-Para peças que precisam encaixar, um eixo em uma bucha ou um parafuso em uma caixa, você faz uma peça e a recorta da outra. Selecione os dois corpos e clique em {{ui:editor.tool.cutOut}} na área {{ui:editor.group.combine}}, ou clique com o botão direito e escolha lá. O painel nomeia a peça que fica e o corpo que recebe a cavidade; o layerling toma o menor como peça, e {{ui:cutOut.swap}} inverte. {{ui:cutOut.clearance}} deixa a cavidade tanto maior que a peça ao redor: 0 encaixa exato, 0,2 mm é uma folga comum para um encaixe impresso. {{ui:cutOut.apply}} recorta uma cópia da peça do outro corpo e deixa a própria peça onde está. O resultado é um grupo: {{ui:editor.tool.ungroup}} separa o recorte de novo. Uma folga exige que a peça seja um corpo exato, como na ferramenta {{ui:editor.tool.offset}}, que é usada para isso.
+## Recortando um sólido de outro
+
+Para peças que precisam encaixar, um eixo em uma bucha ou um parafuso em uma caixa, você faz uma peça e a recorta da outra. Selecione os dois sólidos e clique em {{ui:editor.tool.cutOut}} na área {{ui:editor.group.combine}}, ou clique com o botão direito e escolha lá. O painel nomeia a peça que é mantida e o sólido que recebe a cavidade; layerling toma o menor como peça, e {{ui:cutOut.swap}} inverte. {{ui:cutOut.clearance}} deixa a cavidade maior que a peça nessa medida, de cada lado: com 0, o encaixe é exato; 0,2 mm é uma folga comum para um encaixe impresso. {{ui:cutOut.apply}} recorta uma cópia da peça do outro sólido e deixa a própria peça onde está. O resultado é um grupo de união: {{ui:editor.tool.ungroup}} separa o recorte de novo. Uma folga exige que a peça seja um sólido exato, como na ferramenta {{ui:editor.tool.offset}}, que o recorte usa para isso.
 
 ## Editando um grupo de união
 
@@ -82,6 +86,8 @@ Uma observação: arredondamentos e chanfros que você aplicou no grupo de uniã
 {{ui:split.apply}} ou [[Enter]] faz o corte, [[Esc]] cancela (enquanto você escolhe uma face, o primeiro [[Esc]] só para a escolha). Cada objeto que o plano cruza vira dois sólidos fechados, com o nome do seu lado, por exemplo "Caixa (Z+)" e "Caixa (Z-)"; os objetos que ele não cruza ficam como estão. Um orifício vira dois orifícios, e um sólido vazado mantém o seu espaço interno. As duas metades ficam onde estavam; para imprimir, deite cada uma sobre a face cortada com {{ui:editor.tool.layFlat}}.
 
 As metades são malhas simples: configurações como os lados de um cilindro ou as letras de um texto se perdem, então ajuste isso antes. [[Ctrl]]+[[Z]] traz o original de volta num só passo. Objetos bloqueados e ocultos não podem ser divididos.
+
+Uma malha importada precisa de uma superfície fechada para ser dividida, agrupada ou recortada. Se ela tiver aberturas, como os olhos de uma figura deixados abertos ou uma rachadura num escaneamento, layerling as fecha antes com uma tampa plana e diz quantas fechou. Ele fecha qualquer abertura pequena e qualquer abertura plana, seja do tamanho que for; uma abertura grande cuja borda não está toda no mesmo plano fica por sua conta, e a mensagem avisa. Feche-a no programa de onde o modelo veio, ou com uma ferramenta de reparo de malha, e importe de novo.
 
 ## Separando peças
 
