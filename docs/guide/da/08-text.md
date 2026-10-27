@@ -1,6 +1,6 @@
 ---
 title: Tekst og buede bogstaver
-summary: Ophøjede eller graverede bogstaver i syv skrifter eller en af dine egne, og hvis du vil langs en cirkelbue, som på en mønt, et låg eller en ring.
+summary: Ophøjede eller graverede bogstaver i otte skrifter eller en af dine egne, og hvis du vil langs en cirkelbue, som på en mønt, et låg eller en ring.
 ---
 
 ## Tilføj tekst
@@ -22,7 +22,9 @@ Bogstavers kanter kan også fases eller rundes, lige eller kurvede, se [Bryd kan
 
 ## Dine egne fonte
 
-Ud over de syv indbyggede fonte kan du bruge enhver font du selv har: en fontfil fra din computer eller, i Chrome og Edge, en font der er installeret på din computer. Vælg {{ui:font.manage}} nederst under {{ui:prop.font}}. Vinduet {{ui:font.title}} åbnes.
+Listen under {{ui:prop.font}} tegner hver font i sine egne bogstaver, med ordene i din tekst, så du ser, hvordan de kommer til at se ud, før du vælger. Det samme gælder fonte i vinduet nedenunder; de fonte, der er listet fra din computer, viser deres navne i deres egne bogstaver. Piletasterne og [[Enter]] virker i listen, og et bogstav hopper til den næste font, der begynder med det.
+
+Ud over de otte indbyggede fonte kan du bruge enhver font du selv har: en fontfil fra din computer eller, i Chrome og Edge, en font der er installeret på din computer. Vælg {{ui:font.manage}} nederst under {{ui:prop.font}}. Vinduet {{ui:font.title}} åbnes.
 
 - **{{ui:font.addFile}}** tager en TrueType-fil (`.ttf`), en OpenType-fil (`.otf`) eller en WOFF-fil (`.woff`). Du kan også bare trække filen ind i vinduet.
 - **På Windows** ligger de installerede fonte i Fonts-mappen (`C:\Windows\Fonts`). Browserens fildialog skjuler den. Åbn den i Stifinder i stedet og træk fonten ind i vinduet {{ui:font.title}}. Fonte der kun er installeret for dig ligger i `%LOCALAPPDATA%\Microsoft\Windows\Fonts`, som fildialogen også viser. På en Mac ligger fonte i `/Library/Fonts` og `~/Library/Fonts`.
