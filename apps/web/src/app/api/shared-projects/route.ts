@@ -4,6 +4,7 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { inspectLylProjectPackage, LYL_LIMITS, LYL_MEDIA_TYPE } from "@/lib/lylProject";
 import { originMatchesRequest } from "@/lib/sameOrigin";
+import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
 import { storeFolderNameProblem } from "@/lib/storeFolderName";
 
 export const runtime = "nodejs";
@@ -256,6 +257,7 @@ export async function GET(request: Request) {
     if (searchTerm) return await searchStore(root, searchTerm);
     const settings = requestUrl.searchParams.get("settings");
     if (settings) return await readSettings(root, settings);
+    if (requestUrl.searchParams.get("all") === "1") return await allDesigns(root);
     const requestedFile = requestUrl.searchParams.get("fileName");
     if (requestedFile) {
       const fileName = existingProjectFileName(requestedFile);
@@ -311,6 +313,8 @@ export async function GET(request: Request) {
       {
         enabled: true,
         path: folderPath,
+        // Every design in the store, not only this folder's: the number on the start page's tab.
+        total: (await storeDesigns(root)).designs.length,
         folders: folders.sort((a, b) => a.name.localeCompare(b.name)),
         projects: projects.filter((entry): entry is SharedProjectFile => Boolean(entry)).sort((a, b) => b.updatedAt - a.updatedAt),
       },
@@ -387,6 +391,49 @@ async function searchStore(root: string, term: string) {
   );
 }
 
+/**
+ * Every design in the store, from the top: the number on the start page's tab and what
+ * "Download all" packs. The same bounds as the search, so a stray tree cannot hold the
+ * answer up, and links are not followed as folders.
+ */
+async function storeDesigns(root: string) {
+  const designs: Array<{ folder: string; fileName: string }> = [];
+  const emptyFolders: string[] = [];
+  let truncated = false;
+  let visited = 0;
+  const walk = async (folder: string, depth: number): Promise<void> => {
+    if (depth > SEARCH_DEPTH_LIMIT || visited >= SEARCH_FOLDER_LIMIT) {
+      truncated = true;
+      return;
+    }
+    visited += 1;
+    const entries = (await fs.readdir(folder, { withFileTypes: true }).catch(() => [])).filter((entry) => !entry.name.startsWith("."));
+    if (depth > 0 && entries.length === 0) emptyFolders.push(folderKey(root, folder));
+    for (const entry of entries) {
+      // The custom shapes keep their own folder in the store; they are shapes, not designs.
+      if (entry.isDirectory() && depth === 0 && entry.name === CUSTOM_SHAPES_FOLDER) continue;
+      if (entry.isDirectory()) await walk(path.join(folder, entry.name), depth + 1);
+      else if (entry.isFile() && /\.(lyl|skf)$/i.test(entry.name)) designs.push({ folder, fileName: entry.name });
+    }
+  };
+  await walk(root, 0);
+  return { designs, emptyFolders, truncated };
+}
+
+/** Every design with the folder it is in, and the folders with nothing in them, for "Download all". */
+async function allDesigns(root: string) {
+  const { designs, emptyFolders, truncated } = await storeDesigns(root);
+  const projects = await Promise.all(designs.map(async ({ folder, fileName }) => {
+    const stat = await regularFileStat(path.join(folder, fileName));
+    if (!stat) return null;
+    const thumbnail = await regularFileStat(sharedThumbnailPath(folder, fileName, revisionForStat(stat)));
+    return projectRecord(fileName, stat, Boolean(thumbnail), folderKey(root, folder));
+  }));
+  return NextResponse.json(
+    { enabled: true, truncated, emptyFolders, projects: projects.filter((entry): entry is SharedProjectFile => Boolean(entry)) },
+    { headers: { "Cache-Control": "no-store" } },
+  );
+}
 
 /** Creating a folder is the one write that touches no project at all. */
 async function createFolder(root: string, folder: string, name: string) {
@@ -400,12 +447,18 @@ async function createFolder(root: string, folder: string, name: string) {
   return NextResponse.json({ created: true, path: folderKey(root, target) }, { status: 201, headers: { "Cache-Control": "no-store" } });
 }
 
+/** The store's own folder for custom shapes, at its top level: the shapes are found by that name. */
+function isCustomShapesFolder(root: string, folder: string) {
+  return path.dirname(folder) === root && path.basename(folder) === CUSTOM_SHAPES_FOLDER;
+}
+
 /**
  * Renaming a folder. The projects inside travel with it, and so do their
  * pictures - they live in the folder, not in a register somewhere else.
  */
 async function renameFolder(root: string, folder: string, name: string) {
   if (folder === root) throw new RequestFailure("The store folder itself cannot be renamed", 400);
+  if (isCustomShapesFolder(root, folder)) throw new RequestFailure("The custom shapes folder cannot be renamed", 400);
   const wanted = name.trim();
   if (storeFolderNameProblem(wanted, []) !== null) throw new RequestFailure("That folder name is not allowed", 400);
   const current = path.basename(folder);
@@ -605,6 +658,7 @@ async function copyProject(root: string, folder: string, requestedName: string, 
  */
 async function deleteFolder(root: string, folder: string, recursive: boolean) {
   if (folder === root) throw new RequestFailure("The store folder itself cannot be removed", 400);
+  if (isCustomShapesFolder(root, folder)) throw new RequestFailure("The custom shapes folder cannot be removed", 400);
   const counts = await folderContentsCount(folder);
   if (!recursive && (counts.projects > 0 || counts.folders > 0 || counts.files > 0)) {
     throw new RequestFailure("That folder is not empty", 409, counts);

@@ -515,6 +515,59 @@ function search_store(string $root, string $term): void
     ]);
 }
 
+/**
+ * Every design in the store with the folder it is in, and the folders with nothing in them: what
+ * "Back up all" on the start page's server tab packs. The same bounds as the search; the custom
+ * shapes keep their own folder and are shapes, not designs.
+ */
+function handle_all_designs(string $root): void
+{
+    $projects = [];
+    $emptyFolders = [];
+    $truncated = false;
+    $visited = 0;
+
+    $walk = static function (string $folder, int $depth) use (&$walk, $root, &$projects, &$emptyFolders, &$truncated, &$visited): void {
+        if ($depth > SEARCH_DEPTH_LIMIT || $visited >= SEARCH_FOLDER_LIMIT) {
+            $truncated = true;
+            return;
+        }
+        $visited++;
+        $folderKey = folder_key($root, $folder);
+        $entries = array_values(array_filter(scandir($folder) ?: [], static fn(string $entry): bool => $entry[0] !== '.'));
+        if ($depth > 0 && $entries === []) {
+            $emptyFolders[] = $folderKey;
+        }
+        foreach ($entries as $entry) {
+            $full = $folder . DIRECTORY_SEPARATOR . $entry;
+            if (is_dir($full) && !is_link($full)) {
+                if ($depth === 0 && $entry === 'Custom shapes') {
+                    continue;
+                }
+                $walk($full, $depth + 1);
+                continue;
+            }
+            if (!preg_match('/\.(lyl|skf)$/i', $entry)) {
+                continue;
+            }
+            $stat = regular_file_stat($full);
+            if ($stat === null) {
+                continue;
+            }
+            $hasThumbnail = regular_file_stat(thumbnail_path($folder, $entry, revision_for($stat))) !== null;
+            $projects[] = project_record($entry, $stat, $hasThumbnail, $folderKey);
+        }
+    };
+
+    $walk($root, 0);
+    send_json([
+        'enabled'      => true,
+        'truncated'    => $truncated,
+        'emptyFolders' => $emptyFolders,
+        'projects'     => $projects,
+    ]);
+}
+
 function handle_list(string $root, string $folder): void
 {
     $projects = [];
@@ -580,6 +633,10 @@ function handle_rename_folder(string $root, string $folder, string $name): void
     }
     if ($folder === $root) {
         fail('The store folder itself cannot be renamed', 400);
+    }
+    // The custom shapes are found by this folder's name.
+    if (dirname($folder) === $root && basename($folder) === 'Custom shapes') {
+        fail('The custom shapes folder cannot be renamed', 400);
     }
     $name = trim($name);
     if (!folder_name_ok($name)) {
@@ -971,6 +1028,9 @@ function handle_delete_folder(string $root, string $folder, bool $recursive): vo
     if ($folder === $root) {
         fail('The store folder itself cannot be removed', 400);
     }
+    if (dirname($folder) === $root && basename($folder) === 'Custom shapes') {
+        fail('The custom shapes folder cannot be removed', 400);
+    }
     $counts = folder_contents_count($folder);
     if (!$recursive && ($counts['projects'] > 0 || $counts['folders'] > 0 || $counts['files'] > 0)) {
         fail('That folder is not empty', 409, $counts);
@@ -1285,6 +1345,9 @@ switch ($method) {
         $settings = $_GET['settings'] ?? null;
         if ($settings !== null && $settings !== '') {
             handle_read_settings($root, (string) $settings);
+        }
+        if (($_GET['all'] ?? '') === '1') {
+            handle_all_designs($root);
         }
         $requested = $_GET['fileName'] ?? null;
         if ($requested !== null && $requested !== '') {

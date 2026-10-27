@@ -37,9 +37,9 @@ export const CUSTOM_SHAPES_BACKUP_FOLDER = "Custom shapes";
 export const CUSTOM_SHAPES_MANIFEST = "custom-shapes.json";
 const inCustomShapesFolder = (path: string) => path.startsWith(`${CUSTOM_SHAPES_BACKUP_FOLDER}/`);
 
-export function backupFileName(date: Date) {
+export function backupFileName(date: Date, prefix = "layerling-backup") {
   const pad = (value: number) => String(value).padStart(2, "0");
-  return `layerling-backup-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}.zip`;
+  return `${prefix}-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}.zip`;
 }
 
 /** File names for the designs: readable, safe on every system, never twice the same. */

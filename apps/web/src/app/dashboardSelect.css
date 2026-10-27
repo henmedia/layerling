@@ -49,8 +49,7 @@
 }
 
 /* The button stays pressed while the selection is on. */
-.dashboard-select.active,
-.shared-projects-refresh.active {
+.dashboard-select.active {
   color: #ffffff;
   background: #c9731d;
   border-color: #c9731d;
