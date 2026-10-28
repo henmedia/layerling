@@ -1,4 +1,5 @@
 
+import { bentTubeParameterPatch, bentTubeProfileRadii, bentTubeSettings } from "@/lib/bentTubeGeometry";
 import { removeLooseSplinters } from "@/lib/meshSplinters";
 import { closeSmallMeshHoles } from "@/lib/meshHoleFill";
 import { meshIsConvex } from "@/lib/meshConvexity";
@@ -2379,11 +2380,40 @@ export function restoreGroupedChildrenForEdges(group: WorkplaneShape): Workplane
 }
 
 /**
+ * A bent tube's opening as a hole (#892), as `splitBoreTube` does it for a tube: the pipe as a solid without its opening, and the opening as a bent tube of its own
+ * that is a hole - same path, same start, the opening's profile as its outside. Both come from `bentTubeParameterPatch`,
+ * so a pipe that was stretched by its handles keeps that stretch in each part.
+ */
+function splitBentTubeBore(shape: WorkplaneShape): WorkplaneShape[] {
+  const settings = bentTubeSettings(shape);
+  const radii = bentTubeProfileRadii(settings);
+  if (settings.innerProfile === "none" || radii.inner === null) return [shape];
+  const sides = settings.innerProfile === "square" ? 4 : settings.innerProfile === "hexagon" ? 6 : settings.innerProfile === "octagon" ? 8 : 0;
+  const boreSize = sides === 0 ? 2 * radii.inner : 2 * radii.inner * Math.cos(Math.PI / sides);
+  const { tubeBoreHole: _flag, ...rest } = shape;
+  const solid = { ...rest, ...bentTubeParameterPatch(shape, { bentTubeInnerProfile: "none" }) };
+  const bore = {
+    ...rest,
+    ...bentTubeParameterPatch(shape, { bentTubeProfile: settings.innerProfile, bentTubeInnerProfile: "none", bentTubeSize: boreSize }),
+    id: derivedLocalId(shape.id, "bore"),
+    hole: true,
+  };
+  // The patch keeps the underside where it was, as it should when the size is changed in the panel; the opening has to sit in
+  // the middle of the pipe instead, or it lies a wall lower and cuts through the bottom of the pipe (#892). Its box and the
+  // pipe's share their middle, lying, standing or tipped.
+  const solidBox = boundsForShapesOfVertices([solid]);
+  const boreBox = boundsForShapesOfVertices([bore]);
+  bore.elevation = (bore.elevation ?? 0) + (solidBox.minY + solidBox.maxY) / 2 - (boreBox.minY + boreBox.maxY) / 2;
+  return [solid, bore];
+}
+
+/**
  * A tube or ring whose bore counts as a hole (#892) is cut as two shapes: its outer cylinder, a solid, and its bore, a hole.
  * The bore then cuts whatever the tube is grouped with, as a hole does - the wall of the other tube in a T-junction, which the
  * bore of a plain tube never reaches. Only where shapes are combined: the tube itself stays one shape.
  */
 export function splitBoreTube(shape: WorkplaneShape): WorkplaneShape[] {
+  if (shape.tubeBoreHole === true && !shape.hole && !shape.importedMesh && shape.kind === "bentTube") return splitBentTubeBore(shape);
   if (shape.tubeBoreHole !== true || shape.hole || shape.importedMesh || (shape.kind !== "tube" && shape.kind !== "ring")) return [shape];
   const wall = Math.max(0, shape.bevel ?? 4);
   const width = shape.width - 2 * wall;

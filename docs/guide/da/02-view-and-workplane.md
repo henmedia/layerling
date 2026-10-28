@@ -16,7 +16,7 @@ Med musen:
 | hold [[Ctrl]] / [[Cmd]] og træk med venstre knap | flytter også visningen |
 | dobbeltklik på et tomt sted på arbejdsplanet eller ved siden af pladen | flytter visningen, så stedet kommer i midten; visningen drejer derefter om det |
 
-På en MacBook-trackpad: hold [[Cmd]] nede, tryk og træk.
+På en MacBook-trackpad: hold [[Cmd]] nede, tryk og træk. På en Mac drejer du i stedet visningen ved at holde Control nede, som Control-klik er højreklik på Mac.
 
 Hvor hurtigt musehjulet zoomer sættes med {{ui:workspace.zoomSpeed}} i indstillingerne, under {{ui:workspace.appearance}}: en skyder fra 1 til 14, 5 til at begynde med. Den gælder kun musehjulet og trackpad'en: knapperne og tasterne [[+]] og [[−]] zoomer altid i de samme små trin. Et hak på et musehjul zoomer ens i alle browsere, en trackpad zoomer efter hvor langt du stryger.
 
@@ -73,8 +73,6 @@ Du kan også gemme fire af dine egne visninger i hvert design. [[Shift]]+[[7]], 
 - {{ui:camera.sectionExportSvg}} gemmer omridsene på skæreplanet som en SVG i 1:1, til en laser, en plotter, en skabelon eller en pakning. Et X-snit ses fra højre, et Y-snit forfra, et Z-snit oppefra. Som i eksporten kommer kun synlige former med, huller er allerede taget af, og former med samme farve samles til ét omrids. Hver farve forbliver sin egen sti uden fyld, så lasersoftware holder dem adskilt som lag.
 
 Panelet hænger på sin knap. Hvis det dækker noget, så træk det i dets titellinje hvor som helst på arbejdsplanet; det åbner dér næste gang også. Dobbeltklik på titellinjen eller slip det ved knappen for at sætte det tilbage.
-
-[[Esc]] lukker panelet; snittet bliver indtil du slår det fra eller går tilbage til designoversigten. Mens det er aktivt, forbliver dets knap fremhævet. Alt hvad du placerer på den side der skæres væk, vises først når du slår snittet fra.
 
 X og [[Esc]] lukker panelet; med en måling i gang afslutter [[Esc]] den først. Snittet bliver, indtil du slår det fra med {{ui:camera.sectionActive}} eller går tilbage til designoversigten. En tablet har ingen [[Esc]], så der har panelet to knapper mere: {{ui:camera.sectionBack}} afslutter målingen, hvis en kører, og lukker ellers panelet, og {{ui:camera.sectionConfirm}} lukker panelet i ét skridt. En computer viser dem ikke.
 
@@ -141,7 +139,7 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 ### Udseende: lys og skygger
 
-{{ui:workspace.showShadows}} slår kasteskyggerne til og fra. To skyder sætter hvordan formerne belyses. {{ui:workspace.shadowStrength}} siger hvor mørke kasteskyggerne er, og {{ui:workspace.shadeContrast}} flytter lys fra det jævne omgivende lys til hovedlyset: mod "kraftig" bliver de skyggefulde sider mørkere og skyggerne viser mere, mod "blød" bliver alt fladere. I den øverste ende bliver kontrasten meget stærk, så skyggefulde sider og skygger bliver virkelig mørke. {{ui:workspace.shadowSoftness}} gør skyggernes kanter bløde i stedet for skarpe. {{ui:workspace.lightAzimuth}} drejer hovedlyset rundt om pladen (0° forfra, 90° fra højre), og {{ui:workspace.lightElevation}} løfter det; ved 90° står det lige over pladen som i Tinkercad, og skyggerne falder lige under formerne. {{ui:workspace.softLighting}} henter det meste af lyset fra den retning, du ser i, og det drejer sig med synet: ingen flade bliver mørk, og en mørk flade der vender opad brændes ikke længere ud til hvidt. Hovedlyset bliver lidt tilbage til skyggerne, og kontrastskyderen virker stadig. {{ui:workspace.lightReset}} sætter alt tilbage.
+{{ui:workspace.showShadows}} slår kasteskyggerne til og fra. To skyder sætter hvordan formerne belyses. {{ui:workspace.shadowStrength}} siger hvor mørke kasteskyggerne er, og {{ui:workspace.shadeContrast}} flytter lys fra det jævne omgivende lys til hovedlyset: mod "kraftig" bliver de skyggefulde sider mørkere og skyggerne viser mere, mod "blød" bliver alt fladere. I den øverste ende bliver kontrasten meget stærk, så skyggefulde sider og skygger bliver virkelig mørke. {{ui:workspace.shadowSoftness}} gør skyggernes kanter bløde i stedet for skarpe. {{ui:workspace.lightAzimuth}} drejer hovedlyset rundt om pladen (0° forfra, 90° fra højre), og {{ui:workspace.lightElevation}} løfter det; ved 90° står det lige over pladen som i Tinkercad, og skyggerne falder lige under formerne. {{ui:workspace.softLighting}} henter det meste af lyset fra den retning, du ser i, og det drejer sig med synet: ingen flade bliver mørk, og en mørk flade der vender opad brændes ikke længere ud til hvidt. Hovedlyset bliver lidt tilbage til skyggerne, og kontrastskyderen virker stadig. Hvis der stadig vises en lys refleks med lyset sat lavt, hæver du {{ui:workspace.lightElevation}} til 90°: så ser det ud som i Tinkercad. {{ui:workspace.lightReset}} sætter alt tilbage.
 
 ### Udseende: mål på arbejdsplanet
 

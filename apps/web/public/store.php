@@ -102,25 +102,98 @@ function fail(string $message, int $status, array $extra = []): void
     send_json(array_merge(['error' => $message], $extra), $status);
 }
 
+/**
+ * Detects the authenticated user when configured with LAYERLING_USER_HEADER.
+ * If the setting is unset or empty, header-based user isolation is disabled.
+ *
+ * Returns a sanitized folder name if authenticated, or null if disabled / unauthenticated.
+ */
+function authenticated_user_folder(): ?string
+{
+    $userHeader = getenv('LAYERLING_USER_HEADER');
+    if (!is_string($userHeader) || trim($userHeader) === '') {
+        $userHeader = $_ENV['LAYERLING_USER_HEADER'] ?? $_SERVER['LAYERLING_USER_HEADER'] ?? null;
+    }
+    if (!is_string($userHeader) || trim($userHeader) === '') {
+        return null;
+    }
+
+    $headerName = trim($userHeader);
+    $identity = null;
+
+    $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $headerName));
+    if (isset($_SERVER[$serverKey]) && is_string($_SERVER[$serverKey])) {
+        $identity = $_SERVER[$serverKey];
+    } elseif (isset($_SERVER[$headerName]) && is_string($_SERVER[$headerName])) {
+        $identity = $_SERVER[$headerName];
+    } else {
+        $upper = strtoupper(str_replace('-', '_', $headerName));
+        if (isset($_SERVER[$upper]) && is_string($_SERVER[$upper])) {
+            $identity = $_SERVER[$upper];
+        } elseif ($upper === 'REMOTE_USER' && isset($_SERVER['REDIRECT_REMOTE_USER']) && is_string($_SERVER['REDIRECT_REMOTE_USER'])) {
+            $identity = $_SERVER['REDIRECT_REMOTE_USER'];
+        } elseif (function_exists('getallheaders')) {
+            $all = getallheaders();
+            if (is_array($all)) {
+                foreach ($all as $k => $v) {
+                    if (strcasecmp((string) $k, $headerName) === 0 && is_string($v)) {
+                        $identity = $v;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!is_string($identity) || trim($identity) === '') {
+        return null;
+    }
+
+    $safe = str_replace('@', '_at_', strtolower(trim($identity)));
+    $safe = preg_replace('/[^a-z0-9_.-]/', '_', $safe);
+    $safe = trim($safe, '._-');
+    return $safe !== '' ? $safe : null;
+}
+
 /** The store, or null while nobody has created it. */
 function store_root(): ?string
 {
-    $root = __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
-    if (!is_dir($root)) {
+    $base = __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
+    if (!is_dir($base)) {
         return null;
     }
-    $resolved = realpath($root);
+
+    $userFolder = authenticated_user_folder();
+
+    // 1. Authenticated: Scope to the user's isolated subfolder inside .users/
+    if ($userFolder !== null) {
+        $usersBase = $base . DIRECTORY_SEPARATOR . '.users';
+        $userRoot = $usersBase . DIRECTORY_SEPARATOR . $userFolder;
+        if (!is_dir($userRoot) && !@mkdir($userRoot, 0775, true) && !is_dir($userRoot)) {
+            return null;
+        }
+        $resolved = realpath($userRoot);
+        return $resolved === false ? null : $resolved;
+    }
+
+    // 2. Unauthenticated: Preserve default behavior (shared /store/ directory)
+    $resolved = realpath($base);
     return $resolved === false ? null : $resolved;
 }
 
 /** Keeps the guard file current without ever touching the projects. */
 function ensure_store_guard(string $root): void
 {
-    $guard = $root . DIRECTORY_SEPARATOR . '.htaccess';
-    if (is_file($guard) && file_get_contents($guard) === STORE_HTACCESS) {
-        return;
+    $base = __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
+    $directories = array_unique([$base, $root]);
+    foreach ($directories as $dir) {
+        if (is_dir($dir)) {
+            $guard = $dir . DIRECTORY_SEPARATOR . '.htaccess';
+            if (!is_file($guard) || file_get_contents($guard) !== STORE_HTACCESS) {
+                @file_put_contents($guard, STORE_HTACCESS);
+            }
+        }
     }
-    @file_put_contents($guard, STORE_HTACCESS);
 }
 
 /** The same sanitising the Node route applies, so both write identical names. */
@@ -331,35 +404,85 @@ function same_origin(): bool
     return false;
 }
 
-/** A .lyl is a ZIP. Anything else never reaches the disk. */
-function looks_like_lyl(string $bytes): bool
+/**
+ * The request body, streamed into a temporary file outside the store, or the file PHP already
+ * received for a form upload. Never held in memory as a whole (#588): with a surface texture a
+ * design runs to hundreds of MB, and reading that into a string was the slow part of a save on a
+ * small server - or ran past memory_limit. Checked where it lies; only a file that passes reaches
+ * the store folder.
+ */
+function received_file(?string $uploadedPath): string
 {
-    if (strlen($bytes) < 4) {
+    if ($uploadedPath !== null) {
+        return $uploadedPath;
+    }
+    $path = tempnam(sys_get_temp_dir(), 'lyl');
+    if ($path === false) {
+        fail('The server has no temporary folder to receive the upload in', 500);
+    }
+    cleanup_later($path);
+    $input = fopen('php://input', 'rb');
+    $output = fopen($path, 'wb');
+    if ($input === false || $output === false || stream_copy_to_stream($input, $output) === false) {
+        fail('The upload could not be received', 500);
+    }
+    fclose($input);
+    fclose($output);
+    return $path;
+}
+
+function file_size_of(string $path): int
+{
+    clearstatcache(true, $path);
+    return (int) @filesize($path);
+}
+
+/** The first bytes of a file, enough for every signature checked here. */
+function file_head(string $path, int $length = 4096): string
+{
+    $handle = @fopen($path, 'rb');
+    if ($handle === false) {
+        return '';
+    }
+    $head = (string) fread($handle, $length);
+    fclose($handle);
+    return $head;
+}
+
+/**
+ * Into the store folder: a form upload with move_uploaded_file, the streamed body with rename (both
+ * copy across disks). tempnam made the latter readable by its owner alone; it gets the rights a file
+ * written there would have, so a slicer sharing the folder can still read it.
+ */
+function move_received_file(string $from, string $to, bool $uploaded): bool
+{
+    if ($uploaded) {
+        return @move_uploaded_file($from, $to);
+    }
+    if (!@rename($from, $to)) {
         return false;
     }
-    $signature = substr($bytes, 0, 4);
+    @chmod($to, 0666 & ~umask());
+    return true;
+}
+
+/** A .lyl is a ZIP. Anything else never reaches the disk. */
+function looks_like_lyl(string $path): bool
+{
+    $signature = substr(file_head($path, 4), 0, 4);
     if ($signature !== "PK\x03\x04" && $signature !== "PK\x05\x06") {
         return false;
     }
     if (!class_exists('ZipArchive')) {
         return true;
     }
-    $probe = tempnam(sys_get_temp_dir(), 'lyl');
-    if ($probe === false) {
-        return true;
+    $zip = new ZipArchive();
+    if ($zip->open($path) !== true) {
+        return false;
     }
-    try {
-        file_put_contents($probe, $bytes);
-        $zip = new ZipArchive();
-        if ($zip->open($probe) !== true) {
-            return false;
-        }
-        $hasManifest = $zip->locateName('project.json') !== false;
-        $zip->close();
-        return $hasManifest;
-    } finally {
-        @unlink($probe);
-    }
+    $hasManifest = $zip->locateName('project.json') !== false;
+    $zip->close();
+    return $hasManifest;
 }
 
 function is_png(string $bytes): bool
@@ -515,6 +638,59 @@ function search_store(string $root, string $term): void
     ]);
 }
 
+/**
+ * Every design in the store with the folder it is in, and the folders with nothing in them: what
+ * "Back up all" on the start page's server tab packs. The same bounds as the search; the custom
+ * shapes keep their own folder and are shapes, not designs.
+ */
+function handle_all_designs(string $root): void
+{
+    $projects = [];
+    $emptyFolders = [];
+    $truncated = false;
+    $visited = 0;
+
+    $walk = static function (string $folder, int $depth) use (&$walk, $root, &$projects, &$emptyFolders, &$truncated, &$visited): void {
+        if ($depth > SEARCH_DEPTH_LIMIT || $visited >= SEARCH_FOLDER_LIMIT) {
+            $truncated = true;
+            return;
+        }
+        $visited++;
+        $folderKey = folder_key($root, $folder);
+        $entries = array_values(array_filter(scandir($folder) ?: [], static fn(string $entry): bool => $entry[0] !== '.'));
+        if ($depth > 0 && $entries === []) {
+            $emptyFolders[] = $folderKey;
+        }
+        foreach ($entries as $entry) {
+            $full = $folder . DIRECTORY_SEPARATOR . $entry;
+            if (is_dir($full) && !is_link($full)) {
+                if ($depth === 0 && $entry === 'Custom shapes') {
+                    continue;
+                }
+                $walk($full, $depth + 1);
+                continue;
+            }
+            if (!preg_match('/\.(lyl|skf)$/i', $entry)) {
+                continue;
+            }
+            $stat = regular_file_stat($full);
+            if ($stat === null) {
+                continue;
+            }
+            $hasThumbnail = regular_file_stat(thumbnail_path($folder, $entry, revision_for($stat))) !== null;
+            $projects[] = project_record($entry, $stat, $hasThumbnail, $folderKey);
+        }
+    };
+
+    $walk($root, 0);
+    send_json([
+        'enabled'      => true,
+        'truncated'    => $truncated,
+        'emptyFolders' => $emptyFolders,
+        'projects'     => $projects,
+    ]);
+}
+
 function handle_list(string $root, string $folder): void
 {
     $projects = [];
@@ -581,6 +757,10 @@ function handle_rename_folder(string $root, string $folder, string $name): void
     if ($folder === $root) {
         fail('The store folder itself cannot be renamed', 400);
     }
+    // The custom shapes are found by this folder's name.
+    if (dirname($folder) === $root && basename($folder) === 'Custom shapes') {
+        fail('The custom shapes folder cannot be renamed', 400);
+    }
     $name = trim($name);
     if (!folder_name_ok($name)) {
         fail('That folder name is not allowed', 400);
@@ -611,6 +791,30 @@ function handle_rename_folder(string $root, string $folder, string $name): void
     ]);
 }
 
+/**
+ * Streams a file to the client in small chunks with output buffering cleared,
+ * ensuring constant low memory usage (~64 KB) and immediate TTFB even for large files.
+ */
+function stream_file(string $path): void
+{
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    if (function_exists('ini_set')) {
+        @ini_set('zlib.output_compression', 'Off');
+    }
+    if (function_exists('set_time_limit')) {
+        @set_time_limit(0);
+    }
+
+    $handle = @fopen($path, 'rb');
+    if ($handle === false) {
+        return;
+    }
+    fpassthru($handle);
+    fclose($handle);
+}
+
 function handle_download(string $root, string $folder, string $requested): void
 {
     $fileName = existing_project_file_name($requested);
@@ -637,7 +841,7 @@ function handle_download(string $root, string $folder, string $requested): void
         header('Cache-Control: public, max-age=31536000, immutable');
         header('ETag: "' . $revision . '"');
         header('Content-Length: ' . (string) filesize($imagePath));
-        readfile($imagePath);
+        stream_file($imagePath);
         exit;
     }
 
@@ -646,7 +850,7 @@ function handle_download(string $root, string $folder, string $requested): void
     header('ETag: "' . $revision . '"');
     header('Content-Length: ' . (string) $stat['size']);
     header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($fileName));
-    readfile($filePath);
+    stream_file($filePath);
     exit;
 }
 
@@ -680,20 +884,14 @@ function handle_save(string $root, string $folder): void
         fail('Shared projects only accept same-origin saves', 403);
     }
 
-    // PHP throws the whole body away when it is larger than post_max_size, and
-    // then $_FILES is empty for a reason that has nothing to do with the file.
-    $declaredLength = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
-    if ($declaredLength > 0 && empty($_FILES) && empty($_POST) && file_get_contents('php://input') === '') {
-        fail('The upload was larger than this server accepts (post_max_size is ' . ini_get('post_max_size') . '). Raise post_max_size and upload_max_filesize in php.ini.', 413);
-    }
-
     $thumbnailBytes = null;
-    if (isset($_FILES['project'])) {
+    $uploaded = isset($_FILES['project']);
+    if ($uploaded) {
         if ($_FILES['project']['error'] !== UPLOAD_ERR_OK) {
             $code = (int) $_FILES['project']['error'];
             fail(upload_error_message($code, 'The project'), in_array($code, [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) ? 413 : 400);
         }
-        $bytes = (string) file_get_contents($_FILES['project']['tmp_name']);
+        $receivedPath = received_file((string) $_FILES['project']['tmp_name']);
         if (!isset($_FILES['thumbnail']) || $_FILES['thumbnail']['error'] !== UPLOAD_ERR_OK) {
             fail('Shared project upload is missing its thumbnail', 400);
         }
@@ -705,16 +903,23 @@ function handle_save(string $root, string $folder): void
             fail('Shared project thumbnail must be a PNG image', 400);
         }
     } else {
-        $bytes = (string) file_get_contents('php://input');
+        $receivedPath = received_file(null);
     }
+    $receivedBytes = file_size_of($receivedPath);
 
-    if ($bytes === '') {
+    // PHP throws the whole body away when it is larger than post_max_size, and
+    // then $_FILES is empty for a reason that has nothing to do with the file.
+    $declaredLength = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
+    if ($declaredLength > 0 && empty($_FILES) && empty($_POST) && $receivedBytes === 0) {
+        fail('The upload was larger than this server accepts (post_max_size is ' . ini_get('post_max_size') . '). Raise post_max_size and upload_max_filesize in php.ini.', 413);
+    }
+    if ($receivedBytes === 0) {
         fail('The project upload was empty', 400);
     }
-    if (strlen($bytes) > MAX_PROJECT_BYTES) {
+    if ($receivedBytes > MAX_PROJECT_BYTES) {
         fail('.lyl file exceeds the shared storage size limit', 413);
     }
-    if (!looks_like_lyl($bytes)) {
+    if (!looks_like_lyl($receivedPath)) {
         fail('That is not a .lyl project package', 400);
     }
 
@@ -736,7 +941,7 @@ function handle_save(string $root, string $folder): void
 
     $temporaryPath = $folder . DIRECTORY_SEPARATOR . '.' . $fileName . '.' . bin2hex(random_bytes(8)) . '.tmp';
     cleanup_later($temporaryPath);
-    if (file_put_contents($temporaryPath, $bytes) === false) {
+    if (!move_received_file($receivedPath, $temporaryPath, $uploaded)) {
         fail('The store folder is not writable by the web server', 500);
     }
     $pendingStat = regular_file_stat($temporaryPath);
@@ -860,18 +1065,21 @@ function handle_save_export(string $root, string $folder, string $requested): vo
         fail('That file type cannot be saved on the server', 400);
     }
     $declaredLength = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
-    $bytes = (string) file_get_contents('php://input');
-    if ($declaredLength > 0 && $bytes === '') {
+    $receivedPath = received_file(null);
+    $receivedBytes = file_size_of($receivedPath);
+    if ($declaredLength > 0 && $receivedBytes === 0) {
         fail('The upload was larger than this server accepts (post_max_size is ' . ini_get('post_max_size') . '). Raise post_max_size in php.ini.', 413);
     }
-    if ($bytes === '') {
+    if ($receivedBytes === 0) {
         fail('The file was empty', 400);
     }
-    if (strlen($bytes) > MAX_PROJECT_BYTES) {
+    if ($receivedBytes > MAX_PROJECT_BYTES) {
         fail('The file exceeds the shared storage size limit', 413);
     }
     $extension = strtolower((string) pathinfo($fileName, PATHINFO_EXTENSION));
-    if (!export_bytes_acceptable($extension, $bytes)) {
+    // An SVG is read whole, it is checked tag by tag; every other kind only needs its first bytes.
+    $checked = $extension === 'svg' ? (string) file_get_contents($receivedPath) : file_head($receivedPath);
+    if (!export_bytes_acceptable($extension, $checked)) {
         fail('That is not a ' . strtoupper($extension) . ' file layerling would write', 400);
     }
 
@@ -883,7 +1091,7 @@ function handle_save_export(string $root, string $folder, string $requested): vo
     }
     $temporaryPath = $folder . DIRECTORY_SEPARATOR . '.' . $fileName . '.' . bin2hex(random_bytes(8)) . '.tmp';
     cleanup_later($temporaryPath);
-    if (file_put_contents($temporaryPath, $bytes) === false) {
+    if (!move_received_file($receivedPath, $temporaryPath, false)) {
         fail('The store folder is not writable by the web server', 500);
     }
     if (!@rename($temporaryPath, $filePath)) {
@@ -892,7 +1100,7 @@ function handle_save_export(string $root, string $folder, string $requested): vo
     cleanup_now($temporaryPath);
     $savedStat = regular_file_stat($filePath);
     send_json(
-        ['file' => ['fileName' => $fileName, 'path' => folder_key($root, $folder), 'size' => $savedStat === null ? strlen($bytes) : $savedStat['size']]],
+        ['file' => ['fileName' => $fileName, 'path' => folder_key($root, $folder), 'size' => $savedStat === null ? $receivedBytes : $savedStat['size']]],
         $exists ? 200 : 201
     );
 }
@@ -970,6 +1178,9 @@ function handle_delete_folder(string $root, string $folder, bool $recursive): vo
     }
     if ($folder === $root) {
         fail('The store folder itself cannot be removed', 400);
+    }
+    if (dirname($folder) === $root && basename($folder) === 'Custom shapes') {
+        fail('The custom shapes folder cannot be removed', 400);
     }
     $counts = folder_contents_count($folder);
     if (!$recursive && ($counts['projects'] > 0 || $counts['folders'] > 0 || $counts['files'] > 0)) {
@@ -1285,6 +1496,9 @@ switch ($method) {
         $settings = $_GET['settings'] ?? null;
         if ($settings !== null && $settings !== '') {
             handle_read_settings($root, (string) $settings);
+        }
+        if (($_GET['all'] ?? '') === '1') {
+            handle_all_designs($root);
         }
         $requested = $_GET['fileName'] ?? null;
         if ($requested !== null && $requested !== '') {

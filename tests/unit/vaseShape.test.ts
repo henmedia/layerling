@@ -111,7 +111,8 @@ describe("the vase as a shape", () => {
       expect(analysis.boundaryEdges, name).toBe(0);
       expect(analysis.nonManifoldEdges, name).toBe(0);
     }
-  });
+    // Six whole vases: alone it takes about 4 s, in the full parallel suite it ran past the default 5 s.
+  }, 30_000);
 
   it("must hold water: wall and bottom at least 1.6 mm", () => {
     const settings = normalizeVaseSettings({ body: "hohl", wall: 0.8, bottom: 1, watertight: "ja" });

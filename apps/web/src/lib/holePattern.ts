@@ -14,8 +14,13 @@ export type HolePatternSettings = {
   size: number;
   /** Rectangle and slot: height (along the frame's z). The other forms follow `size`. */
   height: number;
-  /** Centre to centre of neighbouring holes. */
+  /** Centre to centre of neighbouring holes; for a rectangle or slot, of the holes along a row. */
   spacing: number;
+  /**
+   * Rectangle and slot: centre to centre of the rows (#975), so a narrow, tall hole can sit close to its neighbours in
+   * the row while the rows keep clear of each other. The other forms space their rows by `spacing`.
+   */
+  rowSpacing?: number;
   arrangement: HoleArrangement;
   /** Clear distance between a hole and the edge of the face (and any opening in it). */
   margin: number;
@@ -48,6 +53,18 @@ export const HEXAGON_FLAT_RATIO = Math.sqrt(3) / 2;
 
 /** Rows of a staggered pattern sit this far apart relative to the spacing, so every neighbour is one spacing away. */
 const STAGGER_ROW_RATIO = Math.sqrt(3) / 2;
+
+/** Whether the form has its own spacing for the rows (#975): the two forms whose width and height differ. */
+export function holePatternHasRowSpacing(form: HoleForm) {
+  return form === "rectangle" || form === "slot";
+}
+
+/** Centre to centre of the rows: the row spacing of a rectangle or slot, else what the spacing makes of it. */
+export function holePatternRowSpacing(settings: Pick<HolePatternSettings, "form" | "arrangement" | "spacing" | "rowSpacing">) {
+  if (holePatternHasRowSpacing(settings.form) && settings.rowSpacing !== undefined) return Math.max(HOLE_PATTERN_MIN_SIZE, settings.rowSpacing);
+  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
+  return settings.arrangement === "staggered" ? spacing * STAGGER_ROW_RATIO : spacing;
+}
 
 /** The most lattice points tried at once; a face with more is far beyond the hole limit anyway. */
 const MAX_CANDIDATES = 60000;
@@ -301,7 +318,7 @@ export function holePatternCenters(outline: FaceOutline, settings: HolePatternSe
   const margin = Math.max(0, settings.margin);
   const staggered = settings.arrangement === "staggered";
   const pitchU = spacing;
-  const pitchV = staggered ? spacing * STAGGER_ROW_RATIO : spacing;
+  const pitchV = holePatternRowSpacing(settings);
 
   const loops = outline.loops.filter((loop) => loop.length >= 3);
   if (loops.length === 0) return empty;
@@ -404,18 +421,36 @@ function footprintsCloserThan(polygon: readonly Point2[], dU: number, dV: number
   return false;
 }
 
-/** The directions in which a hole meets its neighbours: along the row and along the next one. */
-function neighbourDirections(arrangement: HoleArrangement) {
-  return arrangement === "staggered"
-    ? [{ u: 1, v: 0 }, { u: 0.5, v: STAGGER_ROW_RATIO }]
-    : [{ u: 1, v: 0 }, { u: 0, v: 1 }];
+/**
+ * Where a hole's neighbours sit, relative to it: along the row and in the next row (straight above, or half a spacing
+ * over in a staggered pattern, and then also two rows up, which tall holes can reach first).
+ */
+function neighbourOffsets(settings: Pick<HolePatternSettings, "form" | "arrangement" | "spacing" | "rowSpacing">): Point2[] {
+  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
+  const row = holePatternRowSpacing(settings);
+  return settings.arrangement === "staggered"
+    ? [{ u: spacing, v: 0 }, { u: spacing / 2, v: row }, { u: 0, v: row * 2 }]
+    : [{ u: spacing, v: 0 }, { u: 0, v: row }];
+}
+
+/** The least distance at which `place(distance)` keeps two holes `gap` apart, found by halving. */
+function leastClearDistance(polygon: readonly Point2[], gap: number, high: number, place: (distance: number) => Point2) {
+  let low = 0;
+  for (let step = 0; step < 40; step += 1) {
+    const middle = (low + high) / 2;
+    const offset = place(middle);
+    if (footprintsCloserThan(polygon, offset.u, offset.v, gap)) low = middle;
+    else high = middle;
+  }
+  return high;
 }
 
 /**
  * The smallest spacing at which neighbouring holes of this shape keep a wall of `wall`
  * (default `HOLE_PATTERN_MIN_WALL`): a grid compares along both axes, a staggered
  * pattern along the row and along the diagonal. Hexagons that interlock in a
- * staggered pattern can stand closer than their corner-to-corner size.
+ * staggered pattern can stand closer than their corner-to-corner size. A rectangle or
+ * slot spaces its rows on its own (#975), so only its neighbour in the row counts.
  */
 export function holePatternMinSpacing(
   settings: Pick<HolePatternSettings, "form" | "size" | "height" | "arrangement">,
@@ -423,34 +458,50 @@ export function holePatternMinSpacing(
 ) {
   const polygon = holeFootprintPolygon(settings);
   const gap = Math.max(HOLE_PATTERN_MIN_WALL, wall);
+  const high = (holeFootprintSize(settings).width + holeFootprintSize(settings).height) * 2 + gap;
+  if (holePatternHasRowSpacing(settings.form)) {
+    return Math.max(HOLE_PATTERN_MIN_SIZE, leastClearDistance(polygon, gap, high, (distance) => ({ u: distance, v: 0 })));
+  }
+  const directions = settings.arrangement === "staggered"
+    ? [{ u: 1, v: 0 }, { u: 0.5, v: STAGGER_ROW_RATIO }]
+    : [{ u: 1, v: 0 }, { u: 0, v: 1 }];
   let needed = HOLE_PATTERN_MIN_SIZE;
-  for (const direction of neighbourDirections(settings.arrangement)) {
-    let low = 0;
-    let high = (holeFootprintSize(settings).width + holeFootprintSize(settings).height) * 2 + gap;
-    for (let step = 0; step < 40; step += 1) {
-      const middle = (low + high) / 2;
-      if (footprintsCloserThan(polygon, direction.u * middle, direction.v * middle, gap)) low = middle;
-      else high = middle;
-    }
-    needed = Math.max(needed, high);
+  for (const direction of directions) {
+    needed = Math.max(needed, leastClearDistance(polygon, gap, high, (distance) => ({ u: direction.u * distance, v: direction.v * distance })));
   }
   return needed;
+}
+
+/**
+ * The smallest row spacing of a rectangle or slot at which the rows keep a wall of `wall` (#975), for the spacing
+ * along the row that is set: straight above in a grid, half a spacing over in a staggered pattern.
+ */
+export function holePatternMinRowSpacing(
+  settings: Pick<HolePatternSettings, "form" | "size" | "height" | "arrangement" | "spacing">,
+  wall = HOLE_PATTERN_MIN_WALL,
+) {
+  const polygon = holeFootprintPolygon(settings);
+  const gap = Math.max(HOLE_PATTERN_MIN_WALL, wall);
+  const high = (holeFootprintSize(settings).width + holeFootprintSize(settings).height) * 2 + gap;
+  const over = settings.arrangement === "staggered" ? Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing) / 2 : 0;
+  const next = leastClearDistance(polygon, gap, high, (distance) => ({ u: over, v: distance }));
+  // Two rows up stands straight above again.
+  const twoUp = over ? leastClearDistance(polygon, gap, high, (distance) => ({ u: 0, v: distance })) / 2 : 0;
+  return Math.max(HOLE_PATTERN_MIN_SIZE, next, twoUp);
 }
 
 /**
  * The wall between two neighbouring holes (#239): the least clear distance between a hole and
  * its neighbours at the current spacing, which is what the print's wall thickness comes to.
  * Holes that overlap have none. It is the other way to say the spacing - set one, the other
- * follows: `holePatternMinSpacing(settings, wall)` is the spacing for a wanted wall.
+ * follows: `holePatternMinSpacing(settings, wall)` is the spacing for a wanted wall (and
+ * `holePatternMinRowSpacing` the row spacing of a rectangle or slot).
  */
-export function holePatternWall(settings: Pick<HolePatternSettings, "form" | "size" | "height" | "arrangement" | "spacing">) {
+export function holePatternWall(settings: Pick<HolePatternSettings, "form" | "size" | "height" | "arrangement" | "spacing" | "rowSpacing">) {
   const polygon = holeFootprintPolygon(settings);
-  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
   let wall = Infinity;
-  for (const direction of neighbourDirections(settings.arrangement)) {
-    const dU = direction.u * spacing;
-    const dV = direction.v * spacing;
-    const moved = polygon.map((point) => ({ u: point.u + dU, v: point.v + dV }));
+  for (const offset of neighbourOffsets(settings)) {
+    const moved = polygon.map((point) => ({ u: point.u + offset.u, v: point.v + offset.v }));
     if (moved.some((point) => insideConvex(polygon, point)) || polygon.some((point) => insideConvex(moved, point))) return 0;
     for (let i = 0; i < polygon.length; i += 1) {
       for (let j = 0; j < moved.length; j += 1) {
@@ -473,11 +524,20 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
   const height = number(input.height, size, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SIZE);
   // Holes that overlap would only merge into one wide cut.
   const minSpacing = holePatternMinSpacing({ form, size, height, arrangement });
+  const spacing = Math.max(minSpacing, number(input.spacing, base.spacing, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SPACING));
+  // A rectangle or slot without a row spacing of its own (saved before #975) keeps the rows where its spacing put them.
+  const rowSpacing = holePatternHasRowSpacing(form)
+    ? Math.max(
+        holePatternMinRowSpacing({ form, size, height, arrangement, spacing }),
+        number(input.rowSpacing, holePatternRowSpacing({ form, arrangement, spacing }), HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SPACING),
+      )
+    : undefined;
   return {
     form,
     size,
     height,
-    spacing: Math.max(minSpacing, number(input.spacing, base.spacing, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SPACING)),
+    spacing,
+    ...(rowSpacing !== undefined ? { rowSpacing } : {}),
     arrangement,
     margin: number(input.margin, base.margin, 0, HOLE_PATTERN_MAX_MARGIN),
     depth: typeof input.depth === "number" && Number.isFinite(input.depth) && input.depth > 0 ? Math.min(input.depth, 1000) : null,

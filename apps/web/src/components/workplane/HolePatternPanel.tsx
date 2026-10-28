@@ -14,7 +14,10 @@ import {
   HOLE_PATTERN_MAX_SPACING,
   HOLE_PATTERN_MIN_SIZE,
   HOLE_PATTERN_MIN_WALL,
+  holePatternHasRowSpacing,
+  holePatternMinRowSpacing,
   holePatternMinSpacing,
+  holePatternRowSpacing,
   holePatternWall,
   type HoleArrangement,
   type HoleForm,
@@ -147,6 +150,19 @@ export function HolePatternPanel({
         length
         onChange={(value) => onChange({ spacing: value })}
       />
+      {/* A rectangle or slot spaces its rows on its own (#975): narrow holes close in the row, the rows clear of each other. */}
+      {holePatternHasRowSpacing(settings.form) ? (
+        <EdgeModifierSlider
+          label={t("holePattern.rowSpacing")}
+          value={holePatternRowSpacing(settings)}
+          min={HOLE_PATTERN_MIN_SIZE}
+          max={HOLE_PATTERN_MAX_SPACING / 2}
+          step={0.5}
+          workspace={workspace}
+          length
+          onChange={(value) => onChange({ rowSpacing: value })}
+        />
+      ) : null}
       {/* The same as the spacing, said as the wall left between two holes (#239): set one and the other follows. */}
       <EdgeModifierSlider
         label={t("holePattern.wall")}
@@ -156,7 +172,12 @@ export function HolePatternPanel({
         step={0.1}
         workspace={workspace}
         length
-        onChange={(value) => onChange({ spacing: holePatternMinSpacing(settings, value) })}
+        onChange={(value) => {
+          const spacing = holePatternMinSpacing(settings, value);
+          onChange(holePatternHasRowSpacing(settings.form)
+            ? { spacing, rowSpacing: holePatternMinRowSpacing({ ...settings, spacing }, value) }
+            : { spacing });
+        }}
       />
 
       <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.arrangement")}>

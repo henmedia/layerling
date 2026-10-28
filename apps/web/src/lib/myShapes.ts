@@ -273,27 +273,34 @@ export async function deleteMyShape(id: string) {
 
 type ManifestEntry = { file: string; name: string; createdAt: number; thumbnail: string; bodyCount: number; fingerprint?: string; folder?: string };
 
+/** A custom shape on its way into a backup: its package, and what the list says about it. */
+export type CustomShapeBackupItem = Omit<ManifestEntry, "file"> & { bytes: Uint8Array };
+
 /**
- * The custom shapes of this browser as entries for a backup ZIP: one .lyl
- * each in the custom shapes folder, and a list with their names and
- * pictures, so a restore needs no editor to draw them again. Folders go in as
- * paths ("Brackets/M3"), the empty ones too.
+ * Custom shapes as entries for a backup ZIP: one .lyl each in the custom shapes folder, and a list
+ * with their names and pictures, so a restore needs no editor to draw them again. Folders go in as
+ * paths ("Brackets/M3"), the empty ones too. The same for the shapes of the browser and the server.
  */
+export function packCustomShapesBackup(shapes: CustomShapeBackupItem[], folders: string[]): BackupEntry[] {
+  if (shapes.length === 0) return [];
+  const files = backupEntryNames(shapes.map((shape) => shape.name), "shape");
+  const entries: BackupEntry[] = shapes.map((shape, index) => ({ name: `${CUSTOM_SHAPES_BACKUP_FOLDER}/${files[index]}`, bytes: shape.bytes }));
+  const manifest: ManifestEntry[] = shapes.map(({ bytes: _bytes, ...shape }, index) => ({ file: files[index], ...shape }));
+  entries.push({ name: `${CUSTOM_SHAPES_BACKUP_FOLDER}/${CUSTOM_SHAPES_MANIFEST}`, bytes: new TextEncoder().encode(JSON.stringify({ format: "com.layerling.custom-shapes", version: 1, folders, shapes: manifest })) });
+  return entries;
+}
+
+/** The custom shapes of this browser as entries for a backup ZIP. */
 export async function customShapesBackupEntries(): Promise<BackupEntry[]> {
   const list = await listMyShapes();
   if (list.length === 0) return [];
   const folders = await listMyShapeFolders();
   const folderPath = (id?: string) => (id ? folderAncestry(folders, id).map((folder) => folder.name).join(FOLDER_PATH_SEPARATOR) || undefined : undefined);
-  const files = backupEntryNames(list.map((shape) => shape.name), "shape");
-  const entries: BackupEntry[] = [];
-  const manifest: ManifestEntry[] = [];
-  for (let index = 0; index < list.length; index += 1) {
-    const shape = list[index];
-    entries.push({ name: `${CUSTOM_SHAPES_BACKUP_FOLDER}/${files[index]}`, bytes: await readMyShapePackage(shape.id) });
-    manifest.push({ file: files[index], name: shape.name, createdAt: shape.createdAt, thumbnail: shape.thumbnail, bodyCount: shape.bodyCount, fingerprint: shape.fingerprint, folder: folderPath(shape.folderId) });
+  const shapes: CustomShapeBackupItem[] = [];
+  for (const shape of list) {
+    shapes.push({ bytes: await readMyShapePackage(shape.id), name: shape.name, createdAt: shape.createdAt, thumbnail: shape.thumbnail, bodyCount: shape.bodyCount, fingerprint: shape.fingerprint, folder: folderPath(shape.folderId) });
   }
-  entries.push({ name: `${CUSTOM_SHAPES_BACKUP_FOLDER}/${CUSTOM_SHAPES_MANIFEST}`, bytes: new TextEncoder().encode(JSON.stringify({ format: "com.layerling.custom-shapes", version: 1, folders: folders.map((folder) => folderPath(folder.id)), shapes: manifest })) });
-  return entries;
+  return packCustomShapesBackup(shapes, folders.map((folder) => folderPath(folder.id)).filter((path): path is string => Boolean(path)));
 }
 
 function manifestEntries(manifest: unknown): ManifestEntry[] {

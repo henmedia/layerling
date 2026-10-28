@@ -10,7 +10,7 @@ layerling kører i browseren på en tablet, og som en app fra hjemmeskærmen. En
 | Du vil | På en tablet |
 | --- | --- |
 | Vælge et legeme | Tryk på det. |
-| Vælge flere legemer | Hold en finger stille i et halvt sekund, vælg {{ui:contextMenu.selectMultiple}}, og tryk så på ét legeme efter det andet. Et tryk på et valgt legeme tager det ud igen. |
+| Vælge flere legemer | Tryk på et legeme: en rund knap dukker op nederst til venstre. Tryk på den, og hvert legeme du trykker på bagefter lægges til markeringen; et tryk på et valgt legeme tager det ud igen. Et tryk på tom plads gør intet; et tryk på knappen igen afslutter og rydder markeringen. Eller hold en finger stille i et halvt sekund, vælg {{ui:contextMenu.selectMultiple}}, og tryk så på ét legeme efter det andet. |
 | Vælge alle legemer | Hold en finger stille på tom plads i et halvt sekund, og vælg {{ui:contextMenu.selectAll}}. |
 | Åbne menuen fra et højreklik | Hold en finger stille på et legeme eller på tom plads i et halvt sekund. |
 | Flytte et legeme | Træk det. |

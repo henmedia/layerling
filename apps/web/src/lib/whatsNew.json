@@ -1,5 +1,150 @@
 [
   {
+    "version": "1.116.1",
+    "items": [
+      {
+        "title": {
+          "de": "STEP-Baugruppen: jeder Körper in seiner Farbe",
+          "en": "STEP assemblies: every body in its colour"
+        },
+        "body": {
+          "de": "Eine STEP-Datei aus einem anderen CAD-Programm bringt jetzt die Farben ihrer Körper mit. Liegen mehrere Körper unter einem Eintrag, etwa alle Schrauben eines Bauteils, wird jeder ein eigenes Teil. Und beim STEP-Export kommen die Farben nicht mehr blasser in der Datei an.",
+          "en": "A STEP file from another CAD program now brings the colours of its bodies along. Where several bodies sit under one entry, all the screws of a part say, each becomes a part of its own. And a STEP export no longer makes the colours paler in the file."
+        }
+      },
+      {
+        "title": {
+          "de": "Sicherung auf den Server: mit Vorschaubild",
+          "en": "Backup restored to the server: with its picture"
+        },
+        "body": {
+          "de": "Stellst du eine Sicherung wieder her und landen die Entwürfe auf dem Server, etwa in der Docker-Version, behalten sie jetzt ihr Vorschaubild. Bisher blieb die Kachel leer, bis der Entwurf einmal im Editor gespeichert wurde.",
+          "en": "When you restore a backup and the designs go to the server, as in the Docker version, they now keep their picture. Until now the card stayed blank until the design was saved once in the editor."
+        }
+      },
+      {
+        "title": {
+          "de": "Position von der Mitte oder von der Kante",
+          "en": "Position from the middle or from the edge"
+        },
+        "body": {
+          "de": "In der Karte Position wählst du jetzt, wovon X und Y messen: von der Mitte des Körpers wie bisher oder von seiner linken und vorderen Kante. So legst du eine Kante genau auf ein Maß, ohne die halbe Breite auszurechnen.",
+          "en": "In the Position card you now choose what X and Y measure from: the middle of the body as before, or its left and front edges. So you put an edge exactly on a measure without working out half the width."
+        }
+      },
+      {
+        "title": {
+          "de": "Lochmuster: schmale Löcher dicht nebeneinander",
+          "en": "Hole pattern: narrow holes close together"
+        },
+        "body": {
+          "de": "Rechteckige Löcher und Langlöcher haben jetzt einen eigenen Reihenabstand. Schmale, hohe Schlitze stehen so dicht nebeneinander, wie die Wand es erlaubt, statt so weit auseinander, wie sie hoch sind.",
+          "en": "Rectangle and slot holes now have their own spacing between the rows. Narrow, tall slots stand as close side by side as the wall allows, instead of as far apart as they are high."
+        }
+      },
+      {
+        "title": {
+          "de": "Gruppe oder Bündel auf einen Blick",
+          "en": "Group or bundle at a glance"
+        },
+        "body": {
+          "de": "In der Objektliste steht vor einer Gruppe oder einem Bündel jetzt dasselbe Symbol wie auf dem Knopf, der sie gemacht hat, und darunter „Gruppe · 3 Teile“ oder „Bündel · 3 Teile“. Das stimmt auch, wenn du sie umbenannt hast.",
+          "en": "In the Objects panel a group or bundle now shows the same mark as the button that made it, with “Group · 3 parts” or “Bundle · 3 parts” below. That stays right after you rename it."
+        }
+      },
+      {
+        "title": {
+          "de": "Server-Entwurf öffnen: die Kachel zeigt es",
+          "en": "Opening a server design shows on its card"
+        },
+        "body": {
+          "de": "Ein großer Entwurf vom Server braucht ein paar Sekunden. Solange er lädt, dreht sich jetzt ein Kreis auf seiner Kachel, und weitere Klicks warten, bis er offen ist.",
+          "en": "A large design from the server takes a few seconds. While it loads, a circle now turns on its card, and further clicks wait until it is open."
+        }
+      },
+      {
+        "title": {
+          "de": "Serverspeicher: ein Ordner je Benutzer",
+          "en": "Server store: a folder for each user"
+        },
+        "body": {
+          "de": "Wer layerling hinter einem Proxy mit Anmeldung betreibt, kann jedem Benutzer einen eigenen Serverordner geben: mit der Einstellung LAYERLING_USER_HEADER. Ohne sie bleibt alles wie bisher. Große Entwürfe kommen außerdem vom Server, ohne den Speicher zu füllen.",
+          "en": "If you run layerling behind a proxy with sign-in, you can give each user a server folder of their own with the setting LAYERLING_USER_HEADER. Without it everything stays as it was. Large designs also come from the server without filling its memory."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.116.0",
+    "items": [
+      {
+        "title": {
+          "de": "Maßband: klarere Beschriftung",
+          "en": "Tape measure: clearer labels"
+        },
+        "body": {
+          "de": "Jede Beschriftung nennt die Achsen, entlang derer gemessen wird, etwa X, XY oder 3D. Fährst du mit der Maus darüber, siehst du die Strecke je Achse, über einem Punkt seine Lage. Beschriftungen stehen neben der Linie statt darauf, und Messungen hinter anderen Körpern werden blasser.",
+          "en": "Each label names the axes it measures along, such as X, XY or 3D. Hover it to see the reach along each axis, hover a point to see where it is. Labels sit beside their line instead of on it, and measurements behind other bodies fade."
+        }
+      },
+      {
+        "title": {
+          "de": "Gebogenes Rohr: Öffnung wieder mittig",
+          "en": "Bent tube: the opening is centred again"
+        },
+        "body": {
+          "de": "Mit „Bohrung schneidet beim Gruppieren wie ein Loch“ saß die Öffnung eines gebogenen Rohrs nach dem Gruppieren um die Wandstärke zu tief und schnitt das Rohr unten auf. Sie liegt jetzt wieder mittig, und die Wand bleibt geschlossen.",
+          "en": "With \"Bore cuts as a hole when grouped\", the opening of a bent tube sat one wall too low after grouping and cut the bottom of the pipe open. It is centred again, and the wall stays closed."
+        }
+      },
+      {
+        "title": {
+          "de": "Mausrad im Eigenschaftenfeld: das Feld bleibt stehen",
+          "en": "Mouse wheel in a property field: the field stays put"
+        },
+        "body": {
+          "de": "Beim Drehen um X oder Y mit dem Mausrad erscheint der Hinweis, dass der Körper schräg steht. Bisher rutschte das Feld dadurch unter dem Mauszeiger weg, und das Mausrad rollte die Seitenleiste. Jetzt bleibt das Feld an seinem Platz und nimmt jede Raddrehung an.",
+          "en": "Turning a body about X or Y with the mouse wheel brings up the hint that it stands tilted. The field used to slip away from under the pointer, and the wheel scrolled the panel instead. Now the field stays in place and takes every turn of the wheel."
+        }
+      },
+      {
+        "title": {
+          "de": "Speichern auf dem eigenen Server: auch große Entwürfe",
+          "en": "Saving to your own server: large designs too"
+        },
+        "body": {
+          "de": "store.php lädt einen Entwurf beim Speichern nicht mehr ganz in den Arbeitsspeicher. Große Entwürfe, etwa mit Oberflächentextur, speichern auch auf einem kleinen Server schnell und scheitern nicht mehr an der Speichergrenze von PHP.",
+          "en": "store.php no longer loads a whole design into memory when saving. Large designs, with a surface texture say, save quickly even on a small server and no longer fail at PHP's memory limit."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.115.0",
+    "items": [
+      {
+        "title": {
+          "de": "STEP-Dateien mit mehreren Körpern",
+          "en": "STEP files with several solids"
+        },
+        "body": {
+          "de": "Eine STEP-Datei aus einem anderen CAD-Programm, etwa eine Baugruppe aus Pfosten, Leisten und Platten, kommt jetzt als je ein Körper herein, unter dem Namen aus der Datei und an der richtigen Stelle zueinander, alle gemeinsam ausgewählt. Farben und Gruppen der Datei übernimmt layerling noch nicht.",
+          "en": "A STEP file from another CAD program, an assembly of posts, rails and panels for example, now comes in as one body each, under the name from the file and in the right place to the others, all selected together. layerling does not take over the colours and groups of the file yet."
+        }
+      },
+      {
+        "title": {
+          "de": "Startseite aufgeräumt",
+          "en": "A clearer start page"
+        },
+        "body": {
+          "de": "Die Entwürfe liegen unter einer Überschrift mit den Reitern Server und Browser, beide mit denselben Knöpfen: Neuer Ordner, Auswählen, Alle sichern und Sicherung wiederherstellen. Auch auf dem Server sichert „Alle sichern“ jetzt alles in einer ZIP-Datei. Die Willkommens-Anleitung steht oben und lässt sich schließen, und der Hinweis, dass Entwürfe nur im Browser verloren gehen können, ist eine auffällige Karte.",
+          "en": "The designs sit under one heading with Server and Browser tabs, both with the same buttons: New folder, Select, Back up all and Restore backup. On the server too, Back up all now saves everything in one ZIP file. The welcome guide comes first and can be closed, and the notice that designs kept only in the browser can be lost is a clear card."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.114.0",
     "items": [
       {

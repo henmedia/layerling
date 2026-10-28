@@ -37,7 +37,7 @@ import { onManifoldReady } from "@/lib/manifoldHandle";
 import { onCustomFontsChanged } from "@/lib/textFonts";
 import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeStartView } from "@/lib/designView";
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
-import { readTape, savedTape, writeTape } from "@/lib/tapeStore";
+import { highestTapeIdNumber, readTape, savedTape, writeTape } from "@/lib/tapeStore";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
 import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
@@ -1734,7 +1734,8 @@ export function WorkplaneViewport({
   const noteDragRef = useRef<NoteDragState | null>(null);
   const noteClickSuppressedRef = useRef<string | null>(null);
   const tapeOverlayRef = useRef<TapeOverlayState | null>(null);
-  const tapeIdRef = useRef(0);
+  const tapeIdRef = useRef(-1);
+  if (tapeIdRef.current < 0) tapeIdRef.current = highestTapeIdNumber(tapeModel); // New ids count on from the kept measurements' (#881).
   const rulerDimensionOverlayRef = useRef<RulerDimensionOverlayState | null>(null);
   const cornerRulerModeRef = useRef(false);
   // Back from the sketch the square comes from the editor's memory; on opening the design, from what the design keeps (#829).
@@ -3539,12 +3540,7 @@ export function WorkplaneViewport({
           if (!points.some((point) => point.id === start.id)) points.push(start);
           if (!points.some((point) => point.id === end.id)) points.push(end);
           const duplicate = current.segments.some((segment) => segment.edge?.key === candidate.edge?.key);
-          const segments = duplicate ? current.segments : [...current.segments, {
-            id: `tape-segment-${++tapeIdRef.current}`,
-            startId: start.id,
-            endId: end.id,
-            edge: candidate.edge,
-          }];
+          const segments = duplicate ? current.segments : [...current.segments, { id: `tape-segment-${++tapeIdRef.current}`, startId: start.id, endId: end.id, edge: candidate.edge }];
           storeTapeModel({ points, segments, startPointId: null, startEdge: null, startNormal: null, hover: null });
           return;
         }

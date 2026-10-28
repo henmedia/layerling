@@ -21,6 +21,8 @@ import { type RotationAxis } from "@/components/workplane/TransformOverlay";
 import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
 import type { MeasurementAccuracy, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { NOTE_TEXT_LIMIT } from "@/lib/workplaneNotes";
+import { measurementMiddle } from "@/lib/referencePoints";
+import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeLabelSize } from "@/lib/tapeLabels";
 
 /** Light-blue chrome for origin-distance lines, matching `.origin-dimension-value`. */
 const ORIGIN_DIMENSION_LINE_COLOR = { light: "#6ec4e8", dark: "#8fd4f0" } as const;
@@ -194,10 +196,19 @@ export type TapeModel = {
 };
 
 export type TapeOverlayState = {
-  points: Array<TapePoint & { screenX: number; screenY: number }>;
-  /** `editable`: a straight measurement with a body at one end at least, so typing a length can move that body (#823). */
-  segments: Array<TapeSegment & { x1: number; y1: number; x2: number; y2: number; screenPoints?: string; labelX: number; labelY: number; label: string; editable: boolean }>;
-  hover: { screenX: number; screenY: number; edgeScreenPoints?: string } | null;
+  /** `coordinates`: where the point is, as X, Y and Z read in the editor, for its hover tip. */
+  points: Array<TapePoint & { screenX: number; screenY: number; coordinates: string }>;
+  /**
+   * `editable`: a straight measurement with a body at one end at least, so typing a length can move that body (#823).
+   * `axes`: the axes it runs along ("X", "XZ", "3D"); `deltas`: its reach along each of them, when there are two or more.
+   * `midX`/`midY`: where a reference point in its middle would go. `occluded`: mostly behind a body, so its label fades.
+   */
+  segments: Array<TapeSegment & {
+    x1: number; y1: number; x2: number; y2: number; screenPoints?: string; labelX: number; labelY: number; label: string; editable: boolean;
+    axes: string; deltas: string; midX: number; midY: number; occluded: boolean;
+  }>;
+  /** `preview`: what the measurement would read while its second point is placed. */
+  hover: { screenX: number; screenY: number; edgeScreenPoints?: string; preview?: string } | null;
 };
 
 export type TapeCandidate = {
@@ -524,23 +535,40 @@ function tapePolylineLength(points: THREE.Vector3[]) {
   return length;
 }
 
-function tapePolylineMidpoint(points: THREE.Vector3[]) {
-  if (points.length === 0) return new THREE.Vector3();
-  const half = tapePolylineLength(points) / 2;
-  let traversed = 0;
-  for (let index = 0; index + 1 < points.length; index += 1) {
-    const length = points[index].distanceTo(points[index + 1]);
-    if (traversed + length >= half && length > 1e-9) return points[index].clone().lerp(points[index + 1], (half - traversed) / length);
-    traversed += length;
-  }
-  return points[points.length - 1].clone();
-}
-
 function tapeScreenPointList(points: THREE.Vector3[], state: ThreeState) {
   return points.map((point) => {
     const screen = projectToScreen(point, state);
     return `${screen.x},${screen.y}`;
   }).join(" ");
+}
+
+/** The axes a measurement runs along and, when there are two or more, its reach along each; one axis needs no breakdown. */
+function tapeAxesText(points: THREE.Vector3[], accuracy: MeasurementAccuracy) {
+  const spans = tapeAxisSpans(points);
+  const axes = tapeAxisTag(spans, accuracy);
+  const deltas = axes.length > 1 ? (["X", "Y", "Z"] as const).filter((axis) => axes === "3D" || axes.includes(axis)).map((axis) => `Δ${axis} ${formatMeasure(spans[axis], accuracy)}`).join("   ") : "";
+  return { axes, deltas };
+}
+
+/** Whether most of a measurement lies behind a body: three of five places along it. `ownShapeId`: the body both ends sit on, which never hides it. */
+function tapeMostlyHidden(points: THREE.Vector3[], state: ThreeState, ownShapeId?: string) {
+  // shortcut: 5 raycasts per measurement on every sync, like the corner ruler's labels; cache by camera if many measurements get slow.
+  const total = tapePolylineLength(points);
+  if (total < 1e-9) return false;
+  const at = (fraction: number) => {
+    let left = total * fraction;
+    for (let index = 0; index + 1 < points.length; index += 1) {
+      const piece = points[index].distanceTo(points[index + 1]);
+      if (piece >= left && piece > 1e-9) return points[index].clone().lerp(points[index + 1], left / piece);
+      left -= piece;
+    }
+    return points[points.length - 1];
+  };
+  return [0.1, 0.3, 0.5, 0.7, 0.9].filter((fraction) => worldPointHidden(at(fraction), state, ownShapeId)).length >= 3;
+}
+
+function tapeCoordinates(world: THREE.Vector3, accuracy: MeasurementAccuracy) {
+  return `X ${formatMeasure(world.x, accuracy)}   Y ${formatMeasure(displayY(world.z), accuracy)}   Z ${formatMeasure(world.y, accuracy)}`;
 }
 
 /** The length of every measurement in millimetres, for MCP: a measured edge counts along the edge. */
@@ -565,12 +593,13 @@ export function syncTapeOverlay(
   const projectedPoints = new Map<string, { screenX: number; screenY: number }>();
   // Hidden measurements stay in the model; nothing of them is drawn or can be hit.
   const points = (model.hidden ? [] : model.points).map((point) => {
-    const screen = projectToScreen(tapePointWorld(state, point), state);
+    const world = tapePointWorld(state, point);
+    const screen = projectToScreen(world, state);
     const projected = { screenX: screen.x, screenY: screen.y };
     projectedPoints.set(point.id, projected);
-    return { ...point, ...projected };
+    return { ...point, ...projected, coordinates: tapeCoordinates(world, accuracy) };
   });
-  const segments = (model.hidden ? [] : model.segments).flatMap((segment) => {
+  const measured = (model.hidden ? [] : model.segments).flatMap((segment) => {
     const start = model.points.find((point) => point.id === segment.startId);
     const end = model.points.find((point) => point.id === segment.endId);
     const startScreen = projectedPoints.get(segment.startId);
@@ -582,25 +611,53 @@ export function syncTapeOverlay(
     const endWorld = tapePointWorld(state, end);
     const attachedEdgePoints = segment.edge ? tapeEdgeWorldPoints(state, segment.edge) : [];
     const worldPoints = attachedEdgePoints.length >= 2 ? attachedEdgePoints : [startWorld, endWorld];
-    const labelScreen = projectToScreen(tapePolylineMidpoint(worldPoints), state);
-    return [
-      {
-        ...segment,
-        x1: startScreen.screenX,
-        y1: startScreen.screenY,
-        x2: endScreen.screenX,
-        y2: endScreen.screenY,
-        screenPoints: segment.edge && worldPoints.length >= 2 ? tapeScreenPointList(worldPoints, state) : undefined,
-        labelX: labelScreen.x,
-        labelY: labelScreen.y - 18,
-        label: formatMeasure(tapePolylineLength(worldPoints), accuracy),
-        editable: tapeMovableShapeId(model, segment.id, []) !== null,
-      },
-    ];
+    const screenLine = worldPoints.map((point) => projectToScreen(point, state));
+    const middle = measurementMiddle(worldPoints);
+    const midScreen = middle ? projectToScreen(new THREE.Vector3(middle.x, middle.y, middle.z), state) : screenPolylineMiddle(screenLine).point;
+    // A measurement across one body (its thickness, one of its edges) runs inside or along it and is not hidden by it.
+    const ownShapeId = segment.edge?.shapeId ?? (start.attachment && start.attachment.shapeId === end.attachment?.shapeId ? start.attachment.shapeId : undefined);
+    return [{ segment, startScreen, endScreen, worldPoints, screenLine, midScreen, ownShapeId, label: formatMeasure(tapePolylineLength(worldPoints), accuracy), ...tapeAxesText(worldPoints, accuracy) }];
+  });
+  // Labels go beside their line, clear of the other lines, the points, the middle marks and the labels placed before.
+  const lines = measured.map((entry) => entry.screenLine);
+  const taken = [
+    ...points.map((point) => ({ x: point.screenX, y: point.screenY, w: 12, h: 12 })),
+    ...measured.map((entry) => ({ x: entry.midScreen.x, y: entry.midScreen.y, w: 12, h: 12 })),
+  ];
+  const segments = measured.map(({ segment, startScreen, endScreen, worldPoints, screenLine, axes, deltas, midScreen, ownShapeId, label }) => {
+    const { point, direction } = screenPolylineMiddle(screenLine);
+    const size = tapeLabelSize(label, axes);
+    const labelScreen = placeTapeLabel(point, direction, size, lines, taken);
+    taken.push({ ...labelScreen, ...size });
+    return {
+      ...segment,
+      x1: startScreen.screenX,
+      y1: startScreen.screenY,
+      x2: endScreen.screenX,
+      y2: endScreen.screenY,
+      screenPoints: segment.edge && worldPoints.length >= 2 ? screenLine.map((screen) => `${screen.x},${screen.y}`).join(" ") : undefined,
+      labelX: labelScreen.x,
+      labelY: labelScreen.y,
+      label,
+      editable: tapeMovableShapeId(model, segment.id, []) !== null,
+      axes,
+      deltas,
+      midX: midScreen.x,
+      midY: midScreen.y,
+      occluded: tapeMostlyHidden(worldPoints, state, ownShapeId),
+    };
   });
   const hoverWorld = model.hover && !model.hidden ? tapePointWorld(state, model.hover) : null;
   const hoverScreen = hoverWorld ? projectToScreen(hoverWorld, state) : null;
   const hoverEdgePoints = model.hover?.edge && !model.hidden ? tapeEdgeWorldPoints(state, model.hover.edge) : [];
+  // While the second point is being placed: what the measurement would read, axes and reach along each included.
+  const startPoint = model.startPointId ? model.points.find((point) => point.id === model.startPointId) : undefined;
+  const startWorld = startPoint && hoverWorld ? tapePointWorld(state, startPoint) : null;
+  let preview: string | undefined;
+  if (startWorld && hoverWorld && startWorld.distanceTo(hoverWorld) > 1e-6) {
+    const { axes, deltas } = tapeAxesText([startWorld, hoverWorld], accuracy);
+    preview = `${axes} ${formatMeasure(startWorld.distanceTo(hoverWorld), accuracy)}${deltas ? `\n${deltas}` : ""}`;
+  }
   const next: TapeOverlayState = {
     points,
     segments,
@@ -608,6 +665,7 @@ export function syncTapeOverlay(
       screenX: hoverScreen.x,
       screenY: hoverScreen.y,
       edgeScreenPoints: hoverEdgePoints.length >= 2 ? tapeScreenPointList(hoverEdgePoints, state) : undefined,
+      preview,
     } : null,
   };
   const previous = overlayRef.current;
@@ -617,12 +675,17 @@ export function syncTapeOverlay(
     previous.segments.length === next.segments.length &&
     previous.points.every((point, index) => {
       const candidate = next.points[index];
-      return point.id === candidate.id && Math.abs(point.screenX - candidate.screenX) < 0.2 && Math.abs(point.screenY - candidate.screenY) < 0.2;
+      return point.id === candidate.id && point.coordinates === candidate.coordinates && Math.abs(point.screenX - candidate.screenX) < 0.2 && Math.abs(point.screenY - candidate.screenY) < 0.2;
     }) &&
     previous.segments.every((segment, index) => {
       const candidate = next.segments[index];
       return segment.id === candidate.id
         && segment.label === candidate.label
+        && segment.deltas === candidate.deltas
+        && segment.axes === candidate.axes
+        && segment.occluded === candidate.occluded
+        && Math.abs(segment.midX - candidate.midX) < 0.2
+        && Math.abs(segment.midY - candidate.midY) < 0.2
         && segment.screenPoints === candidate.screenPoints
         && Math.abs(segment.x1 - candidate.x1) < 0.2
         && Math.abs(segment.y1 - candidate.y1) < 0.2
@@ -634,6 +697,7 @@ export function syncTapeOverlay(
     ((!previous.hover && !next.hover) ||
       (previous.hover && next.hover
         && previous.hover.edgeScreenPoints === next.hover.edgeScreenPoints
+        && previous.hover.preview === next.hover.preview
         && Math.abs(previous.hover.screenX - next.hover.screenX) < 0.2
         && Math.abs(previous.hover.screenY - next.hover.screenY) < 0.2));
   if (!unchanged) {
@@ -1034,18 +1098,31 @@ export function TapeOverlay({
   /** Opens the field to type a length, which moves the body at one end (#823). */
   onEditLength?: (segmentId: string) => void;
 }) {
+  // The line or the label under the pointer: either brings a faded measurement back; only the label shows the deltas.
+  const [hovered, setHovered] = useState<{ segmentId: string; onLabel: boolean } | null>(null);
+  const [hoveredPointId, setHoveredPointId] = useState<string | null>(null);
+  const hoveredSegmentId = hovered?.segmentId ?? null;
+  const hoverSegment = (segmentId: string, onLabel: boolean) => ({
+    onPointerEnter: () => setHovered({ segmentId, onLabel }),
+    onPointerLeave: () => setHovered((current) => (current?.segmentId === segmentId && current.onLabel === onLabel ? null : current)),
+  });
+  const hoveredSegment = hovered?.onLabel ? overlay.segments.find((segment) => segment.id === hovered.segmentId && segment.deltas) : undefined;
+  const hoverClass = (segment: { id: string; occluded: boolean }) => `${segment.id === hoveredSegmentId ? "hovered" : ""} ${segment.occluded ? "occluded" : ""}`;
+  const hoveredPoint = overlay.points.find((point) => point.id === hoveredPointId);
   return (
     <div className={`tape-overlay ${active ? "active" : ""} ${deleteMode ? "delete-mode" : ""} ${quickDelete ? "quick-delete" : ""} ${moveMode ? "move-mode" : ""}`} aria-label={t("aria.tapeMeasurements")}>
       <svg className="tape-guides" width="100%" height="100%" aria-hidden="true">
         {overlay.segments.map((segment) => (
-          <g key={segment.id} className="tape-segment-group">
+          <g key={segment.id} className={`tape-segment-group ${hoverClass(segment)}`}>
             {segment.screenPoints ? (
               <>
+                <polyline className="tape-segment-casing" points={segment.screenPoints} fill="none" />
                 <polyline className="tape-segment" points={segment.screenPoints} fill="none" />
-                <polyline className="tape-segment-hit" points={segment.screenPoints} fill="none" onPointerDown={(event) => onSegmentPointerDown(event, segment.id)} />
+                <polyline className="tape-segment-hit" points={segment.screenPoints} fill="none" onPointerDown={(event) => onSegmentPointerDown(event, segment.id)} {...hoverSegment(segment.id, false)} />
               </>
             ) : (
               <>
+                <line className="tape-segment-casing" x1={segment.x1} y1={segment.y1} x2={segment.x2} y2={segment.y2} />
                 <line className="tape-segment" x1={segment.x1} y1={segment.y1} x2={segment.x2} y2={segment.y2} />
                 <line
                   className="tape-segment-hit"
@@ -1054,6 +1131,7 @@ export function TapeOverlay({
                   x2={segment.x2}
                   y2={segment.y2}
                   onPointerDown={(event) => onSegmentPointerDown(event, segment.id)}
+                  {...hoverSegment(segment.id, false)}
                 />
               </>
             )}
@@ -1070,41 +1148,70 @@ export function TapeOverlay({
             onPointerMove={(event) => onPointPointerMove(event, point.id)}
             onPointerUp={(event) => onPointPointerUp(event, point.id)}
             onPointerCancel={(event) => onPointPointerUp(event, point.id)}
+            onPointerEnter={() => setHoveredPointId(point.id)}
+            onPointerLeave={() => setHoveredPointId((current) => (current === point.id ? null : current))}
           />
         ))}
         {active && overlay.hover?.edgeScreenPoints ? <polyline className="tape-hover-edge" points={overlay.hover.edgeScreenPoints} fill="none" /> : null}
         {active && overlay.hover ? <circle className="tape-hover-point" cx={overlay.hover.screenX} cy={overlay.hover.screenY} r="5" /> : null}
       </svg>
-      {overlay.segments.map((segment) => segment.editable && onEditLength && !deleteMode ? (
-        <button
-          key={`${segment.id}-label`}
-          type="button"
-          className="tape-label editable"
-          style={{ left: segment.labelX, top: segment.labelY }}
-          title={t("camera.tapeTypeLength")}
-          onPointerDown={(event) => event.stopPropagation()}
-          onClick={() => onEditLength(segment.id)}
+      {overlay.segments.map((segment) => {
+        const content = (
+          <>
+            {segment.axes ? <span className="tape-label-axes">{segment.axes}</span> : null}
+            {segment.label}
+          </>
+        );
+        return segment.editable && onEditLength && !deleteMode ? (
+          <button
+            key={`${segment.id}-label`}
+            type="button"
+            className={`tape-label editable ${hoverClass(segment)}`}
+            style={{ left: segment.labelX, top: segment.labelY }}
+            title={t("camera.tapeTypeLength")}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={() => onEditLength(segment.id)}
+            {...hoverSegment(segment.id, true)}
+          >
+            {content}
+          </button>
+        ) : (
+          <span key={`${segment.id}-label`} className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""}`} style={{ left: segment.labelX, top: segment.labelY }} {...hoverSegment(segment.id, true)}>
+            {content}
+          </span>
+        );
+      })}
+      {hoveredSegment ? (
+        // On the far side of the label from its line, so the tip covers neither.
+        <span
+          className={`tape-tip ${hoveredSegment.labelY <= hoveredSegment.midY ? "above" : "below"}`}
+          style={{ left: hoveredSegment.labelX, top: hoveredSegment.labelY + (hoveredSegment.labelY <= hoveredSegment.midY ? -16 : 16) }}
         >
-          {segment.label}
-        </button>
-      ) : (
-        <span key={`${segment.id}-label`} className="tape-label" style={{ left: segment.labelX, top: segment.labelY }}>
-          {segment.label}
+          {hoveredSegment.deltas}
         </span>
-      ))}
-      {onMarkMiddle && !deleteMode ? overlay.segments.map((segment) => (
+      ) : null}
+      {active && overlay.hover?.preview ? (
+        <span className="tape-tip" style={{ left: overlay.hover.screenX, top: overlay.hover.screenY + 16 }}>
+          {overlay.hover.preview}
+        </span>
+      ) : null}
+      {hoveredPoint ? (
+        <span className="tape-tip above" style={{ left: hoveredPoint.screenX, top: hoveredPoint.screenY - 10 }}>
+          {hoveredPoint.coordinates}
+        </span>
+      ) : null}
+      {onMarkMiddle && !deleteMode && !quickDelete ? overlay.segments.map((segment) => (
         <button
           key={`${segment.id}-mark`}
           type="button"
-          className="tape-mark"
-          style={{ left: segment.labelX, top: segment.labelY + 24 }}
+          className={`tape-mark ${hoverClass(segment)}`}
+          style={{ left: segment.midX, top: segment.midY }}
           title={t("camera.tapeMarkMiddle")}
           aria-label={t("camera.tapeMarkMiddle")}
           onPointerDown={(event) => event.stopPropagation()}
           onClick={() => onMarkMiddle(segment.id)}
-        >
-          <Crosshair size={13} aria-hidden="true" />
-        </button>
+          {...hoverSegment(segment.id, false)}
+        />
       )) : null}
     </div>
   );
@@ -1565,7 +1672,11 @@ const CORNER_RULER_LINE_LIFT = 0.05;
  * Whether a body stands between the camera and a point of the room: a ray through the point's place on the
  * screen, against the bodies, stopping a little short of the point itself.
  */
-function worldPointHidden(point: THREE.Vector3, state: ThreeState) {
+/**
+ * Whether a body stands between the camera and the point. What the section view cuts away, see-through bodies
+ * and holes hide nothing; neither does `ignoredShapeId`, the body a measurement runs across.
+ */
+function worldPointHidden(point: THREE.Vector3, state: ThreeState, ignoredShapeId?: string) {
   state.camera.updateMatrixWorld();
   const ndc = point.clone().project(state.camera);
   if (!Number.isFinite(ndc.x) || !Number.isFinite(ndc.y) || Math.abs(ndc.x) > 1.2 || Math.abs(ndc.y) > 1.2) return false;
@@ -1576,7 +1687,11 @@ function worldPointHidden(point: THREE.Vector3, state: ThreeState) {
   const along = point.clone().sub(raycaster.ray.origin).dot(raycaster.ray.direction);
   const savedFar = raycaster.far;
   raycaster.far = Math.max(0, along - 0.5);
-  const hit = raycaster.intersectObjects(state.shapeLayer.children, true).some((entry) => entry.object instanceof THREE.Mesh && entry.object.visible);
+  const hit = raycaster.intersectObjects(state.shapeLayer.children, true).some((entry) => entry.object instanceof THREE.Mesh
+    && entry.object.visible
+    && !(entry.object.material as THREE.Material).transparent
+    && (!state.sectionPlane || state.sectionPlane.distanceToPoint(entry.point) >= -0.001)
+    && (!ignoredShapeId || entry.object.userData.shapeId !== ignoredShapeId));
   raycaster.far = savedFar;
   raycaster.layers.mask = previousLayers;
   return hit;

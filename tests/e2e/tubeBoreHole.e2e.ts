@@ -2,7 +2,8 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import manifoldModule from "manifold-3d";
 import type { WorkplaneShape } from "@/types/layerling";
 import { buildGroupedShapeFromSelection, manifoldFromMeshData, splitBoreTube } from "@/lib/editorBooleans";
-import { meshForShape } from "@/lib/editorMeshCore";
+import { bentTubeNaturalDimensions, bentTubeProfileRadii, bentTubeSettings, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
+import { boundsForShapesOfVertices, meshForShape } from "@/lib/editorMeshCore";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 
 /**
@@ -57,5 +58,71 @@ describe("a tube whose bore cuts as a hole (#892)", () => {
     expect(splitBoreTube(tube("t", { tubeBoreHole: true, hole: true }))).toHaveLength(1);
     // A wall as thick as the radius has no bore to cut.
     expect(splitBoreTube(tube("t", { tubeBoreHole: true, bevel: 10 }))).toHaveLength(1);
+  });
+});
+
+/** A straight bent tube (outer 10, bore 6) lying along x through a 6 mm wall: the bore only cuts that wall with the switch (#892). */
+function bentPipe(bore: boolean) {
+  const fields = normalizedBentTubeFields({ bentTubeSize: 10, bentTubeWall: 2, bentTubeSegments: [{ length: 40, bendAngle: 0, bendRadius: 15, roll: 0 }] });
+  const natural = bentTubeNaturalDimensions(fields);
+  return { id: "pipe", name: "Bent tube", kind: "bentTube", color: "#c33", x: 0, z: 0, elevation: 0, rotation: 0, locked: false, hidden: false, ...fields, width: natural.width, depth: natural.depth, height: natural.height, size: natural.size, tubeBoreHole: bore || undefined } as WorkplaneShape;
+}
+const wall = () => ({ id: "wall", name: "Wall", kind: "box", color: "#33c", x: 0, z: 0, elevation: 0, rotation: 0, size: 30, width: 6, depth: 30, height: 30, locked: false, hidden: false } as WorkplaneShape);
+
+async function bentPipeBlockedVolume(bore: boolean) {
+  const { group } = await buildGroupedShapeFromSelection([bentPipe(bore), wall()], 500_000);
+  expect(group).not.toBeNull();
+  const solid = manifoldFromMeshData(runtime, meshForShape(group!));
+  const rod = runtime.Manifold.cylinder(2, 1, 1, 32).rotate([0, 90, 0]).translate([-1, 5, 0]);
+  const inside = solid.intersect(rod);
+  const volume = inside.volume();
+  [solid, rod, inside].forEach((item) => item.delete());
+  return volume;
+}
+
+describe("a bent tube whose opening cuts as a hole (#892)", () => {
+  it("leaves the wall standing in its opening without the switch", async () => {
+    expect(await bentPipeBlockedVolume(false)).toBeGreaterThan(3);
+  });
+
+  it("opens the wall with it", async () => {
+    expect(await bentPipeBlockedVolume(true)).toBeLessThan(0.05);
+  });
+
+  it("keeps the opening in the middle of the pipe, so its own wall stays closed", async () => {
+    // Lying, stood up and tipped: the bottom of the pipe's wall (2 mm) is still there beside the other wall.
+    for (const turn of [{}, { rotationZ: 90 }, { rotationX: 30, rotation: 20 }]) {
+      const pipe = { ...bentPipe(true), ...turn } as WorkplaneShape;
+      const [solid, bore] = splitBoreTube(pipe);
+      const solidBox = boundsForShapesOfVertices([solid]);
+      const boreBox = boundsForShapesOfVertices([bore]);
+      for (const [low, high] of [["minX", "maxX"], ["minY", "maxY"], ["minZ", "maxZ"]] as const) {
+        expect((boreBox[low] + boreBox[high]) / 2).toBeCloseTo((solidBox[low] + solidBox[high]) / 2, 3);
+      }
+    }
+    const { group } = await buildGroupedShapeFromSelection([bentPipe(true), wall()], 500_000);
+    const solid = manifoldFromMeshData(runtime, meshForShape(group!));
+    const floor = runtime.Manifold.cube([4, 1.2, 1], true).translate([-14, 1, 0]);
+    const kept = solid.intersect(floor);
+    const volume = kept.volume();
+    [solid, floor, kept].forEach((item) => item.delete());
+    expect(volume).toBeGreaterThan(4.8 * 0.95);
+  });
+
+  it("is cut as a solid pipe and an opening that is a hole, and stays one shape otherwise", () => {
+    const parts = splitBoreTube(bentPipe(true));
+    expect(parts.map((part) => [part.bentTubeInnerProfile, part.hole === true])).toEqual([["none", false], ["none", true]]);
+    expect(parts[1].bentTubeSize).toBeCloseTo(6, 5);
+    expect(parts[0].bentTubeSize).toBe(10);
+    // Whatever the profiles: the hole's outside is the pipe's opening.
+    for (const [profile, innerProfile] of [["square", "round"], ["round", "hexagon"], ["octagon", "square"]] as const) {
+      const pipe = { ...bentPipe(true), ...normalizedBentTubeFields({ ...bentPipe(true), bentTubeProfile: profile, bentTubeInnerProfile: innerProfile }) } as WorkplaneShape;
+      const opening = bentTubeProfileRadii(bentTubeSettings(pipe)).inner;
+      const bore = splitBoreTube(pipe)[1];
+      expect(bore.bentTubeProfile).toBe(innerProfile);
+      expect(bentTubeProfileRadii(bentTubeSettings(bore)).outer).toBeCloseTo(opening!, 5);
+    }
+    expect(splitBoreTube(bentPipe(false))).toHaveLength(1);
+    expect(splitBoreTube({ ...bentPipe(true), bentTubeInnerProfile: "none" } as WorkplaneShape)).toHaveLength(1);
   });
 });

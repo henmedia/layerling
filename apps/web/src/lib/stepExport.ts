@@ -501,6 +501,20 @@ async function buildScope(brep: Brep, shapes: WorkplaneShape[], skipped: Skipped
   });
 }
 
+/**
+ * The kernel takes a colour as linear light and writes it to the file as sRGB, so a colour handed over as it is came out
+ * paler in the file (#d12a2a as #ea7171). Handed over as linear light, unrounded (on the 0-255 scale the kernel divides
+ * by 255), the file carries the colour as it shows here.
+ */
+export function stepColorForKernel(color: string): [number, number, number, number] {
+  const hex = /^#?([0-9a-f]{6})$/i.exec(color)?.[1] ?? "ff0000";
+  const channel = (offset: number) => {
+    const value = parseInt(hex.slice(offset, offset + 2), 16) / 255;
+    return (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4) * 255;
+  };
+  return [channel(0), channel(2), channel(4), 255];
+}
+
 export async function exportShapesToStep(shapes: WorkplaneShape[]): Promise<StepExportResult> {
   const brep = await loadBrepWithOcct();
 
@@ -512,10 +526,16 @@ export async function exportShapesToStep(shapes: WorkplaneShape[]): Promise<Step
     throw new StepExportEmptyError();
   }
 
-  const result = brep.exportAssemblySTEP(parts, { unit: "MM" });
-  if (!result.ok) {
-    throw new Error(`STEP export failed: ${String(result.error.message ?? result.error)}`);
+  // The kernel's own document rather than brepjs's exportAssemblySTEP, which takes colours only as whole hex steps.
+  const kernel = brep.getKernel();
+  const doc = kernel.createXCAFDocument(parts.map((part) => ({ shape: part.shape.wrapped, name: part.name, color: stepColorForKernel(part.color) })));
+  let step: string;
+  try {
+    step = kernel.writeXCAFToSTEP(doc, { unit: "MM" });
+  } finally {
+    doc.delete();
   }
+  if (!step) throw new Error("STEP export failed: Failed to write STEP file");
 
-  return { blob: result.value, exportedCount: parts.length, skipped };
+  return { blob: new Blob([step], { type: "application/STEP" }), exportedCount: parts.length, skipped };
 }

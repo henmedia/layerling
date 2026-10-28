@@ -6,6 +6,7 @@ import {
   HOLE_PATTERN_MANY_HOLES,
   holeFootprintPolygon,
   holePatternCenters,
+  holePatternMinRowSpacing,
   holePatternMinSpacing,
   holePatternWall,
   normalizeHolePattern,
@@ -198,5 +199,43 @@ describe("wall between the holes (#239)", () => {
     const hexagon = { form: "hexagon" as const, size: 6, height: 6, arrangement: "staggered" as const };
     // flats face each other along the row and along the diagonal, so the wall is the spacing less the flat-to-flat width
     expect(holePatternWall({ ...hexagon, spacing: 9 })).toBeCloseTo(9 - 6 * HEXAGON_FLAT_RATIO, 3);
+  });
+});
+
+describe("a rectangle or slot with its own row spacing (#975)", () => {
+  // Narrow, tall holes: 2 mm wide, 14 mm high, as in the report.
+  const narrow = { form: "rectangle" as const, size: 2, height: 14, arrangement: "grid" as const };
+
+  it("takes the wall along the row from the width and between the rows from the height", () => {
+    const spacing = holePatternMinSpacing(narrow, 2);
+    expect(spacing).toBeCloseTo(4, 3);
+    expect(holePatternMinRowSpacing({ ...narrow, spacing }, 2)).toBeCloseTo(16, 3);
+    expect(holePatternWall({ ...narrow, spacing: 4, rowSpacing: 16 })).toBeCloseTo(2, 3);
+  });
+
+  it("puts the holes of a row 4 mm apart and the rows 16 mm apart", () => {
+    const settings = normalizeHolePattern({ ...narrow, spacing: 4, rowSpacing: 16, margin: 2, depth: null });
+    expect(settings.spacing).toBeCloseTo(4, 3);
+    expect(settings.rowSpacing).toBeCloseTo(16, 3);
+    const { centers } = holePatternCenters(rectangleOutline(-23, -23, 23, 23), settings);
+    const us = distinct(centers.map((center) => center.u));
+    const vs = distinct(centers.map((center) => center.v));
+    expect(us[1] - us[0]).toBeCloseTo(4, 3);
+    expect(vs[1] - vs[0]).toBeCloseTo(16, 3);
+    expect(us.length).toBeGreaterThan(8);
+  });
+
+  it("raises a row spacing that would let the rows overlap", () => {
+    expect(normalizeHolePattern({ ...narrow, spacing: 4, rowSpacing: 4 }).rowSpacing).toBeGreaterThan(14);
+  });
+
+  it("keeps the rows of a pattern saved without a row spacing where they were", () => {
+    const saved = normalizeHolePattern({ form: "rectangle", size: 10, height: 5, spacing: 13, arrangement: "staggered" });
+    expect(saved.spacing).toBe(13);
+    expect(saved.rowSpacing).toBeCloseTo(13 * Math.sqrt(3) / 2, 6);
+  });
+
+  it("leaves the other forms without one", () => {
+    expect(normalizeHolePattern({ ...round, rowSpacing: 30 }).rowSpacing).toBeUndefined();
   });
 });

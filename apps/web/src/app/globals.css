@@ -1379,138 +1379,6 @@ html[data-theme="dark"] .dashboard-trademark {
   font-weight: 800;
 }
 
-/* The designs live in this browser and nowhere else: said in bold, and it stays. */
-.storage-notice {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: -8px 0 22px;
-  padding: 14px 14px 14px 16px;
-  background: #fff1dc;
-  border: 2px solid #e08a2c;
-  border-radius: 10px;
-}
-
-/* The designs are on the server: a statement, not a warning. */
-.storage-notice.on-server {
-  background: #e8f4ec;
-  border-color: #4f9a6a;
-}
-
-.storage-notice.on-server .storage-notice-icon {
-  background: #3d8a59;
-}
-
-.storage-notice.on-server .storage-notice-text strong {
-  color: #1f3d2a;
-}
-
-.storage-notice.on-server .storage-notice-text span {
-  color: #34503e;
-}
-
-.storage-notice.on-server .storage-notice-button.secondary {
-  color: #24553a;
-  box-shadow: inset 0 0 0 2px #3d8a59;
-}
-
-.storage-notice-icon {
-  display: grid;
-  flex: none;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  color: #ffffff;
-  background: #d9730d;
-  border-radius: 10px;
-}
-
-.storage-notice-text {
-  display: grid;
-  flex: 1;
-  min-width: 0;
-  gap: 3px;
-}
-
-.storage-notice-text strong {
-  color: #4a2f10;
-  font-size: 16px;
-  font-weight: 900;
-}
-
-.storage-notice-text span {
-  color: #5e4630;
-  font-size: 13.5px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.storage-notice-button {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 15px;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 800;
-  background: #bf6508;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.storage-notice-button:hover {
-  background: #a95805;
-}
-
-/* "Back up all" and "Restore backup" side by side; the restore one is the quieter of the two. */
-.storage-notice-actions {
-  display: flex;
-  flex: none;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.storage-notice-button.secondary {
-  color: #8a4a05;
-  background: #ffffff;
-  box-shadow: inset 0 0 0 2px #bf6508;
-}
-
-.storage-notice-button.secondary:hover {
-  background: #ffe9cc;
-}
-
-.storage-notice-help {
-  display: inline-grid;
-  width: 22px;
-  height: 22px;
-  /* In the heading: a box of the usual 30 px would make its line taller than the others. */
-  margin-block: -6px;
-  vertical-align: middle;
-  color: #8a5312;
-}
-
-.storage-notice-help:hover {
-  color: #4a2f10;
-}
-
-@media (max-width: 560px) {
-  .storage-notice {
-    flex-wrap: wrap;
-  }
-
-  .storage-notice-actions {
-    width: 100%;
-  }
-
-  .storage-notice-button {
-    flex: 1 1 140px;
-    justify-content: center;
-  }
-}
-
 /* The recommendation to install layerling as an app: a card under the start tiles that is meant
    to be seen - what it brings, an install button where the browser has one, "Not now" for two
    weeks and a cross for good. */
@@ -2217,11 +2085,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   transform: translateY(-1px);
 }
 
-/* All three start tiles have the same cream ground, which the grey-beige icon squares of the two plain ones belong to; the create tile only differs by its orange border and icon. */
-.dashboard-action-tile.create {
-  border-color: #f3a452;
-}
-
+/* All three start tiles look the same at rest (cream ground, plain border); the create tile only differs by its orange icon. */
 .dashboard-action-icon {
   display: grid;
   flex: 0 0 auto;
@@ -2239,7 +2103,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   background: transparent;
 }
 
-.dashboard-action-tile span:last-child {
+.dashboard-action-tile span:last-of-type {
   min-width: 0;
   overflow-wrap: anywhere;
   font-size: 16px;
@@ -2247,23 +2111,13 @@ html[data-theme="dark"] .whats-new-earlier:hover {
 }
 
 /*
- * On a phone the start page used to put the designs more than a screen down, behind three big tiles and the backup
- * note. Once there are designs, the tiles become one short row and the note moves behind the designs, so the designs
- * start in the first screen (a donor's wish by mail). Without designs nothing changes: the note and the tiles come first.
+ * On a phone the start page used to put the designs more than a screen down, behind three big tiles. Once there are
+ * designs, the tiles become one short row, so the designs start in the first screen (a donor's wish by mail).
  */
 @media (max-width: 560px) {
   .dashboard-main.has-projects {
     display: flex;
     flex-direction: column;
-  }
-
-  .dashboard-main.has-projects .storage-notice {
-    order: 1;
-    margin: 22px 0;
-  }
-
-  .dashboard-main.has-projects .dashboard-welcome {
-    order: 2;
   }
 
   .dashboard-main.has-projects .dashboard-actions-band {
@@ -2281,7 +2135,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
     text-align: center;
   }
 
-  .dashboard-main.has-projects .dashboard-action-tile span:last-child {
+  .dashboard-main.has-projects .dashboard-action-tile span:last-of-type {
     font-size: 12.5px;
     line-height: 1.2;
   }
@@ -2317,39 +2171,6 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   margin-top: 4px;
   color: #97836e;
   font-size: 13px;
-}
-
-.shared-projects-refresh {
-  display: inline-flex;
-  min-height: 36px;
-  align-items: center;
-  gap: 7px;
-  padding: 0 12px;
-  color: #6a4e31;
-  font-size: 12px;
-  font-weight: 800;
-  background: #fff;
-  border: 1px solid #eae0d0;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.shared-projects-refresh:hover:not(:disabled) {
-  color: #9f5508;
-  border-color: #d59858;
-}
-
-.shared-projects-refresh:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
-.shared-projects-refresh .spinning {
-  animation: shared-project-spin 850ms linear infinite;
-}
-
-@keyframes shared-project-spin {
-  to { transform: rotate(360deg); }
 }
 
 .dashboard-controls {
@@ -2494,12 +2315,6 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   font-weight: 600;
 }
 
-.shared-projects-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
 /* The folder that stands for the server, sitting among the cards that stand
    for this browser. Same frame and same size as a project card, so the row
    reads as one shelf - only the contents of the picture area differ. */
@@ -2589,6 +2404,14 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   align-items: center;
 }
 
+.project-card.is-opening {
+  pointer-events: none;
+}
+
+.project-card.is-opening .project-card-open {
+  cursor: wait;
+}
+
 .project-preview {
   position: relative;
   display: block;
@@ -2596,6 +2419,32 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   overflow: hidden;
   border-radius: 6px;
   background: #f8f5ef;
+}
+
+.project-preview.is-loading .project-thumbnail-image {
+  opacity: 0.35;
+  filter: grayscale(40%);
+}
+
+.project-preview-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.38);
+  color: #ffffff;
+  backdrop-filter: blur(1.5px);
+  z-index: 2;
+  border-radius: inherit;
+}
+
+.project-preview-spinner {
+  animation: project-preview-spin 0.8s linear infinite;
+}
+
+@keyframes project-preview-spin {
+  to { transform: rotate(360deg); }
 }
 
 .project-list .project-preview {
@@ -2852,178 +2701,6 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   font-size: 18px;
 }
 
-/* Shown only on a genuine first visit. The steps are numbered because they are
-   a sequence - each one needs the one before it - and the numbers sit in their
-   own column so the text lines up whatever the wording. */
-.dashboard-welcome {
-  margin-top: 18px;
-  padding: 0;
-  background: #ffffff;
-  border: 1px solid #ede4d4;
-  border-radius: 10px;
-}
-
-/* The fold handle. It carries the heading, so a reader who never opens it still
-   learns what is inside; the arrow is drawn here rather than left to the
-   browser's own marker, which differs from engine to engine. */
-.dashboard-welcome-summary {
-  display: grid;
-  grid-template-columns: 18px 1fr;
-  gap: 2px 12px;
-  padding: 16px 22px;
-  cursor: pointer;
-  list-style: none;
-}
-
-.dashboard-welcome-summary::-webkit-details-marker {
-  display: none;
-}
-
-.dashboard-welcome-summary::before {
-  grid-row: span 2;
-  align-self: center;
-  width: 8px;
-  height: 8px;
-  margin-left: 4px;
-  border-right: 2px solid #ad6206;
-  border-bottom: 2px solid #ad6206;
-  transform: rotate(-45deg);
-  transition: transform 120ms ease;
-  content: "";
-}
-
-.dashboard-welcome[open] .dashboard-welcome-summary::before {
-  transform: rotate(45deg);
-}
-
-.dashboard-welcome-summary:hover .dashboard-welcome-summary-title {
-  color: #ad6206;
-}
-
-.dashboard-welcome-summary-title {
-  color: #573f26;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-}
-
-.dashboard-welcome-summary-hint {
-  color: #96816a;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.dashboard-welcome-body {
-  display: grid;
-  gap: 16px;
-  padding: 4px 22px 24px 52px;
-}
-
-/* As wide as the lists in the panel, so the closing lines do not stop short of them. */
-.dashboard-welcome p {
-  margin: 0;
-  color: #7a6650;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.dashboard-welcome ol {
-  display: grid;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: welcome-step;
-}
-
-.dashboard-welcome li {
-  display: grid;
-  grid-template-columns: 26px 1fr;
-  gap: 4px 12px;
-  color: #7a6650;
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.dashboard-welcome li::before {
-  counter-increment: welcome-step;
-  content: counter(welcome-step);
-  grid-row: span 2;
-  width: 26px;
-  height: 26px;
-  color: #9a5a06;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 26px;
-  text-align: center;
-  background: #fdf3e2;
-  border: 1px solid #edcfa2;
-  border-radius: 50%;
-}
-
-.dashboard-welcome li strong {
-  color: #573f26;
-  font-size: 15px;
-}
-
-/* The one emphasised thing in the panel, because it is the sentence this
-   project exists for: people arriving from other tools. */
-.dashboard-welcome-switch {
-  padding: 13px 16px;
-  color: #6c5640;
-  background: #fdf4e3;
-  border-left: 3px solid #e8a865;
-  border-radius: 0 7px 7px 0;
-}
-
-.dashboard-welcome-switch strong {
-  color: #9a5a06;
-}
-
-/* Everything beyond the first steps: a plain list, so it does not compete
-   with the numbered steps above it. The step rules match any li in the panel,
-   hence the resets. */
-.dashboard-welcome-more {
-  display: grid;
-  gap: 8px;
-}
-
-.dashboard-welcome-more h3 {
-  margin: 0;
-  color: #573f26;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.dashboard-welcome-more ul {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding-left: 18px;
-}
-
-.dashboard-welcome-more li {
-  display: list-item;
-}
-
-.dashboard-welcome-more li::before {
-  content: none;
-}
-
-.dashboard-welcome-more li strong {
-  font-size: inherit;
-}
-
-.dashboard-welcome-videos a {
-  color: #8f4700;
-  font-weight: 700;
-}
-
-.dashboard-welcome-video-meta {
-  color: #8a745c;
-  font-size: 13px;
-}
-
 /* Present for search engines and screen readers, out of sight on screen. */
 .visually-hidden {
   position: absolute;
@@ -3035,37 +2712,6 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
-}
-
-/* ... which leaves the pointer to the in-editor help as a quiet closing line,
-   not a second box competing with it. */
-.dashboard-welcome-help {
-  color: #8a745c;
-  font-size: 13px;
-}
-
-/* The guide is the way to learn more, so its link stands apart as a button rather than hiding in the sentence. */
-.dashboard-welcome-guide-link {
-  display: flex;
-  align-self: flex-start;
-  width: fit-content;
-  align-items: center;
-  gap: 8px;
-  margin-top: 4px;
-  padding: 9px 16px;
-  border: 1.5px solid #ad5900;
-  border-radius: 8px;
-  background: #fff6ea;
-  color: #8f4700;
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.dashboard-welcome-guide-link:hover,
-.dashboard-welcome-guide-link:focus-visible {
-  background: #ad5900;
-  color: #fff;
 }
 
 .preview-grid {
@@ -3131,6 +2777,14 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.project-card-meta-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #c25e00;
+  font-weight: 500;
 }
 
 /* Der Ordner eines Suchtreffers: eine Zeile unter der Kachel, die sagt, wo
@@ -7637,154 +7291,6 @@ html[data-theme="dark"] .touch-multi-select {
   box-shadow: 0 1px 4px rgba(40, 110, 150, 0.12);
 }
 
-.tape-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 7;
-  pointer-events: none;
-}
-
-.tape-guides {
-  position: absolute;
-  inset: 0;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.tape-segment {
-  stroke: #5a3917;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-  pointer-events: none;
-  transition: stroke 120ms ease, stroke-width 120ms ease;
-}
-
-.tape-segment-hit {
-  stroke: transparent;
-  stroke-width: 14;
-  vector-effect: non-scaling-stroke;
-  pointer-events: stroke;
-  cursor: pointer;
-}
-
-.tape-point,
-.tape-hover-point {
-  fill: #ffffff;
-  stroke: #b66108;
-  stroke-width: 2.4;
-  vector-effect: non-scaling-stroke;
-}
-
-.tape-point {
-  pointer-events: all;
-  cursor: pointer;
-  transition: fill 120ms ease, stroke 120ms ease, filter 120ms ease;
-}
-
-.tape-overlay.move-mode .tape-point {
-  cursor: grab;
-}
-
-.tape-overlay.move-mode .tape-point:active {
-  /* The hand would hide the point it moves; while dragging the crosshair shows where it lands (#943). */
-  cursor: crosshair;
-  fill: #f6f1e8;
-  filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
-}
-
-.tape-overlay.delete-mode .tape-segment-group:hover .tape-segment,
-.tape-overlay.quick-delete .tape-segment-group:hover .tape-segment {
-  stroke: var(--hover-accent-color);
-  stroke-width: 3;
-  filter: drop-shadow(0 0 2px rgba(220, 63, 54, 0.3));
-}
-
-.tape-overlay.delete-mode .tape-point:hover,
-.tape-overlay.quick-delete .tape-point:hover {
-  fill: #fff0ee;
-  stroke: var(--hover-accent-color);
-  filter: drop-shadow(0 0 3px rgba(220, 63, 54, 0.36));
-}
-
-.tape-point.pending {
-  fill: #cf6e09;
-  stroke: #ffffff;
-  filter: drop-shadow(0 0 3px rgba(113, 58, 0, 0.72));
-}
-
-.tape-hover-point {
-  fill: rgba(155, 80, 0, 0.28);
-  stroke-dasharray: 3 2;
-  pointer-events: none;
-}
-
-.tape-hover-edge {
-  fill: none;
-  stroke: #e17709;
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 3px rgba(173, 89, 0, 0.48));
-  pointer-events: none;
-}
-
-.tape-label {
-  position: absolute;
-  z-index: 2;
-  min-width: 46px;
-  padding: 5px 9px;
-  color: #3a2816;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(224, 208, 190, 0.96);
-  border-radius: 999px;
-  box-shadow: 0 1px 4px rgba(58, 40, 20, 0.12);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
-  text-align: center;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-}
-
-/* A measurement with a body at one end: a click types a length and moves that body (#823). */
-.tape-label.editable {
-  font-family: inherit;
-  pointer-events: auto;
-  cursor: text;
-}
-
-.tape-label.editable:hover,
-.tape-label.editable:focus-visible {
-  color: #ad5900;
-  border-color: #ad5900;
-}
-
-/* The button under a measurement that puts a reference point in its middle (#323). */
-.tape-mark {
-  position: absolute;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  color: #3a2816;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(224, 208, 190, 0.96);
-  border-radius: 999px;
-  box-shadow: 0 1px 4px rgba(58, 40, 20, 0.12);
-  cursor: pointer;
-  pointer-events: auto;
-  transform: translate(-50%, -50%);
-}
-
-.tape-mark:hover,
-.tape-mark:focus-visible {
-  color: #ad5900;
-  border-color: #ad5900;
-}
-
 /* --- Winkellineal-Werkzeug ---------------------------------------------
    Reine Bildschirm-Darstellung wie das Massband, kein Three.js-Objekt und
    kein Formen-Katalog-Eintrag - der Griff ist immer direkt ziehbar, ohne
@@ -10327,6 +9833,17 @@ html[data-theme="dark"] .property-hint {
   padding-right: 8px;
 }
 
+/* Centre or edge for the position fields (#973). */
+.name-tag-sides.position-from {
+  grid-template-columns: auto repeat(2, minmax(0, 1fr));
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.name-tag-sides.position-from > span {
+  padding-right: 8px;
+}
+
 .name-tag-sides.name-tag-edge button {
   padding: 0 2px;
   font-size: 12.5px;
@@ -12199,7 +11716,6 @@ html[data-theme="dark"] .dashboard-action-tile,
 html[data-theme="dark"] .project-card,
 html[data-theme="dark"] .dashboard-select,
 html[data-theme="dark"] .dashboard-segmented,
-html[data-theme="dark"] .shared-projects-refresh,
 html[data-theme="dark"] .project-empty,
 html[data-theme="dark"] .project-card-menu,
 html[data-theme="dark"] .dashboard-confirm-dialog {
@@ -12313,56 +11829,6 @@ html[data-theme="dark"] .support-nudge-close:hover {
   background: #3a2c16;
 }
 
-html[data-theme="dark"] .storage-notice {
-  background: #33230f;
-  border-color: #d9863a;
-}
-
-html[data-theme="dark"] .storage-notice-text strong {
-  color: #fbeed9;
-}
-
-html[data-theme="dark"] .storage-notice-text span {
-  color: #e2cfb6;
-}
-
-html[data-theme="dark"] .storage-notice.on-server {
-  background: #15291d;
-  border-color: #4f9a6a;
-}
-
-html[data-theme="dark"] .storage-notice.on-server .storage-notice-text strong {
-  color: #dff0e5;
-}
-
-html[data-theme="dark"] .storage-notice.on-server .storage-notice-text span {
-  color: #bcd6c5;
-}
-
-html[data-theme="dark"] .storage-notice.on-server .storage-notice-button.secondary {
-  color: #dff0e5;
-  background: #15291d;
-  box-shadow: inset 0 0 0 2px #4f9a6a;
-}
-
-html[data-theme="dark"] .storage-notice-button.secondary {
-  color: #fbeed9;
-  background: #33230f;
-  box-shadow: inset 0 0 0 2px #d9863a;
-}
-
-html[data-theme="dark"] .storage-notice-button.secondary:hover {
-  background: #4a3318;
-}
-
-html[data-theme="dark"] .storage-notice-help {
-  color: #f3a452;
-}
-
-html[data-theme="dark"] .storage-notice-help:hover {
-  color: #fbeed9;
-}
-
 html[data-theme="dark"] .install-app-hint-text strong {
   color: #fbeed9;
 }
@@ -12377,74 +11843,6 @@ html[data-theme="dark"] .install-app-hint-close:hover,
 html[data-theme="dark"] .install-app-hint-later:hover {
   color: #fbeed9;
   background: #4a3318;
-}
-
-html[data-theme="dark"] .dashboard-welcome {
-  background: var(--panel);
-  border-color: #514130;
-}
-
-html[data-theme="dark"] .dashboard-welcome h2,
-html[data-theme="dark"] .dashboard-welcome h3,
-html[data-theme="dark"] .dashboard-welcome li strong {
-  color: #f3ede3;
-}
-
-/* The folded-shut state was left behind when the rest of this panel was given
-   dark colours: its heading kept the near-brown of the light theme and came
-   out dimmer than the line underneath it. */
-html[data-theme="dark"] .dashboard-welcome-summary-title {
-  color: #f3ede3;
-}
-
-html[data-theme="dark"] .dashboard-welcome-summary-hint {
-  color: #a79078;
-}
-
-html[data-theme="dark"] .dashboard-welcome-summary:hover .dashboard-welcome-summary-title {
-  color: #f3a452;
-}
-
-html[data-theme="dark"] .dashboard-welcome p,
-html[data-theme="dark"] .dashboard-welcome li {
-  color: #bda78e;
-}
-
-html[data-theme="dark"] .dashboard-welcome li::before {
-  color: #f3a452;
-  background: #3a2c16;
-  border-color: #6b5326;
-}
-
-html[data-theme="dark"] .dashboard-welcome-switch {
-  color: #cdb99f;
-  background: #332619;
-  border-left-color: #b9762c;
-}
-
-html[data-theme="dark"] .dashboard-welcome-switch strong {
-  color: #f3a452;
-}
-
-html[data-theme="dark"] .dashboard-welcome-videos a {
-  color: #f3a452;
-}
-
-html[data-theme="dark"] .dashboard-welcome-video-meta,
-html[data-theme="dark"] .dashboard-welcome-help {
-  color: #a08a71;
-}
-
-html[data-theme="dark"] .dashboard-welcome-guide-link {
-  border-color: #f3a452;
-  background: rgba(243, 164, 82, 0.12);
-  color: #f3a452;
-}
-
-html[data-theme="dark"] .dashboard-welcome-guide-link:hover,
-html[data-theme="dark"] .dashboard-welcome-guide-link:focus-visible {
-  background: #f3a452;
-  color: #241a10;
 }
 
 html[data-theme="dark"] .dashboard-legal-dot {
@@ -12557,6 +11955,15 @@ html[data-theme="dark"] .dashboard-confirm-dialog p {
   color: #a89179;
 }
 
+html[data-theme="dark"] .project-card-meta-loading {
+  color: #f59e0b;
+}
+
+html[data-theme="dark"] .project-preview-loading {
+  background: rgba(0, 0, 0, 0.58);
+  color: #ffffff;
+}
+
 html[data-theme="dark"] .dashboard-rename-dialog input,
 html[data-theme="dark"] .dashboard-confirm-cancel,
 html[data-theme="dark"] .dashboard-confirm-dialog header button {
@@ -12605,7 +12012,6 @@ html[data-theme="dark"] .project-menu-trigger {
 
 html[data-theme="dark"] .dashboard-action-tile.create {
   color: #f7f3ec;
-  border-color: #a3682b;
 }
 
 html[data-theme="dark"] .dashboard-action-tile:not(.create) .dashboard-action-icon {
@@ -14138,6 +13544,18 @@ html[data-theme="dark"] .theme-check {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* The toolbar's group and bundle marks, small enough for a row; the thicker
+   stroke keeps them from thinning to a hairline at this size. */
+.outliner-shape-name .outliner-kind-icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+  vertical-align: -3px;
+  stroke-width: 3.6;
+  opacity: 0.75;
 }
 
 .outliner-shape-kind {

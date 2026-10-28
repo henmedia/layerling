@@ -1,15 +1,18 @@
 import { randomUUID } from "crypto";
-import { constants as fsConstants, promises as fs } from "fs";
+import { constants as fsConstants, promises as fs, createReadStream } from "fs";
+import { Readable } from "stream";
 import path from "path";
 import { NextResponse } from "next/server";
 import { inspectLylProjectPackage, LYL_LIMITS, LYL_MEDIA_TYPE } from "@/lib/lylProject";
 import { originMatchesRequest } from "@/lib/sameOrigin";
+import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
 import { storeFolderNameProblem } from "@/lib/storeFolderName";
 
 export const runtime = "nodejs";
 export const revalidate = false;
 
 const SHARED_PROJECTS_ENV = "LAYERLING_SHARED_PROJECTS_DIR";
+const USER_HEADER_ENV = "LAYERLING_USER_HEADER";
 const SHARED_THUMBNAILS_DIR = ".thumbnails";
 const MAX_THUMBNAIL_BYTES = 5 * 1024 * 1024;
 const MAX_MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
@@ -45,9 +48,39 @@ function failureResponse(error: unknown, fallback: string, fallbackStatus = 500)
   return NextResponse.json({ error: error instanceof Error ? error.message : fallback }, { status: fallbackStatus });
 }
 
-function sharedProjectsDirectory() {
+/**
+ * Detects the authenticated user when configured with LAYERLING_USER_HEADER.
+ * If the setting is unset or empty, header-based user isolation is disabled.
+ *
+ * Returns a sanitized folder name if authenticated, or null if disabled / unauthenticated.
+ */
+function authenticatedUserFolder(request: Request): string | null {
+  const headerName = process.env[USER_HEADER_ENV]?.trim();
+  if (!headerName) {
+    return null;
+  }
+
+  const identity = request.headers.get(headerName);
+  if (typeof identity === "string" && identity.trim() !== "") {
+    let safe = identity.trim().toLowerCase().replace(/@/g, "_at_");
+    safe = safe.replace(/[^a-z0-9_.-]/g, "_");
+    safe = safe.replace(/^[._-]+|[._-]+$/g, "");
+    return safe !== "" ? safe : null;
+  }
+
+  return null;
+}
+
+function sharedProjectsDirectory(request?: Request) {
   const configured = (process.env[SHARED_PROJECTS_ENV])?.trim();
-  return configured ? path.resolve(configured) : null;
+  if (!configured) return null;
+  const base = path.resolve(configured);
+  if (!request) return base;
+  const userFolder = authenticatedUserFolder(request);
+  if (userFolder) {
+    return path.join(base, ".users", userFolder);
+  }
+  return base;
 }
 
 /**
@@ -243,7 +276,7 @@ function disabledResponse() {
 }
 
 export async function GET(request: Request) {
-  const root = sharedProjectsDirectory();
+  const root = sharedProjectsDirectory(request);
   if (!root) return disabledResponse();
   try {
     await ensureSharedRoot(root);
@@ -256,6 +289,7 @@ export async function GET(request: Request) {
     if (searchTerm) return await searchStore(root, searchTerm);
     const settings = requestUrl.searchParams.get("settings");
     if (settings) return await readSettings(root, settings);
+    if (requestUrl.searchParams.get("all") === "1") return await allDesigns(root);
     const requestedFile = requestUrl.searchParams.get("fileName");
     if (requestedFile) {
       const fileName = existingProjectFileName(requestedFile);
@@ -272,22 +306,22 @@ export async function GET(request: Request) {
         const imagePath = sharedThumbnailPath(folder, fileName, revision);
         const imageStat = await regularFileStat(imagePath);
         if (!imageStat) return new NextResponse("Shared project thumbnail was not found", { status: 404 });
-        const image = await fs.readFile(imagePath);
-        return new NextResponse(image, {
+        const imageStream = Readable.toWeb(createReadStream(imagePath));
+        return new Response(imageStream as BodyInit, {
           headers: {
             "Cache-Control": "public, max-age=31536000, immutable",
-            "Content-Length": String(image.byteLength),
+            "Content-Length": String(imageStat.size),
             "Content-Type": "image/png",
             ETag: `"${revision}"`,
           },
         });
       }
-      const bytes = await fs.readFile(filePath);
-      return new Response(bytes, {
+      const fileStream = Readable.toWeb(createReadStream(filePath));
+      return new Response(fileStream as BodyInit, {
         headers: {
           "Cache-Control": "no-store",
           "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`,
-          "Content-Length": String(bytes.byteLength),
+          "Content-Length": String(stat.size),
           "Content-Type": LYL_MEDIA_TYPE,
           ETag: `"${revisionForStat(stat)}"`,
         },
@@ -311,6 +345,8 @@ export async function GET(request: Request) {
       {
         enabled: true,
         path: folderPath,
+        // Every design in the store, not only this folder's: the number on the start page's tab.
+        total: (await storeDesigns(root)).designs.length,
         folders: folders.sort((a, b) => a.name.localeCompare(b.name)),
         projects: projects.filter((entry): entry is SharedProjectFile => Boolean(entry)).sort((a, b) => b.updatedAt - a.updatedAt),
       },
@@ -387,6 +423,49 @@ async function searchStore(root: string, term: string) {
   );
 }
 
+/**
+ * Every design in the store, from the top: the number on the start page's tab and what
+ * "Download all" packs. The same bounds as the search, so a stray tree cannot hold the
+ * answer up, and links are not followed as folders.
+ */
+async function storeDesigns(root: string) {
+  const designs: Array<{ folder: string; fileName: string }> = [];
+  const emptyFolders: string[] = [];
+  let truncated = false;
+  let visited = 0;
+  const walk = async (folder: string, depth: number): Promise<void> => {
+    if (depth > SEARCH_DEPTH_LIMIT || visited >= SEARCH_FOLDER_LIMIT) {
+      truncated = true;
+      return;
+    }
+    visited += 1;
+    const entries = (await fs.readdir(folder, { withFileTypes: true }).catch(() => [])).filter((entry) => !entry.name.startsWith("."));
+    if (depth > 0 && entries.length === 0) emptyFolders.push(folderKey(root, folder));
+    for (const entry of entries) {
+      // The custom shapes keep their own folder in the store; they are shapes, not designs.
+      if (entry.isDirectory() && depth === 0 && entry.name === CUSTOM_SHAPES_FOLDER) continue;
+      if (entry.isDirectory()) await walk(path.join(folder, entry.name), depth + 1);
+      else if (entry.isFile() && /\.(lyl|skf)$/i.test(entry.name)) designs.push({ folder, fileName: entry.name });
+    }
+  };
+  await walk(root, 0);
+  return { designs, emptyFolders, truncated };
+}
+
+/** Every design with the folder it is in, and the folders with nothing in them, for "Download all". */
+async function allDesigns(root: string) {
+  const { designs, emptyFolders, truncated } = await storeDesigns(root);
+  const projects = await Promise.all(designs.map(async ({ folder, fileName }) => {
+    const stat = await regularFileStat(path.join(folder, fileName));
+    if (!stat) return null;
+    const thumbnail = await regularFileStat(sharedThumbnailPath(folder, fileName, revisionForStat(stat)));
+    return projectRecord(fileName, stat, Boolean(thumbnail), folderKey(root, folder));
+  }));
+  return NextResponse.json(
+    { enabled: true, truncated, emptyFolders, projects: projects.filter((entry): entry is SharedProjectFile => Boolean(entry)) },
+    { headers: { "Cache-Control": "no-store" } },
+  );
+}
 
 /** Creating a folder is the one write that touches no project at all. */
 async function createFolder(root: string, folder: string, name: string) {
@@ -400,12 +479,18 @@ async function createFolder(root: string, folder: string, name: string) {
   return NextResponse.json({ created: true, path: folderKey(root, target) }, { status: 201, headers: { "Cache-Control": "no-store" } });
 }
 
+/** The store's own folder for custom shapes, at its top level: the shapes are found by that name. */
+function isCustomShapesFolder(root: string, folder: string) {
+  return path.dirname(folder) === root && path.basename(folder) === CUSTOM_SHAPES_FOLDER;
+}
+
 /**
  * Renaming a folder. The projects inside travel with it, and so do their
  * pictures - they live in the folder, not in a register somewhere else.
  */
 async function renameFolder(root: string, folder: string, name: string) {
   if (folder === root) throw new RequestFailure("The store folder itself cannot be renamed", 400);
+  if (isCustomShapesFolder(root, folder)) throw new RequestFailure("The custom shapes folder cannot be renamed", 400);
   const wanted = name.trim();
   if (storeFolderNameProblem(wanted, []) !== null) throw new RequestFailure("That folder name is not allowed", 400);
   const current = path.basename(folder);
@@ -605,6 +690,7 @@ async function copyProject(root: string, folder: string, requestedName: string, 
  */
 async function deleteFolder(root: string, folder: string, recursive: boolean) {
   if (folder === root) throw new RequestFailure("The store folder itself cannot be removed", 400);
+  if (isCustomShapesFolder(root, folder)) throw new RequestFailure("The custom shapes folder cannot be removed", 400);
   const counts = await folderContentsCount(folder);
   if (!recursive && (counts.projects > 0 || counts.folders > 0 || counts.files > 0)) {
     throw new RequestFailure("That folder is not empty", 409, counts);
@@ -728,7 +814,7 @@ async function saveSettings(root: string, requested: string, request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const root = sharedProjectsDirectory();
+  const root = sharedProjectsDirectory(request);
   if (!root) return NextResponse.json({ error: "Shared project storage is disabled" }, { status: 404 });
   if (!sameOriginRequest(request)) return NextResponse.json({ error: "Shared projects only accept same-origin deletes" }, { status: 403 });
 
@@ -788,7 +874,7 @@ export async function DELETE(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const root = sharedProjectsDirectory();
+  const root = sharedProjectsDirectory(request);
   if (!root) return NextResponse.json({ error: "Shared project storage is disabled" }, { status: 404 });
   if (!sameOriginRequest(request)) return NextResponse.json({ error: "Shared projects only accept same-origin saves" }, { status: 403 });
 

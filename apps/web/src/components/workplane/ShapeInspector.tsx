@@ -273,6 +273,7 @@ import {
 import { hingeLargestConeSize, MAX_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
+import { meshAabb } from "@/lib/editorMeshCore";
 import { isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
 import { roundSideCount } from "@/lib/roundSideCount";
@@ -481,6 +482,17 @@ function formatPropertyNumber(value: number, accuracy: MeasurementAccuracy, step
 
 const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diameter", "starOuterSize"]);
 const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ"]);
+/** How long after the last turn of the wheel a field is kept under the pointer. */
+const WHEEL_ANCHOR_MS = 600;
+
+/** The nearest box around an element that scrolls up and down. */
+function scrollingAncestor(element: HTMLElement): HTMLElement | null {
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    const overflow = getComputedStyle(parent).overflowY;
+    if ((overflow === "auto" || overflow === "scroll") && parent.scrollHeight > parent.clientHeight) return parent;
+  }
+  return null;
+}
 
 function propertyUsesLengthUnit(key: string) {
   return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
@@ -882,6 +894,9 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         step: 0.1,
         onChange: (value) => update({ bentTubeWall: value }),
       });
+    }
+    if (fields.bentTubeInnerProfile !== "none") {
+      properties.push({ type: "toggle" as const, id: "tubeBoreHole", label: t("prop.tubeBoreHole"), value: shape.tubeBoreHole === true, onChange: (value: boolean) => onUpdate({ tubeBoreHole: value || undefined }) });
     }
     properties.push({
       id: "bentTubeQuality",
@@ -2942,7 +2957,7 @@ export function ShapeInspector({
   const reachY = workspace.depth * 1.5;
   // Up, the slider reaches as far as the plate does and the printer is high; any number can be typed (#425).
   const reachZ = positionReach(workspace, printerPresetById(workspace.printer)?.height);
-  const positionProperties: ShapePropertyConfig[] = [
+  const positionProperties: RangePropertyConfig[] = [
     { id: "positionX", label: t("prop.positionX"), value: shape.x, min: -reachX, max: reachX, step: 0.5, onChange: (x) => onUpdate({ x }) },
     // Y counts towards the back, right-handed (#182); inside, z runs towards the viewer.
     { id: "positionY", label: t("prop.positionY"), value: displayY(shape.z), min: -reachY, max: reachY, step: 0.5, onChange: (y) => onUpdate({ z: insideZ(y) }) },
@@ -2990,6 +3005,25 @@ export function ShapeInspector({
   const [propertiesOpen, setPropertiesOpen] = useInspectorCard("properties", true);
   const [textFillMoreOpen, setTextFillMoreOpen] = useState(false);
   const [positionOpen, setPositionOpen] = useInspectorCard("position", false);
+  // Where X and Y measure from (#973): the middle of the body, or its left and front edges, as the angle ruler's
+  // corner does. Z is its bottom either way. Kept in this browser with the cards.
+  const [positionAtEdge, setPositionAtEdge] = useInspectorCard("positionAtEdge", false);
+  const edges = positionAtEdge && positionOpen ? meshAabb(shape) : null;
+  const shownPositionProperties = edges
+    ? positionProperties.map((property): RangePropertyConfig => {
+        if (property.id === "positionX") {
+          const offset = shape.x - edges.minX;
+          return { ...property, label: t("prop.positionXEdge"), value: edges.minX, onChange: (x) => onUpdate({ x: x + offset }) };
+        }
+        if (property.id === "positionY") {
+          // Y runs towards the back, so the front edge is the smaller Y.
+          const front = Math.min(displayY(edges.minZ), displayY(edges.maxZ));
+          const offset = displayY(shape.z) - front;
+          return { ...property, label: t("prop.positionYEdge"), value: front, onChange: (y) => onUpdate({ z: insideZ(y + offset) }) };
+        }
+        return property;
+      })
+    : positionProperties;
   const [rotationOpen, setRotationOpen] = useInspectorCard("rotation", false);
   const [taperOpen, setTaperOpen] = useInspectorCard("taper", false);
   const [twistOpen, setTwistOpen] = useInspectorCard("twist", false);
@@ -3383,7 +3417,7 @@ export function ShapeInspector({
                 onChange={threadHeadProperty.onChange}
               />
             ) : null}
-            {onProportionLockChange && primaryProperties.some((property) => property.id === "height") && primaryProperties.some((property) => ["width", "length", "diameter"].includes(property.id)) ? (
+            {onProportionLockChange && primaryProperties.some((property) => property.id === "height") && primaryProperties.some((property) => ["width", "length", "diameter", "outerDiameter"].includes(property.id)) ? (
               <ToggleProperty
                 label={t("inspector.keepProportions")}
                 value={proportionLock}
@@ -3439,7 +3473,16 @@ export function ShapeInspector({
         </button>
         {positionOpen ? (
           <div className="property-list" id={`position-${shape.id}`}>
-            <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={positionProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            <div className="name-tag-sides position-from" role="radiogroup" aria-label={t("inspector.positionFrom")}>
+              <span>{t("inspector.positionFrom")}</span>
+              {([false, true] as const).map((atEdge) => (
+                <button key={String(atEdge)} type="button" role="radio" aria-checked={positionAtEdge === atEdge} className={positionAtEdge === atEdge ? "active" : ""} onClick={() => setPositionAtEdge(atEdge)}>
+                  {t(atEdge ? "inspector.positionEdge" : "inspector.positionCentre")}
+                </button>
+              ))}
+            </div>
+            {/* A formula is written for the middle; at the edges the fields take plain numbers. */}
+            <ShapePropertyRows formulas={edges ? undefined : shape.formulas} onFormula={edges ? undefined : noteFormula} properties={shownPositionProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             {pivot ? (
               <>
                 <div className="property-subheading">
@@ -5544,11 +5587,49 @@ function RangeProperty({
     const turn = wheelTurn(event);
     if (!input || disabled || !editing || document.activeElement !== input || turn === 0) return;
     event.preventDefault();
+    const starting = wheelAnchorRef.current === null;
+    if (starting) wheelAnchorRef.current = { top: input.getBoundingClientRect().top, until: 0 };
+    wheelAnchorRef.current!.until = performance.now() + WHEEL_ANCHOR_MS;
     stepFieldValue(turn < 0 ? 1 : -1, { shift: event.shiftKey, ctrl: event.ctrlKey, alt: event.altKey });
+    if (starting) holdFieldUnderPointer();
+  };
+  // A hint above the field can come or go with the value the wheel sets - "The body stands tilted" appears as soon as
+  // a rotation leaves 0 - and push the field away from under the pointer, so the next turn of the wheel scrolled the
+  // panel instead (forum, StonXX). While the wheel turns, the panel scrolls along by as much as the field moved.
+  const wheelAnchorRef = useRef<{ top: number; until: number } | null>(null);
+  const keepFieldInPlace = () => {
+    const input = numberInputRef.current;
+    const anchor = wheelAnchorRef.current;
+    if (!input || !anchor) return;
+    const moved = input.getBoundingClientRect().top - anchor.top;
+    if (Math.abs(moved) >= 1) scrollingAncestor(input)?.scrollBy({ top: moved, behavior: "instant" });
+  };
+  const holdFieldUnderPointer = () => {
+    // Where the panel cannot scroll far enough the field still moves: until the wheel rests, its turns stay with the
+    // field wherever the pointer ended up, rather than zooming the view or scrolling the panel.
+    const forward = (event: WheelEvent) => {
+      const input = numberInputRef.current;
+      if (!input || event.target === input || document.activeElement !== input) return;
+      event.stopPropagation();
+      wheelHandlerRef.current?.(event);
+    };
+    window.addEventListener("wheel", forward, { capture: true, passive: false });
+    // The shape changes in the editor, which can paint the hint a frame or two later than this field's own render.
+    const follow = () => {
+      keepFieldInPlace();
+      if (wheelAnchorRef.current && performance.now() < wheelAnchorRef.current.until) {
+        requestAnimationFrame(follow);
+        return;
+      }
+      wheelAnchorRef.current = null;
+      window.removeEventListener("wheel", forward, true);
+    };
+    requestAnimationFrame(follow);
   };
   useLayoutEffect(() => {
     const input = numberInputRef.current;
     if (keepSelectedRef.current && input && document.activeElement === input) selectWholeValue(input);
+    keepFieldInPlace();
   });
   useEffect(() => {
     const input = numberInputRef.current;

@@ -320,6 +320,12 @@ Wer eine gemeinsame Datei öffnet, erhält eine private lokale Arbeitskopie. Bei
 dem Server geprüft; hat jemand anderes die Datei inzwischen geändert, verweigert layerling das Überschreiben und bittet
 darum, neu zu laden oder unter anderem Namen zu speichern. Das ist gemeinsame Dateiablage, kein gleichzeitiges Bearbeiten.
 
+Hinter einem Reverse Proxy mit Anmeldung (etwa Authelia, oauth2-proxy, Cloudflare Access oder HTTP Basic Auth) bekommt
+jeder Benutzer einen eigenen Ordner `.users/<Benutzer>/`, wenn du `LAYERLING_USER_HEADER` auf den Header setzt, den dein
+Proxy mitschickt (z. B. `LAYERLING_USER_HEADER=X-Forwarded-Email`, in Apache `SetEnv LAYERLING_USER_HEADER Remote-User`).
+Das ist nur sicher, wenn layerling ausschließlich über den Proxy erreichbar ist, damit niemand den Header direkt an den
+Server schicken kann. Ohne die Einstellung bleibt alles wie bisher.
+
 #### Ohne Node: der Ordner `store`
 
 Wird layerling als statischer Export ausgeliefert – also als reine Dateien auf einem Webserver –, kann es von sich aus

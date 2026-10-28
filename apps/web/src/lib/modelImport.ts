@@ -198,6 +198,15 @@ export async function importModelFiles(
         }
         shape = colored.shapes[0];
       } else if (isStep) {
+        // Several solids in one file, as an assembly from another CAD program: one body each, under its own name (#830).
+        // Whatever stops that - one solid only, too many, a kernel that cannot read the structure - leaves it as one body.
+        const assembly = await (await import("@/lib/stepAssemblyImport")).importedShapesFromStepAssembly(file.name, buffer).catch(() => null);
+        if (assembly) {
+          result.shapes.push(...assembly.shapes);
+          result.importedFileNames.push(file.name);
+          result.notes.push(t("status.importStepParts", { name: file.name, count: assembly.shapes.length }));
+          continue;
+        }
         const { importedShapeFromStep } = await import("@/lib/stepImport");
         shape = await importedShapeFromStep(file.name, buffer);
       } else if (isSvg) {

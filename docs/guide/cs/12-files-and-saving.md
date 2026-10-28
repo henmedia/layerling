@@ -16,7 +16,7 @@ Nevýhodou je ztráta projektů při vymazání úložiště prohlížeče nebo 
 Při desítkách projektů jeden seznam nestačí. Na úvodní stránce vytvoří {{ui:shared.newFolder}} složku pro projekty tohoto prohlížeče; kliknutím na složku ji otevřete. Složky mohou obsahovat další složky.
 
 - **Do složky:** přetáhněte projekt na složku nebo v nabídce projektu zvolte {{ui:shared.moveTo}}, kde jsou všechny složky. Nový projekt i soubor, který otevřete nebo importujete, se uloží do právě otevřené složky.
-- **Zase ven:** první dlaždice ve složce, `..`, a řádek pod {{ui:dashboard.projects}} vedou zpět; i na ně lze projekt přetáhnout. Složka přetažená na jinou složku se do ní vloží.
+- **Zase ven:** první dlaždice ve složce, `..`, a řádek pod záložkami vedou zpět; i na ně lze projekt přetáhnout. Složka přetažená na jinou složku se do ní vloží.
 - **Přejmenovat a smazat** najdete v nabídce složky. Smazáním složky se nesmaže žádný projekt: její obsah se posune o úroveň výš.
 - **Vyhledávání** prochází všechny složky; nalezený projekt ukazuje svou složku a kliknutím na ni ji otevřete.
 
@@ -24,7 +24,7 @@ Při desítkách projektů jeden seznam nestačí. Na úvodní stránce vytvoř�
 
 ## Zálohování a předávání
 
-Každý projekt na úvodní stránce má nabídku přejmenování, duplikování a smazání. {{ui:dashboard.backupAll}} zabalí všechny projekty do jediného souboru. Přes {{ui:dashboard.importGeometry}} je obnovíte i v jiném prohlížeči nebo počítači. Součástí zálohy jsou také {{ui:myShapes.title}} z tohoto prohlížeče ve složce `Custom shapes`, viz [Tvary](chapter:shapes). Pokud obnovíte zálohu v prohlížeči, který některé z těchto projektů už má, nepřidají se znovu; zpráva uvede, kolik jich tu už bylo.
+Každý projekt na úvodní stránce má nabídku přejmenování, duplikování a smazání. Řada tlačítek vedle záložek je na každé záložce stejná. {{ui:dashboard.backupAll}} zabalí všechny projekty otevřené záložky do jediného souboru ZIP. {{ui:dashboard.restoreBackup}} hned vedle (je tam i na novém počítači bez projektů) je obnoví i v jiném prohlížeči nebo počítači; stejný soubor přijme i {{ui:dashboard.importGeometry}}. Součástí zálohy jsou také {{ui:myShapes.title}} z tohoto prohlížeče ve složce `Custom shapes`, viz [Tvary](chapter:shapes). Pokud obnovíte zálohu v prohlížeči, který některé z těchto projektů už má, nepřidají se znovu; zpráva uvede, kolik jich tu už bylo. Nad projekty tohoto prohlížeče krátký řádek připomíná, že nejsou uložené nikde jinde.
 
 Jeden projekt uložíte v editoru přes {{ui:editor.export}}, formát **LYL** a {{ui:export.saveProject}}. LYL je vlastní formát Layerlingu a obsahuje tvary, sloučení, náčrty, CAD data, importované podklady i historii kroků zpět. V {{ui:export.historyTitle}} určíte počet přenášených posledních kroků. Výchozí odpovídá nastavení {{ui:workspace.history}}. Krajní volba {{ui:export.historyNone}} uloží jen současný stav, například pro sdílení bez historie. Export vytvoří kopii pod názvem {{ui:export.fileName}}; historie v prohlížeči zůstává zachovaná. Starší `.skf` lze stále otevřít, ale další uložení používá `.lyl`.
 
@@ -112,7 +112,7 @@ Při chybě, která aplikaci zastaví, se místo prázdné stránky objeví chyb
 
 ## Sdílené projekty na serveru
 
-Vlastní instalace může nabídnout společnou složku pro všechny uživatele. Na úvodní stránce se zobrazí jako {{ui:dashboard.sharedProjects}}. Lze vytvářet podsložky, přesouvat projekty přetažením a prohledávat celou složku. Projekt se průběžně ukládá zpět na server. Místní projekt přesunete přetažením jeho karty na dlaždici serveru nebo přes {{ui:dashboard.sendToServer}}. Otevřená záloha se nejprve obnoví do prohlížeče; odtud ji přesuňte na server. Název projektu odpovídá názvu souboru, takže přejmenování karty či názvu v editoru přejmenuje i serverový soubor. Smazání projektu nebo složky je trvalé a odstraní i pracovní kopii v prohlížeči. Serverové vlastní tvary jsou ve složce `Custom shapes`, viz [Tvary](chapter:shapes).
+Vlastní instalace může nabídnout společnou složku pro všechny uživatele. Úvodní stránka pak ukazuje projekty na dvou záložkách, {{ui:shared.trailRoot}} pro společnou složku a jedné pro tento prohlížeč, každou s počtem projektů; záložka s více projekty je první a otevřená. Lze vytvářet podsložky, přesouvat projekty přetažením a prohledávat celou složku. Projekt se průběžně ukládá zpět na server. Místní projekt přesunete přetažením jeho karty na záložku {{ui:shared.trailRoot}} nebo přes {{ui:dashboard.sendToServer}}. Když je otevřená záložka {{ui:shared.trailRoot}}, {{ui:dashboard.createDesign}} a {{ui:dashboard.restoreBackup}} ukládají projekt do otevřené složky na serveru a {{ui:dashboard.backupAll}} zabalí všechny projekty serveru i s jejich složkami a vlastními tvary do jednoho souboru ZIP. Název projektu odpovídá názvu souboru, takže přejmenování karty či názvu v editoru přejmenuje i serverový soubor. Smazání projektu nebo složky je trvalé a odstraní i pracovní kopii v prohlížeči. Serverové vlastní tvary jsou ve složce `Custom shapes`, viz [Tvary](chapter:shapes).
 
 {{ui:dashboard.sendAllToServer}} přesune všechny místní projekty najednou. Zapnutí {{ui:dashboard.newOnServer}} vytváří nové projekty rovnou na serveru a ukládá je tam od první změny. Volbu si pamatuje tento prohlížeč. Projekt, který nelze přesunout, například kvůli shodnému názvu, zůstane v prohlížeči a hlášení uvede počet neúspěchů.
 

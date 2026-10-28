@@ -295,6 +295,8 @@ With `LL_BIND=127.0.0.1`, layerling is reachable from this computer only. If oth
 
    A proxy must pass on `Host` and `X-Forwarded-Proto` (Caddy does by default). If it rewrites the host, enter the address in `LAYERLING_ALLOWED_ORIGINS`.
 
+   To give each user a server folder of their own, have the proxy pass the signed-in name as a header (Caddy: `reverse_proxy 127.0.0.1:3000 { header_up X-Remote-User {http.auth.user.id} }`) and set `LAYERLING_USER_HEADER: "X-Remote-User"` in `compose.yml`. The designs then live under `.users/<user>/`. Only safe when layerling can be reached through the proxy alone (`LL_BIND` stays `127.0.0.1`).
+
 `LL_BIND=0.0.0.0` without one of these two exposes all designs to the whole network. Never make layerling reachable directly from the internet.
 
 ## 12. Troubleshooting
