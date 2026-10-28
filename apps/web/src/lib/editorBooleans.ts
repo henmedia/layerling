@@ -959,7 +959,7 @@ function positionsInteriorTriangleCount(positions: number[], cutters: WorkplaneS
   return count;
 }
 
-function meshPositionsToGroupShape(selection: WorkplaneShape[], solids: WorkplaneShape[], positions: number[], idPrefix: string, groupChildren?: WorkplaneShape[]): WorkplaneShape | null {
+function meshPositionsToGroupShape(selection: WorkplaneShape[], solids: WorkplaneShape[], positions: number[], idPrefix: string, groupChildren?: WorkplaneShape[], partOfTriangle?: number[]): WorkplaneShape | null {
   if (positions.length < 9) {
     return null;
   }
@@ -1021,6 +1021,7 @@ function meshPositionsToGroupShape(selection: WorkplaneShape[], solids: Workplan
       baseHeight: rawHeight,
       triangleCount: Math.floor(normalizedPositions.length / 9),
       sourceFormat: "json",
+      ...(partOfTriangle && partOfTriangle.length === Math.floor(normalizedPositions.length / 9) ? { partOfTriangle } : {}),
     },
     groupedBaseWidth: width,
     groupedBaseDepth: depth,
@@ -1601,9 +1602,225 @@ async function manifoldBooleanMeshShape(selection: WorkplaneShape[], triangleLim
   }
 }
 
-async function manifoldUnionMeshShape(selection: WorkplaneShape[], triangleLimit: number, groupChildren?: WorkplaneShape[]): Promise<WorkplaneShape | null> {
+/**
+ * Union the original parts directly and retain their original IDs for per-triangle colour ownership.
+ * Avoid subtracting earlier parts from later parts just to establish ownership: those extra boolean
+ * operations split curved faces unnecessarily and can create very thin triangles at round intersections.
+ */
+function shapesToOwnedManifoldUnion(runtime: ManifoldToplevel, shapes: WorkplaneShape[], created: ManifoldSolid[]) {
+  const parts: ManifoldSolid[] = [];
+  const partIds: number[] = [];
+  for (const shape of shapes) {
+    const raw = shapeToManifoldSolid(runtime, shape, created, true);
+    if (!raw || raw.status() !== "NoError" || raw.numTri() < 1) return null;
+    // Preserve each source's identity so Manifold can report the source ID for output triangle runs.
+    const part = raw.asOriginal();
+    created.push(raw, part);
+    parts.push(part);
+    partIds.push(part.originalID());
+  }
+  const union = parts.length === 1 ? parts[0] : runtime.Manifold.union(parts);
+  created.push(union);
+  if (union.status() !== "NoError" || union.numTri() < 1) return null;
+  return { solid: union, partIds, parts };
+}
+
+/** For every triangle of a kernel mesh the index of the part it came from, or -1 where that is not known. */
+function triangleOwners(mesh: InstanceType<ManifoldToplevel["Mesh"]>, partIds: number[]): number[] | null {
+  const runIndex = mesh.runIndex;
+  const runIds = mesh.runOriginalID;
+  if (!runIndex?.length || !runIds?.length) return null;
+  const triangleCount = Math.floor(mesh.triVerts.length / 3);
+  const owners = new Array<number>(triangleCount).fill(-1);
+  const lookup = new Map(partIds.map((id, index) => [id, index]));
+  for (let run = 0; run < runIds.length; run += 1) {
+    const from = Math.floor(runIndex[run] / 3);
+    const to = run + 1 < runIndex.length ? Math.floor(runIndex[run + 1] / 3) : triangleCount;
+    const owner = lookup.get(runIds[run]) ?? -1;
+    for (let triangle = from; triangle < to && triangle < triangleCount; triangle += 1) owners[triangle] = owner;
+  }
+  return owners.some((owner) => owner >= 0) ? owners : null;
+}
+
+/** How thin (mm) a triangle of a merged group may be before the kernel folds it away: well above the viewer's 1/10,000 mm, far below anything printable. */
+const MERGE_SLIVER_TOLERANCE = 5e-4;
+
+/** The viewer's edge lines treat corners that round to the same 1/10,000 mm as one corner. */
+const SURFACE_WELD = 1e4;
+
+/**
+ * How clean a merged surface is where the viewer draws it. The edge lines draw every edge that is not shared by exactly
+ * two triangles (`openEdges`, a stray stroke each) and every edge where its two faces meet at a crease (the viewer's
+ * smallest angle is 14 degrees); `creaseLength` is the length of those, so a line drawn in two pieces counts as it
+ * does in one. `volume` is the signed volume, to see that two builds are the same body.
+ * Thin triangles on a flat face are never drawn, so they do not count.
+ */
+function surfaceQuality(positions: ArrayLike<number>) {
+  const triangleCount = Math.floor(positions.length / 9);
+  const ids = new Map<string, number>();
+  const cornerId = (offset: number) => {
+    const key = `${Math.round(positions[offset] * SURFACE_WELD)},${Math.round(positions[offset + 1] * SURFACE_WELD)},${Math.round(positions[offset + 2] * SURFACE_WELD)}`;
+    let id = ids.get(key);
+    if (id === undefined) {
+      id = ids.size;
+      ids.set(key, id);
+    }
+    return id;
+  };
+  const creaseDot = Math.cos((14 * Math.PI) / 180);
+  const edges = new Map<number, { count: number; nx: number; ny: number; nz: number; crease: boolean; length: number }>();
+  const addEdge = (from: number, to: number, length: number, nx: number, ny: number, nz: number) => {
+    const key = Math.min(from, to) * 67108864 + Math.max(from, to);
+    const edge = edges.get(key);
+    if (!edge) {
+      edges.set(key, { count: 1, nx, ny, nz, crease: false, length });
+      return;
+    }
+    edge.count += 1;
+    if (edge.count === 2) edge.crease = edge.nx * nx + edge.ny * ny + edge.nz * nz < creaseDot;
+  };
+  let volume = 0;
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+    const o = triangle * 9;
+    const [ax, ay, az] = [positions[o], positions[o + 1], positions[o + 2]];
+    const [bx, by, bz] = [positions[o + 3], positions[o + 4], positions[o + 5]];
+    const [cx, cy, cz] = [positions[o + 6], positions[o + 7], positions[o + 8]];
+    volume += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+    const a = cornerId(o);
+    const b = cornerId(o + 3);
+    const c = cornerId(o + 6);
+    if (a === b || b === c || c === a) continue;
+    const nx = (by - ay) * (cz - az) - (bz - az) * (cy - ay);
+    const ny = (bz - az) * (cx - ax) - (bx - ax) * (cz - az);
+    const nz = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+    const length = Math.hypot(nx, ny, nz) || 1;
+    addEdge(a, b, Math.hypot(bx - ax, by - ay, bz - az), nx / length, ny / length, nz / length);
+    addEdge(b, c, Math.hypot(cx - bx, cy - by, cz - bz), nx / length, ny / length, nz / length);
+    addEdge(c, a, Math.hypot(ax - cx, ay - cy, az - cz), nx / length, ny / length, nz / length);
+  }
+  let openEdges = 0;
+  let creaseLength = 0;
+  edges.forEach((edge) => {
+    if (edge.count !== 2) openEdges += 1;
+    else if (edge.crease) creaseLength += edge.length;
+  });
+  return { openEdges, creaseLength, volume };
+}
+
+type FlatTriangle = { part: number; min: number[]; max: number[]; n: number[]; d: number };
+
+function flatTriangleOf(positions: ArrayLike<number>, offset: number, part: number): FlatTriangle | null {
+  const p = (corner: number, axis: number) => positions[offset + corner * 3 + axis];
+  const ux = p(1, 0) - p(0, 0), uy = p(1, 1) - p(0, 1), uz = p(1, 2) - p(0, 2);
+  const vx = p(2, 0) - p(0, 0), vy = p(2, 1) - p(0, 1), vz = p(2, 2) - p(0, 2);
+  const cx = uy * vz - uz * vy, cy = uz * vx - ux * vz, cz = ux * vy - uy * vx;
+  const length = Math.hypot(cx, cy, cz);
+  if (length < 1e-12) return null;
+  const n = [cx / length, cy / length, cz / length];
+  const axes = [0, 1, 2];
+  return {
+    part,
+    n,
+    d: n[0] * p(0, 0) + n[1] * p(0, 1) + n[2] * p(0, 2),
+    min: axes.map((axis) => Math.min(p(0, axis), p(1, axis), p(2, axis))),
+    max: axes.map((axis) => Math.max(p(0, axis), p(1, axis), p(2, axis))),
+  };
+}
+
+const FLAT_FACE_PLANE_TOLERANCE = 1e-3;
+const FLAT_FACE_NORMAL_DOT = 0.9999;
+const FLAT_FACE_PAIR_LIMIT = 4_000_000;
+/** Normals are sorted into cells of 1/20; two normals within 0.8 degrees differ by under a third of a cell. */
+const FLAT_FACE_NORMAL_CELLS = 20;
+
+/** The cells (normal cell and plane slice) a flat triangle's plane can share with another flat triangle's plane. */
+function flatFaceCells(flat: FlatTriangle): string[] {
+  const along = flat.n.map((component) => {
+    const scaled = component * FLAT_FACE_NORMAL_CELLS;
+    const cell = Math.round(scaled);
+    const offsets = [cell];
+    if (scaled - cell > 0.2) offsets.push(cell + 1);
+    else if (cell - scaled > 0.2) offsets.push(cell - 1);
+    return offsets;
+  });
+  const slice = Math.round(flat.d / (2 * FLAT_FACE_PLANE_TOLERANCE));
+  const cells: string[] = [];
+  for (const x of along[0]) for (const y of along[1]) for (const z of along[2]) for (let step = -1; step <= 1; step += 1) cells.push(`${x},${y},${z}|${slice + step}`);
+  return cells;
+}
+
+/**
+ * Whether a piece of the merged surface lies on a flat face of a part picked before the part it is credited to:
+ * the kernel keeps one copy of a face two parts share (a box and a cylinder of one height have the same top)
+ * and may credit either part, so the part picked first does not show where it should.
+ * Generous on purpose: a false alarm only costs the attempt, which is checked before it is used.
+ */
+function hasSharedFlatFace(output: ArrayLike<number>, owners: ArrayLike<number>, partPositions: ArrayLike<number>[]): boolean {
+  const planes = new Map<string, FlatTriangle[]>();
+  partPositions.forEach((positions, part) => {
+    for (let offset = 0; offset + 8 < positions.length; offset += 9) {
+      const flat = flatTriangleOf(positions, offset, part);
+      if (!flat) continue;
+      const key = `${Math.round(flat.n[0] * FLAT_FACE_NORMAL_CELLS)},${Math.round(flat.n[1] * FLAT_FACE_NORMAL_CELLS)},${Math.round(flat.n[2] * FLAT_FACE_NORMAL_CELLS)}|${Math.round(flat.d / (2 * FLAT_FACE_PLANE_TOLERANCE))}`;
+      const list = planes.get(key);
+      if (list) list.push(flat); else planes.set(key, [flat]);
+    }
+  });
+  let pairs = 0;
+  for (let triangle = 0; triangle < owners.length; triangle += 1) {
+    const owner = owners[triangle];
+    if (owner < 1) continue;
+    const flat = flatTriangleOf(output, triangle * 9, owner);
+    if (!flat) continue;
+    for (const cell of flatFaceCells(flat)) {
+      for (const other of planes.get(cell) ?? []) {
+        if (other.part >= owner) continue;
+        pairs += 1;
+        if (pairs > FLAT_FACE_PAIR_LIMIT) return false;
+        if (other.n[0] * flat.n[0] + other.n[1] * flat.n[1] + other.n[2] * flat.n[2] < FLAT_FACE_NORMAL_DOT) continue;
+        if (Math.abs(other.d - flat.d) > FLAT_FACE_PLANE_TOLERANCE) continue;
+        // The two triangles cover some common area: their boxes overlap along at least the two directions of the plane.
+        let along = 0;
+        let touching = true;
+        for (let axis = 0; axis < 3; axis += 1) {
+          const overlap = Math.min(other.max[axis], flat.max[axis]) - Math.max(other.min[axis], flat.min[axis]);
+          if (overlap < -FLAT_FACE_PLANE_TOLERANCE) touching = false;
+          else if (overlap > 1e-6) along += 1;
+        }
+        if (touching && along >= 2) return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * The union of the parts, each one cut down to what the parts before it do not cover (as in Tinkercad, where the
+ * part picked first is the one that shows where parts overlap). A face two parts share then ends where the part
+ * picked first ends, so its colour follows the outline of that part and not the triangles of the merge.
+ */
+function shapesToSplitManifoldUnion(runtime: ManifoldToplevel, parts: ManifoldSolid[], created: ManifoldSolid[]) {
+  const pieces = parts.map((part, index) => {
+    if (index === 0) return part;
+    const earlier = index === 1 ? parts[0] : runtime.Manifold.union(parts.slice(0, index));
+    if (index > 1) created.push(earlier);
+    const piece = part.subtract(earlier);
+    created.push(piece);
+    return piece;
+  });
+  const union = pieces.length === 1 ? pieces[0] : runtime.Manifold.union(pieces);
+  created.push(union);
+  return union.status() === "NoError" && union.numTri() > 0 ? union : null;
+}
+
+async function manifoldUnionMeshShape(
+  selection: WorkplaneShape[],
+  triangleLimit: number,
+  groupChildren?: WorkplaneShape[],
+  options: { requireImported?: boolean } = {},
+): Promise<WorkplaneShape | null> {
   const solids = selection.filter((shape) => !shape.hole && !shape.locked);
-  if (solids.length < 2 || !selection.some((shape) => Boolean(shape.importedMesh))) {
+  if (solids.length < 2 || (options.requireImported !== false && !selection.some((shape) => Boolean(shape.importedMesh)))) {
     return null;
   }
 
@@ -1616,7 +1833,11 @@ async function manifoldUnionMeshShape(selection: WorkplaneShape[], triangleLimit
   let result: ManifoldSolid | null = null;
   try {
     const runtime = await getManifoldRuntime();
-    result = shapesToManifoldUnion(runtime, solids, created, true);
+    // A plain group also remembers which part each piece of its surface belongs to, so its colours
+    // follow the parts exactly. Only when the parts of the group are the solids that were merged, in the same order.
+    const sameParts = options.requireImported === false && Boolean(groupChildren) && groupChildren?.length === solids.length && solids.every((solid, index) => groupChildren?.[index]?.id === solid.id);
+    const owned = sameParts ? shapesToOwnedManifoldUnion(runtime, solids, created) : null;
+    result = owned?.solid ?? shapesToManifoldUnion(runtime, solids, created, true);
     if (!result) {
       return null;
     }
@@ -1624,9 +1845,47 @@ async function manifoldUnionMeshShape(selection: WorkplaneShape[], triangleLimit
       return null;
     }
 
+    // Where round parts cross, the merge leaves triangles thinner than the viewer can tell apart (a corner is one
+    // when it rounds to the same 1/10,000 mm). Every such sliver breaks the pairing of its neighbours there, and the
+    // edge lines drew the unpaired edges as stray strokes across a see-through group. The kernel folds them away,
+    // keeping the body closed and which part every triangle belongs to.
+    if (options.requireImported === false) {
+      const tidy = result.setTolerance(MERGE_SLIVER_TOLERANCE);
+      created.push(tidy);
+      if (tidy.status() === "NoError" && tidy.numTri() > 0) result = tidy;
+    }
     const outputMesh = result.getMesh();
-    const positions = manifoldMeshToPositions(outputMesh);
-    const group = meshPositionsToGroupShape(selection, solids, positions, "grouped-manifold-union", groupChildren);
+    let positions = manifoldMeshToPositions(outputMesh);
+    let owners = owned ? triangleOwners(outputMesh, owned.partIds) : null;
+    // Where a later part lies on a flat face of an earlier one, the kernel keeps one copy of that face and credits
+    // either part. The part picked first should show there, with its own outline (a cylinder picked before a cube
+    // keeps its round top), so the parts are merged again, each cut down to what the ones before it do not cover.
+    // That is only used when the viewer would draw it as cleanly as the plain merge: the same body, no edge left
+    // unpaired and no more crease lines than before. Where round parts cross it is not (it leaves stray strokes
+    // there), and the plain merge stays, as before.
+    if (owned && owners && owned.parts.length > 1) {
+      const partPositions = owned.parts.map((part) => manifoldMeshToPositions(part.getMesh()));
+      if (hasSharedFlatFace(positions, owners, partPositions)) {
+        const split = shapesToSplitManifoldUnion(runtime, owned.parts, created);
+        const tidy = split ? split.setTolerance(MERGE_SLIVER_TOLERANCE) : null;
+        if (tidy) created.push(tidy);
+        const splitSolid = tidy && tidy.status() === "NoError" && tidy.numTri() > 0 ? tidy : split;
+        if (splitSolid) {
+          const splitMesh = splitSolid.getMesh();
+          const splitPositions = manifoldMeshToPositions(splitMesh);
+          const splitOwners = triangleOwners(splitMesh, owned.partIds);
+          const before = surfaceQuality(positions);
+          const after = surfaceQuality(splitPositions);
+          const sameBody = Math.abs(after.volume - before.volume) <= Math.max(1e-6, Math.abs(before.volume) * 1e-4);
+          const asClean = after.openEdges <= before.openEdges && after.creaseLength <= before.creaseLength * 1.001 + 1e-3;
+          if (splitOwners && sameBody && asClean) {
+            positions = splitPositions;
+            owners = splitOwners;
+          }
+        }
+      }
+    }
+    const group = meshPositionsToGroupShape(selection, solids, positions, "grouped-manifold-union", groupChildren, owners ?? undefined);
     return isUsableBooleanGroup(group, mergedSourceMesh.faces.length, false) ? group : null;
   } catch {
     return null;
@@ -2491,6 +2750,17 @@ function withMulticolorGroupsOpened(selection: WorkplaneShape[]): WorkplaneShape
   });
 }
 
+/**
+ * What a group merged into one mesh keeps of its parts: the see-through look when every solid in it
+ * was see-through. Its colour is the colour of the part picked first, and Multicolor is off until it is
+ * switched on, as in Tinkercad; the group then shows each part in its own colour.
+ */
+function mergedGroupLook(group: WorkplaneShape | null, parts: WorkplaneShape[]): WorkplaneShape | null {
+  if (!group) return null;
+  const solids = parts.filter((shape) => !shape.hole && !shape.locked);
+  return solids.length > 0 && solids.every((shape) => shape.transparent) ? { ...group, transparent: true } : group;
+}
+
 export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[], triangleLimit: number): Promise<GroupBuildResult> {
   takeHoleFillTally();
   // What the group carries as its parts; the cut itself is made from what was selected.
@@ -2512,6 +2782,15 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
   const manifoldImportedMerge = hasImportedMesh && hasSolid && !hasHole ? await manifoldUnionMeshShape(booleanSelection, triangleLimit, groupable) : null;
   const exactImportedGroup = hasImportedMesh && hasSolid && hasHole ? manifoldCutGroup ?? importedBooleanMeshShape(booleanSelection, groupable) : null;
   const bakedImportedMerge = hasImportedMesh && !(hasSolid && hasHole) ? manifoldImportedMerge ?? mergedMeshShape(booleanSelection, groupable) : null;
+  // Plain solids that are only grouped (no hole, no imported mesh) merge into one solid body, as a group
+  // does in Tinkercad: the lines and faces where the parts overlap are gone and only the outer surface is
+  // left, the same look a group gets once it is chamfered or filleted. The group takes the colour of the
+  // part picked first; with Multicolor on, each part shows its own colour on the merged surface, the part
+  // picked first winning where parts overlap. Above the triangle limit the parts stay separate bodies as
+  // before. A bundle never comes through here.
+  const manifoldPlainMerge = !hasImportedMesh && !hasHole && hasSolid
+    ? mergedGroupLook(await manifoldUnionMeshShape(booleanSelection, triangleLimit, groupable, { requireImported: false }), groupable)
+    : null;
   const group = hasSolid && hasHole
     ? cleanBoxGroup ??
       exactImportedGroup ??
@@ -2520,7 +2799,7 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
         : manifoldCutGroup ?? booleanMeshShape(booleanSelection, groupable))
     : hasImportedMesh
       ? bakedImportedMerge ?? groupedShape(groupable)
-      : groupedShape(groupable);
+      : manifoldPlainMerge ?? groupedShape(groupable);
   const consumed = !group && hasSolid && hasHole && cutFullyConsumesSolids(booleanSelection);
   // The cut was made, but the fallback left its face open: say so when the cause is gaps in the surface (#346).
   const openGapEdges = group && hasImportedMesh && hasSolid && hasHole && OPEN_CUT_ID.test(group.id)

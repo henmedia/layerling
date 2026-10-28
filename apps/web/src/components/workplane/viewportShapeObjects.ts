@@ -803,7 +803,9 @@ export function syncShapeObjectAppearance(object: THREE.Group, shape: WorkplaneS
   const surface = object.children.find((child): child is THREE.Mesh => child instanceof THREE.Mesh && Boolean(child.userData.shapeSurface));
   if (!surface) return;
   if (updateSurfaceMaterial) {
-    const material = sharedShapeMaterial(shape);
+    // A group merged into one mesh shows its parts' colours through the colours of its vertices: the
+    // material has to keep reading them, or the whole group turns into one colour on the next sync.
+    const material = sharedShapeMaterial(shape, Boolean(surface.geometry.getAttribute("color")) && !shape.hole);
     const nextMaterial = shape.kind === "box" && shape.imagePlate && !shape.hole
       ? createImagePlateMaterials(shape, material, onTextureReady)
       : material;
@@ -2300,10 +2302,9 @@ export function buildPartColoredMeshGeometry(
 ): THREE.BufferGeometry | null {
   // The parts in the frame of the mesh: both are stored around the group's
   // centre, standing on its lowest point.
-  const solids: Array<{ probe: THREE.Mesh; box: THREE.Box3; color: THREE.Color }> = [];
-  parts
-    .filter((part) => !part.hole && !part.hidden)
-    .forEach((part) => {
+  const solids: Array<{ probe: THREE.Mesh; box: THREE.Box3; color: THREE.Color; part: number }> = [];
+  parts.forEach((part, partIndex) => {
+      if (part.hole || part.hidden) return;
       const object = createShapeObject(part, false, undefined, false);
       object.updateMatrixWorld(true);
       object.traverse((node) => {
@@ -2318,7 +2319,7 @@ export function buildPartColoredMeshGeometry(
         const probe = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
         probe.raycast = acceleratedRaycast;
         const color = material instanceof THREE.MeshStandardMaterial ? material.color.clone() : new THREE.Color(part.color);
-        solids.push({ probe, box: geometry.boundingBox ?? new THREE.Box3(), color });
+        solids.push({ probe, box: geometry.boundingBox ?? new THREE.Box3(), color, part: partIndex });
       });
       disposeObject(object);
     });
@@ -2360,6 +2361,9 @@ export function buildPartColoredMeshGeometry(
     }
     return best;
   };
+  const ownerOfTriangle = mesh.partOfTriangle && mesh.partOfTriangle.length === triangleCount && mesh.triangleCount === triangleCount ? mesh.partOfTriangle : null;
+  const solidOfPart = new Map<number, (typeof solids)[number]>();
+  solids.forEach((solid) => { if (!solidOfPart.has(solid.part)) solidOfPart.set(solid.part, solid); });
   for (let triangle = 0; triangle < triangleCount; triangle += 1) {
     const offset = triangle * 3;
     a.fromBufferAttribute(positions, offset);
@@ -2370,7 +2374,10 @@ export function buildPartColoredMeshGeometry(
     probePoint.addVectors(a, b).add(c).multiplyScalar(1 / 3);
     probePoint.y += offsetY;
     probePoint.addScaledVector(normal, -inset);
-    const solid = insideOf(probePoint) ?? nearestTo(probePoint);
+    // The part the merge itself recorded for this triangle, when the mesh carries it: exact also where
+    // two parts share a flat face. Otherwise the part is looked up behind the face.
+    const recorded = ownerOfTriangle ? ownerOfTriangle[triangle] : -1;
+    const solid = (recorded >= 0 ? solidOfPart.get(recorded) : undefined) ?? insideOf(probePoint) ?? nearestTo(probePoint);
     for (let corner = 0; corner < 3; corner += 1) {
       colors[(offset + corner) * 3] = solid.color.r;
       colors[(offset + corner) * 3 + 1] = solid.color.g;

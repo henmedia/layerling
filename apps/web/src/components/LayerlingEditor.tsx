@@ -3440,6 +3440,11 @@ export function LayerlingEditor({
   }, [initialSnap]);
 
   const selectedShapes = useMemo(() => shapes.filter((shape) => selectedIds.includes(shape.id)), [selectedIds, shapes]);
+  // The selection in the order it was clicked: the part picked first is the one whose colour a group shows where parts overlap.
+  const selectedShapesInClickOrder = useMemo(
+    () => selectedIds.map((id) => selectedShapes.find((shape) => shape.id === id)).filter((shape): shape is WorkplaneShape => Boolean(shape)),
+    [selectedIds, selectedShapes],
+  );
   const selectedShape = selectedShapes.at(-1) ?? null;
   const hasSelection = selectedShapes.length > 0;
 
@@ -3696,7 +3701,13 @@ export function LayerlingEditor({
         : faceToolPreview?.shape
         ? [...shapes, faceToolPreview.shape]
         : edgeModifier?.preview && cadModifierBaseShapeRef.current
-        ? shapes.map((shape) => shape.id === cadModifierBaseShapeRef.current?.id ? edgeModifier.preview as WorkplaneShape : shape)
+        // The preview is one body in the group's colour, as the treated group is (a chamfer or fillet turns a group into one colour):
+        // the parts' colours are not worked out for it, which showed as stray triangles of the other colours while edges were picked.
+        ? shapes.map((shape) => {
+          if (shape.id !== cadModifierBaseShapeRef.current?.id) return shape;
+          const preview = edgeModifier.preview as WorkplaneShape;
+          return preview.groupedShapes?.length ? { ...preview, multicolor: false } : preview;
+        })
         : alignMode && alignPreview
         ? alignedShapesForSelection(shapes, selectedIds, selectedShapes, effectiveAlignAnchorId, alignPreview.axis, alignPreview.target, alignAxes).nextShapes
         : mirrorMode && mirrorPreviewAxis
@@ -8513,7 +8524,7 @@ export function LayerlingEditor({
 
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
     const sourceProjectId = projectInfoRef.current.projectId;
-    const result = await buildGroupedShapeOffThread(selectedShapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+    const result = await buildGroupedShapeOffThread(selectedShapesInClickOrder, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
     if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
       setNotice(t("status.groupChanged"));
       return;
@@ -8535,7 +8546,7 @@ export function LayerlingEditor({
       editableGroup.id,
       result.openGapEdges ? t("status.cutLeftOpen", { count: result.openGapEdges }) : result.mergeWarning ?? withClosedHolesNote(t("status.groupedMany", { count: selectedShapes.length }), result.closedHoles),
     );
-  }, [refuseLockedSelection, commitShapes, selectedIds, selectedShapes]);
+  }, [refuseLockedSelection, commitShapes, selectedIds, selectedShapes, selectedShapesInClickOrder]);
 
   /** the usual bundle (Ctrl+B): the parts move, turn and scale together and stay what they are. */
   const bundleSelected = useCallback(() => {
@@ -10324,8 +10335,10 @@ export function LayerlingEditor({
       }
 
       if (command.action === "group_objects") {
-        const ids = new Set(mcpStringArray(params.ids));
-        const groupable = currentShapes().filter((shape) => ids.has(shape.id));
+        const idList = mcpStringArray(params.ids);
+        const ids = new Set(idList);
+        // In the order the ids were given: the first one is the part whose colour a group shows where parts overlap.
+        const groupable = idList.map((id) => currentShapes().find((shape) => shape.id === id)).filter((shape, index, all): shape is WorkplaneShape => Boolean(shape) && all.indexOf(shape) === index);
         if (groupable.length < 2) throw new Error("Select at least two objects to group");
         if (groupable.some((shape) => shape.locked)) throw new Error("Unlock every selected object before grouping");
         if (groupable.some((shape) => isNonSolidShape(shape))) throw new Error("A ruler isn't a solid and can't be grouped");

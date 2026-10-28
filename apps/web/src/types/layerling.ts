@@ -1116,6 +1116,9 @@ export type WorkplaneShape = {
     // Only on the sketch's own copy of a body on a workplane set on a face: how many triangles of `positions` belong to
     // each visible part in turn (one count for a single body); the sketch shows each part as seen from the plane (#778). Never saved.
     partTriangleCounts?: number[];
+    // Only on a group merged into one body: for every triangle the index of the part (in the group's own parts)
+    // whose surface it is, so Multicolor can colour the merged body exactly by part. Absent once the mesh is rebuilt.
+    partOfTriangle?: number[];
     sourceFormat: "stl" | "obj" | "svg" | "json" | "step" | "3mf";
     // IndexedDB persistence uses this only in compact stored shape records.
     // Runtime editor shapes are hydrated with the full immutable mesh resource.

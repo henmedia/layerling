@@ -2,7 +2,7 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type ReactElement } from "react";
-import { ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, ListTree, Lock, Pencil, Search, Unlock, X } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, Group as GroupIcon, Layers, ListTree, Lock, Pencil, Search, Unlock, X } from "lucide-react";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { t, type MessageKey } from "@/lib/i18n";
@@ -105,7 +105,9 @@ export function ObjectListPanel({
 
   const getShapeKindSubtitle = (shape: WorkplaneShape): string => {
     if (shape.groupedShapes?.length) {
-      return t("outliner.children", { count: shape.groupedShapes.length });
+      // Says which it is even after a rename: a group is merged into one body, a bundle keeps its parts apart.
+      const kindName = t(shape.groupOperation === "bundle" ? "shape.bundle" : "shape.group");
+      return `${kindName} · ${t("outliner.children", { count: shape.groupedShapes.length })}`;
     }
     const key = `shape.${shape.kind}` as MessageKey;
     const translated = t(key);
@@ -312,6 +314,11 @@ export function ObjectListPanel({
                         ) : (
                           <div className="outliner-label-group" onDoubleClick={(e) => startRename(shape, e)}>
                             <span className="outliner-shape-name" title={displayName}>
+                              {isGroup ? (
+                                shape.groupOperation === "bundle"
+                                  ? <Layers size={12} style={{ display: "inline-block", verticalAlign: "-1px", marginRight: 5, opacity: 0.7 }} aria-hidden="true" />
+                                  : <GroupIcon size={12} style={{ display: "inline-block", verticalAlign: "-1px", marginRight: 5, opacity: 0.7 }} aria-hidden="true" />
+                              ) : null}
                               {displayName}
                             </span>
                             <span className="outliner-shape-kind">{subtitle}</span>
@@ -330,8 +337,8 @@ export function ObjectListPanel({
                           <button
                             type="button"
                             className="outliner-action-btn open-group-btn"
-                            title={t("group.edit")}
-                            aria-label={t("group.edit")}
+                            title={t(shape.groupOperation === "bundle" ? "group.editBundle" : "group.edit")}
+                            aria-label={t(shape.groupOperation === "bundle" ? "group.editBundle" : "group.edit")}
                             onClick={(e) => {
                               e.stopPropagation();
                               onOpenGroup(shape.id);
