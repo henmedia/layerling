@@ -2,7 +2,8 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type ReactElement } from "react";
-import { ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, Group as GroupIcon, Layers, ListTree, Lock, Pencil, Search, Unlock, X } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, ListTree, Lock, Pencil, Search, Unlock, X } from "lucide-react";
+import { ToolbarBundleIcon, ToolbarGroupIcon } from "@/components/toolbarIcons";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { t, type MessageKey } from "@/lib/i18n";
@@ -105,7 +106,7 @@ export function ObjectListPanel({
 
   const getShapeKindSubtitle = (shape: WorkplaneShape): string => {
     if (shape.groupedShapes?.length) {
-      // Says which it is even after a rename: a group is merged into one body, a bundle keeps its parts apart.
+      // Says which it is even after a rename: a group (merged) or a bundle (parts stay what they are).
       const kindName = t(shape.groupOperation === "bundle" ? "shape.bundle" : "shape.group");
       return `${kindName} · ${t("outliner.children", { count: shape.groupedShapes.length })}`;
     }
@@ -315,9 +316,10 @@ export function ObjectListPanel({
                           <div className="outliner-label-group" onDoubleClick={(e) => startRename(shape, e)}>
                             <span className="outliner-shape-name" title={displayName}>
                               {isGroup ? (
+                                // The marks of the toolbar buttons that made it, so the list and the ribbon agree.
                                 shape.groupOperation === "bundle"
-                                  ? <Layers size={12} style={{ display: "inline-block", verticalAlign: "-1px", marginRight: 5, opacity: 0.7 }} aria-hidden="true" />
-                                  : <GroupIcon size={12} style={{ display: "inline-block", verticalAlign: "-1px", marginRight: 5, opacity: 0.7 }} aria-hidden="true" />
+                                  ? <ToolbarBundleIcon className="outliner-kind-icon" />
+                                  : <ToolbarGroupIcon className="outliner-kind-icon" />
                               ) : null}
                               {displayName}
                             </span>
