@@ -46,6 +46,8 @@ Attachments are saved with the design like everything else: in the browser, in a
 
 Click {{ui:editor.export}} or press [[Ctrl]]+[[E]].
 
+If the window covers something, drag it by its title bar to another spot; the Import and Attachments windows move the same way. A double click on the title bar puts it back.
+
 ![The export window with the formats STL, 3MF, OBJ, STEP, SVG, PNG, LYL and 2D.](shot:export-panel)
 
 At the top is the file name, below it you choose the format. With something selected, only the selection is exported, otherwise the whole design. If the selection leaves out visible parts, a note in the window says so plainly, and {{ui:export.selectAll}} selects everything visible in one click. Once the file is written, the window closes by itself; if the export fails, it stays open with the message.

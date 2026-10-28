@@ -46,6 +46,8 @@ Anhänge werden wie alles andere mit dem Entwurf gespeichert: im Browser, in ein
 
 Klicke auf {{ui:editor.export}} oder drücke [[Strg]]+[[E]].
 
+Verdeckt das Fenster etwas, ziehst du es an seiner Titelleiste an eine andere Stelle; das gilt auch für die Fenster von Import und Anhängen. Ein Doppelklick auf die Titelleiste bringt es zurück.
+
 ![Das Exportfenster mit den Formaten STL, 3MF, OBJ, STEP, SVG, PNG, LYL und 2D.](shot:export-panel)
 
 Oben steht der Dateiname, darunter wählst du das Format. Ist etwas markiert, wird nur die Auswahl exportiert, sonst der ganze Entwurf. Lässt die Auswahl sichtbare Teile aus, sagt das ein Hinweis im Fenster deutlich, und {{ui:export.selectAll}} markiert mit einem Klick alles Sichtbare. Ist die Datei geschrieben, schließt sich das Fenster von selbst; schlägt der Export fehl, bleibt es mit der Meldung offen.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CYLINDER_WRAP_INWARD_OVERSHOOT_MM, wrapMeshAroundCylinder, type CylinderWrapInput } from "@/lib/cylinderWrap";
+import { CYLINDER_WRAP_INWARD_OVERSHOOT_MM, CYLINDER_WRAP_STEP_DEGREES, wrapMeshAroundCylinder, type CylinderWrapInput, type CylinderWrapVec3 } from "@/lib/cylinderWrap";
 import { validateClosedSolidTriangleSoup } from "@/lib/svgImport";
 
 /** A closed box lying on the plate, faces wound outward. */
@@ -33,6 +33,69 @@ function signedVolume(positions: number[]) {
 
 function soup(mesh: CylinderWrapInput) {
   return mesh.faces.flatMap((face) => face.flatMap((index) => mesh.vertices[index]));
+}
+
+/** The cut as it was: the whole mesh, plane after plane. The new cut has to give the same triangles in the same order. */
+function oldCutPositions(mesh: CylinderWrapInput, diameter: number) {
+  const radius = diameter / 2;
+  const xs = mesh.vertices.map((vertex) => vertex[0]);
+  const ys = mesh.vertices.map((vertex) => vertex[1]);
+  const zs = mesh.vertices.map((vertex) => vertex[2]);
+  const [minX, maxX, minY, minZ, maxZ] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.min(...zs), Math.max(...zs)];
+  const vertices: CylinderWrapVec3[] = mesh.vertices.map(([x, y, z]) => [x - (minX + maxX) / 2, y - minY, z - (minZ + maxZ) / 2]);
+  let faces = mesh.faces.map((face) => [...face] as [number, number, number]);
+  const width = maxX - minX;
+  const step = radius * (CYLINDER_WRAP_STEP_DEGREES * Math.PI / 180);
+  for (let k = Math.ceil((-width / 2) / step); k <= Math.floor((width / 2) / step); k += 1) {
+    const cut = k * step;
+    const points = new Map<string, number>();
+    const onEdge = (a: number, b: number) => {
+      const [i, j] = a < b ? [a, b] : [b, a];
+      const known = points.get(`${i}:${j}`);
+      if (known !== undefined) return known;
+      const t = (cut - vertices[i][0]) / (vertices[j][0] - vertices[i][0]);
+      vertices.push([cut, vertices[i][1] + (vertices[j][1] - vertices[i][1]) * t, vertices[i][2] + (vertices[j][2] - vertices[i][2]) * t]);
+      points.set(`${i}:${j}`, vertices.length - 1);
+      return vertices.length - 1;
+    };
+    const side = (index: number) => (Math.abs(vertices[index][0] - cut) <= 1e-9 ? 0 : Math.sign(vertices[index][0] - cut));
+    const next: [number, number, number][] = [];
+    faces.forEach((face) => {
+      const sides = face.map(side);
+      if (!(sides.some((value) => value > 0) && sides.some((value) => value < 0))) return void next.push(face);
+      const zero = sides.indexOf(0);
+      if (zero >= 0) {
+        const [a, b, c] = [face[zero], face[(zero + 1) % 3], face[(zero + 2) % 3]];
+        const m = onEdge(b, c);
+        return void next.push([a, b, m], [a, m, c]);
+      }
+      const lone = sides.findIndex((value) => sides.filter((other) => other === value).length === 1);
+      const [a, b, c] = [face[lone], face[(lone + 1) % 3], face[(lone + 2) % 3]];
+      const ab = onEdge(a, b);
+      const ca = onEdge(c, a);
+      next.push([a, ab, ca], [ab, b, c], [ab, c, ca]);
+    });
+    faces = next;
+  }
+  return faces.flatMap((face) => face.flatMap((index) => vertices[index]));
+}
+
+/** A rough plate of many small slanted triangles, as text or a picture brings: a grid with a wavy top. */
+function wavyPlate(columns: number, rows: number, size: number): CylinderWrapInput {
+  const vertices: CylinderWrapVec3[] = [];
+  const faces: CylinderWrapInput["faces"] = [];
+  for (let row = 0; row <= rows; row += 1) {
+    for (let column = 0; column <= columns; column += 1) {
+      vertices.push([column * size + (row % 2) * size * 0.37, 1 + 0.4 * Math.sin(column * 0.7 + row), row * size]);
+    }
+  }
+  const at = (row: number, column: number) => row * (columns + 1) + column;
+  for (let row = 0; row < rows; row += 1) {
+    for (let column = 0; column < columns; column += 1) {
+      faces.push([at(row, column), at(row + 1, column), at(row + 1, column + 1)], [at(row, column), at(row + 1, column + 1), at(row, column + 1)]);
+    }
+  }
+  return { vertices, faces };
 }
 
 describe("wrapping a flat body around a cylinder (#106)", () => {
@@ -90,6 +153,28 @@ describe("wrapping a flat body around a cylinder (#106)", () => {
     // The first box's vertices come first in the output order of its faces.
     const firstBoxHeights = result.positions.filter((_, index) => index % 3 === 1).slice(0, 36);
     expect(Math.min(...firstBoxHeights)).toBeGreaterThan(10);
+  });
+
+  it("cuts the faces exactly as cutting the whole mesh plane after plane did", () => {
+    for (const [mesh, diameter] of [[plateBox(60, 2, 20, { x: 15, y: 3, z: -7 }), 40], [wavyPlate(24, 4, 1.7), 30], [wavyPlate(12, 3, 4.1), 80]] as const) {
+      const result = wrapMeshAroundCylinder(mesh, { diameter });
+      if ("error" in result) throw new Error(result.error);
+      const flat = oldCutPositions(mesh, diameter);
+      expect(result.positions.length).toBe(flat.length);
+      // The same flat triangles, bent: the height on the wall is the depth on the plate, unchanged by bending.
+      const radius = diameter / 2;
+      let worst = 0;
+      for (let index = 0; index < flat.length; index += 3) {
+        const angle = Math.atan2(result.positions[index], result.positions[index + 2]);
+        worst = Math.max(
+          worst,
+          Math.abs(angle * radius - flat[index]),
+          Math.abs(result.positions[index + 1] - (result.height / 2 - flat[index + 2])),
+          Math.abs(Math.hypot(result.positions[index], result.positions[index + 2]) - (radius + flat[index + 1])),
+        );
+      }
+      expect(worst).toBeLessThan(1e-9);
+    }
   });
 
   it("refuses a body longer than the circumference, a missing diameter and too deep an engraving", () => {

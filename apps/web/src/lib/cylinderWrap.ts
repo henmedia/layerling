@@ -72,14 +72,10 @@ export function wrapMeshAroundCylinder(mesh: CylinderWrapInput, options: Cylinde
   const centerX = (minX + maxX) / 2;
   const centerZ = (minZ + maxZ) / 2;
   const vertices: CylinderWrapVec3[] = mesh.vertices.map(([x, y, z]) => [x - centerX, y - minY, z - centerZ]);
-  let faces = mesh.faces.map((face) => [...face] as [number, number, number]);
-
   const step = radius * (CYLINDER_WRAP_STEP_DEGREES * Math.PI / 180);
   const first = Math.ceil((-width / 2) / step);
   const last = Math.floor((width / 2) / step);
-  for (let k = first; k <= last; k += 1) {
-    faces = cutFaces(vertices, faces, k * step);
-  }
+  const faces = cutAcrossArc(vertices, mesh.faces, step, first, last);
 
   const innerRadius = options.inward ? radius - thickness : radius;
   // The inside of an engraving stays where it was; only its outside is pushed out by the overshoot.
@@ -104,12 +100,42 @@ export function wrapMeshAroundCylinder(mesh: CylinderWrapInput, options: Cylinde
   };
 }
 
-/** Splits every face that crosses the plane x = cut; the point on a shared edge is made once. */
-function cutFaces(vertices: CylinderWrapVec3[], faces: [number, number, number][], cut: number) {
+/**
+ * Cuts every face by the planes x = k * step, k from first to last, in that order. Each face is cut
+ * on its own, and only by the planes that lie across it: the same pieces as cutting the whole mesh plane
+ * after plane, in the same order, without going over every face for each of up to 180 planes. The point
+ * on an edge is made once per plane, so neighbouring faces share it.
+ */
+function cutAcrossArc(vertices: CylinderWrapVec3[], faces: readonly [number, number, number][], step: number, first: number, last: number) {
   const edgePoints = new Map<string, number>();
+  const result: [number, number, number][] = [];
+  const pieces: Array<{ face: [number, number, number]; from: number }> = [];
+  for (let index = faces.length - 1; index >= 0; index -= 1) pieces.push({ face: [...faces[index]] as [number, number, number], from: first });
+  while (pieces.length) {
+    const { face, from } = pieces.pop()!;
+    const xs = face.map((index) => vertices[index][0]);
+    // A plane further than this from the face cannot have its corners on both sides.
+    const to = Math.min(last, Math.floor((Math.max(...xs) + ON_PLANE_EPSILON) / step) + 1);
+    let k = Math.max(from, Math.ceil((Math.min(...xs) - ON_PLANE_EPSILON) / step) - 1);
+    let split: [number, number, number][] | null = null;
+    for (; k <= to; k += 1) {
+      split = cutFace(vertices, face, k * step, edgePoints, k);
+      if (split) break;
+    }
+    if (!split) {
+      result.push(face);
+      continue;
+    }
+    for (let index = split.length - 1; index >= 0; index -= 1) pieces.push({ face: split[index], from: k + 1 });
+  }
+  return result;
+}
+
+/** The pieces of a face that crosses the plane x = cut, or null when it does not cross it. */
+function cutFace(vertices: CylinderWrapVec3[], face: [number, number, number], cut: number, edgePoints: Map<string, number>, plane: number): [number, number, number][] | null {
   const pointOnEdge = (a: number, b: number) => {
     const [i, j] = a < b ? [a, b] : [b, a];
-    const key = `${i}:${j}`;
+    const key = `${plane}:${i}:${j}`;
     const known = edgePoints.get(key);
     if (known !== undefined) return known;
     const p = vertices[i];
@@ -124,31 +150,23 @@ function cutFaces(vertices: CylinderWrapVec3[], faces: [number, number, number][
     return Math.abs(offset) <= ON_PLANE_EPSILON ? 0 : Math.sign(offset);
   };
 
-  const result: [number, number, number][] = [];
-  faces.forEach((face) => {
-    const sides = face.map(side);
-    if (!(sides.some((s) => s > 0) && sides.some((s) => s < 0))) {
-      result.push(face);
-      return;
-    }
-    const zero = sides.indexOf(0);
-    if (zero >= 0) {
-      // One corner on the plane, the other two on either side: halve the opposite edge.
-      const a = face[zero];
-      const b = face[(zero + 1) % 3];
-      const c = face[(zero + 2) % 3];
-      const m = pointOnEdge(b, c);
-      result.push([a, b, m], [a, m, c]);
-      return;
-    }
-    // One corner alone on its side: it keeps a triangle, the other two a quad.
-    const lone = sides.findIndex((s, index) => sides.filter((other) => other === s).length === 1 && index >= 0);
-    const a = face[lone];
-    const b = face[(lone + 1) % 3];
-    const c = face[(lone + 2) % 3];
-    const ab = pointOnEdge(a, b);
-    const ca = pointOnEdge(c, a);
-    result.push([a, ab, ca], [ab, b, c], [ab, c, ca]);
-  });
-  return result;
+  const sides = face.map(side);
+  if (!(sides.some((s) => s > 0) && sides.some((s) => s < 0))) return null;
+  const zero = sides.indexOf(0);
+  if (zero >= 0) {
+    // One corner on the plane, the other two on either side: halve the opposite edge.
+    const a = face[zero];
+    const b = face[(zero + 1) % 3];
+    const c = face[(zero + 2) % 3];
+    const m = pointOnEdge(b, c);
+    return [[a, b, m], [a, m, c]];
+  }
+  // One corner alone on its side: it keeps a triangle, the other two a quad.
+  const lone = sides.findIndex((s, index) => sides.filter((other) => other === s).length === 1 && index >= 0);
+  const a = face[lone];
+  const b = face[(lone + 1) % 3];
+  const c = face[(lone + 2) % 3];
+  const ab = pointOnEdge(a, b);
+  const ca = pointOnEdge(c, a);
+  return [[a, ab, ca], [ab, b, c], [ab, c, ca]];
 }

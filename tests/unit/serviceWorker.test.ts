@@ -49,6 +49,8 @@ describe("offline copy of layerling", () => {
     expect(paths).toEqual(["/anleitung/formen.html", "/anleitung/index.html", "/guide/shapes.html"]);
     // The page for printing the whole guide is big and opened by few.
     expect(precachePaths(["anleitung/print-all.html", "guide/print-all.html", "handleiding/print-all.html", "guide/shapes.html"])).toEqual(["/guide/shapes.html"]);
+    // Every language's folder, not only the first three (the Arabic pictures and 16 print pages went in, 28.10.2026).
+    expect(precachePaths(["dalil/img/editor-overview.webp", "dalil/print-all.html", "zh-cn/print-all.html", "zh-cn/index.html"])).toEqual(["/zh-cn/index.html"]);
   });
 
   /*

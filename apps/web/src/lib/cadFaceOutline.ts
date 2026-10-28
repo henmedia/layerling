@@ -17,24 +17,50 @@ const MAX_CHECKED_FACES = 600;
 const AREA_TOLERANCE = 0.002;
 const MIN_AREA_DIFFERENCE = 0.05;
 
+function releaseAll(cad: OcctKernel, handles: ShapeHandle[]) {
+  handles.forEach((handle) => {
+    try {
+      cad.release(handle);
+    } catch {
+      // A failed topology operation can invalidate temporary handles.
+    }
+  });
+}
+
 function key(point: V3) {
   return `${Math.round(point[0] * 1e5)},${Math.round(point[1] * 1e5)},${Math.round(point[2] * 1e5)}`;
 }
 
 /** The corners of a face's one outer wire in order, or null when an edge is not straight or the edges do not close up. */
 function straightOutline(cad: OcctKernel, face: ShapeHandle): V3[] | null {
+  // Every sub-shape asked for is a handle of its own in the kernel's arena; each preview asks again (#740).
   const wires = cad.getSubShapes(face, "wire");
+  releaseAll(cad, wires);
   if (wires.length !== 1) return null;
   const edges = cad.getSubShapes(face, "edge");
+  try {
+    return outlineOfEdges(cad, edges);
+  } finally {
+    releaseAll(cad, edges);
+  }
+}
+
+function outlineOfEdges(cad: OcctKernel, edges: ShapeHandle[]): V3[] | null {
   if (edges.length < 3) return null;
   const links = new Map<string, { to: string; point: V3 }[]>();
   const points = new Map<string, V3>();
   for (const edge of edges) {
     if (cad.curveType(edge) !== "line") return null;
-    const ends = cad.getSubShapes(edge, "vertex").map((vertex) => {
-      const position = cad.vertexPosition(vertex) as unknown as { x: number; y: number; z: number } | V3;
-      return (Array.isArray(position) ? [position[0], position[1], position[2]] : [position.x, position.y, position.z]) as V3;
-    });
+    const vertices = cad.getSubShapes(edge, "vertex");
+    let ends: V3[];
+    try {
+      ends = vertices.map((vertex) => {
+        const position = cad.vertexPosition(vertex) as unknown as { x: number; y: number; z: number } | V3;
+        return (Array.isArray(position) ? [position[0], position[1], position[2]] : [position.x, position.y, position.z]) as V3;
+      });
+    } finally {
+      releaseAll(cad, vertices);
+    }
     if (ends.length < 2) return null;
     const a = ends[0];
     const b = ends[ends.length - 1];
@@ -108,7 +134,15 @@ function meshArea(cad: OcctKernel, face: ShapeHandle) {
  * A face with a hole or a curved edge is not judged: the check only says so when it knows.
  */
 export function cadFlatFaceMeshStraysFromOutline(cad: OcctKernel, shape: ShapeHandle): boolean {
-  const faces = cad.getSubShapes(shape, "face").filter((face) => cad.surfaceType(face) === "plane");
+  const all = cad.getSubShapes(shape, "face");
+  try {
+    return planeFaceStrays(cad, all.filter((face) => cad.surfaceType(face) === "plane"));
+  } finally {
+    releaseAll(cad, all);
+  }
+}
+
+function planeFaceStrays(cad: OcctKernel, faces: ShapeHandle[]) {
   if (faces.length === 0 || faces.length > MAX_CHECKED_FACES) return false;
   for (const face of faces) {
     let outline: V3[] | null;

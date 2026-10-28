@@ -85,3 +85,47 @@ describe("a STEP file with several solids", () => {
     expect((await importedShapeFromStep("one.step", await blob.arrayBuffer())).name).toBe("one");
   }, 60000);
 });
+
+describe("a STEP file read the geometry worker's way", () => {
+  it("brings the same parts across, packed and unpacked, as reading it on the page", async () => {
+    const { importedShapesFromStepFile } = await import("@/lib/stepFileImport");
+    const { packValue, unpackValue } = await import("@/lib/geometryTransfer");
+    const { resultMeshes } = await import("@/lib/geometryWorkerTypes");
+    const { blob } = await exportShapesToStep([
+      shape({ kind: "box", name: "Left post", x: -30, width: 10, depth: 6, height: 4 }),
+      shape({ kind: "cylinder", name: "Round rod", x: 0, width: 8, depth: 8, height: 12 }),
+    ]);
+    const buffer = await blob.arrayBuffer();
+    const sentArgs = packValue({ fileName: "stand.step", buffer });
+    const args = unpackValue(sentArgs.value, sentArgs.buffers) as { fileName: string; buffer: ArrayBuffer };
+    const inWorker = await importedShapesFromStepFile(args.fileName, args.buffer);
+    expect(resultMeshes("step", inWorker)).toHaveLength(2);
+    const answer = packValue(inWorker);
+    const arrived = unpackValue(answer.value, answer.buffers) as Awaited<ReturnType<typeof importedShapesFromStepFile>>;
+    const onPage = await importedShapesFromStepFile("stand.step", buffer);
+    expect(arrived.assembly).toBe(true);
+    // Ids are new each time, and the kernel numbers each STEP it writes ("translator 8.0 5") and stamps the time.
+    const stepText = (text?: string) => text?.replace(/translator [\d.]+ \d+/g, "translator").replace(/'\d{4}-\d\d-\d\dT[\d:]+'/g, "'time'");
+    const strip = (result: typeof onPage) => result.shapes.map(({ id: _id, ...rest }) => ({ ...rest, importedMesh: { ...rest.importedMesh!, brepStep: stepText(rest.importedMesh!.brepStep) } }));
+    expect(strip(arrived)).toEqual(strip(onPage));
+
+    // And back out: the parts written the worker's way (packed in, the text out) give the same file.
+    const sentShapes = packValue({ shapes: onPage.shapes });
+    const { shapes: workerShapes } = unpackValue(sentShapes.value, sentShapes.buffers) as { shapes: typeof arrived.shapes };
+    const written = await exportShapesToStep(workerShapes);
+    const direct = await exportShapesToStep(onPage.shapes);
+    expect(written.exportedCount).toBe(2);
+    // The kernel lists the colour entries of one file in a different order from one call to the next, so the two files
+    // are compared by what they bring back in: the same parts, names, colours and sizes.
+    const back = async (result: typeof written) => (await importedShapesFromStepFile("back.step", await result.blob.arrayBuffer())).shapes
+      .map((part) => ({ name: part.name, color: part.color, size: [part.width, part.height, part.depth].map((value) => Math.round(value * 1e4) / 1e4) }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    expect(await back(written)).toEqual(await back(direct));
+    await expect(exportShapesToStep([shape({ kind: "box", name: "Gap", hole: true, width: 4, depth: 4, height: 4 })])).rejects.toMatchObject({ name: "StepExportEmptyError" });
+
+    const one = await exportShapesToStep([shape({ kind: "box", name: "Only", width: 10, depth: 6, height: 4 })]);
+    const single = await importedShapesFromStepFile("one.step", await one.blob.arrayBuffer());
+    expect(single.assembly).toBe(false);
+    expect(single.shapes.map((part) => part.name)).toEqual(["one"]);
+  }, 60000);
+});

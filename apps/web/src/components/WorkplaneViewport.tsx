@@ -88,7 +88,7 @@ import { useViewportDoubleClick } from "@/components/workplane/useViewportDouble
 import { aimPickRay, firstShapeHit, pickImagePoint, pickLayFlatFace, pickMateFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeMovableShapeId, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
-import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject } from "./workplane/viewportShapeObjects";
+import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject } from "./workplane/viewportShapeObjects";
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane } from "./workplane/viewportScene";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
@@ -1868,10 +1868,19 @@ export function WorkplaneViewport({
     [renderSelectionIds],
   );
 
+  // The edge lines are built when the edges or their states change; the pointer moving onto
+  // another edge only swaps the hover lines (thousands of edges on a mesh body).
+  const hoverModifierEdgeIdRef = useRef(hoverModifierEdgeId);
+  hoverModifierEdgeIdRef.current = hoverModifierEdgeId;
   useEffect(() => {
     modifierEdgesRef.current = modifierEdges;
-    rebuildModifierEdges(threeRef.current, modifierEdges, selectedModifierEdgeIds, modifierPreviewActive, hoverModifierEdgeId, modifierHighlightedEdgeIds, failedModifierEdgeIds, modifierOnlyVisibleEdges);
-  }, [failedModifierEdgeIds, hoverModifierEdgeId, modifierEdges, modifierHighlightedEdgeIds, modifierOnlyVisibleEdges, modifierPreviewActive, selectedModifierEdgeIds]);
+    rebuildModifierEdges(threeRef.current, modifierEdges, selectedModifierEdgeIds, modifierPreviewActive, hoverModifierEdgeIdRef.current, modifierHighlightedEdgeIds, failedModifierEdgeIds, modifierOnlyVisibleEdges);
+  }, [failedModifierEdgeIds, modifierEdges, modifierHighlightedEdgeIds, modifierOnlyVisibleEdges, modifierPreviewActive, selectedModifierEdgeIds]);
+  useEffect(() => {
+    setModifierEdgeHover(threeRef.current, modifierEdgesRef.current, hoverModifierEdgeId, selectedModifierEdgeIds, modifierPreviewActive, failedModifierEdgeIds);
+    // Only the pointer: everything else rebuilds the lines (and the hover with them) above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hoverModifierEdgeId]);
 
   const resolvedThemeRef = useRef(resolvedTheme);
   resolvedThemeRef.current = resolvedTheme;

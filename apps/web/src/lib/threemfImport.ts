@@ -1,6 +1,6 @@
 import { unzipSync } from "fflate";
 import { zUpToLayerling } from "@/lib/meshCoordinates";
-import { importedShapeFromTriangleSoup } from "@/lib/stlImport";
+import { importedMeshName, importedShapeFromTriangleSoup } from "@/lib/stlImport";
 import type { WorkplaneShape } from "@/types/layerling";
 import { normalizeHexColor, placeColoredParts } from "@/lib/coloredImport";
 
@@ -67,6 +67,9 @@ function localName(element: Element) {
 
 /** Elemente nach ihrem Namen ohne Praefix - die Materials-Erweiterung schreibt `m:colorgroup`. */
 function elementsByLocalName(root: Document | Element, name: string) {
+  // Asked by name first, prefixed or not, instead of walking every element of a mesh of millions.
+  const named = [...root.getElementsByTagNameNS("*", name)];
+  if (named.length) return named;
   return [...root.getElementsByTagName("*")].filter((element) => localName(element) === name);
 }
 
@@ -495,15 +498,16 @@ export function importedShapesFrom3mf(fileName: string, buffer: ArrayBuffer): Th
   });
   const objects = new Set(order.map((group) => group.item)).size;
 
-  const whole = importedShapeFromTriangleSoup(fileName, triangles.positions, undefined, "3mf");
   if (order.length <= 1) {
+    const whole = importedShapeFromTriangleSoup(fileName, triangles.positions, undefined, "3mf");
     const color = triangles.colors.get(order[0]?.key ?? "")?.color;
     return { shapes: [color ? { ...whole, color } : whole], split: false, objects, painted: triangles.painted };
   }
   const colorsIn = (item: number) => order.filter((group) => group.item === item).length;
   const seenIn = new Map<number, number>();
+  // The parts are named after the file as one body would be; that body itself is not built.
   const shapes = placeColoredParts(
-    whole.name,
+    importedMeshName(fileName, "3mf"),
     order.map(({ item, key }) => {
       const found = triangles.colors.get(key);
       const nth = (seenIn.get(item) ?? 0) + 1;

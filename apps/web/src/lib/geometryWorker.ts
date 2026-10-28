@@ -8,6 +8,8 @@ import type { ModelSplitPlane } from "@/lib/modelSplit";
 import { simplifyTrianglePositions, type SimplifiedMesh } from "@/lib/meshSimplify";
 import { importedShapesFromObj, type ObjImportResult } from "@/lib/objImport";
 import { importedShapeFromStl } from "@/lib/stlImport";
+import { importedShapesFromStepFile, type StepFileImport } from "@/lib/stepFileImport";
+import type { StepExportResult } from "@/lib/stepExport";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /**
@@ -266,6 +268,32 @@ export function importedShapeFromStlOffThread(fileName: string, buffer: ArrayBuf
   return runGeometryTask("stl", { fileName, buffer }, async () => importedShapeFromStl(fileName, buffer), () => {
     throw new Error(t("status.computeTimedOut"));
   }, undefined, true);
+}
+
+/**
+ * A STEP file read off the page (importedShapesFromStepFile in lib/stepFileImport.ts): the kernel reads, meshes and writes
+ * every part in one go, and a file of 390 parts held the page for over 4 seconds. The import window shows its progress.
+ */
+export function importedShapesFromStepOffThread(fileName: string, buffer: ArrayBuffer): Promise<StepFileImport> {
+  return runGeometryTask("step", { fileName, buffer }, async () => importedShapesFromStepFile(fileName, buffer), () => {
+    throw new Error(t("status.computeTimedOut"));
+  }, undefined, true);
+}
+
+/**
+ * A STEP file written off the page (exportShapesToStep in lib/stepExport.ts): reading every part back into the kernel
+ * and writing the file held the page for about 3 s at 390 parts. A design with nothing STEP can carry still rejects
+ * with a StepExportEmptyError by name.
+ */
+export async function exportShapesToStepOffThread(shapes: readonly WorkplaneShape[]): Promise<StepExportResult> {
+  const result = await runGeometryTask<{ text: string; exportedCount: number; skipped: StepExportResult["skipped"] }>("stepExport", { shapes: [...shapes] }, async () => {
+    const { exportShapesToStep } = await import("@/lib/stepExport");
+    const { blob, exportedCount, skipped } = await exportShapesToStep([...shapes]);
+    return { text: await blob.text(), exportedCount, skipped };
+  }, () => {
+    throw new Error(t("status.computeTimedOut"));
+  }, undefined, true);
+  return { blob: new Blob([result.text], { type: "application/STEP" }), exportedCount: result.exportedCount, skipped: result.skipped };
 }
 
 /** An OBJ file read off the page (importedShapesFromObj in lib/objImport.ts). */

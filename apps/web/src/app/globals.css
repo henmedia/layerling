@@ -4763,6 +4763,19 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   cursor: grabbing;
 }
 
+/* Moved down the work area, the panel is cut to the room left below it: its content scrolls
+   then, so the export button at its foot stays reachable. */
+.top-action-panel.floating {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-action-panel.floating > .export-dialog-body,
+.top-action-panel.floating > .top-action-body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .top-action-panel.export-action-panel,
 .top-action-panel.import-action-panel {
   width: min(440px, calc(100vw - 28px));

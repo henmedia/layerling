@@ -3,7 +3,7 @@ import type { PreparedImportedMeshDisplay } from "@/lib/importedMeshDisplay";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /** What the page asks the geometry worker (workers/geometry.worker.ts) to work out. */
-export type GeometryTask = "group" | "split" | "stl" | "obj" | "estimate" | "simplify" | "face" | "warm";
+export type GeometryTask = "group" | "split" | "stl" | "obj" | "step" | "stepExport" | "estimate" | "simplify" | "face" | "warm";
 
 export interface GeometryWorkerRequest {
   requestId: number;
@@ -36,7 +36,7 @@ export function resultMeshes(task: GeometryTask, result: unknown): Array<Importe
   if (task === "group") return [(result as { group?: WorkplaneShape | null }).group?.importedMesh];
   if (task === "split") return ((result as { parts?: WorkplaneShape[] | null }).parts ?? []).map((part) => part.importedMesh);
   if (task === "stl") return [(result as WorkplaneShape).importedMesh];
-  if (task === "obj") return ((result as { shapes?: WorkplaneShape[] }).shapes ?? []).map((shape) => shape.importedMesh);
+  if (task === "obj" || task === "step") return ((result as { shapes?: WorkplaneShape[] }).shapes ?? []).map((shape) => shape.importedMesh);
   // A simplified mesh becomes a body with exactly these positions and no normals of its own.
   if (task === "simplify") return [{ positions: (result as { positions: number[] }).positions } as ImportedMesh];
   return [];

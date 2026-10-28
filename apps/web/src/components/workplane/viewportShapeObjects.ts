@@ -1054,28 +1054,63 @@ export function rebuildModifierEdges(
   const selected = new Set(selectedIds);
   const highlighted = new Set(highlightedIds);
   const failed = new Set(failedIds);
+  // Drawn as if no edge were under the pointer; the one that is gets its own lines from
+  // setModifierEdgeHover, so moving the pointer onto another edge leaves these thousands alone.
   edges.forEach((edge) => {
     if (edge.points.length < 6) return;
     const active = selected.has(edge.id);
-    const hovered = hoverId === edge.id;
-    const belowThreshold = !active && !hovered && !highlighted.has(edge.id);
-    const style = modifierEdgeMaterialStyle(active, hovered, previewActive, belowThreshold, failed.has(edge.id));
-    if (hovered || (active && failed.has(edge.id))) {
-      if (hovered) {
-        state.modifierLayer.add(wideModifierEdgeLine(state, edge.points, MODIFIER_EDGE_HALO_COLOR, 1002.5, MODIFIER_EDGE_HALO_PX, 0.85));
-      }
-      state.modifierLayer.add(wideModifierEdgeLine(state, edge.points, style.color, hovered ? 1003 : 1002));
+    const belowThreshold = !active && !highlighted.has(edge.id);
+    const style = modifierEdgeMaterialStyle(active, false, previewActive, belowThreshold, failed.has(edge.id));
+    if (active && failed.has(edge.id)) {
+      const wide = wideModifierEdgeLine(state, edge.points, style.color, 1002);
+      wide.userData.modifierEdgeId = edge.id;
+      state.modifierLayer.add(wide);
       return;
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(edge.points, 3));
     const line = new THREE.Line(geometry, modifierEdgeMaterial(style, onlyVisible));
     line.userData.modifierEdgeId = edge.id;
-    line.renderOrder = hovered ? 1003 : active ? 1002 : 1001;
+    line.renderOrder = active ? 1002 : 1001;
     setObjectRenderLayer(line, RENDER_LAYER_MODIFIERS);
     freezeStaticObjectMatrices(line);
     state.modifierLayer.add(line);
   });
+  setModifierEdgeHover(state, edges, hoverId, selectedIds, previewActive, failedIds);
+}
+
+/**
+ * The edge under the pointer: a halo and a wide line in its hovered colour, and its own line from
+ * rebuildModifierEdges hidden meanwhile. Only these two lines are made again when the pointer moves.
+ */
+export function setModifierEdgeHover(
+  state: ThreeState | null,
+  edges: CadModifierEdge[],
+  hoverId: number | null,
+  selectedIds: number[],
+  previewActive = false,
+  failedIds: number[] = [],
+) {
+  if (!state) return;
+  const layer = state.modifierLayer;
+  layer.children
+    .filter((child) => child.userData.modifierEdgeHover)
+    .forEach((child) => {
+      layer.remove(child);
+      disposeObject(child);
+    });
+  layer.children.forEach((child) => {
+    if (typeof child.userData.modifierEdgeId === "number") child.visible = child.userData.modifierEdgeId !== hoverId;
+  });
+  const edge = hoverId === null ? undefined : edges.find((candidate) => candidate.id === hoverId);
+  if (edge && edge.points.length >= 6) {
+    const style = modifierEdgeMaterialStyle(selectedIds.includes(edge.id), true, previewActive, false, failedIds.includes(edge.id));
+    const halo = wideModifierEdgeLine(state, edge.points, MODIFIER_EDGE_HALO_COLOR, 1002.5, MODIFIER_EDGE_HALO_PX, 0.85);
+    const core = wideModifierEdgeLine(state, edge.points, style.color, 1003);
+    halo.userData.modifierEdgeHover = true;
+    core.userData.modifierEdgeHover = true;
+    layer.add(halo, core);
+  }
   state.needsRender = true;
 }
 
@@ -1443,11 +1478,30 @@ export function replaceObjectMaterials(object: THREE.Mesh, materials: THREE.Mate
   trimSharedShapeMaterialCache();
 }
 
-export function enableAcceleratedMeshPicking(mesh: THREE.Mesh, geometry: THREE.BufferGeometry, force = false) {
+function geometryTriangleCount(geometry: THREE.BufferGeometry) {
   const position = geometry.getAttribute("position");
-  const triangles = geometry.getIndex()?.count
+  return geometry.getIndex()?.count
     ? Math.floor((geometry.getIndex()?.count ?? 0) / 3)
     : Math.floor((position?.count ?? 0) / 3);
+}
+
+/** From this size a treated body's mesh gets a picking tree: a ray then costs 0.01 ms instead of 1 ms and up (14 ms at 400,000). */
+export const TREATED_BVH_TRIANGLE_THRESHOLD = 20_000;
+
+/**
+ * A body with edge treatments is rebuilt for every preview and every change, so it gets no tree up front.
+ * A large one builds it the first time a ray is cast against it (the tape measure, placing a shape on it).
+ */
+export function enableLazyMeshPicking(mesh: THREE.Mesh, geometry: THREE.BufferGeometry) {
+  if (geometryTriangleCount(geometry) < TREATED_BVH_TRIANGLE_THRESHOLD) return;
+  mesh.raycast = function lazyAcceleratedRaycast(this: THREE.Mesh, raycaster, intersects) {
+    if (!(geometry as THREE.BufferGeometry & { boundsTree?: unknown }).boundsTree) computeImportedBoundsTree(geometry);
+    acceleratedRaycast.call(this, raycaster, intersects);
+  };
+}
+
+export function enableAcceleratedMeshPicking(mesh: THREE.Mesh, geometry: THREE.BufferGeometry, force = false) {
+  const triangles = geometryTriangleCount(geometry);
   mesh.raycast = acceleratedRaycast;
   const bvhGeometry = geometry as THREE.BufferGeometry & { boundsTree?: unknown };
   if ((force || triangles >= BVH_PICKING_TRIANGLE_THRESHOLD) && !bvhGeometry.boundsTree) {
@@ -2145,8 +2199,9 @@ export function addMesh(
   mesh.userData.shapeSurface = true;
   retainSharedShapeGeometry(mesh, prepared);
   retainSharedShapeMaterials(mesh, material);
-  if (group.userData.acceleratedPicking !== false && !shape.edgeTreatments?.length) {
-    enableAcceleratedMeshPicking(mesh, prepared, Boolean(shape.importedMesh));
+  if (group.userData.acceleratedPicking !== false) {
+    if (shape.edgeTreatments?.length) enableLazyMeshPicking(mesh, prepared);
+    else enableAcceleratedMeshPicking(mesh, prepared, Boolean(shape.importedMesh));
   }
   mesh.castShadow = true;
   mesh.receiveShadow = false;

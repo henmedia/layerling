@@ -24,7 +24,7 @@
  * binary STL and as OBJ, 60 boxes with 20 cylinder holes, and so on.
  */
 import { createRequire } from "node:module";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -47,6 +47,8 @@ const GPU = process.argv.includes("--gpu");
 const CHANNEL = option("channel", "");
 const FREEZE_MS = 200;
 const scratch = mkdtempSync(join(tmpdir(), "layerling-measure-"));
+// The test files run to 45 MB; they go with the run, also when it stops on an error.
+process.on("exit", () => rmSync(scratch, { recursive: true, force: true }));
 
 // ---- Test data -------------------------------------------------------------------------------
 

@@ -121,16 +121,31 @@ function parseEdgeFaceMap(values: number[]) {
   return map;
 }
 
-function edgeAngle(cad: OcctKernel, points: number[], faceHashes: number[], faceByHash: Map<number, ShapeHandle>) {
+type FaceFacts = {
+  byHash: Map<number, ShapeHandle>;
+  surfaceType: (hash: number) => string;
+  /** A flat face points the same way all over: its normal is found once (a mesh body is nothing but flat faces). */
+  planeNormals: Map<number, { x: number; y: number; z: number }>;
+};
+
+function faceNormalAt(cad: OcctKernel, faces: FaceFacts, hash: number, face: ShapeHandle, point: { x: number; y: number; z: number }) {
+  const known = faces.planeNormals.get(hash);
+  if (known) return known;
+  const normal = orientedFaceNormal(cad, face, point);
+  if (faces.surfaceType(hash) === "plane") faces.planeNormals.set(hash, normal);
+  return normal;
+}
+
+function edgeAngle(cad: OcctKernel, points: number[], faceHashes: number[], faces: FaceFacts) {
   if (faceHashes.length !== 2 || points.length < 6) return { angle: 0, boundary: faceHashes.length < 2, manifold: false };
   const offset = Math.max(0, Math.floor(points.length / 6) * 3);
   const point = { x: points[offset], y: points[offset + 1], z: points[offset + 2] };
-  const faceA = faceByHash.get(faceHashes[0]);
-  const faceB = faceByHash.get(faceHashes[1]);
+  const faceA = faces.byHash.get(faceHashes[0]);
+  const faceB = faces.byHash.get(faceHashes[1]);
   if (faceA === undefined || faceB === undefined) return { angle: 0, boundary: false, manifold: false };
   try {
-    const a = orientedFaceNormal(cad, faceA, point);
-    const b = orientedFaceNormal(cad, faceB, point);
+    const a = faceNormalAt(cad, faces, faceHashes[0], faceA, point);
+    const b = faceNormalAt(cad, faces, faceHashes[1], faceB, point);
     const dot = Math.max(-1, Math.min(1, a.x * b.x + a.y * b.y + a.z * b.z));
     // Both normals point out of the solid, so this is the turn across the edge:
     // 0 on a smooth seam, 90 on a box corner, near 180 on a knife edge.
@@ -473,18 +488,28 @@ function rebuiltMeshSolid(cad: OcctKernel, part: CadModifierMeshPart) {
   if (part.positions && part.indices && part.indices.length / 3 <= PLANAR_FACE_TRIANGLE_LIMIT) {
     try {
       const flat = planarMeshFaces(cad, part.positions, part.indices);
-      if (flat && (plain === null || cad.getSubShapes(plain, "face").length > flat.faceCount)) {
-        for (const tolerance of [1e-6, 1e-5, 1e-4]) {
-          let candidate = cad.sewAndSolidify(flat.faces, tolerance);
-          candidate = cad.fixShape(candidate);
-          if (cad.isSolid(candidate)) candidate = cad.healSolid(candidate, tolerance);
-          candidate = cad.fixFaceOrientations(candidate);
-          candidate = cad.removeDegenerateEdges(candidate);
-          candidate = cad.unifySameDomain(candidate);
-          if (cad.isSolid(candidate) && cadShapeIsValid(cad, candidate) && (plain === null || cad.getSubShapes(candidate, "face").length < cad.getSubShapes(plain, "face").length)) {
-            return candidate;
+      // The face counts are handles too: counted and let go, the session keeps only the solid it goes on with.
+      const plainFaces = flat && plain !== null ? faceCount(cad, plain) : 0;
+      if (flat && (plain === null || plainFaces > flat.faceCount)) {
+        try {
+          for (const tolerance of [1e-6, 1e-5, 1e-4]) {
+            let candidate = cad.sewAndSolidify(flat.faces, tolerance);
+            candidate = cad.fixShape(candidate);
+            if (cad.isSolid(candidate)) candidate = cad.healSolid(candidate, tolerance);
+            candidate = cad.fixFaceOrientations(candidate);
+            candidate = cad.removeDegenerateEdges(candidate);
+            candidate = cad.unifySameDomain(candidate);
+            if (cad.isSolid(candidate) && cadShapeIsValid(cad, candidate) && (plain === null || faceCount(cad, candidate) < plainFaces)) {
+              if (plain !== null) releaseHandles(cad, [plain]);
+              return candidate;
+            }
+            releaseHandles(cad, [candidate]);
           }
+        } finally {
+          releaseHandles(cad, flat.faces);
         }
+      } else if (flat) {
+        releaseHandles(cad, flat.faces);
       }
     } catch (error) {
       if (isFatalKernelFault(error)) throw error;
@@ -493,6 +518,12 @@ function rebuiltMeshSolid(cad: OcctKernel, part: CadModifierMeshPart) {
   }
   if (plain !== null) return plain;
   throw plainError;
+}
+
+function faceCount(cad: OcctKernel, shape: ShapeHandle) {
+  const faces = cad.getSubShapes(shape, "face");
+  releaseHandles(cad, faces);
+  return faces.length;
 }
 
 function plainMeshSolid(cad: OcctKernel, part: CadModifierMeshPart) {
@@ -651,18 +682,38 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
   let keepEdgeHandles = false;
   try {
     const faceByHash = new Map(faces.map((face) => [cad.hashCode(face, HASH_UPPER_BOUND), face]));
+    // The areas only matter when small treatment faces are left out; each one is a surface integral.
     const faceAreaByHash = new Map<number, number>();
-    faces.forEach((face) => {
-      const hash = cad.hashCode(face, HASH_UPPER_BOUND);
-      let area = 0;
-      try {
-        area = Math.abs(cad.getSurfaceArea(face));
-      } catch {
-        area = 0;
-      }
-      faceAreaByHash.set(hash, area);
-    });
+    if (suppressTreatmentDetailEdges) {
+      faceByHash.forEach((face, hash) => {
+        let area = 0;
+        try {
+          area = Math.abs(cad.getSurfaceArea(face));
+        } catch {
+          area = 0;
+        }
+        faceAreaByHash.set(hash, area);
+      });
+    }
     const treatmentAreaLimit = suppressTreatmentDetailEdges ? treatmentDetailFaceAreaLimit([...faceAreaByHash.values()]) : 0;
+    const surfaceTypeByHash = new Map<number, string>();
+    const faceFacts: FaceFacts = {
+      byHash: faceByHash,
+      planeNormals: new Map(),
+      surfaceType: (hash) => {
+        let type = surfaceTypeByHash.get(hash);
+        if (type === undefined) {
+          const face = faceByHash.get(hash);
+          try {
+            type = face === undefined ? "unknown" : cad.surfaceType(face);
+          } catch {
+            type = "unknown";
+          }
+          surfaceTypeByHash.set(hash, type);
+        }
+        return type;
+      },
+    };
     const adjacentFaces = parseEdgeFaceMap(cad.edgeToFaceMap(shape, HASH_UPPER_BOUND));
     const wire = cad.wireframe(shape, CAD_EDGE_WIREFRAME_DEFLECTION);
     const pointsByHash = new Map<number, number[]>();
@@ -677,18 +728,9 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
       const hash = cad.hashCode(handle, HASH_UPPER_BOUND);
       const faceHashes = adjacentFaces.get(hash) ?? [];
       const points = pointsByHash.get(hash) ?? [];
-      const classification = edgeAngle(cad, points, faceHashes, faceByHash);
+      const classification = edgeAngle(cad, points, faceHashes, faceFacts);
       const faceAreas = faceHashes.map((faceHash) => faceAreaByHash.get(faceHash) ?? 0);
-      const surfaceTypes = faceHashes
-        .map((faceHash) => faceByHash.get(faceHash))
-        .filter((face): face is ShapeHandle => face !== undefined)
-        .map((face) => {
-          try {
-            return cad.surfaceType(face);
-          } catch {
-            return "unknown";
-          }
-        });
+      const surfaceTypes = faceHashes.filter((faceHash) => faceByHash.has(faceHash)).map(faceFacts.surfaceType);
       let curveType = "line";
       try {
         curveType = cad.curveType(handle);
@@ -821,6 +863,8 @@ function culpritEdgeIds(cad: OcctKernel, solid: ShapeHandle, entries: { id: numb
 
 // Which solid of the body each edge or face belongs to, found by hash and isSame.
 function componentOwners(cad: OcctKernel, handles: ShapeHandle[], type: "edge" | "face", unmappedMessage: string) {
+  // One solid owns everything there is.
+  if (baseSolids.length === 1) return new Array<number>(handles.length).fill(0);
   const ownerHandles = baseSolids.map((solid) => cad.getSubShapes(solid, type));
   try {
     const ownerCandidates = new Map<number, Array<{ owner: number; handle: ShapeHandle }>>();
@@ -944,7 +988,17 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     const mesh = copyCadMesh(meshed.mesh);
     const displayEdges = collectEdges(activeCad, result, 0).displayEdges;
     const brep = storedBrep(activeCad, result);
-    const components: CadModifierComponentMesh[] = componentResults.map((component, owner) => {
+    // One component is the body itself: its mesh, BREP and edges are the ones just made, copied
+    // rather than worked out a second time (the buffers above go to the page, so these need their own).
+    const components: CadModifierComponentMesh[] = componentResults.length === 1 ? [{
+      owner: 0,
+      positions: mesh.positions.slice(),
+      normals: mesh.normals.slice(),
+      indices: mesh.indices.slice(),
+      triangleCount: mesh.triangleCount,
+      brep,
+      displayEdges,
+    }] : componentResults.map((component, owner) => {
       const componentMesh = copyCadMesh(activeCad.tessellate(component, options));
       return {
         owner,

@@ -1,5 +1,40 @@
 [
   {
+    "version": "1.117.0",
+    "items": [
+      {
+        "title": {
+          "de": "Import, Export und Anhänge lassen sich verschieben",
+          "en": "Import, Export and Attachments can be moved"
+        },
+        "body": {
+          "de": "Das Fenster unter diesen drei Knöpfen ziehst du jetzt an seiner Titelleiste dorthin, wo es nicht stört. Ein Doppelklick auf die Leiste bringt es zurück an seinen Platz.",
+          "en": "You can now drag the window under these three buttons by its title bar to where it is out of the way. A double click on the bar puts it back in its place."
+        }
+      },
+      {
+        "title": {
+          "de": "Schnellerer erster Besuch",
+          "en": "A quicker first visit"
+        },
+        "body": {
+          "de": "Wer layerling zum ersten Mal öffnet, lädt für die Offline-Fassung rund 10 MB weniger: Die Druckseiten und Bilder der Anleitung kommen erst, wenn du sie aufrufst.",
+          "en": "Opening layerling for the first time downloads about 10 MB less for the offline copy: the guide's print pages and pictures only come when you open them."
+        }
+      },
+      {
+        "title": {
+          "de": "Performance-Verbesserungen",
+          "en": "Performance improvements"
+        },
+        "body": {
+          "de": "STEP-Dateien werden im Hintergrund gelesen und geschrieben: Eine Baugruppe mit 390 Teilen hält den Editor beim Öffnen höchstens 0,3 s statt 8,7 s an, beim Speichern 0,1 s statt 1,7 s, und die Ausfuhr ist in 3,7 statt 5,3 s fertig. Um einen Zylinder wickeln geht bei großen Körpern ein Vielfaches schneller (120.000 Dreiecke: 0,28 s statt 2,1 s). Die Vorschau des Kantenwerkzeugs erscheint etwa ein Drittel schneller, und große verrundete Körper reagieren sofort, wenn du darauf misst, Formen platzierst oder Flächen wählst.",
+          "en": "STEP files are read and written in the background: an assembly of 390 parts holds the editor for at most 0.3 s instead of 8.7 s when opening it and 0.1 s instead of 1.7 s when saving it, and the export finishes in 3.7 instead of 5.3 s. Wrapping large bodies around a cylinder is several times quicker (120,000 triangles: 0.28 s instead of 2.1 s). The edge tool's preview appears about a third quicker, and large filleted bodies respond at once when you measure on them, place shapes on them or pick their faces."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.116.1",
     "items": [
       {

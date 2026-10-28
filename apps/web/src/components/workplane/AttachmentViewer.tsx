@@ -83,7 +83,7 @@ export function AttachmentViewer({ attachment, onClose }: { attachment: ProjectA
         <header className="workspace-modal-header movable" title={t("panel.moveHint")} {...movable.handleProps}>
           {/* translate="no": a file name is not text to be translated by the browser. */}
           <strong translate="no" title={attachment.name}>{attachment.name}</strong>
-          <GuideHelpLink chapter="files" />
+          <GuideHelpLink section="attachments" />
           <button aria-label={t("attachments.viewerClose", { name: attachment.name })} onClick={onClose}>
             <X size={18} />
           </button>

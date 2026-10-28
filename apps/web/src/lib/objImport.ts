@@ -103,6 +103,10 @@ function generatedFaceNormals(positions: readonly number[]) {
   return normals;
 }
 
+function objShapeName(fileName: string) {
+  return fileName.replace(/\.[^.]+$/, "") || "Imported OBJ";
+}
+
 function importedObjShapeFromTriangles(
   fileName: string,
   rawPositions: number[],
@@ -157,7 +161,7 @@ function importedObjShapeFromTriangles(
 
   return {
     id: createLocalId("uploaded-mesh"),
-    name: fileName.replace(/\.[^.]+$/, "") || "Imported OBJ",
+    name: objShapeName(fileName),
     kind: "mesh",
     color: "#0098c7",
     x: 10,
@@ -411,8 +415,8 @@ export function importedShapesFromObj(fileName: string, source: string, mtlSourc
   const { parts, droppedVertexColors } = parseObjPartsLimited(source, materialColors);
   const missingMaterialColors = parts.some((part) => part.material !== undefined && !part.color);
 
-  const whole = wholeShapeFromObjParts(fileName, parts);
   if (parts.length <= 1) {
+    const whole = wholeShapeFromObjParts(fileName, parts);
     const color = parts[0]?.color;
     // Eine eigene OBJ traegt ihr Netz selbst: die .lyl baut OBJ-Quellen in der
     // alten Achsen-Lesart nach (siehe `legacyAxes`).
@@ -420,8 +424,9 @@ export function importedShapesFromObj(fileName: string, source: string, mtlSourc
     return { shapes: [color ? { ...own, color } : own], split: false, missingMaterialColors, droppedVertexColors };
   }
 
+  // The parts are named after the file as one body would be; that body itself is not built.
   const shapes = placeColoredParts(
-    whole.name,
+    objShapeName(fileName),
     parts.map((part) => ({
       color: part.color,
       label: part.material && !colorFromMaterialName(part.material) ? part.material : undefined,

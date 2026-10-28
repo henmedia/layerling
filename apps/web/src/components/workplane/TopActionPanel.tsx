@@ -2,6 +2,7 @@
 
 import { DEFAULT_STENCIL_BRIDGES, MAX_BRIDGE_COUNT, normalizedStencilBridges, type StencilBridgeOptions } from "@/lib/stencilBridges";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
@@ -286,17 +287,15 @@ export function TopActionPanel({
   };
 
   return (
-    <div
-      className={`top-action-panel ${panel === "export" ? "export-action-panel" : panel === "import" || panel === "attachments" ? "import-action-panel" : ""}`}
-      role="dialog"
-      aria-label={title}
-    >
-      <header>
+    // Movable by its title bar like the other tool panels, so it never has to cover the design (as QrCodePanel).
+    <MovableToolPanel className={`top-action-panel icon-tag-panel ${panel === "export" ? "export-action-panel" : panel === "import" || panel === "attachments" ? "import-action-panel" : ""}`} ariaLabel={title}>
+      {(handleProps) => (<>
+      <header className="movable" title={t("panel.moveHint")} {...handleProps}>
         <div className="top-action-heading">
           <strong>{title}</strong>
         </div>
         <div className="panel-header-actions">
-          {panel === "attachments" ? <GuideHelpLink chapter="files" /> : <GuideHelpLink section={panel === "import" ? "importing" : "exporting"} />}
+          {panel === "attachments" ? <GuideHelpLink section="attachments" /> : <GuideHelpLink section={panel === "import" ? "importing" : "exporting"} />}
           <button aria-label={t("panel.close", { title })} onClick={onClose}>
             <X size={18} />
           </button>
@@ -676,7 +675,8 @@ export function TopActionPanel({
           </footer>
         </div>
       ) : null}
-    </div>
+      </>)}
+    </MovableToolPanel>
   );
 }
 
