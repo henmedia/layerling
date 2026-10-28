@@ -102,25 +102,98 @@ function fail(string $message, int $status, array $extra = []): void
     send_json(array_merge(['error' => $message], $extra), $status);
 }
 
+/**
+ * Detects the authenticated user when configured with LAYERLING_USER_HEADER.
+ * If the setting is unset or empty, header-based user isolation is disabled.
+ *
+ * Returns a sanitized folder name if authenticated, or null if disabled / unauthenticated.
+ */
+function authenticated_user_folder(): ?string
+{
+    $userHeader = getenv('LAYERLING_USER_HEADER');
+    if (!is_string($userHeader) || trim($userHeader) === '') {
+        $userHeader = $_ENV['LAYERLING_USER_HEADER'] ?? $_SERVER['LAYERLING_USER_HEADER'] ?? null;
+    }
+    if (!is_string($userHeader) || trim($userHeader) === '') {
+        return null;
+    }
+
+    $headerName = trim($userHeader);
+    $identity = null;
+
+    $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $headerName));
+    if (isset($_SERVER[$serverKey]) && is_string($_SERVER[$serverKey])) {
+        $identity = $_SERVER[$serverKey];
+    } elseif (isset($_SERVER[$headerName]) && is_string($_SERVER[$headerName])) {
+        $identity = $_SERVER[$headerName];
+    } else {
+        $upper = strtoupper(str_replace('-', '_', $headerName));
+        if (isset($_SERVER[$upper]) && is_string($_SERVER[$upper])) {
+            $identity = $_SERVER[$upper];
+        } elseif ($upper === 'REMOTE_USER' && isset($_SERVER['REDIRECT_REMOTE_USER']) && is_string($_SERVER['REDIRECT_REMOTE_USER'])) {
+            $identity = $_SERVER['REDIRECT_REMOTE_USER'];
+        } elseif (function_exists('getallheaders')) {
+            $all = getallheaders();
+            if (is_array($all)) {
+                foreach ($all as $k => $v) {
+                    if (strcasecmp((string) $k, $headerName) === 0 && is_string($v)) {
+                        $identity = $v;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!is_string($identity) || trim($identity) === '') {
+        return null;
+    }
+
+    $safe = str_replace('@', '_at_', strtolower(trim($identity)));
+    $safe = preg_replace('/[^a-z0-9_.-]/', '_', $safe);
+    $safe = trim($safe, '._-');
+    return $safe !== '' ? $safe : null;
+}
+
 /** The store, or null while nobody has created it. */
 function store_root(): ?string
 {
-    $root = __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
-    if (!is_dir($root)) {
+    $base = __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
+    if (!is_dir($base)) {
         return null;
     }
-    $resolved = realpath($root);
+
+    $userFolder = authenticated_user_folder();
+
+    // 1. Authenticated: Scope to the user's isolated subfolder inside .users/
+    if ($userFolder !== null) {
+        $usersBase = $base . DIRECTORY_SEPARATOR . '.users';
+        $userRoot = $usersBase . DIRECTORY_SEPARATOR . $userFolder;
+        if (!is_dir($userRoot) && !@mkdir($userRoot, 0775, true) && !is_dir($userRoot)) {
+            return null;
+        }
+        $resolved = realpath($userRoot);
+        return $resolved === false ? null : $resolved;
+    }
+
+    // 2. Unauthenticated: Preserve default behavior (shared /store/ directory)
+    $resolved = realpath($base);
     return $resolved === false ? null : $resolved;
 }
 
 /** Keeps the guard file current without ever touching the projects. */
 function ensure_store_guard(string $root): void
 {
-    $guard = $root . DIRECTORY_SEPARATOR . '.htaccess';
-    if (is_file($guard) && file_get_contents($guard) === STORE_HTACCESS) {
-        return;
+    $base = __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
+    $directories = array_unique([$base, $root]);
+    foreach ($directories as $dir) {
+        if (is_dir($dir)) {
+            $guard = $dir . DIRECTORY_SEPARATOR . '.htaccess';
+            if (!is_file($guard) || file_get_contents($guard) !== STORE_HTACCESS) {
+                @file_put_contents($guard, STORE_HTACCESS);
+            }
+        }
     }
-    @file_put_contents($guard, STORE_HTACCESS);
 }
 
 /** The same sanitising the Node route applies, so both write identical names. */
@@ -718,6 +791,30 @@ function handle_rename_folder(string $root, string $folder, string $name): void
     ]);
 }
 
+/**
+ * Streams a file to the client in small chunks with output buffering cleared,
+ * ensuring constant low memory usage (~64 KB) and immediate TTFB even for large files.
+ */
+function stream_file(string $path): void
+{
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    if (function_exists('ini_set')) {
+        @ini_set('zlib.output_compression', 'Off');
+    }
+    if (function_exists('set_time_limit')) {
+        @set_time_limit(0);
+    }
+
+    $handle = @fopen($path, 'rb');
+    if ($handle === false) {
+        return;
+    }
+    fpassthru($handle);
+    fclose($handle);
+}
+
 function handle_download(string $root, string $folder, string $requested): void
 {
     $fileName = existing_project_file_name($requested);
@@ -744,7 +841,7 @@ function handle_download(string $root, string $folder, string $requested): void
         header('Cache-Control: public, max-age=31536000, immutable');
         header('ETag: "' . $revision . '"');
         header('Content-Length: ' . (string) filesize($imagePath));
-        readfile($imagePath);
+        stream_file($imagePath);
         exit;
     }
 
@@ -753,7 +850,7 @@ function handle_download(string $root, string $folder, string $requested): void
     header('ETag: "' . $revision . '"');
     header('Content-Length: ' . (string) $stat['size']);
     header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($fileName));
-    readfile($filePath);
+    stream_file($filePath);
     exit;
 }
 
