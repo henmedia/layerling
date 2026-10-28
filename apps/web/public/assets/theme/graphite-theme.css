@@ -840,6 +840,15 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-earlier:hove
   background: #f3f3f3;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .project-preview.is-loading .project-thumbnail-image {
+  filter: grayscale(40%);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .project-preview-loading {
+  background: rgba(0, 0, 0, 0.38);
+  color: #ffffff;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .project-menu-trigger {
   color: #636363;
   background: rgba(255, 255, 255, 0.94);
@@ -1005,6 +1014,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-earlier:hove
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .project-card-meta {
   color: #717171;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .project-card-meta-loading {
+  color: #c25e00;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .project-card-folder {
@@ -5076,6 +5089,15 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .project-card-meta,
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-import-notice,
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-confirm-dialog p {
   color: #7f7f7f;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .project-card-meta-loading {
+  color: #f59e0b;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .project-preview-loading {
+  background: rgba(0, 0, 0, 0.58);
+  color: #ffffff;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-rename-dialog input,

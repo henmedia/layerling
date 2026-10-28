@@ -2,7 +2,7 @@
 
 import { requestPersistentStorage } from "@/lib/persistentStorage";
 import { keepShownSelection, localDesignKey, selectionHasStale, serverDesignKey, toggleDesignSelection } from "@/lib/designSelection";
-import { Archive, ArchiveRestore, Check, CheckSquare, Clock3, Copy, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
+import { Archive, ArchiveRestore, Check, CheckSquare, Clock3, Copy, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -993,6 +993,7 @@ export default function Home() {
   const [sharedProjectsLoading, setSharedProjectsLoading] = useState(false);
   const [sharedSearch, setSharedSearch] = useState<SharedSearchResult | null>(null);
   const [sharedSearchLoading, setSharedSearchLoading] = useState(false);
+  const [openingSharedKey, setOpeningSharedKey] = useState<string | null>(null);
   // Hochgezaehlt, wenn sich am Server etwas geaendert hat: Eine Trefferliste
   // muss dann neu gefragt werden, sie haengt an keinem Ordner.
   const [sharedSearchNonce, setSharedSearchNonce] = useState(0);
@@ -1796,6 +1797,8 @@ export default function Home() {
   }, [mounted]);
 
   const openSharedProject = useCallback(async (sharedProject: SharedProject) => {
+    const key = sharedProjectKey(sharedProject);
+    setOpeningSharedKey(key);
     setDashboardNotice(t("notice.openingShared", { name: sharedProject.name }));
     try {
       const response = await fetch(`${SHARED_PROJECTS_ENDPOINT}?${storeQuery(sharedProject.path ?? "", sharedProject.fileName)}`, { cache: "no-store" });
@@ -1808,6 +1811,8 @@ export default function Home() {
       await openLylProjectFromFile(file, { ...sharedProject, revision });
     } catch (error) {
       setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.openSharedFailed"));
+    } finally {
+      setOpeningSharedKey(null);
     }
   }, [openLylProjectFromFile]);
 
@@ -2874,6 +2879,7 @@ export default function Home() {
           onBackupAll={() => void backupAllProjects()}
           onBackupAllServer={() => void backupAllServerDesigns()}
           onRestoreBackup={() => backupRestoreInputRef.current?.click()}
+          openingSharedKey={openingSharedKey}
           onOpenSharedProject={(project) => void openSharedProject(project)}
           onOpenProject={openEditor}
           onQueryChange={setQuery}
@@ -3090,6 +3096,7 @@ function Dashboard({
   onBackupAll,
   onBackupAllServer,
   onRestoreBackup,
+  openingSharedKey = null,
   newDesignsOnServer,
   newDesignsOnServerLocked,
   onNewDesignsOnServerChange,
@@ -3151,6 +3158,7 @@ function Dashboard({
   onBackupAll: () => void;
   onBackupAllServer: () => void;
   onRestoreBackup: () => void;
+  openingSharedKey?: string | null;
   newDesignsOnServer: boolean;
   newDesignsOnServerLocked: boolean;
   onNewDesignsOnServerChange: (on: boolean) => void;
@@ -3825,13 +3833,15 @@ function Dashboard({
                   {shownSharedProjects.map((project, index) => {
                     const key = sharedProjectKey(project);
                     const where = project.path ?? "";
+                    const isOpening = openingSharedKey === key;
                     return (
                     <article
-                      className={`project-card shared-project-card${draggedSharedKey === key ? " dragging" : ""}${selecting ? " selectable" : ""}${selecting && selectedKeys.has(serverDesignKey(key)) ? " selected" : ""}`}
+                      className={`project-card shared-project-card${isOpening ? " is-opening" : ""}${draggedSharedKey === key ? " dragging" : ""}${selecting ? " selectable" : ""}${selecting && selectedKeys.has(serverDesignKey(key)) ? " selected" : ""}`}
                       key={key}
-                      draggable={!searchResults && !selecting}
+                      draggable={!searchResults && !selecting && !isOpening}
                       title={searchResults ? undefined : t("shared.dragHint")}
                       onDragStart={(event) => {
+                        if (isOpening) return;
                         event.dataTransfer.effectAllowed = "move";
                         event.dataTransfer.setData("text/plain", project.fileName);
                         setDraggedSharedKey(key);
@@ -3844,13 +3854,31 @@ function Dashboard({
                       <button
                         className="project-card-open"
                         type="button"
+                        disabled={Boolean(openingSharedKey)}
+                        aria-busy={isOpening ? "true" : undefined}
                         aria-pressed={selecting ? selectedKeys.has(serverDesignKey(key)) : undefined}
                         aria-label={selecting ? t("dashboard.selectDesign", { name: project.name }) : undefined}
-                        onClick={() => (selecting ? toggleSelected(serverDesignKey(key)) : onOpenSharedProject(project))}
+                        onClick={() => {
+                          if (openingSharedKey) return;
+                          if (selecting) {
+                            toggleSelected(serverDesignKey(key));
+                          } else {
+                            onOpenSharedProject(project);
+                          }
+                        }}
                       >
-                        <ProjectPreview accent={PROJECT_ACCENTS[index % PROJECT_ACCENTS.length]} thumbnailUrl={project.thumbnailUrl} />
+                        <ProjectPreview accent={PROJECT_ACCENTS[index % PROJECT_ACCENTS.length]} thumbnailUrl={project.thumbnailUrl} loading={isOpening} />
                         <span className="project-card-title" translate="no">{project.name}</span>
-                        <span className="project-card-meta">{formatUpdated(project.updatedAt, language)} - {formatFileSize(project.size)}</span>
+                        <span className="project-card-meta">
+                          {isOpening ? (
+                            <span className="project-card-meta-loading">
+                              <LoaderCircle size={13} className="project-preview-spinner" />
+                              <span>{t("notice.openingShared", { name: project.name })}</span>
+                            </span>
+                          ) : (
+                            `${formatUpdated(project.updatedAt, language)} - ${formatFileSize(project.size)}`
+                          )}
+                        </span>
                       </button>
                       {/* Ein Treffer sagt, wo er liegt - und der Ordner ist ein
                           Knopf, der genau dorthin fuehrt. Ohne das waere die
@@ -4596,7 +4624,7 @@ function Dashboard({
   );
 }
 
-function ProjectPreview({ accent, thumbnailUrl }: { accent: DashboardProject["accent"]; thumbnailUrl?: string | null }) {
+function ProjectPreview({ accent, thumbnailUrl, loading = false }: { accent: DashboardProject["accent"]; thumbnailUrl?: string | null; loading?: boolean }) {
   const [failedThumbnailUrl, setFailedThumbnailUrl] = useState<string | null>(null);
   const showThumbnail = Boolean(thumbnailUrl && thumbnailUrl !== failedThumbnailUrl);
 
@@ -4605,7 +4633,7 @@ function ProjectPreview({ accent, thumbnailUrl }: { accent: DashboardProject["ac
   }, [thumbnailUrl]);
 
   return (
-    <span className={`project-preview accent-${accent}`} aria-hidden="true">
+    <span className={`project-preview accent-${accent}${loading ? " is-loading" : ""}`} aria-hidden="true">
       {showThumbnail ? (
         <img className="project-thumbnail-image" src={thumbnailUrl ?? ""} alt="" onError={() => setFailedThumbnailUrl(thumbnailUrl ?? null)} />
       ) : (
@@ -4614,6 +4642,11 @@ function ProjectPreview({ accent, thumbnailUrl }: { accent: DashboardProject["ac
           <span className="preview-empty-mark">{t("dashboard.noSnapshot")}</span>
         </>
       )}
+      {loading ? (
+        <span className="project-preview-loading">
+          <LoaderCircle size={28} className="project-preview-spinner" />
+        </span>
+      ) : null}
     </span>
   );
 }

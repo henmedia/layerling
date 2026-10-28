@@ -2404,6 +2404,14 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   align-items: center;
 }
 
+.project-card.is-opening {
+  pointer-events: none;
+}
+
+.project-card.is-opening .project-card-open {
+  cursor: wait;
+}
+
 .project-preview {
   position: relative;
   display: block;
@@ -2411,6 +2419,32 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   overflow: hidden;
   border-radius: 6px;
   background: #f8f5ef;
+}
+
+.project-preview.is-loading .project-thumbnail-image {
+  opacity: 0.35;
+  filter: grayscale(40%);
+}
+
+.project-preview-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.38);
+  color: #ffffff;
+  backdrop-filter: blur(1.5px);
+  z-index: 2;
+  border-radius: inherit;
+}
+
+.project-preview-spinner {
+  animation: project-preview-spin 0.8s linear infinite;
+}
+
+@keyframes project-preview-spin {
+  to { transform: rotate(360deg); }
 }
 
 .project-list .project-preview {
@@ -2743,6 +2777,14 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.project-card-meta-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #c25e00;
+  font-weight: 500;
 }
 
 /* Der Ordner eines Suchtreffers: eine Zeile unter der Kachel, die sagt, wo
@@ -11900,6 +11942,15 @@ html[data-theme="dark"] .project-card-meta,
 html[data-theme="dark"] .dashboard-import-notice,
 html[data-theme="dark"] .dashboard-confirm-dialog p {
   color: #a89179;
+}
+
+html[data-theme="dark"] .project-card-meta-loading {
+  color: #f59e0b;
+}
+
+html[data-theme="dark"] .project-preview-loading {
+  background: rgba(0, 0, 0, 0.58);
+  color: #ffffff;
 }
 
 html[data-theme="dark"] .dashboard-rename-dialog input,
