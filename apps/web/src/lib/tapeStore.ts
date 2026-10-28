@@ -126,6 +126,18 @@ export function savedTape(model: { points: readonly SavedTapePoint[]; segments: 
   return normalizeSavedTape({ points: model.points, segments: model.segments, hidden: model.hidden });
 }
 
+/**
+ * The highest number in the ids of these points and lines (`tape-point-7`, `tape-segment-12`), so new ones count on
+ * from there: measurements come back from the design or the editor's memory with their ids, and a counter that started
+ * at 0 again gave a new point the id of a kept one.
+ */
+export function highestTapeIdNumber(model: { points: readonly { id: string }[]; segments: readonly { id: string }[] }) {
+  return [...model.points, ...model.segments].reduce((highest, entry) => {
+    const number = Number(/-(\d+)$/.exec(entry.id)?.[1]);
+    return Number.isSafeInteger(number) ? Math.max(highest, number) : highest;
+  }, 0);
+}
+
 export function readTape(projectId: string | null | undefined): SavedTape | null {
   if (!projectId) return null;
   try {

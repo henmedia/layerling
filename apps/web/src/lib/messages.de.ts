@@ -1176,6 +1176,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.svgEdgesTooComplex": ". Der Entwurf hat zu viele Kanten für diese Ansicht, deshalb enthält das SVG seine gefüllte Silhouette.",
   "status.dxfSummary": ". Kreise: {circles}, Bögen: {arcs}, Linien: {lines}.",
   "status.dxfOpenLeftOut": " Nicht geschlossene Umrisse weggelassen: {count}.",
+  "status.stencilBridgesLead": ".",
   "status.stencilBridgesAdded": " Eingefügte Stege: {count}.",
   "status.stencilBridgesUnheld": " Teile, die kein Steg erreicht (sie würden herausfallen): {count}.",
   "status.mcpAligned": "MCP-Ausrichtung bereits {label}",

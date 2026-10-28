@@ -481,6 +481,17 @@ function formatPropertyNumber(value: number, accuracy: MeasurementAccuracy, step
 
 const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diameter", "starOuterSize"]);
 const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ"]);
+/** How long after the last turn of the wheel a field is kept under the pointer. */
+const WHEEL_ANCHOR_MS = 600;
+
+/** The nearest box around an element that scrolls up and down. */
+function scrollingAncestor(element: HTMLElement): HTMLElement | null {
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    const overflow = getComputedStyle(parent).overflowY;
+    if ((overflow === "auto" || overflow === "scroll") && parent.scrollHeight > parent.clientHeight) return parent;
+  }
+  return null;
+}
 
 function propertyUsesLengthUnit(key: string) {
   return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "sketchLineWidth", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
@@ -5545,11 +5556,49 @@ function RangeProperty({
     const turn = wheelTurn(event);
     if (!input || disabled || !editing || document.activeElement !== input || turn === 0) return;
     event.preventDefault();
+    const starting = wheelAnchorRef.current === null;
+    if (starting) wheelAnchorRef.current = { top: input.getBoundingClientRect().top, until: 0 };
+    wheelAnchorRef.current!.until = performance.now() + WHEEL_ANCHOR_MS;
     stepFieldValue(turn < 0 ? 1 : -1, { shift: event.shiftKey, ctrl: event.ctrlKey, alt: event.altKey });
+    if (starting) holdFieldUnderPointer();
+  };
+  // A hint above the field can come or go with the value the wheel sets - "The body stands tilted" appears as soon as
+  // a rotation leaves 0 - and push the field away from under the pointer, so the next turn of the wheel scrolled the
+  // panel instead (forum, StonXX). While the wheel turns, the panel scrolls along by as much as the field moved.
+  const wheelAnchorRef = useRef<{ top: number; until: number } | null>(null);
+  const keepFieldInPlace = () => {
+    const input = numberInputRef.current;
+    const anchor = wheelAnchorRef.current;
+    if (!input || !anchor) return;
+    const moved = input.getBoundingClientRect().top - anchor.top;
+    if (Math.abs(moved) >= 1) scrollingAncestor(input)?.scrollBy({ top: moved, behavior: "instant" });
+  };
+  const holdFieldUnderPointer = () => {
+    // Where the panel cannot scroll far enough the field still moves: until the wheel rests, its turns stay with the
+    // field wherever the pointer ended up, rather than zooming the view or scrolling the panel.
+    const forward = (event: WheelEvent) => {
+      const input = numberInputRef.current;
+      if (!input || event.target === input || document.activeElement !== input) return;
+      event.stopPropagation();
+      wheelHandlerRef.current?.(event);
+    };
+    window.addEventListener("wheel", forward, { capture: true, passive: false });
+    // The shape changes in the editor, which can paint the hint a frame or two later than this field's own render.
+    const follow = () => {
+      keepFieldInPlace();
+      if (wheelAnchorRef.current && performance.now() < wheelAnchorRef.current.until) {
+        requestAnimationFrame(follow);
+        return;
+      }
+      wheelAnchorRef.current = null;
+      window.removeEventListener("wheel", forward, true);
+    };
+    requestAnimationFrame(follow);
   };
   useLayoutEffect(() => {
     const input = numberInputRef.current;
     if (keepSelectedRef.current && input && document.activeElement === input) selectWholeValue(input);
+    keepFieldInPlace();
   });
   useEffect(() => {
     const input = numberInputRef.current;

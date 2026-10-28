@@ -1,5 +1,50 @@
 [
   {
+    "version": "1.116.0",
+    "items": [
+      {
+        "title": {
+          "de": "Maßband: klarere Beschriftung",
+          "en": "Tape measure: clearer labels"
+        },
+        "body": {
+          "de": "Jede Beschriftung nennt die Achsen, entlang derer gemessen wird, etwa X, XY oder 3D. Fährst du mit der Maus darüber, siehst du die Strecke je Achse, über einem Punkt seine Lage. Beschriftungen stehen neben der Linie statt darauf, und Messungen hinter anderen Körpern werden blasser.",
+          "en": "Each label names the axes it measures along, such as X, XY or 3D. Hover it to see the reach along each axis, hover a point to see where it is. Labels sit beside their line instead of on it, and measurements behind other bodies fade."
+        }
+      },
+      {
+        "title": {
+          "de": "Gebogenes Rohr: Öffnung wieder mittig",
+          "en": "Bent tube: the opening is centred again"
+        },
+        "body": {
+          "de": "Mit „Bohrung schneidet beim Gruppieren wie ein Loch“ saß die Öffnung eines gebogenen Rohrs nach dem Gruppieren um die Wandstärke zu tief und schnitt das Rohr unten auf. Sie liegt jetzt wieder mittig, und die Wand bleibt geschlossen.",
+          "en": "With \"Bore cuts as a hole when grouped\", the opening of a bent tube sat one wall too low after grouping and cut the bottom of the pipe open. It is centred again, and the wall stays closed."
+        }
+      },
+      {
+        "title": {
+          "de": "Mausrad im Eigenschaftenfeld: das Feld bleibt stehen",
+          "en": "Mouse wheel in a property field: the field stays put"
+        },
+        "body": {
+          "de": "Beim Drehen um X oder Y mit dem Mausrad erscheint der Hinweis, dass der Körper schräg steht. Bisher rutschte das Feld dadurch unter dem Mauszeiger weg, und das Mausrad rollte die Seitenleiste. Jetzt bleibt das Feld an seinem Platz und nimmt jede Raddrehung an.",
+          "en": "Turning a body about X or Y with the mouse wheel brings up the hint that it stands tilted. The field used to slip away from under the pointer, and the wheel scrolled the panel instead. Now the field stays in place and takes every turn of the wheel."
+        }
+      },
+      {
+        "title": {
+          "de": "Speichern auf dem eigenen Server: auch große Entwürfe",
+          "en": "Saving to your own server: large designs too"
+        },
+        "body": {
+          "de": "store.php lädt einen Entwurf beim Speichern nicht mehr ganz in den Arbeitsspeicher. Große Entwürfe, etwa mit Oberflächentextur, speichern auch auf einem kleinen Server schnell und scheitern nicht mehr an der Speichergrenze von PHP.",
+          "en": "store.php no longer loads a whole design into memory when saving. Large designs, with a surface texture say, save quickly even on a small server and no longer fail at PHP's memory limit."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.115.0",
     "items": [
       {

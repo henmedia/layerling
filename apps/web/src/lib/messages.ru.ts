@@ -1173,6 +1173,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.svgEdgesTooComplex": ". У модели слишком много рёбер для этого вида, поэтому SVG содержит её залитый силуэт.",
   "status.dxfSummary": ". В файле окружностей: {circles}, дуг: {arcs}, отрезков: {lines}.",
   "status.dxfOpenLeftOut": " Незамкнутые контуры пропущены: {count}.",
+  "status.stencilBridgesLead": ".",
   "status.stencilBridgesAdded": " Добавлено перемычек: {count}.",
   "status.stencilBridgesUnheld": " Части, к которым не подходит ни одна перемычка (они выпадут): {count}.",
   "status.mcpAligned": "MCP: выравнивание уже {label}",

@@ -936,6 +936,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.svgEdgesTooComplex": ". Model ima za ta pogled preveč robov, zato SVG vsebuje njegovo zapolnjeno silhueto.",
   "status.dxfSummary": ". Datoteka vsebuje krogov: {circles}, lokov: {arcs}, črt: {lines}.",
   "status.dxfOpenLeftOut": " Nesklenjeni obrisi so izpuščeni: {count}.",
+  "status.stencilBridgesLead": ".",
   "status.stencilBridgesAdded": " Dodani mostički: {count}.",
   "status.stencilBridgesUnheld": " Deli, do katerih ne seže noben mostiček (bi izpadli): {count}.",
   "status.mcpAligned": "Poravnava MCP že je: {label}",

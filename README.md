@@ -314,6 +314,8 @@ Opening a design from the server gives you a private local working copy. Saving 
 first; if someone else changed the file in the meantime, layerling refuses to overwrite it and asks you to reload or save
 under a different name. This is shared file storage, not simultaneous editing.
 
+Behind an authenticating reverse proxy (such as Authelia, oauth2-proxy, Cloudflare Access, or HTTP Basic Auth), set `LAYERLING_USER_HEADER` to the header your proxy sets (e.g. `LAYERLING_USER_HEADER=X-Forwarded-Email` or in Apache `SetEnv LAYERLING_USER_HEADER Remote-User`) to isolate each user's designs into `.users/<user>/`. This is only safe when layerling can be reached through the proxy alone, so nobody can send arbitrary headers directly to the server.
+
 #### Without Node: the `store` Folder
 
 An installation served as a static export – plain files on a web server – cannot write anything by itself. For that case

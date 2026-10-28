@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
-import { constants as fsConstants, promises as fs } from "fs";
+import { constants as fsConstants, promises as fs, createReadStream } from "fs";
+import { Readable } from "stream";
 import path from "path";
 import { NextResponse } from "next/server";
 import { inspectLylProjectPackage, LYL_LIMITS, LYL_MEDIA_TYPE } from "@/lib/lylProject";
@@ -11,6 +12,7 @@ export const runtime = "nodejs";
 export const revalidate = false;
 
 const SHARED_PROJECTS_ENV = "LAYERLING_SHARED_PROJECTS_DIR";
+const USER_HEADER_ENV = "LAYERLING_USER_HEADER";
 const SHARED_THUMBNAILS_DIR = ".thumbnails";
 const MAX_THUMBNAIL_BYTES = 5 * 1024 * 1024;
 const MAX_MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
@@ -46,9 +48,39 @@ function failureResponse(error: unknown, fallback: string, fallbackStatus = 500)
   return NextResponse.json({ error: error instanceof Error ? error.message : fallback }, { status: fallbackStatus });
 }
 
-function sharedProjectsDirectory() {
+/**
+ * Detects the authenticated user when configured with LAYERLING_USER_HEADER.
+ * If the setting is unset or empty, header-based user isolation is disabled.
+ *
+ * Returns a sanitized folder name if authenticated, or null if disabled / unauthenticated.
+ */
+function authenticatedUserFolder(request: Request): string | null {
+  const headerName = process.env[USER_HEADER_ENV]?.trim();
+  if (!headerName) {
+    return null;
+  }
+
+  const identity = request.headers.get(headerName);
+  if (typeof identity === "string" && identity.trim() !== "") {
+    let safe = identity.trim().toLowerCase().replace(/@/g, "_at_");
+    safe = safe.replace(/[^a-z0-9_.-]/g, "_");
+    safe = safe.replace(/^[._-]+|[._-]+$/g, "");
+    return safe !== "" ? safe : null;
+  }
+
+  return null;
+}
+
+function sharedProjectsDirectory(request?: Request) {
   const configured = (process.env[SHARED_PROJECTS_ENV])?.trim();
-  return configured ? path.resolve(configured) : null;
+  if (!configured) return null;
+  const base = path.resolve(configured);
+  if (!request) return base;
+  const userFolder = authenticatedUserFolder(request);
+  if (userFolder) {
+    return path.join(base, ".users", userFolder);
+  }
+  return base;
 }
 
 /**
@@ -244,7 +276,7 @@ function disabledResponse() {
 }
 
 export async function GET(request: Request) {
-  const root = sharedProjectsDirectory();
+  const root = sharedProjectsDirectory(request);
   if (!root) return disabledResponse();
   try {
     await ensureSharedRoot(root);
@@ -274,22 +306,22 @@ export async function GET(request: Request) {
         const imagePath = sharedThumbnailPath(folder, fileName, revision);
         const imageStat = await regularFileStat(imagePath);
         if (!imageStat) return new NextResponse("Shared project thumbnail was not found", { status: 404 });
-        const image = await fs.readFile(imagePath);
-        return new NextResponse(image, {
+        const imageStream = Readable.toWeb(createReadStream(imagePath));
+        return new Response(imageStream as BodyInit, {
           headers: {
             "Cache-Control": "public, max-age=31536000, immutable",
-            "Content-Length": String(image.byteLength),
+            "Content-Length": String(imageStat.size),
             "Content-Type": "image/png",
             ETag: `"${revision}"`,
           },
         });
       }
-      const bytes = await fs.readFile(filePath);
-      return new Response(bytes, {
+      const fileStream = Readable.toWeb(createReadStream(filePath));
+      return new Response(fileStream as BodyInit, {
         headers: {
           "Cache-Control": "no-store",
           "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`,
-          "Content-Length": String(bytes.byteLength),
+          "Content-Length": String(stat.size),
           "Content-Type": LYL_MEDIA_TYPE,
           ETag: `"${revisionForStat(stat)}"`,
         },
@@ -782,7 +814,7 @@ async function saveSettings(root: string, requested: string, request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const root = sharedProjectsDirectory();
+  const root = sharedProjectsDirectory(request);
   if (!root) return NextResponse.json({ error: "Shared project storage is disabled" }, { status: 404 });
   if (!sameOriginRequest(request)) return NextResponse.json({ error: "Shared projects only accept same-origin deletes" }, { status: 403 });
 
@@ -842,7 +874,7 @@ export async function DELETE(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const root = sharedProjectsDirectory();
+  const root = sharedProjectsDirectory(request);
   if (!root) return NextResponse.json({ error: "Shared project storage is disabled" }, { status: 404 });
   if (!sameOriginRequest(request)) return NextResponse.json({ error: "Shared projects only accept same-origin saves" }, { status: 403 });
 

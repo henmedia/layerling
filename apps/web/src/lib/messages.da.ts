@@ -1649,6 +1649,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.importFailedMore": " og {count} mere",
   "status.importColoredParts": "{name} har {count} farver og kommer ind som {count} former, hver på sin plads og valgt sammen.",
   "status.importObjectParts": "{name} indeholder {objects} objekter og kommer ind som {count} former, hver på sin plads og valgt sammen.",
+  "status.importStepParts": "{name} indeholder {count} solider; hver kommer ind som en form under sit eget navn, på sin plads og valgt sammen.",
   "status.importSvgSkipped": "{count} form(er) af {name} blev ikke bygget til en solid og blev udeladt. Saml overlappende stykker i tegneprogrammet, luk omridset og gem SVG'en igen.",
   "status.importDxfUnit": "{name} er tegnet i enheden „{unit}“; den blev omregnet til millimeter.",
   "status.importDxfUnitless": "{name} angiver ingen enhed, så den blev læst som millimeter. Tjek størrelsen.",

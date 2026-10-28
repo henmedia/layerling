@@ -26,6 +26,9 @@ services:
       # Behind a reverse proxy that rewrites the host, so saving to the server is refused ("only accept requests from
       # this site"): list the address people use. Normally the proxy just has to pass Host and X-Forwarded-Proto.
       # LAYERLING_ALLOWED_ORIGINS: "https://layerling.example.com"
+      # Behind an authenticating reverse proxy (Authelia, oauth2-proxy, Cloudflare Access, Basic Auth, Caddy forward_auth):
+      # isolate each user's shared projects under .users/<user> by naming the header your proxy sets:
+      # LAYERLING_USER_HEADER: "X-Forwarded-Email"
       # LAYERLING_MCP_REMOTE: "true"
       # LAYERLING_MCP_TOKEN: "a-long-random-secret-of-at-least-16-characters"
       # LAYERLING_MCP_ALLOWED_HOSTS: "layerling.example.com"   # only for a real domain, e.g. behind a reverse proxy

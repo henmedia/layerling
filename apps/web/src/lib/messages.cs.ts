@@ -1287,6 +1287,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.svgEdgesTooComplex": ". Návrh má pro tento pohled příliš mnoho hran, proto SVG obsahuje jeho vyplněnou siluetu.",
   "status.dxfSummary": ". Soubor obsahuje kružnice: {circles}, oblouky: {arcs}, úsečky: {lines}.",
   "status.dxfOpenLeftOut": " Neuzavřené obrysy byly vynechány: {count}.",
+  "status.stencilBridgesLead": ".",
   "status.stencilBridgesAdded": " Přidané můstky: {count}.",
   "status.stencilBridgesUnheld": " Části, ke kterým nevede žádný můstek (vypadly by): {count}.",
   "status.mcpAligned": "Zarovnání MCP už je {label}",

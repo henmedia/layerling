@@ -1176,6 +1176,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.svgEdgesTooComplex": ". Het ontwerp heeft te veel randen voor deze weergave, daarom bevat de SVG zijn gevulde silhouet.",
   "status.dxfSummary": ". Cirkels: {circles}, bogen: {arcs}, lijnen: {lines}.",
   "status.dxfOpenLeftOut": " Niet-gesloten omtrekken weggelaten: {count}.",
+  "status.stencilBridgesLead": ".",
   "status.stencilBridgesAdded": " Toegevoegde bruggen: {count}.",
   "status.stencilBridgesUnheld": " Delen die geen brug kan bereiken (ze zouden eruit vallen): {count}.",
   "status.mcpAligned": "MCP-uitlijning al {label}",

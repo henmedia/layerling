@@ -1166,6 +1166,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.svgEdgesTooComplex": ". Le modèle a trop d'arêtes pour cette vue, le SVG contient donc sa silhouette remplie.",
   "status.dxfSummary": ". Cercles : {circles}, arcs : {arcs}, lignes : {lines}.",
   "status.dxfOpenLeftOut": " Contours non fermés laissés de côté : {count}.",
+  "status.stencilBridgesLead": ".",
   "status.stencilBridgesAdded": " Ponts ajoutés : {count}.",
   "status.stencilBridgesUnheld": " Pièces qu'aucun pont n'atteint (elles tomberaient) : {count}.",
   "status.mcpAligned": "Alignement MCP déjà {label}",

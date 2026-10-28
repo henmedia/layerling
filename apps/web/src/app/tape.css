@@ -1,0 +1,236 @@
+/* --- Tape measure overlay: lines, points and labels drawn over the 3D view. */
+.tape-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.tape-guides {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tape-segment {
+  stroke: #5a3917;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  transition: stroke 120ms ease, stroke-width 120ms ease;
+}
+
+/* A halo under the line, so it reads on the workplane and on bodies of any colour. */
+.tape-segment-casing {
+  stroke: rgba(255, 255, 255, 0.75);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.tape-segment-group.hovered .tape-segment {
+  stroke-width: 3;
+}
+
+.tape-segment-hit {
+  stroke: transparent;
+  stroke-width: 14;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.tape-point,
+.tape-hover-point {
+  fill: #ffffff;
+  stroke: #b66108;
+  stroke-width: 2.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.tape-point {
+  pointer-events: all;
+  cursor: pointer;
+  transition: fill 120ms ease, stroke 120ms ease, filter 120ms ease;
+}
+
+.tape-overlay.move-mode .tape-point {
+  cursor: grab;
+}
+
+.tape-overlay.move-mode .tape-point:active {
+  /* The hand would hide the point it moves; while dragging the crosshair shows where it lands (#943). */
+  cursor: crosshair;
+  fill: #f6f1e8;
+  filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
+}
+
+.tape-overlay.delete-mode .tape-segment-group:hover .tape-segment,
+.tape-overlay.quick-delete .tape-segment-group:hover .tape-segment {
+  stroke: var(--hover-accent-color);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 2px rgba(220, 63, 54, 0.3));
+}
+
+.tape-overlay.delete-mode .tape-point:hover,
+.tape-overlay.quick-delete .tape-point:hover {
+  fill: #fff0ee;
+  stroke: var(--hover-accent-color);
+  filter: drop-shadow(0 0 3px rgba(220, 63, 54, 0.36));
+}
+
+.tape-point.pending {
+  fill: #cf6e09;
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 3px rgba(113, 58, 0, 0.72));
+}
+
+.tape-hover-point {
+  fill: rgba(155, 80, 0, 0.28);
+  stroke-dasharray: 3 2;
+  pointer-events: none;
+}
+
+.tape-hover-edge {
+  fill: none;
+  stroke: #e17709;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 3px rgba(173, 89, 0, 0.48));
+  pointer-events: none;
+}
+
+.tape-label {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 46px;
+  padding: 5px 9px;
+  color: #3a2816;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(224, 208, 190, 0.96);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(58, 40, 20, 0.12);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+/* Hovering the label shows the reach along each axis, or brings a faded one back; any other label lets clicks through to the view. */
+.tape-label.has-deltas,
+.tape-label.occluded {
+  pointer-events: auto;
+  cursor: default;
+}
+
+/* Mostly behind a body: still readable, but it no longer looks like it floats in front. */
+.tape-label.occluded,
+.tape-segment-group.occluded,
+.tape-mark.occluded {
+  opacity: 0.4;
+  transition: opacity 160ms ease;
+}
+
+.tape-label.occluded.hovered,
+.tape-segment-group.occluded.hovered,
+.tape-segment-group.occluded:hover,
+.tape-mark.occluded.hovered {
+  opacity: 1;
+}
+
+/* The axes a measurement runs along: X, XY, 3D. */
+.tape-label-axes {
+  color: #ad5900;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* A measurement with a body at one end: a click types a length and moves that body (#823). */
+.tape-label.editable {
+  font-family: inherit;
+  pointer-events: auto;
+  cursor: text;
+}
+
+.tape-label.editable:hover,
+.tape-label.editable:focus-visible {
+  color: #ad5900;
+  border-color: #ad5900;
+}
+
+/* Hover tips: a measurement's reach along each axis, a point's coordinates. */
+.tape-tip {
+  position: absolute;
+  z-index: 4;
+  padding: 4px 8px;
+  color: #ffffff;
+  background: rgba(40, 30, 20, 0.92);
+  border-radius: 6px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  white-space: pre;
+  pointer-events: none;
+  transform: translate(-50%, 0);
+}
+
+.tape-tip.above {
+  transform: translate(-50%, -100%);
+}
+
+/* The middle of a measurement, as big as a point: its lower half filled says "half way" (#323). */
+.tape-mark {
+  position: absolute;
+  z-index: 3;
+  width: 11px;
+  height: 11px;
+  padding: 0;
+  background: linear-gradient(to bottom, #ffffff 50%, #b66108 50%);
+  border: 2px solid #b66108;
+  border-radius: 999px;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+}
+
+/* A finger needs more to aim at than the mark shows. */
+.tape-mark::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 999px;
+}
+
+.tape-mark:hover,
+.tape-mark:focus-visible {
+  border-color: #e17709;
+  background: linear-gradient(to bottom, #ffffff 50%, #e17709 50%);
+  filter: drop-shadow(0 0 3px rgba(173, 89, 0, 0.48));
+}
+
+/* Dark and graphite: the brown line vanished on the dark workplane. */
+html[data-theme="dark"] .tape-segment {
+  stroke: #f2a65a;
+}
+
+html[data-theme="dark"] .tape-segment-casing {
+  stroke: rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="dark"] .tape-tip {
+  color: #1f1a15;
+  background: rgba(250, 246, 240, 0.95);
+}

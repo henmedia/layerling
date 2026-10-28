@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
-import { normalizeSavedTape, savedTape, type SavedTape } from "@/lib/tapeStore";
+import { highestTapeIdNumber, normalizeSavedTape, savedTape, type SavedTape } from "@/lib/tapeStore";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -82,5 +82,18 @@ describe("the measurements a design keeps (#881)", () => {
     expect(read?.points[0].attachment).toBeUndefined();
     expect(read?.points[1].attachment).toEqual({ shapeId: "b", normalized: [0, 0, 1] });
     expect(read?.segments[0].edge).toBeUndefined();
+  });
+});
+
+describe("highestTapeIdNumber", () => {
+  it("counts on from the highest id of the kept points and lines, so a new one never takes a kept id", () => {
+    expect(highestTapeIdNumber({ points: [], segments: [] })).toBe(0);
+    expect(highestTapeIdNumber({
+      points: [{ id: "tape-point-2" }, { id: "tape-point-7" }],
+      segments: [{ id: "tape-segment-3" }],
+    })).toBe(7);
+    expect(highestTapeIdNumber({ points: [{ id: "tape-point-1" }], segments: [{ id: "tape-segment-12" }] })).toBe(12);
+    // Ids from elsewhere (an AI, an older file) without a number are passed over.
+    expect(highestTapeIdNumber({ points: [{ id: "a" }, { id: "tape-point-4" }], segments: [] })).toBe(4);
   });
 });

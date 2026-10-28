@@ -2657,6 +2657,12 @@ function splitBentTubeBore(shape: WorkplaneShape): WorkplaneShape[] {
     id: derivedLocalId(shape.id, "bore"),
     hole: true,
   };
+  // The patch keeps the underside where it was, as it should when the size is changed in the panel; the opening has to sit in
+  // the middle of the pipe instead, or it lies a wall lower and cuts through the bottom of the pipe (#892). Its box and the
+  // pipe's share their middle, lying, standing or tipped.
+  const solidBox = boundsForShapesOfVertices([solid]);
+  const boreBox = boundsForShapesOfVertices([bore]);
+  bore.elevation = (bore.elevation ?? 0) + (solidBox.minY + solidBox.maxY) / 2 - (boreBox.minY + boreBox.maxY) / 2;
   return [solid, bore];
 }
 

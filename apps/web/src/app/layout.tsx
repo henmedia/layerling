@@ -3,6 +3,7 @@ import "./globals.css";
 import "./dashboard.css";
 import "./historyView.css";
 import "./notes.css";
+import "./tape.css";
 import "./myShapes.css";
 import "./attachments.css";
 import "./viewCube.css";

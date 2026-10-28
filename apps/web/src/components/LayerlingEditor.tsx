@@ -12033,8 +12033,8 @@ export function LayerlingEditor({
       void stencilSvg(sourceShapes, exportName.trim() || projectName, bridges)
         .then(async (result) => {
           await deliver(projectExportFileName(exportName, "svg"), result.svg, "image/svg+xml;charset=utf-8");
-          // The bridges sentence follows "… as SVG", which has no full stop of its own.
-          finishNotice("SVG", result.bridgeCount || result.unheldCount ? `.${bridgeNote(result.bridgeCount, result.unheldCount)}` : "");
+          // The bridges sentence follows "… as SVG", which has no full stop of its own; the language supplies it.
+          finishNotice("SVG", result.bridgeCount || result.unheldCount ? t("status.stencilBridgesLead") + bridgeNote(result.bridgeCount, result.unheldCount) : "");
         })
         .catch((error: unknown) => failNotice("SVG", error));
       return;

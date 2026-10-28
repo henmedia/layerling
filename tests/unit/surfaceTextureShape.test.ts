@@ -98,7 +98,8 @@ describe("a textured shape", () => {
     expect(textured.rotationX ?? 0).toBe(0);
     // Lying down, the cylinder is as tall as it is wide.
     expect(textured.height).toBeGreaterThan(29);
-  });
+    // Up to 150,000 triangles textured all round: it ran past the default 5 s twice in the full parallel suite.
+  }, 30_000);
 
   it("works without a worker, here in the tests", async () => {
     const outcome = await textureSurfaceOffThread(surfaceTextureInput(shape({})), normalizeSurfaceTexture({ pattern: "honeycomb", spacing: 6 }), 150_000);

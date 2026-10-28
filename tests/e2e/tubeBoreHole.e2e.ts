@@ -3,7 +3,7 @@ import manifoldModule from "manifold-3d";
 import type { WorkplaneShape } from "@/types/layerling";
 import { buildGroupedShapeFromSelection, manifoldFromMeshData, splitBoreTube } from "@/lib/editorBooleans";
 import { bentTubeNaturalDimensions, bentTubeProfileRadii, bentTubeSettings, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
-import { meshForShape } from "@/lib/editorMeshCore";
+import { boundsForShapesOfVertices, meshForShape } from "@/lib/editorMeshCore";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 
 /**
@@ -87,6 +87,26 @@ describe("a bent tube whose opening cuts as a hole (#892)", () => {
 
   it("opens the wall with it", async () => {
     expect(await bentPipeBlockedVolume(true)).toBeLessThan(0.05);
+  });
+
+  it("keeps the opening in the middle of the pipe, so its own wall stays closed", async () => {
+    // Lying, stood up and tipped: the bottom of the pipe's wall (2 mm) is still there beside the other wall.
+    for (const turn of [{}, { rotationZ: 90 }, { rotationX: 30, rotation: 20 }]) {
+      const pipe = { ...bentPipe(true), ...turn } as WorkplaneShape;
+      const [solid, bore] = splitBoreTube(pipe);
+      const solidBox = boundsForShapesOfVertices([solid]);
+      const boreBox = boundsForShapesOfVertices([bore]);
+      for (const [low, high] of [["minX", "maxX"], ["minY", "maxY"], ["minZ", "maxZ"]] as const) {
+        expect((boreBox[low] + boreBox[high]) / 2).toBeCloseTo((solidBox[low] + solidBox[high]) / 2, 3);
+      }
+    }
+    const { group } = await buildGroupedShapeFromSelection([bentPipe(true), wall()], 500_000);
+    const solid = manifoldFromMeshData(runtime, meshForShape(group!));
+    const floor = runtime.Manifold.cube([4, 1.2, 1], true).translate([-14, 1, 0]);
+    const kept = solid.intersect(floor);
+    const volume = kept.volume();
+    [solid, floor, kept].forEach((item) => item.delete());
+    expect(volume).toBeGreaterThan(4.8 * 0.95);
   });
 
   it("is cut as a solid pipe and an opening that is a hole, and stays one shape otherwise", () => {
