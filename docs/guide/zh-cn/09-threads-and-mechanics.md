@@ -147,6 +147,14 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 {{ui:prop.hingeStyle}}有三个选项：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（为自备销留的孔）和{{ui:hinge.styleCone}}。选圆锥时，{{ui:prop.hingeConeSize}}决定圆锥从关节长出处的大小；圆锥越大越牢固，默认取能放下的最大值。带圆锥的铰链没有销也没有孔，所以它的翼板可以和整个关节一样厚：把{{ui:prop.hingeLeafThickness}}设为关节直径，翼板就与关节齐平；这样的铰链最多打开约 90°，因为厚翼板会相碰。
 
+## 弹性关节（Flexi）
+
+{{ui:editor.tool.flexi}} 把一个扁平的实体变成可以活动的小玩偶，例如鱼、蛇或龙，一次打印成型（print-in-place）。实体由你自己画或搭建，例如用草图或拉伸的 SVG。工具沿实体长度横向把它切成若干节，并在每个切口处加一个关节：一节带着一根竖直的轴，中间比上下两端粗，下一节带间隙地把它包住。这样关节既能卡住又不会粘连，所有斜面都是 45°，无需支撑即可打印。各节之间留出一道楔形缺口，宽度对应各节向两侧摆动的角度。
+
+选中实体（多个部件会合并，其中的孔会被减去），点击 {{ui:editor.tool.flexi}}。在窗口中设置沿哪一边切分（{{ui:flexi.axis.auto}} 取较长的一边）、{{ui:flexi.joints}} 的数量、{{ui:flexi.clearance}}（一般 0.4 mm 即可）以及 {{ui:flexi.swing}} 的角度。关节大小会按实体自动确定；取消 {{ui:flexi.autoSize}} 后可自己填写 {{ui:flexi.size}}。取消 {{ui:flexi.evenLinks}} 后可以设定第一个关节离起点、最后一个离终点的距离，比如让头部保持为一整块。关节所在处，实体至少应约 6 mm 高、12 mm 宽；放不下时，窗口会告诉你是哪一个。
+
+结果是一组关节节段（网格）的捆绑，按摆放的样子直接打印。如果不满意切分，撤销后换别的数值再试。先用两三个关节试打一次，就能看出间隙是否适合你的打印机。
+
 ## 滚花
 
 {{ui:shape.knurl}} 是布满四周沟槽的圆形握持面，用于旋钮、拨轮和工具手柄。在 {{ui:prop.knurlPattern}} 下选择 {{ui:knurl.straight}}（沿轴线的沟槽，像控制旋钮）、{{ui:knurl.diamond}}（两排斜向沟槽交叉成小菱形），或 {{ui:knurl.round}}（沿轴线的沟槽和凸脊形成柔和的圆弧波纹，握感舒适而没有锐利的棱）。圆形沟槽保持浅于半个齿距，否则凸脊会在根部鼓起；深度过大会自动退让。你设置 {{ui:prop.diameter}} 和 {{ui:prop.height}}、{{ui:prop.knurlCount}} 的数量和 {{ui:prop.knurlDepth}}；交叉滚花还要设置相对轴线的 {{ui:prop.knurlAngle}}。{{ui:prop.knurlChamfer}} 以 45 度断开两端，像车削的旋钮；0 则保持尖锐。

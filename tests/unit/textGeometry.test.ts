@@ -1,6 +1,7 @@
+import * as THREE from "three";
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadTextFonts } from "@/lib/textFonts";
-import { createTextGeometry, curvedTextFootprint, curvedTextPatch, textGlyphShapes } from "@/lib/textGeometry";
+import { createTextGeometry, curvedTextFootprint, curvedTextLayout, curvedTextPatch, textGlyphShapes } from "@/lib/textGeometry";
 import { textLetterSize, textLetterSizePatch } from "@/lib/nameTag";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -221,5 +222,52 @@ describe("stretched text (#382)", () => {
     const patch = textLetterSizePatch(shape, size * 2);
     expect(patch.width).toBeCloseTo(40, 3);
     expect(patch.depth).toBeCloseTo(20, 1);
+  });
+  it("runs vertical curved text as a column along the circle, the letters upright (#981)", () => {
+    const shape = mockShape({ text: "Harvey", textCurved: true, textVertical: true, textRadius: 40, textSize: 8 });
+    const { glyphs } = curvedTextLayout(shape);
+    expect(glyphs.map((glyph) => glyph.char).join("")).toBe("Harvey");
+    const places = glyphs.map(({ matrix }) => new THREE.Vector3(0, 0, 0).applyMatrix4(matrix));
+    // The glyph's own middle is the arc point, so the letters' places (matrix applied to the glyph middle) lie on the circle at the left.
+    const middles = glyphs.map(({ char, matrix }) => {
+      const outline = curvedTextLayout(shape).options.font.generateShapes(char, curvedTextLayout(shape).options.size).flatMap((glyph) => glyph.getPoints());
+      const xs = outline.map((point) => point.x);
+      const ys = outline.map((point) => point.y);
+      return new THREE.Vector3((Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2, 0).applyMatrix4(matrix);
+    });
+    middles.forEach((middle) => {
+      expect(Math.hypot(middle.x, middle.z)).toBeCloseTo(40, 3);
+      expect(middle.x).toBeLessThan(0);
+    });
+    // Top to bottom: z grows from letter to letter.
+    for (let index = 1; index < middles.length; index += 1) expect(middles[index].z).toBeGreaterThan(middles[index - 1].z);
+    // Upright: every letter's height still points to -Z and its width to +X, whatever its place on the arc.
+    glyphs.forEach(({ matrix }) => {
+      const up = new THREE.Vector3(0, 1, 0).transformDirection(matrix);
+      const across = new THREE.Vector3(1, 0, 0).transformDirection(matrix);
+      expect(up.z).toBeCloseTo(-1, 6);
+      expect(across.x).toBeCloseTo(1, 6);
+    });
+    expect(places).toHaveLength(6);
+  });
+
+  it("puts the vertical curved column on the right with 'along the bottom', and sizes the box for it", () => {
+    const left = mockShape({ text: "Harvey", textCurved: true, textVertical: true, textRadius: 40, textSize: 8 });
+    const right = { ...left, textInward: true };
+    const centre = (shape: WorkplaneShape) => {
+      const { glyphs } = curvedTextLayout(shape);
+      return glyphs.reduce((sum, { matrix }) => sum + new THREE.Vector3(0, 0, 0).applyMatrix4(matrix).x, 0) / glyphs.length;
+    };
+    expect(centre(left)).toBeLessThan(0);
+    expect(centre(right)).toBeGreaterThan(0);
+    const patch = curvedTextPatch({ ...left, textVertical: undefined, textCurved: true } as WorkplaneShape, { textVertical: true });
+    expect(patch.width).toBeGreaterThan(70);
+  });
+
+  it("shrinks a vertical column that is too long for its circle", () => {
+    const text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const shape = mockShape({ text, textCurved: true, textVertical: true, textRadius: 10, textSize: 8 });
+    const { options } = curvedTextLayout(shape);
+    expect(options.size).toBeLessThan(8);
   });
 });

@@ -69,6 +69,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_intersect_objects` | zachová pouze společný průnik objektů |
 | `layerling_hull_objects` | obalí objekty jedním vypouklým tělesem, jako by byly zataveny ve fólii (obal) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | rozdělí tvar na jeho nespojené části, těleso z náčrtu na jedno těleso za každý obrys |
 | `layerling_split_objects` | rozdělí tělesa nebo výřezy rovinou na dvě části |

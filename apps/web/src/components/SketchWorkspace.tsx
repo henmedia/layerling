@@ -543,7 +543,10 @@ export function shapeMeshFootprint(shape: WorkplaneShape): SketchReferenceFootpr
   if (mesh.faces.length > REFERENCE_OUTLINE_TRIANGLE_LIMIT) return null;
   const positions: number[] = [];
   mesh.faces.forEach((face) => face.forEach((index) => positions.push(...mesh.vertices[index])));
-  const footprint = footprintOfPositions(positions, (x, z) => ({ x, z }), Math.max(shape.width, shape.depth, shape.height), shape.height);
+  // An edge treatment on the bottom takes the bottom face in from the body's wall: the outline is the body as seen from above,
+  // or a 10 mm square with its bottom edges chamfered showed as 9 mm (#1006).
+  const treated = Boolean(shape.edgeTreatments?.length || shape.edgeTreatmentHistory?.length);
+  const footprint = footprintOfPositions(positions, (x, z) => ({ x, z }), Math.max(shape.width, shape.depth, shape.height), shape.height, treated);
   return footprint ? { ...footprint, world: true } : null;
 }
 
@@ -606,7 +609,7 @@ function boxOfPositions(positions: ArrayLike<number>): SketchReferenceFootprint 
  * The outline of a mesh seen from above: its bottom triangles, as a fill and as the boundary round them; as it is seen from
  * above when it has no flat bottom or `asSeen` asks for that (#778).
  */
-function footprintOfPositions(
+export function footprintOfPositions(
   positions: ArrayLike<number>,
   project: (x: number, z: number) => { x: number; z: number },
   size: number,

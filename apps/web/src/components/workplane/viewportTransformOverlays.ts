@@ -30,6 +30,18 @@ export const LIFT_HANDLE_MAX_OFFSET = 12;
 export const ALIGN_HANDLE_OFFSET = 3;
 
 /** How far the lift arrow stands over the face it belongs to; the overlay and the drag plane both use this. */
+/**
+ * The marks a lone selection shows without a handle hovered, by the handles they belong to: width, depth (not for a
+ * round footprint) and height, and the height above the workplane when the body does not stand on it, as Tinkercad
+ * shows it (#979); on the workplane that would only be a 0.
+ */
+export function alwaysVisibleDimensionKeysFor(circular: boolean, elevation: number, keys: { width: string; depth: string; height: string; lift: string }) {
+  return [
+    ...(circular ? [keys.width, keys.height] : [keys.width, keys.depth, keys.height]),
+    ...(Math.abs(elevation) > 0.005 ? [keys.lift] : []),
+  ];
+}
+
 export function liftHandleOffset(liftHeight: number) {
   return Math.max(2, Math.min(liftHeight * LIFT_HANDLE_HEIGHT_OFFSET_FRACTION, LIFT_HANDLE_MAX_OFFSET));
 }
@@ -611,9 +623,7 @@ export function syncTransformOverlay(
   const widthMidHandleKey = cameraView.dot(xFootAxis) >= 0 ? "right-mid" : "left-mid";
   const depthMidHandleKey = cameraView.dot(zFootAxis) >= 0 ? "near-mid" : "far-mid";
   const alwaysVisibleDimensionKeys = dimensionsAlwaysVisible && frame.singleShape
-    ? isCircularFootprint
-      ? [widthMidHandleKey, heightHandleKey]
-      : [widthMidHandleKey, depthMidHandleKey, heightHandleKey]
+    ? alwaysVisibleDimensionKeysFor(isCircularFootprint, lift.elevation, { width: widthMidHandleKey, depth: depthMidHandleKey, height: heightHandleKey, lift: liftHandleKey })
     : [];
 
   const next = {

@@ -33,7 +33,7 @@ const POSITION_FIELDS = new Set(["x", "z", "elevation"]);
 const ROTATION_FIELDS = new Set(["rotation", "rotationX", "rotationZ", "rotationPivot"]);
 const SIZE_FIELDS = new Set(["size", "width", "depth", "height", "groupedBaseWidth", "groupedBaseDepth", "groupedBaseHeight"]);
 const MIRROR_FIELDS = new Set(["mirrorX", "mirrorY", "mirrorZ"]);
-const EDGE_FIELDS = new Set(["edgeTreatments", "edgeTreatmentHistory", "cadDisplayEdges", "cadDisplayEdgesVersion", "cadBrep", "cadBrepFrame", "cadMeshDeflection"]);
+const EDGE_FIELDS = new Set(["edgeTreatments", "edgeTreatmentHistory", "cadDisplayEdges", "cadDisplayEdgesVersion", "cadBrep", "cadBrepFrame", "sketchPose", "cadMeshDeflection"]);
 /** Fields that follow from another change and say nothing of their own. */
 const DERIVED_FIELDS = new Set(["formulas"]);
 

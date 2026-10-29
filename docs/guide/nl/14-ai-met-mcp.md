@@ -69,6 +69,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_intersect_objects` | houdt alleen over wat de objecten gemeen hebben (doorsnijding) |
 | `layerling_hull_objects` | verpakt de objecten in één bol lichaam, alsof ze gekrompen zijn in folie (omhulsel) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | splitst een vorm in zijn losse delen, een schetslichaam in één lichaam per omtrek |
 | `layerling_split_objects` | snijdt lichamen of gaten met een vlak in tweeën |

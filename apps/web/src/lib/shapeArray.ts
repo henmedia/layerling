@@ -53,6 +53,19 @@ export function arrayFollowingPivot(settings: ArraySettings, pivot: { x: number;
   return settings.centerX === centerX && settings.centerY === centerY ? settings : { ...settings, centerX, centerY };
 }
 
+/**
+ * Where a circle pattern turned its pieces, as the pivot they keep (#990): the circle's centre, at the height of a pivot that
+ * stood there already, or else halfway up the pieces (`bottom` to `top`, scene y). The middle of the pieces' box is not it:
+ * three legs round a ball fill a box wider one way than the other. Null for a row.
+ */
+export function arrayCirclePivot(settings: Pick<ArraySettings, "mode" | "centerX" | "centerY">, bottom: number, top: number, pivot?: { x: number; y: number; z: number } | null) {
+  if (settings.mode !== "circle") return null;
+  const x = settings.centerX;
+  const z = -settings.centerY || 0;
+  const onCentre = pivot && Math.abs(pivot.x - x) < 1e-6 && Math.abs(pivot.z - z) < 1e-6;
+  return { x, y: onCentre ? pivot.y : (bottom + top) / 2, z };
+}
+
 export const ARRAY_MIN_COUNT = 2;
 export const ARRAY_MAX_COUNT = 100;
 

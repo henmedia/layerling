@@ -73,6 +73,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_intersect_objects` | keeps only what the objects have in common (Intersection) |
 | `layerling_hull_objects` | wraps the objects in one convex body, as if shrink-wrapped (Hull) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall with a cutting edge and a rim round the mirrored outline (Cookie cutter) |
+| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separates a shape into its loose parts, a sketch body into one body per outline |
 | `layerling_split_objects` | cuts solids or holes in two with a plane |

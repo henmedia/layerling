@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { hingeWorldParts } from "@/lib/hingeParts";
-import { hingeSections, hingeConeRadius, hingeKnucklesForWidth, hingeHasExactParts, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
+import { automaticSideCount } from "@/lib/roundSideCount";
+import { hingeLeaves, hingeSections, hingeConeRadius, hingeKnucklesForWidth, hingeHasExactParts, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
 
 type V = [number, number, number];
 
@@ -340,5 +341,228 @@ describe("the two parts keep the clearance apart in every section (#907)", () =>
       expect(gap(s.aFull, s.bLeaf), JSON.stringify(shape)).toBeGreaterThanOrEqual(clearance - 1e-6);
       expect(gap(s.bFull, s.aLeaf), JSON.stringify(shape)).toBeGreaterThanOrEqual(clearance - 1e-6);
     });
+  });
+});
+
+describe("screw holes and rounded corners in the leaves", () => {
+  const polygonArea = (r: number, sides: number) => (sides / 2) * r * r * Math.sin((2 * Math.PI) / sides);
+
+  it("stays closed, wound outwards and in two parts with holes and corners in every style and fold", () => {
+    for (const fields of [
+      { ...shape, hingeScrewHoles: 2 },
+      { ...shape, hingeScrewHoles: 3, hingeScrewCountersink: false },
+      { ...shape, hingeCornerRadius: 4 },
+      { ...shape, hingeCornerRadius: 50 },
+      { ...shape, hingeScrewHoles: 2, hingeCornerRadius: 6, hingeAngle: 90 },
+      { ...shape, hingeScrewHoles: 2, hingeCornerRadius: 3, hingeStyle: "cone", hingeAngle: 45 },
+      { ...shape, hingeScrewHoles: 1, hingeStyle: "cone", hingeLeafThickness: 8 },
+      { ...shape, hingeScrewHoles: 2, hingeStyle: "pinless", hingeAngle: 180 },
+      { width: 80, depth: 60, height: 12, hingeKnuckles: 9, hingePinDiameter: 5, hingeLeafThickness: 3, hingeScrewHoles: 4, hingeScrewDiameter: 4.5, hingeScrewSpacing: 18, hingeScrewAcross: 40, hingeCornerRadius: 5 },
+      { width: 25, depth: 30, height: 6, hingeKnuckles: 3, hingeScrewHoles: 6, hingeCornerRadius: 2, sides: 24 },
+    ]) {
+      const triangles = hingeTriangles(fields);
+      expect(edgeProblems(triangles), JSON.stringify(fields)).toBe(0);
+      expect(signedVolume(triangles)).toBeGreaterThan(0);
+      expect(components(triangles)).toBe(2);
+    }
+  });
+
+  it("takes out exactly the straight holes: their area times the leaf, in both leaves", () => {
+    const plain = signedVolume(hingeTriangles(shape));
+    const fields = { ...shape, hingeScrewHoles: 2, hingeScrewCountersink: false };
+    const plan = hingePlan(fields);
+    expect(plan.screwXs).toHaveLength(2);
+    expect(plan.screwSink).toBe(0);
+    const sides = automaticSideCount(2 * plan.screwRadius, 2 * plan.screwRadius);
+    expect(plain - signedVolume(hingeTriangles(fields))).toBeCloseTo(2 * 2 * polygonArea(plan.screwRadius, sides) * plan.leaf, 6);
+  });
+
+  it("countersinks at 90 degrees on top, leaving some straight hole below", () => {
+    const plain = signedVolume(hingeTriangles(shape));
+    const fields = { ...shape, hingeScrewHoles: 3 };
+    const plan = hingePlan(fields);
+    // 3.5 mm holes in a 2 mm leaf: a full head of twice the hole's diameter; in a thinner leaf the cone stops 0.2 mm above the bottom.
+    expect(plan.screwSink).toBeCloseTo(plan.screwRadius, 9);
+    expect(hingePlan({ ...fields, hingeLeafThickness: 1.5 }).screwSink).toBeCloseTo(1.3, 9);
+    expect(plan.screwHeadRadius - plan.screwRadius).toBeCloseTo(plan.screwSink, 9);
+    const sides = automaticSideCount(2 * plan.screwHeadRadius, 2 * plan.screwHeadRadius);
+    const shaft = polygonArea(plan.screwRadius, sides);
+    const head = polygonArea(plan.screwHeadRadius, sides);
+    const hole = shaft * (plan.leaf - plan.screwSink) + (plan.screwSink / 3) * (shaft + head + Math.sqrt(shaft * head));
+    expect(plain - signedVolume(hingeTriangles(fields))).toBeCloseTo(2 * 3 * hole, 6);
+    // In a thin leaf a countersink too shallow to take a head is left out.
+    expect(hingePlan({ ...fields, hingeLeafThickness: 0.4, hingeScrewDiameter: 6 }).screwSink).toBe(0);
+  });
+
+  it("spreads the holes evenly by default and keeps them on the leaf, clear of the knuckles", () => {
+    const plan = hingePlan({ ...shape, hingeScrewHoles: 2 });
+    expect(plan.screwXs[0]).toBeCloseTo(-10, 9);
+    expect(plan.screwXs[1]).toBeCloseTo(10, 9);
+    // In the middle of the leaf beside the knuckles, with half a millimetre to spare each way.
+    expect(plan.screwZ - plan.screwHeadRadius).toBeGreaterThanOrEqual(plan.leafStart + 0.5 - 1e-9);
+    expect(plan.screwZ + plan.screwHeadRadius).toBeLessThanOrEqual(plan.depth / 2 - 0.5 + 1e-9);
+  });
+
+  it("takes a spacing along and a distance across, within the leaf", () => {
+    const plan = hingePlan({ ...shape, hingeScrewHoles: 3, hingeScrewSpacing: 12, hingeScrewAcross: 30 });
+    expect(plan.screwXs.map((x) => Math.round(x * 1e6) / 1e6)).toEqual([-12, 0, 12]);
+    expect(plan.screwZ).toBeCloseTo(15, 9);
+    // Too far apart or out past the edge: pulled in until they fit.
+    const wide = hingePlan({ ...shape, hingeScrewHoles: 2, hingeScrewSpacing: 100, hingeScrewAcross: 100 });
+    expect(wide.screwXs[1] + wide.screwHeadRadius).toBeLessThanOrEqual(20 - 0.5 + 1e-9);
+    expect(wide.screwZ + wide.screwHeadRadius).toBeLessThanOrEqual(20 - 0.5 + 1e-9);
+  });
+
+  it("makes fewer holes where fewer fit, and none on a leaf too small for one", () => {
+    const crowded = hingePlan({ ...shape, width: 20, hingeScrewHoles: 6 });
+    expect(crowded.screwXs.length).toBeLessThan(6);
+    expect(crowded.screwXs.length).toBeGreaterThan(0);
+    crowded.screwXs.slice(1).forEach((x, i) => expect(x - crowded.screwXs[i]).toBeGreaterThanOrEqual(2 * crowded.screwHeadRadius + 0.5 - 1e-9));
+    expect(hingePlan({ ...shape, depth: 16, hingeScrewHoles: 2 }).screwXs).toEqual([]);
+  });
+
+  it("keeps a hole clear of a rounded corner", () => {
+    const plan = hingePlan({ ...shape, hingeScrewHoles: 2, hingeCornerRadius: 12, hingeScrewAcross: 34 });
+    const r = plan.cornerRadius;
+    const arc = { x: plan.width / 2 - r, w: plan.depth / 2 - r };
+    const x = plan.screwXs[1];
+    expect(r).toBe(12);
+    expect(r - Math.hypot(x - arc.x, plan.screwZ - arc.w)).toBeGreaterThanOrEqual(plan.screwHeadRadius + 0.5 - 1e-6);
+  });
+
+  it("rounds no more than the leaf beside the knuckles is deep", () => {
+    const plan = hingePlan({ ...shape, hingeCornerRadius: 100 });
+    expect(plan.cornerRadius).toBeCloseTo(Math.min(plan.depth / 2 - plan.leafStart, plan.width / 2) - 0.05, 9);
+    expect(hingePlan(shape).cornerRadius).toBe(0);
+  });
+
+  it("builds the exact leaf of two boxes and two corner cylinders, the holes as cutters", () => {
+    const fields = { ...shape, hingeScrewHoles: 2, hingeCornerRadius: 4 };
+    const parts = hingeLocalParts(fields);
+    const plan = hingePlan(fields);
+    const corners = parts.filter((part) => part.kind === "cylinder" && part.rotationZ === undefined && !part.hole);
+    expect(corners).toHaveLength(4);
+    corners.forEach((part) => {
+      expect(part.width).toBeCloseTo(8, 9);
+      expect(part.height).toBeCloseTo(plan.leaf, 9);
+    });
+    const holes = parts.filter((part) => part.hole);
+    expect(holes).toHaveLength(4);
+    holes.forEach((part) => {
+      expect(part.kind).toBe("countersink");
+      expect(part.screwHoleShaft).toBeCloseTo(3.5, 9);
+      // Reaching past both faces: the head's cone meets the top at the head's diameter.
+      expect(part.elevation).toBeLessThan(0);
+      expect((part.elevation ?? 0) + part.height).toBeGreaterThan(plan.leaf);
+    });
+    // Straight holes are cylinders.
+    expect(hingeLocalParts({ ...fields, hingeScrewCountersink: false }).filter((part) => part.hole).every((part) => part.kind === "cylinder")).toBe(true);
+    // Without either, the leaves stay one box each.
+    expect(hingeLocalParts(shape).filter((part) => part.kind === "box" && Math.abs(part.z ?? 0) > plan.leafStart)).toHaveLength(2);
+  });
+
+  it("folds B's corners and holes with its leaf, where the display mesh has them", () => {
+    const fields = { ...shape, hingeScrewHoles: 2, hingeCornerRadius: 4, hingeAngle: 90 };
+    const plan = hingePlan(fields);
+    const parts = hingeLocalParts(fields);
+    const turn = Math.PI / 2;
+    // A point of B's flat leaf, folded up about the axis as the display mesh folds it.
+    const folded = (y: number, z: number) => ({ y: plan.radius + (y - plan.radius) * Math.cos(turn) + z * Math.sin(turn), z: -(y - plan.radius) * Math.sin(turn) + z * Math.cos(turn) });
+    const bHoles = parts.filter((part) => part.hole && part.rotationX === -90);
+    expect(bHoles).toHaveLength(2);
+    const want = folded(plan.leaf / 2, plan.screwZ);
+    bHoles.forEach((part) => {
+      expect((part.elevation ?? 0) + part.height / 2).toBeCloseTo(want.y, 9);
+      expect(part.z).toBeCloseTo(want.z, 9);
+    });
+    const bCorners = parts.filter((part) => part.kind === "cylinder" && !part.hole && part.rotationX === -90);
+    expect(bCorners).toHaveLength(2);
+    // The mesh reaches as high as B's outer edge, folded straight up.
+    const top = Math.max(...hingeTriangles(fields).flat().map(([, y]) => y));
+    expect(top).toBeCloseTo(plan.radius + plan.depth / 2, 6);
+  });
+
+  it("points every countersink's head to its leaf's top in the world, folded or mirrored", () => {
+    const base = { id: "h", name: "H", kind: "hinge", color: "#fff", x: 0, z: 0, elevation: 0, size: 40, rotation: 0, ...shape, hingeScrewHoles: 1 };
+    const heads = (extra: object) => hingeWorldParts({ ...base, ...extra } as never).filter((part) => part.kind === "countersink").map((part) => {
+      const up = new THREE.Vector3(0, 1, 0).applyEuler(new THREE.Euler(THREE.MathUtils.degToRad(part.rotationX ?? 0), THREE.MathUtils.degToRad(part.rotation), THREE.MathUtils.degToRad(part.rotationZ ?? 0), "XYZ"));
+      return { z: part.z, up: Math.round(up.y) };
+    });
+    // Lying open, both heads are on top.
+    expect(heads({}).map((head) => head.up)).toEqual([1, 1]);
+    // Closed, B's head faces down onto A's.
+    expect(heads({ hingeAngle: 180 }).map((head) => head.up)).toEqual([1, -1]);
+    // Mirrored upside down, the heads go with the leaves' tops.
+    expect(heads({ mirrorY: true }).map((head) => head.up)).toEqual([-1, -1]);
+  });
+});
+
+describe("fingers instead of leaves", () => {
+  const fingers = { ...shape, hingeLeafStyle: "fingers" };
+
+  it("stays closed in every style and fold; the pin holds A's fingers, B's and the coned ones are loose pieces", () => {
+    for (const [fields, pieces] of [
+      [fingers, 1 + 2],
+      [{ ...fingers, hingeAngle: 180 }, 1 + 2],
+      [{ ...fingers, hingeStyle: "pinless", hingeAngle: 90 }, 5],
+      [{ ...fingers, hingeStyle: "cone", hingeLeafThickness: 8, hingeAngle: 180 }, 5],
+      [{ ...fingers, hingeStyle: "cone", hingeCornerRadius: 2, hingeAngle: 270 }, 5],
+      [{ width: 80, depth: 60, height: 12, hingeKnuckles: 9, hingeLeafThickness: 3, hingeCornerRadius: 3, hingeLeafStyle: "fingers" }, 1 + 4],
+    ] as const) {
+      const triangles = hingeTriangles(fields);
+      expect(edgeProblems(triangles), JSON.stringify(fields)).toBe(0);
+      expect(signedVolume(triangles)).toBeGreaterThan(0);
+      expect(components(triangles), JSON.stringify(fields)).toBe(pieces);
+    }
+  });
+
+  it("is a leaf under each knuckle, as wide as it, and less material than two leaves", () => {
+    const plan = hingePlan(fingers);
+    expect(plan.fingers).toBe(true);
+    const leaves = hingeLeaves(plan);
+    expect(leaves).toHaveLength(plan.knuckles);
+    leaves.forEach((leaf, i) => {
+      expect(leaf.x0).toBeCloseTo(plan.segments[i].x0, 9);
+      expect(leaf.x1).toBeCloseTo(plan.segments[i].x1, 9);
+      expect(leaf.side).toBe(plan.segments[i].owner === "a" ? -1 : 1);
+    });
+    // Two leaves are the same thing along the whole length.
+    expect(hingeLeaves(hingePlan(shape)).map((leaf) => [leaf.x0, leaf.x1])).toEqual([[-20, 20], [-20, 20]]);
+    // The fingers leave out the leaf beside the other side's knuckles and in the gaps: A beside B's two knuckles, B beside
+    // A's three, each side in the four gaps.
+    const missing = (5 * plan.knuckleLength + 2 * 4 * plan.clearance) * (plan.depth / 2 - plan.leafStart) * plan.leaf;
+    expect(signedVolume(hingeTriangles(shape)) - signedVolume(hingeTriangles(fingers))).toBeCloseTo(missing, 6);
+  });
+
+  it("closes flat with cones and fingers as thick as the knuckle: as thick as one finger, the volume kept", () => {
+    const flush = { ...fingers, hingeStyle: "cone", hingeLeafThickness: 8 };
+    const open = hingeTriangles(flush);
+    const closed = hingeTriangles({ ...flush, hingeAngle: 180 });
+    expect(edgeProblems(closed)).toBe(0);
+    expect(signedVolume(closed)).toBeCloseTo(signedVolume(open), 6);
+    const ys = closed.flat().map(([, y]) => y);
+    expect(Math.min(...ys)).toBeCloseTo(0, 6);
+    expect(Math.max(...ys)).toBeCloseTo(8, 6);
+    // B's fingers lie between A's, on A's side.
+    const zs = closed.flat().map(([, , z]) => z);
+    expect(Math.max(...zs)).toBeLessThanOrEqual(hingePlan(flush).radius + 1e-6);
+  });
+
+  it("rounds the finger tips no more than half a finger, and takes no screw holes", () => {
+    const plan = hingePlan({ ...fingers, hingeCornerRadius: 100, hingeScrewHoles: 3 });
+    expect(plan.cornerRadius).toBeCloseTo(plan.knuckleLength / 2 - 0.05, 9);
+    expect(plan.screwXs).toEqual([]);
+  });
+
+  it("builds each finger of the exact parts as wide as its knuckle, B's folding with it", () => {
+    const fields = { ...fingers, hingeAngle: 90 };
+    const plan = hingePlan(fields);
+    const parts = hingeLocalParts(fields);
+    const fingerBoxes = parts.filter((part) => part.kind === "box" && Math.abs((part.depth ?? 0) - (plan.depth / 2 - plan.leafStart)) < 1e-9);
+    expect(fingerBoxes).toHaveLength(plan.knuckles);
+    fingerBoxes.forEach((part) => expect(part.width).toBeCloseTo(plan.knuckleLength, 9));
+    expect(fingerBoxes.filter((part) => part.rotationX === -90)).toHaveLength(2);
+    // With rounded tips: two boxes and two corner cylinders a finger.
+    expect(hingeLocalParts({ ...fields, hingeCornerRadius: 2 }).filter((part) => part.kind === "cylinder" && part.rotationZ === undefined)).toHaveLength(2 * plan.knuckles);
   });
 });

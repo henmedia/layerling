@@ -5,10 +5,11 @@ import { meshYawDegrees, mirrorSign } from "@/lib/workplaneShapes";
 
 /**
  * The hinge's exact parts placed in the world, as ordinary shapes the edge
- * tool and the STEP export already build exactly. A lying cylinder or tube is
- * turned only about x and z: round shapes ignore their yaw when they are
- * placed, and being round, any turn that lays the axis the right way is the
- * same body.
+ * tool and the STEP export already build exactly. A round part - a lying
+ * cylinder or tube, an upright corner cylinder or screw hole - is turned only
+ * about x and z: round shapes ignore their yaw when they are placed, and being
+ * round, any turn that sets the axis the right way is the same body. The
+ * screw holes keep their `hole` mark and are cut out of the rest.
  */
 export function hingeWorldParts(hinge: WorkplaneShape): WorkplaneShape[] {
   const centerY = hinge.height / 2;
@@ -36,8 +37,11 @@ export function hingeWorldParts(hinge: WorkplaneShape): WorkplaneShape[] {
       const euler = new THREE.Euler().setFromQuaternion(quaternion.clone().multiply(own), "XYZ");
       rotation = { rotationX: THREE.MathUtils.radToDeg(euler.x), rotation: THREE.MathUtils.radToDeg(euler.y), rotationZ: THREE.MathUtils.radToDeg(euler.z) };
     } else if (part.kind !== "box") {
-      // Where the axis points: along the hinge's own x.
-      const axis = new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize();
+      // Where the axis points: along the hinge's own x when lying, else up, folded with B's leaf and seen through the
+      // mirror (a countersink's head stays on the leaf's top).
+      const axis = part.rotationZ === 90
+        ? new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize()
+        : new THREE.Vector3(0, 1, 0).applyMatrix4(new THREE.Matrix4().makeRotationX(THREE.MathUtils.degToRad(part.rotationX ?? 0))).applyMatrix4(mirror).applyQuaternion(quaternion).normalize();
       const sinZ = THREE.MathUtils.clamp(-axis.x, -1, 1);
       const rotationZ = Math.asin(sinZ);
       const rotationX = Math.atan2(axis.z, axis.y);
@@ -57,6 +61,8 @@ export function hingeWorldParts(hinge: WorkplaneShape): WorkplaneShape[] {
       height: part.height,
       ...rotation,
       bevel: part.bevel,
+      ...(part.hole ? { hole: true } : {}),
+      ...(part.kind === "countersink" ? { screwHoleShaft: part.screwHoleShaft, screwHoleAngle: part.screwHoleAngle } : {}),
     };
   });
 }

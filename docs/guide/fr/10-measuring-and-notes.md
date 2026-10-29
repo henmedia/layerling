@@ -51,7 +51,7 @@ Dans les paramètres sous {{ui:workspace.appearance}}, il y a deux commutateurs 
 - {{ui:workspace.showMoveDimensions}} indique de combien vous vous déplacez en faisant glisser. Cela vaut aussi pour le levage avec la flèche noire au-dessus d'un corps ; le déplacement s'affiche à son coin avant. Une fois relâché, cliquez sur ce nombre et saisissez la distance exacte ; une valeur négative descend.
 - {{ui:workspace.showOriginDimensions}} montre les distances de la sélection à l'origine de la plaque, également avec plusieurs corps sélectionnés.
 
-Avec {{ui:workspace.dimensionsAlwaysVisible}} les cotes restent visibles en permanence.
+Avec {{ui:workspace.dimensionsAlwaysVisible}} les cotes restent visibles en permanence. Un corps qui ne repose pas sur le plan de travail affiche aussi sa hauteur au-dessus ; cliquez sur le nombre pour en saisir une nouvelle.
 
 Pour vous en passer un instant, appuyez sur [[Q]] : les cotes et distances autour de la sélection disparaissent, et la pièce que vous déplacez se voit bien. Un nouvel appui sur [[Q]] les ramène. Une poignée que vous survolez affiche quand même sa cote.
 

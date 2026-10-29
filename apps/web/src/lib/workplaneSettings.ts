@@ -415,6 +415,13 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.hingePinless = typeof source.hingePinless === "boolean" ? source.hingePinless : fallbackEntry?.hingePinless;
       entry.hingeStyle = source.hingeStyle === "cone" || source.hingeStyle === "pinless" || source.hingeStyle === "pin" ? source.hingeStyle : fallbackEntry?.hingeStyle;
       entry.hingeConeSize = optionalShapeNumber(source.hingeConeSize, fallbackEntry?.hingeConeSize, 0.6, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.hingeScrewHoles = optionalShapeNumber(source.hingeScrewHoles, fallbackEntry?.hingeScrewHoles, 0, 6, true);
+      entry.hingeScrewDiameter = optionalShapeNumber(source.hingeScrewDiameter, fallbackEntry?.hingeScrewDiameter, 1, 12);
+      entry.hingeScrewSpacing = optionalShapeNumber(source.hingeScrewSpacing, fallbackEntry?.hingeScrewSpacing, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.hingeScrewAcross = optionalShapeNumber(source.hingeScrewAcross, fallbackEntry?.hingeScrewAcross, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.hingeScrewCountersink = typeof source.hingeScrewCountersink === "boolean" ? source.hingeScrewCountersink : fallbackEntry?.hingeScrewCountersink;
+      entry.hingeCornerRadius = optionalShapeNumber(source.hingeCornerRadius, fallbackEntry?.hingeCornerRadius, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.hingeLeafStyle = source.hingeLeafStyle === "fingers" || source.hingeLeafStyle === "plate" ? source.hingeLeafStyle : fallbackEntry?.hingeLeafStyle;
     }
     if (kind === "gridfinity") {
       entry.gridfinityType = source.gridfinityType === "bin" || source.gridfinityType === "baseplate" || source.gridfinityType === "tray" ? source.gridfinityType : fallbackEntry?.gridfinityType;

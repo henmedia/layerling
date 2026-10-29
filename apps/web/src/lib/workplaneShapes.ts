@@ -363,6 +363,18 @@ export function edgeTreatmentsAfterShell(shape: WorkplaneShape) {
   return after.every(relaid) ? after : null;
 }
 
+/**
+ * The hollowing's entry as a rebuild reads it: with fillets or chamfers laid after it, the body's size and place since
+ * then are measured against the frame the last of them left, not the one the hollowing left. A fillet makes the body's
+ * box a little smaller and moves its middle; read against the hollowing's frame, that looked like a resize, and the body
+ * was hollowed and filleted again and again, a step further along each time (forum, 621472).
+ */
+export function shellRebuildReference(shape: WorkplaneShape, entry: NonNullable<WorkplaneShape["edgeTreatmentHistory"]>[number]) {
+  const history = shape.edgeTreatmentHistory ?? [];
+  const lastFrame = history[history.length - 1]?.appliedFrame;
+  return lastFrame && history[history.length - 1] !== entry ? { ...entry, appliedFrame: lastFrame } : entry;
+}
+
 export function shellRebuildEntry(shape: WorkplaneShape) {
   const history = shape.edgeTreatmentHistory ?? [];
   if (!shape.importedMesh || shape.hole || shape.groupedShapes?.length) return null;
@@ -371,7 +383,7 @@ export function shellRebuildEntry(shape: WorkplaneShape) {
   if (last?.feature.kind !== "shell" || !last.appliedFrame) return null;
   // A star, knurl or thread is round by definition; stretched unevenly there is
   // nothing to hollow again, so it keeps the bands as before.
-  const stretch = hollowStretchSincePicture(shape, last);
+  const stretch = hollowStretchSincePicture(shape, shellRebuildReference(shape, last));
   const stretched = Math.abs(stretch.x - stretch.z) > 1e-3;
   if (stretched && (last.before.kind === "star" || last.before.kind === "knurl" || last.before.kind === "thread")) return null;
   return last;
@@ -380,7 +392,7 @@ export function shellRebuildEntry(shape: WorkplaneShape) {
 /** The hollowing to redo, when the body has been resized since it was hollowed. */
 export function shellNeedingRebuild(shape: WorkplaneShape) {
   const entry = shellRebuildEntry(shape);
-  const applied = entry?.appliedFrame;
+  const applied = entry ? shellRebuildReference(shape, entry).appliedFrame : undefined;
   if (!entry || !applied) return null;
   const changed = Math.abs(shapeWidth(shape) - applied.width) > 0.005
     || Math.abs(shapeDepth(shape) - applied.depth) > 0.005
@@ -650,6 +662,13 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.hingeClearance === b.hingeClearance &&
     a.hingePinless === b.hingePinless &&
     a.hingeAngle === b.hingeAngle &&
+    a.hingeScrewHoles === b.hingeScrewHoles &&
+    a.hingeScrewDiameter === b.hingeScrewDiameter &&
+    a.hingeScrewSpacing === b.hingeScrewSpacing &&
+    a.hingeScrewAcross === b.hingeScrewAcross &&
+    a.hingeScrewCountersink === b.hingeScrewCountersink &&
+    a.hingeCornerRadius === b.hingeCornerRadius &&
+    a.hingeLeafStyle === b.hingeLeafStyle &&
     a.gridfinityType === b.gridfinityType &&
     a.gridfinityLip === b.gridfinityLip &&
     a.gridfinityMagnets === b.gridfinityMagnets &&
@@ -772,6 +791,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.edgeResizeMode === b.edgeResizeMode &&
     a.cadBrep === b.cadBrep &&
     a.cadBrepFrame === b.cadBrepFrame &&
+    a.sketchPose === b.sketchPose &&
     a.cadPrimitiveFrame === b.cadPrimitiveFrame &&
     a.groupedShapes === b.groupedShapes &&
     a.groupedBaseWidth === b.groupedBaseWidth &&

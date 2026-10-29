@@ -53,7 +53,7 @@ W ustawieniach w sekcji {{ui:workspace.appearance}} są dwa przełączniki wymia
 - {{ui:workspace.showMoveDimensions}} pokazuje podczas przeciągania, o ile przesuwasz. Dotyczy to też podnoszenia czarną strzałką nad bryłą; droga pokazuje się przy jej przednim narożniku. Po puszczeniu kliknij taką liczbę i wpisz dokładną odległość; wartość ujemna idzie w dół.
 - {{ui:workspace.showOriginDimensions}} pokazuje odległości zaznaczenia od początku układu płyty, także przy kilku zaznaczonych bryłach.
 
-Z {{ui:workspace.dimensionsAlwaysVisible}} wymiary są widoczne cały czas.
+Z {{ui:workspace.dimensionsAlwaysVisible}} wymiary są widoczne cały czas. Bryła, która nie stoi na płaszczyźnie roboczej, pokazuje też swoją wysokość nad nią; kliknij liczbę, by wpisać nową.
 
 Jeśli na chwilę przeszkadzają, naciśnij [[Q]]: wymiary i odległości wokół zaznaczenia znikają, a przesuwana część jest dobrze widoczna. Ponowne [[Q]] przywraca je. Uchwyt, na który wskazujesz, nadal pokazuje swój wymiar.
 

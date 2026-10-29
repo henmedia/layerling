@@ -114,3 +114,28 @@ describe("the outline of a body under a sketch (#596)", () => {
     expect(shapeMeshFootprint(shape({ kind: "cylinder" }))).toBeNull();
   });
 });
+
+describe("a body with a chamfered bottom edge under a sketch (#1006)", () => {
+  it("shows the wall's outline when seen from above, not the smaller bottom face", async () => {
+    const { footprintOfPositions } = await import("@/components/SketchWorkspace");
+    // A 10 x 10 box, 10 high, its bottom edges chamfered by 1: the bottom face is 8 x 8, the top and the walls are 10 x 10.
+    const v = (x: number, y: number, z: number) => [x, y, z];
+    const quad = (a: number[], b: number[], c: number[], d: number[]) => [...a, ...b, ...c, ...a, ...c, ...d];
+    const positions = [
+      ...quad(v(1, 0, 1), v(9, 0, 1), v(9, 0, 9), v(1, 0, 9)),
+      ...quad(v(0, 1, 0), v(10, 1, 0), v(10, 10, 0), v(0, 10, 0)),
+      ...quad(v(0, 10, 0), v(0, 10, 10), v(10, 10, 10), v(10, 10, 0)),
+      ...quad(v(0, 1, 10), v(0, 1, 0), v(0, 10, 0), v(0, 10, 10)),
+      ...quad(v(10, 1, 0), v(10, 1, 10), v(10, 10, 10), v(10, 10, 0)),
+      ...quad(v(0, 1, 10), v(10, 1, 10), v(10, 10, 10), v(0, 10, 10)),
+    ];
+    const width = (d: string | null) => {
+      const xs = corners(d).map(([x]) => x);
+      return Math.max(...xs) - Math.min(...xs);
+    };
+    const bottom = footprintOfPositions(positions, (x, z) => ({ x, z }), 10, 10, false);
+    const seen = footprintOfPositions(positions, (x, z) => ({ x, z }), 10, 10, true);
+    expect(width(bottom?.outlineD ?? null)).toBeCloseTo(8, 3);
+    expect(width(seen?.outlineD ?? null)).toBeCloseTo(10, 3);
+  });
+});

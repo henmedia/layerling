@@ -73,6 +73,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_intersect_objects` | behält nur, was die Objekte gemeinsam haben (Schnittmenge) |
 | `layerling_hull_objects` | hüllt die Objekte in einen konvexen Körper, wie in Schrumpffolie (Hülle) |
 | `layerling_cookie_cutter` | baut aus den Objekten eine Ausstechform: Wand mit Schneidkante und Rand um den gespiegelten Umriss (Ausstechform) |
+| `layerling_flexi_joints` | teilt einen flachen Körper in Glieder mit mitgedruckten Gelenken, die zur Seite schwenken (Flexi-Gelenke) |
 | `layerling_loft_sketches` | verbindet zwei Skizzenkörper zu einem Übergang von einem Umriss zum anderen (Übergang aus Skizzen) |
 | `layerling_separate_parts` | zerlegt eine Form mit losen Teilen, einen Skizzenkörper in einen Körper je Umriss |
 | `layerling_split_objects` | teilt Körper oder Aussparungen mit einer Ebene in zwei |

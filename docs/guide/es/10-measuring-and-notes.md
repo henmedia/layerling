@@ -53,7 +53,7 @@ En los ajustes, en {{ui:workspace.appearance}}, hay dos interruptores para ver m
 - {{ui:workspace.showMoveDimensions}} muestra cuánto te desplazas mientras arrastras. También al levantar con la flecha negra sobre un cuerpo; el recorrido aparece en su esquina delantera. Al soltar, haz clic en ese número y escribe la distancia exacta; un valor negativo baja.
 - {{ui:workspace.showOriginDimensions}} muestra las distancias de la selección al origen de la placa, también con varios cuerpos seleccionados.
 
-Con {{ui:workspace.dimensionsAlwaysVisible}}, las medidas se ven siempre.
+Con {{ui:workspace.dimensionsAlwaysVisible}}, las medidas se ven siempre. Un cuerpo que no está sobre el plano de trabajo muestra también su altura sobre él; haz clic en el número para escribir otra.
 
 Si estorban un momento, pulsa [[Q]]: las medidas y distancias alrededor de la selección desaparecen y la pieza que mueves se ve bien. Otra vez [[Q]] las recupera. Un tirador al que apuntas sigue mostrando su medida.
 

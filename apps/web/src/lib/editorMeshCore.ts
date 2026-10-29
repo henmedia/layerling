@@ -503,6 +503,13 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         hingeClearance: shape.hingeClearance,
         hingePinless: shape.hingePinless,
         hingeAngle: shape.hingeAngle,
+        hingeScrewHoles: shape.hingeScrewHoles,
+        hingeScrewDiameter: shape.hingeScrewDiameter,
+        hingeScrewSpacing: shape.hingeScrewSpacing,
+        hingeScrewAcross: shape.hingeScrewAcross,
+        hingeScrewCountersink: shape.hingeScrewCountersink,
+        hingeCornerRadius: shape.hingeCornerRadius,
+        hingeLeafStyle: shape.hingeLeafStyle,
         sides: shape.sides,
       });
       break;

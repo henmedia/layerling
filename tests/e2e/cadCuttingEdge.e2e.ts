@@ -21,6 +21,17 @@ function squares(...middles: number[]): SketchProfile {
 
 const wall: SketchStroke = { width: 1.2, align: "outside", join: "round", cap: "flat" };
 
+/** A circle of `count` straight pieces, as a cylinder's footprint is cut from its triangles. */
+function polygonRing(count: number, radius: number): SketchProfile {
+  const ring: SketchProfile = { points: [], segments: [] };
+  for (let index = 0; index < count; index += 1) {
+    const angle = (index / count) * Math.PI * 2;
+    ring.points.push({ id: `c${index}`, x: Math.cos(angle) * radius, z: Math.sin(angle) * radius, mode: "corner" });
+    ring.segments.push({ id: `d${index}`, startId: `c${index}`, endId: `c${(index + 1) % count}`, kind: "line" });
+  }
+  return ring;
+}
+
 describe("a cutting edge on a stroked wall with the real OCCT kernel (#982)", () => {
   let kernel: OcctKernel;
 
@@ -86,18 +97,38 @@ describe("a cutting edge on a stroked wall with the real OCCT kernel (#982)", ()
     expect(kernel.getBoundingBox(chamfered!, false).ymax).toBeCloseTo(15, 6);
   });
 
-  it("gives up at once on an outline of many short straight pieces instead of trying for minutes", () => {
-    // What a body's outline cut from its triangles looks like: a circle of 400 pieces. One try of the kernel at chamfering
-    // the 1 670 pieces of a text body "Wera" ran 159 s, past the sketch worker's 30 s.
-    const ring: SketchProfile = { points: [], segments: [] };
-    for (let index = 0; index < 400; index += 1) {
-      const angle = (index / 400) * Math.PI * 2;
-      ring.points.push({ id: `c${index}`, x: Math.cos(angle) * 20, z: Math.sin(angle) * 20, mode: "corner" });
-      ring.segments.push({ id: `d${index}`, startId: `c${index}`, endId: `c${(index + 1) % 400}`, kind: "line" });
-    }
-    const solid = buildStrokedSketchSolid(kernel, ring, wall, 15)!;
+  it("chamfers a clean outline of many straight pieces, such as a cylinder's footprint", () => {
+    const solid = buildStrokedSketchSolid(kernel, polygonRing(120, 15), wall, 15)!;
+    expect(chamferTopEdges(kernel, solid, 15, 0.4)).not.toBeNull();
+  });
+
+  it("gives up at once on an outline with pieces of a few thousandths of a millimetre instead of trying for minutes", () => {
+    // The outline a mirrored text body "Rb" stood on, cut from its triangles: its wall has arcs 0.003 mm long. One try of the
+    // kernel at the 1 670 pieces of a text body "Wera" ran 159 s, past the sketch worker's 30 s.
+    const outline = silhouetteSketchProfile(JSON.parse(readFileSync("tests/fixtures/mirrored-rb-outline-982.json", "utf8")) as SketchProfile);
+    const solid = buildStrokedSketchSolid(kernel, outline, wall, 15)!;
     const started = performance.now();
     expect(chamferTopEdges(kernel, solid, 15, 0.4)).toBeNull();
     expect(performance.now() - started).toBeLessThan(3000);
+  });
+
+  it("builds a wall round a hole as well, inside it, and chamfers both walls (#982)", () => {
+    // A square of 30 with a hole of 12 off its middle: the inside of a letter. The wall runs outside the outer line and inside
+    // the hole, so the dough between them is what the cutter cuts out.
+    const frame = squares(0);
+    [[-6, -6], [6, -6], [6, 6], [-6, 6]].forEach(([x, z], index) => {
+      frame.points.push({ id: `h${index}`, x: x + 3, z, mode: "corner" });
+      frame.segments.push({ id: `hs${index}`, startId: `h${index}`, endId: `h${(index + 1) % 4}`, kind: "line" });
+    });
+    frame.points.forEach((point) => {
+      if (point.id.startsWith("p")) Object.assign(point, { x: point.x * 1.5, z: point.z * 1.5 });
+    });
+    const solid = buildStrokedSketchSolid(kernel, frame, wall, 15)!;
+    expect(kernel.getSubShapes(solid, "solid")).toHaveLength(2);
+    const box = kernel.getBoundingBox(solid, false);
+    expect(box.xmin).toBeCloseTo(-16.2, 4);
+    const chamfered = chamferTopEdges(kernel, solid, 15, 0.4);
+    expect(chamfered).not.toBeNull();
+    expect(kernel.isValid(chamfered!)).toBe(true);
   });
 });

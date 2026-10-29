@@ -195,6 +195,20 @@ export type ShapeCustomization = {
   hingePinless?: boolean;
   /** Hinge: the second leaf folded up about the pin, in degrees; 0 lies flat, 180 is closed. */
   hingeAngle?: number;
+  /** Hinge: screw holes in each leaf along the axis, 0 to 6; left out, none. */
+  hingeScrewHoles?: number;
+  /** Hinge: the screw holes' diameter in mm. */
+  hingeScrewDiameter?: number;
+  /** Hinge: from one screw hole's middle to the next along the axis in mm; left out, they share the length evenly. */
+  hingeScrewSpacing?: number;
+  /** Hinge: from the hole in one leaf to the hole in the other, across the axis, in mm; left out, each in the middle of its leaf. */
+  hingeScrewAcross?: number;
+  /** Hinge: false for straight screw holes; otherwise countersunk on the side that faces the other leaf when closed. */
+  hingeScrewCountersink?: boolean;
+  /** Hinge: the leaves' outer corners rounded with this radius in mm. */
+  hingeCornerRadius?: number;
+  /** Hinge: "fingers" gives each knuckle its own finger instead of a leaf each side, the two sides' alternating like combs; left out, plates. */
+  hingeLeafStyle?: "plate" | "fingers";
   /** Gridfinity: a bin or the baseplate it stands in, whose size counts grid units of 42 mm (height units of 7 mm), or a tray of any size in mm (#837). */
   gridfinityType?: GridfinityType;
   /** Gridfinity bin: the stacking lip on top of the wall; missing means on. */
@@ -716,6 +730,17 @@ export type CadBrepFrame = {
 };
 
 /**
+ * Where an extruded sketch body's sketch lay once an edge treatment or hollowing baked its turn and place into its exact
+ * body (#1006): `transform` takes sketch points (y up from the sketch) into the exact body's own coordinates, `height`
+ * is the extrusion's and `anchor` the point of the outline under the body's middle, as it was before.
+ */
+export type SketchPose = {
+  transform: number[];
+  height: number;
+  anchor: { x: number; z: number };
+};
+
+/**
  * Was ein Koerper war, bevor eine Drehung ihn in ein Netz gebacken hat.
  *
  * Gedreht wird um die Mitte des Rahmens, und danach muss der Rahmen neu
@@ -872,6 +897,20 @@ export type WorkplaneShape = {
   hingePinless?: boolean;
   /** Hinge: the second leaf folded up about the pin, in degrees; 0 lies flat, 180 is closed. */
   hingeAngle?: number;
+  /** Hinge: screw holes in each leaf along the axis, 0 to 6; left out, none. */
+  hingeScrewHoles?: number;
+  /** Hinge: the screw holes' diameter in mm. */
+  hingeScrewDiameter?: number;
+  /** Hinge: from one screw hole's middle to the next along the axis in mm; left out, they share the length evenly. */
+  hingeScrewSpacing?: number;
+  /** Hinge: from the hole in one leaf to the hole in the other, across the axis, in mm; left out, each in the middle of its leaf. */
+  hingeScrewAcross?: number;
+  /** Hinge: false for straight screw holes; otherwise countersunk on the side that faces the other leaf when closed. */
+  hingeScrewCountersink?: boolean;
+  /** Hinge: the leaves' outer corners rounded with this radius in mm. */
+  hingeCornerRadius?: number;
+  /** Hinge: "fingers" gives each knuckle its own finger instead of a leaf each side, the two sides' alternating like combs; left out, plates. */
+  hingeLeafStyle?: "plate" | "fingers";
   /** Gridfinity: a bin or the baseplate it stands in, whose size counts grid units of 42 mm (height units of 7 mm), or a tray of any size in mm (#837). */
   gridfinityType?: GridfinityType;
   /** Gridfinity bin: the stacking lip on top of the wall; missing means on. */
@@ -1058,8 +1097,8 @@ export type WorkplaneShape = {
    */
   textStretch?: boolean;
   /**
-   * Straight text only (#981): the letters stacked top to bottom, each centred on one upright line, instead of
-   * side by side. Curved text ignores it.
+   * The letters stacked top to bottom (#981), each centred on one upright line, instead of side by side. Curved text
+   * runs them as a column along the circle at its left side (its right side with textInward), the letters upright.
    */
   textVertical?: boolean;
   /**
@@ -1167,6 +1206,7 @@ export type WorkplaneShape = {
   edgeResizeMode?: "scale" | "preserve";
   cadBrep?: string;
   cadBrepFrame?: CadBrepFrame;
+  sketchPose?: SketchPose;
   // The finest tessellation deflection any edge treatment on this body has
   // needed so far. Carried forward as a floor for the next one, so a later
   // fillet with a larger radius cannot re-tessellate an already finely

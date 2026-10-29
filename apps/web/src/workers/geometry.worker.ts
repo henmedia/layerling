@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
 import { buildMessage } from "@/lib/buildStamp";
+import { articulateShapes, type FlexiOptions } from "@/lib/flexiJoints";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadPositions, splitShapeIfCrossed } from "@/lib/editorBooleans";
 import { getManifoldRuntime, setManifoldAssetBase } from "@/lib/editorMeshCore";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
@@ -15,7 +16,7 @@ import type { ModelSplitPlane } from "@/lib/modelSplit";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /**
- * Groups, cuts, splits and reads STL and OBJ files off the page, so the editor keeps moving while Manifold works
+ * Groups, cuts, splits, makes flexi links and reads STL and OBJ files off the page, so the editor keeps moving while Manifold works
  * (lib/geometryWorker.ts). The same functions as on the page, with the same arguments.
  */
 
@@ -40,6 +41,9 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
     } else if (request.task === "split") {
       const { shape, plane } = args as { shape: WorkplaneShape; plane: Pick<ModelSplitPlane, "axis" | "normal" | "position"> };
       result = await splitShapeIfCrossed(shape, plane);
+    } else if (request.task === "flexi") {
+      const { targets, options } = args as { targets: WorkplaneShape[]; options: FlexiOptions };
+      result = await articulateShapes(targets, options);
     } else if (request.task === "stl") {
       const { fileName, buffer } = args as { fileName: string; buffer: ArrayBuffer };
       result = importedShapeFromStl(fileName, buffer);

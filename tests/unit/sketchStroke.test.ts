@@ -1,7 +1,7 @@
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
 import { orderedCadSketchPaths } from "@/lib/sketchCadProfile";
-import { normalizeSketchStroke, sampledPath, strokeEdgeChamfer, strokedSketchProfile } from "@/lib/sketchStroke";
+import { normalizeSketchStroke, sampledPath, steppedEdgeWall, strokeEdgeChamfer, strokedSketchProfile } from "@/lib/sketchStroke";
 import type { SketchProfile, SketchStroke } from "@/types/layerling";
 
 let runtime: ManifoldToplevel;
@@ -198,5 +198,47 @@ describe("a cutting edge on a wall (#982)", () => {
 
   it("never chamfers deeper than most of a low wall", () => {
     expect(strokeEdgeChamfer({ ...wall, width: 5, edge: 0.4 }, 1)).toBeCloseTo(0.9, 9);
+  });
+});
+
+describe("a cutting edge in steps where the kernel cannot chamfer (#982)", () => {
+  const square: SketchProfile = {
+    points: [[-10, -10], [10, -10], [10, 10], [-10, 10]].map(([x, z], index) => ({ id: `q${index}`, x, z })),
+    segments: [0, 1, 2, 3].map((index) => ({ id: `r${index}`, startId: `q${index}`, endId: `q${(index + 1) % 4}`, kind: "line" as const })),
+    stroke: { width: 1.2, align: "outside", join: "miter", cap: "flat" },
+  };
+
+  it("stands 15 mm high and runs in to the edge on top, from both sides", () => {
+    const wall = steppedEdgeWall(runtime, square, 15, 0.4)!;
+    const ys: number[] = [];
+    const topX: number[] = [];
+    for (let index = 0; index < wall.positions.length; index += 3) {
+      ys.push(wall.positions[index + 1]);
+      if (Math.abs(wall.positions[index + 1] - 15) < 1e-4) topX.push(Math.max(Math.abs(wall.positions[index]), Math.abs(wall.positions[index + 2])));
+    }
+    expect(Math.min(...ys)).toBeCloseTo(0, 6);
+    expect(Math.max(...ys)).toBeCloseTo(15, 6);
+    // The wall stood from 10 to 11.2 out from the middle (its corners); its top is 0.4 mm narrower on each side.
+    expect(Math.min(...topX)).toBeCloseTo(10.4, 4);
+    expect(Math.max(...topX)).toBeCloseTo(10.8, 4);
+  });
+
+  it("faces outwards: its triangles enclose a positive volume, less than the wall without an edge", () => {
+    const wall = steppedEdgeWall(runtime, square, 15, 0.4)!;
+    const p = wall.positions;
+    let volume = 0;
+    for (let index = 0; index < wall.indices.length; index += 3) {
+      const [a, b, c] = [wall.indices[index] * 3, wall.indices[index + 1] * 3, wall.indices[index + 2] * 3];
+      volume += (p[a] * (p[b + 1] * p[c + 2] - p[b + 2] * p[c + 1]) - p[a + 1] * (p[b] * p[c + 2] - p[b + 2] * p[c]) + p[a + 2] * (p[b] * p[c + 1] - p[b + 1] * p[c])) / 6;
+    }
+    const full = (22.4 * 22.4 - 20 * 20) * 15;
+    expect(volume).toBeGreaterThan(full * 0.95);
+    expect(volume).toBeLessThan(full);
+  });
+
+  it("is null for a stroke that is no wall, for an open line, and for an edge as high as the wall", () => {
+    expect(steppedEdgeWall(runtime, { ...square, stroke: { width: 1.2, align: "grow", join: "miter", cap: "flat" } }, 15, 0.4)).toBeNull();
+    expect(steppedEdgeWall(runtime, { ...square, segments: square.segments.slice(0, 3) }, 15, 0.4)).toBeNull();
+    expect(steppedEdgeWall(runtime, square, 0.4, 0.4)).toBeNull();
   });
 });

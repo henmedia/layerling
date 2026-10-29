@@ -53,7 +53,7 @@ summary: 卷尺、标尺与角尺，到原点的距离，附着在零件上的�
 - {{ui:workspace.showMoveDimensions}} 显示拖动时移动了多少。用物体上方的黑色箭头抬起时也会显示，距离标在它的前角。松开后，点击这样的数字即可输入确切的距离；负数表示向下。
 - {{ui:workspace.showOriginDimensions}} 显示所选对象到平台原点的距离，选中多个实体时同样有效。
 
-启用 {{ui:workspace.dimensionsAlwaysVisible}} 后，尺寸会一直可见。
+启用 {{ui:workspace.dimensionsAlwaysVisible}} 后，尺寸会一直可见。不在工作平面上的实体还会显示它离平面的高度；点击该数字即可输入新值。
 
 想暂时去掉它们时，按 [[Q]]：所选对象周围的尺寸和距离会消失，正在移动的部件更容易看清。再按一次 [[Q]] 即可恢复。指向某个手柄时，它仍会显示自己的尺寸。
 

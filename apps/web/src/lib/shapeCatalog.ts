@@ -147,6 +147,8 @@ import {
   normalizeHingeKnuckleWidth,
   normalizeHingeLeafThickness,
   normalizeHingePinDiameter,
+  normalizeHingeScrewDiameter,
+  normalizeHingeScrewHoles,
 } from "@/lib/hingeGeometry";
 import { DEFAULT_GRIDFINITY_LIP, DEFAULT_GRIDFINITY_MAGNETS, DEFAULT_GRIDFINITY_TRAY_SIZE, DEFAULT_GRIDFINITY_TYPE, DEFAULT_GRIDFINITY_UNITS, gridfinityFootprintPatch, gridfinityPadding, gridfinitySize, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
 import {
@@ -675,6 +677,13 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     hingeClearance: shape.hingeClearance,
     hingePinless: shape.hingePinless,
     hingeAngle: shape.hingeAngle,
+    hingeScrewHoles: shape.hingeScrewHoles,
+    hingeScrewDiameter: shape.hingeScrewDiameter,
+    hingeScrewSpacing: shape.hingeScrewSpacing,
+    hingeScrewAcross: shape.hingeScrewAcross,
+    hingeScrewCountersink: shape.hingeScrewCountersink,
+    hingeCornerRadius: shape.hingeCornerRadius,
+    hingeLeafStyle: shape.hingeLeafStyle,
     gridfinityType: shape.gridfinityType,
     gridfinityLip: shape.gridfinityLip,
     gridfinityMagnets: shape.gridfinityMagnets,
@@ -1048,6 +1057,14 @@ export function makeShapeFromAsset(
     hingeKnuckleWidth: asset.kind === "hinge" ? normalizeHingeKnuckleWidth(customization.hingeKnuckleWidth) : undefined,
     hingeStyle: asset.kind === "hinge" && (customization.hingeStyle === "cone" || customization.hingeStyle === "pinless") ? customization.hingeStyle : undefined,
     hingeConeSize: asset.kind === "hinge" && customization.hingeStyle === "cone" && Number.isFinite(customization.hingeConeSize) ? customization.hingeConeSize : undefined,
+    // Screw holes and round corners only when the defaults ask for them; the geometry fits them to the leaf.
+    hingeScrewHoles: asset.kind === "hinge" && normalizeHingeScrewHoles(customization.hingeScrewHoles) > 0 ? normalizeHingeScrewHoles(customization.hingeScrewHoles) : undefined,
+    hingeScrewDiameter: asset.kind === "hinge" && Number.isFinite(customization.hingeScrewDiameter) ? normalizeHingeScrewDiameter(customization.hingeScrewDiameter) : undefined,
+    hingeScrewSpacing: asset.kind === "hinge" && (customization.hingeScrewSpacing ?? 0) > 0 ? customization.hingeScrewSpacing : undefined,
+    hingeScrewAcross: asset.kind === "hinge" && (customization.hingeScrewAcross ?? 0) > 0 ? customization.hingeScrewAcross : undefined,
+    hingeScrewCountersink: asset.kind === "hinge" && customization.hingeScrewCountersink === false ? false : undefined,
+    hingeCornerRadius: asset.kind === "hinge" && (customization.hingeCornerRadius ?? 0) > 0 ? customization.hingeCornerRadius : undefined,
+    hingeLeafStyle: asset.kind === "hinge" && customization.hingeLeafStyle === "fingers" ? "fingers" : undefined,
     hingeKnuckles: asset.kind === "hinge" ? normalizeHingeKnuckles(customization.hingeKnuckles ?? DEFAULT_HINGE_KNUCKLES, width, normalizeHingeClearance(customization.hingeClearance)) : undefined,
     hingePinDiameter: asset.kind === "hinge" ? normalizeHingePinDiameter(customization.hingePinDiameter ?? DEFAULT_HINGE_PIN_DIAMETER, height, normalizeHingeClearance(customization.hingeClearance)) : undefined,
     hingeLeafThickness: asset.kind === "hinge"

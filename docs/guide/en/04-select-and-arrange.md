@@ -101,6 +101,8 @@ For hole grids, bolt circles and rings of teeth there is the {{ui:editor.tool.ar
 
 Tip: first set the pivot on a face with {{ui:editor.tool.rotationPivot}}, then the centre of the circle lies exactly there.
 
+Afterwards the pieces keep the circle's centre as their pivot, also once grouped. That is where another part belongs, for example a ball in the middle of three legs: the middle of the pieces' box is not the centre, since three legs fill a box wider one way than the other. Right-click the pieces and choose {{ui:contextMenu.markPivot}}, and the centre of the part you drag snaps onto it.
+
 ![The pattern in "Circle" mode with a rise and a radius change per copy: the copies climb and widen like a spiral.](shot:pattern-spiral)
 
 The copies first appear as a preview. Only {{ui:array.apply}} creates them. If the copies are holes, group them afterwards with the body they should cut into.

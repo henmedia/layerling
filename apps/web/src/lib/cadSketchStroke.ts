@@ -121,11 +121,14 @@ export function buildStrokedSketchSolid(cad: OcctKernel, profile: SketchProfile,
 /** Closer than this to the top, in mm, a point of an edge lies on it. */
 const TOP_TOLERANCE = 1e-4;
 /**
- * More rim pieces than this take no cutting edge: an outline cut from a body's triangles has hundreds of short straight
- * pieces, and one try of the kernel at chamfering 1 670 of them ran 159 s before it failed - the sketch worker stops at 30 s
- * and the cookie cutter failed with it (#982, a text body "Wera"). A drawn letter has a few dozen.
+ * Rims with a piece shorter than this, in mm, take no cutting edge. Offsetting an outline cut from a body's triangles leaves
+ * arcs a few thousandths of a millimetre long, and the kernel cannot chamfer them: one try at the 1 670 rim pieces of a text
+ * body "Wera" ran 159 s before it failed, past the sketch worker's 30 s, and the cookie cutter failed with it (#982). A clean
+ * outline of the same size chamfers in seconds: 900 pieces round a circle took 3.5 s.
  */
-const MAX_EDGE_PIECES = 200;
+const MIN_EDGE_PIECE = 0.01;
+/** More rim pieces than this take no cutting edge either. */
+const MAX_EDGE_PIECES = 1000;
 /** After this many milliseconds no further try is started; the one running cannot be stopped. */
 const EDGE_BUDGET_MS = 8000;
 
@@ -158,12 +161,12 @@ function topRims(cad: OcctKernel, solid: ShapeHandle, height: number) {
  * compound, which the kernel does not chamfer: each solid in it is chamfered on its own. Where the kernel cannot chamfer both
  * rims at once - a tight bend of a letter, where the two chamfers meet - it chamfers them one after the other, and failing
  * that one rim by twice as much, which leaves the same edge on top. Null when no solid has an edge up there, when the rims
- * are too many pieces to try (an outline cut from a body's triangles), or when none of this works in time.
+ * have pieces too short or too many to try (an outline cut from a body's triangles), or when none of this works in time.
  */
 export function chamferTopEdges(cad: OcctKernel, shape: ShapeHandle, height: number, amount: number): ShapeHandle | null {
   const solids = cad.getSubShapes(shape, "solid").map((solid) => ({ solid, ...topRims(cad, solid, height) }));
-  const pieces = solids.reduce((sum, { outer, inner }) => sum + outer.length + inner.length, 0);
-  if (!pieces || pieces > MAX_EDGE_PIECES) return null;
+  const rims = solids.flatMap(({ outer, inner }) => [...outer, ...inner]);
+  if (!rims.length || rims.length > MAX_EDGE_PIECES || rims.some((edge) => cad.curveLength(edge) < MIN_EDGE_PIECE)) return null;
   const started = performance.now();
   const attempt = (build: () => ShapeHandle) => {
     if (performance.now() - started > EDGE_BUDGET_MS) return null;

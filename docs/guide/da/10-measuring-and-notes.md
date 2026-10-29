@@ -57,7 +57,7 @@ Under {{ui:workspace.appearance}} i indstillingerne er der to kontakter for leve
 - {{ui:workspace.showMoveDimensions}} viser hvor meget du flytter mens du trækker. Det gælder også, når du løfter med den sorte pil over et legeme; vejen måles op langs dets forreste hjørne. Når du har sluppet, klikker du på sådan et tal og skriver den nøjagtige afstand; minus går ned.
 - {{ui:workspace.showOriginDimensions}} viser afstandene fra markeringen til pladens nulpunkt, også med flere valgte former.
 
-Med {{ui:workspace.dimensionsAlwaysVisible}} bliver dimensionerne permanent synlige.
+Med {{ui:workspace.dimensionsAlwaysVisible}} bliver dimensionerne permanent synlige. Et legeme, der ikke står på arbejdsplanet, viser også sin højde over det; klik på tallet for at skrive en ny.
 
 Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring markeringen forsvinder, så en del du flytter er nem at se. [[Q]] igen henter dem tilbage. Et håndtag du peger på viser stadig sit mål.
 

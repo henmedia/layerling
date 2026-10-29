@@ -53,7 +53,7 @@ In den Einstellungen unter {{ui:workspace.appearance}} gibt es zwei Schalter fü
 - {{ui:workspace.showMoveDimensions}} zeigt beim Verschieben, um wie viel du dich bewegst. Das gilt auch beim Heben mit dem schwarzen Pfeil über einem Körper; der Weg steht dann an seiner vorderen Ecke. Nach dem Loslassen klickst du auf so eine Zahl und tippst den genauen Weg ein; ein Minus geht nach unten.
 - {{ui:workspace.showOriginDimensions}} zeigt die Abstände der Auswahl zum Nullpunkt der Platte, auch bei mehreren markierten Körpern.
 
-Mit {{ui:workspace.dimensionsAlwaysVisible}} bleiben die Maße dauerhaft sichtbar.
+Mit {{ui:workspace.dimensionsAlwaysVisible}} bleiben die Maße dauerhaft sichtbar. Steht ein Körper nicht auf der Arbeitsebene, steht auch seine Höhe darüber dabei; ein Klick auf die Zahl nimmt einen neuen Wert.
 
 Wenn sie kurz stören, drück [[Q]]: Die Maße und Abstände um die Auswahl verschwinden, und ein Teil, das du verschiebst, ist gut zu sehen. Noch einmal [[Q]] holt sie zurück. Ein Griff, auf den du zeigst, zeigt sein Maß trotzdem.
 

@@ -147,6 +147,14 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 {{ui:prop.hingeStyle}}有三個選項：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（為自備銷留的孔）和{{ui:hinge.styleCone}}。選圓錐時，{{ui:prop.hingeConeSize}}決定圓錐從關節長出處的大小；圓錐越大越牢固，預設取能放下的最大值。帶圓錐的鉸鏈沒有銷也沒有孔，所以它的翼板可以和整個關節一樣厚：把{{ui:prop.hingeLeafThickness}}設為關節直徑，翼板就與關節齊平；這樣的鉸鏈最多開啟約 90°，因為厚翼板會相碰。
 
+## 彈性關節（Flexi）
+
+{{ui:editor.tool.flexi}} 把一個扁平的實體變成可以活動的小玩偶，例如魚、蛇或龍，一次列印成型（print-in-place）。實體由你自己畫或搭建，例如用草圖或擠出的 SVG。工具沿實體長度橫向把它切成若干節，並在每個切口處加一個關節：一節帶著一根直立的軸，中間比上下兩端粗，下一節帶間隙地把它包住。這樣關節既能卡住又不會黏連，所有斜面都是 45°，不需支撐即可列印。各節之間留出一道楔形缺口，寬度對應各節向兩側擺動的角度。
+
+選取實體（多個部件會合併，其中的孔會被減去），按下 {{ui:editor.tool.flexi}}。在視窗中設定沿哪一邊切分（{{ui:flexi.axis.auto}} 取較長的一邊）、{{ui:flexi.joints}} 的數量、{{ui:flexi.clearance}}（一般 0.4 mm 即可）以及 {{ui:flexi.swing}} 的角度。關節大小會依實體自動決定；取消 {{ui:flexi.autoSize}} 後可自己填寫 {{ui:flexi.size}}。取消 {{ui:flexi.evenLinks}} 後可以設定第一個關節離起點、最後一個離終點的距離，例如讓頭部保持為一整塊。關節所在處，實體至少應約 6 mm 高、12 mm 寬；放不下時，視窗會告訴你是哪一個。
+
+結果是一組關節節段（網格）的組合，照擺放的樣子直接列印。如果不滿意切分，復原後換別的數值再試。先用兩三個關節試印一次，就能看出間隙是否適合你的印表機。
+
 ## 滾花
 
 {{ui:shape.knurl}} 是四周佈滿溝槽的圓形握持面，用於旋鈕、撥輪與工具握把。在 {{ui:prop.knurlPattern}} 下選擇 {{ui:knurl.straight}}（沿軸線的溝槽，像控制旋鈕）、{{ui:knurl.diamond}}（兩排斜向溝槽交叉成小菱形），或 {{ui:knurl.round}}（沿軸線的溝槽與凸脊形成柔和的圓弧波浪，握感舒適而沒有銳利稜線）。圓弧溝槽保持淺於半個節距，否則凸脊會在根部鼓起；深度過大會自動退讓。你設定 {{ui:prop.diameter}} 與 {{ui:prop.height}}、{{ui:prop.knurlCount}} 的數量與 {{ui:prop.knurlDepth}}；交叉滾花還要設定相對軸線的 {{ui:prop.knurlAngle}}。{{ui:prop.knurlChamfer}} 以 45 度切開兩端，像車削的旋鈕；0 則保持尖銳。

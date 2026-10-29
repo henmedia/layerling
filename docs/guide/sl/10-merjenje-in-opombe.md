@@ -51,7 +51,7 @@ V nastavitvah pod {{ui:workspace.appearance}} sta dve stikali za tekoče mere:
 - {{ui:workspace.showMoveDimensions}} pri premikanju pokaže, za koliko se premikaš. To velja tudi pri dvigovanju s črno puščico nad telesom; pot se pokaže ob njegovem sprednjem vogalu. Ko spustiš, klikni takšno število in vpiši natančno razdaljo; minus gre navzdol.
 - {{ui:workspace.showOriginDimensions}} pokaže razdalje izbora do ničle plošče, tudi pri več označenih telesih.
 
-Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne.
+Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne. Če telo ne stoji na delovni ravnini, je prikazana tudi njegova višina nad njo; klikni številko, da vneseš novo.
 
 Če vas za trenutek motijo, pritisnite [[Q]]: mere in razdalje okoli izbora izginejo, zato je del, ki ga premikate, dobro viden. Ponovni [[Q]] jih vrne. Ročica, na katero pokažete, svojo mero vseeno pokaže.
 

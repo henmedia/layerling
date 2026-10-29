@@ -83,6 +83,41 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     }
   });
 
+  it("exports a hinge with screw holes and rounded corners, the holes cut, with the display mesh's volume", async () => {
+    const { hingeTriangles } = await import("@/lib/hingeGeometry");
+    const volume = (fields: Parameters<typeof hingeTriangles>[0]) => hingeTriangles(fields).reduce(
+      (sum, [a, b, c]) => sum + (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6,
+      0,
+    );
+    for (const [hingeScrewCountersink, hingeAngle, mirrorY] of [[true, 0, false], [false, 0, false], [true, 120, false], [true, 60, true]] as const) {
+      const fields = { width: 40, depth: 40, height: 8, sides: 96, hingeScrewHoles: 2, hingeScrewCountersink, hingeCornerRadius: 5, hingeAngle };
+      const hinge = shape({ kind: "hinge", name: "Hinge", size: 40, rotation: 30, x: 12, z: -7, elevation: 3, mirrorY, ...fields });
+      const { blob, exportedCount, skipped } = await exportShapesToStep([hinge]);
+      expect(skipped).toEqual([]);
+      expect(exportedCount).toBe(1);
+      // Less than the hinge without holes, and within a percent of the display mesh (polygons against true circles).
+      const exported = await reimportVolume(blob);
+      expect(exported).toBeLessThan(volume({ width: 40, depth: 40, height: 8, sides: 96, hingeAngle }) - 30);
+      expect(near(exported, volume(fields), 0.01)).toBe(true);
+    }
+  });
+
+  it("exports a hinge with fingers instead of leaves, with the display mesh's volume", async () => {
+    const { hingeTriangles } = await import("@/lib/hingeGeometry");
+    for (const [hingeStyle, hingeCornerRadius, hingeAngle] of [["pin", 0, 0], ["pin", 2, 135], ["pinless", 3, 270]] as const) {
+      const fields = { width: 40, depth: 40, height: 8, sides: 96, hingeLeafStyle: "fingers" as const, hingeStyle, hingeCornerRadius, hingeAngle };
+      const hinge = shape({ kind: "hinge", name: "Hinge", size: 40, rotation: 30, x: 12, z: -7, elevation: 3, ...fields });
+      const { blob, exportedCount, skipped } = await exportShapesToStep([hinge]);
+      expect(skipped).toEqual([]);
+      expect(exportedCount).toBe(1);
+      const meshVolume = hingeTriangles(fields).reduce(
+        (sum, [a, b, c]) => sum + (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6,
+        0,
+      );
+      expect(near(await reimportVolume(blob), meshVolume, 0.01)).toBe(true);
+    }
+  });
+
   it("exports box + cylinder + sphere as exact B-Rep with conserved volume", async () => {
     const box = shape({ kind: "box", name: "Box", x: -30, width: 10, depth: 6, height: 4 });
     const cyl = shape({ kind: "cylinder", name: "Cyl", x: 0, width: 8, depth: 8, height: 12 });

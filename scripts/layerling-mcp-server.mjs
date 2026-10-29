@@ -132,6 +132,8 @@ async function callTool(name, args) {
       return bridgeCommand("hull_objects", args, 30000);
     case "layerling_cookie_cutter":
       return bridgeCommand("cookie_cutter", args, 60000);
+    case "layerling_flexi_joints":
+      return bridgeCommand("flexi_joints", args, 120000);
     case "layerling_loft_sketches":
       return bridgeCommand("loft_sketches", args, 60000);
     case "layerling_ungroup_objects":

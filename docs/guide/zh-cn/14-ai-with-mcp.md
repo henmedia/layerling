@@ -73,6 +73,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_intersect_objects` | 只保留对象共有的部分（交集） |
 | `layerling_hull_objects` | 把对象包成一个凸体，就像用收缩膜包住一样（凸包） |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | 把形状分离成松散的部件，把草图实体按轮廓分离为每个轮廓一个实体 |
 | `layerling_split_objects` | 用一个平面把实体或孔切成两半 |

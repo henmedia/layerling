@@ -77,6 +77,7 @@ export const GUIDE_SECTIONS = {
   vase: { chapter: "shapes", de: "eine-vase", en: "a-vase", nl: "een-vaas", fr: "un-vase", ru: "vaza", cs: "vaza", sl: "vaza" },
   gridfinity: { chapter: "threads", de: "gridfinity", en: "gridfinity", nl: "gridfinity", ru: "gridfinity", cs: "gridfinity", sl: "gridfinity", hu: "gridfinity", es: "gridfinity" },
   hinge: { chapter: "threads", de: "scharnier", en: "hinge", nl: "scharnier", ru: "petlya", cs: "pant", sl: "tecaj", hu: "zsaner", es: "bisagra" },
+  flexi: { chapter: "threads", de: "flexi-gelenke", en: "flexi-joints", nl: "flexi-scharnieren", ru: "fleksi-sharniry", cs: "flexi-klouby", sl: "flexi-zgibi", hu: "flexi-csuklok", es: "articulaciones-flexi", fr: "articulations-flexi" },
   knurl: { chapter: "threads", de: "raendelung", en: "knurling", nl: "kartel", ru: "nakatka", cs: "ryhovane-uchopy", sl: "narebricenje", hu: "recezes", es: "moleteado" },
   dovetail: { chapter: "threads", de: "schwalbenschwanz", en: "dovetail", nl: "zwaluwstaart", ru: "lastochkin-khvost", cs: "rybinovy-spoj", sl: "lastovicji-rep", hu: "fecskefark", es: "cola-de-milano" },
   teardrop: { chapter: "threads", de: "tropfenbohrung", en: "teardrop-hole", nl: "druppelgat", ru: "kaplevidnoe-otverstie", cs: "kapkovity-otvor", sl: "kapljicna-izvrtina", hu: "csepp-alaku-lyuk", es: "orificio-en-lagrima" },

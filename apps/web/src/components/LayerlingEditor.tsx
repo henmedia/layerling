@@ -19,7 +19,8 @@ import { normalizeTextEdge } from "@/lib/textEdge";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, type NameTagKeyring } from "@/lib/textLayers";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
-import { cookieCutterProfiles, normalizeCookieCutterOptions, outlineFromLoops, type CookieCutterOptions } from "@/lib/cookieCutter";
+import { automaticFlexiJoints, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
+import { cookieCutterFillets, cookieCutterProfiles, normalizeCookieCutterOptions, outlineFromCurves, outlineFromLoops, sampledCurveLoop, unitedFootprint, type CookieCutterOptions, type CurveLoop } from "@/lib/cookieCutter";
 import type { IconLayerPatch, IconTagControls, ReferenceImageControls, TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import { calibratedReferenceImage, dataUrlByteLength, isReferenceImage, LARGE_REFERENCE_IMAGE_BYTES, mirrorHidesReferenceImage, referenceImageOpacity, referenceImagePixelDistance, referenceImageShape } from "@/lib/referenceImage";
 import { IconTagPanel } from "@/components/workplane/IconTagPanel";
@@ -46,6 +47,8 @@ import { EdgeModifierPanel } from "./workplane/EdgeModifierPanel";
 import { ShellPanel } from "./workplane/ShellPanel";
 import { OffsetPanel } from "./workplane/OffsetPanel";
 import { CutOutPanel } from "./workplane/CutOutPanel";
+import { COOKIE_CUTTER_SETTINGS_DEFAULTS, CookieCutterPanel, type CookieCutterSettings } from "./workplane/CookieCutterPanel";
+import { FlexiPanel, type FlexiToolSettings } from "./workplane/FlexiPanel";
 import { DeleteFacePanel } from "./workplane/DeleteFacePanel";
 import { MateFacesPanel } from "./workplane/MateFacesPanel";
 import { concentricMotion, mateMotion, type FacePick, type MateMode } from "@/lib/mateFaces";
@@ -70,7 +73,7 @@ import { scaleShapesByPercent } from "@/lib/scaleByPercent";
 import { canToggleGroupColors, colorForParts, groupShowsPartColors } from "@/lib/groupColors";
 import { disposeBoundsTree } from "three-mesh-bvh";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
-import { arrayFollowingPivot, arrayGroupsCopies, circleStepDegrees, clampArrayCount, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
+import { arrayCirclePivot, arrayFollowingPivot, arrayGroupsCopies, circleStepDegrees, clampArrayCount, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { bedOverhangs, keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
 import { SplitPanel, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
 import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitOrientationForNormal, splitAxisFromLabel, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
@@ -82,7 +85,7 @@ import { ShortcutsModal } from "./workplane/ShortcutsModal";
 import { InteractiveHelp } from "./InteractiveHelp";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
 import { nextSelectionTransparency } from "@/lib/selectionTransparency";
-import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
+import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
 import { pasteCenteringShift } from "@/lib/pasteCentering";
 import { faceWorkplaneCenteringShift, workplaneCenteringOffset } from "@/lib/workplaneCentering";
 import { projectShapesExtent } from "@/components/workplane/ViewportOverlays";
@@ -159,7 +162,7 @@ import { DEFAULT_SKETCH_STROKE, normalizeSketchStroke, strokedSketchProfile } fr
 import { bottomCadModifierEdgeIds, horizontalCadModifierEdgeIds, topCadModifierEdgeIds, verticalCadModifierEdgeIds } from "@/lib/topEdges";
 import { tangentCadEdgeChain } from "@/lib/cadEdgeChain";
 import { sketchEditTurn, turnedSketchProfile, type SketchEditTurn } from "@/lib/sketchEditTurn";
-import { movedWithEditedOutline, placedLikeExisting, placeSketchShape, sketchBodyAnchor, type SketchAnchor } from "@/lib/sketchPlacement";
+import { movedWithEditedOutline, placedLikeExisting, placeSketchShape, sketchBodyAnchor, sketchPoseOf, type SketchAnchor } from "@/lib/sketchPlacement";
 import { notesWithSketchNotes, sketchNoteFrame, sketchNotesFromBody } from "@/lib/sketchNotes";
 import { useSketchNotes } from "@/lib/useSketchNotes";
 import { useEditorNotes } from "@/lib/useEditorNotes";
@@ -171,7 +174,7 @@ import { useRememberedFlag } from "@/lib/useRememberedFlag";
 import { BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportEvent } from "@/lib/bugReport";
 import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
-import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
+import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
 import { useInspectorCard } from "@/lib/inspectorCards";
@@ -186,7 +189,7 @@ import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_
 import type { AlignAxis, AlignHandleStatus, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, appendMeshData, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
-import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
+import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, articulateShapesOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { frameAabb, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
@@ -1304,6 +1307,43 @@ async function footprintSvg(shapes: readonly WorkplaneShape[], title: string) {
 }
 
 /**
+ * A cookie cutter's outline from texts lying flat (#982): the letters' own curves, as the edge tool takes them, placed where
+ * the text stands - so the wall follows them exactly and can take its cutting edge, which an outline cut from the letters'
+ * triangles cannot. Null for anything else, for letters the exact outline does not know, and for letters that overlap
+ * (a joined-up script), which the cut through the triangles unites.
+ */
+async function textCutterOutline(shapes: readonly WorkplaneShape[]) {
+  if (!shapes.length || shapes.some((shape) => shape.kind !== "text" || shape.rotationX || shape.rotationZ)) return null;
+  const bodies: CurveLoop[][] = [];
+  for (const shape of shapes) {
+    const glyphs = textGlyphProfiles(shape);
+    if (!glyphs?.length || glyphs.some((glyph) => !glyph.profile)) return null;
+    for (const { profile } of glyphs) {
+      const t = profile!.transform ?? [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0];
+      const world = (point: { x: number; z: number }) => ({ x: t[0] * point.x + t[2] * point.z + t[3], z: t[8] * point.x + t[10] * point.z + t[11] });
+      const loops: CurveLoop[] = [];
+      for (const loop of profile!.loops) {
+        if (loop.segments.some((segment) => segment.kind === "arc")) return null;
+        loops.push({
+          ...world(loop),
+          segments: loop.segments.map((segment) => ({
+            kind: segment.kind === "bezier" ? "bezier" as const : "line" as const,
+            ...world(segment),
+            ...(segment.kind === "bezier" ? { controls: segment.controls.map(world) } : {}),
+          })),
+        });
+      }
+      bodies.push(loops);
+    }
+  }
+  // Letters that touch or overlap would give walls crossing each other; their united outline has fewer rings than they do.
+  const united = unitedFootprint(await getManifoldRuntime(), bodies.map((loops) => loops.map(sampledCurveLoop)));
+  if (united.length !== bodies.reduce((sum, loops) => sum + loops.length, 0)) return null;
+  const outline = outlineFromCurves(bodies.flat());
+  return outline ? { ...outline, floor: Math.min(...shapes.map((shape) => shape.elevation ?? 0)) } : null;
+}
+
+/**
  * What the shapes stand on as one outline for a cookie cutter (#982): the closed outlines the workplane cuts through them,
  * as a sketch round the middle of their box, with that middle and the height of their lowest point. Null when nothing closed is cut.
  */
@@ -1312,7 +1352,8 @@ async function footprintOutline(shapes: readonly WorkplaneShape[]) {
   const { meshes } = await colorSeparatedExportMeshes(solids, cut, wasCut);
   const offset = footprintCutOffset(meshes);
   if (offset === null) return null;
-  const outline = outlineFromLoops(meshes.flatMap((mesh) => sliceMeshContours(mesh, "y", offset)));
+  // Shapes that overlap give one outline round all of them, as if they were grouped.
+  const outline = outlineFromLoops(unitedFootprint(await getManifoldRuntime(), meshes.map((mesh) => sliceMeshContours(mesh, "y", offset))));
   return outline ? { ...outline, floor: offset - FOOTPRINT_CUT_HEIGHT } : null;
 }
 
@@ -2263,7 +2304,8 @@ function separateShapeParts(shape: WorkplaneShape) {
  * its own, as when the sketch is edited down to it, so each part stays where it was, keeps the body's
  * height, turn and colour, and has a sketch of its own to edit. The first part keeps the body's id.
  */
-async function separateSketchBodyParts(shape: WorkplaneShape) {
+async function separateSketchBodyParts(baked: WorkplaneShape) {
+  const shape = sketchPoseOf(baked);
   const profiles = shape.sketchProfile ? sketchOutlineParts(shape.sketchProfile) : [];
   if (profiles.length < 2) return [];
   const quaternion = quaternionForShape(shape);
@@ -2508,6 +2550,9 @@ const NO_ATTACHMENTS: ProjectAttachment[] = [];
 function withSelectionPivot(shape: WorkplaneShape, pivot: PivotPoint | null): WorkplaneShape {
   return pivot ? { ...shape, rotationPivot: shapePivotFromWorld(shape, pivot) } : shape;
 }
+
+/** Where the cookie cutter panel keeps its settings for the next cutter (#982). */
+const COOKIE_CUTTER_SETTINGS_STORAGE_KEY = "layerling.cookieCutterSettings";
 
 export function LayerlingEditor({
   initialAssets = [],
@@ -3021,6 +3066,10 @@ export function LayerlingEditor({
   const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; busy: boolean; error: string | null } | null>(null);
   /** Cut out (#927): `partId` stays, a copy of it grown by `clearance` is cut out of `hostId`. */
   const [cutOutTool, setCutOutTool] = useState<{ partId: string; hostId: string; clearance: number; busy: boolean; error: string | null } | null>(null);
+  /** Flexi joints (Liane's mail, 29.10.2026): the bodies `targetIds` are cut into links with a joint at every cut. */
+  const [flexiTool, setFlexiTool] = useState<(FlexiToolSettings & { targetIds: string[]; busy: boolean; error: string | null }) | null>(null);
+  /** The cookie cutter's panel (#982): what it is made from and the settings it is built with, kept for the next cutter. */
+  const [cookieCutterTool, setCookieCutterTool] = useState<(CookieCutterSettings & { targetIds: string[]; busy: boolean; error: string | null }) | null>(null);
   const [simplifyToolId, setSimplifyToolId] = useState<string | null>(null);
   /** The window for fonts of one's own (#customFonts), opened from a text's font select. */
   const [fontManagerOpen, setFontManagerOpen] = useState(false);
@@ -4672,21 +4721,23 @@ export function LayerlingEditor({
     let turn: SketchEditTurn | null = null;
     sketchEditAnchorRef.current = null;
     if (operation === "extrude" || operation === "sweep") {
-      const quaternion = quaternionForShape(selectedShape);
+      // Baked by an edge treatment, the body opens its sketch where it was drawn, turned as it was (#1006).
+      const body = sketchPoseOf(selectedShape);
+      const quaternion = quaternionForShape(body);
       const normal = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).normalize();
       const xAxis = new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize();
       const zAxis = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize();
       // The sketch is drawn over the body: the point of the outline under the body's middle goes there.
-      const anchor = sketchBodyAnchor(selectedShape);
+      const anchor = sketchBodyAnchor(body);
       sketchEditAnchorRef.current = anchor;
       const profileCenterX = anchor.x;
       const profileCenterZ = anchor.z;
       const origin = new THREE.Vector3(
-        selectedShape.x,
-        (selectedShape.elevation ?? 0) + selectedShape.height / 2,
-        selectedShape.z,
+        body.x,
+        (body.elevation ?? 0) + body.height / 2,
+        body.z,
       )
-        .addScaledVector(normal, -selectedShape.height / 2)
+        .addScaledVector(normal, -body.height / 2)
         .addScaledVector(xAxis, -profileCenterX)
         .addScaledVector(zAxis, -profileCenterZ);
       editWorkplane = placementWorkplaneFromSurface(
@@ -4696,7 +4747,7 @@ export function LayerlingEditor({
       );
       // Turned only about the vertical, it opens on the plate as it stands in 3D, turned and moved, on the plate's grid
       // (forum, 621358); before, its own frame made the bodies round it look turned and the grid sit off the plate's.
-      const upright = !selectedShape.rotationX && !selectedShape.rotationZ && !selectedShape.mirrorX && !selectedShape.mirrorY && !selectedShape.mirrorZ;
+      const upright = !body.rotationX && !body.rotationZ && !body.mirrorX && !body.mirrorY && !body.mirrorZ;
       turn = upright && !selectedShape.sketchProfile.keyring
         ? sketchEditTurn({ x: origin.x, z: origin.z }, { x: xAxis.x, z: xAxis.z }, { x: zAxis.x, z: zAxis.z })
         : null;
@@ -5425,7 +5476,9 @@ export function LayerlingEditor({
     const turn = sketchEditTurnRef.current;
     // The notes are not part of the body's sketch: they become the body's own.
     const { notes: sketchNotes, ...drawnProfile } = turn ? turnedSketchProfile(sketchProfile, turn, "toBody") : sketchProfile;
-    const edited = editingSketchShapeId ? shapes.find((shape) => shape.id === editingSketchShapeId) ?? null : null;
+    const editedBody = editingSketchShapeId ? shapes.find((shape) => shape.id === editingSketchShapeId) ?? null : null;
+    // A body baked by an edge treatment is built again where its sketch lay, turned as it was (#1006).
+    const edited = editedBody ? sketchPoseOf(editedBody) : null;
     // Switched to another kind of body (#655): a new body of that kind takes the edited one's place.
     const switchedBody = edited && sketchOperationSwitchRef.current ? edited : null;
     const existing = switchedBody ? null : edited;
@@ -5956,8 +6009,15 @@ export function LayerlingEditor({
     if (!arrayTool || selectedShapes.length === 0) return;
     const copies = arrayCopies(selectedShapes, arrayTool);
     const groupPieces = arrayGroupsCopies(arrayTool) && !selectedShapes.some((shape) => isNonSolidShape(shape));
+    // A circle leaves its centre as the pieces' pivot, to align another part to or mark it (#990).
+    const piecesBounds = boundsForShapes([...selectedShapes, ...copies]);
+    const circlePivot = arrayCirclePivot(arrayTool, piecesBounds.minY, piecesBounds.maxY, activeRotationPivot);
     setArrayTool(null);
-    const keepLoose = (message: string) => commitShapes([...shapes, ...copies], [...selectedIds, ...copies.map((shape) => shape.id)], message);
+    const keepLoose = (message: string) => {
+      const ids = [...selectedIds, ...copies.map((shape) => shape.id)];
+      commitShapes([...shapes, ...copies], ids, message);
+      if (circlePivot) setRotationPivot({ selectionKey: ids.join("|"), point: circlePivot });
+    };
     if (!groupPieces) {
       keepLoose(t("status.arrayCreated", { count: copies.length }));
       return;
@@ -5983,13 +6043,13 @@ export function LayerlingEditor({
       return;
     }
     const selected = new Set(selectedIds);
-    const editableGroup = canonicalizeShape({ ...group, groupOperation: "group" });
+    const editableGroup = withSelectionPivot(canonicalizeShape({ ...group, groupOperation: "group" }), circlePivot);
     commitShapes(
       [...shapesRef.current.filter((shape) => !selected.has(shape.id)), editableGroup],
       editableGroup.id,
       result.openGapEdges ? t("status.cutLeftOpen", { count: result.openGapEdges }) : result.mergeWarning ?? t("status.groupedMany", { count: pieces.length }),
     );
-  }, [arrayTool, commitShapes, selectedIds, selectedShapes, shapes]);
+  }, [activeRotationPivot, arrayTool, commitShapes, selectedIds, selectedShapes, shapes]);
 
   const duplicateShapeAt = useCallback((id: string, position: { x: number; z: number }) => {
     const shape = shapesRef.current.find((entry) => entry.id === id);
@@ -7347,6 +7407,101 @@ export function LayerlingEditor({
     setCutOutTool((current) => current && !current.busy && !(selectedIds.length === 2 && selectedIds.includes(current.partId) && selectedIds.includes(current.hostId)) ? null : current);
   }, [selectedIds]);
 
+  /**
+   * Flexi joints from the selection (Liane's mail, 29.10.2026): the solids joined and the holes among them cut away, then cut
+   * into links with a joint printed in place at every cut, as a bundle in place of what they are made from. The same code
+   * the MCP action uses.
+   */
+  const makeFlexi = useCallback(async (given?: Partial<Record<keyof FlexiOptions, unknown>>, only?: readonly WorkplaneShape[]) => {
+    const fail = (message: string) => {
+      setNotice(message);
+      return { ok: false as const, message };
+    };
+    const targets = (only ?? selectedShapes).filter((shape) => !isNonSolidShape(shape));
+    if (!targets.some((shape) => !shape.hole)) return fail(t("flexi.error.needsBody"));
+    if (targets.some((shape) => shape.locked)) return fail(t("status.objectLocked"));
+    const options = normalizeFlexiOptions(given);
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    setNotice(t("flexi.working"), true);
+    const result = await articulateShapesOffThread(targets, options);
+    if (!result.links) return fail(result.error);
+    if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
+      return fail(t("flexi.error.changed"));
+    }
+    const group = groupedShape(result.links);
+    if (!group) return fail(t("flexi.error.empty", { link: 1 }));
+    const body = withSelectionPivot(canonicalizeShape({ ...group, name: t("flexi.name", { name: targets.find((shape) => !shape.hole)?.name ?? "" }), groupOperation: "bundle" }), activeRotationPivot);
+    const consumed = new Set(targets.map((shape) => shape.id));
+    commitShapes([...shapesRef.current.filter((shape) => !consumed.has(shape.id)), body], body.id, t("status.flexiMade", { joints: result.joints, links: result.links.length, swing: result.swing }));
+    return { ok: true as const, id: body.id, joints: result.joints, links: result.links.length, swing: result.swing, axis: result.axis };
+  }, [commitShapes, selectedShapes, activeRotationPivot]);
+
+  /** How long the bodies are along x and along z (the depth), as the flexi tool cuts them. */
+  const flexiExtent = useCallback((targets: WorkplaneShape[]) => {
+    const bounds = boundsForShapes(targets);
+    return { x: bounds.maxX - bounds.minX, z: bounds.maxZ - bounds.minZ };
+  }, []);
+
+  const startFlexiTool = useCallback(() => {
+    if (flexiTool) {
+      setFlexiTool(null);
+      return;
+    }
+    if (refuseLockedSelection()) return;
+    const targets = selectedShapes.filter((shape) => !isNonSolidShape(shape));
+    if (!targets.some((shape) => !shape.hole)) {
+      setNotice(t("flexi.error.needsBody"));
+      return;
+    }
+    if (edgeModifier) invalidateCadModifierSession();
+    closeSplit();
+    const extent = flexiExtent(targets);
+    const [length, width] = extent.x >= extent.z ? [extent.x, extent.z] : [extent.z, extent.x];
+    setFlexiTool({
+      targetIds: targets.map((shape) => shape.id),
+      axis: "auto",
+      joints: automaticFlexiJoints(length, width),
+      clearance: FLEXI_DEFAULTS.clearance,
+      swing: FLEXI_DEFAULTS.swing,
+      autoSize: true,
+      size: 12,
+      evenLinks: true,
+      start: Math.round(length / 5),
+      end: Math.round(length / 5),
+      busy: false,
+      error: null,
+    });
+  }, [closeSplit, edgeModifier, flexiExtent, flexiTool, invalidateCadModifierSession, refuseLockedSelection, selectedShapes]);
+
+  const applyFlexiTool = useCallback(() => {
+    if (!flexiTool || flexiTool.busy) return;
+    const targets = shapesRef.current.filter((shape) => flexiTool.targetIds.includes(shape.id));
+    if (!targets.length) {
+      setFlexiTool(null);
+      return;
+    }
+    const { axis, joints, clearance, swing, autoSize, size, evenLinks, start, end } = flexiTool;
+    setFlexiTool((current) => current ? { ...current, busy: true, error: null } : current);
+    void makeFlexi({
+      axis: axis === "auto" ? undefined : axis,
+      joints,
+      clearance,
+      swing,
+      size: autoSize ? undefined : size,
+      start: evenLinks ? undefined : start,
+      end: evenLinks ? undefined : end,
+    }, targets).then((result) => {
+      if (result.ok) setFlexiTool(null);
+      else setFlexiTool((current) => current ? { ...current, busy: false, error: result.message } : current);
+    });
+  }, [flexiTool, makeFlexi]);
+
+  // The panel belongs to the bodies it was opened for; another selection closes it.
+  useEffect(() => {
+    setFlexiTool((current) => current && !current.busy && !(selectedIds.length === current.targetIds.length && current.targetIds.every((id) => selectedIds.includes(id))) ? null : current);
+  }, [selectedIds]);
+
   const applyShellTool = useCallback(() => {
     if (!shellTool || shellTool.busy) return;
     const target = selectedShape;
@@ -7442,13 +7597,15 @@ export function LayerlingEditor({
       if (!entry) return;
       const fingerprint = projectShapesFingerprint([stale]);
       const { amount, openings, shellEdges } = entry.feature;
-      const stretch = hollowStretchSincePicture(stale, entry);
+      // Measured from where the last fillet after the hollowing left the body, if there is one (forum, 621472).
+      const reference = shellRebuildReference(stale, entry);
+      const stretch = hollowStretchSincePicture(stale, reference);
       const width = entry.before.width * stretch.x;
       const depth = entry.before.depth * stretch.z;
       // A cylinder stays round; stretched unevenly it becomes the ellipse it now is.
       const source = entry.before.kind === "cylinder" && Math.abs(width - depth) > 0.005
-        ? { ...entry, before: { ...entry.before, kind: "ellipse" as const } }
-        : entry;
+        ? { ...reference, before: { ...entry.before, kind: "ellipse" as const } }
+        : reference;
       const before = restoreShapeBeforeEdgeTreatment(stale, source);
       if (Math.abs(shapeWidth(before) - width) > 0.05 || Math.abs(shapeDepth(before) - depth) > 0.05) {
         shellRebuildFailedRef.current.add(fingerprint);
@@ -8879,34 +9036,57 @@ export function LayerlingEditor({
     try {
       const single = targets.length === 1 && isIconLayerBody(targets[0]) ? targets[0] : null;
       let outline: SketchProfile;
-      let place: (built: WorkplaneShape) => WorkplaneShape;
+      // A built part is centred on its own outline (its x and z, in the sketch's coordinates); each is put where the wall
+      // goes, shifted by how far its middle lies from the wall's - the rim shares the wall's middle, the bridges do not.
+      let place: (built: WorkplaneShape, wall: SketchAnchor) => WorkplaneShape;
       if (single) {
         const stretch = sketchBodyStretch(single);
         outline = stretch ? stretchedSketchProfile(single.sketchProfile, stretch.x, stretch.z) : single.sketchProfile;
-        place = (built) => placeSketchShape(built, placementWorkplaneRef.current, single);
+        const quaternion = quaternionForShape(single);
+        const xAxis = new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion);
+        const zAxis = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion);
+        const axes = { x: [xAxis.x, xAxis.y, xAxis.z] as const, z: [zAxis.x, zAxis.y, zAxis.z] as const };
+        place = (built, wall) => movedWithEditedOutline(placeSketchShape(built, placementWorkplaneRef.current, single), single, wall, { x: built.x, z: built.z }, axes);
       } else {
-        const found = await footprintOutline(targets);
+        const found = (await textCutterOutline(targets)) ?? (await footprintOutline(targets));
         if (!found) return fail(t("status.cookieCutterNoOutline"));
         outline = found.profile;
-        place = (built) => canonicalizeShape({ ...built, x: found.x, z: found.z, elevation: found.floor });
+        place = (built, wall) => canonicalizeShape({ ...built, x: found.x + built.x - wall.x, z: found.z + built.z - wall.z, elevation: found.floor });
       }
       const profiles = cookieCutterProfiles(outline, options);
       const color = targets[0].color;
-      const build = async (profile: SketchProfile, height: number, name: string) =>
-        canonicalizeShape({ ...place(await cadShapeFromSketchProfile(profile, height, single)), id: createLocalId("cutter"), name, color, hole: false });
+      const extrude = (profile: SketchProfile, height: number) => cadShapeFromSketchProfile(profile, height, null);
       // An outline with steps shorter than the edge's chamfer cannot take it; the cutter is built with a flat top then, and says so.
       let edgeLeftOut = false;
-      const wall = await build(profiles.wall, options.height, "Wall").catch((error: unknown) => {
-        if (!(error instanceof Error && error.message === t("sketch.edgeFailed")) || !profiles.wall.stroke) throw error;
+      const extrudeWall = (profile: SketchProfile, height: number) => extrude(profile, height).catch((error: unknown) => {
+        if (!(error instanceof Error && error.message === t("sketch.edgeFailed")) || !profile.stroke) throw error;
         edgeLeftOut = true;
-        const { edge: _edge, ...flat } = profiles.wall.stroke;
-        return build({ ...profiles.wall, stroke: flat }, options.height, "Wall");
+        const { edge: _edge, ...flat } = profile.stroke;
+        return extrude({ ...profile, stroke: flat }, height);
       });
-      const rim = await build(profiles.rim, options.rimHeight, "Rim");
+      const wallBuilt = await extrudeWall(profiles.wall, options.height);
+      const anchor = { x: wallBuilt.x, z: wallBuilt.z };
+      const finish = (built: WorkplaneShape, name: string) =>
+        canonicalizeShape({ ...place(built, anchor), id: createLocalId("cutter"), name, color, hole: false });
+      const parts = [finish(wallBuilt, "Wall"), finish(await extrude(profiles.rim, options.rimHeight), "Rim")];
+      // The walls round the holes are a body of their own, so they can be lower than the outer wall and only press the inside
+      // into the dough; the bridges hold them, standing on the rim's level, on the side the hand presses.
+      if (profiles.inner) parts.push(finish(await extrudeWall(profiles.inner, options.height - options.imprint), "Inner walls"));
+      if (profiles.bridges) parts.push(finish(await extrude(profiles.bridges, options.bridgeHeight), "Bridges"));
+      // Instead of the bridges, a plate over the whole outline on the side the hand presses (avxmw, #982).
+      if (profiles.plate) parts.push(finish(await extrude(profiles.plate, options.plate), "Plate"));
+      // The fillets where the walls stand on the rim, the bridges or the plate: one mesh of fine steps, lifted to where it starts.
+      const fillets = options.fillet > 0 ? cookieCutterFillets(await getManifoldRuntime(), profiles, options) : null;
+      const filletSource = canonicalizeShape({ id: createLocalId("cutter"), name: "Fillets", kind: "mesh", color, x: 0, z: 0, elevation: 0, size: 1, width: 1, depth: 1, height: 1, rotation: 0 });
+      const filletBody = fillets ? shapeFromCadMesh(filletSource, fillets.positions, new Float32Array(0), fillets.indices, "") : null;
+      if (filletBody) {
+        const placed = finish({ ...filletBody, cadBrep: undefined }, "Fillets");
+        parts.push(canonicalizeShape({ ...placed, elevation: (placed.elevation ?? 0) + (filletBody.elevation ?? 0) }));
+      }
       if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
         return fail(t("status.cookieCutterChanged"));
       }
-      const group = groupedShape([wall, rim]);
+      const group = groupedShape(parts);
       if (!group) return fail(t("status.cookieCutterNoOutline"));
       const cutter = withSelectionPivot(canonicalizeShape({ ...group, name: t("cookieCutter.name"), groupOperation: "bundle" }), activeRotationPivot);
       const consumed = new Set(targets.map((shape) => shape.id));
@@ -8920,6 +9100,57 @@ export function LayerlingEditor({
       return { ok: false as const, message };
     }
   }, [commitShapes, selectedShapes, activeRotationPivot]);
+
+  /** The settings the last cutter was built with, so the next one starts from them; the defaults where none are kept. */
+  const storedCookieCutterSettings = useCallback((): CookieCutterSettings => {
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(COOKIE_CUTTER_SETTINGS_STORAGE_KEY) ?? "null") as Partial<CookieCutterSettings> | null;
+      return { ...COOKIE_CUTTER_SETTINGS_DEFAULTS, ...(stored && typeof stored === "object" ? stored : {}) };
+    } catch {
+      return COOKIE_CUTTER_SETTINGS_DEFAULTS;
+    }
+  }, []);
+
+  const startCookieCutterTool = useCallback(() => {
+    if (cookieCutterTool) {
+      setCookieCutterTool(null);
+      return;
+    }
+    if (refuseLockedSelection()) return;
+    const targets = selectedShapes.filter((shape) => !isNonSolidShape(shape));
+    if (!targets.length) {
+      setNotice(t("status.cookieCutterNeedsShape"));
+      return;
+    }
+    if (edgeModifier) invalidateCadModifierSession();
+    closeSplit();
+    setCookieCutterTool({ ...storedCookieCutterSettings(), targetIds: targets.map((shape) => shape.id), busy: false, error: null });
+  }, [closeSplit, cookieCutterTool, edgeModifier, invalidateCadModifierSession, refuseLockedSelection, selectedShapes, storedCookieCutterSettings]);
+
+  const applyCookieCutterTool = useCallback(() => {
+    if (!cookieCutterTool || cookieCutterTool.busy) return;
+    const targets = shapesRef.current.filter((shape) => cookieCutterTool.targetIds.includes(shape.id));
+    if (!targets.length) {
+      setCookieCutterTool(null);
+      return;
+    }
+    const { support, plate, fillet, imprint, mirror } = cookieCutterTool;
+    try {
+      window.localStorage.setItem(COOKIE_CUTTER_SETTINGS_STORAGE_KEY, JSON.stringify({ support, plate, fillet, imprint, mirror }));
+    } catch {
+      // Not kept for next time, but built all the same.
+    }
+    setCookieCutterTool((current) => current ? { ...current, busy: true, error: null } : current);
+    void makeCookieCutter({ plate: support === "plate" ? plate : 0, fillet, imprint, mirror }, targets).then((result) => {
+      if (result.ok) setCookieCutterTool(null);
+      else setCookieCutterTool((current) => current ? { ...current, busy: false, error: result.message } : current);
+    });
+  }, [cookieCutterTool, makeCookieCutter]);
+
+  // The panel belongs to the bodies it was opened for; another selection closes it.
+  useEffect(() => {
+    setCookieCutterTool((current) => current && !current.busy && !(selectedIds.length === current.targetIds.length && current.targetIds.every((id) => selectedIds.includes(id))) ? null : current);
+  }, [selectedIds]);
 
   // Each step answers with what happened, so the buttons can show it and MCP can pass it on.
   const refuseOpenGroupStep = useCallback((message: string): OpenGroupOutcome => {
@@ -10130,8 +10361,10 @@ export function LayerlingEditor({
           if (typeof params.silhouette === "boolean") patch.textSilhouette = params.silhouette || undefined;
           // Straight text only (#382): the letters stretched to fill the box, or fitted with their proportions.
           if (typeof params.stretch === "boolean") patch.textStretch = params.stretch || undefined;
-          // Straight text only (#981): the letters stacked top to bottom; the box turns upright and the letters keep their size.
-          if (typeof params.vertical === "boolean" && !target.textCurved) {
+          // The letters stacked top to bottom (#981). Straight: the box turns upright and the letters keep their size. Curved: the
+          // column runs along the circle, the letters upright, and the box follows in curvedTextPatch.
+          if (typeof params.vertical === "boolean" && target.textCurved) patch.textVertical = params.vertical || undefined;
+          else if (typeof params.vertical === "boolean") {
             const vertical = { ...target, ...patch, textVertical: params.vertical || undefined } as WorkplaneShape;
             Object.assign(patch, { textVertical: params.vertical || undefined }, vertical.textStretch ? {} : textLetterSizePatch(vertical, textLetterSize({ ...target, ...patch } as WorkplaneShape)));
           }
@@ -10854,10 +11087,20 @@ export function LayerlingEditor({
         const ids = new Set(mcpStringArray(params.ids));
         const targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the objects to make a cookie cutter from");
-        const result = await makeCookieCutter({ wall: params.wall, height: params.height, rim: params.rim, rimHeight: params.rimHeight, edge: params.edge, mirror: params.mirror }, targets);
+        const result = await makeCookieCutter({ wall: params.wall, height: params.height, rim: params.rim, rimHeight: params.rimHeight, edge: params.edge, mirror: params.mirror, inner: params.inner, imprint: params.imprint, bridgeCount: params.bridgeCount, bridge: params.bridge, bridgeHeight: params.bridgeHeight, plate: params.plate, fillet: params.fillet }, targets);
         if (!result.ok) throw new Error(result.message);
         const cutter = currentShapes().find((shape) => shape.id === result.id);
         return { object: cutter ? mcpShapeSummary(cutter) : { id: result.id }, ...(result.edgeLeftOut ? { note: "The outline could not take the cutting edge; the wall has a flat top." } : {}) };
+      }
+
+      if (command.action === "flexi_joints") {
+        const ids = new Set(mcpStringArray(params.ids));
+        const targets = currentShapes().filter((shape) => ids.has(shape.id));
+        if (!targets.length) throw new Error("Pass the ids of the objects to make flexi links from");
+        const result = await makeFlexi({ axis: params.axis, joints: params.joints, clearance: params.clearance, swing: params.swing, size: params.size, start: params.start, end: params.end }, targets);
+        if (!result.ok) throw new Error(result.message);
+        const made = currentShapes().find((shape) => shape.id === result.id);
+        return { object: made ? mcpShapeSummary(made) : { id: result.id }, joints: result.joints, links: result.links, swing: result.swing, axis: result.axis === "x" ? "X" : "Y" };
       }
 
       if (command.action === "loft_sketches") {
@@ -10961,7 +11204,7 @@ export function LayerlingEditor({
         ["textContent", "textFont"].forEach((key) => {
           if (params[key] !== undefined && typeof params[key] !== "string") throw new Error(`${key} must be text`);
         });
-        const choices: Record<string, readonly string[]> = { pattern: SURFACE_TEXTURE_PATTERNS, profile: SURFACE_TEXTURE_PROFILES, direction: SURFACE_TEXTURE_DIRECTIONS, projection: SURFACE_TEXTURE_PROJECTIONS, axis: SURFACE_TEXTURE_AXES, detail: SURFACE_TEXTURE_DETAILS, crackStyle: SURFACE_TEXTURE_CRACK_STYLES, crackStart: SURFACE_TEXTURE_CRACK_STARTS, image: SURFACE_TEXTURE_IMAGES, imageTiling: SURFACE_TEXTURE_TILINGS, capStyle: SURFACE_TEXTURE_CAP_STYLES, capEdge: SURFACE_TEXTURE_CAP_EDGES };
+        const choices: Record<string, readonly string[]> = { pattern: SURFACE_TEXTURE_PATTERNS, profile: SURFACE_TEXTURE_PROFILES, direction: SURFACE_TEXTURE_DIRECTIONS, projection: SURFACE_TEXTURE_PROJECTIONS, axis: SURFACE_TEXTURE_AXES, detail: SURFACE_TEXTURE_DETAILS, crackStyle: SURFACE_TEXTURE_CRACK_STYLES, crackStart: SURFACE_TEXTURE_CRACK_STARTS, carbonWeave: SURFACE_TEXTURE_CARBON_WEAVES, brickBond: SURFACE_TEXTURE_BRICK_BONDS, barkType: SURFACE_TEXTURE_BARK_TYPES, woodType: SURFACE_TEXTURE_WOOD_TYPES, woodCut: SURFACE_TEXTURE_WOOD_CUTS, image: SURFACE_TEXTURE_IMAGES, imageTiling: SURFACE_TEXTURE_TILINGS, capStyle: SURFACE_TEXTURE_CAP_STYLES, capEdge: SURFACE_TEXTURE_CAP_EDGES };
         Object.entries(choices).forEach(([key, allowed]) => {
           if (params[key] !== undefined && !allowed.includes(String(params[key]))) throw new Error(`${key} must be one of ${allowed.join(", ")}`);
         });
@@ -11020,7 +11263,7 @@ export function LayerlingEditor({
           [textured.id],
           t("status.surfaceTextured", { pattern: surfacePatternLabel(settings.pattern), triangles: formatTriangleCount(outcome.stats.triangles) }),
         );
-        const { triangles, around, spacing, limited, tooDeep, bedClamped, cracks, text, projection } = outcome.stats;
+        const { triangles, around, spacing, limited, tooDeep, bedClamped, cracks, text, bricks, projection } = outcome.stats;
         // One's own image is told by its size, not its grey values.
         const { masks: _planes, textOutline: _outline, imageOwn, ...rest } = settings;
         const shown = { ...rest, imageOwn: imageOwn ? { width: imageOwn.width, height: imageOwn.height } : null };
@@ -11030,7 +11273,7 @@ export function LayerlingEditor({
           changed: Boolean(under),
           settings: shown,
           masks: masks.length,
-          texture: { triangles, projection, around, spacing, limited, tooDeep, bedClamped, ...(cracks ? { cracks } : {}), ...(text ? { text } : {}) },
+          texture: { triangles, projection, around, spacing, limited, tooDeep, bedClamped, ...(cracks ? { cracks } : {}), ...(text ? { text } : {}), ...(bricks ? { bricks } : {}) },
         };
       }
 
@@ -11260,13 +11503,14 @@ export function LayerlingEditor({
           radiusChange: mcpNumber(params.radiusChange, 0),
         };
         const copies = arrayCopies(sources, settings);
+        const piecesBounds = boundsForShapes([...sources, ...copies]);
+        const circlePivot = arrayCirclePivot(settings, piecesBounds.minY, piecesBounds.maxY);
+        const pivotAnswer = circlePivot ? { pivot: { x: circlePivot.x, y: -circlePivot.z, z: circlePivot.y } } : {};
         const looseResult = (message: string, warning?: string) => {
-          commitShapes(
-            [...shapesRef.current, ...copies],
-            [...sources.map((shape) => shape.id), ...copies.map((shape) => shape.id)],
-            message,
-          );
-          return { settings, originals: sources.map((shape) => shape.id), copies: copies.map(mcpShapeSummary), ...(warning ? { warning } : {}) };
+          const ids = [...sources.map((shape) => shape.id), ...copies.map((shape) => shape.id)];
+          commitShapes([...shapesRef.current, ...copies], ids, message);
+          if (circlePivot) setRotationPivot({ selectionKey: ids.join("|"), point: circlePivot });
+          return { settings, originals: sources.map((shape) => shape.id), copies: copies.map(mcpShapeSummary), ...pivotAnswer, ...(warning ? { warning } : {}) };
         };
         // `group: true` groups the originals and the copies as the Pattern window's box does (#828); left out, they stay loose.
         if (params.group !== true) return looseResult(t("status.arrayCreated", { count: copies.length }));
@@ -11287,9 +11531,9 @@ export function LayerlingEditor({
           return looseResult(result.failureNotice, result.failureNotice);
         }
         const sourceIds = new Set(sources.map((shape) => shape.id));
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = withSelectionPivot(canonicalizeShape({ ...result.group, groupOperation: "group" }), circlePivot);
         commitShapes([...currentShapes().filter((shape) => !sourceIds.has(shape.id)), editableGroup], editableGroup.id, result.mergeWarning ?? t("status.groupedMany", { count: pieces.length }));
-        return { settings, group: mcpShapeSummary(editableGroup), pieces: pieces.length, ...(result.mergeWarning ? { warning: result.mergeWarning } : {}) };
+        return { settings, group: mcpShapeSummary(editableGroup), pieces: pieces.length, ...pivotAnswer, ...(result.mergeWarning ? { warning: result.mergeWarning } : {}) };
       }
 
       if (command.action === "apply_edge_treatment") {
@@ -13739,6 +13983,8 @@ export function LayerlingEditor({
         canIntersect={!selectionLocked && canIntersectShapes(selectedShapes.filter((shape) => !isNonSolidShape(shape)))}
         canHull={!selectionLocked && canHullShapes(selectedShapes.filter((shape) => !isNonSolidShape(shape)))}
         canCookieCutter={!selectionLocked && selectedShapes.some((shape) => !isNonSolidShape(shape))}
+        canFlexi={!selectionLocked && selectedShapes.some((shape) => !shape.hole && !isNonSolidShape(shape))}
+        flexiActive={Boolean(flexiTool)}
         canLoftSketches={!selectionLocked && canSketchLoft(selectedShapes)}
         canUngroup={!selectionLocked && selectedShapes.some((shape) => Boolean(shape.groupedShapes?.length) || wasGroupBeforeEdgeTreatments(shape))}
         canModifySelection={hasSelection && !selectionLocked}
@@ -13808,7 +14054,8 @@ export function LayerlingEditor({
         onBundle={bundleSelected}
         onIntersect={intersectSelected}
         onHull={hullSelected}
-        onCookieCutter={() => void makeCookieCutter()}
+        onCookieCutter={startCookieCutterTool}
+        onFlexi={startFlexiTool}
         onLoftSketches={() => void loftSketches()}
         onIntersectPreview={toggleIntersectPreview}
         intersectPreviewActive={Boolean(intersectPreviewIds)}
@@ -14326,6 +14573,36 @@ export function LayerlingEditor({
           }}
         />
       ) : null}
+      {cookieCutterTool ? (
+        <CookieCutterPanel
+          targetName={shapesRef.current.filter((shape) => cookieCutterTool.targetIds.includes(shape.id)).map((shape) => shape.name).join(", ")}
+          settings={cookieCutterTool}
+          workspace={workspaceSettings}
+          busy={cookieCutterTool.busy}
+          error={cookieCutterTool.error}
+          onChange={(patch) => setCookieCutterTool((current) => current ? { ...current, ...patch, error: null } : current)}
+          onApply={applyCookieCutterTool}
+          onCancel={() => setCookieCutterTool(null)}
+        />
+      ) : null}
+      {flexiTool ? (() => {
+        const targets = shapesRef.current.filter((shape) => flexiTool.targetIds.includes(shape.id));
+        const extent = flexiExtent(targets.length ? targets : selectedShapes);
+        const length = flexiTool.axis === "x" ? extent.x : flexiTool.axis === "z" ? extent.z : Math.max(extent.x, extent.z);
+        return (
+          <FlexiPanel
+            targetName={targets.map((shape) => shape.name).join(", ")}
+            settings={flexiTool}
+            length={length}
+            workspace={workspaceSettings}
+            busy={flexiTool.busy}
+            error={flexiTool.error}
+            onChange={(patch) => setFlexiTool((current) => current ? { ...current, ...patch, error: null } : current)}
+            onApply={applyFlexiTool}
+            onCancel={() => setFlexiTool(null)}
+          />
+        );
+      })() : null}
       {cutOutTool ? (
         <CutOutPanel
           partName={shapesRef.current.find((shape) => shape.id === cutOutTool.partId)?.name ?? ""}

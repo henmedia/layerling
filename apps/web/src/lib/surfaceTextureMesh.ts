@@ -1567,6 +1567,91 @@ export function interpolatedNormals(base: { vertices: Float64Array; indices: Uin
 const MITER_LIMIT = 3;
 
 /**
+ * The sides meeting at each point on a sharp edge (see creaseMoves): their unit normals, grouped within the crease angle,
+ * three numbers per side. Only points with two sides or more.
+ */
+export function creaseSides(base: { vertices: Float64Array; indices: Uint32Array }, mesh: SurfaceMesh, creaseAngle: number) {
+  const bv = base.vertices, BI = base.indices;
+  const fn = new Float64Array(BI.length);
+  for (let f = 0; f < BI.length / 3; f += 1) {
+    const [x, y, z] = faceCross(bv, BI[f * 3], BI[f * 3 + 1], BI[f * 3 + 2]);
+    const l = Math.hypot(x, y, z);
+    if (l > 0) {
+      fn[f * 3] = x / l;
+      fn[f * 3 + 1] = y / l;
+      fn[f * 3 + 2] = z / l;
+    }
+  }
+  const limit = Math.cos((creaseAngle * Math.PI) / 180);
+  const I = mesh.indices;
+  const sums = new Map<number, number[]>();
+  for (let t = 0; t < I.length; t += 1) {
+    const i = I[t], P = mesh.parents[(t - (t % 3)) / 3];
+    let list = sums.get(i);
+    if (!list) sums.set(i, (list = []));
+    let k = 0;
+    for (; k < list.length; k += 4) {
+      const R = list[k];
+      if (fn[P * 3] * fn[R * 3] + fn[P * 3 + 1] * fn[R * 3 + 1] + fn[P * 3 + 2] * fn[R * 3 + 2] >= limit) break;
+    }
+    if (k >= list.length) list.push(P, 0, 0, 0);
+    list[k + 1] += fn[P * 3];
+    list[k + 2] += fn[P * 3 + 1];
+    list[k + 3] += fn[P * 3 + 2];
+  }
+  const out = new Map<number, Float64Array>();
+  for (const [i, list] of sums) {
+    if (list.length < 8) continue;
+    const normals = new Float64Array((list.length / 4) * 3);
+    for (let k = 0; k < list.length; k += 4) {
+      const l = Math.hypot(list[k + 1], list[k + 2], list[k + 3]) || 1;
+      normals[(k / 4) * 3] = list[k + 1] / l;
+      normals[(k / 4) * 3 + 1] = list[k + 2] / l;
+      normals[(k / 4) * 3 + 2] = list[k + 3] / l;
+    }
+    out.set(i, normals);
+  }
+  return out;
+}
+
+/**
+ * Where a point on a sharp edge goes when each side moves by its own amount along its normal (`moves`, one per side of
+ * `normals`): where the moved sides meet (least squares, as creaseMoves for equal moves), at most MITER_LIMIT times the
+ * largest move away. null when the sides do not pin it down.
+ */
+export function creaseMeet(normals: Float64Array, moves: number[]) {
+  let a00 = 1e-9, a01 = 0, a02 = 0, a11 = 1e-9, a12 = 0, a22 = 1e-9, b0 = 0, b1 = 0, b2 = 0;
+  let most = 0;
+  for (let k = 0; k < moves.length; k += 1) {
+    const x = normals[k * 3], y = normals[k * 3 + 1], z = normals[k * 3 + 2], d = moves[k];
+    a00 += x * x;
+    a01 += x * y;
+    a02 += x * z;
+    a11 += y * y;
+    a12 += y * z;
+    a22 += z * z;
+    b0 += x * d;
+    b1 += y * d;
+    b2 += z * d;
+    most = Math.max(most, Math.abs(d));
+  }
+  const c00 = a11 * a22 - a12 * a12, c01 = a02 * a12 - a01 * a22, c02 = a01 * a12 - a02 * a11;
+  const det = a00 * c00 + a01 * c01 + a02 * c02;
+  if (!(Math.abs(det) > 1e-18)) return null;
+  const c11 = a00 * a22 - a02 * a02, c12 = a01 * a02 - a00 * a12, c22 = a00 * a11 - a01 * a01;
+  let mx = (c00 * b0 + c01 * b1 + c02 * b2) / det;
+  let my = (c01 * b0 + c11 * b1 + c12 * b2) / det;
+  let mz = (c02 * b0 + c12 * b1 + c22 * b2) / det;
+  const ml = Math.hypot(mx, my, mz);
+  if (ml > MITER_LIMIT * most) {
+    mx *= (MITER_LIMIT * most) / ml;
+    my *= (MITER_LIMIT * most) / ml;
+    mz *= (MITER_LIMIT * most) / ml;
+  }
+  return [mx, my, mz];
+}
+
+/**
  * How far and where each point moves for a depth of 1: its direction (see interpolatedNormals), but on a sharp edge or
  * corner of the input (faces bending by more than `creaseAngle` degrees) the point where the faces, each moved by 1
  * along its own normal, meet. Moved along the mean of both sides by only 1, a point on a box's edge inside a letter

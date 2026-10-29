@@ -11,8 +11,9 @@ import { placementWorkplaneCoordinates, type PlacementWorkplane } from "@/lib/pl
 import { silhouetteSketchProfile } from "@/lib/sketchCadProfile";
 import { sweepPlan } from "@/lib/cadSketchSweep";
 import { SKETCH_LOFT_FAILED, SKETCH_LOFT_HOLES, SKETCH_LOFT_OUTLINES, SKETCH_LOFT_STROKE_UNSUPPORTED, type SketchLoftSection } from "@/lib/cadSketchLoft";
-import { filledGrowPockets, strokeEdgeChamfer, strokedSketchProfile } from "@/lib/sketchStroke";
+import { filledGrowPockets, steppedEdgeWall, strokeEdgeChamfer, strokedSketchProfile } from "@/lib/sketchStroke";
 import { keyringSketchProfile } from "@/lib/sketchKeyring";
+import { bakedSketchPose } from "@/lib/sketchPlacement";
 import type { ManifoldToplevel } from "manifold-3d";
 import type { CadModifierDeflection } from "@/lib/cadModifierTypes";
 import { SKETCH_EDGE_FAILED, SKETCH_INSET_UNSUPPORTED, SKETCH_STROKE_UNSUPPORTED, type SketchCadBuildResponse } from "@/lib/sketchCadTypes";
@@ -138,7 +139,15 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
   } else {
     response = await buildOnWorker(buildProfile);
   }
-  if (response.type === "error") throw new Error(response.message === SKETCH_EDGE_FAILED ? t("sketch.edgeFailed") : response.message);
+  // Where the kernel cannot chamfer the cutting edge (a logo's sharp points), the wall is built with the edge in fine steps,
+  // from polygon offsets, as a mesh instead of an exact body (#982).
+  let stepped: ReturnType<typeof steppedEdgeWall> = null;
+  if (response.type === "error" && response.message === SKETCH_EDGE_FAILED) {
+    stepped = steppedEdgeWall(await getManifoldRuntime(), { ...buildProfile, stroke: profile.stroke }, safeHeight, topChamfer);
+    if (!stepped) throw new Error(t("sketch.edgeFailed"));
+  } else if (response.type === "error") {
+    throw new Error(response.message);
+  }
   const source = canonicalizeShape({
     ...(existing ?? {
       id: createLocalId("sketch-extrusion"),
@@ -160,9 +169,16 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
     cadDisplayEdges: undefined,
     cadDisplayEdgesVersion: undefined,
   });
+  if (stepped) {
+    const mesh = shapeFromCadMesh(source, stepped.positions, new Float32Array(0), stepped.indices, "");
+    if (!mesh) throw new Error(t("sketch.edgeFailed"));
+    return { ...mesh, cadBrep: undefined, cadBrepFrame: undefined, cadMeshDeflection: undefined, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined };
+  }
+  if (response.type === "error") throw new Error(response.message);
   const shape = shapeFromCadMesh(source, response.positions, response.normals, response.indices, response.brep, response.deflection ?? SKETCH_CAD_DEFLECTION);
   if (!shape) throw new Error("OpenCascade returned an empty sketch solid");
-  return { ...shape, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const };
+  // Built in the sketch's own coordinates, not baked where a body stands: no pose to keep.
+  return { ...shape, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined };
 }
 
 /**
@@ -462,6 +478,8 @@ export function shapeFromCadMesh(
       height,
     },
     cadPrimitiveFrame: undefined,
+    // The turn and place are baked in now: a sketch body keeps where its sketch lay, for Edit sketch (#1006).
+    sketchPose: bakedSketchPose(source),
   });
 }
 

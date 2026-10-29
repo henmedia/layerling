@@ -73,6 +73,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_intersect_objects` | beholder kun hvad objekterne har til fælles (Fælles) |
 | `layerling_hull_objects` | pakker objekterne ind i ét konvekst legeme, som var de krympefolieret (Hylster) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | adskiller en form i dens løse dele, et skitselegeme i ét legeme pr. omrids |
 | `layerling_split_objects` | skærer solider eller huller over med et plan |

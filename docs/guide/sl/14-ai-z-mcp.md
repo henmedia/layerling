@@ -69,6 +69,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_intersect_objects` | obdrži samo to, kar imajo objekti skupnega (presek) |
 | `layerling_hull_objects` | ovije objekte v eno izbočeno telo, kot bi jih skrčili v folijo (ovojnica) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | razstavi obliko z ločenimi deli, telo iz skice na eno telo za vsak obris |
 | `layerling_split_objects` | razdeli telesa ali luknje z ravnino na dva dela |

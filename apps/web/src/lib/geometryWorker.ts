@@ -1,6 +1,7 @@
 import { buildsDiffer, BUILD_ID, isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type GroupBuildResult, type SplitShapesOutcome } from "@/lib/editorBooleans";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
+import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
 import { resultMeshes, type GeometryTask, type GeometryWorkerRequest, type GeometryWorkerResponse } from "@/lib/geometryWorkerTypes";
 import { rememberPreparedDisplay } from "@/lib/importedMeshDisplay";
 import { getLanguage, t } from "@/lib/i18n";
@@ -257,6 +258,13 @@ function splitShapeOffThread(shape: WorkplaneShape, plane: SplitPlane, signal?: 
 /** splitShapesByPlane (lib/editorBooleans.ts) with each cut made off the page. */
 export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal): Promise<SplitShapesOutcome> {
   return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane) => splitShapeOffThread(shape, shapePlane, signal));
+}
+
+/** articulateShapes (lib/flexiJoints.ts) off the page: the links of a flexi body. */
+export function articulateShapesOffThread(targets: readonly WorkplaneShape[], options: FlexiOptions, signal?: AbortSignal): Promise<FlexiShapesResult> {
+  const onPage = () => articulateShapes([...targets], options);
+  if (containsText([...targets])) return onPage();
+  return runGeometryTask<FlexiShapesResult>("flexi", { targets: [...targets], options }, onPage, () => ({ links: null, error: t("status.computeTimedOut") }), signal);
 }
 
 /**

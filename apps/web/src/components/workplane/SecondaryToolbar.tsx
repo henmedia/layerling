@@ -2,7 +2,7 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
-import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Cookie, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Rotate3d, Route as RouteIcon, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Cookie, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Rotate3d, Route as RouteIcon, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, Worm, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { useWheelField } from "@/lib/useWheelField";
 import { wheelNextValue } from "@/lib/wheelValueStep";
@@ -155,6 +155,8 @@ export function SecondaryToolbar({
   canIntersect,
   canHull,
   canCookieCutter,
+  canFlexi,
+  flexiActive,
   canLoftSketches,
   canRedo,
   canUngroup,
@@ -224,6 +226,7 @@ export function SecondaryToolbar({
   onIntersect,
   onHull,
   onCookieCutter,
+  onFlexi,
   onLoftSketches,
   onIntersectPreview,
   intersectPreviewActive,
@@ -295,6 +298,8 @@ export function SecondaryToolbar({
   canIntersect: boolean;
   canHull: boolean;
   canCookieCutter: boolean;
+  canFlexi: boolean;
+  flexiActive: boolean;
   canLoftSketches: boolean;
   canRedo: boolean;
   canUngroup: boolean;
@@ -364,6 +369,7 @@ export function SecondaryToolbar({
   onIntersect: () => void;
   onHull: () => void;
   onCookieCutter: () => void;
+  onFlexi: () => void;
   onLoftSketches: () => void;
   onIntersectPreview: () => void;
   intersectPreviewActive: boolean;
@@ -672,7 +678,6 @@ export function SecondaryToolbar({
     { id: "intersect", label: t("editor.tool.intersect"), icon: ToolbarIntersectionIcon, action: onIntersect, enabled: canIntersect || intersectPreviewActive },
     { id: "cutOut", label: t("editor.tool.cutOut"), icon: ToolbarCutOutIcon, action: onCutOut, enabled: canCutOut || cutOutActive, active: cutOutActive },
     { id: "hull", label: t("editor.tool.hull"), icon: ToolbarHullIcon, action: onHull, enabled: canHull },
-    { id: "cookieCutter", label: t("editor.tool.cookieCutter"), icon: Cookie, action: onCookieCutter, enabled: canCookieCutter },
     { id: "loftSketches", label: t("editor.tool.loftSketches"), icon: ToolbarLoftSketchesIcon, action: onLoftSketches, enabled: canLoftSketches },
     { id: "intersect-preview", label: t("editor.tool.intersectPreview"), icon: ToolbarIntersectPreviewIcon, action: onIntersectPreview, enabled: canIntersect || intersectPreviewActive, active: intersectPreviewActive },
   ];
@@ -683,6 +688,8 @@ export function SecondaryToolbar({
     { id: "holePattern", label: t("holePattern.title"), icon: ToolbarHolePatternIcon, action: onHolePattern, enabled: canHolePattern, active: holePatternActive },
     { id: "faceTool", label: t("faceTool.title"), icon: ToolbarFaceToolIcon, action: onFaceTool, enabled: canFaceTool, active: faceToolActive },
     { id: "split", label: t("editor.tool.split"), icon: ToolbarSplitIcon, action: onSplit, enabled: splitMode || canSplit, active: splitMode },
+    { id: "flexi", label: t("editor.tool.flexi"), icon: Worm, action: onFlexi, enabled: canFlexi || flexiActive, active: flexiActive },
+    { id: "cookieCutter", label: t("editor.tool.cookieCutter"), icon: Cookie, action: onCookieCutter, enabled: canCookieCutter },
     { id: "chamfer", label: t("editor.tool.chamfer"), icon: ToolbarChamferIcon, action: onChamfer, enabled: canEdgeModify, active: edgeModifierKind === "chamfer" || edgeModifierKind === "chamfillet" },
     { id: "fillet", label: t("editor.tool.fillet"), icon: ToolbarFilletIcon, action: onFillet, enabled: canEdgeModify, active: edgeModifierKind === "fillet" },
     { id: "hollow", label: t("editor.tool.hollow"), icon: ToolbarHollowIcon, action: onHollow, enabled: canEdgeModify, active: hollowActive },
@@ -712,6 +719,9 @@ export function SecondaryToolbar({
     // kein Loeschen freischalten, waehrend die Flaeche etwas anderes zeigt.
     const enabled = tool.enabled && (!historyViewActive || id === "history");
     const active = "active" in tool && Boolean(tool.active);
+    // Switched off by aria-disabled, not by the disabled attribute: a disabled button gets no pointer events,
+    // so Chrome and Edge never showed its tooltip, and what a greyed-out icon was for could not be found out
+    // by hovering it (a donor's mail, 29.10.2026).
     return (
       <button
         className={`toolbar-icon ${enabled ? "" : "disabled"} ${active ? "active" : ""}`}
@@ -719,8 +729,8 @@ export function SecondaryToolbar({
         data-layerling-tool={id}
         aria-label={label}
         title={COMMAND_SHORTCUTS[id] ? `${label} (${COMMAND_SHORTCUTS[id]})` : label}
-        onClick={action}
-        disabled={!enabled}
+        onClick={enabled ? action : undefined}
+        aria-disabled={enabled ? undefined : true}
       >
         <Icon />
       </button>

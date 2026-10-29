@@ -28,6 +28,7 @@ import {
   shellNeedingRebuild,
   hollowStretchSincePicture,
   shellRebuildEntry,
+  shellRebuildReference,
   edgeTreatmentsAfterShell,
   patchTouchesBodyParameters,
   shapeTaperDimensions,
@@ -456,6 +457,37 @@ describe("workplane shape helpers", () => {
     expect(preservesEdgeTreatmentSize(unknownEdges)).toBe(true);
     const unrecorded = { ...filleted, edgeTreatmentHistory: [shellEntry] };
     expect(shellRebuildEntry(unrecorded)).toBeNull();
+  });
+
+  it("measures a filleted hollow body against the frame its last fillet left, not the hollowing's (forum, 621472)", () => {
+    // Hollowed at 158.5 x 180, then filleted, which left the box 158.127 x 179.681 and its middle 0.158 further along x.
+    const shellFrame = { x: 3.788, z: 0, elevation: 0, width: 158.5, depth: 180, height: 120, rotation: 0, rotationX: 0, rotationZ: 0, mirrorX: false, mirrorY: false, mirrorZ: false };
+    const filletFrame = { ...shellFrame, x: 3.946, width: 158.127, depth: 179.681 };
+    const shell = { kind: "shell" as const, amount: 3, edgeCount: 0, openings: "top-bottom" as const };
+    const fillet = { kind: "fillet" as const, amount: 1.35, edgeCount: 8, edgeIds: [0, 2, 4, 5, 6, 7, 9, 11] };
+    const body = (width: number, depth: number, x = 3.946) => shape({
+      kind: "mesh",
+      x,
+      width,
+      depth,
+      height: 120,
+      edgeResizeMode: "preserve",
+      edgeTreatments: [shell, fillet],
+      edgeTreatmentHistory: [
+        { id: "h", createdAt: 1, feature: shell, before: shape({ kind: "ellipse", x: 2.538, width: 148.27, depth: 149.67, height: 120 }), appliedFrame: shellFrame },
+        { id: "f", createdAt: 2, feature: fillet, before: shape({ kind: "mesh", x: 3.788, width: 158.5, depth: 180, height: 120 }), appliedFrame: filletFrame },
+      ],
+      importedMesh: { positions: [-79, 0, 0, 79, 120, 0], baseWidth: width, baseDepth: depth, baseHeight: 120, triangleCount: 1, sourceFormat: "json" },
+    });
+    // As the fillet left it: nothing to rebuild, so it is not hollowed again and again.
+    expect(shellNeedingRebuild(body(158.127, 179.681))).toBeNull();
+    // Resized since: rebuilt, stretched from the fillet's frame, and placed where the body now is.
+    const resized = body(79.0635, 179.681, 13.946);
+    const entry = shellNeedingRebuild(resized);
+    expect(entry?.id).toBe("h");
+    const reference = shellRebuildReference(resized, entry!);
+    expect(reference.appliedFrame).toEqual(filletFrame);
+    expect(hollowStretchSincePicture(resized, reference)).toEqual({ x: 0.5, z: 1, height: 1 });
   });
 
   it("reads the stretch of a hollow body in the axes of the shape it was hollowed from, a quarter turn apart (#729)", () => {

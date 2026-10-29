@@ -342,17 +342,21 @@ function buildGridfinityBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
   return buildPlacedBody(brep, part, (kernel) => gridfinityPartSolid(kernel, part!));
 }
 
-/** The hinge as the boxes, cylinders and tubes it is made of, fused: two bodies that turn against each other. */
+/** The hinge as the boxes, cylinders and tubes it is made of, fused, its screw holes cut out: two bodies that turn against each other. */
 function buildHingeBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
   const solids: BrepSolid[] = [];
+  const holes: BrepSolid[] = [];
   for (const part of hingeWorldParts(shape)) {
     const source = stepSourceForShape(part);
     const built = source === "primitive" ? buildExactSolid(brep, part) : source === "profile" ? buildProfileBody(brep, part) : { skip: `its ${part.kind} part has no exact body` };
     if ("skip" in built) return built;
-    solids.push(built.solid);
+    (part.hole ? holes : solids).push(built.solid);
   }
   const fused = brep.fuseAll(solids as Parameters<Brep["fuseAll"]>[0]);
-  return fused.ok ? { solid: fused.value as BrepSolid } : { skip: "the hinge's parts could not be joined" };
+  if (!fused.ok) return { skip: "the hinge's parts could not be joined" };
+  if (holes.length === 0) return { solid: fused.value as BrepSolid };
+  const cut = brep.cutAll(fused.value as BrepSolid, holes);
+  return cut.ok ? { solid: cut.value as BrepSolid } : { skip: "the hinge's screw holes could not be cut" };
 }
 
 export function skipCodeFor(shape: WorkplaneShape, reason: string): SkipCode {

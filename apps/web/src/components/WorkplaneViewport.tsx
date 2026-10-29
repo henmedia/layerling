@@ -4460,6 +4460,14 @@ export function WorkplaneViewport({
     return (axis === "width" ? modes.x : axis === "depth" ? modes.z : axis === "height" ? modes.elevation : "endpoint") === "midpoint";
   }, []);
 
+  // The calculation the lone selected body's height above the plate was set from (#180), if it still holds.
+  const elevationFormulaFor = useCallback((elevation: number): string | undefined => {
+    if (selectedIdsRef.current.length !== 1) return undefined;
+    const shape = shapesRef.current.find((entry) => entry.id === selectedIdsRef.current[0]);
+    const formula = shape?.formulas?.[DIMENSION_FORMULA_FIELDS.elevation];
+    return formulaMatchesMillimeters(formula, elevation, parseMeasureMm) ? formula : undefined;
+  }, []);
+
   const beginDimensionEdit = useCallback((mark: DimensionMark) => {
     const id = selectedIdsRef.current[0];
     const isCornerRulerMidpoint = rulerCountsToMiddle(mark.axis);
@@ -4469,16 +4477,10 @@ export function WorkplaneViewport({
       lastResizeAnchorRef.current = null;
     }
     setPinnedMeasureKey(mark.handleKey);
-    setEditingDimension({ key: mark.key, axis: mark.axis, x: mark.labelX, y: mark.labelY, value: formulaForDimensionMark(mark) ?? mark.label });
-  }, [formulaForDimensionMark, rememberResizeAnchor]);
-
-  // The calculation the lone selected body's height above the plate was set from (#180), if it still holds.
-  const elevationFormulaFor = useCallback((elevation: number): string | undefined => {
-    if (selectedIdsRef.current.length !== 1) return undefined;
-    const shape = shapesRef.current.find((entry) => entry.id === selectedIdsRef.current[0]);
-    const formula = shape?.formulas?.[DIMENSION_FORMULA_FIELDS.elevation];
-    return formulaMatchesMillimeters(formula, elevation, parseMeasureMm) ? formula : undefined;
-  }, []);
+    // The height above the plate, shown with the other sizes (#979), keeps its calculation as the arrow's box does.
+    const formula = mark.axis === "elevation" ? elevationFormulaFor(parseMeasureMm(mark.label)) : formulaForDimensionMark(mark);
+    setEditingDimension({ key: mark.key, axis: mark.axis, x: mark.labelX, y: mark.labelY, value: formula ?? mark.label });
+  }, [elevationFormulaFor, formulaForDimensionMark, rememberResizeAnchor]);
 
   const beginLiftEdit = useCallback((handleKey: string, x: number, y: number) => {
     if (suppressNextLiftEditRef.current) {

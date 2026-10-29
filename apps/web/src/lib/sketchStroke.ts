@@ -260,3 +260,63 @@ export function filledGrowPockets(runtime: ManifoldToplevel, profile: SketchProf
   const closedRings = (sketch: SketchProfile) => orderedCadSketchPaths(sketch).filter((path) => path.closed).length;
   return closedRings(filled) < closedRings(stroked) ? filled : null;
 }
+
+/** How high one step of a stepped cutting edge is, in mm: half a usual print layer, so the printer draws it as a slope. */
+const EDGE_STEP = 0.1;
+
+/**
+ * A wall with its cutting edge in fine steps, as a mesh (#982), where the kernel cannot chamfer the outline - a logo's sharp
+ * points and pieces a hundredth of a millimetre long. Below the edge the wall is the stroke of the closed outlines; above it,
+ * `chamfer` mm high, come steps of EDGE_STEP mm, each set in by one step on both sides, so the top is as narrow as the 45°
+ * chamfer would leave it. A 0.2 mm print layer cannot tell the steps from the slope. The polygon offsets (Manifold) do not
+ * fail where the kernel's chamfer does. Positions with y up, from 0 to `height`; null without a closed outline, for a stroke
+ * that is no wall, or when a step leaves nothing.
+ */
+export function steppedEdgeWall(runtime: ManifoldToplevel, profile: SketchProfile, height: number, chamfer: number): { positions: Float32Array; indices: Uint32Array } | null {
+  const stroke = normalizeSketchStroke(profile.stroke);
+  if (!stroke || !(stroke.align === "outside" || stroke.align === "inside" || stroke.align === "center")) return null;
+  if (!(chamfer > 0) || chamfer >= height) return null;
+  const paths = orderedCadSketchPaths(profile);
+  if (paths.some((path) => !path.closed)) return null;
+  const loops = paths.map(sampledPath).filter((loop) => loop.length >= 3);
+  if (!loops.length) return null;
+  const made: Array<{ delete(): void }> = [];
+  const keep = <T extends { delete(): void }>(item: T) => {
+    made.push(item);
+    return item;
+  };
+  try {
+    const region = keep(new runtime.CrossSection(loops.map(toPolygon), "EvenOdd"));
+    const joinType = stroke.join === "round" ? "Round" : stroke.join === "bevel" ? "Square" : "Miter";
+    const grow = (delta: number) => (Math.abs(delta) < 1e-9 ? region : keep(region.offset(delta, joinType, MITER_LIMIT, 48)));
+    const [outer, inner] = stroke.align === "inside" ? [0, -stroke.width] : stroke.align === "outside" ? [stroke.width, 0] : [stroke.width / 2, -stroke.width / 2];
+    const ring = (inset: number) => keep(grow(outer - inset).subtract(grow(inner + inset)));
+    const steps = Math.max(2, Math.min(12, Math.round(chamfer / EDGE_STEP)));
+    const rise = chamfer / steps;
+    const pieces = [keep(ring(0).extrude(height - chamfer))];
+    for (let step = 1; step <= steps; step += 1) {
+      const section = ring((chamfer * step) / steps);
+      if (section.area() <= 1e-9) return null;
+      pieces.push(keep(keep(section.extrude(rise)).translate([0, 0, height - chamfer + rise * (step - 1)])));
+    }
+    const mesh = keep(runtime.Manifold.union(pieces)).getMesh();
+    const count = mesh.vertProperties.length / mesh.numProp;
+    const positions = new Float32Array(count * 3);
+    // The section lies in x and the sketch's z, the extrusion runs along z: y up is (x, extrusion, sketch z).
+    for (let vertex = 0; vertex < count; vertex += 1) {
+      positions[vertex * 3] = mesh.vertProperties[vertex * mesh.numProp];
+      positions[vertex * 3 + 1] = mesh.vertProperties[vertex * mesh.numProp + 2];
+      positions[vertex * 3 + 2] = mesh.vertProperties[vertex * mesh.numProp + 1];
+    }
+    // Swapping two axes mirrors the mesh, so each triangle turns the other way round to keep facing out.
+    const indices = new Uint32Array(mesh.triVerts.length);
+    for (let index = 0; index < mesh.triVerts.length; index += 3) {
+      indices[index] = mesh.triVerts[index];
+      indices[index + 1] = mesh.triVerts[index + 2];
+      indices[index + 2] = mesh.triVerts[index + 1];
+    }
+    return indices.length ? { positions, indices } : null;
+  } finally {
+    new Set(made).forEach((item) => item.delete());
+  }
+}
