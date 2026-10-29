@@ -118,6 +118,22 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     }
   });
 
+  it("exports a lift-off hinge and nut pockets, turned, folded and mirrored, with the display mesh's volume", async () => {
+    const { hingeTriangles } = await import("@/lib/hingeGeometry");
+    const volume = (fields: Parameters<typeof hingeTriangles>[0]) => hingeTriangles(fields).reduce(
+      (sum, [a, b, c]) => sum + (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6,
+      0,
+    );
+    for (const [hingeStyle, hingeScrewHead, hingeAngle, mirrorY] of [["liftOff", "countersunk", 0, false], ["liftOff", "countersunkNut", 120, false], ["pin", "nut", 60, true], ["pinless", "nut", 0, false]] as const) {
+      const fields = { width: 50, depth: 44, height: 10, sides: 96, hingeStyle, hingeLeafThickness: 2.5, hingeScrewHoles: 2, hingeScrewHead, hingeCornerRadius: 4, hingeAngle };
+      const hinge = shape({ kind: "hinge", name: "Hinge", size: 50, rotation: 30, x: 12, z: -7, elevation: 3, mirrorY, ...fields });
+      const { blob, exportedCount, skipped } = await exportShapesToStep([hinge]);
+      expect(skipped).toEqual([]);
+      expect(exportedCount).toBe(1);
+      expect(near(await reimportVolume(blob), volume(fields), 0.01)).toBe(true);
+    }
+  });
+
   it("exports box + cylinder + sphere as exact B-Rep with conserved volume", async () => {
     const box = shape({ kind: "box", name: "Box", x: -30, width: 10, depth: 6, height: 4 });
     const cyl = shape({ kind: "cylinder", name: "Cyl", x: 0, width: 8, depth: 8, height: 12 });

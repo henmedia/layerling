@@ -184,7 +184,7 @@ export type ShapeCustomization = {
   /** Hinge, cone style: the diameter of the cones at their root in mm; left out, the largest that fits (#907). */
   hingeConeSize?: number;
   /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907). */
-  hingeStyle?: "pin" | "pinless" | "cone";
+  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff";
   /** Hinge: diameter of the pin in mm; the other part's bore is wider by the clearance. */
   hingePinDiameter?: number;
   /** Hinge: thickness of the two leaves in mm. */
@@ -205,6 +205,10 @@ export type ShapeCustomization = {
   hingeScrewAcross?: number;
   /** Hinge: false for straight screw holes; otherwise countersunk on the side that faces the other leaf when closed. */
   hingeScrewCountersink?: boolean;
+  /** Hinge: the screw holes' top - "countersunk", "straight", "nut" (a hexagonal pocket for a nut) or "countersunkNut" (countersunk on leaf A, a nut on B); left out, hingeScrewCountersink decides. */
+  hingeScrewHead?: "countersunk" | "straight" | "nut" | "countersunkNut";
+  /** Hinge: a nut's width across the flats in mm for the nut's pockets; left out, from the hole's diameter. */
+  hingeNutWidth?: number;
   /** Hinge: the leaves' outer corners rounded with this radius in mm. */
   hingeCornerRadius?: number;
   /** Hinge: "fingers" gives each knuckle its own finger instead of a leaf each side, the two sides' alternating like combs; left out, plates. */
@@ -886,7 +890,7 @@ export type WorkplaneShape = {
   /** Hinge, cone style: the diameter of the cones at their root in mm; left out, the largest that fits (#907). */
   hingeConeSize?: number;
   /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907). */
-  hingeStyle?: "pin" | "pinless" | "cone";
+  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff";
   /** Hinge: diameter of the pin in mm; the other part's bore is wider by the clearance. */
   hingePinDiameter?: number;
   /** Hinge: thickness of the two leaves in mm. */
@@ -907,6 +911,10 @@ export type WorkplaneShape = {
   hingeScrewAcross?: number;
   /** Hinge: false for straight screw holes; otherwise countersunk on the side that faces the other leaf when closed. */
   hingeScrewCountersink?: boolean;
+  /** Hinge: the screw holes' top - "countersunk", "straight", "nut" (a hexagonal pocket for a nut) or "countersunkNut" (countersunk on leaf A, a nut on B); left out, hingeScrewCountersink decides. */
+  hingeScrewHead?: "countersunk" | "straight" | "nut" | "countersunkNut";
+  /** Hinge: a nut's width across the flats in mm for the nut's pockets; left out, from the hole's diameter. */
+  hingeNutWidth?: number;
   /** Hinge: the leaves' outer corners rounded with this radius in mm. */
   hingeCornerRadius?: number;
   /** Hinge: "fingers" gives each knuckle its own finger instead of a leaf each side, the two sides' alternating like combs; left out, plates. */

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { hingeWorldParts } from "@/lib/hingeParts";
 import { automaticSideCount } from "@/lib/roundSideCount";
-import { hingeLeaves, hingeSections, hingeConeRadius, hingeKnucklesForWidth, hingeHasExactParts, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
+import { hingeLeaves, normalizeHingeNutWidth, normalizeHingeScrewHead, hingeSections, hingeConeRadius, hingeKnucklesForWidth, hingeHasExactParts, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
 
 type V = [number, number, number];
 
@@ -564,5 +564,125 @@ describe("fingers instead of leaves", () => {
     expect(fingerBoxes.filter((part) => part.rotationX === -90)).toHaveLength(2);
     // With rounded tips: two boxes and two corner cylinders a finger.
     expect(hingeLocalParts({ ...fields, hingeCornerRadius: 2 }).filter((part) => part.kind === "cylinder" && part.rotationZ === undefined)).toHaveLength(2 * plan.knuckles);
+  });
+});
+
+describe("the lift-off hinge", () => {
+  const liftOff = { ...shape, hingeStyle: "liftOff" };
+  const parts = (triangles: V[][]) => {
+    // Points by component, so A (with the pin) and B (the sleeve) can be told apart.
+    const faces = weld(triangles);
+    const parent = new Map<number, number>();
+    const find = (x: number): number => { const p = parent.get(x) ?? x; if (p === x) return x; const r = find(p); parent.set(x, r); return r; };
+    faces.forEach(([a, b, c]) => { parent.set(find(b), find(a)); parent.set(find(c), find(a)); });
+    const groups = new Map<number, V[]>();
+    triangles.forEach((t, i) => { const root = find(faces[i][0]); groups.set(root, [...(groups.get(root) ?? []), ...t]); });
+    return [...groups.values()];
+  };
+
+  it("has two knuckles whatever the count says, and is closed in two parts in every fold and with fingers or holes", () => {
+    expect(hingePlan({ ...liftOff, hingeKnuckles: 9 }).knuckles).toBe(2);
+    expect(hingePlan({ ...liftOff, hingeKnuckleWidth: 3 }).segments.map((segment) => segment.owner)).toEqual(["a", "b"]);
+    for (const fields of [
+      liftOff,
+      { ...liftOff, hingeAngle: 90 },
+      { ...liftOff, hingeAngle: 180, hingeScrewHoles: 2, hingeScrewHead: "nut" },
+      { ...liftOff, hingeLeafStyle: "fingers", hingeCornerRadius: 3 },
+      { width: 60, depth: 50, height: 10, hingeStyle: "liftOff", hingePinDiameter: 4, hingeLeafThickness: 2.5, hingeScrewHoles: 2, hingeScrewHead: "countersunkNut", hingeCornerRadius: 6 },
+    ]) {
+      const triangles = hingeTriangles(fields);
+      expect(edgeProblems(triangles), JSON.stringify(fields)).toBe(0);
+      expect(signedVolume(triangles)).toBeGreaterThan(0);
+      expect(components(triangles)).toBe(2);
+    }
+  });
+
+  it("lets the sleeve come off: the pin runs to the end inside B's bore, and nothing of B is in its way", () => {
+    const plan = hingePlan(liftOff);
+    const [a, b] = parts(hingeTriangles(liftOff)).sort((p, q) => Math.max(...q.map(([x]) => x)) - Math.max(...p.map(([x]) => x)) || 0);
+    const axis = ([, y, z]: V) => Math.hypot(y - plan.radius, z);
+    const pinSide = [a, b].find((points) => points.some(([x, y, z]) => Math.abs(x - plan.width / 2) < 1e-6 && Math.abs(axis([x, y, z]) - plan.pinRadius) < 1e-6))!;
+    const sleeve = pinSide === a ? b : a;
+    const [, sleeveSegment] = plan.segments;
+    // Past A's knuckle, round the axis A is nothing but the pin (its leaf goes on beside B's knuckle), and it reaches the end.
+    expect(Math.max(...pinSide.map(([x]) => x))).toBeCloseTo(plan.width / 2, 9);
+    const near = pinSide.filter(([x, , z]) => x > plan.segments[0].x1 + 1e-6 && Math.abs(z) < plan.leafStart - 1e-6);
+    expect(near.length).toBeGreaterThan(10);
+    near.forEach((p) => expect(axis(p)).toBeLessThanOrEqual(plan.pinRadius + 1e-6));
+    // B keeps the bore clear over its whole length, open at both ends.
+    sleeve.filter(([x]) => x >= sleeveSegment.x0 - 1e-9).forEach((p) => expect(axis(p)).toBeGreaterThanOrEqual(plan.boreRadius - 1e-6));
+    expect(Math.min(...sleeve.map(([x]) => x))).toBeCloseTo(-plan.width / 2, 9);
+  });
+
+  it("is built of the pin hinge's exact parts: the pin along the whole length, one knuckle each", () => {
+    expect(hingeHasExactParts({ hingeStyle: "liftOff" })).toBe(true);
+    const local = hingeLocalParts(liftOff);
+    const lying = local.filter((part) => part.rotationZ === 90);
+    expect(lying.filter((part) => part.kind === "cylinder" && Math.abs(part.height - shape.width) < 1e-9)).toHaveLength(1);
+    expect(lying.filter((part) => part.kind === "cylinder")).toHaveLength(2);
+    expect(lying.filter((part) => part.kind === "tube")).toHaveLength(1);
+  });
+});
+
+describe("nut pockets", () => {
+  const holes = { ...shape, hingeLeafThickness: 2, hingeScrewHoles: 2 };
+  const hexArea = (r: number) => ((3 * Math.sqrt(3)) / 2) * r * r;
+  const polygonArea = (r: number, sides: number) => (sides / 2) * r * r * Math.sin((2 * Math.PI * 2) / (2 * sides));
+
+  it("takes the nut's width from the hole, M2 to M8, with play, or as given", () => {
+    expect(normalizeHingeNutWidth(undefined, 3.5)).toBeCloseTo(5.8, 9);
+    expect(normalizeHingeNutWidth(0, 4.5)).toBeCloseTo(7.3, 9);
+    expect(normalizeHingeNutWidth(undefined, 6.6)).toBeCloseTo(10.3, 9);
+    expect(normalizeHingeNutWidth(6.2, 3.5)).toBeCloseTo(6.2, 9);
+    // Never narrower than the hole.
+    expect(normalizeHingeNutWidth(2, 3.5)).toBeCloseTo(4.1, 9);
+    expect(normalizeHingeScrewHead(undefined, false)).toBe("straight");
+    expect(normalizeHingeScrewHead("nut", false)).toBe("nut");
+    expect(normalizeHingeScrewHead(undefined)).toBe("countersunk");
+  });
+
+  it("cuts a six-sided pocket over the hole, as deep as the leaf allows, the leaf closed", () => {
+    const fields = { ...holes, hingeScrewHead: "nut" };
+    const plan = hingePlan(fields);
+    expect(plan.screwTops).toEqual({ a: "nut", b: "nut" });
+    expect(plan.nutDepth).toBeCloseTo(plan.leaf - 0.6, 9);
+    const triangles = hingeTriangles(fields);
+    expect(edgeProblems(triangles)).toBe(0);
+    const sides = automaticSideCount(2 * plan.screwHeadRadius, 2 * plan.screwHeadRadius);
+    const shaft = polygonArea(plan.screwRadius, sides);
+    const hole = shaft * plan.leaf + (hexArea(plan.nutRadius) - shaft) * plan.nutDepth;
+    expect(signedVolume(hingeTriangles(shape)) - signedVolume(triangles)).toBeCloseTo(2 * 2 * hole, 6);
+  });
+
+  it("puts a countersink on A and a nut on B when asked to, and leaves a pocket out where the leaf is too thin", () => {
+    expect(hingePlan({ ...holes, hingeScrewHead: "countersunkNut" }).screwTops).toEqual({ a: "countersunk", b: "nut" });
+    const thin = hingePlan({ ...holes, hingeScrewHead: "nut", hingeLeafThickness: 0.8 });
+    expect(thin.nutDepth).toBe(0);
+    expect(thin.screwTops).toEqual({ a: "straight", b: "straight" });
+    // The holes keep their walls by the nut's corners.
+    const plan = hingePlan({ ...holes, hingeScrewHead: "nut" });
+    expect(plan.screwZ - plan.nutRadius).toBeGreaterThanOrEqual(plan.leafStart + 0.5 - 1e-9);
+  });
+
+  it("cuts the pocket exactly as a six-sided prism with the hole, on B folding with its leaf", () => {
+    const fields = { ...holes, hingeScrewHead: "countersunkNut", hingeAngle: 90 };
+    const plan = hingePlan(fields);
+    const cutters = hingeLocalParts(fields).filter((part) => part.hole);
+    expect(cutters.filter((part) => part.kind === "countersink")).toHaveLength(2);
+    const pockets = cutters.filter((part) => part.kind === "polygon");
+    expect(pockets).toHaveLength(2);
+    pockets.forEach((part) => {
+      expect(part.sides).toBe(6);
+      expect(part.width).toBeCloseTo(plan.nutWidth, 9);
+      expect(part.rotationX).toBe(-90);
+    });
+    expect(cutters.filter((part) => part.kind === "cylinder" && part.rotationX === -90)).toHaveLength(2);
+  });
+
+  it("turns a pocket with the hinge in the world, flats across the axis", () => {
+    const base = { id: "h", name: "H", kind: "hinge", color: "#fff", x: 0, z: 0, elevation: 0, size: 40, ...holes, hingeScrewHead: "nut", hingeScrewHoles: 1 };
+    const pocket = (extra: object) => hingeWorldParts({ ...base, ...extra } as never).filter((part) => part.kind === "polygon");
+    expect(pocket({ rotation: 30 }).map((part) => Math.round(part.rotation))).toEqual([30, 30]);
+    expect(pocket({ rotation: 0 }).map((part) => Math.round(part.rotation))).toEqual([0, 0]);
   });
 });

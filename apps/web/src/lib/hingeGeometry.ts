@@ -25,6 +25,11 @@ import { automaticSideCount, roundSideCount } from "@/lib/roundSideCount";
  * (oben ist die Seite, die beim Zuklappen zum anderen Blatt zeigt), und ihre
  * aeusseren Ecken koennen gerundet sein.
  *
+ * Abnehmbar (Fahnenscharnier) hat es zwei Knoechel: Der untere traegt den
+ * Stift bis ans Ende, der obere ist eine Huelse, die man nach oben abzieht.
+ * Statt Senkungen koennen die Schraubenloecher Sechskant-Taschen fuer Muttern
+ * haben, auf beiden Blaettern oder auf B allein.
+ *
  * Statt zweier Blaetter gibt es auch Finger: Jeder Knoechel traegt seinen
  * eigenen, so breit wie er, und die Finger beider Seiten wechseln sich ab wie
  * zwei Kaemme. Keiner liegt unter einem Knoechel der anderen Seite, so klappt
@@ -63,16 +68,46 @@ const SCREW_WALL = 0.5;
 const MIN_SCREW_SHAFT = 0.2;
 /** The exact cutters reach this far past both faces of the leaf, so no face of the cut lies on one of the leaf's. */
 const SCREW_OVERCUT = 0.05;
+/** A nut's pocket is this much wider across the flats than the nut, so it goes in. */
+const NUT_PLAY = 0.3;
+/** Under a nut's pocket this much leaf stays; a pocket that would be shallower than MIN_NUT_DEPTH is left out. */
+const NUT_FLOOR = 0.6;
+const MIN_NUT_DEPTH = 0.4;
+export const MAX_HINGE_NUT_WIDTH = 40;
 
-export type HingeStyle = "pin" | "pinless" | "cone";
+export type HingeStyle = "pin" | "pinless" | "cone" | "liftOff";
 
 /**
  * The hinge's style (#907): a printed pin through the knuckles (default), a bore for a pin of one's own ("pinless", which
- * `hingePinless` used to switch on and still does for designs that have it), or cones on every other knuckle nesting into the others.
+ * `hingePinless` used to switch on and still does for designs that have it), cones on every other knuckle nesting into the
+ * others, or lift-off: two knuckles, the lower one carrying the pin to the end, the upper one a sleeve that lifts off it.
  */
 export function normalizeHingeStyle(value?: string, pinless?: boolean): HingeStyle {
-  if (value === "cone" || value === "pinless" || value === "pin") return value;
+  if (value === "cone" || value === "pinless" || value === "pin" || value === "liftOff") return value;
   return pinless === true ? "pinless" : "pin";
+}
+
+/**
+ * What the screw holes are on top: countersunk at 90 degrees, straight, a hexagonal pocket for a nut, or a countersink on
+ * leaf A and a nut's pocket on leaf B. Left out, `hingeScrewCountersink` decides, as it did before the nuts.
+ */
+export type HingeScrewHead = "countersunk" | "straight" | "nut" | "countersunkNut";
+
+export function normalizeHingeScrewHead(value?: string, countersink?: boolean): HingeScrewHead {
+  if (value === "countersunk" || value === "straight" || value === "nut" || value === "countersunkNut") return value;
+  return countersink === false ? "straight" : "countersunk";
+}
+
+/** Across the flats of the nut for a hole this wide, with play: M2 to M8 by the standard sizes, larger ones in proportion. */
+export function hingeNutWidthFor(holeDiameter: number) {
+  const sizes = [[2.6, 4], [3.2, 5], [3.9, 5.5], [4.9, 7], [5.9, 8], [7, 10], [9, 13]];
+  const size = sizes.find(([hole]) => holeDiameter < hole);
+  return (size ? size[1] : 1.6 * holeDiameter) + NUT_PLAY;
+}
+
+/** A nut's width across the flats in mm; 0 or left out takes it from the hole's diameter. Always wider than the hole. */
+export function normalizeHingeNutWidth(value: number | undefined, holeDiameter: number) {
+  return Number.isFinite(value) && (value as number) > 0 ? clamp(value as number, holeDiameter + 0.6, MAX_HINGE_NUT_WIDTH) : hingeNutWidthFor(holeDiameter);
 }
 
 /** Whether the hinge is made of parts the CAD kernel knows (boxes, cylinders, tubes): the pin hinge is, the cone hinge is a mesh. */
@@ -226,7 +261,7 @@ export type HingeShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   hingeClearance?: number;
   /** No printed pin: the bore runs through every knuckle, for a pin of one's own. */
   hingePinless?: boolean;
-  /** "pin" (default), "pinless" (a bore for a pin of one's own) or "cone": cones on every other knuckle nesting into the others. */
+  /** "pin" (default), "pinless" (a bore for a pin of one's own), "cone" (cones on every other knuckle nesting into the others) or "liftOff" (two knuckles, the upper one lifts off the pin). */
   hingeStyle?: string;
   /** The cone hinge: the diameter of a cone where it grows from its knuckle, in mm; left out, the largest that fits. */
   hingeConeSize?: number;
@@ -242,6 +277,10 @@ export type HingeShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   hingeScrewAcross?: number;
   /** false: straight holes; otherwise countersunk at 90 degrees on the top, the side that faces the other leaf when closed. */
   hingeScrewCountersink?: boolean;
+  /** What the holes are on top (see HingeScrewHead); left out, `hingeScrewCountersink` decides. */
+  hingeScrewHead?: string;
+  /** A nut's width across the flats in mm, for the nut's pockets; 0 or left out, from the hole's diameter. */
+  hingeNutWidth?: number;
   /** The leaves' four outer corners rounded with this radius in mm; with fingers, each finger's two. */
   hingeCornerRadius?: number;
   /** "plate" (default): a leaf each side; "fingers": each knuckle carries its own finger, the two sides' alternating. No screw holes on fingers. */
@@ -261,7 +300,8 @@ export function hingePlan(shape: HingeShapeFields) {
   const style = normalizeHingeStyle(shape.hingeStyle, shape.hingePinless);
   const leaf = normalizeHingeLeafThickness(shape.hingeLeafThickness, height, pinDiameter, clearance, style);
   const knuckleWidth = normalizeHingeKnuckleWidth(shape.hingeKnuckleWidth);
-  let knuckles = knuckleWidth ? hingeKnucklesForWidth(width, knuckleWidth, clearance) : normalizeHingeKnuckles(shape.hingeKnuckles, width, clearance);
+  // A lift-off hinge has two knuckles: the lower one with the pin, the upper one that comes off it.
+  let knuckles = style === "liftOff" ? 2 : knuckleWidth ? hingeKnucklesForWidth(width, knuckleWidth, clearance) : normalizeHingeKnuckles(shape.hingeKnuckles, width, clearance);
   const lengthFor = (count: number) => (width - (count - 1) * clearance) / count;
   // Knuckles too short to carry a cone are made fewer, the way ones shorter than 1 mm are.
   if (style === "cone") while (knuckles > MIN_HINGE_KNUCKLES && hingeConeRadius(lengthFor(knuckles), height, clearance) < MIN_CONE_RADIUS) knuckles -= 2;
@@ -293,13 +333,26 @@ export function hingePlan(shape: HingeShapeFields) {
   const cornerRadius = clamp(finite(shape.hingeCornerRadius, 0), 0, hingeLargestCornerRadius(fingers ? knuckleLength : width, depth, leafStart));
   // A countersink at 90 degrees is as deep as it widens; it leaves some straight hole, and one too shallow to hold a head is left out.
   const screwRadius = normalizeHingeScrewDiameter(shape.hingeScrewDiameter) / 2;
-  const sink = shape.hingeScrewCountersink === false ? 0 : Math.min(screwRadius, leaf - MIN_SCREW_SHAFT);
+  const screwHead = normalizeHingeScrewHead(shape.hingeScrewHead, shape.hingeScrewCountersink);
+  const sink = screwHead === "countersunk" || screwHead === "countersunkNut" ? Math.min(screwRadius, leaf - MIN_SCREW_SHAFT) : 0;
   const screwSink = sink >= Math.max(0.15, 0.08 * screwRadius) ? sink : 0;
   const screwHeadRadius = screwRadius + screwSink;
-  const screws = screwHolePlaces(fingers ? 0 : normalizeHingeScrewHoles(shape.hingeScrewHoles), width, depth / 2, leafStart, cornerRadius, screwHeadRadius, finite(shape.hingeScrewSpacing, 0), finite(shape.hingeScrewAcross, 0));
+  // A nut's pocket is as deep as a nut is high, about half its width, but leaves a floor under it; too shallow, it is left out.
+  const nutWidth = normalizeHingeNutWidth(shape.hingeNutWidth, 2 * screwRadius);
+  const pocket = Math.min(0.5 * nutWidth + 0.3, leaf - NUT_FLOOR);
+  const nutDepth = (screwHead === "nut" || screwHead === "countersunkNut") && pocket >= MIN_NUT_DEPTH ? pocket : 0;
+  const nutRadius = nutWidth / Math.sqrt(3);
+  const top = (wanted: "countersunk" | "straight" | "nut"): "countersunk" | "straight" | "nut" => wanted === "countersunk" && screwSink > 0 ? wanted : wanted === "nut" && nutDepth > 0 ? wanted : "straight";
+  const screwTops = {
+    a: top(screwHead === "nut" ? "nut" : screwHead === "straight" ? "straight" : "countersunk"),
+    b: top(screwHead === "countersunk" ? "countersunk" : screwHead === "straight" ? "straight" : "nut"),
+  };
+  // The holes lie alike on both leaves, so they keep their walls by the wider top of the two.
+  const footprint = Math.max(...[screwTops.a, screwTops.b].map((kind) => (kind === "countersunk" ? screwHeadRadius : kind === "nut" ? nutRadius : screwRadius)));
+  const screws = screwHolePlaces(fingers ? 0 : normalizeHingeScrewHoles(shape.hingeScrewHoles), width, depth / 2, leafStart, cornerRadius, footprint, finite(shape.hingeScrewSpacing, 0), finite(shape.hingeScrewAcross, 0));
   return {
     width, depth, height, radius, clearance, pinless, angle, style, coneRadius, recessRadius, recessDepth, pinRadius, boreRadius, leaf, knuckles, knuckleLength, chord, leafStart, segments, sides,
-    fingers, cornerRadius, screwRadius, screwSink, screwHeadRadius, screwZ: screws.z, screwXs: screws.xs,
+    fingers, cornerRadius, screwRadius, screwSink, screwHeadRadius, screwHead, screwTops, nutWidth, nutDepth, nutRadius, screwZ: screws.z, screwXs: screws.xs,
   };
 }
 
@@ -455,19 +508,22 @@ export function hingeTriangles(shape: HingeShapeFields) {
     const p3 = (q: Q, y: number): Vec3 => [q.x, y, side * q.w];
     const sides = automaticSideCount(2 * plan.screwHeadRadius, 2 * plan.screwHeadRadius);
     const ring = (x: number, r: number): Q[] => Array.from({ length: sides }, (_, k) => ({ x: x + r * Math.cos((2 * Math.PI * k) / sides), w: plan.screwZ + r * Math.sin((2 * Math.PI * k) / sides) }));
-    const face = (holeRadius: number, y: number, up: 1 | -1) => {
-      const holes = plan.screwXs.map((x) => ring(x, holeRadius));
-      const all = [...outline, ...holes.flat()];
+    // A nut's pocket: a hexagon with a corner towards the leaf's edge and the axis, as the polygon shape lies (its flats across the axis).
+    const hexagon = (x: number): Q[] => Array.from({ length: 6 }, (_, k) => ({ x: x + plan.nutRadius * Math.sin((Math.PI * k) / 3), w: plan.screwZ + plan.nutRadius * Math.cos((Math.PI * k) / 3) }));
+    const kind = side < 0 ? plan.screwTops.a : plan.screwTops.b;
+    const topHole = (x: number) => (kind === "nut" ? hexagon(x) : ring(x, kind === "countersunk" ? plan.screwHeadRadius : plan.screwRadius));
+    const face = (holes: Q[][], y: number, up: 1 | -1, outer: Q[] = outline) => {
+      const all = [...outer, ...holes.flat()];
       const want: Vec3 = [0, up, 0];
       const between = (a: Q, b: Q) => {
         const dx = b.x - a.x, dw = b.w - a.w, length2 = dx * dx + dw * dw;
-        return outline
+        return outer
           .map((p) => ({ p, t: ((p.x - a.x) * dx + (p.w - a.w) * dw) / length2 }))
           .filter(({ p, t }) => t > 1e-9 && t < 1 - 1e-9 && Math.abs((p.x - a.x) * dw - (p.w - a.w) * dx) / Math.sqrt(length2) < 1e-7)
           .sort((m, n) => m.t - n.t)
           .map(({ p }) => p);
       };
-      THREE.ShapeUtils.triangulateShape(outline.map((q) => new THREE.Vector2(q.x, q.w)), holes.map((hole) => hole.map((q) => new THREE.Vector2(q.x, q.w)))).forEach(([i, j, k]) => {
+      THREE.ShapeUtils.triangulateShape(outer.map((q) => new THREE.Vector2(q.x, q.w)), holes.map((points) => points.map((q) => new THREE.Vector2(q.x, q.w)))).forEach(([i, j, k]) => {
         const corners = [all[i], all[j], all[k]];
         const loop = corners.flatMap((q, n) => [q, ...between(q, corners[(n + 1) % 3])]);
         if (loop.length === 3) return push(p3(corners[0], y), p3(corners[1], y), p3(corners[2], y), want);
@@ -475,8 +531,10 @@ export function hingeTriangles(shape: HingeShapeFields) {
         loop.forEach((q, n) => push(p3(q, y), p3(loop[(n + 1) % loop.length], y), p3(middle, y), want));
       });
     };
-    face(plan.screwHeadRadius, plan.leaf, 1);
-    face(plan.screwRadius, 0, -1);
+    face(plan.screwXs.map(topHole), plan.leaf, 1);
+    face(plan.screwXs.map((x) => ring(x, plan.screwRadius)), 0, -1);
+    // A nut's pocket has a floor round the hole, facing up.
+    if (kind === "nut") plan.screwXs.forEach((x) => face([ring(x, plan.screwRadius)], plan.leaf - plan.nutDepth, 1, hexagon(x)));
     outline.forEach((p, n) => {
       const q = outline[(n + 1) % outline.length];
       // Along the axis under its own knuckle, the leaf goes on into the knuckle.
@@ -486,21 +544,23 @@ export function hingeTriangles(shape: HingeShapeFields) {
       push(p3(p, 0), p3(q, 0), p3(q, plan.leaf), want);
       push(p3(p, 0), p3(q, plan.leaf), p3(p, plan.leaf), want);
     });
-    // Each hole: straight up from the bottom, then, countersunk, widening to its head at the top.
-    const levels = plan.screwSink > 0
+    // Each hole: straight up from the bottom, then, countersunk, widening to its head at the top, or for a nut up to the
+    // pocket's floor, the pocket's six walls above it.
+    const levels = kind === "countersunk"
       ? [{ r: plan.screwRadius, y: 0 }, { r: plan.screwRadius, y: plan.leaf - plan.screwSink }, { r: plan.screwHeadRadius, y: plan.leaf }]
-      : [{ r: plan.screwRadius, y: 0 }, { r: plan.screwRadius, y: plan.leaf }];
+      : [{ r: plan.screwRadius, y: 0 }, { r: plan.screwRadius, y: kind === "nut" ? plan.leaf - plan.nutDepth : plan.leaf }];
+    const tube = (x: number, lower: Q[], y0: number, upper: Q[], y1: number) => {
+      lower.forEach((p, k) => {
+        const l = (k + 1) % lower.length;
+        // Into the hole, towards its axis.
+        const want: Vec3 = [x - p.x, 0, side * (plan.screwZ - p.w)];
+        push(p3(p, y0), p3(lower[l], y0), p3(upper[l], y1), want);
+        push(p3(p, y0), p3(upper[l], y1), p3(upper[k], y1), want);
+      });
+    };
     plan.screwXs.forEach((x) => {
-      for (let level = 0; level + 1 < levels.length; level += 1) {
-        const lower = ring(x, levels[level].r), upper = ring(x, levels[level + 1].r);
-        for (let k = 0; k < sides; k += 1) {
-          const l = (k + 1) % sides;
-          // Into the hole, towards its axis.
-          const want: Vec3 = [x - lower[k].x, 0, side * (plan.screwZ - lower[k].w)];
-          push(p3(lower[k], levels[level].y), p3(lower[l], levels[level].y), p3(upper[l], levels[level + 1].y), want);
-          push(p3(lower[k], levels[level].y), p3(upper[l], levels[level + 1].y), p3(upper[k], levels[level + 1].y), want);
-        }
-      }
+      for (let level = 0; level + 1 < levels.length; level += 1) tube(x, ring(x, levels[level].r), levels[level].y, ring(x, levels[level + 1].r), levels[level + 1].y);
+      if (kind === "nut") tube(x, hexagon(x), plan.leaf - plan.nutDepth, hexagon(x), plan.leaf);
     });
   };
 
@@ -519,7 +579,12 @@ export function hingeTriangles(shape: HingeShapeFields) {
       cap(s.aCap, [hole], segment.x0, -1);
       if (coned) cone(segment.x0, plan.coneRadius, segment.x0 - plan.coneRadius, true);
     }
-    if (index === a.length - 1) cap(s.aCap, endHoles, rightEnd, 1);
+    if (index === a.length - 1 && plan.style === "liftOff") {
+      // Lift-off: the pin goes on from A's only knuckle through B's sleeve to the end, where the sleeve comes off.
+      cap(s.aCap, [s.pin], segment.x1, 1);
+      walls(s.pin, segment.x1, rightEnd);
+      cap(s.pin, [], rightEnd, 1);
+    } else if (index === a.length - 1) cap(s.aCap, endHoles, rightEnd, 1);
     else {
       cap(s.aCap, [hole], segment.x1, 1);
       if (coned) cone(segment.x1, plan.coneRadius, segment.x1 + plan.coneRadius, true);
@@ -575,7 +640,7 @@ export function createHingeGeometry(shape: HingeShapeFields): THREE.BufferGeomet
   return geometry;
 }
 
-export type HingeLocalPart = Pick<WorkplaneShape, "kind" | "x" | "z" | "elevation" | "width" | "depth" | "height" | "rotationX" | "rotationZ" | "bevel" | "hole" | "screwHoleShaft" | "screwHoleAngle">;
+export type HingeLocalPart = Pick<WorkplaneShape, "kind" | "x" | "z" | "elevation" | "width" | "depth" | "height" | "rotationX" | "rotationZ" | "bevel" | "hole" | "screwHoleShaft" | "screwHoleAngle" | "sides">;
 
 /**
  * The exact body in parts the CAD kernel already knows - boxes, lying
@@ -603,9 +668,15 @@ export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
       ];
   };
   // The screw holes as cutters reaching a little past both faces: countersunk with the head on top, or straight.
-  const screwParts = (side: 1 | -1): HingeLocalPart[] => plan.screwXs.map((x) => plan.screwSink > 0
-    ? { kind: "countersink", x, z: side * plan.screwZ, elevation: -SCREW_OVERCUT, width: 2 * (plan.screwHeadRadius + SCREW_OVERCUT), depth: 2 * (plan.screwHeadRadius + SCREW_OVERCUT), height: leaf + 2 * SCREW_OVERCUT, screwHoleShaft: 2 * plan.screwRadius, screwHoleAngle: 90, hole: true }
-    : { kind: "cylinder", x, z: side * plan.screwZ, elevation: -SCREW_OVERCUT, width: 2 * plan.screwRadius, depth: 2 * plan.screwRadius, height: leaf + 2 * SCREW_OVERCUT, hole: true });
+  // A nut's pocket is a six-sided prism from its floor up past the top, its flats across the axis, the hole a cylinder.
+  const screwParts = (side: 1 | -1): HingeLocalPart[] => plan.screwXs.flatMap((x): HingeLocalPart[] => {
+    const kind = side < 0 ? plan.screwTops.a : plan.screwTops.b;
+    const z = side * plan.screwZ;
+    if (kind === "countersunk") return [{ kind: "countersink", x, z, elevation: -SCREW_OVERCUT, width: 2 * (plan.screwHeadRadius + SCREW_OVERCUT), depth: 2 * (plan.screwHeadRadius + SCREW_OVERCUT), height: leaf + 2 * SCREW_OVERCUT, screwHoleShaft: 2 * plan.screwRadius, screwHoleAngle: 90, hole: true }];
+    const hole: HingeLocalPart = { kind: "cylinder", x, z, elevation: -SCREW_OVERCUT, width: 2 * plan.screwRadius, depth: 2 * plan.screwRadius, height: leaf + 2 * SCREW_OVERCUT, hole: true };
+    if (kind !== "nut") return [hole];
+    return [hole, { kind: "polygon", sides: 6, x, z, elevation: leaf - plan.nutDepth, width: plan.nutWidth, depth: 2 * plan.nutRadius, height: plan.nutDepth + SCREW_OVERCUT, hole: true }];
+  });
   const leaves = hingeLeaves(plan);
   const aLeaf = leaves.filter((one) => one.side < 0).flatMap(leafParts);
   const bLeaf = leaves.filter((one) => one.side > 0).flatMap(leafParts);

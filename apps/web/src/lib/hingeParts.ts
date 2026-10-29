@@ -30,13 +30,15 @@ export function hingeWorldParts(hinge: WorkplaneShape): WorkplaneShape[] {
   return hingeLocalParts({ ...hinge, depth: hinge.depth ?? hinge.width }).map((part, index) => {
     const center = new THREE.Vector3(part.x, (part.elevation ?? 0) + part.height / 2, part.z).applyMatrix4(matrix);
     let rotation = { rotationX: hinge.rotationX ?? 0, rotation: hinge.rotation, rotationZ: hinge.rotationZ ?? 0 };
-    if (part.kind === "box" && part.rotationX) {
+    // A box, or a nut's six-sided pocket, turns with the hinge about its own axis too: it is not round.
+    const square = part.kind === "box" || part.kind === "polygon";
+    if (square && part.rotationX) {
       // A folded leaf: its own turn about the axis, seen through the hinge's mirror, then the hinge's turn.
       const fold = new THREE.Matrix4().makeRotationX(THREE.MathUtils.degToRad(part.rotationX));
       const own = new THREE.Quaternion().setFromRotationMatrix(mirror.clone().multiply(fold).multiply(mirrorInverse));
       const euler = new THREE.Euler().setFromQuaternion(quaternion.clone().multiply(own), "XYZ");
       rotation = { rotationX: THREE.MathUtils.radToDeg(euler.x), rotation: THREE.MathUtils.radToDeg(euler.y), rotationZ: THREE.MathUtils.radToDeg(euler.z) };
-    } else if (part.kind !== "box") {
+    } else if (!square) {
       // Where the axis points: along the hinge's own x when lying, else up, folded with B's leaf and seen through the
       // mirror (a countersink's head stays on the leaf's top).
       const axis = part.rotationZ === 90
@@ -63,6 +65,7 @@ export function hingeWorldParts(hinge: WorkplaneShape): WorkplaneShape[] {
       bevel: part.bevel,
       ...(part.hole ? { hole: true } : {}),
       ...(part.kind === "countersink" ? { screwHoleShaft: part.screwHoleShaft, screwHoleAngle: part.screwHoleAngle } : {}),
+      ...(part.kind === "polygon" ? { sides: part.sides } : {}),
     };
   });
 }
