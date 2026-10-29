@@ -72,6 +72,8 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_boolean_cut` | corta sólidos con orificios |
 | `layerling_intersect_objects` | conserva solo lo que los objetos tienen en común (Intersección) |
 | `layerling_hull_objects` | envuelve los objetos en un solo cuerpo convexo, como con film retráctil (Envolvente) |
+| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separa una forma en sus piezas sueltas, y un cuerpo de boceto en un cuerpo por contorno |
 | `layerling_split_objects` | corta sólidos u orificios en dos con un plano |
 | `layerling_list_edges` | lista las aristas CAD reales de un objeto |
@@ -103,7 +105,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_delete_custom_shape` | elimina una forma personalizada; los cuerpos ya insertados se quedan |
 | `layerling_show_workplane` | oculta y muestra la placa con su cuadrícula, por ejemplo para una captura de la parte de abajo (solo la vista) |
 | `layerling_set_section_view` | abre la vista en corte por un plano para mirar dentro (solo la vista: no se corta nada) |
-| `layerling_measurements` | muestra u oculta las mediciones de la cinta métrica y las lista con sus longitudes |
+| `layerling_measurements` | muestra u oculta las mediciones de la cinta métrica y las lista con sus longitudes, y oculta o muestra las medidas alrededor de la selección como [[Q]] |
 | `layerling_saved_view` | guarda la vista actual en la tecla 7, 8, 9 o 0 y vuelve a ella, como Mayús+tecla y la tecla (solo la vista); también fija la vista de arranque de los diseños nuevos |
 | `layerling_clear_history` | elimina para siempre todos los pasos de deshacer, como el botón «Eliminar historial» de la vista del historial; necesita `confirm: true` |
 | `layerling_set_history_view` | consulta un estado anterior del proyecto, como la vista del historial (el diseño real no se toca; las herramientas que cambian algo esperan a que se cierre) |

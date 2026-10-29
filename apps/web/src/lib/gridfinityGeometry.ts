@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 import type { ManifoldToplevel } from "manifold-3d";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityType, WorkplaneShape } from "@/types/layerling";

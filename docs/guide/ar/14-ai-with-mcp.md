@@ -72,6 +72,8 @@ summary: كيف ينشئ مساعد ذكاء اصطناعي مثل Gemini أو C
 | `layerling_boolean_cut` | تقطع الأجسام الصلبة بالثقوب |
 | `layerling_intersect_objects` | تحتفظ فقط بالجزء المشترك بين الأجسام (التقاطع) |
 | `layerling_hull_objects` | تلف الأجسام في جسم واحد محدب، كأنها مغلفة بغشاء (الغلاف) |
+| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | تفصل شكلًا إلى أجزائه المنفصلة، وجسم الرسم التخطيطي إلى جسم لكل حد خارجي |
 | `layerling_split_objects` | تقطع أجسامًا صلبة أو ثقوبًا إلى قسمين بمستوى |
 | `layerling_list_edges` | تسرد حواف CAD الحقيقية لجسم |
@@ -103,7 +105,7 @@ summary: كيف ينشئ مساعد ذكاء اصطناعي مثل Gemini أو C
 | `layerling_delete_custom_shape` | تزيل شكلًا مخصصًا؛ وتبقى الأجسام المُدرجة |
 | `layerling_show_workplane` | تخفي اللوحة بشبكتها وتظهرها، لالتقاط صورة للجانب السفلي مثلًا (العرض فقط) |
 | `layerling_set_section_view` | تفتح العرض بقطعه على طول مستوى للنظر إلى الداخل (العرض فقط، لا يُقطع شيء فعليًا) |
-| `layerling_measurements` | يُظهر قياسات شريط القياس أو يخفيها ويسردها مع أطوالها |
+| `layerling_measurements` | يُظهر قياسات شريط القياس أو يخفيها ويسردها مع أطوالها، ويخفي الأبعاد حول التحديد أو يظهرها مثل [[Q]] |
 | `layerling_saved_view` | يحفظ العرض الحالي تحت المفتاح 7 أو 8 أو 9 أو 0 ويعود إليه، مثل Shift+المفتاح والمفتاح وحده (العرض فقط)؛ ويضبط أيضًا عرض البداية للتصاميم الجديدة |
 | `layerling_clear_history` | تحذف كل خطوات التراجع نهائيًا، كما يفعل زر "حذف السجل" في عرض السجل؛ وتحتاج `confirm: true` |
 | `layerling_set_history_view` | تعرض حالة سابقة للمشروع، كعرض السجل (يبقى التصميم الحقيقي دون تغيير؛ وتنتظر الأدوات التي تغيّر التصميم حتى يُغلق) |

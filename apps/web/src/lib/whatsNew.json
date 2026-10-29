@@ -1,5 +1,250 @@
 [
   {
+    "version": "1.119.0",
+    "items": [
+      {
+        "title": {
+          "de": "Übergang aus Skizzen",
+          "en": "Loft sketches"
+        },
+        "body": {
+          "de": "Zwei Skizzen oder importierte SVGs werden ein Körper: unten der eine Umriss, oben der andere, dazwischen gerade Wände. Aus zwei Ringen wird ein hohler Rahmen, und „Gruppe bearbeiten“ öffnet die Skizzen wieder.",
+          "en": "Two sketches or imported SVGs become one body: one outline at the bottom, the other at the top, straight walls between them. Two rings give a hollow frame, and Edit group opens the sketches again."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.118.1",
+    "items": [
+      {
+        "title": {
+          "de": "Ausstechform: richtig herum und scharf",
+          "en": "Cookie cutter: the right way round and sharp"
+        },
+        "body": {
+          "de": "Die Ausstechform spiegelt den Umriss jetzt, weil man sie zum Ausstechen umdreht: Schrift und Logos kommen richtig herum aus dem Teig. Die Wand läuft oben auf eine schmale Schneidkante zu, deren Breite du unter Eigenschaften änderst.",
+          "en": "The cookie cutter now mirrors the outline, since you turn it over to cut: text and logos come out of the dough the right way round. The wall runs up to a thin cutting edge, and you change its width under Properties."
+        }
+      },
+      {
+        "title": {
+          "de": "Größe angleichen",
+          "en": "Match sizes"
+        },
+        "body": {
+          "de": "Halte beim Ausrichten Alt gedrückt: Die Punkte werden zu Quadraten und strecken die Teile bis an die Kante eines anderen oder auf seine Breite, Länge oder Höhe, statt sie zu verschieben.",
+          "en": "Hold Alt while aligning: the dots turn into squares and stretch the parts to the side of another or to its width, length or height instead of moving them."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.118.0",
+    "items": [
+      {
+        "title": {
+          "de": "Heben um einen genauen Weg",
+          "en": "Lift by an exact distance"
+        },
+        "body": {
+          "de": "Beim Ziehen am schwarzen Pfeil über einem Körper steht jetzt an seiner vorderen Ecke, wie weit er hoch- oder runterging. Nach dem Loslassen klickst du auf die Zahl und tippst den genauen Weg ein, so wie beim Verschieben in X und Y.",
+          "en": "Dragging the black arrow above a body now shows at its front corner how far it went up or down. Once you let go, click the number and type the exact distance, as you can when moving in X and Y."
+        }
+      },
+      {
+        "title": {
+          "de": "Maßband: auch nach innen",
+          "en": "Tape measure: inwards too"
+        },
+        "body": {
+          "de": "Eine negative Länge schiebt den Körper über den ersten Messpunkt hinaus, etwa ein Loch 5 mm hinter die Kante eines Quaders. Mit Shift bleibt die Messung gerade, und das Fadenkreuz lässt den Fangpunkt frei.",
+          "en": "A negative length moves the body past the first measuring point, a hole 5 mm inside the edge of a box for example. Shift keeps the measurement straight, and the crosshair leaves the snap point visible."
+        }
+      },
+      {
+        "title": {
+          "de": "Nur einige Entwürfe sichern",
+          "en": "Back up only some designs"
+        },
+        "body": {
+          "de": "Nach „Auswählen“ sichert „Sichern“ nur die gewählten Entwürfe, und „Sichern“ im Menü eines Ordners den ganzen Ordner. Sichern geht außerdem schneller, vor allem bei großen Entwürfen.",
+          "en": "After \"Select\", \"Back up\" saves just the chosen designs, and \"Back up\" in a folder's menu saves the whole folder. Backing up is also quicker, above all with large designs."
+        }
+      },
+      {
+        "title": {
+          "de": "Gruppen behalten den Drehpunkt",
+          "en": "Groups keep the pivot"
+        },
+        "body": {
+          "de": "Ein für mehrere Körper gesetzter Drehpunkt geht beim Gruppieren auf die Gruppe über. Mit „Drehpunkt markieren“ im Rechtsklick-Menü wird er zum Bezugspunkt, an dem andere Teile einrasten.",
+          "en": "A pivot set for several bodies passes to the group made of them. \"Mark the pivot\" in the right-click menu turns it into a reference point that other parts snap to."
+        }
+      },
+      {
+        "title": {
+          "de": "Maße bleiben bei kleinen Teilen nah",
+          "en": "Sizes stay close on tiny parts"
+        },
+        "body": {
+          "de": "Bei Teilen unter einem Millimeter standen die Maße beim Heranzoomen weit außerhalb des Bildes. Jetzt bleiben sie dicht neben dem Körper, so dass du zum Ablesen nicht mehr herauszoomen musst.",
+          "en": "On parts below a millimetre, the sizes ended up far outside the view when you zoomed in. They now stay right next to the body, so you no longer have to zoom out to read them."
+        }
+      },
+      {
+        "title": {
+          "de": "Abschrägen von Gruppen mit Löchern",
+          "en": "Chamfering groups with holes"
+        },
+        "body": {
+          "de": "Eine Gruppe aus mehreren Teilen, die jeweils eigene Löcher haben, etwa ein kopierter Halter, ließ sich kaum abschrägen oder abrunden: Das Werkzeug rechnete Minuten und brach ab. Jetzt baut es solche Gruppen exakt und ist in Sekunden bereit.",
+          "en": "A group of several parts that each have their own holes, a copied holder for example, could hardly be chamfered or rounded: the tool worked for minutes and then gave up. It now builds such groups exactly and is ready in seconds."
+        }
+      },
+      {
+        "title": {
+          "de": "Drehring in der Skizze",
+          "en": "Turning ring in the sketch"
+        },
+        "body": {
+          "de": "Beim Drehen in der Skizze erscheint ein Ring wie im 3D-Editor: Darin rastet die Drehung in 22,5°-Schritten ein, außerhalb geht sie in ganzen Grad. Das Raster stört dabei nicht mehr, 90° gelingen sofort.",
+          "en": "Turning in the sketch shows a ring as in the 3D editor: inside it the turn snaps to 22.5°, outside it goes in whole degrees. The grid no longer gets in the way, so 90° is easy."
+        }
+      },
+      {
+        "title": {
+          "de": "Skizze öffnet sich wie in 3D",
+          "en": "Sketch opens as in 3D"
+        },
+        "body": {
+          "de": "Einen Skizzenkörper, den du im 3D-Editor gedreht oder verschoben hast, zeigt die Skizze jetzt genau so, wie er auf der Platte steht, auf dem Raster der Platte.",
+          "en": "A sketch body you turned or moved in the 3D editor now shows in the sketch exactly as it stands on the plate, on the plate's grid."
+        }
+      },
+      {
+        "title": {
+          "de": "Saubere Kante bei Oberflächenstrukturen",
+          "en": "Clean rim on surface textures"
+        },
+        "body": {
+          "de": "Auch auf runden Körpern, etwa einem Sechskant, lässt die Oberflächenstruktur Noppen und Löcher am glatten Rand jetzt ganz weg, statt sie halb abzuschneiden.",
+          "en": "On round bodies too, a hexagonal prism for example, the surface texture now leaves bumps and holes at the smooth rim off whole instead of cutting them in half."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.117.2",
+    "items": [
+      {
+        "title": {
+          "de": "Senkrechter Text",
+          "en": "Vertical text"
+        },
+        "body": {
+          "de": "Mit „Buchstaben untereinander“ stehen die Buchstaben von oben nach unten, jeder mittig. Das geht bei Text, Namensschildern und Schrift auf Oberflächen; der Buchstabenabstand bestimmt die Lücke dazwischen.",
+          "en": "With \"Letters top to bottom\" the letters run downwards, each centred. It works for text, name tags and lettering on surfaces, and the letter spacing sets the gap between them."
+        }
+      },
+      {
+        "title": {
+          "de": "Q blendet die Maße aus",
+          "en": "Q hides the measurements"
+        },
+        "body": {
+          "de": "Beim Verschieben kleiner Teile verdecken Maße und Abstände leicht, was man bewegt. Die Taste Q blendet sie aus, ein zweites Q zeigt sie wieder.",
+          "en": "When moving small parts, sizes and distances can cover what you move. The Q key hides them, and Q again brings them back."
+        }
+      },
+      {
+        "title": {
+          "de": "Kleine Werkzeugleiste bleibt klein",
+          "en": "A small toolbar stays small"
+        },
+        "body": {
+          "de": "Veränderte eine Browser-Erweiterung oder die Übersetzung des Browsers die Seite beim Laden, kam die Leiste nach einem Neustart in mittlerer Größe zurück. Größe, einfacher Modus und Ecke des Ansichtswürfels bleiben jetzt erhalten.",
+          "en": "When a browser extension or the browser's translation changed the page while it loaded, the toolbar came back at medium size after a restart. Its size, the simple mode and the view cube's corner now stay as set."
+        }
+      },
+      {
+        "title": {
+          "de": "Gewickelte Körper zeigen das Zylindermaß",
+          "en": "Wrapped bodies show the cylinder's size"
+        },
+        "body": {
+          "de": "Ein um einen Zylinder gewickelter Körper zeigt an seinen Griffen jetzt dieselben Maße wie in den Eigenschaften, also die des Zylinders.",
+          "en": "A body wrapped round a cylinder now shows the same sizes at its handles as in its properties: those of the cylinder."
+        }
+      },
+      {
+        "title": {
+          "de": "Importierte STL nicht mehr schwarz",
+          "en": "Imported STL files no longer black"
+        },
+        "body": {
+          "de": "Manche Programme schreiben in eine STL-Datei keine Flächenrichtungen. Solche Modelle kamen schwarz herein; layerling berechnet die Richtungen jetzt wieder selbst aus den Dreiecken, auch für schon gespeicherte Entwürfe.",
+          "en": "Some programs write no face directions into an STL file. Such models came in black; layerling works the directions out from the triangles again, also in designs saved before."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.117.1",
+    "items": [
+      {
+        "title": {
+          "de": "Oberflächentextur nur auf gewählten Flächen",
+          "en": "Surface texture on the faces you pick"
+        },
+        "body": {
+          "de": "Mit „Flächen anklicken“ wählst du die Oberseite, die Unterseite oder eine Seite, und nur dort kommt das Muster hin, etwa eine Rändelung auf einer einzigen Seite. Auf runden Deckflächen laufen Rillen als Ringe, und um kantige Körper läuft das Muster ohne Naht um die Ecken.",
+          "en": "With \"Pick faces\" you click the top, the bottom or a side, and only there does the pattern go, knurling on a single side for example. On round tops grooves run in rings, and round angular bodies the pattern runs round the corners without a seam."
+        }
+      },
+      {
+        "title": {
+          "de": "Flacher Torus behält sein Loch",
+          "en": "A flat torus keeps its hole"
+        },
+        "body": {
+          "de": "Der Torus hat jetzt eine eigene „Wulstdicke“. Die Höhe staucht den Wulst nur noch, statt ihn dicker zu machen, und so bleibt ein flacher Ring offen. Ziehst du an den Griffen, wächst der Wulst mit.",
+          "en": "The torus now has its own \"Tube thickness\". The height only squashes the tube instead of making it thicker, so a flat ring stays open. Drag the handles and the tube grows along."
+        }
+      },
+      {
+        "title": {
+          "de": "Tasten für das Einrastraster",
+          "en": "Keys for the snap grid"
+        },
+        "body": {
+          "de": "Alt+1 bis Alt+0 wählen den Eintrag mit dieser Nummer im Rastermenü, Alt+1 schaltet das Einrasten aus. Komma und Punkt machen den Schritt eine Stufe feiner oder gröber, im 3D-Fenster wie in der Skizze.",
+          "en": "Alt+1 to Alt+0 pick that entry of the snap menu, and Alt+1 turns snapping off. Comma and period make the step one size finer or coarser, in the 3D view and in a sketch alike."
+        }
+      },
+      {
+        "title": {
+          "de": "Verrundetes Rohr bleibt beim Skalieren rund",
+          "en": "A filleted tube stays round when resized"
+        },
+        "body": {
+          "de": "Ein ausgehöhlter Körper, den du danach verrundet oder gefast hast, wird beim Skalieren neu ausgehöhlt, und die Verrundung kommt wieder an dieselbe Kante. Ein Rohr wird dabei nicht mehr eckig.",
+          "en": "A hollowed body you filleted or chamfered afterwards is hollowed again when you resize it, and the fillet goes back on the same edge. A tube no longer turns square."
+        }
+      },
+      {
+        "title": {
+          "de": "Punkt löschen ändert nur die Nachbarn",
+          "en": "Deleting a point changes only its neighbours"
+        },
+        "body": {
+          "de": "Löschst du in einer Skizze einen Punkt einer glatten Kontur, werden nur die zwei Punkte daneben neu geglättet. Griffe, die du anderswo von Hand gezogen hast, bleiben.",
+          "en": "Deleting a point of a smooth outline in a sketch smooths only the two points beside it again. Handles you set by hand elsewhere stay as they are."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.117.0",
     "items": [
       {

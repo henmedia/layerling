@@ -278,4 +278,78 @@ describe("texturing a body", () => {
     expect(deepest(first)).toBeCloseTo(10 - 0.3, 1);
     expect(deepest(second)).toBeCloseTo(10 - 0.9, 1);
   });
+
+  it("ends an image cut in round a cylinder in a short wall below the rim, not in notches running out at it", () => {
+    const result = applySurfaceTexture(tube(12, 0, 20, 96, 2), { pattern: "image", projection: "cylinder" });
+    const side = usedPoints(result).filter((p) => p.r > 6);
+    // Up to the wall's foot the side stays whole (fade 1 mm, wall 0.15 mm); below the wall the picture is cut in.
+    side.filter((p) => 20 - p.y < 0.84).forEach((p) => expect(p.r).toBeGreaterThan(12 - 1e-6));
+    expect(Math.min(...side.filter((p) => 20 - p.y > 1.05 && 20 - p.y < 2).map((p) => p.r))).toBeLessThan(12 - 0.1);
+  });
+
+  it("leaves bumps cut in right on a box's corner off whole, not folded round it into a heart", () => {
+    const result = applySurfaceTexture(box(40, 30, 30), { pattern: "bumps" });
+    expect(result.stats.projection).toBe("cylinder");
+    // No point of the four upright edges is cut in (a bump folded round the corner pulled them in), while the faces have
+    // their bumps elsewhere.
+    const v = result.vertices;
+    let byCorner = 0, cutIn = 0;
+    for (const i of new Set(result.indices)) {
+      const [x, y, z] = [v[i * 3], v[i * 3 + 1], v[i * 3 + 2]];
+      if (y < 3 || y > 27) continue;
+      const fromX = 20 - Math.abs(x), fromZ = 15 - Math.abs(z);
+      if (fromX < -1e-6 || fromZ < -1e-6) continue;
+      if (Math.max(fromX, fromZ) > 0.6) continue;
+      // A point of an upright edge itself, cut in (it moves in between both faces).
+      if (Math.abs(fromX - fromZ) < 0.02 && Math.min(fromX, fromZ) > 0.1) byCorner += 1;
+      if (Math.min(fromX, fromZ) < 1e-6 && Math.max(fromX, fromZ) > 0.3) cutIn += 1;
+    }
+    expect(byCorner).toBe(0);
+    expect(cutIn).toBeGreaterThan(20);
+  }, 30000);
+
+  it("cuts a weave along its stakes and rows on a box: their sides straight, not in a sawtooth", () => {
+    const result = applySurfaceTexture(box(40, 30, 30), { pattern: "weave" });
+    expect(surfaceMeshReport(result.indices, result.vertices.length / 3)).toEqual({ shells: 1, openEdges: 0, nonManifoldEdges: 0 });
+    // On the front face, away from its edges: a stake's side faces sideways, a row's joint up or down. A sawtooth along
+    // them turned its teeth both ways at once.
+    const v = result.vertices, I = result.indices;
+    let teeth = 0, sides = 0;
+    for (let t = 0; t < I.length / 3; t += 1) {
+      const [a, b, c] = [I[t * 3], I[t * 3 + 1], I[t * 3 + 2]];
+      const [x, y, z] = [0, 1, 2].map((k) => (v[a * 3 + k] + v[b * 3 + k] + v[c * 3 + k]) / 3);
+      if (z < 14 || Math.abs(x) > 17 || y < 3 || y > 27) continue;
+      const u = [v[b * 3] - v[a * 3], v[b * 3 + 1] - v[a * 3 + 1], v[b * 3 + 2] - v[a * 3 + 2]];
+      const w = [v[c * 3] - v[a * 3], v[c * 3 + 1] - v[a * 3 + 1], v[c * 3 + 2] - v[a * 3 + 2]];
+      const n = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
+      const l = Math.hypot(n[0], n[1], n[2]) || 1;
+      if (Math.abs(n[0] / l) > 0.4) sides += 1;
+      if (Math.abs(n[0] / l) > 0.4 && Math.abs(n[1] / l) > 0.4) teeth += 1;
+    }
+    expect(sides).toBeGreaterThan(100);
+    // (About one in seven before, one in thirty now.)
+    expect(teeth).toBeLessThan(0.1 * sides);
+    // Round the upright edges it bends in an arc, cut upright: no column of teeth tilted up and down along them.
+    let byEdges = 0, tilted = 0;
+    for (let t = 0; t < I.length / 3; t += 1) {
+      const [a, b, c] = [I[t * 3], I[t * 3 + 1], I[t * 3 + 2]];
+      const [x, y, z] = [0, 1, 2].map((k) => (v[a * 3 + k] + v[b * 3 + k] + v[c * 3 + k]) / 3);
+      if (Math.abs(x) < 19 || Math.abs(z) < 14 || y < 3 || y > 27) continue;
+      const u = [v[b * 3] - v[a * 3], v[b * 3 + 1] - v[a * 3 + 1], v[b * 3 + 2] - v[a * 3 + 2]];
+      const w = [v[c * 3] - v[a * 3], v[c * 3 + 1] - v[a * 3 + 1], v[c * 3 + 2] - v[a * 3 + 2]];
+      const n = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
+      byEdges += 1;
+      if (Math.abs(n[1]) > 0.5 * (Math.hypot(n[0], n[1], n[2]) || 1)) tilted += 1;
+    }
+    expect(byEdges).toBeGreaterThan(500);
+    expect(tilted).toBeLessThan(0.015 * byEdges);
+  }, 30000);
+
+  it("runs rope out at a cylinder's rim on rows cut at its steps, not over halved triangles", () => {
+    const result = applySurfaceTexture(tube(12, 0, 20, 96, 2), { pattern: "rope", projection: "cylinder" });
+    expect(surfaceMeshReport(result.indices, result.vertices.length / 3)).toEqual({ shells: 1, openEdges: 0, nonManifoldEdges: 0 });
+    // Fade 1 mm in four steps: rows of points all round, a quarter mm apart below the rim.
+    const side = usedPoints(result).filter((p) => Math.abs(p.r) > 6);
+    for (const step of [0.25, 0.5, 0.75]) expect(side.filter((p) => Math.abs(20 - p.y - step) < 1e-6).length).toBeGreaterThan(90);
+  }, 30000);
 });

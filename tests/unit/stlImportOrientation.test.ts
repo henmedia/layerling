@@ -39,6 +39,23 @@ describe("STL import orientation", () => {
     expect(shape.importedMesh?.baseDepth).toBeCloseTo(58);
   });
 
+  it("works out the normals from the triangles when the file's are 0 0 0 (#988)", () => {
+    const mesh = importedShapeFromStl("zero-normals.stl", boxStl(80, 60, 20)).importedMesh!;
+    const positions = mesh.positions;
+    const normals = mesh.normals!;
+    expect(normals).toHaveLength(positions.length);
+    const centre = [0, 0, 0];
+    for (let i = 0; i < positions.length; i += 3) for (let axis = 0; axis < 3; axis += 1) centre[axis] += positions[i + axis] / (positions.length / 3);
+    for (let corner = 0; corner < positions.length; corner += 9) {
+      const middle = [0, 1, 2].map((axis) => (positions[corner + axis] + positions[corner + 3 + axis] + positions[corner + 6 + axis]) / 3 - centre[axis]);
+      for (let i = corner; i < corner + 9; i += 3) {
+        expect(Math.hypot(normals[i], normals[i + 1], normals[i + 2])).toBeCloseTo(1);
+        // Every face of the box looks away from its middle.
+        expect(normals[i] * middle[0] + normals[i + 1] * middle[1] + normals[i + 2] * middle[2]).toBeGreaterThan(0);
+      }
+    }
+  });
+
   it("preserves our own STL exports regardless of proportions", () => {
     const shape = importedShapeFromStl("layerling.stl", boxStl(20, 80, 10, "layerling_design"));
 

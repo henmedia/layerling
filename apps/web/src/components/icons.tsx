@@ -103,6 +103,18 @@ export function ToolbarHullIcon(props: IconProps) {
   );
 }
 
+// Loft between two sketches: a small outline above a large one, joined by the walls between them.
+export function ToolbarLoftSketchesIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true" className="toolbar-vector-art-icon" {...props}>
+      <path d="M17 11H31L42 37H6Z" fill="currentColor" opacity="0.22" />
+      <path d="M17 11L6 37M31 11L42 37" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+      <rect x="15" y="7" width="18" height="8" rx="3" fill="none" stroke="currentColor" strokeWidth="2.4" />
+      <rect x="4" y="32" width="40" height="10" rx="4" fill="none" stroke="currentColor" strokeWidth="2.4" />
+    </svg>
+  );
+}
+
 // The class gives it the same disabled dimming as the rest of the ribbon; the
 // bare theme colour alone left it looking live on the dark grounds.
 export function ToolbarIntersectPreviewIcon({ className, ...props }: IconProps) {

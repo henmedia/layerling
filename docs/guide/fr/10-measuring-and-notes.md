@@ -17,7 +17,7 @@ Le ruban à mesurer se trouve à l'extrémité inférieure de la barre de la cam
 4. **{{ui:camera.tapeWholeEdges}} :** Un clic sur une arête mesure la totalité de celle-ci, la longueur d'un cercle par exemple. Lorsque cette option est désactivée, un clic place un point sur le bord, et le deuxième point va n'importe où, vous pouvez donc mesurer le diamètre ou toute autre distance. [[Alt]] fait tourner l'interrupteur en un seul clic. Sur un cercle, le point en face du premier s'enclenche lorsque le pointeur s'approche, et les points se trouvent sur le vrai cercle, de sorte que le diamètre ressort exactement.
 5. **{{ui:camera.deleteAllMeasurements}} :** Supprime toutes les mesures en même temps. Comme cela ne peut pas être annulé, layerling vous demande d'abord confirmation ; sans mesures, il n'y a rien à faire.
 6. **{{ui:camera.tapeMarkMiddle}} :** Au milieu de chaque mesure se trouve une petite marque ronde, à moitié remplie par le bas. Il place un [point de référence](#points-de-reference) au milieu de la mesure : après un clic sur un bord rond, tel que le rebord d'un trou, au centre de ce cercle — également sur un maillage importé, où rien d'autre ne marque le milieu d'un trou — et pour un diamètre ou toute mesure droite, à mi-chemin. Une forme que vous faites glisser s'enclenche ensuite avec son centre sur le point. Un point déjà existant n'est pas créé en double.
-7. **{{ui:camera.tapeTypeLength}} :** Quand au moins une extrémité d'une mesure droite se trouve sur un corps, son nombre peut être cliqué. Saisis une nouvelle longueur et appuie sur [[Enter]] : le corps au second point se déplace le long de la ligne mesurée jusqu'à ce que la distance soit exactement celle-là, comme avec la règle de Tinkercad. Si seul le corps au premier point est sélectionné, c'est lui qui se déplace. Les points de mesure restent sur le corps, la mesure suit donc. Mesure depuis un coin, une arête ou un [point de référence](#points-de-reference), comme le centre d'un cercle, pour placer des pièces à une distance exacte.
+7. **{{ui:camera.tapeTypeLength}} :** Quand au moins une extrémité d'une mesure droite se trouve sur un corps, son nombre peut être cliqué. Saisis une nouvelle longueur et appuie sur [[Enter]] : le corps au second point se déplace le long de la ligne mesurée jusqu'à ce que la distance soit exactement celle-là, comme avec la règle de Tinkercad. Si seul le corps au premier point est sélectionné, c'est lui qui se déplace. Les points de mesure restent sur le corps, la mesure suit donc. Mesure depuis un coin, une arête ou un [point de référence](#points-de-reference), comme le centre d'un cercle, pour placer des pièces à une distance exacte. Une longueur négative le fait passer d'autant au-delà du premier point, par exemple 5 mm à l'intérieur du bord d'une boîte.
 
 [[Esc]] quitte le mode mesure.
 
@@ -48,10 +48,12 @@ Le ruban à mesurer et l'équerre de cadrage restent là où ils se trouvent pen
 
 Dans les paramètres sous {{ui:workspace.appearance}}, il y a deux commutateurs pour les cotes dynamiques :
 
-- {{ui:workspace.showMoveDimensions}} indique de combien vous vous déplacez en faisant glisser.
+- {{ui:workspace.showMoveDimensions}} indique de combien vous vous déplacez en faisant glisser. Cela vaut aussi pour le levage avec la flèche noire au-dessus d'un corps ; le déplacement s'affiche à son coin avant. Une fois relâché, cliquez sur ce nombre et saisissez la distance exacte ; une valeur négative descend.
 - {{ui:workspace.showOriginDimensions}} montre les distances de la sélection à l'origine de la plaque, également avec plusieurs corps sélectionnés.
 
 Avec {{ui:workspace.dimensionsAlwaysVisible}} les cotes restent visibles en permanence.
+
+Pour vous en passer un instant, appuyez sur [[Q]] : les cotes et distances autour de la sélection disparaissent, et la pièce que vous déplacez se voit bien. Un nouvel appui sur [[Q]] les ramène. Une poignée que vous survolez affiche quand même sa cote.
 
 ## Remarques
 
@@ -70,7 +72,7 @@ Les notes sont enregistrées dans la conception, n'apparaissent dans aucune expo
 
 ## Points de référence
 
-Un point de référence est une marque nue dans l'espace, comme une marque de crayon ou un point de tracé dans un atelier : il n'appartient à personne, n'est jamais imprimé et d'autres choses s'y accrochent. Faites un clic droit sur un corps et choisissez {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} ou {{ui:contextMenu.markMidpoints}} : les points apparaissent sur la face supérieure du corps (de toute la sélection, si vous en avez sélectionné plusieurs). {{ui:contextMenu.markFaceCenter}} place à la place un point au milieu de la face plane sur laquelle vous avez fait un clic droit, sur un côté ou une extrémité par exemple.
+Un point de référence est une marque nue dans l'espace, comme une marque de crayon ou un point de tracé dans un atelier : il n'appartient à personne, n'est jamais imprimé et d'autres choses s'y accrochent. Faites un clic droit sur un corps et choisissez {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} ou {{ui:contextMenu.markMidpoints}} : les points apparaissent sur la face supérieure du corps (de toute la sélection, si vous en avez sélectionné plusieurs). {{ui:contextMenu.markFaceCenter}} place à la place un point au milieu de la face plane sur laquelle vous avez fait un clic droit, sur un côté ou une extrémité par exemple. Avec un pivot défini, {{ui:contextMenu.markPivot}} en place un exactement dessus, pour que le centre d'une autre pièce s'accroche au point autour duquel tourne la sélection.
 
 - Le ruban à mesurer peut également marquer un point : {{ui:camera.tapeMarkMiddle}}, la marque à moitié remplie au milieu d'une mesure, en place un en son milieu, par exemple au centre d'un trou rond.
 - Faites glisser un point pour le déplacer, ou cliquez dessus pour voir ses coordonnées et en saisir de nouvelles ; ils utilisent l'unité que vous avez définie. Chaque carte peut être déplacée par son titre si elle recouvre quelque chose, individuellement : les autres restent là où elles sont, et un double-clic sur le titre la remet en place. La carte que vous avez touchée en dernier se trouve devant les autres. **Tout supprimer** dans une carte, ou dans le menu contextuel du clic droit, supprime tous les points en une seule fois. {{ui:common.delete}} le supprime.

@@ -2358,24 +2358,45 @@ export function restoreGroupedChildren(group: WorkplaneShape): WorkplaneShape[] 
 }
 
 /**
- * The bodies of a group for the edge tool, with the groups inside it opened where that changes nothing:
+ * The bodies of a group for the edge tool, with the groups inside it opened into their parts where that changes nothing:
  * a group of nothing but holes (the usual way to cut a pattern) or of nothing but solids. Left closed it
  * reaches the kernel as one mesh of several loose pieces, and its curves are facets there; opened, every
- * hole is the exact shape it was. A group that mixes solids and holes cuts only its own solids, so it stays closed (#394).
+ * hole is the exact shape it was.
+ *
+ * A group that mixes solids and holes cuts only its own solids (#394), so its parts come with a scope of their own:
+ * the kernel cuts its holes into its solids before the rest is added. Left closed it went as its mesh, and four
+ * such groups patterned and grouped were thousands of triangles the edge tool could not finish (#996).
  */
-export function restoreGroupedChildrenForEdges(group: WorkplaneShape): WorkplaneShape[] {
+export type EdgeToolPart = { shape: WorkplaneShape; scope: number[] };
+
+export function restoreGroupedChildrenForEdges(group: WorkplaneShape, scope: number[] = [], nestedScopes = { count: 0 }): EdgeToolPart[] {
   // A hull or an intersection is its own body, not the sum of its parts: opened, Hollow hollowed the two rounds of a
   // hull one by one and the hull was gone, and an intersection could not be hollowed at all (#908). Its mesh goes.
-  if (group.groupOperation === "hull" || group.groupOperation === "intersection") return [group];
+  // A loft between two sketches is the same: its parts are only its two outlines.
+  if (group.groupOperation === "hull" || group.groupOperation === "intersection" || group.groupOperation === "loft") return [{ shape: group, scope }];
   return restoreGroupedChildren(group).flatMap((child) => {
     const grandChildren = child.groupedShapes ?? [];
-    const opensCleanly = grandChildren.length > 0
-      && !child.importedMesh
+    // Only while its mesh is still nothing but its parts. Every computed group carries its mesh, so that alone says
+    // nothing; baking an edge treatment, a deform or a simplification drops the parts, and texture, wrap or vase stay out.
+    const plainGroup = grandChildren.length > 0
       && !shapeHasShapeDeform(child)
       && (child.groupOperation === undefined || child.groupOperation === "group")
+      && !child.edgeTreatments?.length
+      && !child.cadBrep
+      && !child.surfaceTexture
+      && !child.cylinderWrap
+      && !child.vase;
+    const opensCleanly = plainGroup
       && (grandChildren.every((part) => part.hole) || grandChildren.every((part) => !part.hole))
       && (child.hole || grandChildren.every((part) => !part.hole));
-    return opensCleanly ? restoreGroupedChildrenForEdges(child) : [child];
+    // Opened into the same level, so it numbers the scopes inside it on with that level's count.
+    if (opensCleanly) return restoreGroupedChildrenForEdges(child, scope, nestedScopes);
+    const opensInOwnScope = plainGroup
+      && !child.hole
+      && grandChildren.some((part) => part.hole)
+      && grandChildren.some((part) => !part.hole);
+    if (opensInOwnScope) return restoreGroupedChildrenForEdges(child, [...scope, nestedScopes.count++], { count: 0 });
+    return [{ shape: child, scope }];
   });
 }
 
@@ -2437,7 +2458,7 @@ function expandGroupsForBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
 
 function expandGroupsForBoxBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
   // An intersection or a hull is not the sum of its parts: opened, a hull of four boxes would be cut as the four boxes (#863).
-  return selection.flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube);
+  return selection.flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube);
 }
 
 function canUseBoxBoolean(selection: WorkplaneShape[]) {

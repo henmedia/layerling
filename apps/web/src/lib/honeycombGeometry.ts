@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 
 export const DEFAULT_HONEYCOMB_WIDTH = 60;
 export const DEFAULT_HONEYCOMB_DEPTH = 60;

@@ -17,7 +17,7 @@ A mérőszalag a bal szélen lévő kamerasáv alsó végén van ({{ui:camera.ta
 4. **{{ui:camera.tapeWholeEdges}}:** Egy élre kattintva az egészet méri, például egy kör kerületét. Ha ez ki van kapcsolva, a kattintás ehelyett egy pontot tesz az élre, a második pont pedig bárhová kerülhet, így az átmérőt vagy bármilyen más távolságot mérheted. Az [[Alt]] egy kattintás erejéig megfordítja a kapcsolót. Körön az elsővel szemközti pont beugrik, amikor a mutató a közelébe ér, és a pontok a valódi körön ülnek, így az átmérő pontosan jön ki.
 5. **{{ui:camera.deleteAllMeasurements}}:** Egyszerre eltávolít minden mérést. Mivel ez nem vonható vissza, a layerling előbb rákérdez; ha nincs mérés, nincs mit tenni.
 6. **{{ui:camera.tapeMarkMiddle}}:** Minden mérés közepén egy kis kerek jel ül, az alsó fele kitöltve. [Referenciapontot](#referenciapontok) tesz a mérés közepére: egy kerek élre, például egy lyuk peremére kattintva annak a körnek a középpontjába – importált hálón is, ahol semmi más nem jelöli egy lyuk közepét –, átmérőnél vagy bármilyen egyenes mérésnél pedig a felénél. Az az alakzat, amelyet ezután húzol, a középpontjával a ponthoz illeszkedik. Egy már meglévő pontot nem készít el kétszer. A mérőszalag úgy illeszkedik egy referenciaponthoz, mint egy sarokhoz, így egy kör középpontjától vagy egy vonal közepétől is mérhetsz: jelöld meg, majd kattints a pontra.
-7. **{{ui:camera.tapeTypeLength}}:** Ha egy egyenes mérés legalább egyik vége egy testen van, a száma rákattintható. Írj be új hosszt, és nyomd meg az [[Enter]] billentyűt: a második pontnál lévő test a mért vonal mentén addig mozdul, amíg a távolság pontosan ennyi nem lesz, mint a Tinkercad vonalzójánál. Ha csak az első pontnál lévő test van kijelölve, az mozdul. A mérési pontok a testen maradnak, így a mérés követi. Mérj sarokból, élről vagy [referenciapontból](#referenciapontok), például egy kör közepéből, hogy az alkatrészeket pontos távolságra tedd.
+7. **{{ui:camera.tapeTypeLength}}:** Ha egy egyenes mérés legalább egyik vége egy testen van, a száma rákattintható. Írj be új hosszt, és nyomd meg az [[Enter]] billentyűt: a második pontnál lévő test a mért vonal mentén addig mozdul, amíg a távolság pontosan ennyi nem lesz, mint a Tinkercad vonalzójánál. Ha csak az első pontnál lévő test van kijelölve, az mozdul. A mérési pontok a testen maradnak, így a mérés követi. Mérj sarokból, élről vagy [referenciapontból](#referenciapontok), például egy kör közepéből, hogy az alkatrészeket pontos távolságra tedd. Negatív hossz ennyivel az első ponton túlra viszi, például 5 mm-rel egy doboz élén belülre.
 
 Az [[Esc]] kilép a mérés módból.
 
@@ -48,10 +48,12 @@ A mérőszalag és a derékszögvonalzó is a helyén marad, amíg vázlatot ké
 
 A beállításokban a {{ui:workspace.appearance}} alatt két kapcsoló van az élő méretekhez:
 
-- A {{ui:workspace.showMoveDimensions}} húzás közben mutatja, mennyit mozdulsz.
+- A {{ui:workspace.showMoveDimensions}} húzás közben mutatja, mennyit mozdulsz. Ez a test feletti fekete nyíllal való emelésre is érvényes; az utat az elülső sarkánál mutatja. Elengedés után kattints egy ilyen számra, és írd be a pontos távolságot; a negatív érték lefelé visz.
 - Az {{ui:workspace.showOriginDimensions}} a kijelölés távolságait mutatja a tárgyasztal origójától, több kijelölt testnél is.
 
 A {{ui:workspace.dimensionsAlwaysVisible}} beállítással a méretek állandóan láthatók maradnak.
+
+Ha egy pillanatra zavarnak, nyomd meg a [[Q]] billentyűt: a kijelölés körüli méretek és távolságok eltűnnek, így jól látszik a mozgatott alkatrész. Újabb [[Q]] visszahozza őket. Az a fogantyú, amelyre mutatsz, így is megmutatja a méretét.
 
 ## Jegyzetek
 
@@ -70,7 +72,7 @@ A jegyzetek a tervben mentődnek, egyik exportban sem jelennek meg, és a {{ui:v
 
 ## Referenciapontok
 
-A referenciapont egy puszta jel a térben, mint egy ceruzajel vagy egy kijelölő pont a műhelyben: egyik testhez sem tartozik, sosem nyomtatódik ki, és más dolgok illeszkednek hozzá. Kattints jobb gombbal egy testre, és válaszd az {{ui:contextMenu.markCenter}}, az {{ui:contextMenu.markCorners}} vagy az {{ui:contextMenu.markMidpoints}} lehetőséget: a pontok a test felső lapján jelennek meg (a teljes kijelölésén, ha többet jelöltél ki). {{ui:contextMenu.markFaceCenter}} ehelyett annak a sík lapnak a közepére tesz egyet, amelyre jobb gombbal kattintottál, például egy oldalon vagy egy végén.
+A referenciapont egy puszta jel a térben, mint egy ceruzajel vagy egy kijelölő pont a műhelyben: egyik testhez sem tartozik, sosem nyomtatódik ki, és más dolgok illeszkednek hozzá. Kattints jobb gombbal egy testre, és válaszd az {{ui:contextMenu.markCenter}}, az {{ui:contextMenu.markCorners}} vagy az {{ui:contextMenu.markMidpoints}} lehetőséget: a pontok a test felső lapján jelennek meg (a teljes kijelölésén, ha többet jelöltél ki). {{ui:contextMenu.markFaceCenter}} ehelyett annak a sík lapnak a közepére tesz egyet, amelyre jobb gombbal kattintottál, például egy oldalon vagy egy végén. Ha van forgáspont, a {{ui:contextMenu.markPivot}} pontosan rá tesz egy pontot, így egy másik alkatrész közepe arra a pontra ugrik, amely körül a kijelölés forog.
 
 - Húzással mozgatsz egy pontot, vagy rákattintva megnézheted a koordinátáit, és újakat gépelhetsz be; a beállított mértékegységet használják. Minden kártya a címénél fogva elhúzható, ha eltakar valamit, önállóan: a többi a helyén marad, a címre dupla kattintás pedig visszateszi. Az utoljára megérintett kártya áll a többi előtt. Egy kártyán vagy a jobb gombos menüben a **Mind törlése** egyszerre minden pontot töröl. A {{ui:common.delete}} eltávolítja.
 - A mérőszalag is meg tud jelölni egy pontot: az {{ui:camera.tapeMarkMiddle}}, a mérés közepén ülő, félig kitöltött jel a közepére tesz egyet, például egy kerek lyuk középpontjába. És egy ponttól is mér: a szalag úgy illeszkedik a referenciapontokhoz, mint a sarkokhoz.

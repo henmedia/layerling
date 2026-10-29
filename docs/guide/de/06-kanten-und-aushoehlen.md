@@ -79,7 +79,7 @@ Auch ein Körper mit einer Tasche lässt sich aushöhlen, etwa ein Block mit ein
 
 **Körper, die in einer Spitze enden,** etwa ein Kegel oder ein gedrehtes Dreieck, haben oben keine ebene Fläche, die offen bleiben könnte. Auch ein ganz geschlossener Hohlraum gelingt dort nicht, denn eine Spitze lässt sich nicht nach innen versetzen: Selbst mit 1 mm Wand kommt die Meldung, dass die Wände nicht so dick sein können. Zeichne die Wand dann vor dem Drehen ins Profil: Dupliziere den Umriss, verkleinere die Kopie gleichmäßig, setze sie in die Mitte des großen Umrisses und schneide mit ihr den großen aus, dann dreh das Ganze (Kapitel Skizzen, Abschnitt Rotieren). Der Abstand der beiden Umrisse ist die Wandstärke.
 
-Änderst du später die Größe des ausgehöhlten Körpers, höhlt layerling ihn in der neuen Größe gleich noch einmal aus. Die Wand bleibt so dick, wie du sie gewählt hast, auch bei runden Körpern. Ein Zylinder, den du dabei in eine Richtung mehr ziehst als in die andere, wird zur Ellipse.
+Änderst du später die Größe des ausgehöhlten Körpers, höhlt layerling ihn in der neuen Größe gleich noch einmal aus. Die Wand bleibt so dick, wie du sie gewählt hast, auch bei runden Körpern. Ein Zylinder, den du dabei in eine Richtung mehr ziehst als in die andere, wird zur Ellipse. Verrundungen und Fasen, die du nach dem Aushöhlen angebracht hast, kommen danach wieder an dieselben Kanten.
 
 > **Tipp:** Bei einer 0,4-mm-Düse sind 1,2 bis 2 mm Wandstärke ein guter Anfang: dünn genug, um Material zu sparen, dick genug für ein stabiles Teil.
 

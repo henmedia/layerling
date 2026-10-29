@@ -5,9 +5,9 @@ summary: Todas as teclas num só lugar, tiradas direto do programa, então a lis
 
 Os atalhos funcionam enquanto o plano de trabalho estiver em foco. Enquanto você digita num campo, eles não atrapalham. No Mac, [[Cmd]] vale sempre que aqui aparece [[Ctrl]].
 
-No editor, {{ui:editor.keyboardShortcuts}} na área {{ui:editor.group.help}} abre a mesma lista numa janela. O botão de impressora na janela ({{ui:shortcuts.print}}) imprime só a lista, em preto sobre branco, a lista inteira em um lado de uma folha A4 ou Carta, em três colunas, para deixar à mão como referência rápida; a janela de impressão do navegador também oferece salvar como PDF.
+No editor, {{ui:editor.keyboardShortcuts}} na área {{ui:editor.group.help}} abre a mesma lista numa janela. O botão de impressora na janela ({{ui:shortcuts.print}}) imprime só a lista, em preto sobre branco, a lista inteira em um lado de uma folha A4 ou Carta, em três colunas, para deixar à mão como referência rápida. Na janela de impressão do navegador, você também pode salvar como PDF.
 
-A caixa no alto da janela pesquisa a lista: ela mantém só os atalhos cuja frase, grupo ou teclas contêm todas as palavras digitadas, então "ctrl+z" deixa só essas linhas. Maiúsculas e acentos não importam, e uma única letra ou dígito encontra essa tecla e as palavras que começam com ela. O X no fim da caixa a esvazia; com a caixa vazia, a lista inteira volta. O botão de impressora imprime o que a janela mostra, então depois de uma pesquisa imprime só os atalhos encontrados.
+A caixa no alto da janela pesquisa a lista: ela mantém só os atalhos cuja frase, grupo ou teclas contêm todas as palavras digitadas, então "arredondamento" ou "ctrl+z" deixa só essas linhas. Maiúsculas e acentos não importam, e uma única letra ou dígito encontra essa tecla e as palavras que começam com ela. O X no fim da caixa a esvazia; com a caixa vazia, a lista inteira volta. O botão de impressora imprime o que a janela mostra, então depois de uma pesquisa imprime só os atalhos encontrados.
 
 ![A janela de atalhos de teclado no editor.](shot:shortcuts)
 
@@ -29,9 +29,9 @@ O guia que você está lendo também tem uma caixa de pesquisa, no topo de cada 
 
 Não acha onde ler sobre um botão ou um campo? Deixe o programa levar você até lá. Clique no ponto de interrogação na área {{ui:editor.group.help}}, ou pressione [[Shift]]+[[F1]]. O ponteiro vira um ponto de interrogação, e o que estiver embaixo dele fica contornado.
 
-- Clique num botão, num campo, numa chave, numa alça, numa área da barra de opções ou na barra de título de uma janela. O elemento **não** faz o que normalmente faz. Em vez disso, abre uma pequena janela com o nome do elemento, um resumo curto da parte deste guia que fala dele, até dois outros lugares que o mencionam, e {{ui:interactiveHelp.open}}.
+- Clique num botão, num campo, numa chave, numa alça, numa área da barra de opções ou na barra de título de uma janela. O elemento **não** faz o que normalmente faz. Em vez disso, abre uma pequena janela com o nome do elemento, um resumo curto da parte deste guia que fala dele, até dois outros lugares que o mencionam e o botão {{ui:interactiveHelp.open}}.
 - A ajuda é sobre o elemento que você apontou, não sobre a janela inteira em volta dele. Um elemento sem nome próprio usa o mais próximo em volta dele; dentro de uma janela, ele recorre ao ponto de interrogação dessa janela.
-- {{ui:interactiveHelp.open}} abre o guia nessa seção numa nova aba. Lá, a seção fica com um contorno colorido, do título até o fim, para você ver onde ela começa e termina.
+- {{ui:interactiveHelp.open}} abre o guia nessa seção numa nova aba. Na nova aba, a seção fica com um contorno colorido, do título até o fim, para você ver onde ela começa e termina.
 - Se o guia não fala nada sobre o elemento, a janela diz isso e oferece {{ui:interactiveHelp.search}}.
 - [[Esc]], ou o ponto de interrogação de novo, sai do modo. Numa tela sensível ao toque não existe passar o mouse por cima: um toque num elemento abre a janela na hora.
 

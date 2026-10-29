@@ -72,6 +72,8 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_boolean_cut` | Sottrae i fori dai solidi. |
 | `layerling_intersect_objects` | Conserva solo la parte comune agli oggetti (intersezione). |
 | `layerling_hull_objects` | Avvolge gli oggetti in un unico corpo convesso, come con la pellicola termoretraibile (involucro). |
+| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | Separa una forma nelle sue parti distinte; un corpo da schizzo viene diviso in un corpo per contorno. |
 | `layerling_split_objects` | Taglia a metà solidi o fori con un piano. |
 | `layerling_list_edges` | Elenca gli spigoli CAD reali di un oggetto. |
@@ -103,7 +105,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_delete_custom_shape` | Elimina una forma personalizzata; i corpi già inseriti restano nel progetto. |
 | `layerling_show_workplane` | Nasconde o mostra il piano con la griglia, per esempio per fotografare la parte inferiore (modifica solo la vista). |
 | `layerling_set_section_view` | Apre la vista lungo un piano di sezione per mostrare l’interno; non taglia realmente il pezzo (modifica solo la vista). |
-| `layerling_measurements` | mostra o nasconde le misurazioni del metro a nastro e le elenca con le loro lunghezze |
+| `layerling_measurements` | mostra o nasconde le misurazioni del metro a nastro e le elenca con le loro lunghezze, e nasconde o mostra le misure attorno alla selezione come [[Q]] |
 | `layerling_saved_view` | Salva la vista corrente con il tasto 7, 8, 9 o 0 e la richiama in seguito, come con Maiusc+tasto e poi il tasto (modifica solo la vista). Imposta anche la vista di avvio dei nuovi progetti. |
 | `layerling_clear_history` | Elimina definitivamente tutti i passaggi annullabili, come il pulsante «Elimina cronologia» nella vista Cronologia; richiede `confirm: true`. |
 | `layerling_set_history_view` | Mostra uno stato precedente del progetto, come la vista Cronologia. Il progetto vero e proprio non viene modificato; gli strumenti di modifica restano in attesa finché la vista non viene chiusa. |

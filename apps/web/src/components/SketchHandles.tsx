@@ -69,3 +69,35 @@ export function SketchLockBadge({
     </g>
   );
 }
+
+/**
+ * The ring shown while a picture or a selection turns (forum, 621358), like the 3D editor's rotation wheel:
+ * with the pointer inside it the turn snaps to 22.5°, a mark for each step; outside it goes in whole degrees.
+ * `active` while the pointer is inside. In plate units around `pivot`; strokes stay one screen pixel wide.
+ */
+export function SketchTurnRing({
+  pivot,
+  radius,
+  active,
+  screenUnit,
+}: {
+  pivot: { x: number; z: number };
+  radius: number;
+  active: boolean;
+  screenUnit: number;
+}) {
+  const ticks = Array.from({ length: 16 }, (_, index) => {
+    const angle = (index * Math.PI) / 8;
+    // Every fourth mark, a right angle, reaches further in.
+    const inner = radius - (index % 4 === 0 ? 10 : 5) * screenUnit;
+    return { key: index, x1: Math.cos(angle) * inner, z1: Math.sin(angle) * inner, x2: Math.cos(angle) * radius, z2: Math.sin(angle) * radius };
+  });
+  return (
+    <g className={`sketch-turn-ring ${active ? "active" : ""}`} pointerEvents="none" transform={`translate(${pivot.x} ${pivot.z})`}>
+      <circle r={radius} strokeWidth={1.5 * screenUnit} strokeDasharray={`${4 * screenUnit} ${3 * screenUnit}`} />
+      {ticks.map((tick) => (
+        <line key={tick.key} x1={tick.x1} y1={tick.z1} x2={tick.x2} y2={tick.z2} strokeWidth={1.5 * screenUnit} />
+      ))}
+    </g>
+  );
+}

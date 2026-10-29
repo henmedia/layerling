@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, normalizeScaleForUnits, parseMeasurementInput, resolveMeasurementInput, scaleOptionsForUnits } from "@/lib/measurementUnits";
-import { booleanTriangleLimitPreset, canBeginShapeDrag, customSnapGridDivisors, customSnapGridLabel, normalizeCustomSnapGrids, DEFAULT_ORBIT_ZOOM_SPEED, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeStep, normalizeShapeCustomizations, snapGridForUnits, snapGridOptions, snapGridStep, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsZoomSpeed, shapeDimensionLimit, workplaneSettingsFingerprint, ZOOM_SPEED_SLIDER_MAX, workspaceHydrationSyncDecision, zoomDistanceScale, standardGridSettings, resetGridInSavedDefault, readWorkspaceDefault, saveWorkspaceDefault } from "@/lib/workplaneSettings";
+import { booleanTriangleLimitPreset, canBeginShapeDrag, customSnapGridDivisors, customSnapGridLabel, normalizeCustomSnapGrids, DEFAULT_ORBIT_ZOOM_SPEED, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeStep, normalizeShapeCustomizations, snapGridForShortcut, snapGridForUnits, snapGridOptions, snapGridStep, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsZoomSpeed, shapeDimensionLimit, workplaneSettingsFingerprint, ZOOM_SPEED_SLIDER_MAX, workspaceHydrationSyncDecision, zoomDistanceScale, standardGridSettings, resetGridInSavedDefault, readWorkspaceDefault, saveWorkspaceDefault } from "@/lib/workplaneSettings";
 import { toolbarShapeAssets } from "@/lib/shapeCatalog";
 
 describe("workplane settings helpers", () => {
@@ -371,5 +371,34 @@ describe("Ask before closing the tab", () => {
     expect(normalizeWorkspaceSettings({}, DEFAULT_WORKPLANE_WORKSPACE).confirmTabClose).toBe(false);
     expect(normalizeWorkspaceSettings({ confirmTabClose: true }, DEFAULT_WORKPLANE_WORKSPACE).confirmTabClose).toBe(true);
     expect(normalizeWorkspaceSettings({ confirmTabClose: "yes" }, DEFAULT_WORKPLANE_WORKSPACE).confirmTabClose).toBe(false);
+  });
+});
+
+describe("snap grid shortcuts (#748)", () => {
+  const press = (key: string, code: string, mods: Partial<Record<"altKey" | "ctrlKey" | "metaKey" | "shiftKey", boolean>> = {}) =>
+    ({ key, code, altKey: false, ctrlKey: false, metaKey: false, shiftKey: false, ...mods });
+  const metric = snapGridOptions("Metric (Default)");
+
+  it("picks the menu entry of Alt plus a digit, by the key's position", () => {
+    expect(snapGridForShortcut(press("1", "Digit1", { altKey: true }), metric, "1.0 mm")).toBe("Off");
+    expect(snapGridForShortcut(press("¡", "Digit2", { altKey: true }), metric, "1.0 mm")).toBe("0.1 mm");
+    expect(snapGridForShortcut(press("8", "Digit8", { altKey: true }), metric, "1.0 mm")).toBe("Brick");
+    expect(snapGridForShortcut(press("9", "Digit9", { altKey: true }), metric, "1.0 mm")).toBeNull();
+    expect(snapGridForShortcut(press("5", "Digit5", { altKey: true }), metric, "1.0 mm")).toBeNull();
+    expect(snapGridForShortcut(press("3", "Digit3", { altKey: true, ctrlKey: true }), metric, "1.0 mm")).toBeNull();
+    const custom = snapGridOptions("Metric (Default)", [{ name: "Key", size: 19.05 }]);
+    expect(snapGridForShortcut(press("9", "Digit9", { altKey: true }), custom, "1.0 mm")).toBe(custom[8]);
+    expect(snapGridForShortcut(press("0", "Digit0", { altKey: true }), custom, "1.0 mm")).toBe(custom[9]);
+  });
+
+  it("steps finer and coarser with comma and period, Off lying below the finest step", () => {
+    expect(snapGridForShortcut(press(".", "Period"), metric, "1.0 mm")).toBe("2.0 mm");
+    expect(snapGridForShortcut(press(",", "Comma"), metric, "1.0 mm")).toBe("0.5 mm");
+    expect(snapGridForShortcut(press(",", "Comma"), metric, "0.1 mm")).toBe("Off");
+    expect(snapGridForShortcut(press(",", "Comma"), metric, "Off")).toBeNull();
+    expect(snapGridForShortcut(press(".", "Period"), metric, "Brick")).toBeNull();
+    expect(snapGridForShortcut(press(".", "Period"), metric, "Off")).toBe("0.1 mm");
+    expect(snapGridForShortcut(press(",", "NumpadDecimal"), metric, "1.0 mm")).toBeNull();
+    expect(snapGridForShortcut(press(";", "Comma", { shiftKey: true }), metric, "1.0 mm")).toBeNull();
   });
 });

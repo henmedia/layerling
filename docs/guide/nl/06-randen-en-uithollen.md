@@ -77,7 +77,7 @@ Een lichaam met een kamer, een blok met een gat dat niet helemaal doorloopt, gem
 
 **Lichamen die in een punt eindigen,** zoals een kegel of een omgewentelde driehoek, hebben bovenaan geen plat vlak dat open kan blijven. Een volledig gesloten holte lukt daar ook niet, omdat een punt niet naar binnen verschoven kan worden: zelfs met een wand van 1 mm krijg je de melding dat de wanden niet zo dik kunnen zijn. Teken de wand in plaats daarvan in het profiel voordat je het omwentelt: dupliceer de omtrek, schaal de kopie gelijkmatig kleiner, zet hem midden in de grote omtrek en snijd de grote ermee uit, en wentel daarna het geheel om (hoofdstuk Schetsen, sectie Omwentelen). De afstand tussen de twee omtrekken is de wanddikte.
 
-Verander je later de maat van een uitgehold lichaam, dan holt layerling het meteen opnieuw uit op de nieuwe maat. De wand blijft zo dik als je hebt gekozen, ook bij ronde lichamen. Een cilinder die je de ene kant verder uittrekt dan de andere wordt een ellips.
+Verander je later de maat van een uitgehold lichaam, dan holt layerling het meteen opnieuw uit op de nieuwe maat. De wand blijft zo dik als je hebt gekozen, ook bij ronde lichamen. Een cilinder die je de ene kant verder uittrekt dan de andere wordt een ellips. Afrondingen en afschuiningen die je na het uithollen hebt aangebracht, komen daarna weer op dezelfde randen.
 
 > **Tip:** Met een spuitmond van 0,4 mm is 1,2 tot 2 mm wand een goed begin: dun genoeg om materiaal te besparen, dik genoeg voor een stevig onderdeel.
 

@@ -12,6 +12,7 @@ import {
 
 export {
   continuousSnappedWheelRotation,
+  dimensionMarkNeedsScreenLayout,
   dimensionMarkScreenPush,
   getElevationMeasureKey,
   isPointInsideTransformBounds,
@@ -19,10 +20,12 @@ export {
   normalizedRotationPlaneBasis,
   rotateHandleArrow,
   rotationPlaneDirectionSign,
+  screenSpaceDimensionMark,
   transformBoundsIntersectClipVolume,
   transformOverlayScreenPoint,
   snappedRotationDelta,
   snappedWheelRotation,
+  DIMENSION_LABEL_MAX_SCREEN_OFFSET,
   DIMENSION_LABEL_MIN_SCREEN_OFFSET,
   ROTATION_WHEEL_SHIFT_SNAP_DEGREES,
   ROTATION_WHEEL_SNAP_DEGREES,

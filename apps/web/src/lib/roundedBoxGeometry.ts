@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 
 export const DEFAULT_ROUNDED_BOX_WIDTH = 40;
 export const DEFAULT_ROUNDED_BOX_DEPTH = 30;

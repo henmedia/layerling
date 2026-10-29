@@ -16,7 +16,7 @@ Se o seu navegador permitir, aparece na página inicial uma dica com {{ui:instal
 
 Você pode fechar a dica na página inicial com {{ui:installHint.dismiss}}. No Chrome ou no Edge, abrir o app instalado uma segunda vez traz a janela já aberta para a frente, em vez de abrir outra.
 
-No computador, o layerling instalado no Chrome ou no Edge também se registra como programa para arquivos `.lyl`: no gerenciador de arquivos, um duplo clique num projeto abre o projeto no layerling, e [[Ctrl]]+[[S]] salva de volta nesse arquivo. No Android isso não funciona, porque lá o navegador não associa arquivos a web apps instalados; abra o projeto com {{ui:dashboard.importGeometry}} na página inicial.
+No computador, o layerling instalado no Chrome ou no Edge também se registra como programa para arquivos `.lyl`: no gerenciador de arquivos, um clique duplo num projeto abre o projeto no layerling, e [[Ctrl]]+[[S]] salva de volta nesse arquivo. No Android isso não funciona, porque lá o navegador não associa arquivos a web apps instalados; abra o projeto com {{ui:dashboard.importGeometry}} na página inicial.
 
 ## Atualizações
 
@@ -36,7 +36,7 @@ Você escolhe o idioma no canto superior direito, na lista de idiomas. O esquema
 
 layerling é software livre (AGPL-3.0) e pode rodar no seu próprio computador ou servidor, por exemplo numa oficina, num clube ou numa escola. Há várias formas, descritas no [README no GitHub](https://github.com/henmedia/layerling/blob/main/README.md#getting-started):
 
-- **O início rápido no Windows:** uma única linha no PowerShell instala tudo e põe um atalho na área de trabalho. Se o layerling já estiver rodando, outro duplo clique não inicia um segundo servidor, só abre a página.
+- **O início rápido no Windows:** uma única linha no PowerShell instala tudo e põe um atalho na área de trabalho. Se o layerling já estiver rodando, outro clique duplo não inicia um segundo servidor, só abre a página.
 - **Docker:** para NAS (dispositivos de armazenamento em rede) e servidores domésticos, sem precisar instalar o Node.js. Cada versão sai como uma imagem pronta `henmedia/layerling` no Docker Hub (também `ghcr.io/henmedia/layerling`) para amd64 e arm64; `docker run -d -p 3000:3000 -v layerling-thumbnails:/app/.codex/project-thumbnails henmedia/layerling:latest` inicia o layerling, e num NAS você procura a imagem no registro do gerenciador de contêineres. O volume `layerling-thumbnails` mantém as miniaturas da página inicial quando você atualiza; sem ele, elas somem toda vez que o contêiner é criado de novo, até você abrir o projeto.
 - **Exportação estática:** o resultado são arquivos simples que qualquer servidor web consegue servir. Eles precisam ficar na raiz de um endereço (`https://layerling.example.com/` ou `http://192.168.0.5:8080/`), não numa subpasta nem abertos direto do disco; o README traz o passo a passo. Se o servidor tiver PHP e houver uma pasta `store` gravável ao lado do `index.html`, a exportação também passa a ser o armazenamento compartilhado de projetos.
 

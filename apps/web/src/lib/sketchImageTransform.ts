@@ -138,10 +138,11 @@ export function resizeImage(start: SketchImage, handle: ResizeHandle, point: Vec
 }
 
 /** Turning: the picture follows the pointer round its centre from where the drag began; Shift snaps to 15 degrees. */
-export function rotateImage(start: SketchImage, startAngle: number, point: Vec2, snap: boolean): { rotation: number } {
+/** `step` rounds the picture's own angle (0: none), so a turn lands on 90° and not 90° off where it began. */
+export function rotateImage(start: SketchImage, startAngle: number, point: Vec2, step: number): { rotation: number } {
   const delta = imageAngleTo(start, point) - startAngle;
   const rotation = (start.rotation ?? 0) + delta;
-  return { rotation: normalizeImageRotation(snap ? Math.round(rotation / 15) * 15 : rotation) };
+  return { rotation: normalizeImageRotation(step > 0 ? Math.round(rotation / step) * step : rotation) };
 }
 
 /**

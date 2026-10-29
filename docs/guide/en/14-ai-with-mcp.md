@@ -72,6 +72,8 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_boolean_cut` | cuts solids with holes |
 | `layerling_intersect_objects` | keeps only what the objects have in common (Intersection) |
 | `layerling_hull_objects` | wraps the objects in one convex body, as if shrink-wrapped (Hull) |
+| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall with a cutting edge and a rim round the mirrored outline (Cookie cutter) |
+| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separates a shape into its loose parts, a sketch body into one body per outline |
 | `layerling_split_objects` | cuts solids or holes in two with a plane |
 | `layerling_list_edges` | lists the real CAD edges of an object |
@@ -103,7 +105,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_delete_custom_shape` | removes a custom shape; inserted bodies stay |
 | `layerling_show_workplane` | hides and shows the plate with its grid, for a picture of the underside for example (only the view) |
 | `layerling_set_section_view` | cuts the view open along a plane to look inside (only the view, nothing is cut apart) |
-| `layerling_measurements` | shows or hides the measurements of the tape measure and lists them with their lengths |
+| `layerling_measurements` | shows or hides the measurements of the tape measure and lists them with their lengths, and hides or shows the sizes around the selection like [[Q]] |
 | `layerling_saved_view` | saves the current view under the key 7, 8, 9 or 0 and goes back to it, like Shift+key and the key (only the view); also sets the start view of new designs |
 | `layerling_clear_history` | deletes every undo step for good, as the History view's "Delete history" button does; needs `confirm: true` |
 | `layerling_set_history_view` | looks back at an earlier state of the project, like the History view (the real design stays untouched; changing tools wait until it is closed) |

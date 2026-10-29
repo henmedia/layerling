@@ -44,8 +44,8 @@ describe("sketch image transform (#216)", () => {
     const start = image();
     const startAngle = imageAngleTo(start, { x: 30, z: -5 });
     expect(startAngle).toBeCloseTo(0, 6);
-    expect(rotateImage(start, startAngle, { x: 10, z: -25 }, false).rotation).toBeCloseTo(90, 6);
-    expect(rotateImage(start, startAngle, { x: 10 + 20 * Math.cos(0.4), z: -5 - 20 * Math.sin(0.4) }, true).rotation).toBe(30);
+    expect(rotateImage(start, startAngle, { x: 10, z: -25 }, 0).rotation).toBeCloseTo(90, 6);
+    expect(rotateImage(start, startAngle, { x: 10 + 20 * Math.cos(0.4), z: -5 - 20 * Math.sin(0.4) }, 15).rotation).toBe(30);
   });
 
   it("crops by moving an edge, keeps the opposite edge and remembers the share cut away", () => {

@@ -62,6 +62,8 @@ A begépelés pontosabb, mint a húzás. Minden számmező milliméterben vár �
 
 A kerek alakzatok, mint a henger, a kúp, a cső, az ellipszis vagy a furatok, a tulajdonságaik között az {{ui:prop.sidesFollowSize}} kapcsolót és az {{ui:prop.sides}} csúszkát kínálják. A {{ui:shape.torus}} alakzatnak két csúszkája van: {{ui:prop.torusSides}} a gyűrű körül és {{ui:prop.torusSteps}} a cső körül. Ott is a mérettel változnak, amíg nem rögzíted őket, így egy nagy tórusz sem lesz szögletes. Az ok: a nézethez és az STL-hez, 3MF-hez és OBJ-hez a layerling a kört sok kis oldalú sokszögként rajzolja. Minél több az oldal, annál simább, és annál több háromszög kell hozzá.
 
+A {{ui:prop.torusTube}} adja meg, milyen vastag a cső felülről nézve. A magasság csak összenyomja vagy megnyújtja a csövet, így a lapos gyűrű megtartja a lyukát; a külső méret felénél a lyuk bezárul. A fogantyúk húzásakor a cső is vele méreteződik. Csak az a tórusz marad pontos test élletöréshez, lekerekítéshez és STEP-hez, amelynek csöve olyan vastag, amilyen magas a tórusz.
+
 **Ahol az oldalszám számít**
 
 - **A szeletelőnek szánt exportban** (STL, 3MF, OBJ). Egy kevés oldalú henger ott sokszögként érkezik.

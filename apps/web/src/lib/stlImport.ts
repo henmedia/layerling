@@ -130,19 +130,15 @@ export function importedShapeFromStl(fileName: string, buffer: ArrayBuffer): Wor
   const rawGeometry = stlLoader.parse(buffer);
   const geometry = rawGeometry.index ? rawGeometry.toNonIndexed() : rawGeometry.clone();
   const position = geometry.getAttribute("position");
-  const normal = geometry.getAttribute("normal");
   const rawPositions: number[] = [];
-  const rawNormals: number[] = [];
   const usesLayerlingYUp = stlUsesLayerlingYUp(buffer, position);
 
   for (let i = 0; i < position.count; i += 1) {
     const sourcePosition: [number, number, number] = [position.getX(i), position.getY(i), position.getZ(i)];
     rawPositions.push(...(usesLayerlingYUp ? sourcePosition : zUpToLayerling(sourcePosition)));
-    if (normal) {
-      const sourceNormal: [number, number, number] = [normal.getX(i), normal.getY(i), normal.getZ(i)];
-      rawNormals.push(...(usesLayerlingYUp ? sourceNormal : zUpToLayerling(sourceNormal)));
-    }
   }
 
-  return importedShapeFromTriangleSoup(fileName, rawPositions, rawNormals.length ? rawNormals : undefined);
+  // The file's facet normals are left out: many programs write 0 0 0 or stale ones, and the
+  // triangles' own order gives the same direction for a sound file (#988), as Tinkercad and Cura do.
+  return importedShapeFromTriangleSoup(fileName, rawPositions, undefined);
 }

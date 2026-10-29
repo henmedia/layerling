@@ -63,9 +63,15 @@ export function layeredTextShape(source: WorkplaneShape, layers: readonly TextLa
  * The name tag panel (#215): the letters of a stack with other words, another font or another
  * letter size. New words or another font keep the letter size, so a tag grows with its name.
  */
-export function nameTagSource(source: WorkplaneShape, change: { text?: string; font?: string; letterSize?: number }): WorkplaneShape {
-  const next = { ...source, ...(change.text !== undefined ? { text: change.text } : {}), ...(change.font !== undefined ? { font: change.font } : {}) };
-  if (change.text === undefined && change.font === undefined && change.letterSize === undefined) return next;
+export function nameTagSource(source: WorkplaneShape, change: { text?: string; font?: string; letterSize?: number; vertical?: boolean }): WorkplaneShape {
+  const next = {
+    ...source,
+    ...(change.text !== undefined ? { text: change.text } : {}),
+    ...(change.font !== undefined ? { font: change.font } : {}),
+    // Vertical letters (#981): the tag turns upright and keeps its letter size.
+    ...(change.vertical !== undefined ? { textVertical: change.vertical || undefined } : {}),
+  };
+  if (change.text === undefined && change.font === undefined && change.letterSize === undefined && change.vertical === undefined) return next;
   return { ...next, ...textLetterSizePatch(next, change.letterSize ?? textLetterSize(source)) };
 }
 

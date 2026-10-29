@@ -39,6 +39,11 @@ export const GUIDE_SECTIONS = {
   viewCube: { chapter: "view", de: "der-ansichtswuerfel", en: "the-view-cube", nl: "de-weergavekubus", ru: "kub-orientatsii", cs: "orientacni-krychle", sl: "orientacijska-kocka", hu: "a-nezetkocka", es: "el-cubo-de-vista" },
   cameraBar: { chapter: "view", de: "die-kameraleiste", en: "the-camera-bar", nl: "de-camerabalk", ru: "panel-kamery", cs: "lista-pohledu", sl: "vrstica-kamere", hu: "a-kamerasav", es: "la-barra-de-camara" },
   gridAndSnapping: { chapter: "view", de: "gitter-und-raster", en: "grid-and-snapping", nl: "raster-en-vastklikken", ru: "setka-i-privyazka", cs: "mrizka-a-prichytavani", sl: "mreza-in-pripenjanje", hu: "racs-es-illesztes", es: "cuadricula-y-ajuste" },
+  // The tabs of the settings window. Languages whose chapter explains the window in one go, under
+  // "Grid and snapping", land there.
+  settingsAppearance: { chapter: "view", de: "darstellung-thema-leiste-und-ansichtswuerfel", en: "appearance-theme-toolbar-and-view-cube", nl: "raster-en-vastklikken", ru: "setka-i-privyazka", cs: "mrizka-a-prichytavani", sl: "mreza-in-pripenjanje", hu: "racs-es-illesztes", es: "aspecto-tema-barra-de-herramientas-y-cubo-de-vista" },
+  settingsMeasurement: { chapter: "view", de: "masse-einheiten-massstab-und-rasterschritte", en: "measurement-units-scale-and-snap-steps", nl: "raster-en-vastklikken", ru: "setka-i-privyazka", cs: "mrizka-a-prichytavani", sl: "mreza-in-pripenjanje", hu: "racs-es-illesztes", es: "medidas-unidades-escala-y-pasos-de-ajuste" },
+  settingsWorkplane: { chapter: "view", de: "arbeitsebene-platte-und-drucker", en: "workplane-plate-and-printer", nl: "raster-en-vastklikken", ru: "setka-i-privyazka", cs: "mrizka-a-prichytavani", sl: "mreza-in-pripenjanje", hu: "racs-es-illesztes", es: "plano-de-trabajo-placa-e-impresora" },
   colorCard: { chapter: "shapes", de: "farben-waehlen", en: "choosing-colours", nl: "kleuren-kiezen", ru: "vybor-tsveta", cs: "vyber-barev", es: "elegir-colores" },
   shapeSettings: { chapter: "shapes", de: "die-einstellungen-der-form", en: "the-shape-s-settings", nl: "de-instellingen-van-de-vorm", ru: "nastroyki-figury", cs: "nastaveni-tvaru", sl: "nastavitve-oblike", hu: "az-alakzat-beallitasai", es: "los-ajustes-de-la-forma" },
   wrapCylinder: { chapter: "shapes", de: "um-einen-zylinder-wickeln", en: "wrapping-around-a-cylinder", nl: "om-een-cilinder-wikkelen", ru: "oborachivanie-vokrug-tsilindra", cs: "obtoceni-kolem-valce", sl: "ovijanje-okoli-valja", hu: "hengerre-tekeres", es: "envolver-alrededor-de-un-cilindro" },
@@ -151,7 +156,8 @@ export function guideSectionForShape(shape: GuideShape): GuideSection | undefine
   if (shape.imagePlate) return "referenceImage";
   if (shape.groupedShapes?.length) {
     if (shape.groupOperation === "bundle") return "bundling";
-    if (shape.groupOperation === "intersection" || shape.groupOperation === "hull") return "intersection";
+    // A loft between two sketches is explained next to the hull and the cookie cutter.
+    if (shape.groupOperation === "intersection" || shape.groupOperation === "hull" || shape.groupOperation === "loft") return "intersection";
     return "grouping";
   }
   // A body made from a sketch, or a file brought in, is explained where it was made.

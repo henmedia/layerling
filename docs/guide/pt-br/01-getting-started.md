@@ -35,7 +35,7 @@ Passe o mouse sobre um botão para ver o nome dele. Se não tiver certeza do que
 
 ### Excluir
 
-{{ui:common.delete}} ([[Delete]]) remove as formas selecionadas. {{ui:editor.tool.undo}} as traz de volta.
+{{ui:common.delete}} ([[Delete]]) exclui as formas selecionadas. {{ui:editor.tool.undo}} as traz de volta.
 
 ### Desagrupar
 
@@ -55,7 +55,7 @@ Passe o mouse sobre um botão para ver o nome dele. Se não tiver certeza do que
 
 ### Nome do projeto
 
-O nome do projeto ({{ui:confirm.projectName}}) fica bem no topo. Clique nele, digite, e [[Enter]] mantém o nome.
+O nome do projeto ({{ui:confirm.projectName}}) fica bem no topo. Clique nele, digite o novo nome e pressione [[Enter]] para confirmar.
 
 ### Opções de visibilidade
 
@@ -103,7 +103,7 @@ Por exemplo, vamos montar um cubo com um furo.
 
 ## Novidades desde a sua última visita
 
-Quando você abre o layerling de novo depois de uma atualização, um cartão na página inicial lista o que foi adicionado desde a sua última visita: cada versão desde então, a mais nova primeiro. Depois de muito tempo fora, você rola dentro do cartão. Abaixo delas, {{ui:whatsNew.earlier}} acrescenta também as versões de antes da sua última visita. Feche o cartão com {{ui:whatsNew.dismiss}} e ele não aparece mais até a próxima atualização. {{ui:whatsNew.footerLink}}, no rodapé da página inicial, mostra as últimas novidades de novo a qualquer momento. O navegador lembra a última versão que você viu, e nada sobre você sai dele.
+Quando você abre o layerling de novo depois de uma atualização, um cartão na página inicial lista o que foi adicionado desde a sua última visita: cada versão desde então, a mais nova primeiro. Depois de muito tempo sem abrir o layerling, você rola a lista dentro do cartão. Abaixo da lista, {{ui:whatsNew.earlier}} acrescenta também as versões de antes da sua última visita. Feche o cartão com {{ui:whatsNew.dismiss}} e ele não aparece mais até a próxima atualização. {{ui:whatsNew.footerLink}}, no rodapé da página inicial, mostra as últimas novidades de novo a qualquer momento. O navegador lembra a última versão que você viu, e nada sobre você sai dele.
 
 Numa cópia do layerling no seu próprio computador ou servidor, o aviso "Atualização disponível" tem um botão, {{ui:update.previewShow}}, que lista o que a atualização traz antes de você instalá-la. A lista só é buscada no GitHub quando você clica no botão.
 

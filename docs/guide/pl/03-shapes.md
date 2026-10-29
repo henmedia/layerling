@@ -72,6 +72,8 @@ Kolory obszaru roboczego w ustawieniach mają własny, prostszy wybór koloru, z
 
 Okrągłe kształty, takie jak walec, stożek, rura, elipsa albo otwory, mają we właściwościach przełącznik {{ui:prop.sidesFollowSize}} i suwak {{ui:prop.sides}}. {{ui:shape.torus}} ma dwa suwaki: {{ui:prop.torusSides}} wokół pierścienia i {{ui:prop.torusSteps}} wokół rury. Także tam zależą od rozmiaru, dopóki ich nie ustawisz, więc duży torus nie pokazuje płaskich ścianek. Powód: do widoku oraz do STL, 3MF i OBJ layerling rysuje okrąg jako wielokąt z wielu małych boków. Im więcej boków, tym gładszy, ale tym więcej trójkątów potrzebuje.
 
+{{ui:prop.torusTube}} określa, jak gruba jest rura widziana z góry. Wysokość tylko spłaszcza lub rozciąga rurę, więc płaski pierścień zachowuje otwór; przy połowie wymiaru zewnętrznego otwór się zamyka. Przeciąganie uchwytów skaluje rurę razem z kształtem. Dokładną bryłą do fazowania, zaokrąglania i STEP pozostaje tylko torus, którego rura jest tak gruba, jak wysoki jest torus.
+
 **Kiedy liczba boków ma znaczenie**
 
 - **W eksporcie do slicera** (STL, 3MF, OBJ). Walec o małej liczbie boków trafia tam jako wielokąt.

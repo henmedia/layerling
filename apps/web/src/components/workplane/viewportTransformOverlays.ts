@@ -9,7 +9,7 @@ import { t } from "@/lib/i18n";
 import { horizontalPlacementWorkplane, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { liftHandleScreenPoint } from "@/components/workplane/transformOverlayTypes";
-import { dimensionMarkScreenPush, isPointInsideTransformBounds, rotateHandleArrow, rotationPlaneDirectionSign, transformBoundsIntersectClipVolume, transformOverlayScreenPoint, type DimensionMark, type RotationAxis, type RotationPlaneView, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
+import { dimensionMarkNeedsScreenLayout, dimensionMarkScreenPush, isPointInsideTransformBounds, screenSpaceDimensionMark, rotateHandleArrow, rotationPlaneDirectionSign, transformBoundsIntersectClipVolume, transformOverlayScreenPoint, type DimensionMark, type RotationAxis, type RotationPlaneView, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import { cuboidCorners, pointAlongAxes } from "@/lib/alignFrame";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, MeasurementAccuracy, WorkplaneShape } from "@/types/layerling";
 import { outwardFaceNormal } from "@/lib/layFlat";
@@ -148,7 +148,7 @@ export function makeDimensionMark(
   fromWorld: THREE.Vector3,
   toWorld: THREE.Vector3,
   outwardWorld: THREE.Vector3,
-  project: (point: THREE.Vector3) => { x: number; y: number },
+  project: (point: THREE.Vector3) => { x: number; y: number; visible?: boolean },
 ): DimensionMark {
   const from = project(fromWorld);
   const to = project(toWorld);
@@ -158,17 +158,28 @@ export function makeDimensionMark(
   const railOffset = 5.8;
   const extensionOverrun = 1.4;
   const labelOffset = 3.2;
-  const railFrom = project(fromWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset)));
-  const railTo = project(toWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset)));
-  const extensionFrom = project(fromWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset + extensionOverrun)));
-  const extensionTo = project(toWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset + extensionOverrun)));
-  const edgeMidpoint = project(fromWorld.clone().lerp(toWorld, 0.5));
-  const labelPoint = project(
-    fromWorld
-      .clone()
-      .lerp(toWorld, 0.5)
-      .add(outwardAxis.clone().multiplyScalar(railOffset + labelOffset)),
-  );
+  const midpointWorld = fromWorld.clone().lerp(toWorld, 0.5);
+  const edgeMidpoint = project(midpointWorld);
+  let railFrom: { x: number; y: number; visible?: boolean } = project(fromWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset)));
+  let railTo: { x: number; y: number; visible?: boolean } = project(toWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset)));
+  let extensionFrom: { x: number; y: number; visible?: boolean } = project(fromWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset + extensionOverrun)));
+  let extensionTo: { x: number; y: number; visible?: boolean } = project(toWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset + extensionOverrun)));
+  let labelPoint: { x: number; y: number; visible?: boolean } = project(midpointWorld.clone().add(outwardAxis.clone().multiplyScalar(railOffset + labelOffset)));
+  // Zoomed far in on a tiny part, the same world offset lands the mark off screen
+  // or behind the camera, where it flips back across the body (#989). Then take
+  // only the outward direction from a tiny world step and place the mark in pixels.
+  const offsetPointsVisible = [railFrom, railTo, extensionFrom, extensionTo, labelPoint].every((point) => point.visible !== false);
+  if (dimensionMarkNeedsScreenLayout(edgeMidpoint, labelPoint, offsetPointsVisible)) {
+    const step = Math.max(fromWorld.distanceTo(toWorld), 0.01) * 0.01;
+    const probe = project(midpointWorld.clone().add(outwardAxis.clone().multiplyScalar(step)));
+    const length = Math.hypot(probe.x - edgeMidpoint.x, probe.y - edgeMidpoint.y);
+    if (Number.isFinite(length) && length > 1e-6) {
+      const direction = { x: (probe.x - edgeMidpoint.x) / length, y: (probe.y - edgeMidpoint.y) / length };
+      ({ railFrom, railTo, extensionFrom, extensionTo, labelPoint } = screenSpaceDimensionMark(
+        from, to, edgeMidpoint, direction, { rail: railOffset, overrun: extensionOverrun, label: labelOffset },
+      ));
+    }
+  }
   // The world offset above shrinks to a few pixels when zoomed out, which puts
   // the label under a rotate handle. Lift the whole mark together so the label
   // keeps its distance without tearing away from its own rail.

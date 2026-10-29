@@ -7130,9 +7130,11 @@ html[data-theme="dark"] .inspector-bundle-note {
   cursor: crosshair;
 }
 
+/* The tape measure's crosshair is open in the middle: the system one covered the small ring that
+   shows where the point will snap (#963). Dark lines with a light edge, readable on any ground. */
 .workplane-wrap.tape-mode .three-workplane-host,
 .workplane-wrap.tape-mode .three-workplane-host:active {
-  cursor: crosshair;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg stroke-linecap='round'%3E%3Cpath d='M16 2v8M16 22v8M2 16h8M22 16h8' stroke='%23ffffff' stroke-width='3.5'/%3E%3Cpath d='M16 2v8M16 22v8M2 16h8M22 16h8' stroke='%23241f20' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") 16 16, crosshair;
 }
 
 .workplane-wrap.corner-ruler-mode .three-workplane-host,
@@ -7715,6 +7717,11 @@ html[data-theme="dark"] .touch-multi-select {
   box-shadow: none;
   cursor: default;
   opacity: 0.72;
+}
+
+/* With Alt held the dots are squares, like the size handles: they stretch the parts instead of moving them (#998). */
+.align-overlay.size-mode .align-dot {
+  border-radius: 2px;
 }
 
 .mirror-overlay {

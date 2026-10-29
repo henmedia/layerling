@@ -1,4 +1,4 @@
-import { JoinType, type OcctKernel, type ShapeHandle } from "occt-wasm";
+import { JoinType, type BoundingBox, type OcctKernel, type ShapeHandle } from "occt-wasm";
 import { cadSketchRegions, orderedCadSketchPaths, type OrderedCadSketchPath } from "@/lib/sketchCadProfile";
 import { pathWire } from "@/lib/sketchCadWire";
 import { sampledPath } from "@/lib/sketchStroke";
@@ -91,6 +91,7 @@ export function buildStrokedSketchSolid(cad: OcctKernel, profile: SketchProfile,
             ? [-stroke.width, null]
             : [stroke.width / 2, -stroke.width / 2];
     let result: ShapeHandle | null = null;
+    const pieceBoxes: BoundingBox[] = [];
     for (const region of regions) {
       const outer = regionPrism(cad, region, outerDelta, join, height);
       if (!outer) return null;
@@ -100,13 +101,97 @@ export function buildStrokedSketchSolid(cad: OcctKernel, profile: SketchProfile,
         if (!inner) return null;
         piece = cad.cut(outer, cad.translate(inner, 0, -1, 0));
       }
+      pieceBoxes.push(cad.getBoundingBox(piece, false));
       result = result ? cad.fuse(result, piece) : piece;
     }
     if (!result || !cad.isValid(result) || !(cad.getVolume(result) > 1e-9)) return null;
+    // Two walls grown into each other can lose one of them in the fuse, and the rest is still a valid solid (#982: the rim of a
+    // mirrored "Rb" kept the R alone). The whole has to reach as far as every piece did.
+    const box = cad.getBoundingBox(result, false);
+    const reach = 1e-3;
+    if (pieceBoxes.some((piece) => piece.xmin < box.xmin - reach || piece.xmax > box.xmax + reach || piece.zmin < box.zmin - reach || piece.zmax > box.zmax + reach)) return null;
     return result;
   } catch (error) {
     // A kernel that has crashed is for the caller to reset; any other failure is the polygon route's to handle.
     if (/memory|WebAssembly|abort/i.test(error instanceof Error ? error.message : String(error))) throw error;
     return null;
   }
+}
+
+/** Closer than this to the top, in mm, a point of an edge lies on it. */
+const TOP_TOLERANCE = 1e-4;
+/**
+ * More rim pieces than this take no cutting edge: an outline cut from a body's triangles has hundreds of short straight
+ * pieces, and one try of the kernel at chamfering 1 670 of them ran 159 s before it failed - the sketch worker stops at 30 s
+ * and the cookie cutter failed with it (#982, a text body "Wera"). A drawn letter has a few dozen.
+ */
+const MAX_EDGE_PIECES = 200;
+/** After this many milliseconds no further try is started; the one running cannot be stopped. */
+const EDGE_BUDGET_MS = 8000;
+
+/**
+ * The rims along the very top of a solid standing from 0 to `height` (y up), split by the top faces' wires: `outer` the outer
+ * wire of each top face - the wall's outside - and `inner` the rest, the outline the wall stands round.
+ */
+function topRims(cad: OcctKernel, solid: ShapeHandle, height: number) {
+  const outer: ShapeHandle[] = [];
+  const inner: ShapeHandle[] = [];
+  const spread = (edges: ShapeHandle[]) => {
+    const box = cad.getBoundingBox(cad.makeCompound(edges), false);
+    return (box.xmax - box.xmin) * (box.zmax - box.zmin);
+  };
+  for (const face of cad.getSubShapes(solid, "face")) {
+    const box = cad.getBoundingBox(face, false);
+    if (Math.abs(box.ymin - height) > TOP_TOLERANCE || Math.abs(box.ymax - height) > TOP_TOLERANCE) continue;
+    // The outer wire of a flat face reaches furthest; the holes in it lie inside.
+    const wires = cad.getSubShapes(face, "wire").map((wire) => cad.getSubShapes(wire, "edge")).filter((edges) => edges.length);
+    wires.sort((a, b) => spread(b) - spread(a));
+    if (wires.length) outer.push(...wires[0]);
+    wires.slice(1).forEach((edges) => inner.push(...edges));
+  }
+  return { outer, inner };
+}
+
+/**
+ * A wall with a cutting edge (#982): the rims along the very top of the solid get a 45° chamfer reaching `amount` in from
+ * each side, so the top runs in to a narrow edge. The solid stands from 0 to `height` (y up). A cut or a fuse leaves a
+ * compound, which the kernel does not chamfer: each solid in it is chamfered on its own. Where the kernel cannot chamfer both
+ * rims at once - a tight bend of a letter, where the two chamfers meet - it chamfers them one after the other, and failing
+ * that one rim by twice as much, which leaves the same edge on top. Null when no solid has an edge up there, when the rims
+ * are too many pieces to try (an outline cut from a body's triangles), or when none of this works in time.
+ */
+export function chamferTopEdges(cad: OcctKernel, shape: ShapeHandle, height: number, amount: number): ShapeHandle | null {
+  const solids = cad.getSubShapes(shape, "solid").map((solid) => ({ solid, ...topRims(cad, solid, height) }));
+  const pieces = solids.reduce((sum, { outer, inner }) => sum + outer.length + inner.length, 0);
+  if (!pieces || pieces > MAX_EDGE_PIECES) return null;
+  const started = performance.now();
+  const attempt = (build: () => ShapeHandle) => {
+    if (performance.now() - started > EDGE_BUDGET_MS) return null;
+    try {
+      const result = build();
+      return cad.isValid(result) && cad.getVolume(result) > 1e-9 ? result : null;
+    } catch (error) {
+      if (/memory|WebAssembly|abort/i.test(error instanceof Error ? error.message : String(error))) throw error;
+      return null;
+    }
+  };
+  const chamfered: ShapeHandle[] = [];
+  for (const { solid, outer, inner } of solids) {
+    if (!outer.length && !inner.length) {
+      chamfered.push(solid);
+      continue;
+    }
+    const result = attempt(() => cad.chamfer(solid, [...outer, ...inner], amount))
+      ?? (outer.length && inner.length
+        ? attempt(() => {
+          const first = cad.chamfer(solid, outer, amount);
+          return cad.chamfer(first, topRims(cad, first, height).inner, amount);
+        })
+        : null)
+      ?? (outer.length ? attempt(() => cad.chamfer(solid, outer, amount * 2)) : null)
+      ?? (inner.length ? attempt(() => cad.chamfer(solid, inner, amount * 2)) : null);
+    if (!result) return null;
+    chamfered.push(result);
+  }
+  return chamfered.length === 1 ? chamfered[0] : cad.makeCompound(chamfered);
 }

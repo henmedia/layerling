@@ -57,7 +57,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.117.0";
+export const LYL_CREATED_WITH_VERSION = "1.119.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -904,7 +904,7 @@ function nodeGroupOperation(node: LylShapeNodeV1, nodeById: Map<string, LylShape
   if (node.definition.groupOperation === "intersection") return "boolean-intersection";
   if (node.definition.groupOperation === "bundle") return "group";
   // A hull keeps its parts as a group does; the operation itself travels in the definition (#863).
-  if (node.definition.groupOperation === "hull") return "group";
+  if (node.definition.groupOperation === "hull" || node.definition.groupOperation === "loft") return "group";
   const children = (node.groupedShapeNodeIds ?? []).map((id) => nodeById.get(id)).filter(Boolean) as LylShapeNodeV1[];
   const hasHole = children.some((child) => child.definition.hole === true);
   const hasSolid = children.some((child) => child.definition.hole !== true);
@@ -1027,6 +1027,31 @@ function unzipAsync(bytes: Uint8Array) {
       else resolve(files);
     });
   });
+}
+
+/** Only the project.json of a package, or nothing when it cannot be read; the rest stays packed. */
+function unzipProjectJson(bytes: Uint8Array) {
+  return new Promise<Uint8Array | null>((resolve) => {
+    try {
+      inspectZipBeforeExpansion(bytes);
+    } catch {
+      resolve(null);
+      return;
+    }
+    unzip(bytes, { filter: (file) => file.name === "project.json" }, (error, files) => {
+      resolve(error ? null : files["project.json"] ?? null);
+    });
+  });
+}
+
+function packagedLylProjectName(projectJson: Uint8Array | null) {
+  if (!projectJson) return null;
+  try {
+    const name = (JSON.parse(strFromU8(projectJson)) as { metadata?: { projectName?: unknown } } | null)?.metadata?.projectName;
+    return typeof name === "string" ? name : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function exportLylProject(input: LylProjectExportInput) {
@@ -1351,6 +1376,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (definition.textStretch !== undefined && typeof definition.textStretch !== "boolean") {
     throw new Error(`${label}.textStretch must be true or false`);
+  }
+  if (definition.textVertical !== undefined && typeof definition.textVertical !== "boolean") {
+    throw new Error(`${label}.textVertical must be true or false`);
   }
   // The space between a text's letters (#594), in per cent of the letter size.
   if (definition.textSpacing !== undefined && !(typeof definition.textSpacing === "number" && Number.isFinite(definition.textSpacing) && definition.textSpacing >= -50 && definition.textSpacing <= 300)) {
@@ -1695,6 +1723,11 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const value = finiteNumber(definition[key], `${label}.${key}`);
       if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
     }
+  }
+  if (kind === "torus" && definition.torusTubeRatio !== undefined) {
+    // Up to 1, not 0.5: a design from before #981 carries its height as the tube, and that may have been taller than the hole allowed.
+    const ratio = finiteNumber(definition.torusTubeRatio, `${label}.torusTubeRatio`);
+    if (ratio <= 0 || ratio > 1) throw new Error(`${label}.torusTubeRatio is outside the supported range`);
   }
   if (kind === "slot" && definition.slotEndRatio !== undefined) {
     const ratio = finiteNumber(definition.slotEndRatio, `${label}.slotEndRatio`);
@@ -2318,6 +2351,9 @@ export async function withLylProjectName(input: ArrayBuffer | Uint8Array, projec
   const name = projectName.trim();
   const prefix = strFromU8(bytes.subarray(0, Math.min(bytes.length, 64))).trimStart();
   if (!name || prefix.startsWith("{")) return bytes;
+  // Only project.json is read to compare the name: unpacking and checking every mesh of every design
+  // made backing up many large designs slow (#991). The whole package is opened only to rename it.
+  if (packagedLylProjectName(await unzipProjectJson(bytes)) === name) return bytes;
   const { files, validated } = await readPackagedLyl(bytes);
   if (validated.document.metadata.projectName === name) return bytes;
   const raw = JSON.parse(strFromU8(files["project.json"])) as { metadata: { projectName: string } };

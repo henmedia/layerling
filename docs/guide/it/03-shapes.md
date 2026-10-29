@@ -72,6 +72,8 @@ I colori dell’area di lavoro nelle impostazioni hanno un selettore più sempli
 
 Le forme rotonde, come cilindri, coni, tubi, ellissi e fori, hanno nelle proprietà l’interruttore {{ui:prop.sidesFollowSize}} e il cursore {{ui:prop.sides}}. {{ui:shape.torus}} ha due cursori: {{ui:prop.torusSides}} attorno all’anello e {{ui:prop.torusSteps}} attorno al tubo. Anche questi seguono le dimensioni finché non li regoli manualmente, così un toro grande non mostra facce piatte. Il motivo è che, per la visualizzazione e per le esportazioni STL, 3MF e OBJ, layerling rappresenta un cerchio come un poligono formato da tanti lati piccoli. Più lati ci sono, più la forma è liscia e più triangoli richiede.
 
+{{ui:prop.torusTube}} stabilisce quanto è spesso il tubo visto dall'alto. L'altezza schiaccia o allunga soltanto il tubo, quindi un anello piatto conserva il suo foro; a metà della misura esterna il foro si chiude. Trascinando le maniglie, il tubo si ridimensiona insieme alla forma. Solo un toro il cui tubo è spesso quanto il toro è alto resta un corpo esatto per smussi, raccordi e STEP.
+
 **Quando il numero di lati è importante**
 
 - **Nell’esportazione per lo slicer** (STL, 3MF, OBJ): un cilindro con pochi lati viene esportato come poligono.

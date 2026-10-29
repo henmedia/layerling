@@ -28,6 +28,7 @@ import {
   shellNeedingRebuild,
   hollowStretchSincePicture,
   shellRebuildEntry,
+  edgeTreatmentsAfterShell,
   patchTouchesBodyParameters,
   shapeTaperDimensions,
   shapeTaperScaleAt,
@@ -440,11 +441,21 @@ describe("workplane shape helpers", () => {
     // A star stretched unevenly has no round body to hollow again; it keeps the bands.
     expect(shellRebuildEntry(hollow("star", 45, 50))).toBeNull();
     expect(shellNeedingRebuild(hollow("star", 45, 45))?.id).toBe("h");
-    // A fillet after the hollowing keeps the old way.
+    // A fillet after the hollowing on edges it knows is laid again on the fresh walls (forum, 621213).
+    const fillet = { kind: "fillet" as const, amount: 1, edgeCount: 1, edgeIds: [0] };
     const filleted = hollow("cylinder", 45, 50);
-    filleted.edgeTreatments = [feature, { kind: "fillet", amount: 1, edgeCount: 1 }];
-    expect(shellRebuildEntry(filleted)).toBeNull();
-    expect(preservesEdgeTreatmentSize(filleted)).toBe(true);
+    const shellEntry = filleted.edgeTreatmentHistory![0];
+    filleted.edgeTreatments = [feature, fillet];
+    filleted.edgeTreatmentHistory = [shellEntry, { id: "f", createdAt: 2, feature: fillet, before: shape({ kind: "mesh", width: 60, depth: 60, height: 40 }), appliedFrame: frame }];
+    expect(shellNeedingRebuild(filleted)?.id).toBe("h");
+    expect(edgeTreatmentsAfterShell(filleted)?.map((entry) => entry.id)).toEqual(["f"]);
+    expect(preservesEdgeTreatmentSize(filleted)).toBe(false);
+    // One without its edges, or with no record of its own, keeps the old way.
+    const unknownEdges = { ...filleted, edgeTreatments: [feature, { ...fillet, edgeIds: undefined }], edgeTreatmentHistory: [shellEntry, { ...filleted.edgeTreatmentHistory[1], feature: { ...fillet, edgeIds: undefined } }] };
+    expect(shellRebuildEntry(unknownEdges)).toBeNull();
+    expect(preservesEdgeTreatmentSize(unknownEdges)).toBe(true);
+    const unrecorded = { ...filleted, edgeTreatmentHistory: [shellEntry] };
+    expect(shellRebuildEntry(unrecorded)).toBeNull();
   });
 
   it("reads the stretch of a hollow body in the axes of the shape it was hollowed from, a quarter turn apart (#729)", () => {

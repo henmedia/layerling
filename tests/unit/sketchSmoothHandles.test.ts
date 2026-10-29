@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
-import { alignedSmoothHandles, withSegmentHandles, withSmoothSketchHandles } from "@/lib/sketchSmoothHandles";
+import { alignedSmoothHandles, withSegmentHandles, withSmoothHandlesAfterRemoval, withSmoothSketchHandles } from "@/lib/sketchSmoothHandles";
+import { sketchProfileWithoutPoint } from "@/lib/sketchPointRemoval";
 import type { SketchProfile } from "@/types/layerling";
 
 let counter = 0;
@@ -111,5 +112,23 @@ describe("a corner with two handles made smooth (#347)", () => {
   it("leaves a point without a usable direction to the editor's own smoothing", () => {
     expect(alignedSmoothHandles({ x: 0, z: 0, handleOut: { x: 1, z: 0 } })).toBeNull();
     expect(alignedSmoothHandles({ x: 1, z: 1, handleIn: { x: 1, z: 1 }, handleOut: { x: 2, z: 1 } })).toBeNull();
+  });
+});
+
+describe("deleting a point of a smooth outline (forum, 621213)", () => {
+  it("lays the handles of its two neighbours again and leaves every other point as it was", () => {
+    const ids = ["a", "b", "c", "d", "e", "f"];
+    const spots = [[0, 0], [20, -5], [40, 0], [45, 20], [20, 30], [-5, 20]];
+    const drawn = withSmoothSketchHandles({
+      points: ids.map((id, index) => ({ id, x: spots[index][0], z: spots[index][1], mode: "smooth" as const })),
+      segments: ids.map((id, index) => ({ id: `s${index}`, startId: id, endId: ids[(index + 1) % ids.length], kind: "smooth" as const })),
+    });
+    // A handle dragged by hand, far from the point that goes.
+    const dragged = { ...drawn, points: drawn.points.map((point) => point.id === "e" ? { ...point, handleIn: { x: 30, z: 40 }, handleOut: { x: 10, z: 20 } } : point) };
+    const after = withSmoothHandlesAfterRemoval(dragged, sketchProfileWithoutPoint(dragged, "b"), "b");
+    const of = (profile: SketchProfile, id: string) => profile.points.find((point) => point.id === id);
+    for (const id of ["d", "e", "f"]) expect(of(after, id)).toEqual(of(dragged, id));
+    expect(of(after, "a")?.handleOut).not.toEqual(of(dragged, "a")?.handleOut);
+    expect(of(after, "c")?.handleIn).not.toEqual(of(dragged, "c")?.handleIn);
   });
 });

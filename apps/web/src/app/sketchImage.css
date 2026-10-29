@@ -141,6 +141,11 @@ html[data-theme="dark"] .sketch-rotate-handle {
   line-height: 1.4;
 }
 
+/* No header above it, so it takes the bottom padding at the top too. */
+.property-card.sketch-image-calibrate-card {
+  padding-top: 18px;
+}
+
 .sketch-image-calibrate-field {
   display: grid;
   gap: 6px;
@@ -319,4 +324,22 @@ html[data-theme="dark"] .sketch-image-hint {
 /* Calibrating: the next two clicks mark points on the picture, so the pointer is a crosshair, not the move cross. */
 .sketch-reference-images image.calibrating {
   cursor: crosshair;
+}
+
+/* The ring shown while turning in the sketch (forum, 621358): inside it the turn snaps to 22.5°, and then the
+   ring is drawn in the handle's blue; outside it, faint. */
+.sketch-turn-ring {
+  --sketch-turn-ring: rgba(47, 111, 224, 0.35);
+  --sketch-turn-ring-active: #2f6fe0;
+  fill: none;
+  stroke: var(--sketch-turn-ring);
+}
+
+.sketch-turn-ring.active {
+  stroke: var(--sketch-turn-ring-active);
+}
+
+html[data-theme="dark"] .sketch-turn-ring {
+  --sketch-turn-ring: rgba(106, 160, 255, 0.4);
+  --sketch-turn-ring-active: #6aa0ff;
 }

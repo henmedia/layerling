@@ -64,7 +64,7 @@ Kąty zostają przy bryle. W jej ustawieniach karta {{ui:inspector.rotation}} po
 
 ![Bryła obrócona wokół dwóch osi: jej kąty stoją pod nią, a karta Obrót w jej ustawieniach przyjmuje je jako liczby.](shot:rotation-card)
 
-Gdy zaznaczona jest **jedna bryła**, punkt obrotu należy do tej bryły: zaznacz inne części i wróć, a nadal tam będzie. Przesuwa się, obraca i skaluje razem z bryłą, zapisuje się w projekcie i wraca po Cofnij. W karcie {{ui:inspector.position}} punkt obrotu ma własne X, Y i Z, które możesz wpisać albo dostroić, a {{ui:inspector.pivotRemove}} go usuwa. Czerwony znacznik punktu obrotu możesz też przeciągać myszą: ślizga się po powierzchni brył i przyciąga się do narożników, środków krawędzi i krawędzi, więc oś zawiasu ląduje dokładnie na narożniku. Gdy zaznaczonych jest kilka brył, punkt obrotu obowiązuje tylko dla tego zaznaczenia, a nowe zaznaczenie go usuwa.
+Gdy zaznaczona jest **jedna bryła**, punkt obrotu należy do tej bryły: zaznacz inne części i wróć, a nadal tam będzie. Przesuwa się, obraca i skaluje razem z bryłą, zapisuje się w projekcie i wraca po Cofnij. W karcie {{ui:inspector.position}} punkt obrotu ma własne X, Y i Z, które możesz wpisać albo dostroić, a {{ui:inspector.pivotRemove}} go usuwa. Czerwony znacznik punktu obrotu możesz też przeciągać myszą: ślizga się po powierzchni brył i przyciąga się do narożników, środków krawędzi i krawędzi, więc oś zawiasu ląduje dokładnie na narożniku. Gdy zaznaczonych jest kilka brył, punkt obrotu obowiązuje tylko dla tego zaznaczenia, a nowe zaznaczenie go usuwa. Po zgrupowaniu lub połączeniu w pakiet zostaje: grupa przejmuje go jako własny punkt obrotu, z X, Y i Z w {{ui:inspector.position}}.
 
 ## Kładzenie płasko na ścianie
 

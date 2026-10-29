@@ -22,6 +22,8 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   bundle: ["bundle", "buendel", "bündel", "buendeln", "bündeln", "ohne verrechnung"],
   ungroup: ["ungroup", "split group", "trennen", "aufloesen", "auflösen", "gruppe aufheben"],
   intersect: ["intersect", "intersection", "schnittmenge", "verschneiden", "gemeinsam"],
+  cookieCutter: ["cookie cutter", "cookie", "cutter", "biscuit", "pastry", "stencil", "christmas", "ausstechform", "ausstecher", "plaetzchen", "plätzchen", "keks", "keksform", "backform", "weihnachten"],
+  loftSketches: ["loft", "transition", "two sketches", "two svgs", "blend", "uebergang", "übergang", "zwei skizzen", "skizzen verbinden", "trichter", "funnel"],
   hull: ["hull", "convex hull", "shrink wrap", "wrap", "hülle", "konvexe hülle", "schrumpffolie", "umhüllen"],
   "intersect-preview": ["preview", "common", "overlap", "venn", "vorschau", "gemeinsam", "gemeinsames", "ueberlappung", "schnittmenge"],
   align: ["align", "ausrichten", "buendig", "bündig", "mitte", "center"],

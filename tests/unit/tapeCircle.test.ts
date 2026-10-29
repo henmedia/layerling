@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { describe, expect, it } from "vitest";
 import {
   axisLockedPoint,
+  tapeLengthShift,
   circleOfEdgePoints,
   perpendicularFootOnPlane,
   perpendicularFootOnSegment,
@@ -146,3 +147,28 @@ describe("perpendicular snapping and axis locking for the tape measure (#589)", 
   });
 });
 
+
+describe("a typed tape length (#823, #963)", () => {
+  // The edge of a box at x = 40, the left edge of a hole at x = 60: 20 mm apart.
+  const edge = new THREE.Vector3(40, 0, 10);
+  const hole = new THREE.Vector3(60, 0, 10);
+
+  it("moves the body at the second point closer or further along the line", () => {
+    expect(tapeLengthShift(edge, hole, 5, true)!.distanceTo(new THREE.Vector3(-15, 0, 0))).toBeLessThan(1e-9);
+    expect(tapeLengthShift(edge, hole, 30, true)!.distanceTo(new THREE.Vector3(10, 0, 0))).toBeLessThan(1e-9);
+  });
+
+  it("takes it past the first point for a negative length, into the box", () => {
+    const shift = tapeLengthShift(edge, hole, -5, true)!;
+    expect(hole.clone().add(shift).distanceTo(new THREE.Vector3(35, 0, 10))).toBeLessThan(1e-9);
+  });
+
+  it("moves the body at the first point the other way when that one moves", () => {
+    const shift = tapeLengthShift(edge, hole, -5, false)!;
+    expect(edge.clone().add(shift).distanceTo(new THREE.Vector3(65, 0, 10))).toBeLessThan(1e-9);
+  });
+
+  it("gives no direction for two points on top of each other", () => {
+    expect(tapeLengthShift(edge, edge.clone(), 5, true)).toBeNull();
+  });
+});

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 import type { GearProfile, GearType, WorkplaneShape } from "@/types/layerling";
 
 export const DEFAULT_GEAR_TEETH = 12;

@@ -19,15 +19,46 @@ export function putGeometryOnBase(geometry: THREE.BufferGeometry, preserveNormal
 }
 
 /**
+ * A mesh's own normals, made fit to be lit by. Many exporters write 0 0 0 for every facet of an
+ * STL, and a body drawn with those gets no light at all and shows black (#988). A corner whose
+ * normal is not a direction takes its triangle's, from the order of its corners; the others, such
+ * as the smooth ones of a chamfillet, stay as they are.
+ */
+export function drawableNormals(positions: ArrayLike<number>, normals: ArrayLike<number>) {
+  const result = Float32Array.from(normals);
+  for (let corner = 0; corner < result.length; corner += 9) {
+    let faceNormal: THREE.Vector3 | null = null;
+    for (let i = corner; i < corner + 9; i += 3) {
+      const lengthSq = result[i] * result[i] + result[i + 1] * result[i + 1] + result[i + 2] * result[i + 2];
+      // NaN fails every comparison, so it is caught by the same test.
+      if (lengthSq > 0.25) continue;
+      faceNormal ??= triangleNormal(positions, corner);
+      result[i] = faceNormal.x;
+      result[i + 1] = faceNormal.y;
+      result[i + 2] = faceNormal.z;
+    }
+  }
+  return result;
+}
+
+function triangleNormal(positions: ArrayLike<number>, corner: number) {
+  const a = new THREE.Vector3(positions[corner], positions[corner + 1], positions[corner + 2]);
+  const b = new THREE.Vector3(positions[corner + 3], positions[corner + 4], positions[corner + 5]);
+  const c = new THREE.Vector3(positions[corner + 6], positions[corner + 7], positions[corner + 8]);
+  return b.sub(a).cross(c.sub(a)).normalize();
+}
+
+/**
  * The view's geometry of an imported mesh (WorkplaneViewport's getImportedMeshCache). Its own
- * normals when it brings them; without, putGeometryOnBase works them out.
+ * normals when it brings them (corners without a usable one take their triangle's); without,
+ * putGeometryOnBase works them out.
  */
 export function buildImportedMeshGeometry(mesh: ImportedMesh) {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(mesh.positions, 3));
-  const hasNormals = Boolean(mesh.normals && mesh.normals.length === mesh.positions.length);
+  const hasNormals = Boolean(mesh.normals && mesh.normals.length === mesh.positions.length && mesh.positions.length % 9 === 0);
   if (hasNormals && mesh.normals) {
-    geometry.setAttribute("normal", new THREE.Float32BufferAttribute(mesh.normals, 3));
+    geometry.setAttribute("normal", new THREE.BufferAttribute(drawableNormals(mesh.positions, mesh.normals), 3));
   }
   return putGeometryOnBase(geometry, hasNormals);
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dragRotationDegrees, rotateSketchPoints, rotateSketchPointsAbout, selectedClosedSketchPoints, sketchPointsPivot } from "@/lib/sketchRotation";
+import { dragRotationDegrees, rotateSketchPoints, rotateSketchPointsAbout, selectedClosedSketchPoints, SKETCH_TURN_FREE_STEP, SKETCH_TURN_RING_STEP, SKETCH_TURN_SHIFT_STEP, sketchPointsPivot, sketchTurnRing, sketchTurnStep } from "@/lib/sketchRotation";
 import type { SketchProfile } from "@/types/layerling";
 
 const rectangle: SketchProfile = {
@@ -76,5 +76,34 @@ describe("turning a selection by its handle (#330)", () => {
     expect(dragRotationDegrees(pivot, { x: 10, z: 0 }, { x: 10, z: 3 }, 15)).toBe(15);
     expect(dragRotationDegrees(pivot, { x: 10, z: 1 }, { x: -10, z: -1 })).toBeCloseTo(180, 6);
     expect(dragRotationDegrees(pivot, { x: -10, z: 1 }, { x: -10, z: -1 })).toBeCloseTo(11.4, 0);
+  });
+});
+
+// Forum, 621358: on a 1 mm grid an exact 90° was out of reach; the turn now snaps by a ring as in 3D.
+describe("the step a turn in the sketch snaps to", () => {
+  const pivot = { x: 3, z: -2 };
+  const ring = sketchTurnRing(pivot, { x: 13, z: -2 });
+
+  it("draws the ring a little inside the point where the handle was taken", () => {
+    expect(ring).toBeCloseTo(7.5, 9);
+  });
+
+  it("snaps to 22.5° inside the ring, to whole degrees outside, to 15° with Shift", () => {
+    expect(sketchTurnStep(pivot, ring, { x: 3, z: 3 }, false)).toBe(SKETCH_TURN_RING_STEP);
+    expect(sketchTurnStep(pivot, ring, { x: 3, z: 12 }, false)).toBe(SKETCH_TURN_FREE_STEP);
+    expect(sketchTurnStep(pivot, ring, { x: 3, z: 3 }, true)).toBe(SKETCH_TURN_SHIFT_STEP);
+    expect(sketchTurnStep(pivot, ring, { x: 3, z: 12 }, true)).toBe(SKETCH_TURN_SHIFT_STEP);
+  });
+
+  it("lands on exactly 90° inside the ring from a pointer a little off", () => {
+    const start = { x: 13, z: -2 };
+    const near = { x: 3.4, z: 3 };
+    expect(dragRotationDegrees(pivot, start, near, sketchTurnStep(pivot, ring, near, false))).toBe(90);
+  });
+
+  it("turns in whole degrees outside the ring, off the grid", () => {
+    const start = { x: 13, z: -2 };
+    const far = { x: 3 + 20 * Math.cos((37.3 * Math.PI) / 180), z: -2 + 20 * Math.sin((37.3 * Math.PI) / 180) };
+    expect(dragRotationDegrees(pivot, start, far, sketchTurnStep(pivot, ring, far, false))).toBe(37);
   });
 });

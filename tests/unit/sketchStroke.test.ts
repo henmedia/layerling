@@ -1,7 +1,7 @@
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
 import { orderedCadSketchPaths } from "@/lib/sketchCadProfile";
-import { normalizeSketchStroke, sampledPath, strokedSketchProfile } from "@/lib/sketchStroke";
+import { normalizeSketchStroke, sampledPath, strokeEdgeChamfer, strokedSketchProfile } from "@/lib/sketchStroke";
 import type { SketchProfile, SketchStroke } from "@/types/layerling";
 
 let runtime: ManifoldToplevel;
@@ -172,5 +172,31 @@ describe("curves cut into straight pieces (#461)", () => {
     const stroked = strokedSketchProfile(runtime, { ...curvedLoop(568, 58), stroke: { width: 1, align: "inside", join: "round", cap: "round" } });
     expect(stroked).not.toBeNull();
     expect(stroked!.points.length).toBeLessThan((568 * 32) / 2);
+  });
+});
+
+describe("a cutting edge on a wall (#982)", () => {
+  const wall: SketchStroke = { width: 1.2, align: "outside", join: "round", cap: "flat", edge: 0.4 };
+
+  it("keeps the edge through normalizing, and drops one that is no number above 0", () => {
+    expect(normalizeSketchStroke(wall)?.edge).toBe(0.4);
+    expect(normalizeSketchStroke({ ...wall, edge: 0 })?.edge).toBeUndefined();
+    expect(normalizeSketchStroke({ ...wall, edge: "x" })).not.toHaveProperty("edge");
+  });
+
+  it("chamfers half of what the wall is wider than its edge from each side", () => {
+    expect(strokeEdgeChamfer(wall, 15)).toBeCloseTo(0.4, 9);
+    expect(strokeEdgeChamfer({ ...wall, align: "center", width: 2, edge: 1 }, 15)).toBeCloseTo(0.5, 9);
+  });
+
+  it("leaves the top flat without an edge, for an edge as wide as the wall, and for an area", () => {
+    expect(strokeEdgeChamfer({ ...wall, edge: undefined }, 15)).toBe(0);
+    expect(strokeEdgeChamfer({ ...wall, edge: 1.2 }, 15)).toBe(0);
+    expect(strokeEdgeChamfer({ ...wall, align: "grow" }, 15)).toBe(0);
+    expect(strokeEdgeChamfer(undefined, 15)).toBe(0);
+  });
+
+  it("never chamfers deeper than most of a low wall", () => {
+    expect(strokeEdgeChamfer({ ...wall, width: 5, edge: 0.4 }, 1)).toBeCloseTo(0.9, 9);
   });
 });

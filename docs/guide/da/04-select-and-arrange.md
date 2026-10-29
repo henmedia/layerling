@@ -32,7 +32,7 @@ Listen sidder docket lige til højre for visningskuben. Træk den i dens titelli
 
 ## Tast en position
 
-Kortet {{ui:inspector.position}} i egenskabspanelet viser hvor den valgte form står, og du kan taste den: {{ui:prop.positionX}} og {{ui:prop.positionY}} er midten af dens boks på pladen, med de samme fortegn som afstandene vist på arbejdsplanet, og {{ui:prop.positionZ}} er højden af dens underside. X tæller til højre, Y mod bag og Z op, efter højrehåndsreglen som i Tinkercad og CAD-programmer; aksepilene på pladen viser retningerne. Værdierne går i den enhed du har sat, og skydere rækker lige så langt som at trække.
+Kortet {{ui:inspector.position}} i egenskabspanelet viser hvor den valgte form står, og du kan taste den: {{ui:prop.positionX}} og {{ui:prop.positionY}} er midten af dens boks på pladen, med de samme fortegn som afstandene vist på arbejdsplanet, og {{ui:prop.positionZ}} er højden af dens underside. Med {{ui:inspector.positionFrom}} øverst på kortet skifter du til {{ui:inspector.positionEdge}}: X og Y viser så formens venstre og forreste kant, så du kan lægge en kant præcis på et mål. Indstillingen bliver, indtil du skifter tilbage til {{ui:inspector.positionCentre}}. X tæller til højre, Y mod bag og Z op, efter højrehåndsreglen som i Tinkercad og CAD-programmer; aksepilene på pladen viser retningerne. Værdierne går i den enhed du har sat, og skydere rækker lige så langt som at trække.
 
 ## Parkér dele ved siden af pladen
 
@@ -68,7 +68,7 @@ Vinklerne bliver ved formen. I dens indstillinger viser {{ui:inspector.rotation}
 
 ![En form vendt omkring to akser: dens vinkler står under den, og Rotationskortet i dens indstillinger tager dem som tal.](shot:rotation-card)
 
-Med **én form** valgt hører rotationspunktet til den form: vælg andre dele og kom tilbage, så er det stadig der. Det flytter, drejer og skalerer med formen, gemmes i projektet og kommer tilbage med Fortryd. Under {{ui:inspector.position}} har rotationspunktet sit eget X, Y og Z, som du kan taste eller skubbe, og {{ui:inspector.pivotRemove}} fjerner det. Du kan også trække rotationspunktets røde markør med musen: den glider hen over formernes overflade og snapper til hjørner, kantmidtpunkter og kanter, så en hængseltap lander præcis på et hjørne. Med flere former valgt er rotationspunktet kun for den markering, og en ny markering fjerner det.
+Med **én form** valgt hører rotationspunktet til den form: vælg andre dele og kom tilbage, så er det stadig der. Det flytter, drejer og skalerer med formen, gemmes i projektet og kommer tilbage med Fortryd. Under {{ui:inspector.position}} har rotationspunktet sit eget X, Y og Z, som du kan taste eller skubbe, og {{ui:inspector.pivotRemove}} fjerner det. Du kan også trække rotationspunktets røde markør med musen: den glider hen over formernes overflade og snapper til hjørner, kantmidtpunkter og kanter, så en hængseltap lander præcis på et hjørne. Med flere former valgt er rotationspunktet kun for den markering, og en ny markering fjerner det. Grupperer eller bundter du dem, bevares det: gruppen får drejepunktet som sit eget, med X, Y og Z under {{ui:inspector.position}}.
 
 ## Læg fladt på en flade
 
@@ -112,8 +112,9 @@ Til udluftninger, højttalergitre, kurve og kabinetter spreder {{ui:holePattern.
 2. I vinduet sæt du hvordan hullerne ser ud og ligger:
    - **{{ui:holePattern.form}}:** {{ui:holePattern.form.round}}, {{ui:holePattern.form.square}}, {{ui:holePattern.form.rectangle}}, {{ui:holePattern.form.hexagon}} eller {{ui:holePattern.form.slot}}.
    - **Størrelse:** {{ui:holePattern.size.diameter}} for et rundt hul, {{ui:holePattern.size.side}} for et firkantet, {{ui:holePattern.size.width}} og {{ui:holePattern.size.height}} for et rektangel og en slids. For hexagon er størrelsen {{ui:holePattern.size.corners}}.
-   - **{{ui:holePattern.spacing}}:** afstanden fra ét huls midte til det næste. Hvis den er mindre end hullerne tillader, hæver layerling den til den mindst mulige værdi så en væg bliver mellem hullerne.
-   - **{{ui:holePattern.wall}}:** den samme afstand sagt på en anden måde: væggen mellem to nabohuller, det er vægtykkelsen i printet. Sæt den og afstanden center-til-center følger, og omvendt. For hexagons, rektangler og slidser måler layerling den korteste afstand mellem deres kanter.
+   - **{{ui:holePattern.spacing}}:** afstanden fra ét huls midte til det næste. Hvis den er mindre end hullerne tillader, hæver layerling den til den mindst mulige værdi så en væg bliver mellem hullerne. For rektangler og slidser tæller den langs rækken, fra venstre mod højre.
+   - **{{ui:holePattern.rowSpacing}}:** kun rektangler og slidser: afstanden fra én række til den næste. Så står smalle, høje huller tæt ved siden af hinanden, mens rækkerne holder afstand. Et hul 2 mm bredt og 14 mm højt har brug for 4 mm langs rækken og 16 mm fra række til række med en 2 mm væg.
+   - **{{ui:holePattern.wall}}:** den samme afstand sagt på en anden måde: væggen mellem to nabohuller, det er vægtykkelsen i printet. Sæt den og afstanden center-til-center følger (for rektangler og slidser rækkeafstanden også), og omvendt. For hexagons, rektangler og slidser måler layerling den korteste afstand mellem deres kanter.
    - **{{ui:holePattern.arrangement}}:** {{ui:holePattern.arrangement.grid}} lægger hullerne i rækker og kolonner. {{ui:holePattern.arrangement.staggered}} skubber hver anden række en halv afstand og rykker rækkerne tættere, så hvert hul har naboer i samme afstand - med hexagons bliver det en bikube.
    - **{{ui:holePattern.margin}}:** den fri afstand mellem hullerne og kanten af fladen. Kun huller der ligger helt inden for fladen minus denne margin laves; alt der ville nå ud over den udelades. Marginen holder også omkring åbninger i fladen.
    - **{{ui:holePattern.depth}}:** {{ui:holePattern.depth.through}} (standard) skærer gennem hele væggen. Med {{ui:holePattern.depth.custom}} giver du dybden i millimeter, for forsænkninger for eksempel.

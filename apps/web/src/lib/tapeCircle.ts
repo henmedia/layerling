@@ -120,3 +120,16 @@ export function axisLockedPoint(from: THREE.Vector3, target: THREE.Vector3, plan
   return bestPoint ?? target.clone();
 }
 
+
+/**
+ * How far the body at one end of a measurement moves when a length is typed for it: along the
+ * measured line until the two points are `length` apart (#823). A negative length takes that end
+ * past the other point by as much, for a hole inside a box measured from the box's edge (#963).
+ * Null when the points lie on top of each other and give no direction.
+ */
+export function tapeLengthShift(start: THREE.Vector3, end: THREE.Vector3, length: number, movesEnd: boolean) {
+  const current = start.distanceTo(end);
+  if (current < 1e-6) return null;
+  const shift = end.clone().sub(start).multiplyScalar((length - current) / current);
+  return movesEnd ? shift : shift.negate();
+}

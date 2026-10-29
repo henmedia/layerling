@@ -1,7 +1,7 @@
 import { textNeedsJapanese, textNeedsJapaneseLevel2 } from "@/lib/japaneseText";
 import { SURFACE_TEXTURE_MAX_TEXT_POINTS } from "@/lib/surfaceTexture";
 import { loadJapaneseLevel2, loadJapaneseTypeface, loadTextFonts, textFont } from "@/lib/textFonts";
-import { displayTextOf, textLayoutFont } from "@/lib/textGeometry";
+import { straightTextShapes } from "@/lib/textGeometry";
 
 /** The built-in fonts, as a text shape offers them; fonts of one's own come by their id. */
 export const SURFACE_TEXT_FONTS = ["Multilanguage", "Sans", "Serif", "Script", "Monospace", "Rounded", "Stencil", "Japanese"];
@@ -15,7 +15,7 @@ const LAYOUT_SIZE = 100;
  * numbers [x0, y0, x1, y1, ...], inside by the even-odd rule; empty when there is nothing to write. Fonts live on the
  * main thread: the outlines are made here and go to the worker with the settings.
  */
-export async function surfaceTextOutline({ content, font, size }: { content: string; font: string; size: number }): Promise<number[][]> {
+export async function surfaceTextOutline({ content, font, size, vertical = false }: { content: string; font: string; size: number; vertical?: boolean }): Promise<number[][]> {
   const words = content.trim();
   if (!words) return [];
   await loadTextFonts();
@@ -26,7 +26,8 @@ export async function surfaceTextOutline({ content, font, size }: { content: str
   // Stencil is drawn with straight segments, as the text shape draws it.
   const segments = font === "Stencil" ? 1 : 6;
   const raw: number[][] = [];
-  textLayoutFont(shape).generateShapes(displayTextOf(shape), LAYOUT_SIZE).forEach((glyph) => {
+  // Vertical letters (#981) are stacked as a text shape stacks them.
+  straightTextShapes({ ...shape, textVertical: vertical }, LAYOUT_SIZE).forEach((glyph) => {
     const sampled = glyph.extractPoints(segments);
     [sampled.shape, ...sampled.holes].forEach((points) => {
       if (points.length >= 3) raw.push(points.flatMap((point) => [point.x, point.y]));

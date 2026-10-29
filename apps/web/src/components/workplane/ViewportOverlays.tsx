@@ -22,6 +22,7 @@ import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
 import type { MeasurementAccuracy, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { NOTE_TEXT_LIMIT } from "@/lib/workplaneNotes";
 import { measurementMiddle } from "@/lib/referencePoints";
+import type { MoveDimensionLift } from "@/lib/moveDimensionLines";
 import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeLabelSize } from "@/lib/tapeLabels";
 
 /** Light-blue chrome for origin-distance lines, matching `.origin-dimension-value`. */
@@ -123,6 +124,10 @@ export type MoveDimensionSession = {
   deltaX: number;
   deltaZ: number;
   items: Array<Pick<DragItem, "id" | "startX" | "startZ">>;
+  /** Set while lifting with the arrow (#979): the way up or down, and where each body's centre started. */
+  lift?: MoveDimensionLift & {
+    items: Array<{ id: string; centerX: number; centerY: number; centerZ: number; height: number }>;
+  };
 };
 
 /** Breite einer offenen Notizkarte samt Nadel und Abstand, in Bildpunkten. */
@@ -298,15 +303,17 @@ export function syncMoveDimensionWorldLines(
   theme: ResolvedAppTheme,
 ) {
   const layer = state.moveDimensionLayer;
+  const lift = session?.lift;
   const signature = session
-    ? [session.originX, session.originZ, session.planeY, session.deltaX, session.deltaZ, theme].join(":")
+    ? [session.originX, session.originZ, session.planeY, session.deltaX, session.deltaZ, theme,
+        lift ? [lift.start.x, lift.start.y, lift.start.z, lift.axis.x, lift.axis.y, lift.axis.z, lift.delta].join(",") : ""].join(":")
     : "";
   if (layer.userData.moveDimensionSignature === signature) {
     return;
   }
   layer.userData.moveDimensionSignature = signature;
   disposeChildren(layer);
-  if (!session || (Math.abs(session.deltaX) < 1e-9 && Math.abs(session.deltaZ) < 1e-9)) {
+  if (!session || (Math.abs(session.deltaX) < 1e-9 && Math.abs(session.deltaZ) < 1e-9 && Math.abs(lift?.delta ?? 0) < 1e-9)) {
     state.needsRender = true;
     return;
   }
@@ -337,19 +344,22 @@ export function syncMoveDimensionWorldLines(
     setObjectRenderLayer(lines, RENDER_LAYER_HELPERS);
     layer.add(lines);
   };
-  const addArrow = (endpoint: THREE.Vector3, axisX: number, axisZ: number, movement: number) => {
-    const direction = new THREE.Vector3(axisX * Math.sign(movement), 0, axisZ * Math.sign(movement));
+  const addArrow = (endpoint: THREE.Vector3, axisX: number, axisZ: number, movement: number, axisY = 0) => {
+    const direction = new THREE.Vector3(axisX, axisY, axisZ).multiplyScalar(Math.sign(movement));
     const arrowLength = Math.min(1.1, Math.max(0.26, Math.abs(movement) * 0.5));
     const arrowWidth = arrowLength * 0.72;
     const base = endpoint.clone().addScaledVector(direction, -arrowLength);
-    const perpendicular = new THREE.Vector3(-direction.z, 0, direction.x).multiplyScalar(arrowWidth / 2);
+    // Flat on the workplane, or for the lift facing the camera, so the head is seen full.
+    const perpendicular = (axisY !== 0
+      ? direction.clone().cross(state.camera.getWorldDirection(new THREE.Vector3())).normalize()
+      : new THREE.Vector3(-direction.z, 0, direction.x)).multiplyScalar(arrowWidth / 2);
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute(
       "position",
       new THREE.Float32BufferAttribute([
         endpoint.x, endpoint.y, endpoint.z,
-        base.x + perpendicular.x, base.y, base.z + perpendicular.z,
-        base.x - perpendicular.x, base.y, base.z - perpendicular.z,
+        base.x + perpendicular.x, base.y + perpendicular.y, base.z + perpendicular.z,
+        base.x - perpendicular.x, base.y - perpendicular.y, base.z - perpendicular.z,
       ], 3),
     );
     const arrow = new THREE.Mesh(geometry, sharedOverlayArrowMaterial(solidColor));
@@ -372,6 +382,14 @@ export function syncMoveDimensionWorldLines(
     addSegment(solidPoints, start, zEnd);
     addSegment(guidePoints, zEnd, current);
     addArrow(zEnd, 0, 1, session.deltaZ);
+  }
+  if (lift && Math.abs(lift.delta) >= 1e-9) {
+    const axis = new THREE.Vector3(lift.axis.x, lift.axis.y, lift.axis.z);
+    const liftStart = new THREE.Vector3(lift.start.x, lift.start.y, lift.start.z);
+    const liftEnd = liftStart.clone().addScaledVector(axis, lift.delta);
+    const overrun = Math.min(2, Math.max(0.5, Math.abs(lift.delta) * 0.15));
+    addSegment(solidPoints, liftStart.clone().addScaledVector(axis, -Math.sign(lift.delta) * overrun), liftEnd);
+    addArrow(liftEnd, axis.x, axis.z, lift.delta, axis.y);
   }
 
   addWideSegments(solidPoints, solidColor, 1.45, 1, 1001);
@@ -2027,7 +2045,10 @@ function importedShapeProjectionBounds(
   yAxis: THREE.Vector3,
   zAxis: THREE.Vector3,
 ) {
-  if (!shape.importedMesh?.positions.length) {
+  // A body wrapped round a cylinder keeps the cylinder as its box, the same one the properties show and the
+  // alignment centres; its points cover only an arc and an engraving reaches a hair past it, so measuring
+  // them showed 92.30 by 91.72 for a 92.2 mm wrap, and typing 92.2 changed nothing (#987).
+  if (!shape.importedMesh?.positions.length || shape.cylinderWrap) {
     return null;
   }
 

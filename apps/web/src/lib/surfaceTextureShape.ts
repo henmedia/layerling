@@ -32,6 +32,8 @@ import {
   type SurfaceTextureSettings,
   type SurfaceTextureStats,
   type SurfaceTextureTiling,
+  type SurfaceTextureCapEdge,
+  type SurfaceTextureCapStyle,
 } from "@/lib/surfaceTexture";
 import { canonicalizeShape, cleanNearZero, isNonSolidShapeKind } from "@/lib/workplaneShapes";
 import type { EdgeTreatmentHistoryEntry, ShapeKind, WorkplaneShape } from "@/types/layerling";
@@ -69,6 +71,9 @@ export const SURFACE_TEXTURE_LABELS: {
   crackStart: Record<SurfaceTextureCrackStart, MessageKey>;
   image: Record<SurfaceTextureImage, MessageKey>;
   tiling: Record<SurfaceTextureTiling, MessageKey>;
+  capStyle: Record<SurfaceTextureCapStyle, MessageKey>;
+  capEdge: Record<SurfaceTextureCapEdge, MessageKey>;
+  capEdgeHint: Record<SurfaceTextureCapEdge, MessageKey>;
 } = {
   pattern: {
     grooves: "surfaceTexture.grooves",
@@ -109,6 +114,9 @@ export const SURFACE_TEXTURE_LABELS: {
     own: "surfaceTexture.imageOwn",
   },
   tiling: { repeat: "surfaceTexture.tilingRepeat", mirror: "surfaceTexture.tilingMirror", staggered: "surfaceTexture.tilingStaggered" },
+  capStyle: { auto: "surfaceTexture.capAuto", rows: "surfaceTexture.capRows", rings: "surfaceTexture.capRings" },
+  capEdge: { auto: "surfaceTexture.edgeAuto", sharp: "surfaceTexture.edgeSharp", over: "surfaceTexture.edgeOver", fold: "surfaceTexture.edgeFold", bead: "surfaceTexture.edgeBead" },
+  capEdgeHint: { auto: "surfaceTexture.edgeAutoHint", sharp: "surfaceTexture.edgeSharpHint", over: "surfaceTexture.edgeOverHint", fold: "surfaceTexture.edgeFoldHint", bead: "surfaceTexture.edgeBeadHint" },
 };
 
 /** The pattern's name in the current language. */

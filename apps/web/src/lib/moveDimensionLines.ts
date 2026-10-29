@@ -1,6 +1,12 @@
 import { formatLengthMm } from "@/lib/measurementUnits";
 
-export type MoveDimensionAxis = "x" | "z";
+/** "lift" is the way up or down along the lift arrow (#979), shown as Z. */
+export type MoveDimensionAxis = "x" | "z" | "lift";
+
+/** The axis name the user sees: inside z is Y, counting towards the back (#182), and up is Z. */
+export function moveDimensionAxisName(axis: MoveDimensionAxis) {
+  return axis === "lift" ? "Z" : axis === "z" ? "Y" : "X";
+}
 
 export type MoveDimensionScreenPoint = {
   x: number;
@@ -40,12 +46,21 @@ type MoveDimensionWorldPoint = {
   z: number;
 };
 
+/** A lift with the arrow: from `start`, `delta` along `axis`; `side` is a point the label keeps away from. */
+export type MoveDimensionLift = {
+  start: MoveDimensionWorldPoint;
+  axis: MoveDimensionWorldPoint;
+  delta: number;
+  side: MoveDimensionWorldPoint;
+};
+
 type CreateMoveDimensionOverlayOptions = {
   originX: number;
   originZ: number;
   planeY: number;
   deltaX: number;
   deltaZ: number;
+  lift?: MoveDimensionLift | null;
   accuracy: number;
   width: number;
   height: number;
@@ -108,17 +123,50 @@ export function createMoveDimensionOverlay({
   accuracy,
   width,
   height,
+  lift,
   project,
 }: CreateMoveDimensionOverlayOptions): MoveDimensionOverlayData | null {
   const zeroThreshold = 0.5 * 10 ** -accuracy;
-  if (Math.abs(deltaX) < zeroThreshold && Math.abs(deltaZ) < zeroThreshold) {
-    return null;
-  }
-
   const safeScreenPoint = (point: MoveDimensionScreenPoint) => ({
     x: Number.isFinite(point.x) ? point.x : width / 2,
     y: Number.isFinite(point.y) ? point.y : height / 2,
   });
+
+  if (lift) {
+    if (Math.abs(lift.delta) < zeroThreshold) {
+      return null;
+    }
+    const origin = safeScreenPoint(project(lift.start));
+    const endpoint = safeScreenPoint(project({
+      x: lift.start.x + lift.axis.x * lift.delta,
+      y: lift.start.y + lift.axis.y * lift.delta,
+      z: lift.start.z + lift.axis.z * lift.delta,
+    }));
+    // The label sits on the side away from the body, so it does not cover what was lifted.
+    const label = dimensionLabelPosition(origin, endpoint, safeScreenPoint(project(lift.side)), true, width, height);
+    const start = dimensionLineStart(origin, endpoint);
+    return {
+      width,
+      height,
+      lines: [{
+        axis: "lift",
+        value: lift.delta,
+        label: formatMoveDimension(lift.delta, accuracy),
+        x1: start.x,
+        y1: start.y,
+        x2: endpoint.x,
+        y2: endpoint.y,
+        labelX: label.x,
+        labelY: label.y,
+      }],
+      guides: [],
+    };
+  }
+
+  if (Math.abs(deltaX) < zeroThreshold && Math.abs(deltaZ) < zeroThreshold) {
+    return null;
+  }
+
   const origin = safeScreenPoint(project({ x: originX, y: planeY, z: originZ }));
   const xEndpoint = safeScreenPoint(project({ x: originX + deltaX, y: planeY, z: originZ }));
   const zEndpoint = safeScreenPoint(project({ x: originX, y: planeY, z: originZ + deltaZ }));

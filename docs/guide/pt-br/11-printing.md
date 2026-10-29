@@ -25,7 +25,7 @@ Um sólido que passa da borda da mesa de impressão fica marcado. Uma mensagem d
 
 O aviso não impede você de continuar trabalhando. É uma dica, para você não descobrir só no fatiador que a peça é grande demais. Uma peça grande demais muitas vezes pode ser dividida: corte-a em duas com {{ui:editor.tool.split}} e imprima as duas metades separadamente.
 
-Se você deixa peças ao lado da mesa de propósito, clique no pequeno X da mensagem. O aviso some então para exatamente esses sólidos. Se um deles voltar a caber e depois você o tirar de novo, ou se outro sólido passar da borda, a mensagem volta. Sólidos ocultos nunca contam, então ocultar as peças deixadas ao lado também funciona.
+Se você deixa peças ao lado da mesa de propósito, clique no pequeno X da mensagem. O aviso então some só para esses sólidos. Se um deles voltar a caber e depois você o tirar da mesa de novo, ou se outro sólido passar da borda, a mensagem volta. Sólidos ocultos nunca contam, então ocultar as peças deixadas ao lado também funciona.
 
 ## Deitando a peça do jeito certo
 

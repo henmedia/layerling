@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 import type { ThreadHand, ThreadHead, ThreadProfile, ThreadRole } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import type { MessageKey } from "@/lib/messages.en";

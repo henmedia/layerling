@@ -3,7 +3,7 @@ import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { ShapeInspector } from "@/components/workplane/ShapeInspector";
-import { normalizeSurfaceTexture, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
+import { normalizeSurfaceTexture, type SurfaceTextureFace, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { surfaceTexturedShape, surfaceTextureInput, textureSurfacePositions } from "@/lib/surfaceTextureShape";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
@@ -37,15 +37,18 @@ const cylinder = canonicalizeShape({
   size: 30, width: 30, depth: 30, height: 20, rotation: 0,
 });
 
-type Calls = { applied: SurfaceTextureSettings[]; removed: number; updates: Array<Partial<WorkplaneShape>> };
+type Calls = { applied: SurfaceTextureSettings[]; removed: number; updates: Array<Partial<WorkplaneShape>>; picks: Array<SurfaceTextureFace[] | null> };
 
-/** The settings panel for this shape, with the surface texture card open as the editor holds it. */
+/**
+ * The settings panel for this shape, with the surface texture card open as the editor holds it. `render` draws it again
+ * with the editor's face picking as given.
+ */
 function mount(shape: WorkplaneShape) {
-  const calls: Calls = { applied: [], removed: 0, updates: [] };
+  const calls: Calls = { applied: [], removed: 0, updates: [], picks: [] };
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
-  act(() => {
+  const render = (picking: { surfaceFacePicking?: boolean; surfacePickedFaces?: SurfaceTextureFace[] | null } = {}) => act(() => {
     root!.render(createElement(ShapeInspector, {
       shape,
       snap: DEFAULT_SNAP_GRID,
@@ -62,9 +65,14 @@ function mount(shape: WorkplaneShape) {
       },
       surfaceTextureOpen: true,
       onSurfaceTextureOpenChange: () => {},
+      onSurfaceFacePick: (faces: SurfaceTextureFace[] | null) => {
+        calls.picks.push(faces);
+      },
+      ...picking,
     }));
   });
-  return { panel: container, calls };
+  render();
+  return { panel: container, calls, render };
 }
 
 const card = (panel: HTMLElement) => panel.querySelector<HTMLElement>("[id^=surface-texture-]")!;
@@ -123,6 +131,31 @@ describe("the surface texture card in a shape's settings", () => {
     expect(calls.applied[0]).toMatchObject({ pattern: "grooves", spacing: 4, depth: 0.5 });
     act(() => button(panel, "Remove texture")!.click());
     expect(calls.removed).toBe(1);
+  });
+
+  it("picks faces in the view: the editor gets the clicks, the card the faces, and only they get the pattern", async () => {
+    const { panel, calls, render } = mount(cylinder);
+    expect(card(panel).textContent).toContain("The pattern goes on every face.");
+    act(() => button(panel, "Pick faces")!.click());
+    expect(calls.picks).toEqual([[]]);
+    // A click on the top in the view comes back from the editor as the faces picked so far.
+    const top: SurfaceTextureFace = { at: [0.5, 1, 0.5], normal: [0, 1, 0] };
+    render({ surfaceFacePicking: true, surfacePickedFaces: [top] });
+    expect(card(panel).textContent).toContain("Picked faces: 1. Only they get the pattern.");
+    expect(button(panel, "Done picking")).toBeDefined();
+    // Picked faces say where it goes: the smooth top and bottom and the height band leave the card.
+    act(() => button(panel, "More")!.click());
+    expect(rangeNamed(panel, "Top smooth to (°)")).toBeUndefined();
+    expect(rangeNamed(panel, "Fade in over")).toBeDefined();
+    await act(async () => button(panel, "Apply texture")!.click());
+    expect(calls.picks.at(-1)).toBeNull();
+    expect(calls.applied[0].faces).toEqual([top]);
+    // Every face again: none picked, and picking starts over from none.
+    render({ surfaceFacePicking: true, surfacePickedFaces: [top] });
+    act(() => button(panel, "Every face again")!.click());
+    expect(calls.picks.at(-1)).toEqual([]);
+    render({ surfaceFacePicking: false, surfacePickedFaces: null });
+    expect(card(panel).textContent).toContain("The pattern goes on every face.");
   });
 
   it("lets a box be a texture mask, which turns it transparent", () => {

@@ -77,7 +77,7 @@ Vytvořit dutinu lze i v tělese s kapsou, tedy kvádru se slepým otvorem vznik
 
 **Tělesa zakončená špičkou**, například kužel nebo rotační těleso z trojúhelníku, nemají nahoře rovinnou plochu, kterou by šlo otevřít. Nefunguje ani zcela uzavřená dutina, protože špičku nelze rovnoměrně odsadit dovnitř. I při stěně 1 mm se proto může zobrazit hlášení o příliš silné stěně. V takovém případě vytvořte stěnu už v profilu před rotací: obrys zkopírujte, kopii rovnoměrně zmenšete a vystřeďte v původním obrysu, odečtěte ji a výsledek otočte kolem osy. Viz kapitola Náčrty, část o rotaci. Odstup mezi obrysy určuje tloušťku stěny.
 
-Při pozdější změně velikosti se dutina ihned přepočítá. Zadaná tloušťka stěn zůstává zachovaná i u oblých těles. Válec protažený v jednom směru více než v druhém se změní na elipsu.
+Při pozdější změně velikosti se dutina ihned přepočítá. Zadaná tloušťka stěn zůstává zachovaná i u oblých těles. Válec protažený v jednom směru více než v druhém se změní na elipsu. Zaoblení a sražení, která jste přidali po vytvoření dutiny, se pak znovu použijí na stejné hrany.
 
 > **Tip:** Pro trysku 0,4 mm je vhodným výchozím rozsahem stěna 1,2 až 2 mm: šetří materiál a přitom poskytuje dostatečně pevný díl.
 

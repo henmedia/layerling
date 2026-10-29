@@ -125,6 +125,57 @@ export function dimensionMarkScreenPush(
   return { x: dx * scale, y: dy * scale };
 }
 
+/**
+ * Largest screen distance between a measured edge and its dimension label.
+ *
+ * The same fixed world offset grows without bound as you zoom in: on a part
+ * below a millimetre that fills the view, the label landed many screen widths
+ * away and you had to zoom out to read it (#989).
+ */
+export const DIMENSION_LABEL_MAX_SCREEN_OFFSET = 120;
+
+/**
+ * Whether a dimension mark has to be laid out in screen space: its label lands
+ * further than `maxOffset` from the edge, or one of its world offset points lies
+ * behind the camera, where the projection flips it back across the body.
+ */
+export function dimensionMarkNeedsScreenLayout(
+  edgeMidpoint: TransformOverlayPoint,
+  labelPoint: TransformOverlayPoint,
+  offsetPointsVisible: boolean,
+  maxOffset = DIMENSION_LABEL_MAX_SCREEN_OFFSET,
+) {
+  const distance = Math.hypot(labelPoint.x - edgeMidpoint.x, labelPoint.y - edgeMidpoint.y);
+  return !offsetPointsVisible || !Number.isFinite(distance) || distance > maxOffset;
+}
+
+/**
+ * Lays a dimension mark out along a screen direction, with the label exactly
+ * `maxOffset` from the edge and rail and extension lines at the same ratios as
+ * their world offsets, so it looks like the world-placed mark, only closer.
+ */
+export function screenSpaceDimensionMark(
+  from: TransformOverlayPoint,
+  to: TransformOverlayPoint,
+  edgeMidpoint: TransformOverlayPoint,
+  direction: TransformOverlayPoint,
+  offsets: { rail: number; overrun: number; label: number },
+  maxOffset = DIMENSION_LABEL_MAX_SCREEN_OFFSET,
+) {
+  const pixelsPerUnit = maxOffset / (offsets.rail + offsets.label);
+  const along = (point: TransformOverlayPoint, distance: number) => ({
+    x: point.x + direction.x * distance * pixelsPerUnit,
+    y: point.y + direction.y * distance * pixelsPerUnit,
+  });
+  return {
+    railFrom: along(from, offsets.rail),
+    railTo: along(to, offsets.rail),
+    extensionFrom: along(from, offsets.rail + offsets.overrun),
+    extensionTo: along(to, offsets.rail + offsets.overrun),
+    labelPoint: along(edgeMidpoint, offsets.rail + offsets.label),
+  };
+}
+
 type RotationDirectionVector = { x: number; y: number; z: number };
 
 export function rotationPlaneDirectionSign(

@@ -17,7 +17,7 @@ The tape measure sits at the lower end of the camera bar on the left edge ({{ui:
 4. **{{ui:camera.tapeWholeEdges}}:** A click on an edge measures all of it, the length of a circle for example. With this switched off, a click puts a point on the edge instead, and the second point goes anywhere, so you can measure the diameter or any other distance. [[Alt]] turns the switch round for one click. On a circle, the point across from the first one snaps in when the pointer comes near, and the points sit on the true circle, so the diameter comes out exact.
 5. **{{ui:camera.deleteAllMeasurements}}:** Removes every measurement at once. Because this cannot be undone, layerling asks first; with no measurements there is nothing to do.
 6. **{{ui:camera.tapeMarkMiddle}}:** In the middle of every measurement sits a small round mark, its lower half filled. It puts a [reference point](#reference-points) in the middle of the measurement: after a click on a round edge, such as the rim of a hole, in the centre of that circle - on an imported mesh too, where nothing else marks the middle of a hole - and for a diameter or any straight measurement halfway along it. A shape you drag then snaps to the point with its centre. A point that is there already is not made twice. The tape measure snaps to a reference point like to a corner, so you can measure from the centre of a circle or from the middle of a line: mark it, then click the point.
-7. **{{ui:camera.tapeTypeLength}}:** When at least one end of a straight measurement sits on a body, its number can be clicked. Type a new length and press [[Enter]]: the body at the second point moves along the measured line until the distance is exactly that, as with the ruler in Tinkercad. If only the body at the first point is selected, that one moves instead. The measuring points stay on the body, so the measurement follows. Measure from a corner, an edge or a [reference point](#reference-points), such as the centre of a circle, to place parts at an exact distance.
+7. **{{ui:camera.tapeTypeLength}}:** When at least one end of a straight measurement sits on a body, its number can be clicked. Type a new length and press [[Enter]]: the body at the second point moves along the measured line until the distance is exactly that, as with the ruler in Tinkercad. If only the body at the first point is selected, that one moves instead. The measuring points stay on the body, so the measurement follows. Measure from a corner, an edge or a [reference point](#reference-points), such as the centre of a circle, to place parts at an exact distance. A negative length takes it that far past the first point, say 5 mm inside the edge of a box.
 
 [[Esc]] leaves measuring mode.
 
@@ -50,10 +50,12 @@ Both the tape measure and the framing square stay where they are while you sketc
 
 In the settings under {{ui:workspace.appearance}} there are two switches for live dimensions:
 
-- {{ui:workspace.showMoveDimensions}} shows by how much you move while dragging.
+- {{ui:workspace.showMoveDimensions}} shows by how much you move while dragging. That includes lifting with the black arrow above a body; the way up or down shows at its front corner. Once you let go, click such a number and type the exact distance; a minus goes down.
 - {{ui:workspace.showOriginDimensions}} shows the distances of the selection to the origin of the plate, also with several selected bodies.
 
 With {{ui:workspace.dimensionsAlwaysVisible}} the dimensions stay visible permanently.
+
+For a moment without them, press [[Q]]: the sizes and distances around the selection disappear, so a part you move is easy to see. [[Q]] again brings them back. A handle you point at still shows its size.
 
 ## Notes
 
@@ -72,7 +74,7 @@ Notes are saved in the design, appear in no export and can be shown or hidden wi
 
 ## Reference points
 
-A reference point is a bare mark in space, like a pencil mark or a layout point in a workshop: it belongs to no body, is never printed, and other things snap to it. Right-click a body and choose {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} or {{ui:contextMenu.markMidpoints}}: the points appear on the top face of the body (of the whole selection, if you selected several). {{ui:contextMenu.markFaceCenter}} puts one in the middle of the flat face you right-clicked instead, on a side or an end, say.
+A reference point is a bare mark in space, like a pencil mark or a layout point in a workshop: it belongs to no body, is never printed, and other things snap to it. Right-click a body and choose {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} or {{ui:contextMenu.markMidpoints}}: the points appear on the top face of the body (of the whole selection, if you selected several). {{ui:contextMenu.markFaceCenter}} puts one in the middle of the flat face you right-clicked instead, on a side or an end, say. With a pivot set, {{ui:contextMenu.markPivot}} puts one exactly on it, so another part's centre snaps to the point the selection turns about.
 
 - Drag a point to move it: it snaps to the corners, the middles of the edges and faces of bodies, to their real corners and to other points; hold [[Alt]] to let it go free. Or click it to see its coordinates and type new ones; they use the unit you set. Each card can be dragged away by its title if it covers something, on its own: the others stay where they are, and a double-click on the title puts it back. The card you touched last stands in front of the others. **Delete all** in a card, or **Delete all reference points** in the right-click menu (of a body, or of an empty spot of the 3D view), deletes every point at once. {{ui:common.delete}} removes it.
 - The tape measure can mark a point too: {{ui:camera.tapeMarkMiddle}}, the half-filled mark in the middle of a measurement, puts one in its middle, in the centre of a round hole for example. And it measures from a point: the tape snaps to reference points like to corners.

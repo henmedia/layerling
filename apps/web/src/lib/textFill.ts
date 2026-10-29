@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { CrossSection, ManifoldToplevel } from "manifold-3d";
-import { mergeGeometries, toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 import { extrudeOutline, type OutlinePoint } from "@/lib/gearGeometry";
 import { normalizeTextEdge, textEdgeLevels, textHasEdge } from "@/lib/textEdge";
 import { loftedTextEdge } from "@/lib/textEdgeLoft";

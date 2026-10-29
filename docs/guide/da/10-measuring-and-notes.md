@@ -19,7 +19,7 @@ Målebåndet sidder for neden i kamerabjælken ved venstre kant ({{ui:camera.tap
 4. **{{ui:camera.tapeWholeEdges}}:** Et klik på en kant måler hele den, længden af en cirkel for eksempel. Med denne slået fra sætter et klik et punkt på kanten i stedet, og det andet punkt kan være hvor som helst, så du kan måle diameteren eller enhver anden afstand. [[Alt]] bytter om for ét klik. På en cirkel snapper punktet overfor til når markøren kommer nær, og punkterne sidder på den sande cirkel, så diameteren kommer nøjagtig ud.
 5. **{{ui:camera.deleteAllMeasurements}}:** Fjerner hvert mål på én gang. Da det ikke kan fortrydes, spørger layerling først; uden mål er der intet at gøre.
 6. **{{ui:camera.tapeMarkMiddle}}:** Midt på hvert mål sidder et lille rundt mærke med den nederste halvdel udfyldt. Den sætter et [referencepunkt](#referencepunkter) midt i målet: efter et klik på en rund kant, såsom kanten af et hul, i midten af den cirkel - også på et importeret mesh, hvor intet andet markerer midten af et hul - og for en diameter eller et hvilket som helst lige mål halvvejs langs det. En form du trækker snapper så til punktet med sit centrum. Et punkt der allerede er der laves ikke to gange.
-7. **{{ui:camera.tapeTypeLength}}:** Når mindst én ende af en lige måling sidder på et legeme, kan tallet klikkes. Skriv en ny længde og tryk [[Enter]]: legemet ved det andet punkt flyttes langs den målte linje, til afstanden er præcis den, som med linealen i Tinkercad. Er kun legemet ved det første punkt valgt, flyttes det i stedet. Målepunkterne bliver på legemet, så målingen følger med. Mål fra et hjørne, en kant eller et [referencepunkt](#referencepunkter), fx midten af en cirkel, for at placere dele i en præcis afstand.
+7. **{{ui:camera.tapeTypeLength}}:** Når mindst én ende af en lige måling sidder på et legeme, kan tallet klikkes. Skriv en ny længde og tryk [[Enter]]: legemet ved det andet punkt flyttes langs den målte linje, til afstanden er præcis den, som med linealen i Tinkercad. Er kun legemet ved det første punkt valgt, flyttes det i stedet. Målepunkterne bliver på legemet, så målingen følger med. Mål fra et hjørne, en kant eller et [referencepunkt](#referencepunkter), fx midten af en cirkel, for at placere dele i en præcis afstand. En negativ længde flytter det så langt forbi det første punkt, for eksempel 5 mm inden for kanten af en kasse.
    Målebåndet snapper til et referencepunkt som til et hjørne, så du kan måle fra centrum af en cirkel eller fra midten af en linje: markér punktet, og klik så på det.
 
 [[Esc]] forlader måletilstand.
@@ -54,10 +54,12 @@ Både målebåndet og vinkelmåleren bliver hvor de er mens du skitser og kommer
 
 Under {{ui:workspace.appearance}} i indstillingerne er der to kontakter for levende dimensioner:
 
-- {{ui:workspace.showMoveDimensions}} viser hvor meget du flytter mens du trækker.
+- {{ui:workspace.showMoveDimensions}} viser hvor meget du flytter mens du trækker. Det gælder også, når du løfter med den sorte pil over et legeme; vejen måles op langs dets forreste hjørne. Når du har sluppet, klikker du på sådan et tal og skriver den nøjagtige afstand; minus går ned.
 - {{ui:workspace.showOriginDimensions}} viser afstandene fra markeringen til pladens nulpunkt, også med flere valgte former.
 
 Med {{ui:workspace.dimensionsAlwaysVisible}} bliver dimensionerne permanent synlige.
+
+Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring markeringen forsvinder, så en del du flytter er nem at se. [[Q]] igen henter dem tilbage. Et håndtag du peger på viser stadig sit mål.
 
 ## Noter
 
@@ -76,7 +78,7 @@ Noter gemmes i designet, optræder i ingen eksport og kan vises eller skjules me
 
 ## Referencepunkter
 
-Et referencepunkt er et bart mærke i rummet, som en blyantsmarkering eller et layout-punkt i et værksted: det hører til ingen form, printes aldrig, og andre ting snapper til det. Højreklik en form og vælg {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} eller {{ui:contextMenu.markMidpoints}}: punkterne dukker op på formens øverste flade (af hele markeringen, hvis du valgte flere). {{ui:contextMenu.markFaceCenter}} sætter i stedet ét i midten af den flade du højreklikkede på, for eksempel på en side eller en ende.
+Et referencepunkt er et bart mærke i rummet, som en blyantsmarkering eller et layout-punkt i et værksted: det hører til ingen form, printes aldrig, og andre ting snapper til det. Højreklik en form og vælg {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} eller {{ui:contextMenu.markMidpoints}}: punkterne dukker op på formens øverste flade (af hele markeringen, hvis du valgte flere). {{ui:contextMenu.markFaceCenter}} sætter i stedet ét i midten af den flade du højreklikkede på, for eksempel på en side eller en ende. Er der sat et drejepunkt, sætter {{ui:contextMenu.markPivot}} et punkt præcis på det, så midten af en anden del fanges i det punkt, markeringen drejer om.
 
 - Træk et punkt for at flytte det, eller klik det for at se dets koordinater og taste nye; de bruger den enhed du har sat. Kortet kan trækkes væk i dets titellinje hvis det dækker noget, og et dobbeltklik på titellinjen sætter det tilbage. {{ui:common.delete}} fjerner det.
   Hvert kort kan trækkes væk alene, så de andre kort bliver hvor de er. Det kort du rørte sidst ligger foran de andre. **Slet alle** i et kort, eller **Slet alle referencepunkter** i højreklikmenuen (på en form eller på et tomt sted i 3D-visningen), sletter alle punkter på én gang.

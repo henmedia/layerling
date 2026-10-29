@@ -68,6 +68,8 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_boolean_cut` | snijdt lichamen met gaten |
 | `layerling_intersect_objects` | houdt alleen over wat de objecten gemeen hebben (doorsnijding) |
 | `layerling_hull_objects` | verpakt de objecten in één bol lichaam, alsof ze gekrompen zijn in folie (omhulsel) |
+| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | splitst een vorm in zijn losse delen, een schetslichaam in één lichaam per omtrek |
 | `layerling_split_objects` | snijdt lichamen of gaten met een vlak in tweeën |
 | `layerling_list_edges` | somt de echte CAD-randen van een object op |
@@ -99,7 +101,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_delete_custom_shape` | verwijdert een eigen vorm; ingevoegde lichamen blijven staan |
 | `layerling_show_workplane` | verbergt en toont de plaat met zijn raster, bijvoorbeeld voor een afbeelding van de onderkant (alleen de weergave) |
 | `layerling_set_section_view` | snijdt de weergave open langs een vlak om naar binnen te kijken (alleen de weergave, er wordt niets doorgesneden) |
-| `layerling_measurements` | toont of verbergt de metingen van het meetlint en somt ze op met hun lengtes |
+| `layerling_measurements` | toont of verbergt de metingen van het meetlint en somt ze op met hun lengtes, en verbergt of toont de maten rond de selectie zoals [[Q]] |
 | `layerling_saved_view` | slaat de huidige weergave op onder de toets 7, 8, 9 of 0 en gaat ernaar terug, zoals Shift+toets en de toets (alleen de weergave); stelt ook de startweergave van nieuwe ontwerpen in |
 | `layerling_clear_history` | verwijdert definitief elke stap voor ongedaan maken, zoals de knop "Geschiedenis verwijderen" van de geschiedenisweergave; vereist `confirm: true` |
 | `layerling_set_history_view` | kijkt terug naar een eerdere toestand van het project, zoals de geschiedenisweergave (het echte ontwerp blijft onaangeroerd; gereedschappen die iets wijzigen wachten tot hij gesloten is) |

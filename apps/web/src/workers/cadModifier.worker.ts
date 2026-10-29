@@ -585,10 +585,25 @@ function joinedShellSolids(cad: OcctKernel, sewn: ShapeHandle) {
   return cad.getSubShapes(joined, "solid").length > 0 && cadShapeIsValid(cad, joined) ? joined : null;
 }
 
-function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
-  const solids = parts.filter((part) => !part.hole).map((part) => reconstructSolid(cad, part));
-  const holes = parts.filter((part) => part.hole).map((part) => reconstructSolid(cad, part));
-  if (solids.length === 0) throw new Error("The group has no solid body to modify");
+/**
+ * The solids and holes of one level of the group, the parts of the groups inside it that mix solids and holes
+ * first built on their own (#996): such a group's holes cut only its own solids, not the neighbours it was
+ * grouped with afterwards.
+ */
+function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number): ShapeHandle | null {
+  const here = parts.filter((part) => (part.scope?.length ?? 0) === depth);
+  const inner = new Map<number, CadModifierMeshPart[]>();
+  for (const part of parts) {
+    if ((part.scope?.length ?? 0) <= depth) continue;
+    const key = (part.scope as number[])[depth];
+    inner.set(key, [...(inner.get(key) ?? []), part]);
+  }
+  const solids = [
+    ...here.filter((part) => !part.hole).map((part) => reconstructSolid(cad, part)),
+    ...[...inner.values()].flatMap((nested) => combinedScope(cad, nested, depth + 1) ?? []),
+  ];
+  const holes = here.filter((part) => part.hole).map((part) => reconstructSolid(cad, part));
+  if (solids.length === 0) return null;
   let result = solids[0];
   for (let index = 1; index < solids.length; index += 1) {
     result = cad.fuse(result, solids[index]);
@@ -598,7 +613,13 @@ function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
   for (const hole of holes) {
     result = tidiedIfValid(cad, fuzzyCut(cad, result, hole), cadShapeIsValid);
   }
-  const combined = result;
+  return result;
+}
+
+function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
+  const combined = combinedScope(cad, parts, 0);
+  if (combined === null) throw new Error("The group has no solid body to modify");
+  let result: ShapeHandle;
   // The repair runs on a copy: ShapeFix also rewrites the sub-shapes it
   // shares with its input, so a body it breaks would be broken for the
   // fallback below as well.

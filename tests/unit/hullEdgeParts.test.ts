@@ -16,8 +16,8 @@ const group = (groupOperation?: WorkplaneShape["groupOperation"]): WorkplaneShap
 
 describe("which bodies the edge tools get from a group (#908)", () => {
   it("keeps a hull and an intersection whole", () => {
-    expect(restoreGroupedChildrenForEdges(group("hull")).map((shape) => shape.id)).toEqual(["g"]);
-    expect(restoreGroupedChildrenForEdges(group("intersection")).map((shape) => shape.id)).toEqual(["g"]);
+    expect(restoreGroupedChildrenForEdges(group("hull")).map((part) => part.shape.id)).toEqual(["g"]);
+    expect(restoreGroupedChildrenForEdges(group("intersection")).map((part) => part.shape.id)).toEqual(["g"]);
   });
 
   it("still opens an ordinary group into its parts", () => {

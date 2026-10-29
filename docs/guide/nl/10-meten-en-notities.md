@@ -17,7 +17,7 @@ Het meetlint zit aan de onderkant van de camerabalk aan de linkerrand ({{ui:came
 4. **{{ui:camera.tapeWholeEdges}}:** Een klik op een rand meet de hele rand, bij een cirkel bijvoorbeeld de omtrek. Staat dit uit, dan zet een klik in plaats daarvan een punt op de rand, en het tweede punt mag overal liggen, zodat je de diameter of een andere afstand kunt meten. [[Alt]] draait de schakelaar voor één klik om. Op een cirkel klikt het punt tegenover het eerste vast zodra de aanwijzer in de buurt komt, en de punten liggen op de echte cirkel, zodat de diameter precies klopt.
 5. **{{ui:camera.deleteAllMeasurements}}:** Verwijdert alle metingen in één keer. Omdat dit niet ongedaan kan worden gemaakt, vraagt layerling het eerst; zijn er geen metingen, dan is er niets te doen.
 6. **{{ui:camera.tapeMarkMiddle}}:** In het midden van elke meting zit een klein rond merkteken, de onderste helft gevuld. Het zet een [referentiepunt](#referentiepunten) in het midden van de meting: na een klik op een ronde rand, zoals de rand van een gat, in het middelpunt van die cirkel - ook bij een geïmporteerd net, waar anders niets het midden van een gat markeert - en bij een diameter of elke rechte meting halverwege. Een vorm die je sleept snapt dan met zijn midden op het punt. Een punt dat er al is, wordt niet dubbel gemaakt. Het meetlint klikt vast aan een referentiepunt zoals aan een hoek: zo meet je vanaf het middelpunt van een cirkel of vanaf het midden van een lijn - punt zetten, dan aanklikken.
-7. **{{ui:camera.tapeTypeLength}}:** Ligt minstens één uiteinde van een rechte meting op een lichaam, dan is het getal aan te klikken. Typ een nieuwe lengte en druk op [[Enter]]: het lichaam bij het tweede punt schuift langs de gemeten lijn tot de afstand precies zo groot is, zoals met de liniaal in Tinkercad. Is alleen het lichaam bij het eerste punt geselecteerd, dan schuift dat. De meetpunten blijven op het lichaam, dus de meting gaat mee. Meet vanaf een hoek, een rand of een [referentiepunt](#referentiepunten), zoals het midden van een cirkel, om onderdelen op een exacte afstand te zetten.
+7. **{{ui:camera.tapeTypeLength}}:** Ligt minstens één uiteinde van een rechte meting op een lichaam, dan is het getal aan te klikken. Typ een nieuwe lengte en druk op [[Enter]]: het lichaam bij het tweede punt schuift langs de gemeten lijn tot de afstand precies zo groot is, zoals met de liniaal in Tinkercad. Is alleen het lichaam bij het eerste punt geselecteerd, dan schuift dat. De meetpunten blijven op het lichaam, dus de meting gaat mee. Meet vanaf een hoek, een rand of een [referentiepunt](#referentiepunten), zoals het midden van een cirkel, om onderdelen op een exacte afstand te zetten. Een negatieve lengte schuift het zo ver voorbij het eerste punt, bijvoorbeeld 5 mm binnen de rand van een doos.
 
 [[Esc]] verlaat de meetmodus.
 
@@ -48,10 +48,12 @@ Zowel het meetlint als de winkelhaak blijven staan terwijl je schetst en terugke
 
 In de instellingen onder {{ui:workspace.appearance}} staan twee schakelaars voor live maten:
 
-- {{ui:workspace.showMoveDimensions}} toont hoeveel je verplaatst tijdens het slepen.
+- {{ui:workspace.showMoveDimensions}} toont hoeveel je verplaatst tijdens het slepen. Dat geldt ook bij het optillen met de zwarte pijl boven een lichaam; de afstand staat dan bij de voorste hoek. Na het loslaten klik je op zo'n getal en typ je de precieze afstand; een min gaat omlaag.
 - {{ui:workspace.showOriginDimensions}} toont de afstanden van de selectie tot de oorsprong van de plaat, ook bij meerdere geselecteerde lichamen.
 
 Met {{ui:workspace.dimensionsAlwaysVisible}} blijven de maten altijd zichtbaar.
+
+Zitten ze even in de weg, druk dan op [[Q]]: de maten en afstanden rond de selectie verdwijnen, zodat een deel dat je verschuift goed te zien is. Nog eens [[Q]] haalt ze terug. Een greep waar je naar wijst, toont zijn maat toch.
 
 ## Notities
 
@@ -70,7 +72,7 @@ Notities worden in het ontwerp opgeslagen, komen in geen enkele export terecht e
 
 ## Referentiepunten
 
-Een referentiepunt is een kaal merkteken in de ruimte, zoals een potloodstreep of een aftekenpunt in een werkplaats: het hoort bij geen enkel lichaam, wordt nooit geprint, en andere dingen klikken eraan vast. Klik met rechts op een lichaam en kies {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} of {{ui:contextMenu.markMidpoints}}: de punten verschijnen op het bovenvlak van het lichaam (van de hele selectie, als je er meerdere hebt geselecteerd). {{ui:contextMenu.markFaceCenter}} zet er in plaats daarvan een in het midden van het vlakke vlak waarop je rechtsklikte, bijvoorbeeld aan een zijkant of een uiteinde.
+Een referentiepunt is een kaal merkteken in de ruimte, zoals een potloodstreep of een aftekenpunt in een werkplaats: het hoort bij geen enkel lichaam, wordt nooit geprint, en andere dingen klikken eraan vast. Klik met rechts op een lichaam en kies {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} of {{ui:contextMenu.markMidpoints}}: de punten verschijnen op het bovenvlak van het lichaam (van de hele selectie, als je er meerdere hebt geselecteerd). {{ui:contextMenu.markFaceCenter}} zet er in plaats daarvan een in het midden van het vlakke vlak waarop je rechtsklikte, bijvoorbeeld aan een zijkant of een uiteinde. Is er een draaipunt gezet, dan zet {{ui:contextMenu.markPivot}} er precies een op, zodat het midden van een ander onderdeel vastklikt op het punt waar de selectie om draait.
 
 - Sleep een punt om het te verplaatsen, of klik erop om de coördinaten te zien en nieuwe te typen; ze gebruiken de eenheid die je hebt ingesteld. Elke kaart kun je aan zijn titel wegslepen als die iets bedekt, en wel afzonderlijk: de andere blijven waar ze zijn, en een dubbelklik op de titel zet hem terug. De kaart die je het laatst hebt aangeraakt, ligt voor de andere. **Alles verwijderen** in een kaart, of in het rechtsklikmenu, verwijdert alle punten in één keer. {{ui:common.delete}} verwijdert het punt.
 - Het meetlint kan ook een punt zetten: {{ui:camera.tapeMarkMiddle}}, het half gevulde merkteken in het midden van een meting, zet er een in het midden, bijvoorbeeld in het middelpunt van een rond gat. En het meet vanaf een punt: het meetlint klikt vast aan referentiepunten zoals aan hoeken.

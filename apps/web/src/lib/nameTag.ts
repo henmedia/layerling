@@ -1,4 +1,4 @@
-import { curvedTextPatch, DEFAULT_TEXT_SIZE, displayTextOf, MAX_TEXT_SPACING, MIN_TEXT_SPACING, textBoxAroundLetters, textFitScale, textLayoutFont, textLetterBox, textLetterOffset, textSpacingOf } from "@/lib/textGeometry";
+import { curvedTextPatch, DEFAULT_TEXT_SIZE, displayTextOf, straightTextShapes, MAX_TEXT_SPACING, MIN_TEXT_SPACING, textBoxAroundLetters, textFitScale, textLayoutFont, textLetterBox, textLetterOffset, textSpacingOf } from "@/lib/textGeometry";
 import { customFontRevision, ensureJapaneseGlyphs, textFont } from "@/lib/textFonts";
 import { DEFAULT_TEXT_LAYERS, MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, type TextLayer, type textLayersOf } from "@/lib/textLayers";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -66,14 +66,15 @@ const measuresCache = new Map<string, { width: number; depth: number; cap: numbe
  */
 function layoutMeasures(shape: WorkplaneShape) {
   const fontName = shape.font ?? "Multilanguage";
-  const key = JSON.stringify([wordsOf(shape), fontName, customFontRevision(shape.font), textSpacingOf(shape)]);
+  const key = JSON.stringify([wordsOf(shape), fontName, customFontRevision(shape.font), textSpacingOf(shape), Boolean(shape.textVertical)]);
   const cached = measuresCache.get(key);
   if (cached) return cached;
   // The spacing between the letters (#594) is part of the line, so it is part of its measure.
   const font = textLayoutFont(shape);
   const extent = (words: string) => {
     const box = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity };
-    font.generateShapes(words, LAYOUT_SIZE).forEach((glyph) => {
+    // Vertical text (#981) is measured stacked, as it is drawn.
+    (shape.textVertical ? straightTextShapes({ ...shape, text: words }, LAYOUT_SIZE) : font.generateShapes(words, LAYOUT_SIZE)).forEach((glyph) => {
       const sampled = glyph.extractPoints(curveSegmentsOf(fontName));
       [sampled.shape, ...sampled.holes].forEach((points) => points.forEach((point) => {
         box.minX = Math.min(box.minX, point.x);
@@ -144,6 +145,8 @@ function textBaselineZ(shape: WorkplaneShape): number {
  */
 export function textBaselineKeepShift(before: WorkplaneShape, after: WorkplaneShape): { x: number; z: number } | null {
   if (before.kind !== "text" || after.kind !== "text" || before.textCurved || after.textCurved || before.textStretch || after.textStretch) return null;
+  // Vertical text has no baseline to keep: its letters hang from the top.
+  if (before.textVertical || after.textVertical) return null;
   if (before.rotationX || before.rotationZ) return null;
   const along = textBaselineZ(before) - textBaselineZ(after);
   if (!Number.isFinite(along) || Math.abs(along) < 1e-6) return null;

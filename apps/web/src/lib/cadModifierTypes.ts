@@ -358,6 +358,11 @@ export type CadModifierMeshPart = {
   /** When set, positions/indices (if any) are only the fallback if the exact body fails. */
   profile?: CadModifierProfilePart;
   hole: boolean;
+  /**
+   * The groups inside the treated group that this part sits in, where such a group mixes solids and holes: its
+   * holes cut only the solids with the same scope (#996). Missing or empty for the treated group's own level.
+   */
+  scope?: number[];
 };
 
 export type CadModifierComponentMesh = {

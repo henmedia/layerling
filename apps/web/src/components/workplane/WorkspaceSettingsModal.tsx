@@ -1,6 +1,7 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
 import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -85,6 +86,14 @@ import { selectWholeValue } from "@/lib/numberField";
 
 type WorkspaceSettings = WorkplaneWorkspaceSettings;
 type WorkspaceSettingsSection = "appearance" | "measurement" | "workplane" | "shapes" | "history";
+// The question mark of each tab opens that tab's own part of the guide.
+const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
+  appearance: "settingsAppearance",
+  measurement: "settingsMeasurement",
+  workplane: "settingsWorkplane",
+  shapes: "shapeSettings",
+  history: "backingUp",
+};
 
 const MIN_WORKSPACE_SIZE = 60;
 const MAX_WORKSPACE_SIZE = 5000;
@@ -697,7 +706,7 @@ export function WorkspaceSettingsModal({
         <header className="workspace-modal-header movable" title={t("panel.moveHint")} {...movable.handleProps}>
           <strong>{t("workspace.title")}</strong>
           <div className="panel-header-actions">
-            <GuideHelpLink section={activeSection === "history" ? "backingUp" : activeSection === "shapes" ? "shapeSettings" : "gridAndSnapping"} />
+            <GuideHelpLink section={SETTINGS_HELP_SECTION[activeSection]} />
             <button aria-label={t("workspace.close")} onClick={onClose}>
               <X size={18} />
             </button>

@@ -4,6 +4,7 @@ import { normalizeScaleForUnits } from "@/lib/measurementUnits";
 import { DEFAULT_IMPERIAL_GRID_BLOCK_PRESET, DEFAULT_METRIC_GRID_BLOCK_PRESET, DEFAULT_EDGE_LINE_COLOR, DEFAULT_LIGHT_AZIMUTH, DEFAULT_LIGHT_ELEVATION, DEFAULT_SKETCH_BACKGROUND, DEFAULT_SKETCH_GRID_COLOR, DEFAULT_SKETCH_PLATE_COLOR, DEFAULT_WORKPLANE_BACKGROUND, DEFAULT_WORKPLANE_GRID_COLOR, DEFAULT_WORKPLANE_SURFACE_COLOR, inchGridPresetMm } from "@/lib/workplaneGrid";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { normalizeHexColor } from "@/lib/coloredImport";
+import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO } from "@/lib/torusShape";
 
 export const DEFAULT_SNAP_GRID: GridSize = "1.0 mm";
 export const BRICK_SNAP_STEP = 8;
@@ -201,6 +202,34 @@ export function snapGridOptions(units: string, customGrids: CustomSnapGrid[] = [
 }
 
 /**
+ * The snap step a key picks from the snap menu (#748): Alt+1 to Alt+9 and Alt+0 take that entry of the
+ * menu, so Alt+1 turns snapping off; comma and period step one entry finer or coarser. Off counts as finer than
+ * the finest step: comma goes there from the finest step, period leaves it for the finest step.
+ * The digit comes from the key's position, since Option+digit types a sign on the Mac. Null when the key
+ * picks nothing or the step would stay the same.
+ */
+export function snapGridForShortcut(
+  event: Pick<KeyboardEvent, "key" | "code" | "altKey" | "ctrlKey" | "metaKey" | "shiftKey">,
+  options: GridSize[],
+  current: GridSize,
+): GridSize | null {
+  if (event.ctrlKey || event.metaKey || event.shiftKey) return null;
+  let next: GridSize | undefined;
+  const digit = /^Digit(\d)$/.exec(event.code);
+  if (event.altKey) {
+    if (!digit) return null;
+    next = options[(Number(digit[1]) + 9) % 10];
+  } else if ((event.key === "," || event.key === ".") && event.code !== "NumpadDecimal") {
+    const steps: GridSize[] = options.filter((size) => size !== "Off");
+    const index = steps.indexOf(current);
+    if (index < 0) next = event.key === "." ? steps[0] : undefined;
+    else if (index === 0 && event.key === "," && options.includes("Off")) next = "Off";
+    else next = steps[index + (event.key === "." ? 1 : -1)];
+  }
+  return next && next !== current ? next : null;
+}
+
+/**
  * What a custom snap step is called in a menu: "½ × MX Key Unit". A step whose
  * measure is no longer in the list keeps working and shows its millimetres.
  */
@@ -331,6 +360,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
     }
     if (kind === "torus") {
       entry.sides = optionalShapeNumber(source.sides, fallbackEntry?.sides, 12, MAX_HIGH_RESOLUTION_SIDES, true);
+      entry.torusTubeRatio = optionalShapeNumber(source.torusTubeRatio, fallbackEntry?.torusTubeRatio, TORUS_MIN_TUBE_RATIO, TORUS_MAX_TUBE_RATIO);
     }
     if (kind === "cylinder" || kind === "ellipse" || kind === "slot" || kind === "cone" || kind === "tube" || kind === "ring" || kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "teardrop") {
       entry.sides = optionalShapeNumber(source.sides, fallbackEntry?.sides, 3, MAX_HIGH_RESOLUTION_SIDES, true);

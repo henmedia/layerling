@@ -124,6 +124,19 @@ export function withSmoothSketchHandles(profile: SketchProfile, onlyPointIds?: R
 }
 
 /**
+ * After a point was deleted: lays the handles again only of its former neighbours that sit on a smooth
+ * curve. Every other point keeps its handles - handles dragged by hand elsewhere in the outline used to be
+ * laid anew too, and the whole curve changed far from the deleted point (forum, 621213).
+ */
+export function withSmoothHandlesAfterRemoval(before: SketchProfile, after: SketchProfile, removedId: string) {
+  const neighbours = new Set(before.segments.flatMap((segment) =>
+    segment.startId === removedId ? [segment.endId] : segment.endId === removedId ? [segment.startId] : []));
+  const onSmoothCurve = new Set(after.segments.flatMap((segment) => segment.kind === "smooth" ? [segment.startId, segment.endId] : []));
+  const ids = new Set([...neighbours].filter((id) => onSmoothCurve.has(id)));
+  return ids.size ? withSmoothSketchHandles(after, ids) : after;
+}
+
+/**
  * A curved segment is drawn only when both of its ends have the handle that faces it (the start's
  * out handle, the end's in handle). Gives each curved segment among `segmentIds` the ones it lacks,
  * a third of the way along the segment, so it first looks straight and the handles can be dragged.

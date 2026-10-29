@@ -36,11 +36,12 @@ import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { positionsForTwist, twistBandCount } from "@/lib/heightSlices";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 import { DEFAULT_EDGE_LINE_COLOR } from "@/lib/workplaneGrid";
 import { deformsAboutOrigin, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, resizedImportedCoordinates, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeSupportsTaper, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { torusTessellation } from "@/lib/torusTessellation";
+import { torusRadii, torusTubeRatio } from "@/lib/torusShape";
 import type { WorkplaneShape } from "@/types/layerling";
 import { OVERHANG_PLATE_TOLERANCE, overhangDownwardLimit } from "@/lib/overhangLimits";
 import type { CadModifierEdge } from "@/lib/cadModifierTypes";
@@ -127,6 +128,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     radius: shape.radius,
     steps: shape.steps,
     sides: shape.sides,
+    torusTubeRatio: shape.torusTubeRatio,
     bevel: shape.bevel,
     segments: shape.segments,
     topRadius: shape.topRadius,
@@ -294,6 +296,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     textStroke: shape.textStroke,
     textSilhouette: shape.textSilhouette,
     textStretch: shape.textStretch,
+    textVertical: shape.textVertical,
     textSpacing: shape.textSpacing,
     textKeyring: shape.textKeyring,
     textEdge: shape.textEdge,
@@ -449,6 +452,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     radius: shape.radius,
     steps: shape.steps,
     sides: shape.sides,
+    torusTubeRatio: shape.torusTubeRatio,
     bevel: shape.bevel,
     segments: shape.segments,
     topRadius: shape.topRadius,
@@ -616,6 +620,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     textStroke: shape.textStroke,
     textSilhouette: shape.textSilhouette,
     textStretch: shape.textStretch,
+    textVertical: shape.textVertical,
     textSpacing: shape.textSpacing,
     textKeyring: shape.textKeyring,
     textEdge: shape.textEdge,
@@ -2538,14 +2543,12 @@ export function createWedgeGeometry(width: number, height: number, depth: number
   return geometry.toNonIndexed();
 }
 
-export function createTorusGeometry(width: number, height: number, depth: number, shape: Pick<WorkplaneShape, "sides" | "steps">) {
-  const tubeRadius = Math.max(0.1, height / 2);
-  const majorRadius = Math.max(0.2, Math.min(width, depth) / 2 - tubeRadius);
+export function createTorusGeometry(width: number, height: number, depth: number, shape: Pick<WorkplaneShape, "sides" | "steps" | "torusTubeRatio">) {
+  const { tubeRadius, majorRadius, outerDiameter, verticalScale } = torusRadii(width, depth, height, torusTubeRatio({ ...shape, width, depth, height }));
   const { ringSides, tubeSteps } = torusTessellation(shape, width, depth, height);
   const geometry = new THREE.TorusGeometry(majorRadius, tubeRadius, tubeSteps, ringSides);
   geometry.rotateX(Math.PI / 2);
-  const outerDiameter = (majorRadius + tubeRadius) * 2;
-  geometry.scale(width / outerDiameter, 1, depth / outerDiameter);
+  geometry.scale(width / outerDiameter, verticalScale, depth / outerDiameter);
   return geometry.toNonIndexed();
 }
 

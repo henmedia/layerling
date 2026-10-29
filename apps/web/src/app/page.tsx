@@ -2273,47 +2273,57 @@ export default function Home() {
     }
   }, [projects, refreshSharedProjects, removeWorkingCopies]);
 
-  // Every design of this browser as its own .lyl, together in one ZIP, and
-  // the custom shapes of this browser in a folder beside them.
-  const backupAllProjects = useCallback(async () => {
+  // Designs of this browser, each as its own .lyl, together in one ZIP. "Back up all" takes every design
+  // and the custom shapes of this browser in a folder beside them; the chosen designs or one folder (#991)
+  // go without the shapes. Empty folders go along when all or a folder is backed up.
+  const backupProjects = useCallback(async (scope: { designIds: string[] } | { folderId: string } | null) => {
     // The browser's own designs: a design of the server kept here while open is the server's to back up.
-    const shapeEntries = await customShapesBackupEntries().catch(() => []);
+    const inFolder = (folderId: string, id: string | null | undefined) => folderTrail(designFolders, folderOfDesign(designFolders, id)).some((folder) => folder.id === folderId);
+    const designs = !scope
+      ? localDesigns
+      : "designIds" in scope
+        ? localDesigns.filter((project) => scope.designIds.includes(project.id))
+        : localDesigns.filter((project) => inFolder(scope.folderId, project.folderId));
+    const shapeEntries = scope ? [] : await customShapesBackupEntries().catch(() => []);
     const shapeCount = Math.max(0, shapeEntries.length - 1);
-    if (localDesigns.length === 0 && shapeCount === 0) {
+    if (designs.length === 0 && shapeCount === 0) {
       setDashboardNotice(t("notice.backupEmpty"));
       return;
     }
     try {
       // A design in a folder goes into the ZIP in that folder, so a restore puts it back there (#496).
-      const names = backupEntryPaths(localDesigns.map((project) => ({ name: project.name, folder: folderPathNames(designFolders, project.folderId) })), t("dashboard.backupFallbackName"));
+      const names = backupEntryPaths(designs.map((project) => ({ name: project.name, folder: folderPathNames(designFolders, project.folderId) })), t("dashboard.backupFallbackName"));
       // Each design goes into the file as it comes and is let go, instead of all of them and then the whole ZIP once
       // more in memory, where large designs made Safari reload the page without a word (#887).
       const writer = createBackupWriter();
       const skipped: string[] = [];
-      for (let index = 0; index < localDesigns.length; index += 1) {
-        setDashboardNotice(t("notice.backingUp", { index: index + 1, total: localDesigns.length }));
+      for (let index = 0; index < designs.length; index += 1) {
+        setDashboardNotice(t("notice.backingUp", { index: index + 1, total: designs.length }));
         // Noted before the design is read, so a page that is gone in the middle can say afterwards where it stopped.
-        writeBackupProgress({ index: index + 1, total: localDesigns.length, name: localDesigns[index].name });
+        writeBackupProgress({ index: index + 1, total: designs.length, name: designs[index].name });
         try {
-          writer.add(names[index], await projectPackageBytes(localDesigns[index]));
+          writer.add(names[index], await projectPackageBytes(designs[index]));
         } catch (error) {
           // One design that cannot be read does not cost the backup of the others; the message names it.
-          skipped.push(`${localDesigns[index].name} (${error instanceof Error ? localizedError(error.message) : String(error)})`);
+          skipped.push(`${designs[index].name} (${error instanceof Error ? localizedError(error.message) : String(error)})`);
           continue;
         }
         // The card picture goes along, so a restore shows it at once.
-        const thumbnail = await projectThumbnailPngBytes(localDesigns[index].thumbnailUrl).catch(() => null);
+        const thumbnail = await projectThumbnailPngBytes(designs[index].thumbnailUrl).catch(() => null);
         if (thumbnail) writer.add(backupThumbnailPath(names[index]), thumbnail);
       }
       shapeEntries.forEach((entry) => writer.add(entry.name, entry.bytes));
       // Folders with no design anywhere inside them go along as empty folders.
-      const holding = new Set(localDesigns.flatMap((project) => folderTrail(designFolders, folderOfDesign(designFolders, project.folderId)).map((folder) => folder.id)));
-      const emptyFolders = designFolders.filter((folder) => !holding.has(folder.id) && !designFolders.some((other) => other.parentId === folder.id));
+      const holding = new Set(designs.flatMap((project) => folderTrail(designFolders, folderOfDesign(designFolders, project.folderId)).map((folder) => folder.id)));
+      const foldersAlong = !scope ? designFolders : "folderId" in scope ? designFolders.filter((folder) => inFolder(scope.folderId, folder.id)) : [];
+      const emptyFolders = foldersAlong.filter((folder) => !holding.has(folder.id) && !designFolders.some((other) => other.parentId === folder.id));
       backupFolderPaths(emptyFolders.map((folder) => folderPathNames(designFolders, folder.id))).forEach((name) => writer.add(name, new Uint8Array()));
-      const fileName = backupFileName(new Date());
+      // A folder's backup is named after it, so several of them stay apart in the downloads.
+      const folder = scope && "folderId" in scope ? designFolders.find((entry) => entry.id === scope.folderId) : undefined;
+      const fileName = backupFileName(new Date(), folder ? `layerling-${folder.name.replace(/[\\/:*?"<>|\s]+/g, "-")}` : undefined);
       downloadBackup(writer.finish(), fileName);
       writeBackupProgress(null);
-      const saved = localDesigns.length - skipped.length;
+      const saved = designs.length - skipped.length;
       const done = shapeCount
         ? t("notice.backupDoneWithShapes", { count: saved, shapes: shapeCount, name: fileName })
         : t("notice.backupDone", { count: saved, name: fileName });
@@ -2323,6 +2333,7 @@ export default function Home() {
       setDashboardNotice(t("notice.backupFailed", { reason: error instanceof Error ? localizedError(error.message) : String(error) }));
     }
   }, [designFolders, localDesigns]);
+  const backupAllProjects = useCallback(() => backupProjects(null), [backupProjects]);
 
   // Every design of the server, in its folders, and its custom shapes, as the same kind of ZIP:
   // "Restore backup" brings it back, on this computer or another.
@@ -2879,6 +2890,8 @@ export default function Home() {
           onDuplicateSharedProject={(project) => void duplicateSharedProject(project)}
           onImportFile={() => void pickDashboardImport()}
           onBackupAll={() => void backupAllProjects()}
+          onBackupProjects={(designIds) => void backupProjects({ designIds })}
+          onBackupFolder={(folderId) => void backupProjects({ folderId })}
           onBackupAllServer={() => void backupAllServerDesigns()}
           onRestoreBackup={() => backupRestoreInputRef.current?.click()}
           openingSharedKey={openingSharedKey}
@@ -3096,6 +3109,8 @@ function Dashboard({
   onDuplicateSharedProject,
   onImportFile,
   onBackupAll,
+  onBackupProjects,
+  onBackupFolder,
   onBackupAllServer,
   onRestoreBackup,
   openingSharedKey = null,
@@ -3158,6 +3173,8 @@ function Dashboard({
   onDuplicateSharedProject: (project: SharedProject) => void;
   onImportFile: () => void;
   onBackupAll: () => void;
+  onBackupProjects: (designIds: string[]) => void;
+  onBackupFolder: (folderId: string) => void;
   onBackupAllServer: () => void;
   onRestoreBackup: () => void;
   openingSharedKey?: string | null;
@@ -3298,6 +3315,16 @@ function Dashboard({
       <strong role="status">{t("dashboard.selectedCount", { count: selectedCount })}</strong>
       <button type="button" onClick={() => setSelectedKeys(new Set(selectableKeys))}>{t("dashboard.selectAll")}</button>
       <button type="button" disabled={selectedCount === 0} onClick={() => setSelectedKeys(new Set())}>{t("dashboard.selectNone")}</button>
+      {activeSection === "shared" ? null : (
+        <button
+          type="button"
+          disabled={selectedCount === 0}
+          title={t("dashboard.backupSelectedTitle")}
+          onClick={() => onBackupProjects(selectedLocal.map((project) => project.id))}
+        >
+          {t("dashboard.backupSelected")}
+        </button>
+      )}
       <button className="delete" type="button" disabled={selectedCount === 0} onClick={() => setSelectionDeletePending(true)}>{t("common.delete")}</button>
       <button type="button" onClick={endSelecting}>{t("dashboard.selectDone")}</button>
     </div>
@@ -4094,6 +4121,18 @@ function Dashboard({
                                 >
                                   <Pencil size={16} />
                                   <span>{t("common.rename")}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  title={t("dashboard.backupFolderTitle")}
+                                  onClick={() => {
+                                    setOpenLocalFolderMenuId(null);
+                                    onBackupFolder(folder.id);
+                                  }}
+                                >
+                                  <Archive size={16} />
+                                  <span>{t("dashboard.backupSelected")}</span>
                                 </button>
                                 <button
                                   className="delete"

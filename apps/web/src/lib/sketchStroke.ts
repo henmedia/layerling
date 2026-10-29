@@ -31,12 +31,29 @@ export function normalizeSketchStroke(value: unknown): SketchStroke | undefined 
   const candidate = value as Partial<SketchStroke>;
   const width = Number(candidate.width);
   if (!Number.isFinite(width) || width <= 0) return undefined;
+  const edge = Number(candidate.edge);
   return {
     width: Math.max(MIN_SKETCH_STROKE_WIDTH, Math.min(MAX_SKETCH_STROKE_WIDTH, width)),
     align: SKETCH_STROKE_ALIGNS.includes(candidate.align as SketchStrokeAlign) ? candidate.align as SketchStrokeAlign : DEFAULT_SKETCH_STROKE.align,
     join: SKETCH_STROKE_JOINS.includes(candidate.join as SketchStrokeJoin) ? candidate.join as SketchStrokeJoin : DEFAULT_SKETCH_STROKE.join,
     cap: SKETCH_STROKE_CAPS.includes(candidate.cap as SketchStrokeCap) ? candidate.cap as SketchStrokeCap : DEFAULT_SKETCH_STROKE.cap,
+    ...(Number.isFinite(edge) && edge > 0 ? { edge: Math.min(MAX_SKETCH_STROKE_WIDTH, edge) } : {}),
   };
+}
+
+/** The narrowest cutting edge, in mm: less is no flat top the kernel can still chamfer down to. */
+export const MIN_SKETCH_STROKE_EDGE = 0.1;
+
+/**
+ * How far the 45° chamfer of a cutting edge (#982) reaches in from each side of the wall's top, in mm, or 0 for a flat top:
+ * half of what the line is wider than its edge, and never more than most of the height. Only a wall has an edge -
+ * a line inside, outside or centred; a wider or narrower area does not.
+ */
+export function strokeEdgeChamfer(stroke: SketchStroke | undefined, height: number): number {
+  if (!stroke?.edge || !(stroke.align === "outside" || stroke.align === "inside" || stroke.align === "center")) return 0;
+  const edge = Math.max(MIN_SKETCH_STROKE_EDGE, stroke.edge);
+  if (edge >= stroke.width) return 0;
+  return Math.min((stroke.width - edge) / 2, height * 0.9);
 }
 
 /**

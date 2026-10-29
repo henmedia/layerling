@@ -1,9 +1,11 @@
 import * as THREE from "three";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { buildVase, printVolume, printWeight, vaseChecks, VASE_MODE_BOTTOM } from "@/lib/vase/vase-geometry.mjs";
+import { toCreasedNormals } from "@/lib/creasedNormals";
+import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
+import { printVolume, printWeight, vaseChecks, VASE_MODE_BOTTOM } from "@/lib/vase/vase-geometry.mjs";
 import { buildParts, layoutParts, meshBox, placePoint, type VasePart } from "@/lib/vase/vase-parts.mjs";
 import { t, type MessageKey } from "@/lib/i18n";
 import { createLocalId } from "@/lib/localIds";
+import { buildVaseBody, type VaseBody, type VaseBodyWorkerRequest, type VaseBodyWorkerResponse } from "@/lib/vaseBody";
 import { normalizeVaseSettings, vaseSettingsInFrame, type VaseSettings } from "@/lib/vaseSettings";
 import { canonicalizeShape, cleanNearZero, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -24,9 +26,6 @@ import type { WorkplaneShape } from "@/types/layerling";
  * Frame as the knurl's: centred on x and z, from y = 0 to the height.
  */
 
-/** The vase's body in the core's coordinates: one closed mesh, with legs moulded on when it has them. */
-type VaseBody = { vertices: Float64Array; indices: Uint32Array; triangleCount: number; notes: string[] };
-
 const builtCache = new Map<string, VaseBody>();
 
 /** The core's body for these settings; the last few are kept (the frame and the fitted mesh both ask). */
@@ -38,28 +37,83 @@ function buildVaseCached(settings: VaseSettings): VaseBody {
     builtCache.set(key, known);
     return known;
   }
-  const mesh = buildVase(settings);
-  let body: VaseBody = { vertices: mesh.vertices, indices: mesh.indices, triangleCount: mesh.triangleCount, notes: mesh.notes ?? [] };
-  if (settings.legMode === "angeformt") {
-    // Moulded legs are part of the vase's own object: built alone (the other parts are not needed here), joined on.
-    const legs = buildParts({ ...settings, saucerMode: "keine", insertMode: "keine", lidMode: "keiner" }).parts.filter((part) => part.merge);
-    body = legs.reduce((joined, part) => joinMeshes(joined, part.mesh), body);
-  }
+  return rememberVaseBody(key, buildVaseBody(settings));
+}
+
+function rememberVaseBody(key: string, body: VaseBody) {
   builtCache.set(key, body);
   while (builtCache.size > 3) builtCache.delete(builtCache.keys().next().value as string);
   return body;
 }
 
-/** Two closed meshes as one (the legs reach a little into the bottom; slicers join them). */
-function joinMeshes(a: VaseBody, b: { vertices: Float64Array; indices: Uint32Array }): VaseBody {
-  const vertices = new Float64Array(a.vertices.length + b.vertices.length);
-  vertices.set(a.vertices, 0);
-  vertices.set(b.vertices, a.vertices.length);
-  const offset = a.vertices.length / 3;
-  const indices = new Uint32Array(a.indices.length + b.indices.length);
-  indices.set(a.indices, 0);
-  for (let i = 0; i < b.indices.length; i += 1) indices[a.indices.length + i] = b.indices[i] + offset;
-  return { vertices, indices, triangleCount: indices.length / 3, notes: a.notes };
+let worker: Worker | null = null;
+let requestCounter = 0;
+const pending = new Map<number, { key: string; resolve: () => void; reject: (error: Error) => void }>();
+const latestForShape = new Map<string, number>();
+
+function ensureWorker() {
+  if (worker) return worker;
+  const next = new Worker(new URL("../workers/vaseBody.worker.ts", import.meta.url), { type: "module" });
+  next.onmessage = (event: MessageEvent<VaseBodyWorkerResponse>) => {
+    if (isBuildMessage(event.data)) {
+      reportWorkerBuild(event.data);
+      return;
+    }
+    const entry = pending.get(event.data.requestId);
+    if (!entry) return;
+    pending.delete(event.data.requestId);
+    if ("error" in event.data) {
+      entry.reject(new Error(event.data.error));
+      return;
+    }
+    rememberVaseBody(entry.key, event.data.body);
+    entry.resolve();
+  };
+  next.onerror = () => {
+    pending.forEach((entry) => entry.reject(new Error("The vase worker stopped")));
+    pending.clear();
+    next.terminate();
+    worker = null;
+  };
+  worker = next;
+  return next;
+}
+
+/**
+ * vaseShapePatch with the body built on a worker: a hollow vase with Voronoi cells took a fifth of a
+ * second to build, a fine one half a second, and the editor stood still while a setting changed. The
+ * patch comes once the body is there; for the same shape only the newest change is handed on, so
+ * clicking through the choices does not play them all back. Where no worker can run (tests), and for
+ * a body built before, it comes at once.
+ */
+export function vaseShapePatchOffThread(
+  shape: { id?: string; width: number; depth: number; height: number },
+  vase: VaseSettings,
+  apply: (patch: ReturnType<typeof vaseShapePatch>) => void,
+) {
+  const size = Math.max(shape.width, shape.depth);
+  const settings = vaseSettingsInFrame(vase, size, size, shape.height);
+  const key = JSON.stringify(settings);
+  const requestId = ++requestCounter;
+  const owner = shape.id ?? "";
+  latestForShape.set(owner, requestId);
+  if (builtCache.has(key) || typeof Worker === "undefined" || typeof window === "undefined") {
+    apply(vaseShapePatch(shape, vase));
+    return;
+  }
+  const handOn = () => {
+    if (latestForShape.get(owner) !== requestId) return;
+    latestForShape.delete(owner);
+    apply(vaseShapePatch(shape, vase));
+  };
+  pending.set(requestId, {
+    key,
+    resolve: handOn,
+    // The worker could not build it: build it here, as before there was one.
+    reject: handOn,
+  });
+  const request: VaseBodyWorkerRequest = { requestId, settings };
+  ensureWorker().postMessage(request);
 }
 
 /** How the core's coordinates map into the shape's frame: centred, scaled, z up turned into y up. */

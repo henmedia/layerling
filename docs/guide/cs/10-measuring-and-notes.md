@@ -17,7 +17,7 @@ Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. M�
 4. **{{ui:camera.tapeWholeEdges}}:** Kliknutí na hranu změří celou její délku, například obvod kružnice. Při vypnutí se na hranu umístí bod a druhý můžete zvolit kdekoliv. Změříte tak průměr i jiné vzdálenosti. [[Alt]] režim pro jedno kliknutí obrátí. Na kružnici se při přiblížení ukazatele přichytí bod protilehlý prvnímu. Body leží na skutečné kružnici, takže průměr vyjde přesně.
 5. **{{ui:camera.deleteAllMeasurements}}:** Odstraní všechna měření. Protože operaci nelze vrátit, program si vyžádá potvrzení. Bez měření nemá příkaz co odstranit.
 6. **{{ui:camera.tapeMarkMiddle}}:** Uprostřed každého měření je malá kulatá značka se spodní polovinou vyplněnou. Vytvoří [referenční bod](#referencni-body) ve středu měření. U kruhové hrany, například okraje otvoru, je to střed kružnice, a to i u importované sítě. U průměru nebo přímého měření vznikne bod v polovině úsečky. Přetahovaný tvar se na něj přichytí svým středem. Již existující bod se nevytváří znovu. Měřicí pásmo se k referenčním bodům přichytává stejně jako k rohům. Chcete-li měřit od středu kružnice nebo úsečky, nejprve jej označte a potom na bod klikněte.
-7. **{{ui:camera.tapeTypeLength}}:** Leží-li aspoň jeden konec přímého měření na tělese, lze na jeho číslo kliknout. Zadejte novou délku a stiskněte [[Enter]]: těleso u druhého bodu se posune podél změřené čáry, až je vzdálenost přesně taková, jako u pravítka v Tinkercadu. Je-li vybráno jen těleso u prvního bodu, posune se to. Měřicí body zůstávají na tělese, takže měření jde s ním. Měřte od rohu, hrany nebo [referenčního bodu](#referencni-body), například středu kružnice, a díly tak umístíte na přesnou vzdálenost.
+7. **{{ui:camera.tapeTypeLength}}:** Leží-li aspoň jeden konec přímého měření na tělese, lze na jeho číslo kliknout. Zadejte novou délku a stiskněte [[Enter]]: těleso u druhého bodu se posune podél změřené čáry, až je vzdálenost přesně taková, jako u pravítka v Tinkercadu. Je-li vybráno jen těleso u prvního bodu, posune se to. Měřicí body zůstávají na tělese, takže měření jde s ním. Měřte od rohu, hrany nebo [referenčního bodu](#referencni-body), například středu kružnice, a díly tak umístíte na přesnou vzdálenost. Záporná délka ho posune o tolik za první bod, třeba 5 mm dovnitř za hranu kvádru.
 
 [[Esc]] ukončí režim měření.
 
@@ -48,10 +48,12 @@ Měřicí nástroj i úhelník zůstávají na místě při přechodu do náčrt
 
 V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného kótování:
 
-- {{ui:workspace.showMoveDimensions}} zobrazuje posunutí během tažení.
+- {{ui:workspace.showMoveDimensions}} zobrazuje posunutí během tažení. Patří sem i zvedání černou šipkou nad tělesem, měřené podél jeho přední hrany. Po puštění klikni na takové číslo a napiš přesnou vzdálenost; záporná hodnota jde dolů.
 - {{ui:workspace.showOriginDimensions}} zobrazuje vzdálenosti výběru od počátku podložky, i při výběru více těles.
 
 {{ui:workspace.dimensionsAlwaysVisible}} ponechá rozměry zobrazené trvale.
+
+Když na chvíli překážejí, stiskněte [[Q]]: rozměry a vzdálenosti kolem výběru zmizí a díl, který posouváte, je dobře vidět. Další [[Q]] je vrátí. Úchyt, na který ukážete, svůj rozměr ukáže i tak.
 
 ## Poznámky
 
@@ -70,7 +72,7 @@ Poznámky se ukládají v projektu, do exportu se nezahrnují a jejich viditelno
 
 ## Referenční body
 
-Referenční bod je samostatná značka v prostoru, podobná rysce při práci v dílně. Nepatří žádnému tělesu, netiskne se a ostatní objekty se na něj přichytávají. Klikněte pravým tlačítkem na těleso a vyberte {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} nebo {{ui:contextMenu.markMidpoints}}. Body vzniknou na horní ploše tělesa, případně celého výběru. {{ui:contextMenu.markFaceCenter}} místo toho umístí bod doprostřed rovné stěny, na kterou jste klikli pravým tlačítkem, třeba na boku nebo na konci.
+Referenční bod je samostatná značka v prostoru, podobná rysce při práci v dílně. Nepatří žádnému tělesu, netiskne se a ostatní objekty se na něj přichytávají. Klikněte pravým tlačítkem na těleso a vyberte {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} nebo {{ui:contextMenu.markMidpoints}}. Body vzniknou na horní ploše tělesa, případně celého výběru. {{ui:contextMenu.markFaceCenter}} místo toho umístí bod doprostřed rovné stěny, na kterou jste klikli pravým tlačítkem, třeba na boku nebo na konci. Je-li nastaven střed otáčení, {{ui:contextMenu.markPivot}} umístí bod přesně na něj, takže se střed jiného dílu zachytí v bodě, kolem kterého se výběr otáčí.
 
 - Bod přesunete tažením nebo kliknutím otevřete souřadnice v nastavených jednotkách. Každou kartu lze přetáhnout za záhlaví samostatně; ostatní zůstanou na místě. Dvojklik ji vrátí a naposledy použitá karta se zobrazí vpředu. **Odstranit všechny** na kartě nebo v nabídce pravého tlačítka odstraní všechny body najednou. {{ui:common.delete}} odstraní jednotlivý bod.
 - Bod vytvoří i měřicí nástroj: {{ui:camera.tapeMarkMiddle}}, napůl vyplněná značka uprostřed měření, označí jeho střed, například střed kruhového otvoru. Měřit lze také od takového bodu: pásmo se k referenčním bodům přichytává stejně jako k rohům.

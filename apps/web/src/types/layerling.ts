@@ -326,6 +326,8 @@ export type ShapeCustomization = {
   loftSegments?: number;
   /** Capsule: the small end's diameter as a share of the large one, 1 or missing for equal ends (#206). */
   slotEndRatio?: number;
+  /** Torus: how thick the tube is seen from above, as a share of the outer size; the height only squashes it (#981). */
+  torusTubeRatio?: number;
   /** Transition: degrees the top end tilts about the x axis and about the z axis (#205). */
   loftTiltX?: number;
   loftTiltZ?: number;
@@ -460,6 +462,8 @@ export type AlignHandleStatus = {
   disabled: boolean;
   aligned: boolean;
   title: string;
+  /** The same dot with Alt held: it stretches the parts to the reference instead of moving them (#998). */
+  size?: { disabled: boolean; aligned: boolean; title: string };
 };
 
 export type SketchPoint = {
@@ -506,8 +510,11 @@ export type SketchImage = {
 export type SketchStrokeAlign = "center" | "inside" | "outside" | "grow" | "shrink";
 export type SketchStrokeJoin = "miter" | "round" | "bevel";
 export type SketchStrokeCap = "flat" | "square" | "round";
-/** A sketch drawn as a line of this width instead of a filled area (#154). */
-export type SketchStroke = { width: number; align: SketchStrokeAlign; join: SketchStrokeJoin; cap: SketchStrokeCap };
+/**
+ * A sketch drawn as a line of this width instead of a filled area (#154). `edge` makes the wall a cutting edge (#982): its top
+ * runs in to that width with a 45° chamfer on both sides; only for a line inside, outside or centred, and narrower than the line.
+ */
+export type SketchStroke = { width: number; align: SketchStrokeAlign; join: SketchStrokeJoin; cap: SketchStrokeCap; edge?: number };
 /** Where a name tag's key ring hole sits, seen from above (#215). */
 export type TextKeyringSide = "left" | "right" | "top";
 /**
@@ -1004,6 +1011,8 @@ export type WorkplaneShape = {
   loftSegments?: number;
   /** Capsule: the small end's diameter as a share of the large one, 1 or missing for equal ends (#206). */
   slotEndRatio?: number;
+  /** Torus: how thick the tube is seen from above, as a share of the outer size; the height only squashes it (#981). */
+  torusTubeRatio?: number;
   /** Transition: degrees the top end tilts about the x axis and about the z axis (#205). */
   loftTiltX?: number;
   loftTiltZ?: number;
@@ -1048,6 +1057,11 @@ export type WorkplaneShape = {
    * proportions and are fitted into the box, centred.
    */
   textStretch?: boolean;
+  /**
+   * Straight text only (#981): the letters stacked top to bottom, each centred on one upright line, instead of
+   * side by side. Curved text ignores it.
+   */
+  textVertical?: boolean;
   /**
    * Text only (#594): the space between the letters, in per cent of the letter size on top of the typeface's own
    * advance - 0 or left out as the font has it, above it wider, below it (down to -50) tighter. Straight and curved text.
@@ -1169,7 +1183,7 @@ export type WorkplaneShape = {
    * them together: no cutting, every part keeps its colour and goes out as
    * its own body.
    */
-  groupOperation?: "group" | "intersection" | "hull" | "bundle";
+  groupOperation?: "group" | "intersection" | "hull" | "bundle" | "loft";
   /**
    * The point this body turns about, kept with the body: a fraction of its
    * width, height and depth from its centre, in its own frame, so it moves,

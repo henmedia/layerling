@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 import { roundSideCount } from "@/lib/roundSideCount";
 
 export const DEFAULT_SLOT_WIDTH = 40;

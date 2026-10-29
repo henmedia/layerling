@@ -89,7 +89,7 @@ While a workplane sits on a face, an eye appears next to {{ui:camera.placeWorkpl
 
 ## Grid and snapping
 
-The grid shows the size of the plate. At the bottom right is the **snap step**: moving and scaling snap in steps of that size, for example 1 mm. Make it smaller for fine work and larger for rough arranging. {{ui:editor.tool.snapToGrid}} in the ribbon moves the selected shapes afterwards onto the nearest grid crossing. While moving, shapes also snap to other shapes, see [Selecting and arranging](chapter:select-and-arrange).
+The grid shows the size of the plate. At the bottom right is the **snap step**: moving and scaling snap in steps of that size, for example 1 mm. Make it smaller for fine work and larger for rough arranging. {{ui:editor.tool.snapToGrid}} in the ribbon moves the selected shapes afterwards onto the nearest grid crossing. While moving, shapes also snap to other shapes, see [Selecting and arranging](chapter:select-and-arrange). Without the mouse: [[Alt]]+[[1]] to [[Alt]]+[[0]] pick that entry of the menu ([[Alt]]+[[1]] turns snapping off), and [[,]] and [[.]] make the step one size finer or coarser. This works in a sketch too.
 
 > **Tip:** Stop rotating the view when you fit parts together exactly. Use the number keys to go to the straight view from top or front and press [[O]] for the flat display. Then you see at once whether two edges are really flush.
 

@@ -54,6 +54,12 @@ A shape turned at an angle, say by 45°, has its box round it to line up with, n
 
 The key is [[L]]. [[Esc]] cancels.
 
+### Matching sizes
+
+Hold [[Alt]] while aligning and the dots turn into squares: a click no longer moves the shapes but changes their size. A dot at a side stretches each shape to that side, its other side staying where it is, as if you had dragged its handle there. The dot in the middle leaves each shape in its place and gives it the width, length or height in that direction. That way you swap a box for a cylinder of the same size, say, or replace a broken piece of a mesh with a clean shape. Move over a dot with [[Alt]] held and you see beforehand how large the shapes become.
+
+The reference is the shape you clicked first; only the others change. Without one, the side dots stretch all shapes to the farthest side, and the middle dot gives them all the size of the largest. A cylinder stays round, so it grows in the other direction too. A shape turned at an angle stays as it is; shapes turned by 90° work.
+
 ## Mirroring
 
 {{ui:editor.tool.mirror}} ([[M]], or right-click the selection and choose it) flips the selection across a plane: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} or {{ui:mirror.topBottom}}. Click the matching axis arrow. That is handy for symmetric parts: build one half, copy it and mirror the copy.
@@ -66,7 +72,7 @@ The angles stay with the body. In its settings, {{ui:inspector.rotation}} shows 
 
 ![A body turned about two axes: its angles stand under it, and the Rotation card in its settings takes them as numbers.](shot:rotation-card)
 
-With **one body** selected, the pivot belongs to that body: select other parts and come back, and it is still there. It moves, turns and scales with the body, is saved in the project and comes back with Undo. Under {{ui:inspector.position}} the pivot has its own X, Y and Z, which you can type or nudge, and {{ui:inspector.pivotRemove}} takes it away. You can also drag the pivot's red marker with the mouse: it slides over the surface of the bodies and snaps to corners, edge midpoints and edges, so a hinge pin lands exactly on a corner. With several bodies selected the pivot is only for that selection, and a new selection removes it.
+With **one body** selected, the pivot belongs to that body: select other parts and come back, and it is still there. It moves, turns and scales with the body, is saved in the project and comes back with Undo. Under {{ui:inspector.position}} the pivot has its own X, Y and Z, which you can type or nudge, and {{ui:inspector.pivotRemove}} takes it away. You can also drag the pivot's red marker with the mouse: it slides over the surface of the bodies and snaps to corners, edge midpoints and edges, so a hinge pin lands exactly on a corner. With several bodies selected the pivot is only for that selection, and a new selection removes it. Grouping or bundling them keeps it: the group takes the pivot as its own, with X, Y and Z under {{ui:inspector.position}}.
 
 ## Laying flat on a face
 

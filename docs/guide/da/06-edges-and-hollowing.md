@@ -49,7 +49,7 @@ Ved siden af en fas, en rund eller en udhuling er der også {{ui:edge.editAction
 
 På en gruppe, for eksempel en cylinder med et hul, hører den behandlede kant til den færdige form, ikke til en af dens dele. Så bliver gruppen til én form. {{ui:editor.tool.ungroup}} virker alligevel: Det tager først kantbehandlingerne tilbage og opløser derefter gruppen, i ét trin som [[Ctrl]]+[[Z]] fortryder. Tag behandlingen tilbage som beskrevet ovenfor og gruppen vender tilbage med alle sine dele. Den nemmeste måde er at behandle kanter til sidst. Det gælder også gevind: kantværktøjet tager et gevind som dets eksakte form, så en blok med et gevindhul får sine kanter rundet med gevindet på plads. At beregne et gevinds kanter tager længere end for en almindelig form, et par sekunder for en M6 og omkring et halvt minut for et G1/2-rørgevind.
 
-> **Godt at vide:** layerling arbejder med rigtig CAD-geometri til runding og fas, ikke kun et trekantnet. Det er derfor en rundet kant stadig er en rundet kant i STEP-eksporten.
+> **Godt at vide:** layerling arbejder med rigtig CAD-geometri til runding og fas, ikke kun et mesh af trekanter. Det er derfor en rundet kant stadig er en rundet kant i STEP-eksporten.
 
 En del importeret som STEP beholder også sin CAD-geometri: fas, rund og udhuling virker på formen fra filen, uanset hvor fint delen er tegnet på skærmen. STL, OBJ og 3MF bringer kun trekanter, og en fint tegnet del kan være for tæt for kantværktøjet. Hvis en del også er tilgængelig som STEP, importér den.
 
@@ -80,7 +80,7 @@ En form med en lomme - en blok med et hul der ikke går hele vejen igennem, lave
 
 **Former der ender i en spids,** såsom en kegle eller en revolvet trekant, har ingen flad flade på toppen der kan forblive åben. Et helt lukket hulrum virker der heller ikke, fordi en spids ikke kan forskydes indad: selv med 1 mm væg får du beskeden om at væggene ikke kan være så tykke. Tegn væggen ind i profilen før du revolverer i stedet: duplikér omridset, skalér kopien ensartet ned, læg den i midten af det store omrids og skær det store med det, så revolver det hele (kapitel Skitser, afsnit Revolver). Afstanden mellem de to omrids er vægtykkelsen.
 
-Hvis du ændrer størrelse på en udhulet form senere, udhuler layerling den igen med det samme ved den nye størrelse. Væggen forbliver så tyk som du valgte, runde former inkluderet. En cylinder du trækker længere den ene vej end den anden bliver til en ellipse.
+Hvis du ændrer størrelse på en udhulet form senere, udhuler layerling den igen med det samme ved den nye størrelse. Væggen forbliver så tyk som du valgte, runde former inkluderet. En cylinder du trækker længere den ene vej end den anden bliver til en ellipse. Afrundinginger og affasninger du lagde på den efter udhulingen lægges igen på de samme kanter.
 
 > **Tip:** Med en 0,4 mm dyse er 1,2 til 2 mm væg et godt udgangspunkt: tyndt nok til at spare materiale, tykt nok til en solid del.
 
@@ -94,7 +94,7 @@ Hver flade på et legeme kan flyttes den samme afstand, udad eller indad. Det er
 4. Sæt hak ved {{ui:offset.copy}} for at beholde delen, som den er, og få det forstørrede legeme som en kopi, der allerede er et hul. Grupper hullet med modstykket, så skærer det præcis det spillerum, du valgte.
 5. Klik på {{ui:offset.apply}}.
 
-Uden hak forskydes selve legemet. Det bliver et fast, nøjagtigt legeme, som efter en affasning: listen øverst i panelet tager forskydningen tilbage, og {{ui:edge.editAction}} åbner værktøjet igen med den gamle afstand. Kun nøjagtige CAD-legemer kan forskydes - kasser, cylindre og de andre former, grupper af dem, importerede STEP-dele. Et legeme, der kun er et trekantsnet, som mange STL-importer, kan ofte ikke. En afstand, der er for stor til legemet, for eksempel en formindskelse ud over den tyndeste væg, afvises.
+Uden hak forskydes selve legemet. Det bliver et fast, nøjagtigt legeme, som efter en affasning: listen øverst i panelet tager forskydningen tilbage, og {{ui:edge.editAction}} åbner værktøjet igen med den gamle afstand. Kun nøjagtige CAD-legemer kan forskydes - kasser, cylindre og de andre former, grupper af dem, importerede STEP-dele. Et legeme, der kun er et mesh af trekanter, som mange STL-importer, kan ofte ikke. En afstand, der er for stor til legemet, for eksempel en formindskelse ud over den tyndeste væg, afvises.
 
 ## Slet flader
 

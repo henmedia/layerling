@@ -124,7 +124,7 @@ describe("the patterns from the surface tool", () => {
   });
 
   it("cuts cells along their joints: on a box's face a pointed joint follows its profile in the triangles", () => {
-    const asked = { pattern: "cells", profile: "pointed", fade: 0, spacing: 6, width: 0.4 } as const;
+    const asked = { pattern: "cells", profile: "pointed", fade: 0, spacing: 6, width: 0.4, projection: "allRound" } as const;
     const session = createSurfaceTextureSession(box(20, 20, 20));
     const result = session.apply(asked);
     expectClosed(result);

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { toCreasedNormals } from "@/lib/creasedNormals";
 import type { CadModifierProfileLoop } from "@/lib/cadModifierTypes";
 import { loftEaseShare } from "@/lib/loftEase";
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";

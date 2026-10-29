@@ -72,6 +72,8 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_boolean_cut` | 用孔切割实体 |
 | `layerling_intersect_objects` | 只保留对象共有的部分（交集） |
 | `layerling_hull_objects` | 把对象包成一个凸体，就像用收缩膜包住一样（凸包） |
+| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | 把形状分离成松散的部件，把草图实体按轮廓分离为每个轮廓一个实体 |
 | `layerling_split_objects` | 用一个平面把实体或孔切成两半 |
 | `layerling_list_edges` | 列出一个对象真实的 CAD 边 |
@@ -103,7 +105,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_delete_custom_shape` | 移除自定义形状；已插入的实体保留 |
 | `layerling_show_workplane` | 隐藏和显示带网格的平台，例如为了拍摄底部图片（仅改变视图） |
 | `layerling_set_section_view` | 沿一个平面把视图剖开以便查看内部（仅改变视图，不会真正切开任何东西） |
-| `layerling_measurements` | 显示或隐藏卷尺的测量，并列出它们及其长度 |
+| `layerling_measurements` | 显示或隐藏卷尺的测量，并列出它们及其长度，并像 [[Q]] 一样隐藏或显示所选对象周围的尺寸 |
 | `layerling_saved_view` | 把当前视图保存在按键 7、8、9 或 0 下，并可回到该视图，如同 Shift+按键和单独按该键（仅改变视图）；也可设置新设计的起始视图 |
 | `layerling_clear_history` | 永久删除所有撤销步骤，如同历史记录视图的“删除历史记录”按钮；需要 `confirm: true` |
 | `layerling_set_history_view` | 回看项目更早的状态，如同历史记录视图（实际设计不受影响；会改动设计的工具会等到它关闭） |

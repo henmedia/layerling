@@ -68,6 +68,8 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_boolean_cut` | coupe les solides avec des trous |
 | `layerling_intersect_objects` | ne garde que ce que les objets ont en commun (Intersection) |
 | `layerling_hull_objects` | enveloppe les objets dans un seul corps convexe, comme sous film rétractable (Enveloppe) |
+| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
+| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | sépare une forme en ses parties détachées, un corps d'esquisse en un corps par contour |
 | `layerling_split_objects` | coupe des solides ou des trous en deux avec un rabot |
 | `layerling_list_edges` | répertorie les véritables bords CAO d'un objet |
@@ -99,7 +101,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_delete_custom_shape` | supprime une forme personnalisée ; les corps insérés restent |
 | `layerling_show_workplane` | cache et affiche la plaque avec sa grille, pour une photo du dessous par exemple (uniquement la vue) |
 | `layerling_set_section_view` | coupe la vue ouverte le long d'un plan pour regarder à l'intérieur (seulement la vue, rien n'est coupé) |
-| `layerling_measurements` | affiche ou masque les mesures du ruban à mesurer et les liste avec leurs longueurs |
+| `layerling_measurements` | affiche ou masque les mesures du ruban à mesurer et les liste avec leurs longueurs, et masque ou affiche les cotes autour de la sélection comme [[Q]] |
 | `layerling_saved_view` | enregistre la vue actuelle sous la touche 7, 8, 9 ou 0 et y revient, comme Maj+touche et la touche (seulement la vue); règle aussi la vue de départ des nouveaux designs |
 | `layerling_clear_history` | supprime définitivement chaque étape d'annulation, comme le fait le bouton "Supprimer l'historique" de la vue Historique ; besoins `confirm: true` |
 | `layerling_set_history_view` | revient sur un état antérieur du projet, comme la vue Historique (la conception réelle reste intacte ; les outils de changement attendent qu'il soit fermé) |

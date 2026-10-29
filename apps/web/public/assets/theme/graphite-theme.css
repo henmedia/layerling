@@ -8432,6 +8432,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-image-hint {
   border-color: #d59c5f;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-turn-ring {
+  --sketch-turn-ring: rgba(47, 111, 224, 0.35);
+  --sketch-turn-ring-active: #2f6fe0;
+  fill: none;
+  stroke: var(--sketch-turn-ring);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-turn-ring.active {
+  stroke: var(--sketch-turn-ring-active);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-turn-ring {
+  --sketch-turn-ring: rgba(106, 160, 255, 0.4);
+  --sketch-turn-ring-active: #6aa0ff;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-plate {
   --locked-handle-ink: #898989;
   --locked-handle-fill: #dfdfdf;

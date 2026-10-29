@@ -82,6 +82,59 @@ export function textLayoutFont(shape: Pick<WorkplaneShape, "font" | "text" | "te
   return spacedFont(textFont(shape.font ?? "Multilanguage"), spaced);
 }
 
+/** The gap between two letters of vertical text, in parts of a capital's height, with no spacing set. */
+const VERTICAL_GAP = 0.35;
+
+/** Moves every point of a glyph outline, its holes included; a point two curves share is moved once. */
+function translateGlyph(glyph: THREE.Shape, dx: number, dy: number) {
+  const moved = new Set<THREE.Vector2>();
+  [glyph, ...glyph.holes].forEach((path) => path.curves.forEach((curve) => {
+    for (const key of ["v0", "v1", "v2", "v3"] as const) {
+      const point = (curve as unknown as Record<string, THREE.Vector2 | undefined>)[key];
+      if (point instanceof THREE.Vector2 && !moved.has(point)) {
+        point.x += dx;
+        point.y += dy;
+        moved.add(point);
+      }
+    }
+  }));
+}
+
+/**
+ * The outlines of straight text at `size`, as the font lays out the line - or, for vertical text (#981), the
+ * letters stacked top to bottom, each centred on one upright line, a gap of about a third of a capital between
+ * them plus the spacing in per cent of the letter size. A space leaves the room of a capital. Everything that
+ * draws or measures straight text takes its outlines from here.
+ */
+export function straightTextShapes(shape: Pick<WorkplaneShape, "text" | "font" | "textSpacing" | "textVertical">, size: number): THREE.Shape[] {
+  const font = textLayoutFont(shape);
+  const text = displayTextOf(shape);
+  if (!shape.textVertical) return font.generateShapes(text, size);
+  const plain = textFont(shape.font ?? "Multilanguage");
+  const cap = capHeightOf(plain, size);
+  const gap = Math.max(0, cap * VERTICAL_GAP + (size * textSpacingOf(shape)) / 100);
+  const shapes: THREE.Shape[] = [];
+  let top = 0;
+  for (const char of [...text]) {
+    const glyphs = char.trim() ? plain.generateShapes(char, size) : [];
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    glyphs.forEach((glyph) => glyph.getPoints().forEach((point) => {
+      minX = Math.min(minX, point.x);
+      maxX = Math.max(maxX, point.x);
+      minY = Math.min(minY, point.y);
+      maxY = Math.max(maxY, point.y);
+    }));
+    if (!Number.isFinite(minX)) {
+      top -= cap + gap;
+      continue;
+    }
+    glyphs.forEach((glyph) => translateGlyph(glyph, -(minX + maxX) / 2, top - maxY));
+    shapes.push(...glyphs);
+    top -= maxY - minY + gap;
+  }
+  return shapes;
+}
+
 function textOptions(shape: WorkplaneShape, size: number) {
   const bevel = clamp(shape.bevel ?? 0, 0, 8);
   const fontName = shape.font ?? "Multilanguage";
@@ -523,7 +576,7 @@ export function curvedTextFootprint(shape: WorkplaneShape): { width: number; dep
 
 /** Width and depth of the straight line at layout size, before it is fitted into its box. */
 function straightTextExtent(shape: WorkplaneShape) {
-  const geometry = new TextGeometry(displayTextOf(shape), textOptions({ ...shape, height: 1 }, LAYOUT_SIZE));
+  const geometry = new THREE.ExtrudeGeometry(straightTextShapes(shape, LAYOUT_SIZE), textOptions({ ...shape, height: 1 }, LAYOUT_SIZE));
   geometry.computeBoundingBox();
   const box = geometry.boundingBox;
   const extent = box ? { width: Math.max(1, box.max.x - box.min.x), depth: Math.max(1, box.max.y - box.min.y) } : { width: LAYOUT_SIZE, depth: LAYOUT_SIZE };
@@ -619,7 +672,7 @@ export function textGlyphShapes(shape: WorkplaneShape): { glyphs: TextGlyphShape
       options.font.generateShapes(char, options.size).forEach((glyph) => glyphs.push({ glyph, map }));
     });
   } else {
-    const shapes = textLayoutFont(shape).generateShapes(displayTextOf(shape), LAYOUT_SIZE);
+    const shapes = straightTextShapes(shape, LAYOUT_SIZE);
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
@@ -658,7 +711,8 @@ export function createTextGeometry(shape: WorkplaneShape): THREE.BufferGeometry 
     return curved;
   }
 
-  const geometry = new TextGeometry(displayTextOf(shape), textOptions(shape, LAYOUT_SIZE));
+  // TextGeometry extrudes font.generateShapes; vertical text (#981) has outlines of its own.
+  const geometry = new THREE.ExtrudeGeometry(straightTextShapes(shape, LAYOUT_SIZE), textOptions(shape, LAYOUT_SIZE));
   geometry.computeBoundingBox();
   const box = geometry.boundingBox;
   if (box) {

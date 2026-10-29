@@ -7,6 +7,7 @@ import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
 import { qrSettingsEqual } from "@/lib/qrCode";
+import { torusTubeRatio } from "@/lib/torusShape";
 import type { SketchStroke, WorkplaneShape } from "@/types/layerling";
 
 /** Bauwerte der Wabengitter, die es nur noch in alten Entwuerfen gibt: Die Form wird nicht mehr angeboten (#223), bleibt aber bearbeitbar. */
@@ -344,12 +345,30 @@ export function hollowStretchSincePicture(shape: WorkplaneShape, entry: NonNulla
  * each side of the box only keeps flat walls, a round wall came out with four
  * bulges (forum, 05.10.2026).
  */
-export function shellRebuildEntry(shape: WorkplaneShape) {
+/**
+ * The fillets and chamfers laid on a hollow body after its hollowing, which a rebuild lays again on the
+ * same edges (forum, 621213). Null when something else came after it, or an edge treatment without the
+ * edges it was laid on: such a body keeps the bands at its sides.
+ */
+export function edgeTreatmentsAfterShell(shape: WorkplaneShape) {
   const features = shape.edgeTreatments ?? [];
   const history = shape.edgeTreatmentHistory ?? [];
-  const last = history[history.length - 1];
+  const shellAt = history.map((entry) => entry.feature.kind).lastIndexOf("shell");
+  const featureShellAt = features.map((feature) => feature.kind).lastIndexOf("shell");
+  if (shellAt < 0 || featureShellAt < 0) return null;
+  const after = history.slice(shellAt + 1);
+  if (after.length !== features.length - featureShellAt - 1) return null;
+  const relaid = (entry: (typeof history)[number]) => (entry.feature.kind === "fillet" || entry.feature.kind === "chamfer" || entry.feature.kind === "chamfillet")
+    && Boolean(entry.feature.edgeIds?.length);
+  return after.every(relaid) ? after : null;
+}
+
+export function shellRebuildEntry(shape: WorkplaneShape) {
+  const history = shape.edgeTreatmentHistory ?? [];
   if (!shape.importedMesh || shape.hole || shape.groupedShapes?.length) return null;
-  if (features[features.length - 1]?.kind !== "shell" || last?.feature.kind !== "shell" || !last.appliedFrame) return null;
+  const after = edgeTreatmentsAfterShell(shape);
+  const last = after ? history[history.length - 1 - after.length] : undefined;
+  if (last?.feature.kind !== "shell" || !last.appliedFrame) return null;
   // A star, knurl or thread is round by definition; stretched unevenly there is
   // nothing to hollow again, so it keeps the bands as before.
   const stretch = hollowStretchSincePicture(shape, last);
@@ -500,6 +519,10 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
   if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "knurl" || involuteGear) && next.width !== next.depth) {
     next.depth = next.width;
     next.size = next.width;
+  }
+  // A torus keeps its tube once it has one; a torus from before #981 takes the one it showed, its height (#981).
+  if (shape.kind === "torus" && next.torusTubeRatio === undefined) {
+    next.torusTubeRatio = torusTubeRatio(next);
   }
   if (shape.groupedShapes) {
     next.groupedShapes = shape.groupedShapes.map(canonicalizeShape);
@@ -695,6 +718,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.loftSmooth === b.loftSmooth &&
     a.loftSegments === b.loftSegments &&
     a.slotEndRatio === b.slotEndRatio &&
+    a.torusTubeRatio === b.torusTubeRatio &&
     a.loftTiltX === b.loftTiltX &&
     a.loftTiltZ === b.loftTiltZ &&
     a.screwHoleShaft === b.screwHoleShaft &&
@@ -731,6 +755,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     sketchStrokesEqual(a.textStroke, b.textStroke) &&
     Boolean(a.textSilhouette) === Boolean(b.textSilhouette) &&
     Boolean(a.textStretch) === Boolean(b.textStretch) &&
+    Boolean(a.textVertical) === Boolean(b.textVertical) &&
     (a.textSpacing ?? 0) === (b.textSpacing ?? 0) &&
     JSON.stringify(a.textKeyring ?? null) === JSON.stringify(b.textKeyring ?? null) &&
     JSON.stringify(a.textEdge ?? null) === JSON.stringify(b.textEdge ?? null) &&

@@ -17,7 +17,7 @@ Merilni trak je na spodnjem koncu vrstice kamere ob levem robu ({{ui:camera.tape
 4. **{{ui:camera.tapeWholeEdges}}:** Klik na rob izmeri ves rob, na primer obseg kroga. Ko je to stikalo izklopljeno, klik namesto tega postavi točko na rob, druga točka pa je lahko kjer koli, tako da lahko izmeriš premer ali katero koli drugo razdaljo. [[Alt]] stikalo obrne za en klik. Pri krogu se točka čez, nasproti prve, pripne, ko se kazalec približa, točki pa ležita na pravem krogu, zato je premer natančen.
 5. **{{ui:camera.deleteAllMeasurements}}:** Odstrani vse mere naenkrat. Ker se tega ne da razveljaviti, layerling prej vpraša; če mer ni, se nič ne zgodi.
 6. **{{ui:camera.tapeMarkMiddle}}:** Na sredini vsake meritve je majhna okrogla oznaka s polno spodnjo polovico. Na sredino meritve postavi [referenčno točko](#referencne-tocke): po kliku na okrogli rob, na primer rob luknje, v središče tega kroga – tudi pri uvoženi mreži, kjer sicer nič ne označuje sredine luknje –, pri premeru ali kateri koli ravni meritvi pa na sredino poti. Oblika, ki jo potem vlečeš, se s sredino zaskoči na točko. Točke, ki že obstaja, ne naredi dvakrat. Merilni trak se zaskoči na referenčno točko kakor na oglišče, zato lahko meriš od središča kroga ali od sredine črte: označi jo, nato klikni točko.
-7. **{{ui:camera.tapeTypeLength}}:** Ko vsaj en konec ravne meritve leži na telesu, lahko kliknete njeno število. Vnesite novo dolžino in pritisnite [[Enter]]: telo pri drugi točki se premakne vzdolž izmerjene črte, dokler razdalja ni točno taka, kot pri ravnilu v Tinkercadu. Če je izbrano le telo pri prvi točki, se premakne to. Merilne točke ostanejo na telesu, zato meritev sledi. Merite od vogala, roba ali [referenčne točke](#referencne-tocke), na primer središča kroga, da dele postavite na točno razdaljo.
+7. **{{ui:camera.tapeTypeLength}}:** Ko vsaj en konec ravne meritve leži na telesu, lahko kliknete njeno število. Vnesite novo dolžino in pritisnite [[Enter]]: telo pri drugi točki se premakne vzdolž izmerjene črte, dokler razdalja ni točno taka, kot pri ravnilu v Tinkercadu. Če je izbrano le telo pri prvi točki, se premakne to. Merilne točke ostanejo na telesu, zato meritev sledi. Merite od vogala, roba ali [referenčne točke](#referencne-tocke), na primer središča kroga, da dele postavite na točno razdaljo. Negativna dolžina ga premakne toliko čez prvo točko, na primer 5 mm navznoter od roba škatle.
 
 S [[Esc]] zapustiš način merjenja.
 
@@ -48,10 +48,12 @@ Merilni trak in kotno ravnilo ostaneta tam, kjer sta, ko skiciraš in se vrneš 
 
 V nastavitvah pod {{ui:workspace.appearance}} sta dve stikali za tekoče mere:
 
-- {{ui:workspace.showMoveDimensions}} pri premikanju pokaže, za koliko se premikaš.
+- {{ui:workspace.showMoveDimensions}} pri premikanju pokaže, za koliko se premikaš. To velja tudi pri dvigovanju s črno puščico nad telesom; pot se pokaže ob njegovem sprednjem vogalu. Ko spustiš, klikni takšno število in vpiši natančno razdaljo; minus gre navzdol.
 - {{ui:workspace.showOriginDimensions}} pokaže razdalje izbora do ničle plošče, tudi pri več označenih telesih.
 
 Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne.
+
+Če vas za trenutek motijo, pritisnite [[Q]]: mere in razdalje okoli izbora izginejo, zato je del, ki ga premikate, dobro viden. Ponovni [[Q]] jih vrne. Ročica, na katero pokažete, svojo mero vseeno pokaže.
 
 ## Opombe
 
@@ -70,7 +72,7 @@ Opombe se shranijo v načrtu, ne pojavijo se v nobenem izvozu in jih lahko prika
 
 ## Referenčne točke
 
-Referenčna točka je zgolj oznaka v prostoru, kot svinčnikova črta ali točka za zarisovanje v delavnici: ne spada k nobenemu telesu, nikoli se ne natisne in druge stvari se nanjo zaskočijo. Z desnim gumbom klikni na telo in izberi {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} ali {{ui:contextMenu.markMidpoints}}: točke se pokažejo na zgornji strani telesa (celotnega izbora, če si jih izbral več). {{ui:contextMenu.markFaceCenter}} namesto tega postavi točko na sredino ravne ploskve, na katero si kliknil z desno tipko, na primer na stranski ali čelni.
+Referenčna točka je zgolj oznaka v prostoru, kot svinčnikova črta ali točka za zarisovanje v delavnici: ne spada k nobenemu telesu, nikoli se ne natisne in druge stvari se nanjo zaskočijo. Z desnim gumbom klikni na telo in izberi {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} ali {{ui:contextMenu.markMidpoints}}: točke se pokažejo na zgornji strani telesa (celotnega izbora, če si jih izbral več). {{ui:contextMenu.markFaceCenter}} namesto tega postavi točko na sredino ravne ploskve, na katero si kliknil z desno tipko, na primer na stranski ali čelni. Če je vrtišče nastavljeno, {{ui:contextMenu.markPivot}} postavi točko natanko nanj, da se sredina drugega dela zaskoči v točko, okoli katere se vrti izbor.
 
 - Povleci točko, da jo premakneš, ali jo klikni, da vidiš njene koordinate in vpišeš nove; veljajo v nastavljeni enoti. Vsako kartico lahko za naslov povlečeš stran, če kaj zakriva, samo zase: druge ostanejo, kjer so, dvoklik na naslov pa jo vrne nazaj. Kartica, katere si se nazadnje dotaknil, stoji pred drugimi. **Izbriši vse** v kartici ali v meniju z desnim klikom izbriše vse točke naenkrat. {{ui:common.delete}} jo odstrani.
 - Ko vlečeš obliko, se njeni robovi in sredina zaskočijo na točko, kot se zaskočijo na druge oblike ({{ui:workspace.objectSnap}}). Tudi kotno ravnilo se zaskoči na točke.

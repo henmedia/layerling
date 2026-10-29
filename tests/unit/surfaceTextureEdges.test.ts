@@ -32,10 +32,11 @@ function rightFace(vertices: Float32Array | Float64Array) {
   return out;
 }
 
+// Each face on its own (all round): along the outline a box's upright edges are no border (see surfaceTextureOutline.test.ts).
 describe("patterns on the flat sides of a box end at a border", () => {
   it("leave a frame as wide as the fade along every edge, and run at full depth inside it", () => {
     const session = createSurfaceTextureSession(box(20, 20, 20));
-    const result = session.apply({ pattern: "grooves" });
+    const result = session.apply({ pattern: "grooves", projection: "allRound" });
     expect(surfaceMeshReport(result.indices, result.vertices.length / 3)).toMatchObject({ openEdges: 0, nonManifoldEdges: 0 });
     let deep = 0;
     for (const [across, up, inward] of rightFace(result.vertices)) {
@@ -50,7 +51,7 @@ describe("patterns on the flat sides of a box end at a border", () => {
   }, 60_000);
 
   it("cut knurling's diamonds cleanly: no triangle bends across a groove's middle or edge", () => {
-    const asked = { pattern: "knurl", fade: 0 };
+    const asked = { pattern: "knurl", fade: 0, projection: "allRound" } as const;
     const session = createSurfaceTextureSession(box(20, 20, 20));
     const result = session.apply(asked);
     const s = { ...normalizeSurfaceTexture(asked), projection: "allRound" as const };
@@ -67,13 +68,14 @@ describe("patterns on the flat sides of a box end at a border", () => {
       const want = s.depth * surfaceTextureValueAt(10, -c[2], c[1], 1, 0, 0, s, layout);
       if (Math.abs(10 - c[0] - want) > 0.05) bent += 1;
     }
-    expect(checked).toBeGreaterThan(500);
+    // The diamonds' flat flanks are merged into few triangles each (see mergeFlatPoints).
+    expect(checked).toBeGreaterThan(200);
     expect(bent).toBe(0);
   }, 60_000);
 
   it("keep only whole bumps: none is cut by the frame", () => {
     const session = createSurfaceTextureSession(box(20, 20, 20));
-    const result = session.apply({ pattern: "bumps", direction: "outward", depth: 0.6 });
+    const result = session.apply({ pattern: "bumps", direction: "outward", depth: 0.6, projection: "allRound" });
     expect(surfaceMeshReport(result.indices, result.vertices.length / 3)).toMatchObject({ openEdges: 0, nonManifoldEdges: 0 });
     let raised = 0;
     for (const [across, up, inward] of rightFace(result.vertices)) {

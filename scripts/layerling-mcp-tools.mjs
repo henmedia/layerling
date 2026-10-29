@@ -243,6 +243,7 @@ export const shapeSettingSchema = {
   loftTiltX: { type: "number", description: "Loft only: degrees the top end tilts about the x axis, -45 to 45: positive raises its front (+z) edge. The sections tilt evenly on the way up; the highest point stays at the height, and a tilt too steep for the height is reduced." },
   loftTiltZ: { type: "number", description: "Loft only: degrees the top end tilts about the z axis, -45 to 45: positive raises its right (+x) side. Same as loftTiltX otherwise." },
   slotEndRatio: { type: "number", description: "Capsule (slot) only: the small end's diameter as a share of the large one, 0.1 to 1 (default 1, two equal ends). The large end sits at the start of the long axis, the small one at its end, the sides run as tangents to both - a belt guard. The large diameter is the capsule's short side; the centre distance is the long side less both radii." },
+  torusTubeRatio: { type: "number", description: "Torus only: how thick the tube is seen from above, as a share of the torus's outer size, 0.01 to 0.5 (0.5 closes the hole). The height only squashes or stretches the tube, so a flat ring keeps its hole; resizing the torus scales the tube along. A tube as thick as the torus is high keeps the torus an exact CAD body." },
   dovetailClearance: { type: "number", description: "Dovetail only: gap in mm (0 to 2, default 0.2) added on every side while the dovetail is a hole - a copy of the tail set to hole cuts a socket the tail fits into." },
   cornerFillet: { type: "number", description: "Rounded box only: fillet radius of vertical corners in mm." },
   topBottomFillet: { type: "number", description: "Rounded box only: fillet radius of top and bottom edges in mm." },
@@ -360,6 +361,7 @@ export const tools = [
             align: { type: "string", enum: ["center", "inside", "outside", "grow", "shrink"] },
             join: { type: "string", enum: ["miter", "round", "bevel"] },
             cap: { type: "string", enum: ["flat", "square", "round"] },
+            edge: { type: "number", description: "Kind sketch with align outside, inside or center: a cutting edge, the width in mm the wall's top runs in to with a 45° chamfer on both sides." },
           },
           required: ["width"],
         },
@@ -464,15 +466,17 @@ export const tools = [
                 align: { type: "string", enum: ["center", "inside", "outside", "grow", "shrink"] },
                 join: { type: "string", enum: ["miter", "round", "bevel"] },
                 cap: { type: "string", enum: ["flat", "square", "round"] },
+                edge: { type: "number", description: "Extruded sketch bodies with align outside, inside or center: a cutting edge, the width in mm the wall's top runs in to with a 45° chamfer on both sides (a cookie cutter's wall); 0 for a flat top, and an edge as wide as the line or wider is none." },
               },
             },
             { type: "null" },
           ],
-          description: "Extruded sketch bodies (an imported SVG among them) and texts: how the body is filled. An object builds the outline as a frame - align outside is Tinkercad's outer line, inside its inner line, center on the line - or with align grow keeps the area and widens it by width all round; width in mm; join miter (sharp), round or bevel; values left out keep the current ones. null makes it a filled area again. A sketch body is built again from its sketch, where it stands; a text keeps its letters and its box grows by the stroke's reach (outside and grow by width, center by half).",
+          description: "Extruded sketch bodies (an imported SVG among them) and texts: how the body is filled. An object builds the outline as a frame - align outside is Tinkercad's outer line, inside its inner line, center on the line - or with align grow keeps the area and widens it by width all round; width in mm; join miter (sharp), round or bevel; edge a cutting edge on top of a sketch body's wall; values left out keep the current ones. null makes it a filled area again. A sketch body is built again from its sketch, where it stands; a text keeps its letters and its box grows by the stroke's reach (outside and grow by width, center by half).",
         },
         silhouette: { type: "boolean", description: "Extruded sketch bodies and texts: true leaves out every outline inside another - holes, and islands in them; on a text the counters of its letters - false brings them back. With an outside stroke this makes a cookie cutter from one SVG; with grow, a base layer under a text." },
         sketchOperation: { type: "string", enum: ["extrude", "revolve", "sweep"], description: "Sketch bodies only: make the body again from its sketch as another kind - an imported SVG comes in extruded, revolve turns its outline about the sketch's vertical axis (x = 0) into a round body, as the sketch's badge does in the editor. The new body keeps the id, name and colour and stands where the old one stood, its foot at the same height; an extrusion made from another kind is 10 mm high. Edge treatments go. For a revolve an outline reaching across the axis is first moved left until its right edge lies on it, so the half cross-section of an SVG turns about its straight side; sweep needs a construction line as the path." },
         stretch: { type: "boolean", description: "Straight text only: true stretches the letters to fill the whole box in both directions, so a capital can be made lower or narrower as in Tinkercad; false (the default) fits them into the box with their proportions kept, centred. Set the box with width and depth." },
+        vertical: { type: "boolean", description: "Straight text only: true stacks the letters top to bottom, each centred on one upright line; the box turns upright and the letters keep their size. Spacing widens or narrows the gap between them. Curved text ignores it." },
         spacing: { type: "number", minimum: -50, maximum: 300, description: "Text only: the space between the letters on top of the font's own, in per cent of the letter size - 0 as the font has it, above it wider, below it tighter (down to -50), up to 300. Straight and curved text; the letters keep their size and the box follows. Not applied to Arabic and Hebrew, whose letters join up." },
         letterEdge: {
           anyOf: [
@@ -506,7 +510,7 @@ export const tools = [
   },
   {
     name: "layerling_align_objects",
-    description: "Align two or more Layerling objects using the same alignment logic as the editor Alignment button. On the plate the axes are the world's; with a workplane set on a face (layerling_set_workplane) the objects are measured and moved along that plane's axes instead - x along the face, y out of it, z across - so a part turned 45° lines up with its own edges.",
+    description: "Align two or more Layerling objects using the same alignment logic as the editor Alignment button. On the plate the axes are the world's; with a workplane set on a face (layerling_set_workplane) the objects are measured and moved along that plane's axes instead - x along the face, y out of it, z across - so a part turned 45° lines up with its own edges. mode size is the editor's Alt on an align dot: the objects stay where they are and change their size instead - min or max stretches each one, its other side fixed, to that side of the anchor (or of the farthest object without one); center gives each one the anchor's size along the axis (or the largest object's), its middle fixed. An object turned at some other angle than square to the axis is left as it is and counted in skipped.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["axis", "target"],
@@ -516,6 +520,7 @@ export const tools = [
         anchorId: { type: "string", description: "Optional object id to keep fixed as the alignment reference." },
         axis: { type: "string", enum: ["x", "y", "z"], description: "x=left/right, z=front/back, y=bottom/top - or along the set workplane's x, z and normal." },
         target: { type: "string", enum: ["min", "center", "max"], description: "Which side/center to align." },
+        mode: { type: "string", enum: ["position", "size"], description: "position (default) moves the objects; size stretches them to the reference instead." },
       },
     },
   },
@@ -708,6 +713,36 @@ export const tools = [
     },
   },
   {
+    name: "layerling_cookie_cutter",
+    description: "Make a cookie cutter from the given objects, like the editor's Cookie cutter button: a wall and a flat rim round the outline, as two sketch bodies in one bundle that replaces the objects. One extruded sketch body gives its own outline; anything else (shapes built in layerling, an imported mesh, several parts) gives what it stands on, the outlines the workplane cuts through it - holes inside stay open. The wall and the rim are lines outside the outline in the sketch fill modes, so change them under Properties afterwards. The wall's top runs in to a cutting edge, and the outline is mirrored left to right, because the cutter is printed on its rim and turned over to cut: a text or logo comes out the right way round. All sizes in mm: wall (thickness, default 1.2), height (default 15), rim (how far the rim reaches beyond the wall, default 4), rimHeight (default 2), edge (the cutting edge's width on top of the wall, default 0.4, 0 for a flat top; if the outline has steps too short for it, the wall gets a flat top and the answer has a note); mirror (default true; false for an outline that should stay as drawn).",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["ids"],
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" } },
+        wall: { type: "number" },
+        height: { type: "number" },
+        rim: { type: "number" },
+        rimHeight: { type: "number" },
+        edge: { type: "number" },
+        mirror: { type: "boolean" },
+      },
+    },
+  },
+  {
+    name: "layerling_loft_sketches",
+    description: "Loft between two sketch bodies, like the editor's Loft sketches button: two extruded sketch or SVG bodies, each with one outline (a ring with holes in both is fine, as long as both have as many), become one exact body whose bottom is the outline of the lower body at its bottom and whose top is the outline of the upper body at its top, with straight walls between them - for a funnel, a transition piece or a tapered frame. Each outline is taken where its body stands, turned about the vertical and stretched as the body is; bodies tipped over are refused. The two bodies stay inside the result as a group with groupOperation loft: layerling_open_group opens them, and closing the group builds the loft again. Returns the new object.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["ids"],
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 2, description: "The two sketch bodies." },
+      },
+    },
+  },
+  {
     name: "layerling_ungroup_objects",
     description: "Ungroup one or more grouped objects by id and preserve their edited geometry.",
     inputSchema: {
@@ -759,7 +794,7 @@ export const tools = [
   },
   {
     name: "layerling_texture_surface",
-    description: "Lay a surface texture onto one body, as the editor's \"Surface texture\" does: grooves, knurling, honeycomb, bumps, irregular cells, knitting, a wound rope, basket weave, grain or an image as a height map, for grip or for looks, cracks as in kintsugi, with gold in them as a part of its own, or a text stuck on like a label pressed on (engraved or raised, along a vase's belly or over a box's edge). The body becomes one mesh with the relief, standing where it stood; the body under the relief is kept with it. Called again on a textured body, it makes the texture again on that body with the settings given (the ones not given stay as they were), where the body stands now; remove: true takes the texture off and brings that body back. A texture made before this, or one with other steps after it, has no body kept: undo it instead. Around an axis (projection \"cylinder\", the default, for round bodies such as a cup, a knob or a handle) the spacing is rounded so that a whole number of grooves or cells goes round and the pattern closes without a seam; \"allRound\" suits bodies that are not round, \"flat\" a lid or a plate seen along the axis. Axes are named as the editor shows them, z up. Faces pointing down or up within 30 degrees stay smooth unless bottomFree or topFree say otherwise, so the body stays flat on the bed. A large body takes a few seconds. Returns the new object, the settings used (values out of range are clamped), how many masks took part and what was made: triangles, how many grooves or cells go round, the spacing as made, and warnings (limited: made coarser to stay within the triangle budget; tooDeep: inward from both sides deeper than half the thinnest size).",
+    description: "Lay a surface texture onto one body, as the editor's \"Surface texture\" does: grooves, knurling, honeycomb, bumps, irregular cells, knitting, a wound rope, basket weave, grain or an image as a height map, for grip or for looks, cracks as in kintsugi, with gold in them as a part of its own, or a text stuck on like a label pressed on (engraved or raised, along a vase's belly or over a box's edge). The body becomes one mesh with the relief, standing where it stood; the body under the relief is kept with it. Called again on a textured body, it makes the texture again on that body with the settings given (the ones not given stay as they were), where the body stands now; remove: true takes the texture off and brings that body back. A texture made before this, or one with other steps after it, has no body kept: undo it instead. Around an axis (projection \"cylinder\", the default, for round bodies such as a cup, a knob or a handle) the spacing is rounded so that a whole number of grooves or cells goes round and the pattern closes without a seam; \"allRound\" suits bodies that are not round, \"flat\" a lid or a plate seen along the axis. Axes are named as the editor shows them, z up. Faces pointing down or up within 30 degrees stay smooth unless bottomFree or topFree say otherwise, so the body stays flat on the bed; faces names the faces that get it instead (faces: [\"top\"] textures only the top, also of a cylinder). A large body takes a few seconds. Returns the new object, the settings used (values out of range are clamped), how many masks took part and what was made: triangles, how many grooves or cells go round, the spacing as made, and warnings (limited: made coarser to stay within the triangle budget; tooDeep: inward from both sides deeper than half the thinnest size).",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -772,8 +807,11 @@ export const tools = [
         width: { type: "number", description: "Share of the spacing a groove, joint or bump takes, 0.1 to 1; knit: the yarn's thickness, rope: how far the rings grip into each other, weave: the stakes' thickness. Default 0.6." },
         profile: { type: "string", enum: ["pointed", "round", "flat", "dome"], description: "Cross-section of a groove or joint, or the shape of a bump: pointed (a V; a cone on a bump), round (a soft bell), flat (a flat floor or top), dome (a half circle; a half ball on a bump). Default pointed, for bumps dome." },
         angle: { type: "number", description: "Grooves and knurling: slant against the axis in degrees, -90 to 90 (0 = along the axis). Default 30." },
+        faceTurn: { type: "number", description: "The pattern on the faces seen along the axis (a box's top and bottom) turned round it, -180 to 180 degrees: 0 = rows along the front edge, 90 = along the side edge. On a round top or bottom, grooves, rope and knitting run in rings round the middle instead. Default 0." },
+        capStyle: { type: "string", enum: ["auto", "rows", "rings"], description: "Grooves, rope and knitting on a top or bottom round the axis: rows (turned by faceTurn) or rings following the outline inwards; auto: rings on a round body, rows on an angular one. Default auto." },
+        capEdge: { type: "string", enum: ["auto", "sharp", "over", "fold", "bead"], description: "Where a side round the axis meets a top or bottom that has the pattern too (rope, knitting, grooves): sharp (each ends at the edge), over (the side's pattern bends round the edge and takes the whole top: rows as rings, upright and slanted grooves as rays almost to the middle), fold (the same as a band round the rim only, the top's own pattern inside, as capStyle sets it), bead (a border in the pattern's style runs round the edge, for every pattern: a cord for rope, a cast-off chain for knitting, a round bead otherwise). Default auto: over with rings on top, fold with rows, else sharp." },
         direction: { type: "string", enum: ["inward", "outward", "both"], description: "Into the body, out of it, or centred on the surface. Default inward." },
-        projection: { type: "string", enum: ["auto", "cylinder", "allRound", "flat"], description: "How the pattern is laid on: cylinder round the axis (round bodies; the spacing is rounded so it closes), allRound from three sides (angular bodies like a box; flat sides are cut exactly), flat from one side. Default auto: cylinder on a round body, allRound on an angular one; the result's texture.projection says which." },
+        projection: { type: "string", enum: ["auto", "cylinder", "allRound", "flat"], description: "How the pattern is laid on: cylinder round the axis (round bodies; the spacing is rounded so it closes; on an angular body standing along the axis, like a box or a prism, it follows the outline round the edges without a seam, a raised pattern bending round them), allRound from three sides (each face on its own; flat sides are cut exactly), flat from one side. Default auto: cylinder on a round body and on an angular one standing along the axis, allRound on others; the result's texture.projection says which." },
         axis: { type: "string", enum: ["x", "y", "z"], description: "The axis for cylinder and flat, as the editor shows it (z up). Default z." },
         bottomFree: { type: "number", description: "Faces pointing down within this many degrees stay smooth, 0 to 90 (0 textures the bottom too). Default 30." },
         topFree: { type: "number", description: "Faces pointing up within this many degrees stay smooth, 0 to 90. Default 30." },
@@ -803,6 +841,7 @@ export const tools = [
         textAround: { type: "number", description: "Text: where it sits round the axis in degrees, -180 to 180: 0 the front, 90 the right, -90 the left (with axis x or y, 0 is the top and 180 the bottom). Default 0." },
         textHeight: { type: "number", description: "Text: where its middle sits along the axis, in % of the body's size along it, 0 to 100. Default 50." },
         textTurn: { type: "number", description: "Text: turned on the surface in degrees, -180 to 180, counterclockwise seen from outside. Default 0." },
+        textVertical: { type: "boolean", description: "Text: true stacks the letters top to bottom instead of side by side. Default false." },
         seed: { type: "number", description: "Cells and grain: another whole number, 1 to 9999, lays them out anew; the same number gives the same pattern. Default 1." },
         image: { type: "string", enum: ["topography", "wood", "woodRift", "guilloche", "terrazzo", "craquelure", "cord", "moire", "mosaic", "folds", "fingerprint", "rosettes", "own"], description: "Image: a ready height map drawn in code (each tiles without a seam), or own for imageOwn. Default topography." },
         imageOwn: {
@@ -816,6 +855,16 @@ export const tools = [
         imageInvert: { type: "boolean", description: "Image: light and dark swapped. Default false." },
         imageBlur: { type: "number", description: "Image: softened over this many of its points, 0 to 8. Default 0." },
         imageTiling: { type: "string", enum: ["repeat", "mirror", "staggered"], description: "Image: tiles repeated, mirrored (no seam at their borders), or every other row half a tile along. Default repeat." },
+        faces: {
+          type: "array",
+          items: {
+            anyOf: [
+              { type: "string", enum: ["top", "bottom", "front", "back", "left", "right"] },
+              { type: "object", properties: { at: { type: "array", items: { type: "number" } }, normal: { type: "array", items: { type: "number" } } } },
+            ],
+          },
+          description: "Only these faces of the body get the pattern; the others stay as they are, with few triangles. A face is the region within the body's sharp edges (edgeAngle): a box's side, a cylinder's mantle or its top. By name: top, bottom, front, back, left, right - the face there (on a cylinder the four sides all name its mantle). Faces picked in the editor are kept as { at, normal } and are taken back as they are. An empty list: every face again. Picked faces go before bottomFree, topFree, the height band, outside and inside. Not for text, which goes where it is put.",
+        },
         masks: {
           type: "array",
           description: "Helper bodies that keep the texture away (mode exclude) or are the only place it goes (mode only): other boxes, cylinders, spheres, cones or pyramids that reach into the body, by id. Without this list, the bodies marked as texture masks in the design (surfaceTextureMask) that reach into it take part. A mask is a helper: hide or delete it before printing.",
@@ -1073,6 +1122,7 @@ export const tools = [
         id: { type: "string", description: "A text, or a layered-text bundle to build again." },
         text: { type: "string", description: "New words for every layer." },
         font: { type: "string", description: "New font for every layer: a built-in name or a font of one's own by name or id." },
+        vertical: { type: "boolean", description: "true stacks the letters of every layer top to bottom, so the tag stands upright at the same letter size; false lays them side by side again." },
         layers: {
           type: "array",
           maxItems: 6,
@@ -1316,12 +1366,13 @@ export const tools = [
   },
   {
     name: "layerling_measurements",
-    description: "The measurements of the editor's tape measure: what is measured and whether they are shown. Call with nothing to read them: visible and measurements, each with its id and its length in millimetres (a measured edge counts along the edge). visible true shows the measurements, false hides them, like the eye among the tape measure's buttons; hidden measurements stay in the design. The measurements belong to the design: they stay in the browser and travel in a .lyl file, never in the undo history, and hiding is kept too. Combine with layerling_capture_image to see them (or not) in the picture. Not available while a sketch is open.",
+    description: "The measurements of the editor's tape measure: what is measured and whether they are shown. Call with nothing to read them: visible and measurements, each with its id and its length in millimetres (a measured edge counts along the edge). visible true shows the measurements, false hides them, like the eye among the tape measure's buttons; hidden measurements stay in the design. The measurements belong to the design: they stay in the browser and travel in a .lyl file, never in the undo history, and hiding is kept too. dimensions false hides the sizes and distances the editor shows around the selection by itself (the size marks, the movement dimensions while dragging, the distances to the origin and the angle badge), like the key Q; true shows them again. Only the view changes, for this editor until it is reloaded; a handle pointed at still shows its size. The answer has dimensions too. Combine with layerling_capture_image to see them (or not) in the picture. Not available while a sketch is open.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
         ...editorTargetSchema.properties,
         visible: { type: "boolean", description: "true shows the measurements, false hides them. Left out they stay as they are." },
+        dimensions: { type: "boolean", description: "false hides the sizes and distances around the selection (key Q), true shows them again. Left out they stay as they are." },
       },
     },
   },

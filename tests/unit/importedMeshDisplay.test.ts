@@ -85,3 +85,30 @@ describe("the view's geometry prepared in the worker", () => {
     expect((geometry as THREE.BufferGeometry & { boundsTree?: MeshBVH }).boundsTree).toBeInstanceOf(MeshBVH);
   });
 });
+
+describe("normals a mesh can be lit by (#988)", () => {
+  it("gives a corner without a usable normal its triangle's and keeps the others", () => {
+    const mesh = sphereMesh(true);
+    const normals = [...mesh.normals!];
+    // The first triangle has 0 0 0 at one corner and NaN at another, as some exporters write them.
+    normals.splice(0, 3, 0, 0, 0);
+    normals.splice(3, 3, Number.NaN, Number.NaN, Number.NaN);
+    const drawn = buildImportedMeshGeometry({ ...mesh, normals }).getAttribute("normal").array as Float32Array;
+
+    const [a, b, c] = [0, 3, 6].map((i) => new THREE.Vector3(mesh.positions[i], mesh.positions[i + 1], mesh.positions[i + 2]));
+    const face = b.clone().sub(a).cross(c.clone().sub(a)).normalize();
+    expect(new THREE.Vector3(drawn[0], drawn[1], drawn[2]).distanceTo(face)).toBeLessThan(1e-6);
+    expect(new THREE.Vector3(drawn[3], drawn[4], drawn[5]).distanceTo(face)).toBeLessThan(1e-6);
+    // Every other corner keeps the smooth normal it came with.
+    for (let i = 6; i < normals.length; i += 1) expect(drawn[i]).toBeCloseTo(normals[i], 6);
+  });
+
+  it("lights a mesh whose normals are all 0 0 0", () => {
+    const mesh = sphereMesh(true);
+    const drawn = buildImportedMeshGeometry({ ...mesh, normals: mesh.normals!.map(() => 0) }).getAttribute("normal").array as Float32Array;
+    let lit = 0;
+    for (let i = 0; i < drawn.length; i += 3) if (Math.hypot(drawn[i], drawn[i + 1], drawn[i + 2]) > 0.99) lit += 1;
+    // Only the sphere's pole triangles, which have no area, are left without a direction.
+    expect(lit / (drawn.length / 3)).toBeGreaterThan(0.95);
+  });
+});

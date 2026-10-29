@@ -94,7 +94,7 @@ Mens et arbejdsplan ligger på en flade, dukker et øje op ved siden af {{ui:cam
 
 ## Gitter og snap
 
-Gitteret viser pladens størrelse. Nederst til højre er **snap-trinnet**: flytning og skalering snapper i trin af den størrelse, for eksempel 1 mm. Gør det mindre til fint arbejde og større til grov arrangering. {{ui:editor.tool.snapToGrid}} i båndet flytter de valgte former bagefter hen på det nærmeste gitterkryds. Mens der flyttes, snapper former også til andre former, se [Valg og arrangering](chapter:select-and-arrange).
+Gitteret viser pladens størrelse. Nederst til højre er **snap-trinnet**: flytning og skalering snapper i trin af den størrelse, for eksempel 1 mm. Gør det mindre til fint arbejde og større til grov arrangering. {{ui:editor.tool.snapToGrid}} i båndet flytter de valgte former bagefter hen på det nærmeste gitterkryds. Mens der flyttes, snapper former også til andre former, se [Valg og arrangering](chapter:select-and-arrange). Uden musen: [[Alt]]+[[1]] til [[Alt]]+[[0]] vælger den post i menuen med det nummer ([[Alt]]+[[1]] slår snapping fra), og [[,]] og [[.]] gør trinnet ét trin finere eller grovere. Det virker i en skitse også.
 
 > **Tip:** Stop med at dreje visningen når du sætter dele helt præcist sammen. Brug taltasterne til at gå til den lige visning fra top eller for og tryk [[O]] for den flade visning. Så ser du straks om to kanter virkelig flugter.
 ### Indstillingsvinduet

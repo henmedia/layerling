@@ -13,13 +13,13 @@ export function groupShowsPartColors(shape: WorkplaneShape): boolean {
   // A bundle keeps its parts' colours unless Multicolor is switched off for it.
   if (shape.groupOperation === "bundle") return shape.multicolor ?? true;
   // A hull is one body round its parts: there is no part of it to show in its own colour (#863).
-  if (shape.groupOperation === "hull") return false;
+  if (shape.groupOperation === "hull" || shape.groupOperation === "loft") return false;
   return shape.multicolor ?? !shape.importedMesh;
 }
 
 /** Whether the "Multicolor" switch applies to this shape at all. */
 export function canToggleGroupColors(shape: WorkplaneShape): boolean {
-  return Boolean(shape.groupedShapes?.length) && shape.groupOperation !== "hull" && !shape.hole;
+  return Boolean(shape.groupedShapes?.length) && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" && !shape.hole;
 }
 
 /**
@@ -28,5 +28,5 @@ export function canToggleGroupColors(shape: WorkplaneShape): boolean {
  * was shown in one colour; only a hull, which is one body, takes the colour into its parts.
  */
 export function colorForParts(shape: WorkplaneShape, color: string | undefined): string | undefined {
-  return shape.groupedShapes?.length && shape.groupOperation !== "hull" ? undefined : color;
+  return shape.groupedShapes?.length && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? undefined : color;
 }

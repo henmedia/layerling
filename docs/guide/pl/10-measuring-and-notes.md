@@ -17,7 +17,7 @@ Narzędzie Zmierz jest na dolnym końcu paska kamery przy lewej krawędzi ({{ui:
 4. **{{ui:camera.tapeWholeEdges}}:** kliknięcie krawędzi mierzy ją w całości, na przykład obwód okręgu. Gdy to jest wyłączone, kliknięcie stawia zamiast tego punkt na krawędzi, a drugi punkt idzie w dowolne miejsce, więc możesz zmierzyć średnicę albo dowolną inną odległość. [[Alt]] odwraca ten przełącznik na jedno kliknięcie. Na okręgu punkt naprzeciwko pierwszego przyciąga się, gdy wskaźnik się do niego zbliży, a punkty leżą na prawdziwym okręgu, więc średnica wychodzi dokładnie.
 5. **{{ui:camera.deleteAllMeasurements}}:** usuwa naraz wszystkie pomiary. Ponieważ tego nie da się cofnąć, layerling najpierw pyta. Gdy nie ma pomiarów, nie ma czego robić.
 6. **{{ui:camera.tapeMarkMiddle}}:** w środku każdego pomiaru jest mały okrągły znacznik z wypełnioną dolną połową. Stawia on [punkt odniesienia](#punkty-odniesienia) w środku pomiaru: po kliknięciu okrągłej krawędzi, takiej jak brzeg otworu, w środku tego okręgu (także na zaimportowanej siatce, gdzie nic innego nie oznacza środka otworu), a dla średnicy albo dowolnego prostego pomiaru w połowie jego długości. Przeciągany kształt przyciąga się wtedy do punktu swoim środkiem. Punkt, który już istnieje, nie powstaje drugi raz. Narzędzie Zmierz przyciąga się do punktu odniesienia jak do narożnika, więc możesz mierzyć od środka okręgu albo od środka linii: zaznacz go, a potem kliknij punkt.
-7. **{{ui:camera.tapeTypeLength}}:** Gdy co najmniej jeden koniec prostego pomiaru leży na bryle, jego liczbę można kliknąć. Wpisz nową długość i naciśnij [[Enter]]: bryła przy drugim punkcie przesuwa się wzdłuż zmierzonej linii, aż odległość będzie dokładnie taka, jak przy linijce w Tinkercad. Jeśli zaznaczona jest tylko bryła przy pierwszym punkcie, przesuwa się ona. Punkty pomiaru zostają na bryle, więc pomiar podąża za nią. Mierz od narożnika, krawędzi lub [punktu odniesienia](#punkty-odniesienia), np. środka okręgu, aby ustawić części w dokładnej odległości.
+7. **{{ui:camera.tapeTypeLength}}:** Gdy co najmniej jeden koniec prostego pomiaru leży na bryle, jego liczbę można kliknąć. Wpisz nową długość i naciśnij [[Enter]]: bryła przy drugim punkcie przesuwa się wzdłuż zmierzonej linii, aż odległość będzie dokładnie taka, jak przy linijce w Tinkercad. Jeśli zaznaczona jest tylko bryła przy pierwszym punkcie, przesuwa się ona. Punkty pomiaru zostają na bryle, więc pomiar podąża za nią. Mierz od narożnika, krawędzi lub [punktu odniesienia](#punkty-odniesienia), np. środka okręgu, aby ustawić części w dokładnej odległości. Ujemna długość przesuwa ją o tyle za pierwszy punkt, na przykład 5 mm do wewnątrz od krawędzi pudełka.
 
 [[Esc]] wychodzi z trybu mierzenia.
 
@@ -50,10 +50,12 @@ Zarówno narzędzie Zmierz, jak i kątownik zostają tam, gdzie są, gdy szkicuj
 
 W ustawieniach w sekcji {{ui:workspace.appearance}} są dwa przełączniki wymiarów na żywo:
 
-- {{ui:workspace.showMoveDimensions}} pokazuje podczas przeciągania, o ile przesuwasz.
+- {{ui:workspace.showMoveDimensions}} pokazuje podczas przeciągania, o ile przesuwasz. Dotyczy to też podnoszenia czarną strzałką nad bryłą; droga pokazuje się przy jej przednim narożniku. Po puszczeniu kliknij taką liczbę i wpisz dokładną odległość; wartość ujemna idzie w dół.
 - {{ui:workspace.showOriginDimensions}} pokazuje odległości zaznaczenia od początku układu płyty, także przy kilku zaznaczonych bryłach.
 
 Z {{ui:workspace.dimensionsAlwaysVisible}} wymiary są widoczne cały czas.
+
+Jeśli na chwilę przeszkadzają, naciśnij [[Q]]: wymiary i odległości wokół zaznaczenia znikają, a przesuwana część jest dobrze widoczna. Ponowne [[Q]] przywraca je. Uchwyt, na który wskazujesz, nadal pokazuje swój wymiar.
 
 ## Notatki
 
@@ -72,7 +74,7 @@ Notatki zapisują się w projekcie, nie pojawiają się w żadnym eksporcie i mo
 
 ## Punkty odniesienia
 
-Punkt odniesienia to sam znak w przestrzeni, jak kreska ołówkiem albo punkt trasowania w warsztacie: nie należy do żadnej bryły, nigdy nie jest drukowany, a inne rzeczy się do niego przyciągają. Kliknij bryłę prawym przyciskiem i wybierz {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} albo {{ui:contextMenu.markMidpoints}}: punkty pojawią się na górnej ścianie bryły (całego zaznaczenia, jeśli zaznaczyłeś kilka). {{ui:contextMenu.markFaceCenter}} ustawia natomiast punkt na środku płaskiej ściany, na którą kliknięto prawym przyciskiem, na przykład z boku lub na końcu.
+Punkt odniesienia to sam znak w przestrzeni, jak kreska ołówkiem albo punkt trasowania w warsztacie: nie należy do żadnej bryły, nigdy nie jest drukowany, a inne rzeczy się do niego przyciągają. Kliknij bryłę prawym przyciskiem i wybierz {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} albo {{ui:contextMenu.markMidpoints}}: punkty pojawią się na górnej ścianie bryły (całego zaznaczenia, jeśli zaznaczyłeś kilka). {{ui:contextMenu.markFaceCenter}} ustawia natomiast punkt na środku płaskiej ściany, na którą kliknięto prawym przyciskiem, na przykład z boku lub na końcu. Gdy ustawiono punkt obrotu, {{ui:contextMenu.markPivot}} stawia punkt dokładnie na nim, więc środek innej części przyciąga się do punktu, wokół którego obraca się zaznaczenie.
 
 - Przeciągnij punkt, aby go przesunąć, albo kliknij go, aby zobaczyć jego współrzędne i wpisać nowe. Są w ustawionej jednostce. Każdą kartę można odsunąć za tytuł, jeśli coś zasłania, osobno: pozostałe zostają na miejscu, a dwukrotne kliknięcie tytułu odkłada ją z powrotem. Karta dotknięta ostatnio stoi przed pozostałymi. **Usuń wszystkie** w karcie albo **Usuń wszystkie punkty odniesienia** w menu prawego przycisku (na bryle albo na pustym miejscu widoku 3D) usuwa naraz wszystkie punkty. {{ui:common.delete}} usuwa punkt.
 - Narzędzie Zmierz też potrafi postawić punkt: {{ui:camera.tapeMarkMiddle}}, do połowy wypełniony znacznik w środku pomiaru, stawia go w jego środku, na przykład w środku okrągłego otworu. Mierzy też od punktu: przyciąga się do punktów odniesienia jak do narożników.
