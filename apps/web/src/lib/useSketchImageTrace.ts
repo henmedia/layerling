@@ -16,7 +16,10 @@ import {
 import { croppedPixels } from "@/lib/sketchImageTrace";
 import type { SketchImage } from "@/types/layerling";
 
-/** How long the settings must rest before the picture is traced again, in ms: a slider being dragged traces once it stops. */
+/**
+ * How long the settings must rest before the picture is traced again, in ms: a slider being dragged traces once
+ * it stops. The range of points is found then too, not on every move, as it takes three fits of its own.
+ */
 const TRACE_PAUSE = 90;
 
 /** What clicks on the picture draw: a region cut away by its corners (Cut away), or one the magnetic lasso lays along the edges. */
@@ -34,6 +37,11 @@ export type SketchImageTraceState = {
   trace: PictureTrace | null;
   /** The size of the traced part of the picture, in its pixels. */
   size: { width: number; height: number } | null;
+  /**
+   * The trace for the settings as they are now (Apply): the one shown when it is up to date, else traced at
+   * once - while a change waits for its pause, the one shown is still the one before it.
+   */
+  traceNow: () => PictureTrace | null;
   change: (patch: Partial<PictureTraceSettings>) => void;
   /** Pick areas: while on, a click on the picture adds the area of like colour there. */
   picking: boolean;
@@ -88,7 +96,9 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
   const key = active && image ? `${image.id}:${image.dataUrl.length}:${image.dataUrl.slice(-48)}:${JSON.stringify(image.crop ?? null)}` : null;
   const [picture, setPicture] = useState<{ key: string; prepared: PreparedPicture | null; failed?: boolean } | null>(null);
   const [settings, setSettings] = useState<PictureTraceSettings | null>(null);
-  const [trace, setTrace] = useState<PictureTrace | null>(null);
+  // The last trace, with the range of points it was found with and the settings it is for (`key`).
+  const [traced, setTraced] = useState<{ key: string; range: PictureTraceRange; trace: PictureTrace } | null>(null);
+  const rangeRef = useRef<{ picture: PreparedPicture; key: string; range: PictureTraceRange } | null>(null);
   const [picking, setPicking] = useState(false);
   const [highlight, setHighlight] = useState<string | null>(null);
   const [areaRejected, setAreaRejected] = useState(false);
@@ -119,14 +129,14 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
     if (!key || !dataUrl) {
       setPicture(null);
       setSettings(null);
-      setTrace(null);
+      setTraced(null);
       return;
     }
     let cancelled = false;
     pointsSetRef.current = false;
     setPicture({ key, prepared: null });
     setSettings(null);
-    setTrace(null);
+    setTraced(null);
     picturePixels(dataUrl)
       .then((pixels) => {
         if (cancelled) return;
@@ -152,31 +162,39 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
     return rest;
   }, [settings]);
   const shapeKey = shapeSettings ? JSON.stringify(shapeSettings) : "";
-  const range = useMemo(
-    () => (prepared && shapeSettings ? traceRange(prepared, shapeSettings) : null),
-    // shapeKey stands for the settings other than the number of points.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [prepared, shapeKey],
-  );
-  const points = settings && range
-    ? pointsSetRef.current ? Math.min(range.most, Math.max(range.fewest, settings.points)) : range.suggested
-    : 0;
+  // What the trace is for: the settings other than the number of points, and that number when it is set by hand.
+  const wantedKey = `${shapeKey}|${pointsSetRef.current && settings ? settings.points : "suggested"}`;
+  // Until the pause is over, the range and the number of points are those last found.
+  const range = traced?.range ?? null;
+  const pointsIn = (within: PictureTraceRange) => (settings && pointsSetRef.current ? Math.min(within.most, Math.max(within.fewest, settings.points)) : within.suggested);
+  const points = settings && range ? pointsIn(range) : 0;
+
+  /** Traces the picture with the settings as they are now: the range of points (kept while only the number changes), then the outlines. */
+  const traceCurrent = () => {
+    if (!prepared || !shapeSettings) return null;
+    const known = rangeRef.current;
+    const within = known?.picture === prepared && known.key === shapeKey ? known.range : traceRange(prepared, shapeSettings);
+    rangeRef.current = { picture: prepared, key: shapeKey, range: within };
+    const next = { key: wantedKey, range: within, trace: tracePicture(prepared, { ...shapeSettings, points: pointsIn(within) }) };
+    setTraced(next);
+    return next.trace;
+  };
 
   useEffect(() => {
     if (!prepared || !shapeSettings) return;
     const timer = window.setTimeout(() => {
-      const next = tracePicture(prepared, { ...shapeSettings, points });
-      setTrace(next);
+      const next = traceCurrent();
       // An area on the background (it reaches the edge) is no area of the object: it goes again, and the card says so.
-      if (next.rejected?.length) {
+      if (next?.rejected?.length) {
         const rejected = new Set(next.rejected);
         setAreaRejected(true);
         setSettings((value) => (value ? { ...value, areas: (value.areas ?? []).filter((area) => !rejected.has(area.id)) } : value));
       }
     }, TRACE_PAUSE);
     return () => window.clearTimeout(timer);
+    // wantedKey stands for the settings the trace is for.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prepared, shapeKey, points]);
+  }, [prepared, wantedKey]);
 
   const patch = (change: Partial<PictureTraceSettings> | ((value: PictureTraceSettings) => Partial<PictureTraceSettings>)) =>
     setSettings((value) => (value ? { ...value, ...(typeof change === "function" ? change(value) : change) } : value));
@@ -198,8 +216,9 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
     failed: Boolean(current?.failed),
     settings: settings ? { ...settings, points } : null,
     range,
-    trace,
+    trace: traced?.trace ?? null,
     size: prepared ? { width: prepared.width, height: prepared.height } : null,
+    traceNow: () => (traced?.key === wantedKey ? traced.trace : traceCurrent()),
     change: (change) => {
       if (change.points !== undefined) pointsSetRef.current = true;
       // Another part has a threshold of its own, and its holes other keys.

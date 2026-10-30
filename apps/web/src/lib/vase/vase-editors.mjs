@@ -428,7 +428,7 @@ function drawingBoard(api) {
       onChange(v)
       // While the slider moves, trace again once it rests a moment.
       clearTimeout(traceTimer)
-      traceTimer = setTimeout(updateTrace, 60)
+      traceTimer = setTimeout(() => { traceTimer = 0; updateTrace() }, 60)
     })
     return slider
   }
@@ -464,6 +464,8 @@ function drawingBoard(api) {
   /** Trace off: with `apply`, its outline becomes the body form and the photo stays on the object as found; else all is as before. */
   function stopTrace(apply) {
     if (!trace) return
+    // A slider moved a moment ago: its retrace still waits, so the outline shown is the one before it.
+    if (apply && traceTimer) { clearTimeout(traceTimer); traceTimer = 0; updateTrace() }
     const done = trace
     endTrace()
     if (apply && done.result?.ok) {
@@ -479,6 +481,7 @@ function drawingBoard(api) {
   }
   function endTrace() {
     clearTimeout(traceTimer)
+    traceTimer = 0
     stopLasso()
     trace = null
     traceRow.hidden = true

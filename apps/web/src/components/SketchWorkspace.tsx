@@ -3233,8 +3233,10 @@ export function SketchWorkspace({
             }
           }}
           onApplyTrace={() => {
-            if (!imageTrace.trace?.rings.length || !imageTrace.size) return;
-            onTraceImage?.(selectedImage.id, imageTrace.trace, imageTrace.size);
+            // The trace for the settings as they are now, not the one still shown while a change waits for its pause.
+            const trace = imageTrace.traceNow();
+            if (!trace?.rings.length || !imageTrace.size) return;
+            onTraceImage?.(selectedImage.id, trace, imageTrace.size);
             setTraceImageId(null);
           }}
         />
