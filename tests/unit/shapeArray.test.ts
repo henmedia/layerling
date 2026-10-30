@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ARRAY_AUTO_GROUP_ABOVE, arrayGroupsCopies, circleStepDegrees, clampArrayCount, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing } from "@/lib/shapeArray";
+import { ARRAY_AUTO_GROUP_ABOVE, arrayFitGap, arrayFitShift, arrayFitStep, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing } from "@/lib/shapeArray";
 
 describe("shape arrays", () => {
   it("groups the pieces by itself above five, until the person chooses", () => {
@@ -61,5 +61,32 @@ describe("shape arrays", () => {
     const half = rotateAroundVertical({ x: 15, z: -5 }, { x: 5, y: 5 }, 180);
     expect(half.x).toBeCloseTo(-5);
     expect(half.z).toBeCloseTo(-5);
+  });
+  it("spreads a row over a body with the same gap at both ends (#1037)", () => {
+    // Five holes of 8 mm, 20 mm in from the left end of a 150 mm plate: 25.5 mm apart, the last one 20 mm from the right.
+    const plate = { min: -75, max: 75 };
+    const hole = { min: -55, max: -47 };
+    expect(arrayFitGap(hole, plate)).toEqual({ gap: 20, fromStart: true });
+    const step = arrayFitStep(5, hole, plate);
+    expect(step).toBeCloseTo(25.5);
+    expect(plate.max - (hole.max + 4 * step)).toBeCloseTo(20);
+    // Nearer the far end the row runs back towards the start.
+    expect(arrayFitStep(5, { min: 47, max: 55 }, plate)).toBeCloseTo(-25.5);
+    // A new gap moves the piece in from its nearer end, at either end.
+    expect(arrayFitShift(hole, plate, 10)).toBeCloseTo(-10);
+    expect(arrayFitShift({ min: 47, max: 55 }, plate, 10)).toBeCloseTo(10);
+  });
+
+  it("turns a fit into spacings along X or Y only, and leaves a circle alone", () => {
+    const base = { mode: "row" as const, count: 3, spacingX: 7, spacingY: 3, spacingZ: 1 };
+    const pieces = { minX: 0, maxX: 10, minZ: -5, maxZ: 5 };
+    const body = { minX: -10, maxX: 50, minZ: -20, maxZ: 40 };
+    // X: 10 mm in from -10, so the last piece ends 10 mm before 50: two steps of 15.
+    expect(arrayWithFit({ ...base, fit: { axis: "x", bodyId: "b" } }, pieces, body)).toMatchObject({ spacingX: 15, spacingY: 0, spacingZ: 0 });
+    // Y is -z in the scene: 15 mm in from -20, so the last piece ends at 25 - two steps of 10 towards +z, -10 in Y.
+    expect(arrayWithFit({ ...base, fit: { axis: "y", bodyId: "b" } }, pieces, body)).toMatchObject({ spacingX: 0, spacingY: -10, spacingZ: 0 });
+    expect(arrayWithFit({ ...base, fit: null }, pieces, body)).toMatchObject({ spacingX: 7, spacingY: 3, spacingZ: 1 });
+    expect(arrayWithFit({ ...base, fit: { axis: "x", bodyId: "b" } }, pieces, null)).toMatchObject({ spacingX: 7 });
+    expect(arrayWithFit({ ...base, mode: "circle", fit: { axis: "x", bodyId: "b" } }, pieces, body)).toMatchObject({ spacingX: 7 });
   });
 });

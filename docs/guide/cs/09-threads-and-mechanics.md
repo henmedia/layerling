@@ -12,7 +12,7 @@ Vložte {{ui:shape.thread}} a v {{ui:inspector.threadRole}} zvolte:
 - **{{ui:thread.rod}}:** válec se závitem, například šroub bez hlavy.
 - **{{ui:thread.screw}}:** šroub s hlavou {{ui:inspector.threadHead}} typu {{ui:thread.headCylinder}}, {{ui:thread.headCountersunk}} nebo {{ui:thread.headHex}}.
 - **{{ui:thread.nut}}:** odpovídající matice.
-- **{{ui:thread.bore}}:** závitový výřez. Zasuňte jej do dílu a slučte, aby vznikl vnitřní závit.
+- **{{ui:thread.bore}}:** závitový výřez. Zasuňte jej do dílu a slučte, aby vznikl vnitřní závit. Pro otvor, do kterého se šroubuje šroub, vždy použijte {{ui:thread.bore}}: {{ui:thread.rod}} nebo {{ui:thread.screw}} jako otvor má plnou velikost šroubu bez vůle a vyjde příliš těsný. Pokud ji přesto nastavíte jako otvor, layerling na to upozorní a {{ui:inspector.threadMakeTappedHole}} z ní udělá {{ui:thread.bore}}.
 
 ![Šroub s válcovou hlavou. Vpravo jsou typ dílu, hlava, velikost, stoupání a profil.](shot:thread-screw)
 
@@ -153,7 +153,7 @@ Nosná deska může mít pruh, pro zásuvku, která nemá celý počet jednotek 
 
 {{ui:prop.hingeClearance}} je mezera kolem čepu, mezi klouby a před křídly. Při 0,4 mm dobře seřízená tiskárna obvykle vytvoří pant uvolnitelný lehkým pootočením. Při slepení vůli zvětšete, při viklání zmenšete. Tiskněte naležato jako v náhledu a bez podpěr. Do křídel lze přidat otvory nebo je začlenit do většího dílu, například víka.
 
-Pant lze vyrobit i {{ui:hinge.styleCone}} (pod {{ui:prop.hingeStyle}}): každý druhý kloub pak končí kužely, které zapadají do kuželových důlků sousedních kloubů. Není tu čep ani dlouhý most, který by se mohl prověsit, takže se tiskne vleže; kužely mají sklon 45°. Je to síť, takže na něm nefungují zkosení a zaoblení a export STEP obsahuje trojúhelníky; kde by klouby byly na kužel příliš krátké, vytvoří jich méně. Místo počtu kloubů lze zadat {{ui:prop.hingeKnuckleWidth}}: klouby jsou pak nejvýše tak široké a jejich počet vyplyne z délky; zadání počtu kloubů šířku opět zruší.
+Pant lze vyrobit i {{ui:hinge.styleCone}} (pod {{ui:prop.hingeStyle}}): každý druhý kloub pak končí kužely, které zapadají do kuželových důlků sousedních kloubů. Není tu čep ani dlouhý most, který by se mohl prověsit, takže se tiskne vleže; kužely mají sklon 45°. Stejně jako ostatní provedení je to přesné těleso, takže na něm fungují zkosení i zaoblení a export STEP obsahuje jeho skutečné kužely; kde by klouby byly na kužel příliš krátké, vytvoří jich méně. Místo počtu kloubů lze zadat {{ui:prop.hingeKnuckleWidth}}: klouby jsou pak nejvýše tak široké a jejich počet vyplyne z délky; zadání počtu kloubů šířku opět zruší.
 
 {{ui:prop.hingeStyle}} nabízí čtyři možnosti: {{ui:hinge.stylePin}}, {{ui:prop.hingePinless}} (otvor pro vlastní čep), {{ui:hinge.styleCone}} a {{ui:hinge.styleLiftOff}}. U kuželů určuje {{ui:prop.hingeConeSize}}, jak velké jsou tam, kde vyrůstají z kloubu; větší kužely drží lépe a ve výchozím stavu jsou tak velké, jak se vejdou. Pant s kužely nemá čep ani otvor, proto smí být jeho list tak silný jako celý kloub: nastavíte-li {{ui:prop.hingeLeafThickness}} na průměr kloubu, listy lícují s klouby; takový pant se otevře asi o 90° a dál ne, protože se silné listy dotknou.
 

@@ -24,6 +24,7 @@ import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createThreadGeometry } from "@/lib/threadGeometry";
 import { bentTubeNaturalDimensions, createBentTubeGeometry } from "@/lib/bentTubeGeometry";
 import { createGearGeometry } from "@/lib/gearGeometry";
+import { createHirthGeometry } from "@/lib/hirthGeometry";
 import manifoldModule from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
@@ -405,6 +406,15 @@ describe("palette icons", () => {
         height: 16,
         sides: 32,
       }),
+    });
+    render({
+      // Schraeg von oben, damit die Zaehne um die Bohrung zu sehen sind.
+      name: "apps/web/public/assets/editor/shape-icons-gray/hirth.png",
+      height: 10,
+      lay: false,
+      azimuth: 35,
+      elevation: 42,
+      build: () => createHirthGeometry(30, 10, 30, { teeth: 12, toothSize: 4.5, centerHoleSize: 9 }),
     });
     render({
       name: "apps/web/public/assets/editor/shape-icons-gray/paraboloid.png",

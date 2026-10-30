@@ -32,8 +32,8 @@ describe("exact Gridfinity bins with dividers", () => {
     const solid = gridfinityPartSolid(cad, divided({ gridfinityScoopFront: true }));
     expect(cad.isValid(solid)).toBe(true);
     expect(cad.isSolid(solid) ? 1 : cad.getSubShapes(solid, "solid").length).toBe(1);
-    // 28347.64 mm³, measured with OCCT when this was written.
-    expect(Math.abs(Math.abs(cad.getVolume(solid)) - 28347.64)).toBeLessThan(0.05);
+    // 28347.58 mm³, measured with occt-wasm 5.11, which measures the curved scoop exactly (28347.64 before).
+    expect(Math.abs(Math.abs(cad.getVolume(solid)) - 28347.58)).toBeLessThan(0.05);
     expect(shortEdges(solid)).toHaveLength(0);
     expectMeshOf(divided({ gridfinityScoopFront: true }), solid);
   });

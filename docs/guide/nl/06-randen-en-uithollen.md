@@ -81,6 +81,18 @@ Verander je later de maat van een uitgehold lichaam, dan holt layerling het mete
 
 > **Tip:** Met een spuitmond van 0,4 mm is 1,2 tot 2 mm wand een goed begin: dun genoeg om materiaal te besparen, dik genoeg voor een stevig onderdeel.
 
+## Een deksel voor een open vorm
+
+{{ui:editor.tool.lid}} maakt het deksel voor een vorm die bovenaan open is: een doos die je met open bovenkant hebt uitgehold, een pot, een bakje. Selecteer de vorm en klik op {{ui:editor.tool.lid}}. In het venster kies je de soort:
+
+- {{ui:lid.type.plug}}: een plaat zo groot als de vorm met eronder een lip die in de opening grijpt.
+- {{ui:lid.type.cap}}: een plaat een wand breder dan de vorm met eronder een rand die om de buitenkant grijpt.
+- {{ui:lid.type.flat}}: alleen de plaat, om erop te leggen of te lijmen.
+
+Daarna stel je de {{ui:lid.thickness}} in, de {{ui:lid.fit}} (de {{ui:lid.gap}} tussen deksel en vorm: 0,1 mm strak, 0,2 mm normaal, 0,3 mm ruim, of elke waarde tot 1 mm) en hoe diep de lip of rand naar beneden reikt en hoe dik de wand is. Klik op {{ui:lid.apply}}: het deksel ligt naast de vorm, omgedraaid met de plaat naar beneden, zodat het zonder support print. De vorm blijft zoals hij is. Het deksel volgt elke omtrek, rond of hoekig, omdat het vlak onder de rand van de vorm zelf wordt afgenomen. Een vorm zonder opening bovenaan krijgt alleen een plat deksel; hol hem voor de andere twee eerst uit met de bovenkant open.
+
+> **Tip:** Hoe strak een deksel zit, hangt van de printer af. Print eerst een kleine doos met deksel; zit het te strak, neem dan de volgende ruimere passing.
+
 ## Lichamen verschuiven
 
 Elk vlak van een lichaam kan over dezelfde afstand naar buiten of naar binnen worden verschoven. Dat is wat een pasvorm, een deksel of een klikverbinding nodig heeft: een spleet van 0,1 tot 0,3 mm rondom terwijl de onderdelen op hun plaats blijven, wat schalen niet kan.

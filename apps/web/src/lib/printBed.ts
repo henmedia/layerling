@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { meshForShape } from "@/lib/editorMeshCore";
 import { quaternionForShape } from "@/lib/geometryRotation";
 import { PRINTER_PRESETS, type PrinterPreset } from "@/lib/printerPresets.generated";
 import { isNonSolidShape, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
@@ -70,6 +71,8 @@ export type BedOverhang = {
   right: number;
   back: number;
   front: number;
+  /** On a round plate, how far it reaches past the edge instead of past the four sides (0 = inside). */
+  edge: number;
   /** How far it reaches above the printer's build height (0 = fits). */
   top: number;
 };
@@ -83,9 +86,10 @@ const BED_EDGE_TOLERANCE = 0.01;
  * the build height. Height counts from the lowest printed body, because the
  * slicer sets the model down on the plate anyway - a design that floats or
  * sinks a little is not too tall for that. Holes, hidden bodies and rulers are
- * not printed, so they never count.
+ * not printed, so they never count. A `round` plate (a delta printer's, #1024)
+ * is a circle `width` across.
  */
-export function bedOverhangs(shapes: readonly WorkplaneShape[], width: number, depth: number, height?: number): BedOverhang[] {
+export function bedOverhangs(shapes: readonly WorkplaneShape[], width: number, depth: number, height?: number, round = false): BedOverhang[] {
   const halfWidth = width / 2;
   const halfDepth = depth / 2;
   const printed = shapes.filter((shape) => !shape.hole && !shape.hidden && !isNonSolidShape(shape));
@@ -94,16 +98,38 @@ export function bedOverhangs(shapes: readonly WorkplaneShape[], width: number, d
   const overhangs: BedOverhang[] = [];
   for (const shape of printed) {
     const footprint = shapeBedFootprint(shape);
-    const left = Math.max(0, -halfWidth - footprint.minX);
-    const right = Math.max(0, footprint.maxX - halfWidth);
-    const back = Math.max(0, -halfDepth - footprint.minZ);
-    const front = Math.max(0, footprint.maxZ - halfDepth);
+    const sides = round ? { left: 0, right: 0, back: 0, front: 0 } : {
+      left: Math.max(0, -halfWidth - footprint.minX),
+      right: Math.max(0, footprint.maxX - halfWidth),
+      back: Math.max(0, -halfDepth - footprint.minZ),
+      front: Math.max(0, footprint.maxZ - halfDepth),
+    };
+    const edge = round ? Math.max(0, roundBedReach(shape, footprint, halfWidth) - halfWidth) : 0;
     const top = height ? Math.max(0, (vertical.get(shape)?.maxY ?? 0) - base - height) : 0;
-    if (Math.max(left, right, back, front, top) > BED_EDGE_TOLERANCE) {
-      overhangs.push({ shape, left, right, back, front, top });
+    if (Math.max(sides.left, sides.right, sides.back, sides.front, edge, top) > BED_EDGE_TOLERANCE) {
+      overhangs.push({ shape, ...sides, edge, top });
     }
   }
   return overhangs;
+}
+
+/**
+ * How far from the plate's middle a body reaches, seen from above, for a round plate (#1024). The box round it reaches
+ * past the circle with its corners long before a round body does - a cylinder as wide as the plate would never fit -
+ * so a box that does not fit is measured again on the body's own mesh, and the box stands only when there is none.
+ */
+function roundBedReach(shape: WorkplaneShape, footprint: BedFootprint, radius: number) {
+  const box = Math.max(...[footprint.minX, footprint.maxX].flatMap((x) => [footprint.minZ, footprint.maxZ].map((z) => Math.hypot(x, z))));
+  if (box <= radius + BED_EDGE_TOLERANCE) return box;
+  try {
+    const { vertices } = meshForShape(shape);
+    if (!vertices.length) return box;
+    let reach = 0;
+    for (const [x, , z] of vertices) reach = Math.max(reach, Math.hypot(x, z));
+    return Math.min(box, reach);
+  } catch {
+    return box;
+  }
 }
 
 /**

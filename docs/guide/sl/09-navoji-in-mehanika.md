@@ -12,7 +12,7 @@ V knjižnici oblik izberi {{ui:shape.thread}}. Pod {{ui:inspector.threadRole}} s
 - **{{ui:thread.rod}}:** valj z navojem, na primer vijak brez glave.
 - **{{ui:thread.screw}}:** z glavo. {{ui:inspector.threadHead}} izbereš: {{ui:thread.headCylinder}}, {{ui:thread.headCountersunk}} ali {{ui:thread.headHex}}.
 - **{{ui:thread.nut}}:** ustrezna matica.
-- **{{ui:thread.bore}}:** navojna luknja. To je luknja. Povleci jo v del, oboje združi v skupino in del ima notranji navoj.
+- **{{ui:thread.bore}}:** navojna luknja. To je luknja. Povleci jo v del, oboje združi v skupino in del ima notranji navoj. Za luknjo, v katero se privije vijak, vedno uporabi {{ui:thread.bore}}: {{ui:thread.rod}} ali {{ui:thread.screw}} kot luknja ima polno mero vijaka brez zračnosti in je pretesna. Če jo vseeno nastaviš kot luknjo, te layerling opozori, {{ui:inspector.threadMakeTappedHole}} pa iz nje naredi {{ui:thread.bore}}.
 
 ![Vijak z valjasto glavo. Desno sta vrsta in oblika glave, nižje velikost, korak in profil.](shot:thread-screw)
 
@@ -153,7 +153,7 @@ Podstavek ima lahko pas, za predal, ki ni celo število enot mreže: {{ui:prop.g
 
 {{ui:prop.hingeClearance}} je razmik med premičnimi deli: okoli zatiča, med členi in pred listi. Z 0,4 mm se dobro nastavljen tiskalnik običajno sprosti z majhnim vrtljajem; če deli zrastejo skupaj, vzemi več, če se preveč maje, manj. Tečaj natisni ležeče, tako kot se pokaže na plošči, brez podpor. Liste lahko opremiš z izvrtinami ali združiš v večji del, na primer pokrov.
 
-Tečaj je mogoče narediti tudi {{ui:hinge.styleCone}} (pod {{ui:prop.hingeStyle}}): vsak drugi členek se potem konča s stožci, ki se prilegajo stožčastim vdolbinam sosednjih členkov. Ni trna in ni dolgega mostu, ki bi se povesil, zato se tiska ležeče; stožci so pod 45°. To je mreža, zato posnetja in zaokrožitve na njem ne delujejo, izvoz STEP pa vsebuje trikotnike; kjer bi bili členki za stožec prekratki, jih naredi manj. Namesto števila členkov lahko podaš {{ui:prop.hingeKnuckleWidth}}: členki so potem največ tako široki, njihovo število pa sledi iz dolžine; vpis števila členkov širino spet odstrani.
+Tečaj je mogoče narediti tudi {{ui:hinge.styleCone}} (pod {{ui:prop.hingeStyle}}): vsak drugi členek se potem konča s stožci, ki se prilegajo stožčastim vdolbinam sosednjih členkov. Ni trna in ni dolgega mostu, ki bi se povesil, zato se tiska ležeče; stožci so pod 45°. Kot druge vrste je tudi to natančno telo, zato posnetja in zaokrožitve na njem delujejo, izvoz STEP pa vsebuje njegove prave stožce; kjer bi bili členki za stožec prekratki, jih naredi manj. Namesto števila členkov lahko podaš {{ui:prop.hingeKnuckleWidth}}: členki so potem največ tako široki, njihovo število pa sledi iz dolžine; vpis števila členkov širino spet odstrani.
 
 {{ui:prop.hingeStyle}} ima štiri možnosti: {{ui:hinge.stylePin}}, {{ui:prop.hingePinless}} (izvrtina za lasten trn), {{ui:hinge.styleCone}} in {{ui:hinge.styleLiftOff}}. Pri stožcih {{ui:prop.hingeConeSize}} določa, kako veliki so tam, kjer rastejo iz členka; večji stožci držijo bolje in so privzeto tako veliki, kot gre. Tečaj s stožci nima trna ne izvrtine, zato je lahko njegovo krilo tako debelo kot cel členek: nastavi {{ui:prop.hingeLeafThickness}} na premer členka in krila ležijo v ravnini s členki; tak tečaj se odpre okoli 90° in ne več, ker se debela krila srečata.
 

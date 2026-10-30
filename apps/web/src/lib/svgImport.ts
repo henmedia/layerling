@@ -76,6 +76,42 @@ export function normalizeSvgDocumentType(source: string) {
   return source.replace(SVG_DOCUMENT_TYPE_PATTERN, "");
 }
 
+/** An SVG document type with an internal subset: the name and ids before the bracket, and the subset itself. */
+const SVG_INTERNAL_SUBSET_PATTERN = /<!DOCTYPE(\s+svg\b[^[>]*)\[([^\]]*)\]\s*>/i;
+/** One entity whose value is plain text: no markup, no reference to another entity, nothing outside the file. */
+const SVG_TEXT_ENTITY_PATTERN = /\s*<!ENTITY\s+([A-Za-z_][\w.-]*)\s+(["'])([^"'<>&%]{0,2000})\2\s*>/y;
+const XML_BUILT_IN_ENTITIES = new Set(["amp", "lt", "gt", "quot", "apos"]);
+
+/**
+ * Adobe Illustrator's "Save As SVG" declares its namespaces as entities in the document type and uses them on the
+ * <svg> element - `<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">`, `xmlns:i="&ns_ai;"` - and such files
+ * were refused whole ("SVG entities are not supported", asked in the Facebook group). An internal subset of nothing
+ * but plain text entities is resolved here and dropped. Anything else in it - a value with markup or another reference, an
+ * external or parameter entity, an ATTLIST - leaves the source as it is, for the preflight to refuse: those are the ways
+ * to blow a file up or reach outside it.
+ */
+export function resolveSvgTextEntities(source: string) {
+  const documentType = SVG_INTERNAL_SUBSET_PATTERN.exec(source);
+  if (!documentType) return source;
+  const subset = documentType[2].replace(/<!--[\s\S]*?-->/g, " ");
+  const entities = new Map<string, string>();
+  // A failed match puts lastIndex back to 0, so where the declarations end is kept apart.
+  let end = 0;
+  SVG_TEXT_ENTITY_PATTERN.lastIndex = 0;
+  let declaration: RegExpExecArray | null;
+  while ((declaration = SVG_TEXT_ENTITY_PATTERN.exec(subset))) {
+    if (XML_BUILT_IN_ENTITIES.has(declaration[1])) return source;
+    entities.set(declaration[1], declaration[3]);
+    end = SVG_TEXT_ENTITY_PATTERN.lastIndex;
+  }
+  if (subset.slice(end).trim() || entities.size === 0 || entities.size > 64) return source;
+  const start = documentType.index;
+  const body = source.slice(start + documentType[0].length).replace(/&([A-Za-z_][\w.-]*);/g, (reference, name: string) => entities.get(name) ?? reference);
+  const resolved = `${source.slice(0, start)}<!DOCTYPE${documentType[1].trimEnd()}>${body}`;
+  // Each entity is short and refers to no other, but thousands of uses could still grow the file a lot.
+  return resolved.length > source.length * 2 + 65_536 ? source : resolved;
+}
+
 /**
  * The text of an SVG file. Most are UTF-8, but CorelDRAW and some Windows tools save UTF-16 with a
  * byte order mark, which read as UTF-8 comes out as text with null characters between the letters (#317).
@@ -610,7 +646,8 @@ export function svgProfilePaths(paths: readonly THREE.ShapePath[]) {
 }
 
 /** The checked and parsed drawing, as both the mesh and the sketch import read it. */
-export function parseSvgForImport(source: string) {
+export function parseSvgForImport(raw: string) {
+  const source = resolveSvgTextEntities(raw);
   validateSvgSourcePreflight(source);
   const parsed = svgLoader.parse(normalizeSvgUseReferences(normalizeSvgDocumentType(source)));
   const parsedXml = parsed.xml as unknown as XMLDocument | Element;

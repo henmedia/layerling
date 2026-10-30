@@ -47,6 +47,14 @@ describe("printer presets", () => {
     expect(printerPresetById("qidi-x-plus-5")).toMatchObject({ width: 320, depth: 320, height: 300 });
   });
 
+  it("include delta printers with their round plates, by diameter (#1024)", () => {
+    expect(printerPresetById("flsun-super-racer-sr")).toMatchObject({ vendor: "FLSun", model: "Super Racer (SR)", width: 270, depth: 270, height: 330, round: true });
+    expect(printerPresetById("seemecnc-rostockmax-v4")).toMatchObject({ vendor: "SeeMeCNC", width: 280, round: true });
+    expect(printerPresetById("rolohaun-delta-flyer-refit")).toMatchObject({ vendor: "Rolohaun", model: "Delta Flyer Refit", round: true });
+    expect(printerPresetById("bambu-lab-a1")?.round).toBeUndefined();
+    for (const preset of PRINTER_PRESETS.filter((entry) => entry.round)) expect(preset.depth).toBe(preset.width);
+  });
+
   it("are found by id", () => {
     expect(printerPresetById("bambu-lab-a1")).toMatchObject({ vendor: "Bambu Lab", model: "A1", width: 256, depth: 256, height: 256 });
     expect(printerPresetById("prusa-mk4")).toMatchObject({ width: 250, depth: 210 });
@@ -121,6 +129,21 @@ describe("bedOverhangs", () => {
 
   it("leaves height alone when no build height is given", () => {
     expect(bedOverhangs([shape({ height: 900 })], 256, 256)).toEqual([]);
+  });
+
+  it("measures a round plate by its rim, not by the bodies' boxes (#1024)", () => {
+    // A cylinder 250 mm across fits a plate 270 mm across, though the corners of its box reach 177 mm out.
+    const cylinder = shape({ id: "cyl", kind: "cylinder", width: 250, depth: 250, size: 250, height: 20 });
+    expect(bedOverhangs([cylinder], 270, 270, 330, true)).toEqual([]);
+    // Moved 20 mm to the side it reaches 145 mm from the middle, 10 past the rim.
+    const [moved] = bedOverhangs([{ ...cylinder, x: 20 }], 270, 270, 330, true);
+    expect(moved.edge).toBeCloseTo(10, 1);
+    expect(Math.max(moved.left, moved.right, moved.back, moved.front)).toBe(0);
+    // A square 200 mm wide fits a square plate of 200, but its corners stand 141 mm out on a round one.
+    const square = shape({ width: 200, depth: 200, height: 20 });
+    expect(bedOverhangs([square], 200, 200)).toEqual([]);
+    expect(bedOverhangs([square], 270, 270, 330, true)[0].edge).toBeCloseTo(100 * Math.SQRT2 - 135, 5);
+    expect(bedOverhangs([square], 290, 290, 330, true)).toEqual([]);
   });
 
   it("ignores holes, hidden bodies and rulers", () => {

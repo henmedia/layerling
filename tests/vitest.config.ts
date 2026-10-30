@@ -1,5 +1,6 @@
 import path from "node:path";
 import { defineConfig } from "vitest/config";
+import { shareTheMachine } from "./shareTheMachine";
 
 const rootDir = path.resolve(__dirname, "..");
 
@@ -18,5 +19,6 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/unit/**/*.test.ts"],
+    maxWorkers: shareTheMachine(),
   },
 });

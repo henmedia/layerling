@@ -81,6 +81,18 @@ Izdolbiš lahko tudi telo z žepom, na primer kvader z luknjo, ki ne gre skozi d
 
 > **Namig:** Pri šobi 0,4 mm je dobro izhodišče debelina stene od 1,2 do 2 mm: dovolj tanka, da prihraniš material, dovolj debela za stabilen del.
 
+## Pokrov za odprto telo
+
+{{ui:editor.tool.lid}} naredi pokrov za telo, ki je zgoraj odprto: škatlo, ki si jo izdolbel z odprto zgornjo stranjo, lonček, pladenj. Izberi telo in klikni {{ui:editor.tool.lid}}. V oknu izbereš vrsto:
+
+- {{ui:lid.type.plug}}: plošča, velika kot telo, pod njo ustnica, ki seže v odprtino.
+- {{ui:lid.type.cap}}: plošča, za steno širša od telesa, pod njo rob, ki objame zunanjost.
+- {{ui:lid.type.flat}}: samo plošča, za polaganje ali lepljenje.
+
+Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom in telesom: 0,1 mm tesen, 0,2 mm običajen, 0,3 mm ohlapen ali katera koli vrednost do 1 mm) ter kako globoko seže ustnica ali rob in kako debela je njuna stena. Klikni {{ui:lid.apply}}: pokrov leži poleg telesa, obrnjen s ploščo navzdol, zato se natisne brez podpor. Telo ostane, kakršno je. Pokrov sledi vsakemu obrisu, okroglemu ali oglatemu, ker je vzet s telesa samega tik pod njegovim robom. Telo brez odprtine zgoraj dobi samo raven pokrov; za drugi dve vrsti ga najprej izdolbi z odprto zgornjo stranjo.
+
+> **Namig:** Kako tesno sede pokrov, je odvisno od tiskalnika. Najprej natisni majhno škatlo s pokrovom; če je pretesen, izberi naslednji ohlapnejši ujem.
+
 ## Odmik teles
 
 Vsako ploskev telesa lahko premakneš za isto razdaljo navzven ali navznoter. To potrebuje nasedanje, pokrov ali zaskočni spoj: reža 0,1 do 0,3 mm naokrog, medtem ko značilnosti ostanejo na mestu, česar spreminjanje merila ne zmore.

@@ -82,6 +82,18 @@ Ha egy kiüregelt testet később átméretezel, a layerling azonnal újra kiür
 
 > **Tipp:** 0,4 mm-es fúvókával 1,2–2 mm-es fal jó kiindulás: elég vékony, hogy anyagot spórolj, és elég vastag egy erős alkatrészhez.
 
+## Fedél nyitott testhez
+
+A(z) {{ui:editor.tool.lid}} fedelet készít egy felül nyitott testhez: egy nyitott tetővel kiüregelt dobozhoz, cseréphez, tálcához. Jelöld ki a testet, és kattints a(z) {{ui:editor.tool.lid}} gombra. Az ablakban kiválasztod a fajtát:
+
+- {{ui:lid.type.plug}}: a testtel azonos méretű lap, alatta perem, amely a nyílásba illeszkedik.
+- {{ui:lid.type.cap}}: a testnél egy falvastagsággal szélesebb lap, alatta perem, amely kívülről öleli körbe.
+- {{ui:lid.type.flat}}: csak a lap, ráhelyezéshez vagy ragasztáshoz.
+
+Ezután beállítod a vastagságot ({{ui:lid.thickness}}), az illesztést ({{ui:lid.fit}}, a fedél és a test közti hézagot oldalanként: 0,1 mm szoros, 0,2 mm normál, 0,3 mm laza, vagy bármely érték 1 mm-ig), valamint hogy milyen mélyre nyúlik a perem, és milyen vastag a fala. Kattints a(z) {{ui:lid.apply}} gombra: a fedél a test mellett fekszik, megfordítva, lappal lefelé, így támasz nélkül nyomtatható. A test változatlan marad. A fedél bármilyen körvonalat követ, kereket vagy szögleteset, mert közvetlenül a test pereme alatt veszi le a formát. Felül nyílás nélküli test csak lapos fedelet kaphat; a másik kettőhöz előbb üregeld ki nyitott tetővel.
+
+> **Tipp:** Hogy milyen szorosan ül a fedél, az a nyomtatótól függ. Előbb nyomtass egy kis dobozt fedéllel; ha túl szoros, válaszd a következő, lazább illesztést.
+
 ## Testek eltolása
 
 A test minden lapja ugyanannyival tolható el kifelé vagy befelé. Erre van szüksége egy illesztésnek, fedélnek vagy pattintós kötésnek: 0,1-0,3 mm rés körben, miközben a részletek a helyükön maradnak, amit a méretezés nem ad.

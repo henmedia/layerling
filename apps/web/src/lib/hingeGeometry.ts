@@ -74,6 +74,8 @@ const NUT_PLAY = 0.3;
 const NUT_FLOOR = 0.6;
 const MIN_NUT_DEPTH = 0.4;
 export const MAX_HINGE_NUT_WIDTH = 40;
+/** A cone reaches this far into its own knuckle, and a recess's cutter this far out of the end face, so no faces lie flush. */
+const CONE_OVERCUT = 0.05;
 
 export type HingeStyle = "pin" | "pinless" | "cone" | "liftOff";
 
@@ -108,11 +110,6 @@ export function hingeNutWidthFor(holeDiameter: number) {
 /** A nut's width across the flats in mm; 0 or left out takes it from the hole's diameter. Always wider than the hole. */
 export function normalizeHingeNutWidth(value: number | undefined, holeDiameter: number) {
   return Number.isFinite(value) && (value as number) > 0 ? clamp(value as number, holeDiameter + 0.6, MAX_HINGE_NUT_WIDTH) : hingeNutWidthFor(holeDiameter);
-}
-
-/** Whether the hinge is made of parts the CAD kernel knows (boxes, cylinders, tubes): the pin hinge is, the cone hinge is a mesh. */
-export function hingeHasExactParts(shape: Pick<HingeShapeFields, "hingeStyle" | "hingePinless">) {
-  return normalizeHingeStyle(shape.hingeStyle, shape.hingePinless) !== "cone";
 }
 
 /** The radial gap that leaves `clearance` between two 45 degree cones measured across the surfaces. */
@@ -640,14 +637,20 @@ export function createHingeGeometry(shape: HingeShapeFields): THREE.BufferGeomet
   return geometry;
 }
 
-export type HingeLocalPart = Pick<WorkplaneShape, "kind" | "x" | "z" | "elevation" | "width" | "depth" | "height" | "rotationX" | "rotationZ" | "bevel" | "hole" | "screwHoleShaft" | "screwHoleAngle" | "sides">;
+export type HingeLocalPart = Pick<WorkplaneShape, "kind" | "x" | "z" | "elevation" | "width" | "depth" | "height" | "rotationX" | "rotationZ" | "bevel" | "hole" | "screwHoleShaft" | "screwHoleAngle" | "sides"> & {
+  /** Its knuckle's index in `plan.segments`, for a knuckle of B whose parts are joined and cut on their own (the cone hinge). */
+  knuckle?: number;
+};
 
 /**
  * The exact body in parts the CAD kernel already knows - boxes, lying
  * cylinders and lying tubes, upright cylinders for rounded leaf corners - in
  * the shape's own frame: x along the axis, `elevation` from the bottom of the
  * shape, before its own turn. Overlapping parts are fused into the two bodies;
- * the screw holes are parts marked `hole`, cut out of them afterwards.
+ * the screw holes are parts marked `hole`, cut out of them afterwards. The cone
+ * hinge's cones are lying cones on A's knuckles; each knuckle of B, with the
+ * strip under it, has its two recesses cut on its own (`knuckle`), as the cone
+ * of the neighbour sits in each recess and would be cut with it.
  */
 export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
   const plan = hingePlan(shape);
@@ -683,14 +686,32 @@ export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
   const parts: HingeLocalPart[] = [...aLeaf, ...bLeaf];
   // B's parts that fold up with it; its tubes lie on the axis and only spin in place.
   const folding = new Set<HingeLocalPart>(bLeaf);
-  if (!plan.pinless) parts.push({ kind: "cylinder", ...lying(0, pinRadius * 2, width) });
-  plan.segments.forEach((segment) => {
+  // The pin runs the whole length: through all knuckles, or (lift-off) on into the upper one, which lifts off it.
+  if (plan.style === "pin" || plan.style === "liftOff") parts.push({ kind: "cylinder", ...lying(0, pinRadius * 2, width) });
+  const coned = plan.style === "cone";
+  // A cone lying on the axis, its base of radius `base` at `x` and its point at `apexX`: turned -90 degrees about z its
+  // point is towards +x, turned 90 towards -x.
+  const cone = (x: number, base: number, apexX: number): HingeLocalPart => ({ kind: "cone", ...lying((x + apexX) / 2, 2 * base, Math.abs(apexX - x)), rotationZ: apexX > x ? -90 : 90 });
+  plan.segments.forEach((segment, index) => {
     const center = (segment.x0 + segment.x1) / 2;
     if (segment.owner === "a") {
       // A pinless hinge has the same bore through A's knuckles as through B's.
       if (plan.pinless) parts.push({ kind: "tube", ...lying(center, radius * 2, knuckleLength), bevel: radius - boreRadius });
       else parts.push({ kind: "cylinder", ...lying(center, radius * 2, knuckleLength) });
       parts.push({ kind: "box", x: center, z: -e / 2, elevation: 0, width: knuckleLength, depth: e, height: leaf });
+      // The cone hinge's cones point into the neighbours, their bases a little inside this knuckle.
+      if (coned && index > 0) parts.push(cone(segment.x0 + CONE_OVERCUT, plan.coneRadius + CONE_OVERCUT, segment.x0 - plan.coneRadius));
+      if (coned && index < plan.segments.length - 1) parts.push(cone(segment.x1 - CONE_OVERCUT, plan.coneRadius + CONE_OVERCUT, segment.x1 + plan.coneRadius));
+    } else if (coned) {
+      // The knuckle and the strip under it, with a recess for the neighbour's cone at each end.
+      parts.push(
+        { kind: "cylinder", ...lying(center, radius * 2, knuckleLength), knuckle: index },
+        { ...cone(segment.x0 - CONE_OVERCUT, plan.recessRadius + CONE_OVERCUT, segment.x0 + plan.recessDepth), hole: true, knuckle: index },
+        { ...cone(segment.x1 + CONE_OVERCUT, plan.recessRadius + CONE_OVERCUT, segment.x1 - plan.recessDepth), hole: true, knuckle: index },
+      );
+      const under: HingeLocalPart = { kind: "box", x: center, z: e / 2, elevation: 0, width: knuckleLength, depth: e, height: leaf, knuckle: index };
+      parts.push(under);
+      folding.add(under);
     } else {
       parts.push({ kind: "tube", ...lying(center, radius * 2, knuckleLength), bevel: radius - boreRadius });
       const under: HingeLocalPart = { kind: "box", x: center, z: e / 2, elevation: 0, width: knuckleLength, depth: e, height: leaf };

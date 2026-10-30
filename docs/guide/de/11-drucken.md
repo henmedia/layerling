@@ -5,7 +5,7 @@ summary: Den eigenen Drucker wählen, gewarnt werden, wenn etwas nicht passt, un
 
 ## Den Drucker wählen
 
-Öffne die Einstellungen (das Zahnrad im Menüband, {{ui:editor.workspaceSettings}}) und wechsle zum Bereich {{ui:workspace.workplane}}. Bei {{ui:workspace.printer}} suchst du deinen Drucker aus einer Liste von über 220 gängigen Modellen aus, darunter Bambu Lab, Prusa, Creality, Anycubic, Elegoo und viele mehr.
+Öffne die Einstellungen (das Zahnrad im Menüband, {{ui:editor.workspaceSettings}}) und wechsle zum Bereich {{ui:workspace.workplane}}. Bei {{ui:workspace.printer}} suchst du deinen Drucker aus einer Liste von über 230 gängigen Modellen aus, darunter Bambu Lab, Prusa, Creality, Anycubic, Elegoo und viele mehr.
 
 ![Die Einstellungen der Arbeitsebene mit gewähltem Drucker. Druckbett und maximale Druckhöhe stammen aus dem Slicer-Profil.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Damit passiert dreierlei:
 - layerling **warnt**, wenn etwas nicht passt.
 
 Die Druckerprofile stammen aus OrcaSlicer, sie sind also dieselben, die auch dein Slicer kennt. Möchtest du ohne Drucker arbeiten, wählst du {{ui:workspace.printerNone}}. Die Größe der Arbeitsebene kannst du auch von Hand einstellen.
+
+Delta-Drucker wie die von FLSun oder SeeMeCNC oder der Anycubic Predator drucken auf einer runden Platte. Mit einem von ihnen ist auch die Arbeitsfläche rund, so breit wie die Platte, und ein Körper ist zu groß, sobald er über den Rand ragt. Ein runder Körper wird an seinem eigenen Umriss gemessen, nicht an dem Kasten um ihn, so passt auch ein Zylinder, der fast so breit ist wie die Platte.
 
 ## Wenn etwas nicht passt
 

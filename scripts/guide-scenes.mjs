@@ -177,7 +177,7 @@ export const scenes = {
     const box = await create(ctx, { kind: "box", x: 0, z: 0, width: 40, depth: 40, height: 20, name: ctx.language === "de" ? "Grundplatte" : "Base plate", color: BLUE });
     const hole = await create(ctx, { kind: "cylinder", x: 0, z: 0, width: 14, depth: 14, height: 30, name: ctx.language === "de" ? "Bohrung" : "Bore", color: ORANGE });
     await ctx.mcp("update_object", { id: hole, hole: true });
-    await create(ctx, { kind: "sphere", x: 45, z: 5, width: 20, depth: 20, height: 20, name: "Kugel", color: GREEN });
+    await create(ctx, { kind: "sphere", x: 45, z: 5, width: 20, depth: 20, height: 20, color: GREEN });
     await ctx.mcp("group_objects", { ids: [box, hole] });
     await ctx.wait(2500);
     await ctx.click(ctx.t("editor.tool.showOutliner"));
@@ -316,7 +316,8 @@ scenes["printer-overhang"] = async (ctx) => {
   await ctx.evaluate(`window.dispatchEvent(new Event("layerling:open-workspace-settings")); true`);
   await ctx.wait(1000);
   await ctx.click(ctx.t("workspace.workplane"), "button, [role=tab]");
-  await ctx.chooseOption("Bambu Lab A1");
+  // The A1 mini, as the guide says: its plate is narrower than the box, the A1's is not.
+  await ctx.chooseOption("Bambu Lab A1 mini");
   await ctx.click(ctx.t("workspace.close"));
   await ctx.wait(1500);
   await ctx.click(ctx.t("view.top"));

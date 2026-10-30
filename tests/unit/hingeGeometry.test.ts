@@ -1,8 +1,10 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { hingeWorldParts } from "@/lib/hingeParts";
+import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { automaticSideCount } from "@/lib/roundSideCount";
-import { hingeLeaves, normalizeHingeNutWidth, normalizeHingeScrewHead, hingeSections, hingeConeRadius, hingeKnucklesForWidth, hingeHasExactParts, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
+import { hingeLeaves, normalizeHingeNutWidth, normalizeHingeScrewHead, hingeSections, hingeConeRadius, hingeKnucklesForWidth, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
 
 type V = [number, number, number];
 
@@ -301,9 +303,6 @@ describe("the cone hinge, second round (#907)", () => {
     expect(hingePlan({ width: 40, height: 8, hingePinless: true }).pinless).toBe(true);
     expect(hingePlan({ width: 40, height: 8, hingeStyle: "pinless" }).pinless).toBe(true);
     expect(hingePlan({ width: 40, height: 8, hingeStyle: "cone", hingePinless: true }).pinless).toBe(false);
-    expect(hingeHasExactParts({ hingeStyle: "pinless" })).toBe(true);
-    expect(hingeHasExactParts({ hingePinless: true })).toBe(true);
-    expect(hingeHasExactParts({ hingeStyle: "cone" })).toBe(false);
   });
 });
 
@@ -615,7 +614,6 @@ describe("the lift-off hinge", () => {
   });
 
   it("is built of the pin hinge's exact parts: the pin along the whole length, one knuckle each", () => {
-    expect(hingeHasExactParts({ hingeStyle: "liftOff" })).toBe(true);
     const local = hingeLocalParts(liftOff);
     const lying = local.filter((part) => part.rotationZ === 90);
     expect(lying.filter((part) => part.kind === "cylinder" && Math.abs(part.height - shape.width) < 1e-9)).toHaveLength(1);
@@ -684,5 +682,107 @@ describe("nut pockets", () => {
     const pocket = (extra: object) => hingeWorldParts({ ...base, ...extra } as never).filter((part) => part.kind === "polygon");
     expect(pocket({ rotation: 30 }).map((part) => Math.round(part.rotation))).toEqual([30, 30]);
     expect(pocket({ rotation: 0 }).map((part) => Math.round(part.rotation))).toEqual([0, 0]);
+  });
+});
+
+describe("the cone hinge as exact parts (#1007)", () => {
+  const cases = [
+    { width: 40, height: 8, hingeStyle: "cone" },
+    { width: 60, depth: 50, height: 10, hingeStyle: "cone", hingeKnuckles: 7, hingeClearance: 0.3 },
+    { width: 40, height: 6, hingeStyle: "cone", hingeLeafThickness: 6, hingeLeafStyle: "fingers" as const, hingeCornerRadius: 2 },
+    { width: 40, height: 8, hingeStyle: "cone", hingeConeSize: 3, hingeScrewHoles: 2 },
+  ];
+
+  it("has a cone into each neighbour and a recess cut in each end of B's knuckles, and no pin", () => {
+    cases.forEach((shape) => {
+      const plan = hingePlan(shape);
+      const parts = hingeLocalParts(shape);
+      const cones = parts.filter((part) => part.kind === "cone" && !part.hole);
+      const recesses = parts.filter((part) => part.kind === "cone" && part.hole);
+      expect(cones, JSON.stringify(shape)).toHaveLength(plan.knuckles - 1);
+      expect(recesses).toHaveLength(plan.knuckles - 1);
+      expect(parts.some((part) => part.kind === "cylinder" && part.height >= plan.width - 1e-9)).toBe(false);
+      // Each knuckle of B and what is cut out of it alone: the knuckle, the strip under it and its two recesses.
+      plan.segments.forEach((segment, index) => {
+        const own = parts.filter((part) => part.knuckle === index);
+        if (segment.owner === "a") return expect(own).toHaveLength(0);
+        expect(own.map((part) => `${part.kind}${part.hole ? " hole" : ""}`).sort()).toEqual(["box", "cone hole", "cone hole", "cylinder"]);
+      });
+      // A's parts and the screw holes stay on the hinge's own level.
+      expect(cones.every((part) => part.knuckle === undefined)).toBe(true);
+      const screws = parts.filter((part) => part.hole && part.kind !== "cone");
+      expect(screws).toHaveLength(2 * plan.screwXs.length);
+      expect(screws.every((part) => part.knuckle === undefined)).toBe(true);
+    });
+  });
+
+  it("sinks each cone a little into its own knuckle and starts each recess's cutter a little outside, so no faces lie flush", () => {
+    cases.forEach((shape) => {
+      const plan = hingePlan(shape);
+      const ends = plan.segments.flatMap((segment) => [segment.x0, segment.x1]);
+      hingeLocalParts(shape).filter((part) => part.kind === "cone").forEach((part) => {
+        const toward = part.rotationZ === -90 ? 1 : -1;
+        const base = part.x - (toward * part.height) / 2;
+        const face = ends.reduce((nearest, x) => (Math.abs(x - base) < Math.abs(nearest - base) ? x : nearest));
+        // Behind the end face, seen from the point: inside A's knuckle for a cone, outside B's for a recess.
+        const behind = (face - base) * toward;
+        expect(behind, JSON.stringify(shape)).toBeGreaterThan(0.01);
+        // At 45 degrees, so the end face still meets it at the display mesh's radius.
+        expect(part.width / 2 - behind).toBeCloseTo(part.hole ? plan.recessRadius : plan.coneRadius, 9);
+        expect(part.height).toBeCloseTo(part.width / 2, 9);
+      });
+    });
+  });
+
+  it("sends each knuckle of B to the kernel in a scope of its own, below the numbers the groups round it use", () => {
+    const hinge = { id: "h", name: "H", kind: "hinge", color: "#fff", x: 0, z: 0, elevation: 0, size: 40, rotation: 0, width: 40, height: 8, hingeStyle: "cone" } as never as Parameters<typeof hingeWorldParts>[0];
+    const parts = hingeWorldParts(hinge);
+    const scopes = new Set(parts.map((part) => JSON.stringify(hingePartScope([2], part))));
+    // B's two knuckles of five, and the hinge's own level for the rest; a hinge inside a group's scope stays inside it.
+    expect([...scopes].sort()).toEqual(["[2,-2]", "[2,-4]", "[2]"]);
+    expect(hingePartScope([], parts.find((part) => part.knuckle === 1)!)).toEqual([-2]);
+  });
+
+  it("puts the tip of every cone and recess where the display mesh has it, also turned, mirrored and folded", () => {
+    cases.forEach((fields) => {
+      for (const place of [{}, { rotation: 30, rotationX: 20, rotationZ: 15, hingeAngle: 70 }, { rotation: 120, mirrorX: true, hingeAngle: 135 }]) {
+        const shape = { ...fields, ...place } as typeof fields & typeof place & { rotation?: number; rotationX?: number; rotationZ?: number; mirrorX?: boolean };
+        const hinge = { id: "h", name: "H", kind: "hinge", color: "#fff", x: 12, z: -7, elevation: 3, size: shape.width, rotation: 0, ...shape } as never as Parameters<typeof hingeWorldParts>[0];
+        const centerY = shape.height / 2;
+        const turn = new THREE.Euler(THREE.MathUtils.degToRad(shape.rotationX ?? 0), THREE.MathUtils.degToRad(shape.rotation ?? 0), THREE.MathUtils.degToRad(shape.rotationZ ?? 0), "XYZ");
+        const matrix = new THREE.Matrix4().makeTranslation(12, 3 + centerY, -7)
+          .multiply(new THREE.Matrix4().makeRotationFromEuler(turn))
+          .multiply(new THREE.Matrix4().makeScale(shape.mirrorX ? -1 : 1, 1, 1))
+          .multiply(new THREE.Matrix4().makeTranslation(0, -centerY, 0));
+        const mesh = hingeTriangles(shape).flat().map(([x, y, z]) => new THREE.Vector3(x, y, z).applyMatrix4(matrix));
+        const cones = hingeWorldParts(hinge).filter((part) => part.kind === "cone");
+        expect(cones.length).toBeGreaterThan(0);
+        cones.forEach((part) => {
+          // A cone's tip is the top of its own frame, half its height above its middle.
+          const tip = new THREE.Vector3(0, part.height / 2, 0)
+            .applyEuler(new THREE.Euler(THREE.MathUtils.degToRad(part.rotationX ?? 0), THREE.MathUtils.degToRad(part.rotation ?? 0), THREE.MathUtils.degToRad(part.rotationZ ?? 0), "XYZ"))
+            .add(new THREE.Vector3(part.x, (part.elevation ?? 0) + part.height / 2, part.z));
+          expect(Math.min(...mesh.map((v) => v.distanceTo(tip))), JSON.stringify(shape)).toBeLessThan(1e-3);
+        });
+      }
+    });
+  });
+
+  it("folds the strip under each knuckle of B with B's leaf, as the pin hinge does", () => {
+    for (const hingeAngle of [0, 70, 135]) {
+      const plan = hingePlan({ width: 40, height: 8, hingeStyle: "cone", hingeAngle });
+      const strips = (hingeStyle: string) => hingeLocalParts({ width: 40, height: 8, hingeStyle, hingeAngle })
+        .filter((part) => part.kind === "box" && plan.segments.some((segment) => segment.owner === "b" && Math.abs(part.x - (segment.x0 + segment.x1) / 2) < 1e-9))
+        .map(({ x, z, elevation, width, depth, height, rotationX }) => ({ x, z, elevation, width, depth, height, rotationX }));
+      expect(strips("cone")).toHaveLength((plan.knuckles - 1) / 2);
+      expect(strips("cone")).toEqual(strips("pin"));
+    }
+  });
+
+  it("goes to the kernel in parts from both of the editor's calls, each knuckle of B in its scope, and as its mesh as a hole", () => {
+    const editor = readFileSync(fileURLToPath(new URL("../../apps/web/src/components/LayerlingEditor.tsx", import.meta.url)), "utf8").replace(/\s+/g, " ");
+    expect(editor.match(/cadModifierSourceParts\((?:entry\.)?shape\)\.map\(\(part\) => \(\{ part, scope: hingePartScope\((?:entry\.)?scope, part\) \}\)\)/g)).toHaveLength(2);
+    // Set as a hole, its parts would be joined as solids; its mesh is cut out whole.
+    expect(editor).toMatch(/if \(shape\.kind === "hinge" && !shape\.hole && [^;]*\) return hingeWorldParts\(shape\);/);
   });
 });

@@ -31,8 +31,8 @@ export const EXACT_ROUND_TOLERANCE = 0.05;
  * Einheit seines eigenen Reglers: so fein zeichnet ihn die Form von sich aus.
  * Zylinder, Kegel, Rohr und Ring trugen 96 Seiten fest, bevor die Seitenzahl
  * der Groesse folgte; aeltere Projekte haben sie gespeichert. Kugel,
- * Halbkugel und Rundbogendach haben ihre Vorgabe noch (shapeCatalog.ts; ein
- * Test prueft, dass beide Stellen gleich bleiben).
+ * Halbkugel, Paraboloid und Rundbogendach haben ihre Vorgabe noch
+ * (shapeCatalog.ts; ein Test prueft, dass beide Stellen gleich bleiben).
  */
 export const ROUND_FROM_SIDES = 96;
 export const ROUND_FROM_SPHERE_STEPS = 24;

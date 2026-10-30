@@ -134,6 +134,35 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     }
   });
 
+  it("exports a hinge with cones as its exact parts, each recess cut, with the display mesh's volume (#1007)", async () => {
+    const { hingePlan, hingeTriangles } = await import("@/lib/hingeGeometry");
+    const volume = (fields: Parameters<typeof hingeTriangles>[0]) => hingeTriangles(fields).reduce(
+      (sum, [a, b, c]) => sum + (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6,
+      0,
+    );
+    const cases = [
+      { width: 40, depth: 40, height: 8 },
+      { width: 40, depth: 40, height: 8, hingeAngle: 90, hingeScrewHoles: 2, hingeCornerRadius: 3 },
+      { width: 40, depth: 40, height: 6, hingeLeafThickness: 6, hingeLeafStyle: "fingers" as const, hingeAngle: 135 },
+      { width: 60, depth: 50, height: 10, hingeKnuckles: 7, hingeClearance: 0.3, hingeConeSize: 3, mirrorY: true },
+      { width: 50, depth: 44, height: 8, hingeLeafStyle: "fingers" as const, hingeCornerRadius: 2, hingeAngle: 45, mirrorZ: true },
+      { width: 50, depth: 44, height: 8, hingeScrewHoles: 3, hingeScrewCountersink: false, hingeAngle: 45, mirrorZ: true },
+    ];
+    for (const fields of cases) {
+      // Drawn with 384 sides the display mesh's knuckles and cones are within two tenths of a cubic millimetre of the true
+      // circles; its screw holes and rounded corners have sides of their own, a few tenths off.
+      const drawn = { ...fields, hingeStyle: "cone", sides: 384 };
+      const hinge = shape({ kind: "hinge", name: "Hinge", size: fields.width, rotation: 30, x: 12, z: -7, elevation: 3, ...drawn });
+      const { blob, exportedCount, skipped } = await exportShapesToStep([hinge]);
+      expect(skipped).toEqual([]);
+      expect(exportedCount).toBe(1);
+      // Close enough that a single recess left uncut, or a cone left off, would show.
+      const plan = hingePlan(drawn);
+      const recess = (PI * plan.recessRadius ** 2 * plan.recessDepth) / 3;
+      expect(Math.abs(await reimportVolume(blob) - volume(drawn))).toBeLessThan(recess / 4);
+    }
+  });
+
   it("exports box + cylinder + sphere as exact B-Rep with conserved volume", async () => {
     const box = shape({ kind: "box", name: "Box", x: -30, width: 10, depth: 6, height: 4 });
     const cyl = shape({ kind: "cylinder", name: "Cyl", x: 0, width: 8, depth: 8, height: 12 });
@@ -191,13 +220,13 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
 
   it("skips non-exact shapes with descriptive reasons but still exports the rest", async () => {
     const box = shape({ kind: "box", name: "Box", width: 8, depth: 8, height: 8 });
-    const pyramid = shape({ kind: "pyramid", name: "Pyramid", width: 8, depth: 8, height: 8 });
+    const vase = shape({ kind: "vase", name: "Vase", width: 8, depth: 8, height: 8 });
     const meshNoBrep = shape({ kind: "mesh", name: "RawMesh" });
 
-    const { exportedCount, skipped } = await exportShapesToStep([box, pyramid, meshNoBrep]);
+    const { exportedCount, skipped } = await exportShapesToStep([box, vase, meshNoBrep]);
     expect(exportedCount).toBe(1);
-    expect(skipped.map((s) => s.kind).sort()).toEqual(["mesh", "pyramid"]);
-    expect(skipped.find((s) => s.kind === "pyramid")?.reason).toMatch(/no exact B-Rep mapping/i);
+    expect(skipped.map((s) => s.kind).sort()).toEqual(["mesh", "vase"]);
+    expect(skipped.find((s) => s.kind === "vase")?.reason).toMatch(/no exact B-Rep mapping/i);
     expect(skipped.find((s) => s.kind === "mesh")?.reason).toMatch(/no B-Rep source/i);
   });
 
@@ -245,10 +274,11 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     const dome = shape({ kind: "halfSphere", name: "Faceted dome", x: -40, width: 30, depth: 30, height: 15, steps: 8 });
     const cone = shape({ kind: "cone", name: "Six-sided oval cone", x: 0, width: 30, depth: 15, height: 15, baseRadius: 15, topRadius: 0, sides: 6 });
     const ellipse = shape({ kind: "ellipse", name: "Eight-sided ellipse", x: 40, width: 26, depth: 16, height: 20, sides: 8 });
-    const { blob, exportedCount, skipped } = await exportShapesToStep([dome, cone, ellipse]);
+    const paraboloid = shape({ kind: "paraboloid", name: "Faceted paraboloid", x: 80, width: 20, depth: 20, height: 12, steps: 8 });
+    const { blob, exportedCount, skipped } = await exportShapesToStep([dome, cone, ellipse, paraboloid]);
     expect(skipped).toEqual([]);
-    expect(exportedCount).toBe(3);
-    const expected = (2 / 3) * PI * 15 ** 3 + (PI * 15 * 7.5 * 15) / 3 + PI * 13 * 8 * 20;
+    expect(exportedCount).toBe(4);
+    const expected = (2 / 3) * PI * 15 ** 3 + (PI * 15 * 7.5 * 15) / 3 + PI * 13 * 8 * 20 + (PI * 10 ** 2 * 12) / 2;
     // The pointed oval cone is a B-spline body; OCCT's volume of it runs about 1 % high.
     expect(Math.abs(await reimportVolume(blob) - expected) / expected).toBeLessThan(0.01);
   });
@@ -399,6 +429,31 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     expect(await reimportVolume(blob)).toBeGreaterThan(0);
   });
 
+  it("exports a wedge, a pyramid and a paraboloid as exact bodies, and cuts them as holes (#1007)", async () => {
+    const wedge = shape({ kind: "wedge", name: "Wedge", x: -40, width: 20, depth: 10, height: 8 });
+    const pyramid = shape({ kind: "pyramid", name: "Pyramid", x: 0, width: 20, depth: 20, height: 15, sides: 4 });
+    const dome = shape({ kind: "paraboloid", name: "Paraboloid", x: 40, width: 20, depth: 20, height: 12 });
+    const solids = await exportShapesToStep([wedge, pyramid, dome]);
+    expect(solids.exportedCount).toBe(3);
+    expect(solids.skipped).toEqual([]);
+    // Half the wedge's box, a third of the pyramid's, half the paraboloid's cylinder.
+    const volume = (20 * 8 * 10) / 2 + (20 * 20 * 15) / 3 + (PI * 10 ** 2 * 12) / 2;
+    expect(near(await reimportVolume(solids.blob), volume, 0.001)).toBe(true);
+
+    // As holes they are cut out of a block.
+    const block = shape({ kind: "box", name: "Block", width: 40, depth: 40, height: 30 });
+    const holes = [
+      shape({ kind: "wedge", name: "Wedge hole", hole: true, x: -10, z: -10, elevation: 2, width: 10, depth: 8, height: 6 }),
+      shape({ kind: "pyramid", name: "Pyramid hole", hole: true, x: 10, z: -10, elevation: 2, width: 12, depth: 12, height: 9, sides: 4 }),
+      shape({ kind: "paraboloid", name: "Paraboloid hole", hole: true, x: 0, z: 10, elevation: 2, width: 14, depth: 14, height: 10 }),
+    ];
+    const cut = await exportShapesToStep([block, ...holes]);
+    expect(cut.exportedCount).toBe(1);
+    expect(cut.skipped).toEqual([]);
+    const removed = (10 * 6 * 8) / 2 + (12 * 12 * 9) / 3 + (PI * 7 ** 2 * 10) / 2;
+    expect(near(await reimportVolume(cut.blob), 40 * 40 * 30 - removed, 0.001)).toBe(true);
+  });
+
   it("cuts a counterbore out of a plate", async () => {
     const plate = shape({ kind: "box", name: "Plate", width: 20, depth: 20, height: 20 });
     const bore = shape({ kind: "counterbore", name: "Bore", hole: true, width: 6.4, depth: 6.4, height: 12, elevation: 8.1, screwHoleShaft: 3.4, screwHoleHeadDepth: 3.2 });
@@ -447,7 +502,7 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
   });
 
   it("throws when there is nothing exact to export", async () => {
-    await expect(exportShapesToStep([shape({ kind: "pyramid", name: "Pyramid" })])).rejects.toThrow(/No exportable B-Rep solids/i);
+    await expect(exportShapesToStep([shape({ kind: "vase", name: "Vase" })])).rejects.toThrow(/No exportable B-Rep solids/i);
   });
 });
 

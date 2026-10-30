@@ -14,13 +14,14 @@ import { cad, bin, plate, meshVolume, meshBounds, overlap, material, expectBuilt
 
 describe("exact Gridfinity bins with every side closed, unchanged by open sides", () => {
   it("builds the same solids as before open sides came in, also with every side switched off", () => {
-    // Taken before open sides came in (#682): volume, faces and edges of the one solid.
+    // Taken before open sides came in (#682): volume, faces and edges of the one solid. The bins with a scoop were
+    // measured again with occt-wasm 5.11, which measures curved faces exactly (0.03 and 0.06 mm³ less than before).
     const closed = { gridfinityOpenBack: false, gridfinityOpenFront: false, gridfinityOpenLeft: false, gridfinityOpenRight: false };
     for (const [part, volume, faces, edges] of [
       [bin(), 23248.7382, 100, 210],
-      [bin({ gridfinityScoopFront: true }), 24249.8297, 108, 228],
+      [bin({ gridfinityScoopFront: true }), 24249.8041, 108, 228],
       [bin({ gridfinityLabelBack: true, gridfinityLabelLeft: true, gridfinityLabelRight: true }), 35470.5361, 127, 285],
-      [bin({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopFront: true, gridfinityCompartmentLabels: [{ column: 1, row: 1, side: "back" }] }), 29877.6412, 203, 481],
+      [bin({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopFront: true, gridfinityCompartmentLabels: [{ column: 1, row: 1, side: "back" }] }), 29877.5811, 203, 481],
       [bin({ gridfinityLip: false, height: 21 }), 21312.6174, 69, 154],
     ] as const) {
       for (const each of [part, { ...part, ...closed }]) {

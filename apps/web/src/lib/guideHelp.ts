@@ -9,6 +9,7 @@ import {
   type GuidePrepared,
   type GuideSearchEntry,
 } from "@/lib/guideSearchCore";
+import { hoverTitleOf } from "@/lib/penHoverTip";
 
 /**
  * Interactive Help: from an element of the program to the part of the user guide that is about it.
@@ -71,7 +72,8 @@ export function helpNameOf(element: Element): string {
     const named = clean(text);
     if (named) return named;
   }
-  const title = clean(element.getAttribute("title"));
+  // The installed app holds a title back while its own bubble shows it (#1013).
+  const title = clean(hoverTitleOf(element));
   if (title) return title;
   // The label around a slider holds its name, its value and its unit ("Length 30.00 mm"): ask about the name.
   const sliderName = element.matches("input, select, textarea") ? element.closest("label")?.querySelector(".range-property-name") : null;

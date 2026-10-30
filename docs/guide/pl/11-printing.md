@@ -5,7 +5,7 @@ summary: Wybór własnej drukarki, ostrzeżenie, gdy coś się nie mieści, i w�
 
 ## Wybór drukarki
 
-Otwórz ustawienia (koło zębate na wstążce, {{ui:editor.workspaceSettings}}) i przejdź do sekcji {{ui:workspace.workplane}}. W {{ui:workspace.printer}} wybierasz swoją drukarkę z listy ponad 220 popularnych modeli, między innymi Bambu Lab, Prusa, Creality, Anycubic, Elegoo i wielu innych.
+Otwórz ustawienia (koło zębate na wstążce, {{ui:editor.workspaceSettings}}) i przejdź do sekcji {{ui:workspace.workplane}}. W {{ui:workspace.printer}} wybierasz swoją drukarkę z listy ponad 230 popularnych modeli, między innymi Bambu Lab, Prusa, Creality, Anycubic, Elegoo i wielu innych.
 
 ![Ustawienia płaszczyzny roboczej z wybraną drukarką. Stół i maksymalna wysokość wydruku pochodzą z profilu slicera.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Dzieją się trzy rzeczy:
 - layerling **ostrzega**, gdy coś się nie mieści.
 
 Profile drukarek pochodzą z OrcaSlicera, więc są takie same, jakie zna Twój slicer. Jeśli wolisz pracować bez drukarki, wybierz {{ui:workspace.printerNone}}. Rozmiar płaszczyzny roboczej możesz też ustawić ręcznie.
+
+Drukarki delta, takie jak FLSun, SeeMeCNC czy Anycubic Predator, drukują na okrągłym stole. Przy jednej z nich płaszczyzna robocza też jest okrągła i tak szeroka jak stół, a bryła jest za duża, gdy tylko wystaje poza krawędź. Okrągłą bryłę mierzy się po jej własnym obrysie, a nie po otaczającym ją prostopadłościanie, więc zmieści się nawet walec prawie tak szeroki jak stół.
 
 ## Gdy coś się nie mieści
 

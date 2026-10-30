@@ -83,6 +83,18 @@ Se in seguito ridimensioni un corpo svuotato, layerling lo svuota di nuovo subit
 
 > **Suggerimento:** con un ugello da 0,4 mm, uno spessore tra 1,2 e 2 mm è un buon punto di partenza: abbastanza sottile da risparmiare materiale e abbastanza spesso da creare un pezzo robusto.
 
+## Un coperchio per un corpo aperto
+
+{{ui:editor.tool.lid}} crea il coperchio per un corpo aperto in alto: una scatola svuotata con il lato superiore aperto, un vaso, un vassoio. Seleziona il corpo e fai clic su {{ui:editor.tool.lid}}. Nella finestra scegli il tipo:
+
+- {{ui:lid.type.plug}}: una piastra grande quanto il corpo con sotto un labbro che entra nell'apertura.
+- {{ui:lid.type.cap}}: una piastra più larga del corpo di una parete con sotto un bordo che avvolge l'esterno.
+- {{ui:lid.type.flat}}: solo la piastra, da appoggiare o incollare.
+
+Poi imposti lo spessore ({{ui:lid.thickness}}), l'accoppiamento ({{ui:lid.fit}}, il gioco per lato tra coperchio e corpo: 0,1 mm stretto, 0,2 mm normale, 0,3 mm largo, o qualsiasi valore fino a 1 mm) e quanto scende il labbro o il bordo e quanto è spessa la sua parete. Fai clic su {{ui:lid.apply}}: il coperchio si trova accanto al corpo, capovolto con la piastra in basso, così si stampa senza supporti. Il corpo resta com'è. Il coperchio segue qualsiasi contorno, tondo o spigoloso, perché viene preso dal corpo stesso appena sotto il suo bordo. Un corpo senza apertura in alto riceve solo un coperchio piatto; per gli altri due, svuotalo prima con il lato superiore aperto.
+
+> **Suggerimento:** Quanto un coperchio è stretto dipende dalla stampante. Stampa prima una piccola scatola con il suo coperchio; se è troppo stretto, scegli l'accoppiamento successivo, più largo.
+
 ## Offset dei corpi
 
 Ogni faccia di un corpo può essere spostata della stessa distanza, verso l'esterno o l'interno. È ciò che serve a un accoppiamento, a un coperchio o a un incastro a scatto: un gioco di 0,1-0,3 mm tutto intorno mentre i dettagli restano dove sono, cosa che il ridimensionamento non dà.

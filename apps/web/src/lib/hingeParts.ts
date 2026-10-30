@@ -3,15 +3,21 @@ import type { WorkplaneShape } from "@/types/layerling";
 import { hingeLocalParts } from "@/lib/hingeGeometry";
 import { meshYawDegrees, mirrorSign } from "@/lib/workplaneShapes";
 
+export type HingeWorldPart = WorkplaneShape & {
+  /** The knuckle of the cone hinge's B the part belongs to, as in `hingeLocalParts`. */
+  knuckle?: number;
+};
+
 /**
  * The hinge's exact parts placed in the world, as ordinary shapes the edge
  * tool and the STEP export already build exactly. A round part - a lying
  * cylinder or tube, an upright corner cylinder or screw hole - is turned only
  * about x and z: round shapes ignore their yaw when they are placed, and being
- * round, any turn that sets the axis the right way is the same body. The
- * screw holes keep their `hole` mark and are cut out of the rest.
+ * round, any turn that sets the axis the right way is the same body; a cone
+ * points one way, so its axis is its tip's direction. The screw holes keep
+ * their `hole` mark and are cut out of the rest.
  */
-export function hingeWorldParts(hinge: WorkplaneShape): WorkplaneShape[] {
+export function hingeWorldParts(hinge: WorkplaneShape): HingeWorldPart[] {
   const centerY = hinge.height / 2;
   const turn = new THREE.Euler(
     THREE.MathUtils.degToRad(hinge.rotationX ?? 0),
@@ -40,10 +46,12 @@ export function hingeWorldParts(hinge: WorkplaneShape): WorkplaneShape[] {
       rotation = { rotationX: THREE.MathUtils.radToDeg(euler.x), rotation: THREE.MathUtils.radToDeg(euler.y), rotationZ: THREE.MathUtils.radToDeg(euler.z) };
     } else if (!square) {
       // Where the axis points: along the hinge's own x when lying, else up, folded with B's leaf and seen through the
-      // mirror (a countersink's head stays on the leaf's top).
-      const axis = part.rotationZ === 90
-        ? new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize()
-        : new THREE.Vector3(0, 1, 0).applyMatrix4(new THREE.Matrix4().makeRotationX(THREE.MathUtils.degToRad(part.rotationX ?? 0))).applyMatrix4(mirror).applyQuaternion(quaternion).normalize();
+      // mirror (a countersink's head stays on the leaf's top); a cone's towards its tip, which its own turn sets.
+      const axis = part.kind === "cone"
+        ? new THREE.Vector3(0, 1, 0).applyEuler(new THREE.Euler(THREE.MathUtils.degToRad(part.rotationX ?? 0), 0, THREE.MathUtils.degToRad(part.rotationZ ?? 0), "XYZ")).applyMatrix4(mirror).applyQuaternion(quaternion).normalize()
+        : part.rotationZ === 90
+          ? new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize()
+          : new THREE.Vector3(0, 1, 0).applyMatrix4(new THREE.Matrix4().makeRotationX(THREE.MathUtils.degToRad(part.rotationX ?? 0))).applyMatrix4(mirror).applyQuaternion(quaternion).normalize();
       const sinZ = THREE.MathUtils.clamp(-axis.x, -1, 1);
       const rotationZ = Math.asin(sinZ);
       const rotationX = Math.atan2(axis.z, axis.y);
@@ -66,6 +74,12 @@ export function hingeWorldParts(hinge: WorkplaneShape): WorkplaneShape[] {
       ...(part.hole ? { hole: true } : {}),
       ...(part.kind === "countersink" ? { screwHoleShaft: part.screwHoleShaft, screwHoleAngle: part.screwHoleAngle } : {}),
       ...(part.kind === "polygon" ? { sides: part.sides } : {}),
+      ...(part.knuckle === undefined ? {} : { knuckle: part.knuckle }),
     };
   });
+}
+
+/** B's knuckles each in a scope of their own, below zero where the groups' scopes count up (restoreGroupedChildrenForEdges). */
+export function hingePartScope(scope: number[], part: HingeWorldPart) {
+  return part.knuckle === undefined ? scope : [...scope, -1 - part.knuckle];
 }

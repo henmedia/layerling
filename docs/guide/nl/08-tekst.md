@@ -155,7 +155,7 @@ Moet de belettering niet recht lopen, maar de rand van een munt, een deksel of e
 
 Zodra je die aanzet, loopt de tekst langs de cirkel. Alle letters staan op dezelfde basislijn, net zo gelijkmatig als bij gewone tekst. Er zijn vier instellingen:
 
-- **{{ui:prop.textRadius}}** (5 tot 500 mm): De straal van de cirkel waarover de basislijn van de letters loopt.
+- **{{ui:prop.textRadius}}** (5 tot 500 mm): De straal van de cirkel waarover de basislijn van de letters loopt. De letters blijven op hun plek staan; alleen hun buiging verandert.
 - **{{ui:nameTag.letterSize}}:** Hoe hoog de letters zijn. Dit hangt niet meer af van de breedte van de vorm.
 - **{{ui:prop.textInward}}:** Verplaatst de tekst van de bovenkant van de cirkel naar de onderkant. De letters wijzen dan met hun kop naar het middelpunt.
 - **{{ui:prop.textFlipped}}:** Draait alleen de letters om, zodat je ze van de andere kant kunt lezen. De tekst blijft op zijn plaats op de cirkel.

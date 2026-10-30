@@ -6,6 +6,7 @@ import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
 import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
+import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
 import { createPortal } from "react-dom";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { APP_THEME_OPTIONS, type AppThemePreference } from "@/lib/appTheme";
@@ -83,6 +84,7 @@ import type { BentTubeProfile, CustomSnapGrid, GearProfile, GearType, GridSize, 
 import { DEFAULT_LOFT } from "@/lib/loftGeometry";
 import { DEFAULT_GRIDFINITY_TRAY_SIZE, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
 import { selectWholeValue } from "@/lib/numberField";
+import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_TEETH, MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthToothHeightLimit } from "@/lib/hirthGeometry";
 
 type WorkspaceSettings = WorkplaneWorkspaceSettings;
 type WorkspaceSettingsSection = "appearance" | "measurement" | "workplane" | "shapes" | "history";
@@ -338,6 +340,13 @@ function specialFieldsForShape(
       );
     }
     return fields;
+  }
+  if (kind === "hirth") {
+    return [
+      { type: "number", key: "teeth", label: t("prop.teeth"), defaultValue: defaults.teeth ?? DEFAULT_HIRTH_TEETH, min: MIN_HIRTH_TEETH, max: MAX_HIRTH_TEETH, step: 1 },
+      { type: "number", key: "toothSize", label: t("prop.hirthToothHeight"), defaultValue: defaults.toothSize ?? 2.6, min: MIN_HIRTH_TOOTH_HEIGHT, max: hirthToothHeightLimit(dimensions.width, dimensions.depth, dimensions.height), unit: "mm" },
+      { type: "number", key: "centerHoleSize", label: t("prop.centerHole"), defaultValue: defaults.centerHoleSize ?? DEFAULT_HIRTH_BORE, min: 0, max: hirthBoreLimit(dimensions.width, dimensions.depth), unit: "mm" },
+    ];
   }
   if (kind === "star") {
     return [
@@ -1107,6 +1116,18 @@ export function WorkspaceSettingsModal({
                       <span>{t("workspace.fast")}</span>
                     </small>
                   </label>
+                  <label className="workspace-select" data-help={t("workspace.mouseScheme")}>
+                    <span>{t("workspace.mouseScheme")}</span>
+                    <select
+                      value={workspace.mouseScheme}
+                      onChange={(event) => patchWorkspace({ mouseScheme: event.currentTarget.value === "slicer" ? "slicer" : "layerling" })}
+                    >
+                      <option value="layerling">{t("workspace.mouseSchemeLayerling")}</option>
+                      <option value="slicer">{t("workspace.mouseSchemeSlicer")}</option>
+                    </select>
+                    <small>{workspace.mouseScheme === "slicer" ? t("workspace.mouseSchemeSlicerHint") : t("workspace.mouseSchemeLayerlingHint")}</small>
+                  </label>
+                  <SpaceMouseSetting />
                   <WorkspaceToggle
                     label={t("workspace.cameraInertia")}
                     description={workspace.fastMode ? t("workspace.offInFastMode") : t("workspace.cameraInertiaHint")}
@@ -1236,7 +1257,9 @@ export function WorkspaceSettingsModal({
                   </label>
                   <p className="workspace-printer-info">
                     {chosenPrinter
-                      ? t("workspace.printerInfo", { width: chosenPrinter.width, depth: chosenPrinter.depth, height: chosenPrinter.height })
+                      ? chosenPrinter.round
+                        ? t("workspace.printerInfoRound", { diameter: chosenPrinter.width, height: chosenPrinter.height })
+                        : t("workspace.printerInfo", { width: chosenPrinter.width, depth: chosenPrinter.depth, height: chosenPrinter.height })
                       : t("workspace.printerHint")}
                   </p>
                   <WorkspaceToggle

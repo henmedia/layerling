@@ -782,8 +782,15 @@ export function refinePlanar(mesh: SurfaceMesh, free: Uint8Array, maxEdge: numbe
  * Point normals weighted by area and, per point, whether a face at it bends away by more than
  * half of `edgeAngle` (a sharp edge), how far the steepest face at it points down and up (so a
  * point on the rim of the bottom counts as bottom and stays on the bed).
+ *
+ * Given the body the mesh was refined from (`base`, and `parents` per triangle), the normals, the
+ * sharp edges and which way the faces point are all judged by the body's own faces: a thin refined
+ * triangle across a gentle edge of a cylinder's mantle (5.6 degrees with 64 sides) leant up to 22
+ * degrees out of it, one even pointed 67 degrees down, and a point a cut left a hair's breadth from
+ * another had only slivers round it and its normal turned inwards - the bumps there were left out as
+ * if they sat on a sharp edge, at the bottom or on an inner wall (issue #1030).
  */
-export function normalsAndCreases(v: Float64Array, I: Uint32Array, edgeAngle: number) {
+export function normalsAndCreases(v: Float64Array, I: Uint32Array, edgeAngle: number, base?: { vertices: Float64Array; indices: Uint32Array }, parents?: Uint32Array) {
   const n = v.length / 3;
   const vn = new Float64Array(n * 3);
   const fn = new Float64Array(I.length);
@@ -805,16 +812,50 @@ export function normalsAndCreases(v: Float64Array, I: Uint32Array, edgeAngle: nu
     vn[i + 1] /= l;
     vn[i + 2] /= l;
   }
+  // The faces the sharp edges are judged by, and the normal at each point they are measured against.
+  let cf = fn, cn = vn;
+  if (base && parents) {
+    cf = new Float64Array(I.length);
+    cn = new Float64Array(n * 3);
+    const own = new Float64Array(base.indices.length);
+    for (let f = 0; f < base.indices.length / 3; f += 1) {
+      const [x, y, z] = faceCross(base.vertices, base.indices[f * 3], base.indices[f * 3 + 1], base.indices[f * 3 + 2]);
+      const l = Math.hypot(x, y, z);
+      if (l === 0) continue;
+      own[f * 3] = x / l;
+      own[f * 3 + 1] = y / l;
+      own[f * 3 + 2] = z / l;
+    }
+    for (let t = 0; t < I.length; t += 3) {
+      const p = parents[t / 3] * 3;
+      const area = Math.hypot(fn[t], fn[t + 1], fn[t + 2]);
+      cf[t] = own[p] * area;
+      cf[t + 1] = own[p + 1] * area;
+      cf[t + 2] = own[p + 2] * area;
+      for (let k = 0; k < 3; k += 1) {
+        const id = I[t + k] * 3;
+        cn[id] += cf[t];
+        cn[id + 1] += cf[t + 1];
+        cn[id + 2] += cf[t + 2];
+      }
+    }
+    for (let i = 0; i < n * 3; i += 3) {
+      const l = Math.hypot(cn[i], cn[i + 1], cn[i + 2]) || 1;
+      cn[i] /= l;
+      cn[i + 1] /= l;
+      cn[i + 2] /= l;
+    }
+  }
   const minDot = new Float64Array(n).fill(1);
   const down = new Float64Array(n).fill(-1);
   const up = new Float64Array(n).fill(-1);
   for (let t = 0; t < I.length; t += 3) {
-    const l = Math.hypot(fn[t], fn[t + 1], fn[t + 2]);
-    if (l === 0) continue;
-    const fz = fn[t + 2] / l;
+    const lc = Math.hypot(cf[t], cf[t + 1], cf[t + 2]);
+    if (lc === 0) continue;
+    const fz = cf[t + 2] / lc;
     for (let k = 0; k < 3; k += 1) {
       const id = I[t + k];
-      const d = (fn[t] * vn[id * 3] + fn[t + 1] * vn[id * 3 + 1] + fn[t + 2] * vn[id * 3 + 2]) / l;
+      const d = (cf[t] * cn[id * 3] + cf[t + 1] * cn[id * 3 + 1] + cf[t + 2] * cn[id * 3 + 2]) / lc;
       if (d < minDot[id]) minDot[id] = d;
       if (-fz > down[id]) down[id] = -fz;
       if (fz > up[id]) up[id] = fz;
@@ -824,7 +865,7 @@ export function normalsAndCreases(v: Float64Array, I: Uint32Array, edgeAngle: nu
   const limit = Math.cos(((edgeAngle / 2) * Math.PI) / 180);
   const crease = new Uint8Array(n);
   for (let i = 0; i < n; i += 1) crease[i] = minDot[i] < limit ? 1 : 0;
-  return { normals: vn, crease, down, up };
+  return { normals: cn, crease, down, up };
 }
 
 export type Adjacency = { start: Uint32Array; nb: Uint32Array };

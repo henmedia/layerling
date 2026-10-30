@@ -81,6 +81,18 @@ Při pozdější změně velikosti se dutina ihned přepočítá. Zadaná tlouš
 
 > **Tip:** Pro trysku 0,4 mm je vhodným výchozím rozsahem stěna 1,2 až 2 mm: šetří materiál a přitom poskytuje dostatečně pevný díl.
 
+## Víko pro otevřené těleso
+
+{{ui:editor.tool.lid}} vytvoří víko pro těleso otevřené nahoře: krabičku vydlabanou s otevřenou horní stranou, nádobu, misku. Vyber těleso a klikni na {{ui:editor.tool.lid}}. V okně zvolíš druh:
+
+- {{ui:lid.type.plug}}: deska velká jako těleso a pod ní límec, který zapadne do otvoru.
+- {{ui:lid.type.cap}}: deska o stěnu širší než těleso a pod ní okraj, který obejme vnějšek.
+- {{ui:lid.type.flat}}: jen deska, k položení nebo přilepení.
+
+Pak nastavíš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} mezi víkem a tělesem: 0,1 mm těsné, 0,2 mm běžné, 0,3 mm volné, nebo jakákoli hodnota do 1 mm) a jak hluboko límec nebo okraj sahá a jak silná je jeho stěna. Klikni na {{ui:lid.apply}}: víko leží vedle tělesa, otočené deskou dolů, takže se tiskne bez podpěr. Těleso zůstane, jak je. Víko sleduje jakýkoli obrys, kulatý i hranatý, protože se odebírá ze samotného tělesa těsně pod jeho okrajem. Těleso bez otvoru nahoře dostane jen ploché víko; pro další dva druhy ho nejdřív vydlab s otevřenou horní stranou.
+
+> **Tip:** Jak těsně víko sedí, záleží na tiskárně. Nejdřív vytiskni malou krabičku s víkem; je-li víko příliš těsné, zvol další volnější uložení.
+
 ## Odsazení těles
 
 Každou plochu tělesa lze posunout o stejnou vzdálenost ven nebo dovnitř. To potřebuje lícovaný spoj, víko nebo zacvakávací spoj: mezera 0,1 až 0,3 mm dokola, zatímco prvky zůstanou na místě, což změna měřítka nedá.

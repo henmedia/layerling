@@ -12,7 +12,7 @@ summary: 能相互配合的螺絲、螺帽與螺紋孔，以及齒輪、彈簧�
 - **{{ui:thread.rod}}：** 帶螺紋的圓柱，例如沒有頭的螺絲。
 - **{{ui:thread.screw}}：** 帶頭部。頭部形狀在 {{ui:inspector.threadHead}} 選擇：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。
 - **{{ui:thread.nut}}：** 對應的螺帽。
-- **{{ui:thread.bore}}：** 螺紋孔。它是一個孔。把它拖進零件、將兩者群組，零件就有內螺紋。
+- **{{ui:thread.bore}}：** 螺紋孔。它是一個孔。把它拖進零件、將兩者群組，零件就有內螺紋。 要做鎖螺栓的孔，請一律使用{{ui:thread.bore}}：{{ui:thread.rod}}或{{ui:thread.screw}}作為孔時是螺栓的完整尺寸，沒有間隙，會太緊。如果仍把它設為孔，layerling 會提示你，點選{{ui:inspector.threadMakeTappedHole}}即可改為{{ui:thread.bore}}。
 
 ![帶圓柱頭的螺絲。右側：類型與頭部形狀，往下是規格、螺距與牙型。](shot:thread-screw)
 
@@ -143,7 +143,7 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 {{ui:prop.hingeClearance}} 是活動零件之間的間隙：銷周圍、鉸鏈節之間，以及葉片前方。0.4 mm 時，調校良好的印表機通常輕輕一扭就能鬆開；如果零件黏在一起就加大，晃得太厲害就減小。依平台上呈現的姿態平放列印鉸鏈，不要支撐。如果你偏好用自己的銷，例如一段線材或鐵絲，在小鉸鏈上它比列印的銷更光滑，就開啟 {{ui:prop.hingePinless}}：列印的銷會被略去，孔徑等於銷直徑加間隙，貫穿每個鉸鏈節，包括兩端。用 {{ui:prop.hingeAngle}} 讓第二片繞銷折起，把鉸鏈擺成設計中的姿態：0° 平躺如列印時，180° 為閉合。鉸鏈節維持原位，鉸鏈仍是一體；就地列印前記得設回 0°。你可以給葉片加孔，或把它們群組進更大的零件，例如蓋子。
 
-鉸鏈也可以做成{{ui:hinge.styleCone}}（在{{ui:prop.hingeStyle}}下）：每隔一個關節的兩端是圓錐，嵌入相鄰關節的錐形凹坑。沒有銷，也沒有可能下垂的長懸空橋，所以可以平放列印；圓錐為 45°。它是網格，因此倒角和圓角對它無效，STEP 匯出包含的是三角形；關節對圓錐來說太短時，會做得更少。除了關節數量，也可以指定{{ui:prop.hingeKnuckleWidth}}：關節不會比它更寬，數量由長度決定；輸入關節數量會取消寬度。
+鉸鏈也可以做成{{ui:hinge.styleCone}}（在{{ui:prop.hingeStyle}}下）：每隔一個關節的兩端是圓錐，嵌入相鄰關節的錐形凹坑。沒有銷，也沒有可能下垂的長懸空橋，所以可以平放列印；圓錐為 45°。和其他樣式一樣，它是精確實體，因此倒角和圓角對它有效，STEP 匯出包含它真正的圓錐；關節對圓錐來說太短時，會做得更少。除了關節數量，也可以指定{{ui:prop.hingeKnuckleWidth}}：關節不會比它更寬，數量由長度決定；輸入關節數量會取消寬度。
 
 {{ui:prop.hingeStyle}}有三個選項：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（為自備銷留的孔）和{{ui:hinge.styleCone}}。選圓錐時，{{ui:prop.hingeConeSize}}決定圓錐從關節長出處的大小；圓錐越大越牢固，預設取能放下的最大值。帶圓錐的鉸鏈沒有銷也沒有孔，所以它的翼板可以和整個關節一樣厚：把{{ui:prop.hingeLeafThickness}}設為關節直徑，翼板就與關節齊平；這樣的鉸鏈最多開啟約 90°，因為厚翼板會相碰。
 
