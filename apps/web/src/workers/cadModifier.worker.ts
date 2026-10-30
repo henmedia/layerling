@@ -999,7 +999,9 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       }
       if (request.kind !== "shell" && componentEdges.length > 0 && !cadHasSolidBody(activeCad, component)) {
         // Past a certain size the kernel returns a "valid" compound without any
-        // solid in it (and a volume that grew): not a body to go on with.
+        // solid in it (and a volume that grew): not a body to go on with. Since
+        // occt-wasm 5.8.1 a plain fillet or chamfer throws there itself
+        // (andymai/occt-wasm#420); this still guards the other treatments.
         releaseHandles(activeCad, [component]);
         throw new Error("The chosen size does not leave a closed solid");
       }

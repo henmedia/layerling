@@ -89,6 +89,7 @@ summary: 選取形狀、在物件清單中找到它們、對齊、鏡像、旋�
 ![圓周模式下的陣列：副本首先以預覽形式出現。](shot:pattern-tool)
 
 - **{{ui:array.mode.row}}：** 選取範圍會以相等間距重複。直線陣列可同時沿三個軸逐步排列，使用 {{ui:array.spacingX}}、{{ui:array.spacingY}} 和 {{ui:array.spacingZ}}：其中一個給出直線排列，兩個或三個則給出斜線或階梯排列。負間距會讓排列朝相反方向。
+- **{{ui:array.fit}}：** 用於沿一塊板排一排孔，例如鑰匙掛板或衣帽架。把第一件放在實體上或裡面，選擇{{ui:array.fit.x}}或{{ui:array.fit.y}}，再設定{{ui:array.fitGap}}：原件會從較近的一端向內移動這麼多（從邊緣到這一件的側面），最後一件副本到另一端也保持相同的間隙。間距隨後跟隨{{ui:array.count}}：五個孔也好九個也好，總能均勻地鋪滿整塊板。
 - **{{ui:array.mode.circle}}：** 選取範圍會圍繞一個中心分布。副本數量在 {{ui:array.count}} 中設定，{{ui:array.angle}} 為 360° 時是整圈。可選擇副本是否隨之轉動。{{ui:array.rise}} 讓每個副本比前一個略微升高（螺絲或上升螺旋），{{ui:array.radiusChange}} 讓它離中心更遠或更近（平面螺旋）；兩者結合則形成錐形螺旋。螺旋最多繞一圈：角度超過 360° 以整圈計算，副本最多 100 個。
 
 提示：先用 {{ui:editor.tool.rotationPivot}} 在某個面上設定旋轉中心，圓周的中心就會正好落在那裡。

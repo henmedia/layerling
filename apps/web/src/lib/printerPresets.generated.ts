@@ -125,6 +125,7 @@ export const PRINTER_PRESETS: readonly PrinterPreset[] = [
   {"id":"qidi-q2","vendor":"Qidi","model":"Q2","width":270,"depth":270,"height":256},
   {"id":"qidi-q2c","vendor":"Qidi","model":"Q2C","width":270,"depth":270,"height":256},
   {"id":"qidi-x-smart-3","vendor":"Qidi","model":"X-Smart 3","width":175,"depth":180,"height":170},
+  {"id":"qidi-x-smart-5","vendor":"Qidi","model":"X-Smart 5","width":180,"depth":180,"height":180},
   {"id":"qidi-x-plus","vendor":"Qidi","model":"X-Plus","width":270,"depth":200,"height":200},
   {"id":"qidi-x-plus-3","vendor":"Qidi","model":"X-Plus 3","width":280,"depth":280,"height":270},
   {"id":"qidi-x-plus-4","vendor":"Qidi","model":"X-Plus 4","width":305,"depth":305,"height":280},

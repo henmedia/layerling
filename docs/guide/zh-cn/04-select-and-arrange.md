@@ -89,6 +89,7 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 ![圆周模式下的阵列：副本首先以预览形式出现。](shot:pattern-tool)
 
 - **{{ui:array.mode.row}}：** 选择会以相等间距重复。直线阵列可同时沿三个轴逐步排列，使用 {{ui:array.spacingX}}、{{ui:array.spacingY}} 和 {{ui:array.spacingZ}}：其中一个给出直线排列，两个或三个则给出斜线或阶梯排列。负间距会让排列朝相反方向。
+- **{{ui:array.fit}}：** 用于沿一块板排一排孔，例如钥匙挂板或衣帽架。把第一件放在实体上或里面，选择{{ui:array.fit.x}}或{{ui:array.fit.y}}，再设置{{ui:array.fitGap}}：原件会从较近的一端向内移动这么多（从边缘到这一件的侧面），最后一件副本到另一端也保持相同的间隙。间距随后跟随{{ui:array.count}}：五个孔也好九个也好，总能均匀地铺满整块板。
 - **{{ui:array.mode.circle}}：** 选择会围绕一个中心分布。副本数量在 {{ui:array.count}} 中设置，{{ui:array.angle}} 为 360° 时是整圈。可选择副本是否随之旋转。{{ui:array.rise}} 让每个副本比前一个略微升高（螺钉或上升螺旋），{{ui:array.radiusChange}} 让它离中心更远或更近（平面螺旋）；两者结合则形成锥形螺旋。螺旋最多绕一圈：角度超过 360° 按整圈计算，副本最多 100 个。
 
 提示：先用 {{ui:editor.tool.rotationPivot}} 在某个面上设置旋转中心，圆周的中心就会正好落在那一点。

@@ -72,7 +72,7 @@ function injectStyle() {
   .vz .vz-g-major { fill: none; stroke: var(--vz-major); stroke-width: 1px; vector-effect: non-scaling-stroke; opacity: .55; }
   .vz .vz-g-label { fill: var(--vz-label); font-family: Arial, sans-serif; font-weight: 600; }
   .vz .vz-axis { fill: none; stroke: var(--vz-label); stroke-width: 1px; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
-  .vz .vz-axis-label { fill: var(--vz-label); font-family: Arial, sans-serif; font-weight: 800; }
+  .vz .vz-axis-label { fill: var(--vz-label); font-family: Arial, sans-serif; font-weight: 600; }
   .vz .vz-shape { fill: var(--vz-accent); fill-opacity: .13; stroke: var(--vz-accent); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
   .vz .vz-ghost { fill: var(--vz-accent); fill-opacity: .05; stroke: var(--vz-accent); stroke-opacity: .35; stroke-width: 1px; vector-effect: non-scaling-stroke; }
   .vz .vz-edit { fill: none; stroke: var(--vz-accent); stroke-width: 2.5px; vector-effect: non-scaling-stroke; }

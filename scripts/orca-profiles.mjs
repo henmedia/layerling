@@ -122,6 +122,7 @@ export const PRINTERS = [
   ["Qidi", "Qidi Q2"],
   ["Qidi", "Qidi Q2C"],
   ["Qidi", "Qidi X-Smart 3"],
+  ["Qidi", "Qidi X-Smart 5"],
   ["Qidi", "Qidi X-Plus"],
   ["Qidi", "Qidi X-Plus 3"],
   ["Qidi", "Qidi X-Plus 4"],

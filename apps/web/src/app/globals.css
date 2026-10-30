@@ -884,7 +884,7 @@ button {
   overflow: hidden;
   color: #231a11;
   font-size: 23px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1.4;
   text-overflow: ellipsis;
@@ -1284,7 +1284,7 @@ html[data-theme="dark"] .dashboard-trademark {
   align-items: center;
   gap: 4px;
   color: #1a6424;
-  font-weight: 800;
+  font-weight: 600;
   text-decoration: underline;
 }
 
@@ -1321,7 +1321,7 @@ html[data-theme="dark"] .dashboard-trademark {
   padding: 0;
   color: #1a6424;
   font: inherit;
-  font-weight: 800;
+  font-weight: 600;
   text-decoration: underline;
   background: transparent;
   border: 0;
@@ -1376,7 +1376,7 @@ html[data-theme="dark"] .dashboard-trademark {
   margin: -12px 0 20px;
   color: #6c5640;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /* The recommendation to install layerling as an app: a card under the start tiles that is meant
@@ -1415,7 +1415,7 @@ html[data-theme="dark"] .dashboard-trademark {
 .install-app-hint-text strong {
   color: #4a2f10;
   font-size: 16px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .install-app-hint-text span {
@@ -1441,7 +1441,7 @@ html[data-theme="dark"] .dashboard-trademark {
   padding: 10px 18px;
   color: #ffffff;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
   background: #bf6508;
   border: 0;
   border-radius: 9px;
@@ -1592,7 +1592,7 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
 .support-nudge-text strong {
   color: #573f26;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .support-nudge-text span {
@@ -1608,7 +1608,7 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
   padding: 7px 12px;
   color: #ffffff;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   text-decoration: none;
   background: #bf6508;
   border-radius: 8px;
@@ -1757,7 +1757,7 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
   margin-left: 8px;
   color: var(--primary);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   content: "●";
 }
 
@@ -1765,7 +1765,7 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
   padding: 8px 10px 4px;
   color: var(--muted-strong);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -1844,7 +1844,7 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
 
 .command-palette-blocked {
   color: var(--primary);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 @media (max-width: 560px) {
@@ -1887,7 +1887,7 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
   flex: 1;
   min-width: 0;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .whats-new-icon {
@@ -1936,14 +1936,14 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
 
 .whats-new-note a {
   color: #bf6508;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .whats-new-version h2 {
   margin: 0 0 6px;
   color: #bf6508;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -1963,7 +1963,7 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
 
 .whats-new-version li strong {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .whats-new-version li span {
@@ -2010,7 +2010,7 @@ body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install
   padding: 8px 16px;
   color: #ffffff;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   background: #bf6508;
   border: 0;
   border-radius: 8px;
@@ -2107,7 +2107,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   min-width: 0;
   overflow-wrap: anywhere;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /*
@@ -2585,7 +2585,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
 
 .dashboard-confirm-dialog p span {
   color: #48331d;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /* The destinations in the move dialog: one row each, like a menu, so the list
@@ -2630,7 +2630,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
 .dashboard-confirm-actions button {
   height: 38px;
   padding: 0 16px;
-  font-weight: 800;
+  font-weight: 600;
   border-radius: 6px;
 }
 
@@ -2663,7 +2663,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   padding: 18px;
   color: #6c5640;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .dashboard-rename-dialog input {
@@ -2738,7 +2738,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   top: 50%;
   color: #96816a;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   text-align: center;
   transform: translate(-50%, -50%);
   white-space: nowrap;
@@ -2765,7 +2765,7 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   overflow: hidden;
   color: #573f26;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3151,7 +3151,7 @@ html[data-theme="dark"] .shell-openings-summary {
   border: 1px solid #e0bd80;
   border-radius: 7px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -3230,7 +3230,7 @@ html[data-theme="dark"] .shell-openings-summary {
   border-radius: 8px;
   cursor: pointer;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .edge-modifier-history-edit:hover {
@@ -3450,7 +3450,7 @@ html[data-theme="dark"] .shell-openings-summary {
   margin-bottom: 6px;
   color: #6d5133;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .split-axis-control > div {
@@ -3467,7 +3467,7 @@ html[data-theme="dark"] .shell-openings-summary {
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .split-axis-control button.active {
@@ -3498,7 +3498,7 @@ html[data-theme="dark"] .shell-openings-summary {
   border-radius: 6px;
   font: inherit;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   text-align: right;
 }
 
@@ -3506,7 +3506,7 @@ html[data-theme="dark"] .shell-openings-summary {
   min-width: 20px;
   color: #7e6852;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .split-position-pick {
@@ -3731,7 +3731,7 @@ html[data-theme="dark"] .shell-openings-summary {
   border-radius: 3px;
   cursor: pointer;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .sketch-command-button svg {
@@ -3830,7 +3830,7 @@ html[data-theme="dark"] .shell-openings-summary {
 .toolbar-brand-name {
   color: #231a11;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1.15;
 }
@@ -3983,7 +3983,7 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   border-bottom: 3px solid transparent;
   cursor: pointer;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -4093,7 +4093,7 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 
 .visibility-dropdown-action strong {
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .visibility-dropdown-help {
@@ -4118,7 +4118,7 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   border-radius: 4px;
   font-family: inherit;
   font-size: 8px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .toolbar-section-label {
@@ -4128,7 +4128,7 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   color: var(--group-color);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: .04em;
   line-height: 16px;
   text-align: center;
@@ -4186,6 +4186,28 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 
 .toolbar-collapse-trigger {
   position: relative;
+}
+
+/* A tab with a chevron under the folded button, in the group's colour, so it does not pass for one tool but reads as a
+   menu that opens (Stefan 30.10.2026); it turns up while the group is open. */
+.toolbar-section[data-collapsed] .toolbar-collapse-trigger::before {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  width: 18px;
+  height: 11px;
+  content: "";
+  background-color: var(--group-color);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 11'%3E%3Cpath d='M5.5 3.5 9 7l3.5-3.5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border-radius: 0 0 6px 6px;
+  transform: translateX(-50%);
+  transition: transform 0.15s ease;
+}
+
+.toolbar-section[data-collapsed][data-open] .toolbar-collapse-trigger::before {
+  transform: translateX(-50%) scaleY(-1);
 }
 
 /* What the tools would show at a glance - something hidden, files attached - shows on the folded button as a dot. */
@@ -4535,7 +4557,7 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   padding: 0 15px;
   color: #604529;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 42px;
   background: linear-gradient(180deg, #fff, #faf7f3);
   border-bottom: 1px solid #efe7d9;
@@ -4565,7 +4587,7 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   cursor: pointer;
   touch-action: manipulation;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
   transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
 
@@ -4822,7 +4844,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   padding: 8px 15px 0;
   color: #8a6d4c;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -4839,7 +4861,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   color: #573e24;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
   background: transparent;
@@ -4899,7 +4921,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
 
 .top-action-panel strong {
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .top-action-panel header button {
@@ -4998,7 +5020,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
 .export-section-heading strong {
   color: #4d3720;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .export-file-input-wrap {
@@ -5037,7 +5059,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   padding: 0 9px 0 4px;
   color: #937f6a;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: lowercase;
 }
 
@@ -5106,7 +5128,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   margin: 0;
   color: #4d3720;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -5133,7 +5155,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   padding: 4px 8px;
   color: #975613;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 600;
   text-transform: uppercase;
   background: #f8f5ef;
   border: 1px solid #ece2d0;
@@ -5207,7 +5229,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   padding: 0 5px;
   color: #94816c;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 600;
   letter-spacing: 0.02em;
   background: transparent;
   border: 0;
@@ -5372,7 +5394,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
 
 .lyl-history-range-labels span.active {
   color: #9f5508;
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .export-format-summary {
@@ -5394,7 +5416,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
 .export-format-summary strong {
   color: #52391f;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .export-format-summary span,
@@ -5444,7 +5466,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .export-dialog-footer .export-primary-button {
@@ -5535,7 +5557,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   border-radius: 3px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .top-action-body button:hover {
@@ -5589,7 +5611,7 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   gap: 9px;
   color: #9c8b78;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
@@ -5679,7 +5701,7 @@ html[data-theme="dark"] .import-option {
 
 .import-drop-zone strong {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.25;
 }
 
@@ -5712,7 +5734,7 @@ html[data-theme="dark"] .import-option {
   padding: 7px 14px;
   color: #5c442b;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.4;
   white-space: normal;
   word-break: break-word;
@@ -5748,7 +5770,7 @@ html[data-theme="dark"] .import-option {
   color: #fff;
   font: inherit;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 600;
   background: #cf6a12;
   border: 0;
   border-radius: 8px;
@@ -5778,7 +5800,7 @@ html[data-theme="dark"] .import-option {
   place-items: center;
   color: #fff;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 600;
   line-height: 1;
   background: #d9730d;
   border: 2px solid #fffaf2;
@@ -5891,7 +5913,7 @@ html[data-theme="dark"] .visibility-hidden-badge {
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(25, 64, 43, 0.2);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 600;
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -5952,7 +5974,7 @@ html[data-theme="dark"] .visibility-hidden-badge {
   z-index: 1;
   color: #7a6249;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -6211,7 +6233,7 @@ html[data-theme="dark"] .sketch-shape-options .unit {
 
 .sketch-revolve-guide text {
   fill: #9e2996;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-anchor: end;
 }
@@ -6544,7 +6566,7 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   border-radius: 17px;
   cursor: pointer;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .sketch-point-actions button:disabled {
@@ -7215,7 +7237,7 @@ html[data-theme="dark"] .inspector-bundle-note {
 .section-measure-readout strong {
   color: #2b1f14;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .section-measure-readout span,
@@ -7430,7 +7452,7 @@ html[data-theme="dark"] .touch-multi-select {
   color: #fff;
   background: #bf6508;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 20px;
   text-align: center;
   pointer-events: none;
@@ -8233,6 +8255,13 @@ html[data-theme="dark"] .touch-multi-select {
   background: #f5f2ec;
 }
 
+/* Slope along: the lower end's dot, round so it is not taken for the height. */
+.transform-handle.height-top.slope-end {
+  border-radius: 50%;
+  background: #e0873a;
+  border-color: #6b3a12;
+}
+
 .transform-handle.edge,
 .transform-handle.dark {
   width: 9px;
@@ -8716,7 +8745,7 @@ html[data-theme="dark"] .rotation-angle-badge {
   border-radius: 4px;
   outline: none;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .inspector-header-actions {
@@ -8858,7 +8887,7 @@ html[data-theme="dark"] .rotation-angle-badge {
 .color-value {
   color: #98846f;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .color-grid {
@@ -8955,7 +8984,7 @@ html[data-theme="dark"] .rotation-angle-badge {
   border-radius: 5px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .shape-inspector .edit-sketch-button:hover:not(:disabled),
@@ -9089,7 +9118,7 @@ html[data-theme="dark"] .rotation-angle-badge {
   border-radius: 7px;
   cursor: pointer;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
 }
 
@@ -9327,7 +9356,7 @@ html[data-theme="dark"] .property-defaults-actions button {
 .range-value-unit {
   color: #816f5d;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -9450,7 +9479,7 @@ html[data-theme="dark"] .property-defaults-actions button {
 
 .mesh-compare-header strong {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -9563,7 +9592,7 @@ html[data-theme="dark"] .property-defaults-actions button {
   border: 1px solid #e9e4dc;
   border-radius: 5px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   pointer-events: none;
 }
@@ -9666,7 +9695,7 @@ html[data-theme="dark"] .property-defaults-actions button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .mesh-compare-actions .secondary {
@@ -9950,7 +9979,7 @@ html[data-theme="dark"] .property-hint {
   min-width: 18px;
   text-align: center;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .name-tag-layers {
@@ -10638,7 +10667,7 @@ html[data-theme="dark"] .font-picker-option.action {
 
 .workspace-modal-header strong {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-modal-header button {
@@ -10688,7 +10717,7 @@ html[data-theme="dark"] .font-picker-option.action {
   border-radius: 5px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   text-align: left;
 }
 
@@ -10880,7 +10909,7 @@ html[data-theme="dark"] .font-picker-option.action {
   cursor: pointer;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.03em;
   text-align: left;
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
@@ -10995,7 +11024,7 @@ html[data-theme="dark"] .font-picker-option.action {
   border: 1px solid #d9cdbf;
   border-radius: 8px;
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .workspace-color-popover-footer label > span {
@@ -11013,7 +11042,7 @@ html[data-theme="dark"] .font-picker-option.action {
   outline: 0;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
@@ -11260,7 +11289,7 @@ html[data-theme="dark"] .workspace-custom-snap-add:hover {
   gap: 6px;
   color: #7a6550;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-dimensions input {
@@ -11271,7 +11300,7 @@ html[data-theme="dark"] .workspace-custom-snap-add:hover {
   background: #fff;
   border: 1px solid #dacfc2;
   border-radius: 2px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-shape-picker {
@@ -11280,7 +11309,7 @@ html[data-theme="dark"] .workspace-custom-snap-add:hover {
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-shape-picker-control {
@@ -11362,7 +11391,7 @@ html[data-theme="dark"] .workspace-custom-snap-add:hover {
   border-radius: 5px;
   cursor: pointer;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-shape-card-heading button:disabled {
@@ -11397,7 +11426,7 @@ html[data-theme="dark"] .workspace-custom-snap-add:hover {
   border-radius: 5px;
   cursor: pointer;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 html[data-theme="dark"] .workspace-reset-row {
@@ -11422,7 +11451,7 @@ html[data-theme="dark"] .workspace-reset-row button {
   gap: 6px;
   color: #7a6550;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-shape-specials {
@@ -11454,7 +11483,7 @@ html[data-theme="dark"] .workspace-reset-row button {
   gap: 6px;
   color: #7a6550;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-shape-dimensions input,
@@ -11469,7 +11498,7 @@ html[data-theme="dark"] .workspace-reset-row button {
   background: #fff;
   border: 1px solid #d7cbbe;
   border-radius: 5px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-shape-limit {
@@ -11515,7 +11544,7 @@ html[data-theme="dark"] .workspace-reset-row button {
   border-radius: 3px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .workspace-modal-footer {
@@ -14386,7 +14415,7 @@ html[data-theme="dark"] .shape-menu-subtitle {
   align-items: center;
   gap: 9px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -14409,7 +14438,7 @@ html[data-theme="dark"] .shape-menu-subtitle {
 .color-recent-label {
   color: #84715d;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -15006,7 +15035,7 @@ html[data-theme="dark"] .color-recent {
   gap: 4px 10px;
   color: #4d3720;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .icon-tag-width input {
@@ -15073,7 +15102,7 @@ html[data-theme="dark"] .top-action-body .icon-tag-ok {
 
 .icon-tag-preview-empty {
   font-size: 26px;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: 0.08em;
 }
 
@@ -15084,7 +15113,7 @@ html[data-theme="dark"] .top-action-body .icon-tag-ok {
   gap: 4px;
   color: var(--foreground);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .qr-code-text textarea {
@@ -15137,7 +15166,7 @@ html[data-theme="dark"] .top-action-body .icon-tag-ok {
   gap: 8px;
   color: var(--foreground);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .qr-code-check input {
@@ -15285,7 +15314,7 @@ html[data-theme="dark"] [data-help-hover] {
 .interactive-help-more small {
   display: block;
   font-size: 10.5px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.03em;
   opacity: 0.72;
 }

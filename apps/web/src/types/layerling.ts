@@ -776,6 +776,13 @@ export type ParametricSource = {
   extrudeTwist?: number;
   extrudeTopOffsetX?: number;
   extrudeTopOffsetZ?: number;
+  slopeEnd?: number;
+  slopeSide?: "back" | "front" | "left" | "right";
+  slopeCurve?: number;
+  narrowEnd?: number;
+  narrowSide?: "back" | "front" | "left" | "right";
+  narrowCurve?: number;
+  narrowStart?: number;
 };
 
 export type CadPrimitiveFrame = {
@@ -835,6 +842,26 @@ export type WorkplaneShape = {
   extrudeTopOffsetX?: number;
   /** Shifts the top face along the shape's local Z axis, in mm. */
   extrudeTopOffsetZ?: number;
+  /**
+   * Slope along: the height of the top at the far end, in mm. The kept
+   * end stays at the body's height; missing or equal to the height means no slope.
+   */
+  slopeEnd?: number;
+  /** Slope along: which end goes down ("back" unless set; a round roof or a wedge slopes front or back). */
+  slopeSide?: "back" | "front" | "left" | "right";
+  /** Slope along: -1 to 1, 0 a straight top, above 0 bulging up, below 0 sagging. */
+  slopeCurve?: number;
+  /**
+   * Narrow along: seen from above, the width of the narrow end in mm,
+   * both long sides running in evenly. Missing or the full width means no narrowing.
+   */
+  narrowEnd?: number;
+  /** Narrow along: which end narrows ("back" unless set; a round roof or a wedge narrows front or back). */
+  narrowSide?: "back" | "front" | "left" | "right";
+  /** Narrow along: -1 to 1, 0 straight sides, above 0 bulging out, below 0 drawn in. */
+  narrowCurve?: number;
+  /** Narrow along: 0 to 0.95, the share of the length from the wide end where the narrowing starts. */
+  narrowStart?: number;
   teeth?: number;
   toothSize?: number;
   toothWidth?: number;

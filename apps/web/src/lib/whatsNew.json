@@ -1,5 +1,150 @@
 [
   {
+    "version": "1.124.2",
+    "items": [
+      {
+        "title": {
+          "de": "Fläche löschen bei Keil, Pyramide und Paraboloid",
+          "en": "Delete face for the wedge, pyramid and paraboloid"
+        },
+        "body": {
+          "de": "Ragt ein Keil, eine Pyramide oder ein Paraboloid aus einem anderen Körper heraus, gruppierst du die beiden und nimmst das Überstehende mit „Fläche löschen“ weg. Auch der STEP-Export nimmt sie jetzt mit, als Körper wie als Aussparung.",
+          "en": "Where a wedge, a pyramid or a paraboloid sticks out of another body, group the two and take off what sticks out with Delete face. The STEP export now takes them too, as bodies and as holes."
+        }
+      },
+      {
+        "title": {
+          "de": "Muster nur außen, auch nach dem Verrunden",
+          "en": "Pattern only outside, also after a fillet"
+        },
+        "body": {
+          "de": "Bei einem Becher mit verrundeten Rändern nahm „Flächen anklicken“ für die Oberflächenstruktur bisher den ganzen Becher, innen und unten mit. Jetzt endet eine Fläche auch an einer engen Rundung: Ein Klick auf die Außenseite nimmt nur die Außenseite, die Rundungen lassen sich einzeln dazuwählen.",
+          "en": "On a cup with rounded rims, Pick faces for the surface texture used to take the whole cup, the inside and the bottom too. Now a face also ends at a tight round: a click on the outside takes only the outside, and the rounds can be picked on their own."
+        }
+      },
+      {
+        "title": {
+          "de": "Klarere Überschriften",
+          "en": "Crisper headings"
+        },
+        "body": {
+          "de": "Überschriften, Reiter und Leistentitel sind etwas weniger fett. Auf dem Mac liefen die Buchstaben bei kleinen Größen zusammen und wirkten unscharf; jetzt nutzt die Oberfläche dort Avenir Next Demi Bold statt Heavy, unter Windows Arial Bold statt Arial Black.",
+          "en": "Headings, tabs and ribbon labels are a little less heavy. On the Mac the letters ran together at small sizes and looked blurred; now the interface uses Avenir Next Demi Bold there instead of Heavy, and Arial Bold instead of Arial Black on Windows."
+        }
+      },
+      {
+        "title": {
+          "de": "Zugeklappte Gruppen zeigen, dass sie aufgehen",
+          "en": "Folded groups show that they open"
+        },
+        "body": {
+          "de": "Ist das Fenster schmal, klappen Gruppen im Menüband zu einem Knopf zusammen. Der sah aus wie ein einzelnes Werkzeug, „Verlauf“ etwa wie Rückgängig. Jetzt hängt darunter ein kleiner Pfeil in der Farbe der Gruppe, und der Hinweistext sagt, dass ein Klick die Werkzeuge zeigt.",
+          "en": "When the window is narrow, groups in the ribbon fold into one button. It looked like a single tool, History like Undo, say. Now a small arrow in the group's colour hangs beneath it, and its hint says that a click shows the tools."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.124.1",
+    "items": [
+      {
+        "title": {
+          "de": "Eine Reihe gleichmäßig über eine Platte verteilen",
+          "en": "Spread a row evenly over a plate"
+        },
+        "body": {
+          "de": "Im Muster gibt es unter „Reihe“ jetzt „Über einen Körper verteilen“: Setze ein Loch auf eine Platte, wähle entlang X oder Y und den Abstand zum Rand, und die Löcher füllen die Platte von einem Ende zum anderen. Der Abstand folgt der Anzahl, du musst ihn nicht mehr ausrechnen - etwa für ein Schlüsselbrett oder eine Garderobe.",
+          "en": "The pattern's row has a new \"Spread over a body\": put a hole on a plate, choose along X or Y and the gap to the edge, and the holes fill the plate from one end to the other. The spacing follows the count, so there is nothing left to work out - for a key holder or a coat rack, say."
+        }
+      },
+      {
+        "title": {
+          "de": "SVGs aus Adobe Illustrator",
+          "en": "SVGs from Adobe Illustrator"
+        },
+        "body": {
+          "de": "Mit „Speichern unter → SVG“ aus Illustrator gespeicherte Dateien lehnte layerling bisher ab („SVG entities are not supported“). Jetzt lassen sie sich ganz normal importieren. Klappt ein Import nicht, steht der Grund in deiner Sprache da, mit einem Hinweis, was hilft.",
+          "en": "Files saved from Illustrator with Save As → SVG used to be refused (\"SVG entities are not supported\"). Now they import like any other. When an import does not work, the reason is shown in your language, with a hint at what helps."
+        }
+      },
+      {
+        "title": {
+          "de": "Gewindelöcher, in die die Schraube auch passt",
+          "en": "Tapped holes the bolt actually fits"
+        },
+        "body": {
+          "de": "Eine Gewindestange oder Schraube, die du als Aussparung setzt, hat das volle Maß der Schraube und kein Spiel, das Loch wird gedruckt also zu eng. layerling weist jetzt darauf hin und macht mit einem Klick ein Gewindeloch daraus, das das eingestellte Spiel bekommt.",
+          "en": "A threaded rod or screw that you set as a hole has the bolt's full size and no play, so the printed hole comes out too tight. layerling now points this out and turns it into a tapped hole with one click, which gets the clearance you set."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.124.0",
+    "items": [
+      {
+        "title": {
+          "de": "Gefälle und Zulaufen in der Länge",
+          "en": "Slope and narrow along"
+        },
+        "body": {
+          "de": "Zwei neue Karten in den Einstellungen von Quader, Zylinder, Vieleck, Keil und anderen Formen: „Gefälle in der Länge“ lässt die Oberseite zu einem Ende hin abfallen, „Zulaufen in der Länge“ führt die Seiten zu einem Ende zusammen, gerade oder gebogen. So entstehen ein Dach mit Gefälle, eine Rampe oder ein Bootsbug, und ein orangefarbener Punkt am Ende zieht die Höhe oder Breite direkt in der Ansicht.",
+          "en": "Two new cards in the settings of the box, cylinder, polygon, wedge and other shapes: \"Slope Along\" runs the top down towards one end, \"Narrow Along\" runs the sides in towards one end, straight or curved. That gives a sloping roof, a ramp or a boat's bow, and an orange dot on the end drags the height or width right in the view."
+        }
+      },
+      {
+        "title": {
+          "de": "Eine Gruppe sieht aus wie ein Körper",
+          "en": "A group looks like one body"
+        },
+        "body": {
+          "de": "Eine Gruppe aus Körpern zeigt sich jetzt als ein verschmolzener Körper, so dass du sie auf einen Blick von einem Bündel unterscheidest. Neue Gruppen beginnen einfarbig, „Mehrfarbig“ holt die Farben der Teile zurück; gespeicherte Gruppen behalten ihre Farben.",
+          "en": "A group of solids now shows as one merged body, so you can tell it from a bundle at a glance. New groups start in one colour, and \"Multicolor\" brings the parts' colours back; saved groups keep their colours."
+        }
+      },
+      {
+        "title": {
+          "de": "Fasen und Verrunden an nachgezeichneten SVGs",
+          "en": "Chamfers and fillets on traced SVGs"
+        },
+        "body": {
+          "de": "Eine SVG, die ein Programm aus einem Bild nachgezeichnet hat, nimmt jetzt Fasen und Verrundungen an ihren Kanten an. Vorher schlug das an jeder Kante fehl.",
+          "en": "An SVG that a program traced from a picture now takes chamfers and fillets on its edges. Before, every edge failed."
+        }
+      },
+      {
+        "title": {
+          "de": "Den Dateinamen für den Entwurf übernehmen",
+          "en": "Take the file name for the design"
+        },
+        "body": {
+          "de": "Gibst du der Datei beim Speichern einen anderen Namen als dem Entwurf, bietet die Meldung danach einen Knopf an, der den Entwurf genauso nennt. Wer den anderen Namen mit Absicht gewählt hat, etwa mit einer Versionsnummer, lässt ihn einfach stehen.",
+          "en": "If you give the file a different name than the design when saving, the message afterwards offers a button that names the design the same. If you picked the other name on purpose, say with a version number, just leave it."
+        }
+      },
+      {
+        "title": {
+          "de": "Noppen: keine Lücken mehr, auf Wunsch in geraden Reihen",
+          "en": "Bumps: no more gaps, and straight rows if you like"
+        },
+        "body": {
+          "de": "Auf runden Körpern fehlten bei der Oberflächentextur „Noppen“ einzelne Noppen, und manche Mulden sahen zerfetzt aus. Jetzt sitzt jede an ihrem Platz. Unter „Anordnung“ stehen sie versetzt wie bisher oder in geraden Reihen.",
+          "en": "On round bodies the surface texture \"Bumps\" left single bumps out, and some hollows looked torn. Now every one sits in its place. Under \"Arrangement\" they stand staggered as before, or in straight rows."
+        }
+      },
+      {
+        "title": {
+          "de": "Schnelle Tooltips in der installierten App",
+          "en": "Quick tooltips in the installed app"
+        },
+        "body": {
+          "de": "Als App installiert zeigte layerling die Namen der Knöpfe spät oder gar nicht. Jetzt erscheinen sie dort nach einem kurzen Moment in einer kleinen Blase.",
+          "en": "Installed as an app, layerling showed the names of its buttons late or not at all. There they now come up after a short moment in a small bubble."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.123.0",
     "items": [
       {

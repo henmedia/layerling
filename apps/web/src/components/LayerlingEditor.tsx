@@ -1,4 +1,5 @@
 "use client";
+import { normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope } from "@/lib/slopeAlong";
 import { AlertTriangle, X } from "lucide-react";
 import { ObjectListPanel } from "@/components/workplane/ObjectListPanel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -8,8 +9,7 @@ import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { loftShapePatch, type LoftMeasures } from "@/lib/loftGeometry";
-import { hingeHasExactParts } from "@/lib/hingeGeometry";
-import { hingeWorldParts } from "@/lib/hingeParts";
+import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
 import { gridfinityListPatch } from "@/lib/gridfinityGeometry";
@@ -75,7 +75,7 @@ import { scaleShapesByPercent } from "@/lib/scaleByPercent";
 import { canToggleGroupColors, colorForParts, groupShowsPartColors } from "@/lib/groupColors";
 import { disposeBoundsTree } from "three-mesh-bvh";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
-import { arrayCirclePivot, arrayFollowingPivot, arrayGroupsCopies, circleStepDegrees, clampArrayCount, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
+import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { bedOverhangs, keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
 import { SplitPanel, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
 import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitOrientationForNormal, splitAxisFromLabel, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
@@ -119,7 +119,7 @@ import { rotateSketchPoints, selectedClosedSketchPoints } from "@/lib/sketchRota
 import { PROJECT_THUMBNAIL_IDLE_MS, projectThumbnailSceneChanged, type ProjectThumbnailSceneKey } from "@/lib/projectThumbnail";
 import { importedShapeFromObj } from "@/lib/objImport";
 import { takeImportSvgWidth } from "@/lib/importPreferences";
-import { importFailureSummary, importModelFiles } from "@/lib/modelImport";
+import { importFailureReason, importFailureSummary, importModelFiles } from "@/lib/modelImport";
 import { dedupeProjectAssets } from "@/lib/projectAssets";
 import { useCustomShapes } from "@/lib/useCustomShapes";
 import { packBackup } from "@/lib/projectBackup";
@@ -179,7 +179,7 @@ import { useRememberedFlag } from "@/lib/useRememberedFlag";
 import { BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportEvent } from "@/lib/bugReport";
 import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
-import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
+import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
 import { useInspectorCard } from "@/lib/inspectorCards";
@@ -994,6 +994,8 @@ async function restoreEdgeTreatmentInShape(shape: WorkplaneShape, path: number[]
       hidden: shape.hidden,
       edgeResizeMode: shape.edgeResizeMode,
       groupOperation: shape.groupOperation,
+      // Built again, the group is not a new one: it keeps the colours it showed (#1029).
+      multicolor: shape.multicolor,
       edgeTreatments: shape.edgeTreatments,
       edgeTreatmentHistory: shape.edgeTreatmentHistory?.length ? compactEdgeTreatmentHistory(shape.edgeTreatmentHistory) : undefined,
     }),
@@ -1055,6 +1057,13 @@ function parametricSourceForBake(shape: WorkplaneShape): ParametricSource | unde
     extrudeTwist: shape.extrudeTwist,
     extrudeTopOffsetX: shape.extrudeTopOffsetX,
     extrudeTopOffsetZ: shape.extrudeTopOffsetZ,
+    slopeEnd: shape.slopeEnd,
+    slopeSide: shape.slopeSide,
+    slopeCurve: shape.slopeCurve,
+    narrowEnd: shape.narrowEnd,
+    narrowSide: shape.narrowSide,
+    narrowCurve: shape.narrowCurve,
+    narrowStart: shape.narrowStart,
   };
 }
 
@@ -1091,6 +1100,13 @@ function rebuiltParametricShape(shape: WorkplaneShape, patch: Partial<WorkplaneS
     extrudeTwist: source.extrudeTwist,
     extrudeTopOffsetX: source.extrudeTopOffsetX,
     extrudeTopOffsetZ: source.extrudeTopOffsetZ,
+    slopeEnd: source.slopeEnd,
+    slopeSide: source.slopeSide,
+    slopeCurve: source.slopeCurve,
+    narrowEnd: source.narrowEnd,
+    narrowSide: source.narrowSide,
+    narrowCurve: source.narrowCurve,
+    narrowStart: source.narrowStart,
     importedMesh: undefined,
     parametricSource: undefined,
     rotation: 0,
@@ -1197,6 +1213,13 @@ function bakeShapeTransformIntoMesh(shape: WorkplaneShape): WorkplaneShape {
     extrudeTwist: undefined,
     extrudeTopOffsetX: undefined,
     extrudeTopOffsetZ: undefined,
+    slopeEnd: undefined,
+    slopeSide: undefined,
+    slopeCurve: undefined,
+    narrowEnd: undefined,
+    narrowSide: undefined,
+    narrowCurve: undefined,
+    narrowStart: undefined,
     importedMesh: {
       positions,
       baseWidth: rawWidth,
@@ -1596,6 +1619,34 @@ async function downloadBlobFile(filename: string, blob: Blob) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+
+/**
+ * The body a row can be spread over (#1037): of the other solids, the smallest whose footprint holds the middle of the
+ * pieces and is larger than they are both ways - the plate the holes sit in or on.
+ */
+function arrayFitBodyFor(pieces: WorkplaneShape[], shapes: WorkplaneShape[]) {
+  if (pieces.length === 0) return null;
+  const ids = new Set(pieces.map((shape) => shape.id));
+  const box = boundsForShapes(pieces);
+  const middleX = (box.minX + box.maxX) / 2;
+  const middleZ = (box.minZ + box.maxZ) / 2;
+  let best: { shape: WorkplaneShape; area: number } | null = null;
+  for (const shape of shapes) {
+    if (ids.has(shape.id) || shape.hole || isNonSolidShape(shape)) continue;
+    const body = boundsForShapes([shape]);
+    if (middleX < body.minX || middleX > body.maxX || middleZ < body.minZ || middleZ > body.maxZ) continue;
+    if (body.maxX - body.minX <= box.maxX - box.minX || body.maxZ - body.minZ <= box.maxZ - box.minZ) continue;
+    const area = (body.maxX - body.minX) * (body.maxZ - body.minZ);
+    if (!best || area < best.area) best = { shape, area };
+  }
+  return best?.shape ?? null;
+}
+
+/** The pattern's settings with a fit to a body worked out into spacings; the body gone, they stay as they are. */
+function arraySettingsResolved(settings: ArraySettings, sources: WorkplaneShape[], shapes: WorkplaneShape[]): ArraySettings {
+  const body = settings.fit ? shapes.find((shape) => shape.id === settings.fit?.bodyId) : undefined;
+  return arrayWithFit(settings, boundsForShapes(sources), body ? boundsForShapes([body]) : null);
+}
 
 /**
  * The copies of a pattern: every selected shape, once per extra piece, moved
@@ -2247,8 +2298,9 @@ function withCadPartScope(part: CadModifierMeshPart, scope: number[]): CadModifi
 }
 
 function cadModifierSourceParts(shape: WorkplaneShape) {
-  // The hinge reaches the kernel as the boxes, cylinders and tubes it is made of.
-  if (shape.kind === "hinge" && hingeHasExactParts(shape) && !shape.importedMesh && !shape.cadBrep && !shapeHasShapeDeform(shape)) return hingeWorldParts(shape);
+  // The hinge reaches the kernel as the boxes, cylinders, tubes and cones it is made of; a hinge set as a hole goes as
+  // its mesh, as its parts would go as solids.
+  if (shape.kind === "hinge" && !shape.hole && !shape.importedMesh && !shape.cadBrep && !shapeHasShapeDeform(shape)) return hingeWorldParts(shape);
   if (shape.kind !== "text" || shape.importedMesh || shape.cadBrep) return [shape];
   const mesh = meshForShape(shape);
   const components = meshFaceComponents(mesh).filter((component) => component.length > 0);
@@ -2439,6 +2491,26 @@ function mcpTaperPatch(shape: WorkplaneShape, params: Record<string, unknown>, m
     bottomWidth: mcpOptionalNumber(params.taperBottomWidth),
     bottomDepth: mcpOptionalNumber(params.taperBottomDepth),
   }, maxDimension);
+}
+
+/**
+ * Slope along and narrow along (slopeAlong.ts) belong to the single body like the taper, so
+ * they do not come through `normalizeShapeCustomizations` either: the lower end's height in
+ * mm, its side and the curve (-1 to 1); the narrow end's width in mm, its side, the curve and
+ * where the narrowing starts (0 to 0.95) - for creating a shape and for changing one.
+ */
+function mcpSlopePatch(shape: WorkplaneShape, params: Record<string, unknown>): Partial<WorkplaneShape> {
+  const patch: Partial<WorkplaneShape> = {};
+  if (!shapeSupportsSlope(shape)) return patch;
+  if (typeof params.slopeSide === "string") patch.slopeSide = normalizeSlopeSide(shape.kind, params.slopeSide);
+  if (typeof params.slopeCurve === "number") patch.slopeCurve = normalizeSlopeCurve(params.slopeCurve);
+  if (typeof params.slopeEnd === "number" && Number.isFinite(params.slopeEnd)) patch.slopeEnd = Math.max(0, params.slopeEnd);
+  if (!shapeSupportsNarrow(shape)) return patch;
+  if (typeof params.narrowSide === "string") patch.narrowSide = normalizeSlopeSide(shape.kind, params.narrowSide);
+  if (typeof params.narrowCurve === "number") patch.narrowCurve = normalizeSlopeCurve(params.narrowCurve);
+  if (typeof params.narrowStart === "number") patch.narrowStart = normalizeNarrowStart(params.narrowStart);
+  if (typeof params.narrowEnd === "number" && Number.isFinite(params.narrowEnd)) patch.narrowEnd = Math.max(0, params.narrowEnd);
+  return patch;
 }
 
 /**
@@ -3763,8 +3835,8 @@ export function LayerlingEditor({
   }, [alignAxes, alignMode, effectiveAlignAnchorId, selectedShapes]);
   // The copies a pattern would add, shown on the workplane until "Create".
   const arrayPreview = useMemo(
-    () => (arrayTool && selectedShapes.length > 0 ? arrayCopies(selectedShapes, arrayTool) : null),
-    [arrayTool, selectedShapes],
+    () => (arrayTool && selectedShapes.length > 0 ? arrayCopies(selectedShapes, arraySettingsResolved(arrayTool, selectedShapes, shapes)) : null),
+    [arrayTool, selectedShapes, shapes],
   );
   // The holes a hole pattern would cut, shown on the face until "Create".
   const holePatternPreview = useMemo(
@@ -4091,6 +4163,24 @@ export function LayerlingEditor({
     if (arrayPivotX === undefined || arrayPivotZ === undefined) return;
     setArrayTool((current) => (current ? arrayFollowingPivot(current, { x: arrayPivotX, z: arrayPivotZ }) : current));
   }, [arrayPivotX, arrayPivotZ]);
+
+  // A row spread over a body (#1037): the body it runs over - the one chosen, or else the one under the pieces - and
+  // the pieces' gap to its nearer end along the chosen axis.
+  const arrayIsRow = arrayTool?.mode === "row";
+  const arrayFitBodyId = arrayTool?.fit?.bodyId;
+  const arrayFitAxis = arrayTool?.fit?.axis;
+  const arrayFitBody = useMemo(
+    () => (!arrayIsRow ? null : arrayFitBodyId ? shapes.find((shape) => shape.id === arrayFitBodyId) ?? null : arrayFitBodyFor(selectedShapes, shapes)),
+    [arrayFitBodyId, arrayIsRow, selectedShapes, shapes],
+  );
+  const arrayFitSpans = useMemo(() => {
+    if (!arrayFitBody || !arrayFitAxis || selectedShapes.length === 0) return null;
+    const pieces = boundsForShapes(selectedShapes);
+    const body = boundsForShapes([arrayFitBody]);
+    return arrayFitAxis === "x"
+      ? { piece: { min: pieces.minX, max: pieces.maxX }, body: { min: body.minX, max: body.maxX } }
+      : { piece: { min: pieces.minZ, max: pieces.maxZ }, body: { min: body.minZ, max: body.maxZ } };
+  }, [arrayFitAxis, arrayFitBody, selectedShapes]);
 
 
   const pickRotationPivot = useCallback(async (target: PivotPoint | null, face?: LayFlatPick | null) => {
@@ -6055,7 +6145,7 @@ export function LayerlingEditor({
 
   const applyArrayTool = useCallback(async () => {
     if (!arrayTool || selectedShapes.length === 0) return;
-    const copies = arrayCopies(selectedShapes, arrayTool);
+    const copies = arrayCopies(selectedShapes, arraySettingsResolved(arrayTool, selectedShapes, shapes));
     const groupPieces = arrayGroupsCopies(arrayTool) && !selectedShapes.some((shape) => isNonSolidShape(shape));
     // A circle leaves its centre as the pieces' pivot, to align another part to or mark it (#990).
     const piecesBounds = boundsForShapes([...selectedShapes, ...copies]);
@@ -6098,6 +6188,16 @@ export function LayerlingEditor({
       result.openGapEdges ? t("status.cutLeftOpen", { count: result.openGapEdges }) : result.mergeWarning ?? t("status.groupedMany", { count: pieces.length }),
     );
   }, [activeRotationPivot, arrayTool, commitShapes, selectedIds, selectedShapes, shapes]);
+
+  // A new gap moves the originals; a run of changes is one step of the history, like a run of arrow keys.
+  const setArrayFitGap = useCallback((gap: number) => {
+    if (!arrayFitSpans || !arrayFitAxis) return;
+    const shift = arrayFitShift(arrayFitSpans.piece, arrayFitSpans.body, gap);
+    if (Math.abs(shift) < 1e-9) return;
+    const selected = new Set(selectedIds);
+    const moved = shapes.map((shape) => (!selected.has(shape.id) ? shape : arrayFitAxis === "x" ? { ...shape, x: shape.x + shift } : { ...shape, z: shape.z + shift }));
+    commitShapes(moved, selectedIds, undefined, "array-fit-gap");
+  }, [arrayFitAxis, arrayFitSpans, commitShapes, selectedIds, shapes]);
 
   const duplicateShapeAt = useCallback((id: string, position: { x: number; z: number }) => {
     const shape = shapesRef.current.find((entry) => entry.id === id);
@@ -6786,7 +6886,7 @@ export function LayerlingEditor({
     const hasAppliedEdgeTreatment = Boolean(selectedShape.importedMesh && selectedShape.edgeTreatments?.length);
     const sourceEntries = (selectedShape.groupedShapes?.length && !hasAppliedEdgeTreatment && !shapeHasShapeDeform(selectedShape)
       ? restoreGroupedChildrenForEdges(selectedShape)
-      : [{ shape: selectedShape, scope: [] }]).flatMap(({ shape, scope }) => cadModifierSourceParts(shape).map((part) => ({ part, scope })));
+      : [{ shape: selectedShape, scope: [] }]).flatMap(({ shape, scope }) => cadModifierSourceParts(shape).map((part) => ({ part, scope: hingePartScope(scope, part) })));
     const sourceParts = sourceEntries.map((entry) => entry.part);
     const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; hirth?: CadModifierHirthPart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((shape) => {
       const frame = shape.cadBrepFrame;
@@ -6934,7 +7034,7 @@ export function LayerlingEditor({
     const hasAppliedEdgeTreatment = Boolean(shape.importedMesh && shape.edgeTreatments?.length);
     const sourceEntries = (shape.groupedShapes?.length && !hasAppliedEdgeTreatment && !shapeHasShapeDeform(shape)
       ? restoreGroupedChildrenForEdges(shape)
-      : [{ shape, scope: [] }]).flatMap((entry) => cadModifierSourceParts(entry.shape).map((part) => ({ part, scope: entry.scope })));
+      : [{ shape, scope: [] }]).flatMap((entry) => cadModifierSourceParts(entry.shape).map((part) => ({ part, scope: hingePartScope(entry.scope, part) })));
     const sourceParts = sourceEntries.map((entry) => entry.part);
     const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; hirth?: CadModifierHirthPart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((partShape) => {
       const frame = partShape.cadBrepFrame;
@@ -10289,6 +10389,7 @@ export function LayerlingEditor({
           }
           shape = { ...shape, ...mcpTaperPatch(shape, params, shapeDimensionLimit(workspaceSettingsRef.current, shape.kind, DEFAULT_TAPER_DIMENSION_MAX)) };
           shape = { ...shape, ...mcpExtrudeDeformPatch(shape, params) };
+          shape = { ...shape, ...mcpSlopePatch(shape, params) };
           if (shape.kind === "bentTube") {
             shape = { ...shape, ...mcpBentTubePatch(shape, params) };
           }
@@ -10437,6 +10538,7 @@ export function LayerlingEditor({
         // umbaut - erst Breite und Tiefe anwenden, dann die Kanten darauf.
         Object.assign(patch, mcpTaperPatch({ ...target, ...patch }, params, shapeDimensionLimit(workspaceSettingsRef.current, target.kind, DEFAULT_TAPER_DIMENSION_MAX)));
         Object.assign(patch, mcpExtrudeDeformPatch({ ...target, ...patch }, params));
+        Object.assign(patch, mcpSlopePatch(target, params));
         if (target.kind === "loft") {
           // The stored ends were set above as they came; the frame and the place follow from them here.
           const change = mcpLoftChange(params);
@@ -11364,7 +11466,7 @@ export function LayerlingEditor({
         ["textContent", "textFont"].forEach((key) => {
           if (params[key] !== undefined && typeof params[key] !== "string") throw new Error(`${key} must be text`);
         });
-        const choices: Record<string, readonly string[]> = { pattern: SURFACE_TEXTURE_PATTERNS, profile: SURFACE_TEXTURE_PROFILES, direction: SURFACE_TEXTURE_DIRECTIONS, projection: SURFACE_TEXTURE_PROJECTIONS, axis: SURFACE_TEXTURE_AXES, detail: SURFACE_TEXTURE_DETAILS, crackStyle: SURFACE_TEXTURE_CRACK_STYLES, crackStart: SURFACE_TEXTURE_CRACK_STARTS, carbonWeave: SURFACE_TEXTURE_CARBON_WEAVES, brickBond: SURFACE_TEXTURE_BRICK_BONDS, barkType: SURFACE_TEXTURE_BARK_TYPES, woodType: SURFACE_TEXTURE_WOOD_TYPES, woodCut: SURFACE_TEXTURE_WOOD_CUTS, image: SURFACE_TEXTURE_IMAGES, imageTiling: SURFACE_TEXTURE_TILINGS, capStyle: SURFACE_TEXTURE_CAP_STYLES, capEdge: SURFACE_TEXTURE_CAP_EDGES };
+        const choices: Record<string, readonly string[]> = { pattern: SURFACE_TEXTURE_PATTERNS, profile: SURFACE_TEXTURE_PROFILES, direction: SURFACE_TEXTURE_DIRECTIONS, projection: SURFACE_TEXTURE_PROJECTIONS, axis: SURFACE_TEXTURE_AXES, detail: SURFACE_TEXTURE_DETAILS, crackStyle: SURFACE_TEXTURE_CRACK_STYLES, crackStart: SURFACE_TEXTURE_CRACK_STARTS, carbonWeave: SURFACE_TEXTURE_CARBON_WEAVES, brickBond: SURFACE_TEXTURE_BRICK_BONDS, barkType: SURFACE_TEXTURE_BARK_TYPES, woodType: SURFACE_TEXTURE_WOOD_TYPES, woodCut: SURFACE_TEXTURE_WOOD_CUTS, image: SURFACE_TEXTURE_IMAGES, imageTiling: SURFACE_TEXTURE_TILINGS, bumpGrid: SURFACE_TEXTURE_BUMP_GRIDS, capStyle: SURFACE_TEXTURE_CAP_STYLES, capEdge: SURFACE_TEXTURE_CAP_EDGES };
         Object.entries(choices).forEach(([key, allowed]) => {
           if (params[key] !== undefined && !allowed.includes(String(params[key]))) throw new Error(`${key} must be one of ${allowed.join(", ")}`);
         });
@@ -11639,10 +11741,30 @@ export function LayerlingEditor({
       if (command.action === "array_objects") {
         const requestedIds = mcpStringArray(params.ids);
         const ids = requestedIds.length > 0 ? requestedIds : selectedIdsRef.current;
-        const sources = ids.map((id) => findShape(id)).filter((shape): shape is WorkplaneShape => Boolean(shape));
-        if (sources.length === 0) throw new Error("No objects to repeat - pass ids or select something first");
-        if (sources.some((shape) => shape.locked)) throw new Error("A locked object cannot be repeated - unlock it first");
+        const picked = ids.map((id) => findShape(id)).filter((shape): shape is WorkplaneShape => Boolean(shape));
+        if (picked.length === 0) throw new Error("No objects to repeat - pass ids or select something first");
+        if (picked.some((shape) => shape.locked)) throw new Error("A locked object cannot be repeated - unlock it first");
         const mode = params.mode === "circle" ? "circle" : "row";
+        // `fitAxis` spreads a row over a body as the Pattern window does (#1037): `fitTo`, or else the body under the
+        // pieces; `edgeGap` first moves the originals that far in from the body's nearer end.
+        let fit: ArraySettings["fit"] = null;
+        let sources = picked;
+        if (mode === "row" && (params.fitAxis === "x" || params.fitAxis === "y")) {
+          const axis = params.fitAxis;
+          const body = params.fitTo !== undefined ? findShape(params.fitTo) : arrayFitBodyFor(picked, currentShapes());
+          if (!body) throw new Error("No body to spread the row over: pass fitTo, or place the pieces on or in a body");
+          fit = { axis, bodyId: body.id };
+          if (params.edgeGap !== undefined) {
+            const box = boundsForShapes(picked);
+            const bodyBox = boundsForShapes([body]);
+            const shift = axis === "x"
+              ? arrayFitShift({ min: box.minX, max: box.maxX }, { min: bodyBox.minX, max: bodyBox.maxX }, Math.max(0, mcpNumber(params.edgeGap, 0)))
+              : arrayFitShift({ min: box.minZ, max: box.maxZ }, { min: bodyBox.minZ, max: bodyBox.maxZ }, Math.max(0, mcpNumber(params.edgeGap, 0)));
+            sources = picked.map((shape) => (axis === "x" ? { ...shape, x: shape.x + shift } : { ...shape, z: shape.z + shift }));
+          }
+        }
+        const movedSources = new Map(sources.filter((shape, index) => shape !== picked[index]).map((shape) => [shape.id, shape]));
+        const withMovedSources = (list: WorkplaneShape[]) => (movedSources.size ? list.map((shape) => movedSources.get(shape.id) ?? shape) : list);
         const direction = params.direction === "y" || params.direction === "z" ? params.direction : "x";
         const bounds = boundsForShapes(sources);
         // spacingX / spacingY / spacingZ step along several axes at once; the
@@ -11651,7 +11773,7 @@ export function LayerlingEditor({
         const spacings = perAxis
           ? { spacingX: mcpNumber(params.spacingX, 0), spacingY: mcpNumber(params.spacingY, 0), spacingZ: mcpNumber(params.spacingZ, 0) }
           : singleAxisSpacing(direction, mcpNumber(params.spacing, bounds.maxX - bounds.minX + 5));
-        const settings: ArraySettings = {
+        const settings: ArraySettings = arraySettingsResolved({
           mode,
           count: clampArrayCount(mcpNumber(params.count, 2)),
           ...spacings,
@@ -11661,14 +11783,15 @@ export function LayerlingEditor({
           rotateCopies: params.rotateCopies !== false,
           rise: mcpNumber(params.rise, 0),
           radiusChange: mcpNumber(params.radiusChange, 0),
-        };
+          fit,
+        }, sources, currentShapes());
         const copies = arrayCopies(sources, settings);
         const piecesBounds = boundsForShapes([...sources, ...copies]);
         const circlePivot = arrayCirclePivot(settings, piecesBounds.minY, piecesBounds.maxY);
         const pivotAnswer = circlePivot ? { pivot: { x: circlePivot.x, y: -circlePivot.z, z: circlePivot.y } } : {};
         const looseResult = (message: string, warning?: string) => {
           const ids = [...sources.map((shape) => shape.id), ...copies.map((shape) => shape.id)];
-          commitShapes([...shapesRef.current, ...copies], ids, message);
+          commitShapes([...withMovedSources(shapesRef.current), ...copies], ids, message);
           if (circlePivot) setRotationPivot({ selectionKey: ids.join("|"), point: circlePivot });
           return { settings, originals: sources.map((shape) => shape.id), copies: copies.map(mcpShapeSummary), ...pivotAnswer, ...(warning ? { warning } : {}) };
         };
@@ -12953,6 +13076,7 @@ export function LayerlingEditor({
     // before anything that takes time. A browser without it keeps the download.
     const projectId = projectInfoRef.current.projectId ?? "";
     let fileHandle: LylFileHandle | null = null;
+    let pickedNewFile = false;
     if (target === "file" || target === "fileAs") {
       if (!lylFileAccessSupported()) {
         target = "download";
@@ -12963,7 +13087,10 @@ export function LayerlingEditor({
             setNotice(t("status.fileNotWritable", { name: fileHandle.name }), true);
             return;
           }
-          fileHandle ??= await pickLylFileToSave(projectExportFileName(exportName, "lyl"));
+          if (!fileHandle) {
+            fileHandle = await pickLylFileToSave(projectExportFileName(exportName, "lyl"));
+            pickedNewFile = true;
+          }
           // Closed without a choice: nothing to do.
           if (!fileHandle) return;
         } catch {
@@ -13019,7 +13146,22 @@ export function LayerlingEditor({
           throw new Error(t("status.saveFileFailed", { name: fileHandle.name }));
         }
         rememberLylFile(projectId, fileHandle);
-        setNotice(t("status.savedToFile", { name: fileHandle.name }));
+        // A different name typed into the file dialog may be on purpose (a version, a date), so
+        // the draft only takes it on a click (#1035).
+        const fileStem = fileHandle.name.replace(/\.(lyl|skf)$/i, "").trim();
+        const offerRename = pickedNewFile && onProjectNameChange && fileStem
+          && fileHandle.name !== projectExportFileName(projectName, "lyl");
+        setNotice(
+          t("status.savedToFile", { name: fileHandle.name }),
+          Boolean(offerRename),
+          offerRename ? {
+            label: t("status.renameDraftToFile"),
+            run: () => {
+              onProjectNameChange(fileStem);
+              setNotice(t("status.draftRenamedToFile", { name: fileStem }));
+            },
+          } : null,
+        );
       } else {
         const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
         await downloadBlobFile(projectExportFileName(exportName, "lyl"), new Blob([buffer], { type: LYL_MEDIA_TYPE }));
@@ -13031,7 +13173,7 @@ export function LayerlingEditor({
     } finally {
       setLylExporting(false);
     }
-  }, [onSaveSharedProject, placementElevation, placementWorkplane, projectCreatedAt, projectModifiedAt, projectName, lylExporting, snapGrid]);
+  }, [onProjectNameChange, onSaveSharedProject, placementElevation, placementWorkplane, projectCreatedAt, projectModifiedAt, projectName, lylExporting, snapGrid]);
 
   /** Ctrl+S: into the file the design is tied to; the first time it asks for one (#251). */
   const saveDesignRef = useRef<() => void>(() => undefined);
@@ -13388,7 +13530,7 @@ export function LayerlingEditor({
 
     if (!importedShapes.length) {
       setNotice(failures.length === 1 && files.length <= 1
-        ? failures[0].reason
+        ? importFailureReason(failures[0])
         : t("status.importNoneFailed", { total: Math.max(files.length, failures.length), summary: failureSummary }), true);
       return { importedIds: [], failures };
     }
@@ -14675,9 +14817,13 @@ export function LayerlingEditor({
       {arrayTool && selectedShapes.length > 0 ? (
         <ArrayPanel
           targetName={selectedShapes.length === 1 ? selectedShapes[0].name : t("array.targetMany", { count: selectedShapes.length })}
-          settings={arrayTool}
+          settings={arraySettingsResolved(arrayTool, selectedShapes, shapes)}
           workspace={workspaceSettings}
           pivotSet={Boolean(activeRotationPivot)}
+          fitBody={arrayFitBody ? { id: arrayFitBody.id, name: arrayFitBody.name } : null}
+          fitGap={arrayFitSpans ? arrayFitGap(arrayFitSpans.piece, arrayFitSpans.body).gap : null}
+          fitGapMax={arrayFitSpans ? (arrayFitSpans.body.max - arrayFitSpans.body.min) / 2 : 0}
+          onFitGap={setArrayFitGap}
           onChange={(patch) => setArrayTool((current) => current ? { ...current, ...patch } : current)}
           onApply={applyArrayTool}
           onCancel={() => {

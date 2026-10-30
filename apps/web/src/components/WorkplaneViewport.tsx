@@ -68,6 +68,7 @@ import { ownSideForMark } from "@/lib/dimensionSides";
 import { SelectionCounter } from "@/components/workplane/SelectionCounter";
 import { TouchMultiSelectButton } from "@/components/workplane/TouchMultiSelectButton";
 import { showsTouchMultiSelect } from "@/lib/touchMultiSelect";
+import { narrowCrossWidth, narrowEndWidth, normalizeSlopeSide, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight } from "@/lib/slopeAlong";
 import { TransformOverlay, continuousSnappedWheelRotation, getElevationMeasureKey, measureKeyForHandle, ROTATION_WHEEL_SHIFT_SNAP_DEGREES, ROTATION_WHEEL_SNAP_DEGREES, snappedRotationDelta, snappedWheelRotation, type DimensionMark, type EditingCorner, type EditingDimension, type EditingRotation, type PinnedRotationWheelView, type RotationAxis, type RotationPlaneView, type RotationReadout, type TransformHandleKind, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, GridSize, MeasurementAccuracy, ShapeAsset, WorkplaneNote, WorkplaneNoteAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -90,7 +91,7 @@ import { useViewportDoubleClick } from "@/components/workplane/useViewportDouble
 import { aimPickRay, firstShapeHit, pickImagePoint, pickLayFlatFace, pickMateFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeMovableShapeId, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
-import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject } from "./workplane/viewportShapeObjects";
+import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane } from "./workplane/viewportScene";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
@@ -1878,6 +1879,8 @@ export function WorkplaneViewport({
   const [drawRound, setDrawRound] = useState(0);
   useEffect(() => onCustomFontsChanged(() => setDrawRound((round) => round + 1)), []);
   useEffect(() => onManifoldReady(() => setDrawRound((round) => round + 1)), []);
+  // A plain group is merged into one body a moment after it last changed, and drawn again then (#1029).
+  useEffect(() => onGroupDisplayReady(() => setDrawRound((round) => round + 1)), []);
   cruiseAssetRef.current = cruiseAsset;
   const projectNameRef = useRef(projectName);
   const projectIdRef = useRef(projectId);
@@ -2191,6 +2194,8 @@ export function WorkplaneViewport({
       }
       return;
     }
+    // The slope's dot changes no size: it leaves the anchor of the last resize as it was.
+    if (handleKey === "slope-end" || handleKey === "narrow-end") return;
     if (kind === "height") {
       lastResizeAnchorRef.current = {
         shapeId,
@@ -3939,7 +3944,11 @@ export function WorkplaneViewport({
       const scaleStartPoint = scalePlane ? toRawPlanePoint(event.clientX, event.clientY, scalePlane) ?? undefined : undefined;
       const scaleSigns = kind === "scale" ? resizeSignsForHandle(resizeHandleKey) : undefined;
       const scaleAnchorPoint = kind === "scale" && scaleSigns ? resizeAnchorPointForFrame(frame, scaleSigns) : undefined;
-      const liftAxis = kind === "lift" ? lift.axis : kind === "height" ? frame.yAxis.clone().normalize() : undefined;
+      // The narrowing's dot moves across the body, along the axis its end's width runs on.
+      const narrowAxis = handleKey === "narrow-end"
+        ? (slopeAlongWidth(normalizeSlopeSide(shape.kind, shape.narrowSide)) ? frame.zAxis : frame.xAxis).clone().normalize()
+        : null;
+      const liftAxis = kind === "lift" ? lift.axis : narrowAxis ?? (kind === "height" ? frame.yAxis.clone().normalize() : undefined);
       const liftHandlePoint = liftAxis
         ? (kind === "lift"
             ? lift.pointAt(handlesLowerSide ? lift.low : lift.high).addScaledVector(liftAxis, liftOffset)
@@ -4193,6 +4202,23 @@ export function WorkplaneViewport({
         const rawDelta = currentPoint && transform.liftStartPoint
           ? currentPoint.clone().sub(transform.liftStartPoint).dot(axis)
           : 0;
+        // Slope along: the dot on the lower end moves that end's height, between the floor's minimum and the body's height.
+        // Narrow along: the dot on the narrow end's side moves that end's half-width.
+        if (transform.handleKey === "narrow-end") {
+          const start = transform.startShape;
+          const startWidth = narrowEndWidth(start);
+          const full = narrowCrossWidth(start);
+          const nextWidth = clamp(startWidth + 2 * snapValue(rawDelta, step), 0, full);
+          onUpdateShape(start.id, { narrowEnd: Math.round(nextWidth * 1e4) / 1e4, narrowSide: normalizeSlopeSide(start.kind, start.narrowSide) });
+          return true;
+        }
+        if (transform.handleKey === "slope-end") {
+          const start = transform.startShape;
+          const startEnd = slopeEndHeight(start);
+          const nextEnd = clamp(startEnd + snapValue(rawDelta, step), Math.min(SLOPE_MIN_END, start.height), start.height);
+          onUpdateShape(start.id, { slopeEnd: Math.round(nextEnd * 1e4) / 1e4, slopeSide: normalizeSlopeSide(start.kind, start.slopeSide) });
+          return true;
+        }
         const resizingFromBottom = transform.handleKey === "bottom-height";
         const rawFrameHeight = transform.selectionFrame.height + (resizingFromBottom ? -rawDelta : rawDelta);
         const printerHeight = printerPresetById(workspaceRef.current.printer)?.height;

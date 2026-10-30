@@ -581,10 +581,10 @@ export function SecondaryToolbar({
     }
   };
   useToolbarCollapse(toolbarContentRef, !simpleMode && !ribbonPinned);
-  /** The one button a folded group shows under its name, with the icon of the tool it is known by. */
+  /** The one button a folded group shows under its name, with the icon of the tool it is known by; its hint says it opens. */
   const collapseBox = (label: string, Icon: ComponentType) => (
     <div className="toolbar-section-tools toolbar-collapse-box">
-      <button className="toolbar-icon toolbar-collapse-trigger" type="button" aria-label={label} title={label} aria-expanded={false} data-collapse-trigger>
+      <button className="toolbar-icon toolbar-collapse-trigger" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger>
         <Icon />
       </button>
     </div>

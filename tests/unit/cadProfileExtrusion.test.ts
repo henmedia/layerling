@@ -17,6 +17,7 @@ import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
 import { createPrismGeometry } from "@/lib/prismGeometry";
 import { createBooleanHollowCylinderGeometry, createBooleanRoundRoofGeometry } from "@/lib/roundBodyGeometry";
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
+import { meshForShape } from "@/lib/editorMeshCore";
 import { BEVEL_GEAR_TOP_SCALE, createGearGeometry, normalizeGearCenterHoleSize, normalizeGearTeeth } from "@/lib/gearGeometry";
 
 type Vec3 = [number, number, number];
@@ -642,5 +643,99 @@ describe("rounded box in the edge tool (#239)", () => {
     expect(cadModifierProfileForShape(shape("roundedBox", { ...base, roundedBoxQuality: 2 }))).not.toBeNull();
     expect(cadModifierProfileForShape(shape("roundedBox", { ...base, roundedBoxQuality: 1 }))).toBeNull();
     expect(cadModifierProfileForShape(shape("roundedBox", { ...base, topBottomFillet: 0, roundedBoxQuality: 1 }))).toBeNull();
+  });
+});
+
+describe("the wedge, pyramid and paraboloid as exact parts (#1007)", () => {
+  const placed = (transform: number[] | undefined, x: number, y: number, z: number) =>
+    new THREE.Vector3(x, y, z).applyMatrix4(cadTransformToMatrix(transform)).toArray().map((value) => Number(value.toFixed(9)) + 0);
+  const key = (x: number, z: number) => `${(Math.round(x * 1e6) / 1e6 + 0).toFixed(6)},${(Math.round(z * 1e6) / 1e6 + 0).toFixed(6)}`;
+  const lineCorners = (loop: CadModifierProfileLoop) => loop.segments.map((segment) => {
+    expect(segment.kind).toBe("line");
+    return key(segment.x, segment.z);
+  }).sort();
+  /** The display mesh's corners at height y, as (x, z), leaving out a cap's centre where a fan of triangles meets. */
+  const ringOf = (part: WorkplaneShape, y: number) => [...new Set(meshForShape(part).vertices.filter(([, vy]) => Math.abs(vy - y) < 1e-6).map(([x, , z]) => key(x, z)))].filter((corner) => corner !== key(0, 0)).sort();
+
+  it("pushes the wedge's triangle from its front face along the depth, the right angle at +x", () => {
+    const part = cadModifierProfileForShape(shape("wedge", { width: 30, depth: 12, height: 8 }));
+    expect(part).toMatchObject({ kind: "extrusion", height: 12 });
+    expect(lineCorners(part!.loops[0])).toEqual([key(-15, 0), key(15, 0), key(15, 8)].sort());
+    // The display's front face (z = depth / 2) carries the triangle: profile (x, z) is display (x, y).
+    const front = [...new Set(meshForShape(shape("wedge", { width: 30, depth: 12, height: 8 })).vertices.filter(([, , z]) => Math.abs(z - 6) < 1e-6).map(([x, y]) => key(x, y)))].sort();
+    expect(lineCorners(part!.loops[0])).toEqual(front);
+    // The profile's z is the height, the extrusion runs from the front face to the back one.
+    expect(placed(part?.transform, 15, 0, 8)).toEqual([15, 8, 6]);
+    expect(placed(part?.transform, 15, 12, 8)).toEqual([15, 8, -6]);
+    // A tapered wedge stays on its display mesh, as before.
+    expect(cadModifierProfileForShape(shape("wedge", { width: 30, depth: 12, height: 8, taperTopWidth: 10 }))).toBeNull();
+  });
+
+  it("turns the paraboloid's parabola, one Bezier curve, round its axis and stretches it to the depth", () => {
+    const part = cadModifierProfileForShape(shape("paraboloid", { width: 30, depth: 20, height: 18, steps: 32 }));
+    expect(part).toMatchObject({ kind: "revolution", height: 18 });
+    const [first, curve, back] = part!.loops[0].segments;
+    expect(part!.loops[0]).toMatchObject({ x: 0, z: 0 });
+    expect(first).toMatchObject({ kind: "line", x: 15, z: 0 });
+    expect(curve).toMatchObject({ kind: "bezier", x: 0, z: 18, controls: [{ x: 7.5, z: 18 }] });
+    expect(back).toMatchObject({ kind: "line", x: 0, z: 0 });
+    // The quadratic Bezier is the parabola y = h (1 - (r / R)^2) point for point.
+    for (const t of [0.1, 0.35, 0.5, 0.8]) {
+      const r = (1 - t) ** 2 * 15 + 2 * t * (1 - t) * 7.5;
+      const y = 2 * t * (1 - t) * 18 + t * t * 18;
+      expect(y).toBeCloseTo(18 * (1 - (r / 15) ** 2), 12);
+    }
+    // The radius runs along x at full width and along z at depth / width of it.
+    expect(placed(part?.transform, 0, 15, 0)).toEqual([0, 0, -10]);
+    expect(placed(part?.transform, 0, 0, 18)).toEqual([0, 18, 0]);
+    // Drawn with few steps it is faceted and stays on its display mesh, as the half sphere.
+    expect(cadModifierProfileForShape(shape("paraboloid", { width: 30, depth: 20, height: 18, steps: 5 }))).toBeNull();
+  });
+
+  it("lofts a pointed pyramid from its base to its tip, corner for corner the display's", () => {
+    for (const sides of [3, 4, 5, 6]) {
+      const pyramid = shape("pyramid", { width: 30, depth: 20, height: 25, sides, topWidth: 0, topDepth: 0 });
+      const part = cadModifierProfileForShape(pyramid);
+      expect(part).toMatchObject({ kind: "loft", height: 25, apex: { x: 0, z: 0 } });
+      expect(part?.topLoops).toBeUndefined();
+      expect(lineCorners(part!.loops[0])).toEqual(ringOf(pyramid, 0));
+      // The display's tip, the one point at the full height, is the loft's.
+      expect([...new Set(meshForShape(pyramid).vertices.filter(([, y]) => Math.abs(y - 25) < 1e-6).map(([x, , z]) => key(x, z)))]).toEqual([key(0, 0)]);
+      expect(() => validateCadProfile(part!)).not.toThrow();
+    }
+    // A top under the smallest one the display draws is a point too.
+    expect(cadModifierProfileForShape(shape("pyramid", { width: 30, depth: 20, height: 25, sides: 4, topWidth: 0.01, topDepth: 8 }))?.apex).toEqual({ x: 0, z: 0 });
+  });
+
+  it("lofts a pyramid with a top from its base to its top, both the display's corners", () => {
+    for (const sides of [3, 4, 6]) {
+      const frustum = shape("pyramid", { width: 30, depth: 20, height: 25, sides, topWidth: 12, topDepth: 6 });
+      const part = cadModifierProfileForShape(frustum);
+      expect(part).toMatchObject({ kind: "loft", height: 25 });
+      expect(part?.apex).toBeUndefined();
+      expect(lineCorners(part!.loops[0])).toEqual(ringOf(frustum, 0));
+      expect(lineCorners(part!.topLoops![0])).toEqual(ringOf(frustum, 25));
+    }
+  });
+
+  it("validates a loft to a point only with one outline of straight lines", () => {
+    const base = cadModifierProfileForShape(shape("pyramid", { width: 30, depth: 20, height: 25, sides: 4 }))!;
+    expect(base.apex).toEqual({ x: 0, z: 0 });
+    expect(() => validateCadProfile(base)).not.toThrow();
+    expect(() => validateCadProfile({ ...base, apex: { x: Number.NaN, z: 0 } })).toThrow();
+    expect(() => validateCadProfile({ ...base, loops: [base.loops[0], base.loops[0]] })).toThrow();
+    expect(() => validateCadProfile({ ...base, topLoops: base.loops })).toThrow();
+    // A capsule's outline has arcs, and a loft to a point takes only straight sides.
+    const capsule = cadModifierProfileForShape(shape("slot", { width: 30, depth: 10 }))!;
+    expect(capsule.loops[0].segments.some((segment) => segment.kind === "arc")).toBe(true);
+    expect(() => validateCadProfile({ ...base, loops: capsule.loops })).toThrow(/straight-sided/);
+    expect(() => validateCadProfile({ ...base, apex: undefined })).toThrow();
+    // Its sides are built flat, so nothing may turn, tilt, smooth or chamfer them.
+    expect(() => validateCadProfile({ ...base, twist: 30 })).toThrow();
+    expect(() => validateCadProfile({ ...base, tilt: { x: 5, z: 0 } })).toThrow();
+    expect(() => validateCadProfile({ ...base, smooth: 0.5 })).toThrow();
+    expect(() => validateCadProfile({ ...base, capChamfer: { radius: 15, size: 1 } })).toThrow();
+    // Nothing turned is nothing turned.
+    expect(() => validateCadProfile({ ...base, twist: 0, tilt: { x: 0, z: 0 } })).not.toThrow();
   });
 });

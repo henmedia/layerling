@@ -8,6 +8,7 @@ import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
 import { qrSettingsEqual } from "@/lib/qrCode";
 import { torusTubeRatio } from "@/lib/torusShape";
+import { shapeHasAlongDeform } from "@/lib/slopeAlong";
 import type { SketchStroke, WorkplaneShape } from "@/types/layerling";
 
 /** Bauwerte der Wabengitter, die es nur noch in alten Entwuerfen gibt: Die Form wird nicht mehr angeboten (#223), bleibt aber bearbeitbar. */
@@ -78,6 +79,13 @@ export function shapeWithParametricSource(shape: WorkplaneShape): WorkplaneShape
     extrudeTwist: source.extrudeTwist,
     extrudeTopOffsetX: source.extrudeTopOffsetX,
     extrudeTopOffsetZ: source.extrudeTopOffsetZ,
+    slopeEnd: source.slopeEnd,
+    slopeSide: source.slopeSide,
+    slopeCurve: source.slopeCurve,
+    narrowEnd: source.narrowEnd,
+    narrowSide: source.narrowSide,
+    narrowCurve: source.narrowCurve,
+    narrowStart: source.narrowStart,
   };
 }
 
@@ -241,7 +249,7 @@ export function shapeHasExtrudeDeform(shape: WorkplaneShape) {
 
 /** Either deformation needs the same per-vertex rebuild, so callers that only care whether to bother can ask once. */
 export function shapeHasShapeDeform(shape: WorkplaneShape) {
-  return shapeHasTaper(shape) || shapeHasExtrudeDeform(shape);
+  return shapeHasTaper(shape) || shapeHasExtrudeDeform(shape) || shapeHasAlongDeform(shape);
 }
 
 /**
@@ -602,6 +610,13 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.extrudeTwist === b.extrudeTwist &&
     a.extrudeTopOffsetX === b.extrudeTopOffsetX &&
     a.extrudeTopOffsetZ === b.extrudeTopOffsetZ &&
+    a.slopeEnd === b.slopeEnd &&
+    a.slopeSide === b.slopeSide &&
+    a.slopeCurve === b.slopeCurve &&
+    a.narrowEnd === b.narrowEnd &&
+    a.narrowSide === b.narrowSide &&
+    a.narrowCurve === b.narrowCurve &&
+    a.narrowStart === b.narrowStart &&
     a.teeth === b.teeth &&
     a.toothSize === b.toothSize &&
     a.toothWidth === b.toothWidth &&

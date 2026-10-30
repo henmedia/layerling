@@ -89,6 +89,7 @@ Za luknjaste mreže, krožne razporeditve lukenj in zobate vence je {{ui:editor.
 ![Polje v načinu »Krog«: kopije se najprej pokažejo kot predogled.](shot:pattern-tool)
 
 - **{{ui:array.mode.row}}:** Izbor se ponavlja z enakim razmikom. Vrsta teče v vseh treh oseh hkrati, z {{ui:array.spacingX}}, {{ui:array.spacingY}} in {{ui:array.spacingZ}}: ena sama da ravno vrsto, dve ali tri poševno vrsto ali stopnice. Negativen razmik položi vrsto v drugo smer.
+- **{{ui:array.fit}}:** Za luknje vzdolž plošče, obešalnik za ključe ali za oblačila. Postavi prvi kos na telo ali vanj, izberi {{ui:array.fit.x}} ali {{ui:array.fit.y}} in nastavi {{ui:array.fitGap}}: original se pomakne toliko navznoter od bližjega konca (od roba do stranice kosa), zadnja kopija pa ohrani enak razmik do drugega konca. Razmik nato sledi vrednosti {{ui:array.count}}: pet lukenj ali devet, ploščo vedno zapolnijo enakomerno.
 - **{{ui:array.mode.circle}}:** Izbor se razporedi okoli središča. Koliko kopij je, nastaviš pri {{ui:array.count}}, {{ui:array.angle}} je za poln krog 360°. Nastaviš, ali naj se kopije vrtijo zraven. {{ui:array.rise}} dvigne vsako kopijo malo više od prejšnje (vijak ali naraščajoča spirala), {{ui:array.radiusChange}} pa jo oddalji od središča ali približa (ploska spirala); skupaj dasta stožčasto spiralo. Spirala naredi največ en ovoj: kot nad 360° šteje za poln krog, kopij pa je največ 100.
 
 Namig: prej z {{ui:editor.tool.rotationPivot}} postavi vrtišče na ploskev, potem je središče kroga natanko tam.

@@ -25,6 +25,7 @@ import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
 import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createBentTubeGeometry } from "@/lib/bentTubeGeometry";
 import { createPrismGeometry } from "@/lib/prismGeometry";
+import { shapeHasAlongDeform, slopeMesh } from "@/lib/slopeAlong";
 import { createBooleanHalfSphereGeometry, createBooleanHollowCylinderGeometry, createBooleanRoundRoofGeometry, createParaboloidGeometry } from "@/lib/roundBodyGeometry";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { roundSideCount } from "@/lib/roundSideCount";
@@ -171,29 +172,36 @@ export function transformMesh(mesh: MeshData, shape: WorkplaneShape): MeshData {
   const mirrorY = mirrorSign(shape.mirrorY);
   const mirrorZ = mirrorSign(shape.mirrorZ);
   const reversedWinding = mirroredAxisCount(shape) % 2 === 1;
+  const local = mesh.vertices.map(([x, y, z]) => {
+    const normalizedHeight = (y - minLocalY) / taperHeight;
+    const widthScale = tapered ? shapeTaperScaleAt(shape, normalizedHeight, "width") : 1;
+    const depthScale = tapered ? shapeTaperScaleAt(shape, normalizedHeight, "depth") : 1;
+    let localX = (x - deformCenterX) * widthScale;
+    let localZ = (z - deformCenterZ) * depthScale;
+    if (deformed) {
+      const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
+      const cos = Math.cos(deform.twistRadians);
+      const sin = Math.sin(deform.twistRadians);
+      const twistedX = localX * cos - localZ * sin;
+      const twistedZ = localX * sin + localZ * cos;
+      localX = twistedX + deform.offsetX;
+      localZ = twistedZ + deform.offsetZ;
+    }
+    localX += deformCenterX;
+    localZ += deformCenterZ;
+    return [localX, y, localZ] as Vec3;
+  });
+  // A slope along (slopeAlong.ts) lowers the top towards one end, after the taper and the twist, as the viewport does.
+  const sloped = shapeHasAlongDeform(shape)
+    ? slopeMesh(local, mesh.faces as Array<[number, number, number]>, shape)
+    : { vertices: local, faces: mesh.faces as Array<[number, number, number]> };
   return {
     ...mesh,
-    vertices: mesh.vertices.map(([x, y, z]) => {
-      const normalizedHeight = (y - minLocalY) / taperHeight;
-      const widthScale = tapered ? shapeTaperScaleAt(shape, normalizedHeight, "width") : 1;
-      const depthScale = tapered ? shapeTaperScaleAt(shape, normalizedHeight, "depth") : 1;
-      let localX = (x - deformCenterX) * widthScale;
-      let localZ = (z - deformCenterZ) * depthScale;
-      if (deformed) {
-        const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
-        const cos = Math.cos(deform.twistRadians);
-        const sin = Math.sin(deform.twistRadians);
-        const twistedX = localX * cos - localZ * sin;
-        const twistedZ = localX * sin + localZ * cos;
-        localX = twistedX + deform.offsetX;
-        localZ = twistedZ + deform.offsetZ;
-      }
-      localX += deformCenterX;
-      localZ += deformCenterZ;
+    vertices: sloped.vertices.map(([localX, y, localZ]) => {
       const vertex = new THREE.Vector3(localX * mirrorX, (y - centerY) * mirrorY, localZ * mirrorZ).applyMatrix4(matrix);
       return [vertex.x + shape.x, vertex.y + (shape.elevation ?? 0) + centerY, vertex.z + shape.z] as Vec3;
     }),
-    faces: reversedWinding ? mesh.faces.map(([a, b, c]) => [a, c, b] as [number, number, number]) : mesh.faces,
+    faces: reversedWinding ? sloped.faces.map(([a, b, c]) => [a, c, b] as [number, number, number]) : sloped.faces,
   };
 }
 

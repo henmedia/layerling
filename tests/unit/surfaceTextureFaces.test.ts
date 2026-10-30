@@ -56,6 +56,36 @@ function cylinder(radius: number, height: number, segments = 96, strips = false)
   return out;
 }
 
+/**
+ * A body turned about the y axis from a profile of [radius, y] points, bottom middle to top middle, inside frame, faces
+ * wound outward.
+ */
+function revolve(profile: Array<[number, number]>, segments = 96): number[] {
+  const out: number[] = [];
+  const at = (k: number, [r, y]: [number, number]): Vec3 => {
+    const a = (2 * Math.PI * k) / segments;
+    return [r * Math.cos(a), y, r * Math.sin(a)];
+  };
+  for (let j = 0; j + 1 < profile.length; j += 1) {
+    const p = profile[j], q = profile[j + 1];
+    for (let k = 0; k < segments; k += 1) {
+      if (p[0] > 0) out.push(...at(k, p), ...at(k, q), ...at(k + 1, p));
+      if (q[0] > 0) out.push(...at(k + 1, p), ...at(k, q), ...at(k + 1, q));
+    }
+  }
+  return out;
+}
+
+/** A cylinder of radius 30 and 80 high with its top and bottom rims rounded by `fillet`, each round in eight steps. */
+function filletedCylinder(fillet: number) {
+  const arc = (cx: number, cy: number, from: number) =>
+    Array.from({ length: 9 }, (_, k): [number, number] => {
+      const a = from + (k * Math.PI) / 16;
+      return [cx + fillet * Math.cos(a), cy + fillet * Math.sin(a)];
+    });
+  return revolve([[0, 0], ...arc(30 - fillet, fillet, -Math.PI / 2), ...arc(30 - fillet, 80 - fillet, 0), [0, 80]]);
+}
+
 type Result = { vertices: Float32Array | Float64Array; indices: Uint32Array };
 
 /** The points the triangles use (moving and merging leave others behind). */
@@ -107,6 +137,20 @@ describe("picked faces", () => {
     expect(count(["top"])).toBe(96);
     expect(count([{ at: [1, 0.5, 0.5], normal: [1, 0, 0] }])).toBe(192);
     expect(count(["top", "bottom", "left"])).toBe(384);
+  });
+
+  it("end a face at a fillet, though it bends softly (#1043)", () => {
+    const mantle = { at: [1, 0.5, 0.5], normal: [1, 0, 0] };
+    // A 2 mm round on a body 80 high is an edge: the mantle is its 192 triangles, the round and the top apart.
+    const filleted = prepareSurfaceBase(insideToScreenPositions(filletedCylinder(2)));
+    const chosen = (base: typeof filleted, faces: unknown) => surfaceTextureChosenTriangles(base, normalizeSurfaceTexture({ faces }).faces, 30).reduce((sum, c) => sum + c, 0);
+    expect(chosen(filleted, [mantle])).toBe(192);
+    expect(chosen(filleted, ["top"])).toBe(96);
+    // A wide round (a quarter of the body) is part of the face, as a sphere is one face.
+    const wide = prepareSurfaceBase(insideToScreenPositions(filletedCylinder(20)));
+    expect(chosen(wide, [mantle])).toBe(wide.indices.length / 3);
+    const ball = surfaceTextureFacePick(revolve(Array.from({ length: 33 }, (_, k): [number, number] => [20 * Math.sin((k * Math.PI) / 32), 20 - 20 * Math.cos((k * Math.PI) / 32)])));
+    expect(new Set(ball.triangleFaces).size).toBe(1);
   });
 
   it("toggle a face with a click: in, out again, and another one beside it", () => {

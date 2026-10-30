@@ -121,6 +121,11 @@ export type CadModifierProfilePart = {
   /** Loft only: the section at the top, loop for loop and piece for piece the partner of `loops`. */
   topLoops?: CadModifierProfileLoop[];
   /**
+   * Loft only, instead of `topLoops`: the top is this one point at `height` (a pointed pyramid). The bottom is then
+   * one outline of straight lines, and every side is the flat triangle from one of its edges to the point.
+   */
+  apex?: { x: number; z: number };
+  /**
    * Loft only: the section turns this many degrees from bottom to top, evenly, around
    * `twistCenter` (which moves with the lean). The sides are then no longer ruled: the body is a
    * smooth loft through sections a few degrees apart (#184).
@@ -129,6 +134,20 @@ export type CadModifierProfilePart = {
   twistCenter?: { x: number; z: number };
   /** Degrees between two sections of a twisted loft, where the standard step is too coarse for an outline with fine teeth (a knurl). */
   twistStep?: number;
+  /**
+   * Loft only: the sections at the shares `t` of the way up, scaled by `sx` across and `sz` in
+   * height from the shape's own section; `loops` is the first of them and `topLoops` the last - a round roof sloping or narrowing
+   * along its length. Two neighbours where nothing between them curves are joined by a ruled
+   * loft, the rest smoothly; a `corner` breaks the loft there, so the edge stays sharp.
+   */
+  sections?: Array<{ t: number; sx: number; sz: number; corner?: boolean }>;
+  /**
+   * Extrusion only: what the body keeps of itself inside a second prism - `loops` (one outline)
+   * pushed `height` along its local y and placed by `frame` (a 3x4 matrix, row by row) in the
+   * part's own frame. An upright body whose top slopes along its length (slope along) is its
+   * plain extrusion trimmed by its side outline pushed across.
+   */
+  trim?: { loops: CadModifierProfileLoop[]; height: number; frame: number[] };
   /** Loft only: 0 to 1, how much of an S-curve the sides take between the ends instead of a straight line (#271); built like a turned loft, through sections. */
   smooth?: number;
   /** Loft only, with a twist: how far the lean moves the top; the turning centre moves along with it. */

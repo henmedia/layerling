@@ -45,6 +45,8 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 - **{{ui:inspector.makeEllipse}}：** 仅用于圆柱体。圆柱体始终是圆的：它只有一个直径，每个手柄都会同时改变两侧。要得到椭圆，单击此项，它就会变成 {{ui:shape.ellipse}}——同一个实体，之后你可以分别设置它的长度和宽度。带有倒角、圆角或壁的圆柱体，以及旋转过或分组过的圆柱体，不能这样转换；这些情况请从一开始就使用 {{ui:shape.ellipse}}。
 - **{{ui:inspector.taper}}：** 顶部和底部尺寸不同，例如用于斜面或漏斗。
 - **{{ui:inspector.twist}}：** 让顶部相对底部扭转或横向偏移。这样可以做出扭转的柱子和倾斜的塔。
+- **{{ui:inspector.slope}}：** 让顶部朝一端倾斜下降。{{ui:prop.slopeSide}} 选择哪一端，{{ui:prop.slopeEnd}} 或 {{ui:prop.slopeAngle}} 决定降多低，{{ui:prop.slopeCurve}} 决定顶部是直的（0）、向上鼓起（大于 0）还是下凹（小于 0）。另一端保持物体的高度；低端顶部的橙色圆点可拖动调整其高度。适合沿长度方向降低的屋顶、坡道或斜切的管端。可用于：{{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}、{{ui:shape.tube}}、环、{{ui:shape.wedge}}、{{ui:shape.roundRoof}}。物体仍是精确实体，可倒角、圆角并导出 STEP。
+- **{{ui:inspector.narrow}}：** 从上方看，让两条长边均匀地朝一端收拢。{{ui:prop.narrowSide}} 选择哪一端，{{ui:prop.narrowEnd}} 设定该端宽度（0 为尖端），{{ui:prop.narrowStart}} 设定收窄从哪里开始（宽端为 0 %，中间为 50 %），{{ui:prop.slopeCurve}} 决定两侧是直的（0）、像船头一样向外鼓（大于 0）还是向内收（小于 0）。窄端侧面的橙色圆点可拖动调整其宽度。可用于除管和环以外的相同形状。保持精确的有：{{ui:shape.box}}、{{ui:shape.wedge}}、{{ui:shape.roundRoof}}；其余以网格显示。
 
 ![一个由橙色方块、蓝色销钉和孔组成的分组，被挖成单一实体。开启多色后，销钉保持蓝色，方块保持橙色，孔壁则采用方块的颜色。](shot:group-multicolor)
 
@@ -83,7 +85,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 **边数在哪些地方不重要**
 
 - **导出 STEP 时。** 它写出的是圆形形状，而不是多边形。
-- **使用倒角和圆角时**（{{ui:editor.tool.chamfer}}、{{ui:editor.tool.fillet}}），只要形状保持圆形。未设置边数、边数不少于该形状的默认值，或者多边形与圆的偏差最多 {{value:EXACT_ROUND_TOLERANCE}} mm 时，就是这种情况。默认值是：圆柱体、椭圆、管和圆锥为 {{value:ROUND_FROM_SIDES}} 条边，{{ui:shape.roundRoof}} 为 {{value:ROUND_FROM_ROOF_SIDES}}，{{ui:shape.sphere}} 为 {{value:ROUND_FROM_SPHERE_STEPS}} 段，{{ui:shape.halfSphere}} 为 {{value:ROUND_FROM_HALF_SPHERE_STEPS}} 段，{{ui:shape.torus}} 为 {{value:ROUND_FROM_TORUS_SIDES}} 条边和 {{value:ROUND_FROM_TORUS_STEPS}} 段，圆形 {{ui:shape.bentTube}} 的 {{ui:prop.quality}} 为 {{value:ROUND_FROM_BENT_TUBE_QUALITY}}。
+- **使用倒角和圆角时**（{{ui:editor.tool.chamfer}}、{{ui:editor.tool.fillet}}），只要形状保持圆形。未设置边数、边数不少于该形状的默认值，或者多边形与圆的偏差最多 {{value:EXACT_ROUND_TOLERANCE}} mm 时，就是这种情况。默认值是：圆柱体、椭圆、管和圆锥为 {{value:ROUND_FROM_SIDES}} 条边，{{ui:shape.roundRoof}} 为 {{value:ROUND_FROM_ROOF_SIDES}}，{{ui:shape.sphere}} 为 {{value:ROUND_FROM_SPHERE_STEPS}} 段，{{ui:shape.halfSphere}} 和 {{ui:shape.paraboloid}} 为 {{value:ROUND_FROM_HALF_SPHERE_STEPS}} 段，{{ui:shape.torus}} 为 {{value:ROUND_FROM_TORUS_SIDES}} 条边和 {{value:ROUND_FROM_TORUS_STEPS}} 段，圆形 {{ui:shape.bentTube}} 的 {{ui:prop.quality}} 为 {{value:ROUND_FROM_BENT_TUBE_QUALITY}}。
 - **螺纹、弹簧或斜齿轮。** 边缘工具和 STEP 导出使用它的精确实体；它的 {{ui:prop.quality}} 只决定绘制得有多精细。
 
 **边数再次重要的情况**

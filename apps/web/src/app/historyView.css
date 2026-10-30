@@ -55,7 +55,7 @@
 
 .history-view-heading strong {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .history-view-heading span {
@@ -255,7 +255,7 @@
 }
 
 .history-view-state strong {
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .history-view-facts {

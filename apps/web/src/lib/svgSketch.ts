@@ -131,6 +131,44 @@ function subPathRing(path: THREE.Path, tolerance: number): SvgPiece[] | null {
 }
 
 /**
+ * Below this many degrees, two pieces of an outline meeting at a curve are taken as running smoothly
+ * on (#996). A tracer such as VTracer joins its curves with kinks of up to 10 degrees where the
+ * picture runs on smoothly, and puts its real corners well above that (17 degrees and more in the
+ * file of #996). The kernel cannot chamfer or fillet along such a kink: too small for a corner, too
+ * large for a smooth run, it fails every edge treatment along the whole outline.
+ */
+const SMOOTH_JOIN_DEGREES = 12;
+
+/**
+ * A ring with its near-smooth joins made smooth: where a curve meets another piece at a kink below
+ * {@link SMOOTH_JOIN_DEGREES}, its handle turns onto the line through the join (the line's own
+ * direction, or between both curves' handles), keeping its length. Straight lines and real corners
+ * stay as drawn.
+ */
+function smoothedRing(ring: SvgPiece[]): SvgPiece[] {
+  const limit = Math.cos((SMOOTH_JOIN_DEGREES * Math.PI) / 180);
+  const unit = (from: SvgPoint, to: SvgPoint) => {
+    const length = distance(from, to);
+    return length > 0 ? { x: (to.x - from.x) / length, y: (to.y - from.y) / length, length } : null;
+  };
+  return ring.map((piece, index) => {
+    const next = ring[(index + 1) % ring.length];
+    const join = piece.end;
+    // How the piece arrives at the join and how the next one leaves it; a curve's handle can turn, a line cannot.
+    const arriving = piece.c2 ? unit(piece.c2, join) : unit(piece.start, join);
+    const leaving = next.c1 ? unit(join, next.c1) : unit(join, next.end);
+    if (!arriving || !leaving || (!piece.c2 && !next.c1)) return piece;
+    const cos = arriving.x * leaving.x + arriving.y * leaving.y;
+    if (cos < limit || cos > 1 - 1e-15) return piece;
+    const along = !piece.c2 ? arriving : !next.c1 ? leaving : unit({ x: 0, y: 0 }, { x: arriving.x + leaving.x, y: arriving.y + leaving.y });
+    if (!along) return piece;
+    if (piece.c2) piece.c2 = { x: join.x - along.x * arriving.length, y: join.y - along.y * arriving.length };
+    if (next.c1) next.c1 = { x: join.x + along.x * leaving.length, y: join.y + along.y * leaving.length };
+    return piece;
+  });
+}
+
+/**
  * The SVG's visible outlines as a sketch, read as the top view shows the plate: x across, the
  * drawing's y down the page running to the front (+z), centred on the middle of its outline - so a
  * letter reads right from above. Null when the drawing cannot become a sketch, so the import keeps
@@ -157,7 +195,7 @@ export function sketchProfileFromSvgPaths(profilePaths: readonly THREE.ShapePath
       if (ring.length < 3) continue;
       total += ring.length;
       if (total > MAX_SVG_SKETCH_SEGMENTS) return null;
-      rings.push(ring);
+      rings.push(smoothedRing(ring));
     }
   }
   if (!rings.length) return null;
@@ -199,7 +237,7 @@ export function sketchFromPieceRings(
       }
       segments.push({ id: `${prefix}-${ringIndex}-s${index}`, startId: ids[index], endId: ids[next], kind: curved ? "bezier" : "line" });
     });
-    // Each handle moves on its own, as drawn: the outline stays exactly the SVG's.
+    // Each handle moves on its own, as drawn: the outline stays the drawing's (an SVG's with its near-smooth joins made smooth).
     ringPoints.forEach((point) => {
       if (point.handleIn || point.handleOut) point.mode = "split";
     });
