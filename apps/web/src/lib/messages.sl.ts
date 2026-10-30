@@ -3581,6 +3581,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "sketch.traceThreshold": "Prag",
   "sketch.tracePoints": "Točke",
   "sketch.traceCount": "Točke: {points} · oglišča: {corners}",
+  "sketch.traceRefined": "Nekateri obrisi so ležali tako blizu, da bi se prekrižali: dobili so več točk, da se telo lahko zgradi.",
   "sketch.traceNothing": "S temi nastavitvami ni ničesar za obrisati.",
   "sketch.traceCorners": "Oglišče od",
   "sketch.traceNoCorners": "Brez oglišč: obris je povsod gladek.",

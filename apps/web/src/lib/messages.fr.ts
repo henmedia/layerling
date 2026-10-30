@@ -507,6 +507,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "sketch.traceThreshold": "Seuil",
   "sketch.tracePoints": "Points",
   "sketch.traceCount": "{points} points · angles : {corners}",
+  "sketch.traceRefined": "Certains contours étaient si proches qu'ils se seraient croisés : ils ont reçu plus de points, pour que le corps puisse être construit.",
   "sketch.traceNothing": "Avec ces réglages, il ne reste rien à vectoriser.",
   "sketch.traceCorners": "Angle à partir de",
   "sketch.traceNoCorners": "Aucun angle : le contour reste lisse partout.",

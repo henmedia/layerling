@@ -345,6 +345,12 @@ html[data-theme="dark"] .sketch-turn-ring {
 }
 
 /* Trace: the outlines the settings give, over the picture, and their points. */
+.sketch-trace-preview path.background {
+  fill: var(--sketch-plate, #f5f0e7);
+  fill-opacity: 0.88;
+  stroke: none;
+}
+
 .sketch-trace-preview path {
   fill: rgba(229, 72, 77, 0.12);
   stroke: #e5484d;

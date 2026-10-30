@@ -514,6 +514,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "sketch.traceThreshold": "Schwellwert",
   "sketch.tracePoints": "Punkte",
   "sketch.traceCount": "{points} Punkte · Ecken: {corners}",
+  "sketch.traceRefined": "Einige Umrisse lagen so dicht, dass sie sich gekreuzt hätten: Sie haben mehr Punkte bekommen, damit der Körper gebaut werden kann.",
   "sketch.traceNothing": "Bei diesen Einstellungen bleibt nichts zum Nachzeichnen.",
   "sketch.traceCorners": "Ecke ab",
   "sketch.traceNoCorners": "Keine Ecken: Der Umriss läuft überall weich.",

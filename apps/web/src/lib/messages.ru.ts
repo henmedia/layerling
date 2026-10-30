@@ -516,6 +516,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "sketch.traceThreshold": "Порог",
   "sketch.tracePoints": "Точки",
   "sketch.traceCount": "Точек: {points} · углов: {corners}",
+  "sketch.traceRefined": "Некоторые контуры лежали так близко, что пересеклись бы: они получили больше точек, чтобы тело можно было построить.",
   "sketch.traceNothing": "При этих настройках обводить нечего.",
   "sketch.traceCorners": "Угол от",
   "sketch.traceNoCorners": "Без углов: контур везде гладкий.",

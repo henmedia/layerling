@@ -8607,6 +8607,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-turn-ring {
   --sketch-turn-ring-active: #6aa0ff;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.background {
+  fill: var(--sketch-plate, #eeeeee);
+  stroke: none;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path {
   fill: rgba(229, 72, 77, 0.12);
   stroke: #e5484d;

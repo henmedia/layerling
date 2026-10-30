@@ -78,6 +78,8 @@ export type PictureTrace = {
   rings: TraceRing[];
   /** Clicked areas that were not taken: they reach the picture's edge (the background) or lie outside it. */
   rejected?: string[];
+  /** Some outlines lay so close that loosely fitted they would have crossed: they got more points than asked for. */
+  refined?: boolean;
   /** How many points all the outlines have together. */
   points: number;
   /** How many of them are corners. */
@@ -932,7 +934,7 @@ function ringNodes(pieces: readonly Piece[], picture: PreparedPicture): TraceNod
   });
 }
 
-type Fit = { rings: Array<{ pieces: Piece[]; hole: boolean; key: string; source: TraceSource }>; points: number; corners: number };
+type Fit = { rings: Array<{ pieces: Piece[]; hole: boolean; key: string; source: TraceSource }>; points: number; corners: number; tolerance: number; refined?: boolean };
 
 function fitAll(contours: readonly Contour[], corners: readonly number[][], tolerance: number): Fit {
   let points = 0;
@@ -943,7 +945,95 @@ function fitAll(contours: readonly Contour[], corners: readonly number[][], tole
     cornerCount += pieces.filter((piece) => piece.cornerAtStart).length;
     return { pieces, hole: contour.depth % 2 === 1, key: contour.key, source: contour.source };
   });
-  return { rings, points, corners: cornerCount };
+  return { rings, points, corners: cornerCount, tolerance };
+}
+
+/** A piece as a line of short straight steps: 8 along a curve. */
+function pieceSteps(piece: Piece, out: TracePoint[]) {
+  if (!piece.c1 || !piece.c2) {
+    out.push(piece.from);
+    return;
+  }
+  const curve = { from: piece.from, c1: piece.c1, c2: piece.c2, to: piece.to };
+  for (let step = 0; step < 8; step += 1) out.push(pointOn(curve, step / 8));
+}
+
+/**
+ * Which outlines cross another or themselves, by their index. Fitted loosely, two outlines a pixel or
+ * two apart (the two edges of a drawn line) can cross, and crossing outlines make no body. The steps
+ * are sorted into cells of a grid so only near ones are compared.
+ */
+function crossingRings(rings: readonly Piece[][]): Set<number> {
+  type Step = { ring: number; index: number; count: number; a: TracePoint; b: TracePoint };
+  const steps: Step[] = [];
+  rings.forEach((pieces, ring) => {
+    const line: TracePoint[] = [];
+    pieces.forEach((piece) => pieceSteps(piece, line));
+    line.forEach((a, index) => steps.push({ ring, index, count: line.length, a, b: line[(index + 1) % line.length] }));
+  });
+  const cell = 6;
+  const grid = new Map<string, number[]>();
+  steps.forEach((step, index) => {
+    const x0 = Math.floor(Math.min(step.a.x, step.b.x) / cell);
+    const x1 = Math.floor(Math.max(step.a.x, step.b.x) / cell);
+    const y0 = Math.floor(Math.min(step.a.y, step.b.y) / cell);
+    const y1 = Math.floor(Math.max(step.a.y, step.b.y) / cell);
+    for (let x = x0; x <= x1; x += 1) {
+      for (let y = y0; y <= y1; y += 1) {
+        const key = `${x}:${y}`;
+        const list = grid.get(key);
+        if (list) list.push(index);
+        else grid.set(key, [index]);
+      }
+    }
+  });
+  const side = (p: TracePoint, q: TracePoint, r: TracePoint) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+  const crossing = new Set<number>();
+  for (const list of grid.values()) {
+    for (let i = 0; i < list.length; i += 1) {
+      for (let j = i + 1; j < list.length; j += 1) {
+        const first = steps[list[i]];
+        const second = steps[list[j]];
+        if (crossing.has(first.ring) && crossing.has(second.ring)) continue;
+        // Neighbouring steps of one outline meet at their end, which is no crossing.
+        if (first.ring === second.ring) {
+          const apart = Math.abs(first.index - second.index);
+          if (apart <= 1 || apart === first.count - 1) continue;
+        }
+        if (side(first.a, first.b, second.a) * side(first.a, first.b, second.b) < 0 && side(second.a, second.b, first.a) * side(second.a, second.b, first.b) < 0) {
+          crossing.add(first.ring);
+          crossing.add(second.ring);
+        }
+      }
+    }
+  }
+  return crossing;
+}
+
+/** The fit with no outline crossing another or itself: each that does is fitted again more closely, down to the closest fit. */
+function withoutCrossings(fit: Fit, contours: readonly Contour[], corners: readonly number[][]): Fit {
+  const tolerances = fit.rings.map(() => fit.tolerance);
+  const rings = fit.rings.map((ring) => ({ ...ring }));
+  let refined = false;
+  for (let round = 0; round < 10; round += 1) {
+    const crossing = crossingRings(rings.map((ring) => ring.pieces));
+    let changed = false;
+    crossing.forEach((index) => {
+      if (tolerances[index] <= FINEST_TOLERANCE) return;
+      tolerances[index] = Math.max(FINEST_TOLERANCE, tolerances[index] / 2);
+      rings[index].pieces = ringPieces(contours[index].samples, corners[index], tolerances[index]);
+      changed = true;
+      refined = true;
+    });
+    if (!changed) break;
+  }
+  let points = 0;
+  let cornerCount = 0;
+  rings.forEach((ring) => {
+    points += ring.pieces.length;
+    cornerCount += ring.pieces.filter((piece) => piece.cornerAtStart).length;
+  });
+  return { rings, points, corners: cornerCount, tolerance: fit.tolerance, ...(refined ? { refined } : {}) };
 }
 
 /** The outlines a set of settings keeps, with their corners, and the areas not taken. */
@@ -987,6 +1077,8 @@ export function tracePicture(picture: PreparedPicture, settings: PictureTraceSet
       }
     }
   }
+  // No outline may cross another: where loose curves would, those outlines are fitted more closely.
+  best = withoutCrossings(best, contours, corners);
   return {
     rings: best.rings.map((ring) => ({
       nodes: ringNodes(ring.pieces, picture),
@@ -998,6 +1090,7 @@ export function tracePicture(picture: PreparedPicture, settings: PictureTraceSet
     points: best.points,
     corners: best.corners,
     ...(rejected.length ? { rejected } : {}),
+    ...(best.refined ? { refined: true } : {}),
   };
 }
 

@@ -329,4 +329,31 @@ describe("tracing a picture into points (Trace)", () => {
       expect(tracePicture(prepared, { ...settings, cuts: [{ id: "line", points: inner.slice(0, 2) }] }).rings).toHaveLength(1);
     });
   });
+
+  it("never gives outlines that cross: those that would are fitted more closely, and the trace says so", () => {
+    // A drawn line: a frame 3 pixels wide, whose two edges lie close together, and a second frame touching it.
+    const frames = picture(160, 120, (x, y) => {
+      const frame = (x0: number, y0: number, x1: number, y1: number) => x >= x0 && x < x1 && y >= y0 && y < y1 && !(x >= x0 + 3 && x < x1 - 3 && y >= y0 + 3 && y < y1 - 3);
+      return frame(10, 10, 90, 110) || frame(84, 30, 150, 90) ? BLACK : WHITE;
+    });
+    const { prepared, settings } = settingsFor(frames, { part: "dark", threshold: 0.5, holes: true, cornerAngle: MAX_TRACE_CORNER_ANGLE });
+    const trace = tracePicture(prepared, { ...settings, points: 1 });
+    const segments = trace.rings.flatMap((ring, ringIndex) => {
+      const points = outlinePoints(ring.nodes);
+      return points.map((a, index) => ({ ringIndex, index, count: points.length, a, b: points[(index + 1) % points.length] }));
+    });
+    const side = (p: TracePoint, q: TracePoint, r: TracePoint) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+    let crossings = 0;
+    for (let i = 0; i < segments.length; i += 1) {
+      for (let j = i + 1; j < segments.length; j += 1) {
+        const first = segments[i];
+        const second = segments[j];
+        if (first.ringIndex === second.ringIndex && (Math.abs(first.index - second.index) <= 1 || Math.abs(first.index - second.index) === first.count - 1)) continue;
+        if (side(first.a, first.b, second.a) * side(first.a, first.b, second.b) < 0 && side(second.a, second.b, first.a) * side(second.a, second.b, first.b) < 0) crossings += 1;
+      }
+    }
+    expect(crossings).toBe(0);
+    expect(trace.refined).toBe(true);
+    expect(trace.points).toBeGreaterThan(traceRange(prepared, settings).fewest);
+  });
 });

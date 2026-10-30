@@ -2325,6 +2325,12 @@ export function SketchWorkspace({
           {tracing && selectedImage && imageTrace.trace && imageTrace.size ? (
             // Trace: the outlines the settings give, over the picture, with their points - corners square, smooth points round.
             <g className="sketch-trace-preview" pointerEvents="none">
+              {/* What falls away - outside the outlines, in the holes, what is cut away - is covered by the plate, so only what stays shows of the picture. */}
+              <path
+                className="background"
+                fillRule="evenodd"
+                d={`M${[{ x: 0, y: 0 }, { x: imageTrace.size.width, y: 0 }, { x: imageTrace.size.width, y: imageTrace.size.height }, { x: 0, y: imageTrace.size.height }].map((corner) => { const spot = tracedPointOnPlane(selectedImage, imageTrace.size!, corner); return `${spot.x} ${spot.z}`; }).join("L")}Z${tracePreviewPath({ rings: imageTrace.trace.rings.filter((ring) => !ring.line) }, selectedImage, imageTrace.size)}`}
+              />
               <path d={tracePreviewPath({ rings: imageTrace.trace.rings.filter((ring) => !ring.line) }, selectedImage, imageTrace.size)} fillRule="evenodd" />
               {(imageTrace.settings?.cuts ?? []).map((cut) => (
                 <path
@@ -3643,6 +3649,7 @@ function SketchImageTraceCard({
             <p className="sketch-image-hint">
               {outlines ? t("sketch.traceCount", { points: trace.trace?.points ?? 0, corners: trace.trace?.corners ?? 0 }) : t("sketch.traceNothing")}
             </p>
+            {trace.trace?.refined ? <p className="sketch-image-hint">{t("sketch.traceRefined")}</p> : null}
             <SketchImageRange label={t("sketch.traceCorners")} value={settings.cornerAngle} min={MIN_TRACE_CORNER_ANGLE} max={MAX_TRACE_CORNER_ANGLE} accuracy={1} whole suffix="°" onChange={(cornerAngle) => trace.change({ cornerAngle })} />
             {settings.cornerAngle >= MAX_TRACE_CORNER_ANGLE ? <p className="sketch-image-hint">{t("sketch.traceNoCorners")}</p> : null}
             <SketchImageRange label={t("sketch.traceSpeck")} value={speckSide} min={0} max={maxSpeckSide} accuracy={2} onChange={(side) => trace.change({ speck: (side * side) / Math.max(1e-12, pixel.x * pixel.z) })} />

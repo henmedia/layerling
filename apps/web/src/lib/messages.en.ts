@@ -515,6 +515,7 @@ export const MESSAGES_EN = {
   "sketch.traceThreshold": "Threshold",
   "sketch.tracePoints": "Points",
   "sketch.traceCount": "{points} points · corners: {corners}",
+  "sketch.traceRefined": "Some outlines lay so close that they would have crossed: they got more points, so the body can be built.",
   "sketch.traceNothing": "With these settings there is nothing to trace.",
   "sketch.traceCorners": "Corner from",
   "sketch.traceNoCorners": "No corners: the outline runs smoothly everywhere.",

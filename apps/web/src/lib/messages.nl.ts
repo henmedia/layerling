@@ -514,6 +514,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "sketch.traceThreshold": "Drempelwaarde",
   "sketch.tracePoints": "Punten",
   "sketch.traceCount": "{points} punten · hoeken: {corners}",
+  "sketch.traceRefined": "Sommige omtrekken lagen zo dicht bij elkaar dat ze elkaar gekruist zouden hebben: ze kregen meer punten, zodat het lichaam gebouwd kan worden.",
   "sketch.traceNothing": "Met deze instellingen is er niets om over te trekken.",
   "sketch.traceCorners": "Hoek vanaf",
   "sketch.traceNoCorners": "Geen hoeken: de omtrek loopt overal vloeiend.",

@@ -642,6 +642,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "sketch.traceThreshold": "Práh",
   "sketch.tracePoints": "Body",
   "sketch.traceCount": "Body: {points} · rohy: {corners}",
+  "sketch.traceRefined": "Některé obrysy ležely tak blízko, že by se zkřížily: dostaly víc bodů, aby se těleso dalo sestavit.",
   "sketch.traceNothing": "S tímto nastavením nezbývá nic k obkreslení.",
   "sketch.traceCorners": "Roh od",
   "sketch.traceNoCorners": "Žádné rohy: obrys je všude hladký.",

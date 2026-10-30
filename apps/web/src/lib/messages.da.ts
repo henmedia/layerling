@@ -1149,6 +1149,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "sketch.traceThreshold": "Tærskel",
   "sketch.tracePoints": "Punkter",
   "sketch.traceCount": "{points} punkter · hjørner: {corners}",
+  "sketch.traceRefined": "Nogle omrids lå så tæt, at de ville have krydset hinanden: de har fået flere punkter, så kroppen kan bygges.",
   "sketch.traceNothing": "Med disse indstillinger er der intet at optegne.",
   "sketch.traceCorners": "Hjørne fra",
   "sketch.traceNoCorners": "Ingen hjørner: omridset er glat overalt.",
