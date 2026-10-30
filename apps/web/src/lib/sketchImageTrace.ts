@@ -51,6 +51,14 @@ export function tracedPixelSize(image: SketchImage, size: TracedSize) {
   return { x: image.width / Math.max(1, size.width), z: image.depth / Math.max(1, size.height) };
 }
 
+/** A line through spots of the traced part on the sketch plane as SVG path data (open; a Z closes it), for the preview over the picture. */
+export function tracedLinePath(points: readonly TracePoint[], image: SketchImage, size: TracedSize) {
+  return `M${points.map((point) => {
+    const { x, z } = tracedPointOnPlane(image, size, point);
+    return `${Math.round(x * 1000) / 1000} ${Math.round(z * 1000) / 1000}`;
+  }).join("L")}`;
+}
+
 /** The traced outlines on the sketch plane as SVG path data, for the preview over the picture. */
 export function tracePreviewPath(trace: Pick<PictureTrace, "rings">, image: SketchImage, size: TracedSize) {
   const at = (point: TracePoint) => {

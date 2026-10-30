@@ -297,7 +297,7 @@ describe("tracing a picture into points (Trace)", () => {
     });
   });
 
-  describe("cutting a part away (Cut away)", () => {
+  describe("regions drawn by hand: cut away, taken in, or alone the shape (Cut away, magnetic lasso)", () => {
     const GREY: [number, number, number, number] = [110, 110, 115, 255];
     /** A black block with a grey shadow below it, as dark as a part: no threshold tells them apart. */
     const shadowed = picture(120, 100, (x, y) => {
@@ -310,7 +310,7 @@ describe("tracing a picture into points (Trace)", () => {
       const { prepared, settings } = settingsFor(shadowed, { part: "dark", threshold: 0.5 });
       const whole = tracePicture(prepared, settings);
       expect(area(outlinePoints(whole.rings[0].nodes))).toBeGreaterThan(80 * 40 + 60 * 10);
-      const cut = tracePicture(prepared, { ...settings, cuts: [{ id: "shadow", points: [{ x: 25, y: 60 }, { x: 95, y: 60 }, { x: 95, y: 85 }, { x: 25, y: 85 }] }] });
+      const cut = tracePicture(prepared, { ...settings, regions: [{ id: "shadow", points: [{ x: 25, y: 60 }, { x: 95, y: 60 }, { x: 95, y: 85 }, { x: 25, y: 85 }] }] });
       expect(cut.rings).toHaveLength(1);
       expect(area(outlinePoints(cut.rings[0].nodes))).toBeCloseTo(80 * 40, -2);
       expect(Math.max(...cut.rings[0].nodes.map((node) => node.y))).toBeLessThan(61);
@@ -319,14 +319,48 @@ describe("tracing a picture into points (Trace)", () => {
     it("cuts a hole inside the shape, kept without holes too, and works on the object", () => {
       const { prepared, settings } = settingsFor(square, { holes: false });
       const inner = [{ x: 30, y: 30 }, { x: 50, y: 30 }, { x: 50, y: 50 }, { x: 30, y: 50 }];
-      const trace = tracePicture(prepared, { ...settings, cuts: [{ id: "middle", points: inner }] });
+      const trace = tracePicture(prepared, { ...settings, regions: [{ id: "middle", points: inner }] });
       const hole = trace.rings.find((ring) => ring.source === "cut");
       expect(hole?.hole).toBe(true);
       expect(area(outlinePoints(hole!.nodes))).toBeCloseTo(20 * 20, -1.5);
-      const objectTrace = tracePicture(prepared, { ...settings, part: "object", threshold: 0.2, cuts: [{ id: "middle", points: inner }] });
+      const objectTrace = tracePicture(prepared, { ...settings, part: "object", threshold: 0.2, regions: [{ id: "middle", points: inner }] });
       expect(objectTrace.rings.map((ring) => ring.source).sort()).toEqual(["cut", "outline"]);
       // A cut with fewer than three corners takes nothing.
-      expect(tracePicture(prepared, { ...settings, cuts: [{ id: "line", points: inner.slice(0, 2) }] }).rings).toHaveLength(1);
+      expect(tracePicture(prepared, { ...settings, regions: [{ id: "line", points: inner.slice(0, 2) }] }).rings).toHaveLength(1);
+    });
+
+    it("takes a region into the shape whatever its colour, joined with the shape where they meet", () => {
+      const { prepared, settings } = settingsFor(square, { part: "dark", threshold: 0.5 });
+      // A white patch to the right of the square, overlapping it a little.
+      const beside = [{ x: 55, y: 30 }, { x: 75, y: 30 }, { x: 75, y: 50 }, { x: 55, y: 50 }];
+      const taken = tracePicture(prepared, { ...settings, regions: [{ id: "beside", points: beside, add: true }] });
+      expect(taken.rings).toHaveLength(1);
+      expect(area(outlinePoints(taken.rings[0].nodes))).toBeCloseTo(40 * 40 + 15 * 20, -1.5);
+      expect(Math.max(...taken.rings[0].nodes.map((node) => node.x))).toBeCloseTo(75, 0);
+      // The same on the object; and cut away instead, it takes the square's edge away.
+      const object = tracePicture(prepared, { ...settings, part: "object", threshold: 0.2, regions: [{ id: "beside", points: beside, add: true }] });
+      expect(area(outlinePoints(object.rings[0].nodes))).toBeCloseTo(40 * 40 + 15 * 20, -1.5);
+      const cut = tracePicture(prepared, { ...settings, regions: [{ id: "beside", points: beside }] });
+      expect(area(outlinePoints(cut.rings[0].nodes))).toBeCloseTo(40 * 40 - 5 * 20, -1.5);
+    });
+
+    it("traces only the regions taken in with Lasso only, nothing of the picture's own", () => {
+      const { prepared, settings } = settingsFor(square, { part: "lasso", threshold: 0.5 });
+      expect(tracePicture(prepared, settings).rings).toHaveLength(0);
+      // A triangle across the square and the white round it: its outline is the triangle's, area and all.
+      const triangle = [{ x: 10, y: 10 }, { x: 70, y: 25 }, { x: 25, y: 70 }];
+      const trace = tracePicture(prepared, { ...settings, regions: [{ id: "lasso", points: triangle, add: true, lasso: true }] });
+      expect(trace.rings).toHaveLength(1);
+      const triangleArea = Math.abs((triangle[1].x - triangle[0].x) * (triangle[2].y - triangle[0].y) - (triangle[2].x - triangle[0].x) * (triangle[1].y - triangle[0].y)) / 2;
+      expect(Math.abs(area(outlinePoints(trace.rings[0].nodes)) - triangleArea) / triangleArea).toBeLessThan(0.02);
+      expect(trace.rings[0].nodes.filter((node) => node.corner)).toHaveLength(3);
+      // A region cut away inside it is a hole in it; a region cut away alone takes nothing.
+      const holed = tracePicture(prepared, {
+        ...settings,
+        regions: [{ id: "lasso", points: triangle, add: true, lasso: true }, { id: "hole", points: [{ x: 25, y: 25 }, { x: 35, y: 25 }, { x: 35, y: 35 }, { x: 25, y: 35 }] }],
+      });
+      expect(holed.rings.map((ring) => `${ring.source}${ring.hole ? "*" : ""}`).sort()).toEqual(["cut*", "outline"]);
+      expect(tracePicture(prepared, { ...settings, regions: [{ id: "cut", points: triangle }] }).rings).toHaveLength(0);
     });
   });
 

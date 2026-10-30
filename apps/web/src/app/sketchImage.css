@@ -467,3 +467,42 @@ html[data-theme="dark"] .sketch-turn-ring {
 .sketch-trace-preview circle.draft.first {
   fill: #d97a00;
 }
+
+/* A region taken into the shape (the magnetic lasso's, as a rule) in blue, dashed like a cut. */
+.sketch-trace-preview path.taken {
+  fill: rgba(11, 114, 185, 0.1);
+  stroke: #0b72b9;
+  stroke-width: 1.6;
+  stroke-dasharray: 6 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.sketch-trace-preview path.taken.highlight {
+  stroke-width: 3.2;
+  fill: rgba(11, 114, 185, 0.22);
+}
+
+.sketch-trace-preview path.taken.draft {
+  fill: none;
+  stroke-dasharray: none;
+}
+
+/* The line on to the pointer, as the next click would lay it: lighter than the line laid. */
+.sketch-trace-preview path.draft.hover {
+  stroke-dasharray: 4 3;
+  stroke-opacity: 0.75;
+}
+
+.sketch-trace-preview circle.draft.lasso {
+  stroke: #0b72b9;
+}
+
+.sketch-trace-preview circle.draft.lasso.first {
+  fill: #0b72b9;
+}
+
+.sketch-trace-item-action {
+  max-width: 132px;
+  min-height: 26px;
+  font-size: 12px;
+}

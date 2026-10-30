@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { edgePath, snapToEdge } from "@/lib/pictureEdgePath";
 import { picturePixels } from "@/lib/pictureIcon";
 import {
   defaultThreshold,
@@ -17,6 +18,11 @@ import type { SketchImage } from "@/types/layerling";
 
 /** How long the settings must rest before the picture is traced again, in ms: a slider being dragged traces once it stops. */
 const TRACE_PAUSE = 90;
+
+/** What clicks on the picture draw: a region cut away by its corners (Cut away), or one the magnetic lasso lays along the edges. */
+export type TraceDrawing = "cut" | "lasso";
+
+const rounded = (spot: TracePoint): TracePoint => ({ x: Math.round(spot.x * 10) / 10, y: Math.round(spot.y * 10) / 10 });
 
 export type SketchImageTraceState = {
   /** The picture is being read. */
@@ -45,18 +51,29 @@ export type SketchImageTraceState = {
   setHighlight: (key: string | null) => void;
   /** An area just clicked reached the picture's edge and was not taken. */
   areaRejected: boolean;
-  /** Cut away: while on, clicks on the picture set the corners of a part to cut away. */
-  cutting: boolean;
-  setCutting: (cutting: boolean) => void;
-  /** The corners set so far, in the picture's pixels. */
+  /**
+   * What clicks on the picture draw, if anything: the corners of a part to cut away, or a line the
+   * magnetic lasso lays along the edges between them.
+   */
+  drawing: TraceDrawing | null;
+  setDrawing: (drawing: TraceDrawing | null) => void;
+  /** The spots clicked so far (for the lasso, moved onto the edge), in the picture's pixels. */
+  anchors: TracePoint[];
+  /** The line laid so far through them: the corners, or the lasso's way along the edges. */
   draft: TracePoint[];
-  addCutPoint: (spot: TracePoint) => void;
-  /** Closes the corners set into a cut (three at least). */
-  closeCut: () => void;
-  /** Throws away the corners set so far. */
-  discardCut: () => void;
-  /** Takes a cut out of the list. */
-  removeCut: (id: string) => void;
+  /** The line on from the last spot to the pointer, as the next click would lay it. */
+  hover: TracePoint[];
+  addDraftPoint: (spot: TracePoint) => void;
+  /** The pointer over the picture (null when it left), for the line on to it. */
+  hoverDraft: (spot: TracePoint | null) => void;
+  /** Closes the line into a region (three spots at least): the lasso's back to its first spot along the edge. */
+  closeDraft: () => void;
+  /** Throws away the line laid so far. */
+  discardDraft: () => void;
+  /** Takes a region drawn by hand out of the list. */
+  removeRegion: (id: string) => void;
+  /** Takes a region into the shape (true) or cuts it away. */
+  setRegionAdd: (id: string, add: boolean) => void;
 };
 
 /**
@@ -64,7 +81,8 @@ export type SketchImageTraceState = {
  * starts from the settings that suit it and traces it again whenever they change. The number of points
  * follows the suggested one until it is set by hand, and stays within what the other settings allow.
  * Holes and clicked areas form a list: each can be taken out, or drawn as a construction line instead
- * of cut. An area that reaches the picture's edge is the background and is dropped again.
+ * of cut. An area that reaches the picture's edge is the background and is dropped again. Regions drawn
+ * by hand - corners clicked, or the magnetic lasso's line along the edges - are cut away or taken in.
  */
 export function useSketchImageTrace(image: SketchImage | null, active: boolean): SketchImageTraceState {
   const key = active && image ? `${image.id}:${image.dataUrl.length}:${image.dataUrl.slice(-48)}:${JSON.stringify(image.crop ?? null)}` : null;
@@ -74,17 +92,28 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
   const [picking, setPicking] = useState(false);
   const [highlight, setHighlight] = useState<string | null>(null);
   const [areaRejected, setAreaRejected] = useState(false);
-  const [cutting, setCutting] = useState(false);
+  const [drawing, setDrawingState] = useState<TraceDrawing | null>(null);
+  const [anchors, setAnchors] = useState<TracePoint[]>([]);
   const [draft, setDraft] = useState<TracePoint[]>([]);
+  const [hover, setHover] = useState<TracePoint[]>([]);
+  const hoverRef = useRef<{ spot: TracePoint | null; frame: number }>({ spot: null, frame: 0 });
   const pointsSetRef = useRef(false);
   const areaCountRef = useRef(0);
   const dataUrl = image?.dataUrl;
   const crop = image?.crop;
 
+  const clearDraft = () => {
+    window.cancelAnimationFrame(hoverRef.current.frame);
+    hoverRef.current = { spot: null, frame: 0 };
+    setAnchors([]);
+    setDraft([]);
+    setHover([]);
+  };
+
   useEffect(() => {
     setPicking(false);
-    setCutting(false);
-    setDraft([]);
+    setDrawingState(null);
+    clearDraft();
     setHighlight(null);
     setAreaRejected(false);
     if (!key || !dataUrl) {
@@ -151,6 +180,18 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
 
   const patch = (change: Partial<PictureTraceSettings> | ((value: PictureTraceSettings) => Partial<PictureTraceSettings>)) =>
     setSettings((value) => (value ? { ...value, ...(typeof change === "function" ? change(value) : change) } : value));
+  const nextId = () => {
+    areaCountRef.current += 1;
+    return `${Date.now().toString(36)}-${areaCountRef.current}`;
+  };
+  const setDrawing = (next: TraceDrawing | null) => {
+    setDrawingState(next);
+    clearDraft();
+    if (next) setPicking(false);
+  };
+  // The lasso's way from one spot to the next, along the edge; corners are joined straight.
+  const wayTo = (from: TracePoint, to: TracePoint) => (drawing === "lasso" && prepared ? edgePath(prepared, from, to).map(rounded) : [from, to]);
+  const spotFor = (spot: TracePoint) => rounded(drawing === "lasso" && prepared ? snapToEdge(prepared, spot) : spot);
 
   return {
     loading: Boolean(key) && !prepared && !current?.failed,
@@ -164,6 +205,8 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
       // Another part has a threshold of its own, and its holes other keys.
       if (change.part !== undefined && prepared && settings && change.part !== settings.part) {
         patch({ ...change, threshold: defaultThreshold(prepared, change.part), removed: [], lines: [] });
+        // Lasso only with nothing taken in yet: the lasso is what comes next.
+        if (change.part === "lasso" && !(settings.regions ?? []).some((region) => region.add)) setDrawing("lasso");
         return;
       }
       patch(change);
@@ -173,15 +216,14 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
       setPicking(on);
       setAreaRejected(false);
       if (on) {
-        setCutting(false);
-        setDraft([]);
+        setDrawingState(null);
+        clearDraft();
       }
     },
     addArea: (spot) => {
-      areaCountRef.current += 1;
-      const id = `${Date.now().toString(36)}-${areaCountRef.current}`;
+      const id = nextId();
       setAreaRejected(false);
-      patch((value) => ({ areas: [...(value.areas ?? []), { id, x: Math.round(spot.x * 10) / 10, y: Math.round(spot.y * 10) / 10 }] }));
+      patch((value) => ({ areas: [...(value.areas ?? []), { id, ...rounded(spot) }] }));
     },
     remove: (ringKey) => {
       if (highlight === ringKey) setHighlight(null);
@@ -197,26 +239,56 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
     highlight,
     setHighlight,
     areaRejected,
-    cutting,
-    setCutting: (on) => {
-      setCutting(on);
-      setDraft([]);
-      if (on) setPicking(false);
-    },
+    drawing,
+    setDrawing,
+    anchors,
     draft,
-    addCutPoint: (spot) => setDraft((points) => [...points, { x: Math.round(spot.x * 10) / 10, y: Math.round(spot.y * 10) / 10 }]),
-    closeCut: () => {
-      if (draft.length < 3) return;
-      areaCountRef.current += 1;
-      const id = `${Date.now().toString(36)}-${areaCountRef.current}`;
-      const points = draft;
-      setDraft([]);
-      patch((value) => ({ cuts: [...(value.cuts ?? []), { id, points }] }));
+    hover,
+    addDraftPoint: (spot) => {
+      const at = spotFor(spot);
+      const last = anchors[anchors.length - 1];
+      if (last && last.x === at.x && last.y === at.y) return;
+      // A way to the pointer still being looked for runs from the spot before.
+      window.cancelAnimationFrame(hoverRef.current.frame);
+      hoverRef.current.frame = 0;
+      setAnchors([...anchors, at]);
+      setDraft(last ? [...draft, ...wayTo(last, at).slice(1)] : [at]);
+      setHover([]);
     },
-    discardCut: () => setDraft([]),
-    removeCut: (id) => {
-      if (highlight === `cut:${id}`) setHighlight(null);
-      patch((value) => ({ cuts: (value.cuts ?? []).filter((cut) => cut.id !== id) }));
+    hoverDraft: (spot) => {
+      const state = hoverRef.current;
+      state.spot = spot;
+      if (!spot) {
+        window.cancelAnimationFrame(state.frame);
+        state.frame = 0;
+        setHover([]);
+        return;
+      }
+      // Once a frame at most: the lasso's way is looked for anew each time.
+      if (state.frame) return;
+      const from = anchors[anchors.length - 1];
+      state.frame = window.requestAnimationFrame(() => {
+        state.frame = 0;
+        if (!from || !state.spot) return;
+        setHover(wayTo(from, spotFor(state.spot)));
+      });
     },
+    closeDraft: () => {
+      if (anchors.length < 3 || !drawing) return;
+      const back = wayTo(anchors[anchors.length - 1], anchors[0]).slice(1, -1);
+      const points = [...draft, ...back];
+      const id = nextId();
+      const lasso = drawing === "lasso";
+      clearDraft();
+      patch((value) => ({ regions: [...(value.regions ?? []), { id, points, ...(lasso ? { add: true, lasso: true } : {}) }] }));
+    },
+    discardDraft: clearDraft,
+    removeRegion: (id) => {
+      if (highlight === `r:${id}`) setHighlight(null);
+      patch((value) => ({ regions: (value.regions ?? []).filter((region) => region.id !== id) }));
+    },
+    setRegionAdd: (id, add) => patch((value) => ({
+      regions: (value.regions ?? []).map((region) => (region.id === id ? { ...region, add: add || undefined } : region)),
+    })),
   };
 }

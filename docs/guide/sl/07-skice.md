@@ -157,6 +157,8 @@ Vsa štiri delujejo samo na predlogo, nikoli na skico.
 
 Za fotografijo – na primer igračo na beli mizi – izberi pod {{ui:sketch.tracePart}} **{{ui:sketch.traceObject}}**: ozadje je barva na robu slike, in vse, kar se od nje loči, postane en sam obris, ne glede na barve; {{ui:sketch.traceThreshold}} nato določa, kako jasno. Barvita slika na enakomernem ozadju se tako začne. {{ui:sketch.tracePickAreas}} obriše več: klikni na ploskev v sliki, na primer okno, in ploskev enake barve okrog mesta se obriše ({{ui:sketch.traceAreaTolerance}} določa, kako enake). Luknje in izbrane ploskve so naštete pod {{ui:sketch.traceList}}; ko pokažeš nanjo, se v predogledu poudari, ✕ jo odstrani, z izključenim {{ui:sketch.traceCut}} pa je namesto luknje narisana kot pomožna črta. Ploskev, ki sega do roba slike, je ozadje in ni vzeta. Kar ne loči noben prag in nobena barva – senco, temno kot kolesa nad njo –, odstrani {{ui:sketch.traceTrim}}: klikni oglišča okrog nje (klik na prvo oglišče, dvoklik ali [[Enter]] jo zapre), in obris teče ob rezu; na seznamu je kot »Rez 1«.
 
+Drevo ob hiši, figura pred nemirnim ozadjem – kjer nobena barva ne loči oblike od ostalega, jo ujame **{{ui:sketch.traceLasso}}**: klikaj približno ob njenem robu, in med dvema klikoma črta sama sledi robu, tudi v lokih; že med premikanjem predogled pokaže, kod bo tekla. Klik na prvo točko, dvoklik ali [[Enter]] jo zapre, [[Esc]] jo zavrže. Na seznamu je kot »Laso 1«, z izbiro {{ui:sketch.traceRegionAdd}} (ploskev se pridruži obliki) ali {{ui:sketch.traceTrim}} (odvzeta je); enako izbiro ima vsak rez. Pod {{ui:sketch.tracePart}} naredi **{{ui:sketch.traceLassoOnly}}** obliko le iz tega, kar tako ujameš – nič drugega s slike.
+
 ## Tipke v skicirnem načinu
 
 | Tipka | Učinek |

@@ -8666,6 +8666,27 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-turn-ring {
   fill: #d97a00;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.taken {
+  fill: rgba(11, 114, 185, 0.1);
+  stroke: #0b72b9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.taken.highlight {
+  fill: rgba(11, 114, 185, 0.22);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.taken.draft {
+  fill: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle.draft.lasso {
+  stroke: #0b72b9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle.draft.lasso.first {
+  fill: #0b72b9;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-plate {
   --locked-handle-ink: #898989;
   --locked-handle-fill: #dfdfdf;

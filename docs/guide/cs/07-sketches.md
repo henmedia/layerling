@@ -155,6 +155,8 @@ Tyto volby mění pouze podklad, nikoli náčrt.
 
 Pro fotku – třeba hračky na bílém stole – zvol v {{ui:sketch.tracePart}} **{{ui:sketch.traceObject}}**: pozadí je barva na okraji obrázku a vše, co se od ní odlišuje, se stane jediným obrysem, ať má jakékoli barvy; {{ui:sketch.traceThreshold}} pak určuje, jak zřetelně. Barevný obrázek na jednolitém pozadí tak začíná. {{ui:sketch.tracePickAreas}} obkreslí víc: klikni v obrázku na plochu, třeba okno, a plocha stejné barvy kolem místa se obkreslí ({{ui:sketch.traceAreaTolerance}} určuje, jak stejné). Otvory a vybrané plochy jsou v {{ui:sketch.traceList}}; když na jednu ukážeš, zvýrazní se v náhledu, ✕ ji odebere a s vypnutým {{ui:sketch.traceCut}} se místo otvoru nakreslí jako pomocná čára. Plocha, která sahá k okraji obrázku, je pozadí a nebere se. Co neoddělí žádný práh ani barva – stín tmavý jako kola nad ním –, odstraní {{ui:sketch.traceTrim}}: klikni kolem něj rohy (klik na první roh, dvojklik nebo [[Enter]] ho uzavře) a obrys povede podél řezu; v seznamu je jako „Řez 1“.
 
+Strom vedle domu, postava před neklidným pozadím – kde žádná barva neoddělí tvar od zbytku, chytí ho **{{ui:sketch.traceLasso}}**: klikej zhruba podél jeho hrany a mezi dvěma kliky čára sama sleduje hranu, i v obloucích; už při pohybu ukazuje náhled, kudy povede. Klik na první bod, dvojklik nebo [[Enter]] ji uzavře, [[Esc]] ji zahodí. V seznamu je jako „Laso 1“ s volbou {{ui:sketch.traceRegionAdd}} (plocha se přidá k tvaru) nebo {{ui:sketch.traceTrim}} (odebere se); stejnou volbu má každý řez. V {{ui:sketch.tracePart}} udělá **{{ui:sketch.traceLassoOnly}}** tvar jen z toho, co takto chytíš – nic jiného z obrázku.
+
 ## Klávesy v náčrtu
 
 | Klávesa | Význam |

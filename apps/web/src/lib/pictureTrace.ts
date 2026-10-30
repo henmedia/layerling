@@ -11,8 +11,10 @@ import { fieldRings, ringArea, shapeField, shrinkRaster, softened, type RasterPa
  * the light part, the shape can be the object: all that stands out from the picture's background, the
  * colour at its edge - a toy photographed on white comes out as one outline, whatever its colours.
  * Areas clicked in the picture (a window) are outlined too, as patches of like colour; every hole and
- * area has a key, so it can be left out or drawn as a construction line instead of cut. A part can be
- * cut away whatever its colour - a polygon round a shadow under a toy - before the outline is found.
+ * area has a key, so it can be left out or drawn as a construction line instead of cut. Regions drawn by
+ * hand - corners clicked round a shadow under a toy, or a line the magnetic lasso laid along an edge -
+ * are cut away from the shape or taken into it, whatever their colour, before the outline is found;
+ * with the part "lasso" they alone are the shape.
  *
  * The steps: the outline where the picture crosses the threshold (rasterTrace's marching squares, on
  * the picture softened a little, so a hard pixel edge gives a smooth line); the outline walked in even
@@ -33,7 +35,7 @@ export type TraceNode = TracePoint & {
   /** The handle of the side leaving here, when that side is curved. */
   handleOut?: TracePoint;
 };
-/** Where an outline comes from: the shape's own edge, a hole in it, an area clicked in the picture, or a part cut away inside the shape. */
+/** Where an outline comes from: the shape's own edge, a hole in it, an area clicked in the picture, or a region cut away inside the shape. */
 export type TraceSource = "outline" | "hole" | "area" | "cut";
 /**
  * A closed outline: each point joins the next, the last the first; a side is curved when both of its ends
@@ -42,12 +44,18 @@ export type TraceSource = "outline" | "hole" | "area" | "cut";
  */
 export type TraceRing = { nodes: TraceNode[]; hole: boolean; key: string; source: TraceSource; line?: boolean };
 
-/** What becomes the shape: the dark part, the light part, or the object - all that stands out from the background, the colour at the picture's edge. */
-export type TracePart = RasterPart | "object";
+/**
+ * What becomes the shape: the dark part, the light part, the object - all that stands out from the
+ * background, the colour at the picture's edge - or only the regions taken in by hand (the lasso).
+ */
+export type TracePart = RasterPart | "object" | "lasso";
 /** An area clicked in the picture: the patch of like colour round the spot, given in the picture's own pixels. */
 export type TraceArea = { id: string; x: number; y: number };
-/** A part cut away from the shape (Cut away): a closed polygon in the picture's own pixels, taken out whatever its colour. */
-export type TraceCut = { id: string; points: TracePoint[] };
+/**
+ * A region drawn by hand: a closed polygon in the picture's own pixels, cut away from the shape (Cut
+ * away) or, with `add`, taken into it, whatever its colour. `lasso` marks one the magnetic lasso drew.
+ */
+export type TraceRegion = { id: string; points: TracePoint[]; add?: boolean; lasso?: boolean };
 
 export type PictureTraceSettings = {
   /** The dark part (a black shape on white), the light one, or the object before its background. */
@@ -70,8 +78,8 @@ export type PictureTraceSettings = {
   removed?: string[];
   /** The keys of holes and areas drawn as construction lines instead of cut. */
   lines?: string[];
-  /** Parts cut away from the shape before its outline is found. */
-  cuts?: TraceCut[];
+  /** Regions drawn by hand, cut away from the shape or taken into it before its outline is found. */
+  regions?: TraceRegion[];
 };
 
 export type PictureTrace = {
@@ -228,8 +236,10 @@ export type PreparedPicture = {
   /** The background's colour (the colour at the picture's edge) and each pixel's distance from it, 0 to 1, once asked for. */
   background?: { colour: [number, number, number]; distance: Float32Array };
   areas: Map<string, Contour | null>;
-  /** How much of each pixel the cuts take, 0 to 1, for the cuts last asked for. */
-  cutCover?: { key: string; cover: Float32Array | null };
+  /** How much of each pixel the regions drawn by hand take in and cut away, 0 to 1, for the regions last asked for. */
+  regionCover?: { key: string; add: Float32Array | null; cut: Float32Array | null };
+  /** How strong an edge each pixel lies on, 0 to 1, once asked for (the magnetic lasso). */
+  edges?: Float32Array;
 };
 
 /** Gets a picture ready for tracing it several times over, as its settings change. */
@@ -251,7 +261,7 @@ export function preparePicture(source: RasterPixels): PreparedPicture {
  * The settings a picture is traced with to start: a colourful picture on an even background (a photo
  * of a toy on white) as the object, without holes; else the part that is not its background, with its
  * holes, cut where its two parts meet. Specks of a few pixels left out, corners from 45 degrees, no
- * areas or cuts yet. The number of points follows the picture closely.
+ * areas or regions yet. The number of points follows the picture closely.
  */
 export function defaultTraceSettings(picture: PreparedPicture): PictureTraceSettings {
   const object = isColourful(picture.pixels) && hasEvenBorder(picture.pixels);
@@ -265,13 +275,14 @@ export function defaultTraceSettings(picture: PreparedPicture): PictureTraceSett
     areaTolerance: DEFAULT_TRACE_AREA_TOLERANCE,
     removed: [],
     lines: [],
-    cuts: [],
+    regions: [],
   };
   return { ...base, points: traceRange(picture, base).suggested };
 }
 
 /** The threshold a part starts with: where the picture's dark and light split, or, for the object, as defaultObjectThreshold. */
 export function defaultThreshold(picture: PreparedPicture, part: TracePart) {
+  if (part === "lasso") return 0.5;
   return part === "object" ? defaultObjectThreshold(picture) : Math.round(splitLightness(picture.pixels) * 100) / 100;
 }
 
@@ -378,11 +389,13 @@ function backgroundOf(picture: PreparedPicture) {
  * at a half: a distance is scaled so the threshold is a half and twice it the whole, which puts a hard
  * edge's line where the edge is rather than a pixel out.
  */
-function objectFields(picture: PreparedPicture, threshold: number, cover: Float32Array | null) {
+function objectFields(picture: PreparedPicture, threshold: number, cover: Float32Array | null, added: Float32Array | null = null) {
   const { width, height } = picture.pixels;
   const { distance: plain } = backgroundOf(picture);
-  // What is cut away lies on the background, so the background fills into it from the edge.
-  const distance = cover ? plain.map((value, index) => value * (1 - cover[index])) : plain;
+  // What is taken in by hand is the object; what is cut away lies on the background, so the background fills into it from the edge.
+  const distance = cover || added
+    ? plain.map((value, index) => Math.max(value, added ? added[index] * 2 * threshold : 0) * (cover ? 1 - cover[index] : 1))
+    : plain;
   const outside = new Uint8Array(width * height);
   const stack: number[] = [];
   for (const index of borderPixels(width, height)) {
@@ -469,40 +482,67 @@ function contoursFromRings(rings: TracePoint[][], sourceAt: (depth: number) => T
 }
 
 /**
- * How much of each pixel of the traced picture the cuts take, 0 to 1 (4 x 4 samples a pixel), or null
- * without cuts; kept for the cuts last asked for.
+ * How much of each pixel a closed polygon covers, 0 to 1, added into `cover` (the larger of the two):
+ * four rows of samples a pixel, each filled even-odd between the polygon's crossings, the ends of a span
+ * by the share of the pixel they reach.
  */
-function cutCover(picture: PreparedPicture, cuts: readonly TraceCut[]): Float32Array | null {
-  const usable = cuts.filter((cut) => cut.points.length >= 3);
-  const key = JSON.stringify(usable.map((cut) => cut.points.map((point) => [Math.round(point.x * 10), Math.round(point.y * 10)])));
-  if (picture.cutCover?.key === key) return picture.cutCover.cover;
-  let cover: Float32Array | null = null;
-  if (usable.length) {
-    const { width, height } = picture.pixels;
-    cover = new Float32Array(width * height);
-    for (const cut of usable) {
-      const polygon = cut.points.map((point) => ({ x: point.x / picture.scaleX, y: point.y / picture.scaleY }));
-      const minX = Math.max(0, Math.floor(Math.min(...polygon.map((point) => point.x))));
-      const maxX = Math.min(width - 1, Math.ceil(Math.max(...polygon.map((point) => point.x))));
-      const minY = Math.max(0, Math.floor(Math.min(...polygon.map((point) => point.y))));
-      const maxY = Math.min(height - 1, Math.ceil(Math.max(...polygon.map((point) => point.y))));
-      for (let y = minY; y <= maxY; y += 1) {
-        for (let x = minX; x <= maxX; x += 1) {
-          let hits = 0;
-          for (let sy = 0; sy < 4; sy += 1) {
-            for (let sx = 0; sx < 4; sx += 1) if (inside({ x: x + (sx + 0.5) / 4, y: y + (sy + 0.5) / 4 }, polygon)) hits += 1;
+function coverPolygon(polygon: readonly TracePoint[], width: number, height: number, cover: Float32Array) {
+  const minY = Math.max(0, Math.floor(Math.min(...polygon.map((point) => point.y))));
+  const maxY = Math.min(height - 1, Math.ceil(Math.max(...polygon.map((point) => point.y))));
+  const row = new Float32Array(width);
+  for (let y = minY; y <= maxY; y += 1) {
+    row.fill(0);
+    let touched = false;
+    for (let sample = 0; sample < 4; sample += 1) {
+      const sy = y + (sample + 0.5) / 4;
+      const crossings: number[] = [];
+      for (let index = 0, previous = polygon.length - 1; index < polygon.length; previous = index, index += 1) {
+        const a = polygon[previous];
+        const b = polygon[index];
+        if ((a.y > sy) !== (b.y > sy)) crossings.push(a.x + ((sy - a.y) * (b.x - a.x)) / (b.y - a.y));
+      }
+      crossings.sort((p, q) => p - q);
+      for (let pair = 0; pair + 1 < crossings.length; pair += 2) {
+        const from = Math.max(0, crossings[pair]);
+        const to = Math.min(width, crossings[pair + 1]);
+        for (let x = Math.floor(from); x < to && x < width; x += 1) {
+          const share = Math.min(x + 1, to) - Math.max(x, from);
+          if (share > 0) {
+            row[x] += share / 4;
+            touched = true;
           }
-          const index = y * width + x;
-          cover[index] = Math.max(cover[index], hits / 16);
         }
       }
     }
+    if (!touched) continue;
+    for (let x = 0; x < width; x += 1) {
+      const index = y * width + x;
+      if (row[x] > cover[index]) cover[index] = Math.min(1, row[x]);
+    }
   }
-  picture.cutCover = { key, cover };
-  return cover;
 }
 
-/** Whether a contour is a cut's: a hole in the shape whose middle a cut takes. */
+/**
+ * How much of each pixel of the traced picture the regions drawn by hand take in (`add`) and cut away,
+ * 0 to 1, or null where there are none; kept for the regions last asked for.
+ */
+function regionCover(picture: PreparedPicture, regions: readonly TraceRegion[]) {
+  const usable = regions.filter((region) => region.points.length >= 3);
+  const key = JSON.stringify(usable.map((region) => [region.add ? 1 : 0, region.points.map((point) => [Math.round(point.x * 10), Math.round(point.y * 10)])]));
+  if (picture.regionCover?.key === key) return picture.regionCover;
+  const { width, height } = picture.pixels;
+  let add: Float32Array | null = null;
+  let cut: Float32Array | null = null;
+  for (const region of usable) {
+    const polygon = region.points.map((point) => ({ x: point.x / picture.scaleX, y: point.y / picture.scaleY }));
+    const into = region.add ? (add ??= new Float32Array(width * height)) : (cut ??= new Float32Array(width * height));
+    coverPolygon(polygon, width, height, into);
+  }
+  picture.regionCover = { key, add, cut };
+  return picture.regionCover;
+}
+
+/** Whether a contour is a cut's: a hole in the shape whose middle a region cut away takes. */
 function madeByCut(contour: Contour, cover: Float32Array | null, picture: PreparedPicture) {
   if (!cover || contour.depth % 2 === 0) return false;
   const x = Math.floor(contour.centre.x);
@@ -511,13 +551,15 @@ function madeByCut(contour: Contour, cover: Float32Array | null, picture: Prepar
 }
 
 /**
- * The outlines for a part and a threshold, with the cuts taken away; for the object, its outlines and,
- * apart, its holes. A hole a cut makes inside the shape is the cut's, not one of the picture's holes.
+ * The outlines for a part and a threshold, with the regions drawn by hand taken in and cut away; for the
+ * object, its outlines and, apart, its holes. A hole a cut makes inside the shape is the cut's, not one
+ * of the picture's holes. With the part "lasso", the regions taken in are the shape.
  */
-function contoursFor(picture: PreparedPicture, part: TracePart, threshold: number, cuts: readonly TraceCut[] = []): { outlines: Contour[]; holes: Contour[] } {
-  const level = Math.min(0.98, Math.max(0.02, threshold));
-  const cover = cutCover(picture, cuts);
-  const key = `${part}:${level.toFixed(3)}:${picture.cutCover?.key ?? ""}`;
+function contoursFor(picture: PreparedPicture, part: TracePart, threshold: number, regions: readonly TraceRegion[] = []): { outlines: Contour[]; holes: Contour[] } {
+  const level = part === "lasso" ? 0.5 : Math.min(0.98, Math.max(0.02, threshold));
+  const covers = regionCover(picture, regions);
+  const cover = covers.cut;
+  const key = `${part}:${level.toFixed(3)}:${covers.key}`;
   const known = picture.contours.get(key);
   const knownHoles = picture.contours.get(`${key}:holes`);
   if (known && knownHoles) return { outlines: known, holes: knownHoles };
@@ -526,15 +568,17 @@ function contoursFor(picture: PreparedPicture, part: TracePart, threshold: numbe
   let holes: Contour[] = [];
   const asCut = (contour: Contour): Contour => (madeByCut(contour, cover, picture) ? { ...contour, source: "cut", key: `c:${contour.key.slice(2)}` } : contour);
   if (part === "object") {
-    const fields = objectFields(picture, level, cover);
+    const fields = objectFields(picture, level, cover, covers.add);
     // Only a cut makes a hole in the object's own field.
     outlines = contoursFromRings(fieldRings(fields.object, width + 2, height + 2, 0.5).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 1 ? "cut" : "outline"))
       .map((contour) => (contour.source === "cut" ? { ...contour, key: `c:${contour.key.slice(2)}` } : contour));
     // The holes' own lines: an outline round a patch of background, or (inside it) round an island of the object again.
     holes = contoursFromRings(fieldRings(fields.holes, width + 2, height + 2, 0.5).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 0 ? "hole" : "outline"), 1);
   } else {
-    const plain = picture.fields[part] ?? (picture.fields[part] = shapeField(picture.pixels, part));
-    const field = cover ? cutField(plain, cover, width, height) : plain;
+    // The lasso's shape is what it took in, and nothing of the picture's own.
+    const plain = part === "lasso" ? new Float32Array((width + 2) * (height + 2)) : picture.fields[part] ?? (picture.fields[part] = shapeField(picture.pixels, part));
+    const taken = covers.add ? addedField(plain, covers.add, width, height, level) : plain;
+    const field = cover ? cutField(taken, cover, width, height) : taken;
     const all = contoursFromRings(fieldRings(field, width + 2, height + 2, level).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 1 ? "hole" : "outline")).map(asCut);
     outlines = all.filter((contour) => contour.depth === 0 || contour.source === "cut");
     holes = all.filter((contour) => contour.depth > 0 && contour.source !== "cut");
@@ -542,6 +586,19 @@ function contoursFor(picture: PreparedPicture, part: TracePart, threshold: numbe
   picture.contours.set(key, outlines);
   picture.contours.set(`${key}:holes`, holes);
   return { outlines, holes };
+}
+
+/** A padded field with what the regions taken in cover, taken in: scaled so a pixel half covered lies at the level, which puts the line on the region's edge. */
+function addedField(field: Float32Array, cover: Float32Array, width: number, height: number, level: number) {
+  const out = new Float32Array(field);
+  const gridWidth = width + 2;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const cell = (y + 1) * gridWidth + x + 1;
+      out[cell] = Math.max(out[cell], cover[y * width + x] * 2 * level);
+    }
+  }
+  return out;
 }
 
 /** A padded field with what the cuts take, taken away. */
@@ -620,7 +677,7 @@ function areaContour(picture: PreparedPicture, area: TraceArea, tolerance: numbe
 function keptContours(picture: PreparedPicture, settings: Omit<PictureTraceSettings, "points">) {
   const speck = settings.speck / (picture.scaleX * picture.scaleY);
   const removed = new Set(settings.removed ?? []);
-  const { outlines, holes } = contoursFor(picture, settings.part, settings.threshold, settings.cuts ?? []);
+  const { outlines, holes } = contoursFor(picture, settings.part, settings.threshold, settings.regions ?? []);
   const rejected: string[] = [];
   const areas: Contour[] = [];
   for (const area of settings.areas ?? []) {
