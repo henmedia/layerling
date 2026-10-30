@@ -16,7 +16,8 @@
  *
  * Version for Layerling (taken over from the vase tool): all texts come through `tr(key, params)`
  * (keys vaseDraw.*), notes from the import modules through `note(text)`, numbers in the format of
- * `locale`; a mesh is read by `readMesh(name, bytes)` (triangles, Z up) with Layerling's own import.
+ * `locale`; a mesh is read by `readMesh(name, bytes)` (triangles, Z up) with Layerling's own import, and
+ * Trace's magnetic lasso finds its way along the photo's edges with `edgeLasso` (Layerling's pictureEdgePath).
  */
 import {
   DRAW_PRESETS, DRAW_PROFILE, LIMITS, MAX_DRAW_POINTS, MAX_TWIST_ANGLE, PROFILES, PROFILE_CORNER, PROFILE_HANDLE,
@@ -24,7 +25,7 @@ import {
 } from './vase-geometry.mjs'
 import { svgToProfile, svgToSection } from './svg-import.mjs'
 import { meshToProfile } from './vase-import.mjs'
-import { findObject, photoPlacement, photoProfile } from './vase-photo.mjs'
+import { findObject, outlineObject, photoPlacement, photoProfile } from './vase-photo.mjs'
 
 const SVG = 'http://www.w3.org/2000/svg'
 /** The most points a body form and a twist curve can have (as in the core). */
@@ -82,6 +83,12 @@ function injectStyle() {
   .vz .vz-tangent { stroke: var(--vz-accent); stroke-width: 1.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
   .vz .vz-trace { fill: #e5484d; fill-opacity: .08; stroke: #e5484d; stroke-width: 2px; stroke-dasharray: 6 4; vector-effect: non-scaling-stroke; pointer-events: none; }
   .vz .vz-trace-knob { fill: #fff; stroke: #e5484d; stroke-width: 2px; vector-effect: non-scaling-stroke; pointer-events: none; }
+  .vz .vz-lasso { fill: none; stroke: #0b72b9; stroke-width: 2px; vector-effect: non-scaling-stroke; pointer-events: none; }
+  .vz .vz-lasso.vz-lasso-hover { stroke-dasharray: 4 3; stroke-opacity: .75; }
+  .vz .vz-lasso.vz-lasso-done { fill: #0b72b9; fill-opacity: .06; stroke-dasharray: 6 4; }
+  .vz .vz-lasso-knob { fill: #fff; stroke: #0b72b9; stroke-width: 2px; vector-effect: non-scaling-stroke; pointer-events: none; }
+  .vz .vz-lasso-knob.vz-first { fill: #0b72b9; }
+  .vz svg.vz-lassoing { cursor: crosshair; }
   .vz .vz-tknob { fill: var(--vz-bg); stroke: var(--vz-accent); stroke-width: 1.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
   .vz .vz-readonly { position: absolute; inset: auto 10px 10px 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
     padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--vz-bg) 88%, transparent); border: 1px solid var(--vz-edge); font-size: 12.5px; }
@@ -352,7 +359,8 @@ function drawingBoard(api) {
     calibBtn.hidden = !photo
     offBtn.hidden = !photo
     outlineBtn.hidden = !(photo && found?.ok)
-    traceBtn.hidden = !(photo && found?.ok && photoPixels)
+    // Without an object found (a busy background), Trace is still there for its magnetic lasso.
+    traceBtn.hidden = !(photo && photoPixels && (found?.ok || api.edgeLasso))
     traceBtn.setAttribute('aria-pressed', String(Boolean(trace)))
     opacityWrap.hidden = !photo
     calibBtn.setAttribute('aria-pressed', String(Boolean(calib)))
@@ -383,11 +391,19 @@ function drawingBoard(api) {
    * Trace (Nachzeichnen): the object's outline taken with settings - how far a colour must lie from the
    * background's to belong to it (threshold), how many points, from what kink a point is a corner - and
    * shown in red over the photo before it becomes the body form. The photo follows the object as the
-   * threshold changes it; Cancel lays it back.
+   * threshold changes it; Cancel lays it back. The magnetic lasso (with api.edgeLasso): clicks roughly
+   * round the vase lay a line that follows the photo's edges between them, the way on to the pointer
+   * shown as it moves; closed, it is the object instead of the search - a vase before a shelf or in a
+   * room, which no background colour tells apart.
    */
-  let trace = null // null | { threshold, points, cornerAngle, found, result }
+  // `searched`: the search found the object when Trace began; `outline`: the lasso's, in the photo's pixels; `placed`: where the photo lay.
+  let trace = null // null | { threshold, points, cornerAngle, found, result, searched, outline, placed }
   let traceThreshold = null, tracePoints = null, traceCorners = null
   let traceTimer = 0
+  // The lasso: the photo made ready for it once, and the line being laid - spots in the photo's pixels.
+  let lassoPicture = null
+  let lasso = null // null | { anchors, draft, hover, spot, frame }
+  let lassoBtn = null, lassoOffBtn = null
   function traceSlider(label, min, max, step, show, onChange) {
     const wrapT = document.createElement('label')
     wrapT.className = 'vz-num'
@@ -402,6 +418,7 @@ function drawingBoard(api) {
     wrapT.append(`${label} `, input, ' ', value)
     traceRow.append(wrapT)
     const slider = {
+      wrap: wrapT,
       set(v) { input.value = String(v); value.textContent = show(v) },
     }
     input.addEventListener('input', () => {
@@ -418,25 +435,31 @@ function drawingBoard(api) {
   function updateTrace() {
     if (!trace || !photo || !photoPixels) return
     const size = objectSize()
-    const f = findObject(photoPixels, { threshold: trace.threshold })
+    // Drawn round with the lasso, the object is what the lasso holds; else it is searched for with the threshold.
+    const f = trace.outline ? outlineObject(photoPixels, trace.outline) : findObject(photoPixels, { threshold: trace.threshold })
     trace.found = f
     trace.result = f.ok ? photoProfile(f, { ...size, tolerance: 0.001, maxPoints: trace.points, cornerAngle: trace.cornerAngle }) : f
     if (f.ok) Object.assign(photo, photoPlacement(photoPx, f.box, size))
-    photoHint(trace.result.ok ? tr('vaseDraw.traceHint', { points: trace.result.profilePoints.length }) : trace.result.notes.map(api.note).join(' '))
+    // While the lasso is laid, its hint stays.
+    if (!lasso) photoHint(trace.result.ok ? tr(trace.outline ? 'vaseDraw.traceLassoResult' : 'vaseDraw.traceHint', { points: trace.result.profilePoints.length }) : trace.result.notes.map(api.note).join(' '))
     render()
   }
   function startTrace() {
-    if (!photo || !found?.ok || !photoPixels) return
+    if (!photo || !photoPixels || !(found?.ok || api.edgeLasso)) return
     calib = null
     // To start, what Take outline would give: its threshold and its number of points.
-    const first = photoProfile(found, objectSize())
-    trace = { threshold: found.threshold, points: first.ok ? first.profilePoints.length : 8, cornerAngle: 20, found, result: null }
+    const searched = Boolean(found?.ok)
+    const first = searched ? photoProfile(found, objectSize()) : null
+    trace = { threshold: searched ? found.threshold : 0.25, points: first?.ok ? first.profilePoints.length : 8, cornerAngle: 20, found, result: null, searched, outline: null, placed: { x0: photo.x0, y0: photo.y0, w: photo.w, h: photo.h } }
     traceThreshold.set(Math.round(trace.threshold * 100))
     tracePoints.set(trace.points)
     traceCorners.set(trace.cornerAngle)
     traceRow.hidden = false
     photoState()
-    updateTrace()
+    lassoState()
+    // Where the search found nothing (a busy background), the lasso is the way to the object.
+    if (searched) updateTrace()
+    else startLasso()
   }
   /** Trace off: with `apply`, its outline becomes the body form and the photo stays on the object as found; else all is as before. */
   function stopTrace(apply) {
@@ -450,18 +473,114 @@ function drawingBoard(api) {
       return
     }
     if (photo && found?.ok) Object.assign(photo, photoPlacement(photoPx, found.box, objectSize()))
+    else if (photo) Object.assign(photo, done.placed)
     photoHint(api.hint)
     render()
   }
   function endTrace() {
     clearTimeout(traceTimer)
+    stopLasso()
     trace = null
     traceRow.hidden = true
     if (traceBtn) photoState()
   }
+  // A spot of the photo in its pixels (y down) and in mm on the board (y up), and back.
+  const photoToMm = ([u, v]) => [photo.x0 + (u / photoPx.width) * photo.w, photo.y0 + (1 - v / photoPx.height) * photo.h]
+  const mmToPhoto = ([x, y]) => [((x - photo.x0) / photo.w) * photoPx.width, (1 - (y - photo.y0) / photo.h) * photoPx.height]
+  const onPhoto = ([u, v]) => u >= 0 && v >= 0 && u <= photoPx.width && v <= photoPx.height
+  const lassoReady = () => (lassoPicture ??= api.edgeLasso.prepare(photoPixels))
+  function startLasso() {
+    if (!trace || !api.edgeLasso || !photoPixels) return
+    lasso = { anchors: [], draft: [], hover: [], spot: null, frame: 0 }
+    svg.classList.add('vz-lassoing')
+    // Enter and Escape go to the board from now on.
+    svg.focus({ preventScroll: true })
+    photoHint(tr('vaseDraw.traceLassoHint'))
+    lassoState()
+    render()
+  }
+  function stopLasso() {
+    if (lasso) cancelAnimationFrame(lasso.frame)
+    lasso = null
+    svg.classList.remove('vz-lassoing')
+    lassoState()
+  }
+  /** The lasso's buttons, and the threshold: of no use while the lasso holds the object, or when the search found nothing. */
+  function lassoState() {
+    if (!lassoBtn) return
+    lassoBtn.setAttribute('aria-pressed', String(Boolean(lasso)))
+    lassoOffBtn.hidden = !trace?.outline
+    traceThreshold.wrap.hidden = Boolean(trace?.outline) || !trace?.searched
+  }
+  /** A click on the photo while the lasso is on: the next spot, moved onto the edge near it - or, on the first spot, the line closed. */
+  function lassoClick(event) {
+    if (!lasso || !photo) return false
+    svg.focus({ preventScroll: true })
+    const spot = mmToPhoto(mmOf(event))
+    if (!onPhoto(spot)) return true
+    if (lasso.anchors.length >= 3) {
+      const [fx, fy] = photoToMm(lasso.anchors[0])
+      const [mx, my] = mmOf(event)
+      if (Math.hypot(fx - mx, fy - my) * pxPerMm() <= 8) { closeLasso(); return true }
+    }
+    const picture = lassoReady()
+    const at = api.edgeLasso.snap(picture, spot)
+    const last = lasso.anchors[lasso.anchors.length - 1]
+    if (last && last[0] === at[0] && last[1] === at[1]) return true
+    // A way to the pointer still being looked for runs from the spot before.
+    cancelAnimationFrame(lasso.frame)
+    lasso.frame = 0
+    lasso.draft = last ? [...lasso.draft, ...api.edgeLasso.path(picture, last, at).slice(1)] : [at]
+    lasso.anchors.push(at)
+    lasso.hover = []
+    render()
+    return true
+  }
+  /** The pointer over the board while the lasso is on: the way on to it along the edges, looked for once a frame at most. */
+  function lassoHover(event) {
+    if (!lasso?.anchors.length || !photo) return
+    lasso.spot = mmToPhoto(mmOf(event))
+    if (lasso.frame) return
+    lasso.frame = requestAnimationFrame(() => {
+      if (!lasso) return
+      lasso.frame = 0
+      const picture = lassoReady()
+      lasso.hover = onPhoto(lasso.spot) ? api.edgeLasso.path(picture, lasso.anchors[lasso.anchors.length - 1], api.edgeLasso.snap(picture, lasso.spot)) : []
+      drawTrace(pxPerMm())
+    })
+  }
+  /** Closes the line (three spots at least) back to its first spot along the edge: from now on the object is what it holds. */
+  function closeLasso() {
+    if (!lasso || lasso.anchors.length < 3 || !trace) return
+    const back = api.edgeLasso.path(lassoReady(), lasso.anchors[lasso.anchors.length - 1], lasso.anchors[0]).slice(1, -1)
+    trace.outline = [...lasso.draft, ...back]
+    stopLasso()
+    updateTrace()
+    fit()
+  }
+  /** Throws away the line laid so far; the lasso stays on. */
+  function discardLassoLine() {
+    cancelAnimationFrame(lasso.frame)
+    Object.assign(lasso, { anchors: [], draft: [], hover: [], frame: 0 })
+    render()
+  }
+  /** The lasso over the photo: the line laid, the way on to the pointer, the spots clicked (the first filled), and a closed one dashed. */
+  function drawLasso(ppm) {
+    if (!photo || !trace) return
+    const inMm = (points) => points.map(photoToMm)
+    if (trace.outline) svgEl('path', { class: 'vz-lasso vz-lasso-done', d: pathOf(inMm(trace.outline), true) }, traceG)
+    if (!lasso) return
+    if (lasso.draft.length > 1) svgEl('path', { class: 'vz-lasso', d: pathOf(inMm(lasso.draft), false) }, traceG)
+    if (lasso.hover.length > 1) svgEl('path', { class: 'vz-lasso vz-lasso-hover', d: pathOf(inMm(lasso.hover), false) }, traceG)
+    lasso.anchors.forEach((spot, i) => {
+      const [x, y] = photoToMm(spot)
+      svgEl('circle', { class: `vz-lasso-knob${i ? '' : ' vz-first'}`, cx: x, cy: y, r: (i ? 4 : 5.5) / ppm }, traceG)
+    })
+  }
   /** Trace's outline over the photo: the body form both sides of the axis, its points - corners square. */
   function drawTrace(ppm) {
     traceG.replaceChildren()
+    drawLasso(ppm)
     const result = trace?.result
     if (!result?.ok) return
     const pts = result.profilePoints
@@ -490,6 +609,7 @@ function drawingBoard(api) {
       img.onload = () => {
         if (photo) URL.revokeObjectURL(photo.href)
         endTrace()
+        lassoPicture = null
         const [, , , by1] = api.bounds()
         const h = Math.max(10, by1 / 1.04)
         const w = (h * img.naturalWidth) / Math.max(1, img.naturalHeight)
@@ -540,6 +660,22 @@ function drawingBoard(api) {
     traceThreshold = traceSlider(tr('vaseDraw.traceThreshold'), 1, 99, 1, (v) => `${nf(v, 0)} %`, (v) => { trace.threshold = v / 100 })
     tracePoints = traceSlider(tr('vaseDraw.tracePoints'), 3, MAX_PROFILE_POINTS, 1, (v) => nf(v, 0), (v) => { trace.points = v })
     traceCorners = traceSlider(tr('vaseDraw.traceCorners'), 5, 180, 1, (v) => (v >= 180 ? tr('vaseDraw.traceNoCorners') : `${nf(v, 0)}°`), (v) => { trace.cornerAngle = v })
+    if (api.edgeLasso) {
+      lassoBtn = button(traceRow, tr('vaseDraw.traceLasso'), tr('vaseDraw.traceLassoTitle'), () => {
+        if (!lasso) { startLasso(); return }
+        stopLasso()
+        updateTrace()
+      })
+      lassoOffBtn = button(traceRow, tr('vaseDraw.traceLassoOff'), tr('vaseDraw.traceLassoOffTitle'), () => {
+        if (!trace) return
+        trace.outline = null
+        stopLasso()
+        // Without an object found, the lasso is the only way to it: it starts again.
+        if (trace.searched) updateTrace()
+        else startLasso()
+      })
+      lassoOffBtn.hidden = true
+    }
     button(traceRow, tr('vaseDraw.traceApply'), tr('vaseDraw.traceApplyTitle'), () => stopTrace(true))
     button(traceRow, tr('vaseDraw.traceCancel'), null, () => stopTrace(false))
     calibBtn = button(photoRow, tr('vaseDraw.calibrate'), tr('vaseDraw.calibrateTitle'), () => {
@@ -576,6 +712,7 @@ function drawingBoard(api) {
       endTrace()
       photo = null
       photoPixels = null
+      lassoPicture = null
       calib = null
       found = null
       photoState()
@@ -683,7 +820,9 @@ function drawingBoard(api) {
     if (ro) selected = null
     // Double-click on the line: insert a point.
     const curve = api.editCurve?.()
-    if (curve && !ro) {
+    // While the lasso is laid, clicks belong to it: the points lie on the vase's edge, just where it is clicked.
+    const editable = !ro && !lasso
+    if (curve && editable) {
       const hitPath = svgEl('path', { class: 'vz-curve-hit', d: pathOf(curve, false) }, shapeG)
       hitPath.addEventListener('dblclick', (event) => {
         const at = api.insertNear(mmOf(event))
@@ -691,7 +830,7 @@ function drawingBoard(api) {
       })
     }
     const r = 6 / ppm
-    if (!ro) {
+    if (editable) {
       pts.forEach((pt, i) => {
         const hit = svgEl('circle', { class: 'vz-hit', cx: pt.x, cy: pt.y, r: 15 / ppm }, knobG)
         if (pt.kind === 'ecke') svgEl('rect', { class: `vz-knob${i === selected ? ' sel' : ''}`, x: pt.x - r, y: pt.y - r, width: 2 * r, height: 2 * r }, knobG)
@@ -762,7 +901,7 @@ function drawingBoard(api) {
   })
   svg.addEventListener('pointermove', (event) => {
     if (pointers.has(event.pointerId)) pointers.set(event.pointerId, [event.clientX, event.clientY])
-    if (!drag) return
+    if (!drag) { lassoHover(event); return }
     event.preventDefault()
     if (drag.kind === 'pan') {
       const ppm = pxPerMm()
@@ -789,6 +928,7 @@ function drawingBoard(api) {
     drag = null
     svg.classList.remove('vz-panning')
     if (was.kind === 'pan' && !was.moved) {
+      if (lassoClick(event)) return
       if (calibClick(event)) return
       selected = null
       render()
@@ -807,7 +947,18 @@ function drawingBoard(api) {
     const [mx, my] = mmOf(event)
     zoomAt(Math.exp(event.deltaY * 0.0015), mx, my)
   }, { passive: false })
+  // The lasso: a double click closes the line too.
+  svg.addEventListener('dblclick', () => { if (lasso?.anchors.length >= 3) closeLasso() })
   svg.addEventListener('keydown', (event) => {
+    // The lasso: Enter closes the line, Escape throws it away (and then the lasso), ahead of the window, which would close.
+    if (lasso && (event.key === 'Enter' || event.key === 'Escape')) {
+      event.preventDefault()
+      event.stopPropagation()
+      if (event.key === 'Enter') closeLasso()
+      else if (lasso.anchors.length) discardLassoLine()
+      else { stopLasso(); updateTrace() }
+      return
+    }
     if (selected === null) return
     const step = event.shiftKey ? 10 : 1
     const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] }[event.key]
@@ -1093,7 +1244,7 @@ export function sectionEditor({ get, set, notify, tr = (key) => key, note = (tex
 /* ------------------------------------------------------------------ */
 
 /** Drawing the body form: right side in mm (radius, height), mirrored on the left; axis of rotation at x = 0. */
-export function profileEditor({ get, set, notify, tr = (key) => key, note = (text) => text, locale, readMesh }) {
+export function profileEditor({ get, set, notify, tr = (key) => key, note = (text) => text, locale, readMesh, edgeLasso }) {
   if (locale) numberLocale = locale
   const drawn = () => get().profile === 'gezeichnet'
   /** Normalised points [height 0..1, radius 0..1, kind?, slope?] - drawn or from the preset. */
@@ -1166,6 +1317,8 @@ export function profileEditor({ get, set, notify, tr = (key) => key, note = (tex
       if (Math.abs(height - get().height) > 1e-6 || Math.abs(diameter - get().diameter) > 1e-6) set({ height: Math.round(height * 10) / 10, diameter: Math.round(diameter * 10) / 10 })
     },
     photoProfile: (r) => takeProfile(r, 'photo'),
+    // Trace's magnetic lasso, when Layerling hands over the way along the edges.
+    edgeLasso,
     maxPoints: MAX_PROFILE_POINTS,
     notify,
     svgTitle: tr('vaseDraw.profileSvgTitle'),

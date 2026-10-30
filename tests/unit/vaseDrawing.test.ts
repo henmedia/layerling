@@ -6,7 +6,9 @@ import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { analyzeTriangleSoup } from "@/lib/svgImport";
 import { svgToProfile, svgToSection } from "@/lib/vase/svg-import.mjs";
 import { meshToProfile } from "@/lib/vase/vase-import.mjs";
-import { findObject, photoProfile } from "@/lib/vase/vase-photo.mjs";
+import { findObject, outlineObject, photoProfile } from "@/lib/vase/vase-photo.mjs";
+import { edgePath, snapToEdge } from "@/lib/pictureEdgePath";
+import { preparePicture } from "@/lib/pictureTrace";
 import { PROFILE_CORNER } from "@/lib/vase/vase-geometry.mjs";
 import { vaseNote } from "@/lib/vaseNotes";
 import { normalizeVaseSettings } from "@/lib/vaseSettings";
@@ -176,17 +178,22 @@ describe("drawing a vase", () => {
   });
 });
 
-/** A photo of a bottle-like vase: a round belly and a narrow neck on a light wall, as RGBA pixels. */
-function vasePhoto() {
+/**
+ * A photo of a bottle-like vase: a round belly and a narrow neck on a light wall, as RGBA pixels - or, `busy`,
+ * before a shelf of stripes in three colours, where no background colour tells it apart.
+ */
+function vasePhoto(busy = false) {
   const width = 200;
   const height = 300;
   const data = new Uint8ClampedArray(width * height * 4);
+  const stripes: [number, number, number, number][] = [[200, 60, 50, 255], [70, 170, 70, 255], [235, 225, 200, 255]];
   for (let y = 0; y < height; y += 1) {
     const belly = 30 + 30 * Math.sin((Math.PI * (y - 100)) / 180);
     for (let x = 0; x < width; x += 1) {
       const body = y >= 100 && y < 280 && Math.abs(x + 0.5 - 100) <= belly;
       const neck = y >= 40 && y < 100 && x >= 75 && x < 125;
-      data.set(body || neck ? [40, 70, 120, 255] : [230, 225, 215, 255], (y * width + x) * 4);
+      const wall: [number, number, number, number] = busy ? stripes[Math.floor((x + 2 * y) / 9) % 3] : [230, 225, 215, 255];
+      data.set(body || neck ? [40, 70, 120, 255] : wall, (y * width + x) * 4);
     }
   }
   return { width, height, data };
@@ -213,6 +220,26 @@ describe("tracing the photo of a vase (Trace)", () => {
       expect(result.profilePoints).toHaveLength(maxPoints);
     }
     expect(photoProfile(found, { ...size, maxPoints: 99 }).profilePoints.length).toBeLessThanOrEqual(40);
+  });
+
+  it("takes the vase drawn round with the magnetic lasso where no background colour finds it", () => {
+    const busy = vasePhoto(true);
+    expect(findObject(busy).ok).toBe(false);
+    // Clicks a few pixels off the vase's edge, round it; the lasso's way between them along the edges.
+    const picture = preparePicture(busy);
+    const clicks = [[73, 43], [72, 95], [44, 160], [42, 220], [62, 277], [138, 277], [158, 220], [156, 160], [128, 95], [127, 43]];
+    const spots = clicks.map(([x, y]) => snapToEdge(picture, { x, y }));
+    const outline = spots.flatMap((spot, index) => edgePath(picture, spot, spots[(index + 1) % spots.length]).slice(1)).map(({ x, y }) => [x, y]);
+    const drawn = outlineObject(busy, outline);
+    expect(drawn.ok).toBe(true);
+    // The same object as on a plain wall: as high and as wide, give or take a grid step.
+    const plain = findObject(vasePhoto());
+    for (const side of ["x0", "y0", "x1", "y1"] as const) expect(Math.abs(drawn.box[side] - plain.box[side])).toBeLessThanOrEqual(2);
+    const size = { height: 120, diameter: 60, tolerance: 0.001, maxPoints: 8 };
+    expect(photoProfile(drawn, size).ok).toBe(true);
+    // Drawn round, the photo may be filled; an outline of two points holds nothing.
+    expect(outlineObject(busy, [[0, 0], [200, 0], [200, 300], [0, 300]]).ok).toBe(true);
+    expect(outlineObject(busy, [[0, 0], [100, 100]]).ok).toBe(false);
   });
 
   it("makes the shoulder's kinks corners, or none at the largest corner angle", () => {

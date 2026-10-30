@@ -110,15 +110,66 @@ export function findObject(img, { threshold = null } = {}) {
   if (bestLabel < 0 || bestSize < 0.01 * w * h) return { ok: false, notes: ['Im Foto hebt sich nichts deutlich vom Hintergrund ab.'] }
   // Per row, the left and right edge of the region.
   const rows = []
-  let y0 = h, y1 = -1, x0 = w, x1 = -1
   for (let y = 0; y < h; y++) {
     let lo = -1, hi = -1
     for (let x = 0; x < w; x++) if (label[y * w + x] === bestLabel) { if (lo < 0) lo = x; hi = x }
     rows.push(lo < 0 ? null : [lo, hi])
-    if (lo >= 0) { y0 = Math.min(y0, y); y1 = Math.max(y1, y); x0 = Math.min(x0, lo); x1 = Math.max(x1, hi) }
   }
+  const object = objectFromRows(rows, g)
+  if (!object.ok) return object
+  return { ...object, threshold: T / 442, autoThreshold: auto / 442 }
+}
+
+/**
+ * The object drawn round by hand (the magnetic lasso of Trace) instead of found: `outline` a closed polygon
+ * in the photo's pixels ([x, y], y down). Inside it is the object, whatever the background - a shelf, a room.
+ * Returns the same as findObject (without a threshold), or `ok: false` when the outline holds next to nothing.
+ */
+export function outlineObject(img, outline) {
+  if (!img || !(img.width > 2) || !(img.height > 2)) return { ok: false, notes: ['Kein Bild.'] }
+  if (!outline || outline.length < 3) return { ok: false, notes: ['Kein Gegenstand gefunden.'] }
+  const f = Math.max(1, Math.max(img.width, img.height) / GRID)
+  const w = Math.max(1, Math.round(img.width / f)), h = Math.max(1, Math.round(img.height / f))
+  const g = { w, h, f: img.width / w, fy: img.height / h }
+  // Per grid row, through its middle: the outline's crossings, from the first to the last a grid point's middle lies between.
+  const rows = []
+  let inside = 0
+  for (let y = 0; y < h; y++) {
+    const sy = (y + 0.5) * g.fy
+    const crossings = []
+    for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
+      const [ax, ay] = outline[j], [bx, by] = outline[i]
+      if ((ay > sy) !== (by > sy)) crossings.push(ax + ((sy - ay) * (bx - ax)) / (by - ay))
+    }
+    crossings.sort((a, b) => a - b)
+    let lo = -1, hi = -1
+    for (let k = 0; k + 1 < crossings.length; k += 2) {
+      const from = Math.max(0, Math.ceil(crossings[k] / g.f - 0.5)), to = Math.min(w - 1, Math.floor(crossings[k + 1] / g.f - 0.5))
+      if (to < from) continue
+      inside += to - from + 1
+      if (lo < 0) lo = from
+      hi = to
+    }
+    rows.push(lo < 0 ? null : [lo, hi])
+  }
+  if (inside < 0.002 * w * h) return { ok: false, notes: ['Der Gegenstand ist im Foto zu klein für einen Umriss.'] }
+  return objectFromRows(rows, g, { drawn: true })
+}
+
+/**
+ * The object from its extent per grid row ([left, right] or null): its box in the photo's pixels, top and
+ * bottom without the ellipses of rim and base, and notes. `drawn`: drawn round by hand, so filling the photo
+ * is no sign of a missing background.
+ */
+function objectFromRows(rows, g, { drawn = false } = {}) {
+  const { w, h } = g
+  let y0 = h, y1 = -1, x0 = w, x1 = -1
+  rows.forEach((row, y) => {
+    if (!row) return
+    y0 = Math.min(y0, y); y1 = Math.max(y1, y); x0 = Math.min(x0, row[0]); x1 = Math.max(x1, row[1])
+  })
   const notes = []
-  if (x1 - x0 >= w - 2 && y1 - y0 >= h - 2) return { ok: false, notes: ['Der gefundene Bereich füllt das ganze Foto – der Gegenstand hebt sich nicht vom Hintergrund ab.'] }
+  if (!drawn && x1 - x0 >= w - 2 && y1 - y0 >= h - 2) return { ok: false, notes: ['Der gefundene Bereich füllt das ganze Foto – der Gegenstand hebt sich nicht vom Hintergrund ab.'] }
   if (x0 === 0 || x1 === w - 1 || y0 === 0) notes.push('Der Gegenstand reicht bis an den Bildrand – vielleicht ist er angeschnitten.')
   // Perspective: photographed slightly from above, rim and base appear as ellipses - the outermost rows
   // get abruptly narrower (more than 8 % per row; a real foot tapers off more gently). They do not count
@@ -133,7 +184,7 @@ export function findObject(img, { threshold = null } = {}) {
   if (bottom < y1) while (bottom > y1 - capMax && width(bottom) < 0.98 * width(bottom - 1)) bottom--
   if (top > y0 + 1 || bottom < y1 - 1) notes.push('Rand und Boden erscheinen als Ellipse (leicht von oben fotografiert) – gemessen wird zwischen ihren Mitten.')
   const box = { x0: x0 * g.f, y0: top * g.fy, x1: (x1 + 1) * g.f, y1: (bottom + 1) * g.fy }
-  return { ok: true, box, rows, top, bottom, grid: { w, h, f: g.f, fy: g.fy }, threshold: T / 442, autoThreshold: auto / 442, notes }
+  return { ok: true, box, rows, top, bottom, grid: { w, h, f: g.f, fy: g.fy }, notes }
 }
 
 /**

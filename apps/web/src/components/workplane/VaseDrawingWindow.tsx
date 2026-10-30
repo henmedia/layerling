@@ -6,10 +6,12 @@ import { createPortal } from "react-dom";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { importModelFiles } from "@/lib/modelImport";
+import { edgePath, snapToEdge } from "@/lib/pictureEdgePath";
+import { preparePicture, type PreparedPicture } from "@/lib/pictureTrace";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import type { VaseSettings } from "@/lib/vase/vase-geometry.mjs";
-import { profileEditor, sectionEditor, twistEditor, type VaseDrawingBoard, type VaseDrawingOptions } from "@/lib/vase/vase-editors.mjs";
+import { profileEditor, sectionEditor, twistEditor, type VaseDrawingBoard, type VaseDrawingOptions, type VaseEdgeLasso } from "@/lib/vase/vase-editors.mjs";
 import { vaseNote } from "@/lib/vaseNotes";
 import { vaseDrawingPatch, vaseDrawingSettings } from "@/lib/vaseShape";
 import { resizedImportedMeshPositions } from "@/lib/workplaneShapes";
@@ -39,6 +41,16 @@ async function readMeshTriangles(name: string, bytes: Uint8Array) {
   }
   return soup;
 }
+
+/** Trace's magnetic lasso in the vase drawing: the sketch's way along a picture's edges (pictureEdgePath), on the photo. */
+const EDGE_LASSO: VaseEdgeLasso = {
+  prepare: (pixels) => preparePicture(pixels),
+  snap: (photo, [x, y]) => {
+    const spot = snapToEdge(photo as PreparedPicture, { x, y });
+    return [spot.x, spot.y];
+  },
+  path: (photo, [fromX, fromY], [toX, toY]) => edgePath(photo as PreparedPicture, { x: fromX, y: fromY }, { x: toX, y: toY }).map((point): [number, number] => [point.x, point.y]),
+};
 
 /** Where the window stands in the editor area, remembered in this browser. */
 const WINDOW: MovablePanelOptions = {
@@ -191,6 +203,7 @@ function VaseDrawingHost({
       note: vaseNote,
       locale: numberLocale(),
       readMesh: readMeshTriangles,
+      edgeLasso: EDGE_LASSO,
     };
     const board = mode === "profile" ? profileEditor(options) : mode === "section" ? sectionEditor(options) : twistEditor(options);
     boardRef.current = board;
