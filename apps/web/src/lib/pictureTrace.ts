@@ -1,5 +1,5 @@
 import { pictureShapePart } from "@/lib/pictureIcon";
-import { fieldRings, ringArea, shapeField, shrinkRaster, type RasterPart, type RasterPixels } from "@/lib/rasterTrace";
+import { fieldRings, ringArea, shapeField, shrinkRaster, softened, type RasterPart, type RasterPixels } from "@/lib/rasterTrace";
 
 /*
  * Trace (Nachzeichnen): a picture - a silhouette, a logo, a word - becomes outlines a person goes on
@@ -7,7 +7,11 @@ import { fieldRings, ringArea, shapeField, shrinkRaster, type RasterPart, type R
  * many short straight pieces, this one sets few points: a corner point where the outline turns sharply,
  * and between the corners smooth points with handles, as one would draw them by hand. How many points
  * there are, which turn counts as a corner, where dark turns light, how small a speck is left out and
- * whether holes stay are the settings, as in the trace tools of laser programs.
+ * whether holes stay are the settings, as in the trace tools of laser programs. Instead of the dark or
+ * the light part, the shape can be the object: all that stands out from the picture's background, the
+ * colour at its edge - a toy photographed on white comes out as one outline, whatever its colours.
+ * Areas clicked in the picture (a window) are outlined too, as patches of like colour; every hole and
+ * area has a key, so it can be left out or drawn as a construction line instead of cut.
  *
  * The steps: the outline where the picture crosses the threshold (rasterTrace's marching squares, on
  * the picture softened a little, so a hard pixel edge gives a smooth line); the outline walked in even
@@ -28,13 +32,24 @@ export type TraceNode = TracePoint & {
   /** The handle of the side leaving here, when that side is curved. */
   handleOut?: TracePoint;
 };
-/** A closed outline: each point joins the next, the last the first; a side is curved when both of its ends have the handle facing it. */
-export type TraceRing = { nodes: TraceNode[]; hole: boolean };
+/** Where an outline comes from: the shape's own edge, a hole in it, or an area clicked in the picture. */
+export type TraceSource = "outline" | "hole" | "area";
+/**
+ * A closed outline: each point joins the next, the last the first; a side is curved when both of its ends
+ * have the handle facing it. `key` names it while the settings change (a hole by where it lies), `line`
+ * marks one to draw as a construction line rather than cut.
+ */
+export type TraceRing = { nodes: TraceNode[]; hole: boolean; key: string; source: TraceSource; line?: boolean };
+
+/** What becomes the shape: the dark part, the light part, or the object - all that stands out from the background, the colour at the picture's edge. */
+export type TracePart = RasterPart | "object";
+/** An area clicked in the picture: the patch of like colour round the spot, given in the picture's own pixels. */
+export type TraceArea = { id: string; x: number; y: number };
 
 export type PictureTraceSettings = {
-  /** The dark part (a black shape on white) or the light one becomes the shape. */
-  part: RasterPart;
-  /** Where dark turns light, 0 to 1. */
+  /** The dark part (a black shape on white), the light one, or the object before its background. */
+  part: TracePart;
+  /** Where dark turns light, 0 to 1; for the object, how far a colour must lie from the background's (a share of the largest distance). */
   threshold: number;
   /** At most this many points in all the outlines together; the corners always stay. */
   points: number;
@@ -44,10 +59,20 @@ export type PictureTraceSettings = {
   speck: number;
   /** Holes (the middle of an A or an O) stay; without them only the outermost outlines are traced. */
   holes: boolean;
+  /** Areas clicked in the picture, each outlined as a hole. */
+  areas?: TraceArea[];
+  /** How far a colour may lie from the clicked one and still belong to its area, 0 to 1. */
+  areaTolerance?: number;
+  /** The keys of holes and areas left out. */
+  removed?: string[];
+  /** The keys of holes and areas drawn as construction lines instead of cut. */
+  lines?: string[];
 };
 
 export type PictureTrace = {
   rings: TraceRing[];
+  /** Clicked areas that were not taken: they reach the picture's edge (the background) or lie outside it. */
+  rejected?: string[];
   /** How many points all the outlines have together. */
   points: number;
   /** How many of them are corners. */
@@ -56,6 +81,11 @@ export type PictureTrace = {
 
 /** The range the number of points can be set in for some settings, and the number that follows the picture closely. */
 export type PictureTraceRange = { fewest: number; most: number; suggested: number };
+
+/** How far a colour may lie from the clicked one to start, as a share of the largest distance. */
+export const DEFAULT_TRACE_AREA_TOLERANCE = 0.12;
+/** The largest colour distance, from black to white. */
+const MAX_COLOUR_DISTANCE = Math.sqrt(3) * 255;
 
 /** Corner angles that can be set, in degrees; at the largest there are no corners. */
 export const MIN_TRACE_CORNER_ANGLE = 10;
@@ -78,7 +108,7 @@ type Cubic = { from: TracePoint; c1: TracePoint; c2: TracePoint; to: TracePoint 
 /** A piece of an outline: straight when it has no handles. */
 type Piece = { from: TracePoint; to: TracePoint; c1?: TracePoint; c2?: TracePoint; cornerAtStart: boolean };
 /** One outline of the picture, walked in even steps, with what does not change with the number of points. */
-type Contour = { samples: TracePoint[]; area: number; depth: number };
+type Contour = { samples: TracePoint[]; area: number; depth: number; key: string; source: TraceSource; centre: TracePoint };
 
 const sub = (a: TracePoint, b: TracePoint): TracePoint => ({ x: a.x - b.x, y: a.y - b.y });
 const add = (a: TracePoint, b: TracePoint): TracePoint => ({ x: a.x + b.x, y: a.y + b.y });
@@ -188,6 +218,9 @@ export type PreparedPicture = {
   scaleY: number;
   fields: Partial<Record<RasterPart, Float32Array>>;
   contours: Map<string, Contour[]>;
+  /** The background's colour (the colour at the picture's edge) and each pixel's distance from it, 0 to 1, once asked for. */
+  background?: { colour: [number, number, number]; distance: Float32Array };
+  areas: Map<string, Contour | null>;
 };
 
 /** Gets a picture ready for tracing it several times over, as its settings change. */
@@ -201,23 +234,175 @@ export function preparePicture(source: RasterPixels): PreparedPicture {
     scaleY: source.height / pixels.height,
     fields: {},
     contours: new Map(),
+    areas: new Map(),
   };
 }
 
 /**
- * The settings a picture is traced with to start: the part that is not its background, the threshold
- * between its two parts, specks of a few pixels left out, holes kept, corners from 45 degrees. The
- * number of points follows the picture closely.
+ * The settings a picture is traced with to start: a colourful picture on an even background (a photo
+ * of a toy on white) as the object, without holes; else the part that is not its background, with its
+ * holes, cut where its two parts meet. Specks of a few pixels left out, corners from 45 degrees, no
+ * areas yet. The number of points follows the picture closely.
  */
 export function defaultTraceSettings(picture: PreparedPicture): PictureTraceSettings {
+  const object = isColourful(picture.pixels) && hasEvenBorder(picture.pixels);
   const base = {
-    part: pictureShapePart(picture.pixels),
-    threshold: Math.round(splitLightness(picture.pixels) * 100) / 100,
+    part: object ? "object" as const : pictureShapePart(picture.pixels),
+    threshold: defaultThreshold(picture, object ? "object" : "dark"),
     cornerAngle: DEFAULT_TRACE_CORNER_ANGLE,
     speck: defaultSpeck(picture),
-    holes: true,
+    holes: !object,
+    areas: [],
+    areaTolerance: DEFAULT_TRACE_AREA_TOLERANCE,
+    removed: [],
+    lines: [],
   };
   return { ...base, points: traceRange(picture, base).suggested };
+}
+
+/** The threshold a part starts with: where the picture's dark and light split, or, for the object, as defaultObjectThreshold. */
+export function defaultThreshold(picture: PreparedPicture, part: TracePart) {
+  return part === "object" ? defaultObjectThreshold(picture) : Math.round(splitLightness(picture.pixels) * 100) / 100;
+}
+
+/** The threshold the object starts with when it is chosen: half way to where the picture's colours split from the background's, a little off it at least. */
+export function defaultObjectThreshold(picture: PreparedPicture) {
+  const { distance } = backgroundOf(picture);
+  const histogram = new Float64Array(256);
+  distance.forEach((value) => { histogram[Math.min(255, Math.round(value * 255))] += 1; });
+  let total = 0;
+  let sum = 0;
+  histogram.forEach((count, level) => {
+    total += count;
+    sum += count * level;
+  });
+  let below = 0;
+  let belowSum = 0;
+  let best = -1;
+  let split = 64;
+  for (let level = 0; level < 255; level += 1) {
+    below += histogram[level];
+    belowSum += histogram[level] * level;
+    const above = total - below;
+    if (below === 0 || above === 0) continue;
+    const spread = below * above * (belowSum / below - (sum - belowSum) / above) ** 2;
+    if (spread > best) {
+      best = spread;
+      split = level;
+    }
+  }
+  return Math.round(Math.min(0.3, Math.max(0.05, split / 255 / 2)) * 100) / 100;
+}
+
+/** Whether a picture has colour in it: more than a few of its pixels clearly coloured, not grey. */
+function isColourful(pixels: RasterPixels) {
+  const { data } = pixels;
+  let coloured = 0;
+  let counted = 0;
+  for (let index = 0; index < data.length; index += 4) {
+    if (data[index + 3] < 128) continue;
+    counted += 1;
+    if (Math.max(data[index], data[index + 1], data[index + 2]) - Math.min(data[index], data[index + 1], data[index + 2]) > 60) coloured += 1;
+  }
+  return counted > 0 && coloured / counted > 0.04;
+}
+
+/** The pixels along the picture's edge, by index. */
+function borderPixels(width: number, height: number) {
+  const edge: number[] = [];
+  for (let x = 0; x < width; x += 1) {
+    edge.push(x);
+    if (height > 1) edge.push((height - 1) * width + x);
+  }
+  for (let y = 1; y < height - 1; y += 1) {
+    edge.push(y * width);
+    if (width > 1) edge.push(y * width + width - 1);
+  }
+  return edge;
+}
+
+const median = (values: number[]) => {
+  const sorted = values.slice().sort((a, b) => a - b);
+  return sorted.length ? sorted[Math.floor(sorted.length / 2)] : 255;
+};
+
+/** Whether the picture's edge is mostly of one colour, a background to tell an object from. */
+function hasEvenBorder(pixels: RasterPixels) {
+  const { colour } = backgroundColour(pixels);
+  const edge = borderPixels(pixels.width, pixels.height);
+  const even = edge.filter((index) => colourDistance(pixels.data, index, colour) < 0.1).length;
+  return edge.length > 0 && even / edge.length > 0.6;
+}
+
+/** How far a pixel's colour lies from a colour, 0 to 1; a see-through pixel lies on the background. */
+function colourDistance(data: RasterPixels["data"], index: number, colour: readonly number[]) {
+  const offset = index * 4;
+  const opacity = data[offset + 3] / 255;
+  const apart = Math.hypot(data[offset] - colour[0], data[offset + 1] - colour[1], data[offset + 2] - colour[2]) / MAX_COLOUR_DISTANCE;
+  return apart * opacity;
+}
+
+/** The background's colour: the middle of the colours along the picture's edge, channel by channel. */
+function backgroundColour(pixels: RasterPixels): { colour: [number, number, number] } {
+  const edge = borderPixels(pixels.width, pixels.height).filter((index) => pixels.data[index * 4 + 3] >= 128);
+  const channel = (offset: number) => median(edge.map((index) => pixels.data[index * 4 + offset]));
+  return { colour: [channel(0), channel(1), channel(2)] };
+}
+
+/** The background of a prepared picture and every pixel's distance from it, worked out once. */
+function backgroundOf(picture: PreparedPicture) {
+  if (picture.background) return picture.background;
+  const { width, height, data } = picture.pixels;
+  const { colour } = backgroundColour(picture.pixels);
+  const distance = new Float32Array(width * height);
+  for (let index = 0; index < width * height; index += 1) distance[index] = colourDistance(data, index, colour);
+  picture.background = { colour, distance };
+  return picture.background;
+}
+
+/**
+ * The object's fields, on the padded grid the outline is found on: the background is what is close to
+ * the background's colour and joined to the picture's edge (filled from it); all else is the object,
+ * a white patch inside it too. The second field finds the holes: the patches close to the background's
+ * colour that the object encloses, high where they are, so its empty border is no hole. Both are cut
+ * at a half: a distance is scaled so the threshold is a half and twice it the whole, which puts a hard
+ * edge's line where the edge is rather than a pixel out.
+ */
+function objectFields(picture: PreparedPicture, threshold: number) {
+  const { width, height } = picture.pixels;
+  const { distance } = backgroundOf(picture);
+  const outside = new Uint8Array(width * height);
+  const stack: number[] = [];
+  for (const index of borderPixels(width, height)) {
+    if (!outside[index] && distance[index] < threshold) {
+      outside[index] = 1;
+      stack.push(index);
+    }
+  }
+  while (stack.length) {
+    const index = stack.pop()!;
+    const x = index % width;
+    const y = (index - x) / width;
+    for (const next of [x > 0 ? index - 1 : -1, x < width - 1 ? index + 1 : -1, y > 0 ? index - width : -1, y < height - 1 ? index + width : -1]) {
+      if (next >= 0 && !outside[next] && distance[next] < threshold) {
+        outside[next] = 1;
+        stack.push(next);
+      }
+    }
+  }
+  const gridWidth = width + 2;
+  const object = new Float32Array(gridWidth * (height + 2));
+  const holes = new Float32Array(gridWidth * (height + 2));
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const index = y * width + x;
+      const value = Math.min(1, distance[index] / (2 * threshold));
+      const cell = (y + 1) * gridWidth + x + 1;
+      object[cell] = outside[index] || distance[index] >= threshold ? value : 1;
+      holes[cell] = outside[index] ? 0 : 1 - value;
+    }
+  }
+  return { object: softened(object, gridWidth, height + 2), holes: softened(holes, gridWidth, height + 2) };
 }
 
 /** Specks left out to start: a few pixels of the traced picture, or a hundred-thousandth of its area. */
@@ -226,15 +411,12 @@ export function defaultSpeck(picture: PreparedPicture) {
   return Math.max(4, width * height * 2e-5) * picture.scaleX * picture.scaleY;
 }
 
-/** The outlines for a part and a threshold, walked in even steps, with how deeply each lies inside the others. */
-function contoursFor(picture: PreparedPicture, part: RasterPart, threshold: number): Contour[] {
-  const level = Math.min(0.98, Math.max(0.02, threshold));
-  const key = `${part}:${level.toFixed(3)}`;
-  const known = picture.contours.get(key);
-  if (known) return known;
-  const { width, height } = picture.pixels;
-  const field = picture.fields[part] ?? (picture.fields[part] = shapeField(picture.pixels, part));
-  const rings = fieldRings(field, width + 2, height + 2, level).filter((ring) => ring.length >= 3);
+/**
+ * Closed lines as contours, walked in even steps: how deeply each lies inside the others decides what it
+ * is (`source`), and its key names it by where it lies, so a hole keeps its key while the threshold moves
+ * it a little. `offset` is added to the depth (the object's holes lie in it).
+ */
+function contoursFromRings(rings: TracePoint[][], sourceAt: (depth: number) => TraceSource, offset = 0): Contour[] {
   const areas = rings.map((ring) => ringArea(ring));
   const boxes = rings.map((ring) => {
     let minX = Number.POSITIVE_INFINITY;
@@ -249,7 +431,8 @@ function contoursFor(picture: PreparedPicture, part: RasterPart, threshold: numb
     });
     return { minX, minY, maxX, maxY };
   });
-  const contours = rings.map((ring, index): Contour => {
+  const keys = new Set<string>();
+  return rings.map((ring, index): Contour => {
     // How many larger outlines this one lies in: even for an outline, odd for a hole.
     const probe = ring[0];
     let depth = 0;
@@ -259,19 +442,142 @@ function contoursFor(picture: PreparedPicture, part: RasterPart, threshold: numb
       if (probe.x < box.minX || probe.x > box.maxX || probe.y < box.minY || probe.y > box.maxY) return;
       if (inside(probe, other)) depth += 1;
     });
+    const box = boxes[index];
+    const centre = { x: (box.minX + box.maxX) / 2, y: (box.minY + box.maxY) / 2 };
+    const source = sourceAt(depth);
+    let key = `${source === "hole" ? "h" : "o"}:${Math.round(centre.x / 6)}:${Math.round(centre.y / 6)}`;
+    for (let count = 2; keys.has(key); count += 1) key = `${key.split("#")[0]}#${count}`;
+    keys.add(key);
     // Steps of a pixel, but at least 16 round a small outline.
     const step = Math.min(1, perimeter(ring) / 16);
-    return { samples: resampled(ring, step), area: areas[index], depth };
+    return { samples: resampled(ring, step), area: areas[index], depth: depth + offset, key, source, centre };
   });
-  picture.contours.set(key, contours);
-  return contours;
 }
 
-/** The outlines the settings keep: no specks, and only the outermost ones without holes. */
+/** The outlines for a part and a threshold; for the object, its outlines and, apart, its holes. */
+function contoursFor(picture: PreparedPicture, part: TracePart, threshold: number): { outlines: Contour[]; holes: Contour[] } {
+  const level = Math.min(0.98, Math.max(0.02, threshold));
+  const key = `${part}:${level.toFixed(3)}`;
+  const known = picture.contours.get(key);
+  const knownHoles = picture.contours.get(`${key}:holes`);
+  if (known && knownHoles) return { outlines: known, holes: knownHoles };
+  const { width, height } = picture.pixels;
+  let outlines: Contour[];
+  let holes: Contour[] = [];
+  if (part === "object") {
+    const fields = objectFields(picture, level);
+    outlines = contoursFromRings(fieldRings(fields.object, width + 2, height + 2, 0.5).filter((ring) => ring.length >= 3), () => "outline");
+    // The holes' own lines: an outline round a patch of background, or (inside it) round an island of the object again.
+    holes = contoursFromRings(fieldRings(fields.holes, width + 2, height + 2, 0.5).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 0 ? "hole" : "outline"), 1);
+  } else {
+    const field = picture.fields[part] ?? (picture.fields[part] = shapeField(picture.pixels, part));
+    const all = contoursFromRings(fieldRings(field, width + 2, height + 2, level).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 1 ? "hole" : "outline"));
+    outlines = all.filter((contour) => contour.depth === 0);
+    holes = all.filter((contour) => contour.depth > 0);
+  }
+  picture.contours.set(key, outlines);
+  picture.contours.set(`${key}:holes`, holes);
+  return { outlines, holes };
+}
+
+/**
+ * A clicked area as a contour: the patch of pixels round the spot whose colour lies within `tolerance`
+ * of the spot's (its 3 x 3 pixels' middle), joined side by side, its outer line only - a window with a
+ * dot of other colour in it is the whole window. Null when the patch reaches the picture's edge: that is
+ * the background, not an area of the object.
+ */
+function areaContour(picture: PreparedPicture, area: TraceArea, tolerance: number): Contour | null {
+  const cacheKey = `${area.id}:${area.x}:${area.y}:${tolerance.toFixed(3)}`;
+  if (picture.areas.has(cacheKey)) return picture.areas.get(cacheKey)!;
+  const { width, height, data } = picture.pixels;
+  const seedX = Math.floor(area.x / picture.scaleX);
+  const seedY = Math.floor(area.y / picture.scaleY);
+  let contour: Contour | null = null;
+  if (seedX >= 0 && seedY >= 0 && seedX < width && seedY < height) {
+    const colour = [0, 0, 0];
+    let counted = 0;
+    for (let y = Math.max(0, seedY - 1); y <= Math.min(height - 1, seedY + 1); y += 1) {
+      for (let x = Math.max(0, seedX - 1); x <= Math.min(width - 1, seedX + 1); x += 1) {
+        const offset = (y * width + x) * 4;
+        colour[0] += data[offset];
+        colour[1] += data[offset + 1];
+        colour[2] += data[offset + 2];
+        counted += 1;
+      }
+    }
+    for (let channel = 0; channel < 3; channel += 1) colour[channel] /= counted;
+    const inArea = new Uint8Array(width * height);
+    const stack = [seedY * width + seedX];
+    inArea[stack[0]] = 1;
+    let atEdge = false;
+    while (stack.length) {
+      const index = stack.pop()!;
+      const x = index % width;
+      const y = (index - x) / width;
+      if (x === 0 || y === 0 || x === width - 1 || y === height - 1) atEdge = true;
+      for (const next of [x > 0 ? index - 1 : -1, x < width - 1 ? index + 1 : -1, y > 0 ? index - width : -1, y < height - 1 ? index + width : -1]) {
+        if (next >= 0 && !inArea[next] && data[next * 4 + 3] >= 128 && colourDistance(data, next, colour) <= tolerance) {
+          inArea[next] = 1;
+          stack.push(next);
+        }
+      }
+    }
+    if (!atEdge) {
+      const gridWidth = width + 2;
+      const field = new Float32Array(gridWidth * (height + 2));
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) if (inArea[y * width + x]) field[(y + 1) * gridWidth + x + 1] = 1;
+      }
+      const rings = fieldRings(softened(field, gridWidth, height + 2), gridWidth, height + 2, 0.5).filter((ring) => ring.length >= 3);
+      const outer = contoursFromRings(rings, () => "area").filter((entry) => entry.depth === 0).sort((a, b) => b.area - a.area)[0];
+      if (outer) contour = { ...outer, depth: 1, key: `a:${area.id}`, source: "area" };
+    }
+  }
+  picture.areas.set(cacheKey, contour);
+  return contour;
+}
+
+/**
+ * The outlines the settings keep: no specks; holes only with holes on; the clicked areas, each in place
+ * of a hole that is the same patch; nothing that was taken out of the list. An island in a hole goes
+ * with its hole: out of the list with it, a construction line with it. Also which keys are drawn as
+ * lines, and which areas were not taken.
+ */
 function keptContours(picture: PreparedPicture, settings: Omit<PictureTraceSettings, "points">) {
   const speck = settings.speck / (picture.scaleX * picture.scaleY);
-  return contoursFor(picture, settings.part, settings.threshold).filter((contour) =>
-    contour.samples.length >= 3 && contour.area >= speck && (settings.holes || contour.depth === 0));
+  const removed = new Set(settings.removed ?? []);
+  const { outlines, holes } = contoursFor(picture, settings.part, settings.threshold);
+  const rejected: string[] = [];
+  const areas: Contour[] = [];
+  for (const area of settings.areas ?? []) {
+    const contour = areaContour(picture, area, settings.areaTolerance ?? DEFAULT_TRACE_AREA_TOLERANCE);
+    if (contour) areas.push(contour);
+    else rejected.push(area.id);
+  }
+  const big = (contour: Contour) => contour.samples.length >= 3 && contour.area >= speck;
+  // A hole that is the patch an area was clicked in gives way to the area: the two would cancel out.
+  const sameAsArea = (hole: Contour) => areas.some((area) => Math.abs(area.area - hole.area) <= 0.3 * Math.max(area.area, hole.area) && inside(hole.centre, area.samples));
+  const candidates = [
+    ...outlines.filter(big),
+    ...(settings.holes ? holes.filter((hole) => big(hole) && !sameAsArea(hole)) : []),
+    ...areas,
+  ];
+  const lines = new Set(settings.lines ?? []);
+  // An island's hole: the smallest one a level up that it lies in.
+  const holeOf = (island: Contour) => candidates
+    .filter((hole) => hole.source !== "outline" && hole.depth === island.depth - 1 && hole.area > island.area && inside(island.centre, hole.samples))
+    .sort((a, b) => a.area - b.area)[0];
+  const kept: Contour[] = [];
+  for (const contour of candidates) {
+    if (removed.has(contour.key)) continue;
+    if (contour.source === "outline" && contour.depth >= 2) {
+      const hole = holeOf(contour);
+      if (hole && removed.has(hole.key)) continue;
+      if (hole && lines.has(hole.key)) lines.add(contour.key);
+    }
+    kept.push(contour);
+  }
+  return { contours: kept, rejected, lines };
 }
 
 /**
@@ -554,7 +860,7 @@ function ringNodes(pieces: readonly Piece[], picture: PreparedPicture): TraceNod
   });
 }
 
-type Fit = { rings: Array<{ pieces: Piece[]; hole: boolean }>; points: number; corners: number };
+type Fit = { rings: Array<{ pieces: Piece[]; hole: boolean; key: string; source: TraceSource }>; points: number; corners: number };
 
 function fitAll(contours: readonly Contour[], corners: readonly number[][], tolerance: number): Fit {
   let points = 0;
@@ -563,15 +869,15 @@ function fitAll(contours: readonly Contour[], corners: readonly number[][], tole
     const pieces = ringPieces(contour.samples, corners[index], tolerance);
     points += pieces.length;
     cornerCount += pieces.filter((piece) => piece.cornerAtStart).length;
-    return { pieces, hole: contour.depth % 2 === 1 };
+    return { pieces, hole: contour.depth % 2 === 1, key: contour.key, source: contour.source };
   });
   return { rings, points, corners: cornerCount };
 }
 
-/** The outlines a set of settings keeps, with their corners. */
+/** The outlines a set of settings keeps, with their corners, and the areas not taken. */
 function keptWithCorners(picture: PreparedPicture, settings: Omit<PictureTraceSettings, "points">) {
-  const contours = keptContours(picture, settings);
-  return { contours, corners: contours.map((contour) => cornerIndexes(contour.samples, settings.cornerAngle)) };
+  const { contours, rejected, lines } = keptContours(picture, settings);
+  return { contours, rejected, lines, corners: contours.map((contour) => cornerIndexes(contour.samples, settings.cornerAngle)) };
 }
 
 /** How many points the outlines can have with these settings: fewest at the loosest fit, most at the closest. */
@@ -590,8 +896,8 @@ export function traceRange(picture: PreparedPicture, settings: Omit<PictureTrace
  * more (the corners always stay). No outlines when the settings leave nothing.
  */
 export function tracePicture(picture: PreparedPicture, settings: PictureTraceSettings): PictureTrace {
-  const { contours, corners } = keptWithCorners(picture, settings);
-  if (!contours.length) return { rings: [], points: 0, corners: 0 };
+  const { contours, corners, rejected, lines } = keptWithCorners(picture, settings);
+  if (!contours.length) return { rings: [], points: 0, corners: 0, ...(rejected.length ? { rejected } : {}) };
   let best = fitAll(contours, corners, FINEST_TOLERANCE);
   if (best.points > settings.points) {
     let close = Math.log(FINEST_TOLERANCE);
@@ -610,9 +916,16 @@ export function tracePicture(picture: PreparedPicture, settings: PictureTraceSet
     }
   }
   return {
-    rings: best.rings.map((ring) => ({ nodes: ringNodes(ring.pieces, picture), hole: ring.hole })),
+    rings: best.rings.map((ring) => ({
+      nodes: ringNodes(ring.pieces, picture),
+      hole: ring.hole,
+      key: ring.key,
+      source: ring.source,
+      ...(lines.has(ring.key) ? { line: true } : {}),
+    })),
     points: best.points,
     corners: best.corners,
+    ...(rejected.length ? { rejected } : {}),
   };
 }
 

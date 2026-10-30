@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  DEFAULT_TRACE_AREA_TOLERANCE,
   defaultTraceSettings,
   MAX_TRACE_CORNER_ANGLE,
   preparePicture,
@@ -211,5 +212,88 @@ describe("tracing a picture into points (Trace)", () => {
     const { prepared, settings } = settingsFor(square);
     expect(tracePicture(prepared, { ...settings, speck: 1e6 })).toEqual({ rings: [], points: 0, corners: 0 });
     expect(traceRange(prepared, { ...settings, speck: 1e6 })).toEqual({ fewest: 0, most: 0, suggested: 0 });
+  });
+
+  describe("the object before its background, and areas clicked in it", () => {
+    const RED: [number, number, number, number] = [210, 30, 40, 255];
+    const BLUE: [number, number, number, number] = [150, 200, 240, 255];
+    /** A red toy on white: a body with a white logo (a patch the colour of the background) and a pale blue window. */
+    const toy = picture(140, 100, (x, y) => {
+      if (x < 20 || x >= 120 || y < 20 || y >= 80) return WHITE;
+      if (x >= 35 && x < 55 && y >= 35 && y < 55) return WHITE;
+      if (x >= 80 && x < 105 && y >= 30 && y < 50) return BLUE;
+      return RED;
+    });
+
+    it("starts a colourful picture on an even background as the object, without holes", () => {
+      const { prepared, settings } = settingsFor(toy);
+      expect(settings.part).toBe("object");
+      expect(settings.holes).toBe(false);
+      expect(settings.areas).toEqual([]);
+      const trace = tracePicture(prepared, settings);
+      expect(trace.rings).toHaveLength(1);
+      expect(trace.rings[0]).toMatchObject({ source: "outline", hole: false });
+      // The white logo is part of the object: one outline round the whole body.
+      expect(area(outlinePoints(trace.rings[0].nodes))).toBeCloseTo(100 * 60, -2);
+    });
+
+    it("finds the patches of background colour inside the object as holes, each by a key of its own", () => {
+      const { prepared, settings } = settingsFor(toy, { holes: true });
+      const trace = tracePicture(prepared, settings);
+      const holes = trace.rings.filter((ring) => ring.source === "hole");
+      expect(holes).toHaveLength(1);
+      expect(holes[0].hole).toBe(true);
+      expect(area(outlinePoints(holes[0].nodes))).toBeCloseTo(20 * 20, -1.5);
+      // Taken out of the list, it is gone; the outline stays.
+      const without = tracePicture(prepared, { ...settings, removed: [holes[0].key] });
+      expect(without.rings.map((ring) => ring.source)).toEqual(["outline"]);
+      // The key survives a small change of the threshold.
+      const moved = tracePicture(prepared, { ...settings, threshold: settings.threshold + 0.03 });
+      expect(moved.rings.find((ring) => ring.source === "hole")?.key).toBe(holes[0].key);
+    });
+
+    it("outlines a clicked area as a hole, or as a construction line when it is not cut out", () => {
+      const { prepared, settings } = settingsFor(toy);
+      const clicked = { ...settings, areas: [{ id: "window", x: 92, y: 40 }] };
+      const trace = tracePicture(prepared, clicked);
+      const window = trace.rings.find((ring) => ring.source === "area");
+      expect(window).toMatchObject({ key: "a:window", hole: true });
+      expect(window?.line).toBeUndefined();
+      expect(area(outlinePoints(window!.nodes))).toBeCloseTo(25 * 20, -1.5);
+      expect(tracePicture(prepared, { ...clicked, lines: ["a:window"] }).rings.find((ring) => ring.source === "area")?.line).toBe(true);
+      // A tolerance too small for the window's own colour still takes the window: its colour is even.
+      expect(tracePicture(prepared, { ...clicked, areaTolerance: 0.01 }).rings.some((ring) => ring.key === "a:window")).toBe(true);
+      expect(DEFAULT_TRACE_AREA_TOLERANCE).toBeGreaterThan(0);
+    });
+
+    it("refuses an area that reaches the picture's edge: that is the background", () => {
+      const { prepared, settings } = settingsFor(toy);
+      const trace = tracePicture(prepared, { ...settings, areas: [{ id: "wall", x: 5, y: 5 }, { id: "out", x: 500, y: 5 }] });
+      expect(trace.rejected?.sort()).toEqual(["out", "wall"]);
+      expect(trace.rings.some((ring) => ring.source === "area")).toBe(false);
+    });
+
+    it("takes an area in place of the hole that is the same patch, so the two do not cancel out", () => {
+      const { prepared, settings } = settingsFor(toy, { holes: true });
+      const trace = tracePicture(prepared, { ...settings, areas: [{ id: "logo", x: 45, y: 45 }] });
+      expect(trace.rings.filter((ring) => ring.source !== "outline").map((ring) => ring.key)).toEqual(["a:logo"]);
+    });
+
+    it("lets an island in a hole go with its hole: out of the list, or a construction line with it", () => {
+      // A black square with a white hole and a black dot in the hole.
+      const islandPicture = picture(80, 80, (x, y) => {
+        const inSquare = x >= 10 && x < 70 && y >= 10 && y < 70;
+        const inHole = x >= 25 && x < 55 && y >= 25 && y < 55;
+        const inDot = x >= 35 && x < 45 && y >= 35 && y < 45;
+        return inSquare && (!inHole || inDot) ? BLACK : WHITE;
+      });
+      const { prepared, settings } = settingsFor(islandPicture);
+      const trace = tracePicture(prepared, settings);
+      expect(trace.rings).toHaveLength(3);
+      const hole = trace.rings.find((ring) => ring.source === "hole")!;
+      expect(tracePicture(prepared, { ...settings, removed: [hole.key] }).rings).toHaveLength(1);
+      const lined = tracePicture(prepared, { ...settings, lines: [hole.key] });
+      expect(lined.rings.filter((ring) => ring.line)).toHaveLength(2);
+    });
   });
 });

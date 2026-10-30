@@ -363,3 +363,73 @@ html[data-theme="dark"] .sketch-turn-ring {
 .sketch-trace-preview rect.corner {
   stroke: #e5484d;
 }
+
+/* Holes and areas over the outlines: a construction line dashed, the one pointed at in the list stronger. */
+.sketch-trace-preview path.ring {
+  fill: none;
+  stroke: #e5484d;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.sketch-trace-preview path.ring.area {
+  stroke: #1f8a4c;
+}
+
+.sketch-trace-preview path.ring.line {
+  stroke-dasharray: 5 4;
+}
+
+.sketch-trace-preview path.ring.highlight {
+  stroke: #f08a00;
+  stroke-width: 3.4;
+}
+
+.sketch-reference-images image.trace-picking {
+  cursor: crosshair;
+}
+
+.sketch-trace-parts .shell-opening-options {
+  flex-wrap: wrap;
+}
+
+.sketch-trace-list {
+  display: grid;
+  gap: 6px;
+}
+
+.sketch-trace-list-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sketch-trace-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.sketch-trace-list li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px 3px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.sketch-trace-list li.highlight {
+  background: rgba(240, 138, 0, 0.14);
+}
+
+.sketch-trace-item-cut {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}

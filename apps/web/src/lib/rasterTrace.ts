@@ -110,7 +110,7 @@ export function shapeField(pixels: RasterPixels, part: RasterPart) {
 }
 
 /** The field blurred by a 3x3 weighting (1 2 1), which rounds off the steps of hard pixel edges. */
-function softened(field: Float32Array, width: number, height: number) {
+export function softened(field: Float32Array, width: number, height: number) {
   const across = new Float32Array(field.length);
   for (let y = 0; y < height; y += 1) {
     for (let x = 1; x < width - 1; x += 1) {

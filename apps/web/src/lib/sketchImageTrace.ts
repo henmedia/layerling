@@ -1,4 +1,4 @@
-import { imageToWorld } from "@/lib/sketchImageTransform";
+import { imageToLocal, imageToWorld } from "@/lib/sketchImageTransform";
 import type { PictureTrace, TracePoint } from "@/lib/pictureTrace";
 import type { RasterPixels } from "@/lib/rasterTrace";
 import type { SketchImage, SketchPoint, SketchSegment } from "@/types/layerling";
@@ -37,6 +37,15 @@ export function tracedPointOnPlane(image: SketchImage, size: TracedSize, point: 
   });
 }
 
+/** Where a spot on the sketch plane lies in the pixels of the traced part: the other way round from tracedPointOnPlane. */
+export function planePointToTraced(image: SketchImage, size: TracedSize, point: { x: number; z: number }): TracePoint {
+  const local = imageToLocal(image, point);
+  return {
+    x: (local.x / Math.max(1e-9, image.width) + 0.5) * size.width,
+    y: (local.z / Math.max(1e-9, image.depth) + 0.5) * size.height,
+  };
+}
+
 /** How many mm one pixel of the traced part spans on the plate, across and down. */
 export function tracedPixelSize(image: SketchImage, size: TracedSize) {
   return { x: image.width / Math.max(1, size.width), z: image.depth / Math.max(1, size.height) };
@@ -62,13 +71,14 @@ export function tracePreviewPath(trace: Pick<PictureTrace, "rings">, image: Sket
 /**
  * The traced outlines as sketch points and sides, on the picture: a corner without handles is a plain
  * point, a corner between curves keeps its two handles apart, and a point where the outline runs on
- * smoothly is a smooth point. Each outline is closed; a hole is simply an outline inside another.
+ * smoothly is a smooth point. Each outline is closed; a hole is simply an outline inside another, and
+ * one marked as a line is drawn as a construction line, there but not cut.
  */
 export function sketchGeometryFromTrace(trace: Pick<PictureTrace, "rings">, image: SketchImage, size: TracedSize, createId: (prefix: string) => string) {
   const points: SketchPoint[] = [];
   const segments: SketchSegment[] = [];
   const on = (point: TracePoint) => tracedPointOnPlane(image, size, point);
-  trace.rings.forEach(({ nodes }) => {
+  trace.rings.forEach(({ nodes, line }) => {
     const ids = nodes.map(() => createId("sketch-point"));
     nodes.forEach((node, index) => {
       const point: SketchPoint = { id: ids[index], ...on(node) };
@@ -78,7 +88,13 @@ export function sketchGeometryFromTrace(trace: Pick<PictureTrace, "rings">, imag
       else if (node.handleIn || node.handleOut) point.mode = "split";
       points.push(point);
       const next = nodes[(index + 1) % nodes.length];
-      segments.push({ id: createId("sketch-segment"), startId: ids[index], endId: ids[(index + 1) % nodes.length], kind: node.handleOut && next.handleIn ? "bezier" : "line" });
+      segments.push({
+        id: createId("sketch-segment"),
+        startId: ids[index],
+        endId: ids[(index + 1) % nodes.length],
+        kind: node.handleOut && next.handleIn ? "bezier" : "line",
+        ...(line ? { construction: true } : {}),
+      });
     });
   });
   return { points, segments };

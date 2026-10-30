@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { croppedPixels, sketchGeometryFromTrace, tracedPixelSize, tracedPointOnPlane, tracePreviewPath } from "@/lib/sketchImageTrace";
+import { croppedPixels, planePointToTraced, sketchGeometryFromTrace, tracedPixelSize, tracedPointOnPlane, tracePreviewPath } from "@/lib/sketchImageTrace";
 import type { TraceRing } from "@/lib/pictureTrace";
 import type { SketchImage } from "@/types/layerling";
 
@@ -10,6 +10,8 @@ function image(patch: Partial<SketchImage> = {}): SketchImage {
 /** A square with a straight side, a curved side and a corner between curves, in the traced part's pixels. */
 const ring: TraceRing = {
   hole: false,
+  key: "o:17:8",
+  source: "outline",
   nodes: [
     { x: 0, y: 0, corner: true },
     { x: 200, y: 0, corner: true, handleOut: { x: 220, y: 30 } },
@@ -42,6 +44,18 @@ describe("tracing the sketch's reference image", () => {
     expect(turned.x).toBeCloseTo(10, 6);
     expect(turned.z).toBeCloseTo(-25, 6);
     expect(tracedPixelSize(flat, size)).toEqual({ x: 0.2, z: 0.2 });
+    // And back: a spot on the plate in the picture's pixels, for a click on it.
+    const back = planePointToTraced(image({ rotation: 90 }), size, turned);
+    expect(back.x).toBeCloseTo(200, 6);
+    expect(back.y).toBeCloseTo(50, 6);
+  });
+
+  it("draws a ring marked as a line as construction lines, there but not cut", () => {
+    let next = 0;
+    const { segments } = sketchGeometryFromTrace({ rings: [{ ...ring, source: "area", hole: true, line: true }] }, image(), { width: 200, height: 100 }, (prefix) => `${prefix}-${(next += 1)}`);
+    expect(segments.every((segment) => segment.construction)).toBe(true);
+    const cut = sketchGeometryFromTrace({ rings: [ring] }, image(), { width: 200, height: 100 }, (prefix) => `${prefix}-${(next += 1)}`);
+    expect(cut.segments.some((segment) => segment.construction)).toBe(false);
   });
 
   it("makes sketch points of the outline: plain corners, split corners between curves, smooth points", () => {

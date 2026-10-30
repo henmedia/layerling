@@ -8555,6 +8555,23 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-turn-ring {
   stroke: #e5484d;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.ring {
+  fill: none;
+  stroke: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.ring.area {
+  stroke: #1f8a4c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.ring.highlight {
+  stroke: #f08a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-list li.highlight {
+  background: rgba(240, 138, 0, 0.14);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-plate {
   --locked-handle-ink: #898989;
   --locked-handle-fill: #dfdfdf;

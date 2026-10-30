@@ -39,8 +39,8 @@ import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } f
 import { changesLockedOutline, sketchLockState } from "@/lib/sketchLock";
 import { dragRotationDegrees, rotateSketchPointsAbout, sketchPointsPivot, sketchTurnRing, sketchTurnStep, SKETCH_TURN_RING_STEP } from "@/lib/sketchRotation";
 import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, uncropImage } from "@/lib/sketchImageTransform";
-import { MAX_TRACE_CORNER_ANGLE, MIN_TRACE_CORNER_ANGLE, type PictureTrace } from "@/lib/pictureTrace";
-import { tracedPixelSize, tracedPointOnPlane, tracePreviewPath, type TracedSize } from "@/lib/sketchImageTrace";
+import { MAX_TRACE_CORNER_ANGLE, MIN_TRACE_CORNER_ANGLE, type PictureTrace, type TracePart } from "@/lib/pictureTrace";
+import { planePointToTraced, tracedPixelSize, tracedPointOnPlane, tracePreviewPath, type TracedSize } from "@/lib/sketchImageTrace";
 import { useSketchImageTrace, type SketchImageTraceState } from "@/lib/useSketchImageTrace";
 import { DEFAULT_SKETCH_STROKE, SKETCH_STROKE_ALIGNS, SKETCH_STROKE_CAPS, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { selectWholeValue } from "@/lib/numberField";
@@ -2240,7 +2240,7 @@ export function SketchWorkspace({
               >
               <image
                 data-sketch-entity={image.locked ? undefined : "image"}
-                className={image.locked ? "locked" : calibration?.imageId === image.id ? "calibrating" : undefined}
+                className={tracing && imageTrace.picking && image.id === traceImageId ? "trace-picking" : image.locked ? "locked" : calibration?.imageId === image.id ? "calibrating" : undefined}
                 aria-label={image.name}
                 href={image.dataUrl}
                 x={0}
@@ -2249,8 +2249,16 @@ export function SketchWorkspace({
                 height={Math.max(1, image.pixelHeight)}
                 opacity={image.opacity ?? 0.55}
                 preserveAspectRatio="none"
-                pointerEvents={tool === "select" ? "auto" : "none"}
+                pointerEvents={tool === "select" || (tracing && imageTrace.picking) ? "auto" : "none"}
                 onPointerDown={(event) => {
+                  // Trace's Pick areas: a click on the picture adds the area of like colour there.
+                  if (tracing && imageTrace.picking && image.id === traceImageId && imageTrace.size && event.button === 0) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const spot = unsnappedPointFromEvent(event);
+                    if (spot) imageTrace.addArea(planePointToTraced(image, imageTrace.size, spot));
+                    return;
+                  }
                   // Calibrating (#216): the next two clicks on the picture mark the distance to type.
                   if (calibration && calibration.imageId === image.id && event.button === 0 && tool === "select") {
                     event.preventDefault();
@@ -2291,7 +2299,14 @@ export function SketchWorkspace({
           {tracing && selectedImage && imageTrace.trace && imageTrace.size ? (
             // Trace: the outlines the settings give, over the picture, with their points - corners square, smooth points round.
             <g className="sketch-trace-preview" pointerEvents="none">
-              <path d={tracePreviewPath(imageTrace.trace, selectedImage, imageTrace.size)} fillRule="evenodd" />
+              <path d={tracePreviewPath({ rings: imageTrace.trace.rings.filter((ring) => !ring.line) }, selectedImage, imageTrace.size)} fillRule="evenodd" />
+              {imageTrace.trace.rings.map((ring) => ring.source === "outline" && ring.key !== imageTrace.highlight ? null : (
+                <path
+                  key={ring.key}
+                  className={`ring ${ring.source}${ring.line ? " line" : ""}${ring.key === imageTrace.highlight ? " highlight" : ""}`}
+                  d={tracePreviewPath({ rings: [ring] }, selectedImage, imageTrace.size!)}
+                />
+              ))}
               {imageTrace.trace.rings.flatMap((ring, ringIndex) => ring.nodes.map((node, nodeIndex) => {
                 const spot = tracedPointOnPlane(selectedImage, imageTrace.size!, node);
                 const size = 1.7 * screenUnit;
@@ -3513,11 +3528,16 @@ function SketchImageInspector({
   );
 }
 
+const TRACE_PARTS: readonly TracePart[] = ["dark", "light", "object"];
+const TRACE_PART_LABELS: Record<TracePart, "sketch.traceDark" | "sketch.traceLight" | "sketch.traceObject"> = { dark: "sketch.traceDark", light: "sketch.traceLight", object: "sketch.traceObject" };
+
 /**
  * Trace (Nachzeichnen): the button that starts it and, while it is on, its settings - which part of the
- * picture is the shape, where dark turns light, how many points, from what turn a point is a corner, how
- * small a speck is left out and whether holes stay. The outlines show over the picture as the settings
- * change; Apply makes them sketch points.
+ * picture is the shape (dark, light, or the object before its background), the threshold, how many
+ * points, from what turn a point is a corner, how small a speck is left out, whether holes stay - and
+ * Pick areas, with the list of holes and areas: each can be taken out (✕) or, with cut out off, drawn
+ * as a construction line. The outlines show over the picture as the settings change; Apply makes them
+ * sketch points.
  */
 function SketchImageTraceCard({
   image,
@@ -3548,6 +3568,16 @@ function SketchImageTraceCard({
   const speckSide = settings && pixel ? Math.sqrt(settings.speck * pixel.x * pixel.z) : 0;
   const maxSpeckSide = Math.max(0.5, Math.min(image.width, image.depth) / 10);
   const outlines = trace.trace?.rings.length ?? 0;
+  // The list: the holes in the order they come, then the clicked areas in the order they were clicked.
+  const rings = trace.trace?.rings ?? [];
+  const holes = rings.filter((ring) => ring.source === "hole");
+  const areaRings = new Map(rings.filter((ring) => ring.source === "area").map((ring) => [ring.key, ring]));
+  const areas = (settings?.areas ?? []).map((area) => areaRings.get(`a:${area.id}`)).filter((ring): ring is NonNullable<typeof ring> => Boolean(ring));
+  const listed = [
+    ...holes.map((ring, index) => ({ ring, name: t("sketch.traceHoleItem", { number: index + 1 }) })),
+    ...areas.map((ring, index) => ({ ring, name: t("sketch.traceAreaItem", { number: index + 1 }) })),
+  ];
+  const removedHoles = (settings?.removed ?? []).length;
   return (
     <div className="property-card sketch-image-trace-card">
       <div className="property-card-header static"><span>{t("sketch.traceImage")}</span></div>
@@ -3556,13 +3586,16 @@ function SketchImageTraceCard({
         {!settings && !trace.failed ? <p className="sketch-image-hint">{t("sketch.traceLoading")}</p> : null}
         {settings && range && pixel ? (
           <>
-            <div className="sketch-image-action-row">
-              <button className={`sketch-image-aspect-toggle ${settings.part === "dark" ? "active" : ""}`} type="button" aria-pressed={settings.part === "dark"} onClick={() => trace.change({ part: "dark" })}>
-                <span>{t("sketch.traceDark")}</span>
-              </button>
-              <button className={`sketch-image-aspect-toggle ${settings.part === "light" ? "active" : ""}`} type="button" aria-pressed={settings.part === "light"} onClick={() => trace.change({ part: "light" })}>
-                <span>{t("sketch.traceLight")}</span>
-              </button>
+            <div className="edge-modifier-field shell-openings sketch-trace-parts" role="radiogroup" aria-label={t("sketch.tracePart")}>
+              <span>{t("sketch.tracePart")}</span>
+              <div className="shell-opening-options">
+                {TRACE_PARTS.map((part) => (
+                  <button key={part} type="button" role="radio" aria-checked={settings.part === part} className={settings.part === part ? "active" : ""} onClick={() => trace.change({ part })}>
+                    {t(TRACE_PART_LABELS[part])}
+                  </button>
+                ))}
+              </div>
+              {settings.part === "object" ? <small className="sketch-stroke-note">{t("sketch.traceObjectHint")}</small> : null}
             </div>
             <SketchImageRange label={t("sketch.traceThreshold")} value={settings.threshold * 100} min={2} max={98} accuracy={1} whole suffix="%" onChange={(value) => trace.change({ threshold: value / 100 })} />
             <SketchImageRange label={t("sketch.tracePoints")} value={settings.points} min={range.fewest} max={Math.max(range.fewest, range.most)} accuracy={1} whole suffix="" disabled={range.most <= range.fewest} onChange={(points) => trace.change({ points })} />
@@ -3576,6 +3609,48 @@ function SketchImageTraceCard({
               {settings.holes ? <Check size={17} /> : <X size={17} />}
               <span>{t("sketch.traceHoles")}</span>
             </button>
+            <button className={`sketch-image-aspect-toggle ${trace.picking ? "active" : ""}`} type="button" aria-pressed={trace.picking} title={t("sketch.tracePickAreasHint")} onClick={() => trace.setPicking(!trace.picking)}>
+              <Crosshair size={17} />
+              <span>{t("sketch.tracePickAreas")}</span>
+            </button>
+            {trace.picking ? <p className="sketch-image-hint">{t("sketch.tracePickAreasHint")}</p> : null}
+            {trace.areaRejected ? <p className="sketch-image-hint">{t("sketch.traceAreaAtEdge")}</p> : null}
+            {trace.picking || areas.length ? (
+              <SketchImageRange label={t("sketch.traceAreaTolerance")} value={(settings.areaTolerance ?? 0.12) * 100} min={1} max={50} accuracy={1} whole suffix="%" onChange={(value) => trace.change({ areaTolerance: value / 100 })} />
+            ) : null}
+            {listed.length || removedHoles ? (
+              <div className="sketch-trace-list" role="group" aria-label={t("sketch.traceList")}>
+                <span className="sketch-trace-list-title">{t("sketch.traceList")}</span>
+                <ul>
+                  {listed.map(({ ring, name }) => {
+                    const cut = !ring.line;
+                    return (
+                      <li
+                        key={ring.key}
+                        className={ring.key === trace.highlight ? "highlight" : undefined}
+                        onPointerEnter={() => trace.setHighlight(ring.key)}
+                        onPointerLeave={() => trace.setHighlight(null)}
+                      >
+                        <span className="sketch-trace-item-name">{name}</span>
+                        <label className="sketch-trace-item-cut" title={t("sketch.traceCutHint")}>
+                          <input type="checkbox" checked={cut} onChange={(event) => trace.setCut(ring.key, event.currentTarget.checked)} />
+                          <span>{t("sketch.traceCut")}</span>
+                        </label>
+                        <button className="inspector-header-icon" type="button" aria-label={t("sketch.traceRemove", { name })} title={t("sketch.traceRemove", { name })} onClick={() => trace.remove(ring.key)}>
+                          <X size={15} />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <p className="sketch-image-hint">{t("sketch.traceCutHint")}</p>
+                {removedHoles ? (
+                  <button className="sketch-image-aspect-toggle" type="button" onClick={() => trace.restoreHoles()}>
+                    <span>{t("sketch.traceRestoreHoles", { count: removedHoles })}</span>
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
             <p className="sketch-image-hint">{t("sketch.traceHint")}</p>
           </>
         ) : null}
