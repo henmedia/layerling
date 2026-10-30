@@ -11,7 +11,8 @@ import { fieldRings, ringArea, shapeField, shrinkRaster, softened, type RasterPa
  * the light part, the shape can be the object: all that stands out from the picture's background, the
  * colour at its edge - a toy photographed on white comes out as one outline, whatever its colours.
  * Areas clicked in the picture (a window) are outlined too, as patches of like colour; every hole and
- * area has a key, so it can be left out or drawn as a construction line instead of cut.
+ * area has a key, so it can be left out or drawn as a construction line instead of cut. A part can be
+ * cut away whatever its colour - a polygon round a shadow under a toy - before the outline is found.
  *
  * The steps: the outline where the picture crosses the threshold (rasterTrace's marching squares, on
  * the picture softened a little, so a hard pixel edge gives a smooth line); the outline walked in even
@@ -32,8 +33,8 @@ export type TraceNode = TracePoint & {
   /** The handle of the side leaving here, when that side is curved. */
   handleOut?: TracePoint;
 };
-/** Where an outline comes from: the shape's own edge, a hole in it, or an area clicked in the picture. */
-export type TraceSource = "outline" | "hole" | "area";
+/** Where an outline comes from: the shape's own edge, a hole in it, an area clicked in the picture, or a part cut away inside the shape. */
+export type TraceSource = "outline" | "hole" | "area" | "cut";
 /**
  * A closed outline: each point joins the next, the last the first; a side is curved when both of its ends
  * have the handle facing it. `key` names it while the settings change (a hole by where it lies), `line`
@@ -45,6 +46,8 @@ export type TraceRing = { nodes: TraceNode[]; hole: boolean; key: string; source
 export type TracePart = RasterPart | "object";
 /** An area clicked in the picture: the patch of like colour round the spot, given in the picture's own pixels. */
 export type TraceArea = { id: string; x: number; y: number };
+/** A part cut away from the shape (Cut away): a closed polygon in the picture's own pixels, taken out whatever its colour. */
+export type TraceCut = { id: string; points: TracePoint[] };
 
 export type PictureTraceSettings = {
   /** The dark part (a black shape on white), the light one, or the object before its background. */
@@ -67,6 +70,8 @@ export type PictureTraceSettings = {
   removed?: string[];
   /** The keys of holes and areas drawn as construction lines instead of cut. */
   lines?: string[];
+  /** Parts cut away from the shape before its outline is found. */
+  cuts?: TraceCut[];
 };
 
 export type PictureTrace = {
@@ -221,6 +226,8 @@ export type PreparedPicture = {
   /** The background's colour (the colour at the picture's edge) and each pixel's distance from it, 0 to 1, once asked for. */
   background?: { colour: [number, number, number]; distance: Float32Array };
   areas: Map<string, Contour | null>;
+  /** How much of each pixel the cuts take, 0 to 1, for the cuts last asked for. */
+  cutCover?: { key: string; cover: Float32Array | null };
 };
 
 /** Gets a picture ready for tracing it several times over, as its settings change. */
@@ -242,7 +249,7 @@ export function preparePicture(source: RasterPixels): PreparedPicture {
  * The settings a picture is traced with to start: a colourful picture on an even background (a photo
  * of a toy on white) as the object, without holes; else the part that is not its background, with its
  * holes, cut where its two parts meet. Specks of a few pixels left out, corners from 45 degrees, no
- * areas yet. The number of points follows the picture closely.
+ * areas or cuts yet. The number of points follows the picture closely.
  */
 export function defaultTraceSettings(picture: PreparedPicture): PictureTraceSettings {
   const object = isColourful(picture.pixels) && hasEvenBorder(picture.pixels);
@@ -256,6 +263,7 @@ export function defaultTraceSettings(picture: PreparedPicture): PictureTraceSett
     areaTolerance: DEFAULT_TRACE_AREA_TOLERANCE,
     removed: [],
     lines: [],
+    cuts: [],
   };
   return { ...base, points: traceRange(picture, base).suggested };
 }
@@ -368,9 +376,11 @@ function backgroundOf(picture: PreparedPicture) {
  * at a half: a distance is scaled so the threshold is a half and twice it the whole, which puts a hard
  * edge's line where the edge is rather than a pixel out.
  */
-function objectFields(picture: PreparedPicture, threshold: number) {
+function objectFields(picture: PreparedPicture, threshold: number, cover: Float32Array | null) {
   const { width, height } = picture.pixels;
-  const { distance } = backgroundOf(picture);
+  const { distance: plain } = backgroundOf(picture);
+  // What is cut away lies on the background, so the background fills into it from the edge.
+  const distance = cover ? plain.map((value, index) => value * (1 - cover[index])) : plain;
   const outside = new Uint8Array(width * height);
   const stack: number[] = [];
   for (const index of borderPixels(width, height)) {
@@ -398,8 +408,10 @@ function objectFields(picture: PreparedPicture, threshold: number) {
       const index = y * width + x;
       const value = Math.min(1, distance[index] / (2 * threshold));
       const cell = (y + 1) * gridWidth + x + 1;
-      object[cell] = outside[index] || distance[index] >= threshold ? value : 1;
-      holes[cell] = outside[index] ? 0 : 1 - value;
+      // A cut inside the object takes it away there too, a hole whatever the holes are.
+      const kept = cover ? 1 - cover[index] : 1;
+      object[cell] = (outside[index] || distance[index] >= threshold ? value : 1) * kept;
+      holes[cell] = outside[index] ? 0 : (1 - value) * kept;
     }
   }
   return { object: softened(object, gridWidth, height + 2), holes: softened(holes, gridWidth, height + 2) };
@@ -454,30 +466,90 @@ function contoursFromRings(rings: TracePoint[][], sourceAt: (depth: number) => T
   });
 }
 
-/** The outlines for a part and a threshold; for the object, its outlines and, apart, its holes. */
-function contoursFor(picture: PreparedPicture, part: TracePart, threshold: number): { outlines: Contour[]; holes: Contour[] } {
+/**
+ * How much of each pixel of the traced picture the cuts take, 0 to 1 (4 x 4 samples a pixel), or null
+ * without cuts; kept for the cuts last asked for.
+ */
+function cutCover(picture: PreparedPicture, cuts: readonly TraceCut[]): Float32Array | null {
+  const usable = cuts.filter((cut) => cut.points.length >= 3);
+  const key = JSON.stringify(usable.map((cut) => cut.points.map((point) => [Math.round(point.x * 10), Math.round(point.y * 10)])));
+  if (picture.cutCover?.key === key) return picture.cutCover.cover;
+  let cover: Float32Array | null = null;
+  if (usable.length) {
+    const { width, height } = picture.pixels;
+    cover = new Float32Array(width * height);
+    for (const cut of usable) {
+      const polygon = cut.points.map((point) => ({ x: point.x / picture.scaleX, y: point.y / picture.scaleY }));
+      const minX = Math.max(0, Math.floor(Math.min(...polygon.map((point) => point.x))));
+      const maxX = Math.min(width - 1, Math.ceil(Math.max(...polygon.map((point) => point.x))));
+      const minY = Math.max(0, Math.floor(Math.min(...polygon.map((point) => point.y))));
+      const maxY = Math.min(height - 1, Math.ceil(Math.max(...polygon.map((point) => point.y))));
+      for (let y = minY; y <= maxY; y += 1) {
+        for (let x = minX; x <= maxX; x += 1) {
+          let hits = 0;
+          for (let sy = 0; sy < 4; sy += 1) {
+            for (let sx = 0; sx < 4; sx += 1) if (inside({ x: x + (sx + 0.5) / 4, y: y + (sy + 0.5) / 4 }, polygon)) hits += 1;
+          }
+          const index = y * width + x;
+          cover[index] = Math.max(cover[index], hits / 16);
+        }
+      }
+    }
+  }
+  picture.cutCover = { key, cover };
+  return cover;
+}
+
+/** Whether a contour is a cut's: a hole in the shape whose middle a cut takes. */
+function madeByCut(contour: Contour, cover: Float32Array | null, picture: PreparedPicture) {
+  if (!cover || contour.depth % 2 === 0) return false;
+  const x = Math.floor(contour.centre.x);
+  const y = Math.floor(contour.centre.y);
+  return x >= 0 && y >= 0 && x < picture.pixels.width && y < picture.pixels.height && cover[y * picture.pixels.width + x] > 0.5;
+}
+
+/**
+ * The outlines for a part and a threshold, with the cuts taken away; for the object, its outlines and,
+ * apart, its holes. A hole a cut makes inside the shape is the cut's, not one of the picture's holes.
+ */
+function contoursFor(picture: PreparedPicture, part: TracePart, threshold: number, cuts: readonly TraceCut[] = []): { outlines: Contour[]; holes: Contour[] } {
   const level = Math.min(0.98, Math.max(0.02, threshold));
-  const key = `${part}:${level.toFixed(3)}`;
+  const cover = cutCover(picture, cuts);
+  const key = `${part}:${level.toFixed(3)}:${picture.cutCover?.key ?? ""}`;
   const known = picture.contours.get(key);
   const knownHoles = picture.contours.get(`${key}:holes`);
   if (known && knownHoles) return { outlines: known, holes: knownHoles };
   const { width, height } = picture.pixels;
   let outlines: Contour[];
   let holes: Contour[] = [];
+  const asCut = (contour: Contour): Contour => (madeByCut(contour, cover, picture) ? { ...contour, source: "cut", key: `c:${contour.key.slice(2)}` } : contour);
   if (part === "object") {
-    const fields = objectFields(picture, level);
-    outlines = contoursFromRings(fieldRings(fields.object, width + 2, height + 2, 0.5).filter((ring) => ring.length >= 3), () => "outline");
+    const fields = objectFields(picture, level, cover);
+    // Only a cut makes a hole in the object's own field.
+    outlines = contoursFromRings(fieldRings(fields.object, width + 2, height + 2, 0.5).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 1 ? "cut" : "outline"))
+      .map((contour) => (contour.source === "cut" ? { ...contour, key: `c:${contour.key.slice(2)}` } : contour));
     // The holes' own lines: an outline round a patch of background, or (inside it) round an island of the object again.
     holes = contoursFromRings(fieldRings(fields.holes, width + 2, height + 2, 0.5).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 0 ? "hole" : "outline"), 1);
   } else {
-    const field = picture.fields[part] ?? (picture.fields[part] = shapeField(picture.pixels, part));
-    const all = contoursFromRings(fieldRings(field, width + 2, height + 2, level).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 1 ? "hole" : "outline"));
-    outlines = all.filter((contour) => contour.depth === 0);
-    holes = all.filter((contour) => contour.depth > 0);
+    const plain = picture.fields[part] ?? (picture.fields[part] = shapeField(picture.pixels, part));
+    const field = cover ? cutField(plain, cover, width, height) : plain;
+    const all = contoursFromRings(fieldRings(field, width + 2, height + 2, level).filter((ring) => ring.length >= 3), (depth) => (depth % 2 === 1 ? "hole" : "outline")).map(asCut);
+    outlines = all.filter((contour) => contour.depth === 0 || contour.source === "cut");
+    holes = all.filter((contour) => contour.depth > 0 && contour.source !== "cut");
   }
   picture.contours.set(key, outlines);
   picture.contours.set(`${key}:holes`, holes);
   return { outlines, holes };
+}
+
+/** A padded field with what the cuts take, taken away. */
+function cutField(field: Float32Array, cover: Float32Array, width: number, height: number) {
+  const out = new Float32Array(field);
+  const gridWidth = width + 2;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) out[(y + 1) * gridWidth + x + 1] *= 1 - cover[y * width + x];
+  }
+  return out;
 }
 
 /**
@@ -546,7 +618,7 @@ function areaContour(picture: PreparedPicture, area: TraceArea, tolerance: numbe
 function keptContours(picture: PreparedPicture, settings: Omit<PictureTraceSettings, "points">) {
   const speck = settings.speck / (picture.scaleX * picture.scaleY);
   const removed = new Set(settings.removed ?? []);
-  const { outlines, holes } = contoursFor(picture, settings.part, settings.threshold);
+  const { outlines, holes } = contoursFor(picture, settings.part, settings.threshold, settings.cuts ?? []);
   const rejected: string[] = [];
   const areas: Contour[] = [];
   for (const area of settings.areas ?? []) {

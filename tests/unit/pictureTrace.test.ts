@@ -296,4 +296,37 @@ describe("tracing a picture into points (Trace)", () => {
       expect(lined.rings.filter((ring) => ring.line)).toHaveLength(2);
     });
   });
+
+  describe("cutting a part away (Cut away)", () => {
+    const GREY: [number, number, number, number] = [110, 110, 115, 255];
+    /** A black block with a grey shadow below it, as dark as a part: no threshold tells them apart. */
+    const shadowed = picture(120, 100, (x, y) => {
+      if (x >= 20 && x < 100 && y >= 20 && y < 60) return BLACK;
+      if (x >= 30 && x < 90 && y >= 60 && y < 75) return GREY;
+      return WHITE;
+    });
+
+    it("takes a part away whatever its colour, the outline running along the cut", () => {
+      const { prepared, settings } = settingsFor(shadowed, { part: "dark", threshold: 0.5 });
+      const whole = tracePicture(prepared, settings);
+      expect(area(outlinePoints(whole.rings[0].nodes))).toBeGreaterThan(80 * 40 + 60 * 10);
+      const cut = tracePicture(prepared, { ...settings, cuts: [{ id: "shadow", points: [{ x: 25, y: 60 }, { x: 95, y: 60 }, { x: 95, y: 85 }, { x: 25, y: 85 }] }] });
+      expect(cut.rings).toHaveLength(1);
+      expect(area(outlinePoints(cut.rings[0].nodes))).toBeCloseTo(80 * 40, -2);
+      expect(Math.max(...cut.rings[0].nodes.map((node) => node.y))).toBeLessThan(61);
+    });
+
+    it("cuts a hole inside the shape, kept without holes too, and works on the object", () => {
+      const { prepared, settings } = settingsFor(square, { holes: false });
+      const inner = [{ x: 30, y: 30 }, { x: 50, y: 30 }, { x: 50, y: 50 }, { x: 30, y: 50 }];
+      const trace = tracePicture(prepared, { ...settings, cuts: [{ id: "middle", points: inner }] });
+      const hole = trace.rings.find((ring) => ring.source === "cut");
+      expect(hole?.hole).toBe(true);
+      expect(area(outlinePoints(hole!.nodes))).toBeCloseTo(20 * 20, -1.5);
+      const objectTrace = tracePicture(prepared, { ...settings, part: "object", threshold: 0.2, cuts: [{ id: "middle", points: inner }] });
+      expect(objectTrace.rings.map((ring) => ring.source).sort()).toEqual(["cut", "outline"]);
+      // A cut with fewer than three corners takes nothing.
+      expect(tracePicture(prepared, { ...settings, cuts: [{ id: "line", points: inner.slice(0, 2) }] }).rings).toHaveLength(1);
+    });
+  });
 });

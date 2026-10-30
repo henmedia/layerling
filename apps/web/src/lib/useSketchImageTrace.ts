@@ -45,6 +45,18 @@ export type SketchImageTraceState = {
   setHighlight: (key: string | null) => void;
   /** An area just clicked reached the picture's edge and was not taken. */
   areaRejected: boolean;
+  /** Cut away: while on, clicks on the picture set the corners of a part to cut away. */
+  cutting: boolean;
+  setCutting: (cutting: boolean) => void;
+  /** The corners set so far, in the picture's pixels. */
+  draft: TracePoint[];
+  addCutPoint: (spot: TracePoint) => void;
+  /** Closes the corners set into a cut (three at least). */
+  closeCut: () => void;
+  /** Throws away the corners set so far. */
+  discardCut: () => void;
+  /** Takes a cut out of the list. */
+  removeCut: (id: string) => void;
 };
 
 /**
@@ -62,6 +74,8 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
   const [picking, setPicking] = useState(false);
   const [highlight, setHighlight] = useState<string | null>(null);
   const [areaRejected, setAreaRejected] = useState(false);
+  const [cutting, setCutting] = useState(false);
+  const [draft, setDraft] = useState<TracePoint[]>([]);
   const pointsSetRef = useRef(false);
   const areaCountRef = useRef(0);
   const dataUrl = image?.dataUrl;
@@ -69,6 +83,8 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
 
   useEffect(() => {
     setPicking(false);
+    setCutting(false);
+    setDraft([]);
     setHighlight(null);
     setAreaRejected(false);
     if (!key || !dataUrl) {
@@ -156,6 +172,10 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
     setPicking: (on) => {
       setPicking(on);
       setAreaRejected(false);
+      if (on) {
+        setCutting(false);
+        setDraft([]);
+      }
     },
     addArea: (spot) => {
       areaCountRef.current += 1;
@@ -177,5 +197,26 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
     highlight,
     setHighlight,
     areaRejected,
+    cutting,
+    setCutting: (on) => {
+      setCutting(on);
+      setDraft([]);
+      if (on) setPicking(false);
+    },
+    draft,
+    addCutPoint: (spot) => setDraft((points) => [...points, { x: Math.round(spot.x * 10) / 10, y: Math.round(spot.y * 10) / 10 }]),
+    closeCut: () => {
+      if (draft.length < 3) return;
+      areaCountRef.current += 1;
+      const id = `${Date.now().toString(36)}-${areaCountRef.current}`;
+      const points = draft;
+      setDraft([]);
+      patch((value) => ({ cuts: [...(value.cuts ?? []), { id, points }] }));
+    },
+    discardCut: () => setDraft([]),
+    removeCut: (id) => {
+      if (highlight === `cut:${id}`) setHighlight(null);
+      patch((value) => ({ cuts: (value.cuts ?? []).filter((cut) => cut.id !== id) }));
+    },
   };
 }

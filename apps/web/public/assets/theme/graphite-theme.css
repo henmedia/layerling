@@ -8639,6 +8639,28 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-turn-ring {
   background: rgba(240, 138, 0, 0.14);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.cut {
+  fill: rgba(240, 138, 0, 0.12);
+  stroke: #d97a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.cut.highlight {
+  fill: rgba(240, 138, 0, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.cut.draft {
+  fill: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle.draft {
+  fill: #ffffff;
+  stroke: #d97a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle.draft.first {
+  fill: #d97a00;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-plate {
   --locked-handle-ink: #898989;
   --locked-handle-fill: #dfdfdf;

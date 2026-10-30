@@ -433,3 +433,31 @@ html[data-theme="dark"] .sketch-turn-ring {
   gap: 4px;
   font-size: 12px;
 }
+
+/* Cut away: the parts cut, and the corners being set. */
+.sketch-trace-preview path.cut {
+  fill: rgba(240, 138, 0, 0.12);
+  stroke: #d97a00;
+  stroke-width: 1.6;
+  stroke-dasharray: 6 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.sketch-trace-preview path.cut.highlight {
+  stroke-width: 3.2;
+  fill: rgba(240, 138, 0, 0.24);
+}
+
+.sketch-trace-preview path.cut.draft {
+  fill: none;
+  stroke-dasharray: none;
+}
+
+.sketch-trace-preview circle.draft {
+  fill: #ffffff;
+  stroke: #d97a00;
+}
+
+.sketch-trace-preview circle.draft.first {
+  fill: #d97a00;
+}
