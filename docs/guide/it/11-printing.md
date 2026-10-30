@@ -5,7 +5,7 @@ summary: Scegliere la propria stampante, ricevere avvisi quando un pezzo non ent
 
 ## Scegliere la stampante
 
-Apri le impostazioni con l’ingranaggio nella barra multifunzione ({{ui:editor.workspaceSettings}}) e passa alla sezione {{ui:workspace.workplane}}. In {{ui:workspace.printer}} scegli la tua stampante da un elenco di oltre 220 modelli comuni, tra cui Bambu Lab, Prusa, Creality, Anycubic, Elegoo e molti altri.
+Apri le impostazioni con l’ingranaggio nella barra multifunzione ({{ui:editor.workspaceSettings}}) e passa alla sezione {{ui:workspace.workplane}}. In {{ui:workspace.printer}} scegli la tua stampante da un elenco di oltre 230 modelli comuni, tra cui Bambu Lab, Prusa, Creality, Anycubic, Elegoo e molti altri.
 
 ![Le impostazioni del piano di lavoro con una stampante selezionata. Il piatto e l’altezza massima di stampa provengono dal profilo dello slicer.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Succedono tre cose:
 - layerling **mostra un avviso** se qualcosa non entra.
 
 I profili delle stampanti provengono da OrcaSlicer, quindi sono gli stessi disponibili nel tuo slicer. Se preferisci lavorare senza una stampante selezionata, scegli {{ui:workspace.printerNone}}. Puoi anche impostare manualmente le dimensioni del piano di lavoro.
+
+Le stampanti delta, come quelle di FLSun o SeeMeCNC o la Anycubic Predator, stampano su una piastra rotonda. Con una di queste anche il piano di lavoro è rotondo e largo quanto la piastra, e un corpo è troppo grande appena supera il bordo. Un corpo rotondo viene misurato sul proprio contorno e non sul riquadro che lo racchiude, quindi ci sta anche un cilindro largo quasi quanto la piastra.
 
 ## Se qualcosa non entra
 

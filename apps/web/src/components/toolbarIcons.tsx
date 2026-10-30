@@ -447,6 +447,51 @@ export function ToolbarSurfaceTextureIcon(props: IconProps) {
   );
 }
 
+/** Three links of a print-in-place chain in a gentle bend, held by the round joints between them. */
+export function ToolbarFlexiIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <rect x="4" y="25" width="14" height="10" rx="3.5" transform="rotate(-24 11 30)" {...SOLID} />
+      <rect x="4" y="25" width="14" height="10" rx="3.5" transform="rotate(-24 11 30)" />
+      <rect x="17" y="18" width="14" height="10" rx="3.5" {...SOLID} />
+      <rect x="17" y="18" width="14" height="10" rx="3.5" />
+      <rect x="30" y="25" width="14" height="10" rx="3.5" transform="rotate(24 37 30)" {...SOLID} />
+      <rect x="30" y="25" width="14" height="10" rx="3.5" transform="rotate(24 37 30)" />
+      <circle cx="17.5" cy="26" r="3" fill="currentColor" stroke="none" />
+      <circle cx="30.5" cy="26" r="3" fill="currentColor" stroke="none" />
+    </ToolbarVectorIcon>
+  );
+}
+
+/** A round cookie with a bite out of it and a few chips: what the cutter is for (Stefan, 29.10.2026 - a star read as a star). */
+export function ToolbarCookieCutterIcon(props: IconProps) {
+  const cookie = "M28.5 11A16 16 0 1 0 38 20.5A9 9 0 0 1 28.5 11Z";
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d={cookie} {...SOLID} />
+      <path d={cookie} />
+      <circle cx="17" cy="21" r="2" fill="currentColor" stroke="none" />
+      <circle cx="25.5" cy="30" r="2" fill="currentColor" stroke="none" />
+      <circle cx="15.5" cy="32" r="1.7" fill="currentColor" stroke="none" />
+      <circle cx="24" cy="19.5" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="32" cy="30.5" r="1.7" fill="currentColor" stroke="none" />
+    </ToolbarVectorIcon>
+  );
+}
+
+/** A box cut open, its lid lifted above it with the lip that fits into the opening. */
+export function ToolbarLidIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M8 23h7v10h18V23h7v17H8Z" {...SOLID} />
+      <path d="M8 23h7v10h18V23h7v17H8Z" />
+      <path d="M6 9h36v6H6Z" {...SOLID} />
+      <path d="M6 9h36v6H6Z" />
+      <path d="M16.5 15v4h15v-4" />
+    </ToolbarVectorIcon>
+  );
+}
+
 export function ToolbarSnapGridIcon(props: IconProps) {
   return (
     <ToolbarVectorIcon {...props}>

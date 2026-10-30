@@ -168,6 +168,19 @@ type PointerAction =
   | { kind: "crop-image"; pointerId: number; imageId: string; handle: ResizeHandle; current: { x: number; z: number }; start: SketchImage };
 
 /** The step a turn of a selection or a picture snaps to, by where the pointer is against the ring it shows. */
+/**
+ * A Bezier handle (#1008): lit up and with the hand under the pointer like a point, and catching a press a little around
+ * it, so a near miss while tracing does not grab the reference image underneath.
+ */
+function CurveHandle({ at, radius, selected, onPointerDown }: { at: { x: number; z: number }; radius: number; selected: boolean; onPointerDown: (event: ReactPointerEvent<SVGElement>) => void }) {
+  return (
+    <g className="sketch-curve-handle" data-sketch-entity="handle" onPointerDown={onPointerDown}>
+      <circle className="sketch-curve-handle-hit" cx={at.x} cy={at.z} r={radius * 2} />
+      <circle className={selected ? "sketch-handle-selected" : undefined} cx={at.x} cy={at.z} r={radius} />
+    </g>
+  );
+}
+
 function turnStep(action: Extract<PointerAction, { kind: "rotate-selection" | "rotate-image" }>) {
   const pivot = action.kind === "rotate-selection" ? action.pivot : { x: action.start.x, z: action.start.z };
   return sketchTurnStep(pivot, action.ring, action.current, action.snap);
@@ -1382,7 +1395,7 @@ export function SketchWorkspace({
       return;
     }
     if (event.button === 2) rightPressRef.current = { x: event.clientX, y: event.clientY };
-    if (isSketchPanGesture(event)) beginPan(event);
+    if (isSketchPanGesture(event, workspace.mouseScheme)) beginPan(event);
     else retargetTouchPress(event);
   };
 
@@ -2691,9 +2704,9 @@ export function SketchWorkspace({
             return (
               <g className="sketch-curve-handles">
                 <line x1={start.x} y1={start.z} x2={outHandle.x} y2={outHandle.z} />
-                <circle data-sketch-entity="handle" cx={outHandle.x} cy={outHandle.z} r={controlPointRadius} className={selectedHandle?.pointId === start.id && selectedHandle.handle === "out" ? "sketch-handle-selected" : undefined} onPointerDown={(event) => pressHandle(event, start.id, "out", outHandle)} />
+                <CurveHandle at={outHandle} radius={controlPointRadius} selected={selectedHandle?.pointId === start.id && selectedHandle.handle === "out"} onPointerDown={(event) => pressHandle(event, start.id, "out", outHandle)} />
                 <line x1={end.x} y1={end.z} x2={inHandle.x} y2={inHandle.z} />
-                <circle data-sketch-entity="handle" cx={inHandle.x} cy={inHandle.z} r={controlPointRadius} className={selectedHandle?.pointId === end.id && selectedHandle.handle === "in" ? "sketch-handle-selected" : undefined} onPointerDown={(event) => pressHandle(event, end.id, "in", inHandle)} />
+                <CurveHandle at={inHandle} radius={controlPointRadius} selected={selectedHandle?.pointId === end.id && selectedHandle.handle === "in"} onPointerDown={(event) => pressHandle(event, end.id, "in", inHandle)} />
               </g>
             );
           })() : null}
@@ -2702,8 +2715,8 @@ export function SketchWorkspace({
             const outHandle = selectedPoint.handleOut ? displayedHandle(displayProfile, selectedPoint, "out") ?? selectedPoint.handleOut : null;
             return (
               <g className="sketch-curve-handles">
-                {inHandle ? <><line x1={selectedPoint.x} y1={selectedPoint.z} x2={inHandle.x} y2={inHandle.z} /><circle data-sketch-entity="handle" cx={inHandle.x} cy={inHandle.z} r={controlPointRadius} className={selectedHandle?.pointId === selectedPoint.id && selectedHandle.handle === "in" ? "sketch-handle-selected" : undefined} onPointerDown={(event) => pressHandle(event, selectedPoint.id, "in", inHandle)} /></> : null}
-                {outHandle ? <><line x1={selectedPoint.x} y1={selectedPoint.z} x2={outHandle.x} y2={outHandle.z} /><circle data-sketch-entity="handle" cx={outHandle.x} cy={outHandle.z} r={controlPointRadius} className={selectedHandle?.pointId === selectedPoint.id && selectedHandle.handle === "out" ? "sketch-handle-selected" : undefined} onPointerDown={(event) => pressHandle(event, selectedPoint.id, "out", outHandle)} /></> : null}
+                {inHandle ? <><line x1={selectedPoint.x} y1={selectedPoint.z} x2={inHandle.x} y2={inHandle.z} /><CurveHandle at={inHandle} radius={controlPointRadius} selected={selectedHandle?.pointId === selectedPoint.id && selectedHandle.handle === "in"} onPointerDown={(event) => pressHandle(event, selectedPoint.id, "in", inHandle)} /></> : null}
+                {outHandle ? <><line x1={selectedPoint.x} y1={selectedPoint.z} x2={outHandle.x} y2={outHandle.z} /><CurveHandle at={outHandle} radius={controlPointRadius} selected={selectedHandle?.pointId === selectedPoint.id && selectedHandle.handle === "out"} onPointerDown={(event) => pressHandle(event, selectedPoint.id, "out", outHandle)} /></> : null}
               </g>
             );
           })() : null}

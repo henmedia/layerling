@@ -5,7 +5,7 @@ summary: Choosing your own printer, being warned when something does not fit, an
 
 ## Choosing your printer
 
-Open the settings (the cogwheel in the ribbon, {{ui:editor.workspaceSettings}}) and switch to the area {{ui:workspace.workplane}}. Under {{ui:workspace.printer}} you pick your printer from a list of over 220 common models, including Bambu Lab, Prusa, Creality, Anycubic, Elegoo and many more.
+Open the settings (the cogwheel in the ribbon, {{ui:editor.workspaceSettings}}) and switch to the area {{ui:workspace.workplane}}. Under {{ui:workspace.printer}} you pick your printer from a list of over 230 common models, including Bambu Lab, Prusa, Creality, Anycubic, Elegoo and many more.
 
 ![The workplane settings with a printer chosen. Print bed and maximum print height come from the slicer profile.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Three things happen:
 - layerling **warns** when something does not fit.
 
 The printer profiles come from OrcaSlicer, so they are the same ones your slicer knows. If you would rather work without a printer, choose {{ui:workspace.printerNone}}. You can also set the size of the workplane by hand.
+
+Delta printers such as those by FLSun or SeeMeCNC, or the Anycubic Predator, print on a round plate. With one of them the workplane is round too, as wide as the plate, and a body is too large as soon as it reaches past the rim. A round body is measured by its own outline, not by the box round it, so a cylinder nearly as wide as the plate still fits.
 
 ## When something does not fit
 

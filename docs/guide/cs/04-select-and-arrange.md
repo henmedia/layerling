@@ -89,6 +89,7 @@ Pro přiložení dvou dílů vyberte pohyblivý díl, spusťte {{ui:editor.tool.
 ![Opakování po kružnici nejprve zobrazuje náhled kopií.](shot:pattern-tool)
 
 - **{{ui:array.mode.row}}:** stejné rozestupy podél X, Y a Z přes {{ui:array.spacingX}}, {{ui:array.spacingY}} a {{ui:array.spacingZ}}. Jedna nenulová osa tvoří přímou řadu, více os šikmou řadu nebo schodiště. Záporný rozestup obrátí směr.
+- **{{ui:array.fit}}:** Pro díry podél desky, věšák na klíče nebo na oblečení. Polož první kus na těleso nebo do něj, zvol {{ui:array.fit.x}} nebo {{ui:array.fit.y}} a nastav {{ui:array.fitGap}}: originál se posune o tolik dovnitř od bližšího konce (od okraje k boku kusu) a poslední kopie si drží stejnou mezeru ke vzdálenému konci. Rozestup se pak řídí hodnotou {{ui:array.count}}: pět děr nebo devět, vždy desku vyplní rovnoměrně.
 - **{{ui:array.mode.circle}}:** rozmístění kolem středu s počtem {{ui:array.count}} a úhlem {{ui:array.angle}}, pro celý obvod 360°. Můžete zapnout společné natáčení kopií. {{ui:array.rise}} zvedá každou další kopii pro šroubovici, {{ui:array.radiusChange}} mění poloměr pro rovinnou spirálu. Kombinací vznikne kuželová spirála. Spirála udělá nejvýš jeden závit: úhel nad 360° se počítá jako celý kruh a kopií je nejvýš 100.
 
 Tip: nastavte nejprve {{ui:editor.tool.rotationPivot}} na plochu. Střed kružnice pak bude přesně tam.
@@ -153,11 +154,11 @@ Změnu provede až {{ui:scalePercent.apply}} a jediný krok Zpět ji vrátí. Se
 
 ## Zpět a znovu
 
-{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) a {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] nebo [[Ctrl]]+[[Y]]) procházejí historii. Počet kroků ukládaných s projektem určuje {{ui:workspace.history}}.
+{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) a {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] nebo [[Ctrl]]+[[Y]]) procházejí historii. Počet kroků ukládaných s projektem určuje {{ui:workspace.history}}. Když najedete na jedno z obou tlačítek, jeho popisek pojmenuje krok, který vrátí nebo zopakuje, a u kroku s rozměrem i ten rozměr, například „Zaobleny hrany: Box (5 mm)“; hlášení po kroku říká totéž. Chcete-li se vrátit o více kroků najednou, použijte zobrazení historie níže.
 
 ## Prohlížení historie
 
-{{ui:editor.tool.history}} vedle Zpět a Znovu umožní prohlížet starší stavy bez změny projektu. Pracovní plocha ukazuje minulou podobu a spodní posuvník prochází kroky. Současný stav je vpravo, předchozí vlevo; již vrácené kroky leží napravo od současného. Šipky procházejí stavy a [[Esc]] vrátí současnost. Kolečko myši nad posuvníkem dělá totéž, jeden stav na zoubek, nahoru ke staršímu; [[Page Up]] a [[Page Down]] skáčou o deset stavů, [[Home]] jde na nejstarší stav a [[End]] zpět na aktuální. Pohled můžete otáčet a přibližovat a klepnutím vybírat objekty k vrácení (viz níže), ale nic nelze měnit. Lištu lze přetáhnout za záhlaví a dvojklikem vrátit.
+{{ui:editor.tool.history}} vedle Zpět a Znovu umožní prohlížet starší stavy bez změny projektu. Pracovní plocha ukazuje minulou podobu a spodní posuvník prochází kroky. Současný stav je vpravo, předchozí vlevo; již vrácené kroky leží napravo od současného. Šipky procházejí stavy a [[Esc]] vrátí současnost. Kolečko myši nad posuvníkem dělá totéž, jeden stav na zoubek, nahoru ke staršímu; [[Page Up]] a [[Page Down]] skáčou o deset stavů, [[Home]] jde na nejstarší stav a [[End]] zpět na aktuální. Pohled můžete otáčet a přibližovat a klepnutím vybírat objekty k vrácení (viz níže), ale nic nelze měnit. Lištu lze přetáhnout za záhlaví a dvojklikem vrátit. Tlačítko se seznamem v záhlaví ukáže všechny kroky podle názvu v seznamu, nejnovější nahoře: kliknutí na krok přejde do tohoto stavu, stav, ve kterém návrh je, je označen {{ui:historyView.listNow}}, a vrácené kroky jsou šedé. Necháš-li seznam otevřený, bude otevřený i příště.
 
 Ze staršího stavu můžete vytvořit {{ui:historyView.createProject}}. Nový projekt má původní název doplněný časem stavu; u starých dat bez času označení kopie. Obsahuje historii až do daného okamžiku, takže Zpět nadále funguje. {{ui:historyView.export}} otevře běžný export tohoto stavu jako STL, 3MF, STEP, obrázek nebo LYL včetně příslušné historie.
 

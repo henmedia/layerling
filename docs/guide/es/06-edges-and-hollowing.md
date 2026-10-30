@@ -83,6 +83,18 @@ Si más adelante cambias el tamaño de un cuerpo vaciado, layerling lo vuelve a 
 
 > **Consejo:** Con una boquilla de 0,4 mm, una pared de 1,2 a 2 mm es un buen punto de partida: lo bastante fina para ahorrar material y lo bastante gruesa para que la pieza sea resistente.
 
+## Una tapa para un cuerpo abierto
+
+{{ui:editor.tool.lid}} crea la tapa de un cuerpo abierto por arriba: una caja que vaciaste con la parte de arriba abierta, una maceta, una bandeja. Selecciona el cuerpo y haz clic en {{ui:editor.tool.lid}}. En la ventana eliges el tipo:
+
+- {{ui:lid.type.plug}}: una placa tan grande como el cuerpo con un labio debajo que entra en la abertura.
+- {{ui:lid.type.cap}}: una placa una pared más ancha que el cuerpo con un borde debajo que abraza el exterior.
+- {{ui:lid.type.flat}}: solo la placa, para apoyarla o pegarla.
+
+Después ajustas el grosor ({{ui:lid.thickness}}), el ajuste ({{ui:lid.fit}}, la holgura por lado entre tapa y cuerpo: 0,1 mm apretado, 0,2 mm normal, 0,3 mm suelto, o cualquier valor hasta 1 mm) y cuánto baja el labio o el borde y lo gruesa que es su pared. Haz clic en {{ui:lid.apply}}: la tapa queda junto al cuerpo, dada la vuelta con la placa abajo, así se imprime sin soportes. El cuerpo queda como está. La tapa sigue cualquier contorno, redondo o anguloso, porque se toma del propio cuerpo justo debajo de su borde. Un cuerpo sin abertura arriba solo recibe una tapa plana; para las otras dos, vacíalo antes con la parte de arriba abierta.
+
+> **Consejo:** Lo apretada que queda una tapa depende de la impresora. Imprime primero una caja pequeña con su tapa; si queda demasiado apretada, elige el siguiente ajuste más suelto.
+
 ## Desfasar cuerpos
 
 Cada cara de un cuerpo puede moverse la misma distancia, hacia fuera o hacia dentro. Eso necesita un ajuste, una tapa o una unión a presión: una holgura de 0,1 a 0,3 mm alrededor mientras los detalles quedan donde están, algo que el escalado no da.

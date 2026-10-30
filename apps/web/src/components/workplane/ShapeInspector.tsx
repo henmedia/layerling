@@ -162,7 +162,7 @@ import { t, type MessageKey } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { displayShapeName, makeShapeFromAsset, renamedShapeName } from "@/lib/shapeCatalog";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
-import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
+import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { SURFACE_TEXTURE_OWN_IMAGE_SIZE, surfaceTextureOwnImage } from "@/lib/surfaceTextureImages";
 import { BARK_STARTS, WOOD_RINGS } from "@/lib/surfaceTextureWood";
 import { offersSurfaceTextureMask, SURFACE_TEXTURE_LABELS, surfacePatternLabel, surfaceTextureEntry } from "@/lib/surfaceTextureShape";
@@ -182,7 +182,7 @@ import { textHasFill } from "@/lib/textFill";
 import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
 import { MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, nameTagKeyringAlongLimit, namesFromList, type NameTagKeyring, type TextLayer } from "@/lib/textLayers";
 import { iconKeyringAlongLimit } from "@/lib/sketchKeyring";
-import { DEFAULT_KEYRING_DIAMETER, MAX_TEXT_SPACING, MIN_KEYRING_DIAMETER, MIN_TEXT_SPACING, TEXT_KEYRING_SIDES } from "@/lib/textGeometry";
+import { DEFAULT_KEYRING_DIAMETER, curvedRadiusPatch, MAX_TEXT_SPACING, MIN_KEYRING_DIAMETER, MIN_TEXT_SPACING, TEXT_KEYRING_SIDES } from "@/lib/textGeometry";
 import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, removeTextLayer, textBaselineKeepShift, textLetterSize, textLetterSizePatch, textSpacingPatch, type NameTagStack } from "@/lib/nameTag";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { FontPicker } from "@/components/workplane/FontPicker";
@@ -295,6 +295,7 @@ import {
 import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridOptions, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
+import { narrowCrossWidth, narrowEndWidth, normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight, slopeSidesFor } from "@/lib/slopeAlong";
 import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { selectWholeValue } from "@/lib/numberField";
 import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFormulas } from "@/lib/fieldFormulas";
@@ -305,6 +306,7 @@ import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
+import { MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
 /**
  * Docked at the right edge, full height. Moved away, it floats: no longer
@@ -2299,6 +2301,68 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     return properties;
   }
 
+  if (shape.kind === "hirth") {
+    // A Hirth joint (#1016): teeth round the ring, their height at the rim and the bore. Changing the
+    // teeth or the size keeps the angle between the flanks; only the tooth height changes it.
+    const teeth = normalizeHirthTeeth(shape.teeth);
+    const toothHeight = normalizeHirthToothHeight(shape.toothSize, baseWidth, baseDepth, shape.height, teeth);
+    const bore = normalizeHirthBore(shape.centerHoleSize, baseWidth, baseDepth);
+    const keepAngle = (patch: Partial<WorkplaneShape>, nextTeeth = teeth, options?: ShapeInspectorUpdateOptions) => {
+      const nextWidth = patch.width ?? baseWidth;
+      const nextDepth = patch.depth ?? baseDepth;
+      const scale = (Math.min(nextWidth, nextDepth) / Math.max(MIN_SHAPE_SIZE, Math.min(baseWidth, baseDepth))) * (teeth / nextTeeth);
+      onUpdate({
+        ...patch,
+        toothSize: normalizeHirthToothHeight(toothHeight * scale, nextWidth, nextDepth, shape.height, nextTeeth),
+        centerHoleSize: normalizeHirthBore(bore, nextWidth, nextDepth),
+      }, options);
+    };
+    return [
+      {
+        id: "teeth",
+        label: t("prop.teeth"),
+        value: teeth,
+        min: MIN_HIRTH_TEETH,
+        max: MAX_HIRTH_TEETH,
+        step: 1,
+        hint: t("inspector.hirthHint", { angle: plainNumber(hirthFlankAngle(baseWidth, baseDepth, teeth, toothHeight)), step: plainNumber(360 / teeth) }),
+        onChange: (value) => {
+          const nextTeeth = normalizeHirthTeeth(value);
+          keepAngle({ teeth: nextTeeth }, nextTeeth);
+        },
+      },
+      {
+        id: "toothSize",
+        label: t("prop.hirthToothHeight"),
+        value: toothHeight,
+        min: MIN_HIRTH_TOOTH_HEIGHT,
+        max: hirthToothHeightLimit(baseWidth, baseDepth, shape.height),
+        step: 0.1,
+        onChange: (value) => onUpdate({ toothSize: normalizeHirthToothHeight(value, baseWidth, baseDepth, shape.height, teeth) }),
+      },
+      {
+        id: "centerHole",
+        label: t("prop.centerHole"),
+        value: bore,
+        min: 0,
+        max: hirthBoreLimit(baseWidth, baseDepth),
+        step: 0.1,
+        onChange: (value) => onUpdate({ centerHoleSize: normalizeHirthBore(value, baseWidth, baseDepth) }),
+      },
+      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: (value) => keepAngle(depthPatch(value), teeth, { resizeAxis: "depth" }) },
+      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: (value) => keepAngle(widthPatch(value), teeth, { resizeAxis: "width" }) },
+      {
+        id: "height",
+        label: t("prop.height"),
+        value: shape.height,
+        min: MIN_HIRTH_BASE + MIN_HIRTH_TOOTH_HEIGHT,
+        max: 160,
+        // A lower joint keeps a base under the roots: the teeth give way first.
+        onChange: (height) => onUpdate({ height, toothSize: normalizeHirthToothHeight(toothHeight, baseWidth, baseDepth, height, teeth) }, { resizeAxis: "height" }),
+      },
+    ];
+  }
+
   if (shape.kind === "gear") {
     const gearType = normalizeGearType(shape.gearType);
     // A ring gear and a rack (#201) have no straight teeth; "simple" counts as involute there.
@@ -2592,7 +2656,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           min: 5,
           max: 500,
           step: 1,
-          onChange: (textRadius) => onUpdate({ textRadius }),
+          // The letters stay where they sit; only their bend changes (#981).
+          onChange: (textRadius) => onUpdate(curvedRadiusPatch(shape, textRadius)),
         },
         {
           type: "toggle",
@@ -3073,6 +3138,117 @@ export function ShapeInspector({
     },
   ];
   /*
+   * Slope along (slopeAlong.ts): the far end's height in millimetres and as an
+   * angle, the side it goes down to and how much the top curves. The angle is
+   * the straight line's from end to end, so it stays the same when only the
+   * curve changes.
+   */
+  const slopeShown = shapeSupportsSlope(shape);
+  const slopeSide = normalizeSlopeSide(shape.kind, shape.slopeSide);
+  const slopeLength = slopeAlongWidth(slopeSide) ? shapeWidth(shape) : shapeDepth(shape);
+  const slopeEndValue = slopeEndHeight(shape);
+  const slopeAngle = (Math.atan2(shape.height - slopeEndValue, Math.max(1e-6, slopeLength)) * 180) / Math.PI;
+  const slopeMaxAngle = (Math.atan2(shape.height - Math.min(SLOPE_MIN_END, shape.height), Math.max(1e-6, slopeLength)) * 180) / Math.PI;
+  const slopeProperties: ShapePropertyConfig[] = !slopeShown ? [] : [
+    {
+      type: "select",
+      id: "slopeSide",
+      label: t("prop.slopeSide"),
+      value: slopeSide,
+      options: slopeSidesFor(shape.kind).map((side) => ({ value: side, label: t(`slope.side.${side}`) })),
+      onChange: (value) => onUpdate({ slopeSide: normalizeSlopeSide(shape.kind, value), slopeEnd: shape.slopeEnd ?? shape.height }),
+    },
+    {
+      id: "slopeEnd",
+      label: t("prop.slopeEnd"),
+      value: slopeEndValue,
+      min: Math.min(SLOPE_MIN_END, shape.height),
+      max: shape.height,
+      step: 0.1,
+      hint: t("slope.endHint"),
+      onChange: (slopeEnd) => onUpdate({ slopeEnd: Math.min(shape.height, Math.max(Math.min(SLOPE_MIN_END, shape.height), slopeEnd)), slopeSide: shape.slopeSide ?? slopeSide }),
+    },
+    {
+      id: "slopeAngle",
+      label: t("prop.slopeAngle"),
+      value: Math.round(slopeAngle * 100) / 100,
+      min: 0,
+      max: Math.floor(slopeMaxAngle * 100) / 100,
+      step: 0.5,
+      onChange: (angle) => {
+        const drop = Math.tan((Math.min(89.9, Math.max(0, angle)) * Math.PI) / 180) * slopeLength;
+        onUpdate({ slopeEnd: Math.max(Math.min(SLOPE_MIN_END, shape.height), shape.height - drop), slopeSide: shape.slopeSide ?? slopeSide });
+      },
+    },
+    {
+      id: "slopeCurve",
+      label: t("prop.slopeCurve"),
+      value: Math.round(normalizeSlopeCurve(shape.slopeCurve) * 100),
+      min: -100,
+      max: 100,
+      step: 1,
+      hint: t("slope.curveHint"),
+      onChange: (percent) => onUpdate({ slopeCurve: normalizeSlopeCurve(percent / 100), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
+    },
+  ];
+  const slopeDefaults: PropertyDefaultValues = new Map<string, number | string | boolean>([["slopeEnd", shape.height], ["slopeAngle", 0], ["slopeCurve", 0]]);
+  /*
+   * Narrow along (slopeAlong.ts): seen from above, both long sides run in towards one
+   * end - its width, where along the length it starts and how much the sides curve.
+   */
+  const narrowSide = normalizeSlopeSide(shape.kind, shape.narrowSide);
+  const narrowFull = narrowCrossWidth({ ...shape, narrowSide });
+  const narrowKeep = { narrowEnd: shape.narrowEnd ?? narrowFull, narrowSide: shape.narrowSide ?? narrowSide };
+  const narrowShown = shapeSupportsNarrow(shape);
+  const narrowProperties: ShapePropertyConfig[] = !narrowShown ? [] : [
+    {
+      type: "select",
+      id: "narrowSide",
+      label: t("prop.narrowSide"),
+      value: narrowSide,
+      options: slopeSidesFor(shape.kind).map((side) => ({ value: side, label: t(`slope.side.${side}`) })),
+      onChange: (value) => {
+        const side = normalizeSlopeSide(shape.kind, value);
+        // The other axis has another full width: a narrowing that was set keeps its share of it.
+        const full = narrowCrossWidth({ ...shape, narrowSide: side });
+        const share = shape.narrowEnd === undefined ? 1 : narrowEndWidth({ ...shape, narrowSide }) / Math.max(1e-9, narrowFull);
+        onUpdate({ narrowSide: side, narrowEnd: Math.round(full * share * 100) / 100 });
+      },
+    },
+    {
+      id: "narrowEnd",
+      label: t("prop.narrowEnd"),
+      // The body keeps a sliver of 0.01 mm at a point; the field shows the 0 that was typed.
+      value: Math.min(narrowFull, Math.max(0, shape.narrowEnd ?? narrowFull)),
+      min: 0,
+      max: narrowFull,
+      step: 0.1,
+      hint: t("narrow.endHint"),
+      onChange: (narrowEnd) => onUpdate({ ...narrowKeep, narrowEnd: Math.min(narrowFull, Math.max(0, narrowEnd)) }),
+    },
+    {
+      id: "narrowStart",
+      label: t("prop.narrowStart"),
+      value: Math.round(normalizeNarrowStart(shape.narrowStart) * 100),
+      min: 0,
+      max: 95,
+      step: 1,
+      hint: t("narrow.startHint"),
+      onChange: (percent) => onUpdate({ ...narrowKeep, narrowStart: normalizeNarrowStart(percent / 100) }),
+    },
+    {
+      id: "narrowCurve",
+      label: t("prop.slopeCurve"),
+      value: Math.round(normalizeSlopeCurve(shape.narrowCurve) * 100),
+      min: -100,
+      max: 100,
+      step: 1,
+      hint: t("narrow.curveHint"),
+      onChange: (percent) => onUpdate({ ...narrowKeep, narrowCurve: normalizeSlopeCurve(percent / 100) }),
+    },
+  ];
+  const narrowDefaults: PropertyDefaultValues = new Map<string, number | string | boolean>([["narrowEnd", narrowFull], ["narrowStart", 0], ["narrowCurve", 0]]);
+  /*
    * Wo der Koerper steht, zum Eintippen: X und Y auf der Platte (die Mitte
    * seines Rahmens, mit denselben Vorzeichen wie die Masse auf der
    * Arbeitsflaeche), Z als Hoehe seiner Unterkante. Die Regler reichen so weit
@@ -3152,6 +3328,8 @@ export function ShapeInspector({
   const [rotationOpen, setRotationOpen] = useInspectorCard("rotation", false);
   const [taperOpen, setTaperOpen] = useInspectorCard("taper", false);
   const [twistOpen, setTwistOpen] = useInspectorCard("twist", false);
+  const [slopeOpen, setSlopeOpen] = useInspectorCard("slope", false);
+  const [narrowOpen, setNarrowOpen] = useInspectorCard("narrow", false);
   const [gearTeethOpen, setGearTeethOpen] = useInspectorCard("gearTeeth", true);
   const [vaseFormOpen, setVaseFormOpen] = useInspectorCard("vaseForm", true);
   const [vaseFloorOpen, setVaseFloorOpen] = useInspectorCard("vaseFloor", false);
@@ -3531,6 +3709,16 @@ export function ShapeInspector({
                 onChange={threadRoleProperty.onChange}
               />
             ) : null}
+            {/* A rod or screw is the bolt at full size: cut as a hole it leaves no play (#1039). */}
+            {threadRoleProperty && shape.hole && (threadRoleProperty.value === "rod" || threadRoleProperty.value === "screw") ? (
+              <>
+                <p className="cylinder-wrap-hint">{t("inspector.threadBoltAsHoleHint")}</p>
+                <button className="inspector-action-button" type="button" disabled={locked} onClick={() => threadRoleProperty.onChange("bore")}>
+                  <RefreshCw size={17} strokeWidth={2.5} />
+                  <span>{t("inspector.threadMakeTappedHole")}</span>
+                </button>
+              </>
+            ) : null}
             {threadHeadProperty ? (
               <IconOptionSelector
                 label={t("inspector.threadHead")}
@@ -3686,6 +3874,44 @@ export function ShapeInspector({
           {twistOpen ? (
             <div className="property-list" id={`twist-${shape.id}`}>
               <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={twistProperties} defaults={propertyDefaults?.twist} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      {slopeShown ? (
+        <div className={`property-card ${slopeOpen ? "" : "collapsed"}`} data-help-section-all="shapeSettings">
+          <button
+            className="property-card-header"
+            type="button"
+            aria-expanded={slopeOpen}
+            aria-controls={`slope-${shape.id}`}
+            onClick={() => setSlopeOpen((open) => !open)}
+          >
+            <span>{t("inspector.slope")}</span>
+            <ChevronUp className={slopeOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+          </button>
+          {slopeOpen ? (
+            <div className="property-list" id={`slope-${shape.id}`}>
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={slopeProperties} defaults={slopeDefaults} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      {narrowShown ? (
+        <div className={`property-card ${narrowOpen ? "" : "collapsed"}`} data-help-section-all="shapeSettings">
+          <button
+            className="property-card-header"
+            type="button"
+            aria-expanded={narrowOpen}
+            aria-controls={`narrow-${shape.id}`}
+            onClick={() => setNarrowOpen((open) => !open)}
+          >
+            <span>{t("inspector.narrow")}</span>
+            <ChevronUp className={narrowOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+          </button>
+          {narrowOpen ? (
+            <div className="property-list" id={`narrow-${shape.id}`}>
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={narrowProperties} defaults={narrowDefaults} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -5019,14 +5245,24 @@ export function SurfaceTextureCard({
                 </>
               )}
               {settings.pattern === "bumps" ? (
-                <SelectProperty
-                  type="select"
-                  label={t("inspector.surfaceBumpShape")}
-                  value={settings.profile}
-                  options={options(BUMP_SHAPES, (value) => t(SURFACE_TEXTURE_LABELS.bumpShape[value]))}
-                  disabled={disabled || busy}
-                  onChange={(value) => set({ profile: value as SurfaceTextureSettings["profile"] })}
-                />
+                <>
+                  <SelectProperty
+                    type="select"
+                    label={t("inspector.surfaceBumpShape")}
+                    value={settings.profile}
+                    options={options(BUMP_SHAPES, (value) => t(SURFACE_TEXTURE_LABELS.bumpShape[value]))}
+                    disabled={disabled || busy}
+                    onChange={(value) => set({ profile: value as SurfaceTextureSettings["profile"] })}
+                  />
+                  <SelectProperty
+                    type="select"
+                    label={t("inspector.surfaceBumpGrid")}
+                    value={settings.bumpGrid}
+                    options={options(SURFACE_TEXTURE_BUMP_GRIDS, (value) => t(SURFACE_TEXTURE_LABELS.bumpGrid[value]))}
+                    disabled={disabled || busy}
+                    onChange={(value) => set({ bumpGrid: value as SurfaceTextureSettings["bumpGrid"] })}
+                  />
+                </>
               ) : null}
               {range("surfaceDepth", t("inspector.surfaceDepth"), settings.depth, SURFACE_TEXTURE_LIMITS.depth, 0.05, (depth) => set({ depth }))}
               <SelectProperty

@@ -83,6 +83,18 @@ Auch ein Körper mit einer Tasche lässt sich aushöhlen, etwa ein Block mit ein
 
 > **Tipp:** Bei einer 0,4-mm-Düse sind 1,2 bis 2 mm Wandstärke ein guter Anfang: dünn genug, um Material zu sparen, dick genug für ein stabiles Teil.
 
+## Ein Deckel für einen offenen Körper
+
+{{ui:editor.tool.lid}} macht den Deckel für einen Körper, der oben offen ist: eine Kiste, die du mit offener Oberseite ausgehöhlt hast, einen Topf, eine Schale. Wähle den Körper und klicke auf {{ui:editor.tool.lid}}. Im Fenster wählst du die Art:
+
+- {{ui:lid.type.plug}}: eine Platte so groß wie der Körper, darunter eine Lippe, die in die Öffnung greift.
+- {{ui:lid.type.cap}}: eine Platte eine Wand breiter als der Körper, darunter ein Rand, der außen herum greift.
+- {{ui:lid.type.flat}}: nur die Platte, zum Auflegen oder Ankleben.
+
+Dann stellst du die {{ui:lid.thickness}} ein, die {{ui:lid.fit}} (den {{ui:lid.gap}} zwischen Deckel und Körper: 0,1 mm stramm, 0,2 mm normal, 0,3 mm locker, oder jeden Wert bis 1 mm) und wie tief Lippe oder Rand nach unten reichen und wie dick ihre Wand ist. Klicke auf {{ui:lid.apply}}: Der Deckel liegt neben dem Körper, umgedreht mit der Platte nach unten, so druckt er ohne Stützen. Der Körper bleibt, wie er ist. Der Deckel folgt jedem Umriss, rund oder eckig, weil er dem Körper selbst knapp unter seinem Rand abgenommen wird. Ein Körper ohne Öffnung oben bekommt nur einen flachen Deckel; für die beiden anderen höhle ihn zuerst mit offener Oberseite aus.
+
+> **Tipp:** Wie stramm ein Deckel sitzt, hängt vom Drucker ab. Drucke zuerst eine kleine Kiste mit Deckel; sitzt er zu fest, nimm die nächst lockerere Passung.
+
 ## Körper versetzen
 
 Jede Fläche eines Körpers lässt sich um dieselbe Strecke nach außen oder innen verschieben. Das braucht eine Passung, ein Deckel oder eine Schnappverbindung: ein Spalt von 0,1 bis 0,3 mm ringsum, während die Merkmale an ihrem Platz bleiben, was Skalieren nicht kann.

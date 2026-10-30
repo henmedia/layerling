@@ -155,7 +155,7 @@ Escanea el código con el móvil antes de imprimirlo, y otra vez después. Oscur
 
 En cuanto lo activas, el texto recorre el círculo. Todas las letras se apoyan en la misma línea base, tan regulares como en un texto normal. Hay cuatro ajustes:
 
-- **{{ui:prop.textRadius}}** (de 5 a 500 mm): El radio del círculo por el que va la línea base de las letras.
+- **{{ui:prop.textRadius}}** (de 5 a 500 mm): El radio del círculo por el que va la línea base de las letras. Las letras se quedan donde están; solo cambia su curvatura.
 - **{{ui:nameTag.letterSize}}:** La altura de las letras. Ya no depende de la anchura de la forma.
 - **{{ui:prop.textInward}}:** Lleva el texto de la parte de arriba del círculo a la de abajo. Las letras apuntan entonces con la cabeza hacia el centro.
 - **{{ui:prop.textFlipped}}:** Da la vuelta solo a las letras, para que puedas leerlas desde el otro lado. El texto se queda en su sitio en el círculo.

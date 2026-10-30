@@ -1,5 +1,270 @@
 [
   {
+    "version": "1.124.2",
+    "items": [
+      {
+        "title": {
+          "de": "Fläche löschen bei Keil, Pyramide und Paraboloid",
+          "en": "Delete face for the wedge, pyramid and paraboloid"
+        },
+        "body": {
+          "de": "Ragt ein Keil, eine Pyramide oder ein Paraboloid aus einem anderen Körper heraus, gruppierst du die beiden und nimmst das Überstehende mit „Fläche löschen“ weg. Auch der STEP-Export nimmt sie jetzt mit, als Körper wie als Aussparung.",
+          "en": "Where a wedge, a pyramid or a paraboloid sticks out of another body, group the two and take off what sticks out with Delete face. The STEP export now takes them too, as bodies and as holes."
+        }
+      },
+      {
+        "title": {
+          "de": "Muster nur außen, auch nach dem Verrunden",
+          "en": "Pattern only outside, also after a fillet"
+        },
+        "body": {
+          "de": "Bei einem Becher mit verrundeten Rändern nahm „Flächen anklicken“ für die Oberflächenstruktur bisher den ganzen Becher, innen und unten mit. Jetzt endet eine Fläche auch an einer engen Rundung: Ein Klick auf die Außenseite nimmt nur die Außenseite, die Rundungen lassen sich einzeln dazuwählen.",
+          "en": "On a cup with rounded rims, Pick faces for the surface texture used to take the whole cup, the inside and the bottom too. Now a face also ends at a tight round: a click on the outside takes only the outside, and the rounds can be picked on their own."
+        }
+      },
+      {
+        "title": {
+          "de": "Klarere Überschriften",
+          "en": "Crisper headings"
+        },
+        "body": {
+          "de": "Überschriften, Reiter und Leistentitel sind etwas weniger fett. Auf dem Mac liefen die Buchstaben bei kleinen Größen zusammen und wirkten unscharf; jetzt nutzt die Oberfläche dort Avenir Next Demi Bold statt Heavy, unter Windows Arial Bold statt Arial Black.",
+          "en": "Headings, tabs and ribbon labels are a little less heavy. On the Mac the letters ran together at small sizes and looked blurred; now the interface uses Avenir Next Demi Bold there instead of Heavy, and Arial Bold instead of Arial Black on Windows."
+        }
+      },
+      {
+        "title": {
+          "de": "Zugeklappte Gruppen zeigen, dass sie aufgehen",
+          "en": "Folded groups show that they open"
+        },
+        "body": {
+          "de": "Ist das Fenster schmal, klappen Gruppen im Menüband zu einem Knopf zusammen. Der sah aus wie ein einzelnes Werkzeug, „Verlauf“ etwa wie Rückgängig. Jetzt hängt darunter ein kleiner Pfeil in der Farbe der Gruppe, und der Hinweistext sagt, dass ein Klick die Werkzeuge zeigt.",
+          "en": "When the window is narrow, groups in the ribbon fold into one button. It looked like a single tool, History like Undo, say. Now a small arrow in the group's colour hangs beneath it, and its hint says that a click shows the tools."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.124.1",
+    "items": [
+      {
+        "title": {
+          "de": "Eine Reihe gleichmäßig über eine Platte verteilen",
+          "en": "Spread a row evenly over a plate"
+        },
+        "body": {
+          "de": "Im Muster gibt es unter „Reihe“ jetzt „Über einen Körper verteilen“: Setze ein Loch auf eine Platte, wähle entlang X oder Y und den Abstand zum Rand, und die Löcher füllen die Platte von einem Ende zum anderen. Der Abstand folgt der Anzahl, du musst ihn nicht mehr ausrechnen - etwa für ein Schlüsselbrett oder eine Garderobe.",
+          "en": "The pattern's row has a new \"Spread over a body\": put a hole on a plate, choose along X or Y and the gap to the edge, and the holes fill the plate from one end to the other. The spacing follows the count, so there is nothing left to work out - for a key holder or a coat rack, say."
+        }
+      },
+      {
+        "title": {
+          "de": "SVGs aus Adobe Illustrator",
+          "en": "SVGs from Adobe Illustrator"
+        },
+        "body": {
+          "de": "Mit „Speichern unter → SVG“ aus Illustrator gespeicherte Dateien lehnte layerling bisher ab („SVG entities are not supported“). Jetzt lassen sie sich ganz normal importieren. Klappt ein Import nicht, steht der Grund in deiner Sprache da, mit einem Hinweis, was hilft.",
+          "en": "Files saved from Illustrator with Save As → SVG used to be refused (\"SVG entities are not supported\"). Now they import like any other. When an import does not work, the reason is shown in your language, with a hint at what helps."
+        }
+      },
+      {
+        "title": {
+          "de": "Gewindelöcher, in die die Schraube auch passt",
+          "en": "Tapped holes the bolt actually fits"
+        },
+        "body": {
+          "de": "Eine Gewindestange oder Schraube, die du als Aussparung setzt, hat das volle Maß der Schraube und kein Spiel, das Loch wird gedruckt also zu eng. layerling weist jetzt darauf hin und macht mit einem Klick ein Gewindeloch daraus, das das eingestellte Spiel bekommt.",
+          "en": "A threaded rod or screw that you set as a hole has the bolt's full size and no play, so the printed hole comes out too tight. layerling now points this out and turns it into a tapped hole with one click, which gets the clearance you set."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.124.0",
+    "items": [
+      {
+        "title": {
+          "de": "Gefälle und Zulaufen in der Länge",
+          "en": "Slope and narrow along"
+        },
+        "body": {
+          "de": "Zwei neue Karten in den Einstellungen von Quader, Zylinder, Vieleck, Keil und anderen Formen: „Gefälle in der Länge“ lässt die Oberseite zu einem Ende hin abfallen, „Zulaufen in der Länge“ führt die Seiten zu einem Ende zusammen, gerade oder gebogen. So entstehen ein Dach mit Gefälle, eine Rampe oder ein Bootsbug, und ein orangefarbener Punkt am Ende zieht die Höhe oder Breite direkt in der Ansicht.",
+          "en": "Two new cards in the settings of the box, cylinder, polygon, wedge and other shapes: \"Slope Along\" runs the top down towards one end, \"Narrow Along\" runs the sides in towards one end, straight or curved. That gives a sloping roof, a ramp or a boat's bow, and an orange dot on the end drags the height or width right in the view."
+        }
+      },
+      {
+        "title": {
+          "de": "Eine Gruppe sieht aus wie ein Körper",
+          "en": "A group looks like one body"
+        },
+        "body": {
+          "de": "Eine Gruppe aus Körpern zeigt sich jetzt als ein verschmolzener Körper, so dass du sie auf einen Blick von einem Bündel unterscheidest. Neue Gruppen beginnen einfarbig, „Mehrfarbig“ holt die Farben der Teile zurück; gespeicherte Gruppen behalten ihre Farben.",
+          "en": "A group of solids now shows as one merged body, so you can tell it from a bundle at a glance. New groups start in one colour, and \"Multicolor\" brings the parts' colours back; saved groups keep their colours."
+        }
+      },
+      {
+        "title": {
+          "de": "Fasen und Verrunden an nachgezeichneten SVGs",
+          "en": "Chamfers and fillets on traced SVGs"
+        },
+        "body": {
+          "de": "Eine SVG, die ein Programm aus einem Bild nachgezeichnet hat, nimmt jetzt Fasen und Verrundungen an ihren Kanten an. Vorher schlug das an jeder Kante fehl.",
+          "en": "An SVG that a program traced from a picture now takes chamfers and fillets on its edges. Before, every edge failed."
+        }
+      },
+      {
+        "title": {
+          "de": "Den Dateinamen für den Entwurf übernehmen",
+          "en": "Take the file name for the design"
+        },
+        "body": {
+          "de": "Gibst du der Datei beim Speichern einen anderen Namen als dem Entwurf, bietet die Meldung danach einen Knopf an, der den Entwurf genauso nennt. Wer den anderen Namen mit Absicht gewählt hat, etwa mit einer Versionsnummer, lässt ihn einfach stehen.",
+          "en": "If you give the file a different name than the design when saving, the message afterwards offers a button that names the design the same. If you picked the other name on purpose, say with a version number, just leave it."
+        }
+      },
+      {
+        "title": {
+          "de": "Noppen: keine Lücken mehr, auf Wunsch in geraden Reihen",
+          "en": "Bumps: no more gaps, and straight rows if you like"
+        },
+        "body": {
+          "de": "Auf runden Körpern fehlten bei der Oberflächentextur „Noppen“ einzelne Noppen, und manche Mulden sahen zerfetzt aus. Jetzt sitzt jede an ihrem Platz. Unter „Anordnung“ stehen sie versetzt wie bisher oder in geraden Reihen.",
+          "en": "On round bodies the surface texture \"Bumps\" left single bumps out, and some hollows looked torn. Now every one sits in its place. Under \"Arrangement\" they stand staggered as before, or in straight rows."
+        }
+      },
+      {
+        "title": {
+          "de": "Schnelle Tooltips in der installierten App",
+          "en": "Quick tooltips in the installed app"
+        },
+        "body": {
+          "de": "Als App installiert zeigte layerling die Namen der Knöpfe spät oder gar nicht. Jetzt erscheinen sie dort nach einem kurzen Moment in einer kleinen Blase.",
+          "en": "Installed as an app, layerling showed the names of its buttons late or not at all. There they now come up after a short moment in a small bubble."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.123.0",
+    "items": [
+      {
+        "title": {
+          "de": "Delta-Drucker mit runder Platte",
+          "en": "Delta printers with a round plate"
+        },
+        "body": {
+          "de": "Die Druckerliste kennt jetzt Delta-Drucker von FLSun, SeeMeCNC, Anycubic und Rolohaun. Mit einem von ihnen ist die Arbeitsfläche rund wie die Platte, und layerling warnt, wenn ein Körper über den Rand ragt.",
+          "en": "The printer list now has delta printers by FLSun, SeeMeCNC, Anycubic and Rolohaun. With one of them the workplane is round like the plate, and layerling warns when a body reaches past the rim."
+        }
+      },
+      {
+        "title": {
+          "de": "Schraffierter Schnitt",
+          "en": "A hatched cut"
+        },
+        "body": {
+          "de": "Die Schnittansicht schraffiert den Schnitt jetzt wie eine Zeichnung, und ein Körper in einem anderen ist andersherum schraffiert. Unter „Schnittfläche“ kannst du ihn auch einfarbig füllen oder offen lassen.",
+          "en": "The section view now hatches the cut like a drawing, and a body inside another is hatched the other way. Under \"Cut face\" you can also fill it plain or leave it open."
+        }
+      },
+      {
+        "title": {
+          "de": "Der Verlauf als Liste",
+          "en": "The history as a list"
+        },
+        "body": {
+          "de": "Der Listen-Knopf in der Verlaufsansicht zeigt alle Schritte mit Namen und Maß untereinander, den neuesten oben. Ein Klick springt zu diesem Stand, ohne erst am Schieber zu suchen.",
+          "en": "The list button in the History view shows every step by name and measure, the newest at the top. A click jumps to that state without hunting along the slider."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.122.0",
+    "items": [
+      {
+        "title": {
+          "de": "Rückgängig sagt, was es zurücknimmt",
+          "en": "Undo says what it takes back"
+        },
+        "body": {
+          "de": "Zeigst du auf Rückgängig oder Wiederholen, nennt der Tooltip den Schritt samt Maß, etwa „Kanten von Box gerundet (5 mm)“, und die Meldung nach Strg+Z sagt, was zurückgenommen wurde.",
+          "en": "Point at Undo or Redo and the tooltip names the step with its measure, such as \"Rounded the edges of Box (5 mm)\", and the message after Ctrl+Z says what was undone."
+        }
+      },
+      {
+        "title": {
+          "de": "Skizze aus dem Schnitt",
+          "en": "Sketch from the cut"
+        },
+        "body": {
+          "de": "Im Schnittfenster beginnt „Skizze aus Schnitt“ eine neue Skizze direkt auf dem Schnitt, mit seinen Umrissen schon darin, Löcher als echte Kreise. So startet ein Deckel, ein Einsatz oder eine Dichtung mit dem Umriss des Teils, an das sie passen sollen.",
+          "en": "In the section view, \"Sketch from cut\" starts a new sketch right on the cut with its outlines already in it, holes as true circles. A lid, an insert or a gasket then starts from the outline of the part it has to fit."
+        }
+      },
+      {
+        "title": {
+          "de": "Maustasten wie im Slicer, und die 3D-Maus",
+          "en": "Mouse buttons like your slicer, and a 3D mouse"
+        },
+        "body": {
+          "de": "In den Einstellungen unter Darstellung lassen sich die Maustasten jetzt wie in Bambu Studio und OrcaSlicer belegen: Ziehen mit links auf leerer Fläche dreht die Ansicht, rechts verschiebt sie. Und eine SpaceMouse steuert die Ansicht in Chrome und Edge, einmal dort verbunden.",
+          "en": "Under Appearance in the settings, the mouse buttons can now work as in Bambu Studio and OrcaSlicer: a left drag on empty space turns the view, the right button shifts it. And a SpaceMouse steers the view in Chrome and Edge once it is connected there."
+        }
+      },
+      {
+        "title": {
+          "de": "Hirth-Verzahnung",
+          "en": "Hirth joint"
+        },
+        "body": {
+          "de": "Eine neue Form neben dem Zahnrad: eine Scheibe mit V-förmigen Zähnen, die strahlenförmig von der Mitte ausgehen. Eine umgedrehte Kopie greift in jedem Zahnschritt hinein und zentriert sich selbst, etwa für ein verstellbares Gelenk oder einen Rastknopf.",
+          "en": "A new shape next to the gears: a disc with V-shaped teeth running out from the centre. A copy turned over locks into it at every tooth and centres itself, for a hinge you can set at an angle or a knob that clicks into place."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.121.1",
+    "items": [
+      {
+        "title": {
+          "de": "Passende Symbole, Polnisch wieder vollständig",
+          "en": "Matching icons, Polish complete again"
+        },
+        "body": {
+          "de": "Flexi-Gelenke, Ausstecher und Deckel haben in der Leiste Symbole bekommen, die zu den übrigen Werkzeugen passen. Die polnische Oberfläche und Anleitung sind wieder auf dem neuesten Stand, und die Teile eines Ausstechers (Wand, Rand, Innenwände, Stege, Platte) heißen jetzt in deiner Sprache.",
+          "en": "Flexi joints, Cookie cutter and Lid now have icons in the ribbon that match the other tools. The Polish interface and guide are up to date again, and the parts of a cookie cutter (wall, rim, inner walls, bridges, plate) are named in your language."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.121.0",
+    "items": [
+      {
+        "title": {
+          "de": "Neu: Das Menüband klappt Gruppen ein",
+          "en": "New: the ribbon folds groups away"
+        },
+        "body": {
+          "de": "Damit mehr Platz zum Bauen bleibt, ist das Menüband jetzt immer nur eine Zeile hoch. Passen nicht alle Gruppen ins Fenster, klappen die seltener gebrauchten zu einem Knopf zusammen; zeig mit der Maus darauf oder tippe ihn an, dann öffnen sich ihre Werkzeuge. Der Start-Knopf (das Haus) steht jetzt links neben „3D-Editor“, die Hilfe oben rechts. Lieber alles offen wie bisher? Klicke oben rechts auf die Stecknadel links neben der Lupe: Dann bleiben alle Gruppen offen, auch beim nächsten Mal. Ein zweiter Klick schaltet zurück.",
+          "en": "To leave more room for building, the ribbon now always stays one row high. When not all groups fit into the window, the ones used least fold into one button; point at it or tap it and its tools open. The Start button (the house) now sits left of \"3D editor\", the help at the top right. Prefer everything open as before? Click the pin left of the magnifying glass at the top right: all groups then stay open, next time too. A second click switches back."
+        }
+      },
+      {
+        "title": {
+          "de": "Neu: Deckel für Kisten und Töpfe",
+          "en": "New: lids for boxes and pots"
+        },
+        "body": {
+          "de": "Unter Bearbeiten macht „Deckel“ den passenden Deckel für einen Körper, der oben offen ist, etwa eine Kiste, die du mit offener Oberseite ausgehöhlt hast. Wähle eingesteckt, übergestülpt oder flach und die Passung: stramm, normal oder locker. Der Deckel folgt dem Umriss, auch einem runden, und liegt danach umgedreht neben dem Körper, fertig zum Drucken.",
+          "en": "Under Modify, \"Lid\" makes the matching lid for a body that is open at the top, such as a box you hollowed with its top open. Choose push in, over the top or flat, and the fit: tight, normal or loose. The lid follows the outline, a round one too, and lies turned over beside the body, ready to print."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.120.2",
     "items": [
       {

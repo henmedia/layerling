@@ -12,7 +12,7 @@ summary: 相互配合的螺钉、螺母与螺纹孔，以及齿轮、弹簧、�
 - **{{ui:thread.rod}}：** 带螺纹的圆柱体，例如没有头的螺钉。
 - **{{ui:thread.screw}}：** 带头部。你可以选择 {{ui:inspector.threadHead}}：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。
 - **{{ui:thread.nut}}：** 配套的螺母。
-- **{{ui:thread.bore}}：** 螺纹孔。它属于孔。把它拖进零件，将两者分组，零件就有内螺纹。
+- **{{ui:thread.bore}}：** 螺纹孔。它属于孔。把它拖进零件，将两者分组，零件就有内螺纹。 要做拧螺栓的孔，请始终使用{{ui:thread.bore}}：{{ui:thread.rod}}或{{ui:thread.screw}}作为孔时是螺栓的完整尺寸，没有间隙，会太紧。如果仍把它设为孔，layerling 会提示你，点击{{ui:inspector.threadMakeTappedHole}}即可改为{{ui:thread.bore}}。
 
 ![一个带圆柱头的螺钉。右侧：类型和头部形状，往下是规格、螺距和牙型。](shot:thread-screw)
 
@@ -143,7 +143,7 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 {{ui:prop.hingeClearance}} 是活动部件之间的间隙：销周围、铰链节之间以及叶片前方。0.4 mm 时，调校良好的打印机通常轻轻一扭就能松开；如果部件粘在一起，就加大；如果晃得太厉害，就减小。按平台上的姿态平放打印铰链，不要支撑。如果你更想用自己的销，例如一段耗材或铁丝，在小铰链上它比打印的销更光滑，就开启 {{ui:prop.hingePinless}}：打印的销被略去，孔径等于销直径加间隙，贯穿每个铰链节，包括两端。用 {{ui:prop.hingeAngle}} 你让第二片绕销折起，把铰链摆成设计中的姿态：0° 平躺如打印时，180° 为闭合。铰链节保持原位，铰链仍是一体；在就地打印前记得设回 0°。你可以给叶片加孔，或把它们分组进更大的零件，例如盖子。
 
-铰链也可以做成{{ui:hinge.styleCone}}（在{{ui:prop.hingeStyle}}下）：每隔一个关节的两端是圆锥，嵌入相邻关节的锥形凹坑。没有销，也没有可能下垂的长悬空桥，所以可以平放打印；圆锥为 45°。它是网格，因此倒角和圆角对它无效，STEP 导出包含的是三角形；关节对圆锥来说太短时，会做得更少。除了关节数量，也可以指定{{ui:prop.hingeKnuckleWidth}}：关节不会比它更宽，数量由长度决定；输入关节数量会取消宽度。
+铰链也可以做成{{ui:hinge.styleCone}}（在{{ui:prop.hingeStyle}}下）：每隔一个关节的两端是圆锥，嵌入相邻关节的锥形凹坑。没有销，也没有可能下垂的长悬空桥，所以可以平放打印；圆锥为 45°。和其他样式一样，它是精确实体，因此倒角和圆角对它有效，STEP 导出包含它真正的圆锥；关节对圆锥来说太短时，会做得更少。除了关节数量，也可以指定{{ui:prop.hingeKnuckleWidth}}：关节不会比它更宽，数量由长度决定；输入关节数量会取消宽度。
 
 {{ui:prop.hingeStyle}}有三个选项：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（为自备销留的孔）和{{ui:hinge.styleCone}}。选圆锥时，{{ui:prop.hingeConeSize}}决定圆锥从关节长出处的大小；圆锥越大越牢固，默认取能放下的最大值。带圆锥的铰链没有销也没有孔，所以它的翼板可以和整个关节一样厚：把{{ui:prop.hingeLeafThickness}}设为关节直径，翼板就与关节齐平；这样的铰链最多打开约 90°，因为厚翼板会相碰。
 

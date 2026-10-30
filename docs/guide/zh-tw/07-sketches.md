@@ -42,7 +42,7 @@ summary: 畫出平面輪廓，為角點做圓角或倒角，再將它擠出或�
 
 ## 讓直邊彎曲
 
-選取一條直線，點擊出現的工具列中的 {{ui:sketch.curveLine}}：這條邊會彎成曲線，與 Tinkercad 一樣，並顯示兩個控點。拖曳控點來塑造曲線；控點拉得越遠，彎得越強。{{ui:sketch.straightenLine}} 會讓這條邊重新變直。選取的點可以用 {{ui:sketch.smooth}} 變成圓滑的：它會獲得自己的控點，相鄰的線也會變成曲線。選取三個或更多點時，工具列中的 {{ui:sketch.curveThroughPoints}} 會從第一個點到最後一個點鋪一條平滑曲線，穿過中間的每個點，與 {{ui:sketch.smooth}} 工具畫出的一樣；兩端以外的線保持不變。其他軟體稱之為「Fit curve」或「Fit point spline」。兩者的差別：{{ui:sketch.curveLine}} 會把每條選取的邊單獨彎曲，保留邊與邊之間的轉角，適合在一條邊上做拱形；{{ui:sketch.curveThroughPoints}} 讓一條曲線穿過這些點，不留轉角，適合把描出的鋸齒狀邊緣變平滑。點擊一個控點，它會亮起：此時方向鍵會以一個網格步距移動它，配合 [[Shift]] 則步距更大，因此可以精確設定曲線。
+選取一條直線，點擊出現的工具列中的 {{ui:sketch.curveLine}}：這條邊會彎成曲線，與 Tinkercad 一樣，並顯示兩個控點。拖曳控點來塑造曲線；控點拉得越遠，彎得越強。指標下的控點會變成橘色，並且也能接住緊挨著它的點擊，這樣下面的範本圖片不會被誤移。{{ui:sketch.straightenLine}} 會讓這條邊重新變直。選取的點可以用 {{ui:sketch.smooth}} 變成圓滑的：它會獲得自己的控點，相鄰的線也會變成曲線。選取三個或更多點時，工具列中的 {{ui:sketch.curveThroughPoints}} 會從第一個點到最後一個點鋪一條平滑曲線，穿過中間的每個點，與 {{ui:sketch.smooth}} 工具畫出的一樣；兩端以外的線保持不變。其他軟體稱之為「Fit curve」或「Fit point spline」。兩者的差別：{{ui:sketch.curveLine}} 會把每條選取的邊單獨彎曲，保留邊與邊之間的轉角，適合在一條邊上做拱形；{{ui:sketch.curveThroughPoints}} 讓一條曲線穿過這些點，不留轉角，適合把描出的鋸齒狀邊緣變平滑。點擊一個控點，它會亮起：此時方向鍵會以一個網格步距移動它，配合 [[Shift]] 則步距更大，因此可以精確設定曲線。
 
 ![L 形輪廓的底邊彎成曲線，兩個控點位於兩端。](shot:sketch-curve)
 

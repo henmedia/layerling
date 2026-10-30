@@ -74,6 +74,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_hull_objects` | Avvolge gli oggetti in un unico corpo convesso, come con la pellicola termoretraibile (involucro). |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | Separa una forma nelle sue parti distinte; un corpo da schizzo viene diviso in un corpo per contorno. |
 | `layerling_split_objects` | Taglia a metà solidi o fori con un piano. |
@@ -112,6 +113,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_set_history_view` | Mostra uno stato precedente del progetto, come la vista Cronologia. Il progetto vero e proprio non viene modificato; gli strumenti di modifica restano in attesa finché la vista non viene chiusa. |
 | `layerling_restore_from_history` | Ripristina nel progetto come copie gli oggetti di uno stato precedente, comprese le parti all’interno dei gruppi, come «Inserisci nel progetto» nella vista Cronologia; l’operazione è un singolo passaggio annullabile. |
 | `layerling_export_section_svg` | Restituisce in formato SVG, in scala 1:1, i contorni sul piano di sezione, usando gli stessi corpi dell’esportazione. |
+| `layerling_sketch_from_section` | Crea uno schizzo dai contorni su un piano di sezione, appoggiato sulla sezione: aperto nell'editor per modificarlo, oppure costruito subito come corpo di un'altezza data. |
 | `layerling_export_drawing` | Crea il disegno tecnico dell’esportazione «2D»: tre viste in scala 1:1 su un foglio ISO, con dimensioni complessive e tabella dei fori circolari, in formato SVG testuale o PDF. |
 | `layerling_export_mesh` | Esporta i corpi della finestra di esportazione in formato STL, 3MF, OBJ, SVG (vista dall’alto, impronta o spigoli visibili) o DXF per il taglio laser, in un percorso del computer o come base64. |
 | `layerling_save_project` | Salva l’intero progetto modificabile come file `.lyl` in un percorso del computer su cui è in esecuzione il server MCP, senza finestra di dialogo. Un file esistente viene sostituito solo con `overwrite`; il salvataggio avviene tramite un file temporaneo e non modifica la destinazione di [[Ctrl]]+[[S]] nell’editor. |

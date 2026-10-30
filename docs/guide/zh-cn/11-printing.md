@@ -5,7 +5,7 @@ summary: 选择自己的打印机，在部件放不下时收到警告，并正�
 
 ## 选择打印机
 
-打开设置（功能区里的齿轮图标，{{ui:editor.workspaceSettings}}），切换到 {{ui:workspace.workplane}} 区域。在 {{ui:workspace.printer}} 下，可以从 220 多种常见型号的列表中选择自己的打印机，包括 Bambu Lab、Prusa、Creality、Anycubic、Elegoo 等众多品牌。
+打开设置（功能区里的齿轮图标，{{ui:editor.workspaceSettings}}），切换到 {{ui:workspace.workplane}} 区域。在 {{ui:workspace.printer}} 下，可以从 230 多种常见型号的列表中选择自己的打印机，包括 Bambu Lab、Prusa、Creality、Anycubic、Elegoo 等众多品牌。
 
 ![已选择打印机的工作平面设置。打印床尺寸和最大打印高度来自切片软件配置。](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ summary: 选择自己的打印机，在部件放不下时收到警告，并正�
 - 部件放不下时，layerling 会**警告**。
 
 打印机配置来自 OrcaSlicer，因此与你的切片软件所知的完全相同。如果不想使用打印机，选择 {{ui:workspace.printerNone}}。也可以手动设置工作平面的尺寸。
+
+FLSun、SeeMeCNC 等品牌的三角洲（Delta）打印机以及 Anycubic Predator 使用圆形打印平台。选择这类打印机后，工作平面也变成圆形，宽度与平台相同；物体一旦超出边缘就算太大。圆形物体按自身轮廓测量，而不是按包围它的方框，所以几乎和平台一样宽的圆柱体也能放下。
 
 ## 部件放不下时
 

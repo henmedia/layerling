@@ -83,6 +83,18 @@ If you resize a hollowed body later, layerling hollows it again at the new size 
 
 > **Tip:** With a 0.4 mm nozzle, 1.2 to 2 mm of wall is a good start: thin enough to save material, thick enough for a sturdy part.
 
+## A lid for an open body
+
+{{ui:editor.tool.lid}} makes the lid for a body that is open at the top: a box you hollowed with its top open, a pot, a tray. Select the body and click {{ui:editor.tool.lid}}. In the window you choose the kind:
+
+- {{ui:lid.type.plug}}: a plate as large as the body with a lip below it that goes into the opening.
+- {{ui:lid.type.cap}}: a plate a wall wider than the body with a rim below it that goes over the outside.
+- {{ui:lid.type.flat}}: only the plate, to lay on top or glue on.
+
+Then you set the {{ui:lid.thickness}}, the {{ui:lid.fit}} (the {{ui:lid.gap}} between lid and body: 0.1 mm tight, 0.2 mm normal, 0.3 mm loose, or any value up to 1 mm) and how deep the lip or rim reaches down and how thick its wall is. Click {{ui:lid.apply}}: the lid lies beside the body, turned over with its plate down, so it prints without support. The body stays as it is. The lid follows any outline, round or angular, because it is taken from the body itself just below its rim. A body without an opening at the top only gets a flat lid; for the other two, hollow it with the top open first.
+
+> **Tip:** How tight a lid sits depends on the printer. Print a small box with its lid first; if the lid is too tight, take the next looser fit.
+
 ## Offsetting bodies
 
 Every face of a body can be moved by the same distance, out or in. That is what a press fit, a lid or a snap joint needs: a gap of 0.1 to 0.3 mm all round while the features stay where they are, which scaling cannot give you.

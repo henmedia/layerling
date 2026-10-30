@@ -63,8 +63,8 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_place_on_face` | odkłada obiekty na ścianę innego, także skośną, jak klawisz C |
 | `layerling_perforate_face` | wycina wzór otworów w płaskiej ścianie. Otwory zostają otworami zgrupowanymi z bryłą |
 | `layerling_sweep_sketch` | prowadzi prostokątny albo okrągły przekrój wzdłuż ścieżki z punktów jako jedną dokładną bryłę. Zamknięta ścieżka daje pierścień |
-| `layerling_push_face` | wypycha płaską ścianę na zewnątrz albo wycina w niej kieszeń, z odsunięciem od krawędzi i promieniem narożników. Nowa część to bryła ze szkicu zgrupowana z bryłą |
-| `layerling_mate_faces` | przykłada ścianę jednego obiektu do ściany drugiego, ściana do ściany albo na równo |
+| `layerling_push_face` | wypycha płaską ścianę na zewnątrz albo wycina w niej kieszeń, z odsunięciem od krawędzi i promieniem narożników. Nowa część to bryła ze szkicu zgrupowana z bryłą albo, z `separate`, osobna wolna bryła |
+| `layerling_mate_faces` | przykłada ścianę jednego obiektu do ściany drugiego, ściana do ściany, na równo albo dwie okrągłe ściany na jednej osi |
 | `layerling_open_group` | otwiera grupę, żeby zmieniać jej części po kolei, także grupę wewnątrz otwartej |
 | `layerling_close_group` | zamyka ją z powrotem („Gotowe”) albo anuluje |
 | `layerling_group_objects` | grupuje obiekty |
@@ -72,9 +72,10 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_boolean_cut` | wycina otworami materiał z brył |
 | `layerling_intersect_objects` | zostawia tylko to, co obiekty mają wspólnego (część wspólna) |
 | `layerling_hull_objects` | owija obiekty jedną wypukłą bryłą, jak folią termokurczliwą (otoczka) |
-| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
-| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
+| `layerling_cookie_cutter` | robi z obiektów foremkę do ciastek: ściankę z ostrzem i kołnierz wokół odbitego konturu (Foremka do ciastek) |
+| `layerling_flexi_joints` | tnie płaską bryłę na ogniwa z przegubami drukowanymi w miejscu, które wychylają się na boki (Przeguby flexi) |
+| `layerling_make_lid` | robi pokrywkę do bryły otwartej u góry: wciskaną, nakładaną albo płaską, z wybranym pasowaniem (Pokrywka) |
+| `layerling_loft_sketches` | łączy dwie bryły ze szkicu w przejście od jednego konturu do drugiego (Przejście między szkicami) |
 | `layerling_separate_parts` | rozdziela kształt na jego luźne części, bryłę ze szkicu na jedną bryłę na kontur |
 | `layerling_split_objects` | przecina bryły albo otwory na dwie części płaszczyzną |
 | `layerling_list_edges` | wypisuje prawdziwe krawędzie CAD obiektu |
@@ -112,11 +113,12 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_set_history_view` | pokazuje wcześniejszy stan projektu, jak widok historii (prawdziwy projekt zostaje nietknięty, a narzędzia zmieniające czekają, aż widok zostanie zamknięty) |
 | `layerling_restore_from_history` | przywraca obiekty (także części wewnątrz grup) z wcześniejszego stanu do projektu jako kopie, jak przycisk Przywróć do projektu w widoku historii. To jeden krok, który cofanie wycofuje |
 | `layerling_export_section_svg` | zwraca kontury na płaszczyźnie cięcia jako SVG w skali 1:1, z tych samych brył co eksport |
+| `layerling_sketch_from_section` | tworzy szkic z konturów na płaszczyźnie cięcia, leżący na przekroju: otwarty w edytorze do zmiany albo od razu zbudowany jako bryła o podanej wysokości |
 | `layerling_export_drawing` | tworzy rysunek warsztatowy eksportu „2D”: trzy widoki w skali 1:1 na arkuszu ISO z wymiarami gabarytowymi i tabelą okrągłych otworów, jako tekst SVG albo PDF |
 | `layerling_export_mesh` | zapisuje plik okna eksportu jako STL, 3MF, OBJ, SVG (widok z góry, ślad albo widoczne krawędzie) albo DXF do cięcia laserem, z tych samych brył, do ścieżki na tym komputerze albo jako base64 |
 | `layerling_save_project` | zapisuje cały edytowalny projekt jako plik .lyl pod ścieżką na komputerze, na którym działa serwer MCP, bez okna dialogowego; istniejący plik jest zastępowany tylko z `overwrite`, zapis idzie przez plik tymczasowy, a cel Ctrl+S w edytorze pozostaje bez zmian |
-| `layerling_list_attachments` | wypisuje pliki dołączone do projektu (nazwa, typ, rozmiar), tak jak pokazuje je panel Attachments |
-| `layerling_get_attachment` | odczytuje jeden załącznik, jego bajty jako base64, jak Download w panelu |
+| `layerling_list_attachments` | wypisuje pliki dołączone do projektu (nazwa, typ, rozmiar), tak jak pokazuje je panel Załączniki |
+| `layerling_get_attachment` | odczytuje jeden załącznik, jego bajty jako base64, jak pobieranie w panelu |
 | `layerling_add_attachment` | dołącza plik podany jako base64, z kontrolami panelu; nazwa już dołączona jest nadpisywana tylko z `replace` |
 | `layerling_rename_attachment` | nadaje załącznikowi inną nazwę; zawartość zostaje |
 | `layerling_remove_attachment` | usuwa załącznik na zawsze; wymaga `confirm: true` |

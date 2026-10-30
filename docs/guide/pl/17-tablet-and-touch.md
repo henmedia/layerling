@@ -10,7 +10,7 @@ layerling działa w przeglądarce tabletu oraz jako aplikacja z jego ekranu pocz
 | Chcesz | Na tablecie |
 | --- | --- |
 | Zaznaczyć bryłę | Stuknij ją. |
-| Zaznaczyć kilka brył | Przytrzymaj nieruchomo palec przez pół sekundy, wybierz {{ui:contextMenu.selectMultiple}}, potem stukaj kolejne bryły. Stuknięcie zaznaczonej bryły ją odznacza. |
+| Zaznaczyć kilka brył | Stuknij bryłę: w lewym dolnym rogu pojawi się okrągły przycisk. Stuknij go, a każda kolejna stuknięta bryła dołącza do zaznaczenia. Stuknięcie zaznaczonej bryły ją odznacza. Stuknięcie pustego miejsca niczego nie zmienia, a drugie stuknięcie przycisku kończy wybieranie i czyści zaznaczenie. Albo przytrzymaj nieruchomo palec przez pół sekundy, wybierz {{ui:contextMenu.selectMultiple}}, potem stukaj kolejne bryły. |
 | Zaznaczyć wszystkie bryły | Przytrzymaj nieruchomo palec na pustym miejscu przez pół sekundy, wybierz {{ui:contextMenu.selectAll}}. |
 | Otworzyć menu prawego przycisku | Przytrzymaj nieruchomo palec na bryle albo na pustym miejscu przez pół sekundy. |
 | Przesunąć bryłę | Przeciągnij ją. |
@@ -41,7 +41,7 @@ Jeśli bryły się przesuwają, gdy dotykają ich dzieci albo pośpieszne ręce,
 ## Na iPadzie albo iPhonie
 
 - **Zainstaluj go jako aplikację.** W Safari stuknij ikonę Udostępnij i wybierz „Do ekranu początkowego”. Aplikacja otwiera się we własnym oknie bez paska adresu i działa bez połączenia, zobacz [Offline i instalacja](chapter:offline-and-install).
-- **Twoje projekty mieszkają w przeglądarce.** Nie ma konta i nic nie jest wysyłane. Safari ma własną zasadę przeciw śledzeniu: usuwa to, co strona zapisała, po siedmiu dniach, w których jej nie odwiedzałeś w Safari. Aplikacja internetowa dodana do ekranu początkowego jest z tej zasady wyłączona, jak opisuje to WebKit. To jeszcze jeden powód, żeby używać aplikacji z ekranu początkowego i robić kopie zapasowe ważnej pracy: {{ui:dashboard.backupAll}} na stronie startowej pakuje wszystkie projekty do jednego pliku.
+- **Twoje projekty mieszkają w przeglądarce** (chyba że sam hostujesz layerling i skonfigurujesz folder na serwerze). Nie ma konta i nic nie jest wysyłane. Safari ma własną zasadę przeciw śledzeniu: usuwa to, co strona zapisała, po siedmiu dniach, w których jej nie odwiedzałeś w Safari. Aplikacja internetowa dodana do ekranu początkowego jest z tej zasady wyłączona, jak opisuje to WebKit. To jeszcze jeden powód, żeby używać aplikacji z ekranu początkowego i robić kopie zapasowe ważnej pracy: {{ui:dashboard.backupAll}} na stronie startowej pakuje wszystkie projekty do jednego pliku.
 - **Pliki.** Safari pozwala stronie zapisywać do pliku tylko przez pobieranie, więc {{ui:editor.export}} kładzie plik do folderu Pobrane w aplikacji Pliki, a [[Ctrl]]+[[S]] na klawiaturze pobiera go ponownie. Zobacz [Pliki i zapis](chapter:files-and-saving).
 - **Klawiatura nie jest potrzebna.** Każde narzędzie ma przycisk na wstążce, a pole liczbowe otwiera klawiaturę ekranową. Klawiatura podłączona do iPada dodaje [skróty klawiszowe](chapter:shortcuts). Pole wartości obok bryły otwiera swoje pole liczbowe dopiero drugim stuknięciem: pierwsze tylko je zaznacza, więc palec, który tam przypadkiem trafi, nie wywoła klawiatury.
 

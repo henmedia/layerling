@@ -149,6 +149,9 @@ export type SurfaceTextureImage = (typeof SURFACE_TEXTURE_IMAGES)[number];
 /** Image tiles: repeated, mirrored (no seam at their borders) or every other row half a tile along. */
 export const SURFACE_TEXTURE_TILINGS = ["repeat", "mirror", "staggered"] as const;
 export type SurfaceTextureTiling = (typeof SURFACE_TEXTURE_TILINGS)[number];
+/** Bumps: every other row half a spacing along (a hexagon grid), or in straight rows and columns (issue #1030). */
+export const SURFACE_TEXTURE_BUMP_GRIDS = ["staggered", "straight"] as const;
+export type SurfaceTextureBumpGrid = (typeof SURFACE_TEXTURE_BUMP_GRIDS)[number];
 /** Grooves, rope and knitting on a top or bottom round the axis: in rows (turned by faceTurn) or in rings following the outline; auto: rings on a round body, rows on an angular one. */
 export const SURFACE_TEXTURE_CAP_STYLES = ["auto", "rows", "rings"] as const;
 export type SurfaceTextureCapStyle = (typeof SURFACE_TEXTURE_CAP_STYLES)[number];
@@ -205,6 +208,8 @@ export type SurfaceTextureSettings = {
   /** Share of the spacing a groove, joint or bump takes (0.1 to 1). */
   width: number;
   profile: SurfaceTextureProfile;
+  /** Bumps: staggered rows (a hexagon grid) or straight rows and columns, `spacing` apart both ways. */
+  bumpGrid: SurfaceTextureBumpGrid;
   /** Grooves and knurling: slant against the axis in degrees (0 = along the axis). */
   angle: number;
   /**
@@ -322,6 +327,7 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   depth: 0.6,
   width: 0.6,
   profile: "pointed",
+  bumpGrid: "staggered",
   angle: 30,
   faceTurn: 0,
   capStyle: "auto",
@@ -441,6 +447,7 @@ const CHOICES = {
   woodCut: SURFACE_TEXTURE_WOOD_CUTS,
   image: SURFACE_TEXTURE_IMAGES,
   imageTiling: SURFACE_TEXTURE_TILINGS,
+  bumpGrid: SURFACE_TEXTURE_BUMP_GRIDS,
   capStyle: SURFACE_TEXTURE_CAP_STYLES,
   capEdge: SURFACE_TEXTURE_CAP_EDGES,
 } as const;
@@ -732,6 +739,13 @@ function hexSite(u: number, v: number, spacing: number) {
   else if (dy > dz) ry = -rx - rz;
   else rz = -rx - ry;
   return { key: (rx + 50000) * 100000 + (rz + 50000), x: size * SQRT3 * (rx + rz / 2), y: size * 1.5 * rz };
+}
+
+/** The bump nearest (u, v): its key and middle, on the hexagon grid or (straight) on a square one, `spacing` apart. */
+function bumpSite(u: number, v: number, spacing: number, grid: SurfaceTextureBumpGrid) {
+  if (grid === "staggered") return hexSite(u, v, spacing);
+  const qx = Math.round(u / spacing), qy = Math.round(v / spacing);
+  return { key: (qx + 50000) * 100000 + (qy + 50000), x: qx * spacing, y: qy * spacing };
 }
 
 /** Normals of the hexagon's six sides (as hexCell: a corner up). */
@@ -1507,8 +1521,10 @@ function patternValue(u: number, v: number, s: SurfaceTextureSettings, layout: S
       return Math.max(stripe(u, v, layout.angle, layout.period, s), stripe(u, v, -layout.angle, layout.period, s));
     case "honeycomb":
       return surfaceFalloff(hexCell(u, v, layout.cell).edge / ((layout.cell / 2) * s.width), s.profile);
-    case "bumps":
-      return surfaceFalloff(hexCell(u, v, layout.cell).center / ((layout.cell / 2) * s.width), s.profile);
+    case "bumps": {
+      const c = bumpSite(u, v, layout.cell, s.bumpGrid);
+      return surfaceFalloff(Math.hypot(u - c.x, v - c.y) / ((layout.cell / 2) * s.width), s.profile);
+    }
     case "cells":
       return surfaceFalloff(cellEdge(u, v, layout.cell, layout.around, s.seed) / ((layout.cell / 2) * s.width), s.profile);
     case "bricks":
@@ -2040,6 +2056,7 @@ function stripesAreCut(s: SurfaceTextureSettings) {
  */
 function patternExtras(s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
   if (s.pattern === "cells" || s.pattern === "grain") return [s.seed];
+  if (s.pattern === "bumps") return [s.bumpGrid];
   if (s.pattern === "carbon") return [s.carbonWeave, s.carbonCross];
   if (s.pattern === "bricks") return [s.brickBond, s.brickJoint, layout.rowHeight ?? s.brickHeight, layout.rowOrigin ?? 0, layout.brickAxes ?? null, layout.capBricks ?? null];
   if (s.pattern === "bark") return [s.barkType, s.seed, s.ringWidth];
@@ -2391,6 +2408,16 @@ function sliceCells(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfac
       rec[o + 9] = CELL_PTS[kb * 2 + 1];
       return;
     }
+    if (s.pattern === "bumps" && s.bumpGrid === "straight") {
+      // Straight rows: square cells, the border the nearer of their sides (bumps need no more of a cell than that).
+      const c = bumpSite(u, v, cell, "straight");
+      rec[o] = cell / 2 - Math.max(Math.abs(u - c.x), Math.abs(v - c.y));
+      rec[o + 1] = c.key;
+      rec[o + 2] = 0;
+      rec[o + 3] = c.x;
+      rec[o + 4] = c.y;
+      return;
+    }
     const c = hexSite(u, v, cell);
     let lo = Infinity, kb = 0;
     for (let k = 0; k < 6; k += 1) {
@@ -2578,9 +2605,22 @@ function sliceCells(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfac
       const [cx, cy] = middleOf(rec, a, b, ua, va, ub, vb);
       const px = ua - cx, py = va - cy, dx = ub - ua, dy = vb - va;
       const fa = px * px + py * py - hw * hw, fb = (px + dx) ** 2 + (py + dy) ** 2 - hw * hw;
-      if (Math.abs(Math.hypot(px, py) - hw) < RIM_NEAR || Math.abs(Math.hypot(px + dx, py + dy) - hw) < RIM_NEAR) return -1;
+      const offA = Math.hypot(px, py) - hw, offB = Math.hypot(px + dx, py + dy) - hw;
       const A = dx * dx + dy * dy, B = 2 * (px * dx + py * dy);
       const disc = B * B - 4 * A * fa;
+      if (Math.abs(offA) < RIM_NEAR || Math.abs(offB) < RIM_NEAR) {
+        // From a rim point to one outside, an edge almost along the rim may dip in and leave the circle again further on
+        // (a cylinder's facet edge 0.014 mm inside a bump's rim): it is cut there too, or the sliver between it and the
+        // rim is left out and the bump touches itself at the rim point - and keeps its grid (issue #1030).
+        if (chords || !(A > 0) || disc <= 0 || Math.abs(offA) < RIM_NEAR === Math.abs(offB) < RIM_NEAR) return -1;
+        if (Math.max(offA, offB) <= RIM_NEAR) return -1;
+        const root = Math.sqrt(disc);
+        const t1 = (-B - root) / (2 * A), t2 = (-B + root) / (2 * A);
+        // The crossing away from the rim point, far enough from it not to be the same one.
+        const t = Math.abs(offA) < RIM_NEAR ? t2 : t1;
+        const from = Math.abs(offA) < RIM_NEAR ? 0 : 1;
+        return t > 0 && t < 1 && Math.abs(t - from) * Math.sqrt(A) > 4 * RIM_SNAP ? t : -1;
+      }
       if (!(A > 0) || disc <= 0) return -1;
       const root = Math.sqrt(disc);
       const t1 = (-B - root) / (2 * A), t2 = (-B + root) / (2 * A);
@@ -3411,8 +3451,44 @@ function triangleDistance2(p: number[], a: number[], b: number[], c: number[]) {
 }
 
 /**
+ * How tightly the body bends at each input triangle: the largest bend per mm from it to the triangles sharing a
+ * corner with it over smooth edges (bending by less than `cosLimit`), from middle to middle. A cylinder's mantle of
+ * radius r gives about 1/r, a fillet of 1 mm about 1, a flat face 0. Corners rather than edges: in a row of a round
+ * split into triangles, every other one has no edge to the next row and would pass for flat.
+ */
+function triangleCurvatures(base: SurfaceBase, normals: Float64Array, cosLimit: number) {
+  const v = base.vertices, I = base.indices, T = I.length / 3;
+  const centers = new Float64Array(T * 3);
+  const byCorner = new Map<number, number[]>();
+  for (let t = 0; t < T; t += 1) {
+    for (let k = 0; k < 3; k += 1) {
+      centers[t * 3 + k] = (v[I[t * 3] * 3 + k] + v[I[t * 3 + 1] * 3 + k] + v[I[t * 3 + 2] * 3 + k]) / 3;
+      const list = byCorner.get(I[t * 3 + k]);
+      if (list) list.push(t);
+      else byCorner.set(I[t * 3 + k], [t]);
+    }
+  }
+  const curvatures = new Float64Array(T);
+  for (let t = 0; t < T; t += 1) {
+    for (let k = 0; k < 3; k += 1) {
+      for (const u of byCorner.get(I[t * 3 + k])!) {
+        if (u === t) continue;
+        const cos = normals[t * 3] * normals[u * 3] + normals[t * 3 + 1] * normals[u * 3 + 1] + normals[t * 3 + 2] * normals[u * 3 + 2];
+        if (cos < cosLimit) continue;
+        const distance = Math.hypot(centers[t * 3] - centers[u * 3], centers[t * 3 + 1] - centers[u * 3 + 1], centers[t * 3 + 2] - centers[u * 3 + 2]);
+        if (distance > 1e-9) curvatures[t] = Math.max(curvatures[t], Math.acos(Math.min(1, cos)) / distance);
+      }
+    }
+  }
+  return curvatures;
+}
+
+/**
  * The body's faces: every input triangle (screen frame) numbered by the face it lies on - the region reached from it
- * over edges that bend by less than `edgeAngle` (a box's side, a cylinder's mantle or its top). `count` faces.
+ * over edges that bend by less than `edgeAngle` (a box's side, a cylinder's mantle or its top). A fillet bends softly
+ * but tightly: where a round of a radius under a tenth of the body's size meets a face more than four times flatter,
+ * that is an edge too, so a filleted cup's mantle stays apart from its rim, its inside and its bottom (#1043).
+ * `count` faces.
  */
 export function surfaceTextureFaceIds(base: SurfaceBase, edgeAngle: number) {
   const v = base.vertices, I = base.indices, T = I.length / 3;
@@ -3436,6 +3512,12 @@ export function surfaceTextureFaceIds(base: SurfaceBase, edgeAngle: number) {
     }
   }
   const cosLimit = Math.cos((edgeAngle * Math.PI) / 180);
+  const curvatures = triangleCurvatures(base, normals, cosLimit);
+  const tight = 10 / Math.max(base.size[0], base.size[1], base.size[2], 1e-9);
+  const rounded = (t: number, u: number) => {
+    const high = Math.max(curvatures[t], curvatures[u]), low = Math.min(curvatures[t], curvatures[u]);
+    return high > tight && high > 4 * low;
+  };
   const ids = new Int32Array(T).fill(-1);
   let count = 0;
   for (let first = 0; first < T; first += 1) {
@@ -3448,6 +3530,7 @@ export function surfaceTextureFaceIds(base: SurfaceBase, edgeAngle: number) {
         for (const u of byEdge.get(edge(I[t * 3 + k], I[t * 3 + ((k + 1) % 3)])) ?? []) {
           if (ids[u] >= 0) continue;
           if (normals[t * 3] * normals[u * 3] + normals[t * 3 + 1] * normals[u * 3 + 1] + normals[t * 3 + 2] * normals[u * 3 + 2] < cosLimit) continue;
+          if (rounded(t, u)) continue;
           ids[u] = count;
           queue.push(u);
         }
@@ -3455,7 +3538,68 @@ export function surfaceTextureFaceIds(base: SurfaceBase, edgeAngle: number) {
     }
     count += 1;
   }
-  return { ids, normals, count };
+  return mergeSmallRoundedPatches(base, ids, count, normals, byEdge, cosLimit);
+}
+
+/**
+ * Faces split off only by the rounding rule that stay small all round (a box under a quarter of the body's size) are
+ * no fillet but bumps on a rough or scanned body: each goes back to the face it shares most smooth edge with, so a
+ * picked face does not leave specks without pattern. A fillet runs along its edge and keeps its own face.
+ */
+function mergeSmallRoundedPatches(base: SurfaceBase, ids: Int32Array, count: number, normals: Float64Array, byEdge: Map<number, number[]>, cosLimit: number) {
+  const v = base.vertices, I = base.indices, T = I.length / 3;
+  const lo = new Float64Array(count * 3).fill(Infinity), hi = new Float64Array(count * 3).fill(-Infinity);
+  const sizes = new Int32Array(count);
+  for (let t = 0; t < T; t += 1) {
+    const f = ids[t];
+    sizes[f] += 1;
+    for (let c = 0; c < 3; c += 1) {
+      for (let k = 0; k < 3; k += 1) {
+        const value = v[I[t * 3 + c] * 3 + k];
+        lo[f * 3 + k] = Math.min(lo[f * 3 + k], value);
+        hi[f * 3 + k] = Math.max(hi[f * 3 + k], value);
+      }
+    }
+  }
+  const limit = 0.25 * Math.max(base.size[0], base.size[1], base.size[2]);
+  const small = (f: number) => Math.hypot(hi[f * 3] - lo[f * 3], hi[f * 3 + 1] - lo[f * 3 + 1], hi[f * 3 + 2] - lo[f * 3 + 2]) < limit;
+  // Smooth edge length shared between two faces.
+  const shared = new Map<number, Map<number, number>>();
+  for (const [key, list] of byEdge) {
+    if (list.length !== 2) continue;
+    const [t, u] = list, f = ids[t], g = ids[u];
+    if (f === g) continue;
+    if (normals[t * 3] * normals[u * 3] + normals[t * 3 + 1] * normals[u * 3 + 1] + normals[t * 3 + 2] * normals[u * 3 + 2] < cosLimit) continue;
+    const a = Math.floor(key / 67108864), b = key % 67108864;
+    const length = Math.hypot(v[a * 3] - v[b * 3], v[a * 3 + 1] - v[b * 3 + 1], v[a * 3 + 2] - v[b * 3 + 2]);
+    for (const [x, y] of [[f, g], [g, f]]) {
+      const row = shared.get(x) ?? new Map<number, number>();
+      row.set(y, (row.get(y) ?? 0) + length);
+      shared.set(x, row);
+    }
+  }
+  const parent = Int32Array.from({ length: count }, (_, f) => f);
+  const root = (f: number): number => (parent[f] === f ? f : (parent[f] = root(parent[f])));
+  const order = Array.from({ length: count }, (_, f) => f).filter((f) => shared.has(f) && small(f)).sort((f, g) => sizes[f] - sizes[g]);
+  for (const f of order) {
+    let best = -1, longest = 0;
+    for (const [g, length] of shared.get(f)!) {
+      if (length > longest && root(g) !== root(f)) {
+        longest = length;
+        best = g;
+      }
+    }
+    if (best >= 0) parent[root(f)] = root(best);
+  }
+  // Numbered again from 0.
+  const renumber = new Int32Array(count).fill(-1);
+  let merged = 0;
+  for (let t = 0; t < T; t += 1) {
+    const r = root(ids[t]);
+    if (renumber[r] < 0) renumber[r] = merged++;
+    ids[t] = renumber[r];
+  }
+  return { ids, normals, count: merged };
 }
 
 /** The body's box in the inside frame (x, y up, z to the viewer), from the screen frame's (x, y back, z up). */
@@ -4298,7 +4442,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
   }
 
   function withNormals(key: string, mesh: SurfaceMesh, edge: number, crossMax: number, limited: boolean, slice: RefinedState["slice"], edgeAngle: number): RefinedState {
-    const { normals, crease, down, up } = normalsAndCreases(mesh.vertices, mesh.indices, edgeAngle);
+    const { normals, crease, down, up } = normalsAndCreases(mesh.vertices, mesh.indices, edgeAngle, base, mesh.parents);
     const directions = interpolatedNormals(base, mesh, edgeAngle);
     const moves = creaseMoves(base, mesh, directions, edgeAngle);
     return { key, mesh, normals, directions, moves, crease, down, up, adj: adjacency(mesh.vertices.length / 3, mesh.indices), edge, crossMax, limited, slice };
@@ -5022,7 +5166,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
             // Faces seen along the body's axis have the pattern turned (see faceTurn).
             const turned = k === AXIS_INDEX[s.axis];
             const [pu, pv] = turned ? turnOnFace(p[i1], p[i2], s, layout) : [p[i1], p[i2]];
-            const site = hexSite(pu, pv, layout.cell);
+            const site = bumpSite(pu, pv, layout.cell, s.bumpGrid);
             if (Math.hypot(pu - site.x, pv - site.y) >= radius) continue;
             // Opposite faces share their sites: the face's place along its axis tells them apart.
             const key = `${site.key}|${k}|${Math.round(p[ax] * 1000)}`;
@@ -5047,7 +5191,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         for (let i = 0; i < n; i += 1) {
           if (faded.weights[i] === 0 || Math.abs(normals[i * 3 + ax]) > 0.8) continue;
           const u = aroundAngle(layout, v[i * 3 + i1], v[i * 3 + i2]) * layout.radius, w = v[i * 3 + ax];
-          const site = hexSite(u, w, layout.cell);
+          const site = bumpSite(u, w, layout.cell, s.bumpGrid);
           if (Math.hypot(u - site.x, w - site.y) >= radius) continue;
           if (cornerU.some((at) => Math.abs(site.x - at - turn * Math.round((site.x - at) / turn)) < radius)) faded.weights[i] = 0;
         }
@@ -5063,7 +5207,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         const siteKey = (i: number) => {
           if (Math.abs(normals[i * 3 + ax]) > 0.8) return -1;
           const u = aroundAngle(layout, v[i * 3 + i1], v[i * 3 + i2]) * layout.radius, w = v[i * 3 + ax];
-          const site = hexSite(u, w, layout.cell);
+          const site = bumpSite(u, w, layout.cell, s.bumpGrid);
           if (Math.hypot(u - site.x, w - site.y) >= radius) return -1;
           const round = Math.max(1, Math.round((2 * turn) / layout.cell));
           const kx = ((Math.round((2 * site.x) / layout.cell) % round) + round) % round;

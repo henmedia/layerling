@@ -84,6 +84,18 @@ Hvis du ændrer størrelse på en udhulet form senere, udhuler layerling den ige
 
 > **Tip:** Med en 0,4 mm dyse er 1,2 til 2 mm væg et godt udgangspunkt: tyndt nok til at spare materiale, tykt nok til en solid del.
 
+## Et låg til et åbent legeme
+
+{{ui:editor.tool.lid}} laver låget til et legeme, der er åbent foroven: en kasse, du har udhulet med åben top, en potte, en bakke. Vælg legemet og klik på {{ui:editor.tool.lid}}. I vinduet vælger du typen:
+
+- {{ui:lid.type.plug}}: en plade så stor som legemet med en læbe nedenunder, der går ind i åbningen.
+- {{ui:lid.type.cap}}: en plade en væg bredere end legemet med en kant nedenunder, der går uden om.
+- {{ui:lid.type.flat}}: kun pladen, til at lægge ovenpå eller lime på.
+
+Derefter indstiller du tykkelsen ({{ui:lid.thickness}}), pasningen ({{ui:lid.fit}}, spalten pr. side mellem låg og legeme: 0,1 mm stramt, 0,2 mm normalt, 0,3 mm løst eller enhver værdi op til 1 mm) og hvor dybt læben eller kanten når ned, og hvor tyk dens væg er. Klik på {{ui:lid.apply}}: låget ligger ved siden af legemet, vendt med pladen nedad, så det printes uden støtte. Legemet forbliver, som det er. Låget følger enhver omrids, rundt eller kantet, fordi det tages fra selve legemet lige under dets kant. Et legeme uden åbning foroven får kun et fladt låg; til de to andre skal du først udhule det med åben top.
+
+> **Tip:** Hvor stramt et låg sidder, afhænger af printeren. Print først en lille kasse med låg; sidder det for stramt, så vælg den næste, løsere pasning.
+
 ## Forskyd legemer
 
 Hver flade på et legeme kan flyttes den samme afstand, udad eller indad. Det er, hvad en pasning, et låg eller en snapsamling har brug for: et spillerum på 0,1 til 0,3 mm hele vejen rundt, mens detaljerne bliver, hvor de er, hvad skalering ikke kan give.

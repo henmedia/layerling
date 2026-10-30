@@ -152,7 +152,7 @@ A felirat ne egyenesen fusson, hanem kövesse egy érme, egy fedél vagy egy gy�
 
 Amint bekapcsolod, a szöveg a kör mentén fut. Minden betű ugyanazon az alapvonalon áll, olyan egyenletesen, mint normál szövegnél. Négy beállítás van:
 
-- **{{ui:prop.textRadius}}** (5–500 mm): Annak a körnek a sugara, amelyen a betűk alapvonala fut.
+- **{{ui:prop.textRadius}}** (5–500 mm): Annak a körnek a sugara, amelyen a betűk alapvonala fut. A betűk a helyükön maradnak, csak a hajlításuk változik.
 - **{{ui:nameTag.letterSize}}:** Milyen magasak a betűk. Már nem függ az alakzat szélességétől.
 - **{{ui:prop.textInward}}:** A szöveget a kör tetejéről az aljára viszi. A betűk ilyenkor a fejükkel a középpont felé mutatnak.
 - **{{ui:prop.textFlipped}}:** Csak a betűket fordítja meg, hogy a másik oldalról olvashasd őket. A szöveg a helyén marad a körön.

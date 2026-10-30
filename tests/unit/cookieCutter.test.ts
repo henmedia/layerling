@@ -69,7 +69,7 @@ describe("cookie cutter", () => {
 
   it("takes the options as given within their limits, and the nearest allowed value outside", () => {
     expect(normalizeCookieCutterOptions()).toEqual(COOKIE_CUTTER_DEFAULTS);
-    const given = { wall: 2, height: 20, rim: 6, rimHeight: 3, edge: 0.8, mirror: false, inner: false, imprint: 5, bridgeCount: 3, bridge: 3, bridgeHeight: 4, plate: 1.5, fillet: 2 };
+    const given = { wall: 2, height: 20, rim: 6, rimHeight: 3, edge: 0.8, mirror: false, inner: false, imprint: 5, innerEdge: true, bridgeCount: 3, bridge: 3, bridgeHeight: 4, plate: 1.5, fillet: 2 };
     expect(normalizeCookieCutterOptions(given)).toEqual(given);
     expect(normalizeCookieCutterOptions({ mirror: "no", inner: "no" })).toMatchObject({ mirror: true, inner: true });
     expect(normalizeCookieCutterOptions({ height: 3, bridgeHeight: 10 }).bridgeHeight).toBe(3);
@@ -254,11 +254,42 @@ describe("bridges that hold the inner walls (#982)", () => {
       const points = corners(bridges, bar);
       const xs = points.map((point) => point.x);
       const zs = points.map((point) => point.z);
-      // No bar overlaps the right piece, x 22 to 26 and z -2 to 2, other than the one that holds it.
+      // No bar overlaps the right piece, x 22 to 26 and z -2 to 2, other than the one that holds it and the one joining the two.
       const holdsRight = Math.min(...xs) > 22;
+      const joinsBoth = Math.min(...xs) > 17 && Math.max(...xs) < 24;
       const overlaps = Math.max(...xs) > 22 && Math.min(...xs) < 26 && Math.max(...zs) > -2 && Math.min(...zs) < 2;
-      expect(holdsRight || !overlaps).toBe(true);
+      expect(holdsRight || joinsBoth || !overlaps).toBe(true);
     }
+  });
+
+  /** Every bar, as the box round its corners. */
+  const boxes = (profile: SketchProfile) => {
+    const result: Array<{ minX: number; maxX: number; minZ: number; maxZ: number }> = [];
+    for (let bar = 0; corners(profile, bar).length; bar += 1) {
+      const points = corners(profile, bar);
+      const xs = points.map((point) => point.x);
+      const zs = points.map((point) => point.z);
+      result.push({ minX: Math.min(...xs), maxX: Math.max(...xs), minZ: Math.min(...zs), maxZ: Math.max(...zs) });
+    }
+    return result;
+  };
+
+  it("joins two pieces side by side to each other, a wall past both ends (avxmw, #982)", () => {
+    // Pieces at x 15 to 19 and 22 to 26: a bar from x = 19 - 1.2 to 22 + 1.2, 2 mm wide, besides those to the frame.
+    const joins = boxes(cookieCutterBridges(squares([0, 0, 30], [17, 0, 2], [24, 0, 2]), 1.2, 2, 1)!)
+      .filter((box) => box.minX > 15 && box.maxX < 26 && box.minZ > -2 && box.maxZ < 2);
+    expect(joins).toHaveLength(1);
+    expect(joins[0].minX).toBeCloseTo(17.8, 6);
+    expect(joins[0].maxX).toBeCloseTo(23.2, 6);
+    expect(joins[0].maxZ - joins[0].minZ).toBeCloseTo(2, 6);
+  });
+
+  it("joins a row of pieces neighbour to neighbour, not the first to the last across the middle (avxmw, #982)", () => {
+    // Three pieces in a row, 4 mm apart, in the middle of a large frame: two short bars, and none 12 mm long past the middle one.
+    const joins = boxes(cookieCutterBridges(squares([0, 0, 40], [-8, 0, 2], [0, 0, 2], [8, 0, 2]), 1.2, 2, 1)!)
+      .filter((box) => box.minX > -10 && box.maxX < 10 && box.minZ > -2 && box.maxZ < 2);
+    expect(joins).toHaveLength(2);
+    expect(joins.every((box) => box.maxX - box.minX < 7)).toBe(true);
   });
 
   it("fills the silhouette as a plate instead of the bridges when asked (avxmw, #982)", () => {
@@ -285,6 +316,16 @@ describe("bridges that hold the inner walls (#982)", () => {
     const without = cookieCutterProfiles(framed, { ...COOKIE_CUTTER_DEFAULTS, inner: false });
     expect(without.inner).toBeNull();
     expect(without.bridges).toBeNull();
+  });
+
+  it("gives inner walls that only press a flat top, unless asked to keep the edge (avxmw, #982)", () => {
+    const framed = squares([0, 0, 20], [0, 0, 12], [0, 0, 4]);
+    const pressing = cookieCutterProfiles(framed, normalizeCookieCutterOptions({ imprint: 3 }));
+    expect(pressing.inner?.stroke?.edge).toBeUndefined();
+    // The outer wall still cuts.
+    expect(pressing.wall.stroke?.edge).toBeCloseTo(COOKIE_CUTTER_DEFAULTS.edge, 9);
+    expect(cookieCutterProfiles(framed, normalizeCookieCutterOptions({ imprint: 3, innerEdge: true })).inner?.stroke?.edge).toBeCloseTo(COOKIE_CUTTER_DEFAULTS.edge, 9);
+    expect(normalizeCookieCutterOptions({ innerEdge: "yes" }).innerEdge).toBe(false);
   });
 });
 

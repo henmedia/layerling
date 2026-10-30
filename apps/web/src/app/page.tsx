@@ -30,7 +30,7 @@ import {
   type DesignFolder,
 } from "@/lib/designFolders";
 import dynamic from "next/dynamic";
-import { importFailureSummary, importModelFiles } from "@/lib/modelImport";
+import { importFailureReason, importFailureSummary, importModelFiles } from "@/lib/modelImport";
 import { loadTextFonts } from "@/lib/textFonts";
 import { loadStoredCustomFonts } from "@/lib/customFontStore";
 import { fetchServerDefaults, type NewDesignsOnServerSetting } from "@/lib/serverDefaults";
@@ -2517,7 +2517,7 @@ export default function Home() {
         setDashboardNotice(result.mtlOnly
           ? t("status.importMtlAlone")
           : failures.length === 1 && result.files.length <= 1
-            ? failures[0].reason
+            ? importFailureReason(failures[0])
             : t("status.importNoneFailed", { total: Math.max(result.files.length, failures.length), summary: failureSummary }));
         return;
       }

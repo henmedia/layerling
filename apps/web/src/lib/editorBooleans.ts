@@ -4,11 +4,12 @@ import { removeLooseSplinters } from "@/lib/meshSplinters";
 import { closeSmallMeshHoles } from "@/lib/meshHoleFill";
 import { meshIsConvex } from "@/lib/meshConvexity";
 import type { ManifoldToplevel } from "manifold-3d";
+import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { ADDITION, Brush, Evaluator, HOLLOW_INTERSECTION, HOLLOW_SUBTRACTION, INTERSECTION, SUBTRACTION, type CSGOperation } from "three-bvh-csg";
 import * as THREE from "three";
 import { numberLocale, t } from "@/lib/i18n";
 import { sphereTessellation } from "@/lib/sphereTessellation";
-import { groupShowsPartColors } from "@/lib/groupColors";
+import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices } from "@/lib/groupScale";
 import { dropSplitSlivers, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
@@ -1601,9 +1602,18 @@ async function manifoldBooleanMeshShape(selection: WorkplaneShape[], triangleLim
   }
 }
 
-async function manifoldUnionMeshShape(selection: WorkplaneShape[], triangleLimit: number, groupChildren?: WorkplaneShape[]): Promise<WorkplaneShape | null> {
+/** How thin (mm) a triangle of a merged group may be before the kernel folds it away: well above the viewer's 1/10,000 mm, far below anything printable. */
+const MERGE_SLIVER_TOLERANCE = 5e-4;
+
+function manifoldUnionMeshShapeWithRuntime(
+  selection: WorkplaneShape[],
+  triangleLimit: number,
+  groupChildren: WorkplaneShape[] | undefined,
+  options: { requireImported?: boolean },
+  runtime: ManifoldToplevel,
+): WorkplaneShape | null {
   const solids = selection.filter((shape) => !shape.hole && !shape.locked);
-  if (solids.length < 2 || !selection.some((shape) => Boolean(shape.importedMesh))) {
+  if (solids.length < 2 || (options.requireImported !== false && !selection.some((shape) => Boolean(shape.importedMesh)))) {
     return null;
   }
 
@@ -1615,7 +1625,8 @@ async function manifoldUnionMeshShape(selection: WorkplaneShape[], triangleLimit
   const created: ManifoldSolid[] = [];
   let result: ManifoldSolid | null = null;
   try {
-    const runtime = await getManifoldRuntime();
+    // The merged boundary is independent of selection order. Surface colours are assigned later by
+    // testing which source part actually contributes each exposed face, not by kernel triangle provenance.
     result = shapesToManifoldUnion(runtime, solids, created, true);
     if (!result) {
       return null;
@@ -1624,8 +1635,16 @@ async function manifoldUnionMeshShape(selection: WorkplaneShape[], triangleLimit
       return null;
     }
 
-    const outputMesh = result.getMesh();
-    const positions = manifoldMeshToPositions(outputMesh);
+    // Where round parts cross, the merge leaves triangles thinner than the viewer can tell apart (a corner is one
+    // when it rounds to the same 1/10,000 mm). Every such sliver breaks the pairing of its neighbours there, and the
+    // edge lines drew the unpaired edges as stray strokes across a see-through group. The kernel folds them away,
+    // keeping the merged boundary cleaner.
+    if (options.requireImported === false) {
+      const tidy = result.setTolerance(MERGE_SLIVER_TOLERANCE);
+      created.push(tidy);
+      if (tidy.status() === "NoError" && tidy.numTri() > 0) result = tidy;
+    }
+    const positions = manifoldMeshToPositions(result.getMesh());
     const group = meshPositionsToGroupShape(selection, solids, positions, "grouped-manifold-union", groupChildren);
     return isUsableBooleanGroup(group, mergedSourceMesh.faces.length, false) ? group : null;
   } catch {
@@ -1633,6 +1652,37 @@ async function manifoldUnionMeshShape(selection: WorkplaneShape[], triangleLimit
   } finally {
     Array.from(new Set(created)).forEach(disposeManifold);
   }
+}
+
+async function manifoldUnionMeshShape(
+  selection: WorkplaneShape[],
+  triangleLimit: number,
+  groupChildren?: WorkplaneShape[],
+  options: { requireImported?: boolean } = {},
+): Promise<WorkplaneShape | null> {
+  try {
+    return manifoldUnionMeshShapeWithRuntime(selection, triangleLimit, groupChildren, options, await getManifoldRuntime());
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Builds the merged mesh for display only. The returned mesh is derived from the group's original parts and must
+ * never be assigned to the saved WorkplaneShape. Callers should cache it against the group's geometry signature.
+ */
+export function buildGroupDisplayMesh(shape: WorkplaneShape): NonNullable<WorkplaneShape["importedMesh"]> | null {
+  const runtime = loadedManifoldRuntime();
+  const parts = shape.groupedShapes;
+  // Plain, visible, solid primitives only. Bundles, nested groups, holes and imported meshes retain the existing
+  // renderer rather than risking a misleading partial merge.
+  if (!runtime || !parts || !groupDisplayMergeable(shape)) return null;
+  // Manifold's triangulation can depend on operand order, especially for coplanar/coincident faces.
+  // Use a canonical order so selecting the same solids in a different order cannot change the displayed
+  // boundary mesh. This order is only for the derived display mesh; saved child order is untouched.
+  const canonicalParts = [...parts].sort((left, right) => left.id.localeCompare(right.id));
+  const merged = manifoldUnionMeshShapeWithRuntime(canonicalParts, IMPORTED_FALLBACK_BOOLEAN_TRIANGLE_LIMIT, canonicalParts, { requireImported: false }, runtime);
+  return merged?.importedMesh ?? null;
 }
 
 /** All parts of a bundle with the bundles in it opened too, so their holes and solids count as the bundle's own. */
@@ -2191,6 +2241,16 @@ function mergedMeshShape(selection: WorkplaneShape[], groupChildren?: WorkplaneS
   };
 }
 
+/**
+ * A group the person makes of plain solids is drawn as one body, so it starts in one colour; Multicolor brings
+ * the parts' colours back. Groups saved before keep showing their parts' colours (#1029), and so do the groups
+ * the editor makes itself (a name tag's plate and letters).
+ */
+function newPlainGroup(selection: WorkplaneShape[]): WorkplaneShape | null {
+  const group = groupedShape(selection);
+  return group && groupDisplayMergeable(group) ? { ...group, multicolor: false } : group;
+}
+
 export function groupedShape(selection: WorkplaneShape[]): WorkplaneShape | null {
   const groupable = selection.filter((shape) => !shape.locked);
   if (groupable.length < 2) {
@@ -2547,7 +2607,7 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
         : manifoldCutGroup ?? booleanMeshShape(booleanSelection, groupable))
     : hasImportedMesh
       ? bakedImportedMerge ?? groupedShape(groupable)
-      : groupedShape(groupable);
+      : newPlainGroup(groupable);
   const consumed = !group && hasSolid && hasHole && cutFullyConsumesSolids(booleanSelection);
   // The cut was made, but the fallback left its face open: say so when the cause is gaps in the surface (#346).
   const openGapEdges = group && hasImportedMesh && hasSolid && hasHole && OPEN_CUT_ID.test(group.id)

@@ -5,7 +5,7 @@ summary: Choisir sa propre imprimante, être averti lorsque quelque chose ne ren
 
 ## Choisir votre imprimante
 
-Ouvrez les paramètres (la roue dentée dans le ruban, {{ui:editor.workspaceSettings}}) et passez à la zone {{ui:workspace.workplane}}. Sous {{ui:workspace.printer}}, vous choisissez votre imprimante parmi une liste de plus de 220 modèles courants, dont Bambu Lab, Prusa, Creality, Anycubic, Elegoo et bien d'autres.
+Ouvrez les paramètres (la roue dentée dans le ruban, {{ui:editor.workspaceSettings}}) et passez à la zone {{ui:workspace.workplane}}. Sous {{ui:workspace.printer}}, vous choisissez votre imprimante parmi une liste de plus de 230 modèles courants, dont Bambu Lab, Prusa, Creality, Anycubic, Elegoo et bien d'autres.
 
 ![Les paramètres du plan de travail avec une imprimante choisie. Le lit d'impression et la hauteur d'impression maximale proviennent du profil de trancheuse.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Trois choses se produisent :
 - layerling **avertit** quand quelque chose ne rentre pas.
 
 Les profils d'imprimante proviennent d'OrcaSlicer, ce sont donc les mêmes que ceux que votre slicer connaît. Si vous préférez travailler sans imprimante, choisissez {{ui:workspace.printerNone}}. Vous pouvez également définir manuellement la taille du plan de travail.
+
+Les imprimantes delta, comme celles de FLSun ou de SeeMeCNC ou l'Anycubic Predator, impriment sur un plateau rond. Avec l'une d'elles, le plan de travail est rond lui aussi, aussi large que le plateau, et un corps est trop grand dès qu'il dépasse le bord. Un corps rond est mesuré sur son propre contour, pas sur la boîte qui l'entoure : un cylindre presque aussi large que le plateau y tient encore.
 
 ## Quand quelque chose ne va pas
 

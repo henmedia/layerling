@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadTextFonts } from "@/lib/textFonts";
-import { createTextGeometry, curvedTextFootprint, curvedTextLayout, curvedTextPatch, textGlyphShapes } from "@/lib/textGeometry";
+import { createTextGeometry, curvedRadiusPatch, curvedTextFootprint, curvedTextLayout, curvedTextPatch, textGlyphShapes } from "@/lib/textGeometry";
 import { textLetterSize, textLetterSizePatch } from "@/lib/nameTag";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -269,5 +269,35 @@ describe("stretched text (#382)", () => {
     const shape = mockShape({ text, textCurved: true, textVertical: true, textRadius: 10, textSize: 8 });
     const { options } = curvedTextLayout(shape);
     expect(options.size).toBeLessThan(8);
+  });
+  it("keeps curved text where it sits when the radius changes, only the bend differs (#981)", () => {
+    // The middle letter's own middle, on the workplane: the shape turned (XYZ, degrees) and mirrored about its centre.
+    const middleOnPlate = (shape: WorkplaneShape) => {
+      const { glyphs, options } = curvedTextLayout(shape);
+      const { char, matrix } = glyphs[1];
+      const outline = options.font.generateShapes(char, options.size).flatMap((glyph) => glyph.getPoints());
+      const xs = outline.map((point) => point.x);
+      const ys = outline.map((point) => point.y);
+      const local = new THREE.Vector3((Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2, 0).applyMatrix4(matrix);
+      local.multiply(new THREE.Vector3(shape.mirrorX ? -1 : 1, 1, shape.mirrorZ ? -1 : 1));
+      local.applyEuler(new THREE.Euler(0, THREE.MathUtils.degToRad(shape.rotation), 0, "XYZ"));
+      return new THREE.Vector2(shape.x + local.x, shape.z + local.z);
+    };
+    const cases: Array<Partial<WorkplaneShape>> = [
+      {},
+      { textInward: true },
+      { textVertical: true },
+      { textVertical: true, textInward: true, rotation: 90 },
+      { rotation: 30, mirrorX: true, x: 12, z: -7 },
+    ];
+    cases.forEach((overrides) => {
+      const shape = mockShape({ text: "HHH", textCurved: true, textRadius: 40, textSize: 8, ...overrides });
+      const before = middleOnPlate(shape);
+      const after = middleOnPlate({ ...shape, ...curvedRadiusPatch(shape, 70) });
+      expect(after.distanceTo(before)).toBeLessThan(1e-3);
+    });
+    // A column on the left: a bigger circle moves the shape's middle (the circle's centre) to the right by the change.
+    const column = mockShape({ text: "HHH", textCurved: true, textVertical: true, textRadius: 40, textSize: 8 });
+    expect(curvedRadiusPatch(column, 60)).toMatchObject({ textRadius: 60, x: 20, z: 0 });
   });
 });

@@ -3,7 +3,7 @@
 import { sectionPointFromFrame, sectionPointToFrame, type SectionPlaneSettings } from "@/lib/sectionView";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { leftButtonCameraAction } from "@/lib/cameraMouseButtons";
+import { cameraButtonsFor, leftButtonCameraAction } from "@/lib/cameraMouseButtons";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { type AppThemePalette, type ResolvedAppTheme } from "@/lib/appTheme";
 import type { ModelSplitPlane } from "@/lib/modelSplit";
@@ -23,6 +23,8 @@ import { RENDER_LAYER_MODIFIERS, RENDER_LAYER_PREVIEWS, clamp, WORKPLANE_LABEL_F
 export const WORKPLANE_WIDTH = 200;
 export const WORKPLANE_DEPTH = 140;
 export const DEFAULT_WORKSPACE = DEFAULT_WORKPLANE_WORKSPACE;
+/** How many pieces the rim of a round plate is drawn with: smooth at any zoom a plate is looked at. */
+const ROUND_PLATE_SEGMENTS = 192;
 
 /**
  * The normal view zooms towards its pivot and stops at the closest distance
@@ -272,15 +274,28 @@ export function createThreeScene(host: HTMLDivElement): ThreeState {
     }
     // Ctrl or Cmd with the left button moves the view (#654), see leftButtonCameraAction.
     controls.mouseButtons.LEFT = leftButtonCameraAction(event);
-    controls.mouseButtons.MIDDLE = THREE.MOUSE.PAN;
-    controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+    Object.assign(controls.mouseButtons, cameraButtonsFor(state.mouseScheme));
   };
   const resetLayerlingMouseButtons = (event?: PointerEvent) => {
     if (event) cameraPointers.delete(event.pointerId);
     controls.mouseButtons.LEFT = null;
-    controls.mouseButtons.MIDDLE = THREE.MOUSE.PAN;
-    controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+    Object.assign(controls.mouseButtons, cameraButtonsFor(state.mouseScheme));
   };
+  /*
+   * A left drag on empty space turns the view in the slicer scheme (#1013). The view only knows the press hit nothing
+   * after OrbitControls has seen it with the left button switched off, so the turn is started here by hand: on the
+   * pointer the controls already follow, or as a fresh press when they were off at the time.
+   */
+  type OrbitInternals = { _isTrackingPointer: (event: PointerEvent) => boolean; _onPointerDown: (event: PointerEvent) => void; _onMouseDown: (event: PointerEvent) => void };
+  const turnWithLeftButton = (event: PointerEvent) => {
+    const orbit = controls as unknown as OrbitInternals;
+    cameraPointers.set(event.pointerId, event);
+    controls.enabled = true;
+    controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+    if (orbit._isTrackingPointer(event)) orbit._onMouseDown(event);
+    else orbit._onPointerDown(event);
+  };
+  state.turnWithLeftButton = turnWithLeftButton;
   const preventContextMenu = (event: MouseEvent) => {
     event.preventDefault();
   };
@@ -412,15 +427,22 @@ export function rebuildWorkplane(
   state.lights.fill.position.set(fillPosition.x, fillPosition.y, fillPosition.z);
   state.needsRender = true;
   state.controls.zoomSpeed = orbitControlsZoomSpeed(workspace.zoomSpeed);
+  state.mouseScheme = workspace.mouseScheme;
+  Object.assign(state.controls.mouseButtons, cameraButtonsFor(workspace.mouseScheme));
 
   const activeIsBase = placementWorkplaneIsBase(placementWorkplane);
   // A workplane lying on the plate shares its plane, so the plate drops its grid (#178).
   const plateOutlineOnly = !activeIsBase && placementWorkplaneLiesOnBase(placementWorkplane);
-  const addPlane = (workplane: PlacementWorkplane, muted: boolean, showMarker: boolean, outlineOnly = false) => {
+  // A delta printer's plate is round (#1024): the plate itself, not a workplane laid on a face.
+  const roundPlate = printerPresetById(workspace.printer)?.round === true && workspace.width === workspace.depth;
+  const addPlane = (workplane: PlacementWorkplane, muted: boolean, showMarker: boolean, outlineOnly = false, round = false) => {
     const group = new THREE.Group();
     group.name = muted ? "ReferenceWorkplane" : "ActiveWorkplane";
+    // The name and the printer, and the axis arrows, sit in the corners of the square inside a round plate.
+    const cornerWidth = round ? workspace.width * Math.SQRT1_2 : workspace.width;
+    const cornerDepth = round ? workspace.depth * Math.SQRT1_2 : workspace.depth;
     const surface = new THREE.Mesh(
-      new THREE.PlaneGeometry(workspace.width, workspace.depth),
+      round ? new THREE.CircleGeometry(workspace.width / 2, ROUND_PLATE_SEGMENTS) : new THREE.PlaneGeometry(workspace.width, workspace.depth),
       new THREE.MeshStandardMaterial({
         color: muted
           ? theme === "dark" ? "#59646b" : "#b8c0c5"
@@ -460,6 +482,7 @@ export function rebuildWorkplane(
         true,
         majorLineColor,
         workspace.gridLinesGrow !== false,
+        round,
       ));
     } else if (workspace.showGrid) {
       group.add(createGridLines(
@@ -472,13 +495,14 @@ export function rebuildWorkplane(
         false,
         majorLineColor,
         workspace.gridLinesGrow !== false,
+        round,
       ));
       const labelPalette = workplaneGridPalette(theme, lineColor, state.palette).major;
       // The design's name in the near left corner, so a screenshot of the scene
       // says what it shows - unless it was switched off as a distraction (#192).
       const label = workspace.showPlateLabels === false ? null : createWorkplaneLabel(
-        workspace.width,
-        workspace.depth,
+        cornerWidth,
+        cornerDepth,
         labelPalette.color,
         muted ? labelPalette.opacity * 0.5 : labelPalette.opacity,
         projectName,
@@ -492,12 +516,12 @@ export function rebuildWorkplane(
       const printer = muted || workspace.showPlateLabels === false ? null : printerPresetById(workspace.printer);
       if (printer) {
         const printerLabel = createWorkplaneLabel(
-          workspace.width,
-          workspace.depth,
+          cornerWidth,
+          cornerDepth,
           labelPalette.color,
           labelPalette.opacity,
           `${printer.vendor} ${printer.model}`,
-          `${printer.width} × ${printer.depth} × ${printer.height} mm`,
+          printer.round ? `Ø ${printer.width} × ${printer.height} mm` : `${printer.width} × ${printer.depth} × ${printer.height} mm`,
           { align: "right", outline: palette.surface.color },
         );
         if (printerLabel) {
@@ -507,7 +531,7 @@ export function rebuildWorkplane(
       }
     }
     if (!muted && workspace.showAxes) {
-      group.add(createAxisArrows(workspace.width, workspace.depth));
+      group.add(createAxisArrows(cornerWidth, cornerDepth));
     }
     if (showMarker) {
       const markerMaterial = new THREE.MeshBasicMaterial({
@@ -530,7 +554,7 @@ export function rebuildWorkplane(
     state.workplaneLayer.add(group);
   };
 
-  addPlane(horizontalPlacementWorkplane(), !activeIsBase, false, plateOutlineOnly);
+  addPlane(horizontalPlacementWorkplane(), !activeIsBase, false, plateOutlineOnly, roundPlate);
   if (!activeIsBase) {
     addPlane(placementWorkplane, false, true);
   }
@@ -806,8 +830,12 @@ export function createGridLines(
   outlineOnly = false,
   majorColor = "",
   linesGrow = true,
+  round = false,
 ) {
   const group = new THREE.Group();
+  // On a round plate (#1024) each line runs from rim to rim: half its length either side of the middle.
+  const radius = width / 2;
+  const across = (coordinate: number, half: number) => (round ? Math.sqrt(Math.max(0, radius * radius - coordinate * coordinate)) : half);
   const palette = workplaneThemePalette(theme, DEFAULT_WORKSPACE.background, gridColor, paletteName, undefined, majorColor).grid;
   const minor = new THREE.LineBasicMaterial({ ...palette.minor, transparent: true, depthWrite: false });
   const major = new THREE.LineBasicMaterial({ ...palette.major, transparent: true, depthWrite: false });
@@ -825,20 +853,35 @@ export function createGridLines(
   const majorBands: Array<[number, number, number, number]> = [];
   const bandsFor = (kind: "axis" | "major" | "minor") => (kind === "major" ? majorBands : kind === "minor" ? minorBands : null);
   for (const { coordinate: centeredX, kind } of outlineOnly ? [] : workplaneGridLines(width, layout)) {
-    pushLine(pointsFor(kind), [centeredX, WORKPLANE_LINE_ELEVATION, -depth / 2], [centeredX, WORKPLANE_LINE_ELEVATION, depth / 2]);
-    bandsFor(kind)?.push([centeredX, -depth / 2, centeredX, depth / 2]);
+    const half = across(centeredX, depth / 2);
+    if (half <= 0) continue;
+    pushLine(pointsFor(kind), [centeredX, WORKPLANE_LINE_ELEVATION, -half], [centeredX, WORKPLANE_LINE_ELEVATION, half]);
+    bandsFor(kind)?.push([centeredX, -half, centeredX, half]);
   }
 
   for (const { coordinate: centeredZ, kind } of outlineOnly ? [] : workplaneGridLines(depth, layout)) {
-    pushLine(pointsFor(kind), [-width / 2, WORKPLANE_LINE_ELEVATION, centeredZ], [width / 2, WORKPLANE_LINE_ELEVATION, centeredZ]);
-    bandsFor(kind)?.push([-width / 2, centeredZ, width / 2, centeredZ]);
+    const half = across(centeredZ, width / 2);
+    if (half <= 0) continue;
+    pushLine(pointsFor(kind), [-half, WORKPLANE_LINE_ELEVATION, centeredZ], [half, WORKPLANE_LINE_ELEVATION, centeredZ]);
+    bandsFor(kind)?.push([-half, centeredZ, half, centeredZ]);
   }
 
   const border = new THREE.LineBasicMaterial({ ...palette.border, transparent: true, depthWrite: false });
-  pushLine(borderPoints, [-width / 2, WORKPLANE_LINE_ELEVATION, -depth / 2], [width / 2, WORKPLANE_LINE_ELEVATION, -depth / 2]);
-  pushLine(borderPoints, [width / 2, WORKPLANE_LINE_ELEVATION, -depth / 2], [width / 2, WORKPLANE_LINE_ELEVATION, depth / 2]);
-  pushLine(borderPoints, [width / 2, WORKPLANE_LINE_ELEVATION, depth / 2], [-width / 2, WORKPLANE_LINE_ELEVATION, depth / 2]);
-  pushLine(borderPoints, [-width / 2, WORKPLANE_LINE_ELEVATION, depth / 2], [-width / 2, WORKPLANE_LINE_ELEVATION, -depth / 2]);
+  // The rim of a round plate as many short pieces, at `inset` inside it.
+  const rim = (inset: number) => Array.from({ length: ROUND_PLATE_SEGMENTS }, (_, index): [number, number, number, number] => {
+    const from = (index / ROUND_PLATE_SEGMENTS) * Math.PI * 2;
+    const to = ((index + 1) / ROUND_PLATE_SEGMENTS) * Math.PI * 2;
+    const r = radius - inset;
+    return [Math.cos(from) * r, Math.sin(from) * r, Math.cos(to) * r, Math.sin(to) * r];
+  });
+  if (round) {
+    for (const [x1, z1, x2, z2] of rim(0)) pushLine(borderPoints, [x1, WORKPLANE_LINE_ELEVATION, z1], [x2, WORKPLANE_LINE_ELEVATION, z2]);
+  } else {
+    pushLine(borderPoints, [-width / 2, WORKPLANE_LINE_ELEVATION, -depth / 2], [width / 2, WORKPLANE_LINE_ELEVATION, -depth / 2]);
+    pushLine(borderPoints, [width / 2, WORKPLANE_LINE_ELEVATION, -depth / 2], [width / 2, WORKPLANE_LINE_ELEVATION, depth / 2]);
+    pushLine(borderPoints, [width / 2, WORKPLANE_LINE_ELEVATION, depth / 2], [-width / 2, WORKPLANE_LINE_ELEVATION, depth / 2]);
+    pushLine(borderPoints, [-width / 2, WORKPLANE_LINE_ELEVATION, depth / 2], [-width / 2, WORKPLANE_LINE_ELEVATION, -depth / 2]);
+  }
 
   group.add(linesFromPoints(minorPoints, minor));
   group.add(linesFromPoints(majorPoints, major));
@@ -862,7 +905,7 @@ export function createGridLines(
   group.add(bandsFromSegments(axisBands, axisBand, palette.axis));
   // The border band lies inside the plate, so the plate keeps its size.
   const inset = borderBand / 2;
-  group.add(bandsFromSegments([
+  group.add(bandsFromSegments(round ? rim(inset) : [
     [-width / 2, -depth / 2 + inset, width / 2, -depth / 2 + inset],
     [-width / 2, depth / 2 - inset, width / 2, depth / 2 - inset],
     [-width / 2 + inset, -depth / 2, -width / 2 + inset, depth / 2],

@@ -2,6 +2,7 @@ import { buildsDiffer, BUILD_ID, isBuildMessage, reportWorkerBuild } from "@/lib
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type GroupBuildResult, type SplitShapesOutcome } from "@/lib/editorBooleans";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
+import { lidForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
 import { resultMeshes, type GeometryTask, type GeometryWorkerRequest, type GeometryWorkerResponse } from "@/lib/geometryWorkerTypes";
 import { rememberPreparedDisplay } from "@/lib/importedMeshDisplay";
 import { getLanguage, t } from "@/lib/i18n";
@@ -265,6 +266,13 @@ export function articulateShapesOffThread(targets: readonly WorkplaneShape[], op
   const onPage = () => articulateShapes([...targets], options);
   if (containsText([...targets])) return onPage();
   return runGeometryTask<FlexiShapesResult>("flexi", { targets: [...targets], options }, onPage, () => ({ links: null, error: t("status.computeTimedOut") }), signal);
+}
+
+/** lidForShapes (lib/lidTool.ts) off the page: the lid for a body open at the top (#1009). */
+export function lidForShapesOffThread(targets: readonly WorkplaneShape[], options: LidOptions, signal?: AbortSignal): Promise<LidShapeResult> {
+  const onPage = () => lidForShapes([...targets], options);
+  if (containsText([...targets])) return onPage();
+  return runGeometryTask<LidShapeResult>("lid", { targets: [...targets], options }, onPage, () => ({ lid: null, error: t("status.computeTimedOut") }), signal);
 }
 
 /**

@@ -697,6 +697,32 @@ export function curvedTextPatch(shape: WorkplaneShape, patch: Partial<WorkplaneS
   return patch;
 }
 
+/**
+ * A new radius from the inspector (#981): the letters stay where they sit and only bend more or less. The circle's centre is
+ * the shape's middle, so on its own a bigger radius pushed the text away from it - a column off the plate to the left. The
+ * middle of the text lies on the circle at 12 o'clock (6 with "along the bottom"), a column at 9 (3); the shape moves the
+ * other way by the change of radius, turned and mirrored as the shape is.
+ */
+export function curvedRadiusPatch(shape: WorkplaneShape, textRadius: number): Partial<WorkplaneShape> {
+  const change = curvedRadius({ ...shape, textRadius }) - curvedRadius(shape);
+  const side = shape.textInward ? 1 : -1;
+  const middle = shape.textVertical ? new THREE.Vector3(side, 0, 0) : new THREE.Vector3(0, 0, side);
+  middle.multiply(new THREE.Vector3(shape.mirrorX ? -1 : 1, shape.mirrorY ? -1 : 1, shape.mirrorZ ? -1 : 1));
+  middle.applyEuler(new THREE.Euler(
+    THREE.MathUtils.degToRad(shape.rotationX ?? 0),
+    THREE.MathUtils.degToRad(shape.rotation),
+    THREE.MathUtils.degToRad(shape.rotationZ ?? 0),
+    "XYZ",
+  ));
+  const round = (value: number) => Number(value.toFixed(3));
+  return {
+    textRadius,
+    x: round(shape.x - middle.x * change),
+    z: round(shape.z - middle.z * change),
+    ...(Math.abs(middle.y) > 1e-9 ? { elevation: round((shape.elevation ?? 0) - middle.y * change) } : {}),
+  };
+}
+
 export type TextGlyphShape = { glyph: THREE.Shape; map: (point: THREE.Vector2) => { x: number; z: number } };
 
 /**

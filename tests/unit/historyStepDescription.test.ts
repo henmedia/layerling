@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { groupedShape, restoreGroupedChildren } from "@/lib/editorBooleans";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
+import { historyStepTextIn } from "@/lib/historyStepText";
 import type { WorkplaneNote, WorkplaneShape } from "@/types/layerling";
 
 function box(overrides: Partial<WorkplaneShape> = {}): WorkplaneShape {
@@ -54,7 +55,7 @@ describe("history step descriptions", () => {
   it("counts several objects with the same change and falls back when they differ", () => {
     const a = box({ id: "a" });
     const b = box({ id: "b" });
-    expect(step([a, b], [{ ...a, x: 4 }, { ...b, x: 4 }])).toEqual({ key: "historyStep.movedMany", values: { count: 2 } });
+    expect(step([a, b], [{ ...a, x: 4 }, { ...b, x: 4 }])).toEqual({ key: "historyStep.movedMany", values: { count: 2 }, detail: { kind: "length", mm: 4 } });
     expect(step([a, b], [{ ...a, x: 4 }, { ...b, color: "#000000" }])).toEqual({ key: "historyStep.editedMany", values: { count: 2 } });
   });
 
@@ -121,5 +122,43 @@ describe("history step descriptions of the editor's own steps", () => {
     expect(step([source, other], [source, other, copy("c1", 30), { ...other, id: "c2", x: 50 }])).toEqual({ key: "historyStep.duplicatedMany", values: { count: 2 } });
     // A copy that differs in more than its place is a new object, as one brought back from the history with its time in the name.
     expect(step([source], [source, box({ id: "c1", name: "Peg (12:32)" })])).toEqual({ key: "historyStep.addedOne", values: { name: "Peg (12:32)" } });
+  });
+});
+
+describe("history step measures (#1023)", () => {
+  const treated = (kind: "fillet" | "chamfer" | "shell" | "offset", amount: number) =>
+    box({ edgeTreatments: [{ kind, amount, edgeCount: 4 }], cadBrep: "brep", kind: "imported" as WorkplaneShape["kind"] });
+
+  it("gives a treatment the size it was made with", () => {
+    expect(step([box()], [treated("fillet", 5)])).toMatchObject({ key: "historyStep.roundedOne", detail: { kind: "length", mm: 5 } });
+    expect(step([box()], [treated("chamfer", 1.5)]).detail).toEqual({ kind: "length", mm: 1.5 });
+    expect(step([box()], [treated("shell", 2)]).detail).toEqual({ kind: "length", mm: 2 });
+  });
+
+  it("gives a move its distance, a turn about one axis its angle and a resize the new size", () => {
+    expect(step([box()], [box({ x: 3, z: 4 })]).detail).toEqual({ kind: "length", mm: 5 });
+    expect(step([box()], [box({ rotation: 90 })]).detail).toEqual({ kind: "angle", degrees: 90 });
+    expect(step([box({ rotation: 350 })], [box({ rotation: 10 })]).detail).toEqual({ kind: "angle", degrees: 20 });
+    expect(step([box()], [box({ rotation: 30, rotationX: 45 })]).detail).toBeUndefined();
+    expect(step([box()], [box({ width: 30, x: 5 })]).detail).toEqual({ kind: "size", mm: [30, 20, 20] });
+  });
+
+  it("shares a measure between objects only when they changed alike", () => {
+    const a = box({ id: "a", name: "A" });
+    const b = box({ id: "b", name: "B", x: 40 });
+    expect(step([a, b], [{ ...a, x: 10 }, { ...b, x: 50 }]).detail).toEqual({ kind: "length", mm: 10 });
+    expect(step([a, b], [{ ...a, x: 10 }, { ...b, x: 45 }]).detail).toBeUndefined();
+  });
+
+  it("leaves steps without one number as they were", () => {
+    expect(step([box()], [box({ color: "#00ff00" })]).detail).toBeUndefined();
+    expect(step([box()], [box({ name: "Lid" })]).detail).toBeUndefined();
+  });
+
+  it("prints the measure after the sentence, in millimetres for the AI tools", () => {
+    expect(historyStepTextIn("en", { key: "historyStep.roundedOne", values: { name: "Box" }, detail: { kind: "length", mm: 5 } })).toBe("Rounded the edges of Box (5 mm)");
+    expect(historyStepTextIn("en", { key: "historyStep.resizedOne", values: { name: "Box" }, detail: { kind: "size", mm: [30, 20, 12.5] } })).toBe("Resized Box (30 × 20 × 12.5 mm)");
+    expect(historyStepTextIn("en", { key: "historyStep.rotatedOne", values: { name: "Box" }, detail: { kind: "angle", degrees: -45 } })).toBe("Rotated Box (-45°)");
+    expect(historyStepTextIn("en", { key: "historyStep.colorOne", values: { name: "Box" } })).toBe("Changed the colour of Box");
   });
 });

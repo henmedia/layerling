@@ -45,6 +45,7 @@ describe("drawn round or drawn with sides", () => {
     expect(fresh("sphere").steps).toBe(ROUND_FROM_SPHERE_STEPS);
     expect(DEFAULT_SPHERE_STEPS).toBe(ROUND_FROM_SPHERE_STEPS);
     expect(fresh("halfSphere").steps).toBe(ROUND_FROM_HALF_SPHERE_STEPS);
+    expect(fresh("paraboloid").steps).toBe(ROUND_FROM_HALF_SPHERE_STEPS);
     expect(fresh("roundRoof").sides).toBe(ROUND_FROM_ROOF_SIDES);
     expect(fresh("bentTube").bentTubeQuality ?? DEFAULT_BENT_TUBE_QUALITY).toBe(ROUND_FROM_BENT_TUBE_QUALITY);
     expect(DEFAULT_BENT_TUBE_QUALITY).toBe(ROUND_FROM_BENT_TUBE_QUALITY);

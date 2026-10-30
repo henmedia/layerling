@@ -1,5 +1,6 @@
 import { unzipSync } from "fflate";
 import { t } from "@/lib/i18n";
+import { localizedError } from "@/lib/userErrors";
 import { importExtensionSupported } from "@/lib/importExtensions";
 import { attachProjectAsset, projectAssetFromBytes, sourceFormatForFileName } from "@/lib/projectAssets";
 import { readKeepSvgPage } from "@/lib/importPreferences";
@@ -284,9 +285,17 @@ export async function importModelFiles(
 }
 
 /** Die Fehlerzeile unter einer Importmeldung, oder nichts. */
+/**
+ * Why a file did not come in, as a person reads it: the readers throw English, which came on screen as it was ("SVG
+ * entities are not supported" in the Facebook group). The MCP answer keeps the raw reason.
+ */
+export function importFailureReason(failure: ImportFailure) {
+  return localizedError(failure.reason);
+}
+
 export function importFailureSummary(failures: readonly ImportFailure[]) {
   if (!failures.length) return "";
-  const details = failures.slice(0, 3).map((failure) => `${failure.fileName}: ${failure.reason}`).join("; ");
+  const details = failures.slice(0, 3).map((failure) => `${failure.fileName}: ${importFailureReason(failure)}`).join("; ");
   const more = failures.length > 3 ? t("status.importFailedMore", { count: failures.length - 3 }) : "";
   return " " + t("status.importFailedList", { details, more });
 }

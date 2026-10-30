@@ -81,6 +81,18 @@ Si vous redimensionnez un corps évidé ultérieurement, layerling le creuse imm
 
 > **Astuce :** Avec une buse de 0,4 mm, 1,2 à 2 mm de paroi est un bon début : suffisamment fin pour économiser de la matière, suffisamment épais pour une pièce solide.
 
+## Un couvercle pour un corps ouvert
+
+{{ui:editor.tool.lid}} crée le couvercle d'un corps ouvert en haut : une boîte évidée avec le dessus ouvert, un pot, un plateau. Sélectionne le corps et clique sur {{ui:editor.tool.lid}}. Dans la fenêtre, tu choisis le type :
+
+- {{ui:lid.type.plug}} : une plaque aussi grande que le corps avec en dessous une lèvre qui entre dans l'ouverture.
+- {{ui:lid.type.cap}} : une plaque plus large que le corps d'une paroi avec en dessous un rebord qui passe par-dessus l'extérieur.
+- {{ui:lid.type.flat}} : seulement la plaque, à poser ou à coller.
+
+Ensuite tu règles l'{{ui:lid.thickness}}, l'{{ui:lid.fit}} (le {{ui:lid.gap}} entre couvercle et corps : 0,1 mm serré, 0,2 mm normal, 0,3 mm lâche, ou toute valeur jusqu'à 1 mm) et jusqu'où descend la lèvre ou le rebord et l'épaisseur de sa paroi. Clique sur {{ui:lid.apply}} : le couvercle est posé à côté du corps, retourné, plaque en bas, et s'imprime ainsi sans supports. Le corps reste tel quel. Le couvercle suit n'importe quel contour, rond ou anguleux, car il est pris sur le corps lui-même juste sous son bord. Un corps sans ouverture en haut n'obtient qu'un couvercle plat ; pour les deux autres, évide-le d'abord avec le dessus ouvert.
+
+> **Astuce :** Le serrage d'un couvercle dépend de l'imprimante. Imprime d'abord une petite boîte avec son couvercle ; s'il est trop serré, prends l'ajustement suivant, plus lâche.
+
 ## Décaler des corps
 
 Chaque face d'un corps peut être déplacée de la même distance, vers l'extérieur ou l'intérieur. C'est ce qu'il faut pour un ajustement, un couvercle ou un assemblage à clip : un jeu de 0,1 à 0,3 mm tout autour, les éléments restant à leur place, ce que la mise à l'échelle ne donne pas.

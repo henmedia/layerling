@@ -154,7 +154,7 @@ Le lettrage ne doit-il pas être droit mais suivre le bord d'une pièce de monna
 
 Une fois allumé, le texte parcourt le cercle. Toutes les lettres reposent sur la même ligne de base, aussi uniformément qu'avec un texte normal. Il existe quatre paramètres :
 
-- **{{ui:prop.textRadius}}** (5 à 500 mm) : Le rayon du cercle sur lequel s'étend la ligne de base des lettres.
+- **{{ui:prop.textRadius}}** (5 à 500 mm) : Le rayon du cercle sur lequel s'étend la ligne de base des lettres. Les lettres restent à leur place ; seule leur courbure change.
 - **{{ui:nameTag.letterSize}} :** Quelle est la hauteur des lettres. Cela ne dépend plus de la largeur de la forme.
 - **{{ui:prop.textInward}} :** Déplace le texte du haut du cercle vers le bas. Les lettres pointent alors la tête vers le centre.
 - **{{ui:prop.textFlipped}} :** Retourne uniquement les lettres pour que vous puissiez les lire de l'autre côté. Le texte reste à sa place sur le cercle.

@@ -33,6 +33,9 @@ function outline(sides: number, width: number, depth: number) {
   });
 }
 
+/** The corners of the base or the top, for the exact body (cadProfileExtrusion.ts). */
+export const pyramidOutline = outline;
+
 /**
  * Eine Pyramide mit Deckflaeche - ohne sie laeuft sie wie bisher in einer
  * Spitze zusammen. Oben und unten sind eigene Masse, damit ein Stumpf auch

@@ -301,7 +301,7 @@ html[data-theme="dark"] .sketch-image-hint {
   border-radius: 5px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .sketch-image-aspect-toggle.active {
