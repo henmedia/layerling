@@ -155,6 +155,8 @@ Unter {{ui:sketch.imageAlign}} richtest du ein Foto aus, das nicht gerade aufgen
 
 Alle vier wirken nur auf die Vorlage, nie auf die Skizze.
 
+**{{ui:sketch.traceImage}}** in den Einstellungen des Bildes setzt die Punkte für dich: Es zeichnet den Umriss der Form im Bild nach – eine Silhouette, ein Logo, ein Wort – und zeigt ihn in Rot über dem Bild, eckige Punkte für Ecken, runde für weiche Punkte. {{ui:sketch.traceDark}} oder {{ui:sketch.traceLight}} wählt, welcher Teil des Bildes die Form ist, {{ui:sketch.traceThreshold}}, wo Dunkel in Hell übergeht, {{ui:sketch.tracePoints}}, wie viele Punkte die Umrisse zusammen bekommen (weniger ergeben weichere Kurven, mehr folgen dem Bild genauer), {{ui:sketch.traceCorners}}, ab welchem Knick ein Punkt eine Ecke ist, {{ui:sketch.traceSpeck}}, bis zu welcher Größe Flecken wegfallen, und {{ui:sketch.traceHoles}} behält die Mitte eines A oder O. {{ui:sketch.traceApply}} legt die Umrisse genau dorthin in die Skizze, wo das Bild liegt, in seiner Größe, Drehung und seinem Zuschnitt, und wählt sie aus: Es sind gewöhnliche Punkte zum Verschieben, Krümmen oder Entfernen, und [[Strg]]+[[Z]] nimmt sie in einem Schritt zurück. Am besten klappt es mit klarem Kontrast; ein Foto mit unruhigem Hintergrund stellst du vorher frei.
+
 ## Tasten im Skizzenmodus
 
 | Taste | Wirkung |

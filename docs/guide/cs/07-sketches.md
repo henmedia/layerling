@@ -151,6 +151,8 @@ Stěny nyní mají sklon zvenku i zevnitř. Zúžení škáluje celý obrys, pro
 
 Tyto volby mění pouze podklad, nikoli náčrt.
 
+**{{ui:sketch.traceImage}}** v nastavení obrázku za tebe rozmístí body: obkreslí obrys tvaru na obrázku – siluetu, logo, slovo – a ukáže ho červeně přes obrázek, hranaté body pro rohy, kulaté pro hladké body. {{ui:sketch.traceDark}} nebo {{ui:sketch.traceLight}} volí, která část obrázku je tvar, {{ui:sketch.traceThreshold}}, kde tmavá přechází ve světlou, {{ui:sketch.tracePoints}}, kolik bodů dostanou obrysy dohromady (méně dává hladší křivky, více věrněji sleduje obrázek), {{ui:sketch.traceCorners}}, od jakého zlomu je bod rohem, {{ui:sketch.traceSpeck}}, do jaké velikosti se skvrny vynechají, a {{ui:sketch.traceHoles}} zachová střed písmene A nebo O. {{ui:sketch.traceApply}} vloží obrysy do skici přesně tam, kde leží obrázek, v jeho velikosti, otočení a ořezu, a vybere je: jsou to běžné body k posouvání, ohýbání nebo mazání a [[Ctrl]]+[[Z]] je vrátí jedním krokem. Nejlépe to funguje při jasném kontrastu; fotku s neklidným pozadím nejdřív vyřízni.
+
 ## Klávesy v náčrtu
 
 | Klávesa | Význam |

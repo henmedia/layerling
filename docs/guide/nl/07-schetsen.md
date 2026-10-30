@@ -153,6 +153,8 @@ Onder {{ui:sketch.imageAlign}} lijn je een foto uit die niet recht genomen is:
 
 Alle vier raken alleen de referentie, nooit de schets.
 
+**{{ui:sketch.traceImage}}** in de instellingen van de afbeelding zet de punten voor je: het trekt de omtrek van de vorm in de afbeelding over – een silhouet, een logo, een woord – en toont die in rood over de afbeelding, vierkante punten voor hoeken, ronde voor vloeiende punten. {{ui:sketch.traceDark}} of {{ui:sketch.traceLight}} kiest welk deel van de afbeelding de vorm is, {{ui:sketch.traceThreshold}} waar donker in licht overgaat, {{ui:sketch.tracePoints}} hoeveel punten de omtrekken samen krijgen (minder geven vloeiendere krommen, meer volgen de afbeelding nauwkeuriger), {{ui:sketch.traceCorners}} vanaf welke knik een punt een hoek is, {{ui:sketch.traceSpeck}} tot welke grootte vlekjes wegvallen, en {{ui:sketch.traceHoles}} houdt het midden van een A of O. {{ui:sketch.traceApply}} zet de omtrekken precies daar in de schets waar de afbeelding ligt, op haar grootte, draaiing en uitsnede, en selecteert ze: het zijn gewone punten om te verplaatsen, te krommen of te verwijderen, en [[Ctrl]]+[[Z]] neemt ze in één stap terug. Het werkt het best met duidelijk contrast; stel een foto met een drukke achtergrond eerst vrij.
+
 ## Toetsen in de schetsmodus
 
 | Toets | Werking |

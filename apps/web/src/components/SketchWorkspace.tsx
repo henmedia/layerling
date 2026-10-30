@@ -1,6 +1,6 @@
 "use client";
 
-import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Minus, Plus, Ruler, RulerDimensionLine, Slash, Spline, Split, Trash2, Waves, X } from "lucide-react";
+import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Minus, Plus, Ruler, RulerDimensionLine, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
 import { displayedHandle } from "@/lib/sketchBezierHandles";
 import { curveStretches } from "@/lib/sketchCurveThroughPoints";
 import { markEscapeHandled } from "@/lib/escapeHandled";
@@ -39,6 +39,9 @@ import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } f
 import { changesLockedOutline, sketchLockState } from "@/lib/sketchLock";
 import { dragRotationDegrees, rotateSketchPointsAbout, sketchPointsPivot, sketchTurnRing, sketchTurnStep, SKETCH_TURN_RING_STEP } from "@/lib/sketchRotation";
 import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, uncropImage } from "@/lib/sketchImageTransform";
+import { MAX_TRACE_CORNER_ANGLE, MIN_TRACE_CORNER_ANGLE, type PictureTrace } from "@/lib/pictureTrace";
+import { tracedPixelSize, tracedPointOnPlane, tracePreviewPath, type TracedSize } from "@/lib/sketchImageTrace";
+import { useSketchImageTrace, type SketchImageTraceState } from "@/lib/useSketchImageTrace";
 import { DEFAULT_SKETCH_STROKE, SKETCH_STROKE_ALIGNS, SKETCH_STROKE_CAPS, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { selectWholeValue } from "@/lib/numberField";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -99,6 +102,8 @@ type SketchWorkspaceProps = {
   onSelectImage: (id: string) => void;
   onUpdateImage: (id: string, patch: Partial<SketchImage>, message?: string, keyRunKey?: string) => void;
   onDeleteImage: (id: string) => void;
+  /** Trace: the reference image's outlines, traced in the pixels of the part it shows, become sketch points. */
+  onTraceImage?: (imageId: string, trace: PictureTrace, size: TracedSize) => void;
   onDeletePoint: (id: string) => void;
   onDeleteSegment: (id: string) => void;
   onMovePoint: (id: string, point: { x: number; z: number }) => void;
@@ -278,6 +283,10 @@ function formatDimension(value: number, accuracy: 1 | 2 | 3) {
 function formatPlainNumber(value: number, accuracy: 1 | 2 | 3) {
   const threshold = 0.5 * 10 ** -accuracy;
   return (Math.abs(value) < threshold ? 0 : value).toFixed(accuracy);
+}
+
+function formatWholeNumber(value: number) {
+  return String(Math.round(value));
 }
 
 function defaultCornerText() {
@@ -722,6 +731,7 @@ export function SketchWorkspace({
   onSelectImage,
   onUpdateImage,
   onDeleteImage,
+  onTraceImage,
   onDeletePoint,
   onDeleteSegment,
   onMovePoint,
@@ -990,22 +1000,29 @@ export function SketchWorkspace({
   const selectedSegmentCurved = selectedSegment ? isSegmentCurved(displayProfile, selectedSegment) : false;
   const selectedImage = selected?.kind === "image" ? displayImages.find((image) => image.id === selected.id) ?? null : null;
   const selectedImageId = selectedImage?.id ?? null;
+  // Trace (Nachzeichnen) belongs to the selected image too: its settings and the outlines it would give.
+  const [traceImageId, setTraceImageId] = useState<string | null>(null);
+  const tracing = traceImageId !== null && traceImageId === selectedImageId && tool === "select";
+  const traceImage = tracing ? profile.images?.find((image) => image.id === traceImageId) ?? null : null;
+  const imageTrace = useSketchImageTrace(traceImage, tracing);
   useEffect(() => {
     setCropMode(false);
     setCalibration(null);
+    setTraceImageId(null);
   }, [selectedImageId]);
   useEffect(() => {
-    if (!cropMode && !calibration) return;
+    if (!cropMode && !calibration && !tracing) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       // Ahead of the editor, which would otherwise also put the tool down (#664).
       markEscapeHandled(event);
       setCalibration(null);
       setCropMode(false);
+      setTraceImageId(null);
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [calibration, cropMode]);
+  }, [calibration, cropMode, tracing]);
   const selectedGeometryPoints = selected?.kind === "multiple"
     ? selected.pointIds.map((id) => pointById.get(id)).filter((point): point is SketchPoint => Boolean(point))
     : [];
@@ -2271,6 +2288,19 @@ export function SketchWorkspace({
               </g>
             ))}
           </g>
+          {tracing && selectedImage && imageTrace.trace && imageTrace.size ? (
+            // Trace: the outlines the settings give, over the picture, with their points - corners square, smooth points round.
+            <g className="sketch-trace-preview" pointerEvents="none">
+              <path d={tracePreviewPath(imageTrace.trace, selectedImage, imageTrace.size)} fillRule="evenodd" />
+              {imageTrace.trace.rings.flatMap((ring, ringIndex) => ring.nodes.map((node, nodeIndex) => {
+                const spot = tracedPointOnPlane(selectedImage, imageTrace.size!, node);
+                const size = 1.7 * screenUnit;
+                return node.corner
+                  ? <rect key={`${ringIndex}-${nodeIndex}`} className="corner" x={spot.x - size} y={spot.z - size} width={2 * size} height={2 * size} />
+                  : <circle key={`${ringIndex}-${nodeIndex}`} cx={spot.x} cy={spot.z} r={size} />;
+              }))}
+            </g>
+          ) : null}
           <g className="sketch-reference-shapes" pointerEvents="none">
             {referenceShapes.filter((shape) => !shape.hidden).map((shape) => {
               const footprint = referenceFootprints.get(shape.id);
@@ -3119,6 +3149,19 @@ export function SketchWorkspace({
           onClose={() => onSelectMany([], [], [])}
           onUpdate={(patch, message) => onUpdateImage(selectedImage.id, patch, message)}
           onDelete={() => onDeleteImage(selectedImage.id)}
+          trace={onTraceImage ? (tracing ? imageTrace : null) : undefined}
+          onTrace={(on) => {
+            setTraceImageId(on ? selectedImage.id : null);
+            if (on) {
+              setCropMode(false);
+              setCalibration(null);
+            }
+          }}
+          onApplyTrace={() => {
+            if (!imageTrace.trace?.rings.length || !imageTrace.size) return;
+            onTraceImage?.(selectedImage.id, imageTrace.trace, imageTrace.size);
+            setTraceImageId(null);
+          }}
         />
       ) : null}
       {selectedPoint && tool === "select" ? (
@@ -3314,6 +3357,9 @@ function SketchImageInspector({
   onClose,
   onUpdate,
   onDelete,
+  trace,
+  onTrace,
+  onApplyTrace,
 }: {
   image: SketchImage;
   accuracy: 1 | 2 | 3;
@@ -3326,6 +3372,10 @@ function SketchImageInspector({
   onClose: () => void;
   onUpdate: (patch: Partial<SketchImage>, message?: string) => void;
   onDelete: () => void;
+  /** Trace: its state while it is on, null while it is off; left out where the sketch cannot take traced outlines. */
+  trace?: SketchImageTraceState | null;
+  onTrace: (on: boolean) => void;
+  onApplyTrace: () => void;
 }) {
   useLanguage();
   const measured = calibration?.points.length === 2 ? Math.hypot(calibration.points[1].x - calibration.points[0].x, calibration.points[1].z - calibration.points[0].z) : 0;
@@ -3415,6 +3465,9 @@ function SketchImageInspector({
           ) : null}
         </div>
       </div>
+      {trace !== undefined ? (
+        <SketchImageTraceCard image={image} trace={trace} onTrace={onTrace} onApply={onApplyTrace} />
+      ) : null}
       <div className="property-card">
         <div className="property-card-header static"><span>{t("sketch.imageProperties")}</span></div>
         <div className="property-list">
@@ -3457,6 +3510,87 @@ function SketchImageInspector({
         </div>
       </div>
     </aside>
+  );
+}
+
+/**
+ * Trace (Nachzeichnen): the button that starts it and, while it is on, its settings - which part of the
+ * picture is the shape, where dark turns light, how many points, from what turn a point is a corner, how
+ * small a speck is left out and whether holes stay. The outlines show over the picture as the settings
+ * change; Apply makes them sketch points.
+ */
+function SketchImageTraceCard({
+  image,
+  trace,
+  onTrace,
+  onApply,
+}: {
+  image: SketchImage;
+  trace: SketchImageTraceState | null;
+  onTrace: (on: boolean) => void;
+  onApply: () => void;
+}) {
+  if (!trace) {
+    return (
+      <div className="property-card sketch-image-trace-card">
+        <div className="property-list">
+          <button className="sketch-image-aspect-toggle" type="button" title={t("sketch.traceImageHint")} onClick={() => onTrace(true)}>
+            <WandSparkles size={17} />
+            <span>{t("sketch.traceImage")}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+  const { settings, range, size } = trace;
+  const pixel = size ? tracedPixelSize(image, size) : null;
+  // A speck by the side of a square of its area, in mm on the plate.
+  const speckSide = settings && pixel ? Math.sqrt(settings.speck * pixel.x * pixel.z) : 0;
+  const maxSpeckSide = Math.max(0.5, Math.min(image.width, image.depth) / 10);
+  const outlines = trace.trace?.rings.length ?? 0;
+  return (
+    <div className="property-card sketch-image-trace-card">
+      <div className="property-card-header static"><span>{t("sketch.traceImage")}</span></div>
+      <div className="property-list">
+        {trace.failed ? <p className="sketch-image-hint">{t("sketch.traceUnreadable")}</p> : null}
+        {!settings && !trace.failed ? <p className="sketch-image-hint">{t("sketch.traceLoading")}</p> : null}
+        {settings && range && pixel ? (
+          <>
+            <div className="sketch-image-action-row">
+              <button className={`sketch-image-aspect-toggle ${settings.part === "dark" ? "active" : ""}`} type="button" aria-pressed={settings.part === "dark"} onClick={() => trace.change({ part: "dark" })}>
+                <span>{t("sketch.traceDark")}</span>
+              </button>
+              <button className={`sketch-image-aspect-toggle ${settings.part === "light" ? "active" : ""}`} type="button" aria-pressed={settings.part === "light"} onClick={() => trace.change({ part: "light" })}>
+                <span>{t("sketch.traceLight")}</span>
+              </button>
+            </div>
+            <SketchImageRange label={t("sketch.traceThreshold")} value={settings.threshold * 100} min={2} max={98} accuracy={1} whole suffix="%" onChange={(value) => trace.change({ threshold: value / 100 })} />
+            <SketchImageRange label={t("sketch.tracePoints")} value={settings.points} min={range.fewest} max={Math.max(range.fewest, range.most)} accuracy={1} whole suffix="" disabled={range.most <= range.fewest} onChange={(points) => trace.change({ points })} />
+            <p className="sketch-image-hint">
+              {outlines ? t("sketch.traceCount", { points: trace.trace?.points ?? 0, corners: trace.trace?.corners ?? 0 }) : t("sketch.traceNothing")}
+            </p>
+            <SketchImageRange label={t("sketch.traceCorners")} value={settings.cornerAngle} min={MIN_TRACE_CORNER_ANGLE} max={MAX_TRACE_CORNER_ANGLE} accuracy={1} whole suffix="°" onChange={(cornerAngle) => trace.change({ cornerAngle })} />
+            {settings.cornerAngle >= MAX_TRACE_CORNER_ANGLE ? <p className="sketch-image-hint">{t("sketch.traceNoCorners")}</p> : null}
+            <SketchImageRange label={t("sketch.traceSpeck")} value={speckSide} min={0} max={maxSpeckSide} accuracy={2} onChange={(side) => trace.change({ speck: (side * side) / Math.max(1e-12, pixel.x * pixel.z) })} />
+            <button className={`sketch-image-aspect-toggle ${settings.holes ? "active" : ""}`} type="button" aria-pressed={settings.holes} onClick={() => trace.change({ holes: !settings.holes })}>
+              {settings.holes ? <Check size={17} /> : <X size={17} />}
+              <span>{t("sketch.traceHoles")}</span>
+            </button>
+            <p className="sketch-image-hint">{t("sketch.traceHint")}</p>
+          </>
+        ) : null}
+        <div className="sketch-image-action-row">
+          <button className="sketch-image-aspect-toggle active" type="button" disabled={!outlines} onClick={onApply}>
+            <Check size={17} />
+            <span>{t("sketch.traceApply")}</span>
+          </button>
+          <button className="sketch-image-aspect-toggle" type="button" onClick={() => onTrace(false)}>
+            <X size={17} />
+            <span>{t("common.cancel")}</span>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -3561,6 +3695,7 @@ function SketchImageRange({
   accuracy,
   suffix = "mm",
   disabled = false,
+  whole = false,
   onChange,
 }: {
   label: string;
@@ -3570,16 +3705,19 @@ function SketchImageRange({
   accuracy: 1 | 2 | 3;
   suffix?: string;
   disabled?: boolean;
+  /** A count: whole numbers only, in steps of one. */
+  whole?: boolean;
   onChange: (value: number) => void;
 }) {
   const safeValue = clamp(Number.isFinite(value) ? value : min, min, max);
   const isLength = suffix === "mm";
-  const formatValue = isLength ? formatDimension : formatPlainNumber;
+  const formatValue = isLength ? formatDimension : whole ? formatWholeNumber : formatPlainNumber;
   const [draft, setDraft] = useState(formatValue(safeValue, accuracy));
   useEffect(() => setDraft(formatValue(safeValue, accuracy)), [accuracy, safeValue, formatValue]);
   const commit = () => {
     const parsed = isLength ? parseLengthMm(draft) : parseMeasurementInput(draft);
-    onChange(clamp(Number.isFinite(parsed) ? parsed : safeValue, min, max));
+    const value = clamp(Number.isFinite(parsed) ? parsed : safeValue, min, max);
+    onChange(whole ? Math.round(value) : value);
   };
   const position = ((safeValue - min) / Math.max(0.001, max - min)) * 100;
   return (
@@ -3599,7 +3737,7 @@ function SketchImageRange({
         />
         <span>{isLength ? currentLengthUnitLabel() : suffix}</span>
       </div>
-      <input type="range" min={min} max={max} step={accuracy === 1 ? 0.1 : 0.01} value={safeValue} disabled={disabled} onChange={(event) => onChange(Number(event.currentTarget.value))} />
+      <input type="range" min={min} max={max} step={whole ? 1 : accuracy === 1 ? 0.1 : 0.01} value={safeValue} disabled={disabled} onChange={(event) => onChange(Number(event.currentTarget.value))} />
     </label>
   );
 }

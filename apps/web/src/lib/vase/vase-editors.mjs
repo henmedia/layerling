@@ -80,6 +80,8 @@ function injectStyle() {
   .vz .vz-knob { fill: var(--vz-bg); stroke: var(--vz-accent); stroke-width: 2px; vector-effect: non-scaling-stroke; pointer-events: none; }
   .vz .vz-knob.sel { fill: var(--vz-accent); }
   .vz .vz-tangent { stroke: var(--vz-accent); stroke-width: 1.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
+  .vz .vz-trace { fill: #e5484d; fill-opacity: .08; stroke: #e5484d; stroke-width: 2px; stroke-dasharray: 6 4; vector-effect: non-scaling-stroke; pointer-events: none; }
+  .vz .vz-trace-knob { fill: #fff; stroke: #e5484d; stroke-width: 2px; vector-effect: non-scaling-stroke; pointer-events: none; }
   .vz .vz-tknob { fill: var(--vz-bg); stroke: var(--vz-accent); stroke-width: 1.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
   .vz .vz-readonly { position: absolute; inset: auto 10px 10px 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
     padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--vz-bg) 88%, transparent); border: 1px solid var(--vz-edge); font-size: 12.5px; }
@@ -115,6 +117,7 @@ function drawingBoard(api) {
   const photoG = svgEl('g', {}, world)
   const gridG = svgEl('g', {}, world)
   const shapeG = svgEl('g', {}, world)
+  const traceG = svgEl('g', {}, world)
   const knobG = svgEl('g', {}, world)
   const calibG = svgEl('g', {}, world)
   const labelG = svgEl('g', {}, svg) // labels not mirrored
@@ -137,7 +140,11 @@ function drawingBoard(api) {
   const photoRow = document.createElement('div')
   photoRow.className = 'vz-row'
   photoRow.hidden = !api.photo
-  el.append(wrap, pointRow, numRow, editRow, photoRow, hint)
+  // Trace's settings, under the photo's row while it is on.
+  const traceRow = document.createElement('div')
+  traceRow.className = 'vz-row'
+  traceRow.hidden = true
+  el.append(wrap, pointRow, numRow, editRow, photoRow, traceRow, hint)
 
   const button = (parent, text, title, fn) => {
     const b = document.createElement('button')
@@ -276,6 +283,7 @@ function drawingBoard(api) {
   let calib = null // null | { points: [[x, y], ...] }
   let found = null // the object in the (scaled-down) photo, see findObject
   let photoPx = null // { width, height } of the scaled-down photo
+  let photoPixels = null // its pixels, { width, height, data }, to search it again with another threshold (Trace)
   // Measures of the object: filled in from the vase until one enters them oneself.
   const sizeField = (label, key, title) => {
     const wrapS = document.createElement('label')
@@ -337,13 +345,15 @@ function drawingBoard(api) {
   dist.inputMode = 'decimal'
   distWrap.append(`${tr('vaseDraw.distance')} `, dist, ' mm')
   distWrap.hidden = true
-  let photoBtn = null, calibBtn = null, applyBtn = null, offBtn = null, outlineBtn = null
+  let photoBtn = null, calibBtn = null, applyBtn = null, offBtn = null, outlineBtn = null, traceBtn = null
   const photoHint = (text) => { hint.textContent = text }
   function photoState() {
     if (!api.photo) return
     calibBtn.hidden = !photo
     offBtn.hidden = !photo
     outlineBtn.hidden = !(photo && found?.ok)
+    traceBtn.hidden = !(photo && found?.ok && photoPixels)
+    traceBtn.setAttribute('aria-pressed', String(Boolean(trace)))
     opacityWrap.hidden = !photo
     calibBtn.setAttribute('aria-pressed', String(Boolean(calib)))
     distWrap.hidden = !(calib && calib.points.length === 2)
@@ -369,6 +379,107 @@ function drawingBoard(api) {
       }
     }
   }
+  /*
+   * Trace (Nachzeichnen): the object's outline taken with settings - how far a colour must lie from the
+   * background's to belong to it (threshold), how many points, from what kink a point is a corner - and
+   * shown in red over the photo before it becomes the body form. The photo follows the object as the
+   * threshold changes it; Cancel lays it back.
+   */
+  let trace = null // null | { threshold, points, cornerAngle, found, result }
+  let traceThreshold = null, tracePoints = null, traceCorners = null
+  let traceTimer = 0
+  function traceSlider(label, min, max, step, show, onChange) {
+    const wrapT = document.createElement('label')
+    wrapT.className = 'vz-num'
+    const input = document.createElement('input')
+    input.type = 'range'
+    input.min = String(min)
+    input.max = String(max)
+    input.step = String(step)
+    input.style.cssText = 'width:110px;min-width:0;flex:0 0 auto'
+    const value = document.createElement('span')
+    value.style.cssText = 'min-width:44px;display:inline-block'
+    wrapT.append(`${label} `, input, ' ', value)
+    traceRow.append(wrapT)
+    const slider = {
+      set(v) { input.value = String(v); value.textContent = show(v) },
+    }
+    input.addEventListener('input', () => {
+      if (!trace) return
+      const v = Number(input.value)
+      value.textContent = show(v)
+      onChange(v)
+      // While the slider moves, trace again once it rests a moment.
+      clearTimeout(traceTimer)
+      traceTimer = setTimeout(updateTrace, 60)
+    })
+    return slider
+  }
+  function updateTrace() {
+    if (!trace || !photo || !photoPixels) return
+    const size = objectSize()
+    const f = findObject(photoPixels, { threshold: trace.threshold })
+    trace.found = f
+    trace.result = f.ok ? photoProfile(f, { ...size, tolerance: 0.001, maxPoints: trace.points, cornerAngle: trace.cornerAngle }) : f
+    if (f.ok) Object.assign(photo, photoPlacement(photoPx, f.box, size))
+    photoHint(trace.result.ok ? tr('vaseDraw.traceHint', { points: trace.result.profilePoints.length }) : trace.result.notes.map(api.note).join(' '))
+    render()
+  }
+  function startTrace() {
+    if (!photo || !found?.ok || !photoPixels) return
+    calib = null
+    // To start, what Take outline would give: its threshold and its number of points.
+    const first = photoProfile(found, objectSize())
+    trace = { threshold: found.threshold, points: first.ok ? first.profilePoints.length : 8, cornerAngle: 20, found, result: null }
+    traceThreshold.set(Math.round(trace.threshold * 100))
+    tracePoints.set(trace.points)
+    traceCorners.set(trace.cornerAngle)
+    traceRow.hidden = false
+    photoState()
+    updateTrace()
+  }
+  /** Trace off: with `apply`, its outline becomes the body form and the photo stays on the object as found; else all is as before. */
+  function stopTrace(apply) {
+    if (!trace) return
+    const done = trace
+    endTrace()
+    if (apply && done.result?.ok) {
+      found = done.found
+      placeFound()
+      photoHint(api.photoProfile(done.result))
+      return
+    }
+    if (photo && found?.ok) Object.assign(photo, photoPlacement(photoPx, found.box, objectSize()))
+    photoHint(api.hint)
+    render()
+  }
+  function endTrace() {
+    clearTimeout(traceTimer)
+    trace = null
+    traceRow.hidden = true
+    if (traceBtn) photoState()
+  }
+  /** Trace's outline over the photo: the body form both sides of the axis, its points - corners square. */
+  function drawTrace(ppm) {
+    traceG.replaceChildren()
+    const result = trace?.result
+    if (!result?.ok) return
+    const pts = result.profilePoints
+    const f = profileFunction(pts)
+    const maxR = Math.max(...pts.map((pt) => pt[1]))
+    const R = result.diameter / 2
+    const H = result.height
+    const right = []
+    for (let k = 0; k <= 240; k++) right.push([(Math.max(0.02, f(k / 240)) * R) / maxR, (k / 240) * H])
+    svgEl('path', { class: 'vz-trace', d: pathOf([...right, ...right.slice().reverse().map(([x, y]) => [-x, y])], true) }, traceG)
+    const s = 5 / ppm
+    for (const pt of pts) {
+      const x = (pt[1] * R) / maxR
+      const y = pt[0] * H
+      if (pt[2] === PROFILE_CORNER) svgEl('rect', { class: 'vz-trace-knob', x: x - s, y: y - s, width: 2 * s, height: 2 * s }, traceG)
+      else svgEl('circle', { class: 'vz-trace-knob', cx: x, cy: y, r: s }, traceG)
+    }
+  }
   if (api.photo) {
     photoFile.addEventListener('change', () => {
       const f = photoFile.files?.[0]
@@ -378,6 +489,7 @@ function drawingBoard(api) {
       const img = new Image()
       img.onload = () => {
         if (photo) URL.revokeObjectURL(photo.href)
+        endTrace()
         const [, , , by1] = api.bounds()
         const h = Math.max(10, by1 / 1.04)
         const w = (h * img.naturalWidth) / Math.max(1, img.naturalHeight)
@@ -393,7 +505,8 @@ function drawingBoard(api) {
           const ctx = c.getContext('2d', { willReadFrequently: true })
           ctx.drawImage(img, 0, 0, c.width, c.height)
           photoPx = { width: c.width, height: c.height }
-          found = findObject({ width: c.width, height: c.height, data: ctx.getImageData(0, 0, c.width, c.height).data })
+          photoPixels = { width: c.width, height: c.height, data: ctx.getImageData(0, 0, c.width, c.height).data }
+          found = findObject(photoPixels)
         } catch (error) {
           found = { ok: false, notes: [tr('vaseDraw.photoUnreadable', { error: error?.message || String(error) })] }
         }
@@ -411,17 +524,26 @@ function drawingBoard(api) {
         f.edited = f.input.value.trim() !== ''
         if (f.edited && !(parseNum(f.input.value) > 0)) { photoHint(tr('vaseDraw.sizeInvalid')); return }
         syncSize()
-        if (photo && found?.ok) placeFound()
+        if (trace) updateTrace()
+        else if (photo && found?.ok) placeFound()
       }
       f.input.addEventListener('change', commit)
       f.input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commit() } })
     }
     photoBtn = button(photoRow, tr('vaseDraw.addPhoto'), tr('vaseDraw.addPhotoTitle'), () => photoFile.click())
     outlineBtn = button(photoRow, tr('vaseDraw.takeOutline'), tr('vaseDraw.takeOutlineTitle'), () => {
+      endTrace()
       const r = photoProfile(found, objectSize())
       photoHint(api.photoProfile(r))
     })
+    traceBtn = button(photoRow, tr('vaseDraw.trace'), tr('vaseDraw.traceTitle'), () => (trace ? stopTrace(false) : startTrace()))
+    traceThreshold = traceSlider(tr('vaseDraw.traceThreshold'), 1, 99, 1, (v) => `${nf(v, 0)} %`, (v) => { trace.threshold = v / 100 })
+    tracePoints = traceSlider(tr('vaseDraw.tracePoints'), 3, MAX_PROFILE_POINTS, 1, (v) => nf(v, 0), (v) => { trace.points = v })
+    traceCorners = traceSlider(tr('vaseDraw.traceCorners'), 5, 180, 1, (v) => (v >= 180 ? tr('vaseDraw.traceNoCorners') : `${nf(v, 0)}°`), (v) => { trace.cornerAngle = v })
+    button(traceRow, tr('vaseDraw.traceApply'), tr('vaseDraw.traceApplyTitle'), () => stopTrace(true))
+    button(traceRow, tr('vaseDraw.traceCancel'), null, () => stopTrace(false))
     calibBtn = button(photoRow, tr('vaseDraw.calibrate'), tr('vaseDraw.calibrateTitle'), () => {
+      stopTrace(false)
       calib = calib ? null : { points: [] }
       photoState()
       render()
@@ -451,7 +573,9 @@ function drawingBoard(api) {
     photoRow.append(opacityWrap)
     offBtn = button(photoRow, tr('vaseDraw.photoOff'), tr('vaseDraw.photoOffTitle'), () => {
       if (photo) URL.revokeObjectURL(photo.href)
+      endTrace()
       photo = null
+      photoPixels = null
       calib = null
       found = null
       photoState()
@@ -549,6 +673,7 @@ function drawingBoard(api) {
     const ppm = pxPerMm()
     const ctx = { ppm, labelG, shapeG, svgEl }
     api.drawShape(shapeG, ctx)
+    drawTrace(ppm)
     const ro = api.readonly?.()
     // While calibrating, the foot often lies where the note "comes from the settings" is shown.
     readonly.hidden = !ro || Boolean(calib)

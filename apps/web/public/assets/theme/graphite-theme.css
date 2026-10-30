@@ -8540,6 +8540,21 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-turn-ring {
   --sketch-turn-ring-active: #6aa0ff;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path {
+  fill: rgba(229, 72, 77, 0.12);
+  stroke: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle,
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview rect {
+  fill: #ffffff;
+  stroke: #0b72b9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview rect.corner {
+  stroke: #e5484d;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-plate {
   --locked-handle-ink: #898989;
   --locked-handle-fill: #dfdfdf;

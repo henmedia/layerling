@@ -154,6 +154,8 @@ Under {{ui:sketch.imageAlign}} justerer du et foto der ikke blev taget lige:
 
 Alle fire rører kun referencen, aldrig skitsen.
 
+**{{ui:sketch.traceImage}}** i billedets indstillinger sætter punkterne for dig: det optegner omridset af formen på billedet – en silhuet, et logo, et ord – og viser det i rødt over billedet, firkantede punkter for hjørner, runde for glatte punkter. {{ui:sketch.traceDark}} eller {{ui:sketch.traceLight}} vælger, hvilken del af billedet der er formen, {{ui:sketch.traceThreshold}}, hvor mørkt går over i lyst, {{ui:sketch.tracePoints}}, hvor mange punkter omridsene får tilsammen (færre giver blødere kurver, flere følger billedet nøjere), {{ui:sketch.traceCorners}}, fra hvilket knæk et punkt er et hjørne, {{ui:sketch.traceSpeck}}, op til hvilken størrelse pletter udelades, og {{ui:sketch.traceHoles}} beholder midten af et A eller O. {{ui:sketch.traceApply}} lægger omridsene ind i skitsen præcis der, hvor billedet ligger, i dets størrelse, drejning og beskæring, og markerer dem: det er almindelige punkter, der kan flyttes, bøjes eller fjernes, og [[Ctrl]]+[[Z]] fjerner dem i ét trin. Det virker bedst med tydelig kontrast; frilæg først et foto med en urolig baggrund.
+
 ## Taster i skitsetilstand
 
 | Taste | Virkning |

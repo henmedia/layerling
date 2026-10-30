@@ -155,6 +155,8 @@ Under {{ui:sketch.imageAlign}} you line up a photo that was not taken straight:
 
 All four touch the reference only, never the sketch.
 
+**{{ui:sketch.traceImage}}**, in the picture's settings, sets the points for you: it traces the outline of the shape in the picture – a silhouette, a logo, a word – and shows it in red over the picture, square points for corners, round ones for smooth points. {{ui:sketch.traceDark}} or {{ui:sketch.traceLight}} picks which part of the picture is the shape, {{ui:sketch.traceThreshold}} where dark turns light, {{ui:sketch.tracePoints}} how many points the outlines get together (fewer give smoother curves, more follow the picture more closely), {{ui:sketch.traceCorners}} from what turn a point is a corner, {{ui:sketch.traceSpeck}} how small a speck is left out, and {{ui:sketch.traceHoles}} keeps the middle of an A or an O. {{ui:sketch.traceApply}} puts the outlines into the sketch exactly where the picture lies, at its size, turn and crop, and selects them: they are ordinary points to move, curve or remove, and [[Ctrl]]+[[Z]] takes them back in one step. It works best with clear contrast; cut a photo with a busy background out first.
+
 ## Keys in sketch mode
 
 | Key | Effect |

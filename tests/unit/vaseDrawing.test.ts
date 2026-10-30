@@ -6,6 +6,8 @@ import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { analyzeTriangleSoup } from "@/lib/svgImport";
 import { svgToProfile, svgToSection } from "@/lib/vase/svg-import.mjs";
 import { meshToProfile } from "@/lib/vase/vase-import.mjs";
+import { findObject, photoProfile } from "@/lib/vase/vase-photo.mjs";
+import { PROFILE_CORNER } from "@/lib/vase/vase-geometry.mjs";
 import { vaseNote } from "@/lib/vaseNotes";
 import { normalizeVaseSettings } from "@/lib/vaseSettings";
 import { vaseDrawingPatch, vaseDrawingSettings, vaseShapePatch } from "@/lib/vaseShape";
@@ -173,3 +175,52 @@ describe("drawing a vase", () => {
     expect(code).not.toMatch(/'[^'\n]*[äöüÄÖÜß][^'\n]*'/);
   });
 });
+
+/** A photo of a bottle-like vase: a round belly and a narrow neck on a light wall, as RGBA pixels. */
+function vasePhoto() {
+  const width = 200;
+  const height = 300;
+  const data = new Uint8ClampedArray(width * height * 4);
+  for (let y = 0; y < height; y += 1) {
+    const belly = 30 + 30 * Math.sin((Math.PI * (y - 100)) / 180);
+    for (let x = 0; x < width; x += 1) {
+      const body = y >= 100 && y < 280 && Math.abs(x + 0.5 - 100) <= belly;
+      const neck = y >= 40 && y < 100 && x >= 75 && x < 125;
+      data.set(body || neck ? [40, 70, 120, 255] : [230, 225, 215, 255], (y * width + x) * 4);
+    }
+  }
+  return { width, height, data };
+}
+
+describe("tracing the photo of a vase (Trace)", () => {
+  it("finds the object at a threshold of its own, or at one that is set", () => {
+    const found = findObject(vasePhoto());
+    expect(found.ok).toBe(true);
+    expect(found.threshold).toBeCloseTo(found.autoThreshold, 6);
+    const set = findObject(vasePhoto(), { threshold: 0.3 });
+    expect(set.ok).toBe(true);
+    expect(set.threshold).toBeCloseTo(0.3, 2);
+    // A threshold above the object's colour finds nothing.
+    expect(findObject(vasePhoto(), { threshold: 0.95 }).ok).toBe(false);
+  });
+
+  it("takes as many points as asked for, from 3 up to 40", () => {
+    const found = findObject(vasePhoto());
+    const size = { height: 120, diameter: 60, tolerance: 0.001 };
+    for (const maxPoints of [3, 5, 12]) {
+      const result = photoProfile(found, { ...size, maxPoints });
+      expect(result.ok).toBe(true);
+      expect(result.profilePoints).toHaveLength(maxPoints);
+    }
+    expect(photoProfile(found, { ...size, maxPoints: 99 }).profilePoints.length).toBeLessThanOrEqual(40);
+  });
+
+  it("makes the shoulder's kinks corners, or none at the largest corner angle", () => {
+    const found = findObject(vasePhoto());
+    const size = { height: 120, diameter: 60, tolerance: 0.001, maxPoints: 12 };
+    const corners = (cornerAngle: number) => photoProfile(found, { ...size, cornerAngle }).profilePoints.filter((point: unknown[]) => point[2] === PROFILE_CORNER).length;
+    expect(corners(20)).toBeGreaterThanOrEqual(2);
+    expect(corners(180)).toBe(0);
+  });
+});
+

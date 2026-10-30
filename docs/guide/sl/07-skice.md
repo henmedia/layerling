@@ -153,6 +153,8 @@ Pod {{ui:sketch.imageAlign}} poravnaš fotografijo, ki ni bila posneta naravnost
 
 Vsa štiri delujejo samo na predlogo, nikoli na skico.
 
+**{{ui:sketch.traceImage}}** v nastavitvah slike postavi točke namesto tebe: obriše obris oblike na sliki – silhueto, logotip, besedo – in ga pokaže v rdečem čez sliko, oglate točke za oglišča, okrogle za gladke točke. {{ui:sketch.traceDark}} ali {{ui:sketch.traceLight}} izbere, kateri del slike je oblika, {{ui:sketch.traceThreshold}}, kje temno preide v svetlo, {{ui:sketch.tracePoints}}, koliko točk dobijo obrisi skupaj (manj da bolj gladke krivulje, več natančneje sledi sliki), {{ui:sketch.traceCorners}}, od katerega preloma je točka oglišče, {{ui:sketch.traceSpeck}}, do katere velikosti madeži odpadejo, in {{ui:sketch.traceHoles}} ohrani sredino črke A ali O. {{ui:sketch.traceApply}} postavi obrise v skico natanko tja, kjer leži slika, v njeni velikosti, zasuku in obrezu, in jih izbere: to so navadne točke za premikanje, krivljenje ali odstranjevanje, [[Ctrl]]+[[Z]] pa jih v enem koraku vzame nazaj. Najbolje deluje pri jasnem kontrastu; fotografijo z razgibanim ozadjem najprej izreži.
+
 ## Tipke v skicirnem načinu
 
 | Tipka | Učinek |

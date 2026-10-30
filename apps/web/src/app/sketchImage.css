@@ -343,3 +343,23 @@ html[data-theme="dark"] .sketch-turn-ring {
   --sketch-turn-ring: rgba(106, 160, 255, 0.4);
   --sketch-turn-ring-active: #6aa0ff;
 }
+
+/* Trace: the outlines the settings give, over the picture, and their points. */
+.sketch-trace-preview path {
+  fill: rgba(229, 72, 77, 0.12);
+  stroke: #e5484d;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.sketch-trace-preview circle,
+.sketch-trace-preview rect {
+  fill: #ffffff;
+  stroke: #0b72b9;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.sketch-trace-preview rect.corner {
+  stroke: #e5484d;
+}

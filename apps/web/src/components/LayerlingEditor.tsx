@@ -160,6 +160,8 @@ import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { sketchBodyStretch, stretchedSketchProfile } from "@/lib/sketchResize";
 import { silhouetteSketchProfile } from "@/lib/sketchCadProfile";
 import { svgSketchMatchesMesh } from "@/lib/svgSketch";
+import { sketchGeometryFromTrace, type TracedSize } from "@/lib/sketchImageTrace";
+import type { PictureTrace } from "@/lib/pictureTrace";
 import { DEFAULT_SKETCH_STROKE, normalizeSketchStroke, strokedSketchProfile } from "@/lib/sketchStroke";
 import { bottomCadModifierEdgeIds, horizontalCadModifierEdgeIds, topCadModifierEdgeIds, verticalCadModifierEdgeIds } from "@/lib/topEdges";
 import { tangentCadEdgeChain } from "@/lib/cadEdgeChain";
@@ -5106,6 +5108,20 @@ export function LayerlingEditor({
       images: (sketchProfile.images ?? []).filter((image) => image.id !== id),
     }, t("status.sketchImageRemoved"));
     setSketchSelection(null);
+  }, [commitSketchProfile, sketchProfile]);
+
+  // Trace: the reference image's outlines become sketch points on the picture, one step to undo, and stay selected to move or scale them.
+  const traceSketchImage = useCallback((id: string, trace: PictureTrace, size: TracedSize) => {
+    const image = (sketchProfile.images ?? []).find((entry) => entry.id === id);
+    if (!image || !trace.rings.length) return;
+    const { points, segments } = sketchGeometryFromTrace(trace, image, size, createLocalId);
+    commitSketchProfile({
+      ...sketchProfile,
+      points: [...sketchProfile.points, ...points],
+      segments: [...sketchProfile.segments, ...segments],
+    }, t("status.sketchImageTraced", { points: points.length }));
+    setSketchSelection({ kind: "multiple", pointIds: points.map((point) => point.id), segmentIds: segments.map((segment) => segment.id), imageIds: [] });
+    setSketchActivePointId(null);
   }, [commitSketchProfile, sketchProfile]);
 
   const addSketchImageFile = useCallback(async (file: File) => {
@@ -14318,6 +14334,7 @@ export function LayerlingEditor({
             }}
             onUpdateImage={updateSketchImage}
             onDeleteImage={deleteSketchImage}
+            onTraceImage={traceSketchImage}
             onDeletePoint={deleteSketchPoint}
             onDeleteSegment={deleteSketchSegment}
             onMovePoint={moveSketchPoint}

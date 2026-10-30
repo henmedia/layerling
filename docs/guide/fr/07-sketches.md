@@ -151,6 +151,8 @@ Sous {{ui:sketch.imageAlign}} vous alignez une photo qui n'a pas été prise dir
 
 Tous les quatre touchent uniquement à la référence, jamais au croquis.
 
+**{{ui:sketch.traceImage}}**, dans les réglages de l'image, place les points pour toi : il suit le contour de la forme dans l'image – une silhouette, un logo, un mot – et l'affiche en rouge sur l'image, des points carrés pour les angles, ronds pour les points lisses. {{ui:sketch.traceDark}} ou {{ui:sketch.traceLight}} choisit quelle partie de l'image est la forme, {{ui:sketch.traceThreshold}} où le sombre devient clair, {{ui:sketch.tracePoints}} combien de points les contours reçoivent en tout (moins donnent des courbes plus douces, plus suivent l'image de plus près), {{ui:sketch.traceCorners}} à partir de quel virage un point est un angle, {{ui:sketch.traceSpeck}} jusqu'à quelle taille les taches disparaissent, et {{ui:sketch.traceHoles}} garde le milieu d'un A ou d'un O. {{ui:sketch.traceApply}} place les contours dans l'esquisse exactement là où se trouve l'image, à sa taille, sa rotation et son recadrage, et les sélectionne : ce sont des points ordinaires à déplacer, courber ou supprimer, et [[Ctrl]]+[[Z]] les retire en une étape. Cela marche le mieux avec un contraste net ; détoure d'abord une photo au fond chargé.
+
 ## Touches en mode esquisse
 
 | Clé | Effet |

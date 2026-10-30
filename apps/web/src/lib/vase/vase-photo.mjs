@@ -64,9 +64,11 @@ function otsu(values, max) {
 /**
  * Find the object in the photo. Returns { ok, box: { x0, y0, x1, y1 } in the photo's pixels (y down;
  * top and bottom are the centres of the rim and base ellipses), rows: per grid row from the top [left, right]
- * or null, top/bottom: first and last row of the body, grid: { w, h, f, fy }, notes }.
+ * or null, top/bottom: first and last row of the body, grid: { w, h, f, fy }, threshold, autoThreshold, notes }.
+ * `threshold` (0 to 1, a share of the largest colour distance) sets how far a colour must lie from the
+ * background's to belong to the object (Trace); without it, it is found from the photo (Otsu). Both come back.
  */
-export function findObject(img) {
+export function findObject(img, { threshold = null } = {}) {
   if (!img || !(img.width > 2) || !(img.height > 2) || !img.data) return { ok: false, notes: ['Kein Bild.'] }
   const g = downsample(img)
   const { w, h, rgb } = g
@@ -81,7 +83,8 @@ export function findObject(img) {
   // Busy border: many border points differ clearly from the median - then there is no clear background.
   const busy = border.filter((p) => dist[p] > 2 * MIN).length / border.length
   if (busy > 0.35) return { ok: false, notes: ['Der Hintergrund ist unruhig (am Bildrand keine einheitliche Farbe) – der Gegenstand lässt sich nicht sicher finden. Am besten vor einer hellen, einfarbigen Wand fotografieren; sonst „Kalibrieren“.'] }
-  const T = Math.max(MIN, otsu(dist, 442))
+  const auto = Math.max(MIN, otsu(dist, 442))
+  const T = threshold === null ? auto : Math.min(438, Math.max(4, threshold * 442))
   const fg = new Uint8Array(w * h)
   for (let p = 0; p < w * h; p++) fg[p] = dist[p] > T ? 1 : 0
   // Largest connected region (4-neighbourhood).
@@ -130,16 +133,17 @@ export function findObject(img) {
   if (bottom < y1) while (bottom > y1 - capMax && width(bottom) < 0.98 * width(bottom - 1)) bottom--
   if (top > y0 + 1 || bottom < y1 - 1) notes.push('Rand und Boden erscheinen als Ellipse (leicht von oben fotografiert) – gemessen wird zwischen ihren Mitten.')
   const box = { x0: x0 * g.f, y0: top * g.fy, x1: (x1 + 1) * g.f, y1: (bottom + 1) * g.fy }
-  return { ok: true, box, rows, top, bottom, grid: { w, h, f: g.f, fy: g.fy }, notes }
+  return { ok: true, box, rows, top, bottom, grid: { w, h, f: g.f, fy: g.fy }, threshold: T / 442, autoThreshold: auto / 442, notes }
 }
 
 /**
  * Outline of a found object as a body form: per row half the width (the middle taken per row - in case
  * it stands askew), smoothed and simplified to a few points. `height`, `diameter`: real dimensions in mm
  * (diameter = the widest point); without a diameter, the height's scale applies across as well.
+ * `maxPoints` and `cornerAngle` as in profileFromSamples (Trace sets them).
  * Returns { ok, profilePoints, height, diameter, notes } like the SVG import.
  */
-export function photoProfile(found, { height, diameter = null, tolerance = null } = {}) {
+export function photoProfile(found, { height, diameter = null, tolerance = null, maxPoints, cornerAngle } = {}) {
   if (!found?.ok) return { ok: false, notes: found?.notes ?? ['Kein Gegenstand gefunden.'] }
   if (!(height > 0)) return { ok: false, notes: ['Bitte die Höhe des Gegenstands in mm angeben.'] }
   const { rows, grid, top, bottom } = found
@@ -168,7 +172,7 @@ export function photoProfile(found, { height, diameter = null, tolerance = null 
     rs.push(smooth[k] * sx)
   }
   const tol = tolerance ?? Math.max(0.3, height / 300)
-  const fit = profileFromSamples(ts, rs, height, { tolerance: tol })
+  const fit = profileFromSamples(ts, rs, height, { tolerance: tol, maxPoints, cornerAngle })
   if (!fit) return { ok: false, notes: ['Aus dem Umriss lässt sich keine Körperform ablesen.'] }
   const notes = [...found.notes]
   const ratio = diameter > 0 ? sx / sy : 1
