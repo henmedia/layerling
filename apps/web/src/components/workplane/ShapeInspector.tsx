@@ -305,6 +305,7 @@ import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
+import { MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
 /**
  * Docked at the right edge, full height. Moved away, it floats: no longer
@@ -2295,6 +2296,68 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       onChange: (quality) => applyThread({ quality }),
     });
     return properties;
+  }
+
+  if (shape.kind === "hirth") {
+    // A Hirth joint (#1016): teeth round the ring, their height at the rim and the bore. Changing the
+    // teeth or the size keeps the angle between the flanks; only the tooth height changes it.
+    const teeth = normalizeHirthTeeth(shape.teeth);
+    const toothHeight = normalizeHirthToothHeight(shape.toothSize, baseWidth, baseDepth, shape.height, teeth);
+    const bore = normalizeHirthBore(shape.centerHoleSize, baseWidth, baseDepth);
+    const keepAngle = (patch: Partial<WorkplaneShape>, nextTeeth = teeth, options?: ShapeInspectorUpdateOptions) => {
+      const nextWidth = patch.width ?? baseWidth;
+      const nextDepth = patch.depth ?? baseDepth;
+      const scale = (Math.min(nextWidth, nextDepth) / Math.max(MIN_SHAPE_SIZE, Math.min(baseWidth, baseDepth))) * (teeth / nextTeeth);
+      onUpdate({
+        ...patch,
+        toothSize: normalizeHirthToothHeight(toothHeight * scale, nextWidth, nextDepth, shape.height, nextTeeth),
+        centerHoleSize: normalizeHirthBore(bore, nextWidth, nextDepth),
+      }, options);
+    };
+    return [
+      {
+        id: "teeth",
+        label: t("prop.teeth"),
+        value: teeth,
+        min: MIN_HIRTH_TEETH,
+        max: MAX_HIRTH_TEETH,
+        step: 1,
+        hint: t("inspector.hirthHint", { angle: plainNumber(hirthFlankAngle(baseWidth, baseDepth, teeth, toothHeight)), step: plainNumber(360 / teeth) }),
+        onChange: (value) => {
+          const nextTeeth = normalizeHirthTeeth(value);
+          keepAngle({ teeth: nextTeeth }, nextTeeth);
+        },
+      },
+      {
+        id: "toothSize",
+        label: t("prop.hirthToothHeight"),
+        value: toothHeight,
+        min: MIN_HIRTH_TOOTH_HEIGHT,
+        max: hirthToothHeightLimit(baseWidth, baseDepth, shape.height),
+        step: 0.1,
+        onChange: (value) => onUpdate({ toothSize: normalizeHirthToothHeight(value, baseWidth, baseDepth, shape.height, teeth) }),
+      },
+      {
+        id: "centerHole",
+        label: t("prop.centerHole"),
+        value: bore,
+        min: 0,
+        max: hirthBoreLimit(baseWidth, baseDepth),
+        step: 0.1,
+        onChange: (value) => onUpdate({ centerHoleSize: normalizeHirthBore(value, baseWidth, baseDepth) }),
+      },
+      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: (value) => keepAngle(depthPatch(value), teeth, { resizeAxis: "depth" }) },
+      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: (value) => keepAngle(widthPatch(value), teeth, { resizeAxis: "width" }) },
+      {
+        id: "height",
+        label: t("prop.height"),
+        value: shape.height,
+        min: MIN_HIRTH_BASE + MIN_HIRTH_TOOTH_HEIGHT,
+        max: 160,
+        // A lower joint keeps a base under the roots: the teeth give way first.
+        onChange: (height) => onUpdate({ height, toothSize: normalizeHirthToothHeight(toothHeight, baseWidth, baseDepth, height, teeth) }, { resizeAxis: "height" }),
+      },
+    ];
   }
 
   if (shape.kind === "gear") {

@@ -13,7 +13,15 @@ import type { EdgeTreatmentFeature, WorkplaneShape } from "@/types/layerling";
 export type HistoryStepDescription = {
   key: MessageKey;
   values?: Record<string, string | number>;
+  /** The measure the step set or changed (#1023), so "Rounded the edges of Box" can say by how much. */
+  detail?: HistoryStepDetail;
 };
+
+/** A measure of a step, in millimetres or degrees; historyStepText prints it in the workspace's unit. */
+export type HistoryStepDetail =
+  | { kind: "length"; mm: number }
+  | { kind: "size"; mm: [number, number, number] }
+  | { kind: "angle"; degrees: number };
 
 type ChangeKind = "moved" | "rotated" | "resized" | "color" | "hole" | "solid" | "renamed" | "mirrored" | "edges" | "rounded" | "chamfered" | "hollowed" | "offset" | "facesDeleted" | "hidden" | "shown" | "locked" | "unlocked" | "edited";
 
@@ -76,6 +84,41 @@ function changeKind(before: WorkplaneShape, after: WorkplaneShape, fields: Set<s
   if (only(new Set([...MIRROR_FIELDS, ...POSITION_FIELDS])) && meaningful.some((field) => MIRROR_FIELDS.has(field))) return "mirrored";
   if (meaningful.some((field) => field === "edgeTreatments") && only(new Set([...EDGE_FIELDS, ...SIZE_FIELDS, ...POSITION_FIELDS]))) return "edges";
   return "edited";
+}
+
+const ROTATION_ANGLE_FIELDS = ["rotation", "rotationX", "rotationZ"] as const;
+
+/**
+ * The measure of one object's change: the size a treatment was made with, how far it moved, the angle it
+ * turned by about one axis, or the size it was given. Null where no single number says it.
+ */
+function changeDetail(before: WorkplaneShape, after: WorkplaneShape, kind: ChangeKind): HistoryStepDetail | null {
+  if (kind === "rounded" || kind === "chamfered" || kind === "hollowed" || kind === "offset") {
+    const amount = after.edgeTreatments?.at(-1)?.amount;
+    return typeof amount === "number" && Number.isFinite(amount) ? { kind: "length", mm: amount } : null;
+  }
+  if (kind === "moved") {
+    const mm = Math.hypot(after.x - before.x, after.z - before.z, (after.elevation ?? 0) - (before.elevation ?? 0));
+    return mm > 0 ? { kind: "length", mm } : null;
+  }
+  if (kind === "rotated") {
+    const turned = ROTATION_ANGLE_FIELDS.filter((field) => (after[field] ?? 0) !== (before[field] ?? 0));
+    if (turned.length !== 1) return null;
+    let degrees = ((after[turned[0]] ?? 0) - (before[turned[0]] ?? 0)) % 360;
+    if (degrees > 180) degrees -= 360;
+    if (degrees <= -180) degrees += 360;
+    return { kind: "angle", degrees };
+  }
+  if (kind === "resized") return { kind: "size", mm: [after.width, after.depth, after.height] };
+  return null;
+}
+
+function sameDetail(a: HistoryStepDetail | null, b: HistoryStepDetail | null) {
+  if (!a || !b || a.kind !== b.kind) return false;
+  const close = (x: number, y: number) => Math.abs(x - y) < 1e-6;
+  if (a.kind === "angle" && b.kind === "angle") return close(a.degrees, b.degrees);
+  if (a.kind === "length" && b.kind === "length") return close(a.mm, b.mm);
+  return a.kind === "size" && b.kind === "size" && a.mm.every((value, index) => close(value, b.mm[index]));
 }
 
 const ONE_KEYS: Record<ChangeKind, MessageKey> = {
@@ -236,10 +279,14 @@ function describeShapes(before: WorkplaneShape[], after: WorkplaneShape[], openG
     if (change.kind === "renamed") {
       return { key: "historyStep.renamedOne", values: { name: change.before.name, newName: change.after.name } };
     }
-    return { key: ONE_KEYS[change.kind], values: { name: change.after.name } };
+    const detail = changeDetail(change.before, change.after, change.kind);
+    return { key: ONE_KEYS[change.kind], values: { name: change.after.name }, ...(detail ? { detail } : {}) };
   }
   const kind = changes.every((change) => change.kind === changes[0].kind) ? changes[0].kind : "edited";
-  return { key: MANY_KEYS[kind], values: { count: changes.length } };
+  // Several objects changed alike - moved together, rounded with one radius - share their measure.
+  const details = kind === "edited" ? [] : changes.map((change) => changeDetail(change.before, change.after, kind));
+  const detail = details.length > 0 && details.every((entry) => sameDetail(entry, details[0])) ? details[0] : null;
+  return { key: MANY_KEYS[kind], values: { count: changes.length }, ...(detail ? { detail } : {}) };
 }
 
 function describeNotes(before: EditorHistoryEntry, after: EditorHistoryEntry): HistoryStepDescription | null {

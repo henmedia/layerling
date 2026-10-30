@@ -21,6 +21,7 @@ export type ShapeKind =
   | "heart"
   | "crescent"
   | "gear"
+  | "hirth"
   | "honeycomb"
   | "hinge"
   | "knurl"
@@ -453,6 +454,12 @@ export type WorkplaneWorkspaceSettings = {
   /** A turned body shows its angles about X, Y and Z beside it while it is selected. */
   showRotationAngles: boolean;
   zoomSpeed: number;
+  /**
+   * Which mouse buttons steer the view (#1013): layerling's own (right turns, middle shifts, a left drag on empty space draws
+   * a selection box) or as in Bambu Studio and OrcaSlicer (a left drag on empty space turns, the right button shifts,
+   * Shift and a left drag draws the box).
+   */
+  mouseScheme: MouseScheme;
   units: string;
   /** With Imperial: inches as fractions (1⅝, like similar tools) or decimals (1.625). */
   inchFormat: InchFormat;
@@ -467,6 +474,8 @@ export type WorkplaneWorkspaceSettings = {
 };
 
 export type InchFormat = "fraction" | "decimal";
+
+export type MouseScheme = "layerling" | "slicer";
 
 export type AlignAxis = "x" | "y" | "z";
 export type AlignTarget = "min" | "center" | "max";

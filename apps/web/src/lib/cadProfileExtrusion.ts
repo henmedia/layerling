@@ -2,7 +2,8 @@ import * as THREE from "three";
 import { taperedSlotOutline } from "@/lib/slotGeometry";
 import { weldOnGrid } from "@/lib/gridWeld";
 import type { WorkplaneShape } from "@/types/layerling";
-import type { CadModifierProfileLoop, CadModifierProfilePart, CadModifierProfileSegment, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierSpringPart, CadModifierSweepPiece, CadModifierThreadPart } from "@/lib/cadModifierTypes";
+import type { CadModifierProfileLoop, CadModifierProfilePart, CadModifierProfileSegment, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierSpringPart, CadModifierSweepPiece, CadModifierThreadPart } from "@/lib/cadModifierTypes";
+import { hirthMeasures } from "@/lib/hirthGeometry";
 import { profileArcPoint, profileLoopBounds, TWIST_SECTION_STEP, validateCadProfile } from "@/lib/cadProfileSolid";
 import { cadTransformFromMatrix } from "@/lib/cadBakeMetadata";
 import { CAD_MODIFIER_EXACT_SEGMENT_LIMIT } from "@/lib/cadModifierRuntime";
@@ -1514,6 +1515,17 @@ export function cadModifierHelicalGearForShape(shape: WorkplaneShape): CadModifi
     if (!(boreRadius < outlineClearance(ring) * Math.min(stretch.x, stretch.z) * 0.999)) return null;
   }
   return { corners, twist, height: shape.height, stretch, boreRadius, transform: profileTransformForShape(shape) };
+}
+
+/** A Hirth joint (#1016) as the exact body its display mesh draws, or null for one that has to stay its mesh. */
+export function cadModifierHirthForShape(shape: WorkplaneShape): CadModifierHirthPart | null {
+  if (shape.kind !== "hirth") return null;
+  if (shape.importedMesh || shape.groupedShapes?.length || shape.cadBrep || shape.imagePlate || shapeHasShapeDeform(shape)) return null;
+  const width = shapeWidth(shape);
+  const depth = shapeDepth(shape);
+  if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
+  const { rx, rz, height, teeth, toothHeight, boreRadius } = hirthMeasures(shape, width, depth);
+  return { rx, rz, height, teeth, toothHeight, boreRadius, transform: profileTransformForShape(shape) };
 }
 
 /** Outline pieces of a profile, the measure its kernel cost grows with. */

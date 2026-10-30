@@ -5,7 +5,7 @@ summary: Izberi svoj tiskalnik, bodi opozorjen, če kaj ne ustreza, in del pravi
 
 ## Izbira tiskalnika
 
-Odpri nastavitve (zobnik v orodni vrstici, {{ui:editor.workspaceSettings}}) in preklopi na področje {{ui:workspace.workplane}}. Pri {{ui:workspace.printer}} svoj tiskalnik izbereš s seznama več kot 220 običajnih modelov, med njimi Bambu Lab, Prusa, Creality, Anycubic, Elegoo in mnogi drugi.
+Odpri nastavitve (zobnik v orodni vrstici, {{ui:editor.workspaceSettings}}) in preklopi na področje {{ui:workspace.workplane}}. Pri {{ui:workspace.printer}} svoj tiskalnik izbereš s seznama več kot 230 običajnih modelov, med njimi Bambu Lab, Prusa, Creality, Anycubic, Elegoo in mnogi drugi.
 
 ![Nastavitve delovne ravnine z izbranim tiskalnikom. Tiskalna postelja in največja višina tiska prihajata iz profila rezalnika.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ S tem se zgodijo tri stvari:
 - layerling **opozori**, če kaj ne ustreza.
 
 Profili tiskalnikov izvirajo iz OrcaSlicerja, torej so enaki, kot jih pozna tudi tvoj rezalnik. Če želiš delati brez tiskalnika, izberi {{ui:workspace.printerNone}}. Velikost delovne ravnine lahko nastaviš tudi ročno.
+
+Delta tiskalniki, na primer FLSun ali SeeMeCNC ali Anycubic Predator, tiskajo na okroglo ploščo. Z enim od njih je tudi delovna ploskev okrogla in široka kot plošča, telo pa je preveliko, takoj ko sega čez rob. Okroglo telo se meri po lastnem obrisu, ne po škatli okoli njega, zato se prilega tudi valj, ki je skoraj tako širok kot plošča.
 
 ## Kadar kaj ne ustreza
 

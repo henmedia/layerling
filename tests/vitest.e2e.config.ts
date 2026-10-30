@@ -1,5 +1,6 @@
 import path from "node:path";
 import { defineConfig } from "vitest/config";
+import { shareTheMachine } from "./shareTheMachine";
 
 const rootDir = path.resolve(__dirname, "..");
 
@@ -19,5 +20,6 @@ export default defineConfig({
     include: ["tests/e2e/**/*.e2e.ts"],
     testTimeout: 120000,
     hookTimeout: 120000,
+    maxWorkers: shareTheMachine(),
   },
 });

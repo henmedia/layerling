@@ -235,10 +235,26 @@ export const PRINTERS = [
   ["Vivedino", "Xplorer Single"],
   ["Vivedino", "Xplorer IDEX"],
   ["Tronxy", "Tronxy X5SA 400 Marlin Firmware"],
+  // Delta printers, on a round plate (LLL-GitHub, #1024).
+  ["FLSun", "FLSun Q5"],
+  ["FLSun", "FLSun QQ-S Pro"],
+  ["FLSun", "FLSun Super Racer (SR)"],
+  ["FLSun", "FLSun T1"],
+  ["FLSun", "FLSun V400"],
+  ["FLSun", "FLSun S1"],
+  ["SeeMeCNC", "SeeMeCNC RostockMAX v3.2"],
+  ["SeeMeCNC", "SeeMeCNC RostockMAX v4"],
+  ["SeeMeCNC", "SeeMeCNC Artemis 300"],
+  ["SeeMeCNC", "SeeMeCNC BOSSdelta 300"],
+  ["SeeMeCNC", "SeeMeCNC BOSSdelta 500 0505"],
+  ["SeeMeCNC", "SeeMeCNC BOSSdelta 500 0510"],
+  ["SeeMeCNC", "SeeMeCNC BOSSdelta 500 0521"],
+  ["Anycubic", "Anycubic Predator"],
+  ["RolohaunDesign", "Rolohaun Delta Flyer Refit"],
 ];
 
 /** How the vendor is written in the menu. */
-export const VENDOR_LABELS = { BBL: "Bambu Lab" };
+export const VENDOR_LABELS = { BBL: "Bambu Lab", RolohaunDesign: "Rolohaun" };
 
 export function orcaCheckout(given) {
   if (given) return { root: given, cleanup: () => {} };
@@ -295,8 +311,16 @@ export function bedFromArea(area, label) {
   const depth = Math.max(...ys) - Math.min(...ys);
   const rectangle = points.length === 4 && points.every(([x, y]) =>
     (x === Math.min(...xs) || x === Math.max(...xs)) && (y === Math.min(...ys) || y === Math.max(...ys)));
-  if (!rectangle) throw new Error(`${label}: only rectangular beds are supported, got ${JSON.stringify(area)}`);
-  return { width, depth };
+  if (rectangle) return { width, depth };
+  // A delta printer's plate is a circle, listed as many points round it (#1024): its diameter, as wide as deep.
+  const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+  const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  const radii = points.map(([x, y]) => Math.hypot(x - cx, y - cy));
+  const radius = Math.max(...radii);
+  const round = points.length >= 12 && Math.abs(width - depth) <= width * 0.005 && radii.every((value) => value >= radius * 0.995);
+  if (!round) throw new Error(`${label}: only rectangular and round beds are supported, got ${JSON.stringify(area)}`);
+  const diameter = Math.round(radius * 2 * 10) / 10;
+  return { width: diameter, depth: diameter, round: true };
 }
 
 export function slug(value) {

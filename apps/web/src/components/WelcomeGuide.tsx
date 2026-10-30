@@ -53,6 +53,7 @@ const MORE = [
   ["welcome.moreHistoryTitle", "welcome.moreHistoryBody"],
   ["welcome.moreDrawingTitle", "welcome.moreDrawingBody"],
   ["welcome.moreLookTitle", "welcome.moreLookBody"],
+  ["welcome.moreControlsTitle", "welcome.moreControlsBody"],
 ] as const satisfies ReadonlyArray<readonly [MessageKey, MessageKey]>;
 
 /** What andere Programme cannot do: the short list that follows the switch note. */

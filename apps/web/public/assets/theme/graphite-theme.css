@@ -4537,7 +4537,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .font-picker-option.act
   accent-color: #cf710f;
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-range small {
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-range small,
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-select > small {
   color: #5a5a5a;
 }
 
@@ -5803,6 +5804,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-settings-nav
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-settings-nav button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-dimensions label,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-range small,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-select > small,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-history-labels,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-history-note,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-toggle-copy small,
@@ -7448,6 +7450,44 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note > 
   color: #797979;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-head .panel-header-actions button.active {
+  color: #b35f07;
+  background: #e9e9e9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list {
+  background: #fff;
+  border: 1px solid #d8d8d8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button {
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button:hover {
+  background: #eeeeee;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.shown {
+  color: #fff;
+  background: #cc7011;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.ahead:not(.shown) {
+  color: #797979;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list-now {
+  color: #2a8f57;
+  border: 1px solid currentColor;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.shown .history-view-list-now {
+  color: #fff;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-facts {
   color: #676767;
 }
@@ -7524,6 +7564,33 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-facts .cu
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-head .panel-header-actions button:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-head .guide-help-link:hover {
   background: #353535;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-head .panel-header-actions button.active {
+  color: #f0a95a;
+  background: #3a3a3a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list {
+  background: #292929;
+  border-color: #4c4c4c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button:hover {
+  background: #353535;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button.shown {
+  color: #fff;
+  background: #c4670d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button.ahead:not(.shown) {
+  color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list-now {
+  color: #5fd394;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-slider > button,

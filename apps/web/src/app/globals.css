@@ -6977,6 +6977,21 @@ html[data-theme="dark"] .panel-grip:hover {
   white-space: nowrap;
 }
 
+/* The cut face (#446): its name above the three looks, so a long name in any language fits the panel. */
+.section-popover-axis-row.section-cut-face-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.section-cut-face-row .section-axis-buttons {
+  flex: none;
+}
+
+.camera-controls .section-tool-popover .section-cut-face-row .section-orientation-btn {
+  flex: 1 1 0;
+}
+
 .camera-controls .section-tool-popover .section-axis-btn:hover {
   background: rgba(255, 255, 255, 0.5);
   color: #2b1f14;
@@ -11036,7 +11051,9 @@ html[data-theme="dark"] .font-picker-option.action {
   accent-color: #cf710f;
 }
 
-.workspace-range small {
+/* A select's line beneath it says what the chosen option does (the mouse buttons, #1013). */
+.workspace-range small,
+.workspace-select > small {
   grid-column: 2;
   display: flex;
   justify-content: space-between;
@@ -12795,6 +12812,7 @@ html[data-theme="dark"] .workspace-settings-nav {
 html[data-theme="dark"] .workspace-settings-nav button,
 html[data-theme="dark"] .workspace-dimensions label,
 html[data-theme="dark"] .workspace-range small,
+html[data-theme="dark"] .workspace-select > small,
 html[data-theme="dark"] .workspace-history-labels,
 html[data-theme="dark"] .workspace-history-note,
 html[data-theme="dark"] .workspace-toggle-copy small,

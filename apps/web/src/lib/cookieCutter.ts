@@ -10,7 +10,8 @@ import { sampledPath } from "@/lib/sketchStroke";
  * press. The wall's top runs in to a cutting edge, and the outline is mirrored: the cutter is printed on its rim and turned
  * over to cut, so a text or a logo would come out the wrong way round otherwise. Holes in the outline - the inside of an e or
  * an a - get walls of their own, a body of their own as well, held to the outer wall and to each other by bridges at the rim, on the side the hand
- * presses. Lower than the outer wall, they only press the inside into the dough instead of cutting it out. Instead of the
+ * presses. Lower than the outer wall, they only press the inside into the dough instead of cutting it out, and have a flat top
+ * then: an edge there would only leave thin tips that break off and grooves that hold dough (avxmw, #982). Instead of the
  * bridges a plate can fill the whole outline on that side, and small fillets join the walls to the rim and to the bridges or
  * the plate, so thin parts such as the dot of an i do not break off (avxmw, #982).
  */
@@ -18,7 +19,8 @@ import { sampledPath } from "@/lib/sketchStroke";
 /**
  * The wall's thickness, how high the cutter stands, how far the rim reaches beyond the wall and how high it is, and how wide
  * the cutting edge on top of the wall is (0 for a flat top), in mm; whether the outline is mirrored left to right; whether
- * holes get walls of their own, how much lower than the outer wall they are (0: they cut through), how many bridges hold each
+ * holes get walls of their own, how much lower than the outer wall they are (0: they cut through), whether lower inner walls
+ * keep the cutting edge as well (inner walls that cut through always do), how many bridges hold each
  * of them and how wide and how high those are, in mm; how thick a plate over the whole outline is instead of the bridges (0: the
  * bridges), and how big the fillets are where the walls meet the rim, the bridges or the plate (0: none), in mm.
  */
@@ -31,6 +33,7 @@ export type CookieCutterOptions = {
   mirror: boolean;
   inner: boolean;
   imprint: number;
+  innerEdge: boolean;
   bridgeCount: number;
   bridge: number;
   bridgeHeight: number;
@@ -38,7 +41,7 @@ export type CookieCutterOptions = {
   fillet: number;
 };
 
-type CookieCutterSize = Exclude<keyof CookieCutterOptions, "mirror" | "inner">;
+type CookieCutterSize = Exclude<keyof CookieCutterOptions, "mirror" | "inner" | "innerEdge">;
 
 export const COOKIE_CUTTER_DEFAULTS: CookieCutterOptions = {
   wall: 1.2,
@@ -49,6 +52,7 @@ export const COOKIE_CUTTER_DEFAULTS: CookieCutterOptions = {
   mirror: true,
   inner: true,
   imprint: 0,
+  innerEdge: false,
   bridgeCount: 2,
   bridge: 4,
   bridgeHeight: 3,
@@ -81,6 +85,7 @@ export function normalizeCookieCutterOptions(value?: Partial<Record<keyof Cookie
   }
   if (typeof value?.mirror === "boolean") result.mirror = value.mirror;
   if (typeof value?.inner === "boolean") result.inner = value.inner;
+  if (typeof value?.innerEdge === "boolean") result.innerEdge = value.innerEdge;
   result.bridgeCount = Math.round(result.bridgeCount);
   // The rim and the bridges cannot be higher than the cutter itself: they would then be the cutter.
   result.rimHeight = Math.min(result.rimHeight, result.height);
@@ -405,7 +410,7 @@ export function cookieCutterProfiles(source: SketchProfile, options: CookieCutte
   return {
     wall: line(outline, options.wall, "outside", true, options.edge),
     rim: line(outline, options.wall + options.rim, "outside", true),
-    inner: holes ? line(holes, options.wall, "inside", false, options.edge) : null,
+    inner: holes ? line(holes, options.wall, "inside", false, options.imprint > 0 && !options.innerEdge ? 0 : options.edge) : null,
     bridges: holes && !options.plate ? cookieCutterBridges(outline, options.wall, options.bridge, options.bridgeCount) : null,
     plate: options.plate ? { ...outline, points: outline.points.map((point) => ({ ...point })), segments: outline.segments.map((segment) => ({ ...segment })), silhouette: true } : null,
   };

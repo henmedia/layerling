@@ -1,5 +1,85 @@
 [
   {
+    "version": "1.123.0",
+    "items": [
+      {
+        "title": {
+          "de": "Delta-Drucker mit runder Platte",
+          "en": "Delta printers with a round plate"
+        },
+        "body": {
+          "de": "Die Druckerliste kennt jetzt Delta-Drucker von FLSun, SeeMeCNC, Anycubic und Rolohaun. Mit einem von ihnen ist die Arbeitsfläche rund wie die Platte, und layerling warnt, wenn ein Körper über den Rand ragt.",
+          "en": "The printer list now has delta printers by FLSun, SeeMeCNC, Anycubic and Rolohaun. With one of them the workplane is round like the plate, and layerling warns when a body reaches past the rim."
+        }
+      },
+      {
+        "title": {
+          "de": "Schraffierter Schnitt",
+          "en": "A hatched cut"
+        },
+        "body": {
+          "de": "Die Schnittansicht schraffiert den Schnitt jetzt wie eine Zeichnung, und ein Körper in einem anderen ist andersherum schraffiert. Unter „Schnittfläche“ kannst du ihn auch einfarbig füllen oder offen lassen.",
+          "en": "The section view now hatches the cut like a drawing, and a body inside another is hatched the other way. Under \"Cut face\" you can also fill it plain or leave it open."
+        }
+      },
+      {
+        "title": {
+          "de": "Der Verlauf als Liste",
+          "en": "The history as a list"
+        },
+        "body": {
+          "de": "Der Listen-Knopf in der Verlaufsansicht zeigt alle Schritte mit Namen und Maß untereinander, den neuesten oben. Ein Klick springt zu diesem Stand, ohne erst am Schieber zu suchen.",
+          "en": "The list button in the History view shows every step by name and measure, the newest at the top. A click jumps to that state without hunting along the slider."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.122.0",
+    "items": [
+      {
+        "title": {
+          "de": "Rückgängig sagt, was es zurücknimmt",
+          "en": "Undo says what it takes back"
+        },
+        "body": {
+          "de": "Zeigst du auf Rückgängig oder Wiederholen, nennt der Tooltip den Schritt samt Maß, etwa „Kanten von Box gerundet (5 mm)“, und die Meldung nach Strg+Z sagt, was zurückgenommen wurde.",
+          "en": "Point at Undo or Redo and the tooltip names the step with its measure, such as \"Rounded the edges of Box (5 mm)\", and the message after Ctrl+Z says what was undone."
+        }
+      },
+      {
+        "title": {
+          "de": "Skizze aus dem Schnitt",
+          "en": "Sketch from the cut"
+        },
+        "body": {
+          "de": "Im Schnittfenster beginnt „Skizze aus Schnitt“ eine neue Skizze direkt auf dem Schnitt, mit seinen Umrissen schon darin, Löcher als echte Kreise. So startet ein Deckel, ein Einsatz oder eine Dichtung mit dem Umriss des Teils, an das sie passen sollen.",
+          "en": "In the section view, \"Sketch from cut\" starts a new sketch right on the cut with its outlines already in it, holes as true circles. A lid, an insert or a gasket then starts from the outline of the part it has to fit."
+        }
+      },
+      {
+        "title": {
+          "de": "Maustasten wie im Slicer, und die 3D-Maus",
+          "en": "Mouse buttons like your slicer, and a 3D mouse"
+        },
+        "body": {
+          "de": "In den Einstellungen unter Darstellung lassen sich die Maustasten jetzt wie in Bambu Studio und OrcaSlicer belegen: Ziehen mit links auf leerer Fläche dreht die Ansicht, rechts verschiebt sie. Und eine SpaceMouse steuert die Ansicht in Chrome und Edge, einmal dort verbunden.",
+          "en": "Under Appearance in the settings, the mouse buttons can now work as in Bambu Studio and OrcaSlicer: a left drag on empty space turns the view, the right button shifts it. And a SpaceMouse steers the view in Chrome and Edge once it is connected there."
+        }
+      },
+      {
+        "title": {
+          "de": "Hirth-Verzahnung",
+          "en": "Hirth joint"
+        },
+        "body": {
+          "de": "Eine neue Form neben dem Zahnrad: eine Scheibe mit V-förmigen Zähnen, die strahlenförmig von der Mitte ausgehen. Eine umgedrehte Kopie greift in jedem Zahnschritt hinein und zentriert sich selbst, etwa für ein verstellbares Gelenk oder einen Rastknopf.",
+          "en": "A new shape next to the gears: a disc with V-shaped teeth running out from the centre. A copy turned over locks into it at every tooth and centres itself, for a hinge you can set at an angle or a knob that clicks into place."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.121.1",
     "items": [
       {

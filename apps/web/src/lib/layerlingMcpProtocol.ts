@@ -151,6 +151,7 @@ export type LayerlingMcpCommandName =
   | "saved_view"
   | "measurements"
   | "export_section_svg"
+  | "sketch_from_section"
   | "export_drawing"
   | "export_mesh"
   | "save_project"

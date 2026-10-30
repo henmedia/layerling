@@ -19,7 +19,8 @@ export const MAX_SVG_SKETCH_SEGMENTS = 2500;
 type SvgPoint = { x: number; y: number };
 type SvgPiece = { start: SvgPoint; c1?: SvgPoint; c2?: SvgPoint; end: SvgPoint };
 
-function ellipsePieces(curve: THREE.EllipseCurve): SvgPiece[] {
+/** An arc or ellipse as cubic curves of a quarter turn at most. */
+export function ellipsePieces(curve: THREE.EllipseCurve): SvgPiece[] {
   // The sweep exactly as EllipseCurve.getPoint works it out.
   const twoPi = Math.PI * 2;
   let delta = curve.aEndAngle - curve.aStartAngle;
@@ -79,7 +80,8 @@ function curvePieces(curve: THREE.Curve<THREE.Vector2>): SvgPiece[] | null {
 
 const distance = (a: SvgPoint, b: SvgPoint) => Math.hypot(a.x - b.x, a.y - b.y);
 
-function splitPiece(piece: SvgPiece): [SvgPiece, SvgPiece] {
+/** A piece cut in two at its middle. */
+export function splitPiece(piece: SvgPiece): [SvgPiece, SvgPiece] {
   const mid = (a: SvgPoint, b: SvgPoint) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
   if (!piece.c1 || !piece.c2) {
     const centre = mid(piece.start, piece.end);
@@ -171,11 +173,22 @@ export function sketchProfileFromSvgPaths(profilePaths: readonly THREE.ShapePath
   }));
   const centreX = (minX + maxX) / 2;
   const centreY = (minY + maxY) / 2;
-  const place = ({ x, y }: SvgPoint) => ({ x: x - centreX, z: y - centreY });
+  return sketchFromPieceRings(rings, ({ x, y }) => ({ x: x - centreX, z: y - centreY }));
+}
+
+/** A run of an outline: a straight line from start to end, or a cubic curve with its two handles. */
+export type SketchPiece = SvgPiece;
+
+/** Closed rings of pieces as sketch points and lines, each piece's handles kept apart as drawn, `place` putting a point into the sketch. */
+export function sketchFromPieceRings(
+  rings: readonly SketchPiece[][],
+  place: (point: SvgPoint) => { x: number; z: number },
+  prefix = "svg",
+): SketchProfile {
   const points: SketchPoint[] = [];
   const segments: SketchSegment[] = [];
   rings.forEach((ring, ringIndex) => {
-    const ids = ring.map((_, index) => `svg-${ringIndex}-${index}`);
+    const ids = ring.map((_, index) => `${prefix}-${ringIndex}-${index}`);
     const ringPoints: SketchPoint[] = ring.map((piece, index) => ({ id: ids[index], ...place(piece.start) }));
     ring.forEach((piece, index) => {
       const next = (index + 1) % ring.length;
@@ -184,7 +197,7 @@ export function sketchProfileFromSvgPaths(profilePaths: readonly THREE.ShapePath
         ringPoints[index].handleOut = place(piece.c1!);
         ringPoints[next].handleIn = place(piece.c2!);
       }
-      segments.push({ id: `svg-${ringIndex}-s${index}`, startId: ids[index], endId: ids[next], kind: curved ? "bezier" : "line" });
+      segments.push({ id: `${prefix}-${ringIndex}-s${index}`, startId: ids[index], endId: ids[next], kind: curved ? "bezier" : "line" });
     });
     // Each handle moves on its own, as drawn: the outline stays exactly the SVG's.
     ringPoints.forEach((point) => {

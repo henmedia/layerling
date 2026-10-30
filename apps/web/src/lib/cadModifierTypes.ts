@@ -271,6 +271,23 @@ export type CadModifierHelicalGearPart = {
 };
 
 /**
+ * A Hirth joint (#1016), as the exact body its display mesh draws: the rim's
+ * half width and half depth, the height, the teeth and their height at the
+ * rim, and the round bore (0 for none), in the shape's own frame (y up, the
+ * bottom at y = 0, centred on x and z); `transform` places it.
+ */
+export type CadModifierHirthPart = {
+  rx: number;
+  rz: number;
+  height: number;
+  teeth: number;
+  toothHeight: number;
+  boreRadius: number;
+  transform?: number[];
+  expected?: { bounds: number[]; volume: number };
+};
+
+/**
  * A Gridfinity bin or baseplate, as the exact body its display mesh draws:
  * the size and settings it is built from (`gridfinityPlan`), in the shape's
  * own frame (y up, the bottom at y = 0, centred on x and z); `transform`
@@ -354,6 +371,8 @@ export type CadModifierMeshPart = {
   helicalGear?: CadModifierHelicalGearPart;
   /** A Gridfinity bin or baseplate's exact body; positions/indices (if any) are only the fallback if it cannot be built. */
   gridfinity?: CadModifierGridfinityPart;
+  /** A Hirth joint's exact body; positions/indices (if any) are only the fallback if it cannot be built. */
+  hirth?: CadModifierHirthPart;
   primitive?: CadModifierPrimitivePart;
   /** When set, positions/indices (if any) are only the fallback if the exact body fails. */
   profile?: CadModifierProfilePart;

@@ -164,6 +164,9 @@ export function SecondaryToolbar({
   canRedo,
   canUngroup,
   canUndo,
+  undoHint,
+  redoHint,
+  onUndoRedoHover,
   canHistoryView,
   historyViewActive,
   onHistoryView,
@@ -310,6 +313,12 @@ export function SecondaryToolbar({
   canRedo: boolean;
   canUngroup: boolean;
   canUndo: boolean;
+  /** What undo would take back, with its measure ("Rounded the edges of Box (5 mm)"), named on its button (#1023). */
+  undoHint?: string | null;
+  /** What redo would bring again. */
+  redoHint?: string | null;
+  /** The pointer or the focus came onto undo or redo: time to work out their hints. */
+  onUndoRedoHover?: () => void;
   canHistoryView: boolean;
   historyViewActive: boolean;
   onHistoryView: () => void;
@@ -679,8 +688,8 @@ export function SecondaryToolbar({
     { id: "paste", label: t("editor.tool.paste"), icon: ToolbarPasteIcon, action: onPaste, enabled: hasClipboard },
     { id: "duplicate", label: t("editor.tool.duplicate"), icon: ToolbarDuplicateIcon, action: onDuplicate, enabled: hasSelection },
     { id: "delete", label: t("editor.tool.delete"), icon: ToolbarTrashIcon, action: onDelete, enabled: canModifySelection },
-    { id: "undo", label: t("editor.tool.undo"), icon: ToolbarUndoIcon, action: onUndo, enabled: canUndo },
-    { id: "redo", label: t("editor.tool.redo"), icon: ToolbarRedoIcon, action: onRedo, enabled: canRedo },
+    { id: "undo", label: t("editor.tool.undo"), icon: ToolbarUndoIcon, action: onUndo, enabled: canUndo, hint: canUndo ? undoHint : null, onHover: onUndoRedoHover },
+    { id: "redo", label: t("editor.tool.redo"), icon: ToolbarRedoIcon, action: onRedo, enabled: canRedo, hint: canRedo ? redoHint : null, onHover: onUndoRedoHover },
     { id: "history", label: t("editor.tool.history"), icon: ToolbarHistoryIcon, action: onHistoryView, enabled: canHistoryView, active: historyViewActive },
   ];
   const visibilityTools = [
@@ -755,6 +764,8 @@ export function SecondaryToolbar({
     // kein Loeschen freischalten, waehrend die Flaeche etwas anderes zeigt.
     const enabled = tool.enabled && (!historyViewActive || id === "history");
     const active = "active" in tool && Boolean(tool.active);
+    const hint = "hint" in tool && tool.hint ? tool.hint : null;
+    const onHover = "onHover" in tool ? tool.onHover : undefined;
     // Switched off by aria-disabled, not by the disabled attribute: a disabled button gets no pointer events,
     // so Chrome and Edge never showed its tooltip, and what a greyed-out icon was for could not be found out
     // by hovering it (a donor's mail, 29.10.2026).
@@ -764,7 +775,9 @@ export function SecondaryToolbar({
         key={id}
         data-layerling-tool={id}
         aria-label={label}
-        title={COMMAND_SHORTCUTS[id] ? `${label} (${COMMAND_SHORTCUTS[id]})` : label}
+        title={`${hint ? `${label}: ${hint}` : label}${COMMAND_SHORTCUTS[id] ? ` (${COMMAND_SHORTCUTS[id]})` : ""}`}
+        onPointerEnter={onHover}
+        onFocus={onHover}
         onClick={enabled ? action : undefined}
         aria-disabled={enabled ? undefined : true}
       >

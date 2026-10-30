@@ -113,6 +113,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_set_history_view` | 回看项目更早的状态，如同历史记录视图（实际设计不受影响；会改动设计的工具会等到它关闭） |
 | `layerling_restore_from_history` | 把对象（也包括分组内的部件）从更早的状态作为副本带回设计，如同历史记录视图的“带入设计”——撤销会一次性撤回这一步 |
 | `layerling_export_section_svg` | 以 1:1 的 SVG 返回剖切平面上的轮廓，所用实体与导出相同 |
+| `layerling_sketch_from_section` | 用剖切平面上的轮廓创建一个位于切口上的草图：在编辑器中打开以便修改，或立即构建为给定高度的实体 |
 | `layerling_export_drawing` | 制作“2D”导出的工作图：在 ISO 图纸上以 1:1 绘制三个视图，标注总体尺寸并列出圆孔表格，可输出 SVG 文本或 PDF |
 | `layerling_export_mesh` | 按导出窗口写出 STL、3MF、OBJ、SVG（顶视图、轮廓或可见边）或用于激光切割的 DXF文件，所用实体相同；可写到这台电脑上的路径，或写成 base64 |
 | `layerling_save_project` | 把整个可编辑设计保存为 .lyl 文件，写到运行 MCP 服务器的电脑上的路径，不弹出对话框；只有给出 `overwrite` 才会替换已有文件，写入会经过临时文件，编辑器中 Ctrl+S 的目标保持不变 |

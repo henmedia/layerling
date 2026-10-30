@@ -93,7 +93,7 @@ import { faceWorkplaneCenteringShift, workplaneCenteringOffset } from "@/lib/wor
 import { projectShapesExtent } from "@/components/workplane/ViewportOverlays";
 import { bakeCadMetadataForShapeTransform, cadBrepTransformForShape, cadModifierPrimitiveForAnalyticShape, cadModifierPrimitiveForBakedShape, importedStepPartForShape } from "@/lib/cadBakeMetadata";
 import { hasOneToOneCadComponentMapping } from "@/lib/cadModifierGroups";
-import { cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape, cadProfileExpectation, cadProfileSegmentCount, textGlyphProfiles, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
+import { cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape, cadProfileExpectation, cadProfileSegmentCount, textGlyphProfiles, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
 import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle, overhangArea } from "@/lib/overhang";
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
@@ -101,7 +101,8 @@ import { matchingEdgeIds } from "@/lib/edgeMatching";
 import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
-import { historyStepsAround } from "@/lib/historyStepDescription";
+import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
+import { historyStepText } from "@/lib/historyStepText";
 import { historyViewMcpCommand } from "./workplane/historyViewMcp";
 import { attachmentsFingerprint } from "@/lib/projectAttachments";
 import { ATTACHMENT_MCP_READ_ACTIONS, attachmentMcpCommand, attachmentMcpList } from "@/lib/projectAttachmentsMcp";
@@ -187,8 +188,10 @@ import { normalizeVaseSettings, parseVaseSettingsInput } from "@/lib/vaseSetting
 import { sceneWithVaseAccessories, vaseAccessoryKindName, vaseAccessoryName, vaseShapePatch } from "@/lib/vaseShape";
 import { screenAlignedNudge } from "@/lib/keyboardNudge";
 import { LAYERLING_MCP_HEARTBEAT_MS, LAYERLING_MCP_POLL_RETRY_MS, LAYERLING_MCP_ROUTE, type LayerlingMcpCommand, type LayerlingMcpSceneSummary, type LayerlingMcpViewFace } from "@/lib/layerlingMcpProtocol";
-import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
+import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { getSectionBounds, sectionAxisLetter, sectionMeshInFrame, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
+import { SECTION_CUT_FACES, type SectionCutFace } from "@/lib/sectionCaps";
+import { MAX_SECTION_SKETCH_SEGMENTS, sectionSketchProfile } from "@/lib/sectionSketch";
 import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_VIEW_FACE, sectionSvgDocument, sliceMeshContours } from "@/lib/sectionSvg";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, appendMeshData, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
@@ -374,7 +377,7 @@ declare global {
     layerlingCaptureCanvasAsync?: () => Promise<string>;
     layerlingCaptureView?: (face?: LayerlingMcpViewFace) => Promise<string> | string;
     /** The section view for MCP: applies what is given, returns the settings it ends on and the plane's range. */
-    layerlingSectionView?: (patch: Partial<SectionPlaneSettings> & { center?: boolean }) => { settings: SectionPlaneSettings; bounds: { min: number; max: number; center: number } };
+    layerlingSectionView?: (patch: Partial<SectionPlaneSettings> & { center?: boolean; cutFace?: SectionCutFace }) => { settings: SectionPlaneSettings; bounds: { min: number; max: number; center: number }; cutFace: SectionCutFace };
     /** "Hide workplane" in the camera bar for MCP: sets it when given, returns whether the plate is shown. */
     layerlingWorkplaneDisplay?: (visible?: boolean) => { visible: boolean };
     /** The tape measure's measurements for MCP: shows or hides them when asked, returns what is there (#881). */
@@ -573,6 +576,16 @@ function cadModifierHelicalGearMeshPart(gear: CadModifierHelicalGearPart, mesh: 
   };
 }
 
+/** A Hirth joint's exact body for the worker, with the display mesh's bounds and volume to check it against and, when it fits, the mesh to fall back on. */
+function cadModifierHirthMeshPart(hirth: CadModifierHirthPart, mesh: MeshData | undefined, sendMesh: boolean, hole: boolean): CadModifierMeshPart {
+  const expected = mesh && mesh.faces.length > 0 ? cadProfileExpectation(mesh.vertices, mesh.faces) : undefined;
+  return {
+    hirth: expected ? { ...hirth, expected } : hirth,
+    ...(sendMesh && mesh ? meshDataToCadTransfer(mesh) : {}),
+    hole,
+  };
+}
+
 /** A Gridfinity bin or baseplate's exact body for the worker, with the display mesh's bounds and volume to check it against and, when it fits, the mesh to fall back on. */
 function cadModifierGridfinityMeshPart(gridfinity: CadModifierGridfinityPart, mesh: MeshData | undefined, sendMesh: boolean, hole: boolean): CadModifierMeshPart {
   const expected = mesh && mesh.faces.length > 0 ? cadProfileExpectation(mesh.vertices, mesh.faces) : undefined;
@@ -657,7 +670,7 @@ function bedOverhangMessage(overhangs: BedOverhang[], printer: string) {
   if (overhangs.length > 1) return t("status.bedOverhangMany", { count: overhangs.length, printer });
   const [overhang] = overhangs;
   const mm = (value: number) => Number(value.toFixed(1));
-  const sides = (["left", "right", "back", "front", "top"] as const)
+  const sides = (["left", "right", "back", "front", "edge", "top"] as const)
     .filter((side) => overhang[side] > 0.01)
     .map((side) => t(`bed.side.${side}`, { mm: mm(overhang[side]) }))
     .join(", ");
@@ -2720,7 +2733,7 @@ export function LayerlingEditor({
   const [workspaceSettings, setWorkspaceSettings] = useState<WorkplaneWorkspaceSettings>(() => normalizeWorkspaceSettings(initialWorkspace));
   const bedPrinter = printerPresetById(workspaceSettings.printer);
   const overhangs = useMemo(
-    () => bedPrinter ? bedOverhangs(shapes, bedPrinter.width, bedPrinter.depth, bedPrinter.height) : [],
+    () => bedPrinter ? bedOverhangs(shapes, bedPrinter.width, bedPrinter.depth, bedPrinter.height, bedPrinter.round) : [],
     [bedPrinter, shapes],
   );
   // Bodies whose warning was clicked away (#640), for this session only. A body drops out of the
@@ -2800,6 +2813,11 @@ export function LayerlingEditor({
   const historyViewSteps = useMemo(
     () => (historyViewState ? historyStepsAround(history, historyViewState.index, openGroupCount) : null),
     [history, historyViewState, openGroupCount],
+  );
+  // The step that led to each state, for the History view's list of steps (#1023).
+  const describeHistoryViewStep = useCallback(
+    (index: number) => describeHistoryStep(history[index - 1], history[index], openGroupCount),
+    [history, openGroupCount],
   );
   const setOpenGroupLevels = useCallback((levels: OpenGroupLevel[]) => {
     openGroupsRef.current = levels;
@@ -3009,6 +3027,16 @@ export function LayerlingEditor({
   const projectInfoRef = useRef({ projectId: projectId ?? null, projectName, projectCreatedAt });
   const historyIndexRef = useRef(historyIndex);
   const historyRef = useRef(history);
+  // What undo and redo would take back or bring again, named on their buttons (#1023). Worked out when the
+  // pointer comes onto them, not at every step: reading a step compares the two states.
+  const [undoRedoHints, setUndoRedoHints] = useState<{ history: EditorHistoryEntry[]; index: number; undo: string | null; redo: string | null } | null>(null);
+  const refreshUndoRedoHints = useCallback(() => {
+    const entries = historyRef.current;
+    const index = historyIndexRef.current;
+    const steps = historyStepsAround(entries, index, openGroupCount);
+    const accuracy = workspaceSettingsRef.current.accuracy;
+    setUndoRedoHints({ history: entries, index, undo: steps.last ? historyStepText(steps.last, accuracy) : null, redo: steps.next ? historyStepText(steps.next, accuracy) : null });
+  }, [openGroupCount]);
   const historyLimitRef = useRef(workspaceSettings.historyLimit);
   const interactionHistoryStartRef = useRef("");
   const interactionHistoryChangedRef = useRef(false);
@@ -6163,6 +6191,7 @@ export function LayerlingEditor({
     }
     const nextIndex = currentIndex - 1;
     const entry = currentHistory[nextIndex];
+    const undoneStep = modifierCancelled ? null : describeHistoryStep(entry, currentHistory[currentIndex], openGroupCount);
     const nextShapes = (entry?.shapes ?? []).map(canonicalizeShape);
     const nextSelection = (entry?.selectedIds ?? []).filter((id) => nextShapes.some((shape) => shape.id === id));
     const nextNotes = normalizeNotes(entry?.notes);
@@ -6190,8 +6219,9 @@ export function LayerlingEditor({
     syncProjectShapes(nextShapes);
     setNotice(modifierCancelled
       ? t("status.edgeCancelledUndo")
-      : workplaneChanged ? t(placementWorkplaneIsBase(nextWorkplane) ? "status.undoWorkplaneBase" : "status.undoWorkplaneFace") : t("status.undo"));
-  }, [invalidateCadModifierSession, setOpenGroupLevels, syncProjectShapes]);
+      : workplaneChanged ? t(placementWorkplaneIsBase(nextWorkplane) ? "status.undoWorkplaneBase" : "status.undoWorkplaneFace")
+        : undoneStep ? t("status.undoneStep", { step: historyStepText(undoneStep, workspaceSettingsRef.current.accuracy) }) : t("status.undo"));
+  }, [invalidateCadModifierSession, openGroupCount, setOpenGroupLevels, syncProjectShapes]);
 
   const redo = useCallback(() => {
     if (projectInteractionActiveRef.current) {
@@ -6207,6 +6237,7 @@ export function LayerlingEditor({
     const modifierCancelled = invalidateCadModifierSession();
     const nextIndex = currentIndex + 1;
     const entry = currentHistory[nextIndex];
+    const redoneStep = modifierCancelled ? null : describeHistoryStep(currentHistory[currentIndex], entry, openGroupCount);
     const nextShapes = (entry?.shapes ?? []).map(canonicalizeShape);
     const nextSelection = (entry?.selectedIds ?? []).filter((id) => nextShapes.some((shape) => shape.id === id));
     const nextNotes = normalizeNotes(entry?.notes);
@@ -6234,8 +6265,9 @@ export function LayerlingEditor({
     syncProjectShapes(nextShapes);
     setNotice(modifierCancelled
       ? t("status.edgeCancelledRedo")
-      : workplaneChanged ? t(placementWorkplaneIsBase(nextWorkplane) ? "status.redoWorkplaneBase" : "status.redoWorkplaneFace") : t("status.redo"));
-  }, [invalidateCadModifierSession, setOpenGroupLevels, syncProjectShapes]);
+      : workplaneChanged ? t(placementWorkplaneIsBase(nextWorkplane) ? "status.redoWorkplaneBase" : "status.redoWorkplaneFace")
+        : redoneStep ? t("status.redoneStep", { step: historyStepText(redoneStep, workspaceSettingsRef.current.accuracy) }) : t("status.redo"));
+  }, [invalidateCadModifierSession, openGroupCount, setOpenGroupLevels, syncProjectShapes]);
 
   /**
    * Der Verlaufsblick oeffnet beim aktuellen Stand; von dort fuehrt der Schieber
@@ -6756,7 +6788,7 @@ export function LayerlingEditor({
       ? restoreGroupedChildrenForEdges(selectedShape)
       : [{ shape: selectedShape, scope: [] }]).flatMap(({ shape, scope }) => cadModifierSourceParts(shape).map((part) => ({ part, scope })));
     const sourceParts = sourceEntries.map((entry) => entry.part);
-    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((shape) => {
+    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; hirth?: CadModifierHirthPart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((shape) => {
       const frame = shape.cadBrepFrame;
       const preserveNeedsRetessellation = preservesEdgeTreatmentSize(shape) && Boolean(frame) && (
         Math.abs(shapeWidth(shape) - (frame?.width ?? shapeWidth(shape))) > 1e-6 ||
@@ -6784,6 +6816,9 @@ export function LayerlingEditor({
       // A Gridfinity bin or baseplate likewise.
       const exactGridfinity = cadModifierGridfinityForShape(shape);
       if (exactGridfinity) return { shape, gridfinity: exactGridfinity, profileMesh: meshForShape(shape) };
+      // A Hirth joint likewise.
+      const exactHirth = cadModifierHirthForShape(shape);
+      if (exactHirth) return { shape, hirth: exactHirth, profileMesh: meshForShape(shape) };
       // A STEP import brought its exact body along; the display mesh only checks it, and stands in if it fails.
       const importedStep = importedStepPartForShape(shape);
       if (importedStep) return { shape, ...importedStep, profileMesh: meshForShape(shape) };
@@ -6793,16 +6828,16 @@ export function LayerlingEditor({
     }));
     const triangleCount = partInputs.reduce((total, part) => total + (part.mesh?.faces.length ?? 0), 0);
     const profileTriangleCount = partInputs.reduce((total, part) => total + (part.profileMesh?.faces.length ?? 0), 0);
-    const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity).length;
+    const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth).length;
     const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0), 0);
     const sendProfileMeshes = triangleCount + profileTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
     // A STEP import's, a thread's, a spring's or a helical gear's mesh went
     // along as the part itself until it had its own body; it still goes along
     // whenever it would have fitted then. A Gridfinity part's goes the same way.
-    const stepTriangleCount = partInputs.reduce((total, part) => total + (part.step || part.thread || part.spring || part.helicalGear || part.gridfinity ? part.profileMesh?.faces.length ?? 0 : 0), 0);
+    const stepTriangleCount = partInputs.reduce((total, part) => total + (part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth ? part.profileMesh?.faces.length ?? 0 : 0), 0);
     const sendStepMeshes = sendProfileMeshes || triangleCount + stepTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
     const prepareTimeoutMs = cadModifierPrepareTimeoutMs(triangleCount + (sendProfileMeshes ? profileTriangleCount : sendStepMeshes ? stepTriangleCount : 0), profilePartCount, profileSegmentCount);
-    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.step && !part.thread && !part.spring && !part.helicalGear && !part.gridfinity && !part.primitive && !part.profile)) {
+    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.step && !part.thread && !part.spring && !part.helicalGear && !part.gridfinity && !part.hirth && !part.primitive && !part.profile)) {
       setNotice(t("status.noPrintableSurface"));
       return;
     }
@@ -6853,6 +6888,7 @@ export function LayerlingEditor({
       if (part.spring) return cadModifierSpringMeshPart(part.spring, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.helicalGear) return cadModifierHelicalGearMeshPart(part.helicalGear, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.gridfinity) return cadModifierGridfinityMeshPart(part.gridfinity, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
+      if (part.hirth) return cadModifierHirthMeshPart(part.hirth, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.step) return cadModifierImportedStepMeshPart(part.step, part.brepTransform, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.primitive) return { primitive: part.primitive, hole: Boolean(part.shape.hole) };
       if (part.profile) return cadModifierProfileMeshPart(part.profile, part.profileMesh, sendProfileMeshes, Boolean(part.shape.hole));
@@ -6900,7 +6936,7 @@ export function LayerlingEditor({
       ? restoreGroupedChildrenForEdges(shape)
       : [{ shape, scope: [] }]).flatMap((entry) => cadModifierSourceParts(entry.shape).map((part) => ({ part, scope: entry.scope })));
     const sourceParts = sourceEntries.map((entry) => entry.part);
-    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((partShape) => {
+    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; hirth?: CadModifierHirthPart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((partShape) => {
       const frame = partShape.cadBrepFrame;
       const preserveNeedsRetessellation = preservesEdgeTreatmentSize(partShape) && Boolean(frame) && (
         Math.abs(shapeWidth(partShape) - (frame?.width ?? shapeWidth(partShape))) > 1e-6 ||
@@ -6928,6 +6964,8 @@ export function LayerlingEditor({
       // A Gridfinity bin or baseplate likewise.
       const exactGridfinity = cadModifierGridfinityForShape(partShape);
       if (exactGridfinity) return { shape: partShape, gridfinity: exactGridfinity, profileMesh: meshForShape(partShape) };
+      const exactHirth = cadModifierHirthForShape(partShape);
+      if (exactHirth) return { shape: partShape, hirth: exactHirth, profileMesh: meshForShape(partShape) };
       // A STEP import brought its exact body along; the display mesh only checks it, and stands in if it fails.
       const importedStep = importedStepPartForShape(partShape);
       if (importedStep) return { shape: partShape, ...importedStep, profileMesh: meshForShape(partShape) };
@@ -6937,16 +6975,16 @@ export function LayerlingEditor({
     }));
     const triangleCount = partInputs.reduce((total, part) => total + (part.mesh?.faces.length ?? 0), 0);
     const profileTriangleCount = partInputs.reduce((total, part) => total + (part.profileMesh?.faces.length ?? 0), 0);
-    const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity).length;
+    const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth).length;
     const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0), 0);
     const sendProfileMeshes = !options.faces && triangleCount + profileTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
     // A STEP import's, a thread's, a spring's or a helical gear's mesh went
     // along as the part itself until it had its own body; it still goes along
     // whenever it would have fitted then. A Gridfinity part's goes the same way.
-    const stepTriangleCount = partInputs.reduce((total, part) => total + (part.step || part.thread || part.spring || part.helicalGear || part.gridfinity ? part.profileMesh?.faces.length ?? 0 : 0), 0);
+    const stepTriangleCount = partInputs.reduce((total, part) => total + (part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth ? part.profileMesh?.faces.length ?? 0 : 0), 0);
     const sendStepMeshes = !options.faces && (sendProfileMeshes || triangleCount + stepTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT);
     const prepareTimeoutMs = cadModifierPrepareTimeoutMs(triangleCount + (sendProfileMeshes ? profileTriangleCount : sendStepMeshes ? stepTriangleCount : 0), profilePartCount, profileSegmentCount);
-    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.step && !part.thread && !part.spring && !part.helicalGear && !part.gridfinity && !part.primitive && !part.profile)) {
+    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.step && !part.thread && !part.spring && !part.helicalGear && !part.gridfinity && !part.hirth && !part.primitive && !part.profile)) {
       throw new Error("The selected object has no printable surface");
     }
     // A body revolved before the exact revolve is a mesh; hollowing or rounding it fails in confusing ways.
@@ -6969,6 +7007,7 @@ export function LayerlingEditor({
       if (part.spring) return cadModifierSpringMeshPart(part.spring, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.helicalGear) return cadModifierHelicalGearMeshPart(part.helicalGear, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.gridfinity) return cadModifierGridfinityMeshPart(part.gridfinity, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
+      if (part.hirth) return cadModifierHirthMeshPart(part.hirth, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.step) return cadModifierImportedStepMeshPart(part.step, part.brepTransform, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.primitive) return { primitive: part.primitive, hole: Boolean(part.shape.hole) };
       if (part.profile) return cadModifierProfileMeshPart(part.profile, part.profileMesh, sendProfileMeshes, Boolean(part.shape.hole));
@@ -10045,6 +10084,36 @@ export function LayerlingEditor({
     }
   }, [buildSectionSvg, projectName]);
 
+  /** The cut's outlines as a sketch on the workplane on the cut (#1022), for the panel's button and the MCP action. */
+  const sectionSketchAt = useCallback(async (settings: Pick<SectionPlaneSettings, "axis" | "offset" | "flipped" | "frame">) => {
+    const frame = settings.frame ?? null;
+    const { bodies } = await sectionBodiesAt(settings.axis, settings.offset, frame);
+    if (bodies.length === 0) throw new Error(t("status.sectionSvgNothing"));
+    const workplane = sectionPlacementWorkplane(settings);
+    const made = sectionSketchProfile(bodies.flatMap((body) => body.loops), settings.axis, settings.offset, frame, workplane);
+    if (made.tooMany) throw new Error(t("status.sectionSketchTooMany", { count: MAX_SECTION_SKETCH_SEGMENTS }));
+    if (!made.profile) throw new Error(t("status.sectionSvgMissed"));
+    return { profile: made.profile, outlines: made.outlines, openLeftOut: made.openLeftOut, workplane };
+  }, [sectionBodiesAt]);
+
+  const sketchFromSection = useCallback(async (settings: Pick<SectionPlaneSettings, "axis" | "offset" | "flipped" | "frame">) => {
+    // A sketch already open would be thrown away.
+    if (sketchActive) {
+      setNotice(t("status.sectionSketchFinishFirst"), true);
+      return;
+    }
+    setNotice(t("status.buildingSectionSketch"), true);
+    try {
+      const made = await sectionSketchAt(settings);
+      beginSketch("extrude", made.profile, null, undefined, made.workplane);
+      const parts = [t("status.sectionSketchStarted", { count: made.outlines })];
+      if (made.openLeftOut > 0) parts.push(t("status.sectionSketchOpen", { count: made.openLeftOut }));
+      setNotice(parts.join(" "), made.openLeftOut > 0);
+    } catch (error) {
+      setNotice(error instanceof Error ? localizedError(error.message) : t("status.sectionSketchFailed"), true);
+    }
+  }, [beginSketch, sectionSketchAt, sketchActive]);
+
   // Der Dateiimport steht weiter unten; die MCP-Aktion nimmt denselben Weg.
   const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }> }>) | null>(null);
 
@@ -11168,7 +11237,7 @@ export function LayerlingEditor({
         const ids = new Set(mcpStringArray(params.ids));
         const targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the objects to make a cookie cutter from");
-        const result = await makeCookieCutter({ wall: params.wall, height: params.height, rim: params.rim, rimHeight: params.rimHeight, edge: params.edge, mirror: params.mirror, inner: params.inner, imprint: params.imprint, bridgeCount: params.bridgeCount, bridge: params.bridge, bridgeHeight: params.bridgeHeight, plate: params.plate, fillet: params.fillet }, targets);
+        const result = await makeCookieCutter({ wall: params.wall, height: params.height, rim: params.rim, rimHeight: params.rimHeight, edge: params.edge, mirror: params.mirror, inner: params.inner, imprint: params.imprint, innerEdge: params.innerEdge, bridgeCount: params.bridgeCount, bridge: params.bridge, bridgeHeight: params.bridgeHeight, plate: params.plate, fillet: params.fillet }, targets);
         if (!result.ok) throw new Error(result.message);
         const cutter = currentShapes().find((shape) => shape.id === result.id);
         return { object: cutter ? mcpShapeSummary(cutter) : { id: result.id }, ...(result.edgeLeftOut ? { note: "The outline could not take the cutting edge; the wall has a flat top." } : {}) };
@@ -11860,6 +11929,8 @@ export function LayerlingEditor({
         if (orientation !== undefined && orientation !== "world" && orientation !== "workplane" && orientation !== "view") {
           throw new Error("orientation must be world, workplane or view");
         }
+        const cutFace = params.cutFace === undefined ? undefined : mcpString(params.cutFace, "hatch").toLowerCase();
+        if (cutFace !== undefined && !SECTION_CUT_FACES.includes(cutFace as SectionCutFace)) throw new Error("cutFace must be hatch, fill or open");
         const result = window.layerlingSectionView({
           ...(typeof params.enabled === "boolean" ? { enabled: params.enabled } : {}),
           ...(orientation ? { orientation: orientation as SectionOrientation } : {}),
@@ -11868,6 +11939,7 @@ export function LayerlingEditor({
           ...(typeof params.flipped === "boolean" ? { flipped: params.flipped } : {}),
           ...(typeof params.showPlane === "boolean" ? { showPlane: params.showPlane } : {}),
           ...(params.center === true ? { center: true } : {}),
+          ...(cutFace ? { cutFace: cutFace as SectionCutFace } : {}),
         });
         return result;
       }
@@ -11962,6 +12034,41 @@ export function LayerlingEditor({
           hiddenSkipped: built.hiddenCount,
           svg: built.result.svg,
         };
+      }
+
+      if (command.action === "sketch_from_section") {
+        // The cut's outlines as a sketch on the cut (#1022), the plane resolved as for the section SVG.
+        const axisParam = params.axis === undefined ? undefined : mcpString(params.axis, "x").toLowerCase();
+        if (axisParam !== undefined && axisParam !== "x" && axisParam !== "y" && axisParam !== "z") throw new Error("axis must be x, y or z");
+        const current = window.layerlingSectionView?.({}).settings;
+        const axis = (axisParam ?? current?.axis ?? "x") as SectionPlaneAxis;
+        const followsView = axisParam === undefined && params.offset === undefined && Boolean(current?.enabled);
+        const offset = params.offset !== undefined
+          ? mcpNumber(params.offset, 0)
+          : current?.enabled && current.axis === axis
+            ? current.offset
+            : getSectionBounds(currentShapes(), axis, workspaceSettings.width, workspaceSettings.depth).center;
+        const flipped = params.flipped !== undefined ? params.flipped === true : followsView ? current?.flipped === true : false;
+        const frame = followsView ? current?.frame ?? null : null;
+        const height = params.height === undefined ? null : mcpNumber(params.height, 0);
+        if (height !== null && !(height > 0 && height <= 1000)) throw new Error("height must be more than 0 and at most 1000 mm");
+        if (height === null && sketchActive) throw new Error("A sketch is open in the editor: finish or cancel it first");
+        const made = await sectionSketchAt({ axis, offset, flipped, frame });
+        const counts = { axis, offset, flipped, outlines: made.outlines, openLeftOut: made.openLeftOut, segments: made.profile.segments.length };
+        if (height === null) {
+          beginSketch("extrude", made.profile, null, undefined, made.workplane);
+          setNotice(t("status.sectionSketchStarted", { count: made.outlines }));
+          return { ...counts, sketchOpened: true };
+        }
+        const extrusion = await cadShapeFromSketchProfile(made.profile, height, null);
+        const named = {
+          ...extrusion,
+          ...(typeof params.name === "string" && params.name.trim() ? { name: params.name.trim().slice(0, 60) } : {}),
+          ...(typeof params.color === "string" && params.color.trim() ? { color: params.color.trim() } : {}),
+        };
+        const placed = placeSketchShape(named, made.workplane, null);
+        commitShapes([...currentShapes(), placed], placed.id, t("status.exactSketchCreated"));
+        return { ...counts, object: mcpShapeSummary(placed) };
       }
 
       if (command.action === "export_drawing") {
@@ -12199,6 +12306,9 @@ export function LayerlingEditor({
   }, [
     alignSizeLimit,
     buildSectionSvg,
+    sectionSketchAt,
+    beginSketch,
+    sketchActive,
     rebuildSketchBodyFill,
     applyCustomFontToSelection,
     addReferencePoints,
@@ -14067,6 +14177,9 @@ export function LayerlingEditor({
         onToggleOutliner={toggleOutliner}
         canUndo={!splitSession && !projectInteractionActive && historyViewIndex === null && (historyIndex > 0 || Boolean(edgeModifier))}
         canRedo={!splitSession && !projectInteractionActive && historyViewIndex === null && historyIndex < history.length - 1}
+        undoHint={!edgeModifier && undoRedoHints?.history === history && undoRedoHints.index === historyIndex ? undoRedoHints.undo : null}
+        redoHint={!edgeModifier && undoRedoHints?.history === history && undoRedoHints.index === historyIndex ? undoRedoHints.redo : null}
+        onUndoRedoHover={refreshUndoRedoHints}
         canHistoryView={historyViewIndex !== null || (!splitSession && !projectInteractionActive && !edgeModifier && !deleteFaceTool && !openGroup && history.length > 1)}
         historyViewActive={historyViewIndex !== null}
         onHistoryView={historyViewIndex === null ? openHistoryView : closeHistoryView}
@@ -14498,6 +14611,7 @@ export function LayerlingEditor({
           resolvedTheme={resolvedTheme}
           onThemePreferenceChange={onThemePreferenceChange}
           onExportSectionSvg={(axis, offset, frame) => void exportSectionSvg(axis, offset, frame)}
+          onSketchFromSection={(settings) => void sketchFromSection(settings)}
           onSectionContours={sectionContours}
           onSectionBodies={sectionBodies}
           />
@@ -14522,6 +14636,8 @@ export function LayerlingEditor({
           objectCount={historyViewState.shapes.length}
           lastStep={historyViewSteps?.last ?? null}
           nextStep={historyViewSteps?.next ?? null}
+          describeStep={describeHistoryViewStep}
+          accuracy={workspaceSettings.accuracy}
           creating={historyProjectCreating}
           canCreateProject={Boolean(onCreateProjectFromState)}
           pickedCount={historyView.picked.length}

@@ -164,6 +164,87 @@
   }
 }
 
+/* The steps as a list, newest at the top (#1023): a click goes to that state. */
+.history-view-head .panel-header-actions button.active {
+  color: #b35f07;
+  background: #fbead6;
+}
+
+.history-view-list {
+  display: grid;
+  max-height: min(240px, 32vh);
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #e6d9ca;
+  border-radius: 8px;
+}
+
+.history-view-list button {
+  display: flex;
+  width: 100%;
+  min-height: 28px;
+  padding: 3px 8px;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.history-view-list button:hover {
+  background: #f6efe6;
+}
+
+.history-view-list button.shown {
+  color: #fff;
+  background: #cc7011;
+}
+
+.history-view-list button.ahead:not(.shown) {
+  color: #a08a73;
+  font-style: italic;
+}
+
+.history-view-list-number {
+  flex: none;
+  min-width: 2.2em;
+  font-size: 11px;
+  text-align: end;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-view-list-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-view-list-now {
+  flex: none;
+  padding: 0 7px;
+  font-size: 11px;
+  font-weight: 700;
+  font-style: normal;
+  color: #2a8f57;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+}
+
+.history-view-list button.shown .history-view-list-now {
+  color: #fff;
+}
+
 .history-view-state {
   display: flex;
   flex-wrap: wrap;
@@ -347,6 +428,33 @@ html[data-theme="dark"] .history-view-facts .current {
 html[data-theme="dark"] .history-view-head .panel-header-actions button:hover,
 html[data-theme="dark"] .history-view-head .guide-help-link:hover {
   background: #3f3022;
+}
+
+html[data-theme="dark"] .history-view-head .panel-header-actions button.active {
+  color: #f0a95a;
+  background: #4a3622;
+}
+
+html[data-theme="dark"] .history-view-list {
+  background: #2f2318;
+  border-color: #5b4b3a;
+}
+
+html[data-theme="dark"] .history-view-list button:hover {
+  background: #3f3022;
+}
+
+html[data-theme="dark"] .history-view-list button.shown {
+  color: #fff;
+  background: #c4670d;
+}
+
+html[data-theme="dark"] .history-view-list button.ahead:not(.shown) {
+  color: #b9a68f;
+}
+
+html[data-theme="dark"] .history-view-list-now {
+  color: #5fd394;
 }
 
 html[data-theme="dark"] .history-view-slider > button,

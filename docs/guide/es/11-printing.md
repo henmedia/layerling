@@ -5,7 +5,7 @@ summary: Elegir tu impresora, recibir un aviso cuando algo no cabe y colocar bie
 
 ## Elegir tu impresora
 
-Abre los ajustes (la rueda dentada de la cinta, {{ui:editor.workspaceSettings}}) y pasa al apartado {{ui:workspace.workplane}}. En {{ui:workspace.printer}} eliges tu impresora en una lista de más de 220 modelos habituales, entre ellos de Bambu Lab, Prusa, Creality, Anycubic, Elegoo y muchas marcas más.
+Abre los ajustes (la rueda dentada de la cinta, {{ui:editor.workspaceSettings}}) y pasa al apartado {{ui:workspace.workplane}}. En {{ui:workspace.printer}} eliges tu impresora en una lista de más de 230 modelos habituales, entre ellos de Bambu Lab, Prusa, Creality, Anycubic, Elegoo y muchas marcas más.
 
 ![Los ajustes del plano de trabajo con una impresora elegida. La cama y la altura máxima de impresión salen del perfil del laminador.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Pasan tres cosas:
 - layerling te **avisa** cuando algo no cabe.
 
 Los perfiles de impresora vienen de OrcaSlicer, así que son los mismos que conoce tu laminador (*slicer*). Si prefieres trabajar sin impresora, elige {{ui:workspace.printerNone}}. También puedes fijar a mano el tamaño del plano de trabajo.
+
+Las impresoras delta, como las de FLSun o SeeMeCNC o la Anycubic Predator, imprimen sobre una cama redonda. Con una de ellas, el plano de trabajo también es redondo y tan ancho como la cama, y un cuerpo es demasiado grande en cuanto sobresale del borde. Un cuerpo redondo se mide por su propio contorno y no por la caja que lo rodea, así que cabe incluso un cilindro casi tan ancho como la cama.
 
 ## Cuando algo no cabe
 

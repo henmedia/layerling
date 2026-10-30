@@ -69,7 +69,7 @@ describe("cookie cutter", () => {
 
   it("takes the options as given within their limits, and the nearest allowed value outside", () => {
     expect(normalizeCookieCutterOptions()).toEqual(COOKIE_CUTTER_DEFAULTS);
-    const given = { wall: 2, height: 20, rim: 6, rimHeight: 3, edge: 0.8, mirror: false, inner: false, imprint: 5, bridgeCount: 3, bridge: 3, bridgeHeight: 4, plate: 1.5, fillet: 2 };
+    const given = { wall: 2, height: 20, rim: 6, rimHeight: 3, edge: 0.8, mirror: false, inner: false, imprint: 5, innerEdge: true, bridgeCount: 3, bridge: 3, bridgeHeight: 4, plate: 1.5, fillet: 2 };
     expect(normalizeCookieCutterOptions(given)).toEqual(given);
     expect(normalizeCookieCutterOptions({ mirror: "no", inner: "no" })).toMatchObject({ mirror: true, inner: true });
     expect(normalizeCookieCutterOptions({ height: 3, bridgeHeight: 10 }).bridgeHeight).toBe(3);
@@ -316,6 +316,16 @@ describe("bridges that hold the inner walls (#982)", () => {
     const without = cookieCutterProfiles(framed, { ...COOKIE_CUTTER_DEFAULTS, inner: false });
     expect(without.inner).toBeNull();
     expect(without.bridges).toBeNull();
+  });
+
+  it("gives inner walls that only press a flat top, unless asked to keep the edge (avxmw, #982)", () => {
+    const framed = squares([0, 0, 20], [0, 0, 12], [0, 0, 4]);
+    const pressing = cookieCutterProfiles(framed, normalizeCookieCutterOptions({ imprint: 3 }));
+    expect(pressing.inner?.stroke?.edge).toBeUndefined();
+    // The outer wall still cuts.
+    expect(pressing.wall.stroke?.edge).toBeCloseTo(COOKIE_CUTTER_DEFAULTS.edge, 9);
+    expect(cookieCutterProfiles(framed, normalizeCookieCutterOptions({ imprint: 3, innerEdge: true })).inner?.stroke?.edge).toBeCloseTo(COOKIE_CUTTER_DEFAULTS.edge, 9);
+    expect(normalizeCookieCutterOptions({ innerEdge: "yes" }).innerEdge).toBe(false);
   });
 });
 

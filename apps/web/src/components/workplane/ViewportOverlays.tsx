@@ -19,7 +19,7 @@ import { displayY, insideZ } from "@/lib/displayAxes";
 import { isNonSolidShape, preservesEdgeTreatmentSize, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasTaper, shapeOverallFootprintDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
 import { type RotationAxis } from "@/components/workplane/TransformOverlay";
 import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
-import type { MeasurementAccuracy, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { MeasurementAccuracy, MouseScheme, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { NOTE_TEXT_LIMIT } from "@/lib/workplaneNotes";
 import { measurementMiddle } from "@/lib/referencePoints";
 import type { MoveDimensionLift } from "@/lib/moveDimensionLines";
@@ -95,6 +95,10 @@ export type ThreeState = {
   animationId: number;
   needsRender: boolean;
   wasCameraMoving: boolean;
+  /** Which mouse buttons steer the view, from the settings (#1013). */
+  mouseScheme?: MouseScheme;
+  /** Starts turning the view with the left button held, for a press on empty space in the slicer scheme (#1013). */
+  turnWithLeftButton?: (event: PointerEvent) => void;
   /** The view cube turn under way: the camera eases to the clicked face instead of jumping. */
   cameraTurn?: CameraTurn | null;
   lastOverlaySync: number;

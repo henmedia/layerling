@@ -12,14 +12,14 @@ import { PRINTERS, VENDOR_LABELS, bedFromArea, orcaCheckout, vendorMachines } fr
  *   node scripts/check-printer-updates.mjs [--json] [--accept] [path/to/OrcaSlicer]
  *
  * Reports, for the makers layerling already lists:
- *   - new:     models OrcaSlicer has (a 0.4 mm profile with a rectangular plate) that the list lacks
+ *   - new:     models OrcaSlicer has (a 0.4 mm profile with a rectangular or round plate) that the list lacks
  *   - changed: models whose plate or height differs from printerPresets.generated.ts
  *   - gone:    models of the list OrcaSlicer no longer has under that name
  * and, for the makers it does not list at all, how many models they have (the makers are left out on
- * purpose when they print on a round plate or are industrial; this is only for looking).
+ * purpose when they are industrial; this is only for looking).
  *
- * Models and makers that were looked at and left out on purpose (kit and firmware variants, round
- * plates, industrial machines) stand in printer-check-reviewed.json and are not reported again, so
+ * Models and makers that were looked at and left out on purpose (kit and firmware variants,
+ * industrial machines) stand in printer-check-reviewed.json and are not reported again, so
  * what the report shows is what is new since the last look. `--accept` writes everything the report
  * shows into that file. To take a model over, add it to PRINTERS and run `npm run printers:update`.
  */
@@ -60,9 +60,9 @@ function standardProfile(machines, model) {
 
 function plateOf(profile) {
   try {
-    const { width, depth } = bedFromArea(profile.printable_area ?? [], profile.printer_model);
+    const { width, depth, round } = bedFromArea(profile.printable_area ?? [], profile.printer_model);
     const height = Number(profile.printable_height);
-    return Number.isFinite(height) && height > 0 ? { width, depth, height } : null;
+    return Number.isFinite(height) && height > 0 ? { width, depth, height, ...(round ? { round } : {}) } : null;
   } catch {
     return null;
   }
@@ -97,7 +97,7 @@ try {
       const plate = plateOf(profile);
       const name = model.startsWith(`${label} `) ? model : `${label} ${model}`;
       const known = listed.get(name) ?? listed.get(`${label} ${model.startsWith(`${label} `) ? model.slice(label.length + 1) : model}`);
-      if (plate && known && (known.width !== plate.width || known.depth !== plate.depth || known.height !== plate.height)) {
+      if (plate && known && (known.width !== plate.width || known.depth !== plate.depth || known.height !== plate.height || Boolean(known.round) !== Boolean(plate.round))) {
         report.changed.push({ vendor: label, model, from: `${known.width} x ${known.depth} x ${known.height}`, to: `${plate.width} x ${plate.depth} x ${plate.height}` });
       }
     }

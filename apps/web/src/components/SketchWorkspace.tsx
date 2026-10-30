@@ -1412,7 +1412,7 @@ export function SketchWorkspace({
       return;
     }
     if (event.button === 2) rightPressRef.current = { x: event.clientX, y: event.clientY };
-    if (isSketchPanGesture(event)) beginPan(event);
+    if (isSketchPanGesture(event, workspace.mouseScheme)) beginPan(event);
     else retargetTouchPress(event);
   };
 

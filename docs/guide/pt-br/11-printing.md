@@ -5,7 +5,7 @@ summary: Como escolher a sua impressora, ser avisado quando algo não cabe e dei
 
 ## Escolhendo a sua impressora
 
-Abra as configurações (a engrenagem na área {{ui:editor.group.manage}} da barra de opções, {{ui:editor.workspaceSettings}}) e vá para a área {{ui:workspace.workplane}}. Em {{ui:workspace.printer}} você escolhe a sua impressora numa lista de mais de 220 modelos comuns, entre eles Bambu Lab, Prusa, Creality, Anycubic, Elegoo e muitos outros.
+Abra as configurações (a engrenagem na área {{ui:editor.group.manage}} da barra de opções, {{ui:editor.workspaceSettings}}) e vá para a área {{ui:workspace.workplane}}. Em {{ui:workspace.printer}} você escolhe a sua impressora numa lista de mais de 230 modelos comuns, entre eles Bambu Lab, Prusa, Creality, Anycubic, Elegoo e muitos outros.
 
 ![As configurações do plano de trabalho com uma impressora escolhida. A mesa de impressão e a altura máxima de impressão vêm do perfil do fatiador.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Três coisas acontecem:
 - layerling **avisa** quando algo não cabe.
 
 Os perfis de impressora vêm do OrcaSlicer, então são os mesmos que o seu fatiador conhece. Se preferir trabalhar sem impressora, escolha {{ui:workspace.printerNone}}. Você também pode definir o tamanho do plano de trabalho à mão.
+
+Impressoras delta, como as da FLSun ou da SeeMeCNC ou a Anycubic Predator, imprimem sobre uma mesa redonda. Com uma delas, o plano de trabalho também fica redondo e tão largo quanto a mesa, e um sólido é grande demais assim que passa da borda. Um sólido redondo é medido pelo próprio contorno, não pela caixa em volta dele, então cabe até um cilindro quase tão largo quanto a mesa.
 
 ## Quando algo não cabe
 

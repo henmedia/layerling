@@ -66,14 +66,15 @@ describe("shape catalog", () => {
     expect(kinds.indexOf("gridfinity")).toBe(kinds.indexOf("spring") + 1);
   });
 
-  it("exposes knurl, hinge and dovetail between gear and the decorative shapes in the toolbar catalog", () => {
+  it("exposes the Hirth joint, knurl, hinge and dovetail between gear and the decorative shapes in the toolbar catalog", () => {
     const kinds = toolbarShapeAssets.map((asset) => asset.kind);
 
     const gearIndex = kinds.indexOf("gear");
     const dovetailIndex = kinds.indexOf("dovetail");
-    expect(kinds.indexOf("knurl")).toBe(gearIndex + 1);
-    expect(kinds.indexOf("hinge")).toBe(gearIndex + 2);
-    expect(dovetailIndex).toBe(gearIndex + 3);
+    expect(kinds.indexOf("hirth")).toBe(gearIndex + 1);
+    expect(kinds.indexOf("knurl")).toBe(gearIndex + 2);
+    expect(kinds.indexOf("hinge")).toBe(gearIndex + 3);
+    expect(dovetailIndex).toBe(gearIndex + 4);
     expect(kinds.indexOf("star")).toBe(dovetailIndex + 1);
   });
 
