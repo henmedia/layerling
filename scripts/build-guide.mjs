@@ -1,6 +1,6 @@
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 // Builds the user guide: plain static pages from docs/guide/<language>/*.md,
@@ -765,7 +765,13 @@ export async function loadValues() {
 
 export async function loadMessages(language) {
   const load = async (code) => {
-    const module = await import(pathToFileURL(join(root, "apps", "web", "src", "lib", `messages.${code}.ts`)).href);
+    const baseFull = resolve(join(root, "apps", "web", "src", "lib"));
+    const target = join(baseFull, `messages.${code}.ts`);
+    const rel = relative(baseFull, target);
+    if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel) || dirname(target) !== baseFull) {
+      throw new Error("Invalid file path");
+    }
+    const module = await import(pathToFileURL(target).href);
     return module[`MESSAGES_${code.toUpperCase().replace(/-/g, "_")}`];
   };
   const english = await load("en");

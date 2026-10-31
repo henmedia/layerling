@@ -341,3 +341,32 @@ describe("the whole guide on one page", () => {
     expect(html).toContain("not translated");
   });
 });
+
+describe("loadMessages security", () => {
+  it("loads valid language codes without error", async () => {
+    const messages = await loadMessages("en");
+    expect(messages).toBeDefined();
+    expect(messages["dashboard.sponsor"]).toBeDefined();
+  });
+
+  it("rejects path traversal attempts with .. to prevent reading arbitrary files", async () => {
+    // These should fail because they attempt to traverse outside the lib directory
+    await expect(loadMessages("../../../etc/passwd")).rejects.toThrow();
+    await expect(loadMessages("../package")).rejects.toThrow();
+  });
+
+  it("rejects absolute paths to prevent reading arbitrary files", async () => {
+    // Absolute paths should be rejected
+    await expect(loadMessages("/etc/passwd")).rejects.toThrow();
+    await expect(loadMessages("/tmp/malicious")).rejects.toThrow();
+  });
+
+  it("only allows loading files from the messages lib directory", async () => {
+    // Valid language codes should work
+    await expect(loadMessages("en")).resolves.toBeDefined();
+    await expect(loadMessages("de")).resolves.toBeDefined();
+    
+    // Attempts to load files outside the lib directory should fail
+    await expect(loadMessages("../../package")).rejects.toThrow();
+  });
+});
