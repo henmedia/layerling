@@ -127,6 +127,13 @@ export type CadModifierProfilePart = {
    */
   apex?: { x: number; z: number };
   /**
+   * Loft only, through more sections (#1034): every section up the height with its loops (outer first, the
+   * opening second), piece for piece alike; `loops` is the first of them and `topLoops` the last.
+   */
+  through?: Array<{ y: number; loops: CadModifierProfileLoop[] }>;
+  /** With `through`: straight walls between neighbouring sections instead of one smooth surface. */
+  throughRuled?: boolean;
+  /**
    * Loft only: the section turns this many degrees from bottom to top, evenly, around
    * `twistCenter` (which moves with the lean). The sides are then no longer ruled: the body is a
    * smooth loft through sections a few degrees apart (#184).

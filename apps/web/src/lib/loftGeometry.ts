@@ -4,7 +4,7 @@ import type { CadModifierProfileLoop } from "@/lib/cadModifierTypes";
 import { loftEaseShare } from "@/lib/loftEase";
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { meshYawDegrees, mirrorSign } from "@/lib/workplaneShapes";
-import type { WorkplaneShape } from "@/types/layerling";
+import type { LoftMiddleSection, WorkplaneShape } from "@/types/layerling";
 
 /**
  * The transition ("Übergang", a loft, #188): one outline at the bottom, another at the top,
@@ -52,6 +52,12 @@ export const MAX_LOFT_SIDES = 24;
 /** How many straight pieces a full circle of a round end or a rounded corner is drawn with (#755). */
 export const MIN_LOFT_SEGMENTS = 16;
 export const MAX_LOFT_SEGMENTS = 360;
+/** At most this many sections between the bottom and the top (#1034). */
+export const MAX_LOFT_MIDDLES = 12;
+/** A section stands at least this share of the height away from the ends and from its neighbours. */
+const MIN_LOFT_GAP = 0.01;
+/** Sections a smooth transition through more sections is built with between two of them: the kernel's body and the mesh follow the same. */
+export const LOFT_THROUGH_STEPS = 8;
 /** What a wall leaves at least of the opening, so the inner outline stays a real outline. */
 const MIN_LOFT_OPENING = 0.4;
 
@@ -92,13 +98,22 @@ export type LoftMeasures = {
   smooth: number;
   /** Straight pieces of a full circle in the mesh of the view and of the exports (#755). */
   segments: number;
+  /** Sections between the bottom and the top (#1034), sorted up the height; empty for two ends. */
+  middles: LoftMiddle[];
+  /** With middles: one smooth surface through all sections, or straight walls between neighbours. */
+  through: LoftThrough;
 };
+
+export type LoftThrough = "smooth" | "straight";
+
+/** A middle section with every value set (#1034). */
+export type LoftMiddle = Required<LoftMiddleSection>;
 
 export type LoftShapeFields = Pick<WorkplaneShape,
   "width" | "depth" | "size" | "height"
   | "loftBottomOutline" | "loftTopOutline" | "loftBottomWidth" | "loftBottomDepth" | "loftTopWidth" | "loftTopDepth"
   | "loftBottomCorner" | "loftTopCorner" | "loftBottomSides" | "loftTopSides" | "loftOffsetX" | "loftOffsetZ" | "loftWall"
-  | "loftTwist" | "loftTiltX" | "loftTiltZ" | "loftSmooth" | "loftSegments">;
+  | "loftTwist" | "loftTiltX" | "loftTiltZ" | "loftSmooth" | "loftSegments" | "loftSections" | "loftThrough">;
 
 export function normalizeLoftOutline(value: unknown, fallback: LoftOutline = "round"): LoftOutline {
   return value === "round" || value === "rectangle" || value === "polygon" ? value : fallback;
@@ -115,9 +130,82 @@ export function normalizeLoftCorner(value: unknown, width: number, depth: number
   return Math.min(Math.min(width, depth) / 2, Math.max(0, finite(value, 0)));
 }
 
-/** The thickest wall that still leaves both openings. */
-export function maxLoftWall(measures: Pick<LoftMeasures, "bottomWidth" | "bottomDepth" | "topWidth" | "topDepth">) {
-  return Math.max(0, Math.min(measures.bottomWidth, measures.bottomDepth, measures.topWidth, measures.topDepth) / 2 - MIN_LOFT_OPENING);
+/** The thickest wall that still leaves every opening. */
+export function maxLoftWall(measures: Pick<LoftMeasures, "bottomWidth" | "bottomDepth" | "topWidth" | "topDepth"> & { middles?: LoftMiddle[] }) {
+  const middles = (measures.middles ?? []).flatMap((middle) => [middle.width, middle.depth]);
+  return Math.max(0, Math.min(measures.bottomWidth, measures.bottomDepth, measures.topWidth, measures.topDepth, ...middles) / 2 - MIN_LOFT_OPENING);
+}
+
+/**
+ * The middle sections in their ranges (#1034): each at least 1 mm, its corner inside it, standing
+ * strictly between the ends and apart from its neighbours, sorted up the height; at most MAX_LOFT_MIDDLES.
+ */
+export function normalizeLoftMiddles(raw: unknown): LoftMiddle[] {
+  if (!Array.isArray(raw)) return [];
+  const out: LoftMiddle[] = [];
+  raw
+    .filter((entry): entry is Partial<LoftMiddleSection> => !!entry && typeof entry === "object")
+    .map((entry) => {
+      const width = Math.max(MIN_LOFT_SIZE, finite(entry.width, 20));
+      const depth = Math.max(MIN_LOFT_SIZE, finite(entry.depth, 20));
+      const outline = normalizeLoftOutline(entry.outline, "round");
+      return {
+        at: Math.min(1 - MIN_LOFT_GAP, Math.max(MIN_LOFT_GAP, finite(entry.at, 0.5))),
+        outline,
+        width,
+        depth,
+        corner: normalizeLoftCorner(entry.corner ?? DEFAULT_LOFT.bottomCorner, width, depth),
+        sides: normalizeLoftSides(entry.sides, DEFAULT_LOFT.bottomSides),
+        offsetX: finite(entry.offsetX, 0),
+        offsetZ: finite(entry.offsetZ, 0),
+      };
+    })
+    .sort((a, b) => a.at - b.at)
+    .forEach((middle) => {
+      // Two sections in one place would make a fold: the later one gives way.
+      if (out.length < MAX_LOFT_MIDDLES && (!out.length || middle.at - out[out.length - 1].at >= MIN_LOFT_GAP - 1e-9)) out.push(middle);
+    });
+  return out;
+}
+
+/**
+ * The middle sections changed to `count` of them (#1034): a new one goes into the middle of the largest
+ * gap up the height, its outline that of the section below and its size and offset halfway between its
+ * neighbours, so the body hardly changes until it is set; fewer drop the topmost.
+ */
+export function loftMiddlesWithCount(measures: LoftMeasures, count: number): LoftMiddle[] {
+  const target = Math.min(MAX_LOFT_MIDDLES, Math.max(0, Math.round(count)));
+  const middles = measures.middles.map((middle) => ({ ...middle }));
+  while (middles.length > target) middles.pop();
+  while (middles.length < target) {
+    const bottom: LoftMiddle = { at: 0, outline: measures.bottomOutline, width: measures.bottomWidth, depth: measures.bottomDepth, corner: measures.bottomCorner, sides: measures.bottomSides, offsetX: 0, offsetZ: 0 };
+    const top: LoftMiddle = { at: 1, outline: measures.topOutline, width: measures.topWidth, depth: measures.topDepth, corner: measures.topCorner, sides: measures.topSides, offsetX: measures.offsetX, offsetZ: measures.offsetZ };
+    const chain = [bottom, ...middles, top];
+    let gap = 0;
+    chain.slice(1).forEach((upper, index) => {
+      if (upper.at - chain[index].at > chain[gap + 1].at - chain[gap].at) gap = index;
+    });
+    const lower = chain[gap];
+    const upper = chain[gap + 1];
+    if (upper.at - lower.at < 2 * MIN_LOFT_GAP) break;
+    const half = (a: number, b: number) => (a + b) / 2;
+    middles.push({
+      at: half(lower.at, upper.at),
+      outline: lower.outline,
+      width: half(lower.width, upper.width),
+      depth: half(lower.depth, upper.depth),
+      corner: half(lower.corner, upper.corner),
+      sides: lower.sides,
+      offsetX: half(lower.offsetX, upper.offsetX),
+      offsetZ: half(lower.offsetZ, upper.offsetZ),
+    });
+    middles.sort((a, b) => a.at - b.at);
+  }
+  return middles;
+}
+
+export function normalizeLoftThrough(value: unknown): LoftThrough {
+  return value === "straight" ? "straight" : "smooth";
 }
 
 /** Every value in its range: sizes at least 1 mm, corners inside their rectangle, the wall leaving an opening. */
@@ -127,6 +215,7 @@ export function normalizeLoftMeasures(raw: Partial<LoftMeasures>): LoftMeasures 
   const topWidth = Math.max(MIN_LOFT_SIZE, finite(raw.topWidth, DEFAULT_LOFT.topWidth));
   const topDepth = Math.max(MIN_LOFT_SIZE, finite(raw.topDepth, DEFAULT_LOFT.topDepth));
   const sizes = { bottomWidth, bottomDepth, topWidth, topDepth };
+  const middles = normalizeLoftMiddles(raw.middles);
   return {
     bottomOutline: normalizeLoftOutline(raw.bottomOutline, DEFAULT_LOFT.bottomOutline),
     topOutline: normalizeLoftOutline(raw.topOutline, DEFAULT_LOFT.topOutline),
@@ -137,18 +226,29 @@ export function normalizeLoftMeasures(raw: Partial<LoftMeasures>): LoftMeasures 
     topSides: normalizeLoftSides(raw.topSides, DEFAULT_LOFT.topSides),
     offsetX: finite(raw.offsetX, 0),
     offsetZ: finite(raw.offsetZ, 0),
-    wall: Math.min(maxLoftWall(sizes), Math.max(0, finite(raw.wall, 0))),
+    wall: Math.min(maxLoftWall({ ...sizes, middles }), Math.max(0, finite(raw.wall, 0))),
     twist: Math.min(MAX_LOFT_TWIST, Math.max(-MAX_LOFT_TWIST, finite(raw.twist, 0))),
     tiltX: Math.min(MAX_LOFT_TILT, Math.max(-MAX_LOFT_TILT, finite(raw.tiltX, 0))),
     tiltZ: Math.min(MAX_LOFT_TILT, Math.max(-MAX_LOFT_TILT, finite(raw.tiltZ, 0))),
     smooth: Math.min(1, Math.max(0, finite(raw.smooth, 0))),
     segments: Math.min(MAX_LOFT_SEGMENTS, Math.max(MIN_LOFT_SEGMENTS, Math.round(finite(raw.segments, DEFAULT_LOFT.segments)))),
+    middles,
+    through: normalizeLoftThrough(raw.through),
   };
 }
 
-/** Whether the sections turn or tilt on the way up, so the sides are no longer ruled lines. */
-export function loftIsTurned(measures: Pick<LoftMeasures, "twist" | "tiltX" | "tiltZ">) {
+/**
+ * Whether the sections turn or tilt on the way up, so the sides are no longer ruled lines. A transition
+ * through more sections (#1034) neither turns nor tilts: its sections set its shape.
+ */
+export function loftIsTurned(measures: Pick<LoftMeasures, "twist" | "tiltX" | "tiltZ"> & { middles?: LoftMiddle[] }) {
+  if (measures.middles?.length) return false;
   return Math.abs(measures.twist) > 1e-9 || Math.abs(measures.tiltX) > 1e-9 || Math.abs(measures.tiltZ) > 1e-9;
+}
+
+/** Whether a transition goes through more than its two ends (#1034). */
+export function loftHasMiddles(measures: Pick<LoftMeasures, "middles">) {
+  return measures.middles.length > 0;
 }
 
 /** The stored values of a shape, as set (before the frame stretches them). */
@@ -172,6 +272,8 @@ export function loftStoredMeasures(shape: LoftShapeFields): LoftMeasures {
     tiltZ: shape.loftTiltZ,
     smooth: shape.loftSmooth,
     segments: shape.loftSegments,
+    middles: shape.loftSections as LoftMiddle[] | undefined,
+    through: shape.loftThrough,
   });
 }
 
@@ -179,6 +281,19 @@ export function loftStoredMeasures(shape: LoftShapeFields): LoftMeasures {
 export function loftMeasuresBounds(measures: LoftMeasures) {
   // Turned or tilted sections reach out differently: measured on the sections themselves.
   if (loftIsTurned(measures)) return turnedLoftBounds(measures);
+  if (measures.middles.length) {
+    const boxes = [
+      [0, 0, measures.bottomWidth, measures.bottomDepth],
+      [measures.offsetX, measures.offsetZ, measures.topWidth, measures.topDepth],
+      ...measures.middles.map((middle) => [middle.offsetX, middle.offsetZ, middle.width, middle.depth]),
+    ];
+    return [
+      Math.min(...boxes.map(([x, , w]) => x - w / 2)),
+      Math.min(...boxes.map(([, z, , d]) => z - d / 2)),
+      Math.max(...boxes.map(([x, , w]) => x + w / 2)),
+      Math.max(...boxes.map(([, z, , d]) => z + d / 2)),
+    ];
+  }
   return [
     Math.min(-measures.bottomWidth / 2, measures.offsetX - measures.topWidth / 2),
     Math.min(-measures.bottomDepth / 2, measures.offsetZ - measures.topDepth / 2),
@@ -208,6 +323,7 @@ export function loftMeasures(shape: LoftShapeFields): LoftMeasures {
     topDepth: stored.topDepth * sz,
     offsetX: stored.offsetX * sx,
     offsetZ: stored.offsetZ * sz,
+    middles: stored.middles.map((middle) => ({ ...middle, width: middle.width * sx, depth: middle.depth * sz, offsetX: middle.offsetX * sx, offsetZ: middle.offsetZ * sz })),
   });
 }
 
@@ -272,6 +388,9 @@ export function loftFieldsFromMeasures(measures: LoftMeasures): Partial<Workplan
     loftTiltZ: measures.tiltZ,
     loftSmooth: measures.smooth,
     loftSegments: measures.segments,
+    // Only a transition through more sections carries them: a plain one stays as it was saved.
+    loftSections: measures.middles.length ? measures.middles.map((middle) => ({ ...middle })) : undefined,
+    loftThrough: measures.middles.length ? measures.through : undefined,
   };
 }
 
@@ -304,6 +423,21 @@ function sectionsAt(measures: LoftMeasures, cx: number, cz: number): { bottom: L
       cz: cz + measures.offsetZ,
     },
   };
+}
+
+/** Every section from the bottom up, with the share of the height each stands at (#1034). */
+function chainAt(measures: LoftMeasures, cx: number, cz: number): { sections: LoftSection[]; at: number[] } {
+  const { bottom, top } = sectionsAt(measures, cx, cz);
+  const middles = measures.middles.map((middle): LoftSection => ({
+    outline: middle.outline,
+    width: middle.width,
+    depth: middle.depth,
+    corner: middle.corner,
+    sides: middle.sides,
+    cx: cx + middle.offsetX,
+    cz: cz + middle.offsetZ,
+  }));
+  return { sections: [bottom, ...middles, top], at: [0, ...measures.middles.map((middle) => middle.at), 1] };
 }
 
 // --- Outlines as pieces ----------------------------------------------------------------------
@@ -507,6 +641,109 @@ export function loftPieces(shape: LoftShapeFields): { outer: LoftPieces; inner: 
   return { outer, inner };
 }
 
+/**
+ * Every section of a transition through more sections (#1034) cut alike: at 0, 90, 180 and 270 degrees
+ * and at every corner of any of them, round each one's own middle. Piece i of one faces piece i of the
+ * next, and every outline starts at the angle 0 - the start points line up, so nothing twists.
+ */
+function cutChain(sections: LoftSection[]): Piece[][] {
+  const middles = sections.map(sectionMiddle);
+  const pieces = sections.map(sectionPieces);
+  const notWhole = (piece: Piece) => piece.kind === "line" || Math.abs(piece.t1 - piece.t0) < TWO_PI - 1e-9;
+  const cuts = uniqueAngles([
+    0, Math.PI / 2, Math.PI, Math.PI * 1.5,
+    ...pieces.flatMap((list, index) => cornerAngles(list.filter(notWhole), middles[index])),
+  ]);
+  return pieces.map((list, index) => cutAtAngles(list, middles[index], cuts));
+}
+
+/** The sections of a transition through more sections, outer and (with a wall) inner, cut alike, and where each stands. */
+export function loftChainPieces(shape: LoftShapeFields) {
+  const measures = loftMeasures(shape);
+  const frame = loftFrameSize(measures);
+  const { sections, at } = chainAt(measures, -frame.centerX, -frame.centerZ);
+  const outer = cutChain(sections);
+  const inner = measures.wall > 1e-6 ? cutChain(sections.map((section) => insetSection(section, measures.wall))) : null;
+  return { outer, inner, at, measures };
+}
+
+/**
+ * A monotone cubic through (xs, ys) (Fritsch and Carlson, as PCHIP): it passes through every point and
+ * never swings past two neighbours, so a section between two smaller ones does not bulge the body out
+ * beyond them. Linear for two points.
+ */
+export function monotoneCubic(xs: number[], ys: number[]) {
+  const n = xs.length;
+  const h = xs.slice(1).map((x, k) => x - xs[k]);
+  const delta = h.map((step, k) => (ys[k + 1] - ys[k]) / step);
+  if (n === 2) return (x: number) => ys[0] + delta[0] * (x - xs[0]);
+  const slopes = new Array<number>(n).fill(0);
+  for (let k = 1; k < n - 1; k += 1) {
+    if (delta[k - 1] * delta[k] <= 0) continue;
+    const w1 = 2 * h[k] + h[k - 1];
+    const w2 = h[k] + 2 * h[k - 1];
+    slopes[k] = (w1 + w2) / (w1 / delta[k - 1] + w2 / delta[k]);
+  }
+  // The ends: a three-point estimate, kept from turning the curve back.
+  const edge = (h0: number, h1: number, d0: number, d1: number) => {
+    const d = ((2 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);
+    if (Math.sign(d) !== Math.sign(d0)) return 0;
+    if (Math.sign(d0) !== Math.sign(d1) && Math.abs(d) > Math.abs(3 * d0)) return 3 * d0;
+    return d;
+  };
+  slopes[0] = edge(h[0], h[1], delta[0], delta[1]);
+  slopes[n - 1] = edge(h[n - 2], h[n - 3], delta[n - 2], delta[n - 3]);
+  return (x: number) => {
+    let k = 0;
+    while (k < n - 2 && x > xs[k + 1]) k += 1;
+    const t = (x - xs[k]) / h[k];
+    const t2 = t * t;
+    const t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * ys[k] + (t3 - 2 * t2 + t) * h[k] * slopes[k] + (-2 * t3 + 3 * t2) * ys[k + 1] + (t3 - t2) * h[k] * slopes[k + 1];
+  };
+}
+
+/** The shares of the height a smooth transition through more sections is built at: LOFT_THROUGH_STEPS between two sections. */
+export function loftThroughStations(at: number[]) {
+  const stations: number[] = [];
+  for (let k = 0; k + 1 < at.length; k += 1) {
+    for (let step = 0; step < LOFT_THROUGH_STEPS; step += 1) stations.push(at[k] + ((at[k + 1] - at[k]) * step) / LOFT_THROUGH_STEPS);
+  }
+  stations.push(at[at.length - 1]);
+  return stations;
+}
+
+/** A loop of cubic Bezier pieces as its points: the start, then the two handles and the end of every piece. */
+function bezierPoints(loop: CadModifierProfileLoop): Point[] {
+  return [{ x: loop.x, z: loop.z }, ...loop.segments.flatMap((segment) => {
+    if (segment.kind !== "bezier" || segment.controls.length !== 2) throw new Error("A smooth section is made of cubic pieces");
+    return [segment.controls[0], segment.controls[1], { x: segment.x, z: segment.z }];
+  })];
+}
+
+function bezierLoopOf(points: Point[]): CadModifierProfileLoop {
+  const segments = [];
+  for (let k = 1; k + 2 < points.length; k += 3) {
+    segments.push({ kind: "bezier" as const, x: points[k + 2].x, z: points[k + 2].z, controls: [points[k], points[k + 1]] });
+  }
+  return { x: points[0].x, z: points[0].z, segments };
+}
+
+/**
+ * The smooth sections between the given ones: every handle of the Bezier pieces follows a monotone
+ * cubic up the height through the same handle of every section. Body and mesh are built through
+ * the same sections, so they are the same surface.
+ */
+function smoothStations(chain: Piece[][], at: number[]): { stations: number[]; loops: CadModifierProfileLoop[] } {
+  const points = chain.map((pieces) => bezierPoints(piecesToBezierLoop(pieces)));
+  const stations = loftThroughStations(at);
+  const curves = points[0].map((_, index) => ({
+    x: monotoneCubic(at, points.map((list) => list[index].x)),
+    z: monotoneCubic(at, points.map((list) => list[index].z)),
+  }));
+  return { stations, loops: stations.map((t) => bezierLoopOf(curves.map((curve) => ({ x: curve.x(t), z: curve.z(t) })))) };
+}
+
 // --- Turning and tilting (#205) ------------------------------------------------------------
 
 /** Degrees between two sections of a turned loft: the kernel's TWIST_SECTION_STEP, so the mesh follows the body's sections. */
@@ -694,9 +931,29 @@ export type LoftProfileLoops = {
   twistLean?: { x: number; z: number };
   tilt?: { x: number; z: number };
   height?: number;
+  /** Through more sections (#1034): every section up the height with its loops, outer first. */
+  through?: Array<{ y: number; loops: CadModifierProfileLoop[] }>;
+  /** Straight walls between neighbouring sections instead of one smooth surface. */
+  throughRuled?: boolean;
 };
 
+/** The loops of a transition through more sections (#1034): its own sections when straight, the smooth ones between them when smooth. */
+function loftThroughLoops(shape: LoftShapeFields): LoftProfileLoops {
+  const { outer, inner, at, measures } = loftChainPieces(shape);
+  const height = Math.max(0.01, shape.height);
+  let through: Array<{ y: number; loops: CadModifierProfileLoop[] }>;
+  if (measures.through === "straight") {
+    through = at.map((t, index) => ({ y: t * height, loops: [piecesToLoop(outer[index]), ...(inner ? [piecesToLoop(inner[index])] : [])] }));
+  } else {
+    const outerSmooth = smoothStations(outer, at);
+    const innerSmooth = inner ? smoothStations(inner, at) : null;
+    through = outerSmooth.stations.map((t, index) => ({ y: t * height, loops: [outerSmooth.loops[index], ...(innerSmooth ? [innerSmooth.loops[index]] : [])] }));
+  }
+  return { loops: through[0].loops, topLoops: through[through.length - 1].loops, through, ...(measures.through === "straight" ? { throughRuled: true } : {}) };
+}
+
 export function loftProfileLoops(shape: LoftShapeFields): LoftProfileLoops {
+  if (loftStoredMeasures(shape).middles.length) return loftThroughLoops(shape);
   const { outer, inner } = loftPieces(shape);
   const turn = loftTurn(shape);
   const smooth = turn.measures.smooth;
@@ -769,7 +1026,104 @@ function wallRows(rings: { bottom: Point[]; top: Point[] }, height: number) {
   return Math.min(32, Math.max(1, Math.ceil(THREE.MathUtils.radToDeg(worst) / 6)));
 }
 
+/** A point of a cubic Bezier piece from `from` through handles a, b to `to`. */
+function bezierAt(from: Point, a: Point, b: Point, to: Point, f: number): Point {
+  const g = 1 - f;
+  return {
+    x: g * g * g * from.x + 3 * g * g * f * a.x + 3 * g * f * f * b.x + f * f * f * to.x,
+    z: g * g * g * from.z + 3 * g * g * f * a.z + 3 * g * f * f * b.z + f * f * f * to.z,
+  };
+}
+
+/** How many steps each piece index gets: as many as the roundest of its partners up the chain needs. */
+function chainSteps(chain: Piece[][], segments: number) {
+  const steps = (piece: Piece) => (piece.kind === "line" ? 1 : Math.max(2, Math.ceil(Math.abs(piece.t1 - piece.t0) / (TWO_PI / segments))));
+  return chain[0].map((_, index) => Math.max(...chain.map((pieces) => steps(pieces[index]))));
+}
+
+/**
+ * The display mesh of a transition through more sections (#1034). Straight: every section sampled
+ * at the same fractions of its pieces, rows between neighbours mixed evenly. Smooth: the smooth
+ * sections the body is lofted through, each sampled the same way.
+ */
+function createLoftChainGeometry(shape: LoftShapeFields): THREE.BufferGeometry {
+  const height = Math.max(0.01, shape.height);
+  const { outer, inner, at, measures } = loftChainPieces(shape);
+  const segments = measures.segments;
+  const positions: number[] = [];
+  const indices: number[] = [];
+  /** Rows of rings up the height for one chain: [share of the height, points]. */
+  const rowsOf = (chain: Piece[][]): Array<{ t: number; ring: Point[] }> => {
+    const steps = chainSteps(chain, segments);
+    if (measures.through === "smooth") {
+      const { stations, loops } = smoothStations(chain, at);
+      return stations.map((t, index) => {
+        const points = bezierPoints(loops[index]);
+        const ring: Point[] = [];
+        steps.forEach((count, piece) => {
+          const [from, a, b, to] = points.slice(piece * 3, piece * 3 + 4);
+          for (let step = 0; step < count; step += 1) ring.push(bezierAt(from, a, b, to, step / count));
+        });
+        return { t, ring };
+      });
+    }
+    const rings = chain.map((pieces) => pieces.flatMap((piece, index) => Array.from({ length: steps[index] }, (_, step) => pieceAt(piece, step / steps[index]))));
+    const rows: Array<{ t: number; ring: Point[] }> = [{ t: at[0], ring: rings[0] }];
+    for (let k = 0; k + 1 < rings.length; k += 1) {
+      const count = wallRows({ bottom: rings[k], top: rings[k + 1] }, height * (at[k + 1] - at[k]));
+      for (let row = 1; row <= count; row += 1) {
+        const share = row / count;
+        rows.push({ t: at[k] + (at[k + 1] - at[k]) * share, ring: rings[k].map((point, index) => mix(point, rings[k + 1][index], share)) });
+      }
+    }
+    return rows;
+  };
+  const addWall = (rows: Array<{ t: number; ring: Point[] }>, outward: boolean) => {
+    const count = rows[0].ring.length;
+    const starts = rows.map(({ t, ring }) => {
+      const first = positions.length / 3;
+      ring.forEach((point) => positions.push(point.x, height * t, point.z));
+      return first;
+    });
+    for (let row = 0; row + 1 < rows.length; row += 1) {
+      const b = starts[row];
+      const t = starts[row + 1];
+      for (let i = 0; i < count; i += 1) {
+        const j = (i + 1) % count;
+        if (outward) indices.push(b + i, t + j, b + j, b + i, t + i, t + j);
+        else indices.push(b + i, b + j, t + j, b + i, t + j, t + i);
+      }
+    }
+    return { bottom: starts[0], top: starts[starts.length - 1] };
+  };
+  const outerRows = rowsOf(outer);
+  const innerRows = inner ? rowsOf(inner) : null;
+  const outerStart = addWall(outerRows, true);
+  const innerStart = innerRows ? addWall(innerRows, false) : null;
+  const addCap = (contour: Point[], contourStart: number, hole: Point[] | null, holeStart: number, up: boolean) => {
+    const all = hole ? [...contour, ...hole] : contour;
+    const index = (k: number) => (k < contour.length ? contourStart + k : holeStart + k - contour.length);
+    THREE.ShapeUtils.triangulateShape(contour.map((p) => new THREE.Vector2(p.x, p.z)), hole ? [hole.map((p) => new THREE.Vector2(p.x, p.z))] : [])
+      .forEach(([a, b, c]) => {
+        const area = (all[b].x - all[a].x) * (all[c].z - all[a].z) - (all[c].x - all[a].x) * (all[b].z - all[a].z);
+        const facesDown = area > 0;
+        if (facesDown === !up) indices.push(index(a), index(b), index(c));
+        else indices.push(index(a), index(c), index(b));
+      });
+  };
+  addCap(outerRows[0].ring, outerStart.bottom, innerRows?.[0].ring ?? null, innerStart?.bottom ?? 0, false);
+  addCap(outerRows[outerRows.length - 1].ring, outerStart.top, innerRows?.[innerRows.length - 1].ring ?? null, innerStart?.top ?? 0, true);
+  const indexed = new THREE.BufferGeometry();
+  indexed.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  indexed.setIndex(indices);
+  const geometry = toCreasedNormals(indexed, THREE.MathUtils.degToRad(30));
+  indexed.dispose();
+  geometry.computeBoundingBox();
+  return geometry;
+}
+
 export function createLoftGeometry(shape: LoftShapeFields): THREE.BufferGeometry {
+  if (loftStoredMeasures(shape).middles.length) return createLoftChainGeometry(shape);
   const height = Math.max(0.01, shape.height);
   const { outer, inner } = loftPieces(shape);
   const turn = loftTurn(shape);
