@@ -450,7 +450,6 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "Termina il ritaglio",
   "sketch.cropImageHint": "Trascina le maniglie verso l'interno: l'immagine non viene deformata, ma ne vengono semplicemente nascosti i bordi. Trascinandole verso l'esterno, puoi ripristinarli.",
   "sketch.traceImage": "Ricalca",
-  "sketch.traceImageButton": "Ricalca contorno",
   "sketch.traceThreshold": "Soglia",
   "sketch.traceImageHint": "La parte scura o chiara dell'immagine diventa linee di schizzo proprio dove si trova. Arrivano selezionate: Canc le toglie di nuovo per provare un'altra soglia.",
   "status.sketchImageTraced": "Immagine ricalcata: {outlines} contorni con {lines} linee",

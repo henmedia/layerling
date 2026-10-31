@@ -495,7 +495,6 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "إنهاء القص",
   "sketch.cropImageHint": "اسحب المقابض إلى الداخل: الصورة لا تُضغط، بل يُستبعد الجزء الطرفي فقط. والسحب إلى الخارج يعيده.",
   "sketch.traceImage": "تتبّع",
-  "sketch.traceImageButton": "تتبّع المخطط",
   "sketch.traceThreshold": "العتبة",
   "sketch.traceImageHint": "يصبح الجزء الداكن أو الفاتح من الصورة خطوط رسم في المكان الذي تقع فيه تمامًا. تأتي محددة: يزيلها Delete مرة أخرى لتجربة عتبة أخرى.",
   "status.sketchImageTraced": "تم تتبّع الصورة: {outlines} مخططات بـ {lines} خطوط",

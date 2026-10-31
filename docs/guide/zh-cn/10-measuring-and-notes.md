@@ -92,4 +92,4 @@ summary: 卷尺、标尺与角尺，到原点的距离，附着在零件上的�
 - {{ui:referenceImage.calibrate}} 让它恢复真实尺寸，与草图中相同：单击图片上两个你知道实际距离的点——例如电路板的两个安装孔——并在 {{ui:referenceImage.distance}} 中输入该距离。图片会保持比例和中心不变。
 - 用设置标题栏中的锁将它锁定，它就会固定不动：点击会穿过它落到底板上。在对象列表中选中它即可解锁。
 - 无论复制或撤销多少次，图片在设计文件中只保存一次。大图片会让文件相应变大；添加时的提示会说明它的大小。
-- AI 可以用 `layerling_reference_image` 添加、移动、校准、淡化和锁定参考图片。使用 `trace` 可将图片描摹为立在其上的草图实体，与草图中的 {{ui:sketch.traceImageButton}} 相同。
+- AI 可以用 `layerling_reference_image` 添加、移动、校准、淡化和锁定参考图片。使用 `trace` 可将图片描摹为立在其上的草图实体，与草图中的 {{ui:sketch.traceImage}} 相同。

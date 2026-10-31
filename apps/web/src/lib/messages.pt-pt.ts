@@ -461,7 +461,6 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "Concluir recorte",
   "sketch.cropImageHint": "Arrasta os controlos para dentro: a imagem não é comprimida, apenas se oculta a parte exterior. Arrastá-los para fora volta a mostrar essa parte.",
   "sketch.traceImage": "Decalcar",
-  "sketch.traceImageButton": "Decalcar contorno",
   "sketch.traceThreshold": "Limiar",
   "sketch.traceImageHint": "A parte escura ou clara da imagem passa a linhas do esboço exatamente onde ela está. Ficam selecionadas: Delete remove-as de novo para experimentar outro limiar.",
   "status.sketchImageTraced": "Imagem decalcada: {outlines} contornos com {lines} linhas",

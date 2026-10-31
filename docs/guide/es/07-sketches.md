@@ -155,7 +155,7 @@ En {{ui:sketch.imageAlign}} enderezas una foto que salió torcida:
 
 Las cuatro actúan solo sobre la imagen de plantilla, nunca sobre el boceto.
 
-**{{ui:sketch.traceImage}}** te ahorra calcar a mano: elige {{ui:iconTag.part.dark}} o {{ui:iconTag.part.light}}, ajusta el {{ui:sketch.traceThreshold}} donde lo oscuro pasa a claro y haz clic en {{ui:sketch.traceImageButton}}. Esa parte de la imagen se convierte en líneas cerradas del boceto justo donde está, girada y recortada con ella, y luego las editas como cualquier otra línea. Quedan seleccionadas, así que [[Supr]] las quita de nuevo para probar otro umbral. Para un borde por fuera o por dentro del contorno, da al cuerpo del boceto un trazo por fuera o por dentro de sus líneas, o desplaza el cuerpo terminado.
+**{{ui:sketch.traceImage}}** te ahorra calcar a mano: elige {{ui:iconTag.part.dark}} o {{ui:iconTag.part.light}}, ajusta el {{ui:sketch.traceThreshold}} donde lo oscuro pasa a claro y haz clic en {{ui:sketch.traceApply}}. Esa parte de la imagen se convierte en líneas cerradas del boceto justo donde está, girada y recortada con ella, y luego las editas como cualquier otra línea. Quedan seleccionadas, así que [[Supr]] las quita de nuevo para probar otro umbral. Para un borde por fuera o por dentro del contorno, da al cuerpo del boceto un trazo por fuera o por dentro de sus líneas, o desplaza el cuerpo terminado.
 
 ## Teclas en el modo de boceto
 

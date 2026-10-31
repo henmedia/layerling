@@ -1777,7 +1777,6 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "Concluir recorte",
   "sketch.cropImageHint": "Arraste as alças para dentro para ocultar as bordas sem distorcer a imagem. Arraste para fora para mostrar as partes recortadas de novo.",
   "sketch.traceImage": "Traçar",
-  "sketch.traceImageButton": "Traçar contorno",
   "sketch.traceThreshold": "Limiar",
   "sketch.traceImageHint": "A parte escura ou clara da imagem vira linhas do esboço exatamente onde ela está. Elas vêm selecionadas: Delete as remove de novo para testar outro limiar.",
   "status.sketchImageTraced": "Imagem traçada: {outlines} contornos com {lines} linhas",

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { RASTER_TRACE_EMPTY, type RasterPixels } from "@/lib/rasterTrace";
-import { croppedPixels, imageTraceProfile, sketchTraceOfImage, tracedImageOutlines } from "@/lib/sketchImageTrace";
+import { croppedPixels, imageTraceProfile, planePointToTraced, shownPixels, sketchGeometryFromTrace, tracedImageOutlines, tracedPixelSize, tracedPointOnPlane, tracePreviewPath } from "@/lib/sketchImageTrace";
+import type { TraceRing } from "@/lib/pictureTrace";
 import type { SketchImage } from "@/types/layerling";
 
 /*
@@ -58,29 +59,16 @@ describe("tracing the reference image", () => {
     expect(box.maxZ).toBeCloseTo(-5, 0);
   });
 
-  it("moves and turns the lines with the picture", () => {
-    const { points, segments, outlines } = sketchTraceOfImage(image({ x: 30, z: -10, rotation: 90 }), pixels, { part: "dark" }, "trace-a");
-    expect(outlines).toBe(1);
-    expect(segments).toHaveLength(points.length);
-    expect(segments.every((segment) => segment.kind === "line")).toBe(true);
-    // A quarter turn counter-clockwise on the plate (z down): local (x, z) lands at (z, -x) from the middle.
-    const box = bounds(points);
-    expect(box.minX - 30).toBeCloseTo(-20, 0);
-    expect(box.maxX - 30).toBeCloseTo(-5, 0);
-    expect(box.minZ + 10).toBeCloseTo(10, 0);
-    expect(box.maxZ + 10).toBeCloseTo(40, 0);
-  });
-
   it("traces only the part a crop leaves, at the size it is shown", () => {
-    // The right half cut away: the block stays where it was on the picture, and the shown part is 50 x 50 mm.
-    const cropped = image({ crop: { left: 0, top: 0, right: 0.5, bottom: 0 }, width: 50, depth: 50, x: -25 });
-    const box = bounds(sketchTraceOfImage(cropped, pixels, { part: "dark" }, "trace-b").points);
-    expect(box.minX).toBeCloseTo(-40, 0);
-    expect(box.maxX).toBeCloseTo(-10, 0);
+    // The right half cut away: the shown part is 50 x 50 mm, its middle at 0, and the block keeps its place on it.
+    const cropped = image({ crop: { left: 0, top: 0, right: 0.5, bottom: 0 }, width: 50, depth: 50 });
+    const box = bounds(tracedImageOutlines(cropped, pixels, { part: "dark" })[0]);
+    expect(box.minX).toBeCloseTo(-15, 0);
+    expect(box.maxX).toBeCloseTo(15, 0);
   });
 
   it("traces the light part as the ring round the block, and keeps ids apart by the prefix", () => {
-    const light = sketchTraceOfImage(image(), pixels, { part: "light" }, "trace-c");
+    const light = imageTraceProfile(image(), pixels, { part: "light" }, "trace-c");
     expect(light.outlines).toBe(2);
     expect(light.points.every((point) => point.id.startsWith("trace-c-"))).toBe(true);
     expect(new Set(light.points.map((point) => point.id)).size).toBe(light.points.length);
@@ -102,5 +90,90 @@ describe("tracing the reference image", () => {
     expect(cut.height).toBe(30);
     expect(Array.from(cut.data.subarray(0, 4))).toEqual([0, 0, 0, 255]);
     expect(croppedPixels(pixels, [0, 0, 200, 100])).toBe(pixels);
+  });
+});
+
+function placedImage(patch: Partial<SketchImage> = {}): SketchImage {
+  return { id: "image", name: "picture", dataUrl: "data:image/png;base64,", mimeType: "image/png", pixelWidth: 200, pixelHeight: 100, x: 10, z: -5, width: 40, depth: 20, ...patch };
+}
+
+/** A square with a straight side, a curved side and a corner between curves, in the traced part's pixels. */
+const ring: TraceRing = {
+  hole: false,
+  key: "o:17:8",
+  source: "outline",
+  nodes: [
+    { x: 0, y: 0, corner: true },
+    { x: 200, y: 0, corner: true, handleOut: { x: 220, y: 30 } },
+    { x: 200, y: 100, corner: false, handleIn: { x: 220, y: 70 }, handleOut: { x: 180, y: 110 } },
+    { x: 0, y: 100, corner: true, handleIn: { x: 20, y: 110 } },
+  ],
+};
+
+describe("Trace in the sketch: the outlines on the picture", () => {
+  it("cuts the picture down to the part the image shows", () => {
+    const data = new Uint8ClampedArray(10 * 4 * 4);
+    for (let index = 0; index < 40; index += 1) data[index * 4] = index;
+    const frame = { width: 40, depth: 20, pixelWidth: 10, pixelHeight: 4 };
+    const cut = shownPixels({ ...frame, crop: { left: 0.2, top: 0.25, right: 0.3, bottom: 0.25 } }, { width: 10, height: 4, data });
+    expect(cut.width).toBe(5);
+    expect(cut.height).toBe(2);
+    // The first pixel shown is (2, 1): the eleventh plus two.
+    expect(cut.data[0]).toBe(12);
+    expect(cut.data[4 * 5]).toBe(22);
+    const whole = { width: 10, height: 4, data };
+    expect(shownPixels(frame, whole)).toBe(whole);
+  });
+
+  it("lays the traced points on the picture: its middle, its size and its turn", () => {
+    const flat = placedImage();
+    const size = { width: 200, height: 100 };
+    expect(tracedPointOnPlane(flat, size, { x: 100, y: 50 })).toEqual({ x: 10, z: -5 });
+    expect(tracedPointOnPlane(flat, size, { x: 0, y: 0 })).toEqual({ x: -10, z: -15 });
+    expect(tracedPointOnPlane(flat, size, { x: 200, y: 100 })).toEqual({ x: 30, z: 5 });
+    // Turned a quarter counter-clockwise on the plate: the picture's right edge points up the screen.
+    const turned = tracedPointOnPlane(placedImage({ rotation: 90 }), size, { x: 200, y: 50 });
+    expect(turned.x).toBeCloseTo(10, 6);
+    expect(turned.z).toBeCloseTo(-25, 6);
+    expect(tracedPixelSize(flat, size)).toEqual({ x: 0.2, z: 0.2 });
+    // And back: a spot on the plate in the picture's pixels, for a click on it.
+    const back = planePointToTraced(placedImage({ rotation: 90 }), size, turned);
+    expect(back.x).toBeCloseTo(200, 6);
+    expect(back.y).toBeCloseTo(50, 6);
+  });
+
+  it("draws a ring marked as a line as construction lines, there but not cut", () => {
+    let next = 0;
+    const { segments } = sketchGeometryFromTrace({ rings: [{ ...ring, source: "area", hole: true, line: true }] }, placedImage(), { width: 200, height: 100 }, (prefix) => `${prefix}-${(next += 1)}`);
+    expect(segments.every((segment) => segment.construction)).toBe(true);
+    const cut = sketchGeometryFromTrace({ rings: [ring] }, placedImage(), { width: 200, height: 100 }, (prefix) => `${prefix}-${(next += 1)}`);
+    expect(cut.segments.some((segment) => segment.construction)).toBe(false);
+  });
+
+  it("makes sketch points of the outline: plain corners, split corners between curves, smooth points", () => {
+    let next = 0;
+    const { points, segments } = sketchGeometryFromTrace({ rings: [ring] }, placedImage(), { width: 200, height: 100 }, (prefix) => `${prefix}-${(next += 1)}`);
+    expect(points).toHaveLength(4);
+    expect(segments).toHaveLength(4);
+    expect(points[0]).toMatchObject({ x: -10, z: -15 });
+    expect(points[0].mode).toBeUndefined();
+    expect(points[0].handleIn).toBeUndefined();
+    expect(points[1].mode).toBe("split");
+    expect(points[2].mode).toBe("smooth");
+    expect(points[3].mode).toBe("split");
+    expect(points[1].handleOut).toEqual({ x: 34, z: -9 });
+    expect(segments.map((segment) => segment.kind)).toEqual(["line", "bezier", "bezier", "line"]);
+    // A closed outline: each side starts where the last one ended.
+    segments.forEach((segment, index) => {
+      expect(segment.startId).toBe(points[index].id);
+      expect(segment.endId).toBe(points[(index + 1) % points.length].id);
+    });
+    expect(points.every((point) => point.id.startsWith("sketch-point-"))).toBe(true);
+    expect(segments.every((segment) => segment.id.startsWith("sketch-segment-"))).toBe(true);
+  });
+
+  it("draws the preview as one closed path per outline, curves as C", () => {
+    const path = tracePreviewPath({ rings: [ring] }, placedImage(), { width: 200, height: 100 });
+    expect(path).toBe("M-10 -15L30 -15C34 -9 34 -1 30 5C26 7 -6 7 -10 5Z");
   });
 });

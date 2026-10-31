@@ -82,7 +82,7 @@ Un’immagine di riferimento è una fotografia da usare per allineare le parti: 
 - {{ui:referenceImage.calibrate}} imposta la dimensione reale, come nello schizzo: fai clic su due punti dell’immagine di cui conosci la distanza reale, per esempio due fori di fissaggio della scheda, poi inseriscila in {{ui:referenceImage.distance}}. L’immagine mantiene le proporzioni e il centro.
 - Blocca l’immagine con il lucchetto nell’intestazione delle sue impostazioni: resterà ferma e i clic passeranno attraverso di essa fino alla piastra. Per sbloccarla, selezionala nell’elenco degli oggetti.
 - L’immagine viene salvata una sola volta nel file del progetto, anche se la copi o annulli l’operazione più volte. Un’immagine grande aumenta il file della stessa quantità; il messaggio che appare quando la aggiungi ne indica la dimensione.
-- Un sistema di IA può aggiungere, spostare, calibrare, rendere trasparente e bloccare un’immagine con `layerling_reference_image`. Con `trace` ricalca l'immagine in un corpo di schizzo appoggiato sopra, come {{ui:sketch.traceImageButton}} nello schizzo.
+- Un sistema di IA può aggiungere, spostare, calibrare, rendere trasparente e bloccare un’immagine con `layerling_reference_image`. Con `trace` ricalca l'immagine in un corpo di schizzo appoggiato sopra, come {{ui:sketch.traceImage}} nello schizzo.
 
 ## Punti di riferimento
 

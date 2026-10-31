@@ -15,6 +15,19 @@ export type VaseDrawingOptions = {
   locale?: string;
   /** Reads a mesh file into triangles (9 numbers each, z up); without it there is no button for it. */
   readMesh?: (name: string, bytes: Uint8Array) => Promise<ArrayLike<number>>;
+  /** Trace's magnetic lasso along the photo's edges; without it there is none. */
+  edgeLasso?: VaseEdgeLasso;
+};
+
+/**
+ * The way along a photo's edges, for Trace's magnetic lasso: `prepare` makes a photo ready once (its pixels,
+ * RGBA); `snap` moves a spot onto the strongest edge near it; `path` is the way from one spot to another along
+ * the edges, both ends included. Spots are [x, y] in the photo's pixels, y down.
+ */
+export type VaseEdgeLasso = {
+  prepare: (pixels: { width: number; height: number; data: Uint8ClampedArray }) => unknown;
+  snap: (photo: unknown, spot: [number, number]) => [number, number];
+  path: (photo: unknown, from: [number, number], to: [number, number]) => [number, number][];
 };
 
 export type VaseDrawingBoard = { el: HTMLElement; render: () => void; fit: () => void; select: (index: number | null) => void };

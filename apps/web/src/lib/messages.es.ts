@@ -488,7 +488,6 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "Terminar el recorte",
   "sketch.cropImageHint": "Arrastra los tiradores hacia dentro: la imagen no se deforma, solo se deja fuera el borde. Hacia fuera, el borde vuelve a aparecer.",
   "sketch.traceImage": "Calcar",
-  "sketch.traceImageButton": "Calcar contorno",
   "sketch.traceThreshold": "Umbral",
   "sketch.traceImageHint": "La parte oscura o la clara de la imagen se convierte en líneas de boceto justo donde está. Quedan seleccionadas: Supr las quita de nuevo para probar otro umbral.",
   "status.sketchImageTraced": "Imagen calcada: {outlines} contornos con {lines} líneas",

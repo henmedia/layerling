@@ -150,7 +150,7 @@ Az {{ui:sketch.imageAlign}} alatt egy nem egyenesen készült fényképet igazí
 
 Mind a négy csak a mintaképet érinti, a vázlatot soha.
 
-**{{ui:sketch.traceImage}}** megspórolja a kézi körberajzolást: válaszd a {{ui:iconTag.part.dark}} vagy a {{ui:iconTag.part.light}} lehetőséget, állítsd be a {{ui:sketch.traceThreshold}} értéket, ahol a sötét világosba vált, és kattints a {{ui:sketch.traceImageButton}} gombra. A kép ezen része zárt vázlatvonalakká válik pontosan ott, ahol a kép fekszik, vele együtt elforgatva és körbevágva, és utána úgy szerkeszted, mint bármely más vonalat. Kijelölve jelennek meg, így a [[Delete]] újra eltávolítja őket, ha más küszöböt próbálnál. Ha a körvonalon kívül vagy belül peremet szeretnél, adj a vázlattestnek kontúrt a vonalain kívül vagy belül, vagy told el a kész testet.
+**{{ui:sketch.traceImage}}** megspórolja a kézi körberajzolást: válaszd a {{ui:iconTag.part.dark}} vagy a {{ui:iconTag.part.light}} lehetőséget, állítsd be a {{ui:sketch.traceThreshold}} értéket, ahol a sötét világosba vált, és kattints a {{ui:sketch.traceApply}} gombra. A kép ezen része zárt vázlatvonalakká válik pontosan ott, ahol a kép fekszik, vele együtt elforgatva és körbevágva, és utána úgy szerkeszted, mint bármely más vonalat. Kijelölve jelennek meg, így a [[Delete]] újra eltávolítja őket, ha más küszöböt próbálnál. Ha a körvonalon kívül vagy belül peremet szeretnél, adj a vázlattestnek kontúrt a vonalain kívül vagy belül, vagy told el a kész testet.
 
 ## Billentyűk vázlatmódban
 

@@ -92,4 +92,4 @@ summary: 捲尺、標尺與角尺，到原點的距離，附著在零件上的�
 - {{ui:referenceImage.calibrate}} 讓它恢復真實尺寸，與草圖中相同：點擊圖片上兩個你知道實際距離的點——例如電路板的兩個安裝孔——並在 {{ui:referenceImage.distance}} 中輸入該距離。圖片會保持比例和中心不變。
 - 用設定標題列中的鎖將它鎖定，它就會固定不動：點擊會穿過它落到底板上。在物件清單中選取它即可解鎖。
 - 無論複製或復原多少次，圖片在設計檔案中只儲存一次。大圖片會讓檔案相應變大；新增時的提示會說明它的大小。
-- AI 可以用 `layerling_reference_image` 新增、移動、校準、淡化和鎖定參考圖片。使用 `trace` 可將圖片描摹為立在其上的草圖實體，與草圖中的 {{ui:sketch.traceImageButton}} 相同。
+- AI 可以用 `layerling_reference_image` 新增、移動、校準、淡化和鎖定參考圖片。使用 `trace` 可將圖片描摹為立在其上的草圖實體，與草圖中的 {{ui:sketch.traceImage}} 相同。

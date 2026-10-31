@@ -543,37 +543,44 @@ export function svgToProfile(text, { tolerance = 0.2 } = {}) {
 
 /**
  * Body form from measured radii: `ts` heights 0..1 (ascending), `rs` radii in mm, `H` height in mm.
- * Points with handles, as few as possible (at most 40), until the curve is at most `tolerance` mm
- * off; kinks over 20 degrees become corners. Shared by SVG and mesh import. Null when there is nothing.
+ * Points with handles, as few as possible (at most 40), until the curve is at most `tolerance` mm off;
+ * kinks over `cornerAngle` degrees (20 to start) become corners. Given `maxPoints` (Trace), as many points
+ * as that, 3 to 40, unless the curve is within `tolerance` before. Shared by SVG, mesh and photo import.
+ * Null when there is nothing.
  */
-export function profileFromSamples(ts, rs, H, { tolerance = 0.2 } = {}) {
+export function profileFromSamples(ts, rs, H, { tolerance = 0.2, maxPoints, cornerAngle = 20 } = {}) {
   const maxR = Math.max(...rs)
   if (!(maxR > 0) || ts.length < 3 || !(H > 0)) return null
+  const asked = maxPoints !== undefined
+  const most = asked ? Math.max(3, Math.min(40, Math.round(maxPoints))) : 40
   const r = rs.map((v) => v / maxR)
   // Slope (radius per height, normalised) left and right of every sample point.
   const slopeL = (k) => (k > 0 ? (r[k] - r[k - 1]) / (ts[k] - ts[k - 1]) : (r[1] - r[0]) / (ts[1] - ts[0]))
   const slopeR = (k) => (k < ts.length - 1 ? (r[k + 1] - r[k]) / (ts[k + 1] - ts[k]) : slopeL(k))
   const angleMm = (s) => Math.atan((s * maxR) / H)
-  const isCorner = (k) => k > 0 && k < ts.length - 1 && Math.abs(angleMm(slopeL(k)) - angleMm(slopeR(k))) > (20 * Math.PI) / 180
+  // A kink sharper than `cornerAngle` degrees is a corner; at 180 there are none.
+  const isCorner = (k) => cornerAngle < 180 && k > 0 && k < ts.length - 1 && Math.abs(angleMm(slopeL(k)) - angleMm(slopeR(k))) > (cornerAngle * Math.PI) / 180
   const pointAt = (k) => {
     if (isCorner(k)) return [ts[k], Math.max(0.03, r[k]), PROFILE_CORNER]
     const s = k === 0 ? slopeR(0) : k === ts.length - 1 ? slopeL(k) : (slopeL(k) + slopeR(k)) / 2
     return [ts[k], Math.max(0.03, r[k]), PROFILE_HANDLE, Math.max(-40, Math.min(40, s))]
   }
   // Start with the bottom, the top, the widest place and all kinks; then insert where the
-  // curve is furthest off.
+  // curve is furthest off, up to `maxPoints` points.
   const chosen = new Set([0, ts.length - 1, r.indexOf(1)])
-  for (let k = 1; k < ts.length - 1 && chosen.size < 20; k++) if (isCorner(k)) chosen.add(k)
+  for (let k = 1; k < ts.length - 1 && chosen.size < Math.min(20, most); k++) if (isCorner(k)) chosen.add(k)
   const build = () => [...chosen].sort((a, b) => a - b).map(pointAt)
   let points = build()
   for (let round = 0; round < 40; round++) {
     const at = profileSpline(points).at
     let worst = -1, worstD = 0
     for (let k = 0; k < ts.length; k++) {
+      // With a number of points asked for, the worst place that is not a point yet: one that is cannot get better.
+      if (asked && chosen.has(k)) continue
       const d = Math.abs(at(ts[k]) - r[k]) * maxR
       if (d > worstD) { worstD = d; worst = k }
     }
-    if (worstD <= tolerance || chosen.size >= 40 || chosen.has(worst)) break
+    if (worstD <= tolerance || chosen.size >= most || worst < 0 || chosen.has(worst)) break
     chosen.add(worst)
     points = build()
   }

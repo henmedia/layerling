@@ -512,7 +512,6 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "完成裁剪",
   "sketch.cropImageHint": "向内拖动控制点：图片不会被挤压，只会裁掉边缘；向外拖动可恢复。",
   "sketch.traceImage": "描摹",
-  "sketch.traceImageButton": "描摹轮廓",
   "sketch.traceThreshold": "阈值",
   "sketch.traceImageHint": "图片的暗部或亮部会在图片所在的位置变成草图线条。线条会被选中：按 Delete 可再次删除，以尝试其他阈值。",
   "status.sketchImageTraced": "已描摹图片：{outlines} 个轮廓，共 {lines} 条线",
