@@ -76,7 +76,7 @@ A {{ui:prop.torusTube}} adja meg, milyen vastag a cső felülről nézve. A maga
 
 - **A STEP-exportnál.** Az a kerek alakot írja ki, nem a sokszöget.
 - **Élletörésnél és lekerekítésnél** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}), amíg az alakzat kerek marad. Ez akkor áll fenn, ha nem állítottál be oldalszámot, ha az oldalszám legalább az alakzat alapértéke, vagy ha a sokszög legfeljebb {{value:EXACT_ROUND_TOLERANCE}} mm-rel tér el a körtől. Az alapérték hengernél, ellipszisnél, csőnél és kúpnál {{value:ROUND_FROM_SIDES}} oldal, az {{ui:shape.roundRoof}} alakzatnál {{value:ROUND_FROM_ROOF_SIDES}}, a {{ui:shape.sphere}} alakzatnál {{value:ROUND_FROM_SPHERE_STEPS}} lépés, a {{ui:shape.halfSphere}} és a {{ui:shape.paraboloid}} alakzatnál {{value:ROUND_FROM_HALF_SPHERE_STEPS}}, a {{ui:shape.torus}} alakzatnál {{value:ROUND_FROM_TORUS_SIDES}} oldal és {{value:ROUND_FROM_TORUS_STEPS}} lépés, egy kerek {{ui:shape.bentTube}} alakzatnál pedig {{value:ROUND_FROM_BENT_TUBE_QUALITY}} a {{ui:prop.quality}}.
-- **Menetnél, rugónál vagy ferde fogazású fogaskeréknél.** Az élműveleti eszköz és a STEP-export a pontos testét veszi; a {{ui:prop.quality}} csak azt adja meg, milyen finoman rajzolódik.
+- **Menetnél, rugónál, ferde fogazású vagy nyílfogazású fogaskeréknél.** Az élműveleti eszköz és a STEP-export a pontos testét veszi; a {{ui:prop.quality}} csak azt adja meg, milyen finoman rajzolódik.
 
 **Ahol mégis számít**
 

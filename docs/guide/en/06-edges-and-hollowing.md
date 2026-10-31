@@ -91,9 +91,10 @@ If you resize a hollowed body later, layerling hollows it again at the new size 
 
 - {{ui:lid.type.plug}}: a plate as large as the body with a lip below it that goes into the opening.
 - {{ui:lid.type.cap}}: a plate a wall wider than the body with a rim below it that goes over the outside.
+- {{ui:lid.type.both}}: a plate a wall wider than the body with both: a lip into the opening and a rim over the outside. The body's wall sits in a groove between them, like on a food container.
 - {{ui:lid.type.flat}}: only the plate, to lay on top or glue on.
 
-Then you set the {{ui:lid.thickness}}, the {{ui:lid.fit}} (the {{ui:lid.gap}} between lid and body: 0.1 mm tight, 0.2 mm normal, 0.3 mm loose, or any value up to 1 mm) and how deep the lip or rim reaches down and how thick its wall is. Click {{ui:lid.apply}}: the lid lies beside the body, turned over with its plate down, so it prints without support. The body stays as it is. The lid follows any outline, round or angular, because it is taken from the body itself just below its rim. A body without an opening at the top only gets a flat lid; for the other two, hollow it with the top open first.
+Then you set the {{ui:lid.thickness}}, the {{ui:lid.fit}} (the {{ui:lid.gap}} between lid and body: 0.1 mm tight, 0.2 mm normal, 0.3 mm loose, or any value up to 1 mm) and how deep the lip or rim reaches down and how thick its wall is. Click {{ui:lid.apply}}: the lid lies beside the body, turned over with its plate down, so it prints without support. The body stays as it is. The lid follows any outline, round or angular, because it is taken from the body itself just below its rim. A body without an opening at the top only gets a flat lid; for the others, hollow it with the top open first.
 
 > **Tip:** How tight a lid sits depends on the printer. Print a small box with its lid first; if the lid is too tight, take the next looser fit.
 

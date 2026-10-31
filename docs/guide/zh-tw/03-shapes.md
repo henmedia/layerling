@@ -86,7 +86,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 - **匯出 STEP 時。** 它寫出的是圓形，而不是多邊形。
 - **套用倒角與圓角時**（{{ui:editor.tool.chamfer}}、{{ui:editor.tool.fillet}}），只要形狀保持圓形。未設定邊數、邊數不少於該形狀的預設值，或多邊形與圓的偏差最多 {{value:EXACT_ROUND_TOLERANCE}} mm 時，就是這種情況。預設值為 {{value:ROUND_FROM_SIDES}} 邊（圓柱、橢圓、管與圓錐）、{{value:ROUND_FROM_ROOF_SIDES}} 邊的 {{ui:shape.roundRoof}}、{{value:ROUND_FROM_SPHERE_STEPS}} 段的 {{ui:shape.sphere}}、{{value:ROUND_FROM_HALF_SPHERE_STEPS}} 段的 {{ui:shape.halfSphere}} 與 {{ui:shape.paraboloid}}、{{value:ROUND_FROM_TORUS_SIDES}} 邊與 {{value:ROUND_FROM_TORUS_STEPS}} 段的 {{ui:shape.torus}}，以及 {{ui:prop.quality}} 為 {{value:ROUND_FROM_BENT_TUBE_QUALITY}} 的圓形 {{ui:shape.bentTube}}。
-- **螺紋、彈簧或斜齒輪。** 邊緣工具與 STEP 匯出採用它的精確實體；{{ui:prop.quality}} 只決定繪製得多精細。
+- **螺紋、彈簧、斜齒輪或人字齒輪。** 邊緣工具與 STEP 匯出採用它的精確實體；{{ui:prop.quality}} 只決定繪製得多精細。
 
 **邊數又變得重要的情況**
 

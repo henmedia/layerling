@@ -95,7 +95,7 @@ La griglia mostra le dimensioni della piastra. In basso a destra trovi il **pass
 
 ### La finestra delle impostazioni
 
-L’ingranaggio nella barra multifunzione ({{ui:editor.workspaceSettings}}) apre le impostazioni. A sinistra trovi cinque sezioni: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} e {{ui:workspace.history}}. Ogni modifica viene applicata subito. {{ui:workspace.makeDefault}} in fondo salva le impostazioni correnti come predefinite, così i nuovi progetti iniziano con quelle; {{ui:workspace.close}} in alto a destra chiude la finestra. Di seguito sono descritte le opzioni una per una.
+L’ingranaggio nella riga del titolo ({{ui:editor.workspaceSettings}}) apre le impostazioni. A sinistra trovi cinque sezioni: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} e {{ui:workspace.history}}. Ogni modifica viene applicata subito. {{ui:workspace.makeDefault}} in fondo salva le impostazioni correnti come predefinite, così i nuovi progetti iniziano con quelle; {{ui:workspace.close}} in alto a destra chiude la finestra. Di seguito sono descritte le opzioni una per una.
 
 ### Aspetto: tema, barra degli strumenti e cubo di visualizzazione
 

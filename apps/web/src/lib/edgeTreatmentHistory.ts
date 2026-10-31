@@ -1,3 +1,4 @@
+import { bentTubeSettings } from "@/lib/bentTubeGeometry";
 import { canonicalizeShape, hollowStretchSincePicture } from "@/lib/workplaneShapes";
 import type { EdgeTreatmentHistoryEntry, WorkplaneShape } from "@/types/layerling";
 
@@ -62,6 +63,19 @@ export function wasGroupBeforeEdgeTreatments(shape: WorkplaneShape) {
 export function groupBeforeEdgeTreatments(shape: WorkplaneShape): WorkplaneShape | null {
   if (!wasGroupBeforeEdgeTreatments(shape)) return null;
   return restoreShapeBeforeEdgeTreatment(shape, shape.edgeTreatmentHistory![0]);
+}
+
+/**
+ * The tube, ring or bent tube such a body was before its first fillet or chamfer, with the body's own place and size;
+ * null when it was none. Its bore still cuts what the body is grouped with (#1067): the fillet made it one mesh,
+ * and the mesh alone has no bore to hand on.
+ */
+export function tubeBeforeEdgeTreatments(shape: WorkplaneShape): WorkplaneShape | null {
+  const first = shape.edgeTreatmentHistory?.[0];
+  if (!shape.importedMesh || shape.groupedShapes?.length || !first) return null;
+  const before = first.before;
+  const hollow = before.kind === "tube" || before.kind === "ring" || (before.kind === "bentTube" && bentTubeSettings(before).innerProfile !== "none");
+  return hollow ? restoreShapeBeforeEdgeTreatment(shape, first) : null;
 }
 
 export function restoreShapeBeforeEdgeTreatment(shape: WorkplaneShape, entry: EdgeTreatmentHistoryEntry) {

@@ -34,7 +34,7 @@ Para hacer una copia de un solo diseño, ve al editor: haz clic en {{ui:editor.e
 
 ## Archivos adjuntos
 
-Instrucciones, una lista de piezas, notas, una foto o una hoja de datos pueden quedarse con el diseño como archivos. {{ui:editor.attachments}} en la barra {{ui:editor.group.manage}}, el clip, abre la lista; un puntito en el clip indica que el diseño tiene alguno.
+Instrucciones, una lista de piezas, notas, una foto o una hoja de datos pueden quedarse con el diseño como archivos. {{ui:editor.attachments}} en la barra {{ui:editor.group.file}}, el clip, abre la lista; un puntito en el clip indica que el diseño tiene alguno.
 
 - **{{ui:attachments.upload}}:** elige uno o varios archivos: `.md` (Markdown) o `.txt` como texto plano (UTF-8), imágenes `.png`, `.jpg`, `.jpeg` o `.webp`, o documentos `.pdf`. Cada archivo se comprueba por su contenido, así que uno que no es lo que dice su nombre se rechaza, y otros tipos, entre ellos `.svg`, no se pueden adjuntar. Un archivo de texto puede tener como mucho 2 MB, una imagen 16 MB y un PDF 32 MB; un diseño admite hasta 32 archivos y 64 MB en total.
 - **La lista:** la flecha descarga un archivo tal como se subió. La papelera lo quita; la fila pregunta una vez más antes, y un archivo quitado no se recupera con deshacer, porque los adjuntos no forman parte del historial de deshacer.

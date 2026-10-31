@@ -34,7 +34,7 @@ Vous sauvegardez un seul dessin dans l'éditeur : {{ui:editor.export}}, choisiss
 
 ## Pièces jointes
 
-Des instructions, une liste de pièces, des notes, une photo ou une fiche technique peuvent rester avec la création sous forme de fichiers. {{ui:editor.attachments}} dans la barre {{ui:editor.group.manage}}, le trombone, ouvre la liste ; un petit point sur le trombone indique que la création en a.
+Des instructions, une liste de pièces, des notes, une photo ou une fiche technique peuvent rester avec la création sous forme de fichiers. {{ui:editor.attachments}} dans la barre {{ui:editor.group.file}}, le trombone, ouvre la liste ; un petit point sur le trombone indique que la création en a.
 
 - **{{ui:attachments.upload}} :** Choisissez un ou plusieurs fichiers : `.md` (Markdown) ou `.txt` en texte brut (UTF-8), des images `.png`, `.jpg`, `.jpeg` ou `.webp`, ou des documents `.pdf`. Un fichier est vérifié d'après son contenu : un fichier qui n'est pas ce que dit son nom est refusé, et les autres types, dont `.svg`, ne peuvent pas être joints. Un fichier texte pèse au plus 2 Mo, une image 16 Mo et un PDF 32 Mo ; une création contient jusqu'à 32 fichiers et 64 Mo au total.
 - **La liste :** La flèche télécharge un fichier tel qu'il a été envoyé. La corbeille le retire ; la ligne demande d'abord une confirmation, et un fichier retiré ne revient pas avec Annuler, car les pièces jointes ne font pas partie de l'historique d'annulation.

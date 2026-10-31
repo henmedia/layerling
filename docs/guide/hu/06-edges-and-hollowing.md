@@ -90,9 +90,10 @@ A(z) {{ui:editor.tool.lid}} fedelet készít egy felül nyitott testhez: egy nyi
 
 - {{ui:lid.type.plug}}: a testtel azonos méretű lap, alatta perem, amely a nyílásba illeszkedik.
 - {{ui:lid.type.cap}}: a testnél egy falvastagsággal szélesebb lap, alatta perem, amely kívülről öleli körbe.
+- {{ui:lid.type.both}}: a testnél egy falvastagsággal szélesebb lap, alatta mindkettő: perem a nyílásba és perem kívül körbe. A test fala a kettő közötti horonyban ül, mint egy ételtároló dobozon.
 - {{ui:lid.type.flat}}: csak a lap, ráhelyezéshez vagy ragasztáshoz.
 
-Ezután beállítod a vastagságot ({{ui:lid.thickness}}), az illesztést ({{ui:lid.fit}}, a fedél és a test közti hézagot oldalanként: 0,1 mm szoros, 0,2 mm normál, 0,3 mm laza, vagy bármely érték 1 mm-ig), valamint hogy milyen mélyre nyúlik a perem, és milyen vastag a fala. Kattints a(z) {{ui:lid.apply}} gombra: a fedél a test mellett fekszik, megfordítva, lappal lefelé, így támasz nélkül nyomtatható. A test változatlan marad. A fedél bármilyen körvonalat követ, kereket vagy szögleteset, mert közvetlenül a test pereme alatt veszi le a formát. Felül nyílás nélküli test csak lapos fedelet kaphat; a másik kettőhöz előbb üregeld ki nyitott tetővel.
+Ezután beállítod a vastagságot ({{ui:lid.thickness}}), az illesztést ({{ui:lid.fit}}, a fedél és a test közti hézagot oldalanként: 0,1 mm szoros, 0,2 mm normál, 0,3 mm laza, vagy bármely érték 1 mm-ig), valamint hogy milyen mélyre nyúlik a perem, és milyen vastag a fala. Kattints a(z) {{ui:lid.apply}} gombra: a fedél a test mellett fekszik, megfordítva, lappal lefelé, így támasz nélkül nyomtatható. A test változatlan marad. A fedél bármilyen körvonalat követ, kereket vagy szögleteset, mert közvetlenül a test pereme alatt veszi le a formát. Felül nyílás nélküli test csak lapos fedelet kaphat; a többihez előbb üregeld ki nyitott tetővel.
 
 > **Tipp:** Hogy milyen szorosan ül a fedél, az a nyomtatótól függ. Előbb nyomtass egy kis dobozt fedéllel; ha túl szoros, válaszd a következő, lazább illesztést.
 

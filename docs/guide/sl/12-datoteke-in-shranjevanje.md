@@ -34,7 +34,7 @@ Posamezen načrt shraniš v urejevalniku: {{ui:editor.export}}, nato izberi obli
 
 ## Priloge
 
-Navodila, seznam delov, opombe, fotografija ali podatkovni list lahko ostanejo pri projektu kot datoteke. {{ui:editor.attachments}} v vrstici {{ui:editor.group.manage}}, sponka, odpre seznam; majhna pika na sponki pokaže, da jih projekt ima.
+Navodila, seznam delov, opombe, fotografija ali podatkovni list lahko ostanejo pri projektu kot datoteke. {{ui:editor.attachments}} v vrstici {{ui:editor.group.file}}, sponka, odpre seznam; majhna pika na sponki pokaže, da jih projekt ima.
 
 - **{{ui:attachments.upload}}:** Izberi eno ali več datotek: `.md` (Markdown) ali `.txt` kot navadno besedilo (UTF-8), slike `.png`, `.jpg`, `.jpeg` ali `.webp` ali dokumente `.pdf`. Datoteka se preveri po vsebini, zato je datoteka, ki ni to, kar pravi njeno ime, zavrnjena, drugih vrst, med njimi `.svg`, pa ni mogoče priložiti. Besedilna datoteka ima lahko največ 2 MB, slika 16 MB in PDF 32 MB; projekt sprejme do 32 datotek in skupaj 64 MB.
 - **Seznam:** Puščica prenese datoteko, kakršna je bila naložena. Koš jo odstrani; vrstica prej še enkrat vpraša, odstranjene datoteke pa ni mogoče vrniti z razveljavitvijo, ker priloge niso del zgodovine razveljavitev.

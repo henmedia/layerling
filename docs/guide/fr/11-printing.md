@@ -5,7 +5,7 @@ summary: Choisir sa propre imprimante, être averti lorsque quelque chose ne ren
 
 ## Choisir votre imprimante
 
-Ouvrez les paramètres (la roue dentée dans le ruban, {{ui:editor.workspaceSettings}}) et passez à la zone {{ui:workspace.workplane}}. Sous {{ui:workspace.printer}}, vous choisissez votre imprimante parmi une liste de plus de 230 modèles courants, dont Bambu Lab, Prusa, Creality, Anycubic, Elegoo et bien d'autres.
+Ouvrez les paramètres (la roue dentée dans la ligne de titre, {{ui:editor.workspaceSettings}}) et passez à la zone {{ui:workspace.workplane}}. Sous {{ui:workspace.printer}}, vous choisissez votre imprimante parmi une liste de plus de 230 modèles courants, dont Bambu Lab, Prusa, Creality, Anycubic, Elegoo et bien d'autres.
 
 ![Les paramètres du plan de travail avec une imprimante choisie. Le lit d'impression et la hauteur d'impression maximale proviennent du profil de trancheuse.](shot:settings-workplane)
 

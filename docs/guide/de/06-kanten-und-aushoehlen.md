@@ -91,9 +91,10 @@ Auch ein Körper mit einer Tasche lässt sich aushöhlen, etwa ein Block mit ein
 
 - {{ui:lid.type.plug}}: eine Platte so groß wie der Körper, darunter eine Lippe, die in die Öffnung greift.
 - {{ui:lid.type.cap}}: eine Platte eine Wand breiter als der Körper, darunter ein Rand, der außen herum greift.
+- {{ui:lid.type.both}}: eine Platte eine Wand breiter als der Körper mit beidem: einer Lippe in die Öffnung und einem Rand außen herum. Die Wand des Körpers sitzt dazwischen in einer Nut, wie bei einer Frischhaltedose.
 - {{ui:lid.type.flat}}: nur die Platte, zum Auflegen oder Ankleben.
 
-Dann stellst du die {{ui:lid.thickness}} ein, die {{ui:lid.fit}} (den {{ui:lid.gap}} zwischen Deckel und Körper: 0,1 mm stramm, 0,2 mm normal, 0,3 mm locker, oder jeden Wert bis 1 mm) und wie tief Lippe oder Rand nach unten reichen und wie dick ihre Wand ist. Klicke auf {{ui:lid.apply}}: Der Deckel liegt neben dem Körper, umgedreht mit der Platte nach unten, so druckt er ohne Stützen. Der Körper bleibt, wie er ist. Der Deckel folgt jedem Umriss, rund oder eckig, weil er dem Körper selbst knapp unter seinem Rand abgenommen wird. Ein Körper ohne Öffnung oben bekommt nur einen flachen Deckel; für die beiden anderen höhle ihn zuerst mit offener Oberseite aus.
+Dann stellst du die {{ui:lid.thickness}} ein, die {{ui:lid.fit}} (den {{ui:lid.gap}} zwischen Deckel und Körper: 0,1 mm stramm, 0,2 mm normal, 0,3 mm locker, oder jeden Wert bis 1 mm) und wie tief Lippe oder Rand nach unten reichen und wie dick ihre Wand ist. Klicke auf {{ui:lid.apply}}: Der Deckel liegt neben dem Körper, umgedreht mit der Platte nach unten, so druckt er ohne Stützen. Der Körper bleibt, wie er ist. Der Deckel folgt jedem Umriss, rund oder eckig, weil er dem Körper selbst knapp unter seinem Rand abgenommen wird. Ein Körper ohne Öffnung oben bekommt nur einen flachen Deckel; für die anderen höhle ihn zuerst mit offener Oberseite aus.
 
 > **Tipp:** Wie stramm ein Deckel sitzt, hängt vom Drucker ab. Drucke zuerst eine kleine Kiste mit Deckel; sitzt er zu fest, nimm die nächst lockerere Passung.
 

@@ -5,7 +5,7 @@ summary: Como escolher a sua impressora, ser avisado quando algo não cabe e dei
 
 ## Escolhendo a sua impressora
 
-Abra as configurações (a engrenagem na área {{ui:editor.group.manage}} da barra de opções, {{ui:editor.workspaceSettings}}) e vá para a área {{ui:workspace.workplane}}. Em {{ui:workspace.printer}} você escolhe a sua impressora numa lista de mais de 230 modelos comuns, entre eles Bambu Lab, Prusa, Creality, Anycubic, Elegoo e muitos outros.
+Abra as configurações (a engrenagem na linha do título, {{ui:editor.workspaceSettings}}) e vá para a área {{ui:workspace.workplane}}. Em {{ui:workspace.printer}} você escolhe a sua impressora numa lista de mais de 230 modelos comuns, entre eles Bambu Lab, Prusa, Creality, Anycubic, Elegoo e muitos outros.
 
 ![As configurações do plano de trabalho com uma impressora escolhida. A mesa de impressão e a altura máxima de impressão vêm do perfil do fatiador.](shot:settings-workplane)
 

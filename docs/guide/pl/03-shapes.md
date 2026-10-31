@@ -90,7 +90,7 @@ Okrągłe kształty, takie jak walec, stożek, rura, elipsa albo otwory, mają w
 
 - **W eksporcie STEP.** Zapisuje on okrągły kształt, a nie wielokąt.
 - **Przy fazowaniu i zaokrąglaniu** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}), dopóki kształt pozostaje okrągły. Tak jest, gdy nie ustawiłeś liczby boków, gdy liczba jest co najmniej domyślna dla kształtu albo gdy wielokąt odbiega od okręgu najwyżej o {{value:EXACT_ROUND_TOLERANCE}} mm. Domyślnie to {{value:ROUND_FROM_SIDES}} boków dla walca, elipsy, rury i stożka, {{value:ROUND_FROM_ROOF_SIDES}} dla kształtu {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} kroków dla kształtu {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} dla kształtów {{ui:shape.halfSphere}} i {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} boków i {{value:ROUND_FROM_TORUS_STEPS}} kroków dla kształtu {{ui:shape.torus}} oraz {{ui:prop.quality}} {{value:ROUND_FROM_BENT_TUBE_QUALITY}} dla okrągłej rury typu {{ui:shape.bentTube}}.
-- **Przy gwincie, sprężynie albo kole o zębach skośnych.** Narzędzie krawędzi i eksport STEP biorą ich dokładną bryłę, a {{ui:prop.quality}} ustawia tylko, jak dokładnie są rysowane.
+- **Przy gwincie, sprężynie, kole o zębach skośnych albo kole daszkowym.** Narzędzie krawędzi i eksport STEP biorą ich dokładną bryłę, a {{ui:prop.quality}} ustawia tylko, jak dokładnie są rysowane.
 
 **Kiedy znów ma znaczenie**
 

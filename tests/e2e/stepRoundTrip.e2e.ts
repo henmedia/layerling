@@ -404,6 +404,27 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     expect(near(await reimportVolume(blob), expected, 1e-4)).toBe(true);
   });
 
+  it("exports a herringbone gear and a herringbone pocket as their exact bodies, each side in two halves (#1007)", async () => {
+    const { cadModifierHelicalGearForShape } = await import("@/lib/cadProfileExtrusion");
+    const { helicalGearPartSolid } = await import("@/lib/gearSolid");
+    const { occtKernel } = await import("@/lib/brepKernel");
+    const gear = (overrides: Partial<WorkplaneShape>) => shape({ kind: "gear", gearType: "herringbone", width: 30, depth: 30, size: 30, height: 6, teeth: 12, toothSize: 2.5, centerHoleSize: 6, helixAngle: 22.5, ...overrides });
+    const herringbone = gear({ name: "Herringbone", x: -40, rotation: 20 });
+    const block = shape({ kind: "box", name: "Block", x: 50, width: 40, depth: 40, height: 6 });
+    const pocket = gear({ name: "Pocket", x: 50, hole: true, helixAngle: -15 });
+
+    const { blob, exportedCount, skipped } = await exportShapesToStep([herringbone, block, pocket]);
+    expect(skipped).toEqual([]);
+    expect(exportedCount).toBe(2);
+    const kernel = occtKernel()!;
+    const volume = (source: WorkplaneShape) => kernel.getVolume(helicalGearPartSolid(kernel, cadModifierHelicalGearForShape(source)!));
+    expect(near(await reimportVolume(blob), volume(herringbone) + 40 * 40 * 6 - volume(pocket), 1e-4)).toBe(true);
+    // A helical gear would have the same volume; its 48 sides are one face each, the herringbone's two.
+    const alone = await exportShapesToStep([herringbone]);
+    const faces = kernel.getSubShapes(kernel.importStep(await alone.blob.text()), "face").length;
+    expect(faces).toBe(2 * 48 + 3);
+  });
+
   it("exports a Gridfinity bin and baseplate as their exact bodies", async () => {
     const { cadModifierGridfinityForShape } = await import("@/lib/cadProfileExtrusion");
     const { gridfinityPartSolid } = await import("@/lib/gridfinitySolid");

@@ -19,7 +19,7 @@ layerling 是一款直接在浏览器里运行的 3D 打印设计程序。你用
 
 ![编辑器的工作平面上有两个形状。上方是功能区，左侧是相机控制，右侧是所选形状的设置。](shot:editor-overview)
 
-- **上方**是功能区。它按任务分类：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}}、{{ui:editor.group.manage}} 和 {{ui:editor.group.help}}。把鼠标停在图标上就能看到名称。凡是看到小问号的地方，比如形状的设置里、形状库中或工具面板里，它都会直接带你到本指南对应的章节。
+- **上方**是功能区。它按任务分类：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}}、{{ui:editor.group.file}} 和 {{ui:editor.group.help}}。把鼠标停在图标上就能看到名称。凡是看到小问号的地方，比如形状的设置里、形状库中或工具面板里，它都会直接带你到本指南对应的章节。
 - **中间**是工作平面。你在这里放置形状、把它们拉成想要的形状，并看到结果。
 - **右侧**显示所选形状的设置：颜色、尺寸、位置以及组成该形状的其他内容。输入数字比拖动更精确。
 - **左侧**是相机控制，上方是视图立方体。它们带你在这个场景中移动，详见[视图与工作平面](chapter:view-and-workplane)。

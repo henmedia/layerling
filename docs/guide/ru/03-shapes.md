@@ -88,7 +88,7 @@ summary: Библиотека фигур, размеры числами и ма�
 
 - При экспорте STEP. Экспорт записывает круглую форму, а не многоугольник.
 - Для фасок и скруглений ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}), пока фигура остаётся круглой. Так бывает, если число сторон не задано, если оно не меньше значения фигуры по умолчанию или если многоугольник отклоняется от круга не более чем на {{value:EXACT_ROUND_TOLERANCE}} мм. По умолчанию: {{value:ROUND_FROM_SIDES}} сторон для цилиндра, эллипса, трубы и конуса, {{value:ROUND_FROM_ROOF_SIDES}} для {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} шагов для {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} для {{ui:shape.halfSphere}} и {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} сторон и {{value:ROUND_FROM_TORUS_STEPS}} шагов для {{ui:shape.torus}} и {{ui:prop.quality}} со значением {{value:ROUND_FROM_BENT_TUBE_QUALITY}} для круглой {{ui:shape.bentTube}}.
-- Для резьбы, пружины или косозубой шестерни. Инструмент кромок и экспорт STEP берут её точное тело; её {{ui:prop.quality}} задаёт только то, насколько мелко она нарисована.
+- Для резьбы, пружины, косозубой или шевронной шестерни. Инструмент кромок и экспорт STEP берут её точное тело; её {{ui:prop.quality}} задаёт только то, насколько мелко она нарисована.
 
 Где это снова важно
 

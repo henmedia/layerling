@@ -10,6 +10,7 @@ describe("lid options (#1009)", () => {
   it("takes the kind in any case and keeps the default for an unknown one", () => {
     expect(normalizeLidOptions({ type: " CAP " }).type).toBe("cap");
     expect(normalizeLidOptions({ type: "flat" }).type).toBe("flat");
+    expect(normalizeLidOptions({ type: "Both" }).type).toBe("both");
     expect(normalizeLidOptions({ type: "thread" }).type).toBe("plug");
   });
 

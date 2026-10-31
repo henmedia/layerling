@@ -276,12 +276,15 @@ export type CadModifierSpringPart = {
  * face between the helices of its two corners; the result stretched by
  * `stretch` (x and z) as the mesh is, then the straight round bore cut
  * through it. Built in the shape's own frame (y up, the foot at y = 0);
- * `transform` places it.
+ * `transform` places it. A herringbone gear's corners turn by half the
+ * twist up to the middle and back.
  */
 export type CadModifierHelicalGearPart = {
   corners: Array<{ angle: number; radius: number }>;
   /** Radians; the corners turn from +x towards +z as they rise when positive. */
   twist: number;
+  /** A herringbone gear: the corners turn by half the twist up to the middle and back to where they began at the top. */
+  herringbone?: boolean;
   height: number;
   stretch: { x: number; z: number };
   /** 0 for none. */

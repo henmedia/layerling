@@ -89,9 +89,10 @@ Verander je later de maat van een uitgehold lichaam, dan holt layerling het mete
 
 - {{ui:lid.type.plug}}: een plaat zo groot als de vorm met eronder een lip die in de opening grijpt.
 - {{ui:lid.type.cap}}: een plaat een wand breder dan de vorm met eronder een rand die om de buitenkant grijpt.
+- {{ui:lid.type.both}}: een plaat een wand breder dan de vorm met allebei: een lip in de opening en een rand om de buitenkant. De wand van de vorm zit daartussen in een groef, zoals bij een vershouddoos.
 - {{ui:lid.type.flat}}: alleen de plaat, om erop te leggen of te lijmen.
 
-Daarna stel je de {{ui:lid.thickness}} in, de {{ui:lid.fit}} (de {{ui:lid.gap}} tussen deksel en vorm: 0,1 mm strak, 0,2 mm normaal, 0,3 mm ruim, of elke waarde tot 1 mm) en hoe diep de lip of rand naar beneden reikt en hoe dik de wand is. Klik op {{ui:lid.apply}}: het deksel ligt naast de vorm, omgedraaid met de plaat naar beneden, zodat het zonder support print. De vorm blijft zoals hij is. Het deksel volgt elke omtrek, rond of hoekig, omdat het vlak onder de rand van de vorm zelf wordt afgenomen. Een vorm zonder opening bovenaan krijgt alleen een plat deksel; hol hem voor de andere twee eerst uit met de bovenkant open.
+Daarna stel je de {{ui:lid.thickness}} in, de {{ui:lid.fit}} (de {{ui:lid.gap}} tussen deksel en vorm: 0,1 mm strak, 0,2 mm normaal, 0,3 mm ruim, of elke waarde tot 1 mm) en hoe diep de lip of rand naar beneden reikt en hoe dik de wand is. Klik op {{ui:lid.apply}}: het deksel ligt naast de vorm, omgedraaid met de plaat naar beneden, zodat het zonder support print. De vorm blijft zoals hij is. Het deksel volgt elke omtrek, rond of hoekig, omdat het vlak onder de rand van de vorm zelf wordt afgenomen. Een vorm zonder opening bovenaan krijgt alleen een plat deksel; hol hem voor de andere eerst uit met de bovenkant open.
 
 > **Tip:** Hoe strak een deksel zit, hangt van de printer af. Print eerst een kleine doos met deksel; zit het te strak, neem dan de volgende ruimere passing.
 

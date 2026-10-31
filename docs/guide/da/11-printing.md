@@ -5,7 +5,7 @@ summary: Vælg din egen printer, bliv advaret når noget ikke passer, og læg de
 
 ## Vælg din printer
 
-Åbn indstillingerne (tandhjulet i båndet, {{ui:editor.workspaceSettings}}) og skift til området {{ui:workspace.workplane}}. Under {{ui:workspace.printer}} vælger du din printer fra en liste på over 230 almindelige modeller, herunder Bambu Lab, Prusa, Creality, Anycubic, Elegoo og mange flere.
+Åbn indstillingerne (tandhjulet i titellinjen, {{ui:editor.workspaceSettings}}) og skift til området {{ui:workspace.workplane}}. Under {{ui:workspace.printer}} vælger du din printer fra en liste på over 230 almindelige modeller, herunder Bambu Lab, Prusa, Creality, Anycubic, Elegoo og mange flere.
 
 ![Arbejdsplan-indstillingerne med en printer valgt. Printleje og maksimale printhøjde kommer fra slicer-profilen.](shot:settings-workplane)
 

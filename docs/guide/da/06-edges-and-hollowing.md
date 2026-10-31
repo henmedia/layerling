@@ -92,9 +92,10 @@ Hvis du ændrer størrelse på en udhulet form senere, udhuler layerling den ige
 
 - {{ui:lid.type.plug}}: en plade så stor som legemet med en læbe nedenunder, der går ind i åbningen.
 - {{ui:lid.type.cap}}: en plade en væg bredere end legemet med en kant nedenunder, der går uden om.
+- {{ui:lid.type.both}}: en plade en væg bredere end legemet med begge dele: en læbe ned i åbningen og en kant uden om. Legemets væg sidder i en rille mellem dem, som på en madkasse.
 - {{ui:lid.type.flat}}: kun pladen, til at lægge ovenpå eller lime på.
 
-Derefter indstiller du tykkelsen ({{ui:lid.thickness}}), pasningen ({{ui:lid.fit}}, spalten pr. side mellem låg og legeme: 0,1 mm stramt, 0,2 mm normalt, 0,3 mm løst eller enhver værdi op til 1 mm) og hvor dybt læben eller kanten når ned, og hvor tyk dens væg er. Klik på {{ui:lid.apply}}: låget ligger ved siden af legemet, vendt med pladen nedad, så det printes uden støtte. Legemet forbliver, som det er. Låget følger enhver omrids, rundt eller kantet, fordi det tages fra selve legemet lige under dets kant. Et legeme uden åbning foroven får kun et fladt låg; til de to andre skal du først udhule det med åben top.
+Derefter indstiller du tykkelsen ({{ui:lid.thickness}}), pasningen ({{ui:lid.fit}}, spalten pr. side mellem låg og legeme: 0,1 mm stramt, 0,2 mm normalt, 0,3 mm løst eller enhver værdi op til 1 mm) og hvor dybt læben eller kanten når ned, og hvor tyk dens væg er. Klik på {{ui:lid.apply}}: låget ligger ved siden af legemet, vendt med pladen nedad, så det printes uden støtte. Legemet forbliver, som det er. Låget følger enhver omrids, rundt eller kantet, fordi det tages fra selve legemet lige under dets kant. Et legeme uden åbning foroven får kun et fladt låg; til de andre skal du først udhule det med åben top.
 
 > **Tip:** Hvor stramt et låg sidder, afhænger af printeren. Print først en lille kasse med låg; sidder det for stramt, så vælg den næste, løsere pasning.
 

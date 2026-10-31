@@ -187,3 +187,87 @@ describe("the helical and bevel gears' exact bodies", () => {
   });
 });
 
+describe("the herringbone gear's exact body (#1007)", () => {
+  const herringbone = (extra: Partial<WorkplaneShape> = {}) => gear({ gearType: "herringbone", ...extra });
+  const cases: Array<[string, Partial<WorkplaneShape>]> = [
+    ["default herringbone gear", {}],
+    ["herringbone gear turned the other way", { helixAngle: -30 }],
+    ["herringbone gear of 64 teeth at -45 degrees", { teeth: 64, helixAngle: -45, toothSize: 1 }],
+    ["herringbone gear of 7 teeth at 5 degrees, stretched unevenly as drawn", { teeth: 7, helixAngle: 5 }],
+    ["herringbone gear of 12 teeth at 10 degrees, stretched as drawn", { toothWidth: 4, helixAngle: 10 }],
+    ["herringbone gear at 0 degrees", { helixAngle: 0 }],
+    ["herringbone gear without a bore, tall", { centerHoleSize: 0, height: 25 }],
+    ["herringbone gear turned, tipped and lifted", { rotation: 30, rotationX: 90, rotationZ: 15, elevation: 4, x: 12, z: -5 }],
+    ["herringbone gear mirrored left to right", { mirrorX: true, helixAngle: -20 }],
+    ["herringbone gear mirrored front to back", { mirrorZ: true }],
+    ["involute herringbone gear", { width: 28, depth: 28, size: 28, gearProfile: "involute", gearPressureAngle: 20, gearBacklash: 0.2, centerHoleSize: 5, helixAngle: 20 }],
+    ["involute herringbone gear turned the other way, mirrored", { width: 28, depth: 28, size: 28, gearProfile: "involute", gearPressureAngle: 20, gearBacklash: 0.2, centerHoleSize: 5, helixAngle: -25, mirrorX: true }],
+    ["round herringbone gear", { width: 26.4, depth: 26.4, size: 26.4, gearProfile: "round", gearBacklash: 0.2, centerHoleSize: 5, helixAngle: 20 }],
+  ];
+
+  it.each(cases)("matches the drawn %s", (_name, extra) => {
+    const shape = herringbone(extra);
+    const started = performance.now();
+    const solid = body(shape);
+    const seconds = (performance.now() - started) / 1000;
+    expect(cad.isValid(solid)).toBe(true);
+    const expected = displayMesh(shape);
+    expect(cadProfileSolidMismatch(cad, solid, expected)).toBeNull();
+    const box = cad.getBoundingBox(solid);
+    [box.xmin, box.ymin, box.zmin, box.xmax, box.ymax, box.zmax].forEach((value, index) => expect(Math.abs(value - expected.bounds[index])).toBeLessThan(0.01));
+    // Volume and bounds cannot tell a herringbone from a helical gear: the sections at five heights can.
+    const volume = cad.getVolume(solid);
+    expect(Math.abs(volume - outlineVolume(shape)) / volume).toBeLessThan(1e-5);
+    expect(Math.abs(expected.volume - volume) / volume).toBeLessThan(0.01);
+    const inside = surfaceSides(solid);
+    const points = sectionPoints(shape, 0.02);
+    for (const { p, inside: expectInside } of points) expect(inside(p, 0.5)).toBe(expectInside);
+    expect(points.length).toBeGreaterThan(80);
+    expect(seconds).toBeLessThan(20);
+  });
+
+  it("is one face a side at 0 degrees, as the helical gear is, with no seam in the middle", () => {
+    const flat = body(herringbone({ helixAngle: 0 }));
+    const helical = body(gear({ helixAngle: 0 }));
+    expect(cad.getSubShapes(flat, "face").length).toBe(cad.getSubShapes(helical, "face").length);
+    expect(cad.getSubShapes(flat, "edge").length).toBe(cad.getSubShapes(helical, "edge").length);
+    // Turned, each side is two faces: one for each half.
+    expect(cad.getSubShapes(body(herringbone()), "face").length).toBe(2 * 48 + 3);
+  });
+
+  it("builds the same exact herringbone gear at any quality, which only sets how finely the turn is drawn", () => {
+    const coarse = herringbone({ helixQuality: MIN_GEAR_HELIX_QUALITY, helixAngle: 45 });
+    const solid = body(coarse);
+    expect(cadProfileSolidMismatch(cad, solid, displayMesh(coarse))).toBeNull();
+    expect(Math.abs(cad.getVolume(solid) - cad.getVolume(body(herringbone({ helixQuality: MAX_GEAR_HELIX_QUALITY, helixAngle: 45 }))))).toBeLessThan(1e-6 * cad.getVolume(solid));
+  });
+
+  it("takes a fillet on its ends and on the flanks where the halves meet", () => {
+    const solid = body(herringbone());
+    const flat = (edge: ShapeHandle, y: number) => {
+      const box = cad.getBoundingBox(edge);
+      return box.ymax - box.ymin < 1e-6 && Math.abs(box.ymin - y) < 1e-6;
+    };
+    const ends = cad.getSubShapes(solid, "edge").filter((edge) => flat(edge, 0) || flat(edge, 6));
+    expect(ends.length).toBeGreaterThanOrEqual(98);
+    const rounded = cad.fillet(solid, ends, 0.5);
+    expect(cad.isValid(rounded)).toBe(true);
+    expect(cad.getVolume(rounded)).toBeLessThan(cad.getVolume(solid));
+    // In the middle a flank runs from the foot to the tip and turns back there, a ridge on one side of a tooth and a
+    // valley on the other; the tip and the foot run on almost smoothly.
+    const reach = (edge: ShapeHandle) => cad.getSubShapes(edge, "vertex").map((vertex) => {
+      const { x, z } = cad.vertexPosition(vertex);
+      return Math.hypot(x, z);
+    });
+    const flanks = cad.getSubShapes(solid, "edge").filter((edge) => {
+      if (!flat(edge, 3)) return false;
+      const [a, b] = reach(edge);
+      return Math.abs(a - b) > 0.5;
+    });
+    expect(flanks).toHaveLength(12 * 2);
+    const middle = cad.fillet(solid, flanks, 0.3);
+    expect(cad.isValid(middle)).toBe(true);
+    // A rounding face for every flank.
+    expect(cad.getSubShapes(middle, "face").length).toBe(cad.getSubShapes(solid, "face").length + flanks.length);
+  });
+});

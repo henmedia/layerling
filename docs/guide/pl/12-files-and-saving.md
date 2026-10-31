@@ -34,7 +34,7 @@ Pojedynczy projekt zapisujesz w edytorze: {{ui:editor.export}}, wybierz format *
 
 ## Załączniki
 
-Instrukcja, lista części, notatki, zdjęcie albo karta katalogowa mogą zostać przy projekcie jako pliki. {{ui:editor.attachments}} na pasku {{ui:editor.group.manage}}, spinacz, otwiera listę. Mała kropka na spinaczu pokazuje, że projekt jakieś ma.
+Instrukcja, lista części, notatki, zdjęcie albo karta katalogowa mogą zostać przy projekcie jako pliki. {{ui:editor.attachments}} na pasku {{ui:editor.group.file}}, spinacz, otwiera listę. Mała kropka na spinaczu pokazuje, że projekt jakieś ma.
 
 - **{{ui:attachments.upload}}:** wybierz jeden plik lub kilka: `.md` (Markdown) albo `.txt` jako zwykły tekst (UTF-8), obrazy `.png`, `.jpg`, `.jpeg` albo `.webp` lub dokumenty `.pdf`. Plik jest sprawdzany po zawartości, więc plik, który nie jest tym, co mówi jego nazwa, zostaje odrzucony, a innych typów, w tym `.svg`, nie da się załączyć. Plik tekstowy może mieć najwyżej 2 MB, obraz 16 MB, a PDF 32 MB. Projekt mieści do 32 plików i łącznie 64 MB.
 - **Lista:** strzałka pobiera plik tak, jak został wgrany. Kosz go usuwa. Wiersz najpierw pyta jeszcze raz, a usuniętego pliku nie da się przywrócić cofaniem, bo załączniki nie należą do historii cofania.

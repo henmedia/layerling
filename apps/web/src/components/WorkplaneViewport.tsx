@@ -14,6 +14,8 @@ import * as THREE from "three";
 import { triangleTouchesRect, type ScreenRect } from "@/lib/screenRectHit";
 import { FramingSquareIcon } from "@/components/FramingSquareIcon";
 import { GridEyeIcon } from "@/components/GridEyeIcon";
+import { ToolbarNoteIcon } from "@/components/toolbarIcons";
+import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
@@ -77,6 +79,7 @@ import { pivotHeightRange, pivotPlateReach } from "@/lib/zoomPivot";
 import { pointerReach } from "@/lib/pointerReach";
 import { boxSnapSpots, measurementMiddle, nearestReferenceOnScreen, type ReferencePosition } from "@/lib/referencePoints";
 import { type PivotPoint } from "@/lib/rotationPivot";
+import { pivotSnapCentre } from "@/lib/pivotSnap";
 import { overhangDownwardLimit } from "@/lib/overhangLimits";
 import { rotatedGeometryShapePatch, rotationPatchFromQuaternion as sharedRotationPatchFromQuaternion, signedDegrees } from "@/lib/geometryRotation";
 import type { CadModifierEdge } from "@/lib/cadModifierTypes";
@@ -88,7 +91,7 @@ import { syncHistoryPickHighlight, syncPickHighlight } from "@/components/workpl
 import { orbitViewBy, panViewBy } from "@/lib/viewArrowKeys";
 import { useViewportKeyboardHooks } from "@/components/workplane/viewportKeyboard";
 import { useViewportDoubleClick } from "@/components/workplane/useViewportDoubleClick";
-import { aimPickRay, firstShapeHit, pickImagePoint, pickLayFlatFace, pickMateFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
+import { aimPickRay, firstShapeHit, pickImagePoint, pickLayFlatFace, pickMateFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeMovableShapeId, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
 import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
@@ -233,6 +236,10 @@ type WorkplaneViewportProps = {
   onDuplicateShapesMoved?: (ids: string[], delta: { dx: number; dz: number; delevation: number }) => void;
   notes?: WorkplaneNote[];
   notesVisible?: boolean;
+  /** The note buttons of the camera bar: put a note, show or hide them all (Stefan, 31.10.2026: they moved here from Manage). */
+  onNoteTool?: () => void;
+  onToggleNotes?: () => void;
+  noteCount?: number;
   /** Tint faces red that overhang more steeply than workspace.overhangAngle. */
   showOverhangs?: boolean;
   noteMode?: boolean;
@@ -1449,6 +1456,9 @@ export function WorkplaneViewport({
   onDuplicateShapesMoved,
   notes = EMPTY_NOTES,
   notesVisible = true,
+  onNoteTool,
+  onToggleNotes,
+  noteCount = 0,
   showOverhangs = false,
   noteMode = false,
   rotationPivot = null,
@@ -1540,6 +1550,7 @@ export function WorkplaneViewport({
   const [tapeToolsOpen, setTapeToolsOpen] = useState(false);
   const [tapeClearPending, setTapeClearPending] = useState(false);
   const [cameraControlsCollapsed, setCameraControlsCollapsed] = useState(false);
+  const cameraBarMove = useMovablePanel<HTMLDivElement>("layerling.editor.cameraBarPosition", CAMERA_BAR_PANEL);
   const language = useLanguage();
   const [orthographicView, setOrthographicView] = useState(false);
   /** The window of the second view, while it is open. */
@@ -4090,7 +4101,7 @@ export function WorkplaneViewport({
     };
     const move = (moveEvent: PointerEvent) => {
       if (moveEvent.pointerId !== event.pointerId) return;
-      const point = resolvePivotDragPoint(state, moveEvent.clientX, moveEvent.clientY, latest ?? start);
+      const point = resolvePivotDragPoint(state, moveEvent.clientX, moveEvent.clientY, latest ?? start, moveEvent.shiftKey);
       if (!point) return;
       latest = point;
       show(point);
@@ -7469,16 +7480,17 @@ export function WorkplaneViewport({
       <ViewCube getRig={getViewCubeRig} cubeRef={viewCubeRef} />
       {secondViewWindow ? <SecondViewWindow popup={secondViewWindow} threeRef={threeRef} projectId={projectId} getSelectedIds={getSelectedIds} hasSelection={selectedIds.length > 0} onClosed={closeSecondView} /> : null}
 
-      <div className={`camera-controls ${cameraControlsCollapsed ? "collapsed" : ""}`} aria-label={t("camera.controls")} data-help-section="cameraBar">
-        {cameraControlsCollapsed ? (
-          <button className="camera-controls-toggle" aria-label={t("camera.show")} title={t("camera.showShort")} aria-expanded={false} onClick={() => setCameraControlsCollapsed(false)}>
-            <ChevronRight size={24} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-        ) : (
+      <div
+        ref={cameraBarMove.panelRef}
+        className={`camera-controls ${cameraControlsCollapsed ? "collapsed" : ""} ${cameraBarMove.dragging ? "moving" : ""}`}
+        style={cameraBarMove.style}
+        aria-label={t("camera.controls")}
+        data-help-section="cameraBar"
+      >
+        <CameraBarHandle move={cameraBarMove} collapsed={cameraControlsCollapsed} onToggle={() => (cameraControlsCollapsed ? setCameraControlsCollapsed(false) : collapseCameraControls())} />
+        {cameraControlsCollapsed ? null : (
           <>
-            <button className="camera-controls-toggle" aria-label={t("camera.hide")} title={t("camera.hideShort")} aria-expanded={true} onClick={collapseCameraControls}>
-              <ChevronLeft size={24} strokeWidth={2.25} aria-hidden="true" />
-            </button>
+            <div className="camera-group">
             <button aria-label={t("camera.home")} aria-keyshortcuts="Home" title={t("camera.shortcut", { label: t("camera.home"), keys: "Home" })} onClick={resetView}>
               <Home size={24} strokeWidth={2.25} />
             </button>
@@ -7491,6 +7503,8 @@ export function WorkplaneViewport({
             >
               <Crosshair size={24} strokeWidth={2.25} />
             </button>
+            </div>
+            <div className="camera-group">
             <button className="camera-zoom-button" aria-label={t("camera.zoomIn")} aria-keyshortcuts="+" title={t("camera.shortcut", { label: t("camera.zoomIn"), keys: "+" })} onClick={() => zoomCamera(ZOOM_STEP_IN)}>
               <Plus size={28} strokeWidth={2.15} />
             </button>
@@ -7511,6 +7525,8 @@ export function WorkplaneViewport({
                 <Rotate3d size={26} strokeWidth={2.15} />
               </button>
             ) : null}
+            </div>
+            <div className="camera-group">
             <button
               className={orthographicView ? "active" : ""}
               aria-label={t("camera.orthographic")}
@@ -7536,6 +7552,8 @@ export function WorkplaneViewport({
                 <PictureInPicture2 size={24} strokeWidth={2.15} aria-hidden="true" />
               </button>
             ) : null}
+            </div>
+            <div className="camera-group">
             <div className="workplane-display-control-group">
               <button
                 className={workplaneLayerHidden ? "active" : ""}
@@ -7581,6 +7599,8 @@ export function WorkplaneViewport({
                 </button>
               ) : null}
             </div>
+            </div>
+            <div className="camera-group">
             <div className="tape-control-group">
               <button
                 className={`tape-trigger ${tapeToolsOpen ? "active" : ""}`}
@@ -7960,6 +7980,30 @@ export function WorkplaneViewport({
                 </MovableSectionPanel>
               ) : null}
             </div>
+            </div>
+            {onNoteTool && onToggleNotes ? (
+              <div className="camera-group note-control-group" role="group" aria-label={t("visibility.notes")}>
+                <button
+                  className={noteMode ? "active" : ""}
+                  aria-label={t("editor.tool.note")}
+                  aria-pressed={noteMode}
+                  title={t("editor.tool.note")}
+                  onClick={onNoteTool}
+                >
+                  <ToolbarNoteIcon />
+                </button>
+                <button
+                  className={`note-visibility-button ${notesVisible ? "" : "active"}`}
+                  aria-label={t("visibility.notes")}
+                  aria-pressed={!notesVisible}
+                  title={noteCount > 0 ? `${t("visibility.notes")} (${noteCount})` : t("visibility.notes")}
+                  disabled={noteCount === 0}
+                  onClick={onToggleNotes}
+                >
+                  {notesVisible ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
+                </button>
+              </div>
+            ) : null}
           </>
         )}
       </div>
@@ -8444,12 +8488,18 @@ function pivotVector(point: PivotPoint | null | undefined) {
  * Where a dragged pivot marker lands (#140): on the body under the pointer - a corner or the
  * middle of an edge when the pointer is near one, a point along the edge, or else the point of
  * the surface. Beside every body it slides in the plane through `depth` facing the camera.
+ * With `centre` (Shift, #1065) it takes the centre of the face instead - the axis of a round one,
+ * the middle of a flat one, the tip of a cone - and looks through see-through bodies to reach it.
  */
-function resolvePivotDragPoint(state: ThreeState, clientX: number, clientY: number, depth: THREE.Vector3): THREE.Vector3 | null {
+function resolvePivotDragPoint(state: ThreeState, clientX: number, clientY: number, depth: THREE.Vector3, centre = false): THREE.Vector3 | null {
   const rect = aimPickRay(state, clientX, clientY, RENDER_LAYER_SHAPES);
-  const hit = firstShapeHit(state, { needsFace: true });
+  const hit = firstShapeHit(state, { needsFace: true, throughSeeThrough: centre });
   if (hit?.face) {
     const mesh = hit.object as THREE.Mesh<THREE.BufferGeometry>;
+    if (centre && hit.faceIndex !== undefined && hit.faceIndex !== null) {
+      const middle = pivotSnapCentre(pivotDragTriangles(mesh), hit.faceIndex);
+      if (middle) return new THREE.Vector3(middle.x, middle.y, middle.z);
+    }
     mesh.updateWorldMatrix(true, false);
     const normal = hit.face.normal.clone().applyNormalMatrix(new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld)).normalize();
     const pointerX = clientX - rect.left;
@@ -8467,6 +8517,16 @@ function resolvePivotDragPoint(state: ThreeState, clientX: number, clientY: numb
   state.camera.getWorldDirection(facing);
   const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(facing, depth);
   return state.raycaster.ray.intersectPlane(plane, new THREE.Vector3());
+}
+
+/** A mesh's world triangles for the Shift snap, kept while neither it nor its place changes, so the drag does not redo them per move. */
+function pivotDragTriangles(mesh: THREE.Mesh<THREE.BufferGeometry>): Float64Array {
+  mesh.updateWorldMatrix(true, false);
+  const cached = mesh.userData.pivotDragTriangles as { geometry: THREE.BufferGeometry; matrix: THREE.Matrix4; positions: Float64Array } | undefined;
+  if (cached && cached.geometry === mesh.geometry && cached.matrix.equals(mesh.matrixWorld)) return cached.positions;
+  const positions = worldTrianglePositions(mesh);
+  mesh.userData.pivotDragTriangles = { geometry: mesh.geometry, matrix: mesh.matrixWorld.clone(), positions };
+  return positions;
 }
 
 function pickCadFace(state: ThreeState, pick: CadFacePick, clientX: number, clientY: number) {

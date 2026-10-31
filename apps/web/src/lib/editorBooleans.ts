@@ -22,6 +22,7 @@ import { createLocalId, derivedLocalId } from "@/lib/localIds";
 import { boundsOverlap, exportColorGroups, meshBounds, overlappingExportClusters } from "@/lib/exportUnion";
 import type { WorkplaneShape } from "@/types/layerling";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
+import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, CUTTER_PADDING, CUTTER_LATERAL_PADDING, POINT_TOLERANCE, CUTTER_RESIDUAL_INSET, MIN_SHAPE_DIMENSION, IMPORTED_FALLBACK_BOOLEAN_TRIANGLE_LIMIT, COPLANAR_BOOLEAN_RESCUE_DEGREES, cleanModelDimension, getManifoldRuntime, transformMesh, meshForShape, appendMeshData, formatTriangleCount, shapeAabb, boundsForShapesOfVertices, boundsForCuboids, meshAabb, geometryFromMeshData, positionsFromGeometryDrawRange, boundsForPositions, positionsDifferFromMeshData, geometryDiffersFromMeshData, positionsBoundaryEdges, meshDataPositions, midpoint, localGroupBounds } from "@/lib/editorMeshCore";
 
 export type GroupBuildResult = {
@@ -2497,6 +2498,9 @@ function splitBentTubeBore(shape: WorkplaneShape): WorkplaneShape[] {
  * bore of a plain tube never reaches. Only where shapes are combined: the tube itself stays one shape.
  */
 export function splitBoreTube(shape: WorkplaneShape): WorkplaneShape[] {
+  // A filleted or chamfered tube stays the solid it is, its ends rounded; the bore of the tube it was cuts the rest (#1067).
+  const tube = shape.tubeBoreHole === true && !shape.hole ? tubeBeforeEdgeTreatments(shape) : null;
+  if (tube) return [{ ...shape, tubeBoreHole: undefined }, ...splitBoreTube({ ...tube, tubeBoreHole: true }).slice(1)];
   if (shape.tubeBoreHole === true && !shape.hole && !shape.importedMesh && shape.kind === "bentTube") return splitBentTubeBore(shape);
   if (shape.tubeBoreHole !== true || shape.hole || shape.importedMesh || (shape.kind !== "tube" && shape.kind !== "ring")) return [shape];
   const wall = Math.max(0, shape.bevel ?? 4);

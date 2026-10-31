@@ -86,7 +86,7 @@ Ronde vormen zoals cilinder, kegel, buis, ellips of de boringen hebben in hun ei
 
 - **Voor de STEP-export.** Die schrijft de ronde vorm weg, niet de veelhoek.
 - **Voor afschuiningen en afrondingen** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}) zolang de vorm rond blijft. Dat is zo als je geen aantal zijden hebt ingesteld, als het aantal minstens de standaard van de vorm is, of als de veelhoek hooguit {{value:EXACT_ROUND_TOLERANCE}} mm van de cirkel afwijkt. De standaard is {{value:ROUND_FROM_SIDES}} zijden voor cilinder, ellips, buis en kegel, {{value:ROUND_FROM_ROOF_SIDES}} voor het {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} stappen voor de {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} voor de {{ui:shape.halfSphere}} en de {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} zijden en {{value:ROUND_FROM_TORUS_STEPS}} stappen voor de {{ui:shape.torus}}, en een {{ui:prop.quality}} van {{value:ROUND_FROM_BENT_TUBE_QUALITY}} voor een ronde {{ui:shape.bentTube}}.
-- **Voor schroefdraad, een veer of een schuin vertand tandwiel.** Het randgereedschap en de STEP-export nemen het exacte lichaam; de {{ui:prop.quality}} bepaalt alleen hoe fijn het getekend wordt.
+- **Voor schroefdraad, een veer, een schuin vertand tandwiel of een visgraattandwiel.** Het randgereedschap en de STEP-export nemen het exacte lichaam; de {{ui:prop.quality}} bepaalt alleen hoe fijn het getekend wordt.
 
 **Waar het toch weer uitmaakt**
 

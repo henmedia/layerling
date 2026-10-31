@@ -34,7 +34,7 @@ Einen einzelnen Entwurf sicherst du im Editor: {{ui:editor.export}}, dann das Fo
 
 ## Anhänge
 
-Eine Anleitung, eine Teileliste, Notizen, ein Foto oder ein Datenblatt können als Dateien beim Entwurf bleiben. {{ui:editor.attachments}} in der Leiste {{ui:editor.group.manage}}, die Büroklammer, öffnet die Liste; ein kleiner Punkt an der Büroklammer zeigt, dass der Entwurf welche hat.
+Eine Anleitung, eine Teileliste, Notizen, ein Foto oder ein Datenblatt können als Dateien beim Entwurf bleiben. {{ui:editor.attachments}} in der Leiste {{ui:editor.group.file}}, die Büroklammer, öffnet die Liste; ein kleiner Punkt an der Büroklammer zeigt, dass der Entwurf welche hat.
 
 - **{{ui:attachments.upload}}:** Wähle eine oder mehrere Dateien: `.md` (Markdown) oder `.txt` als reinen Text (UTF-8), Bilder als `.png`, `.jpg`, `.jpeg` oder `.webp` oder Dokumente als `.pdf`. Eine Datei wird an ihrem Inhalt geprüft, eine Datei, die nicht ist, was ihr Name sagt, wird also abgelehnt, und andere Arten, darunter `.svg`, lassen sich nicht anhängen. Eine Textdatei darf höchstens 2 MB groß sein, ein Bild 16 MB und ein PDF 32 MB; ein Entwurf nimmt bis zu 32 Dateien und zusammen 64 MB auf.
 - **Die Liste:** Der Pfeil lädt eine Datei so herunter, wie sie hochgeladen wurde. Der Papierkorb entfernt sie; die Zeile fragt vorher noch einmal nach, und eine entfernte Datei kommt mit Rückgängig nicht zurück, weil Anhänge nicht zum Rückgängig-Verlauf gehören.

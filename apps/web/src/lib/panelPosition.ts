@@ -10,11 +10,11 @@ export const PANEL_GRAB_HEIGHT = 48;
 
 export function clampPanelPosition(
   position: PanelPosition,
-  panel: { width: number },
+  panel: { width: number; height?: number },
   area: { width: number; height: number },
 ): PanelPosition {
   const maxLeft = Math.max(0, area.width - panel.width);
-  const maxTop = Math.max(0, area.height - PANEL_GRAB_HEIGHT);
+  const maxTop = Math.max(0, area.height - (panel.height ?? PANEL_GRAB_HEIGHT));
   return {
     left: Math.round(Math.min(Math.max(0, position.left), maxLeft)),
     top: Math.round(Math.min(Math.max(0, position.top), maxTop)),

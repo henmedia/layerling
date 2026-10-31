@@ -65,7 +65,7 @@ Otáčejte obloukovými šipkami, čísly v nastavení nebo [[R]] po 45°. Taže
 
 ![Těleso otočené kolem dvou os. Úhly se zobrazují pod ním a lze je zadat v pravém panelu.](shot:rotation-card)
 
-Při výběru **jednoho tělesa** patří střed otáčení jemu. Zachová se po výběru jiného objektu, pohybuje se, otáčí a škáluje s tělesem, ukládá se a obnovuje přes Zpět. V {{ui:inspector.position}} má vlastní X, Y, Z, které lze zadávat nebo krokovat. {{ui:inspector.pivotRemove}} jej odstraní. Červenou značku lze táhnout po povrchu a přichytávat k rohům, středům hran i hranám, například pro umístění čepu přesně v rohu. U více těles platí bod jen pro aktuální výběr a nový výběr jej zruší. Seskupíš-li je nebo svážeš, zůstane zachován: skupina ho převezme jako vlastní střed otáčení, s X, Y a Z v {{ui:inspector.position}}.
+Při výběru **jednoho tělesa** patří střed otáčení jemu. Zachová se po výběru jiného objektu, pohybuje se, otáčí a škáluje s tělesem, ukládá se a obnovuje přes Zpět. V {{ui:inspector.position}} má vlastní X, Y, Z, které lze zadávat nebo krokovat. {{ui:inspector.pivotRemove}} jej odstraní. Červenou značku lze táhnout po povrchu a přichytávat k rohům, středům hran i hranám, například pro umístění čepu přesně v rohu. U více těles platí bod jen pro aktuální výběr a nový výběr jej zruší. Seskupíš-li je nebo svážeš, zůstane zachován: skupina ho převezme jako vlastní střed otáčení, s X, Y a Z v {{ui:inspector.position}}. Se stisknutým Shiftem se při tažení přichytí ke středu plochy pod ukazatelem - k ose kulaté plochy, středu rovné plochy nebo špičce kužele - a vidí přitom skrz průhledná tělesa.
 
 ## Položení na plochu
 

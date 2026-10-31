@@ -384,6 +384,10 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
     if (kind === "tube" || kind === "ring") {
       entry.bevel = optionalShapeNumber(source.bevel, fallbackEntry?.bevel, 0.5, 20);
     }
+    // The switch came only from the panel: the AI bridge's tubeBoreHole fell away here and the bore never cut (#1067).
+    if (kind === "tube" || kind === "ring" || kind === "bentTube") {
+      entry.tubeBoreHole = typeof source.tubeBoreHole === "boolean" ? source.tubeBoreHole : fallbackEntry?.tubeBoreHole;
+    }
     if (kind === "star") {
       entry.starPoints = optionalShapeNumber(source.starPoints, fallbackEntry?.starPoints, 3, 32, true);
       entry.starInnerSize = optionalShapeNumber(source.starInnerSize, fallbackEntry?.starInnerSize, 0.1, MAX_CUSTOM_SHAPE_DIMENSION);

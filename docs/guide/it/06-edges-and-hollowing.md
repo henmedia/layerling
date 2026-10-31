@@ -91,9 +91,10 @@ Se in seguito ridimensioni un corpo svuotato, layerling lo svuota di nuovo subit
 
 - {{ui:lid.type.plug}}: una piastra grande quanto il corpo con sotto un labbro che entra nell'apertura.
 - {{ui:lid.type.cap}}: una piastra più larga del corpo di una parete con sotto un bordo che avvolge l'esterno.
+- {{ui:lid.type.both}}: una piastra più larga del corpo di una parete con sotto entrambi: un labbro nell'apertura e un bordo all'esterno. La parete del corpo sta in una scanalatura tra i due, come su un contenitore per alimenti.
 - {{ui:lid.type.flat}}: solo la piastra, da appoggiare o incollare.
 
-Poi imposti lo spessore ({{ui:lid.thickness}}), l'accoppiamento ({{ui:lid.fit}}, il gioco per lato tra coperchio e corpo: 0,1 mm stretto, 0,2 mm normale, 0,3 mm largo, o qualsiasi valore fino a 1 mm) e quanto scende il labbro o il bordo e quanto è spessa la sua parete. Fai clic su {{ui:lid.apply}}: il coperchio si trova accanto al corpo, capovolto con la piastra in basso, così si stampa senza supporti. Il corpo resta com'è. Il coperchio segue qualsiasi contorno, tondo o spigoloso, perché viene preso dal corpo stesso appena sotto il suo bordo. Un corpo senza apertura in alto riceve solo un coperchio piatto; per gli altri due, svuotalo prima con il lato superiore aperto.
+Poi imposti lo spessore ({{ui:lid.thickness}}), l'accoppiamento ({{ui:lid.fit}}, il gioco per lato tra coperchio e corpo: 0,1 mm stretto, 0,2 mm normale, 0,3 mm largo, o qualsiasi valore fino a 1 mm) e quanto scende il labbro o il bordo e quanto è spessa la sua parete. Fai clic su {{ui:lid.apply}}: il coperchio si trova accanto al corpo, capovolto con la piastra in basso, così si stampa senza supporti. Il corpo resta com'è. Il coperchio segue qualsiasi contorno, tondo o spigoloso, perché viene preso dal corpo stesso appena sotto il suo bordo. Un corpo senza apertura in alto riceve solo un coperchio piatto; per gli altri, svuotalo prima con il lato superiore aperto.
 
 > **Suggerimento:** Quanto un coperchio è stretto dipende dalla stampante. Stampa prima una piccola scatola con il suo coperchio; se è troppo stretto, scegli l'accoppiamento successivo, più largo.
 

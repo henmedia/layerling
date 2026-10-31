@@ -34,7 +34,7 @@ Een losse back-up van één ontwerp maak je in de editor: {{ui:editor.export}}, 
 
 ## Bijlagen
 
-Een instructie, een onderdelenlijst, notities, een foto of een datasheet kunnen als bestanden bij het ontwerp blijven. {{ui:editor.attachments}} in de balk {{ui:editor.group.manage}}, de paperclip, opent de lijst; een klein stipje op de paperclip laat zien dat het ontwerp er heeft.
+Een instructie, een onderdelenlijst, notities, een foto of een datasheet kunnen als bestanden bij het ontwerp blijven. {{ui:editor.attachments}} in de balk {{ui:editor.group.file}}, de paperclip, opent de lijst; een klein stipje op de paperclip laat zien dat het ontwerp er heeft.
 
 - **{{ui:attachments.upload}}:** Kies een of meer bestanden: `.md` (Markdown) of `.txt` als gewone tekst (UTF-8), afbeeldingen als `.png`, `.jpg`, `.jpeg` of `.webp`, of documenten als `.pdf`. Een bestand wordt op zijn inhoud gecontroleerd, dus een bestand dat niet is wat zijn naam zegt, wordt geweigerd, en andere soorten, waaronder `.svg`, kunnen niet worden toegevoegd. Een tekstbestand is hoogstens 2 MB groot, een afbeelding 16 MB en een PDF 32 MB; een ontwerp bevat tot 32 bestanden en samen 64 MB.
 - **De lijst:** De pijl downloadt een bestand zoals het is geüpload. De prullenbak verwijdert het; de rij vraagt eerst nog een keer, en een verwijderd bestand komt niet terug met ongedaan maken, omdat bijlagen niet bij de geschiedenis van ongedaan maken horen.

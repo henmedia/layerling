@@ -1,5 +1,80 @@
 [
   {
+    "version": "1.127.0",
+    "items": [
+      {
+        "title": {
+          "de": "Vorlagenbild nachzeichnen",
+          "en": "Trace the template picture"
+        },
+        "body": {
+          "de": "Ein Bild unter der Skizze wird mit „Umriss nachzeichnen“ zu Skizzenlinien, genau dort, wo es liegt: der dunkle oder der helle Teil, bei einer Schwelle, die du einstellst. Die Linien bearbeitest du danach wie alle anderen.",
+          "en": "A picture under the sketch becomes sketch lines with \"Trace outline\", right where it lies: its dark or its light part, at a threshold you set. You then edit the lines like any others."
+        }
+      },
+      {
+        "title": {
+          "de": "Deckel, der die Wand von beiden Seiten fasst",
+          "en": "A lid that grips the wall from both sides"
+        },
+        "body": {
+          "de": "Das Werkzeug „Deckel“ kennt eine vierte Art: „Beidseitig“. Unter der Platte sitzen eine Lippe, die in die Öffnung greift, und ein Rand, der außen herum greift. Die Wand deiner Dose sitzt dazwischen in einer Nut, wie bei einer Frischhaltedose.",
+          "en": "The Lid tool has a fourth kind: \"Both sides\". Below the plate sit a lip that goes into the opening and a rim that goes over the outside. The wall of your box sits in a groove between them, like on a food container."
+        }
+      },
+      {
+        "title": {
+          "de": "Lage in der Skizze eintippen",
+          "en": "Type the position in a sketch"
+        },
+        "body": {
+          "de": "Wähle in einer Skizze eine Form aus: In der Leiste darüber stehen jetzt X und Y für ihre Mitte, in mm vom Ursprung. Tippe einen Wert ein, und die Form rückt genau dorthin, etwa ein Loch 12 mm neben die Mitte einer Platte.",
+          "en": "Select a shape in a sketch: the bar above it now shows X and Y for its middle, in mm from the origin. Type a value and the shape moves exactly there, such as a hole 12 mm from the middle of a plate."
+        }
+      },
+      {
+        "title": {
+          "de": "Drehpunkt auf die Mitte einer Fläche",
+          "en": "Pivot to the centre of a face"
+        },
+        "body": {
+          "de": "Halte beim Ziehen der roten Drehpunkt-Markierung Shift gedrückt: Sie rastet dann an der Mitte der Fläche unter dem Zeiger ein, etwa auf der Achse eines Scharnierrings oder an der Spitze eines Kegels. Transparente Körper davor übergeht sie dabei.",
+          "en": "Hold Shift while you drag the red pivot marker: it snaps to the centre of the face under the pointer, such as the axis of a hinge ring or the tip of a cone. It looks past transparent bodies in front."
+        }
+      },
+      {
+        "title": {
+          "de": "Verrundete Rohre bohren weiter durch",
+          "en": "Rounded tubes still bore through"
+        },
+        "body": {
+          "de": "Ein Rohr mit verrundeten oder gefasten Enden behält „Bohrung schneidet beim Gruppieren wie ein Loch“. Gruppiert öffnet seine Bohrung die Wand des anderen Rohrs, etwa an einer T-Kreuzung, und die runden Enden bleiben.",
+          "en": "A tube with filleted or chamfered ends keeps \"Bore cuts as a hole when grouped\". Grouped, its bore opens the wall of the other tube, such as at a T-junction, and the rounded ends stay."
+        }
+      },
+      {
+        "title": {
+          "de": "Gewinde in vergrößerten Gruppen",
+          "en": "Threads in enlarged groups"
+        },
+        "body": {
+          "de": "Ein Gewinde in einer Gruppe, die du in eine Richtung größer ziehst, wird jetzt passend neu gebaut, statt gestaucht oder verzerrt zu werden.",
+          "en": "A thread in a group that you pull larger in one direction is now built again to fit, instead of coming out squeezed or stretched."
+        }
+      },
+      {
+        "title": {
+          "de": "Aufgeräumte Kameraleiste",
+          "en": "A tidier camera bar"
+        },
+        "body": {
+          "de": "Zusammengehörige Knöpfe der Kameraleiste stehen in Rahmen. Mit dem ersten Knopf klappst du sie ein oder verschiebst sie, ein Doppelklick setzt sie zurück. Die Notizen sitzen jetzt dort, das Zahnrad für die Einstellungen steht in der Titelzeile, und „Verwalten“ heißt jetzt „Datei“.",
+          "en": "Buttons of the camera bar that belong together sit in frames. Its first button folds the bar or moves it, and a double click puts it back. The notes are there now, the settings cogwheel sits in the title row, and \"Manage\" is now \"File\"."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.126.0",
     "items": [
       {

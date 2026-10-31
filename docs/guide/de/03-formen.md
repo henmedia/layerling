@@ -91,7 +91,7 @@ Die {{ui:prop.torusTube}} legt fest, wie dick der Wulst von oben gesehen ist. Di
 
 - **Beim STEP-Export.** Er schreibt die runde Form, nicht das Vieleck.
 - **Bei Fasen und Verrundungen** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}), solange die Form rund bleibt. Das ist der Fall, wenn du keine Seitenzahl eingestellt hast, wenn die Zahl mindestens so hoch ist wie der Vorgabewert der Form oder wenn das Vieleck höchstens {{value:EXACT_ROUND_TOLERANCE}} mm vom Kreis abweicht. Der Vorgabewert ist {{value:ROUND_FROM_SIDES}} Seiten bei Zylinder, Ellipse, Rohr und Kegel, {{value:ROUND_FROM_ROOF_SIDES}} beim {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} Schritte bei der {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} bei der {{ui:shape.halfSphere}} und beim {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} Seiten und {{value:ROUND_FROM_TORUS_STEPS}} Stufen beim {{ui:shape.torus}} und eine {{ui:prop.quality}} von {{value:ROUND_FROM_BENT_TUBE_QUALITY}} bei einem runden {{ui:shape.bentTube}}.
-- **Bei einem Gewinde, einer Feder oder einem Schrägrad.** Das Kantenwerkzeug und der STEP-Export nehmen den exakten Körper; die {{ui:prop.quality}} bestimmt nur, wie fein die Form gezeichnet wird.
+- **Bei einem Gewinde, einer Feder, einem Schrägrad oder einem Pfeilrad.** Das Kantenwerkzeug und der STEP-Export nehmen den exakten Körper; die {{ui:prop.quality}} bestimmt nur, wie fein die Form gezeichnet wird.
 
 **Wo sie wieder wichtig wird**
 
