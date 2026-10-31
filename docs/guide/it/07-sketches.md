@@ -154,7 +154,7 @@ In {{ui:sketch.imageAlign}} puoi correggere l’orientamento di una foto non sca
 
 Tutte e quattro le opzioni modificano solo l’immagine di riferimento, non lo schizzo.
 
-**{{ui:sketch.traceImage}}** ti risparmia di ricalcare a mano: scegli {{ui:iconTag.part.dark}} o {{ui:iconTag.part.light}}, imposta la {{ui:sketch.traceThreshold}} dove lo scuro diventa chiaro e fai clic su {{ui:sketch.traceImageButton}}. Quella parte dell'immagine diventa linee chiuse dello schizzo proprio dove si trova, ruotata e ritagliata con essa, che poi modifichi come qualsiasi altra linea. Arrivano selezionate, quindi [[Delete]] le toglie di nuovo per provare un'altra soglia. Per un bordo all'esterno o all'interno del contorno, dai al corpo dello schizzo un tratto all'esterno o all'interno delle sue linee, oppure sposta il corpo finito con un offset.
+**{{ui:sketch.traceImage}}** ti risparmia di ricalcare a mano: scegli {{ui:iconTag.part.dark}} o {{ui:iconTag.part.light}}, imposta la {{ui:sketch.traceThreshold}} dove lo scuro diventa chiaro e fai clic su {{ui:sketch.traceApply}}. Quella parte dell'immagine diventa linee chiuse dello schizzo proprio dove si trova, ruotata e ritagliata con essa, che poi modifichi come qualsiasi altra linea. Arrivano selezionate, quindi [[Delete]] le toglie di nuovo per provare un'altra soglia. Per un bordo all'esterno o all'interno del contorno, dai al corpo dello schizzo un tratto all'esterno o all'interno delle sue linee, oppure sposta il corpo finito con un offset.
 
 ## Tasti in modalità Schizzo
 

@@ -90,4 +90,4 @@ A mintakép egy kép, amelyhez a részeket igazíthatod: tedd egy áramköri lap
 - A {{ui:referenceImage.calibrate}} a valódi méretére állítja, mint a vázlatban: kattints a képen két pontra, amelyek valódi távolságát ismered - például a lap két rögzítőfuratára -, és írd be ezt a távolságot a {{ui:referenceImage.distance}} mezőbe. A kép megtartja az arányait és a közepét.
 - A beállításai fejlécében lévő lakattal zárold, és a helyén marad: a kattintások átmennek rajta a tárgyasztalra. Feloldáshoz az objektumlistában válaszd ki újra.
 - A kép egyszer kerül a tervfájlba, akárhányszor másolod vagy vonod vissza. Egy nagy kép ennyivel nagyobbá teszi a fájlt; hozzáadáskor az üzenet megmondja a méretét.
-- Egy MI a `layerling_reference_image` segítségével ad hozzá, mozgat, kalibrál, halványít és zárol egyet. A `trace` a képet egy rajta álló vázlattestté rajzolja körbe, ahogy a vázlatban a {{ui:sketch.traceImageButton}}.
+- Egy MI a `layerling_reference_image` segítségével ad hozzá, mozgat, kalibrál, halványít és zárol egyet. A `trace` a képet egy rajta álló vázlattestté rajzolja körbe, ahogy a vázlatban a {{ui:sketch.traceImage}}.

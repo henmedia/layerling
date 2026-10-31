@@ -461,7 +461,6 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "Kırpmayı bitir",
   "sketch.cropImageHint": "Tutamakları içe doğru sürükle: resim sıkıştırılmaz, sadece kenarı dışarıda kalır. Dışa doğru geri getirir.",
   "sketch.traceImage": "İzle",
-  "sketch.traceImageButton": "Dış hattı izle",
   "sketch.traceThreshold": "Eşik",
   "sketch.traceImageHint": "Resmin koyu ya da açık kısmı, resmin durduğu yerde eskiz çizgilerine dönüşür. Seçili gelirler: Delete onları yeniden kaldırır, başka bir eşik deneyebilirsin.",
   "status.sketchImageTraced": "Resim izlendi: {outlines} dış hat, {lines} çizgi",

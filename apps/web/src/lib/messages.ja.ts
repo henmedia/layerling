@@ -508,7 +508,6 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "トリミングを終了",
   "sketch.cropImageHint": "ハンドルを内側にドラッグします。画像は縮まず、端がかくれるだけです。外側にドラッグすると戻ります。",
   "sketch.traceImage": "トレース",
-  "sketch.traceImageButton": "輪郭をトレース",
   "sketch.traceThreshold": "しきい値",
   "sketch.traceImageHint": "画像の暗い部分または明るい部分が、画像のある位置にそのままスケッチの線になります。線は選択された状態で入るので、Delete で消して別のしきい値を試せます。",
   "status.sketchImageTraced": "画像をトレースしました：{outlines} 個の輪郭、{lines} 本の線",

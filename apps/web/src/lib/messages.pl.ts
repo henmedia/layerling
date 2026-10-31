@@ -510,7 +510,6 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "Zakończ przycinanie",
   "sketch.cropImageHint": "Przeciągnij uchwyty do środka: obraz nie jest ściskany, tylko brzeg zostaje pominięty. Na zewnątrz przywraca go z powrotem.",
   "sketch.traceImage": "Obrysuj",
-  "sketch.traceImageButton": "Obrysuj kontur",
   "sketch.traceThreshold": "Próg",
   "sketch.traceImageHint": "Ciemna lub jasna część obrazu staje się liniami szkicu dokładnie tam, gdzie leży obraz. Pojawiają się zaznaczone: Delete usuwa je z powrotem, by spróbować innego progu.",
   "status.sketchImageTraced": "Obraz obrysowany: {outlines} konturów, {lines} linii",

@@ -155,7 +155,7 @@ W {{ui:sketch.imageAlign}} wyrównujesz zdjęcie, które nie zostało zrobione n
 
 Wszystkie cztery dotyczą tylko wzorca, nigdy szkicu.
 
-**{{ui:sketch.traceImage}}** oszczędza ręcznego obrysowywania: wybierz {{ui:iconTag.part.dark}} lub {{ui:iconTag.part.light}}, ustaw {{ui:sketch.traceThreshold}}, w którym ciemne przechodzi w jasne, i kliknij {{ui:sketch.traceImageButton}}. Ta część obrazu staje się zamkniętymi liniami szkicu dokładnie tam, gdzie leży obraz, obrócona i przycięta razem z nim, a potem edytujesz je jak każde inne linie. Pojawiają się zaznaczone, więc [[Delete]] usuwa je z powrotem, by spróbować innego progu. Aby uzyskać brzeg na zewnątrz lub wewnątrz konturu, nadaj bryle szkicu obrys na zewnątrz lub wewnątrz jej linii albo odsuń gotową bryłę.
+**{{ui:sketch.traceImage}}** oszczędza ręcznego obrysowywania: wybierz {{ui:iconTag.part.dark}} lub {{ui:iconTag.part.light}}, ustaw {{ui:sketch.traceThreshold}}, w którym ciemne przechodzi w jasne, i kliknij {{ui:sketch.traceApply}}. Ta część obrazu staje się zamkniętymi liniami szkicu dokładnie tam, gdzie leży obraz, obrócona i przycięta razem z nim, a potem edytujesz je jak każde inne linie. Pojawiają się zaznaczone, więc [[Delete]] usuwa je z powrotem, by spróbować innego progu. Aby uzyskać brzeg na zewnątrz lub wewnątrz konturu, nadaj bryle szkicu obrys na zewnątrz lub wewnątrz jej linii albo odsuń gotową bryłę.
 
 ## Klawisze w trybie szkicu
 

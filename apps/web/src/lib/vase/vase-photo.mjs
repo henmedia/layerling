@@ -64,9 +64,11 @@ function otsu(values, max) {
 /**
  * Find the object in the photo. Returns { ok, box: { x0, y0, x1, y1 } in the photo's pixels (y down;
  * top and bottom are the centres of the rim and base ellipses), rows: per grid row from the top [left, right]
- * or null, top/bottom: first and last row of the body, grid: { w, h, f, fy }, notes }.
+ * or null, top/bottom: first and last row of the body, grid: { w, h, f, fy }, threshold, autoThreshold, notes }.
+ * `threshold` (0 to 1, a share of the largest colour distance) sets how far a colour must lie from the
+ * background's to belong to the object (Trace); without it, it is found from the photo (Otsu). Both come back.
  */
-export function findObject(img) {
+export function findObject(img, { threshold = null } = {}) {
   if (!img || !(img.width > 2) || !(img.height > 2) || !img.data) return { ok: false, notes: ['Kein Bild.'] }
   const g = downsample(img)
   const { w, h, rgb } = g
@@ -81,7 +83,8 @@ export function findObject(img) {
   // Busy border: many border points differ clearly from the median - then there is no clear background.
   const busy = border.filter((p) => dist[p] > 2 * MIN).length / border.length
   if (busy > 0.35) return { ok: false, notes: ['Der Hintergrund ist unruhig (am Bildrand keine einheitliche Farbe) – der Gegenstand lässt sich nicht sicher finden. Am besten vor einer hellen, einfarbigen Wand fotografieren; sonst „Kalibrieren“.'] }
-  const T = Math.max(MIN, otsu(dist, 442))
+  const auto = Math.max(MIN, otsu(dist, 442))
+  const T = threshold === null ? auto : Math.min(438, Math.max(4, threshold * 442))
   const fg = new Uint8Array(w * h)
   for (let p = 0; p < w * h; p++) fg[p] = dist[p] > T ? 1 : 0
   // Largest connected region (4-neighbourhood).
@@ -107,15 +110,66 @@ export function findObject(img) {
   if (bestLabel < 0 || bestSize < 0.01 * w * h) return { ok: false, notes: ['Im Foto hebt sich nichts deutlich vom Hintergrund ab.'] }
   // Per row, the left and right edge of the region.
   const rows = []
-  let y0 = h, y1 = -1, x0 = w, x1 = -1
   for (let y = 0; y < h; y++) {
     let lo = -1, hi = -1
     for (let x = 0; x < w; x++) if (label[y * w + x] === bestLabel) { if (lo < 0) lo = x; hi = x }
     rows.push(lo < 0 ? null : [lo, hi])
-    if (lo >= 0) { y0 = Math.min(y0, y); y1 = Math.max(y1, y); x0 = Math.min(x0, lo); x1 = Math.max(x1, hi) }
   }
+  const object = objectFromRows(rows, g)
+  if (!object.ok) return object
+  return { ...object, threshold: T / 442, autoThreshold: auto / 442 }
+}
+
+/**
+ * The object drawn round by hand (the magnetic lasso of Trace) instead of found: `outline` a closed polygon
+ * in the photo's pixels ([x, y], y down). Inside it is the object, whatever the background - a shelf, a room.
+ * Returns the same as findObject (without a threshold), or `ok: false` when the outline holds next to nothing.
+ */
+export function outlineObject(img, outline) {
+  if (!img || !(img.width > 2) || !(img.height > 2)) return { ok: false, notes: ['Kein Bild.'] }
+  if (!outline || outline.length < 3) return { ok: false, notes: ['Kein Gegenstand gefunden.'] }
+  const f = Math.max(1, Math.max(img.width, img.height) / GRID)
+  const w = Math.max(1, Math.round(img.width / f)), h = Math.max(1, Math.round(img.height / f))
+  const g = { w, h, f: img.width / w, fy: img.height / h }
+  // Per grid row, through its middle: the outline's crossings, from the first to the last a grid point's middle lies between.
+  const rows = []
+  let inside = 0
+  for (let y = 0; y < h; y++) {
+    const sy = (y + 0.5) * g.fy
+    const crossings = []
+    for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
+      const [ax, ay] = outline[j], [bx, by] = outline[i]
+      if ((ay > sy) !== (by > sy)) crossings.push(ax + ((sy - ay) * (bx - ax)) / (by - ay))
+    }
+    crossings.sort((a, b) => a - b)
+    let lo = -1, hi = -1
+    for (let k = 0; k + 1 < crossings.length; k += 2) {
+      const from = Math.max(0, Math.ceil(crossings[k] / g.f - 0.5)), to = Math.min(w - 1, Math.floor(crossings[k + 1] / g.f - 0.5))
+      if (to < from) continue
+      inside += to - from + 1
+      if (lo < 0) lo = from
+      hi = to
+    }
+    rows.push(lo < 0 ? null : [lo, hi])
+  }
+  if (inside < 0.002 * w * h) return { ok: false, notes: ['Der Gegenstand ist im Foto zu klein für einen Umriss.'] }
+  return objectFromRows(rows, g, { drawn: true })
+}
+
+/**
+ * The object from its extent per grid row ([left, right] or null): its box in the photo's pixels, top and
+ * bottom without the ellipses of rim and base, and notes. `drawn`: drawn round by hand, so filling the photo
+ * is no sign of a missing background.
+ */
+function objectFromRows(rows, g, { drawn = false } = {}) {
+  const { w, h } = g
+  let y0 = h, y1 = -1, x0 = w, x1 = -1
+  rows.forEach((row, y) => {
+    if (!row) return
+    y0 = Math.min(y0, y); y1 = Math.max(y1, y); x0 = Math.min(x0, row[0]); x1 = Math.max(x1, row[1])
+  })
   const notes = []
-  if (x1 - x0 >= w - 2 && y1 - y0 >= h - 2) return { ok: false, notes: ['Der gefundene Bereich füllt das ganze Foto – der Gegenstand hebt sich nicht vom Hintergrund ab.'] }
+  if (!drawn && x1 - x0 >= w - 2 && y1 - y0 >= h - 2) return { ok: false, notes: ['Der gefundene Bereich füllt das ganze Foto – der Gegenstand hebt sich nicht vom Hintergrund ab.'] }
   if (x0 === 0 || x1 === w - 1 || y0 === 0) notes.push('Der Gegenstand reicht bis an den Bildrand – vielleicht ist er angeschnitten.')
   // Perspective: photographed slightly from above, rim and base appear as ellipses - the outermost rows
   // get abruptly narrower (more than 8 % per row; a real foot tapers off more gently). They do not count
@@ -137,9 +191,10 @@ export function findObject(img) {
  * Outline of a found object as a body form: per row half the width (the middle taken per row - in case
  * it stands askew), smoothed and simplified to a few points. `height`, `diameter`: real dimensions in mm
  * (diameter = the widest point); without a diameter, the height's scale applies across as well.
+ * `maxPoints` and `cornerAngle` as in profileFromSamples (Trace sets them).
  * Returns { ok, profilePoints, height, diameter, notes } like the SVG import.
  */
-export function photoProfile(found, { height, diameter = null, tolerance = null } = {}) {
+export function photoProfile(found, { height, diameter = null, tolerance = null, maxPoints, cornerAngle } = {}) {
   if (!found?.ok) return { ok: false, notes: found?.notes ?? ['Kein Gegenstand gefunden.'] }
   if (!(height > 0)) return { ok: false, notes: ['Bitte die Höhe des Gegenstands in mm angeben.'] }
   const { rows, grid, top, bottom } = found
@@ -168,7 +223,7 @@ export function photoProfile(found, { height, diameter = null, tolerance = null 
     rs.push(smooth[k] * sx)
   }
   const tol = tolerance ?? Math.max(0.3, height / 300)
-  const fit = profileFromSamples(ts, rs, height, { tolerance: tol })
+  const fit = profileFromSamples(ts, rs, height, { tolerance: tol, maxPoints, cornerAngle })
   if (!fit) return { ok: false, notes: ['Aus dem Umriss lässt sich keine Körperform ablesen.'] }
   const notes = [...found.notes]
   const ratio = diameter > 0 ? sx / sy : 1

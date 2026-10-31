@@ -452,7 +452,6 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "sketch.cropImageDone": "Körbevágás befejezése",
   "sketch.cropImageHint": "Húzd befelé a fogantyúkat: a kép nem nyomódik össze, csak a széle marad le. Kifelé húzva visszajön.",
   "sketch.traceImage": "Körberajzolás",
-  "sketch.traceImageButton": "Körvonal körberajzolása",
   "sketch.traceThreshold": "Küszöb",
   "sketch.traceImageHint": "A kép sötét vagy világos része vázlatvonalakká válik pontosan ott, ahol a kép fekszik. Kijelölve jelennek meg: a Delete újra eltávolítja őket, hogy más küszöböt próbálhass.",
   "status.sketchImageTraced": "Kép körberajzolva: {outlines} körvonal, {lines} vonal",

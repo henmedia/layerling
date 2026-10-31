@@ -155,7 +155,7 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 
 这四项都只影响参考图，绝不会影响草图。
 
-**{{ui:sketch.traceImage}}** 省去手工描摹：选择 {{ui:iconTag.part.dark}} 或 {{ui:iconTag.part.light}}，设置暗部变为亮部的 {{ui:sketch.traceThreshold}}，然后点击 {{ui:sketch.traceImageButton}}。图片的这一部分会在图片所在的位置变成闭合的草图线条，随图片一起旋转和裁剪，之后可以像其他线条一样编辑。线条会被选中，因此按 [[Delete]] 可以再次删除，以尝试其他阈值。如需在轮廓外侧或内侧留出边，可给草图实体加上线条外侧或内侧的描边，或对完成的实体做偏移。
+**{{ui:sketch.traceImage}}** 省去手工描摹：选择 {{ui:iconTag.part.dark}} 或 {{ui:iconTag.part.light}}，设置暗部变为亮部的 {{ui:sketch.traceThreshold}}，然后点击 {{ui:sketch.traceApply}}。图片的这一部分会在图片所在的位置变成闭合的草图线条，随图片一起旋转和裁剪，之后可以像其他线条一样编辑。线条会被选中，因此按 [[Delete]] 可以再次删除，以尝试其他阈值。如需在轮廓外侧或内侧留出边，可给草图实体加上线条外侧或内侧的描边，或对完成的实体做偏移。
 
 ## 草图模式下的按键
 

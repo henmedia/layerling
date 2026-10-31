@@ -92,4 +92,4 @@ A reference image is a picture to line parts up on: lay a photo of a circuit boa
 - {{ui:referenceImage.calibrate}} gives it its true size, as in the sketch: click two points on the picture whose real distance you know - two mounting holes of the board, say - and type that distance in {{ui:referenceImage.distance}}. The picture keeps its proportions and its middle.
 - Lock it with the lock in the header of its settings, and it stays put: clicks then go through it to the plate. Pick it in the object list to unlock it.
 - The picture is saved once in the design file, however often it is copied or undone. A large picture makes the file larger by as much; the message when you add it says how large it is.
-- An AI adds, moves, calibrates, fades and locks one with `layerling_reference_image`. With `trace` it traces the picture into a sketch body standing on it, as the sketch's {{ui:sketch.traceImageButton}} does.
+- An AI adds, moves, calibrates, fades and locks one with `layerling_reference_image`. With `trace` it traces the picture into a sketch body standing on it, as the sketch's {{ui:sketch.traceImage}} does.
