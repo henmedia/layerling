@@ -195,7 +195,7 @@ Výsledek je síť jako importovaný model a ponechává si těleso, na kterém 
 
 - {{ui:prop.vaseProfile}}: láhev, baňatá, mísa s hrdlem, sud, válec nebo trychtýř. Výška a největší průměr jsou rozměry samotného tvaru: táhněte za úchyty nebo zadejte {{ui:prop.vaseDiameter}} a {{ui:prop.height}}.
 - {{ui:prop.vaseSection}}: kruh, mnohoúhelník se zaoblenými rohy nebo vlna (měkká, špičatá, oblouky nebo lamely). {{ui:prop.vaseTwist}} ho po výšce stáčí, {{ui:prop.vaseSway}} ho nechá kývat sem a tam.
-- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} je pro režim vázy ve sliceru (také „spiralizace“): slicer tiskne jednu stěnu ve spirále a vynechá víko i výplň, proto je těleso kreslené plné. {{ui:vase.bodyHollow}} dává skutečnou stěnu a dno pro běžný tisk.
+- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} je pro režim vázy ve sliceru (také „spiralizace“): slicer tiskne jednu stěnu ve spirále a vynechá víko i výplň, proto je těleso kreslené plné. {{ui:vase.bodyHollow}} dává skutečnou stěnu a dno pro běžný tisk. S {{ui:prop.vaseBottom}} na 0 mm nemá dutá váza dno: trubka otevřená na obou koncích, pro roztruby, náustky a trubky.
 - {{ui:prop.vaseEffect}}: nová váza je hladká. Na výběr jsou drážky, pruhy, Voronoiovy buňky nebo fazety (low poly) zvenku, podle přání jen v části výšky; patří k váze a zůstávají s ní upravitelné.
 
 {{ui:prop.vaseSection2}} nechá průřez po výšce plynule přejít ve druhý, například z kruhu dole do šestiúhelníku nahoře.

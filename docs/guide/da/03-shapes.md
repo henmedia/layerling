@@ -23,9 +23,9 @@ Hvad biblioteket tilbyder:
 - **Rør:** {{ui:shape.tube}} og {{ui:shape.bentTube}}, lavet af op til tolv lige stykker med bøjninger ind imellem, og {{ui:shape.loft}} fra ét omrids til et andet, for eksempel fra firkant til rundt.
 - **Dekorative former:** {{ui:shape.star}}, {{ui:shape.heart}} og {{ui:shape.crescent}}.
 - **Bogstaver:** {{ui:shape.text}}, også langs en cirkelbue. Mere i [Tekst](chapter:text).
-- **Mekanik:** {{ui:shape.thread}} (gevindstang, skrue, møtrik og gevindhul), {{ui:shape.spring}}, {{ui:shape.gear}} og {{ui:shape.knurl}} til greb. Mere i [Gevind og mekanik](chapter:threads-and-mechanics).
+- **Mekanik:** {{ui:shape.thread}} (gevindstang, skrue, møtrik og gevindhul), {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} og {{ui:shape.knurl}} til greb. Mere i [Gevind og mekanik](chapter:threads-and-mechanics).
   Gridfinity-bakke og -grundplader vælger du med {{ui:shape.gridfinity}}.
-- **Til konstruktioner:** det print-in-place {{ui:shape.hinge}}, {{ui:shape.dovetail}}, {{ui:shape.teardrop}} til vandrette huller, {{ui:shape.counterbore}} og {{ui:shape.countersink}} til skruehoveder og {{ui:shape.ruler}}, som kun er et måleværktøj og aldrig vises i en eksport.
+- **Til konstruktioner:** det print-in-place {{ui:shape.hinge}}, {{ui:shape.dovetail}}, {{ui:shape.teardrop}} til vandrette huller, {{ui:shape.port}} til USB-, HDMI-, DisplayPort- og RJ45-stik, {{ui:shape.counterbore}} og {{ui:shape.countersink}} til skruehoveder og {{ui:shape.ruler}}, som kun er et måleværktøj og aldrig vises i en eksport.
 
 Du får en trekant på to måder: {{ui:shape.polygon}} med tre sider er en ligebenet trekant, Tinkercads "Roof", og {{ui:shape.wedge}} er en retvinklet trekant. Begge er ægte trekantede prismer. For et trekantet hul, kopier formen, gør kopien mindre, markér den som et hul og justér den med {{ui:editor.tool.centerOnWorkplane}} eller {{ui:editor.tool.align}}. Begge arbejder med formens begrænsningsboks, den mindste kasse der omslutter den, så en halveret firkant stadig tæller som en hel firkant. Kommandosøgningen ([[Ctrl]]+[[K]]) finder også begge former under "triangle" eller "roof".
 
@@ -53,13 +53,17 @@ Indstillingerne sidder docket ved højre kant. Hvis de dækker noget du vil se, 
 
 ![En gruppe af en orange blok, en blå pind og et hul, skåret til én form. Med Multicolor slået til, forbliver pinden blå, blokken orange, og hullets vægge tager blokkens farve.](shot:group-multicolor)
 
-Spids og snoing virker på næsten alle former. Kun tandhjulet, gevindet, fjederen, riflingen, hængslet, pyramiden, bøjede rør, dråbehullet, skruehovedskærerne og linealen udelader dem: de har faste mål af deres egne eller, som pyramiden, en top af sin egen i forvejen.
+Spids og snoing virker på næsten alle former. Kun tandhjulet, gevindet, fjederen, riflingen, hængslet, pyramiden, bøjede rør, dråbehullet, stikåbningen, skruehovedskærerne og linealen udelader dem: de har faste mål af deres egne eller, som pyramiden, en top af sin egen i forvejen.
 
 ![En kegle hvis topradius og højde blev ændret: en lille pil ved hver tager værdien tilbage, og de to knapper nederst gemmer eller nulstiller formens standarder.](shot:property-reset)
 
 {{ui:inspector.saveDefaults}} husker det, du har ændret på denne form, som start for hver ny form af samme slags: målene, formens indstillinger og dens farve. Farv en cylinder grøn og tryk på knappen, så er hver cylinder, du tilføjer bagefter, grøn; de andre slags beholder deres egne farver. {{ui:inspector.resetDefaults}} stiller slagsen tilbage til det, programmet starter den med. Hvilke slags der har egne standarder, er markeret i indstillingerne under {{ui:workspace.shapeDefaults}}. Et nyt design, du starter fra startsiden, begynder også med dem; værdierne huskes i denne browser.
 
 En spids eller hældende kasse, cylinder, ellipse, polygon, rør eller ring bevarer sin eksakte form, og det samme gør kapslen, stjernen, hjertet, halvmånen, svalehalen, en rundet kasse uden rundede top- og bundkanter og en lige eller rund rifling (dens fasede ender smalles med den): fas og rund virker på den som på den almindelige form, og STEP-eksporten skriver den. Det samme gælder for en snoet form: dens tværsnit drejer nøjagtigt når det stiger, og siderne snor sig jævnt fra bund til top.
+{{ui:inspector.slope}} får du på kassen, den rundede kasse, cylinderen, ellipsen, polygonet, røret, ringen, kilen og det runde tag. Kilen og det runde tag ligger langs deres dybde, så de hælder kun mod forsiden eller bagsiden. Det hældede legeme bevarer sin eksakte form, så fas og rund og STEP-eksporten virker på det som på den almindelige form; kun en rundet kasse med rundede top- og bundkanter, og en hældning sammen med en spids, en snoing eller et hældende legeme, bliver kun et mesh i visningen.
+
+{{ui:inspector.narrow}} får du på de samme former, bortset fra røret og ringen, hvis væg ellers ville blive tyndere på tværs end langs. En indsnævret kasse, og en kile eller et rundt tag der indsnævres, hældes eller begge dele, bevarer deres eksakte form på samme måde. For nu bliver resten kun et mesh i visningen: en indsnævret cylinder, ellipse, polygon eller rundet kasse, og en kasse der både hælder og indsnævres. Fas og rund og STEP-eksporten virker så på det mesh i stedet for på et eksakt legeme.
+
 
 At taste er mere nøjagtigt end at trække. Alle talfelter tager millimeter, men også procenter: tast "50 %" ind i en bredde på 40 mm og du får 20 mm. De beregner også: "15*3", "120-2*4" eller "(40+2)/2" giver 45, 112 og 21; x virker i stedet for *. Feltet husker beregningen, i egenskabspanelet såvel som i dimensionsboksene omkring den valgte form: klik ind i det igen senere og formlen står der i stedet for tallet, så længe værdien stadig passer til den, og du ændrer den på stedet, "(140+2)/2" bliver til "(40+6)/2". Træk formen i et håndtag eller skalér den og formlen passer ikke mere, så feltet viser kun tallet igen. I et talfelt, du har klikket på, ændrer musehjulet og tasterne [[↑]] og [[↓]] værdien et trin, med [[Shift]] et større trin og med [[Alt]] et finere. I et felt for størrelse eller position går [[Shift]] i stedet et gittertrin, og ti trin når gitteret er slået fra.
 
@@ -200,7 +204,7 @@ Resultatet er et mesh som en importeret model, og det bevarer det legeme, det bl
 
 - {{ui:prop.vaseProfile}}: flaske, buget, skål med hals, tønde, cylinder eller tragt. Højden og den bredeste diameter er formens egne mål: træk i håndtagene, eller tast {{ui:prop.vaseDiameter}} og {{ui:prop.height}}.
 - {{ui:prop.vaseSection}}: en cirkel, et polygon med rundede hjørner eller en bølge (blød, spids, buer eller finner). {{ui:prop.vaseTwist}} drejer tværsnittet op ad højden, {{ui:prop.vaseSway}} får det til at svinge frem og tilbage.
-- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} er til slicerens vasemodus (også kaldet spiralize): sliceren printer én væg i en spiral og lader top og fyldning være, så kroppen tegnes massiv. {{ui:vase.bodyHollow}} giver en rigtig væg og bund til et normalt print.
+- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} er til slicerens vasemodus (også kaldet spiralize): sliceren printer én væg i en spiral og lader top og fyldning være, så kroppen tegnes massiv. {{ui:vase.bodyHollow}} giver en rigtig væg og bund til et normalt print. Med {{ui:prop.vaseBottom}} på 0 mm har den hule vase ingen bund: et rør, åbent i begge ender, til lydtragte, mundstykker og rør.
 - {{ui:prop.vaseEffect}}: en ny vase er glat. Der er riller, striber, Voronoi-celler eller facetter (low poly) at vælge imellem på ydersiden, i et bånd af højden hvis du vil; de hører til vasen og bliver redigerbare sammen med den.
 
 {{ui:prop.vaseSection2}} blander tværsnittet ind i et andet op ad højden, for eksempel fra en cirkel i bunden til en sekskant i toppen.

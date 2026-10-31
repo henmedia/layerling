@@ -57,6 +57,12 @@ En form vendt i en vinkel, for eksempel med 45°, har sin kasse omkring sig at j
 
 Tasten er [[L]]. [[Esc]] annullerer.
 
+### Tilpas størrelser
+
+Hold [[Alt]] nede under justering, og punkterne bliver firkantede: et klik flytter ikke længere formerne, men ændrer deres størrelse. Et punkt på siden strækker hver form hen til den side, mens dens anden side bliver hvor den er, som om du havde trukket dens håndtag dertil. Punktet i midten lader hver form blive hvor den er og giver den bredden, længden eller höjden i den retning. Sådan kan du for eksempel bytte en kasse med en cylinder af samme størrelse, eller erstatte en brudt del af et mesh med en ren form. Flytter du over et punkt med [[Alt]] holdt, ser du på forhånd, hvor store formerne bliver.
+
+Referencen er den form, du klikkede på først; kun de andre ændres. Uden en reference strækker sidepunkterne alle former til den yderste side, og midtpunktet giver dem alle den størstes størrelse. En cylinder bliver rund, så den vokser i den anden retning også. En form vendt i en vinkel forbliver som den er; former vendt 90° virker.
+
 ## Spejling
 
 {{ui:editor.tool.mirror}} ([[M]], eller højreklik på markeringen og vælg den) vender markeringen over et plan: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} eller {{ui:mirror.topBottom}}. Klik den tilsvarende akse-pil. Det er handy for symmetriske dele: byg én halvdel, kopier den og spejl kopien.
@@ -69,7 +75,7 @@ Vinklerne bliver ved formen. I dens indstillinger viser {{ui:inspector.rotation}
 
 ![En form vendt omkring to akser: dens vinkler står under den, og Rotationskortet i dens indstillinger tager dem som tal.](shot:rotation-card)
 
-Med **én form** valgt hører rotationspunktet til den form: vælg andre dele og kom tilbage, så er det stadig der. Det flytter, drejer og skalerer med formen, gemmes i projektet og kommer tilbage med Fortryd. Under {{ui:inspector.position}} har rotationspunktet sit eget X, Y og Z, som du kan taste eller skubbe, og {{ui:inspector.pivotRemove}} fjerner det. Du kan også trække rotationspunktets røde markør med musen: den glider hen over formernes overflade og snapper til hjørner, kantmidtpunkter og kanter, så en hængseltap lander præcis på et hjørne. Med flere former valgt er rotationspunktet kun for den markering, og en ny markering fjerner det. Grupperer eller bundter du dem, bevares det: gruppen får drejepunktet som sit eget, med X, Y og Z under {{ui:inspector.position}}. Hold Shift nede mens du trækker, så snapper den i stedet til midten af fladen under markøren - aksen på en rund flade, midten af en flad eller spidsen af en kegle - og ser gennem gennemsigtige former.
+Med **én legeme** valgt hører rotationspunktet til det legeme: vælg andre dele og kom tilbage, så er det stadig der. Det flytter, drejer og skalerer med legemet, gemmes i projektet og kommer tilbage med Fortryd. Under {{ui:inspector.position}} har rotationspunktet sit eget X, Y og Z, som du kan taste eller skubbe, og {{ui:inspector.pivotRemove}} fjerner det. Du kan også trække rotationspunktets røde markør med musen: den glider hen over legernes overflade og snapper til hjørner, kantmidtpunkter og kanter, så en hængseltap lander præcis på et hjørne. Med flere legemer valgt er rotationspunktet kun for den markering, og en ny markering fjerner det. Grupperer eller bundter du dem, bevares det: gruppen får rotationspunktet som sit eget, med X, Y og Z under {{ui:inspector.position}}. Hold Shift nede mens du trækker, så snapper den i stedet til midten af fladen under markøren - aksen på en rund flade, midten af en flad eller spidsen af en kegle - og ser gennem gennemsigtige former.
 
 ## Læg fladt på en flade
 
@@ -99,6 +105,8 @@ Til hulgitre, boltecirkler og ringe af tænder er der {{ui:editor.tool.array}}. 
 - **{{ui:array.mode.circle}}:** Markeringen spredes rundt om et centrum. Hvor mange kopier der er sætter du under {{ui:array.count}}, og {{ui:array.angle}} er 360° for en hel cirkel. Vælg om kopierne drejer med. {{ui:array.rise}} løfter hver kopi lidt mere end den forrige (en skrue eller en stigende spiral), og {{ui:array.radiusChange}} flytter den længere fra centrum eller tættere på det (en flad spiral); sammen giver de en konisk spiral. En spiral får højst én vinding: en vinkel over 360° tæller som en hel cirkel, og der er højst 100 kopier.
 
 Tip: sæt først rotationspunktet på en flade med {{ui:editor.tool.rotationPivot}}, så ligger cirklens centrum præcis der.
+
+Bagefter beholder stykkerne cirklens centrum som deres rotationspunkt, også når de er grupperet. Det er der, en anden del hører hjemme, en bold midt i tre ben for eksempel: midten af den kasse, stykkerne fylder, er ikke centrum, fordi tre ben fylder den bredere den ene vej end den anden. Højreklik på stykkerne og vælg {{ui:contextMenu.markPivot}}, så snapser midten af den del, du trækker, til det.
 
 ![Mønsteret i "Cirkel"-tilstand med stigning og radiusændring pr. kopi: kopierne klatrer op og bliver bredere som en spiral.](shot:pattern-spiral)
 

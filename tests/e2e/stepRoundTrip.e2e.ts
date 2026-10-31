@@ -285,6 +285,47 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     expect(near(await reimportVolume(blob), expected, 1e-4)).toBe(true);
   });
 
+  it("exports a loft through more sections, smooth, straight and with a wall, as its exact body (#1034)", async () => {
+    const { createLoftGeometry, loftFrameSize, loftStoredMeasures } = await import("@/lib/loftGeometry");
+    const loft = (extra: Partial<WorkplaneShape>) => {
+      const base = shape({
+        kind: "loft", name: "Loft", height: 100,
+        loftBottomOutline: "round", loftTopOutline: "round", loftBottomWidth: 10, loftBottomDepth: 10, loftTopWidth: 10, loftTopDepth: 10,
+        loftBottomCorner: 0, loftTopCorner: 0, loftOffsetX: 0, loftOffsetZ: 0, loftWall: 0,
+        loftSections: [{ at: 0.5, outline: "round", width: 30, depth: 30 }],
+        ...extra,
+      });
+      const frame = loftFrameSize(loftStoredMeasures(base));
+      return { ...base, width: frame.width, depth: frame.depth, size: Math.max(frame.width, frame.depth) };
+    };
+    const meshVolume = (source: WorkplaneShape) => {
+      const p = createLoftGeometry(source).getAttribute("position");
+      let total = 0;
+      for (let i = 0; i + 2 < p.count; i += 3) {
+        const [ax, ay, az] = [p.getX(i), p.getY(i), p.getZ(i)];
+        const [bx, by, bz] = [p.getX(i + 1), p.getY(i + 1), p.getZ(i + 1)];
+        const [cx, cy, cz] = [p.getX(i + 2), p.getY(i + 2), p.getZ(i + 2)];
+        total += (ax * (by * cz - bz * cy) + ay * (bz * cx - bx * cz) + az * (bx * cy - by * cx)) / 6;
+      }
+      return total;
+    };
+    const straight = loft({ loftThrough: "straight" });
+    const smooth = loft({ x: 50, loftSections: [{ at: 0.3, outline: "rectangle", width: 24, depth: 18, corner: 4 }, { at: 0.7, outline: "round", width: 30, depth: 26, offsetZ: 3 }] });
+    const walled = loft({ x: 100, loftWall: 1.5 });
+    for (const source of [straight, smooth, walled]) {
+      const { blob, exportedCount, skipped } = await exportShapesToStep([source]);
+      expect(skipped).toEqual([]);
+      expect(exportedCount).toBe(1);
+      const volume = await reimportVolume(blob);
+      if (source === straight) {
+        // Two frustums, radius 5 to 15 and back, 50 high each.
+        expect(near(volume, 2 * ((PI * 50) / 3) * (5 * 5 + 5 * 15 + 15 * 15), 1e-4)).toBe(true);
+      } else {
+        expect(near(volume, meshVolume(source), 5e-3)).toBe(true);
+      }
+    }
+  });
+
   it("exports a tapered, a leaning and (since #184) a twisted box as they are drawn, not as plain boxes", async () => {
     // 30 x 20 at the bottom to 12 x 8 at the top over 15: (h/3)(A1 + A2 + sqrt(A1 A2)) for similar ends.
     const frustum = shape({ kind: "box", name: "Frustum", x: -40, width: 30, depth: 20, height: 15, taperTopWidth: 12, taperTopDepth: 8 });

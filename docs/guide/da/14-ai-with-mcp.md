@@ -72,10 +72,10 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_boolean_cut` | skærer solider med huller |
 | `layerling_intersect_objects` | beholder kun hvad objekterne har til fælles (Fælles) |
 | `layerling_hull_objects` | pakker objekterne ind i ét konvekst legeme, som var de krympefolieret (Hylster) |
-| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
-| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
-| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
+| `layerling_cookie_cutter` | laver en småkageudstikker af objekterne: en væg med en skærekant og en kant rundt om det spejlede omrids (Småkageudstikker) |
+| `layerling_flexi_joints` | skærer et fladt legeme i stykker med led, der er printet på plads og svinger ud til siden (Flexi-led) |
+| `layerling_make_lid` | laver et låg til et legeme, der er åbent foroven: skubbet ind, over ydersiden eller fladt, med den pasning du vælger (Låg) |
+| `layerling_loft_sketches` | forbinder to skitseformer i en overgang fra det ene omrids til det andet (Overgang mellem skitser) |
 | `layerling_separate_parts` | adskiller en form i dens løse dele, et skitselegeme i ét legeme pr. omrids |
 | `layerling_split_objects` | skærer solider eller huller over med et plan |
 | `layerling_list_edges` | lister objektets rigtige CAD-kanter |

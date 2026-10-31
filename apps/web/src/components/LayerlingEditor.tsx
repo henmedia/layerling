@@ -9,7 +9,7 @@ import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
 import { getLanguage, t, type MessageKey } from "@/lib/i18n";
 import { isObjectListOrder, sortObjectList } from "@/lib/objectListSearch";
 import { useLanguage } from "@/lib/useLanguage";
-import { loftShapePatch, type LoftMeasures } from "@/lib/loftGeometry";
+import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/loftGeometry";
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
@@ -2457,6 +2457,20 @@ function mcpLoftChange(params: Record<string, unknown>): Partial<LoftMeasures> {
     const value = mcpOptionalNumber(params[param]);
     if (value !== undefined) Object.assign(change, { [key]: value });
   });
+  // Sections between the ends (#1034): a list, or its JSON text as layerling_read_scene reports it; [] removes them.
+  if (params.loftSections !== undefined) {
+    let sections: unknown = params.loftSections;
+    if (typeof sections === "string") {
+      try {
+        sections = JSON.parse(sections);
+      } catch {
+        throw new Error("loftSections must be a list of sections, or its JSON text");
+      }
+    }
+    if (!Array.isArray(sections)) throw new Error("loftSections must be a list of sections, or its JSON text");
+    change.middles = normalizeLoftMiddles(sections);
+  }
+  if (params.loftThrough === "smooth" || params.loftThrough === "straight") change.through = params.loftThrough;
   return change;
 }
 
@@ -10468,6 +10482,8 @@ export function LayerlingEditor({
           shape = { ...shape, ...mcpTaperPatch(shape, params, shapeDimensionLimit(workspaceSettingsRef.current, shape.kind, DEFAULT_TAPER_DIMENSION_MAX)) };
           shape = { ...shape, ...mcpExtrudeDeformPatch(shape, params) };
           shape = { ...shape, ...mcpSlopePatch(shape, params) };
+          // A loft's sections between the ends (#1034) are a list the shape defaults do not carry.
+          if (shape.kind === "loft" && (params.loftSections !== undefined || params.loftThrough !== undefined)) shape = { ...shape, ...loftShapePatch(shape, mcpLoftChange(params)) };
           if (shape.kind === "bentTube") {
             shape = { ...shape, ...mcpBentTubePatch(shape, params) };
           }
