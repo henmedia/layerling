@@ -219,6 +219,8 @@ docker run -d --name layerling -p 3000:3000 -v layerling-thumbnails:/app/.codex/
 （Synology Container Manager、Unraid、Portainer），在其注册表（Docker Hub）中搜索 `henmedia/layerling`，
 或输入 `henmedia/layerling:latest`，映射 3000 端口，并为 `/app/.codex/project-thumbnails` 添加一个卷。要更新，
 重新拉取镜像并重新创建容器（或让 Watchtower 代劳）。
+在 **Unraid** 上，layerling 也已上架应用商店（Community Applications）：搜索 “Layerling”，点几下即可安装；
+由 [jbat66](https://github.com/jbat66/unraid-templates) 维护的模板会直接把服务器存储设在 Unraid 共享文件夹上。
 
 镜像标签是纯版本号，**不带 “v”**：`ghcr.io/henmedia/layerling:1.42.0`，而 GitHub 发布版本叫 `v1.42.0`。
 拉取只会获取新镜像；已经存在的容器仍会运行旧镜像，直到它被删除并重新创建：
