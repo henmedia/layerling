@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.129.1
+
 - **Trace with curves and corners, the object, picked areas, Cut away and a magnetic lasso (Discussion #1060):** Trace in a reference image's settings takes the place of Dark/Light, Threshold and Trace outline: the outlines come as cubic curves and corners with a number of points you set (`pictureTrace.ts`, fitted after Schneider on `rasterTrace`'s outline), shown in red over the picture before Apply, with Corner from, Leave out specks and Keep holes. Object takes everything that stands out from the background at the picture's edge as one outline; Pick areas outlines a patch of like colour as a hole or construction line; Cut away removes a part by clicked corners; the magnetic lasso follows the picture's edges between clicks (Sobel edges, Dijkstra). Outlines that would cross are fitted more closely. The vase drawing gets Trace with threshold, points, corners and the lasso. Nothing new is stored. Guide chapters 3 and 7 and the texts in every fully kept language. By @marcus040473 in #1095.
 - **Hinge: lift-off style and nut pockets:** The hinge's style has a fourth choice, Lift-off: two knuckles, the lower one carrying the pin to the end, the upper one a sleeve that lifts off it. Holes now offer Countersunk, Straight, Nut pocket and Countersunk + nut pocket, with the nut's width across flats (0 takes it from the hole, M3 5.8 mm, M4 7.3 mm); a pocket leaves 0.6 mm of leaf and is left out on a leaf too thin for it. Exact bodies and STEP included; `hingeScrewHead` takes the place of the countersink switch, which old designs still read. MCP, guide chapter 9 and texts in every fully kept language. By @marcus040473 in #1097.
 
