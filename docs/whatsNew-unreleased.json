@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Loft durch mehr Schnitte",
+      "en": "Loft through more sections"
+    },
+    "body": {
+      "de": "Die Loft-Form bekommt Schnitte zwischen ihren beiden Enden (0 bis 12): jeder mit eigenem Umriss, eigener Größe, Höhe und eigenem Versatz. \"Glatt\" legt eine weiche Fläche durch alle Schnitte, \"Gerade\" macht flache Wände von Schnitt zu Schnitt. So entstehen Vasen, Griffe und Gehäuse mit Taille. Beigetragen von plazmabokor.",
+      "en": "The Loft shape gets sections between its two ends (0 to 12): each with its own outline, size, height and offset. Smooth lays a soft surface through all sections, Straight makes flat walls from section to section. That gives vases, handles and housings with a waist. Contributed by plazmabokor."
+    }
+  }
+]
