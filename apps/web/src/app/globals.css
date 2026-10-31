@@ -5956,8 +5956,12 @@ html[data-theme="dark"] .visibility-hidden-badge {
   z-index: 2;
   max-width: min(560px, calc(100% - 32px));
   margin: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
   transform: translateX(-50%);
-  color: var(--muted-strong);
+  color: var(--foreground);
   font-size: 14px;
   line-height: 1.45;
   text-align: center;

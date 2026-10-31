@@ -2270,7 +2270,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .visibility-hidden-badg
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .workplane-empty-hint {
-  color: var(--muted-strong);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  color: var(--foreground);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-workspace-stage {
