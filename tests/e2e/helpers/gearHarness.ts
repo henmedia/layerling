@@ -8,12 +8,12 @@ import { cadModifierHelicalGearForShape, cadModifierProfileForShape, cadProfileE
 import { cadProfileSolidMismatch, profileExtrusionSolid } from "@/lib/cadProfileSolid";
 import { cadTransformRequiresGeneralTransform } from "@/lib/cadModifierRuntime";
 import { helicalGearPartSolid } from "@/lib/gearSolid";
-import { BEVEL_GEAR_TOP_SCALE, createGearGeometry, gearOutlineCorners, gearSettings, MIN_GEAR_HELIX_QUALITY, MAX_GEAR_HELIX_QUALITY } from "@/lib/gearGeometry";
+import { BEVEL_GEAR_TOP_SCALE, createGearGeometry, gearHelixTwist, gearOutlineCorners, gearSettings, gearTypeHasHelix, MIN_GEAR_HELIX_QUALITY, MAX_GEAR_HELIX_QUALITY } from "@/lib/gearGeometry";
 import { meshYawDegrees, mirrorSign } from "@/lib/workplaneShapes";
 
 
 /*
- * The helical and the bevel gear's exact bodies against their display mesh,
+ * The helical, herringbone and bevel gears' exact bodies against their display mesh,
  * built by the real createGearGeometry and placed as transformMesh places it
  * (copied here, as LayerlingEditor.tsx keeps it to itself; gears take no
  * taper, twist or lean).
@@ -22,7 +22,8 @@ import { meshYawDegrees, mirrorSign } from "@/lib/workplaneShapes";
  * far, from the right one. So the body is also cut at several heights, and
  * points just inside and just outside the section the gear has there are
  * tested against it: the foot outline turned by its share of the helix
- * angle (helical), or shrunk towards the top (bevel), and the round bore.
+ * angle (helical; half of it up to the middle and back for a herringbone
+ * gear), or shrunk towards the top (bevel), and the round bore.
  *
  * The mesh draws the bore as a polygon inside the circle and a helical gear
  * in straight steps; it holds within 1 % of the body. The body is held to
@@ -76,7 +77,7 @@ export function displayMesh(shape: WorkplaneShape) {
 export function body(shape: WorkplaneShape) {
   let local: ShapeHandle;
   let transform: number[] | undefined;
-  if (gearSettings(shape).gearType === "helical") {
+  if (gearTypeHasHelix(gearSettings(shape).gearType)) {
     const part = cadModifierHelicalGearForShape(shape);
     expect(part).not.toBeNull();
     local = helicalGearPartSolid(cad, part!);
@@ -103,16 +104,18 @@ export function area(points: P2[]) {
 /**
  * The gear's section at height y in its own frame, worked out here from the
  * corners alone: the helical gear's ring turned by its share of the helix
- * angle and stretched as its part says, the bevel gear's foot outline
+ * angle and stretched as its part says (the herringbone gear's turned half
+ * the angle up to the middle and back), the bevel gear's foot outline
  * stretched to width x depth and shrunk towards the top. And its bore.
  */
 export function section(shape: WorkplaneShape, y: number) {
   const settings = gearSettings(shape);
   const corners = gearOutlineCorners(shape.width, shape.depth!, shape);
   const t = y / shape.height;
-  if (settings.gearType === "helical") {
+  if (gearTypeHasHelix(settings.gearType)) {
     const { stretch } = cadModifierHelicalGearForShape(shape)!;
-    const turn = (settings.helixAngle * Math.PI) / 180 * t;
+    const twist = gearHelixTwist(shape.width, shape.depth!, shape.height, shape);
+    const turn = settings.gearType === "herringbone" ? (twist / 2) * (1 - Math.abs(2 * t - 1)) : twist * t;
     return { outline: corners.map((c) => ({ x: Math.cos(c.angle + turn) * c.radiusX * stretch.x, z: Math.sin(c.angle + turn) * c.radiusZ * stretch.z })), bore: settings.centerHoleSize / 2 };
   }
   const raw = corners.map((c) => ({ x: Math.cos(c.angle) * c.radiusX, z: Math.sin(c.angle) * c.radiusZ }));
@@ -159,7 +162,8 @@ export function surfaceSides(solid: ShapeHandle) {
 export function sectionPoints(shape: WorkplaneShape, offset: number) {
   const place = placer(shape);
   const points: Array<{ p: Vec3; inside: boolean }> = [];
-  for (const share of [0.15, 0.5, 0.85]) {
+  // A herringbone gear turns up to the middle and back: two heights more on the way there and back.
+  for (const share of gearSettings(shape).gearType === "herringbone" ? [0.15, 0.3, 0.5, 0.7, 0.85] : [0.15, 0.5, 0.85]) {
     const y = shape.height * share;
     const { outline, bore } = section(shape, y);
     // Outward normal of a side: the outline runs counter-clockwise in x/z, so the outside is to its right.

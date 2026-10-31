@@ -19,7 +19,6 @@ import { COMMAND_KEYWORDS, COMMAND_SHORTCUTS, SHAPE_KEYWORDS } from "@/lib/comma
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { libraryShapeAssets, shapeAssetColor, shapeAssetLabel, shapeAssetMenuLabel } from "@/lib/shapeCatalog";
-import { NoteToolButton } from "@/components/workplane/NoteToolButton";
 import type { CadModifierKind } from "@/lib/cadModifierTypes";
 import type { ShapeAsset, SketchOperation, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { TopPanel } from "./TopActionPanel";
@@ -843,8 +842,8 @@ export function SecondaryToolbar({
         plain("sketch-arc", t("sketch.arc"), drawGroup, true, () => onSketchTool("arc"), { icon: SKETCH_PALETTE_ICONS.arc, active: sketchTool === "arc" }),
         plain("sketch-bezier", t("sketch.bezier"), drawGroup, true, () => onSketchTool("bezier"), { icon: SKETCH_PALETTE_ICONS.bezier, active: sketchTool === "bezier" }),
         plain("sketch-smooth", t("sketch.smooth"), drawGroup, true, () => onSketchTool("smooth"), { icon: SKETCH_PALETTE_ICONS.smooth, active: sketchTool === "smooth" }),
-        plain("note", t("editor.tool.note"), t("editor.group.manage"), true, onNoteTool, { icon: ToolbarNoteIcon, active: noteMode }),
-        plain("notes", t("visibility.notes"), t("editor.group.manage"), true, onToggleNotes, { icon: notesVisible ? Eye : EyeOff, active: notesVisible }),
+        plain("note", t("editor.tool.note"), t("editor.group.visibility"), true, onNoteTool, { icon: ToolbarNoteIcon, active: noteMode }),
+        plain("notes", t("visibility.notes"), t("editor.group.visibility"), true, onToggleNotes, { icon: notesVisible ? Eye : EyeOff, active: notesVisible }),
         plain("sketch-construction", t("sketch.construction"), drawGroup, true, () => onSketchConstruction?.(), { icon: ToolbarConstructionLineIcon, active: Boolean(sketchConstruction), keywords: ["construction", "guide", "helper", "hilfslinie", "hilfs", "konstruktion"] }),
         plain("sketch-from-middle", t("sketch.fromMiddle"), drawGroup, true, () => onSketchFromMiddle?.(), { icon: ToolbarMiddleLineIcon, active: Boolean(sketchFromMiddle), keywords: ["middle", "center", "centre", "mitte", "mittellinie", "symmetric", "symmetrisch"] }),
         ...sketchShapeMenuItems.map(({ primitive, label, icon }) => plain(
@@ -873,7 +872,7 @@ export function SecondaryToolbar({
     }
     const shapesGroup = t("editor.group.shapes");
     const visibilityGroup = t("editor.group.visibility");
-    const manageGroup = t("editor.group.manage");
+    const fileGroup = t("editor.group.file");
     return [
       ...leftTools.slice(0, 4).map((tool) => fromTool(tool, t("editor.group.clipboard"))),
       ...leftTools.slice(4).map((tool) => fromTool(tool, t("editor.group.history"))),
@@ -901,11 +900,11 @@ export function SecondaryToolbar({
       plain("carry", t("contextMenu.carry"), t("editor.group.arrange"), canModifySelection, onCarryOntoFace, { icon: ArrowDownToLine }),
       plain("scalePercent", t("scalePercent.title"), t("editor.group.modify"), canModifySelection, onScalePercent, { icon: Percent, active: scalePercentActive }),
       ...arrangeTools.map((tool) => fromTool(tool, t("editor.group.arrange"))),
-      plain("note", t("editor.tool.note"), manageGroup, true, onNoteTool, { icon: ToolbarNoteIcon, active: noteMode }),
-      plain("import", t("editor.import"), manageGroup, true, () => onTopPanel("import"), { icon: ToolbarImportIcon }),
-      plain("export", t("editor.export"), manageGroup, true, () => onTopPanel("export"), { icon: ToolbarVectorExportIcon }),
-      plain("attachments", t("editor.attachments"), manageGroup, true, () => onTopPanel("attachments"), { icon: ToolbarAttachmentsIcon, keywords: ["attachment", "file", "notes", "instructions", "readme", "anhang", "datei"] }),
-      plain("settings", t("editor.workspaceSettings"), manageGroup, true, () => window.dispatchEvent(new Event("layerling:open-workspace-settings")), { icon: ToolbarSettingsIcon }),
+      plain("note", t("editor.tool.note"), visibilityGroup, true, onNoteTool, { icon: ToolbarNoteIcon, active: noteMode }),
+      plain("import", t("editor.import"), fileGroup, true, () => onTopPanel("import"), { icon: ToolbarImportIcon }),
+      plain("export", t("editor.export"), fileGroup, true, () => onTopPanel("export"), { icon: ToolbarVectorExportIcon }),
+      plain("attachments", t("editor.attachments"), fileGroup, true, () => onTopPanel("attachments"), { icon: ToolbarAttachmentsIcon, keywords: ["attachment", "file", "notes", "instructions", "readme", "anhang", "datei"] }),
+      plain("settings", t("editor.workspaceSettings"), t("editor.group.help"), true, () => window.dispatchEvent(new Event("layerling:open-workspace-settings")), { icon: ToolbarSettingsIcon }),
       plain("mode-sketch", t("palette.switchSketch"), t("palette.group.mode"), true, () => selectToolbarMode("sketch")),
       ...helpCommands,
       ...objects.map((object) => plain(
@@ -1167,10 +1166,9 @@ export function SecondaryToolbar({
         </div>
       </div>
       <div className="toolbar-section toolbar-actions-section" data-group="manage" data-collapse="1">
-        <div className="toolbar-section-label">{t("editor.group.manage")}</div>
-        {collapseBox(t("editor.group.manage"), ToolbarSettingsIcon)}
+        <div className="toolbar-section-label">{t("editor.group.file")}</div>
+        {collapseBox(t("editor.group.file"), ToolbarVectorExportIcon)}
         <div className="action-buttons">
-          {simpleMode ? null : <NoteToolButton active={noteMode} shortcut={COMMAND_SHORTCUTS.note} onClick={onNoteTool} disabled={historyViewActive} />}
           {simpleMode ? null : <button className="action-icon-button" aria-label={t("editor.import")} title={`${t("editor.import")} (${COMMAND_SHORTCUTS.import})`} onClick={() => onTopPanel("import")} disabled={historyViewActive}>
             <ToolbarImportIcon />
           </button>}
@@ -1186,9 +1184,6 @@ export function SecondaryToolbar({
           >
             <ToolbarAttachmentsIcon />
             {attachmentCount > 0 ? <span className="attachments-indicator" aria-hidden="true" /> : null}
-          </button>
-          <button className="action-icon-button" aria-label={t("editor.workspaceSettings")} title={t("editor.workspaceSettings")} onClick={() => window.dispatchEvent(new Event("layerling:open-workspace-settings"))}>
-            <ToolbarSettingsIcon />
           </button>
         </div>
       </div>
@@ -1425,11 +1420,6 @@ export function SecondaryToolbar({
                 </div>
               </div>
             )}
-            {/* Notes go on a sketch as in 3D: they are the sketch body's. */}
-            {simpleMode || !sketchActive ? null : <div className="toolbar-section toolbar-actions-section" data-group="manage">
-              <div className="toolbar-section-label">{t("editor.group.manage")}</div>
-              <div className="action-buttons"><NoteToolButton active={noteMode} shortcut={COMMAND_SHORTCUTS.note} onClick={onNoteTool} /></div>
-            </div>}
           </div>
         )}
       </div>
@@ -1539,6 +1529,10 @@ export function SecondaryToolbar({
           )}
           <ThemeSwitch />
           <LanguageSwitch />
+          {/* The settings sit with the theme and the language, which are settings too, in the corner every mode shares (Stefan, 31.10.2026). */}
+          <button className="action-icon-button toolbar-title-settings" type="button" aria-label={t("editor.workspaceSettings")} title={t("editor.workspaceSettings")} onClick={() => window.dispatchEvent(new Event("layerling:open-workspace-settings"))}>
+            <ToolbarSettingsIcon />
+          </button>
         </div>
       </div>
     </div>

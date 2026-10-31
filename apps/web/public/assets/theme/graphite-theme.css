@@ -2662,6 +2662,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-shape-options .
   background: #cdcdcd;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-selection-position {
+  color: #505050;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-selection-position input {
+  color: #575757;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  outline: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-selection-position input:focus {
+  border-color: #ea953d;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-corner-label {
   color: #505050;
 }
@@ -2767,6 +2783,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .panel-grip:hover {
   background: #fff0ee;
   border-color: #ee9b92;
   box-shadow: inset 3px 0 0 #dc3f36;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .camera-controls > .camera-group {
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .section-tool-popover {
@@ -6054,6 +6074,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-point-actions {
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-point-actions button {
   color: #cbd5e0;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-selection-position {
+  color: #cbd5e0;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-selection-position input {
+  color: #f7fafc;
+  background: #202020;
+  border-color: #484848;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-point-actions button:hover,

@@ -13,6 +13,11 @@ import type { CadModifierHelicalGearPart } from "@/lib/cadModifierTypes";
  * solid, without a boolean; the mesh's stretch to width x depth follows, and
  * last the straight round bore is cut through it.
  *
+ * A herringbone gear (#1007) is the lower half, a helical gear half as high
+ * that turns half as far, and its mirror image above the middle: the faces of
+ * both halves are sewn as one, again without a boolean. Joined with a
+ * boolean, the halves take many times as long.
+ *
  * Built with the axis on z (the kernel's helix frame) and stood up on y.
  */
 
@@ -22,16 +27,20 @@ const AXIS = { point: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 0, z: 1 } };
 
 /** The helical gear part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */
 export function helicalGearPartSolid(cad: OcctKernel, part: CadModifierHelicalGearPart): ShapeHandle {
-  const { corners, twist, height, stretch, boreRadius } = part;
+  const { corners, twist, height, stretch, boreRadius, herringbone } = part;
   if (!(corners.length >= 3 && height > 0 && stretch.x > 0 && stretch.z > 0 && boreRadius >= 0 && Number.isFinite(twist))) throw new Error("The gear's measures are out of range");
   // As drawn, a corner at angle a from +x towards +z turns on towards +z as
   // it rises; the turn up to y maps that to angle -a, turning clockwise
   // about +z seen from above - a left-hand helix for a positive twist.
   const turns = Math.abs(twist) > 1e-9;
+  // A herringbone gear that does not turn is a straight one, one face a side.
+  const halved = herringbone === true && turns;
+  const rise = halved ? height / 2 : height;
+  const climb = halved ? twist / 2 : twist;
   const at = (radius: number, angle: number, z: number) => ({ x: radius * Math.cos(-angle), y: radius * Math.sin(-angle), z });
   const rails = corners.map(({ angle, radius }) => {
     if (!turns) return cad.makeWire([cad.makeLineEdge(at(radius, angle, 0), at(radius, angle, height))]);
-    const helix = cad.makeHelixWireHanded({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 }, (2 * Math.PI * height) / Math.abs(twist), height, radius, twist > 0);
+    const helix = cad.makeHelixWireHanded({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 }, (2 * Math.PI * rise) / Math.abs(climb), rise, radius, climb > 0);
     // The helix starts on +x; turned to the corner's own angle.
     return cad.rotate(helix, AXIS, -angle);
   });
@@ -44,7 +53,9 @@ export function helicalGearPartSolid(cad: OcctKernel, part: CadModifierHelicalGe
     const points = corners.map(({ angle, radius }) => at(radius, angle + turn, z));
     return cad.makeFace(cad.makeWire(points.map((point, index) => cad.makeLineEdge(point, points[(index + 1) % points.length]))));
   };
-  faces.push(end(0, 0), end(height, twist));
+  faces.push(end(0, 0));
+  if (halved) faces.push(...faces.map((face) => cad.mirror(face, { x: 0, y: 0, z: height / 2 }, { x: 0, y: 0, z: 1 })));
+  else faces.push(end(height, twist));
   const size = Math.max(...corners.map((corner) => corner.radius));
   const shells = cad.getSubShapes(cad.sew(faces, size * 1e-6), "shell");
   if (shells.length !== 1) throw new Error(`The gear's sides sewed into ${shells.length} shells`);

@@ -5,7 +5,7 @@ summary: اختيار طابعتك الخاصة، والتحذير عندما ل
 
 ## اختيار طابعتك (Choosing your printer)
 
-افتح الإعدادات (الترس في الشريط، {{ui:editor.workspaceSettings}}) وانتقل إلى منطقة {{ui:workspace.workplane}}. تحت {{ui:workspace.printer}} اختر طابعتك من قائمة تضم أكثر من 230 طرازًا شائعًا، بما في ذلك Bambu Lab وPrusa وCreality وAnycubic وElegoo وغيرها الكثير.
+افتح الإعدادات (الترس في شريط العنوان، {{ui:editor.workspaceSettings}}) وانتقل إلى منطقة {{ui:workspace.workplane}}. تحت {{ui:workspace.printer}} اختر طابعتك من قائمة تضم أكثر من 230 طرازًا شائعًا، بما في ذلك Bambu Lab وPrusa وCreality وAnycubic وElegoo وغيرها الكثير.
 
 ![إعدادات سطح العمل مع اختيار طابعة. سرير الطباعة وأقصى ارتفاع للطباعة يأتيان من ملف تعريف برنامج التقطيع.](shot:settings-workplane)
 

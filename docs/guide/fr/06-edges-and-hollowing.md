@@ -89,9 +89,10 @@ Si vous redimensionnez un corps évidé ultérieurement, layerling le creuse imm
 
 - {{ui:lid.type.plug}} : une plaque aussi grande que le corps avec en dessous une lèvre qui entre dans l'ouverture.
 - {{ui:lid.type.cap}} : une plaque plus large que le corps d'une paroi avec en dessous un rebord qui passe par-dessus l'extérieur.
+- {{ui:lid.type.both}} : une plaque plus large que le corps d'une paroi avec les deux : une lèvre dans l'ouverture et un rebord par-dessus l'extérieur. La paroi du corps se loge entre les deux dans une rainure, comme sur une boîte alimentaire.
 - {{ui:lid.type.flat}} : seulement la plaque, à poser ou à coller.
 
-Ensuite tu règles l'{{ui:lid.thickness}}, l'{{ui:lid.fit}} (le {{ui:lid.gap}} entre couvercle et corps : 0,1 mm serré, 0,2 mm normal, 0,3 mm lâche, ou toute valeur jusqu'à 1 mm) et jusqu'où descend la lèvre ou le rebord et l'épaisseur de sa paroi. Clique sur {{ui:lid.apply}} : le couvercle est posé à côté du corps, retourné, plaque en bas, et s'imprime ainsi sans supports. Le corps reste tel quel. Le couvercle suit n'importe quel contour, rond ou anguleux, car il est pris sur le corps lui-même juste sous son bord. Un corps sans ouverture en haut n'obtient qu'un couvercle plat ; pour les deux autres, évide-le d'abord avec le dessus ouvert.
+Ensuite tu règles l'{{ui:lid.thickness}}, l'{{ui:lid.fit}} (le {{ui:lid.gap}} entre couvercle et corps : 0,1 mm serré, 0,2 mm normal, 0,3 mm lâche, ou toute valeur jusqu'à 1 mm) et jusqu'où descend la lèvre ou le rebord et l'épaisseur de sa paroi. Clique sur {{ui:lid.apply}} : le couvercle est posé à côté du corps, retourné, plaque en bas, et s'imprime ainsi sans supports. Le corps reste tel quel. Le couvercle suit n'importe quel contour, rond ou anguleux, car il est pris sur le corps lui-même juste sous son bord. Un corps sans ouverture en haut n'obtient qu'un couvercle plat ; pour les autres, évide-le d'abord avec le dessus ouvert.
 
 > **Astuce :** Le serrage d'un couvercle dépend de l'imprimante. Imprime d'abord une petite boîte avec son couvercle ; s'il est trop serré, prends l'ajustement suivant, plus lâche.
 

@@ -91,7 +91,7 @@ X 與 [[Esc]] 會關閉面板；若正在量測，[[Esc]] 會先結束量測。�
 
 ### 設定視窗
 
-功能區中的齒輪（{{ui:editor.workspaceSettings}}）會開啟設定。左側有五個區域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 與 {{ui:workspace.history}}。變更會立即生效。底部的 {{ui:workspace.makeDefault}} 會將目前設定儲存為預設值，讓新設計從這些設定開始；右上角的 {{ui:workspace.close}} 則關閉視窗。本節會逐一說明這些設定。
+標題列中的齒輪（{{ui:editor.workspaceSettings}}）會開啟設定。左側有五個區域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 與 {{ui:workspace.history}}。變更會立即生效。底部的 {{ui:workspace.makeDefault}} 會將目前設定儲存為預設值，讓新設計從這些設定開始；右上角的 {{ui:workspace.close}} 則關閉視窗。本節會逐一說明這些設定。
 
 ### 外觀：主題、工具列與視圖立方體
 

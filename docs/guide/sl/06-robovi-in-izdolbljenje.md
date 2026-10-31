@@ -89,9 +89,10 @@ Izdolbiš lahko tudi telo z žepom, na primer kvader z luknjo, ki ne gre skozi d
 
 - {{ui:lid.type.plug}}: plošča, velika kot telo, pod njo ustnica, ki seže v odprtino.
 - {{ui:lid.type.cap}}: plošča, za steno širša od telesa, pod njo rob, ki objame zunanjost.
+- {{ui:lid.type.both}}: plošča, za steno širša od telesa, pod njo oboje: ustnica v odprtino in rob okoli zunanjosti. Stena telesa sedi med njima v utoru, kot pri posodi za živila.
 - {{ui:lid.type.flat}}: samo plošča, za polaganje ali lepljenje.
 
-Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom in telesom: 0,1 mm tesen, 0,2 mm običajen, 0,3 mm ohlapen ali katera koli vrednost do 1 mm) ter kako globoko seže ustnica ali rob in kako debela je njuna stena. Klikni {{ui:lid.apply}}: pokrov leži poleg telesa, obrnjen s ploščo navzdol, zato se natisne brez podpor. Telo ostane, kakršno je. Pokrov sledi vsakemu obrisu, okroglemu ali oglatemu, ker je vzet s telesa samega tik pod njegovim robom. Telo brez odprtine zgoraj dobi samo raven pokrov; za drugi dve vrsti ga najprej izdolbi z odprto zgornjo stranjo.
+Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom in telesom: 0,1 mm tesen, 0,2 mm običajen, 0,3 mm ohlapen ali katera koli vrednost do 1 mm) ter kako globoko seže ustnica ali rob in kako debela je njuna stena. Klikni {{ui:lid.apply}}: pokrov leži poleg telesa, obrnjen s ploščo navzdol, zato se natisne brez podpor. Telo ostane, kakršno je. Pokrov sledi vsakemu obrisu, okroglemu ali oglatemu, ker je vzet s telesa samega tik pod njegovim robom. Telo brez odprtine zgoraj dobi samo raven pokrov; za druge vrste ga najprej izdolbi z odprto zgornjo stranjo.
 
 > **Namig:** Kako tesno sede pokrov, je odvisno od tiskalnika. Najprej natisni majhno škatlo s pokrovom; če je pretesen, izberi naslednji ohlapnejši ujem.
 

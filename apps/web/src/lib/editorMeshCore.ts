@@ -35,8 +35,9 @@ import { createSpringGeometry } from "@/lib/springGeometry";
 import { textDisplayGeometry } from "@/lib/textFill";
 import { rememberManifoldRuntime, setManifoldLoader } from "@/lib/manifoldHandle";
 import { meshForTwist, twistBandCount } from "@/lib/heightSlices";
-import { groupedContentScale, scaleGroupedVertices } from "@/lib/groupScale";
-import { deformsAboutOrigin, meshYawDegrees, mirroredAxisCount, mirrorSign, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasTaper, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
+import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices } from "@/lib/groupScale";
+import { quaternionForShape } from "@/lib/geometryRotation";
+import { canonicalizeShape, deformsAboutOrigin, meshYawDegrees, mirroredAxisCount, mirrorSign, resizedImportedMeshPositions, resizedShapeSize, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasTaper, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
 export type Vec3 = [number, number, number];
@@ -727,6 +728,31 @@ export function meshReachAlong(mesh: Pick<MeshData, "vertices">, direction: { x:
   return reach;
 }
 
+/**
+ * A thread inside a group, at the size the group's stretch gives it, in the group's own frame: its width, height and
+ * depth stretch by the length each of its own axes gets (a thread lying on its side has them on other axes), and its
+ * place stretches with the group. The same sizes Ungroup gives it, so the group shows what opening it would.
+ */
+function groupedThreadAtStretch(thread: WorkplaneShape, [sx, sy, sz]: readonly [number, number, number]): WorkplaneShape {
+  const quaternion = quaternionForShape(thread);
+  const axes = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)]
+    .map((axis) => axis.applyQuaternion(quaternion).toArray() as [number, number, number]) as [[number, number, number], [number, number, number], [number, number, number]];
+  const part = groupedPartSizeScale(axes, [sx, sy, sz]);
+  const width = shapeWidth(thread) * part.width;
+  const depth = shapeDepth(thread) * part.depth;
+  const height = thread.height * part.height;
+  return canonicalizeShape({
+    ...thread,
+    x: thread.x * sx,
+    z: thread.z * sz,
+    elevation: ((thread.elevation ?? 0) + thread.height / 2) * sy - height / 2,
+    width,
+    depth,
+    height,
+    size: resizedShapeSize(width, depth),
+  });
+}
+
 export function meshForShape(shape: WorkplaneShape): MeshData {
   if (shape.kind === "mesh" && shape.importedMesh) {
     return importedMeshForShape(shape);
@@ -735,13 +761,18 @@ export function meshForShape(shape: WorkplaneShape): MeshData {
   if (shape.groupedShapes?.length) {
     const vertices: Vec3[] = [];
     const faces: [number, number, number][] = [];
+    const stretch = groupedContentScale(shape, localGroupBounds(shape.groupedShapes));
+    // A thread is not stretched with the group: it is built again at the size the stretch gives it, as Ungroup builds
+    // it, so its turns keep their shape instead of coming out squeezed or pulled (Discussion #1066).
+    const rebuilt: MeshData[] = [];
     shape.groupedShapes.filter((child) => !child.hidden).forEach((child) => {
-      const childMesh = meshForShape(child);
-      appendMeshData(vertices, faces, childMesh);
+      if (child.kind === "thread") rebuilt.push(meshForShape(groupedThreadAtStretch(child, stretch)));
+      else appendMeshData(vertices, faces, meshForShape(child));
     });
     // Without the stretch, split, export and alignment would see a resized
     // group at the size it had when it was grouped.
-    const scaled = scaleGroupedVertices(vertices, groupedContentScale(shape, localGroupBounds(shape.groupedShapes)));
+    const scaled = scaleGroupedVertices(vertices, stretch);
+    rebuilt.forEach((mesh) => appendMeshData(scaled, faces, mesh));
     return transformMesh({ name: sanitizeName(shape.name), vertices: scaled, faces }, shape);
   }
 

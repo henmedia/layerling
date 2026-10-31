@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Verrunden und STEP am Pfeilrad",
+      "en": "Fillets and STEP for the herringbone gear"
+    },
+    "body": {
+      "de": "Verrunden und „Fläche löschen“ gehen jetzt auch am Pfeilrad. Der STEP-Export, der es bisher ausließ, nimmt es mit seinen echten schrägen Zähnen mit.",
+      "en": "Fillets and \"Delete face\" now work on the herringbone gear too. The STEP export, which used to leave it out, now takes it with its true slanted teeth."
+    }
+  }
+]

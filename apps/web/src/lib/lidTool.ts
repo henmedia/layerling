@@ -12,12 +12,13 @@ import type { WorkplaneShape } from "@/types/layerling";
  * below its rim; the outline of that cut is the body seen from above, the empty part inside it the opening. From these:
  * - plug: a plate as large as the body with a lip below it that goes into the opening, the gap smaller all round;
  * - cap: a plate a wall wider than the body with a rim below it that goes over the outside, the gap larger all round;
+ * - both: the lip of the plug and the rim of the cap on one plate, so the body's wall sits in a groove between them (#1062);
  * - flat: only the plate, as large as the body, to glue on or lay on top.
  * The lid comes out as a body of its own beside the one it closes, turned over with its plate on the plate, ready to
  * print. Everything is worked out with Manifold, in a frame where z is up (the scene's y).
  */
 
-export type LidType = "plug" | "cap" | "flat";
+export type LidType = "plug" | "cap" | "both" | "flat";
 
 /** The kind of lid; the plate's thickness, the gap per side, how deep the lip or rim reaches down and how thick its wall is, in mm. */
 export type LidOptions = {
@@ -28,7 +29,7 @@ export type LidOptions = {
   wall: number;
 };
 
-export const LID_TYPES: readonly LidType[] = ["plug", "cap", "flat"];
+export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat"];
 export const LID_DEFAULTS: LidOptions = { type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6 };
 export const LID_FITS = [0.1, 0.2, 0.3] as const;
 export const MIN_LID_THICKNESS = 0.4;
@@ -124,18 +125,18 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const parts: ManifoldSolid[] = [];
     if (options.type === "flat") {
       parts.push(prism(outline, top, top + options.thickness));
-    } else if (options.type === "plug") {
-      parts.push(prism(outline, top, top + options.thickness));
-      const lip = keep(created, opening.offset(-options.gap, "Round", 2, 48));
-      if (lip.area() < MIN_OPENING_AREA) return { error: { code: "tooSmall" } };
-      const inside = keep(created, opening.offset(-(options.gap + options.wall), "Round", 2, 48));
-      const ring = inside.area() >= MIN_OPENING_AREA ? keep(created, lip.subtract(inside)) : lip;
-      parts.push(prism(ring, top - options.depth, top));
     } else {
       const inner = keep(created, outline.offset(options.gap, "Round", 2, 48));
       const outer = keep(created, outline.offset(options.gap + options.wall, "Round", 2, 48));
-      parts.push(prism(outer, top, top + options.thickness));
-      parts.push(prism(keep(created, outer.subtract(inner)), top - options.depth, top));
+      parts.push(prism(options.type === "plug" ? outline : outer, top, top + options.thickness));
+      if (options.type !== "cap") {
+        const lip = keep(created, opening.offset(-options.gap, "Round", 2, 48));
+        if (lip.area() < MIN_OPENING_AREA) return { error: { code: "tooSmall" } };
+        const inside = keep(created, opening.offset(-(options.gap + options.wall), "Round", 2, 48));
+        const ring = inside.area() >= MIN_OPENING_AREA ? keep(created, lip.subtract(inside)) : lip;
+        parts.push(prism(ring, top - options.depth, top));
+      }
+      if (options.type !== "plug") parts.push(prism(keep(created, outer.subtract(inner)), top - options.depth, top));
     }
     const made = parts.length === 1 ? parts[0] : keep(created, runtime.Manifold.union(parts));
     if (made.isEmpty()) return { error: { code: "empty" } };

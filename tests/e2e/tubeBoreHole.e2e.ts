@@ -5,6 +5,8 @@ import { buildGroupedShapeFromSelection, manifoldFromMeshData, splitBoreTube } f
 import { bentTubeNaturalDimensions, bentTubeProfileRadii, bentTubeSettings, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
 import { boundsForShapesOfVertices, meshForShape } from "@/lib/editorMeshCore";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
+import { edgeTreatmentAppliedFrame } from "@/lib/edgeTreatmentHistory";
+import { normalizeShapeCustomizations } from "@/lib/workplaneSettings";
 
 /**
  * Two tubes grouped into a T-junction: the bore of one does not cut the wall of the other, so nothing flows through (#892).
@@ -58,6 +60,62 @@ describe("a tube whose bore cuts as a hole (#892)", () => {
     expect(splitBoreTube(tube("t", { tubeBoreHole: true, hole: true }))).toHaveLength(1);
     // A wall as thick as the radius has no bore to cut.
     expect(splitBoreTube(tube("t", { tubeBoreHole: true, bevel: 10 }))).toHaveLength(1);
+  });
+});
+
+/**
+ * A tube with filleted ends is one mesh, which the fillet made from the tube; the first entry of its history remembers the
+ * tube. Here the mesh is the tube's own, standing in for the rounded one: what counts is where its bore goes (#1067).
+ */
+function filletedTube(base: WorkplaneShape, extra: Partial<WorkplaneShape> = {}) {
+  const mesh = meshForShape(base);
+  const box = boundsForShapesOfVertices([base]);
+  const x = (box.minX + box.maxX) / 2;
+  const z = (box.minZ + box.maxZ) / 2;
+  const positions = mesh.faces.flatMap((face) => face.flatMap((index) => [mesh.vertices[index][0] - x, mesh.vertices[index][1] - box.minY, mesh.vertices[index][2] - z]));
+  const width = box.maxX - box.minX;
+  const depth = box.maxZ - box.minZ;
+  const height = box.maxY - box.minY;
+  const filleted = {
+    ...base, kind: "mesh", x, z, elevation: box.minY, width, depth, height, size: Math.max(width, depth), rotation: 0, rotationX: 0, rotationZ: 0,
+    importedMesh: { positions, baseWidth: width, baseDepth: depth, baseHeight: height, triangleCount: mesh.faces.length, sourceFormat: "step" },
+  } as WorkplaneShape;
+  return {
+    ...filleted,
+    edgeTreatments: [{ kind: "fillet", amount: 1, edgeCount: 2 }],
+    edgeTreatmentHistory: [{ id: "fillet", createdAt: 0, feature: { kind: "fillet", amount: 1, edgeCount: 2 }, before: base, appliedFrame: edgeTreatmentAppliedFrame(filleted) }],
+    ...extra,
+  } as WorkplaneShape;
+}
+
+describe("a filleted tube whose bore cuts as a hole (#1067)", () => {
+  /** The lying tube filleted: only its bore opens the standing tube's wall where the rod runs. */
+  async function blocked(bore: boolean) {
+    const lying = filletedTube({ ...tubes(false)[1], tubeBoreHole: bore || undefined });
+    const { group } = await buildGroupedShapeFromSelection([tubes(false)[0], lying], 500_000);
+    const solid = manifoldFromMeshData(runtime, meshForShape(group!));
+    const rod = runtime.Manifold.cylinder(2, 1, 1, 32).rotate([0, 90, 0]).translate([7.5, 30, 0]);
+    const inside = solid.intersect(rod);
+    const volume = inside.volume();
+    [solid, rod, inside].forEach((item) => item.delete());
+    return volume;
+  }
+
+  it("still opens the wall of the other tube", async () => {
+    expect(await blocked(false)).toBeGreaterThan(5);
+    expect(await blocked(true)).toBeLessThan(0.01);
+  });
+
+  it("keeps the filleted body and cuts with the tube's bore where the body now stands", () => {
+    const parts = splitBoreTube(filletedTube(tube("upright", {}), { tubeBoreHole: true, x: 7 }));
+    expect(parts.map((part) => [part.kind, part.hole === true])).toEqual([["mesh", false], ["cylinder", true]]);
+    expect(parts[0].tubeBoreHole).toBeUndefined();
+    expect(parts[1].width).toBe(14);
+    expect(parts[1].x).toBe(7);
+    // The AI bridge reads the switch through the shape settings, which dropped it.
+    expect(normalizeShapeCustomizations({ tube: { tubeBoreHole: true }, bentTube: { tubeBoreHole: false } })).toMatchObject({ tube: { tubeBoreHole: true }, bentTube: { tubeBoreHole: false } });
+    // A body that was never a tube has no bore to hand on.
+    expect(splitBoreTube(filletedTube({ ...tube("box", {}), kind: "box" } as WorkplaneShape, { tubeBoreHole: true }))).toHaveLength(1);
   });
 });
 

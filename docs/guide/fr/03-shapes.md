@@ -75,7 +75,7 @@ Les formes rondes telles que le cylindre, le cône, le tube, l'ellipse ou les al
 
 - **Pour l'export STEP.** Il écrit la forme ronde, pas le polygone.
 - **Pour les chanfreins et congés** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}) tant que la forme reste ronde. C'est le cas lorsque vous n'avez pas défini de nombre de côtés, lorsque le nombre est au moins celui par défaut de la forme ou lorsque le polygone s'éloigne d'au plus {{value:EXACT_ROUND_TOLERANCE}} mm du cercle. La valeur par défaut est les côtés {{value:ROUND_FROM_SIDES}} pour le cylindre, l'ellipse, le tube et le cône, {{value:ROUND_FROM_ROOF_SIDES}} pour le {{ui:shape.roundRoof}}, les pas {{value:ROUND_FROM_SPHERE_STEPS}} pour le {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} pour le {{ui:shape.halfSphere}} et le {{ui:shape.paraboloid}}, les côtés {{value:ROUND_FROM_TORUS_SIDES}} et les pas {{value:ROUND_FROM_TORUS_STEPS}}. pour le {{ui:shape.torus}}, et un {{ui:prop.quality}} de {{value:ROUND_FROM_BENT_TUBE_QUALITY}} pour un tour {{ui:shape.bentTube}}.
-- **Pour un filetage, un ressort ou un engrenage hélicoïdal.** L'outil bord et l'export STEP prennent son corps exact ; son {{ui:prop.quality}} définit uniquement la précision avec laquelle il est dessiné.
+- **Pour un filetage, un ressort ou un engrenage hélicoïdal ou à chevrons.** L'outil bord et l'export STEP prennent son corps exact ; son {{ui:prop.quality}} définit uniquement la précision avec laquelle il est dessiné.
 
 **Là où cela compte à nouveau**
 

@@ -112,11 +112,18 @@ describe("herringbone gear", () => {
     expect(turnBetween(positive, 0, 5) * turnBetween(negative, 0, 5)).toBeLessThan(0);
   });
 
-  it("stays a mesh for the edge tool, where the helical gear has an exact body", () => {
+  it("gets an exact part for the edge tool and STEP, as the helical gear does (#1007)", () => {
     const asset = toolbarShapeAssets.find((entry) => entry.kind === "gear")!;
     const gear = canonicalizeShape(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gearType: "herringbone", teeth: 14, helixAngle: 20 }));
     expect(gear.gearType).toBe("herringbone");
-    expect(cadModifierHelicalGearForShape(gear)).toBeNull();
+    const part = cadModifierHelicalGearForShape(gear);
+    // The twist of a helical gear of the whole height; the halves turn half of it each.
+    expect(part?.herringbone).toBe(true);
+    const helical = cadModifierHelicalGearForShape({ ...gear, gearType: "helical" })!;
+    expect(part!.twist).toBeCloseTo(helical.twist, 12);
+    expect(helical.herringbone).not.toBe(true);
+    // On an oval footprint its corners do not turn as one ring, as the helical gear's do not.
+    expect(cadModifierHelicalGearForShape({ ...gear, width: 30, depth: 18 })).toBeNull();
   });
 
   it("is kept in a saved project", async () => {

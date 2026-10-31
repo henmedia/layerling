@@ -8,9 +8,14 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { wheelZoomDelta } from "@/lib/wheelZoom";
+import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
+
+/** The window moves by its title, like the object list and the settings: it floats from its corner, dropped near it it docks again. */
+const PREVIEW_PANEL: MovablePanelOptions = { floatingStyle: { right: "auto" } };
 
 export function SketchRevolvePreview({ positions }: { positions: number[] | null }) {
   useLanguage();
+  const movable = useMovablePanel<HTMLElement>("layerling.sketch.revolvePreviewPosition", PREVIEW_PANEL);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // The viewing angle the person turned the preview to, so redrawing the sketch keeps it.
   const savedView = useRef<{ position: THREE.Vector3; target: THREE.Vector3 } | null>(null);
@@ -116,8 +121,13 @@ export function SketchRevolvePreview({ positions }: { positions: number[] | null
   }, [positions]);
 
   return (
-    <aside className="sketch-revolve-preview" aria-label={t("sketch.revolvePreview")}>
-      <div className="sketch-revolve-preview-title">
+    <aside
+      ref={movable.panelRef}
+      className={`sketch-revolve-preview ${movable.moved ? "floating" : ""} ${movable.dragging ? "moving" : ""}`}
+      style={movable.style}
+      aria-label={t("sketch.revolvePreview")}
+    >
+      <div className="sketch-revolve-preview-title movable" title={t("panel.moveHint")} {...movable.handleProps}>
         {t("sketch.revolvePreviewTitle")}
         <GuideHelpLink section="sketchToBody" iconSize={15} />
       </div>

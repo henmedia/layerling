@@ -34,7 +34,7 @@ Puoi fare una copia di un singolo progetto dall’editor: scegli {{ui:editor.exp
 
 ## Allegati
 
-Istruzioni, una distinta dei pezzi, appunti, una foto o una scheda tecnica possono restare con il progetto come file. {{ui:editor.attachments}} nella barra {{ui:editor.group.manage}}, la graffetta, apre l'elenco; un puntino sulla graffetta indica che il progetto ne ha.
+Istruzioni, una distinta dei pezzi, appunti, una foto o una scheda tecnica possono restare con il progetto come file. {{ui:editor.attachments}} nella barra {{ui:editor.group.file}}, la graffetta, apre l'elenco; un puntino sulla graffetta indica che il progetto ne ha.
 
 - **{{ui:attachments.upload}}:** scegli uno o più file: `.md` (Markdown) o `.txt` come testo semplice (UTF-8), immagini `.png`, `.jpg`, `.jpeg` o `.webp`, oppure documenti `.pdf`. Ogni file viene controllato in base al contenuto, quindi un file che non è ciò che dice il suo nome viene rifiutato, e altri tipi, tra cui `.svg`, non si possono allegare. Un file di testo può avere al massimo 2 MB, un'immagine 16 MB e un PDF 32 MB; un progetto contiene fino a 32 file e 64 MB in tutto.
 - **L'elenco:** la freccia scarica un file così come è stato caricato. Il cestino lo toglie; la riga chiede prima ancora una volta, e un file tolto non si recupera con Annulla, perché gli allegati non fanno parte della cronologia di annullamento.

@@ -34,7 +34,7 @@ You back up a single design in the editor: {{ui:editor.export}}, choose the form
 
 ## Attachments
 
-Instructions, a parts list, notes, a photo or a datasheet can stay with the design as files. {{ui:editor.attachments}} in the {{ui:editor.group.manage}} toolbar, the paperclip, opens the list; a small dot on the paperclip shows that the design has some.
+Instructions, a parts list, notes, a photo or a datasheet can stay with the design as files. {{ui:editor.attachments}} in the {{ui:editor.group.file}} toolbar, the paperclip, opens the list; a small dot on the paperclip shows that the design has some.
 
 - **{{ui:attachments.upload}}:** Choose one or more files: `.md` (Markdown) or `.txt` as plain text (UTF-8), `.png`, `.jpg`, `.jpeg` or `.webp` pictures, or `.pdf` documents. A file is checked by its content, so a file that is not what its name says is refused, and other types, `.svg` among them, cannot be attached. A text file can be at most 2 MB, a picture 16 MB and a PDF 32 MB; a design holds up to 32 files and 64 MB together.
 - **The list:** The arrow downloads a file as it was uploaded. The bin removes it; the row asks once more first, and a removed file cannot be brought back with undo, because attachments are not part of the undo history.

@@ -91,9 +91,10 @@ Jeśli później zmienisz rozmiar wydrążonej bryły, layerling od razu wydrą�
 
 - {{ui:lid.type.plug}}: płyta tak duża jak bryła, a pod nią kołnierz, który wchodzi w otwór.
 - {{ui:lid.type.cap}}: płyta szersza od bryły o grubość ścianki, a pod nią obrzeże, które obejmuje ją z zewnątrz.
+- {{ui:lid.type.both}}: płyta szersza od bryły o grubość ścianki, a pod nią jedno i drugie: kołnierz w otworze i obrzeże na zewnątrz. Ścianka bryły siedzi między nimi w rowku, jak w pojemniku na żywność.
 - {{ui:lid.type.flat}}: tylko płyta, do położenia lub przyklejenia.
 
-Następnie ustawiasz grubość ({{ui:lid.thickness}}), pasowanie ({{ui:lid.fit}}, czyli {{ui:lid.gap}} między pokrywką a bryłą: 0,1 mm ciasno, 0,2 mm normalnie, 0,3 mm luźno lub dowolna wartość do 1 mm) oraz jak głęboko sięga kołnierz lub obrzeże i jak gruba jest jego ścianka. Kliknij {{ui:lid.apply}}: pokrywka leży obok bryły, odwrócona płytą w dół, więc drukuje się bez podpór. Bryła zostaje bez zmian. Pokrywka podąża za każdym obrysem, okrągłym lub kanciastym, bo jest zdejmowana z samej bryły tuż pod jej krawędzią. Bryła bez otworu u góry dostaje tylko płaską pokrywkę; dla dwóch pozostałych najpierw wydrąż ją z otwartą górą.
+Następnie ustawiasz grubość ({{ui:lid.thickness}}), pasowanie ({{ui:lid.fit}}, czyli {{ui:lid.gap}} między pokrywką a bryłą: 0,1 mm ciasno, 0,2 mm normalnie, 0,3 mm luźno lub dowolna wartość do 1 mm) oraz jak głęboko sięga kołnierz lub obrzeże i jak gruba jest jego ścianka. Kliknij {{ui:lid.apply}}: pokrywka leży obok bryły, odwrócona płytą w dół, więc drukuje się bez podpór. Bryła zostaje bez zmian. Pokrywka podąża za każdym obrysem, okrągłym lub kanciastym, bo jest zdejmowana z samej bryły tuż pod jej krawędzią. Bryła bez otworu u góry dostaje tylko płaską pokrywkę; dla pozostałych najpierw wydrąż ją z otwartą górą.
 
 > **Wskazówka:** To, jak ciasno siedzi pokrywka, zależy od drukarki. Najpierw wydrukuj małe pudełko z pokrywką; jeśli jest za ciasna, wybierz następne, luźniejsze pasowanie.
 

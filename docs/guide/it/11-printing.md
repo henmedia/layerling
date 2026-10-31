@@ -5,7 +5,7 @@ summary: Scegliere la propria stampante, ricevere avvisi quando un pezzo non ent
 
 ## Scegliere la stampante
 
-Apri le impostazioni con l’ingranaggio nella barra multifunzione ({{ui:editor.workspaceSettings}}) e passa alla sezione {{ui:workspace.workplane}}. In {{ui:workspace.printer}} scegli la tua stampante da un elenco di oltre 230 modelli comuni, tra cui Bambu Lab, Prusa, Creality, Anycubic, Elegoo e molti altri.
+Apri le impostazioni con l’ingranaggio nella riga del titolo ({{ui:editor.workspaceSettings}}) e passa alla sezione {{ui:workspace.workplane}}. In {{ui:workspace.printer}} scegli la tua stampante da un elenco di oltre 230 modelli comuni, tra cui Bambu Lab, Prusa, Creality, Anycubic, Elegoo e molti altri.
 
 ![Le impostazioni del piano di lavoro con una stampante selezionata. Il piatto e l’altezza massima di stampa provengono dal profilo dello slicer.](shot:settings-workplane)
 

@@ -5,7 +5,7 @@ summary: 选择自己的打印机，在部件放不下时收到警告，并正�
 
 ## 选择打印机
 
-打开设置（功能区里的齿轮图标，{{ui:editor.workspaceSettings}}），切换到 {{ui:workspace.workplane}} 区域。在 {{ui:workspace.printer}} 下，可以从 230 多种常见型号的列表中选择自己的打印机，包括 Bambu Lab、Prusa、Creality、Anycubic、Elegoo 等众多品牌。
+打开设置（标题行里的齿轮图标，{{ui:editor.workspaceSettings}}），切换到 {{ui:workspace.workplane}} 区域。在 {{ui:workspace.printer}} 下，可以从 230 多种常见型号的列表中选择自己的打印机，包括 Bambu Lab、Prusa、Creality、Anycubic、Elegoo 等众多品牌。
 
 ![已选择打印机的工作平面设置。打印床尺寸和最大打印高度来自切片软件配置。](shot:settings-workplane)
 

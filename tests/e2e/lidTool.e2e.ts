@@ -117,6 +117,41 @@ describe("lid (real Manifold kernel, #1009)", () => {
     }
   });
 
+  it("makes a lid that grips the wall from both sides, the wall in a groove with the gap on each side (#1062)", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const body = openBox(kernel, created);
+      const result = lidForSolid(kernel, body, normalizeLidOptions({ type: "both", thickness: 2, gap: 0.2, depth: 4, wall: 1.6 }));
+      if ("error" in result) throw new Error(JSON.stringify(result.error));
+      created.push(result.lid);
+      expect(result.lid.status()).toBe("NoError");
+      expect(result.lid.genus()).toBe(0);
+      const box = result.lid.boundingBox();
+      // As wide as the cap, as high as plate and lip: 60 + 2 x (0.2 + 1.6) across, 2 + 4 high.
+      expect(box.max[0] - box.min[0]).toBeCloseTo(60 + 2 * 1.8, 2);
+      expect(box.max[1] - box.min[1]).toBeCloseTo(6, 3);
+      const closed = closing(kernel, body, result.lid, 2, created);
+      const overlap = closed.intersect(body);
+      created.push(overlap);
+      expect(overlap.volume()).toBeLessThan(0.01);
+      const grip = below(kernel, closed, 30, created);
+      expect(grip.minGap(body, 1)).toBeGreaterThan(0.19);
+      expect(grip.minGap(body, 1)).toBeLessThan(0.21);
+      // The lip of the push-in lid and the rim of the cap, both 4 mm deep: two rings round the 2 mm wall.
+      const lip = (55.6 * 35.6 - 52.4 * 32.4) * 3.99;
+      const rimOuter = 63.6 * 43.6 - (4 - Math.PI) * 1.8 * 1.8;
+      const rimInner = 60.4 * 40.4 - (4 - Math.PI) * 0.2 * 0.2;
+      expect(grip.volume()).toBeCloseTo(lip + (rimOuter - rimInner) * 3.99, 0);
+      // Below the plate, lip and rim are two rings apart: the groove between them holds the wall.
+      const parts = grip.decompose();
+      created.push(...parts);
+      expect(parts).toHaveLength(2);
+    } finally {
+      dispose(created);
+    }
+  });
+
   it("follows a round pot", async () => {
     const kernel = await runtime();
     const created: Solid[] = [];
@@ -150,6 +185,7 @@ describe("lid (real Manifold kernel, #1009)", () => {
       created.push(closedBox);
       expect(lidForSolid(kernel, closedBox, normalizeLidOptions({ type: "plug" }))).toEqual({ error: { code: "notOpen" } });
       expect(lidForSolid(kernel, closedBox, normalizeLidOptions({ type: "cap" }))).toEqual({ error: { code: "notOpen" } });
+      expect(lidForSolid(kernel, closedBox, normalizeLidOptions({ type: "both" }))).toEqual({ error: { code: "notOpen" } });
       const flat = lidForSolid(kernel, closedBox, normalizeLidOptions({ type: "flat", thickness: 3 }));
       if ("error" in flat) throw new Error(JSON.stringify(flat.error));
       created.push(flat.lid);

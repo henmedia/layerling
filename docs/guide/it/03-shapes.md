@@ -86,7 +86,7 @@ Le forme rotonde, come cilindri, coni, tubi, ellissi e fori, hanno nelle proprie
 
 - **Nell’esportazione STEP:** viene scritta la geometria rotonda, non il poligono.
 - **Per smussi e raccordi** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}), finché la forma resta rotonda. Accade se non hai impostato un numero di lati, se il numero è almeno pari al valore predefinito della forma oppure se il poligono si discosta dal cerchio al massimo di {{value:EXACT_ROUND_TOLERANCE}} mm. I valori predefiniti sono {{value:ROUND_FROM_SIDES}} lati per cilindro, ellisse, tubo e cono; {{value:ROUND_FROM_ROOF_SIDES}} per {{ui:shape.roundRoof}}; {{value:ROUND_FROM_SPHERE_STEPS}} passaggi per {{ui:shape.sphere}}; {{value:ROUND_FROM_HALF_SPHERE_STEPS}} per {{ui:shape.halfSphere}} e {{ui:shape.paraboloid}}; {{value:ROUND_FROM_TORUS_SIDES}} lati e {{value:ROUND_FROM_TORUS_STEPS}} passaggi per {{ui:shape.torus}}; e {{value:ROUND_FROM_BENT_TUBE_QUALITY}} di {{ui:prop.quality}} per un {{ui:shape.bentTube}} circolare.
-- **Per filettature, molle e ingranaggi elicoidali:** lo strumento per gli spigoli e l’esportazione STEP usano il corpo esatto; {{ui:prop.quality}} determina solo il livello di dettaglio della visualizzazione.
+- **Per filettature, molle e ingranaggi elicoidali o a spina di pesce:** lo strumento per gli spigoli e l’esportazione STEP usano il corpo esatto; {{ui:prop.quality}} determina solo il livello di dettaglio della visualizzazione.
 
 **Quando torna a essere importante**
 

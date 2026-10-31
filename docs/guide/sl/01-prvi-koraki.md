@@ -19,7 +19,7 @@ Vsi tvoji načrti se pozneje pojavijo na začetni strani s sličico predogleda. 
 
 ![Urejevalnik z dvema oblikama na delovni ravnini. Zgoraj orodna vrstica, levo upravljanje kamere, desno nastavitve izbrane oblike.](shot:editor-overview)
 
-- **Zgoraj** je orodna vrstica. Razvrščena je po opravilih: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.manage}} in {{ui:editor.group.help}}. Ko z miško zapelješ čez ikono, se pokaže njeno ime. Kjer vidiš majhen vprašaj, na primer pri nastavitvah oblike, v knjižnici oblik ali v oknih z orodji, te pelje naravnost v ustrezno poglavje teh navodil.
+- **Zgoraj** je orodna vrstica. Razvrščena je po opravilih: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} in {{ui:editor.group.help}}. Ko z miško zapelješ čez ikono, se pokaže njeno ime. Kjer vidiš majhen vprašaj, na primer pri nastavitvah oblike, v knjižnici oblik ali v oknih z orodji, te pelje naravnost v ustrezno poglavje teh navodil.
 - **V sredini** je delovna ravnina. Tu postavljaš oblike, jih naravnaš in vidiš rezultat.
 - **Desno** se pokažejo nastavitve izbrane oblike: barva, mere, lega in vse drugo, kar oblika še ima. Vpisovanje številk je natančnejše od vlečenja.
 - **Levo** je upravljanje kamere z orientacijsko kocko nad njim. S tem se premikaš po prizoru, več o tem v poglavju [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina).

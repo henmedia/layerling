@@ -5,7 +5,7 @@ summary: Elegir tu impresora, recibir un aviso cuando algo no cabe y colocar bie
 
 ## Elegir tu impresora
 
-Abre los ajustes (la rueda dentada de la cinta, {{ui:editor.workspaceSettings}}) y pasa al apartado {{ui:workspace.workplane}}. En {{ui:workspace.printer}} eliges tu impresora en una lista de más de 230 modelos habituales, entre ellos de Bambu Lab, Prusa, Creality, Anycubic, Elegoo y muchas marcas más.
+Abre los ajustes (la rueda dentada de la fila del título, {{ui:editor.workspaceSettings}}) y pasa al apartado {{ui:workspace.workplane}}. En {{ui:workspace.printer}} eliges tu impresora en una lista de más de 230 modelos habituales, entre ellos de Bambu Lab, Prusa, Creality, Anycubic, Elegoo y muchas marcas más.
 
 ![Los ajustes del plano de trabajo con una impresora elegida. La cama y la altura máxima de impresión salen del perfil del laminador.](shot:settings-workplane)
 

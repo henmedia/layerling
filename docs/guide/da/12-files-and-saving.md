@@ -34,7 +34,7 @@ Du sikkerhedskopierer et enkelt design i editoren: {{ui:editor.export}}, vælg f
 
 ## Vedhæftninger
 
-Instruktioner, en deleliste, noter, et foto eller et datablad kan blive ved designet som filer. {{ui:editor.attachments}} i {{ui:editor.group.manage}}-værktøjslinjen, papirklemmen, åbner listen; en lille prik på papirklemmen viser at designet har nogle.
+Instruktioner, en deleliste, noter, et foto eller et datablad kan blive ved designet som filer. {{ui:editor.attachments}} i {{ui:editor.group.file}}-værktøjslinjen, papirklemmen, åbner listen; en lille prik på papirklemmen viser at designet har nogle.
 
 - **{{ui:attachments.upload}}:** Vælg en eller flere filer: `.md` (Markdown) eller `.txt` som ren tekst (UTF-8), billeder som `.png`, `.jpg`, `.jpeg` eller `.webp`, eller dokumenter som `.pdf`. En fil kontrolleres ud fra sit indhold, så en fil, der ikke er det, dens navn siger, afvises, og andre typer, blandt dem `.svg`, kan ikke vedhæftes. En tekstfil må højst være 2 MB, et billede 16 MB og en PDF 32 MB; et design rummer højst 32 filer og 64 MB i alt.
 - **Listen:** Pilen downloader en fil, som den blev uploadet. Skraldespanden fjerner den; rækken spørger én gang til først, og en fjernet fil kan ikke hentes tilbage med fortryd, for vedhæftninger er ikke en del af fortrykshistorikken.

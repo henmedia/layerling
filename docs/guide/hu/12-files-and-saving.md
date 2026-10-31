@@ -34,7 +34,7 @@ Egy tervről a szerkesztőben készítesz biztonsági mentést: {{ui:editor.expo
 
 ## Mellékletek
 
-Útmutató, alkatrészlista, jegyzetek, egy fénykép vagy egy adatlap fájlként a tervvel maradhat. A {{ui:editor.group.manage}} eszköztár {{ui:editor.attachments}} gombja, a gemkapocs, megnyitja a listát; a gemkapcson egy kis pont jelzi, hogy a tervnek van melléklete.
+Útmutató, alkatrészlista, jegyzetek, egy fénykép vagy egy adatlap fájlként a tervvel maradhat. A {{ui:editor.group.file}} eszköztár {{ui:editor.attachments}} gombja, a gemkapocs, megnyitja a listát; a gemkapcson egy kis pont jelzi, hogy a tervnek van melléklete.
 
 - **{{ui:attachments.upload}}:** válassz egy vagy több fájlt: `.md` (Markdown) vagy `.txt` egyszerű szövegként (UTF-8), `.png`, `.jpg`, `.jpeg` vagy `.webp` képeket, vagy `.pdf` dokumentumokat. Minden fájlt a tartalma alapján ellenőriz, így az a fájl, amely nem az, aminek a neve mondja, elutasításra kerül, más típusok, köztük az `.svg`, pedig nem csatolhatók. Egy szövegfájl legfeljebb 2 MB, egy kép 16 MB, egy PDF 32 MB lehet; egy terv legfeljebb 32 fájlt és összesen 64 MB-ot tartalmazhat.
 - **A lista:** a nyíl úgy tölti le a fájlt, ahogy feltöltötték. A kuka eltávolítja; a sor előtte még egyszer rákérdez, és egy eltávolított fájl nem hozható vissza visszavonással, mert a mellékletek nem részei a visszavonási előzményeknek.

@@ -10,8 +10,8 @@ import { useLanguage } from "@/lib/useLanguage";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 /**
- * A lid for a body open at the top (#1009): pushed into the opening, put over the outside or laid flat on it. It comes
- * out as a body of its own beside the one it closes, ready to print.
+ * A lid for a body open at the top (#1009): pushed into the opening, put over the outside, gripping the wall from both
+ * sides (#1062) or laid flat on it. It comes out as a body of its own beside the one it closes, ready to print.
  */
 export function LidPanel({
   targetName,
@@ -117,7 +117,7 @@ export function LidPanel({
           onChange={(value) => onChange({ gap: value })}
         />
         <EdgeModifierSlider
-          label={settings.type === "cap" ? t("lid.depthCap") : t("lid.depth")}
+          label={t(settings.type === "cap" ? "lid.depthCap" : settings.type === "both" ? "lid.depthBoth" : "lid.depth")}
           value={settings.depth}
           min={MIN_LID_DEPTH}
           max={MAX_LID_DEPTH}
@@ -128,7 +128,7 @@ export function LidPanel({
           onChange={(value) => onChange({ depth: value })}
         />
         <EdgeModifierSlider
-          label={settings.type === "cap" ? t("lid.wallCap") : t("lid.wall")}
+          label={t(settings.type === "cap" ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
           value={settings.wall}
           min={MIN_LID_WALL}
           max={MAX_LID_WALL}
