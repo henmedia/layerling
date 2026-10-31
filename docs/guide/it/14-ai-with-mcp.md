@@ -82,7 +82,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_apply_edge_treatment` | Applica smussi o raccordi agli spigoli selezionati. |
 | `layerling_hollow_object` | Svuota un corpo mantenendo pareti di spessore uniforme. |
 | `layerling_cut_out` | ritaglia un solido da un altro perché combacino: la parte resta, una copia ingrandita del gioco viene sottratta all'altro corpo |
-| `layerling_offset_object` | sposta tutte le facce di un corpo per il gioco di un accoppiamento: lo ingrandisce o riduce, o aggiunge la copia ingrandita come vuoto |
+| `layerling_offset_object` | sposta tutte le facce di un corpo per il gioco di un accoppiamento: lo ingrandisce o riduce, o aggiunge la copia ingrandita come vuoto, o sposta solo i lati |
 | `layerling_list_faces` | Elenca le facce di un corpo CAD esatto. |
 | `layerling_delete_faces` | Elimina le facce e chiude l’apertura. |
 | `layerling_array_objects` | Crea copie in fila o disposte in cerchio. |

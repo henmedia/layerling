@@ -41,6 +41,8 @@ Si una selección que funcionaba falla al hacer clic en una arista más, esa ari
 
 La arista que hay bajo el puntero también se dibuja más gruesa, para que veas cuál va a elegir el clic.
 
+Un hueco también admite {{ui:editor.tool.chamfer}} y {{ui:editor.tool.fillet}}, igual que {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} y {{ui:editor.tool.deleteFace}}: sigue siendo un hueco y corta con su nueva forma. Redondear las cuatro aristas verticales de un hueco en forma de caja da una cavidad con esquinas interiores redondeadas, y un hueco agrandado con {{ui:editor.tool.offset}} corta con ese margen de más. Para romper la arista donde un hueco se une a la pieza, trata el grupo terminado: esa arista es suya.
+
 ### Deshacer una operación de aristas
 
 Un cuerpo con chaflanes, redondeos o vaciado siempre se puede volver a modificar. Selecciónalo de nuevo y abre la herramienta (Redondeo, Chaflán o Vaciar; todas muestran la lista): en {{ui:edge.featureHistory}} ves lo que ya tiene aplicado. {{ui:edge.revertAction}} deshace una sola operación. Atención: si hay operaciones más recientes encima, se van con ella, y el panel te dice cuántas.
@@ -104,6 +106,8 @@ Cada cara de un cuerpo puede moverse la misma distancia, hacia fuera o hacia den
 3. Los {{ui:offset.edges}} deciden las esquinas exteriores: redondeado mantiene redonda la superficie desfasada, afilado deja que las caras sigan hasta encontrarse.
 4. Marca {{ui:offset.copy}} para conservar la pieza tal cual y obtener el cuerpo agrandado como una copia que ya es un hueco. Agrupa ese hueco con la pieza que encaja y corta exactamente la holgura elegida.
 5. Haz clic en {{ui:offset.apply}}.
+
+Marca {{ui:offset.sideways}} cuando solo deba crecer o encoger el contorno: los lados se mueven la distancia, y cada cara plana de arriba y de abajo se queda a su altura. Un cartel recibe un borde alrededor, una base se ensancha y el cuerpo no se hace más alto. En un cuerpo escalonado, cada escalón conserva su altura. Un texto que se desfasa a través de sus contornos también conserva entonces su altura.
 
 Sin la marca se desfasa el propio cuerpo. Pasa a ser un cuerpo exacto fijo, como tras un chaflán: la lista de arriba del panel deshace el desfase, y {{ui:edge.editAction}} abre de nuevo la herramienta con la distancia anterior. Solo se pueden desfasar cuerpos CAD exactos - cajas, cilindros y las demás formas, sus grupos, piezas STEP importadas. Un cuerpo que es solo una malla de triángulos, como muchas importaciones STL, a menudo no se puede. Una distancia demasiado grande para el cuerpo, por ejemplo reducir más allá de su pared más fina, se rechaza.
 

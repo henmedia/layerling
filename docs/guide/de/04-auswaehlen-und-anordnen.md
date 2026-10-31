@@ -23,6 +23,7 @@ Bei vielen Teilen verliert man in der Ansicht leicht den Überblick. Die Objektl
 - Das Etikett zeigt, ob ein Teil {{ui:outliner.solid}} oder {{ui:outliner.hole}} ist.
 - Schloss und Auge sperren und verstecken einzelne Teile.
 - Über {{ui:outliner.rename}} gibst du einem Teil einen eigenen Namen; der Stift neben dem Namen oben in den Einstellungen macht dasselbe für die ausgewählte Form. Vernünftige Namen helfen bei größeren Entwürfen enorm.
+- Der Knopf A–Z in der Titelleiste ({{ui:outliner.sortByName}}) sortiert die Formen, denen du einen Namen gegeben hast, alphabetisch, Zahlen dabei als Zahlen („Teil 2“ vor „Teil 10“). Formen mit ihrem Standardnamen bleiben darunter in der Reihenfolge, in der du sie angelegt hast, die neueste zuletzt; Teile in Gruppen werden genauso sortiert. Das ändert nur die Liste, nie den Entwurf. Ein zweiter Klick zeigt wieder alles in der Reihenfolge des Anlegens, und der Browser merkt sich die Wahl.
 - Das Suchfeld findet Formen nach Namen und nach Art, also auch „Zylinder“ oder „Aussparung“. Es sucht auch in Gruppen, egal wie tief verschachtelt: Eine Gruppe mit einem Treffer bleibt in der Liste und klappt auf, sodass die passenden Teile und die Gruppen auf dem Weg dorthin zu sehen sind. Passt der Name der Gruppe selbst, zeigt sie aufgeklappt alle ihre Teile.
 - Der Pfeil ganz links in der Titelleiste klappt die Liste bis auf ihre Titelleiste ein und wieder auf.
 

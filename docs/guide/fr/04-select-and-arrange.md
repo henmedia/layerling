@@ -21,6 +21,7 @@ Avec de nombreuses pièces, il est facile de perdre le fil de la vue. La liste d
 - L'étiquette indique si une pièce est {{ui:outliner.solid}} ou {{ui:outliner.hole}}.
 - Cadenas et œillet de verrouillage et cache pièces détachées.
 - {{ui:outliner.rename}} donne à une pièce un nom qui lui est propre ; le crayon à côté du nom en haut des paramètres fait de même pour la forme sélectionnée. Les noms sensés aident énormément dans les conceptions plus grandes.
+- Le bouton A–Z de la barre de titre ({{ui:outliner.sortByName}}) trie par ordre alphabétique les formes que vous avez nommées, en comptant les nombres comme des nombres (Pièce 2 avant Pièce 10). Les formes qui portent encore leur nom par défaut restent en dessous, dans l'ordre où vous les avez ajoutées, la plus récente en dernier, et les pièces dans les groupes sont triées de la même façon. Seule la liste change, jamais la conception. Un second clic affiche à nouveau tout dans l'ordre d'ajout, et le navigateur retient ce choix.
 - Le champ de recherche trouve les formes par nom et par genre, donc aussi "cylindre" ou "trou". Il examine également l'intérieur des groupes, aussi profondément imbriqués soient-ils : un groupe détenant une allumette reste dans la liste et s'ouvre pour montrer les parties correspondantes et les groupes qui y mènent. Un groupe trouvé par son propre nom affiche toutes ses parties lorsque vous l'ouvrez.
 - La flèche à l'extrême gauche de la barre de titre replie la liste jusqu'à sa barre de titre et inversement.
 

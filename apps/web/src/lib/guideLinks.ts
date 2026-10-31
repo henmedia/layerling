@@ -17,7 +17,7 @@ export const GUIDE_CHAPTERS = {
   edges: { de: "kanten-und-aushoehlen", en: "edges-and-hollowing", nl: "randen-en-uithollen", ru: "edges-and-hollowing", cs: "edges-and-hollowing", sl: "robovi-in-izdolbljenje", hu: "edges-and-hollowing", es: "edges-and-hollowing" },
   sketches: { de: "skizzen", en: "sketches", nl: "schetsen", ru: "sketches", cs: "sketches", sl: "skice", hu: "sketches", es: "sketches" },
   text: { de: "text", en: "text", nl: "tekst", ru: "text", cs: "text", sl: "besedilo", hu: "text", es: "text" },
-  threads: { de: "gewinde-und-mechanik", en: "threads-and-mechanics", nl: "schroefdraad-en-mechanica", ru: "threads-and-mechanics", cs: "threads-and-mechanics", sl: "navoj", hu: "threads-and-mechanics", es: "threads-and-mechanics" },
+  threads: { de: "gewinde-und-mechanik", en: "threads-and-mechanics", nl: "schroefdraad-en-mechanica", ru: "threads-and-mechanics", cs: "threads-and-mechanics", sl: "navoji-in-mehanika", hu: "threads-and-mechanics", es: "threads-and-mechanics" },
   measuring: { de: "messen-und-notizen", en: "measuring-and-notes", nl: "meten-en-notities", ru: "measuring-and-notes", cs: "measuring-and-notes", sl: "merjenje-in-opombe", hu: "measuring-and-notes", es: "measuring-and-notes" },
   printing: { de: "drucken", en: "printing", nl: "printen", ru: "printing", cs: "printing", sl: "tiskanje", hu: "printing", es: "printing" },
   files: { de: "dateien-und-speichern", en: "files-and-saving", nl: "bestanden-en-opslaan", ru: "files-and-saving", cs: "files-and-saving", sl: "datoteke-in-shranjevanje", hu: "files-and-saving", es: "files-and-saving" },
@@ -82,6 +82,7 @@ export const GUIDE_SECTIONS = {
   knurl: { chapter: "threads", de: "raendelung", en: "knurling", nl: "kartel", ru: "nakatka", cs: "ryhovane-uchopy", sl: "narebricenje", hu: "recezes", es: "moleteado" },
   dovetail: { chapter: "threads", de: "schwalbenschwanz", en: "dovetail", nl: "zwaluwstaart", ru: "lastochkin-khvost", cs: "rybinovy-spoj", sl: "lastovicji-rep", hu: "fecskefark", es: "cola-de-milano" },
   teardrop: { chapter: "threads", de: "tropfenbohrung", en: "teardrop-hole", nl: "druppelgat", ru: "kaplevidnoe-otverstie", cs: "kapkovity-otvor", sl: "kapljicna-izvrtina", hu: "csepp-alaku-lyuk", es: "orificio-en-lagrima" },
+  ports: { chapter: "threads", de: "anschlussoeffnungen", en: "port-openings", nl: "aansluitopeningen", ru: "otverstiya-pod-razemy", cs: "otvory-pro-konektory", sl: "odprtine-za-prikljucke", hu: "csatlakozonyilasok", es: "aberturas-para-conectores", fr: "ouvertures-de-connecteur", it: "aperture-per-connettori", pl: "otwory-na-zlacza", da: "stikabninger", ar: "port-openings" },
   screwHoles: { chapter: "threads", de: "stufen-und-senkbohrung", en: "counterbore-and-countersink", nl: "verzinkboring-en-verzinking", ru: "tsekovka-i-zenkovka", cs: "valcove-a-kuzelove-zahloubeni", sl: "stopnicasta-in-udirna-izvrtina", hu: "hengeres-es-kupos-suellyesztes", es: "escariado-y-avellanado" },
   ruler: { chapter: "measuring", de: "das-lineal", en: "the-ruler", nl: "de-liniaal", ru: "lineyka", cs: "pravitko", sl: "ravnilo", hu: "a-vonalzo", es: "la-regla" },
   printer: { chapter: "printing", de: "den-drucker-waehlen", en: "choosing-your-printer", nl: "je-printer-kiezen", "pt-br": "escolhendo-a-sua-impressora", ru: "vybor-printera", cs: "vyber-tiskarny", sl: "izbira-tiskalnika", hu: "a-nyomtatod-kivalasztasa", es: "elegir-tu-impresora" },
@@ -198,6 +199,8 @@ export function guideSectionForShape(shape: GuideShape): GuideSection | undefine
       return "dovetail";
     case "teardrop":
       return "teardrop";
+    case "port":
+      return "ports";
     case "counterbore":
     case "countersink":
     case "doubleCountersink":
@@ -229,6 +232,7 @@ export function guideChapterForShape(shape: GuideShape): GuideChapter {
     case "knurl":
     case "dovetail":
     case "teardrop":
+    case "port":
     case "counterbore":
     case "countersink":
     case "doubleCountersink":

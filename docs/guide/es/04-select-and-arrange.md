@@ -21,6 +21,7 @@ Con muchas piezas, es fácil perderse en la vista. La lista de objetos ({{ui:edi
 - La etiqueta indica si una pieza es {{ui:outliner.solid}} u {{ui:outliner.hole}}.
 - El candado y el ojo bloquean y ocultan piezas sueltas.
 - {{ui:outliner.rename}} le da a una pieza un nombre propio; el lápiz junto al nombre, en la parte de arriba del panel de propiedades, hace lo mismo con la forma seleccionada. En los diseños grandes, unos nombres con sentido ayudan muchísimo.
+- El botón A–Z de la barra de título ({{ui:outliner.sortByName}}) ordena alfabéticamente las formas a las que has dado nombre, contando los números como números (Pieza 2 antes que Pieza 10). Las formas que conservan su nombre por defecto quedan debajo en el orden en que las añadiste, la más nueva al final, y las piezas dentro de los grupos se ordenan igual. Solo cambia la lista, nunca el diseño. Un segundo clic vuelve a mostrarlo todo en el orden en que se añadió, y el navegador recuerda la elección.
 - El campo de búsqueda encuentra formas por su nombre y por su tipo, así que también puedes buscar «cilindro» u «orificio». Busca también dentro de los grupos, por muy anidados que estén: un grupo que contiene una coincidencia se queda en la lista y se despliega para mostrar las piezas que coinciden y los grupos que llevan hasta ellas. Un grupo encontrado por su propio nombre muestra todas sus piezas cuando lo abres.
 - La flecha del extremo izquierdo de la barra de título pliega la lista hasta dejar solo la barra de título, y la vuelve a desplegar.
 

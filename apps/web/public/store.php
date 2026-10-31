@@ -9,7 +9,7 @@
  * the interface does not need to know which of the two it is talking to.
  *
  * It stays switched off until somebody creates a directory named "store" next
- * to this file. That is deliberate: the folder has no login, so whoever can
+ * to this file, or the one LAYERLING_SHARED_PROJECTS_DIR names. That is deliberate: the folder has no login, so whoever can
  * reach the page can read, write and delete what is in it. Creating the folder
  * by hand is the decision to allow that.
  */
@@ -155,10 +155,33 @@ function authenticated_user_folder(): ?string
     return $safe !== '' ? $safe : null;
 }
 
+/** The folder LAYERLING_SHARED_PROJECTS_DIR names, the setting the Node route reads too, or null without one. */
+function configured_store_path(): ?string
+{
+    $configured = getenv('LAYERLING_SHARED_PROJECTS_DIR');
+    if (!is_string($configured) || trim($configured) === '') {
+        $configured = $_ENV['LAYERLING_SHARED_PROJECTS_DIR'] ?? $_SERVER['LAYERLING_SHARED_PROJECTS_DIR'] ?? null;
+    }
+    if (!is_string($configured) || trim($configured) === '') {
+        return null;
+    }
+    $trimmed = rtrim(trim($configured), '/\\');
+    return $trimmed === '' ? DIRECTORY_SEPARATOR : $trimmed;
+}
+
+/**
+ * Where the store lives (#1050): the configured folder, which may lie outside the web root so no
+ * address reaches it at all, or else "store" next to this file. Either way it has to exist.
+ */
+function store_base_path(): string
+{
+    return configured_store_path() ?? __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
+}
+
 /** The store, or null while nobody has created it. */
 function store_root(): ?string
 {
-    $base = __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
+    $base = store_base_path();
     if (!is_dir($base)) {
         return null;
     }
@@ -184,7 +207,7 @@ function store_root(): ?string
 /** Keeps the guard file current without ever touching the projects. */
 function ensure_store_guard(string $root): void
 {
-    $base = __DIR__ . DIRECTORY_SEPARATOR . STORE_DIRECTORY;
+    $base = store_base_path();
     $directories = array_unique([$base, $root]);
     foreach ($directories as $dir) {
         if (is_dir($dir)) {
@@ -1462,7 +1485,9 @@ if ($root === null) {
         send_json([
             'enabled'  => false,
             'projects' => [],
-            'error'    => 'Create a folder named "' . STORE_DIRECTORY . '" next to store.php to keep projects on this server.',
+            'error'    => configured_store_path() !== null
+                ? 'The folder named in LAYERLING_SHARED_PROJECTS_DIR does not exist. Create it, writable for the web server, to keep projects on this server.'
+                : 'Create a folder named "' . STORE_DIRECTORY . '" next to store.php to keep projects on this server.',
         ]);
     }
     fail('Shared project storage is disabled', 404);
@@ -1473,7 +1498,9 @@ if (!is_writable($root)) {
         send_json([
             'enabled'  => true,
             'projects' => [],
-            'error'    => 'The "' . STORE_DIRECTORY . '" folder exists but the web server cannot write to it.',
+            'error'    => configured_store_path() !== null
+                ? 'The folder named in LAYERLING_SHARED_PROJECTS_DIR exists but the web server cannot write to it.'
+                : 'The "' . STORE_DIRECTORY . '" folder exists but the web server cannot write to it.',
         ], 500);
     }
 }

@@ -22,6 +22,7 @@ export function OffsetPanel({
   targetName,
   distance,
   shrink,
+  sideways,
   keepCopy,
   edges,
   workspace,
@@ -34,6 +35,7 @@ export function OffsetPanel({
   onEditFeature,
   onDistanceChange,
   onShrinkChange,
+  onSidewaysChange,
   onKeepCopyChange,
   onEdgesChange,
   onApply,
@@ -42,6 +44,8 @@ export function OffsetPanel({
   targetName: string;
   distance: number;
   shrink: boolean;
+  /** Only the sides move (#1057): the body keeps its height. */
+  sideways: boolean;
   keepCopy: boolean;
   edges: ShellEdges;
   workspace: WorkplaneWorkspaceSettings;
@@ -55,6 +59,7 @@ export function OffsetPanel({
   onEditFeature?: (id: string) => void;
   onDistanceChange: (value: number) => void;
   onShrinkChange: (value: boolean) => void;
+  onSidewaysChange: (value: boolean) => void;
   onKeepCopyChange: (value: boolean) => void;
   onEdgesChange: (value: ShellEdges) => void;
   onApply: () => void;
@@ -139,6 +144,11 @@ export function OffsetPanel({
         </div>
         <span className="shell-openings-summary">{t("offset.edgesHint")}</span>
       </div>
+
+      <label className="edge-modifier-field offset-copy">
+        <input type="checkbox" checked={sideways} disabled={busy} onChange={(event) => onSidewaysChange(event.target.checked)} />
+        <span>{t("offset.sideways")}</span>
+      </label>
 
       <label className="edge-modifier-field offset-copy">
         <input type="checkbox" checked={keepCopy} disabled={busy} onChange={(event) => onKeepCopyChange(event.target.checked)} />

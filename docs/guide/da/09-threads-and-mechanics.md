@@ -11,7 +11,8 @@ Vælg {{ui:shape.thread}} i formbiblioteket. Under {{ui:inspector.threadRole}} b
 
 - **{{ui:thread.rod}}:** en cylinder med gevind, for eksempel en skrue uden hoved.
 - **{{ui:thread.screw}}:** med hoved. Du vælger {{ui:inspector.threadHead}}: {{ui:thread.headCylinder}}, {{ui:thread.headCountersunk}} eller {{ui:thread.headHex}}.
-- **{{ui:thread.nut}}:** den matchende møtrik.
+  Længere nede indstiller du {{ui:prop.headDiameter}} (på et sekskanthoved {{ui:prop.headAcrossFlats}}; på et undersænket hoved følger diameteren højden) og {{ui:inspector.threadDrive}} i hovedfladen: {{ui:thread.driveHex}}, {{ui:thread.driveTorx}}, {{ui:thread.drivePhillips}}, {{ui:thread.driveSlot}}, {{ui:thread.driveRobertson}} eller {{ui:thread.driveNone}} til en skrue, man drejer med hånden eller en nøgle. {{ui:prop.driveSize}} er nøglevidden på den indvendige sekskant, Torx-stjernens yderdiameter eller korsets spændvidde; {{ui:prop.driveDepth}} er hvor dybt det går, højst ni tiendedele af hovedet, og 0 udelader det. Så længe du ikke ændrer dem, følger de størrelsen; et sekskanthoved starter uden drev. Drevet hører til det eksakte legeme og kommer derfor også med i STEP-eksporten. Med {{ui:thread.driveSlot}} er {{ui:prop.driveSize}} kærvens længde og bredden en femtedel af den, så en almindelig skruetrækker eller en mønt passer; den starter så lang, som hovedet tillader. {{ui:thread.driveRobertson}} er den firkant, der er almindelig i Canada: {{ui:prop.driveSize}} er firkantens nøglevidde, og den starter med den bit, der passer til størrelsen, nr. 2 (2,84 mm) til M4 og M5.
+- **{{ui:thread.nut}}:** den matchende møtrik. Spændeskiven til den er et {{ui:shape.tube}}: vælg skruestørrelsen under {{ui:prop.washerSize}}, så følger yder- og inderdiameter og tykkelse ISO 7089.
 - **{{ui:thread.bore}}:** et gevindhul. Det er et hul. Træk det ind i en del, gruppér begge, og delen har et indvendigt gevind. Til et hul, som en bolt skrues i, skal du altid bruge {{ui:thread.bore}}: En {{ui:thread.rod}} eller {{ui:thread.screw}} som hul har boltens fulde mål uden spillerum og bliver for stram. Sætter du den alligevel som hul, gør layerling opmærksom på det, og {{ui:inspector.threadMakeTappedHole}} laver den om til et {{ui:thread.bore}}.
 
 ![En skrue med cylinderhoved. Til højre: type og hovedform, længere nede størrelse, deling og profil.](shot:thread-screw)
@@ -198,6 +199,12 @@ Et hul der ligger på siden får en bro hen over toppen når det printes, og bro
 Gør dråbehullet til et hul og gruppér det med delen. Dets længde løber langs dybden, og spidsen vender opad. Til et hul i den anden retning drejer du det 90° om den lodrette akse.
 
 Et **gevindhul** på siden falder sammen foroven på samme måde. Giv det en dråbeform af sin egen: tilføj et {{ui:shape.teardrop}}-hul, hvis {{ui:prop.teardropDiameter}} er gevindets kerne, den diameter tænderne lader fri (omkring 8,4 mm for M10), med samme længde som gevindhullet, og vælg begge. Klik på {{ui:editor.tool.align}} og bring dem på linje i midten – midten af dråbeformen er midten af den runde del, ikke af kassen med spidsen, så de to cirkler ligger oven i hinanden – og gruppér begge med delen. Gevindet skæres som sædvanligt, og spidsen åbner toppen af hullet, så det printer uden støtter.
+
+## Stikåbninger
+
+En kasse til elektronik skal have en åbning til kablet. {{ui:shape.port}} er netop den åbning: en liggende udskæring med afrundede hjørner. Vælg stikket under {{ui:prop.portPreset}} - {{ui:port.usbC}}, {{ui:port.microUsb}} eller {{ui:port.usbA}} - så får den stikkets mål plus ca. 0,25 mm luft på hver side. {{ui:port.usbCPlug}} er til et stik, der sidder bag væggen, så stikhuset skal kunne nå ind. Bredde, højde og {{ui:prop.portCorner}} kan ændres i hånden; listen viser så {{ui:port.custom}}. {{ui:port.hdmi}}, {{ui:port.miniHdmi}}, {{ui:port.displayPort}} og {{ui:port.miniDisplayPort}} har ligesom stikket skråt afskårne nederste hjørner, DisplayPort kun det venstre, og {{ui:port.rj45}} passer til et netværksstik; målene stammer fra producenternes anbefalede udskæringer og VESA-tegningerne.
+
+Den kommer som udskæring og vender fremad. Sæt {{ui:prop.portDepth}} lidt større end vægtykkelsen, flyt den hen, hvor stikket sidder på printet, og gruppér den med kassen. Til en sidevæg drejer du den 90° om den lodrette akse.
 
 ## Forsænkning og undersænkning
 

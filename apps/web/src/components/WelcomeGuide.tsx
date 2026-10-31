@@ -28,6 +28,7 @@ const MORE = [
   ["welcome.moreLibraryTitle", "welcome.moreLibraryBody"],
   ["welcome.morePatternTitle", "welcome.morePatternBody"],
   ["welcome.moreHolePatternTitle", "welcome.moreHolePatternBody"],
+  ["welcome.moreFaceTitle", "welcome.moreFaceBody"],
   ["welcome.moreOffsetTitle", "welcome.moreOffsetBody"],
   ["welcome.moreTextureTitle", "welcome.moreTextureBody"],
   ["welcome.moreVaseTitle", "welcome.moreVaseBody"],
@@ -50,11 +51,13 @@ const MORE = [
   ["welcome.moreAiTitle", "welcome.moreAiBody"],
   ["welcome.morePointsTitle", "welcome.morePointsBody"],
   ["welcome.moreSearchTitle", "welcome.moreSearchBody"],
+  ["welcome.moreHelpTitle", "welcome.moreHelpBody"],
   ["welcome.moreSimplifyTitle", "welcome.moreSimplifyBody"],
   ["welcome.moreHistoryTitle", "welcome.moreHistoryBody"],
   ["welcome.moreDrawingTitle", "welcome.moreDrawingBody"],
   ["welcome.moreLookTitle", "welcome.moreLookBody"],
   ["welcome.moreControlsTitle", "welcome.moreControlsBody"],
+  ["welcome.moreTabletTitle", "welcome.moreTabletBody"],
 ] as const satisfies ReadonlyArray<readonly [MessageKey, MessageKey]>;
 
 /** What andere Programme cannot do: the short list that follows the switch note. */

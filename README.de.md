@@ -79,9 +79,9 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 - **Millimeter oder Zoll** – mit Imperial erscheinen alle Maße in Zoll, als Bruch wie in Tinkercad (1 5/8) oder als Dezimalzahl, das Raster rastet von 1/64 bis 1 Zoll, und das Gitter der Platte ist in Zoll gezeichnet.
 - **Die Platte deines Druckers** – wähl einen von über 230 gängigen Druckern, dann bekommt die Platte seine Größe – rund bei einem Delta-Drucker wie einem FLSun. Name und Bauraum stehen in der Ecke der Arbeitsfläche (ein Schalter in den Einstellungen blendet das und den Namen des Entwurfs aus), und eine Warnung erscheint, wenn ein Körper über den Rand ragt.
 - **Überhänge und Filament** – „Überhänge zeigen“ schraffiert jede Fläche, die steiler als 45° (oder der Winkel deines Druckers) überhängt und Stützen bräuchte, und das Exportfenster nennt Volumen, Gewicht und Meter Filament, bevor du slicst.
-- **Formen-Bibliothek** – Quader, Zylinder, Kapseln (auf Wunsch mit einem kleineren Ende, etwa für eine Riemenabdeckung), Kugeln, Kegel, Pyramiden, Keile, Text, Dächer, Halbkugeln, Paraboloide, Tori, Rohre, Übergänge (Loft) von einem Umriss zum anderen, etwa eckig auf rund, auch verdreht oder mit geneigtem oberen Ende, mit oder ohne Wand, Mehrkante von drei bis vierundzwanzig Seiten, Federn, ein druckbares Scharnier (mit Schraubenlöchern oder als Fingerscharnier), Gridfinity-Behälter und -Bodenplatten, Rändelungen für Griffe (gerade, gekreuzt oder rund) und mehr.
+- **Formen-Bibliothek** – Quader, Zylinder, Kapseln (auf Wunsch mit einem kleineren Ende, etwa für eine Riemenabdeckung), Kugeln, Kegel, Pyramiden, Keile, Text, Dächer, Halbkugeln, Paraboloide, Tori, Rohre, Übergänge (Loft) von einem Umriss zum anderen, etwa eckig auf rund, auch verdreht oder mit geneigtem oberen Ende, mit oder ohne Wand, Mehrkante von drei bis vierundzwanzig Seiten, Federn, ein druckbares Scharnier (mit Schraubenlöchern oder als Fingerscharnier), Gridfinity-Behälter und -Bodenplatten, Rändelungen für Griffe (gerade, gekreuzt oder rund), Anschlussöffnungen für USB-C-, Micro-USB-, USB-A-, HDMI-, DisplayPort- und RJ45-Buchsen in einer Gehäusewand und mehr.
 - **Vasen, Töpfe und Lampenschirme** – eine eigene Form Vase: Körperform, Querschnitt (auch selbst gezeichnet) mit einem zweiten, in den er übergeht, Verdrehung, Muster, Abflusslöcher, Fuß, Untersetzer und Deckel, massiv für den Vasenmodus des Slicers oder hohl. Von @marcus040473.
-- **Gewinde, die passen** – Gewindestangen, Schrauben mit Zylinder-, Senk- oder Sechskantkopf, Sechskantmuttern und Gewindelöcher. M2 bis M12 liegen bereit, dazu UNC und UNF von #4 bis ein Zoll und die Whitworth-Rohrgewinde G1/16 bis G4 (ISO 228-1); Durchmesser und Steigung lassen sich auch frei wählen, Linksgewinde ebenso. Bei einer Zoll- oder G-Größe fragt das Feld nach Gängen je Zoll statt nach Millimetern. Die Enden bekommen auf Wunsch eine Fase, und das Gewindeloch ist eine Aussparung: in ein Teil ziehen, gruppieren, fertig.
+- **Gewinde, die passen** – Gewindestangen, Schrauben mit Zylinder-, Senk- oder Sechskantkopf und Innensechskant, Torx, Kreuzschlitz, Schlitz oder Robertson-Vierkant (Kopfdurchmesser, Antriebsgröße und -tiefe frei einstellbar), Sechskantmuttern, Unterlegscheiben nach ISO 7089 und Gewindelöcher. M2 bis M12 liegen bereit, dazu UNC und UNF von #4 bis ein Zoll und die Whitworth-Rohrgewinde G1/16 bis G4 (ISO 228-1); Durchmesser und Steigung lassen sich auch frei wählen, Linksgewinde ebenso. Bei einer Zoll- oder G-Größe fragt das Feld nach Gängen je Zoll statt nach Millimetern. Die Enden bekommen auf Wunsch eine Fase, und das Gewindeloch ist eine Aussparung: in ein Teil ziehen, gruppieren, fertig.
 - **Zahnräder, die ineinandergreifen** – Stirn-, Schräg- und Kegelräder, Hohlräder und Zahnstangen mit Evolventenzähnen, eingestellt über Modul und Zähnezahl wie in einem Zahnradgenerator, mit Eingriffswinkel und Spiel für den Druck - oder mit runden Zähnen, gutmütig bei kleinen gedruckten Rädern und als Griff an Drehknöpfen. Zwei Räder auswählen, und das Eigenschaftenfeld nennt den Achsabstand, bei dem sie ineinandergreifen.
 - **Hirth-Verzahnung** – eine Scheibe mit V-förmigen Zähnen, die strahlenförmig von der Mitte ausgehen: Eine umgedrehte Kopie greift in jedem Zahnschritt hinein und zentriert sich selbst, für verstellbare Gelenke, Stativköpfe und Rastknöpfe. Zähnezahl, Zahnhöhe und Bohrung sind einstellbar; sie ist ein exakter Körper für die Kantenwerkzeuge und STEP.
 - **Körper und Aussparungen** – Formen zu Schneidwerkzeugen erklären und zur fertigen Geometrie gruppieren. „Gruppe bearbeiten“ (**E**) legt die Teile einer Gruppe einzeln hin und rechnet sie mit „Fertig“ neu – auch eine Gruppe in einer Gruppe, so tief der Entwurf geht.
@@ -101,7 +101,7 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 - **Aushöhlen** – aus einem Körper Wände gleicher Stärke machen, auf jeder gewünschten Seite offen (oben, unten, vorne, hinten, links, rechts, beliebig kombiniert) oder ganz geschlossen – für Dosen, Becher und Gehäuse.
 - **Gefälle und Zulaufen in der Länge** – die Oberseite von Quader, Zylinder, Vieleck, Rohr, Keil oder rundem Dach zu einem Ende hin abfallen lassen oder die Seiten aller außer dem Rohr zu einem Ende hin zusammenlaufen lassen, gerade oder gewölbt, per Zahl oder mit einem Punkt am Ende: ein Dach, das in der Länge abfällt, eine Rampe, ein schräg abgeschnittenes Rohrende, ein Bootsbug. Ein Gefälle bleibt exakt für Fasen, Verrundungen und STEP, ebenso ein zulaufender Quader, Keil oder rundes Dach. Von @plazmabokor.
 - **Deckel** – der Deckel für eine Kiste, einen Topf oder eine Schale, die oben offen ist, aus ihrem eigenen Umriss, rund oder eckig: eingesteckt, übergestülpt oder flach aufgelegt, mit strammer, normaler oder lockerer Passung (0,1, 0,2 oder 0,3 mm je Seite) oder eigenem Spalt, Deckeldicke sowie Tiefe und Wand der Lippe. Er liegt danach neben dem Körper, umgedreht mit der Platte nach unten, druckbar ohne Stützen.
-- **Versetzen und Ausschneiden** – einen exakten Körper an allen Flächen um 0,01 bis 10 mm wachsen oder schrumpfen lassen, für das Spiel einer Presspassung oder eines Schnappverschlusses, oder ein Teil in einem Schritt mit Spiel ringsum aus einem anderen ausschneiden, wobei das Teil stehen bleibt.
+- **Versetzen und Ausschneiden** – einen exakten Körper an allen Flächen um 0,01 bis 10 mm wachsen oder schrumpfen lassen, oder nur seitlich, sodass er seine Höhe behält, für das Spiel einer Presspassung oder eines Schnappverschlusses, oder ein Teil in einem Schritt mit Spiel ringsum aus einem anderen ausschneiden, wobei das Teil stehen bleibt.
 - **Oberflächentextur** – ein Relief auf jeden Körper legen, für Griff oder Aussehen: Rillen, Rändel, Waben, Noppen, Voronoi-Zellen, Ziegel, Strick, Seil, Korbgeflecht, Carbon, Baumrinde, Holzmaserung, Risse, ein Bild als Höhenkarte oder Text, rund um runde Körper oder flach entlang einer Achse.
 - **Fläche löschen** – die Flächen einer Verrundung, eines Lochs oder eines Zapfens anklicken und löschen: Die Flächen ringsum wachsen und schließen die Lücke, und der Körper bleibt exakt für weitere Verrundungen und den STEP-Export.
 - **Eigene Formen** – Körper, die du immer wieder brauchst, oben in der Formenliste ablegen und per Klick oder Ziehen in jeden Entwurf setzen; im Browser oder, mit dem Serverspeicher, auf dem Server für jedes Gerät. „Alle sichern“ nimmt sie mit.
@@ -151,7 +151,8 @@ Von anderen gemacht, nicht von diesem Projekt:
 - [I Tried Layerling After Tinkercad… Is It REALLY Better?](https://youtu.be/5DpOxdoNwqs) – Maker Mates Studio 3D Printing (Englisch). Jemand, der von Tinkercad kommt, probiert layerling aus und vergleicht die beiden.
 - [Print by Layer](https://www.youtube.com/playlist?list=PLejZBz4L7CGQ) – Print N Repeat (Englisch). Eine Playlist über layerling, bisher mit „The EASIEST Way to Design Hinges in Layerling“ und „The EASIEST Way to 3D Model Threads!“.
 - [Tinkercad Too Basic? Fusion 360 Too Much? Meet Layerling for 3D Printing](https://youtu.be/kzV7fQ3rXhw) – 3D Jesus | 3D Printing & Design (Englisch). Ein erster Test von layerling ganz ohne Anleitung: Verrunden und Fasen, Aushöhlen, Gewinde, Skizzen, Drehkörper, Muster, Import und Druckerprofile.
-- [Layerling la nueva herramienta gratuita de modelado 3D, más completo que Tinkercad](https://youtu.be/-EEt0RSINoY) – Fulcro 1900 (Spanisch). Ein Video über layerling als neues, kostenloses 3D-Modellierwerkzeug, das vollständiger ist als Tinkercad.
+- [Layerling en español: el CAD gratis que reemplaza a Tinkercad (2026)](https://youtu.be/iroftGBX-0Y) – Random Maker (Spanisch). Ein erster Blick von jemandem, der seit Jahren mit Tinkercad arbeitet: wie sich die Oberfläche anfühlt, was anders ist, was layerling kann, das in Tinkercad mühsam oder unmöglich ist, und für wen es sich lohnt.
+- [Proyectos en Layerling](https://www.youtube.com/playlist?list=PLTEdmvVC2bxs) – Fulcro 1900 (Spanisch). Eine Playlist mit Projekten in layerling, bisher mit einer Vorstellung von layerling als kostenlosem Werkzeug, das vollständiger ist als Tinkercad, Schreibtischzubehör (drei Modelle), einer Handyhülle sowie Gewindestange, Mutter und Schraube.
 - [Layerling](https://www.youtube.com/playlist?list=PLQuXPoMXTnRQ) – Werkplaats Marc (Niederländisch). Eine Playlist über layerling, bisher mit einem ersten Blick für Tinkercad-Umsteiger („Layerling - De Gratis Tussenstap van Tinkercad naar Fusion 360“) und einer Anleitung zu Skizzen: Foto nachzeichnen, Drehen und entlang eines Pfads ziehen („Schetsen Uitgelegd“).
 <!-- videos:end -->
 
@@ -275,11 +276,12 @@ npm run export
 
 Die fertige Seite liegt in **`apps/web/.next-export/`**. Kopiere den **Inhalt** dieses Ordners (nicht den Ordner selbst) in das Dokumentenverzeichnis des Webservers, sodass `index.html` direkt darin liegt.
 
-Drei Dinge zu wissen:
+Vier Dinge zu wissen:
 
 - **layerling braucht eine eigene Adresse.** Die Dateien verweisen mit Pfaden aufeinander, die an der Wurzel beginnen (`/_next/...`). layerling muss deshalb an der Wurzel einer Adresse ausgeliefert werden, etwa `https://layerling.example.com/` oder `http://192.168.0.5:8080/`. In einem Unterordner (`https://example.com/layerling/`) läuft es nicht, und von der Festplatte (`file://`) lässt es sich nicht öffnen. Siehst du nur einen Block Text ohne jede Gestaltung, wurden die Skript- und Stildateien nicht geladen: Öffne die Entwicklerwerkzeuge des Browsers (F12), sieh im Reiter „Netzwerk“ nach roten Einträgen `/_next/...` und vergleiche deren Adresse mit dem Ort, an den du die Dateien gelegt hast.
 - **Ordner, die mit einem Unterstrich beginnen, müssen ausgeliefert werden.** Manche Server verstecken sie (GitHub Pages zum Beispiel ohne eine Datei `.nojekyll`), und in `_next` steckt das ganze Programm.
 - **Ein schneller Test auf dem eigenen Rechner:** `npx serve apps/web/.next-export` und die angezeigte Adresse öffnen.
+- **Als App installieren und offline nutzen geht nur mit https.** Der Export enthält die Offline-Dateien (`sw.js`), aber ein Browser nutzt sie nur unter einer `https://`-Adresse oder auf `localhost`, nicht unter einer einfachen `http://`-Adresse im eigenen Netz.
 
 ### Gemeinsame Entwürfe im Netz
 
@@ -354,6 +356,13 @@ Apache legt `store.php` dort eine `.htaccess` an, die jeden direkten Abruf abwei
 `store/` dort selbst (in Apache: `<Directory /var/www/html/store> Require all denied </Directory>`, in nginx:
 `location /store/ { deny all; }`). `store.php` prüft außerdem jeden Export, den es speichert, und weist eine Datei ab,
 die in einem Browser etwas ausführen könnte.
+
+Der Ordner kann auch außerhalb des Web-Roots liegen, wo ihn keine Adresse erreicht, ob mit `.htaccess` oder ohne:
+Setze `LAYERLING_SHARED_PROJECTS_DIR`, dieselbe Einstellung, die der Node-Server liest, auf seinen Pfad – in Apache
+mit `SetEnv LAYERLING_SHARED_PROJECTS_DIR /var/layerling-projects`, in nginx mit
+`fastcgi_param LAYERLING_SHARED_PROJECTS_DIR /var/layerling-projects;`, in Docker als Umgebungsvariable des
+Containers. Dieser Ordner tritt dann an die Stelle von `store`; auch er muss vorhanden sein und für den Webserver
+beschreibbar.
 
 Beim Ausliefern daran denken: Wer den Export mit einer Option spiegelt, die Überzähliges löscht – `rsync --delete`,
 `robocopy /MIR`, WinSCP `-delete` –, muss `store` ausdrücklich ausnehmen. Sonst räumt jedes Update die Projekte weg.
@@ -436,7 +445,7 @@ MCP-Route abgeschaltet, es sei denn, der Server schaltet sie mit einem Zugriffss
 
 Die wichtigsten Werkzeugnamen sind `layerling_list_editors`, `layerling_read_scene`, `layerling_list_objects`,
 `layerling_create_shape`, `layerling_update_object`, `layerling_list_edges`, `layerling_apply_edge_treatment`,
-`layerling_hollow_object`, `layerling_make_lid`, `layerling_array_objects`, `layerling_set_section_view` und `layerling_capture_image`.
+`layerling_hollow_object`, `layerling_offset_object`, `layerling_cut_out`, `layerling_make_lid`, `layerling_array_objects`, `layerling_set_section_view` und `layerling_capture_image`.
 
 ### Claude Code
 

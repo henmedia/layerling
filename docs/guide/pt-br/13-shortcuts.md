@@ -19,7 +19,7 @@ Não acha uma ferramenta? Pressione [[Ctrl]]+[[K]] ou clique na lupa na área {{
 - Cada entrada mostra as teclas que fazem o mesmo e a área da barra de opções onde ela fica, para você aprender onde está.
 - Entradas em cinza não podem ser executadas agora, na maioria das vezes porque nada está selecionado. Elas continuam na lista para que a pesquisa ainda mostre onde a ferramenta fica.
 
-O guia que você está lendo também tem uma caixa de pesquisa, no topo de cada página: digite uma ou duas palavras e ela lista as seções que contêm todas elas, com as palavras encontradas destacadas. Clique numa delas, ou pressione [[Enter]] para a primeira, para ir direto até lá.
+O guia que você está lendo também tem uma caixa de pesquisa, no topo de cada página: digite uma ou duas palavras e ela lista as seções que contêm todas elas, com as palavras encontradas destacadas. Clique numa delas, ou pressione [[Enter]] para a primeira, para ir direto até lá. A página que se abre destaca cada lugar onde suas palavras aparecem e rola até o primeiro naquela seção; [[Esc]] ou um clique num destaque os remove.
 - O nome de uma forma adiciona essa forma ao plano de trabalho, como clicar nela no menu de formas.
 - Com o campo vazio, a pesquisa de comandos lista no topo os comandos que você usou por último.
 - O nome de um sólido do seu projeto encontra esse sólido e o seleciona, o que ajuda num projeto com muitas peças. Os sólidos só aparecem depois que você digita.

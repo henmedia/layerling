@@ -23,6 +23,7 @@ Przy wielu częściach łatwo zgubić się w widoku. Lista obiektów ({{ui:edito
 - Etykieta pokazuje, czy część jest {{ui:outliner.solid}}, czy {{ui:outliner.hole}}.
 - Kłódka i oko blokują i ukrywają pojedyncze części.
 - {{ui:outliner.rename}} nadaje części własną nazwę. Ołówek obok nazwy na górze ustawień robi to samo dla zaznaczonego kształtu. Sensowne nazwy bardzo pomagają w większych projektach.
+- Przycisk A–Z na pasku tytułu ({{ui:outliner.sortByName}}) sortuje alfabetycznie kształty, którym nadano nazwy, licząc liczby jako liczby (Część 2 przed Częścią 10). Kształty z domyślną nazwą zostają poniżej w kolejności dodania, najnowszy na końcu, a części w grupach są sortowane tak samo. Zmienia się tylko lista, nigdy projekt. Drugie kliknięcie znów pokazuje wszystko w kolejności dodania, a przeglądarka zapamiętuje wybór.
 - Pole wyszukiwania znajduje kształty po nazwie i po rodzaju, więc także „walec” albo „otwór”. Zagląda też do wnętrza grup, niezależnie od głębokości zagnieżdżenia: grupa zawierająca trafienie zostaje na liście i rozwija się, pokazując pasujące części i grupy, które do nich prowadzą. Grupa znaleziona po własnej nazwie po otwarciu pokazuje wszystkie swoje części.
 - Strzałka po lewej stronie paska tytułu zwija listę do samego paska i z powrotem.
 

@@ -21,6 +21,7 @@ Quando ci sono molte parti, è facile perderne qualcuna nella vista. L’elenco 
 - L’etichetta indica se una parte è {{ui:outliner.solid}} oppure {{ui:outliner.hole}}.
 - Il lucchetto e l’occhio bloccano o nascondono le singole parti.
 - {{ui:outliner.rename}} assegna un nome alla parte; la matita accanto al nome in cima alle impostazioni rinomina allo stesso modo la forma selezionata. In un progetto grande, nomi chiari sono di grande aiuto.
+- Il pulsante A–Z nella barra del titolo ({{ui:outliner.sortByName}}) ordina alfabeticamente le forme a cui hai dato un nome, contando i numeri come numeri (Parte 2 prima di Parte 10). Le forme che hanno ancora il nome predefinito restano sotto, nell'ordine in cui le hai aggiunte, la più recente per ultima, e le parti dentro i gruppi vengono ordinate allo stesso modo. Cambia solo l'elenco, mai il progetto. Un secondo clic mostra di nuovo tutto nell'ordine di aggiunta, e il browser ricorda la scelta.
 - Il campo di ricerca trova le forme per nome e per tipo, per esempio “cilindro” o “foro”. Cerca anche all’interno dei gruppi, a qualsiasi livello: se un gruppo contiene una corrispondenza, resta nell’elenco e si apre mostrando le parti trovate e i gruppi che conducono a esse. Se invece il nome del gruppo stesso corrisponde alla ricerca, aprendolo vedrai tutte le sue parti.
 - La freccia all’estrema sinistra della barra del titolo comprime l’elenco nella sola barra e lo riapre.
 

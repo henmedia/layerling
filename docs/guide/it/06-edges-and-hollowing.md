@@ -41,6 +41,8 @@ Se una selezione che funzionava smette di funzionare quando aggiungi un altro sp
 
 Anche lo spigolo sotto il puntatore viene disegnato più largo, così puoi vedere quale selezionerai con il clic.
 
+Anche un foro accetta {{ui:editor.tool.chamfer}} e {{ui:editor.tool.fillet}}, così come {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} e {{ui:editor.tool.deleteFace}}: resta un foro e taglia con la sua nuova forma. Arrotondando i quattro spigoli verticali di un foro a parallelepipedo si ottiene una tasca con angoli interni arrotondati, e un foro ingrandito con {{ui:editor.tool.offset}} taglia con altrettanto gioco in più. Per smussare lo spigolo dove un foro incontra il pezzo, tratta invece il gruppo finito: quello spigolo appartiene a lui.
+
 ### Annullare un trattamento degli spigoli
 
 Puoi sempre modificare di nuovo un corpo su cui hai applicato uno strumento per gli spigoli. Selezionalo e apri Raccordo, Smusso o Svuota: in ciascuno trovi l’elenco dei trattamenti già applicati sotto {{ui:edge.featureHistory}}. {{ui:edge.revertAction}} annulla un singolo trattamento. Se sopra ce ne sono di più recenti, verranno annullati insieme; il pannello ti indica quanti.
@@ -104,6 +106,8 @@ Ogni faccia di un corpo può essere spostata della stessa distanza, verso l'este
 3. Gli {{ui:offset.edges}} decidono gli angoli esterni: arrotondato mantiene tonda la superficie, netto lascia proseguire le facce finché non si incontrano.
 4. Spunta {{ui:offset.copy}} per tenere il pezzo com'è e ottenere il corpo ingrandito come copia che è già un vuoto. Raggruppa quel vuoto con il pezzo da accoppiare e taglia esattamente il gioco scelto.
 5. Clicca su {{ui:offset.apply}}.
+
+Spunta {{ui:offset.sideways}} quando deve crescere o restringersi solo il contorno: i lati si spostano della distanza, mentre ogni faccia piana sopra e sotto resta alla sua altezza. Un'insegna riceve un bordo tutto intorno, una base si allarga e il corpo non diventa più alto. In un corpo a gradini ogni gradino mantiene la propria altezza. Anche un testo spostato tramite i suoi contorni mantiene allora la sua altezza.
 
 Senza la spunta viene spostato il corpo stesso. Diventa un corpo esatto fisso, come dopo uno smusso: l'elenco in alto nel pannello annulla l'offset e {{ui:edge.editAction}} riapre lo strumento con la distanza precedente. Si possono spostare solo corpi CAD esatti - scatole, cilindri e le altre forme, i loro gruppi, parti STEP importate. Un corpo che è solo una maglia di triangoli, come molte importazioni STL, spesso non può. Una distanza troppo grande per il corpo, ad esempio una riduzione oltre la parete più sottile, viene rifiutata.
 

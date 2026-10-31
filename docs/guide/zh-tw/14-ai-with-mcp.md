@@ -82,7 +82,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_apply_edge_treatment` | 對選定的邊倒角或圓角 |
 | `layerling_hollow_object` | 以均勻壁厚抽殼實體 |
 | `layerling_cut_out` | 從一個實體中挖出另一個實體使兩者配合：零件保留，依間隙放大的副本從另一個實體中減去 |
-| `layerling_offset_object` | 移動實體的所有面以得到配合間隙：放大或縮小實體，或把放大的副本作為孔加入 |
+| `layerling_offset_object` | 移動實體的所有面以得到配合間隙：放大或縮小實體，或把放大的副本作為孔加入，或只移動側面 |
 | `layerling_list_faces` | 列出精確實體的面 |
 | `layerling_delete_faces` | 刪除面並補平缺口 |
 | `layerling_array_objects` | 以直線排列或環繞圓周複製 |

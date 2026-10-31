@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { loadTextFonts } from "@/lib/textFonts";
 import { textFillClosedGeometry, textFillComponents, textFillPieceGeometry, textHasFill, type TextFillComponent } from "@/lib/textFill";
 import { textFillExtent, textFillPatch, textLetterBox } from "@/lib/textGeometry";
+import { textOffsetAsFill } from "@/lib/textFillChoice";
 import type { SketchStroke, WorkplaneShape } from "@/types/layerling";
 
 // #215: fill modes for the Text shape - stroke outside/inside/centred, "Wider" and the silhouette.
@@ -171,3 +172,45 @@ describe("the closed body of a text fill (#352)", () => {
     expect(textFillClosedGeometry(runtime, text({ text: "O" }))).toBeNull();
   });
 });
+
+describe("offsetting a text through its outlines (Discussion #1037)", () => {
+  it("grows the letters by the distance and the text by as much at both ends", () => {
+    const shape = text({ text: "ABMNW9", elevation: 2, height: 10 });
+    const grown = textOffsetAsFill(shape, 0.2, false, "round")!;
+    expect(grown.textStroke).toEqual({ width: 0.2, align: "grow", join: "round", cap: "flat" });
+    expect(grown.height).toBeCloseTo(10.4, 9);
+    expect(grown.elevation).toBeCloseTo(1.8, 9);
+    // The box takes the fill: 0.2 mm more on every side, the letters stay where they are.
+    expect(grown.width).toBeCloseTo(shape.width + 0.4, 6);
+    expect(grown.depth).toBeCloseTo(shape.depth + 0.4, 6);
+    expect(textOffsetAsFill(shape, 0.2, false, "sharp")!.textStroke?.join).toBe("miter");
+  });
+
+  it("shrinks them the other way", () => {
+    const shrunk = textOffsetAsFill(text({ elevation: 0, height: 10 }), 0.5, true, "round")!;
+    expect(shrunk.textStroke?.align).toBe("shrink");
+    expect(shrunk.height).toBeCloseTo(9, 9);
+    expect(shrunk.elevation).toBeCloseTo(0.5, 9);
+  });
+
+  it("keeps the height and place when only the sides move (Discussion #1057)", () => {
+    const shape = text({ text: "ABMNW9", elevation: 2, height: 10 });
+    const grown = textOffsetAsFill(shape, 0.2, false, "round", true)!;
+    expect(grown.textStroke?.align).toBe("grow");
+    expect(grown.height).toBe(10);
+    expect(grown.elevation).toBe(2);
+    expect(grown.width).toBeCloseTo(shape.width + 0.4, 6);
+    const shrunk = textOffsetAsFill(shape, 0.5, true, "round", true)!;
+    expect(shrunk.height).toBe(10);
+    expect(shrunk.elevation).toBe(2);
+  });
+
+  it("leaves texts with a fill or rounded lettering, other shapes and too small or large distances alone", () => {
+    expect(textOffsetAsFill(text({ textStroke: stroke("outside") }), 0.2, false, "round")).toBeNull();
+    expect(textOffsetAsFill(text({ bevel: 0.5 }), 0.2, false, "round")).toBeNull();
+    expect(textOffsetAsFill(text({ kind: "box" }), 0.2, false, "round")).toBeNull();
+    expect(textOffsetAsFill(text(), 0.01, false, "round")).toBeNull();
+    expect(textOffsetAsFill(text({ height: 5 }), 3, true, "round")).toBeNull();
+  });
+});
+

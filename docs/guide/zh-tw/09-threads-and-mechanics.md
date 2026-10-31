@@ -11,7 +11,8 @@ summary: 能相互配合的螺絲、螺帽與螺紋孔，以及齒輪、彈簧�
 
 - **{{ui:thread.rod}}：** 帶螺紋的圓柱，例如沒有頭的螺絲。
 - **{{ui:thread.screw}}：** 帶頭部。頭部形狀在 {{ui:inspector.threadHead}} 選擇：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。
-- **{{ui:thread.nut}}：** 對應的螺帽。
+  再往下可以設定{{ui:prop.headDiameter}}(六角頭為{{ui:prop.headAcrossFlats}};沉頭的直徑隨高度而定)以及頭部端面的{{ui:inspector.threadDrive}}:{{ui:thread.driveHex}}、{{ui:thread.driveTorx}}、{{ui:thread.drivePhillips}}、{{ui:thread.driveSlot}}、{{ui:thread.driveRobertson}},或用手或扳手轉的螺絲選{{ui:thread.driveNone}}。{{ui:prop.driveSize}}是內六角的對邊寬度、星型的外徑或十字的跨度;{{ui:prop.driveDepth}}是它的深度,最多為頭部的十分之九,0 表示不要。只要不改動,這些值就隨尺寸變化;六角頭預設沒有驅動。驅動屬於精確實體,因此也會出現在 STEP 匯出中。選擇{{ui:thread.driveSlot}}時，{{ui:prop.driveSize}}是槽的長度，寬度為長度的五分之一，一字起子或硬幣都能轉；初始長度為頭部允許的最大值。 {{ui:thread.driveRobertson}}是加拿大常見的方頭驅動：{{ui:prop.driveSize}}是方孔的對邊寬度，預設取與規格相配的起子頭，M4 和 M5 為 2 號（2.84 公釐）。
+- **{{ui:thread.nut}}：** 對應的螺帽。配套的墊圈是一個{{ui:shape.tube}}：在{{ui:prop.washerSize}}中選擇螺絲規格，外徑、內徑和厚度即依 ISO 7089 設定。
 - **{{ui:thread.bore}}：** 螺紋孔。它是一個孔。把它拖進零件、將兩者群組，零件就有內螺紋。 要做鎖螺栓的孔，請一律使用{{ui:thread.bore}}：{{ui:thread.rod}}或{{ui:thread.screw}}作為孔時是螺栓的完整尺寸，沒有間隙，會太緊。如果仍把它設為孔，layerling 會提示你，點選{{ui:inspector.threadMakeTappedHole}}即可改為{{ui:thread.bore}}。
 
 ![帶圓柱頭的螺絲。右側：類型與頭部形狀，往下是規格、螺距與牙型。](shot:thread-screw)
@@ -174,6 +175,12 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 把淚滴孔設為孔，並與零件群組。其長度沿深度方向，尖端朝上。要在另一個方向開孔，就讓它繞垂直軸旋轉 90°。
 
 側放的**螺紋孔**同樣會在頂部下垂。給它配一個自己的淚滴孔：新增一個 {{ui:shape.teardrop}} 孔，其 {{ui:prop.teardropDiameter}} 為螺紋芯部，即螺牙讓出的直徑（M10 約 8.4 mm），長度與螺紋孔相同，然後同時選取兩者。點擊 {{ui:editor.tool.align}}，讓它們在中央對齊——淚滴孔的中心是其圓部的中心，而不是含尖端外框的中心，所以兩個圓彼此重合——再把兩者與零件群組。螺紋照常切出，尖端打開孔的頂部，因此不需支撐即可列印。
+
+## 接頭開孔
+
+電子產品外殼需要為線材留開孔。{{ui:shape.port}} 就是這種開孔：一個橫放、帶圓角的挖空體。在 {{ui:prop.portPreset}} 中選擇接頭（{{ui:port.usbC}}、{{ui:port.microUsb}} 或 {{ui:port.usbA}}），它就會取得該接頭的尺寸，並在每邊多留約 0.25 mm 間隙。{{ui:port.usbCPlug}} 用於裝在壁後方的接頭，插頭外殼需要伸進來。寬度、高度和 {{ui:prop.portCorner}} 都可以手動修改，此時清單會顯示 {{ui:port.custom}}。{{ui:port.hdmi}}、{{ui:port.miniHdmi}}、{{ui:port.displayPort}} 和 {{ui:port.miniDisplayPort}} 像接頭本身一樣把下方的角斜切掉，DisplayPort 只切左下角；{{ui:port.rj45}} 適用於網路接頭。這些尺寸來自廠商建議的面板開孔和 VESA 圖紙。
+
+它預設為挖空體，朝向前方。把 {{ui:prop.portDepth}} 設得比壁厚稍大，移到電路板上接頭所在的位置，再與外殼組合。用於側壁時，繞垂直軸旋轉 90°。
 
 ## 沉頭孔與錐形沉頭孔
 

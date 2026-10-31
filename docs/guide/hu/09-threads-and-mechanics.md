@@ -11,7 +11,8 @@ Válaszd az alakzattárban a {{ui:shape.thread}} alakzatot. A {{ui:inspector.thr
 
 - **{{ui:thread.rod}}:** menetes henger, például fej nélküli csavar.
 - **{{ui:thread.screw}}:** fejjel. Kiválasztod a {{ui:inspector.threadHead}} típusát: {{ui:thread.headCylinder}}, {{ui:thread.headCountersunk}} vagy {{ui:thread.headHex}}.
-- **{{ui:thread.nut}}:** a hozzá illő anya.
+  Lejjebb állítod be a {{ui:prop.headDiameter}} (hatlapfejnél a {{ui:prop.headAcrossFlats}}; süllyesztett fejnél az átmérő a magasságot követi) és a fejfelület {{ui:inspector.threadDrive}}: {{ui:thread.driveHex}}, {{ui:thread.driveTorx}}, {{ui:thread.drivePhillips}}, {{ui:thread.driveSlot}}, {{ui:thread.driveRobertson}} vagy {{ui:thread.driveNone}} a kézzel vagy kulccsal hajtott csavarhoz. A {{ui:prop.driveSize}} a belső hatszög kulcsnyílása, a Torx csillag külső átmérője vagy a kereszt fesztávja; a {{ui:prop.driveDepth}} azt adja meg, milyen mélyre ér, legfeljebb a fej kilenc tizedéig, a 0 pedig elhagyja. Amíg nem változtatod meg őket, a mérethez igazodnak; a hatlapfej hajtás nélkül indul. A hajtás a pontos test része, így a STEP-exportba is bekerül. {{ui:thread.driveSlot}} esetén a {{ui:prop.driveSize}} a horony hossza, szélessége ennek ötöde, így lapos csavarhúzó vagy pénzérme is illik bele; kezdetben olyan hosszú, amennyit a fej enged. A {{ui:thread.driveRobertson}} a Kanadában szokásos négyszögű hajtás: a {{ui:prop.driveSize}} a négyszög laptávolsága, és a mérethez illő bittel indul, M4-en és M5-ön a 2-essel (2,84 mm).
+- **{{ui:thread.nut}}:** a hozzá illő anya. A hozzá való alátét egy {{ui:shape.tube}}: a {{ui:prop.washerSize}} alatt válaszd ki a csavarméretet, és a külső és belső átmérő meg a vastagság az ISO 7089-et követi.
 - **{{ui:thread.bore}}:** menetes furat. Ez lyuk. Húzd bele egy alkatrészbe, csoportosítsd a kettőt, és az alkatrészben belső menet lesz. Olyan furathoz, amelybe csavart hajtasz, mindig a {{ui:thread.bore}} legyen: a {{ui:thread.rod}} vagy {{ui:thread.screw}} üregként a csavar teljes mérete, holtjáték nélkül, és túl szűk lesz. Ha mégis üregnek állítod, a layerling figyelmeztet, és a {{ui:inspector.threadMakeTappedHole}} gombbal {{ui:thread.bore}} lesz belőle.
 
 ![Egy hengeres fejű csavar. Jobbra: fajta és fejforma, lejjebb méret, menetemelkedés és profil.](shot:thread-screw)
@@ -184,6 +185,12 @@ Egy oldalán fekvő lyuk tetején nyomtatáskor híd keletkezik, és a híd bel�
 Tedd lyukká a csepp alakú lyukat, és csoportosítsd az alkatrésszel. A hossza a mélység mentén fut, a csúcsa felfelé néz. Másik irányú lyukhoz forgasd el 90°-kal a függőleges tengely körül.
 
 Egy oldalán fekvő **menetes furat** teteje ugyanígy belóg. Adj neki saját cseppet: adj hozzá egy {{ui:shape.teardrop}} lyukat, amelynek az {{ui:prop.teardropDiameter}} értéke a menet magja, vagyis az az átmérő, amelyet a fogai szabadon hagynak (M10-nél nagyjából 8,4 mm), ugyanakkora hosszal, mint a menetes furat, és jelöld ki mindkettőt. Kattints az {{ui:editor.tool.align}} gombra, és igazítsd őket középen egy vonalba – a csepp közepe a kerek részének közepe, nem a csúcsos dobozáé, így a két kör egymásra kerül –, majd csoportosítsd mindkettőt az alkatrésszel. A menet a szokásos módon vágódik ki, a csúcs pedig megnyitja a lyuk tetejét, így támasz nélkül nyomtatható.
+
+## Csatlakozónyílások
+
+Egy elektronikai doboznak nyílás kell a kábelhez. A {{ui:shape.port}} pontosan ez: fekvő kivágás lekerekített sarkokkal. A {{ui:prop.portPreset}} mezőben válaszd ki az aljzatot - {{ui:port.usbC}}, {{ui:port.microUsb}} vagy {{ui:port.usbA}} -, és megkapja annak méretét, minden oldalon kb. 0,25 mm hézaggal. A {{ui:port.usbCPlug}} a fal mögött ülő aljzathoz való, ahol a dugó házának is be kell férnie. A szélesség, a magasság és a {{ui:prop.portCorner}} kézzel is állítható; ilyenkor a lista ezt mutatja: {{ui:port.custom}}. A {{ui:port.hdmi}}, {{ui:port.miniHdmi}}, {{ui:port.displayPort}} és {{ui:port.miniDisplayPort}} alsó sarkai az aljzathoz hasonlóan ferdén levágottak, DisplayPortnál csak a bal, a {{ui:port.rj45}} pedig hálózati aljzathoz való; ezek a méretek a gyártók ajánlott panelkivágásaiból és a VESA-rajzokból származnak.
+
+Kivágásként érkezik, előre nézve. A {{ui:prop.portDepth}} legyen kicsit nagyobb a fal vastagságánál, told oda, ahol az aljzat a panelen ül, és csoportosítsd a dobozzal. Oldalfalhoz forgasd el 90°-kal a függőleges tengely körül.
 
 ## Hengeres és kúpos süllyesztés
 

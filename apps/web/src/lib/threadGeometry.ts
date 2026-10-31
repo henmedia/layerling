@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import { toCreasedNormals } from "@/lib/creasedNormals";
-import type { ThreadHand, ThreadHead, ThreadProfile, ThreadRole } from "@/types/layerling";
+import type { ThreadDrive, ThreadHand, ThreadHead, ThreadProfile, ThreadRole } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import type { MessageKey } from "@/lib/messages.en";
 
 export const DEFAULT_THREAD_ROLE: ThreadRole = "rod";
 export const DEFAULT_THREAD_HEAD: ThreadHead = "cylinder";
+export const THREAD_DRIVES: readonly ThreadDrive[] = ["hex", "torx", "phillips", "slot", "robertson", "none"];
 export const DEFAULT_THREAD_HAND: ThreadHand = "right";
 export const DEFAULT_THREAD_PROFILE: ThreadProfile = "v";
 export const DEFAULT_THREAD_DIAMETER = 6;
@@ -526,6 +527,10 @@ export type ThreadShapeFields = {
   threadChamfer?: number;
   threadChamferBottom?: number;
   threadHeadChamfer?: number;
+  threadHeadDiameter?: number;
+  threadDrive?: ThreadDrive;
+  threadDriveSize?: number;
+  threadDriveDepth?: number;
 };
 
 export type ThreadSettings = {
@@ -548,6 +553,11 @@ export type ThreadSettings = {
   /** The chamfer at the bottom end (a screw has none there: the head sits on it). */
   chamferLow: number;
   headChamfer: number;
+  /** Screw only (#1052): head diameter (across flats on a hex head), the drive, its size and depth. */
+  headDiameter: number;
+  drive: ThreadDrive;
+  driveSize: number;
+  driveDepth: number;
 };
 
 export function threadSettings(shape: ThreadShapeFields): ThreadSettings {
@@ -564,6 +574,7 @@ export function threadSettings(shape: ThreadShapeFields): ThreadSettings {
   const chamfer = normalizeThreadChamfer(shape.threadChamfer, chamferShape);
   // Without a value of its own the bottom end has what the top has, as it always did.
   const chamferLow = normalizeThreadChamfer(shape.threadChamferBottom ?? shape.threadChamfer, chamferShape);
+  const drive = threadDriveSettings(shape, { ...head, headHeight });
   return {
     ...head,
     hand: normalizeThreadHand(shape.threadHand),
@@ -579,7 +590,38 @@ export function threadSettings(shape: ThreadShapeFields): ThreadSettings {
     chamferLow,
     // Die Aussenfase kennt ihre Grenze erst, wenn Kopfhoehe und Ansenkung
     // feststehen - bei der Mutter frisst die Ansenkung von innen mit.
-    headChamfer: normalizeThreadHeadChamfer(shape.threadHeadChamfer, { ...head, headHeight, chamfer, chamferLow, profile }),
+    headChamfer: normalizeThreadHeadChamfer(shape.threadHeadChamfer, { ...head, headHeight, ...drive, chamfer, chamferLow, profile }),
+    ...drive,
+  };
+}
+
+/**
+ * Head diameter and drive, in this order: the drive must fit the head, and
+ * the head chamfer (worked out after) must leave the drive's mouth standing.
+ */
+export function threadDriveSettings(shape: Pick<ThreadShapeFields, "threadHeadDiameter" | "threadDrive" | "threadDriveSize" | "threadDriveDepth">, head: HeadSizeShape) {
+  const headDiameter = normalizeThreadHeadDiameter(shape.threadHeadDiameter, head);
+  const drive = normalizeThreadDrive(shape.threadDrive, head.head);
+  const driveDepth = normalizeThreadDriveDepth(shape.threadDriveDepth, { ...head, drive });
+  const driveSize = normalizeThreadDriveSize(shape.threadDriveSize, { ...head, headDiameter, drive, driveDepth });
+  return { headDiameter, drive, driveSize, driveDepth };
+}
+
+/**
+ * The drive fields to store: a value that was set stays, checked against the
+ * head it now sits on; one left unset, or set back to the standard measure,
+ * stays unset and goes on following the size.
+ */
+export function threadDriveFields(shape: Pick<ThreadShapeFields, "threadHeadDiameter" | "threadDrive" | "threadDriveSize" | "threadDriveDepth">, head: HeadSizeShape) {
+  const resolved = threadDriveSettings(shape, head);
+  const standard = threadDriveSettings({ threadDrive: resolved.drive }, head);
+  const own = (value: number | undefined, measured: number, normal: number) =>
+    value === undefined || Math.abs(measured - normal) < 1e-6 ? undefined : measured;
+  return {
+    threadHeadDiameter: own(shape.threadHeadDiameter, resolved.headDiameter, standard.headDiameter),
+    threadDrive: shape.threadDrive === undefined ? undefined : resolved.drive,
+    threadDriveSize: own(shape.threadDriveSize, resolved.driveSize, standard.driveSize),
+    threadDriveDepth: own(shape.threadDriveDepth, resolved.driveDepth, standard.driveDepth),
   };
 }
 
@@ -618,26 +660,289 @@ export function normalizeThreadHeadHeight(value: number | undefined, settings: H
  * aneinander: wer den Kopf flacher zieht, macht ihn zwangslaeufig kleiner.
  * Zylinder- und Sechskantkopf behalten ihren Durchmesser.
  */
-export function threadHeadDiameter(settings: Pick<ThreadSettings, "role" | "head" | "diameter" | "pitch" | "headHeight">) {
-  const spec = threadSizeSpec(settings.diameter, settings.pitch);
+export function threadHeadDiameter(settings: Pick<ThreadSettings, "role" | "head" | "diameter" | "pitch" | "headHeight"> & { headDiameter?: number }) {
   if (settings.head === "countersunk") return settings.diameter + settings.headHeight * 2;
-  return spec.headDiameter;
+  if (settings.head === "hex") return threadSizeSpec(settings.diameter, settings.pitch).headDiameter;
+  return settings.headDiameter ?? threadSizeSpec(settings.diameter, settings.pitch).headDiameter;
 }
 
-type HeadChamferShape = Pick<ThreadSettings, "role" | "head" | "diameter" | "pitch" | "headHeight" | "profile"> & { chamfer?: number; chamferLow?: number };
+type HeadSizeShape = HeadShape & Pick<ThreadSettings, "headHeight">;
+
+/**
+ * Wie breit der Kopf nach Norm ist (#1052): beim Zylinderkopf sein
+ * Durchmesser, beim Sechskantkopf die Schluesselweite. Den Senkkopf legt
+ * seine Hoehe fest - ein 90-Grad-Kegel hat keinen zweiten freien Wert.
+ */
+export function defaultThreadHeadDiameter(settings: HeadSizeShape) {
+  const spec = threadSizeSpec(settings.diameter, settings.pitch);
+  if (settings.head === "countersunk") return settings.diameter + settings.headHeight * 2;
+  return settings.head === "hex" ? spec.acrossFlats : spec.headDiameter;
+}
+
+export function threadHeadDiameterLimits(settings: HeadSizeShape) {
+  if (settings.head === "countersunk") {
+    const fixed = defaultThreadHeadDiameter(settings);
+    return { min: fixed, max: fixed };
+  }
+  return { min: settings.diameter + 0.4, max: Math.max(settings.diameter + 1, settings.diameter * 4) };
+}
+
+export function normalizeThreadHeadDiameter(value: number | undefined, settings: HeadSizeShape) {
+  if (settings.head === "countersunk") return defaultThreadHeadDiameter(settings);
+  const limits = threadHeadDiameterLimits(settings);
+  return clamp(finite(value, defaultThreadHeadDiameter(settings)), limits.min, limits.max);
+}
+
+/** A hex head comes without a drive (a spanner takes it from outside), every other head with a hex socket, as they always did. */
+export function defaultThreadDrive(head: ThreadHead): ThreadDrive {
+  return head === "hex" ? "none" : "hex";
+}
+
+export function normalizeThreadDrive(value: string | undefined, head: ThreadHead): ThreadDrive {
+  return THREAD_DRIVES.includes(value as ThreadDrive) ? value as ThreadDrive : defaultThreadDrive(head);
+}
+
+type DriveShape = HeadSizeShape & { drive: ThreadDrive };
+
+/** So tief wie bisher der Innensechskant: 60 % des Kopfes, hoechstens gut der halbe Durchmesser. */
+export function defaultThreadDriveDepth(settings: DriveShape) {
+  if (settings.role !== "screw" || settings.drive === "none") return 0;
+  return Math.min(settings.headHeight * 0.6, settings.diameter * 0.55);
+}
+
+/** Unter dem Antrieb bleibt ein Zehntel des Kopfes stehen; tiefer liefe er in den Schaft. */
+export function threadDriveDepthLimits(settings: DriveShape) {
+  return { min: 0, max: settings.role === "screw" && settings.drive !== "none" ? settings.headHeight * 0.9 : 0 };
+}
+
+export function normalizeThreadDriveDepth(value: number | undefined, settings: DriveShape) {
+  const limits = threadDriveDepthLimits(settings);
+  return clamp(finite(value, defaultThreadDriveDepth(settings)), limits.min, limits.max);
+}
+
+/** Torx (ISO 10664): inner over outer diameter, and the lobe radius over the outer diameter. */
+const TORX_INNER_PER_SIZE = 0.72;
+const TORX_LOBE_PER_SIZE = 0.08;
+/** Phillips: the width of each arm of the cross over its span. */
+const PHILLIPS_ARM_PER_SIZE = 0.25;
+/** Slot: its width over its length - wide enough for a coin on the larger sizes (#1052). */
+const SLOT_WIDTH_PER_SIZE = 0.2;
+/**
+ * Robertson (square, as in Canada): the square across flats of #00 to #4 and
+ * the largest screw diameter each takes - #00 on #2 (2.18 mm), #0 on #4, #1 on
+ * #7, #2 on #10, #3 on 1/4", #4 on 3/8". A screw between two takes the bit of
+ * the nearer one, so M3 gets #0, M4 and M5 #2, M6 #3, M8 #4.
+ */
+const ROBERTSON_SIZES: ReadonlyArray<{ upTo: number; square: number }> = [
+  { upTo: 2.35, square: 1.3 },
+  { upTo: 3.0, square: 1.79 },
+  { upTo: 3.99, square: 2.3 },
+  { upTo: 5.16, square: 2.84 },
+  { upTo: 7.14, square: 3.36 },
+  { upTo: Number.POSITIVE_INFINITY, square: 4.83 },
+];
+
+/**
+ * The size a drive is given by: hex socket across flats, Torx outer
+ * diameter, Phillips span of the cross, slot length, Robertson square across
+ * flats. The defaults follow the hex socket of the size: T20 on M4 measures
+ * 3.86 mm where its socket is 3 mm, PH2 on M4 about 4 mm; Robertson follows
+ * its own sizes. A slot runs as far across the head as it may: asked for
+ * more than any head holds, it is cut back to the limit.
+ */
+export function defaultThreadDriveSize(settings: DriveShape) {
+  if (settings.drive === "slot") return Number.POSITIVE_INFINITY;
+  if (settings.drive === "robertson") return ROBERTSON_SIZES.find((size) => settings.diameter <= size.upTo)!.square;
+  const socket = threadSizeSpec(settings.diameter, settings.pitch).socket;
+  if (settings.drive === "torx") return socket * 1.11;
+  if (settings.drive === "phillips") return socket * 1.3;
+  return socket;
+}
+
+/** How far out from the axis a drive of this size reaches. */
+export function threadDriveRadius(drive: ThreadDrive, size: number) {
+  if (drive === "hex") return size / Math.sqrt(3);
+  if (drive === "torx") return size / 2;
+  if (drive === "phillips") return Math.hypot(size / 2, (size * PHILLIPS_ARM_PER_SIZE) / 2);
+  if (drive === "slot") return Math.hypot(size / 2, (size * SLOT_WIDTH_PER_SIZE) / 2);
+  if (drive === "robertson") return size / Math.SQRT2;
+  return 0;
+}
+
+/**
+ * Der Antrieb muss im Kopf Platz haben, auch an seinem Boden: der Senkkopf
+ * wird nach oben schmaler. Ein Rand von einem Zehntel bleibt stehen.
+ */
+export function threadDriveSizeLimits(settings: DriveShape & { headDiameter: number; driveDepth: number }) {
+  if (settings.role !== "screw" || settings.drive === "none") return { min: 0, max: 0 };
+  // Radius of the head face, or across its flats on a hex head.
+  const face = settings.headDiameter / 2;
+  const room = settings.head === "countersunk"
+    ? face + (settings.diameter / 2 - face) * (settings.headHeight > 0 ? settings.driveDepth / settings.headHeight : 1)
+    : face;
+  const reach = threadDriveRadius(settings.drive, 1);
+  return { min: 0.3, max: Math.max(0.3, (room * 0.9) / reach) };
+}
+
+export function normalizeThreadDriveSize(value: number | undefined, settings: DriveShape & { headDiameter: number; driveDepth: number }) {
+  if (settings.role !== "screw" || settings.drive === "none") return 0;
+  const limits = threadDriveSizeLimits(settings);
+  return clamp(finite(value, defaultThreadDriveSize(settings)), limits.min, limits.max);
+}
+
+type DrivePoint = [number, number];
+
+/**
+ * The outline of a drive in the head face, as straight edges and arcs
+ * (through `mid`), from the point on +x once round counter-clockwise back to
+ * it. The display mesh samples the arcs, the exact body takes them as arcs.
+ * Every drive is mirror-symmetric about x, so the turn from the body's z up
+ * to y up, which mirrors, leaves it unchanged.
+ */
+export type ThreadDriveOutline = {
+  start: DrivePoint;
+  edges: Array<{ to: DrivePoint; mid?: DrivePoint }>;
+};
+
+const polar = (radius: number, angle: number): DrivePoint => [radius * Math.cos(angle), radius * Math.sin(angle)];
+
+export function threadDriveOutline(drive: ThreadDrive, size: number): ThreadDriveOutline | null {
+  if (drive === "hex") {
+    const corner = size / Math.sqrt(3);
+    // The last corner is the start itself, not a rounding off it.
+    return { start: [corner, 0], edges: Array.from({ length: 6 }, (_, index) => ({ to: index === 5 ? [corner, 0] : polar(corner, ((index + 1) * Math.PI) / 3) })) };
+  }
+  if (drive === "slot") {
+    const half = size / 2;
+    const width = (size * SLOT_WIDTH_PER_SIZE) / 2;
+    return { start: [half, 0], edges: [[half, width], [-half, width], [-half, -width], [half, -width], [half, 0]].map((to) => ({ to: to as DrivePoint })) };
+  }
+  if (drive === "robertson") {
+    // A square, its sides along x and y; the taper of a real socket is left out, a straight one holds the bit as well.
+    const half = size / 2;
+    return { start: [half, 0], edges: [[half, half], [-half, half], [-half, -half], [half, -half], [half, 0]].map((to) => ({ to: to as DrivePoint })) };
+  }
+  if (drive === "phillips") {
+    const reach = size / 2;
+    const arm = (size * PHILLIPS_ARM_PER_SIZE) / 2;
+    // Each arm: the two corners of its end, then the inner corner to the next arm.
+    const quarter: DrivePoint[] = [[reach, -arm], [reach, arm], [arm, arm]];
+    const turn = (point: DrivePoint, quarters: number): DrivePoint => {
+      const angle = (quarters * Math.PI) / 2;
+      return [point[0] * Math.cos(angle) - point[1] * Math.sin(angle), point[0] * Math.sin(angle) + point[1] * Math.cos(angle)];
+    };
+    const corners = [0, 1, 2, 3].flatMap((quarters) => quarter.map((point) => turn(point, quarters)));
+    // Started halfway along the first arm's end, so the first corner comes last.
+    return { start: [reach, 0], edges: [...corners.slice(1), corners[0], [reach, 0] as DrivePoint].map((to) => ({ to })) };
+  }
+  if (drive === "torx") {
+    /*
+     * Six lobes, each a circle of radius `lobe` touching the outer diameter,
+     * joined by concave arcs that touch the inner diameter. The concave
+     * radius is the one at which the two arcs meet tangentially:
+     * |lobe centre - concave centre| = lobe + concave.
+     */
+    const outer = size / 2;
+    const inner = (size * TORX_INNER_PER_SIZE) / 2;
+    const lobe = size * TORX_LOBE_PER_SIZE;
+    const lobeCentre = outer - lobe;
+    const cos30 = Math.cos(Math.PI / 6);
+    const concave = (lobeCentre * lobeCentre + inner * inner - 2 * lobeCentre * inner * cos30 - lobe * lobe) / (2 * lobe - 2 * inner + 2 * lobeCentre * cos30);
+    const concaveCentre = inner + concave;
+    const edges: ThreadDriveOutline["edges"] = [];
+    // The direction from a centre to a point, taken within half a turn of `near`.
+    const direction = (centre: DrivePoint, point: DrivePoint, near: number) => {
+      const angle = Math.atan2(point[1] - centre[1], point[0] - centre[0]);
+      return near + (wrapAngle(angle - near + Math.PI) - Math.PI);
+    };
+    for (let index = 0; index < 6; index += 1) {
+      const lobeAngle = (index * Math.PI) / 3;
+      const hollowAngle = lobeAngle + Math.PI / 6;
+      const c1 = polar(lobeCentre, lobeAngle);
+      const c2 = polar(concaveCentre, hollowAngle);
+      const towards = (from: DrivePoint, to: DrivePoint, distance: number): DrivePoint => {
+        const length = Math.hypot(to[0] - from[0], to[1] - from[1]);
+        return [from[0] + ((to[0] - from[0]) * distance) / length, from[1] + ((to[1] - from[1]) * distance) / length];
+      };
+      const leave = towards(c1, c2, lobe);
+      const leaveAngle = direction(c1, leave, lobeAngle);
+      // From the lobe tip on to where it meets the hollow, through the hollow's bottom to the next lobe.
+      edges.push({ mid: [c1[0] + lobe * Math.cos((lobeAngle + leaveAngle) / 2), c1[1] + lobe * Math.sin((lobeAngle + leaveAngle) / 2)], to: leave });
+      const mirrored = (point: DrivePoint): DrivePoint => {
+        const cos = Math.cos(2 * hollowAngle);
+        const sin = Math.sin(2 * hollowAngle);
+        return [point[0] * cos + point[1] * sin, point[0] * sin - point[1] * cos];
+      };
+      const arrive = mirrored(leave);
+      edges.push({ mid: polar(inner, hollowAngle), to: arrive });
+      const tipAngle = lobeAngle + Math.PI / 3;
+      const nextCentre = polar(lobeCentre, tipAngle);
+      const arriveAngle = direction(nextCentre, arrive, tipAngle);
+      edges.push({ mid: [nextCentre[0] + lobe * Math.cos((arriveAngle + tipAngle) / 2), nextCentre[1] + lobe * Math.sin((arriveAngle + tipAngle) / 2)], to: index === 5 ? [outer, 0] : polar(outer, tipAngle) });
+    }
+    return { start: [outer, 0], edges };
+  }
+  return null;
+}
+
+/** The outline as points, the arcs sampled, from the start round to it again: what the display mesh draws. */
+export function threadDriveOutlinePoints(outline: ThreadDriveOutline, arcSteps = 6): DrivePoint[] {
+  const points: DrivePoint[] = [outline.start];
+  let from = outline.start;
+  for (const edge of outline.edges) {
+    if (edge.mid) {
+      const circle = circleThrough(from, edge.mid, edge.to);
+      const a0 = Math.atan2(from[1] - circle.y, from[0] - circle.x);
+      const am = Math.atan2(edge.mid[1] - circle.y, edge.mid[0] - circle.x);
+      let a1 = Math.atan2(edge.to[1] - circle.y, edge.to[0] - circle.x);
+      // Go round the side the middle point is on.
+      const between = (a: number, lo: number, hi: number) => wrapAngle(a - lo) <= wrapAngle(hi - lo);
+      const ccw = between(am, a0, a1);
+      if (ccw) { while (a1 <= a0) a1 += 2 * Math.PI; } else { while (a1 >= a0) a1 -= 2 * Math.PI; }
+      for (let step = 1; step < arcSteps; step += 1) {
+        const angle = a0 + ((a1 - a0) * step) / arcSteps;
+        points.push([circle.x + circle.r * Math.cos(angle), circle.y + circle.r * Math.sin(angle)]);
+      }
+    }
+    points.push(edge.to);
+    from = edge.to;
+  }
+  return points;
+}
+
+function wrapAngle(angle: number) {
+  const turn = 2 * Math.PI;
+  return ((angle % turn) + turn) % turn;
+}
+
+function circleThrough(a: DrivePoint, b: DrivePoint, c: DrivePoint) {
+  const d = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]));
+  const a2 = a[0] * a[0] + a[1] * a[1];
+  const b2 = b[0] * b[0] + b[1] * b[1];
+  const c2 = c[0] * c[0] + c[1] * c[1];
+  const x = (a2 * (b[1] - c[1]) + b2 * (c[1] - a[1]) + c2 * (a[1] - b[1])) / d;
+  const y = (a2 * (c[0] - b[0]) + b2 * (a[0] - c[0]) + c2 * (b[0] - a[0])) / d;
+  return { x, y, r: Math.hypot(a[0] - x, a[1] - y) };
+}
+
+type HeadChamferShape = Pick<ThreadSettings, "role" | "head" | "diameter" | "pitch" | "headHeight" | "profile">
+  & { chamfer?: number; chamferLow?: number; headDiameter?: number; drive?: ThreadDrive; driveSize?: number };
 
 /**
  * Der Kopf steht auf seinem freien Ende. `inscribed` ist der kleinste Radius
  * seines Querschnitts - beim Sechskant die Schluesselflaeche -, `circumscribed`
  * der groesste. Beide Masse brauchen die Fase und ihre Grenze.
  */
-function headRingRadii(settings: Pick<ThreadSettings, "role" | "head" | "diameter" | "pitch">) {
+function headRingRadii(settings: Pick<ThreadSettings, "role" | "head" | "diameter" | "pitch"> & { headDiameter?: number }) {
   const spec = threadSizeSpec(settings.diameter, settings.pitch);
   // Eine Mutter ist immer sechskantig - ihre Kopfform steht auf gar nichts.
-  if (settings.role === "nut" || settings.head === "hex") {
-    return { inscribed: spec.acrossFlats / 2, circumscribed: spec.acrossFlats / Math.sqrt(3) };
+  if (settings.role === "nut") return { inscribed: spec.acrossFlats / 2, circumscribed: spec.acrossFlats / Math.sqrt(3) };
+  if (settings.head === "hex") {
+    const acrossFlats = settings.headDiameter ?? spec.acrossFlats;
+    return { inscribed: acrossFlats / 2, circumscribed: acrossFlats / Math.sqrt(3) };
   }
-  return { inscribed: spec.headDiameter / 2, circumscribed: spec.headDiameter / 2 };
+  const diameter = settings.headDiameter ?? spec.headDiameter;
+  return { inscribed: diameter / 2, circumscribed: diameter / 2 };
 }
 
 /**
@@ -668,15 +973,15 @@ function chamferRimHeight(settings: HeadChamferShape) {
 export function threadHeadChamferLimits(settings: HeadChamferShape) {
   const gilt = settings.role === "nut" || (settings.role === "screw" && settings.head !== "countersunk");
   if (!gilt) return { min: 0, max: 0 };
-  const spec = threadSizeSpec(settings.diameter, settings.pitch);
   const { inscribed, circumscribed } = headRingRadii(settings);
   // Was stehen bleiben muss: das Loch in der Mitte - beim Kopf der
-  // Innensechskant und der Kragen um den Schaft, bei der Mutter ihre
+  // Antrieb und der Kragen um den Schaft, bei der Mutter ihre
   // Bohrung samt Ansenkung - und ein Rest Flanke zwischen den beiden Kegeln.
-  const socketCorner = spec.socket / Math.sqrt(3);
+  const drive = settings.drive ?? defaultThreadDrive(settings.head);
+  const driveCorner = threadDriveRadius(drive, settings.driveSize ?? threadSizeSpec(settings.diameter, settings.pitch).socket);
   const innen = settings.role === "nut"
     ? settings.diameter / 2 + Math.max(normalizeThreadChamfer(settings.chamfer, settings), normalizeThreadChamfer(settings.chamferLow ?? settings.chamfer, settings))
-    : Math.max(socketCorner, settings.diameter / 2);
+    : Math.max(driveCorner, settings.diameter / 2);
   const roomToBore = Math.max(0, inscribed - innen - 0.2);
   const roomToHeight = Math.max(0, chamferRimHeight(settings) * 0.35 - (circumscribed - inscribed));
   return { min: 0, max: Math.max(0, Math.min(inscribed * 0.4, roomToBore, roomToHeight)) };
@@ -710,7 +1015,7 @@ export function threadNaturalFootprint(settings: ThreadSettings) {
   }
   if (settings.role === "screw") {
     if (settings.head === "hex") {
-      return { width: spec.acrossFlats / Math.cos(Math.PI / 6), depth: spec.acrossFlats };
+      return { width: settings.headDiameter / Math.cos(Math.PI / 6), depth: settings.headDiameter };
     }
     const diameter = Math.max(settings.diameter, threadHeadDiameter(settings));
     return { width: diameter, depth: diameter };
@@ -1000,6 +1305,26 @@ function capRing(builder: Builder, inner: readonly number[], outer: readonly num
 }
 
 /**
+ * The flat face between an inner and an outer ring that do not share their
+ * columns, facing down like `capRing(..., false)`: both rings run once
+ * round by angle, and each step takes the ring whose next point comes first.
+ */
+function zipRings(builder: Builder, inner: readonly number[], innerAngles: readonly number[], outer: readonly number[], outerAngles: readonly number[]) {
+  let i = 0;
+  let o = 0;
+  while (i < inner.length - 1 || o < outer.length - 1) {
+    const takeOuter = i >= inner.length - 1 || (o < outer.length - 1 && outerAngles[o + 1] <= innerAngles[i + 1]);
+    if (takeOuter) {
+      triangle(builder, inner[i], outer[o], outer[o + 1]);
+      o += 1;
+    } else {
+      triangle(builder, inner[i], outer[o], inner[i + 1]);
+      i += 1;
+    }
+  }
+}
+
+/**
  * Die Gewindeflaeche selbst. Jede Spalte traegt dieselbe Folge von
  * Profilpunkten, nur um den Vorschub einer Teilumdrehung in der Hoehe
  * versetzt - dadurch verbindet Reihe zu Reihe genau die Wendel, und die Naht
@@ -1120,6 +1445,12 @@ export function threadFootprintPatch(shape: ThreadShapeFields & { width?: number
     const headHeight = normalizeThreadHeadHeight(settings.headHeight * factor, head);
     const chamfer = normalizeThreadChamfer(settings.chamfer * factor, { role: head.role, diameter: head.diameter, pitch: head.pitch, profile: settings.profile });
     const chamferLow = normalizeThreadChamfer(settings.chamferLow * factor, { role: head.role, diameter: head.diameter, pitch: head.pitch, profile: settings.profile });
+    const drive = threadDriveSettings({
+      threadHeadDiameter: settings.headDiameter * factor,
+      threadDrive: settings.drive,
+      threadDriveSize: settings.driveSize * factor,
+      threadDriveDepth: settings.driveDepth * factor,
+    }, { ...head, headHeight });
     return {
       ...settings,
       diameter,
@@ -1129,7 +1460,8 @@ export function threadFootprintPatch(shape: ThreadShapeFields & { width?: number
       headHeight,
       chamfer,
       chamferLow,
-      headChamfer: normalizeThreadHeadChamfer(settings.headChamfer * factor, { ...head, headHeight, chamfer, chamferLow, profile: settings.profile }),
+      headChamfer: normalizeThreadHeadChamfer(settings.headChamfer * factor, { ...head, headHeight, ...drive, chamfer, chamferLow, profile: settings.profile }),
+      ...drive,
     };
   })();
   const footprint = drift < 1e-6 ? natural : threadNaturalFootprint(scaled);
@@ -1152,6 +1484,10 @@ export function threadFootprintPatch(shape: ThreadShapeFields & { width?: number
     threadChamfer: scaled.chamfer,
     threadChamferBottom: scaled.chamferLow,
     threadHeadChamfer: scaled.headChamfer,
+    // Unset, they follow the size; a body pulled bigger takes them along as measured.
+    ...(drift < 1e-6
+      ? { threadHeadDiameter: shape.threadHeadDiameter, threadDrive: shape.threadDrive, threadDriveSize: shape.threadDriveSize, threadDriveDepth: shape.threadDriveDepth }
+      : { threadHeadDiameter: scaled.headDiameter, threadDrive: scaled.drive, threadDriveSize: scaled.driveSize, threadDriveDepth: scaled.driveDepth }),
   };
 }
 
@@ -1208,9 +1544,10 @@ export function threadBuildPlan(options: ThreadGeometryOptions) {
   // Dieselbe Fase wie an der Mutter, nur in der Hoehe des Kopfes.
   const headRoom = Math.max(0, headHeight * 0.35 - (rimRadii.circumscribed - rimRadii.inscribed));
   const headChamfer = Math.min(settings.headChamfer, headRoom);
-  // Der Innensechskant sitzt in der freien Kopfflaeche. Der Sechskantkopf
-  // bekommt keinen: den fasst man von aussen an.
-  const socketDepth = settings.head === "hex" ? 0 : Math.min(headHeight * 0.6, settings.diameter * 0.55);
+  // Der Antrieb sitzt in der freien Kopfflaeche (#1052); ein flacher
+  // gezogener Koerper nimmt ihm hoechstens die Tiefe.
+  const socketDepth = settings.role === "screw" && settings.drive !== "none" ? Math.min(settings.driveDepth, headHeight * 0.9) : 0;
+  const driveOutline = socketDepth > 0.05 ? threadDriveOutline(settings.drive, settings.driveSize) : null;
   const natural = threadNaturalFootprint(settings);
   return {
     settings,
@@ -1236,7 +1573,8 @@ export function threadBuildPlan(options: ThreadGeometryOptions) {
     headFaceRadius: rimRadii.inscribed - headChamfer,
     headCrown: threadHeadDiameter(settings) / 2,
     socketDepth,
-    hasSocket: socketDepth > 0.05,
+    hasSocket: driveOutline !== null,
+    driveOutline,
     scaleX: Math.max(0.01, options.width) / Math.max(Number.EPSILON, natural.width),
     scaleZ: Math.max(0.01, options.depth) / Math.max(Number.EPSILON, natural.depth),
   };
@@ -1310,13 +1648,13 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
     capFan(builder, shaft.topEdge, height, true);
 
     const headRadiusAt = (angle: number, y: number) => {
-      if (settings.head === "hex") return hexRadius(angle, spec.acrossFlats);
+      if (settings.head === "hex") return hexRadius(angle, settings.headDiameter);
       if (settings.head === "countersunk") {
         const progress = headHeight > 0 ? y / headHeight : 1;
         const crown = plan.headCrown;
         return crown + (settings.diameter / 2 - crown) * progress;
       }
-      return spec.headDiameter / 2;
+      return settings.headDiameter / 2;
     };
     const gebrochen = plan.headBroken;
     const faceRadius = plan.headFaceRadius;
@@ -1344,10 +1682,19 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
     capRing(builder, shaft.bottomEdge, headTop, true);
 
     const socketDepth = plan.socketDepth;
-    if (plan.hasSocket) {
-      const socketMouth = ring(builder, angles, (angle) => hexRadius(angle, spec.socket), 0);
-      const socketFloor = ring(builder, angles, (angle) => hexRadius(angle, spec.socket), socketDepth);
-      capRing(builder, socketMouth, headBottom, false);
+    if (plan.driveOutline) {
+      // The drive has corners of its own, off the head's columns: its rings
+      // run on its own points, and the face between is zipped by angle.
+      const outline = threadDriveOutlinePoints(plan.driveOutline);
+      const driveAngles = outline.map(([x, z], index) => index === outline.length - 1 ? Math.PI * 2 : wrapAngle(Math.atan2(z, x)));
+      const driveRing = (y: number) => outline.map(([x, z]) => {
+        const index = builder.positions.length / 3;
+        builder.positions.push(x, y, z);
+        return index;
+      });
+      const socketMouth = driveRing(0);
+      const socketFloor = driveRing(socketDepth);
+      zipRings(builder, socketMouth, driveAngles, headBottom, angles.map((_, index) => (index / segments) * Math.PI * 2));
       wall(builder, socketMouth, socketFloor, true);
       capFan(builder, socketFloor, socketDepth, false);
     } else {

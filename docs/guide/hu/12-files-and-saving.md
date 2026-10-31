@@ -11,6 +11,17 @@ Ha egy üres tervből mész vissza a kezdőlapra, a layerling megkérdezi, megta
 
 Ennek van egy hátulütője: aki törli a böngésző tárolóját, vagy másik számítógépre vált, elveszíti a terveket. **A fontos munkáidról ezért készíts biztonsági mentést egy fájlba.**
 
+## Mappák a terveidhez
+
+Több tucat tervnél egyetlen lista már nem elég. A kezdőlapon a {{ui:shared.newFolder}} mappát készít ennek a böngészőnek a terveihez; a mappára kattintva megnyílik. A mappák mappákat is tartalmazhatnak.
+
+- **Mappába:** húzz egy tervet a mappára, vagy válaszd a terv menüjében a {{ui:shared.moveTo}} pontot, amely minden mappát felsorol. Egy új terv, valamint egy fájl, amelyet nyitott mappa mellett nyitsz meg vagy importálsz, ebbe a mappába kerül.
+- **Ki újra:** egy mappa első csempéje, a `..`, és a fülek alatti sor vezet vissza; ezekre is ejthetsz tervet. Egy másik mappára húzott mappa abba kerül.
+- **Átnevezés és törlés** a mappa menüjében van. Egy mappa törlése nem töröl tervet: ami benne volt, egy szinttel feljebb kerül.
+- **Keresés** minden mappában keres; egy megtalált terv megmutatja a mappáját, és rákattintva megnyílik a mappa.
+
+A {{ui:dashboard.backupAll}} megőrzi a mappákat: a tervek a biztonsági mentés fájljában a mappáikban ülnek, és a mentés visszaállítása oda teszi vissza őket. Ennek a böngészőnek a mappái külön vannak a szerveren lévő mappáktól. A kártyaképek is bekerülnek a fájlba, így a visszaállítás után azonnal visszatérnek.
+
 ## Biztonsági mentés és továbbadás
 
 A kezdőlapon minden tervnek van egy menüje az átnevezés, a másolatkészítés és a törlés lehetőségével. A fülek melletti sorban minden fülön ugyanazok a gombok vannak. A {{ui:dashboard.backupAll}} gombbal a nyitott fül összes tervét egyetlen ZIP-fájlba csomagolod. A mellette lévő {{ui:dashboard.restoreBackup}} (új, tervek nélküli számítógépen is ott van) visszahozza őket, másik böngészőben vagy másik számítógépen is; a {{ui:dashboard.importGeometry}} ugyanezt a fájlt fogadja. Ennek a böngészőnek a {{ui:myShapes.title}} ugyanabban a fájlban utaznak, a `Custom shapes` mappában, lásd az [Alakzatok](chapter:shapes) fejezetet. Ha olyan böngészőbe állítasz vissza mentést, amelyben ezek közül néhány terv már megvan, azok nem kerülnek be még egyszer; az üzenet megmondja, hányat találtunk már meg. A kártyák előnézeti képei is bekerülnek a fájlba, így visszaállítás után azonnal megjelennek. A böngésző tervei fölött egy rövid sor emlékeztet arra, hogy máshol nincsenek meg.
@@ -20,6 +31,18 @@ Csak néhány terv: a {{ui:dashboard.select}} után a {{ui:dashboard.backupSelec
 Egy tervről a szerkesztőben készítesz biztonsági mentést: {{ui:editor.export}}, válaszd a **LYL** formátumot, és kattints a {{ui:export.saveProject}} gombra. A LYL fájl a layerling saját tervformátuma, és mindent tartalmaz: alakzatokat, csoportokat, vázlatokat, CAD-adatokat, importált forrásokat és az előzményeket, vagyis a visszavonási lépéseket. A {{ui:export.historyTitle}} alatt választod ki, hány utolsó lépés utazzon vele; azzal az értékkel indul, amelyet a beállítások (a fogaskerék a szalagon) az {{ui:workspace.history}} alatt megtartanak. Az utolsó állás, a {{ui:export.historyNone}}, csak a terv jelenlegi állapotát menti – így oszthatsz meg egy fájlt a visszavonási lépései nélkül. Az export egy másolat az általad megadott {{ui:export.fileName}} alatt; a böngésződben lévő terv megtartja az előzményeit. A korábbi verziókból származó régebbi `.skf` fájlok továbbra is megnyithatók; ilyenkor `.lyl`-ként mentődnek.
 
 **Mentés a saját mappádba (Chrome és Edge).** Ott a gomb a rendszered mentési ablakát nyitja meg, így magad választod ki a mappát és a nevet, és egy meglévő fájl le is cserélhető. Ezután a [[Ctrl]]+[[S]] ablak nélkül újra ugyanabba a fájlba menti a tervet. Egy `.lyl` fájlból a {{ui:dashboard.importGeometry}} gombbal vagy az exportálási ablak megnyitás gombjával megnyitott terv is abba a fájlba ment vissza. A böngésző egyszer engedélyt kérhet a fájl módosításához. Az oldal újratöltése után a terv elfelejti a fájlját, és a következő [[Ctrl]]+[[S]] újra rákérdez; az ablak az utoljára használt mappában indul. A Firefox és a Safari nem engedi, hogy egy oldal így fájlokba írjon. Ott a fájl a korábbiakhoz hasonlóan a Letöltések mappába töltődik le, és a [[Ctrl]]+[[S]] újra letölti; a Firefoxban a beállítások letöltésekre vonatkozó részében beállítható, hogy minden alkalommal rákérdezzen a mappára. Ha ott más nevet adsz a fájlnak, a terv megtartja a sajátját, mert a fájlnévben lévő verzió vagy dátum gyakran szándékos; a mentés utáni üzenet ilyenkor felajánlja ezt: {{ui:status.renameDraftToFile}}.
+
+## Mellékletek
+
+Útmutató, alkatrészlista, jegyzetek, egy fénykép vagy egy adatlap fájlként a tervvel maradhat. A {{ui:editor.group.manage}} eszköztár {{ui:editor.attachments}} gombja, a gemkapocs, megnyitja a listát; a gemkapcson egy kis pont jelzi, hogy a tervnek van melléklete.
+
+- **{{ui:attachments.upload}}:** válassz egy vagy több fájlt: `.md` (Markdown) vagy `.txt` egyszerű szövegként (UTF-8), `.png`, `.jpg`, `.jpeg` vagy `.webp` képeket, vagy `.pdf` dokumentumokat. Minden fájlt a tartalma alapján ellenőriz, így az a fájl, amely nem az, aminek a neve mondja, elutasításra kerül, más típusok, köztük az `.svg`, pedig nem csatolhatók. Egy szövegfájl legfeljebb 2 MB, egy kép 16 MB, egy PDF 32 MB lehet; egy terv legfeljebb 32 fájlt és összesen 64 MB-ot tartalmazhat.
+- **A lista:** a nyíl úgy tölti le a fájlt, ahogy feltöltötték. A kuka eltávolítja; a sor előtte még egyszer rákérdez, és egy eltávolított fájl nem hozható vissza visszavonással, mert a mellékletek nem részei a visszavonási előzményeknek.
+- **Fájl olvasása:** egy `.md` vagy `.txt` fájl sorában a szem letöltés nélkül megnyitja egy ablakban olvasásra. A Markdown formázva jelenik meg, címekkel, listákkal, jelölőnégyzetekkel, táblázatokkal és kóddal; a szövegfájl pontosan úgy, ahogy írták. Csak a weboldalakra és e-mail-címekre mutató hivatkozások működnek, és új lapon nyílnak meg. A fájlban említett képek nem töltődnek be: helyükön a leírásuk áll. Az Esc, a kereszt vagy egy kattintás az ablak mellé bezárja. Az olvasás az előzménynézetben is működik.
+- **Kép megtekintése:** egy kép sorában a szem ugyanabban az ablakban nyitja meg, nagy kép esetén kicsinyítve. Egy PDF-nek nincs szeme: töltsd le, és nyisd meg azzal a programmal, amellyel PDF-eket olvasol.
+- **Már létező név:** a layerling megkérdezi, mit tegyen. A {{ui:attachments.replace}} az új tartalmat az ilyen nevű fájlba teszi, amely megtartja a helyét a listában. A {{ui:common.rename}} más néven adja hozzá az új fájlt, és az első szabad nevet javasolja, például `notes 2.md`. A kereszt kihagyja az új fájlt. A kis- és nagybetűk ugyanannak számítanak, és ugyanannak a fájlnak az újbóli feltöltése nem változtat semmit.
+
+A mellékletek mindennel együtt mentődnek a tervvel: a böngészőben, egy LYL-fájlban, egy biztonsági mentésben és egy szerveren lévő tervben, ahová azonnal eljutnak, amint egyet hozzáadnak vagy eltávolítanak. Nem jönnek át a {{ui:import.insertProject}} funkcióval vagy egy saját alakzattal, és egy hibajelentés sem tartalmazza őket. Egy mellékletekkel rendelkező terv egy újabb fajta LYL-fájlként mentődik: egy régebbi layerling azt mondja, hogy nem tudja megnyitni, ahelyett hogy elhagyná a fájlokat. Egy melléklet nélküli terv pontosan úgy mentődik, mint korábban.
 
 ## Exportálás
 

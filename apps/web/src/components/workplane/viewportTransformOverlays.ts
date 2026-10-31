@@ -29,6 +29,18 @@ export const LIFT_HANDLE_MAX_OFFSET = 12;
  *  selection (16 % of its largest side), which put it 15 mm and more away from a larger body; it stays
  *  close now, as in Tinkercad. Handles that land on one spot are still pushed apart on the screen. */
 export const ALIGN_HANDLE_OFFSET = 3;
+/** On the screen the line of alignment handles stands at most this far beside the selection: zoomed in on a part
+ *  below a millimetre, the 3 mm put it far off the part or off the screen (Discussion #989). */
+export const ALIGN_HANDLE_MAX_SCREEN_OFFSET = 40;
+
+/**
+ * Factor that pulls a line of alignment handles towards the selection when the projected offset between a handle and
+ * the point of the box it stands beside is larger than `maxOffset` on the screen; 1 when it is close enough.
+ */
+export function alignHandleScreenShrink(handle: { x: number; y: number }, base: { x: number; y: number }, maxOffset = ALIGN_HANDLE_MAX_SCREEN_OFFSET) {
+  const distance = Math.hypot(handle.x - base.x, handle.y - base.y);
+  return Number.isFinite(distance) && distance > maxOffset ? maxOffset / distance : 1;
+}
 
 /** How far the lift arrow stands over the face it belongs to; the overlay and the drag plane both use this. */
 /**
@@ -468,7 +480,7 @@ export function syncTransformOverlay(
   // handle shows that single mark instead of a separate width and depth line
   // (which used to appear together at a corner handle, and independently
   // editable at all, letting the two drift apart).
-  const isCircularFootprint = frame.singleShape?.kind === "cylinder" || frame.singleShape?.kind === "star";
+  const isCircularFootprint = frame.singleShape?.kind === "cylinder" || frame.singleShape?.kind === "star" || frame.singleShape?.kind === "hirth";
   const footprintDimensionMarks = Object.fromEntries(
     footprintHandleKeys.map((handleKey) => {
       if (isCircularFootprint) {
@@ -790,33 +802,42 @@ export function syncAlignOverlay(
 
   // The three handles of an axis, minimum, middle and maximum, stand on one line. Where they land close
   // together on the screen they are pushed apart (alignHandleSpread.ts), so each can still be picked.
-  const groups: Array<{ axis: AlignAxis; points: [THREE.Vector3, THREE.Vector3, THREE.Vector3]; along: THREE.Vector3 }> = [
+  // Each line also keeps the points of the box it stands beside (`bases`, the same points without the offset).
+  const line = (point: (shift: number) => [THREE.Vector3, THREE.Vector3, THREE.Vector3]) => ({ points: point(offset), bases: point(0) });
+  const groups: Array<{ axis: AlignAxis; points: [THREE.Vector3, THREE.Vector3, THREE.Vector3]; bases: [THREE.Vector3, THREE.Vector3, THREE.Vector3]; along: THREE.Vector3 }> = [
     {
       axis: "x",
-      points: [at(worldMinX, worldMinY, worldMaxZ + offset), at(worldCenterX, worldMinY, worldMaxZ + offset), at(worldMaxX, worldMinY, worldMaxZ + offset)],
+      ...line((shift) => [at(worldMinX, worldMinY, worldMaxZ + shift), at(worldCenterX, worldMinY, worldMaxZ + shift), at(worldMaxX, worldMinY, worldMaxZ + shift)]),
       along: at(1, 0, 0),
     },
     {
       axis: "z",
-      points: [at(worldMaxX + offset, worldMinY, worldMinZ), at(worldMaxX + offset, worldMinY, worldCenterZ), at(worldMaxX + offset, worldMinY, worldMaxZ)],
+      ...line((shift) => [at(worldMaxX + shift, worldMinY, worldMinZ), at(worldMaxX + shift, worldMinY, worldCenterZ), at(worldMaxX + shift, worldMinY, worldMaxZ)]),
       along: at(0, 0, 1),
     },
     {
       axis: "y",
-      points: [at(worldMinX - offset, worldMinY, worldMaxZ + offset), at(worldMinX - offset, worldCenterY, worldMaxZ + offset), at(worldMinX - offset, worldMaxY, worldMaxZ + offset)],
+      ...line((shift) => [at(worldMinX - shift, worldMinY, worldMaxZ + shift), at(worldMinX - shift, worldCenterY, worldMaxZ + shift), at(worldMinX - shift, worldMaxY, worldMaxZ + shift)]),
       along: at(0, 1, 0),
     },
   ];
   const targets: AlignTarget[] = ["min", "center", "max"];
   const handles: AlignOverlayState["handles"] = [];
   const guides: AlignOverlayState["guides"] = [];
-  groups.forEach(({ axis, points, along }) => {
-    const screen = points.map(project);
-    if (screen.some((point) => !point)) return;
-    const [lo, mid, hi] = screen as Array<{ x: number; y: number }>;
+  groups.forEach(({ axis, points, bases, along }) => {
+    const projected = points.map(project);
+    const baseScreen = bases.map(project);
+    if (projected.some((point) => !point) || baseScreen.some((point) => !point)) return;
+    // Zoomed far in on a tiny part, pull the whole line towards the box by one factor (Discussion #989).
+    const shrink = alignHandleScreenShrink(projected[1]!, baseScreen[1]!);
+    const screen = projected.map((point, index) => {
+      const base = baseScreen[index]!;
+      return shrink === 1 ? point! : { x: base.x + (point!.x - base.x) * shrink, y: base.y + (point!.y - base.y) * shrink };
+    });
+    const [lo, mid, hi] = screen;
     // Which way the axis runs on the screen, from a point a unit further along it.
     const ahead = project(points[1].clone().add(along));
-    const direction = ahead ? { x: ahead.x - mid.x, y: ahead.y - mid.y } : { x: 1, y: 0 };
+    const direction = ahead ? { x: ahead.x - projected[1]!.x, y: ahead.y - projected[1]!.y } : { x: 1, y: 0 };
     const spread = spreadAlignHandles(lo, mid, hi, direction);
     guides.push({ key: axis, x1: spread[0].x, y1: spread[0].y, x2: spread[2].x, y2: spread[2].y });
     targets.forEach((target, index) => {

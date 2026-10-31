@@ -25,6 +25,7 @@ Den bliver åben eller lukket, som du lod den være, for hvert design, indtil du
 - Etiketten viser om en del er {{ui:outliner.solid}} eller {{ui:outliner.hole}}.
 - Hængelås og øje låser og skjuler enkelte dele.
 - {{ui:outliner.rename}} giver en del sit eget navn; blyanten ved siden af navnet øverst i indstillingerne gør det samme for den valgte form. Fornuftige navne hjælper enormt i større designs.
+- Knappen A–Z i titellinjen ({{ui:outliner.sortByName}}) sorterer de former, du har navngivet, alfabetisk, med tal talt som tal (Del 2 før Del 10). Former, der stadig har deres standardnavn, bliver nedenunder i den rækkefølge, du tilføjede dem, den nyeste sidst, og dele inde i grupper sorteres på samme måde. Kun listen ændres, aldrig designet. Et klik mere viser alt i den rækkefølge, det blev tilføjet, og browseren husker valget.
 - Søgefeltet finder former på navn og type, så også "cylinder" eller "hul". Det kigger også inden i grupper, uanset hvor dybt: en gruppe der indeholder et match bliver i listen og folder sig åben for at vise de matchende dele og de grupper der fører til dem. En gruppe fundet på sit eget navn viser alle sine dele når du åbner den.
 - Pilen yderst til venstre på titellinjen folder listen ned til dens titellinje og tilbage igen.
 

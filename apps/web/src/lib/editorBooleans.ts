@@ -1930,21 +1930,24 @@ export type HullBuildResult = {
 /** Whether a selection can be hulled: two shapes or more, at least one of them a solid. */
 export function canHullShapes(shapes: WorkplaneShape[]) {
   const solids = shapes.filter((shape) => !shape.hole && !isNonSolidShape(shape));
-  return shapes.length >= 2 && solids.length >= 1;
+  // Holes only make a hole: two cylinder holes, a slot (#1055).
+  return shapes.length >= 2 && (solids.length >= 1 || shapes.every((shape) => shape.hole && !isNonSolidShape(shape)));
 }
 
 /**
  * The convex hull of the selected solids (#863): the smallest convex body round all of them, as if
  * they were shrink-wrapped, so a half sphere on a cylinder or four corner posts become one smooth body.
- * Holes in the selection are cut out of the hull afterwards, as a group cuts them. The parts stay in the
+ * Holes in the selection are cut out of the hull afterwards, as a group cuts them; a selection of holes
+ * only is wrapped itself and the hull is a hole (#1055), so two cylinder holes cut a slot. The parts stay in the
  * group, which Edit group opens again and builds anew; the hull itself is a mesh (Manifold.hull of the
  * parts' solids), so its round faces are facets, as the parts' own meshes are.
  */
 export async function buildHullShapeFromSelection(groupable: WorkplaneShape[], triangleLimit: number): Promise<HullBuildResult> {
   const shapes = groupable.filter((shape) => !isNonSolidShape(shape));
   if (!canHullShapes(shapes)) return { group: null, failureNotice: t("status.hullNeedsShapes") };
-  const solids = shapes.filter((shape) => !shape.hole);
-  const holes = shapes.filter((shape) => shape.hole);
+  const holesOnly = shapes.every((shape) => shape.hole);
+  const solids = holesOnly ? shapes : shapes.filter((shape) => !shape.hole);
+  const holes = holesOnly ? [] : shapes.filter((shape) => shape.hole);
   const sourceTriangleCount = shapes.reduce((total, shape) => total + meshForShape(shape).faces.length, 0);
   if (sourceTriangleCount > triangleLimit) {
     return { group: null, failureNotice: t("status.hullTooBig", { count: formatTriangleCount(sourceTriangleCount), limit: formatTriangleCount(triangleLimit) }) };
@@ -1969,7 +1972,7 @@ export async function buildHullShapeFromSelection(groupable: WorkplaneShape[], t
     }
     if (result.status() !== "NoError" || result.numTri() < 1) return { group: null, failureNotice: t("status.hullFailed") };
     const group = meshPositionsToGroupShape(shapes, solids, manifoldMeshToPositions(result.getMesh()), "grouped-hull");
-    return group ? { group: { ...group, name: "Hull", hole: false }, failureNotice: "" } : { group: null, failureNotice: t("status.hullFailed") };
+    return group ? { group: { ...group, name: "Hull", hole: holesOnly }, failureNotice: "" } : { group: null, failureNotice: t("status.hullFailed") };
   } catch {
     return { group: null, failureNotice: t("status.hullFailed") };
   } finally {

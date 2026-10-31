@@ -40,6 +40,8 @@ Ha egy addig működő kijelölés egy újabb élre kattintva hibára fut, az az
 
 A mutató alatti él is vastagabban rajzolódik, így látod, melyiket választja ki egy kattintás.
 
+Egy furat is elfogadja a {{ui:editor.tool.chamfer}} és a {{ui:editor.tool.fillet}} műveletet, akárcsak a {{ui:editor.tool.hollow}}, a {{ui:editor.tool.offset}} és a {{ui:editor.tool.deleteFace}} eszközt: furat marad, és az új alakjával vág. Ha egy hasáb alakú furat négy függőleges élét lekerekíted, lekerekített belső sarkú zsebet vág, a {{ui:editor.tool.offset}} eszközzel megnövelt furat pedig ennyivel több hézaggal vág. Azt az élt, ahol a furat a darabhoz ér, inkább a kész csoporton munkáld meg: az az él hozzá tartozik.
+
 ### Élművelet visszavétele
 
 Egy megmunkált test bármikor újra megmunkálható. Jelöld ki újra, és nyisd meg az eszközt – a Lekerekítés, az Élletörés és a Kiüregelés is mutatja a listát: az {{ui:edge.featureHistory}} alatt látod, mi van már rajta. A {{ui:edge.revertAction}} egyetlen műveletet vesz vissza. Figyelem: ha újabb műveletek vannak fölötte, azok is vele mennek, és a panel megmondja, hány.
@@ -104,4 +106,18 @@ A test minden lapja ugyanannyival tolható el kifelé vagy befelé. Erre van sz�
 4. Pipáld be az {{ui:offset.copy}} jelölőt, hogy az alkatrész maradjon, a megnagyobbított test pedig másolatként jöjjön létre, amely már lyuk. Csoportosítsd ezt a lyukat a párjával, és pontosan a választott játékot vágja ki.
 5. Kattints az {{ui:offset.apply}} gombra.
 
+Pipáld be a(z) {{ui:offset.sideways}} lehetőséget, ha csak a körvonalnak kell nőnie vagy zsugorodnia: az oldalak a távolsággal elmozdulnak, minden sík felső és alsó lap a magasságán marad. Egy tábla körben szegélyt kap, egy talp szélesebb lesz, és a test nem lesz magasabb. Lépcsős testnél minden lépcső megtartja a saját magasságát. A körvonalain át eltolt szöveg ilyenkor szintén megtartja a magasságát.
+
 Pipa nélkül maga a test tolódik el. Rögzített, pontos test lesz, mint egy letörés után: a panel tetején lévő lista visszavonja az eltolást, az {{ui:edge.editAction}} pedig újra megnyitja az eszközt a régi távolsággal. Csak pontos CAD-testek tolhatók el - dobozok, hengerek és a többi forma, ezek csoportjai, importált STEP-alkatrészek. Az a test, amely csak háromszögháló, mint sok STL-import, gyakran nem. A testhez túl nagy távolságot, például a legvékonyabb falon túli kicsinyítést, elutasítja.
+
+## Lapok törlése
+
+Egy útban lévő lekerekítés, egy rossz helyen lévő lyuk, egy már nem kellő csap: a {{ui:editor.tool.deleteFace}} újra leveszi a testről, anélkül hogy újra kellene építeni.
+
+1. Jelöld ki a testet, és kattints a {{ui:editor.tool.deleteFace}} gombra, vagy kattints jobb gombbal a testre, és válaszd a menüből.
+2. Kattints mindarra a lapra, aminek el kell tűnnie: egy lekerekített él lapjaira, egy lyuk falára, egy csap oldalára és tetejére. A kiválasztott lap kivilágosodik; egy újabb kattintás kiveszi. Az ablak számolja a lapokat.
+3. Kattints a {{ui:deleteFace.apply}} gombra, vagy nyomd meg a [[Delete]] billentyűt. Az [[Esc]] bezárja az eszközt, változtatás nélkül.
+
+A törölt lapok körüli lapok addig nőnek, amíg a rés be nem zárul. Egy lekerekített felső élű doboz visszakapja éles éleit, egy lyuk betöltődik, egy csap eltűnik. A test pontos marad, így újra lekerekíthető és letörhető, és a STEP-export megőrzi valódi lapjait. A [[Ctrl]]+[[Z]] egy lépésben visszavonja a törlést. Az {{ui:edge.featureHistory}} alatt is szerepel a lekerekítésekkel és letörésekkel együtt, ahol az {{ui:edge.revertAction}} visszavonja; {{ui:edge.editAction}} nincs hozzá. Csoporton az eredmény egyetlen test, mint egy élkezelésnél.
+
+Mindannak a lapjait válaszd ki, aminek el kell tűnnie, és csak azokat. Ha a körülöttük lévő lapok nem tudják bezárni a rést, a layerling jelzi, és semmi sem változik: egy doboz fő oldalának például nincs olyan szomszédja, amely átvehetné a helyét. Ha egy zsebnek csak az alját törlöd, átmenő lyuk lesz belőle, mert a zseb falai a túloldalig futnak tovább.

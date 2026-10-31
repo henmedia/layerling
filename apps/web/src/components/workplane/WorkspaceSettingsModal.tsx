@@ -1573,7 +1573,7 @@ export function WorkspaceSettingsModal({
             </div>
 
             <div className="workspace-modal-footer">
-              <span>{t("workspace.footerHint")}</span>
+              <span className="workspace-footer-hint">{t("workspace.footerHint")}</span>
               <div className="workspace-footer-buttons">
                 {savedDefault ? (
                   <button

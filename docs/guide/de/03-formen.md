@@ -24,7 +24,7 @@ Was die Bibliothek bietet:
 - **Zierformen:** {{ui:shape.star}}, {{ui:shape.heart}} und {{ui:shape.crescent}}.
 - **Beschriftung:** {{ui:shape.text}}, auch auf einem Kreisbogen. Mehr im Kapitel [Text](chapter:text).
 - **Mechanik:** {{ui:shape.thread}} (Gewindestange, Schraube, Mutter und Gewindeloch), {{ui:shape.spring}}, {{ui:shape.gridfinity}}-Behälter und -Bodenplatten, {{ui:shape.gear}}, die {{ui:shape.hirth}} und die {{ui:shape.knurl}} für Griffe. Mehr im Kapitel [Gewinde und Mechanik](chapter:gewinde-und-mechanik).
-- **Für Konstruktionen:** das druckbare {{ui:shape.hinge}}, {{ui:shape.dovetail}}, die {{ui:shape.teardrop}} für waagerechte Löcher, die {{ui:shape.counterbore}} und {{ui:shape.countersink}} für Schraubenköpfe und das {{ui:shape.ruler}}, das nur ein Messwerkzeug ist und in keinem Export auftaucht.
+- **Für Konstruktionen:** das druckbare {{ui:shape.hinge}}, {{ui:shape.dovetail}}, die {{ui:shape.teardrop}} für waagerechte Löcher, die {{ui:shape.port}} für USB-, HDMI-, DisplayPort- und RJ45-Buchsen, die {{ui:shape.counterbore}} und {{ui:shape.countersink}} für Schraubenköpfe und das {{ui:shape.ruler}}, das nur ein Messwerkzeug ist und in keinem Export auftaucht.
 
 Ein Dreieck bekommst du auf zwei Wegen: Der {{ui:shape.polygon}} mit drei Seiten ist ein gleichschenkliges Dreieck, das „Dach“ aus Tinkercad, der {{ui:shape.wedge}} ein rechtwinkliges. Beide sind echte Dreiecksprismen. Für ein dreieckiges Loch kopierst du die Form, machst die Kopie kleiner, markierst sie als Aussparung und richtest sie mit {{ui:editor.tool.centerOnWorkplane}} oder {{ui:editor.tool.align}} aus. Beides arbeitet mit dem Umgrenzungskasten der Form, also dem kleinsten Quader, der sie umschließt; ein halbiertes Quadrat gilt deshalb weiter als ganzes Quadrat. Mit der Befehlssuche ([[Strg]]+[[K]]) findest du beide Formen auch unter „Dreieck“ oder „Dach“.
 
@@ -51,7 +51,7 @@ Die Einstellungen sind am rechten Rand angedockt. Verdecken sie etwas, ziehst du
 
 ![Eine Gruppe aus einem orangen Block, einem blauen Zapfen und einer Aussparung, zu einem Körper verrechnet. Mit Mehrfarbig bleibt der Zapfen blau, der Block orange, und die Wände der Aussparung nehmen die Farbe des Blocks an.](shot:group-multicolor)
 
-Verjüngen und Verdrehen gibt es bei fast allen Formen. Nur Zahnrad, Gewinde, Feder, Gridfinity, Scharnier, Pyramide, gebogenes Rohr, Tropfen, Senkungen und Lineal haben sie nicht: Diese Formen haben ihre eigenen festen Maße oder, wie die Pyramide, schon eine eigene Oberseite.
+Verjüngen und Verdrehen gibt es bei fast allen Formen. Nur Zahnrad, Gewinde, Feder, Gridfinity, Scharnier, Pyramide, gebogenes Rohr, Tropfen, Anschlussöffnung, Senkungen und Lineal haben sie nicht: Diese Formen haben ihre eigenen festen Maße oder, wie die Pyramide, schon eine eigene Oberseite.
 
 ![Ein Kegel, bei dem Radius oben und Höhe geändert wurden: Ein kleiner Pfeil neben jedem Wert holt ihn zurück, und die beiden Knöpfe unten speichern oder setzen die Vorgaben der Form zurück.](shot:property-reset)
 

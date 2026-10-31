@@ -11529,15 +11529,28 @@ html[data-theme="dark"] .workspace-reset-row button {
   line-height: 1.5;
 }
 
-.workspace-footer-buttons {
-  display: flex;
-  gap: 8px;
+/* The hint gives way to the buttons: it wraps its own words, and only when it would be narrower
+   than 160px do the buttons move to a row of their own (#1045). */
+.workspace-footer-hint {
+  flex: 1 1 160px;
 }
 
+.workspace-footer-buttons {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* A label on one line: the buttons had a fixed height and wrapped "Meine Vorgabe verwenden" out of it
+   on the Mac's wider Avenir Next (#1045). */
 .make-default-button {
   min-width: 128px;
-  height: 34px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 6px 14px;
+  white-space: nowrap;
   color: #584026;
   background: #fcfaf7;
   border: 1px solid #eae2d4;
@@ -11549,9 +11562,10 @@ html[data-theme="dark"] .workspace-reset-row button {
 
 .workspace-modal-footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px 16px;
   min-height: 64px;
   padding: 12px 24px;
   color: #756656;
@@ -13631,6 +13645,12 @@ html[data-theme="dark"] .theme-check {
   background: #e9e0d3;
 }
 
+/* Sorted A to Z: the button stays lit, so the list's order does not come as a surprise (#1046). */
+.outliner-sort-button.active {
+  color: #ad6206;
+  background: #f6e7d2;
+}
+
 .outliner-search-wrap {
   position: relative;
   display: flex;
@@ -13992,6 +14012,11 @@ html[data-theme="dark"] .outliner-close-button {
 html[data-theme="dark"] .outliner-close-button:hover {
   color: #ffffff;
   background: #443a30;
+}
+
+html[data-theme="dark"] .outliner-sort-button.active {
+  color: #f0a64a;
+  background: #4a3826;
 }
 
 html[data-theme="dark"] .outliner-search-wrap {

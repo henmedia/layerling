@@ -39,6 +39,8 @@ Lorsqu'une sélection qui a fonctionné échoue après avoir cliqué sur un bord
 
 Le bord sous le pointeur est également plus large, afin que vous puissiez voir lequel un clic sélectionnera.
 
+Un perçage accepte aussi {{ui:editor.tool.chamfer}} et {{ui:editor.tool.fillet}}, de même que {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} et {{ui:editor.tool.deleteFace}} : il reste un perçage et découpe avec sa nouvelle forme. Arrondir les quatre arêtes verticales d'un perçage en boîte donne une poche aux coins intérieurs arrondis, et un perçage agrandi avec {{ui:editor.tool.offset}} découpe avec autant de jeu en plus. Pour casser l'arête là où un perçage rencontre la pièce, traitez plutôt le groupe terminé : cette arête lui appartient.
+
 ### Reprendre un traitement de pointe
 
 Un corps traité peut toujours être traité à nouveau. Sélectionnez-le à nouveau et ouvrez l'outil - Congé, Chanfrein ou Creux, chacun affiche la liste : sous {{ui:edge.featureHistory}} vous voyez ce qu'il y a déjà dessus. {{ui:edge.revertAction}} reprend un seul traitement. Remarque : si des traitements plus récents se trouvent au-dessus, ils vont avec et le panneau vous indique combien.
@@ -102,6 +104,8 @@ Chaque face d'un corps peut être déplacée de la même distance, vers l'extér
 3. Les {{ui:offset.edges}} décident des coins extérieurs : arrondi garde la surface décalée ronde, vif laisse les faces se prolonger jusqu'à ce qu'elles se rencontrent.
 4. Coche {{ui:offset.copy}} pour garder la pièce telle quelle et obtenir le corps agrandi comme copie qui est déjà un trou. Groupe ce trou avec la pièce complémentaire, il coupe exactement le jeu choisi.
 5. Clique sur {{ui:offset.apply}}.
+
+Coche {{ui:offset.sideways}} quand seul le contour doit grandir ou rétrécir : les côtés se déplacent de la distance, et chaque face plane du dessus et du dessous garde sa hauteur. Un panneau reçoit une bordure tout autour, un socle s'élargit, et le corps ne devient pas plus haut. Sur un corps en gradins, chaque marche garde sa propre hauteur. Un texte décalé par ses contours garde alors lui aussi sa hauteur.
 
 Sans la coche, le corps lui-même est décalé. Il devient un corps exact fixe, comme après un chanfrein : la liste en haut du panneau annule le décalage, et {{ui:edge.editAction}} rouvre l'outil avec l'ancienne distance. Seuls les corps CAD exacts peuvent être décalés - boîtes, cylindres et les autres formes, leurs groupes, pièces STEP importées. Un corps qui n'est qu'un maillage de triangles, comme beaucoup d'imports STL, ne le peut souvent pas. Une distance trop grande pour le corps, par exemple une réduction au-delà de sa paroi la plus fine, est refusée.
 

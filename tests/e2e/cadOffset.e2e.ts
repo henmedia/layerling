@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { OcctKernel } from "occt-wasm";
-import { CANNOT_OFFSET_MESSAGE, offsetSolid } from "@/lib/cadShell";
+import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways } from "@/lib/cadShell";
 
 // A body grown or shrunk along its faces, for the clearance of a press fit (#919).
 describe("offsetting a solid with the real OCCT kernel", () => {
@@ -46,6 +46,45 @@ describe("offsetting a solid with the real OCCT kernel", () => {
     expect(kernel.getVolume(grown)).toBeGreaterThan(kernel.getVolume(plate));
     expect(kernel.isValid(grown)).toBe(true);
     [small, grown, box, plate, pin].forEach((handle) => kernel.release(handle));
+  });
+
+  // Sideways only (#1057): the border grows all round, the height stays.
+  it("grows a box sideways only, keeping its height", () => {
+    const box = kernel.makeBox(40, 20, 30);
+    const sharp = offsetSolidSideways(kernel, box, 2, false, "sharp");
+    expect(kernel.isValid(sharp)).toBe(true);
+    expect(kernel.getVolume(sharp)).toBeCloseTo(44 * 20 * 34, 2);
+    const bounds = kernel.getBoundingBox(sharp, false);
+    expect(bounds.ymin).toBeCloseTo(0, 4);
+    expect(bounds.ymax).toBeCloseTo(20, 4);
+    const round = offsetSolidSideways(kernel, box, 2, false, "round");
+    // Round corners: the four upright corners become quarter cylinders.
+    expect(kernel.getVolume(round)).toBeCloseTo((44 * 34 - (16 - 4 * Math.PI)) * 20, 1);
+    expect(kernel.getBoundingBox(round, false).ymax).toBeCloseTo(20, 4);
+    [sharp, round, box].forEach((handle) => kernel.release(handle));
+  });
+
+  it("keeps every step of a stepped body at its height", () => {
+    const low = kernel.makeBox(40, 10, 20);
+    const high = kernel.makeBox(20, 20, 20);
+    const stepped = kernel.fuse(low, high);
+    const grown = offsetSolidSideways(kernel, stepped, 1, false, "sharp");
+    expect(kernel.isValid(grown)).toBe(true);
+    // Lower step 42 x 22 x 10, upper step 22 x 22 x 10 on top of it.
+    expect(kernel.getVolume(grown)).toBeCloseTo(42 * 22 * 10 + 22 * 22 * 10, 2);
+    [grown, stepped, high, low].forEach((handle) => kernel.release(handle));
+  });
+
+  it("shrinks sideways only, and grows a round body without making it taller", () => {
+    const box = kernel.makeBox(40, 20, 30);
+    const small = offsetSolidSideways(kernel, box, 1, true, "sharp");
+    expect(kernel.getVolume(small)).toBeCloseTo(38 * 20 * 28, 2);
+    expect(kernel.getBoundingBox(small, false).ymax - kernel.getBoundingBox(small, false).ymin).toBeCloseTo(20, 4);
+    const disc = kernel.makeCylinder(10, 5);
+    const lying = kernel.rotate(disc, { point: { x: 0, y: 0, z: 0 }, direction: { x: 1, y: 0, z: 0 } }, -Math.PI / 2);
+    const wider = offsetSolidSideways(kernel, lying, 2, false, "round");
+    expect(kernel.getVolume(wider)).toBeCloseTo(Math.PI * 12 * 12 * 5, 0);
+    [small, box, disc, lying, wider].forEach((handle) => kernel.release(handle));
   });
 
   it("refuses a shrink that eats the whole body", () => {

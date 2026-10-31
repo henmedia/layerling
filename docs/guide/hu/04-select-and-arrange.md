@@ -21,6 +21,7 @@ Sok résznél a nézetben könnyű elveszíteni a fonalat. Az objektumlista ({{u
 - A címke mutatja, hogy egy rész {{ui:outliner.solid}} vagy {{ui:outliner.hole}}.
 - A lakat és a szem egyes részeket zárol és rejt el.
 - Az {{ui:outliner.rename}} saját nevet ad egy résznek; a beállítások tetején a név melletti ceruza ugyanezt teszi a kijelölt alakzattal. Nagyobb terveknél az értelmes nevek rengeteget segítenek.
+- A címsor A–Z gombja ({{ui:outliner.sortByName}}) ábécérendbe rendezi az általad elnevezett alakzatokat, a számokat számként kezelve (2. rész a 10. rész előtt). Az alapértelmezett nevüket viselő alakzatok alattuk maradnak a hozzáadás sorrendjében, a legújabb a végén, és a csoportokon belüli részek ugyanígy rendeződnek. Csak a lista változik, a terv soha. Egy második kattintás ismét a hozzáadás sorrendjében mutat mindent, és a böngésző megjegyzi a választást.
 - A keresőmező név és fajta szerint is megtalálja az alakzatokat, így a „henger” vagy a „lyuk” szóra is. A csoportokon belül is keres, akármilyen mélyen vannak egymásba ágyazva: egy találatot tartalmazó csoport a listában marad, és kinyílik, hogy megmutassa az egyező részeket és a hozzájuk vezető csoportokat. A saját neve alapján megtalált csoport megnyitáskor az összes részét mutatja.
 - A címsor bal szélén lévő nyíl a címsoráig összecsukja a listát, majd újra kinyitja.
 
@@ -117,6 +118,24 @@ Szellőzőkhöz, hangszórórácsokhoz, kosarakhoz és dobozokhoz a {{ui:holePat
 A lyukak közönséges lyukak, a testtel csoportosítva, pont mint a {{ui:editor.tool.group}} után: semmi sincs „beégetve”. A {{ui:editor.tool.ungroup}} újra feloldja a csoportot, és minden lyukat felszabadít, amelyeket ezután egyenként mozgathatsz, módosíthatsz vagy törölhetsz. Az egész egyetlen lépés a {{ui:editor.tool.undo}} számára. Az eszköz egyszerre legfeljebb 400 lyukat készít; ilyenkor legyenek nagyobbak a lyukak, vagy nagyobb a távolság.
 
 Egy MI ugyanezt az MCP-hídon keresztül is meg tudja tenni a `layerling_perforate_face` paranccsal (lásd az [MI MCP-vel](chapter:ai-with-mcp) fejezetet).
+
+## Lap kitolása vagy benyomása
+
+Vastagabb falhoz, egy lapra emelt párnához vagy egy belevágott zsebhez a {{ui:faceTool.title}} eszköz egyetlen sík lapon dolgozik. Importált STL-en is működik, ahol nincs módosítható vázlat. Jelölj ki pontosan egy testet, és kattints az eszköztár {{ui:editor.group.modify}} csoportjában a {{ui:faceTool.title}} gombra, a lyukminta mellett. A testre jobb gombbal is kattinthatsz, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűkkel.
+
+1. Kattints a test egy sík lapjára. A lyukmintához hasonlóan a kattintás körüli teljes sík lap számít; görbe lap nem működik. Csoporton vagy kötegen a lap átfut az összeérő részeken, mint a lyukmintánál.
+2. Az ablakban:
+   - **{{ui:faceTool.direction}}:** válaszd a {{ui:faceTool.direction.out}} lehetőséget a lapon álló anyaghoz, vagy a {{ui:faceTool.direction.in}} lehetőséget egy belevágott zsebhez. Egy zseb nem megy mélyebbre, mint a lap mögötti test; üreges testen elérheti az üreget.
+   - **{{ui:faceTool.inset}}:** mennyivel marad az új körvonal a lap szélén belül. Kifelé a 0 az egész lapot veszi, ami vastagabbá tesz egy falat. A lapon lévő nyílások ugyanennyivel nőnek.
+   - **{{ui:faceTool.radius}}:** a körvonal minden sarkát lekerekíti, a belsőket is, így egy éles csúcs ívben végződik. A sugár kétszeresénél keskenyebb bevágás bezárul, és a lapnak az a része, amely a beljebb húzás és a sugár együttes kétszeresénél keskenyebb, kimarad.
+   - **{{ui:faceTool.depth}}:** mennyire áll ki az új rész a lapból, vagy milyen mély a zseb.
+   - **{{ui:faceTool.separate}}:** bekapcsolt kapcsolóval az új rész (vagy egy zseb lyuka) önálló test a test mellett, nem csoport vele, így azonnal átméretezheted, mozgathatod vagy vágásra használhatod.
+3. Az eredmény azonnal előnézetként látszik, és minden értéket követ. A {{ui:faceTool.repick}} másik lapot választ, az [[Esc]] bezárja az eszközt.
+4. Csak a {{ui:faceTool.apply}} hozza létre.
+
+Amit az eszköz hozzáad, az egy közönséges vázlattest, a testtel csoportosítva, hacsak a {{ui:faceTool.separate}} nincs bekapcsolva (ekkor a {{ui:group.edit}} gombnak nincs mit megnyitnia, és a rész szabad): semmi sincs beégetve. A {{ui:group.edit}} megnyitja a csoportot, és az új részen a {{ui:inspector.editSketch}} megmutatja a körvonalat, amelyet követ. Egy egyszerű vázlattest tetején vagy alján (egy terület, nem csoportosított, nem tükrözött, nem kúposított, nem csavart, nem dőlt, és nincs körvonala, kulcstartó-füle, lekerekítése vagy letörése) ez a test saját körvonala, építéskor beljebb húzva, így vonalai és ívei pontosak maradnak, ahol a CAD-kernel be tudja húzni őket, az élszerszámokhoz és a STEP-exporthoz. Később átméretezve a rész megtartja a beljebb húzását. Minden más lapon, és egy importált háló minden lapján, a körvonal a lap háromszögeit követi, és egy görbe rövid egyenes darabokból áll. Az egész egyetlen lépés a {{ui:editor.tool.undo}} számára. A beljebb húzás vagy a sugár későbbi módosításához vond vissza, és futtasd újra az eszközt. A felső él utólagos lekerekítéséhez használd a {{ui:editor.tool.fillet}} eszközt a {{ui:edge.topEdges}} beállítással a csoporton utolsó lépésként: mint minden élkezelés egy csoporton, egyetlen testté egyesíti a csoportot.
+
+Egy MI ugyanezt az MCP-hídon át a `layerling_push_face` eszközzel teheti meg (lásd a [MI MCP-vel](chapter:ai-with-mcp) fejezetet).
 
 ## Több rész módosítása egyszerre
 

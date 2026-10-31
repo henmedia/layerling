@@ -41,6 +41,8 @@ Gdy wybór, który działał, przestaje działać po kliknięciu jeszcze jednej 
 
 Krawędź pod wskaźnikiem też jest rysowana grubiej, więc widać, którą wybierze kliknięcie.
 
+Otwór także przyjmuje {{ui:editor.tool.chamfer}} i {{ui:editor.tool.fillet}}, podobnie jak {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} i {{ui:editor.tool.deleteFace}}: pozostaje otworem i wycina swoim nowym kształtem. Zaokrąglenie czterech pionowych krawędzi otworu w kształcie prostopadłościanu daje kieszeń z zaokrąglonymi narożnikami wewnętrznymi, a otwór powiększony przez {{ui:editor.tool.offset}} wycina z odpowiednio większym luzem. Krawędź, w której otwór styka się z częścią, obrabiaj na gotowej grupie: ta krawędź należy do niej.
+
 ### Cofanie obróbki krawędzi
 
 Obrobioną bryłę zawsze można obrobić ponownie. Zaznacz ją znowu i otwórz narzędzie. Zaokrąglenie, Fazowanie i Wydrąż pokazują listę: w {{ui:edge.featureHistory}} widzisz, co już na niej jest. {{ui:edge.revertAction}} cofa pojedynczą obróbkę. Uwaga: jeśli leżą na niej nowsze obróbki, znikają razem z nią, a panel mówi, ile ich jest.
@@ -104,6 +106,8 @@ Każdą ścianę bryły można przesunąć o tę samą odległość na zewnątrz
 3. {{ui:offset.edges}} decydują o zewnętrznych narożach: zaokrąglone utrzymuje odsuniętą powierzchnię okrągłą, ostre pozwala ścianom biec dalej, aż się spotkają.
 4. Zaznacz {{ui:offset.copy}}, aby zachować część bez zmian, a powiększoną bryłę dostać jako kopię, która już jest otworem. Zgrupuj ten otwór z częścią współpracującą, a wytnie dokładnie wybrany luz.
 5. Kliknij {{ui:offset.apply}}.
+
+Zaznacz {{ui:offset.sideways}}, gdy ma rosnąć lub maleć tylko obrys: boki przesuwają się o odległość, a każda płaska górna i dolna ściana zostaje na swojej wysokości. Tabliczka dostaje obramowanie dookoła, podstawa robi się szersza, a bryła nie staje się wyższa. W bryle schodkowej każdy stopień zachowuje swoją wysokość. Tekst odsuwany przez swoje obrysy też zachowuje wtedy swoją wysokość.
 
 Bez zaznaczenia odsunięta zostaje sama bryła. Staje się stałą, dokładną bryłą, jak po fazie: lista u góry panelu cofa odsunięcie, a {{ui:edge.editAction}} otwiera narzędzie ponownie ze starą odległością. Odsunąć można tylko dokładne bryły CAD - prostopadłościany, walce i inne kształty, ich grupy, importowane części STEP. Bryła będąca tylko siatką trójkątów, jak wiele importów STL, często nie daje się odsunąć. Odległość zbyt duża dla bryły, na przykład zmniejszenie poza najcieńszą ścianę, zostaje odrzucona.
 

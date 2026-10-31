@@ -21,6 +21,7 @@ import { buildHoneycombHoles, normalizeHoneycombCellSize, normalizeHoneycombFram
 import { dovetailOutlineForShape } from "@/lib/dovetailGeometry";
 import { loftProfileLoops } from "@/lib/loftGeometry";
 import { teardropExactSection } from "@/lib/teardropGeometry";
+import { normalizePortCorner, portChamfer } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile } from "@/lib/screwHoleGeometry";
 import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeRoundedBoxQuality, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
@@ -47,7 +48,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "counterbore", "countersink", "doubleCountersink", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -970,6 +971,47 @@ function roundedRectLoop(width: number, depth: number, radius: number): CadModif
   ]);
 }
 
+/**
+ * The port opening's outline in its front view, standing on z = 0. Fully round
+ * ends (a USB-C socket) are one half circle each, not two quarters, so each end
+ * is one face; a round opening is one circle.
+ */
+function portProfileLoop(width: number, height: number, corner: number, chamfer: ReturnType<typeof portChamfer>): CadModifierProfileLoop {
+  const half = height / 2;
+  if (chamfer) {
+    // HDMI and DisplayPort: the lower corners cut off straight, the others rounded by a quarter circle (portContourPoints).
+    const hw = width / 2;
+    const quarter = (x: number, z: number, cx: number, cz: number, start: number): Corner => {
+      if (corner <= 1e-4) return { start: { x, z }, end: { x, z } };
+      const arc: Arc = { cx, cz, rx: corner, rz: corner, start, end: start + Math.PI / 2 };
+      return { start: profileArcPoint(arc, arc.start), end: profileArcPoint(arc, arc.end), arc };
+    };
+    const point = (x: number, z: number): Corner => ({ start: { x, z }, end: { x, z } });
+    return loopFromCorners([
+      ...(chamfer.right ? [point(hw - chamfer.x, 0), point(hw, chamfer.y)] : [quarter(hw, 0, hw - corner, corner, -Math.PI / 2)]),
+      quarter(hw, height, hw - corner, height - corner, 0),
+      quarter(-hw, height, -(hw - corner), height - corner, Math.PI / 2),
+      ...(chamfer.left ? [point(-hw, chamfer.y), point(-(hw - chamfer.x), 0)] : [quarter(-hw, 0, -(hw - corner), corner, Math.PI)]),
+    ]);
+  }
+  const roundAcrossHeight = corner >= half - 1e-6;
+  const roundAcrossWidth = corner >= width / 2 - 1e-6;
+  if (roundAcrossHeight && roundAcrossWidth) return mapLoop(ellipseLoop(width / 2, half), 1, 0, 1, half);
+  const end = (cx: number, cz: number, start: number): Corner => {
+    const arc: Arc = { cx, cz, rx: corner, rz: corner, start, end: start + Math.PI };
+    return { start: profileArcPoint(arc, arc.start), end: profileArcPoint(arc, arc.end), arc };
+  };
+  if (roundAcrossHeight) {
+    const hx = width / 2 - corner;
+    return loopFromCorners([end(hx, half, -Math.PI / 2), end(-hx, half, Math.PI / 2)]);
+  }
+  if (roundAcrossWidth) {
+    const hz = half - corner;
+    return loopFromCorners([end(0, half + hz, 0), end(0, half - hz, Math.PI)]);
+  }
+  return mapLoop(roundedRectLoop(width, height, corner), 1, 0, 1, half);
+}
+
 /** Frame that lays an outline built in the profile's x/z plane along the shape's depth: solid (x, e, z) -> local (x, z, depth / 2 - e). */
 function alongDepthFrame(depth: number): ProfileFrame {
   return { kind: "extrusion", height: depth, local: new THREE.Matrix4().set(1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, depth / 2, 0, 0, 0, 1) };
@@ -1008,6 +1050,11 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
         // solid (x, e, z) -> local (x, z, depth / 2 - e): the profile's z becomes the height, the extrusion runs along the depth
         frame: alongDepthFrame(depth),
       };
+    }
+    case "port": {
+      // A rounded rectangle in the front view (createPortGeometry), lifted to stand on z = 0 and pushed along the depth like the teardrop.
+      const corner = normalizePortCorner(shape.cornerFillet, width, shape.height, shape.portProfile);
+      return { loops: [portProfileLoop(width, shape.height, corner, portChamfer(shape.portProfile, width, shape.height))], frame: alongDepthFrame(depth) };
     }
     case "wedge": {
       // A right triangle in the front view, its right angle at the bottom of +x (createBooleanWedgeGeometry), pushed along the depth.
@@ -1540,6 +1587,10 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     threadChamfer: shape.threadChamfer,
     threadChamferBottom: shape.threadChamferBottom,
     threadHeadChamfer: shape.threadHeadChamfer,
+    threadHeadDiameter: shape.threadHeadDiameter,
+    threadDrive: shape.threadDrive,
+    threadDriveSize: shape.threadDriveSize,
+    threadDriveDepth: shape.threadDriveDepth,
   });
   const { settings, spec } = plan;
   const part: CadModifierThreadPart = {
@@ -1569,12 +1620,12 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     part.head = {
       kind: settings.head,
       height: plan.headHeight,
-      radius: settings.head === "countersunk" ? plan.headCrown : spec.headDiameter / 2,
-      acrossFlats: spec.acrossFlats,
+      radius: settings.head === "countersunk" ? plan.headCrown : settings.headDiameter / 2,
+      acrossFlats: settings.headDiameter,
       neckRadius: settings.diameter / 2,
       chamferFaceRadius: plan.headBroken ? plan.headFaceRadius : 0,
-      socketAcrossFlats: spec.socket,
-      socketDepth: plan.hasSocket ? plan.socketDepth : 0,
+      ...(plan.driveOutline ? { driveOutline: plan.driveOutline } : {}),
+      socketDepth: plan.driveOutline ? plan.socketDepth : 0,
     };
   }
   if (settings.role === "nut") part.nut = { acrossFlats: spec.acrossFlats, chamferFaceRadius: plan.rimBroken ? plan.rimFaceRadius : 0 };

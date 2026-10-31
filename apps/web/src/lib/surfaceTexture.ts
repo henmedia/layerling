@@ -1436,7 +1436,7 @@ function rayValue(a: number, b: number, h: number, rim: SurfaceRim, ring: Return
 }
 
 /** How far in from a rim upright or slanted grooves run (see rayValue). */
-function rayReach(rim: SurfaceRim, s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
+function rayReach(rim: SurfaceRim, _s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
   if (layout.capEdge !== "over") return RAY_BAND * layout.period;
   // Where the ring is RAY_SHARE as long as the rim.
   if (layout.outline) {
@@ -1740,7 +1740,6 @@ export function makeSurfaceTextureLayout(base: SurfaceBase, asked: SurfaceTextur
     if (asked.projection === "auto") s = { ...asked, projection: round || (shape && wrapsOutline(asked, shape)) ? "cylinder" : "allRound" };
     if (s.projection !== "cylinder") shape = null;
   }
-  const ax = AXIS_INDEX[s.axis];
   const [i1, i2] = acrossAxes(s.axis);
   const v = base.vertices;
   const I = base.indices;
@@ -5384,8 +5383,6 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
 
   return { base, apply };
 }
-
-export type SurfaceTextureSession = ReturnType<typeof createSurfaceTextureSession>;
 
 /** Texture a body once: its triangles (inside frame) in, the textured triangles out. */
 export function applySurfaceTexture(positions: ArrayLike<number>, settings: unknown, options: SurfaceTextureOptions = {}) {

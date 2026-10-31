@@ -81,7 +81,7 @@ export function curveThroughPoints(profile: SketchProfile, pointIds: readonly st
     const backwardFree = outerHandle(next, run[0], inner) !== "in" && outerHandle(next, run[last], inner) !== "out";
     const forward = stretch.closed || forwardFree === backwardFree ? storedForward : forwardFree;
     // The tangent along the run at each point, a sixth of the way between its neighbours.
-    const tangents = run.map((point, index) => {
+    const tangents = run.map((_point, index) => {
       const previous = stretch.closed ? run[(index - 1 + run.length) % run.length] : run[Math.max(0, index - 1)];
       const following = stretch.closed ? run[(index + 1) % run.length] : run[Math.min(last, index + 1)];
       return { x: (following.x - previous.x) / 6, z: (following.z - previous.z) / 6 };

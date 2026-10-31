@@ -6335,6 +6335,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .theme-check {
   background: #dedede;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-sort-button.active {
+  color: #ad6206;
+  background: #e4e4e4;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-search-wrap {
   border-bottom: 1px solid #e8e8e8;
   background: #f8f8f8;
@@ -6520,6 +6525,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-close-button 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-close-button:hover {
   color: #ffffff;
   background: #3d3d3d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-sort-button.active {
+  color: #f0a64a;
+  background: #3b3b3b;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-search-wrap {

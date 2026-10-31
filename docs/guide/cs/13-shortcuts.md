@@ -19,7 +19,7 @@ Nemůžete najít nástroj? Stiskněte [[Ctrl]]+[[K]] nebo klikněte na lupu v �
 - Každá položka uvádí odpovídající klávesovou zkratku i část pásu nástrojů, ve které ji najdete.
 - Neaktivní položku nyní nelze spustit, zpravidla proto, že není nic vybráno. V seznamu zůstává, abyste věděli, kde nástroj hledat.
 
-Vyhledávací pole má i tato příručka, nahoře na každé stránce. Zadejte jedno či více slov. Zobrazí se části obsahující všechna zadaná slova se zvýrazněnými shodami. Kliknutím nebo klávesou [[Enter]] přejdete na první výsledek.
+Vyhledávací pole má i tato příručka, nahoře na každé stránce. Zadejte jedno či více slov. Zobrazí se části obsahující všechna zadaná slova se zvýrazněnými shodami. Kliknutím nebo klávesou [[Enter]] přejdete na první výsledek. Otevřená stránka zvýrazní každé místo, kde se hledaná slova vyskytují, a posune se na první z nich ve zvolené části; [[Esc]] nebo kliknutí na zvýraznění ho zase odstraní.
 - Zadání názvu tvaru jej přidá na pracovní rovinu stejně jako výběr v nabídce tvarů.
 - Prázdné pole nabízí nahoře naposledy použité příkazy.
 - Názvem tělesa vyhledáte a vyberete příslušný objekt v projektu. Pomůže to ve složitém modelu. Objekty se nabízejí až po zadání textu.

@@ -9,6 +9,8 @@ import {
   hirthSurfaceY,
   normalizeHirthToothHeight,
 } from "@/lib/hirthGeometry";
+import { canonicalizeShape } from "@/lib/workplaneShapes";
+import type { WorkplaneShape } from "@/types/layerling";
 
 function triangles(geometry: ReturnType<typeof createHirthGeometry>) {
   const position = geometry.getAttribute("position");
@@ -109,5 +111,17 @@ describe("Hirth joint geometry (#1016)", () => {
     const innermost = Math.min(...points.map((p) => Math.hypot(p[0], p[2])));
     expect(innermost).toBeCloseTo(5, 4);
     expect(isClosed(createHirthGeometry(50, 10, 30, shape))).toBe(true);
+  });
+});
+
+describe("Hirth joint size (#1016)", () => {
+  it("stays round: stretched, its teeth would no longer interlock all round", () => {
+    const joint = canonicalizeShape({
+      id: "h1", name: "Hirth Joint", kind: "hirth", color: "#7d8f9e", x: 0, z: 0, elevation: 0,
+      size: 54, width: 54, depth: 30, height: 10, rotation: 0, teeth: 24,
+    } as WorkplaneShape);
+    expect(joint.width).toBe(54);
+    expect(joint.depth).toBe(54);
+    expect(joint.size).toBe(54);
   });
 });

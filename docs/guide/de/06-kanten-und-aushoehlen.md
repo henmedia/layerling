@@ -41,6 +41,8 @@ Scheitert eine Auswahl, die eben noch ging, nachdem du eine weitere Kante angekl
 
 Auch die Kante unter dem Mauszeiger wird breiter gezeichnet, damit du siehst, welche ein Klick wählt.
 
+Auch eine Aussparung nimmt {{ui:editor.tool.chamfer}} und {{ui:editor.tool.fillet}} an, ebenso {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} und {{ui:editor.tool.deleteFace}}: Sie bleibt eine Aussparung und schneidet mit ihrer neuen Form. Werden die vier senkrechten Kanten einer Quader-Aussparung verrundet, entsteht eine Tasche mit runden Innenecken, und eine mit {{ui:editor.tool.offset}} vergrößerte Aussparung schneidet mit entsprechend mehr Luft. Die Kante, an der eine Aussparung auf das Teil trifft, brichst du dagegen an der fertigen Gruppe: Diese Kante gehört ihr.
+
 ### Eine Kantenbearbeitung zurücknehmen
 
 Ein behandelter Körper lässt sich jederzeit noch einmal behandeln. Wähle ihn wieder aus und öffne das Werkzeug - Verrundung, Fase oder Aushöhlen zeigen alle die Liste: Unter {{ui:edge.featureHistory}} steht, was schon darauf liegt. {{ui:edge.revertAction}} nimmt eine einzelne Bearbeitung zurück. Achtung: Liegen neuere Bearbeitungen darüber, gehen sie mit weg, und das Fenster sagt dir, wie viele.
@@ -105,7 +107,11 @@ Jede Fläche eines Körpers lässt sich um dieselbe Strecke nach außen oder inn
 4. Setze den Haken bei {{ui:offset.copy}}, um das Teil zu behalten und den vergrößerten Körper als Kopie zu bekommen, die schon ein Loch ist. Gruppiere dieses Loch mit dem Gegenstück, und es schneidet genau das Spiel, das du gewählt hast.
 5. Klicke auf {{ui:offset.apply}}.
 
+Setze den Haken bei {{ui:offset.sideways}}, wenn nur der Umriss wachsen oder schrumpfen soll: Die Seiten wandern um den Abstand, jede flache Ober- und Unterseite bleibt auf ihrer Höhe. Ein Schild bekommt ringsum einen Rand, ein Sockel wird breiter, und der Körper wird nicht höher. Bei einem abgestuften Körper behält jede Stufe ihre eigene Höhe. Ein Text, der über seine Umrisse versetzt wird, behält dann ebenfalls seine Höhe.
+
 Ohne den Haken wird der Körper selbst versetzt. Er wird zu einem festen exakten Körper, wie nach einer Fase: Die Liste oben im Fenster nimmt den Versatz zurück, und {{ui:edge.editAction}} öffnet das Werkzeug wieder mit dem alten Abstand. Versetzen lassen sich nur exakte CAD-Körper - Quader, Zylinder und die anderen Formen, Gruppen davon, importierte STEP-Teile. Ein Körper, der nur ein Dreiecksnetz ist, wie viele STL-Importe, lässt sich oft nicht versetzen. Ein Abstand, der für den Körper zu groß ist, etwa ein Verkleinern über die dünnste Wand hinaus, wird abgelehnt.
+
+Ein Text, dessen Buchstaben der Kern nicht als Körper versetzen kann - in manchen Schriften ein A, B, M, N, W oder 9 -, wird stattdessen über seine Umrisse versetzt: Er bekommt die Füllung {{ui:prop.textWider}} um den Abstand (beim Verkleinern schmaler) und wird oben und unten um ebenso viel höher. Er bleibt ein Text, den du weiter bearbeiten kannst. Das gilt für einen Text mit gefüllten Buchstaben ohne Rundung; einer, der schon eine Füllart hat, wird wie bisher abgelehnt.
 
 ## Flächen löschen
 

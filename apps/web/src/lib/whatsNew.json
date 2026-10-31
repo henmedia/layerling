@@ -1,5 +1,155 @@
 [
   {
+    "version": "1.126.0",
+    "items": [
+      {
+        "title": {
+          "de": "Ausrichtgriffe bleiben am kleinen Teil",
+          "en": "Alignment handles stay by a tiny part"
+        },
+        "body": {
+          "de": "Bei einem winzigen Teil, ganz nah herangezoomt, standen die Ausrichtgriffe weit daneben oder außerhalb des Bildes. Jetzt stehen sie auf dem Bildschirm höchstens 40 Pixel neben der Auswahl.",
+          "en": "On a tiny part zoomed in close, the alignment handles landed far off it or off the screen. Now they stand at most 40 pixels beside the selection on the screen."
+        }
+      },
+      {
+        "title": {
+          "de": "Rechtsklickmenü scrollt mit dem Mausrad",
+          "en": "The right-click menu scrolls with the wheel"
+        },
+        "body": {
+          "de": "Ein Rechtsklickmenü, das höher als das Fenster ist, scrollt jetzt mit dem Mausrad, statt sich zu schließen. Das Rad außerhalb des Menüs schließt es wie bisher.",
+          "en": "A right-click menu taller than the window now scrolls with the mouse wheel instead of closing. The wheel outside the menu closes it as before."
+        }
+      },
+      {
+        "title": {
+          "de": "Suchwörter auf der Anleitungsseite markiert",
+          "en": "Search words marked on the guide page"
+        },
+        "body": {
+          "de": "Öffnest du einen Treffer der Anleitungssuche, markiert die Seite jede Stelle, an der deine Wörter stehen, und springt zur ersten im gewählten Abschnitt. Esc oder ein Klick auf eine Markierung nimmt sie wieder weg.",
+          "en": "When you open a result of the guide search, the page marks every place your words appear and jumps to the first one in that section. Esc or a click on a mark clears them."
+        }
+      },
+      {
+        "title": {
+          "de": "Versetzen nur zur Seite",
+          "en": "Offset sideways only"
+        },
+        "body": {
+          "de": "Beim Versetzen gibt es den Haken „Nur seitlich“: Der Umriss wächst oder schrumpft um den Abstand, flache Ober- und Unterseiten bleiben auf ihrer Höhe. So bekommt ein Schild einen Rand ringsum, ohne höher zu werden.",
+          "en": "Offset has a new tick, \"Sides only\": the outline grows or shrinks by the distance, while flat tops and bottoms stay at their height. A sign gets a border all round without getting taller."
+        }
+      },
+      {
+        "title": {
+          "de": "Schlitz- und Vierkantschrauben, Unterlegscheiben",
+          "en": "Slotted and Robertson screws, washers"
+        },
+        "body": {
+          "de": "Eine Schraube kann jetzt einen Schlitz bekommen, für einen Schlitzschraubendreher oder eine Münze, oder den Robertson-Vierkant, der in Kanada üblich ist. Und ein Rohr wird mit einem Klick zur Unterlegscheibe: unter „Unterlegscheibe“ die Schraubengröße wählen, Außen- und Innendurchmesser und Dicke folgen der ISO 7089.",
+          "en": "A screw can now have a slot, for a flat screwdriver or a coin, or the square Robertson drive common in Canada. And a tube becomes a washer in one click: choose the screw size under \"Washer\", and outer and inner diameter and thickness follow ISO 7089."
+        }
+      },
+      {
+        "title": {
+          "de": "Werkzeuge auch für Aussparungen",
+          "en": "Tools for holes too"
+        },
+        "body": {
+          "de": "Fasen, Verrunden, Aushöhlen, Versatz und Fläche löschen gehen jetzt auch an einer Aussparung, und sie bleibt eine Aussparung: eine verrundete Quader-Aussparung schneidet eine Tasche mit runden Innenecken. Die Hülle aus zwei Zylinder-Aussparungen ergibt ein Langloch.",
+          "en": "Chamfer, fillet, hollow, offset and delete face now work on a hole too, and it stays a hole: a rounded box hole cuts a pocket with round inside corners. The hull of two cylinder holes cuts a slot."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.125.0",
+    "items": [
+      {
+        "title": {
+          "de": "Schrauben mit Torx, Kreuzschlitz oder ohne Antrieb",
+          "en": "Screws with Torx, Phillips or no drive"
+        },
+        "body": {
+          "de": "Eine Schraube bekommt jetzt den Antrieb, den du willst: Innensechskant, Torx, Kreuzschlitz oder keinen. Größe und Tiefe des Antriebs und der Kopfdurchmesser lassen sich einstellen, so passt auch in einen flachen Kopf ein brauchbarer Antrieb.",
+          "en": "A screw now takes the drive you want: hex socket, Torx, Phillips or none. The drive's size and depth and the head diameter can be set, so a flat head gets a usable drive too."
+        }
+      },
+      {
+        "title": {
+          "de": "Öffnungen für USB, HDMI, DisplayPort und RJ45",
+          "en": "Openings for USB, HDMI, DisplayPort and RJ45"
+        },
+        "body": {
+          "de": "Die neue Form „Anschlussöffnung“ setzt das Loch für eine Buchse in eine Gehäusewand: USB-C, Micro-USB, USB-A, HDMI, Mini-HDMI, DisplayPort, Mini-DisplayPort oder RJ45. Buchse wählen, an die Wand schieben, gruppieren. Die Maße kommen aus Datenblättern und Normen, mit etwas Luft zum Drucken, bei HDMI und DisplayPort mit den schrägen Ecken.",
+          "en": "The new shape \"Port opening\" puts the hole for a socket into a box wall: USB-C, Micro-USB, USB-A, HDMI, Mini HDMI, DisplayPort, Mini DisplayPort or RJ45. Pick the socket, move it onto the wall, group. The sizes come from data sheets and standards, with a little room for printing, and HDMI and DisplayPort get their slanted corners."
+        }
+      },
+      {
+        "title": {
+          "de": "Versetzen klappt bei jedem Buchstaben",
+          "en": "Offset works on every letter"
+        },
+        "body": {
+          "de": "Texte mit A, B, M, N, W oder 9 ließen sich nicht versetzen. Jetzt werden ihre Buchstaben über die Umrisse breiter oder schmaler, auch als Loch mit Spiel und beim Ausschneiden.",
+          "en": "Texts with an A, B, M, N, W or 9 could not be offset. Now their letters grow or shrink along their outlines, also as a hole with clearance and when cutting out."
+        }
+      },
+      {
+        "title": {
+          "de": "Hirth-Verzahnung bleibt rund",
+          "en": "The Hirth joint stays round"
+        },
+        "body": {
+          "de": "Statt Länge und Breite hat die Hirth-Verzahnung jetzt einen Durchmesser, und jeder Griff ändert nur diesen. So greifen die Zähne immer rundum ineinander.",
+          "en": "Instead of a length and a width, the Hirth joint now has one diameter, and every handle changes just that. So its teeth always interlock all round."
+        }
+      },
+      {
+        "title": {
+          "de": "Knöpfe der Arbeitsbereich-Einstellungen wieder sauber",
+          "en": "Tidy buttons under the workspace settings"
+        },
+        "body": {
+          "de": "Auf dem Mac liefen „Meine Vorgabe verwenden“ und „Als Vorgabe gesichert“ über den Rand ihrer Knöpfe hinaus. Jetzt bleibt die Beschriftung auf einer Zeile, und ist es zu eng, rücken die Knöpfe unter den Hinweis.",
+          "en": "On the Mac, the labels of the two buttons at the foot of the workspace settings ran out over their edges. Now each label stays on one line, and where it is too tight the buttons move below the hint."
+        }
+      },
+      {
+        "title": {
+          "de": "Objektliste nach Namen sortieren",
+          "en": "Sort the object list by name"
+        },
+        "body": {
+          "de": "Der Knopf A–Z in der Titelleiste der Objektliste stellt die Formen, denen du einen Namen gegeben hast, alphabetisch nach oben, „Teil 2“ vor „Teil 10“. Die übrigen bleiben darunter in der Reihenfolge des Anlegens, die neueste zuletzt.",
+          "en": "The A–Z button in the object list's title bar puts the shapes you have named at the top in alphabetical order, Part 2 before Part 10. The others stay below in the order you added them, the newest last."
+        }
+      },
+      {
+        "title": {
+          "de": "Fasen, Verrunden und STEP am Scharnier mit Kegeln",
+          "en": "Chamfers, fillets and STEP for the hinge with cones"
+        },
+        "body": {
+          "de": "Fasen, Verrunden und „Fläche löschen“ gehen jetzt auch am Scharnier mit Kegeln. Der STEP-Export, der es bisher ausließ, nimmt es mit seinen echten Kegeln mit.",
+          "en": "Chamfers, fillets and \"Delete face\" now work on the hinge with cones too. The STEP export, which used to leave it out, now takes it with its true cones."
+        }
+      },
+      {
+        "title": {
+          "de": "Skizzenformen in deiner Vorgabegröße",
+          "en": "Sketch shapes in your default size"
+        },
+        "body": {
+          "de": "Rechteck, Kreis und Ellipse in der Skizze beginnen jetzt so groß, wie du Quader und Zylinder in den Formvorgaben eingestellt hast, statt immer mit 20 mm.",
+          "en": "The rectangle, circle and ellipse in a sketch now start as large as you set the box and the cylinder in the shape defaults, instead of always at 20 mm."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.124.2",
     "items": [
       {

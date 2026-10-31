@@ -11,7 +11,8 @@ V knjižnici oblik izberi {{ui:shape.thread}}. Pod {{ui:inspector.threadRole}} s
 
 - **{{ui:thread.rod}}:** valj z navojem, na primer vijak brez glave.
 - **{{ui:thread.screw}}:** z glavo. {{ui:inspector.threadHead}} izbereš: {{ui:thread.headCylinder}}, {{ui:thread.headCountersunk}} ali {{ui:thread.headHex}}.
-- **{{ui:thread.nut}}:** ustrezna matica.
+  Nižje nastaviš {{ui:prop.headDiameter}} (pri šestrobi glavi {{ui:prop.headAcrossFlats}}; pri ugreznjeni glavi premer sledi višini) in {{ui:inspector.threadDrive}} v čelu glave: {{ui:thread.driveHex}}, {{ui:thread.driveTorx}}, {{ui:thread.drivePhillips}}, {{ui:thread.driveSlot}}, {{ui:thread.driveRobertson}} ali {{ui:thread.driveNone}} za vijak, ki ga vrtiš z roko ali ključem. {{ui:prop.driveSize}} je velikost ključa notranjega šestroba, zunanji premer zvezde Torx ali razpon križa; {{ui:prop.driveDepth}} pove, kako globoko seže, največ devet desetin glave, 0 pa ga izpusti. Dokler jih ne spremeniš, sledijo velikosti; šestroba glava se začne brez pogona. Pogon je del natančnega telesa, zato pride tudi v izvoz STEP. Pri {{ui:thread.driveSlot}} je {{ui:prop.driveSize}} dolžina zareze, njena širina pa petina dolžine, da se prilega ploski izvijač ali kovanec; na začetku je tako dolga, kot dopušča glava. {{ui:thread.driveRobertson}} je kvadratni pogon, običajen v Kanadi: {{ui:prop.driveSize}} je razdalja med ploskvama kvadrata, začne pa z nastavkom, ki ustreza velikosti, št. 2 (2,84 mm) pri M4 in M5.
+- **{{ui:thread.nut}}:** ustrezna matica. Podložka zanjo je {{ui:shape.tube}}: pod {{ui:prop.washerSize}} izberi velikost vijaka, pa zunanji in notranji premer ter debelina sledijo ISO 7089.
 - **{{ui:thread.bore}}:** navojna luknja. To je luknja. Povleci jo v del, oboje združi v skupino in del ima notranji navoj. Za luknjo, v katero se privije vijak, vedno uporabi {{ui:thread.bore}}: {{ui:thread.rod}} ali {{ui:thread.screw}} kot luknja ima polno mero vijaka brez zračnosti in je pretesna. Če jo vseeno nastaviš kot luknjo, te layerling opozori, {{ui:inspector.threadMakeTappedHole}} pa iz nje naredi {{ui:thread.bore}}.
 
 ![Vijak z valjasto glavo. Desno sta vrsta in oblika glave, nižje velikost, korak in profil.](shot:thread-screw)
@@ -190,6 +191,12 @@ Luknja, ki leži vodoravno v delu, dobi pri tiskanju zgoraj most, ta pa se poves
 Kapljično izvrtino naredi za luknjo in jo združi v skupino z delom. Z dolžino leži v smeri globine, konica kaže navzgor. Za luknjo v drugi smeri jo zavrtiš za 90° okoli navpične osi.
 
 **Navojna luknja** na boku se zgoraj povesi na enak način. Daj ji lastno kapljico: dodaj luknjo {{ui:shape.teardrop}}, katere {{ui:prop.teardropDiameter}} je jedro navoja, premer, ki ga zobci pustijo prostega (za M10 približno 8,4 mm), z enako dolžino kot navojna luknja, in izberi obe. Klikni {{ui:editor.tool.align}} in ju poravnaj po sredini – sredina kapljice je sredina njenega okroglega dela, ne njenega okvirja s konico, zato se krožnici prekrivata – ter obe skupaj z delom združi v skupino. Navoj se izreže kot običajno, konica pa odpre vrh luknje, zato se natisne brez podpor.
+
+## Odprtine za priključke
+
+Ohišje za elektroniko potrebuje odprtino za kabel. {{ui:shape.port}} je prav to: ležeča izrezna oblika z zaobljenimi vogali. Pod {{ui:prop.portPreset}} izberi priključek - {{ui:port.usbC}}, {{ui:port.microUsb}} ali {{ui:port.usbA}} - in dobi njegovo mero z zračnostjo približno 0,25 mm na vsaki strani. {{ui:port.usbCPlug}} je za priključek, ki je za steno, kamor mora seči ohišje vtiča. Širino, višino in {{ui:prop.portCorner}} lahko spremeniš ročno; seznam takrat pokaže {{ui:port.custom}}. {{ui:port.hdmi}}, {{ui:port.miniHdmi}}, {{ui:port.displayPort}} in {{ui:port.miniDisplayPort}} imajo kot priključek poševno odrezane spodnje vogale, DisplayPort samo levega, {{ui:port.rj45}} pa je za omrežno vtičnico; mere izhajajo iz izrezov, ki jih priporočajo proizvajalci, in iz risb VESA.
+
+Pride kot izrezna oblika in gleda naprej. Nastavi {{ui:prop.portDepth}} nekoliko večjo od debeline stene, jo premakni tja, kjer je priključek na plošči, in jo združi z ohišjem. Za stransko steno jo zavrti za 90° okoli navpične osi.
 
 ## Stopničasta in udirna izvrtina
 

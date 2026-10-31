@@ -21,6 +21,7 @@ Met veel onderdelen raak je in de weergave makkelijk het overzicht kwijt. De obj
 - Het label laat zien of een onderdeel {{ui:outliner.solid}} of {{ui:outliner.hole}} is.
 - Hangslot en oog vergrendelen en verbergen afzonderlijke onderdelen.
 - {{ui:outliner.rename}} geeft een onderdeel een eigen naam; het potlood naast de naam bovenaan in de instellingen doet hetzelfde voor de geselecteerde vorm. Zinnige namen helpen enorm in grotere ontwerpen.
+- De knop A–Z in de titelbalk ({{ui:outliner.sortByName}}) sorteert de vormen die je een naam hebt gegeven alfabetisch, met getallen als getallen geteld (Deel 2 voor Deel 10). Vormen die nog hun standaardnaam dragen, blijven daaronder in de volgorde waarin je ze hebt toegevoegd, de nieuwste als laatste, en onderdelen in groepen worden op dezelfde manier gesorteerd. Alleen de lijst verandert, nooit het ontwerp. Een tweede klik toont alles weer in de volgorde van toevoegen, en de browser onthoudt de keuze.
 - Het zoekveld vindt vormen op naam en op soort, dus ook "cilinder" of "gat". Het zoekt ook binnen groepen, hoe diep ook genest: een groep met een treffer blijft in de lijst staan en klapt open om de gevonden onderdelen te tonen en de groepen die ernaartoe leiden. Een groep die op zijn eigen naam gevonden is, toont al zijn onderdelen als je hem opent.
 - Het pijltje helemaal links in de titelbalk klapt de lijst in tot alleen de titelbalk, en weer terug.
 
