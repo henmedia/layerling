@@ -23,6 +23,7 @@ With many parts it is easy to lose track in the view. The object list ({{ui:edit
 - The label shows whether a part is {{ui:outliner.solid}} or {{ui:outliner.hole}}.
 - Padlock and eye lock and hide single parts.
 - {{ui:outliner.rename}} gives a part a name of its own; the pencil beside the name at the top of the settings does the same for the selected shape. Sensible names help enormously in larger designs.
+- The A–Z button in the title bar ({{ui:outliner.sortByName}}) sorts the shapes you have named alphabetically, with numbers counted as numbers (Part 2 before Part 10). Shapes that still carry their default name stay below in the order you added them, the newest last, and parts inside groups are sorted the same way. Only the list changes, never the design. A second click shows everything in the order added again, and the browser remembers the choice.
 - The search field finds shapes by name and by kind, so also "cylinder" or "hole". It also looks inside groups, however deeply nested: a group holding a match stays in the list and folds open to show the matching parts and the groups that lead to them. A group found by its own name shows all its parts when you open it.
 - The arrow on the far left of the title bar folds the list down to its title bar and back.
 
@@ -72,7 +73,7 @@ The angles stay with the body. In its settings, {{ui:inspector.rotation}} shows 
 
 ![A body turned about two axes: its angles stand under it, and the Rotation card in its settings takes them as numbers.](shot:rotation-card)
 
-With **one body** selected, the pivot belongs to that body: select other parts and come back, and it is still there. It moves, turns and scales with the body, is saved in the project and comes back with Undo. Under {{ui:inspector.position}} the pivot has its own X, Y and Z, which you can type or nudge, and {{ui:inspector.pivotRemove}} takes it away. You can also drag the pivot's red marker with the mouse: it slides over the surface of the bodies and snaps to corners, edge midpoints and edges, so a hinge pin lands exactly on a corner. With several bodies selected the pivot is only for that selection, and a new selection removes it. Grouping or bundling them keeps it: the group takes the pivot as its own, with X, Y and Z under {{ui:inspector.position}}.
+With **one body** selected, the pivot belongs to that body: select other parts and come back, and it is still there. It moves, turns and scales with the body, is saved in the project and comes back with Undo. Under {{ui:inspector.position}} the pivot has its own X, Y and Z, which you can type or nudge, and {{ui:inspector.pivotRemove}} takes it away. You can also drag the pivot's red marker with the mouse: it slides over the surface of the bodies and snaps to corners, edge midpoints and edges, so a hinge pin lands exactly on a corner. With several bodies selected the pivot is only for that selection, and a new selection removes it. Grouping or bundling them keeps it: the group takes the pivot as its own, with X, Y and Z under {{ui:inspector.position}}. Hold Shift while dragging the red marker and it snaps to the centre of the face under the pointer instead - the axis of a round face, the middle of a flat one or the tip of a cone - looking through transparent bodies.
 
 ## Laying flat on a face
 

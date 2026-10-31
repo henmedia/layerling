@@ -127,6 +127,9 @@ describe("stepSourceForShape", () => {
     expect(stepSourceForShape(shape({ kind: "gear", width: 30, depth: 18, height: 6, gearType: "bevel" }))).toBe("profile");
     // Ein ovales Schraegrad dreht keinen festen Zahnkranz: es bleibt ein Netz.
     expect(stepSourceForShape(shape({ kind: "gear", width: 30, depth: 18, height: 6, gearType: "helical" }))).toBe("unsupported");
+    // Ein Pfeilrad ist exakt, oval bleibt es ein Netz (#1007).
+    expect(stepSourceForShape(shape({ kind: "gear", width: 30, depth: 30, height: 6, gearType: "herringbone" }))).toBe("helicalGear");
+    expect(stepSourceForShape(shape({ kind: "gear", width: 30, depth: 18, height: 6, gearType: "herringbone" }))).toBe("unsupported");
   });
 
   it("laesst tragen, was STEP nicht abbilden kann", () => {

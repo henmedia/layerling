@@ -24,7 +24,7 @@ What the library offers:
 - **Decorative shapes:** {{ui:shape.star}}, {{ui:shape.heart}} and {{ui:shape.crescent}}.
 - **Lettering:** {{ui:shape.text}}, also along a circular arc. More in [Text](chapter:text).
 - **Mechanics:** {{ui:shape.thread}} (threaded rod, screw, nut and tapped hole), {{ui:shape.spring}}, {{ui:shape.gridfinity}} bins and baseplates, {{ui:shape.gear}}, the {{ui:shape.hirth}} and the {{ui:shape.knurl}} for grips. More in [Threads and mechanics](chapter:threads-and-mechanics).
-- **For constructions:** the print-in-place {{ui:shape.hinge}}, {{ui:shape.dovetail}}, the {{ui:shape.teardrop}} for horizontal holes, the {{ui:shape.counterbore}} and {{ui:shape.countersink}} for screw heads and the {{ui:shape.ruler}}, which is only a measuring tool and never shows up in an export.
+- **For constructions:** the print-in-place {{ui:shape.hinge}}, {{ui:shape.dovetail}}, the {{ui:shape.teardrop}} for horizontal holes, the {{ui:shape.port}} for USB, HDMI, DisplayPort and RJ45 sockets, the {{ui:shape.counterbore}} and {{ui:shape.countersink}} for screw heads and the {{ui:shape.ruler}}, which is only a measuring tool and never shows up in an export.
 
 You get a triangle in two ways: the {{ui:shape.polygon}} with three sides is an isosceles triangle, the "Roof" of Tinkercad, and the {{ui:shape.wedge}} is a right triangle. Both are true triangular prisms. For a triangular hole, copy the shape, make the copy smaller, mark it as a hole and line it up with {{ui:editor.tool.centerOnWorkplane}} or {{ui:editor.tool.align}}. Both work with the shape's bounding box, the smallest box that encloses it, so a halved square still counts as a whole square. The command search ([[Ctrl]]+[[K]]) also finds both shapes under "triangle" or "roof".
 
@@ -50,7 +50,7 @@ The settings sit docked at the right edge. If they cover something you want to s
 
 ![A group of an orange block, a blue peg and a hole, cut into one body. With Multicolor switched on, the peg stays blue, the block orange, and the walls of the hole take the block's colour.](shot:group-multicolor)
 
-Taper and twist work on almost every shape. Only the gear, thread, spring, Gridfinity, hinge, pyramid, bent tube, teardrop, the screw-head cutters and the ruler leave them out: they have fixed measures of their own or, like the pyramid, a top of their own already.
+Taper and twist work on almost every shape. Only the gear, thread, spring, Gridfinity, hinge, pyramid, bent tube, teardrop, port opening, the screw-head cutters and the ruler leave them out: they have fixed measures of their own or, like the pyramid, a top of their own already.
 
 ![A cone whose top radius and height were changed: a small arrow next to each takes the value back, and the two buttons at the bottom save or reset the defaults of the shape.](shot:property-reset)
 
@@ -90,7 +90,7 @@ The {{ui:prop.torusTube}} sets how thick the tube is seen from above. The height
 
 - **For the STEP export.** It writes the round shape, not the polygon.
 - **For chamfers and fillets** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}) as long as the shape stays round. That is the case when you have not set a side count, when the count is at least the shape's default, or when the polygon strays at most {{value:EXACT_ROUND_TOLERANCE}} mm from the circle. The default is {{value:ROUND_FROM_SIDES}} sides for cylinder, ellipse, tube and cone, {{value:ROUND_FROM_ROOF_SIDES}} for the {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} steps for the {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} for the {{ui:shape.halfSphere}} and the {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} sides and {{value:ROUND_FROM_TORUS_STEPS}} steps for the {{ui:shape.torus}}, and a {{ui:prop.quality}} of {{value:ROUND_FROM_BENT_TUBE_QUALITY}} for a round {{ui:shape.bentTube}}.
-- **For a thread, a spring or a helical gear.** The edge tool and the STEP export take its exact body; its {{ui:prop.quality}} only sets how finely it is drawn.
+- **For a thread, a spring or a helical or herringbone gear.** The edge tool and the STEP export take its exact body; its {{ui:prop.quality}} only sets how finely it is drawn.
 
 **Where it matters again**
 
@@ -108,7 +108,7 @@ The {{ui:prop.torusTube}} sets how thick the tube is seen from above. The height
 Besides the settings there are handles on the shape itself:
 
 - The **corners and edges** make the shape larger or smaller. Drag one past the opposite side and the shape keeps growing there, on the other side of that edge. The arrow on top does the same below the base. Hold [[Shift]] while dragging a corner to scale width, depth and height together and keep the proportions; hold [[Alt]] to scale from the center instead of the opposite corner. Without a keyboard, or if you do not want to hold a key, switch on {{ui:inspector.keepProportions}} at the top of the properties: then the corners always keep the proportions, and typing one of width, depth or height scales the other two by the same factor. The setting is remembered.
-- The black **arrow above** the shape lifts or lowers it; with [[Alt]] held from the start, a copy is made where you let go, so you can stack. The white handle **on the top face** changes the height.
+- The black **arrow above** the shape lifts or lowers it; with [[Alt]] held from the start, a copy is made where you let go, so you can stack. The handle **on the top face** changes the height. The handles that change one measure carry the colour of its axis, as the curved arrows do: the middle of a side (width red, depth green) and the top (height blue); the corners change two measures and stay white.
 - The **curved arrows** rotate it.
 - The **numbers** beside the shape show the dimensions. A click on one opens a field in which you type the number you want. With [[Enter]] the shape grows from the edge opposite the number, as when you drag; with [[Alt]]+[[Enter]] it grows round its middle, so a shape that was aligned with another stays aligned. With {{ui:inspector.keepProportions}} ticked in the properties, or with [[Shift]]+[[Enter]], the other two dimensions follow by the same factor. That holds for width and length; the height always grows upward from the underside. The fields in the properties on the right keep the middle without a key. [[Tab]] keeps the number and opens the next one (width, depth, height); [[Shift]]+[[Tab]] goes back. In a field of the properties that you have clicked, the mouse wheel changes the value as well: a unit a notch, ten times as much with [[Shift]] (in a size or position field the snap grid), a tenth with [[Ctrl]] and a hundredth with [[Alt]]. A field that you have not clicked leaves the wheel to the panel, which scrolls.
 - A **click on a corner** (without dragging) opens width and depth together. Type the first, press [[Tab]] for the second and [[Enter]] to apply both. [[Esc]] cancels.
@@ -123,7 +123,7 @@ The snap step is at the bottom right of the editor and can be changed at any tim
 
 ## Copying and duplicating
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} and {{ui:editor.tool.duplicate}} are in the ribbon ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplicates a selection. layerling remembers how you last moved or rotated the copy and applies the same again on the next duplicate. That produces a row of holes or steps in a few key presses. For regular arrangements there is also the pattern, described in [Selecting and arranging](chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} and {{ui:editor.tool.duplicate}} are in the ribbon ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplicates a selection. layerling remembers how you last moved or rotated the copy and applies the same again on the next duplicate. That produces a row of holes or steps in a few key presses. For regular arrangements there is also the pattern, described in [Selecting and arranging](chapter:select-and-arrange). If you also resized the copy, every further copy grows by the same factor again, as in Tinkercad.
 
 > **Tip:** If a shape refuses to take the size you want, it is often the limits for new shapes. Under {{ui:workspace.shapeDefaults}} in the settings you decide how each shape starts and how large it may get.
 

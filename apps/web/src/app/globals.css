@@ -5979,6 +5979,21 @@ html[data-theme="dark"] .visibility-hidden-badge {
   text-transform: uppercase;
 }
 
+/* The title is the window's handle: a bar across the top of the picture that takes the press, the rest lets clicks through. */
+.sketch-revolve-preview-title.movable {
+  top: 0;
+  right: 0;
+  left: 0;
+  padding: 10px 12px 8px;
+  cursor: grab;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.sketch-revolve-preview.moving .sketch-revolve-preview-title.movable {
+  cursor: grabbing;
+}
+
 .sketch-revolve-preview canvas {
   display: block;
   width: 100%;
@@ -6604,6 +6619,39 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   background: #dccdbd;
 }
 
+/* The middle of the selection, typed in mm from the sketch's origin (#1064). */
+.sketch-selection-position {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 2px;
+  color: #725b43;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sketch-selection-position input {
+  width: 64px;
+  height: 29px;
+  padding: 0 8px;
+  color: #746352;
+  font: 700 12px/1 var(--font-ui);
+  background: #ffffff;
+  border: 1px solid #daccbe;
+  border-radius: 999px;
+  outline: 0;
+}
+
+.sketch-selection-position input:focus {
+  border-color: #ea953d;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
+.sketch-selection-position input:disabled {
+  cursor: default;
+  opacity: 0.52;
+}
+
 .sketch-corner-dialog {
   display: inline-flex;
   align-items: center;
@@ -6692,8 +6740,8 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   z-index: 11;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 5px;
+  gap: 1px;
+  padding: 4px;
   background: #faf7f3;
   border: 1px solid rgba(219, 207, 194, 0.9);
   border-radius: 17px;
@@ -6705,7 +6753,7 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   position: relative;
   display: grid;
   width: 44px;
-  height: 43px;
+  height: 40px;
   place-items: center;
   color: #5a3917;
   background: transparent;
@@ -6721,13 +6769,17 @@ html[data-theme="dark"] .sketch-shape-options .unit {
    keeps its size relative to the others (they are drawn from 22 to 28 px), so
    the browser zooms the icon instead of every icon getting one new size. */
 .camera-controls > button,
-.camera-controls > div > button {
+.camera-controls > div > button,
+.camera-controls > .camera-group > div > button,
+.camera-controls > .camera-controls-handle > button {
   width: calc(44px * var(--toolbar-scale));
-  height: calc(43px * var(--toolbar-scale));
+  height: calc(40px * var(--toolbar-scale));
 }
 
 .camera-controls > button > svg,
-.camera-controls > div > button > svg {
+.camera-controls > div > button > svg,
+.camera-controls > .camera-group > div > button > svg,
+.camera-controls > .camera-controls-handle > button > svg {
   zoom: var(--toolbar-scale);
 }
 
@@ -6755,8 +6807,9 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   box-shadow: inset 3px 0 0 #c56808;
 }
 
+/* Its buttons (place, eye, reset) take their places in the group around them, so a flat window's two columns can fill rows with them. */
 .workplane-control-group {
-  position: relative;
+  display: contents;
 }
 
 .tape-control-group {
@@ -6843,6 +6896,44 @@ html[data-theme="dark"] .panel-grip:hover {
 
 .section-control-group {
   position: relative;
+}
+
+/* The first button folds the bar away and, dragged, moves it (Stefan, 31.10.2026). A grip above the arrow says so; in two
+   columns it sits in the middle of the bar. */
+.camera-controls-handle {
+  display: flex;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+}
+
+.camera-controls.moving .camera-controls-handle {
+  cursor: grabbing;
+}
+
+.camera-controls .camera-controls-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  cursor: inherit;
+}
+
+.camera-controls .camera-controls-toggle > svg:first-child {
+  opacity: 0.55;
+}
+
+/* What belongs together in the camera bar sits in a frame of its own (Stefan, 31.10.2026): the view, the zoom, the
+   projection, the workplane, the measuring and the notes. One column: the buttons below each other. Two columns (a flat
+   window): each group takes whole rows, two buttons wide, so a pair like plus and minus never splits. */
+.camera-controls > .camera-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 1px;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border-radius: 14px;
 }
 
 /* The section button is the last one in the bar, so the panel opens upwards
@@ -8268,6 +8359,11 @@ html[data-theme="dark"] .touch-multi-select {
   height: 9px;
   background: #433629;
 }
+
+/* The handles that change one measure carry the colour of its axis, as the turn arrows do (#1078): the middle of a side width or depth, the top height. The corners change two and stay neutral. */
+.transform-handle.axis-x { background: #d6363c; border-color: #7d1a1e; }
+.transform-handle.axis-y { background: #2f9a4b; border-color: #17542a; }
+.transform-handle.axis-z { background: #2f6fe0; border-color: #163f86; }
 
 .transform-handle:not(.height-lift):hover {
     background: var(--hover-accent-color);
@@ -11529,15 +11625,28 @@ html[data-theme="dark"] .workspace-reset-row button {
   line-height: 1.5;
 }
 
-.workspace-footer-buttons {
-  display: flex;
-  gap: 8px;
+/* The hint gives way to the buttons: it wraps its own words, and only when it would be narrower
+   than 160px do the buttons move to a row of their own (#1045). */
+.workspace-footer-hint {
+  flex: 1 1 160px;
 }
 
+.workspace-footer-buttons {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* A label on one line: the buttons had a fixed height and wrapped "Meine Vorgabe verwenden" out of it
+   on the Mac's wider Avenir Next (#1045). */
 .make-default-button {
   min-width: 128px;
-  height: 34px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 6px 14px;
+  white-space: nowrap;
   color: #584026;
   background: #fcfaf7;
   border: 1px solid #eae2d4;
@@ -11549,9 +11658,10 @@ html[data-theme="dark"] .workspace-reset-row button {
 
 .workspace-modal-footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px 16px;
   min-height: 64px;
   padding: 12px 24px;
   color: #756656;
@@ -12736,6 +12846,9 @@ html[data-theme="dark"] .rotate-handle {
 html[data-theme="dark"] .rotate-handle.axis-x { --rotate-handle-axis: #ff6b70; }
 html[data-theme="dark"] .rotate-handle.axis-y { --rotate-handle-axis: #5fd47c; }
 html[data-theme="dark"] .rotate-handle.axis-z { --rotate-handle-axis: #6aa0ff; }
+html[data-theme="dark"] .transform-handle.axis-x { background: #ff6b70; border-color: #7d1a1e; }
+html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-color: #17542a; }
+html[data-theme="dark"] .transform-handle.axis-z { background: #6aa0ff; border-color: #163f86; }
 
 html[data-theme="dark"] .transform-handle.height-lift {
   border-bottom-color: #ffffff;
@@ -13083,6 +13196,16 @@ html[data-theme="dark"] .sketch-point-actions {
 
 html[data-theme="dark"] .sketch-point-actions button {
   color: #cbd5e0;
+}
+
+html[data-theme="dark"] .sketch-selection-position {
+  color: #cbd5e0;
+}
+
+html[data-theme="dark"] .sketch-selection-position input {
+  color: #f7fafc;
+  background: #1e1a16;
+  border-color: #554438;
 }
 
 html[data-theme="dark"] .sketch-point-actions button:hover,
@@ -13442,6 +13565,15 @@ html[data-theme="dark"] .theme-check {
   color: #f3a452;
 }
 
+/* Die Kameraleiste ist mit den beiden Notizknoepfen (31.10.2026) um zwei Knoepfe laenger geworden, und die Flaeche eines 900 Pixel hohen Fensters
+   ist rund 750 hoch: Bei Normalgroesse lief sie unten ins Fussband. Bis 900 Pixel wird sie darum schon verkleinert, wie unter 780. */
+@media (min-height: 781px) and (max-height: 900px) {
+  .camera-controls {
+    transform: scale(0.88);
+    transform-origin: top left;
+  }
+}
+
 /* Ein flaches Fenster - ein iPad quer, in Safari mit Adress-, Lesezeichen- und
    Tableiste - laesst der Arbeitsflaeche kaum vierhundert Pixel. Die
    Kameraleiste braucht aufgerecht rund 380 davon und lief deshalb unten aus dem
@@ -13478,55 +13610,45 @@ html[data-theme="dark"] .theme-check {
    nur gut 500 Pixel hoch, und die einspaltige Leiste (120 + 460 Pixel) lief
    unten aus dem Bild - samt dem Knopf, der eine eingeschaltete
    Schnittansicht anzeigt. */
-@container workplane (max-height: 600px) {
+@container workplane (max-height: 660px) {
   .camera-controls {
     display: grid;
     grid-template-columns: repeat(2, auto);
     transform: none;
   }
 
-  /* Gefuellt wird zeilenweise, und das Zoompaar rutscht hinter die
-     Ansichtsknoepfe: So beginnt es auf einer neuen Zeile und Plus und Minus
-     stehen nebeneinander statt ueber Eck.
-
-     Benannt statt gezaehlt: Ein nth-child sitzt nur so lange richtig, bis
-     zwischen den Knoepfen einer dazukommt - der Finger-Umschalter tat genau
-     das und trieb Plus und Minus ueber Eck. Er reiht sich hier hinter das
-     Paar ein, damit dessen Zeile gerade aufgeht. */
-  .camera-controls > .camera-zoom-button,
-  .camera-controls > .camera-touch-rotate {
-    order: 1;
+  /* Jede Gruppe nimmt ganze Zeilen, zwei Knoepfe breit: Plus und Minus, Maßband und Winkellineal, Notiz und ihr Auge
+     bleiben so nebeneinander, und der Rahmen faellt mit der Gruppe zusammen. */
+  .camera-controls > .camera-group {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-column: 1 / -1;
+    justify-content: start;
   }
 
-  .camera-controls > .workplane-control-group,
-  .camera-controls > .workplane-display-control-group,
-  .camera-controls > .tape-control-group,
-  .camera-controls > .corner-ruler-control-group,
-  .camera-controls > .section-control-group {
-    order: 2;
+  .camera-controls > .camera-controls-handle {
+    grid-column: 1 / -1;
   }
 }
 
 /* At Large the column is a quarter taller, so it needs two columns from a taller
    workplane on - 600 px was measured for Medium (#241). */
-@container workplane (max-height: 720px) {
+@container workplane (max-height: 870px) {
   html[data-toolbar-size="large"] .camera-controls {
     display: grid;
     grid-template-columns: repeat(2, auto);
     transform: none;
   }
 
-  html[data-toolbar-size="large"] .camera-controls > .camera-zoom-button,
-  html[data-toolbar-size="large"] .camera-controls > .camera-touch-rotate {
-    order: 1;
+  html[data-toolbar-size="large"] .camera-controls > .camera-group {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-column: 1 / -1;
+    justify-content: start;
   }
 
-  html[data-toolbar-size="large"] .camera-controls > .workplane-control-group,
-  html[data-toolbar-size="large"] .camera-controls > .workplane-display-control-group,
-  html[data-toolbar-size="large"] .camera-controls > .tape-control-group,
-  html[data-toolbar-size="large"] .camera-controls > .corner-ruler-control-group,
-  html[data-toolbar-size="large"] .camera-controls > .section-control-group {
-    order: 2;
+  html[data-toolbar-size="large"] .camera-controls > .camera-controls-handle {
+    grid-column: 1 / -1;
   }
 }
 
@@ -13629,6 +13751,12 @@ html[data-theme="dark"] .theme-check {
 .outliner-close-button:hover {
   color: #3b2817;
   background: #e9e0d3;
+}
+
+/* Sorted A to Z: the button stays lit, so the list's order does not come as a surprise (#1046). */
+.outliner-sort-button.active {
+  color: #ad6206;
+  background: #f6e7d2;
 }
 
 .outliner-search-wrap {
@@ -13992,6 +14120,11 @@ html[data-theme="dark"] .outliner-close-button {
 html[data-theme="dark"] .outliner-close-button:hover {
   color: #ffffff;
   background: #443a30;
+}
+
+html[data-theme="dark"] .outliner-sort-button.active {
+  color: #f0a64a;
+  background: #4a3826;
 }
 
 html[data-theme="dark"] .outliner-search-wrap {

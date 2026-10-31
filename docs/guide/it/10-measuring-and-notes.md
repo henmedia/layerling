@@ -68,7 +68,7 @@ Una nota registra informazioni che la geometria non può esprimere: “Questa vi
 - Se il corpo viene eliminato, o se sotto la nota non resta più alcun corpo visibile, la nota rimane nella stessa posizione sul piano di lavoro.
 - Trascina il fermaglio per spostare la nota. Facendo clic sul fermaglio, la scheda si comprime e resta visibile solo il numero; fai di nuovo clic per riaprirla. Fai clic sul testo per modificarlo.
 - Durante la modifica, [[Enter]] salva il testo e [[Esc]] lo ripristina com’era prima; [[Shift]]+[[Enter]] inserisce una nuova riga.
-- **In uno schizzo**, anche {{ui:editor.tool.note}} (in {{ui:editor.group.manage}}) o [[N]] inseriscono una nota, in qualsiasi punto dello schizzo. Tutte le note di uno schizzo appartengono al suo corpo: nella vista 3D stanno su di esso, sopra un corpo creato con {{ui:sketch.extrude}} o {{ui:sketch.sweep}} e sul profilo disegnato di uno creato con {{ui:sketch.revolve}}, e si spostano con lui. Quando riapri lo schizzo, mostra le note del corpo, comprese quelle inserite in 3D. Nello schizzo, {{ui:sketch.undo}} annulla una nota come una linea e {{ui:sketch.cancel}} scarta ciò che hai cambiato nelle note. Anche qui [[Shift]]+[[N]] mostra o nasconde le note.
+- **In uno schizzo**, anche {{ui:editor.tool.note}} o [[N]] inseriscono una nota, in qualsiasi punto dello schizzo. Tutte le note di uno schizzo appartengono al suo corpo: nella vista 3D stanno su di esso, sopra un corpo creato con {{ui:sketch.extrude}} o {{ui:sketch.sweep}} e sul profilo disegnato di uno creato con {{ui:sketch.revolve}}, e si spostano con lui. Quando riapri lo schizzo, mostra le note del corpo, comprese quelle inserite in 3D. Nello schizzo, {{ui:sketch.undo}} annulla una nota come una linea e {{ui:sketch.cancel}} scarta ciò che hai cambiato nelle note. Anche qui [[Shift]]+[[N]] mostra o nasconde le note.
 
 Le note vengono salvate nel progetto, non compaiono nelle esportazioni e possono essere mostrate o nascoste con {{ui:visibility.notes}} (in {{ui:editor.visibilityOptions}}, la freccia accanto all’icona dell’occhio) o con [[Shift]]+[[N]].
 
@@ -82,7 +82,7 @@ Un’immagine di riferimento è una fotografia da usare per allineare le parti: 
 - {{ui:referenceImage.calibrate}} imposta la dimensione reale, come nello schizzo: fai clic su due punti dell’immagine di cui conosci la distanza reale, per esempio due fori di fissaggio della scheda, poi inseriscila in {{ui:referenceImage.distance}}. L’immagine mantiene le proporzioni e il centro.
 - Blocca l’immagine con il lucchetto nell’intestazione delle sue impostazioni: resterà ferma e i clic passeranno attraverso di essa fino alla piastra. Per sbloccarla, selezionala nell’elenco degli oggetti.
 - L’immagine viene salvata una sola volta nel file del progetto, anche se la copi o annulli l’operazione più volte. Un’immagine grande aumenta il file della stessa quantità; il messaggio che appare quando la aggiungi ne indica la dimensione.
-- Un sistema di IA può aggiungere, spostare, calibrare, rendere trasparente e bloccare un’immagine con `layerling_reference_image`.
+- Un sistema di IA può aggiungere, spostare, calibrare, rendere trasparente e bloccare un’immagine con `layerling_reference_image`. Con `trace` ricalca l'immagine in un corpo di schizzo appoggiato sopra, come {{ui:sketch.traceImage}} nello schizzo.
 
 ## Punti di riferimento
 

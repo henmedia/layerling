@@ -14,7 +14,8 @@ summary: 其他人製作的 layerling 影片。
 - [I Tried Layerling After Tinkercad… Is It REALLY Better?](https://youtu.be/5DpOxdoNwqs) – Maker Mates Studio 3D Printing（英語）。一位 Tinkercad 使用者試用 layerling，並比較兩者。
 - [Print by Layer](https://www.youtube.com/playlist?list=PLejZBz4L7CGQ) – Print N Repeat（英語）。一個關於 layerling 的播放清單，目前收錄「The EASIEST Way to Design Hinges in Layerling」和「The EASIEST Way to 3D Model Threads!」。
 - [Tinkercad Too Basic? Fusion 360 Too Much? Meet Layerling for 3D Printing](https://youtu.be/kzV7fQ3rXhw) – 3D Jesus | 3D Printing & Design（英語）。在完全沒有手冊的情況下初次試用 layerling：圓角與倒角、抽殼、螺紋、草圖、旋轉實體、陣列、匯入與印表機設定。
-- [Layerling la nueva herramienta gratuita de modelado 3D, más completo que Tinkercad](https://youtu.be/-EEt0RSINoY) – Fulcro 1900（西班牙語）。一支關於 layerling 的影片：這款新的免費 3D 建模工具比 Tinkercad 更完整。
+- [Layerling en español: el CAD gratis que reemplaza a Tinkercad (2026)](https://youtu.be/iroftGBX-0Y) – Random Maker（西班牙語）。一位多年使用 Tinkercad 的使用者的初次體驗：介面感受如何、有哪些不同、layerling 能做哪些在 Tinkercad 中很難或做不到的事，以及適合哪些人。
+- [Proyectos en Layerling](https://www.youtube.com/playlist?list=PLTEdmvVC2bxs) – Fulcro 1900（西班牙語）。一個 layerling 專案播放清單，目前包括把 layerling 介紹為比 Tinkercad 更完整的免費工具、桌面配件（三個模型）、手機殼，以及螺桿、螺帽和螺絲。
 - [Layerling](https://www.youtube.com/playlist?list=PLQuXPoMXTnRQ) – Werkplaats Marc（荷蘭語）。一個關於 layerling 的播放清單，目前收錄給 Tinkercad 使用者的初探（「Layerling - De Gratis Tussenstap van Tinkercad naar Fusion 360」）和草圖教學：描摹照片、旋轉與沿路徑掃掠（「Schetsen Uitgelegd」）。
 
 你知道其他影片，或自己也拍了一支？在[討論區](https://github.com/henmedia/layerling/discussions)告訴我們，它就會被新增到這裡。

@@ -23,6 +23,14 @@ export type MovablePanelOptions = {
    * then kept in the area's terms and turned into its own offset parent's.
    */
   area?: (panel: HTMLElement) => HTMLElement | null;
+  /**
+   * Where a press does not start a move. By default every control in the title bar keeps its own clicks; a handle that
+   * is a button itself (the camera bar's, which also folds the bar away) names only the other controls here and tells
+   * a click from a drag by how far the pointer went.
+   */
+  handleIgnores?: string;
+  /** The whole panel stays inside the area, not only its title bar - for a bar of buttons, where a hidden button is lost. */
+  keepInside?: boolean;
 };
 
 /** Where the panel stands in its area, and what that means for its own offset parent. */
@@ -36,7 +44,7 @@ type Placement = { position: PanelPosition; origin: PanelPosition; scale: number
  * docks it again. Spread `handleProps` on the title bar, put `panelRef` and
  * `style` on the panel.
  */
-export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageKey: string, { floatingStyle, dockedAt, area }: MovablePanelOptions = {}) {
+export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageKey: string, { floatingStyle, dockedAt, area, handleIgnores = NOT_A_HANDLE, keepInside = false }: MovablePanelOptions = {}) {
   const panelRef = useRef<T>(null);
   const [placement, setPlacement] = useState<Placement | null>(null);
   const placementRef = useRef(placement);
@@ -100,9 +108,9 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
     const measured = measure();
     if (!measured) return null;
     const { panel, area: areaElement, origin, scale } = measured;
-    const position = clampPanelPosition(next, { width: screenWidth ?? panel.offsetWidth * scale }, { width: areaElement.clientWidth, height: areaElement.clientHeight });
+    const position = clampPanelPosition(next, { width: screenWidth ?? panel.offsetWidth * scale, height: keepInside ? panel.getBoundingClientRect().height : undefined }, { width: areaElement.clientWidth, height: areaElement.clientHeight });
     return { position, origin, scale, areaHeight: areaElement.clientHeight };
-  }, [measure]);
+  }, [measure, keepInside]);
 
   const store = useCallback((next: PanelPosition | null) => {
     try {
@@ -159,14 +167,14 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
   const onPointerDown = useCallback((event: PointerEvent<HTMLElement>) => {
     const measured = measure();
     if (event.button !== 0 || !measured) return;
-    if (event.target instanceof Element && event.target.closest(NOT_A_HANDLE)) return;
+    if (event.target instanceof Element && event.target.closest(handleIgnores)) return;
     event.preventDefault();
     capturePointer(event.currentTarget, event.pointerId);
     const { left, top } = measured.current;
     if (!placementRef.current) dockRef.current = { left, top };
     dragRef.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, left, top };
     setDragging(true);
-  }, [measure]);
+  }, [measure, handleIgnores]);
 
   const onPointerMove = useCallback((event: PointerEvent<HTMLElement>) => {
     const drag = dragRef.current;
@@ -195,10 +203,10 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
   }, [dockedAt, measure, store]);
 
   const onDoubleClick = useCallback((event: MouseEvent<HTMLElement>) => {
-    if (event.target instanceof Element && event.target.closest(NOT_A_HANDLE)) return;
+    if (event.target instanceof Element && event.target.closest(handleIgnores)) return;
     setPlacement(null);
     store(null);
-  }, [store]);
+  }, [store, handleIgnores]);
 
   const style: CSSProperties | undefined = placement
     ? {
@@ -206,7 +214,7 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
         left: (placement.position.left - placement.origin.left) / placement.scale,
         top: (placement.position.top - placement.origin.top) / placement.scale,
         // Down to the area's lower edge, but never less than the title bar, which stays inside it.
-        maxHeight: Math.max(PANEL_GRAB_HEIGHT, placement.areaHeight - placement.position.top - 32) / placement.scale,
+        ...(keepInside ? {} : { maxHeight: Math.max(PANEL_GRAB_HEIGHT, placement.areaHeight - placement.position.top - 32) / placement.scale }),
       }
     : undefined;
 

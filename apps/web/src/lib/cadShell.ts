@@ -1,4 +1,5 @@
 import { JoinType, type OcctKernel, type ShapeHandle } from "occt-wasm";
+import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { shellOpenSides } from "@/lib/shellLimits";
 import type { ShellEdges, ShellOpenings, ShellSide } from "@/types/layerling";
 
@@ -20,6 +21,15 @@ function shapeIsValid(cad: OcctKernel, shape: ShapeHandle) {
   } catch {
     return false;
   }
+}
+
+/**
+ * Whether a failure is more than a verdict on the distance: a missing kernel function, or a WebAssembly fault after which
+ * the kernel must be started again. Those go up to the worker instead of being read as "too thick" or "too far".
+ */
+function mustSurface(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  return /is not a function/.test(error.message) || isCadModifierWasmMemoryFault(error.message, error.name);
 }
 
 function releaseAll(cad: OcctKernel, handles: ShapeHandle[]) {
@@ -177,8 +187,8 @@ function shellBody(cad: OcctKernel, solid: ShapeHandle, thickness: number, openi
               cad.release(result);
               lastError = new Error("invalid shell");
             } catch (error) {
-              // A missing kernel function is not a verdict on the wall thickness.
-              if (error instanceof Error && /is not a function/.test(error.message)) throw error;
+              // A missing kernel function or a kernel fault is not a verdict on the wall thickness.
+              if (mustSurface(error)) throw error;
               lastError = error;
             }
           }
@@ -273,9 +283,92 @@ export function offsetSolid(cad: OcctKernel, solid: ShapeHandle, distance: numbe
         if (volume > 0 && (shrink ? volume < baseVolume * (1 - 1e-6) : volume > baseVolume * (1 + 1e-6))) return result;
         cad.release(result);
       } catch (error) {
-        if (error instanceof Error && /is not a function/.test(error.message)) throw error;
+        if (mustSurface(error)) throw error;
       }
     }
   }
   throw new Error(CANNOT_OFFSET_MESSAGE);
+}
+
+/**
+ * The heights (y, the body's own up) at which the body has a flat face looking straight up or down,
+ * with its bottom and top: between two of them the body is one layer, the same from bottom to top
+ * wherever its sides stand upright.
+ */
+function horizontalFaceLevels(cad: OcctKernel, solid: ShapeHandle, bounds: { ymin: number; ymax: number }) {
+  const tolerance = Math.max(1e-5, (bounds.ymax - bounds.ymin) * 1e-6);
+  const levels = [bounds.ymin, bounds.ymax];
+  const faces = cad.getSubShapes(solid, "face");
+  try {
+    faces.forEach((face) => {
+      if (cad.surfaceType(face) !== "plane") return;
+      const center = cad.getSurfaceCenterOfMass(face);
+      if (Math.abs(orientedFaceNormal(cad, face, center).y) > 0.999) levels.push(center.y);
+    });
+  } finally {
+    releaseAll(cad, faces);
+  }
+  return levels
+    .filter((level) => level >= bounds.ymin - tolerance && level <= bounds.ymax + tolerance)
+    .sort((a, b) => a - b)
+    .filter((level, index, sorted) => index === 0 || level - sorted[index - 1] > tolerance);
+}
+
+/**
+ * Offsets a body sideways only (#1057): its sides move by `distance`, its flat tops and bottoms stay at
+ * their heights, so a border grows all round without the body getting taller. OCCT offsets every face
+ * alike, so the body is cut into layers at the heights of its flat faces; each layer is offset as a
+ * whole and cut back to its own height, and the layers are joined again. A shrink grows the room around
+ * the layer instead and takes that away, so the layer keeps its height there too.
+ */
+export function offsetSolidSideways(cad: OcctKernel, solid: ShapeHandle, distance: number, shrink: boolean, edges: ShellEdges = "round") {
+  const bounds = cad.getBoundingBox(solid, false);
+  const levels = horizontalFaceLevels(cad, solid, bounds);
+  const margin = distance * 2 + 1;
+  const slab = (bottom: number, top: number) => cad.makeBoxFromCorners(
+    { x: bounds.xmin - margin, y: bottom, z: bounds.zmin - margin },
+    { x: bounds.xmax + margin, y: top, z: bounds.zmax + margin },
+  );
+  const handles: ShapeHandle[] = [];
+  const keep = (handle: ShapeHandle) => {
+    handles.push(handle);
+    return handle;
+  };
+  const layers: ShapeHandle[] = [];
+  try {
+    for (let index = 0; index + 1 < levels.length; index += 1) {
+      const bottom = levels[index];
+      const top = levels[index + 1];
+      const height = keep(slab(bottom, top));
+      // The first and last cut reach past the body, so they do not lie on its own top and bottom.
+      const reach = keep(slab(index === 0 ? bottom - margin : bottom, index + 2 === levels.length ? top + margin : top));
+      // A cut leaves faces split where they used to run on; OCCT's offset fails on those, so they are merged first.
+      const layer = keep(cad.unifySameDomain(keep(cad.common(solid, reach))));
+      if (!(cad.getVolume(layer) > 0)) continue;
+      if (shrink) {
+        const around = keep(cad.unifySameDomain(keep(cad.cut(height, layer))));
+        const grown = keep(offsetSolid(cad, around, distance, false, edges));
+        const taken = keep(cad.common(grown, height));
+        const rest = cad.cut(layer, taken);
+        if (cad.getVolume(rest) > 0) layers.push(rest);
+        else cad.release(rest);
+      } else {
+        const grown = keep(offsetSolid(cad, layer, distance, false, edges));
+        layers.push(cad.common(grown, height));
+      }
+    }
+    if (layers.length === 0) throw new Error(CANNOT_OFFSET_MESSAGE);
+    const joined = layers.length === 1 ? cad.copy(layers[0]) : keep(cad.fuseAll(layers));
+    const result = layers.length === 1 ? joined : cad.unifySameDomain(joined);
+    const baseVolume = cad.getVolume(solid);
+    const volume = shapeIsValid(cad, result) ? cad.getVolume(result) : 0;
+    if (volume > 0 && (shrink ? volume < baseVolume * (1 - 1e-6) : volume > baseVolume * (1 + 1e-6))) return result;
+    cad.release(result);
+    throw new Error(CANNOT_OFFSET_MESSAGE);
+  } catch (error) {
+    if (mustSurface(error)) throw error;
+    throw new Error(CANNOT_OFFSET_MESSAGE);
+  } finally {
+    releaseAll(cad, [...handles, ...layers]);
+  }
 }

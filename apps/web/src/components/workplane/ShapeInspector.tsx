@@ -76,6 +76,7 @@ import {
   normalizeThreadDiameter,
   normalizeThreadHand,
   normalizeThreadHead,
+  normalizeThreadDrive,
   normalizeThreadHeadChamfer,
   normalizeThreadHeadHeight,
   normalizeThreadPitch,
@@ -86,13 +87,20 @@ import {
   pitchToThreadsPerInch,
   threadChamferLimits,
   threadHeadChamferLimits,
+  threadHeadDiameterLimits,
+  threadDriveSizeLimits,
+  threadDriveDepthLimits,
+  threadDriveFields,
+  threadDriveSettings,
+  threadDriveOutline,
+  threadDriveOutlinePoints,
   threadHeadHeightLimits,
   threadNaturalHeight,
   threadPitchLimits,
   threadSettings,
   threadSizeFor,
   threadSizeById,
-  threadProfileForSize,
+  threadSizeSettings,
   threadUsesInchPitch,
   threadsPerInchToPitch,
   type ThreadSettings,
@@ -160,7 +168,7 @@ import {
 import { displayStepFromMillimeters, formatFractionalInches, showsInchFractions, displayToMillimeters, formatMeasurementNumber, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseMeasurementInput, resolveMeasurementInput } from "@/lib/measurementUnits";
 import { t, type MessageKey } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
-import { displayShapeName, makeShapeFromAsset, renamedShapeName } from "@/lib/shapeCatalog";
+import { displayShapeName, makeShapeFromAsset, renamedShapeName, shapeAssetDefaultDimensions } from "@/lib/shapeCatalog";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { SURFACE_TEXTURE_OWN_IMAGE_SIZE, surfaceTextureOwnImage } from "@/lib/surfaceTextureImages";
@@ -174,6 +182,7 @@ import { VasePrintReport } from "@/components/workplane/VasePrintReport";
 import { shapeDefaultsAsset, shapeDefaultsFromShape } from "@/lib/shapeDefaults";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, normalizeScrewHoleAngle, normalizeScrewHoleHeadDepth, normalizeScrewHoleShaft } from "@/lib/screwHoleGeometry";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
+import { maxPortCorner, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, type PortPreset } from "@/lib/portGeometry";
 import { MAX_DOVETAIL_CLEARANCE, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_EDGE, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { MAX_TEXT_EDGE, MIN_TEXT_EDGE, normalizeTextEdge } from "@/lib/textEdge";
@@ -276,12 +285,15 @@ import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
 import { isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
+import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { torusTessellation } from "@/lib/torusTessellation";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO, torusTubeRatio, torusTubeThickness } from "@/lib/torusShape";
 import { normalizePyramidTop } from "@/lib/pyramidGeometry";
 import {
+  DEFAULT_SPRING_TURNS,
+  DEFAULT_SPRING_WIRE,
   MAX_SPRING_QUALITY,
   MIN_SPRING_QUALITY,
   normalizeSpringQuality,
@@ -292,11 +304,24 @@ import {
   springTurnLimits,
   springWireLimits,
 } from "@/lib/springGeometry";
+import {
+  DEFAULT_FLAT_SPRING_TURNS,
+  DEFAULT_FLAT_SPRING_WIRE,
+  FLAT_SPRING_DIMENSIONS,
+  flatSpringSettings,
+  flatSpringTurnLimits,
+  flatSpringWireLimits,
+  normalizeFlatSpringEnds,
+  normalizeFlatSpringPattern,
+  normalizeFlatSpringTurns,
+  normalizeFlatSpringWire,
+  normalizeSpringForm,
+} from "@/lib/flatSpringGeometry";
 import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridOptions, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
 import { narrowCrossWidth, narrowEndWidth, normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight, slopeSidesFor } from "@/lib/slopeAlong";
-import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, ThreadDrive, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { selectWholeValue } from "@/lib/numberField";
 import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFormulas } from "@/lib/fieldFormulas";
 import { useKeptColors, useRecentColors } from "@/lib/recentColors";
@@ -306,6 +331,7 @@ import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
+import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
 import { MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
 /**
@@ -359,6 +385,11 @@ const GEAR_TYPE_OPTIONS: Array<{ value: GearType; label: MessageKey }> = [
   { value: "rack", label: "gear.rack" },
 ];
 /** The vase's choices, by the core's names for them. */
+const PORT_PRESET_LABELS: Record<PortPreset, MessageKey> = {
+  usbC: "port.usbC", usbCPlug: "port.usbCPlug", microUsb: "port.microUsb", usbA: "port.usbA",
+  hdmi: "port.hdmi", miniHdmi: "port.miniHdmi", displayPort: "port.displayPort", miniDisplayPort: "port.miniDisplayPort", rj45: "port.rj45",
+};
+
 const VASE_CHOICES: Partial<Record<VaseChoiceKey, Record<string, MessageKey>>> = {
   profile: { flasche: "vase.profileBottle", bauchig: "vase.profileBellied", schale: "vase.profileBowl", fass: "vase.profileBarrel", zylinder: "vase.profileCylinder", trichter: "vase.profileFunnel", gezeichnet: "vase.profileDrawn" },
   section: { kreis: "vase.sectionCircle", vieleck: "vase.sectionPolygon", welle: "vase.sectionWave", gezeichnet: "vase.sectionDrawn" },
@@ -402,6 +433,21 @@ const THREAD_HEAD_OPTIONS: Array<{ value: ThreadHead; label: MessageKey }> = [
   { value: "countersunk", label: "thread.headCountersunk" },
   { value: "hex", label: "thread.headHex" },
 ];
+const THREAD_DRIVE_OPTIONS: Array<{ value: ThreadDrive; label: MessageKey }> = [
+  { value: "hex", label: "thread.driveHex" },
+  { value: "torx", label: "thread.driveTorx" },
+  { value: "phillips", label: "thread.drivePhillips" },
+  { value: "slot", label: "thread.driveSlot" },
+  { value: "robertson", label: "thread.driveRobertson" },
+  { value: "none", label: "thread.driveNone" },
+];
+const DRIVE_SIZE_HINT: Record<Exclude<ThreadDrive, "none">, MessageKey> = {
+  hex: "prop.driveSizeHex",
+  torx: "prop.driveSizeTorx",
+  phillips: "prop.driveSizePhillips",
+  slot: "prop.driveSizeSlot",
+  robertson: "prop.driveSizeRobertson",
+};
 const THREAD_PROFILE_OPTIONS: Array<{ value: ThreadProfile; label: MessageKey }> = [
   { value: "v", label: "thread.profileV" },
   { value: "trapezoidal", label: "thread.profileTrapezoidal" },
@@ -499,7 +545,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceRingWidth", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceRingWidth", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -1019,6 +1065,45 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       },
       { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
       ...roundSideProperties(shape, width, width, onUpdate),
+    ];
+  }
+
+  if (shape.kind === "port") {
+    // A preset sets the socket's opening at once; a size changed by hand shows as "Custom" (#1049).
+    // The outline (round corners, or cut ones as on HDMI and DisplayPort) comes with the preset and stays when the size changes.
+    const profile = shape.portProfile;
+    const corner = normalizePortCorner(shape.cornerFillet, width, shape.height, profile);
+    const preset = portPresetFor(width, shape.height, shape.cornerFillet, profile);
+    const applyPreset = (value: string) => {
+      const chosen = PORT_PRESETS[value as PortPreset];
+      if (!chosen) return;
+      onUpdate({ ...widthPatch(chosen.width), height: chosen.height, cornerFillet: chosen.corner, portProfile: chosen.profile });
+    };
+    return [
+      {
+        type: "select",
+        id: "portPreset",
+        label: t("prop.portPreset"),
+        value: preset ?? "custom",
+        options: [
+          ...PORT_PRESET_ORDER.map((key) => ({ value: key, label: t(PORT_PRESET_LABELS[key]) })),
+          { value: "custom", label: t("port.custom") },
+        ],
+        hint: t("prop.portPresetHint"),
+        onChange: applyPreset,
+      },
+      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 100, onChange: (value) => onUpdate({ ...widthPatch(value), cornerFillet: normalizePortCorner(corner, value, shape.height, profile) }, { resizeAxis: "width" }) },
+      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 100, onChange: (value) => onUpdate({ height: value, cornerFillet: normalizePortCorner(corner, width, value, profile) }, { resizeAxis: "height" }) },
+      {
+        id: "portCorner",
+        label: t("prop.portCorner"),
+        value: Math.round(corner * 100) / 100,
+        min: 0,
+        max: Math.max(0.05, maxPortCorner(width, shape.height, profile)),
+        step: 0.05,
+        onChange: (value) => onUpdate({ cornerFillet: normalizePortCorner(value, width, shape.height, profile) }),
+      },
+      { id: "length", label: t("prop.portDepth"), value: depth, min: MIN_SHAPE_SIZE, max: 100, onChange: setDepth },
     ];
   }
 
@@ -1857,7 +1942,25 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       // A round tube has one outer diameter, and outer, inner and wall follow one another whatever is typed
       // first (see tubeDiameters.ts); the two sides Length and Width only come back for an oval one.
       const inner = tubeInnerDiameter(width, wall);
+      // A washer is a tube of its screw size's measures (ISO 7089, #1052): one choice sets all three.
+      const applyWasher = (value: string) => {
+        if (!isWasherSize(value)) return;
+        const washer = washerTubeFields(value);
+        onUpdate({ ...widthPatch(washer.width), depth: washer.depth, size: resizedShapeSize(washer.width, washer.depth), height: washer.height, bevel: washer.bevel }, { resizeAxis: "width" });
+      };
       return [
+        {
+          type: "select" as const,
+          id: "washerSize",
+          label: t("prop.washerSize"),
+          value: washerSizeFor(width, inner, shape.height) ?? "custom",
+          options: [
+            { value: "custom", label: t("port.custom") },
+            ...WASHER_SIZE_ORDER.map((size) => ({ value: size, label: size })),
+          ],
+          hint: t("prop.washerSizeHint"),
+          onChange: applyWasher,
+        },
         ...roundSideProperties(shape, width, depth, onUpdate),
         {
           id: "outerDiameter",
@@ -1905,6 +2008,116 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
   }
 
   if (shape.kind === "spring") {
+    /*
+     * The form switch (#1076): a flat spring lies on the plate, so the switch
+     * also gives it a strip's measures, and back to the coil a coil's.
+     */
+    const formSelect = {
+      type: "select" as const,
+      id: "springForm",
+      label: t("prop.springForm"),
+      value: normalizeSpringForm(shape.springForm),
+      options: [{ value: "coil", label: t("spring.coil") }, { value: "flat", label: t("spring.flat") }],
+      onChange: (form: string) => {
+        if (normalizeSpringForm(form) === normalizeSpringForm(shape.springForm)) return;
+        if (form === "flat") {
+          const { width: nextWidth, depth: nextDepth, height: nextHeight } = FLAT_SPRING_DIMENSIONS;
+          onUpdate({ springForm: "flat", width: nextWidth, depth: nextDepth, height: nextHeight, size: resizedShapeSize(nextWidth, nextDepth), springWire: DEFAULT_FLAT_SPRING_WIRE, springTurns: DEFAULT_FLAT_SPRING_TURNS });
+        } else {
+          const coil = shapeAssetDefaultDimensions("spring");
+          onUpdate({ springForm: undefined, width: coil.width, depth: coil.depth, height: coil.height, size: resizedShapeSize(coil.width, coil.depth), springWire: DEFAULT_SPRING_WIRE, springTurns: DEFAULT_SPRING_TURNS });
+        }
+      },
+    };
+    if (shape.springForm === "flat") {
+      const flat = flatSpringSettings(shape, width, depth);
+      const wireLimits = flatSpringWireLimits(width, depth, flat.pattern, flat.ends);
+      const turnLimits = flatSpringTurnLimits(width, depth, flat.wire, flat.pattern, flat.ends);
+      // As with the coil: band and turns move into what the new measures or settings hold.
+      const fit = (nextWidth: number, nextDepth: number, pattern = flat.pattern, ends = flat.ends) => {
+        const wire = normalizeFlatSpringWire(flat.wire, nextWidth, nextDepth, pattern, ends);
+        return { springWire: wire, springTurns: normalizeFlatSpringTurns(flat.turns, nextWidth, nextDepth, wire, pattern, ends) };
+      };
+      return [
+        formSelect,
+        {
+          type: "select",
+          id: "springPattern",
+          label: t("prop.springPattern"),
+          value: flat.pattern,
+          options: [{ value: "round", label: t("spring.round") }, { value: "zigzag", label: t("spring.zigzag") }, { value: "square", label: t("spring.square") }],
+          onChange: (value) => {
+            const pattern = normalizeFlatSpringPattern(value);
+            onUpdate({ springPattern: pattern, ...fit(width, depth, pattern) });
+          },
+        },
+        {
+          type: "select",
+          id: "springEnds",
+          label: t("prop.springEnds"),
+          value: flat.ends,
+          options: [{ value: "eye", label: t("spring.eye") }, { value: "tab", label: t("spring.tab") }, { value: "none", label: t("spring.none") }],
+          onChange: (value) => {
+            const ends = normalizeFlatSpringEnds(value);
+            onUpdate({ springEnds: ends, ...fit(width, depth, flat.pattern, ends) });
+          },
+        },
+        {
+          id: "turns",
+          label: t("prop.bends"),
+          value: flat.turns,
+          min: turnLimits.min,
+          max: turnLimits.max,
+          step: 1,
+          onChange: (turns) => onUpdate({ springTurns: normalizeFlatSpringTurns(turns, width, depth, flat.wire, flat.pattern, flat.ends) }),
+        },
+        {
+          id: "wire",
+          label: t("prop.band"),
+          value: flat.wire,
+          min: wireLimits.min,
+          max: wireLimits.max,
+          step: 0.1,
+          onChange: (value) => {
+            const wire = normalizeFlatSpringWire(value, width, depth, flat.pattern, flat.ends);
+            onUpdate({ springWire: wire, springTurns: normalizeFlatSpringTurns(flat.turns, width, depth, wire, flat.pattern, flat.ends) });
+          },
+        },
+        {
+          id: "quality",
+          label: t("prop.quality"),
+          value: normalizeSpringQuality(shape.springQuality),
+          min: MIN_SPRING_QUALITY,
+          max: MAX_SPRING_QUALITY,
+          step: 4,
+          onChange: (quality) => onUpdate({ springQuality: normalizeSpringQuality(quality) }),
+        },
+        {
+          id: "length",
+          label: t("prop.length"),
+          value: width,
+          min: MIN_SHAPE_SIZE,
+          max: 480,
+          onChange: (value) => onUpdate({ width: value, size: resizedShapeSize(value, depth), ...fit(value, depth) }, { resizeAxis: "width" }),
+        },
+        {
+          id: "width",
+          label: t("prop.width"),
+          value: depth,
+          min: MIN_SHAPE_SIZE,
+          max: 160,
+          onChange: (value) => onUpdate({ depth: value, size: resizedShapeSize(width, value), ...fit(width, value) }, { resizeAxis: "depth" }),
+        },
+        {
+          id: "height",
+          label: t("prop.height"),
+          value: shape.height,
+          min: MIN_SHAPE_SIZE,
+          max: 160,
+          onChange: (value) => onUpdate({ height: value }, { resizeAxis: "height" }),
+        },
+      ];
+    }
     const across = Math.max(width, depth);
     const settings = springSettings(shape, across, shape.height);
     const wireLimits = springWireLimits(across, shape.height);
@@ -1921,6 +2134,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       return { springWire: wire, springTurns: normalizeSpringTurns(settings.turns, reach, nextHeight, wire) };
     };
     return [
+      formSelect,
       {
         id: "turns",
         label: t("prop.turns"),
@@ -1994,6 +2208,9 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const headLimits = threadHeadHeightLimits(settings);
     const chamferLimits = threadChamferLimits(settings);
     const headChamferLimits = threadHeadChamferLimits(settings);
+    const headDiameterLimits = threadHeadDiameterLimits(settings);
+    const driveSizeLimits = threadDriveSizeLimits(settings);
+    const driveDepthLimits = threadDriveDepthLimits(settings);
     // Zollgewinde werden in Gaengen je Zoll gedacht, nicht in Millimetern.
     const inchPitch = threadUsesInchPitch(settings.diameter);
     const sizeOptions = [
@@ -2034,9 +2251,23 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         keepHeadHeight ? next.headHeight : defaultThreadHeadHeight(headBase),
         headBase,
       );
+      // Kopfbreite und Antrieb (#1052): gesetzte Werte bleiben, ungesetzte
+      // folgen der Groesse. Eine andere Kopfform misst anders (Sechskant ueber
+      // die Schluesselflaechen), ein anderer Antrieb auch - dann gilt wieder
+      // das Normmass.
+      const headSize = { ...headBase, headHeight: next.headHeight };
+      const headChanged = next.head !== settings.head;
+      const driveChanged = next.drive !== settings.drive;
+      const driveFields = threadDriveFields({
+        threadHeadDiameter: patch.headDiameter ?? (headChanged ? undefined : shape.threadHeadDiameter),
+        threadDrive: patch.drive ?? (headChanged ? undefined : shape.threadDrive),
+        threadDriveSize: patch.driveSize ?? (headChanged || driveChanged ? undefined : shape.threadDriveSize),
+        threadDriveDepth: patch.driveDepth ?? (headChanged ? undefined : shape.threadDriveDepth),
+      }, headSize);
+      Object.assign(next, threadDriveSettings(driveFields, headSize));
       // Die Kopffase haengt am Kopf: wer den Kopf flacher zieht oder auf
       // Senkkopf umschaltet, darf keine Fase behalten, die es dort nicht gibt.
-      next.headChamfer = normalizeThreadHeadChamfer(next.headChamfer, { ...headBase, headHeight: next.headHeight, chamferLow: next.chamferLow, profile: next.profile });
+      next.headChamfer = normalizeThreadHeadChamfer(next.headChamfer, { ...headSize, headDiameter: next.headDiameter, drive: next.drive, driveSize: next.driveSize, chamferLow: next.chamferLow, profile: next.profile });
       const footprint = threadNaturalFootprint(next);
       const update: Partial<WorkplaneShape> = {
         threadRole: next.role,
@@ -2056,6 +2287,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         threadChamfer: next.chamfer,
         threadChamferBottom: next.chamferLow,
         threadHeadChamfer: next.headChamfer,
+        ...driveFields,
         width: footprint.width,
         depth: footprint.depth,
         size: resizedShapeSize(footprint.width, footprint.depth),
@@ -2092,6 +2324,13 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         value: settings.head,
         options: THREAD_HEAD_OPTIONS.map((option) => ({ value: option.value, label: t(option.label) })),
         onChange: (head) => applyThread({ head: normalizeThreadHead(head) }),
+      }, {
+        type: "select",
+        id: "threadDrive",
+        label: t("inspector.threadDrive"),
+        value: settings.drive,
+        options: THREAD_DRIVE_OPTIONS.map((option) => ({ value: option.value, label: t(option.label) })),
+        onChange: (drive) => applyThread({ drive: normalizeThreadDrive(drive, settings.head) }),
       });
     }
     properties.push(
@@ -2105,8 +2344,9 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         onChange: (value) => {
           const chosen = threadSizeById(value);
           // Eine G-Groesse bringt ihr Whitworth-Profil mit, eine M-, UNC- oder
-          // UNF-Groesse das Spitzgewinde; Trapez und Rund bleiben stehen.
-          if (chosen) applyThread({ diameter: chosen.diameter, pitch: chosen.pitch, profile: threadProfileForSize(chosen, settings.profile) });
+          // UNF-Groesse das Spitzgewinde, ein Flaschenhals sein eigenes Profil;
+          // Trapez und Rund bleiben stehen.
+          if (chosen) applyThread(threadSizeSettings(chosen, settings.profile, standard));
         },
       },
       {
@@ -2138,6 +2378,38 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         step: 0.1,
         onChange: (headHeight) => applyThread({ headHeight }),
       });
+      // Den Senkkopf legt seine Hoehe fest; Zylinder- und Sechskantkopf haben eine eigene Breite (#1052).
+      if (settings.head !== "countersunk") {
+        properties.push({
+          id: "headDiameter",
+          label: t(settings.head === "hex" ? "prop.headAcrossFlats" : "prop.headDiameter"),
+          value: settings.headDiameter,
+          min: headDiameterLimits.min,
+          max: headDiameterLimits.max,
+          step: 0.1,
+          onChange: (headDiameter) => applyThread({ headDiameter }),
+        });
+      }
+      if (settings.drive !== "none") {
+        properties.push({
+          id: "driveSize",
+          label: t("prop.driveSize"),
+          value: settings.driveSize,
+          min: driveSizeLimits.min,
+          max: driveSizeLimits.max,
+          step: 0.05,
+          hint: t(DRIVE_SIZE_HINT[settings.drive]),
+          onChange: (driveSize) => applyThread({ driveSize }),
+        }, {
+          id: "driveDepth",
+          label: t("prop.driveDepth"),
+          value: settings.driveDepth,
+          min: driveDepthLimits.min,
+          max: driveDepthLimits.max,
+          step: 0.05,
+          onChange: (driveDepth) => applyThread({ driveDepth }),
+        });
+      }
     }
     /*
      * Die Aussenfase gibt es am Schraubenkopf und an der Mutter: beide haben
@@ -2347,8 +2619,18 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         step: 0.1,
         onChange: (value) => onUpdate({ centerHoleSize: normalizeHirthBore(value, baseWidth, baseDepth) }),
       },
-      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: (value) => keepAngle(depthPatch(value), teeth, { resizeAxis: "depth" }) },
-      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: (value) => keepAngle(widthPatch(value), teeth, { resizeAxis: "width" }) },
+      // Round like a cylinder: stretched, the teeth would no longer interlock all round.
+      {
+        id: "diameter",
+        label: t("prop.diameter"),
+        value: width,
+        min: MIN_SHAPE_SIZE,
+        max: 160,
+        onChange: (value) => {
+          const patch = widthPatch(value);
+          keepAngle({ ...patch, depth: patch.width ?? value }, teeth, { resizeAxis: "width" });
+        },
+      },
       {
         id: "height",
         label: t("prop.height"),
@@ -2682,6 +2964,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
     { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
     { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+    // A tube with rounded or chamfered ends keeps its switch (#1067).
+    ...(tubeBeforeEdgeTreatments(shape) ? [{ type: "toggle" as const, id: "tubeBoreHole", label: t("prop.tubeBoreHole"), value: shape.tubeBoreHole === true, onChange: (value: boolean) => onUpdate({ tubeBoreHole: value || undefined }) }] : []),
   ];
 }
 
@@ -3041,6 +3325,7 @@ export function ShapeInspector({
   const showTaperCards = !shapeIgnoresTaper && !shape.layeredText;
   const threadRoleProperty = isThread ? findSelectProperty(properties, "threadRole") : null;
   const threadHeadProperty = isThread ? findSelectProperty(properties, "threadHead") : null;
+  const threadDriveProperty = isThread ? findSelectProperty(properties, "threadDrive") : null;
   // A vase: its measures here, its form and pattern and its bottom and wall on cards of their own.
   const vaseFormProperties = shape.kind === "vase" ? properties.filter((property) => property.id.startsWith("vase.")) : [];
   const vaseFloorProperties = shape.kind === "vase" ? properties.filter((property) => property.id.startsWith("vaseFloor.")) : [];
@@ -3051,7 +3336,7 @@ export function ShapeInspector({
     : shape.kind === "gear"
     ? properties.filter((property) => ["centerHole", "length", "width", "height"].includes(property.id))
     : isThread
-      ? properties.filter((property) => ["threadSize", "diameter", "threadLength", "headHeight", "headChamfer"].includes(property.id))
+      ? properties.filter((property) => ["threadSize", "diameter", "threadLength", "headHeight", "headDiameter", "driveSize", "driveDepth", "headChamfer"].includes(property.id))
       : properties.filter((property) => shape.kind !== "text" || !TEXT_FILL_MORE_IDS.has(property.id));
   // A text's fill (#215): the list and the line width in view, the rest under "More" right below them.
   const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
@@ -3729,6 +4014,20 @@ export function ShapeInspector({
                   preview: <ThreadHeadPreview head={option.value} />,
                 }))}
                 onChange={threadHeadProperty.onChange}
+              />
+            ) : null}
+            {threadDriveProperty ? (
+              <IconOptionSelector
+                label={t("inspector.threadDrive")}
+                columns={2}
+                value={threadDriveProperty.value}
+                disabled={locked}
+                options={THREAD_DRIVE_OPTIONS.map((option) => ({
+                  value: option.value,
+                  label: t(option.label),
+                  preview: <ThreadDrivePreview drive={option.value} />,
+                }))}
+                onChange={threadDriveProperty.onChange}
               />
             ) : null}
             {onProportionLockChange && primaryProperties.some((property) => property.id === "height") && primaryProperties.some((property) => ["width", "length", "diameter", "outerDiameter"].includes(property.id)) ? (
@@ -6517,6 +6816,19 @@ function ThreadHeadPreview({ head }: { head: ThreadHead }) {
       <path d="M9 16V3h6v13" />
       <path d="M9 7.1l6-1.1M9 11.1l6-1.1" />
       <path d="M10.5 22v-3h3v3z" />
+    </svg>
+  );
+}
+
+/** Der Antrieb von oben, so wie man in den Kopf schaut. */
+function ThreadDrivePreview({ drive }: { drive: ThreadDrive }) {
+  const common = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinejoin: "round" as const, "aria-hidden": true };
+  const recess = drive === "none" ? null : threadDriveOutline(drive, drive === "phillips" ? 14 : drive === "slot" ? 16 : drive === "robertson" ? 10 : 12);
+  const points = recess ? threadDriveOutlinePoints(recess).map(([x, z]) => `${(12 + x).toFixed(2)},${(12 - z).toFixed(2)}`).join(" ") : "";
+  return (
+    <svg {...common}>
+      <circle cx="12" cy="12" r="10" />
+      {recess ? <polygon points={points} /> : null}
     </svg>
   );
 }

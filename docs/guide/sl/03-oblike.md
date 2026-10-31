@@ -77,7 +77,7 @@ Okrogle oblike, kot so valj, stožec, cev, elipsa ali izvrtine, imajo v lastnost
 
 - **Pri izvozu STEP.** Zapiše okroglo obliko, ne večkotnika.
 - **Pri posnetjih in zaokrožitvah** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}), dokler oblika ostane okrogla. To je tako, če nisi nastavil števila stranic, če je število vsaj tako visoko kot privzeta vrednost oblike ali če se večkotnik od kroga razlikuje za največ {{value:EXACT_ROUND_TOLERANCE}} mm. Privzeta vrednost je {{value:ROUND_FROM_SIDES}} stranic pri valju, elipsi, cevi in stožcu, {{value:ROUND_FROM_ROOF_SIDES}} pri {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} korakov pri {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} pri {{ui:shape.halfSphere}} in {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} stranic in {{value:ROUND_FROM_TORUS_STEPS}} korakov pri {{ui:shape.torus}} in {{ui:prop.quality}} {{value:ROUND_FROM_BENT_TUBE_QUALITY}} pri okrogli {{ui:shape.bentTube}}.
-- **Pri navoju, vzmeti ali poševnem zobniku.** Robno orodje in izvoz STEP vzameta natančno telo; {{ui:prop.quality}} določa samo, kako fino je oblika narisana.
+- **Pri navoju, vzmeti, poševnem ali puščičnem zobniku.** Robno orodje in izvoz STEP vzameta natančno telo; {{ui:prop.quality}} določa samo, kako fino je oblika narisana.
 
 **Kje spet postane pomembno**
 
@@ -110,7 +110,7 @@ Korak mreže je spodaj desno v urejevalniku in ga lahko kadarkoli spremeniš.
 
 ## Kopiranje in podvajanje
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} in {{ui:editor.tool.duplicate}} so v orodni vrstici ({{ui:editor.group.clipboard}}). Z [[Ctrl]]+[[D]] podvojiš izbor. layerling si pri tem zapomni, kako si kopijo nazadnje premaknil ali zavrtel, in isto uporabi ob naslednjem podvajanju. Tako z nekaj pritiski tipk nastane vrsta lukenj ali stopnic. Za pravilne razporeditve je poleg tega polje, ki je opisano v poglavju [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} in {{ui:editor.tool.duplicate}} so v orodni vrstici ({{ui:editor.group.clipboard}}). Z [[Ctrl]]+[[D]] podvojiš izbor. layerling si pri tem zapomni, kako si kopijo nazadnje premaknil ali zavrtel, in isto uporabi ob naslednjem podvajanju. Tako z nekaj pritiski tipk nastane vrsta lukenj ali stopnic. Za pravilne razporeditve je poleg tega polje, ki je opisano v poglavju [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje). Če si kopiji spremenil tudi velikost, se vsaka naslednja kopija znova spremeni za enak faktor, kot v Tinkercadu.
 
 > **Namig:** Če oblika ne zavzame želene velikosti, je razlog pogosto v mejah za nove oblike. Pod {{ui:workspace.shapeDefaults}} v nastavitvah določiš, kako se vsaka oblika začne in kako velika lahko največ postane.
 

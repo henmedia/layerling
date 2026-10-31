@@ -74,5 +74,28 @@ export function guideSearch(prepared: GuidePrepared[], query: string, limit?: nu
   return found.slice(0, limit || 8);
 }
 
+/**
+ * Every place in a folded text where one of the query's words stands, in order and with places that
+ * touch or overlap joined into one, for the page a result leads to to mark them all (#1059). Words of
+ * a single letter are left out when the query has longer ones: they would light up half the page.
+ */
+export function guideRanges(text: string, query: string, umlauts?: boolean): GuideFound[] {
+  var tokens = guideTokens(query), longer = tokens.filter(function (w) { return w.length > 1; });
+  if (longer.length) tokens = longer;
+  var all: GuideFound[] = [];
+  tokens.forEach(function (w) {
+    var forms = guideForms(w, !!umlauts), f = guideFind(text, forms, 0);
+    while (f) { all.push(f); f = guideFind(text, forms, f.at + f.len); }
+  });
+  all.sort(function (a, b) { return a.at - b.at; });
+  var joined: GuideFound[] = [];
+  all.forEach(function (f) {
+    var last = joined[joined.length - 1];
+    if (last && f.at <= last.at + last.len) last.len = Math.max(last.len, f.at + f.len - last.at);
+    else joined.push({ at: f.at, len: f.len });
+  });
+  return joined;
+}
+
 /** The functions in the order a page needs them, for the build to copy. */
-export const GUIDE_SEARCH_CORE_FUNCTIONS = [guideFold, guideForms, guideFind, guidePrepare, guideTokens, guideSearch];
+export const GUIDE_SEARCH_CORE_FUNCTIONS = [guideFold, guideForms, guideFind, guidePrepare, guideTokens, guideSearch, guideRanges];

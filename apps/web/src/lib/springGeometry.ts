@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { toCreasedNormals } from "@/lib/creasedNormals";
-import type { ThreadHand } from "@/types/layerling";
+import { createFlatSpringGeometry } from "@/lib/flatSpringGeometry";
+import type { FlatSpringEnds, FlatSpringPattern, SpringForm, ThreadHand } from "@/types/layerling";
 
 export const DEFAULT_SPRING_TURNS = 6;
 export const DEFAULT_SPRING_WIRE = 3;
@@ -34,6 +35,9 @@ export type SpringShapeFields = {
   springWire?: number;
   springQuality?: number;
   springHand?: ThreadHand;
+  springForm?: SpringForm;
+  springPattern?: FlatSpringPattern;
+  springEnds?: FlatSpringEnds;
 };
 
 export type SpringSettings = {
@@ -167,6 +171,7 @@ export function springBuildPlan(options: SpringGeometryOptions) {
  * dreht sich der Querschnitt unterwegs auch nicht auf.
  */
 export function createSpringGeometry(options: SpringGeometryOptions) {
+  if (options.springForm === "flat") return createFlatSpringGeometry(options);
   const { settings, wireRadius, coilRadius, twist, span, bottom, zSign, scaleX, scaleZ } = springBuildPlan(options);
   const stations = Math.max(8, Math.round(settings.quality)) * settings.turns;
   const ringSegments = springRingSegments(settings.quality);

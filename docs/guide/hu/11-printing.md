@@ -5,7 +5,7 @@ summary: A saját nyomtatód kiválasztása, figyelmeztetés, ha valami nem fér
 
 ## A nyomtatód kiválasztása
 
-Nyisd meg a beállításokat (a fogaskerék a szalagon, {{ui:editor.workspaceSettings}}), és válts a {{ui:workspace.workplane}} részre. A {{ui:workspace.printer}} alatt egy több mint 230 elterjedt modellt tartalmazó listából választod ki a nyomtatódat, köztük Bambu Lab, Prusa, Creality, Anycubic, Elegoo és sok más gyártó gépeit.
+Nyisd meg a beállításokat (a fogaskerék a címsorban, {{ui:editor.workspaceSettings}}), és válts a {{ui:workspace.workplane}} részre. A {{ui:workspace.printer}} alatt egy több mint 230 elterjedt modellt tartalmazó listából választod ki a nyomtatódat, köztük Bambu Lab, Prusa, Creality, Anycubic, Elegoo és sok más gyártó gépeit.
 
 ![A munkasík beállításai kiválasztott nyomtatóval. A tárgyasztal és a legnagyobb nyomtatási magasság a szeletelőprofilból származik.](shot:settings-workplane)
 

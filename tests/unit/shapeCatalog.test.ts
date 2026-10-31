@@ -52,13 +52,14 @@ describe("shape catalog", () => {
     expect(rulerIndex).toBe(kinds.length - 1);
   });
 
-  it("puts the screw holes and the teardrop after the bent tube, and text right behind them", () => {
+  it("puts the screw holes, the teardrop and the port opening after the bent tube, and text right behind them", () => {
     const kinds = toolbarShapeAssets.map((asset) => asset.kind);
     expect(kinds.indexOf("counterbore")).toBe(kinds.indexOf("bentTube") + 1);
     expect(kinds.indexOf("countersink")).toBe(kinds.indexOf("counterbore") + 1);
     expect(kinds.indexOf("doubleCountersink")).toBe(kinds.indexOf("countersink") + 1);
     expect(kinds.indexOf("teardrop")).toBe(kinds.indexOf("doubleCountersink") + 1);
-    expect(kinds.indexOf("text")).toBe(kinds.indexOf("teardrop") + 1);
+    expect(kinds.indexOf("port")).toBe(kinds.indexOf("teardrop") + 1);
+    expect(kinds.indexOf("text")).toBe(kinds.indexOf("port") + 1);
   });
 
   it("puts Gridfinity right after the spring", () => {

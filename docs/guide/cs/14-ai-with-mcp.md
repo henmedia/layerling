@@ -78,7 +78,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_apply_edge_treatment` | zkosí nebo zaoblí vybrané hrany |
 | `layerling_hollow_object` | vytvoří dutinu s rovnoměrnou stěnou |
 | `layerling_cut_out` | vyřízne jedno těleso z druhého, aby k sobě pasovala: díl zůstane, kopie zvětšená o vůli se odečte od druhého tělesa |
-| `layerling_offset_object` | odsadí všechny plochy tělesa pro vůli lícovaného spoje: zvětší nebo zmenší těleso, nebo přidá zvětšenou kopii jako díru |
+| `layerling_offset_object` | odsadí všechny plochy tělesa pro vůli lícovaného spoje: zvětší nebo zmenší těleso, nebo přidá zvětšenou kopii jako díru, nebo posune jen boky |
 | `layerling_list_faces` | vypíše plochy přesného tělesa |
 | `layerling_delete_faces` | smaže plochy a uzavře mezeru |
 | `layerling_array_objects` | opakuje objekty v řadě nebo po kružnici |
@@ -86,7 +86,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_layer_text` | vytvoří vrstvenou jmenovku: písmena, širší okraje a souvislou podložku; podporuje otvor na kroužek, rohy po vrstvách, úpravu hran písmen a seznam jmen |
 | `layerling_layer_icon` | vytvoří vrstvený štítek ze SVG nebo vysunutého náčrtu, s rozšířenými okraji a souvislou podložkou; umožní změnit šířku a vrstvy i rozmístit více kopií na podložku |
 | `layerling_create_qr_code` | vytvoří z textu nebo webové adresy QR kód jako {{ui:shape.qrCode}} v knihovně tvarů – samotný kód, vystouplý na destičce nebo vyrytý, s opravou chyb, šířkou, výškou, klidovou zónou a na přání jako otvor; varuje, když modul klesne pod 0,8 mm |
-| `layerling_reference_image` | přidá referenční obrázek z obrázku jako {{ui:import.referenceImage}}, nebo jeden posune, otočí, kalibruje (dva body obrázku a jejich skutečná vzdálenost), zprůhlední nebo zamkne - pomůcka, která se nikdy neexportuje ani netiskne |
+| `layerling_reference_image` | přidá referenční obrázek z obrázku jako {{ui:import.referenceImage}}, nebo jeden posune, otočí, kalibruje (dva body obrázku a jejich skutečná vzdálenost), zprůhlední nebo zamkne - pomůcka, která se nikdy neexportuje ani netiskne; `trace` udělá z tmavé nebo světlé části těleso náčrtu, které na něm stojí |
 | `layerling_measure_section` | změří tloušťku stěny, mezeru či vůli v řezu mezi body přichycenými k obrysu |
 | `layerling_show_overhangs` | zapne šrafování převisů, nastaví úhel a oznámí plochu vyžadující podpěry pro každé těleso |
 | `layerling_estimate_print` | odhadne objem, hmotnost a délku filamentu výběru nebo projektu, pro plný tisk i přibližně se stěnami a výplní |

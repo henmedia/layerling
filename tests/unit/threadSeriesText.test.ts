@@ -24,7 +24,7 @@ describe("thread size series texts", () => {
   });
 
   it("names the series in its header, and every size belongs to the series it is listed under", () => {
-    const leads = { metric: "M", UNC: "UNC", UNF: "UNF", G: "G" } as const;
+    const leads = { metric: "M", UNC: "UNC", UNF: "UNF", G: "G", bottle: "PCO" } as const;
     for (const group of THREAD_SIZE_GROUPS) {
       for (const messages of Object.values(catalogues)) expect(messages[THREAD_SERIES_TEXT[group.series].group].startsWith(`${leads[group.series]} – `)).toBe(true);
       for (const size of group.sizes) expect(threadSeriesFor(size)).toBe(group.series);

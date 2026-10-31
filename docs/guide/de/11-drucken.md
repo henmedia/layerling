@@ -5,7 +5,7 @@ summary: Den eigenen Drucker wählen, gewarnt werden, wenn etwas nicht passt, un
 
 ## Den Drucker wählen
 
-Öffne die Einstellungen (das Zahnrad im Menüband, {{ui:editor.workspaceSettings}}) und wechsle zum Bereich {{ui:workspace.workplane}}. Bei {{ui:workspace.printer}} suchst du deinen Drucker aus einer Liste von über 230 gängigen Modellen aus, darunter Bambu Lab, Prusa, Creality, Anycubic, Elegoo und viele mehr.
+Öffne die Einstellungen (das Zahnrad in der Titelzeile, {{ui:editor.workspaceSettings}}) und wechsle zum Bereich {{ui:workspace.workplane}}. Bei {{ui:workspace.printer}} suchst du deinen Drucker aus einer Liste von über 230 gängigen Modellen aus, darunter Bambu Lab, Prusa, Creality, Anycubic, Elegoo und viele mehr.
 
 ![Die Einstellungen der Arbeitsebene mit gewähltem Drucker. Druckbett und maximale Druckhöhe stammen aus dem Slicer-Profil.](shot:settings-workplane)
 

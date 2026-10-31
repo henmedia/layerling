@@ -66,7 +66,7 @@ Poznámka zachytí informace, které geometrie nevyjadřuje: „Šroub je o 0,3 
 - Když je její těleso smazáno nebo pod ní už není žádné viditelné těleso, poznámka zůstane, kde byla, na pracovní rovině.
 - Tažením za špendlík poznámku přesunete. Kliknutím na špendlík kartu sbalíte, zůstane jen malé číslo; dalším kliknutím ji zase otevřete. Kliknutím do textu ho upravíte.
 - [[Enter]] potvrdí text, [[Esc]] vrátí podobu před zahájením úpravy. [[Shift]]+[[Enter]] vloží nový řádek.
-- **V náčrtu** vložíte poznámku také pomocí {{ui:editor.tool.note}} (v sekci {{ui:editor.group.manage}}) nebo klávesy [[N]], kamkoli do náčrtu. Všechny poznámky náčrtu patří k jeho tělesu: ve 3D zobrazení na něm sedí, nahoře na tělese vytvořeném přes {{ui:sketch.extrude}} nebo {{ui:sketch.sweep}} a na nakresleném profilu tělesa vytvořeného přes {{ui:sketch.revolve}}, a pohybují se s ním. Když náčrt znovu otevřete, ukáže poznámky tělesa, i ty vložené ve 3D. V náčrtu vezme {{ui:sketch.undo}} poznámku zpět stejně jako čáru a {{ui:sketch.cancel}} zahodí, co jste na poznámkách změnili. [[Shift]]+[[N]] poznámky i zde zobrazí nebo skryje.
+- **V náčrtu** vložíte poznámku také pomocí {{ui:editor.tool.note}} nebo klávesy [[N]], kamkoli do náčrtu. Všechny poznámky náčrtu patří k jeho tělesu: ve 3D zobrazení na něm sedí, nahoře na tělese vytvořeném přes {{ui:sketch.extrude}} nebo {{ui:sketch.sweep}} a na nakresleném profilu tělesa vytvořeného přes {{ui:sketch.revolve}}, a pohybují se s ním. Když náčrt znovu otevřete, ukáže poznámky tělesa, i ty vložené ve 3D. V náčrtu vezme {{ui:sketch.undo}} poznámku zpět stejně jako čáru a {{ui:sketch.cancel}} zahodí, co jste na poznámkách změnili. [[Shift]]+[[N]] poznámky i zde zobrazí nebo skryje.
 
 Poznámky se ukládají v projektu, do exportu se nezahrnují a jejich viditelnost přepíná {{ui:visibility.notes}} (v {{ui:editor.visibilityOptions}}, šipce vedle ikony oka) nebo zkratka [[Shift]]+[[N]].
 
@@ -90,4 +90,4 @@ Referenční obrázek je obrázek, podle kterého zarovnáte díly: položte fot
 - {{ui:referenceImage.calibrate}} mu dá skutečnou velikost jako ve skice: klikněte na dva body obrázku, jejichž skutečnou vzdálenost znáte - třeba dva montážní otvory desky - a zadejte tuto vzdálenost do pole {{ui:referenceImage.distance}}. Obrázek si zachová proporce i střed.
 - Zamkněte ho zámkem v záhlaví jeho nastavení a zůstane na místě: kliknutí pak jím procházejí na podložku. K odemčení ho vyberte v seznamu objektů.
 - Obrázek je v souboru návrhu uložen jednou, ať se kopíruje nebo vrací kolikrát chce. Velký obrázek zvětší soubor o tolik; hlášení při přidání uvede jeho velikost.
-- AI ho přidá, posune, kalibruje, zeslabí a zamkne pomocí `layerling_reference_image`.
+- AI ho přidá, posune, kalibruje, zeslabí a zamkne pomocí `layerling_reference_image`. S `trace` obrázek obkreslí do tělesa náčrtu, které na něm stojí, jako {{ui:sketch.traceImage}} v náčrtu.

@@ -1209,7 +1209,7 @@ export function collapseShortEdges(vertices: ArrayLike<number>, indices: Uint32A
       if (prev === undefined) seen.set(key, m - 3);
       else if (prev >= 0) {
         // A second triangle on the same points: of opposite winding both cancel, of the same winding one stays.
-        const p = out[prev], q = out[prev + 1], r = out[prev + 2];
+        const p = out[prev], q = out[prev + 1];
         const same = (p === a && q === b) || (p === b && q === c) || (p === c && q === a);
         out[m - 3] = -1;
         if (!same) {

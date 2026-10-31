@@ -9,6 +9,19 @@ import type { PlateSpot, RotateHandleSpot } from "@/lib/sketchHandleSpots";
 const ARROW_RADIUS = 26 * 0.6;
 
 /**
+ * How wide, in screen pixels, the band along the arrow that takes the pointer is. Only the arrow itself grabs:
+ * the 3D handle's 40px square, standing just beyond a corner, covered most of the sketch's corner square and
+ * a drag meant to scale turned instead (forum, 621826).
+ */
+export const SKETCH_ROTATE_HIT_WIDTH = 14;
+
+/** The arrow for a spot whose way out from the middle is `outward`, in screen pixels about the spot. */
+export function sketchRotateArrow(outward: PlateSpot) {
+  // Flat on the plate: the arc lies in the plate and turns about its normal.
+  return rotateHandleArrow((point) => ({ x: point.x, y: point.z }), { x: 0, y: 0, z: 0 }, { x: outward.x, y: 0, z: outward.z }, { x: 0, y: 1, z: 0 }, ARROW_RADIUS);
+}
+
+/**
  * The turning arrows round a picture or a selection in the sketch: the 3D editor's rotate handle for the
  * up axis, the same arrow in the same blue, one at each spot. Drawn in screen pixels, scaled onto the plate.
  */
@@ -31,14 +44,12 @@ export function SketchRotateHandles({
   return (
     <g className="sketch-rotate-handles">
       {spots.map((spot) => {
-        // Flat on the plate: the arc lies in the plate and turns about its normal.
-        const arrow = rotateHandleArrow((point) => ({ x: point.x, y: point.z }), { x: 0, y: 0, z: 0 }, { x: spot.outward.x, y: 0, z: spot.outward.z }, { x: 0, y: 1, z: 0 }, ARROW_RADIUS);
+        const arrow = sketchRotateArrow(spot.outward);
         return (
           <g key={spot.corner} className={`sketch-rotate-handle ${locked ? "locked" : ""}`} data-sketch-entity={entity} transform={`translate(${spot.x} ${spot.z}) scale(${screenUnit})`} onPointerDown={(event) => onPointerDown(event, spot.corner)}>
             <title>{title}</title>
-            {/* The 40px grab area of the 3D handle. */}
-            <rect className="sketch-rotate-handle-hit" x={-20} y={-20} width={40} height={40} />
             <svg x={-15} y={-15} width={30} height={30} viewBox="-15 -15 30 30" overflow="visible">
+              <path className="sketch-rotate-handle-hit" d={`${arrow.arc} ${arrow.heads}`} strokeWidth={SKETCH_ROTATE_HIT_WIDTH} />
               <path className="rotate-arrow-arc" d={arrow.arc} />
               <path className="rotate-arrow-heads" d={arrow.heads} />
             </svg>

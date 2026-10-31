@@ -5,7 +5,7 @@ summary: 選擇自己的印表機、在零件放不下時收到警告，以及�
 
 ## 選擇印表機
 
-開啟設定（功能區裡的齒輪圖示，{{ui:editor.workspaceSettings}}），切換到 {{ui:workspace.workplane}} 區段。在 {{ui:workspace.printer}} 下，可以從超過 230 種常見機型的清單中選擇自己的印表機，包括 Bambu Lab、Prusa、Creality、Anycubic、Elegoo 等眾多品牌。
+開啟設定（標題列裡的齒輪圖示，{{ui:editor.workspaceSettings}}），切換到 {{ui:workspace.workplane}} 區段。在 {{ui:workspace.printer}} 下，可以從超過 230 種常見機型的清單中選擇自己的印表機，包括 Bambu Lab、Prusa、Creality、Anycubic、Elegoo 等眾多品牌。
 
 ![已選擇印表機的工作平面設定。列印床與最大列印高度來自切片軟體的設定檔。](shot:settings-workplane)
 

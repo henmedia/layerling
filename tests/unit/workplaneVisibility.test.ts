@@ -80,8 +80,8 @@ describe("hiding the workplane from the camera bar", () => {
 
   it("joins the tools in the two-column bar of a flat window, so plus and minus stay side by side", () => {
     const css = read("apps/web/src/app/globals.css");
-    const compact = css.slice(css.indexOf("@container workplane (max-height: 600px)"));
-    expect(compact).toMatch(/\.camera-controls > \.workplane-display-control-group,[^{]*\{\s*order: 2;/);
+    const compact = css.slice(css.indexOf("@container workplane (max-height: 660px)"));
+    expect(compact).toMatch(/\.camera-controls > \.camera-group \{\s*display: grid;\s*grid-template-columns: repeat\(2, auto\);\s*grid-column: 1 \/ -1;/);
   });
 });
 

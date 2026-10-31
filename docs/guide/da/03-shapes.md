@@ -89,7 +89,7 @@ Runde former som cylinder, kegle, rør, ellipse eller boringer har kontakten {{u
 
 - **Til STEP-eksporten.** Den skriver den runde form, ikke polygonen.
 - **Til fas og rund** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}) så længe formen forbliver rund. Det er tilfældet når du ikke har sat et antal sider, når antallet er mindst formens standard, eller når polygonen afviger højst {{value:EXACT_ROUND_TOLERANCE}} mm fra cirklen. Standarden er {{value:ROUND_FROM_SIDES}} sider for cylinder, ellipse, rør og kegle, {{value:ROUND_FROM_ROOF_SIDES}} for {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} trin for {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} for {{ui:shape.halfSphere}} og {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} sider og {{value:ROUND_FROM_TORUS_STEPS}} trin for {{ui:shape.torus}}, og en {{ui:prop.quality}} på {{value:ROUND_FROM_BENT_TUBE_QUALITY}} for et rundt {{ui:shape.bentTube}}.
-- **For et gevind, en fjeder eller et helisk tandhjul.** Kantværktøjet og STEP-eksporten tager dens eksakte form; dens {{ui:prop.quality}} sætter kun hvor fint den tegnes.
+- **For et gevind, en fjeder, et helisk tandhjul eller et kongegear.** Kantværktøjet og STEP-eksporten tager dens eksakte form; dens {{ui:prop.quality}} sætter kun hvor fint den tegnes.
 
 **Hvor det betyder noget igen**
 
@@ -123,7 +123,7 @@ Snap-trinnet er nederst til højre i editoren og kan ændres når som helst.
 
 ## Kopiering og duplikering
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} og {{ui:editor.tool.duplicate}} er i båndet ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplikerer en markering. layerling husker hvordan du sidst flyttede eller roterede kopien og anvender det samme igen ved næste duplikering. Det giver en række huller eller trin i få tastetryk. For regelmæssige arrangementer er der også mønsteret, beskrevet i [Valg og arrangering](chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} og {{ui:editor.tool.duplicate}} er i båndet ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplikerer en markering. layerling husker hvordan du sidst flyttede eller roterede kopien og anvender det samme igen ved næste duplikering. Det giver en række huller eller trin i få tastetryk. For regelmæssige arrangementer er der også mønsteret, beskrevet i [Valg og arrangering](chapter:select-and-arrange). Har du også ændret kopiens størrelse, vokser hver ny kopi igen med samme faktor, som i Tinkercad.
 
 > **Tip:** Hvis en form nægter at tage den størrelse du vil have, er det ofte grænserne for nye former. Under {{ui:workspace.shapeDefaults}} i indstillingerne bestemmer du hvordan hver form starter og hvor stor den må blive.
 

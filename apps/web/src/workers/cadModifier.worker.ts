@@ -4,7 +4,7 @@ import { cadHasSolidBody } from "@/lib/cadSolidBody";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
-import { CANNOT_OFFSET_MESSAGE, offsetSolid, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
+import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
 import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
@@ -635,7 +635,10 @@ function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: num
 }
 
 function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
-  const combined = combinedScope(cad, parts, 0);
+  // A hole on its own, or a group of holes only, is the body to treat itself (#1055): it stays a
+  // hole in the scene, and here it is built like a solid.
+  const holesOnly = parts.length > 0 && parts.every((part) => part.hole);
+  const combined = combinedScope(cad, holesOnly ? parts.map((part) => ({ ...part, hole: false })) : parts, 0);
   if (combined === null) throw new Error("The group has no solid body to modify");
   let result: ShapeHandle;
   // The repair runs on a copy: ShapeFix also rewrites the sub-shapes it
@@ -982,7 +985,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       if (request.kind === "shell") {
         component = shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
       } else if (request.kind === "offset") {
-        component = offsetSolid(activeCad, solid, request.amount, request.offsetShrink === true, request.shellEdges);
+        component = (request.offsetSideways ? offsetSolidSideways : offsetSolid)(activeCad, solid, request.amount, request.offsetShrink === true, request.shellEdges);
       } else if (request.kind === "deleteFace") {
         const componentFaces = selectedFaces.filter((entry) => entry.owner === owner).map((entry) => entry.face);
         component = componentFaces.length ? deleteFacesSolid(activeCad, solid, componentFaces) : activeCad.copy(solid);

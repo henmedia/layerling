@@ -10,6 +10,7 @@ import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import { loadTextFonts } from "@/lib/textFonts";
 import { NAME_TAG_LAYERS } from "@/lib/nameTag";
 import { textLayerShapes } from "@/lib/textLayers";
+import { textOffsetAsFill } from "@/lib/textFillChoice";
 
 /**
  * A widened text as an exact body (#215): the letters' own outlines moved out by the kernel, so the
@@ -103,4 +104,26 @@ describe("a widened text as an exact body (#215, real OCCT kernel)", () => {
     expect(parts(text({ textStroke: { ...grow(1.5), join: "bevel" } })).every((part) => !part.grow)).toBe(true);
     expect(parts(text({ textStroke: grow(1.5), textKeyring: { side: "left", diameter: 3, offset: 0, ear: true } })).every((part) => !part.grow)).toBe(true);
   });
+
+  it("the letters the kernel's offset trips over, offset as a fill instead (Discussion #1037)", () => {
+    const plain = text({ text: "ABMNW9", height: 10 });
+    const volumes = (shape: WorkplaneShape) => parts(shape).map((part) => {
+      const solid = profileExtrusionSolid(cad, part);
+      expect(cad.isValid(solid)).toBe(true);
+      return cad.getVolume(solid);
+    });
+    const total = (list: number[]) => list.reduce((sum, volume) => sum + volume, 0);
+    const before = volumes(plain);
+    expect(before).toHaveLength(6);
+    for (const edges of ["round", "sharp"] as const) {
+      const wider = volumes(textOffsetAsFill(plain, 0.2, false, edges)!);
+      // Every letter a body of its own, 0.4 mm taller and wider all round (the pieces come in another order).
+      expect(wider).toHaveLength(6);
+      expect(total(wider)).toBeGreaterThan(total(before) * 1.04);
+    }
+    const narrower = volumes(textOffsetAsFill(plain, 0.2, true, "round")!);
+    expect(narrower).toHaveLength(6);
+    expect(total(narrower)).toBeLessThan(total(before) * 0.96);
+  });
 });
+

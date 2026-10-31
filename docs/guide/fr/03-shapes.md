@@ -75,7 +75,7 @@ Les formes rondes telles que le cylindre, le cône, le tube, l'ellipse ou les al
 
 - **Pour l'export STEP.** Il écrit la forme ronde, pas le polygone.
 - **Pour les chanfreins et congés** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}) tant que la forme reste ronde. C'est le cas lorsque vous n'avez pas défini de nombre de côtés, lorsque le nombre est au moins celui par défaut de la forme ou lorsque le polygone s'éloigne d'au plus {{value:EXACT_ROUND_TOLERANCE}} mm du cercle. La valeur par défaut est les côtés {{value:ROUND_FROM_SIDES}} pour le cylindre, l'ellipse, le tube et le cône, {{value:ROUND_FROM_ROOF_SIDES}} pour le {{ui:shape.roundRoof}}, les pas {{value:ROUND_FROM_SPHERE_STEPS}} pour le {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} pour le {{ui:shape.halfSphere}} et le {{ui:shape.paraboloid}}, les côtés {{value:ROUND_FROM_TORUS_SIDES}} et les pas {{value:ROUND_FROM_TORUS_STEPS}}. pour le {{ui:shape.torus}}, et un {{ui:prop.quality}} de {{value:ROUND_FROM_BENT_TUBE_QUALITY}} pour un tour {{ui:shape.bentTube}}.
-- **Pour un filetage, un ressort ou un engrenage hélicoïdal.** L'outil bord et l'export STEP prennent son corps exact ; son {{ui:prop.quality}} définit uniquement la précision avec laquelle il est dessiné.
+- **Pour un filetage, un ressort ou un engrenage hélicoïdal ou à chevrons.** L'outil bord et l'export STEP prennent son corps exact ; son {{ui:prop.quality}} définit uniquement la précision avec laquelle il est dessiné.
 
 **Là où cela compte à nouveau**
 
@@ -108,7 +108,7 @@ L'étape d'accrochage se trouve en bas à droite de l'éditeur et peut être mod
 
 ## Copier et dupliquer
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} et {{ui:editor.tool.duplicate}} sont dans le ruban ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplique une sélection. layerling se souvient de la façon dont vous avez déplacé ou fait pivoter la copie pour la dernière fois et applique à nouveau la même chose à la copie suivante. Cela produit une rangée de trous ou de marches en quelques pressions sur une touche. Pour les arrangements réguliers, il existe également le modèle décrit dans [Sélection et arrangement] (chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} et {{ui:editor.tool.duplicate}} sont dans le ruban ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplique une sélection. layerling se souvient de la façon dont vous avez déplacé ou fait pivoter la copie pour la dernière fois et applique à nouveau la même chose à la copie suivante. Cela produit une rangée de trous ou de marches en quelques pressions sur une touche. Pour les arrangements réguliers, il existe également le modèle décrit dans [Sélection et arrangement] (chapter:select-and-arrange). Si vous avez aussi redimensionné la copie, chaque copie suivante grandit à nouveau du même facteur, comme dans Tinkercad.
 
 > **Astuce :** Si une forme refuse de prendre la taille souhaitée, c'est souvent la limite pour de nouvelles formes. Sous {{ui:workspace.shapeDefaults}} dans les paramètres, vous décidez comment chaque forme commence et quelle taille elle peut atteindre.
 

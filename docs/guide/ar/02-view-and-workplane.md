@@ -96,7 +96,7 @@ summary: التنقل حول المشهد، النظر مباشرة، ووضع �
 
 ### نافذة الإعدادات (The settings window)
 
-الترس في الشريط ({{ui:editor.workspaceSettings}}) يفتح الإعدادات. على اليسار خمسة أقسام: {{ui:workspace.appearance}} و{{ui:workspace.measurement}} و{{ui:workspace.workplane}} و{{ui:workspace.shapeDefaults}} و{{ui:workspace.history}}. ويُعتمد كل تغيير فورًا. و{{ui:workspace.makeDefault}} في الأسفل يحفظ الإعدادات الحالية كقيم افتراضية، فيبدأ التصميم الجديد بها. والملف الذي تفتحه يجلب إعداداته الخاصة؛ و{{ui:workspace.useMyDefault}} بجانبه يضع ألوانك وشبكتك وبقية ما حفظته على التصميم المفتوح، مع الإبقاء على وحداته. وإذا كانت في إعدادك الافتراضي طابعة، فإنها تأتي مع مقاس لوحتها؛ ومن دونها يحتفظ التصميم بلوحته وطابعته. و{{ui:workspace.close}} في أعلى اليمين يغلق النافذة. ويمر هذا الجزء على الإعدادات واحدًا واحدًا.
+الترس في شريط العنوان ({{ui:editor.workspaceSettings}}) يفتح الإعدادات. على اليسار خمسة أقسام: {{ui:workspace.appearance}} و{{ui:workspace.measurement}} و{{ui:workspace.workplane}} و{{ui:workspace.shapeDefaults}} و{{ui:workspace.history}}. ويُعتمد كل تغيير فورًا. و{{ui:workspace.makeDefault}} في الأسفل يحفظ الإعدادات الحالية كقيم افتراضية، فيبدأ التصميم الجديد بها. والملف الذي تفتحه يجلب إعداداته الخاصة؛ و{{ui:workspace.useMyDefault}} بجانبه يضع ألوانك وشبكتك وبقية ما حفظته على التصميم المفتوح، مع الإبقاء على وحداته. وإذا كانت في إعدادك الافتراضي طابعة، فإنها تأتي مع مقاس لوحتها؛ ومن دونها يحتفظ التصميم بلوحته وطابعته. و{{ui:workspace.close}} في أعلى اليمين يغلق النافذة. ويمر هذا الجزء على الإعدادات واحدًا واحدًا.
 
 ### المظهر: نظام الألوان وشريط الأدوات ومكعب العرض (Appearance: theme, toolbar and view cube)
 

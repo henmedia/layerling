@@ -41,6 +41,8 @@ Si una selección que funcionaba falla al hacer clic en una arista más, esa ari
 
 La arista que hay bajo el puntero también se dibuja más gruesa, para que veas cuál va a elegir el clic.
 
+Un hueco también admite {{ui:editor.tool.chamfer}} y {{ui:editor.tool.fillet}}, igual que {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} y {{ui:editor.tool.deleteFace}}: sigue siendo un hueco y corta con su nueva forma. Redondear las cuatro aristas verticales de un hueco en forma de caja da una cavidad con esquinas interiores redondeadas, y un hueco agrandado con {{ui:editor.tool.offset}} corta con ese margen de más. Para romper la arista donde un hueco se une a la pieza, trata el grupo terminado: esa arista es suya.
+
 ### Deshacer una operación de aristas
 
 Un cuerpo con chaflanes, redondeos o vaciado siempre se puede volver a modificar. Selecciónalo de nuevo y abre la herramienta (Redondeo, Chaflán o Vaciar; todas muestran la lista): en {{ui:edge.featureHistory}} ves lo que ya tiene aplicado. {{ui:edge.revertAction}} deshace una sola operación. Atención: si hay operaciones más recientes encima, se van con ella, y el panel te dice cuántas.
@@ -89,9 +91,10 @@ Si más adelante cambias el tamaño de un cuerpo vaciado, layerling lo vuelve a 
 
 - {{ui:lid.type.plug}}: una placa tan grande como el cuerpo con un labio debajo que entra en la abertura.
 - {{ui:lid.type.cap}}: una placa una pared más ancha que el cuerpo con un borde debajo que abraza el exterior.
+- {{ui:lid.type.both}}: una placa una pared más ancha que el cuerpo con las dos cosas: un labio dentro de la abertura y un borde por fuera. La pared del cuerpo queda en una ranura entre ambos, como en un táper.
 - {{ui:lid.type.flat}}: solo la placa, para apoyarla o pegarla.
 
-Después ajustas el grosor ({{ui:lid.thickness}}), el ajuste ({{ui:lid.fit}}, la holgura por lado entre tapa y cuerpo: 0,1 mm apretado, 0,2 mm normal, 0,3 mm suelto, o cualquier valor hasta 1 mm) y cuánto baja el labio o el borde y lo gruesa que es su pared. Haz clic en {{ui:lid.apply}}: la tapa queda junto al cuerpo, dada la vuelta con la placa abajo, así se imprime sin soportes. El cuerpo queda como está. La tapa sigue cualquier contorno, redondo o anguloso, porque se toma del propio cuerpo justo debajo de su borde. Un cuerpo sin abertura arriba solo recibe una tapa plana; para las otras dos, vacíalo antes con la parte de arriba abierta.
+Después ajustas el grosor ({{ui:lid.thickness}}), el ajuste ({{ui:lid.fit}}, la holgura por lado entre tapa y cuerpo: 0,1 mm apretado, 0,2 mm normal, 0,3 mm suelto, o cualquier valor hasta 1 mm) y cuánto baja el labio o el borde y lo gruesa que es su pared. Haz clic en {{ui:lid.apply}}: la tapa queda junto al cuerpo, dada la vuelta con la placa abajo, así se imprime sin soportes. El cuerpo queda como está. La tapa sigue cualquier contorno, redondo o anguloso, porque se toma del propio cuerpo justo debajo de su borde. Un cuerpo sin abertura arriba solo recibe una tapa plana; para las demás, vacíalo antes con la parte de arriba abierta.
 
 > **Consejo:** Lo apretada que queda una tapa depende de la impresora. Imprime primero una caja pequeña con su tapa; si queda demasiado apretada, elige el siguiente ajuste más suelto.
 
@@ -104,6 +107,8 @@ Cada cara de un cuerpo puede moverse la misma distancia, hacia fuera o hacia den
 3. Los {{ui:offset.edges}} deciden las esquinas exteriores: redondeado mantiene redonda la superficie desfasada, afilado deja que las caras sigan hasta encontrarse.
 4. Marca {{ui:offset.copy}} para conservar la pieza tal cual y obtener el cuerpo agrandado como una copia que ya es un hueco. Agrupa ese hueco con la pieza que encaja y corta exactamente la holgura elegida.
 5. Haz clic en {{ui:offset.apply}}.
+
+Marca {{ui:offset.sideways}} cuando solo deba crecer o encoger el contorno: los lados se mueven la distancia, y cada cara plana de arriba y de abajo se queda a su altura. Un cartel recibe un borde alrededor, una base se ensancha y el cuerpo no se hace más alto. En un cuerpo escalonado, cada escalón conserva su altura. Un texto que se desfasa a través de sus contornos también conserva entonces su altura.
 
 Sin la marca se desfasa el propio cuerpo. Pasa a ser un cuerpo exacto fijo, como tras un chaflán: la lista de arriba del panel deshace el desfase, y {{ui:edge.editAction}} abre de nuevo la herramienta con la distancia anterior. Solo se pueden desfasar cuerpos CAD exactos - cajas, cilindros y las demás formas, sus grupos, piezas STEP importadas. Un cuerpo que es solo una malla de triángulos, como muchas importaciones STL, a menudo no se puede. Una distancia demasiado grande para el cuerpo, por ejemplo reducir más allá de su pared más fina, se rechaza.
 

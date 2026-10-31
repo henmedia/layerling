@@ -1,7 +1,7 @@
 import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { GRIDFINITY_PADDING_KEYS, gridfinityPaddingPatch, gridfinityShapePatch, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
-import { normalizeThreadProfile, THREAD_SIZES, threadProfileForSize, threadSettings, threadSizeById, threadSizeFor } from "@/lib/threadGeometry";
+import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings } from "@/lib/threadGeometry";
 
 /**
  * Die formeigenen Werte, die eine Zusammenfassung sonst verschweigt: Ohne sie
@@ -30,8 +30,8 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "teeth", "toothSize", "toothWidth", "centerHoleSize", "gearType", "helixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
   "threadRole", "threadHead", "threadHand", "threadProfile", "threadDiameter", "threadPitch",
   "threadClearance", "threadBoltClearance", "threadAxialClearance", "threadDepth", "threadFlankAngle", "threadQuality", "threadHeadHeight", "threadChamfer", "threadChamferBottom",
-  "threadHeadChamfer",
-  "springTurns", "springWire", "springQuality", "springHand",
+  "threadHeadChamfer", "threadHeadDiameter", "threadDrive", "threadDriveSize", "threadDriveDepth",
+  "springTurns", "springWire", "springQuality", "springHand", "springForm", "springPattern", "springEnds",
   "starPoints", "starInnerSize", "starOuterFillet", "starInnerFillet", "starQuality",
   "heartTipFillet", "heartQuality",
   "crescentThickness", "crescentTipFillet", "crescentQuality",
@@ -43,7 +43,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "knurlPattern", "knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer",
   "dovetailNeckWidth", "dovetailClearance",
   "loftBottomOutline", "loftTopOutline", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments", "slotEndRatio", "torusTubeRatio",
-  "screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle",
+  "screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "portProfile",
   "cornerFillet", "topBottomFillet", "roundedBoxQuality",
   "bentTubeProfile", "bentTubeInnerProfile", "bentTubeSize", "bentTubeWall", "bentTubeQuality", "bentTubeSegments",
   "vase",
@@ -55,7 +55,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
  * `threadSize` aus der Bruecke: eine Normgroesse beim Namen, die hier in
  * Durchmesser, Steigung und Profil aufgeloest wird, bevor der Editor die Werte
  * wie jede andere Gewindeangabe prueft. Das Profil folgt derselben Regel wie
- * das Groessenmenue (`threadProfileForSize`); ein gueltiges `threadProfile` im
+ * das Groessenmenue (`threadSizeSettings`); ein gueltiges `threadProfile` im
  * selben Aufruf geht vor.
  *
  * Durchmesser und Steigung daneben sind erlaubt, solange sie zur Groesse
@@ -77,11 +77,15 @@ export function mcpThreadSizeParams(params: Record<string, unknown>, currentProf
       throw new Error(`threadSize "${size.id}" is ${size.diameter} mm with a pitch of ${size.pitch} mm, but threadDiameter or threadPitch in the same call say otherwise. Send threadSize alone, or threadDiameter and threadPitch without it.`);
     }
   }
+  const chosen = threadSizeSettings(size, normalizeThreadProfile(currentProfile), null);
   return {
     ...params,
     threadDiameter: size.diameter,
     threadPitch: size.pitch,
-    threadProfile: isThreadProfile(params.threadProfile) ? params.threadProfile : threadProfileForSize(size, normalizeThreadProfile(currentProfile)),
+    threadProfile: isThreadProfile(params.threadProfile) ? params.threadProfile : chosen.profile,
+    // A bottle neck brings its own profile's depth and flank angle along, unless the call sets them.
+    ...(chosen.depth !== undefined && params.threadDepth === undefined ? { threadDepth: chosen.depth } : {}),
+    ...(chosen.flankAngle !== undefined && params.threadFlankAngle === undefined ? { threadFlankAngle: chosen.flankAngle } : {}),
   };
 }
 

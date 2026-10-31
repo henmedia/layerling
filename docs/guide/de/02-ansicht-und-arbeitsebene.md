@@ -48,7 +48,7 @@ Am linken Rand liegt eine schmale Leiste. Von oben nach unten:
 - {{ui:camera.hideWorkplane}} (das Auge über dem Gitter) blendet die Platte mit ihrem Gitter aus, damit du die Unterseite eines Entwurfs von unten ansehen kannst. Es ändert sich nur die Ansicht: Neue Formen landen weiter auf der Arbeitsebene. Ein zweiter Klick blendet sie wieder ein.
 - {{ui:camera.placeWorkplane}}, das Maßband und das Winkellineal sind eigene Werkzeuge, sie kommen weiter unten und im Kapitel [Messen und Notizen](chapter:messen-und-notizen) vor.
 
-Über den kleinen Pfeil ganz oben in der Leiste kannst du sie ausblenden, wenn sie stört.
+Über den kleinen Pfeil ganz oben in der Leiste kannst du sie ausblenden, wenn sie stört. Derselbe Knopf, gezogen, verschiebt die Leiste an eine beliebige Stelle im Editor, auch in einer Skizze; ein Doppelklick stellt sie zurück. Die 3D-Vorschau einer gedrehten Skizze verschiebst du ebenso an ihrer Titelzeile.
 
 Ein Entwurf öffnet sich so, wie du ihn verlassen hast: Blickwinkel, Zoom und Ausschnitt der Ansicht bleiben mit ihm in diesem Browser erhalten, du machst also dort weiter, wo du aufgehört hast, auch nach „Home“ oder dem Schließen der Seite. Eine gespeicherte Datei (.lyl) nimmt die Ansicht mit, sie öffnet sich also auch anderswo darin. Die Ansicht gehört nicht zum Rückgängig-Verlauf.
 
@@ -100,7 +100,7 @@ Das Gitter zeigt die Größe der Platte. Unten rechts steht das **Raster**: Vers
 
 ### Das Einstellungsfenster
 
-Das Zahnrad im Menüband ({{ui:editor.workspaceSettings}}) öffnet die Einstellungen. Links liegen fünf Bereiche: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} und {{ui:workspace.history}}. Eine Änderung gilt sofort. {{ui:workspace.makeDefault}} unten sichert die aktuellen Einstellungen als Vorgabe, sodass ein neues Design mit ihnen beginnt. Eine geöffnete Datei bringt ihre eigenen Einstellungen mit; {{ui:workspace.useMyDefault}} daneben legt deine gesicherten Farben, das Raster und das Übrige auf den offenen Entwurf und lässt die Einheiten unberührt. Steht in deiner Vorgabe ein Drucker, kommt er mit seiner Plattengröße mit; sonst behält der Entwurf seine Platte und seinen Drucker. {{ui:workspace.close}} oben rechts schließt das Fenster. Dieser Teil geht die Einstellungen eine nach der anderen durch.
+Das Zahnrad in der Titelzeile ({{ui:editor.workspaceSettings}}) öffnet die Einstellungen. Links liegen fünf Bereiche: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} und {{ui:workspace.history}}. Eine Änderung gilt sofort. {{ui:workspace.makeDefault}} unten sichert die aktuellen Einstellungen als Vorgabe, sodass ein neues Design mit ihnen beginnt. Eine geöffnete Datei bringt ihre eigenen Einstellungen mit; {{ui:workspace.useMyDefault}} daneben legt deine gesicherten Farben, das Raster und das Übrige auf den offenen Entwurf und lässt die Einheiten unberührt. Steht in deiner Vorgabe ein Drucker, kommt er mit seiner Plattengröße mit; sonst behält der Entwurf seine Platte und seinen Drucker. {{ui:workspace.close}} oben rechts schließt das Fenster. Dieser Teil geht die Einstellungen eine nach der anderen durch.
 
 ### Darstellung: Thema, Leiste und Ansichtswürfel
 

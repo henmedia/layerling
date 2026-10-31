@@ -10,8 +10,9 @@ import { GUIDE_SEARCH_CORE, plainText, searchEntries } from "../../scripts/build
 type Entry = { c: string; h: string; u: string; t: string };
 type Hit = { entry: Entry; score: number };
 
-const core = new Function(`${GUIDE_SEARCH_CORE}; return { fold: guideFold, prepare: guidePrepare, search: guideSearch };`)() as {
+const core = new Function(`${GUIDE_SEARCH_CORE}; return { fold: guideFold, prepare: guidePrepare, search: guideSearch, ranges: guideRanges };`)() as {
   fold: (text: string) => string;
+  ranges: (text: string, query: string, umlauts?: boolean) => { at: number; len: number }[];
   prepare: (entries: Entry[]) => unknown;
   search: (prepared: unknown, query: string, limit?: number, umlauts?: boolean) => Hit[];
 };
@@ -131,5 +132,34 @@ describe("the matching", () => {
 
   it("limits the number of results", () => {
     expect(core.search(prepared, "e", 2)).toHaveLength(2);
+  });
+});
+
+describe("the words marked on the page a result leads to (#1059)", () => {
+  const marked = (text: string, query: string, umlauts = false) =>
+    core.ranges(core.fold(text), query, umlauts).map((r) => text.slice(r.at, r.at + r.len));
+
+  it("marks every place a word stands, whatever its case or accents", () => {
+    expect(marked("Mirror flips; a mirrored copy is a MIRROR too.", "mirror")).toEqual(["Mirror", "mirror", "MIRROR"]);
+    expect(marked("Café and cafe", "cafe")).toEqual(["Café", "cafe"]);
+  });
+
+  it("marks each word of the query and joins places that touch", () => {
+    expect(marked("Align lays bodies out along one edge.", "edge align")).toEqual(["Align", "edge"]);
+    expect(marked("fillet", "fil let")).toEqual(["fillet"]);
+  });
+
+  it("leaves out single letters when the query has longer words", () => {
+    expect(marked("a hole in a wall", "a hole")).toEqual(["hole"]);
+    expect(marked("x and y", "x")).toEqual(["x"]);
+  });
+
+  it("finds the umlaut by its two letters and the sharp s by ss", () => {
+    expect(marked("Ändere die Größe", "aendere grosse", true)).toEqual(["Ändere", "Größe"]);
+  });
+
+  it("marks nothing for an empty query or a word that is not there", () => {
+    expect(marked("Mirror", "")).toEqual([]);
+    expect(marked("Mirror", "align")).toEqual([]);
   });
 });

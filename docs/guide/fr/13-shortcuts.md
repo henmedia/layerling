@@ -19,7 +19,7 @@ Vous ne trouvez pas d'outil ? Appuyez sur [[Ctrl]]+[[K]] ou cliquez sur la loupe
 - Chaque entrée affiche les touches qui font la même chose et la zone de la barre d'outils dans laquelle elle se trouve, afin que vous sachiez où elle se trouve.
 - Les entrées grisées ne peuvent pas être exécutées pour le moment, principalement parce que rien n'est sélectionné. Ils restent dans la liste afin que la recherche vous indique toujours où se trouve l'outil.
 
-Le guide que vous lisez dispose également d'un champ de recherche, en haut de chaque page : tapez un mot ou deux et il répertorie les sections qui les contiennent tous, avec les mots correspondants marqués. Cliquez sur un ou appuyez sur [[Enter]] pour le premier, pour y accéder directement.
+Le guide que vous lisez dispose également d'un champ de recherche, en haut de chaque page : tapez un mot ou deux et il répertorie les sections qui les contiennent tous, avec les mots correspondants marqués. Cliquez sur un ou appuyez sur [[Enter]] pour le premier, pour y accéder directement. La page qui s'ouvre marque chaque endroit où apparaissent vos mots et défile jusqu'au premier dans cette section ; [[Esc]] ou un clic sur une marque les efface.
 - Le nom d'une forme ajoute cette forme au plan de travail, tout comme si vous cliquez dessus dans le menu des formes.
 - Avec un champ vide, la recherche répertorie les commandes que vous avez utilisées en dernier en haut.
 - Le nom d'un corps dans votre conception trouve ce corps et le sélectionne, ce qui facilite une conception comportant de nombreuses pièces. Les corps n'apparaissent qu'une fois que vous tapez.

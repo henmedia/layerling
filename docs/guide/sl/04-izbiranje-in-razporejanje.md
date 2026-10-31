@@ -21,6 +21,7 @@ Pri mnogih delih v pogledu zlahka izgubiš pregled. Seznam objektov ({{ui:editor
 - Oznaka kaže, ali je del {{ui:outliner.solid}} ali {{ui:outliner.hole}}.
 - Ključavnica in oko zaklenita in skrijeta posamezne dele.
 - Z {{ui:outliner.rename}} daš delu lastno ime; svinčnik ob imenu zgoraj v nastavitvah naredi isto za izbrano obliko. Smiselna imena pri večjih načrtih zelo pomagajo.
+- Gumb A–Ž v naslovni vrstici ({{ui:outliner.sortByName}}) razvrsti oblike, ki si jim dal ime, po abecedi, številke pa šteje kot številke (Del 2 pred Delom 10). Oblike s privzetim imenom ostanejo spodaj v vrstnem redu dodajanja, najnovejša zadnja, deli v skupinah pa se razvrstijo enako. Spremeni se le seznam, nikoli načrt. Drugi klik spet pokaže vse v vrstnem redu dodajanja, brskalnik pa si izbiro zapomni.
 - Iskalno polje najde oblike po imenu in po vrsti, torej tudi »valj« ali »luknja«. Išče tudi v skupinah, ne glede na to, kako globoko so ugnezdene: skupina z zadetkom ostane na seznamu in se razpre, tako da so vidni ustrezni deli in skupine na poti do njih. Če ime same skupine ustreza, pokaže razpro vse svoje dele.
 - Puščica čisto levo v naslovni vrstici zloži seznam do naslovne vrstice in ga spet razpre.
 
@@ -64,7 +65,7 @@ Koti ostanejo na telesu. V njegovih nastavitvah jih {{ui:inspector.rotation}} ka
 
 ![Telo, zavrteno okoli dveh osi: njegovi koti so pod njim, kartica »Vrtenje« v njegovih nastavitvah pa jih sprejme kot številke.](shot:rotation-card)
 
-Če je izbrano **eno telo**, vrtišče spada k temu telesu: izberi druge dele in se vrni in še vedno je tam. Premika se, vrti in spreminja velikost s telesom, shrani se v projekt in se vrne z »Razveljavi«. Pod {{ui:inspector.position}} ima vrtišče lastne vrednosti za X, Y in Z, ki jih lahko vpišeš ali premakneš, {{ui:inspector.pivotRemove}} pa ga odstrani. Rdečo oznako vrtišča lahko tudi povlečeš z miško: drsi po površini teles in se zaskoči na oglišča, sredine robov in robove, tako da zatič tečaja pride natanko na oglišče. Če je izbranih več teles, vrtišče velja samo za ta izbor, nov izbor pa ga odpravi. Če jih združiš ali povežeš, ostane: skupina ga prevzame kot svoje vrtišče, z X, Y in Z pod {{ui:inspector.position}}.
+Če je izbrano **eno telo**, vrtišče spada k temu telesu: izberi druge dele in se vrni in še vedno je tam. Premika se, vrti in spreminja velikost s telesom, shrani se v projekt in se vrne z »Razveljavi«. Pod {{ui:inspector.position}} ima vrtišče lastne vrednosti za X, Y in Z, ki jih lahko vpišeš ali premakneš, {{ui:inspector.pivotRemove}} pa ga odstrani. Rdečo oznako vrtišča lahko tudi povlečeš z miško: drsi po površini teles in se zaskoči na oglišča, sredine robov in robove, tako da zatič tečaja pride natanko na oglišče. Če je izbranih več teles, vrtišče velja samo za ta izbor, nov izbor pa ga odpravi. Če jih združiš ali povežeš, ostane: skupina ga prevzame kot svoje vrtišče, z X, Y in Z pod {{ui:inspector.position}}. Če med vlečenjem držiš Shift, se namesto tega pripne na sredino ploskve pod kazalcem - os okrogle ploskve, sredino ravne ali konico stožca - in pri tem gleda skozi prozorna telesa.
 
 ## Polaganje na ploskev
 

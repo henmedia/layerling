@@ -30,6 +30,7 @@ export type ShapeKind =
   | "countersink"
   | "doubleCountersink"
   | "teardrop"
+  | "port"
   | "loft"
   | "vase"
   | "thread"
@@ -41,6 +42,9 @@ export type ShapeKind =
   | "icosahedron"
   | "ruler"
   | "mesh";
+
+/** Outline of a port opening (portGeometry.ts): rounded corners, or the lower corners cut as on these sockets. */
+export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "displayPort" | "miniDisplayPort";
 
 /** Cross-section of a bent tube; the inner one may also be "none" for a solid tube. */
 export type BentTubeProfile = "round" | "square" | "hexagon" | "octagon";
@@ -159,10 +163,19 @@ export type ShapeCustomization = {
   /** The chamfer at the bottom end; without it the bottom end has the same chamfer as the top. */
   threadChamferBottom?: number;
   threadHeadChamfer?: number;
+  /** Screw only (#1052): the head diameter (across flats on a hex head), the drive in its free face, and the drive's size and depth. Unset = the standard measure. */
+  threadHeadDiameter?: number;
+  threadDrive?: ThreadDrive;
+  threadDriveSize?: number;
+  threadDriveDepth?: number;
   springTurns?: number;
   springWire?: number;
   springHand?: ThreadHand;
   springQuality?: number;
+  /** A flat spring (#1076) instead of the coil: a band that runs in waves across the plate, `height` thick. Unset = the coil. */
+  springForm?: SpringForm;
+  springPattern?: FlatSpringPattern;
+  springEnds?: FlatSpringEnds;
   starPoints?: number;
   starInnerSize?: number;
   starOuterFillet?: number;
@@ -352,6 +365,8 @@ export type ShapeCustomization = {
   screwHoleHeadDepth?: number;
   /** Countersink and double countersink: opening angle of the cone in degrees. */
   screwHoleAngle?: number;
+  /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
+  portProfile?: PortProfile;
   bentTubeProfile?: BentTubeProfile;
   bentTubeInnerProfile?: BentTubeInnerProfile;
   bentTubeSize?: number;
@@ -641,7 +656,12 @@ export type GridfinityOpening = {
 /** Was aus dem Gewinde wird: Stange, Schraube, Mutter oder das Loch dafuer. */
 export type ThreadRole = "rod" | "screw" | "nut" | "bore";
 export type ThreadHead = "cylinder" | "countersunk" | "hex";
+/** What drives a screw: a recess in its free head face (#1052). */
+export type ThreadDrive = "hex" | "torx" | "phillips" | "slot" | "robertson" | "none";
 export type ThreadHand = "right" | "left";
+export type SpringForm = "coil" | "flat";
+export type FlatSpringPattern = "round" | "zigzag" | "square";
+export type FlatSpringEnds = "eye" | "tab" | "none";
 /**
  * Die Zahnform: scharfe ISO-Spitze, flache Trapezflanke, rundes Profil oder
  * das Whitworth-Profil der G-Rohrgewinde (55 Grad, Kuppe und Grund gerundet).
@@ -696,6 +716,8 @@ export type EdgeTreatmentFeature = {
   shellEdges?: ShellEdges;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
+  /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */
+  offsetSideways?: boolean;
   /** Only for "deleteFace": the faces deleted, as the tool numbered them on the body before. */
   faceIds?: number[];
   faceCount?: number;
@@ -896,10 +918,19 @@ export type WorkplaneShape = {
   /** The chamfer at the bottom end; without it the bottom end has the same chamfer as the top. */
   threadChamferBottom?: number;
   threadHeadChamfer?: number;
+  /** Screw only (#1052): the head diameter (across flats on a hex head), the drive in its free face, and the drive's size and depth. Unset = the standard measure. */
+  threadHeadDiameter?: number;
+  threadDrive?: ThreadDrive;
+  threadDriveSize?: number;
+  threadDriveDepth?: number;
   springTurns?: number;
   springWire?: number;
   springHand?: ThreadHand;
   springQuality?: number;
+  /** A flat spring (#1076) instead of the coil: a band that runs in waves across the plate, `height` thick. Unset = the coil. */
+  springForm?: SpringForm;
+  springPattern?: FlatSpringPattern;
+  springEnds?: FlatSpringEnds;
   starPoints?: number;
   starInnerSize?: number;
   starOuterFillet?: number;
@@ -1097,6 +1128,8 @@ export type WorkplaneShape = {
   screwHoleHeadDepth?: number;
   /** Countersink and double countersink: opening angle of the cone in degrees. */
   screwHoleAngle?: number;
+  /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
+  portProfile?: PortProfile;
   cornerFillet?: number;
   topBottomFillet?: number;
   roundedBoxQuality?: number;

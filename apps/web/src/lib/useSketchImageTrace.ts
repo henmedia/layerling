@@ -13,7 +13,7 @@ import {
   type PreparedPicture,
   type TracePoint,
 } from "@/lib/pictureTrace";
-import { croppedPixels } from "@/lib/sketchImageTrace";
+import { shownPixels } from "@/lib/sketchImageTrace";
 import type { SketchImage } from "@/types/layerling";
 
 /**
@@ -110,7 +110,7 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
   const pointsSetRef = useRef(false);
   const areaCountRef = useRef(0);
   const dataUrl = image?.dataUrl;
-  const crop = image?.crop;
+  const frame = image ? { width: image.width, depth: image.depth, pixelWidth: image.pixelWidth, pixelHeight: image.pixelHeight, crop: image.crop } : null;
 
   const clearDraft = () => {
     window.cancelAnimationFrame(hoverRef.current.frame);
@@ -140,7 +140,7 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
     picturePixels(dataUrl)
       .then((pixels) => {
         if (cancelled) return;
-        const prepared = preparePicture(croppedPixels(pixels, crop));
+        const prepared = preparePicture(frame ? shownPixels(frame, pixels) : pixels);
         setPicture({ key, prepared });
         setSettings(defaultTraceSettings(prepared));
       })

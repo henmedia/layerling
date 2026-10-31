@@ -86,7 +86,7 @@ Válec, kužel, trubka, elipsa a otvory mají {{ui:prop.sidesFollowSize}} a {{ui
 
 - **STEP:** ukládá oblý tvar, nikoli jeho mnohoúhelníkové zobrazení.
 - **{{ui:editor.tool.chamfer}} a {{ui:editor.tool.fillet}}**, pokud se tvar stále vyhodnocuje jako oblý: počet stran nebyl ručně změněn, je alespoň výchozí nebo odchylka od kružnice nepřesáhne {{value:EXACT_ROUND_TOLERANCE}} mm. Výchozí prahy jsou {{value:ROUND_FROM_SIDES}} stran pro válec, elipsu, trubku a kužel, {{value:ROUND_FROM_ROOF_SIDES}} pro {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} kroků pro {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} pro {{ui:shape.halfSphere}} a {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} stran a {{value:ROUND_FROM_TORUS_STEPS}} kroků pro {{ui:shape.torus}} a {{ui:prop.quality}} alespoň {{value:ROUND_FROM_BENT_TUBE_QUALITY}} pro oblou {{ui:shape.bentTube}}.
-- **Závit, pružina a šikmé ozubení:** úpravy hran a STEP pracují s přesným tělesem. {{ui:prop.quality}} určuje jen jemnost zobrazení.
+- **Závit, pružina, šikmé ozubení a šípové kolo:** úpravy hran a STEP pracují s přesným tělesem. {{ui:prop.quality}} určuje jen jemnost zobrazení.
 
 **Kdy opět rozhoduje**
 
@@ -119,7 +119,7 @@ Krok přichytávání vpravo dole můžete měnit kdykoliv.
 
 ## Kopírování a duplikování
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} a {{ui:editor.tool.duplicate}} jsou v {{ui:editor.group.clipboard}}. [[Ctrl]]+[[D]] duplikuje výběr. Další duplikování zopakuje poslední posun nebo natočení kopie, takže několika stisky vytvoříte řadu otvorů či schodů. Pro pravidelné sestavy je také opakování, viz [Výběr a uspořádání](chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} a {{ui:editor.tool.duplicate}} jsou v {{ui:editor.group.clipboard}}. [[Ctrl]]+[[D]] duplikuje výběr. Další duplikování zopakuje poslední posun nebo natočení kopie, takže několika stisky vytvoříte řadu otvorů či schodů. Pro pravidelné sestavy je také opakování, viz [Výběr a uspořádání](chapter:select-and-arrange). Pokud jste kopii také zvětšili nebo zmenšili, každá další kopie se změní znovu o stejný poměr, jako v Tinkercadu.
 
 > **Tip:** Pokud tvar odmítá požadovaný rozměr, zkontrolujte limity nových tvarů v {{ui:workspace.shapeDefaults}}. Určují jejich výchozí i maximální rozměry.
 

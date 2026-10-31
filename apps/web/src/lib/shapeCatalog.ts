@@ -54,6 +54,7 @@ import {
   threadNaturalFootprint,
   threadNaturalHeight,
   threadSettings,
+  threadDriveFields,
 } from "@/lib/threadGeometry";
 import {
   DEFAULT_SPRING_QUALITY,
@@ -65,6 +66,7 @@ import {
   normalizeSpringHand,
   normalizeSpringWire,
 } from "@/lib/springGeometry";
+import { FLAT_SPRING_DIMENSIONS, flatSpringSettings } from "@/lib/flatSpringGeometry";
 import {
   DEFAULT_STAR_HEIGHT,
   DEFAULT_STAR_INNER_FILLET,
@@ -123,6 +125,7 @@ import {
   DEFAULT_TEARDROP_WIDTH,
   teardropHeightForTipAngle,
 } from "@/lib/teardropGeometry";
+import { DEFAULT_PORT_DEPTH, DEFAULT_PORT_PRESET, normalizePortCorner, normalizePortProfile, PORT_PRESETS } from "@/lib/portGeometry";
 import { DEFAULT_LOFT, loftFieldsFromMeasures, loftFrameSize, normalizeLoftMeasures } from "@/lib/loftGeometry";
 import { DEFAULT_VASE_SIZE, normalizeVaseSettings } from "@/lib/vaseSettings";
 import {
@@ -231,6 +234,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   knurl: "shape.knurl",
   dovetail: "shape.dovetail",
   teardrop: "shape.teardrop",
+  port: "shape.port",
   loft: "shape.loft",
   vase: "shape.vase",
   counterbore: "shape.counterbore",
@@ -268,6 +272,7 @@ export const toolbarShapeAssets: ToolbarShapeAsset[] = [
   { id: "countersink", name: "Countersink", src: "assets/editor/shape-icons-gray/countersink.png", menuIcon: "assets/editor/shape-icons-gray/countersink.png", kind: "countersink", color: "#6b8a7a" },
   { id: "doubleCountersink", name: "Double Countersink", src: "assets/editor/shape-icons-gray/doubleCountersink.png", menuIcon: "assets/editor/shape-icons-gray/doubleCountersink.png", kind: "doubleCountersink", color: "#6b8a8a" },
   { id: "teardrop", name: "Teardrop", src: "assets/editor/shape-icons-gray/teardrop.png", menuIcon: "assets/editor/shape-icons-gray/teardrop.png", kind: "teardrop", color: "#7d6a9c" },
+  { id: "port", name: "Port opening", src: "assets/editor/shape-icons-gray/port.png", menuIcon: "assets/editor/shape-icons-gray/port.png", kind: "port", color: "#5b7d99", hole: true },
   { id: "text", name: "Text", src: "assets/editor/shape-icons-gray/text.png", menuIcon: "assets/editor/shape-icons-gray/text.png", kind: "text", color: "#cf101b" },
   { id: "thread", name: "Thread", src: "assets/editor/shape-icons-gray/thread.png", menuIcon: "assets/editor/shape-icons-gray/thread.png", kind: "thread", color: "#8a98a6" },
   { id: "spring", name: "Spring", src: "assets/editor/shape-icons-gray/spring.png", menuIcon: "assets/editor/shape-icons-gray/spring.png", kind: "spring", color: "#18b99a" },
@@ -372,6 +377,21 @@ export function parseDroppedShapeAsset(raw: string): ShapeAsset | null {
 export const RULER_DEPTH = 25;
 export const RULER_HEIGHT = 3;
 
+/** A spring's own settings for a new shape: a coil's against its round footprint, a flat spring's (#1076) against its length and reach. */
+function springFields(customization: ShapeCustomization, width: number, depth: number, height: number) {
+  const quality = normalizeSpringQuality(customization.springQuality ?? DEFAULT_SPRING_QUALITY);
+  if (customization.springForm === "flat") {
+    const flat = flatSpringSettings(customization, width, depth);
+    return { springForm: "flat" as const, springPattern: flat.pattern, springEnds: flat.ends, springTurns: flat.turns, springWire: flat.wire, springQuality: quality };
+  }
+  return {
+    springTurns: normalizeSpringTurns(customization.springTurns ?? DEFAULT_SPRING_TURNS, Math.max(width, depth), height, customization.springWire),
+    springWire: normalizeSpringWire(customization.springWire ?? DEFAULT_SPRING_WIRE, Math.max(width, depth), height),
+    springQuality: quality,
+    springHand: normalizeSpringHand(customization.springHand ?? DEFAULT_SPRING_HAND),
+  };
+}
+
 export function shapeAssetDefaultDimensions(kind: ShapeKind) {
   if (kind === "thread") {
     const settings = threadSettings({});
@@ -414,6 +434,10 @@ export function shapeAssetDefaultDimensions(kind: ShapeKind) {
   }
   if (kind === "teardrop") {
     return { width: DEFAULT_TEARDROP_WIDTH, depth: DEFAULT_TEARDROP_DEPTH, height: Math.round(teardropHeightForTipAngle(DEFAULT_TEARDROP_WIDTH, DEFAULT_TEARDROP_TIP_ANGLE) * 100) / 100 };
+  }
+  if (kind === "port") {
+    const preset = PORT_PRESETS[DEFAULT_PORT_PRESET];
+    return { width: preset.width, depth: DEFAULT_PORT_DEPTH, height: preset.height };
   }
   if (kind === "dovetail") {
     return { width: DEFAULT_DOVETAIL_WIDTH, depth: DEFAULT_DOVETAIL_DEPTH, height: DEFAULT_DOVETAIL_HEIGHT };
@@ -663,10 +687,17 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     threadChamfer: shape.threadChamfer,
     threadChamferBottom: shape.threadChamferBottom,
     threadHeadChamfer: shape.threadHeadChamfer,
+    threadHeadDiameter: shape.threadHeadDiameter,
+    threadDrive: shape.threadDrive,
+    threadDriveSize: shape.threadDriveSize,
+    threadDriveDepth: shape.threadDriveDepth,
     springTurns: shape.springTurns,
     springWire: shape.springWire,
     springHand: shape.springHand,
     springQuality: shape.springQuality,
+    springForm: shape.springForm,
+    springPattern: shape.springPattern,
+    springEnds: shape.springEnds,
     starPoints: shape.starPoints,
     starInnerSize: shape.starInnerSize,
     starOuterFillet: shape.starOuterFillet,
@@ -775,6 +806,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     screwHoleShaft: shape.screwHoleShaft,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
+    portProfile: shape.portProfile,
     cornerFillet: shape.cornerFillet,
     topBottomFillet: shape.topBottomFillet,
     roundedBoxQuality: shape.roundedBoxQuality,
@@ -832,7 +864,8 @@ export function makeShapeFromAsset(
   point?: { x: number; z: number; elevation?: number },
   customization: ShapeCustomization = {},
 ): WorkplaneShape {
-  const defaults = shapeAssetDefaultDimensions(asset.kind);
+  // A flat spring (#1076) starts as a strip on the plate, not in the coil's upright box.
+  const defaults = asset.kind === "spring" && customization.springForm === "flat" ? FLAT_SPRING_DIMENSIONS : shapeAssetDefaultDimensions(asset.kind);
   // Ein Gewinde bekommt seinen Platzbedarf aus Durchmesser und Art. Eine
   // eingetragene Breite waere hier nicht nur ueberfluessig, sondern falsch:
   // sie wuerde spaeter als Zug am Anfasser gelesen und den Durchmesser
@@ -856,6 +889,10 @@ export function makeShapeFromAsset(
     threadChamfer: customization.threadChamfer,
     threadChamferBottom: customization.threadChamferBottom,
     threadHeadChamfer: customization.threadHeadChamfer,
+    threadHeadDiameter: customization.threadHeadDiameter,
+    threadDrive: customization.threadDrive,
+    threadDriveSize: customization.threadDriveSize,
+    threadDriveDepth: customization.threadDriveDepth,
   }) : null;
   const threadFootprint = threadDefaults ? threadNaturalFootprint(threadDefaults) : null;
   // Ein gebogenes Rohr bekommt seinen Rahmen aus Profil und Segmenten. Ein
@@ -1007,10 +1044,8 @@ export function makeShapeFromAsset(
     threadChamfer: threadDefaults ? threadDefaults.chamfer : undefined,
     threadChamferBottom: threadDefaults && customization.threadChamferBottom !== undefined ? threadDefaults.chamferLow : undefined,
     threadHeadChamfer: threadDefaults ? threadDefaults.headChamfer : undefined,
-    springTurns: asset.kind === "spring" ? normalizeSpringTurns(customization.springTurns ?? DEFAULT_SPRING_TURNS, Math.max(width, depth), height, customization.springWire) : undefined,
-    springWire: asset.kind === "spring" ? normalizeSpringWire(customization.springWire ?? DEFAULT_SPRING_WIRE, Math.max(width, depth), height) : undefined,
-    springQuality: asset.kind === "spring" ? normalizeSpringQuality(customization.springQuality ?? DEFAULT_SPRING_QUALITY) : undefined,
-    springHand: asset.kind === "spring" ? normalizeSpringHand(customization.springHand ?? DEFAULT_SPRING_HAND) : undefined,
+    ...(threadDefaults ? threadDriveFields(customization, threadDefaults) : {}),
+    ...(asset.kind === "spring" ? springFields(customization, width, depth, height) : {}),
     starPoints: asset.kind === "star" ? normalizeStarPoints(customization.starPoints ?? DEFAULT_STAR_POINTS) : undefined,
     starInnerSize: asset.kind === "star" ? normalizeStarInnerSize(customization.starInnerSize ?? DEFAULT_STAR_INNER_SIZE, width) : undefined,
     starOuterFillet: asset.kind === "star" ? normalizeStarFillet(customization.starOuterFillet ?? DEFAULT_STAR_OUTER_FILLET) : undefined,
@@ -1104,7 +1139,9 @@ export function makeShapeFromAsset(
     screwHoleShaft: asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "doubleCountersink" ? normalizeScrewHoleShaft(customization.screwHoleShaft ?? DEFAULT_SCREW_HOLE_SHAFT, width) : undefined,
     screwHoleHeadDepth: asset.kind === "counterbore" ? normalizeScrewHoleHeadDepth(customization.screwHoleHeadDepth ?? DEFAULT_SCREW_HOLE_HEAD_DEPTH, height) : undefined,
     screwHoleAngle: asset.kind === "countersink" || asset.kind === "doubleCountersink" ? normalizeScrewHoleAngle(customization.screwHoleAngle ?? DEFAULT_SCREW_HOLE_ANGLE) : undefined,
-    cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2) : undefined,
+    cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2)
+      : asset.kind === "port" ? normalizePortCorner(customization.cornerFillet, width, height, customization.portProfile) : undefined,
+    portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,
     topBottomFillet: asset.kind === "roundedBox" ? normalizeTopBottomFillet(customization.topBottomFillet ?? DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, height / 2) : undefined,
     roundedBoxQuality: asset.kind === "roundedBox" ? normalizeRoundedBoxQuality(customization.roundedBoxQuality ?? DEFAULT_ROUNDED_BOX_QUALITY) : undefined,
     ...(bentTube ?? {}),

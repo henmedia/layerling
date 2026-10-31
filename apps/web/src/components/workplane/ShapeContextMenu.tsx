@@ -25,7 +25,8 @@ const isMac = () => typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(n
 /**
  * The menu a right click on a body opens: the commands people otherwise look
  * for in the ribbon or know only as shortcuts. It stays inside the window and
- * closes on any press outside it, on Escape, on the wheel and on a resize.
+ * closes on any press outside it, on Escape, on the wheel outside it and on
+ * a resize.
  */
 export function ShapeContextMenu({ x, y, label, items, onClose }: {
   x: number;
@@ -55,6 +56,10 @@ export function ShapeContextMenu({ x, y, label, items, onClose }: {
     const closeOutside = (event: PointerEvent) => {
       if (!menuRef.current?.contains(event.target as Node)) onClose();
     };
+    // The wheel over the menu scrolls a long one (Discussion #1058); only the wheel elsewhere closes it.
+    const closeOnWheel = (event: WheelEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) onClose();
+    };
     const closeOnKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -63,13 +68,13 @@ export function ShapeContextMenu({ x, y, label, items, onClose }: {
     };
     window.addEventListener("pointerdown", closeOutside, true);
     window.addEventListener("keydown", closeOnKey, true);
-    window.addEventListener("wheel", onClose, { passive: true });
+    window.addEventListener("wheel", closeOnWheel, { passive: true });
     window.addEventListener("resize", onClose);
     window.addEventListener("blur", onClose);
     return () => {
       window.removeEventListener("pointerdown", closeOutside, true);
       window.removeEventListener("keydown", closeOnKey, true);
-      window.removeEventListener("wheel", onClose);
+      window.removeEventListener("wheel", closeOnWheel);
       window.removeEventListener("resize", onClose);
       window.removeEventListener("blur", onClose);
     };

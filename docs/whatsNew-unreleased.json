@@ -1,12 +1,1 @@
-[
-  {
-    "title": {
-      "de": "Fasen, Verrunden und STEP am Scharnier mit Kegeln",
-      "en": "Chamfers, fillets and STEP for the hinge with cones"
-    },
-    "body": {
-      "de": "Fasen, Verrunden und „Fläche löschen“ gehen jetzt auch am Scharnier mit Kegeln. Der STEP-Export, der es bisher ausließ, nimmt es mit seinen echten Kegeln mit.",
-      "en": "Chamfers, fillets and \"Delete face\" now work on the hinge with cones too. The STEP export, which used to leave it out, now takes it with its true cones."
-    }
-  }
-]
+[]

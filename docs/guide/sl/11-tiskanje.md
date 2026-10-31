@@ -5,7 +5,7 @@ summary: Izberi svoj tiskalnik, bodi opozorjen, če kaj ne ustreza, in del pravi
 
 ## Izbira tiskalnika
 
-Odpri nastavitve (zobnik v orodni vrstici, {{ui:editor.workspaceSettings}}) in preklopi na področje {{ui:workspace.workplane}}. Pri {{ui:workspace.printer}} svoj tiskalnik izbereš s seznama več kot 230 običajnih modelov, med njimi Bambu Lab, Prusa, Creality, Anycubic, Elegoo in mnogi drugi.
+Odpri nastavitve (zobnik v naslovni vrstici, {{ui:editor.workspaceSettings}}) in preklopi na področje {{ui:workspace.workplane}}. Pri {{ui:workspace.printer}} svoj tiskalnik izbereš s seznama več kot 230 običajnih modelov, med njimi Bambu Lab, Prusa, Creality, Anycubic, Elegoo in mnogi drugi.
 
 ![Nastavitve delovne ravnine z izbranim tiskalnikom. Tiskalna postelja in največja višina tiska prihajata iz profila rezalnika.](shot:settings-workplane)
 

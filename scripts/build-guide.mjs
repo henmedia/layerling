@@ -222,24 +222,59 @@ function renderTable(rows, context) {
  */
 /** The ids the headings of a chapter get, in order: what slugify makes of each, outside code blocks. */
 export function headingIds(markdown) {
-  const ids = [];
+  return headingEntries(markdown).map((entry) => entry.id);
+}
+
+/** The headings of a chapter in order, each with its id and level. */
+function headingEntries(markdown) {
+  const entries = [];
   let inCode = false;
   for (const line of markdown.replace(/\r\n/g, "\n").split("\n")) {
     if (/^```/.test(line)) inCode = !inCode;
     const heading = !inCode && /^(#{1,3}) (.+)$/.exec(line);
-    if (heading) ids.push(slugify(heading[2]));
+    if (heading) entries.push({ id: slugify(heading[2]), level: heading[1].length });
   }
-  return ids;
+  return entries;
+}
+
+/**
+ * For each heading of a translated chapter, the ids of the English headings it stands for (often none): titles
+ * and sections are paired in order when the chapter has as many of them as the English one, and the sub-headings
+ * of a paired section likewise. Where a translated section has fewer or more sub-headings, the English ones point
+ * at the section itself, so a help link lands at least there instead of at the top of the chapter.
+ */
+export function englishHeadingPairs(translated, english) {
+  const own = headingEntries(translated);
+  const theirs = headingEntries(english);
+  const pairs = own.map(() => []);
+  const positions = (entries, level) => entries.flatMap((entry, position) => (entry.level === level ? [position] : []));
+  const children = (entries, position) => {
+    const found = [];
+    for (let next = position + 1; next < entries.length && entries[next].level > 2; next += 1) if (entries[next].level === 3) found.push(next);
+    return found;
+  };
+  const titles = [positions(own, 1), positions(theirs, 1)];
+  if (titles[0].length === titles[1].length) titles[0].forEach((position, index) => pairs[position].push(theirs[titles[1][index]].id));
+  const sections = [positions(own, 2), positions(theirs, 2)];
+  if (sections[0].length !== sections[1].length) return pairs;
+  sections[0].forEach((position, index) => {
+    const englishSection = sections[1][index];
+    pairs[position].push(theirs[englishSection].id);
+    const mine = children(own, position);
+    const matching = children(theirs, englishSection);
+    if (mine.length === matching.length) mine.forEach((child, childIndex) => pairs[child].push(theirs[matching[childIndex]].id));
+    else matching.forEach((child) => pairs[position].push(theirs[child].id));
+  });
+  return pairs;
 }
 
 /**
  * The id of a heading whose own text gives none - an Arabic heading loses every letter in slugify.
- * It takes the id of the English heading at the same place when the chapter has as many headings
- * as the English one, so links that use the English anchor still land; otherwise a numbered one.
+ * It takes the id of the English heading it stands for (englishHeadingPairs), so links that use the
+ * English anchor still land; otherwise a numbered one.
  */
 function fallbackHeadingId(context, position) {
-  const english = context.englishHeadingIds;
-  return (english && english[position]) || `section-${position + 1}`;
+  return context.englishHeadingIds?.[position]?.[0] || `section-${position + 1}`;
 }
 
 export function renderBlocks(markdown, context) {
@@ -261,7 +296,12 @@ export function renderBlocks(markdown, context) {
       const position = context.headingCount.value++;
       const id = slugify(heading[2]) || fallbackHeadingId(context, position);
       if (level === 2) headings.push({ id, text: renderInline(heading[2], { ...context, references: undefined }).replace(/<[^>]+>/g, "") });
-      html.push(`<h${level} id="${id}">${renderInline(heading[2], context)}</h${level}>`);
+      // The English id as a second anchor, so a help link that knows only the English name of a section still lands on it.
+      const alias = (context.englishHeadingIds?.[position] ?? [])
+        .filter((englishId) => englishId !== id && !context.ownHeadingIds?.has(englishId))
+        .map((englishId) => `<span class="heading-alias" id="${englishId}"></span>`)
+        .join("");
+      html.push(`<h${level} id="${id}">${alias}${renderInline(heading[2], context)}</h${level}>`);
       index += 1;
       continue;
     }
@@ -415,6 +455,7 @@ a { color: var(--accent); }
 .guide-results span { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; }
 .guide-results mark { background: transparent; color: var(--accent); font-weight: 800; }
 .guide-results p { margin: 0; padding: 10px 12px; color: var(--muted); font-size: 14px; }
+mark.guide-hit { background: #ffd54a; color: #231a11; border-radius: 2px; padding: 0 1px; cursor: pointer; }
 .editor-elsewhere { max-width: 1100px; margin: 0 auto; padding: 0 16px 10px; color: var(--muted); font-size: 14px; text-align: right; }
 .editor-elsewhere[hidden] { display: none; }
 .bar a.button { padding: 7px 14px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14px; text-decoration: none; }
@@ -510,6 +551,7 @@ footer.note { max-width: 1100px; margin: 0 auto; padding: 0 16px 12px; color: va
   }
   body { font-size: 11pt; line-height: 1.55; }
   .bar, nav.chapters, .pager, .print-actions { display: none; }
+  mark.guide-hit { background: none; color: inherit; padding: 0; }
   .shell { display: block; padding: 0; }
   main { max-width: none; }
   h2, h3, h4 { break-after: avoid; }
@@ -610,20 +652,57 @@ function guideSnippet(hit){
   if(end<text.length)parts.push({text:" ...",mark:false});
   return parts;
 }
+function guideUnmarkPage(){
+  Array.prototype.forEach.call(document.querySelectorAll("mark.guide-hit"),function(mark){var parent=mark.parentNode;parent.replaceChild(document.createTextNode(mark.textContent),mark);parent.normalize();});
+}
+function guideMarkPage(query,umlauts,anchor){
+  var main=document.querySelector("main");if(!main)return;
+  guideUnmarkPage();
+  var walker=document.createTreeWalker(main,NodeFilter.SHOW_TEXT,null),nodes=[],node,marks=[];
+  while((node=walker.nextNode()))if(node.nodeValue.trim()&&!node.parentNode.closest("script,style"))nodes.push(node);
+  nodes.forEach(function(node){
+    var text=node.nodeValue,ranges=guideRanges(guideFold(text),query,umlauts);if(!ranges.length)return;
+    var piece=document.createDocumentFragment(),pos=0;
+    ranges.forEach(function(r){
+      if(r.at>pos)piece.appendChild(document.createTextNode(text.slice(pos,r.at)));
+      var mark=document.createElement("mark");mark.className="guide-hit";mark.textContent=text.slice(r.at,r.at+r.len);piece.appendChild(mark);marks.push(mark);pos=r.at+r.len;
+    });
+    if(pos<text.length)piece.appendChild(document.createTextNode(text.slice(pos)));
+    node.parentNode.replaceChild(piece,node);
+  });
+  if(!marks.length)return;
+  var target=anchor?document.getElementById(anchor):null,first=marks[0];
+  if(target)for(var i=0;i<marks.length;i++){if(target.compareDocumentPosition(marks[i])&Node.DOCUMENT_POSITION_FOLLOWING){first=marks[i];break;}}
+  first.scrollIntoView({block:"center"});
+}
 (function(){
   var form=document.getElementById("guide-search");if(!form||!window.fetch)return;
   var input=form.querySelector("input"),box=document.getElementById("guide-results"),prepared=null,loading=null;
+  var umlauts=form.getAttribute("data-umlauts")==="true";
+  function remember(link){
+    try{sessionStorage.setItem("layerling.guideHit",JSON.stringify({q:input.value,p:link.pathname}));}catch(e){}
+    if(link.pathname===location.pathname)setTimeout(markRemembered,0);
+  }
+  function markRemembered(){
+    var hit=null;try{hit=JSON.parse(sessionStorage.getItem("layerling.guideHit")||"null");sessionStorage.removeItem("layerling.guideHit");}catch(e){}
+    if(!hit||hit.p!==location.pathname||!guideTokens(hit.q||"").length)return;
+    var anchor="";try{anchor=decodeURIComponent(location.hash.slice(1));}catch(e){}
+    guideMarkPage(hit.q,umlauts,anchor);
+  }
+  if(document.readyState==="complete")markRemembered();else window.addEventListener("load",markRemembered);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")guideUnmarkPage();});
+  document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest("mark.guide-hit"))guideUnmarkPage();});
   function load(){if(!loading){loading=fetch(form.getAttribute("data-index")).then(function(r){return r.json();}).then(function(list){prepared=guidePrepare(list);}).catch(function(){loading=null;});}return loading;}
   function close(){box.hidden=true;input.setAttribute("aria-expanded","false");}
   function render(){
     if(!guideTokens(input.value).length){close();return;}
     if(!prepared){load().then(function(){if(prepared)render();});return;}
-    var hits=guideSearch(prepared,input.value,8,form.getAttribute("data-umlauts")==="true");
+    var hits=guideSearch(prepared,input.value,8,umlauts);
     box.textContent="";
     if(!hits.length){var none=document.createElement("p");none.textContent=form.getAttribute("data-nothing");box.appendChild(none);}
     hits.forEach(function(hit){
       var link=document.createElement("a"),title=document.createElement("b"),line=document.createElement("span");
-      link.href=hit.entry.u;
+      link.href=hit.entry.u;link.addEventListener("click",function(){remember(link);});
       title.textContent=hit.entry.h?hit.entry.c+" > "+hit.entry.h:hit.entry.c;
       guideSnippet(hit).forEach(function(part){if(part.mark){var mark=document.createElement("mark");mark.textContent=part.text;line.appendChild(mark);}else line.appendChild(document.createTextNode(part.text));});
       link.appendChild(title);link.appendChild(line);box.appendChild(link);
@@ -636,7 +715,7 @@ function guideSnippet(hit){
     if(e.key==="ArrowDown"){var first=box.querySelector("a");if(first){e.preventDefault();first.focus();}}
     else if(e.key==="Escape"){input.value="";close();}
   });
-  form.addEventListener("submit",function(e){e.preventDefault();var first=box.querySelector("a");if(first)window.location.href=first.href;});
+  form.addEventListener("submit",function(e){e.preventDefault();var first=box.querySelector("a");if(first){remember(first);window.location.href=first.href;}});
   box.addEventListener("keydown",function(e){
     var current=document.activeElement;
     if(e.key==="ArrowDown"&&current.nextElementSibling){e.preventDefault();current.nextElementSibling.focus();}
@@ -840,13 +919,11 @@ export async function buildGuide({ log = console.log } = {}) {
       return { code, name: LANGUAGE_INFO[code].name, htmlLang: target.htmlLang, href: `/${target.dir}/${slug ?? "index"}.html` };
     });
 
-    /** The English chapter's heading ids, when this language's own chapter has just as many headings. */
+    /** For each heading of this language's own chapter, the id of the English heading it stands for (see englishHeadingPairs). */
     const englishHeadingIdsFor = (chapter) => {
       if (language === "en" || chapter.fallback) return null;
       const source = effective.en.find((entry) => entry.number === chapter.number);
-      if (!source) return null;
-      const englishIds = headingIds(source.body);
-      return englishIds.length === headingIds(chapter.body).length ? englishIds : null;
+      return source ? englishHeadingPairs(chapter.body, source.body) : null;
     };
 
     const searchIndex = [];
@@ -861,6 +938,7 @@ export async function buildGuide({ log = console.log } = {}) {
         imageSrc: (name) => (ownPictures.has(name) ? `/${strings.dir}/img/${name}.webp` : `/${GUIDE_LANGUAGES.en.dir}/img/${name}.webp`),
         references: { uiKeys: new Set(), shots: new Set(), chapters: new Set() },
         englishHeadingIds: englishHeadingIdsFor(chapter),
+        ownHeadingIds: new Set(headingIds(chapter.body)),
       };
       let rendered;
       try {

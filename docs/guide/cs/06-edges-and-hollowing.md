@@ -39,6 +39,8 @@ Jestliže dříve funkční výběr přestane fungovat po přidání další hra
 
 Hrana pod ukazatelem se také kreslí silněji, abyste věděli, kterou kliknutí vybere.
 
+Také díra přijme {{ui:editor.tool.chamfer}} a {{ui:editor.tool.fillet}}, stejně jako {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} a {{ui:editor.tool.deleteFace}}: zůstane dírou a řeže svým novým tvarem. Zaoblením čtyř svislých hran díry ve tvaru kvádru vznikne kapsa se zaoblenými vnitřními rohy a díra zvětšená pomocí {{ui:editor.tool.offset}} řeže s o tolik větší vůlí. Hranu, kde se díra setkává s dílem, upravte raději na hotové skupině: tato hrana patří jí.
+
 ### Vrácení úpravy hran
 
 Upravené těleso lze upravovat znovu. Vyberte je a otevřete zaoblení, zkosení nebo vytvoření dutiny. Všechny tyto panely zobrazují {{ui:edge.featureHistory}}. Příkaz {{ui:edge.revertAction}} vrátí konkrétní úpravu. Pokud na ni navazují novější úpravy, odstraní se také; panel předem uvede jejich počet.
@@ -87,9 +89,10 @@ Při pozdější změně velikosti se dutina ihned přepočítá. Zadaná tlouš
 
 - {{ui:lid.type.plug}}: deska velká jako těleso a pod ní límec, který zapadne do otvoru.
 - {{ui:lid.type.cap}}: deska o stěnu širší než těleso a pod ní okraj, který obejme vnějšek.
+- {{ui:lid.type.both}}: deska o stěnu širší než těleso a pod ní obojí: límec do otvoru a okraj kolem vnějšku. Stěna tělesa sedí mezi nimi v drážce, jako u dózy na potraviny.
 - {{ui:lid.type.flat}}: jen deska, k položení nebo přilepení.
 
-Pak nastavíš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} mezi víkem a tělesem: 0,1 mm těsné, 0,2 mm běžné, 0,3 mm volné, nebo jakákoli hodnota do 1 mm) a jak hluboko límec nebo okraj sahá a jak silná je jeho stěna. Klikni na {{ui:lid.apply}}: víko leží vedle tělesa, otočené deskou dolů, takže se tiskne bez podpěr. Těleso zůstane, jak je. Víko sleduje jakýkoli obrys, kulatý i hranatý, protože se odebírá ze samotného tělesa těsně pod jeho okrajem. Těleso bez otvoru nahoře dostane jen ploché víko; pro další dva druhy ho nejdřív vydlab s otevřenou horní stranou.
+Pak nastavíš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} mezi víkem a tělesem: 0,1 mm těsné, 0,2 mm běžné, 0,3 mm volné, nebo jakákoli hodnota do 1 mm) a jak hluboko límec nebo okraj sahá a jak silná je jeho stěna. Klikni na {{ui:lid.apply}}: víko leží vedle tělesa, otočené deskou dolů, takže se tiskne bez podpěr. Těleso zůstane, jak je. Víko sleduje jakýkoli obrys, kulatý i hranatý, protože se odebírá ze samotného tělesa těsně pod jeho okrajem. Těleso bez otvoru nahoře dostane jen ploché víko; pro ostatní druhy ho nejdřív vydlab s otevřenou horní stranou.
 
 > **Tip:** Jak těsně víko sedí, záleží na tiskárně. Nejdřív vytiskni malou krabičku s víkem; je-li víko příliš těsné, zvol další volnější uložení.
 
@@ -102,6 +105,8 @@ Každou plochu tělesa lze posunout o stejnou vzdálenost ven nebo dovnitř. To 
 3. {{ui:offset.edges}} rozhodují o vnějších rozích: zaoblené drží odsazený povrch kulatý, ostré nechá plochy pokračovat, dokud se nepotkají.
 4. Zaškrtni {{ui:offset.copy}}, aby díl zůstal, jak je, a zvětšené těleso vzniklo jako kopie, která už je dírou. Seskup tuto díru s protikusem a vyřízne přesně vůli, kterou jsi zvolil.
 5. Klikni na {{ui:offset.apply}}.
+
+Zaškrtni {{ui:offset.sideways}}, když se má zvětšit nebo zmenšit jen obrys: boky se posunou o vzdálenost, každá rovná horní a spodní plocha zůstane ve své výšce. Cedule dostane okraj dokola, podstavec se rozšíří a těleso nebude vyšší. U stupňovitého tělesa si každý stupeň ponechá svou výšku. Text, který se odsazuje přes své obrysy, si pak také ponechá svou výšku.
 
 Bez zaškrtnutí se odsadí samotné těleso. Stane se pevným přesným tělesem, jako po zkosení: seznam nahoře v panelu odsazení vezme zpět a {{ui:edge.editAction}} znovu otevře nástroj se starou vzdáleností. Odsadit lze jen přesná CAD tělesa - kvádry, válce a další tvary, jejich skupiny, importované díly STEP. Těleso, které je jen trojúhelníková síť, jako mnoho importů STL, často nejde. Vzdálenost příliš velká pro těleso, například zmenšení za nejtenčí stěnu, se odmítne.
 

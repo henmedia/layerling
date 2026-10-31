@@ -78,7 +78,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_apply_edge_treatment` | kiválasztott éleket tör le vagy kerekít le |
 | `layerling_hollow_object` | egyenletes fallal üregel ki egy testet |
 | `layerling_cut_out` | kivág egy testet egy másikból, hogy illeszkedjenek: az alkatrész marad, a hézaggal megnövelt másolatot kivonja a másik testből |
-| `layerling_offset_object` | eltolja a test minden lapját az illesztés játékához: nagyítja vagy kicsinyíti, vagy lyukként adja hozzá a megnagyobbított másolatot |
+| `layerling_offset_object` | eltolja a test minden lapját az illesztés játékához: nagyítja vagy kicsinyíti, vagy lyukként adja hozzá a megnagyobbított másolatot, vagy csak az oldalakat tolja el |
 | `layerling_list_faces` | felsorolja egy pontos test lapjait |
 | `layerling_delete_faces` | lapokat töröl, és bezárja a rést |
 | `layerling_array_objects` | sorban vagy körön sokszoroz |
@@ -86,7 +86,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_layer_text` | egy szöveget rétegekből álló kötegbe alakít többszínű nyomtatáshoz (betűk, szélesebb szegélyek, egy lyukak nélküli lap), vagy újraépít egy köteget, kulcstartólyukkal, rétegenkénti sarkokkal és lekerekített vagy letört betűéllel; névlistával nevenként egy címkét készít |
 | `layerling_layer_icon` | egy SVG-ikont (a fájl szövegét vagy egy kihúzott vázlattestet) rétegekből álló ikoncímkévé alakít többszínű nyomtatáshoz – az ikon, szélesebb szegélyek, egy lyukak nélküli lap –, vagy új szélességgel vagy rétegekkel újraépít egyet; darabszámmal másolatokkal tölti meg a tárgyasztalt |
 | `layerling_create_qr_code` | szövegből vagy webcímből QR-kódot készít, mint az alakzatkönyvtár {{ui:shape.qrCode}} eleme – csak a kódot, lapon kiemelve vagy gravírozva, hibajavítással, szélességgel, magassággal, csendes zónával és kérésre üregként; figyelmeztet, ha egy modul 0,8 mm alá kerül |
-| `layerling_reference_image` | képből mintaképet ad hozzá, mint a {{ui:import.referenceImage}}, vagy egyet mozgat, forgat, kalibrál (a kép két pontja és valódi távolságuk), halványít vagy zárol - segédlet, amely sosem exportálódik és sosem nyomtatódik |
+| `layerling_reference_image` | képből mintaképet ad hozzá, mint a {{ui:import.referenceImage}}, vagy egyet mozgat, forgat, kalibrál (a kép két pontja és valódi távolságuk), halványít vagy zárol - segédlet, amely sosem exportálódik és sosem nyomtatódik; a `trace` a sötét vagy világos részéből rajta álló vázlattestet készít |
 | `layerling_measure_section` | egy vágósíkon két, a körvonalhoz illeszkedő pont között mér – falvastagság, rések, illesztések |
 | `layerling_show_overhangs` | be- vagy kikapcsolja a túlnyúlások sraffozását, beállítja a szöget, és minden testnél megadja azt a területet, amelyhez támasz kellene |
 | `layerling_estimate_print` | megbecsüli a térfogatot, a tömeget és a filamentet a kijelöléshez vagy a teljes tervhez: tömör testre, és durva becslésként falakkal és kitöltéssel, mint az exportálási ablak |

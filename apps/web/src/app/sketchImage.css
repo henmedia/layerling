@@ -80,8 +80,13 @@ html[data-theme="dark"] .sketch-rotate-handle {
   --rotate-handle-halo: rgba(28, 24, 20, 0.9);
 }
 
+/* A band along the arrow takes the pointer, never the corner square beside it (forum, 621826). */
 .sketch-rotate-handle-hit {
-  fill: transparent;
+  fill: none;
+  stroke: transparent;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: stroke;
 }
 
 .sketch-rotate-handle svg {

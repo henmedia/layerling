@@ -96,7 +96,7 @@ La cuadrícula muestra el tamaño de la placa. Abajo a la derecha está el **pas
 
 ### La ventana de ajustes
 
-La rueda dentada de la cinta ({{ui:editor.workspaceSettings}}) abre los ajustes. A la izquierda hay cinco apartados: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} y {{ui:workspace.history}}. Los cambios se aplican al momento. {{ui:workspace.makeDefault}}, abajo, guarda los ajustes actuales como predeterminados, para que los diseños nuevos empiecen con ellos, y {{ui:workspace.close}}, arriba a la derecha, cierra la ventana. Esta parte repasa los ajustes uno por uno.
+La rueda dentada de la fila del título ({{ui:editor.workspaceSettings}}) abre los ajustes. A la izquierda hay cinco apartados: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} y {{ui:workspace.history}}. Los cambios se aplican al momento. {{ui:workspace.makeDefault}}, abajo, guarda los ajustes actuales como predeterminados, para que los diseños nuevos empiecen con ellos, y {{ui:workspace.close}}, arriba a la derecha, cierra la ventana. Esta parte repasa los ajustes uno por uno.
 
 ### Aspecto: tema, barra de herramientas y cubo de vista
 

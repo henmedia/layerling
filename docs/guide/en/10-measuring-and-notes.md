@@ -68,7 +68,7 @@ A note records what the geometry does not say: "This screw is 0.3 mm too tight",
 - If its body is deleted, or no visible body is under it any more, the note stays where it stood, on the workplane.
 - Dragging the pin moves the note. A click on the pin folds the card away, only the small number stays; another click opens it again. A click into the text edits it.
 - While you write, [[Enter]] keeps the text and [[Esc]] puts it back to how it was before you started; [[Shift]]+[[Enter]] starts a new line.
-- **In a sketch**, {{ui:editor.tool.note}} (under {{ui:editor.group.manage}}) or [[N]] places a note too, anywhere on the sketch. All of a sketch's notes belong to its body: in the 3D view they sit on it, on the top of an extruded or swept body and on the drawn profile of a revolved one, and move with it. When you open the sketch again it shows the body's notes, including those placed in 3D. In the sketch, Undo takes back a note like a line, and {{ui:sketch.cancel}} discards what you changed in the notes. [[Shift]]+[[N]] shows or hides the notes here too.
+- **In a sketch**, {{ui:editor.tool.note}} or [[N]] places a note too, anywhere on the sketch. All of a sketch's notes belong to its body: in the 3D view they sit on it, on the top of an extruded or swept body and on the drawn profile of a revolved one, and move with it. When you open the sketch again it shows the body's notes, including those placed in 3D. In the sketch, Undo takes back a note like a line, and {{ui:sketch.cancel}} discards what you changed in the notes. [[Shift]]+[[N]] shows or hides the notes here too.
 
 Notes are saved in the design, appear in no export and can be shown or hidden with {{ui:visibility.notes}} (in {{ui:editor.visibilityOptions}}, the arrow beside the eye icon) or with [[Shift]]+[[N]].
 
@@ -92,4 +92,4 @@ A reference image is a picture to line parts up on: lay a photo of a circuit boa
 - {{ui:referenceImage.calibrate}} gives it its true size, as in the sketch: click two points on the picture whose real distance you know - two mounting holes of the board, say - and type that distance in {{ui:referenceImage.distance}}. The picture keeps its proportions and its middle.
 - Lock it with the lock in the header of its settings, and it stays put: clicks then go through it to the plate. Pick it in the object list to unlock it.
 - The picture is saved once in the design file, however often it is copied or undone. A large picture makes the file larger by as much; the message when you add it says how large it is.
-- An AI adds, moves, calibrates, fades and locks one with `layerling_reference_image`.
+- An AI adds, moves, calibrates, fades and locks one with `layerling_reference_image`. With `trace` it traces the picture into a sketch body standing on it, as the sketch's {{ui:sketch.traceImage}} does.

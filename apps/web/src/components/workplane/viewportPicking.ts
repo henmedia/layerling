@@ -131,16 +131,26 @@ export function pickShapeAt(
 /**
  * The first body surface the aimed ray meets that the section view has not cut
  * away: only meshes count, not edge lines. `needsFace` asks for a hit that
- * knows its triangle; `skip` passes through these bodies.
+ * knows its triangle; `skip` passes through these bodies. `throughSeeThrough`
+ * looks past transparent bodies and holes to a solid one behind them, and
+ * takes the first see-through one only when nothing solid is there.
  */
-export function firstShapeHit(state: ThreeState, options: { needsFace?: boolean; skip?: ReadonlySet<string> } = {}) {
-  return state.raycaster.intersectObjects(state.shapeLayer.children, true).find((entry) => {
+export function firstShapeHit(state: ThreeState, options: { needsFace?: boolean; skip?: ReadonlySet<string>; throughSeeThrough?: boolean } = {}) {
+  const hits = state.raycaster.intersectObjects(state.shapeLayer.children, true).filter((entry) => {
     if (state.sectionPlane && state.sectionPlane.distanceToPoint(entry.point) < -0.001) return false;
     if (!(entry.object instanceof THREE.Mesh)) return false;
     const shapeId = entry.object.userData.shapeId;
     if (typeof shapeId !== "string" || options.skip?.has(shapeId)) return false;
     return !options.needsFace || Boolean(entry.face);
   });
+  if (!options.throughSeeThrough) return hits[0];
+  return hits.find((entry) => !seeThrough(entry.object as THREE.Mesh)) ?? hits[0];
+}
+
+/** A body drawn see-through: a transparent solid or a hole. */
+function seeThrough(mesh: THREE.Mesh) {
+  const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+  return materials.every((material) => material.transparent && material.opacity < 1);
 }
 
 /** The first body the ray meets, whatever it is, without the near-miss ring. */

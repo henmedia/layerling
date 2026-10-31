@@ -11,7 +11,8 @@ Vložte {{ui:shape.thread}} a v {{ui:inspector.threadRole}} zvolte:
 
 - **{{ui:thread.rod}}:** válec se závitem, například šroub bez hlavy.
 - **{{ui:thread.screw}}:** šroub s hlavou {{ui:inspector.threadHead}} typu {{ui:thread.headCylinder}}, {{ui:thread.headCountersunk}} nebo {{ui:thread.headHex}}.
-- **{{ui:thread.nut}}:** odpovídající matice.
+  Níže nastavíte {{ui:prop.headDiameter}} (u šestihranné hlavy {{ui:prop.headAcrossFlats}}; u zápustné hlavy se průměr řídí výškou) a {{ui:inspector.threadDrive}} v čele hlavy: {{ui:thread.driveHex}}, {{ui:thread.driveTorx}}, {{ui:thread.drivePhillips}}, {{ui:thread.driveSlot}}, {{ui:thread.driveRobertson}} nebo {{ui:thread.driveNone}} pro šroub, který se točí rukou nebo klíčem. {{ui:prop.driveSize}} je rozměr přes plochy vnitřního šestihranu, vnější průměr hvězdy Torx nebo rozpětí kříže; {{ui:prop.driveDepth}} udává, jak hluboko sahá, nejvýše devět desetin hlavy, a 0 ho vynechá. Dokud je nezměníte, řídí se velikostí; šestihranná hlava začíná bez pohonu. Pohon je součástí přesného tělesa, a tak se dostane i do exportu STEP. U {{ui:thread.driveSlot}} je {{ui:prop.driveSize}} délka drážky a její šířka pětina délky, aby pasoval plochý šroubovák nebo mince; na začátku je tak dlouhá, jak hlava dovolí. {{ui:thread.driveRobertson}} je čtyřhran běžný v Kanadě: {{ui:prop.driveSize}} je jeho rozměr přes plochy a začíná na bitu, který odpovídá velikosti, č. 2 (2,84 mm) u M4 a M5.
+- **{{ui:thread.nut}}:** odpovídající matice. Podložka k ní je {{ui:shape.tube}}: pod {{ui:prop.washerSize}} zvolte velikost šroubu a vnější a vnitřní průměr i tloušťka se řídí ISO 7089.
 - **{{ui:thread.bore}}:** závitový výřez. Zasuňte jej do dílu a slučte, aby vznikl vnitřní závit. Pro otvor, do kterého se šroubuje šroub, vždy použijte {{ui:thread.bore}}: {{ui:thread.rod}} nebo {{ui:thread.screw}} jako otvor má plnou velikost šroubu bez vůle a vyjde příliš těsný. Pokud ji přesto nastavíte jako otvor, layerling na to upozorní a {{ui:inspector.threadMakeTappedHole}} z ní udělá {{ui:thread.bore}}.
 
 ![Šroub s válcovou hlavou. Vpravo jsou typ dílu, hlava, velikost, stoupání a profil.](shot:thread-screw)
@@ -26,6 +27,8 @@ Seznam je rozdělen podle řad a pod ním je vysvětlení vybrané řady:
 - **G, trubkový:** sprchová hadice G1/2, přívod pračky G3/4, zahradní kohout běžně G3/4 nebo menší G1/2 pro našroubování hadicové rychlospojky.
 
 G je válcový Whitworthův trubkový závit podle ISO 228-1 pro vodu, plyn, hydrauliku a pneumatiku. Označení odpovídá trubce, nikoli vnějšímu průměru závitu: G1 má 33,249 mm. Volba G nastaví {{ui:thread.profileWhitworth}}, metrická či palcová velikost vrátí {{ui:thread.profileV}}. Ručně zvolený {{ui:thread.profileTrapezoidal}} nebo {{ui:thread.profileRound}} zůstává. Norma zde určuje jen závit; hlava šroubu a matice G mají obecné proporce jako vlastní průměr. Varianty R, Rc a Rp nejsou zahrnuty.
+
+Poslední řada seznamu, {{ui:thread.group.bottle}}, obsahuje PCO 1881: hrdlo 28 mm většiny lahví od vody a limonád, 27,4 mm přes závit se stoupáním 2,7 mm. Jeho závit má široké ploché vrcholy, proto jeho volba přepne profil na {{ui:thread.profileCustom}} s {{ui:prop.threadDepth}} 1,6 mm a {{ui:prop.threadFlankAngle}} 30°; velikost zvolená potom vrátí svůj vlastní profil. Hrdlo udělejte jako {{ui:thread.rod}} a víčko jako {{ui:thread.nut}}, nebo odečtěte {{ui:thread.bore}} od válce. Rozměry odpovídají výkresu normy, jak jej uvádí knihovna OpenSCAD BOSL2; před celým víčkem vytiskněte zkušební kus. Kanystry a lahve od saponátu žádnou společnou normu nemají, změřte tedy hrdlo, které máte, a zadejte hodnoty v {{ui:thread.customSize}}.
 
 Další nastavení:
 
@@ -77,7 +80,7 @@ Nástroj hran pracuje s přesným závitovým tělesem. Můžete upravit hrany n
 
 {{ui:shape.gear}} nabízí {{ui:gear.spur}}, {{ui:gear.helical}}, {{ui:gear.herringbone}}, {{ui:gear.bevel}}, {{ui:gear.internal}} a {{ui:gear.rack}}. Výchozí {{ui:prop.gearProfile}} je {{ui:gear.profileInvolute}}: evolventní boky pro plynulý záběr jako ve strojírenství. Nastavte {{ui:prop.teeth}} a {{ui:prop.gearModule}}. Vnější průměr je modul × (počet zubů + 2), roztečný průměr modul × počet zubů. Výchozí modul je 2. Dvě kola spolu zabírají při stejném modulu a {{ui:prop.gearPressureAngle}}, obvykle 20°, a osové vzdálenosti (součet počtů zubů) × modul / 2. Po výběru obou kol panel ukáže požadovanou i současnou vzdálenost. Stojí-li zub proti zubu, otočte jedno o polovinu rozteče zubu, tedy 180° děleno jeho počtem zubů. {{ui:prop.gearBacklash}} ztenčí zuby pro tištěný pár. Je zadána pro celou dvojici, každé kolo odebere polovinu; začněte na 0,2 mm, nula znamená přesný profil. Pod základní kružnicí pokračuje bok rovně k patě bez nástrojového podříznutí. To vyhovuje tisku, ale malé pastorky pod asi 17 zubů mohou u paty lehce drhnout.
 
-Šikmé ozubení přidává {{ui:prop.helixAngle}}, u evolventy skutečný úhel šroubovice na roztečné kružnici. Dvojice potřebuje stejný modul a opačná znaménka stejného úhlu. {{ui:gear.herringbone}} má dvě poloviny opačného sklonu, které se uprostřed setkají do šipky. Má samostředicí účinek a ruší axiální síly, které běžné šikmé ozubení vytváří. {{ui:prop.helixAngle}} a {{ui:prop.helixQuality}} fungují jako u šikmého kola, úhel platí pro každou polovinu. Párová kola opět potřebují opačná znaménka. Uprostřed není drážka, obě poloviny navazují bez schodu. Šípové kolo se do nástroje hran i STEP předává jako síť, nikoli přesné těleso.
+Šikmé ozubení přidává {{ui:prop.helixAngle}}, u evolventy skutečný úhel šroubovice na roztečné kružnici. Dvojice potřebuje stejný modul a opačná znaménka stejného úhlu. {{ui:gear.herringbone}} má dvě poloviny opačného sklonu, které se uprostřed setkají do šipky. Má samostředicí účinek a ruší axiální síly, které běžné šikmé ozubení vytváří. {{ui:prop.helixAngle}} a {{ui:prop.helixQuality}} fungují jako u šikmého kola, úhel platí pro každou polovinu. Párová kola opět potřebují opačná znaménka. Uprostřed není drážka, obě poloviny navazují bez schodu.
 
 Kuželové kolo zmenšuje evolventní profil směrem nahoru. Jde o přiblížení, nikoli přesně vypočtený kuželový převod.
 
@@ -89,13 +92,15 @@ Kuželové kolo zmenšuje evolventní profil směrem nahoru. Jde o přiblížen�
 
 {{ui:gear.rack}} představuje ozubení nekonečného poloměru: tyč se zuby podél jedné strany. U evolventního profilu jsou boky přímé v úhlu záběru. Šířka podél X je počet zubů × rozteč, kde rozteč = π × modul. Hřebeny stejného modulu navazují konci v mezeře. Délka podél Y určuje tloušťku tyče a může se měnit, pokud se vejdou zuby a nejméně půl milimetru nosné části. Zuby míří dopředu a hřeben můžete natočit. Kolo stejného modulu zabírá, když je jeho střed před roztečnou přímkou ve vzdálenosti počet zubů kola × modul / 2. Přímka leží jeden modul za špičkami, u oblých zubů 0,6 modulu. Věnec a hřeben podporují evolventní a oblý profil, nikoli jednoduchý. Přepnutí typu zachovává modul.
 
-Úpravy hran a STEP běžně používají přesná tělesa a hladké evolventy. Výjimkou je šikmé kolo s oválnou základnou a šikmá evolventa přibližně od 31 zubů, které zůstávají sítí. Malé zuby omezují poloměr úprav. U jednoduchého kola průměru 30 mm s 12 zuby má ploška u paty asi 0,65 mm a všechny hrany lze zaoblit zhruba do 0,5 mm. Kuželové kolo s menším vrškem přibližně do 0,4 mm. Šikmé boky prostor dále zužují podle úhlu a výšky. Koncové hrany šikmého kola lze zaoblovat, ale jejich samostatné zkosení v CAD jádře selhává. Použijte zaoblení nebo malé zkosení všech hran současně, například 0,2 mm.
+Úpravy hran a STEP běžně používají přesná tělesa a hladké evolventy. Výjimkou je šikmé kolo s oválnou základnou a šikmá evolventa přibližně od 31 zubů, které zůstávají sítí. Šípové kolo zůstává sítí ve stejných dvou případech. Malé zuby omezují poloměr úprav. U jednoduchého kola průměru 30 mm s 12 zuby má ploška u paty asi 0,65 mm a všechny hrany lze zaoblit zhruba do 0,5 mm. Kuželové kolo s menším vrškem přibližně do 0,4 mm. Šikmé boky prostor dále zužují podle úhlu a výšky. Koncové hrany šikmého i šípového kola lze zaoblovat, ale jejich samostatné zkosení v CAD jádře selhává. Použijte zaoblení nebo malé zkosení všech hran současně, například 0,2 mm. U šípového kola s evolventními zuby a úhlem sklonu zhruba od 15 stupňů, jako ve výchozím nastavení, se zaoblení nebo zkosení všech hran najednou odmítne; zaoblete zvlášť konce nebo hrany, kde se obě poloviny stýkají.
 
 ## Pružiny
 
 {{ui:shape.spring}} má {{ui:prop.turns}} a {{ui:prop.wire}}. Spolu s výškou určují tuhost. {{ui:prop.springHand}} volí {{ui:spring.right}} jako u běžné tlačné pružiny nebo {{ui:spring.left}}.
 
 Úpravy hran a STEP používají přesné těleso kruhového drátu vedeného po šroubovici, na koncích kolmo seříznutého. Oba konce lze zkosit nebo zaoblit.
+
+V nabídce {{ui:prop.springForm}} se z pružiny stane plochá pružina ({{ui:spring.flat}}): pásek, který se vlní přes desku a pruží ve své vlastní rovině, tištěný naležato. {{ui:prop.springPattern}} dává {{ui:spring.round}}, {{ui:spring.zigzag}} nebo hranaté ohyby ({{ui:spring.square}}), {{ui:prop.springEnds}} {{ui:spring.eye}} s otvorem, {{ui:spring.tab}} napříč páskem nebo nic ({{ui:spring.none}}). {{ui:prop.bends}} a {{ui:prop.band}} určují, jak je měkká; délka je délka pružiny, šířka, kam až vlny sahají, a výška, jak silná se tiskne. I plochá pružina je přesné těleso.
 
 ## Ohnuté trubky
 
@@ -188,6 +193,12 @@ Vodorovný kruhový otvor vytváří nahoře most, který může prověsit. {{ui
 Tvar přepněte na výřez a slučte s dílem. Délka směřuje podél hloubky a špička vzhůru. Pro kolmý směr otočte o 90° kolem svislé osy.
 
 Stejně se prověšuje vodorovný **závitový otvor**. Přidejte {{ui:shape.teardrop}} s {{ui:prop.teardropDiameter}} podle průměru jádra závitu, tedy volného prostoru mezi zuby, například asi 8,4 mm pro M10. Délka odpovídá závitovému otvoru. Vyberte oba a přes {{ui:editor.tool.align}} zarovnejte středy. Střed kapkovitého otvoru odpovídá středu kruhové části, nikoli obálce se špičkou. Pak oba slučte s tělesem. Závit se vyřízne běžně a hrot otevře horní část pro tisk bez podpěr.
+
+## Otvory pro konektory
+
+Krabička pro elektroniku potřebuje otvor pro kabel. {{ui:shape.port}} je přesně takový otvor: ležící výřez se zaoblenými rohy. V poli {{ui:prop.portPreset}} vyberte konektor - {{ui:port.usbC}}, {{ui:port.microUsb}} nebo {{ui:port.usbA}} - a otvor dostane jeho rozměr s vůlí asi 0,25 mm na každé straně. {{ui:port.usbCPlug}} je pro konektor, který sedí za stěnou, takže do otvoru musí zasahovat pouzdro zástrčky. Šířku, výšku a {{ui:prop.portCorner}} lze změnit ručně; seznam pak ukáže {{ui:port.custom}}. {{ui:port.hdmi}}, {{ui:port.miniHdmi}}, {{ui:port.displayPort}} a {{ui:port.miniDisplayPort}} mají jako konektor šikmo seříznuté spodní rohy, DisplayPort jen levý, a {{ui:port.rj45}} se hodí pro síťovou zásuvku; tyto rozměry pocházejí z výřezů doporučených výrobci a z výkresů VESA.
+
+Otvor přichází jako výřez a míří dopředu. Nastavte {{ui:prop.portDepth}} o něco větší, než je tloušťka stěny, posuňte ho tam, kde konektor sedí na desce, a seskupte ho s krabičkou. Pro boční stěnu ho otočte o 90° kolem svislé osy.
 
 ## Válcové a kuželové zahloubení
 

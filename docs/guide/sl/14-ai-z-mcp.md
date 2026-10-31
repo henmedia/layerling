@@ -78,7 +78,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_apply_edge_treatment` | posname ali zaobli izbrane robove |
 | `layerling_hollow_object` | izdolbe telo z enakomerno steno |
 | `layerling_cut_out` | izreže eno telo iz drugega, da si ustrezata: del ostane, kopija, povečana za zračnost, se odšteje od drugega telesa |
-| `layerling_offset_object` | odmakne vse ploskve telesa za zračnost nasedanja: telo poveča ali zmanjša ali doda povečano kopijo kot luknjo |
+| `layerling_offset_object` | odmakne vse ploskve telesa za zračnost nasedanja: telo poveča ali zmanjša ali doda povečano kopijo kot luknjo ali premakne le stranice |
 | `layerling_list_faces` | našteje ploskve natančnega telesa |
 | `layerling_delete_faces` | izbriše ploskve in zapre vrzel |
 | `layerling_array_objects` | pomnoži v vrsti ali na krogu |
@@ -86,7 +86,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_layer_text` | iz besedila naredi sklad plasti za večbarvni tisk (črke, širši robovi, plošča brez lukenj) ali sklad zgradi znova, z luknjo za obesek za ključe, vogali za vsako plast in zaobljenim ali poševno odrezanim robom črk; s seznamom imen en napis na ime |
 | `layerling_layer_icon` | iz simbola SVG (besedilo datoteke ali iztisnjeno telo skice) naredi simbolno oznako v plasteh za večbarvni tisk – simbol, širši robovi, plošča brez lukenj – ali jo zgradi znova z novo širino ali plastmi; s številom napolni ploščo s kopijami |
 | `layerling_create_qr_code` | iz besedila ali spletnega naslova naredi kodo QR kot {{ui:shape.qrCode}} v knjižnici oblik – samo kodo, dvignjeno na plošči ali vgravirano, s popravkom napak, širino, višino, tihim območjem in po želji kot luknjo; opozori, ko je modul manjši od 0,8 mm |
-| `layerling_reference_image` | doda referenčno sliko iz slike kot {{ui:import.referenceImage}} ali eno premakne, zavrti, umeri (dve točki slike in njuna prava razdalja), zbledi ali zaklene - pomoč, ki se nikoli ne izvozi ali natisne |
+| `layerling_reference_image` | doda referenčno sliko iz slike kot {{ui:import.referenceImage}} ali eno premakne, zavrti, umeri (dve točki slike in njuna prava razdalja), zbledi ali zaklene - pomoč, ki se nikoli ne izvozi ali natisne; `trace` iz temnega ali svetlega dela naredi telo skice, ki stoji na njej |
 | `layerling_measure_section` | meri na ravnini prereza med dvema točkama, ki se zaskočita na obris – debeline sten, reže, prileganja |
 | `layerling_show_overhangs` | vklopi ali izklopi šrafuro previsov, nastavi kot in za vsako telo navede ploskev, ki bi potrebovala podpore |
 | `layerling_estimate_print` | oceni prostornino, težo in filament za izbor ali celoten načrt: za polno telo in kot grobo oceno s stenami in polnilom kot v oknu za izvoz |

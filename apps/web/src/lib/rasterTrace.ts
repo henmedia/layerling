@@ -264,10 +264,12 @@ function straightenedRing(ring: Point[], tolerance: number): Point[] {
 const coordinate = (value: number) => String(Math.round(value * 100) / 100);
 
 /**
- * Traces one part of a picture as an outline. Throws RASTER_TRACE_EMPTY when that part has
- * nothing larger than a speck.
+ * The closed lines round one part of a picture, straightened, in the pixels of the picture as it
+ * was traced (shrunk to MAX_RASTER_TRACE_SIDE at most; its size comes along): x to the right, y
+ * down, a pixel's edges on whole numbers. Throws RASTER_TRACE_EMPTY when that part has nothing
+ * larger than a speck.
  */
-export function traceRaster(source: RasterPixels, options: RasterTraceOptions = {}): RasterTrace {
+export function traceRasterRings(source: RasterPixels, options: RasterTraceOptions = {}): { rings: Array<Array<{ x: number; y: number }>>; width: number; height: number } {
   const pixels = shrinkRaster(source);
   const { width, height } = pixels;
   const threshold = Math.min(0.95, Math.max(0.05, options.threshold ?? 0.5));
@@ -286,6 +288,15 @@ export function traceRaster(source: RasterPixels, options: RasterTraceOptions = 
     tolerance = Math.min(MAX_TOLERANCE, tolerance * 1.35);
   }
   if (!lines.length) throw new Error(RASTER_TRACE_EMPTY);
+  return { rings: lines, width, height };
+}
+
+/**
+ * Traces one part of a picture as an outline. Throws RASTER_TRACE_EMPTY when that part has
+ * nothing larger than a speck.
+ */
+export function traceRaster(source: RasterPixels, options: RasterTraceOptions = {}): RasterTrace {
+  const { rings: lines, width, height } = traceRasterRings(source, options);
   let unit = 1;
   if (options.width !== undefined) {
     let minX = Number.POSITIVE_INFINITY;

@@ -90,7 +90,7 @@ Okrągłe kształty, takie jak walec, stożek, rura, elipsa albo otwory, mają w
 
 - **W eksporcie STEP.** Zapisuje on okrągły kształt, a nie wielokąt.
 - **Przy fazowaniu i zaokrąglaniu** ({{ui:editor.tool.chamfer}}, {{ui:editor.tool.fillet}}), dopóki kształt pozostaje okrągły. Tak jest, gdy nie ustawiłeś liczby boków, gdy liczba jest co najmniej domyślna dla kształtu albo gdy wielokąt odbiega od okręgu najwyżej o {{value:EXACT_ROUND_TOLERANCE}} mm. Domyślnie to {{value:ROUND_FROM_SIDES}} boków dla walca, elipsy, rury i stożka, {{value:ROUND_FROM_ROOF_SIDES}} dla kształtu {{ui:shape.roundRoof}}, {{value:ROUND_FROM_SPHERE_STEPS}} kroków dla kształtu {{ui:shape.sphere}}, {{value:ROUND_FROM_HALF_SPHERE_STEPS}} dla kształtów {{ui:shape.halfSphere}} i {{ui:shape.paraboloid}}, {{value:ROUND_FROM_TORUS_SIDES}} boków i {{value:ROUND_FROM_TORUS_STEPS}} kroków dla kształtu {{ui:shape.torus}} oraz {{ui:prop.quality}} {{value:ROUND_FROM_BENT_TUBE_QUALITY}} dla okrągłej rury typu {{ui:shape.bentTube}}.
-- **Przy gwincie, sprężynie albo kole o zębach skośnych.** Narzędzie krawędzi i eksport STEP biorą ich dokładną bryłę, a {{ui:prop.quality}} ustawia tylko, jak dokładnie są rysowane.
+- **Przy gwincie, sprężynie, kole o zębach skośnych albo kole daszkowym.** Narzędzie krawędzi i eksport STEP biorą ich dokładną bryłę, a {{ui:prop.quality}} ustawia tylko, jak dokładnie są rysowane.
 
 **Kiedy znów ma znaczenie**
 
@@ -123,7 +123,7 @@ Krok przyciągania jest w prawym dolnym rogu edytora i możesz go zmienić w ka�
 
 ## Kopiowanie i duplikowanie
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} i {{ui:editor.tool.duplicate}} są na wstążce ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplikuje zaznaczenie. layerling pamięta, jak ostatnio przesunąłeś lub obróciłeś kopię, i przy następnym duplikowaniu robi to samo. Tak w kilku naciśnięciach powstaje rząd otworów albo schodków. Do regularnych układów jest też szyk, opisany w rozdziale [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} i {{ui:editor.tool.duplicate}} są na wstążce ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplikuje zaznaczenie. layerling pamięta, jak ostatnio przesunąłeś lub obróciłeś kopię, i przy następnym duplikowaniu robi to samo. Tak w kilku naciśnięciach powstaje rząd otworów albo schodków. Do regularnych układów jest też szyk, opisany w rozdziale [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange). Jeśli zmieniłeś też rozmiar kopii, każda kolejna kopia zmienia się znowu o ten sam współczynnik, jak w Tinkercadzie.
 
 > **Wskazówka:** Jeśli kształt nie chce przyjąć żądanego rozmiaru, często winne są limity dla nowych kształtów. W sekcji {{ui:workspace.shapeDefaults}} w ustawieniach decydujesz, jak każdy kształt zaczyna i jak duży może być.
 

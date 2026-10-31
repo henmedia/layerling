@@ -2662,6 +2662,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-shape-options .
   background: #cdcdcd;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-selection-position {
+  color: #505050;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-selection-position input {
+  color: #575757;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  outline: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-selection-position input:focus {
+  border-color: #ea953d;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-corner-label {
   color: #505050;
 }
@@ -2767,6 +2783,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .panel-grip:hover {
   background: #fff0ee;
   border-color: #ee9b92;
   box-shadow: inset 3px 0 0 #dc3f36;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .camera-controls > .camera-group {
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .section-tool-popover {
@@ -3373,6 +3393,21 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.edge,
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.dark {
   background: #3a3a3a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.axis-x {
+  background: #d6363c;
+  border-color: #7d1a1e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.axis-y {
+  background: #2f9a4b;
+  border-color: #17542a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.axis-z {
+  background: #2f6fe0;
+  border-color: #163f86;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle:not(.height-lift):hover {
@@ -5716,6 +5751,21 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .rotate-handle.axis-z {
   --rotate-handle-axis: #6aa0ff;
 }
 
+html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.axis-x {
+  background: #ff6b70;
+  border-color: #7d1a1e;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.axis-y {
+  background: #5fd47c;
+  border-color: #17542a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.axis-z {
+  background: #6aa0ff;
+  border-color: #163f86;
+}
+
 html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.height-lift {
   border-bottom-color: #ffffff;
 }
@@ -6056,6 +6106,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-point-actions b
   color: #cbd5e0;
 }
 
+html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-selection-position {
+  color: #cbd5e0;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-selection-position input {
+  color: #f7fafc;
+  background: #202020;
+  border-color: #484848;
+}
+
 html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-point-actions button:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-point-actions button.active {
   color: #f7fafc;
@@ -6335,6 +6395,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .theme-check {
   background: #dedede;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-sort-button.active {
+  color: #ad6206;
+  background: #e4e4e4;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-search-wrap {
   border-bottom: 1px solid #e8e8e8;
   background: #f8f8f8;
@@ -6520,6 +6585,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-close-button 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-close-button:hover {
   color: #ffffff;
   background: #3d3d3d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-sort-button.active {
+  color: #f0a64a;
+  background: #3b3b3b;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-search-wrap {
@@ -8479,7 +8549,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-rotate-handle {
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-rotate-handle-hit {
-  fill: transparent;
+  fill: none;
+  stroke: transparent;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-rotate-handle svg {

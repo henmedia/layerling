@@ -86,8 +86,12 @@ export type TeardropGeometryOptions = {
 
 /** A closed, watertight teardrop body: the outline pushed along z, centred on the origin, from y = 0 to y = height. */
 export function createTeardropGeometry({ width, depth, height, sides }: TeardropGeometryOptions): THREE.BufferGeometry {
+  return createContourPrismAlongZ(teardropContourPoints(width, height, sides), depth);
+}
+
+/** A closed outline in the front view (x, y) pushed along z by `depth`, centred on z = 0; also the port opening's body. */
+export function createContourPrismAlongZ(contour: Point2D[], depth: number): THREE.BufferGeometry {
   const safeDepth = Math.max(0.01, depth);
-  const contour = teardropContourPoints(width, height, sides);
   const count = contour.length;
   const front = safeDepth / 2;
   const back = -safeDepth / 2;

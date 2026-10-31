@@ -19,7 +19,7 @@ Všechny projekty se později zobrazují na úvodní stránce s náhledem. Uchov
 
 ![Editor se dvěma tvary na pracovní rovině. Nahoře pás nástrojů, vlevo ovládání pohledu a vpravo nastavení vybraného tvaru.](shot:editor-overview)
 
-- **Nahoře** je pás nástrojů rozdělený podle činností: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.manage}} a {{ui:editor.group.help}}. Najetím na ikonu zobrazíte její název. Malý otazník v nastavení tvaru, knihovně nebo panelu nástroje vede přímo do příslušné části této příručky.
+- **Nahoře** je pás nástrojů rozdělený podle činností: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} a {{ui:editor.group.help}}. Najetím na ikonu zobrazíte její název. Malý otazník v nastavení tvaru, knihovně nebo panelu nástroje vede přímo do příslušné části této příručky.
 - **Uprostřed** leží pracovní rovina. Sem pokládáte tvary, upravujete je a sledujete výsledek.
 - **Vpravo** se zobrazuje nastavení vybraného tvaru: barva, rozměry, poloha a další vlastnosti. Zadání čísla je přesnější než tažení myší.
 - **Vlevo** najdete ovládání pohledu a nad ním orientační krychli. Jejich použití popisuje kapitola [Pohled a pracovní rovina](chapter:view-and-workplane).

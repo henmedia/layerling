@@ -1,6 +1,6 @@
 "use client";
 
-import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Magnet, Minus, Plus, Ruler, RulerDimensionLine, Scissors, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
+import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, Eye, EyeOff, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Magnet, Minus, Plus, Ruler, RulerDimensionLine, Scissors, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
 import { displayedHandle } from "@/lib/sketchBezierHandles";
 import { curveStretches } from "@/lib/sketchCurveThroughPoints";
 import { markEscapeHandled } from "@/lib/escapeHandled";
@@ -11,7 +11,8 @@ import { SketchNotes } from "@/components/SketchNotes";
 import { SketchLockBadge, SketchRotateHandles, SketchTurnRing } from "@/components/SketchHandles";
 import { lockBadgeSpot, rotateHandleSpots } from "@/lib/sketchHandleSpots";
 import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchViewSlide";
-import { ToolbarConstructionLineIcon } from "@/components/toolbarIcons";
+import { ToolbarConstructionLineIcon, ToolbarNoteIcon } from "@/components/toolbarIcons";
+import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
 import { constructionCrossings } from "@/lib/sketchConstruction";
 import { outlineSideMiddles, sketchSnapPoints } from "@/lib/sketchSnapPoints";
 import { openEndPoints } from "@/lib/sketchPointJoin";
@@ -45,6 +46,7 @@ import { useSketchImageTrace, type SketchImageTraceState } from "@/lib/useSketch
 import { DEFAULT_SKETCH_STROKE, SKETCH_STROKE_ALIGNS, SKETCH_STROKE_CAPS, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { selectWholeValue } from "@/lib/numberField";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { displayY, insideZ } from "@/lib/displayAxes";
 import { clampNudge, constrainToAxis, sketchSegmentDragPointIds, sketchSelectedPointIds, sketchSelectedSegmentIds, sketchSelectionMovePointIds, type SketchSelectableEntity, type SketchSelection } from "@/lib/sketchSelection";
 import { closedPathAt, closedPathRegions, cubicPoint, curveControls, isInsideEdges, orderedPaths, pathEdges, type DisplayPath, type PlaneEdge } from "@/lib/sketchPaths";
 import { capturePointer } from "@/lib/pointerCapture";
@@ -102,7 +104,7 @@ type SketchWorkspaceProps = {
   onSelectImage: (id: string) => void;
   onUpdateImage: (id: string, patch: Partial<SketchImage>, message?: string, keyRunKey?: string) => void;
   onDeleteImage: (id: string) => void;
-  /** Trace: the reference image's outlines, traced in the pixels of the part it shows, become sketch points. */
+  /** Trace (#1060): the reference image's outlines, traced in the pixels of the part it shows, become sketch points. */
   onTraceImage?: (imageId: string, trace: PictureTrace, size: TracedSize) => void;
   onDeletePoint: (id: string) => void;
   onDeleteSegment: (id: string) => void;
@@ -146,6 +148,11 @@ type SketchWorkspaceProps = {
   notes?: readonly SketchNote[];
   noteNumbers?: ReadonlyMap<string, number>;
   noteMode?: boolean;
+  /** The note buttons of the camera bar (Stefan, 31.10.2026: they moved here from Manage). */
+  notesVisible?: boolean;
+  noteCount?: number;
+  onNoteTool?: () => void;
+  onToggleNotes?: () => void;
   /** Puts a note on the spot and gives its id, or null when there is no room for another. */
   onAddNote?: (spot: { x: number; z: number }) => string | null;
   onUpdateNote?: (id: string, patch: Partial<SketchNote>) => void;
@@ -763,11 +770,17 @@ export function SketchWorkspace({
   notes,
   noteNumbers,
   noteMode = false,
+  notesVisible = true,
+  noteCount = 0,
+  onNoteTool,
+  onToggleNotes,
   onAddNote,
   onUpdateNote,
   onRemoveNote,
 }: SketchWorkspaceProps) {
   useLanguage();
+  const cameraBarMove = useMovablePanel<HTMLDivElement>("layerling.sketch.cameraBarPosition", CAMERA_BAR_PANEL);
+  const [cameraBarCollapsed, setCameraBarCollapsed] = useState(false);
   const workspace = useMemo(() => normalizeWorkspaceSettings(initialWorkspace, DEFAULT_WORKPLANE_WORKSPACE), [initialWorkspace]);
   setLengthUnit(workspace);
   const unitLabel = lengthDisplayUnit(workspace).label;
@@ -1051,6 +1064,17 @@ export function SketchWorkspace({
     if (moved) onTransformPoints(moved, t("sketch.aligned"));
   };
   const selectionLocked = selectionLock !== "none";
+  // A typed X or Y moves the selection so its middle lies there, in mm from the sketch's origin (#1064); Y counts up the
+  // screen, as the Y of the 3D editor counts towards the back.
+  const moveSelectionBy = (dx: number, dz: number) => {
+    if (selected?.kind !== "multiple" || selectionLocked) return;
+    const moving = new Set(sketchSelectionMovePointIds(profile, selected));
+    const startPoints = profile.points.filter((point) => moving.has(point.id));
+    if (!startPoints.length) return;
+    const allowed = clampNudge(startPoints, dx, dz, workspace.width / 2, workspace.depth / 2);
+    if (Math.abs(allowed.dx) < 1e-9 && Math.abs(allowed.dz) < 1e-9) return;
+    onTransformPoints(translateSketchPoints(startPoints, allowed.dx, allowed.dz), t("sketch.shapeMoved"));
+  };
   const isPointSelected = (id: string) => selected?.kind === "point" ? selected.id === id : selected?.kind === "multiple" ? selected.pointIds.includes(id) : false;
   const isSegmentSelected = (id: string) => selected?.kind === "segment" ? selected.id === id : selected?.kind === "multiple" ? selected.segmentIds.includes(id) : false;
   const [localCornerDialog, setLocalCornerDialog] = useState<"fillet" | "chamfer" | null>(null);
@@ -2133,48 +2157,80 @@ export function SketchWorkspace({
         <div className="sketch-mode-badge">{operation === "revolve" ? t("sketch.modeBadgeRevolve") : operation === "sweep" ? t("sketch.modeBadgeSweep") : t("sketch.modeBadge")}</div>
       )}
       {operation === "revolve" ? <SketchRevolvePreview positions={revolvePreviewPositions} /> : null}
-      <div className="camera-controls sketch-camera-controls" aria-label={t("sketch.viewControls")} data-help-section="cameraBar">
-        <button aria-label={t("sketch.resetView")} aria-keyshortcuts="Home" title={t("camera.shortcut", { label: t("sketch.resetView"), keys: "Home" })} onClick={resetView}><Home size={28} /></button>
-        <button
-          aria-label={t("camera.focusSelection")}
-          aria-keyshortcuts="F Shift+F"
-          title={t("camera.shortcut", { label: t("camera.focusSelection"), keys: "F" })}
-          disabled={!focusBounds}
-          onClick={() => focusSelection()}
-        >
-          <Crosshair size={28} />
-        </button>
-        <button aria-label={t("sketch.zoomIn")} aria-keyshortcuts="+" title={t("camera.shortcut", { label: t("sketch.zoomIn"), keys: "+" })} onClick={() => zoomByButton(ZOOM_STEP_IN)}><Plus size={33} /></button>
-        <button aria-label={t("sketch.zoomOut")} aria-keyshortcuts="-" title={t("camera.shortcut", { label: t("sketch.zoomOut"), keys: "−" })} onClick={() => zoomByButton(ZOOM_STEP_OUT)}><Minus size={33} /></button>
-        <button
-          className={tool === "measure" ? "active" : ""}
-          aria-label={t("camera.tapeTools")}
-          title={t("camera.tapeTools")}
-          aria-pressed={tool === "measure"}
-          onClick={onMeasureTool}
-        >
-          <RulerDimensionLine size={26} strokeWidth={2.2} aria-hidden="true" />
-        </button>
-        <button
-          className={showMeasurements ? "active" : ""}
-          aria-label={t("sketch.showMeasurements")}
-          title={t("sketch.showMeasurements")}
-          aria-pressed={showMeasurements}
-          onClick={toggleMeasurements}
-        >
-          <Ruler size={26} strokeWidth={2.2} aria-hidden="true" />
-        </button>
-        {onToggleReferenceEdges ? (
+      <div
+        ref={cameraBarMove.panelRef}
+        className={`camera-controls sketch-camera-controls ${cameraBarCollapsed ? "collapsed" : ""} ${cameraBarMove.dragging ? "moving" : ""}`}
+        style={cameraBarMove.style}
+        aria-label={t("sketch.viewControls")}
+        data-help-section="cameraBar"
+      >
+        <CameraBarHandle move={cameraBarMove} collapsed={cameraBarCollapsed} onToggle={() => setCameraBarCollapsed((folded) => !folded)} />
+        {cameraBarCollapsed ? null : (<>
+        <div className="camera-group">
+          <button aria-label={t("sketch.resetView")} aria-keyshortcuts="Home" title={t("camera.shortcut", { label: t("sketch.resetView"), keys: "Home" })} onClick={resetView}><Home size={24} strokeWidth={2.25} /></button>
           <button
-            className={showReferenceEdges ? "active" : ""}
-            aria-label={t("sketch.showPartEdges")}
-            title={t("sketch.showPartEdges")}
-            aria-pressed={Boolean(showReferenceEdges)}
-            onClick={onToggleReferenceEdges}
+            aria-label={t("camera.focusSelection")}
+            aria-keyshortcuts="F Shift+F"
+            title={t("camera.shortcut", { label: t("camera.focusSelection"), keys: "F" })}
+            disabled={!focusBounds}
+            onClick={() => focusSelection()}
           >
-            <Layers size={26} strokeWidth={2.2} aria-hidden="true" />
+            <Crosshair size={24} strokeWidth={2.25} />
           </button>
+        </div>
+        <div className="camera-group">
+          <button aria-label={t("sketch.zoomIn")} aria-keyshortcuts="+" title={t("camera.shortcut", { label: t("sketch.zoomIn"), keys: "+" })} onClick={() => zoomByButton(ZOOM_STEP_IN)}><Plus size={28} strokeWidth={2.15} /></button>
+          <button aria-label={t("sketch.zoomOut")} aria-keyshortcuts="-" title={t("camera.shortcut", { label: t("sketch.zoomOut"), keys: "−" })} onClick={() => zoomByButton(ZOOM_STEP_OUT)}><Minus size={28} strokeWidth={2.15} /></button>
+        </div>
+        <div className="camera-group">
+          <button
+            className={tool === "measure" ? "active" : ""}
+            aria-label={t("camera.tapeTools")}
+            title={t("camera.tapeTools")}
+            aria-pressed={tool === "measure"}
+            onClick={onMeasureTool}
+          >
+            <RulerDimensionLine size={26} strokeWidth={2.2} aria-hidden="true" />
+          </button>
+          <button
+            className={showMeasurements ? "active" : ""}
+            aria-label={t("sketch.showMeasurements")}
+            title={t("sketch.showMeasurements")}
+            aria-pressed={showMeasurements}
+            onClick={toggleMeasurements}
+          >
+            <Ruler size={26} strokeWidth={2.2} aria-hidden="true" />
+          </button>
+          {onToggleReferenceEdges ? (
+            <button
+              className={showReferenceEdges ? "active" : ""}
+              aria-label={t("sketch.showPartEdges")}
+              title={t("sketch.showPartEdges")}
+              aria-pressed={Boolean(showReferenceEdges)}
+              onClick={onToggleReferenceEdges}
+            >
+              <Layers size={26} strokeWidth={2.2} aria-hidden="true" />
+            </button>
+          ) : null}
+        </div>
+        {onNoteTool && onToggleNotes ? (
+          <div className="camera-group note-control-group" role="group" aria-label={t("visibility.notes")}>
+            <button className={noteMode ? "active" : ""} aria-label={t("editor.tool.note")} aria-pressed={noteMode} title={t("editor.tool.note")} onClick={onNoteTool}>
+              <ToolbarNoteIcon />
+            </button>
+            <button
+              className={`note-visibility-button ${notesVisible ? "" : "active"}`}
+              aria-label={t("visibility.notes")}
+              aria-pressed={!notesVisible}
+              title={noteCount > 0 ? `${t("visibility.notes")} (${noteCount})` : t("visibility.notes")}
+              disabled={noteCount === 0}
+              onClick={onToggleNotes}
+            >
+              {notesVisible ? <Eye size={22} strokeWidth={2.1} aria-hidden="true" /> : <EyeOff size={22} strokeWidth={2.1} aria-hidden="true" />}
+            </button>
+          </div>
         ) : null}
+        </>)}
       </div>
       <section ref={wrapRef} className="sketch-plate-wrap" aria-label="2D sketch plate">
         <svg
@@ -3355,6 +3411,29 @@ export function SketchWorkspace({
                       <span>{t(selectionLock === "all" ? "sketch.unlockOutline" : "sketch.lockOutline")}</span>
                     </button>
                   ) : null}
+                  {selectedGeometryBounds ? (
+                    <>
+                      <span className="sketch-point-divider" />
+                      <SketchImagePositionField
+                        className="sketch-selection-position"
+                        label={t("sketch.selectionX")}
+                        title={t("sketch.selectionPositionHint")}
+                        value={selectedGeometryBounds.cx}
+                        accuracy={workspace.accuracy}
+                        disabled={selectionLocked}
+                        onChange={(x) => moveSelectionBy(x - selectedGeometryBounds.cx, 0)}
+                      />
+                      <SketchImagePositionField
+                        className="sketch-selection-position"
+                        label={t("sketch.selectionY")}
+                        title={t("sketch.selectionPositionHint")}
+                        value={displayY(selectedGeometryBounds.cz)}
+                        accuracy={workspace.accuracy}
+                        disabled={selectionLocked}
+                        onChange={(y) => moveSelectionBy(0, insideZ(y) - selectedGeometryBounds.cz)}
+                      />
+                    </>
+                  ) : null}
                   {canAlignOutlines ? (
                     <>
                       <span className="sketch-point-divider" />
@@ -3956,12 +4035,16 @@ function SketchImagePositionField({
   value,
   accuracy,
   disabled = false,
+  className = "sketch-image-position-field",
+  title,
   onChange,
 }: {
   label: string;
   value: number;
   accuracy: 1 | 2 | 3;
   disabled?: boolean;
+  className?: string;
+  title?: string;
   onChange: (value: number) => void;
 }) {
   const formatted = formatDimension(value, accuracy);
@@ -3975,7 +4058,7 @@ function SketchImagePositionField({
   };
 
   return (
-    <label className="sketch-image-position-field">
+    <label className={className} title={title}>
       <span>{label}</span>
       <input
         type="text"

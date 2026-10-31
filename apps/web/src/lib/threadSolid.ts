@@ -1,5 +1,6 @@
 import type { OcctKernel, ShapeHandle, SweepMode } from "occt-wasm";
 import type { CadModifierThreadPart } from "@/lib/cadModifierTypes";
+import type { ThreadDriveOutline } from "@/lib/threadGeometry";
 
 /** SweepMode.FixedUp, by value: the STEP export runs this outside the worker, where occt-wasm is only a type. */
 const FIXED_UP = 2 as SweepMode;
@@ -272,8 +273,24 @@ function screwHead(cad: OcctKernel, head: NonNullable<CadModifierThreadPart["hea
   else if (head.kind === "countersunk") body = revolved(cad, [[0, 0], [head.radius, 0], [head.neckRadius, head.height], [0, head.height]]);
   else body = cad.makeCylinder(head.radius, head.height);
   if (head.chamferFaceRadius > 0) body = oneSolid(cad, cad.common(body, rimChamferBound(cad, head.chamferFaceRadius, head.height)), "head");
-  if (head.socketDepth > 0) body = oneSolid(cad, cad.cut(body, hexPrism(cad, head.socketAcrossFlats, head.socketDepth)), "head");
+  if (head.socketDepth > 0 && head.driveOutline) body = oneSolid(cad, cad.cut(body, drivePrism(cad, head.driveOutline, head.socketDepth)), "head");
   return body;
+}
+
+/**
+ * The drive as a prism of `depth` from z = 0, from its outline: straight
+ * edges and true arcs. The outline lies in the shape's x/z plane; the turn
+ * up to y takes this z-up (x, y) to (x, -z), so z goes in as -y.
+ */
+function drivePrism(cad: OcctKernel, outline: ThreadDriveOutline, depth: number) {
+  const at = ([x, z]: readonly [number, number]) => ({ x, y: -z, z: 0 });
+  const edges: ShapeHandle[] = [];
+  let from = outline.start;
+  for (const edge of outline.edges) {
+    edges.push(edge.mid ? cad.makeArcEdge(at(from), at(edge.mid), at(edge.to)) : cad.makeLineEdge(at(from), at(edge.to)));
+    from = edge.to;
+  }
+  return cad.extrude(cad.makeFace(cad.makeWire(edges)), 0, 0, depth);
 }
 
 /** The thread part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */

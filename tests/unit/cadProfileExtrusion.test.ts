@@ -434,6 +434,24 @@ describe("which shapes get an exact profile", () => {
     expect(cadModifierHelicalGearForShape(shape("gear", { gearType: "spur" }))).toBeNull();
   });
 
+  it("stretches a herringbone gear by what its ring spans turning half the twist, up to the middle and back (#1007)", () => {
+    // Simple teeth: involute and round ones take their stretch from the tip circle, whatever the turn.
+    const fields = { width: 30, depth: 30, height: 6, teeth: 12, toothWidth: 4, helixAngle: 10, centerHoleSize: 6 };
+    const helical = cadModifierHelicalGearForShape(shape("gear", { gearType: "helical", ...fields }))!;
+    const herringbone = cadModifierHelicalGearForShape(shape("gear", { gearType: "herringbone", ...fields }))!;
+    // Turned the whole 10 degrees a tooth tip passes +x: the helical ring spans its full tip circle.
+    expect(helical.stretch.x).toBeCloseTo(1, 12);
+    // The span of the corners turned anywhere from 0 to half the twist, sampled finely.
+    const span = (pick: (angle: number) => number) => {
+      const values = herringbone.corners.flatMap(({ angle, radius }) => Array.from({ length: 2001 }, (_, step) => pick(angle + (step / 2000) * (herringbone.twist / 2)) * radius));
+      return Math.max(...values) - Math.min(...values);
+    };
+    expect(herringbone.stretch.x).toBeGreaterThan(1.0001);
+    expect(span(Math.cos) * herringbone.stretch.x).toBeCloseTo(30, 5);
+    expect(span(Math.sin) * herringbone.stretch.z).toBeCloseTo(30, 5);
+    expect({ ...herringbone, herringbone: undefined, stretch: undefined }).toEqual({ ...helical, herringbone: undefined, stretch: undefined });
+  });
+
   it("leaves everything else on its old path", () => {
     expect(cadModifierProfileForShape(shape("box"))).toBeNull();
     // A helical gear turns its outline as it rises: its own part (cadModifierHelicalGearForShape), no profile.

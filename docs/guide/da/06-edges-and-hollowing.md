@@ -41,6 +41,8 @@ Når en markering der virkede fejler efter du klikker én kant mere, bliver den 
 
 Kanten under markøren tegnes også bredere, så du kan se hvilken et klik vil vælge.
 
+Et hul tager også {{ui:editor.tool.chamfer}} og {{ui:editor.tool.fillet}}, og det samme gør {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} og {{ui:editor.tool.deleteFace}}: det forbliver et hul og skærer med sin nye form. Afrundes de fire lodrette kanter på et kassehul, får du en lomme med runde indvendige hjørner, og et hul gjort større med {{ui:editor.tool.offset}} skærer med så meget mere luft. Kanten, hvor et hul møder delen, bearbejder du i stedet på den færdige gruppe: den kant hører til den.
+
 ### Tage en kantbehandling tilbage
 
 En behandlet form kan altid behandles igen. Vælg den igen og åbn værktøjet - Rund, Fas eller Hul, hver viser listen: under {{ui:edge.featureHistory}} ser du hvad der allerede er på den. {{ui:edge.revertAction}} tager en enkelt behandling tilbage. Bemærk: hvis nyere behandlinger ligger ovenpå, følger de med, og panelet fortæller dig hvor mange.
@@ -90,9 +92,10 @@ Hvis du ændrer størrelse på en udhulet form senere, udhuler layerling den ige
 
 - {{ui:lid.type.plug}}: en plade så stor som legemet med en læbe nedenunder, der går ind i åbningen.
 - {{ui:lid.type.cap}}: en plade en væg bredere end legemet med en kant nedenunder, der går uden om.
+- {{ui:lid.type.both}}: en plade en væg bredere end legemet med begge dele: en læbe ned i åbningen og en kant uden om. Legemets væg sidder i en rille mellem dem, som på en madkasse.
 - {{ui:lid.type.flat}}: kun pladen, til at lægge ovenpå eller lime på.
 
-Derefter indstiller du tykkelsen ({{ui:lid.thickness}}), pasningen ({{ui:lid.fit}}, spalten pr. side mellem låg og legeme: 0,1 mm stramt, 0,2 mm normalt, 0,3 mm løst eller enhver værdi op til 1 mm) og hvor dybt læben eller kanten når ned, og hvor tyk dens væg er. Klik på {{ui:lid.apply}}: låget ligger ved siden af legemet, vendt med pladen nedad, så det printes uden støtte. Legemet forbliver, som det er. Låget følger enhver omrids, rundt eller kantet, fordi det tages fra selve legemet lige under dets kant. Et legeme uden åbning foroven får kun et fladt låg; til de to andre skal du først udhule det med åben top.
+Derefter indstiller du tykkelsen ({{ui:lid.thickness}}), pasningen ({{ui:lid.fit}}, spalten pr. side mellem låg og legeme: 0,1 mm stramt, 0,2 mm normalt, 0,3 mm løst eller enhver værdi op til 1 mm) og hvor dybt læben eller kanten når ned, og hvor tyk dens væg er. Klik på {{ui:lid.apply}}: låget ligger ved siden af legemet, vendt med pladen nedad, så det printes uden støtte. Legemet forbliver, som det er. Låget følger enhver omrids, rundt eller kantet, fordi det tages fra selve legemet lige under dets kant. Et legeme uden åbning foroven får kun et fladt låg; til de andre skal du først udhule det med åben top.
 
 > **Tip:** Hvor stramt et låg sidder, afhænger af printeren. Print først en lille kasse med låg; sidder det for stramt, så vælg den næste, løsere pasning.
 
@@ -105,6 +108,8 @@ Hver flade på et legeme kan flyttes den samme afstand, udad eller indad. Det er
 3. {{ui:offset.edges}} bestemmer de ydre hjørner: afrundet holder den forskudte flade rund, skarp lader fladerne løbe videre, til de mødes.
 4. Sæt hak ved {{ui:offset.copy}} for at beholde delen, som den er, og få det forstørrede legeme som en kopi, der allerede er et hul. Grupper hullet med modstykket, så skærer det præcis det spillerum, du valgte.
 5. Klik på {{ui:offset.apply}}.
+
+Sæt flueben ved {{ui:offset.sideways}}, når kun omridset skal vokse eller skrumpe: siderne flytter sig med afstanden, mens hver flad over- og underside bliver i sin højde. Et skilt får en kant hele vejen rundt, en sokkel bliver bredere, og legemet bliver ikke højere. På et trappeformet legeme beholder hvert trin sin egen højde. En tekst, der forskydes via sine omrids, beholder så også sin højde.
 
 Uden hak forskydes selve legemet. Det bliver et fast, nøjagtigt legeme, som efter en affasning: listen øverst i panelet tager forskydningen tilbage, og {{ui:edge.editAction}} åbner værktøjet igen med den gamle afstand. Kun nøjagtige CAD-legemer kan forskydes - kasser, cylindre og de andre former, grupper af dem, importerede STEP-dele. Et legeme, der kun er et mesh af trekanter, som mange STL-importer, kan ofte ikke. En afstand, der er for stor til legemet, for eksempel en formindskelse ud over den tyndeste væg, afvises.
 

@@ -82,7 +82,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_apply_edge_treatment` | Applica smussi o raccordi agli spigoli selezionati. |
 | `layerling_hollow_object` | Svuota un corpo mantenendo pareti di spessore uniforme. |
 | `layerling_cut_out` | ritaglia un solido da un altro perché combacino: la parte resta, una copia ingrandita del gioco viene sottratta all'altro corpo |
-| `layerling_offset_object` | sposta tutte le facce di un corpo per il gioco di un accoppiamento: lo ingrandisce o riduce, o aggiunge la copia ingrandita come vuoto |
+| `layerling_offset_object` | sposta tutte le facce di un corpo per il gioco di un accoppiamento: lo ingrandisce o riduce, o aggiunge la copia ingrandita come vuoto, o sposta solo i lati |
 | `layerling_list_faces` | Elenca le facce di un corpo CAD esatto. |
 | `layerling_delete_faces` | Elimina le facce e chiude l’apertura. |
 | `layerling_array_objects` | Crea copie in fila o disposte in cerchio. |
@@ -90,7 +90,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_layer_text` | Trasforma un testo in una serie di livelli per la stampa multicolore (lettere, bordi più larghi e piastra senza fori) oppure ricostruisce la serie, con foro per portachiavi, angoli per livello e bordo delle lettere arrotondato o smussato. Se fornisci un elenco di nomi, crea un’etichetta per ciascuno. |
 | `layerling_layer_icon` | Trasforma un’icona SVG (il testo del file o un corpo da schizzo estruso) in un’etichetta a livelli per la stampa multicolore — icona, bordi più larghi e piastra senza fori — oppure la ricrea con una nuova larghezza o nuovi livelli. Se specifichi una quantità, riempie la piastra con copie. |
 | `layerling_create_qr_code` | Crea un codice QR da un testo o da un indirizzo web, come {{ui:shape.qrCode}} nella raccolta di forme: il solo codice, in rilievo su una piastra oppure inciso, con correzione degli errori, larghezza, altezza e zona libera; può anche creare un foro. Avvisa se un modulo è più piccolo di 0,8 mm. |
-| `layerling_reference_image` | aggiunge un'immagine di riferimento da un'immagine, come {{ui:import.referenceImage}}, oppure ne sposta, ruota, calibra (due punti dell'immagine e la loro distanza reale), rende trasparente o blocca una: una guida che non viene mai esportata né stampata |
+| `layerling_reference_image` | aggiunge un'immagine di riferimento da un'immagine, come {{ui:import.referenceImage}}, oppure ne sposta, ruota, calibra (due punti dell'immagine e la loro distanza reale), rende trasparente o blocca una: una guida che non viene mai esportata né stampata; `trace` trasforma la parte scura o chiara in un corpo di schizzo appoggiato sopra |
 | `layerling_measure_section` | Misura su un piano di sezione tra due punti agganciati al contorno: spessore delle pareti, spazi e accoppiamenti. |
 | `layerling_show_overhangs` | Attiva o disattiva la visualizzazione dei sovrasbalzi, ne imposta l’angolo e indica per ogni corpo l’area che richiederebbe supporti. |
 | `layerling_estimate_print` | Stima volume, peso e filamento per la selezione o per l’intero progetto: calcola il corpo pieno e fornisce una stima approssimativa con pareti e riempimento, come nella finestra di esportazione. |
