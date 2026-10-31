@@ -5,7 +5,7 @@ summary: A saját nyomtatód kiválasztása, figyelmeztetés, ha valami nem fér
 
 ## A nyomtatód kiválasztása
 
-Nyisd meg a beállításokat (a fogaskerék a szalagon, {{ui:editor.workspaceSettings}}), és válts a {{ui:workspace.workplane}} részre. A {{ui:workspace.printer}} alatt egy több mint 220 elterjedt modellt tartalmazó listából választod ki a nyomtatódat, köztük Bambu Lab, Prusa, Creality, Anycubic, Elegoo és sok más gyártó gépeit.
+Nyisd meg a beállításokat (a fogaskerék a szalagon, {{ui:editor.workspaceSettings}}), és válts a {{ui:workspace.workplane}} részre. A {{ui:workspace.printer}} alatt egy több mint 230 elterjedt modellt tartalmazó listából választod ki a nyomtatódat, köztük Bambu Lab, Prusa, Creality, Anycubic, Elegoo és sok más gyártó gépeit.
 
 ![A munkasík beállításai kiválasztott nyomtatóval. A tárgyasztal és a legnagyobb nyomtatási magasság a szeletelőprofilból származik.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Három dolog történik:
 - A layerling **figyelmeztet**, ha valami nem fér el.
 
 A nyomtatóprofilok az OrcaSlicerből származnak, így ugyanazok, amelyeket a szeletelőd is ismer. Ha inkább nyomtató nélkül dolgoznál, válaszd a {{ui:workspace.printerNone}} lehetőséget. A munkasík méretét kézzel is beállíthatod.
+
+A delta nyomtatók, például az FLSun vagy a SeeMeCNC gépei vagy az Anycubic Predator, kerek tárgyasztalra nyomtatnak. Ezekkel a munkafelület is kerek, olyan széles, mint a tárgyasztal, és egy test túl nagy, amint túlnyúlik a peremen. Egy kerek testet a saját körvonala alapján mér a program, nem a köré írt doboz alapján, így egy majdnem asztalnyi széles henger is elfér.
 
 ## Ha valami nem fér el
 

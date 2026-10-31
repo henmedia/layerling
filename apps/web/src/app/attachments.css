@@ -63,7 +63,7 @@ html[data-theme="dark"] .attachments-indicator {
   overflow: hidden;
   color: #5a3917;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

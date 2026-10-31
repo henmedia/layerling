@@ -1,3 +1,4 @@
+import type { ThreadDriveOutline } from "@/lib/threadGeometry";
 import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityType, ShellEdges, ShellOpenings } from "@/types/layerling";
 
 export type CadModifierKind = "chamfer" | "chamfillet" | "fillet" | "shell" | "deleteFace" | "offset";
@@ -121,6 +122,11 @@ export type CadModifierProfilePart = {
   /** Loft only: the section at the top, loop for loop and piece for piece the partner of `loops`. */
   topLoops?: CadModifierProfileLoop[];
   /**
+   * Loft only, instead of `topLoops`: the top is this one point at `height` (a pointed pyramid). The bottom is then
+   * one outline of straight lines, and every side is the flat triangle from one of its edges to the point.
+   */
+  apex?: { x: number; z: number };
+  /**
    * Loft only: the section turns this many degrees from bottom to top, evenly, around
    * `twistCenter` (which moves with the lean). The sides are then no longer ruled: the body is a
    * smooth loft through sections a few degrees apart (#184).
@@ -129,6 +135,20 @@ export type CadModifierProfilePart = {
   twistCenter?: { x: number; z: number };
   /** Degrees between two sections of a twisted loft, where the standard step is too coarse for an outline with fine teeth (a knurl). */
   twistStep?: number;
+  /**
+   * Loft only: the sections at the shares `t` of the way up, scaled by `sx` across and `sz` in
+   * height from the shape's own section; `loops` is the first of them and `topLoops` the last - a round roof sloping or narrowing
+   * along its length. Two neighbours where nothing between them curves are joined by a ruled
+   * loft, the rest smoothly; a `corner` breaks the loft there, so the edge stays sharp.
+   */
+  sections?: Array<{ t: number; sx: number; sz: number; corner?: boolean }>;
+  /**
+   * Extrusion only: what the body keeps of itself inside a second prism - `loops` (one outline)
+   * pushed `height` along its local y and placed by `frame` (a 3x4 matrix, row by row) in the
+   * part's own frame. An upright body whose top slopes along its length (slope along) is its
+   * plain extrusion trimmed by its side outline pushed across.
+   */
+  trim?: { loops: CadModifierProfileLoop[]; height: number; frame: number[] };
   /** Loft only: 0 to 1, how much of an S-curve the sides take between the ends instead of a straight line (#271); built like a turned loft, through sections. */
   smooth?: number;
   /** Loft only, with a twist: how far the lean moves the top; the turning centre moves along with it. */
@@ -218,8 +238,8 @@ export type CadModifierThreadPart = {
     neckRadius: number;
     /** Radius of the flat faces when both head edges are chamfered, or 0. */
     chamferFaceRadius: number;
-    /** Hex socket across flats and depth, or 0 depth for none. */
-    socketAcrossFlats: number;
+    /** The drive in the free head face (#1052) as its outline in the x/z plane of the shape, and its depth; 0 depth for none. */
+    driveOutline?: ThreadDriveOutline;
     socketDepth: number;
   };
   /** Nut only: its hex across flats, and the face radius of its chamfered rims (0 for sharp). */
@@ -265,6 +285,23 @@ export type CadModifierHelicalGearPart = {
   height: number;
   stretch: { x: number; z: number };
   /** 0 for none. */
+  boreRadius: number;
+  transform?: number[];
+  expected?: { bounds: number[]; volume: number };
+};
+
+/**
+ * A Hirth joint (#1016), as the exact body its display mesh draws: the rim's
+ * half width and half depth, the height, the teeth and their height at the
+ * rim, and the round bore (0 for none), in the shape's own frame (y up, the
+ * bottom at y = 0, centred on x and z); `transform` places it.
+ */
+export type CadModifierHirthPart = {
+  rx: number;
+  rz: number;
+  height: number;
+  teeth: number;
+  toothHeight: number;
   boreRadius: number;
   transform?: number[];
   expected?: { bounds: number[]; volume: number };
@@ -354,6 +391,8 @@ export type CadModifierMeshPart = {
   helicalGear?: CadModifierHelicalGearPart;
   /** A Gridfinity bin or baseplate's exact body; positions/indices (if any) are only the fallback if it cannot be built. */
   gridfinity?: CadModifierGridfinityPart;
+  /** A Hirth joint's exact body; positions/indices (if any) are only the fallback if it cannot be built. */
+  hirth?: CadModifierHirthPart;
   primitive?: CadModifierPrimitivePart;
   /** When set, positions/indices (if any) are only the fallback if the exact body fails. */
   profile?: CadModifierProfilePart;
@@ -413,6 +452,8 @@ export type CadModifierWorkerRequest =
       shellEdges?: ShellEdges;
       // Only for "offset" (#919): `amount` is the distance, moved inward when this is set.
       offsetShrink?: boolean;
+      // Only for "offset" (#1057): only the sides move, the body keeps its height.
+      offsetSideways?: boolean;
       // Only for "deleteFace": the faces to delete, as the prepare numbered them.
       faceIds?: number[];
       // The finest deflection the shape's edge-treatment history has needed

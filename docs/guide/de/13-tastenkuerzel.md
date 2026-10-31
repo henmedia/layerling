@@ -19,7 +19,7 @@ Du findest ein Werkzeug nicht? Drücke [[Strg]]+[[K]] oder klicke auf die Lupe i
 - Jeder Eintrag zeigt die Tasten, die dasselbe tun, und den Bereich der Leiste, in dem er liegt, so lernst du, wo er sitzt.
 - Ausgegraute Einträge lassen sich gerade nicht ausführen, meist weil nichts ausgewählt ist. Sie bleiben in der Liste, damit die Suche trotzdem verrät, wo das Werkzeug liegt.
 
-Auch diese Anleitung hat oben auf jeder Seite ein Suchfeld: Tippe ein oder zwei Wörter, und es listet die Abschnitte auf, in denen alle vorkommen, die Treffer hervorgehoben. Ein Klick, oder [[Enter]] für den ersten, springt direkt dorthin.
+Auch diese Anleitung hat oben auf jeder Seite ein Suchfeld: Tippe ein oder zwei Wörter, und es listet die Abschnitte auf, in denen alle vorkommen, die Treffer hervorgehoben. Ein Klick, oder [[Enter]] für den ersten, springt direkt dorthin. Die Seite, die sich öffnet, markiert jede Stelle, an der deine Wörter stehen, und rollt zur ersten im gewählten Abschnitt; [[Esc]] oder ein Klick auf eine Markierung nimmt sie wieder weg.
 - Der Name einer Form fügt diese Form auf die Arbeitsfläche ein, genau wie ein Klick im Formenmenü.
 - Bei leerem Feld stehen die zuletzt benutzten Befehle oben.
 - Der Name eines Körpers in deinem Entwurf findet diesen Körper und wählt ihn aus, praktisch bei Entwürfen mit vielen Teilen. Körper erscheinen erst, sobald du etwas tippst.

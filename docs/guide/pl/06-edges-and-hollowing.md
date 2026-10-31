@@ -41,6 +41,8 @@ Gdy wybór, który działał, przestaje działać po kliknięciu jeszcze jednej 
 
 Krawędź pod wskaźnikiem też jest rysowana grubiej, więc widać, którą wybierze kliknięcie.
 
+Otwór także przyjmuje {{ui:editor.tool.chamfer}} i {{ui:editor.tool.fillet}}, podobnie jak {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} i {{ui:editor.tool.deleteFace}}: pozostaje otworem i wycina swoim nowym kształtem. Zaokrąglenie czterech pionowych krawędzi otworu w kształcie prostopadłościanu daje kieszeń z zaokrąglonymi narożnikami wewnętrznymi, a otwór powiększony przez {{ui:editor.tool.offset}} wycina z odpowiednio większym luzem. Krawędź, w której otwór styka się z częścią, obrabiaj na gotowej grupie: ta krawędź należy do niej.
+
 ### Cofanie obróbki krawędzi
 
 Obrobioną bryłę zawsze można obrobić ponownie. Zaznacz ją znowu i otwórz narzędzie. Zaokrąglenie, Fazowanie i Wydrąż pokazują listę: w {{ui:edge.featureHistory}} widzisz, co już na niej jest. {{ui:edge.revertAction}} cofa pojedynczą obróbkę. Uwaga: jeśli leżą na niej nowsze obróbki, znikają razem z nią, a panel mówi, ile ich jest.
@@ -79,9 +81,21 @@ Bryłę z kieszenią (klocek z otworem, który nie przechodzi na wylot, zrobiony
 
 **Bryły zakończone szpicem,** takie jak stożek albo obrócony trójkąt, nie mają na górze płaskiej ściany, która mogłaby zostać otwarta. Całkowicie zamknięta wnęka też tam nie zadziała, bo szpica nie da się odsunąć do środka: nawet przy ściance 1 mm dostaniesz komunikat, że ścianki nie mogą być tak grube. Zamiast tego wrysuj ściankę w profil przed obrotem: zduplikuj kontur, zmniejsz kopię równomiernie, ustaw ją na środku dużego konturu i wytnij nią duży, a potem obróć całość (rozdział Szkice, część o obracaniu szkicu). Odległość między oboma konturami to grubość ścianki.
 
-Jeśli później zmienisz rozmiar wydrążonej bryły, layerling od razu wydrąży ją ponownie w nowym rozmiarze. Ścianka zostaje tak gruba, jak wybrałeś, także w bryłach okrągłych. Walec rozciągnięty w jedną stronę bardziej niż w drugą staje się elipsą.
+Jeśli później zmienisz rozmiar wydrążonej bryły, layerling od razu wydrąży ją ponownie w nowym rozmiarze. Ścianka zostaje tak gruba, jak wybrałeś, także w bryłach okrągłych. Walec rozciągnięty w jedną stronę bardziej niż w drugą staje się elipsą. Zaokrąglenia i fazki nałożone po drążeniu wracają na te same krawędzie.
 
 > **Wskazówka:** przy dyszy 0,4 mm dobrym początkiem jest ścianka od 1,2 do 2 mm: wystarczająco cienka, żeby oszczędzić materiał, i wystarczająco gruba na solidną część.
+
+## Pokrywka do otwartej bryły
+
+{{ui:editor.tool.lid}} tworzy pokrywkę do bryły otwartej u góry: pudełka wydrążonego z otwartą górą, doniczki, tacki. Zaznacz bryłę i kliknij {{ui:editor.tool.lid}}. W oknie wybierasz rodzaj:
+
+- {{ui:lid.type.plug}}: płyta tak duża jak bryła, a pod nią kołnierz, który wchodzi w otwór.
+- {{ui:lid.type.cap}}: płyta szersza od bryły o grubość ścianki, a pod nią obrzeże, które obejmuje ją z zewnątrz.
+- {{ui:lid.type.flat}}: tylko płyta, do położenia lub przyklejenia.
+
+Następnie ustawiasz grubość ({{ui:lid.thickness}}), pasowanie ({{ui:lid.fit}}, czyli {{ui:lid.gap}} między pokrywką a bryłą: 0,1 mm ciasno, 0,2 mm normalnie, 0,3 mm luźno lub dowolna wartość do 1 mm) oraz jak głęboko sięga kołnierz lub obrzeże i jak gruba jest jego ścianka. Kliknij {{ui:lid.apply}}: pokrywka leży obok bryły, odwrócona płytą w dół, więc drukuje się bez podpór. Bryła zostaje bez zmian. Pokrywka podąża za każdym obrysem, okrągłym lub kanciastym, bo jest zdejmowana z samej bryły tuż pod jej krawędzią. Bryła bez otworu u góry dostaje tylko płaską pokrywkę; dla dwóch pozostałych najpierw wydrąż ją z otwartą górą.
+
+> **Wskazówka:** To, jak ciasno siedzi pokrywka, zależy od drukarki. Najpierw wydrukuj małe pudełko z pokrywką; jeśli jest za ciasna, wybierz następne, luźniejsze pasowanie.
 
 ## Odsuwanie brył
 
@@ -92,6 +106,8 @@ Każdą ścianę bryły można przesunąć o tę samą odległość na zewnątrz
 3. {{ui:offset.edges}} decydują o zewnętrznych narożach: zaokrąglone utrzymuje odsuniętą powierzchnię okrągłą, ostre pozwala ścianom biec dalej, aż się spotkają.
 4. Zaznacz {{ui:offset.copy}}, aby zachować część bez zmian, a powiększoną bryłę dostać jako kopię, która już jest otworem. Zgrupuj ten otwór z częścią współpracującą, a wytnie dokładnie wybrany luz.
 5. Kliknij {{ui:offset.apply}}.
+
+Zaznacz {{ui:offset.sideways}}, gdy ma rosnąć lub maleć tylko obrys: boki przesuwają się o odległość, a każda płaska górna i dolna ściana zostaje na swojej wysokości. Tabliczka dostaje obramowanie dookoła, podstawa robi się szersza, a bryła nie staje się wyższa. W bryle schodkowej każdy stopień zachowuje swoją wysokość. Tekst odsuwany przez swoje obrysy też zachowuje wtedy swoją wysokość.
 
 Bez zaznaczenia odsunięta zostaje sama bryła. Staje się stałą, dokładną bryłą, jak po fazie: lista u góry panelu cofa odsunięcie, a {{ui:edge.editAction}} otwiera narzędzie ponownie ze starą odległością. Odsunąć można tylko dokładne bryły CAD - prostopadłościany, walce i inne kształty, ich grupy, importowane części STEP. Bryła będąca tylko siatką trójkątów, jak wiele importów STL, często nie daje się odsunąć. Odległość zbyt duża dla bryły, na przykład zmniejszenie poza najcieńszą ścianę, zostaje odrzucona.
 

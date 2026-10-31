@@ -55,10 +55,17 @@ export const LAYERLING_VIDEOS = [
     url: "https://youtu.be/kzV7fQ3rXhw",
   },
   {
-    title: "Layerling la nueva herramienta gratuita de modelado 3D, más completo que Tinkercad",
+    title: "Layerling en español: el CAD gratis que reemplaza a Tinkercad (2026)",
+    channel: "Random Maker",
+    lang: "ES",
+    url: "https://youtu.be/iroftGBX-0Y",
+  },
+  {
+    // A whole playlist, so new videos in it arrive here without a release.
+    title: "Proyectos en Layerling",
     channel: "Fulcro 1900",
     lang: "ES",
-    url: "https://youtu.be/-EEt0RSINoY",
+    url: "https://www.youtube.com/playlist?list=PLTEdmvVC2bxs",
   },
   {
     // A whole playlist, so new videos in it arrive here without a release.

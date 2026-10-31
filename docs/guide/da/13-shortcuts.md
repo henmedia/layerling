@@ -19,7 +19,7 @@ Kan du ikke finde et værktøj? Tryk [[Ctrl]]+[[K]] eller klik forstørrelsesgla
 - Hver post viser de taster der gør det samme og det værktøjsbjælke-område den bor i, så du lærer hvor den er.
 - Poster der er grået ud kan ikke køres lige nu, for det meste fordi intet er valgt. De bliver i listen så søgningen stadig fortæller dig hvor værktøjet er.
 
-Vejledningen du læser har også en søgeboks, øverst på hver side: tast et ord eller to, og den lister de sektioner der indeholder dem alle, med de matchende ord markeret. Klik én, eller tryk [[Enter]] for den første, for at springe direkte derhen.
+Vejledningen du læser har også en søgeboks, øverst på hver side: tast et ord eller to, og den lister de sektioner der indeholder dem alle, med de matchende ord markeret. Klik én, eller tryk [[Enter]] for den første, for at springe direkte derhen. Siden der åbner, markerer hvert sted dine ord står, og ruller til det første i den valgte sektion; [[Esc]] eller et klik på en markering fjerner dem igen.
 - En forms navn tilføjer den form til arbejdsplanet, ligesom at klikke den i formmenuen.
 - Med et tomt felt lister søgningen de kommandoer du brugte sidst øverst.
 - Navnet på en form i dit design finder den form og vælger den, hvilket hjælper i et design med mange dele. Former vises først når du taster.

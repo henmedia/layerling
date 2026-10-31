@@ -8,8 +8,6 @@ import type { SketchPoint, SketchProfile } from "@/types/layerling";
  */
 export type SketchAlignMode = "left" | "centerX" | "right" | "top" | "centerZ" | "bottom";
 
-export const SKETCH_ALIGN_MODES: readonly SketchAlignMode[] = ["left", "centerX", "right", "top", "centerZ", "bottom"];
-
 type Bounds = { minX: number; maxX: number; minZ: number; maxZ: number };
 
 function boundsOf(points: readonly SketchPoint[]): Bounds {

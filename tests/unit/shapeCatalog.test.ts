@@ -52,13 +52,14 @@ describe("shape catalog", () => {
     expect(rulerIndex).toBe(kinds.length - 1);
   });
 
-  it("puts the screw holes and the teardrop after the bent tube, and text right behind them", () => {
+  it("puts the screw holes, the teardrop and the port opening after the bent tube, and text right behind them", () => {
     const kinds = toolbarShapeAssets.map((asset) => asset.kind);
     expect(kinds.indexOf("counterbore")).toBe(kinds.indexOf("bentTube") + 1);
     expect(kinds.indexOf("countersink")).toBe(kinds.indexOf("counterbore") + 1);
     expect(kinds.indexOf("doubleCountersink")).toBe(kinds.indexOf("countersink") + 1);
     expect(kinds.indexOf("teardrop")).toBe(kinds.indexOf("doubleCountersink") + 1);
-    expect(kinds.indexOf("text")).toBe(kinds.indexOf("teardrop") + 1);
+    expect(kinds.indexOf("port")).toBe(kinds.indexOf("teardrop") + 1);
+    expect(kinds.indexOf("text")).toBe(kinds.indexOf("port") + 1);
   });
 
   it("puts Gridfinity right after the spring", () => {
@@ -66,14 +67,15 @@ describe("shape catalog", () => {
     expect(kinds.indexOf("gridfinity")).toBe(kinds.indexOf("spring") + 1);
   });
 
-  it("exposes knurl, hinge and dovetail between gear and the decorative shapes in the toolbar catalog", () => {
+  it("exposes the Hirth joint, knurl, hinge and dovetail between gear and the decorative shapes in the toolbar catalog", () => {
     const kinds = toolbarShapeAssets.map((asset) => asset.kind);
 
     const gearIndex = kinds.indexOf("gear");
     const dovetailIndex = kinds.indexOf("dovetail");
-    expect(kinds.indexOf("knurl")).toBe(gearIndex + 1);
-    expect(kinds.indexOf("hinge")).toBe(gearIndex + 2);
-    expect(dovetailIndex).toBe(gearIndex + 3);
+    expect(kinds.indexOf("hirth")).toBe(gearIndex + 1);
+    expect(kinds.indexOf("knurl")).toBe(gearIndex + 2);
+    expect(kinds.indexOf("hinge")).toBe(gearIndex + 3);
+    expect(dovetailIndex).toBe(gearIndex + 4);
     expect(kinds.indexOf("star")).toBe(dovetailIndex + 1);
   });
 

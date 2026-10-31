@@ -38,7 +38,12 @@ export const SKETCH_PRIMITIVES: readonly SketchPrimitive[] = [
  * Zackenzahl und beim Stern, wie weit die Taeler nach innen reichen (in Prozent des Aussenradius).
  * Danach sind es ganz gewoehnliche Eckpunkte, die Zahl steht nirgends mehr.
  */
-export type SketchPrimitiveOptions = { sides?: number; innerPercent?: number };
+export type SketchPrimitiveOptions = {
+  sides?: number;
+  innerPercent?: number;
+  /** Nur beim Rechteck: seine Tiefe entlang z, wenn sie von der Breite (`size`) abweicht (#1048). */
+  depth?: number;
+};
 export const SKETCH_POLYGON_DEFAULT_SIDES = 5;
 export const SKETCH_POLYGON_MIN_SIDES = 3;
 export const SKETCH_POLYGON_MAX_SIDES = 64;
@@ -71,6 +76,32 @@ const KAPPA = 0.5522847498307936;
 
 /** Die Kantenlaenge, mit der eine neu eingefuegte Form beginnt. */
 export const SKETCH_PRIMITIVE_SIZE = 20;
+
+const positiveSize = (value: unknown): number | undefined =>
+  typeof value === "number" && Number.isFinite(value) && value > 0 ? value : undefined;
+
+/**
+ * Womit eine Form in der Skizze beginnt (#1048): Das Rechteck nimmt Breite und Tiefe, die in den
+ * Formvorgaben fuer den Quader stehen, Kreis und Ellipse die Breite des Zylinders als Durchmesser.
+ * Die uebrigen Formen haben in der Bibliothek kein Gegenstueck und bleiben bei SKETCH_PRIMITIVE_SIZE,
+ * ebenso alles, wofuer keine Vorgabe eingetragen ist.
+ */
+export function sketchPrimitiveStartSize(
+  primitive: SketchPrimitive,
+  defaults: Partial<Record<string, { width?: number; depth?: number }>>,
+): { size: number; depth?: number } {
+  if (primitive === "rectangle") {
+    const box = defaults.box ?? {};
+    const width = positiveSize(box.width) ?? SKETCH_PRIMITIVE_SIZE;
+    const depth = positiveSize(box.depth) ?? SKETCH_PRIMITIVE_SIZE;
+    return depth === width ? { size: width } : { size: width, depth };
+  }
+  if (primitive === "circle" || primitive === "ellipse") {
+    const cylinder = defaults.cylinder ?? {};
+    return { size: positiveSize(cylinder.width) ?? positiveSize(cylinder.depth) ?? SKETCH_PRIMITIVE_SIZE };
+  }
+  return { size: SKETCH_PRIMITIVE_SIZE };
+}
 
 export type SketchPrimitiveGeometry = { points: SketchPoint[]; segments: SketchSegment[] };
 type MakeId = (prefix: string) => string;
@@ -275,8 +306,10 @@ export function sketchPrimitiveGeometry(
 
   const minX = cx - radius;
   const maxX = cx + radius;
-  const minZ = cz - radius;
-  const maxZ = cz + radius;
+  // Nur das Rechteck darf tiefer oder flacher sein als breit; Dreieck und Sechseck bleiben gleichmaessig.
+  const halfDepth = primitive === "rectangle" ? (positiveSize(options.depth) ?? size) / 2 : radius;
+  const minZ = cz - halfDepth;
+  const maxZ = cz + halfDepth;
   const vertices: Array<{ x: number; z: number }> = primitive === "rectangle"
     ? [
         { x: minX, z: minZ },

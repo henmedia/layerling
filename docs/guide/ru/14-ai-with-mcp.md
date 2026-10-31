@@ -70,6 +70,7 @@ Claude Desktop не читает файлы проекта. Впишите се�
 | `layerling_hull_objects` | оборачивает объекты одним выпуклым телом, как термоплёнкой (Оболочка) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | разделяет фигуру на её отдельные части, тело эскиза — на тело для каждого контура |
 | `layerling_split_objects` | разделяет тела или отверстия надвое плоскостью |
@@ -77,7 +78,7 @@ Claude Desktop не читает файлы проекта. Впишите се�
 | `layerling_apply_edge_treatment` | обрабатывает выбранные кромки фаской или скруглением |
 | `layerling_hollow_object` | создаёт у тела оболочку с равномерной стенкой |
 | `layerling_cut_out` | вырезает одно тело из другого, чтобы они подходили: деталь остаётся, копия, увеличенная на зазор, вычитается из другого тела |
-| `layerling_offset_object` | смещает все грани тела для зазора посадки: увеличивает или уменьшает его либо добавляет увеличенную копию как отверстие |
+| `layerling_offset_object` | смещает все грани тела для зазора посадки: увеличивает или уменьшает его либо добавляет увеличенную копию как отверстие либо сдвигает только боковые стороны |
 | `layerling_list_faces` | перечисляет грани точного тела |
 | `layerling_delete_faces` | удаляет грани и закрывает разрыв |
 | `layerling_array_objects` | размножает в ряд или по кругу |
@@ -108,6 +109,7 @@ Claude Desktop не читает файлы проекта. Впишите се�
 | `layerling_set_history_view` | показывает более раннее состояние проекта, как панель истории (сам проект остаётся нетронутым; инструменты правки ждут, пока она закрыта) |
 | `layerling_restore_from_history` | возвращает объекты (и детали внутри групп) из более раннего состояния в проект как копии, как кнопка «Вернуть в проект» в просмотре истории, - один шаг, который снимает отмена |
 | `layerling_export_section_svg` | возвращает контуры на плоскости сечения как SVG в масштабе 1:1, из тех же тел, что и при экспорте |
+| `layerling_sketch_from_section` | делает эскиз из контуров на плоскости сечения, лежащий на разрезе: открывает его в редакторе для правки или сразу строит из него тело заданной высоты |
 | `layerling_export_drawing` | строит чертёж для мастерской из экспорта «2D»: три вида в масштабе 1:1 на листе ISO, с габаритными размерами и таблицей круглых отверстий — как текст SVG или как PDF |
 | `layerling_export_mesh` | записывает файл окна экспорта как STL, 3MF, OBJ, SVG (вид сверху, след или видимые кромки) или DXF для лазерной резки из тех же тел; по пути на этом компьютере или как base64 |
 | `layerling_save_project` | сохраняет весь редактируемый проект как файл .lyl по пути на компьютере, где работает MCP-сервер, без диалога; существующий файл заменяется только с `overwrite`, запись идёт через временный файл, а цель Ctrl+S в редакторе не меняется |

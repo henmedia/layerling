@@ -19,8 +19,8 @@ export const editorTargetSchema = {
  */
 export const creatableShapeKinds = [
   "box", "roundedBox", "cube", "cylinder", "slot", "ellipse", "polygon", "sphere", "cone", "pyramid", "wedge",
-  "roundRoof", "halfSphere", "paraboloid", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "text", "thread", "spring", "gridfinity", "gear",
-  "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "teardrop", "ruler", "sketch",
+  "roundRoof", "halfSphere", "paraboloid", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "text", "thread", "spring", "gridfinity", "gear", "hirth",
+  "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "teardrop", "port", "ruler", "sketch",
 ];
 
 /**
@@ -67,20 +67,27 @@ export const shapeSettingSchema = {
   baseRadius: { type: "number", description: "Cone only: radius at the base." },
   topWidth: { type: "number", description: "Pyramid only: width of the flat top. 0 runs to a point." },
   topDepth: { type: "number", description: "Pyramid only: depth of the flat top. 0 runs to a point." },
-  taperTopWidth: { type: "number", description: "Taper, on every shape except gear, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the top face. Setting one value of a face pins the other." },
-  taperTopDepth: { type: "number", description: "Taper, on every shape except gear, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: depth of the top face." },
-  taperBottomWidth: { type: "number", description: "Taper, on every shape except gear, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the bottom face." },
-  taperBottomDepth: { type: "number", description: "Taper, on every shape except gear, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: depth of the bottom face." },
-  extrudeTwist: { type: "number", description: "On every shape except gear, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: rotates the top face relative to the base, in degrees, for a twisted extrusion." },
-  extrudeTopOffsetX: { type: "number", description: "On every shape except gear, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: shifts the top face along the shape's own X axis, in mm, for a leaning extrusion." },
-  extrudeTopOffsetZ: { type: "number", description: "On every shape except gear, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: shifts the top face along the shape's own Z axis, in mm, for a leaning extrusion." },
-  teeth: { type: "number", description: "Gear only: how many teeth, 6 to 150." },
+  taperTopWidth: { type: "number", description: "Taper, on every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the top face. Setting one value of a face pins the other." },
+  taperTopDepth: { type: "number", description: "Taper, on every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: depth of the top face." },
+  taperBottomWidth: { type: "number", description: "Taper, on every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the bottom face." },
+  taperBottomDepth: { type: "number", description: "Taper, on every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: depth of the bottom face." },
+  extrudeTwist: { type: "number", description: "On every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: rotates the top face relative to the base, in degrees, for a twisted extrusion." },
+  extrudeTopOffsetX: { type: "number", description: "On every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: shifts the top face along the shape's own X axis, in mm, for a leaning extrusion." },
+  extrudeTopOffsetZ: { type: "number", description: "On every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: shifts the top face along the shape's own Z axis, in mm, for a leaning extrusion." },
+  slopeEnd: { type: "number", description: "Box, roundedBox, cylinder, ellipse, polygon, tube, ring, wedge and roundRoof only: slope along - the height of the top at the lower end, in mm (0.2 up to the body's height); the other end keeps the body's height. Equal to the height means no slope." },
+  slopeSide: { type: "string", enum: ["back", "front", "left", "right"], description: "Where slopeEnd applies: which end goes down (a round roof or a wedge slopes front or back only)." },
+  slopeCurve: { type: "number", description: "Slope along only, where slopeEnd applies: how the top runs down to slopeEnd, -1 to 1: 0 straight, above 0 bulging up (level at the high end), below 0 sagging (level at the low end)." },
+  narrowEnd: { type: "number", description: "Box, roundedBox, cylinder, ellipse, polygon, wedge and roundRoof only (not tube or ring): narrow along - seen from above, the width of the narrow end in mm (0 for a point, up to the full width); both long sides run in evenly so the end stays in the middle. The full width means no narrowing." },
+  narrowSide: { type: "string", enum: ["back", "front", "left", "right"], description: "Where narrowEnd applies: which end narrows (a round roof or a wedge narrows front or back only)." },
+  narrowCurve: { type: "number", description: "Narrow along only, where narrowEnd applies: how the sides run in to narrowEnd, -1 to 1: 0 straight, above 0 bulging out (a rounded bow), below 0 drawn in." },
+  narrowStart: { type: "number", description: "Narrow along only, where narrowEnd applies: where the narrowing starts, as a share of the length from the wide end, 0 to 0.95 (0.5 starts it in the middle)." },
+  teeth: { type: "number", description: "Gear: how many teeth, 6 to 150. Hirth joint: how many teeth round the ring, 6 to 90 (default 24)." },
   gearProfile: { type: "string", enum: ["involute", "round", "simple"], description: "Gear only: involute teeth that mesh (new gears), round teeth made of arcs (like Tinkercad's Useful gear: forgiving on small printed gears, a smooth grip on knobs), or the plain straight teeth older designs have. An involute gear's width and depth are its outside diameter, module x (teeth + 2): for module 1.5 and 20 teeth give width and depth 33. Round teeth stand lower, so a round gear's outside diameter is module x (teeth + 1.2): module 1.5 and 20 teeth give 31.8. Two gears with the same module and tooth shape mesh at a centre distance of module x (teeth1 + teeth2) / 2; gearBacklash applies to both, gearPressureAngle only to involute teeth." },
   gearPressureAngle: { type: "number", description: "Involute gear only: pressure angle in degrees, 14.5 to 30 (default 20)." },
   gearBacklash: { type: "number", description: "Involute gear only: play of a meshing pair in mm, half taken off each gear (default 0.2, 0 for an exact gear)." },
-  toothSize: { type: "number", description: "Gear with simple teeth only." },
+  toothSize: { type: "number", description: "Gear with simple teeth only. Hirth joint: the teeth's height at the rim in mm, crest over root (default: right-angled teeth, pi x radius / teeth); at least 0.4 mm stays under the roots." },
   toothWidth: { type: "number", description: "Gear with simple teeth only." },
-  centerHoleSize: { type: "number", description: "Gear only: bore through the middle." },
+  centerHoleSize: { type: "number", description: "Gear and Hirth joint: bore through the middle (Hirth joint default 10, 0 for none)." },
   gearType: { type: "string", enum: ["spur", "helical", "herringbone", "bevel", "internal", "rack"], description: "Gear only. \"herringbone\" is two helical halves turning opposite ways, like an arrow: it centres itself on its shaft and has no axial thrust, which is why it suits 3D printing; it takes the same helixAngle and helixQuality as a helical gear, and two meshing herringbone gears have angles of opposite sign. \"internal\" is a ring gear with its teeth pointing in, the outer wheel of a planetary set: width and depth are its outside diameter, module x (teeth + 2.5) + 2 x gearRim (round teeth: module x (teeth + 1.7)), and a pinion of the same module meshes inside it at a centre distance of module x (teeth - pinion teeth) / 2; ring teeth = sun teeth + 2 x planet teeth. \"rack\" is a bar along x with its teeth towards +z: width = teeth x pi x module (so racks of one module line up end to end), depth the bar's thickness, free above the teeth plus 0.5; a gear of the same module rolls on it with its centre teeth x module / 2 in front of the pitch line, which lies a module behind the tooth tips. Both take involute or round teeth, never simple ones, and no centerHoleSize." },
   gearRim: { type: "number", description: "Ring gear only: the rim outside the teeth, in mm (default 3)." },
   helixAngle: { type: "number", description: "Helical and herringbone gear only. With involute teeth the true helix angle on the pitch circle: two helical gears mesh with the same module and angle, one positive and one negative; with simple teeth the turn from foot to top." },
@@ -101,6 +108,10 @@ export const shapeSettingSchema = {
   threadChamferBottom: { type: "number", description: "Thread only, for a rod, nut or tapped hole: the chamfer at the bottom end when it should differ from the top one. Left out, the bottom end has threadChamfer. A screw has no chamfer there." },
   threadHeadHeight: { type: "number", description: "Thread only, and only for a screw: height of the head. Left out it follows the standard for the size." },
   threadHeadChamfer: { type: "number", description: "Thread only, and only for a screw with a cylinder or hex head: the chamfer that breaks the sharp rim of the head. 0 leaves it sharp." },
+  threadHeadDiameter: { type: "number", description: "Thread only, and only for a screw with a cylinder or hex head: the head diameter, across flats on a hex head, in mm. Left out it follows the standard for the size. A countersunk head's diameter follows its height (90 degree cone)." },
+  threadDrive: { type: "string", enum: ["hex", "torx", "phillips", "slot", "robertson", "none"], description: "Thread only, and only for a screw: the drive recess in the head. \"hex\" is a hex socket (the default for cylinder and countersunk heads), \"torx\" six lobes, \"phillips\" a cross, \"slot\" a straight slot across the head (for a flat screwdriver or a coin), \"robertson\" a square socket (the Robertson drive common in Canada), \"none\" a plain head turned by hand or with a spanner (the default for a hex head)." },
+  threadDriveSize: { type: "number", description: "Thread only, for a screw with a drive, in mm: hex socket across flats, Torx outer diameter, or the span of the Phillips cross, or the slot's length (its width is a fifth of it), or the Robertson square across flats. Left out it follows the standard for the size (an M4 takes 3 mm hex, about T20, about PH2, Robertson #2 (2.84 mm); a slot runs as far across the head as it fits); it must fit the head." },
+  threadDriveDepth: { type: "number", description: "Thread only, for a screw with a drive: how deep the recess goes into the head, in mm, at most 90 % of the head height. 0 leaves the head without a drive. Left out it is 60 % of the head height, at most a little over half the diameter." },
   springTurns: { type: "number", description: "Spring only." },
   springWire: { type: "number", description: "Spring only: thickness of the wire." },
   springHand: { type: "string", enum: ["right", "left"], description: "Spring only: winding direction; right-hand (default) like a usual compression spring, or left-hand." },
@@ -123,7 +134,7 @@ export const shapeSettingSchema = {
   hingeKnuckles: { type: "number", description: "Hinge only: how many knuckles share the axis, odd from 3 to 15 (default 5) so the part with the pin holds both ends. A hinge is a print-in-place hinge lying open flat: width is its length along the axis (x), depth both leaves together (z), height the knuckle diameter; it prints in one piece and turns afterwards." },
   tubeBoreHole: { type: "boolean", description: "Tube, ring or bent tube with an opening: when true the bore counts as a hole once the shape is grouped, so it also cuts the wall of whatever the tube is grouped with - two tubes in a T-junction open into each other. false or left out: the bore only keeps the tube hollow." },
   hingeKnuckleWidth: { type: "number", description: "Hinge only: the knuckles are at most this wide in mm and their number follows (odd, from 3 up to 31), instead of giving hingeKnuckles; the fewest knuckles that are not wider. Left out, hingeKnuckles stands. Giving hingeKnuckles in a later update takes the width away." },
-  hingeStyle: { type: "string", enum: ["pin", "pinless", "cone"], description: "Hinge only: \"pin\" (default) puts a printed pin through the knuckles; \"pinless\" leaves the pin out and runs the bore through every knuckle for a pin of one's own (the same as hingePinless true); \"cone\" gives every other knuckle cones on its ends that nest into conical recesses of the others - no pin and no bridge, so it prints lying flat without sagging. The cone hinge ignores hingePinDiameter, is a mesh (no chamfers or fillets, a mesh in STEP), makes fewer knuckles when they would be too short for a cone, and its hingeLeafThickness may be as thick as the whole knuckle (a flush hinge that opens about 90 degrees)." },
+  hingeStyle: { type: "string", enum: ["pin", "pinless", "cone"], description: "Hinge only: \"pin\" (default) puts a printed pin through the knuckles; \"pinless\" leaves the pin out and runs the bore through every knuckle for a pin of one's own (the same as hingePinless true); \"cone\" gives every other knuckle cones on its ends that nest into conical recesses of the others - no pin and no bridge, so it prints lying flat without sagging. The cone hinge ignores hingePinDiameter, is an exact body like the others (chamfers and fillets work, true cones in STEP), makes fewer knuckles when they would be too short for a cone, and its hingeLeafThickness may be as thick as the whole knuckle (a flush hinge that opens about 90 degrees)." },
   hingeConeSize: { type: "number", description: "Hinge, cone style only: the diameter of a cone where it grows from its knuckle, in mm. Left out, the largest that fits; a larger value is cut back to that." },
   hingePinDiameter: { type: "number", description: "Hinge only: diameter of the pin in mm (default 3); the other part's bore is wider by the clearance." },
   hingeLeafThickness: { type: "number", description: "Hinge only: thickness of the two leaves in mm (default 2), at most the knuckle radius less the bore radius so a leaf stays below the bore." },
@@ -252,7 +263,8 @@ export const shapeSettingSchema = {
   slotEndRatio: { type: "number", description: "Capsule (slot) only: the small end's diameter as a share of the large one, 0.1 to 1 (default 1, two equal ends). The large end sits at the start of the long axis, the small one at its end, the sides run as tangents to both - a belt guard. The large diameter is the capsule's short side; the centre distance is the long side less both radii." },
   torusTubeRatio: { type: "number", description: "Torus only: how thick the tube is seen from above, as a share of the torus's outer size, 0.01 to 0.5 (0.5 closes the hole). The height only squashes or stretches the tube, so a flat ring keeps its hole; resizing the torus scales the tube along. A tube as thick as the torus is high keeps the torus an exact CAD body." },
   dovetailClearance: { type: "number", description: "Dovetail only: gap in mm (0 to 2, default 0.2) added on every side while the dovetail is a hole - a copy of the tail set to hole cuts a socket the tail fits into." },
-  cornerFillet: { type: "number", description: "Rounded box only: fillet radius of vertical corners in mm." },
+  portProfile: { type: "string", enum: ["rounded", "hdmi", "miniHdmi", "displayPort", "miniDisplayPort"], description: "Port opening only: rounded corners (default), or the lower corners cut off at a slant as on an HDMI, Mini HDMI or Mini DisplayPort socket, or only the lower left one as on DisplayPort. The cut grows with width and height." },
+  cornerFillet: { type: "number", description: "Rounded box and port opening only. Rounded box: fillet radius of vertical corners in mm. Port opening: radius of the opening's four corners in mm, at most half its width or height (half the height gives fully round ends, as on USB-C)." },
   topBottomFillet: { type: "number", description: "Rounded box only: fillet radius of top and bottom edges in mm." },
   roundedBoxQuality: { type: "number", description: "Rounded box only: quality / segment count for fillet rounding (1 to 32; 1 gives chamfered corners)." },
   bentTubeProfile: { type: "string", enum: ["round", "square", "hexagon", "octagon"], description: "Bent tube only: outer cross-section." },
@@ -313,7 +325,17 @@ export const tools = [
   {
     name: "layerling_list_objects",
     description: "List all current objects available in the editor with exact dimensions, position, rotation, and object ids.",
-    inputSchema: editorTargetSchema,
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        sort: {
+          type: "string",
+          enum: ["added", "name"],
+          description: "Order of the list. \"added\" (default) is the design's order, the newest last; \"name\" is the object list's A-Z order: shapes with a name of their own first, alphabetically with numbers counted (Part 2 before Part 10), then the rest as added.",
+        },
+      },
+    },
   },
   {
     name: "layerling_select_objects",
@@ -341,7 +363,7 @@ export const tools = [
   },
   {
     name: "layerling_create_shape",
-    description: "Create any of Layerling's shapes: boxes, cylinders, slots, polygons, spheres, cones, pyramids, wedges, roofs, tori, tubes, stars, hearts, crescents, print-in-place hinges, Gridfinity bins and baseplates, knurled grips, raised text, threads (rod, screw, nut, tapped hole), springs, gears, or a simple extruded sketch. Width, depth and height default to what the editor uses for that shape; everything a shape has beyond its size is optional and falls back to the same defaults as a shape placed by hand. With a workplane set on a face (layerling_set_workplane), the shape stands on that face and x and z count on it (0, 0 is where the workplane sits) - unless elevation or a rotation is given, which mean the base plate.",
+    description: "Create any of Layerling's shapes: boxes, cylinders, slots, polygons, spheres, cones, pyramids, wedges, roofs, tori, tubes, stars, hearts, crescents, print-in-place hinges, Gridfinity bins and baseplates, knurled grips, raised text, threads (rod, screw, nut, tapped hole), springs, gears, Hirth joints (face teeth that lock two parts at any multiple of one tooth), port openings for USB, HDMI, DisplayPort and RJ45 sockets, or a simple extruded sketch. Width, depth and height default to what the editor uses for that shape; everything a shape has beyond its size is optional and falls back to the same defaults as a shape placed by hand. With a workplane set on a face (layerling_set_workplane), the shape stands on that face and x and z count on it (0, 0 is where the workplane sits) - unless elevation or a rotation is given, which mean the base plate.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["kind"],
@@ -374,6 +396,8 @@ export const tools = [
         },
         silhouette: { type: "boolean", description: "For kind sketch and kind text: leave out every outline inside another - holes, and islands in them; on a text the counters of O, A and e - so only the outermost outlines count, as Tinkercad's Silhouette." },
         ...shapeSettingSchema,
+        washer: { type: "string", enum: ["M1.6", "M2", "M2.5", "M3", "M4", "M5", "M6", "M8", "M10", "M12", "M14", "M16", "M20", "M24", "M30"], description: "Tube (kind tube) only, when creating: a washer for this screw size to ISO 7089, normal series - outer diameter, bore and thickness, e.g. M5 is 10 mm across with a 5.3 mm bore, 1 mm thick. A width, depth, height or bevel given as well wins over the standard measure." },
+        portPreset: { type: "string", enum: ["usbC", "usbCPlug", "microUsb", "usbA", "hdmi", "miniHdmi", "displayPort", "miniDisplayPort", "rj45"], description: "Port opening (kind port) only, when creating: the socket whose opening it gets, from data sheets and standards with room for printing - usbC 9.4 x 3.7 mm with round ends, usbCPlug 12.8 x 7 mm for a USB-C socket behind the wall, microUsb 8 x 3.1 mm, usbA 13 x 5.6 mm, hdmi 15.7 x 6.2 mm and miniHdmi 11.2 x 3.1 mm with both lower corners cut, displayPort 17.1 x 5.76 mm with the lower left corner cut, miniDisplayPort 8.8 x 5.9 mm with both lower corners cut, rj45 16.7 x 14.4 mm for a network jack. It sets width, height, cornerFillet and portProfile; width, height, cornerFillet or portProfile given as well win. A port opening is a hole lying on its side: width and height are the opening seen from the front, depth how far it reaches into the wall along its own Z axis, so turn it with rotation to face the wall it goes through." },
         vaseParts: { type: "boolean", description: "Vase only: true also lays out the vase's accessories (legs to plug in, a stand, a saucer, an insert, a lid, as its settings ask for) as objects of their own beside it, ready to print; the ones laid out for this vase before are replaced. Returns them as parts; accessories this vase does not allow (an insert through a narrow neck) are listed as notPossible." },
         ...threadSizeSetting,
       },
@@ -709,7 +733,7 @@ export const tools = [
   },
   {
     name: "layerling_hull_objects",
-    description: "Wrap the given objects in their convex hull, like the editor's Hull button: the smallest convex body round all of them, as if shrink-wrapped (a half sphere on a cylinder, four posts become a box). Pass two or more objects, at least one of them a solid; holes among them are cut out of the hull afterwards. The result replaces them and opens like a group, so the parts stay editable; the hull itself is a mesh.",
+    description: "Wrap the given objects in their convex hull, like the editor's Hull button: the smallest convex body round all of them, as if shrink-wrapped (a half sphere on a cylinder, four posts become a box). Pass two or more objects. With a solid among them, the holes among them are cut out of the hull afterwards; when all of them are holes, the hull is a hole itself, so two cylinder holes cut a slot. The result replaces them and opens like a group, so the parts stay editable; the hull itself is a mesh.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["ids"],
@@ -721,7 +745,7 @@ export const tools = [
   },
   {
     name: "layerling_cookie_cutter",
-    description: "Make a cookie cutter from the given objects, like the editor's Cookie cutter button: a wall and a flat rim round the outline, as two sketch bodies in one bundle that replaces the objects. One extruded sketch body gives its own outline; anything else (shapes built in layerling, an imported mesh, several parts) gives what it stands on, the outlines the workplane cuts through it - holes inside get walls of their own (see inner). The wall and the rim are lines outside the outline in the sketch fill modes, so change them under Properties afterwards. The wall's top runs in to a cutting edge, and the outline is mirrored left to right, because the cutter is printed on its rim and turned over to cut: a text or logo comes out the right way round. All sizes in mm: wall (thickness, default 1.2), height (default 15), rim (how far the rim reaches beyond the wall, default 4), rimHeight (default 2), edge (the cutting edge's width on top of the wall, default 0.4, 0 for a flat top; if the outline has steps too short for it, the wall gets a flat top and the answer has a note); mirror (default true; false for an outline that should stay as drawn); inner (default true: holes in the outline, the inside of an e or an a, get walls of their own, a sketch body \"Inner walls\" of its own, held to the outer wall by bridges at the rim; false leaves them open as before), imprint (how much lower the inner walls are than the outer one, default 0 so they cut through; with dough 5 mm thick, imprint 3 on a 15 mm cutter presses the inside 2 mm deep instead of cutting it out), bridgeCount (bridges per inner wall, spread round it, default 2, 1 to 8), bridge (the bridges' width, default 4) and bridgeHeight (default 3). A text lying flat gives its letters' own curves. Each bridge sits with its whole width on the walls, in the middle of a side that runs along the outline round it, never across another piece; several are spread round the piece. plate (mm, default 0): a plate that thick fills the whole outline on the side the hand presses instead of the bridges - steadier, better on the print bed, but the dough cannot be pushed out from behind. fillet (mm, default 1, 0 for none): 45 degree fillets in fine steps where the walls stand on the rim, the bridges or the plate, so thin parts such as the dot of an i do not break off; they are one mesh body, Fillets, in the bundle.",
+    description: "Make a cookie cutter from the given objects, like the editor's Cookie cutter button: a wall and a flat rim round the outline, as two sketch bodies in one bundle that replaces the objects. One extruded sketch body gives its own outline; anything else (shapes built in layerling, an imported mesh, several parts) gives what it stands on, the outlines the workplane cuts through it - holes inside get walls of their own (see inner). The wall and the rim are lines outside the outline in the sketch fill modes, so change them under Properties afterwards. The wall's top runs in to a cutting edge, and the outline is mirrored left to right, because the cutter is printed on its rim and turned over to cut: a text or logo comes out the right way round. All sizes in mm: wall (thickness, default 1.2), height (default 15), rim (how far the rim reaches beyond the wall, default 4), rimHeight (default 2), edge (the cutting edge's width on top of the wall, default 0.4, 0 for a flat top; if the outline has steps too short for it, the wall gets a flat top and the answer has a note); mirror (default true; false for an outline that should stay as drawn); inner (default true: holes in the outline, the inside of an e or an a, get walls of their own, a sketch body \"Inner walls\" of its own, held to the outer wall by bridges at the rim; false leaves them open as before), imprint (how much lower the inner walls are than the outer one, default 0 so they cut through; with dough 5 mm thick, imprint 3 on a 15 mm cutter presses the inside 2 mm deep instead of cutting it out; inner walls lower than the outer one have a flat top), innerEdge (default false; true gives lower inner walls the cutting edge too - inner walls that cut through always have it), bridgeCount (bridges per inner wall, spread round it, default 2, 1 to 8), bridge (the bridges' width, default 4) and bridgeHeight (default 3). A text lying flat gives its letters' own curves. Each bridge sits with its whole width on the walls, in the middle of a side that runs along the outline round it, never across another piece; several are spread round the piece. plate (mm, default 0): a plate that thick fills the whole outline on the side the hand presses instead of the bridges - steadier, better on the print bed, but the dough cannot be pushed out from behind. fillet (mm, default 1, 0 for none): 45 degree fillets in fine steps where the walls stand on the rim, the bridges or the plate, so thin parts such as the dot of an i do not break off; they are one mesh body, Fillets, in the bundle.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["ids"],
@@ -736,6 +760,7 @@ export const tools = [
         mirror: { type: "boolean" },
         inner: { type: "boolean" },
         imprint: { type: "number" },
+        innerEdge: { type: "boolean" },
         bridgeCount: { type: "number" },
         bridge: { type: "number" },
         bridgeHeight: { type: "number" },
@@ -760,6 +785,23 @@ export const tools = [
         size: { type: "number" },
         start: { type: "number" },
         end: { type: "number" },
+      },
+    },
+  },
+  {
+    name: "layerling_make_lid",
+    description: "Make a lid for a body that is open at the top, like the editor's Lid button (#1009): a box hollowed with its top open, a pot, a tray. Solids among the ids are joined and holes among them cut away; the body is cut just below its rim, and the lid follows that outline and the opening inside it, round or angular. `type`: `plug` (default) a plate as large as the body with a lip below it that goes into the opening, `cap` a plate a wall wider than the body with a rim below it that goes over the outside, `flat` only the plate. Sizes in mm: `thickness` of the plate (2), `gap` per side between lid and body (0.2; 0.1 tight, 0.3 loose, up to 1), `depth` how far the lip or rim reaches down (4), `wall` its thickness (1.6). The lid is a new mesh beside the body, turned over with its plate down, ready to print; the body stays. A body without an opening at the top is refused for plug and cap (hollow it with `layerling_hollow_object` and the top open first).",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["ids"],
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" } },
+        type: { type: "string", enum: ["plug", "cap", "flat"] },
+        thickness: { type: "number" },
+        gap: { type: "number" },
+        depth: { type: "number" },
+        wall: { type: "number" },
       },
     },
   },
@@ -839,6 +881,7 @@ export const tools = [
         depth: { type: "number", description: "How far the surface moves at the deepest place, in mm, 0.05 to 5. Default 0.6." },
         width: { type: "number", description: "Share of the spacing a groove, joint or bump takes, 0.1 to 1; knit: the yarn's thickness, rope: how far the rings grip into each other, weave: the stakes' thickness, carbon: the share of the spacing a band fills. Default 0.6." },
         profile: { type: "string", enum: ["pointed", "round", "flat", "dome"], description: "Cross-section of a groove or joint, or the shape of a bump: pointed (a V; a cone on a bump), round (a soft bell), flat (a flat floor or top), dome (a half circle; a half ball on a bump). Default pointed, for bumps dome." },
+        bumpGrid: { type: "string", enum: ["staggered", "straight"], description: "Bumps: staggered (every other row half a spacing along, a hexagon grid) or straight (rows and columns, spacing apart both ways). Around a cylinder both close without a seam. Default staggered." },
         angle: { type: "number", description: "Grooves and knurling: slant against the axis in degrees, -90 to 90 (0 = along the axis, 90 = level round it). Default: grooves 0, knurling 30." },
         faceTurn: { type: "number", description: "The pattern on the faces seen along the axis (a box's top and bottom) turned round it, -180 to 180 degrees: 0 = rows along the front edge, 90 = along the side edge. On a round top or bottom, grooves, rope and knitting run in rings round the middle instead. Default 0." },
         capStyle: { type: "string", enum: ["auto", "rows", "rings"], description: "Grooves, rope and knitting on a top or bottom round the axis: rows (turned by faceTurn) or rings following the outline inwards; auto: rings on a round body, rows on an angular one. Default auto." },
@@ -1027,7 +1070,7 @@ export const tools = [
   },
   {
     name: "layerling_delete_faces",
-    description: "Delete faces of an exact body, as the editor's Delete face tool does: the faces around them grow until they close the gap, so a fillet, a hole, a boss or a step is gone and the body stays exact (fillet, chamfer and STEP export still work on it). Give every face of the feature, with ids from layerling_list_faces - the four faces of a box's rounded top edges, the wall of a hole, the side and top of a boss. When the faces around them cannot close the gap, nothing changes and the answer says so. Deleting only the floor of a pocket makes it a hole straight through. One undo step; undone like an edge treatment.",
+    description: "Delete faces of an exact body, solid or hole, as the editor's Delete face tool does: the faces around them grow until they close the gap, so a fillet, a hole, a boss or a step is gone and the body stays exact (fillet, chamfer and STEP export still work on it). Give every face of the feature, with ids from layerling_list_faces - the four faces of a box's rounded top edges, the wall of a hole, the side and top of a boss. When the faces around them cannot close the gap, nothing changes and the answer says so. Deleting only the floor of a pocket makes it a hole straight through. One undo step; undone like an edge treatment.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id", "faceIds"],
@@ -1040,7 +1083,7 @@ export const tools = [
   },
   {
     name: "layerling_hollow_object",
-    description: "Hollow a solid into walls of equal thickness, like a box, cup or case. The walls grow inward, so the outside keeps its size. `openings` chooses which flat sides stay open, measured against the world's axes: a list of any of top, bottom, front (+z), back (-z), left (-x) and right (+x) - for example [\"front\"] for a drawer slot - or one of the names top (default), bottom, top-bottom, or none for a sealed cavity. A side asked for in a list must have a flat face at the very edge of the body on that side. `edges` sets how the inner walls meet where the body has a step or opening: round (default, radius = wall thickness) or sharp. Can be undone like an edge treatment. Resizing the body later hollows it again at the new size a moment afterwards, so the walls keep their thickness.",
+    description: "Hollow a solid into walls of equal thickness, like a box, cup or case. A hole can be hollowed too and stays a hole. The walls grow inward, so the outside keeps its size. `openings` chooses which flat sides stay open, measured against the world's axes: a list of any of top, bottom, front (+z), back (-z), left (-x) and right (+x) - for example [\"front\"] for a drawer slot - or one of the names top (default), bottom, top-bottom, or none for a sealed cavity. A side asked for in a list must have a flat face at the very edge of the body on that side. `edges` sets how the inner walls meet where the body has a step or opening: round (default, radius = wall thickness) or sharp. Can be undone like an edge treatment. Resizing the body later hollows it again at the new size a moment afterwards, so the walls keep their thickness.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id", "thickness"],
@@ -1060,7 +1103,7 @@ export const tools = [
   },
   {
     name: "layerling_offset_object",
-    description: "Move every face of one exact solid by the same distance, outward (grow, the default) or inward (shrink) - like the editor's Offset tool. This is the clearance for a press fit or a snap joint: with asHole true the original stays as it is and a copy, grown by the distance, is added as a hole to cut the mating part with (group them with layerling_group_objects, or use layerling_boolean_cut). `distance` is in millimetres (0.01 to 10, default 0.2). `edges` round (default) keeps the offset surface round at the outer corners, sharp lets the faces run on until they meet. A body that is only a triangle mesh often cannot be offset, and neither can a bundle or a hole; the error then says so. The result is a fixed exact body: its offset can be taken back like a chamfer.",
+    description: "Move every face of one exact solid by the same distance, outward (grow, the default) or inward (shrink) - like the editor's Offset tool. A hole can be offset too and stays a hole: grown, it cuts with that much clearance. This is the clearance for a press fit or a snap joint: with asHole true the original stays as it is and a copy, grown by the distance, is added as a hole to cut the mating part with (group them with layerling_group_objects, or use layerling_boolean_cut). `distance` is in millimetres (0.01 to 10, default 0.2). `edges` round (default) keeps the offset surface round at the outer corners, sharp lets the faces run on until they meet. With `sideways` true only the sides move and every flat top and bottom stays at its height, so the body gets a border all round (or loses one) without getting taller - a wider base, a rim around a sign. A body that is only a triangle mesh often cannot be offset, and neither can a bundle or a hole; the error then says so. The result is a fixed exact body: its offset can be taken back like a chamfer.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id"],
@@ -1070,6 +1113,7 @@ export const tools = [
         distance: { type: "number", description: "Distance in millimetres, 0.01 to 10; 0.2 when omitted." },
         shrink: { type: "boolean", description: "True moves the faces inward (the body gets smaller); false or omitted outward." },
         asHole: { type: "boolean", description: "True keeps the original and adds the offset body as a copy that is a hole; the result is that copy." },
+        sideways: { type: "boolean", description: "True moves only the sides (X and Y); flat tops and bottoms keep their height. False or omitted moves every face." },
         edges: { type: "string", enum: ["round", "sharp"] },
       },
     },
@@ -1090,7 +1134,7 @@ export const tools = [
   },
   {
     name: "layerling_array_objects",
-    description: "Repeat objects n times in a row or around a circle - hole rows, hole grids, bolt circles, the teeth of a ring - like the editor's Pattern tool. `count` includes the originals. Coordinates are as in a slicer: X to the right, Y to the back, Z up. A row steps `spacing` millimetres along `direction` (negative runs the other way), or along several axes at once with `spacingX`, `spacingY` and `spacingZ` (a diagonal row, a staircase; give any of them and the others count as 0). A circle turns about the vertical axis through (`centerX`, `centerY`) over `angle` degrees: 360 (default) spreads the pieces evenly, a smaller angle puts the first and last piece on its ends; positive runs counter-clockwise seen from above. `rise` lifts every copy that many millimetres more than the one before (a screw, an ascending spiral) and `radiusChange` moves it that far further from the centre (negative: closer) for a flat or conical spiral. `rotateCopies` (default true) turns each copy with the circle. The copies are added as one undo step and returned with their ids; the originals stay where they are. A circle leaves its centre as the pieces' pivot (their selection's, or the group's with `group: true`), halfway up the pieces, and returns it as `pivot` (X, Y, Z), so another part can be aligned to the true centre rather than the middle of the pieces' box.",
+    description: "Repeat objects n times in a row or around a circle - hole rows, hole grids, bolt circles, the teeth of a ring - like the editor's Pattern tool. `count` includes the originals. Coordinates are as in a slicer: X to the right, Y to the back, Z up. A row steps `spacing` millimetres along `direction` (negative runs the other way), or along several axes at once with `spacingX`, `spacingY` and `spacingZ` (a diagonal row, a staircase; give any of them and the others count as 0). With `fitAxis` a row is spread evenly over a body instead - holes along a plate: the last piece ends as far from the body's far end as the original stands from its nearer one, and `edgeGap` sets that gap first. A circle turns about the vertical axis through (`centerX`, `centerY`) over `angle` degrees: 360 (default) spreads the pieces evenly, a smaller angle puts the first and last piece on its ends; positive runs counter-clockwise seen from above. `rise` lifts every copy that many millimetres more than the one before (a screw, an ascending spiral) and `radiusChange` moves it that far further from the centre (negative: closer) for a flat or conical spiral. `rotateCopies` (default true) turns each copy with the circle. The copies are added as one undo step and returned with their ids; the originals stay where they are, unless `edgeGap` moves them. A circle leaves its centre as the pieces' pivot (their selection's, or the group's with `group: true`), halfway up the pieces, and returns it as `pivot` (X, Y, Z), so another part can be aligned to the true centre rather than the middle of the pieces' box.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["mode", "count"],
@@ -1110,13 +1154,16 @@ export const tools = [
         rotateCopies: { type: "boolean", description: "Circle: turn the copies with the circle, default true." },
         rise: { type: "number", description: "Circle: height gained per copy in millimetres, default 0 (a screw when not 0)." },
         radiusChange: { type: "number", description: "Circle: distance from the centre gained per copy in millimetres, default 0 (a spiral when not 0; negative tightens)." },
+        fitAxis: { type: "string", enum: ["x", "y"], description: "Row: spread the row evenly over a body along X or Y, like a row of holes in a plate. The last piece keeps the same gap to the body's far end as the original has to its nearer end, and the spacing follows `count` (spacing and direction are then ignored)." },
+        fitTo: { type: "string", description: "Row with fitAxis: id of the body to spread over; left out, the smallest body whose footprint holds the middle of the pieces." },
+        edgeGap: { type: "number", description: "Row with fitAxis: first move the originals so they stand this many millimetres in from the body's nearer end (from the edge to the piece's side, not its centre)." },
         group: { type: "boolean", description: "Group the originals and the copies into one object in the same step, as Group does (holes among them cut the solids), default false. If grouping fails the pieces stay loose and `warning` says why." },
       },
     },
   },
   {
     name: "layerling_apply_edge_treatment",
-    description: "Apply chamfer, chamfillet or fillet to specific edge ids returned by layerling_list_edges, to \"all\" sharp edges, to the \"top\" edges (every edge along the body's highest level, such as the rim of a cookie cutter), to the \"bottom\" edges (every edge along its lowest level, such as the foot of a part), or to the \"vertical\" edges (every edge that stands straight up, such as the corners of a box), as the editor's Top edges, Bottom edges and Vertical edges buttons pick them. A chamfillet is the printable foot: a chamfer at the plate (chamferAngle 15 to 75, default 45) that blends tangentially into a fillet toward the wall, so the foot needs no support and ends soft; amount is the height it takes up, and it is mostly used with \"bottom\". A fillet with endAmount has a variable radius: it runs from amount at one end of the edge to endAmount at the other, on exactly one edge id; if the large end comes out where the small one should be, apply it again with the two values swapped.",
+    description: "Apply chamfer, chamfillet or fillet to specific edge ids returned by layerling_list_edges, on a solid or a hole (a hole stays a hole: a box hole with filleted vertical edges cuts a pocket with round inside corners), to \"all\" sharp edges, to the \"top\" edges (every edge along the body's highest level, such as the rim of a cookie cutter), to the \"bottom\" edges (every edge along its lowest level, such as the foot of a part), or to the \"vertical\" edges (every edge that stands straight up, such as the corners of a box), as the editor's Top edges, Bottom edges and Vertical edges buttons pick them. A chamfillet is the printable foot: a chamfer at the plate (chamferAngle 15 to 75, default 45) that blends tangentially into a fillet toward the wall, so the foot needs no support and ends soft; amount is the height it takes up, and it is mostly used with \"bottom\". A fillet with endAmount has a variable radius: it runs from amount at one end of the edge to endAmount at the other, on exactly one edge id; if the large end comes out where the small one should be, apply it again with the two values swapped.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id", "kind", "edgeIds", "amount"],
@@ -1447,19 +1494,21 @@ export const tools = [
         center: { type: "boolean", description: "Move the plane to the middle of the design." },
         flipped: { type: "boolean", description: "Show the other side of the plane." },
         showPlane: { type: "boolean", description: "Draw the blue plane (false hides it, the cut stays)." },
+        cutFace: { type: "string", enum: ["hatch", "fill", "open"], description: "How the cut face looks, like the panel's \"Cut face\": hatch = filled and hatched like a drawing, a body inside another hatched the other way (the start); fill = filled plain, a little darker than the body; open = not filled, you look into the skin of the body. The choice is kept in this browser for every design and returned as cutFace." },
         orientation: { type: "string", enum: ["world", "workplane", "view"], description: "What axis and offset are measured along, like the panel's \"Axes from\": world = the design's axes (default); workplane = the workplane's own axes, offset counted from its origin, \"y\" cuts parallel to it and the cut moves with the workplane; view = the current view, \"y\" faces the screen and takes away what lies in front - the view is taken when this is given, so give it again after turning the view. Choosing workplane or view starts on \"y\" in the middle of the design." },
       },
     },
   },
   {
     name: "layerling_set_history_view",
-    description: "Look back at an earlier state of the project, like the editor's History view: the workplane shows that state while the real design stays untouched. Give `index` (0 is the oldest state, the last one is the current design) to open the view at that state or move it, `open: false` to close it, or no settings to read where it stands. While it is open, tools that change the design answer with an error - close it first; reading, `layerling_capture_image` (a picture of the shown state) and the section view still work. `layerling_read_scene` keeps describing the live design. Returns the state shown, how many there are and its bodies; a group lists its `parts` at every depth, whose ids `layerling_restore_from_history` takes.",
+    description: "Look back at an earlier state of the project, like the editor's History view: the workplane shows that state while the real design stays untouched. Give `index` (0 is the oldest state, the last one is the current design) to open the view at that state or move it, `open: false` to close it, or no settings to read where it stands. While it is open, tools that change the design answer with an error - close it first; reading, `layerling_capture_image` (a picture of the shown state) and the section view still work. `layerling_read_scene` keeps describing the live design. Returns the state shown, how many there are and its bodies; a group lists its `parts` at every depth, whose ids `layerling_restore_from_history` takes. Every answer also has undoStep and redoStep: what undo and redo would take back or bring again from the design's own state, as a sentence with the measure in brackets where the step has one (\"Rounded the edges of Box (5 mm)\"); lastStep and nextStep carry measures the same way. With `steps: true` it also lists every state with the step that led to it (`steps`, newest last), as the History view's list does.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
         ...editorTargetSchema.properties,
         open: { type: "boolean", description: "false closes the view; true (or an index) opens it." },
         index: { type: "number", description: "The state to show, 0 = oldest. Clamped to the existing states." },
+        steps: { type: "boolean", description: "true adds `steps`: every state's index with the step that led to it, as a sentence." },
       },
     },
   },
@@ -1497,6 +1546,22 @@ export const tools = [
         ...editorTargetSchema.properties,
         axis: { type: "string", enum: ["x", "y", "z"], description: "Cutting axis. Defaults to the axis of the section view." },
         offset: { type: "number", description: "Where the plane cuts, in mm: an x position, a height above the plate or a z position. Defaults to the section view's position, or the middle of the design." },
+      },
+    },
+  },
+  {
+    name: "layerling_sketch_from_section",
+    description: "Make a sketch from a cut through the design, like \"Sketch from cut\" in the editor's section view (#1022): the outlines the plane cuts from the bodies become the lines of a new extruded sketch lying on the cut, so a part that has to fit another one starts from that part's own outline - a lid, an insert, a gasket, a mating piece. Same bodies as layerling_export_section_svg: visible solids only, holes already taken off, bodies of one colour joined. The round parts come back as true arcs and circles (a hole is a circle, a fillet an arc), free curves as arcs within 0.01 mm, the rest as straight lines. axis and offset work like layerling_export_section_svg and default to the section view as it is set (also turned to the workplane or the view) or the middle of the design. The sketch faces the side that the section view takes away (flipped, default as the section view, else false), so its body grows out of the cut into that side. With height (mm) the body is built at once and returned as object; without it the sketch opens in the editor to be changed and finished by hand (fails while another sketch is open). Returns axis, offset, flipped, outlines, openLeftOut (outlines that did not close, left out), segments and object or sketchOpened. Fails with a message when the plane misses every visible solid or the cut has more than 2500 lines and curves.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        axis: { type: "string", enum: ["x", "y", "z"], description: "Cutting axis, as in layerling_set_section_view. Defaults to the axis of the section view." },
+        offset: { type: "number", description: "Where the plane cuts, in mm: an x position, a height above the plate or a z position. Defaults to the section view's position, or the middle of the design." },
+        flipped: { type: "boolean", description: "Which side the sketch faces and its body grows into: false towards smaller x, height or z (the side the section view takes away unless flipped), true towards greater. Defaults to the section view's." },
+        height: { type: "number", description: "Build the body at once, this many mm out of the cut (more than 0, at most 1000). Left out, the sketch opens in the editor instead." },
+        name: { type: "string", description: "Name of the new body (with height)." },
+        color: { type: "string", description: "Colour of the new body (with height)." },
       },
     },
   },

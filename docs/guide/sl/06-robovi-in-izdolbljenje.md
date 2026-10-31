@@ -39,6 +39,8 @@ Medtem ko vrtiš mero, layerling predogled preračuna. To lahko traja trenutek. 
 
 Rob pod kazalcem je prav tako narisan širše, da vidiš, kateri se bo izbral s klikom.
 
+Tudi luknja sprejme {{ui:editor.tool.chamfer}} in {{ui:editor.tool.fillet}}, prav tako {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} in {{ui:editor.tool.deleteFace}}: ostane luknja in reže s svojo novo obliko. Če zaobliš štiri navpične robove luknje v obliki kvadra, dobiš žep z zaobljenimi notranjimi vogali, luknja, povečana z {{ui:editor.tool.offset}}, pa reže s toliko več zračnosti. Rob, kjer luknja sreča del, raje obdelaj na končani skupini: ta rob pripada njej.
+
 ### Preklic obdelave robov
 
 Obdelano telo lahko kadarkoli obdelaš še enkrat. Izberi ga znova in odpri orodje - zaokrožitev, posnetje ali izdolbljenje vsi pokažejo seznam: Pod {{ui:edge.featureHistory}} piše, kaj je že na njem. {{ui:edge.revertAction}} prekliče posamezno obdelavo. Pozor: če so nad njo novejše obdelave, gredo z njo, okno pa pove, koliko jih je.
@@ -81,6 +83,18 @@ Izdolbiš lahko tudi telo z žepom, na primer kvader z luknjo, ki ne gre skozi d
 
 > **Namig:** Pri šobi 0,4 mm je dobro izhodišče debelina stene od 1,2 do 2 mm: dovolj tanka, da prihraniš material, dovolj debela za stabilen del.
 
+## Pokrov za odprto telo
+
+{{ui:editor.tool.lid}} naredi pokrov za telo, ki je zgoraj odprto: škatlo, ki si jo izdolbel z odprto zgornjo stranjo, lonček, pladenj. Izberi telo in klikni {{ui:editor.tool.lid}}. V oknu izbereš vrsto:
+
+- {{ui:lid.type.plug}}: plošča, velika kot telo, pod njo ustnica, ki seže v odprtino.
+- {{ui:lid.type.cap}}: plošča, za steno širša od telesa, pod njo rob, ki objame zunanjost.
+- {{ui:lid.type.flat}}: samo plošča, za polaganje ali lepljenje.
+
+Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom in telesom: 0,1 mm tesen, 0,2 mm običajen, 0,3 mm ohlapen ali katera koli vrednost do 1 mm) ter kako globoko seže ustnica ali rob in kako debela je njuna stena. Klikni {{ui:lid.apply}}: pokrov leži poleg telesa, obrnjen s ploščo navzdol, zato se natisne brez podpor. Telo ostane, kakršno je. Pokrov sledi vsakemu obrisu, okroglemu ali oglatemu, ker je vzet s telesa samega tik pod njegovim robom. Telo brez odprtine zgoraj dobi samo raven pokrov; za drugi dve vrsti ga najprej izdolbi z odprto zgornjo stranjo.
+
+> **Namig:** Kako tesno sede pokrov, je odvisno od tiskalnika. Najprej natisni majhno škatlo s pokrovom; če je pretesen, izberi naslednji ohlapnejši ujem.
+
 ## Odmik teles
 
 Vsako ploskev telesa lahko premakneš za isto razdaljo navzven ali navznoter. To potrebuje nasedanje, pokrov ali zaskočni spoj: reža 0,1 do 0,3 mm naokrog, medtem ko značilnosti ostanejo na mestu, česar spreminjanje merila ne zmore.
@@ -90,6 +104,8 @@ Vsako ploskev telesa lahko premakneš za isto razdaljo navzven ali navznoter. To
 3. {{ui:offset.edges}} določajo zunanje vogale: zaobljeno obdrži odmaknjeno površino okroglo, ostro pusti ploskvam, da tečejo naprej, dokler se ne srečajo.
 4. Obkljukaj {{ui:offset.copy}}, da del ostane, kakršen je, povečano telo pa dobiš kot kopijo, ki je že luknja. To luknjo združi v skupino s protikosom in izreže natanko zračnost, ki si jo izbral.
 5. Klikni {{ui:offset.apply}}.
+
+Označi {{ui:offset.sideways}}, ko naj se poveča ali zmanjša le obris: stranice se premaknejo za razdaljo, vsaka ravna zgornja in spodnja ploskev pa ostane na svoji višini. Tabla dobi rob naokoli, podstavek postane širši, telo pa ne postane višje. Pri stopničastem telesu vsaka stopnica obdrži svojo višino. Tudi besedilo, ki se odmakne prek svojih obrisov, takrat obdrži svojo višino.
 
 Brez kljukice se odmakne samo telo. Postane fiksno natančno telo, kot po posnetju: seznam na vrhu okna odmik vzame nazaj, {{ui:edge.editAction}} pa orodje znova odpre s staro razdaljo. Odmakniti je mogoče le natančna telesa CAD - kvadre, valje in druge oblike, njihove skupine, uvožene dele STEP. Telo, ki je samo trikotniška mreža, kot mnogi uvozi STL, pogosto ne gre. Razdalja, ki je za telo prevelika, na primer zmanjšanje čez najtanjšo steno, se zavrne.
 

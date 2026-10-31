@@ -298,7 +298,8 @@ export function resizeShapeFromFrameHandle(
   // A cylinder is always circular - every horizontal handle (side or corner)
   // drives the one shared diameter instead of stretching width and depth
   // independently into an ellipse.
-  if ((shape.kind === "cylinder" || shape.kind === "star") && (signs.x || signs.z)) {
+  // A Hirth joint too: stretched, its teeth no longer interlock all round (#1016).
+  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth") && (signs.x || signs.z)) {
     const diameter = signs.x && signs.z ? (nextWidth + nextDepth) / 2 : signs.x ? nextWidth : nextDepth;
     nextWidth = diameter;
     nextDepth = diameter;

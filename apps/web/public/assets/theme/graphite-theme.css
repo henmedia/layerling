@@ -1448,6 +1448,65 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   color: #595959;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-title-home {
+  color: #484848;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-title-home:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.58);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-ribbon-pin {
+  color: #787878;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-ribbon-pin:hover {
+  color: #484848;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-ribbon-pin.active {
+  color: #d07415;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-ribbon-pin:hover {
+  color: #f1f1f1;
+  background: #3a3a3a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-title-help {
+  --group-color: var(--group-help);
+  background: color-mix(in srgb, var(--group-color) 7%, var(--toolbar-tile));
+  border: 2px solid var(--group-color);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-title-help .action-icon-button {
+  color: #484848;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-title-help .action-icon-button .toolbar-search-icon,
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-title-help .action-icon-button .toolbar-vector-art-icon {
+  color: inherit;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-title-help .action-icon-button:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-title-help .action-icon-button.active {
+  color: var(--group-color);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .action-icon-button {
+  color: #d2d2d2;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .action-icon-button:hover,
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .action-icon-button.active {
+  color: #f1f1f1;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-workspace-tabs button {
   color: #676767;
   background: transparent;
@@ -1572,6 +1631,23 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   border: 2px solid var(--group-color);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-collapsed] .toolbar-collapse-trigger::before {
+  background-color: var(--group-color);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 11'%3E%3Cpath d='M5.5 3.5 9 7l3.5-3.5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-collapsed]:has(.visibility-hidden-badge, .attachments-indicator) .toolbar-collapse-trigger::after {
+  background: var(--group-color);
+  border: 1.5px solid var(--toolbar-tile);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-collapsed][data-open] > .toolbar-section-tools:not(.toolbar-collapse-box),
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-collapsed][data-open] > .action-buttons {
+  background: color-mix(in srgb, var(--group-color) 7%, var(--toolbar-tile));
+  border: 2px solid var(--group-color);
+  box-shadow: 0 14px 34px rgba(52, 52, 52, 0.22);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-project-name-field {
   background: transparent;
 }
@@ -1614,6 +1690,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-icon:not(.disabled):hover {
   background: var(--toolbar-hover-bg);
   box-shadow: inset 0 0 0 1px var(--toolbar-hover-ring);
+  color: var(--toolbar-icon);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-icon:not(.disabled):not(.active) > svg.lucide {
   color: var(--toolbar-icon);
 }
 
@@ -2431,6 +2511,15 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-shape-options .
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-curve-handles circle {
   fill: #ffffff;
   stroke: #f08036;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-curve-handles circle.sketch-curve-handle-hit {
+  fill: transparent;
+  stroke: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-curve-handles .sketch-curve-handle:hover circle:not(.sketch-curve-handle-hit):not(.sketch-handle-selected) {
+  fill: #f08036;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-points circle {
@@ -3274,6 +3363,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.height-top,
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.height-lift {
   background: #f1f1f1;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.height-top.slope-end {
+  background: #e0873a;
+  border-color: #6b3a12;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.edge,
@@ -4453,7 +4547,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .font-picker-option.act
   accent-color: #cf710f;
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-range small {
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-range small,
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-select > small {
   color: #5a5a5a;
 }
 
@@ -5213,6 +5308,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-workspace-tabs
   background: #3a3a3a;
 }
 
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-home {
+  color: #d2d2d2;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-home:hover:not(:disabled) {
+  background: #3a3a3a;
+}
+
 html[data-theme="dark"]:where([data-palette="graphite"]) .shape-menu-dropdown,
 html[data-theme="dark"]:where([data-palette="graphite"]) .visibility-dropdown,
 html[data-theme="dark"]:where([data-palette="graphite"]) .top-action-panel,
@@ -5711,6 +5814,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-settings-nav
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-settings-nav button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-dimensions label,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-range small,
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-select > small,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-history-labels,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-history-note,
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-toggle-copy small,
@@ -6231,6 +6335,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .theme-check {
   background: #dedede;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .outliner-sort-button.active {
+  color: #ad6206;
+  background: #e4e4e4;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-search-wrap {
   border-bottom: 1px solid #e8e8e8;
   background: #f8f8f8;
@@ -6416,6 +6525,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-close-button 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-close-button:hover {
   color: #ffffff;
   background: #3d3d3d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-sort-button.active {
+  color: #f0a64a;
+  background: #3b3b3b;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-search-wrap {
@@ -7356,6 +7470,44 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note > 
   color: #797979;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-head .panel-header-actions button.active {
+  color: #b35f07;
+  background: #e9e9e9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list {
+  background: #fff;
+  border: 1px solid #d8d8d8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button {
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button:hover {
+  background: #eeeeee;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.shown {
+  color: #fff;
+  background: #cc7011;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.ahead:not(.shown) {
+  color: #797979;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list-now {
+  color: #2a8f57;
+  border: 1px solid currentColor;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.shown .history-view-list-now {
+  color: #fff;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-facts {
   color: #676767;
 }
@@ -7432,6 +7584,33 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-facts .cu
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-head .panel-header-actions button:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-head .guide-help-link:hover {
   background: #353535;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-head .panel-header-actions button.active {
+  color: #f0a95a;
+  background: #3a3a3a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list {
+  background: #292929;
+  border-color: #4c4c4c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button:hover {
+  background: #353535;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button.shown {
+  color: #fff;
+  background: #c4670d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button.ahead:not(.shown) {
+  color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list-now {
+  color: #5fd394;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-slider > button,

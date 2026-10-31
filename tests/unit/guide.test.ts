@@ -14,8 +14,10 @@ import {
   renderInline,
   slugify,
   webpSize,
+  englishHeadingPairs,
 } from "../../scripts/build-guide.mjs";
 import { tools } from "../../scripts/layerling-mcp-tools.mjs";
+import { LANGUAGE_INFO } from "@/lib/languages";
 import { GUIDE_CHAPTERS, GUIDE_SECTIONS, guideChapterForShape, guideHref, guideSectionForShape } from "@/lib/guideLinks";
 
 // These read every language's chapters; under a full parallel run that can take more than the 5 s default.
@@ -267,6 +269,33 @@ describe("guide content", () => {
     }
   });
 
+  it("lands every question mark of every language on its page and heading", () => {
+    const headings = (markdown: string) => markdown.split(/\r?\n/).filter((line) => /^#{1,3} /.test(line)).map((line) => slugify(line.replace(/^#{1,3} /, "").trim()));
+    const english = join(root, "docs", "guide", "en");
+    const broken: string[] = [];
+    for (const language of Object.keys(LANGUAGE_INFO) as Array<keyof typeof LANGUAGE_INFO>) {
+      const directory = join(root, "docs", "guide", language);
+      const own = existsSync(directory) ? readdirSync(directory).filter((entry) => entry.endsWith(".md")) : [];
+      for (const [name, section] of Object.entries(GUIDE_SECTIONS)) {
+        const [path, anchor] = guideHref(language, undefined, name as keyof typeof GUIDE_SECTIONS).split("#");
+        const slug = path.split("/").pop()!.replace(/\.html$/, "");
+        const englishFile = readdirSync(english).find((entry) => entry.endsWith(`-${GUIDE_CHAPTERS[section.chapter].en}.md`))!;
+        const number = englishFile.slice(0, 3);
+        const translated = own.find((entry) => entry.startsWith(number));
+        const englishBody = readFileSync(join(english, englishFile), "utf8");
+        if (!translated) {
+          // An untranslated chapter shows the English text under the English name.
+          if (slug !== GUIDE_CHAPTERS[section.chapter].en || !headings(englishBody).includes(anchor)) broken.push(`${language} ${name}: ${path}#${anchor}`);
+          continue;
+        }
+        const body = readFileSync(join(directory, translated), "utf8");
+        const ids = [...headings(body), ...englishHeadingPairs(body, englishBody).flat()];
+        if (translated !== `${number}${slug}.md` || !ids.includes(anchor)) broken.push(`${language} ${name}: ${path}#${anchor} (${translated})`);
+      }
+    }
+    expect(broken).toEqual([]);
+  });
+
   it("has a heading behind every question mark that jumps into a chapter", () => {
     for (const language of LANGUAGES) {
       const directory = join(root, "docs", "guide", language);
@@ -289,7 +318,7 @@ describe("guide content", () => {
     expect(guideSectionForShape({ kind: "mesh", sketchProfile: {}, sketchOperation: "revolve" })).toBe("sketchToBody");
     expect(guideSectionForShape({ kind: "mesh", importedMesh: { sourceFormat: "stl" } })).toBe("importing");
     expect(guideHref("de", guideChapterForShape({ kind: "mesh", sketchProfile: {} }), guideSectionForShape({ kind: "mesh", sketchProfile: {} }))).toBe("/anleitung/skizzen.html#fuellung-und-silhouette");
-    for (const kind of ["thread", "gear", "spring", "bentTube", "gridfinity", "hinge", "knurl", "vase", "dovetail", "teardrop", "counterbore", "countersink", "doubleCountersink", "ruler"] as const) {
+    for (const kind of ["thread", "gear", "spring", "bentTube", "gridfinity", "hinge", "knurl", "vase", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "ruler"] as const) {
       const section = guideSectionForShape({ kind });
       expect(section && GUIDE_SECTIONS[section].chapter, kind).toBe(guideChapterForShape({ kind }));
     }

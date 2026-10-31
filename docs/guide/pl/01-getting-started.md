@@ -19,7 +19,7 @@ Wszystkie Twoje projekty pojawiają się potem na stronie startowej z obrazkiem 
 
 ![Edytor z dwoma kształtami na płaszczyźnie roboczej. Na górze wstążka, po lewej sterowanie kamerą, po prawej ustawienia zaznaczonego kształtu.](shot:editor-overview)
 
-- **Na górze** jest wstążka. Jest podzielona według zadań: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.manage}} i {{ui:editor.group.help}}. Najedź na ikonę, aby zobaczyć jej nazwę. Gdziekolwiek widzisz mały znak zapytania, na przykład w ustawieniach kształtu, w bibliotece kształtów albo w panelach narzędzi, prowadzi on prosto do pasującego rozdziału tej instrukcji.
+- **Na górze** jest wstążka. Jest podzielona według zadań: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} i {{ui:editor.group.manage}}. {{ui:editor.group.help}} jest nad nią w wierszu tytułu, a domek obok kart prowadzi z powrotem na stronę startową. Gdy okno jest za wąskie na wszystkie grupy, najrzadziej używane zwijają się do jednego przycisku pod swoją nazwą: wskaż go albo stuknij, a jego narzędzia otworzą się pod nim. Pinezka w prawym górnym rogu, na lewo od lupy, trzyma zamiast tego wszystkie grupy otwarte. Najedź na ikonę, aby zobaczyć jej nazwę, także na wyszarzoną. {{ui:interactiveHelp.title}} (znak zapytania pod {{ui:editor.group.help}} albo Shift+F1) objaśnia każdą z nich jednym kliknięciem i prowadzi do jej części tej instrukcji. Gdziekolwiek widzisz mały znak zapytania, na przykład w ustawieniach kształtu, w bibliotece kształtów albo w panelach narzędzi, prowadzi on prosto do pasującego rozdziału tej instrukcji.
 - **Na środku** leży płaszczyzna robocza. Tu umieszczasz kształty, nadajesz im formę i oglądasz wynik.
 - **Po prawej** pojawiają się ustawienia zaznaczonego kształtu: kolor, wymiary, pozycja i wszystko inne, co go tworzy. Wpisywanie liczb jest dokładniejsze niż przeciąganie.
 - **Po lewej** jest sterowanie kamerą, a nad nim kostka widoku. Służą do poruszania się po scenie, więcej w rozdziale [Widok i płaszczyzna robocza](chapter:view-and-workplane).
@@ -31,7 +31,7 @@ Najedź na przycisk, aby zobaczyć jego nazwę. Jeśli nie wiesz, co robi dany p
 
 ### Wklej
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) dodaje do projektu to, co skopiowałeś przyciskiem {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopiuje i wkleja w jednym kroku.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) dodaje do projektu to, co skopiowałeś przyciskiem {{ui:editor.tool.copy}}. {{ui:common.duplicate}} kopiuje i wkleja w jednym kroku. Wklejenie stawia każdą część trochę obok miejsca, w którym była. Części pochodzące z innego programu mogą wylądować daleko od płyty i dla nich jest w ustawieniach, w sekcji {{ui:workspace.appearance}}, opcja {{ui:workspace.pasteCentered}}: wklejenie stawia wtedy części razem na środku płaszczyzny roboczej i opuszcza je na nią.
 
 ### Usuń
 

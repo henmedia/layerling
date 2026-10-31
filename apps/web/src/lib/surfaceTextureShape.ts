@@ -37,6 +37,7 @@ import {
   type SurfaceTextureWoodType,
   type SurfaceTextureStats,
   type SurfaceTextureTiling,
+  type SurfaceTextureBumpGrid,
   type SurfaceTextureCapEdge,
   type SurfaceTextureCapStyle,
 } from "@/lib/surfaceTexture";
@@ -67,6 +68,7 @@ export const SURFACE_TEXTURE_LABELS: {
   profile: Record<SurfaceTextureProfile, MessageKey>;
   /** The same profiles as the shape of a bump. */
   bumpShape: Record<SurfaceTextureProfile, MessageKey>;
+  bumpGrid: Record<SurfaceTextureBumpGrid, MessageKey>;
   direction: Record<SurfaceTextureDirection, MessageKey>;
   projection: Record<SurfaceTextureProjection, MessageKey>;
   projectionHint: Record<SurfaceTextureProjection, MessageKey>;
@@ -109,6 +111,7 @@ export const SURFACE_TEXTURE_LABELS: {
   },
   profile: { round: "surfaceTexture.round", pointed: "surfaceTexture.pointed", flat: "surfaceTexture.flat", dome: "surfaceTexture.dome" },
   bumpShape: { dome: "surfaceTexture.bumpDome", pointed: "surfaceTexture.bumpCone", round: "surfaceTexture.bumpSoft", flat: "surfaceTexture.bumpFlat" },
+  bumpGrid: { staggered: "surfaceTexture.bumpGridStaggered", straight: "surfaceTexture.bumpGridStraight" },
   direction: { inward: "surfaceTexture.inward", outward: "surfaceTexture.outward", both: "surfaceTexture.both" },
   projection: { auto: "surfaceTexture.auto", cylinder: "surfaceTexture.cylinder", allRound: "surfaceTexture.allRound", flat: "surfaceTexture.flatProjection" },
   projectionHint: { auto: "surfaceTexture.autoHint", cylinder: "surfaceTexture.cylinderHint", allRound: "surfaceTexture.allRoundHint", flat: "surfaceTexture.flatHint" },

@@ -155,7 +155,7 @@ Vuoi che il testo segua il bordo di una moneta, un coperchio o un anello invece 
 
 Attivandola, il testo segue il cerchio. Tutte le lettere poggiano sulla stessa linea di base e hanno una spaziatura uniforme, come nel testo normale. Ci sono quattro impostazioni:
 
-- **{{ui:prop.textRadius}}** (da 5 a 500 mm): raggio del cerchio su cui si dispone la linea di base delle lettere.
+- **{{ui:prop.textRadius}}** (da 5 a 500 mm): raggio del cerchio su cui si dispone la linea di base delle lettere. Le lettere restano al loro posto; cambia solo la loro curvatura.
 - **{{ui:nameTag.letterSize}}:** altezza delle lettere. Non dipende più dalla larghezza della forma.
 - **{{ui:prop.textInward}}:** sposta il testo dalla parte superiore a quella inferiore del cerchio. Le lettere sono rivolte verso il centro.
 - **{{ui:prop.textFlipped}}:** capovolge solo le lettere, per renderle leggibili dall’altro lato. Il testo resta nella stessa posizione sul cerchio.

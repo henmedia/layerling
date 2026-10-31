@@ -74,6 +74,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_hull_objects` | 把物件包成一個凸體，就像用收縮膜包住一樣（凸包） |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | 把形狀分離成各自的鬆散部件；草圖實體則依輪廓拆成每個輪廓一個實體 |
 | `layerling_split_objects` | 用平面把實體或孔切成兩半 |
@@ -81,7 +82,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_apply_edge_treatment` | 對選定的邊倒角或圓角 |
 | `layerling_hollow_object` | 以均勻壁厚抽殼實體 |
 | `layerling_cut_out` | 從一個實體中挖出另一個實體使兩者配合：零件保留，依間隙放大的副本從另一個實體中減去 |
-| `layerling_offset_object` | 移動實體的所有面以得到配合間隙：放大或縮小實體，或把放大的副本作為孔加入 |
+| `layerling_offset_object` | 移動實體的所有面以得到配合間隙：放大或縮小實體，或把放大的副本作為孔加入，或只移動側面 |
 | `layerling_list_faces` | 列出精確實體的面 |
 | `layerling_delete_faces` | 刪除面並補平缺口 |
 | `layerling_array_objects` | 以直線排列或環繞圓周複製 |
@@ -112,6 +113,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_set_history_view` | 回看專案較早的狀態，就像歷史記錄檢視（實際設計不受影響；會修改設計的工具會等到它關閉） |
 | `layerling_restore_from_history` | 把物件（也包括群組內的部件）從較早的狀態以副本帶回設計，就像歷史記錄檢視的「帶入設計」——復原時一步就能撤回 |
 | `layerling_export_section_svg` | 以 1:1 的 SVG 回傳剖切平面上的輪廓，所用實體與匯出時相同 |
+| `layerling_sketch_from_section` | 用剖切平面上的輪廓建立一個位於切口上的草圖：在編輯器中開啟以便修改，或立即建構為指定高度的實體 |
 | `layerling_export_drawing` | 製作「2D」匯出的工程圖：在 ISO 圖紙上以 1:1 繪出三個視圖，標註整體尺寸並附圓孔表格，可輸出 SVG 文字或 PDF |
 | `layerling_export_mesh` | 寫出匯出視窗的檔案，可為 STL、3MF、OBJ、SVG（俯視、底面輪廓或可見邊）或用於雷射切割的 DXF，所用實體相同；可寫到這台電腦上的路徑，或以 base64 回傳 |
 | `layerling_save_project` | 把整個可編輯設計儲存成 .lyl 檔，寫到執行 MCP 伺服器的那台電腦上的路徑，不會跳出對話方塊；既有檔案只有在指定 `overwrite` 時才會被取代，寫入時會先經過暫存檔，而編輯器中 Ctrl+S 的目標維持不變 |

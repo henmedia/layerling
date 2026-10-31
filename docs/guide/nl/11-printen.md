@@ -5,7 +5,7 @@ summary: Je eigen printer kiezen, een waarschuwing krijgen als iets niet past, e
 
 ## Je printer kiezen
 
-Open de instellingen (het tandwiel in het lint, {{ui:editor.workspaceSettings}}) en ga naar het onderdeel {{ui:workspace.workplane}}. Onder {{ui:workspace.printer}} kies je je printer uit een lijst van meer dan 220 gangbare modellen, waaronder Bambu Lab, Prusa, Creality, Anycubic, Elegoo en nog veel meer.
+Open de instellingen (het tandwiel in het lint, {{ui:editor.workspaceSettings}}) en ga naar het onderdeel {{ui:workspace.workplane}}. Onder {{ui:workspace.printer}} kies je je printer uit een lijst van meer dan 230 gangbare modellen, waaronder Bambu Lab, Prusa, Creality, Anycubic, Elegoo en nog veel meer.
 
 ![De werkvlakinstellingen met een gekozen printer. Printbed en maximale printhoogte komen uit het slicerprofiel.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Er gebeuren drie dingen:
 - layerling **waarschuwt** als iets niet past.
 
 De printerprofielen komen uit OrcaSlicer, dus het zijn dezelfde die je slicer kent. Werk je liever zonder printer, kies dan {{ui:workspace.printerNone}}. Je kunt de maat van het werkvlak ook met de hand instellen.
+
+Deltaprinters zoals die van FLSun of SeeMeCNC of de Anycubic Predator printen op een rond bed. Met een van hen is het werkvlak ook rond, even breed als het bed, en een lichaam is te groot zodra het over de rand steekt. Een rond lichaam wordt gemeten aan zijn eigen omtrek, niet aan de doos eromheen, dus een cilinder die bijna zo breed is als het bed past nog.
 
 ## Als iets niet past
 

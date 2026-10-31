@@ -159,7 +159,7 @@ Soll die Beschriftung nicht gerade laufen, sondern dem Rand einer Münze, eines 
 
 Sobald du sie einschaltest, läuft der Text am Kreis entlang. Alle Buchstaben stehen auf derselben Grundlinie, so gleichmäßig wie bei normalem Text. Dazu gibt es vier Einstellungen:
 
-- **{{ui:prop.textRadius}}** (5 bis 500 mm): Der Radius des Kreises, auf dem die Grundlinie der Buchstaben läuft.
+- **{{ui:prop.textRadius}}** (5 bis 500 mm): Der Radius des Kreises, auf dem die Grundlinie der Buchstaben läuft. Die Buchstaben bleiben dabei an ihrer Stelle, nur ihre Biegung ändert sich.
 - **{{ui:nameTag.letterSize}}:** Wie hoch die Buchstaben sind. Sie hängt nicht mehr an der Breite der Form.
 - **{{ui:prop.textInward}}:** Schaltet den Text von der Oberseite des Kreises auf die Unterseite. Die Buchstaben zeigen dann mit dem Kopf zur Mitte.
 - **{{ui:prop.textFlipped}}:** Dreht nur die Buchstaben um, damit du sie von der anderen Seite lesen kannst. Der Text bleibt dabei an seiner Stelle auf dem Kreis.

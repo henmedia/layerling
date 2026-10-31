@@ -5,7 +5,7 @@ summary: Vælg din egen printer, bliv advaret når noget ikke passer, og læg de
 
 ## Vælg din printer
 
-Åbn indstillingerne (tandhjulet i båndet, {{ui:editor.workspaceSettings}}) og skift til området {{ui:workspace.workplane}}. Under {{ui:workspace.printer}} vælger du din printer fra en liste på over 220 almindelige modeller, herunder Bambu Lab, Prusa, Creality, Anycubic, Elegoo og mange flere.
+Åbn indstillingerne (tandhjulet i båndet, {{ui:editor.workspaceSettings}}) og skift til området {{ui:workspace.workplane}}. Under {{ui:workspace.printer}} vælger du din printer fra en liste på over 230 almindelige modeller, herunder Bambu Lab, Prusa, Creality, Anycubic, Elegoo og mange flere.
 
 ![Arbejdsplan-indstillingerne med en printer valgt. Printleje og maksimale printhøjde kommer fra slicer-profilen.](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ Tre ting sker:
 - layerling **advarer** når noget ikke passer.
 
 Printerprofilerne kommer fra OrcaSlicer, så de er de samme som din slicer kender. Hvis du hellere vil arbejde uden en printer, vælg {{ui:workspace.printerNone}}. Du kan også sætte arbejdsplanets størrelse i hånden.
+
+Deltaprintere som dem fra FLSun eller SeeMeCNC eller Anycubic Predator printer på en rund plade. Med en af dem er arbejdsfladen også rund, lige så bred som pladen, og et legeme er for stort, så snart det rækker ud over kanten. Et rundt legeme måles efter sit eget omrids, ikke efter kassen omkring det, så en cylinder næsten lige så bred som pladen passer stadig.
 
 ## Når noget ikke passer
 

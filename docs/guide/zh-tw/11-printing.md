@@ -5,7 +5,7 @@ summary: 選擇自己的印表機、在零件放不下時收到警告，以及�
 
 ## 選擇印表機
 
-開啟設定（功能區裡的齒輪圖示，{{ui:editor.workspaceSettings}}），切換到 {{ui:workspace.workplane}} 區段。在 {{ui:workspace.printer}} 下，可以從超過 220 種常見機型的清單中選擇自己的印表機，包括 Bambu Lab、Prusa、Creality、Anycubic、Elegoo 等眾多品牌。
+開啟設定（功能區裡的齒輪圖示，{{ui:editor.workspaceSettings}}），切換到 {{ui:workspace.workplane}} 區段。在 {{ui:workspace.printer}} 下，可以從超過 230 種常見機型的清單中選擇自己的印表機，包括 Bambu Lab、Prusa、Creality、Anycubic、Elegoo 等眾多品牌。
 
 ![已選擇印表機的工作平面設定。列印床與最大列印高度來自切片軟體的設定檔。](shot:settings-workplane)
 
@@ -16,6 +16,8 @@ summary: 選擇自己的印表機、在零件放不下時收到警告，以及�
 - 零件放不下時，layerling 會**警告**。
 
 印表機設定來自 OrcaSlicer，因此和你的切片軟體所認得的完全相同。如果不想使用印表機，選擇 {{ui:workspace.printerNone}}。也可以手動設定工作平面的尺寸。
+
+FLSun、SeeMeCNC 等品牌的三角洲（Delta）印表機以及 Anycubic Predator 使用圓形列印平台。選擇這類印表機後，工作平面也會變成圓形，寬度與平台相同；物件一旦超出邊緣就算太大。圓形物件依自身輪廓測量，而不是依包圍它的方框，所以幾乎和平台一樣寬的圓柱體也放得下。
 
 ## 零件放不下時
 

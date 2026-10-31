@@ -153,7 +153,7 @@ Naj napis ne teče naravnost, ampak sledi robu kovanca, pokrova ali obroča? Za 
 
 Takoj ko jo vklopiš, besedilo teče vzdolž kroga. Vse črke stojijo na isti osnovni črti, tako enakomerno kot pri običajnem besedilu. Poleg so štiri nastavitve:
 
-- **{{ui:prop.textRadius}}** (5 do 500 mm): Polmer kroga, na katerem teče osnovna črta črk.
+- **{{ui:prop.textRadius}}** (5 do 500 mm): Polmer kroga, na katerem teče osnovna črta črk. Črke ostanejo na svojem mestu, spremeni se le njihova ukrivljenost.
 - **{{ui:nameTag.letterSize}}:** Kako visoke so črke. Ne visi več na širini oblike.
 - **{{ui:prop.textInward}}:** Preklopi besedilo z zgornje strani kroga na spodnjo. Črke potem kažejo z glavo proti središču.
 - **{{ui:prop.textFlipped}}:** Obrne samo črke, da jih lahko bereš z druge strani. Besedilo pri tem ostane na svojem mestu na krogu.

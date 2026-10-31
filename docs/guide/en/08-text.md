@@ -159,7 +159,7 @@ Should the lettering not run straight but follow the edge of a coin, a lid or a 
 
 Once you switch it on, the text runs along the circle. All letters stand on the same baseline, as evenly as with normal text. There are four settings:
 
-- **{{ui:prop.textRadius}}** (5 to 500 mm): The radius of the circle the letters' baseline runs on.
+- **{{ui:prop.textRadius}}** (5 to 500 mm): The radius of the circle the letters' baseline runs on. The letters stay where they are; only their bend changes.
 - **{{ui:nameTag.letterSize}}:** How tall the letters are. It no longer depends on the width of the shape.
 - **{{ui:prop.textInward}}:** Moves the text from the top of the circle to its bottom. The letters then point with their heads to the centre.
 - **{{ui:prop.textFlipped}}:** Turns only the letters over so you can read them from the other side. The text stays in its place on the circle.

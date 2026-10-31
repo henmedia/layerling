@@ -1,9 +1,10 @@
 "use client";
 
-import { ArchiveRestore, ChevronLeft, ChevronRight, CornerLeftUp, Download, FilePlus2, FolderOpen, LoaderCircle, Trash2, X } from "lucide-react";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { ArchiveRestore, ChevronLeft, ChevronRight, CornerLeftUp, Download, FilePlus2, FolderOpen, ListOrdered, LoaderCircle, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import type { HistoryStepDescription } from "@/lib/historyStepDescription";
+import { historyStepText } from "@/lib/historyStepText";
 import { historyKeyTarget, historyWheelSteps } from "@/lib/historyStepping";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -18,6 +19,17 @@ const HISTORY_BAR: MovablePanelOptions = {
   floatingStyle: { right: "auto", bottom: "auto", margin: 0 },
   area: (panel) => panel.ownerDocument.querySelector<HTMLElement>(".workplane-stage"),
 };
+
+/** Whether the list of steps is open, kept for the next time the view opens (#1023). */
+const STEP_LIST_STORAGE_KEY = "layerling.editor.historyViewList";
+
+function readStepListOpen() {
+  try {
+    return window.localStorage.getItem(STEP_LIST_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Wann ein Stand entstanden ist, in der Sprache der Oberflaeche. Staende aus
@@ -59,6 +71,8 @@ export function HistoryViewOverlay({
   objectCount,
   lastStep,
   nextStep,
+  describeStep,
+  accuracy = 2,
   creating,
   canCreateProject,
   pickedCount,
@@ -84,6 +98,10 @@ export function HistoryViewOverlay({
   lastStep: HistoryStepDescription | null;
   /** What the right arrow would redo: the step after the state shown; null at the newest state. */
   nextStep: HistoryStepDescription | null;
+  /** The step that led to the state at `index` (the start at 0), for the list of steps; read only while the list is open. */
+  describeStep: (index: number) => HistoryStepDescription;
+  /** Decimal places for the measures of the steps, as the workspace shows them. */
+  accuracy?: number;
   creating: boolean;
   canCreateProject: boolean;
   /** How many objects of the shown state are picked to bring back. */
@@ -115,9 +133,30 @@ export function HistoryViewOverlay({
   const max = Math.max(0, count - 1);
   const position = max > 0 ? `${(index / max) * 100}%` : "100%";
   const time = formatHistoryStateTime(recordedAt, language);
-  const lastText = lastStep ? t(lastStep.key, lastStep.values) : t("historyView.lastStepNone");
-  const nextText = nextStep ? t(nextStep.key, nextStep.values) : t("historyView.nextStepNone");
+  const lastText = lastStep ? historyStepText(lastStep, accuracy) : t("historyView.lastStepNone");
+  const nextText = nextStep ? historyStepText(nextStep, accuracy) : t("historyView.nextStepNone");
   const distance = index - liveIndex;
+
+  // The steps as a list, newest at the top, to jump to any of them with one click (#1023).
+  // Reading a step compares two states, so they are read only while the list is open.
+  const [listOpen, setListOpen] = useState(readStepListOpen);
+  const toggleList = () => {
+    const next = !listOpen;
+    setListOpen(next);
+    try {
+      window.localStorage.setItem(STEP_LIST_STORAGE_KEY, String(next));
+    } catch {
+      // Not kept then; the list still opens.
+    }
+  };
+  const listTexts = useMemo(
+    () => (listOpen ? Array.from({ length: count }, (_, state) => historyStepText(describeStep(state), accuracy)) : []),
+    [listOpen, count, describeStep, accuracy],
+  );
+  const listRef = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    listRef.current?.querySelector<HTMLElement>("[aria-current='step']")?.scrollIntoView({ block: "nearest" });
+  }, [index, listOpen]);
 
   // The mouse wheel over the slider steps through the states, one per notch, up to an
   // earlier one (#688). Not a React handler: that one is passive and the page would scroll.
@@ -189,10 +228,41 @@ export function HistoryViewOverlay({
           <span>{t("historyView.subtitle")}</span>
         </div>
         <div className="panel-header-actions">
+          <button
+            type="button"
+            className={listOpen ? "active" : ""}
+            aria-pressed={listOpen}
+            aria-label={listOpen ? t("historyView.listHide") : t("historyView.listShow")}
+            title={listOpen ? t("historyView.listHide") : t("historyView.listShow")}
+            data-testid="history-view-list-toggle"
+            onClick={toggleList}
+          >
+            <ListOrdered size={18} />
+          </button>
           <GuideHelpLink section="historyView" />
           <button type="button" aria-label={t("historyView.close")} title={t("historyView.close")} onClick={onClose}><X size={20} /></button>
         </div>
       </div>
+
+      {listOpen ? (
+        <ol className="history-view-list" ref={listRef} aria-label={t("historyView.list")} data-testid="history-view-list">
+          {listTexts.map((text, state) => ({ text, state })).reverse().map(({ text, state }) => (
+            <li key={state}>
+              <button
+                type="button"
+                className={`${state === index ? "shown" : ""} ${state > liveIndex ? "ahead" : ""}`}
+                aria-current={state === index ? "step" : undefined}
+                title={text}
+                onClick={() => onIndexChange(state)}
+              >
+                <span className="history-view-list-number">{state + 1}</span>
+                <span className="history-view-list-text">{text}</span>
+                {state === liveIndex ? <span className="history-view-list-now">{t("historyView.listNow")}</span> : null}
+              </button>
+            </li>
+          ))}
+        </ol>
+      ) : null}
 
       <div className="history-view-slider" ref={wheelAreaRef}>
         <button type="button" aria-label={t("historyView.earlier")} title={t("historyView.earlier")} disabled={index <= 0} onClick={() => onIndexChange(index - 1)}>

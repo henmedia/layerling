@@ -70,6 +70,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_hull_objects` | verpakt de objecten in één bol lichaam, alsof ze gekrompen zijn in folie (omhulsel) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | splitst een vorm in zijn losse delen, een schetslichaam in één lichaam per omtrek |
 | `layerling_split_objects` | snijdt lichamen of gaten met een vlak in tweeën |
@@ -77,7 +78,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_apply_edge_treatment` | schuint gekozen randen af of rondt ze af |
 | `layerling_hollow_object` | holt een lichaam uit met een gelijkmatige wand |
 | `layerling_cut_out` | snijdt het ene lichaam uit het andere zodat ze passen: het onderdeel blijft, een met de speling vergrote kopie wordt van het andere lichaam afgetrokken |
-| `layerling_offset_object` | verschuift alle vlakken van een lichaam voor de speling van een pasvorm: vergroot of verkleint het, of voegt de vergrote kopie als gat toe |
+| `layerling_offset_object` | verschuift alle vlakken van een lichaam voor de speling van een pasvorm: vergroot of verkleint het, of voegt de vergrote kopie als gat toe, of verschuift alleen de zijkanten |
 | `layerling_list_faces` | somt de vlakken van een exact lichaam op |
 | `layerling_delete_faces` | verwijdert vlakken en sluit de opening |
 | `layerling_array_objects` | vermenigvuldigt in een rij of op een cirkel |
@@ -108,6 +109,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_set_history_view` | kijkt terug naar een eerdere toestand van het project, zoals de geschiedenisweergave (het echte ontwerp blijft onaangeroerd; gereedschappen die iets wijzigen wachten tot hij gesloten is) |
 | `layerling_restore_from_history` | haalt objecten (ook onderdelen in groepen) uit een eerdere toestand als kopieën terug in het ontwerp, zoals „In het ontwerp halen” in de geschiedenisweergave - één stap die ongedaan maken terugneemt |
 | `layerling_export_section_svg` | geeft de contouren op een doorsnedevlak terug als SVG op 1:1, van dezelfde lichamen als de export |
+| `layerling_sketch_from_section` | maakt van de omtrekken op een doorsnedevlak een schets die op de doorsnede ligt: geopend in de editor om aan te passen, of meteen gebouwd als lichaam met een opgegeven hoogte |
 | `layerling_export_drawing` | maakt de werkplaatstekening van de "2D"-export: drie aanzichten op 1:1 op een ISO-blad met buitenmaten en een tabel van de ronde boringen, als SVG-tekst of PDF |
 | `layerling_export_mesh` | schrijft het bestand van het exportvenster als STL, 3MF, OBJ, SVG (bovenaanzicht, voetafdruk of zichtbare randen) of DXF voor lasersnijden, uit dezelfde lichamen; naar een pad op deze computer of als base64 |
 | `layerling_save_project` | slaat het hele bewerkbare ontwerp op als .lyl-bestand op een pad op de computer waarop de MCP-server draait, zonder dialoog; een bestaand bestand wordt alleen met `overwrite` vervangen, het wordt via een tijdelijk bestand geschreven, en het doel van Ctrl+S in de editor blijft zoals het was |

@@ -39,6 +39,8 @@ Mislukt een selectie die eerst werkte nadat je op nog een rand hebt geklikt, dan
 
 Ook de rand onder de aanwijzer wordt breder getekend, zodat je ziet welke een klik zal kiezen.
 
+Ook een gat neemt {{ui:editor.tool.chamfer}} en {{ui:editor.tool.fillet}} aan, net als {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} en {{ui:editor.tool.deleteFace}}: het blijft een gat en snijdt met zijn nieuwe vorm. Rond je de vier staande randen van een kubusvormig gat af, dan krijg je een kamer met ronde binnenhoeken, en een gat dat met {{ui:editor.tool.offset}} groter is gemaakt, snijdt met zoveel meer ruimte. De rand waar een gat het onderdeel raakt, bewerk je juist op de afgewerkte groep: die rand hoort bij haar.
+
 ### Een randbewerking terugdraaien
 
 Een bewerkt lichaam kun je altijd opnieuw bewerken. Selecteer het weer en open het gereedschap; Afronden, Afschuinen en Uithollen tonen allemaal de lijst: onder {{ui:edge.featureHistory}} zie je wat er al op zit. {{ui:edge.revertAction}} draait één bewerking terug. Let op: liggen er nieuwere bewerkingen bovenop, dan gaan die mee, en het paneel meldt hoeveel.
@@ -81,6 +83,18 @@ Verander je later de maat van een uitgehold lichaam, dan holt layerling het mete
 
 > **Tip:** Met een spuitmond van 0,4 mm is 1,2 tot 2 mm wand een goed begin: dun genoeg om materiaal te besparen, dik genoeg voor een stevig onderdeel.
 
+## Een deksel voor een open vorm
+
+{{ui:editor.tool.lid}} maakt het deksel voor een vorm die bovenaan open is: een doos die je met open bovenkant hebt uitgehold, een pot, een bakje. Selecteer de vorm en klik op {{ui:editor.tool.lid}}. In het venster kies je de soort:
+
+- {{ui:lid.type.plug}}: een plaat zo groot als de vorm met eronder een lip die in de opening grijpt.
+- {{ui:lid.type.cap}}: een plaat een wand breder dan de vorm met eronder een rand die om de buitenkant grijpt.
+- {{ui:lid.type.flat}}: alleen de plaat, om erop te leggen of te lijmen.
+
+Daarna stel je de {{ui:lid.thickness}} in, de {{ui:lid.fit}} (de {{ui:lid.gap}} tussen deksel en vorm: 0,1 mm strak, 0,2 mm normaal, 0,3 mm ruim, of elke waarde tot 1 mm) en hoe diep de lip of rand naar beneden reikt en hoe dik de wand is. Klik op {{ui:lid.apply}}: het deksel ligt naast de vorm, omgedraaid met de plaat naar beneden, zodat het zonder support print. De vorm blijft zoals hij is. Het deksel volgt elke omtrek, rond of hoekig, omdat het vlak onder de rand van de vorm zelf wordt afgenomen. Een vorm zonder opening bovenaan krijgt alleen een plat deksel; hol hem voor de andere twee eerst uit met de bovenkant open.
+
+> **Tip:** Hoe strak een deksel zit, hangt van de printer af. Print eerst een kleine doos met deksel; zit het te strak, neem dan de volgende ruimere passing.
+
 ## Lichamen verschuiven
 
 Elk vlak van een lichaam kan over dezelfde afstand naar buiten of naar binnen worden verschoven. Dat is wat een pasvorm, een deksel of een klikverbinding nodig heeft: een spleet van 0,1 tot 0,3 mm rondom terwijl de onderdelen op hun plaats blijven, wat schalen niet kan.
@@ -90,6 +104,8 @@ Elk vlak van een lichaam kan over dezelfde afstand naar buiten of naar binnen wo
 3. De {{ui:offset.edges}} bepalen de buitenhoeken: afgerond houdt het verschoven oppervlak daar rond, scherp laat de vlakken doorlopen tot ze elkaar raken.
 4. Vink {{ui:offset.copy}} aan om het onderdeel te houden en het vergrote lichaam als kopie te krijgen die al een gat is. Groepeer dat gat met het tegenstuk en het snijdt precies de speling die je koos.
 5. Klik op {{ui:offset.apply}}.
+
+Vink {{ui:offset.sideways}} aan als alleen de omtrek moet groeien of krimpen: de zijkanten schuiven de afstand op, terwijl elke vlakke boven- en onderkant op zijn hoogte blijft. Een bord krijgt rondom een rand, een sokkel wordt breder en het lichaam wordt niet hoger. Bij een getrapt lichaam houdt elke trede zijn eigen hoogte. Een tekst die via zijn omtrekken wordt verschoven, houdt dan ook zijn hoogte.
 
 Zonder vinkje wordt het lichaam zelf verschoven. Het wordt een vast exact lichaam, zoals na een afschuining: de lijst bovenin het paneel neemt de offset terug en {{ui:edge.editAction}} opent het gereedschap opnieuw met de oude afstand. Alleen exacte CAD-lichamen kunnen worden verschoven - blokken, cilinders en de andere vormen, groepen daarvan, geïmporteerde STEP-onderdelen. Een lichaam dat alleen een driehoeksnet is, zoals veel STL-imports, lukt vaak niet. Een afstand die te groot is voor het lichaam, bijvoorbeeld verkleinen voorbij de dunste wand, wordt geweigerd.
 

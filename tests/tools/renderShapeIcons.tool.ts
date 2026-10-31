@@ -17,6 +17,7 @@ import { createGridfinityGeometry } from "@/lib/gridfinityGeometry";
 import { createKnurlGeometry } from "@/lib/knurlGeometry";
 import { createVaseGeometry } from "@/lib/vaseShape";
 import { createTeardropGeometry, teardropHeightForTipAngle } from "@/lib/teardropGeometry";
+import { createPortGeometry } from "@/lib/portGeometry";
 import { createLoftGeometry } from "@/lib/loftGeometry";
 import { createScrewHoleGeometry } from "@/lib/screwHoleGeometry";
 import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
@@ -24,6 +25,7 @@ import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createThreadGeometry } from "@/lib/threadGeometry";
 import { bentTubeNaturalDimensions, createBentTubeGeometry } from "@/lib/bentTubeGeometry";
 import { createGearGeometry } from "@/lib/gearGeometry";
+import { createHirthGeometry } from "@/lib/hirthGeometry";
 import manifoldModule from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
@@ -407,6 +409,15 @@ describe("palette icons", () => {
       }),
     });
     render({
+      // Schraeg von oben, damit die Zaehne um die Bohrung zu sehen sind.
+      name: "apps/web/public/assets/editor/shape-icons-gray/hirth.png",
+      height: 10,
+      lay: false,
+      azimuth: 35,
+      elevation: 42,
+      build: () => createHirthGeometry(30, 10, 30, { teeth: 12, toothSize: 4.5, centerHoleSize: 9 }),
+    });
+    render({
       name: "apps/web/public/assets/editor/shape-icons-gray/paraboloid.png",
       height: 22,
       lay: false,
@@ -460,6 +471,15 @@ describe("palette icons", () => {
       azimuth: 35,
       elevation: 18,
       build: () => createTeardropGeometry({ width: 16, depth: 30, height: teardropHeightForTipAngle(16, 90) }),
+    });
+    render({
+      // A USB-C opening, much enlarged: from the front at a slant, so the round ends and the depth show (#1049).
+      name: "apps/web/public/assets/editor/shape-icons-gray/port.png",
+      height: 12.5,
+      lay: false,
+      azimuth: 30,
+      elevation: 18,
+      build: () => createPortGeometry({ width: 31.8, depth: 14, height: 12.5, cornerFillet: 6.25 }),
     });
     render({
       // Von eckig auf rund, mit Wand: von oben schraeg, damit die Oeffnung zeigt, was der Uebergang ist (#188).

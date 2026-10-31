@@ -59,10 +59,29 @@ describe("Hull (#863)", () => {
     expect(volumeOf(group!)).toBeCloseTo(4000 - 4 * 4 * 10, 0);
   });
 
-  it("needs two shapes, at least one a solid", () => {
+  it("needs two shapes", () => {
     expect(canHullShapes([box("a", 0)])).toBe(false);
-    expect(canHullShapes([box("a", 0, { hole: true }), box("b", 20, { hole: true })])).toBe(false);
+    expect(canHullShapes([box("a", 0, { hole: true })])).toBe(false);
     expect(canHullShapes([box("a", 0), box("b", 20, { hole: true })])).toBe(true);
+    // Holes only make a hole (#1055).
+    expect(canHullShapes([box("a", 0, { hole: true }), box("b", 20, { hole: true })])).toBe(true);
+  });
+
+  it("wraps holes only into a hole: two cylinder holes cut a slot (#1055)", async () => {
+    const pin = (id: string, x: number): WorkplaneShape => ({ ...box(id, x), kind: "cylinder", hole: true, sides: 64, elevation: -1, height: 12 });
+    const { group } = await buildHullShapeFromSelection([pin("a", -10), pin("b", 10)], 200_000);
+    expect(group).not.toBeNull();
+    expect(group!.hole).toBe(true);
+    expect(group!.width).toBeCloseTo(30, 1);
+    expect(group!.depth).toBeCloseTo(10, 1);
+    // A slot 20 mm between centres, 10 mm wide, 12 high: the rectangle between the circles and one circle.
+    const slot = (20 * 10 + Math.PI * 25) * 12;
+    expect(volumeOf(group!)).toBeCloseTo(slot, -1);
+    // Grouped with a plate, it cuts the slot out of it.
+    const plate = box("p", 0, { width: 50, depth: 30, height: 10 });
+    const cut = await buildGroupedShapeFromSelection([plate, { ...group!, groupOperation: "hull" as const }], 200_000);
+    expect(cut.group).not.toBeNull();
+    expect(volumeOf(cut.group!)).toBeCloseTo(50 * 30 * 10 - (20 * 10 + Math.PI * 25) * 10, -1);
   });
 
   it("stays one body in one colour inside another group with a hole", async () => {

@@ -74,6 +74,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_hull_objects` | wraps the objects in one convex body, as if shrink-wrapped (Hull) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall with a cutting edge and a rim round the mirrored outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separates a shape into its loose parts, a sketch body into one body per outline |
 | `layerling_split_objects` | cuts solids or holes in two with a plane |
@@ -81,7 +82,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_apply_edge_treatment` | chamfers or fillets chosen edges |
 | `layerling_hollow_object` | hollows a body with an even wall |
 | `layerling_cut_out` | cuts one solid out of another so they fit: the part stays, a copy grown by the clearance is subtracted from the other body |
-| `layerling_offset_object` | builds the clearance of a press fit: grows or shrinks a solid, or adds the grown copy as a hole |
+| `layerling_offset_object` | builds the clearance of a press fit: grows or shrinks a solid, or adds the grown copy as a hole, or moves only the sides |
 | `layerling_list_faces` | lists the faces of an exact body |
 | `layerling_delete_faces` | deletes faces and closes the gap |
 | `layerling_array_objects` | multiplies in a row or on a circle |
@@ -112,6 +113,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_set_history_view` | looks back at an earlier state of the project, like the History view (the real design stays untouched; changing tools wait until it is closed) |
 | `layerling_restore_from_history` | brings objects (also parts inside groups) back from an earlier state into the design as copies, as the History view's Bring into design does - one step that undo takes back |
 | `layerling_export_section_svg` | returns the outlines on a cutting plane as an SVG at 1:1, from the same bodies as the export |
+| `layerling_sketch_from_section` | makes a sketch from the outlines on a cutting plane, lying on the cut: opened in the editor to change, or built at once into a body of a given height |
 | `layerling_export_drawing` | makes the workshop drawing of the "2D" export: three views at 1:1 on an ISO sheet with overall sizes and a table of the round bores, as SVG text or PDF |
 | `layerling_export_mesh` | writes the file of the export window as STL, 3MF, OBJ, SVG (top view, footprint or visible edges) or DXF for laser cutting, from the same bodies; to a path on this computer, or as base64 |
 | `layerling_save_project` | saves the whole editable design as a .lyl file at a path on the computer where the MCP server runs, without a dialog; an existing file is only replaced with `overwrite`, it is written through a temporary file, and the target of Ctrl+S in the editor stays as it is |

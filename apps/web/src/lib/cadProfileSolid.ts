@@ -111,7 +111,18 @@ export function validateCadProfile(profile: CadModifierProfilePart) {
   if (!Number.isFinite(profile.height) || profile.height <= 0) throw new Error("The profile has no height");
   if (!profile.loops.length) throw new Error("The profile has no outline");
   if (profile.kind === "sweep") validateSweepPath(profile.path);
-  if (profile.kind === "loft") {
+  if (profile.kind === "loft" && profile.apex) {
+    // A loft to a point: one outline of straight lines below it, and no top section.
+    if (!Number.isFinite(profile.apex.x) || !Number.isFinite(profile.apex.z)) throw new Error("The loft's point is not a number");
+    if (profile.topLoops || profile.loops.length !== 1 || profile.loops[0].segments.some((segment) => segment.kind !== "line")) {
+      throw new Error("A loft to a point needs one straight-sided outline and no top");
+    }
+    // Its sides are built flat, so nothing may turn, tilt, smooth or chamfer them.
+    const tilted = Math.abs(profile.tilt?.x ?? 0) > 1e-9 || Math.abs(profile.tilt?.z ?? 0) > 1e-9;
+    if (Math.abs(profile.twist ?? 0) > 1e-9 || tilted || (profile.smooth ?? 0) > 1e-9 || (profile.capChamfer?.size ?? 0) > 1e-4) {
+      throw new Error("A loft to a point cannot be turned, tilted, smoothed or chamfered");
+    }
+  } else if (profile.kind === "loft") {
     // The top has to be the bottom's partner piece for piece: the loft joins them in that order.
     // A piece may face one of another kind - a side of a square a quarter of a circle (#188).
     const top = profile.topLoops ?? [];
@@ -387,7 +398,8 @@ function sidesAreFlat(profile: CadModifierProfilePart, tolerance: number) {
 /**
  * A tapered or leaning prism whose sides all stay flat (a box, or a polygon
  * scaled evenly), built face by face so that every side is a plane - a
- * lofted side comes out as a B-spline even when it is flat.
+ * lofted side comes out as a B-spline even when it is flat. A loft to a point
+ * (a pyramid) has no top: each side is the triangle from a bottom edge to the point.
  */
 function flatLoftSolid(cad: OcctKernel, profile: CadModifierProfilePart, tolerance: number) {
   const top = profile.topLoops ?? [];
@@ -399,13 +411,14 @@ function flatLoftSolid(cad: OcctKernel, profile: CadModifierProfilePart, toleran
     faces.push(face);
   };
   cap(profile.loops, 0);
-  cap(top, profile.height);
+  const apex = profile.apex ? { x: profile.apex.x, y: profile.height, z: profile.apex.z } : null;
+  if (!apex) cap(top, profile.height);
   profile.loops.forEach((loop, index) => {
     const lower = loopCorners(loop, 0);
-    const upper = loopCorners(top[index], profile.height);
+    const upper = apex ? [] : loopCorners(top[index], profile.height);
     lower.forEach((a, corner) => {
       const next = (corner + 1) % lower.length;
-      faces.push(cad.makeFace(ring([a, lower[next], upper[next], upper[corner]])));
+      faces.push(cad.makeFace(ring(apex ? [a, lower[next], apex] : [a, lower[next], upper[next], upper[corner]])));
     });
   });
   const sewn = cad.sew(faces, tolerance * 100);
@@ -586,8 +599,57 @@ function piecewiseLoftSolid(cad: OcctKernel, profile: CadModifierProfilePart, to
   return solid;
 }
 
+/** A loop scaled by `sx` across (x) and `sz` in height (z) about the origin. */
+function loopScaled(loop: CadModifierProfileLoop, sx: number, sz: number): CadModifierProfileLoop {
+  return {
+    x: loop.x * sx,
+    z: loop.z * sz,
+    segments: loop.segments.map((segment): CadModifierProfileSegment => {
+      if (segment.kind === "line") return { ...segment, x: segment.x * sx, z: segment.z * sz };
+      if (segment.kind === "bezier") return { ...segment, x: segment.x * sx, z: segment.z * sz, controls: segment.controls.map((control) => ({ x: control.x * sx, z: control.z * sz })) };
+      return { ...segment, x: segment.x * sx, z: segment.z * sz, cx: segment.cx * sx, cz: segment.cz * sz, rx: segment.rx * sx, rz: segment.rz * sz };
+    }),
+  };
+}
+
+/**
+ * A loft through the bottom section scaled step by step (slope and narrowing along, `sections`):
+ * split at its corners into runs, each run ruled between two sections or smooth through more,
+ * the runs fused into one body.
+ */
+function sectionedLoftSolid(cad: OcctKernel, profile: CadModifierProfilePart, tolerance: number) {
+  const sections = profile.sections ?? [];
+  const runs: Array<typeof sections> = [];
+  let run: typeof sections = [];
+  sections.forEach((section, index) => {
+    run.push(section);
+    if (index > 0 && (section.corner || index === sections.length - 1)) {
+      runs.push(run);
+      run = [section];
+    }
+  });
+  // `loops` is the first section already: the others are scaled relative to it.
+  const first = sections[0];
+  const runSolid = (index: number, part: typeof sections) => {
+    const wires = part.map((section) => cad.transform(loopWire(cad, loopScaled(profile.loops[index], section.sx / first.sx, section.sz / first.sz), tolerance), [1, 0, 0, 0, 0, 1, 0, profile.height * section.t, 0, 0, 1, 0]));
+    const lofted = cad.loft(wires, true, part.length === 2);
+    const solids = cad.isSolid(lofted) ? [lofted] : cad.getSubShapes(lofted, "solid");
+    if (solids.length !== 1) throw new Error("A sectioned loft did not become one solid");
+    return cad.getVolume(solids[0]) < 0 ? cad.reverseShape(solids[0]) : solids[0];
+  };
+  const solidOf = (index: number) => runs.slice(1).reduce((body, part) => cad.fuse(body, runSolid(index, part)), runSolid(index, runs[0]));
+  let solid = solidOf(0);
+  for (let index = 1; index < profile.loops.length; index += 1) solid = cad.cut(solid, solidOf(index));
+  const solids = cad.isSolid(solid) ? [solid] : cad.getSubShapes(solid, "solid");
+  if (solids.length !== 1) throw new Error("The sectioned loft did not become one solid");
+  return solids[0];
+}
+
 function loftSolid(cad: OcctKernel, profile: CadModifierProfilePart, tolerance: number) {
+  // A triangle is always flat.
+  if (profile.apex) return flatLoftSolid(cad, profile, tolerance);
   const top = profile.topLoops ?? [];
+  if ((profile.sections?.length ?? 0) > 2) return sectionedLoftSolid(cad, profile, tolerance);
   if (Math.abs(profile.twist ?? 0) > 1e-9 || Math.abs(profile.tilt?.x ?? 0) > 1e-9 || Math.abs(profile.tilt?.z ?? 0) > 1e-9 || (profile.smooth ?? 0) > 1e-9) {
     return twistedLoftSolid(cad, profile, tolerance);
   }
@@ -870,7 +932,18 @@ export function grownProfileSolid(cad: OcctKernel, profile: CadModifierProfilePa
   return solid;
 }
 
-export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfilePart) {
+export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfilePart): ShapeHandle {
+  if (profile.trim && profile.kind === "extrusion") {
+    // Slope along: the plain body, and what of it lies inside the side outline pushed across.
+    const base = profileExtrusionSolid(cad, { ...profile, trim: undefined });
+    const trim = profile.trim;
+    const face = cad.makeFace(loopWire(cad, trim.loops[0], profileExtent(profile) * 1e-6));
+    const prism = cad.transform(cad.extrude(face, 0, trim.height, 0), trim.frame);
+    const kept = cad.common(base, prism);
+    const solids = cad.isSolid(kept) ? [kept] : cad.getSubShapes(kept, "solid");
+    if (solids.length !== 1 || !cad.isValid(solids[0]) || !(cad.getVolume(solids[0]) > 0)) throw new Error("The trimmed profile solid is not valid");
+    return solids[0];
+  }
   validateCadProfile(profile);
   if (profile.kind === "extrusion" && profile.grow) {
     try {

@@ -4,7 +4,7 @@ import { cadHasSolidBody } from "@/lib/cadSolidBody";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
-import { CANNOT_OFFSET_MESSAGE, offsetSolid, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
+import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
 import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
@@ -15,6 +15,7 @@ import { springPartSolid } from "@/lib/springSolid";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
 import { fuzzyCut, tidiedIfValid } from "@/lib/cadFuzzyCut";
 import { helicalGearPartSolid } from "@/lib/gearSolid";
+import { hirthPartSolid } from "@/lib/hirthSolid";
 import { meshTreatedBody } from "@/lib/cadMeshAccuracy";
 import { planarMeshFaces } from "@/lib/cadPlanarMesh";
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
@@ -379,6 +380,23 @@ function reconstructSolid(cad: OcctKernel, part: CadModifierMeshPart) {
       }
     }
   }
+  if (part.hirth) {
+    try {
+      const placed = applyCadTransform(cad, hirthPartSolid(cad, part.hirth), part.hirth.transform);
+      if (!cadShapeIsValid(cad, placed)) throw new Error("The exact Hirth joint is not valid after placing it");
+      const mismatch = cadProfileSolidMismatch(cad, placed, part.hirth.expected);
+      if (mismatch) throw new Error(`The exact Hirth joint does not match the shape (${mismatch})`);
+      exactProfileBodiesUsed += 1;
+      return placed;
+    } catch (error) {
+      // As for a profile: with its mesh along, the part goes the way it always went.
+      if (isFatalKernelFault(error)) throw error;
+      if (!part.positions || !part.indices) {
+        const reason = error instanceof Error ? error.message : String(error ?? "");
+        throw new Error(`This Hirth joint could not be built as an exact body, and its mesh is too dense for edge treatment. ${reason}`.trim());
+      }
+    }
+  }
   if (part.gridfinity) {
     try {
       const placed = applyCadTransform(cad, gridfinityPartSolid(cad, part.gridfinity), part.gridfinity.transform);
@@ -617,7 +635,10 @@ function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: num
 }
 
 function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
-  const combined = combinedScope(cad, parts, 0);
+  // A hole on its own, or a group of holes only, is the body to treat itself (#1055): it stays a
+  // hole in the scene, and here it is built like a solid.
+  const holesOnly = parts.length > 0 && parts.every((part) => part.hole);
+  const combined = combinedScope(cad, holesOnly ? parts.map((part) => ({ ...part, hole: false })) : parts, 0);
   if (combined === null) throw new Error("The group has no solid body to modify");
   let result: ShapeHandle;
   // The repair runs on a copy: ShapeFix also rewrites the sub-shapes it
@@ -654,14 +675,14 @@ function reconstructPartsWithFallback(cad: OcctKernel, parts: CadModifierMeshPar
   try {
     return reconstructParts(cad, parts);
   } catch (error) {
-    const exactParts = parts.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity);
+    const exactParts = parts.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth);
     if (
       isFatalKernelFault(error) ||
       exactProfileBodiesUsed === 0 ||
       exactParts.some((part) => !part.positions || !part.indices)
     ) throw error;
     releaseSession(cad);
-    return reconstructParts(cad, parts.map((part) => (part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity ? { ...part, profile: undefined, step: undefined, thread: undefined, spring: undefined, helicalGear: undefined, gridfinity: undefined } : part)));
+    return reconstructParts(cad, parts.map((part) => (part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth ? { ...part, profile: undefined, step: undefined, thread: undefined, spring: undefined, helicalGear: undefined, gridfinity: undefined, hirth: undefined } : part)));
   }
 }
 
@@ -964,7 +985,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       if (request.kind === "shell") {
         component = shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
       } else if (request.kind === "offset") {
-        component = offsetSolid(activeCad, solid, request.amount, request.offsetShrink === true, request.shellEdges);
+        component = (request.offsetSideways ? offsetSolidSideways : offsetSolid)(activeCad, solid, request.amount, request.offsetShrink === true, request.shellEdges);
       } else if (request.kind === "deleteFace") {
         const componentFaces = selectedFaces.filter((entry) => entry.owner === owner).map((entry) => entry.face);
         component = componentFaces.length ? deleteFacesSolid(activeCad, solid, componentFaces) : activeCad.copy(solid);
@@ -981,7 +1002,9 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       }
       if (request.kind !== "shell" && componentEdges.length > 0 && !cadHasSolidBody(activeCad, component)) {
         // Past a certain size the kernel returns a "valid" compound without any
-        // solid in it (and a volume that grew): not a body to go on with.
+        // solid in it (and a volume that grew): not a body to go on with. Since
+        // occt-wasm 5.8.1 a plain fillet or chamfer throws there itself
+        // (andymai/occt-wasm#420); this still guards the other treatments.
         releaseHandles(activeCad, [component]);
         throw new Error("The chosen size does not leave a closed solid");
       }

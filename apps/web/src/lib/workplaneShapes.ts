@@ -8,6 +8,7 @@ import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
 import { qrSettingsEqual } from "@/lib/qrCode";
 import { torusTubeRatio } from "@/lib/torusShape";
+import { shapeHasAlongDeform } from "@/lib/slopeAlong";
 import type { SketchStroke, WorkplaneShape } from "@/types/layerling";
 
 /** Bauwerte der Wabengitter, die es nur noch in alten Entwuerfen gibt: Die Form wird nicht mehr angeboten (#223), bleibt aber bearbeitbar. */
@@ -78,6 +79,13 @@ export function shapeWithParametricSource(shape: WorkplaneShape): WorkplaneShape
     extrudeTwist: source.extrudeTwist,
     extrudeTopOffsetX: source.extrudeTopOffsetX,
     extrudeTopOffsetZ: source.extrudeTopOffsetZ,
+    slopeEnd: source.slopeEnd,
+    slopeSide: source.slopeSide,
+    slopeCurve: source.slopeCurve,
+    narrowEnd: source.narrowEnd,
+    narrowSide: source.narrowSide,
+    narrowCurve: source.narrowCurve,
+    narrowStart: source.narrowStart,
   };
 }
 
@@ -131,7 +139,7 @@ export function shapeTaperDimensions(shape: WorkplaneShape) {
  * Wabe und Schwalbenschwanz sie an. Die Liste steht hier, damit das Merkmalsfeld, die
  * Vorschau und die MCP-Bruecke nicht je ihre eigene fuehren.
  */
-const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "teardrop", "bentTube", "loft", "vase", "gridfinity"]);
+const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity"]);
 
 export function shapeSupportsTaper(kind: WorkplaneShape["kind"]) {
   return !SHAPES_WITHOUT_TAPER.has(kind);
@@ -241,7 +249,7 @@ export function shapeHasExtrudeDeform(shape: WorkplaneShape) {
 
 /** Either deformation needs the same per-vertex rebuild, so callers that only care whether to bother can ask once. */
 export function shapeHasShapeDeform(shape: WorkplaneShape) {
-  return shapeHasTaper(shape) || shapeHasExtrudeDeform(shape);
+  return shapeHasTaper(shape) || shapeHasExtrudeDeform(shape) || shapeHasAlongDeform(shape);
 }
 
 /**
@@ -526,9 +534,9 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
   // authoritative, depth follows. This is the single enforcement point: every
   // creation, edit and project load runs through canonicalizeShape.
   // A gear set by module too, involute or round: its size is its module, the same both ways (#201) -
-  // except the rack, a bar whose depth is its own.
+  // except the rack, a bar whose depth is its own. A Hirth joint interlocks only when it is round (#1016).
   const involuteGear = shape.kind === "gear" && shape.gearType !== "rack" && (shape.gearProfile === "involute" || shape.gearProfile === "round");
-  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "knurl" || involuteGear) && next.width !== next.depth) {
+  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "knurl" || shape.kind === "hirth" || involuteGear) && next.width !== next.depth) {
     next.depth = next.width;
     next.size = next.width;
   }
@@ -602,6 +610,13 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.extrudeTwist === b.extrudeTwist &&
     a.extrudeTopOffsetX === b.extrudeTopOffsetX &&
     a.extrudeTopOffsetZ === b.extrudeTopOffsetZ &&
+    a.slopeEnd === b.slopeEnd &&
+    a.slopeSide === b.slopeSide &&
+    a.slopeCurve === b.slopeCurve &&
+    a.narrowEnd === b.narrowEnd &&
+    a.narrowSide === b.narrowSide &&
+    a.narrowCurve === b.narrowCurve &&
+    a.narrowStart === b.narrowStart &&
     a.teeth === b.teeth &&
     a.toothSize === b.toothSize &&
     a.toothWidth === b.toothWidth &&
@@ -629,6 +644,10 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.threadChamfer === b.threadChamfer &&
     a.threadChamferBottom === b.threadChamferBottom &&
     a.threadHeadChamfer === b.threadHeadChamfer &&
+    a.threadHeadDiameter === b.threadHeadDiameter &&
+    a.threadDrive === b.threadDrive &&
+    a.threadDriveSize === b.threadDriveSize &&
+    a.threadDriveDepth === b.threadDriveDepth &&
     a.parametricSource?.kind === b.parametricSource?.kind &&
     a.parametricSource?.rotation === b.parametricSource?.rotation &&
     a.parametricSource?.rotationX === b.parametricSource?.rotationX &&
@@ -743,6 +762,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.screwHoleShaft === b.screwHoleShaft &&
     a.screwHoleHeadDepth === b.screwHoleHeadDepth &&
     a.screwHoleAngle === b.screwHoleAngle &&
+    a.portProfile === b.portProfile &&
     a.cornerFillet === b.cornerFillet &&
     a.topBottomFillet === b.topBottomFillet &&
     a.roundedBoxQuality === b.roundedBoxQuality &&

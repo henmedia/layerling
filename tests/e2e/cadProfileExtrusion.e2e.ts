@@ -245,8 +245,12 @@ describe("exact profile extrusions with the real OCCT kernel", () => {
       return Math.hypot((box.xmin + box.xmax) / 2, (box.zmin + box.zmax) / 2) > 5;
     });
     expect(sharp.length).toBe(148);
-    const rounded = cad.fillet(gear, sharp, 1);
+    // At 1 mm the kernel up to occt-wasm 5.8.0 gave back a compound that checked valid but held no solid;
+    // since 5.8.1 it refuses that (andymai/occt-wasm#420). 0.9 mm is a real rounded gear.
+    expect(() => cad.fillet(gear, sharp, 1)).toThrow(/fillet: produced an invalid solid/);
+    const rounded = cad.fillet(gear, sharp, 0.9);
     expect(cad.isValid(rounded)).toBe(true);
+    expect(cad.isSolid(rounded)).toBe(true);
     expectExactBody(shape("gear", { width: 60, depth: 40, teeth: 20, toothSize: 4 }), 84);
     expectExactBody(shape("gear", { width: 40, depth: 40, centerHoleSize: 0 }), 50);
     expect(cadModifierProfileForShape(shape("gear", { gearType: "helical" }))).toBeNull();

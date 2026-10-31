@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 const isStaticExport = process.env.STATIC_EXPORT === "true";
+const buildCpus = Math.max(0, Math.floor(Number(process.env.LAYERLING_BUILD_CPUS)) || 0);
 const extraAllowedDevOrigins = (process.env.LAYERLING_ALLOWED_DEV_ORIGINS ?? "")
   .split(",")
   .map((origin) => origin.trim())
@@ -62,6 +63,9 @@ const nextConfig: NextConfig = {
         trailingSlash: true,
       }
     : {}),
+  // How many workers the build may start; the release script leaves two threads free with it, so the machine
+  // stays usable while it builds. Left out, Next takes all cores but one.
+  ...(buildCpus ? { experimental: { cpus: buildCpus } } : {}),
 };
 
 export default nextConfig;

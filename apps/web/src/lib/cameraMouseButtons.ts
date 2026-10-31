@@ -19,6 +19,24 @@ export function isMacPointer() {
  *
  * Any other left press belongs to the editor (null).
  */
+/**
+ * What the middle and right buttons do in the 3D view (#1013): in layerling's own scheme the right one turns the view
+ * and the middle one shifts it; in the slicer scheme (Bambu Studio, OrcaSlicer) both shift it, and a left drag on empty
+ * space turns it instead (handed over by the view, see `slicerLeftTurn`).
+ */
+export function cameraButtonsFor(scheme: "layerling" | "slicer" | undefined): { MIDDLE: THREE.MOUSE; RIGHT: THREE.MOUSE } {
+  return scheme === "slicer" ? { MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.PAN } : { MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE };
+}
+
+/**
+ * Whether a press on empty space turns the view instead of drawing a selection box: in the slicer scheme a plain left
+ * drag of a mouse or a pen does (#1013); Shift keeps the box, as in Bambu Studio, and Alt (a box that takes what it
+ * touches) too. A finger has its own way.
+ */
+export function slicerLeftTurn(scheme: "layerling" | "slicer" | undefined, event: Pick<PointerEvent, "button" | "pointerType" | "shiftKey" | "altKey" | "ctrlKey" | "metaKey">) {
+  return scheme === "slicer" && event.pointerType !== "touch" && event.button === 0 && !event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey;
+}
+
 export function leftButtonCameraAction(event: Pick<PointerEvent, "button" | "ctrlKey" | "metaKey">, mac = isMacPointer()): THREE.MOUSE | null {
   if (event.button !== 0 || !(event.ctrlKey || event.metaKey)) return null;
   return mac && event.ctrlKey && !event.metaKey ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;

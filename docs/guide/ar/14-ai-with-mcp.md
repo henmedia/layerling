@@ -74,6 +74,7 @@ summary: كيف ينشئ مساعد ذكاء اصطناعي مثل Gemini أو C
 | `layerling_hull_objects` | تلف الأجسام في جسم واحد محدب، كأنها مغلفة بغشاء (الغلاف) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | تفصل شكلًا إلى أجزائه المنفصلة، وجسم الرسم التخطيطي إلى جسم لكل حد خارجي |
 | `layerling_split_objects` | تقطع أجسامًا صلبة أو ثقوبًا إلى قسمين بمستوى |
@@ -81,7 +82,7 @@ summary: كيف ينشئ مساعد ذكاء اصطناعي مثل Gemini أو C
 | `layerling_apply_edge_treatment` | تشطف الحواف المختارة أو تنعّمها |
 | `layerling_hollow_object` | تفرّغ جسمًا بجدار متساوي السمك |
 | `layerling_cut_out` | تقصّ جسمًا صلبًا من آخر لكي يتناسبا: تبقى القطعة وتُطرح من الجسم الآخر نسخة مكبّرة بمقدار الخلوص |
-| `layerling_offset_object` | تزيح كل أوجه الجسم لخلوص التركيب: تكبّره أو تصغّره أو تضيف النسخة المكبّرة كثقب |
+| `layerling_offset_object` | تزيح كل أوجه الجسم لخلوص التركيب: تكبّره أو تصغّره أو تضيف النسخة المكبّرة كثقب، أو يحرّك الجوانب فقط |
 | `layerling_list_faces` | تسرد أوجه جسم دقيق |
 | `layerling_delete_faces` | تحذف أوجهًا وتسدّ الفجوة |
 | `layerling_array_objects` | تكرّر في صف أو على دائرة |
@@ -112,6 +113,7 @@ summary: كيف ينشئ مساعد ذكاء اصطناعي مثل Gemini أو C
 | `layerling_set_history_view` | تعرض حالة سابقة للمشروع، كعرض السجل (يبقى التصميم الحقيقي دون تغيير؛ وتنتظر الأدوات التي تغيّر التصميم حتى يُغلق) |
 | `layerling_restore_from_history` | تعيد أجسامًا (وأجزاء داخل المجموعات أيضًا) من حالة سابقة إلى التصميم كنسخ، كزر الإعادة إلى التصميم في عرض السجل - خطوة واحدة يعيدها التراجع |
 | `layerling_export_section_svg` | تعيد الحدود الخارجية على مستوى القطع كملف SVG بمقياس 1:1، من الأجسام نفسها التي يأخذها التصدير |
+| `layerling_sketch_from_section` | تصنع رسمًا تخطيطيًا من الخطوط الخارجية على مستوى القطع، موضوعًا على القطع نفسه: يُفتح في المحرر لتغييره، أو يُبنى فورًا جسمًا بارتفاع محدد |
 | `layerling_export_drawing` | تصنع الرسم الهندسي للورشة من تصدير "2D": ثلاثة مساقط بمقياس 1:1 على ورقة ISO مع الأبعاد الإجمالية وجدول للثقوب المستديرة، كنص SVG أو PDF |
 | `layerling_export_mesh` | تكتب ملف نافذة التصدير بصيغة STL أو 3MF أو OBJ أو SVG (مسقط علوي أو مساحة الارتكاز أو الحواف المرئية) أو DXF للقص بالليزر، من الأجسام نفسها؛ إلى مسار على هذا الكمبيوتر، أو بترميز base64 |
 | `layerling_save_project` | يحفظ التصميم القابل للتحرير كله كملف .lyl في مسار على الحاسوب الذي يعمل عليه خادم MCP، دون نافذة حوار؛ لا يُستبدل ملف موجود إلا مع `overwrite`، ويُكتب عبر ملف مؤقت، ويبقى هدف Ctrl+S في المحرر كما كان |

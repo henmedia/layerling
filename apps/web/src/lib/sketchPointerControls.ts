@@ -5,8 +5,9 @@ export type SketchPointerModifiers = {
   shiftKey: boolean;
 };
 
-export function isSketchPanGesture(event: SketchPointerModifiers) {
-  return event.button === 1 || (event.button === 2 && (event.ctrlKey || event.metaKey || event.shiftKey));
+/** Whether a press shifts the sketch: the middle button, or the right one with a modifier - or alone in the slicer scheme, where the right button shifts the 3D view too (#1013). */
+export function isSketchPanGesture(event: SketchPointerModifiers, scheme: "layerling" | "slicer" = "layerling") {
+  return event.button === 1 || (event.button === 2 && (scheme === "slicer" || event.ctrlKey || event.metaKey || event.shiftKey));
 }
 
 export type SketchView = { zoom: number; pan: { x: number; z: number } };

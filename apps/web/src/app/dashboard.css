@@ -83,7 +83,7 @@
 .dashboard-welcome-summary-title {
   color: #573f26;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.01em;
 }
 
@@ -133,7 +133,7 @@
   height: 26px;
   color: #9a5a06;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 26px;
   text-align: center;
   background: #fdf3e2;
@@ -325,7 +325,7 @@ html[data-theme="dark"] .dashboard-welcome-guide-link:focus-visible {
   color: #97836e;
   font: inherit;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 600;
   white-space: nowrap;
   background: transparent;
   border: 0;

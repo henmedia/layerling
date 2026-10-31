@@ -8,6 +8,16 @@ type Point = { x: number; z: number };
  */
 const ARC_TOLERANCE = 2e-3;
 
+/**
+ * How far (radians) a handle may point off the circle's tangent at its end. The arc through the
+ * ends and the middle leaves each end along the circle, not along the handle: a curve that only
+ * comes close to a circle - a traced outline (#996) - turned into that arc gets a kink of up to
+ * 3 degrees against the curve beside it, and every chamfer and fillet running along the outline
+ * fails at such a kink. A fillet's own Bezier, an SVG arc or a DXF circle has its handles on the
+ * tangent; rounded coordinates in a file stay well inside this.
+ */
+const ARC_TANGENT_TOLERANCE = 1e-5;
+
 function bezierPoint(p0: Point, p1: Point, p2: Point, p3: Point, t: number): Point {
   const u = 1 - t;
   return {
@@ -51,6 +61,15 @@ function circularArc(p0: Point, p1: Point, p2: Point, p3: Point): { mid: Point; 
   for (let step = 1; step < 10; step += 1) {
     const point = bezierPoint(p0, p1, p2, p3, step / 10);
     if (Math.abs(Math.hypot(point.x - cx, point.z - cz) - radius) > ARC_TOLERANCE * radius) return null;
+  }
+  // The handle runs square to the radius at its end, or the arc would leave the curve beside it at an angle.
+  for (const [end, handle] of [[p0, p1], [p3, p2]] as const) {
+    const hx = handle.x - end.x;
+    const hz = handle.z - end.z;
+    const length = Math.hypot(hx, hz);
+    if (!(length > 1e-12)) return null;
+    const along = Math.abs(hx * (end.x - cx) + hz * (end.z - cz)) / (length * radius);
+    if (along > Math.sin(ARC_TANGENT_TOLERANCE)) return null;
   }
   return { mid, center: { x: cx, z: cz } };
 }
