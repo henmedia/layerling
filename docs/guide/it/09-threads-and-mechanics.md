@@ -28,6 +28,8 @@ L’elenco raggruppa le misure per serie; una riga sotto il campo indica la seri
 
 Le misure G sono filettature cilindriche Whitworth per tubi secondo ISO 228-1, usate nei raccordi per acqua, gas, idraulica e pneumatica. La misura indica il tubo, non il diametro della filettatura: una G1 ha un diametro esterno di 33,249 mm. Scegliendo una misura G, il profilo passa a {{ui:thread.profileWhitworth}}; scegliendo una misura metrica o in pollici torna a {{ui:thread.profileV}}. Se hai selezionato tu un profilo {{ui:thread.profileTrapezoidal}} o {{ui:thread.profileRound}}, questo resta invariato. Lo standard definisce solo la filettatura, quindi la testa della vite e il dado per una misura G hanno le stesse proporzioni di quelli con diametro personalizzato. Le filettature coniche per tubi R, Rc e Rp non sono incluse.
 
+L'ultima serie dell'elenco, {{ui:thread.group.bottle}}, contiene PCO 1881: il collo da 28 mm della maggior parte delle bottiglie d'acqua e bibite, 27,4 mm sul filetto con passo 2,7 mm. Il suo filetto ha creste piatte e larghe, quindi sceglierlo porta il profilo a {{ui:thread.profileCustom}} con {{ui:prop.threadDepth}} di 1,6 mm e {{ui:prop.threadFlankAngle}} di 30°; una misura scelta dopo riporta il proprio profilo. Fai il collo come {{ui:thread.rod}} e il tappo come {{ui:thread.nut}}, oppure sottrai un {{ui:thread.bore}} da un cilindro. Le misure seguono il disegno della norma come lo riporta la libreria OpenSCAD BOSL2; stampa un pezzo di prova prima di un tappo intero. Taniche e flaconi di detersivo per piatti non hanno una norma comune: misura il collo che hai e inserisci i valori in {{ui:thread.customSize}}.
+
 Altre impostazioni:
 
 - **{{ui:prop.threadHand}}:** {{ui:thread.right}} o {{ui:thread.left}}.
@@ -98,6 +100,8 @@ Lo strumento per gli spigoli e l’esportazione STEP trattano ogni ingranaggio c
 {{ui:shape.spring}} usa {{ui:prop.turns}} e {{ui:prop.wire}}; insieme all’altezza determinano la flessibilità della molla. {{ui:prop.springHand}} imposta la direzione di avvolgimento del filo: {{ui:spring.right}}, come in una normale molla di compressione, oppure {{ui:spring.left}}.
 
 Lo strumento per gli spigoli e l’esportazione STEP usano la geometria esatta della molla: un filo rotondo disposto a elica e tagliato perpendicolarmente alle due estremità. Puoi arrotondare o smussare, per esempio, le estremità del filo.
+
+In {{ui:prop.springForm}} la molla diventa piatta ({{ui:spring.flat}}): un nastro che corre a onde sul piano e flette nel proprio piano, stampato disteso. {{ui:prop.springPattern}} dà {{ui:spring.round}}, uno {{ui:spring.zigzag}} o curve ad angolo ({{ui:spring.square}}), {{ui:prop.springEnds}} un {{ui:spring.eye}} con foro, una {{ui:spring.tab}} di traverso o niente ({{ui:spring.none}}). {{ui:prop.bends}} e {{ui:prop.band}} decidono quanto è morbida; la lunghezza è quella della molla, la larghezza fin dove arrivano le onde e l'altezza lo spessore di stampa. Anche la molla piatta è un corpo esatto.
 
 ## Tubi curvi
 

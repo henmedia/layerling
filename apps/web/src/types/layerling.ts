@@ -172,6 +172,10 @@ export type ShapeCustomization = {
   springWire?: number;
   springHand?: ThreadHand;
   springQuality?: number;
+  /** A flat spring (#1076) instead of the coil: a band that runs in waves across the plate, `height` thick. Unset = the coil. */
+  springForm?: SpringForm;
+  springPattern?: FlatSpringPattern;
+  springEnds?: FlatSpringEnds;
   starPoints?: number;
   starInnerSize?: number;
   starOuterFillet?: number;
@@ -659,6 +663,9 @@ export type ThreadHead = "cylinder" | "countersunk" | "hex";
 /** What drives a screw: a recess in its free head face (#1052). */
 export type ThreadDrive = "hex" | "torx" | "phillips" | "slot" | "robertson" | "none";
 export type ThreadHand = "right" | "left";
+export type SpringForm = "coil" | "flat";
+export type FlatSpringPattern = "round" | "zigzag" | "square";
+export type FlatSpringEnds = "eye" | "tab" | "none";
 /**
  * Die Zahnform: scharfe ISO-Spitze, flache Trapezflanke, rundes Profil oder
  * das Whitworth-Profil der G-Rohrgewinde (55 Grad, Kuppe und Grund gerundet).
@@ -924,6 +931,10 @@ export type WorkplaneShape = {
   springWire?: number;
   springHand?: ThreadHand;
   springQuality?: number;
+  /** A flat spring (#1076) instead of the coil: a band that runs in waves across the plate, `height` thick. Unset = the coil. */
+  springForm?: SpringForm;
+  springPattern?: FlatSpringPattern;
+  springEnds?: FlatSpringEnds;
   starPoints?: number;
   starInnerSize?: number;
   starOuterFillet?: number;

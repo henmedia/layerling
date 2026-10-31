@@ -28,6 +28,8 @@ summary: 相互配合的螺钉、螺母与螺纹孔，以及齿轮、弹簧、�
 
 G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、液压和气动接头。规格指的是管子，而不是螺纹：G1 在螺纹处测得 33.249 mm。选择 G 规格会把牙型设为 {{ui:thread.profileWhitworth}}，选择公制或英制规格则设回 {{ui:thread.profileV}}。自己选定的 {{ui:thread.profileTrapezoidal}} 或 {{ui:thread.profileRound}} 牙型会保留。标准只定义螺纹，所以 G 规格的螺钉头和螺母会得到与你自行设置直径时相同的比例。锥形管螺纹 R、Rc 和 Rp 不包括在内。
 
+列表中的最后一个系列 {{ui:thread.group.bottle}} 包含 PCO 1881：大多数水瓶和汽水瓶的 28 mm 瓶口，螺纹外径 27.4 mm，螺距 2.7 mm。它的螺纹牙顶宽而平，所以选择它时牙型会切换为 {{ui:thread.profileCustom}}，{{ui:prop.threadDepth}} 为 1.6 mm，{{ui:prop.threadFlankAngle}} 为 30°；之后选择的其他规格会恢复各自的牙型。瓶口用 {{ui:thread.rod}} 制作，瓶盖用 {{ui:thread.nut}}，或者从圆柱体中减去一个 {{ui:thread.bore}}。尺寸依照 OpenSCAD 库 BOSL2 所载的标准图纸；打印整个瓶盖之前先打印一个试件。油桶和洗洁精瓶没有统一标准：请测量你手上的瓶口，并在 {{ui:thread.customSize}} 中输入数值。
+
 更多设置：
 
 - **{{ui:prop.threadHand}}：** {{ui:thread.right}} 或 {{ui:thread.left}}。
@@ -97,6 +99,8 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 {{ui:shape.spring}} 有 {{ui:prop.turns}} 和 {{ui:prop.wire}}。它们与高度一起决定弹簧的软硬。{{ui:prop.springHand}} 决定线材的走向：{{ui:spring.right}} 像常见的压簧，或 {{ui:spring.left}}。
 
 边缘工具和 STEP 导出把弹簧当作其精确实体：沿螺旋线的圆线材，两端切平。例如，你可以给这两个线材端头倒圆或倒角。
+
+在{{ui:prop.springForm}}中可把弹簧改为{{ui:spring.flat}}：一条在底板上呈波浪延伸、在自身平面内弹性变形的带子，平放打印。{{ui:prop.springPattern}}可选{{ui:spring.round}}、{{ui:spring.zigzag}}或{{ui:spring.square}}，{{ui:prop.springEnds}}可选带孔的{{ui:spring.eye}}、横跨带子的{{ui:spring.tab}}或{{ui:spring.none}}。{{ui:prop.bends}}和{{ui:prop.band}}决定它有多软；长度是弹簧的长度，宽度是波浪的幅度，高度是打印厚度。扁平弹簧同样是精确实体。
 
 ## 弯管
 

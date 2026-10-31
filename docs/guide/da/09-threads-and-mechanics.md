@@ -28,6 +28,8 @@ Listen grupperer størrelserne efter serie, og en linje under feltet navngiver s
 
 G-størrelserne er de parallelle Whitworth-rørgevind til ISO 228-1, der findes på fittings til vand, gas, hydraulik og pneumatik. Størrelsen navngiver røret, ikke gevindet: en G1 måler 33,249 mm over gevindet. At vælge en G-størrelse sætter profilen til {{ui:thread.profileWhitworth}}, og at vælge en metrisk eller tomme-størrelse sætter den tilbage til {{ui:thread.profileV}}. En {{ui:thread.profileTrapezoidal}} eller {{ui:thread.profileRound}} profil du selv har valgt bevares. Standarden definerer kun gevindet, så hovedet på en skrue og en møtrik på en G-størrelse får de samme proportioner som på en diameter du selv har sat. De koniske rørgevind R, Rc og Rp er ikke medtaget.
 
+Den sidste serie på listen, {{ui:thread.group.bottle}}, indeholder PCO 1881: 28 mm-halsen på de fleste vand- og sodavandsflasker, 27,4 mm over gevindet med en stigning på 2,7 mm. Gevindet har brede, flade toppe, så når du vælger det, skifter profilet til {{ui:thread.profileCustom}} med en {{ui:prop.threadDepth}} på 1,6 mm og en {{ui:prop.threadFlankAngle}} på 30°; en størrelse valgt bagefter bringer sit eget profil tilbage. Lav halsen som {{ui:thread.rod}} og kapslen som {{ui:thread.nut}}, eller træk et {{ui:thread.bore}} fra en cylinder. Målene følger standardens tegning, som OpenSCAD-biblioteket BOSL2 gengiver den; print et prøvestykke før en hel kapsel. Dunke og opvaskemiddelflasker har ingen fælles standard, så mål den hals, du har, og indtast værdierne under {{ui:thread.customSize}}.
+
 Flere indstillinger:
 
 - **{{ui:prop.threadHand}}:** {{ui:thread.right}} eller {{ui:thread.left}}.
@@ -99,6 +101,8 @@ Kantværktøjet og STEP-eksporten tager hvert tandhjul som dets eksakte form, ev
 {{ui:shape.spring}} har {{ui:prop.turns}} og en {{ui:prop.wire}}. Sammen med højden bestemmer de hvor blød fjederen er. {{ui:prop.springHand}} sætter hvilken vej wiren løber: {{ui:spring.right}} som en almindelig trykfjeder, eller {{ui:spring.left}}.
 
 Kantværktøjet og STEP-eksporten tager en fjeder som dens eksakte form: en rund wire langs en helix, skåret firkantet i begge ender. Du kan runde eller fase de to wire-ender, for eksempel.
+
+Under {{ui:prop.springForm}} bliver fjederen en {{ui:spring.flat}}: et bånd der løber i bølger hen over pladen og fjedrer i sit eget plan, printet liggende. {{ui:prop.springPattern}} giver {{ui:spring.round}}, {{ui:spring.zigzag}} eller firkantede bøjninger ({{ui:spring.square}}), {{ui:prop.springEnds}} et {{ui:spring.eye}} med hul, en {{ui:spring.tab}} på tværs af båndet eller ingen ({{ui:spring.none}}). {{ui:prop.bends}} og {{ui:prop.band}} bestemmer hvor blød den er; længden er fjederens længde, bredden hvor langt bølgerne når, og højden hvor tyk den printes. En flad fjeder er også et eksakt legeme.
 
 ## Bøjede rør
 

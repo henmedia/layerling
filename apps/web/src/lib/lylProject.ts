@@ -59,7 +59,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.127.0";
+export const LYL_CREATED_WITH_VERSION = "1.128.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -1537,6 +1537,15 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     }
     if (definition.springHand !== undefined && definition.springHand !== "right" && definition.springHand !== "left") {
       throw new Error(`${label}.springHand is invalid`);
+    }
+    if (definition.springForm !== undefined && definition.springForm !== "coil" && definition.springForm !== "flat") {
+      throw new Error(`${label}.springForm is invalid`);
+    }
+    if (definition.springPattern !== undefined && !["round", "zigzag", "square"].includes(definition.springPattern as string)) {
+      throw new Error(`${label}.springPattern is invalid`);
+    }
+    if (definition.springEnds !== undefined && !["eye", "tab", "none"].includes(definition.springEnds as string)) {
+      throw new Error(`${label}.springEnds is invalid`);
     }
     if (definition.springQuality !== undefined) {
       const springQuality = finiteNumber(definition.springQuality, `${label}.springQuality`);

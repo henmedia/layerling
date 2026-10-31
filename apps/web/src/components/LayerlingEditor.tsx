@@ -65,6 +65,7 @@ import { faceToolBody } from "@/lib/faceToolBody";
 import { DEFAULT_HOLE_PATTERN, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
 import { holePatternShapes, readPerforableFace, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
+import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
 import { MeshSimplifyPanel } from "./workplane/MeshSimplifyPanel";
 import { addCustomFontFile, customFontErrorMessage, FontManagerPanel } from "./workplane/FontManagerPanel";
 import { onFontManagerRequested } from "@/lib/fontManagerEvents";
@@ -74,6 +75,7 @@ import { storedCustomFonts } from "@/lib/customFontStore";
 import { ArrayPanel } from "./workplane/ArrayPanel";
 import { ScalePercentPanel, type ScalePercentSettings } from "./workplane/ScalePercentPanel";
 import { scaleShapesByPercent } from "@/lib/scaleByPercent";
+import { isSameSize, resizedCopy, SAME_SIZE, shapeSize, sizeFactorsBetween, type ShapeSize, type SizeFactors } from "@/lib/duplicateResize";
 import { canToggleGroupColors, colorForParts, groupShowsPartColors } from "@/lib/groupColors";
 import { disposeBoundsTree } from "three-mesh-bvh";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
@@ -737,6 +739,7 @@ type ShapeTransformSnapshot = {
   z: number;
   elevation: number;
   rotationQuaternion: THREE.Quaternion;
+  size: ShapeSize;
 };
 
 /**
@@ -754,6 +757,7 @@ function shapeTransformSnapshot(shape: WorkplaneShape): ShapeTransformSnapshot {
     z: shape.z,
     elevation: shape.elevation ?? 0,
     rotationQuaternion: quaternionForShape(shape.parametricSource ?? shape),
+    size: shapeSize(shape),
   };
 }
 
@@ -762,9 +766,11 @@ type ShapeMoveDelta = {
   dz: number;
   delevation: number;
   rotationDelta: THREE.Quaternion;
+  /** A resize of the copy, repeated like the move (Discussion #1072). */
+  sizeFactors: SizeFactors;
 };
 
-const ZERO_MOVE_DELTA: ShapeMoveDelta = { dx: 0, dz: 0, delevation: 0, rotationDelta: new THREE.Quaternion() };
+const ZERO_MOVE_DELTA: ShapeMoveDelta = { dx: 0, dz: 0, delevation: 0, rotationDelta: new THREE.Quaternion(), sizeFactors: SAME_SIZE };
 
 function shapeMoveDeltaBetween(from: ShapeTransformSnapshot, to: ShapeTransformSnapshot): ShapeMoveDelta {
   return {
@@ -772,13 +778,14 @@ function shapeMoveDeltaBetween(from: ShapeTransformSnapshot, to: ShapeTransformS
     dz: to.z - from.z,
     delevation: to.elevation - from.elevation,
     rotationDelta: to.rotationQuaternion.clone().multiply(from.rotationQuaternion.clone().invert()),
+    sizeFactors: sizeFactorsBetween(from.size, to.size),
   };
 }
 
 function isZeroMoveDelta(delta: ShapeMoveDelta) {
   const epsilon = 1e-6;
   return Math.abs(delta.dx) < epsilon && Math.abs(delta.dz) < epsilon && Math.abs(delta.delevation) < epsilon
-    && 1 - Math.abs(delta.rotationDelta.w) < epsilon;
+    && 1 - Math.abs(delta.rotationDelta.w) < epsilon && isSameSize(delta.sizeFactors);
 }
 
 /**
@@ -792,14 +799,16 @@ function isZeroMoveDelta(delta: ShapeMoveDelta) {
  * die Drehung wirklich die Netz-Eckpunkte der Kopie, nicht nur ein Feld, das
  * ohnehin gleich wieder auf 0 zurueckfiele.
  */
-function applyShapeMoveDelta(shape: WorkplaneShape, delta: ShapeMoveDelta): WorkplaneShape {
+function applyShapeMoveDelta(source: WorkplaneShape, delta: ShapeMoveDelta): WorkplaneShape {
+  // The resize comes first, in the copy's own axes, as its original was resized before it was turned on.
+  const shape = resizedCopy(source, delta.sizeFactors);
   const moved: WorkplaneShape = {
     ...shape,
     x: shape.x + delta.dx,
     z: shape.z + delta.dz,
     elevation: (shape.elevation ?? 0) + delta.delevation,
   };
-  if (isZeroMoveDelta({ ...ZERO_MOVE_DELTA, rotationDelta: delta.rotationDelta })) {
+  if (1 - Math.abs(delta.rotationDelta.w) < 1e-6) {
     return moved;
   }
   if (shapeTransformShouldRemainEditable(moved)) {
@@ -4540,7 +4549,7 @@ export function LayerlingEditor({
   const keyRunRef = useRef<KeyRun | null>(null);
 
   const commitShapes = useCallback(
-    (next: WorkplaneShape[], nextSelection: string | string[] | null = selectedIds, message?: string, keyRunKey?: string) => {
+    (next: WorkplaneShape[], nextSelection: string | string[] | null = selectedIds, message?: string, keyRunKey?: string, amendNewest = false) => {
       // Solange der Verlaufsblick offen ist, zeigt die Flaeche nicht den
       // Entwurf. Eine Aenderung, die jetzt noch durchkaeme - ueber einen
       // Umweg, den die Leiste nicht kennt -, traefe etwas, das keiner sieht.
@@ -4569,7 +4578,9 @@ export function LayerlingEditor({
       if (nextNotes !== notes) setNotes(nextNotes);
       const now = Date.now();
       const currentIndex = historyIndexRef.current;
-      const replaceCurrent = keyRunKey !== undefined && continuesKeyRun(keyRunRef.current, keyRunKey, now, historyRef.current[currentIndex], currentIndex === historyRef.current.length - 1);
+      // `amendNewest` finishes the newest step instead of adding one, so Undo takes both back together.
+      const replaceCurrent = (amendNewest && currentIndex === historyRef.current.length - 1)
+        || (keyRunKey !== undefined && continuesKeyRun(keyRunRef.current, keyRunKey, now, historyRef.current[currentIndex], currentIndex === historyRef.current.length - 1));
       const changed = appendHistorySnapshot(canonicalNext, validSelection, nextNotes, placementWorkplaneRef.current, replaceCurrent);
       if (keyRunKey !== undefined) {
         // Only a step the keys just made can be replaced by the next press.
@@ -8924,6 +8935,31 @@ export function LayerlingEditor({
         selectedIdsRef.current,
         t("status.honeycombConverted", { count: replacements.size }),
       );
+    })();
+  }, [commitShapes, historyViewState, shapes]);
+
+  // A resized group with a thread in it is cut again from its parts (Discussion #1066), so a tapped hole stays round and
+  // keeps its size instead of being stretched with the body. It finishes the step that resized it: one Undo takes both
+  // back. Each size is cut once; Undo and Redo then leave the group as they bring it.
+  const threadRecutRef = useRef(new Set<string>());
+  useEffect(() => {
+    if (historyViewState || projectInteractionActiveRef.current) return;
+    const recutKey = (shape: WorkplaneShape) => `${shape.id}:${shape.width}:${shape.depth}:${shape.height}`;
+    const pending = shapes.filter((shape) => !threadRecutRef.current.has(recutKey(shape)) && groupNeedsThreadRecut(shape));
+    if (pending.length === 0) return;
+    pending.forEach((shape) => threadRecutRef.current.add(recutKey(shape)));
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    void (async () => {
+      const replacements = new Map<string, WorkplaneShape>();
+      for (const shape of pending) {
+        const result = await buildGroupedShapeOffThread(threadRecutParts(shape), workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+        if (result.group) replacements.set(shape.id, placeRecutGroup(result.group, shape));
+      }
+      if (replacements.size === 0) return;
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return;
+      replacements.forEach((shape) => threadRecutRef.current.add(recutKey(shape)));
+      commitShapes(shapesRef.current.map((shape) => replacements.get(shape.id) ?? shape), selectedIdsRef.current, undefined, undefined, true);
     })();
   }, [commitShapes, historyViewState, shapes]);
 

@@ -109,7 +109,7 @@ Az illesztési lépés a szerkesztő jobb alsó sarkában van, és bármikor mó
 
 ## Másolás és másolatkészítés
 
-A {{ui:editor.tool.copy}}, a {{ui:editor.tool.paste}} és a {{ui:editor.tool.duplicate}} a szalagon van ({{ui:editor.group.clipboard}}). A [[Ctrl]]+[[D]] másolatot készít a kijelölésről. A layerling megjegyzi, hogyan mozgattad vagy forgattad legutóbb a másolatot, és a következő másolatnál ugyanezt alkalmazza újra. Így néhány billentyűleütéssel lyuksort vagy lépcsőt kapsz. Szabályos elrendezésekhez ott van még az ismétlés is, amelyről a [Kijelölés és elrendezés](chapter:select-and-arrange) fejezet szól.
+A {{ui:editor.tool.copy}}, a {{ui:editor.tool.paste}} és a {{ui:editor.tool.duplicate}} a szalagon van ({{ui:editor.group.clipboard}}). A [[Ctrl]]+[[D]] másolatot készít a kijelölésről. A layerling megjegyzi, hogyan mozgattad vagy forgattad legutóbb a másolatot, és a következő másolatnál ugyanezt alkalmazza újra. Így néhány billentyűleütéssel lyuksort vagy lépcsőt kapsz. Szabályos elrendezésekhez ott van még az ismétlés is, amelyről a [Kijelölés és elrendezés](chapter:select-and-arrange) fejezet szól. Ha a másolat méretét is megváltoztattad, minden további másolat ugyanazzal a szorzóval változik tovább, mint a Tinkercadben.
 
 > **Tipp:** Ha egy alakzat nem hajlandó felvenni a kívánt méretet, gyakran az új alakzatok határai az okai. A beállításokban az {{ui:workspace.shapeDefaults}} alatt döntöd el, hogyan induljon az egyes alakzat, és mekkora lehet.
 

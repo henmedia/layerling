@@ -119,7 +119,7 @@ Krok přichytávání vpravo dole můžete měnit kdykoliv.
 
 ## Kopírování a duplikování
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} a {{ui:editor.tool.duplicate}} jsou v {{ui:editor.group.clipboard}}. [[Ctrl]]+[[D]] duplikuje výběr. Další duplikování zopakuje poslední posun nebo natočení kopie, takže několika stisky vytvoříte řadu otvorů či schodů. Pro pravidelné sestavy je také opakování, viz [Výběr a uspořádání](chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} a {{ui:editor.tool.duplicate}} jsou v {{ui:editor.group.clipboard}}. [[Ctrl]]+[[D]] duplikuje výběr. Další duplikování zopakuje poslední posun nebo natočení kopie, takže několika stisky vytvoříte řadu otvorů či schodů. Pro pravidelné sestavy je také opakování, viz [Výběr a uspořádání](chapter:select-and-arrange). Pokud jste kopii také zvětšili nebo zmenšili, každá další kopie se změní znovu o stejný poměr, jako v Tinkercadu.
 
 > **Tip:** Pokud tvar odmítá požadovaný rozměr, zkontrolujte limity nových tvarů v {{ui:workspace.shapeDefaults}}. Určují jejich výchozí i maximální rozměry.
 

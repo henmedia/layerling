@@ -28,6 +28,8 @@ Seznam je rozdělen podle řad a pod ním je vysvětlení vybrané řady:
 
 G je válcový Whitworthův trubkový závit podle ISO 228-1 pro vodu, plyn, hydrauliku a pneumatiku. Označení odpovídá trubce, nikoli vnějšímu průměru závitu: G1 má 33,249 mm. Volba G nastaví {{ui:thread.profileWhitworth}}, metrická či palcová velikost vrátí {{ui:thread.profileV}}. Ručně zvolený {{ui:thread.profileTrapezoidal}} nebo {{ui:thread.profileRound}} zůstává. Norma zde určuje jen závit; hlava šroubu a matice G mají obecné proporce jako vlastní průměr. Varianty R, Rc a Rp nejsou zahrnuty.
 
+Poslední řada seznamu, {{ui:thread.group.bottle}}, obsahuje PCO 1881: hrdlo 28 mm většiny lahví od vody a limonád, 27,4 mm přes závit se stoupáním 2,7 mm. Jeho závit má široké ploché vrcholy, proto jeho volba přepne profil na {{ui:thread.profileCustom}} s {{ui:prop.threadDepth}} 1,6 mm a {{ui:prop.threadFlankAngle}} 30°; velikost zvolená potom vrátí svůj vlastní profil. Hrdlo udělejte jako {{ui:thread.rod}} a víčko jako {{ui:thread.nut}}, nebo odečtěte {{ui:thread.bore}} od válce. Rozměry odpovídají výkresu normy, jak jej uvádí knihovna OpenSCAD BOSL2; před celým víčkem vytiskněte zkušební kus. Kanystry a lahve od saponátu žádnou společnou normu nemají, změřte tedy hrdlo, které máte, a zadejte hodnoty v {{ui:thread.customSize}}.
+
 Další nastavení:
 
 - **{{ui:prop.threadHand}}:** {{ui:thread.right}} nebo {{ui:thread.left}}.
@@ -97,6 +99,8 @@ Kuželové kolo zmenšuje evolventní profil směrem nahoru. Jde o přiblížen�
 {{ui:shape.spring}} má {{ui:prop.turns}} a {{ui:prop.wire}}. Spolu s výškou určují tuhost. {{ui:prop.springHand}} volí {{ui:spring.right}} jako u běžné tlačné pružiny nebo {{ui:spring.left}}.
 
 Úpravy hran a STEP používají přesné těleso kruhového drátu vedeného po šroubovici, na koncích kolmo seříznutého. Oba konce lze zkosit nebo zaoblit.
+
+V nabídce {{ui:prop.springForm}} se z pružiny stane plochá pružina ({{ui:spring.flat}}): pásek, který se vlní přes desku a pruží ve své vlastní rovině, tištěný naležato. {{ui:prop.springPattern}} dává {{ui:spring.round}}, {{ui:spring.zigzag}} nebo hranaté ohyby ({{ui:spring.square}}), {{ui:prop.springEnds}} {{ui:spring.eye}} s otvorem, {{ui:spring.tab}} napříč páskem nebo nic ({{ui:spring.none}}). {{ui:prop.bends}} a {{ui:prop.band}} určují, jak je měkká; délka je délka pružiny, šířka, kam až vlny sahají, a výška, jak silná se tiskne. I plochá pružina je přesné těleso.
 
 ## Ohnuté trubky
 

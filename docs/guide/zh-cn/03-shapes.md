@@ -119,7 +119,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 ## 复制与重复
 
-{{ui:editor.tool.copy}}、{{ui:editor.tool.paste}} 和 {{ui:editor.tool.duplicate}} 位于功能区（{{ui:editor.group.clipboard}}）。[[Ctrl]]+[[D]] 复制选中项。layerling 会记住你上次如何移动或旋转副本，并在下次复制时再次应用。这样几下按键就能做出一排孔或一排台阶。规则排列还可以使用阵列，见[选择与排列](chapter:select-and-arrange)。
+{{ui:editor.tool.copy}}、{{ui:editor.tool.paste}} 和 {{ui:editor.tool.duplicate}} 位于功能区（{{ui:editor.group.clipboard}}）。[[Ctrl]]+[[D]] 复制选中项。layerling 会记住你上次如何移动或旋转副本，并在下次复制时再次应用。这样几下按键就能做出一排孔或一排台阶。规则排列还可以使用阵列，见[选择与排列](chapter:select-and-arrange)。 如果你还调整了副本的大小，之后的每个副本都会再按同样的比例缩放，和 Tinkercad 一样。
 
 > **提示：** 如果某个形状不肯接受你想要的尺寸，通常是新形状的限制所致。在设置的 {{ui:workspace.shapeDefaults}} 下，你可以决定每种形状如何开始，以及最大能有多大。
 

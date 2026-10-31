@@ -8360,6 +8360,11 @@ html[data-theme="dark"] .touch-multi-select {
   background: #433629;
 }
 
+/* The handles that change one measure carry the colour of its axis, as the turn arrows do (#1078): the middle of a side width or depth, the top height. The corners change two and stay neutral. */
+.transform-handle.axis-x { background: #d6363c; border-color: #7d1a1e; }
+.transform-handle.axis-y { background: #2f9a4b; border-color: #17542a; }
+.transform-handle.axis-z { background: #2f6fe0; border-color: #163f86; }
+
 .transform-handle:not(.height-lift):hover {
     background: var(--hover-accent-color);
     border-color: var(--hover-accent-border-color);
@@ -12841,6 +12846,9 @@ html[data-theme="dark"] .rotate-handle {
 html[data-theme="dark"] .rotate-handle.axis-x { --rotate-handle-axis: #ff6b70; }
 html[data-theme="dark"] .rotate-handle.axis-y { --rotate-handle-axis: #5fd47c; }
 html[data-theme="dark"] .rotate-handle.axis-z { --rotate-handle-axis: #6aa0ff; }
+html[data-theme="dark"] .transform-handle.axis-x { background: #ff6b70; border-color: #7d1a1e; }
+html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-color: #17542a; }
+html[data-theme="dark"] .transform-handle.axis-z { background: #6aa0ff; border-color: #163f86; }
 
 html[data-theme="dark"] .transform-handle.height-lift {
   border-bottom-color: #ffffff;

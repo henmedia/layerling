@@ -28,6 +28,8 @@ Lista grupuje rozmiary według serii, a wiersz pod polem nazywa serię wybranego
 
 Rozmiary G to walcowe gwinty rurowe Whitwortha według ISO 228-1, spotykane w złączkach do wody, gazu, hydrauliki i pneumatyki. Rozmiar określa rurę, a nie gwint: G1 ma na gwincie 33,249 mm średnicy. Wybór rozmiaru G ustawia zarys {{ui:thread.profileWhitworth}}, a wybór rozmiaru metrycznego albo calowego przywraca {{ui:thread.profileV}}. Zarys {{ui:thread.profileTrapezoidal}} albo {{ui:thread.profileRound}}, który wybrałeś sam, zostaje. Norma określa tylko gwint, więc łeb śruby i nakrętka na rozmiarze G dostają te same proporcje co na średnicy ustawionej samodzielnie. Stożkowych gwintów rurowych R, Rc i Rp nie ma.
 
+Ostatnia seria na liście, {{ui:thread.group.bottle}}, zawiera PCO 1881: szyjkę 28 mm większości butelek na wodę i napoje, 27,4 mm na gwincie przy skoku 2,7 mm. Jej gwint ma szerokie, płaskie wierzchołki, więc wybranie go ustawia profil {{ui:thread.profileCustom}} z {{ui:prop.threadDepth}} 1,6 mm i {{ui:prop.threadFlankAngle}} 30°; rozmiar wybrany potem przywraca własny profil. Szyjkę zrób jako {{ui:thread.rod}}, a zakrętkę jako {{ui:thread.nut}} albo odejmij {{ui:thread.bore}} od walca. Wymiary są zgodne z rysunkiem normy w wersji biblioteki OpenSCAD BOSL2; przed całą zakrętką wydrukuj próbkę. Kanistry i butelki po płynie do naczyń nie mają wspólnej normy: zmierz szyjkę, którą masz, i wpisz wartości w {{ui:thread.customSize}}.
+
 Więcej ustawień:
 
 - **{{ui:prop.threadHand}}:** {{ui:thread.right}} albo {{ui:thread.left}}.
@@ -99,6 +101,8 @@ Narzędzie krawędzi i eksport STEP biorą każde koło jako jego dokładną bry
 {{ui:shape.spring}} ma {{ui:prop.turns}} i {{ui:prop.wire}}. Razem z wysokością decydują, jak miękka jest sprężyna. {{ui:prop.springHand}} ustawia, w którą stronę biegnie drut: {{ui:spring.right}}, jak zwykła sprężyna naciskowa, albo {{ui:spring.left}}.
 
 Narzędzie krawędzi i eksport STEP biorą sprężynę jako jej dokładną bryłę: okrągły drut wzdłuż linii śrubowej, ucięty prostopadle na obu końcach. Możesz na przykład zaokrąglić albo sfazować te dwa końce drutu.
+
+W polu {{ui:prop.springForm}} sprężyna staje się płaska ({{ui:spring.flat}}): to taśma, która biegnie falami po płycie i ugina się we własnej płaszczyźnie, drukowana na leżąco. {{ui:prop.springPattern}} daje {{ui:spring.round}}, {{ui:spring.zigzag}} albo prostokątne zgięcia ({{ui:spring.square}}), {{ui:prop.springEnds}} {{ui:spring.eye}} z otworem, {{ui:spring.tab}} w poprzek taśmy albo nic ({{ui:spring.none}}). {{ui:prop.bends}} i {{ui:prop.band}} decydują, jak jest miękka; długość to długość sprężyny, szerokość to zasięg fal, a wysokość to grubość wydruku. Sprężyna płaska też jest dokładną bryłą.
 
 ## Wygięte rury
 

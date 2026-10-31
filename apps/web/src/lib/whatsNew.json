@@ -1,5 +1,60 @@
 [
   {
+    "version": "1.128.0",
+    "items": [
+      {
+        "title": {
+          "de": "Flaschengewinde PCO 1881",
+          "en": "Bottle thread PCO 1881"
+        },
+        "body": {
+          "de": "Im Größenmenü des Gewindes gibt es jetzt die Reihe „PCO – Flaschen“ mit PCO 1881, dem 28-mm-Hals der meisten Wasser- und Limoflaschen. Er bringt sein flaches Profil gleich mit. Baue den Hals als Stange und den Deckel als Mutter oder Gewindeloch, für Trichter, Ausgießer oder einen Ersatzdeckel.",
+          "en": "The thread's size menu now has the series \"PCO – Bottles\" with PCO 1881, the 28 mm neck of most water and soda bottles. It brings its flat profile along. Make the neck as a rod and the cap as a nut or tapped hole, for funnels, spouts or a spare cap."
+        }
+      },
+      {
+        "title": {
+          "de": "Duplizieren wiederholt auch die Größe",
+          "en": "Duplicate repeats the size too"
+        },
+        "body": {
+          "de": "Dupliziere eine Form, vergrößere die Kopie und schiebe sie weiter: Jedes weitere Strg+D macht die nächste Kopie um denselben Faktor größer und rückt sie um denselben Schritt weiter, wie in Tinkercad.",
+          "en": "Duplicate a shape, make the copy larger and move it: every further Ctrl+D makes the next copy larger by the same factor and moves it by the same step, as in Tinkercad."
+        }
+      },
+      {
+        "title": {
+          "de": "Größengriffe in Achsenfarben",
+          "en": "Size handles in axis colours"
+        },
+        "body": {
+          "de": "Die Griffe, die ein einzelnes Maß ändern, haben jetzt die Farbe ihrer Achse: Seitenmitte rot für die Breite und grün für die Tiefe, die Oberseite blau für die Höhe. So siehst du gleich, was du gerade ziehst.",
+          "en": "The handles that change a single measure now have the colour of their axis: the middle of a side is red for the width and green for the depth, the top is blue for the height. So you see at once what you are pulling."
+        }
+      },
+      {
+        "title": {
+          "de": "Flachfedern",
+          "en": "Flat springs"
+        },
+        "body": {
+          "de": "Die Feder gibt es jetzt auch flach: ein Band, das in Wellen über die Platte läuft und liegend gedruckt wird. Wähle runde Wellen, Zickzack oder eckige Bögen, an den Enden eine Öse, eine Lasche oder nichts, und stelle Bögen und Bandbreite ein. Du findest es unter „Form“ bei der Feder.",
+          "en": "The spring now comes flat too: a band that runs in waves across the plate and is printed lying down. Pick round waves, a zigzag or square turns, an eye, a tab or nothing at the ends, and set the bends and the band width. You find it under Form on the spring."
+        }
+      },
+      {
+        "title": {
+          "de": "Verrunden und STEP am Pfeilrad",
+          "en": "Fillets and STEP for the herringbone gear"
+        },
+        "body": {
+          "de": "Verrunden und „Fläche löschen“ gehen jetzt auch am Pfeilrad. Der STEP-Export, der es bisher ausließ, nimmt es mit seinen echten schrägen Zähnen mit.",
+          "en": "Fillets and \"Delete face\" now work on the herringbone gear too. The STEP export, which used to leave it out, now takes it with its true slanted teeth."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.127.0",
     "items": [
       {

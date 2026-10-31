@@ -66,6 +66,7 @@ import {
   normalizeSpringHand,
   normalizeSpringWire,
 } from "@/lib/springGeometry";
+import { FLAT_SPRING_DIMENSIONS, flatSpringSettings } from "@/lib/flatSpringGeometry";
 import {
   DEFAULT_STAR_HEIGHT,
   DEFAULT_STAR_INNER_FILLET,
@@ -376,6 +377,21 @@ export function parseDroppedShapeAsset(raw: string): ShapeAsset | null {
 export const RULER_DEPTH = 25;
 export const RULER_HEIGHT = 3;
 
+/** A spring's own settings for a new shape: a coil's against its round footprint, a flat spring's (#1076) against its length and reach. */
+function springFields(customization: ShapeCustomization, width: number, depth: number, height: number) {
+  const quality = normalizeSpringQuality(customization.springQuality ?? DEFAULT_SPRING_QUALITY);
+  if (customization.springForm === "flat") {
+    const flat = flatSpringSettings(customization, width, depth);
+    return { springForm: "flat" as const, springPattern: flat.pattern, springEnds: flat.ends, springTurns: flat.turns, springWire: flat.wire, springQuality: quality };
+  }
+  return {
+    springTurns: normalizeSpringTurns(customization.springTurns ?? DEFAULT_SPRING_TURNS, Math.max(width, depth), height, customization.springWire),
+    springWire: normalizeSpringWire(customization.springWire ?? DEFAULT_SPRING_WIRE, Math.max(width, depth), height),
+    springQuality: quality,
+    springHand: normalizeSpringHand(customization.springHand ?? DEFAULT_SPRING_HAND),
+  };
+}
+
 export function shapeAssetDefaultDimensions(kind: ShapeKind) {
   if (kind === "thread") {
     const settings = threadSettings({});
@@ -679,6 +695,9 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     springWire: shape.springWire,
     springHand: shape.springHand,
     springQuality: shape.springQuality,
+    springForm: shape.springForm,
+    springPattern: shape.springPattern,
+    springEnds: shape.springEnds,
     starPoints: shape.starPoints,
     starInnerSize: shape.starInnerSize,
     starOuterFillet: shape.starOuterFillet,
@@ -847,7 +866,8 @@ export function makeShapeFromAsset(
   point?: { x: number; z: number; elevation?: number },
   customization: ShapeCustomization = {},
 ): WorkplaneShape {
-  const defaults = shapeAssetDefaultDimensions(asset.kind);
+  // A flat spring (#1076) starts as a strip on the plate, not in the coil's upright box.
+  const defaults = asset.kind === "spring" && customization.springForm === "flat" ? FLAT_SPRING_DIMENSIONS : shapeAssetDefaultDimensions(asset.kind);
   // Ein Gewinde bekommt seinen Platzbedarf aus Durchmesser und Art. Eine
   // eingetragene Breite waere hier nicht nur ueberfluessig, sondern falsch:
   // sie wuerde spaeter als Zug am Anfasser gelesen und den Durchmesser
@@ -1027,10 +1047,7 @@ export function makeShapeFromAsset(
     threadChamferBottom: threadDefaults && customization.threadChamferBottom !== undefined ? threadDefaults.chamferLow : undefined,
     threadHeadChamfer: threadDefaults ? threadDefaults.headChamfer : undefined,
     ...(threadDefaults ? threadDriveFields(customization, threadDefaults) : {}),
-    springTurns: asset.kind === "spring" ? normalizeSpringTurns(customization.springTurns ?? DEFAULT_SPRING_TURNS, Math.max(width, depth), height, customization.springWire) : undefined,
-    springWire: asset.kind === "spring" ? normalizeSpringWire(customization.springWire ?? DEFAULT_SPRING_WIRE, Math.max(width, depth), height) : undefined,
-    springQuality: asset.kind === "spring" ? normalizeSpringQuality(customization.springQuality ?? DEFAULT_SPRING_QUALITY) : undefined,
-    springHand: asset.kind === "spring" ? normalizeSpringHand(customization.springHand ?? DEFAULT_SPRING_HAND) : undefined,
+    ...(asset.kind === "spring" ? springFields(customization, width, depth, height) : {}),
     starPoints: asset.kind === "star" ? normalizeStarPoints(customization.starPoints ?? DEFAULT_STAR_POINTS) : undefined,
     starInnerSize: asset.kind === "star" ? normalizeStarInnerSize(customization.starInnerSize ?? DEFAULT_STAR_INNER_SIZE, width) : undefined,
     starOuterFillet: asset.kind === "star" ? normalizeStarFillet(customization.starOuterFillet ?? DEFAULT_STAR_OUTER_FILLET) : undefined,

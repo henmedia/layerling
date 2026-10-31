@@ -28,6 +28,8 @@ The list groups the sizes by series, and a line under the field names the series
 
 The G sizes are the parallel Whitworth pipe threads to ISO 228-1, found on fittings for water, gas, hydraulics and pneumatics. The size names the pipe, not the thread: a G1 measures 33.249 mm across the thread. Choosing a G size sets the profile to {{ui:thread.profileWhitworth}}, and choosing a metric or inch size sets it back to {{ui:thread.profileV}}. A {{ui:thread.profileTrapezoidal}} or {{ui:thread.profileRound}} profile you picked yourself stays. The standard only defines the thread, so the head of a screw and a nut on a G size get the same proportions as on a diameter you set yourself. The tapered pipe threads R, Rc and Rp are not included.
 
+The last series in the list, {{ui:thread.group.bottle}}, holds PCO 1881: the 28 mm neck of most water and soda bottles, 27.4 mm across with a pitch of 2.7 mm. Its thread has wide flat crests, so choosing it sets the profile to {{ui:thread.profileCustom}} with a {{ui:prop.threadDepth}} of 1.6 mm and a {{ui:prop.threadFlankAngle}} of 30°; another size chosen afterwards brings its own profile back. Make the neck as a {{ui:thread.rod}} and the cap as a {{ui:thread.nut}}, or subtract a {{ui:thread.bore}} from a cylinder. The measures follow the drawing of the standard as the OpenSCAD library BOSL2 has it; print a test piece before a whole cap. Canisters and washing-up liquid bottles have no common standard, so measure the neck you have and enter its values under {{ui:thread.customSize}}.
+
 More settings:
 
 - **{{ui:prop.threadHand}}:** {{ui:thread.right}} or {{ui:thread.left}}.
@@ -99,6 +101,8 @@ The edge tool and the STEP export take every gear as its exact body, involute fl
 The {{ui:shape.spring}} has {{ui:prop.turns}} and a {{ui:prop.wire}}. Together with the height they decide how soft the spring is. {{ui:prop.springHand}} sets which way the wire runs: {{ui:spring.right}} like a usual compression spring, or {{ui:spring.left}}.
 
 The edge tool and the STEP export take a spring as its exact body: a round wire along a helix, cut square at both ends. You can round or chamfer those two wire ends, for instance.
+
+Under {{ui:prop.springForm}} the spring becomes a {{ui:spring.flat}} spring: a band that runs in waves across the plate and flexes in its own plane, printed lying down. {{ui:prop.springPattern}} gives {{ui:spring.round}}, a {{ui:spring.zigzag}} or {{ui:spring.square}} turns, {{ui:prop.springEnds}} an {{ui:spring.eye}} with a hole, a {{ui:spring.tab}} across the band or {{ui:spring.none}}. {{ui:prop.bends}} and {{ui:prop.band}} set how soft it is; length is the spring's length, width how far the waves reach and height how thick it is printed. A flat spring is an exact body too.
 
 ## Bent tubes
 

@@ -32,6 +32,7 @@ import { textFillComponents, textFillPieceGeometry, textHasFill } from "@/lib/te
 import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { threadBuildPlan, WHITWORTH_PROFILE_CONSTANTS } from "@/lib/threadGeometry";
 import { springBuildPlan, springRingSectionShare } from "@/lib/springGeometry";
+import { flatSpringProfileLoops } from "@/lib/flatSpringGeometry";
 import { gridfinityHasPieces, gridfinityPlan } from "@/lib/gridfinityGeometry";
 import { knurlCorners, knurlSettings, roundKnurlWave } from "@/lib/knurlGeometry";
 import { BEVEL_GEAR_TOP_SCALE, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearType, rackMeasures, rackOutlinePoints, rackToothArcs, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
@@ -48,7 +49,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -1035,6 +1036,9 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       return { loops: slotProfileLoops(width, depth, shape.slotEndRatio) };
     case "honeycomb":
       return { loops: honeycombProfileLoops(width, depth, shape) };
+    case "spring":
+      // The flat spring (#1076) is an outline pushed up; the coil is built by springSolid.ts.
+      return shape.springForm === "flat" ? { loops: flatSpringProfileLoops({ ...shape, width, depth }) } : null;
     case "dovetail":
       return { loops: [polygonLoop(dovetailOutlineForShape(shape).map((point) => ({ x: point.x, z: point.y })))] };
     case "teardrop": {
@@ -1638,7 +1642,7 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
  * `springSolid.ts` builds the body from them.
  */
 export function cadModifierSpringForShape(shape: WorkplaneShape): CadModifierSpringPart | null {
-  if (shape.kind !== "spring") return null;
+  if (shape.kind !== "spring" || shape.springForm === "flat") return null;
   if (shape.importedMesh || shape.groupedShapes?.length || shape.cadBrep || shape.imagePlate || shapeHasShapeDeform(shape)) return null;
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);

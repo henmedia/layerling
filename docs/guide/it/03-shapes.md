@@ -119,7 +119,7 @@ Il passo di aggancio si trova nell’angolo inferiore destro dell’editor e pu�
 
 ## Copiare e duplicare
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} e {{ui:editor.tool.duplicate}} si trovano nella barra multifunzione ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplica la selezione. layerling ricorda l’ultimo spostamento o l’ultima rotazione applicati alla copia e ripete lo stesso movimento alla duplicazione successiva. In questo modo puoi creare una fila di fori o gradini in pochi passaggi. Per le disposizioni regolari è disponibile anche lo strumento Pattern, descritto in [Selezionare e disporre](chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} e {{ui:editor.tool.duplicate}} si trovano nella barra multifunzione ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplica la selezione. layerling ricorda l’ultimo spostamento o l’ultima rotazione applicati alla copia e ripete lo stesso movimento alla duplicazione successiva. In questo modo puoi creare una fila di fori o gradini in pochi passaggi. Per le disposizioni regolari è disponibile anche lo strumento Pattern, descritto in [Selezionare e disporre](chapter:select-and-arrange). Se hai anche ridimensionato la copia, ogni copia successiva cresce di nuovo dello stesso fattore, come in Tinkercad.
 
 > **Suggerimento:** se non riesci a impostare la dimensione che vuoi, spesso dipende dai limiti delle nuove forme. Nelle impostazioni, sotto {{ui:workspace.shapeDefaults}}, puoi decidere le dimensioni iniziali di ogni forma e quanto può diventare grande.
 

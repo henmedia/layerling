@@ -108,7 +108,7 @@ L'étape d'accrochage se trouve en bas à droite de l'éditeur et peut être mod
 
 ## Copier et dupliquer
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} et {{ui:editor.tool.duplicate}} sont dans le ruban ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplique une sélection. layerling se souvient de la façon dont vous avez déplacé ou fait pivoter la copie pour la dernière fois et applique à nouveau la même chose à la copie suivante. Cela produit une rangée de trous ou de marches en quelques pressions sur une touche. Pour les arrangements réguliers, il existe également le modèle décrit dans [Sélection et arrangement] (chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} et {{ui:editor.tool.duplicate}} sont dans le ruban ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplique une sélection. layerling se souvient de la façon dont vous avez déplacé ou fait pivoter la copie pour la dernière fois et applique à nouveau la même chose à la copie suivante. Cela produit une rangée de trous ou de marches en quelques pressions sur une touche. Pour les arrangements réguliers, il existe également le modèle décrit dans [Sélection et arrangement] (chapter:select-and-arrange). Si vous avez aussi redimensionné la copie, chaque copie suivante grandit à nouveau du même facteur, comme dans Tinkercad.
 
 > **Astuce :** Si une forme refuse de prendre la taille souhaitée, c'est souvent la limite pour de nouvelles formes. Sous {{ui:workspace.shapeDefaults}} dans les paramètres, vous décidez comment chaque forme commence et quelle taille elle peut atteindre.
 

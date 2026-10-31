@@ -119,7 +119,7 @@ El paso de ajuste está abajo a la derecha del editor y puedes cambiarlo en cual
 
 ## Copiar y duplicar
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} y {{ui:editor.tool.duplicate}} están en la cinta ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplica una selección. layerling recuerda cómo moviste o giraste la última copia y vuelve a aplicar lo mismo en el siguiente duplicado. Así sale una fila de orificios o de escalones con unas pocas pulsaciones. Para disposiciones regulares también está el patrón, que se explica en [Seleccionar y organizar](chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} y {{ui:editor.tool.duplicate}} están en la cinta ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplica una selección. layerling recuerda cómo moviste o giraste la última copia y vuelve a aplicar lo mismo en el siguiente duplicado. Así sale una fila de orificios o de escalones con unas pocas pulsaciones. Para disposiciones regulares también está el patrón, que se explica en [Seleccionar y organizar](chapter:select-and-arrange). Si además cambiaste el tamaño de la copia, cada copia siguiente vuelve a crecer en la misma proporción, como en Tinkercad.
 
 > **Consejo:** Si una forma se niega a tomar el tamaño que quieres, a menudo es por los límites de las formas nuevas. En los ajustes, en {{ui:workspace.shapeDefaults}}, decides cómo empieza cada forma y hasta qué tamaño puede llegar.
 

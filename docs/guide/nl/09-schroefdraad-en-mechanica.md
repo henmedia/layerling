@@ -28,6 +28,8 @@ De lijst groepeert de maten per serie, en een regel onder het veld noemt de seri
 
 De G-maten zijn de cilindrische Whitworth-pijpdraden volgens ISO 228-1, te vinden op fittingen voor water, gas, hydrauliek en pneumatiek. De maat noemt de pijp, niet de draad: een G1 meet 33,249 mm over de draad. Kies je een G-maat, dan wordt het profiel {{ui:thread.profileWhitworth}}, en kies je een metrische of inchmaat, dan gaat het terug naar {{ui:thread.profileV}}. Een {{ui:thread.profileTrapezoidal}}- of {{ui:thread.profileRound}}-profiel dat je zelf koos, blijft staan. De norm legt alleen de draad vast, dus de kop van een schroef en een moer op een G-maat krijgen dezelfde verhoudingen als op een diameter die je zelf instelt. De conische pijpdraden R, Rc en Rp zitten er niet bij.
 
+De laatste reeks in de lijst, {{ui:thread.group.bottle}}, bevat PCO 1881: de 28 mm-hals van de meeste water- en frisdrankflessen, 27,4 mm over de draad met een spoed van 2,7 mm. De draad heeft brede, platte toppen, dus als je hem kiest wordt het profiel {{ui:thread.profileCustom}} met een {{ui:prop.threadDepth}} van 1,6 mm en een {{ui:prop.threadFlankAngle}} van 30°; een maat die je daarna kiest brengt zijn eigen profiel terug. Maak de hals als {{ui:thread.rod}} en de dop als {{ui:thread.nut}}, of trek een {{ui:thread.bore}} van een cilinder af. De maten volgen de normtekening zoals de OpenSCAD-bibliotheek BOSL2 die geeft; print een proefstuk vóór een hele dop. Jerrycans en afwasmiddelflessen hebben geen gezamenlijke norm: meet de hals die je hebt en vul de waarden in bij {{ui:thread.customSize}}.
+
 Meer instellingen:
 
 - **{{ui:prop.threadHand}}:** {{ui:thread.right}} of {{ui:thread.left}}.
@@ -97,6 +99,8 @@ Het randgereedschap en de STEP-export nemen elk tandwiel als zijn exacte lichaam
 De {{ui:shape.spring}} heeft {{ui:prop.turns}} en een {{ui:prop.wire}}. Samen met de hoogte bepalen die hoe zacht de veer is. {{ui:prop.springHand}} bepaalt welke kant de draad op loopt: {{ui:spring.right}} zoals bij een gewone drukveer, of {{ui:spring.left}}.
 
 Het randgereedschap en de STEP-export nemen een veer als zijn exacte lichaam: een ronde draad langs een schroeflijn, aan beide uiteinden recht afgesneden. Die twee draaduiteinden kun je bijvoorbeeld afronden of afschuinen.
+
+Onder {{ui:prop.springForm}} wordt de veer een {{ui:spring.flat}}: een band die in golven over de plaat loopt en in zijn eigen vlak veert, liggend geprint. {{ui:prop.springPattern}} geeft {{ui:spring.round}}, een {{ui:spring.zigzag}} of hoekige bochten ({{ui:spring.square}}), {{ui:prop.springEnds}} een {{ui:spring.eye}} met gat, een {{ui:spring.tab}} dwars op de band of niets ({{ui:spring.none}}). {{ui:prop.bends}} en {{ui:prop.band}} bepalen hoe zacht hij is; de lengte is de lengte van de veer, de breedte hoe ver de golven reiken en de hoogte hoe dik hij geprint wordt. Ook de vlakke veer is een exact lichaam.
 
 ## Gebogen buizen
 

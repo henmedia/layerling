@@ -36,6 +36,7 @@ export const threadSizeNames = [
   "#4-48 UNF", "#6-40 UNF", "#8-36 UNF", "#10-32 UNF", "1/4\"-28 UNF", "5/16\"-24 UNF", "3/8\"-24 UNF", "7/16\"-20 UNF", "1/2\"-20 UNF", "5/8\"-18 UNF", "3/4\"-16 UNF", "1\"-12 UNF",
   "G1/16", "G1/8", "G1/4", "G3/8", "G1/2", "G5/8", "G3/4", "G7/8", "G1", "G1 1/8", "G1 1/4", "G1 1/2", "G1 3/4",
   "G2", "G2 1/4", "G2 1/2", "G2 3/4", "G3", "G3 1/2", "G4",
+  "PCO 1881",
 ];
 
 /**
@@ -48,7 +49,7 @@ export const threadSizeSetting = {
   threadSize: {
     type: "string",
     enum: threadSizeNames,
-    description: "Thread only: a standard size by name, as the editor's size menu lists it. Sets threadDiameter and threadPitch; if those come along (as in a settings block read back), they must match the size. A G size is a Whitworth pipe thread (BSPP, ISO 228-1, for fittings, water, gas, hydraulics and pneumatics): G1/2 is 20.955 mm with 14 threads per inch. It switches a v profile to whitworth, and an M, UNC or UNF size switches whitworth back to v; trapezoidal and round stay, and a threadProfile in the same call wins.",
+    description: "Thread only: a standard size by name, as the editor's size menu lists it. Sets threadDiameter and threadPitch; if those come along (as in a settings block read back), they must match the size. A G size is a Whitworth pipe thread (BSPP, ISO 228-1, for fittings, water, gas, hydraulics and pneumatics): G1/2 is 20.955 mm with 14 threads per inch. It switches a v profile to whitworth, and an M, UNC or UNF size switches whitworth back to v; trapezoidal and round stay, and a threadProfile in the same call wins. PCO 1881 is the 28 mm neck of most water and soda bottles (27.4 mm, pitch 2.7): it sets the custom profile with threadDepth 1.6 and threadFlankAngle 30 unless the call gives them; the neck is a rod, the cap a nut or bore.",
   },
 };
 
@@ -112,8 +113,11 @@ export const shapeSettingSchema = {
   threadDrive: { type: "string", enum: ["hex", "torx", "phillips", "slot", "robertson", "none"], description: "Thread only, and only for a screw: the drive recess in the head. \"hex\" is a hex socket (the default for cylinder and countersunk heads), \"torx\" six lobes, \"phillips\" a cross, \"slot\" a straight slot across the head (for a flat screwdriver or a coin), \"robertson\" a square socket (the Robertson drive common in Canada), \"none\" a plain head turned by hand or with a spanner (the default for a hex head)." },
   threadDriveSize: { type: "number", description: "Thread only, for a screw with a drive, in mm: hex socket across flats, Torx outer diameter, or the span of the Phillips cross, or the slot's length (its width is a fifth of it), or the Robertson square across flats. Left out it follows the standard for the size (an M4 takes 3 mm hex, about T20, about PH2, Robertson #2 (2.84 mm); a slot runs as far across the head as it fits); it must fit the head." },
   threadDriveDepth: { type: "number", description: "Thread only, for a screw with a drive: how deep the recess goes into the head, in mm, at most 90 % of the head height. 0 leaves the head without a drive. Left out it is 60 % of the head height, at most a little over half the diameter." },
-  springTurns: { type: "number", description: "Spring only." },
-  springWire: { type: "number", description: "Spring only: thickness of the wire." },
+  springTurns: { type: "number", description: "Spring only: turns of the coil, or the bends of a flat spring." },
+  springWire: { type: "number", description: "Spring only: thickness of the wire, or the width of a flat spring's band." },
+  springForm: { type: "string", enum: ["coil", "flat"], description: "Spring only: coil (default) or flat - a band that runs in waves across the plate, width its length, depth how far the waves reach, height its thickness. A new flat spring is 60 x 16 x 4 mm unless sizes are given; switching an existing spring keeps its size, so give the new width, depth and height with it." },
+  springPattern: { type: "string", enum: ["round", "zigzag", "square"], description: "Flat spring only: round waves (default), a zigzag or square turns." },
+  springEnds: { type: "string", enum: ["eye", "tab", "none"], description: "Flat spring only: an eye with a hole at each end (default), a tab across each end, or plain ends." },
   springHand: { type: "string", enum: ["right", "left"], description: "Spring only: winding direction; right-hand (default) like a usual compression spring, or left-hand." },
   springQuality: { type: "number", description: "Spring only." },
   starPoints: { type: "number", description: "Star only: number of points or rays (3 to 32)." },

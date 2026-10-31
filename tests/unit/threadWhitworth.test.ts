@@ -185,7 +185,7 @@ describe("G pipe thread series (ISO 228-1)", () => {
   const group = THREAD_SIZE_GROUPS.find((entry) => entry.series === "G");
 
   it("is its own series in the menu, after UNC and UNF", () => {
-    expect(THREAD_SIZE_GROUPS.map((entry) => entry.series)).toEqual(["metric", "UNC", "UNF", "G"]);
+    expect(THREAD_SIZE_GROUPS.map((entry) => entry.series)).toEqual(["metric", "UNC", "UNF", "G", "bottle"]);
     expect(group?.sizes.map((size) => size.id)).toEqual(ISO_228_1.map(([label]) => `G${label}`));
   });
 

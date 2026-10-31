@@ -123,7 +123,7 @@ Krok przyciągania jest w prawym dolnym rogu edytora i możesz go zmienić w ka�
 
 ## Kopiowanie i duplikowanie
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} i {{ui:editor.tool.duplicate}} są na wstążce ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplikuje zaznaczenie. layerling pamięta, jak ostatnio przesunąłeś lub obróciłeś kopię, i przy następnym duplikowaniu robi to samo. Tak w kilku naciśnięciach powstaje rząd otworów albo schodków. Do regularnych układów jest też szyk, opisany w rozdziale [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} i {{ui:editor.tool.duplicate}} są na wstążce ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplikuje zaznaczenie. layerling pamięta, jak ostatnio przesunąłeś lub obróciłeś kopię, i przy następnym duplikowaniu robi to samo. Tak w kilku naciśnięciach powstaje rząd otworów albo schodków. Do regularnych układów jest też szyk, opisany w rozdziale [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange). Jeśli zmieniłeś też rozmiar kopii, każda kolejna kopia zmienia się znowu o ten sam współczynnik, jak w Tinkercadzie.
 
 > **Wskazówka:** Jeśli kształt nie chce przyjąć żądanego rozmiaru, często winne są limity dla nowych kształtów. W sekcji {{ui:workspace.shapeDefaults}} w ustawieniach decydujesz, jak każdy kształt zaczyna i jak duży może być.
 

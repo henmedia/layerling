@@ -28,6 +28,8 @@ A lista sorozatonként csoportosítja a méreteket, a mező alatti sor pedig meg
 
 A G méretek az ISO 228-1 szerinti hengeres Whitworth-csőmenetek, ezek a víz-, gáz-, hidraulika- és pneumatikaszerelvényeken találhatók. A méret a csövet nevezi meg, nem a menetet: egy G1 a meneten mérve 33,249 mm átmérőjű. Egy G méret kiválasztása a profilt {{ui:thread.profileWhitworth}} értékre állítja, egy metrikus vagy colos méret kiválasztása pedig visszaállítja {{ui:thread.profileV}} értékre. Egy általad választott {{ui:thread.profileTrapezoidal}} vagy {{ui:thread.profileRound}} profil megmarad. A szabvány csak a menetet határozza meg, ezért egy G méretű csavar feje és anyája ugyanazokat az arányokat kapja, mint egy magad megadott átmérőnél. A kúpos R, Rc és Rp csőmenetek nincsenek benne.
 
+A lista utolsó sorozata, {{ui:thread.group.bottle}}, a PCO 1881-et tartalmazza: a legtöbb víz- és üdítős palack 28 mm-es nyakát, 27,4 mm a meneten át, 2,7 mm emelkedéssel. A menetének széles, lapos csúcsai vannak, ezért kiválasztásakor a profil {{ui:thread.profileCustom}} lesz 1,6 mm {{ui:prop.threadDepth}} és 30° {{ui:prop.threadFlankAngle}} értékkel; az utána választott méret visszahozza a saját profilját. A nyakat {{ui:thread.rod}}, a kupakot {{ui:thread.nut}} formában készítsd, vagy vonj ki egy {{ui:thread.bore}} elemet egy hengerből. A méretek a szabvány rajzát követik, ahogy a BOSL2 OpenSCAD-könyvtár közli; egy teljes kupak előtt nyomtass próbadarabot. A kannáknak és a mosogatószeres flakonoknak nincs közös szabványuk: mérd le a nyakat, és add meg az értékeket a {{ui:thread.customSize}} alatt.
+
 További beállítások:
 
 - **{{ui:prop.threadHand}}:** {{ui:thread.right}} vagy {{ui:thread.left}}.
@@ -97,6 +99,8 @@ Az élműveleti eszköz és a STEP-export minden fogaskereket a pontos testekén
 A {{ui:shape.spring}} alakzatnak {{ui:prop.turns}} és {{ui:prop.wire}} értéke van. A magassággal együtt ezek döntik el, milyen puha a rugó. A {{ui:prop.springHand}} adja meg, merre fut a huzal: {{ui:spring.right}}, mint egy szokásos nyomórugó, vagy {{ui:spring.left}}.
 
 Az élműveleti eszköz és a STEP-export a rugót a pontos testeként veszi: egy csavarvonal mentén futó kerek huzal, mindkét végén derékszögben levágva. Ezt a két huzalvéget például lekerekítheted vagy letörheted.
+
+A {{ui:prop.springForm}} alatt a rugóból laprugó lesz ({{ui:spring.flat}}): egy szalag, amely hullámokban fut át a lapon, és a saját síkjában rugózik, fekve nyomtatva. A {{ui:prop.springPattern}} {{ui:spring.round}}, {{ui:spring.zigzag}} vagy szögletes hajlatokat ({{ui:spring.square}}) ad, a {{ui:prop.springEnds}} lyukas {{ui:spring.eye}}, a szalagon keresztben álló {{ui:spring.tab}} vagy semmi ({{ui:spring.none}}). A {{ui:prop.bends}} és a {{ui:prop.band}} adja meg, mennyire puha; a hossz a rugó hossza, a szélesség, meddig érnek a hullámok, a magasság pedig, milyen vastagra nyomtatod. A laprugó is pontos test.
 
 ## Hajlított csövek
 

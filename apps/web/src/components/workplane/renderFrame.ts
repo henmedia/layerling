@@ -258,20 +258,119 @@ const plateToCamera = new THREE.Vector3();
 /**
  * The plate is see-through and drawn before the see-through bodies, so a body above it is not laid over by
  * it (viewportScene.ts). Seen from below the plate is in front of them instead, and drawn first it hid them
- * completely (#894). From its back side the plate is drawn after them, so they show through it, faded.
+ * completely (#894). The plate of the active workplane stays first and splits the see-through bodies instead
+ * (splitSeeThroughAtPlate); the muted reference plate is drawn after them from its back side, so they show
+ * through it, faded. Returns the active plate, if there is one.
  */
 function orderPlatesForView(scene: THREE.Scene, camera: THREE.Camera) {
+  let activePlate: THREE.Object3D | null = null;
   scene.traverse((object) => {
-    if (object.name !== "WorkplaneBase" && object.name !== "WorkplaneBaseReference") return;
+    if (object.name === "WorkplaneBase") {
+      activePlate = object;
+      object.renderOrder = -10;
+      return;
+    }
+    if (object.name !== "WorkplaneBaseReference") return;
     plateNormal.set(0, 0, 1).transformDirection(object.matrixWorld);
     object.getWorldPosition(plateCenter);
     const behind = plateToCamera.copy(camera.position).sub(plateCenter).dot(plateNormal) < 0;
     object.renderOrder = behind ? 10 : -10;
   });
+  return activePlate as THREE.Object3D | null;
+}
+
+const nearSide = new THREE.Plane();
+const farSide = new THREE.Plane();
+const bodyCenter = new THREE.Vector3();
+// The far half of a see-through material: a clone that clips to the other side of the plate. One per material,
+// dropped with it.
+const farHalfMaterials = new WeakMap<THREE.Material, THREE.MeshStandardMaterial>();
+const farHalves = new WeakMap<THREE.Mesh, THREE.Mesh>();
+// A face lying on the plate - the floor of a body standing on it - belongs to the near half for sure.
+const NEAR_HALF_TOLERANCE = 1e-3;
+
+function farHalfMaterial(material: THREE.MeshStandardMaterial) {
+  let half = farHalfMaterials.get(material);
+  if (!half) {
+    half = material.clone();
+    // clone() leaves out the overhang stripes, which are put into the shader on compile.
+    half.onBeforeCompile = material.onBeforeCompile;
+    half.customProgramCacheKey = material.customProgramCacheKey;
+    farHalfMaterials.set(material, half);
+  }
+  half.color.copy(material.color);
+  half.opacity = material.opacity;
+  return half;
+}
+
+/**
+ * The plate writes depth, so whatever see-through lies behind it from the camera - holes and see-through
+ * bodies are drawn after it - failed the depth test and was gone: below the plate seen from above (#1077),
+ * above it seen from below (#894). Solid bodies are drawn before every see-through thing and show through
+ * the plate, faded. A see-through body is drawn in two halves now, cut at the plate: the far half goes before
+ * the plate like a solid body, the near half after it as before, so the plate lays over neither more nor
+ * less than it covers. Each half once, also beyond the edge of the plate. Returns what to undo after the frame.
+ */
+function splitSeeThroughAtPlate(state: FrameState, plate: THREE.Object3D) {
+  plateNormal.set(0, 0, 1).transformDirection(plate.matrixWorld);
+  plate.getWorldPosition(plateCenter);
+  const cameraSide = plateToCamera.copy(state.camera.position).sub(plateCenter).dot(plateNormal) >= 0 ? 1 : -1;
+  // three.js keeps what lies on the positive side of a clipping plane.
+  nearSide.setFromNormalAndCoplanarPoint(plateNormal.clone().multiplyScalar(cameraSide), plateCenter);
+  farSide.copy(nearSide).negate();
+  farSide.constant -= NEAR_HALF_TOLERANCE;
+  nearSide.constant += NEAR_HALF_TOLERANCE;
+  const section = state.sectionPlane ?? null;
+  const nearPlanes = section ? [nearSide, section] : [nearSide];
+  const farPlanes = section ? [farSide, section] : [farSide];
+
+  const halves: THREE.Mesh[] = [];
+  const clipped = new Set<THREE.Material>();
+  state.shapeRecords.forEach((record) => {
+    if (record.shape.hidden || !record.object.visible) return;
+    record.object.traverseVisible((child) => {
+      const mesh = child as THREE.Mesh;
+      const material = mesh.material;
+      if (!mesh.isMesh || Array.isArray(material) || !(material instanceof THREE.MeshStandardMaterial) || !material.transparent) return;
+      const geometry = mesh.geometry;
+      if (!geometry.boundingSphere) geometry.computeBoundingSphere();
+      const sphere = geometry.boundingSphere;
+      if (!sphere) return;
+      bodyCenter.copy(sphere.center).applyMatrix4(mesh.matrixWorld);
+      const radius = sphere.radius * mesh.matrixWorld.getMaxScaleOnAxis();
+      // Wholly on the camera's side: nothing to split.
+      if (nearSide.distanceToPoint(bodyCenter) >= radius) return;
+      material.clippingPlanes = nearPlanes;
+      clipped.add(material);
+      let half = farHalves.get(mesh);
+      if (!half) {
+        half = new THREE.Mesh();
+        half.matrixAutoUpdate = false;
+        half.matrixWorldAutoUpdate = false;
+        farHalves.set(mesh, half);
+      }
+      half.geometry = geometry;
+      half.material = farHalfMaterial(material);
+      half.material.clippingPlanes = farPlanes;
+      half.matrixWorld.copy(mesh.matrixWorld);
+      half.layers.mask = mesh.layers.mask;
+      half.renderOrder = -20;
+      halves.push(half);
+      state.scene.add(half);
+    });
+  });
+  return () => {
+    halves.forEach((half) => state.scene.remove(half));
+    clipped.forEach((material) => {
+      material.clippingPlanes = section ? [section] : null;
+    });
+  };
 }
 
 export function renderFrame(state: FrameState) {
-  orderPlatesForView(state.scene, state.camera);
+  const plate = orderPlatesForView(state.scene, state.camera);
+  const undoSplit = plate ? splitSeeThroughAtPlate(state, plate) : null;
   state.renderer.render(state.scene, state.camera);
+  undoSplit?.();
   drawCutPreviews(state);
 }

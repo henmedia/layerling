@@ -28,6 +28,8 @@ La liste regroupe les tailles par série, et une ligne sous le champ nomme la s�
 
 Les tailles G sont les filetages de tuyaux Whitworth parallèles selon la norme ISO 228-1, que l'on trouve sur les raccords pour l'eau, le gaz, l'hydraulique et la pneumatique. La taille désigne le tuyau, pas le filetage : un G1 mesure 33,249 mm à travers le filetage. Le choix d'une taille G définit le profil sur {{ui:thread.profileWhitworth}}, et le choix d'une taille métrique ou en pouces le ramène à {{ui:thread.profileV}}. Un profil {{ui:thread.profileTrapezoidal}} ou {{ui:thread.profileRound}} que vous avez choisi vous-même reste. La norme ne définit que le filetage, donc la tête d'une vis et un écrou sur une taille G ont les mêmes proportions que sur un diamètre que vous fixez vous-même. Les filetages coniques R, Rc et Rp ne sont pas inclus.
 
+La dernière série de la liste, {{ui:thread.group.bottle}}, contient PCO 1881 : le goulot de 28 mm de la plupart des bouteilles d'eau et de soda, 27,4 mm sur le filetage avec un pas de 2,7 mm. Son filetage a des sommets plats et larges, donc le choisir met le profil sur {{ui:thread.profileCustom}} avec une {{ui:prop.threadDepth}} de 1,6 mm et un {{ui:prop.threadFlankAngle}} de 30° ; une taille choisie ensuite reprend son propre profil. Fais le goulot en {{ui:thread.rod}} et le bouchon en {{ui:thread.nut}}, ou soustrais un {{ui:thread.bore}} d'un cylindre. Les cotes suivent le plan de la norme tel que le reprend la bibliothèque OpenSCAD BOSL2 ; imprime une pièce d'essai avant un bouchon entier. Les bidons et les flacons de liquide vaisselle n'ont pas de norme commune : mesure le goulot que tu as et saisis ses valeurs sous {{ui:thread.customSize}}.
+
 Plus de paramètres :
 
 - **{{ui:prop.threadHand}} :** {{ui:thread.right}} ou {{ui:thread.left}}.
@@ -97,6 +99,8 @@ L'outil de bord et l'exportation STEP prennent chaque engrenage comme son corps 
 Le {{ui:shape.spring}} a {{ui:prop.turns}} et un {{ui:prop.wire}}. En fonction de la hauteur, ils déterminent la douceur du ressort. {{ui:prop.springHand}} définit le sens dans lequel passe le fil : {{ui:spring.right}} comme un ressort de compression habituel, ou {{ui:spring.left}}.
 
 L'outil Edge et l'export STEP prennent un ressort comme corps exact : un fil rond le long d'une hélice, coupé en carré aux deux extrémités. Vous pouvez par exemple arrondir ou chanfreiner ces deux extrémités de fil.
+
+Sous {{ui:prop.springForm}}, le ressort devient plat ({{ui:spring.flat}}) : une bande qui ondule sur le plateau et fléchit dans son propre plan, imprimée à plat. {{ui:prop.springPattern}} donne des {{ui:spring.round}}, un {{ui:spring.zigzag}} ou des courbes à angle droit ({{ui:spring.square}}), {{ui:prop.springEnds}} un {{ui:spring.eye}} percé, une {{ui:spring.tab}} en travers de la bande ou rien ({{ui:spring.none}}). {{ui:prop.bends}} et {{ui:prop.band}} règlent sa souplesse ; la longueur est celle du ressort, la largeur jusqu'où vont les ondes et la hauteur son épaisseur à l'impression. Le ressort plat est lui aussi un corps exact.
 
 ## Tubes courbés
 

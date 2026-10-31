@@ -57,6 +57,16 @@ import {
   springWireLimits,
 } from "@/lib/springGeometry";
 import {
+  DEFAULT_FLAT_SPRING_ENDS,
+  DEFAULT_FLAT_SPRING_PATTERN,
+  DEFAULT_FLAT_SPRING_TURNS,
+  DEFAULT_FLAT_SPRING_WIRE,
+  flatSpringTurnLimits,
+  flatSpringWireLimits,
+  normalizeFlatSpringEnds,
+  normalizeFlatSpringPattern,
+} from "@/lib/flatSpringGeometry";
+import {
   DEFAULT_ROUNDED_BOX_CORNER_FILLET,
   DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET,
   DEFAULT_ROUNDED_BOX_QUALITY,
@@ -195,7 +205,7 @@ type ShapeSpecialNumberKey = "steps" | "sides" | "bevel" | "segments" | "topRadi
   | "loftBottomWidth" | "loftBottomDepth" | "loftTopWidth" | "loftTopDepth" | "loftWall";
 type ShapeSpecialField =
   | { type: "number"; key: ShapeSpecialNumberKey; label: string; defaultValue: number; min: number; max: number; step?: number; unit?: string }
-  | { type: "select"; key: "font" | "gearType" | "gearProfile" | "threadRole" | "threadHead" | "threadHand" | "threadProfile" | "springHand" | "bentTubeProfile" | "bentTubeInnerProfile" | "knurlPattern" | "gridfinityType" | "loftBottomOutline" | "loftTopOutline"; label: string; defaultValue: string; options: Array<{ value: string; label: string }> }
+  | { type: "select"; key: "font" | "gearType" | "gearProfile" | "threadRole" | "threadHead" | "threadHand" | "threadProfile" | "springHand" | "springForm" | "springPattern" | "springEnds" | "bentTubeProfile" | "bentTubeInnerProfile" | "knurlPattern" | "gridfinityType" | "loftBottomOutline" | "loftTopOutline"; label: string; defaultValue: string; options: Array<{ value: string; label: string }> }
   | { type: "text"; key: "text"; label: string; defaultValue: string; maxLength: number };
 
 function clamp(value: number, min: number, max: number) {
@@ -271,10 +281,26 @@ function specialFieldsForShape(
     ];
   }
   if (kind === "spring") {
+    const form = { type: "select" as const, key: "springForm" as const, label: t("prop.springForm"), defaultValue: defaults.springForm ?? "coil", options: [{ value: "coil", label: t("spring.coil") }, { value: "flat", label: t("spring.flat") }] };
+    if ((customization.springForm ?? defaults.springForm) === "flat") {
+      const pattern = normalizeFlatSpringPattern(customization.springPattern ?? defaults.springPattern);
+      const ends = normalizeFlatSpringEnds(customization.springEnds ?? defaults.springEnds);
+      const wireLimits = flatSpringWireLimits(dimensions.width, dimensions.depth, pattern, ends);
+      const turnLimits = flatSpringTurnLimits(dimensions.width, dimensions.depth, customization.springWire ?? defaults.springWire, pattern, ends);
+      return [
+        form,
+        { type: "select", key: "springPattern", label: t("prop.springPattern"), defaultValue: defaults.springPattern ?? DEFAULT_FLAT_SPRING_PATTERN, options: [{ value: "round", label: t("spring.round") }, { value: "zigzag", label: t("spring.zigzag") }, { value: "square", label: t("spring.square") }] },
+        { type: "select", key: "springEnds", label: t("prop.springEnds"), defaultValue: defaults.springEnds ?? DEFAULT_FLAT_SPRING_ENDS, options: [{ value: "eye", label: t("spring.eye") }, { value: "tab", label: t("spring.tab") }, { value: "none", label: t("spring.none") }] },
+        { type: "number", key: "springTurns", label: t("prop.bends"), defaultValue: defaults.springTurns ?? DEFAULT_FLAT_SPRING_TURNS, min: turnLimits.min, max: turnLimits.max, step: 1 },
+        { type: "number", key: "springWire", label: t("prop.band"), defaultValue: defaults.springWire ?? DEFAULT_FLAT_SPRING_WIRE, min: wireLimits.min, max: wireLimits.max, unit: "mm" },
+        { type: "number", key: "springQuality", label: t("prop.quality"), defaultValue: defaults.springQuality ?? DEFAULT_SPRING_QUALITY, min: MIN_SPRING_QUALITY, max: MAX_SPRING_QUALITY, step: 4 },
+      ];
+    }
     const across = Math.max(dimensions.width, dimensions.depth);
     const wireLimits = springWireLimits(across, dimensions.height);
     const turnLimits = springTurnLimits(across, dimensions.height, customization.springWire ?? defaults.springWire);
     return [
+      form,
       { type: "number", key: "springTurns", label: t("prop.turns"), defaultValue: defaults.springTurns ?? DEFAULT_SPRING_TURNS, min: turnLimits.min, max: turnLimits.max, step: 1 },
       { type: "number", key: "springWire", label: t("prop.wire"), defaultValue: defaults.springWire ?? DEFAULT_SPRING_WIRE, min: wireLimits.min, max: wireLimits.max, unit: "mm" },
       { type: "number", key: "springQuality", label: t("prop.quality"), defaultValue: defaults.springQuality ?? DEFAULT_SPRING_QUALITY, min: MIN_SPRING_QUALITY, max: MAX_SPRING_QUALITY, step: 4 },

@@ -28,6 +28,8 @@ Die Liste ordnet die Größen nach Reihen, und eine Zeile unter dem Feld nennt d
 
 Die G-Größen sind die zylindrischen Whitworth-Rohrgewinde nach ISO 228-1, wie sie an Fittings für Wasser, Gas, Hydraulik und Pneumatik sitzen. Die Größe nennt das Rohr, nicht das Gewinde: Ein G1 misst über das Gewinde 33,249 mm. Wählst du eine G-Größe, wechselt das Profil auf {{ui:thread.profileWhitworth}}, eine metrische oder Zollgröße stellt es wieder auf {{ui:thread.profileV}}. Ein {{ui:thread.profileTrapezoidal}} oder {{ui:thread.profileRound}}, das du selbst gewählt hast, bleibt. Die Norm legt nur das Gewinde fest; Schraubenkopf und Mutter bekommen bei einer G-Größe dieselben Verhältnisse wie bei einem selbst gewählten Durchmesser. Die kegeligen Rohrgewinde R, Rc und Rp sind nicht dabei.
 
+Die letzte Reihe der Liste, {{ui:thread.group.bottle}}, enthält PCO 1881: den 28-mm-Hals der meisten Wasser- und Limoflaschen, 27,4 mm über das Gewinde mit 2,7 mm Steigung. Sein Gewinde hat breite, flache Spitzen; wählst du es, wechselt das Profil deshalb auf {{ui:thread.profileCustom}} mit 1,6 mm {{ui:prop.threadDepth}} und 30° {{ui:prop.threadFlankAngle}}, und eine danach gewählte Größe bringt ihr eigenes Profil wieder mit. Den Hals baust du als {{ui:thread.rod}}, den Deckel als {{ui:thread.nut}} oder du ziehst ein {{ui:thread.bore}} von einem Zylinder ab. Die Maße folgen der Normzeichnung, wie die OpenSCAD-Bibliothek BOSL2 sie führt; druck vor einem ganzen Deckel ein Probestück. Kanister und Spülmittelflaschen haben keine gemeinsame Norm: Miss den Hals, den du hast, und trag die Werte bei {{ui:thread.customSize}} ein.
+
 Weitere Einstellungen:
 
 - **{{ui:prop.threadHand}}:** {{ui:thread.right}} oder {{ui:thread.left}}.
@@ -99,6 +101,8 @@ Das Kantenwerkzeug und der STEP-Export nehmen jedes Zahnrad als exakten Körper,
 Die {{ui:shape.spring}} hat {{ui:prop.turns}} und eine {{ui:prop.wire}}. Zusammen mit der Höhe bestimmen sie, wie weich die Feder wird. Unter {{ui:prop.springHand}} wählst du, wie herum der Draht läuft: {{ui:spring.right}} wie bei einer üblichen Druckfeder, oder {{ui:spring.left}}.
 
 Das Kantenwerkzeug und der STEP-Export nehmen eine Feder als exakten Körper: ein runder Draht entlang einer Schraubenlinie, an beiden Enden gerade abgeschnitten. Diese beiden Drahtenden kannst du zum Beispiel verrunden oder fasen.
+
+Unter {{ui:prop.springForm}} wird die Feder zur {{ui:spring.flat}}: ein Band, das in Wellen über die Platte läuft und in seiner eigenen Ebene federt, liegend gedruckt. {{ui:prop.springPattern}} gibt {{ui:spring.round}}, einen {{ui:spring.zigzag}} oder eckige Bögen ({{ui:spring.square}}), {{ui:prop.springEnds}} eine {{ui:spring.eye}} mit Loch, eine {{ui:spring.tab}} quer zum Band oder keine ({{ui:spring.none}}). {{ui:prop.bends}} und {{ui:prop.band}} bestimmen, wie weich sie wird; die Länge ist die Länge der Feder, die Breite, wie weit die Wellen reichen, und die Höhe, wie dick sie gedruckt wird. Auch die Flachfeder ist ein exakter Körper.
 
 ## Gebogene Rohre
 

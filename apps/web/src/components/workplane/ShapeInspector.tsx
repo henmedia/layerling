@@ -100,7 +100,7 @@ import {
   threadSettings,
   threadSizeFor,
   threadSizeById,
-  threadProfileForSize,
+  threadSizeSettings,
   threadUsesInchPitch,
   threadsPerInchToPitch,
   type ThreadSettings,
@@ -168,7 +168,7 @@ import {
 import { displayStepFromMillimeters, formatFractionalInches, showsInchFractions, displayToMillimeters, formatMeasurementNumber, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseMeasurementInput, resolveMeasurementInput } from "@/lib/measurementUnits";
 import { t, type MessageKey } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
-import { displayShapeName, makeShapeFromAsset, renamedShapeName } from "@/lib/shapeCatalog";
+import { displayShapeName, makeShapeFromAsset, renamedShapeName, shapeAssetDefaultDimensions } from "@/lib/shapeCatalog";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { SURFACE_TEXTURE_OWN_IMAGE_SIZE, surfaceTextureOwnImage } from "@/lib/surfaceTextureImages";
@@ -292,6 +292,8 @@ import { torusTessellation } from "@/lib/torusTessellation";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO, torusTubeRatio, torusTubeThickness } from "@/lib/torusShape";
 import { normalizePyramidTop } from "@/lib/pyramidGeometry";
 import {
+  DEFAULT_SPRING_TURNS,
+  DEFAULT_SPRING_WIRE,
   MAX_SPRING_QUALITY,
   MIN_SPRING_QUALITY,
   normalizeSpringQuality,
@@ -302,6 +304,19 @@ import {
   springTurnLimits,
   springWireLimits,
 } from "@/lib/springGeometry";
+import {
+  DEFAULT_FLAT_SPRING_TURNS,
+  DEFAULT_FLAT_SPRING_WIRE,
+  FLAT_SPRING_DIMENSIONS,
+  flatSpringSettings,
+  flatSpringTurnLimits,
+  flatSpringWireLimits,
+  normalizeFlatSpringEnds,
+  normalizeFlatSpringPattern,
+  normalizeFlatSpringTurns,
+  normalizeFlatSpringWire,
+  normalizeSpringForm,
+} from "@/lib/flatSpringGeometry";
 import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridOptions, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
@@ -2013,6 +2028,116 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
   }
 
   if (shape.kind === "spring") {
+    /*
+     * The form switch (#1076): a flat spring lies on the plate, so the switch
+     * also gives it a strip's measures, and back to the coil a coil's.
+     */
+    const formSelect = {
+      type: "select" as const,
+      id: "springForm",
+      label: t("prop.springForm"),
+      value: normalizeSpringForm(shape.springForm),
+      options: [{ value: "coil", label: t("spring.coil") }, { value: "flat", label: t("spring.flat") }],
+      onChange: (form: string) => {
+        if (normalizeSpringForm(form) === normalizeSpringForm(shape.springForm)) return;
+        if (form === "flat") {
+          const { width: nextWidth, depth: nextDepth, height: nextHeight } = FLAT_SPRING_DIMENSIONS;
+          onUpdate({ springForm: "flat", width: nextWidth, depth: nextDepth, height: nextHeight, size: resizedShapeSize(nextWidth, nextDepth), springWire: DEFAULT_FLAT_SPRING_WIRE, springTurns: DEFAULT_FLAT_SPRING_TURNS });
+        } else {
+          const coil = shapeAssetDefaultDimensions("spring");
+          onUpdate({ springForm: undefined, width: coil.width, depth: coil.depth, height: coil.height, size: resizedShapeSize(coil.width, coil.depth), springWire: DEFAULT_SPRING_WIRE, springTurns: DEFAULT_SPRING_TURNS });
+        }
+      },
+    };
+    if (shape.springForm === "flat") {
+      const flat = flatSpringSettings(shape, width, depth);
+      const wireLimits = flatSpringWireLimits(width, depth, flat.pattern, flat.ends);
+      const turnLimits = flatSpringTurnLimits(width, depth, flat.wire, flat.pattern, flat.ends);
+      // As with the coil: band and turns move into what the new measures or settings hold.
+      const fit = (nextWidth: number, nextDepth: number, pattern = flat.pattern, ends = flat.ends) => {
+        const wire = normalizeFlatSpringWire(flat.wire, nextWidth, nextDepth, pattern, ends);
+        return { springWire: wire, springTurns: normalizeFlatSpringTurns(flat.turns, nextWidth, nextDepth, wire, pattern, ends) };
+      };
+      return [
+        formSelect,
+        {
+          type: "select",
+          id: "springPattern",
+          label: t("prop.springPattern"),
+          value: flat.pattern,
+          options: [{ value: "round", label: t("spring.round") }, { value: "zigzag", label: t("spring.zigzag") }, { value: "square", label: t("spring.square") }],
+          onChange: (value) => {
+            const pattern = normalizeFlatSpringPattern(value);
+            onUpdate({ springPattern: pattern, ...fit(width, depth, pattern) });
+          },
+        },
+        {
+          type: "select",
+          id: "springEnds",
+          label: t("prop.springEnds"),
+          value: flat.ends,
+          options: [{ value: "eye", label: t("spring.eye") }, { value: "tab", label: t("spring.tab") }, { value: "none", label: t("spring.none") }],
+          onChange: (value) => {
+            const ends = normalizeFlatSpringEnds(value);
+            onUpdate({ springEnds: ends, ...fit(width, depth, flat.pattern, ends) });
+          },
+        },
+        {
+          id: "turns",
+          label: t("prop.bends"),
+          value: flat.turns,
+          min: turnLimits.min,
+          max: turnLimits.max,
+          step: 1,
+          onChange: (turns) => onUpdate({ springTurns: normalizeFlatSpringTurns(turns, width, depth, flat.wire, flat.pattern, flat.ends) }),
+        },
+        {
+          id: "wire",
+          label: t("prop.band"),
+          value: flat.wire,
+          min: wireLimits.min,
+          max: wireLimits.max,
+          step: 0.1,
+          onChange: (value) => {
+            const wire = normalizeFlatSpringWire(value, width, depth, flat.pattern, flat.ends);
+            onUpdate({ springWire: wire, springTurns: normalizeFlatSpringTurns(flat.turns, width, depth, wire, flat.pattern, flat.ends) });
+          },
+        },
+        {
+          id: "quality",
+          label: t("prop.quality"),
+          value: normalizeSpringQuality(shape.springQuality),
+          min: MIN_SPRING_QUALITY,
+          max: MAX_SPRING_QUALITY,
+          step: 4,
+          onChange: (quality) => onUpdate({ springQuality: normalizeSpringQuality(quality) }),
+        },
+        {
+          id: "length",
+          label: t("prop.length"),
+          value: width,
+          min: MIN_SHAPE_SIZE,
+          max: 480,
+          onChange: (value) => onUpdate({ width: value, size: resizedShapeSize(value, depth), ...fit(value, depth) }, { resizeAxis: "width" }),
+        },
+        {
+          id: "width",
+          label: t("prop.width"),
+          value: depth,
+          min: MIN_SHAPE_SIZE,
+          max: 160,
+          onChange: (value) => onUpdate({ depth: value, size: resizedShapeSize(width, value), ...fit(width, value) }, { resizeAxis: "depth" }),
+        },
+        {
+          id: "height",
+          label: t("prop.height"),
+          value: shape.height,
+          min: MIN_SHAPE_SIZE,
+          max: 160,
+          onChange: (value) => onUpdate({ height: value }, { resizeAxis: "height" }),
+        },
+      ];
+    }
     const across = Math.max(width, depth);
     const settings = springSettings(shape, across, shape.height);
     const wireLimits = springWireLimits(across, shape.height);
@@ -2029,6 +2154,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       return { springWire: wire, springTurns: normalizeSpringTurns(settings.turns, reach, nextHeight, wire) };
     };
     return [
+      formSelect,
       {
         id: "turns",
         label: t("prop.turns"),
@@ -2238,8 +2364,9 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         onChange: (value) => {
           const chosen = threadSizeById(value);
           // Eine G-Groesse bringt ihr Whitworth-Profil mit, eine M-, UNC- oder
-          // UNF-Groesse das Spitzgewinde; Trapez und Rund bleiben stehen.
-          if (chosen) applyThread({ diameter: chosen.diameter, pitch: chosen.pitch, profile: threadProfileForSize(chosen, settings.profile) });
+          // UNF-Groesse das Spitzgewinde, ein Flaschenhals sein eigenes Profil;
+          // Trapez und Rund bleiben stehen.
+          if (chosen) applyThread(threadSizeSettings(chosen, settings.profile, standard));
         },
       },
       {

@@ -3395,6 +3395,21 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
   background: #3a3a3a;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.axis-x {
+  background: #d6363c;
+  border-color: #7d1a1e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.axis-y {
+  background: #2f9a4b;
+  border-color: #17542a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.axis-z {
+  background: #2f6fe0;
+  border-color: #163f86;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle:not(.height-lift):hover {
   background: var(--hover-accent-color);
   border-color: var(--hover-accent-border-color);
@@ -5734,6 +5749,21 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .rotate-handle.axis-y {
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .rotate-handle.axis-z {
   --rotate-handle-axis: #6aa0ff;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.axis-x {
+  background: #ff6b70;
+  border-color: #7d1a1e;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.axis-y {
+  background: #5fd47c;
+  border-color: #17542a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.axis-z {
+  background: #6aa0ff;
+  border-color: #163f86;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.height-lift {
@@ -8519,7 +8549,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-rotate-handle {
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-rotate-handle-hit {
-  fill: transparent;
+  fill: none;
+  stroke: transparent;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-rotate-handle svg {

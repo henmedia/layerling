@@ -119,7 +119,7 @@ De snapstap staat rechtsonder in de editor en kun je op elk moment veranderen.
 
 ## Kopiëren en dupliceren
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} en {{ui:editor.tool.duplicate}} staan in het lint ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] dupliceert een selectie. layerling onthoudt hoe je de kopie het laatst hebt verplaatst of gedraaid en past bij het volgende dupliceren hetzelfde opnieuw toe. Zo maak je met een paar toetsaanslagen een rij gaten of treden. Voor regelmatige opstellingen is er ook het patroon, beschreven in [Selecteren en schikken](chapter:selecteren-en-schikken).
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} en {{ui:editor.tool.duplicate}} staan in het lint ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] dupliceert een selectie. layerling onthoudt hoe je de kopie het laatst hebt verplaatst of gedraaid en past bij het volgende dupliceren hetzelfde opnieuw toe. Zo maak je met een paar toetsaanslagen een rij gaten of treden. Voor regelmatige opstellingen is er ook het patroon, beschreven in [Selecteren en schikken](chapter:selecteren-en-schikken). Heb je de kopie ook groter of kleiner gemaakt, dan groeit elke volgende kopie opnieuw met dezelfde factor, zoals in Tinkercad.
 
 > **Tip:** Wil een vorm de gewenste maat niet aannemen, dan ligt het vaak aan de grenzen voor nieuwe vormen. Onder {{ui:workspace.shapeDefaults}} in de instellingen bepaal je hoe elke vorm begint en hoe groot hij mag worden.
 
