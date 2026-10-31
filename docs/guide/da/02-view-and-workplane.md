@@ -20,6 +20,10 @@ På en MacBook-trackpad: hold [[Cmd]] nede, tryk og træk. På en Mac drejer du 
 
 Hvor hurtigt musehjulet zoomer sættes med {{ui:workspace.zoomSpeed}} i indstillingerne, under {{ui:workspace.appearance}}: en skyder fra 1 til 14, 5 til at begynde med. Den gælder kun musehjulet og trackpad'en: knapperne og tasterne [[+]] og [[−]] zoomer altid i de samme små trin. Et hak på et musehjul zoomer ens i alle browsere, en trackpad zoomer efter hvor langt du stryger.
 
+**Musknapper som i din slicer.** I indstillingerne, under {{ui:workspace.appearance}}, sætter du {{ui:workspace.mouseScheme}}. Som standard er det {{ui:workspace.mouseSchemeLayerling}}, hvor højreknappen drejer visningen, midterknappen flytter den, og et træk med venstreknap på tom plads tegner en markering. Er du vant til Bambu Studio eller OrcaSlicer, vælger du {{ui:workspace.mouseSchemeSlicer}}: et træk med venstreknap på tom plads drejer så visningen, højreknappen flytter den som midterknappen gør, og Shift med et træk med venstreknap tegner en markering. Et træk på en form flytter den stadig, og et kort højreklik åbner stadig menuen. I en skitse flytter højreknappen også visningen.
+
+**3D-mus.** En SpaceMouse eller en anden 3D-mus drejer, flytter og zoomer i 3D-visningen: skub kuppelen væk for at zoome ind, glide den for at flytte visningen, vip den for at vippe visningen, og drej den for at dreje visningen rundt. I indstillingerne, under {{ui:workspace.appearance}}, klikker du på {{ui:workspace.spaceMouseConnect}} og vælger enheden i det vindue, browseren åbner; den husker valget, så det skal bare gøres én gang. Det virker i Chrome og Edge, som kan nå sådanne enheder; Firefox og Safari kan ikke.
+
 På en tablet eller telefon zoomer to fingre (spred og knib) og flytter visningen (glid sammen). Én finger arbejder på designet, ligesom venstre museknap. For at dreje med én finger, slå {{ui:camera.touchRotate}} til i kamerabjælken. Den kontakt vises kun på enheder med en berøringsskærm.
 
 Én finger på tom plads drejer visningen, og et tryk dér rydder markeringen.

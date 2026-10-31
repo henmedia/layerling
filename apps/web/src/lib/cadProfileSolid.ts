@@ -131,6 +131,11 @@ export function validateCadProfile(profile: CadModifierProfilePart) {
     ));
     if (!sameShape) throw new Error("The loft's top does not match its bottom");
     validateLoops({ ...profile, kind: "extrusion", loops: top });
+    (profile.through ?? []).forEach((section) => {
+      const alike = Number.isFinite(section.y) && section.loops.length === profile.loops.length && section.loops.every((loop, index) => loop.segments.length === profile.loops[index].segments.length);
+      if (!alike) throw new Error("A section of the loft does not match its bottom");
+      validateLoops({ ...profile, kind: "extrusion", loops: section.loops });
+    });
   }
   validateLoops(profile);
 }
@@ -645,10 +650,31 @@ function sectionedLoftSolid(cad: OcctKernel, profile: CadModifierProfilePart, to
   return solids[0];
 }
 
+/**
+ * A loft through more sections (#1034): the wires of every section at its height, lofted in one go - ruled
+ * between neighbours, or smoothly through all of them; the opening lofted the same way and taken away.
+ */
+function throughLoftSolid(cad: OcctKernel, profile: CadModifierProfilePart, tolerance: number) {
+  const sections = profile.through ?? [];
+  const solidOf = (index: number) => {
+    const wires = sections.map((section) => cad.transform(loopWire(cad, section.loops[index], tolerance), [1, 0, 0, 0, 0, 1, 0, section.y, 0, 0, 1, 0]));
+    const lofted = cad.loft(wires, true, profile.throughRuled === true);
+    const solids = cad.isSolid(lofted) ? [lofted] : cad.getSubShapes(lofted, "solid");
+    if (solids.length !== 1) throw new Error("A loft through its sections did not become one solid");
+    return cad.getVolume(solids[0]) < 0 ? cad.reverseShape(solids[0]) : solids[0];
+  };
+  let solid = solidOf(0);
+  for (let index = 1; index < profile.loops.length; index += 1) solid = cad.cut(solid, solidOf(index));
+  const solids = cad.isSolid(solid) ? [solid] : cad.getSubShapes(solid, "solid");
+  if (solids.length !== 1) throw new Error("The loft through its sections with its opening did not become one solid");
+  return solids[0];
+}
+
 function loftSolid(cad: OcctKernel, profile: CadModifierProfilePart, tolerance: number) {
   // A triangle is always flat.
   if (profile.apex) return flatLoftSolid(cad, profile, tolerance);
   const top = profile.topLoops ?? [];
+  if ((profile.through?.length ?? 0) > 2) return throughLoftSolid(cad, profile, tolerance);
   if ((profile.sections?.length ?? 0) > 2) return sectionedLoftSolid(cad, profile, tolerance);
   if (Math.abs(profile.twist ?? 0) > 1e-9 || Math.abs(profile.tilt?.x ?? 0) > 1e-9 || Math.abs(profile.tilt?.z ?? 0) > 1e-9 || (profile.smooth ?? 0) > 1e-9) {
     return twistedLoftSolid(cad, profile, tolerance);

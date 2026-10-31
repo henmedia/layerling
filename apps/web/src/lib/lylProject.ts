@@ -1765,6 +1765,24 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
         throw new Error(`${label}.${key} must be round, rectangle or polygon`);
       }
     }
+    // Sections between the ends (#1034): a list of plain sections; the geometry sorts and clamps them.
+    if (definition.loftSections !== undefined) {
+      if (!Array.isArray(definition.loftSections)) throw new Error(`${label}.loftSections must be a list`);
+      definition.loftSections.forEach((section: unknown, index: number) => {
+        const at = `${label}.loftSections[${index}]`;
+        if (!section || typeof section !== "object") throw new Error(`${at} must be an object`);
+        const entry = section as Record<string, unknown>;
+        if (entry.outline !== "round" && entry.outline !== "rectangle" && entry.outline !== "polygon") throw new Error(`${at}.outline must be round, rectangle or polygon`);
+        for (const key of ["at", "width", "depth", "corner", "sides", "offsetX", "offsetZ"]) {
+          if (entry[key] === undefined && key !== "at" && key !== "width" && key !== "depth") continue;
+          const value = finiteNumber(entry[key], `${at}.${key}`);
+          if (Math.abs(value) > 1e6) throw new Error(`${at}.${key} is outside the supported range`);
+        }
+      });
+    }
+    if (definition.loftThrough !== undefined && definition.loftThrough !== "smooth" && definition.loftThrough !== "straight") {
+      throw new Error(`${label}.loftThrough must be smooth or straight`);
+    }
   }
   if (kind === "dovetail") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
