@@ -55,7 +55,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "dashboard.copyOf": "{name} (kopya)",
   "dashboard.copyOfNumbered": "{name} (kopya {number})",
   "notice.createdFromHistory": "Bu durumdan \"{name}\" oluşturuldu. Genel bakışta seni bekliyor.",
-  "dashboard.projectOnGitHub": "Proje hakkında daha fazlası GitHub'da",
+  "dashboard.projectOnGitHub": "GitHub'da daha fazlası",
   "dashboard.releaseNotes": "Sürüm notları v{version}",
   "dashboard.footerHelp": "Alt bilgi",
   "dashboard.forum": "Forum",

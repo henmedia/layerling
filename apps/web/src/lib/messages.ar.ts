@@ -71,7 +71,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "dashboard.copyOf": "{name} (نسخة)",
   "dashboard.copyOfNumbered": "{name} (نسخة {number})",
   "notice.createdFromHistory": "تم إنشاء \"{name}\" من تلك الحالة. وهو بانتظارك في النظرة العامة.",
-  "dashboard.projectOnGitHub": "المزيد عن المشروع على GitHub",
+  "dashboard.projectOnGitHub": "المزيد على GitHub",
   "dashboard.releaseNotes": "ملاحظات الإصدار v{version}",
   "dashboard.footerHelp": "تذييل الصفحة",
   "dashboard.forum": "المناقشات",

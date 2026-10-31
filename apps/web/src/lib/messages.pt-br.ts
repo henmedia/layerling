@@ -65,7 +65,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "dashboard.copyOf": "{name} (cópia)",
   "dashboard.copyOfNumbered": "{name} (cópia {number})",
   "notice.createdFromHistory": "Projeto \"{name}\" criado a partir desse estado. Ele já está na página inicial.",
-  "dashboard.projectOnGitHub": "Mais sobre o projeto no GitHub",
+  "dashboard.projectOnGitHub": "Mais no GitHub",
   "dashboard.releaseNotes": "Notas da versão v{version}",
   "dashboard.footerHelp": "O rodapé",
   "dashboard.forum": "Discussões",

@@ -63,7 +63,7 @@ export const MESSAGES_EN = {
   "dashboard.copyOf": "{name} (copy)",
   "dashboard.copyOfNumbered": "{name} (copy {number})",
   "notice.createdFromHistory": "Created \"{name}\" from that state. It is waiting in the overview.",
-  "dashboard.projectOnGitHub": "More about the project on GitHub",
+  "dashboard.projectOnGitHub": "More on GitHub",
   "dashboard.releaseNotes": "Release notes v{version}",
   "dashboard.footerHelp": "The footer",
   "dashboard.forum": "Discussions",

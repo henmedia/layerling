@@ -62,7 +62,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "dashboard.copyOf": "{name} (kopie)",
   "dashboard.copyOfNumbered": "{name} (kopie {number})",
   "notice.createdFromHistory": "“{name}” is gemaakt vanuit die toestand. Het staat klaar in het overzicht.",
-  "dashboard.projectOnGitHub": "Meer over het project op GitHub",
+  "dashboard.projectOnGitHub": "Meer op GitHub",
   "dashboard.releaseNotes": "Release notes v{version}",
   "dashboard.footerHelp": "De voettekst",
   "dashboard.forum": "Discussies",

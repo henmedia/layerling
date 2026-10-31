@@ -716,7 +716,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "dashboard.copyOf": "{name} (kopi)",
   "dashboard.copyOfNumbered": "{name} (kopi {number})",
   "notice.createdFromHistory": "Oprettede \"{name}\" fra den tilstand. Det venter i overblikket.",
-  "dashboard.projectOnGitHub": "Mere om projektet på GitHub",
+  "dashboard.projectOnGitHub": "Mere på GitHub",
   "dashboard.releaseNotes": "Udgivelsesnoter v{version}",
   "dashboard.footerHelp": "Sidefoden",
   "dashboard.forum": "Diskussioner",

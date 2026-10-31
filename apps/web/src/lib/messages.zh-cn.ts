@@ -63,7 +63,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "dashboard.copyOf": "{name}（副本）",
   "dashboard.copyOfNumbered": "{name}（副本 {number}）",
   "notice.createdFromHistory": "已从该状态创建“{name}”。它正在起始页等待。",
-  "dashboard.projectOnGitHub": "在 GitHub 上了解项目的更多信息",
+  "dashboard.projectOnGitHub": "在 GitHub 上了解更多",
   "dashboard.releaseNotes": "发行说明 v{version}",
   "dashboard.footerHelp": "页脚",
   "dashboard.forum": "讨论区",

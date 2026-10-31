@@ -62,7 +62,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "dashboard.copyOf": "{name} (Kopie)",
   "dashboard.copyOfNumbered": "{name} (Kopie {number})",
   "notice.createdFromHistory": "„{name}“ aus diesem Stand angelegt. Es wartet in der Übersicht.",
-  "dashboard.projectOnGitHub": "Mehr Informationen zum Projekt auf GitHub",
+  "dashboard.projectOnGitHub": "Mehr Infos auf GitHub",
   "dashboard.releaseNotes": "Versionshinweise v{version}",
   "dashboard.footerHelp": "Die Fußzeile",
   "dashboard.forum": "Forum",

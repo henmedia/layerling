@@ -201,7 +201,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "dashboard.copyOf": "{name} (kopie)",
   "dashboard.copyOfNumbered": "{name} (kopie {number})",
   "notice.createdFromHistory": "Z vybraného stavu vznikl projekt „{name}“. Najdete ho v přehledu.",
-  "dashboard.projectOnGitHub": "Více o projektu na GitHubu",
+  "dashboard.projectOnGitHub": "Více na GitHubu",
   "dashboard.releaseNotes": "Poznámky k vydání v{version}",
   "dashboard.footerHelp": "Zápatí",
   "dashboard.forum": "Diskuze",

@@ -67,7 +67,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "dashboard.copyOf": "{name}（コピー）",
   "dashboard.copyOfNumbered": "{name}（コピー {number}）",
   "notice.createdFromHistory": "その状態から\"{name}\"を作成しました。一覧に置いてあります。",
-  "dashboard.projectOnGitHub": "プロジェクトの詳細はGitHubで",
+  "dashboard.projectOnGitHub": "詳細はGitHubで",
   "dashboard.releaseNotes": "リリースノート v{version}",
   "dashboard.footerHelp": "フッター",
   "dashboard.forum": "ディスカッション",

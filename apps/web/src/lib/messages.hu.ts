@@ -61,7 +61,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "dashboard.copyOf": "{name} (másolat)",
   "dashboard.copyOfNumbered": "{name} ({number}. másolat)",
   "notice.createdFromHistory": "Elkészült ebből az állapotból: „{name}”. Az áttekintésben vár.",
-  "dashboard.projectOnGitHub": "Bővebben a projektről a GitHubon",
+  "dashboard.projectOnGitHub": "Bővebben a GitHubon",
   "dashboard.releaseNotes": "Kiadási megjegyzések – v{version}",
   "dashboard.footerHelp": "Az oldal alja",
   "dashboard.forum": "Beszélgetések",
