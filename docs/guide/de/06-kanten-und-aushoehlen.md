@@ -98,6 +98,10 @@ Dann stellst du die {{ui:lid.thickness}} ein, die {{ui:lid.fit}} (den {{ui:lid.g
 
 > **Tipp:** Wie stramm ein Deckel sitzt, hängt vom Drucker ab. Drucke zuerst eine kleine Kiste mit Deckel; sitzt er zu fest, nimm die nächst lockerere Passung.
 
+Schaltest du {{ui:lid.magnets}} ein, halten vier runde Magnete den Deckel statt einer strammen Passung. Wähle einen {{ui:lid.magnetSize}} (6 × 2, 8 × 3 oder 10 × 3 mm) oder stelle {{ui:lid.magnetDiameter}} und {{ui:lid.magnetHeight}} selbst ein, dazu das {{ui:lid.magnetGap}}: 0,1 mm zum Einpressen, 0,2 bis 0,3 mm zum Einkleben. Layerling schneidet in jede Ecke des Körperrands eine Tasche und gegenüber eine in die Deckelplatte, etwas tiefer als der Magnet, damit er nie übersteht. Wo die Wand für eine Tasche zu dünn ist, füllt ein Pfeiler die Ecke vom Boden bis zum Rand, und die Lippe des Deckels geht um ihn herum. Der Körper wird mit seinen Taschen und Pfeilern gruppiert: Löst du die Gruppe auf, hast du ihn wieder wie vorher. Die Platte muss mindestens so dick sein wie der Magnet hoch ist plus 0,8 mm; beim Einschalten der Magnete wird sie so dick gemacht.
+
+> **Tipp:** Presse zuerst die Magnete in den Körper. Setze dann auf jeden noch einen Magneten, der dort richtig herum einrastet, und drücke den Deckel darauf (mit einem Tropfen Kleber in den Taschen, falls sie locker sitzen): So kommt jeder Magnet passend zu seinem Partner in den Deckel, und sie ziehen sich an.
+
 ## Körper versetzen
 
 Jede Fläche eines Körpers lässt sich um dieselbe Strecke nach außen oder innen verschieben. Das braucht eine Passung, ein Deckel oder eine Schnappverbindung: ein Spalt von 0,1 bis 0,3 mm ringsum, während die Merkmale an ihrem Platz bleiben, was Skalieren nicht kann.

@@ -205,4 +205,121 @@ describe("lid (real Manifold kernel, #1009)", () => {
       dispose(created);
     }
   });
+
+  it("holds a push-in lid by four magnets: posts in the thin corners, pockets in them and in the lid facing each other", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const body = openBox(kernel, created);
+      const result = lidForSolid(kernel, body, normalizeLidOptions({ type: "plug", thickness: 2.8, magnets: true, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1 }));
+      if ("error" in result) throw new Error(JSON.stringify(result.error));
+      created.push(result.lid);
+      const magnets = result.magnets!;
+      // The 2 mm wall is too thin for a 6.2 mm pocket with 1.2 mm round it: posts fill the corners.
+      expect(magnets.posts).not.toBeNull();
+      const posts = magnets.posts!;
+      created.push(posts);
+      expect(posts.status()).toBe("NoError");
+      // Four pockets of 6.2 mm, 2.2 mm deep below the rim at 30 (reaching 1 mm above it), a wall in from each corner.
+      expect(magnets.pockets).toHaveLength(4);
+      magnets.pockets.forEach((pocket) => {
+        expect(pocket.diameter).toBeCloseTo(6.2, 9);
+        expect(pocket.elevation).toBeCloseTo(27.8, 6);
+        expect(pocket.height).toBeCloseTo(3.2, 6);
+        expect(Math.abs(pocket.x)).toBeCloseTo(30 - 4.3, 1);
+        expect(Math.abs(pocket.z)).toBeCloseTo(20 - 4.3, 1);
+      });
+      // The posts stand in the box, from its bottom to its rim, and fill no more than the corners.
+      const postsBox = posts.boundingBox();
+      expect(postsBox.min[1]).toBeCloseTo(0, 3);
+      expect(postsBox.max[1]).toBeCloseTo(30, 3);
+      const outside = posts.subtract(kernel.Manifold.cube([60, 30, 40], true).translate([0, 15, 0]));
+      created.push(outside);
+      expect(outside.volume()).toBeLessThan(0.01);
+      // Each pocket lies in material all round: the box with its posts holds a cylinder 1 mm wider than the pocket.
+      const filledBody = kernel.Manifold.union(body, posts);
+      created.push(filledBody);
+      magnets.pockets.forEach((pocket) => {
+        const around = kernel.Manifold.cylinder(2.2, pocket.diameter / 2 + 1, pocket.diameter / 2 + 1, 48).rotate([-90, 0, 0]).translate([pocket.x, 27.8, pocket.z]);
+        const held = filledBody.intersect(around);
+        created.push(around, held);
+        expect(held.volume()).toBeCloseTo(around.volume(), 1);
+      });
+      // Turned back on the box, the lid's lip goes round the posts: nothing overlaps.
+      const closed = closing(kernel, filledBody, result.lid, 2.8, created);
+      const overlap = closed.intersect(filledBody);
+      created.push(overlap);
+      expect(overlap.volume()).toBeLessThan(0.01);
+      expect(below(kernel, closed, 30, created).minGap(filledBody, 1)).toBeGreaterThan(0.19);
+      // Over each of the box's pockets the lid has its own, 2.2 mm up into the 2.8 mm plate: empty there, the plate above.
+      magnets.pockets.forEach((pocket) => {
+        const facing = kernel.Manifold.cylinder(2.1, 3, 3, 48).rotate([-90, 0, 0]).translate([pocket.x, 30.05, pocket.z]);
+        const skin = kernel.Manifold.cylinder(0.5, 3, 3, 48).rotate([-90, 0, 0]).translate([pocket.x, 32.25, pocket.z]);
+        const inPocket = closed.intersect(facing);
+        const inSkin = closed.intersect(skin);
+        created.push(facing, skin, inPocket, inSkin);
+        expect(inPocket.volume()).toBeLessThan(0.01);
+        expect(inSkin.volume()).toBeCloseTo(skin.volume(), 1);
+      });
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("needs no posts where the wall holds the pockets, and puts them on the diagonals of a round pot", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      // A box with 10 mm walls: the pockets fit in its corners.
+      const outer = kernel.Manifold.cube([60, 30, 40], true).translate([0, 15, 0]);
+      const inner = kernel.Manifold.cube([40, 30, 20], true).translate([0, 17, 0]);
+      const thick = outer.subtract(inner);
+      created.push(outer, inner, thick);
+      const boxLid = lidForSolid(kernel, thick, normalizeLidOptions({ type: "cap", thickness: 3, magnets: true }));
+      if ("error" in boxLid) throw new Error(JSON.stringify(boxLid.error));
+      created.push(boxLid.lid);
+      expect(boxLid.magnets?.posts).toBeNull();
+      expect(boxLid.magnets?.pockets).toHaveLength(4);
+
+      const potOuter = kernel.Manifold.cylinder(20, 20, 20, 96).rotate([-90, 0, 0]);
+      const potInner = kernel.Manifold.cylinder(20, 18, 18, 96).rotate([-90, 0, 0]).translate([0, 2, 0]);
+      const pot = potOuter.subtract(potInner);
+      created.push(potOuter, potInner, pot);
+      const potLid = lidForSolid(kernel, pot, normalizeLidOptions({ type: "both", thickness: 2.8, magnets: true }));
+      if ("error" in potLid) throw new Error(JSON.stringify(potLid.error));
+      created.push(potLid.lid);
+      if (potLid.magnets?.posts) created.push(potLid.magnets.posts);
+      expect(potLid.magnets?.posts).not.toBeNull();
+      potLid.magnets!.pockets.forEach((pocket) => {
+        expect(Math.abs(Math.abs(pocket.x) - Math.abs(pocket.z))).toBeLessThan(0.1);
+        expect(Math.hypot(pocket.x, pocket.z)).toBeGreaterThan(20 - 4.3 - 0.2);
+        expect(Math.hypot(pocket.x, pocket.z)).toBeLessThan(20 - 4.3 + 0.1);
+      });
+      const filledPot = kernel.Manifold.union(pot, potLid.magnets!.posts!);
+      created.push(filledPot);
+      const closed = closing(kernel, filledPot, potLid.lid, 2.8, created);
+      const overlap = closed.intersect(filledPot);
+      created.push(overlap);
+      expect(overlap.volume()).toBeLessThan(0.01);
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("refuses magnets in a lid too thin for them and in a body too small for four", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const body = openBox(kernel, created);
+      expect(lidForSolid(kernel, body, normalizeLidOptions({ type: "plug", magnets: true }))).toEqual({ error: { code: "magnetsThinLid", thickness: 2.8 } });
+      expect(lidForSolid(kernel, body, normalizeLidOptions({ type: "flat", thickness: 3.5, magnets: true, magnetHeight: 3 }))).toEqual({ error: { code: "magnetsThinLid", thickness: 3.8 } });
+      const outer = kernel.Manifold.cube([12, 10, 12], true).translate([0, 5, 0]);
+      const inner = kernel.Manifold.cube([9, 10, 9], true).translate([0, 6.5, 0]);
+      const small = outer.subtract(inner);
+      created.push(outer, inner, small);
+      expect(lidForSolid(kernel, small, normalizeLidOptions({ type: "flat", thickness: 3, magnets: true }))).toEqual({ error: { code: "magnetsNoRoom" } });
+    } finally {
+      dispose(created);
+    }
+  });
 });

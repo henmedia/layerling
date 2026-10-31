@@ -74,7 +74,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_hull_objects` | envuelve los objetos en un solo cuerpo convexo, como con film retráctil (Envolvente) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separa una forma en sus piezas sueltas, y un cuerpo de boceto en un cuerpo por contorno |
 | `layerling_split_objects` | corta sólidos u orificios en dos con un plano |

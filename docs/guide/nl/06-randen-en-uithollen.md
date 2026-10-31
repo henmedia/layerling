@@ -96,6 +96,10 @@ Daarna stel je de {{ui:lid.thickness}} in, de {{ui:lid.fit}} (de {{ui:lid.gap}} 
 
 > **Tip:** Hoe strak een deksel zit, hangt van de printer af. Print eerst een kleine doos met deksel; zit het te strak, neem dan de volgende ruimere passing.
 
+Vink {{ui:lid.magnets}} aan en vier ronde magneten houden het deksel vast in plaats van een strakke passing. Kies een {{ui:lid.magnetSize}} (6 × 2, 8 × 3 of 10 × 3 mm) of stel zelf de {{ui:lid.magnetDiameter}} en {{ui:lid.magnetHeight}} in, en de {{ui:lid.magnetGap}}: 0,1 mm om de magneten erin te drukken, 0,2 tot 0,3 mm om ze te lijmen. Layerling snijdt een kuiltje in elke hoek van de rand van de vorm en een tegenover in de plaat van het deksel, iets dieper dan de magneet, zodat die nooit uitsteekt. Waar de wand te dun is voor een kuiltje, vult een pijler de hoek van de bodem tot de rand, en de lip van het deksel loopt eromheen. De vorm wordt gegroepeerd met zijn kuiltjes en pijlers: hef de groep op en je hebt hem terug zoals hij was. De plaat moet minstens zo dik zijn als de magneet hoog is plus 0,8 mm; zet je de magneten aan, dan wordt hij zo dik gemaakt.
+
+> **Tip:** Druk eerst de magneten in de vorm. Zet dan op elk ervan nog een magneet, die daar goed om vastklikt, en druk het deksel erop (met een druppel lijm in de kuiltjes als ze los zitten): zo komt elke magneet tegenover zijn partner in het deksel, en trekken ze elkaar aan.
+
 ## Lichamen verschuiven
 
 Elk vlak van een lichaam kan over dezelfde afstand naar buiten of naar binnen worden verschoven. Dat is wat een pasvorm, een deksel of een klikverbinding nodig heeft: een spleet van 0,1 tot 0,3 mm rondom terwijl de onderdelen op hun plaats blijven, wat schalen niet kan.

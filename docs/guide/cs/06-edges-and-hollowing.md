@@ -96,6 +96,10 @@ Pak nastavíš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} mezi víkem 
 
 > **Tip:** Jak těsně víko sedí, záleží na tiskárně. Nejdřív vytiskni malou krabičku s víkem; je-li víko příliš těsné, zvol další volnější uložení.
 
+Když zapneš {{ui:lid.magnets}}, drží víko čtyři kulaté magnety místo těsného uložení. Vyber {{ui:lid.magnetSize}} (6 × 2, 8 × 3 nebo 10 × 3 mm) nebo nastav {{ui:lid.magnetDiameter}} a {{ui:lid.magnetHeight}} sám, k tomu {{ui:lid.magnetGap}}: 0,1 mm k zalisování magnetů, 0,2 až 0,3 mm k vlepení. Layerling vyřízne do každého rohu okraje tělesa kapsu a naproti ní další do desky víka, o něco hlubší než magnet, aby nikdy nevyčníval. Kde je stěna na kapsu příliš tenká, vyplní roh od dna po okraj sloupek a lem víka ho obejde. Těleso se seskupí se svými kapsami a sloupky: když skupinu zrušíš, máš ho zpátky, jak bylo. Deska musí být silná alespoň jako výška magnetu plus 0,8 mm; zapnutím magnetů se na tuto sílu nastaví.
+
+> **Tip:** Nejdřív zalisuj magnety do tělesa. Pak na každý polož ještě jeden magnet, který se na něm sám otočí správně, a přitlač na ně víko (s kapkou lepidla v kapsách, pokud sedí volně): každý magnet tak skončí ve víku naproti svému protějšku a budou se přitahovat.
+
 ## Odsazení těles
 
 Každou plochu tělesa lze posunout o stejnou vzdálenost ven nebo dovnitř. To potřebuje lícovaný spoj, víko nebo zacvakávací spoj: mezera 0,1 až 0,3 mm dokola, zatímco prvky zůstanou na místě, což změna měřítka nedá.
