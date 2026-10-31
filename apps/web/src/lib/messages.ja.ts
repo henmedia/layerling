@@ -2588,6 +2588,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "先にスケッチ内で何かを選択してください",
   "editor.needs.locked": "選択範囲はロックされています。先にロックを解除してください",
   "editor.needs.historyView": "先に履歴を閉じてください",
+  "editor.emptyHint": "上のリボンから形状を選ぶか、Ctrl+K（またはヘルプの虫眼鏡）を押して探しているものを入力してください。",
   "area.ribbon": "リボン",
   "area.objectList": "オブジェクトリスト",
   "area.statusMessage": "ステータスメッセージ",

@@ -3363,6 +3363,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "Najpierw zaznacz coś w szkicu",
   "editor.needs.locked": "Zaznaczenie jest zablokowane: najpierw je odblokuj",
   "editor.needs.historyView": "Najpierw zamknij historię",
+  "editor.emptyHint": "Wybierz kształt na wstążce u góry albo naciśnij Ctrl+K (lub lupę pod Pomocą) i wpisz, czego szukasz.",
   "area.ribbon": "Wstążka",
   "area.objectList": "Lista obiektów",
   "area.statusMessage": "Komunikat stanu",

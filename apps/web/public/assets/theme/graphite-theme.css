@@ -2269,6 +2269,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .visibility-hidden-badg
   background: var(--background);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .workplane-empty-hint {
+  color: var(--muted-strong);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-workspace-stage {
   background: var(--sketch-bg, #fafafa);
 }

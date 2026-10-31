@@ -3358,6 +3358,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "editor.needs.sketchSelection": "Nejprve něco vyberte v náčrtu",
   "editor.needs.locked": "Výběr je zamčený: nejprve ho odemkněte",
   "editor.needs.historyView": "Nejprve zavřete historii",
+  "editor.emptyHint": "Vyberte tvar v pásu karet nahoře, nebo stiskněte Ctrl+K (či lupu pod Nápovědou) a napište, co hledáte.",
   "area.ribbon": "Pás nástrojů",
   "area.objectList": "Seznam objektů",
   "area.statusMessage": "Stavová zpráva",

@@ -3149,6 +3149,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "Vælg først noget i skitsen",
   "editor.needs.locked": "Markeringen er låst: lås den op først",
   "editor.needs.historyView": "Luk først historikken",
+  "editor.emptyHint": "Vælg en form i båndet foroven, eller tryk Ctrl+K (eller luppen under Hjælp) og skriv, hvad du leder efter.",
   "area.ribbon": "Bånd",
   "area.objectList": "Objektliste",
   "area.statusMessage": "Statusbesked",

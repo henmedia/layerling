@@ -1144,6 +1144,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "Selecione primeiro algo no esboço",
   "editor.needs.locked": "A seleção está bloqueada: desbloqueie-a primeiro",
   "editor.needs.historyView": "Feche primeiro o histórico",
+  "editor.emptyHint": "Escolha uma forma na faixa de opções acima, ou pressione Ctrl+K (ou a lupa em Ajuda) e digite o que procura.",
   "area.ribbon": "Barra de opções",
   "area.objectList": "Lista de objetos",
   "area.statusMessage": "Mensagem de status",

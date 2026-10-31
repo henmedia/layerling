@@ -2716,6 +2716,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "Najprej nekaj izberi v skici",
   "editor.needs.locked": "Izbor je zaklenjen: najprej ga odkleni",
   "editor.needs.historyView": "Najprej zapri zgodovino",
+  "editor.emptyHint": "Izberi obliko na traku zgoraj ali pritisni Ctrl+K (ali lupo pod Pomočjo) in vpiši, kar iščeš.",
   "area.ribbon": "Orodna vrstica",
   "area.objectList": "Seznam objektov",
   "area.statusMessage": "Sporočilo stanja",

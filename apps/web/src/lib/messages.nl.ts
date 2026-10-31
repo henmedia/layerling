@@ -3357,6 +3357,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "editor.needs.sketchSelection": "Selecteer eerst iets in de schets",
   "editor.needs.locked": "De selectie is vergrendeld: ontgrendel die eerst",
   "editor.needs.historyView": "Sluit eerst de geschiedenis",
+  "editor.emptyHint": "Kies bovenaan in het lint een vorm, of druk op Ctrl+K (of het vergrootglas onder Help) en typ wat je zoekt.",
   "area.ribbon": "Lint",
   "area.objectList": "Objectenlijst",
   "area.statusMessage": "Statusmelding",

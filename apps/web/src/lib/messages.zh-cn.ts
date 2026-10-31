@@ -3347,6 +3347,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "请先在草图中选择内容",
   "editor.needs.locked": "所选内容已锁定：请先解锁",
   "editor.needs.historyView": "请先关闭历史记录",
+  "editor.emptyHint": "在上方功能区选择一个形状，或按 Ctrl+K（或“帮助”下的放大镜）并输入你要找的内容。",
   "area.ribbon": "功能区",
   "area.objectList": "对象列表",
   "area.statusMessage": "状态消息",

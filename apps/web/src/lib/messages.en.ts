@@ -3358,6 +3358,7 @@ export const MESSAGES_EN = {
   "editor.needs.sketchSelection": "Select something in the sketch first",
   "editor.needs.locked": "The selection is locked: unlock it first",
   "editor.needs.historyView": "Close the history view first",
+  "editor.emptyHint": "Pick a shape in the ribbon above, or press Ctrl+K (or the magnifying glass under Help) and type what you are looking for.",
   "area.ribbon": "Ribbon",
   "area.objectList": "Object list",
   "area.statusMessage": "Status message",

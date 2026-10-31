@@ -2553,6 +2553,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "حدّد شيئًا في الرسم أولًا",
   "editor.needs.locked": "التحديد مقفل: ألغِ القفل أولًا",
   "editor.needs.historyView": "أغلق السجل أولًا",
+  "editor.emptyHint": "اختر شكلًا من الشريط في الأعلى، أو اضغط Ctrl+K (أو العدسة تحت المساعدة) واكتب ما تبحث عنه.",
   "area.ribbon": "الشريط",
   "area.objectList": "قائمة الأجسام",
   "area.statusMessage": "رسالة الحالة",

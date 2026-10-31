@@ -2429,6 +2429,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "Önce eskizde bir şey seç",
   "editor.needs.locked": "Seçim kilitli: önce kilidini aç",
   "editor.needs.historyView": "Önce geçmişi kapat",
+  "editor.emptyHint": "Yukarıdaki şeritten bir şekil seç ya da Ctrl+K'ye (veya Yardım altındaki büyütece) bas ve aradığını yaz.",
   "area.ribbon": "Şerit",
   "area.objectList": "Nesne listesi",
   "area.statusMessage": "Durum mesajı",

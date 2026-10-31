@@ -2447,6 +2447,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "Előbb jelölj ki valamit a vázlatban",
   "editor.needs.locked": "A kijelölés zárolva van: előbb oldd fel",
   "editor.needs.historyView": "Előbb zárd be az előzményeket",
+  "editor.emptyHint": "Válassz egy formát fent a menüszalagon, vagy nyomd meg a Ctrl+K-t (vagy a nagyítót a Súgó alatt), és írd be, mit keresel.",
   "area.ribbon": "Szalag",
   "area.objectList": "Objektumlista",
   "area.statusMessage": "Állapotüzenet",

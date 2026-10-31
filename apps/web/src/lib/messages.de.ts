@@ -3357,6 +3357,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "editor.needs.sketchSelection": "Wähle zuerst etwas in der Skizze aus",
   "editor.needs.locked": "Die Auswahl ist gesperrt: entsperre sie zuerst",
   "editor.needs.historyView": "Schließe zuerst den Verlauf",
+  "editor.emptyHint": "Wähle oben im Menüband eine Form, oder drücke Strg+K (oder die Lupe unter Hilfe) und tippe, was du suchst.",
   "area.ribbon": "Menüband",
   "area.objectList": "Objektliste",
   "area.statusMessage": "Statusmeldung",

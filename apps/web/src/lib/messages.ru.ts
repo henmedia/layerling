@@ -3348,6 +3348,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "editor.needs.sketchSelection": "Сначала выделите что-нибудь в эскизе",
   "editor.needs.locked": "Выделение заблокировано: сначала разблокируйте его",
   "editor.needs.historyView": "Сначала закройте историю",
+  "editor.emptyHint": "Выберите фигуру на ленте вверху или нажмите Ctrl+K (или лупу в разделе «Справка») и введите, что ищете.",
   "area.ribbon": "Панель инструментов",
   "area.objectList": "Список объектов",
   "area.statusMessage": "Сообщение о состоянии",

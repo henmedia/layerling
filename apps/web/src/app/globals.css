@@ -5948,6 +5948,22 @@ html[data-theme="dark"] .visibility-hidden-badge {
   container: workplane / size;
 }
 
+/* What an empty design says: where to start, and that Ctrl+K finds any tool. */
+.workplane-empty-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 2;
+  max-width: min(560px, calc(100% - 32px));
+  margin: 0;
+  transform: translateX(-50%);
+  color: var(--muted-strong);
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: center;
+  pointer-events: none;
+}
+
 .sketch-workspace-stage {
   position: relative;
   flex: 1;
