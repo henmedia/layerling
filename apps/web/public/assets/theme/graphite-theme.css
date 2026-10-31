@@ -1631,6 +1631,15 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .ac
   border: 2px solid var(--group-color);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-subgroup + .toolbar-subgroup::before {
+  background: color-mix(in srgb, var(--group-color) 55%, transparent);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-subgroup-label {
+  color: var(--group-color);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-collapsed] .toolbar-collapse-trigger::before {
   background-color: var(--group-color);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 11'%3E%3Cpath d='M5.5 3.5 9 7l3.5-3.5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -5995,7 +6004,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section {
   border-color: #555555;
 }
 
-html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section-label {
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section-label,
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-subgroup-label {
   color: #c6c6c6;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.72);
 }

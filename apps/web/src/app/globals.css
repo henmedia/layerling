@@ -4158,6 +4158,61 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   border-radius: 11px;
 }
 
+/* "Modify" is cut into named sections (MODIFY_SECTIONS, Stefan 31.10.2026): a fine line in the group's colour between
+   them, and each section's name in the label row above it instead of the group's, which stays on the folded button. */
+.toolbar-subgroup {
+  position: relative;
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+}
+
+.toolbar-subgroup + .toolbar-subgroup {
+  margin-left: 4px;
+  padding-left: 5px;
+}
+
+.toolbar-subgroup + .toolbar-subgroup::before {
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  left: 0;
+  width: 1px;
+  content: "";
+  background: color-mix(in srgb, var(--group-color) 55%, transparent);
+}
+
+.toolbar-subgroup-label {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  color: var(--group-color);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.86);
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.toolbar-section:not([data-collapsed]):has(.toolbar-subgroup-label) > .toolbar-section-label {
+  visibility: hidden;
+}
+
+/* Opened from the folded button, the tools hang below it: the section names go inside, above their tools. */
+.toolbar-section[data-collapsed][data-open] > .toolbar-section-tools:not(.toolbar-collapse-box):has(.toolbar-subgroup) {
+  padding-top: 18px;
+}
+
+.toolbar-section[data-collapsed][data-open] .toolbar-subgroup-label {
+  bottom: auto;
+  top: -16px;
+}
+
 /* A group the window has no room for folds into one button under its name (useToolbarCollapse, Stefan 29.10.2026):
    resting the pointer on it, or a tap, opens its tools beneath it, over the workplane. */
 .toolbar-collapse-box {
@@ -13085,7 +13140,8 @@ html[data-theme="dark"] .toolbar-section {
   border-color: #645546;
 }
 
-html[data-theme="dark"] .toolbar-section-label {
+html[data-theme="dark"] .toolbar-section-label,
+html[data-theme="dark"] .toolbar-subgroup-label {
   color: #d4c6b7;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.72);
 }

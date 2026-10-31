@@ -1124,6 +1124,10 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "prop.helixQuality": "Qualidade da hélice",
 
   "camera.controls": "Barra de visualização",
+  "editor.section.mirrorPattern": "Espelhar e padrão",
+  "editor.section.splitShape": "Dividir e moldar",
+  "editor.section.edgesWalls": "Arestas e paredes",
+  "editor.section.surface": "Superfície",
   "area.ribbon": "Barra de opções",
   "area.objectList": "Lista de objetos",
   "area.statusMessage": "Mensagem de status",
