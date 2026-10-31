@@ -118,6 +118,27 @@ const CORNER_REACH = 3;
 const CORNER_SHARPNESS = 0.7;
 /** A sketch outline needs three sides to count as closed. */
 const MIN_RING_SIDES = 3;
+/** How far a straight stretch of an outline may stray from its line, in traced pixels: about what the pixels' steps leave. */
+const LINE_DEVIATION = 0.6;
+/**
+ * How much a straight stretch may bulge, in traced pixels: the bow of the parabola that fits its steps best,
+ * over its length. A straight's steps lie either side of its line, a gentle curve's bow out to one side - so a
+ * large circle is not taken in straights, however little each stretch of it strays.
+ */
+const LINE_BULGE = 0.12;
+/** Two straights one after the other are one when together they stray no more than this, and turn by no more than LINE_TURN degrees. */
+const LINE_JOIN_DEVIATION = 1;
+const LINE_TURN = 4;
+/**
+ * A stretch counts as straight from this long: a share of the picture's longer side and at least MIN_LINE pixels,
+ * so a large gentle curve is not taken for one, and at least LINE_PER_TOLERANCE times the fit's tolerance, so a
+ * loose fit with few points keeps only the long straights.
+ */
+const MIN_LINE_SHARE = 0.04;
+const MIN_LINE = 20;
+const LINE_PER_TOLERANCE = 4;
+/** Two straights that meet without a corner leave this many steps either side for the rounding between them. */
+const LINE_GAP = 2;
 
 type Cubic = { from: TracePoint; c1: TracePoint; c2: TracePoint; to: TracePoint };
 /** A piece of an outline: straight when it has no handles. */
@@ -934,16 +955,18 @@ function halved(curve: Cubic): [Cubic, Cubic] {
 }
 
 /** The pieces of one outline at a tolerance: straight between two corners where it runs straight, else curved. */
-function ringPieces(samples: readonly TracePoint[], corners: readonly number[], tolerance: number): Piece[] {
+function ringPieces(samples: readonly TracePoint[], corners: readonly number[], tolerance: number, lineFrom: number): Piece[] {
   const count = samples.length;
   const pieces: Piece[] = [];
+  const longEnough = Math.max(lineFrom, LINE_PER_TOLERANCE * tolerance);
   if (!corners.length) {
-    // No corner: one smooth loop, from its first step all the way round, meeting itself smoothly.
-    const loop = [...samples, samples[0]];
-    const across = unit(sub(samples[2 % count], samples[(count - 2) % count]));
-    const curves: Cubic[] = [];
-    fittedCurves(loop, across, scale(across, -1), tolerance, curves);
-    curves.forEach((curve) => pieces.push({ ...curve, cornerAtStart: false }));
+    // No corner: one smooth loop, meeting itself smoothly - begun where it bends most, so no straight is cut in two.
+    const start = mostBent(samples);
+    const turned = [...samples.slice(start), ...samples.slice(0, start)];
+    const straights = joinedStraights(turned, straightStretches(samples, `loop:${start}`, turned, lineFrom).filter(([a, b]) => b - a >= longEnough), tolerance);
+    const loop = straights.length ? [...turned, turned[0]] : [...samples, samples[0]];
+    const across = unit(sub(loop[2 % count], loop[(count - 2) % count]));
+    pieces.push(...runPieces(loop, straights, across, scale(across, -1), false, tolerance));
   } else {
     const points = corners.map((index) => cornerPoint(samples, index));
     corners.forEach((start, order) => {
@@ -956,9 +979,8 @@ function ringPieces(samples: readonly TracePoint[], corners: readonly number[], 
         pieces.push({ from: run[0], to: run[run.length - 1], cornerAtStart: true });
         return;
       }
-      const curves: Cubic[] = [];
-      fittedCurves(run, runDirection(run, 0, 1), runDirection(run, run.length - 1, -1), tolerance, curves);
-      curves.forEach((curve, index) => pieces.push({ ...curve, cornerAtStart: index === 0 }));
+      const straights = joinedStraights(run, straightStretches(samples, `${start}:${steps}`, run, lineFrom).filter(([a, b]) => b - a >= longEnough), tolerance);
+      pieces.push(...runPieces(run, straights, runDirection(run, 0, 1), runDirection(run, run.length - 1, -1), true, tolerance));
     });
   }
   // Fewer than three sides do not close an outline in the sketch: halve the longest until there are three.
@@ -979,6 +1001,167 @@ function ringPieces(samples: readonly TracePoint[], corners: readonly number[], 
   return pieces;
 }
 
+/**
+ * A run of an outline (between corners, or round a loop) as pieces: its straight stretches as lines, the rest as
+ * curves that leave a line and meet the next one along it, so a straight stays straight and the bend between two
+ * straights is a short rounding. `startDirection` and `endDirection` as in fittedCurves.
+ */
+function runPieces(run: readonly TracePoint[], straights: ReadonlyArray<readonly [number, number]>, startDirection: TracePoint, endDirection: TracePoint, startsAtCorner: boolean, tolerance: number): Piece[] {
+  const pieces: Piece[] = [];
+  let at = 0;
+  let direction = startDirection;
+  let corner = startsAtCorner;
+  const curves = (from: number, to: number, leaving: TracePoint, arriving: TracePoint) => {
+    const fitted: Cubic[] = [];
+    fittedCurves(run.slice(from, to + 1), leaving, arriving, tolerance, fitted);
+    fitted.forEach((curve, index) => pieces.push({ ...curve, cornerAtStart: index === 0 && corner }));
+    corner = false;
+  };
+  straights.forEach(([a, b]) => {
+    const along = unit(sub(run[b], run[a]));
+    if (a > at) curves(at, a, direction, scale(along, -1));
+    pieces.push({ from: run[a], to: run[b], cornerAtStart: corner });
+    corner = false;
+    at = b;
+    direction = along;
+  });
+  if (at < run.length - 1) curves(at, run.length - 1, direction, endDirection);
+  return pieces;
+}
+
+/**
+ * Straights that meet nearly in line (a very gentle curve taken in straights) joined into one, as far as the fit's
+ * tolerance allows the steps between to stray from it: a loose fit spends no points on a bend it would not show.
+ */
+function joinedStraights(run: readonly TracePoint[], straights: ReadonlyArray<readonly [number, number]>, tolerance: number) {
+  const joined: Array<[number, number]> = straights.map(([a, b]) => [a, b]);
+  for (let index = 1; index < joined.length; index += 1) {
+    const [a, b] = joined[index - 1];
+    const [c, d] = joined[index];
+    if (c - b > 2 * LINE_GAP || turnDegrees(sub(run[b], run[a]), sub(run[d], run[c])) > LINE_TURN) continue;
+    if (!runsStraight(run.slice(a, d + 1), Math.max(LINE_DEVIATION, tolerance))) continue;
+    joined.splice(index - 1, 2, [a, d]);
+    index -= 1;
+  }
+  return joined;
+}
+
+/** Where a loop bends most (its turn over a few steps either side): a place no straight runs through. */
+function mostBent(samples: readonly TracePoint[]) {
+  const count = samples.length;
+  let best = 0;
+  let most = -1;
+  for (let index = 0; index < count; index += 1) {
+    const back = unit(sub(samples[index], samples[(index - CORNER_REACH + count) % count]));
+    const ahead = unit(sub(samples[(index + CORNER_REACH) % count], samples[index]));
+    const turn = 1 - dot(back, ahead);
+    if (turn > most) {
+      most = turn;
+      best = index;
+    }
+  }
+  return best;
+}
+
+/** The straight stretches found per outline and run, as they do not change with the tolerance. */
+const straightCache = new WeakMap<readonly TracePoint[], Map<string, Array<[number, number]>>>();
+
+/**
+ * The stretches of a run that go straight, at least `minLength` steps long, as [first, last] step indexes in
+ * order and apart: each as long as its steps stay within LINE_DEVIATION of the line between its ends and do not
+ * bow out to one side (LINE_BULGE). Two that meet without a corner are pulled apart by LINE_GAP steps each, for the
+ * rounding between them - or, nearly in line, meet at one point. Kept per outline (`samples`) and run (`key`).
+ */
+function straightStretches(samples: readonly TracePoint[], key: string, run: readonly TracePoint[], minLength: number): Array<[number, number]> {
+  let known = straightCache.get(samples);
+  if (!known) straightCache.set(samples, (known = new Map()));
+  // In whole steps: the stretches are indexes into the run.
+  minLength = Math.max(2, Math.ceil(minLength));
+  const cacheKey = `${key}:${minLength}`;
+  const cached = known.get(cacheKey);
+  if (cached) return cached;
+  const last = run.length - 1;
+  const straight = (from: number, to: number, deviation = LINE_DEVIATION) => {
+    const a = run[from];
+    const direction = sub(run[to], a);
+    const size = length(direction);
+    if (size < 1e-9) return false;
+    // Each step along the line (t, from its middle) and off it; the sums for the parabola off = p t^2 + q t + r.
+    const middle = size / 2;
+    let n = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0, o0 = 0, o1 = 0, o2 = 0;
+    for (let index = from; index <= to; index += 1) {
+      const dx = run[index].x - a.x;
+      const dy = run[index].y - a.y;
+      const off = (direction.x * dy - direction.y * dx) / size;
+      if (Math.abs(off) > deviation) return false;
+      const t = (direction.x * dx + direction.y * dy) / size - middle;
+      n += 1; t1 += t; t2 += t * t; t3 += t * t * t; t4 += t * t * t * t;
+      o0 += off; o1 += off * t; o2 += off * t * t;
+    }
+    // Least squares (Cramer's rule); the bow is how far the parabola rises over half the length.
+    const det = t4 * (t2 * n - t1 * t1) - t3 * (t3 * n - t1 * t2) + t2 * (t3 * t1 - t2 * t2);
+    if (Math.abs(det) < 1e-12) return true;
+    const p = (o2 * (t2 * n - t1 * t1) - t3 * (o1 * n - t1 * o0) + t2 * (o1 * t1 - t2 * o0)) / det;
+    return Math.abs(p) * middle * middle <= LINE_BULGE;
+  };
+  const found: Array<[number, number]> = [];
+  let from = 0;
+  while (from + minLength <= last) {
+    if (!straight(from, from + minLength)) {
+      from += 1;
+      continue;
+    }
+    // As far as it stays straight: in growing steps, then halving the last one.
+    let good = from + minLength;
+    let step = minLength;
+    let bad = -1;
+    while (good < last) {
+      const next = Math.min(last, good + step);
+      if (!straight(from, next)) {
+        bad = next;
+        break;
+      }
+      good = next;
+      step *= 2;
+    }
+    if (bad > 0) {
+      while (bad - good > 1) {
+        const middle = (good + bad) >> 1;
+        if (straight(from, middle)) good = middle;
+        else bad = middle;
+      }
+    }
+    found.push([from, good]);
+    from = good;
+  }
+  // A straight broken in two by a step a little off its line (a pixel, a slight kink of the drawing) is one.
+  for (let index = 1; index < found.length; index += 1) {
+    const [a, b] = found[index - 1];
+    const [c, d] = found[index];
+    const turn = turnDegrees(sub(run[b], run[a]), sub(run[d], run[c]));
+    if (c - b <= 2 * LINE_GAP && turn <= LINE_TURN && straight(a, d, LINE_JOIN_DEVIATION)) {
+      found.splice(index - 1, 2, [a, d]);
+      index -= 1;
+    }
+  }
+  for (let index = 1; index < found.length; index += 1) {
+    const [a, b] = found[index - 1];
+    const [c, d] = found[index];
+    const gap = c - b;
+    if (gap >= 2 * LINE_GAP) continue;
+    // Nearly in line (a very gentle bend taken in straights): they meet at one point, a rounding would only add one.
+    if (turnDegrees(sub(run[b], run[a]), sub(run[d], run[c])) <= LINE_TURN) {
+      found[index - 1][1] = found[index][0] = Math.round((b + c) / 2);
+      continue;
+    }
+    const need = 2 * LINE_GAP - gap;
+    found[index - 1][1] -= Math.ceil(need / 2);
+    found[index][0] += Math.floor(need / 2);
+  }
+  known.set(cacheKey, found);
+  return found;
+}
+
 /** The pieces as points with handles, in the picture's own pixels. */
 function ringNodes(pieces: readonly Piece[], picture: PreparedPicture): TraceNode[] {
   const own = (point: TracePoint): TracePoint => ({ x: point.x * picture.scaleX, y: point.y * picture.scaleY });
@@ -993,11 +1176,11 @@ function ringNodes(pieces: readonly Piece[], picture: PreparedPicture): TraceNod
 
 type Fit = { rings: Array<{ pieces: Piece[]; hole: boolean; key: string; source: TraceSource }>; points: number; corners: number; tolerance: number; refined?: boolean };
 
-function fitAll(contours: readonly Contour[], corners: readonly number[][], tolerance: number): Fit {
+function fitAll(contours: readonly Contour[], corners: readonly number[][], tolerance: number, lineFrom: number): Fit {
   let points = 0;
   let cornerCount = 0;
   const rings = contours.map((contour, index) => {
-    const pieces = ringPieces(contour.samples, corners[index], tolerance);
+    const pieces = ringPieces(contour.samples, corners[index], tolerance, lineFrom);
     points += pieces.length;
     cornerCount += pieces.filter((piece) => piece.cornerAtStart).length;
     return { pieces, hole: contour.depth % 2 === 1, key: contour.key, source: contour.source };
@@ -1068,7 +1251,7 @@ function crossingRings(rings: readonly Piece[][]): Set<number> {
 }
 
 /** The fit with no outline crossing another or itself: each that does is fitted again more closely, down to the closest fit. */
-function withoutCrossings(fit: Fit, contours: readonly Contour[], corners: readonly number[][]): Fit {
+function withoutCrossings(fit: Fit, contours: readonly Contour[], corners: readonly number[][], lineFrom: number): Fit {
   const tolerances = fit.rings.map(() => fit.tolerance);
   const rings = fit.rings.map((ring) => ({ ...ring }));
   let refined = false;
@@ -1078,7 +1261,7 @@ function withoutCrossings(fit: Fit, contours: readonly Contour[], corners: reado
     crossing.forEach((index) => {
       if (tolerances[index] <= FINEST_TOLERANCE) return;
       tolerances[index] = Math.max(FINEST_TOLERANCE, tolerances[index] / 2);
-      rings[index].pieces = ringPieces(contours[index].samples, corners[index], tolerances[index]);
+      rings[index].pieces = ringPieces(contours[index].samples, corners[index], tolerances[index], lineFrom);
       changed = true;
       refined = true;
     });
@@ -1093,6 +1276,9 @@ function withoutCrossings(fit: Fit, contours: readonly Contour[], corners: reado
   return { rings, points, corners: cornerCount, tolerance: fit.tolerance, ...(refined ? { refined } : {}) };
 }
 
+/** How long a straight stretch of this picture's outlines must be to be drawn as a line, in traced pixels. */
+const shortestLine = (picture: PreparedPicture) => Math.max(MIN_LINE, Math.ceil(MIN_LINE_SHARE * Math.max(picture.pixels.width, picture.pixels.height)));
+
 /** The outlines a set of settings keeps, with their corners, and the areas not taken. */
 function keptWithCorners(picture: PreparedPicture, settings: Omit<PictureTraceSettings, "points">) {
   const { contours, rejected, lines } = keptContours(picture, settings);
@@ -1103,9 +1289,10 @@ function keptWithCorners(picture: PreparedPicture, settings: Omit<PictureTraceSe
 export function traceRange(picture: PreparedPicture, settings: Omit<PictureTraceSettings, "points">): PictureTraceRange {
   const { contours, corners } = keptWithCorners(picture, settings);
   if (!contours.length) return { fewest: 0, most: 0, suggested: 0 };
-  const fewest = fitAll(contours, corners, LOOSEST_TOLERANCE).points;
-  const most = Math.max(fewest, fitAll(contours, corners, FINEST_TOLERANCE).points);
-  const suggested = Math.min(most, Math.max(fewest, fitAll(contours, corners, SUGGESTED_TOLERANCE).points));
+  const lineFrom = shortestLine(picture);
+  const fewest = fitAll(contours, corners, LOOSEST_TOLERANCE, lineFrom).points;
+  const most = Math.max(fewest, fitAll(contours, corners, FINEST_TOLERANCE, lineFrom).points);
+  const suggested = Math.min(most, Math.max(fewest, fitAll(contours, corners, SUGGESTED_TOLERANCE, lineFrom).points));
   return { fewest, most, suggested };
 }
 
@@ -1117,16 +1304,17 @@ export function traceRange(picture: PreparedPicture, settings: Omit<PictureTrace
 export function tracePicture(picture: PreparedPicture, settings: PictureTraceSettings): PictureTrace {
   const { contours, corners, rejected, lines } = keptWithCorners(picture, settings);
   if (!contours.length) return { rings: [], points: 0, corners: 0, ...(rejected.length ? { rejected } : {}) };
-  let best = fitAll(contours, corners, FINEST_TOLERANCE);
+  const lineFrom = shortestLine(picture);
+  let best = fitAll(contours, corners, FINEST_TOLERANCE, lineFrom);
   if (best.points > settings.points) {
     let close = Math.log(FINEST_TOLERANCE);
     let loose = Math.log(LOOSEST_TOLERANCE);
-    best = fitAll(contours, corners, LOOSEST_TOLERANCE);
+    best = fitAll(contours, corners, LOOSEST_TOLERANCE, lineFrom);
     if (best.points <= settings.points) {
       // The closest fit within the number of points: halve the gap between too many and few enough.
       for (let round = 0; round < 12; round += 1) {
         const middle = (close + loose) / 2;
-        const fit = fitAll(contours, corners, Math.exp(middle));
+        const fit = fitAll(contours, corners, Math.exp(middle), lineFrom);
         if (fit.points <= settings.points) {
           best = fit;
           loose = middle;
@@ -1135,7 +1323,7 @@ export function tracePicture(picture: PreparedPicture, settings: PictureTraceSet
     }
   }
   // No outline may cross another: where loose curves would, those outlines are fitted more closely.
-  best = withoutCrossings(best, contours, corners);
+  best = withoutCrossings(best, contours, corners, lineFrom);
   return {
     rings: best.rings.map((ring) => ({
       nodes: ringNodes(ring.pieces, picture),

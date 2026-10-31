@@ -364,6 +364,52 @@ describe("tracing a picture into points (Trace)", () => {
     });
   });
 
+  it("keeps straight stretches straight, the rounded top of a roof a short curve between them", () => {
+    // A roof: two slopes at 45 degrees, their top rounded off with a radius of 10 pixels.
+    const apex = { x: 150, y: 40 };
+    const radius = 10;
+    // Below both slopes; above the points where they touch the circle of the rounding, inside that circle.
+    const centre = { x: apex.x, y: apex.y + radius * Math.SQRT2 };
+    const touch = centre.y - radius * Math.SQRT1_2;
+    const roof = picture(300, 200, (x, y) => {
+      const px = x + 0.5;
+      const py = y + 0.5;
+      const inside = py <= 180 && py - apex.y >= Math.abs(px - apex.x) && (py >= touch || Math.hypot(px - centre.x, py - centre.y) <= radius);
+      return inside ? BLACK : WHITE;
+    });
+    const { prepared, settings } = settingsFor(roof, { part: "dark", threshold: 0.5, cornerAngle: 45 });
+    for (const points of [8, 12, settings.points]) {
+      const trace = tracePicture(prepared, { ...settings, points });
+      const outline = outlinePoints(trace.rings[0].nodes);
+      // Along each slope, away from its ends, the outline lies on the slope's line: no bow.
+      const onSlopes = outline.filter((point) => point.y > 75 && point.y < 170);
+      expect(onSlopes.length).toBeGreaterThan(20);
+      const off = Math.max(...onSlopes.map((point) => Math.abs(point.y - apex.y - Math.abs(point.x - apex.x)) / Math.SQRT2));
+      expect(off, `${points} points`).toBeLessThan(0.8);
+      // The top: a short rounding - points near it, none of them a corner.
+      const nearTop = trace.rings[0].nodes.filter((node) => node.y < 75);
+      expect(nearTop.length, `${points} points`).toBeGreaterThanOrEqual(2);
+      expect(nearTop.every((node) => !node.corner), JSON.stringify(nearTop)).toBe(true);
+    }
+  });
+
+  it("takes no stretch of a large circle for a straight", () => {
+    // Its edge smoothed, as a drawing or a photo has it (a hard pixel circle is straight for a few pixels at its sides).
+    const big = picture(500, 500, (x, y) => {
+      let inside = 0;
+      for (let sy = 0; sy < 4; sy += 1) {
+        for (let sx = 0; sx < 4; sx += 1) if (Math.hypot(x + (sx + 0.5) / 4 - 250, y + (sy + 0.5) / 4 - 250) <= 220) inside += 1;
+      }
+      const grey = Math.round(255 * (1 - inside / 16));
+      return [grey, grey, grey, 255];
+    });
+    const { prepared, settings } = settingsFor(big, { part: "dark", threshold: 0.5 });
+    const trace = tracePicture(prepared, settings);
+    expect(trace.rings).toHaveLength(1);
+    // Every side curved: each point has its handles.
+    expect(trace.rings[0].nodes.every((node) => node.handleIn && node.handleOut)).toBe(true);
+  });
+
   it("never gives outlines that cross: those that would are fitted more closely, and the trace says so", () => {
     // A drawn line: a frame 3 pixels wide, whose two edges lie close together, and a second frame touching it.
     const frames = picture(160, 120, (x, y) => {
