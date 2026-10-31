@@ -235,6 +235,8 @@ export type ShapeCustomization = {
   gridfinityMagnets?: boolean;
   /** Gridfinity bin: the size counts cells of 21 mm, each with a foot, four to a baseplate's socket; missing means the 42 mm grid. */
   gridfinityHalfGrid?: boolean;
+  /** Gridfinity baseplate: up to 12 units across and deep instead of 6, for print beds over 256 mm (#1061); missing means 6. */
+  gridfinityLargePlate?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -1010,6 +1012,8 @@ export type WorkplaneShape = {
   gridfinityMagnets?: boolean;
   /** Gridfinity bin: the size counts cells of 21 mm, each with a foot, four to a baseplate's socket; missing means the 42 mm grid. */
   gridfinityHalfGrid?: boolean;
+  /** Gridfinity baseplate: up to 12 units across and deep instead of 6, for print beds over 256 mm (#1061); missing means 6. */
+  gridfinityLargePlate?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */

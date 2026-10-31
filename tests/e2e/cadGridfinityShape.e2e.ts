@@ -11,8 +11,8 @@ import { cad, bin, plate, meshVolume, trianglesVolume, meshBounds, overlap, mate
  */
 
 describe("exact Gridfinity bodies", () => {
-  it("builds bins and baseplates as one valid solid with the mesh's volume and box", () => {
-    for (const part of [bin(), bin({ gridfinityLip: false }), bin({ gridfinityMagnets: true }), bin({ width: 41.5, depth: 41.5, height: 7 + GRIDFINITY_LIP_HEIGHT }), bin({ width: 125.5, depth: 125.5, height: 42 + GRIDFINITY_LIP_HEIGHT, gridfinityMagnets: true }), plate(), plate({ width: 126, depth: 126 })]) {
+  it("builds bins and baseplates up to a large plate of 12 x 12 units as one valid solid with the mesh's volume and box", () => {
+    for (const part of [bin(), bin({ gridfinityLip: false }), bin({ gridfinityMagnets: true }), bin({ width: 41.5, depth: 41.5, height: 7 + GRIDFINITY_LIP_HEIGHT }), bin({ width: 125.5, depth: 125.5, height: 42 + GRIDFINITY_LIP_HEIGHT, gridfinityMagnets: true }), plate(), plate({ width: 126, depth: 126 }), plate({ width: 504, depth: 504, gridfinityLargePlate: true })]) {
       const solid = gridfinityPartSolid(cad, part);
       expect(cad.isValid(solid)).toBe(true);
       const exact = Math.abs(cad.getVolume(solid));

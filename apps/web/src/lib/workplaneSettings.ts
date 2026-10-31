@@ -438,6 +438,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityLip = typeof source.gridfinityLip === "boolean" ? source.gridfinityLip : fallbackEntry?.gridfinityLip;
       entry.gridfinityMagnets = typeof source.gridfinityMagnets === "boolean" ? source.gridfinityMagnets : fallbackEntry?.gridfinityMagnets;
       entry.gridfinityHalfGrid = typeof source.gridfinityHalfGrid === "boolean" ? source.gridfinityHalfGrid : fallbackEntry?.gridfinityHalfGrid;
+      entry.gridfinityLargePlate = typeof source.gridfinityLargePlate === "boolean" ? source.gridfinityLargePlate : fallbackEntry?.gridfinityLargePlate;
       entry.gridfinityLabelBack = typeof source.gridfinityLabelBack === "boolean" ? source.gridfinityLabelBack : fallbackEntry?.gridfinityLabelBack;
       entry.gridfinityLabelFront = typeof source.gridfinityLabelFront === "boolean" ? source.gridfinityLabelFront : fallbackEntry?.gridfinityLabelFront;
       entry.gridfinityLabelLeft = typeof source.gridfinityLabelLeft === "boolean" ? source.gridfinityLabelLeft : fallbackEntry?.gridfinityLabelLeft;
