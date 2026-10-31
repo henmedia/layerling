@@ -3349,7 +3349,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "editor.needs.twoBodies": "Wähle zwei oder mehr Körper aus",
   "editor.needs.twoObjects": "Wähle zwei oder mehr Objekte aus",
   "editor.needs.twoSolids": "Wähle genau zwei Körper aus, keine Aussparungen",
-  "editor.needs.intersect": "Wähle zwei oder mehr Körper aus, oder Körper und Aussparungen",
+  "editor.needs.intersect": "Wähle zwei oder mehr Körper aus oder Körper und Aussparungen",
   "editor.needs.group": "Wähle eine Gruppe aus",
   "editor.needs.visibleBodies": "Wähle sichtbare Körper aus",
   "editor.needs.mesh": "Wähle ein importiertes Netz mit vielen Dreiecken aus",
