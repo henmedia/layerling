@@ -1631,6 +1631,15 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .ac
   border: 2px solid var(--group-color);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-subgroup + .toolbar-subgroup::before {
+  background: color-mix(in srgb, var(--group-color) 55%, transparent);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-subgroup-label {
+  color: var(--group-color);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-collapsed] .toolbar-collapse-trigger::before {
   background-color: var(--group-color);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 11'%3E%3Cpath d='M5.5 3.5 9 7l3.5-3.5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -2258,6 +2267,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .visibility-hidden-badg
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .workplane-stage {
   background: var(--background);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workplane-empty-hint {
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  color: var(--foreground);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-workspace-stage {
@@ -5995,7 +6010,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section {
   border-color: #555555;
 }
 
-html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section-label {
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section-label,
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-subgroup-label {
   color: #c6c6c6;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.72);
 }
@@ -8686,6 +8702,86 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-image-hint {
 html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-turn-ring {
   --sketch-turn-ring: rgba(106, 160, 255, 0.4);
   --sketch-turn-ring-active: #6aa0ff;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.background {
+  fill: var(--sketch-plate, #eeeeee);
+  stroke: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path {
+  fill: rgba(229, 72, 77, 0.12);
+  stroke: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle,
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview rect {
+  fill: #ffffff;
+  stroke: #0b72b9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview rect.corner {
+  stroke: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.ring {
+  fill: none;
+  stroke: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.ring.area {
+  stroke: #1f8a4c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.ring.highlight {
+  stroke: #f08a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-list li.highlight {
+  background: rgba(240, 138, 0, 0.14);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.cut {
+  fill: rgba(240, 138, 0, 0.12);
+  stroke: #d97a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.cut.highlight {
+  fill: rgba(240, 138, 0, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.cut.draft {
+  fill: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle.draft {
+  fill: #ffffff;
+  stroke: #d97a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle.draft.first {
+  fill: #d97a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.taken {
+  fill: rgba(11, 114, 185, 0.1);
+  stroke: #0b72b9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.taken.highlight {
+  fill: rgba(11, 114, 185, 0.22);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview path.taken.draft {
+  fill: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle.draft.lasso {
+  stroke: #0b72b9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-trace-preview circle.draft.lasso.first {
+  fill: #0b72b9;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-plate {

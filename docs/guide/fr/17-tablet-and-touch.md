@@ -26,7 +26,7 @@ Sans touche Maj, {{ui:contextMenu.selectMultiple}} dans le menu de l'appui long 
 
 ## Tourner et zoomer la vue
 
-Un doigt sur l'espace vide tourne la vue, deux doigts la zooment et la déplacent. Un doigt qui commence sur un corps travaille sur le corps, pas sur la vue. Si vous préférez qu'il tourne la vue, activez {{ui:camera.touchRotate}} dans la barre de la caméra : un doigt tourne alors la vue au lieu de sélectionner, où qu'il commence. Ce commutateur n'apparaît que sur un appareil à écran tactile.
+Un doigt sur l'espace vide tourne la vue, deux doigts la zooment et la déplacent. Un doigt qui commence sur un corps travaille sur le corps, pas sur la vue. Si vous préférez qu'il tourne la vue, activez {{ui:camera.touchRotate}} dans la barre de vue : un doigt tourne alors la vue au lieu de sélectionner, où qu'il commence. Ce commutateur n'apparaît que sur un appareil à écran tactile.
 
 Le cube de la vue en haut à gauche tourne la vue quand vous le faites glisser, et un toucher sur l'une de ses faces, de ses coins ou de ses arêtes saute vers cette vue. Voir [Vue et plan de travail](chapter:view-and-workplane).
 

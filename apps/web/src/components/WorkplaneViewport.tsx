@@ -7478,7 +7478,9 @@ export function WorkplaneViewport({
   return (
     <main className="workplane-stage">
       <ViewCube getRig={getViewCubeRig} cubeRef={viewCubeRef} />
-      {secondViewWindow ? <SecondViewWindow popup={secondViewWindow} threeRef={threeRef} projectId={projectId} getSelectedIds={getSelectedIds} hasSelection={selectedIds.length > 0} onClosed={closeSecondView} /> : null}
+      {/* An empty design says where to start, and that a tool can be found by its name (31.10.2026). */}
+      {shapes.length === 0 && !pickOnly ? <p className="workplane-empty-hint">{t("editor.emptyHint")}</p> : null}
+      {secondViewWindow ? <SecondViewWindow popup={secondViewWindow} threeRef={threeRef} projectId={projectId} getSelectedIds={getSelectedIds} onClosed={closeSecondView} /> : null}
 
       <div
         ref={cameraBarMove.panelRef}
@@ -7498,8 +7500,10 @@ export function WorkplaneViewport({
               aria-label={t("camera.focusSelection")}
               aria-keyshortcuts="F Shift+F"
               title={t("camera.shortcut", { label: t("camera.focusSelection"), keys: "F" })}
-              disabled={selectedIds.length === 0}
-              onClick={() => focusSelection()}
+              // As F does: with nothing selected the whole scene, never a greyed-out button (#1082).
+              onClick={() => {
+                if (!focusSelection()) resetView();
+              }}
             >
               <Crosshair size={24} strokeWidth={2.25} />
             </button>

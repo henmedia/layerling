@@ -6,7 +6,7 @@ import { t } from "@/lib/i18n";
 import type { MovablePanelOptions, useMovablePanel } from "@/lib/useMovablePanel";
 
 /**
- * The camera bar moves by its first button, which also folds it away: a click folds, a drag moves, a double click puts
+ * The view bar (once the camera bar) moves by its first button, which also folds it away: a click folds, a drag moves, a double click puts
  * the bar back where the stylesheet has it. It stays inside the editor area whole, so none of its buttons is lost.
  */
 export const CAMERA_BAR_PANEL: MovablePanelOptions = {
@@ -27,7 +27,8 @@ export function CameraBarHandle({ move, collapsed, onToggle }: { move: ReturnTyp
   return (
     <div
       className="camera-controls-handle"
-      title={`${collapsed ? t("camera.showShort") : t("camera.hideShort")} - ${t("camera.moveHint")}`}
+      // The bar's name, so the word the guide and the forum use can be found in the editor (#1080).
+      title={`${t("camera.controls")}: ${collapsed ? t("camera.showShort") : t("camera.hideShort")} - ${t("camera.moveHint")}`}
       {...move.handleProps}
       onPointerDownCapture={(event) => { pressRef.current = { x: event.clientX, y: event.clientY }; }}
       onClick={(event) => {

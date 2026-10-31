@@ -167,7 +167,8 @@ import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { sketchBodyStretch, stretchedSketchProfile } from "@/lib/sketchResize";
 import { silhouetteSketchProfile } from "@/lib/sketchCadProfile";
 import { svgSketchMatchesMesh } from "@/lib/svgSketch";
-import { imageTraceProfile, sketchTraceOfImage, type ImageTraceOptions } from "@/lib/sketchImageTrace";
+import { imageTraceProfile, sketchGeometryFromTrace, type TracedSize } from "@/lib/sketchImageTrace";
+import type { PictureTrace } from "@/lib/pictureTrace";
 import type { RasterPart } from "@/lib/rasterTrace";
 import { DEFAULT_SKETCH_STROKE, normalizeSketchStroke, strokedSketchProfile } from "@/lib/sketchStroke";
 import { bottomCadModifierEdgeIds, horizontalCadModifierEdgeIds, topCadModifierEdgeIds, verticalCadModifierEdgeIds } from "@/lib/topEdges";
@@ -5269,24 +5270,18 @@ export function LayerlingEditor({
     setSketchSelection(null);
   }, [commitSketchProfile, sketchProfile]);
 
-  // Tracing the reference image (#1060): its dark or light part becomes sketch lines on the picture, selected,
-  // so Delete takes them away again to try another threshold.
-  const traceSketchImage = useCallback(async (id: string, options: ImageTraceOptions) => {
+  // Trace (#1060): the reference image's outlines become sketch points on the picture, one step to undo, and stay selected to move or scale them.
+  const traceSketchImage = useCallback((id: string, trace: PictureTrace, size: TracedSize) => {
     const image = (sketchProfile.images ?? []).find((entry) => entry.id === id);
-    if (!image) return;
-    try {
-      const pixels = await picturePixels(image.dataUrl);
-      const { points, segments, outlines } = sketchTraceOfImage(image, pixels, options, createLocalId("trace"));
-      commitSketchProfile({
-        ...sketchProfile,
-        points: [...sketchProfile.points, ...points],
-        segments: [...sketchProfile.segments, ...segments],
-      }, t("status.sketchImageTraced", { outlines, lines: segments.length }));
-      setSketchSelection({ kind: "multiple", pointIds: points.map((point) => point.id), segmentIds: segments.map((segment) => segment.id), imageIds: [] });
-      setSketchActivePointId(null);
-    } catch (error) {
-      setNotice(localizedError(error instanceof Error ? error.message : String(error)), true);
-    }
+    if (!image || !trace.rings.length) return;
+    const { points, segments } = sketchGeometryFromTrace(trace, image, size, createLocalId);
+    commitSketchProfile({
+      ...sketchProfile,
+      points: [...sketchProfile.points, ...points],
+      segments: [...sketchProfile.segments, ...segments],
+    }, t("status.sketchImageTraced", { outlines: trace.rings.length, lines: segments.length }));
+    setSketchSelection({ kind: "multiple", pointIds: points.map((point) => point.id), segmentIds: segments.map((segment) => segment.id), imageIds: [] });
+    setSketchActivePointId(null);
   }, [commitSketchProfile, sketchProfile]);
 
   const addSketchImageFile = useCallback(async (file: File) => {
@@ -14496,6 +14491,13 @@ export function LayerlingEditor({
         canModifySelection={hasSelection && !selectionLocked}
         hasClipboard={clipboard.length > 0 || systemClipboardSupported}
         hasSelection={hasSelection}
+        selectionFacts={{
+          count: selectedShapes.length,
+          locked: selectionLocked,
+          hasGroup: selectedShapes.some((shape) => Boolean(shape.groupedShapes?.length) || wasGroupBeforeEdgeTreatments(shape)),
+          isMesh: selectedShapes.length === 1 && offersMeshSimplify(selectedShape),
+          loftable: canSketchLoft(selectedShapes),
+        }}
         hiddenShapeCount={shapes.filter((shape) => shape.hidden).length}
         selectionHidden={hasSelection && selectedShapes.every((shape) => shape.hidden)}
         alignMode={alignMode}
@@ -14751,8 +14753,8 @@ export function LayerlingEditor({
               setNotice(t("status.sketchImageSelected"));
             }}
             onUpdateImage={updateSketchImage}
-            onTraceImage={traceSketchImage}
             onDeleteImage={deleteSketchImage}
+            onTraceImage={traceSketchImage}
             onDeletePoint={deleteSketchPoint}
             onDeleteSegment={deleteSketchSegment}
             onMovePoint={moveSketchPoint}

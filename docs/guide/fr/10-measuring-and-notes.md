@@ -7,7 +7,7 @@ Pour construire une pièce avec précision, vous devez mesurer. layerling dispos
 
 ## Le mètre ruban
 
-Le ruban à mesurer se trouve à l'extrémité inférieure de la barre de la caméra, sur le bord gauche ({{ui:camera.tapeTools}}). Il mesure les distances entre les coins, les arêtes et les faces. Un clic dessus ouvre cinq boutons. S'ils couvrent ce que vous souhaitez mesurer, faites-les glisser par la poignée de gauche n'importe où sur le plan de travail ; un double-clic sur la poignée les remet :
+Le ruban à mesurer se trouve à l'extrémité inférieure de la barre de vue, sur le bord gauche ({{ui:camera.tapeTools}}). Il mesure les distances entre les coins, les arêtes et les faces. Un clic dessus ouvre cinq boutons. S'ils couvrent ce que vous souhaitez mesurer, faites-les glisser par la poignée de gauche n'importe où sur le plan de travail ; un double-clic sur la poignée les remet :
 
 ![Le mètre ruban avec ses boutons : ajouter une mesure, déplacer des points de mesure, supprimer une mesure, des bords entiers, supprimer toutes les mesures.](shot:tape-menu)
 
@@ -27,7 +27,7 @@ Vous récupérez le {{ui:shape.ruler}} dans la bibliothèque de formes. Il s'agi
 
 ## Le carré de cadrage
 
-Parfois, il est préférable de mesurer à angle droit. Cliquez sur {{ui:camera.cornerRulerTool}} dans la barre de caméra puis sur le plan de travail. Un carré d'encadrement à deux bras à angle droit, avec des graduations comme un carré d'essai, y est placé. Il n'a pas non plus de corps propre. Cliquez près du coin d'un corps et son coin s'accroche exactement là.
+Parfois, il est préférable de mesurer à angle droit. Cliquez sur {{ui:camera.cornerRulerTool}} dans la barre de vue puis sur le plan de travail. Un carré d'encadrement à deux bras à angle droit, avec des graduations comme un carré d'essai, y est placé. Il n'a pas non plus de corps propre. Cliquez près du coin d'un corps et son coin s'accroche exactement là.
 
 Le carré d'encadrement repose sur le plan de travail. Si cela se trouve sur le côté d'un corps, le carré se trouve également de ce côté, voir [Vue et plan de travail](chapter:view-and-workplane). C'est ainsi que vous cotez sur un mur vertical : placez le plan de travail sur le mur, placez le carré dans son coin supérieur gauche et cliquez sur la poignée jusqu'à ce que les bras pointent vers la droite et le bas.
 
@@ -90,4 +90,4 @@ Une image de référence est une image sur laquelle aligner des pièces : posez 
 - {{ui:referenceImage.calibrate}} lui donne sa vraie taille, comme dans l'esquisse : cliquez sur deux points de l'image dont vous connaissez la distance réelle - deux trous de fixation de la carte, par exemple - et saisissez cette distance dans {{ui:referenceImage.distance}}. L'image garde ses proportions et son milieu.
 - Verrouillez-la avec le cadenas dans l'en-tête de ses réglages, et elle reste en place : les clics la traversent alors jusqu'au plateau. Choisissez-la dans la liste des objets pour la déverrouiller.
 - L'image est enregistrée une fois dans le fichier du projet, quel que soit le nombre de copies ou d'annulations. Une grande image grossit le fichier d'autant ; le message à l'ajout indique sa taille.
-- Une IA en ajoute une, la déplace, la calibre, l'estompe et la verrouille avec `layerling_reference_image`. Avec `trace`, elle vectorise l'image en un corps d'esquisse posé dessus, comme {{ui:sketch.traceImageButton}} dans l'esquisse.
+- Une IA en ajoute une, la déplace, la calibre, l'estompe et la verrouille avec `layerling_reference_image`. Avec `trace`, elle vectorise l'image en un corps d'esquisse posé dessus, comme {{ui:sketch.traceImage}} dans l'esquisse.

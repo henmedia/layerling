@@ -7,7 +7,7 @@ Aby zbudować część dokładnie, trzeba mierzyć. layerling ma do tego kilka n
 
 ## Narzędzie Zmierz
 
-Narzędzie Zmierz jest na dolnym końcu paska kamery przy lewej krawędzi ({{ui:camera.tapeTools}}). Mierzy odległości między narożnikami, krawędziami i ścianami. Kliknięcie go otwiera pięć przycisków. Jeśli zasłaniają to, co chcesz zmierzyć, przeciągnij je za uchwyt po lewej w dowolne miejsce na płaszczyźnie roboczej. Dwukrotne kliknięcie uchwytu odkłada je na miejsce:
+Narzędzie Zmierz jest na dolnym końcu paska widoku przy lewej krawędzi ({{ui:camera.tapeTools}}). Mierzy odległości między narożnikami, krawędziami i ścianami. Kliknięcie go otwiera pięć przycisków. Jeśli zasłaniają to, co chcesz zmierzyć, przeciągnij je za uchwyt po lewej w dowolne miejsce na płaszczyźnie roboczej. Dwukrotne kliknięcie uchwytu odkłada je na miejsce:
 
 ![Narzędzie Zmierz z przyciskami: dodaj pomiar, przesuń punkty pomiaru, usuń pomiar, całe krawędzie, usuń wszystkie pomiary.](shot:tape-menu)
 
@@ -27,7 +27,7 @@ Narzędzie Zmierz jest na dolnym końcu paska kamery przy lewej krawędzi ({{ui:
 
 ## Kątownik
 
-Czasem lepiej mierzyć pod kątem prostym. Kliknij {{ui:camera.cornerRulerTool}} na pasku kamery, a potem płaszczyznę roboczą. Zostanie tam położony kątownik z dwoma ramionami pod kątem prostym, z podziałką jak na kątowniku stolarskim. On też nie ma własnej bryły. Kliknij blisko narożnika bryły, a jego narożnik przyciągnie się dokładnie tam. Projekt zachowuje kątownik tam, gdzie go ustawiłeś, także w zapisanym pliku .lyl: po ponownym otwarciu projektu jest w tym samym miejscu, tak samo obrócony i mierzy od tych samych punktów, dopóki go nie usuniesz.
+Czasem lepiej mierzyć pod kątem prostym. Kliknij {{ui:camera.cornerRulerTool}} na pasku widoku, a potem płaszczyznę roboczą. Zostanie tam położony kątownik z dwoma ramionami pod kątem prostym, z podziałką jak na kątowniku stolarskim. On też nie ma własnej bryły. Kliknij blisko narożnika bryły, a jego narożnik przyciągnie się dokładnie tam. Projekt zachowuje kątownik tam, gdzie go ustawiłeś, także w zapisanym pliku .lyl: po ponownym otwarciu projektu jest w tym samym miejscu, tak samo obrócony i mierzy od tych samych punktów, dopóki go nie usuniesz.
 
 Kątownik leży na płaszczyźnie roboczej. Jeśli ta leży na boku bryły, kątownik też leży na tym boku, zobacz [Widok i płaszczyzna robocza](chapter:view-and-workplane). Tak wymiarujesz na pionowej ściance: połóż płaszczyznę roboczą na ściance, postaw kątownik w jej lewym górnym narożniku i klikaj uchwyt, aż ramiona wskażą w prawo i w dół.
 
@@ -92,4 +92,4 @@ Obraz referencyjny to obraz, do którego wyrównujesz części: połóż zdjęci
 - {{ui:referenceImage.calibrate}} nadaje mu prawdziwy rozmiar, jak w szkicu: kliknij dwa punkty na obrazie, których rzeczywistą odległość znasz - na przykład dwa otwory montażowe płytki - i wpisz tę odległość w {{ui:referenceImage.distance}}. Obraz zachowuje proporcje i środek.
 - Zablokuj go kłódką w nagłówku jego ustawień, a zostanie na miejscu: kliknięcia przechodzą przez niego na płytę. Wybierz go na liście obiektów, aby go odblokować.
 - Obraz jest zapisany w pliku projektu tylko raz, niezależnie od tego, ile razy go skopiujesz lub cofniesz. Duży obraz powiększa plik o tyle samo; komunikat przy dodawaniu podaje jego rozmiar.
-- AI dodaje, przesuwa, kalibruje, rozjaśnia i blokuje go za pomocą `layerling_reference_image`. Z `trace` obrysowuje obraz w bryłę szkicu stojącą na nim, jak {{ui:sketch.traceImageButton}} w szkicu.
+- AI dodaje, przesuwa, kalibruje, rozjaśnia i blokuje go za pomocą `layerling_reference_image`. Z `trace` obrysowuje obraz w bryłę szkicu stojącą na nim, jak {{ui:sketch.traceImage}} w szkicu.

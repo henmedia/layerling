@@ -216,7 +216,7 @@ De snelste manier is één enkel commando:
 docker run -d --name layerling -p 3000:3000 -v layerling-thumbnails:/app/.codex/project-thumbnails --restart unless-stopped ghcr.io/henmedia/layerling:latest
 ```
 
-Op een NAS met een containerbeheerder (Synology Container Manager, Unraid, Portainer) zoek je `henmedia/layerling` op in het register (Docker Hub) of vul je `henmedia/layerling:latest` in, en koppel je poort 3000. Om bij te werken haal je de image opnieuw op en maak je de container opnieuw aan (of laat je Watchtower dat doen).
+Op een NAS met een containerbeheerder (Synology Container Manager, Unraid, Portainer) zoek je `henmedia/layerling` op in het register (Docker Hub) of vul je `henmedia/layerling:latest` in, en koppel je poort 3000. Om bij te werken haal je de image opnieuw op en maak je de container opnieuw aan (of laat je Watchtower dat doen). Op **Unraid** staat layerling ook in de app-store (Community Applications): zoek op “Layerling” en installeer het met een paar klikken; het sjabloon van [jbat66](https://github.com/jbat66/unraid-templates) zet de opslag op de server meteen op een Unraid-share.
 
 De image-tags zijn kale versienummers **zonder "v"**: `ghcr.io/henmedia/layerling:1.42.0`, terwijl de GitHub-release `v1.42.0` heet. Een pull haalt alleen de nieuwe image op; een container die al bestaat blijft de oude draaien tot hij verwijderd en opnieuw aangemaakt wordt:
 

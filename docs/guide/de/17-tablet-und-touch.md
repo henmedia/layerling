@@ -28,7 +28,7 @@ Im selben Menü steht {{ui:contextMenu.carry}}, die Taste [[C]] für den Touchsc
 
 ## Ansicht drehen und zoomen
 
-Ein Finger auf der leeren Fläche dreht die Ansicht, zwei Finger zoomen und verschieben sie. Ein Finger, der auf einem Körper beginnt, arbeitet am Körper, nicht an der Ansicht. Soll er lieber die Ansicht drehen, schalte {{ui:camera.touchRotate}} in der Kameraleiste ein: Ein Finger dreht dann die Ansicht statt zu wählen, wo er auch beginnt. Der Schalter erscheint nur auf einem Gerät mit Touchscreen.
+Ein Finger auf der leeren Fläche dreht die Ansicht, zwei Finger zoomen und verschieben sie. Ein Finger, der auf einem Körper beginnt, arbeitet am Körper, nicht an der Ansicht. Soll er lieber die Ansicht drehen, schalte {{ui:camera.touchRotate}} in der Ansichtsleiste ein: Ein Finger dreht dann die Ansicht statt zu wählen, wo er auch beginnt. Der Schalter erscheint nur auf einem Gerät mit Touchscreen.
 
 Der Ansichtswürfel oben links dreht die Ansicht, wenn du ihn ziehst, und ein Tipp auf eine seiner Seiten, Ecken oder Kanten springt in diese Ansicht. Siehe [Ansicht und Arbeitsebene](chapter:ansicht-und-arbeitsebene).
 

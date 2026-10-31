@@ -26,7 +26,7 @@ Brez tipke Shift naredi {{ui:contextMenu.selectMultiple}} v meniju dolgega priti
 
 ## Vrtenje in približevanje pogleda
 
-En prst na praznem mestu vrti pogled, dva prsta ga približujeta in premikata. Prst, ki se začne na telesu, dela s telesom, ne s pogledom. Če želite, da namesto tega vrti pogled, vklopite {{ui:camera.touchRotate}} v vrstici kamere: en prst potem vrti pogled namesto izbiranja, kjerkoli se začne. To stikalo se pokaže samo na napravi z zaslonom na dotik.
+En prst na praznem mestu vrti pogled, dva prsta ga približujeta in premikata. Prst, ki se začne na telesu, dela s telesom, ne s pogledom. Če želite, da namesto tega vrti pogled, vklopite {{ui:camera.touchRotate}} v vrstici pogleda: en prst potem vrti pogled namesto izbiranja, kjerkoli se začne. To stikalo se pokaže samo na napravi z zaslonom na dotik.
 
 Kocka pogleda zgoraj levo vrti pogled, če jo vlečete, tap na eno od njenih stranic, vogalov ali robov pa skoči na ta pogled. Glejte [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina).
 

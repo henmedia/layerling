@@ -7,7 +7,7 @@ Per costruire un pezzo con precisione, devi poterlo misurare. layerling offre di
 
 ## Il metro a nastro
 
-Il metro a nastro si trova in fondo alla barra della telecamera, sul bordo sinistro ({{ui:camera.tapeTools}}). Misura la distanza tra angoli, spigoli e facce. Facendo clic si apre una serie di sei pulsanti. Se coprono la zona che vuoi misurare, trascinali dalla maniglia a sinistra e spostali sul piano di lavoro; un doppio clic sulla maniglia li riporta al loro posto:
+Il metro a nastro si trova in fondo alla barra della vista, sul bordo sinistro ({{ui:camera.tapeTools}}). Misura la distanza tra angoli, spigoli e facce. Facendo clic si apre una serie di sei pulsanti. Se coprono la zona che vuoi misurare, trascinali dalla maniglia a sinistra e spostali sul piano di lavoro; un doppio clic sulla maniglia li riporta al loro posto:
 
 ![Il metro a nastro con i pulsanti: aggiungi misura, sposta i punti di misurazione, rimuovi misura, misura spigoli interi, elimina tutte le misure.](shot:tape-menu)
 
@@ -27,7 +27,7 @@ Seleziona {{ui:shape.ruler}} nella libreria delle forme. È solo uno strumento d
 
 ## La squadra
 
-A volte è più semplice misurare perpendicolarmente. Fai clic su {{ui:camera.cornerRulerTool}} nella barra della telecamera, poi sul piano di lavoro. Qui viene posizionata una squadra con due bracci ad angolo retto e tacche come quelle di una squadra da falegname. Anche la squadra non è un corpo vero e proprio. Fai clic vicino all’angolo di un corpo e l’angolo della squadra vi si aggancia con precisione.
+A volte è più semplice misurare perpendicolarmente. Fai clic su {{ui:camera.cornerRulerTool}} nella barra della vista, poi sul piano di lavoro. Qui viene posizionata una squadra con due bracci ad angolo retto e tacche come quelle di una squadra da falegname. Anche la squadra non è un corpo vero e proprio. Fai clic vicino all’angolo di un corpo e l’angolo della squadra vi si aggancia con precisione.
 
 La squadra poggia sul piano di lavoro. Se questo si trova sul lato di un corpo, anche la squadra si appoggia a quel lato; vedi [Vista e piano di lavoro](chapter:view-and-workplane). Così puoi quotare una parete verticale: posiziona il piano di lavoro sulla parete, metti la squadra nell’angolo superiore sinistro e fai clic sulla maniglia finché i bracci puntano a destra e verso il basso.
 
@@ -82,7 +82,7 @@ Un’immagine di riferimento è una fotografia da usare per allineare le parti: 
 - {{ui:referenceImage.calibrate}} imposta la dimensione reale, come nello schizzo: fai clic su due punti dell’immagine di cui conosci la distanza reale, per esempio due fori di fissaggio della scheda, poi inseriscila in {{ui:referenceImage.distance}}. L’immagine mantiene le proporzioni e il centro.
 - Blocca l’immagine con il lucchetto nell’intestazione delle sue impostazioni: resterà ferma e i clic passeranno attraverso di essa fino alla piastra. Per sbloccarla, selezionala nell’elenco degli oggetti.
 - L’immagine viene salvata una sola volta nel file del progetto, anche se la copi o annulli l’operazione più volte. Un’immagine grande aumenta il file della stessa quantità; il messaggio che appare quando la aggiungi ne indica la dimensione.
-- Un sistema di IA può aggiungere, spostare, calibrare, rendere trasparente e bloccare un’immagine con `layerling_reference_image`. Con `trace` ricalca l'immagine in un corpo di schizzo appoggiato sopra, come {{ui:sketch.traceImageButton}} nello schizzo.
+- Un sistema di IA può aggiungere, spostare, calibrare, rendere trasparente e bloccare un’immagine con `layerling_reference_image`. Con `trace` ricalca l'immagine in un corpo di schizzo appoggiato sopra, come {{ui:sketch.traceImage}} nello schizzo.
 
 ## Punti di riferimento
 

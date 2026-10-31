@@ -16,7 +16,7 @@ Het veld bovenin het venster doorzoekt de lijst: het houdt alleen de sneltoetsen
 Kun je een gereedschap niet vinden? Druk op [[Ctrl]]+[[K]] of klik op het vergrootglas in het gebied {{ui:editor.group.help}} en typ wat je zoekt: een gereedschap ("afronding", "spiegelen"), een vorm ("cilinder") of een opdracht ("exporteren", "ongedaan maken"). Kies met de pijltjestoetsen en druk op [[Enter]], of klik op het item.
 
 - De zoekfunctie begrijpt naast het Nederlandse woord ook het Engelse en het Duitse, en negeert hoofdletters en umlauts: "aushoehlen" vindt {{ui:editor.tool.hollow}}.
-- Elk item toont de toetsen die hetzelfde doen en het gebied van de werkbalk waarin het staat, zodat je leert waar het zit.
+- Elk item toont de toetsen die hetzelfde doen en de groep van het lint waarin het staat, zodat je leert waar het zit.
 - Uitgegrijsde items kunnen op dit moment niet worden uitgevoerd, meestal omdat er niets geselecteerd is. Ze blijven in de lijst staan, zodat de zoekfunctie je toch vertelt waar het gereedschap zit.
 
 Ook deze handleiding heeft een zoekveld, bovenaan elke pagina: typ een of twee woorden en het toont de onderdelen waarin ze allemaal voorkomen, met de gevonden woorden gemarkeerd. Klik op een ervan, of druk op [[Enter]] voor het eerste, om er direct heen te springen. De pagina die opent, markeert elke plek waar je woorden staan en scrolt naar de eerste in dat onderdeel; [[Esc]] of een klik op een markering haalt ze weer weg.

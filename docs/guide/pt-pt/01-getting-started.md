@@ -17,12 +17,15 @@ Todos os teus projetos aparecem depois na página inicial com uma imagem de pré
 
 ## Visão geral do editor
 
-![O editor com duas formas no plano de trabalho. O friso no topo, os controlos da câmara à esquerda e as definições da forma selecionada à direita.](shot:editor-overview)
+![O editor com as suas áreas identificadas: o friso no topo, o cubo de vista à esquerda com a barra de vista por baixo, ao lado a mensagem de estado e a lista de objetos, as propriedades da forma selecionada à direita.](shot:editor-areas)
 
-- **No topo** está o friso, organizado por tarefa: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} e {{ui:editor.group.help}}. Passa o ponteiro sobre um ícone para veres o respetivo nome. Sempre que encontrares um pequeno ponto de interrogação, por exemplo nas definições de uma forma, na biblioteca de formas ou nos painéis de ferramentas, podes usá-lo para abrir diretamente o capítulo correspondente deste guia.
+- **No topo** está o friso, organizado por tarefa: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} e {{ui:editor.group.help}}. Passa o ponteiro sobre um ícone para veres o respetivo nome. Sempre que encontrares um pequeno ponto de interrogação, por exemplo nas definições de uma forma, na biblioteca de formas ou nas janelas de ferramentas, podes usá-lo para abrir diretamente o capítulo correspondente deste guia. O grupo {{ui:editor.group.modify}} está dividido em quatro secções, cada uma com o nome por cima das ferramentas: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} e {{ui:editor.section.surface}}. Um ícone a cinzento diz também o que falta, por exemplo {{ui:editor.needs.oneBody}} ou {{ui:editor.needs.locked}}. Não encontras uma ferramenta? Prime [[Ctrl]]+[[K]] e escreve o nome dela; um projeto vazio lembra-te disso na parte de baixo da vista.
 - **Ao centro** está o plano de trabalho. É aqui que colocas as formas, as ajustas e observas o resultado.
-- **À direita** aparecem as definições da forma selecionada: cor, dimensões, posição e outras propriedades da forma. Introduzir valores numéricos é mais preciso do que arrastar.
-- **À esquerda** estão os controlos da câmara, com o cubo de vista por cima. Permitem navegar pela cena. Mais informações em [Vista e plano de trabalho](chapter:view-and-workplane).
+- **À direita** aparecem as **propriedades** da forma selecionada: cor, dimensões, posição e tudo o resto. Introduzir valores numéricos é mais preciso do que arrastar.
+- **À esquerda** está a **barra de vista**, com o **cubo de vista** por cima. Permitem navegar pela cena. Mais informações em [Vista e plano de trabalho](chapter:view-and-workplane).
+- **Ao lado da barra de vista** abre-se a **lista de objetos** ([[Ctrl]]+[[U]]), com todas as formas do projeto.
+- **À direita do cubo de vista** aparece a **mensagem de estado** quando o layerling tem algo para te dizer, por exemplo o que uma ferramenta espera de ti. Quando não há nada a dizer, não aparece.
+- As **janelas de ferramentas** abrem-se sobre o plano de trabalho quando inicias uma ferramenta como {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} ou {{ui:editor.tool.hollow}}. Arrasta-as pela barra de título quando taparem alguma coisa.
 - **Na barra superior** podes alternar entre {{ui:editor.modeGeometry}} e {{ui:editor.modeSketch}}, mudar o nome do projeto e escolher o idioma e o esquema de cores.
 
 ## Os botões à volta da área de trabalho

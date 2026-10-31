@@ -7,7 +7,7 @@ Om een onderdeel precies te bouwen, moet je meten. layerling heeft daar verschil
 
 ## Het meetlint
 
-Het meetlint zit aan de onderkant van de camerabalk aan de linkerrand ({{ui:camera.tapeTools}}). Het meet afstanden tussen hoeken, randen en vlakken. Een klik erop opent vijf knoppen. Zitten die in de weg bij wat je wilt meten, sleep ze dan aan de greep links naar een willekeurige plek op het werkvlak; een dubbelklik op de greep zet ze terug:
+Het meetlint zit aan de onderkant van de weergavebalk aan de linkerrand ({{ui:camera.tapeTools}}). Het meet afstanden tussen hoeken, randen en vlakken. Een klik erop opent vijf knoppen. Zitten die in de weg bij wat je wilt meten, sleep ze dan aan de greep links naar een willekeurige plek op het werkvlak; een dubbelklik op de greep zet ze terug:
 
 ![Het meetlint met zijn knoppen: meting toevoegen, meetpunten verplaatsen, meting verwijderen, hele randen, alle metingen verwijderen.](shot:tape-menu)
 
@@ -27,7 +27,7 @@ De {{ui:shape.ruler}} haal je uit de vormenbibliotheek. Het is puur een meetinst
 
 ## De winkelhaak
 
-Soms meet je beter in een rechte hoek. Klik op {{ui:camera.cornerRulerTool}} in de camerabalk en dan op het werkvlak. Daar wordt een winkelhaak geplaatst met twee armen in een rechte hoek, met maatstreepjes zoals op een blokhaak. Ook die heeft geen eigen lichaam. Klik je dicht bij de hoek van een lichaam, dan klikt zijn hoek precies daar vast.
+Soms meet je beter in een rechte hoek. Klik op {{ui:camera.cornerRulerTool}} in de weergavebalk en dan op het werkvlak. Daar wordt een winkelhaak geplaatst met twee armen in een rechte hoek, met maatstreepjes zoals op een blokhaak. Ook die heeft geen eigen lichaam. Klik je dicht bij de hoek van een lichaam, dan klikt zijn hoek precies daar vast.
 
 De winkelhaak ligt op het werkvlak. Ligt dat op de zijkant van een lichaam, dan ligt de winkelhaak ook op die zijkant, zie [Weergave en werkvlak](chapter:weergave-en-werkvlak). Zo maat je op een verticale wand: zet het werkvlak op de wand, plaats de winkelhaak in de linkerbovenhoek en klik op de greep tot de armen naar rechts en naar beneden wijzen.
 
@@ -90,4 +90,4 @@ Een referentieafbeelding is een afbeelding om onderdelen op uit te lijnen: leg e
 - {{ui:referenceImage.calibrate}} geeft haar haar echte grootte, zoals in de schets: klik op twee punten op de afbeelding waarvan je de werkelijke afstand kent - twee bevestigingsgaten van de printplaat bijvoorbeeld - en typ die afstand bij {{ui:referenceImage.distance}}. De afbeelding houdt haar verhoudingen en haar midden.
 - Vergrendel haar met het slot in de kop van haar instellingen, dan blijft ze liggen: klikken gaan er dan doorheen naar de plaat. Kies haar in de objectlijst om haar te ontgrendelen.
 - De afbeelding staat één keer in het ontwerpbestand, hoe vaak ze ook wordt gekopieerd of ongedaan gemaakt. Een grote afbeelding maakt het bestand zoveel groter; de melding bij het toevoegen noemt haar grootte.
-- Een AI voegt er een toe, verplaatst, kalibreert, vervaagt en vergrendelt haar met `layerling_reference_image`. Met `trace` trekt ze de afbeelding over tot een schetslichaam dat erop staat, zoals {{ui:sketch.traceImageButton}} in de schets.
+- Een AI voegt er een toe, verplaatst, kalibreert, vervaagt en vergrendelt haar met `layerling_reference_image`. Met `trace` trekt ze de afbeelding over tot een schetslichaam dat erop staat, zoals {{ui:sketch.traceImage}} in de schets.

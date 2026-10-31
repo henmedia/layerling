@@ -7,7 +7,7 @@ For at bygge en del præcist skal man måle. layerling har flere værktøjer til
 
 ## Målebåndet
 
-Målebåndet sidder for neden i kamerabjælken ved venstre kant ({{ui:camera.tapeTools}}). Det måler afstande mellem hjørner, kanter og flader. Et klik på den åbner fem knapper. Dækker de det du vil måle, så træk dem i grebet til venstre, et hvilket som helst sted på arbejdsplanet; et dobbeltklik på grebet sætter dem tilbage:
+Målebåndet sidder for neden i visningsbjælken ved venstre kant ({{ui:camera.tapeTools}}). Det måler afstande mellem hjørner, kanter og flader. Et klik på den åbner fem knapper. Dækker de det du vil måle, så træk dem i grebet til venstre, et hvilket som helst sted på arbejdsplanet; et dobbeltklik på grebet sætter dem tilbage:
 
 ![Målebåndet med dets knapper: tilføj mål, flyt målepunkter, fjern mål, hele kanter, slet alle mål.](shot:tape-menu)
 
@@ -30,7 +30,7 @@ Du henter {{ui:shape.ruler}} fra formbiblioteket. Den er rent et måleværktøj:
 
 ## Vinkelmåleren
 
-Nogle gange måler man bedre i en ret vinkel. Klik på {{ui:camera.cornerRulerTool}} i kamerabjælken og derefter på arbejdsplanet. En vinkelmåler med to arme i en ret vinkel, med takker som en vinkelhage, placeres der. Den har heller ingen egen form. Klik tæt på et hjørne af en form, og dens hjørne snapper præcis der. Designet beholder vinkelmåleren, hvor du satte den, også i en gemt LYL-fil: når du åbner designet igen, er den det samme sted, drejet den samme vej og måler fra de samme punkter, indtil du fjerner den.
+Nogle gange måler man bedre i en ret vinkel. Klik på {{ui:camera.cornerRulerTool}} i visningsbjælken og derefter på arbejdsplanet. En vinkelmåler med to arme i en ret vinkel, med takker som en vinkelhage, placeres der. Den har heller ingen egen form. Klik tæt på et hjørne af en form, og dens hjørne snapper præcis der. Designet beholder vinkelmåleren, hvor du satte den, også i en gemt LYL-fil: når du åbner designet igen, er den det samme sted, drejet den samme vej og måler fra de samme punkter, indtil du fjerner den.
 
 Vinkelmåleren ligger på arbejdsplanet. Ligger det på siden af en form, ligger vinkelmåleren også på den side, se [Visning og arbejdsplan](chapter:view-and-workplane). Sådan målsætter du på en lodret væg: læg arbejdsplanet på væggen, placér måleren i dens øverste venstre hjørne og klik håndtaget indtil armene peger til højre og ned.
 
@@ -98,4 +98,4 @@ Et referencebillede er et billede at rette dele ind efter: læg et foto af et pr
 - {{ui:referenceImage.calibrate}} giver det dets rigtige størrelse, som i skitsen: klik på to punkter på billedet, hvis virkelige afstand du kender - f.eks. to monteringshuller på printkortet - og skriv afstanden i {{ui:referenceImage.distance}}. Billedet beholder sine proportioner og sin midte.
 - Lås det med låsen i overskriften af dets indstillinger, så bliver det liggende: klik går så igennem det til pladen. Vælg det i objektlisten for at låse det op.
 - Billedet gemmes kun én gang i designfilen, uanset hvor ofte det kopieres eller fortrydes. Et stort billede gør filen tilsvarende større; beskeden, når du tilføjer det, siger hvor stort det er.
-- En AI tilføjer, flytter, kalibrerer, falmer og låser et med `layerling_reference_image`. Med `trace` optegner den billedet til et skitselegeme, der står på det, som {{ui:sketch.traceImageButton}} i skitsen.
+- En AI tilføjer, flytter, kalibrerer, falmer og låser et med `layerling_reference_image`. Med `trace` optegner den billedet til et skitselegeme, der står på det, som {{ui:sketch.traceImage}} i skitsen.

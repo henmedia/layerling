@@ -14,11 +14,11 @@ Gli spigoli vivi raramente stanno bene su un pezzo stampato e non sono particola
 
 ![Lo strumento “Raccorda spigoli”: sono selezionati tutti gli spigoli vivi e l’anteprima mostra un raggio di 4 mm.](shot:fillet-preview)
 
-Il pannello si trova in alto a destra. Se copre gli spigoli che vuoi selezionare, spostalo trascinando la barra del titolo; la prossima volta si aprirà nello stesso punto. Lo stesso vale per {{ui:editor.tool.hollow}} e {{ui:editor.tool.array}}. Fai doppio clic sulla barra del titolo per riportarlo nella posizione iniziale.
+La finestra dello strumento si trova in alto a destra. Se copre gli spigoli che vuoi selezionare, spostala trascinando la barra del titolo; la prossima volta si aprirà nello stesso punto. Lo stesso vale per {{ui:editor.tool.hollow}} e {{ui:editor.tool.array}}. Fai doppio clic sulla barra del titolo per riportarlo nella posizione iniziale.
 
-Se, mentre il pannello è aperto, scegli una forma dalla libreria, il pannello si chiude senza applicare la modifica e gli spigoli selezionati vengono dimenticati. Il clic inserisce la nuova forma invece di selezionare uno spigolo.
+Se, mentre la finestra è aperta, scegli una forma dalla libreria, la finestra si chiude senza applicare la modifica e gli spigoli selezionati vengono dimenticati. Il clic inserisce la nuova forma invece di selezionare uno spigolo.
 
-Nel pannello trovi:
+Nella finestra trovi:
 
 - {{ui:edge.allSharpEdges}} seleziona tutti gli spigoli in una volta; {{ui:edge.clear}} svuota la selezione.
 - **{{ui:edge.radius}}** imposta il raggio del raccordo. Per lo smusso, imposta {{ui:edge.distance}} oppure {{ui:edge.angle}}.
@@ -29,13 +29,13 @@ Nel pannello trovi:
 - {{ui:edge.bottomEdges}} seleziona solo gli spigoli sul bordo inferiore del corpo, l’opposto di {{ui:edge.topEdges}}. È un modo rapido per arrotondare o smussare solo la base di un pezzo.
 - {{ui:edge.chamfillet}}, selezionato in cima alla finestra dello smusso accanto a {{ui:editor.tool.chamfer}}, crea una base adatta alla stampa: uno smusso sulla piastra che sfuma in modo tangenziale in un raccordo verso la parete. Così i primi strati non hanno bisogno di supporti e il bordo resta morbido. {{ui:edge.distance}} imposta l’altezza occupata dalla base e {{ui:edge.angle}} (da 15° a 75°) l’inclinazione dello smusso sulla piastra. Seleziona gli spigoli con {{ui:edge.bottomEdges}}.
 - {{ui:edge.onlyVisibleEdges}} nasconde gli spigoli sul lato opposto del corpo rispetto alla vista. Inizialmente tutti gli spigoli sono visibili attraverso il corpo, cosa che può confondere nei pezzi complessi; attivando l’opzione puoi vedere e selezionare solo quelli rivolti verso di te. Ruota la vista per raggiungere gli altri. Gli spigoli evidenziati in rosso (vedi sotto) restano sempre visibili.
-- {{ui:edge.tangentChains}} fa sì che un clic selezioni anche gli spigoli che proseguono in modo uniforme, per esempio tutti quelli attorno a una faccia con angoli arrotondati. L’opzione decide solo quali spigoli vengono selezionati con il clic: il kernel CAD estende comunque smussi e raccordi agli spigoli che proseguono senza interruzioni. Il pannello indica quanti altri spigoli vengono coinvolti.
+- {{ui:edge.tangentChains}} fa sì che un clic selezioni anche gli spigoli che proseguono in modo uniforme, per esempio tutti quelli attorno a una faccia con angoli arrotondati. L’opzione decide solo quali spigoli vengono selezionati con il clic: il kernel CAD estende comunque smussi e raccordi agli spigoli che proseguono senza interruzioni. La finestra indica quanti altri spigoli vengono coinvolti.
 - {{ui:edge.keepSize}} mantiene inalterata la dimensione dello smusso o del raccordo anche se in seguito ridimensioni il corpo.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} o {{ui:edge.fine}}) regola il livello di dettaglio dell’anteprima. Per i pezzi complessi, {{ui:edge.draft}} è più veloce.
 
 Mentre modifichi la dimensione, layerling ricalcola l’anteprima. Può volerci qualche istante; puoi continuare a cambiare i valori e verrà calcolato quello scelto per ultimo.
 
-Se la dimensione è eccessiva per lo spigolo, layerling te lo segnala e suggerisce un valore più piccolo. Spesso basta ridurlo di uno o due millimetri. Con angoli molto acuti, un raccordo richiede più spazio di quanto suggerisca il suo raggio. Sugli schermi piccoli, il pannello scorre automaticamente verso il basso per mostrare il messaggio.
+Se la dimensione è eccessiva per lo spigolo, layerling te lo segnala e suggerisce un valore più piccolo. Spesso basta ridurlo di uno o due millimetri. Con angoli molto acuti, un raccordo richiede più spazio di quanto suggerisca il suo raggio. Sugli schermi piccoli, la finestra scorre automaticamente verso il basso per mostrare il messaggio.
 
 Se una selezione che funzionava smette di funzionare quando aggiungi un altro spigolo, quello spigolo diventa rosso e viene disegnato più largo: con la dimensione impostata non è possibile lavorarlo insieme agli altri. Fai di nuovo clic per rimuoverlo oppure riduci la dimensione. Se selezioni altri spigoli mentre il messaggio è visibile, il primo resta rosso. Se invece non c’è una selezione precedente che funziona — per esempio al primo clic o dopo aver aumentato la dimensione — diventano rossi gli spigoli che non possono essere lavorati neppure da soli, oppure tutti se il problema è la loro combinazione.
 
@@ -45,7 +45,7 @@ Anche un foro accetta {{ui:editor.tool.chamfer}} e {{ui:editor.tool.fillet}}, co
 
 ### Annullare un trattamento degli spigoli
 
-Puoi sempre modificare di nuovo un corpo su cui hai applicato uno strumento per gli spigoli. Selezionalo e apri Raccordo, Smusso o Svuota: in ciascuno trovi l’elenco dei trattamenti già applicati sotto {{ui:edge.featureHistory}}. {{ui:edge.revertAction}} annulla un singolo trattamento. Se sopra ce ne sono di più recenti, verranno annullati insieme; il pannello ti indica quanti.
+Puoi sempre modificare di nuovo un corpo su cui hai applicato uno strumento per gli spigoli. Selezionalo e apri Raccordo, Smusso o Svuota: in ciascuno trovi l’elenco dei trattamenti già applicati sotto {{ui:edge.featureHistory}}. {{ui:edge.revertAction}} annulla un singolo trattamento. Se sopra ce ne sono di più recenti, verranno annullati insieme; la finestra ti indica quanti.
 
 Accanto a uno smusso, un raccordo o uno svuotamento trovi anche {{ui:edge.editAction}}. Annulla il trattamento allo stesso modo, ma riapre subito lo strumento con gli stessi spigoli e il valore precedente. Puoi cambiare il valore e applicarlo di nuovo: per esempio, portare un raccordo da 3 mm a 5 mm senza riselezionare gli spigoli. Anche in questo caso vengono annullati i trattamenti successivi. Questo vale per i trattamenti degli spigoli che applichi da ora in poi; quelli precedenti permettono solo di essere annullati, così come i trattamenti applicati alle singole parti di un gruppo.
 
@@ -61,11 +61,11 @@ Scatole, tazze, involucri e coperchi hanno una caratteristica in comune: sono vu
 
 1. Seleziona il corpo e fai clic su {{ui:editor.tool.hollow}}, oppure fai clic destro sul corpo e scegli il comando dal menu.
 2. Imposta {{ui:shell.wall}}.
-3. In {{ui:shell.openings}}, attiva i lati che vuoi lasciare aperti: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} o {{ui:shell.side.right}}, anche più di uno. Solo {{ui:shell.side.front}} crea un’apertura per un cassetto; {{ui:shell.side.left}} e {{ui:shell.side.right}} creano un tunnel. Se non attivi nessun lato, il corpo resta chiuso su tutti i lati con una cavità al centro. {{ui:shell.side.closed}} disattiva tutti i lati con un clic. {{ui:shell.side.top}} è già attivo quando si apre il pannello; facendo clic lo disattivi e richiudi la parte superiore. Un corpo chiuso su tutti i lati appare invariato dall’esterno: la vista in sezione mostra la cavità.
+3. In {{ui:shell.openings}}, attiva i lati che vuoi lasciare aperti: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} o {{ui:shell.side.right}}, anche più di uno. Solo {{ui:shell.side.front}} crea un’apertura per un cassetto; {{ui:shell.side.left}} e {{ui:shell.side.right}} creano un tunnel. Se non attivi nessun lato, il corpo resta chiuso su tutti i lati con una cavità al centro. {{ui:shell.side.closed}} disattiva tutti i lati con un clic. {{ui:shell.side.top}} è già attivo quando si apre la finestra; facendo clic lo disattivi e richiudi la parte superiore. Un corpo chiuso su tutti i lati appare invariato dall’esterno: la vista in sezione mostra la cavità.
 4. Scegli se gli {{ui:shell.edges}} devono essere {{ui:shell.edges.round}} oppure {{ui:shell.edges.sharp}}.
 5. Fai clic su {{ui:shell.apply}}.
 
-![Il pannello Svuota, con lo spessore della parete, un interruttore per ogni lato da lasciare aperto e le opzioni per gli spigoli interni.](shot:hollow-panel)
+![La finestra Svuota, con lo spessore della parete, un interruttore per ogni lato da lasciare aperto e le opzioni per gli spigoli interni.](shot:hollow-panel)
 
 Le pareti si sviluppano verso l’interno. L’esterno resta invariato.
 
@@ -110,14 +110,14 @@ Ogni faccia di un corpo può essere spostata della stessa distanza, verso l'este
 
 Spunta {{ui:offset.sideways}} quando deve crescere o restringersi solo il contorno: i lati si spostano della distanza, mentre ogni faccia piana sopra e sotto resta alla sua altezza. Un'insegna riceve un bordo tutto intorno, una base si allarga e il corpo non diventa più alto. In un corpo a gradini ogni gradino mantiene la propria altezza. Anche un testo spostato tramite i suoi contorni mantiene allora la sua altezza.
 
-Senza la spunta viene spostato il corpo stesso. Diventa un corpo esatto fisso, come dopo uno smusso: l'elenco in alto nel pannello annulla l'offset e {{ui:edge.editAction}} riapre lo strumento con la distanza precedente. Si possono spostare solo corpi CAD esatti - scatole, cilindri e le altre forme, i loro gruppi, parti STEP importate. Un corpo che è solo una maglia di triangoli, come molte importazioni STL, spesso non può. Una distanza troppo grande per il corpo, ad esempio una riduzione oltre la parete più sottile, viene rifiutata.
+Senza la spunta viene spostato il corpo stesso. Diventa un corpo esatto fisso, come dopo uno smusso: l'elenco in alto nella finestra annulla l'offset e {{ui:edge.editAction}} riapre lo strumento con la distanza precedente. Si possono spostare solo corpi CAD esatti - scatole, cilindri e le altre forme, i loro gruppi, parti STEP importate. Un corpo che è solo una maglia di triangoli, come molte importazioni STL, spesso non può. Una distanza troppo grande per il corpo, ad esempio una riduzione oltre la parete più sottile, viene rifiutata.
 
 ## Eliminare facce
 
 Un raccordo che intralcia, un foro nel posto sbagliato o una sporgenza che non serve più: {{ui:editor.tool.deleteFace}} rimuove queste parti dal corpo senza ricostruirlo da zero.
 
 1. Seleziona il corpo e fai clic su {{ui:editor.tool.deleteFace}}, oppure fai clic destro sul corpo e scegli il comando dal menu.
-2. Fai clic su tutte le facce della parte da eliminare: quelle di uno spigolo arrotondato, la parete di un foro oppure il lato e la sommità di una sporgenza. Le facce selezionate si illuminano; un altro clic le deseleziona. Il pannello mostra il numero di facce selezionate.
+2. Fai clic su tutte le facce della parte da eliminare: quelle di uno spigolo arrotondato, la parete di un foro oppure il lato e la sommità di una sporgenza. Le facce selezionate si illuminano; un altro clic le deseleziona. La finestra mostra il numero di facce selezionate.
 3. Fai clic su {{ui:deleteFace.apply}} o premi [[Delete]]. [[Esc]] chiude lo strumento senza modificare nulla.
 
 Le facce attorno a quelle eliminate si estendono fino a chiudere il vuoto. Una scatola con i bordi superiori arrotondati riacquista gli spigoli vivi; un foro viene riempito e una sporgenza scompare. Il corpo resta una geometria esatta: puoi applicare di nuovo raccordi e smussi e l’esportazione STEP ne conserva le facce reali. [[Ctrl]]+[[Z]] annulla l’eliminazione in un solo passaggio. L’operazione compare anche in {{ui:edge.featureHistory}} insieme a raccordi e smussi; {{ui:edge.revertAction}} la annulla. Per questa operazione non è disponibile {{ui:edge.editAction}}. Su un gruppo, il risultato è un corpo unico, come con un trattamento degli spigoli.

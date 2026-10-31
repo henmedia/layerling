@@ -17,12 +17,15 @@ In seguito, tutti i tuoi progetti compariranno nella pagina iniziale con un’im
 
 ## Panoramica dell’editor
 
-![L’editor con due forme sul piano di lavoro. In alto la barra degli strumenti, a sinistra i controlli della vista e a destra le impostazioni della forma selezionata.](shot:editor-overview)
+![L’editor con le sue aree indicate: in alto la barra degli strumenti, a sinistra il cubo di orientamento con sotto la barra della vista, accanto il messaggio di stato e l’elenco degli oggetti, a destra le proprietà della forma selezionata.](shot:editor-areas)
 
-- **In alto** trovi la barra degli strumenti, organizzata per attività: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} e {{ui:editor.group.help}}. Passa il puntatore su un’icona per vederne il nome. I punti interrogativi — per esempio nelle impostazioni di una forma, nella raccolta delle forme o nei pannelli degli strumenti — rimandano direttamente al capitolo pertinente di questa guida.
+- **In alto** trovi la barra degli strumenti, organizzata per attività: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} e {{ui:editor.group.help}}. Passa il puntatore su un’icona per vederne il nome. I punti interrogativi — per esempio nelle impostazioni di una forma, nella raccolta delle forme o nelle finestre degli strumenti — rimandano direttamente al capitolo pertinente di questa guida. Il gruppo {{ui:editor.group.modify}} è diviso in quattro sezioni, ognuna con il suo nome sopra gli strumenti: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} e {{ui:editor.section.surface}}. Un'icona in grigio dice anche che cosa le manca, per esempio {{ui:editor.needs.oneBody}} o {{ui:editor.needs.locked}}. Non trovi uno strumento? Premi [[Ctrl]]+[[K]] e scrivine il nome; un progetto vuoto te lo ricorda in fondo alla vista.
 - **Al centro** si trova il piano di lavoro. Qui posizioni le forme, le modifichi e ne osservi il risultato.
-- **A destra** trovi le impostazioni della forma selezionata: colore, dimensioni, posizione e tutte le altre proprietà. Inserire numeri è più preciso che trascinare.
-- **A sinistra** ci sono i controlli della vista, con il cubo di orientamento sopra di essi. Ti permettono di muoverti nella scena; trovi maggiori informazioni in [Vista e piano di lavoro](chapter:view-and-workplane).
+- **A destra** trovi le **proprietà** della forma selezionata: colore, dimensioni, posizione e tutto il resto. Inserire numeri è più preciso che trascinare.
+- **A sinistra** c’è la **barra della vista**, con il **cubo di orientamento** sopra. Ti permettono di muoverti nella scena; trovi maggiori informazioni in [Vista e piano di lavoro](chapter:view-and-workplane).
+- **Accanto alla barra della vista** si apre l’**elenco degli oggetti** ([[Ctrl]]+[[U]]), con tutte le forme del progetto. Maggiori informazioni in [Selezionare e disporre](chapter:select-and-arrange).
+- **A destra del cubo di orientamento** compare il **messaggio di stato** quando layerling ha qualcosa da dirti, per esempio che cosa si aspetta da te uno strumento. Quando non c’è nulla da dire, non c’è.
+- Le **finestre degli strumenti** si aprono sopra il piano di lavoro quando avvii uno strumento come {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} o {{ui:editor.tool.hollow}}. Spostale dalla barra del titolo quando coprono qualcosa.
 - **In cima alla finestra** puoi passare da {{ui:editor.modeGeometry}} a {{ui:editor.modeSketch}}, rinominare il progetto e scegliere la lingua e il tema.
 
 ## I pulsanti attorno all’area di lavoro

@@ -26,7 +26,7 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 - **剪贴板：**{{ui:editor.tool.copy}}、{{ui:editor.tool.paste}}、{{ui:editor.tool.duplicate}} 和 {{ui:editor.tool.delete}} 作用于选中的点、线和图片，与 3D 编辑器一样；[[Ctrl]]+[[X]] 为剪切。粘贴和复制的几何图形会落在原图形旁边，相隔 10 mm，位于不接触任何现有线条的空位，因此绝不会与已有内容连在一起。它保持选中，可以直接拖到位。
 - **历史记录：**{{ui:sketch.undo}} 和 {{ui:sketch.redo}}。
 - **{{ui:sketch.viewControls}}:** {{ui:editor.tool.note}}（或 [[N]]）在草图上放置备注，与 3D 编辑器中相同：下一次单击即放置备注，可以放在任何位置，也可以放在线条上。拖动图钉可移动备注；单击图钉会收起卡片。草图的备注属于它的实体：在 3D 视图中，它们位于用 {{ui:sketch.extrude}} 或 {{ui:sketch.sweep}} 生成的实体顶面上，以及用 {{ui:sketch.revolve}} 生成的实体所绘制的轮廓上，并随实体一起移动。再次打开草图会显示该实体的所有备注，包括在 3D 中放置的备注。{{ui:sketch.undo}} 会像撤销线条一样撤销备注，{{ui:sketch.cancel}} 会放弃对备注的更改。详见“测量与备注”一章。
-- **视图：**用中键平移，或按住 [[Shift]] 或 [[Ctrl]] 加右键拖动，与 3D 编辑器一样。没有选中任何东西时，[[Ctrl]] 加方向键也能平移视图：每按一次移动画面的十分之一，同时按 [[Shift]] 则为一半，草图按所指的方向移动。[[Home]] 让整个草图适合视图，[[F]] 缩放到选择（没有选中项时缩放到整个草图），[[+]] 和 [[−]] 放大缩小，与 3D 编辑器一样。没有选中项时，双击空白处会平移视图，使该处移到中间，与 3D 编辑器一样；设置中的 {{ui:workspace.doubleClickCentersView}} 可关闭此功能。侧栏上的 {{ui:camera.tapeTools}} 测量两点之间的距离。一选中某个东西，草图就会显示尺寸：一条线的长度，或某个点上与之相交各线的长度。当这些尺寸碍事时，例如在塑造曲线时，侧栏上的 {{ui:sketch.showMeasurements}} 按钮可以隐藏和显示它们；卷尺仍然可用。在直线上可以点击尺寸胶囊框，键入以毫米计的长度；[[Enter]] 应用，[[Esc]] 取消。线条保持方向，起点不动，另一端的线条跟随移动。若选中的是一个端点，则该端点移动。[[Alt]]+[[Enter]] 使线条以中点为心向两侧伸缩。在曲线上，胶囊框只显示长度。
+- **视图：**用中键平移，或按住 [[Shift]] 或 [[Ctrl]] 加右键拖动，与 3D 编辑器一样。没有选中任何东西时，[[Ctrl]] 加方向键也能平移视图：每按一次移动画面的十分之一，同时按 [[Shift]] 则为一半，草图按所指的方向移动。[[Home]] 让整个草图适合视图，[[F]] 缩放到选择（没有选中项时缩放到整个草图），[[+]] 和 [[−]] 放大缩小，与 3D 编辑器一样。没有选中项时，双击空白处会平移视图，使该处移到中间，与 3D 编辑器一样；设置中的 {{ui:workspace.doubleClickCentersView}} 可关闭此功能。草图工具栏上的 {{ui:camera.tapeTools}} 测量两点之间的距离。一选中某个东西，草图就会显示尺寸：一条线的长度，或某个点上与之相交各线的长度。当这些尺寸碍事时，例如在塑造曲线时，草图工具栏上的 {{ui:sketch.showMeasurements}} 按钮可以隐藏和显示它们；卷尺仍然可用。在直线上可以点击尺寸胶囊框，键入以毫米计的长度；[[Enter]] 应用，[[Esc]] 取消。线条保持方向，起点不动，另一端的线条跟随移动。若选中的是一个端点，则该端点移动。[[Alt]]+[[Enter]] 使线条以中点为心向两侧伸缩。在曲线上，胶囊框只显示长度。
 
 只有**闭合**的轮廓才能生成实体。
 
@@ -52,7 +52,7 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 
 移动一个点会改变三个角度：该点本身，以及它两条线远端相邻的两个角。因此 layerling 也显示那两个角，每一个都可以点击并键入。这样就能在选中会随之移动的左上点的情况下，把左下角设为例如 75.5°。这里也能做运算，例如 “90-14.5”。
 
-曲线交汇处，或超过两条线交汇的角点，不显示角度。侧栏上的 {{ui:sketch.showMeasurements}} 按钮会连同长度一起隐藏角度。
+曲线交汇处，或超过两条线交汇的角点，不显示角度。草图工具栏上的 {{ui:sketch.showMeasurements}} 按钮会连同长度一起隐藏角度。
 
 ## 圆角与倒角
 
@@ -113,7 +113,7 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 
 ## 按描边生成
 
-通常，闭合轮廓内部的区域成为实体。用 {{ui:sketch.group.finish}} 区域里的 {{ui:sketch.stroke}}，改为构建线条本身，宽度由你设置。在面板中勾选 {{ui:sketch.strokeOn}}；草图立刻显示结果。
+通常，闭合轮廓内部的区域成为实体。用 {{ui:sketch.group.finish}} 区域里的 {{ui:sketch.stroke}}，改为构建线条本身，宽度由你设置。在描边窗口中勾选 {{ui:sketch.strokeOn}}；草图立刻显示结果。
 
 - **闭合轮廓**变成一个边框。{{ui:sketch.strokeAlign}} 说明壁落在哪里：{{ui:sketch.strokeAlign.center}} 在画的线上，{{ui:sketch.strokeAlign.inside}} 在其内侧，{{ui:sketch.strokeAlign.outside}} 在其外侧。外侧对齐在留公差时很方便：画出孔的轮廓，比如燕尾，给它 0.2 mm 的外侧描边，就得到了打印所需的间隙。
 - **开放线条**变成一条带子，以线为中心。{{ui:sketch.strokeCap}} 决定端头的样子：{{ui:sketch.strokeCap.flat}}、{{ui:sketch.strokeCap.square}}（长出半个宽度）或 {{ui:sketch.strokeCap.round}}。
@@ -125,9 +125,9 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 
 ## 填充与剪影
 
-不用打开草图也能设置描边：在草图实体的属性里，在 {{ui:prop.sketchFill}} 下选择 {{ui:prop.sketchFill.area}}、{{ui:prop.sketchFill.outside}}、{{ui:prop.sketchFill.inside}} 或 {{ui:prop.sketchFill.center}}，并设置 {{ui:prop.sketchLineWidth}} 和 {{ui:sketch.strokeJoin}}。实体会立刻在原位重建。这些对应 Tinkercad 导入 SVG 的填充模式：默认、外线和内线。{{ui:prop.sketchFill.grow}} 保持区域填充，并向四周扩展一个线宽，角可以是尖角、圆角或斜角：多色打印时标志下方的一层底色，仅用外侧描边只会得到一个环。{{ui:prop.sketchFill.shrink}} 相反：区域保持填充，边缘向四周内缩一个线宽，孔也算在内（孔会变大）。在同一草图的副本上两者都用，可以做配合：孔保持画的尺寸，穿过它的零件用 {{ui:prop.sketchFill.shrink}} 缩 0.5 mm，或者在同一轮廓切出的形状里做一层壁。宽度超过轮廓允许的范围就什么都不剩。在草图的描边面板里，这两个选项位于 {{ui:sketch.strokeAlign}} 下。
+不用打开草图也能设置描边：在草图实体的属性里，在 {{ui:prop.sketchFill}} 下选择 {{ui:prop.sketchFill.area}}、{{ui:prop.sketchFill.outside}}、{{ui:prop.sketchFill.inside}} 或 {{ui:prop.sketchFill.center}}，并设置 {{ui:prop.sketchLineWidth}} 和 {{ui:sketch.strokeJoin}}。实体会立刻在原位重建。这些对应 Tinkercad 导入 SVG 的填充模式：默认、外线和内线。{{ui:prop.sketchFill.grow}} 保持区域填充，并向四周扩展一个线宽，角可以是尖角、圆角或斜角：多色打印时标志下方的一层底色，仅用外侧描边只会得到一个环。{{ui:prop.sketchFill.shrink}} 相反：区域保持填充，边缘向四周内缩一个线宽，孔也算在内（孔会变大）。在同一草图的副本上两者都用，可以做配合：孔保持画的尺寸，穿过它的零件用 {{ui:prop.sketchFill.shrink}} 缩 0.5 mm，或者在同一轮廓切出的形状里做一层壁。宽度超过轮廓允许的范围就什么都不剩。在草图的描边窗口里，这两个选项位于 {{ui:sketch.strokeAlign}} 下。
 
-{{ui:prop.sketchSilhouette}} 略过所有位于其他轮廓内部的轮廓：孔以及孔里的东西。只保留外侧轮廓。与 {{ui:prop.sketchFill.outside}} 一起就能做出饼干模具：把同一个 SVG 导入两次，一次用剪影作为底部的面，一次用剪影加外侧 1 到 2 mm 描边作为壁。在草图模式下，这个开关也在 {{ui:sketch.stroke}} 面板里。
+{{ui:prop.sketchSilhouette}} 略过所有位于其他轮廓内部的轮廓：孔以及孔里的东西。只保留外侧轮廓。与 {{ui:prop.sketchFill.outside}} 一起就能做出饼干模具：把同一个 SVG 导入两次，一次用剪影作为底部的面，一次用剪影加外侧 1 到 2 mm 描边作为壁。在草图模式下，这个开关也在 {{ui:sketch.stroke}} 窗口里。
 
 实体重建时，边上的圆角和倒角会消失，与编辑草图时一样。
 
@@ -155,7 +155,11 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 
 这四项都只影响参考图，绝不会影响草图。
 
-**{{ui:sketch.traceImage}}** 省去手工描摹：选择 {{ui:iconTag.part.dark}} 或 {{ui:iconTag.part.light}}，设置暗部变为亮部的 {{ui:sketch.traceThreshold}}，然后点击 {{ui:sketch.traceImageButton}}。图片的这一部分会在图片所在的位置变成闭合的草图线条，随图片一起旋转和裁剪，之后可以像其他线条一样编辑。线条会被选中，因此按 [[Delete]] 可以再次删除，以尝试其他阈值。如需在轮廓外侧或内侧留出边，可给草图实体加上线条外侧或内侧的描边，或对完成的实体做偏移。
+图片设置中的 **{{ui:sketch.traceImage}}** 会替你放置点：它描摹图片中形状的轮廓——剪影、标志、文字——并以红色显示在图片上，方点表示角点，圆点表示平滑点。{{ui:sketch.traceDark}} 或 {{ui:sketch.traceLight}} 选择图片的哪一部分是形状，{{ui:sketch.traceThreshold}} 决定深色在哪里变为浅色，{{ui:sketch.tracePoints}} 决定所有轮廓一共有多少个点（点少曲线更平滑，点多更贴合图片），{{ui:sketch.traceCorners}} 决定转弯多大时一个点算作角点，{{ui:sketch.traceSpeck}} 决定忽略多小的斑点，{{ui:sketch.traceHoles}} 保留 A 或 O 的中间部分。{{ui:sketch.traceApply}} 把轮廓放进草图中图片所在的位置，带着它的大小、旋转和裁剪，并选中它们：它们是普通的点，可以移动、弯曲或删除，[[Ctrl]]+[[Z]] 一步撤销。对比清晰时效果最好；背景杂乱的照片请先抠出来。被去掉的部分——轮廓周围、孔里、被裁掉的——预览会用平台的颜色盖住，所以图片上只显示留下的部分。靠得太近、宽松曲线会相交的轮廓会自动得到更多的点；卡片会说明。要在轮廓外侧或内侧加一圈边，给草图实体在线条外侧或内侧加描边，或偏移完成的实体。
+
+对于照片——比如白色桌面上的玩具——在 {{ui:sketch.tracePart}} 下选择 **{{ui:sketch.traceObject}}**：背景是图片边缘的颜色，所有与之不同的部分都会成为一个轮廓，不论颜色；此时 {{ui:sketch.traceThreshold}} 决定它要多明显地与背景区分。纯色背景上的彩色图片默认就这样开始。{{ui:sketch.tracePickAreas}} 可以勾出更多：在图片上点击一个区域，比如窗户，点击处周围颜色相近的一块就会被勾出轮廓（{{ui:sketch.traceAreaTolerance}} 决定多相近）。孔和点选的区域列在 {{ui:sketch.traceList}} 下；指向其中一个会在预览中显示，✕ 将其移除，关闭 {{ui:sketch.traceCut}} 时它画成构造线而不是孔。碰到图片边缘的区域是背景，不会被采用。没有任何阈值或颜色能区分的部分——比如和上方车轮一样深的阴影——用 {{ui:sketch.traceTrim}} 去掉：围绕它点击角点（点击第一个角点、双击或按 [[Enter]] 闭合），轮廓就沿着裁切线走；它列为“裁切 1”。
+
+房子旁的树、杂乱背景前的人物——没有颜色能把形状与其他部分分开时，用 **{{ui:sketch.traceLasso}}** 抓住它：沿着它的边缘大致点击，两次点击之间线条会自动沿边缘走，拐弯处也一样；移动指针时，预览已经显示它将经过哪里。点击第一个点、双击或按 [[Enter]] 闭合，按 [[Esc]] 放弃。它列为“套索 1”，可选 {{ui:sketch.traceRegionAdd}}（该区域并入形状）或 {{ui:sketch.traceTrim}}（被去掉）；每个裁切都有同样的选择。在 {{ui:sketch.tracePart}} 下，**{{ui:sketch.traceLassoOnly}}** 只用这样抓住的部分做形状——图片的其他部分都不要。
 
 ## 草图模式下的按键
 

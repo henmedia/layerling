@@ -101,10 +101,10 @@ describe("workplane visibility labels and guide", () => {
     expect(MESSAGES_EN["camera.showWorkplane"]).toBe("Show workplane");
   });
 
-  it("describes the button in the camera bar section of both guides", () => {
+  it("describes the button in the view bar section of both guides", () => {
     const chapters = {
-      "docs/guide/en/02-view-and-workplane.md": "### The camera bar",
-      "docs/guide/de/02-ansicht-und-arbeitsebene.md": "### Die Kameraleiste",
+      "docs/guide/en/02-view-and-workplane.md": "### The view bar",
+      "docs/guide/de/02-ansicht-und-arbeitsebene.md": "### Die Ansichtsleiste",
     };
     for (const [chapter, heading] of Object.entries(chapters)) {
       const text = read(chapter);

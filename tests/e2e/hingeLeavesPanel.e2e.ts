@@ -84,7 +84,7 @@ describe("the hinge's leaves in its settings", () => {
     type(field(panel, "Corner radius"), "4");
     choose(select(panel, "countersunk"), "straight");
     choose(select(panel, "fingers"), "fingers");
-    expect(patches).toEqual([{ hingeScrewHoles: 3 }, { hingeCornerRadius: 4 }, { hingeScrewCountersink: false }, { hingeLeafStyle: "fingers" }]);
+    expect(patches).toEqual([{ hingeScrewHoles: 3 }, { hingeCornerRadius: 4 }, { hingeScrewHead: "straight", hingeScrewCountersink: undefined }, { hingeLeafStyle: "fingers" }]);
   });
 
   it("says when fewer holes fit than asked for", () => {
@@ -100,5 +100,28 @@ describe("the hinge's leaves in its settings", () => {
     expect(row(panel, "Screw holes per leaf")).toBeUndefined();
     expect(row(panel, "Hole diameter")).toBeUndefined();
     expect(panel.textContent).toContain("join them to your model");
+  });
+
+  it("offers nut pockets with the nut's width, and says how deep the pocket goes", () => {
+    const panel = mount({ hingeScrewHoles: 2, hingeLeafThickness: 2 });
+    expect([...select(panel, "countersunk").options].map((option) => option.value)).toEqual(["countersunk", "straight", "nut", "countersunkNut"]);
+    expect(row(panel, "Nut width (across flats)")).toBeUndefined();
+    const nuts = mount({ hingeScrewHoles: 2, hingeLeafThickness: 2, hingeScrewHead: "nut" });
+    expect(field(nuts, "Nut width (across flats)").value).toBe("0.00");
+    expect(row(nuts, "Nut width (across flats)")!.nextElementSibling?.textContent).toBe("0 takes it from the hole (M3 5.8, M4 7.3, with play). Now 5.8 mm; the pocket is 1.4 mm deep, as far as the leaf allows.");
+    // An old hinge without the choice reads its countersink switch.
+    expect(select(mount({ hingeScrewHoles: 2, hingeScrewCountersink: false }), "countersunk").value).toBe("straight");
+  });
+
+  it("has a lift-off style with two knuckles and no count to set", () => {
+    const patches: Partial<WorkplaneShape>[] = [];
+    const panel = mount({}, (patch) => patches.push(patch));
+    choose(select(panel, "liftOff"), "liftOff");
+    expect(patches).toEqual([{ hingeStyle: "liftOff", hingePinless: undefined }]);
+    const liftOff = mount({ hingeStyle: "liftOff" });
+    expect(row(liftOff, "Knuckles")).toBeUndefined();
+    expect(row(liftOff, "Knuckle width (max)")).toBeUndefined();
+    expect(row(liftOff, "Pin diameter")).toBeTruthy();
+    expect(liftOff.textContent).toContain("the upper one is a sleeve that lifts off it");
   });
 });

@@ -33,7 +33,7 @@ V oknu najdeš:
 
 Medtem ko vrtiš mero, layerling predogled preračuna. To lahko traja trenutek. Lahko nastavljaš naprej, izračuna se vedno nazadnje izbrana vrednost.
 
-Če je mera prevelika za rob, layerling to pove in predlaga manjšo vrednost. Običajno zadostuje vzeti en do dva milimetra manj. Na ostrih kotih potrebuje zaokrožitev več prostora, kot bi domnevali po polmeru. Na majhnem zaslonu se plošča sama pomakne navzdol, da je sporočilo v vidnem polju.
+Če je mera prevelika za rob, layerling to pove in predlaga manjšo vrednost. Običajno zadostuje vzeti en do dva milimetra manj. Na ostrih kotih potrebuje zaokrožitev več prostora, kot bi domnevali po polmeru. Na majhnem zaslonu se okno samo pomakne navzdol, da je sporočilo v vidnem polju.
 
 Če izbor, ki je deloval, odpove, ko klikneš še en rob, ta rob postane rdeč in se nariše širše: to je rob, ki ga pri tej meri ni mogoče obdelati skupaj z drugimi. Klikni ga znova, da ga odstraniš, ali pa zmanjšaj mero. Če med prikazanim sporočilom klikneš še več robov, prvi ostane rdeč. Kadar ni prejšnjega izbora, ki bi deloval – pri prvem kliku ali pri meri, ki si jo ravnokar povečal – rdeči postanejo robovi, ki odpovedo že sami, ali vsi, če gre le za njihovo kombinacijo.
 
@@ -59,7 +59,7 @@ Del, uvožen kot STEP, prav tako obdrži svojo geometrijo CAD: posnetja, zaokro�
 
 1. Izberi telo in klikni {{ui:editor.tool.hollow}}, ali klikni z desnim gumbom na telo in izberi v meniju.
 2. Nastavi {{ui:shell.wall}}.
-3. Pod {{ui:shell.openings}} vklopi strani, ki ostanejo odprte: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} ali {{ui:shell.side.right}}, poljubno veliko – {{ui:shell.side.front}} sama da jašek za predal, {{ui:shell.side.left}} in {{ui:shell.side.right}} predor. Če ni vklopljena nobena stran, telo ostane povsod zaprto, z votlino v sredini. {{ui:shell.side.closed}} izklopi vse strani z enim klikom. {{ui:shell.side.top}} je ob odprtju plošče že vklopljen; klik nanj zgornjo stran spet zapre. Telo, zaprto z vseh strani, je od zunaj videti nespremenjeno: votlino pokaže prerez.
+3. Pod {{ui:shell.openings}} vklopi strani, ki ostanejo odprte: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} ali {{ui:shell.side.right}}, poljubno veliko – {{ui:shell.side.front}} sama da jašek za predal, {{ui:shell.side.left}} in {{ui:shell.side.right}} predor. Če ni vklopljena nobena stran, telo ostane povsod zaprto, z votlino v sredini. {{ui:shell.side.closed}} izklopi vse strani z enim klikom. {{ui:shell.side.top}} je ob odprtju okna že vklopljen; klik nanj zgornjo stran spet zapre. Telo, zaprto z vseh strani, je od zunaj videti nespremenjeno: votlino pokaže prerez.
 4. Odloči, ali naj bodo {{ui:shell.edges}} {{ui:shell.edges.round}} ali {{ui:shell.edges.sharp}}.
 5. Klikni {{ui:shell.apply}}.
 

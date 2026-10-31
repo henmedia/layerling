@@ -17,12 +17,15 @@ Vsi tvoji načrti se pozneje pojavijo na začetni strani s sličico predogleda. 
 
 ## Urejevalnik na kratko
 
-![Urejevalnik z dvema oblikama na delovni ravnini. Zgoraj orodna vrstica, levo upravljanje kamere, desno nastavitve izbrane oblike.](shot:editor-overview)
+![Urejevalnik z označenimi deli: zgoraj orodna vrstica, levo orientacijska kocka in pod njo vrstica pogleda, ob njiju sporočilo stanja in seznam objektov, desno lastnosti izbrane oblike.](shot:editor-areas)
 
-- **Zgoraj** je orodna vrstica. Razvrščena je po opravilih: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} in {{ui:editor.group.help}}. Ko z miško zapelješ čez ikono, se pokaže njeno ime. Kjer vidiš majhen vprašaj, na primer pri nastavitvah oblike, v knjižnici oblik ali v oknih z orodji, te pelje naravnost v ustrezno poglavje teh navodil.
+- **Zgoraj** je orodna vrstica. Razvrščena je po opravilih: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} in {{ui:editor.group.help}}. Ko z miško zapelješ čez ikono, se pokaže njeno ime. Kjer vidiš majhen vprašaj, na primer pri nastavitvah oblike, v knjižnici oblik ali v oknih orodij, te pelje naravnost v ustrezno poglavje teh navodil. Skupina {{ui:editor.group.modify}} je razdeljena na štiri dele, vsak ima ime nad svojimi orodji: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} in {{ui:editor.section.surface}}. Siva ikona pove tudi, kaj čaka, na primer {{ui:editor.needs.oneBody}} ali {{ui:editor.needs.locked}}. Ne najdeš orodja? Pritisni [[Ctrl]]+[[K]] in vpiši njegovo ime; prazen načrt te na to opomni na dnu pogleda.
 - **V sredini** je delovna ravnina. Tu postavljaš oblike, jih naravnaš in vidiš rezultat.
-- **Desno** se pokažejo nastavitve izbrane oblike: barva, mere, lega in vse drugo, kar oblika še ima. Vpisovanje številk je natančnejše od vlečenja.
-- **Levo** je upravljanje kamere z orientacijsko kocko nad njim. S tem se premikaš po prizoru, več o tem v poglavju [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina).
+- **Desno** se pokažejo **lastnosti** izbrane oblike: barva, mere, lega in vse drugo, kar oblika še ima. Vpisovanje številk je natančnejše od vlečenja.
+- **Levo** je vrstica pogleda z orientacijsko kocko nad njo. S tem se premikaš po prizoru, več o tem v poglavju [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina).
+- **Ob vrstici pogleda** se odpre **seznam objektov** ([[Ctrl]]+[[U]]) z vsemi oblikami načrta. Več v poglavju [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje).
+- **Desno od orientacijske kocke** se pokaže **sporočilo stanja**, ko ti ima layerling kaj povedati, na primer kaj orodje pričakuje od tebe. Ko ni kaj povedati, ga ni.
+- **Okna orodij** se odprejo nad delovno ravnino, ko zaženeš orodje, kot je {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} ali {{ui:editor.tool.hollow}}. Če kaj zakrivajo, jih za naslovno vrstico odmakni.
 - **Čisto zgoraj** preklapljaš med {{ui:editor.modeGeometry}} in {{ui:editor.modeSketch}}, preimenuješ načrt ter nastaviš jezik in barvno shemo.
 
 ## Gumbi okoli delovne površine
@@ -69,9 +72,9 @@ Ime projekta ({{ui:confirm.projectName}}) je čisto na vrhu. Kliknite nanj, vpi�
 
 {{ui:palette.open}}: vpišite, kar iščete, orodje, obliko ali nastavitev, in kliknite rezultat.
 
-### Skrij upravljanje kamere
+### Skrij vrstico pogleda
 
-{{ui:camera.hide}} zloži upravljanje kamere na levi in da delovni površini več prostora; {{ui:camera.show}} ga vrne.
+{{ui:camera.hide}} zloži vrstico pogleda na levi in da delovni površini več prostora; {{ui:camera.show}} ga vrne.
 
 ### Mreža pripenjanja
 

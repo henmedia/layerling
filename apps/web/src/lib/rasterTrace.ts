@@ -94,7 +94,7 @@ export function shrinkRaster(pixels: RasterPixels, maxSide = MAX_RASTER_TRACE_SI
  * How much each pixel belongs to the shape, 0 to 1, on a grid one pixel wider on every side (that
  * border is empty, so every line closes). A transparent pixel belongs to nothing.
  */
-function shapeField(pixels: RasterPixels, part: RasterPart) {
+export function shapeField(pixels: RasterPixels, part: RasterPart) {
   const { width, height, data } = pixels;
   const gridWidth = width + 2;
   const field = new Float32Array(gridWidth * (height + 2));
@@ -110,7 +110,7 @@ function shapeField(pixels: RasterPixels, part: RasterPart) {
 }
 
 /** The field blurred by a 3x3 weighting (1 2 1), which rounds off the steps of hard pixel edges. */
-function softened(field: Float32Array, width: number, height: number) {
+export function softened(field: Float32Array, width: number, height: number) {
   const across = new Float32Array(field.length);
   for (let y = 0; y < height; y += 1) {
     for (let x = 1; x < width - 1; x += 1) {
@@ -132,7 +132,7 @@ function softened(field: Float32Array, width: number, height: number) {
  * The closed lines where the field crosses `threshold` (marching squares). Grid point (x, y) is the
  * centre of pixel (x - 1, y - 1); the lines come back in pixel coordinates.
  */
-function fieldRings(field: Float32Array, width: number, height: number, threshold: number): Point[][] {
+export function fieldRings(field: Float32Array, width: number, height: number, threshold: number): Point[][] {
   const value = (x: number, y: number) => field[y * width + x];
   // A crossing on the edge from grid point (x, y) to the right (even key) or downward (odd key).
   const crossing = (key: number): Point => {
@@ -206,7 +206,7 @@ function fieldRings(field: Float32Array, width: number, height: number, threshol
   return rings;
 }
 
-function ringArea(ring: Point[]) {
+export function ringArea(ring: Point[]) {
   let area = 0;
   for (let index = 0; index < ring.length; index += 1) {
     const a = ring[index];

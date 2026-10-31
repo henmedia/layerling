@@ -53,7 +53,7 @@ Včasih naj deli samo ostanejo skupaj, ne da bi postali eno – na primer bel lo
 
 ## Izrezovanje enega telesa iz drugega
 
-Pri delih, ki morajo ustrezati drug drugemu, gred v puši ali vijak v ohišju, naredite en del in ga izrežete iz drugega. Izberite obe telesi in kliknite {{ui:editor.tool.cutOut}} v območju {{ui:editor.group.combine}} ali kliknite z desno tipko in ga izberite tam. Plošča navede del, ki ostane, in telo, ki dobi votlino; layerling vzame manjše telo za del, {{ui:cutOut.swap}} pa ju zamenja. {{ui:cutOut.clearance}} naredi votlino okoli dela toliko večjo: 0 ustreza natančno, 0,2 mm je običajna zračnost za natisnjeno ujemanje. {{ui:cutOut.apply}} izreže kopijo dela iz drugega telesa in pusti sam del tam, kjer je. Rezultat je skupina: {{ui:editor.tool.ungroup}} rez spet razstavi. Zračnost zahteva, da je del natančno telo, kot pri orodju {{ui:editor.tool.offset}}, ki se uporablja za to.
+Pri delih, ki morajo ustrezati drug drugemu, gred v puši ali vijak v ohišju, naredite en del in ga izrežete iz drugega. Izberite obe telesi in kliknite {{ui:editor.tool.cutOut}} v območju {{ui:editor.group.combine}} ali kliknite z desno tipko in ga izberite tam. Okno navede del, ki ostane, in telo, ki dobi votlino; layerling vzame manjše telo za del, {{ui:cutOut.swap}} pa ju zamenja. {{ui:cutOut.clearance}} naredi votlino okoli dela toliko večjo: 0 ustreza natančno, 0,2 mm je običajna zračnost za natisnjeno ujemanje. {{ui:cutOut.apply}} izreže kopijo dela iz drugega telesa in pusti sam del tam, kjer je. Rezultat je skupina: {{ui:editor.tool.ungroup}} rez spet razstavi. Zračnost zahteva, da je del natančno telo, kot pri orodju {{ui:editor.tool.offset}}, ki se uporablja za to.
 
 ## Urejanje skupine
 

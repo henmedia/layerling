@@ -28,7 +28,7 @@ To samo menu ma {{ui:contextMenu.carry}}, czyli klawisz [[C]] dla ekranu dotykow
 
 ## Obracanie i przybliżanie widoku
 
-Jeden palec na pustym miejscu obraca widok, dwa palce go przybliżają i przesuwają. Palec, który zaczyna ruch na bryle, działa na bryłę, a nie na widok. Jeśli wolisz, żeby obracał widok, włącz {{ui:camera.touchRotate}} na pasku kamery: jeden palec obraca wtedy widok zamiast zaznaczać, niezależnie od tego, gdzie zaczyna. Ten przełącznik pojawia się tylko na urządzeniu z ekranem dotykowym.
+Jeden palec na pustym miejscu obraca widok, dwa palce go przybliżają i przesuwają. Palec, który zaczyna ruch na bryle, działa na bryłę, a nie na widok. Jeśli wolisz, żeby obracał widok, włącz {{ui:camera.touchRotate}} na pasku widoku: jeden palec obraca wtedy widok zamiast zaznaczać, niezależnie od tego, gdzie zaczyna. Ten przełącznik pojawia się tylko na urządzeniu z ekranem dotykowym.
 
 Kostka widoku w lewym górnym rogu obraca widok, gdy ją przeciągasz, a stuknięcie jednej z jej ścian, narożników albo krawędzi przeskakuje do tego widoku. Zobacz [Widok i płaszczyzna robocza](chapter:view-and-workplane).
 

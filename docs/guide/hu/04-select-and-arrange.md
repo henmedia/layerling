@@ -25,7 +25,7 @@ Sok résznél a nézetben könnyű elveszíteni a fonalat. Az objektumlista ({{u
 - A keresőmező név és fajta szerint is megtalálja az alakzatokat, így a „henger” vagy a „lyuk” szóra is. A csoportokon belül is keres, akármilyen mélyen vannak egymásba ágyazva: egy találatot tartalmazó csoport a listában marad, és kinyílik, hogy megmutassa az egyező részeket és a hozzájuk vezető csoportokat. A saját neve alapján megtalált csoport megnyitáskor az összes részét mutatja.
 - A címsor bal szélén lévő nyíl a címsoráig összecsukja a listát, majd újra kinyitja.
 
-A lista a nézetkockától közvetlenül jobbra van rögzítve. A címsoránál fogva húzd bárhová a munkasíkon; a nézetkocka és a kamerasáv alatt halad el. Ejtsd vissza a nézetkocka mellé, vagy kattints duplán a címsorra, és újra rögzül. Hogy hol volt, és hogy össze volt-e csukva, ebben a böngészőben megmarad.
+A lista a nézetkockától közvetlenül jobbra van rögzítve. A címsoránál fogva húzd bárhová a munkasíkon; a nézetkocka és a nézetsáv alatt halad el. Ejtsd vissza a nézetkocka mellé, vagy kattints duplán a címsorra, és újra rögzül. Hogy hol volt, és hogy össze volt-e csukva, ebben a böngészőben megmarad.
 
 ## Helyzet begépelése
 
@@ -71,9 +71,9 @@ Ha **egy test** van kijelölve, a forgatási pont ahhoz a testhez tartozik: jel�
 
 Nyomtatáshoz egy alkatrésznek a legjobb oldalán kellene feküdnie? Jelöld ki, kattints a {{ui:editor.tool.layFlat}} gombra, majd arra a lapra, amelyik lefelé kerüljön. Amíg a mutatót az alkatrész fölött mozgatod, az alatta lévő lap kivilágosodik, így látod, melyiket fogod kiválasztani; a többi oldal ellenőrzéséhez forgasd el a nézetet. Az alkatrész úgy fordul, hogy ez a lap feküdjön a munkasíkon.
 
-Két alkatrésznek lappal lapra kellene illeszkednie, vagy egy síkba kerülnie? Jelöld ki a mozgatandó alkatrészt, kattints a {{ui:editor.tool.mateFaces}} gombra, majd kattints a lapjára, azután a másik alkatrész lapjára. A panelen a {{ui:mate.mode.against}} egymásnak fordítja a lapokat (háttal egymásnak, érintkezve), az {{ui:mate.mode.flush}} egy síkba fekteti őket egymás mellett; a {{ui:mate.gap}} helyet hagy közöttük, például hézagnak. Az {{ui:mate.apply}} elmozdítja az alkatrészt: a legrövidebb úton fordul, amíg a lapok párhuzamosak nem lesznek – egyáltalán nem, ha már azok –, majd csak a másik lap felé csúszik, így oldalirányban megtartja a helyét. A másik alkatrész a helyén marad, és egyetlen Visszavonás mindent visszavesz.
+Két alkatrésznek lappal lapra kellene illeszkednie, vagy egy síkba kerülnie? Jelöld ki a mozgatandó alkatrészt, kattints a {{ui:editor.tool.mateFaces}} gombra, majd kattints a lapjára, azután a másik alkatrész lapjára. Az ablakban a {{ui:mate.mode.against}} egymásnak fordítja a lapokat (háttal egymásnak, érintkezve), az {{ui:mate.mode.flush}} egy síkba fekteti őket egymás mellett; a {{ui:mate.gap}} helyet hagy közöttük, például hézagnak. Az {{ui:mate.apply}} elmozdítja az alkatrészt: a legrövidebb úton fordul, amíg a lapok párhuzamosak nem lesznek – egyáltalán nem, ha már azok –, majd csak a másik lap felé csúszik, így oldalirányban megtartja a helyét. A másik alkatrész a helyén marad, és egyetlen Visszavonás mindent visszavesz.
 
-![A Lapok igazítása panel: a mozgó alkatrész ki van választva, következik a másik alkatrész egy lapja, aztán laptól lapig vagy egy síkba, és egy tetszőleges hézag.](shot:mate-faces)
+![A Lapok igazítása ablak: a mozgó alkatrész ki van választva, következik a másik alkatrész egy lapja, aztán laptól lapig vagy egy síkba, és egy tetszőleges hézag.](shot:mate-faces)
 
 **Furatok egy tengelyen:** {{ui:mate.mode.concentric}} ehelyett kerek lapokat igazít: furatot furat fölé, csapot furatba, csavart a menet nélküli furatába. Válaszd ki, mielőtt a lapokra kattintasz. Aztán kattints a mozgó alkatrészen egy furat kerek belsejére (vagy egy csap külsejére), majd a másik alkatrész egy kerek lapjára; az egész kerek lap kivilágosodik, amíg rámutatsz. Az {{ui:mate.apply}} a legrövidebb úton elforgatja az alkatrészt, amíg a két tengely párhuzamos nem lesz, majd keresztben a másik tengelyre tolja. A tengely mentén ott marad, ahol volt, így egy csap megtartja a magasságát; utána told be. Importált hálókon is működik, ha a furat egy tengely körüli lapokból áll.
 
@@ -101,7 +101,7 @@ A másolatok előbb előnézetként jelennek meg. Csak a {{ui:array.apply}} hozz
 
 ## Lyukminta egy lapon
 
-Szellőzőkhöz, hangszórórácsokhoz, kosarakhoz és dobozokhoz a {{ui:holePattern.title}} egyenletesen elosztja a lyukakat egy sík lapon. Többé nem kell egy lyukat elkészítened, megismételned és a falra tenned. Jelölj ki pontosan egy testet, és kattints az eszköztár {{ui:editor.group.modify}} csoportjában az ismétlés melletti {{ui:holePattern.title}} gombra. Jobb kattintással is elérheted a testen, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűvel.
+Szellőzőkhöz, hangszórórácsokhoz, kosarakhoz és dobozokhoz a {{ui:holePattern.title}} egyenletesen elosztja a lyukakat egy sík lapon. Többé nem kell egy lyukat elkészítened, megismételned és a falra tenned. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.group.modify}} csoportjában az ismétlés melletti {{ui:holePattern.title}} gombra. Jobb kattintással is elérheted a testen, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűvel.
 
 1. Kattints a test egyik sík lapjára. A kattintás körüli teljes sík lap számít, nem csak a mutató alatti háromszög. Görbe lap nem működik: kapsz egy figyelmeztetést, és helyette egy sík lapra kattintasz.
 2. Az ablakban állítsd be, milyenek legyenek a lyukak, és hogyan helyezkedjenek el:
@@ -121,7 +121,7 @@ Egy MI ugyanezt az MCP-hídon keresztül is meg tudja tenni a `layerling_perfora
 
 ## Lap kitolása vagy benyomása
 
-Vastagabb falhoz, egy lapra emelt párnához vagy egy belevágott zsebhez a {{ui:faceTool.title}} eszköz egyetlen sík lapon dolgozik. Importált STL-en is működik, ahol nincs módosítható vázlat. Jelölj ki pontosan egy testet, és kattints az eszköztár {{ui:editor.group.modify}} csoportjában a {{ui:faceTool.title}} gombra, a lyukminta mellett. A testre jobb gombbal is kattinthatsz, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűkkel.
+Vastagabb falhoz, egy lapra emelt párnához vagy egy belevágott zsebhez a {{ui:faceTool.title}} eszköz egyetlen sík lapon dolgozik. Importált STL-en is működik, ahol nincs módosítható vázlat. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.group.modify}} csoportjában a {{ui:faceTool.title}} gombra, a lyukminta mellett. A testre jobb gombbal is kattinthatsz, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűkkel.
 
 1. Kattints a test egy sík lapjára. A lyukmintához hasonlóan a kattintás körüli teljes sík lap számít; görbe lap nem működik. Csoporton vagy kötegen a lap átfut az összeérő részeken, mint a lyukmintánál.
 2. Az ablakban:

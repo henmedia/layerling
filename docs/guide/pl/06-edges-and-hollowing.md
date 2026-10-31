@@ -14,11 +14,11 @@ Ostre krawędzie rzadko dobrze wyglądają na wydrukowanej części i nie są sz
 
 ![Narzędzie „Zaokrąglenie krawędzi”: wybrane są wszystkie ostre krawędzie, a obraz pokazuje podgląd z promieniem 4 mm.](shot:fillet-preview)
 
-Panel jest w prawym górnym rogu. Jeśli zasłania krawędzie, które chcesz kliknąć, odsuń go za pasek tytułu. Następnym razem otworzy się tam, podobnie jak {{ui:editor.tool.hollow}} i {{ui:editor.tool.array}}. Dwukrotne kliknięcie paska tytułu odkłada go na miejsce.
+Okno narzędzia jest w prawym górnym rogu. Jeśli zasłania krawędzie, które chcesz kliknąć, odsuń je za pasek tytułu. Następnym razem otworzy się tam, podobnie jak {{ui:editor.tool.hollow}} i {{ui:editor.tool.array}}. Dwukrotne kliknięcie paska tytułu odkłada go na miejsce.
 
-Wybranie kształtu z biblioteki kształtów, gdy panel jest otwarty, zamyka go bez stosowania czegokolwiek, a kliknięte krawędzie przepadają. Kliknięcie umieszcza wtedy nowy kształt zamiast wybierać krawędzie.
+Wybranie kształtu z biblioteki kształtów, gdy okno jest otwarte, zamyka je bez stosowania czegokolwiek, a kliknięte krawędzie przepadają. Kliknięcie umieszcza wtedy nowy kształt zamiast wybierać krawędzie.
 
-W panelu znajdziesz:
+W oknie znajdziesz:
 
 - {{ui:edge.allSharpEdges}} wybiera naraz wszystkie krawędzie, {{ui:edge.clear}} czyści wybór.
 - **{{ui:edge.radius}}** dla zaokrąglenia. Dla fazki ustawiasz {{ui:edge.distance}} albo {{ui:edge.angle}}.
@@ -29,13 +29,13 @@ W panelu znajdziesz:
 - {{ui:edge.bottomEdges}} wybiera tylko krawędzie wzdłuż samego dołu bryły, lustrzane do {{ui:edge.topEdges}}. To szybka droga, żeby zaokrąglić lub sfazować tylko stopę elementu.
 - {{ui:edge.chamfillet}}, wybrane u góry okna fazowania obok {{ui:editor.tool.chamfer}}, tworzy drukowalną stopę elementu: fazę przy płycie, która stycznie przechodzi w zaokrąglenie ku ścianie, dzięki czemu pierwsze warstwy nie potrzebują podpór, a krawędź i tak kończy się miękko. {{ui:edge.distance}} to wysokość, jaką zajmuje stopa, {{ui:edge.angle}} (od 15° do 75°) to stromość fazy przy płycie. Krawędzie wybierasz przyciskiem {{ui:edge.bottomEdges}}.
 - {{ui:edge.onlyVisibleEdges}} ukrywa krawędzie, które z Twojego punktu widzenia leżą za bryłą. Domyślnie każda krawędź prześwituje przez bryłę, co na skomplikowanej części robi się nieczytelne. Po włączeniu widzisz i możesz kliknąć tylko krawędzie zwrócone do Ciebie. Obróć widok, żeby dosięgnąć pozostałych. Krawędź narysowana na czerwono (zobacz niżej) jest widoczna zawsze.
-- {{ui:edge.tangentChains}}: kliknięcie wybiera wtedy także krawędzie, które płynnie w siebie przechodzą, na przykład wszystkie krawędzie wokół ściany z zaokrąglonymi narożnikami. Ten przełącznik decyduje tylko o tym, co wybiera kliknięcie: jądro CAD i tak zawsze przeciąga fazkę albo zaokrąglenie wzdłuż takich płynnie przedłużających się krawędzi. Panel mówi, na ile kolejnych krawędzi tak się dzieje.
+- {{ui:edge.tangentChains}}: kliknięcie wybiera wtedy także krawędzie, które płynnie w siebie przechodzą, na przykład wszystkie krawędzie wokół ściany z zaokrąglonymi narożnikami. Ten przełącznik decyduje tylko o tym, co wybiera kliknięcie: jądro CAD i tak zawsze przeciąga fazkę albo zaokrąglenie wzdłuż takich płynnie przedłużających się krawędzi. Okno mówi, na ile kolejnych krawędzi tak się dzieje.
 - {{ui:edge.keepSize}} zachowuje fazkę albo zaokrąglenie w obecnym rozmiarze, nawet jeśli później przeskalujesz bryłę.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} albo {{ui:edge.fine}}) decyduje, jak dokładnie liczony jest podgląd. Przy trudnych częściach {{ui:edge.draft}} jest szybsza.
 
 Gdy zmieniasz rozmiar, layerling przelicza podgląd. Może to chwilę potrwać. Możesz dalej zmieniać wartość, a liczona będzie ostatnia wybrana.
 
-Jeśli rozmiar jest za duży dla krawędzi, layerling o tym informuje i proponuje mniejszą wartość. Często wystarczy milimetr albo dwa mniej. Przy ostrych kątach zaokrąglenie potrzebuje więcej miejsca, niż sugeruje jego promień. Na małym ekranie panel sam przewija się w dół, żeby komunikat był widoczny.
+Jeśli rozmiar jest za duży dla krawędzi, layerling o tym informuje i proponuje mniejszą wartość. Często wystarczy milimetr albo dwa mniej. Przy ostrych kątach zaokrąglenie potrzebuje więcej miejsca, niż sugeruje jego promień. Na małym ekranie okno samo przewija się w dół, żeby komunikat był widoczny.
 
 Gdy wybór, który działał, przestaje działać po kliknięciu jeszcze jednej krawędzi, ta krawędź robi się czerwona i grubsza: to ona nie daje się obrobić razem z pozostałymi w tym rozmiarze. Kliknij ją ponownie, aby ją wyłączyć, albo zmniejsz rozmiar. Jeśli klikasz kolejne krawędzie, gdy komunikat jest widoczny, pierwsza zostaje czerwona. Gdy nie ma wcześniejszego wyboru, który działał (pierwsze kliknięcie albo rozmiar, który właśnie zwiększyłeś), na czerwono robią się krawędzie, które nie działają nawet same, albo wszystkie, jeśli problemem jest tylko ich połączenie.
 
@@ -45,7 +45,7 @@ Otwór także przyjmuje {{ui:editor.tool.chamfer}} i {{ui:editor.tool.fillet}}, 
 
 ### Cofanie obróbki krawędzi
 
-Obrobioną bryłę zawsze można obrobić ponownie. Zaznacz ją znowu i otwórz narzędzie. Zaokrąglenie, Fazowanie i Wydrąż pokazują listę: w {{ui:edge.featureHistory}} widzisz, co już na niej jest. {{ui:edge.revertAction}} cofa pojedynczą obróbkę. Uwaga: jeśli leżą na niej nowsze obróbki, znikają razem z nią, a panel mówi, ile ich jest.
+Obrobioną bryłę zawsze można obrobić ponownie. Zaznacz ją znowu i otwórz narzędzie. Zaokrąglenie, Fazowanie i Wydrąż pokazują listę: w {{ui:edge.featureHistory}} widzisz, co już na niej jest. {{ui:edge.revertAction}} cofa pojedynczą obróbkę. Uwaga: jeśli leżą na niej nowsze obróbki, znikają razem z nią, a okno mówi, ile ich jest.
 
 Obok fazki, zaokrąglenia albo wydrążenia jest też {{ui:edge.editAction}}. Cofa obróbkę w ten sam sposób, ale od razu otwiera narzędzie ponownie z tymi samymi krawędziami i starą wartością. Zmieniasz wartość i stosujesz ją znowu: zaokrąglenie 3 mm staje się zaokrągleniem 5 mm bez ponownego klikania krawędzi. Jeśli leżą na niej nowsze obróbki, także tu znikają razem z nią. Dotyczy to obróbek krawędzi wykonanych od teraz. Starsze oferują tylko cofnięcie, podobnie jak pojedyncze części grupy.
 
@@ -61,11 +61,11 @@ Pudełka, kubki, obudowy i pokrywy mają jedną cechę wspólną: w środku są 
 
 1. Zaznacz bryłę i kliknij {{ui:editor.tool.hollow}} albo kliknij bryłę prawym przyciskiem i wybierz polecenie z menu.
 2. Ustaw {{ui:shell.wall}}.
-3. W {{ui:shell.openings}} włącz strony, które zostają otwarte: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} albo {{ui:shell.side.right}}, ile tylko chcesz. Sam {{ui:shell.side.front}} daje wnękę na szufladę, a {{ui:shell.side.left}} i {{ui:shell.side.right}} tunel. Gdy żadna strona nie jest włączona, bryła zostaje zamknięta ze wszystkich stron, z wnęką w środku. {{ui:shell.side.closed}} wyłącza wszystkie strony jednym kliknięciem. {{ui:shell.side.top}} jest już włączone po otwarciu panelu; kliknięcie go znów zamyka górę. Bryła zamknięta ze wszystkich stron wygląda z zewnątrz bez zmian: wnękę pokazuje widok przekroju.
+3. W {{ui:shell.openings}} włącz strony, które zostają otwarte: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} albo {{ui:shell.side.right}}, ile tylko chcesz. Sam {{ui:shell.side.front}} daje wnękę na szufladę, a {{ui:shell.side.left}} i {{ui:shell.side.right}} tunel. Gdy żadna strona nie jest włączona, bryła zostaje zamknięta ze wszystkich stron, z wnęką w środku. {{ui:shell.side.closed}} wyłącza wszystkie strony jednym kliknięciem. {{ui:shell.side.top}} jest już włączone po otwarciu okna; kliknięcie go znów zamyka górę. Bryła zamknięta ze wszystkich stron wygląda z zewnątrz bez zmian: wnękę pokazuje widok przekroju.
 4. Zdecyduj, czy {{ui:shell.edges}} mają być {{ui:shell.edges.round}}, czy {{ui:shell.edges.sharp}}.
 5. Kliknij {{ui:shell.apply}}.
 
-![Panel drążenia z grubością ścianki, przełącznikiem dla każdej strony, która zostaje otwarta, i krawędziami wewnętrznymi.](shot:hollow-panel)
+![Okno drążenia z grubością ścianki, przełącznikiem dla każdej strony, która zostaje otwarta, i krawędziami wewnętrznymi.](shot:hollow-panel)
 
 Ścianki rosną do środka. Zewnętrzna strona zostaje bez zmian.
 
@@ -110,14 +110,14 @@ Każdą ścianę bryły można przesunąć o tę samą odległość na zewnątrz
 
 Zaznacz {{ui:offset.sideways}}, gdy ma rosnąć lub maleć tylko obrys: boki przesuwają się o odległość, a każda płaska górna i dolna ściana zostaje na swojej wysokości. Tabliczka dostaje obramowanie dookoła, podstawa robi się szersza, a bryła nie staje się wyższa. W bryle schodkowej każdy stopień zachowuje swoją wysokość. Tekst odsuwany przez swoje obrysy też zachowuje wtedy swoją wysokość.
 
-Bez zaznaczenia odsunięta zostaje sama bryła. Staje się stałą, dokładną bryłą, jak po fazie: lista u góry panelu cofa odsunięcie, a {{ui:edge.editAction}} otwiera narzędzie ponownie ze starą odległością. Odsunąć można tylko dokładne bryły CAD - prostopadłościany, walce i inne kształty, ich grupy, importowane części STEP. Bryła będąca tylko siatką trójkątów, jak wiele importów STL, często nie daje się odsunąć. Odległość zbyt duża dla bryły, na przykład zmniejszenie poza najcieńszą ścianę, zostaje odrzucona.
+Bez zaznaczenia odsunięta zostaje sama bryła. Staje się stałą, dokładną bryłą, jak po fazie: lista u góry okna cofa odsunięcie, a {{ui:edge.editAction}} otwiera narzędzie ponownie ze starą odległością. Odsunąć można tylko dokładne bryły CAD - prostopadłościany, walce i inne kształty, ich grupy, importowane części STEP. Bryła będąca tylko siatką trójkątów, jak wiele importów STL, często nie daje się odsunąć. Odległość zbyt duża dla bryły, na przykład zmniejszenie poza najcieńszą ścianę, zostaje odrzucona.
 
 ## Usuwanie ścian
 
 Zaokrąglenie, które przeszkadza, otwór w złym miejscu, występ, którego już nie potrzebujesz: {{ui:editor.tool.deleteFace}} usuwa to z bryły, bez budowania bryły od nowa.
 
 1. Zaznacz bryłę i kliknij {{ui:editor.tool.deleteFace}} albo kliknij bryłę prawym przyciskiem i wybierz polecenie z menu.
-2. Kliknij każdą ścianę tego, co ma zniknąć: ściany zaokrąglonej krawędzi, ściankę otworu, bok i górę występu. Wybrana ściana się podświetla, a kolejne kliknięcie ją wyłącza. Panel liczy ściany.
+2. Kliknij każdą ścianę tego, co ma zniknąć: ściany zaokrąglonej krawędzi, ściankę otworu, bok i górę występu. Wybrana ściana się podświetla, a kolejne kliknięcie ją wyłącza. Okno liczy ściany.
 3. Kliknij {{ui:deleteFace.apply}} albo naciśnij [[Delete]]. [[Esc]] zamyka narzędzie bez zmian.
 
 Ściany wokół usuniętych rosną, aż luka się zamknie. Prostopadłościan z zaokrąglonymi górnymi krawędziami odzyskuje ostre krawędzie, otwór zostaje wypełniony, występ znika. Bryła pozostaje dokładna, więc da się ją znowu zaokrąglać i fazować, a eksport STEP zachowuje jej prawdziwe ściany. [[Ctrl]]+[[Z]] cofa usunięcie jednym krokiem. Jest ono też wymienione w {{ui:edge.featureHistory}} razem z zaokrągleniami i fazkami, gdzie {{ui:edge.revertAction}} je cofa. {{ui:edge.editAction}} dla niego nie ma. Na grupie wynikiem jest jedna bryła, tak jak przy obróbce krawędzi.

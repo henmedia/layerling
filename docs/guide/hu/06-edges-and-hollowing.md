@@ -14,11 +14,11 @@ Az éles élek ritkán mutatnak jól egy nyomtatott alkatrészen, és különös
 
 ![Az „Élek lekerekítése” eszköz: minden éles él ki van jelölve, a kép a 4 mm sugarú előnézetet mutatja.](shot:fillet-preview)
 
-A panel a jobb felső sarokban van. Ha eltakarja azokat az éleket, amelyekre kattintanál, húzd el a címsoránál fogva; legközelebb is ott nyílik meg, ahogy a {{ui:editor.tool.hollow}} és az {{ui:editor.tool.array}} is. Kattints duplán a címsorra, hogy visszakerüljön.
+Az eszközablak a jobb felső sarokban van. Ha eltakarja azokat az éleket, amelyekre kattintanál, húzd el a címsoránál fogva; legközelebb is ott nyílik meg, ahogy a {{ui:editor.tool.hollow}} és az {{ui:editor.tool.array}} is. Kattints duplán a címsorra, hogy visszakerüljön.
 
-Ha nyitott panel mellett alakzatot választasz az alakzatlistából, a panel semmit sem alkalmazva bezárul, és a kiválasztott élek elvesznek. A kattintás ekkor az új alakzatot helyezi el, nem éleket választ.
+Ha nyitott ablak mellett alakzatot választasz az alakzatlistából, az ablak semmit sem alkalmazva bezárul, és a kiválasztott élek elvesznek. A kattintás ekkor az új alakzatot helyezi el, nem éleket választ.
 
-A panelen ezeket találod:
+Az ablakban ezeket találod:
 
 - A {{ui:edge.allSharpEdges}} egyszerre minden élt kijelöl, a {{ui:edge.clear}} kiüríti a kijelölést.
 - **{{ui:edge.radius}}** a lekerekítéshez. Az élletöréshez a {{ui:edge.distance}} vagy a {{ui:edge.angle}} értéket állítod be.
@@ -28,13 +28,13 @@ A panelen ezeket találod:
 - Az {{ui:edge.bottomEdges}} csak a test legalján futó éleket választja ki, a {{ui:edge.topEdges}} párja. Így gyorsan lekerekítheted vagy letörheted csak egy alkatrész talpát.
 - Az {{ui:edge.chamfillet}}, amelyet a letörés ablakának tetején a {{ui:editor.tool.chamfer}} mellett választasz, a munkadarab nyomtatható talpát készíti el: a lemeznél egy letörés, amely érintőlegesen megy át a fal felé vezető lekerekítésbe, így az első rétegekhez nem kell támasz, az él mégis puhán végződik. A {{ui:edge.distance}} a talp által elfoglalt magasság, az {{ui:edge.angle}} (15°–75°) a letörés meredeksége a lemeznél. Az éleket az {{ui:edge.bottomEdges}} gombbal választod ki.
 - A {{ui:edge.onlyVisibleEdges}} elrejti azokat az éleket, amelyek onnan nézve, ahonnan nézel, a test mögött vannak. Alapból minden él átlátszik a testen, ami egy zsúfolt alkatrésznél zavaró lesz; bekapcsolt kapcsolóval csak a feléd néző éleket látod, és csak azokra kattinthatsz. A többi eléréséhez forgasd el a nézetet. Egy pirossal rajzolt él (lásd lent) mindig látszik.
-- {{ui:edge.tangentChains}}: egy kattintás ilyenkor azokat az éleket is kiválasztja, amelyek simán egymásba folynak, például egy lekerekített sarkú lap körüli összes élt. A kapcsoló csak azt dönti el, mit választ ki egy kattintás: a CAD-mag az élletörést vagy a lekerekítést mindig továbbviszi az ilyen simán folytatódó éleken. A panel megmondja, hány további élen történik ez meg.
+- {{ui:edge.tangentChains}}: egy kattintás ilyenkor azokat az éleket is kiválasztja, amelyek simán egymásba folynak, például egy lekerekített sarkú lap körüli összes élt. A kapcsoló csak azt dönti el, mit választ ki egy kattintás: a CAD-mag az élletörést vagy a lekerekítést mindig továbbviszi az ilyen simán folytatódó éleken. Az ablak megmondja, hány további élen történik ez meg.
 - Az {{ui:edge.keepSize}} megtartja az élletörés vagy a lekerekítés méretét akkor is, ha később átméretezed a testet.
 - Az {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} vagy {{ui:edge.fine}}) dönti el, milyen finoman számolódik az előnézet. Nehéz alkatrészeknél a {{ui:edge.draft}} gyorsabb.
 
 Amíg a méretet állítod, a layerling újraszámolja az előnézetet. Ez eltarthat egy pillanatig. Nyugodtan állíts tovább; az utoljára választott érték számolódik ki.
 
-Ha a méret túl nagy az élhez, a layerling ezt jelzi, és kisebb értéket javasol. Gyakran egy-két milliméterrel kevesebb is elég. Éles szögeknél egy lekerekítésnek több hely kell, mint amennyit a sugara sejtet. Kis képernyőn a panel magától legörget, hogy az üzenet látható legyen.
+Ha a méret túl nagy az élhez, a layerling ezt jelzi, és kisebb értéket javasol. Gyakran egy-két milliméterrel kevesebb is elég. Éles szögeknél egy lekerekítésnek több hely kell, mint amennyit a sugara sejtet. Kis képernyőn az ablak magától legörget, hogy az üzenet látható legyen.
 
 Ha egy addig működő kijelölés egy újabb élre kattintva hibára fut, az az él pirosra vált, és vastagabban rajzolódik: ez az, amelyet ekkora méretben nem lehet a többivel együtt megmunkálni. Kattints rá újra, hogy kivedd, vagy csökkentsd a méretet. Ha az üzenet fennállása alatt további élekre kattintasz, az első piros marad. Ha nincs korábbi működő kijelölés – a legelső kattintásnál, vagy egy épp megemelt méretnél –, azok az élek válnak pirossá, amelyek önmagukban sem működnek, vagy mind, ha csak az együttesük a gond.
 
@@ -44,7 +44,7 @@ Egy furat is elfogadja a {{ui:editor.tool.chamfer}} és a {{ui:editor.tool.fille
 
 ### Élművelet visszavétele
 
-Egy megmunkált test bármikor újra megmunkálható. Jelöld ki újra, és nyisd meg az eszközt – a Lekerekítés, az Élletörés és a Kiüregelés is mutatja a listát: az {{ui:edge.featureHistory}} alatt látod, mi van már rajta. A {{ui:edge.revertAction}} egyetlen műveletet vesz vissza. Figyelem: ha újabb műveletek vannak fölötte, azok is vele mennek, és a panel megmondja, hány.
+Egy megmunkált test bármikor újra megmunkálható. Jelöld ki újra, és nyisd meg az eszközt – a Lekerekítés, az Élletörés és a Kiüregelés is mutatja a listát: az {{ui:edge.featureHistory}} alatt látod, mi van már rajta. A {{ui:edge.revertAction}} egyetlen műveletet vesz vissza. Figyelem: ha újabb műveletek vannak fölötte, azok is vele mennek, és az ablak megmondja, hány.
 
 Egy élletörés, lekerekítés vagy kiüregelés mellett ott van a {{ui:edge.editAction}} is. Ugyanígy visszaveszi a műveletet, de azonnal újra megnyitja az eszközt ugyanazokkal az élekkel és a régi értékkel. Megváltoztatod az értéket, és újra alkalmazod: egy 3 mm-es lekerekítésből 5 mm-es lesz anélkül, hogy újra rá kellene kattintanod az élekre. Ha újabb műveletek vannak fölötte, itt is vele mennek. Ez a mostantól készülő élműveletekre érvényes; a régebbiek csak visszavételt kínálnak, ahogy egy csoport egyes részei is.
 
@@ -60,11 +60,11 @@ A dobozokban, poharakban, házakban és fedelekben közös, hogy belül üresek,
 
 1. Jelöld ki a testet, és kattints a {{ui:editor.tool.hollow}} gombra, vagy kattints jobb gombbal a testre, és válaszd ki a menüből.
 2. Állítsd be a {{ui:shell.wall}} értékét.
-3. A {{ui:shell.openings}} alatt kapcsold be azokat az oldalakat, amelyek nyitva maradnak: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} vagy {{ui:shell.side.right}}, ahányat csak akarsz – egyedül az {{ui:shell.side.front}} fióknak való nyílást ad, a {{ui:shell.side.left}} és a {{ui:shell.side.right}} alagutat. Ha egyik oldal sincs bekapcsolva, a test minden oldalon zárt marad, középen egy üreggel. A {{ui:shell.side.closed}} egy kattintással minden oldalt kikapcsol. A {{ui:shell.side.top}} a panel megnyitásakor már be van kapcsolva; egy kattintás rá újra lezárja a tetejét. A minden oldalon zárt test kívülről változatlannak látszik: az üreget a metszetnézet mutatja.
+3. A {{ui:shell.openings}} alatt kapcsold be azokat az oldalakat, amelyek nyitva maradnak: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} vagy {{ui:shell.side.right}}, ahányat csak akarsz – egyedül az {{ui:shell.side.front}} fióknak való nyílást ad, a {{ui:shell.side.left}} és a {{ui:shell.side.right}} alagutat. Ha egyik oldal sincs bekapcsolva, a test minden oldalon zárt marad, középen egy üreggel. A {{ui:shell.side.closed}} egy kattintással minden oldalt kikapcsol. A {{ui:shell.side.top}} az ablak megnyitásakor már be van kapcsolva; egy kattintás rá újra lezárja a tetejét. A minden oldalon zárt test kívülről változatlannak látszik: az üreget a metszetnézet mutatja.
 4. Döntsd el, hogy a {{ui:shell.edges}} {{ui:shell.edges.round}} vagy {{ui:shell.edges.sharp}} legyenek.
 5. Kattints a {{ui:shell.apply}} gombra.
 
-![A kiüregelés panel a falvastagsággal, minden nyitva maradó oldalhoz egy kapcsolóval és a belső élekkel.](shot:hollow-panel)
+![A kiüregelés ablak a falvastagsággal, minden nyitva maradó oldalhoz egy kapcsolóval és a belső élekkel.](shot:hollow-panel)
 
 A falak befelé nőnek. A külső oldal változatlan marad.
 
@@ -109,7 +109,7 @@ A test minden lapja ugyanannyival tolható el kifelé vagy befelé. Erre van sz�
 
 Pipáld be a(z) {{ui:offset.sideways}} lehetőséget, ha csak a körvonalnak kell nőnie vagy zsugorodnia: az oldalak a távolsággal elmozdulnak, minden sík felső és alsó lap a magasságán marad. Egy tábla körben szegélyt kap, egy talp szélesebb lesz, és a test nem lesz magasabb. Lépcsős testnél minden lépcső megtartja a saját magasságát. A körvonalain át eltolt szöveg ilyenkor szintén megtartja a magasságát.
 
-Pipa nélkül maga a test tolódik el. Rögzített, pontos test lesz, mint egy letörés után: a panel tetején lévő lista visszavonja az eltolást, az {{ui:edge.editAction}} pedig újra megnyitja az eszközt a régi távolsággal. Csak pontos CAD-testek tolhatók el - dobozok, hengerek és a többi forma, ezek csoportjai, importált STEP-alkatrészek. Az a test, amely csak háromszögháló, mint sok STL-import, gyakran nem. A testhez túl nagy távolságot, például a legvékonyabb falon túli kicsinyítést, elutasítja.
+Pipa nélkül maga a test tolódik el. Rögzített, pontos test lesz, mint egy letörés után: az ablak tetején lévő lista visszavonja az eltolást, az {{ui:edge.editAction}} pedig újra megnyitja az eszközt a régi távolsággal. Csak pontos CAD-testek tolhatók el - dobozok, hengerek és a többi forma, ezek csoportjai, importált STEP-alkatrészek. Az a test, amely csak háromszögháló, mint sok STL-import, gyakran nem. A testhez túl nagy távolságot, például a legvékonyabb falon túli kicsinyítést, elutasítja.
 
 ## Lapok törlése
 

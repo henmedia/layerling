@@ -73,7 +73,7 @@ Vyberte díl, zapněte {{ui:editor.tool.layFlat}} a klikněte na plochu, která 
 
 Pro přiložení dvou dílů vyberte pohyblivý díl, spusťte {{ui:editor.tool.mateFaces}}, klikněte na jeho plochu a pak na plochu druhého. {{ui:mate.mode.against}} přiloží plochy proti sobě, {{ui:mate.mode.flush}} je srovná do jedné roviny. {{ui:mate.gap}} ponechá mezeru, například pro vůli. {{ui:mate.apply}} otočí první díl nejkratší cestou do rovnoběžné orientace a přesune jej pouze kolmo k druhé ploše. Boční poloha se zachová. Pokud jsou plochy rovnoběžné, neotáčí se. Druhý díl zůstane na místě a jediný krok Zpět operaci vrátí.
 
-![Panel zarovnání ploch: volba pohyblivého dílu, plochy druhého, režimu proti sobě nebo do roviny a případné mezery.](shot:mate-faces)
+![Okno zarovnání ploch: volba pohyblivého dílu, plochy druhého, režimu proti sobě nebo do roviny a případné mezery.](shot:mate-faces)
 
 **Díry na jedné ose:** {{ui:mate.mode.concentric}} místo toho zarovná kulaté plochy: díru nad díru, čep do díry, šroub do jeho průchozí díry. Vyberte to dřív, než kliknete na plochy. Pak klikněte na kulatý vnitřek díry (nebo vnější stranu čepu) na dílu, který se pohne, a na kulatou plochu druhého dílu; celá kulatá plocha se pod ukazatelem rozsvítí. {{ui:mate.apply}} otočí díl nejkratší cestou, až jsou obě osy rovnoběžné, a posune ho napříč na druhou osu. Podél osy zůstane, kde byl, takže čep si drží výšku; zasuňte ho potom. Funguje to i u importovaných sítí, pokud je díra tvořena ploškami kolem jedné osy.
 
@@ -112,7 +112,7 @@ Kopie jsou nejprve pouze náhled. Vytvoří je až {{ui:array.apply}}. Výřezy 
    - **{{ui:holePattern.arrangement}}:** {{ui:holePattern.arrangement.grid}} tvoří řádky a sloupce, {{ui:holePattern.arrangement.staggered}} posune každý druhý řádek o polovinu rozteče a přiblíží řádky tak, aby měly otvory stejně vzdálené sousedy. U šestiúhelníků vznikne voština.
    - **{{ui:holePattern.margin}}:** volný okraj kolem plochy i existujících otvorů. Vytvářejí se pouze celé otvory, které se do zbývající plochy vejdou.
    - **{{ui:holePattern.depth}}:** výchozí {{ui:holePattern.depth.through}} protne celou stěnu. {{ui:holePattern.depth.custom}} umožní zadat hloubku v mm pro zahloubení.
-3. Náhled se průběžně mění a panel uvádí počet otvorů. {{ui:holePattern.repick}} zvolí jinou plochu a [[Esc]] nástroj zavře. Panel lze přesouvat za záhlaví.
+3. Náhled se průběžně mění a okno uvádí počet otvorů. {{ui:holePattern.repick}} zvolí jinou plochu a [[Esc]] nástroj zavře. Okno lze přesouvat za záhlaví.
 4. Skutečné otvory vytvoří až {{ui:holePattern.apply}}.
 
 Výřezy zůstávají běžnými tvary sloučenými s tělesem jako po {{ui:editor.tool.group}}. {{ui:editor.tool.ungroup}} je uvolní pro samostatný posun, změnu nebo smazání. Vše je jediný krok {{ui:editor.tool.undo}}. Najednou lze vytvořit nejvýše 400 otvorů; při překročení zvětšete otvory nebo rozteč.

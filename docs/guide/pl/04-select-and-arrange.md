@@ -27,7 +27,7 @@ Przy wielu częściach łatwo zgubić się w widoku. Lista obiektów ({{ui:edito
 - Pole wyszukiwania znajduje kształty po nazwie i po rodzaju, więc także „walec” albo „otwór”. Zagląda też do wnętrza grup, niezależnie od głębokości zagnieżdżenia: grupa zawierająca trafienie zostaje na liście i rozwija się, pokazując pasujące części i grupy, które do nich prowadzą. Grupa znaleziona po własnej nazwie po otwarciu pokazuje wszystkie swoje części.
 - Strzałka po lewej stronie paska tytułu zwija listę do samego paska i z powrotem.
 
-Lista jest zadokowana tuż na prawo od kostki widoku. Przeciągnij ją za pasek tytułu, aby położyć ją w dowolnym miejscu na płaszczyźnie roboczej. Przechodzi pod kostką widoku i paskiem kamery. Upuść ją z powrotem obok kostki widoku albo kliknij dwukrotnie pasek tytułu, a znów się zadokuje. Przeglądarka zapamiętuje, gdzie była i czy była zwinięta.
+Lista jest zadokowana tuż na prawo od kostki widoku. Przeciągnij ją za pasek tytułu, aby położyć ją w dowolnym miejscu na płaszczyźnie roboczej. Przechodzi pod kostką widoku i paskiem widoku. Upuść ją z powrotem obok kostki widoku albo kliknij dwukrotnie pasek tytułu, a znów się zadokuje. Przeglądarka zapamiętuje, gdzie była i czy była zwinięta.
 
 ## Wpisywanie pozycji
 
@@ -79,9 +79,9 @@ Gdy zaznaczona jest **jedna bryła**, punkt obrotu należy do tej bryły: zaznac
 
 Część ma leżeć do druku na swojej najlepszej stronie? Zaznacz ją, kliknij {{ui:editor.tool.layFlat}}, a potem ścianę, która ma trafić na dół. Gdy przesuwasz wskaźnik nad częścią, ściana pod nim się podświetla, więc widzisz, którą zaraz wybierzesz. Obróć widok, żeby sprawdzić pozostałe strony. Część obraca się tak, że ta ściana opiera się na płaszczyźnie roboczej.
 
-Dwie części mają się zetknąć ścianami albo stanąć na równo? Zaznacz część, która ma się przesunąć, kliknij {{ui:editor.tool.mateFaces}}, potem kliknij jej ścianę, a następnie ścianę drugiej części. W panelu {{ui:mate.mode.against}} przykłada ściany do siebie (plecami, stykając się), a {{ui:mate.mode.flush}} kładzie je w jednej płaszczyźnie obok siebie. {{ui:mate.gap}} zostawia między nimi miejsce, na przykład na luz. {{ui:mate.apply}} przesuwa część: obraca ją najkrótszą drogą, aż ściany będą równoległe (wcale, jeśli już są), a potem przesuwa ją tylko w stronę drugiej ściany, więc w bok zostaje na miejscu. Druga część zostaje tam, gdzie była, a jedno Cofnij cofa wszystko.
+Dwie części mają się zetknąć ścianami albo stanąć na równo? Zaznacz część, która ma się przesunąć, kliknij {{ui:editor.tool.mateFaces}}, potem kliknij jej ścianę, a następnie ścianę drugiej części. W oknie {{ui:mate.mode.against}} przykłada ściany do siebie (plecami, stykając się), a {{ui:mate.mode.flush}} kładzie je w jednej płaszczyźnie obok siebie. {{ui:mate.gap}} zostawia między nimi miejsce, na przykład na luz. {{ui:mate.apply}} przesuwa część: obraca ją najkrótszą drogą, aż ściany będą równoległe (wcale, jeśli już są), a potem przesuwa ją tylko w stronę drugiej ściany, więc w bok zostaje na miejscu. Druga część zostaje tam, gdzie była, a jedno Cofnij cofa wszystko.
 
-![Panel Wyrównaj ściany: część, która się przesuwa, jest wybrana, następna jest ściana drugiej części, potem ściana do ściany albo na równo i opcjonalna szczelina.](shot:mate-faces)
+![Okno Wyrównaj ściany: część, która się przesuwa, jest wybrana, następna jest ściana drugiej części, potem ściana do ściany albo na równo i opcjonalna szczelina.](shot:mate-faces)
 
 **Otwory na jednej osi:** {{ui:mate.mode.concentric}} wyrównuje zamiast tego okrągłe ściany: otwór nad otworem, kołek w otworze, śrubę w jej otworze przelotowym. Wybierz tę opcję, zanim klikniesz ściany. Potem kliknij okrągłe wnętrze otworu (lub zewnętrzną stronę kołka) na części, która się przesuwa, i okrągłą ścianę drugiej części; cała okrągła ściana podświetla się pod wskaźnikiem. {{ui:mate.apply}} obraca część najkrótszą drogą, aż obie osie będą równoległe, i przesuwa ją w poprzek na drugą oś. Wzdłuż osi zostaje tam, gdzie była, więc kołek zachowuje wysokość; wsuń go potem. Działa to też na zaimportowanych siatkach, o ile otwór składa się ze ścianek wokół jednej osi.
 

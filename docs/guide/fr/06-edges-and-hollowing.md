@@ -14,11 +14,11 @@ Les arêtes vives sont rarement belles sur une pièce imprimée, et elles ne son
 
 ![L'outil "Congé arêtes" : toutes les arêtes vives sont sélectionnées, l'image montre l'aperçu avec un rayon de 4 mm.](shot:fillet-preview)
 
-Le panneau se trouve en haut à droite. S'il recouvre les bords sur lesquels vous souhaitez cliquer, faites-le glisser par sa barre de titre ; il s'y ouvrira également la prochaine fois, tout comme {{ui:editor.tool.hollow}} et {{ui:editor.tool.array}}. Double-cliquez sur la barre de titre pour la remettre.
+La fenêtre d'outil se trouve en haut à droite. S'il recouvre les bords sur lesquels vous souhaitez cliquer, faites-le glisser par sa barre de titre ; il s'y ouvrira également la prochaine fois, tout comme {{ui:editor.tool.hollow}} et {{ui:editor.tool.array}}. Double-cliquez sur la barre de titre pour la remettre.
 
-Choisir une forme dans la liste des formes alors que le panneau est ouvert le ferme sans rien appliquer et les bords sur lesquels vous avez cliqué sont oubliés. Le clic place ensuite la nouvelle forme au lieu de sélectionner les bords.
+Choisir une forme dans la liste des formes alors que la fenêtre d'outil est ouverte la ferme sans rien appliquer et les bords sur lesquels vous avez cliqué sont oubliés. Le clic place ensuite la nouvelle forme au lieu de sélectionner les bords.
 
-Dans le panneau vous trouvez :
+Dans la fenêtre d'outil vous trouvez :
 
 - {{ui:edge.allSharpEdges}} sélectionne chaque arête à la fois, {{ui:edge.clear}} vide la sélection.
 - **{{ui:edge.radius}}** pour le congé. Pour le chanfrein, vous définissez {{ui:edge.distance}} ou {{ui:edge.angle}}.
@@ -27,13 +27,13 @@ Dans le panneau vous trouvez :
 - {{ui:edge.bottomEdges}} ne sélectionne que les bords tout en bas du corps, le pendant de {{ui:edge.topEdges}}. C'est le moyen rapide d'arrondir ou de chanfreiner seulement le pied d'une pièce.
 - {{ui:edge.chamfillet}}, choisi en haut de la fenêtre du chanfrein à côté de {{ui:editor.tool.chamfer}}, crée le pied imprimable d'une pièce : un chanfrein sur le plateau qui se fond tangentiellement dans un congé vers la paroi, de sorte que les premières couches n'ont pas besoin de support et que le bord finit tout de même en douceur. {{ui:edge.distance}} est la hauteur que prend le pied, {{ui:edge.angle}} (15° à 75°) la pente du chanfrein au plateau. Choisissez les bords avec {{ui:edge.bottomEdges}}.
 - {{ui:edge.onlyVisibleEdges}} masque les bords qui se trouvent derrière le corps d'où vous regardez. Par défaut, chaque bord apparaît à travers le corps, ce qui prête à confusion sur une partie occupée ; avec l'interrupteur allumé, vous voyez et pouvez cliquer uniquement les bords face à vous. Tournez la vue pour atteindre les autres. Un bord dessiné en rouge (voir ci-dessous) apparaît toujours.
-- {{ui:edge.tangentChains}} : un clic sélectionne alors également les arêtes qui s'enchaînent doucement les unes dans les autres, par exemple toutes les arêtes autour d'une face aux coins arrondis. Le commutateur décide uniquement ce qu'un clic sélectionne : le noyau de CAO comporte toujours un chanfrein ou un congé le long de ces bords continus et fluides. Le panneau vous indique le nombre d'arêtes supplémentaires qui se produisent.
+- {{ui:edge.tangentChains}} : un clic sélectionne alors également les arêtes qui s'enchaînent doucement les unes dans les autres, par exemple toutes les arêtes autour d'une face aux coins arrondis. Le commutateur décide uniquement ce qu'un clic sélectionne : le noyau de CAO comporte toujours un chanfrein ou un congé le long de ces bords continus et fluides. La fenêtre vous indique le nombre d'arêtes supplémentaires qui se produisent.
 - {{ui:edge.keepSize}} conserve le chanfrein ou le congé aussi grand qu'il est, même si vous mettez le corps à l'échelle ultérieurement.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} ou {{ui:edge.fine}}) décide de la précision avec laquelle l'aperçu est calculé. Pour les pièces difficiles, {{ui:edge.draft}} est plus rapide.
 
 Pendant que vous ajustez la taille, layerling recalcule l'aperçu. Cela peut prendre un moment. Vous pouvez continuer à vous adapter ; la dernière valeur que vous avez choisie est celle qui est calculée.
 
-Si la taille est trop grande pour le bord, layerling l'indique et suggère une valeur plus petite. Souvent, un ou deux millimètres de moins suffisent. Aux angles vifs, un congé a besoin de plus d’espace que son rayon ne le suggère. Sur un petit écran, le panneau défile tout seul pour que le message soit visible.
+Si la taille est trop grande pour le bord, layerling l'indique et suggère une valeur plus petite. Souvent, un ou deux millimètres de moins suffisent. Aux angles vifs, un congé a besoin de plus d’espace que son rayon ne le suggère. Sur un petit écran, la fenêtre défile toute seule pour que le message soit visible.
 
 Lorsqu'une sélection qui a fonctionné échoue après avoir cliqué sur un bord supplémentaire, ce bord devient rouge et s'élargit : c'est celui qui ne peut pas être traité avec les autres à cette taille. Cliquez à nouveau dessus pour le retirer ou réduisez la taille. Si vous cliquez sur plusieurs bords pendant que le message est affiché, le premier reste rouge. Lorsqu'aucune sélection antérieure n'a fonctionné - au tout premier clic ou à une taille que vous venez d'augmenter - les bords qui échouent même d'eux-mêmes deviennent rouges, ou tous s'il ne s'agit que de leur combinaison.
 
@@ -43,7 +43,7 @@ Un perçage accepte aussi {{ui:editor.tool.chamfer}} et {{ui:editor.tool.fillet}
 
 ### Reprendre un traitement de pointe
 
-Un corps traité peut toujours être traité à nouveau. Sélectionnez-le à nouveau et ouvrez l'outil - Congé, Chanfrein ou Creux, chacun affiche la liste : sous {{ui:edge.featureHistory}} vous voyez ce qu'il y a déjà dessus. {{ui:edge.revertAction}} reprend un seul traitement. Remarque : si des traitements plus récents se trouvent au-dessus, ils vont avec et le panneau vous indique combien.
+Un corps traité peut toujours être traité à nouveau. Sélectionnez-le à nouveau et ouvrez l'outil - Congé, Chanfrein ou Creux, chacun affiche la liste : sous {{ui:edge.featureHistory}} vous voyez ce qu'il y a déjà dessus. {{ui:edge.revertAction}} reprend un seul traitement. Remarque : si des traitements plus récents se trouvent au-dessus, ils vont avec et la fenêtre vous indique combien.
 
 A côté d'un chanfrein, d'un congé ou d'un évidement, il y a aussi {{ui:edge.editAction}}. Il reprend le traitement de la même manière, mais ouvre à nouveau l'outil immédiatement avec les mêmes bords et l'ancienne valeur. Vous modifiez la valeur et l'appliquez à nouveau : un congé de 3 mm devient un congé de 5 mm sans cliquer à nouveau sur les bords. Si des traitements plus récents se trouvent au-dessus, ils l’accompagnent également ici. Cela vaut pour les traitements de bords que vous effectuerez désormais ; les plus âgés proposent uniquement la reprise, tout comme les parties individuelles d'un groupe.
 
@@ -59,11 +59,11 @@ Boîtes, tasses, étuis et couvercles ont un point commun : ils sont vides à l'
 
 1. Sélectionnez le corps et cliquez sur {{ui:editor.tool.hollow}}, ou cliquez avec le bouton droit sur le corps et sélectionnez-le dans le menu.
 2. Définissez {{ui:shell.wall}}.
-3. Sous {{ui:shell.openings}}, activez les côtés qui restent ouverts : {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} ou {{ui:shell.side.right}}, autant que vous le souhaitez - {{ui:shell.side.front}} fait à lui seul un emplacement pour un tiroir, {{ui:shell.side.left}} et {{ui:shell.side.right}} un tunnel. Sans aucun côté allumé, le corps reste fermé sur tout son pourtour, avec une cavité au milieu. {{ui:shell.side.closed}} désactive tous les côtés en un clic. {{ui:shell.side.top}} est déjà activé à l'ouverture du panneau ; un clic dessus referme le dessus. Un corps fermé de tous côtés semble inchangé de l'extérieur : la vue en coupe montre la cavité.
+3. Sous {{ui:shell.openings}}, activez les côtés qui restent ouverts : {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} ou {{ui:shell.side.right}}, autant que vous le souhaitez - {{ui:shell.side.front}} fait à lui seul un emplacement pour un tiroir, {{ui:shell.side.left}} et {{ui:shell.side.right}} un tunnel. Sans aucun côté allumé, le corps reste fermé sur tout son pourtour, avec une cavité au milieu. {{ui:shell.side.closed}} désactive tous les côtés en un clic. {{ui:shell.side.top}} est déjà activé à l'ouverture de la fenêtre ; un clic dessus referme le dessus. Un corps fermé de tous côtés semble inchangé de l'extérieur : la vue en coupe montre la cavité.
 4. Décidez si {{ui:shell.edges}} doit être {{ui:shell.edges.round}} ou {{ui:shell.edges.sharp}}.
 5. Cliquez sur {{ui:shell.apply}}.
 
-![Le panneau creux avec l'épaisseur de la paroi, un interrupteur pour chaque côté qui reste ouvert et les bords intérieurs.](shot:hollow-panel)
+![La fenêtre Creuser avec l'épaisseur de la paroi, un interrupteur pour chaque côté qui reste ouvert et les bords intérieurs.](shot:hollow-panel)
 
 Les murs grandissent vers l’intérieur. L’extérieur reste tel quel.
 
@@ -112,14 +112,14 @@ Chaque face d'un corps peut être déplacée de la même distance, vers l'extér
 
 Coche {{ui:offset.sideways}} quand seul le contour doit grandir ou rétrécir : les côtés se déplacent de la distance, et chaque face plane du dessus et du dessous garde sa hauteur. Un panneau reçoit une bordure tout autour, un socle s'élargit, et le corps ne devient pas plus haut. Sur un corps en gradins, chaque marche garde sa propre hauteur. Un texte décalé par ses contours garde alors lui aussi sa hauteur.
 
-Sans la coche, le corps lui-même est décalé. Il devient un corps exact fixe, comme après un chanfrein : la liste en haut du panneau annule le décalage, et {{ui:edge.editAction}} rouvre l'outil avec l'ancienne distance. Seuls les corps CAD exacts peuvent être décalés - boîtes, cylindres et les autres formes, leurs groupes, pièces STEP importées. Un corps qui n'est qu'un maillage de triangles, comme beaucoup d'imports STL, ne le peut souvent pas. Une distance trop grande pour le corps, par exemple une réduction au-delà de sa paroi la plus fine, est refusée.
+Sans la coche, le corps lui-même est décalé. Il devient un corps exact fixe, comme après un chanfrein : la liste en haut de la fenêtre annule le décalage, et {{ui:edge.editAction}} rouvre l'outil avec l'ancienne distance. Seuls les corps CAD exacts peuvent être décalés - boîtes, cylindres et les autres formes, leurs groupes, pièces STEP importées. Un corps qui n'est qu'un maillage de triangles, comme beaucoup d'imports STL, ne le peut souvent pas. Une distance trop grande pour le corps, par exemple une réduction au-delà de sa paroi la plus fine, est refusée.
 
 ## Supprimer des faces
 
 Un congé qui gêne, un trou au mauvais endroit, un bossage dont vous n'avez plus besoin : {{ui:editor.tool.deleteFace}} les retire du corps, sans avoir à le reconstruire.
 
 1. Sélectionnez le corps et cliquez sur {{ui:editor.tool.deleteFace}}, ou cliquez avec le bouton droit sur le corps et sélectionnez-le dans le menu.
-2. Cliquez sur chaque face de ce qui doit disparaître : les faces d'un bord arrondi, la paroi d'un trou, le côté et le dessus d'un bossage. Une face choisie s'allume ; un nouveau clic la retire. Le panneau compte les faces.
+2. Cliquez sur chaque face de ce qui doit disparaître : les faces d'un bord arrondi, la paroi d'un trou, le côté et le dessus d'un bossage. Une face choisie s'allume ; un nouveau clic la retire. La fenêtre compte les faces.
 3. Cliquez sur {{ui:deleteFace.apply}} ou appuyez sur [[Delete]]. [[Esc]] ferme l'outil sans rien changer.
 
 Les faces autour s'étendent jusqu'à refermer le vide. Un bloc aux bords supérieurs arrondis retrouve ses arêtes vives, un trou est comblé, un bossage disparaît. Le corps reste exact : il peut à nouveau recevoir des congés et des chanfreins, et l'export STEP garde ses vraies faces. [[Ctrl]]+[[Z]] annule la suppression en une étape. Elle figure aussi sous {{ui:edge.featureHistory}}, au même titre que les congés et les chanfreins, où {{ui:edge.revertAction}} l'annule ; il n'y a pas de {{ui:edge.editAction}} pour elle. Sur un groupe, le résultat est un seul corps, comme pour un traitement de bord.

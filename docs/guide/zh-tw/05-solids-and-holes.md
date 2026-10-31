@@ -53,7 +53,7 @@ summary: 簡單的形狀如何變成內孔、槽與凹槽，以及之後如何�
 
 ## 從一個實體中挖出另一個實體
 
-對需要配合的零件，例如套筒裡的軸或外殼裡的螺栓，先做出其中一個零件，再把它從另一個零件上挖出來。選取兩個實體，在{{ui:editor.group.combine}}區域點擊{{ui:editor.tool.cutOut}}，或按右鍵後在那裡選擇。面板會寫出保留的零件和得到空腔的實體；layerling 把較小的當作零件，{{ui:cutOut.swap}}可以對調。{{ui:cutOut.clearance}}讓空腔在零件四周都大出這麼多：0 表示剛好吻合，0.2 mm 是列印配合的常用間隙。{{ui:cutOut.apply}}從另一個實體上挖掉零件的副本，零件本身留在原處。結果是一個群組：{{ui:editor.tool.ungroup}}可以把這次切割重新拆開。設定間隙要求零件是精確實體，與為此使用的{{ui:editor.tool.offset}}工具相同。
+對需要配合的零件，例如套筒裡的軸或外殼裡的螺栓，先做出其中一個零件，再把它從另一個零件上挖出來。選取兩個實體，在{{ui:editor.group.combine}}區域點擊{{ui:editor.tool.cutOut}}，或按右鍵後在那裡選擇。視窗會寫出保留的零件和得到空腔的實體；layerling 把較小的當作零件，{{ui:cutOut.swap}}可以對調。{{ui:cutOut.clearance}}讓空腔在零件四周都大出這麼多：0 表示剛好吻合，0.2 mm 是列印配合的常用間隙。{{ui:cutOut.apply}}從另一個實體上挖掉零件的副本，零件本身留在原處。結果是一個群組：{{ui:editor.tool.ungroup}}可以把這次切割重新拆開。設定間隙要求零件是精確實體，與為此使用的{{ui:editor.tool.offset}}工具相同。
 
 ## 編輯群組
 

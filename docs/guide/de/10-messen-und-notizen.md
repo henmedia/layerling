@@ -7,7 +7,7 @@ Wer ein Teil genau bauen will, muss messen können. layerling hat dafür mehrere
 
 ## Das Maßband
 
-Das Maßband liegt am unteren Ende der Kameraleiste am linken Rand ({{ui:camera.tapeTools}}). Es misst Abstände zwischen Ecken, Kanten und Flächen. Ein Klick darauf öffnet fünf Schaltflächen. Verdecken sie, was du messen willst, ziehst du sie am Griff links frei über die Arbeitsfläche; ein Doppelklick auf den Griff bringt sie zurück:
+Das Maßband liegt am unteren Ende der Ansichtsleiste am linken Rand ({{ui:camera.tapeTools}}). Es misst Abstände zwischen Ecken, Kanten und Flächen. Ein Klick darauf öffnet fünf Schaltflächen. Verdecken sie, was du messen willst, ziehst du sie am Griff links frei über die Arbeitsfläche; ein Doppelklick auf den Griff bringt sie zurück:
 
 ![Das Maßband mit seinen Schaltflächen: Maß hinzufügen, Messpunkte verschieben, Maß entfernen, ganze Kanten messen, alle Maße entfernen.](shot:tape-menu)
 
@@ -27,7 +27,7 @@ Aus der Formenbibliothek holst du das {{ui:shape.ruler}}. Es ist ein reines Mess
 
 ## Das Winkellineal
 
-Manchmal misst du besser an einem rechten Winkel. Klicke in der Kameraleiste auf {{ui:camera.cornerRulerTool}} und dann auf die Arbeitsfläche. Dort legt sich ein Winkellineal mit zwei Armen im rechten Winkel ab, mit Teilstrichen, wie ein Anschlagwinkel. Auch das hat keinen eigenen Körper. Klickst du nahe an die Ecke eines Körpers, rastet seine Ecke genau dort ein. Der Entwurf behält das Winkellineal dort, wo du es gesetzt hast, auch in einer gespeicherten .lyl-Datei: Öffnest du den Entwurf wieder, liegt es an derselben Stelle, gleich gedreht und mit denselben Messpunkten, bis du es entfernst.
+Manchmal misst du besser an einem rechten Winkel. Klicke in der Ansichtsleiste auf {{ui:camera.cornerRulerTool}} und dann auf die Arbeitsfläche. Dort legt sich ein Winkellineal mit zwei Armen im rechten Winkel ab, mit Teilstrichen, wie ein Anschlagwinkel. Auch das hat keinen eigenen Körper. Klickst du nahe an die Ecke eines Körpers, rastet seine Ecke genau dort ein. Der Entwurf behält das Winkellineal dort, wo du es gesetzt hast, auch in einer gespeicherten .lyl-Datei: Öffnest du den Entwurf wieder, liegt es an derselben Stelle, gleich gedreht und mit denselben Messpunkten, bis du es entfernst.
 
 Das Winkellineal legt sich auf die Arbeitsebene. Liegt sie auf der Seite eines Körpers, liegt es also auch auf dieser Seite, siehe [Ansicht und Arbeitsebene](chapter:ansicht-und-arbeitsebene). So bemaßt du auf einer senkrechten Wand: Arbeitsebene auf die Wand legen, Winkellineal an ihre obere linke Ecke setzen und so oft auf den Griff klicken, bis die Arme nach rechts und nach unten zeigen.
 
@@ -92,4 +92,4 @@ Ein Referenzbild ist ein Bild, an dem du Teile ausrichtest: Leg das Foto einer P
 - {{ui:referenceImage.calibrate}} gibt ihm seine wirkliche Größe wie in der Skizze: Klicke zwei Punkte auf dem Bild an, deren wirklichen Abstand du kennst - zwei Befestigungslöcher der Platine etwa - und gib diesen Abstand unter {{ui:referenceImage.distance}} ein. Das Bild behält seine Proportionen und seine Mitte.
 - Sperre es mit dem Schloss im Kopf seiner Einstellungen, dann bleibt es liegen: Klicks gehen durch es hindurch auf die Platte. In der Objektliste wählst du es wieder aus, um es zu entsperren.
 - Das Bild liegt einmal in der Entwurfsdatei, egal wie oft es kopiert oder rückgängig gemacht wird. Ein großes Bild macht die Datei um so viel größer; die Meldung beim Hinzufügen nennt seine Größe.
-- Eine KI legt eines mit `layerling_reference_image` an, verschiebt, kalibriert, blendet und sperrt es. Mit `trace` zeichnet sie das Bild zu einem Skizzenkörper nach, der darauf steht, wie {{ui:sketch.traceImageButton}} in der Skizze.
+- Eine KI legt eines mit `layerling_reference_image` an, verschiebt, kalibriert, blendet und sperrt es. Mit `trace` zeichnet sie das Bild zu einem Skizzenkörper nach, der darauf steht, wie {{ui:sketch.traceImage}} in der Skizze.

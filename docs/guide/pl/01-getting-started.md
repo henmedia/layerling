@@ -17,12 +17,15 @@ Wszystkie Twoje projekty pojawiają się potem na stronie startowej z obrazkiem 
 
 ## Edytor w skrócie
 
-![Edytor z dwoma kształtami na płaszczyźnie roboczej. Na górze wstążka, po lewej sterowanie kamerą, po prawej ustawienia zaznaczonego kształtu.](shot:editor-overview)
+![Edytor z podpisanymi obszarami: na górze wstążka, po lewej kostka widoku, a pod nią pasek widoku, obok komunikat stanu i lista obiektów, po prawej właściwości zaznaczonego kształtu.](shot:editor-areas)
 
-- **Na górze** jest wstążka. Jest podzielona według zadań: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} i {{ui:editor.group.file}}. {{ui:editor.group.help}} jest nad nią w wierszu tytułu, a domek obok kart prowadzi z powrotem na stronę startową. Gdy okno jest za wąskie na wszystkie grupy, najrzadziej używane zwijają się do jednego przycisku pod swoją nazwą: wskaż go albo stuknij, a jego narzędzia otworzą się pod nim. Pinezka w prawym górnym rogu, na lewo od lupy, trzyma zamiast tego wszystkie grupy otwarte. Najedź na ikonę, aby zobaczyć jej nazwę, także na wyszarzoną. {{ui:interactiveHelp.title}} (znak zapytania pod {{ui:editor.group.help}} albo Shift+F1) objaśnia każdą z nich jednym kliknięciem i prowadzi do jej części tej instrukcji. Gdziekolwiek widzisz mały znak zapytania, na przykład w ustawieniach kształtu, w bibliotece kształtów albo w panelach narzędzi, prowadzi on prosto do pasującego rozdziału tej instrukcji.
+- **Na górze** jest wstążka. Jest podzielona według zadań: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} i {{ui:editor.group.file}}. {{ui:editor.group.help}} jest nad nią w wierszu tytułu, a domek obok kart prowadzi z powrotem na stronę startową. Gdy okno jest za wąskie na wszystkie grupy, najrzadziej używane zwijają się do jednego przycisku pod swoją nazwą: wskaż go albo stuknij, a jego narzędzia otworzą się pod nim. Pinezka w prawym górnym rogu, na lewo od lupy, trzyma zamiast tego wszystkie grupy otwarte. Najedź na ikonę, aby zobaczyć jej nazwę, także na wyszarzoną. {{ui:interactiveHelp.title}} (znak zapytania pod {{ui:editor.group.help}} albo Shift+F1) objaśnia każdą z nich jednym kliknięciem i prowadzi do jej części tej instrukcji. Gdziekolwiek widzisz mały znak zapytania, na przykład w ustawieniach kształtu, w bibliotece kształtów albo w oknach narzędzi, prowadzi on prosto do pasującego rozdziału tej instrukcji. Grupa {{ui:editor.group.modify}} jest podzielona na cztery części, każda z nazwą nad narzędziami: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} i {{ui:editor.section.surface}}. Szara ikona mówi też, na co czeka, na przykład {{ui:editor.needs.oneBody}} albo {{ui:editor.needs.locked}}. Nie możesz znaleźć narzędzia? Naciśnij [[Ctrl]]+[[K]] i wpisz jego nazwę; pusty projekt przypomina o tym na dole widoku.
 - **Na środku** leży płaszczyzna robocza. Tu umieszczasz kształty, nadajesz im formę i oglądasz wynik.
-- **Po prawej** pojawiają się ustawienia zaznaczonego kształtu: kolor, wymiary, pozycja i wszystko inne, co go tworzy. Wpisywanie liczb jest dokładniejsze niż przeciąganie.
-- **Po lewej** jest sterowanie kamerą, a nad nim kostka widoku. Służą do poruszania się po scenie, więcej w rozdziale [Widok i płaszczyzna robocza](chapter:view-and-workplane).
+- **Po prawej** pojawiają się **właściwości** zaznaczonego kształtu: kolor, wymiary, pozycja i wszystko inne, co go tworzy. Wpisywanie liczb jest dokładniejsze niż przeciąganie.
+- **Po lewej** jest pasek widoku, a nad nim kostka widoku. Służą do poruszania się po scenie, więcej w rozdziale [Widok i płaszczyzna robocza](chapter:view-and-workplane).
+- **Obok paska widoku** otwiera się **lista obiektów** ([[Ctrl]]+[[U]]) ze wszystkimi kształtami projektu. Więcej w rozdziale [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange).
+- **Na prawo od kostki widoku** pojawia się **komunikat stanu**, gdy layerling ma ci coś do powiedzenia, na przykład czego narzędzie od ciebie oczekuje. Gdy nie ma nic do powiedzenia, nie ma go.
+- **Okna narzędzi** otwierają się nad płaszczyzną roboczą, gdy uruchamiasz narzędzie takie jak {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} albo {{ui:editor.tool.hollow}}. Gdy coś zasłaniają, odsuń je za pasek tytułu.
 - **Na samej górze** przełączasz między {{ui:editor.modeGeometry}} a {{ui:editor.modeSketch}}, zmieniasz nazwę projektu oraz wybierasz język i motyw kolorów.
 
 ## Przyciski wokół obszaru roboczego
@@ -69,9 +72,9 @@ Nazwa projektu ({{ui:confirm.projectName}}) stoi na samej górze. Kliknij ją, w
 
 {{ui:palette.open}}: wpisz, czego szukasz, narzędzie, kształt albo ustawienie, i kliknij wynik.
 
-### Ukryj sterowanie kamerą
+### Ukryj pasek widoku
 
-{{ui:camera.hide}} chowa sterowanie kamerą po lewej i daje obszarowi roboczemu więcej miejsca. {{ui:camera.show}} przywraca je z powrotem.
+{{ui:camera.hide}} chowa pasek widoku po lewej i daje obszarowi roboczemu więcej miejsca. {{ui:camera.show}} przywraca je z powrotem.
 
 ### Siatka przyciągania
 

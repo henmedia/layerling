@@ -7,7 +7,7 @@ Egy alkatrész pontos megépítéséhez mérni kell. A layerlingben erre több e
 
 ## A mérőszalag
 
-A mérőszalag a bal szélen lévő kamerasáv alsó végén van ({{ui:camera.tapeTools}}). Sarkok, élek és lapok közötti távolságokat mér. Rákattintva öt gomb nyílik meg. Ha eltakarják, amit mérnél, húzd őket a bal oldali fogónál fogva bárhová a munkasíkon; a fogóra dupla kattintás visszateszi őket:
+A mérőszalag a bal szélen lévő nézetsáv alsó végén van ({{ui:camera.tapeTools}}). Sarkok, élek és lapok közötti távolságokat mér. Rákattintva öt gomb nyílik meg. Ha eltakarják, amit mérnél, húzd őket a bal oldali fogónál fogva bárhová a munkasíkon; a fogóra dupla kattintás visszateszi őket:
 
 ![A mérőszalag a gombjaival: mérés hozzáadása, mérési pontok mozgatása, mérés eltávolítása, teljes élek, minden mérés törlése.](shot:tape-menu)
 
@@ -27,7 +27,7 @@ A {{ui:shape.ruler}} alakzatot az alakzattárból veszed elő. Tisztán mérőes
 
 ## A derékszögvonalzó
 
-Néha derékszögben jobban mérsz. Kattints a kamerasávon a {{ui:camera.cornerRulerTool}} gombra, majd a munkasíkra. Oda egy derékszögvonalzó kerül két, egymásra merőleges szárral, osztásokkal, mint egy asztalos derékszögön. Ennek sincs saját teste. Ha egy test sarka közelébe kattintasz, a sarka pontosan oda illeszkedik.
+Néha derékszögben jobban mérsz. Kattints a nézetsávon a {{ui:camera.cornerRulerTool}} gombra, majd a munkasíkra. Oda egy derékszögvonalzó kerül két, egymásra merőleges szárral, osztásokkal, mint egy asztalos derékszögön. Ennek sincs saját teste. Ha egy test sarka közelébe kattintasz, a sarka pontosan oda illeszkedik.
 
 A derékszögvonalzó a munkasíkon fekszik. Ha az egy test oldalán van, a derékszögvonalzó is azon az oldalon fekszik, lásd a [Nézet és munkasík](chapter:view-and-workplane) fejezetet. Így méretezel egy függőleges falon: tedd a munkasíkot a falra, helyezd a derékszögvonalzót a bal felső sarkára, és kattints a fogantyúra, amíg a szárak jobbra és lefelé nem mutatnak.
 
@@ -90,4 +90,4 @@ A mintakép egy kép, amelyhez a részeket igazíthatod: tedd egy áramköri lap
 - A {{ui:referenceImage.calibrate}} a valódi méretére állítja, mint a vázlatban: kattints a képen két pontra, amelyek valódi távolságát ismered - például a lap két rögzítőfuratára -, és írd be ezt a távolságot a {{ui:referenceImage.distance}} mezőbe. A kép megtartja az arányait és a közepét.
 - A beállításai fejlécében lévő lakattal zárold, és a helyén marad: a kattintások átmennek rajta a tárgyasztalra. Feloldáshoz az objektumlistában válaszd ki újra.
 - A kép egyszer kerül a tervfájlba, akárhányszor másolod vagy vonod vissza. Egy nagy kép ennyivel nagyobbá teszi a fájlt; hozzáadáskor az üzenet megmondja a méretét.
-- Egy MI a `layerling_reference_image` segítségével ad hozzá, mozgat, kalibrál, halványít és zárol egyet. A `trace` a képet egy rajta álló vázlattestté rajzolja körbe, ahogy a vázlatban a {{ui:sketch.traceImageButton}}.
+- Egy MI a `layerling_reference_image` segítségével ad hozzá, mozgat, kalibrál, halványít és zárol egyet. A `trace` a képet egy rajta álló vázlattestté rajzolja körbe, ahogy a vázlatban a {{ui:sketch.traceImage}}.

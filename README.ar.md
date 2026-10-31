@@ -215,7 +215,7 @@ npm run dev
 docker run -d --name layerling -p 3000:3000 -v layerling-thumbnails:/app/.codex/project-thumbnails --restart unless-stopped ghcr.io/henmedia/layerling:latest
 ```
 
-الخيار `-v` يحفظ صور المعاينة في صفحة البداية في وحدة تخزين Docker باسم `layerling-thumbnails`، فتبقى بعد التحديث؛ ومن دونه تكون داخل الحاوية وتضيع في كل مرة تُنشأ فيها من جديد (التصاميم نفسها تعيش في المتصفح ولا تتأثر). على NAS فيه مدير حاويات (Synology Container Manager وUnraid وPortainer)، ابحث عن `henmedia/layerling` في سجلّه (Docker Hub) أو أدخل `henmedia/layerling:latest`، واربط المنفذ 3000، وأضف وحدة تخزين لـ`/app/.codex/project-thumbnails`. للتحديث، اسحب الصورة مرة أخرى وأعد إنشاء الحاوية (أو دع Watchtower يفعل ذلك).
+الخيار `-v` يحفظ صور المعاينة في صفحة البداية في وحدة تخزين Docker باسم `layerling-thumbnails`، فتبقى بعد التحديث؛ ومن دونه تكون داخل الحاوية وتضيع في كل مرة تُنشأ فيها من جديد (التصاميم نفسها تعيش في المتصفح ولا تتأثر). على NAS فيه مدير حاويات (Synology Container Manager وUnraid وPortainer)، ابحث عن `henmedia/layerling` في سجلّه (Docker Hub) أو أدخل `henmedia/layerling:latest`، واربط المنفذ 3000، وأضف وحدة تخزين لـ`/app/.codex/project-thumbnails`. للتحديث، اسحب الصورة مرة أخرى وأعد إنشاء الحاوية (أو دع Watchtower يفعل ذلك). على **Unraid** يوجد layerling أيضًا في متجر التطبيقات (Community Applications): ابحث عن «Layerling» وثبّته بنقرات قليلة؛ القالب الذي يصونه [jbat66](https://github.com/jbat66/unraid-templates) يُعدّ التخزين على الخادم في مجلد مشترك على Unraid مباشرة.
 
 وسوم الصورة أرقام إصدار عادية **دون "v"**: `ghcr.io/henmedia/layerling:1.42.0`، بينما يُسمى إصدار GitHub ‏`v1.42.0`. السحب يجلب الصورة الجديدة فقط؛ والحاوية الموجودة من قبل تبقى تشغّل القديمة حتى تُحذف وتُنشأ من جديد:
 

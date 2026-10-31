@@ -14,11 +14,11 @@ Las aristas vivas rara vez quedan bien en una pieza impresa, y tampoco son espec
 
 ![La herramienta «Redondear aristas»: todas las aristas vivas están seleccionadas y la imagen muestra la vista previa con un radio de 4 mm.](shot:fillet-preview)
 
-El panel está arriba a la derecha. Si tapa aristas en las que quieres hacer clic, arrástralo por su barra de título; la próxima vez se abrirá también ahí, y lo mismo pasa con {{ui:editor.tool.hollow}} y {{ui:editor.tool.array}}. Un doble clic en la barra de título lo devuelve a su sitio.
+La ventana de herramienta está arriba a la derecha. Si tapa aristas en las que quieres hacer clic, arrástralo por su barra de título; la próxima vez se abrirá también ahí, y lo mismo pasa con {{ui:editor.tool.hollow}} y {{ui:editor.tool.array}}. Un doble clic en la barra de título lo devuelve a su sitio.
 
-Si eliges una forma de la lista de formas con el panel abierto, este se cierra sin aplicar nada y se olvidan las aristas en las que habías hecho clic. Entonces el clic coloca la forma nueva en lugar de elegir aristas.
+Si eliges una forma de la lista de formas con la ventana abierta, esta se cierra sin aplicar nada y se olvidan las aristas en las que habías hecho clic. Entonces el clic coloca la forma nueva en lugar de elegir aristas.
 
-En el panel encontrarás:
+En la ventana encontrarás:
 
 - {{ui:edge.allSharpEdges}} selecciona todas las aristas a la vez, y {{ui:edge.clear}} vacía la selección.
 - **{{ui:edge.radius}}**, para el redondeo. Para el chaflán ajustas {{ui:edge.distance}} o {{ui:edge.angle}}.
@@ -29,13 +29,13 @@ En el panel encontrarás:
 - {{ui:edge.bottomEdges}} elige solo las aristas de la parte más baja del cuerpo, el reflejo de {{ui:edge.topEdges}}. Es la forma rápida de redondear o achaflanar solo el pie de una pieza.
 - {{ui:edge.chamfillet}}, que se elige arriba en la ventana de chaflán, junto a {{ui:editor.tool.chamfer}}, hace el pie imprimible de una pieza: un chaflán junto a la placa que se funde tangencialmente con un redondeo hacia la pared, para que las primeras capas no necesiten soportes y la arista termine suave de todos modos. {{ui:edge.distance}} es la altura que ocupa el pie, y {{ui:edge.angle}} (de 15° a 75°), la inclinación del chaflán junto a la placa. Elige las aristas con {{ui:edge.bottomEdges}}.
 - {{ui:edge.onlyVisibleEdges}} oculta las aristas que quedan detrás del cuerpo desde donde miras. De forma predeterminada, todas las aristas se ven a través del cuerpo, lo que resulta confuso en una pieza complicada; con el interruptor activado solo ves las aristas que dan hacia ti, y solo puedes hacer clic en ellas. Gira la vista para llegar a las demás. Una arista dibujada en rojo (ver más abajo) se ve siempre.
-- {{ui:edge.tangentChains}}: un clic elige también las aristas que se continúan suavemente unas en otras, por ejemplo todas las aristas alrededor de una cara con esquinas redondeadas. El interruptor solo decide qué elige un clic: el núcleo CAD siempre prolonga un chaflán o un redondeo por esas aristas que continúan suavemente. El panel te dice por cuántas aristas más pasa.
+- {{ui:edge.tangentChains}}: un clic elige también las aristas que se continúan suavemente unas en otras, por ejemplo todas las aristas alrededor de una cara con esquinas redondeadas. El interruptor solo decide qué elige un clic: el núcleo CAD siempre prolonga un chaflán o un redondeo por esas aristas que continúan suavemente. La ventana te dice por cuántas aristas más pasa.
 - {{ui:edge.keepSize}} mantiene el chaflán o el redondeo con el tamaño que tiene, aunque luego escales el cuerpo.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} o {{ui:edge.fine}}) decide con qué detalle se calcula la vista previa. Para piezas difíciles, {{ui:edge.draft}} es más rápido.
 
 Mientras ajustas el tamaño, layerling recalcula la vista previa. Puede tardar un momento. Puedes seguir ajustando: lo que se calcula es el último valor que hayas elegido.
 
-Si el tamaño es demasiado grande para la arista, layerling te lo dice y te propone un valor menor. A menudo basta con uno o dos milímetros menos. En ángulos agudos, un redondeo necesita más espacio del que hace pensar su radio. En una pantalla pequeña, el panel se desplaza solo hacia abajo para que el mensaje quede a la vista.
+Si el tamaño es demasiado grande para la arista, layerling te lo dice y te propone un valor menor. A menudo basta con uno o dos milímetros menos. En ángulos agudos, un redondeo necesita más espacio del que hace pensar su radio. En una pantalla pequeña, la ventana se desplaza sola hacia abajo para que el mensaje quede a la vista.
 
 Si una selección que funcionaba falla al hacer clic en una arista más, esa arista se pone roja y se dibuja más gruesa: es la que no se puede tratar junto con las demás con ese tamaño. Vuelve a hacer clic en ella para quitarla, o reduce el tamaño. Si haces clic en más aristas mientras el mensaje sigue ahí, la primera sigue en rojo. Cuando no hay una selección anterior que funcionara (en el primerísimo clic, o con un tamaño que acabas de aumentar), se ponen en rojo las aristas que fallan incluso por sí solas, o todas, si lo que falla es solo su combinación.
 
@@ -45,7 +45,7 @@ Un hueco también admite {{ui:editor.tool.chamfer}} y {{ui:editor.tool.fillet}},
 
 ### Deshacer una operación de aristas
 
-Un cuerpo con chaflanes, redondeos o vaciado siempre se puede volver a modificar. Selecciónalo de nuevo y abre la herramienta (Redondeo, Chaflán o Vaciar; todas muestran la lista): en {{ui:edge.featureHistory}} ves lo que ya tiene aplicado. {{ui:edge.revertAction}} deshace una sola operación. Atención: si hay operaciones más recientes encima, se van con ella, y el panel te dice cuántas.
+Un cuerpo con chaflanes, redondeos o vaciado siempre se puede volver a modificar. Selecciónalo de nuevo y abre la herramienta (Redondeo, Chaflán o Vaciar; todas muestran la lista): en {{ui:edge.featureHistory}} ves lo que ya tiene aplicado. {{ui:edge.revertAction}} deshace una sola operación. Atención: si hay operaciones más recientes encima, se van con ella, y la ventana te dice cuántas.
 
 Junto a un chaflán, un redondeo o un vaciado aparece también {{ui:edge.editAction}}. Deshace la operación del mismo modo, pero vuelve a abrir enseguida la herramienta con las mismas aristas y el valor anterior. Cambias el valor y lo vuelves a aplicar: un redondeo de 3 mm pasa a ser de 5 mm sin tener que volver a hacer clic en las aristas. Si hay operaciones más recientes encima, aquí también se van con ella. Esto vale para las operaciones de aristas que hagas a partir de ahora; las más antiguas solo ofrecen deshacerlas, y lo mismo ocurre con las piezas sueltas de un grupo.
 
@@ -61,11 +61,11 @@ Cajas, vasos, carcasas y tapas tienen algo en común: están huecos por dentro, 
 
 1. Selecciona el cuerpo y haz clic en {{ui:editor.tool.hollow}}, o haz clic derecho en el cuerpo y elige la opción en el menú.
 2. Ajusta el {{ui:shell.wall}}.
-3. En {{ui:shell.openings}}, activa los lados que se quedan abiertos: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} o {{ui:shell.side.right}}, tantos como quieras. Solo con {{ui:shell.side.front}} sale el hueco para un cajón; con {{ui:shell.side.left}} y {{ui:shell.side.right}}, un túnel. Si no activas ningún lado, el cuerpo queda cerrado por todas partes, con una cavidad en el centro. {{ui:shell.side.closed}} desactiva todos los lados con un solo clic. {{ui:shell.side.top}} ya está activado al abrir el panel; un clic sobre él vuelve a cerrar la parte de arriba. Un cuerpo cerrado por todas partes se ve igual desde fuera: la vista de sección muestra la cavidad.
+3. En {{ui:shell.openings}}, activa los lados que se quedan abiertos: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} o {{ui:shell.side.right}}, tantos como quieras. Solo con {{ui:shell.side.front}} sale el hueco para un cajón; con {{ui:shell.side.left}} y {{ui:shell.side.right}}, un túnel. Si no activas ningún lado, el cuerpo queda cerrado por todas partes, con una cavidad en el centro. {{ui:shell.side.closed}} desactiva todos los lados con un solo clic. {{ui:shell.side.top}} ya está activado al abrir la ventana; un clic sobre él vuelve a cerrar la parte de arriba. Un cuerpo cerrado por todas partes se ve igual desde fuera: la vista de sección muestra la cavidad.
 4. En {{ui:shell.edges}}, elige {{ui:shell.edges.round}} o {{ui:shell.edges.sharp}}.
 5. Haz clic en {{ui:shell.apply}}.
 
-![El panel de vaciado con el grosor de pared, un interruptor para cada lado que queda abierto y las aristas interiores.](shot:hollow-panel)
+![La ventana de vaciado con el grosor de pared, un interruptor para cada lado que queda abierto y las aristas interiores.](shot:hollow-panel)
 
 Las paredes crecen hacia dentro. El exterior se queda como está.
 
@@ -110,14 +110,14 @@ Cada cara de un cuerpo puede moverse la misma distancia, hacia fuera o hacia den
 
 Marca {{ui:offset.sideways}} cuando solo deba crecer o encoger el contorno: los lados se mueven la distancia, y cada cara plana de arriba y de abajo se queda a su altura. Un cartel recibe un borde alrededor, una base se ensancha y el cuerpo no se hace más alto. En un cuerpo escalonado, cada escalón conserva su altura. Un texto que se desfasa a través de sus contornos también conserva entonces su altura.
 
-Sin la marca se desfasa el propio cuerpo. Pasa a ser un cuerpo exacto fijo, como tras un chaflán: la lista de arriba del panel deshace el desfase, y {{ui:edge.editAction}} abre de nuevo la herramienta con la distancia anterior. Solo se pueden desfasar cuerpos CAD exactos - cajas, cilindros y las demás formas, sus grupos, piezas STEP importadas. Un cuerpo que es solo una malla de triángulos, como muchas importaciones STL, a menudo no se puede. Una distancia demasiado grande para el cuerpo, por ejemplo reducir más allá de su pared más fina, se rechaza.
+Sin la marca se desfasa el propio cuerpo. Pasa a ser un cuerpo exacto fijo, como tras un chaflán: la lista de arriba de la ventana deshace el desfase, y {{ui:edge.editAction}} abre de nuevo la herramienta con la distancia anterior. Solo se pueden desfasar cuerpos CAD exactos - cajas, cilindros y las demás formas, sus grupos, piezas STEP importadas. Un cuerpo que es solo una malla de triángulos, como muchas importaciones STL, a menudo no se puede. Una distancia demasiado grande para el cuerpo, por ejemplo reducir más allá de su pared más fina, se rechaza.
 
 ## Eliminar caras
 
 Un redondeo que estorba, un orificio en el sitio equivocado, un saliente que ya no necesitas: {{ui:editor.tool.deleteFace}} lo quita del cuerpo sin tener que volver a construirlo.
 
 1. Selecciona el cuerpo y haz clic en {{ui:editor.tool.deleteFace}}, o haz clic derecho en el cuerpo y elige la opción en el menú.
-2. Haz clic en todas las caras de lo que quieras quitar: las caras de una arista redondeada, la pared de un orificio, el lateral y la parte superior de un saliente. Una cara elegida se resalta; otro clic la vuelve a quitar. El panel cuenta las caras.
+2. Haz clic en todas las caras de lo que quieras quitar: las caras de una arista redondeada, la pared de un orificio, el lateral y la parte superior de un saliente. Una cara elegida se resalta; otro clic la vuelve a quitar. La ventana cuenta las caras.
 3. Haz clic en {{ui:deleteFace.apply}} o pulsa [[Supr]]. [[Esc]] cierra la herramienta sin cambiar nada.
 
 Las caras que rodean a las eliminadas crecen hasta cerrar el hueco. Una caja con las aristas superiores redondeadas recupera sus aristas vivas, un orificio se rellena, un saliente desaparece. El cuerpo sigue siendo exacto, así que se puede volver a redondear y achaflanar, y la exportación STEP conserva sus caras reales. [[Ctrl]]+[[Z]] deshace la eliminación en un solo paso. También aparece en {{ui:edge.featureHistory}} junto con los redondeos y chaflanes, donde {{ui:edge.revertAction}} la deshace; para ella no hay {{ui:edge.editAction}}. En un grupo, el resultado es un único cuerpo, como con una operación de aristas.

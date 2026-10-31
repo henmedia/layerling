@@ -17,12 +17,15 @@ Al je ontwerpen verschijnen later op de startpagina met een voorbeeldafbeelding.
 
 ## De editor in één oogopslag
 
-![De editor met twee vormen op het werkvlak. Bovenaan het lint, links de camerabediening, rechts de instellingen van de geselecteerde vorm.](shot:editor-overview)
+![De editor met zijn benoemde delen: bovenaan het lint, links de weergavekubus met daaronder de weergavebalk, ernaast de statusmelding en de objectenlijst, rechts de eigenschappen van de geselecteerde vorm.](shot:editor-areas)
 
-- **Bovenaan** staat het lint. Het is ingedeeld naar taak: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} en {{ui:editor.group.help}}. Houd de muis boven een pictogram om de naam te zien. Overal waar je een klein vraagteken ziet, bijvoorbeeld in de instellingen van een vorm, in de vormenbibliotheek of in de gereedschapspanelen, kom je daarmee direct bij het bijbehorende hoofdstuk van deze handleiding.
+- **Bovenaan** staat het lint. Het is ingedeeld naar taak: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} en {{ui:editor.group.help}}. Houd de muis boven een pictogram om de naam te zien. Overal waar je een klein vraagteken ziet, bijvoorbeeld in de instellingen van een vorm, in de vormenbibliotheek of in de gereedschapsvensters, kom je daarmee direct bij het bijbehorende hoofdstuk van deze handleiding. De groep {{ui:editor.group.modify}} is verdeeld in vier delen, elk met de naam boven de gereedschappen: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} en {{ui:editor.section.surface}}. Een grijs pictogram zegt ook waarop het wacht, bijvoorbeeld {{ui:editor.needs.oneBody}} of {{ui:editor.needs.locked}}. Kun je een gereedschap niet vinden? Druk op [[Ctrl]]+[[K]] en typ de naam; een leeg ontwerp herinnert je eraan onderaan de weergave.
 - **In het midden** ligt het werkvlak. Hier zet je vormen neer, trek je ze in model en zie je het resultaat.
-- **Rechts** verschijnen de instellingen van de geselecteerde vorm: kleur, afmetingen, positie en wat de vorm verder bepaalt. Getallen typen is nauwkeuriger dan slepen.
-- **Links** staat de camerabediening, met de weergavekubus erboven. Daarmee beweeg je door de scène, meer daarover in [Weergave en werkvlak](chapter:weergave-en-werkvlak).
+- **Rechts** verschijnen de **eigenschappen** van de geselecteerde vorm: kleur, afmetingen, positie en wat de vorm verder bepaalt. Getallen typen is nauwkeuriger dan slepen.
+- **Links** staat de weergavebalk, met de weergavekubus erboven. Daarmee beweeg je door de scène, meer daarover in [Weergave en werkvlak](chapter:weergave-en-werkvlak).
+- **Naast de weergavebalk** gaat de **objectenlijst** open ([[Ctrl]]+[[U]]), met alle vormen van het ontwerp. Meer in [Selecteren en schikken](chapter:selecteren-en-schikken).
+- **Rechts van de weergavekubus** verschijnt de **statusmelding** als layerling je iets te zeggen heeft, bijvoorbeeld wat een gereedschap van je verwacht. Is er niets te zeggen, dan is ze er niet.
+- **Gereedschapsvensters** gaan open boven het werkvlak als je een gereedschap start, zoals {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} of {{ui:editor.tool.hollow}}. Schuif ze aan hun titelbalk opzij als ze iets bedekken.
 - **Helemaal bovenaan** wissel je tussen {{ui:editor.modeGeometry}} en {{ui:editor.modeSketch}}, geef je het ontwerp een andere naam en kies je taal en kleurenschema.
 
 ## De knoppen rond het werkvlak
@@ -69,9 +72,9 @@ De naam van het ontwerp ({{ui:confirm.projectName}}) staat helemaal bovenaan. Kl
 
 {{ui:palette.open}}: typ wat je zoekt, een gereedschap, een vorm of een instelling, en klik op het resultaat.
 
-### Camerabediening verbergen
+### Weergavebalk verbergen
 
-{{ui:camera.hide}} klapt de camerabediening links weg en geeft het werkvlak meer ruimte; {{ui:camera.show}} haalt ze terug.
+{{ui:camera.hide}} klapt de weergavebalk links weg en geeft het werkvlak meer ruimte; {{ui:camera.show}} haalt ze terug.
 
 ### Uitlijnraster
 

@@ -25,7 +25,7 @@ Pri mnogih delih v pogledu zlahka izgubiš pregled. Seznam objektov ({{ui:editor
 - Iskalno polje najde oblike po imenu in po vrsti, torej tudi »valj« ali »luknja«. Išče tudi v skupinah, ne glede na to, kako globoko so ugnezdene: skupina z zadetkom ostane na seznamu in se razpre, tako da so vidni ustrezni deli in skupine na poti do njih. Če ime same skupine ustreza, pokaže razpro vse svoje dele.
 - Puščica čisto levo v naslovni vrstici zloži seznam do naslovne vrstice in ga spet razpre.
 
-Seznam je zasidran desno ob orientacijski kocki. Za naslovno vrstico ga povlečeš na katerokoli mesto delovne površine; pri tem drsi pod orientacijsko kocko in vrstico kamere. Če ga odložiš ob orientacijski kocki ali dvokliknes naslovno vrstico, se spet zasidra. Kje je stal in ali je bil zložen, si brskalnik zapomni.
+Seznam je zasidran desno ob orientacijski kocki. Za naslovno vrstico ga povlečeš na katerokoli mesto delovne površine; pri tem drsi pod orientacijsko kocko in vrstico pogleda. Če ga odložiš ob orientacijski kocki ali dvokliknes naslovno vrstico, se spet zasidra. Kje je stal in ali je bil zložen, si brskalnik zapomni.
 
 ## Vpiši lego
 
@@ -71,7 +71,7 @@ Koti ostanejo na telesu. V njegovih nastavitvah jih {{ui:inspector.rotation}} ka
 
 Del naj za tisk leži na svoji najboljši strani? Izberi ga, klikni {{ui:editor.tool.layFlat}} in nato ploskev, ki naj gre navzdol. Ko s kazalcem zapelješ čez del, se ploskev pod njim posveti, torej vnaprej vidiš, katero boš vzel; zavrti pogled in preveri druge strani. Del se zavrti tako, da ta ploskev leži na delovni ravnini.
 
-Dva dela naj ležita ploskev ob ploskvi ali naj se končata poravnano? Izberi del, ki naj se premakne, klikni {{ui:editor.tool.mateFaces}}, nato njegovo ploskev in zatem ploskev drugega dela. V plošči {{ui:mate.mode.against}} položi ploskvi druga ob drugo (hrbet ob hrbet, dotikanje), {{ui:mate.mode.flush}} ju položi poleg druga druge v isto ravnino; {{ui:mate.gap}} pusti prostor vmes, na primer kot zračnost. {{ui:mate.apply}} del premakne: zavrti se po najkrajši poti, dokler nista ploskvi vzporedni – sploh ne, če že sta – in se potem samo pomakne proti drugi ploskvi, zato obdrži svojo stransko lego. Drugi del ostane, kjer je, »Razveljavi« pa vse vrne.
+Dva dela naj ležita ploskev ob ploskvi ali naj se končata poravnano? Izberi del, ki naj se premakne, klikni {{ui:editor.tool.mateFaces}}, nato njegovo ploskev in zatem ploskev drugega dela. V oknu {{ui:mate.mode.against}} položi ploskvi druga ob drugo (hrbet ob hrbet, dotikanje), {{ui:mate.mode.flush}} ju položi poleg druga druge v isto ravnino; {{ui:mate.gap}} pusti prostor vmes, na primer kot zračnost. {{ui:mate.apply}} del premakne: zavrti se po najkrajši poti, dokler nista ploskvi vzporedni – sploh ne, če že sta – in se potem samo pomakne proti drugi ploskvi, zato obdrži svojo stransko lego. Drugi del ostane, kjer je, »Razveljavi« pa vse vrne.
 
 ![Okno »Poravnaj ploskve«: del, ki se premakne, je izbran, naslednja je ploskev drugega dela, nato »Drugo proti drugemu« ali »Poravnano« in razmik, če želiš.](shot:mate-faces)
 

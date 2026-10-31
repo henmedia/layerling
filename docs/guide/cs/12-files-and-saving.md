@@ -82,7 +82,7 @@ Promítání vychází z práce WC3D na výkresech projektu Cadverix-3D.
 
 ### Kolik filamentu bude potřeba?
 
-U STL, 3MF, OBJ a STEP ukazuje {{ui:export.estimateTitle}} objem, hmotnost a délku filamentu o průměru 1,75 mm. Počítají se viditelná tělesa, výřezy jsou odečtené a překryvy jen jednou. Vpravo vyberete PLA, PETG, ABS, ASA, TPU nebo PA, tedy nylon; hmotnost odpovídá hustotě materiálu. Objem je skutečný geometrický objem tělesa. Hmotnost a filament jsou hrubým odhadem se stěnami a výplní. Nastavte {{ui:export.estimateInfillLabel}}, výchozí 15 %, a {{ui:export.estimateWallsLabel}}, výchozí 2. Panel uvede použité hodnoty i hmotnost při plném tisku. Skutečnost určuje nastavení sliceru. Odhad slouží k porovnání návrhů a posouzení, zda vystačí cívka. Při 100% výplni se počítá plné těleso, tedy horní mez spotřeby.
+U STL, 3MF, OBJ a STEP ukazuje {{ui:export.estimateTitle}} objem, hmotnost a délku filamentu o průměru 1,75 mm. Počítají se viditelná tělesa, výřezy jsou odečtené a překryvy jen jednou. Vpravo vyberete PLA, PETG, ABS, ASA, TPU nebo PA, tedy nylon; hmotnost odpovídá hustotě materiálu. Objem je skutečný geometrický objem tělesa. Hmotnost a filament jsou hrubým odhadem se stěnami a výplní. Nastavte {{ui:export.estimateInfillLabel}}, výchozí 15 %, a {{ui:export.estimateWallsLabel}}, výchozí 2. Okno uvede použité hodnoty i hmotnost při plném tisku. Skutečnost určuje nastavení sliceru. Odhad slouží k porovnání návrhů a posouzení, zda vystačí cívka. Při 100% výplni se počítá plné těleso, tedy horní mez spotřeby.
 
 ## Import
 

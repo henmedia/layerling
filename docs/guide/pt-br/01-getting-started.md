@@ -17,12 +17,15 @@ Depois, todos os seus projetos aparecem na página inicial com uma miniatura. El
 
 ## Conhecendo o editor
 
-![O editor com duas formas no plano de trabalho. A barra de opções no topo, os controles da câmera à esquerda, as configurações da forma selecionada à direita.](shot:editor-overview)
+![O editor com suas áreas nomeadas: a barra de opções no topo, o cubo de visualização à esquerda com a barra de visualização embaixo, ao lado a mensagem de status e a lista de objetos, as propriedades da forma selecionada à direita.](shot:editor-areas)
 
-- **No topo** fica a barra de opções. Ela é organizada por tarefa: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} e {{ui:editor.group.file}}; {{ui:editor.group.help}} fica acima dela, na barra de título, e a casinha ao lado das abas leva de volta à página inicial. Quando a janela é estreita demais para todos os grupos, os menos usados se recolhem num botão com o nome deles: aponte para o botão ou toque nele, e as ferramentas do grupo se abrem logo abaixo. Se preferir, a tachinha no canto superior direito, à esquerda da lupa, mantém todos os grupos abertos. Passe o mouse sobre um ícone, mesmo que esteja acinzentado, para ver o nome dele. Com a {{ui:interactiveHelp.title}} (o ponto de interrogação na área {{ui:editor.group.help}}, ou Shift+F1), você pode clicar em qualquer ícone para saber o que ele faz e acessar a seção correspondente deste guia. O pequeno ponto de interrogação, por exemplo nas configurações de uma forma, na biblioteca de formas ou nos painéis de ferramentas, leva direto ao capítulo correspondente deste guia.
+- **No topo** fica a barra de opções. Ela é organizada por tarefa: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} e {{ui:editor.group.file}}; {{ui:editor.group.help}} fica acima dela, na barra de título, e a casinha ao lado das abas leva de volta à página inicial. Quando a janela é estreita demais para todos os grupos, os menos usados se recolhem num botão com o nome deles: aponte para o botão ou toque nele, e as ferramentas do grupo se abrem logo abaixo. Se preferir, a tachinha no canto superior direito, à esquerda da lupa, mantém todos os grupos abertos. Passe o mouse sobre um ícone, mesmo que esteja acinzentado, para ver o nome dele. Com a {{ui:interactiveHelp.title}} (o ponto de interrogação na área {{ui:editor.group.help}}, ou Shift+F1), você pode clicar em qualquer ícone para saber o que ele faz e acessar a seção correspondente deste guia. O pequeno ponto de interrogação, por exemplo nas configurações de uma forma, na biblioteca de formas ou nas janelas de ferramentas, leva direto ao capítulo correspondente deste guia. O grupo {{ui:editor.group.modify}} é dividido em quatro seções, cada uma com o nome acima das ferramentas: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} e {{ui:editor.section.surface}}. Um ícone em cinza diz também o que falta, por exemplo {{ui:editor.needs.oneBody}} ou {{ui:editor.needs.locked}}. Não encontra uma ferramenta? Pressione [[Ctrl]]+[[K]] e digite o nome dela; um projeto vazio lembra disso na parte de baixo da vista.
 - **No centro** fica o plano de trabalho. É aqui que você posiciona as formas, dá forma a elas e vê o resultado.
 - **À direita** fica o **painel de propriedades**, com as configurações da forma selecionada: cor, dimensões, posição e tudo o mais que compõe a forma. Digitar números é mais exato do que arrastar.
-- **À esquerda** ficam os controles da câmera, com o cubo de visualização acima deles. Eles levam você pela cena; mais em [Vista e plano de trabalho](chapter:view-and-workplane).
+- **À esquerda** fica a barra de visualização, com o cubo de visualização acima dela. Eles levam você pela cena; mais em [Vista e plano de trabalho](chapter:view-and-workplane).
+- **Ao lado da barra de visualização** abre a **lista de objetos** ([[Ctrl]]+[[U]]), com todas as formas do projeto.
+- **À direita do cubo de visualização** aparece a **mensagem de status** quando o layerling tem algo para te dizer, por exemplo o que uma ferramenta espera de você. Quando não há nada a dizer, ela não aparece.
+- **Janelas de ferramentas** abrem sobre o plano de trabalho quando você inicia uma ferramenta como {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} ou {{ui:editor.tool.hollow}}. Arraste-as pela barra de título quando cobrirem algo.
 - **Bem no topo** você alterna entre {{ui:editor.modeGeometry}} e {{ui:editor.modeSketch}}, renomeia o projeto e escolhe o idioma e o tema de cores.
 
 ## Os botões em volta da área de trabalho
@@ -69,9 +72,9 @@ Em {{ui:editor.visibilityOptions}}, na seta ao lado do ícone de olho, você enc
 
 {{ui:palette.open}}: digite o que você procura, uma ferramenta, uma forma ou uma configuração, e clique no resultado.
 
-### Ocultar controles da câmera
+### Ocultar a barra de visualização
 
-{{ui:camera.hide}} recolhe os controles da câmera à esquerda e dá mais espaço à área de trabalho; {{ui:camera.show}} os traz de volta.
+{{ui:camera.hide}} recolhe a barra de visualização à esquerda e dá mais espaço à área de trabalho; {{ui:camera.show}} os traz de volta.
 
 ### Grade de encaixe
 

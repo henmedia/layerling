@@ -16,7 +16,7 @@ El cuadro de la parte superior de la ventana busca en la lista: deja solo los at
 ¿No encuentras una herramienta? Pulsa [[Ctrl]]+[[K]] o haz clic en la lupa del grupo {{ui:editor.group.help}} y escribe lo que buscas: una herramienta («redondeo», «reflejar»), una forma («cilindro») o un comando («exportar», «deshacer»). Muévete con las flechas y pulsa [[Intro]], o haz clic en la entrada.
 
 - La búsqueda entiende igual la palabra en castellano que en inglés o en alemán, y no distingue mayúsculas, tildes ni diéresis: «aushoehlen» encuentra {{ui:editor.tool.hollow}}.
-- Cada entrada muestra las teclas que hacen lo mismo y el grupo de la barra de herramientas en el que está, para que aprendas dónde se encuentra.
+- Cada entrada muestra las teclas que hacen lo mismo y el grupo de la cinta en el que está, para que aprendas dónde se encuentra.
 - Las entradas en gris no se pueden ejecutar en ese momento, casi siempre porque no hay nada seleccionado. Siguen en la lista para que la búsqueda te diga igualmente dónde está la herramienta.
 
 La guía que estás leyendo también tiene un cuadro de búsqueda, arriba en cada página: escribe una o dos palabras y te mostrará las secciones que las contienen todas, con las coincidencias resaltadas. Haz clic en una, o pulsa [[Intro]] para ir a la primera, y llegarás directamente. La página que se abre marca cada lugar donde aparecen tus palabras y se desplaza al primero de esa sección; [[Esc]] o un clic en una marca las quita.

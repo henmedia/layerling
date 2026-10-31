@@ -183,7 +183,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 {{ui:surfaceTexture.bark}} 在原木上包一层树皮：{{ui:surfaceTexture.barkOak}}、{{ui:surfaceTexture.barkPine}}、{{ui:surfaceTexture.barkSpruce}}、{{ui:surfaceTexture.barkBirch}} 或 {{ui:surfaceTexture.barkBeech}}，各有自己的大小和深度。{{ui:surfaceTexture.wood}} 把实体变成一块木头：在 {{ui:inspector.surfaceWoodType}} 下选橡木、白蜡木、山毛榉、松木或胡桃木，在 {{ui:inspector.surfaceWoodCut}} 下选去皮原木或木板，弦切带拱形花纹，径切则是直纹。{{ui:inspector.surfaceRingWidth}} 让木纹细或粗。选 {{ui:inspector.surfaceEndRings}} 时，原木两端显示年轮，并与侧面的木纹对得上：年轮像真木头一样贯穿整个实体。在 {{ui:inspector.more}} 下添加 {{ui:inspector.surfaceWoodKnots}}，年轮会绕着它们弯曲。
 
-用 {{ui:surfaceTexture.text}} 图案可以像压贴标签一样把文字贴到实体上：表面在该位置周围展开，所以字母在花瓶的鼓肚上、在斜壁上或跨过盒子的棱边时都保持大小。“环绕”（0° 是正面，90° 是右侧）和沿轴的“高度”（%）决定位置；轴设在 X 或 Y 时，0° 是顶部，这样文字就落在平板上。{{ui:inspector.surfaceDirection}} 让文字刻入或凸起。遇到真正的尖角时，它会像贴纸一样撕开；状态栏会提示。{{ui:prop.textVertical}} 在这里同样让字母从上到下排列。
+用 {{ui:surfaceTexture.text}} 图案可以像压贴标签一样把文字贴到实体上：表面在该位置周围展开，所以字母在花瓶的鼓肚上、在斜壁上或跨过盒子的棱边时都保持大小。“环绕”（0° 是正面，90° 是右侧）和沿轴的“高度”（%）决定位置；轴设在 X 或 Y 时，0° 是顶部，这样文字就落在平板上。{{ui:inspector.surfaceDirection}} 让文字刻入或凸起。遇到真正的尖角时，它会像贴纸一样撕开；状态消息会提示。{{ui:prop.textVertical}} 在这里同样让字母从上到下排列。
 
 要让实体的一部分保持光滑，或只给一部分加纹理，请用辅助实体：把盒子、圆柱或球放到相应位置，选中它，在 {{ui:inspector.surfaceMask}} 下选 {{ui:surfaceTexture.maskExclude}} 或 {{ui:surfaceTexture.maskOnly}}。它会变成透明，在另一个实体生成纹理时起作用，隐藏时也一样。打印前请隐藏或删除它。
 
@@ -195,12 +195,12 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 - {{ui:prop.vaseProfile}}：瓶形、鼓肚、带颈的碗、桶形、圆柱或漏斗。高度和最大直径是该形状自己的尺寸：拖动手柄，或输入 {{ui:prop.vaseDiameter}} 和 {{ui:prop.height}}。
 - {{ui:prop.vaseSection}}：圆、圆角多边形或波浪（柔和、尖形、拱形或鳍形）。{{ui:prop.vaseTwist}} 让截面沿高度旋转，{{ui:prop.vaseSway}} 让它来回摆动。
-- {{ui:prop.vaseBody}}：{{ui:vase.bodySolid}} 用于切片软件的花瓶模式（也叫螺旋化）：切片软件以螺旋方式只打印一层壁，省去顶部和填充，因此实体画成实心。{{ui:vase.bodyHollow}} 为普通打印生成真正的壁和底。
+- {{ui:prop.vaseBody}}：{{ui:vase.bodySolid}} 用于切片软件的花瓶模式（也叫螺旋化）：切片软件以螺旋方式只打印一层壁，省去顶部和填充，因此实体画成实心。{{ui:vase.bodyHollow}} 为普通打印生成真正的壁和底。{{ui:prop.vaseBottom}} 设为 0 mm 时，空心花瓶没有底：两端开口的管子，适合喇叭口、吹嘴和管道。
 - {{ui:prop.vaseEffect}}：新花瓶是光面的。可选外侧的凹槽、条纹、Voronoi 单元或切面（低多边形），也可只放在高度上的一条带里；它们属于花瓶，随花瓶一起保持可编辑。
 
 {{ui:prop.vaseSection2}} 让截面沿高度过渡到第二种截面，例如从底部的圆过渡到顶部的六边形。
 
-花瓶设置上方的 {{ui:inspector.vaseDraw}} 会在工作区上方打开一个独立的大窗口：在里面按真实毫米亲手绘制花瓶。拖动标题栏可移动窗口，拖动角可放大；视图中的花瓶会跟随每一次更改。{{ui:vaseDraw.tabProfile}} 从侧面显示花瓶：拖动各点，最上面的点决定高度，最宽的点决定直径；{{ui:vaseDraw.handle}} 给点一个角度，{{ui:vaseDraw.corner}} 让它成为折角。{{ui:vaseDraw.tabSection}} 从上方显示截面，{{ui:prop.vaseDrawSymmetry}} 会镜像或重复你画的内容。{{ui:vaseDraw.tabTwist}} 把旋转画成一条沿高度的曲线。绘图软件的 SVG 文件可以成为截面或瓶身形状，样品花瓶的网格（STL、3MF、OBJ）可以成为瓶身形状。可以把花瓶照片放在绘图后面描摹，或用 {{ui:vaseDraw.takeOutline}} 提取它的轮廓。鼠标拖动一次就是一步撤销；拖动时，视图会粗略显示花瓶。
+花瓶设置上方的 {{ui:inspector.vaseDraw}} 会在工作区上方打开一个独立的大窗口：在里面按真实毫米亲手绘制花瓶。拖动标题栏可移动窗口，拖动角可放大；视图中的花瓶会跟随每一次更改。{{ui:vaseDraw.tabProfile}} 从侧面显示花瓶：拖动各点，最上面的点决定高度，最宽的点决定直径；{{ui:vaseDraw.handle}} 给点一个角度，{{ui:vaseDraw.corner}} 让它成为折角。{{ui:vaseDraw.tabSection}} 从上方显示截面，{{ui:prop.vaseDrawSymmetry}} 会镜像或重复你画的内容。{{ui:vaseDraw.tabTwist}} 把旋转画成一条沿高度的曲线。绘图软件的 SVG 文件可以成为截面或瓶身形状，样品花瓶的网格（STL、3MF、OBJ）可以成为瓶身形状。可以把花瓶照片放在绘图后面描摹，或用 {{ui:vaseDraw.takeOutline}} 提取它的轮廓。{{ui:vaseDraw.trace}} 用设置做同样的事：{{ui:vaseDraw.traceThreshold}} 决定物体要多明显地与背景区分，{{ui:vaseDraw.tracePoints}}（3 到 40）和 {{ui:vaseDraw.traceCorners}}；新的瓶身形状先以红色显示在照片上，按 {{ui:vaseDraw.traceApply}} 后成为花瓶的形状。花瓶放在杂乱背景前（书架、房间）时，搜索找不到它；这时用 **{{ui:vaseDraw.traceLasso}}** 抓住它：围绕花瓶大致点击，两次点击之间线条会自动沿边缘走，点击第一个点、双击或按 [[Enter]] 闭合。瓶身形状随后来自套索；{{ui:vaseDraw.traceLassoOff}} 让搜索重新查找。鼠标拖动一次就是一步撤销；拖动时，视图会粗略显示花瓶。
 
 {{ui:inspector.vaseFloor}} 卡片收纳实体在形状之外还需要的东西。空心花瓶上：带朝向排水孔坡度的排水孔、空心底脚、镂空的壁（{{ui:prop.vaseCutout}}：Voronoi、蜂窝、菱形或圆形，适合灯笼和篮子），以及 {{ui:prop.vaseLamp}}：吊挂、装在灯座上或罩在 LED 灯片上。实心花瓶上，{{ui:prop.vaseReinforce}} 会切出细缝，切片软件在花瓶模式下借此一次打印出内部加强筋或双层壁。橡胶脚垫的凹槽两种都可用。{{ui:prop.vaseWatertight}} 把空心花瓶的壁和底加厚到至少 1.6 mm。
 

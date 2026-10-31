@@ -24,7 +24,7 @@ Hvor hurtigt musehjulet zoomer sættes med {{ui:workspace.zoomSpeed}} i indstill
 
 **3D-mus.** En SpaceMouse eller en anden 3D-mus drejer, flytter og zoomer i 3D-visningen: skub kuppelen væk for at zoome ind, glide den for at flytte visningen, vip den for at vippe visningen, og drej den for at dreje visningen rundt. I indstillingerne, under {{ui:workspace.appearance}}, klikker du på {{ui:workspace.spaceMouseConnect}} og vælger enheden i det vindue, browseren åbner; den husker valget, så det skal bare gøres én gang. Det virker i Chrome og Edge, som kan nå sådanne enheder; Firefox og Safari kan ikke.
 
-På en tablet eller telefon zoomer to fingre (spred og knib) og flytter visningen (glid sammen). Én finger arbejder på designet, ligesom venstre museknap. For at dreje med én finger, slå {{ui:camera.touchRotate}} til i kamerabjælken. Den kontakt vises kun på enheder med en berøringsskærm.
+På en tablet eller telefon zoomer to fingre (spred og knib) og flytter visningen (glid sammen). Én finger arbejder på designet, ligesom venstre museknap. For at dreje med én finger, slå {{ui:camera.touchRotate}} til i visningsbjælken. Den kontakt vises kun på enheder med en berøringsskærm.
 
 Én finger på tom plads drejer visningen, og et tryk dér rydder markeringen.
 
@@ -40,7 +40,7 @@ Kuben øverst til venstre viser hvor du kigger. Et klik på en af dens sider spr
 
 Træk i kuben for at dreje visningen rundt, ligesom at trække med højre museknap. Med intet valgt drejer piletasterne også visningen: 15° pr. tryk, 90° med [[Shift]]. De drejer modellen den vej de peger - [[→]] drejer dens forside til højre, [[↑]] vipper dens forside opad. Med [[Ctrl]] holdt nede flytter pilene i stedet visningen hen over skærmen: en tiendedel af billedet pr. tryk, halvdelen med [[Shift]] oveni. Modellen flytter sig den vej, de peger. Hvis noget er valgt, flytter pilene det; klik på tom plads først for at dreje visningen. På en berøringsskærm virker dette med én finger, uden at slå {{ui:camera.touchRotate}} til.
 
-### Kamerabjælken
+### Visningsbjælken
 
 Ved venstre kant er en smal bjælke. Fra toppen:
 
@@ -60,7 +60,7 @@ Du kan også gemme fire af dine egne visninger i hvert design. [[Shift]]+[[7]], 
 
 ### En anden visning i sit eget vindue
 
-{{ui:camera.secondView}} åbner et vindue, der viser det samme design gennem sit eget kamera, så du kan se det fra to sider på én gang - forfra, for eksempel, mens du arbejder ovenfra. Hver ændring, du laver i editoren, vises der med det samme; selve designet ændres kun i hovedvinduet, og håndtagene bliver også der. I det andet vindue drejer musen og visningsterningen dets visning som her, og det gør tasterne også: [[1]] til [[6]], [[F]], [[Home]], [[O]], [[+]] og [[−]], piletasterne til at dreje og [[Ctrl]] med pilene til at skubbe. [[F]] zoomer der ind på det, der er valgt i editoren. Designets fire gemte visninger virker der også: [[7]], [[8]], [[9]] og [[0]] henter dem tilbage, og [[Shift]] med en af disse taster gemmer vinduets visning under den - for begge vinduer. Dets egen kamerabjælke har {{ui:camera.home}}, {{ui:camera.focusSelection}}, {{ui:camera.zoomIn}}, {{ui:camera.zoomOut}}, {{ui:camera.orthographic}} og {{ui:camera.hideWorkplane}}, og de virker kun på det vindue. Vinduet åbner, hvor du forlod det, i samme størrelse, og lukker sammen med editoren. På telefoner og tablets vises knappen ikke.
+{{ui:camera.secondView}} åbner et vindue, der viser det samme design gennem sit eget kamera, så du kan se det fra to sider på én gang - forfra, for eksempel, mens du arbejder ovenfra. Hver ændring, du laver i editoren, vises der med det samme; selve designet ændres kun i hovedvinduet, og håndtagene bliver også der. I det andet vindue drejer musen og visningsterningen dets visning som her, og det gør tasterne også: [[1]] til [[6]], [[F]], [[Home]], [[O]], [[+]] og [[−]], piletasterne til at dreje og [[Ctrl]] med pilene til at skubbe. [[F]] zoomer der ind på det, der er valgt i editoren. Designets fire gemte visninger virker der også: [[7]], [[8]], [[9]] og [[0]] henter dem tilbage, og [[Shift]] med en af disse taster gemmer vinduets visning under den - for begge vinduer. Dets egen visningsbjælke har {{ui:camera.home}}, {{ui:camera.focusSelection}}, {{ui:camera.zoomIn}}, {{ui:camera.zoomOut}}, {{ui:camera.orthographic}} og {{ui:camera.hideWorkplane}}, og de virker kun på det vindue. Vinduet åbner, hvor du forlod det, i samme størrelse, og lukker sammen med editoren. På telefoner og tablets vises knappen ikke.
 
 ## Kigge indeni: snitvisningen
 
@@ -77,9 +77,9 @@ Du kan også gemme fire af dine egne visninger i hvert design. [[Shift]]+[[7]], 
 - På et rundt omrids, som et snit gennem en cylinder eller et hul, markerer et lille kryds centrumet, og centrumet snapper også. Klik på et punkt på cirklen, og gå så tæt på det modsatte punkt: det andet klik lander lige over for centrumet, og tallet læses Ø, diameteren. Fra centrumet til et punkt på cirklen får du R, radiusen.
 - {{ui:camera.sectionExportSvg}} gemmer omridsene på skæreplanet som en SVG i 1:1, til en laser, en plotter, en skabelon eller en pakning. Et X-snit ses fra højre, et Y-snit forfra, et Z-snit oppefra. Som i eksporten kommer kun synlige former med, huller er allerede taget af, og former med samme farve samles til ét omrids. Hver farve forbliver sin egen sti uden fyld, så lasersoftware holder dem adskilt som lag.
 
-Panelet hænger på sin knap. Hvis det dækker noget, så træk det i dets titellinje hvor som helst på arbejdsplanet; det åbner dér næste gang også. Dobbeltklik på titellinjen eller slip det ved knappen for at sætte det tilbage.
+Værktøjsvinduet hænger på sin knap. Hvis det dækker noget, så træk det i dets titellinje hvor som helst på arbejdsplanet; det åbner dér næste gang også. Dobbeltklik på titellinjen eller slip det ved knappen for at sætte det tilbage.
 
-X og [[Esc]] lukker panelet; med en måling i gang afslutter [[Esc]] den først. Snittet bliver, indtil du slår det fra med {{ui:camera.sectionActive}} eller går tilbage til designoversigten. En tablet har ingen [[Esc]], så der har panelet to knapper mere: {{ui:camera.sectionBack}} afslutter målingen, hvis en kører, og lukker ellers panelet, og {{ui:camera.sectionConfirm}} lukker panelet i ét skridt. En computer viser dem ikke.
+X og [[Esc]] lukker vinduet; med en måling i gang afslutter [[Esc]] den først. Snittet bliver, indtil du slår det fra med {{ui:camera.sectionActive}} eller går tilbage til designoversigten. En tablet har ingen [[Esc]], så der har vinduet to knapper mere: {{ui:camera.sectionBack}} afslutter målingen, hvis en kører, og lukker ellers vinduet, og {{ui:camera.sectionConfirm}} lukker vinduet i ét skridt. En computer viser dem ikke.
 
 ## Arbejdsplanet
 
@@ -93,7 +93,7 @@ Klik på den tomme plade i stedet, og arbejdsplanet ligger fladt på det sted du
 
 På en flade snapper arbejdsplanets nulpunkt ellers til gitteret. Klik tæt på et hjørne af fladen og det sidder præcis på det hjørne. Tæt på en kant ligger det på kanten, og gitteret flugter med det; det er sådan du med vilje vælger gitterets vinkel. Uden et hjørne eller en kant løber gitteret på en liggende flade parallelt med formen, så på en vendt kasse er det vendt med den.
 
-Et klik ved siden af pladen eller [[Esc]] returnerer arbejdsplanet til grundpladen. Hurtigere er {{ui:camera.resetWorkplane}}: knappen med pilen nedad sidder i kamerabjælken under øjet mens arbejdsplanet ligger på en flade. [[Shift]]+[[W]] lægger det direkte på den aktuelt valgte flade. [[Alt]]+[[W]] lægger det altid tilbage på grundpladen, uanset om noget er valgt. Holder du [[Shift]] mens du klikker, peger planet den anden vej.
+Et klik ved siden af pladen eller [[Esc]] returnerer arbejdsplanet til grundpladen. Hurtigere er {{ui:camera.resetWorkplane}}: knappen med pilen nedad sidder i visningsbjælken under øjet mens arbejdsplanet ligger på en flade. [[Shift]]+[[W]] lægger det direkte på den aktuelt valgte flade. [[Alt]]+[[W]] lægger det altid tilbage på grundpladen, uanset om noget er valgt. Holder du [[Shift]] mens du klikker, peger planet den anden vej.
 
 Mens et arbejdsplan ligger på en flade, dukker et øje op ved siden af {{ui:camera.placeWorkplane}}. Det skjuler arbejdsplanet uden at droppe det, for et klart blik på designet: nye former lander stadig på den flade, og rotation drejer stadig omkring det. Et klik på øjet viser det igen, og det samme gør et nyt arbejdsplan.
 
@@ -110,11 +110,11 @@ Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingern
 
 {{ui:workspace.theme}} sætter farveskemaet for hele programmet: {{ui:workspace.themeSystem}} følger din computer, de andre er {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} og {{ui:workspace.themeGraphite}}. Du kan også ændre det øverst til højre i editoren.
 
-{{ui:workspace.toolbarSize}} gør knapperne i båndet øverst, dets formmenu, kamerakontrollerne til venstre og egenskabspanelet til højre mindre eller større: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det altid var) eller {{ui:workspace.toolbarSizeLarge}}. Små efterlader mere plads til arbejdsplanet på en bærbar; store er lettere at ramme på en stor skærm eller med en finger. Med store knapper går båndets grupper på en anden række når vinduet er for smalt til dem. Størrelsen gemmes i denne browser og holder for hvert design.
+{{ui:workspace.toolbarSize}} gør knapperne i båndet øverst, dets formmenu, visningsbjælken til venstre og egenskabspanelet til højre mindre eller større: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det altid var) eller {{ui:workspace.toolbarSizeLarge}}. Små efterlader mere plads til arbejdsplanet på en bærbar; store er lettere at ramme på en stor skærm eller med en finger. Med store knapper går båndets grupper på en anden række når vinduet er for smalt til dem. Størrelsen gemmes i denne browser og holder for hvert design.
 
 {{ui:workspace.shapeColors}} sætter den farve, en ny form starter med, på billederne i formbiblioteket (farven for sin art, eller den du gemte med {{ui:inspector.saveDefaults}}). Slå det fra, hvis du foretrækker grå billeder; din browser husker valget.
 
-{{ui:workspace.viewCubePosition}} sætter visningskuben i et andet hjørne af arbejdsplanet: {{ui:workspace.viewCubePositionTopLeft}} (som det altid var), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} eller {{ui:workspace.viewCubePositionBottomRight}}. I alle hjørner undtagen øverst til venstre rykker kamerakontrollerne op på den plads, kuben forlod. Nederst til højre står kuben lige over {{ui:inspector.snapGrid}}-kontrollen. Mens en forms egenskaber er åbne til højre, viger en kube i højre side til venstre for dem. Hjørnet gemmes i denne browser og holder for hvert design. I et smalt vindue, som på en telefon, er indstillingen skjult, og kuben bliver øverst til venstre.
+{{ui:workspace.viewCubePosition}} sætter visningskuben i et andet hjørne af arbejdsplanet: {{ui:workspace.viewCubePositionTopLeft}} (som det altid var), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} eller {{ui:workspace.viewCubePositionBottomRight}}. I alle hjørner undtagen øverst til venstre rykker visningsbjælken op på den plads, kuben forlod. Nederst til højre står kuben lige over {{ui:inspector.snapGrid}}-kontrollen. Mens en forms egenskaber er åbne til højre, viger en kube i højre side til venstre for dem. Hjørnet gemmes i denne browser og holder for hvert design. I et smalt vindue, som på en telefon, er indstillingen skjult, og kuben bliver øverst til venstre.
 
 ### Udseende: hurtig tilstand
 

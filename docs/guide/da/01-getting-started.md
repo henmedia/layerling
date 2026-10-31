@@ -18,12 +18,15 @@ Men sikkerhedskopiér dine designs ind imellem: en browser kan fejle, og en brow
 
 ## Editoren overblik
 
-![Editoren med to former på arbejdsplanet. Båndet øverst, kamerakontrollerne til venstre, indstillingerne for den valgte form til højre.](shot:editor-overview)
+![Editoren med navngivne områder: båndet øverst, visningskuben til venstre med visningsbjælken under, ved siden af statusbeskeden og objektlisten, egenskaberne for den valgte form til højre.](shot:editor-areas)
 
-- **Øverst** er båndet. Det er sorteret efter opgave: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} og {{ui:editor.group.file}}; {{ui:editor.group.help}} sidder over båndet i titelrækken, og huset ved siden af fanerne fører tilbage til startsiden. Når vinduet er for smalt til alle grupper, folder de mindst brugte sammen i én knap under deres navn, med en lille pil i gruppens farve hængende under den: pega på den eller trykke på den, så åbnes gruppens værktøjer under knappen. Nålen øverst til højre, til venstre for forstørrelsesglasset, holder i stedet alle grupper åbne. Hold musen over et ikon for at se dets navn, også når ikonet er nedtonet; {{ui:interactiveHelp.title}} (spørgsmålstegnet under {{ui:editor.group.help}}, eller [[Shift]]+[[F1]]) forklarer dem alle med ét klik og fører videre til deres afsnit i denne vejledning. Hvor du ser et lille spørgsmålstegn, for eksempel i en forms indstillinger, i formbiblioteket eller i værktøjspanelerne, fører det direkte til det tilsvarende kapitel i denne vejledning.
+- **Øverst** er båndet. Det er sorteret efter opgave: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} og {{ui:editor.group.file}}; {{ui:editor.group.help}} sidder over båndet i titelrækken, og huset ved siden af fanerne fører tilbage til startsiden. Når vinduet er for smalt til alle grupper, folder de mindst brugte sammen i én knap under deres navn, med en lille pil i gruppens farve hængende under den: pega på den eller trykke på den, så åbnes gruppens værktøjer under knappen. Nålen øverst til højre, til venstre for forstørrelsesglasset, holder i stedet alle grupper åbne. Hold musen over et ikon for at se dets navn, også når ikonet er nedtonet; {{ui:interactiveHelp.title}} (spørgsmålstegnet under {{ui:editor.group.help}}, eller [[Shift]]+[[F1]]) forklarer dem alle med ét klik og fører videre til deres afsnit i denne vejledning. Hvor du ser et lille spørgsmålstegn, for eksempel i en forms indstillinger, i formbiblioteket eller i værktøjsvinduerne, fører det direkte til det tilsvarende kapitel i denne vejledning. Gruppen {{ui:editor.group.modify}} er delt i fire afsnit med navnet over værktøjerne: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} og {{ui:editor.section.surface}}. Et gråt ikon siger også, hvad det venter på, for eksempel {{ui:editor.needs.oneBody}} eller {{ui:editor.needs.locked}}. Kan du ikke finde et værktøj? Tryk [[Ctrl]]+[[K]] og skriv dets navn; et tomt design minder dig om det nederst i visningen.
 - **I midten** ligger arbejdsplanet. Det er her du placerer former, trækker dem i form og ser resultatet.
-- **Til højre** vises indstillingerne for den valgte form: farve, dimensioner, position og hvad ellers der udgør formen. At taste tal er mere nøjagtigt end at trække.
-- **Til venstre** er kamerakontrollerne med visningskuben over dem. De flytter dig rundt i scenen, mere i [Visning og arbejdsplan](chapter:view-and-workplane).
+- **Til højre** vises **egenskaberne** for den valgte form: farve, dimensioner, position og hvad ellers der udgør formen. At taste tal er mere nøjagtigt end at trække.
+- **Til venstre** er visningsbjælken med visningskuben over den. De flytter dig rundt i scenen, mere i [Visning og arbejdsplan](chapter:view-and-workplane).
+- **Ved siden af visningsbjælken** åbner **objektlisten** ([[Ctrl]]+[[U]]) med alle designets former. Mere i [Valg og arrangering](chapter:select-and-arrange).
+- **Til højre for visningskuben** vises **statusbeskeden**, når layerling har noget at fortælle dig, for eksempel hvad et værktøj venter på. Når der ikke er noget at sige, er den der ikke.
+- **Værktøjsvinduer** åbner over arbejdsplanet, når du starter et værktøj som {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} eller {{ui:editor.tool.hollow}}. Træk dem til side i titellinjen, når de dækker noget.
 - **Øverst oppe** skifter du mellem {{ui:editor.modeGeometry}} og {{ui:editor.modeSketch}}, omdøber designet og vælger sprog og farveskema.
 
 ## Knapperne rundt om arbejdsområdet
@@ -70,9 +73,9 @@ Designets navn ({{ui:confirm.projectName}}) står helt øverst. Klik på det, sk
 
 {{ui:palette.open}}: skriv, hvad du leder efter, et værktøj, en form eller en indstilling, og klik på resultatet.
 
-### Skjul kamerakontroller
+### Skjul visningsbjælken
 
-{{ui:camera.hide}} folder kamerastyringen til venstre væk og giver arbejdsområdet mere plads; {{ui:camera.show}} henter den tilbage.
+{{ui:camera.hide}} folder visningsbjælken til venstre væk og giver arbejdsområdet mere plads; {{ui:camera.show}} henter den tilbage.
 
 ### Snap til gitter
 

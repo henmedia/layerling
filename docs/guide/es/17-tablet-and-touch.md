@@ -28,7 +28,7 @@ El mismo menú tiene {{ui:contextMenu.carry}}, que hace en la pantalla táctil l
 
 ## Girar la vista y hacer zoom
 
-Un dedo sobre un espacio vacío gira la vista; dos dedos hacen zoom y la desplazan. Un dedo que empieza sobre un cuerpo trabaja en el cuerpo, no en la vista. Si prefieres que gire la vista, activa {{ui:camera.touchRotate}} en la barra de cámara: entonces un dedo gira la vista en lugar de seleccionar, empiece donde empiece. Ese interruptor solo aparece en dispositivos con pantalla táctil.
+Un dedo sobre un espacio vacío gira la vista; dos dedos hacen zoom y la desplazan. Un dedo que empieza sobre un cuerpo trabaja en el cuerpo, no en la vista. Si prefieres que gire la vista, activa {{ui:camera.touchRotate}} en la barra de vista: entonces un dedo gira la vista en lugar de seleccionar, empiece donde empiece. Ese interruptor solo aparece en dispositivos con pantalla táctil.
 
 El cubo de vista de arriba a la izquierda gira la vista cuando lo arrastras, y un toque en una de sus caras, esquinas o aristas salta a esa vista. Consulta [Vista y plano de trabajo](chapter:view-and-workplane).
 
