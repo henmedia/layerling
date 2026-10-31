@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  cornerPoint,
   DEFAULT_TRACE_AREA_TOLERANCE,
   defaultTraceSettings,
   MAX_TRACE_CORNER_ANGLE,
@@ -435,5 +436,22 @@ describe("tracing a picture into points (Trace)", () => {
     expect(crossings).toBe(0);
     expect(trace.refined).toBe(true);
     expect(trace.points).toBeGreaterThan(traceRange(prepared, settings).fewest);
+  });
+
+  it("does not move a corner back behind the step before it, where a cut meets an edge", () => {
+    // A house traced with a tree cut away by the lasso: where the cut met the wall, the outline comes down to the right,
+    // turns back sharply and runs down. Moved to where the two sides meet, that corner lay behind the step before it,
+    // the outline turned back on itself there and the kernel built no body ("invalid sketch topology").
+    const along = (from: TracePoint, to: TracePoint) => {
+      const steps = Math.max(1, Math.round(Math.hypot(to.x - from.x, to.y - from.y)));
+      return Array.from({ length: steps }, (_, step) => ({ x: from.x + ((to.x - from.x) * step) / steps, y: from.y + ((to.y - from.y) * step) / steps }));
+    };
+    const bend: TracePoint[] = [[483.54, 440.19], [483.83, 441.14], [484.41, 441.93], [485.14, 442.61], [485.73, 443.42], [486.07, 444.36], [486.51, 445.25], [487.11, 446.05], [487.68, 446.87], [488.01, 447.77], [487.8, 448.72], [487.17, 449.49], [486.33, 450.03], [485.43, 450.47], [484.64, 451.09], [484.15, 451.92], [484, 452.9], [484, 453.9]].map(([x, y]) => ({ x, y }));
+    const ring = [...along({ x: 470, y: 415 }, bend[0]), ...bend, ...along({ x: 484, y: 454.9 }, { x: 484, y: 480 }), ...along({ x: 484, y: 480 }, { x: 440, y: 480 }), ...along({ x: 440, y: 480 }, { x: 440, y: 415 }), ...along({ x: 440, y: 415 }, { x: 470, y: 415 })];
+    const corner = ring.indexOf(bend[10]);
+    const before = ring[corner - 1];
+    const incoming = { x: before.x - ring[corner - 2].x, y: before.y - ring[corner - 2].y };
+    const point = cornerPoint(ring, corner);
+    expect((point.x - before.x) * incoming.x + (point.y - before.y) * incoming.y).toBeGreaterThanOrEqual(0);
   });
 });

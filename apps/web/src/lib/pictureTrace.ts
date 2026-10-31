@@ -766,7 +766,7 @@ function cornerIndexes(samples: readonly TracePoint[], angle: number): number[] 
  * Where a corner's point goes: where the two straight sides meet, as long as that is near the step -
  * the outline rounds every corner off by a pixel, the picture's corner is sharp.
  */
-function cornerPoint(samples: readonly TracePoint[], index: number): TracePoint {
+export function cornerPoint(samples: readonly TracePoint[], index: number): TracePoint {
   const count = samples.length;
   const reach = Math.max(2, Math.round(CORNER_REACH / Math.max(1e-6, perimeter(samples) / count)));
   const at = (offset: number) => samples[(((index + offset) % count) + count) % count];
@@ -780,7 +780,10 @@ function cornerPoint(samples: readonly TracePoint[], index: number): TracePoint 
   if (Math.abs(cross) < 1e-9) return { ...at(0) };
   const t = ((b1.x - a1.x) * db.y - (b1.y - a1.y) * db.x) / cross;
   const meet = add(a1, scale(da, t));
-  return distance(meet, at(0)) <= reach ? meet : { ...at(0) };
+  // Only forward along the side that comes in and back along the one going out: a corner moved behind the step
+  // next to it (two corners close together, where a cut meets an edge) would turn the outline back on itself.
+  const ahead = dot(sub(meet, at(-1)), da) >= 0 && dot(sub(at(1), meet), db) >= 0;
+  return ahead && distance(meet, at(0)) <= reach ? meet : { ...at(0) };
 }
 
 /** The Bernstein weights of a cubic at u. */
