@@ -126,4 +126,4 @@ Dos cosas lo agilizan: {{ui:dashboard.sendAllToServer}}, en la página de inicio
 
 Esto no es edición simultánea: quien abre un archivo trabaja en su propia copia. Si otra persona ha cambiado el archivo mientras tanto, layerling se niega a sobrescribirlo.
 
-En layerling.com esta función no está activada. Cómo configurarla en tu propio servidor se explica en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.md).
+En layerling.com esta función no está activada. Cómo configurarla en tu propio servidor se explica en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.es.md#diseños-compartidos-en-una-red).

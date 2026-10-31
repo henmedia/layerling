@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="可由 AI 驅動" src="https://img.shields.io/badge/AI--drivable-MCP%20server-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.zh-cn.md">简体中文</a> · <strong>繁體中文</strong></p>
+  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.zh-cn.md">简体中文</a> · <strong>繁體中文</strong></p>
 </div>
 
 <p align="center">

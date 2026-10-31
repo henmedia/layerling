@@ -31,7 +31,7 @@ Copia la skill de `docs/skills/layerling-mcp-skill` en tu carpeta de skills de C
 
 Antigravity detecta por sí solo la skill del espacio de trabajo en `.agents/skills/layerling-mcp-skill`. Para Gemini CLI, copia la skill de `docs/skills/layerling-mcp-skill` en tu carpeta global de skills (`~/.gemini/skills/`), añade el servidor a tus ajustes a partir de `docs/mcp/gemini-config.example.json` y reinicia el cliente.
 
-Las instrucciones detalladas para cada cliente están en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill).
+Las instrucciones detalladas para cada cliente están en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.es.md#skill-mcp-de-layerling).
 
 ## Una copia en un NAS o un servidor
 
