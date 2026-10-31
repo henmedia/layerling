@@ -332,6 +332,8 @@ import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
 import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
+import { isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
+import { NUT_POCKET_SIZE_ORDER, isNutPocketSize, nutPocketFields, nutPocketSizeFor } from "@/lib/nutPocketSizes";
 import { MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
 /**
@@ -1016,7 +1018,32 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       step: 0.1,
       onChange: (value) => onUpdate({ screwHoleShaft: normalizeScrewHoleShaft(value, width) }),
     };
+    // A screw size sets shaft, head and its depth or angle at once (ISO 273, DIN 974-1, ISO 15065); the length stays.
+    const holeKind = shape.kind;
+    const applyScrewHoleSize = (value: string) => {
+      if (!isScrewHoleSize(value, holeKind)) return;
+      const fields = screwHoleFields(holeKind, value, shape.height);
+      onUpdate({ ...fields, ...widthPatch(fields.width), depth: fields.depth, size: resizedShapeSize(fields.width, fields.depth) }, { resizeAxis: "width" });
+    };
+    const screwHoleSize = screwHoleSizeFor(holeKind, {
+      width,
+      screwHoleShaft: shaft,
+      screwHoleHeadDepth: normalizeScrewHoleHeadDepth(shape.screwHoleHeadDepth, shape.height),
+      screwHoleAngle: normalizeScrewHoleAngle(shape.screwHoleAngle),
+    });
     return [
+      {
+        type: "select" as const,
+        id: "screwHoleSize",
+        label: t("prop.screwHoleSize"),
+        value: screwHoleSize ?? "custom",
+        options: [
+          { value: "custom", label: t("port.custom") },
+          ...screwHoleSizesFor(holeKind).map((size) => ({ value: size, label: size })),
+        ],
+        hint: t(holeKind === "counterbore" ? "prop.screwHoleSizeCounterboreHint" : "prop.screwHoleSizeCountersinkHint"),
+        onChange: applyScrewHoleSize,
+      },
       { id: "width", label: t("prop.screwHoleHead"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setCylinderDiameter },
       shaftProperty,
       shape.kind === "counterbore"
@@ -1962,7 +1989,29 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
   }
 
   if (shape.kind === "polygon") {
+    const sides = shape.sides ?? 6;
+    // A hexagon becomes the pocket for a nut (ISO 4032) in one choice: across flats, across corners and height.
+    const applyNutPocket = (value: string) => {
+      if (!isNutPocketSize(value)) return;
+      const pocket = nutPocketFields(value);
+      onUpdate({ ...widthPatch(pocket.width), depth: pocket.depth, size: resizedShapeSize(pocket.width, pocket.depth), height: pocket.height }, { resizeAxis: "width" });
+    };
+    const nutPocketProperty: ShapePropertyConfig[] = Math.round(sides) === 6
+      ? [{
+          type: "select" as const,
+          id: "nutPocketSize",
+          label: t("prop.nutPocketSize"),
+          value: nutPocketSizeFor(sides, width, depth, shape.height) ?? "custom",
+          options: [
+            { value: "custom", label: t("port.custom") },
+            ...NUT_POCKET_SIZE_ORDER.map((size) => ({ value: size, label: size })),
+          ],
+          hint: t("prop.nutPocketSizeHint"),
+          onChange: applyNutPocket,
+        }]
+      : [];
     return [
+      ...nutPocketProperty,
       {
         id: "sides",
         label: t("prop.sides"),

@@ -194,4 +194,4 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 {{ui:shape.doubleCountersink}} 是两面都倒角的孔，用于正面和背面都要整洁的板件。它在形状库里没有单独的条目：取用 {{ui:shape.countersink}}，并在其属性中开启 {{ui:prop.screwHoleBothSides}}（本身就是双面锥形沉孔的实体已显示该开关开启）：两端各有一个锥面张开到 {{ui:prop.screwHoleHead}}，中间是 {{ui:prop.screwHoleShaft}}。你照旧设置 {{ui:prop.screwHoleAngle}} 和 {{ui:prop.screwHoleLength}}。如果孔太短，容不下两个完整的锥面，它们会以该角度在中间相接，杆部会比你设置的更宽：10 mm 的头部、6 mm 的杆部、90° 和 2 mm 的长度会形成两个从 10 mm 收窄到 8 mm 的锥面。作为孔，它像其他孔一样被推穿零件。
 
-把形状设为孔，并与零件分组。让它的顶端略高于头部应贴合的表面，使沉孔开口干净。要给六角螺母做沉孔，就用六边的 {{ui:shape.polygon}} 作为孔。
+把形状设为孔，并与零件分组。让它的顶端略高于头部应贴合的表面，使沉孔开口干净。要给六角螺母做沉孔，就用六边的 {{ui:shape.polygon}} 作为孔。 在{{ui:prop.screwHoleSize}}中可选 M2 到 M30（锥形沉孔到 M20），轴径（ISO 273 中等通孔）、头部直径以及深度或角度即按标准设置（DIN 974-1、ISO 15065），长度不变。对于六棱柱，{{ui:prop.nutPocketSize}}按 ISO 4032 设置螺母的对边宽度和高度，并留 0.4 mm 打印余量。

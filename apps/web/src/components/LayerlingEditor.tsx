@@ -144,6 +144,8 @@ import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, lin
 import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { PORT_PRESET_ORDER, PORT_PRESETS, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
+import { isScrewHoleSize, screwHoleFields, screwHoleSizesFor } from "@/lib/screwHoleSizes";
+import { NUT_POCKET_SIZE_ORDER, isNutPocketSize, nutPocketFields } from "@/lib/nutPocketSizes";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { exportMeshesToStl } from "@/lib/stlExport";
 import { exportMeshesTo3mfAsync, THREE_MF_MEDIA_TYPE } from "@/lib/threemfExport";
@@ -10419,9 +10421,18 @@ export function LayerlingEditor({
         // A tube named by a screw size is that size's washer (ISO 7089, #1052), unless a measure is given as well.
         const washer = kind === "tube" && isWasherSize(params.washer) ? washerTubeFields(params.washer) : undefined;
         if (kind === "tube" && params.washer !== undefined && !washer) throw new Error(`washer must be one of ${WASHER_SIZE_ORDER.join(", ")}`);
-        const requestedWidth = mcpOptionalNumber(params.width ?? params.size) ?? portPreset?.width ?? washer?.width;
-        const requestedDepth = mcpOptionalNumber(params.depth ?? params.size) ?? (rawKind === "cube" ? requestedWidth : undefined) ?? washer?.depth;
-        const requestedHeight = mcpOptionalNumber(params.height ?? params.size) ?? (rawKind === "cube" ? requestedWidth : undefined) ?? portPreset?.height ?? washer?.height;
+        // A counterbore or countersink named by a screw size takes its shaft, head and depth or angle (ISO 273,
+        // DIN 974-1, ISO 15065); a hexagon named by one is the pocket for its nut (ISO 4032). Measures given as well win.
+        const holeKind = kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" ? kind : undefined;
+        const screwHole = holeKind && isScrewHoleSize(params.screwSize, holeKind) ? screwHoleFields(holeKind, params.screwSize, height) : undefined;
+        if (holeKind && params.screwSize !== undefined && !screwHole) throw new Error(`screwSize must be one of ${screwHoleSizesFor(holeKind).join(", ")}`);
+        const nutPocket = kind === "polygon" && isNutPocketSize(params.nut) ? nutPocketFields(params.nut) : undefined;
+        if (kind === "polygon" && params.nut !== undefined && !nutPocket) throw new Error(`nut must be one of ${NUT_POCKET_SIZE_ORDER.join(", ")}`);
+        if (nutPocket && params.sides !== undefined && Math.round(Number(params.sides)) !== 6) throw new Error("nut needs a hexagon: leave sides out or set it to 6");
+        const sizePreset = washer ?? screwHole ?? nutPocket;
+        const requestedWidth = mcpOptionalNumber(params.width ?? params.size) ?? portPreset?.width ?? sizePreset?.width;
+        const requestedDepth = mcpOptionalNumber(params.depth ?? params.size) ?? (rawKind === "cube" ? requestedWidth : undefined) ?? sizePreset?.depth;
+        const requestedHeight = mcpOptionalNumber(params.height ?? params.size) ?? (rawKind === "cube" ? requestedWidth : undefined) ?? portPreset?.height ?? sizePreset?.height;
         // A body of no size cannot be built, and a design holding one would not open again.
         ([["width", requestedWidth], ["depth", requestedDepth], ["height", requestedHeight]] as const).forEach(([key, value]) => {
           if (value !== undefined && value <= 0) throw new Error(`${key} must be greater than 0`);
@@ -10457,7 +10468,18 @@ export function LayerlingEditor({
             { ...asset, name, color },
             { x, z, elevation },
             {
-              ...mcpShapeCustomization(asset.kind, portPreset ? { cornerFillet: portPreset.corner, portProfile: portPreset.profile, ...shapeParams } : washer ? { bevel: washer.bevel, ...shapeParams } : shapeParams),
+              ...mcpShapeCustomization(
+                asset.kind,
+                portPreset ? { cornerFillet: portPreset.corner, portProfile: portPreset.profile, ...shapeParams }
+                  : washer ? { bevel: washer.bevel, ...shapeParams }
+                  : screwHole ? {
+                    screwHoleShaft: screwHole.screwHoleShaft,
+                    ...(screwHole.screwHoleHeadDepth !== undefined ? { screwHoleHeadDepth: screwHole.screwHoleHeadDepth } : {}),
+                    ...(screwHole.screwHoleAngle !== undefined ? { screwHoleAngle: screwHole.screwHoleAngle } : {}),
+                    ...shapeParams,
+                  }
+                  : shapeParams,
+              ),
               width: requestedWidth,
               depth: requestedDepth,
               height: requestedHeight,

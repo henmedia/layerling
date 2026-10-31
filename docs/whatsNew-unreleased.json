@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Senkungen und Mutterntaschen nach Schraubengröße",
+      "en": "Counterbores and nut pockets by screw size"
+    },
+    "body": {
+      "de": "Stufen- und Senkbohrung haben eine Auswahl „Schraubengröße“ von M2 bis M30 (die Senkbohrung bis M20): Schaft, Kopfdurchmesser und Tiefe oder Winkel stehen dann nach Norm drin, die Länge bleibt. Der Sechskant wird mit „Mutternaussparung“ zur Tasche für eine Sechskantmutter, mit etwas Luft zum Drucken.",
+      "en": "The counterbore and countersink have a Screw size choice from M2 to M30 (the countersink up to M20): shaft, head diameter and depth or angle follow the standard, and the length stays. With Nut pocket the hexagon becomes the pocket for a hex nut, with a little room for printing."
+    }
+  }
+]
