@@ -1,6 +1,7 @@
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
-import { shapeGeometrySignature, tapeShapeTopologyKey } from "@/components/workplane/viewportShapeObjects";
+import * as THREE from "three";
+import { createShapeObject, shapeGeometrySignature, tapeShapeTopologyKey } from "@/components/workplane/viewportShapeObjects";
 import { cadModifierGridfinityForShape } from "@/lib/cadProfileExtrusion";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { meshForShape } from "@/lib/editorMeshCore";
@@ -42,6 +43,7 @@ import {
   gridfinityDividerPositionPatch,
   gridfinityDividerPositions,
   gridfinityDividerThickness,
+  gridfinityDrawerMax,
   gridfinityDrawerPatch,
   gridfinityDrawerSize,
   gridfinityFloorFits,
@@ -59,6 +61,7 @@ import {
   gridfinityHasPieces,
   gridfinityLipChamfer,
   gridfinityListPatch,
+  gridfinityMaxUnits,
   gridfinityOpenFits,
   gridfinityOpening,
   gridfinityOpeningCornerSize,
@@ -3604,5 +3607,89 @@ describe("gridfinity tray", { timeout: 60_000 }, () => {
     const padded = canonicalizeShape(binShape({ gridfinityType: "baseplate", width: 94, depth: 42, height: 5, gridfinityPaddingLeft: 10 }));
     expect(mcpGridfinityPaddingPatch(padded, { gridfinityType: "tray" }, { gridfinityType: "tray" })).toMatchObject({ width: 94, depth: 42 });
     expect(canonicalizeShape({ ...padded, gridfinityType: "tray" })).toMatchObject({ width: 94, depth: 42, height: 5, gridfinityPaddingLeft: 10 });
+  });
+});
+
+describe("gridfinity large plate", () => {
+  const wide = (fields: Record<string, unknown> = {}) => plate({ width: 252, depth: 252, ...fields });
+  const large = (fields: Record<string, unknown> = {}) => wide({ gridfinityLargePlate: true, ...fields });
+  const plateShape = (fields: Record<string, unknown> = {}) => binShape(wide(fields));
+
+  it("lets a baseplate have up to 12 units with the switch on, 6 without, and keeps a bin at 6", () => {
+    expect(gridfinityMaxUnits(wide())).toBe(6);
+    expect(gridfinityMaxUnits(large())).toBe(12);
+    expect(gridfinityMaxUnits({ gridfinityType: "bin", gridfinityLargePlate: true })).toBe(6);
+  });
+
+  it("reads a plate's box as up to 12 units with the switch, the padding outside them", () => {
+    expect(gridfinityFootprintPatch(wide({ width: 1000, depth: 1000 }))).toMatchObject({ width: 252, depth: 252 });
+    expect(gridfinityFootprintPatch(large({ width: 1000, depth: 1000 }))).toEqual({ width: 504, depth: 504, height: 5 });
+    // (1000 - 82) / 42 is more than 12: 12 units and the 82 mm of padding.
+    expect(gridfinityFootprintPatch(large({ width: 1000, gridfinityPaddingLeft: 41, gridfinityPaddingRight: 41 }))).toMatchObject({ width: 586 });
+  });
+
+  it("clamps the units to the switch, and switching it off brings a large plate back to 6 units, its padding kept", () => {
+    expect(gridfinityShapePatch(large(), { x: 13 })).toMatchObject({ width: 504 });
+    expect(gridfinityShapePatch(large(), { x: 7 })).toMatchObject({ width: 294 });
+    expect(gridfinityShapePatch(wide(), { largePlate: true })).toEqual({ gridfinityType: "baseplate", gridfinityLip: true, gridfinityLargePlate: true, width: 252, depth: 252, height: 5 });
+    // 10 x 8 units and 5 mm and 3 mm of padding a side.
+    const padded = large({ width: 430, depth: 342, gridfinityPaddingLeft: 5, gridfinityPaddingRight: 5, gridfinityPaddingBack: 3, gridfinityPaddingFront: 3 });
+    expect(gridfinityShapePatch(padded, { largePlate: false })).toMatchObject({ gridfinityLargePlate: false, width: 262, depth: 258 });
+    // A large plate turned into a bin is a bin of at most 6 units; it keeps the switch for when it is a baseplate again.
+    const asBin = gridfinityShapePatch(large({ width: 420 }), { type: "bin" });
+    expect(asBin).toMatchObject({ gridfinityType: "bin", width: 251.5 });
+    expect(asBin).not.toHaveProperty("gridfinityLargePlate");
+  });
+
+  it("fits a large plate to a drawer of up to 12 units and 41 mm a side", () => {
+    expect(gridfinityDrawerMax(wide())).toBe(334.5);
+    expect(gridfinityDrawerMax(large())).toBe(586.5);
+    expect(gridfinityDrawerPatch(large(), "x", 586.5)).toEqual({ gridfinityPaddingLeft: 41, gridfinityPaddingRight: 41, width: 586, depth: 252 });
+    expect(gridfinityDrawerPatch(large(), "x", 546.5)).toEqual({ gridfinityPaddingLeft: 21, gridfinityPaddingRight: 21, width: 546, depth: 252 });
+    expect(gridfinityDrawerPatch(large(), "x", 560)).toEqual({ gridfinityPaddingLeft: 27.75, gridfinityPaddingRight: 27.75, width: 559.5, depth: 252 });
+    expect(gridfinityDrawerPatch(wide(), "x", 700)).toEqual({ gridfinityPaddingLeft: 41, gridfinityPaddingRight: 41, width: 334, depth: 252 });
+  });
+
+  it("builds a 12 x 12 plate: 144 sockets, closed, wound outwards and one piece, the editor's mesh as wide", () => {
+    const part = large({ width: 504, depth: 504 });
+    const plan = gridfinityPlan(part);
+    expect(plan.count).toMatchObject({ x: 12, z: 12 });
+    const triangles = gridfinityTriangles(part);
+    expect(edgeProblems(triangles)).toBe(0);
+    expect(signedVolume(triangles)).toBeGreaterThan(0);
+    expect(components(triangles)).toBe(1);
+    const mesh = meshForShape(canonicalizeShape(plateShape({ gridfinityLargePlate: true, width: 504, depth: 504 })));
+    const xs = mesh.vertices.reduce((range, [x]) => ({ min: Math.min(range.min, x), max: Math.max(range.max, x) }), { min: Infinity, max: -Infinity });
+    expect(xs.min).toBeCloseTo(-252, 6);
+    expect(xs.max).toBeCloseTo(252, 6);
+  });
+
+  it("carries the switch to every place that builds or keeps the plate", async () => {
+    const shape = canonicalizeShape(plateShape({ gridfinityLargePlate: true, width: 420, depth: 420 }));
+    expect(shape).toMatchObject({ width: 420, depth: 420, gridfinityLargePlate: true });
+    expect(canonicalizeShape(plateShape({ width: 420, depth: 420 }))).toMatchObject({ width: 252, depth: 252 });
+    expect(workplaneShapesEqual(shape, { ...shape, gridfinityLargePlate: false })).toBe(false);
+    expect(shapeGeometrySignature(shape)).not.toBe(shapeGeometrySignature({ ...shape, gridfinityLargePlate: false }));
+    expect(tapeShapeTopologyKey(shape)).not.toBe(tapeShapeTopologyKey({ ...shape, gridfinityLargePlate: false }));
+    // The viewport draws all ten units, not six in a box of ten.
+    const drawn = new THREE.Box3().setFromObject(createShapeObject(shape, false, undefined, false));
+    expect(drawn.max.x - drawn.min.x).toBeCloseTo(420, 3);
+    expect(drawn.max.z - drawn.min.z).toBeCloseTo(420, 3);
+    const part = cadModifierGridfinityForShape(shape)!;
+    expect(part).toMatchObject({ gridfinityLargePlate: true, width: 420 });
+    expect(gridfinityPlan(part).count).toMatchObject({ x: 10, z: 10 });
+    expect(sceneShape(shape)).toMatchObject({ gridfinityLargePlate: true });
+    expect(mcpShapeSummary(shape)).toMatchObject({ settings: { gridfinityLargePlate: true } });
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinityLargePlate: true } }, {})).toMatchObject({ gridfinity: { gridfinityLargePlate: true } });
+    expect(shapeDefaultsFromShape(shape)).toMatchObject({ gridfinityLargePlate: true });
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
+    expect(canonicalizeShape(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityType: "baseplate", gridfinityLargePlate: true, width: 504, depth: 504 }))).toMatchObject({ width: 504, depth: 504 });
+    const save = (shapes: WorkplaneShape[]) => exportLylProject({ projectId: "large-plate", projectName: "Large plate", createdAt: 1, modifiedAt: 2, shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [], workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0 });
+    const [loaded] = (await importLylProject(await save([shape]))).shapes;
+    expect(loaded).toMatchObject({ width: 420, depth: 420, gridfinityLargePlate: true });
+    // The same file without the switch opens as a plate of 6 units.
+    const [plain] = (await importLylProject(await save([{ ...shape, gridfinityLargePlate: undefined }]))).shapes;
+    expect(plain).toMatchObject({ width: 252, depth: 252 });
+    await expect(importLylProject(await save([{ ...shape, gridfinityLargePlate: "yes" } as unknown as WorkplaneShape]))).rejects.toThrow("gridfinityLargePlate must be true or false");
   });
 });
