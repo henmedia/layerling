@@ -1,12 +1,42 @@
 [
   {
     "title": {
+      "de": "Ein übersichtlicherer Editor",
+      "en": "A clearer editor"
+    },
+    "body": {
+      "de": "Dieses Update räumt den Editor auf, damit du schneller findest, was du suchst. Die große Gruppe „Anpassen“ im Menüband ist jetzt in vier benannte Abschnitte geteilt: Spiegeln & Muster, Teilen & Formen, Kanten & Wände und Oberfläche. Fährst du über einen ausgegrauten Knopf, sagt er, was ihm fehlt, etwa „Wähle genau einen Körper aus“ oder „Die Auswahl ist gesperrt: entsperre sie zuerst“. Ein leerer Entwurf zeigt unten, wo es losgeht: eine Form aus dem Menüband nehmen oder mit Strg+K jedes Werkzeug beim Namen suchen. Die Leiste links heißt jetzt Ansichtsleiste, und ihr Knopf „Auf Auswahl zentrieren“ zeigt ohne Auswahl die ganze Szene, wie die Taste F. Die Anleitung nennt jeden Teil des Editors überall gleich, und „Erste Schritte“ zeigt ein Bild, auf dem alle Teile beschriftet sind.",
+      "en": "This update tidies up the editor so you find what you are looking for faster. The ribbon's big Modify group is now split into four named sections: Mirror & pattern, Split & shape, Edges & walls and Surface. Hover a greyed-out button and it says what it is missing, such as \"Select one body\" or \"The selection is locked: unlock it first\". An empty design shows at the bottom where to start: take a shape from the ribbon, or press Ctrl+K and search any tool by its name. The bar on the left is now called the view bar, and its Center view on selection button shows the whole scene when nothing is selected, as the F key does. The guide calls every part of the editor by one name throughout, and Getting started shows a picture with all parts labelled."
+    }
+  },
+  {
+    "title": {
       "de": "Loft durch mehr Schnitte",
       "en": "Loft through more sections"
     },
     "body": {
-      "de": "Die Loft-Form bekommt Schnitte zwischen ihren beiden Enden (0 bis 12): jeder mit eigenem Umriss, eigener Größe, Höhe und eigenem Versatz. \"Glatt\" legt eine weiche Fläche durch alle Schnitte, \"Gerade\" macht flache Wände von Schnitt zu Schnitt. So entstehen Vasen, Griffe und Gehäuse mit Taille. Beigetragen von plazmabokor.",
-      "en": "The Loft shape gets sections between its two ends (0 to 12): each with its own outline, size, height and offset. Smooth lays a soft surface through all sections, Straight makes flat walls from section to section. That gives vases, handles and housings with a waist. Contributed by plazmabokor."
+      "de": "Die Loft-Form bekommt Schnitte zwischen ihren beiden Enden (0 bis 12): jeder mit eigenem Umriss, eigener Größe, Höhe und eigenem Versatz. \"Glatt\" legt eine weiche Fläche durch alle Schnitte, \"Gerade\" macht flache Wände von Schnitt zu Schnitt. So entstehen Vasen, Griffe und Gehäuse mit Taille.",
+      "en": "The Loft shape gets sections between its two ends (0 to 12): each with its own outline, size, height and offset. Smooth lays a soft surface through all sections, Straight makes flat walls from section to section. That gives vases, handles and housings with a waist."
+    }
+  },
+  {
+    "title": {
+      "de": "Vase ohne Boden",
+      "en": "Vase without a bottom"
+    },
+    "body": {
+      "de": "Stell bei der hohlen Vase den Boden auf 0 mm, und sie bleibt unten offen: ein Rohr, offen an beiden Enden, für Schallbecher, Mundstücke und Röhren. Weil nur der Wandring auf dem Druckbett steht, rät ein Hinweis zu einem Rand (Brim).",
+      "en": "Set the bottom of a hollow vase to 0 mm and it stays open below: a tube open at both ends, for bells, mouthpieces and pipes. As only the ring of the wall stands on the print bed, a note suggests a brim."
+    }
+  },
+  {
+    "title": {
+      "de": "Die Längenanzeige verdeckt den Endpunkt nicht mehr",
+      "en": "The length label no longer hides the end point"
+    },
+    "body": {
+      "de": "Beim Zeichnen einer kurzen, steilen Linie, Kurve oder eines Bogens stand die Anzeige mit Länge und Winkel genau über dem Punkt, den du setzen wolltest. Sie steht jetzt seitlich neben der Linie und lässt beide Enden frei.",
+      "en": "While drawing a short, steep line, curve or arc, the label with length and angle sat right over the point you were about to place. It now sits beside the line and leaves both ends free."
     }
   }
 ]

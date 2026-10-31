@@ -185,7 +185,7 @@ A {{ui:shape.vase}} önálló test vázákhoz, cserepekhez és lámpaernyőkhöz
 
 - {{ui:prop.vaseProfile}}: palack, hasas, nyakas tál, hordó, henger vagy tölcsér. A magasság és a legnagyobb átmérő az alakzat saját méretei: húzd a fogantyúkat, vagy írd be a {{ui:prop.vaseDiameter}} és a {{ui:prop.height}} értékét.
 - {{ui:prop.vaseSection}}: kör, lekerekített sarkú sokszög vagy hullám (lágy, hegyes, ívek vagy uszonyok). A {{ui:prop.vaseTwist}} a magasság mentén elforgatja, a {{ui:prop.vaseSway}} ide-oda lengeti.
-- {{ui:prop.vaseBody}}: a {{ui:vase.bodySolid}} a szeletelő vázamódjához való (spiralizálásnak is hívják): a szeletelő egyetlen falat nyomtat spirálban, és kihagyja a tetejét és a kitöltést, ezért a test tömörként van rajzolva. A {{ui:vase.bodyHollow}} valódi falat és aljat ad egy normál nyomtatáshoz.
+- {{ui:prop.vaseBody}}: a {{ui:vase.bodySolid}} a szeletelő vázamódjához való (spiralizálásnak is hívják): a szeletelő egyetlen falat nyomtat spirálban, és kihagyja a tetejét és a kitöltést, ezért a test tömörként van rajzolva. A {{ui:vase.bodyHollow}} valódi falat és aljat ad egy normál nyomtatáshoz. Ha a {{ui:prop.vaseBottom}} 0 mm, az üreges vázának nincs alja: mindkét végén nyitott cső, tölcsérekhez, fúvókákhoz és csövekhez.
 - {{ui:prop.vaseEffect}}: egy új váza sima. Választható hornyok, csíkok, Voronoi-cellák vagy fazetták (low poly) a külsején, ha szeretnéd, a magasság egy sávjában; a vázához tartoznak, és vele együtt szerkeszthetők maradnak.
 
 A {{ui:prop.vaseSection2}} a magasság mentén átvezeti a keresztmetszetet egy másodikba, például alul körből felül hatszögbe.

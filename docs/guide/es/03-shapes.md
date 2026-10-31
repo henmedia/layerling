@@ -195,7 +195,7 @@ El {{ui:shape.vase}} es un cuerpo propio para jarrones, macetas y pantallas de l
 
 - {{ui:prop.vaseProfile}}: botella, panzudo, cuenco con cuello, barril, cilindro o embudo. La altura y el diámetro máximo son las medidas propias de la forma: arrastra los tiradores o escribe {{ui:prop.vaseDiameter}} y {{ui:prop.height}}.
 - {{ui:prop.vaseSection}}: un círculo, un polígono con esquinas redondeadas o una onda (suave, en punta, arcos o aletas). {{ui:prop.vaseTwist}} la gira a lo largo de la altura, {{ui:prop.vaseSway}} la hace oscilar de un lado a otro.
-- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} es para el modo jarrón del laminador (también llamado espiral): el laminador imprime una sola pared en espiral y omite la tapa y el relleno, por eso el cuerpo se dibuja macizo. {{ui:vase.bodyHollow}} da una pared y un fondo reales para una impresión normal.
+- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} es para el modo jarrón del laminador (también llamado espiral): el laminador imprime una sola pared en espiral y omite la tapa y el relleno, por eso el cuerpo se dibuja macizo. {{ui:vase.bodyHollow}} da una pared y un fondo reales para una impresión normal. Con {{ui:prop.vaseBottom}} a 0 mm el jarrón hueco no tiene fondo: un tubo abierto por los dos extremos, para campanas, boquillas y tubos.
 - {{ui:prop.vaseEffect}}: un jarrón nuevo es liso. Puedes elegir estrías, rayas, celdas de Voronoi o facetas (low poly) en el exterior, si quieres en una franja de la altura; pertenecen al jarrón y siguen siendo editables con él.
 
 {{ui:prop.vaseSection2}} funde la sección con una segunda a lo largo de la altura, por ejemplo de un círculo abajo a un hexágono arriba.

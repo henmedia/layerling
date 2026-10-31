@@ -195,7 +195,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 - {{ui:prop.vaseProfile}}：瓶形、鼓肚、带颈的碗、桶形、圆柱或漏斗。高度和最大直径是该形状自己的尺寸：拖动手柄，或输入 {{ui:prop.vaseDiameter}} 和 {{ui:prop.height}}。
 - {{ui:prop.vaseSection}}：圆、圆角多边形或波浪（柔和、尖形、拱形或鳍形）。{{ui:prop.vaseTwist}} 让截面沿高度旋转，{{ui:prop.vaseSway}} 让它来回摆动。
-- {{ui:prop.vaseBody}}：{{ui:vase.bodySolid}} 用于切片软件的花瓶模式（也叫螺旋化）：切片软件以螺旋方式只打印一层壁，省去顶部和填充，因此实体画成实心。{{ui:vase.bodyHollow}} 为普通打印生成真正的壁和底。
+- {{ui:prop.vaseBody}}：{{ui:vase.bodySolid}} 用于切片软件的花瓶模式（也叫螺旋化）：切片软件以螺旋方式只打印一层壁，省去顶部和填充，因此实体画成实心。{{ui:vase.bodyHollow}} 为普通打印生成真正的壁和底。{{ui:prop.vaseBottom}} 设为 0 mm 时，空心花瓶没有底：两端开口的管子，适合喇叭口、吹嘴和管道。
 - {{ui:prop.vaseEffect}}：新花瓶是光面的。可选外侧的凹槽、条纹、Voronoi 单元或切面（低多边形），也可只放在高度上的一条带里；它们属于花瓶，随花瓶一起保持可编辑。
 
 {{ui:prop.vaseSection2}} 让截面沿高度过渡到第二种截面，例如从底部的圆过渡到顶部的六边形。
