@@ -204,7 +204,7 @@ Resultatet er et mesh som en importeret model, og det bevarer det legeme, det bl
 
 - {{ui:prop.vaseProfile}}: flaske, buget, skål med hals, tønde, cylinder eller tragt. Højden og den bredeste diameter er formens egne mål: træk i håndtagene, eller tast {{ui:prop.vaseDiameter}} og {{ui:prop.height}}.
 - {{ui:prop.vaseSection}}: en cirkel, et polygon med rundede hjørner eller en bølge (blød, spids, buer eller finner). {{ui:prop.vaseTwist}} drejer tværsnittet op ad højden, {{ui:prop.vaseSway}} får det til at svinge frem og tilbage.
-- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} er til slicerens vasemodus (også kaldet spiralize): sliceren printer én væg i en spiral og lader top og fyldning være, så kroppen tegnes massiv. {{ui:vase.bodyHollow}} giver en rigtig væg og bund til et normalt print.
+- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} er til slicerens vasemodus (også kaldet spiralize): sliceren printer én væg i en spiral og lader top og fyldning være, så kroppen tegnes massiv. {{ui:vase.bodyHollow}} giver en rigtig væg og bund til et normalt print. Med {{ui:prop.vaseBottom}} på 0 mm har den hule vase ingen bund: et rør, åbent i begge ender, til lydtragte, mundstykker og rør.
 - {{ui:prop.vaseEffect}}: en ny vase er glat. Der er riller, striber, Voronoi-celler eller facetter (low poly) at vælge imellem på ydersiden, i et bånd af højden hvis du vil; de hører til vasen og bliver redigerbare sammen med den.
 
 {{ui:prop.vaseSection2}} blander tværsnittet ind i et andet op ad højden, for eksempel fra en cirkel i bunden til en sekskant i toppen.
