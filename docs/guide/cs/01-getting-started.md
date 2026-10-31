@@ -71,7 +71,7 @@ Název projektu ({{ui:confirm.projectName}}) je úplně nahoře. Klikněte na n�
 
 ### Skrýt ovládání pohledu
 
-{{ui:camera.hide}} sbalí ovládání kamery vlevo a dá pracovní ploše víc místa; {{ui:camera.show}} ho vrátí.
+{{ui:camera.hide}} sbalí lištu pohledu vlevo a dá pracovní ploše víc místa; {{ui:camera.show}} ho vrátí.
 
 ### Krok přichytávání
 

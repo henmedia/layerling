@@ -7,7 +7,7 @@ Para construir una pieza con exactitud hay que medir. layerling tiene varias her
 
 ## La cinta métrica
 
-La cinta métrica está en el extremo inferior de la barra de cámara, en el borde izquierdo ({{ui:camera.tapeTools}}). Mide distancias entre vértices, aristas y caras. Al hacer clic en ella se abren cinco botones. Si tapan lo que quieres medir, arrástralos por el asa de la izquierda a cualquier punto de la zona de trabajo; un doble clic en el asa los devuelve a su sitio:
+La cinta métrica está en el extremo inferior de la barra de vista, en el borde izquierdo ({{ui:camera.tapeTools}}). Mide distancias entre vértices, aristas y caras. Al hacer clic en ella se abren cinco botones. Si tapan lo que quieres medir, arrástralos por el asa de la izquierda a cualquier punto de la zona de trabajo; un doble clic en el asa los devuelve a su sitio:
 
 ![La cinta métrica con sus botones: añadir medida, mover los puntos de medida, quitar medida, aristas enteras y eliminar todas las medidas.](shot:tape-menu)
 
@@ -27,7 +27,7 @@ La {{ui:shape.ruler}} la sacas de la biblioteca de formas. Es solo una herramien
 
 ## La escuadra
 
-A veces se mide mejor en ángulo recto. Haz clic en {{ui:camera.cornerRulerTool}} en la barra de cámara y luego en la zona de trabajo. Ahí se coloca una escuadra con dos brazos en ángulo recto y marcas de graduación, como una escuadra de carpintero. Tampoco tiene cuerpo propio. Si haces clic cerca de la esquina de un cuerpo, su esquina se ajusta justo ahí.
+A veces se mide mejor en ángulo recto. Haz clic en {{ui:camera.cornerRulerTool}} en la barra de vista y luego en la zona de trabajo. Ahí se coloca una escuadra con dos brazos en ángulo recto y marcas de graduación, como una escuadra de carpintero. Tampoco tiene cuerpo propio. Si haces clic cerca de la esquina de un cuerpo, su esquina se ajusta justo ahí.
 
 La escuadra se apoya en el plano de trabajo. Si este está sobre el lateral de un cuerpo, la escuadra también queda sobre ese lateral; consulta [Vista y plano de trabajo](chapter:view-and-workplane). Así se acota en una pared vertical: coloca el plano de trabajo sobre la pared, pon la escuadra en su esquina superior izquierda y haz clic en el tirador hasta que los brazos apunten a la derecha y hacia abajo.
 

@@ -26,7 +26,7 @@ Bez klávesy Shift dělá {{ui:contextMenu.selectMultiple}} v nabídce dlouhého
 
 ## Otáčení a přibližování pohledu
 
-Jeden prst na prázdném místě otáčí pohled, dva prsty ho přibližují a posouvají. Prst, který začne na tělese, pracuje s tělesem, ne s pohledem. Pokud chcete, aby místo toho otáčel pohled, zapněte {{ui:camera.touchRotate}} na panelu kamery: jeden prst pak otáčí pohled místo výběru, ať začne kdekoli. Tento přepínač se zobrazuje jen na zařízení s dotykovou obrazovkou.
+Jeden prst na prázdném místě otáčí pohled, dva prsty ho přibližují a posouvají. Prst, který začne na tělese, pracuje s tělesem, ne s pohledem. Pokud chcete, aby místo toho otáčel pohled, zapněte {{ui:camera.touchRotate}} v liště pohledu: jeden prst pak otáčí pohled místo výběru, ať začne kdekoli. Tento přepínač se zobrazuje jen na zařízení s dotykovou obrazovkou.
 
 Krychle pohledu vlevo nahoře otáčí pohled, když za ni táhnete, a klepnutí na některou její stranu, roh nebo hranu skočí na tento pohled. Viz [Pohled a pracovní rovina](chapter:view-and-workplane).
 

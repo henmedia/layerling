@@ -25,7 +25,7 @@ Avec de nombreuses pièces, il est facile de perdre le fil de la vue. La liste d
 - Le champ de recherche trouve les formes par nom et par genre, donc aussi "cylindre" ou "trou". Il examine également l'intérieur des groupes, aussi profondément imbriqués soient-ils : un groupe détenant une allumette reste dans la liste et s'ouvre pour montrer les parties correspondantes et les groupes qui y mènent. Un groupe trouvé par son propre nom affiche toutes ses parties lorsque vous l'ouvrez.
 - La flèche à l'extrême gauche de la barre de titre replie la liste jusqu'à sa barre de titre et inversement.
 
-La liste est ancrée juste à droite du cube de visualisation. Faites-le glisser par sa barre de titre pour le placer n'importe où sur le plan de travail ; il passe sous le cube de visualisation et la barre de caméra. Déposez-le à côté du cube de visualisation ou double-cliquez sur la barre de titre et il s'ancre à nouveau. L'endroit où il se trouvait et s'il a été plié sont mémorisés dans ce navigateur.
+La liste est ancrée juste à droite du cube de visualisation. Faites-le glisser par sa barre de titre pour le placer n'importe où sur le plan de travail ; il passe sous le cube de visualisation et la barre de vue. Déposez-le à côté du cube de visualisation ou double-cliquez sur la barre de titre et il s'ancre à nouveau. L'endroit où il se trouvait et s'il a été plié sont mémorisés dans ce navigateur.
 
 ## Saisir une position
 

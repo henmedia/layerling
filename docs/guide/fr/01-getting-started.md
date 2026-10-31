@@ -69,9 +69,9 @@ Le nom de la conception ({{ui:confirm.projectName}}) se trouve tout en haut. Cli
 
 {{ui:palette.open}} : tapez ce que vous cherchez, un outil, une forme ou un réglage, et cliquez sur le résultat.
 
-### Masquer les commandes de la caméra
+### Masquer la barre de vue
 
-{{ui:camera.hide}} replie les commandes de la caméra à gauche et laisse plus de place à la zone de travail ; {{ui:camera.show}} les ramène.
+{{ui:camera.hide}} replie la barre de vue à gauche et laisse plus de place à la zone de travail ; {{ui:camera.show}} les ramène.
 
 ### Grille d'accrochage
 

@@ -7,7 +7,7 @@ Om een onderdeel precies te bouwen, moet je meten. layerling heeft daar verschil
 
 ## Het meetlint
 
-Het meetlint zit aan de onderkant van de camerabalk aan de linkerrand ({{ui:camera.tapeTools}}). Het meet afstanden tussen hoeken, randen en vlakken. Een klik erop opent vijf knoppen. Zitten die in de weg bij wat je wilt meten, sleep ze dan aan de greep links naar een willekeurige plek op het werkvlak; een dubbelklik op de greep zet ze terug:
+Het meetlint zit aan de onderkant van de weergavebalk aan de linkerrand ({{ui:camera.tapeTools}}). Het meet afstanden tussen hoeken, randen en vlakken. Een klik erop opent vijf knoppen. Zitten die in de weg bij wat je wilt meten, sleep ze dan aan de greep links naar een willekeurige plek op het werkvlak; een dubbelklik op de greep zet ze terug:
 
 ![Het meetlint met zijn knoppen: meting toevoegen, meetpunten verplaatsen, meting verwijderen, hele randen, alle metingen verwijderen.](shot:tape-menu)
 
@@ -27,7 +27,7 @@ De {{ui:shape.ruler}} haal je uit de vormenbibliotheek. Het is puur een meetinst
 
 ## De winkelhaak
 
-Soms meet je beter in een rechte hoek. Klik op {{ui:camera.cornerRulerTool}} in de camerabalk en dan op het werkvlak. Daar wordt een winkelhaak geplaatst met twee armen in een rechte hoek, met maatstreepjes zoals op een blokhaak. Ook die heeft geen eigen lichaam. Klik je dicht bij de hoek van een lichaam, dan klikt zijn hoek precies daar vast.
+Soms meet je beter in een rechte hoek. Klik op {{ui:camera.cornerRulerTool}} in de weergavebalk en dan op het werkvlak. Daar wordt een winkelhaak geplaatst met twee armen in een rechte hoek, met maatstreepjes zoals op een blokhaak. Ook die heeft geen eigen lichaam. Klik je dicht bij de hoek van een lichaam, dan klikt zijn hoek precies daar vast.
 
 De winkelhaak ligt op het werkvlak. Ligt dat op de zijkant van een lichaam, dan ligt de winkelhaak ook op die zijkant, zie [Weergave en werkvlak](chapter:weergave-en-werkvlak). Zo maat je op een verticale wand: zet het werkvlak op de wand, plaats de winkelhaak in de linkerbovenhoek en klik op de greep tot de armen naar rechts en naar beneden wijzen.
 

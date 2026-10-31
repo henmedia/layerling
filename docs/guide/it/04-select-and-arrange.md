@@ -25,7 +25,7 @@ Quando ci sono molte parti, è facile perderne qualcuna nella vista. L’elenco 
 - Il campo di ricerca trova le forme per nome e per tipo, per esempio “cilindro” o “foro”. Cerca anche all’interno dei gruppi, a qualsiasi livello: se un gruppo contiene una corrispondenza, resta nell’elenco e si apre mostrando le parti trovate e i gruppi che conducono a esse. Se invece il nome del gruppo stesso corrisponde alla ricerca, aprendolo vedrai tutte le sue parti.
 - La freccia all’estrema sinistra della barra del titolo comprime l’elenco nella sola barra e lo riapre.
 
-L’elenco è ancorato subito a destra del cubo di visualizzazione. Trascinalo dalla barra del titolo per posizionarlo ovunque sul piano di lavoro; può sovrapporsi al cubo e alla barra della telecamera. Riportalo accanto al cubo o fai doppio clic sulla barra del titolo per ancorarlo di nuovo. In questo browser vengono ricordati posizione e stato aperto o compresso.
+L’elenco è ancorato subito a destra del cubo di visualizzazione. Trascinalo dalla barra del titolo per posizionarlo ovunque sul piano di lavoro; può sovrapporsi al cubo e alla barra della vista. Riportalo accanto al cubo o fai doppio clic sulla barra del titolo per ancorarlo di nuovo. In questo browser vengono ricordati posizione e stato aperto o compresso.
 
 ## Digitare una posizione
 

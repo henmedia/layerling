@@ -26,7 +26,7 @@ Zonder Shift-toets doet {{ui:contextMenu.selectMultiple}} in het menu van een la
 
 ## Het beeld draaien en zoomen
 
-Eén vinger op de lege ruimte draait het beeld, twee vingers zoomen en verschuiven het. Een vinger die op een lichaam begint, werkt aan het lichaam, niet aan het beeld. Wil je dat hij liever het beeld draait, zet dan {{ui:camera.touchRotate}} aan in de camerabalk: één vinger draait dan het beeld in plaats van te selecteren, waar hij ook begint. Die schakelaar verschijnt alleen op een apparaat met een aanraakscherm.
+Eén vinger op de lege ruimte draait het beeld, twee vingers zoomen en verschuiven het. Een vinger die op een lichaam begint, werkt aan het lichaam, niet aan het beeld. Wil je dat hij liever het beeld draait, zet dan {{ui:camera.touchRotate}} aan in de weergavebalk: één vinger draait dan het beeld in plaats van te selecteren, waar hij ook begint. Die schakelaar verschijnt alleen op een apparaat met een aanraakscherm.
 
 De beeldkubus linksboven draait het beeld als je eraan sleept, en een tik op een van zijn zijden, hoeken of randen springt naar dat beeld. Zie [Weergave en werkvlak](chapter:weergave-en-werkvlak).
 

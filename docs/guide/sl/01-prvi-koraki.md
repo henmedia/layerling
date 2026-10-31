@@ -17,12 +17,12 @@ Vsi tvoji načrti se pozneje pojavijo na začetni strani s sličico predogleda. 
 
 ## Urejevalnik na kratko
 
-![Urejevalnik z dvema oblikama na delovni ravnini. Zgoraj orodna vrstica, levo upravljanje kamere, desno nastavitve izbrane oblike.](shot:editor-overview)
+![Urejevalnik z dvema oblikama na delovni ravnini. Zgoraj orodna vrstica, levo vrstica pogleda, desno nastavitve izbrane oblike.](shot:editor-overview)
 
 - **Zgoraj** je orodna vrstica. Razvrščena je po opravilih: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} in {{ui:editor.group.help}}. Ko z miško zapelješ čez ikono, se pokaže njeno ime. Kjer vidiš majhen vprašaj, na primer pri nastavitvah oblike, v knjižnici oblik ali v oknih z orodji, te pelje naravnost v ustrezno poglavje teh navodil.
 - **V sredini** je delovna ravnina. Tu postavljaš oblike, jih naravnaš in vidiš rezultat.
 - **Desno** se pokažejo nastavitve izbrane oblike: barva, mere, lega in vse drugo, kar oblika še ima. Vpisovanje številk je natančnejše od vlečenja.
-- **Levo** je upravljanje kamere z orientacijsko kocko nad njim. S tem se premikaš po prizoru, več o tem v poglavju [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina).
+- **Levo** je vrstica pogleda z orientacijsko kocko nad njo. S tem se premikaš po prizoru, več o tem v poglavju [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina).
 - **Čisto zgoraj** preklapljaš med {{ui:editor.modeGeometry}} in {{ui:editor.modeSketch}}, preimenuješ načrt ter nastaviš jezik in barvno shemo.
 
 ## Gumbi okoli delovne površine
@@ -69,9 +69,9 @@ Ime projekta ({{ui:confirm.projectName}}) je čisto na vrhu. Kliknite nanj, vpi�
 
 {{ui:palette.open}}: vpišite, kar iščete, orodje, obliko ali nastavitev, in kliknite rezultat.
 
-### Skrij upravljanje kamere
+### Skrij vrstico pogleda
 
-{{ui:camera.hide}} zloži upravljanje kamere na levi in da delovni površini več prostora; {{ui:camera.show}} ga vrne.
+{{ui:camera.hide}} zloži vrstico pogleda na levi in da delovni površini več prostora; {{ui:camera.show}} ga vrne.
 
 ### Mreža pripenjanja
 

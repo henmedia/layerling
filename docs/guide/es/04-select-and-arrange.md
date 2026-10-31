@@ -25,7 +25,7 @@ Con muchas piezas, es fácil perderse en la vista. La lista de objetos ({{ui:edi
 - El campo de búsqueda encuentra formas por su nombre y por su tipo, así que también puedes buscar «cilindro» u «orificio». Busca también dentro de los grupos, por muy anidados que estén: un grupo que contiene una coincidencia se queda en la lista y se despliega para mostrar las piezas que coinciden y los grupos que llevan hasta ellas. Un grupo encontrado por su propio nombre muestra todas sus piezas cuando lo abres.
 - La flecha del extremo izquierdo de la barra de título pliega la lista hasta dejar solo la barra de título, y la vuelve a desplegar.
 
-La lista está acoplada justo a la derecha del cubo de vista. Arrástrala por su barra de título para ponerla en cualquier punto del plano de trabajo; pasa por debajo del cubo de vista y de la barra de cámara. Si la sueltas otra vez junto al cubo de vista, o haces doble clic en la barra de título, se vuelve a acoplar. Este navegador recuerda dónde estaba y si estaba plegada.
+La lista está acoplada justo a la derecha del cubo de vista. Arrástrala por su barra de título para ponerla en cualquier punto del plano de trabajo; pasa por debajo del cubo de vista y de la barra de vista. Si la sueltas otra vez junto al cubo de vista, o haces doble clic en la barra de título, se vuelve a acoplar. Este navegador recuerda dónde estaba y si estaba plegada.
 
 ## Escribir una posición
 

@@ -18,12 +18,12 @@ Men sikkerhedskopiér dine designs ind imellem: en browser kan fejle, og en brow
 
 ## Editoren overblik
 
-![Editoren med to former på arbejdsplanet. Båndet øverst, kamerakontrollerne til venstre, indstillingerne for den valgte form til højre.](shot:editor-overview)
+![Editoren med to former på arbejdsplanet. Båndet øverst, visningsbjælken til venstre, indstillingerne for den valgte form til højre.](shot:editor-overview)
 
 - **Øverst** er båndet. Det er sorteret efter opgave: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} og {{ui:editor.group.help}}. Hold musen over et ikon for at se dets navn. Hvor du ser et lille spørgsmålstegn, for eksempel i en forms indstillinger, i formbiblioteket eller i værktøjspanelerne, fører det direkte til det tilsvarende kapitel i denne vejledning.
 - **I midten** ligger arbejdsplanet. Det er her du placerer former, trækker dem i form og ser resultatet.
 - **Til højre** vises indstillingerne for den valgte form: farve, dimensioner, position og hvad ellers der udgør formen. At taste tal er mere nøjagtigt end at trække.
-- **Til venstre** er kamerakontrollerne med visningskuben over dem. De flytter dig rundt i scenen, mere i [Visning og arbejdsplan](chapter:view-and-workplane).
+- **Til venstre** er visningsbjælken med visningskuben over den. De flytter dig rundt i scenen, mere i [Visning og arbejdsplan](chapter:view-and-workplane).
 - **Øverst oppe** skifter du mellem {{ui:editor.modeGeometry}} og {{ui:editor.modeSketch}}, omdøber designet og vælger sprog og farveskema.
 
 ## Knapperne rundt om arbejdsområdet
@@ -70,9 +70,9 @@ Designets navn ({{ui:confirm.projectName}}) står helt øverst. Klik på det, sk
 
 {{ui:palette.open}}: skriv, hvad du leder efter, et værktøj, en form eller en indstilling, og klik på resultatet.
 
-### Skjul kamerakontroller
+### Skjul visningsbjælken
 
-{{ui:camera.hide}} folder kamerastyringen til venstre væk og giver arbejdsområdet mere plads; {{ui:camera.show}} henter den tilbage.
+{{ui:camera.hide}} folder visningsbjælken til venstre væk og giver arbejdsområdet mere plads; {{ui:camera.show}} henter den tilbage.
 
 ### Snap til gitter
 

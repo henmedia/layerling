@@ -17,12 +17,12 @@ Todos tus diseños aparecen después en la página de inicio, con una imagen de 
 
 ## El editor de un vistazo
 
-![El editor con dos formas sobre el plano de trabajo. Arriba, la cinta; a la izquierda, los controles de cámara; a la derecha, los ajustes de la forma seleccionada.](shot:editor-overview)
+![El editor con dos formas sobre el plano de trabajo. Arriba, la cinta; a la izquierda, la barra de vista; a la derecha, los ajustes de la forma seleccionada.](shot:editor-overview)
 
 - **Arriba** está la cinta, ordenada por tareas: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} y {{ui:editor.group.help}}. Pasa el ratón por encima de un icono para ver su nombre. Allí donde veas un pequeño signo de interrogación, por ejemplo en los ajustes de una forma, en la biblioteca de formas o en los paneles de herramientas, te lleva directamente al capítulo de esta guía que trata ese tema.
 - **En el centro** está el plano de trabajo. Ahí colocas las formas, las ajustas a tu gusto y ves el resultado.
 - **A la derecha** aparecen los ajustes de la forma seleccionada: color, medidas, posición y todo lo demás que define la forma. Escribir números es más exacto que arrastrar.
-- **A la izquierda** están los controles de cámara, con el cubo de vista encima. Con ellos te mueves por la escena; tienes más detalles en [Vista y plano de trabajo](chapter:view-and-workplane).
+- **A la izquierda** está la barra de vista, con el cubo de vista encima. Con ellos te mueves por la escena; tienes más detalles en [Vista y plano de trabajo](chapter:view-and-workplane).
 - **Arriba del todo** cambias entre {{ui:editor.modeGeometry}} y {{ui:editor.modeSketch}}, cambias el nombre del diseño y eliges el idioma y el tema.
 
 ## Los botones alrededor de la zona de trabajo
@@ -69,9 +69,9 @@ El nombre del diseño ({{ui:confirm.projectName}}) está arriba del todo. Haz cl
 
 {{ui:palette.open}}: escribe lo que buscas, ya sea una herramienta, una forma o un ajuste, y haz clic en el resultado.
 
-### Ocultar los controles de cámara
+### Ocultar la barra de vista
 
-{{ui:camera.hide}} recoge los controles de cámara de la izquierda y deja más sitio a la zona de trabajo; {{ui:camera.show}} los vuelve a mostrar.
+{{ui:camera.hide}} recoge la barra de vista de la izquierda y deja más sitio a la zona de trabajo; {{ui:camera.show}} los vuelve a mostrar.
 
 ### Cuadrícula de ajuste
 

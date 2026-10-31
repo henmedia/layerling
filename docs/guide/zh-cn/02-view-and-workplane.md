@@ -18,7 +18,7 @@ summary: 在场景中移动、正对着观察，以及把新形状放到任意�
 
 滚轮缩放的速度在设置的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 设定：滑块范围 1 到 14，初始为 5。它只作用于滚轮和触控板：按钮以及 [[+]] 和 [[−]] 键始终按同样的小步距缩放。鼠标滚轮的一格在任何浏览器里缩放幅度都相同，触控板则按你滑过的距离缩放。
 
-平板或手机上，两根手指缩放（张开和捏合）并平移视图（并拢滑动）。一根手指在空白处会转动视图，在那里轻点会清除选择；落在形状或控制柄上时，则像鼠标左键那样操作设计。要让从形状上开始的手指也能转动视图，请打开相机栏中的 {{ui:camera.touchRotate}}。这个开关只在带触摸屏的设备上显示。
+平板或手机上，两根手指缩放（张开和捏合）并平移视图（并拢滑动）。一根手指在空白处会转动视图，在那里轻点会清除选择；落在形状或控制柄上时，则像鼠标左键那样操作设计。要让从形状上开始的手指也能转动视图，请打开视图栏中的 {{ui:camera.touchRotate}}。这个开关只在带触摸屏的设备上显示。
 
 带笔的绘图板用起来像鼠标：笔尖是左键，笔杆上的按键是右键，用于转动视图和打开菜单。绘图板的热键可以在其驱动中设为 layerling 的[键盘快捷键](chapter:shortcuts)。
 
@@ -32,7 +32,7 @@ summary: 在场景中移动、正对着观察，以及把新形状放到任意�
 
 拖动立方体可以转动视图，和按住右键拖动一样。没有选中任何东西时，方向键也会转动视图：每按一次 15°，配合 [[Shift]] 为 90°。它们按所指的方向转动模型——[[→]] 把模型的正面转向右，[[↑]] 把它的正面向上仰。按住 [[Ctrl]] 时，方向键改为让视图在屏幕上平移：每按一次移动画面的十分之一，同时按 [[Shift]] 则为一半。模型按所指的方向移动。如果选中了东西，方向键会移动它；先点击空白处再转动视图。在触摸屏上，用一根手指即可，无需打开 {{ui:camera.touchRotate}}。
 
-### 相机栏
+### 视图栏
 
 左边缘是一条窄栏。从上往下：
 
@@ -79,7 +79,7 @@ X 和 [[Esc]] 会关闭面板；如果正在测量，[[Esc]] 会先结束测量�
 
 在面上时，工作平面的原点否则会吸附到网格。点击靠近面角的位置，它就正好落在那个角上。靠近边时它落在边上，网格也与边对齐；这就是有意选择网格角度的方法。没有角或边时，平放的面上的网格与实体平行，所以在一个转过的长方体上，网格也会跟着转。
 
-点击平台旁边或按 [[Esc]] 会把工作平面送回底板。更快的是 {{ui:camera.resetWorkplane}}：工作平面位于面上时，带向下箭头的按钮会出现在相机栏里眼睛的下方。[[Shift]]+[[W]] 直接把它放到当前选中的面上。[[Alt]]+[[W]] 随时把它放回底板，无论是否选中了东西。如果点击时按住 [[Shift]]，平面会朝向另一边。
+点击平台旁边或按 [[Esc]] 会把工作平面送回底板。更快的是 {{ui:camera.resetWorkplane}}：工作平面位于面上时，带向下箭头的按钮会出现在视图栏里眼睛的下方。[[Shift]]+[[W]] 直接把它放到当前选中的面上。[[Alt]]+[[W]] 随时把它放回底板，无论是否选中了东西。如果点击时按住 [[Shift]]，平面会朝向另一边。
 
 工作平面位于面上时，{{ui:camera.placeWorkplane}} 旁边会出现一只眼睛。它会隐藏工作平面而不取消它，方便清楚地查看设计：新形状仍然落在那个面上，旋转也仍然绕它进行。点击眼睛会重新显示，设定新的工作平面也会。
 
@@ -97,9 +97,9 @@ X 和 [[Esc]] 会关闭面板；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.theme}} 设定整个程序的配色：{{ui:workspace.themeSystem}} 跟随电脑，其余为 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 和 {{ui:workspace.themeGraphite}}。也可以在编辑器右上角更改。
 
-{{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧相机控制和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸保存在这个浏览器中，对所有设计生效。
+{{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧视图栏和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸保存在这个浏览器中，对所有设计生效。
 
-{{ui:workspace.viewCubePosition}} 把视图立方体放到工作平面的另一个角：{{ui:workspace.viewCubePositionTopLeft}}（一直以来的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角，相机控制都会上移到立方体让出的位置。在右下角时，立方体正好位于 {{ui:inspector.snapGrid}} 控件上方。右侧打开形状属性时，右侧的立方体会让到属性面板左边。这个角保存在浏览器中，对所有设计生效。窗口很窄时（例如手机上），该设置会隐藏，立方体留在左上角。
+{{ui:workspace.viewCubePosition}} 把视图立方体放到工作平面的另一个角：{{ui:workspace.viewCubePositionTopLeft}}（一直以来的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角，视图栏都会上移到立方体让出的位置。在右下角时，立方体正好位于 {{ui:inspector.snapGrid}} 控件上方。右侧打开形状属性时，右侧的立方体会让到属性面板左边。这个角保存在浏览器中，对所有设计生效。窗口很窄时（例如手机上），该设置会隐藏，立方体留在左上角。
 
 ### 外观：快速模式
 

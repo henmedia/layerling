@@ -28,7 +28,7 @@ Den samme menu har {{ui:contextMenu.carry}}, tasten [[C]] til en berøringsskær
 
 ## Dreje og zoome i visningen
 
-Én finger på tom plads drejer visningen, to fingre zoomer den og flytter den. En finger der begynder på et legeme arbejder på legemet, ikke på visningen. Vil du hellere have den til at dreje visningen, slår du {{ui:camera.touchRotate}} til i kamerabjælken: én finger drejer så visningen i stedet for at vælge, uanset hvor den begynder. Den kontakt vises kun på en enhed med en berøringsskærm.
+Én finger på tom plads drejer visningen, to fingre zoomer den og flytter den. En finger der begynder på et legeme arbejder på legemet, ikke på visningen. Vil du hellere have den til at dreje visningen, slår du {{ui:camera.touchRotate}} til i visningsbjælken: én finger drejer så visningen i stedet for at vælge, uanset hvor den begynder. Den kontakt vises kun på en enhed med en berøringsskærm.
 
 Visningskuben øverst til venstre drejer visningen når du trækker i den, og et tryk på en af dens sider, hjørner eller kanter springer til den visning. Se [Visning og arbejdsplan](chapter:view-and-workplane).
 

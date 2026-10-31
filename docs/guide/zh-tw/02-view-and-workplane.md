@@ -18,7 +18,7 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 
 滾輪縮放的速度在設定的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 設定：滑桿範圍 1 到 14，初始值為 5。它只影響滾輪與觸控式軌跡板：按鈕與 [[+]]、[[−]] 鍵一律以相同的小步距縮放。滑鼠滾輪的一格在任何瀏覽器中的縮放幅度都相同，觸控式軌跡板則依你滑過的距離縮放。
 
-在平板或手機上，兩根手指可縮放（張開與捏合）並平移檢視（併攏滑動）。一根手指在空白處會轉動檢視，在那裡輕點則清除選取；落在形狀或控制點上時，則如同滑鼠左鍵般操作設計。若要讓從形狀上開始的手指也能轉動檢視，請開啟相機列中的 {{ui:camera.touchRotate}}。這個開關只會在具有觸控螢幕的裝置上顯示。
+在平板或手機上，兩根手指可縮放（張開與捏合）並平移檢視（併攏滑動）。一根手指在空白處會轉動檢視，在那裡輕點則清除選取；落在形狀或控制點上時，則如同滑鼠左鍵般操作設計。若要讓從形狀上開始的手指也能轉動檢視，請開啟檢視列中的 {{ui:camera.touchRotate}}。這個開關只會在具有觸控螢幕的裝置上顯示。
 
 搭配筆的繪圖板用起來像滑鼠：筆尖是左鍵，筆身側鍵是右鍵，可用來轉動檢視與開啟選單。繪圖板的快速鍵可在其驅動程式中設為 layerling 的[鍵盤快速鍵](chapter:shortcuts)。
 
@@ -32,7 +32,7 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 
 拖曳立方體可以轉動檢視，就像按住右鍵拖曳一樣。沒有選取任何東西時，方向鍵也會轉動檢視：每按一次 15°，搭配 [[Shift]] 則為 90°。它們會依所指的方向轉動模型——[[→]] 將模型正面轉向右側，[[↑]] 將正面向上抬起。按住 [[Ctrl]] 時，方向鍵改為在螢幕上平移檢視：每按一次移動畫面的十分之一，同時按 [[Shift]] 則為一半。模型會依所指的方向移動。如果選取了東西，方向鍵會移動它；請先點擊空白處再轉動檢視。在觸控螢幕上，用一根手指即可，不必開啟 {{ui:camera.touchRotate}}。
 
-### 相機列
+### 檢視列
 
 左側邊緣有一條窄列。由上而下：
 
@@ -79,7 +79,7 @@ X 與 [[Esc]] 會關閉面板；若正在量測，[[Esc]] 會先結束量測。�
 
 在面上時，工作平面的原點一般會吸附到網格。點擊靠近面角的位置，它就會正好落在該角上。靠近邊時，它會落在邊上，網格也與邊對齊；這就是刻意選擇網格角度的方式。若沒有角或邊，平放面上的網格會與實體平行，所以在轉過的長方體上，網格也會跟著轉。
 
-點擊平台旁邊或按 [[Esc]]，會將工作平面送回底板。更快的方法是 {{ui:camera.resetWorkplane}}：工作平面位於面上時，帶有向下箭頭的按鈕會出現在相機列中眼睛的下方。[[Shift]]+[[W]] 會直接將它放到目前選取的面。[[Alt]]+[[W]] 隨時將它放回底板，無論是否選取了東西。若點擊時按住 [[Shift]]，平面會朝向另一邊。
+點擊平台旁邊或按 [[Esc]]，會將工作平面送回底板。更快的方法是 {{ui:camera.resetWorkplane}}：工作平面位於面上時，帶有向下箭頭的按鈕會出現在檢視列中眼睛的下方。[[Shift]]+[[W]] 會直接將它放到目前選取的面。[[Alt]]+[[W]] 隨時將它放回底板，無論是否選取了東西。若點擊時按住 [[Shift]]，平面會朝向另一邊。
 
 工作平面位於面上時，{{ui:camera.placeWorkplane}} 旁邊會出現一隻眼睛。它會隱藏工作平面而不取消它，方便清楚查看設計：新形狀仍會落在該面上，旋轉也仍繞著它進行。點擊眼睛會重新顯示，設定新的工作平面也會。
 
@@ -97,9 +97,9 @@ X 與 [[Esc]] 會關閉面板；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.theme}} 設定整個程式的配色方案：{{ui:workspace.themeSystem}} 跟隨你的電腦，其餘為 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 與 {{ui:workspace.themeGraphite}}。也可以在編輯器右上角變更。
 
-{{ui:workspace.toolbarSize}} 會讓頂部功能區的按鈕、其形狀選單、左側的相機控制項與右側的屬性面板變小或變大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以來的樣子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在筆記型電腦上能為工作平面留出更多空間；大尺寸在大螢幕上或用手點按時更容易命中。使用大按鈕時，若視窗太窄，功能區的各群組會排到第二列。尺寸會儲存在這個瀏覽器中，並套用於所有設計。
+{{ui:workspace.toolbarSize}} 會讓頂部功能區的按鈕、其形狀選單、左側的檢視列與右側的屬性面板變小或變大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以來的樣子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在筆記型電腦上能為工作平面留出更多空間；大尺寸在大螢幕上或用手點按時更容易命中。使用大按鈕時，若視窗太窄，功能區的各群組會排到第二列。尺寸會儲存在這個瀏覽器中，並套用於所有設計。
 
-{{ui:workspace.viewCubePosition}} 會將視圖立方體放到工作平面的另一個角：{{ui:workspace.viewCubePositionTopLeft}}（一直以來的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角以外，相機控制項都會上移到立方體讓出的位置。在右下角時，立方體會正好位於 {{ui:inspector.snapGrid}} 控制項上方。右側開啟形狀屬性時，位於右側的立方體會讓到屬性面板左邊。這個角會儲存在瀏覽器中，並套用於所有設計。視窗較窄時（例如手機），此設定會隱藏，立方體則留在左上角。
+{{ui:workspace.viewCubePosition}} 會將視圖立方體放到工作平面的另一個角：{{ui:workspace.viewCubePositionTopLeft}}（一直以來的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角以外，檢視列都會上移到立方體讓出的位置。在右下角時，立方體會正好位於 {{ui:inspector.snapGrid}} 控制項上方。右側開啟形狀屬性時，位於右側的立方體會讓到屬性面板左邊。這個角會儲存在瀏覽器中，並套用於所有設計。視窗較窄時（例如手機），此設定會隱藏，立方體則留在左上角。
 
 ### 外觀：快速模式
 

@@ -22,7 +22,7 @@ How fast the wheel zooms is set with {{ui:workspace.zoomSpeed}} in the settings,
 
 **3D mouse.** A SpaceMouse or another 3D mouse turns, shifts and zooms the 3D view: push the cap away to zoom in, slide it to shift the view, tilt it to tilt the view and twist it to turn the view round. In the settings, under {{ui:workspace.appearance}}, click {{ui:workspace.spaceMouseConnect}} and choose the device in the window the browser opens; it remembers the choice, so this is needed only once. This works in Chrome and Edge, which can reach such devices; Firefox and Safari cannot.
 
-On a tablet or phone, two fingers zoom (spread and pinch) and move the view (slide together). One finger on empty space turns the view, and a tap there clears the selection; on a shape or a handle it works on the design, just like the left mouse button. To turn the view with a finger that starts on a shape too, switch on {{ui:camera.touchRotate}} in the camera bar. That switch shows on devices with a touch screen.
+On a tablet or phone, two fingers zoom (spread and pinch) and move the view (slide together). One finger on empty space turns the view, and a tap there clears the selection; on a shape or a handle it works on the design, just like the left mouse button. To turn the view with a finger that starts on a shape too, switch on {{ui:camera.touchRotate}} in the view bar. That switch shows on devices with a touch screen.
 
 A graphics tablet with a pen behaves like a mouse: the tip is the left button, the barrel button on the pen the right one, for turning the view and for the menu. The tablet's hotkeys can be set in its driver to layerling's [keyboard shortcuts](chapter:shortcuts).
 
@@ -36,7 +36,7 @@ The cube in the top left shows where you are looking. A click on one of its side
 
 Drag the cube to turn the view around, just like dragging with the right mouse button. With nothing selected, the arrow keys turn the view as well: 15° a press, 90° with [[Shift]]. They turn the model the way they point - [[→]] turns its front to the right, [[↑]] tilts its front upwards. With [[Ctrl]] held, the arrows slide the view across the screen instead: a tenth of the picture a press, half of it with [[Shift]] as well. The model moves the way they point. If something is selected, the arrows move it; click on empty space first to turn the view. On a touch screen this works with one finger, without switching on {{ui:camera.touchRotate}}.
 
-### The camera bar
+### The view bar
 
 At the left edge is a narrow bar. From the top:
 
@@ -56,7 +56,7 @@ You can also keep four views of your own in each design. [[Shift]]+[[7]], [[Shif
 
 ### A second view in its own window
 
-{{ui:camera.secondView}} opens a window that shows the same design through a camera of its own, so you can see it from two sides at once - from the front, say, while you work from above. Every change you make in the editor shows there straight away; the design is only changed in the main window, and the handles stay there too. In the second window the mouse and the view cube turn its view as they do here, and so do the keys: [[1]] to [[6]], [[F]], [[Home]], [[O]], [[+]] and [[−]], the arrow keys to turn and [[Ctrl]] with the arrows to slide. [[F]] there zooms to what is selected in the editor. The design's four saved views work there too: [[7]], [[8]], [[9]] and [[0]] bring them back, and [[Shift]] with one of these keys saves that window's view under it - for both windows. Its own camera bar has {{ui:camera.home}}, {{ui:camera.focusSelection}}, {{ui:camera.zoomIn}}, {{ui:camera.zoomOut}}, {{ui:camera.orthographic}} and {{ui:camera.hideWorkplane}}, and they act on that window alone. The window opens where you left it, at the same size, and closes with the editor. On phones and tablets the button is not shown.
+{{ui:camera.secondView}} opens a window that shows the same design through a camera of its own, so you can see it from two sides at once - from the front, say, while you work from above. Every change you make in the editor shows there straight away; the design is only changed in the main window, and the handles stay there too. In the second window the mouse and the view cube turn its view as they do here, and so do the keys: [[1]] to [[6]], [[F]], [[Home]], [[O]], [[+]] and [[−]], the arrow keys to turn and [[Ctrl]] with the arrows to slide. [[F]] there zooms to what is selected in the editor. The design's four saved views work there too: [[7]], [[8]], [[9]] and [[0]] bring them back, and [[Shift]] with one of these keys saves that window's view under it - for both windows. Its own view bar has {{ui:camera.home}}, {{ui:camera.focusSelection}}, {{ui:camera.zoomIn}}, {{ui:camera.zoomOut}}, {{ui:camera.orthographic}} and {{ui:camera.hideWorkplane}}, and they act on that window alone. The window opens where you left it, at the same size, and closes with the editor. On phones and tablets the button is not shown.
 
 ## Looking inside: the section view
 
@@ -88,7 +88,7 @@ Click on the empty plate instead, and the workplane lies flat at the spot you cl
 
 On a face the origin of the workplane otherwise snaps to the grid. Click close to a corner of the face and it sits exactly on that corner. Close to an edge it lies on the edge, and the grid lines up with it; that is how you choose the angle of the grid on purpose. Without a corner or an edge, the grid on a lying face runs parallel to the body, so on a turned box it is turned with it.
 
-A click beside the plate or [[Esc]] returns the workplane to the base plate. Quicker still is {{ui:camera.resetWorkplane}}: the button with the downward arrow sits in the camera bar below the eye while the workplane lies on a face. [[Shift]]+[[W]] puts it directly on the currently selected face. [[Alt]]+[[W]] puts it back on the base plate at any time, whether something is selected or not. If you hold [[Shift]] while clicking, the plane points the other way.
+A click beside the plate or [[Esc]] returns the workplane to the base plate. Quicker still is {{ui:camera.resetWorkplane}}: the button with the downward arrow sits in the view bar below the eye while the workplane lies on a face. [[Shift]]+[[W]] puts it directly on the currently selected face. [[Alt]]+[[W]] puts it back on the base plate at any time, whether something is selected or not. If you hold [[Shift]] while clicking, the plane points the other way.
 
 While a workplane sits on a face, an eye appears next to {{ui:camera.placeWorkplane}}. It hides the workplane without dropping it, for a clear look at the design: new shapes still land on that face, and rotating still turns about it. A click on the eye shows it again, and so does setting a new workplane.
 
@@ -106,11 +106,11 @@ The cogwheel in the title row ({{ui:editor.workspaceSettings}}) opens the settin
 
 {{ui:workspace.theme}} sets the colour scheme of the whole program: {{ui:workspace.themeSystem}} follows your computer, the others are {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} and {{ui:workspace.themeGraphite}}. You can also change it at the top right of the editor.
 
-{{ui:workspace.toolbarSize}} makes the buttons of the ribbon on top, its shape menu, the camera controls on the left and the properties panel on the right smaller or larger: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (as it always was) or {{ui:workspace.toolbarSizeLarge}}. Small leaves more room for the workplane on a laptop; large is easier to hit on a big screen or with a finger. With large buttons the groups of the ribbon go onto a second row when the window is too narrow for them. The size is kept in this browser and holds for every design.
+{{ui:workspace.toolbarSize}} makes the buttons of the ribbon on top, its shape menu, the view bar on the left and the properties panel on the right smaller or larger: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (as it always was) or {{ui:workspace.toolbarSizeLarge}}. Small leaves more room for the workplane on a laptop; large is easier to hit on a big screen or with a finger. With large buttons the groups of the ribbon go onto a second row when the window is too narrow for them. The size is kept in this browser and holds for every design.
 
 {{ui:workspace.shapeColors}} puts the colour a new shape starts with on the pictures of the shape library (the colour of its kind, or the one you saved with {{ui:inspector.saveDefaults}}). Switch it off if you prefer grey pictures; your browser remembers the choice.
 
-{{ui:workspace.viewCubePosition}} puts the view cube in another corner of the workplane: {{ui:workspace.viewCubePositionTopLeft}} (as it always was), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} or {{ui:workspace.viewCubePositionBottomRight}}. In any corner but the top left, the camera controls move up into the spot the cube left. In the bottom right the cube stands just above the {{ui:inspector.snapGrid}} control. While the properties of a shape are open on the right, a cube on the right steps to the left of them. The corner is kept in this browser and holds for every design. On a narrow window, such as a phone, the setting is hidden and the cube stays in the top left.
+{{ui:workspace.viewCubePosition}} puts the view cube in another corner of the workplane: {{ui:workspace.viewCubePositionTopLeft}} (as it always was), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} or {{ui:workspace.viewCubePositionBottomRight}}. In any corner but the top left, the view bar moves up into the spot the cube left. In the bottom right the cube stands just above the {{ui:inspector.snapGrid}} control. While the properties of a shape are open on the right, a cube on the right steps to the left of them. The corner is kept in this browser and holds for every design. On a narrow window, such as a phone, the setting is hidden and the cube stays in the top left.
 
 ### Appearance: fast mode
 

@@ -17,12 +17,12 @@ Alle deine Entwürfe erscheinen später auf der Startseite mit einem Vorschaubil
 
 ## Der Editor im Überblick
 
-![Der Editor mit zwei Formen auf der Arbeitsebene. Oben das Menüband, links die Kamerasteuerung, rechts die Einstellungen der ausgewählten Form.](shot:editor-overview)
+![Der Editor mit zwei Formen auf der Arbeitsebene. Oben das Menüband, links die Ansichtsleiste, rechts die Einstellungen der ausgewählten Form.](shot:editor-overview)
 
 - **Oben** steht das Menüband. Es ist nach Aufgaben sortiert: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} und {{ui:editor.group.file}}; {{ui:editor.group.help}} steht darüber in der Titelzeile, und das Haus neben den Reitern führt zurück zur Startseite. Ist das Fenster für alle Gruppen zu schmal, klappen die seltener gebrauchten zu einem Knopf unter ihrem Namen zusammen, an dem unten ein kleiner Pfeil in der Farbe der Gruppe hängt: Zeigst du darauf oder tippst ihn an, öffnen sich ihre Werkzeuge darunter. Die Stecknadel oben rechts, links neben der Lupe, hält stattdessen alle Gruppen offen. Wenn du mit der Maus über ein Symbol fährst, steht sein Name da, auch bei einem ausgegrauten; die {{ui:interactiveHelp.title}} (das Fragezeichen unter {{ui:editor.group.help}}, oder Shift+F1) erklärt jedes mit einem Klick und führt zu seinem Abschnitt in dieser Anleitung. Wo du ein kleines Fragezeichen siehst, etwa an den Einstellungen einer Form, in der Formenbibliothek oder in den Werkzeugfenstern, führt es direkt zum passenden Kapitel dieser Anleitung.
 - **In der Mitte** liegt die Arbeitsebene. Hier stellst du Formen hin, ziehst sie zurecht und siehst das Ergebnis.
 - **Rechts** erscheinen die Einstellungen der ausgewählten Form: Farbe, Maße, Lage und alles, was die Form sonst noch ausmacht. Zahlen tippen ist genauer als ziehen.
-- **Links** liegt die Kamerasteuerung mit dem Ansichtswürfel darüber. Mit ihr bewegst du dich durch die Szene, mehr dazu im Kapitel [Ansicht und Arbeitsebene](chapter:ansicht-und-arbeitsebene).
+- **Links** liegt die Ansichtsleiste mit dem Ansichtswürfel darüber. Mit ihr bewegst du dich durch die Szene, mehr dazu im Kapitel [Ansicht und Arbeitsebene](chapter:ansicht-und-arbeitsebene).
 - **Ganz oben** wechselst du zwischen {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, benennst den Entwurf um und stellst Sprache und Farbschema ein.
 
 ## Die Knöpfe rund um die Arbeitsfläche
@@ -69,9 +69,9 @@ Der Name des Entwurfs ({{ui:confirm.projectName}}) steht ganz oben. Klicke ihn a
 
 {{ui:palette.open}}: Tippe, was du suchst, ein Werkzeug, eine Form oder eine Einstellung, und klicke auf das Ergebnis.
 
-### Kamerasteuerung ausblenden
+### Ansichtsleiste ausblenden
 
-{{ui:camera.hide}} klappt die Kamerasteuerung links weg und gibt der Arbeitsfläche mehr Platz; {{ui:camera.show}} holt sie zurück.
+{{ui:camera.hide}} klappt die Ansichtsleiste links weg und gibt der Arbeitsfläche mehr Platz; {{ui:camera.show}} holt sie zurück.
 
 ### Raster
 

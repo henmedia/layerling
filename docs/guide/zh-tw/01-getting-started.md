@@ -17,12 +17,12 @@ layerling 是一款直接在瀏覽器中執行的 3D 列印設計程式。你用
 
 ## 編輯器一覽
 
-![編輯器的工作平面上有兩個形狀。上方是功能區，左側是相機控制，右側是所選形狀的設定。](shot:editor-overview)
+![編輯器的工作平面上有兩個形狀。上方是功能區，左側是檢視列，右側是所選形狀的設定。](shot:editor-overview)
 
 - **上方**是功能區。它依任務分類：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}}、{{ui:editor.group.file}} 和 {{ui:editor.group.help}}。將滑鼠移到圖示上就能看到名稱。凡是看到小問號的地方，例如形狀的設定裡、形狀庫中或工具面板裡，它都會直接帶你到本指南對應的章節。
 - **中間**是工作平面。你在這裡放置形狀、把它們拉成想要的樣子，並看到結果。
 - **右側**會顯示所選形狀的設定：顏色、尺寸、位置，以及構成該形狀的其他內容。輸入數字比拖曳更精確。
-- **左側**是相機控制，上方是視圖立方體。它們帶你在場景中移動，詳見[視圖與工作平面](chapter:view-and-workplane)。
+- **左側**是檢視列，上方是視圖立方體。它們帶你在場景中移動，詳見[視圖與工作平面](chapter:view-and-workplane)。
 - **最上方**可以切換 {{ui:editor.modeGeometry}} 與 {{ui:editor.modeSketch}}、重新命名設計，並選擇語言與配色方案。
 
 ## 工作區周圍的按鈕
@@ -69,9 +69,9 @@ layerling 是一款直接在瀏覽器中執行的 3D 列印設計程式。你用
 
 {{ui:palette.open}}：輸入你要找的東西，一個工具、一個形狀或一項設定，然後點擊結果。
 
-### 隱藏相機控制
+### 隱藏檢視列
 
-{{ui:camera.hide}} 會收起左側的相機控制，讓工作區更寬敞；{{ui:camera.show}} 會把它們叫回來。
+{{ui:camera.hide}} 會收起左側的檢視列，讓工作區更寬敞；{{ui:camera.show}} 會把它們叫回來。
 
 ### 吸附網格
 
