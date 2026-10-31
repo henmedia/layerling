@@ -2146,8 +2146,10 @@ export function SketchWorkspace({
             aria-label={t("camera.focusSelection")}
             aria-keyshortcuts="F Shift+F"
             title={t("camera.shortcut", { label: t("camera.focusSelection"), keys: "F" })}
-            disabled={!focusBounds}
-            onClick={() => focusSelection()}
+            // As F does: with nothing selected the whole sketch, never a greyed-out button (#1082).
+            onClick={() => {
+              if (!focusSelection()) resetView();
+            }}
           >
             <Crosshair size={24} strokeWidth={2.25} />
           </button>

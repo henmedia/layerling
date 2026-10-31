@@ -7,7 +7,6 @@ import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 
 type SecondViewCameraBarProps = {
-  hasSelection: boolean;
   orthographic: boolean;
   workplaneHidden: boolean;
   onHome: () => void;
@@ -24,7 +23,7 @@ type SecondViewCameraBarProps = {
  */
 export function SecondViewCameraBar(props: SecondViewCameraBarProps) {
   useLanguage();
-  const { hasSelection, orthographic, workplaneHidden } = props;
+  const { orthographic, workplaneHidden } = props;
   // Folded away as in the 3D view, and as there not kept for the next time the window opens.
   const [collapsed, setCollapsed] = useState(false);
   if (collapsed) {
@@ -49,7 +48,6 @@ export function SecondViewCameraBar(props: SecondViewCameraBarProps) {
         aria-label={t("camera.focusSelection")}
         aria-keyshortcuts="F Shift+F"
         title={t("camera.shortcut", { label: t("camera.focusSelection"), keys: "F" })}
-        disabled={!hasSelection}
         onClick={props.onFocusSelection}
       >
         <Crosshair size={24} strokeWidth={2.25} />

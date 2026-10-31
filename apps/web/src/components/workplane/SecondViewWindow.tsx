@@ -120,13 +120,11 @@ type SecondViewWindowProps = {
   projectId: string | null | undefined;
   /** The main window's selection, which F frames here too. */
   getSelectedIds: () => readonly string[];
-  /** Whether anything is selected there, for the bar's "Center view on selection". */
-  hasSelection: boolean;
   /** The window was closed by the user, or went away with a reload. */
   onClosed: () => void;
 };
 
-export function SecondViewWindow({ popup, threeRef, projectId, getSelectedIds, hasSelection, onClosed }: SecondViewWindowProps) {
+export function SecondViewWindow({ popup, threeRef, projectId, getSelectedIds, onClosed }: SecondViewWindowProps) {
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const cubeRef = useRef<HTMLDivElement | null>(null);
@@ -425,11 +423,13 @@ export function SecondViewWindow({ popup, threeRef, projectId, getSelectedIds, h
       <ViewCube getRig={getRig} cubeRef={cubeRef} />
       {notice ? <p className="editor-status second-view-notice" role="status">{notice}</p> : null}
       <SecondViewCameraBar
-        hasSelection={hasSelection}
         orthographic={orthographic}
         workplaneHidden={workplaneHidden}
         onHome={() => moveCamera(resetCamera)}
-        onFocusSelection={() => moveCamera(focusSelection)}
+        // As F does: with nothing selected the whole scene (#1082).
+        onFocusSelection={() => moveCamera((view) => {
+          if (!focusSelection(view)) resetCamera(view);
+        })}
         onZoomIn={() => moveCamera((rig) => zoomCameraBy(rig, ZOOM_STEP_IN))}
         onZoomOut={() => moveCamera((rig) => zoomCameraBy(rig, ZOOM_STEP_OUT))}
         onToggleProjection={() => moveCamera(toggleCameraProjection)}

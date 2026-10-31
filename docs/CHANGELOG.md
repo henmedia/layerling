@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **"Center view on selection" does what F does (Discussion #1082):** With nothing selected, F brings the whole scene into view, but the camera bar's button for the same thing was only greyed out, so it seemed broken while the key worked. The button now centres on the selection or, with nothing selected, shows everything, and is never greyed out - in the 3D view, in a sketch and in the second view's window. The guide (View and workplane, English and German) says so. Unit test in `focusSelectionButton.test.ts`. Reported by @MartinShake in #1082.
 ## 1.128.0
 
 - **Both Chinese versions complete again (PR #1081):** Simplified and Traditional Chinese had fallen behind by the 944 sentences added since 1.123, from the cookie cutter, flexi joints, lid and cut out to attachments, surface texture, the vase, Gridfinity, the Hirth hinge, DXF and the new workspace settings, which showed in English. Both catalogues now have every sentence and the guide all 17 chapters; the sentences that were there before are unchanged. "Rim" became 平沿 / 扣沿 / 口沿 so it no longer collides with "edge". Translated with an AI model and read by a native speaker; a second reader is still welcome. Contributed by @crazykay.
