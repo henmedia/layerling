@@ -155,7 +155,11 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 
 这四项都只影响参考图，绝不会影响草图。
 
-**{{ui:sketch.traceImage}}** 省去手工描摹：选择 {{ui:iconTag.part.dark}} 或 {{ui:iconTag.part.light}}，设置暗部变为亮部的 {{ui:sketch.traceThreshold}}，然后点击 {{ui:sketch.traceApply}}。图片的这一部分会在图片所在的位置变成闭合的草图线条，随图片一起旋转和裁剪，之后可以像其他线条一样编辑。线条会被选中，因此按 [[Delete]] 可以再次删除，以尝试其他阈值。如需在轮廓外侧或内侧留出边，可给草图实体加上线条外侧或内侧的描边，或对完成的实体做偏移。
+图片设置中的 **{{ui:sketch.traceImage}}** 会替你放置点：它描摹图片中形状的轮廓——剪影、标志、文字——并以红色显示在图片上，方点表示角点，圆点表示平滑点。{{ui:sketch.traceDark}} 或 {{ui:sketch.traceLight}} 选择图片的哪一部分是形状，{{ui:sketch.traceThreshold}} 决定深色在哪里变为浅色，{{ui:sketch.tracePoints}} 决定所有轮廓一共有多少个点（点少曲线更平滑，点多更贴合图片），{{ui:sketch.traceCorners}} 决定转弯多大时一个点算作角点，{{ui:sketch.traceSpeck}} 决定忽略多小的斑点，{{ui:sketch.traceHoles}} 保留 A 或 O 的中间部分。{{ui:sketch.traceApply}} 把轮廓放进草图中图片所在的位置，带着它的大小、旋转和裁剪，并选中它们：它们是普通的点，可以移动、弯曲或删除，[[Ctrl]]+[[Z]] 一步撤销。对比清晰时效果最好；背景杂乱的照片请先抠出来。被去掉的部分——轮廓周围、孔里、被裁掉的——预览会用平台的颜色盖住，所以图片上只显示留下的部分。靠得太近、宽松曲线会相交的轮廓会自动得到更多的点；卡片会说明。要在轮廓外侧或内侧加一圈边，给草图实体在线条外侧或内侧加描边，或偏移完成的实体。
+
+对于照片——比如白色桌面上的玩具——在 {{ui:sketch.tracePart}} 下选择 **{{ui:sketch.traceObject}}**：背景是图片边缘的颜色，所有与之不同的部分都会成为一个轮廓，不论颜色；此时 {{ui:sketch.traceThreshold}} 决定它要多明显地与背景区分。纯色背景上的彩色图片默认就这样开始。{{ui:sketch.tracePickAreas}} 可以勾出更多：在图片上点击一个区域，比如窗户，点击处周围颜色相近的一块就会被勾出轮廓（{{ui:sketch.traceAreaTolerance}} 决定多相近）。孔和点选的区域列在 {{ui:sketch.traceList}} 下；指向其中一个会在预览中显示，✕ 将其移除，关闭 {{ui:sketch.traceCut}} 时它画成构造线而不是孔。碰到图片边缘的区域是背景，不会被采用。没有任何阈值或颜色能区分的部分——比如和上方车轮一样深的阴影——用 {{ui:sketch.traceTrim}} 去掉：围绕它点击角点（点击第一个角点、双击或按 [[Enter]] 闭合），轮廓就沿着裁切线走；它列为“裁切 1”。
+
+房子旁的树、杂乱背景前的人物——没有颜色能把形状与其他部分分开时，用 **{{ui:sketch.traceLasso}}** 抓住它：沿着它的边缘大致点击，两次点击之间线条会自动沿边缘走，拐弯处也一样；移动指针时，预览已经显示它将经过哪里。点击第一个点、双击或按 [[Enter]] 闭合，按 [[Esc]] 放弃。它列为“套索 1”，可选 {{ui:sketch.traceRegionAdd}}（该区域并入形状）或 {{ui:sketch.traceTrim}}（被去掉）；每个裁切都有同样的选择。在 {{ui:sketch.tracePart}} 下，**{{ui:sketch.traceLassoOnly}}** 只用这样抓住的部分做形状——图片的其他部分都不要。
 
 ## 草图模式下的按键
 

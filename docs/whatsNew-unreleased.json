@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "title": {
+      "de": "Nachzeichnen mit Kurven, Lasso und mehr",
+      "en": "Trace with curves, a lasso and more"
+    },
+    "body": {
+      "de": "„Nachzeichnen“ in den Einstellungen eines Bildes legt die Umrisse jetzt als Kurven und Ecken an, mit einer Punktzahl, die du wählst, und zeigt sie vorher rot über dem Bild. Bei einem Foto nimmt „Gegenstand“ alles, was sich vom Hintergrund abhebt, als einen Umriss; angeklickte Bereiche werden zu Löchern, „Wegschneiden“ entfernt etwa einen Schatten, und das Magnetlasso folgt von selbst einer Kante, wo keine Farbe die Form trennt. Auch die Vasenzeichnung kann ein Foto so nachzeichnen.",
+      "en": "Trace in a picture's settings now lays the outlines as curves and corners, with as many points as you choose, and shows them in red over the picture first. On a photo, Object takes everything that stands out from the background as one outline; clicked areas become holes, Cut away removes a shadow, say, and the magnetic lasso follows an edge by itself where no colour tells the shape apart. The vase drawing can trace a photo the same way."
+    }
+  },
+  {
+    "title": {
+      "de": "Scharnier: abnehmbar und mit Mutternfallen",
+      "en": "Hinge: lift-off and nut pockets"
+    },
+    "body": {
+      "de": "Das Scharnier hat die Bauart „Abnehmbar“: zwei Knöchel, der untere mit dem Stift, der obere eine Hülse, die man abhebt, sodass Deckel oder Tür abnehmbar bleiben. Bei jeder Bauart können die Schraubenlöcher jetzt Sechskant-Taschen für Muttern bekommen, auf Wunsch angesenkt auf dem einen Blatt und mit Mutternfallen auf dem anderen.",
+      "en": "The hinge has a Lift-off style: two knuckles, the lower one with the pin, the upper one a sleeve that lifts off, so a lid or a door can be taken off. On every style the screw holes can now get hexagonal pockets for nuts, countersunk on one leaf and with nut pockets on the other if you like."
+    }
+  }
+]
