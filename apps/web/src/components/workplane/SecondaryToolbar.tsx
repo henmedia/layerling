@@ -153,24 +153,43 @@ export type ToolNeed =
   | "selection" | "body" | "oneBody" | "oneSolid" | "solid" | "twoBodies" | "twoObjects" | "twoSolids"
   | "intersect" | "group" | "visibleBodies" | "mesh" | "loft";
 const need = (key: ToolNeed) => key;
-/** Needs of exactly one object: with several selected, a locked one is not why the tool sleeps. */
-const NEEDS_ONE: ReadonlySet<ToolNeed> = new Set(["oneBody", "oneSolid", "mesh"]);
 const needText = (key: ToolNeed) => (key === "loft" ? t("status.loftNeedsSketches") : t(`editor.needs.${key}` as const));
+
+/** What of a tool's need the selection has, whether locked or not. */
+export type SelectionFacts = {
+  count: number;
+  locked: boolean;
+  /** Something selected is a group, or was one before its edges were treated. */
+  hasGroup: boolean;
+  /** One imported mesh with enough triangles to simplify. */
+  isMesh: boolean;
+  /** Two sketch or SVG bodies a loft can join. */
+  loftable: boolean;
+};
+
+/** Whether the selection has all a tool needs but being unlocked, so that the lock is what stops it. */
+function onlyLockMissing(key: ToolNeed, facts: SelectionFacts) {
+  switch (key) {
+    case "oneBody": case "oneSolid": return facts.count === 1;
+    case "mesh": return facts.isMesh;
+    case "twoBodies": case "twoObjects": case "intersect": return facts.count >= 2;
+    case "twoSolids": return facts.count === 2;
+    case "loft": return facts.loftable;
+    case "group": return facts.hasGroup;
+    default: return facts.count >= 1;
+  }
+}
 
 /**
  * Why a greyed-out tool sleeps, for its tooltip ("Select one body"), as the sketch's corner tools say it,
- * so it need not be guessed why nothing happens (31.10.2026). Null for a tool that is on, or one with nothing to name.
+ * so it need not be guessed why nothing happens (31.10.2026). The lock is named only where it is all that
+ * is missing; one locked box does not make Group say "unlock it". Null for a tool that is on, or one with nothing to name.
  */
-export function missingForTool(tool: { id: string; enabled: boolean; needs?: ToolNeed }, state: {
-  historyViewActive: boolean;
-  selectionLocked: boolean;
-  selectionCount: number;
-}) {
+export function missingForTool(tool: { id: string; enabled: boolean; needs?: ToolNeed }, historyViewActive: boolean, facts: SelectionFacts) {
   if (tool.enabled) return null;
-  if (state.historyViewActive && tool.id !== "history") return t("editor.needs.historyView");
+  if (historyViewActive && tool.id !== "history") return t("editor.needs.historyView");
   if (!tool.needs) return null;
-  const lockedStops = state.selectionLocked && !(NEEDS_ONE.has(tool.needs) && state.selectionCount !== 1);
-  return lockedStops ? t("editor.needs.locked") : needText(tool.needs);
+  return facts.locked && onlyLockMissing(tool.needs, facts) ? t("editor.needs.locked") : needText(tool.needs);
 }
 
 export function SecondaryToolbar({
@@ -205,8 +224,7 @@ export function SecondaryToolbar({
   onHistoryView,
   hasClipboard,
   hasSelection,
-  selectionLocked,
-  selectionCount,
+  selectionFacts,
   hiddenShapeCount,
   selectionHidden,
   mirrorMode,
@@ -359,9 +377,8 @@ export function SecondaryToolbar({
   onHistoryView: () => void;
   hasClipboard: boolean;
   hasSelection: boolean;
-  /** Some selected object is locked: what greys out a tool that would change it. */
-  selectionLocked: boolean;
-  selectionCount: number;
+  /** What the selection is, for the tooltip of a greyed-out tool to say what is missing. */
+  selectionFacts: SelectionFacts;
   hiddenShapeCount: number;
   selectionHidden: boolean;
   mirrorMode: boolean;
@@ -815,10 +832,7 @@ export function SecondaryToolbar({
     // kein Loeschen freischalten, waehrend die Flaeche etwas anderes zeigt.
     const enabled = tool.enabled && (!historyViewActive || id === "history");
     const active = "active" in tool && Boolean(tool.active);
-    const missing = missingForTool(
-      { id, enabled, needs: "needs" in tool ? tool.needs : undefined },
-      { historyViewActive, selectionLocked, selectionCount },
-    );
+    const missing = missingForTool({ id, enabled, needs: "needs" in tool ? tool.needs : undefined }, historyViewActive, selectionFacts);
     const hint = missing ?? ("hint" in tool && tool.hint ? tool.hint : null);
     const onHover = "onHover" in tool ? tool.onHover : undefined;
     // Switched off by aria-disabled, not by the disabled attribute: a disabled button gets no pointer events,
