@@ -148,6 +148,31 @@ export const MODIFY_SECTIONS = [
 ] as const satisfies readonly (readonly [string, MessageKey])[];
 type ModifySection = (typeof MODIFY_SECTIONS)[number][0];
 
+/** What a greyed-out tool waits for; its tooltip says so. */
+export type ToolNeed =
+  | "selection" | "body" | "oneBody" | "oneSolid" | "solid" | "twoBodies" | "twoObjects" | "twoSolids"
+  | "intersect" | "group" | "visibleBodies" | "mesh" | "loft";
+const need = (key: ToolNeed) => key;
+/** Needs of exactly one object: with several selected, a locked one is not why the tool sleeps. */
+const NEEDS_ONE: ReadonlySet<ToolNeed> = new Set(["oneBody", "oneSolid", "mesh"]);
+const needText = (key: ToolNeed) => (key === "loft" ? t("status.loftNeedsSketches") : t(`editor.needs.${key}` as const));
+
+/**
+ * Why a greyed-out tool sleeps, for its tooltip ("Select one body"), as the sketch's corner tools say it,
+ * so it need not be guessed why nothing happens (31.10.2026). Null for a tool that is on, or one with nothing to name.
+ */
+export function missingForTool(tool: { id: string; enabled: boolean; needs?: ToolNeed }, state: {
+  historyViewActive: boolean;
+  selectionLocked: boolean;
+  selectionCount: number;
+}) {
+  if (tool.enabled) return null;
+  if (state.historyViewActive && tool.id !== "history") return t("editor.needs.historyView");
+  if (!tool.needs) return null;
+  const lockedStops = state.selectionLocked && !(NEEDS_ONE.has(tool.needs) && state.selectionCount !== 1);
+  return lockedStops ? t("editor.needs.locked") : needText(tool.needs);
+}
+
 export function SecondaryToolbar({
   toolbarMode,
   projectName,
@@ -180,6 +205,8 @@ export function SecondaryToolbar({
   onHistoryView,
   hasClipboard,
   hasSelection,
+  selectionLocked,
+  selectionCount,
   hiddenShapeCount,
   selectionHidden,
   mirrorMode,
@@ -332,6 +359,9 @@ export function SecondaryToolbar({
   onHistoryView: () => void;
   hasClipboard: boolean;
   hasSelection: boolean;
+  /** Some selected object is locked: what greys out a tool that would change it. */
+  selectionLocked: boolean;
+  selectionCount: number;
   hiddenShapeCount: number;
   selectionHidden: boolean;
   mirrorMode: boolean;
@@ -692,10 +722,10 @@ export function SecondaryToolbar({
   const inSimpleMode = <T extends { id: string }>(tools: T[]) => (simpleMode ? tools.filter((tool) => simpleModeKeepsTool(tool.id)) : tools);
   const shownShapeAssets = simpleMode ? libraryShapeAssets.filter((shape) => simpleModeKeepsShape(shape.id)) : libraryShapeAssets;
   const leftTools = [
-    { id: "copy", label: t("editor.tool.copy"), icon: ToolbarCopyIcon, action: onCopy, enabled: hasSelection },
-    { id: "paste", label: t("editor.tool.paste"), icon: ToolbarPasteIcon, action: onPaste, enabled: hasClipboard },
-    { id: "duplicate", label: t("editor.tool.duplicate"), icon: ToolbarDuplicateIcon, action: onDuplicate, enabled: hasSelection },
-    { id: "delete", label: t("editor.tool.delete"), icon: ToolbarTrashIcon, action: onDelete, enabled: canModifySelection },
+    { id: "copy", label: t("editor.tool.copy"), icon: ToolbarCopyIcon, action: onCopy, enabled: hasSelection, needs: need("selection") },
+    { id: "paste", label: t("editor.tool.paste"), icon: ToolbarPasteIcon, action: onPaste, enabled: hasClipboard, hint: hasClipboard ? null : t("editor.needs.clipboard") },
+    { id: "duplicate", label: t("editor.tool.duplicate"), icon: ToolbarDuplicateIcon, action: onDuplicate, enabled: hasSelection, needs: need("selection") },
+    { id: "delete", label: t("editor.tool.delete"), icon: ToolbarTrashIcon, action: onDelete, enabled: canModifySelection, needs: need("selection") },
     { id: "undo", label: t("editor.tool.undo"), icon: ToolbarUndoIcon, action: onUndo, enabled: canUndo, hint: canUndo ? undoHint : null, onHover: onUndoRedoHover },
     { id: "redo", label: t("editor.tool.redo"), icon: ToolbarRedoIcon, action: onRedo, enabled: canRedo, hint: canRedo ? redoHint : null, onHover: onUndoRedoHover },
     { id: "history", label: t("editor.tool.history"), icon: ToolbarHistoryIcon, action: onHistoryView, enabled: canHistoryView, active: historyViewActive },
@@ -721,43 +751,44 @@ export function SecondaryToolbar({
         onToggleHidden();
       },
       enabled: hasSelection,
+      needs: need("selection"),
     },
   ];
   const combineTools = [
-    { id: "group", label: t("editor.tool.group"), icon: ToolbarGroupIcon, action: onGroup, enabled: canGroup },
-    { id: "bundle", label: t("editor.tool.bundle"), icon: ToolbarBundleIcon, action: onBundle, enabled: canGroup },
-    { id: "ungroup", label: t("editor.tool.ungroup"), icon: ToolbarUngroupIcon, action: onUngroup, enabled: canUngroup },
-    { id: "intersect", label: t("editor.tool.intersect"), icon: ToolbarIntersectionIcon, action: onIntersect, enabled: canIntersect || intersectPreviewActive },
-    { id: "cutOut", label: t("editor.tool.cutOut"), icon: ToolbarCutOutIcon, action: onCutOut, enabled: canCutOut || cutOutActive, active: cutOutActive },
-    { id: "hull", label: t("editor.tool.hull"), icon: ToolbarHullIcon, action: onHull, enabled: canHull },
-    { id: "loftSketches", label: t("editor.tool.loftSketches"), icon: ToolbarLoftSketchesIcon, action: onLoftSketches, enabled: canLoftSketches },
-    { id: "intersect-preview", label: t("editor.tool.intersectPreview"), icon: ToolbarIntersectPreviewIcon, action: onIntersectPreview, enabled: canIntersect || intersectPreviewActive, active: intersectPreviewActive },
+    { id: "group", label: t("editor.tool.group"), icon: ToolbarGroupIcon, action: onGroup, enabled: canGroup, needs: need("twoBodies") },
+    { id: "bundle", label: t("editor.tool.bundle"), icon: ToolbarBundleIcon, action: onBundle, enabled: canGroup, needs: need("twoBodies") },
+    { id: "ungroup", label: t("editor.tool.ungroup"), icon: ToolbarUngroupIcon, action: onUngroup, enabled: canUngroup, needs: need("group") },
+    { id: "intersect", label: t("editor.tool.intersect"), icon: ToolbarIntersectionIcon, action: onIntersect, enabled: canIntersect || intersectPreviewActive, needs: need("intersect") },
+    { id: "cutOut", label: t("editor.tool.cutOut"), icon: ToolbarCutOutIcon, action: onCutOut, enabled: canCutOut || cutOutActive, active: cutOutActive, needs: need("twoSolids") },
+    { id: "hull", label: t("editor.tool.hull"), icon: ToolbarHullIcon, action: onHull, enabled: canHull, needs: need("twoBodies") },
+    { id: "loftSketches", label: t("editor.tool.loftSketches"), icon: ToolbarLoftSketchesIcon, action: onLoftSketches, enabled: canLoftSketches, needs: need("loft") },
+    { id: "intersect-preview", label: t("editor.tool.intersectPreview"), icon: ToolbarIntersectPreviewIcon, action: onIntersectPreview, enabled: canIntersect || intersectPreviewActive, active: intersectPreviewActive, needs: need("intersect") },
   ];
   const modifyTools = [
-    { id: "mirror", section: "pattern", label: t("editor.tool.mirror"), icon: ToolbarMirrorIcon, action: onMirror, enabled: canModifySelection, active: mirrorMode },
-    { id: "pivot", section: "pattern", label: t("editor.tool.rotationPivot"), icon: ToolbarRotationPivotIcon, action: onRotationPivot, enabled: canModifySelection, active: rotationPivotActive },
-    { id: "array", section: "pattern", label: t("editor.tool.array"), icon: ToolbarPatternIcon, action: onArray, enabled: canModifySelection, active: arrayActive },
-    { id: "holePattern", section: "pattern", label: t("holePattern.title"), icon: ToolbarHolePatternIcon, action: onHolePattern, enabled: canHolePattern, active: holePatternActive },
-    { id: "faceTool", section: "pattern", label: t("faceTool.title"), icon: ToolbarFaceToolIcon, action: onFaceTool, enabled: canFaceTool, active: faceToolActive },
-    { id: "split", section: "shape", label: t("editor.tool.split"), icon: ToolbarSplitIcon, action: onSplit, enabled: splitMode || canSplit, active: splitMode },
-    { id: "flexi", section: "shape", label: t("editor.tool.flexi"), icon: ToolbarFlexiIcon, action: onFlexi, enabled: canFlexi || flexiActive, active: flexiActive },
-    { id: "cookieCutter", section: "shape", label: t("editor.tool.cookieCutter"), icon: ToolbarCookieCutterIcon, action: onCookieCutter, enabled: canCookieCutter },
-    { id: "chamfer", section: "edges", label: t("editor.tool.chamfer"), icon: ToolbarChamferIcon, action: onChamfer, enabled: canEdgeModify, active: edgeModifierKind === "chamfer" || edgeModifierKind === "chamfillet" },
-    { id: "fillet", section: "edges", label: t("editor.tool.fillet"), icon: ToolbarFilletIcon, action: onFillet, enabled: canEdgeModify, active: edgeModifierKind === "fillet" },
-    { id: "hollow", section: "edges", label: t("editor.tool.hollow"), icon: ToolbarHollowIcon, action: onHollow, enabled: canEdgeModify, active: hollowActive },
-    { id: "lid", section: "edges", label: t("editor.tool.lid"), icon: ToolbarLidIcon, action: onLid, enabled: canLid || lidActive, active: lidActive },
-    { id: "offset", section: "edges", label: t("editor.tool.offset"), icon: ToolbarOffsetIcon, action: onOffset, enabled: canEdgeModify, active: offsetActive },
-    { id: "deleteFace", section: "edges", label: t("editor.tool.deleteFace"), icon: ToolbarDeleteFaceIcon, action: onDeleteFace, enabled: canEdgeModify, active: deleteFaceActive },
-    { id: "simplify", section: "surface", label: t("editor.tool.simplify"), icon: ToolbarSimplifyIcon, action: onSimplify, enabled: canSimplify, active: simplifyActive },
-    { id: "surfaceTexture", section: "surface", label: t("inspector.surfaceTexture"), icon: ToolbarSurfaceTextureIcon, action: onSurfaceTextureTool, enabled: canSurfaceTexture, active: surfaceTextureActive },
+    { id: "mirror", section: "pattern", label: t("editor.tool.mirror"), icon: ToolbarMirrorIcon, action: onMirror, enabled: canModifySelection, active: mirrorMode, needs: need("selection") },
+    { id: "pivot", section: "pattern", label: t("editor.tool.rotationPivot"), icon: ToolbarRotationPivotIcon, action: onRotationPivot, enabled: canModifySelection, active: rotationPivotActive, needs: need("selection") },
+    { id: "array", section: "pattern", label: t("editor.tool.array"), icon: ToolbarPatternIcon, action: onArray, enabled: canModifySelection, active: arrayActive, needs: need("selection") },
+    { id: "holePattern", section: "pattern", label: t("holePattern.title"), icon: ToolbarHolePatternIcon, action: onHolePattern, enabled: canHolePattern, active: holePatternActive, needs: need("oneSolid") },
+    { id: "faceTool", section: "pattern", label: t("faceTool.title"), icon: ToolbarFaceToolIcon, action: onFaceTool, enabled: canFaceTool, active: faceToolActive, needs: need("oneSolid") },
+    { id: "split", section: "shape", label: t("editor.tool.split"), icon: ToolbarSplitIcon, action: onSplit, enabled: splitMode || canSplit, active: splitMode, needs: need("visibleBodies") },
+    { id: "flexi", section: "shape", label: t("editor.tool.flexi"), icon: ToolbarFlexiIcon, action: onFlexi, enabled: canFlexi || flexiActive, active: flexiActive, needs: need("solid") },
+    { id: "cookieCutter", section: "shape", label: t("editor.tool.cookieCutter"), icon: ToolbarCookieCutterIcon, action: onCookieCutter, enabled: canCookieCutter, needs: need("body") },
+    { id: "chamfer", section: "edges", label: t("editor.tool.chamfer"), icon: ToolbarChamferIcon, action: onChamfer, enabled: canEdgeModify, active: edgeModifierKind === "chamfer" || edgeModifierKind === "chamfillet", needs: need("oneBody") },
+    { id: "fillet", section: "edges", label: t("editor.tool.fillet"), icon: ToolbarFilletIcon, action: onFillet, enabled: canEdgeModify, active: edgeModifierKind === "fillet", needs: need("oneBody") },
+    { id: "hollow", section: "edges", label: t("editor.tool.hollow"), icon: ToolbarHollowIcon, action: onHollow, enabled: canEdgeModify, active: hollowActive, needs: need("oneBody") },
+    { id: "lid", section: "edges", label: t("editor.tool.lid"), icon: ToolbarLidIcon, action: onLid, enabled: canLid || lidActive, active: lidActive, needs: need("solid") },
+    { id: "offset", section: "edges", label: t("editor.tool.offset"), icon: ToolbarOffsetIcon, action: onOffset, enabled: canEdgeModify, active: offsetActive, needs: need("oneBody") },
+    { id: "deleteFace", section: "edges", label: t("editor.tool.deleteFace"), icon: ToolbarDeleteFaceIcon, action: onDeleteFace, enabled: canEdgeModify, active: deleteFaceActive, needs: need("oneBody") },
+    { id: "simplify", section: "surface", label: t("editor.tool.simplify"), icon: ToolbarSimplifyIcon, action: onSimplify, enabled: canSimplify, active: simplifyActive, needs: need("mesh") },
+    { id: "surfaceTexture", section: "surface", label: t("inspector.surfaceTexture"), icon: ToolbarSurfaceTextureIcon, action: onSurfaceTextureTool, enabled: canSurfaceTexture, active: surfaceTextureActive, needs: need("oneBody") },
   ] satisfies readonly ({ section: ModifySection } & Record<string, unknown>)[];
   const arrangeTools = [
-    { id: "align", label: t("editor.tool.align"), icon: ToolbarAlignIcon, action: onAlign, enabled: canAlign, active: alignMode },
-    { id: "snap", label: t("editor.tool.snapToGrid"), icon: ToolbarSnapGridIcon, action: onSnap, enabled: canModifySelection },
-    { id: "drop", label: t("editor.tool.dropToWorkplane"), icon: ToolbarDropToWorkplaneIcon, action: onDropToWorkplane, enabled: canModifySelection },
-    { id: "layFlat", label: t("editor.tool.layFlat"), icon: ToolbarLayFlatIcon, action: onLayFlat, enabled: canModifySelection, active: layFlatActive },
-    { id: "mateFaces", label: t("editor.tool.mateFaces"), icon: ToolbarMateFacesIcon, action: onMateFaces, enabled: canModifySelection, active: mateFacesActive },
-    { id: "center", label: t("editor.tool.centerOnWorkplane"), icon: ToolbarCenterOnWorkplaneIcon, action: onCenterOnWorkplane, enabled: canModifySelection },
+    { id: "align", label: t("editor.tool.align"), icon: ToolbarAlignIcon, action: onAlign, enabled: canAlign, active: alignMode, needs: need("twoObjects") },
+    { id: "snap", label: t("editor.tool.snapToGrid"), icon: ToolbarSnapGridIcon, action: onSnap, enabled: canModifySelection, needs: need("selection") },
+    { id: "drop", label: t("editor.tool.dropToWorkplane"), icon: ToolbarDropToWorkplaneIcon, action: onDropToWorkplane, enabled: canModifySelection, needs: need("selection") },
+    { id: "layFlat", label: t("editor.tool.layFlat"), icon: ToolbarLayFlatIcon, action: onLayFlat, enabled: canModifySelection, active: layFlatActive, needs: need("selection") },
+    { id: "mateFaces", label: t("editor.tool.mateFaces"), icon: ToolbarMateFacesIcon, action: onMateFaces, enabled: canModifySelection, active: mateFacesActive, needs: need("selection") },
+    { id: "center", label: t("editor.tool.centerOnWorkplane"), icon: ToolbarCenterOnWorkplaneIcon, action: onCenterOnWorkplane, enabled: canModifySelection, needs: need("selection") },
   ];
   // "Modify" holds some 16 tools; named sections with a fine line between them let one be found by what it does
   // (Stefan 31.10.2026). Their names stand in the label row above them, the group's name only on the folded button.
@@ -772,10 +803,10 @@ export function SecondaryToolbar({
     );
   });
   const sketchClipboardTools = [
-    { id: "sketch-copy", label: t("editor.tool.copy"), icon: ToolbarCopyIcon, action: onSketchCopy, enabled: sketchHasSelection },
-    { id: "sketch-paste", label: t("editor.tool.paste"), icon: ToolbarPasteIcon, action: onSketchPaste, enabled: sketchHasClipboard },
-    { id: "sketch-duplicate", label: t("editor.tool.duplicate"), icon: ToolbarDuplicateIcon, action: onSketchDuplicate, enabled: sketchHasSelection },
-    { id: "sketch-delete", label: t("editor.tool.delete"), icon: ToolbarTrashIcon, action: onSketchDelete, enabled: sketchHasSelection },
+    { id: "sketch-copy", label: t("editor.tool.copy"), icon: ToolbarCopyIcon, action: onSketchCopy, enabled: sketchHasSelection, hint: sketchHasSelection ? null : t("editor.needs.sketchSelection") },
+    { id: "sketch-paste", label: t("editor.tool.paste"), icon: ToolbarPasteIcon, action: onSketchPaste, enabled: sketchHasClipboard, hint: sketchHasClipboard ? null : t("editor.needs.clipboard") },
+    { id: "sketch-duplicate", label: t("editor.tool.duplicate"), icon: ToolbarDuplicateIcon, action: onSketchDuplicate, enabled: sketchHasSelection, hint: sketchHasSelection ? null : t("editor.needs.sketchSelection") },
+    { id: "sketch-delete", label: t("editor.tool.delete"), icon: ToolbarTrashIcon, action: onSketchDelete, enabled: sketchHasSelection, hint: sketchHasSelection ? null : t("editor.needs.sketchSelection") },
   ];
   const renderToolButton = (tool: (typeof leftTools)[number] | (typeof visibilityTools)[number] | (typeof combineTools)[number] | (typeof modifyTools)[number] | (typeof arrangeTools)[number]) => {
     const { id, icon: Icon, action, label } = tool;
@@ -784,7 +815,11 @@ export function SecondaryToolbar({
     // kein Loeschen freischalten, waehrend die Flaeche etwas anderes zeigt.
     const enabled = tool.enabled && (!historyViewActive || id === "history");
     const active = "active" in tool && Boolean(tool.active);
-    const hint = "hint" in tool && tool.hint ? tool.hint : null;
+    const missing = missingForTool(
+      { id, enabled, needs: "needs" in tool ? tool.needs : undefined },
+      { historyViewActive, selectionLocked, selectionCount },
+    );
+    const hint = missing ?? ("hint" in tool && tool.hint ? tool.hint : null);
     const onHover = "onHover" in tool ? tool.onHover : undefined;
     // Switched off by aria-disabled, not by the disabled attribute: a disabled button gets no pointer events,
     // so Chrome and Edge never showed its tooltip, and what a greyed-out icon was for could not be found out

@@ -14452,6 +14452,8 @@ export function LayerlingEditor({
         canModifySelection={hasSelection && !selectionLocked}
         hasClipboard={clipboard.length > 0 || systemClipboardSupported}
         hasSelection={hasSelection}
+        selectionLocked={selectionLocked}
+        selectionCount={selectedShapes.length}
         hiddenShapeCount={shapes.filter((shape) => shape.hidden).length}
         selectionHidden={hasSelection && selectedShapes.every((shape) => shape.hidden)}
         alignMode={alignMode}

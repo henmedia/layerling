@@ -19,7 +19,7 @@ layerling 是一款直接在瀏覽器中執行的 3D 列印設計程式。你用
 
 ![標示了各區域的編輯器：上方是功能區，左側是視圖立方體，其下是檢視列，旁邊是狀態訊息與物件清單，右側是所選形狀的屬性。](shot:editor-areas)
 
-- **上方**是功能區。它依任務分類：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}}、{{ui:editor.group.file}} 和 {{ui:editor.group.help}}。將滑鼠移到圖示上就能看到名稱。凡是看到小問號的地方，例如形狀的設定裡、形狀庫中或工具視窗裡，它都會直接帶你到本指南對應的章節。 {{ui:editor.group.modify}} 群組分為四個部分，各自的名稱寫在工具上方：{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 與 {{ui:editor.section.surface}}。
+- **上方**是功能區。它依任務分類：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}}、{{ui:editor.group.file}} 和 {{ui:editor.group.help}}。將滑鼠移到圖示上就能看到名稱。凡是看到小問號的地方，例如形狀的設定裡、形狀庫中或工具視窗裡，它都會直接帶你到本指南對應的章節。 {{ui:editor.group.modify}} 群組分為四個部分，各自的名稱寫在工具上方：{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 與 {{ui:editor.section.surface}}。灰色的圖示還會說明它在等什麼，例如 {{ui:editor.needs.oneBody}} 或 {{ui:editor.needs.locked}}。
 - **中間**是工作平面。你在這裡放置形狀、把它們拉成想要的樣子，並看到結果。
 - **右側**會顯示所選形狀的**屬性**：顏色、尺寸、位置，以及構成該形狀的其他內容。輸入數字比拖曳更精確。
 - **左側**是檢視列，上方是視圖立方體。它們帶你在場景中移動，詳見[視圖與工作平面](chapter:view-and-workplane)。
