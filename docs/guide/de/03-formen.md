@@ -200,7 +200,7 @@ Die {{ui:shape.vase}} ist ein eigener Körper für Vasen, Töpfe und Lampenschir
 
 - {{ui:prop.vaseProfile}}: Flasche, bauchig, Schale mit Hals, Fass, Zylinder oder Trichter. Höhe und größter Durchmesser sind die Maße der Form selbst: Zieh an den Anfassern oder tippe {{ui:prop.vaseDiameter}} und {{ui:prop.height}} ein.
 - {{ui:prop.vaseSection}}: ein Kreis, ein Vieleck mit gerundeten Ecken oder eine Welle (weich, spitz, Bögen oder Lamellen). {{ui:prop.vaseTwist}} dreht ihn über die Höhe, {{ui:prop.vaseSway}} lässt ihn hin und her schwingen.
-- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} ist für den Vasenmodus im Slicer (auch „Spiralisieren“): Der Slicer druckt eine Wand als Spirale und lässt Deckel und Füllung weg, deshalb ist der Körper voll gezeichnet. {{ui:vase.bodyHollow}} gibt eine echte Wand und einen echten Boden für einen normalen Druck.
+- {{ui:prop.vaseBody}}: {{ui:vase.bodySolid}} ist für den Vasenmodus im Slicer (auch „Spiralisieren“): Der Slicer druckt eine Wand als Spirale und lässt Deckel und Füllung weg, deshalb ist der Körper voll gezeichnet. {{ui:vase.bodyHollow}} gibt eine echte Wand und einen echten Boden für einen normalen Druck. Mit {{ui:prop.vaseBottom}} auf 0 mm hat die hohle Vase keinen Boden: ein Rohr, oben und unten offen, für Schallbecher, Mundstücke und Rohre.
 - {{ui:prop.vaseEffect}}: Eine neue Vase ist glatt. Zur Wahl stehen Rillen, Streifen, Voronoi-Zellen oder Facetten (Low Poly) außen, auf Wunsch nur in einem Höhenbereich; sie gehören zur Vase und bleiben mit ihr änderbar.
 
 {{ui:prop.vaseSection2}} lässt den Querschnitt über die Höhe weich in einen zweiten übergehen, etwa von einem Kreis unten zu einem Sechseck oben.

@@ -64,6 +64,8 @@ describe("printing a vase", () => {
       { body: "hohl", lidMode: "schraube", wall: 1.2 },
       { body: "hohl", lidMode: "stuelp", insertMode: "stecker" },
       { body: "hohl", lidMode: "stuelp", lamp: "haengend" },
+      { body: "hohl", bottom: 0, drainHoles: 3, legMode: "stecken" },
+      { body: "hohl", bottom: 0, rubberFeet: 4 },
     ];
     const seen = new Set<string>();
     for (const settings of variants) {
@@ -76,6 +78,14 @@ describe("printing a vase", () => {
     }
     // A good share of the core's notes came up.
     expect(seen.size).toBeGreaterThan(20);
+  });
+
+  it("says how a vase without a bottom prints, and what it leaves out", () => {
+    const notes = vasePrintReport(vase({ body: "hohl", bottom: 0, drainHoles: 3, legMode: "stecken" })).notes;
+    expect(notes).toContain("Ohne Boden gibt es keine Ablauflöcher.");
+    expect(notes).toContain("Ohne Boden gibt es keine Buchsen und Mulden.");
+    expect(notes.some((note) => note.startsWith("Ohne Boden: unten offen wie ein Rohr."))).toBe(true);
+    expect(notes.some((note) => note.startsWith("Boden nur") || note.startsWith("Boden auf"))).toBe(false);
   });
 
   it("has nothing to say about a plain hollow vase", () => {

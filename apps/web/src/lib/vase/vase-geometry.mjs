@@ -278,7 +278,8 @@ export const LIMITS = {
   zoneTo: [0, 100],
   zoneFade: [0, 50],
   wall: [0.4, 10],
-  bottom: [0.4, 20],
+  // 0: no bottom - a tube open at both ends (a bell, a mouthpiece); else at least 0.4 mm.
+  bottom: [0, 20],
   polySides: [3, 24],
   polyRound: [0, 1],
   sectionWaves: [2, 80],
@@ -411,6 +412,8 @@ export function normalizeParams(input = {}) {
   if (p.cutoutTo < p.cutoutFrom) [p.cutoutFrom, p.cutoutTo] = [p.cutoutTo, p.cutoutFrom]
   if (!SECTION_OUTSIDE[p.sectionOutside]) p.sectionOutside = DEFAULTS.sectionOutside
   p.bottom = Math.min(p.bottom, p.height * 0.5)
+  // A bottom thinner than one layer pair is no bottom: below 0.2 mm none, from there at least 0.4 mm.
+  if (p.bottom > 0) p.bottom = p.bottom < 0.2 ? 0 : Math.max(p.bottom, 0.4)
   return p
 }
 
@@ -1324,10 +1327,11 @@ export function floorLayout(input) {
   const p = shape.p
   const notes = []
   const hollow = p.body === 'hohl'
-  // Lamp over an LED puck: no bottom and no foot.
+  // Lamp over an LED puck, or a bottom of 0 mm without a lamp: no bottom and no foot, open below.
   const lamp = hollow ? p.lamp : 'keine'
   if (!hollow && p.lamp !== 'keine') notes.push('Ein Lampenschirm braucht eine hohle Vase (Bauart „Hohl mit Wand“).')
-  const foot = hollow && lamp !== 'puck' ? Math.min(p.footHeight, p.height * 0.4) : 0
+  const open = hollow && (lamp === 'puck' || (lamp === 'keine' && p.bottom === 0))
+  const foot = hollow && !open ? Math.min(p.footHeight, p.height * 0.4) : 0
   const blind = []
   // Plug-in legs: sockets only in a hollow bottom without a foot (in the slicer's vase mode the bottom is thin).
   const legs = []
@@ -1376,14 +1380,14 @@ export function floorLayout(input) {
     if (blind.length < p.rubberFeet) notes.push(`Nur ${blind.length} Mulden für Gummifüße passen in den Boden.`)
     if (!hollow) notes.push('Mulden für Gummifüße: die Vase normal drucken, nicht im Slicer-Vasenmodus (dort ist der Boden nur wenige Schichten dick).')
   }
-  if (lamp === 'puck' && (blind.length || legs.some((l) => l.socket))) {
+  if (open && (blind.length || legs.some((l) => l.socket))) {
     blind.length = 0
     for (const leg of legs) leg.socket = false
-    notes.push('Ohne Boden (über einem LED-Puck) gibt es keine Buchsen und Mulden.')
+    notes.push(lamp === 'puck' ? 'Ohne Boden (über einem LED-Puck) gibt es keine Buchsen und Mulden.' : 'Ohne Boden gibt es keine Buchsen und Mulden.')
   }
   const deepest = Math.max(0, ...blind.map((b) => b.depth))
   let floor = p.bottom
-  if (hollow && deepest + 1.2 > floor) {
+  if (hollow && !open && deepest + 1.2 > floor) {
     floor = deepest + 1.2
     notes.push(`Boden auf ${floor.toFixed(1).replace('.', ',')} mm verstärkt, damit die Buchsen bzw. Mulden nicht durchgehen.`)
   }
@@ -1391,7 +1395,7 @@ export function floorLayout(input) {
   if (lamp === 'haengend' || lamp === 'stehend') {
     if (floor < 2.5) { floor = 2.5; notes.push('Boden auf 2,5 mm verstärkt – er trägt den Schirm an der Fassung.') }
   }
-  if (lamp === 'puck') floor = 0
+  if (open) floor = 0
   // Drain holes in the middle and on a ring; the inner floor slopes down towards them.
   const drains = []
   let slope = 0
@@ -1411,7 +1415,8 @@ export function floorLayout(input) {
     if (p.drainHoles > 0) notes.push('Ohne Boden (über einem LED-Puck) gibt es keine Ablauflöcher.')
   }
   if (lamp !== 'keine') notes.push('Nur LED-Leuchtmittel verwenden: PLA wird ab etwa 55 °C weich, PETG ab etwa 80 °C.')
-  if (lamp === 'keine' && hollow && p.drainHoles > 0) {
+  if (open && lamp === 'keine' && p.drainHoles > 0) notes.push('Ohne Boden gibt es keine Ablauflöcher.')
+  else if (lamp === 'keine' && hollow && p.drainHoles > 0) {
     const r = p.drainDiameter / 2
     // A drain hole goes through both sides of the bottom: it must fit into the inner floor on top and into the
     // underside (the outer rim, or the wall of the hollow foot).
@@ -1511,7 +1516,8 @@ export function vaseChecks(input) {
   }
   if (p.body === 'hohl') {
     if (p.wall < 2 * NOZZLE) notes.push(`Wand nur ${fmtMm(p.wall)} mm – unter zwei Linien einer 0,4-mm-Düse druckt sie sich unsicher.`)
-    if (p.bottom < 2 * NOZZLE && p.lamp !== 'puck') notes.push(`Boden nur ${fmtMm(p.bottom)} mm – unter 0,8 mm wird er leicht undicht oder reißt.`)
+    if (p.bottom === 0 && p.lamp === 'keine') notes.push('Ohne Boden: unten offen wie ein Rohr. Auf dem Druckbett steht nur der Wandring – einen Rand (Brim) zum Haften nehmen.')
+    else if (p.bottom < 2 * NOZZLE && p.lamp !== 'puck') notes.push(`Boden nur ${fmtMm(p.bottom)} mm – unter 0,8 mm wird er leicht undicht oder reißt.`)
   }
   if (p.lidMode !== 'keiner') {
     if (p.lidMode !== 'stuelp' && p.body !== 'hohl') notes.push(`Ein ${LID_MODES[p.lidMode]} braucht eine hohle Vase (Nut bzw. Gewinde in der Wand).`)
@@ -1811,7 +1817,7 @@ export function buildVase(input) {
       return list
     }
     // Inner floor at foot + bottom thickness; below it, with a hollow foot, a cavity for the drip tray.
-    // Without a bottom (lamp over an LED puck): inner wall all the way down.
+    // Without a bottom (lamp over an LED puck, or a bottom of 0 mm): inner wall all the way down.
     const floorTop = foot + floor
     const innerRows = lowpoly ? rows : Math.max(8, Math.ceil(rows / 4))
     const inner = innerWall(floorTop, H, (H - floorTop) / innerRows)
