@@ -71,9 +71,9 @@ Con **un solo cuerpo** seleccionado, el punto de giro pertenece a ese cuerpo: se
 
 ¿Quieres que una pieza se apoye en su mejor lado para imprimirla? Selecciónala, haz clic en {{ui:editor.tool.layFlat}} y luego en la cara que debe quedar abajo. Mientras pasas el puntero por encima de la pieza, la cara que hay debajo se ilumina, así que ves cuál vas a elegir; gira la vista para comprobar los otros lados. La pieza gira hasta que esa cara descansa sobre el plano de trabajo.
 
-¿Quieres que dos piezas queden cara contra cara, o alineadas a ras? Selecciona la pieza que se va a mover, haz clic en {{ui:editor.tool.mateFaces}}, luego en su cara y, después, en la cara de la otra pieza. En el panel, {{ui:mate.mode.against}} pone las caras una contra otra (espalda con espalda, tocándose) y {{ui:mate.mode.flush}} las deja en un mismo plano, una al lado de la otra; {{ui:mate.gap}} deja espacio entre ellas, por ejemplo como holgura. {{ui:mate.apply}} mueve la pieza: gira por el camino más corto hasta que las caras son paralelas —nada, si ya lo son— y luego solo se desliza hacia la otra cara, de modo que conserva su posición lateral. La otra pieza se queda donde está, y un solo Deshacer lo revierte todo.
+¿Quieres que dos piezas queden cara contra cara, o alineadas a ras? Selecciona la pieza que se va a mover, haz clic en {{ui:editor.tool.mateFaces}}, luego en su cara y, después, en la cara de la otra pieza. En la ventana, {{ui:mate.mode.against}} pone las caras una contra otra (espalda con espalda, tocándose) y {{ui:mate.mode.flush}} las deja en un mismo plano, una al lado de la otra; {{ui:mate.gap}} deja espacio entre ellas, por ejemplo como holgura. {{ui:mate.apply}} mueve la pieza: gira por el camino más corto hasta que las caras son paralelas —nada, si ya lo son— y luego solo se desliza hacia la otra cara, de modo que conserva su posición lateral. La otra pieza se queda donde está, y un solo Deshacer lo revierte todo.
 
-![El panel Alinear caras: la pieza que se mueve ya está elegida; luego viene una cara de la otra pieza, después cara contra cara o a ras, y una separación opcional.](shot:mate-faces)
+![La ventana Alinear caras: la pieza que se mueve ya está elegida; luego viene una cara de la otra pieza, después cara contra cara o a ras, y una separación opcional.](shot:mate-faces)
 
 **Agujeros en un mismo eje:** {{ui:mate.mode.concentric}} alinea en cambio caras redondas: un agujero sobre otro, un pasador en un agujero, un tornillo en su agujero pasante. Elígelo antes de hacer clic en las caras. Luego haz clic en el interior redondo de un agujero (o el exterior de un pasador) de la pieza que se mueve, y en una cara redonda de la otra pieza; toda la cara redonda se ilumina al señalarla. {{ui:mate.apply}} gira la pieza por el camino más corto hasta que los dos ejes son paralelos y la desliza de lado sobre el otro eje. A lo largo del eje se queda donde estaba, así que un pasador conserva su altura; empújalo después. También funciona con mallas importadas, siempre que el agujero esté hecho de facetas alrededor de un eje.
 
@@ -101,7 +101,7 @@ Las copias aparecen primero como vista previa. Solo {{ui:array.apply}} las crea.
 
 ## Patrón de orificios en una cara
 
-Para rejillas de ventilación, rejillas de altavoz, cestas y cajas de electrónica, el {{ui:holePattern.title}} reparte orificios por igual sobre una cara plana. Ya no tienes que hacer un orificio, repetirlo y colocarlo en la pared. Selecciona exactamente un cuerpo y haz clic en {{ui:holePattern.title}}, en el grupo {{ui:editor.group.modify}} de la barra de herramientas, junto al patrón. También puedes hacer clic derecho en el cuerpo o buscarlo con [[Ctrl]]+[[K]].
+Para rejillas de ventilación, rejillas de altavoz, cestas y cajas de electrónica, el {{ui:holePattern.title}} reparte orificios por igual sobre una cara plana. Ya no tienes que hacer un orificio, repetirlo y colocarlo en la pared. Selecciona exactamente un cuerpo y haz clic en {{ui:holePattern.title}}, en el grupo {{ui:editor.group.modify}} de la cinta, junto al patrón. También puedes hacer clic derecho en el cuerpo o buscarlo con [[Ctrl]]+[[K]].
 
 1. Haz clic en una cara plana del cuerpo. Cuenta toda la cara plana alrededor de tu clic, no solo el triángulo que hay bajo el puntero. Una cara curva no sirve: te sale un aviso y haces clic en una plana.
 2. En la ventana, elige cómo son los orificios y cómo se colocan:
@@ -121,7 +121,7 @@ Una IA puede hacer lo mismo a través del puente MCP con `layerling_perforate_fa
 
 ## Empujar una cara hacia fuera o hacia dentro
 
-Para engrosar una pared, poner un resalte sobre una cara o abrir un hueco en ella, la herramienta {{ui:faceTool.title}} trabaja sobre una cara plana. También funciona con un STL importado, donde no hay ningún boceto que cambiar. Selecciona exactamente un cuerpo y haz clic en {{ui:faceTool.title}}, en el grupo {{ui:editor.group.modify}} de la barra de herramientas, junto al patrón de orificios. También puedes hacer clic derecho en el cuerpo o buscarla con [[Ctrl]]+[[K]].
+Para engrosar una pared, poner un resalte sobre una cara o abrir un hueco en ella, la herramienta {{ui:faceTool.title}} trabaja sobre una cara plana. También funciona con un STL importado, donde no hay ningún boceto que cambiar. Selecciona exactamente un cuerpo y haz clic en {{ui:faceTool.title}}, en el grupo {{ui:editor.group.modify}} de la cinta, junto al patrón de orificios. También puedes hacer clic derecho en el cuerpo o buscarla con [[Ctrl]]+[[K]].
 
 1. Haz clic en una cara plana del cuerpo. Igual que con el patrón de orificios, cuenta toda la cara plana alrededor de tu clic; una cara curva no sirve.
 2. En la ventana:

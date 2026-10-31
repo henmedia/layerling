@@ -16,7 +16,7 @@ Feltet øverst i vinduet søger i listen: det beholder kun de genveje, hvis sæt
 Kan du ikke finde et værktøj? Tryk [[Ctrl]]+[[K]] eller klik forstørrelsesglasset i området {{ui:editor.group.help}}, og tast hvad du leder efter: et værktøj ("rund", "spejl"), en form ("cylinder") eller en kommando ("eksportér", "fortryd"). Flyt med piletasterne og tryk [[Enter]], eller klik posten.
 
 - Søgningen forstår både det engelske og det tyske ord og ignorerer store bogstaver og omlyd: "aushoehlen" finder {{ui:editor.tool.hollow}}.
-- Hver post viser de taster der gør det samme og det værktøjsbjælke-område den bor i, så du lærer hvor den er.
+- Hver post viser de taster der gør det samme og den gruppe i båndet den bor i, så du lærer hvor den er.
 - Poster der er grået ud kan ikke køres lige nu, for det meste fordi intet er valgt. De bliver i listen så søgningen stadig fortæller dig hvor værktøjet er.
 
 Vejledningen du læser har også en søgeboks, øverst på hver side: tast et ord eller to, og den lister de sektioner der indeholder dem alle, med de matchende ord markeret. Klik én, eller tryk [[Enter]] for den første, for at springe direkte derhen. Siden der åbner, markerer hvert sted dine ord står, og ruller til det første i den valgte sektion; [[Esc]] eller et klik på en markering fjerner dem igen.

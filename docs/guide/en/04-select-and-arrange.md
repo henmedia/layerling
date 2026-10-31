@@ -79,9 +79,9 @@ With **one body** selected, the pivot belongs to that body: select other parts a
 
 Should a part lie on its best side for printing? Select it, click {{ui:editor.tool.layFlat}} and then the face that should go down. While you move the pointer over the part, the face under it lights up, so you see which one you are about to pick; turn the view to check the other sides. The part turns so that this face rests on the workplane.
 
-Two parts should meet face to face, or line up flush? Select the part that should move, click {{ui:editor.tool.mateFaces}}, then click its face and after that the face of the other part. In the panel, {{ui:mate.mode.against}} puts the faces against each other (back to back, touching), {{ui:mate.mode.flush}} lays them in one plane side by side; {{ui:mate.gap}} leaves room between them, for example for clearance. {{ui:mate.apply}} moves the part: it turns the shortest way until the faces are parallel - not at all if they already are - and then slides only towards the other face, so it keeps its place sideways. The other part stays where it is, and one Undo takes it all back.
+Two parts should meet face to face, or line up flush? Select the part that should move, click {{ui:editor.tool.mateFaces}}, then click its face and after that the face of the other part. In the tool window, {{ui:mate.mode.against}} puts the faces against each other (back to back, touching), {{ui:mate.mode.flush}} lays them in one plane side by side; {{ui:mate.gap}} leaves room between them, for example for clearance. {{ui:mate.apply}} moves the part: it turns the shortest way until the faces are parallel - not at all if they already are - and then slides only towards the other face, so it keeps its place sideways. The other part stays where it is, and one Undo takes it all back.
 
-![The Align faces panel: the part that moves is picked, a face of the other part comes next, then face to face or flush, and an optional gap.](shot:mate-faces)
+![The Align faces tool window: the part that moves is picked, a face of the other part comes next, then face to face or flush, and an optional gap.](shot:mate-faces)
 
 **Holes on one axis:** {{ui:mate.mode.concentric}} lines up round faces instead: a hole over a hole, a pin in a hole, a screw in its clearance hole. Choose it before you click the faces. Then click the round inside of a hole (or the outside of a pin) on the part that moves, and a round face of the other part; the whole round face lights up while you point at it. {{ui:mate.apply}} turns the part the shortest way until the two axes are parallel and slides it straight across onto the other axis. Along the axis it stays where it was, so a pin keeps its height; push it in afterwards. This works on imported meshes too, as long as the hole is made of facets around one axis.
 
@@ -113,7 +113,7 @@ With {{ui:array.groupCopies}} ticked, {{ui:array.apply}} groups the original and
 
 ## Hole pattern on a face
 
-For vents, speaker grilles, baskets and enclosures the {{ui:holePattern.title}} spreads holes evenly over a flat face. You no longer have to make one hole, repeat it and set it onto the wall. Select exactly one body and click {{ui:holePattern.title}} in the {{ui:editor.group.modify}} group of the toolbar, next to the pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
+For vents, speaker grilles, baskets and enclosures the {{ui:holePattern.title}} spreads holes evenly over a flat face. You no longer have to make one hole, repeat it and set it onto the wall. Select exactly one body and click {{ui:holePattern.title}} in the {{ui:editor.group.modify}} group of the ribbon, next to the pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
 
 1. Click a flat face of the body. The whole flat face around your click counts, not just the triangle under the pointer. A curved face does not work: you get a hint and click a flat one instead. On a group or a bundle a face runs on across parts that meet, as on one body; on a bundle only when no hole is among them. The parts are joined shortly after the tool opens; until then only one part's face lights up under the pointer, and a click waits for the join. On a group or bundle with text in it, only one part's face lights up, and the click joins the parts.
 2. In the window, set how the holes look and lie:
@@ -134,7 +134,7 @@ An AI can do the same through the MCP bridge with `layerling_perforate_face` (se
 
 ## Pushing a face out or in
 
-For a thicker wall, a raised pad on a face or a pocket cut into it, the {{ui:faceTool.title}} tool works on one flat face. It works on an imported STL too, where there is no sketch to change. Select exactly one body and click {{ui:faceTool.title}} in the {{ui:editor.group.modify}} group of the toolbar, next to the hole pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
+For a thicker wall, a raised pad on a face or a pocket cut into it, the {{ui:faceTool.title}} tool works on one flat face. It works on an imported STL too, where there is no sketch to change. Select exactly one body and click {{ui:faceTool.title}} in the {{ui:editor.group.modify}} group of the ribbon, next to the hole pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
 
 1. Click a flat face of the body. As with the hole pattern, the whole flat face around your click counts; a curved face does not work. On a group or a bundle the face runs on across parts that meet, as with the hole pattern.
 2. In the window:

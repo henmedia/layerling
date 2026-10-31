@@ -14,11 +14,11 @@ Ostré hrany na výtisku často nevypadají dobře a nejsou ani příliš odoln�
 
 ![Nástroj pro zaoblení hran: vybrané všechny ostré hrany a náhled poloměru 4 mm.](shot:fillet-preview)
 
-Panel se otevře vpravo nahoře. Překáží-li při výběru hran, přetáhněte jej za záhlaví. Příště se otevře na stejném místě; platí to i pro {{ui:editor.tool.hollow}} a {{ui:editor.tool.array}}. Dvojklik na záhlaví vrátí původní polohu.
+Okno nástroje se otevře vpravo nahoře. Překáží-li při výběru hran, přetáhněte jej za záhlaví. Příště se otevře na stejném místě; platí to i pro {{ui:editor.tool.hollow}} a {{ui:editor.tool.array}}. Dvojklik na záhlaví vrátí původní polohu.
 
-Vyberete-li při otevřeném panelu jiný tvar z knihovny, nástroj se zavře bez použití úpravy a zapomene vybrané hrany. Následující kliknutí pak umístí nový tvar.
+Vyberete-li při otevřeném okně jiný tvar z knihovny, nástroj se zavře bez použití úpravy a zapomene vybrané hrany. Následující kliknutí pak umístí nový tvar.
 
-Panel nabízí:
+Okno nabízí:
 
 - {{ui:edge.allSharpEdges}} vybere všechny hrany, {{ui:edge.clear}} výběr vyprázdní.
 - **{{ui:edge.radius}}** určuje poloměr zaoblení. U zkosení zadáváte {{ui:edge.distance}} nebo {{ui:edge.angle}}.
@@ -27,13 +27,13 @@ Panel nabízí:
 - {{ui:edge.bottomEdges}} vybere pouze hrany úplně dole na tělese, protějšek tlačítka {{ui:edge.topEdges}}. Je to rychlý způsob, jak zaoblit nebo zkosit jen patu součásti.
 - {{ui:edge.chamfillet}}, zvolené nahoře v okně zkosení vedle {{ui:editor.tool.chamfer}}, vytvoří tisknutelnou patu dílu: zkosení u podložky, které tečně přechází v zaoblení ke stěně, takže první vrstvy nepotřebují podpěry a hrana přesto končí měkce. {{ui:edge.distance}} je výška, kterou pata zabírá, {{ui:edge.angle}} (15° až 75°) strmost zkosení u podložky. Hrany vyberete tlačítkem {{ui:edge.bottomEdges}}.
 - {{ui:edge.onlyVisibleEdges}} skryje hrany za tělesem. Ve výchozím stavu prosvítají všechny, což může být u složitého dílu nepřehledné. Po zapnutí vybíráte pouze hrany obrácené k vám; pro ostatní otočte pohled. Chybová červená hrana se zobrazuje vždy.
-- {{ui:edge.tangentChains}} přidává po kliknutí i plynule navazující hrany, například celý obvod plochy se zaoblenými rohy. Volba ovlivňuje jen výběr kliknutím. CAD jádro vždy pokračuje v úpravě podél tečně navazujících hran. Panel uvádí, kolik dalších hran se tím upraví.
+- {{ui:edge.tangentChains}} přidává po kliknutí i plynule navazující hrany, například celý obvod plochy se zaoblenými rohy. Volba ovlivňuje jen výběr kliknutím. CAD jádro vždy pokračuje v úpravě podél tečně navazujících hran. Okno uvádí, kolik dalších hran se tím upraví.
 - {{ui:edge.keepSize}} zachová velikost zkosení či zaoblení i při pozdější změně velikosti tělesa.
 - {{ui:edge.previewQuality}} nabízí {{ui:edge.draft}}, {{ui:edge.standard}} nebo {{ui:edge.fine}}. U složitých dílů poskytuje {{ui:edge.draft}} rychlejší výpočet.
 
 Při změně velikosti se náhled přepočítává. Výpočet může chvíli trvat. Hodnotu můžete dál upravovat; použije se poslední zadaná.
 
-Pokud je úprava pro danou hranu příliš velká, Layerling navrhne menší hodnotu. Často stačí ubrat jeden nebo dva milimetry. V ostrých úhlech potřebuje zaoblení více prostoru, než by naznačoval samotný poloměr. Na malém displeji panel sám posune obsah tak, aby bylo hlášení vidět.
+Pokud je úprava pro danou hranu příliš velká, Layerling navrhne menší hodnotu. Často stačí ubrat jeden nebo dva milimetry. V ostrých úhlech potřebuje zaoblení více prostoru, než by naznačoval samotný poloměr. Na malém displeji okno samo posune obsah tak, aby bylo hlášení vidět.
 
 Jestliže dříve funkční výběr přestane fungovat po přidání další hrany, tato hrana zčervená a zesílí. Při dané velikosti ji nelze upravit společně s ostatními. Odeberte ji dalším kliknutím nebo zmenšete velikost. Přidáváte-li při zobrazené chybě další hrany, červeně zůstává první problémová. Neexistuje-li předchozí funkční výběr, například při prvním kliknutí nebo po zvětšení poloměru, zčervenají hrany selhávající samostatně, případně celý výběr, pokud vadí až jejich kombinace.
 
@@ -43,7 +43,7 @@ Také díra přijme {{ui:editor.tool.chamfer}} a {{ui:editor.tool.fillet}}, stej
 
 ### Vrácení úpravy hran
 
-Upravené těleso lze upravovat znovu. Vyberte je a otevřete zaoblení, zkosení nebo vytvoření dutiny. Všechny tyto panely zobrazují {{ui:edge.featureHistory}}. Příkaz {{ui:edge.revertAction}} vrátí konkrétní úpravu. Pokud na ni navazují novější úpravy, odstraní se také; panel předem uvede jejich počet.
+Upravené těleso lze upravovat znovu. Vyberte je a otevřete zaoblení, zkosení nebo vytvoření dutiny. Všechna tato okna zobrazují {{ui:edge.featureHistory}}. Příkaz {{ui:edge.revertAction}} vrátí konkrétní úpravu. Pokud na ni navazují novější úpravy, odstraní se také; okno předem uvede jejich počet.
 
 Vedle úpravy je i {{ui:edge.editAction}}. Původní úpravu vrátí stejným způsobem, ale rovnou otevře její nástroj s původním výběrem hran a hodnotou. Zaoblení 3 mm tak změníte na 5 mm bez opakovaného výběru. I zde se zruší navazující úpravy. Možnost platí pro nově vytvořené úpravy; u starších a u jednotlivých částí sloučeného celku lze úpravu pouze vrátit.
 
@@ -59,11 +59,11 @@ Krabičky, nádoby a kryty mají uvnitř prázdný prostor a rovnoměrně silné
 
 1. Vyberte těleso a zvolte {{ui:editor.tool.hollow}} v pásu nástrojů nebo nabídce pravého tlačítka.
 2. Nastavte {{ui:shell.wall}}.
-3. V části {{ui:shell.openings}} zapněte otevřené strany: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} a {{ui:shell.side.right}}. Lze kombinovat libovolný počet. Samotná {{ui:shell.side.front}} vytvoří otvor pro zásuvku, {{ui:shell.side.left}} a {{ui:shell.side.right}} průchozí tunel. Bez otevřené strany vznikne uzavřené těleso s vnitřní dutinou. {{ui:shell.side.closed}} vypne všechny strany jedním kliknutím. {{ui:shell.side.top}} je při otevření panelu už zapnuté; kliknutím na něj se horní strana zase zavře. Těleso uzavřené ze všech stran vypadá zvenku beze změny: dutinu ukáže řez.
+3. V části {{ui:shell.openings}} zapněte otevřené strany: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} a {{ui:shell.side.right}}. Lze kombinovat libovolný počet. Samotná {{ui:shell.side.front}} vytvoří otvor pro zásuvku, {{ui:shell.side.left}} a {{ui:shell.side.right}} průchozí tunel. Bez otevřené strany vznikne uzavřené těleso s vnitřní dutinou. {{ui:shell.side.closed}} vypne všechny strany jedním kliknutím. {{ui:shell.side.top}} je při otevření okna už zapnuté; kliknutím na něj se horní strana zase zavře. Těleso uzavřené ze všech stran vypadá zvenku beze změny: dutinu ukáže řez.
 4. Zvolte, zda mají být {{ui:shell.edges}} nastavené na {{ui:shell.edges.round}} nebo {{ui:shell.edges.sharp}}.
 5. Potvrďte {{ui:shell.apply}}.
 
-![Panel pro vytvoření dutiny: tloušťka stěny, otevřené strany a nastavení vnitřních hran.](shot:hollow-panel)
+![Okno pro vytvoření dutiny: tloušťka stěny, otevřené strany a nastavení vnitřních hran.](shot:hollow-panel)
 
 Stěny vznikají směrem dovnitř. Vnější povrch zůstává zachovaný.
 
@@ -108,14 +108,14 @@ Každou plochu tělesa lze posunout o stejnou vzdálenost ven nebo dovnitř. To 
 
 Zaškrtni {{ui:offset.sideways}}, když se má zvětšit nebo zmenšit jen obrys: boky se posunou o vzdálenost, každá rovná horní a spodní plocha zůstane ve své výšce. Cedule dostane okraj dokola, podstavec se rozšíří a těleso nebude vyšší. U stupňovitého tělesa si každý stupeň ponechá svou výšku. Text, který se odsazuje přes své obrysy, si pak také ponechá svou výšku.
 
-Bez zaškrtnutí se odsadí samotné těleso. Stane se pevným přesným tělesem, jako po zkosení: seznam nahoře v panelu odsazení vezme zpět a {{ui:edge.editAction}} znovu otevře nástroj se starou vzdáleností. Odsadit lze jen přesná CAD tělesa - kvádry, válce a další tvary, jejich skupiny, importované díly STEP. Těleso, které je jen trojúhelníková síť, jako mnoho importů STL, často nejde. Vzdálenost příliš velká pro těleso, například zmenšení za nejtenčí stěnu, se odmítne.
+Bez zaškrtnutí se odsadí samotné těleso. Stane se pevným přesným tělesem, jako po zkosení: seznam nahoře v okně odsazení vezme zpět a {{ui:edge.editAction}} znovu otevře nástroj se starou vzdáleností. Odsadit lze jen přesná CAD tělesa - kvádry, válce a další tvary, jejich skupiny, importované díly STEP. Těleso, které je jen trojúhelníková síť, jako mnoho importů STL, často nejde. Vzdálenost příliš velká pro těleso, například zmenšení za nejtenčí stěnu, se odmítne.
 
 ## Mazání ploch
 
 Zaoblení, které překáží, otvor na špatném místě, výstupek, který už nepotřebujete: {{ui:editor.tool.deleteFace}} je z tělesa zase odstraní, aniž byste ho museli stavět znovu.
 
 1. Vyberte těleso a zvolte {{ui:editor.tool.deleteFace}} v pásu nástrojů nebo nabídce pravého tlačítka.
-2. Klikněte na každou plochu toho, co má zmizet: plochy zaoblené hrany, stěnu otvoru, bok a vršek výstupku. Vybraná plocha se zvýrazní; dalším kliknutím ji z výběru odeberete. Panel plochy počítá.
+2. Klikněte na každou plochu toho, co má zmizet: plochy zaoblené hrany, stěnu otvoru, bok a vršek výstupku. Vybraná plocha se zvýrazní; dalším kliknutím ji z výběru odeberete. Okno plochy počítá.
 3. Klikněte na {{ui:deleteFace.apply}} nebo stiskněte [[Delete]]. [[Esc]] nástroj zavře, aniž by se cokoli změnilo.
 
 Okolní plochy se rozšíří, až se mezera uzavře. Kvádr se zaoblenými horními hranami dostane zpět ostré hrany, otvor se zaplní, výstupek zmizí. Těleso zůstane přesné: lze ho znovu zaoblit a zkosit a export do STEP zachová jeho skutečné plochy. [[Ctrl]]+[[Z]] smazání vrátí jedním krokem. Smazání je také v části {{ui:edge.featureHistory}} stejně jako zaoblení a zkosení, kde ho {{ui:edge.revertAction}} vrátí; {{ui:edge.editAction}} pro něj není. Sloučený celek se přitom změní na jediné těleso, stejně jako při úpravě hran.

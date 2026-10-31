@@ -176,10 +176,10 @@ describe("guide content", () => {
         expect(html, where).not.toMatch(/\{\{|\}\}/);
         for (const target of context.references.chapters) expect(slugs.has(target), `${where}: chapter ${target}`).toBe(true);
         for (const shot of context.references.shots) {
-          // A language without pictures of its own shows the English ones.
-          const own = join(root, "docs", "guide", "images", language);
-          const pictures = existsSync(own) ? own : join(root, "docs", "guide", "images", "en");
-          expect(existsSync(join(pictures, `${shot}.webp`)), `${where}: picture ${shot}`).toBe(true);
+          // A picture a language has no copy of its own of is the English one, as the guide build takes it.
+          const own = join(root, "docs", "guide", "images", language, `${shot}.webp`);
+          const picture = existsSync(own) ? own : join(root, "docs", "guide", "images", "en", `${shot}.webp`);
+          expect(existsSync(picture), `${where}: picture ${shot}`).toBe(true);
         }
       }
     }

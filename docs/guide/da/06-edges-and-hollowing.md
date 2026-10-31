@@ -14,11 +14,11 @@ Skarpe kanter ser sjældent godt ud på en printet del, og de er heller ikke spe
 
 !["Rund kanter"-værktøjet: alle skarpe kanter er valgt, billedet viser forhåndsvisningen med 4 mm radius.](shot:fillet-preview)
 
-Panelet sidder øverst til højre. Hvis det dækker kanter du vil klikke, træk det væk i dets titellinje; det åbner dér næste gang også, og det samme gør {{ui:editor.tool.hollow}} og {{ui:editor.tool.array}}. Dobbeltklik titellinjen for at sætte det tilbage.
+Værktøjsvinduet sidder øverst til højre. Hvis det dækker kanter du vil klikke, træk det væk i dets titellinje; det åbner dér næste gang også, og det samme gør {{ui:editor.tool.hollow}} og {{ui:editor.tool.array}}. Dobbeltklik titellinjen for at sætte det tilbage.
 
-At vælge en form fra formlisten mens panelet er åbent lukker det uden at anvende noget, og de kanter du klikkede glemmes. Klikket placerer så den nye form i stedet for at vælge kanter.
+At vælge en form fra formlisten mens vinduet er åbent lukker det uden at anvende noget, og de kanter du klikkede glemmes. Klikket placerer så den nye form i stedet for at vælge kanter.
 
-I panelet finder du:
+I vinduet finder du:
 
 - {{ui:edge.allSharpEdges}} vælger alle kanter på én gang, {{ui:edge.clear}} tømmer markeringen.
 - **{{ui:edge.radius}}** for runding. For fas sætter du {{ui:edge.distance}} eller {{ui:edge.angle}}.
@@ -29,13 +29,13 @@ I panelet finder du:
 - {{ui:edge.bottomEdges}} vælger kun kanterne langs den allernederste bund af formen, modstykket til {{ui:edge.topEdges}}. Det er den hurtige vej til kun at afrunde eller affase foden på en del.
 - {{ui:edge.chamfillet}}, valgt øverst i affasningsvinduet ved siden af {{ui:editor.tool.chamfer}}, laver den printbare fod på en del: en affasning ved pladen, der går tangentielt over i en afrunding mod væggen, så de første lag ikke behøver støtte, og kanten alligevel ender blødt. {{ui:edge.distance}} er den højde, foden fylder, {{ui:edge.angle}} (15° til 75°) hvor stejl affasningen er ved pladen. Kanterne vælger du med {{ui:edge.bottomEdges}}.
 - {{ui:edge.onlyVisibleEdges}} skjuler kanterne der ligger bag formen fra hvor du kigger. Som standard vises hver kant igennem formen, hvilket bliver forvirrende på en travl del; med kontakten til ser du, og kan klikke, kun de kanter der vender mod dig. Drej visningen for at nå de andre. En kant tegnet i rødt (se nedenfor) vises altid.
-- {{ui:edge.tangentChains}}: et klik vælger så også kanter der glat flyder ind i hinanden, for eksempel alle kanter rundt om en flade med rundede hjørner. Kontakten bestemmer kun hvad et klik vælger: CAD-kernen fører altid en fas eller rund med videre langs sådanne glat fortsættende kanter. Panelet fortæller dig langs hvor mange flere kanter det sker.
+- {{ui:edge.tangentChains}}: et klik vælger så også kanter der glat flyder ind i hinanden, for eksempel alle kanter rundt om en flade med rundede hjørner. Kontakten bestemmer kun hvad et klik vælger: CAD-kernen fører altid en fas eller rund med videre langs sådanne glat fortsættende kanter. Vinduet fortæller dig langs hvor mange flere kanter det sker.
 - {{ui:edge.keepSize}} bevarer fasen eller runding som den er, selvom du skalerer formen senere.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} eller {{ui:edge.fine}}) bestemmer hvor fint forhåndsvisningen beregnes. For vanskelige dele er {{ui:edge.draft}} hurtigere.
 
 Mens du justerer størrelsen, genberegner layerling forhåndsvisningen. Det kan tage et øjeblik. Du må blive ved med at justere; den sidste værdi du valgte er det der beregnes.
 
-Hvis størrelsen er for stor til kanten, siger layerling det og foreslår en mindre værdi. Ofte gør et eller to millimeter mindre det. Ved skarpe vinkler har en rund brug for mere plads end dens radius antyder. På en lille skærm ruller panelet selv ned så beskeden er i syne.
+Hvis størrelsen er for stor til kanten, siger layerling det og foreslår en mindre værdi. Ofte gør et eller to millimeter mindre det. Ved skarpe vinkler har en rund brug for mere plads end dens radius antyder. På en lille skærm ruller vinduet selv ned så beskeden er i syne.
 
 Når en markering der virkede fejler efter du klikker én kant mere, bliver den kant rød og tegnes bredere: det er den der ikke kan behandles sammen med de andre ved denne størrelse. Klik den igen for at tage den ud, eller gør størrelsen mindre. Klikker du flere kanter mens beskeden står, bliver den første ved med at være rød. Når der ikke er en tidligere markering der virkede - det allerførste klik, eller en størrelse du lige hævede - bliver kanterne der fejler selv alene røde, eller alle sammen hvis det kun er deres kombination.
 
@@ -45,7 +45,7 @@ Et hul tager også {{ui:editor.tool.chamfer}} og {{ui:editor.tool.fillet}}, og d
 
 ### Tage en kantbehandling tilbage
 
-En behandlet form kan altid behandles igen. Vælg den igen og åbn værktøjet - Rund, Fas eller Hul, hver viser listen: under {{ui:edge.featureHistory}} ser du hvad der allerede er på den. {{ui:edge.revertAction}} tager en enkelt behandling tilbage. Bemærk: hvis nyere behandlinger ligger ovenpå, følger de med, og panelet fortæller dig hvor mange.
+En behandlet form kan altid behandles igen. Vælg den igen og åbn værktøjet - Rund, Fas eller Hul, hver viser listen: under {{ui:edge.featureHistory}} ser du hvad der allerede er på den. {{ui:edge.revertAction}} tager en enkelt behandling tilbage. Bemærk: hvis nyere behandlinger ligger ovenpå, følger de med, og vinduet fortæller dig hvor mange.
 
 Ved siden af en fas, en rund eller en udhuling er der også {{ui:edge.editAction}}. Den tager behandlingen tilbage på samme måde, men åbner værktøjet igen med det samme med de samme kanter og den gamle værdi. Du ændrer værdien og anvender igen: en 3 mm rund bliver til 5 mm uden at klikke kanterne igen. Hvis nyere behandlinger ligger ovenpå, følger de med her også. Det gælder for kantbehandlinger du laver fra nu af; ældre tilbyder kun at tage tilbage, og det samme gør enkelte dele af en gruppe.
 
@@ -61,11 +61,11 @@ Kasser, krus, kabinetter og låg har én ting til fælles: de er tomme indeni, m
 
 1. Vælg formen og klik på {{ui:editor.tool.hollow}}, eller højreklik formen og vælg det fra menuen.
 2. Sæt {{ui:shell.wall}}.
-3. Under {{ui:shell.openings}} slår du de sider til der forbliver åbne: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} eller {{ui:shell.side.right}}, så mange du vil - kun {{ui:shell.side.front}} laver en slids til en skuffe, {{ui:shell.side.left}} og {{ui:shell.side.right}} en tunnel. Med ingen side slået til forbliver formen lukket hele vejen rundt, med et hulrum i midten. {{ui:shell.side.closed}} slår alle sider fra med ét klik. {{ui:shell.side.top}} er allerede slået til, når panelet åbner; et klik på den lukker toppen igen. Et legeme, der er lukket hele vejen rundt, ser uændret ud udefra: snitvisningen viser hulrummet.
+3. Under {{ui:shell.openings}} slår du de sider til der forbliver åbne: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} eller {{ui:shell.side.right}}, så mange du vil - kun {{ui:shell.side.front}} laver en slids til en skuffe, {{ui:shell.side.left}} og {{ui:shell.side.right}} en tunnel. Med ingen side slået til forbliver formen lukket hele vejen rundt, med et hulrum i midten. {{ui:shell.side.closed}} slår alle sider fra med ét klik. {{ui:shell.side.top}} er allerede slået til, når vinduet åbner; et klik på den lukker toppen igen. Et legeme, der er lukket hele vejen rundt, ser uændret ud udefra: snitvisningen viser hulrummet.
 4. Bestem om {{ui:shell.edges}} skal være {{ui:shell.edges.round}} eller {{ui:shell.edges.sharp}}.
 5. Klik på {{ui:shell.apply}}.
 
-![Udhulingspanelet med vægtykkelse, en kontakt for hver side der forbliver åben, og de indvendige kanter.](shot:hollow-panel)
+![Udhulingsvinduet med vægtykkelse, en kontakt for hver side der forbliver åben, og de indvendige kanter.](shot:hollow-panel)
 
 Væggene vokser indad. Ydersiden forbliver som den er.
 
@@ -111,14 +111,14 @@ Hver flade på et legeme kan flyttes den samme afstand, udad eller indad. Det er
 
 Sæt flueben ved {{ui:offset.sideways}}, når kun omridset skal vokse eller skrumpe: siderne flytter sig med afstanden, mens hver flad over- og underside bliver i sin højde. Et skilt får en kant hele vejen rundt, en sokkel bliver bredere, og legemet bliver ikke højere. På et trappeformet legeme beholder hvert trin sin egen højde. En tekst, der forskydes via sine omrids, beholder så også sin højde.
 
-Uden hak forskydes selve legemet. Det bliver et fast, nøjagtigt legeme, som efter en affasning: listen øverst i panelet tager forskydningen tilbage, og {{ui:edge.editAction}} åbner værktøjet igen med den gamle afstand. Kun nøjagtige CAD-legemer kan forskydes - kasser, cylindre og de andre former, grupper af dem, importerede STEP-dele. Et legeme, der kun er et mesh af trekanter, som mange STL-importer, kan ofte ikke. En afstand, der er for stor til legemet, for eksempel en formindskelse ud over den tyndeste væg, afvises.
+Uden hak forskydes selve legemet. Det bliver et fast, nøjagtigt legeme, som efter en affasning: listen øverst i vinduet tager forskydningen tilbage, og {{ui:edge.editAction}} åbner værktøjet igen med den gamle afstand. Kun nøjagtige CAD-legemer kan forskydes - kasser, cylindre og de andre former, grupper af dem, importerede STEP-dele. Et legeme, der kun er et mesh af trekanter, som mange STL-importer, kan ofte ikke. En afstand, der er for stor til legemet, for eksempel en formindskelse ud over den tyndeste væg, afvises.
 
 ## Slet flader
 
 En runding i vejen, et hul på det forkerte sted, et buldug du ikke har brug for mere: {{ui:editor.tool.deleteFace}} tager det af formen igen, uden at formen bygges på ny.
 
 1. Vælg formen og klik på {{ui:editor.tool.deleteFace}}, eller højreklik formen og vælg det fra menuen.
-2. Klik hver flade af det der skal væk: fladerne af en runding, væggen i et hul, siden og toppen af et buldug. En valgt flade lyser op; endnu et klik tager den ud igen. Panelet tæller fladerne.
+2. Klik hver flade af det der skal væk: fladerne af en runding, væggen i et hul, siden og toppen af et buldug. En valgt flade lyser op; endnu et klik tager den ud igen. Vinduet tæller fladerne.
 3. Klik på {{ui:deleteFace.apply}} eller tryk [[Delete]]. [[Esc]] lukker værktøjet uden at ændre noget.
 
 Fladerne omkring de slettede vokser, indtil hullet er lukket. En kasse med rundede topkanter får sine skarpe kanter tilbage, et hul bliver fyldt, et buldug er væk. Formen bevarer sin eksakte form, så den kan faseres og rundes igen, og STEP-eksporten beholder dens sande flader. [[Ctrl]]+[[Z]] tager sletningen tilbage i ét skridt. Den står også under {{ui:edge.featureHistory}} sammen med runder og faser, hvor {{ui:edge.revertAction}} tager den tilbage; der er ingen {{ui:edge.editAction}} til den. På en gruppe er resultatet ét legeme, som ved en kantbehandling.

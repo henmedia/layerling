@@ -66,9 +66,9 @@ V každém projektu si také můžete uložit čtyři vlastní pohledy. [[Shift]
 - {{ui:camera.sectionMeasure}} měří v řezu dvěma kliknutími. Body se přichytávají k obrysu, přednostně k rohům. Druhý bod na protější stěně se umístí kolmo proti prvnímu. Bez přesného míření tak změříte tloušťku stěny, mezeru nebo vůli. Třetí kliknutí začne další měření, [[Esc]] měření ukončí. Posun řezné roviny měření vymaže.
 - {{ui:camera.sectionExportSvg}} uloží obrysy v řezu jako SVG v měřítku 1:1 pro laser, plotr, šablonu nebo těsnění. Řez X je viděn zprava, Y zepředu a Z shora. Zahrnou se jen viditelná tělesa s již odečtenými výřezy. Tělesa stejné barvy se sjednotí do jednoho obrysu. Každá barva zůstává samostatnou nevyplněnou cestou pro oddělené vrstvy v laserovém programu.
 
-Panel je u svého tlačítka. Přetažením záhlaví ho přesunete kamkoliv na pracovní plochu a příště se tam otevře znovu. Dvojklik nebo vrácení k tlačítku obnoví jeho ukotvení.
+Okno nástroje je u svého tlačítka. Přetažením záhlaví ho přesunete kamkoliv na pracovní plochu a příště se tam otevře znovu. Dvojklik nebo vrácení k tlačítku obnoví jeho ukotvení.
 
-[[Esc]] panel zavře, ale řez zůstane aktivní do vypnutí nebo návratu do přehledu projektů. Tlačítko řezu zůstává zvýrazněné. Objekty vložené do odříznuté části uvidíte až po vypnutí řezu.
+[[Esc]] okno zavře, ale řez zůstane aktivní do vypnutí nebo návratu do přehledu projektů. Tlačítko řezu zůstává zvýrazněné. Objekty vložené do odříznuté části uvidíte až po vypnutí řezu.
 
 ## Pracovní rovina
 
@@ -108,9 +108,9 @@ V {{ui:workspace.appearance}} upravujete i osvětlení. {{ui:workspace.shadowStr
 
 ![Editor v tmavém motivu. Vpravo nahoře lze vybrat systémový, světlý, tmavý nebo grafitový motiv.](shot:editor-dark)
 
-{{ui:workspace.toolbarSize}} v {{ui:workspace.appearance}} mění velikost pásu nástrojů, nabídky tvarů, levého ovládání pohledu a panelu vlastností vpravo: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} nebo {{ui:workspace.toolbarSizeLarge}}. Malé ovládání nechá více místa na notebooku, velké usnadňuje dotyk i použití na velké obrazovce. Nevejdou-li se velká tlačítka, skupiny pásu se zalomí do dalšího řádku. Nastavení se uchovává v tomto prohlížeči pro všechny projekty.
+{{ui:workspace.toolbarSize}} v {{ui:workspace.appearance}} mění velikost pásu nástrojů, nabídky tvarů, lišty pohledu vlevo a panelu vlastností vpravo: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} nebo {{ui:workspace.toolbarSizeLarge}}. Malé ovládání nechá více místa na notebooku, velké usnadňuje dotyk i použití na velké obrazovce. Nevejdou-li se velká tlačítka, skupiny pásu se zalomí do dalšího řádku. Nastavení se uchovává v tomto prohlížeči pro všechny projekty.
 
-{{ui:workspace.viewCubePosition}} v {{ui:workspace.appearance}} přesune orientační krychli do jiného rohu pracovní plochy: {{ui:workspace.viewCubePositionTopLeft}} (jako dosud), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} nebo {{ui:workspace.viewCubePositionBottomRight}}. V každém rohu kromě levého horního se ovládání pohledu posune nahoru na místo, které krychle uvolnila. Vpravo dole stojí krychle těsně nad ovládáním {{ui:inspector.snapGrid}}. Dokud jsou vpravo otevřené vlastnosti tvaru, krychle na pravé straně uhne vlevo od nich. Roh se uchovává v tomto prohlížeči pro všechny projekty. V úzkém okně, třeba na telefonu, je nastavení skryté a krychle zůstává vlevo nahoře.
+{{ui:workspace.viewCubePosition}} v {{ui:workspace.appearance}} přesune orientační krychli do jiného rohu pracovní plochy: {{ui:workspace.viewCubePositionTopLeft}} (jako dosud), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} nebo {{ui:workspace.viewCubePositionBottomRight}}. V každém rohu kromě levého horního se lišta pohledu posune nahoru na místo, které krychle uvolnila. Vpravo dole stojí krychle těsně nad ovládáním {{ui:inspector.snapGrid}}. Dokud jsou vpravo otevřené vlastnosti tvaru, krychle na pravé straně uhne vlevo od nich. Roh se uchovává v tomto prohlížeči pro všechny projekty. V úzkém okně, třeba na telefonu, je nastavení skryté a krychle zůstává vlevo nahoře.
 
 > **Tip:** Při přesném lícování dílů přestaňte pohledem otáčet. Číselnou klávesou zvolte pohled shora nebo zepředu a [[O]] přepněte na rovnoběžné promítání. Snadněji pak poznáte, zda jsou hrany skutečně v jedné rovině.
 

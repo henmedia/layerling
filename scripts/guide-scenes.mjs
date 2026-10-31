@@ -31,6 +31,43 @@ async function select(ctx, ids) {
   await ctx.wait(500);
 }
 
+/**
+ * Frames areas of the editor and names them with the interface's own words, for the labelled overview.
+ * `top` cuts the frame off above (the ribbon without the title row); `place` puts the name below, left or right of it.
+ */
+async function labelAreas(ctx, areas) {
+  const named = areas.map((area) => ({ ...area, text: ctx.t(area.key) }));
+  const missing = await ctx.evaluate(`(() => {
+    const areas = ${JSON.stringify(named)};
+    const layer = document.createElement("div");
+    layer.style.cssText = "position:fixed;inset:0;z-index:100000;pointer-events:none;font:600 13px system-ui,sans-serif";
+    document.body.append(layer);
+    const missing = [];
+    for (const area of areas) {
+      const element = document.querySelector(area.selector);
+      const box = element?.getBoundingClientRect();
+      if (!box || box.width === 0) { missing.push(area.selector); continue; }
+      const top = Math.max(box.top, area.top ?? 0);
+      const frame = document.createElement("div");
+      frame.style.cssText = "position:absolute;border:2px solid #d9480f;border-radius:8px;box-sizing:border-box;"
+        + "left:" + (box.left + 1) + "px;top:" + (top + 1) + "px;width:" + (box.width - 2) + "px;height:" + (box.bottom - top - 2) + "px";
+      const label = document.createElement("div");
+      label.textContent = area.text;
+      label.style.cssText = "position:absolute;background:#d9480f;color:#fff;padding:2px 8px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.25)";
+      layer.append(frame, label);
+      const size = label.getBoundingClientRect();
+      const middle = (box.left + box.right) / 2;
+      const position = area.place === "right" ? [box.right + 8, (top + box.bottom - size.height) / 2]
+        : area.place === "left" ? [box.left - size.width - 8, top + 12]
+        : [Math.max(4, Math.min(innerWidth - size.width - 4, area.selector === ".view-cube" || area.selector === ".camera-controls" ? box.left : middle - size.width / 2)), box.bottom + 3];
+      label.style.left = position[0] + "px";
+      label.style.top = position[1] + "px";
+    }
+    return missing;
+  })()`);
+  if (missing.length) throw new Error(`Not on screen: ${missing.join(", ")}`);
+}
+
 /** A small, good-looking starting point: a plate with a few bodies. */
 async function sampleParts(ctx) {
   const box = await create(ctx, { kind: "box", x: -20, z: 0, width: 30, depth: 30, height: 20, color: BLUE });
@@ -50,6 +87,27 @@ export const scenes = {
     await select(ctx, [box]);
     await quiet(ctx);
     await ctx.shot("editor-overview");
+  },
+
+  async "editor-areas"(ctx) {
+    await freshEditor(ctx);
+    const { box } = await sampleParts(ctx);
+    await ctx.wait(2500);
+    await ctx.click(ctx.t("editor.tool.showOutliner"));
+    await select(ctx, [box]);
+    await quiet(ctx);
+    // The status pill is hidden for every other picture; here it is one of the areas, so a copy puts a message in it.
+    await ctx.evaluate(`[...document.querySelectorAll("style")].filter((style) => style.textContent.includes(".editor-status{display:none")).forEach((style) => style.remove()); true`);
+    await ctx.key("c", 2);
+    await labelAreas(ctx, [
+      { selector: ".secondary-toolbar", key: "area.ribbon", top: 46, place: "below" },
+      { selector: ".view-cube", key: "view.cube", place: "below" },
+      { selector: ".camera-controls", key: "camera.controls", place: "below" },
+      { selector: ".editor-status", key: "area.statusMessage", place: "right" },
+      { selector: ".outliner-panel", key: "area.objectList", place: "below" },
+      { selector: ".shape-inspector", key: "inspector.properties", place: "left" },
+    ]);
+    await ctx.shot("editor-areas");
   },
 
   async "shape-menu"(ctx) {

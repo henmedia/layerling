@@ -16,7 +16,7 @@ Das Feld oben im Fenster durchsucht die Liste: Es lässt nur die Kürzel stehen,
 Du findest ein Werkzeug nicht? Drücke [[Strg]]+[[K]] oder klicke auf die Lupe im Bereich {{ui:editor.group.help}} und tippe, was du suchst: ein Werkzeug („Verrunden“, „Spiegeln“), eine Form („Zylinder“) oder einen Befehl („Exportieren“, „Rückgängig“). Mit den Pfeiltasten wählst du, [[Enter]] führt aus; ein Klick auf den Eintrag geht auch.
 
 - Die Suche versteht das deutsche und das englische Wort und ignoriert Groß- und Kleinschreibung und Umlaute: „aushoehlen“ findet {{ui:editor.tool.hollow}}.
-- Jeder Eintrag zeigt die Tasten, die dasselbe tun, und den Bereich der Leiste, in dem er liegt, so lernst du, wo er sitzt.
+- Jeder Eintrag zeigt die Tasten, die dasselbe tun, und die Gruppe des Menübands, in der er liegt, so lernst du, wo er sitzt.
 - Ausgegraute Einträge lassen sich gerade nicht ausführen, meist weil nichts ausgewählt ist. Sie bleiben in der Liste, damit die Suche trotzdem verrät, wo das Werkzeug liegt.
 
 Auch diese Anleitung hat oben auf jeder Seite ein Suchfeld: Tippe ein oder zwei Wörter, und es listet die Abschnitte auf, in denen alle vorkommen, die Treffer hervorgehoben. Ein Klick, oder [[Enter]] für den ersten, springt direkt dorthin. Die Seite, die sich öffnet, markiert jede Stelle, an der deine Wörter stehen, und rollt zur ersten im gewählten Abschnitt; [[Esc]] oder ein Klick auf eine Markierung nimmt sie wieder weg.

@@ -74,7 +74,7 @@ Du kannst in jedem Entwurf außerdem vier eigene Ansichten festhalten. [[Umschal
 
 Das Fenster hängt an seinem Knopf. Verdeckt es etwas, ziehst du es an seiner Titelleiste frei über die Arbeitsfläche; dort öffnet es sich auch beim nächsten Mal. Ein Doppelklick auf die Titelleiste oder das Ablegen am Knopf bringt es zurück.
 
-Das X und [[Esc]] schließen das Fenster; läuft gerade eine Messung, beendet [[Esc]] zuerst sie. Der Schnitt bleibt, bis du ihn mit {{ui:camera.sectionActive}} ausschaltest oder zur Entwurfsübersicht zurückgehst. Solange er an ist, ist der Knopf hervorgehoben. Was du dann auf der weggeschnittenen Seite ablegst, siehst du erst, wenn du den Schnitt ausschaltest. Ein Tablet hat kein [[Esc]], deshalb hat das Fenster dort zwei Knöpfe mehr: {{ui:camera.sectionBack}} beendet die Messung, falls eine läuft, und schließt sonst das Fenster, {{ui:camera.sectionConfirm}} schließt das Fenster in einem Schritt. Ein Computer zeigt sie nicht.
+Das X und [[Esc]] schließen das Werkzeugfenster; läuft gerade eine Messung, beendet [[Esc]] zuerst sie. Der Schnitt bleibt, bis du ihn mit {{ui:camera.sectionActive}} ausschaltest oder zur Entwurfsübersicht zurückgehst. Solange er an ist, ist der Knopf hervorgehoben. Was du dann auf der weggeschnittenen Seite ablegst, siehst du erst, wenn du den Schnitt ausschaltest. Ein Tablet hat kein [[Esc]], deshalb hat das Werkzeugfenster dort zwei Knöpfe mehr: {{ui:camera.sectionBack}} beendet die Messung, falls eine läuft, und schließt sonst das Fenster, {{ui:camera.sectionConfirm}} schließt das Fenster in einem Schritt. Ein Computer zeigt sie nicht.
 
 ## Die Arbeitsebene
 
@@ -106,7 +106,7 @@ Das Zahnrad in der Titelzeile ({{ui:editor.workspaceSettings}}) öffnet die Eins
 
 {{ui:workspace.theme}} legt das Farbschema des ganzen Programms fest: {{ui:workspace.themeSystem}} folgt deinem Rechner, dazu kommen {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} und {{ui:workspace.themeGraphite}}. Du kannst es auch oben rechts im Editor ändern.
 
-{{ui:workspace.toolbarSize}} macht die Knöpfe der Leiste oben, ihr Formenmenü, die Ansichtsleiste links und die Eigenschaftentafel rechts kleiner oder größer: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (wie bisher) oder {{ui:workspace.toolbarSizeLarge}}. Klein lässt auf einem Laptop mehr Platz für die Arbeitsebene, groß trifft sich leichter auf einem großen Bildschirm oder mit dem Finger. Mit großen Knöpfen gehen die Gruppen der Leiste in eine zweite Zeile, wenn das Fenster für sie zu schmal ist. Die Größe merkt sich dieser Browser, sie gilt für jedes Design.
+{{ui:workspace.toolbarSize}} macht die Knöpfe des Menübands, sein Formenmenü, die Ansichtsleiste links und die Eigenschaften rechts kleiner oder größer: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (wie bisher) oder {{ui:workspace.toolbarSizeLarge}}. Klein lässt auf einem Laptop mehr Platz für die Arbeitsebene, groß trifft sich leichter auf einem großen Bildschirm oder mit dem Finger. Mit großen Knöpfen gehen die Gruppen des Menübands in eine zweite Zeile, wenn das Fenster für sie zu schmal ist. Die Größe merkt sich dieser Browser, sie gilt für jedes Design.
 
 {{ui:workspace.shapeColors}} zeigt auf den Bildern der Formenbibliothek die Farbe, in der eine neue Form beginnt (die Farbe ihrer Art oder die, die du mit {{ui:inspector.saveDefaults}} gespeichert hast). Schalte es aus, wenn dir graue Bilder lieber sind; dein Browser merkt sich die Wahl.
 

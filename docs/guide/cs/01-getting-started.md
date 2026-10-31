@@ -17,12 +17,15 @@ Všechny projekty se později zobrazují na úvodní stránce s náhledem. Uchov
 
 ## Přehled editoru
 
-![Editor se dvěma tvary na pracovní rovině. Nahoře pás nástrojů, vlevo ovládání pohledu a vpravo nastavení vybraného tvaru.](shot:editor-overview)
+![Editor s popsanými oblastmi: nahoře pás nástrojů, vlevo orientační krychle a pod ní lišta pohledu, vedle nich stavová zpráva a seznam objektů, vpravo vlastnosti vybraného tvaru.](shot:editor-areas)
 
-- **Nahoře** je pás nástrojů rozdělený podle činností: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} a {{ui:editor.group.help}}. Najetím na ikonu zobrazíte její název. Malý otazník v nastavení tvaru, knihovně nebo panelu nástroje vede přímo do příslušné části této příručky.
+- **Nahoře** je pás nástrojů rozdělený podle činností: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} a {{ui:editor.group.help}}. Najetím na ikonu zobrazíte její název. Malý otazník v nastavení tvaru, knihovně nebo okně nástroje vede přímo do příslušné části této příručky.
 - **Uprostřed** leží pracovní rovina. Sem pokládáte tvary, upravujete je a sledujete výsledek.
-- **Vpravo** se zobrazuje nastavení vybraného tvaru: barva, rozměry, poloha a další vlastnosti. Zadání čísla je přesnější než tažení myší.
-- **Vlevo** najdete ovládání pohledu a nad ním orientační krychli. Jejich použití popisuje kapitola [Pohled a pracovní rovina](chapter:view-and-workplane).
+- **Vpravo** se zobrazují **vlastnosti** vybraného tvaru: barva, rozměry, poloha a další vlastnosti. Zadání čísla je přesnější než tažení myší.
+- **Vlevo** najdete **lištu pohledu** a nad ní **orientační krychli**. Jejich použití popisuje kapitola [Pohled a pracovní rovina](chapter:view-and-workplane).
+- **Vedle lišty pohledu** se otevírá **seznam objektů** ([[Ctrl]]+[[U]]) se všemi tvary návrhu. Víc v kapitole [Výběr a uspořádání](chapter:select-and-arrange).
+- **Vpravo od orientační krychle** se objeví **stavová zpráva**, když vám layerling chce něco sdělit, třeba co nástroj právě očekává. Když není co říct, není vidět.
+- **Okna nástrojů** se otevírají nad pracovní rovinou, když spustíte nástroj jako {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} nebo {{ui:editor.tool.hollow}}. Za záhlaví je odsunete stranou, když něco zakrývají.
 - **Úplně nahoře** přepínáte mezi {{ui:editor.modeGeometry}} a {{ui:editor.modeSketch}}, přejmenováváte projekt a volíte jazyk a barevný motiv.
 
 ## Tlačítka kolem pracovní plochy

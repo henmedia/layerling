@@ -7,7 +7,7 @@ Pour construire une pièce avec précision, vous devez mesurer. layerling dispos
 
 ## Le mètre ruban
 
-Le ruban à mesurer se trouve à l'extrémité inférieure de la barre de la caméra, sur le bord gauche ({{ui:camera.tapeTools}}). Il mesure les distances entre les coins, les arêtes et les faces. Un clic dessus ouvre cinq boutons. S'ils couvrent ce que vous souhaitez mesurer, faites-les glisser par la poignée de gauche n'importe où sur le plan de travail ; un double-clic sur la poignée les remet :
+Le ruban à mesurer se trouve à l'extrémité inférieure de la barre de vue, sur le bord gauche ({{ui:camera.tapeTools}}). Il mesure les distances entre les coins, les arêtes et les faces. Un clic dessus ouvre cinq boutons. S'ils couvrent ce que vous souhaitez mesurer, faites-les glisser par la poignée de gauche n'importe où sur le plan de travail ; un double-clic sur la poignée les remet :
 
 ![Le mètre ruban avec ses boutons : ajouter une mesure, déplacer des points de mesure, supprimer une mesure, des bords entiers, supprimer toutes les mesures.](shot:tape-menu)
 

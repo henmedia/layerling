@@ -26,7 +26,7 @@ summary: 畫出平面輪廓，為角點做圓角或倒角，再將它擠出或�
 - **剪貼簿：**{{ui:editor.tool.copy}}、{{ui:editor.tool.paste}}、{{ui:editor.tool.duplicate}} 和 {{ui:editor.tool.delete}} 作用於選取的點、線和圖片，與 3D 編輯器一樣；[[Ctrl]]+[[X]] 為剪下。貼上與複製的幾何會落在原圖形旁邊，相隔 10 mm，位於不碰到任何既有線條的空位，因此絕不會與既有內容連在一起。它會保持選取，可以直接拖到定位。
 - **歷史記錄：**{{ui:sketch.undo}} 和 {{ui:sketch.redo}}。
 - **{{ui:sketch.viewControls}}:** {{ui:editor.tool.note}}（或 [[N]]）在草圖上放置備註，與 3D 編輯器中相同：下一次點擊即放置備註，可以放在任何位置，也可以放在線條上。拖曳圖釘可移動備註；點擊圖釘會收起卡片。草圖的備註屬於它的實體：在 3D 檢視中，它們位於用 {{ui:sketch.extrude}} 或 {{ui:sketch.sweep}} 產生的實體頂面上，以及用 {{ui:sketch.revolve}} 產生的實體所繪製的輪廓上，並隨實體一起移動。再次開啟草圖會顯示該實體的所有備註，包括在 3D 中放置的備註。{{ui:sketch.undo}} 會像復原線條一樣復原備註，{{ui:sketch.cancel}} 會捨棄對備註的變更。詳見「量測與備註」一章。
-- **檢視：**用中鍵平移，或按住 [[Shift]] 或 [[Ctrl]] 加右鍵拖曳，與 3D 編輯器一樣。沒有選取任何東西時，[[Ctrl]] 加方向鍵也能平移檢視：每按一次移動畫面的十分之一，同時按 [[Shift]] 則為一半，草圖會依所指的方向移動。[[Home]] 讓整張草圖符合檢視範圍，[[F]] 縮放到選取範圍（沒有選取任何東西時，縮放到整張草圖），[[+]] 和 [[−]] 放大與縮小，與 3D 編輯器一樣。沒有選取任何東西時，雙擊空白處會平移檢視，讓該處移到中間，與 3D 編輯器一樣；設定中的 {{ui:workspace.doubleClickCentersView}} 可關閉此功能。側欄上的 {{ui:camera.tapeTools}} 可量測兩點之間的距離。只要點擊某個東西，草圖就會顯示尺寸：一條線的長度，或某個點上相交各線的長度。當這些尺寸礙事時，例如在塑造曲線時，側欄上的 {{ui:sketch.showMeasurements}} 按鈕可以隱藏與顯示這些尺寸；捲尺仍可照常使用。在直線上可以點擊尺寸標籤，鍵入以公釐計的長度；[[Enter]] 套用，[[Esc]] 取消。線條會保持方向，起點留在原處，另一端的線條會跟著移動。若選取的是端點，則該端點移動。[[Alt]]+[[Enter]] 會讓線條以中點為中心向兩側伸長。在曲線上，標籤只顯示長度。
+- **檢視：**用中鍵平移，或按住 [[Shift]] 或 [[Ctrl]] 加右鍵拖曳，與 3D 編輯器一樣。沒有選取任何東西時，[[Ctrl]] 加方向鍵也能平移檢視：每按一次移動畫面的十分之一，同時按 [[Shift]] 則為一半，草圖會依所指的方向移動。[[Home]] 讓整張草圖符合檢視範圍，[[F]] 縮放到選取範圍（沒有選取任何東西時，縮放到整張草圖），[[+]] 和 [[−]] 放大與縮小，與 3D 編輯器一樣。沒有選取任何東西時，雙擊空白處會平移檢視，讓該處移到中間，與 3D 編輯器一樣；設定中的 {{ui:workspace.doubleClickCentersView}} 可關閉此功能。草圖工具列上的 {{ui:camera.tapeTools}} 可量測兩點之間的距離。只要點擊某個東西，草圖就會顯示尺寸：一條線的長度，或某個點上相交各線的長度。當這些尺寸礙事時，例如在塑造曲線時，草圖工具列上的 {{ui:sketch.showMeasurements}} 按鈕可以隱藏與顯示這些尺寸；捲尺仍可照常使用。在直線上可以點擊尺寸標籤，鍵入以公釐計的長度；[[Enter]] 套用，[[Esc]] 取消。線條會保持方向，起點留在原處，另一端的線條會跟著移動。若選取的是端點，則該端點移動。[[Alt]]+[[Enter]] 會讓線條以中點為中心向兩側伸長。在曲線上，標籤只顯示長度。
 
 只有**閉合**的輪廓才能生成實體。
 
@@ -52,7 +52,7 @@ summary: 畫出平面輪廓，為角點做圓角或倒角，再將它擠出或�
 
 移動一個點會改變三個角度：該點本身，以及它兩條線遠端相鄰的兩個角。因此 layerling 也會顯示那兩個角，每一個都可以點擊並鍵入。這樣一來，就能在選取會隨之移動的左上點時，把左下角設成例如 75.5°。這裡也能做運算，例如「90-14.5」。
 
-曲線與角點相接處，或超過兩條線交會的角點，不會顯示角度。側欄上的 {{ui:sketch.showMeasurements}} 按鈕會連同長度一起隱藏角度。
+曲線與角點相接處，或超過兩條線交會的角點，不會顯示角度。草圖工具列上的 {{ui:sketch.showMeasurements}} 按鈕會連同長度一起隱藏角度。
 
 ## 圓角與倒角
 
@@ -113,7 +113,7 @@ summary: 畫出平面輪廓，為角點做圓角或倒角，再將它擠出或�
 
 ## 以描邊建構
 
-通常，閉合輪廓內部的區域會成為實體。用 {{ui:sketch.group.finish}} 區段中的 {{ui:sketch.stroke}}，改成建構線條本身，寬度由你設定。在面板中勾選 {{ui:sketch.strokeOn}}；草圖會立刻顯示結果。
+通常，閉合輪廓內部的區域會成為實體。用 {{ui:sketch.group.finish}} 區段中的 {{ui:sketch.stroke}}，改成建構線條本身，寬度由你設定。在描邊視窗中勾選 {{ui:sketch.strokeOn}}；草圖會立刻顯示結果。
 
 - **閉合輪廓**會變成一個邊框。{{ui:sketch.strokeAlign}} 說明壁落在哪裡：{{ui:sketch.strokeAlign.center}} 在畫出的線上，{{ui:sketch.strokeAlign.inside}} 在其內側，{{ui:sketch.strokeAlign.outside}} 在其外側。外側對齊在留公差時很方便：畫出孔的輪廓，例如燕尾，給它 0.2 mm 的外側描邊，就能得到列印所需的間隙。
 - **開放線條**會變成一條條帶，以線為中心。{{ui:sketch.strokeCap}} 決定端點樣式：{{ui:sketch.strokeCap.flat}}、{{ui:sketch.strokeCap.square}}（長出半個寬度）或 {{ui:sketch.strokeCap.round}}。
@@ -125,9 +125,9 @@ summary: 畫出平面輪廓，為角點做圓角或倒角，再將它擠出或�
 
 ## 填色與剪影
 
-不用開啟草圖也能設定描邊：在草圖實體的屬性中，於 {{ui:prop.sketchFill}} 下選擇 {{ui:prop.sketchFill.area}}、{{ui:prop.sketchFill.outside}}、{{ui:prop.sketchFill.inside}} 或 {{ui:prop.sketchFill.center}}，並設定 {{ui:prop.sketchLineWidth}} 和 {{ui:sketch.strokeJoin}}。實體會立刻在原地重建。這些對應 Tinkercad 匯入 SVG 的填色模式：預設、外線和內線。{{ui:prop.sketchFill.grow}} 會保持區域填滿，並向四周擴展一個線寬，角可以是尖角、圓角或斜角：這是多色列印時標誌下方的一層底色，單靠外側描邊只會得到一個環。{{ui:prop.sketchFill.shrink}} 則相反：區域保持填滿，邊緣向四周內縮一個線寬，孔也算在內（孔會變大）。在同一張草圖的副本上兩者都用，可以做配合：孔保持畫出的尺寸，穿過它的零件用 {{ui:prop.sketchFill.shrink}} 縮 0.5 mm，或者在同一輪廓切出的形狀裡做一層壁。寬度超過輪廓允許的範圍就什麼都不剩。在草圖的描邊面板中，這兩個選項位於 {{ui:sketch.strokeAlign}} 下。
+不用開啟草圖也能設定描邊：在草圖實體的屬性中，於 {{ui:prop.sketchFill}} 下選擇 {{ui:prop.sketchFill.area}}、{{ui:prop.sketchFill.outside}}、{{ui:prop.sketchFill.inside}} 或 {{ui:prop.sketchFill.center}}，並設定 {{ui:prop.sketchLineWidth}} 和 {{ui:sketch.strokeJoin}}。實體會立刻在原地重建。這些對應 Tinkercad 匯入 SVG 的填色模式：預設、外線和內線。{{ui:prop.sketchFill.grow}} 會保持區域填滿，並向四周擴展一個線寬，角可以是尖角、圓角或斜角：這是多色列印時標誌下方的一層底色，單靠外側描邊只會得到一個環。{{ui:prop.sketchFill.shrink}} 則相反：區域保持填滿，邊緣向四周內縮一個線寬，孔也算在內（孔會變大）。在同一張草圖的副本上兩者都用，可以做配合：孔保持畫出的尺寸，穿過它的零件用 {{ui:prop.sketchFill.shrink}} 縮 0.5 mm，或者在同一輪廓切出的形狀裡做一層壁。寬度超過輪廓允許的範圍就什麼都不剩。在草圖的描邊視窗中，這兩個選項位於 {{ui:sketch.strokeAlign}} 下。
 
-{{ui:prop.sketchSilhouette}} 會略過所有位於其他輪廓內部的輪廓：孔以及孔裡的東西。只保留外側輪廓。與 {{ui:prop.sketchFill.outside}} 一起，就能做出餅乾壓模：把同一個 SVG 匯入兩次，一次用剪影作為底部的面，一次用剪影加上外側 1 到 2 mm 的描邊作為壁。在草圖模式下，這個開關也在 {{ui:sketch.stroke}} 面板裡。
+{{ui:prop.sketchSilhouette}} 會略過所有位於其他輪廓內部的輪廓：孔以及孔裡的東西。只保留外側輪廓。與 {{ui:prop.sketchFill.outside}} 一起，就能做出餅乾壓模：把同一個 SVG 匯入兩次，一次用剪影作為底部的面，一次用剪影加上外側 1 到 2 mm 的描邊作為壁。在草圖模式下，這個開關也在 {{ui:sketch.stroke}} 視窗裡。
 
 實體重建時，邊上的圓角和倒角會消失，與編輯草圖時一樣。
 

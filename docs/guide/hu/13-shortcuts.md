@@ -16,7 +16,7 @@ Az ablak tetején lévő mező a listában keres: csak azokat a billentyűparanc
 Nem találsz egy eszközt? Nyomd meg a [[Ctrl]]+[[K]] billentyűt, vagy kattints a {{ui:editor.group.help}} területen lévő nagyítóra, majd gépeld be, amit keresel: egy eszközt („lekerekítés”, „tükrözés”), egy alakzatot („henger”) vagy egy parancsot („exportálás”, „visszavonás”). A nyílbillentyűkkel mozogj, és nyomj [[Enter]] billentyűt, vagy kattints a bejegyzésre.
 
 - A kereső a magyar, az angol és a német szót is érti, és figyelmen kívül hagyja a kis- és nagybetűket és az ékezeteket: a „kiuregeles” megtalálja a {{ui:editor.tool.hollow}} parancsot.
-- Minden bejegyzés mutatja az ugyanezt végző billentyűket és az eszköztárnak azt a területét, ahol található, így megtanulod, hol van.
+- Minden bejegyzés mutatja az ugyanezt végző billentyűket és a szalagnak azt a csoportját, ahol található, így megtanulod, hol van.
 - A szürkén megjelenő bejegyzések éppen nem futtathatók, többnyire azért, mert semmi sincs kijelölve. A listában maradnak, így a kereső akkor is megmondja, hol van az eszköz.
 
 Az útmutatónak, amelyet olvasol, szintén van keresőmezője, minden oldal tetején: gépelj be egy-két szót, és felsorolja azokat a részeket, amelyek mindegyiket tartalmazzák, kiemelve az egyező szavakat. Kattints egyre, vagy nyomj [[Enter]] billentyűt az elsőhöz, és egyenesen oda ugrasz. A megnyíló oldal kiemeli a szavaid minden előfordulását, és a kiválasztott rész első találatához görget; az [[Esc]] vagy egy kattintás a kiemelésre eltünteti őket.

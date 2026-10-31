@@ -18,7 +18,7 @@ Avec la souris :
 
 La vitesse de zoom de la molette se règle avec {{ui:workspace.zoomSpeed}} dans les paramètres, sous {{ui:workspace.appearance}} : un curseur de 1 à 14, réglé sur 5 au départ ; au-dessus de 10, seule la molette devient plus rapide.
 
-Sur une tablette ou un téléphone, deux doigts zooment (écartent et pincent) et déplacent la vue (glissent ensemble). Un doigt travaille sur le design, tout comme le bouton gauche de la souris. Pour faire pivoter avec un doigt, activez {{ui:camera.touchRotate}} dans la barre de la caméra. Ce commutateur ne s'affiche que sur les appareils dotés d'un écran tactile.
+Sur une tablette ou un téléphone, deux doigts zooment (écartent et pincent) et déplacent la vue (glissent ensemble). Un doigt travaille sur le design, tout comme le bouton gauche de la souris. Pour faire pivoter avec un doigt, activez {{ui:camera.touchRotate}} dans la barre de vue. Ce commutateur ne s'affiche que sur les appareils dotés d'un écran tactile.
 
 Une tablette graphique avec stylet se comporte comme une souris : la pointe est le bouton gauche, le bouton cylindrique du stylet celui de droite, pour tourner la vue et pour le menu. Les raccourcis clavier de la tablette peuvent être définis dans son pilote sur les [raccourcis clavier] de Layerling (chapter:shortcuts).
 
@@ -64,9 +64,9 @@ Vous pouvez aussi garder quatre vues à vous dans chaque design. [[Shift]]+[[7]]
 - {{ui:camera.sectionMeasure}} mesure directement sur la coupe : le contour apparaît en bleu, et deux clics dessus donnent la distance, plus ses parties selon les deux axes du plan. Les deux points s'accrochent au contour, les coins en premier. Lorsque le deuxième clic atterrit n'importe où sur le mur opposé, il s'aligne sur le premier point - vous pouvez ainsi lire l'épaisseur du mur, les espaces et le dégagement sans viser exactement. Un troisième clic démarre la mesure suivante, [[Esc]] termine la mesure. Le déplacement de l'avion efface la mesure. Sur un contour rond, par exemple la coupe d'un cylindre ou d'un trou, une petite croix marque le centre, et le centre s'accroche aussi. Cliquez un point du cercle, puis approchez-vous du point opposé : le second clic tombe exactement en face, à travers le centre, et le nombre est précédé de Ø, c'est le diamètre. Du centre à un point du cercle, vous lisez R, le rayon.
 - {{ui:camera.sectionExportSvg}} enregistre les contours sur le plan de coupe au format SVG au 1:1, pour un laser, un traceur, un gabarit ou un joint. Une coupe en X est vue de droite, une coupe en Y de face, une coupe en Z de dessus. Comme lors de l'exportation, seuls les corps visibles entrent, les trous sont déjà supprimés et les corps de la même couleur sont réunis en un seul contour. Chaque couleur conserve son propre chemin sans remplissage, de sorte que le logiciel laser les sépare sous forme de calques.
 
-Le panneau s'accroche à son bouton. S'il recouvre quelque chose, faites-le glisser par sa barre de titre n'importe où sur le plan de travail ; il y ouvrira la prochaine fois aussi. Double-cliquez sur la barre de titre ou déposez-la sur le bouton pour la remettre en place.
+La fenêtre d'outil s'accroche à son bouton. S'il recouvre quelque chose, faites-le glisser par sa barre de titre n'importe où sur le plan de travail ; il y ouvrira la prochaine fois aussi. Double-cliquez sur la barre de titre ou déposez-la sur le bouton pour la remettre en place.
 
-[[Esc]] ferme le panneau ; la coupe reste jusqu'à ce que vous l'éteigniez ou reveniez à l'aperçu du design. Lorsqu'il est allumé, son bouton reste en surbrillance. Tout ce que vous placez sur le côté coupé ne s'affiche qu'une fois que vous avez désactivé la coupure.
+[[Esc]] ferme la fenêtre ; la coupe reste jusqu'à ce que vous l'éteigniez ou reveniez à l'aperçu du design. Lorsqu'il est allumé, son bouton reste en surbrillance. Tout ce que vous placez sur le côté coupé ne s'affiche qu'une fois que vous avez désactivé la coupure.
 
 ## Le plan de travail
 
@@ -80,7 +80,7 @@ Cliquez plutôt sur la plaque vide et le plan de travail repose à plat à l'end
 
 Sur une face, l'origine du plan de travail s'accroche autrement à la grille. Cliquez près d’un coin du visage et il se place exactement sur ce coin. Près d'un bord, il repose sur le bord et la grille s'aligne avec lui ; c’est ainsi que l’on choisit volontairement l’angle de la grille. Sans coin ni bord, la grille sur une face couchée est parallèle au corps, donc sur une boîte tournée, elle est tournée avec lui.
 
-Un clic à côté de la plaque ou [[Esc]] ramène le plan de travail à la plaque de base. {{ui:camera.resetWorkplane}} est encore plus rapide : le bouton avec la flèche vers le bas se trouve dans la barre de la caméra sous l'œil tandis que le plan de travail se trouve sur un visage. [[Shift]]+[[W]] le place directement sur la face actuellement sélectionnée. [[Alt]]+[[W]] le ramène sur la plaque de base à tout moment, qu'il y ait une sélection ou non. Si vous maintenez [[Shift]] tout en cliquant, le plan pointe dans l'autre sens.
+Un clic à côté de la plaque ou [[Esc]] ramène le plan de travail à la plaque de base. {{ui:camera.resetWorkplane}} est encore plus rapide : le bouton avec la flèche vers le bas se trouve dans la barre de vue sous l'œil tandis que le plan de travail se trouve sur un visage. [[Shift]]+[[W]] le place directement sur la face actuellement sélectionnée. [[Alt]]+[[W]] le ramène sur la plaque de base à tout moment, qu'il y ait une sélection ou non. Si vous maintenez [[Shift]] tout en cliquant, le plan pointe dans l'autre sens.
 
 Lorsqu'un plan de travail repose sur une face, un œil apparaît à côté de {{ui:camera.placeWorkplane}}. Il masque le plan de travail sans le faire tomber, pour une vision claire du design : de nouvelles formes se posent toujours sur cette face, et la rotation tourne toujours autour d'elle. Un clic sur l'œil le montre à nouveau, tout comme la définition d'un nouveau plan de travail.
 

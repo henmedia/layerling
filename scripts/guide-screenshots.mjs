@@ -115,6 +115,8 @@ async function run(language, port) {
       }
       // The status pill keeps the last message of the bridge; it is not part of what a reader should look at.
       await evaluate(`document.head.insertAdjacentHTML("beforeend", "<style>.editor-status{display:none !important}</style>"); true`);
+      // The dev server compiles parts of the page on demand, which can look like a mixed version to the page; no reader sees that notice.
+      await evaluate(`document.head.insertAdjacentHTML("beforeend", "<style>.new-version-notice{display:none !important}</style>"); true`);
     },
     async mcp(action, params = {}) {
       const editorNumber = ownEditor;

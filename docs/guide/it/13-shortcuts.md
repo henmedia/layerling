@@ -16,7 +16,7 @@ La casella in cima alla finestra cerca nell’elenco: tiene solo le scorciatoie 
 Non trovi uno strumento? Premi [[Ctrl]]+[[K]] oppure fai clic sulla lente d’ingrandimento nell’area {{ui:editor.group.help}}, poi digita ciò che cerchi: uno strumento («raccordo», «specchia»), una forma («cilindro») o un comando («esporta», «annulla»). Spostati con i tasti freccia e premi [[Enter]], oppure fai clic sul risultato.
 
 - La ricerca riconosce sia il termine inglese sia quello tedesco e non distingue maiuscole e dieresi: «aushoehlen» trova {{ui:editor.tool.hollow}}.
-- Ogni risultato mostra i tasti che eseguono la stessa operazione e l’area della barra degli strumenti in cui si trova, così puoi imparare dove cercarlo.
+- Ogni risultato mostra i tasti che eseguono la stessa operazione e il gruppo della barra degli strumenti in cui si trova, così puoi imparare dove cercarlo.
 - Le voci disattivate non sono disponibili in quel momento, spesso perché non hai selezionato nulla. Restano nell’elenco, così la ricerca ti indica comunque dove si trova lo strumento.
 
 Anche la guida che stai leggendo ha una casella di ricerca in cima a ogni pagina: digita una o due parole e verranno elencate le sezioni che le contengono tutte, con i termini corrispondenti evidenziati. Fai clic su una sezione oppure premi [[Enter]] per aprire la prima. La pagina che si apre evidenzia ogni punto in cui compaiono le tue parole e scorre fino al primo in quella sezione; [[Esc]] o un clic su un'evidenziazione le rimuove.

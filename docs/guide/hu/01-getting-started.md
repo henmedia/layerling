@@ -17,12 +17,15 @@ A terveid később előnézeti képpel jelennek meg a kezdőlapon. A böngésző
 
 ## A szerkesztő egy pillantással
 
-![A szerkesztő két alakzattal a munkasíkon. Felül a szalag, balra a nézetsáv, jobbra a kijelölt alakzat beállításai.](shot:editor-overview)
+![A szerkesztő megnevezett részeivel: felül a szalag, balra a nézetkocka és alatta a nézetsáv, mellettük az állapotüzenet és az objektumlista, jobbra a kijelölt alakzat tulajdonságai.](shot:editor-areas)
 
-- **Felül** van a szalag. Feladatok szerint van rendezve: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} és {{ui:editor.group.help}}. Ha egy ikon fölé viszed az egeret, látod a nevét. Ahol egy kis kérdőjelet látsz, például egy alakzat beállításainál, az alakzattárban vagy az eszközpaneleken, az egyenesen ennek az útmutatónak a megfelelő fejezetéhez visz.
+- **Felül** van a szalag. Feladatok szerint van rendezve: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} és {{ui:editor.group.help}}. Ha egy ikon fölé viszed az egeret, látod a nevét. Ahol egy kis kérdőjelet látsz, például egy alakzat beállításainál, az alakzattárban vagy az eszközablakokban, az egyenesen ennek az útmutatónak a megfelelő fejezetéhez visz.
 - **Középen** van a munkasík. Itt helyezed el az alakzatokat, itt alakítod őket, és itt látod az eredményt.
-- **Jobbra** jelennek meg a kijelölt alakzat beállításai: szín, méretek, helyzet és minden, ami még az alakzathoz tartozik. A számok begépelése pontosabb, mint a húzás.
+- **Jobbra** jelennek meg a kijelölt alakzat **tulajdonságai**: szín, méretek, helyzet és minden, ami még az alakzathoz tartozik. A számok begépelése pontosabb, mint a húzás.
 - **Balra** van a nézetsáv, fölötte a nézetkocka. Ezekkel mozogsz a jelenetben, bővebben a [Nézet és munkasík](chapter:view-and-workplane) fejezetben.
+- **A nézetsáv mellett** nyílik meg az **objektumlista** ([[Ctrl]]+[[U]]) a terv összes alakzatával. Bővebben a [Kijelölés és elrendezés](chapter:select-and-arrange) fejezetben.
+- **A nézetkockától jobbra** jelenik meg az **állapotüzenet**, ha a layerlingnek mondanivalója van, például hogy mit vár tőled egy eszköz. Ha nincs mit mondani, nincs ott.
+- Az **eszközablakok** a munkasík fölött nyílnak meg, amikor elindítasz egy eszközt, például: {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} vagy {{ui:editor.tool.hollow}}. A címsoruknál fogva félrehúzhatod őket, ha eltakarnak valamit.
 - **Legfelül** váltasz a {{ui:editor.modeGeometry}} és a {{ui:editor.modeSketch}} között, itt nevezed át a tervet, és itt választod ki a nyelvet és a színsémát.
 
 ## A munkaterület körüli gombok

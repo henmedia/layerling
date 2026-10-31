@@ -73,9 +73,9 @@ Du kan også gemme fire af dine egne visninger i hvert design. [[Shift]]+[[7]], 
 - På et rundt omrids, som et snit gennem en cylinder eller et hul, markerer et lille kryds centrumet, og centrumet snapper også. Klik på et punkt på cirklen, og gå så tæt på det modsatte punkt: det andet klik lander lige over for centrumet, og tallet læses Ø, diameteren. Fra centrumet til et punkt på cirklen får du R, radiusen.
 - {{ui:camera.sectionExportSvg}} gemmer omridsene på skæreplanet som en SVG i 1:1, til en laser, en plotter, en skabelon eller en pakning. Et X-snit ses fra højre, et Y-snit forfra, et Z-snit oppefra. Som i eksporten kommer kun synlige former med, huller er allerede taget af, og former med samme farve samles til ét omrids. Hver farve forbliver sin egen sti uden fyld, så lasersoftware holder dem adskilt som lag.
 
-Panelet hænger på sin knap. Hvis det dækker noget, så træk det i dets titellinje hvor som helst på arbejdsplanet; det åbner dér næste gang også. Dobbeltklik på titellinjen eller slip det ved knappen for at sætte det tilbage.
+Værktøjsvinduet hænger på sin knap. Hvis det dækker noget, så træk det i dets titellinje hvor som helst på arbejdsplanet; det åbner dér næste gang også. Dobbeltklik på titellinjen eller slip det ved knappen for at sætte det tilbage.
 
-X og [[Esc]] lukker panelet; med en måling i gang afslutter [[Esc]] den først. Snittet bliver, indtil du slår det fra med {{ui:camera.sectionActive}} eller går tilbage til designoversigten. En tablet har ingen [[Esc]], så der har panelet to knapper mere: {{ui:camera.sectionBack}} afslutter målingen, hvis en kører, og lukker ellers panelet, og {{ui:camera.sectionConfirm}} lukker panelet i ét skridt. En computer viser dem ikke.
+X og [[Esc]] lukker vinduet; med en måling i gang afslutter [[Esc]] den først. Snittet bliver, indtil du slår det fra med {{ui:camera.sectionActive}} eller går tilbage til designoversigten. En tablet har ingen [[Esc]], så der har vinduet to knapper mere: {{ui:camera.sectionBack}} afslutter målingen, hvis en kører, og lukker ellers vinduet, og {{ui:camera.sectionConfirm}} lukker vinduet i ét skridt. En computer viser dem ikke.
 
 ## Arbejdsplanet
 

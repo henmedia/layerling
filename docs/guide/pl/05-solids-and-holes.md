@@ -65,7 +65,7 @@ Przejście jest dokładną bryłą CAD, a narzędzia krawędzi i eksport STEP bi
 
 ## Wycinanie jednej bryły z drugiej
 
-Przy częściach, które mają do siebie pasować, wał w tulei albo śruba w obudowie, robisz jedną część i wycinasz ją z drugiej. Zaznacz obie bryły i kliknij {{ui:editor.tool.cutOut}} w obszarze {{ui:editor.group.combine}} albo kliknij prawym przyciskiem i wybierz to tam. Panel podaje część, która zostaje, i bryłę, która dostaje wnękę; layerling bierze mniejszą za część, a {{ui:cutOut.swap}} to odwraca. {{ui:cutOut.clearance}} powiększa wnękę wokół części o tyle: 0 pasuje dokładnie, 0,2 mm to zwykły luz dla wydrukowanego pasowania. {{ui:cutOut.apply}} wycina kopię części z drugiej bryły i zostawia samą część tam, gdzie jest. Wynikiem jest grupa: {{ui:editor.tool.ungroup}} znów rozdziela wycięcie. Luz wymaga, żeby część była dokładną bryłą, jak przy narzędziu {{ui:editor.tool.offset}}, którego to używa.
+Przy częściach, które mają do siebie pasować, wał w tulei albo śruba w obudowie, robisz jedną część i wycinasz ją z drugiej. Zaznacz obie bryły i kliknij {{ui:editor.tool.cutOut}} w obszarze {{ui:editor.group.combine}} albo kliknij prawym przyciskiem i wybierz to tam. Okno podaje część, która zostaje, i bryłę, która dostaje wnękę; layerling bierze mniejszą za część, a {{ui:cutOut.swap}} to odwraca. {{ui:cutOut.clearance}} powiększa wnękę wokół części o tyle: 0 pasuje dokładnie, 0,2 mm to zwykły luz dla wydrukowanego pasowania. {{ui:cutOut.apply}} wycina kopię części z drugiej bryły i zostawia samą część tam, gdzie jest. Wynikiem jest grupa: {{ui:editor.tool.ungroup}} znów rozdziela wycięcie. Luz wymaga, żeby część była dokładną bryłą, jak przy narzędziu {{ui:editor.tool.offset}}, którego to używa.
 
 ## Edycja grupy
 

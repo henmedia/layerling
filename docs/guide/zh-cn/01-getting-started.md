@@ -17,12 +17,15 @@ layerling 是一款直接在浏览器里运行的 3D 打印设计程序。你用
 
 ## 编辑器一览
 
-![编辑器的工作平面上有两个形状。上方是功能区，左侧是视图栏，右侧是所选形状的设置。](shot:editor-overview)
+![标注了各区域的编辑器：上方是功能区，左侧是视图立方体，其下是视图栏，旁边是状态消息和对象列表，右侧是所选形状的属性。](shot:editor-areas)
 
-- **上方**是功能区。它按任务分类：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}}、{{ui:editor.group.file}} 和 {{ui:editor.group.help}}。把鼠标停在图标上就能看到名称。凡是看到小问号的地方，比如形状的设置里、形状库中或工具面板里，它都会直接带你到本指南对应的章节。
+- **上方**是功能区。它按任务分类：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}}、{{ui:editor.group.file}} 和 {{ui:editor.group.help}}。把鼠标停在图标上就能看到名称。凡是看到小问号的地方，比如形状的设置里、形状库中或工具窗口里，它都会直接带你到本指南对应的章节。
 - **中间**是工作平面。你在这里放置形状、把它们拉成想要的形状，并看到结果。
-- **右侧**显示所选形状的设置：颜色、尺寸、位置以及组成该形状的其他内容。输入数字比拖动更精确。
+- **右侧**显示所选形状的**属性**：颜色、尺寸、位置以及组成该形状的其他内容。输入数字比拖动更精确。
 - **左侧**是视图栏，上方是视图立方体。它们带你在这个场景中移动，详见[视图与工作平面](chapter:view-and-workplane)。
+- **视图栏旁边**会打开**对象列表**（[[Ctrl]]+[[U]]），列出设计中的所有形状。详见[选择与排列](chapter:select-and-arrange)。
+- **视图立方体右侧**会出现**状态消息**，在 layerling 有话要告诉你时显示，比如某个工具正等着你做什么。没有要说的，它就不出现。
+- 启动 {{ui:editor.tool.fillet}}、{{ui:editor.tool.array}} 或 {{ui:editor.tool.hollow}} 等工具时，**工具窗口**会在工作平面上方打开。挡住内容时，拖动标题栏把它移开。
 - **最上方**可以在 {{ui:editor.modeGeometry}} 与 {{ui:editor.modeSketch}} 之间切换、重命名设计，以及选择语言和配色方案。
 
 ## 工作区周围的按钮

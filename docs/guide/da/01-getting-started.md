@@ -18,12 +18,15 @@ Men sikkerhedskopiér dine designs ind imellem: en browser kan fejle, og en brow
 
 ## Editoren overblik
 
-![Editoren med to former på arbejdsplanet. Båndet øverst, visningsbjælken til venstre, indstillingerne for den valgte form til højre.](shot:editor-overview)
+![Editoren med navngivne områder: båndet øverst, visningskuben til venstre med visningsbjælken under, ved siden af statusbeskeden og objektlisten, egenskaberne for den valgte form til højre.](shot:editor-areas)
 
-- **Øverst** er båndet. Det er sorteret efter opgave: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} og {{ui:editor.group.help}}. Hold musen over et ikon for at se dets navn. Hvor du ser et lille spørgsmålstegn, for eksempel i en forms indstillinger, i formbiblioteket eller i værktøjspanelerne, fører det direkte til det tilsvarende kapitel i denne vejledning.
+- **Øverst** er båndet. Det er sorteret efter opgave: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} og {{ui:editor.group.help}}. Hold musen over et ikon for at se dets navn. Hvor du ser et lille spørgsmålstegn, for eksempel i en forms indstillinger, i formbiblioteket eller i værktøjsvinduerne, fører det direkte til det tilsvarende kapitel i denne vejledning.
 - **I midten** ligger arbejdsplanet. Det er her du placerer former, trækker dem i form og ser resultatet.
-- **Til højre** vises indstillingerne for den valgte form: farve, dimensioner, position og hvad ellers der udgør formen. At taste tal er mere nøjagtigt end at trække.
+- **Til højre** vises **egenskaberne** for den valgte form: farve, dimensioner, position og hvad ellers der udgør formen. At taste tal er mere nøjagtigt end at trække.
 - **Til venstre** er visningsbjælken med visningskuben over den. De flytter dig rundt i scenen, mere i [Visning og arbejdsplan](chapter:view-and-workplane).
+- **Ved siden af visningsbjælken** åbner **objektlisten** ([[Ctrl]]+[[U]]) med alle designets former. Mere i [Valg og arrangering](chapter:select-and-arrange).
+- **Til højre for visningskuben** vises **statusbeskeden**, når layerling har noget at fortælle dig, for eksempel hvad et værktøj venter på. Når der ikke er noget at sige, er den der ikke.
+- **Værktøjsvinduer** åbner over arbejdsplanet, når du starter et værktøj som {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} eller {{ui:editor.tool.hollow}}. Træk dem til side i titellinjen, når de dækker noget.
 - **Øverst oppe** skifter du mellem {{ui:editor.modeGeometry}} og {{ui:editor.modeSketch}}, omdøber designet og vælger sprog og farveskema.
 
 ## Knapperne rundt om arbejdsområdet

@@ -183,7 +183,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 {{ui:surfaceTexture.bark}} 在原木上包一层树皮：{{ui:surfaceTexture.barkOak}}、{{ui:surfaceTexture.barkPine}}、{{ui:surfaceTexture.barkSpruce}}、{{ui:surfaceTexture.barkBirch}} 或 {{ui:surfaceTexture.barkBeech}}，各有自己的大小和深度。{{ui:surfaceTexture.wood}} 把实体变成一块木头：在 {{ui:inspector.surfaceWoodType}} 下选橡木、白蜡木、山毛榉、松木或胡桃木，在 {{ui:inspector.surfaceWoodCut}} 下选去皮原木或木板，弦切带拱形花纹，径切则是直纹。{{ui:inspector.surfaceRingWidth}} 让木纹细或粗。选 {{ui:inspector.surfaceEndRings}} 时，原木两端显示年轮，并与侧面的木纹对得上：年轮像真木头一样贯穿整个实体。在 {{ui:inspector.more}} 下添加 {{ui:inspector.surfaceWoodKnots}}，年轮会绕着它们弯曲。
 
-用 {{ui:surfaceTexture.text}} 图案可以像压贴标签一样把文字贴到实体上：表面在该位置周围展开，所以字母在花瓶的鼓肚上、在斜壁上或跨过盒子的棱边时都保持大小。“环绕”（0° 是正面，90° 是右侧）和沿轴的“高度”（%）决定位置；轴设在 X 或 Y 时，0° 是顶部，这样文字就落在平板上。{{ui:inspector.surfaceDirection}} 让文字刻入或凸起。遇到真正的尖角时，它会像贴纸一样撕开；状态栏会提示。{{ui:prop.textVertical}} 在这里同样让字母从上到下排列。
+用 {{ui:surfaceTexture.text}} 图案可以像压贴标签一样把文字贴到实体上：表面在该位置周围展开，所以字母在花瓶的鼓肚上、在斜壁上或跨过盒子的棱边时都保持大小。“环绕”（0° 是正面，90° 是右侧）和沿轴的“高度”（%）决定位置；轴设在 X 或 Y 时，0° 是顶部，这样文字就落在平板上。{{ui:inspector.surfaceDirection}} 让文字刻入或凸起。遇到真正的尖角时，它会像贴纸一样撕开；状态消息会提示。{{ui:prop.textVertical}} 在这里同样让字母从上到下排列。
 
 要让实体的一部分保持光滑，或只给一部分加纹理，请用辅助实体：把盒子、圆柱或球放到相应位置，选中它，在 {{ui:inspector.surfaceMask}} 下选 {{ui:surfaceTexture.maskExclude}} 或 {{ui:surfaceTexture.maskOnly}}。它会变成透明，在另一个实体生成纹理时起作用，隐藏时也一样。打印前请隐藏或删除它。
 

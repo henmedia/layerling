@@ -14,11 +14,11 @@ Scherpe randen zien er op een geprint onderdeel zelden goed uit, en sterk zijn z
 
 ![Het gereedschap "Randen afronden": alle scherpe randen zijn geselecteerd, het beeld toont het voorbeeld met een straal van 4 mm.](shot:fillet-preview)
 
-Het paneel staat rechtsboven. Bedekt het randen waarop je wilt klikken, sleep het dan aan de titelbalk weg; de volgende keer opent het daar ook, net als {{ui:editor.tool.hollow}} en {{ui:editor.tool.array}}. Dubbelklik op de titelbalk om het terug te zetten.
+Het gereedschapsvenster staat rechtsboven. Bedekt het randen waarop je wilt klikken, sleep het dan aan de titelbalk weg; de volgende keer opent het daar ook, net als {{ui:editor.tool.hollow}} en {{ui:editor.tool.array}}. Dubbelklik op de titelbalk om het terug te zetten.
 
-Kies je een vorm uit de vormenlijst terwijl het paneel open is, dan sluit het zonder iets toe te passen, en de randen waarop je had geklikt worden vergeten. De klik plaatst dan de nieuwe vorm in plaats van randen te kiezen.
+Kies je een vorm uit de vormenlijst terwijl het venster open is, dan sluit het zonder iets toe te passen, en de randen waarop je had geklikt worden vergeten. De klik plaatst dan de nieuwe vorm in plaats van randen te kiezen.
 
-In het paneel vind je:
+In het venster vind je:
 
 - {{ui:edge.allSharpEdges}} selecteert alle randen tegelijk, {{ui:edge.clear}} maakt de selectie leeg.
 - **{{ui:edge.radius}}** voor de afronding. Voor de afschuining stel je {{ui:edge.distance}} of {{ui:edge.angle}} in.
@@ -27,13 +27,13 @@ In het paneel vind je:
 - {{ui:edge.bottomEdges}} kiest alleen de randen helemaal onderaan het lichaam, het tegenstuk van {{ui:edge.topEdges}}. Zo rond je snel alleen de voet van een onderdeel af of geef je die een afschuining.
 - {{ui:edge.chamfillet}}, bovenaan het afschuinvenster naast {{ui:editor.tool.chamfer}} gekozen, maakt de printbare voet van een onderdeel: een afschuining bij de plaat die tangentieel overgaat in een afronding naar de wand, zodat de eerste lagen geen steun nodig hebben en de rand toch zacht eindigt. {{ui:edge.distance}} is de hoogte die de voet inneemt, {{ui:edge.angle}} (15° tot 75°) de steilte van de afschuining bij de plaat. De randen kies je met {{ui:edge.bottomEdges}}.
 - {{ui:edge.onlyVisibleEdges}} verbergt de randen die vanuit jouw kijkrichting achter het lichaam liggen. Standaard schijnt elke rand door het lichaam heen, wat bij een druk onderdeel verwarrend wordt; met de schakelaar aan zie je, en klik je, alleen de randen die naar je toe wijzen. Draai het beeld om bij de andere te komen. Een rand die rood getekend is (zie hieronder) is altijd zichtbaar.
-- {{ui:edge.tangentChains}}: een klik kiest dan ook randen die vloeiend in elkaar overlopen, bijvoorbeeld alle randen rond een vlak met afgeronde hoeken. De schakelaar bepaalt alleen wat een klik kiest: de CAD-kernel zet een afschuining of afronding altijd door langs zulke vloeiend doorlopende randen. Het paneel meldt langs hoeveel randen extra dat gebeurt.
+- {{ui:edge.tangentChains}}: een klik kiest dan ook randen die vloeiend in elkaar overlopen, bijvoorbeeld alle randen rond een vlak met afgeronde hoeken. De schakelaar bepaalt alleen wat een klik kiest: de CAD-kernel zet een afschuining of afronding altijd door langs zulke vloeiend doorlopende randen. Het venster meldt langs hoeveel randen extra dat gebeurt.
 - {{ui:edge.keepSize}} houdt de afschuining of afronding even groot, ook als je het lichaam later schaalt.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} of {{ui:edge.fine}}) bepaalt hoe fijn het voorbeeld wordt berekend. Voor lastige onderdelen is {{ui:edge.draft}} sneller.
 
 Terwijl je de maat aanpast, berekent layerling het voorbeeld opnieuw. Dat kan even duren. Je mag gewoon doorgaan met aanpassen; de laatste waarde die je kiest wordt berekend.
 
-Is de maat te groot voor de rand, dan meldt layerling dat en stelt een kleinere waarde voor. Vaak volstaat een of twee millimeter minder. Bij scherpe hoeken heeft een afronding meer ruimte nodig dan zijn straal doet vermoeden. Op een klein scherm scrollt het paneel vanzelf omlaag zodat de melding in beeld komt.
+Is de maat te groot voor de rand, dan meldt layerling dat en stelt een kleinere waarde voor. Vaak volstaat een of twee millimeter minder. Bij scherpe hoeken heeft een afronding meer ruimte nodig dan zijn straal doet vermoeden. Op een klein scherm scrollt het venster vanzelf omlaag zodat de melding in beeld komt.
 
 Mislukt een selectie die eerst werkte nadat je op nog een rand hebt geklikt, dan wordt die rand rood en breder getekend: dat is de rand die bij deze maat niet samen met de andere kan worden bewerkt. Klik er nog een keer op om hem eruit te halen, of maak de maat kleiner. Klik je meer randen aan terwijl de melding staat, dan blijft de eerste rood. Is er geen eerdere selectie die werkte, bij de allereerste klik of een maat die je net hebt verhoogd, dan worden de randen rood die ook op zichzelf mislukken, of allemaal als het alleen aan hun combinatie ligt.
 
@@ -43,7 +43,7 @@ Ook een gat neemt {{ui:editor.tool.chamfer}} en {{ui:editor.tool.fillet}} aan, n
 
 ### Een randbewerking terugdraaien
 
-Een bewerkt lichaam kun je altijd opnieuw bewerken. Selecteer het weer en open het gereedschap; Afronden, Afschuinen en Uithollen tonen allemaal de lijst: onder {{ui:edge.featureHistory}} zie je wat er al op zit. {{ui:edge.revertAction}} draait één bewerking terug. Let op: liggen er nieuwere bewerkingen bovenop, dan gaan die mee, en het paneel meldt hoeveel.
+Een bewerkt lichaam kun je altijd opnieuw bewerken. Selecteer het weer en open het gereedschap; Afronden, Afschuinen en Uithollen tonen allemaal de lijst: onder {{ui:edge.featureHistory}} zie je wat er al op zit. {{ui:edge.revertAction}} draait één bewerking terug. Let op: liggen er nieuwere bewerkingen bovenop, dan gaan die mee, en het venster meldt hoeveel.
 
 Naast een afschuining, een afronding of een uitholling staat ook {{ui:edge.editAction}}. Dat draait de bewerking op dezelfde manier terug, maar opent het gereedschap meteen opnieuw met dezelfde randen en de oude waarde. Je past de waarde aan en past hem opnieuw toe: een afronding van 3 mm wordt er een van 5 mm zonder dat je de randen nog eens hoeft aan te klikken. Liggen er nieuwere bewerkingen bovenop, dan gaan die ook hier mee. Dit geldt voor randbewerkingen die je vanaf nu maakt; oudere bieden alleen terugdraaien aan, net als losse onderdelen van een groep.
 
@@ -59,11 +59,11 @@ Dozen, bekers, behuizingen en deksels hebben één ding gemeen: ze zijn vanbinne
 
 1. Selecteer het lichaam en klik op {{ui:editor.tool.hollow}}, of klik met de rechtermuisknop op het lichaam en kies het in het menu.
 2. Stel de {{ui:shell.wall}} in.
-3. Zet onder {{ui:shell.openings}} de zijden aan die open blijven: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} of {{ui:shell.side.right}}, zoveel als je wilt. {{ui:shell.side.front}} alleen maakt een sleuf voor een lade, {{ui:shell.side.left}} en {{ui:shell.side.right}} een tunnel. Staat er geen zijde aan, dan blijft het lichaam rondom dicht, met een holte in het midden. {{ui:shell.side.closed}} zet alle zijden in één klik uit. {{ui:shell.side.top}} staat al aan als het paneel opent; een klik erop sluit de bovenkant weer. Een lichaam dat rondom dicht is, ziet er van buiten onveranderd uit: de doorsnedeweergave toont de holte.
+3. Zet onder {{ui:shell.openings}} de zijden aan die open blijven: {{ui:shell.side.top}}, {{ui:shell.side.bottom}}, {{ui:shell.side.front}}, {{ui:shell.side.back}}, {{ui:shell.side.left}} of {{ui:shell.side.right}}, zoveel als je wilt. {{ui:shell.side.front}} alleen maakt een sleuf voor een lade, {{ui:shell.side.left}} en {{ui:shell.side.right}} een tunnel. Staat er geen zijde aan, dan blijft het lichaam rondom dicht, met een holte in het midden. {{ui:shell.side.closed}} zet alle zijden in één klik uit. {{ui:shell.side.top}} staat al aan als het venster opent; een klik erop sluit de bovenkant weer. Een lichaam dat rondom dicht is, ziet er van buiten onveranderd uit: de doorsnedeweergave toont de holte.
 4. Bepaal of de {{ui:shell.edges}} {{ui:shell.edges.round}} of {{ui:shell.edges.sharp}} moeten zijn.
 5. Klik op {{ui:shell.apply}}.
 
-![Het uithollingspaneel met wanddikte, een schakelaar voor elke zijde die open blijft, en de binnenranden.](shot:hollow-panel)
+![Het uithollingsvenster met wanddikte, een schakelaar voor elke zijde die open blijft, en de binnenranden.](shot:hollow-panel)
 
 De wanden groeien naar binnen. De buitenkant blijft zoals hij is.
 
@@ -108,7 +108,7 @@ Elk vlak van een lichaam kan over dezelfde afstand naar buiten of naar binnen wo
 
 Vink {{ui:offset.sideways}} aan als alleen de omtrek moet groeien of krimpen: de zijkanten schuiven de afstand op, terwijl elke vlakke boven- en onderkant op zijn hoogte blijft. Een bord krijgt rondom een rand, een sokkel wordt breder en het lichaam wordt niet hoger. Bij een getrapt lichaam houdt elke trede zijn eigen hoogte. Een tekst die via zijn omtrekken wordt verschoven, houdt dan ook zijn hoogte.
 
-Zonder vinkje wordt het lichaam zelf verschoven. Het wordt een vast exact lichaam, zoals na een afschuining: de lijst bovenin het paneel neemt de offset terug en {{ui:edge.editAction}} opent het gereedschap opnieuw met de oude afstand. Alleen exacte CAD-lichamen kunnen worden verschoven - blokken, cilinders en de andere vormen, groepen daarvan, geïmporteerde STEP-onderdelen. Een lichaam dat alleen een driehoeksnet is, zoals veel STL-imports, lukt vaak niet. Een afstand die te groot is voor het lichaam, bijvoorbeeld verkleinen voorbij de dunste wand, wordt geweigerd.
+Zonder vinkje wordt het lichaam zelf verschoven. Het wordt een vast exact lichaam, zoals na een afschuining: de lijst bovenin het venster neemt de offset terug en {{ui:edge.editAction}} opent het gereedschap opnieuw met de oude afstand. Alleen exacte CAD-lichamen kunnen worden verschoven - blokken, cilinders en de andere vormen, groepen daarvan, geïmporteerde STEP-onderdelen. Een lichaam dat alleen een driehoeksnet is, zoals veel STL-imports, lukt vaak niet. Een afstand die te groot is voor het lichaam, bijvoorbeeld verkleinen voorbij de dunste wand, wordt geweigerd.
 
 ## Vlakken verwijderen
 
