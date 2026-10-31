@@ -524,6 +524,8 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         hingeScrewCountersink: shape.hingeScrewCountersink,
         hingeCornerRadius: shape.hingeCornerRadius,
         hingeLeafStyle: shape.hingeLeafStyle,
+        hingeScrewHead: shape.hingeScrewHead,
+        hingeNutWidth: shape.hingeNutWidth,
         sides: shape.sides,
       });
       break;
