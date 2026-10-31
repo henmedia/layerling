@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Section panel stays in view (Discussion #1101):** The section view hangs from its button and opens upwards; with the camera bar moved far up (or a low window) its title bar, with the close button, lay above the work area. Then the panel now opens lower down, so the title bar is in view. It is not remembered: the next time it opens at its usual place if there is room.
+
 ## 1.129.1
 
 - **Trace with curves and corners, the object, picked areas, Cut away and a magnetic lasso (Discussion #1060):** Trace in a reference image's settings takes the place of Dark/Light, Threshold and Trace outline: the outlines come as cubic curves and corners with a number of points you set (`pictureTrace.ts`, fitted after Schneider on `rasterTrace`'s outline), shown in red over the picture before Apply, with Corner from, Leave out specks and Keep holes. Object takes everything that stands out from the background at the picture's edge as one outline; Pick areas outlines a patch of like colour as a hole or construction line; Cut away removes a part by clicked corners; the magnetic lasso follows the picture's edges between clicks (Sobel edges, Dijkstra). Outlines that would cross are fitted more closely. The vase drawing gets Trace with threshold, points, corners and the lasso. Nothing new is stored. Guide chapters 3 and 7 and the texts in every fully kept language. By @marcus040473 in #1095.
