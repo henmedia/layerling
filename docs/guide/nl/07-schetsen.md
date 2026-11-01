@@ -159,6 +159,10 @@ Voor een foto – een speelgoedtrein op een witte tafel bijvoorbeeld – kies je
 
 De boom naast een huis, een figuur voor een drukke achtergrond – waar geen kleur de vorm van de rest scheidt, vangt de **{{ui:sketch.traceLasso}}** hem: klik grofweg langs de rand, en tussen twee klikken volgt de lijn zelf de rand, ook door bochten; terwijl je beweegt, toont het voorbeeld al waar hij zal lopen. Een klik op het eerste punt, een dubbelklik of [[Enter]] sluit hem, [[Esc]] gooit hem weg. In de lijst staat hij als ‘Lasso 1’, met de keuze {{ui:sketch.traceRegionAdd}} (het vlak komt bij de vorm) of {{ui:sketch.traceTrim}} (het wordt weggenomen); elke snede heeft dezelfde keuze. Onder {{ui:sketch.tracePart}} maakt **{{ui:sketch.traceLassoOnly}}** alleen wat je zo vangt tot de vorm – verder niets van de afbeelding.
 
+![Een getekend huis overgetrokken als object, de drempel verlaagd voor de lichte muur: de magnetische lasso heeft de boom weggesneden, en de acht ruiten zijn als gaten gekozen.](shot:trace-house)
+
+![Het huis als lichaam: zonder de boom, de ramen doorgesneden.](shot:trace-house-body)
+
 ## Toetsen in de schetsmodus
 
 | Toets | Werking |

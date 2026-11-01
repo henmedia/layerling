@@ -159,6 +159,10 @@ Za fotografijo – na primer igračo na beli mizi – izberi pod {{ui:sketch.tra
 
 Drevo ob hiši, figura pred nemirnim ozadjem – kjer nobena barva ne loči oblike od ostalega, jo ujame **{{ui:sketch.traceLasso}}**: klikaj približno ob njenem robu, in med dvema klikoma črta sama sledi robu, tudi v lokih; že med premikanjem predogled pokaže, kod bo tekla. Klik na prvo točko, dvoklik ali [[Enter]] jo zapre, [[Esc]] jo zavrže. Na seznamu je kot »Laso 1«, z izbiro {{ui:sketch.traceRegionAdd}} (ploskev se pridruži obliki) ali {{ui:sketch.traceTrim}} (odvzeta je); enako izbiro ima vsak rez. Pod {{ui:sketch.tracePart}} naredi **{{ui:sketch.traceLassoOnly}}** obliko le iz tega, kar tako ujameš – nič drugega s slike.
 
+![Narisana hiša, obrisana kot predmet, prag znižan zaradi svetle stene: magnetni laso je odrezal drevo, osem šip je izbranih kot luknje.](shot:trace-house)
+
+![Hiša kot telo: brez drevesa, okna prerezana skozi.](shot:trace-house-body)
+
 ## Tipke v skicirnem načinu
 
 | Tipka | Učinek |

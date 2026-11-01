@@ -160,6 +160,10 @@ Til et foto – fx et legetøjstog på et hvidt bord – vælger du under {{ui:s
 
 Træet ved siden af et hus, en figur foran en urolig baggrund – hvor ingen farve skiller formen fra resten, fanger **{{ui:sketch.traceLasso}}** den: klik groft langs dens kant, og mellem to klik følger linjen selv kanten, også rundt i buer; mens du bevæger dig, viser forhåndsvisningen allerede, hvor den vil løbe. Et klik på det første punkt, et dobbeltklik eller [[Enter]] lukker den, [[Esc]] kasserer den. På listen står den som „Lasso 1“ med valget {{ui:sketch.traceRegionAdd}} (fladen kommer med i formen) eller {{ui:sketch.traceTrim}} (den tages væk); hvert snit har samme valg. Under {{ui:sketch.tracePart}} gør **{{ui:sketch.traceLassoOnly}}** kun det, du fanger på den måde, til formen – intet andet af billedet.
 
+![Et tegnet hus optegnet som objekt, tærsklen sænket for den lyse væg: den magnetiske lasso har skåret træet væk, og de otte ruder er valgt som huller.](shot:trace-house)
+
+![Huset som legeme: uden træet, vinduerne skåret igennem.](shot:trace-house-body)
+
 ## Taster i skitsetilstand
 
 | Taste | Virkning |

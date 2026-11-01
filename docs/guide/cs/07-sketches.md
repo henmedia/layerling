@@ -157,6 +157,10 @@ Pro fotku – třeba hračky na bílém stole – zvol v {{ui:sketch.tracePart}}
 
 Strom vedle domu, postava před neklidným pozadím – kde žádná barva neoddělí tvar od zbytku, chytí ho **{{ui:sketch.traceLasso}}**: klikej zhruba podél jeho hrany a mezi dvěma kliky čára sama sleduje hranu, i v obloucích; už při pohybu ukazuje náhled, kudy povede. Klik na první bod, dvojklik nebo [[Enter]] ji uzavře, [[Esc]] ji zahodí. V seznamu je jako „Laso 1“ s volbou {{ui:sketch.traceRegionAdd}} (plocha se přidá k tvaru) nebo {{ui:sketch.traceTrim}} (odebere se); stejnou volbu má každý řez. V {{ui:sketch.tracePart}} udělá **{{ui:sketch.traceLassoOnly}}** tvar jen z toho, co takto chytíš – nic jiného z obrázku.
 
+![Nakreslený dům obkreslený jako objekt, práh snížený kvůli světlé zdi: magnetické laso odřízlo strom a osm okenních tabulek je vybráno jako otvory.](shot:trace-house)
+
+![Dům jako těleso: bez stromu, okna proříznutá skrz.](shot:trace-house-body)
+
 ## Klávesy v náčrtu
 
 | Klávesa | Význam |
