@@ -96,6 +96,10 @@ Ensuite tu règles l'{{ui:lid.thickness}}, l'{{ui:lid.fit}} (le {{ui:lid.gap}} e
 
 > **Astuce :** Le serrage d'un couvercle dépend de l'imprimante. Imprime d'abord une petite boîte avec son couvercle ; s'il est trop serré, prends l'ajustement suivant, plus lâche.
 
+Coche {{ui:lid.magnets}} et quatre aimants ronds tiennent le couvercle au lieu d'un ajustement serré. Choisis un {{ui:lid.magnetSize}} (6 × 2, 8 × 3 ou 10 × 3 mm) ou règle toi-même le {{ui:lid.magnetDiameter}} et la {{ui:lid.magnetHeight}}, ainsi que le {{ui:lid.magnetGap}} : 0,1 mm pour insérer les aimants en force, 0,2 à 0,3 mm pour les coller. Layerling creuse une cavité dans chaque coin du bord du corps et une autre en face dans la plaque du couvercle, un peu plus profonde que l'aimant, pour qu'il ne dépasse jamais. Là où la paroi est trop fine pour une cavité, un pilier remplit le coin du fond jusqu'au bord, et la lèvre du couvercle le contourne. Le corps est groupé avec ses cavités et ses piliers : dégroupe-le et tu le retrouves tel qu'il était. La plaque doit faire au moins la hauteur de l'aimant plus 0,8 mm ; activer les aimants lui donne cette épaisseur.
+
+> **Astuce :** Insère d'abord les aimants dans le corps. Pose ensuite un autre aimant sur chacun d'eux, où il s'accroche dans le bon sens, et appuie le couvercle dessus (avec une goutte de colle dans ses cavités s'ils ont du jeu) : chaque aimant entre dans le couvercle face à son partenaire, et ils s'attirent.
+
 ## Décaler des corps
 
 Chaque face d'un corps peut être déplacée de la même distance, vers l'extérieur ou l'intérieur. C'est ce qu'il faut pour un ajustement, un couvercle ou un assemblage à clip : un jeu de 0,1 à 0,3 mm tout autour, les éléments restant à leur place, ce que la mise à l'échelle ne donne pas.

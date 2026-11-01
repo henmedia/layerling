@@ -98,6 +98,10 @@ Then you set the {{ui:lid.thickness}}, the {{ui:lid.fit}} (the {{ui:lid.gap}} be
 
 > **Tip:** How tight a lid sits depends on the printer. Print a small box with its lid first; if the lid is too tight, take the next looser fit.
 
+Tick {{ui:lid.magnets}} and the lid holds by four round magnets instead of a tight fit. Pick a {{ui:lid.magnetSize}} (6 × 2, 8 × 3 or 10 × 3 mm) or set its {{ui:lid.magnetDiameter}} and {{ui:lid.magnetHeight}}, and the {{ui:lid.magnetGap}}: 0.1 mm to press the magnets in, 0.2 to 0.3 mm to glue them. Layerling cuts a pocket into each corner of the body's rim and one facing it into the lid's plate, a little deeper than the magnet, so it never stands proud. Where the wall is too thin for a pocket, a post fills the corner from the bottom up to the rim, and the lid's lip goes round it. The body is grouped with its pockets and posts: ungroup it and you have it back as it was. The plate must be at least the magnet's height plus 0.8 mm thick; switching the magnets on makes it so.
+
+> **Tip:** Press the magnets into the body first. Then set one more magnet on each of them, where it snaps on the right way round, and press the lid down onto them (with a drop of glue in its pockets if they are loose): each magnet goes into the lid facing its partner, so they attract.
+
 ## Offsetting bodies
 
 Every face of a body can be moved by the same distance, out or in. That is what a press fit, a lid or a snap joint needs: a gap of 0.1 to 0.3 mm all round while the features stay where they are, which scaling cannot give you.

@@ -817,7 +817,7 @@ export const tools = [
   },
   {
     name: "layerling_make_lid",
-    description: "Make a lid for a body that is open at the top, like the editor's Lid button (#1009): a box hollowed with its top open, a pot, a tray. Solids among the ids are joined and holes among them cut away; the body is cut just below its rim, and the lid follows that outline and the opening inside it, round or angular. `type`: `plug` (default) a plate as large as the body with a lip below it that goes into the opening, `cap` a plate a wall wider than the body with a rim below it that goes over the outside, `both` the lip and the rim together, so the body's wall sits in a groove between them (#1062), `flat` only the plate. Sizes in mm: `thickness` of the plate (2), `gap` per side between lid and body (0.2; 0.1 tight, 0.3 loose, up to 1), `depth` how far the lip or rim reaches down (4), `wall` its thickness (1.6). The lid is a new mesh beside the body, turned over with its plate down, ready to print; the body stays. A body without an opening at the top is refused for all but flat (hollow it with `layerling_hollow_object` and the top open first).",
+    description: "Make a lid for a body that is open at the top, like the editor's Lid button (#1009): a box hollowed with its top open, a pot, a tray. Solids among the ids are joined and holes among them cut away; the body is cut just below its rim, and the lid follows that outline and the opening inside it, round or angular. `type`: `plug` (default) a plate as large as the body with a lip below it that goes into the opening, `cap` a plate a wall wider than the body with a rim below it that goes over the outside, `both` the lip and the rim together, so the body's wall sits in a groove between them (#1062), `flat` only the plate. Sizes in mm: `thickness` of the plate (2), `gap` per side between lid and body (0.2; 0.1 tight, 0.3 loose, up to 1), `depth` how far the lip or rim reaches down (4), `wall` its thickness (1.6). The lid is a new mesh beside the body, turned over with its plate down, ready to print; the body stays. A body without an opening at the top is refused for all but flat (hollow it with `layerling_hollow_object` and the top open first). `magnets: true` holds the lid by four round magnets in the corners: a pocket for each in the body's rim and one facing it in the lid's plate, `magnetDiameter` by `magnetHeight` (6 by 2; 8 by 3 and 10 by 3 are common too), with `magnetGap` of play per side (0.1 to press them in, more to glue them, up to 0.5). A wall too thin for a pocket gets a post in that corner, which the lip goes round. The plate must be at least the magnet's height plus 0.8 mm thick (2.8 for 6 by 2). With magnets the body changes: it is grouped with the pockets (and the posts), keeping its name, and returned as `body`; `magnets` is the number of pockets and `posts` whether posts were needed.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["ids"],
@@ -829,6 +829,10 @@ export const tools = [
         gap: { type: "number" },
         depth: { type: "number" },
         wall: { type: "number" },
+        magnets: { type: "boolean" },
+        magnetDiameter: { type: "number" },
+        magnetHeight: { type: "number" },
+        magnetGap: { type: "number" },
       },
     },
   },

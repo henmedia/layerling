@@ -96,6 +96,10 @@ Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom
 
 > **Namig:** Kako tesno sede pokrov, je odvisno od tiskalnika. Najprej natisni majhno škatlo s pokrovom; če je pretesen, izberi naslednji ohlapnejši ujem.
 
+Ko vklopiš {{ui:lid.magnets}}, pokrov držijo štirje okrogli magneti namesto tesnega ujema. Izberi {{ui:lid.magnetSize}} (6 × 2, 8 × 3 ali 10 × 3 mm) ali sam nastavi {{ui:lid.magnetDiameter}} in {{ui:lid.magnetHeight}}, poleg tega pa še {{ui:lid.magnetGap}}: 0,1 mm, da magnete vtisneš, 0,2 do 0,3 mm, da jih zalepiš. Layerling izreže žep v vsak kot roba telesa in nasproti še enega v ploščo pokrova, malo globlje od magneta, da nikoli ne štrli ven. Kjer je stena za žep pretanka, kot od dna do roba zapolni steber, ustnica pokrova pa gre okoli njega. Telo se združi s svojimi žepi in stebri: ko skupino razdružiš, ga imaš spet takšnega, kot je bilo. Plošča mora biti debela vsaj za višino magneta in še 0,8 mm; ko magnete vklopiš, se tako odebeli.
+
+> **Namig:** Najprej vtisni magnete v telo. Nato na vsakega postavi še en magnet, ki se nanj sam obrne prav, in nanje pritisni pokrov (s kapljico lepila v žepih, če so ohlapni): tako gre vsak magnet v pokrov nasproti svojemu paru in se privlačita.
+
 ## Odmik teles
 
 Vsako ploskev telesa lahko premakneš za isto razdaljo navzven ali navznoter. To potrebuje nasedanje, pokrov ali zaskočni spoj: reža 0,1 do 0,3 mm naokrog, medtem ko značilnosti ostanejo na mestu, česar spreminjanje merila ne zmore.

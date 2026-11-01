@@ -22,7 +22,7 @@ import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerText
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { LID_DEFAULTS, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { LID_DEFAULTS, groupedWithMagnets, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
 import { cookieCutterFillets, cookieCutterProfiles, normalizeCookieCutterOptions, outlineFromCurves, outlineFromLoops, sampledCurveLoop, unitedFootprint, type CookieCutterOptions, type CurveLoop } from "@/lib/cookieCutter";
 import type { IconLayerPatch, IconTagControls, ReferenceImageControls, TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import { calibratedReferenceImage, dataUrlByteLength, isReferenceImage, LARGE_REFERENCE_IMAGE_BYTES, mirrorHidesReferenceImage, referenceImageOpacity, referenceImagePixelDistance, referenceImageShape } from "@/lib/referenceImage";
@@ -7714,7 +7714,9 @@ export function LayerlingEditor({
 
   /**
    * A lid for the selection (#1009): the solids joined and the holes among them cut away, then a lid made for the
-   * opening at the top and laid beside them, turned over, ready to print. The bodies stay. The same code the MCP action uses.
+   * opening at the top and laid beside them, turned over, ready to print. The bodies stay; with magnets they are
+   * grouped with the pockets (and the posts for thin corners), as Cut out does, so they stay editable inside the group.
+   * The same code the MCP action uses.
    */
   const makeLid = useCallback(async (given?: Partial<Record<keyof LidOptions, unknown>>, only?: readonly WorkplaneShape[]) => {
     const fail = (message: string) => {
@@ -7724,17 +7726,31 @@ export function LayerlingEditor({
     const targets = (only ?? selectedShapes).filter((shape) => !isNonSolidShape(shape));
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
     const options = normalizeLidOptions(given);
+    // The pockets go into the body, so it must be free to change and one body.
+    if (options.magnets && targets.some((shape) => shape.locked)) return fail(t("status.objectLocked"));
+    if (options.magnets && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
     const sourceProjectId = projectInfoRef.current.projectId;
+    const changed = () => projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint;
     setNotice(t("lid.working"), true);
     const result = await lidForShapesOffThread(targets, options);
     if (!result.lid) return fail(result.error);
-    if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
-      return fail(t("lid.error.changed"));
-    }
+    if (changed()) return fail(t("lid.error.changed"));
     const lid = result.lid;
-    commitShapes([...shapesRef.current, lid], lid.id, t("status.lidMade", { type: t(`lid.type.${options.type}`) }));
-    return { ok: true as const, id: lid.id, type: options.type };
+    const type = t(`lid.type.${options.type}`);
+    if (!result.magnets) {
+      commitShapes([...shapesRef.current, lid], lid.id, t("status.lidMade", { type }));
+      return { ok: true as const, id: lid.id, type: options.type };
+    }
+    const { posts, pockets } = result.magnets;
+    const grouped = await groupedWithMagnets(targets, result.magnets, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
+    if (changed()) return fail(t("lid.error.changed"));
+    if (!grouped.group) return fail(grouped.failureNotice || t("lid.error.magnetsKernel"));
+    const body = canonicalizeShape({ ...grouped.group, groupOperation: "group", name: targets.find((shape) => !shape.hole)?.name ?? grouped.group.name });
+    const consumed = new Set(targets.map((shape) => shape.id));
+    const remaining = shapesRef.current.filter((shape) => !consumed.has(shape.id));
+    commitShapes([...remaining, body, lid], lid.id, withClosedHolesNote(t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: pockets.length }), grouped.closedHoles));
+    return { ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: pockets.length, posts: posts.length > 0 };
   }, [commitShapes, selectedShapes]);
 
   const startLidTool = useCallback(() => {
@@ -7759,9 +7775,9 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    void makeLid({ type, thickness, gap, depth, wall }, targets).then((result) => {
+    void makeLid({ type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
     });
@@ -11483,10 +11499,22 @@ export function LayerlingEditor({
         const ids = new Set(mcpStringArray(params.ids));
         const targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the body to make a lid for");
-        const result = await makeLid({ type: params.type, thickness: params.thickness, gap: params.gap, depth: params.depth, wall: params.wall }, targets);
+        const result = await makeLid({
+          type: params.type,
+          thickness: params.thickness,
+          gap: params.gap,
+          depth: params.depth,
+          wall: params.wall,
+          magnets: params.magnets,
+          magnetDiameter: params.magnetDiameter,
+          magnetHeight: params.magnetHeight,
+          magnetGap: params.magnetGap,
+        }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
-        return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type };
+        if (!("bodyId" in result)) return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type };
+        const body = currentShapes().find((shape) => shape.id === result.bodyId);
+        return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, body: body ? mcpShapeSummary(body) : { id: result.bodyId }, magnets: result.magnets, posts: result.posts };
       }
 
       if (command.action === "loft_sketches") {
