@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.131.1
+
 - **Dragging with the right button no longer ends the line on a Mac (#776):** A right click ends a chain of line or smooth-line points. The context menu event that did this comes with the press on macOS and with the release on Windows, so on a Mac the chain ended as the right button went down, also for a pan with Shift and the right button, and the next point started a new line. The chain now ends on the release of the right button, and only if the pointer did not move (`endChainOnRightRelease` in `SketchWorkspace.tsx`). Found from the code, not tried on a Mac. Reported by @stefaanl.
 - **The camera's glide ends as quickly on a slow computer (Discussion #1143):** After a drag, the view glides on for a moment and slows down. The camera controls braked it by a fixed share per drawn frame, so on a computer that draws few frames a pan, zoomed in, followed the mouse late and glided on for 5 to 10 seconds. The braking now goes by the time since the last frame (`timedCameraDamping` in `cameraInertia.ts`, in the 3D view and the second view): on a 60 Hz screen it is the same as before, on a slower one the glide ends after the same short moment. Unit tests in `cameraInertia.test.ts`. Reported by @billdestud.
 - **Gears with more than 150 teeth load again (#1141):** The editor allows up to 500 teeth, but loading a project still stopped at 150, so a saved design with such a gear was refused as a whole and looked lost. Loading and the gear defaults now take the editor's own limits. Unit test in `gearTeethProject.test.ts`. Reported by @Elkniwt.
