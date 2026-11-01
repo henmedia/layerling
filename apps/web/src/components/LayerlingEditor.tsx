@@ -102,7 +102,7 @@ import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle, overhangArea } from "@/
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
 import { matchingEdgeIds } from "@/lib/edgeMatching";
-import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
+import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
@@ -3357,13 +3357,13 @@ export function LayerlingEditor({
         setEdgeModifier((current) => {
           if (!current) return current;
           // Judged here and not on the ref: the answer can come before the session is drawn.
-          const presetEdgeIds = preset && current.kind === preset.kind ? preset.edgeIds.filter((edgeId) => existingEdgeIds.has(edgeId)) : [];
+          const { edgeIds: presetEdgeIds, values: presetValues } = cadModifierPresetValues(preset, current.kind, existingEdgeIds);
           return {
             ...current,
             edges: message.edges,
             sharpAngle: gesenkteSchwelle ?? current.sharpAngle,
             selectedEdgeIds: presetEdgeIds,
-            ...(preset && presetEdgeIds.length ? { amount: preset.amount, chamferAngle: preset.chamferAngle, endAmount: preset.endAmount ?? null } : {}),
+            ...(presetValues ?? {}),
             busy: presetEdgeIds.length > 0,
             prepared: true,
             preview: null,
