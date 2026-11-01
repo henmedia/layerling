@@ -578,7 +578,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
           : fallbackEntry?.threadRole;
       entry.threadHead = source.threadHead === undefined
         ? fallbackEntry?.threadHead
-        : ["cylinder", "countersunk", "hex"].includes(source.threadHead)
+        : ["cylinder", "countersunk", "hex", "square", "flange", "wing", "knob"].includes(source.threadHead)
           ? source.threadHead
           : fallbackEntry?.threadHead;
       entry.threadHand = source.threadHand === undefined
