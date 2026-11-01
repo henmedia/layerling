@@ -1257,6 +1257,11 @@ export type WorkplaneShape = {
    */
   surfaceTexture?: import("@/lib/surfaceTexture").SurfaceTextureSettings;
   /**
+   * More patterns on the same body, each on the faces it picked (the first, surfaceTexture, takes the faces left over
+   * when it picks none): made one after the other on the body under the texture, changed and taken off with it.
+   */
+  surfaceTextureLayers?: import("@/lib/surfaceTexture").SurfaceTextureSettings[];
+  /**
    * A helper for another body's surface texture: where this convex body reaches into it, the
    * texture stays away ("exclude") or goes only there ("only"). It counts when that body gets its
    * texture, also while this one is hidden.

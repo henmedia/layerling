@@ -192,7 +192,7 @@ import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGE
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { canChangeSurfaceTexture, canTextureSurface, offersSurfaceTexture, offersSurfaceTextureMask, sceneWithSurfaceBody, shapeUnderSurfaceTexture, surfaceTextureEntry, surfaceTextureGoldShape, surfacePatternLabel, surfaceTexturedShape, surfaceTextureInput, surfaceTextureMaskOf, surfaceTextureMasksFor, textureSurfaceOffThread } from "@/lib/surfaceTextureShape";
+import { canChangeSurfaceTexture, canTextureSurface, offersSurfaceTexture, offersSurfaceTextureMask, sceneWithSurfaceBody, shapeUnderSurfaceTexture, surfaceTextureEntry, surfaceTextureGoldShape, surfacePatternLabel, surfaceTexturedShape, surfaceTextureInput, surfaceTextureMaskOf, surfaceTextureMasksFor, surfaceTextureLayersToMake, surfaceTextureLayerPlaced, mergedSurfaceTextureStats, mergedSurfaceTextureFill, textureSurfaceOffThread } from "@/lib/surfaceTextureShape";
 import { normalizeVaseSettings, parseVaseSettingsInput } from "@/lib/vaseSettings";
 import { sceneWithVaseAccessories, vaseAccessoryKindName, vaseAccessoryName, vaseShapePatch } from "@/lib/vaseShape";
 import { screenAlignedNudge } from "@/lib/keyboardNudge";
@@ -9702,7 +9702,7 @@ export function LayerlingEditor({
    * Lays a surface texture onto the selected body. The texture is computed on its worker; when the
    * body changed meanwhile, the result is for something else and is dropped.
    */
-  const textureSelectedSurface = useCallback(async (settings: SurfaceTextureSettings) => {
+  const textureSelectedSurface = useCallback(async (settings: SurfaceTextureSettings, layers: readonly SurfaceTextureSettings[] = []) => {
     if (selectedShapes.length !== 1 || !selectedShape) {
       setNotice(t("status.selectOneToTexture"));
       return;
@@ -9720,15 +9720,30 @@ export function LayerlingEditor({
     const masks = surfaceTextureMasksFor(source, shapesRef.current);
     let outcome: Awaited<ReturnType<typeof textureSurfaceOffThread>>;
     let used: SurfaceTextureSettings;
+    let usedLayers: SurfaceTextureSettings[] = [];
+    const outcomes: Awaited<ReturnType<typeof textureSurfaceOffThread>>[] = [];
     try {
       // A text's letters are drawn here, where the fonts are, and go to the worker as outlines.
-      const textOutline = settings.pattern === "text" ? await surfaceTextOutline({ content: settings.textContent, font: settings.textFont, size: settings.textSize, vertical: settings.textVertical }) : [];
-      if (settings.pattern === "text" && !textOutline.length) {
+      const withOutline = async (layer: SurfaceTextureSettings) => {
+        const textOutline = layer.pattern === "text" ? await surfaceTextOutline({ content: layer.textContent, font: layer.textFont, size: layer.textSize, vertical: layer.textVertical }) : [];
+        return layer.pattern === "text" && !textOutline.length ? null : { ...layer, masks, textOutline };
+      };
+      const first = await withOutline(settings);
+      const more = await Promise.all(layers.map(withOutline));
+      if (!first || more.some((layer) => !layer)) {
         setNotice(t("status.surfaceNoText"));
         return;
       }
-      used = { ...settings, masks, textOutline };
-      outcome = await textureSurfaceOffThread(surfaceTextureInput(source), used);
+      used = first;
+      usedLayers = more as SurfaceTextureSettings[];
+      // Several layers are made one after the other on the same body, each on the faces it takes (see surfaceTextureLayersToMake).
+      let positions: Float64Array = surfaceTextureInput(source);
+      for (const layer of surfaceTextureLayersToMake(used, usedLayers)) {
+        const made = await textureSurfaceOffThread(positions, layer);
+        outcomes.push(made);
+        positions = made.positions;
+      }
+      outcome = outcomes.length > 1 ? { ...outcomes[outcomes.length - 1], stats: mergedSurfaceTextureStats(outcomes.map((each) => each.stats)), fill: mergedSurfaceTextureFill(outcomes.map((each) => each.fill)) } : outcomes[0];
     } catch (error) {
       setNotice(t("status.surfaceFailed", { error: error instanceof Error ? error.message : String(error) }));
       return;
@@ -9737,7 +9752,7 @@ export function LayerlingEditor({
       setNotice(t("status.surfaceOutdated"));
       return;
     }
-    const textured = outcome.stats.nothing ? null : surfaceTexturedShape(source, outcome.positions, used);
+    const textured = outcome.stats.nothing ? null : surfaceTexturedShape(source, outcome.positions, used, Date.now(), usedLayers);
     if (!textured) {
       setNotice(t("status.surfaceNothing"));
       return;
@@ -9754,7 +9769,8 @@ export function LayerlingEditor({
       return;
     }
     const gold = outcome.fill ? surfaceTextureGoldShape(textured, outcome.fill, `${displayShapeName(textured)} – ${t("surfaceTexture.goldPart")}`) : null;
-    const pattern = surfacePatternLabel(textured.surfaceTexture?.pattern ?? settings.pattern);
+    // Several layers are named together: "Bricks + Knurling".
+    const pattern = [textured.surfaceTexture?.pattern ?? settings.pattern, ...(textured.surfaceTextureLayers ?? []).map((layer) => layer.pattern)].map(surfacePatternLabel).join(" + ");
     const triangles = formatTriangleCount(stats.triangles);
     // The masks are the mask bodies standing now, as for a new texture: one deleted since no longer counts.
     const masksBefore = under ? current.surfaceTexture?.masks.length ?? 0 : 0;
@@ -11689,9 +11705,39 @@ export function LayerlingEditor({
           settings.textOutline = await surfaceTextOutline({ content: settings.textContent, font: settings.textFont, size: settings.textSize, vertical: settings.textVertical });
           if (!settings.textOutline.length) throw new Error("textContent has no letters to write");
         }
-        const outcome = await textureSurfaceOffThread(surfaceTextureInput(source), settings);
+        // More patterns on the same body, each on faces of its own; left out on a textured body, its layers stay.
+        let layerSettings: SurfaceTextureSettings[] = [];
+        if (params.layers !== undefined) {
+          if (!Array.isArray(params.layers)) throw new Error("layers must be a list of settings, each with faces of its own (or a text)");
+          layerSettings = await Promise.all(params.layers.map(async (entry: unknown, index: number) => {
+            if (!entry || typeof entry !== "object") throw new Error(`layers[${index}] must be settings like the first layer's`);
+            const given = entry as Record<string, unknown>;
+            if (given.pattern !== undefined && !SURFACE_TEXTURE_PATTERNS.includes(String(given.pattern) as never)) throw new Error(`layers[${index}].pattern must be one of ${SURFACE_TEXTURE_PATTERNS.join(", ")}`);
+            if (given.faces !== undefined && (!Array.isArray(given.faces) || given.faces.some((face) => (typeof face === "string" ? !(SURFACE_TEXTURE_FACE_NAMES as readonly string[]).includes(face) : !normalizeSurfaceTextureFaces([face]).length)))) {
+              throw new Error(`layers[${index}].faces must be a list of ${SURFACE_TEXTURE_FACE_NAMES.join(", ")}, or faces picked in the editor ({ at, normal })`);
+            }
+            const layer = { ...normalizeSurfaceTexture(given), masks };
+            if (!surfaceTextureLayerPlaced(layer)) throw new Error(`layers[${index}] needs faces of its own (by name or as picked), or a text: without them it would cover the first layer`);
+            if (layer.pattern === "text") {
+              layer.textFont = mcpTextFont(layer.textFont) ?? layer.textFont;
+              layer.textOutline = await surfaceTextOutline({ content: layer.textContent, font: layer.textFont, size: layer.textSize, vertical: layer.textVertical });
+              if (!layer.textOutline.length) throw new Error(`layers[${index}].textContent has no letters to write`);
+            }
+            return layer;
+          }));
+        } else if (under) {
+          layerSettings = (target.surfaceTextureLayers ?? []).map((layer) => ({ ...normalizeSurfaceTexture(layer), masks }));
+        }
+        const outcomes: Awaited<ReturnType<typeof textureSurfaceOffThread>>[] = [];
+        let layerPositions: Float64Array = surfaceTextureInput(source);
+        for (const layer of surfaceTextureLayersToMake(settings, layerSettings)) {
+          const made = await textureSurfaceOffThread(layerPositions, layer);
+          outcomes.push(made);
+          layerPositions = made.positions;
+        }
+        const outcome = outcomes.length > 1 ? { ...outcomes[outcomes.length - 1], stats: mergedSurfaceTextureStats(outcomes.map((each) => each.stats)), fill: mergedSurfaceTextureFill(outcomes.map((each) => each.fill)) } : outcomes[0];
         if (findShape(target.id) !== target) throw new Error("The object changed while the texture was computed; texture it again");
-        const textured = outcome.stats.nothing ? null : surfaceTexturedShape(source, outcome.positions, settings);
+        const textured = outcome.stats.nothing ? null : surfaceTexturedShape(source, outcome.positions, settings, Date.now(), layerSettings);
         if (!textured) throw new Error("No part of this body gets the pattern: check faces, outside and inside, bottomFree and topFree, and zoneFrom and zoneTo");
         if (outcome.stats.cracks && outcome.stats.cracks.lines === 0) throw new Error("No crack found a way across this body: try another crackStart (anywhere goes on any body), more crackLength, or let the pattern reach more faces");
         if (outcome.stats.text && !outcome.stats.text.placed) throw new Error("The text came onto no face that may get it (a mask lies over it): move it with textAround and textHeight, or change the masks");
@@ -11699,7 +11745,7 @@ export function LayerlingEditor({
         commitShapes(
           sceneWithSurfaceBody(currentShapes(), target.id, textured, gold),
           [textured.id],
-          t("status.surfaceTextured", { pattern: surfacePatternLabel(settings.pattern), triangles: formatTriangleCount(outcome.stats.triangles) }),
+          t("status.surfaceTextured", { pattern: [settings.pattern, ...layerSettings.map((layer) => layer.pattern)].map(surfacePatternLabel).join(" + "), triangles: formatTriangleCount(outcome.stats.triangles) }),
         );
         const { triangles, around, spacing, limited, tooDeep, bedClamped, cracks, text, bricks, projection } = outcome.stats;
         // One's own image is told by its size, not its grey values.
@@ -11710,6 +11756,7 @@ export function LayerlingEditor({
           ...(gold ? { gold: mcpShapeSummary(gold) } : {}),
           changed: Boolean(under),
           settings: shown,
+          layers: layerSettings.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length })),
           masks: masks.length,
           texture: { triangles, projection, around, spacing, limited, tooDeep, bedClamped, ...(cracks ? { cracks } : {}), ...(text ? { text } : {}), ...(bricks ? { bricks } : {}) },
         };

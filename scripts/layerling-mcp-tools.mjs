@@ -987,6 +987,11 @@ export const tools = [
           },
           description: "Only these faces of the body get the pattern; the others stay as they are, with few triangles. A face is the region within the body's sharp edges (edgeAngle): a box's side, a cylinder's mantle or its top. By name: top, bottom, front, back, left, right - the face there (on a cylinder the four sides all name its mantle). Faces picked in the editor are kept as { at, normal } and are taken back as they are. An empty list: every face again. Picked faces go before bottomFree, topFree, the height band, outside and inside. Not for text, which goes where it is put.",
         },
+        layers: {
+          type: "array",
+          items: { type: "object" },
+          description: "More patterns on the same body, each on faces of its own: a list of settings like these (pattern, spacing, depth, ...), each with faces (by name or as picked), or a text, which goes where it is put. The settings given above are the first layer; picking no faces, it goes everywhere it may except on the faces the layers take, so each face carries one pattern. The layers are made one after the other on the body under the texture. Left out on a textured body, its layers stay as they were; an empty list takes them off. Example: { pattern: \"bricks\", layers: [{ pattern: \"knurl\", faces: [\"top\"] }] } - brick walls round a box, knurling on its top.",
+        },
         masks: {
           type: "array",
           description: "Helper bodies that keep the texture away (mode exclude) or are the only place it goes (mode only): other boxes, cylinders, spheres, cones or pyramids that reach into the body, by id. Without this list, the bodies marked as texture masks in the design (surfaceTextureMask) that reach into it take part. A mask is a helper: hide or delete it before printing.",

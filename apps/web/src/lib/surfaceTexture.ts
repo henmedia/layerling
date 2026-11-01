@@ -247,6 +247,11 @@ export type SurfaceTextureSettings = {
    * before the top and bottom kept smooth, the walls and the height band.
    */
   faces: SurfaceTextureFace[];
+  /**
+   * The faces other layers of the same body take (see WorkplaneShape.surfaceTextureLayers): a layer that picks no faces
+   * of its own goes everywhere the settings above allow except there, so each face carries one pattern.
+   */
+  exceptFaces: SurfaceTextureFace[];
   /** Cracks: style, where they begin and how many. */
   crackStyle: SurfaceTextureCrackStyle;
   crackStart: SurfaceTextureCrackStart;
@@ -350,6 +355,7 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   detail: "medium",
   masks: [],
   faces: [],
+  exceptFaces: [],
   crackStyle: "crack",
   crackStart: "top",
   crackCount: 5,
@@ -562,6 +568,8 @@ export function normalizeSurfaceTexture(input: unknown): SurfaceTextureSettings 
   if (out.pattern === "wood" && source.ringWidth === undefined) out.ringWidth = WOOD_RINGS[out.woodType];
   out.masks = normalizeSurfaceTextureMasks(source.masks);
   out.faces = normalizeSurfaceTextureFaces(source.faces);
+  // Faces left to other layers count only for a layer that picks none of its own.
+  out.exceptFaces = out.faces.length ? [] : normalizeSurfaceTextureFaces(source.exceptFaces);
   out.textOutline = normalizeSurfaceTextOutline(source.textOutline);
   return out;
 }
@@ -3954,6 +3962,16 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     chosenCache = { key, chosen };
     return chosen;
   }
+  let exceptCache: { key: string; except: Uint8Array | null } | null = null;
+  /** Per input triangle whether another layer takes it (see SurfaceTextureSettings.exceptFaces); null: none. */
+  function exceptedFaces(s: SurfaceTextureSettings) {
+    if (s.faces.length || !s.exceptFaces.length) return null;
+    const key = JSON.stringify([s.exceptFaces, s.edgeAngle]);
+    if (exceptCache?.key === key) return exceptCache.except;
+    const except = surfaceTextureChosenTriangles(base, s.exceptFaces, s.edgeAngle);
+    exceptCache = { key, except };
+    return except;
+  }
   let fadeCache: { key: string; state: RefinedState } | null = null;
   // Per input triangle what kind of face it is round the axis (see pointKindsFor), by axis.
   const faceKinds = new Map<number, Uint8Array>();
@@ -4285,7 +4303,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const ax = AXIS_INDEX[s.axis];
     const [i1, i2] = acrossAxes(s.axis);
     const key = JSON.stringify([s.crackStyle, s.crackStart, s.crackCount, s.crackLength, s.crackWidth, s.crackBranch, s.crackJag, s.crackRough, s.crackSeed, s.axis,
-      s.bottomFree, s.topFree, s.inside, s.outside, s.zoneFrom, s.zoneTo, s.masks, s.faces, layout.center]);
+      s.bottomFree, s.topFree, s.inside, s.outside, s.zoneFrom, s.zoneTo, s.masks, s.faces, s.exceptFaces, layout.center]);
     if (crackCache?.key === key) return crackCache.net;
     crackIndex ??= surfaceIndex(base);
     const N = crackIndex.normals;
@@ -4293,11 +4311,13 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const cosBottom = Math.cos((s.bottomFree * Math.PI) / 180), cosTop = Math.cos((s.topFree * Math.PI) / 180);
     const zFrom = base.min[2] + (s.zoneFrom / 100) * (base.size[2] || 1), zTo = base.min[2] + (s.zoneTo / 100) * (base.size[2] || 1);
     const chosen = chosenFaces(s);
+    const except = exceptedFaces(s);
     const allowed = (t: number, q: number[]) => {
       const nz = N[t * 3 + 2];
       if (chosen) {
         if (!chosen[t]) return false;
-      } else if ((s.bottomFree > 0 && -nz >= cosBottom) || (s.topFree > 0 && nz >= cosTop)) return false;
+      } else if (except?.[t]) return false;
+      else if ((s.bottomFree > 0 && -nz >= cosBottom) || (s.topFree > 0 && nz >= cosTop)) return false;
       if (q[2] < zFrom - 1e-9 || q[2] > zTo + 1e-9) return false;
       if ((!s.outside || !s.inside) && Math.hypot(N[t * 3 + i1], N[t * 3 + i2]) >= 0.5) {
         const r1 = q[i1] - layout.center[0], r2 = q[i2] - layout.center[1];
@@ -4374,14 +4394,16 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const points = new Uint8Array(v.length / 3).fill(1);
     const faces = new Uint8Array(I.length / 3);
     const chosen = chosenFaces(s);
+    const except = exceptedFaces(s);
     for (let t = 0; t < I.length; t += 3) {
       const [x, y, z] = faceCross(v, I[t], I[t + 1], I[t + 2]);
       const l = Math.hypot(x, y, z);
       if (l === 0) continue;
       const fn = [x / l, y / l, z / l];
       let smooth = false;
-      // Picked faces go before the top and bottom kept smooth and the walls.
+      // Picked faces go before the top and bottom kept smooth and the walls; faces another layer takes stay smooth.
       if (chosen) smooth = !chosen[t / 3];
+      else if (except?.[t / 3]) smooth = true;
       else if (s.bottomFree > 0 && -fn[2] >= cosBottom) smooth = true;
       else if (s.topFree > 0 && fn[2] >= cosTop) smooth = true;
       else if ((!s.outside || !s.inside) && Math.hypot(fn[i1], fn[i2]) >= 0.5) {
@@ -4497,7 +4519,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         : JSON.stringify([s.pattern, s.spacing, s.width, s.profile, s.projection, s.axis, layout.cell, layout.period, layout.angle, layout.radius, layout.center, s.faceTurn, Boolean(layout.flatCaps), s.capStyle, layout.capEdge ?? null, layout.rims ?? null, patternExtras(s, layout)]);
     // A raised pattern round an outline's corners is cut along arcs as deep as the pattern stands out (cornerCuts).
     const cornerReach = s.projection === "cylinder" && layout.outline?.corners.length && standsOut(s) ? Math.max(1, s.depth) : 0;
-    const key = `${edge.toFixed(5)}|${smoothKey}|${JSON.stringify(s.faces)}|${maxTriangles}|${s.edgeAngle}|${s.detail}|${scale}|${cornerReach}|${layoutKey}`;
+    const key = `${edge.toFixed(5)}|${smoothKey}|${JSON.stringify(s.faces)}|${JSON.stringify(s.exceptFaces)}|${maxTriangles}|${s.edgeAngle}|${s.detail}|${scale}|${cornerReach}|${layoutKey}`;
     if (cache?.key === key) return cache;
     let mesh: SurfaceMesh;
     const net = layout.crack;
@@ -5082,12 +5104,14 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       const [i1, i2] = acrossAxes(s.axis);
       // Picked faces: a point on any face not picked stays smooth, so the pattern ends at the faces' edges.
       const chosen = placed ? null : chosenFaces(s);
+      // Faces another layer takes end the pattern the same way.
+      const except = placed || chosen ? null : exceptedFaces(s);
       let notChosen: Uint8Array | null = null;
-      if (chosen) {
+      if (chosen || except) {
         notChosen = new Uint8Array(n);
         const I = mesh.indices;
         for (let f = 0; f < I.length / 3; f += 1) {
-          if (chosen[mesh.parents[f]]) continue;
+          if (chosen ? chosen[mesh.parents[f]] : !except![mesh.parents[f]]) continue;
           notChosen[I[f * 3]] = 1;
           notChosen[I[f * 3 + 1]] = 1;
           notChosen[I[f * 3 + 2]] = 1;
@@ -5232,7 +5256,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // A pattern standing out: its run-out, finer still (see RUN_OUT_STEPS).
     // Bark all round fades out at the edges it keeps (see weightsFor): over its grid's triangles there in teeth.
     if (r.crossMax > 0 || r.straightAxis || standsOut(s) || endsInWall(s) || (s.pattern === "bark" && s.projection === "allRound")) {
-      const weightKey = JSON.stringify([r.key, s.bottomFree, s.topFree, s.zoneFrom, s.zoneTo, s.keepEdges, s.edgeAngle, s.fade, s.direction, s.margin, s.outside, s.inside, layout.center, s.masks, s.faces]);
+      const weightKey = JSON.stringify([r.key, s.bottomFree, s.topFree, s.zoneFrom, s.zoneTo, s.keepEdges, s.edgeAngle, s.fade, s.direction, s.margin, s.outside, s.inside, layout.center, s.masks, s.faces, s.exceptFaces]);
       const runOut = standsOut(s) ? Math.min(0.5, Math.max(s.fade, 0.25) / RUN_OUT_STEPS) : Math.min(0.5, Math.max(s.fade, 0.25) / 2);
       if (fadeCache?.key === weightKey) state = fadeCache.state;
       else {

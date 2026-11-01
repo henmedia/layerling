@@ -200,7 +200,8 @@ type WorkplaneViewportProps = {
   onSelectionHide?: () => void;
   /** Wraps the selected body around a cylinder of this diameter (#106). */
   onWrapAroundCylinder?: (diameter: number, inward: boolean) => void;
-  onSurfaceTexture?: (settings: SurfaceTextureSettings) => Promise<void> | void;
+  /** Makes the texture: the first layer and the further ones (see WorkplaneShape.surfaceTextureLayers). */
+  onSurfaceTexture?: (settings: SurfaceTextureSettings, layers?: SurfaceTextureSettings[]) => Promise<void> | void;
   /** Takes the selected body's texture off; only while the body keeps what was under it. */
   onRemoveSurfaceTexture?: () => void;
   /** Whether the surface texture card is open; the toolbar opens and closes it too. */
