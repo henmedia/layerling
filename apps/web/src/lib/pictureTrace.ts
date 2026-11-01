@@ -192,7 +192,7 @@ function perimeter(ring: readonly TracePoint[]) {
 }
 
 /** Whether a point lies inside a closed line (even-odd). */
-function inside(point: TracePoint, ring: readonly TracePoint[]) {
+export function inside(point: TracePoint, ring: readonly TracePoint[]) {
   let hit = false;
   for (let index = 0, previous = ring.length - 1; index < ring.length; previous = index, index += 1) {
     const a = ring[index];
@@ -701,14 +701,18 @@ function keptContours(picture: PreparedPicture, settings: Omit<PictureTraceSetti
   const { outlines, holes } = contoursFor(picture, settings.part, settings.threshold, settings.regions ?? []);
   const rejected: string[] = [];
   const areas: Contour[] = [];
+  // Two outlines are the same patch when they are about as large and one's middle lies in the other.
+  const samePatch = (contour: Contour, other: Contour) => Math.abs(other.area - contour.area) <= 0.3 * Math.max(other.area, contour.area) && inside(contour.centre, other.samples);
   for (const area of settings.areas ?? []) {
     const contour = areaContour(picture, area, settings.areaTolerance ?? DEFAULT_TRACE_AREA_TOLERANCE);
-    if (contour) areas.push(contour);
-    else rejected.push(area.id);
+    if (!contour) rejected.push(area.id);
+    // A second click in a patch already taken (the door clicked above and below its crossbar) adds nothing: two
+    // holes on the same line are no valid shape, and finishing the sketch failed with "invalid sketch topology".
+    else if (!areas.some((other) => samePatch(contour, other))) areas.push(contour);
   }
   const big = (contour: Contour) => contour.samples.length >= 3 && contour.area >= speck;
   // A hole that is the patch an area was clicked in gives way to the area: the two would cancel out.
-  const sameAsArea = (hole: Contour) => areas.some((area) => Math.abs(area.area - hole.area) <= 0.3 * Math.max(area.area, hole.area) && inside(hole.centre, area.samples));
+  const sameAsArea = (hole: Contour) => areas.some((area) => samePatch(hole, area));
   const candidates = [
     ...outlines.filter(big),
     ...(settings.holes ? holes.filter((hole) => big(hole) && !sameAsArea(hole)) : []),

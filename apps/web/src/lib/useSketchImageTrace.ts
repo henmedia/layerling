@@ -4,6 +4,7 @@ import { picturePixels } from "@/lib/pictureIcon";
 import {
   defaultThreshold,
   defaultTraceSettings,
+  inside,
   preparePicture,
   tracePicture,
   traceRange,
@@ -240,6 +241,8 @@ export function useSketchImageTrace(image: SketchImage | null, active: boolean):
       }
     },
     addArea: (spot) => {
+      // A click in an area already picked adds nothing: the same patch twice would be two holes on one line.
+      if (traced?.trace.rings.some((ring) => ring.source === "area" && inside(spot, ring.nodes))) return;
       const id = nextId();
       setAreaRejected(false);
       patch((value) => ({ areas: [...(value.areas ?? []), { id, ...rounded(spot) }] }));

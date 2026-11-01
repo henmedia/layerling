@@ -267,6 +267,14 @@ describe("tracing a picture into points (Trace)", () => {
       expect(DEFAULT_TRACE_AREA_TOLERANCE).toBeGreaterThan(0);
     });
 
+    it("takes a patch clicked twice once: two holes on the same line would make no shape", () => {
+      const { prepared, settings } = settingsFor(toy);
+      const trace = tracePicture(prepared, { ...settings, areas: [{ id: "first", x: 92, y: 40 }, { id: "again", x: 85, y: 45 }] });
+      expect(trace.rings.filter((ring) => ring.source === "area").map((ring) => ring.key)).toEqual(["a:first"]);
+      // Not refused either: it lies in the picture, on a patch already taken.
+      expect(trace.rejected).toBeUndefined();
+    });
+
     it("refuses an area that reaches the picture's edge: that is the background", () => {
       const { prepared, settings } = settingsFor(toy);
       const trace = tracePicture(prepared, { ...settings, areas: [{ id: "wall", x: 5, y: 5 }, { id: "out", x: 500, y: 5 }] });
