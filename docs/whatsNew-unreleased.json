@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Rechtsklick-Ziehen beendet die Linie nicht mehr (Mac)",
+      "en": "Dragging with the right button no longer ends the line (Mac)"
+    },
+    "body": {
+      "de": "Beim Zeichnen einer Linie oder glatten Kurve beendet ein Rechtsklick die Kette. Auf dem Mac geschah das schon beim Drücken der rechten Taste, also auch beim Verschieben der Ansicht mit Umschalt + rechter Maustaste, und der nächste Punkt hing nicht mehr am vorigen. Jetzt endet die Kette erst beim Loslassen, und nur wenn die Maus dabei stillstand.",
+      "en": "A right click ends a line or smooth curve being drawn. On a Mac this happened as soon as the right button went down, also when you moved the view with Shift and the right button, and the next point no longer joined the previous one. Now the line ends when the button is released, and only if the mouse did not move."
+    }
+  },
+  {
+    "title": {
       "de": "Die Ansicht läuft auf langsamen Rechnern nicht mehr lange nach",
       "en": "The view stops gliding quickly on slow computers too"
     },

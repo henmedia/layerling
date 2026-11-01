@@ -1455,6 +1455,15 @@ export function SketchWorkspace({
     else retargetTouchPress(event);
   };
 
+  // The context menu event comes with the press on macOS and with the release on Windows, so it cannot tell a click from a pan.
+  // The release of the right button can: only one that did not move ends the chain (#776).
+  const endChainOnRightRelease = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (event.button !== 2) return;
+    const press = rightPressRef.current;
+    rightPressRef.current = null;
+    if (onFinishLine && activePointId && isChainDrawingTool(tool) && rightClickEndsChain(press, { x: event.clientX, y: event.clientY })) onFinishLine();
+  };
+
   const handlePlanePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
     if (event.button === 1) {
       beginPan(event);
@@ -2244,7 +2253,10 @@ export function SketchWorkspace({
           onPointerDownCapture={handlePanPointerDownCapture}
           onPointerDown={handlePlanePointerDown}
           onPointerMove={handlePointerMove}
-          onPointerUp={finishPointerAction}
+          onPointerUp={(event) => {
+            endChainOnRightRelease(event);
+            finishPointerAction(event);
+          }}
           onPointerCancel={() => setPointerAction(null)}
           onPointerLeave={() => {
             lastPointerRef.current = null;
@@ -2267,8 +2279,6 @@ export function SketchWorkspace({
           }}
           onContextMenu={(event) => {
             event.preventDefault();
-            if (onFinishLine && activePointId && isChainDrawingTool(tool) && rightClickEndsChain(rightPressRef.current, { x: event.clientX, y: event.clientY })) onFinishLine();
-            rightPressRef.current = null;
           }}
           onDragOver={(event) => {
             if (!event.dataTransfer.types.includes("application/x-layerling-sketch-primitive")) return;
