@@ -260,7 +260,9 @@ function describeShapes(before: WorkplaneShape[], after: WorkplaneShape[], openG
     // A tool that groups the bodies it worked on with what it cut into them and lays something new beside them (a lid
     // with magnets: the box grouped with its pockets, the lid beside it) is named after what it added, not as a split.
     if (added.length > 1) {
-      const holders = added.filter((shape) => shape.groupedShapes?.length && removed.every((gone) => groupedBaseIds(shape).has(localIdBase(gone.id))));
+      // The bodies may sit a group deeper: a box made of a solid and a hole is grouped on its own first.
+      const heldIds = (shape: WorkplaneShape): string[] => (shape.groupedShapes ?? []).flatMap((part) => [localIdBase(part.id), ...heldIds(part)]);
+      const holders = added.filter((shape) => shape.groupedShapes?.length && removed.every((gone) => heldIds(shape).includes(localIdBase(gone.id))));
       if (holders.length === 1) {
         const made = added.filter((shape) => shape !== holders[0]);
         return made.length === 1

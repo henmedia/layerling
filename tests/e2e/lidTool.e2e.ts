@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Module from "manifold-3d";
-import { lidForSolid, normalizeLidOptions } from "@/lib/lidTool";
+import { lidForSolid, normalizeLidOptions, type MagnetPostPart } from "@/lib/lidTool";
 
 type Solid = { delete?: () => void };
 
@@ -52,6 +52,21 @@ function below(kernel: Kernel, solid: Body, y: number, created: Solid[]) {
   const part = solid.intersect(cutter);
   created.push(cutter, part);
   return part;
+}
+
+/** The exact pieces of the posts as one solid, in the scene's frame (unturned pieces: the boxes in these tests stand square). */
+function postSolid(kernel: Kernel, parts: readonly MagnetPostPart[], created: Solid[]) {
+  const pieces = parts.map((part) => {
+    expect(part.rotation).toBeCloseTo(0, 9);
+    const piece = part.kind === "cylinder"
+      ? kernel.Manifold.cylinder(part.height, part.width / 2, part.width / 2, 48).rotate([-90, 0, 0]).translate([part.x, part.elevation, part.z])
+      : kernel.Manifold.cube([part.width, part.height, part.depth], true).translate([part.x, part.elevation + part.height / 2, part.z]);
+    created.push(piece);
+    return piece;
+  });
+  const solid = kernel.Manifold.union(pieces);
+  created.push(solid);
+  return solid;
 }
 
 describe("lid (real Manifold kernel, #1009)", () => {
@@ -215,10 +230,11 @@ describe("lid (real Manifold kernel, #1009)", () => {
       if ("error" in result) throw new Error(JSON.stringify(result.error));
       created.push(result.lid);
       const magnets = result.magnets!;
-      // The 2 mm wall is too thin for a 6.2 mm pocket with 1.2 mm round it: posts fill the corners.
-      expect(magnets.posts).not.toBeNull();
-      const posts = magnets.posts!;
-      created.push(posts);
+      // The 2 mm wall is too thin for a 6.2 mm pocket with 1.2 mm round it: posts fill the corners, each a cylinder
+      // round its pocket and a box from it to the corner - exact pieces, no mesh.
+      expect(magnets.posts).toBeNull();
+      expect(magnets.postParts.map((part) => part.kind)).toEqual(["cylinder", "box", "cylinder", "box", "cylinder", "box", "cylinder", "box"]);
+      const posts = postSolid(kernel, magnets.postParts, created);
       expect(posts.status()).toBe("NoError");
       // Four pockets of 6.2 mm, 2.2 mm deep below the rim at 30 (reaching 1 mm above it), a wall in from each corner.
       expect(magnets.pockets).toHaveLength(4);
@@ -279,6 +295,7 @@ describe("lid (real Manifold kernel, #1009)", () => {
       if ("error" in boxLid) throw new Error(JSON.stringify(boxLid.error));
       created.push(boxLid.lid);
       expect(boxLid.magnets?.posts).toBeNull();
+      expect(boxLid.magnets?.postParts).toEqual([]);
       expect(boxLid.magnets?.pockets).toHaveLength(4);
 
       const potOuter = kernel.Manifold.cylinder(20, 20, 20, 96).rotate([-90, 0, 0]);
@@ -288,19 +305,46 @@ describe("lid (real Manifold kernel, #1009)", () => {
       const potLid = lidForSolid(kernel, pot, normalizeLidOptions({ type: "both", thickness: 2.8, magnets: true }));
       if ("error" in potLid) throw new Error(JSON.stringify(potLid.error));
       created.push(potLid.lid);
-      if (potLid.magnets?.posts) created.push(potLid.magnets.posts);
-      expect(potLid.magnets?.posts).not.toBeNull();
+      expect(potLid.magnets?.posts).toBeNull();
+      expect(potLid.magnets?.postParts.length).toBeGreaterThan(0);
+      const potPosts = postSolid(kernel, potLid.magnets!.postParts, created);
+      const outsidePot = potPosts.subtract(potOuter);
+      created.push(outsidePot);
+      expect(outsidePot.volume()).toBeLessThan(0.01);
       potLid.magnets!.pockets.forEach((pocket) => {
         expect(Math.abs(Math.abs(pocket.x) - Math.abs(pocket.z))).toBeLessThan(0.1);
         expect(Math.hypot(pocket.x, pocket.z)).toBeGreaterThan(20 - 4.3 - 0.2);
         expect(Math.hypot(pocket.x, pocket.z)).toBeLessThan(20 - 4.3 + 0.1);
       });
-      const filledPot = kernel.Manifold.union(pot, potLid.magnets!.posts!);
+      const filledPot = kernel.Manifold.union(pot, potPosts);
       created.push(filledPot);
       const closed = closing(kernel, filledPot, potLid.lid, 2.8, created);
       const overlap = closed.intersect(filledPot);
       created.push(overlap);
       expect(overlap.volume()).toBeLessThan(0.01);
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("cuts the posts to a pot that tapers, as one mesh, where upright pieces would stick out", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      // 40 across at the rim, 30 at the foot, 30 high, 2 mm wall and floor.
+      const outer = kernel.Manifold.cylinder(30, 15, 20, 96).rotate([-90, 0, 0]);
+      const inner = kernel.Manifold.cylinder(30, 13.3, 18, 96).rotate([-90, 0, 0]).translate([0, 2, 0]);
+      const pot = outer.subtract(inner);
+      created.push(outer, inner, pot);
+      const result = lidForSolid(kernel, pot, normalizeLidOptions({ type: "plug", thickness: 2.8, magnets: true }));
+      if ("error" in result) throw new Error(JSON.stringify(result.error));
+      created.push(result.lid);
+      expect(result.magnets?.postParts).toEqual([]);
+      const posts = result.magnets!.posts!;
+      created.push(posts);
+      const outside = posts.subtract(outer);
+      created.push(outside);
+      expect(outside.volume()).toBeLessThan(0.01);
     } finally {
       dispose(created);
     }

@@ -73,6 +73,11 @@ describe("history step descriptions", () => {
     const grouped = box({ id: "g", name: "Box", kind: "group" as WorkplaneShape["kind"], groupedShapes: [body, pocket] });
     const lid = box({ id: "box-1-lid", name: "Box lid", kind: "mesh" as WorkplaneShape["kind"] });
     expect(step([body], [grouped, lid])).toEqual({ key: "historyStep.addedOne", values: { name: "Box lid" } });
+    // A box of a solid and a hole is grouped on its own first, a group deeper.
+    const opening = box({ id: "box-hole", name: "Opening", hole: true });
+    const inner = box({ id: "g-inner", name: "Box", kind: "group" as WorkplaneShape["kind"], groupedShapes: [body, opening] });
+    const outer = box({ id: "g-outer", name: "Box", kind: "group" as WorkplaneShape["kind"], groupedShapes: [inner, pocket] });
+    expect(step([body, opening], [outer, lid])).toEqual({ key: "historyStep.addedOne", values: { name: "Box lid" } });
     // A body cut in two is still a split: neither half holds the body.
     const half = (id: string) => box({ id, name: "Box half", kind: "mesh" as WorkplaneShape["kind"] });
     expect(step([body], [half("h1"), half("h2")])).toEqual({ key: "historyStep.splitOne", values: { name: "Box", count: 2 } });

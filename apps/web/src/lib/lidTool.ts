@@ -1,5 +1,5 @@
 import type { CrossSection, ManifoldToplevel, Mat4 } from "manifold-3d";
-import { shapeToManifoldSolid, disposeManifold } from "@/lib/editorBooleans";
+import { shapeToManifoldSolid, disposeManifold, type GroupBuildResult } from "@/lib/editorBooleans";
 import { getManifoldRuntime, type ManifoldSolid } from "@/lib/editorMeshCore";
 import { numberLocale, t } from "@/lib/i18n";
 import { createLocalId } from "@/lib/localIds";
@@ -228,9 +228,9 @@ function snugTurn(points: readonly Point[]) {
  * corner as a circle of `reach` fits inside the outline. A corner is the point of the outline nearest a corner of the
  * smallest rectangle round it, and the magnet moves in from it at 45 degrees to that rectangle's sides, so in a box,
  * turned or not, it keeps the same distance to both sides and in a round pot it sits on a diagonal. Each comes with the
- * corner it was found from. Null when four do not fit `apart` from one another.
+ * corner it was found from and the rectangle's turn. Null when four do not fit `apart` from one another.
  */
-export function magnetPlaces(polygons: readonly (readonly Point[])[], reach: number, apart: number): { centre: Point; corner: Point }[] | null {
+export function magnetPlaces(polygons: readonly (readonly Point[])[], reach: number, apart: number): { centre: Point; corner: Point; turn: number }[] | null {
   const points = polygons.flat();
   if (points.length < 3) return null;
   // Worked out with the rectangle square to the axes, then turned back.
@@ -245,7 +245,7 @@ export function magnetPlaces(polygons: readonly (readonly Point[])[], reach: num
   const min: Point = [Math.min(...xs), Math.min(...ys)];
   const max: Point = [Math.max(...xs), Math.max(...ys)];
   const furthest = Math.hypot(max[0] - min[0], max[1] - min[1]) / 2;
-  const places: { centre: Point; corner: Point }[] = [];
+  const places: { centre: Point; corner: Point; turn: number }[] = [];
   for (const [cornerX, cornerY, signX, signY] of [[min[0], min[1], 1, 1], [max[0], min[1], -1, 1], [max[0], max[1], -1, -1], [min[0], max[1], 1, -1]] as const) {
     const corner = nearestOnOutline(squared, [cornerX, cornerY]).point;
     let found: Point | null = null;
@@ -258,7 +258,7 @@ export function magnetPlaces(polygons: readonly (readonly Point[])[], reach: num
       }
     }
     if (!found) return null;
-    places.push({ centre: back(found), corner: back(corner) });
+    places.push({ centre: back(found), corner: back(corner), turn });
   }
   for (let first = 0; first < places.length; first += 1) {
     for (let second = first + 1; second < places.length; second += 1) {
@@ -271,7 +271,20 @@ export function magnetPlaces(polygons: readonly (readonly Point[])[], reach: num
 /** A pocket for a magnet in the body, in the scene's frame: a hole cylinder of this diameter whose bottom lies at `elevation`. */
 export type MagnetPocket = { x: number; z: number; elevation: number; height: number; diameter: number };
 
-export type LidResult = { lid: ManifoldSolid; magnets?: { posts: ManifoldSolid | null; pockets: MagnetPocket[] } } | { error: LidError };
+/**
+ * A piece of a post, in the scene's frame, as a shape the CAD kernel knows exactly: the cylinder round a pocket, or the
+ * box from it to its corner, turned by `rotation` degrees about the vertical.
+ */
+export type MagnetPostPart = { kind: "cylinder" | "box"; x: number; z: number; elevation: number; height: number; width: number; depth: number; rotation: number };
+
+/**
+ * With magnets: the pockets the body needs, and its posts - as exact pieces (`postParts`) where a cylinder and a box
+ * fill each corner within the body, or else as one mesh (`posts`) cut to the body's hull, for a tapering pot or an
+ * inner corner.
+ */
+export type LidMagnets = { posts: ManifoldSolid | null; postParts: MagnetPostPart[]; pockets: MagnetPocket[] };
+
+export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets } | { error: LidError };
 
 /**
  * The lid for `body` (in the scene's frame, y up), lying turned over beside it: its plate on the workplane at the
@@ -302,6 +315,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const pocketDepth = magnetPocketDepth(options);
     let magnetCentres: Point[] = [];
     let posts: ManifoldSolid | null = null;
+    let postParts: MagnetPostPart[] = [];
     if (options.magnets) {
       if (options.thickness < lidThicknessForMagnets(options) - 1e-9) return { error: { code: "magnetsThinLid", thickness: lidThicknessForMagnets(options) } };
       if (height < pocketDepth + MAGNET_WALL) return { error: { code: "magnetsNoRoom" } };
@@ -310,19 +324,46 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       const places = magnetPlaces(polygons, reach, 2 * pocketRadius + MAGNET_WALL);
       if (!places) return { error: { code: "magnetsNoRoom" } };
       magnetCentres = places.map(({ centre }) => centre);
-      // Each post is the round wall of its pocket drawn out to its corner, inside the outline.
-      const round = places.map(({ centre, corner }) => keep(created, runtime.CrossSection.hull([
+      // Each post is the round wall of its pocket and the square from it to the corner, square to the box round the
+      // body: a cylinder and a box, exact for the kernel, as long as they stay within the body.
+      const pieces = places.map(({ centre, corner, turn }) => {
+        const along = (point: Point) => point[0] * Math.cos(turn) + point[1] * Math.sin(turn);
+        const across = (point: Point) => -point[0] * Math.sin(turn) + point[1] * Math.cos(turn);
+        const square = { width: Math.abs(along(centre) - along(corner)), depth: Math.abs(across(centre) - across(corner)), middle: [(centre[0] + corner[0]) / 2, (centre[1] + corner[1]) / 2] as Point, turn };
+        return { centre, square };
+      });
+      const exactAreas = pieces.flatMap(({ centre, square }) => [
+        keep(created, keep(created, runtime.CrossSection.circle(reach, MAGNET_SIDES)).translate([centre[0], centre[1]])),
+        ...(square.width > 0.01 && square.depth > 0.01
+          ? [keep(created, keep(created, keep(created, runtime.CrossSection.square([square.width, square.depth], true)).rotate((square.turn * 180) / Math.PI)).translate([square.middle[0], square.middle[1]]))]
+          : []),
+      ]);
+      const exactFootprint = keep(created, runtime.CrossSection.union(exactAreas));
+      const exactInside = keep(created, exactFootprint.subtract(outline)).area() < 0.01;
+      // Where they would not (an inner corner), the round wall drawn out to its corner and cut to the outline.
+      const footprint = exactInside ? exactFootprint : keep(created, keep(created, runtime.CrossSection.union(places.map(({ centre, corner }) => keep(created, runtime.CrossSection.hull([
         keep(created, keep(created, runtime.CrossSection.circle(reach, MAGNET_SIDES)).translate([centre[0], centre[1]])),
         [[[corner[0], corner[1]]]],
-      ])));
-      const footprint = keep(created, keep(created, runtime.CrossSection.union(round)).intersect(outline));
+      ]))))).intersect(outline));
       const added = keep(created, footprint.subtract(section));
       if (added.area() > 0.01) {
         section = keep(created, section.add(footprint));
         opening = keep(created, outline.subtract(section));
         const column = keep(created, keep(created, footprint.extrude(height)).translate([0, 0, box.min[2]]));
-        const within = keep(created, column.intersect(keep(created, up.hull())));
-        if (!within.isEmpty()) posts = keep(created, within.transform(UP_TO_SCENE));
+        const hull = keep(created, up.hull());
+        // Straight up from the bottom, the column stays within a body with upright walls; a pot that tapers cuts it.
+        if (exactInside && keep(created, column.subtract(hull)).volume() < 0.01) {
+          const toScene = ([x, y]: Point) => ({ x, z: -y });
+          postParts = pieces.flatMap(({ centre, square }) => [
+            { kind: "cylinder" as const, ...toScene(centre), elevation: box.min[2], height, width: 2 * reach, depth: 2 * reach, rotation: 0 },
+            ...(square.width > 0.01 && square.depth > 0.01
+              ? [{ kind: "box" as const, ...toScene(square.middle), elevation: box.min[2], height, width: square.width, depth: square.depth, rotation: (square.turn * 180) / Math.PI }]
+              : []),
+          ]);
+        } else {
+          const within = keep(created, column.intersect(hull));
+          if (!within.isEmpty()) posts = keep(created, within.transform(UP_TO_SCENE));
+        }
       }
     }
 
@@ -371,7 +412,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       height: pocketDepth + MAGNET_OVERCUT,
       diameter: 2 * pocketRadius,
     }));
-    return { lid, magnets: { posts, pockets } };
+    return { lid, magnets: { posts, postParts, pockets } };
   } catch (error) {
     return { error: { code: "kernel", message: error instanceof Error ? error.message : String(error ?? "") } };
   } finally {
@@ -412,8 +453,11 @@ function positionsOf(mesh: ReturnType<ManifoldSolid["getMesh"]>) {
   return positions;
 }
 
-/** With magnets, what the body needs as well: the posts for its corners (a mesh, if any) and the pockets (hole cylinders). */
-export type LidShapeMagnets = { posts: WorkplaneShape | null; pockets: WorkplaneShape[] };
+/**
+ * With magnets, what the body needs as well: the posts for its corners, if any (cylinders and boxes, or one mesh where
+ * those would not fit) and the pockets (hole cylinders).
+ */
+export type LidShapeMagnets = { posts: WorkplaneShape[]; pockets: WorkplaneShape[] };
 
 export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets } | { lid: null; error: string };
 
@@ -452,9 +496,26 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     if (!shape) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
     const lid = canonicalizeShape({ ...shape, hidden: false });
     if (!result.magnets) return { lid };
-    const posts = result.magnets.posts
-      ? splitShapeFromWorldPositions(source, positionsOf(result.magnets.posts.getMesh()), createLocalId(`${source.id}-magnet-posts`), t("lid.magnetPosts", { name: source.name }))
+    const postName = t("lid.magnetPosts", { name: source.name });
+    const meshPost = result.magnets.posts
+      ? splitShapeFromWorldPositions(source, positionsOf(result.magnets.posts.getMesh()), createLocalId(`${source.id}-magnet-posts`), postName)
       : null;
+    const posts = meshPost
+      ? [canonicalizeShape({ ...meshPost, hidden: false })]
+      : result.magnets.postParts.map((part) => sceneShape({
+        id: createLocalId(`${source.id}-magnet-post`),
+        name: postName,
+        kind: part.kind,
+        color: source.color,
+        x: part.x,
+        z: part.z,
+        elevation: part.elevation,
+        width: part.width,
+        depth: part.depth,
+        height: part.height,
+        rotation: part.rotation,
+        ...(part.kind === "cylinder" ? { sides: MAGNET_SIDES } : {}),
+      }));
     const pockets = result.magnets.pockets.map((pocket, index) => sceneShape({
       id: createLocalId(`${source.id}-magnet`),
       name: t("lid.magnetPocket", { number: index + 1 }),
@@ -469,10 +530,25 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       height: pocket.height,
       sides: MAGNET_SIDES,
     }));
-    return { lid, magnets: { posts: posts ? canonicalizeShape({ ...posts, hidden: false }) : null, pockets } };
+    return { lid, magnets: { posts, pockets } };
   } catch (error) {
     return { lid: null, error: lidErrorMessage({ code: "kernel", message: error instanceof Error ? error.message : String(error ?? "") }) };
   } finally {
     Array.from(new Set(created)).forEach(disposeManifold);
   }
+}
+
+/**
+ * The body grouped with its pockets and posts, by `build` (the editor's grouping, on or off the page). A body made of
+ * solids and holes - a box with a box hole in it - is grouped on its own first: in one group its holes would cut the
+ * posts standing in its opening too.
+ */
+export async function groupedWithMagnets(targets: readonly WorkplaneShape[], magnets: LidShapeMagnets, build: (shapes: WorkplaneShape[]) => Promise<GroupBuildResult>): Promise<GroupBuildResult> {
+  let body: WorkplaneShape[] = [...targets];
+  if (targets.some((shape) => shape.hole)) {
+    const inner = await build(body);
+    if (!inner.group) return inner;
+    body = [canonicalizeShape({ ...inner.group, groupOperation: "group", name: targets.find((shape) => !shape.hole)?.name ?? inner.group.name })];
+  }
+  return build([...body, ...magnets.posts, ...magnets.pockets]);
 }

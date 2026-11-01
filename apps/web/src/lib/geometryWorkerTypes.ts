@@ -37,8 +37,8 @@ export function resultMeshes(task: GeometryTask, result: unknown): Array<Importe
   if (task === "split") return ((result as { parts?: WorkplaneShape[] | null }).parts ?? []).map((part) => part.importedMesh);
   if (task === "flexi") return ((result as { links?: WorkplaneShape[] | null }).links ?? []).map((link) => link.importedMesh);
   if (task === "lid") {
-    const made = result as { lid?: WorkplaneShape | null; magnets?: { posts?: WorkplaneShape | null } };
-    return [made.lid?.importedMesh, made.magnets?.posts?.importedMesh];
+    const made = result as { lid?: WorkplaneShape | null; magnets?: { posts?: WorkplaneShape[] } };
+    return [made.lid?.importedMesh, ...(made.magnets?.posts ?? []).map((post) => post.importedMesh)];
   }
   if (task === "stl") return [(result as WorkplaneShape).importedMesh];
   if (task === "obj" || task === "step") return ((result as { shapes?: WorkplaneShape[] }).shapes ?? []).map((shape) => shape.importedMesh);
