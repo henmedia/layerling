@@ -166,6 +166,7 @@ export function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary
     ...(shape.qrCode ? { qrCode: shape.qrCode } : {}),
     // A surface texture: its settings, the masks as a count, and whether the body under it is kept to change or remove it.
     ...(shape.surfaceTexture ? { surfaceTexture: { ...shape.surfaceTexture, masks: shape.surfaceTexture.masks.length, changeable: Boolean(surfaceTextureEntry(shape)) } } : {}),
+    ...(shape.surfaceTextureLayers?.length ? { surfaceTextureLayers: shape.surfaceTextureLayers.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length })) } : {}),
     children: shape.groupedShapes?.map(mcpShapeSummary),
   };
 }

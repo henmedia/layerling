@@ -792,6 +792,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.knurlChamfer === b.knurlChamfer &&
     a.cylinderWrap?.inward === b.cylinderWrap?.inward &&
     JSON.stringify(a.surfaceTexture ?? null) === JSON.stringify(b.surfaceTexture ?? null) &&
+    JSON.stringify(a.surfaceTextureLayers ?? null) === JSON.stringify(b.surfaceTextureLayers ?? null) &&
     a.surfaceTextureMask === b.surfaceTextureMask &&
     a.surfaceFillOf === b.surfaceFillOf &&
     vaseSettingsEqual(a.vase, b.vase) &&

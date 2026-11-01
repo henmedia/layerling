@@ -9941,6 +9941,67 @@ html[data-theme="dark"] .mesh-compare-actions .secondary {
   line-height: 1.4;
 }
 
+/* Layers of a surface texture: a tab per pattern, and one to add another. A layer that still needs faces is dashed,
+   and so is the line that asks for them. */
+.surface-layers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.surface-layers button {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 9px 0 5px;
+  color: #6d5133;
+  font: 700 12px/1 var(--font-ui);
+  background: #fbf8f4;
+  border: 1px solid #e0d4c6;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.surface-layers button.active {
+  color: #8a4504;
+  background: #ffe7cc;
+  border-color: #d97813;
+  box-shadow: inset 0 0 0 1px #d97813;
+}
+
+.surface-layers button.needed {
+  border-style: dashed;
+  border-color: #d9a24f;
+}
+
+.surface-layer-number {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  font-size: 11px;
+  background: #b08a62;
+  border-radius: 50%;
+}
+
+.surface-layers button.active .surface-layer-number {
+  background: #d97813;
+}
+
+.surface-layers .surface-layer-add {
+  padding-left: 7px;
+  color: #8a6a45;
+  background: transparent;
+  border-style: dashed;
+}
+
+.cylinder-wrap-hint.surface-layer-missing {
+  color: #9a5d06;
+  font-weight: 700;
+}
+
 /* The vase's drawing boards (card Draw): the vase tool's boards, in the editor's colours. */
 .vase-drawing {
   --accent: var(--primary);
@@ -12873,6 +12934,28 @@ html[data-theme="dark"] .color-value {
 html[data-theme="dark"] .cylinder-wrap-hint,
 html[data-theme="dark"] .select-property-hint {
   color: #a08a72;
+}
+
+html[data-theme="dark"] .surface-layers button {
+  color: #ede4d4;
+  background: #2f2418;
+  border-color: #53412f;
+}
+
+html[data-theme="dark"] .surface-layers button.active {
+  color: #ffc27a;
+  background: #4a3214;
+  border-color: #e08a2c;
+  box-shadow: inset 0 0 0 1px #e08a2c;
+}
+
+html[data-theme="dark"] .surface-layers .surface-layer-add {
+  color: #e7c896;
+  background: transparent;
+}
+
+html[data-theme="dark"] .cylinder-wrap-hint.surface-layer-missing {
+  color: #f0b13c;
 }
 
 html[data-theme="dark"] .vase-print-notes {

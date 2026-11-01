@@ -4024,6 +4024,41 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .mesh-compare-actions .
   color: #6c6c6c;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .surface-layers button {
+  color: #515151;
+  background: #f8f8f8;
+  border: 1px solid #d3d3d3;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .surface-layers button.active {
+  color: #8a4504;
+  background: #e6e6e6;
+  border-color: #d97813;
+  box-shadow: inset 0 0 0 1px #d97813;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .surface-layers button.needed {
+  border-color: #d9a24f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .surface-layer-number {
+  color: #fff;
+  background: #797979;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .surface-layers button.active .surface-layer-number {
+  background: #d97813;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .surface-layers .surface-layer-add {
+  color: #5b5b5b;
+  background: transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .cylinder-wrap-hint.surface-layer-missing {
+  color: #9a5d06;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .vase-drawing {
   --accent: var(--primary);
   --surface: #fcfcfc;
@@ -5709,6 +5744,28 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .color-value {
 html[data-theme="dark"]:where([data-palette="graphite"]) .cylinder-wrap-hint,
 html[data-theme="dark"]:where([data-palette="graphite"]) .select-property-hint {
   color: #797979;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .surface-layers button {
+  color: #e1e1e1;
+  background: #292929;
+  border-color: #434343;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .surface-layers button.active {
+  color: #ffc27a;
+  background: #333333;
+  border-color: #e08a2c;
+  box-shadow: inset 0 0 0 1px #e08a2c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .surface-layers .surface-layer-add {
+  color: #bfbfbf;
+  background: transparent;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .cylinder-wrap-hint.surface-layer-missing {
+  color: #f0b13c;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .vase-print-notes {
