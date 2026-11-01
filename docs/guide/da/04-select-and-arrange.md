@@ -173,7 +173,7 @@ Procentfeltet har fokus, når vinduet åbner, så fra tastaturet er det [[Ctrl]]
 
 ## Fortryd
 
-{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) og {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] eller [[Ctrl]]+[[Y]]) går gennem din historik. Hvor mange skridt der rejser med det gemte design sætter du i indstillingerne under {{ui:workspace.history}}. Peg på en af knapperne, så nævner dens værktøjstip det trin, den fortryder eller gendanner, med målet hvis trinnet har et, fx "Rundede kanterne på Box (5 mm)"; beskeden bagefter siger det samme. Vil du gå flere trin tilbage på én gang, så brug historikvisningen nedenfor.
+{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) og {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] eller [[Ctrl]]+[[Y]]) går gennem din historik. Hvor mange skridt der rejser med det gemte design sætter du i indstillingerne under {{ui:workspace.history}}. Peg på en af knapperne, så nævner dens værktøjstip det trin, den fortryder eller gendanner, med målet hvis trinnet har et, fx "Rundede kanterne på Box (5 mm)" eller "Flyttede 3 objekter (12 mm)"; beskeden bagefter siger det samme. Vil du gå flere trin tilbage på én gang, så brug historikvisningen nedenfor.
 
 ## Se tilbage: historikvisningen
 
