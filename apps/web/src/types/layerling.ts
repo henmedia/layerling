@@ -1246,6 +1246,11 @@ export type WorkplaneShape = {
    */
   qrCode?: QrCodeSettings;
   /**
+   * An SBC board (#1098): which board and the extra room for its edge connectors, so the properties
+   * panel can make it again. On the group that holds the board and its parts.
+   */
+  sbcBoard?: SbcBoardSettings;
+  /**
    * Set on a body made by wrapping around a cylinder (#106): its box is
    * centred on the cylinder's axis, and aligning, snapping and centring use
    * that box rather than the arc the mesh actually covers.
@@ -1399,6 +1404,17 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 /** What is built: the code alone, a plate with the code raised on it, or a plate with the code engraved. */
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
+/** The single-board computers the SBC board shape knows (#1098). */
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12";
+
+export type SbcBoardSettings = {
+  board: SbcBoardType;
+  /** Extra room in mm on every side (but the bottom) of the connectors at the edge, 0 to 2. */
+  clearance: number;
+  /** How much further out in mm the connectors at the edge reach, to cut through a case wall, 0 to 10; none on older boards. */
+  reach?: number;
+};
+
 export type QrCodeSettings = {
   text: string;
   errorCorrection: QrErrorCorrection;

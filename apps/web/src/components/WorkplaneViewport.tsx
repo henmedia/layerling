@@ -19,7 +19,7 @@ import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/Camera
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
-import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
+import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import type { NameTagStack } from "@/lib/nameTag";
 import { WorkspaceSettingsModal } from "@/components/workplane/WorkspaceSettingsModal";
 import { appThemePalette, type AppThemePreference, type ResolvedAppTheme } from "@/lib/appTheme";
@@ -221,6 +221,8 @@ type WorkplaneViewportProps = {
   /** The icon tag card's wiring for the selected sketch body or icon tag. */
   iconTag?: IconTagControls | null;
   qrCode?: QrCodeControls | null;
+  /** The SBC board card's wiring (#1098). */
+  sbcBoard?: SbcBoardControls | null;
   /** The reference image card's wiring (#680). */
   referenceImage?: ReferenceImageControls | null;
   /**
@@ -1457,6 +1459,7 @@ export function WorkplaneViewport({
   textLayerStack,
   iconTag,
   qrCode,
+  sbcBoard,
   referenceImage,
   toolMemory,
   prepareNewShape,
@@ -8289,6 +8292,7 @@ export function WorkplaneViewport({
           textLayerStack={textLayerStack}
           iconTag={iconTag}
           qrCode={qrCode}
+          sbcBoard={sbcBoard}
           referenceImage={referenceImage}
           onInteractionActiveChange={onInteractionActiveChange}
           onSnapGridAwayChange={setInspectorSnapGridAway}

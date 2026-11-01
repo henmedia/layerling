@@ -19,6 +19,7 @@ import {
   attachmentsFormatVersion,
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
+import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
@@ -1406,6 +1407,19 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   // A QR code's settings (#553): a text and known choices. Old projects have none.
   if (definition.qrCode !== undefined && !normalizeQrSettings(definition.qrCode)) {
     throw new Error(`${label}.qrCode must hold the code's text`);
+  }
+  // An SBC board's settings (#1098): a known board, a clearance of 0 to 2 mm and a reach of 0 to 10 mm. Old projects have none.
+  if (definition.sbcBoard !== undefined) {
+    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown } | null;
+    if (!board || typeof board !== "object" || !SBC_BOARD_ORDER.includes(board.board as never)) {
+      throw new Error(`${label}.sbcBoard.board must be one of ${SBC_BOARD_ORDER.join(", ")}`);
+    }
+    if (board.clearance !== undefined && (typeof board.clearance !== "number" || !Number.isFinite(board.clearance) || board.clearance < 0 || board.clearance > MAX_SBC_CLEARANCE)) {
+      throw new Error(`${label}.sbcBoard.clearance is outside the supported range`);
+    }
+    if (board.reach !== undefined && (typeof board.reach !== "number" || !Number.isFinite(board.reach) || board.reach < 0 || board.reach > MAX_SBC_REACH)) {
+      throw new Error(`${label}.sbcBoard.reach is outside the supported range`);
+    }
   }
   // The corners of a text's line (#215): a layer of a name tag can be bevelled or sharp now, so an
   // unknown corner is refused rather than read as sharp.

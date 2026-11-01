@@ -83,6 +83,7 @@ export const GUIDE_SECTIONS = {
   dovetail: { chapter: "threads", de: "schwalbenschwanz", en: "dovetail", nl: "zwaluwstaart", ru: "lastochkin-khvost", cs: "rybinovy-spoj", sl: "lastovicji-rep", hu: "fecskefark", es: "cola-de-milano" },
   teardrop: { chapter: "threads", de: "tropfenbohrung", en: "teardrop-hole", nl: "druppelgat", ru: "kaplevidnoe-otverstie", cs: "kapkovity-otvor", sl: "kapljicna-izvrtina", hu: "csepp-alaku-lyuk", es: "orificio-en-lagrima" },
   ports: { chapter: "threads", de: "anschlussoeffnungen", en: "port-openings", nl: "aansluitopeningen", ru: "otverstiya-pod-razemy", cs: "otvory-pro-konektory", sl: "odprtine-za-prikljucke", hu: "csatlakozonyilasok", es: "aberturas-para-conectores", fr: "ouvertures-de-connecteur", it: "aperture-per-connettori", pl: "otwory-na-zlacza", da: "stikabninger", ar: "port-openings" },
+  sbcBoard: { chapter: "threads", de: "sbc-platinen", en: "sbc-boards", nl: "sbc-borden", ru: "platy-sbc", cs: "desky-sbc", hu: "sbc-lapok" },
   screwHoles: { chapter: "threads", de: "stufen-und-senkbohrung", en: "counterbore-and-countersink", nl: "verzinkboring-en-verzinking", ru: "tsekovka-i-zenkovka", cs: "valcove-a-kuzelove-zahloubeni", sl: "stopnicasta-in-udirna-izvrtina", hu: "hengeres-es-kupos-suellyesztes", es: "escariado-y-avellanado" },
   ruler: { chapter: "measuring", de: "das-lineal", en: "the-ruler", nl: "de-liniaal", ru: "lineyka", cs: "pravitko", sl: "ravnilo", hu: "a-vonalzo", es: "la-regla" },
   printer: { chapter: "printing", de: "den-drucker-waehlen", en: "choosing-your-printer", nl: "je-printer-kiezen", "pt-br": "escolhendo-a-sua-impressora", ru: "vybor-printera", cs: "vyber-tiskarny", sl: "izbira-tiskalnika", hu: "a-nyomtatod-kivalasztasa", es: "elegir-tu-impresora" },
@@ -145,6 +146,7 @@ type GuideShape = {
   layeredText?: boolean;
   layeredIcon?: boolean;
   qrCode?: unknown;
+  sbcBoard?: unknown;
   imagePlate?: unknown;
 };
 
@@ -155,6 +157,8 @@ export function guideSectionForShape(shape: GuideShape): GuideSection | undefine
   if (shape.layeredIcon && shape.groupedShapes?.length) return "iconTag";
   // A QR code (#553), alone or on its plate, is explained with the texts and tags.
   if (shape.qrCode) return "qrCode";
+  // An SBC board (#1098) is a group, but it is explained next to the port openings.
+  if (shape.sbcBoard) return "sbcBoard";
   // A reference image (#680) is explained with the other measuring aids.
   if (shape.imagePlate) return "referenceImage";
   if (shape.groupedShapes?.length) {

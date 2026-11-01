@@ -202,6 +202,12 @@ Krabička pro elektroniku potřebuje otvor pro kabel. {{ui:shape.port}} je přes
 
 Otvor přichází jako výřez a míří dopředu. Nastavte {{ui:prop.portDepth}} o něco větší, než je tloušťka stěny, posuňte ho tam, kde konektor sedí na desce, a seskupte ho s krabičkou. Pro boční stěnu ho otočte o 90° kolem svislé osy.
 
+### Desky SBC
+
+{{ui:shape.sbcBoard}} je jednodeskový počítač ve skutečné velikosti, abyste kolem něj postavili krabičku: deska se čtyřmi montážními otvory a její části, každá ve své barvě: zásuvky ve vlastním obrysu - USB-C se zaoblenými konci, zásuvky HDMI se seříznutými spodními rohy -, pouzdra USB a síťové zásuvky s jejich otvory, audio konektor s kulatým límcem, kolíkové lišty s tečkou pro každý kolík, větší čipy jako kvádry. Vyberte ji v poli {{ui:sbcBoard.board}}: Raspberry Pi 5, 4 Model B, 3 Model B+ nebo Zero 2 W, případně BIGTREETECH Pi V1.2. Přední hrana s USB-C a HDMI míří k vám. Obrys a otvory pocházejí z výkresů a modelů výrobců; výška, kterou žádný výkres neuvádí, je odhadnutá.
+
+Deska ukazuje, kam přijdou sloupky pro její šrouby a jak vysoká musí krabička být. Pro otvory dejte konektorům místo v poli {{ui:sbcBoard.clearance}} - 0,2 až 0,5 mm pro tištěnou krabičku -, z kopie desky udělejte výřez, posuňte ji tam, kde deska v krabičce sedí, a seskupte ji s krabičkou: každý konektor na okraji vyřízne svůj otvor ve stěně. Skutečné konektory vyčnívají z desky jen 1 až 3 mm, méně, než je tloušťka mnoha stěn: {{ui:sbcBoard.reach}} prodlouží každý konektor na okraji o tolik dál ven na jeho straně, aby stěnu prořízl skrz - o něco víc, než je tloušťka stěny. Jiná deska nebo nastavení ji vytvoří znovu na stejném místě. Obě nastavení fungují stejně pro každou desku.
+
 ## Válcové a kuželové zahloubení
 
 Pro zapuštěnou hlavu šroubu slouží {{ui:shape.counterbore}} jako válcová kapsa pro válcovou hlavu DIN 912 a {{ui:shape.countersink}} jako kužel pro zápustnou hlavu DIN 7991. Oba tvary míří hlavou vzhůru. {{ui:prop.screwHoleHead}} je průměr kapsy či kužele, {{ui:prop.screwHoleShaft}} průměr průchozího otvoru a {{ui:prop.screwHoleLength}} celková délka. U válcového nastavujete {{ui:prop.screwHoleHeadDepth}}, u kuželového {{ui:prop.screwHoleAngle}}, obvykle 90°. Výchozí hodnoty odpovídají M3.

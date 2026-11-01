@@ -190,6 +190,8 @@ async function callTool(name, args) {
       return bridgeCommand("reference_image", args, 60000);
     case "layerling_create_qr_code":
       return bridgeCommand("create_qr_code", args, 60000);
+    case "layerling_create_sbc_board":
+      return bridgeCommand("create_sbc_board", args, 60000);
     case "layerling_measure_section":
       return bridgeCommand("measure_section", args, 30000);
     case "layerling_show_overhangs":

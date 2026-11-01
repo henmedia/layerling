@@ -208,6 +208,12 @@ A box for electronics needs an opening for the cable. The {{ui:shape.port}} is t
 
 It comes as a hole, facing front. Set the {{ui:prop.portDepth}} a little more than the wall is thick, move it to where the socket sits on the board and group it with the box. For a side wall, turn it by 90° around the vertical axis.
 
+### SBC boards
+
+The {{ui:shape.sbcBoard}} is a single-board computer true to size, to build a case around: the board with its four mounting holes, and its parts, each in its own colour: the sockets in their own outline - USB-C with round ends, the HDMI sockets with their lower corners cut - the USB and network housings with their openings, the audio jack with its round collar, the pin headers with a dot for every pin, the larger chips as blocks. Choose it under {{ui:sbcBoard.board}}: Raspberry Pi 5, 4 Model B, 3 Model B+ or Zero 2 W, or BIGTREETECH Pi V1.2. Its front edge, with USB-C and HDMI, faces you. The outline and the holes come from the makers' drawings and models; a height no drawing gives is estimated.
+
+The board shows where the posts for its screws go and how tall the case must be. For the openings, give the connectors room under {{ui:sbcBoard.clearance}} - 0.2 to 0.5 mm for a printed case - make a copy of the board a hole, put it where the board sits in the case and group it with the case: every connector at the edge cuts its opening through the wall. The real connectors stand out of the board only 1 to 3 mm, less than many walls are thick: {{ui:sbcBoard.reach}} makes each connector at the edge reach that much further out on its side, so it cuts right through - a little more than the wall is thick. Another board or setting makes it again where it stands. Every board takes both settings the same way.
+
 ## Counterbore and countersink
 
 A screw head often should not stand proud. The {{ui:shape.counterbore}} cuts a round pocket for a socket-head screw (DIN 912), the {{ui:shape.countersink}} a cone for a countersunk screw (DIN 7991). Both stand with the head end up: the {{ui:prop.screwHoleHead}} is the diameter of the pocket or the cone, the {{ui:prop.screwHoleShaft}} the bore below it, the {{ui:prop.screwHoleLength}} the whole length. On the counterbore you set the {{ui:prop.screwHoleHeadDepth}}, on the countersink the {{ui:prop.screwHoleAngle}} (90° suits countersunk screws). The defaults fit an M3 screw.

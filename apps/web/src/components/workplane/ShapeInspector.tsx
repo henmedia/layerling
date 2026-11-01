@@ -196,6 +196,7 @@ import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
+import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARDS, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -3397,6 +3398,7 @@ export function ShapeInspector({
   textLayerStack: nameTagStack,
   iconTag,
   qrCode,
+  sbcBoard,
   referenceImage,
   onInteractionActiveChange,
   onSnapGridAwayChange,
@@ -3446,6 +3448,8 @@ export function ShapeInspector({
   iconTag?: IconTagControls | null;
   /** The QR code card's wiring (#553), for a QR code; null for anything else. */
   qrCode?: QrCodeControls | null;
+  /** The SBC board card's wiring (#1098), for an SBC board; null for anything else. */
+  sbcBoard?: SbcBoardControls | null;
   /** The reference image card's wiring (#680), for a reference image; null for anything else. */
   referenceImage?: ReferenceImageControls | null;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -3907,6 +3911,7 @@ export function ShapeInspector({
       {shape.keyringTab && onFixKeyringTab ? <KeyringTabFixButton disabled={locked} onFix={onFixKeyringTab} /> : null}
       {shape.kind === "text" && onLayerText ? <MakeLayersButton disabled={locked} onLayerText={onLayerText} /> : null}
       {qrCode ? <QrCodeCard key={`qr-code-${shape.id}`} shapeId={shape.id} controls={qrCode} disabled={locked} /> : null}
+      {sbcBoard ? <SbcBoardCard key={`sbc-board-${shape.id}`} shapeId={shape.id} controls={sbcBoard} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {referenceImage ? <ReferenceImageCard key={`reference-image-${shape.id}`} shapeId={shape.id} controls={referenceImage} workspace={workspace} locked={locked} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {iconTag?.isTag ? (
         <IconTagCard key={`icon-tag-${shape.id}`} shapeId={shape.id} controls={iconTag} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
@@ -4957,6 +4962,94 @@ function QrCodeCard({ shapeId, controls, disabled }: { shapeId: string; controls
             <RefreshCw size={17} strokeWidth={2.5} />
             <span>{busy ? t("qrCode.building") : t("qrCode.regenerate")}</span>
           </button>
+          {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/** The SBC board card's wiring (#1098): the board, clearance and reach it was made with, and making it again with others. */
+export type SbcBoardControls = {
+  settings: SbcBoardSettings;
+  onRegenerate: (settings: SbcBoardSettings) => Promise<void>;
+};
+
+/**
+ * The SBC board card, open and first: which board, how much room the connectors at its edge get and
+ * how much further out they reach. Any change makes the board again where it stands.
+ */
+function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionActiveChange }: {
+  shapeId: string;
+  controls: SbcBoardControls;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const regenerate = (patch: Partial<SbcBoardSettings>) => {
+    const next = { ...controls.settings, ...patch };
+    const same = next.board === controls.settings.board && next.clearance === controls.settings.clearance && (next.reach ?? 0) === (controls.settings.reach ?? 0);
+    if (busy || disabled || same) return;
+    setBusy(true);
+    setError("");
+    controls.onRegenerate(next)
+      .catch((reason) => setError(reason instanceof Error ? localizedError(reason.message) : String(reason)))
+      .finally(() => setBusy(false));
+  };
+  const unit = lengthDisplayUnit(workspace).label;
+  return (
+    <div className={`property-card name-tag-card sbc-board-card ${open ? "" : "collapsed"}`}>
+      <button className="property-card-header" type="button" aria-expanded={open} aria-controls={`sbc-board-${shapeId}`} onClick={() => setOpen((current) => !current)}>
+        <span>{t("sbcBoard.title")}</span>
+        <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+      </button>
+      {open ? (
+        <p className="name-tag-hint">
+          {t("sbcBoard.cardHint")}
+          <GuideHelpLink chapter="threads" section="sbcBoard" className="inspector-help-link" />
+        </p>
+      ) : null}
+      {open ? (
+        <div className="property-list name-tag-body" id={`sbc-board-${shapeId}`} data-testid="sbc-board-card">
+          <SelectProperty
+            type="select"
+            label={t("sbcBoard.board")}
+            value={controls.settings.board}
+            options={SBC_BOARD_ORDER.map((board) => ({ value: board, label: SBC_BOARDS[board].name }))}
+            disabled={disabled || busy}
+            onChange={(value) => regenerate({ board: value as SbcBoardType })}
+          />
+          <label className="select-property sbc-board-clearance">
+            <span>{t("sbcBoard.clearance")} ({unit})</span>
+            <CompactMeasureField
+              label={t("sbcBoard.clearance")}
+              value={controls.settings.clearance}
+              min={0}
+              max={MAX_SBC_CLEARANCE}
+              workspace={workspace}
+              disabled={disabled || busy}
+              onChange={(clearance) => regenerate({ clearance })}
+              onInteractionActiveChange={onInteractionActiveChange}
+            />
+          </label>
+          <p className="name-tag-hint">{t("sbcBoard.clearanceHint")}</p>
+          <label className="select-property sbc-board-reach">
+            <span>{t("sbcBoard.reach")} ({unit})</span>
+            <CompactMeasureField
+              label={t("sbcBoard.reach")}
+              value={controls.settings.reach ?? 0}
+              min={0}
+              max={MAX_SBC_REACH}
+              workspace={workspace}
+              disabled={disabled || busy}
+              onChange={(reach) => regenerate({ reach })}
+              onInteractionActiveChange={onInteractionActiveChange}
+            />
+          </label>
+          <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.reachHint")}</p>
           {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
         </div>
       ) : null}
