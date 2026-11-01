@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { Check, LoaderCircle, X } from "lucide-react";
@@ -54,11 +56,17 @@ export function LidPanel({
   useLanguage();
   const title = t("lid.title");
   // A magnet needs its pocket and a skin above it in the plate: a thinner plate is made thick enough for it.
+  // Raised, it says so under the plate's thickness until that is set by hand; set thinner by hand, it says what is needed.
+  const [raised, setRaised] = useState(false);
   const withMagnet = (patch: Partial<LidOptions>) => {
     const next = { ...settings, ...patch };
     const thickness = lidThicknessForMagnets(next);
-    onChange(next.magnets && settings.thickness < thickness ? { ...patch, thickness } : patch);
+    const raise = next.magnets && settings.thickness < thickness;
+    if (raise) setRaised(true);
+    onChange(raise ? { ...patch, thickness } : patch);
   };
+  const needed = lidThicknessForMagnets(settings);
+  const tooThin = settings.magnets && settings.thickness < needed - 1e-9;
   const millimetres = (value: number) => value.toLocaleString(numberLocale());
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
@@ -109,8 +117,16 @@ export function LidPanel({
         workspace={workspace}
         length
         disabled={busy}
-        onChange={(value) => onChange({ thickness: value })}
+        onChange={(value) => {
+          setRaised(false);
+          onChange({ thickness: value });
+        }}
       />
+      {tooThin ? (
+        <span className="shell-openings-summary" role="status">{t("lid.error.magnetsThinLid", { thickness: millimetres(needed) })}</span>
+      ) : settings.magnets && raised ? (
+        <span className="shell-openings-summary" role="status">{t("lid.magnetsThicknessRaised", { thickness: millimetres(settings.thickness) })}</span>
+      ) : null}
 
       {settings.type === "flat" ? null : (<>
         <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.fit")}>
