@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **An open sketch survives a reload (Discussion #1146):** The design saves its bodies, but a sketch that is not finished is no body yet, so a reload - after an update, for one - took the picture traced over and the line drawn. The open sketch is now kept in this browser while it is drawn (`sketchDraftStore.ts`, in a database of its own, as a picture can be large), written at once when the window is left or the update reloads it, and opened again with the design; finishing or cancelling the sketch removes it. The sketch of an existing body comes back once the body is there. Unit test in `sketchDraftStore.test.ts`. Reported by @gquiring.
 ## 1.131.1
 
 - **Dragging with the right button no longer ends the line on a Mac (#776):** A right click ends a chain of line or smooth-line points. The context menu event that did this comes with the press on macOS and with the release on Windows, so on a Mac the chain ended as the right button went down, also for a pan with Shift and the right button, and the next point started a new line. The chain now ends on the release of the right button, and only if the pointer did not move (`endChainOnRightRelease` in `SketchWorkspace.tsx`). Found from the code, not tried on a Mac. Reported by @stefaanl.

@@ -1,4 +1,5 @@
 "use client";
+import { deleteSketchDraft, loadSketchDraft, saveSketchDraft, sketchHasWork, type SketchDraft } from "@/lib/sketchDraftStore";
 import { normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope } from "@/lib/slopeAlong";
 import { AlertTriangle, X } from "lucide-react";
 import { ObjectListPanel } from "@/components/workplane/ObjectListPanel";
@@ -4893,7 +4894,7 @@ export function LayerlingEditor({
     const body = editingId ? shapesRef.current.find((shape) => shape.id === editingId) : undefined;
     const drawn = profile ?? emptySketchProfile();
     // The body's notes come along, shown on the sketch, and go back to the body when it is finished.
-    const own = { ...drawn, notes: body ? sketchNotesFromBody(notesRef.current, body, sketchNoteFrame(body, operation, drawn, revolveSettings)) : [] };
+    const own = { ...drawn, notes: body ? sketchNotesFromBody(notesRef.current, body, sketchNoteFrame(body, operation, drawn, revolveSettings)) : drawn.notes ?? [] };
     sketchEditTurnRef.current = turn ?? null;
     const initial = cloneSketchProfile(turn ? turnedSketchProfile(own, turn, "toPlate") : own);
     setCruiseAsset(null);
@@ -5004,6 +5005,87 @@ export function LayerlingEditor({
   }, []);
 
   const sketchNotes = useSketchNotes({ profile: sketchProfile, commit: commitSketchProfile, notes, editedId: editingSketchShapeId, onPlaced: () => setNoteMode(false), setNotice });
+
+  /*
+   * The sketch that is open is kept in this browser while it is drawn, and comes back after a reload, an update
+   * included (#1146): the design saves its bodies, but a sketch that is not finished is no body yet.
+   */
+  const sketchDraftOpenForRef = useRef<string | null>(null);
+  const sketchDraftWriteRef = useRef<(() => void) | null>(null);
+  const pendingSketchDraftRef = useRef<SketchDraft | null>(null);
+  const [sketchDraftLoaded, setSketchDraftLoaded] = useState(0);
+  useEffect(() => {
+    if (!projectId) return;
+    if (!sketchActive) {
+      if (sketchDraftOpenForRef.current === projectId) void deleteSketchDraft(projectId);
+      sketchDraftOpenForRef.current = null;
+      sketchDraftWriteRef.current = null;
+      return;
+    }
+    sketchDraftOpenForRef.current = projectId;
+    const write = () => {
+      if (!sketchHasWork(sketchProfile)) {
+        void deleteSketchDraft(projectId);
+        return;
+      }
+      void saveSketchDraft({
+        id: projectId,
+        operation: sketchOperation,
+        profile: sketchProfile,
+        workplane: activeSketchWorkplane,
+        editingId: editingSketchShapeId,
+        revolve: sketchRevolveSettings,
+        turn: sketchEditTurnRef.current,
+        anchor: sketchEditAnchorRef.current,
+        savedAt: Date.now(),
+      });
+    };
+    sketchDraftWriteRef.current = write;
+    const timer = window.setTimeout(write, 600);
+    return () => window.clearTimeout(timer);
+  }, [activeSketchWorkplane, editingSketchShapeId, projectId, sketchActive, sketchOperation, sketchProfile, sketchRevolveSettings]);
+  useEffect(() => {
+    // Written at once when the window is left, or an update reloads it, as the shapes are.
+    const writeNow = () => sketchDraftWriteRef.current?.();
+    const onHidden = () => {
+      if (document.visibilityState === "hidden") writeNow();
+    };
+    window.addEventListener("layerling:save-now", writeNow);
+    document.addEventListener("visibilitychange", onHidden);
+    window.addEventListener("pagehide", writeNow);
+    return () => {
+      window.removeEventListener("layerling:save-now", writeNow);
+      document.removeEventListener("visibilitychange", onHidden);
+      window.removeEventListener("pagehide", writeNow);
+    };
+  }, []);
+  useEffect(() => {
+    pendingSketchDraftRef.current = null;
+    if (!projectId) return;
+    let cancelled = false;
+    void loadSketchDraft(projectId).then((draft) => {
+      if (cancelled || !draft || !sketchHasWork(draft.profile)) return;
+      pendingSketchDraftRef.current = draft;
+      setSketchDraftLoaded((count) => count + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
+  useEffect(() => {
+    const draft = pendingSketchDraftRef.current;
+    if (!draft) return;
+    if (sketchActive) {
+      pendingSketchDraftRef.current = null;
+      return;
+    }
+    // The sketch of a body waits for the body, which arrives a moment after the design is chosen.
+    if (draft.editingId && !shapes.some((shape) => shape.id === draft.editingId)) return;
+    pendingSketchDraftRef.current = null;
+    beginSketch(draft.operation, draft.profile, draft.editingId, draft.revolve as Partial<SketchRevolveSettings> | undefined, draft.workplane, null);
+    sketchEditTurnRef.current = draft.turn;
+    sketchEditAnchorRef.current = draft.anchor;
+  }, [beginSketch, shapes, sketchActive, sketchDraftLoaded]);
 
   /**
    * What the open sketch becomes - extruded, revolved or swept - changed while drawing (#655). The sketch
