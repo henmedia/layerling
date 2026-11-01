@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The camera's glide ends as quickly on a slow computer (Discussion #1143):** After a drag, the view glides on for a moment and slows down. The camera controls braked it by a fixed share per drawn frame, so on a computer that draws few frames a pan, zoomed in, followed the mouse late and glided on for 5 to 10 seconds. The braking now goes by the time since the last frame (`timedCameraDamping` in `cameraInertia.ts`, in the 3D view and the second view): on a 60 Hz screen it is the same as before, on a slower one the glide ends after the same short moment. Unit tests in `cameraInertia.test.ts`. Reported by @billdestud.
+- **Gears with more than 150 teeth load again (#1141):** The editor allows up to 500 teeth, but loading a project still stopped at 150, so a saved design with such a gear was refused as a whole and looked lost. Loading and the gear defaults now take the editor's own limits. Unit test in `gearTeethProject.test.ts`. Reported by @Elkniwt.
+- **Custom thread size first in the size list (Discussion #1142):** "Custom" stood at the very end, below every series of sizes, where hardly anyone found it. It now opens the list. Suggested by @avxmw.
+
 ## 1.131.0
 
 - **Check clearance (#1138):** Parts that should move after printing - a flexi toy, a hinge printed in place, a lid in its box, an axle in a bore - need a gap, and until now the only way to find a stuck pair was to print it. Check clearance in Combine, next to Show common part, checks the selection (or every visible object) pair by pair on the meshes the slicer gets: overlapping (with the shared volume shown red), touching (closer than 0.001 mm, they fuse), too tight or fine against a Minimum gap (0.3 mm to start), each gap marked between layers or side by side. Separate parts of one object splits an imported flexi toy into its links. A click on a row brings the camera there and draws the gap. It runs in the geometry worker and only reads; `layerling_check_clearance` does it through MCP. Contributed by @marcus040473 in #1138.

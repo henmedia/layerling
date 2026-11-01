@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "title": {
+      "de": "Die Ansicht läuft auf langsamen Rechnern nicht mehr lange nach",
+      "en": "The view stops gliding quickly on slow computers too"
+    },
+    "body": {
+      "de": "Nach dem Verschieben oder Drehen läuft die Ansicht kurz nach. Auf Rechnern, die wenige Bilder pro Sekunde zeichnen, dauerte das bis zu zehn Sekunden. Jetzt ist es überall nach demselben kurzen Moment vorbei.",
+      "en": "After you pan or turn, the view glides on for a moment. On computers that draw few frames per second this took up to ten seconds. Now it ends after the same short moment everywhere."
+    }
+  },
+  {
+    "title": {
+      "de": "Zahnräder mit mehr als 150 Zähnen laden wieder",
+      "en": "Gears with more than 150 teeth load again"
+    },
+    "body": {
+      "de": "Ein gespeicherter Entwurf mit einem Zahnrad über 150 Zähnen ließ sich nicht mehr öffnen. Jetzt lädt er wieder, bis zu den 500 Zähnen, die der Editor erlaubt.",
+      "en": "A saved design with a gear of more than 150 teeth would not open. It loads again now, up to the 500 teeth the editor allows."
+    }
+  }
+]

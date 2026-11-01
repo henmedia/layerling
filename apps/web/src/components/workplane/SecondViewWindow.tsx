@@ -29,6 +29,7 @@ import { orbitViewBy, panViewBy, viewArrowStep } from "@/lib/viewArrowKeys";
 import { savedViewForKey } from "@/lib/designView";
 import { viewFaceForKey } from "@/lib/viewCubeDrag";
 import { ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
+import { timedCameraDamping } from "@/lib/cameraInertia";
 
 /**
  * A second view of the design in a window of its own: the same scene, seen through a camera of
@@ -44,7 +45,6 @@ const VIEW_PAGE = "/view.html";
 /** The OrbitControls settings the second view takes over from the 3D view's camera. */
 const SHARED_CONTROL_SETTINGS = [
   "enableDamping",
-  "dampingFactor",
   "rotateSpeed",
   "zoomSpeed",
   "panSpeed",
@@ -371,11 +371,15 @@ export function SecondViewWindow({ popup, threeRef, projectId, getSelectedIds, o
     // A frame is drawn when this camera moved, or when the 3D view drew one: that is when the scene changed.
     let lastMainFrame = -1;
     let frameId = 0;
+    let lastFrameAt = performance.now();
     const animate = () => {
       frameId = popup.requestAnimationFrame(animate);
       const state = threeRef.current;
       if (!state) return;
-      const turning = stepCameraTurn(rig, performance.now());
+      const now = performance.now();
+      const turning = stepCameraTurn(rig, now);
+      controls.dampingFactor = timedCameraDamping(now - lastFrameAt);
+      lastFrameAt = now;
       const moved = controls.update();
       const mainFrame = state.renderer.info.render.frame;
       if (!turning && !moved && !rig.needsRender && mainFrame === lastMainFrame) return;

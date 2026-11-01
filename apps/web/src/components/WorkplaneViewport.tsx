@@ -41,6 +41,7 @@ import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeS
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { highestTapeIdNumber, readTape, savedTape, writeTape } from "@/lib/tapeStore";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
+import { timedCameraDamping } from "@/lib/cameraInertia";
 import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
@@ -2982,10 +2983,14 @@ export function WorkplaneViewport({
     rebuildShapes(state, shapesRef.current, shapeOutlineIds(), false, placementWorkplaneRef.current);
     syncSplitPlane(state, splitPlaneRef.current, false, selectedIdsRef.current);
 
+    // The camera's glide brakes by the time since the last frame, not per frame (Discussion #1143).
+    let lastFrameAt = performance.now();
     const animate = () => {
       state.animationId = window.requestAnimationFrame(animate);
       const now = performance.now();
       const turning = stepCameraTurn(state, now);
+      state.controls.dampingFactor = timedCameraDamping(now - lastFrameAt);
+      lastFrameAt = now;
       const controlsChanged = state.controls.update();
       fitCameraDepthRange(state.camera, state.controls.target);
       const cameraSettled = state.wasCameraMoving && !controlsChanged;
