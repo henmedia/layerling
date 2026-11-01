@@ -2456,13 +2456,14 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const driveDepthLimits = threadDriveDepthLimits(settings);
     // Zollgewinde werden in Gaengen je Zoll gedacht, nicht in Millimetern.
     const inchPitch = threadUsesInchPitch(settings.diameter);
+    // "Frei" steht vorn, sonst sieht man es erst ganz unten nach allen Reihen (Discussion #1142).
     const sizeOptions = [
+      { value: "custom", label: t("thread.customSize") },
       ...THREAD_SIZE_GROUPS.flatMap((group) => group.sizes.map((size) => ({
         value: size.id,
         label: size.id,
         group: t(THREAD_SERIES_TEXT[group.series].group),
       }))),
-      { value: "custom", label: t("thread.customSize") },
     ];
     // Die Hoehe des Koerpers bleibt Kopf plus Gewinde; abgefragt wird aber das
     // Gewinde, weil ein Mass, das den Kopf mitzaehlt, niemandem etwas sagt.
