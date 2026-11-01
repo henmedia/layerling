@@ -76,12 +76,12 @@ function aroundCylinder(settings: Record<string, unknown>, radius = 12, height =
 }
 
 /** Area (mm²) of the triangles above `from` (y up) that lean - neither level nor upright: a brick's faces and joints are either. */
-function leaning(result: SurfaceTextureResult, from: number) {
+function leaning(result: SurfaceTextureResult, from: number, within: (x: number, z: number) => boolean = () => true) {
   const v = result.vertices, I = result.indices;
   let area = 0;
   for (let t = 0; t < I.length; t += 3) {
     const p = [0, 1, 2].map((k) => [v[I[t + k] * 3], v[I[t + k] * 3 + 1], v[I[t + k] * 3 + 2]]);
-    if (p.some(([, y]) => y < from)) continue;
+    if (p.some(([x, y, z]) => y < from || !within(x, z))) continue;
     const a = [0, 1, 2].map((k) => p[1][k] - p[0][k]), b = [0, 1, 2].map((k) => p[2][k] - p[0][k]);
     const n = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
     const l = Math.hypot(n[0], n[1], n[2]);
@@ -244,7 +244,9 @@ describe("bricks", () => {
     // The top's joints are its own, fitted to it; at an edge each side moved as deep as its own bricks lie there.
     const result = applySurfaceTexture(box(40, 30, 25), { pattern: "bricks", faces: ["top", "front", "back", "left", "right"] });
     expectClosed(result);
-    expect(leaning(result, 28)).toBeLessThan(5);
+    // The rim itself stays smooth (a wall's and the top's joints cannot meet there): the joints run out over `fade` (1 mm)
+    // in narrow ramps along it. Fans would reach across the top's brick faces, beyond that band.
+    expect(leaning(result, 28, (x, z) => Math.abs(x) < 20 - 1.5 && Math.abs(z) < 12.5 - 1.5)).toBeLessThan(5);
   }, 30000);
 
   it("lays bricks round a hexagonal prism along its outline, its joints not cut in teeth", () => {

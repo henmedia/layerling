@@ -5102,7 +5102,11 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // Bark all round (a board, a box) keeps its edges smooth anyway: its furrows pulled an edge in past the points beside
       // it on the other face, which turned over in spikes there. Round a log its ends' rims slide along (see edgeRounding).
       const keepsEdges = s.keepEdges || (s.pattern === "bark" && s.projection === "allRound");
-      const kept = (i: number) => keepsEdges && crease[i] === 1 && !(wrapped && wrapped[i]) && !overRim(i);
+      // Bricks run round a box's corners (their sharp edges are not kept smooth), but where a wall meets a top or bottom
+      // with bricks of its own, the joints of the two cannot meet: the rim pulled the wall's top course into wedges. That
+      // rim stays smooth, as with keepEdges (a rim whose top or bottom stays smooth is smooth anyway).
+      const brickRims = s.pattern === "bricks" && !keepsEdges ? (kinds ?? pointKindsFor(mesh, AXIS_INDEX[s.axis])) : null;
+      const kept = (i: number) => (keepsEdges || (brickRims !== null && (brickRims[i] & 3) === 3)) && crease[i] === 1 && !(wrapped && wrapped[i]) && !overRim(i);
       const w0 = new Uint8Array(n);
       for (let i = 0; i < n; i += 1) {
         const z = v[i * 3 + 2];

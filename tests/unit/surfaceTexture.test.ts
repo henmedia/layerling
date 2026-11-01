@@ -196,6 +196,37 @@ describe("texturing a body", () => {
     points.filter((p) => p.r < 13.5 && p.y > 0.01 && p.y < 17.99).forEach((p) => expect(Math.abs(p.r - 12)).toBeLessThan(0.01));
   });
 
+  it("keeps the rim between a brick wall and a top with bricks of its own clean, and lets the joints run round the corners", () => {
+    // A box 60 x 24 x 40 (inside frame: y up) with bricks on the four sides and the top, sharp edges not kept smooth.
+    const faces = ["top", "front", "back", "left", "right"];
+    for (const direction of ["inward", "outward"] as const) {
+      const result = applySurfaceTexture(box(60, 24, 40), { pattern: "bricks", spacing: 12, depth: 0.6, profile: "flat", keepEdges: false, faces, direction }, SMALL);
+      expectClosed(result);
+      // The top's joints met the wall's top course at the rim and folded it into wedges: triangles there facing into the
+      // body. Along the front's top edge none may.
+      const v = result.vertices, I = result.indices;
+      let folded = 0;
+      for (let t = 0; t < I.length; t += 3) {
+        const p = [0, 1, 2].map((k) => [v[I[t + k] * 3], v[I[t + k] * 3 + 1], v[I[t + k] * 3 + 2]]);
+        const e1 = [0, 1, 2].map((k) => p[1][k] - p[0][k]), e2 = [0, 1, 2].map((k) => p[2][k] - p[0][k]);
+        const n = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]];
+        const l = Math.hypot(n[0], n[1], n[2]);
+        if (l < 1e-9) continue;
+        const middle = [0, 1, 2].map((k) => (p[0][k] + p[1][k] + p[2][k]) / 3);
+        const long = Math.max(...[0, 1, 2].map((k) => Math.max(...p.map((q) => q[k])) - Math.min(...p.map((q) => q[k])))) > 1;
+        const nearRim = Math.abs(middle[1] - 24) < 2 && Math.abs(middle[2] - 20) < 2 && Math.abs(middle[0]) < 28;
+        if (nearRim && long && (n[2] / l < -0.5 || n[1] / l < -0.5)) folded += 1;
+      }
+      expect(folded).toBe(0);
+      // Round the upright corners the bricks still run on: a joint reaches the corner, cut in (or the bricks standing out).
+      const corner = Array.from(new Set(Array.from(I)), (i) => [v[i * 3], v[i * 3 + 1], v[i * 3 + 2]])
+        .filter(([x, y, z]) => y > 2 && y < 20 && Math.abs(Math.abs(x) - 30) < 0.8 && Math.abs(Math.abs(z) - 20) < 0.8);
+      const off = corner.map(([x, , z]) => Math.max(Math.abs(x) - 30, Math.abs(z) - 20));
+      if (direction === "inward") expect(Math.min(...off)).toBeLessThan(-0.5);
+      else expect(Math.max(...off)).toBeGreaterThan(0.5);
+    }
+  }, 60000);
+
   it("cuts honeycomb along its joints: closed, and every joint reaches the full depth", () => {
     const result = applySurfaceTexture(tube(12, 0, 20), { pattern: "honeycomb", spacing: 5, depth: 0.5, width: 0.3, profile: "flat" }, SMALL);
     expectClosed(result);
