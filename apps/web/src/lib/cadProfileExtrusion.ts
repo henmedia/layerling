@@ -1695,8 +1695,8 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight });
-  // Label shelves, finger scoops and dividers are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554).
+  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOutline: shape.gridfinityOutline });
+  // Label shelves, finger scoops and dividers, and an outline plate's sockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
   if (!loadedManifoldRuntime() && gridfinityHasPieces({ ...shape, width, depth })) return null;
   return {
     width: plan.size.width,
@@ -1752,6 +1752,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityOpenings: shape.gridfinityOpenings,
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
+    gridfinityOutline: shape.gridfinityOutline,
     // Mesh and body are built at the size of the grid units, which canonicalizeShape
     // keeps the shape's box at; a box that differs anyway stretches the body to it.
     transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / plan.size.width, shape.height / plan.size.height, depth / plan.size.depth)),

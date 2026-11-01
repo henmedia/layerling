@@ -662,6 +662,9 @@ export type GridfinityOpening = {
   distance?: number;
 };
 
+/** A point of a Gridfinity baseplate's outline (#1061), in the plate's own frame: x across, z deep, in mm. */
+export type GridfinityOutlinePoint = { x: number; z: number };
+
 /** Was aus dem Gewinde wird: Stange, Schraube, Mutter oder das Loch dafuer. */
 export type ThreadRole = "rod" | "screw" | "nut" | "bore";
 export type ThreadHead = "cylinder" | "countersunk" | "hex" | "square" | "flange" | "wing" | "knob";
@@ -1107,6 +1110,8 @@ export type WorkplaneShape = {
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   /** Gridfinity bin: the size of that rounding or chamfer in mm; missing, 0 or under 0.5 leaves them square. */
   gridfinityOpeningCornerSize?: number;
+  /** Gridfinity baseplate: the outline it fills (#1061), centred on its bounds; built stretched to the box, whole cells inside, the rest solid. */
+  gridfinityOutline?: GridfinityOutlinePoint[];
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */

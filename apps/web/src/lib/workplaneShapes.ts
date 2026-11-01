@@ -2,7 +2,7 @@ import { createLocalId } from "@/lib/localIds";
 import { repairClampedMeshBase } from "@/lib/importedMeshBase";
 import { fieldFormulasEqual } from "@/lib/fieldFormulas";
 import { threadFootprintPatch } from "@/lib/threadGeometry";
-import { GRIDFINITY_PADDING_KEYS, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_PADDING_KEYS, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
@@ -743,6 +743,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     gridfinityOpeningsEqual(a.gridfinityOpenings, b.gridfinityOpenings) &&
     a.gridfinityOpeningCorner === b.gridfinityOpeningCorner &&
     a.gridfinityOpeningCornerSize === b.gridfinityOpeningCornerSize &&
+    gridfinityOutlinesEqual(a.gridfinityOutline, b.gridfinityOutline) &&
     a.dovetailNeckWidth === b.dovetailNeckWidth &&
     a.dovetailClearance === b.dovetailClearance &&
     a.loftBottomOutline === b.loftBottomOutline &&

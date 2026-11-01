@@ -268,6 +268,9 @@ import {
   gridfinityOpeningLimits,
   gridfinityOpeningMaxCornerSize,
   gridfinityOpeningPatch,
+  gridfinityOutlineLimit,
+  gridfinityOutlineNeedsLargePlate,
+  gridfinityOutlineRemovalPatch,
   gridfinityPaddingPatch,
   gridfinityPlan,
   gridfinityScoopFits,
@@ -493,6 +496,8 @@ type TogglePropertyConfig = {
   id: string;
   label: string;
   value: boolean;
+  /** Greyed out on its own, beside the whole panel's lock: a switch that cannot be turned off now. */
+  disabled?: boolean;
   /** Switches next to each other with the same layout, such as a bin's four open sides (#455), are drawn together in it. */
   layout?: "sides";
   /** Its place in that layout, named rather than counted: the row takes the class check-property-{area}. */
@@ -1437,7 +1442,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 
   if (shape.kind === "gridfinity") {
     const plan = gridfinityPlan({ ...shape, depth });
-    // The size is whole grid units; every change writes the box they make; a tray's is free in mm.
+    const needsLargePlate = gridfinityOutlineNeedsLargePlate({ ...shape, depth });
+    // The size is whole grid units; every change writes the box they make; a tray's and an outline plate's are free in mm.
     const apply = (next: Parameters<typeof gridfinityShapePatch>[1]) => {
       const patch = gridfinityShapePatch({ ...shape, depth }, next);
       onUpdate({ ...patch, size: resizedShapeSize(patch.width, patch.depth) });
@@ -1456,9 +1462,23 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     if (plan.type === "bin") {
       properties.push({ type: "toggle", id: "gridfinityHalfGrid", label: t("prop.gridfinityHalfGrid"), value: plan.halfGrid, onChange: (value) => apply({ halfGrid: value }) });
     } else if (plan.type === "baseplate") {
-      properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, onChange: (value) => apply({ largePlate: value }) });
+      // An outline wider than a plate without the switch keeps it on (#1061).
+      properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, disabled: plan.largePlate && needsLargePlate, onChange: (value) => apply({ largePlate: value }) });
     }
-    if (plan.type === "tray") {
+    if (plan.outline) {
+      // A plate fitted into an outline (#1061): its box is free in mm and the outline stretches with it; switched off,
+      // it is a plate of whole units in that box again, the rest padding.
+      const limit = gridfinityOutlineLimit(shape);
+      const removeOutline = () => {
+        const patch = gridfinityOutlineRemovalPatch({ ...shape, depth });
+        onUpdate({ ...patch, size: resizedShapeSize(patch.width, patch.depth) });
+      };
+      properties.push(
+        { type: "toggle", id: "gridfinityOutline", label: t("prop.gridfinityOutline"), value: true, onChange: removeOutline },
+        { id: "length", label: t("prop.length"), value: plan.size.depth, min: MIN_GRIDFINITY_TRAY_SIZE, max: limit, onChange: setDepth },
+        { id: "width", label: t("prop.width"), value: plan.size.width, min: MIN_GRIDFINITY_TRAY_SIZE, max: limit, hint: [plan.cells.length > 0 ? t("gridfinity.outlineCells", { cells: plan.cells.length }) : t("gridfinity.outlineNoCells"), ...(needsLargePlate ? [t("gridfinity.outlineNeedsLargePlate", { size: gridfinityOutlineLimit({ ...shape, gridfinityLargePlate: false }) })] : [])].join(" "), onChange: setWidth },
+      );
+    } else if (plan.type === "tray") {
       // A tray (#837) has no grid: its size is free in mm, as a box's.
       properties.push(
         { id: "length", label: t("prop.length"), value: plan.size.depth, min: MIN_GRIDFINITY_TRAY_SIZE, max: MAX_GRIDFINITY_TRAY_SIZE, onChange: setDepth },
@@ -1472,7 +1492,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         { id: "gridfinityUnitsZ", label: t("prop.gridfinityUnitsZ"), value: plan.count.z, min: MIN_GRIDFINITY_UNITS, max: maxUnits, step: 1, onChange: (value) => apply({ z: Math.round(value) }) },
       );
     }
-    if (plan.type === "baseplate") {
+    if (plan.type === "baseplate" && !plan.outline) {
       // The drawer it fills (#455): typing a drawer's inside size works out the units and the paddings of that axis.
       const drawer = gridfinityDrawerSize({ ...shape, depth });
       const drawerMax = gridfinityDrawerMax(shape);
@@ -1482,7 +1502,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       };
       properties.push(
         { id: "gridfinityDrawerWidth", label: t("prop.gridfinityDrawerWidth"), value: drawer.width, min: MIN_GRIDFINITY_DRAWER, max: drawerMax, step: 0.1, hint: t("gridfinity.drawerHint", { size: drawerMax.toLocaleString(numberLocale()) }), onChange: (value) => fit("x", value) },
-        { id: "gridfinityDrawerDepth", label: t("prop.gridfinityDrawerDepth"), value: drawer.depth, min: MIN_GRIDFINITY_DRAWER, max: drawerMax, step: 0.1, onChange: (value) => fit("z", value) },
+        { id: "gridfinityDrawerDepth", label: t("prop.gridfinityDrawerDepth"), value: drawer.depth, min: MIN_GRIDFINITY_DRAWER, max: drawerMax, step: 0.1, hint: t("gridfinity.outlineFitHint"), onChange: (value) => fit("z", value) },
       );
       // Padding (#455): a solid border on each side, so the plate fills a drawer that is not whole units; the units stay as they are.
       const walls = [
@@ -6614,8 +6634,9 @@ function ShapePropertyRows({
       return <SelectProperty {...property} key={property.id} disabled={disabled} onReset={onReset} />;
     }
     if (property.type === "toggle") {
-      const onReset = typeof fallback === "boolean" && fallback !== property.value ? () => property.onChange(fallback) : undefined;
-      return <ToggleProperty {...property} key={property.id} disabled={disabled} onReset={onReset} />;
+      // A switch greyed out on its own offers no reset either.
+      const onReset = !property.disabled && typeof fallback === "boolean" && fallback !== property.value ? () => property.onChange(fallback) : undefined;
+      return <ToggleProperty {...property} key={property.id} disabled={disabled || property.disabled} onReset={onReset} />;
     }
     const differs = typeof fallback === "number" && Math.abs(fallback - property.value) > Math.max(1e-6, (property.step ?? 0.01) / 10);
     const onReset = differs ? () => property.onChange(fallback as number) : undefined;
@@ -7402,6 +7423,7 @@ export function SelectionInspector({
   onSetHole,
   onSetColor,
   onUpdateShapes,
+  onFitGridfinityOutline,
   onToggleLocked,
   onToggleHidden,
   onInteractionActiveChange,
@@ -7419,6 +7441,8 @@ export function SelectionInspector({
   onSetColor: (color: string) => void;
   /** Changes to several of the selected parts in one step: "Fit module" for two gears (#645). */
   onUpdateShapes?: (changes: readonly { id: string; patch: Partial<WorkplaneShape> }[], message?: string) => void;
+  /** A baseplate and one other shape selected: fit the plate into what the other stands on (#1061). */
+  onFitGridfinityOutline?: (plateId: string, sourceId: string) => Promise<void> | void;
   onToggleLocked: () => void;
   /** Hides the selected parts, or shows them again when all of them are hidden (#491); the button of a single part's panel. */
   onToggleHidden?: () => void;
@@ -7468,6 +7492,9 @@ export function SelectionInspector({
     if (!kept) return;
     onUpdateShapes([kept.patch], t("status.gearPairKept", { name: displayShapeName(shapes[index]), module: plainNumber(kept.module), distance: plainNumber(kept.distance) }));
   };
+  // A baseplate and one other shape: the plate can be fitted into what the other stands on (#1061).
+  const outlinePlates = shapes.length === 2 ? shapes.filter((shape) => shape.kind === "gridfinity" && normalizeGridfinityType(shape.gridfinityType) === "baseplate") : [];
+  const outlineSource = outlinePlates.length === 1 ? shapes.find((shape) => shape !== outlinePlates[0]) : undefined;
   const pick = (color: string) => {
     onSetColor(color);
     rememberColor(color);
@@ -7592,6 +7619,11 @@ export function SelectionInspector({
           {t("inspector.gearPairKeep", { name: displayShapeName(shapes[index]) })}
         </button>
       )) : null}
+      {outlineSource && onFitGridfinityOutline ? (
+        <button type="button" className="inspector-action-button" disabled={anyLocked} title={t("inspector.gridfinityOutlineFitHint")} onClick={() => void onFitGridfinityOutline(outlinePlates[0].id, outlineSource.id)}>
+          {t("inspector.gridfinityOutlineFit")}
+        </button>
+      ) : null}
       <p className="selection-inspector-hint">{t("inspector.selectionHint")}</p>
       {!movable.moved ? (
         <div className="inspector-snap-dock">
