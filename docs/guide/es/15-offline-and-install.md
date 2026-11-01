@@ -32,7 +32,7 @@ El idioma se elige arriba a la derecha, en la lista de idiomas. El tema, a su la
 
 ## Alojarlo tú mismo
 
-layerling es software libre (AGPL-3.0) y puedes hacerlo funcionar en tu propio ordenador o servidor, por ejemplo en un taller, una asociación o un colegio. Hay varias formas, que se describen en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.md#getting-started):
+layerling es software libre (AGPL-3.0) y puedes hacerlo funcionar en tu propio ordenador o servidor, por ejemplo en un taller, una asociación o un colegio. Hay varias formas, que se describen en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.es.md#primeros-pasos):
 
 - **Inicio rápido en Windows:** Una sola línea en PowerShell lo instala todo y crea un acceso directo en el escritorio. Si layerling ya está en marcha, otro doble clic no arranca un segundo servidor: solo abre la página.
 - **Docker:** Para NAS y servidores domésticos, sin necesidad de instalar Node.js. Cada versión se publica como imagen lista para usar, `henmedia/layerling`, en Docker Hub (y también como `ghcr.io/henmedia/layerling`), para amd64 y arm64; `docker run -d -p 3000:3000 -v layerling-thumbnails:/app/.codex/project-thumbnails henmedia/layerling:latest` la pone en marcha, y en un NAS la buscas en el registro del gestor de contenedores. El volumen `layerling-thumbnails` conserva las imágenes de vista previa de la página de inicio al actualizar; sin él, desaparecen cada vez que se vuelve a crear el contenedor, hasta que abres el diseño.

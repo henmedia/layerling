@@ -247,6 +247,11 @@ export type SurfaceTextureSettings = {
    * before the top and bottom kept smooth, the walls and the height band.
    */
   faces: SurfaceTextureFace[];
+  /**
+   * The faces other layers of the same body take (see WorkplaneShape.surfaceTextureLayers): a layer that picks no faces
+   * of its own goes everywhere the settings above allow except there, so each face carries one pattern.
+   */
+  exceptFaces: SurfaceTextureFace[];
   /** Cracks: style, where they begin and how many. */
   crackStyle: SurfaceTextureCrackStyle;
   crackStart: SurfaceTextureCrackStart;
@@ -350,6 +355,7 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   detail: "medium",
   masks: [],
   faces: [],
+  exceptFaces: [],
   crackStyle: "crack",
   crackStart: "top",
   crackCount: 5,
@@ -562,6 +568,8 @@ export function normalizeSurfaceTexture(input: unknown): SurfaceTextureSettings 
   if (out.pattern === "wood" && source.ringWidth === undefined) out.ringWidth = WOOD_RINGS[out.woodType];
   out.masks = normalizeSurfaceTextureMasks(source.masks);
   out.faces = normalizeSurfaceTextureFaces(source.faces);
+  // Faces left to other layers count only for a layer that picks none of its own.
+  out.exceptFaces = out.faces.length ? [] : normalizeSurfaceTextureFaces(source.exceptFaces);
   out.textOutline = normalizeSurfaceTextOutline(source.textOutline);
   return out;
 }
@@ -3935,6 +3943,123 @@ function edgeRounding(layout: SurfaceTextureLayout, s: SurfaceTextureSettings, k
   };
 }
 
+/** At most this many triangles in a leaf of the tree rays across a body go through (see bodyAcross). */
+const ACROSS_LEAF = 8;
+
+/**
+ * Whether the body stands across from a point: a ray from it across the axis (direction `d`, nothing along the axis)
+ * meets one of the body's triangles. A cup's or a tube's inner wall looks across the hollow at the wall opposite; a face
+ * that only leans over the middle, as a wedge's slope does past it, faces the axis as well, but looks into the open
+ * (see SurfaceTextureSettings.inside). The triangles go into a tree of boxes once (halved at the middle triangle along
+ * the longest side), so a ray only meets the few near its way - a hollow vase has tens of thousands.
+ */
+function bodyAcross(base: SurfaceBase) {
+  const v = base.vertices, I = base.indices;
+  const count = I.length / 3;
+  let tree: { box: Float64Array; first: Uint32Array; size: Uint32Array; order: Uint32Array } | null = null;
+  const build = () => {
+    const middle = new Float64Array(count * 3);
+    for (let t = 0; t < count; t += 1) {
+      for (let k = 0; k < 3; k += 1) middle[t * 3 + k] = (v[I[t * 3] * 3 + k] + v[I[t * 3 + 1] * 3 + k] + v[I[t * 3 + 2] * 3 + k]) / 3;
+    }
+    const order = Uint32Array.from({ length: count }, (_, t) => t);
+    // A node is a box and a run of `order` (its triangles); a split node's children follow as 2n+1 and 2n+2.
+    const most = 2 * Math.max(1, Math.ceil(count / ACROSS_LEAF)) * 2;
+    const box = new Float64Array(most * 6), first = new Uint32Array(most), size = new Uint32Array(most);
+    const stack: Array<[number, number, number]> = [[0, 0, count]];
+    while (stack.length) {
+      const [node, from, n] = stack.pop()!;
+      const b = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+      for (let i = from; i < from + n; i += 1) {
+        const t = order[i];
+        for (let c = 0; c < 3; c += 1) {
+          for (let k = 0; k < 3; k += 1) {
+            const x = v[I[t * 3 + c] * 3 + k];
+            if (x < b[k]) b[k] = x;
+            if (x > b[k + 3]) b[k + 3] = x;
+          }
+        }
+      }
+      box.set(b, node * 6);
+      first[node] = from;
+      size[node] = n;
+      if (n <= ACROSS_LEAF || node * 2 + 2 >= most) continue;
+      const k = [0, 1, 2].reduce((best, axis) => (b[axis + 3] - b[axis] > b[best + 3] - b[best] ? axis : best), 0);
+      // The middle triangle along that side in its place, those before it not further along, those after not less far.
+      const half = n >> 1;
+      let lo = from, hi = from + n - 1;
+      const nth = from + half;
+      while (lo < hi) {
+        const pivot = middle[order[(lo + hi) >> 1] * 3 + k];
+        let i = lo, j = hi;
+        while (i <= j) {
+          while (middle[order[i] * 3 + k] < pivot) i += 1;
+          while (middle[order[j] * 3 + k] > pivot) j -= 1;
+          if (i <= j) {
+            const swap = order[i];
+            order[i] = order[j];
+            order[j] = swap;
+            i += 1;
+            j -= 1;
+          }
+        }
+        if (nth <= j) hi = j;
+        else if (nth >= i) lo = i;
+        else break;
+      }
+      size[node] = 0;
+      stack.push([node * 2 + 1, from, half], [node * 2 + 2, from + half, n - half]);
+    }
+    return { box, first, size, order };
+  };
+  // A hit this close is the point's own face (or a neighbour touching it), not a wall across.
+  const near = 1e-5 * Math.max(base.size[0], base.size[1], base.size[2], 1e-3);
+  /** Whether the ray from p along d meets triangle t further than `near` (Moller-Trumbore, its edges counted in). */
+  const meets = (p: number[], d: [number, number, number], t: number) => {
+    const a = I[t * 3] * 3, b = I[t * 3 + 1] * 3, c = I[t * 3 + 2] * 3;
+    const e1x = v[b] - v[a], e1y = v[b + 1] - v[a + 1], e1z = v[b + 2] - v[a + 2];
+    const e2x = v[c] - v[a], e2y = v[c + 1] - v[a + 1], e2z = v[c + 2] - v[a + 2];
+    const hx = d[1] * e2z - d[2] * e2y, hy = d[2] * e2x - d[0] * e2z, hz = d[0] * e2y - d[1] * e2x;
+    const det = e1x * hx + e1y * hy + e1z * hz;
+    if (Math.abs(det) < 1e-12) return false;
+    const f = 1 / det;
+    const sx = p[0] - v[a], sy = p[1] - v[a + 1], sz = p[2] - v[a + 2];
+    const u = f * (sx * hx + sy * hy + sz * hz);
+    if (u < -1e-9 || u > 1 + 1e-9) return false;
+    const qx = sy * e1z - sz * e1y, qy = sz * e1x - sx * e1z, qz = sx * e1y - sy * e1x;
+    const w = f * (d[0] * qx + d[1] * qy + d[2] * qz);
+    if (w < -1e-9 || u + w > 1 + 1e-9) return false;
+    return f * (e2x * qx + e2y * qy + e2z * qz) > near;
+  };
+  return (px: number, py: number, pz: number, d: [number, number, number]) => {
+    if (!count) return false;
+    tree ??= build();
+    const { box, first, size, order } = tree;
+    const p = [px, py, pz];
+    const stack = [0];
+    while (stack.length) {
+      const node = stack.pop()!;
+      // The ray against the node's box (slabs), only ahead of the point.
+      let lo = 0, hi = Infinity;
+      for (let k = 0; k < 3 && lo <= hi; k += 1) {
+        const min = box[node * 6 + k] - near, max = box[node * 6 + k + 3] + near;
+        if (Math.abs(d[k]) < 1e-12) {
+          if (p[k] < min || p[k] > max) hi = -1;
+        } else {
+          const t1 = (min - p[k]) / d[k], t2 = (max - p[k]) / d[k];
+          lo = Math.max(lo, Math.min(t1, t2));
+          hi = Math.min(hi, Math.max(t1, t2));
+        }
+      }
+      if (lo > hi) continue;
+      if (size[node]) {
+        for (let i = first[node]; i < first[node] + size[node]; i += 1) if (meets(p, d, order[i])) return true;
+      } else stack.push(node * 2 + 1, node * 2 + 2);
+    }
+    return false;
+  };
+}
+
 /**
  * Holds the welded body and the last refinement: when only the depth, the direction or what stays
  * smooth changes, the mesh is not refined again. `positions`: the body as triangles (nine numbers
@@ -3942,6 +4067,39 @@ function edgeRounding(layout: SurfaceTextureLayout, s: SurfaceTextureSettings, k
  */
 export function createSurfaceTextureSession(positions: ArrayLike<number>) {
   const base = prepareSurfaceBase(insideToScreenPositions(positions));
+  const across = bodyAcross(base);
+  /**
+   * Whether a wall facing the axis at (x, y, z), its normal across the axis (h1, h2) along `i1` and `i2`, is an inner
+   * one: the body stands across from it (see bodyAcross).
+   */
+  const innerWall = (x: number, y: number, z: number, h1: number, h2: number, i1: number, i2: number) => {
+    const l = Math.hypot(h1, h2);
+    const d: [number, number, number] = [0, 0, 0];
+    d[i1] = h1 / l;
+    d[i2] = h2 / l;
+    return across(x, y, z, d);
+  };
+  // Per input triangle and axis: 1 the body stands across from its middle, 2 it does not, 0 not asked yet.
+  const facesAcross = new Map<number, Uint8Array>();
+  /**
+   * Whether the body stands across from input triangle t (from its middle, across the axis `ax` along its normal; see
+   * bodyAcross). Asked once per triangle: a hollow vase has tens of thousands on its inner wall.
+   */
+  const faceAcross = (t: number, ax: number) => {
+    let known = facesAcross.get(ax);
+    if (!known) {
+      known = new Uint8Array(base.indices.length / 3);
+      facesAcross.set(ax, known);
+    }
+    if (!known[t]) {
+      const v = base.vertices, I = base.indices;
+      const [i1, i2] = acrossAxes(SURFACE_TEXTURE_AXES[ax]);
+      const n = faceCross(v, I[t * 3], I[t * 3 + 1], I[t * 3 + 2]);
+      const at = (k: number) => (v[I[t * 3] * 3 + k] + v[I[t * 3 + 1] * 3 + k] + v[I[t * 3 + 2] * 3 + k]) / 3;
+      known[t] = Math.hypot(n[i1], n[i2]) > 1e-12 && innerWall(at(0), at(1), at(2), n[i1], n[i2], i1, i2) ? 1 : 2;
+    }
+    return known[t] === 1;
+  };
   let cache: RefinedState | null = null;
   let chosenCache: { key: string; chosen: Uint8Array | null } | null = null;
 
@@ -3953,6 +4111,16 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const chosen = surfaceTextureChosenTriangles(base, s.faces, s.edgeAngle);
     chosenCache = { key, chosen };
     return chosen;
+  }
+  let exceptCache: { key: string; except: Uint8Array | null } | null = null;
+  /** Per input triangle whether another layer takes it (see SurfaceTextureSettings.exceptFaces); null: none. */
+  function exceptedFaces(s: SurfaceTextureSettings) {
+    if (s.faces.length || !s.exceptFaces.length) return null;
+    const key = JSON.stringify([s.exceptFaces, s.edgeAngle]);
+    if (exceptCache?.key === key) return exceptCache.except;
+    const except = surfaceTextureChosenTriangles(base, s.exceptFaces, s.edgeAngle);
+    exceptCache = { key, except };
+    return except;
   }
   let fadeCache: { key: string; state: RefinedState } | null = null;
   // Per input triangle what kind of face it is round the axis (see pointKindsFor), by axis.
@@ -4285,7 +4453,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const ax = AXIS_INDEX[s.axis];
     const [i1, i2] = acrossAxes(s.axis);
     const key = JSON.stringify([s.crackStyle, s.crackStart, s.crackCount, s.crackLength, s.crackWidth, s.crackBranch, s.crackJag, s.crackRough, s.crackSeed, s.axis,
-      s.bottomFree, s.topFree, s.inside, s.outside, s.zoneFrom, s.zoneTo, s.masks, s.faces, layout.center]);
+      s.bottomFree, s.topFree, s.inside, s.outside, s.zoneFrom, s.zoneTo, s.masks, s.faces, s.exceptFaces, layout.center]);
     if (crackCache?.key === key) return crackCache.net;
     crackIndex ??= surfaceIndex(base);
     const N = crackIndex.normals;
@@ -4293,11 +4461,13 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const cosBottom = Math.cos((s.bottomFree * Math.PI) / 180), cosTop = Math.cos((s.topFree * Math.PI) / 180);
     const zFrom = base.min[2] + (s.zoneFrom / 100) * (base.size[2] || 1), zTo = base.min[2] + (s.zoneTo / 100) * (base.size[2] || 1);
     const chosen = chosenFaces(s);
+    const except = exceptedFaces(s);
     const allowed = (t: number, q: number[]) => {
       const nz = N[t * 3 + 2];
       if (chosen) {
         if (!chosen[t]) return false;
-      } else if ((s.bottomFree > 0 && -nz >= cosBottom) || (s.topFree > 0 && nz >= cosTop)) return false;
+      } else if (except?.[t]) return false;
+      else if ((s.bottomFree > 0 && -nz >= cosBottom) || (s.topFree > 0 && nz >= cosTop)) return false;
       if (q[2] < zFrom - 1e-9 || q[2] > zTo + 1e-9) return false;
       if ((!s.outside || !s.inside) && Math.hypot(N[t * 3 + i1], N[t * 3 + i2]) >= 0.5) {
         const r1 = q[i1] - layout.center[0], r2 = q[i2] - layout.center[1];
@@ -4374,21 +4544,24 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const points = new Uint8Array(v.length / 3).fill(1);
     const faces = new Uint8Array(I.length / 3);
     const chosen = chosenFaces(s);
+    const except = exceptedFaces(s);
     for (let t = 0; t < I.length; t += 3) {
       const [x, y, z] = faceCross(v, I[t], I[t + 1], I[t + 2]);
       const l = Math.hypot(x, y, z);
       if (l === 0) continue;
       const fn = [x / l, y / l, z / l];
       let smooth = false;
-      // Picked faces go before the top and bottom kept smooth and the walls.
+      // Picked faces go before the top and bottom kept smooth and the walls; faces another layer takes stay smooth.
       if (chosen) smooth = !chosen[t / 3];
+      else if (except?.[t / 3]) smooth = true;
       else if (s.bottomFree > 0 && -fn[2] >= cosBottom) smooth = true;
       else if (s.topFree > 0 && fn[2] >= cosTop) smooth = true;
       else if ((!s.outside || !s.inside) && Math.hypot(fn[i1], fn[i2]) >= 0.5) {
         const cx = (v[I[t] * 3 + i1] + v[I[t + 1] * 3 + i1] + v[I[t + 2] * 3 + i1]) / 3 - layout.center[0];
         const cy = (v[I[t] * 3 + i2] + v[I[t + 1] * 3 + i2] + v[I[t + 2] * 3 + i2]) / 3 - layout.center[1];
         const rl = Math.hypot(cx, cy);
-        const isInside = rl > 1e-9 && (fn[i1] * cx + fn[i2] * cy) / rl < -0.3;
+        // Facing the axis, with the body across (see bodyAcross): a wedge's slope past the middle faces it too.
+        const isInside = rl > 1e-9 && (fn[i1] * cx + fn[i2] * cy) / rl < -0.3 && faceAcross(t / 3, AXIS_INDEX[s.axis]);
         smooth = isInside ? !s.inside : !s.outside;
       }
       if (smooth) faces[t / 3] = 1;
@@ -4497,7 +4670,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         : JSON.stringify([s.pattern, s.spacing, s.width, s.profile, s.projection, s.axis, layout.cell, layout.period, layout.angle, layout.radius, layout.center, s.faceTurn, Boolean(layout.flatCaps), s.capStyle, layout.capEdge ?? null, layout.rims ?? null, patternExtras(s, layout)]);
     // A raised pattern round an outline's corners is cut along arcs as deep as the pattern stands out (cornerCuts).
     const cornerReach = s.projection === "cylinder" && layout.outline?.corners.length && standsOut(s) ? Math.max(1, s.depth) : 0;
-    const key = `${edge.toFixed(5)}|${smoothKey}|${JSON.stringify(s.faces)}|${maxTriangles}|${s.edgeAngle}|${s.detail}|${scale}|${cornerReach}|${layoutKey}`;
+    const key = `${edge.toFixed(5)}|${smoothKey}|${JSON.stringify(s.faces)}|${JSON.stringify(s.exceptFaces)}|${maxTriangles}|${s.edgeAngle}|${s.detail}|${scale}|${cornerReach}|${layoutKey}`;
     if (cache?.key === key) return cache;
     let mesh: SurfaceMesh;
     const net = layout.crack;
@@ -5082,12 +5255,14 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       const [i1, i2] = acrossAxes(s.axis);
       // Picked faces: a point on any face not picked stays smooth, so the pattern ends at the faces' edges.
       const chosen = placed ? null : chosenFaces(s);
+      // Faces another layer takes end the pattern the same way.
+      const except = placed || chosen ? null : exceptedFaces(s);
       let notChosen: Uint8Array | null = null;
-      if (chosen) {
+      if (chosen || except) {
         notChosen = new Uint8Array(n);
         const I = mesh.indices;
         for (let f = 0; f < I.length / 3; f += 1) {
-          if (chosen[mesh.parents[f]]) continue;
+          if (chosen ? chosen[mesh.parents[f]] : !except![mesh.parents[f]]) continue;
           notChosen[I[f * 3]] = 1;
           notChosen[I[f * 3 + 1]] = 1;
           notChosen[I[f * 3 + 2]] = 1;
@@ -5103,6 +5278,31 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // it on the other face, which turned over in spikes there. Round a log its ends' rims slide along (see edgeRounding).
       const keepsEdges = s.keepEdges || (s.pattern === "bark" && s.projection === "allRound");
       const kept = (i: number) => keepsEdges && crease[i] === 1 && !(wrapped && wrapped[i]) && !overRim(i);
+      // Whether the body stands across from a point on a wall facing the axis (see bodyAcross): as its input triangles say
+      // where they agree (a cup's inner wall), else seen from the point itself (where a wall across ends).
+      let ofPoint: { start: Uint32Array; faces: Uint32Array } | null = null;
+      const acrossPoint = (i: number, h1: number, h2: number) => {
+        if (!ofPoint) {
+          const I = mesh.indices;
+          const start = new Uint32Array(n + 1);
+          for (let k = 0; k < I.length; k += 1) start[I[k] + 1] += 1;
+          for (let k = 0; k < n; k += 1) start[k + 1] += start[k];
+          const faces = new Uint32Array(I.length);
+          const fill = start.slice(0, n);
+          for (let k = 0; k < I.length; k += 1) faces[fill[I[k]]++] = mesh.parents[Math.floor(k / 3)];
+          ofPoint = { start, faces };
+        }
+        const ax = AXIS_INDEX[s.axis];
+        let seen = 0;
+        for (let k = ofPoint.start[i]; k < ofPoint.start[i + 1]; k += 1) {
+          const t = ofPoint.faces[k];
+          const fn = faceCross(base.vertices, base.indices[t * 3], base.indices[t * 3 + 1], base.indices[t * 3 + 2]);
+          if (Math.hypot(fn[i1], fn[i2]) < 0.5 * Math.hypot(fn[0], fn[1], fn[2])) continue;
+          seen |= faceAcross(t, ax) ? 1 : 2;
+          if (seen === 3) break;
+        }
+        return seen === 1 ? true : seen === 2 ? false : innerWall(v[i * 3], v[i * 3 + 1], v[i * 3 + 2], h1, h2, i1, i2);
+      };
       const w0 = new Uint8Array(n);
       for (let i = 0; i < n; i += 1) {
         const z = v[i * 3 + 2];
@@ -5120,7 +5320,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
           if (Math.hypot(h1, h2) >= 0.5) {
             const r1 = v[i * 3 + i1] - layout.center[0], r2 = v[i * 3 + i2] - layout.center[1];
             const rl = Math.hypot(r1, r2);
-            const isInside = rl > 1e-9 && (h1 * r1 + h2 * r2) / rl < -0.3;
+            // Facing the axis is not enough: the body has to stand across, as in a cup (see bodyAcross).
+            const isInside = rl > 1e-9 && (h1 * r1 + h2 * r2) / rl < -0.3 && acrossPoint(i, h1, h2);
             if (isInside ? !s.inside : !s.outside) free = true;
           }
         }
@@ -5232,7 +5433,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // A pattern standing out: its run-out, finer still (see RUN_OUT_STEPS).
     // Bark all round fades out at the edges it keeps (see weightsFor): over its grid's triangles there in teeth.
     if (r.crossMax > 0 || r.straightAxis || standsOut(s) || endsInWall(s) || (s.pattern === "bark" && s.projection === "allRound")) {
-      const weightKey = JSON.stringify([r.key, s.bottomFree, s.topFree, s.zoneFrom, s.zoneTo, s.keepEdges, s.edgeAngle, s.fade, s.direction, s.margin, s.outside, s.inside, layout.center, s.masks, s.faces]);
+      const weightKey = JSON.stringify([r.key, s.bottomFree, s.topFree, s.zoneFrom, s.zoneTo, s.keepEdges, s.edgeAngle, s.fade, s.direction, s.margin, s.outside, s.inside, layout.center, s.masks, s.faces, s.exceptFaces]);
       const runOut = standsOut(s) ? Math.min(0.5, Math.max(s.fade, 0.25) / RUN_OUT_STEPS) : Math.min(0.5, Math.max(s.fade, 0.25) / 2);
       if (fadeCache?.key === weightKey) state = fadeCache.state;
       else {

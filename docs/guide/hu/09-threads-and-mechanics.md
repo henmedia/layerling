@@ -200,6 +200,12 @@ Egy elektronikai doboznak nyílás kell a kábelhez. A {{ui:shape.port}} pontosa
 
 Kivágásként érkezik, előre nézve. A {{ui:prop.portDepth}} legyen kicsit nagyobb a fal vastagságánál, told oda, ahol az aljzat a panelen ül, és csoportosítsd a dobozzal. Oldalfalhoz forgasd el 90°-kal a függőleges tengely körül.
 
+### SBC lapok
+
+Az {{ui:shape.sbcBoard}} egy egykártyás számítógép valódi méretben, hogy dobozt építs köré: a lap a négy rögzítőfuratával, és a részei, mindegyik a saját színében: az aljzatok a saját körvonalukkal - az USB-C lekerekített végekkel, a HDMI-aljzatok ferdén levágott alsó sarkokkal -, az USB- és hálózati házak a nyílásaikkal, az audio jack a kerek gallérjával, a tüskesorok minden tüskénél egy ponttal, a nagyobb chipek hasábként. A {{ui:sbcBoard.board}} mezőben választhatsz: Raspberry Pi 5, 4 Model B, 3 Model B+ vagy Zero 2 W, illetve BIGTREETECH Pi V1.2. Az elülső éle, az USB-C-vel és a HDMI-vel, feléd néz. A körvonal és a furatok a gyártók rajzaiból és modelljeiből származnak; az a magasság, amelyet egyik rajz sem ad meg, becsült.
+
+A lap megmutatja, hová kerüljenek a csavarjainak a csonkok, és milyen magas legyen a doboz. A nyílásokhoz adj helyet a csatlakozóknak a {{ui:sbcBoard.clearance}} mezőben - nyomtatott dobozhoz 0,2–0,5 mm -, a lap egy másolatát tedd kivágássá, helyezd oda, ahol a lap a dobozban ül, és csoportosítsd a dobozzal: minden szélső csatlakozó kivágja a nyílását a falon. A valódi csatlakozók csak 1–3 mm-t lógnak ki a lapból, kevesebbet, mint sok fal vastagsága: a {{ui:sbcBoard.reach}} mezővel minden szélső csatlakozó ennyivel tovább nyúlik ki a saját oldalán, így teljesen átvág - legyen kicsit több, mint a fal vastagsága. Másik lap vagy beállítás ugyanott újra elkészíti. Minden lap ugyanúgy kezeli mindkét beállítást.
+
 ## Hengeres és kúpos süllyesztés
 
 Egy csavarfej gyakran ne álljon ki. A {{ui:shape.counterbore}} egy belső kulcsnyílású, hengeres fejű csavarhoz (DIN 912) vág kerek zsebet, a {{ui:shape.countersink}} egy süllyesztett fejű csavarhoz (DIN 7991) kúpot. Mindkettő a fej felőli végével felfelé áll: a {{ui:prop.screwHoleHead}} a zseb vagy a kúp átmérője, a {{ui:prop.screwHoleShaft}} az alatta lévő furat, a {{ui:prop.screwHoleLength}} a teljes hossz. A hengeres süllyesztésnél a {{ui:prop.screwHoleHeadDepth}}, a kúposnál a {{ui:prop.screwHoleAngle}} értékét állítod be (a 90° a süllyesztett fejű csavarokhoz illik). Az alapértékek M3-as csavarhoz illenek.

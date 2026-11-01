@@ -57,6 +57,23 @@ Mit {{ui:workspace.dimensionsAlwaysVisible}} bleiben die Maße dauerhaft sichtba
 
 Wenn sie kurz stören, drück [[Q]]: Die Maße und Abstände um die Auswahl verschwinden, und ein Teil, das du verschiebst, ist gut zu sehen. Noch einmal [[Q]] holt sie zurück. Ein Griff, auf den du zeigst, zeigt sein Maß trotzdem.
 
+## Spiel prüfen
+
+Teile, die sich nach dem Druck bewegen sollen - ein Flexi-Drache, ein am Stück gedrucktes Scharnier, Kasten und Deckel, eine Achse in ihrer Bohrung - brauchen Abstand zueinander. Ist er zu klein, kleben sie zusammen; überschneiden sie sich, werden sie als ein Stück gedruckt. {{ui:editor.tool.clearance}} neben {{ui:editor.tool.intersectPreview}} prüft das vor dem Druck. Es nimmt die ausgewählten Objekte oder, wenn nichts ausgewählt ist, alle sichtbaren (dieselben, die ein Export nimmt) und prüft jedes Paar:
+
+- **{{ui:clearance.kind.overlap}}** (rot): Die beiden teilen sich ein Volumen. Es erscheint rot in den Körpern, die dafür durchsichtig werden, und die Liste nennt seine Größe.
+- **{{ui:clearance.kind.touching}}** (rot): Sie berühren sich und verschmelzen beim Druck.
+- **{{ui:clearance.kind.tight}}** (orange): Der engste Abstand ist kleiner als das {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (grün): Der engste Abstand ist mindestens so groß.
+
+Jede Zeile nennt die beiden Teile und bei einem Spalt seine Breite und wo er liegt: {{ui:clearance.direction.side}} (in derselben Schicht) oder {{ui:clearance.direction.layer}} (darüber oder darunter: Dort kann der Slicer nur ganze Schichten frei lassen, ein Spalt dünner als eine Schicht geht also zu). Ein Klick auf eine Zeile fährt die Kamera hin, umrandet beide Teile und markiert die engste Stelle mit einer Linie und der Zahl. Paare, die weiter als 5 mm auseinanderliegen, stehen nicht in der Liste. Am Entwurf ändert sich nichts: Die Prüfung speichert nichts und hinterlässt nichts zum Rückgängigmachen.
+
+Das {{ui:clearance.threshold}} beginnt bei 0,3 mm; 0,3 ist knapp, 0,4 bei Print in Place üblich. Ändern sortiert die Liste sofort neu, ohne neue Prüfung, und der Browser merkt sich den Wert. {{ui:clearance.splitParts}} (anfangs an) prüft auch die getrennten Teile eines Objekts gegeneinander: Ein als eine STL importierter Flexi-Drache oder ein Scharnier ist ein Objekt, seine Glieder aber getrennte Teile. Sie stehen als „Name · Teil 2“ in der Liste. Ein Teil im Hohlraum eines anderen, etwa eine Kugel im Käfig, zählt als eigenes Teil.
+
+Änderst du den Entwurf, während das Fenster offen ist, steht dort {{ui:clearance.stale}}; ein Klick darauf oder auf {{ui:clearance.checkAgain}} prüft neu. [[Esc]] oder {{ui:clearance.close}} schließt das Fenster. Auch Skalieren ändert die Abstände: Ein auf 70 % verkleinertes Flexi-Modell hat nur noch 70 % seines Spiels, also nach dem Skalieren neu prüfen.
+
+Gemessen wird am Dreiecksnetz, das auch der Slicer bekommt. Eine runde Achse und ihre Bohrung sind Vielecke mit den Ecken auf dem Kreis, ein Spalt kann also um wenige Hundertstel kleiner herauskommen als die runden Maße. Ein Paar mit zu vielen Dreiecken steht als {{ui:clearance.kind.unchecked}} in der Liste. Eine KI prüft dasselbe mit `layerling_check_clearance`.
+
 ## Notizen
 
 Eine Notiz hält fest, was die Geometrie nicht sagt: „Hier ist eine Schraube 0,3 mm zu eng“, „Deckel noch drucken“, „Maß von Peter“. Setze sie mit {{ui:editor.tool.note}} oder der Taste [[N]].

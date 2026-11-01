@@ -31,7 +31,7 @@ Copia la skill de `docs/skills/layerling-mcp-skill` en tu carpeta de skills de C
 
 Antigravity detecta por sí solo la skill del espacio de trabajo en `.agents/skills/layerling-mcp-skill`. Para Gemini CLI, copia la skill de `docs/skills/layerling-mcp-skill` en tu carpeta global de skills (`~/.gemini/skills/`), añade el servidor a tus ajustes a partir de `docs/mcp/gemini-config.example.json` y reinicia el cliente.
 
-Las instrucciones detalladas para cada cliente están en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill).
+Las instrucciones detalladas para cada cliente están en el [README de GitHub](https://github.com/henmedia/layerling/blob/main/README.es.md#skill-mcp-de-layerling).
 
 ## Una copia en un NAS o un servidor
 
@@ -63,8 +63,8 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_place_on_face` | posa objetos sobre una cara de otro, aunque esté inclinada, como la tecla C |
 | `layerling_perforate_face` | corta un patrón de orificios en una cara plana; los orificios se quedan como orificios agrupados con el cuerpo |
 | `layerling_sweep_sketch` | hace un barrido de una sección rectangular o redonda a lo largo de una trayectoria de puntos, como un único cuerpo exacto; una trayectoria cerrada da un anillo |
-| `layerling_push_face` | empuja hacia fuera una cara plana o abre un hueco en ella, con un desfase hacia dentro desde la arista y un radio de esquina; la parte nueva es un cuerpo de boceto agrupado con el cuerpo |
-| `layerling_mate_faces` | lleva una cara de un objeto contra una cara de otro, cara contra cara o a ras |
+| `layerling_push_face` | empuja hacia fuera una cara plana o abre un hueco en ella, con un desfase hacia dentro desde la arista y un radio de esquina; la parte nueva es un cuerpo de boceto agrupado con el cuerpo, o un cuerpo independiente con `separate` |
+| `layerling_mate_faces` | lleva una cara de un objeto contra una cara de otro, cara contra cara o a ras, o pone dos caras redondas en un mismo eje |
 | `layerling_open_group` | abre un grupo para poder cambiar sus piezas una a una, también un grupo dentro de otro abierto |
 | `layerling_close_group` | lo vuelve a cerrar («Listo») o cancela |
 | `layerling_group_objects` | agrupa objetos |
@@ -72,17 +72,17 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_boolean_cut` | corta sólidos con orificios |
 | `layerling_intersect_objects` | conserva solo lo que los objetos tienen en común (Intersección) |
 | `layerling_hull_objects` | envuelve los objetos en un solo cuerpo convexo, como con film retráctil (Envolvente) |
-| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
-| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
-| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
+| `layerling_cookie_cutter` | crea un cortador de galletas a partir de los objetos: una pared con filo y un reborde alrededor del contorno reflejado (Cortador de galletas) |
+| `layerling_flexi_joints` | corta un cuerpo plano en eslabones con articulaciones impresas ya montadas que giran hacia los lados (Articulaciones flexi) |
+| `layerling_make_lid` | crea una tapa para un cuerpo abierto por arriba: encajada dentro, por encima o plana, con el ajuste que elijas y, si quieres, con imanes (Tapa) |
+| `layerling_loft_sketches` | une dos cuerpos de boceto en una transición de un contorno al otro (Transición entre bocetos) |
 | `layerling_separate_parts` | separa una forma en sus piezas sueltas, y un cuerpo de boceto en un cuerpo por contorno |
 | `layerling_split_objects` | corta sólidos u orificios en dos con un plano |
 | `layerling_list_edges` | lista las aristas CAD reales de un objeto |
 | `layerling_apply_edge_treatment` | achaflana o redondea las aristas elegidas |
 | `layerling_hollow_object` | vacía un cuerpo con una pared uniforme |
-| `layerling_cut_out` | recorta un sólido de otro para que encajen: la pieza se queda, una copia ampliada con el margen se resta del otro cuerpo |
-| `layerling_offset_object` | desfasa todas las caras de un cuerpo para la holgura de un ajuste: lo agranda o reduce, o añade la copia agrandada como hueco, o mueve solo los lados |
+| `layerling_cut_out` | recorta un sólido de otro para que encajen: la pieza se queda, una copia ampliada con la holgura se resta del otro cuerpo |
+| `layerling_offset_object` | desfasa todas las caras de un cuerpo para la holgura de un ajuste: lo agranda o reduce, o añade la copia agrandada como orificio, o mueve solo los lados |
 | `layerling_list_faces` | lista las caras de un cuerpo exacto |
 | `layerling_delete_faces` | elimina caras y cierra el hueco |
 | `layerling_array_objects` | multiplica en una fila o en un círculo |
@@ -90,16 +90,18 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_layer_text` | convierte un texto en una pila de capas para una impresión multicolor (letras, contornos más anchos, una placa sin orificios) o vuelve a construir una pila, con orificio para llavero, las esquinas de cada capa y un canto de letra redondeado o achaflanado; con una lista de nombres, hace una placa por nombre |
 | `layerling_layer_icon` | convierte un icono SVG (el texto del archivo o un cuerpo de boceto extruido) en una placa con icono por capas para una impresión multicolor (el icono, contornos más anchos, una placa sin orificios) o vuelve a construir una con otra anchura u otras capas; con un número, llena la placa de copias |
 | `layerling_create_qr_code` | crea un código QR a partir de un texto o una dirección web, como {{ui:shape.qrCode}} en la biblioteca de formas: el código solo, en relieve sobre una placa o grabado, con corrección de errores, anchura, altura, zona de silencio y, si se pide, como orificio; avisa cuando un módulo baja de 0,8 mm |
+| `layerling_create_sbc_board` | coloca una placa SBC a tamaño real, como {{ui:shape.sbcBoard}} en la biblioteca de formas: Raspberry Pi 5, 4, 3 B+, Zero 2 W o BIGTREETECH Pi, con orificios y conectores, la holgura alrededor de los conectores del borde, la posición y como orificio para recortar una caja |
 | `layerling_reference_image` | añade una imagen de referencia a partir de una imagen, como hace {{ui:import.referenceImage}}, o mueve, gira, calibra (dos puntos de la imagen y su distancia real), difumina o bloquea una: una guía que nunca se exporta ni se imprime; `trace` convierte su parte oscura o clara en un cuerpo de boceto apoyado sobre ella |
 | `layerling_measure_section` | mide en un plano de corte entre dos puntos que se ajustan al contorno: grosores de pared, holguras, ajustes |
 | `layerling_show_overhangs` | activa o desactiva el rayado de voladizos, fija el ángulo e indica para cada cuerpo la superficie que necesitaría soportes |
 | `layerling_estimate_print` | calcula el volumen, el peso y el filamento de la selección o del diseño entero: para un cuerpo macizo y, como estimación aproximada, con paredes y relleno, igual que la ventana de exportación |
+| `layerling_check_clearance` | comprueba antes de imprimir qué piezas se solapan, se tocan o quedan más cerca que una holgura mínima, también las piezas separadas de un mismo objeto |
 | `layerling_add_reference_points` | marca puntos de referencia (en el centro, las esquinas o los puntos medios de las aristas de los objetos, o en posiciones exactas) a los que se ajustan las formas |
 | `layerling_list_reference_points` | lista los puntos de referencia con sus id y posiciones |
 | `layerling_remove_reference_points` | elimina puntos de referencia por id, o todos |
 | `layerling_inspect_errors` | muestra el último mensaje y el último error, además de los mensajes y errores de la sesión |
 | `layerling_wrap_around_cylinder` | envuelve un cuerpo plano, como un SVG o un texto, alrededor de un cilindro, hacia fuera o hacia dentro como grabado |
-| `layerling_texture_surface` | aplica una textura de superficie a un cuerpo: estrías, moleteado, panal o relieves, para un mejor agarre o por estética, y la cambia o la quita después |
+| `layerling_texture_surface` | aplica una textura de superficie a un cuerpo: estrías, moleteado, panal o bultos, para un mejor agarre o por estética, y la cambia o la quita después |
 | `layerling_simplify_mesh` | reduce el número de triángulos de una malla importada, a un porcentaje o a un número de triángulos |
 | `layerling_save_custom_shape` | guarda cuerpos como forma personalizada, en el servidor o en el navegador, para insertarlos en otros diseños |
 | `layerling_list_custom_shapes` | lista las formas personalizadas del servidor y del navegador |
@@ -117,8 +119,8 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_export_drawing` | hace el plano para el taller de la exportación «2D»: tres vistas a escala 1:1 en una hoja ISO, con las medidas totales y una tabla de los taladros redondos, como texto SVG o como PDF |
 | `layerling_export_mesh` | escribe el archivo de la ventana de exportación en STL, 3MF, OBJ, SVG (vista superior, huella o aristas visibles) o DXF para corte láser, a partir de los mismos cuerpos; en una ruta de este ordenador o en base64 |
 | `layerling_save_project` | guarda el diseño editable completo como archivo .lyl en una ruta del ordenador donde funciona el servidor MCP, sin cuadro de diálogo; un archivo existente solo se sustituye con `overwrite`, se escribe a través de un archivo temporal y el destino de Ctrl+S en el editor no cambia |
-| `layerling_list_attachments` | lista los archivos adjuntos al diseño (nombre, tipo, tamaño), como los muestra el panel Attachments |
-| `layerling_get_attachment` | lee un archivo adjunto, sus bytes en base64, como Download en el panel |
+| `layerling_list_attachments` | lista los archivos adjuntos al diseño (nombre, tipo, tamaño), como los muestra el panel Adjuntos |
+| `layerling_get_attachment` | lee un archivo adjunto, sus bytes en base64, como Descargar en el panel |
 | `layerling_add_attachment` | adjunta un archivo dado en base64, con las comprobaciones del panel; un nombre ya adjunto solo se sobrescribe con `replace` |
 | `layerling_rename_attachment` | cambia el nombre de un archivo adjunto; su contenido se mantiene |
 | `layerling_remove_attachment` | quita un archivo adjunto para siempre; necesita `confirm: true` |

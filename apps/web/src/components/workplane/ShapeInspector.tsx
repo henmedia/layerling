@@ -4,7 +4,7 @@ import { displayY, displayYTurn, insideZ, insideZTurn } from "@/lib/displayAxes"
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Split, Tags, Unlock, Waves } from "lucide-react";
+import { ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Split, Tags, Trash2, Unlock, Waves } from "lucide-react";
 import { createPortal } from "react-dom";
 import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
@@ -173,7 +173,7 @@ import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { SURFACE_TEXTURE_OWN_IMAGE_SIZE, surfaceTextureOwnImage } from "@/lib/surfaceTextureImages";
 import { BARK_STARTS, WOOD_RINGS } from "@/lib/surfaceTextureWood";
-import { offersSurfaceTextureMask, SURFACE_TEXTURE_LABELS, surfacePatternLabel, surfaceTextureEntry } from "@/lib/surfaceTextureShape";
+import { offersSurfaceTextureMask, SURFACE_TEXTURE_LABELS, surfacePatternLabel, surfaceTextureEntry, surfaceTextureLayerPlaced } from "@/lib/surfaceTextureShape";
 import { LIMITS as VASE_LIMITS, MATERIALS as VASE_MATERIALS, type VaseChoiceKey, type VaseNumberKey } from "@/lib/vase/vase-geometry.mjs";
 import { normalizeVaseSettings, type VaseSettings } from "@/lib/vaseSettings";
 import { vaseShapePatchOffThread } from "@/lib/vaseShape";
@@ -196,6 +196,7 @@ import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
+import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARDS, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -3477,6 +3478,7 @@ export function ShapeInspector({
   textLayerStack: nameTagStack,
   iconTag,
   qrCode,
+  sbcBoard,
   referenceImage,
   onInteractionActiveChange,
   onSnapGridAwayChange,
@@ -3526,6 +3528,8 @@ export function ShapeInspector({
   iconTag?: IconTagControls | null;
   /** The QR code card's wiring (#553), for a QR code; null for anything else. */
   qrCode?: QrCodeControls | null;
+  /** The SBC board card's wiring (#1098), for an SBC board; null for anything else. */
+  sbcBoard?: SbcBoardControls | null;
   /** The reference image card's wiring (#680), for a reference image; null for anything else. */
   referenceImage?: ReferenceImageControls | null;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -3988,6 +3992,7 @@ export function ShapeInspector({
       {shape.keyringTab && onFixKeyringTab ? <KeyringTabFixButton disabled={locked} onFix={onFixKeyringTab} /> : null}
       {shape.kind === "text" && onLayerText ? <MakeLayersButton disabled={locked} onLayerText={onLayerText} /> : null}
       {qrCode ? <QrCodeCard key={`qr-code-${shape.id}`} shapeId={shape.id} controls={qrCode} disabled={locked} /> : null}
+      {sbcBoard ? <SbcBoardCard key={`sbc-board-${shape.id}`} shapeId={shape.id} controls={sbcBoard} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {referenceImage ? <ReferenceImageCard key={`reference-image-${shape.id}`} shapeId={shape.id} controls={referenceImage} workspace={workspace} locked={locked} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {iconTag?.isTag ? (
         <IconTagCard key={`icon-tag-${shape.id}`} shapeId={shape.id} controls={iconTag} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
@@ -5059,6 +5064,94 @@ function QrCodeCard({ shapeId, controls, disabled }: { shapeId: string; controls
   );
 }
 
+/** The SBC board card's wiring (#1098): the board, clearance and reach it was made with, and making it again with others. */
+export type SbcBoardControls = {
+  settings: SbcBoardSettings;
+  onRegenerate: (settings: SbcBoardSettings) => Promise<void>;
+};
+
+/**
+ * The SBC board card, open and first: which board, how much room the connectors at its edge get and
+ * how much further out they reach. Any change makes the board again where it stands.
+ */
+function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionActiveChange }: {
+  shapeId: string;
+  controls: SbcBoardControls;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const regenerate = (patch: Partial<SbcBoardSettings>) => {
+    const next = { ...controls.settings, ...patch };
+    const same = next.board === controls.settings.board && next.clearance === controls.settings.clearance && (next.reach ?? 0) === (controls.settings.reach ?? 0);
+    if (busy || disabled || same) return;
+    setBusy(true);
+    setError("");
+    controls.onRegenerate(next)
+      .catch((reason) => setError(reason instanceof Error ? localizedError(reason.message) : String(reason)))
+      .finally(() => setBusy(false));
+  };
+  const unit = lengthDisplayUnit(workspace).label;
+  return (
+    <div className={`property-card name-tag-card sbc-board-card ${open ? "" : "collapsed"}`}>
+      <button className="property-card-header" type="button" aria-expanded={open} aria-controls={`sbc-board-${shapeId}`} onClick={() => setOpen((current) => !current)}>
+        <span>{t("sbcBoard.title")}</span>
+        <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+      </button>
+      {open ? (
+        <p className="name-tag-hint">
+          {t("sbcBoard.cardHint")}
+          <GuideHelpLink chapter="threads" section="sbcBoard" className="inspector-help-link" />
+        </p>
+      ) : null}
+      {open ? (
+        <div className="property-list name-tag-body" id={`sbc-board-${shapeId}`} data-testid="sbc-board-card">
+          <SelectProperty
+            type="select"
+            label={t("sbcBoard.board")}
+            value={controls.settings.board}
+            options={SBC_BOARD_ORDER.map((board) => ({ value: board, label: SBC_BOARDS[board].name }))}
+            disabled={disabled || busy}
+            onChange={(value) => regenerate({ board: value as SbcBoardType })}
+          />
+          <label className="select-property sbc-board-clearance">
+            <span>{t("sbcBoard.clearance")} ({unit})</span>
+            <CompactMeasureField
+              label={t("sbcBoard.clearance")}
+              value={controls.settings.clearance}
+              min={0}
+              max={MAX_SBC_CLEARANCE}
+              workspace={workspace}
+              disabled={disabled || busy}
+              onChange={(clearance) => regenerate({ clearance })}
+              onInteractionActiveChange={onInteractionActiveChange}
+            />
+          </label>
+          <p className="name-tag-hint">{t("sbcBoard.clearanceHint")}</p>
+          <label className="select-property sbc-board-reach">
+            <span>{t("sbcBoard.reach")} ({unit})</span>
+            <CompactMeasureField
+              label={t("sbcBoard.reach")}
+              value={controls.settings.reach ?? 0}
+              min={0}
+              max={MAX_SBC_REACH}
+              workspace={workspace}
+              disabled={disabled || busy}
+              onChange={(reach) => regenerate({ reach })}
+              onInteractionActiveChange={onInteractionActiveChange}
+            />
+          </label>
+          <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.reachHint")}</p>
+          {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 /** Where calibrating a reference image stands (#680): waiting for the first or second click, or for the real distance. */
 export type ReferenceImageCalibration = { step: "first" | "second" } | { step: "distance"; measured: number };
 
@@ -5429,6 +5522,9 @@ const SURFACE_COVERAGE_LABEL: Partial<Record<SurfaceTexturePattern, MessageKey>>
   carbon: "inspector.surfaceCoverageCarbon",
 };
 
+/** How many patterns one body can carry, the first included (see WorkplaneShape.surfaceTextureLayers). */
+const SURFACE_TEXTURE_MAX_LAYERS = 6;
+
 /**
  * The settings when another pattern is chosen. A pattern with values of its own to start from (cells, knitting, rope,
  * weave, grain, an image) gets them, and leaving one gives the next the plain defaults back, so a knitted stitch's 5 mm
@@ -5489,7 +5585,8 @@ export function SurfaceTextureCard({
   shape: WorkplaneShape;
   workspace: WorkplaneWorkspaceSettings;
   disabled: boolean;
-  onApply: (settings: SurfaceTextureSettings) => Promise<void> | void;
+  /** Makes the texture: the first layer and the further ones (see WorkplaneShape.surfaceTextureLayers). */
+  onApply: (settings: SurfaceTextureSettings, layers?: SurfaceTextureSettings[]) => Promise<void> | void;
   /** Takes the texture off; given while the body keeps what was under it. */
   onRemove?: () => void;
   /** Open or closed as the editor holds it, so the button under "Modify" shows and changes the same; else the card's own. */
@@ -5513,23 +5610,64 @@ export function SurfaceTextureCard({
   }, [open]);
   const [moreOpen, setMoreOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [settings, setSettings] = useState(() => normalizeSurfaceTexture(shape.surfaceTexture ?? {}));
+  // The layers of the texture (see WorkplaneShape.surfaceTextureLayers): the first, and more patterns on faces of their
+  // own. The card shows one of them at a time; its fields and the faces picked belong to that one.
+  const layersOf = (body: WorkplaneShape) => [normalizeSurfaceTexture(body.surfaceTexture ?? {}), ...(body.surfaceTextureLayers ?? []).map((layer) => normalizeSurfaceTexture(layer))];
+  const [layers, setLayers] = useState(() => layersOf(shape));
+  const [layerIndex, setLayerIndex] = useState(0);
+  const shownLayer = Math.min(layerIndex, layers.length - 1);
+  const settings = layers[shownLayer];
+  // The layer the faces picked in the view belong to: the one shown when picking began or went on.
+  const pickedLayer = useRef(shownLayer);
+  const setSettings = (next: SurfaceTextureSettings | ((current: SurfaceTextureSettings) => SurfaceTextureSettings)) =>
+    setLayers((all) => all.map((layer, index) => (index === shownLayer ? (typeof next === "function" ? next(layer) : next) : layer)));
   const set = (patch: Partial<SurfaceTextureSettings>) => setSettings((current) => normalizeSurfaceTexture({ ...current, ...patch }));
   const applied = shape.surfaceTexture;
   // A texture made or changed elsewhere (by an assistant, by redo, in a project opened again) shows its own settings;
   // one taken off leaves the card as it was, to apply again.
-  const appliedKey = applied
-    ? JSON.stringify({ ...applied, masks: applied.masks.length, textOutline: applied.textOutline.length, imageOwn: applied.imageOwn ? applied.imageOwn.data.length : 0 })
-    : "";
+  const keyOf = (layer: SurfaceTextureSettings) => ({ ...layer, masks: layer.masks.length, textOutline: layer.textOutline.length, imageOwn: layer.imageOwn ? layer.imageOwn.data.length : 0 });
+  const appliedKey = applied ? JSON.stringify([keyOf(applied), ...(shape.surfaceTextureLayers ?? []).map(keyOf)]) : "";
   const [shownKey, setShownKey] = useState(appliedKey);
   if (appliedKey !== shownKey) {
     setShownKey(appliedKey);
-    if (applied) setSettings(normalizeSurfaceTexture(applied));
+    if (applied) {
+      setLayers(layersOf(shape));
+      setLayerIndex(0);
+      pickedLayer.current = 0;
+    }
   }
-  // Each click in the view comes back as the faces picked so far.
+  // Each click in the view comes back as the faces picked so far, for the layer they are picked for.
   useEffect(() => {
-    if (pickedFaces) setSettings((current) => normalizeSurfaceTexture({ ...current, faces: pickedFaces }));
+    if (pickedFaces) setLayers((all) => all.map((layer, index) => (index === pickedLayer.current ? normalizeSurfaceTexture({ ...layer, faces: pickedFaces }) : layer)));
   }, [pickedFaces]);
+  /** Shows another layer: picking faces goes on with that layer's faces. */
+  const showLayer = (index: number) => {
+    pickedLayer.current = index;
+    setLayerIndex(index);
+    if (facePicking) onFacePick?.(layers[index].faces, layers[index].edgeAngle);
+  };
+  const addLayer = () => {
+    // A new layer starts on no faces and asks for them at once: it goes only where it is picked.
+    const next = normalizeSurfaceTexture({ pattern: "knurl" });
+    const index = layers.length;
+    setLayers((all) => [...all, next]);
+    pickedLayer.current = index;
+    setLayerIndex(index);
+    onFacePick?.([], next.edgeAngle);
+  };
+  const removeLayer = (index: number) => {
+    if (index === 0) return;
+    setLayers((all) => all.filter((_, at) => at !== index));
+    const shown = Math.max(0, index - 1);
+    pickedLayer.current = shown;
+    setLayerIndex(shown);
+    if (facePicking) onFacePick?.(null, settings.edgeAngle);
+  };
+  // A further layer needs faces of its own; the first, picking none, takes the faces the others leave.
+  const layerWithoutFaces = layers.findIndex((layer, index) => index > 0 && !surfaceTextureLayerPlaced(layer));
+  const needsFaces = shownLayer > 0 && !surfaceTextureLayerPlaced(settings);
+  // What the body carries, every layer's pattern: "Bricks + Knurling".
+  const appliedPatterns = applied ? [applied.pattern, ...(shape.surfaceTextureLayers ?? []).map((layer) => layer.pattern)].map(surfacePatternLabel).join(" + ") : "";
   // A texture that keeps the body under it shows its settings to change; one that does not only says what it is.
   const changeable = Boolean(applied && onRemove && surfaceTextureEntry(shape));
   const options = <T extends string>(values: readonly T[], label: (value: T) => string) => values.map((value) => ({ value, label: label(value) }));
@@ -5585,7 +5723,7 @@ export function SurfaceTextureCard({
     if (facePicking) onFacePick?.(null, settings.edgeAngle);
     setBusy(true);
     try {
-      await onApply(settings);
+      await onApply(layers[0], layers.slice(1));
     } finally {
       setBusy(false);
     }
@@ -5606,11 +5744,37 @@ export function SurfaceTextureCard({
         <div className="property-list cylinder-wrap-body" id={`surface-texture-${shape.id}`}>
           {applied && !changeable ? (
             <p className="cylinder-wrap-hint">
-              {t("inspector.surfaceApplied", { pattern: surfacePatternLabel(applied.pattern) })}
+              {t("inspector.surfaceApplied", { pattern: appliedPatterns })}
               <GuideHelpLink section="surfaceTexture" className="inspector-help-link" />
             </p>
           ) : (
             <>
+              {/* Several patterns on one body: a tab per layer; the first takes the faces the others leave. */}
+              {onFacePick ? (
+                <div className="surface-layers" role="tablist" aria-label={t("inspector.surfaceLayers")}>
+                  {layers.map((layer, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      role="tab"
+                      aria-selected={index === shownLayer}
+                      className={`${index === shownLayer ? "active" : ""} ${index > 0 && !surfaceTextureLayerPlaced(layer) ? "needed" : ""}`}
+                      disabled={busy}
+                      onClick={() => showLayer(index)}
+                    >
+                      <span className="surface-layer-number">{index + 1}</span>
+                      {surfacePatternLabel(layer.pattern)}
+                    </button>
+                  ))}
+                  {layers.length < SURFACE_TEXTURE_MAX_LAYERS ? (
+                    <button type="button" className="surface-layer-add" title={t("inspector.surfaceLayerAdd")} aria-label={t("inspector.surfaceLayerAdd")} disabled={disabled || busy} onClick={addLayer}>
+                      <Plus size={14} strokeWidth={2.6} aria-hidden="true" />
+                      {t("inspector.surfaceLayerAddShort")}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+              {layers.length > 1 ? <p className="cylinder-wrap-hint">{t("inspector.surfaceLayersHint")}</p> : null}
               <SelectProperty
                 type="select"
                 label={t("inspector.surfacePattern")}
@@ -5876,7 +6040,15 @@ export function SurfaceTextureCard({
               {/* Where it goes: every face, or only the faces clicked in the view (a text goes where it is put). */}
               {text || !onFacePick ? null : (
                 <>
-                  <p className="cylinder-wrap-hint">{picked ? t("inspector.surfaceFacesSome", { count: settings.faces.length }) : t("inspector.surfaceFacesAll")}</p>
+                  <p className={`cylinder-wrap-hint ${needsFaces ? "surface-layer-missing" : ""}`}>
+                    {picked
+                      ? t("inspector.surfaceFacesSome", { count: settings.faces.length })
+                      : needsFaces
+                        ? t("inspector.surfaceLayerNeedsFaces")
+                        : layers.length > 1
+                          ? t("inspector.surfaceFacesRest")
+                          : t("inspector.surfaceFacesAll")}
+                  </p>
                   <button
                     className={`inspector-action-button ${facePicking ? "active" : ""}`}
                     type="button"
@@ -5887,7 +6059,7 @@ export function SurfaceTextureCard({
                     <MousePointerClick size={17} strokeWidth={2.5} />
                     <span>{t(facePicking ? "inspector.surfaceFacesDone" : "inspector.surfaceFacesPick")}</span>
                   </button>
-                  {picked ? (
+                  {picked && shownLayer === 0 ? (
                     <button
                       className="inspector-action-button"
                       type="button"
@@ -5904,6 +6076,12 @@ export function SurfaceTextureCard({
                   {facePicking ? <p className="cylinder-wrap-hint">{t("inspector.surfaceFacesPickHint")}</p> : null}
                 </>
               )}
+              {shownLayer > 0 ? (
+                <button className="inspector-action-button" type="button" disabled={disabled || busy} onClick={() => removeLayer(shownLayer)}>
+                  <Trash2 size={17} strokeWidth={2.5} />
+                  <span>{t("inspector.surfaceLayerRemove")}</span>
+                </button>
+              ) : null}
               <button className="name-tag-more" type="button" aria-expanded={moreOpen} onClick={() => setMoreOpen((current) => !current)}>
                 <ChevronDown className={moreOpen ? "open" : ""} size={15} strokeWidth={2.6} />
                 <span>{t(moreOpen ? "inspector.less" : "inspector.more")}</span>
@@ -6026,10 +6204,13 @@ export function SurfaceTextureCard({
                 </>
               ) : null}
               <p className="cylinder-wrap-hint">
-                {applied ? t("inspector.surfaceChangeHint", { pattern: surfacePatternLabel(applied.pattern) }) : t("inspector.surfaceHint")}
+                {applied ? t("inspector.surfaceChangeHint", { pattern: appliedPatterns }) : t("inspector.surfaceHint")}
                 <GuideHelpLink section="surfaceTexture" className="inspector-help-link" />
               </p>
-              <button className="inspector-action-button" type="button" disabled={disabled || busy} onClick={apply}>
+              {layerWithoutFaces > 0 ? (
+                <p className="cylinder-wrap-hint surface-layer-missing" role="status">{t("inspector.surfaceLayerNeedsFacesNumber", { number: layerWithoutFaces + 1 })}</p>
+              ) : null}
+              <button className="inspector-action-button" type="button" disabled={disabled || busy || layerWithoutFaces > 0} onClick={apply}>
                 <Waves size={17} strokeWidth={2.5} />
                 <span>{t(busy ? "inspector.surfaceWorking" : applied ? "inspector.surfaceChange" : "inspector.surfaceApply")}</span>
               </button>

@@ -7430,6 +7430,178 @@ html[data-theme="dark"] .inspector-bundle-note {
   pointer-events: none;
 }
 
+/* The clearance check (Spiel prüfen): its status line, the pairs it found, and the place a row shows in the view. */
+.clearance-status {
+  min-height: 18px;
+  margin: 10px 0 6px;
+  color: #6f5b46;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.clearance-status span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.clearance-stale {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  color: #8a4a00;
+  background: #fff3e0;
+  border: 1px solid #f0b46a;
+  border-radius: 7px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.clearance-list {
+  display: grid;
+  gap: 4px;
+  max-height: 260px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.clearance-list.stale {
+  opacity: 0.55;
+}
+
+.clearance-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  color: #3a2816;
+  text-align: left;
+  background: #fbf8f3;
+  border: 1px solid #ede5d6;
+  border-left: 4px solid #a39584;
+  border-radius: 7px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.clearance-row svg {
+  flex: none;
+  margin-top: 1px;
+  color: #a39584;
+}
+
+.clearance-row-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.clearance-row-text strong {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.clearance-row-text span {
+  color: #7e6953;
+  font-size: 11px;
+}
+
+.clearance-row.overlap,
+.clearance-row.touching {
+  border-left-color: #d93a3f;
+}
+
+.clearance-row.overlap svg,
+.clearance-row.touching svg {
+  color: #d93a3f;
+}
+
+.clearance-row.tight {
+  border-left-color: #e8851a;
+}
+
+.clearance-row.tight svg {
+  color: #e8851a;
+}
+
+.clearance-row.fine {
+  border-left-color: #2f9e5b;
+}
+
+.clearance-row.fine svg {
+  color: #2f9e5b;
+}
+
+.clearance-row:disabled {
+  cursor: default;
+}
+
+.clearance-row:hover:not(:disabled),
+.clearance-row.active {
+  background: #fff1de;
+}
+
+.clearance-row.active {
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+.clearance-hint {
+  margin: 8px 0 0;
+  color: #867360;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.clearance-mark-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.clearance-mark-line {
+  stroke: #e8851a;
+  stroke-width: 2.5;
+}
+
+.clearance-mark-point {
+  fill: #e8851a;
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.clearance-mark-ring {
+  fill: none;
+  stroke: #e8851a;
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+
+.clearance-mark-overlay.overlap .clearance-mark-line,
+.clearance-mark-overlay.touching .clearance-mark-line,
+.clearance-mark-overlay.overlap .clearance-mark-ring,
+.clearance-mark-overlay.touching .clearance-mark-ring {
+  stroke: #d93a3f;
+}
+
+.clearance-mark-overlay.overlap .clearance-mark-point,
+.clearance-mark-overlay.touching .clearance-mark-point {
+  fill: #d93a3f;
+}
+
+.clearance-mark-overlay.fine .clearance-mark-line,
+.clearance-mark-overlay.fine .clearance-mark-ring {
+  stroke: #2f9e5b;
+}
+
+.clearance-mark-overlay.fine .clearance-mark-point {
+  fill: #2f9e5b;
+}
+
 .section-measure-outline {
   stroke: #1677c8;
   stroke-width: 2;
@@ -9955,6 +10127,67 @@ html[data-theme="dark"] .mesh-compare-actions .secondary {
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
+}
+
+/* Layers of a surface texture: a tab per pattern, and one to add another. A layer that still needs faces is dashed,
+   and so is the line that asks for them. */
+.surface-layers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.surface-layers button {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 9px 0 5px;
+  color: #6d5133;
+  font: 700 12px/1 var(--font-ui);
+  background: #fbf8f4;
+  border: 1px solid #e0d4c6;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.surface-layers button.active {
+  color: #8a4504;
+  background: #ffe7cc;
+  border-color: #d97813;
+  box-shadow: inset 0 0 0 1px #d97813;
+}
+
+.surface-layers button.needed {
+  border-style: dashed;
+  border-color: #d9a24f;
+}
+
+.surface-layer-number {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  font-size: 11px;
+  background: #b08a62;
+  border-radius: 50%;
+}
+
+.surface-layers button.active .surface-layer-number {
+  background: #d97813;
+}
+
+.surface-layers .surface-layer-add {
+  padding-left: 7px;
+  color: #8a6a45;
+  background: transparent;
+  border-style: dashed;
+}
+
+.cylinder-wrap-hint.surface-layer-missing {
+  color: #9a5d06;
+  font-weight: 700;
 }
 
 /* The vase's drawing boards (card Draw): the vase tool's boards, in the editor's colours. */
@@ -12629,6 +12862,46 @@ html[data-theme="dark"] .shell-opening-options button.active {
   border-color: #c7772a;
 }
 
+html[data-theme="dark"] .clearance-status {
+  color: #d3bfa8;
+}
+
+html[data-theme="dark"] .clearance-stale {
+  color: #ffc78a;
+  background: #3a2511;
+  border-color: #a8601f;
+}
+
+html[data-theme="dark"] .clearance-row {
+  color: #ecdcc9;
+  background: #2f2418;
+  border-color: #53412f;
+  border-left-color: #8d7c69;
+}
+
+html[data-theme="dark"] .clearance-row-text span,
+html[data-theme="dark"] .clearance-hint {
+  color: #b9a58f;
+}
+
+html[data-theme="dark"] .clearance-row.overlap,
+html[data-theme="dark"] .clearance-row.touching {
+  border-left-color: #ef5b60;
+}
+
+html[data-theme="dark"] .clearance-row.tight {
+  border-left-color: #f39a3a;
+}
+
+html[data-theme="dark"] .clearance-row.fine {
+  border-left-color: #4cbf7b;
+}
+
+html[data-theme="dark"] .clearance-row:hover:not(:disabled),
+html[data-theme="dark"] .clearance-row.active {
+  background: #45311b;
+}
+
 html[data-theme="dark"] .edge-modifier-history-actions {
   background: #2a2015;
   border-color: #53412f;
@@ -12889,6 +13162,28 @@ html[data-theme="dark"] .color-value {
 html[data-theme="dark"] .cylinder-wrap-hint,
 html[data-theme="dark"] .select-property-hint {
   color: #a08a72;
+}
+
+html[data-theme="dark"] .surface-layers button {
+  color: #ede4d4;
+  background: #2f2418;
+  border-color: #53412f;
+}
+
+html[data-theme="dark"] .surface-layers button.active {
+  color: #ffc27a;
+  background: #4a3214;
+  border-color: #e08a2c;
+  box-shadow: inset 0 0 0 1px #e08a2c;
+}
+
+html[data-theme="dark"] .surface-layers .surface-layer-add {
+  color: #e7c896;
+  background: transparent;
+}
+
+html[data-theme="dark"] .cylinder-wrap-hint.surface-layer-missing {
+  color: #f0b13c;
 }
 
 html[data-theme="dark"] .vase-print-notes {

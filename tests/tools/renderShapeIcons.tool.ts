@@ -682,3 +682,48 @@ describe("palette icon of the torus", () => {
     });
   });
 });
+
+describe("palette icon of the SBC board (#1098)", () => {
+  it("renders the Raspberry Pi 5 from its own board data", async () => {
+    const { SBC_BOARDS, sbcBoardSolids } = await import("@/lib/sbcBoards");
+    const board = SBC_BOARDS.pi5;
+    // The board twice as thick as it is, so its edge still reads at the size of a tile.
+    const thickness = board.thickness * 2;
+    const plain = (geometry: THREE.BufferGeometry) => {
+      const flat = geometry.index ? geometry.toNonIndexed() : geometry;
+      for (const name of Object.keys(flat.attributes)) if (name !== "position" && name !== "normal") flat.deleteAttribute(name);
+      return flat;
+    };
+    const plate = plain(createRoundedBoxGeometry({ width: board.width, depth: board.depth, height: thickness, cornerFillet: board.cornerRadius, topBottomFillet: 0, roundedBoxQuality: 16 }));
+    const box = plate.boundingBox ?? (plate.computeBoundingBox(), plate.boundingBox!);
+    plate.translate(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2);
+    // The board's frame: x across, its front edge (y = 0) towards the viewer at +z. The parts as the
+    // editor builds them: boxes, and the sockets in their own outline.
+    const solids = sbcBoardSolids(board, 0, 0).map((solid) => ({ ...solid, bottom: solid.bottom - board.thickness + thickness, top: solid.top - board.thickness + thickness }));
+    const parts = solids.map((solid) => {
+      const height = solid.top - solid.bottom;
+      const geometry = solid.profile
+        ? createPortGeometry({
+          width: solid.profile.along === "y" ? solid.x1 - solid.x0 : solid.y1 - solid.y0,
+          depth: solid.profile.along === "y" ? solid.y1 - solid.y0 : solid.x1 - solid.x0,
+          height,
+          cornerFillet: solid.profile.corner,
+          portProfile: solid.profile.portProfile,
+        })
+        : new BoxGeometry(solid.x1 - solid.x0, height, solid.y1 - solid.y0).translate(0, height / 2, 0);
+      if (solid.profile?.along === "x") geometry.rotateY(Math.PI / 2);
+      geometry.translate((solid.x0 + solid.x1) / 2 - board.width / 2, solid.bottom, board.depth / 2 - (solid.y0 + solid.y1) / 2);
+      return plain(geometry);
+    });
+    const merged = mergeGeometries([plate, ...parts], false);
+    const height = Math.max(...solids.map((solid) => solid.top));
+    render({
+      name: "apps/web/public/assets/editor/shape-icons-gray/sbcBoard.png",
+      height,
+      lay: false,
+      azimuth: 30,
+      elevation: 34,
+      build: () => merged,
+    });
+  });
+});

@@ -90,10 +90,12 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_layer_text` | 把文字变成用于多色打印的分层堆叠（字母、更宽的边沿、无孔底板），或重新构建堆叠，可加钥匙孔、设置每层圆角和圆角或倒角的字母边缘；给出名称列表时，每个名称生成一个名牌 |
 | `layerling_layer_icon` | 把 SVG 图标（文件文本或拉伸的草图实体）变成用于多色打印的分层图标牌——图标、更宽的边沿、无孔底板——或用新的宽度或层数重新构建；给出数量时用副本铺满底板 |
 | `layerling_create_qr_code` | 从文字或网址生成二维码，如同形状库中的 {{ui:shape.qrCode}}——可仅二维码、在底板上凸起或雕刻，可设置纠错级别、宽度、高度、静区，也可按需作为孔；模块小于 0.8 mm 时会发出警告 |
+| `layerling_create_sbc_board` | 放置按实际尺寸的 SBC 主板，如同形状库中的 {{ui:shape.sbcBoard}}——Raspberry Pi 5、4、3 B+、Zero 2 W 或 BIGTREETECH Pi，带孔和接口，可设置边缘接口的间隙和位置，也可作为孔来切割外壳 |
 | `layerling_reference_image` | 像 {{ui:import.referenceImage}} 一样从图片添加参考图片，或移动、旋转、校准（图片上的两个点及其实际距离）、淡化或锁定参考图片——这是一种永远不会被导出或打印的辅助参考；`trace` 将其暗部或亮部变为立在其上的草图实体 |
 | `layerling_measure_section` | 在吸附到轮廓的两点之间的剖切平面上测量——壁厚、间隙、配合 |
 | `layerling_show_overhangs` | 开启或关闭悬垂剖面线，设置角度，并报告每个实体需要支撑的面积 |
 | `layerling_estimate_print` | 估算选中项或整个设计的体积、重量和耗材：既给出实体件的数值，也按与导出窗口相同的壁和填充给出粗略估计 |
+| `layerling_check_clearance` | 打印前检查哪些部件重叠、接触或间距小于最小间隙，也检查同一对象中彼此分离的部件 |
 | `layerling_add_reference_points` | 标记参考点——可位于对象的中心、角或边中点，也可位于精确位置——形状会吸附到这些点 |
 | `layerling_list_reference_points` | 列出参考点及其 id 和位置 |
 | `layerling_remove_reference_points` | 按 id 删除参考点，或删除全部 |
