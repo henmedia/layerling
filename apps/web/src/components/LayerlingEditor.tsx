@@ -29,6 +29,8 @@ import { calibratedReferenceImage, dataUrlByteLength, isReferenceImage, LARGE_RE
 import { IconTagPanel } from "@/components/workplane/IconTagPanel";
 import { QrCodePanel } from "@/components/workplane/QrCodePanel";
 import { qrCodeOf, qrCodeShape, regeneratedQrCodeShape } from "@/lib/editorQrCode";
+import { regeneratedSbcBoardShape, sbcBoardOf, sbcBoardShape } from "@/lib/editorSbcBoard";
+import { DEFAULT_SBC_BOARD, MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { DEFAULT_QR_WIDTH, MAX_QR_HEIGHT, MAX_QR_WIDTH, MIN_QR_HEIGHT, MIN_QR_WIDTH, QR_BYTE_CAPACITY, QR_ERROR_CORRECTIONS, QR_STYLES, normalizeQrSettings, qrByteLength, qrMatrix, qrModuleSize, qrModuleTooSmall, qrTextFits, type QrCodeSettings, type QrErrorCorrection, type QrStyle } from "@/lib/qrCode";
 import { iconSourceFromFile, PICTURE_FILE_ACCEPT, picturePixels, type IconSource } from "@/lib/pictureIcon";
 import { loadedManifoldRuntime, onManifoldReady } from "@/lib/manifoldHandle";
@@ -141,7 +143,7 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE } from "@/lib/lylProject";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
-import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
 import { isScrewHoleSize, screwHoleFields, screwHoleSizesFor } from "@/lib/screwHoleSizes";
@@ -3114,6 +3116,8 @@ export function LayerlingEditor({
   const missingThumbnailProjectRef = useRef<string | null>(null);
   const [thumbnailMissingCheck, setThumbnailMissingCheck] = useState(0);
   const shapesRef = useRef(shapes);
+  /** Builds an SBC board from the library (#1098); set once the commit is known, read by the library's clicks and drops. */
+  const placeSbcBoardRef = useRef<((point?: PlacementPoint, onFace?: PlacementWorkplane) => Promise<void>) | null>(null);
   const notesRef = useRef(notes);
   const projectAssetsRef = useRef(projectAssets);
   const projectAttachmentsRef = useRef(projectAttachments);
@@ -3706,6 +3710,11 @@ export function LayerlingEditor({
     if (asset.id === qrCodeAsset.id) {
       setIconTagPanelOpen(false);
       setQrCodePanelOpen(true);
+      return;
+    }
+    // The SBC board (#1098) is built, not carried: it lands on the middle of the workplane.
+    if (asset.id === sbcBoardAsset.id) {
+      void placeSbcBoardRef.current?.();
       return;
     }
     closeSplit();
@@ -5879,6 +5888,11 @@ export function LayerlingEditor({
       if (asset.id === qrCodeAsset.id) {
         setIconTagPanelOpen(false);
         setQrCodePanelOpen(true);
+        return;
+      }
+      // The SBC board (#1098) is built where it was dropped.
+      if (asset.id === sbcBoardAsset.id) {
+        void placeSbcBoardRef.current?.(point, onFace);
         return;
       }
       const shape = makeShapeFromAsset(asset, undefined, workspaceSettingsRef.current.shapeCustomizations[asset.kind]);
@@ -9995,6 +10009,34 @@ export function LayerlingEditor({
     return settings ? { settings, onRegenerate: regenerateSelectedQrCode } : null;
   }, [regenerateSelectedQrCode, selectedShape, selectedShapes.length]);
 
+  /** The SBC board from the library (#1098): the default board, standing on the workplane at the point, selected. */
+  const placeSbcBoard = useCallback(async (point?: PlacementPoint, onFace?: PlacementWorkplane) => {
+    setNotice(t("sbcBoard.building"), true);
+    try {
+      const built = await sbcBoardShape({ board: DEFAULT_SBC_BOARD, clearance: 0, reach: 0 }, workspaceSettingsRef.current.booleanTriangleLimit);
+      const workplane = onFace ?? placementWorkplaneRef.current;
+      const shape = canonicalizeShape({ ...built, ...placementPatchForNewShape(built, workplane, point ?? workplane.origin) });
+      commitShapes([...shapesRef.current, shape], [shape.id], t("status.sbcBoardAdded", { name: shape.name }));
+    } catch (error) {
+      setNotice(error instanceof Error ? localizedError(error.message) : t("sbcBoard.failed"), true);
+    }
+  }, [commitShapes, setNotice]);
+  placeSbcBoardRef.current = placeSbcBoard;
+
+  /** The SBC board card: another board, clearance or reach, made again where the selected board stands. */
+  const regenerateSelectedSbcBoard = useCallback(async (settings: SbcBoardSettings) => {
+    const current = selectedShapes.length === 1 ? selectedShape : null;
+    if (!current || !sbcBoardOf(current)) return;
+    const next = await regeneratedSbcBoardShape(current, settings, workspaceSettingsRef.current.booleanTriangleLimit);
+    if (!shapesRef.current.some((shape) => shape.id === current.id)) return;
+    commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.sbcBoardRegenerated", { name: next.name }));
+  }, [commitShapes, selectedShape, selectedShapes.length]);
+
+  const sbcBoardControls = useMemo(() => {
+    const settings = selectedShapes.length === 1 && !selectedShape?.locked ? sbcBoardOf(selectedShape) : null;
+    return settings ? { settings, onRegenerate: regenerateSelectedSbcBoard } : null;
+  }, [regenerateSelectedSbcBoard, selectedShape, selectedShapes.length]);
+
   /**
    * Reference images (#680): a picture laid on the plate or on the face the workplane stands on, to
    * line parts up on. Added from the import panel, made see-through and calibrated in its card.
@@ -11412,6 +11454,28 @@ export function LayerlingEditor({
           moduleSize: Math.round(moduleSize * 1000) / 1000,
           ...(qrModuleTooSmall(moduleSize) ? { warning: `A module is ${Math.round(moduleSize * 100) / 100} mm, under the 0.8 mm rule of thumb for a readable print: make the code wider, the text shorter or the error correction lower` } : {}),
         };
+      }
+
+      if (command.action === "create_sbc_board") {
+        const board = params.board ?? DEFAULT_SBC_BOARD;
+        if (typeof board !== "string" || !SBC_BOARD_ORDER.includes(board as SbcBoardType)) throw new Error(`board must be one of ${SBC_BOARD_ORDER.join(", ")}`);
+        const clearance = params.clearance ?? 0;
+        if (typeof clearance !== "number" || !Number.isFinite(clearance) || clearance < 0 || clearance > MAX_SBC_CLEARANCE) throw new Error(`clearance must be 0 to ${MAX_SBC_CLEARANCE} mm`);
+        const reach = params.reach ?? 0;
+        if (typeof reach !== "number" || !Number.isFinite(reach) || reach < 0 || reach > MAX_SBC_REACH) throw new Error(`reach must be 0 to ${MAX_SBC_REACH} mm`);
+        for (const axis of ["x", "z"] as const) {
+          if (params[axis] !== undefined && (typeof params[axis] !== "number" || !Number.isFinite(params[axis]))) throw new Error(`${axis} must be a number`);
+        }
+        const built = await sbcBoardShape({ board: board as SbcBoardType, clearance, reach }, workspaceSettingsRef.current.booleanTriangleLimit);
+        const shape = canonicalizeShape({
+          ...built,
+          ...(typeof params.x === "number" ? { x: params.x } : {}),
+          ...(typeof params.z === "number" ? { z: params.z } : {}),
+          ...(params.asHole === true ? { hole: true } : {}),
+          ...(typeof params.name === "string" && params.name.trim() ? { name: params.name.trim().slice(0, 60) } : {}),
+        });
+        commitShapes([...currentShapes(), shape], shape.id, t("status.sbcBoardAdded", { name: shape.name }));
+        return { object: mcpShapeSummary(shape) };
       }
 
       if (command.action === "layer_icon") {
@@ -14894,6 +14958,7 @@ export function LayerlingEditor({
           textLayerStack={selectedNameTag}
           iconTag={historyViewState ? null : iconTagControls}
           qrCode={historyViewState ? null : qrCodeControls}
+          sbcBoard={historyViewState ? null : sbcBoardControls}
           referenceImage={referenceImageControls}
           toolMemory={viewportToolMemoryRef}
           prepareNewShape={prepareNewShape}

@@ -142,6 +142,7 @@ export type LayerlingMcpCommandName =
   | "layer_text"
   | "layer_icon"
   | "create_qr_code"
+  | "create_sbc_board"
   | "reference_image"
   | "set_section_view"
   | "set_history_view"

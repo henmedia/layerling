@@ -1366,6 +1366,23 @@ export const tools = [
     },
   },
   {
+    name: "layerling_create_sbc_board",
+    description: "An SBC board true to size, like SBC board in the editor's shape library (#1098): a single-board computer to build a case around. `board` is pi5 (Raspberry Pi 5, default), pi4 (Raspberry Pi 4 Model B), pi3bPlus (Raspberry Pi 3 Model B+), zero2w (Raspberry Pi Zero 2 W) or bttPi12 (BIGTREETECH Pi V1.2). It is a group: the board - a plate with rounded corners and its four mounting holes cut through - and a box for each connector, header and larger chip, each its own colour; every part is an exact body, so the edge tool, the STEP export and cuts work on it. The board's front edge (USB-C, HDMI) faces +z, its underside lies at the bottom of the group. `clearance` (0 to 2 mm, default 0) grows the connectors at the board's edge on every side but the bottom, so a case wall cut with the board as a hole leaves them a gap; for a printed case 0.2 to 0.5. `reach` (0 to 10 mm, default 0) then makes each of them reach that much further out on the edge it stands at, so they cut through a case wall as thick as that - the real connectors stand out of the board only 1 to 3 mm. Both work the same for every board. It stands on the middle of the plate; `x` and `z` move its middle (mm). `asHole` makes it a hole, to group into a case and cut the openings. The settings stay on the body (summary `sbcBoard`). Mounting holes and the outline follow the makers' drawings; some heights are estimated. One undo step.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        board: { type: "string", enum: ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12"], description: "The board (default pi5)." },
+        clearance: { type: "number", minimum: 0, maximum: 2, description: "Extra room round the edge connectors, in mm (default 0)." },
+        reach: { type: "number", minimum: 0, maximum: 10, description: "How much further out the edge connectors reach, in mm, to cut through a case wall (default 0)." },
+        x: { type: "number", description: "Move its middle to this x (mm)." },
+        z: { type: "number", description: "Move its middle to this z (mm)." },
+        asHole: { type: "boolean", description: "Make the board a hole (default false)." },
+        name: { type: "string", description: "The object's name (default: the board's name)." },
+      },
+    },
+  },
+  {
     name: "layerling_reference_image",
     description: "A reference image (#680), like Reference image in the editor's import window: a picture laid on the workplane - the plate, or the face it was set on - to line parts up on, a photo of a circuit board under its case, say. It is a guide, not a body: never exported (STL, 3MF, OBJ, STEP, SVG), never part of a group, bundle, cut or intersection, never in the print estimate or the build volume warning, and kept once in the .lyl file as a project asset. Without `id`, `base64` (and `fileName`, whose extension .png, .jpg, .jpeg, .webp, .gif or .bmp gives the format) adds one, `width` mm wide (1 to 2000; left out, its longer side 100 mm), half see-through, selected. With `id` it changes that one. Either way: `x` and `z` move its middle (editor coordinates, mm), `rotation` turns it about the vertical in degrees, `opacity` 0.1 to 1 sets how solid it is drawn, `calibrate` { from: { x, y }, to: { x, y }, distance } scales it as the sketch's calibration does - two points in the picture's own pixels (0 at its left and top edge) that lie `distance` mm apart in reality; its proportions stay and its middle stays put - and `locked` true keeps it in place and lets clicks through, false unlocks it. A locked image is refused any other change unless `locked: false` comes with it. layerling_update_object and layerling_delete_objects work on it as on any object. `trace` (true or { part, threshold, height }) traces the picture into a sketch body standing on it (#1060): the dark or light part of the picture becomes its outline, exactly where the picture lies, `height` mm high (default 2), an extruded sketch whose lines can be edited in sketch mode; the answer then also has `traced` (the new body), `outlines` and `lines`. Returns the object; its summary has `referenceImage` with opacity and the picture's pixel size. One undo step.",
     inputSchema: {
