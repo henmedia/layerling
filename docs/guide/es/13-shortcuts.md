@@ -7,7 +7,7 @@ Los atajos funcionan mientras la zona de trabajo tiene el foco. Cuando escribes 
 
 En el editor, {{ui:editor.keyboardShortcuts}}, en el grupo {{ui:editor.group.help}}, abre esta misma lista en una ventana. El botón de la impresora de la ventana ({{ui:shortcuts.print}}) imprime solo la lista, en negro sobre blanco y entera en una cara de una hoja A4 o carta, a tres columnas, para tenerla a mano como referencia rápida; el cuadro de diálogo de impresión del navegador también te ofrece guardarla como PDF.
 
-El cuadro de la parte superior de la ventana busca en la lista: deja solo los atajos cuya frase, grupo o teclas contienen todas las palabras que escribes, así que "ctrl+z" deja solo esas filas. Las mayúsculas y los acentos no importan, y una sola letra o cifra encuentra esa tecla y las palabras que empiezan por ella. La X del final del cuadro lo vacía; con el cuadro vacío vuelve la lista entera. El botón de la impresora imprime lo que muestra la ventana, así que después de una búsqueda imprime solo los atajos encontrados.
+El cuadro de la parte superior de la ventana busca en la lista: deja solo los atajos cuya frase, grupo o teclas contienen todas las palabras que escribes, así que «redondeo» o «ctrl+z» dejan solo esas filas. Las mayúsculas y los acentos no importan, y una sola letra o cifra encuentra esa tecla y las palabras que empiezan por ella. La X del final del cuadro lo vacía; con el cuadro vacío vuelve la lista entera. El botón de la impresora imprime lo que muestra la ventana, así que después de una búsqueda imprime solo los atajos encontrados.
 
 ![La ventana de los atajos de teclado en el editor.](shot:shortcuts)
 
