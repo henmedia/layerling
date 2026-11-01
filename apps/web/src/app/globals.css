@@ -1531,6 +1531,11 @@ a.install-app-hint-button {
   transform: translateX(-50%);
 }
 
+/* Above the control its top is the bubble's bottom edge, so a one-line name sits as close as a long one. */
+.pen-hover-tip.pen-hover-tip-above {
+  transform: translate(-50%, -100%);
+}
+
 /* On a tablet over https both cards can float at once (install and tablet): the tablet card steps up. */
 body:has(.install-app-hint-floating:not(.tablet-hint)) .install-app-hint.install-app-hint-floating.tablet-hint {
   bottom: 230px;

@@ -24,6 +24,19 @@ describe("penTipPosition", () => {
     expect(place.top).toBeLessThan(780);
   });
 
+  it("puts the text above the control for a mouse, where a large pointer cannot cover it", () => {
+    const place = penTipPosition({ left: 500, right: 540, top: 100, bottom: 140 }, screen, true);
+    expect(place.above).toBe(true);
+    expect(place.top).toBe(92);
+    expect(place.left).toBe(520);
+  });
+
+  it("puts the mouse's text below a control at the very top, where there is no room above", () => {
+    const place = penTipPosition({ left: 500, right: 540, top: 20, bottom: 60 }, screen, true);
+    expect(place.above).toBe(false);
+    expect(place.top).toBe(68);
+  });
+
   it("stays usable on a screen narrower than the text", () => {
     const place = penTipPosition({ left: 10, right: 40, top: 100, bottom: 140 }, { width: 200, height: 500 });
     expect(place.left).toBeGreaterThan(0);

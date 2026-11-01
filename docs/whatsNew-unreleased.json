@@ -28,5 +28,15 @@
       "de": "Drücke P oder klicke in der Ansichtsleiste auf den neuen Knopf neben „Arbeitsebene setzen“: Die Ansicht dreht sich, bis du die Arbeitsebene von vorn siehst, auch auf einer schrägen Fläche, mit ihrem Ursprung in der Mitte.",
       "en": "Press P or click the new button next to Place workplane in the view bar: the view turns until you see the workplane square on, on a sloped face too, with its origin in the middle."
     }
+  },
+  {
+    "title": {
+      "de": "Knopfnamen über dem Knopf",
+      "en": "Button names above the button"
+    },
+    "body": {
+      "de": "In der installierten App erscheint der Name eines Knopfs jetzt über dem Knopf statt darunter. So verdeckt ihn der Mauszeiger nicht mehr, auch wenn du ihn in den Systemeinstellungen größer gestellt hast.",
+      "en": "In the installed app, a button's name now appears above the button instead of below it, so the mouse pointer no longer covers it, even if you made the pointer larger in your system settings."
+    }
   }
 ]
