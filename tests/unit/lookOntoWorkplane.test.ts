@@ -38,7 +38,8 @@ describe("look straight onto the workplane (#1128)", () => {
     // Halfway the pivot is between the two spots, not still at the start.
     expect(view.controls.target.length()).toBeGreaterThan(0);
     expect(view.controls.target.distanceTo(origin)).toBeGreaterThan(0);
-    expect(stepCameraTurn(view, startedAt + VIEW_CUBE_TURN_MS)).toBe(true);
+    // A hair past the end: startedAt + 320 - startedAt can come out 319.99999... and leave the turn unfinished.
+    expect(stepCameraTurn(view, startedAt + VIEW_CUBE_TURN_MS + 0.001)).toBe(true);
     expect(view.controls.target.distanceTo(origin)).toBeLessThan(1e-9);
     expect(lookDirection(view).angleTo(normal)).toBeLessThan(1e-6);
     expect(view.cameraTurn).toBeNull();
