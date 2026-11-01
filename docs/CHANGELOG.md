@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.131.0
+
 - **Check clearance (#1138):** Parts that should move after printing - a flexi toy, a hinge printed in place, a lid in its box, an axle in a bore - need a gap, and until now the only way to find a stuck pair was to print it. Check clearance in Combine, next to Show common part, checks the selection (or every visible object) pair by pair on the meshes the slicer gets: overlapping (with the shared volume shown red), touching (closer than 0.001 mm, they fuse), too tight or fine against a Minimum gap (0.3 mm to start), each gap marked between layers or side by side. Separate parts of one object splits an imported flexi toy into its links. A click on a row brings the camera there and draws the gap. It runs in the geometry worker and only reads; `layerling_check_clearance` does it through MCP. Contributed by @marcus040473 in #1138.
 - **Several surface textures on one body (Discussion #1105):** A body carried one surface texture, so bricks round the walls and knurling on the top were not possible. The Surface texture card now has a tab per layer, up to six: each further layer goes on faces of its own, the first on the ones it picked or on every face the others leave free. The body keeps its layers, and `texture_surface` takes `layers` through MCP. Contributed by @marcus040473 in #1123.
 - **Surface texture on a wedge's slope:** Knurling a wedge left a smooth triangle on its slope, since a wall facing the body's middle counted as an inner wall. A wall is now inner only when the body stands across from it, as a cup's inside does. Reported by mail, fixed by @marcus040473 in #1127.
