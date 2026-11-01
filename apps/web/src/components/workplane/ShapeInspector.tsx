@@ -104,8 +104,7 @@ import {
   threadSizeSettings,
   threadUsesInchPitch,
   threadsPerInchToPitch,
-  type ThreadSettings,
-} from "@/lib/threadGeometry";
+  type ThreadSettings, threadNutShape } from "@/lib/threadGeometry";
 import {
   DEFAULT_STAR_INNER_SIZE,
   DEFAULT_STAR_INNER_FILLET,
@@ -435,6 +434,18 @@ const THREAD_HEAD_OPTIONS: Array<{ value: ThreadHead; label: MessageKey }> = [
   { value: "cylinder", label: "thread.headCylinder" },
   { value: "countersunk", label: "thread.headCountersunk" },
   { value: "hex", label: "thread.headHex" },
+  { value: "square", label: "thread.headSquare" },
+  { value: "flange", label: "thread.headFlange" },
+  { value: "wing", label: "thread.headWing" },
+  { value: "knob", label: "thread.headKnob" },
+];
+/** The shape of a nut (#1131), kept in the head field a nut had no use for. */
+const THREAD_NUT_SHAPE_OPTIONS: Array<{ value: ThreadHead; label: MessageKey }> = [
+  { value: "hex", label: "thread.nutHex" },
+  { value: "square", label: "thread.nutSquare" },
+  { value: "flange", label: "thread.nutFlange" },
+  { value: "wing", label: "thread.nutWing" },
+  { value: "knob", label: "thread.nutKnob" },
 ];
 const THREAD_DRIVE_OPTIONS: Array<{ value: ThreadDrive; label: MessageKey }> = [
   { value: "hex", label: "thread.driveHex" },
@@ -2506,6 +2517,16 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         onChange: (drive) => applyThread({ drive: normalizeThreadDrive(drive, settings.head) }),
       });
     }
+    if (settings.role === "nut") {
+      properties.push({
+        type: "select",
+        id: "threadNutShape",
+        label: t("inspector.threadNutShape"),
+        value: threadNutShape(settings.head),
+        options: THREAD_NUT_SHAPE_OPTIONS.map((option) => ({ value: option.value, label: t(option.label) })),
+        onChange: (head) => applyThread({ head: normalizeThreadHead(head) }),
+      });
+    }
     properties.push(
       {
         type: "select",
@@ -2555,7 +2576,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       if (settings.head !== "countersunk") {
         properties.push({
           id: "headDiameter",
-          label: t(settings.head === "hex" ? "prop.headAcrossFlats" : "prop.headDiameter"),
+          label: t(settings.head === "hex" || settings.head === "square" || settings.head === "flange" ? "prop.headAcrossFlats" : settings.head === "wing" ? "prop.headSpan" : "prop.headDiameter"),
           value: settings.headDiameter,
           min: headDiameterLimits.min,
           max: headDiameterLimits.max,
@@ -3501,6 +3522,7 @@ export function ShapeInspector({
   const showTaperCards = !shapeIgnoresTaper && !shape.layeredText;
   const threadRoleProperty = isThread ? findSelectProperty(properties, "threadRole") : null;
   const threadHeadProperty = isThread ? findSelectProperty(properties, "threadHead") : null;
+  const threadNutShapeProperty = isThread ? findSelectProperty(properties, "threadNutShape") : null;
   const threadDriveProperty = isThread ? findSelectProperty(properties, "threadDrive") : null;
   // A vase: its measures here, its form and pattern and its bottom and wall on cards of their own.
   const vaseFormProperties = shape.kind === "vase" ? properties.filter((property) => property.id.startsWith("vase.")) : [];
@@ -4190,6 +4212,20 @@ export function ShapeInspector({
                   preview: <ThreadHeadPreview head={option.value} />,
                 }))}
                 onChange={threadHeadProperty.onChange}
+              />
+            ) : null}
+            {threadNutShapeProperty ? (
+              <IconOptionSelector
+                label={t("inspector.threadNutShape")}
+                columns={3}
+                value={threadNutShapeProperty.value}
+                disabled={locked}
+                options={THREAD_NUT_SHAPE_OPTIONS.map((option) => ({
+                  value: option.value,
+                  label: t(option.label),
+                  preview: <ThreadNutShapePreview shape={option.value} />,
+                }))}
+                onChange={threadNutShapeProperty.onChange}
               />
             ) : null}
             {threadDriveProperty ? (
@@ -7012,9 +7048,39 @@ function ThreadRolePreview({ role }: { role: ThreadRole }) {
   );
 }
 
+/** A nut's shape seen from above, round its bore (#1131). */
+function ThreadNutShapePreview({ shape }: { shape: ThreadHead }) {
+  const common = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinejoin: "round" as const, "aria-hidden": true };
+  const bore = <circle cx="12" cy="12" r="3" />;
+  if (shape === "square") return <svg {...common}><path d="M5 5h14v14H5z" />{bore}</svg>;
+  if (shape === "flange") return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M16.2 4.7L20.3 12l-4.1 7.3H7.8L3.7 12l4.1-7.3z" />{bore}</svg>;
+  if (shape === "wing") return <svg {...common}><path d="M8.3 9.5H4a2.5 2.5 0 0 0 0 5h4.3M15.7 9.5H20a2.5 2.5 0 0 1 0 5h-4.3" /><circle cx="12" cy="12" r="4.5" />{bore}</svg>;
+  if (shape === "knob") {
+    return (
+      <svg {...common}>
+        <path d="M12 2.5a2.6 2.6 0 0 1 2.4 1.6 4 4 0 0 0 4.3 2.5 2.6 2.6 0 0 1 2 4.1 4 4 0 0 0 0 5 2.6 2.6 0 0 1-2 4.1 4 4 0 0 0-4.3 2.5 2.6 2.6 0 0 1-4.8 0 4 4 0 0 0-4.3-2.5 2.6 2.6 0 0 1-2-4.1 4 4 0 0 0 0-5 2.6 2.6 0 0 1 2-4.1 4 4 0 0 0 4.3-2.5A2.6 2.6 0 0 1 12 2.5z" />
+        {bore}
+      </svg>
+    );
+  }
+  return <svg {...common}><path d="M16.6 4l4.6 8-4.6 8H7.4l-4.6-8 4.6-8z" />{bore}</svg>;
+}
+
 /** Der Kopf sitzt unten, weil die Schraube so auf der Ebene steht. */
 function ThreadHeadPreview({ head }: { head: ThreadHead }) {
   const common = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinejoin: "round" as const, "aria-hidden": true };
+  const shaft = (
+    <>
+      <path d="M9 16V3h6v13" />
+      <path d="M9 7.1l6-1.1M9 11.1l6-1.1" />
+    </>
+  );
+  // The new heads (#1131), seen from the side like the others: a square head plain, a flange head with its disc under
+  // the shaft, a wing head as a long flat bar, a star knob wide with its lobes as bumps.
+  if (head === "square") return <svg {...common}><path d="M5 22v-6h14v6z" />{shaft}</svg>;
+  if (head === "flange") return <svg {...common}><path d="M6 22v-4.5h12V22z" /><path d="M3 17.5V16h18v1.5z" /><path d="M10 17.5V22M14 17.5V22" />{shaft}</svg>;
+  if (head === "wing") return <svg {...common}><path d="M1.5 22v-4a2 2 0 0 1 2-2h17a2 2 0 0 1 2 2v4z" />{shaft}</svg>;
+  if (head === "knob") return <svg {...common}><path d="M3 22v-4.5a1.5 1.5 0 0 1 3 0 1.5 1.5 0 0 1 3 0V16h6v1.5a1.5 1.5 0 0 1 3 0 1.5 1.5 0 0 1 3 0V22z" />{shaft}</svg>;
   if (head === "countersunk") {
     return (
       <svg {...common}>
@@ -7154,6 +7220,14 @@ export function SelectionInspector({
     if (!fitModule || !onUpdateShapes) return;
     onUpdateShapes(gearPairFitPatches(shapes[0], shapes[1], fitModule), t("status.gearPairFitted", { module: plainNumber(fitModule) }));
   };
+  // One gear stays, the other is fitted to it, so a chain of gears can be fitted one pair at a time (Discussion #1136).
+  const gearPairOff = gearPair && (gearPair.distance === null || Math.abs(gearPair.distance - gearPair.current) > 0.005);
+  const keepGear = (index: 0 | 1) => {
+    if (!onUpdateShapes) return;
+    const kept = gearPairKeepPatches(shapes[index], shapes[1 - index]);
+    if (!kept) return;
+    onUpdateShapes([kept.patch], t("status.gearPairKept", { name: displayShapeName(shapes[index]), module: plainNumber(kept.module), distance: plainNumber(kept.distance) }));
+  };
   const pick = (color: string) => {
     onSetColor(color);
     rememberColor(color);
@@ -7220,14 +7294,6 @@ export function SelectionInspector({
                 solids.map((shape) => ({ id: shape.id, patch: { transparent: transparent || undefined } })),
                 transparent ? t("status.selectionTransparent") : t("status.selectionOpaque"),
               )}
-  // One gear stays, the other is fitted to it, so a chain of gears can be fitted one pair at a time (Discussion #1136).
-  const gearPairOff = gearPair && (gearPair.distance === null || Math.abs(gearPair.distance - gearPair.current) > 0.005);
-  const keepGear = (index: 0 | 1) => {
-    if (!onUpdateShapes) return;
-    const kept = gearPairKeepPatches(shapes[index], shapes[1 - index]);
-    if (!kept) return;
-    onUpdateShapes([kept.patch], t("status.gearPairKept", { name: displayShapeName(shapes[index]), module: plainNumber(kept.module), distance: plainNumber(kept.distance) }));
-  };
             />
           ) : null}
         </div>
@@ -7281,6 +7347,11 @@ export function SelectionInspector({
           {t("inspector.gearPairFitApply")}
         </button>
       ) : null}
+      {gearPairOff && onUpdateShapes ? ([0, 1] as const).map((index) => (
+        <button key={shapes[index].id} type="button" className="inspector-action-button selection-gear-fit" disabled={anyLocked} title={t("inspector.gearPairKeepHint")} onClick={() => keepGear(index)}>
+          {t("inspector.gearPairKeep", { name: displayShapeName(shapes[index]) })}
+        </button>
+      )) : null}
       <p className="selection-inspector-hint">{t("inspector.selectionHint")}</p>
       {!movable.moved ? (
         <div className="inspector-snap-dock">
@@ -7290,8 +7361,3 @@ export function SelectionInspector({
     </aside>
   );
 }
-      {gearPairOff && onUpdateShapes ? ([0, 1] as const).map((index) => (
-        <button key={shapes[index].id} type="button" className="inspector-action-button selection-gear-fit" disabled={anyLocked} title={t("inspector.gearPairKeepHint")} onClick={() => keepGear(index)}>
-          {t("inspector.gearPairKeep", { name: displayShapeName(shapes[index]) })}
-        </button>
-      )) : null}

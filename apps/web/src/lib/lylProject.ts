@@ -1447,7 +1447,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.threadRole !== undefined && !["rod", "screw", "nut", "bore"].includes(definition.threadRole as string)) {
       throw new Error(`${label}.threadRole is invalid`);
     }
-    if (definition.threadHead !== undefined && !["cylinder", "countersunk", "hex"].includes(definition.threadHead as string)) {
+    if (definition.threadHead !== undefined && !["cylinder", "countersunk", "hex", "square", "flange", "wing", "knob"].includes(definition.threadHead as string)) {
       throw new Error(`${label}.threadHead is invalid`);
     }
     if (definition.threadHand !== undefined && definition.threadHand !== "right" && definition.threadHand !== "left") {

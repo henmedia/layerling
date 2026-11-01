@@ -54,6 +54,16 @@ describe("the thread's exact body", () => {
     ["a nut with the own profile, 45 degrees", { threadRole: "nut", threadProfile: "custom", threadFlankAngle: 45, threadDepth: 0.6 }],
     ["a tapped hole with the own profile and a chamfer", { threadRole: "bore", hole: true, threadProfile: "custom", threadFlankAngle: 75, threadDepth: 0.5, threadChamfer: 0.4 }],
     ["a rod turned, tipped and lifted", { rotation: 30, rotationX: 90, elevation: 4, x: 12, z: -5 }],
+    // Nut shapes and heads from outlines (#1131).
+    ["a square nut", { threadRole: "nut", threadHead: "square" }],
+    ["a flange nut", { threadRole: "nut", threadHead: "flange" }],
+    ["a wing nut", { threadRole: "nut", threadHead: "wing" }],
+    ["a star knob nut, left hand", { threadRole: "nut", threadHead: "knob", threadHand: "left" }],
+    ["a screw with a square head", { threadRole: "screw", threadHead: "square" }],
+    ["a screw with a flange head", { threadRole: "screw", threadHead: "flange" }],
+    ["a screw with a wing head", { threadRole: "screw", threadHead: "wing" }],
+    ["a screw with a star knob", { threadRole: "screw", threadHead: "knob" }],
+    ["a star knob with a hex socket", { threadRole: "screw", threadHead: "knob", threadDrive: "hex" }],
   ];
 
   it.each(cases)("matches the drawn %s", (_name, extra) => {

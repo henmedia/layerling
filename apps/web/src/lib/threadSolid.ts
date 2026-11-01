@@ -1,6 +1,7 @@
 import type { OcctKernel, ShapeHandle, SweepMode } from "occt-wasm";
 import type { CadModifierThreadPart } from "@/lib/cadModifierTypes";
 import type { ThreadDriveOutline } from "@/lib/threadGeometry";
+import type { ThreadOutline, ThreadOutlineTier } from "@/lib/threadOutline";
 
 /** SweepMode.FixedUp, by value: the STEP export runs this outside the worker, where occt-wasm is only a type. */
 const FIXED_UP = 2 as SweepMode;
@@ -60,6 +61,62 @@ function hexPrism(cad: OcctKernel, acrossFlats: number, height: number) {
 /** Both rims of a turned body broken at 45 degrees: what is left of anything round within `faceRadius` at the faces. */
 function rimChamferBound(cad: OcctKernel, faceRadius: number, height: number) {
   return revolved(cad, [[0, 0], [faceRadius, 0], [faceRadius + height / 2, height / 2], [faceRadius, height], [0, height]]);
+}
+
+/** A prism of `height` from z = 0 on a polygon in the shape's x/z plane, taken to the kernel's (x, -z) as the drive is. */
+function polygonPrism(cad: OcctKernel, corners: readonly Point[], height: number) {
+  const points = corners.map(([x, z]) => ({ x, y: -z, z: 0 }));
+  const wire = cad.makeWire(points.map((point, index) => cad.makeLineEdge(point, points[(index + 1) % points.length])));
+  return cad.extrude(cad.makeFace(wire), 0, 0, height);
+}
+
+/** An upright cylinder of `radius` and `height` from z = 0 round the point (x, z) of the shape's plane. */
+function cylinderAt(cad: OcctKernel, radius: number, height: number, x: number, z: number) {
+  const cylinder = cad.makeCylinder(radius, height);
+  return x === 0 && z === 0 ? cylinder : cad.translate(cylinder, x, -z, 0);
+}
+
+/** The outline of a nut body or screw head (#1131) as a prism of `height` from z = 0, as `outlineRadius` draws it. */
+function outlinePrism(cad: OcctKernel, outline: ThreadOutline, height: number): ShapeHandle {
+  switch (outline.kind) {
+    case "round":
+      return cad.makeCylinder(outline.radius, height);
+    case "hex":
+      return hexPrism(cad, outline.acrossFlats, height);
+    case "square": {
+      const half = outline.acrossFlats / 2;
+      return polygonPrism(cad, [[half, half], [-half, half], [-half, -half], [half, -half]], height);
+    }
+    case "knob": {
+      let body = cad.makeCylinder(outline.radius, height);
+      for (let index = 0; index < outline.lobes; index += 1) {
+        const angle = ((index + 0.5) * Math.PI * 2) / outline.lobes;
+        // A little taller than the knob, so the cut leaves no skin at either face.
+        const scallop = cad.translate(cylinderAt(cad, outline.scallopRadius, height + 2, Math.cos(angle) * outline.scallopCenter, Math.sin(angle) * outline.scallopCenter), 0, 0, -1);
+        body = oneSolid(cad, cad.cut(body, scallop), "star knob");
+      }
+      return body;
+    }
+    case "wing": {
+      const straight = Math.max(0, outline.halfSpan - outline.halfWidth);
+      let body = cad.makeCylinder(outline.hubRadius, height);
+      if (straight > 0) body = oneSolid(cad, cad.fuse(body, polygonPrism(cad, [[straight, outline.halfWidth], [-straight, outline.halfWidth], [-straight, -outline.halfWidth], [straight, -outline.halfWidth]], height)), "wings");
+      for (const side of [1, -1]) body = oneSolid(cad, cad.fuse(body, cylinderAt(cad, outline.halfWidth, height, side * straight, 0)), "wings");
+      return body;
+    }
+  }
+}
+
+/** The tiers of a nut body or screw head, each its outline's prism at its height, fused into one solid. */
+function tiersSolid(cad: OcctKernel, tiers: readonly ThreadOutlineTier[], what: string) {
+  let body: ShapeHandle | null = null;
+  for (const tier of tiers) {
+    const prism = outlinePrism(cad, tier.outline, tier.to - tier.from);
+    const placed = tier.from === 0 ? prism : cad.translate(prism, 0, 0, tier.from);
+    body = body ? oneSolid(cad, cad.fuse(body, placed), what) : placed;
+  }
+  if (!body) throw new Error(`The thread's ${what} has no tiers`);
+  return body;
 }
 
 function oneSolid(cad: OcctKernel, shape: ShapeHandle, what: string) {
@@ -267,9 +324,10 @@ function insideChamferCone(cad: OcctKernel, part: CadModifierThreadPart, face: n
   return revolved(cad, direction === 1 ? outline : [...outline].reverse());
 }
 
-function screwHead(cad: OcctKernel, head: NonNullable<CadModifierThreadPart["head"]>) {
+function screwHead(cad: OcctKernel, head: NonNullable<CadModifierThreadPart["head"]>, tiers?: readonly ThreadOutlineTier[]) {
   let body: ShapeHandle;
-  if (head.kind === "hex") body = hexPrism(cad, head.acrossFlats, head.height);
+  if (tiers) body = tiersSolid(cad, tiers, "head");
+  else if (head.kind === "hex") body = hexPrism(cad, head.acrossFlats, head.height);
   else if (head.kind === "countersunk") body = revolved(cad, [[0, 0], [head.radius, 0], [head.neckRadius, head.height], [0, head.height]]);
   else body = cad.makeCylinder(head.radius, head.height);
   if (head.chamferFaceRadius > 0) body = oneSolid(cad, cad.common(body, rimChamferBound(cad, head.chamferFaceRadius, head.height)), "head");
@@ -309,7 +367,7 @@ export function threadPartSolid(cad: OcctKernel, part: CadModifierThreadPart): S
     const into = head ? Math.min(pitch, (shaftBottom - (head.socketDepth > 0 ? head.socketDepth : 0)) * 0.5) : 0;
     const bottom = shaftBottom - into;
     solid = outsideThread(cad, part, bottom, shaftBottom, counterClockwise);
-    if (head) solid = oneSolid(cad, cad.fuse(screwHead(cad, head), solid), "screw");
+    if (head) solid = oneSolid(cad, cad.fuse(screwHead(cad, head, part.tiers), solid), "screw");
   } else {
     // A nut or a tapped hole: the thread as the tap that cuts it, reaching
     // past both faces, and the chamfer cones that widen its mouths.
@@ -319,7 +377,7 @@ export function threadPartSolid(cad: OcctKernel, part: CadModifierThreadPart): S
       ...(part.chamfer > 0 ? [insideChamferCone(cad, part, height, -1, part.chamfer)] : []),
     ];
     if (role === "nut" && part.nut) {
-      let body = hexPrism(cad, part.nut.acrossFlats, height);
+      let body = part.tiers ? tiersSolid(cad, part.tiers, "nut") : hexPrism(cad, part.nut.acrossFlats, height);
       if (part.nut.chamferFaceRadius > 0) body = oneSolid(cad, cad.common(body, rimChamferBound(cad, part.nut.chamferFaceRadius, height)), "nut");
       for (const cone of cones) body = oneSolid(cad, cad.cut(body, cone), "nut");
       solid = oneSolid(cad, cad.cut(body, tap), "nut");

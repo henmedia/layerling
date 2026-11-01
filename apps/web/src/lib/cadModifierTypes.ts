@@ -1,3 +1,5 @@
+import type { ThreadOutlineTier } from "@/lib/threadOutline";
+import type { ThreadHead } from "@/types/layerling";
 import type { ThreadDriveOutline } from "@/lib/threadGeometry";
 import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityType, ShellEdges, ShellOpenings } from "@/types/layerling";
 
@@ -233,9 +235,11 @@ export type CadModifierThreadPart = {
   /** The chamfer at the bottom end, when the part has one (`chamferBottom`). */
   chamferLow: number;
   chamferBottom: boolean;
+  /** A nut body or screw head of outline tiers (#1131): square, flange, wing or star knob. It takes the place of the hexagon or head kind. */
+  tiers?: ThreadOutlineTier[];
   /** Screw only. */
   head?: {
-    kind: "cylinder" | "hex" | "countersunk";
+    kind: ThreadHead;
     height: number;
     /** Cylinder head radius, or the countersunk head's crown radius at y = 0. */
     radius: number;

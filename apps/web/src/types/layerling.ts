@@ -663,7 +663,7 @@ export type GridfinityOpening = {
 
 /** Was aus dem Gewinde wird: Stange, Schraube, Mutter oder das Loch dafuer. */
 export type ThreadRole = "rod" | "screw" | "nut" | "bore";
-export type ThreadHead = "cylinder" | "countersunk" | "hex";
+export type ThreadHead = "cylinder" | "countersunk" | "hex" | "square" | "flange" | "wing" | "knob";
 /** What drives a screw: a recess in its free head face (#1052). */
 export type ThreadDrive = "hex" | "torx" | "phillips" | "slot" | "robertson" | "none";
 export type ThreadHand = "right" | "left";

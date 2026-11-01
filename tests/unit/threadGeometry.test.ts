@@ -164,6 +164,19 @@ describe("thread geometry", () => {
     }
   });
 
+  // Nut shapes and heads from outlines (#1131): closed, outward, and as wide as their footprint says.
+  it.each<[ThreadRole, string, number]>([
+    ["nut", "square", 5], ["nut", "flange", 5], ["nut", "wing", 5], ["nut", "knob", 5],
+    ["screw", "square", 24], ["screw", "flange", 24], ["screw", "wing", 24], ["screw", "knob", 24],
+  ])("stays closed as a %s of the %s shape and fills its footprint", (role, threadHead, height) => {
+    const { geometry, footprint } = geometryFor(role, height, { threadHead });
+    const position = geometry.getAttribute("position") as unknown as Position;
+    expect([...edgeUseCounts(position).values()].every((uses) => uses === 2)).toBe(true);
+    expect(signedVolume(position)).toBeGreaterThan(0);
+    expect((geometry.boundingBox?.max.x ?? 0) - (geometry.boundingBox?.min.x ?? 0)).toBeCloseTo(footprint.width, 2);
+    expect((geometry.boundingBox?.max.z ?? 0) - (geometry.boundingBox?.min.z ?? 0)).toBeCloseTo(footprint.depth, 2);
+  });
+
   it("cuts the thread between the minor and the major diameter", () => {
     const { geometry } = geometryFor("rod", 20);
     const position = geometry.getAttribute("position") as unknown as Position;

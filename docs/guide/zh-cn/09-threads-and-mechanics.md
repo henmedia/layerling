@@ -10,9 +10,9 @@ summary: 相互配合的螺钉、螺母与螺纹孔，以及齿轮、弹簧、�
 在形状库中选择 {{ui:shape.thread}}。在 {{ui:inspector.threadRole}} 下决定它的类型：
 
 - **{{ui:thread.rod}}：** 带螺纹的圆柱体，例如没有头的螺钉。
-- **{{ui:thread.screw}}：** 带头部。你可以选择 {{ui:inspector.threadHead}}：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。
+- **{{ui:thread.screw}}：** 带头部。你可以选择 {{ui:inspector.threadHead}}：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。另有{{ui:thread.headSquare}}、{{ui:thread.headFlange}}（六角下带一个圆盘）、{{ui:thread.headWing}}和{{ui:thread.headKnob}}：后两种用手拧，初始宽度为螺纹直径的五倍，可平放打印、无需支撑；其{{ui:prop.headDiameter}}（蝶形头为{{ui:prop.headSpan}}）为螺纹直径的三到八倍。
   再往下可以设置{{ui:prop.headDiameter}}(六角头为{{ui:prop.headAcrossFlats}};沉头的直径随高度而定)以及头部端面的{{ui:inspector.threadDrive}}:{{ui:thread.driveHex}}、{{ui:thread.driveTorx}}、{{ui:thread.drivePhillips}}、{{ui:thread.driveSlot}}、{{ui:thread.driveRobertson}},或用手或扳手拧的螺丝选{{ui:thread.driveNone}}。{{ui:prop.driveSize}}是内六角的对边宽度、梅花星形的外径或十字的跨度;{{ui:prop.driveDepth}}是它的深度,最多为头部的十分之九,0 表示不要。只要不改动,这些值就随尺寸变化;六角头默认没有驱动。驱动属于精确实体,因此也会出现在 STEP 导出中。选择{{ui:thread.driveSlot}}时，{{ui:prop.driveSize}}是槽的长度，宽度为长度的五分之一，一字螺丝刀或硬币都能拧；初始长度为头部允许的最大值。 {{ui:thread.driveRobertson}}是加拿大常见的方头驱动：{{ui:prop.driveSize}}是方孔的对边宽度，默认取与规格相配的批头，M4 和 M5 为 2 号（2.84 毫米）。
-- **{{ui:thread.nut}}：** 配套的螺母。配套的垫圈是一个{{ui:shape.tube}}：在{{ui:prop.washerSize}}中选择螺钉规格，外径、内径和厚度即按 ISO 7089 设置。
+- **{{ui:thread.nut}}：** 配套的螺母。配套的垫圈是一个{{ui:shape.tube}}：在{{ui:prop.washerSize}}中选择螺钉规格，外径、内径和厚度即按 ISO 7089 设置。在{{ui:inspector.threadNutShape}}中还可选{{ui:thread.nutSquare}}、{{ui:thread.nutFlange}}（六角下带圆盘）、{{ui:thread.nutWing}}或用手拧的{{ui:thread.nutKnob}}；蝶翼平放，所以蝶形螺母无需支撑即可打印。
 - **{{ui:thread.bore}}：** 螺纹孔。它属于孔。把它拖进零件，将两者分组，零件就有内螺纹。 要做拧螺栓的孔，请始终使用{{ui:thread.bore}}：{{ui:thread.rod}}或{{ui:thread.screw}}作为孔时是螺栓的完整尺寸，没有间隙，会太紧。如果仍把它设为孔，layerling 会提示你，点击{{ui:inspector.threadMakeTappedHole}}即可改为{{ui:thread.bore}}。
 
 ![一个带圆柱头的螺钉。右侧：类型和头部形状，往下是规格、螺距和牙型。](shot:thread-screw)

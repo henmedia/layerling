@@ -1633,6 +1633,7 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     };
   }
   if (settings.role === "nut") part.nut = { acrossFlats: spec.acrossFlats, chamferFaceRadius: plan.rimBroken ? plan.rimFaceRadius : 0 };
+  if (plan.tiers) part.tiers = plan.tiers;
   return part;
 }
 

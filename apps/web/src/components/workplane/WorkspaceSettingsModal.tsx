@@ -182,6 +182,10 @@ const THREAD_HEAD_OPTIONS: Array<{ value: ThreadHead; label: MessageKey }> = [
   { value: "cylinder", label: "thread.headCylinder" },
   { value: "countersunk", label: "thread.headCountersunk" },
   { value: "hex", label: "thread.headHex" },
+  { value: "square", label: "thread.headSquare" },
+  { value: "flange", label: "thread.headFlange" },
+  { value: "wing", label: "thread.headWing" },
+  { value: "knob", label: "thread.headKnob" },
 ];
 const THREAD_HAND_OPTIONS: Array<{ value: ThreadHand; label: MessageKey }> = [
   { value: "right", label: "thread.right" },
