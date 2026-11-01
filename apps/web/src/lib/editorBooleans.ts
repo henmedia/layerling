@@ -1572,6 +1572,7 @@ async function manifoldBooleanMeshShape(selection: WorkplaneShape[], triangleLim
     if (result.status() !== "NoError" || result.numTri() < 1) {
       return null;
     }
+    result = foldCutterPaddingSteps(result, created);
 
     const outputMesh = result.getMesh();
     const positions = manifoldMeshToPositions(outputMesh);
@@ -1601,6 +1602,23 @@ async function manifoldBooleanMeshShape(selection: WorkplaneShape[], triangleLim
   } finally {
     Array.from(new Set(created)).forEach(disposeManifold);
   }
+}
+
+/**
+ * A hole sticks out a thousandth at its ends (CUTTER_PADDING), so one flush with the outside leaves no skin. Where an end
+ * rests on a face inside the body - a hole on the top of a plate, to take a peg off it - it cut that thousandth into the
+ * face too, and the step round the hole showed as a line on the plate (#1133). The kernel folds walls that thin away.
+ */
+const CUT_STEP_TOLERANCE = CUTTER_PADDING * 2;
+
+function foldCutterPaddingSteps(result: ManifoldSolid, created: ManifoldSolid[]): ManifoldSolid {
+  // The step's floor comes from the hole and its rim from the part: the kernel folds only within one source mesh, so
+  // the result is taken as a mesh of its own first. Nothing reads the triangles' source afterwards.
+  const whole = result.asOriginal();
+  created.push(whole);
+  const tidy = whole.setTolerance(CUT_STEP_TOLERANCE);
+  created.push(tidy);
+  return tidy.status() === "NoError" && tidy.numTri() > 0 ? tidy : result;
 }
 
 /** How thin (mm) a triangle of a merged group may be before the kernel folds it away: well above the viewer's 1/10,000 mm, far below anything printable. */
@@ -1743,6 +1761,7 @@ async function manifoldBundleCutShape(selected: WorkplaneShape[], triangleLimit:
       created.push(result);
     }
     if (result.status() !== "NoError" || result.numTri() < 1) return null;
+    result = foldCutterPaddingSteps(result, created);
     const positions = manifoldMeshToPositions(result.getMesh());
     const group = meshPositionsToGroupShape(selected, solids, positions, "grouped-bundle-cut", groupChildren);
     return isUsableBooleanGroup(group, sourceMesh.faces.length, false) ? group : null;
