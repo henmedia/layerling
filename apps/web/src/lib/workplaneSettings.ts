@@ -519,6 +519,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.cornerFillet = optionalShapeNumber(source.cornerFillet, fallbackEntry?.cornerFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION / 2);
       const profile = source.portProfile ?? fallbackEntry?.portProfile;
       if (PORT_PROFILES.includes(profile as PortProfile)) entry.portProfile = profile as PortProfile;
+      entry.portClearance = optionalShapeNumber(source.portClearance, fallbackEntry?.portClearance, 0, 2);
     }
     if (kind === "roundedBox") {
       entry.cornerFillet = optionalShapeNumber(source.cornerFillet, fallbackEntry?.cornerFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION / 2);

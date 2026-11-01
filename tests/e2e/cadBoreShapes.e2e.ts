@@ -154,6 +154,21 @@ describe("exact bodies for the bore shapes with the real OCCT kernel", () => {
     expect(cad.getVolume(dp)).toBeCloseTo(section * 10, 2);
   });
 
+  it("port opening: Micro-HDMI with both lower corners cut, also grown by extra clearance", () => {
+    for (const [width, height, corner] of [[6.8, 3.6, 0.3], [7.4, 4.2, 0.6]]) {
+      const source = shape("port", { width, depth: 10, height, cornerFillet: corner, portProfile: "microHdmi" });
+      const { solid } = exact(source);
+      expect(surfaceTypes(solid)).toEqual(["cylinder", "cylinder", ...Array(8).fill("plane")]);
+      const box = cad.getBoundingBox(solid);
+      expect(box.xmax - box.xmin).toBeCloseTo(width, 3);
+      expect(box.ymax - box.ymin).toBeCloseTo(height, 3);
+      // each cut corner takes a triangle of width / 6.8 by 0.9 / 3.6 of the height, each round one r² (1 - π/4)
+      const cx = width / 6.8, cy = (0.9 / 3.6) * height;
+      const section = width * height - 2 * (corner * corner - Math.PI * corner * corner / 4) - 2 * (cx * cy / 2);
+      expect(cad.getVolume(solid)).toBeCloseTo(section * 10, 2);
+    }
+  });
+
   it("counterbore: five faces, plane and cylinder only, head end on top", () => {
     const source = shape("counterbore", { x: 2, z: 1, elevation: 3, width: 6.4, depth: 6.4, height: 12, screwHoleShaft: 3.4, screwHoleHeadDepth: 3.2 });
     const { solid } = exact(source);

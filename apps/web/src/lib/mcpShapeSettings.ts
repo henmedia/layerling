@@ -43,7 +43,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "knurlPattern", "knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer",
   "dovetailNeckWidth", "dovetailClearance",
   "loftBottomOutline", "loftTopOutline", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments", "loftSections", "loftThrough", "slotEndRatio", "torusTubeRatio",
-  "screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "portProfile",
+  "screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "portProfile", "portClearance",
   "cornerFillet", "topBottomFillet", "roundedBoxQuality",
   "bentTubeProfile", "bentTubeInnerProfile", "bentTubeSize", "bentTubeWall", "bentTubeQuality", "bentTubeSegments",
   "vase",

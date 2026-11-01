@@ -184,7 +184,7 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 ## 接口开孔
 
-电子产品外壳需要给线缆留开孔。{{ui:shape.port}} 就是这种开孔：一个横放的、带圆角的挖空体。在 {{ui:prop.portPreset}} 中选择接口（{{ui:port.usbC}}、{{ui:port.microUsb}} 或 {{ui:port.usbA}}），它就会得到该接口的尺寸，并在每边多留约 0.25 mm 间隙。{{ui:port.usbCPlug}} 用于装在壁后面的接口，插头外壳需要伸进来。宽度、高度和 {{ui:prop.portCorner}} 都可以手动修改，此时列表显示 {{ui:port.custom}}。{{ui:port.hdmi}}、{{ui:port.miniHdmi}}、{{ui:port.displayPort}} 和 {{ui:port.miniDisplayPort}} 像接口本身一样把下方的角斜切掉，DisplayPort 只切左下角；{{ui:port.rj45}} 适用于网络接口。这些尺寸来自厂商推荐的面板开孔和 VESA 图纸。
+电子产品外壳需要给线缆留开孔。{{ui:shape.port}} 就是这种开孔：一个横放的、带圆角的挖空体。在 {{ui:prop.portPreset}} 中选择接口（{{ui:port.usbC}}、{{ui:port.microUsb}} 或 {{ui:port.usbA}}），它就会得到该接口的尺寸，并在每边多留约 0.25 mm 间隙。{{ui:port.usbCPlug}} 用于装在壁后面的接口，插头外壳需要伸进来。宽度、高度和 {{ui:prop.portCorner}} 都可以手动修改，此时列表显示 {{ui:port.custom}}。{{ui:port.hdmi}}、{{ui:port.miniHdmi}}、{{ui:port.microHdmi}}、{{ui:port.displayPort}} 和 {{ui:port.miniDisplayPort}} 像接口本身一样把下方的角斜切掉，DisplayPort 只切左下角；{{ui:port.rj45}} 适用于网络接口。这些尺寸来自厂商推荐的面板开孔和 VESA 图纸。
 
 它默认是挖空体，朝向前方。把 {{ui:prop.portDepth}} 设得比壁厚稍大，移到电路板上接口所在的位置，再与外壳组合。用于侧壁时，绕竖直轴旋转 90°。
 
