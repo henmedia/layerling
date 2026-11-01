@@ -4,6 +4,8 @@
 // current language, ctx.mcp(action, params) drives the editor, ctx.shot(name)
 // writes docs/guide/images/<language>/<name>.webp.
 
+import { readFileSync } from "node:fs";
+
 const BLUE = "#3f8fd2";
 const ORANGE = "#e0793a";
 const GREEN = "#5aa469";
@@ -323,6 +325,79 @@ scenes["sketch"] = async (ctx) => {
   await ctx.click(ctx.t("sketch.finishSketch"));
   await ctx.wait(3500);
   await ctx.shot("sketch-result");
+};
+
+// Trace on a drawn house with a tree behind it (scripts/guide-assets/trace-house.webp, free to use): traced as the
+// object with the threshold lowered for its light wall, the tree cut away with the magnetic lasso, the eight window
+// panes picked as holes; then the house as a body. Points are given in the picture's 1254-pixel original.
+const TRACE_HOUSE = readFileSync(new URL("./guide-assets/trace-house.webp", import.meta.url)).toString("base64");
+const TRACE_HOUSE_LASSO = [
+  [441, 414], [446, 340], [432, 262], [395, 190], [330, 140], [255, 130], [180, 152], [112, 222], [54, 330], [31, 450],
+  [38, 580], [78, 690], [128, 768], [188, 812], [200, 818], [196, 866], [193, 930], [194, 998], [226, 998], [229, 950],
+  [236, 922], [270, 920], [274, 800], [274, 684], [222, 680], [172, 676], [166, 660], [250, 586], [340, 503], [441, 414],
+];
+const TRACE_HOUSE_PANES = [[355, 733], [455, 733], [355, 830], [455, 830], [810, 733], [910, 733], [810, 830], [910, 830]];
+
+scenes["trace-house"] = async (ctx) => {
+  await ctx.goto("/?editor=1");
+  await ctx.click(ctx.t("editor.modeSketch"));
+  await ctx.wait(1500);
+  await ctx.click(ctx.t("sketch.extrude"), undefined, true);
+  await ctx.wait(2500);
+  await ctx.click(ctx.t("sketch.select"));
+  // The picture as if chosen with Add image.
+  await ctx.evaluate(`(() => {
+    const bytes = Uint8Array.from(atob(${JSON.stringify(TRACE_HOUSE)}), (character) => character.charCodeAt(0));
+    const input = document.querySelector('input.hidden-file-input[accept^="image/png"]');
+    const transfer = new DataTransfer();
+    transfer.items.add(new File([bytes], "house.webp", { type: "image/webp" }));
+    input.files = transfer.files;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    return true;
+  })()`);
+  await ctx.wait(2500);
+  await ctx.key("f");
+  await ctx.wait(1200);
+  await ctx.click(ctx.t("sketch.traceImage"));
+  await ctx.wait(3500);
+  await ctx.click(ctx.t("sketch.traceObject"));
+  await ctx.wait(2000);
+  await ctx.setField(ctx.t("sketch.traceThreshold"), 4);
+  await ctx.wait(2500);
+  const box = JSON.parse(await ctx.evaluate(`JSON.stringify(document.querySelector(".sketch-reference-images image").getBoundingClientRect())`));
+  const at = ([x, y]) => [box.x + (box.width * x) / 1254, box.y + (box.height * y) / 1254];
+  await ctx.click(ctx.t("sketch.traceLasso"));
+  await ctx.wait(1200);
+  for (const point of TRACE_HOUSE_LASSO) await ctx.mouse(...at(point));
+  await ctx.wait(2500);
+  await ctx.chooseOption(ctx.t("sketch.traceTrim"));
+  await ctx.wait(2000);
+  await ctx.click(ctx.t("sketch.tracePickAreas"));
+  for (const point of TRACE_HOUSE_PANES) {
+    await ctx.mouse(...at(point));
+    await ctx.wait(700);
+  }
+  await ctx.click(ctx.t("sketch.tracePickAreas"));
+  await ctx.wait(1500);
+  await ctx.mouse(box.x + box.width + 40, box.y + box.height + 40, "move");
+  await ctx.shot("trace-house");
+  await ctx.click(ctx.t("sketch.traceApply"));
+  await ctx.wait(3000);
+  // Off the picture, so the new points are no longer selected and Finish sketch builds the body.
+  await ctx.mouse(box.x + box.width + 60, box.y + box.height / 2);
+  await ctx.wait(800);
+  await ctx.click(ctx.t("sketch.finishSketch"));
+  // Building the exact body from the traced curves takes a while: wait until the sketch ribbon has gone.
+  for (let tries = 0; tries < 60; tries += 1) {
+    await ctx.wait(1000);
+    if (!(await ctx.evaluate(`Boolean(document.querySelector(".sketch-edit-section"))`))) break;
+  }
+  await ctx.wait(1500);
+  await ctx.click(ctx.t("camera.focusSelection")).catch(() => {});
+  await ctx.wait(1500);
+  await ctx.mcp("select_objects", { ids: [] }).catch(() => {});
+  await quiet(ctx, 2000);
+  await ctx.shot("trace-house-body");
 };
 
 // A straight side bent into a curve, with its two handles.

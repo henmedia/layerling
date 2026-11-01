@@ -161,6 +161,10 @@ Für ein Foto – etwa ein Spielzeug auf einem weißen Tisch – wählst du unte
 
 Den Baum neben einem Haus, eine Figur vor unruhigem Hintergrund – wo keine Farbe die Form vom Rest trennt, fängt das **{{ui:sketch.traceLasso}}** sie ein: Klicke grob entlang ihrer Kante, und zwischen zwei Klicks folgt die Linie selbst der Kante, auch um Bögen; schon beim Bewegen zeigt die Vorschau, wo sie laufen wird. Ein Klick auf den ersten Punkt, ein Doppelklick oder [[Enter]] schließt sie, [[Esc]] verwirft sie. In der Liste steht sie als „Lasso 1“ mit der Wahl {{ui:sketch.traceRegionAdd}} (die Fläche kommt zur Form dazu) oder {{ui:sketch.traceTrim}} (sie wird weggenommen); dieselbe Wahl hat jeder Schnitt. Unter {{ui:sketch.tracePart}} macht **{{ui:sketch.traceLassoOnly}}** nur das zur Form, was du so einfängst – sonst nichts vom Bild.
 
+![Ein gezeichnetes Haus als Gegenstand nachgezeichnet, die Schwelle für die helle Wand gesenkt: Das Magnetlasso hat den Baum weggeschnitten, die acht Fensterscheiben sind als Löcher angeklickt.](shot:trace-house)
+
+![Das Haus als Körper: ohne den Baum, die Fenster durchbrochen.](shot:trace-house-body)
+
 ## Tasten im Skizzenmodus
 
 | Taste | Wirkung |

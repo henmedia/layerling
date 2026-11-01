@@ -125,7 +125,7 @@ import {
   DEFAULT_TEARDROP_WIDTH,
   teardropHeightForTipAngle,
 } from "@/lib/teardropGeometry";
-import { DEFAULT_PORT_DEPTH, DEFAULT_PORT_PRESET, normalizePortCorner, normalizePortProfile, PORT_PRESETS } from "@/lib/portGeometry";
+import { DEFAULT_PORT_DEPTH, DEFAULT_PORT_PRESET, normalizePortClearance, normalizePortCorner, normalizePortProfile, PORT_PRESETS } from "@/lib/portGeometry";
 import { DEFAULT_LOFT, loftFieldsFromMeasures, loftFrameSize, normalizeLoftMeasures } from "@/lib/loftGeometry";
 import { DEFAULT_VASE_SIZE, normalizeVaseSettings } from "@/lib/vaseSettings";
 import {
@@ -733,6 +733,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     gridfinityLip: shape.gridfinityLip,
     gridfinityMagnets: shape.gridfinityMagnets,
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
+    gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -809,6 +810,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
     portProfile: shape.portProfile,
+    portClearance: shape.portClearance,
     cornerFillet: shape.cornerFillet,
     topBottomFillet: shape.topBottomFillet,
     roundedBoxQuality: shape.roundedBoxQuality,
@@ -948,6 +950,7 @@ export function makeShapeFromAsset(
     height: customization.height ?? gridfinityDefaults.height,
     gridfinityLip: customization.gridfinityLip,
     gridfinityHalfGrid: customization.gridfinityHalfGrid,
+    gridfinityLargePlate: customization.gridfinityLargePlate,
     ...gridfinityPaddingFields,
   }) : null;
   // New gears get involute teeth (#201); their size follows the module, so other teeth keep module 2.
@@ -1065,6 +1068,7 @@ export function makeShapeFromAsset(
     gridfinityLip: asset.kind === "gridfinity" ? customization.gridfinityLip ?? DEFAULT_GRIDFINITY_LIP : undefined,
     gridfinityMagnets: asset.kind === "gridfinity" ? customization.gridfinityMagnets ?? DEFAULT_GRIDFINITY_MAGNETS : undefined,
     gridfinityHalfGrid: asset.kind === "gridfinity" ? customization.gridfinityHalfGrid : undefined,
+    gridfinityLargePlate: asset.kind === "gridfinity" ? customization.gridfinityLargePlate : undefined,
     gridfinityLabelBack: asset.kind === "gridfinity" ? customization.gridfinityLabelBack : undefined,
     gridfinityLabelFront: asset.kind === "gridfinity" ? customization.gridfinityLabelFront : undefined,
     gridfinityLabelLeft: asset.kind === "gridfinity" ? customization.gridfinityLabelLeft : undefined,
@@ -1146,6 +1150,7 @@ export function makeShapeFromAsset(
     cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2)
       : asset.kind === "port" ? normalizePortCorner(customization.cornerFillet, width, height, customization.portProfile) : undefined,
     portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,
+    portClearance: asset.kind === "port" && normalizePortClearance(customization.portClearance) > 0 ? normalizePortClearance(customization.portClearance) : undefined,
     topBottomFillet: asset.kind === "roundedBox" ? normalizeTopBottomFillet(customization.topBottomFillet ?? DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, height / 2) : undefined,
     roundedBoxQuality: asset.kind === "roundedBox" ? normalizeRoundedBoxQuality(customization.roundedBoxQuality ?? DEFAULT_ROUNDED_BOX_QUALITY) : undefined,
     ...(bentTube ?? {}),

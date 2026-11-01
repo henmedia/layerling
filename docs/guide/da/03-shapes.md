@@ -53,7 +53,7 @@ Indstillingerne sidder docket ved højre kant. Hvis de dækker noget du vil se, 
 
 ![En gruppe af en orange blok, en blå pind og et hul, skåret til én form. Med Multicolor slået til, forbliver pinden blå, blokken orange, og hullets vægge tager blokkens farve.](shot:group-multicolor)
 
-Spids og snoing virker på næsten alle former. Kun tandhjulet, gevindet, fjederen, riflingen, hængslet, pyramiden, bøjede rør, dråbehullet, stikåbningen, skruehovedskærerne og linealen udelader dem: de har faste mål af deres egne eller, som pyramiden, en top af sin egen i forvejen.
+Spids og snoing virker på næsten alle former. Kun tandhjulet, gevindet, fjederen, Gridfinity, hængslet, pyramiden, bøjede rør, dråbehullet, stikåbningen, skruehovedskærerne og linealen udelader dem: de har faste mål af deres egne eller, som pyramiden, en top af sin egen i forvejen.
 
 ![En kegle hvis topradius og højde blev ændret: en lille pil ved hver tager værdien tilbage, og de to knapper nederst gemmer eller nulstiller formens standarder.](shot:property-reset)
 

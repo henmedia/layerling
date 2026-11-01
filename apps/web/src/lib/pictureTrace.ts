@@ -192,7 +192,7 @@ function perimeter(ring: readonly TracePoint[]) {
 }
 
 /** Whether a point lies inside a closed line (even-odd). */
-function inside(point: TracePoint, ring: readonly TracePoint[]) {
+export function inside(point: TracePoint, ring: readonly TracePoint[]) {
   let hit = false;
   for (let index = 0, previous = ring.length - 1; index < ring.length; previous = index, index += 1) {
     const a = ring[index];
@@ -701,14 +701,18 @@ function keptContours(picture: PreparedPicture, settings: Omit<PictureTraceSetti
   const { outlines, holes } = contoursFor(picture, settings.part, settings.threshold, settings.regions ?? []);
   const rejected: string[] = [];
   const areas: Contour[] = [];
+  // Two outlines are the same patch when they are about as large and one's middle lies in the other.
+  const samePatch = (contour: Contour, other: Contour) => Math.abs(other.area - contour.area) <= 0.3 * Math.max(other.area, contour.area) && inside(contour.centre, other.samples);
   for (const area of settings.areas ?? []) {
     const contour = areaContour(picture, area, settings.areaTolerance ?? DEFAULT_TRACE_AREA_TOLERANCE);
-    if (contour) areas.push(contour);
-    else rejected.push(area.id);
+    if (!contour) rejected.push(area.id);
+    // A second click in a patch already taken (the door clicked above and below its crossbar) adds nothing: two
+    // holes on the same line are no valid shape, and finishing the sketch failed with "invalid sketch topology".
+    else if (!areas.some((other) => samePatch(contour, other))) areas.push(contour);
   }
   const big = (contour: Contour) => contour.samples.length >= 3 && contour.area >= speck;
   // A hole that is the patch an area was clicked in gives way to the area: the two would cancel out.
-  const sameAsArea = (hole: Contour) => areas.some((area) => Math.abs(area.area - hole.area) <= 0.3 * Math.max(area.area, hole.area) && inside(hole.centre, area.samples));
+  const sameAsArea = (hole: Contour) => areas.some((area) => samePatch(hole, area));
   const candidates = [
     ...outlines.filter(big),
     ...(settings.holes ? holes.filter((hole) => big(hole) && !sameAsArea(hole)) : []),
@@ -766,7 +770,7 @@ function cornerIndexes(samples: readonly TracePoint[], angle: number): number[] 
  * Where a corner's point goes: where the two straight sides meet, as long as that is near the step -
  * the outline rounds every corner off by a pixel, the picture's corner is sharp.
  */
-function cornerPoint(samples: readonly TracePoint[], index: number): TracePoint {
+export function cornerPoint(samples: readonly TracePoint[], index: number): TracePoint {
   const count = samples.length;
   const reach = Math.max(2, Math.round(CORNER_REACH / Math.max(1e-6, perimeter(samples) / count)));
   const at = (offset: number) => samples[(((index + offset) % count) + count) % count];
@@ -780,7 +784,10 @@ function cornerPoint(samples: readonly TracePoint[], index: number): TracePoint 
   if (Math.abs(cross) < 1e-9) return { ...at(0) };
   const t = ((b1.x - a1.x) * db.y - (b1.y - a1.y) * db.x) / cross;
   const meet = add(a1, scale(da, t));
-  return distance(meet, at(0)) <= reach ? meet : { ...at(0) };
+  // Only forward along the side that comes in and back along the one going out: a corner moved behind the step
+  // next to it (two corners close together, where a cut meets an edge) would turn the outline back on itself.
+  const ahead = dot(sub(meet, at(-1)), da) >= 0 && dot(sub(at(1), meet), db) >= 0;
+  return ahead && distance(meet, at(0)) <= reach ? meet : { ...at(0) };
 }
 
 /** The Bernstein weights of a cubic at u. */

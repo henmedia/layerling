@@ -214,6 +214,17 @@ export function setStrongHoles(enabled: boolean) {
 }
 export const STRONG_HOLE_COLOR = "#5b6670";
 export const STRONG_HOLE_EDGE_COLOR = "#1f262c";
+// A selected body is outlined in blue: a single shape and a group, as before. A selected bundle gets
+// a green outline instead, so the two can be told apart at a glance (the way Tinkercad does it).
+export const SELECTION_OUTLINE_COLOR = "#00aeea";
+export const BUNDLE_SELECTION_OUTLINE_COLOR = "#1fc35a";
+
+/** The colour a selected shape is outlined in: green for a bundle, blue for everything else. */
+export function selectionOutlineColorForShape(shape: Pick<WorkplaneShape, "groupOperation" | "groupedShapes">) {
+  return shape.groupOperation === "bundle" && Boolean(shape.groupedShapes?.length)
+    ? BUNDLE_SELECTION_OUTLINE_COLOR
+    : SELECTION_OUTLINE_COLOR;
+}
 export const NORMAL_IMPORTED_SELECTION_EDGE_ANGLE = 60;
 // "Only visible edges": an edge lies on the body's own faces, so its line is
 // moved this fraction of the way toward the camera before the depth test,
@@ -335,6 +346,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityLip: shape.gridfinityLip,
     gridfinityMagnets: shape.gridfinityMagnets,
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
+    gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -503,6 +515,8 @@ export function shapeMaterialSignature(shape: WorkplaneShape): string {
     hole: shape.hole ? (strongHoles ? "strong" : true) : false,
     transparent: Boolean(shape.transparent),
     multicolor: shape.groupedShapes?.length ? groupShowsPartColors(shape) : undefined,
+    // A group turned into a bundle (or back) changes the colour of its selection outline.
+    selectionOutline: selectionOutlineColorForShape(shape),
     imagePlate: shapeResourceId(shape.imagePlate),
     imageData: dataUrlFingerprint(shape.imagePlate?.dataUrl),
     imageOpacity: shape.imagePlate ? referenceImageOpacity(shape) : undefined,
@@ -693,6 +707,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityLip: shape.gridfinityLip,
     gridfinityMagnets: shape.gridfinityMagnets,
     gridfinityHalfGrid: shape.gridfinityHalfGrid,
+    gridfinityLargePlate: shape.gridfinityLargePlate,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -956,8 +971,18 @@ export function removeShapeDecorations(object: THREE.Group) {
     });
 }
 
-export function syncShapeObjectAppearance(object: THREE.Group, shape: WorkplaneShape, selected: boolean, updateSurfaceMaterial: boolean, onTextureReady?: () => void) {
+export function syncShapeObjectAppearance(
+  object: THREE.Group,
+  shape: WorkplaneShape,
+  selected: boolean,
+  updateSurfaceMaterial: boolean,
+  onTextureReady?: () => void,
+  // Set for the parts inside a group or bundle: they are outlined in the colour of the selected body, not their own.
+  outlineColor?: string,
+) {
   object.userData.showEdges = selected;
+  const selectionOutlineColor = outlineColor ?? selectionOutlineColorForShape(shape);
+  object.userData.selectionOutlineColor = selectionOutlineColor;
   const groupedContent = object.children.find((child): child is THREE.Group => child instanceof THREE.Group && Boolean(child.userData.groupedShapeContent));
   if (groupedContent && shape.groupedShapes?.length && !shape.importedMesh) {
     shape.groupedShapes
@@ -966,7 +991,7 @@ export function syncShapeObjectAppearance(object: THREE.Group, shape: WorkplaneS
         const childObject = groupedContent.children.find((entry): entry is THREE.Group => entry instanceof THREE.Group && entry.userData.groupChildId === child.id);
         if (!childObject) return;
         const childShape = groupChildAppearance(shape, child);
-        syncShapeObjectAppearance(childObject, childShape, selected, updateSurfaceMaterial, onTextureReady);
+        syncShapeObjectAppearance(childObject, childShape, selected, updateSurfaceMaterial, onTextureReady, selectionOutlineColor);
       });
     object.traverse((child) => {
       child.userData.shapeId = shape.id;
@@ -1692,11 +1717,15 @@ export function createShapeObject(
   showEdges = false,
   onTextureReady?: () => void,
   acceleratedPicking = true,
+  // Set for the parts inside a group or bundle: they are outlined in the colour of the selected body, not their own.
+  outlineColor?: string,
 ) {
+  const selectionOutlineColor = outlineColor ?? selectionOutlineColorForShape(shape);
   const group = new THREE.Group();
   group.name = shape.name;
   group.userData.shapeId = shape.id;
   group.userData.showEdges = showEdges;
+  group.userData.selectionOutlineColor = selectionOutlineColor;
   group.userData.acceleratedPicking = acceleratedPicking;
   group.userData.tapeDimensions = [shapeWidth(shape), shape.height, shapeDepth(shape)] satisfies [number, number, number];
   group.userData.tapeTopologyKey = tapeShapeTopologyKey(shape);
@@ -1720,7 +1749,7 @@ export function createShapeObject(
           ...shape,
           transparent: shape.transparent ?? (allPartsTransparent ? true : undefined),
           importedMesh: displayMesh,
-        }, showEdges, onTextureReady, acceleratedPicking);
+        }, showEdges, onTextureReady, acceleratedPicking, selectionOutlineColor);
       }
     }
     const content = new THREE.Group();
@@ -1729,7 +1758,7 @@ export function createShapeObject(
       .filter((child) => !child.hidden)
       .forEach((child) => {
         const childShape = groupChildAppearance(shape, child);
-        const childObject = createShapeObject(childShape, showEdges, onTextureReady, acceleratedPicking);
+        const childObject = createShapeObject(childShape, showEdges, onTextureReady, acceleratedPicking, selectionOutlineColor);
         childObject.userData.groupChildId = child.id;
         content.add(childObject);
       });
@@ -1861,6 +1890,7 @@ export function createShapeObject(
         gridfinityLip: shape.gridfinityLip,
         gridfinityMagnets: shape.gridfinityMagnets,
         gridfinityHalfGrid: shape.gridfinityHalfGrid,
+        gridfinityLargePlate: shape.gridfinityLargePlate,
         gridfinityLabelBack: shape.gridfinityLabelBack,
         gridfinityLabelFront: shape.gridfinityLabelFront,
         gridfinityLabelLeft: shape.gridfinityLabelLeft,
@@ -2461,7 +2491,7 @@ export function addShapeEdgeDecorations(group: THREE.Group, mesh: THREE.Mesh, pr
   if ((group.userData.showEdges || complexEdges || allEdgeLines) && (!skipHeavyImportedEdges || (allEdgeLines && !group.userData.showEdges))) {
     const selectedOutline = Boolean(group.userData.showEdges);
     const selectedRoundedBox = selectedOutline && shape.kind === "box" && Boolean(shape.radius && shape.radius > 0);
-    const edgeColor = selectedOutline ? "#00aeea" : shape.hole ? (strongHoles ? STRONG_HOLE_EDGE_COLOR : "#697989") : allEdgeLines ? edgeLineStyle.color : complexEdges ? "#141b21" : darkenHex(shape.color, 0.34);
+    const edgeColor = selectedOutline ? (group.userData.selectionOutlineColor as string | undefined) ?? selectionOutlineColorForShape(shape) : shape.hole ? (strongHoles ? STRONG_HOLE_EDGE_COLOR : "#697989") : allEdgeLines ? edgeLineStyle.color : complexEdges ? "#141b21" : darkenHex(shape.color, 0.34);
     // Edge lines on every body are a help to tell dark parts apart, not a drawing: half strength
     // keeps them readable without the hard black frame they had.
     const edgeOpacity = selectedRoundedBox ? 0 : selectedOutline ? 0.98 : shape.hole ? (strongHoles ? 0.85 : 0.44) : allEdgeLines ? 0.5 : complexEdges ? 0.38 : shape.kind === "text" ? 0.86 : 0.2;

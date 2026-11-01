@@ -106,6 +106,10 @@ import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpeni
  * be rounded less than the specification's 4 mm, down to square (#856), filled
  * the same way; the sockets keep their rounding, so bins fit as before.
  *
+ * A baseplate can be made large (#1061): up to 12 units across and deep instead
+ * of 6, for print beds over 256 mm. More would take too long to build as an
+ * exact body.
+ *
  * The lip's top can be chamfered (#780) as the edge tool would: the chamfer
  * takes its size off the outer wall and off the slope a stacked bin's feet rest
  * on. The bin keeps its height setting, and its top comes down by 0.71 times it.
@@ -155,14 +159,15 @@ export const GRIDFINITY_MAGNET_DEPTH = 2.4;
 export const GRIDFINITY_MAGNET_OFFSET = 13;
 export const MIN_GRIDFINITY_UNITS = 1;
 export const MAX_GRIDFINITY_UNITS = 6;
+/** A large baseplate's most units across and deep (#1061): 504 mm, more than the 11 a 500 mm bed takes. */
+export const MAX_GRIDFINITY_LARGE_PLATE_UNITS = 12;
 export const MAX_GRIDFINITY_HEIGHT_UNITS = 20;
 /** The most padding on a side of a baseplate: 42 mm would be room for another unit of grid. */
 export const MAX_GRIDFINITY_PADDING = GRIDFINITY_GRID - 1;
 /** How much smaller than the drawer a baseplate fitted to it is, so that it drops in. */
 export const GRIDFINITY_DRAWER_CLEARANCE = 0.5;
-/** The smallest and largest drawer one baseplate fits: 1 unit, or 6 units and 41 mm each side. */
+/** The smallest drawer one baseplate fits: 1 unit. */
 export const MIN_GRIDFINITY_DRAWER = MIN_GRIDFINITY_UNITS * GRIDFINITY_GRID + GRIDFINITY_DRAWER_CLEARANCE;
-export const MAX_GRIDFINITY_DRAWER = MAX_GRIDFINITY_UNITS * GRIDFINITY_GRID + 2 * MAX_GRIDFINITY_PADDING + GRIDFINITY_DRAWER_CLEARANCE;
 export const DEFAULT_GRIDFINITY_TYPE: GridfinityType = "bin";
 export const DEFAULT_GRIDFINITY_UNITS = { x: 2, z: 1, y: 3 };
 export const DEFAULT_GRIDFINITY_LIP = true;
@@ -251,6 +256,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityLip?: boolean;
   gridfinityMagnets?: boolean;
   gridfinityHalfGrid?: boolean;
+  gridfinityLargePlate?: boolean;
   gridfinityLabelBack?: boolean;
   gridfinityLabelFront?: boolean;
   gridfinityLabelLeft?: boolean;
@@ -339,8 +345,9 @@ function gridfinityPitch(shape: Pick<GridfinityShapeFields, "gridfinityType" | "
   return normalizeGridfinityType(shape.gridfinityType) === "bin" && shape.gridfinityHalfGrid === true ? GRIDFINITY_GRID / 2 : GRIDFINITY_GRID;
 }
 
-/** The most units across or deep: 6 of 42 mm, or the same size in cells of 21 mm. */
-export function gridfinityMaxUnits(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityHalfGrid">) {
+/** The most units across or deep: 6 of 42 mm, or the same size in cells of 21 mm; 12 on a large baseplate (#1061). */
+export function gridfinityMaxUnits(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityHalfGrid" | "gridfinityLargePlate">) {
+  if (normalizeGridfinityType(shape.gridfinityType) === "baseplate" && shape.gridfinityLargePlate === true) return MAX_GRIDFINITY_LARGE_PLATE_UNITS;
   return (MAX_GRIDFINITY_UNITS * GRIDFINITY_GRID) / gridfinityPitch(shape);
 }
 
@@ -394,9 +401,10 @@ export function gridfinityFootprintPatch(shape: GridfinityShapeFields) {
  * (2 whole units are 4 cells) and is rounded to the nearest units where it
  * cannot. A tray keeps the box it is given, and a baseplate turned into one
  * gets a tray's default height; a tray turned into a bin or baseplate is read
- * on the grid, its height counted in height units as a bin's.
+ * on the grid, its height counted in height units as a bin's. A large plate
+ * switched off goes back to at most 6 units and keeps its padding.
  */
-export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?: GridfinityType; x?: number; z?: number; y?: number; lip?: boolean; halfGrid?: boolean }) {
+export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?: GridfinityType; x?: number; z?: number; y?: number; lip?: boolean; halfGrid?: boolean; largePlate?: boolean }) {
   const current = gridfinityUnits(shape);
   const currentType = normalizeGridfinityType(shape.gridfinityType);
   const type = next.type ?? currentType;
@@ -406,7 +414,8 @@ export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?
     const box = { width: shape.width, depth: shape.depth ?? shape.width, height: currentType === "baseplate" ? DEFAULT_GRIDFINITY_TRAY_SIZE.height : shape.height };
     return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...gridfinityTraySize(box) };
   }
-  const grid = { gridfinityType: type, gridfinityHalfGrid: halfGrid };
+  const largePlate = next.largePlate ?? shape.gridfinityLargePlate === true;
+  const grid = { gridfinityType: type, gridfinityHalfGrid: halfGrid, gridfinityLargePlate: largePlate };
   const pitch = gridfinityPitch(grid);
   const max = gridfinityMaxUnits(grid);
   // The current size read on the new grid as the new type, as canonicalizeShape reads a size given through the MCP.
@@ -421,7 +430,7 @@ export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?
   };
   // A bin turned into a baseplate takes back the padding it kept.
   const size = gridfinitySize(type, count, lip, pitch, gridfinityPadding({ ...shape, ...grid }));
-  return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...size };
+  return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...(next.largePlate !== undefined ? { gridfinityLargePlate: largePlate } : {}), ...size };
 }
 
 /** Each side's padding on a baseplate (#455). */
@@ -450,6 +459,11 @@ export function gridfinityPaddingPatch(shape: GridfinityShapeFields, next: Parti
   return { ...fields, width, depth };
 }
 
+/** The largest drawer one baseplate fits (#1061): its most units, 41 mm each side and the 0.5 mm clearance. */
+export function gridfinityDrawerMax(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityLargePlate">) {
+  return gridfinityMaxUnits(shape) * GRIDFINITY_GRID + 2 * MAX_GRIDFINITY_PADDING + GRIDFINITY_DRAWER_CLEARANCE;
+}
+
 /** The drawer a baseplate fills (#455): its size and the 0.5 mm it leaves. */
 export function gridfinityDrawerSize(shape: GridfinityShapeFields) {
   return { width: Math.round((shape.width + GRIDFINITY_DRAWER_CLEARANCE) * 100) / 100, depth: Math.round(((shape.depth ?? shape.width) + GRIDFINITY_DRAWER_CLEARANCE) * 100) / 100 };
@@ -457,16 +471,16 @@ export function gridfinityDrawerSize(shape: GridfinityShapeFields) {
 
 /**
  * What fitting a baseplate to a drawer's inside writes on one axis: as many
- * units as fit, up to 6, and the rest split evenly into the two paddings of that
- * axis, up to 41 mm a side. A drawer that one plate cannot fill gets what it can;
- * the other axis is left as it is.
+ * units as fit, up to 6 (12 on a large plate), and the rest split evenly into
+ * the two paddings of that axis, up to 41 mm a side. A drawer that one plate
+ * cannot fill gets what it can; the other axis is left as it is.
  */
 export function gridfinityDrawerPatch(shape: GridfinityShapeFields, axis: "x" | "z", drawer: number) {
   const [first, second] = axis === "x" ? (["left", "right"] as const) : (["back", "front"] as const);
   // In whole hundredths, as the padding is stored, so the units and the rest are read alike.
   const unit = GRIDFINITY_GRID * 100;
   const inside = Math.round((drawer - GRIDFINITY_DRAWER_CLEARANCE) * 100);
-  const count = clamp(Math.floor(inside / unit), MIN_GRIDFINITY_UNITS, MAX_GRIDFINITY_UNITS);
+  const count = clamp(Math.floor(inside / unit), MIN_GRIDFINITY_UNITS, gridfinityMaxUnits(shape));
   const rest = Math.max(0, inside - count * unit);
   const most = MAX_GRIDFINITY_PADDING * 100;
   // An odd hundredth goes to the first side.
@@ -541,7 +555,7 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
   // A bin's outer wall above the feet (#856), to 0.01 mm; within CORNER_SNAP of 3.75 it is built as 3.75. Anything else's wall is its outline.
   const setWallRadius = Math.round(clampLabel(shape.gridfinityBinCornerRadius, GRIDFINITY_BIN_RADIUS, 0, GRIDFINITY_BIN_RADIUS) * 100) / 100;
   const wallRadius = type !== "bin" || GRIDFINITY_BIN_RADIUS - setWallRadius < CORNER_SNAP ? cornerRadius : setWallRadius;
-  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, pitch, size, cells, magnetHoles, top, base, dividerTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, cornerRadius, wallRadius, lipChamfer, wallThickness, innerRadius, solid, reach: gridfinityOpenReach(wallThickness) };
+  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, pitch, size, cells, magnetHoles, top, base, dividerTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, cornerRadius, wallRadius, lipChamfer, wallThickness, innerRadius, solid, reach: gridfinityOpenReach(wallThickness) };
 }
 
 /** A notch cut out of a side's wall, partly open (#455): from and to along the side (x across, z deep), its bottom's height. */

@@ -13,7 +13,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * A Gridfinity baseplate's padding in its settings (#455): a row for each side on a baseplate and
  * none on a bin, and a change of padding writes the plate's size with it, keeping the units. The
  * drawer rows show the drawer a baseplate fills and fit it to one typed in. The corner radius
- * row (#856) rounds the plate's outer corners less, down to square.
+ * row (#856) rounds the plate's outer corners less, down to square. The large plate switch
+ * (#1061) lets a baseplate take up to 12 units.
  */
 beforeAll(() => {
   // jsdom lays nothing out; the panel only scrolls itself back to the top.
@@ -44,6 +45,8 @@ function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<Workpl
 }
 
 const rowNamed = (panel: HTMLElement, name: string) => [...panel.querySelectorAll<HTMLLabelElement>("label.range-property")].find((row) => row.querySelector(".range-property-name")?.textContent === name);
+const toggleNamed = (panel: HTMLElement, name: string) => [...panel.querySelectorAll<HTMLLabelElement>("label.check-property")].find((row) => row.textContent === name);
+const hintOf = (panel: HTMLElement, name: string) => rowNamed(panel, name)!.nextElementSibling!.textContent;
 
 function type(input: HTMLInputElement, value: string) {
   act(() => input.focus());
@@ -111,5 +114,49 @@ describe("a Gridfinity baseplate's padding in its settings", () => {
     const panel = mount({ ...plate, gridfinityCornerRadius: 1.5 }, (patch) => updates.push(patch));
     type(rowNamed(panel, "Corner radius")!.querySelector<HTMLInputElement>("input:not([type=range])")!, "7");
     expect(updates).toEqual([{ gridfinityCornerRadius: 4 }]);
+  });
+});
+
+describe("a Gridfinity baseplate's large plate switch", () => {
+  const largePlate = "Large plate (up to 12 units)";
+
+  it("shows the switch on a baseplate, off and above its units", () => {
+    const panel = mount(plate);
+    const toggle = toggleNamed(panel, largePlate)!;
+    expect(toggle.querySelector("input")!.checked).toBe(false);
+    expect(toggle.compareDocumentPosition(rowNamed(panel, "Units across")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(hintOf(panel, "Drawer width")).toContain("334.5");
+  });
+
+  it("has no switch on a bin", () => {
+    expect(toggleNamed(mount({ gridfinityType: "bin" }), largePlate)).toBeUndefined();
+  });
+
+  it("switching it on is one change that keeps the plate's size", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount(plate, (patch) => updates.push(patch));
+    act(() => toggleNamed(panel, largePlate)!.querySelector("input")!.click());
+    expect(updates).toHaveLength(1);
+    expect(updates[0]).toMatchObject({ gridfinityLargePlate: true, width: 252, depth: 42 });
+  });
+
+  it("with the switch on, takes up to 12 units and fits a drawer of up to 586.5 mm", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...plate, gridfinityLargePlate: true }, (patch) => updates.push(patch));
+    expect(hintOf(panel, "Units across")).toContain("Up to 12 units across and deep instead of 6");
+    expect(hintOf(panel, "Drawer width")).toContain("586.5");
+    type(rowNamed(panel, "Units across")!.querySelector<HTMLInputElement>("input:not([type=range])")!, "13");
+    expect(updates[0]).toMatchObject({ width: 504 });
+    // 560 mm: 12 units and 55.5 mm, 27.75 each side.
+    type(rowNamed(panel, "Drawer width")!.querySelector<HTMLInputElement>("input:not([type=range])")!, "560");
+    expect(updates[1]).toMatchObject({ gridfinityPaddingLeft: 27.75, gridfinityPaddingRight: 27.75, width: 559.5 });
+  });
+
+  it("switching it off brings a large plate back to 6 units in one change, its padding kept", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...plate, gridfinityLargePlate: true, width: 430, depth: 342, gridfinityPaddingLeft: 5, gridfinityPaddingRight: 5, gridfinityPaddingBack: 3, gridfinityPaddingFront: 3 }, (patch) => updates.push(patch));
+    act(() => toggleNamed(panel, largePlate)!.querySelector("input")!.click());
+    expect(updates).toHaveLength(1);
+    expect(updates[0]).toMatchObject({ gridfinityLargePlate: false, width: 262, depth: 258 });
   });
 });

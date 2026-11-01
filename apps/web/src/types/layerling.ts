@@ -44,7 +44,7 @@ export type ShapeKind =
   | "mesh";
 
 /** Outline of a port opening (portGeometry.ts): rounded corners, or the lower corners cut as on these sockets. */
-export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "displayPort" | "miniDisplayPort";
+export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort";
 
 /** Cross-section of a bent tube; the inner one may also be "none" for a solid tube. */
 export type BentTubeProfile = "round" | "square" | "hexagon" | "octagon";
@@ -235,6 +235,8 @@ export type ShapeCustomization = {
   gridfinityMagnets?: boolean;
   /** Gridfinity bin: the size counts cells of 21 mm, each with a foot, four to a baseplate's socket; missing means the 42 mm grid. */
   gridfinityHalfGrid?: boolean;
+  /** Gridfinity baseplate: up to 12 units across and deep instead of 6, for print beds over 256 mm (#1061); missing means 6. */
+  gridfinityLargePlate?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -371,6 +373,8 @@ export type ShapeCustomization = {
   screwHoleAngle?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
+  /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
+  portClearance?: number;
   bentTubeProfile?: BentTubeProfile;
   bentTubeInnerProfile?: BentTubeInnerProfile;
   bentTubeSize?: number;
@@ -1010,6 +1014,8 @@ export type WorkplaneShape = {
   gridfinityMagnets?: boolean;
   /** Gridfinity bin: the size counts cells of 21 mm, each with a foot, four to a baseplate's socket; missing means the 42 mm grid. */
   gridfinityHalfGrid?: boolean;
+  /** Gridfinity baseplate: up to 12 units across and deep instead of 6, for print beds over 256 mm (#1061); missing means 6. */
+  gridfinityLargePlate?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -1162,6 +1168,8 @@ export type WorkplaneShape = {
   screwHoleAngle?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
+  /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
+  portClearance?: number;
   cornerFillet?: number;
   topBottomFillet?: number;
   roundedBoxQuality?: number;
