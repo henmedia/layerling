@@ -48,5 +48,35 @@
       "de": "Eine Mutter gibt es jetzt auch als Vierkant-, Flansch- und Flügelmutter oder mit Sterngriff, eine Schraube mit Vierkant-, Flansch- oder Flügelkopf oder Sterngriff. Flügel und Sterngriff liegen flach und drucken ohne Stützen. Neu ist auch die Rosette: die gewölbte Scheibe unter einer Senkschraube, in M2 bis M20.",
       "en": "A nut now also comes square, with a flange, with wings or as a star knob, and a screw with a square, flange or wing head or a star knob. Wings and knobs lie flat and print without supports. New too is the finishing washer: the domed washer under a countersunk screw, in M2 to M20."
     }
+  },
+  {
+    "title": {
+      "de": "Spiel prüfen",
+      "en": "Check clearance"
+    },
+    "body": {
+      "de": "Unter Verbinden findest du „Spiel prüfen“: Es zeigt vor dem Druck, welche Teile sich überschneiden, berühren oder zu eng beieinander liegen, etwa bei einem Flexi-Spielzeug, einem mitgedruckten Scharnier oder einem Deckel in seiner Dose.",
+      "en": "Combine has Check clearance: before you print, it shows which parts overlap, touch or sit too close together, such as a flexi toy, a hinge printed in place or a lid in its box."
+    }
+  },
+  {
+    "title": {
+      "de": "Mehrere Oberflächenmuster",
+      "en": "Several surface textures"
+    },
+    "body": {
+      "de": "Ein Körper kann jetzt mehrere Oberflächenmuster tragen, jedes auf eigenen Flächen: zum Beispiel Ziegel rundherum und Rändel oben.",
+      "en": "A body can now carry several surface textures, each on faces of its own: bricks all round and knurling on top, for example."
+    }
+  },
+  {
+    "title": {
+      "de": "Raspberry Pi in echter Größe",
+      "en": "Raspberry Pi true to size"
+    },
+    "body": {
+      "de": "Neu in den Formen: die Platine eines Raspberry Pi 5, 4, 3 B+ oder Zero 2 W oder eines BIGTREETECH Pi, mit Löchern und Anschlüssen. Als Aussparung mit einem Gehäuse gruppiert, schneidet sie die Öffnungen für die Anschlüsse.",
+      "en": "New in the shapes: the board of a Raspberry Pi 5, 4, 3 B+ or Zero 2 W or a BIGTREETECH Pi, with its holes and connectors. Grouped with a case as a hole, it cuts the openings for its connectors."
+    }
   }
 ]
