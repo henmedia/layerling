@@ -20,8 +20,8 @@ export function noticeDurationMs(message: string, patient = false) {
   return Math.min(NOTICE_PATIENT_MS, Math.max(patient ? NOTICE_PATIENT_MS : NOTICE_LINGER_MS, reading));
 }
 
-/** How close a message and a step of the design must come, in milliseconds, for the message to report that step. */
-export const NOTICE_CHANGE_WINDOW_MS = 1000;
+/** How close a message and a step of the design must come, in milliseconds, for the message to report that step: one that comes later reports something else, such as a selection right after the step. */
+export const NOTICE_CHANGE_WINDOW_MS = 250;
 
 /**
  * Whether a message reports the step the design just took, so that it can offer to take it back: it came within a
