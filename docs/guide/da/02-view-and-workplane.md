@@ -97,6 +97,8 @@ Et klik ved siden af pladen eller [[Esc]] returnerer arbejdsplanet til grundplad
 
 Mens et arbejdsplan ligger på en flade, dukker et øje op ved siden af {{ui:camera.placeWorkplane}}. Det skjuler arbejdsplanet uden at droppe det, for et klart blik på designet: nye former lander stadig på den flade, og rotation drejer stadig omkring det. Et klik på øjet viser det igen, og det samme gør et nyt arbejdsplan.
 
+Vil du se lige ind på arbejdsplanet, så tryk [[P]] eller klik på {{ui:camera.lookOntoWorkplane}} ved siden af {{ui:camera.placeWorkplane}} i visningslinjen. Visningen drejer, til du ser planet lige forfra, fra den side nye former vokser mod, med dets nulpunkt i midten. På grundpladen er det visningen ovenfra.
+
 ## Gitter og snap
 
 Gitteret viser pladens størrelse. Nederst til højre er **snap-trinnet**: flytning og skalering snapper i trin af den størrelse, for eksempel 1 mm. Gør det mindre til fint arbejde og større til grov arrangering. {{ui:editor.tool.snapToGrid}} i båndet flytter de valgte former bagefter hen på det nærmeste gitterkryds. Mens der flyttes, snapper former også til andre former, se [Valg og arrangering](chapter:select-and-arrange). Uden musen: [[Alt]]+[[1]] til [[Alt]]+[[0]] vælger den post i menuen med det nummer ([[Alt]]+[[1]] slår snapping fra), og [[,]] og [[.]] gør trinnet ét trin finere eller grovere. Det virker i en skitse også.

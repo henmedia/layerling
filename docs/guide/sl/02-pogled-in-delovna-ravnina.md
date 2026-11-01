@@ -86,6 +86,8 @@ Klik ob ploščo ali [[Esc]] vrne delovno ravnino na osnovno ploščo. Hitreje g
 
 Dokler delovna ravnina leži na ploskvi, se ob {{ui:camera.placeWorkplane}} pokaže oko. Skrije ravnino, ne da bi jo odstranilo, da imaš prost pogled na načrt: nove oblike še naprej pristanejo na tej ploskvi, vrti pa se še naprej okoli nje. Klik na oko jo spet prikaže, prav tako postavitev nove delovne ravnine.
 
+Če želiš na delovno ravnino pogledati naravnost, pritisni [[P]] ali klikni {{ui:camera.lookOntoWorkplane}} poleg {{ui:camera.placeWorkplane}} v vrstici pogleda. Pogled se zasuka, dokler ravnine ne vidiš naravnost, s strani, proti kateri rastejo nove oblike, z njenim izhodiščem na sredini. Na osnovni plošči je to pogled od zgoraj.
+
 ## Mreža in pripenjanje
 
 Mreža kaže velikost plošče. Spodaj desno je **pripenjanje**: premikanje in spreminjanje velikosti se zaskočita v korakih te velikosti, na primer 1 mm. Za drobno delo ga nastaviš manjšega, za grobo razporejanje večjega. {{ui:editor.tool.snapToGrid}} v orodni vrstici naknadno pomakne izbrane oblike na najbližje presečišče mreže. Pri premikanju se oblike poleg tega zaskočijo na druge oblike, glej [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje).

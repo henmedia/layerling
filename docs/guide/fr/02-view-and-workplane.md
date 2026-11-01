@@ -84,6 +84,8 @@ Un clic à côté de la plaque ou [[Esc]] ramène le plan de travail à la plaqu
 
 Lorsqu'un plan de travail repose sur une face, un œil apparaît à côté de {{ui:camera.placeWorkplane}}. Il masque le plan de travail sans le faire tomber, pour une vision claire du design : de nouvelles formes se posent toujours sur cette face, et la rotation tourne toujours autour d'elle. Un clic sur l'œil le montre à nouveau, tout comme la définition d'un nouveau plan de travail.
 
+Pour regarder le plan de travail de face, appuie sur [[P]] ou clique sur {{ui:camera.lookOntoWorkplane}} à côté de {{ui:camera.placeWorkplane}} dans la barre de vue. La vue tourne jusqu'à ce que tu voies le plan de face, du côté vers lequel poussent les nouvelles formes, avec son origine au milieu. Sur la plaque de base, c'est la vue de dessus.
+
 ## Grille et capture
 
 La grille montre la taille de la plaque. En bas à droite se trouve l'**étape d'accrochage** : déplacer et mettre à l'échelle l'accrochage par pas de cette taille, par exemple 1 mm. Réduisez-le pour un travail fin et plus grand pour un arrangement grossier. {{ui:editor.tool.snapToGrid}} dans le ruban déplace ensuite les formes sélectionnées sur le croisement de grille le plus proche. Lors du déplacement, les formes s'alignent également sur d'autres formes, voir [Sélection et organisation] (chapter:select-and-arrange).

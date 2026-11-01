@@ -127,6 +127,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Perspective or straight-on** – switch between the normal view and a flat, orthographic one with the cube button beside the zoom controls, or by pressing **O**. Your viewing direction and framing are kept.
 - **Turn the view at the cube** – dragging the view cube turns the view like the right mouse button, with one finger on a tablet; a click still jumps to that side, and a click on a corner or an edge looks from there. Keys **1**–**6** jump too, and **Shift+1**–**6** also zoom to the selection.
 - **Four saved views per design** – **Shift+7**, **8**, **9** or **0** saves the view exactly as it is (angle, pan, zoom), and the key alone brings it back. Each design keeps its own, and a saved `.lyl` file carries them along.
+- **Look straight onto the workplane** – **P**, or the button next to Place workplane in the view bar, turns the view square onto the workplane, on a sloped face too, with its origin in the middle.
 - **The view cube in any corner** – Settings > Appearance > **View cube position** puts the cube in the top left, top right, bottom left or bottom right; in any corner but the top left, the view bar moves up into its place.
 - **In your language** – the program and its user guide come in English, German and 17 more languages; the language list is at the very top right.
 - **Look from below** – the eye over a grid in the view bar hides the plate, so the underside of a design can be seen without it in the way.

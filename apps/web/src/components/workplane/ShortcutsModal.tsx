@@ -136,6 +136,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["W"], label: "shortcuts.placeWorkplane" },
       { combos: ["Shift+W"], label: "shortcuts.placeWorkplaneOnSelection" },
       { combos: ["Alt+W"], label: "shortcuts.resetWorkplane" },
+      { combos: ["P"], label: "shortcuts.lookOntoWorkplane" },
       { combos: ["Shift"], label: "shortcuts.reverseWorkplane" },
       { combos: ["Esc"], label: "shortcuts.leaveMode" },
     ],

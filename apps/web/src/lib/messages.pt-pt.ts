@@ -824,6 +824,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "camera.dimensionsShown": "Medidas e distâncias visíveis",
   "shortcuts.zoom": "Aproximar ou afastar a vista",
   "shortcuts.placeWorkplane": "Colocar um plano de trabalho",
+  "shortcuts.lookOntoWorkplane": "Olhar de frente para o plano de trabalho",
+  "camera.lookOntoWorkplane": "Olhar de frente para o plano de trabalho",
   "shortcuts.placeWorkplaneOnSelection": "Colocar na face selecionada",
   "shortcuts.reverseWorkplane": "Manter premido ao colocar para inverter a direção",
   "shortcuts.leaveMode": "Sair do modo de plano de trabalho ou de fita métrica",

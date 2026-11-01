@@ -88,6 +88,8 @@ Un clic fuera de la placa o [[Esc]] devuelve el plano de trabajo a la placa base
 
 Mientras hay un plano de trabajo sobre una cara, aparece un ojo junto a {{ui:camera.placeWorkplane}}. Oculta el plano de trabajo sin quitarlo, para que veas el diseño sin estorbos: las formas nuevas siguen apareciendo en esa cara y los giros se siguen haciendo respecto a ella. Un clic en el ojo vuelve a mostrarlo, y lo mismo ocurre al colocar un plano de trabajo nuevo.
 
+Para mirar el plano de trabajo de frente, pulsa [[P]] o haz clic en {{ui:camera.lookOntoWorkplane}} junto a {{ui:camera.placeWorkplane}} en la barra de vista. La vista gira hasta que ves el plano de frente, desde el lado hacia el que crecen las formas nuevas, con su origen en el centro. Sobre la placa base es la vista desde arriba.
+
 ## Cuadrícula y ajuste
 
 La cuadrícula muestra el tamaño de la placa. Abajo a la derecha está el **paso de ajuste**: al mover y al cambiar el tamaño, las formas avanzan a saltos de ese tamaño, por ejemplo de 1 mm. Hazlo más pequeño para el trabajo fino y más grande para colocar a grandes rasgos. {{ui:editor.tool.snapToGrid}}, en la cinta, lleva después las formas seleccionadas al cruce de la cuadrícula más cercano. Al moverlas, las formas también se ajustan a otras formas: consulta [Seleccionar y organizar](chapter:select-and-arrange).

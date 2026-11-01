@@ -20,6 +20,8 @@ export type ViewTurn = {
   to: THREE.Spherical;
   startedAt: number;
   duration: number;
+  /** The pivot moving along with the turn: a look onto the workplane brings its origin to the middle (#1128). */
+  slide?: PivotSlide;
 };
 
 /** A slide of the pivot with the camera alongside: a double click on the workplane centres the view there. */

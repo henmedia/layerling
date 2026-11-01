@@ -86,6 +86,8 @@ Een klik naast de plaat of [[Esc]] zet het werkvlak terug op de grondplaat. Nog 
 
 Zolang een werkvlak op een vlak ligt, verschijnt er een oog naast {{ui:camera.placeWorkplane}}. Dat verbergt het werkvlak zonder het los te laten, voor een vrij zicht op het ontwerp: nieuwe vormen komen nog steeds op dat vlak terecht, en draaien gebeurt nog steeds daaromheen. Een klik op het oog toont het weer, en een nieuw werkvlak neerleggen ook.
 
+Om recht op het werkvlak te kijken, druk je op [[P]] of klik je in de weergavebalk naast {{ui:camera.placeWorkplane}} op {{ui:camera.lookOntoWorkplane}}. De weergave draait tot je het vlak recht van voren ziet, vanaf de kant waar nieuwe vormen naartoe groeien, met de oorsprong in het midden. Op de basisplaat is dat het bovenaanzicht.
+
 ## Raster en vastklikken
 
 Het raster toont de grootte van de plaat. Rechtsonder staat de **snapstap**: verplaatsen en schalen klikken vast in stappen van die grootte, bijvoorbeeld 1 mm. Maak hem kleiner voor fijn werk en groter voor grof schikken. {{ui:editor.tool.snapToGrid}} in het lint verplaatst de geselecteerde vormen achteraf naar het dichtstbijzijnde rasterkruispunt. Tijdens het verplaatsen klikken vormen ook vast aan andere vormen, zie [Selecteren en schikken](chapter:selecteren-en-schikken). Zonder muis: [[Alt]]+[[1]] tot [[Alt]]+[[0]] kiezen het item met dat nummer in het menu ([[Alt]]+[[1]] zet vastklikken uit), en [[,]] en [[.]] maken de stap een maat fijner of grover. Dat werkt ook in een schets.

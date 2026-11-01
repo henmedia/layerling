@@ -1,7 +1,7 @@
 "use client";
 import type { SurfaceTextureFace, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, ChevronRight, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, MousePointer2, PanelsTopLeft, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, Ruler, RulerDimensionLine, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronLeft, ChevronRight, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, MousePointer2, PanelsTopLeft, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, Ruler, RulerDimensionLine, Slice, Spline, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { objectSnapOffset, shiftSnapBox, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { dragReach } from "@/lib/dragReach";
@@ -41,7 +41,7 @@ import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeS
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { highestTapeIdNumber, readTape, savedTape, writeTape } from "@/lib/tapeStore";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
-import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
+import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
@@ -453,7 +453,7 @@ declare global {
     /** The measurements of the tape measure for MCP: shows or hides them when asked, returns what is there (#881). */
     layerlingMeasurements?: (request?: { visible?: boolean; dimensions?: boolean }) => { visible: boolean; dimensions: boolean; measurements: Array<{ id: string; length: number }> };
     /** The four saved views (keys 7, 8, 9, 0) for MCP: saves or shows one when asked, returns which keys hold a view. */
-    layerlingSavedViews?: (request?: { save?: number; show?: number; startView?: "save" | "reset" }) => { keys: { key: string; saved: boolean }[]; shown?: boolean; startView: boolean };
+    layerlingSavedViews?: (request?: { save?: number; show?: number; startView?: "save" | "reset"; ontoWorkplane?: boolean }) => { keys: { key: string; saved: boolean }[]; shown?: boolean; startView: boolean };
   }
 }
 
@@ -3126,6 +3126,22 @@ export function WorkplaneViewport({
     setOrthographicView(state.camera instanceof THREE.OrthographicCamera);
   }, [workspaceSettingsKey]);
 
+  // Straight onto the workplane, its origin in the middle (#1128): P, the button beside the workplane's, the command search and MCP.
+  const lookOntoWorkplane = useCallback(() => {
+    const state = threeRef.current;
+    if (!state) return false;
+    const { origin, normal } = placementWorkplaneRef.current;
+    setCameraOntoPlane(state, new THREE.Vector3(origin.x, origin.y, origin.z), new THREE.Vector3(normal.x, normal.y, normal.z));
+    syncViewCube(state, viewCubeRef.current);
+    return true;
+  }, []);
+
+  useEffect(() => {
+    const look = () => lookOntoWorkplane();
+    window.addEventListener("layerling:look-onto-workplane", look);
+    return () => window.removeEventListener("layerling:look-onto-workplane", look);
+  }, [lookOntoWorkplane]);
+
   const { saveView, showSavedView } = useDesignViews({
     threeRef, projectIdRef, viewCubeRef, designViewRestoredRef, orthographicView, setOrthographicView, onNotice,
   });
@@ -3152,6 +3168,7 @@ export function WorkplaneViewport({
       const shown = request.show !== undefined ? showSavedView(request.show) : undefined;
       if (request.startView === "save" && !saveStartView()) throw new Error("The view is not ready yet");
       if (request.startView === "reset") resetStartView();
+      if (request.ontoWorkplane && !lookOntoWorkplane()) throw new Error("The view is not ready yet");
       const views = readSavedViews(projectIdRef.current);
       return {
         keys: SAVED_VIEW_KEYS.map((key, slot) => ({ key, saved: Boolean(views[slot]) })),
@@ -3162,7 +3179,7 @@ export function WorkplaneViewport({
     return () => {
       delete window.layerlingSavedViews;
     };
-  }, [saveView, showSavedView, saveStartView, resetStartView]);
+  }, [saveView, showSavedView, saveStartView, resetStartView, lookOntoWorkplane]);
 
   useEffect(() => {
     const state = threeRef.current;
@@ -7461,6 +7478,9 @@ export function WorkplaneViewport({
       } else if (event.key === "Home") {
         event.preventDefault();
         resetView();
+      } else if (key === "p" && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey) {
+        event.preventDefault();
+        lookOntoWorkplane();
       } else if (key === "o" && !event.ctrlKey && !event.metaKey && !event.altKey) {
         event.preventDefault();
         toggleProjection();
@@ -7481,7 +7501,7 @@ export function WorkplaneViewport({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [chooseSnapGrid, focusSelection, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
+  }, [chooseSnapGrid, focusSelection, lookOntoWorkplane, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
 
   return (
     <main className="workplane-stage">
@@ -7587,6 +7607,14 @@ export function WorkplaneViewport({
                 onClick={togglePlacementWorkplane}
               >
                 <PanelsTopLeft size={25} strokeWidth={2.1} aria-hidden="true" />
+              </button>
+              <button
+                aria-label={t("camera.lookOntoWorkplane")}
+                aria-keyshortcuts="P"
+                title={t("camera.shortcut", { label: t("camera.lookOntoWorkplane"), keys: "P" })}
+                onClick={lookOntoWorkplane}
+              >
+                <ScanEye size={24} strokeWidth={2.1} aria-hidden="true" />
               </button>
               {!placementWorkplaneIsBase(placementWorkplane) && onToggleWorkplaneHidden ? (
                 <button

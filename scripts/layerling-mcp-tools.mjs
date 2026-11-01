@@ -1514,7 +1514,7 @@ export const tools = [
   },
   {
     name: "layerling_saved_view",
-    description: "The four views a design keeps under the keys 7, 8, 9 and 0, like Shift+key (save) and the key alone (show) in the editor. save stores the current view - angle, pan, zoom and flat or perspective - under that key; show turns the camera back to the view saved there and answers with an error if none is. Both may be given; save comes first. Call with neither to read which keys hold a view. Saved views belong to the design: they stay in the browser and travel in a .lyl file, never in the undo history. Combine with layerling_capture_image (face \"current\") for pictures from the same angle every time. startView \"save\" makes the current view the start view of this browser, like \"Use current view\" under Settings > Appearance: new designs open in it and Home (and layerling_capture_image face \"home\") goes back to it; \"reset\" goes back to the standard start view. Returns keys (key, saved), startView (whether a start view of the user's own is set) and, after show, shown.",
+    description: "The four views a design keeps under the keys 7, 8, 9 and 0, like Shift+key (save) and the key alone (show) in the editor. save stores the current view - angle, pan, zoom and flat or perspective - under that key; show turns the camera back to the view saved there and answers with an error if none is. Both may be given; save comes first. Call with neither to read which keys hold a view. Saved views belong to the design: they stay in the browser and travel in a .lyl file, never in the undo history. Combine with layerling_capture_image (face \"current\") for pictures from the same angle every time. startView \"save\" makes the current view the start view of this browser, like \"Use current view\" under Settings > Appearance: new designs open in it and Home (and layerling_capture_image face \"home\") goes back to it; \"reset\" goes back to the standard start view. lookOntoWorkplane true turns the camera straight onto the workplane, its origin in the middle, like the key P: the workplane on a face (layerling_set_workplane) seen square, or the base plate from above; it comes after show. Returns keys (key, saved), startView (whether a start view of the user's own is set) and, after show, shown.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -1522,6 +1522,7 @@ export const tools = [
         save: { type: "string", enum: ["7", "8", "9", "0"], description: "Save the current view under this key." },
         show: { type: "string", enum: ["7", "8", "9", "0"], description: "Go to the view saved under this key." },
         startView: { type: "string", enum: ["save", "reset"], description: "save: the current view becomes the start view for new designs and Home. reset: back to the standard start view." },
+        lookOntoWorkplane: { type: "boolean", description: "true: look straight onto the workplane, its origin in the middle of the view (key P)." },
       },
     },
   },
