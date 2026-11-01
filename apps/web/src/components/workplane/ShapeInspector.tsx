@@ -29,6 +29,7 @@ import {
   involuteGearModule,
   involuteGearPair,
   gearPairFitPatches,
+  gearPairKeepPatches,
   MAX_GEAR_BACKLASH,
   MAX_GEAR_PRESSURE_ANGLE,
   MIN_GEAR_PRESSURE_ANGLE,
@@ -7219,6 +7220,14 @@ export function SelectionInspector({
                 solids.map((shape) => ({ id: shape.id, patch: { transparent: transparent || undefined } })),
                 transparent ? t("status.selectionTransparent") : t("status.selectionOpaque"),
               )}
+  // One gear stays, the other is fitted to it, so a chain of gears can be fitted one pair at a time (Discussion #1136).
+  const gearPairOff = gearPair && (gearPair.distance === null || Math.abs(gearPair.distance - gearPair.current) > 0.005);
+  const keepGear = (index: 0 | 1) => {
+    if (!onUpdateShapes) return;
+    const kept = gearPairKeepPatches(shapes[index], shapes[1 - index]);
+    if (!kept) return;
+    onUpdateShapes([kept.patch], t("status.gearPairKept", { name: displayShapeName(shapes[index]), module: plainNumber(kept.module), distance: plainNumber(kept.distance) }));
+  };
             />
           ) : null}
         </div>
@@ -7281,3 +7290,8 @@ export function SelectionInspector({
     </aside>
   );
 }
+      {gearPairOff && onUpdateShapes ? ([0, 1] as const).map((index) => (
+        <button key={shapes[index].id} type="button" className="inspector-action-button selection-gear-fit" disabled={anyLocked} title={t("inspector.gearPairKeepHint")} onClick={() => keepGear(index)}>
+          {t("inspector.gearPairKeep", { name: displayShapeName(shapes[index]) })}
+        </button>
+      )) : null}
