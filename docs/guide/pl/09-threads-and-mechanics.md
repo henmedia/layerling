@@ -178,6 +178,8 @@ W {{ui:prop.hingeLeafStyle}} opcja {{ui:hinge.leafFingers}} daje każdej tulei w
 
 Zaznacz bryłę (kilka części zostaje połączonych, otwory w nich odjęte) i kliknij {{ui:editor.tool.flexi}}. W oknie ustawiasz, wzdłuż której strony ciąć ({{ui:flexi.axis.auto}} bierze dłuższą), ile będzie przegubów ({{ui:flexi.joints}}), {{ui:flexi.clearance}} (zwykle pasuje 0,4 mm) i kąt dla {{ui:flexi.swing}}. Wielkość przegubów dopasowuje się do bryły; bez {{ui:flexi.autoSize}} sam podajesz {{ui:flexi.size}}. Bez {{ui:flexi.evenLinks}} decydujesz, jak daleko pierwszy przegub leży od początku, a ostatni od końca, żeby na przykład głowa została jednym dużym kawałkiem. Tam, gdzie jest przegub, bryła powinna mieć co najmniej około 6 mm wysokości i 12 mm szerokości; jeśli któryś się nie mieści, okno powie który.
 
+Gdy {{ui:flexi.bend}} ustawisz na {{ui:flexi.bend.fold}}, ogniwa zamiast tego zginają się w górę i w dół, jak paski breloczka flexi, jajka czy bransoletki. Każde cięcie staje się wtedy zawiasem leżącym płasko w poprzek bryły na połowie jej wysokości: trzy lub pięć kłykci obok siebie, należących na zmianę do obu ogniw, a na każdym kłykciu jednego ogniwa stożek 45°, który wchodzi w następny kłykieć drugiego. Obok kłykci cięcie widziane z boku ma kształt litery V, otwartej tak, jak podaje {{ui:flexi.fold}}. Zawias bierze wymiar z wysokości bryły, więc rozmiaru przegubu tu nie ustawiasz; tam, gdzie są zawiasy, bryła powinna mieć co najmniej 3,5 mm wysokości (od 5 mm trzyma lepiej) i około 12 mm szerokości.
+
 Wynikiem jest pakiet ogniw (siatek), który drukujesz tak, jak leży. Jeśli podział ci się nie podoba, cofnij go i spróbuj innych wartości. Pierwszy wydruk próbny z dwoma lub trzema przegubami pokaże, czy luz pasuje do twojej drukarki.
 
 ## Radełkowanie

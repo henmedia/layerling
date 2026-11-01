@@ -21,7 +21,7 @@ import { normalizeTextEdge } from "@/lib/textEdge";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, type NameTagKeyring } from "@/lib/textLayers";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
-import { automaticFlexiJoints, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
+import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { LID_DEFAULTS, groupedWithMagnets, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
 import { cookieCutterFillets, cookieCutterProfiles, normalizeCookieCutterOptions, outlineFromCurves, outlineFromLoops, sampledCurveLoop, unitedFootprint, type CookieCutterOptions, type CurveLoop } from "@/lib/cookieCutter";
 import type { IconLayerPatch, IconTagControls, ReferenceImageControls, TextLayerPatch } from "@/components/workplane/ShapeInspector";
@@ -7645,8 +7645,8 @@ export function LayerlingEditor({
     if (!group) return fail(t("flexi.error.empty", { link: 1 }));
     const body = withSelectionPivot(canonicalizeShape({ ...group, name: t("flexi.name", { name: targets.find((shape) => !shape.hole)?.name ?? "" }), groupOperation: "bundle" }), activeRotationPivot);
     const consumed = new Set(targets.map((shape) => shape.id));
-    commitShapes([...shapesRef.current.filter((shape) => !consumed.has(shape.id)), body], body.id, t("status.flexiMade", { joints: result.joints, links: result.links.length, swing: result.swing }));
-    return { ok: true as const, id: body.id, joints: result.joints, links: result.links.length, swing: result.swing, axis: result.axis };
+    commitShapes([...shapesRef.current.filter((shape) => !consumed.has(shape.id)), body], body.id, t(result.bend === "fold" ? "status.flexiFolded" : "status.flexiMade", { joints: result.joints, links: result.links.length, swing: result.swing }));
+    return { ok: true as const, id: body.id, joints: result.joints, links: result.links.length, swing: result.swing, axis: result.axis, bend: result.bend };
   }, [commitShapes, selectedShapes, activeRotationPivot]);
 
   /** How long the bodies are along x and along z (the depth), as the flexi tool cuts them. */
@@ -7673,6 +7673,7 @@ export function LayerlingEditor({
     setFlexiTool({
       targetIds: targets.map((shape) => shape.id),
       axis: "auto",
+      bend: "side",
       joints: automaticFlexiJoints(length, width),
       clearance: FLEXI_DEFAULTS.clearance,
       swing: FLEXI_DEFAULTS.swing,
@@ -7693,10 +7694,11 @@ export function LayerlingEditor({
       setFlexiTool(null);
       return;
     }
-    const { axis, joints, clearance, swing, autoSize, size, evenLinks, start, end } = flexiTool;
+    const { axis, bend, joints, clearance, swing, autoSize, size, evenLinks, start, end } = flexiTool;
     setFlexiTool((current) => current ? { ...current, busy: true, error: null } : current);
     void makeFlexi({
       axis: axis === "auto" ? undefined : axis,
+      bend,
       joints,
       clearance,
       swing,
@@ -11513,10 +11515,10 @@ export function LayerlingEditor({
         const ids = new Set(mcpStringArray(params.ids));
         const targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the objects to make flexi links from");
-        const result = await makeFlexi({ axis: params.axis, joints: params.joints, clearance: params.clearance, swing: params.swing, size: params.size, start: params.start, end: params.end }, targets);
+        const result = await makeFlexi({ axis: params.axis, bend: params.bend, joints: params.joints, clearance: params.clearance, swing: params.swing, size: params.size, start: params.start, end: params.end }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
-        return { object: made ? mcpShapeSummary(made) : { id: result.id }, joints: result.joints, links: result.links, swing: result.swing, axis: result.axis === "x" ? "X" : "Y" };
+        return { object: made ? mcpShapeSummary(made) : { id: result.id }, joints: result.joints, links: result.links, swing: result.swing, axis: result.axis === "x" ? "X" : "Y", bend: result.bend };
       }
 
       if (command.action === "make_lid") {
@@ -15146,7 +15148,14 @@ export function LayerlingEditor({
             workspace={workspaceSettings}
             busy={flexiTool.busy}
             error={flexiTool.error}
-            onChange={(patch) => setFlexiTool((current) => current ? { ...current, ...patch, error: null } : current)}
+            onChange={(patch) => setFlexiTool((current) => {
+              if (!current) return current;
+              // Another way of bending suggests its own joints and angle.
+              const turned = patch.bend && patch.bend !== current.bend
+                ? { joints: patch.bend === "fold" ? automaticFoldJoints(length) : automaticFlexiJoints(length, flexiTool.axis === "x" ? extent.z : flexiTool.axis === "z" ? extent.x : Math.min(extent.x, extent.z)), swing: patch.bend === "fold" ? DEFAULT_FLEXI_FOLD : FLEXI_DEFAULTS.swing }
+                : {};
+              return { ...current, ...turned, ...patch, error: null };
+            })}
             onApply={applyFlexiTool}
             onCancel={() => setFlexiTool(null)}
           />

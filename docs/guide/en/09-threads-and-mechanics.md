@@ -180,6 +180,8 @@ Under {{ui:prop.hingeLeafStyle}}, {{ui:hinge.leafFingers}} gives each knuckle it
 
 Select the body (several parts are joined, holes among them cut away) and click {{ui:editor.tool.flexi}}. In the window you set along which side it is cut ({{ui:flexi.axis.auto}} takes the longer one), how many {{ui:flexi.joints}} there are, the {{ui:flexi.clearance}} (0.4 mm suits most printers) and the angle for {{ui:flexi.swing}}. The joints are sized to the body; without {{ui:flexi.autoSize}} you give the {{ui:flexi.size}} yourself. Without {{ui:flexi.evenLinks}} you set how far the first joint lies from the start and the last from the end, so that a head, say, stays one large piece. Where a joint goes, the body should be about 6 mm high and 12 mm wide at least; if one does not fit, the window says which.
 
+With {{ui:flexi.bend}} set to {{ui:flexi.bend.fold}}, the links fold up and down instead, like the bands of a flexi keychain, an egg or a bracelet. Every cut then becomes a hinge lying flat across the body at half its height: three or five knuckles side by side that belong to the two links in turn, with a cone at 45° on each knuckle of the one link reaching into the next knuckle of the other. Beside the knuckles the cut is a V seen from the side, open as far as {{ui:flexi.fold}}. The hinge takes its size from the body's height, so there is no joint size to set; the body should be 3.5 mm high at least where the hinges go (5 mm or more holds better) and about 12 mm wide.
+
 The result is a bundle of links (meshes) that you print as it lies. If you do not like the cut, undo it and try other values. A first test print with two or three joints shows whether the clearance suits your printer.
 
 ## Knurling

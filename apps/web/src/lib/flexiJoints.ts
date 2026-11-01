@@ -17,19 +17,29 @@ import type { WorkplaneShape } from "@/types/layerling";
  *
  * Everything is worked out in the joint frame: u along the axis the body is cut across, v to the side, w up. The links
  * are meshes, made with Manifold as the split is.
+ *
+ * The links can instead fold up and down (Michael's mail, 01.11.2026, after HL ModTech's flexi eggs): then the axis of
+ * every joint lies flat across the cut, halfway up the body, and the cut is a hinge of knuckles side by side, those of
+ * the two links taking turns, with a cone on each knuckle of the one link reaching into the next knuckle of the other.
+ * The cut beside the knuckles is a V seen from the side, open upwards and downwards by the fold angle.
  */
 
 /** The axis of the scene the links follow: x, or z (the depth, shown as Y). */
 export type FlexiAxis = "x" | "z";
 
+/** Which way the links move: to the sides, in the plate's plane, or up and down, folding about the cut. */
+export type FlexiBend = "side" | "fold";
+
 /**
  * How many joints (left out: as many as the body's length and width suggest), the clearance and the swing to either side,
  * in mm and degrees; the knuckle's diameter at its widest (left out: the largest that fits, up to 12 mm); how far the
  * first joint lies from the body's start and the last from its end along the axis, in mm (left out: the links are as long
- * as one another).
+ * as one another). With `bend` "fold" the swing is how far the links fold up and down, and the hinge takes its size from
+ * the body's height.
  */
 export type FlexiOptions = {
   axis?: FlexiAxis;
+  bend?: FlexiBend;
   joints?: number;
   clearance: number;
   swing: number;
@@ -43,6 +53,11 @@ export const MIN_FLEXI_CLEARANCE = 0.1;
 export const MAX_FLEXI_CLEARANCE = 1;
 export const MIN_FLEXI_SWING = 5;
 export const MAX_FLEXI_SWING = 60;
+/** How far folding links bend up and down at most, and by default. */
+export const MAX_FLEXI_FOLD = 90;
+export const DEFAULT_FLEXI_FOLD = 45;
+/** The lowest body a folding hinge fits in, in mm. */
+export const MIN_FOLD_HEIGHT = 3.5;
 export const MAX_FLEXI_JOINTS = 30;
 /** The knuckle's radius at its widest, in mm: smaller ones break, larger ones the automatic size does not make. */
 const MIN_KNUCKLE = 2;
@@ -74,12 +89,17 @@ export function normalizeFlexiOptions(value?: Partial<Record<keyof FlexiOptions,
   // The panel and the AI name the depth Y, as the Position card does.
   if (axis === "x") result.axis = "x";
   else if (axis === "y" || axis === "z") result.axis = "z";
+  const bend = typeof value?.bend === "string" ? value.bend.trim().toLowerCase() : "";
+  if (bend === "fold") {
+    result.bend = "fold";
+    result.swing = DEFAULT_FLEXI_FOLD;
+  }
   const joints = finiteNumber(value?.joints);
   if (joints !== null && joints >= 1) result.joints = clamp(Math.round(joints), 1, MAX_FLEXI_JOINTS);
   const clearance = finiteNumber(value?.clearance);
   if (clearance !== null) result.clearance = clamp(clearance, MIN_FLEXI_CLEARANCE, MAX_FLEXI_CLEARANCE);
   const swing = finiteNumber(value?.swing);
-  if (swing !== null) result.swing = clamp(swing, MIN_FLEXI_SWING, MAX_FLEXI_SWING);
+  if (swing !== null) result.swing = clamp(swing, MIN_FLEXI_SWING, result.bend === "fold" ? MAX_FLEXI_FOLD : MAX_FLEXI_SWING);
   const size = finiteNumber(value?.size);
   if (size !== null && size > 0) result.size = clamp(size, 2 * MIN_KNUCKLE, 2 * MAX_KNUCKLE);
   const start = finiteNumber(value?.start);
@@ -340,7 +360,159 @@ function jointSides(runtime: ManifoldToplevel, plan: FlexiJointPlan, clearance: 
   return { a, b };
 }
 
-export type FlexiResult = { links: ManifoldSolid[]; plans: FlexiJointPlan[] } | { error: FlexiError };
+/** One folding hinge as it is built. */
+export type FlexiFoldPlan = {
+  /** Where along the axis (u) the hinge's axis lies and at what height (w); the knuckles' radius. */
+  u: number;
+  w: number;
+  bottom: number;
+  top: number;
+  radius: number;
+  /** The cone on a knuckle: its radius where it leaves the knuckle and at its tip, and how far it reaches into the next. */
+  pin: number;
+  tip: number;
+  reach: number;
+  /** Where the knuckles meet along the hinge (v), from one side of the body to the other; the knuckles before the first, between every second pair and after the last belong to the link before the cut. */
+  bounds: number[];
+  /** How far the links fold up and down (radians). */
+  swing: number;
+};
+
+/** The flat foot and top a folding knuckle keeps where it meets the plate and the body's top, as a share of the body's height. */
+const FOLD_RADIUS = 0.55;
+/** The wall round a cone's socket, and its tip at least, in mm. */
+const FOLD_WALL = 0.5;
+const MIN_FOLD_PIN = 0.6;
+/** How many knuckles a hinge has at most (always an odd number, so the link before the cut holds the other at both ends). */
+const MAX_FOLD_KNUCKLES = 5;
+
+/** The measures of a folding hinge in a body `height` high: the knuckles' radius, and the cone's radius, tip and reach. Null when it is too low. */
+export function flexiFoldProfile(height: number, clearance: number) {
+  const radius = FOLD_RADIUS * height;
+  const pin = Math.min(0.6 * radius, height / 2 - FOLD_WALL - coneGap(clearance));
+  if (height < MIN_FOLD_HEIGHT || pin < MIN_FOLD_PIN) return null;
+  const tip = Math.max(0.2, 0.3 * pin);
+  return { radius, pin, tip, reach: pin - tip };
+}
+
+/** How wide a knuckle must be at least: room for a socket from either side and a wall between them. */
+export function flexiFoldKnuckleWidth(reach: number, clearance: number) {
+  return Math.max(3, 2 * (reach + coneGap(clearance)) + 1.6);
+}
+
+/** Where the knuckles of a hinge meet, the body `from` to `to` wide there: an odd number of them, as many as fit up to five. */
+export function flexiFoldBounds(from: number, to: number, knuckleWidth: number) {
+  const span = to - from - 1.2;
+  let count = Math.min(MAX_FOLD_KNUCKLES, Math.floor(span / knuckleWidth));
+  if (count % 2 === 0) count -= 1;
+  if (count < 3) return null;
+  const width = span / count;
+  return Array.from({ length: count - 1 }, (_, index) => from + 0.6 + width * (index + 1));
+}
+
+/** How far apart two folding hinges must be, so that neither one's knuckles nor V reaches into the other's cut. */
+function flexiFoldSpacing(previous: FlexiFoldPlan, next: FlexiFoldPlan, clearance: number) {
+  const lean = Math.max(previous.top - previous.bottom, next.top - next.bottom) * Math.tan(Math.max(previous.swing, next.swing) / 2);
+  return previous.radius + next.radius + 2 * clearance + 0.5 + lean;
+}
+
+/**
+ * The folding hinges for a body in the joint frame: each sized to the body's height at its cut, with its knuckles across
+ * the width the body has there (the narrowest of where the knuckles reach to either side); or why they do not fit.
+ */
+function planFolds(runtime: ManifoldToplevel, body: ManifoldSolid, positions: readonly number[], options: FlexiOptions, created: { delete?: () => void }[]): FlexiFoldPlan[] | FlexiError {
+  const alongUp = body.transform(ALONG_UP);
+  created.push(alongUp);
+  const plans: FlexiFoldPlan[] = [];
+  for (const [index, u] of positions.entries()) {
+    const site = jointSite(runtime, alongUp, u, created);
+    if (!site) return { code: "tooThin", joint: index + 1, value: 0 };
+    const height = site.top - site.bottom;
+    const profile = flexiFoldProfile(height, options.clearance);
+    if (!profile) return { code: "tooFlat", joint: index + 1, value: height };
+    let from = site.v - site.halfWidth;
+    let to = site.v + site.halfWidth;
+    for (const offset of [-profile.radius - options.clearance, profile.radius + options.clearance]) {
+      const beside = jointSite(runtime, alongUp, u + offset, created);
+      if (!beside) return { code: "tooThin", joint: index + 1, value: 0 };
+      from = Math.max(from, beside.v - beside.halfWidth);
+      to = Math.min(to, beside.v + beside.halfWidth);
+    }
+    const bounds = to > from ? flexiFoldBounds(from, to, flexiFoldKnuckleWidth(profile.reach, options.clearance)) : null;
+    if (!bounds) return { code: "tooThin", joint: index + 1, value: Math.max(0, to - from) };
+    const plan: FlexiFoldPlan = { u, w: (site.bottom + site.top) / 2, bottom: site.bottom, top: site.top, ...profile, bounds, swing: (options.swing * Math.PI) / 180 };
+    const previous = plans[plans.length - 1];
+    if (previous && plan.u - previous.u < flexiFoldSpacing(previous, plan, options.clearance)) {
+      return { code: "tooClose", joint: index + 1, value: flexiFoldSpacing(previous, plan, options.clearance) };
+    }
+    plans.push(plan);
+  }
+  return plans;
+}
+
+/** (u, w, along) to (u, v, w), the third axis pointing to -v, so a section in the side view is stood up across the body. */
+const SIDE_VIEW: Mat4 = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1];
+
+/**
+ * The two sides of a folding hinge, as jointSides makes them for one that swings: the link before the cut (A) has its side
+ * of the V, its knuckles and the cones on them; the link after it (B) its side of the V and its knuckles with the cones'
+ * sockets. Round the other link's knuckles each keeps the clearance, also folded by the swing either way.
+ */
+function foldSides(runtime: ManifoldToplevel, plan: FlexiFoldPlan, clearance: number, low: number, high: number, far: number, created: { delete?: () => void }[]) {
+  const track = <T extends { delete?: () => void }>(value: T) => {
+    created.push(value);
+    return value;
+  };
+  /** A section of the side view (u, w) stood across the body from v0 to v1. */
+  const across = (polygon: [number, number][], v0: number, v1: number) => {
+    const section = track(runtime.CrossSection.ofPolygons([polygon]));
+    return track(track(section.extrude(v1 - v0)).transform(SIDE_VIEW).translate([0, v1, 0]));
+  };
+  /** A round rod along v about the hinge's axis, `r0` wide at v0 and `r1` at v1. */
+  const rod = (v0: number, v1: number, r0: number, r1: number) => {
+    const segments = clamp(Math.ceil((2 * Math.PI * Math.max(r0, r1)) / 0.4), 32, 96);
+    const [lowV, highV, lowR, highR] = v0 <= v1 ? [v0, v1, r0, r1] : [v1, v0, r1, r0];
+    return track(track(runtime.Manifold.cylinder(highV - lowV, highR, lowR, segments)).transform(SIDE_VIEW).translate([plan.u, highV, plan.w]));
+  };
+  const half = Math.PI / 2 - plan.swing / 2;
+  const shift = clearance / 2 / Math.sin(half);
+  const ray = (from: [number, number], angle: number): [number, number] => [from[0] + far * Math.cos(angle), from[1] + far * Math.sin(angle)];
+  const wedge = (apex: [number, number], middle: number) => across([apex, ray(apex, middle - half), ray(apex, middle), ray(apex, middle + half)], -far, far);
+  const sideA = wedge([plan.u - shift, plan.w], Math.PI);
+  const sideB = wedge([plan.u + shift, plan.w], 0);
+  const clear = rod(-far, far, plan.radius + clearance, plan.radius + clearance);
+  const box = (v0: number, v1: number) => across([[plan.u - far, low], [plan.u + far, low], [plan.u + far, high], [plan.u - far, high]], v0, v1);
+
+  const edges = [-far, ...plan.bounds, far];
+  const knucklesA: ManifoldSolid[] = [];
+  const knucklesB: ManifoldSolid[] = [];
+  const pins: ManifoldSolid[] = [];
+  const sockets: ManifoldSolid[] = [];
+  const gap = coneGap(clearance);
+  for (let index = 0; index + 1 < edges.length; index += 1) {
+    const v0 = index === 0 ? edges[index] : edges[index] + clearance / 2;
+    const v1 = index + 2 === edges.length ? edges[index + 1] : edges[index + 1] - clearance / 2;
+    const ownSide = index % 2 === 0 ? sideA : sideB;
+    const knuckle = track(runtime.Manifold.union([ownSide, rod(v0, v1, plan.radius, plan.radius)]).intersect(box(v0, v1)));
+    (index % 2 === 0 ? knucklesA : knucklesB).push(knuckle);
+  }
+  // At every meeting the A knuckle's cone crosses the gap and reaches into the B knuckle, which has its socket.
+  plan.bounds.forEach((bound, index) => {
+    const direction = index % 2 === 0 ? 1 : -1;
+    const faceA = bound - (direction * clearance) / 2;
+    const faceB = bound + (direction * clearance) / 2;
+    pins.push(rod(faceA - direction * 0.05, faceB, plan.pin, plan.pin), rod(faceB, faceB + direction * plan.reach, plan.pin, plan.tip));
+    sockets.push(rod(faceB - direction * 0.05, faceB + direction * (plan.reach + gap), plan.pin + gap, plan.tip));
+  });
+  const outerA = track(sideA.subtract(clear));
+  const outerB = track(sideB.subtract(clear));
+  const a = track(runtime.Manifold.union([outerA, ...knucklesA, ...pins]));
+  const joinedB = track(runtime.Manifold.union([outerB, ...knucklesB]));
+  const b = track(joinedB.subtract(track(runtime.Manifold.union(sockets))));
+  return { a, b };
+}
+
+export type FlexiResult = { links: ManifoldSolid[]; plans: FlexiJointPlan[]; folds: FlexiFoldPlan[] } | { error: FlexiError };
 
 /**
  * How many joints a body `length` long and `width` wide gets when none are asked for: as many as leave links long enough
@@ -351,6 +523,11 @@ export function automaticFlexiJoints(length: number, width: number, clearance = 
   const ring = flexiRingRadius(knuckle, clearance);
   const spacing = 2 * ring + 2 * clearance + 0.5 + 2 * ring * Math.tan((swing * Math.PI) / 360);
   return clamp(Math.floor(length / spacing) - 1, 1, 15);
+}
+
+/** How many folding hinges a body `length` long gets when none are asked for: bands about 11 mm wide, as on a flexi keychain. */
+export function automaticFoldJoints(length: number) {
+  return clamp(Math.round(length / 11) - 1, 1, 15);
 }
 
 /**
@@ -373,20 +550,23 @@ export function articulateSolid(runtime: ManifoldToplevel, body: ManifoldSolid, 
     const low = bounds.min[2] - 1;
     const high = bounds.max[2] + 1;
     const far = 4 * Math.hypot(length, width, high - low) + 20;
-    let count = options.joints ?? automaticFlexiJoints(length, width, options.clearance, options.swing);
-    let plans: FlexiJointPlan[] | FlexiError;
+    const fold = options.bend === "fold";
+    let count = options.joints ?? (fold ? automaticFoldJoints(length) : automaticFlexiJoints(length, width, options.clearance, options.swing));
+    let plans: FlexiJointPlan[] | FlexiFoldPlan[] | FlexiError;
     for (;;) {
       const positions = flexiJointPositions(bounds.min[0], bounds.max[0], count, options.start, options.end);
       if (positions.some((u) => u <= bounds.min[0] + 1 || u >= bounds.max[0] - 1) || positions.some((u, index) => index > 0 && u <= positions[index - 1])) {
         return { error: { code: "tooShort" } };
       }
-      plans = planJoints(runtime, local, positions, options, created);
+      plans = fold ? planFolds(runtime, local, positions, options, created) : planJoints(runtime, local, positions, options, created);
       if (!("code" in plans) || plans.code !== "tooClose" || options.joints !== undefined || count <= 1) break;
       count -= 1;
     }
     if ("code" in plans) return { error: plans };
 
-    const sides = plans.map((plan) => jointSides(runtime, plan, options.clearance, low, high, far, created));
+    const sides = fold
+      ? (plans as FlexiFoldPlan[]).map((plan) => foldSides(runtime, plan, options.clearance, low, high, far, created))
+      : (plans as FlexiJointPlan[]).map((plan) => jointSides(runtime, plan, options.clearance, low, high, far, created));
     const links: ManifoldSolid[] = [];
     for (let index = 0; index <= plans.length; index += 1) {
       const before = index > 0 ? sides[index - 1].b : null;
@@ -401,7 +581,7 @@ export function articulateSolid(runtime: ManifoldToplevel, body: ManifoldSolid, 
       if (link.status() !== "NoError" || link.volume() <= 1e-3) return { error: { code: "empty", joint: index + 1 } };
       links.push(link.transform(toWorld(frame)));
     }
-    return { links, plans };
+    return fold ? { links, plans: [], folds: plans as FlexiFoldPlan[] } : { links, plans: plans as FlexiJointPlan[], folds: [] };
   } catch (error) {
     return { error: { code: "kernel", message: error instanceof Error ? error.message : String(error ?? "") } };
   } finally {
@@ -444,7 +624,7 @@ function positionsOf(mesh: ReturnType<ManifoldSolid["getMesh"]>) {
 }
 
 export type FlexiShapesResult =
-  | { links: WorkplaneShape[]; joints: number; swing: number; axis: FlexiAxis }
+  | { links: WorkplaneShape[]; joints: number; swing: number; axis: FlexiAxis; bend: FlexiBend }
   | { links: null; error: string };
 
 /**
@@ -483,10 +663,10 @@ export async function articulateShapes(targets: readonly WorkplaneShape[], given
       if (!shape) return { links: null, error: flexiErrorMessage({ code: "empty", joint: index + 1 }) };
       links.push(canonicalizeShape({ ...shape, hidden: false }));
     }
-    const swing = Math.min(...result.plans.map((plan) => (plan.swing * 180) / Math.PI));
+    const swing = Math.min(...[...result.plans, ...result.folds].map((plan) => (plan.swing * 180) / Math.PI));
     const box = body.boundingBox();
     const axis = given.axis ?? (box.max[0] - box.min[0] >= box.max[2] - box.min[2] ? "x" : "z");
-    return { links, joints: result.plans.length, swing: Math.round(swing), axis };
+    return { links, joints: result.plans.length + result.folds.length, swing: Math.round(swing), axis, bend: given.bend ?? "side" };
   } catch (error) {
     return { links: null, error: flexiErrorMessage({ code: "kernel", message: error instanceof Error ? error.message : String(error ?? "") }) };
   } finally {

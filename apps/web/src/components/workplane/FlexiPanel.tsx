@@ -4,7 +4,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { Check, LoaderCircle, X } from "lucide-react";
 import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
-import { MAX_FLEXI_CLEARANCE, MAX_FLEXI_JOINTS, MAX_FLEXI_SWING, MIN_FLEXI_CLEARANCE, MIN_FLEXI_SWING } from "@/lib/flexiJoints";
+import { MAX_FLEXI_CLEARANCE, MAX_FLEXI_FOLD, MAX_FLEXI_JOINTS, MAX_FLEXI_SWING, MIN_FLEXI_CLEARANCE, MIN_FLEXI_SWING, type FlexiBend } from "@/lib/flexiJoints";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -12,6 +12,7 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 /** What the panel edits: the axis ("auto" is the body's longer side), the joints, and the knuckle's size and the end links when not left to the tool. */
 export type FlexiToolSettings = {
   axis: "auto" | "x" | "z";
+  bend: FlexiBend;
   joints: number;
   clearance: number;
   swing: number;
@@ -23,10 +24,12 @@ export type FlexiToolSettings = {
 };
 
 const AXES: readonly FlexiToolSettings["axis"][] = ["auto", "x", "z"];
+const BENDS: readonly FlexiBend[] = ["side", "fold"];
 
 /**
  * Flexi joints (Liane's mail, 29.10.2026): a flat body cut into links along its length, with a joint printed in place
- * at every cut, so the links swing to the sides - a fish, a snake or a dragon of one's own drawing.
+ * at every cut, so the links swing to the sides - a fish, a snake or a dragon of one's own drawing; or fold up and down,
+ * as the bands of a flexi keychain do (Michael's mail, 01.11.2026).
  */
 export function FlexiPanel({
   targetName,
@@ -53,6 +56,7 @@ export function FlexiPanel({
   useLanguage();
   const title = t("flexi.title");
   const endMax = Math.max(1, Math.round(length / 2));
+  const fold = settings.bend === "fold";
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel flexi-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -69,7 +73,7 @@ export function FlexiPanel({
 
       <div className="edge-modifier-target">
         <strong>{targetName}</strong>
-        <span>{t("flexi.help")}</span>
+        <span>{t(fold ? "flexi.helpFold" : "flexi.help")}</span>
       </div>
 
       <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("flexi.axis")}>
@@ -86,6 +90,25 @@ export function FlexiPanel({
               onClick={() => onChange({ axis: option })}
             >
               {t(`flexi.axis.${option}`)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("flexi.bend")}>
+        <span>{t("flexi.bend")}</span>
+        <div className="shell-opening-options">
+          {BENDS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              role="radio"
+              aria-checked={settings.bend === option}
+              className={settings.bend === option ? "active" : ""}
+              disabled={busy}
+              onClick={() => onChange({ bend: option })}
+            >
+              {t(`flexi.bend.${option}`)}
             </button>
           ))}
         </div>
@@ -116,10 +139,10 @@ export function FlexiPanel({
       <span className="shell-openings-summary">{t("flexi.clearanceHint")}</span>
 
       <EdgeModifierSlider
-        label={t("flexi.swing")}
+        label={t(fold ? "flexi.fold" : "flexi.swing")}
         value={settings.swing}
         min={MIN_FLEXI_SWING}
-        max={MAX_FLEXI_SWING}
+        max={fold ? MAX_FLEXI_FOLD : MAX_FLEXI_SWING}
         step={1}
         unit="°"
         workspace={workspace}
@@ -127,11 +150,13 @@ export function FlexiPanel({
         onChange={(value) => onChange({ swing: value })}
       />
 
-      <label className="edge-modifier-field offset-copy">
-        <input type="checkbox" checked={settings.autoSize} disabled={busy} onChange={(event) => onChange({ autoSize: event.target.checked })} />
-        <span>{t("flexi.autoSize")}</span>
-      </label>
-      {settings.autoSize ? null : (
+      {fold ? null : (
+        <label className="edge-modifier-field offset-copy">
+          <input type="checkbox" checked={settings.autoSize} disabled={busy} onChange={(event) => onChange({ autoSize: event.target.checked })} />
+          <span>{t("flexi.autoSize")}</span>
+        </label>
+      )}
+      {fold || settings.autoSize ? null : (
         <EdgeModifierSlider
           label={t("flexi.size")}
           value={settings.size}

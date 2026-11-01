@@ -174,6 +174,8 @@ Nástrojem {{ui:editor.tool.flexi}} uděláš z plochého tělesa pohyblivou fig
 
 Vyber těleso (víc dílů se sloučí, otvory v nich se odečtou) a klikni na {{ui:editor.tool.flexi}}. V okně nastavíš, podél které strany se dělí ({{ui:flexi.axis.auto}} vezme delší), kolik bude kloubů ({{ui:flexi.joints}}), {{ui:flexi.clearance}} (obvykle sedí 0,4 mm) a úhel pro {{ui:flexi.swing}}. Velikost kloubů se řídí tělesem; bez {{ui:flexi.autoSize}} zadáš {{ui:flexi.size}} sám. Bez {{ui:flexi.evenLinks}} určíš, jak daleko je první kloub od začátku a poslední od konce, aby třeba hlava zůstala jedním velkým kusem. Tam, kde je kloub, má být těleso aspoň zhruba 6 mm vysoké a 12 mm široké; když se některý nevejde, okno řekne který.
 
+S volbou {{ui:flexi.bend}} na {{ui:flexi.bend.fold}} se články místo toho ohýbají nahoru a dolů jako pásy flexi přívěsku na klíče, vajíčka nebo náramku. Z každého řezu je pak kloub ležící naplocho napříč tělesem v polovině jeho výšky: tři nebo pět kloubních válečků vedle sebe, které střídavě patří oběma článkům, a na každém válečku jednoho článku kužel se sklonem 45°, který zapadá do dalšího válečku druhého. Vedle válečků je řez při pohledu z boku ve tvaru V, otevřený tak, jak udává {{ui:flexi.fold}}. Velikost kloubu se řídí výškou tělesa, velikost kloubu se tu tedy nenastavuje; tam, kde jsou klouby, by mělo být těleso aspoň 3,5 mm vysoké (od 5 mm drží lépe) a asi 12 mm široké.
+
 Výsledkem je svazek článků (sítí), který tiskneš tak, jak leží. Když se ti rozdělení nelíbí, vrať ho zpět a zkus jiné hodnoty. První zkušební tisk se dvěma nebo třemi klouby ukáže, jestli vůle sedí tvé tiskárně.
 
 ## Rýhované úchopy

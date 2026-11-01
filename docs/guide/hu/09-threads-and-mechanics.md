@@ -170,6 +170,8 @@ A {{ui:editor.tool.flexi}} egy lapos testből mozgatható figurát készít, pé
 
 Jelöld ki a testet (több rész egyesül, a bennük lévő lyukak kivonódnak), és kattints a {{ui:editor.tool.flexi}} gombra. Az ablakban beállítod, melyik oldal mentén vágjon ({{ui:flexi.axis.auto}} a hosszabbat veszi), hány csukló legyen ({{ui:flexi.joints}}), a {{ui:flexi.clearance}} értékét (többnyire 0,4 mm jó) és a {{ui:flexi.swing}} szögét. A csuklók mérete a testhez igazodik; {{ui:flexi.autoSize}} nélkül te adod meg a {{ui:flexi.size}} értékét. {{ui:flexi.evenLinks}} nélkül megadod, milyen messze legyen az első csukló az elejétől és az utolsó a végétől, hogy például a fej egy nagy darab maradjon. Ahol csukló van, a test legyen legalább kb. 6 mm magas és 12 mm széles; ha valamelyik nem fér el, az ablak megmondja, melyik.
 
+Ha a {{ui:flexi.bend}} beállítás {{ui:flexi.bend.fold}}, a tagok ehelyett fel és le hajlanak, mint egy flexi kulcstartó, egy tojás vagy egy karkötő csíkjai. Ilyenkor minden vágásból zsanér lesz, amely laposan, keresztben fekszik a testben, a magasság felénél: három vagy öt csukló egymás mellett, felváltva a két taghoz tartozva, és az egyik tag minden csuklóján egy 45°-os kúp nyúlik a másik következő csuklójába. A csuklók mellett a vágás oldalról nézve V alakú, annyira nyitott, mint a {{ui:flexi.fold}}. A zsanér mérete a test magasságából adódik, csuklóméretet itt nem kell megadni; ahol a zsanérok vannak, a test legyen legalább 3,5 mm magas (5 mm-től jobban tart) és nagyjából 12 mm széles.
+
 Az eredmény tagok kötege (hálók), amelyet úgy nyomtatsz ki, ahogy fekszik. Ha nem tetszik a felosztás, vond vissza, és próbálj más értékeket. Egy első próbanyomat két-három csuklóval megmutatja, hogy a hézag illik-e a nyomtatódhoz.
 
 ## Recézés

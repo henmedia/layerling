@@ -174,6 +174,8 @@ Z orodjem {{ui:editor.tool.flexi}} iz ploščatega telesa narediš gibljivo figu
 
 Izberi telo (več delov se združi, luknje v njih se odštejejo) in klikni {{ui:editor.tool.flexi}}. V oknu nastaviš, vzdolž katere stranice se deli ({{ui:flexi.axis.auto}} vzame daljšo), koliko bo zgibov ({{ui:flexi.joints}}), {{ui:flexi.clearance}} (običajno ustreza 0,4 mm) in kot za {{ui:flexi.swing}}. Velikost zgibov se ravna po telesu; brez {{ui:flexi.autoSize}} sam vneseš {{ui:flexi.size}}. Brez {{ui:flexi.evenLinks}} določiš, kako daleč je prvi zgib od začetka in zadnji od konca, da na primer glava ostane en velik kos. Kjer je zgib, naj bo telo vsaj približno 6 mm visoko in 12 mm široko; če kateri ne gre, okno pove, kateri.
 
+Če {{ui:flexi.bend}} nastaviš na {{ui:flexi.bend.fold}}, se členi namesto tega upogibajo gor in dol, kot trakovi flexi obeska za ključe, jajca ali zapestnice. Vsak rez tedaj postane tečaj, ki leži ravno prečno čez telo na polovici višine: trije ali pet členkov drug ob drugem, ki izmenoma pripadajo obema členoma, in na vsakem členku enega člena stožec pod 45°, ki sega v naslednji členek drugega. Ob členkih je rez od strani videti kot V, odprt toliko, kot določa {{ui:flexi.fold}}. Tečaj dobi velikost iz višine telesa, zato velikosti zgloba tu ne nastavljaš; kjer so tečaji, naj bo telo visoko vsaj 3,5 mm (od 5 mm drži bolje) in široko približno 12 mm.
+
 Rezultat je sveženj členov (mrež), ki ga natisneš, kot leži. Če ti razdelitev ni všeč, jo razveljavi in poskusi z drugimi vrednostmi. Prvi poskusni tisk z dvema ali tremi zgibi pokaže, ali zračnost ustreza tvojemu tiskalniku.
 
 ## Narebričenje
