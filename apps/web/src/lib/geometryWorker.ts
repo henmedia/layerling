@@ -1,4 +1,5 @@
 import { buildsDiffer, BUILD_ID, isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
+import { checkClearance, type ClearanceOptions, type ClearanceResult } from "@/lib/clearanceCheck";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type GroupBuildResult, type SplitShapesOutcome } from "@/lib/editorBooleans";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
@@ -266,6 +267,18 @@ export function articulateShapesOffThread(targets: readonly WorkplaneShape[], op
   const onPage = () => articulateShapes([...targets], options);
   if (containsText([...targets])) return onPage();
   return runGeometryTask<FlexiShapesResult>("flexi", { targets: [...targets], options }, onPage, () => ({ links: null, error: t("status.computeTimedOut") }), signal);
+}
+
+/**
+ * checkClearance (lib/clearanceCheck.ts) off the page: overlaps, touching parts and the narrowest gaps. A check the
+ * signal calls off (a new one started) never answers.
+ */
+export function checkClearanceOffThread(source: readonly WorkplaneShape[], options: Partial<ClearanceOptions>, signal?: AbortSignal): Promise<ClearanceResult> {
+  const onPage = () => checkClearance([...source], options);
+  if (containsText([...source])) return onPage();
+  return runGeometryTask<ClearanceResult>("clearance", { source: [...source], options }, onPage, () => {
+    throw new Error(t("status.computeTimedOut"));
+  }, signal);
 }
 
 /** lidForShapes (lib/lidTool.ts) off the page: the lid for a body open at the top (#1009). */

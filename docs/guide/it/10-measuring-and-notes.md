@@ -57,6 +57,23 @@ Con {{ui:workspace.dimensionsAlwaysVisible}} le misure restano sempre visibili. 
 
 Se per un momento danno fastidio, premi [[Q]]: le misure e le distanze attorno alla selezione spariscono e il pezzo che sposti si vede bene. Di nuovo [[Q]] le riporta. Una maniglia su cui punti mostra comunque la sua misura.
 
+## Controllare il gioco
+
+Le parti che devono muoversi dopo la stampa - un drago flexi, una cerniera stampata già montata, una scatola con il suo coperchio, un perno nel suo foro - hanno bisogno di gioco tra loro. Se è troppo poco si incollano; se si sovrappongono, vengono stampate come un pezzo unico. {{ui:editor.tool.clearance}}, accanto a {{ui:editor.tool.intersectPreview}}, lo controlla prima della stampa. Prende gli oggetti selezionati o, se non è selezionato nulla, tutti quelli visibili (gli stessi di un'esportazione) e controlla ogni coppia:
+
+- **{{ui:clearance.kind.overlap}}** (rosso): le due parti condividono un volume. Appare in rosso dentro i corpi, che diventano trasparenti, e l'elenco ne indica la grandezza.
+- **{{ui:clearance.kind.touching}}** (rosso): si toccano e si fondono in stampa.
+- **{{ui:clearance.kind.tight}}** (arancione): la distanza più stretta è minore di {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (verde): la distanza più stretta è almeno così ampia.
+
+Ogni riga nomina le due parti e, per una fessura, la sua larghezza e dove si trova: {{ui:clearance.direction.side}} (nello stesso strato) o {{ui:clearance.direction.layer}} (sopra o sotto: lì lo slicer può lasciare liberi solo strati interi, quindi una fessura più sottile di uno strato si chiude). Un clic su una riga porta la telecamera sul punto, evidenzia il contorno delle due parti e segna il punto più stretto con una linea e il valore. Le coppie distanti più di 5 mm non sono elencate. Il progetto non cambia: il controllo non salva nulla e non lascia nulla da annullare.
+
+{{ui:clearance.threshold}} parte da 0,3 mm; 0,3 è stretto, 0,4 è usuale per la stampa già montata. Cambiarlo riordina subito l'elenco senza un nuovo controllo, e il browser ricorda il valore. {{ui:clearance.splitParts}} (attivo all'inizio) controlla tra loro anche le parti separate di un oggetto: un drago flexi o una cerniera importati come un unico STL sono un oggetto, ma le loro maglie sono parti separate. Compaiono come "Nome · Parte 2". Una parte dentro la cavità di un'altra, una sfera in una gabbia, è una parte a sé.
+
+Se modifichi il progetto mentre la finestra è aperta, compare {{ui:clearance.stale}}; fai clic lì o su {{ui:clearance.checkAgain}}. [[Esc]] o {{ui:clearance.close}} chiude la finestra. Anche il ridimensionamento cambia le distanze: un modello flexi ridotto al 70 % mantiene solo il 70 % del suo gioco, quindi controlla di nuovo dopo il ridimensionamento.
+
+Il controllo misura la mesh di triangoli che riceve anche lo slicer. Un perno rotondo e il suo foro sono poligoni con i vertici sul cerchio, quindi una fessura può risultare qualche centesimo più piccola delle misure tonde. Una coppia con troppi triangoli è elencata come {{ui:clearance.kind.unchecked}}. Un'IA esegue lo stesso controllo con `layerling_check_clearance`.
+
 ## Note
 
 Una nota registra informazioni che la geometria non può esprimere: “Questa vite è troppo stretta di 0,3 mm”, “stampare il coperchio?” oppure “misura presa da Peter”. Inseriscila con {{ui:editor.tool.note}} o premendo [[N]].

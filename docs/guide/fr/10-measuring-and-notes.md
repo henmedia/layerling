@@ -55,6 +55,23 @@ Avec {{ui:workspace.dimensionsAlwaysVisible}} les cotes restent visibles en perm
 
 Pour vous en passer un instant, appuyez sur [[Q]] : les cotes et distances autour de la sélection disparaissent, et la pièce que vous déplacez se voit bien. Un nouvel appui sur [[Q]] les ramène. Une poignée que vous survolez affiche quand même sa cote.
 
+## Vérifier le jeu
+
+Les pièces qui doivent bouger après l'impression - un dragon flexi, une charnière imprimée en place, une boîte et son couvercle, un axe dans son alésage - ont besoin d'un écart entre elles. Trop petit, elles collent ; si elles se chevauchent, elles s'impriment en une seule pièce. {{ui:editor.tool.clearance}}, à côté de {{ui:editor.tool.intersectPreview}}, le vérifie avant l'impression. L'outil prend les objets sélectionnés, ou tous les objets visibles si rien n'est sélectionné (les mêmes qu'un export), et vérifie chaque paire :
+
+- **{{ui:clearance.kind.overlap}}** (rouge) : les deux partagent un volume. Il apparaît en rouge dans les corps, qui deviennent transparents, et la liste indique sa taille.
+- **{{ui:clearance.kind.touching}}** (rouge) : elles se touchent et fusionnent à l'impression.
+- **{{ui:clearance.kind.tight}}** (orange) : l'écart le plus étroit est plus petit que le {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (vert) : l'écart le plus étroit est au moins aussi large.
+
+Chaque ligne nomme les deux pièces et, pour un écart, sa largeur et sa position : {{ui:clearance.direction.side}} (dans la même couche) ou {{ui:clearance.direction.layer}} (au-dessus ou en dessous : le trancheur ne peut y laisser libres que des couches entières, un écart plus fin qu'une couche se referme donc). Un clic sur une ligne amène la caméra à l'endroit, entoure les deux pièces et marque l'endroit le plus étroit d'une ligne avec la valeur. Les paires éloignées de plus de 5 mm ne sont pas listées. Le modèle ne change pas : la vérification n'enregistre rien et ne laisse rien à annuler.
+
+Le {{ui:clearance.threshold}} commence à 0,3 mm ; 0,3 est serré, 0,4 courant pour l'impression en place. Le modifier retrie la liste aussitôt, sans nouvelle vérification, et le navigateur garde la valeur. {{ui:clearance.splitParts}} (activé au départ) vérifie aussi les pièces séparées d'un même objet entre elles : un dragon flexi ou une charnière importés comme un seul STL sont un objet, mais leurs maillons sont des pièces séparées. Elles apparaissent comme « Nom · Pièce 2 ». Une pièce dans une cavité d'une autre, une bille dans une cage, est une pièce à part.
+
+Si vous modifiez le modèle pendant que la fenêtre est ouverte, elle affiche {{ui:clearance.stale}} ; cliquez dessus ou sur {{ui:clearance.checkAgain}}. [[Esc]] ou {{ui:clearance.close}} ferme la fenêtre. La mise à l'échelle change aussi les écarts : un modèle flexi réduit à 70 % garde 70 % de son jeu, vérifiez donc à nouveau après la mise à l'échelle.
+
+La vérification mesure le maillage de triangles que reçoit le trancheur. Un axe rond et son alésage sont des polygones aux sommets sur le cercle : un écart peut donc sortir de quelques centièmes plus petit que les cotes rondes. Une paire avec trop de triangles est listée comme {{ui:clearance.kind.unchecked}}. Une IA effectue la même vérification avec `layerling_check_clearance`.
+
 ## Remarques
 
 Une note enregistre ce que la géométrie ne dit pas : "Cette vis est trop serrée de 0,3 mm", "imprimez encore le couvercle", "cote de Peter". Placez-en un avec {{ui:editor.tool.note}} ou la clé [[N]].

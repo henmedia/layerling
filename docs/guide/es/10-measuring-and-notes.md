@@ -57,6 +57,23 @@ Con {{ui:workspace.dimensionsAlwaysVisible}}, las medidas se ven siempre. Un cue
 
 Si estorban un momento, pulsa [[Q]]: las medidas y distancias alrededor de la selección desaparecen y la pieza que mueves se ve bien. Otra vez [[Q]] las recupera. Un tirador al que apuntas sigue mostrando su medida.
 
+## Comprobar la holgura
+
+Las piezas que deben moverse después de imprimir - un dragón flexi, una bisagra impresa en su sitio, una caja con su tapa, un eje en su agujero - necesitan holgura entre sí. Si es demasiado poca, se pegan; si se solapan, se imprimen como una sola pieza. {{ui:editor.tool.clearance}}, junto a {{ui:editor.tool.intersectPreview}}, lo comprueba antes de imprimir. Toma los objetos seleccionados o, si no hay nada seleccionado, todos los visibles (los mismos que toma una exportación) y comprueba cada pareja:
+
+- **{{ui:clearance.kind.overlap}}** (rojo): las dos comparten un volumen. Aparece en rojo dentro de los cuerpos, que se vuelven transparentes, y la lista indica su tamaño.
+- **{{ui:clearance.kind.touching}}** (rojo): se tocan y se funden al imprimir.
+- **{{ui:clearance.kind.tight}}** (naranja): la separación más estrecha es menor que {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (verde): la separación más estrecha es al menos así de ancha.
+
+Cada fila nombra las dos piezas y, para una separación, su anchura y dónde está: {{ui:clearance.direction.side}} (en la misma capa) o {{ui:clearance.direction.layer}} (encima o debajo: ahí el laminador solo puede dejar libres capas enteras, así que una separación más fina que una capa se cierra). Un clic en una fila lleva la cámara allí, perfila las dos piezas y marca el punto más estrecho con una línea y el número. Las parejas a más de 5 mm no aparecen. El diseño no cambia: la comprobación no guarda nada ni deja nada que deshacer.
+
+{{ui:clearance.threshold}} empieza en 0,3 mm; 0,3 es justo, 0,4 lo habitual para imprimir en su sitio. Cambiarlo reordena la lista al momento, sin nueva comprobación, y el navegador recuerda el valor. {{ui:clearance.splitParts}} (activado al principio) comprueba también entre sí las piezas separadas de un mismo objeto: un dragón flexi o una bisagra importados como un solo STL son un objeto, pero sus eslabones son piezas separadas. Aparecen como "Nombre · Pieza 2". Una pieza dentro de una cavidad de otra, una bola en una jaula, es una pieza aparte.
+
+Si cambias el diseño con la ventana abierta, muestra {{ui:clearance.stale}}; haz clic ahí o en {{ui:clearance.checkAgain}}. [[Esc]] o {{ui:clearance.close}} cierra la ventana. Escalar también cambia las separaciones: un modelo flexi reducido al 70 % conserva solo el 70 % de su holgura, así que vuelve a comprobar después de escalar.
+
+La comprobación mide la malla de triángulos que recibe también el laminador. Un eje redondo y su agujero son polígonos con los vértices sobre el círculo, así que una separación puede salir unas centésimas menor que las medidas redondas. Una pareja con demasiados triángulos aparece como {{ui:clearance.kind.unchecked}}. Una IA hace la misma comprobación con `layerling_check_clearance`.
+
 ## Notas
 
 Una nota recoge lo que la geometría no dice: «Este tornillo va 0,3 mm demasiado justo», «falta imprimir la tapa», «medida de Pedro». Coloca una con {{ui:editor.tool.note}} o con la tecla [[N]].
