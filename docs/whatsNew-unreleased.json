@@ -18,5 +18,15 @@
       "de": "Eine Bodenplatte kann jetzt bis zu 12 × 12 Einheiten groß sein statt 6 × 6, für Drucker mit einem Druckbett über 256 mm. Schalte dazu im Eigenschaften-Fenster „Große Bodenplatte (bis 12 Einheiten)“ ein. Ist dein Drucker in den Einstellungen gewählt, wird eine Platte markiert, die größer ist als sein Druckbett.",
       "en": "A baseplate can now be up to 12 × 12 units instead of 6 × 6, for printers with a bed over 256 mm. Switch on \"Large plate (up to 12 units)\" in the Properties panel. With your printer chosen in the settings, a plate larger than the printer's bed is flagged."
     }
+  },
+  {
+    "title": {
+      "de": "Deckel mit Magneten",
+      "en": "Lids with magnets"
+    },
+    "body": {
+      "de": "Im Deckel-Werkzeug setzt „Magnete in den Ecken“ je einen Magneten in jede Ecke: Taschen in Körper und Deckel, und wo die Wand zu dünn ist, füllt ein Pfeiler die Ecke. Wähle 6 × 2, 8 × 3 oder 10 × 3 mm oder eigene Maße und das Spiel: 0,1 mm zum Einpressen, mehr zum Einkleben.",
+      "en": "In the Lid tool, \"Magnets in the corners\" puts a magnet in each corner: pockets in the body and the lid, and where the wall is too thin, a post fills the corner. Pick 6 × 2, 8 × 3 or 10 × 3 mm or your own size, and the play: 0.1 mm to press them in, more to glue them."
+    }
   }
 ]
