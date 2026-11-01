@@ -200,6 +200,8 @@ type WorkplaneViewportProps = {
   onSelectionColor?: (color: string) => void;
   /** Changes to several selected shapes in one step - "Fit module" for two gears (#645). */
   onSelectionUpdateShapes?: (changes: readonly { id: string; patch: Partial<WorkplaneShape> }[], message?: string) => void;
+  /** Fits the selected baseplate into the outline of the other selected shape (#1061). */
+  onSelectionFitGridfinityOutline?: (plateId: string, sourceId: string) => Promise<void> | void;
   onSelectionLock?: () => void;
   onSelectionHide?: () => void;
   /** Wraps the selected body around a cylinder of this diameter (#106). */
@@ -1447,6 +1449,7 @@ export function WorkplaneViewport({
   onSelectionHole,
   onSelectionColor,
   onSelectionUpdateShapes,
+  onSelectionFitGridfinityOutline,
   onSelectionLock,
   onSelectionHide,
   onWrapAroundCylinder,
@@ -8362,6 +8365,7 @@ export function WorkplaneViewport({
           onSetHole={onSelectionHole}
           onSetColor={onSelectionColor}
           onUpdateShapes={onSelectionUpdateShapes}
+          onFitGridfinityOutline={onSelectionFitGridfinityOutline}
           onToggleLocked={onSelectionLock}
           onToggleHidden={onSelectionHide}
           onInteractionActiveChange={onInteractionActiveChange}

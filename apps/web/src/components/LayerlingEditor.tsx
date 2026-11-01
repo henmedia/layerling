@@ -13,7 +13,7 @@ import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/l
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
-import { gridfinityListPatch } from "@/lib/gridfinityGeometry";
+import { gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlateToWorld } from "@/lib/gridfinityGeometry";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_SPACING, MIN_TEXT_SPACING } from "@/lib/textGeometry";
@@ -95,7 +95,7 @@ import { ShortcutsModal } from "./workplane/ShortcutsModal";
 import { InteractiveHelp } from "./InteractiveHelp";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
 import { nextSelectionTransparency } from "@/lib/selectionTransparency";
-import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
+import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, resizedShapeSize, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
 import { pasteCenteringShift } from "@/lib/pasteCentering";
 import { faceWorkplaneCenteringShift, workplaneCenteringOffset } from "@/lib/workplaneCentering";
 import { projectShapesExtent } from "@/components/workplane/ViewportOverlays";
@@ -162,7 +162,7 @@ import { withStencilBridges } from "@/lib/stencilBridgeSection";
 import type { CrossSection } from "manifold-3d";
 import { DrawingTooComplexError } from "@/lib/drawingProjection";
 import { DEFAULT_TAPER_DIMENSION_MAX, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, shapeDimensionLimit, workplaneSettingsFingerprint } from "@/lib/workplaneSettings";
-import { MCP_GRIDFINITY_LIST_KEYS, mcpGridfinityListParams, mcpGridfinityPaddingPatch, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
+import { MCP_GRIDFINITY_LIST_KEYS, mcpGridfinityListParams, mcpGridfinityOutlinePatch, mcpGridfinityPaddingPatch, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
 import { normalizeNotes, referencePoints } from "@/lib/workplaneNotes";
 import { notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
 import { noticeReportsLastChange } from "@/lib/noticeTiming";
@@ -1410,13 +1410,23 @@ async function textCutterOutline(shapes: readonly WorkplaneShape[]) {
  * as a sketch round the middle of their box, with that middle and the height of their lowest point. Null when nothing closed is cut.
  */
 async function footprintOutline(shapes: readonly WorkplaneShape[]) {
+  const found = await footprintLoops(shapes);
+  if (!found) return null;
+  const outline = outlineFromLoops(found.loops);
+  return outline ? { ...outline, floor: found.floor } : null;
+}
+
+/**
+ * The closed outlines the workplane cuts through the shapes, in its x and z, and the height they stand on; for a cookie
+ * cutter (#982) and a baseplate fitted into an outline (#1061). Null when nothing is cut.
+ */
+async function footprintLoops(shapes: readonly WorkplaneShape[]) {
   const { solids, meshes: cut, cut: wasCut } = await exportBodiesWithLooseHoles(shapes);
   const { meshes } = await colorSeparatedExportMeshes(solids, cut, wasCut);
   const offset = footprintCutOffset(meshes);
   if (offset === null) return null;
   // Shapes that overlap give one outline round all of them, as if they were grouped.
-  const outline = outlineFromLoops(unitedFootprint(await getManifoldRuntime(), meshes.map((mesh) => sliceMeshContours(mesh, "y", offset))));
-  return outline ? { ...outline, floor: offset - FOOTPRINT_CUT_HEIGHT } : null;
+  return { loops: unitedFootprint(await getManifoldRuntime(), meshes.map((mesh) => sliceMeshContours(mesh, "y", offset))), floor: offset - FOOTPRINT_CUT_HEIGHT };
 }
 
 /**
@@ -7027,7 +7037,8 @@ export function LayerlingEditor({
     const triangleCount = partInputs.reduce((total, part) => total + (part.mesh?.faces.length ?? 0), 0);
     const profileTriangleCount = partInputs.reduce((total, part) => total + (part.profileMesh?.faces.length ?? 0), 0);
     const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth).length;
-    const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0), 0);
+    // An outline plate's slab has a side face for each edge of its outline (#1061), as a profile has for each segment.
+    const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0) + (part.gridfinity?.gridfinityOutline?.length ?? 0), 0);
     const sendProfileMeshes = triangleCount + profileTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
     // A STEP import's, a thread's, a spring's or a helical gear's mesh went
     // along as the part itself until it had its own body; it still goes along
@@ -7174,7 +7185,8 @@ export function LayerlingEditor({
     const triangleCount = partInputs.reduce((total, part) => total + (part.mesh?.faces.length ?? 0), 0);
     const profileTriangleCount = partInputs.reduce((total, part) => total + (part.profileMesh?.faces.length ?? 0), 0);
     const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth).length;
-    const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0), 0);
+    // An outline plate's slab has a side face for each edge of its outline (#1061), as a profile has for each segment.
+    const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0) + (part.gridfinity?.gridfinityOutline?.length ?? 0), 0);
     const sendProfileMeshes = !options.faces && triangleCount + profileTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
     // A STEP import's, a thread's, a spring's or a helical gear's mesh went
     // along as the part itself until it had its own body; it still goes along
@@ -9473,6 +9485,52 @@ export function LayerlingEditor({
   }, [commitShapes, selectedShapes, activeRotationPivot]);
 
   /**
+   * A Gridfinity baseplate fitted into what another shape stands on (#1061): the outlines the workplane cuts through it,
+   * read in the plate's own frame and set in by 0.25 mm, filled with whole cells and the rest solid. The plate moves to
+   * the outline's middle and the other shape stays, in one Undo step.
+   */
+  const fitGridfinityOutline = useCallback(async (plateId: string, sourceId: string) => {
+    if (refuseLockedSelection()) return;
+    const plate = shapesRef.current.find((shape) => shape.id === plateId);
+    const source = shapesRef.current.find((shape) => shape.id === sourceId);
+    if (!plate || !source) return;
+    if (!gridfinityPlateFlat(plate)) {
+      setNotice(t("status.gridfinityOutlineTilted"));
+      return;
+    }
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    setNotice(t("status.gridfinityOutlineReading"), true);
+    try {
+      const found = await footprintLoops([withHoleMode(source, false)]);
+      const read = found
+        ? gridfinityOutlineFromLoops(await getManifoldRuntime(), gridfinityOutlineToPlate(found.loops.map((loop) => loop.points.map((p) => ({ x: p.u, z: p.v }))), plate))
+        : { error: "empty" as const };
+      if ("error" in read) {
+        setNotice(t(read.error === "several" ? "status.gridfinityOutlineSeveral" : "status.gridfinityOutlineNoOutline"));
+        return;
+      }
+      const fit = gridfinityOutlineFit(plate, read.points);
+      if (fit.error) {
+        setNotice(fit.error === "points" ? t("status.gridfinityOutlineNoOutline")
+          : fit.error === "complex" ? t("status.gridfinityOutlineTooComplex", { count: fit.limit })
+            : fit.error === "small" ? t("status.gridfinityOutlineTooSmall", { size: fit.limit })
+              : fit.large ? t("status.gridfinityOutlineTooLargeSwitch", { size: fit.limit, large: fit.large }) : t("status.gridfinityOutlineTooLarge", { size: fit.limit }));
+        return;
+      }
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
+        setNotice(t("status.gridfinityOutlineChanged"));
+        return;
+      }
+      const place = gridfinityPlateToWorld(fit.centre, plate);
+      const fitted = canonicalizeShape({ ...plate, ...fit.patch, size: resizedShapeSize(fit.patch.width, fit.patch.depth), x: place.x, z: place.z });
+      commitShapes(shapesRef.current.map((shape) => (shape.id === plate.id ? fitted : shape)), plate.id, t("status.gridfinityOutlineFitted", { cells: gridfinityPlan(fitted).cells.length }));
+    } catch (error) {
+      setNotice(error instanceof Error ? localizedError(error.message) : t("status.gridfinityOutlineNoOutline"), true);
+    }
+  }, [commitShapes, refuseLockedSelection]);
+
+  /**
    * A cookie cutter from the selection (#982): the wall and the rim as two sketch bodies in a bundle, in place of what it is made
    * from. One extruded sketch body gives its own outline; anything else - bodies built here, an imported mesh, several parts -
    * gives what it stands on, the outlines the workplane cuts through it. The same code the MCP action uses.
@@ -10719,6 +10777,7 @@ export function LayerlingEditor({
           }
           if (shape.kind === "gridfinity") {
             shape = { ...shape, ...gridfinityListPatch(mcpGridfinityListParams(params)) };
+            shape = { ...shape, ...mcpGridfinityOutlinePatch(shape, params) };
           }
           if (shape.kind === "text" && shape.textCurved) {
             shape = { ...shape, ...curvedTextPatch({ ...shape, textCurved: false }, { textCurved: true, textRadius: shape.textRadius, textSize: shape.textSize }) };
@@ -10876,6 +10935,8 @@ export function LayerlingEditor({
         }
         // A padding given without a size keeps a baseplate's units (#455).
         Object.assign(patch, mcpGridfinityPaddingPatch(target, patch, params));
+        // An outline (#1061) sets the plate's box and place after everything else that sizes it.
+        Object.assign(patch, mcpGridfinityOutlinePatch({ ...target, ...patch }, params));
         if (target.kind === "bentTube" && MCP_BENT_TUBE_KEYS.some((key) => params[key] !== undefined)) {
           const withSettings = { ...target, ...patch };
           const requested = {
@@ -15165,6 +15226,7 @@ export function LayerlingEditor({
           onSelectionHole={setSelectionHoleMode}
           onSelectionColor={setSelectionColor}
           onSelectionUpdateShapes={updateShapesTogether}
+          onSelectionFitGridfinityOutline={fitGridfinityOutline}
           onSelectionLock={toggleLocked}
           onSelectionHide={toggleHidden}
           onWrapAroundCylinder={selectedShapes.length === 1 && offersCylinderWrap(selectedShape) ? wrapSelectionAroundCylinder : undefined}

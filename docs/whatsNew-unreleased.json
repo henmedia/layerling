@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Bodenplatte in einen Umriss einpassen",
+      "en": "Fit a baseplate into an outline"
+    },
+    "body": {
+      "de": "Eine Gridfinity-Bodenplatte füllt jetzt auch eine Schublade, die kein Rechteck ist. Wähle die Platte zusammen mit einer Form, die das Innere der Schublade nachbildet, und klicke in den Eigenschaften auf „Bodenplatte in Umriss einpassen“: ganze Zellen in einem Raster, das dorthin rückt, wo es die meisten aufnimmt, höchstens 6 in der Breite und 6 in der Tiefe (12 mit „Große Bodenplatte“), der Rest massiv, sodass jede Mulde weiter einen gewöhnlichen Behälter aufnimmt.",
+      "en": "A Gridfinity baseplate can now fill a drawer that is not a rectangle. Select the plate together with a shape of the drawer's inside and click \"Fit baseplate to outline\" in the properties panel: whole cells on one grid, placed where it holds the most, at most 6 across and 6 deep (12 with Large plate), the rest solid, so every socket still takes an ordinary bin."
+    }
+  }
+]

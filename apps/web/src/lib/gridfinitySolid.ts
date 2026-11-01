@@ -289,7 +289,10 @@ function compartmentCutter(cad: OcctKernel, loft: ShapeHandle, pieces: Gridfinit
 
 function baseplateSolid(cad: OcctKernel, plan: GridfinityPlan) {
   const half = GRIDFINITY_GRID / 2;
-  const slab = prism(cad, plan.size.width / 2, plan.size.depth / 2, plan.cornerRadius, 0, GRIDFINITY_BASEPLATE_HEIGHT);
+  // A plate fitted into an outline (#1061) is that outline's slab; the shape's depth (z) is the kernel's -y, as in roundedWire.
+  const slab = plan.outline
+    ? cad.extrude(polygonFace(cad, plan.outline.map((p) => ({ x: p.x, y: -p.z, z: 0 }))), 0, 0, GRIDFINITY_BASEPLATE_HEIGHT)
+    : prism(cad, plan.size.width / 2, plan.size.depth / 2, plan.cornerRadius, 0, GRIDFINITY_BASEPLATE_HEIGHT);
   const last = GRIDFINITY_SOCKET[GRIDFINITY_SOCKET.length - 1];
   const steps: GridfinityStep[] = [[GRIDFINITY_SOCKET[0][0], -PAST], ...GRIDFINITY_SOCKET, [last[0], last[1] + PAST]];
   const sockets = plan.cells.map((cell) => steppedSolid(cad, cell.x, cell.z, half, half, GRIDFINITY_BASEPLATE_RADIUS, steps));
