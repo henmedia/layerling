@@ -257,6 +257,17 @@ function describeShapes(before: WorkplaneShape[], after: WorkplaneShape[], openG
         ? { key: "historyStep.deletedOne", values: { name: removed[0].name } }
         : { key: "historyStep.deletedMany", values: { count: removed.length } };
     }
+    // A tool that groups the bodies it worked on with what it cut into them and lays something new beside them (a lid
+    // with magnets: the box grouped with its pockets, the lid beside it) is named after what it added, not as a split.
+    if (added.length > 1) {
+      const holders = added.filter((shape) => shape.groupedShapes?.length && removed.every((gone) => groupedBaseIds(shape).has(localIdBase(gone.id))));
+      if (holders.length === 1) {
+        const made = added.filter((shape) => shape !== holders[0]);
+        return made.length === 1
+          ? { key: "historyStep.addedOne", values: { name: made[0].name } }
+          : { key: "historyStep.addedMany", values: { count: made.length } };
+      }
+    }
     if (removed.length === 1 && added.length > 1) {
       return { key: "historyStep.splitOne", values: { name: removed[0].name, count: added.length } };
     }

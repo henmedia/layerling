@@ -67,6 +67,17 @@ describe("history step descriptions", () => {
     expect(step([group], [a, b])).toEqual({ key: "historyStep.ungrouped", values: { name: "Group" } });
   });
 
+  it("names what a tool laid beside a body it grouped with its cuts, not a split (a lid with magnets)", () => {
+    const body = box({ id: "box-1", name: "Box" });
+    const pocket = box({ id: "box-1-magnet-a", name: "Magnet pocket 1", kind: "cylinder", hole: true });
+    const grouped = box({ id: "g", name: "Box", kind: "group" as WorkplaneShape["kind"], groupedShapes: [body, pocket] });
+    const lid = box({ id: "box-1-lid", name: "Box lid", kind: "mesh" as WorkplaneShape["kind"] });
+    expect(step([body], [grouped, lid])).toEqual({ key: "historyStep.addedOne", values: { name: "Box lid" } });
+    // A body cut in two is still a split: neither half holds the body.
+    const half = (id: string) => box({ id, name: "Box half", kind: "mesh" as WorkplaneShape["kind"] });
+    expect(step([body], [half("h1"), half("h2")])).toEqual({ key: "historyStep.splitOne", values: { name: "Box", count: 2 } });
+  });
+
   it("names a change to the notes or reference points when no object changed", () => {
     const note: WorkplaneNote = { id: "n1", text: "Check this", x: 0, y: 0, z: 0 };
     const point: WorkplaneNote = { id: "p1", text: "", x: 1, y: 2, z: 3, kind: "point" };
