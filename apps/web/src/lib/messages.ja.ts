@@ -1872,6 +1872,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "shape.counterbore": "座ぐり",
   "shape.countersink": "皿穴",
   "shape.doubleCountersink": "両側皿穴",
+  "shape.finishingWasher": "化粧座金",
   "shape.thread": "ねじ",
   "shape.spring": "ばね",
   "shape.paraboloid": "パラボラ",

@@ -96,3 +96,49 @@ export function screwHoleSizeFor(
       && (kind === "counterbore" ? near(hole.screwHoleHeadDepth, fields.screwHoleHeadDepth) : near(hole.screwHoleAngle, fields.screwHoleAngle));
   }) ?? null;
 }
+
+/*
+ * Finishing washers (rosettes, Discussion #1131) for countersunk screws: no norm sets their measures, so they follow
+ * the countersink of the same size. The bore is the clearance hole, the seat the countersink at 90 degrees, the ring
+ * under the seat a quarter of the screw's diameter (at least 1.5 mm), and the rim reaches a third of the diameter (at
+ * least 2 mm) past the seat. An M3 comes out 10.3 x 3 mm and an M6 16.6 x 4.5 mm, as the washers sold for them.
+ */
+
+export type FinishingWasherFields = { width: number; depth: number; height: number; screwHoleShaft: number; screwHoleHeadDepth: number; screwHoleAngle: number };
+
+const roundToHundredth = (value: number) => Math.round(value * 100) / 100;
+
+/** The sizes a finishing washer offers: those with a countersink. */
+export function finishingWasherSizes(): ScrewHoleSize[] {
+  return screwHoleSizesFor("countersink");
+}
+
+export function isFinishingWasherSize(value: unknown): value is ScrewHoleSize {
+  return isScrewHoleSize(value, "countersink");
+}
+
+/** A finishing washer of this size as the shape's own fields. */
+export function finishingWasherFields(size: ScrewHoleSize): FinishingWasherFields {
+  const row = SCREW_HOLE_ROWS[size];
+  const seat = row.countersink ?? row.counterbore;
+  const seatDepth = roundToHundredth(countersinkDepth(seat, row.shaft, METRIC_COUNTERSINK_ANGLE));
+  const outer = roundToHundredth(seat + 2 * Math.max(2, row.diameter / 3));
+  return {
+    width: outer,
+    depth: outer,
+    height: roundToHundredth(seatDepth + Math.max(1.5, row.diameter / 4)),
+    screwHoleShaft: row.shaft,
+    screwHoleHeadDepth: seatDepth,
+    screwHoleAngle: METRIC_COUNTERSINK_ANGLE,
+  };
+}
+
+/** The size whose finishing washer these measures are, or null for one of measures of its own. */
+export function finishingWasherSizeFor(washer: { width: number; height: number; screwHoleShaft: number; screwHoleHeadDepth: number; screwHoleAngle: number }): ScrewHoleSize | null {
+  const near = (a: number, b: number) => Math.abs(a - b) < 0.005;
+  return finishingWasherSizes().find((size) => {
+    const fields = finishingWasherFields(size);
+    return near(washer.width, fields.width) && near(washer.height, fields.height) && near(washer.screwHoleShaft, fields.screwHoleShaft)
+      && near(washer.screwHoleHeadDepth, fields.screwHoleHeadDepth) && near(washer.screwHoleAngle, fields.screwHoleAngle);
+  }) ?? null;
+}

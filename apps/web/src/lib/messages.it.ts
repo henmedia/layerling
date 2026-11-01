@@ -3229,6 +3229,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "error.drawingTooManyTriangles": "Le viste di un disegno possono contenere al massimo {limit} triangoli; queste ne contengono {count}. Scegli oggetti meno numerosi o più semplici.",
   "inspector.unitsSwitch": "Unità: millimetri o pollici",
   "shape.doubleCountersink": "Doppia svasatura",
+  "shape.finishingWasher": "Rosetta",
   "workspace.frameByDirection": "La direzione del riquadro di selezione determina il comportamento",
   "workspace.frameByDirectionHint": "Trascinando il riquadro verso destra selezioni solo ciò che è completamente al suo interno; verso sinistra, tutto ciò che tocca (bordo tratteggiato), come in SketchUp",
   "sketch.sweep": "Estrusione lungo un percorso",

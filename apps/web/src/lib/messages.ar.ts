@@ -2135,6 +2135,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "shape.counterbore": "ثقب متدرج",
   "shape.countersink": "ثقب غاطس",
   "shape.doubleCountersink": "ثقب غاطس مزدوج",
+  "shape.finishingWasher": "حلقة تشطيب",
   "shape.thread": "سن لولبي",
   "shape.spring": "نابض",
   "shape.paraboloid": "مجسم مكافئ",

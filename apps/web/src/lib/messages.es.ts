@@ -1806,6 +1806,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "shape.counterbore": "Escariado",
   "shape.countersink": "Avellanado",
   "shape.doubleCountersink": "Doble avellanado",
+  "shape.finishingWasher": "Arandela embellecedora",
   "shape.thread": "Rosca",
   "shape.spring": "Muelle",
   "shape.gridfinity": "Gridfinity",

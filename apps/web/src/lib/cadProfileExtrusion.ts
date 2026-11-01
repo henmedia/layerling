@@ -24,6 +24,7 @@ import { teardropExactSection } from "@/lib/teardropGeometry";
 import { normalizePortCorner, portChamfer } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile } from "@/lib/screwHoleGeometry";
+import { finishingWasherMeasures } from "@/lib/finishingWasherGeometry";
 import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeRoundedBoxQuality, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
 import { textGlyphShapes, textKeyringOf } from "@/lib/textGeometry";
 import { normalizeSketchStroke } from "@/lib/sketchStroke";
@@ -49,7 +50,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -1179,6 +1180,18 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       const section = [{ x: 0, z: points[0].z }, ...points, { x: 0, z: points[points.length - 1].z }];
       // solid (x, y, z) -> local (x, z, -y): the turned body stands along z, the shape's height runs along y
       return { loops: [polygonLoop(section)], frame: { kind: "revolution", height: shape.height, local: new THREE.Matrix4().makeRotationX(-Math.PI / 2) } };
+    }
+    case "finishingWasher": {
+      // createFinishingWasherGeometry: the bottom, the rim, the dome as its true quarter ellipse, the seat and the
+      // bore, turned around the axis. It is kept round; an oval one (only from outside the editor) stays a mesh.
+      if (Math.abs(width - depth) > 1e-6) return null;
+      const { outer, height, shaft, seatDepth, seat, rim } = finishingWasherMeasures({ width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle });
+      const segments: CadModifierProfileSegment[] = [{ kind: "line", x: outer, z: 0 }];
+      if (rim > 1e-6) segments.push({ kind: "line", x: outer, z: rim });
+      segments.push(arcSegment({ cx: seat, cz: rim, rx: outer - seat, rz: height - rim, start: 0, end: Math.PI / 2 }));
+      if (seatDepth > 1e-6) segments.push({ kind: "line", x: shaft, z: height - seatDepth });
+      segments.push({ kind: "line", x: shaft, z: 0 });
+      return { loops: [{ x: shaft, z: 0, segments }], frame: { kind: "revolution", height, local: upright() } };
     }
     case "gear": {
       const gearType = normalizeGearType(shape.gearType);

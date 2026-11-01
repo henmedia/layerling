@@ -1772,6 +1772,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "shape.counterbore": "Silindirik havşa",
   "shape.countersink": "Konik havşa",
   "shape.doubleCountersink": "Çift havşa",
+  "shape.finishingWasher": "Rozet pul",
   "shape.thread": "Diş",
   "shape.spring": "Yay",
   "shape.gridfinity": "Gridfinity",

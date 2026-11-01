@@ -651,6 +651,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "shape.counterbore": "Rebaixo",
   "shape.countersink": "Escareado",
   "shape.doubleCountersink": "Escareado duplo",
+  "shape.finishingWasher": "Arruela de acabamento",
   "shape.thread": "Rosca",
   "shape.spring": "Mola",
   "shape.paraboloid": "Paraboloide",

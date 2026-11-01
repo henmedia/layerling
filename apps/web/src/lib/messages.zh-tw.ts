@@ -2078,6 +2078,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "shape.counterbore": "沉頭孔",
   "shape.countersink": "錐形沉頭孔",
   "shape.doubleCountersink": "雙面錐形沉頭孔",
+  "shape.finishingWasher": "裝飾墊圈",
   "shape.thread": "螺紋",
   "shape.spring": "彈簧",
   "shape.paraboloid": "拋物面",

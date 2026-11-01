@@ -29,6 +29,7 @@ export type ShapeKind =
   | "counterbore"
   | "countersink"
   | "doubleCountersink"
+  | "finishingWasher"
   | "teardrop"
   | "port"
   | "loft"

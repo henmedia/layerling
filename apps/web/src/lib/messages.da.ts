@@ -4174,6 +4174,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "ruler.selectedOnly.off": "Former ved armene viser deres mål (klik for kun at vise de valgte)",
   "ruler.occlude.on": "Former skjuler linealen (klik for at holde den synlig)",
   "shape.doubleCountersink": "Dobbelt forsænkning",
+  "shape.finishingWasher": "Rosetskive",
   "shell.errorRoundedEdges": "Denne kasse har rundede top- og bundkanter, og væggen skal være tydeligt tyndere end den afrunding. Vælg en tyndere væg, eller sæt afrundingen af top- og bundkanterne til 0 før du huler den ud. Hvis det stadig fejler, gemmer \"Fejlmelding\" i footeren designet til en rapport.",
   "shortcuts.multicolor": "Multifarve for den valgte gruppe: hver del i sin egen farve, eller én farve for alle",
   "shortcuts.sketchHandleNudge": "Flyt et klikket kurvehåndtag med ét gridtrin (Shift: et større trin)",

@@ -299,7 +299,7 @@ export function resizeShapeFromFrameHandle(
   // drives the one shared diameter instead of stretching width and depth
   // independently into an ellipse.
   // A Hirth joint too: stretched, its teeth no longer interlock all round (#1016).
-  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth") && (signs.x || signs.z)) {
+  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "finishingWasher") && (signs.x || signs.z)) {
     const diameter = signs.x && signs.z ? (nextWidth + nextDepth) / 2 : signs.x ? nextWidth : nextDepth;
     nextWidth = diameter;
     nextDepth = diameter;

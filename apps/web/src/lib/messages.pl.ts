@@ -2092,6 +2092,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "shape.counterbore": "Pogłębienie walcowe",
   "shape.countersink": "Pogłębienie stożkowe",
   "shape.doubleCountersink": "Podwójne pogłębienie stożkowe",
+  "shape.finishingWasher": "Rozeta",
   "shape.thread": "Gwint",
   "shape.spring": "Sprężyna",
   "shape.paraboloid": "Paraboloida",

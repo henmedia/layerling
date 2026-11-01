@@ -332,7 +332,8 @@ import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
 import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
-import { isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
+import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
+import { finishingWasherMeasures, finishingWasherSeatDepthFor } from "@/lib/finishingWasherGeometry";
 import { NUT_POCKET_SIZE_ORDER, isNutPocketSize, nutPocketFields, nutPocketSizeFor } from "@/lib/nutPocketSizes";
 import { MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
@@ -1082,6 +1083,63 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       ...(shape.kind === "counterbore"
         ? []
         : [{ type: "toggle" as const, id: "screwHoleBothSides", label: t("prop.screwHoleBothSides"), value: shape.kind === "doubleCountersink", onChange: (value: boolean) => onUpdate({ kind: value ? "doubleCountersink" : "countersink" }) }]),
+      ...roundSideProperties(shape, width, depth, onUpdate),
+    ];
+  }
+
+  if (shape.kind === "finishingWasher") {
+    // A finishing washer (#1131): one screw size sets it all; the seat is typed as the head's diameter, kept as its depth.
+    const measures = finishingWasherMeasures({ width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle });
+    const angle = normalizeScrewHoleAngle(shape.screwHoleAngle);
+    const applySize = (value: string) => {
+      if (!isFinishingWasherSize(value)) return;
+      const fields = finishingWasherFields(value);
+      onUpdate({ ...fields, ...widthPatch(fields.width), depth: fields.depth, size: resizedShapeSize(fields.width, fields.depth) }, { resizeAxis: "width" });
+    };
+    const size = finishingWasherSizeFor({ width, height: shape.height, screwHoleShaft: measures.shaft * 2, screwHoleHeadDepth: measures.seatDepth, screwHoleAngle: angle });
+    return [
+      {
+        type: "select" as const,
+        id: "screwHoleSize",
+        label: t("prop.screwHoleSize"),
+        value: size ?? "custom",
+        options: [
+          { value: "custom", label: t("port.custom") },
+          ...finishingWasherSizes().map((option) => ({ value: option, label: option })),
+        ],
+        hint: t("prop.finishingWasherSizeHint"),
+        onChange: applySize,
+      },
+      { id: "width", label: t("prop.diameter"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setCylinderDiameter },
+      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+      {
+        id: "screwHoleShaft",
+        label: t("prop.centerHole"),
+        value: measures.shaft * 2,
+        min: 0.1,
+        max: Math.max(0.2, width * 0.95),
+        step: 0.1,
+        onChange: (value) => onUpdate({ screwHoleShaft: value, screwHoleHeadDepth: finishingWasherSeatDepthFor(measures.seat * 2, value, angle) }),
+      },
+      {
+        id: "screwHoleHead",
+        label: t("prop.screwHoleHead"),
+        value: measures.seat * 2,
+        min: 0.1,
+        max: Math.max(0.2, width),
+        step: 0.1,
+        onChange: (value) => onUpdate({ screwHoleHeadDepth: finishingWasherSeatDepthFor(value, measures.shaft * 2, angle) }),
+      },
+      {
+        id: "screwHoleAngle",
+        label: t("prop.screwHoleAngle"),
+        value: angle,
+        min: MIN_SCREW_HOLE_ANGLE,
+        max: MAX_SCREW_HOLE_ANGLE,
+        step: 1,
+        // The head's diameter stays; the seat gets as deep as the new angle needs.
+        onChange: (value) => onUpdate({ screwHoleAngle: normalizeScrewHoleAngle(value), screwHoleHeadDepth: finishingWasherSeatDepthFor(measures.seat * 2, measures.shaft * 2, value) }),
+      },
       ...roundSideProperties(shape, width, depth, onUpdate),
     ];
   }

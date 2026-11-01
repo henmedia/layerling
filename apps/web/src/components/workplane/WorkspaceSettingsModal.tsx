@@ -396,6 +396,14 @@ function specialFieldsForShape(
       { type: "number", key: "sides", label: t("prop.sides"), defaultValue: defaults.sides ?? automaticSideCount(dimensions.width, dimensions.depth), min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1 },
     ];
   }
+  if (kind === "finishingWasher") {
+    return [
+      { type: "number", key: "screwHoleShaft", label: t("prop.centerHole"), defaultValue: defaults.screwHoleShaft ?? 4.5, min: 0.1, max: Math.max(0.2, dimensions.width * 0.95), unit: "mm" },
+      { type: "number", key: "screwHoleHeadDepth", label: t("prop.finishingWasherSeatDepth"), defaultValue: defaults.screwHoleHeadDepth ?? 2.45, min: 0, max: Math.max(0.1, dimensions.height - 0.2), unit: "mm" },
+      { type: "number", key: "screwHoleAngle", label: t("prop.screwHoleAngle"), defaultValue: defaults.screwHoleAngle ?? 90, min: 30, max: 150, step: 1, unit: "°" },
+      { type: "number", key: "sides", label: t("prop.sides"), defaultValue: defaults.sides ?? automaticSideCount(dimensions.width, dimensions.depth), min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1 },
+    ];
+  }
   if (kind === "teardrop") {
     return [{ type: "number", key: "sides", label: t("prop.sides"), defaultValue: defaults.sides ?? automaticSideCount(dimensions.width, dimensions.width), min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1 }];
   }
