@@ -157,6 +157,10 @@ Pour une photo – un jouet sur une table blanche par exemple – choisis **{{ui
 
 L'arbre à côté d'une maison, une figure devant un fond chargé – là où aucune couleur ne sépare la forme du reste, le **{{ui:sketch.traceLasso}}** la capture : clique à peu près le long de son bord, et entre deux clics la ligne suit d'elle-même le bord, même dans les courbes ; pendant que tu bouges, l'aperçu montre déjà où elle passera. Un clic sur le premier point, un double clic ou [[Enter]] la ferme, [[Esc]] l'abandonne. Elle figure dans la liste comme « Lasso 1 », avec le choix {{ui:sketch.traceRegionAdd}} (la zone rejoint la forme) ou {{ui:sketch.traceTrim}} (elle est enlevée) ; chaque découpe a le même choix. Sous {{ui:sketch.tracePart}}, **{{ui:sketch.traceLassoOnly}}** ne fait de la forme que ce que tu captures ainsi – rien d'autre de l'image.
 
+![Une maison dessinée vectorisée comme objet, le seuil abaissé pour son mur clair : le lasso magnétique a découpé l’arbre, et les huit vitres sont choisies comme trous.](shot:trace-house)
+
+![La maison en corps : sans l’arbre, les fenêtres percées.](shot:trace-house-body)
+
 ## Touches en mode esquisse
 
 | Clé | Effet |

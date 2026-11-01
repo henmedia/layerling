@@ -161,6 +161,10 @@ For a photo – a toy on a white table, say – choose **{{ui:sketch.traceObject
 
 The tree beside a house, a figure before a busy background – where no colour tells the shape from the rest, the **{{ui:sketch.traceLasso}}** catches it: click roughly along its edge, and between two clicks the line follows the edge by itself, round its bends too; while you move, the preview already shows where it will run. A click on the first point, a double click or [[Enter]] closes it, [[Esc]] throws it away. It is listed as “Lasso 1”, with the choice {{ui:sketch.traceRegionAdd}} (the area joins the shape) or {{ui:sketch.traceTrim}} (it is taken away); every cut has the same choice. Under {{ui:sketch.tracePart}}, **{{ui:sketch.traceLassoOnly}}** makes the shape only of what you catch this way – nothing else of the picture.
 
+![A drawn house traced as the object, the threshold lowered for its light wall: the magnetic lasso has cut the tree away, and the eight window panes are picked as holes.](shot:trace-house)
+
+![The house as a body: without the tree, the windows cut through.](shot:trace-house-body)
+
 ## Keys in sketch mode
 
 | Key | Effect |
