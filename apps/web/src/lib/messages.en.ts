@@ -694,6 +694,7 @@ export const MESSAGES_EN = {
   "flexi.error.notClosed": "The body is not closed, so it cannot be cut into links. Close or repair it first.",
   "flexi.error.tooShort": "The joints do not fit along the body. Take fewer joints or move the first and last joint further in.",
   "flexi.error.tooThin": "Joint {joint} has no room: the body is only {size} mm wide there. Make the body wider there, take a smaller joint or move the joints.",
+  "flexi.error.foldTooThin": "Joint {joint} has no room: the body is only {size} mm wide there, a folding hinge needs about {need} mm. Make the body wider there or move the joints.",
   "flexi.error.tooFlat": "Joint {joint} has no room: the body is only {size} mm high there. A joint needs about 3 mm at least, better 6 mm or more.",
   "flexi.error.tooClose": "Joint {joint} is too close to the one before: the joints need about {size} mm between them. Take fewer joints or a smaller joint.",
   "flexi.error.empty": "Link {link} would be empty. Take fewer joints.",

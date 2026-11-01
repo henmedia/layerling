@@ -691,6 +691,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "flexi.error.notClosed": "El cuerpo no está cerrado, así que no se puede cortar en eslabones. Ciérralo o repáralo primero.",
   "flexi.error.tooShort": "Las articulaciones no caben a lo largo del cuerpo. Pon menos articulaciones o desplaza la primera y la última más hacia dentro.",
   "flexi.error.tooThin": "La articulación {joint} no tiene sitio: ahí el cuerpo solo mide {size} mm de ancho. Ensancha el cuerpo en ese punto, pon una articulación más pequeña o mueve las articulaciones.",
+  "flexi.error.foldTooThin": "La articulación {joint} no tiene sitio: ahí el cuerpo solo mide {size} mm de ancho y una bisagra plegable necesita unos {need} mm. Ensancha el cuerpo en ese punto o mueve las articulaciones.",
   "flexi.error.tooFlat": "La articulación {joint} no tiene sitio: ahí el cuerpo solo mide {size} mm de alto. Una articulación necesita al menos unos 3 mm, mejor 6 mm o más.",
   "flexi.error.tooClose": "La articulación {joint} está demasiado cerca de la anterior: las articulaciones necesitan unos {size} mm de separación. Pon menos articulaciones o una más pequeña.",
   "flexi.error.empty": "El eslabón {link} quedaría vacío. Pon menos articulaciones.",

@@ -94,6 +94,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "flexi.error.notClosed": "Legemet er ikke lukket, så det kan ikke skæres i stykker. Luk eller reparér det først.",
   "flexi.error.tooShort": "Ledene passer ikke langs legemet. Tag færre led, eller flyt det første og det sidste led længere ind.",
   "flexi.error.tooThin": "Led {joint} har ingen plads: legemet er kun {size} mm bredt der. Gør legemet bredere der, tag et mindre led eller flyt ledene.",
+  "flexi.error.foldTooThin": "Led {joint} har ingen plads: legemet er kun {size} mm bredt der, et klapled kræver ca. {need} mm. Gør legemet bredere der eller flyt ledene.",
   "flexi.error.tooFlat": "Led {joint} har ingen plads: legemet er kun {size} mm højt der. Et led skal have mindst cirka 3 mm, helst 6 mm eller mere.",
   "flexi.error.tooClose": "Led {joint} er for tæt på det forrige: ledene skal have cirka {size} mm mellem sig. Tag færre led eller et mindre led.",
   "flexi.error.empty": "Stykke {link} ville være tomt. Tag færre led.",

@@ -649,6 +649,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "flexi.error.notClosed": "Bryła nie jest zamknięta, więc nie da się jej pociąć na ogniwa. Najpierw ją zamknij albo napraw.",
   "flexi.error.tooShort": "Przeguby nie mieszczą się wzdłuż bryły. Weź mniej przegubów albo przesuń pierwszy i ostatni dalej do środka.",
   "flexi.error.tooThin": "Przegub {joint} nie ma miejsca: bryła ma tam tylko {size} mm szerokości. Poszerz tam bryłę, weź mniejszy przegub albo przesuń przeguby.",
+  "flexi.error.foldTooThin": "Przegub {joint} nie ma miejsca: bryła ma tam tylko {size} mm szerokości, a zawias składany potrzebuje około {need} mm. Poszerz tam bryłę albo przesuń przeguby.",
   "flexi.error.tooFlat": "Przegub {joint} nie ma miejsca: bryła ma tam tylko {size} mm wysokości. Przegub potrzebuje co najmniej około 3 mm, lepiej 6 mm albo więcej.",
   "flexi.error.tooClose": "Przegub {joint} jest za blisko poprzedniego: przeguby potrzebują około {size} mm odstępu. Weź mniej przegubów albo mniejszy przegub.",
   "flexi.error.empty": "Ogniwo {link} byłoby puste. Weź mniej przegubów.",

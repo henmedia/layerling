@@ -195,7 +195,8 @@ export function flexiMinimumSpacing(previous: FlexiJointPlan, next: FlexiJointPl
 
 export type FlexiError =
   | { code: "notClosed" | "tooShort" | "kernel"; message?: string }
-  | { code: "tooThin" | "tooFlat" | "tooClose" | "empty"; joint: number; value?: number };
+  | { code: "tooThin" | "tooFlat" | "tooClose" | "empty"; joint: number; value?: number }
+  | { code: "foldTooThin"; joint: number; value: number; need: number };
 
 type Frame = { along: [number, number, number]; side: [number, number, number] };
 
@@ -383,13 +384,15 @@ const FOLD_RADIUS = 0.55;
 /** The wall round a cone's socket, and its tip at least, in mm. */
 const FOLD_WALL = 0.5;
 const MIN_FOLD_PIN = 0.6;
+/** The cone's radius at most, in mm: grown with the height it made the knuckles so wide that a tall body found no room (Discussion #1144). */
+const MAX_FOLD_PIN = 2.5;
 /** How many knuckles a hinge has at most (always an odd number, so the link before the cut holds the other at both ends). */
 const MAX_FOLD_KNUCKLES = 5;
 
 /** The measures of a folding hinge in a body `height` high: the knuckles' radius, and the cone's radius, tip and reach. Null when it is too low. */
 export function flexiFoldProfile(height: number, clearance: number) {
   const radius = FOLD_RADIUS * height;
-  const pin = Math.min(0.6 * radius, height / 2 - FOLD_WALL - coneGap(clearance));
+  const pin = Math.min(0.6 * radius, height / 2 - FOLD_WALL - coneGap(clearance), MAX_FOLD_PIN);
   if (height < MIN_FOLD_HEIGHT || pin < MIN_FOLD_PIN) return null;
   const tip = Math.max(0.2, 0.3 * pin);
   return { radius, pin, tip, reach: pin - tip };
@@ -434,12 +437,14 @@ function planFolds(runtime: ManifoldToplevel, body: ManifoldSolid, positions: re
     let to = site.v + site.halfWidth;
     for (const offset of [-profile.radius - options.clearance, profile.radius + options.clearance]) {
       const beside = jointSite(runtime, alongUp, u + offset, created);
-      if (!beside) return { code: "tooThin", joint: index + 1, value: 0 };
+      // The knuckles reach past the body's end.
+      if (!beside) return { code: "tooShort" };
       from = Math.max(from, beside.v - beside.halfWidth);
       to = Math.min(to, beside.v + beside.halfWidth);
     }
-    const bounds = to > from ? flexiFoldBounds(from, to, flexiFoldKnuckleWidth(profile.reach, options.clearance)) : null;
-    if (!bounds) return { code: "tooThin", joint: index + 1, value: Math.max(0, to - from) };
+    const knuckleWidth = flexiFoldKnuckleWidth(profile.reach, options.clearance);
+    const bounds = to > from ? flexiFoldBounds(from, to, knuckleWidth) : null;
+    if (!bounds) return { code: "foldTooThin", joint: index + 1, value: Math.max(0, to - from), need: 3 * knuckleWidth + 1.2 };
     const plan: FlexiFoldPlan = { u, w: (site.bottom + site.top) / 2, bottom: site.bottom, top: site.top, ...profile, bounds, swing: (options.swing * Math.PI) / 180 };
     const previous = plans[plans.length - 1];
     if (previous && plan.u - previous.u < flexiFoldSpacing(previous, plan, options.clearance)) {
@@ -603,6 +608,8 @@ export function flexiErrorMessage(error: FlexiError) {
       return t("flexi.error.tooShort");
     case "tooThin":
       return t("flexi.error.tooThin", { joint: error.joint, size: millimetres(error.value) });
+    case "foldTooThin":
+      return t("flexi.error.foldTooThin", { joint: error.joint, size: millimetres(error.value), need: millimetres(error.need) });
     case "tooFlat":
       return t("flexi.error.tooFlat", { joint: error.joint, size: millimetres(error.value) });
     case "tooClose":

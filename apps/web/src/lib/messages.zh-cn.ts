@@ -650,6 +650,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "flexi.error.notClosed": "实体不是封闭的，无法切分成节。请先封闭或修复它。",
   "flexi.error.tooShort": "关节在实体上排不下。请减少关节数量，或把首尾两个关节往内移。",
   "flexi.error.tooThin": "关节 {joint} 没有空间：该处实体只有 {size} mm 宽。请把该处加宽、缩小关节，或移动关节位置。",
+  "flexi.error.foldTooThin": "关节 {joint} 没有空间：该处实体只有 {size} mm 宽，折叠铰链大约需要 {need} mm。请把该处加宽，或移动关节位置。",
   "flexi.error.tooFlat": "关节 {joint} 没有空间：该处实体只有 {size} mm 高。一个关节至少需要约 3 mm，6 mm 以上更好。",
   "flexi.error.tooClose": "关节 {joint} 离前一个太近：关节之间需要约 {size} mm 的间距。请减少关节数量或缩小关节。",
   "flexi.error.empty": "第 {link} 节会是空的。请减少关节数量。",

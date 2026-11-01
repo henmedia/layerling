@@ -650,6 +650,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "flexi.error.notClosed": "實體不是封閉的，無法切分成節。請先封閉或修復它。",
   "flexi.error.tooShort": "關節在實體上排不下。請減少關節數量，或把首尾兩個關節往內移。",
   "flexi.error.tooThin": "關節 {joint} 沒有空間：該處實體只有 {size} mm 寬。請把該處加寬、縮小關節，或移動關節位置。",
+  "flexi.error.foldTooThin": "關節 {joint} 沒有空間：該處實體只有 {size} mm 寬，摺疊鉸鏈大約需要 {need} mm。請把該處加寬，或移動關節位置。",
   "flexi.error.tooFlat": "關節 {joint} 沒有空間：該處實體只有 {size} mm 高。一個關節至少需要約 3 mm，6 mm 以上更好。",
   "flexi.error.tooClose": "關節 {joint} 離前一個太近：關節之間需要約 {size} mm 的間距。請減少關節數量或縮小關節。",
   "flexi.error.empty": "第 {link} 節會是空的。請減少關節數量。",

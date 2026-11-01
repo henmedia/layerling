@@ -94,6 +94,28 @@ describe("folding flexi links (Michael's mail, real Manifold kernel)", () => {
     }
   });
 
+  it("finds room in a body as tall as it is wide (Discussion #1144)", async () => {
+    const kernel = await runtime();
+    // 60 long, 20 high, 20 deep: before, the cones grew with the height and the hinge wanted 37 mm across.
+    const block = kernel.Manifold.cube([60, 20, 20], true).translate([0, 10, 0]);
+    const result = articulateSolid(kernel, block, normalizeFlexiOptions({ bend: "fold", joints: 1, clearance: 0.4 }));
+    if ("error" in result) throw new Error(JSON.stringify(result.error));
+    try {
+      expect(result.links).toHaveLength(2);
+      expect(result.folds[0].pin).toBeLessThanOrEqual(2.5);
+      expect(result.links[0].minGap(result.links[1], 2)).toBeGreaterThan(0.25);
+      result.links.forEach((link) => {
+        const pieces = link.decompose();
+        expect(pieces).toHaveLength(1);
+        dispose(pieces);
+      });
+      const volume = result.links.reduce((sum, link) => sum + link.volume(), 0);
+      expect(volume).toBeGreaterThan(0.8 * 60 * 20 * 20);
+    } finally {
+      dispose([block, ...result.links]);
+    }
+  });
+
   it("says when the body is too low or too narrow for a folding hinge", async () => {
     const kernel = await runtime();
     const flat = kernel.Manifold.cube([60, 2.5, 30], true).translate([0, 1.25, 0]);
@@ -102,7 +124,9 @@ describe("folding flexi links (Michael's mail, real Manifold kernel)", () => {
       const low = articulateSolid(kernel, flat, normalizeFlexiOptions({ bend: "fold", joints: 2 }));
       expect("error" in low && low.error).toMatchObject({ code: "tooFlat", joint: 1 });
       const thin = articulateSolid(kernel, narrow, normalizeFlexiOptions({ bend: "fold", joints: 2 }));
-      expect("error" in thin && thin.error).toMatchObject({ code: "tooThin", joint: 1 });
+      expect("error" in thin && thin.error).toMatchObject({ code: "foldTooThin", joint: 1 });
+      // The message says how wide the hinge needs the body.
+      if ("error" in thin && thin.error.code === "foldTooThin") expect(thin.error.need).toBeGreaterThan(6);
     } finally {
       dispose([flat, narrow]);
     }

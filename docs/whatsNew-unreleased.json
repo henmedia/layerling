@@ -18,5 +18,15 @@
       "de": "Ein gespeicherter Entwurf mit einem Zahnrad über 150 Zähnen ließ sich nicht mehr öffnen. Jetzt lädt er wieder, bis zu den 500 Zähnen, die der Editor erlaubt.",
       "en": "A saved design with a gear of more than 150 teeth would not open. It loads again now, up to the 500 teeth the editor allows."
     }
+  },
+  {
+    "title": {
+      "de": "Klappende Flexi-Glieder auch in höheren Körpern",
+      "en": "Folding flexi links in taller bodies too"
+    },
+    "body": {
+      "de": "Bei Flexi-Gliedern „Auf und ab“ wuchs das Scharnier mit der Höhe des Körpers mit, so dass ein hoher Körper sehr breit sein musste. Jetzt reichen etwa 20 mm Breite, egal wie hoch er ist, und die Meldung nennt die nötige Breite.",
+      "en": "With flexi links that fold up and down, the hinge grew with the body's height, so a tall body had to be very wide. Now about 20 mm of width is enough whatever the height, and the message tells you how wide it needs to be."
+    }
   }
 ]

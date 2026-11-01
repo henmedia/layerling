@@ -819,6 +819,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "flexi.error.notClosed": "Těleso není uzavřené, a proto ho nejde rozdělit na články. Nejdřív ho uzavři nebo oprav.",
   "flexi.error.tooShort": "Klouby se nevejdou na délku tělesa. Vezmi méně kloubů nebo posuň první a poslední kloub víc dovnitř.",
   "flexi.error.tooThin": "Kloub {joint} nemá místo: těleso je tam široké jen {size} mm. Rozšiř ho tam, vezmi menší kloub nebo klouby posuň.",
+  "flexi.error.foldTooThin": "Kloub {joint} nemá místo: těleso je tam široké jen {size} mm, sklopný kloub potřebuje asi {need} mm. Rozšiř ho tam nebo klouby posuň.",
   "flexi.error.tooFlat": "Kloub {joint} nemá místo: těleso je tam vysoké jen {size} mm. Kloub potřebuje aspoň zhruba 3 mm, lépe 6 mm a víc.",
   "flexi.error.tooClose": "Kloub {joint} je moc blízko předchozímu: klouby potřebují mezi sebou asi {size} mm. Vezmi méně kloubů nebo menší kloub.",
   "flexi.error.empty": "Článek {link} by byl prázdný. Vezmi méně kloubů.",

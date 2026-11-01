@@ -684,6 +684,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "flexi.error.notClosed": "Le corps n'est pas fermé, il ne peut donc pas être découpé en maillons. Fermez-le ou réparez-le d'abord.",
   "flexi.error.tooShort": "Les articulations ne tiennent pas sur la longueur du corps. Prenez moins d'articulations ou rapprochez la première et la dernière du milieu.",
   "flexi.error.tooThin": "L'articulation {joint} n'a pas de place : le corps n'y fait que {size} mm de large. Élargissez-le à cet endroit, prenez une articulation plus petite ou déplacez les articulations.",
+  "flexi.error.foldTooThin": "L'articulation {joint} n'a pas de place : le corps n'y fait que {size} mm de large, une charnière pliante demande environ {need} mm. Élargissez-le à cet endroit ou déplacez les articulations.",
   "flexi.error.tooFlat": "L'articulation {joint} n'a pas de place : le corps n'y fait que {size} mm de haut. Une articulation demande au moins environ 3 mm, mieux 6 mm ou plus.",
   "flexi.error.tooClose": "L'articulation {joint} est trop proche de la précédente : les articulations ont besoin d'environ {size} mm entre elles. Prenez moins d'articulations ou une plus petite.",
   "flexi.error.empty": "Le maillon {link} serait vide. Prenez moins d'articulations.",

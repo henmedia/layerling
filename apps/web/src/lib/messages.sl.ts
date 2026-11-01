@@ -561,6 +561,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "flexi.error.notClosed": "Telo ni zaprto, zato ga ni mogoče razdeliti v člene. Najprej ga zapri ali popravi.",
   "flexi.error.tooShort": "Zgibi ne gredo na dolžino telesa. Vzemi manj zgibov ali premakni prvega in zadnjega bolj navznoter.",
   "flexi.error.tooThin": "Zgib {joint} nima prostora: telo je tam široko le {size} mm. Tam ga razširi, vzemi manjši zgib ali premakni zgibe.",
+  "flexi.error.foldTooThin": "Zgib {joint} nima prostora: telo je tam široko le {size} mm, zložljivi tečaj pa potrebuje približno {need} mm. Tam ga razširi ali premakni zgibe.",
   "flexi.error.tooFlat": "Zgib {joint} nima prostora: telo je tam visoko le {size} mm. Zgib potrebuje vsaj približno 3 mm, bolje 6 mm ali več.",
   "flexi.error.tooClose": "Zgib {joint} je preblizu prejšnjemu: zgibi potrebujejo med seboj približno {size} mm. Vzemi manj zgibov ali manjši zgib.",
   "flexi.error.empty": "Člen {link} bi bil prazen. Vzemi manj zgibov.",

@@ -693,6 +693,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "flexi.error.notClosed": "Der Körper ist nicht geschlossen und lässt sich deshalb nicht in Glieder teilen. Schließe oder repariere ihn zuerst.",
   "flexi.error.tooShort": "Die Gelenke passen nicht auf die Länge des Körpers. Nimm weniger Gelenke oder rücke das erste und das letzte Gelenk weiter hinein.",
   "flexi.error.tooThin": "Gelenk {joint} hat keinen Platz: Der Körper ist dort nur {size} mm breit. Mach ihn dort breiter, nimm ein kleineres Gelenk oder verschiebe die Gelenke.",
+  "flexi.error.foldTooThin": "Gelenk {joint} hat keinen Platz: Der Körper ist dort nur {size} mm breit, ein Klappgelenk braucht etwa {need} mm. Mach ihn dort breiter oder verschiebe die Gelenke.",
   "flexi.error.tooFlat": "Gelenk {joint} hat keinen Platz: Der Körper ist dort nur {size} mm hoch. Ein Gelenk braucht mindestens etwa 3 mm, besser 6 mm oder mehr.",
   "flexi.error.tooClose": "Gelenk {joint} liegt zu nah am vorigen: Die Gelenke brauchen etwa {size} mm Abstand. Nimm weniger Gelenke oder ein kleineres Gelenk.",
   "flexi.error.empty": "Glied {link} wäre leer. Nimm weniger Gelenke.",

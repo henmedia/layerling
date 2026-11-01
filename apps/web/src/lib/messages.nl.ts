@@ -693,6 +693,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "flexi.error.notClosed": "Het lichaam is niet gesloten en kan daarom niet in schakels verdeeld worden. Sluit of repareer het eerst.",
   "flexi.error.tooShort": "De scharnieren passen niet op de lengte van het lichaam. Neem minder scharnieren of schuif het eerste en het laatste verder naar binnen.",
   "flexi.error.tooThin": "Scharnier {joint} heeft geen ruimte: het lichaam is daar maar {size} mm breed. Maak het daar breder, neem een kleiner scharnier of verschuif de scharnieren.",
+  "flexi.error.foldTooThin": "Scharnier {joint} heeft geen ruimte: het lichaam is daar maar {size} mm breed, een klapscharnier heeft ongeveer {need} mm nodig. Maak het daar breder of verschuif de scharnieren.",
   "flexi.error.tooFlat": "Scharnier {joint} heeft geen ruimte: het lichaam is daar maar {size} mm hoog. Een scharnier heeft minstens ongeveer 3 mm nodig, beter 6 mm of meer.",
   "flexi.error.tooClose": "Scharnier {joint} ligt te dicht bij het vorige: de scharnieren hebben ongeveer {size} mm tussenruimte nodig. Neem minder scharnieren of een kleiner scharnier.",
   "flexi.error.empty": "Schakel {link} zou leeg zijn. Neem minder scharnieren.",
