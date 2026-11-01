@@ -1503,6 +1503,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "重なっているボディを結合できませんでした。ファイルには別々に含まれています",
   "status.exportSplinters": "ファイルに入れなかったもの: 切り抜きで残った、とても小さいかけら{count}個。",
   "status.dismiss": "メッセージを閉じる",
+  "editor.property.dragToChange": "左右にドラッグすると値が変わります",
   "export.drawing.label": "図面",
   "export.drawing.description": "正面図・上面図・右側面図に、全体の寸法と円い穴の位置をのせます。大きさは1:1です。",
   "export.drawing.note": "SVGまたはベクターPDFでダウンロードします。用紙はデザインの大きさに合わせて広がります。印刷は100%（実物大）にしてください。穴の表は、軸にそろった丸い穴だけが対象です。ななめの穴、ねじ、深さ、公差には、寸法は自動では入りません。",

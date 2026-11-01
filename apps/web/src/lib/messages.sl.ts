@@ -1359,6 +1359,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "Prekrivajočih se teles ni bilo mogoče združiti - v datoteki so ločena",
   "status.exportSplinters": "V datoteko ni zapisanih: {count} drobnih prostih koscev, ki jih je pustil rez.",
   "status.dismiss": "Zapri sporočilo",
+  "editor.property.dragToChange": "Povlecite levo ali desno, da spremenite vrednost",
   "status.exportStepFailed": "Izvoz STEP ni uspel",
   "status.exportStepNothing": "Tu ni ničesar, kar bi bilo mogoče zapisati kot STEP — uporabi STL",
   "status.packagingShared": "Pakiranje projekta za strežnik…",

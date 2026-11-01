@@ -1620,6 +1620,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "Nie udało się scalić nakładających się brył, są w pliku osobno",
   "status.exportSplinters": "Nie zapisano w pliku: {count} drobnych luźnych kawałków pozostawionych przez cięcie.",
   "status.dismiss": "Zamknij komunikat",
+  "editor.property.dragToChange": "Przeciągnij w lewo lub w prawo, aby zmienić wartość",
   "export.drawing.label": "Rysunek",
   "export.drawing.description": "Widoki z przodu, z góry i z prawej z wymiarami gabarytowymi i położeniem okrągłych otworów, w skali 1:1.",
   "export.drawing.note": "Pobierz SVG lub wektorowy PDF. Arkusz rośnie, aby pomieścić projekt. Drukuj w skali 100% / rzeczywisty rozmiar. Tabele otworów obejmują okrągłe otwory równoległe do osi. Otwory skośne, gwinty, głębokości i tolerancje nie są wymiarowane automatycznie.",

@@ -2258,6 +2258,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "Overlappende former kunne ikke flettes – de er i filen hver for sig",
   "status.exportSplinters": "Udeladt fra filen: {count} små løse stykker som et snit havde efterladt.",
   "status.dismiss": "Luk meddelelsen",
+  "editor.property.dragToChange": "Træk til venstre eller højre for at ændre værdien",
   "export.drawing.label": "Tegning",
   "export.drawing.description": "For-, top- og højre-sidevisninger med totalmål og positioner på runde huller, i 1:1.",
   "export.drawing.note": "Download SVG eller vektor-PDF. Arket vokser for at passe til designet; print i 100% / faktisk størrelse. Hul-tabeller dækker aksejusterede runde boringer; skrå huller, gevind, dybder og tolerancer målsættes ikke automatisk.",

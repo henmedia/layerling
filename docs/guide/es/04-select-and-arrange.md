@@ -155,7 +155,7 @@ Solo {{ui:scalePercent.apply}} cambia el diseño, y un paso atrás lo deshace. S
 
 ## Deshacer
 
-{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) y {{ui:editor.tool.redo}} ([[Ctrl]]+[[Mayús]]+[[Z]] o [[Ctrl]]+[[Y]]) recorren tu historial paso a paso. Cuántos pasos viajan con el diseño guardado lo eliges en los ajustes, en {{ui:workspace.history}}. Al señalar cualquiera de los dos botones, su descripción nombra el paso que desharía o reharía, con la medida cuando el paso tiene una, por ejemplo «Aristas redondeadas: Box (5 mm)»; el mensaje posterior dice lo mismo. Para retroceder varios pasos de una vez, usa la vista del historial más abajo.
+{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) y {{ui:editor.tool.redo}} ([[Ctrl]]+[[Mayús]]+[[Z]] o [[Ctrl]]+[[Y]]) recorren tu historial paso a paso. Cuántos pasos viajan con el diseño guardado lo eliges en los ajustes, en {{ui:workspace.history}}. Al señalar cualquiera de los dos botones, su descripción nombra el paso que desharía o reharía, con la medida cuando el paso tiene una, por ejemplo «Aristas redondeadas: Box (5 mm)»; el mensaje posterior dice lo mismo. Para retroceder varios pasos de una vez, usa la vista del historial más abajo. Un mensaje que informa de un paso recién hecho, como «3 formas eliminadas», tiene un botón Deshacer que revierte justo ese paso.
 
 ## Mirar atrás: la vista del historial
 

@@ -3212,6 +3212,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.broughtBackManyNoTime": "Ripristinati {count} oggetti dallo stato {index}",
   "status.exportSplinters": "Esclusi dal file: {count} piccoli pezzi separati lasciati da un'operazione di taglio.",
   "status.dismiss": "Chiudi messaggio",
+  "editor.property.dragToChange": "Trascina a sinistra o a destra per cambiare il valore",
   "error.drawingTooManyTriangles": "Le viste di un disegno possono contenere al massimo {limit} triangoli; queste ne contengono {count}. Scegli oggetti meno numerosi o più semplici.",
   "inspector.unitsSwitch": "Unità: millimetri o pollici",
   "shape.doubleCountersink": "Doppia svasatura",

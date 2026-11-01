@@ -1618,6 +1618,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "无法合并重叠的实体，它们在文件中分别存在",
   "status.exportSplinters": "未写入文件：切割残留的 {count} 个细小碎片。",
   "status.dismiss": "关闭消息",
+  "editor.property.dragToChange": "向左或向右拖动以更改数值",
   "export.drawing.label": "工程图",
   "export.drawing.description": "前视图、俯视图和右视图，标注总尺寸和圆孔位置，比例为 1:1。",
   "export.drawing.note": "下载 SVG 或矢量 PDF。图纸会自动扩展以容纳设计；按 100% / 实际大小打印。孔表仅涵盖与坐标轴对齐的圆孔；斜孔、螺纹、深度和公差不会自动标注。",

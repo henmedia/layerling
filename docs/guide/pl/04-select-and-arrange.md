@@ -169,7 +169,7 @@ Pole procentów jest aktywne od razu po otwarciu okna, więc z klawiatury to [[C
 
 ## Cofanie
 
-{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) i {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] albo [[Ctrl]]+[[Y]]) przechodzą przez Twoją historię. Ile kroków zapisuje się razem z projektem, ustawiasz w ustawieniach w sekcji {{ui:workspace.history}}. Gdy wskażesz jeden z przycisków, jego podpowiedź nazwie krok, który cofnie lub ponowi, z wymiarem, jeśli krok go ma, na przykład „Zaokrąglono krawędzie: Box (5 mm)”; komunikat po kroku mówi to samo. Aby cofnąć się o kilka kroków naraz, użyj widoku historii poniżej.
+{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) i {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] albo [[Ctrl]]+[[Y]]) przechodzą przez Twoją historię. Ile kroków zapisuje się razem z projektem, ustawiasz w ustawieniach w sekcji {{ui:workspace.history}}. Gdy wskażesz jeden z przycisków, jego podpowiedź nazwie krok, który cofnie lub ponowi, z wymiarem, jeśli krok go ma, na przykład „Zaokrąglono krawędzie: Box (5 mm)”; komunikat po kroku mówi to samo. Aby cofnąć się o kilka kroków naraz, użyj widoku historii poniżej. Komunikat o właśnie wykonanym kroku, np. „Usunięto 3 kształty”, ma przycisk Cofnij, który cofa dokładnie ten krok.
 
 ## Spojrzenie wstecz: widok historii
 

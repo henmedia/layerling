@@ -1535,6 +1535,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "Não foi possível fundir os sólidos sobrepostos - eles estão separados no arquivo",
   "status.exportSplinters": "Ficaram de fora do arquivo: {count} pedacinhos soltos que um corte tinha deixado para trás.",
   "status.dismiss": "Fechar mensagem",
+  "editor.property.dragToChange": "Arraste para a esquerda ou para a direita para mudar o valor",
 
   "thread.rod": "Barra roscada",
   "thread.screw": "Parafuso",

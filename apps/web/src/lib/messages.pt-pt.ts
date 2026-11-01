@@ -1372,6 +1372,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "Não foi possível fundir os sólidos sobrepostos; foram incluídos separadamente no ficheiro",
   "status.exportSplinters": "Excluídos do ficheiro: {count} pequenos fragmentos soltos resultantes de um corte.",
   "status.dismiss": "Fechar mensagem",
+  "editor.property.dragToChange": "Arraste para a esquerda ou para a direita para alterar o valor",
   "export.drawing.label": "Desenho técnico",
   "export.drawing.description": "Vistas de frente, de cima e da direita, com dimensões gerais e posições dos furos circulares, à escala 1:1.",
   "export.drawing.note": "Descarrega em SVG ou PDF vetorial. A folha adapta-se ao tamanho do projeto; imprime a 100% / tamanho real. As tabelas de furos incluem furos circulares alinhados com os eixos; os furos inclinados, as roscas, as profundidades e as tolerâncias não são cotados automaticamente.",

@@ -1388,6 +1388,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "Az egymásba lógó testeket nem sikerült egyesíteni – külön-külön vannak a fájlban",
   "status.exportSplinters": "Nem került a fájlba: {count} apró, különálló darab, amelyet egy vágás hagyott hátra.",
   "status.dismiss": "Üzenet bezárása",
+  "editor.property.dragToChange": "Húzd balra vagy jobbra az érték módosításához",
   "export.drawing.label": "Rajz",
   "export.drawing.description": "Elöl-, felül- és jobb oldalnézet befoglaló méretekkel és a kör alakú furatok helyzetével, 1:1 méretarányban.",
   "export.drawing.note": "Letöltés SVG-ként vagy vektoros PDF-ként. A lap a tervhez igazodva nő; 100%-os / tényleges méretben nyomtasd. A furattáblázat a tengelyekkel párhuzamos kerek furatokat tartalmazza; a ferde furatok, menetek, mélységek és tűrések nincsenek automatikusan beméretezve.",

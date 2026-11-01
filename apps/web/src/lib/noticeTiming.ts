@@ -19,3 +19,17 @@ export function noticeDurationMs(message: string, patient = false) {
   const reading = NOTICE_LINGER_MS + Math.max(0, message.length - NOTICE_FREE_CHARACTERS) * NOTICE_MS_PER_CHARACTER;
   return Math.min(NOTICE_PATIENT_MS, Math.max(patient ? NOTICE_PATIENT_MS : NOTICE_LINGER_MS, reading));
 }
+
+/** How close a message and a step of the design must come, in milliseconds, for the message to report that step. */
+export const NOTICE_CHANGE_WINDOW_MS = 1000;
+
+/**
+ * Whether a message reports the step the design just took, so that it can offer to take it back: it came within a
+ * moment of the step, before or after, and the design still stands at that step (not undone, nothing done since).
+ */
+export function noticeReportsLastChange(noticeAt: number, lastChange: { at: number; index: number } | null, historyIndex: number) {
+  return lastChange !== null
+    && lastChange.index > 0
+    && lastChange.index === historyIndex
+    && Math.abs(noticeAt - lastChange.at) <= NOTICE_CHANGE_WINDOW_MS;
+}

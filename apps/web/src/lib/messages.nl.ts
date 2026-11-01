@@ -1680,6 +1680,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.exportUnionFailed": "Overlappende lichamen konden niet worden samengevoegd - ze staan los in het bestand",
   "status.exportSplinters": "Niet in het bestand gezet: {count} kleine losse stukjes die een snede had achtergelaten.",
   "status.dismiss": "Melding sluiten",
+  "editor.property.dragToChange": "Sleep naar links of rechts om de waarde te wijzigen",
   "export.drawing.label": "Tekening",
   "export.drawing.description": "Voor-, boven- en rechterzijaanzicht met buitenmaten en posities van ronde gaten, op 1:1.",
   "export.drawing.note": "Download als SVG of vector-PDF. Het blad groeit mee met het ontwerp; print op 100% / werkelijke grootte. De gatentabel bevat ronde boringen evenwijdig aan de assen; schuine gaten, schroefdraad, diepten en toleranties worden niet automatisch bemaat.",

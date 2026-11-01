@@ -1668,6 +1668,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "Les corps qui se chevauchent n'ont pas pu être fusionnés : ils se trouvent séparément dans le fichier.",
   "status.exportSplinters": "Non écrits dans le fichier : {count} minuscules morceaux détachés laissés par une coupe.",
   "status.dismiss": "Fermer le message",
+  "editor.property.dragToChange": "Faites glisser vers la gauche ou la droite pour changer la valeur",
   "export.drawing.label": "Dessin",
   "export.drawing.description": "Vues de face, de dessus et de droite avec dimensions globales et positions des trous circulaires, à l'échelle 1:1.",
   "export.drawing.note": "Téléchargez SVG ou PDF vectoriel. La feuille s'agrandit pour s'adapter au design ; imprimer à 100% / taille réelle. Les tables de perçage couvrent les alésages ronds alignés sur les axes ; Les trous coudés, les filetages, les profondeurs et les tolérances ne sont pas automatiquement dimensionnés.",

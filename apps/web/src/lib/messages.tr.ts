@@ -1409,6 +1409,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "Örtüşen gövdeler birleştirilemedi - dosyada ayrı ayrılar",
   "status.exportSplinters": "Dosyanın dışında bırakıldı: bir kesimin geride bıraktığı {count} küçük serbest parça.",
   "status.dismiss": "Mesajı kapat",
+  "editor.property.dragToChange": "Değeri değiştirmek için sola veya sağa sürükleyin",
   "export.drawing.label": "Teknik çizim",
   "export.drawing.description": "Genel ölçüler ve yuvarlak delik konumlarıyla ön, üst ve sağ yan görünüşler, 1:1.",
   "export.drawing.note": "SVG veya vektörel PDF indir. Sayfa tasarıma sığacak şekilde büyür; %100 / gerçek boyutta yazdır. Delik tabloları eksenlere paralel yuvarlak delikleri kapsar; açılı delikler, dişler, derinlikler ve toleranslar otomatik ölçülendirilmez.",

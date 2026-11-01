@@ -161,6 +161,7 @@ import { DEFAULT_TAPER_DIMENSION_MAX, keyboardNudgeCoarseFactor, keyboardNudgeSt
 import { MCP_GRIDFINITY_LIST_KEYS, mcpGridfinityListParams, mcpGridfinityPaddingPatch, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
 import { normalizeNotes, referencePoints } from "@/lib/workplaneNotes";
 import { notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
+import { noticeReportsLastChange } from "@/lib/noticeTiming";
 import { referencePointsForBox, unionReferenceBoxes, type ReferencePointSpot, type ReferencePosition } from "@/lib/referencePoints";
 import { normalizePlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFingerprint, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, horizontalPlacementWorkplane, translationToWorkplane, type PlacementPoint, REVOLVE_REFERENCE_WORKPLANE, revolveBodyStandsUpright, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { localizedError } from "@/lib/userErrors";
@@ -3016,7 +3017,7 @@ export function LayerlingEditor({
   const [scalePercentTool, setScalePercentTool] = useState<ScalePercentSettings | null>(null);
   const [scalePercentError, setScalePercentError] = useState<string | null>(null);
   const editorLanguage = useLanguage();
-  const { notice, noticeAction, setNotice, holdNotice, releaseNotice, dismissNotice, reportNoticesRef } = useEditorNotice();
+  const { notice, noticeAction, noticeAt, setNotice, holdNotice, releaseNotice, dismissNotice, reportNoticesRef } = useEditorNotice();
   // Cuts and splits run in a worker (lib/geometryWorker.ts): one that takes a moment says so, and
   // the editor stays usable meanwhile. Leaving the editor calls off what it still had running.
   const geometryAbortRef = useRef<AbortController | null>(null);
@@ -4415,6 +4416,8 @@ export function LayerlingEditor({
     if (limitChanged) syncProjectShapes(shapesRef.current, true);
   }, [syncProjectShapes, workspaceSettings.historyLimit]);
 
+  // The step the design last took, and when: a message that comes with it offers to take it back (see the status message).
+  const lastHistoryChangeRef = useRef<{ at: number; index: number } | null>(null);
   const appendHistoryEntry = useCallback((entry: EditorHistoryEntry, replaceCurrent = false) => {
     openGroupHistoryRef.current.set(entry.fingerprint, openGroupsRef.current);
     const result = appendEditorHistorySnapshot(
@@ -4431,6 +4434,7 @@ export function LayerlingEditor({
     }
     historyIndexRef.current = result.index;
     setHistoryIndex(result.index);
+    if (result.changed) lastHistoryChangeRef.current = { at: performance.now(), index: result.index };
     return result.changed;
   }, []);
 
@@ -15486,6 +15490,18 @@ export function LayerlingEditor({
       {notice ? (
         <p className="editor-status" role="status" aria-live="polite" onMouseEnter={holdNotice} onMouseLeave={releaseNotice}>
           <span className="editor-status-text">{notice}</span>
+          {!noticeAction && noticeReportsLastChange(noticeAt, lastHistoryChangeRef.current, historyIndex) ? (
+            <button
+              className="editor-status-action"
+              type="button"
+              onClick={() => {
+                dismissNotice();
+                undo();
+              }}
+            >
+              {t("shortcuts.undo")}
+            </button>
+          ) : null}
           {noticeAction ? (
             <button
               className="editor-status-action"

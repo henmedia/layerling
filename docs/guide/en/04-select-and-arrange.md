@@ -169,7 +169,7 @@ The percentage field has the focus when the window opens, so from the keyboard i
 
 ## Undoing
 
-{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) and {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] or [[Ctrl]]+[[Y]]) step through your history. How many steps travel with the saved design you set in the settings under {{ui:workspace.history}}. Point at either button and its tooltip names the step it would take back or bring again, with the measure where the step has one, such as "Rounded the edges of Box (5 mm)" or "Moved 3 objects (12 mm)"; the message after the step says the same. To go back several steps at once, use the history view below.
+{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) and {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] or [[Ctrl]]+[[Y]]) step through your history. How many steps travel with the saved design you set in the settings under {{ui:workspace.history}}. Point at either button and its tooltip names the step it would take back or bring again, with the measure where the step has one, such as "Rounded the edges of Box (5 mm)" or "Moved 3 objects (12 mm)"; the message after the step says the same. To go back several steps at once, use the history view below. A message that reports a step just taken, such as "3 shapes deleted", has an Undo button that takes exactly that step back.
 
 ## Looking back: the history view
 

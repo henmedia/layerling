@@ -8,5 +8,15 @@
       "de": "Bei den Flexi-Gelenken wählst du jetzt, wie sich die Glieder bewegen: zur Seite wie bisher oder auf und ab. Auf und ab gibt Streifen wie bei einem Flexi-Schlüsselanhänger, einem Ei oder einem Armband: An jedem Schnitt entsteht ein flaches Scharnier, das gleich mitgedruckt wird.",
       "en": "Flexi joints now let you choose how the links move: to the sides as before, or up and down. Up and down gives bands like a flexi keychain, an egg or a bracelet: every cut gets a flat hinge that is printed in place."
     }
+  },
+  {
+    "title": {
+      "de": "Werte ziehen, Schritte gleich zurücknehmen",
+      "en": "Drag values, undo right away"
+    },
+    "body": {
+      "de": "In den Eigenschaften änderst du einen Wert, indem du seinen Namen, etwa „Breite“, nach links oder rechts ziehst. Und eine Meldung über einen gerade gemachten Schritt, etwa „3 Formen gelöscht“, hat jetzt einen Knopf „Rückgängig“.",
+      "en": "In the properties panel you change a value by dragging its name, such as \"Width\", left or right. And a message about a step just taken, such as \"3 shapes deleted\", now has an Undo button."
+    }
   }
 ]

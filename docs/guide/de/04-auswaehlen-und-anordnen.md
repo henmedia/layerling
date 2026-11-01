@@ -169,7 +169,7 @@ Das Prozentfeld hat beim Öffnen den Fokus, mit der Tastatur geht es also so: [[
 
 ## Rückgängig machen
 
-{{ui:editor.tool.undo}} ([[Strg]]+[[Z]]) und {{ui:editor.tool.redo}} ([[Strg]]+[[Umschalt]]+[[Z]] oder [[Strg]]+[[Y]]) gehen Schritt für Schritt durch deinen Verlauf. Wie viele Schritte mit dem gespeicherten Entwurf mitreisen, stellst du in den Einstellungen unter {{ui:workspace.history}} ein. Zeigst du auf einen der beiden Knöpfe, nennt sein Tooltip den Schritt, den er zurücknimmt oder wiederholt, mit dem Maß, wo der Schritt eins hat, etwa „Kanten von Box gerundet (5 mm)“ oder „3 Objekte verschoben (12 mm)“; die Meldung danach sagt dasselbe. Um mehrere Schritte auf einmal zurückzugehen, nimm die Verlaufsansicht weiter unten.
+{{ui:editor.tool.undo}} ([[Strg]]+[[Z]]) und {{ui:editor.tool.redo}} ([[Strg]]+[[Umschalt]]+[[Z]] oder [[Strg]]+[[Y]]) gehen Schritt für Schritt durch deinen Verlauf. Wie viele Schritte mit dem gespeicherten Entwurf mitreisen, stellst du in den Einstellungen unter {{ui:workspace.history}} ein. Zeigst du auf einen der beiden Knöpfe, nennt sein Tooltip den Schritt, den er zurücknimmt oder wiederholt, mit dem Maß, wo der Schritt eins hat, etwa „Kanten von Box gerundet (5 mm)“ oder „3 Objekte verschoben (12 mm)“; die Meldung danach sagt dasselbe. Um mehrere Schritte auf einmal zurückzugehen, nimm die Verlaufsansicht weiter unten. Eine Meldung, die einen gerade gemachten Schritt meldet, etwa „3 Formen gelöscht“, hat einen Knopf „Rückgängig“, der genau diesen Schritt zurücknimmt.
 
 ## Zurückschauen: die Verlaufsansicht
 

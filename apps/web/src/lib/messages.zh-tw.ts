@@ -1618,6 +1618,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.exportUnionFailed": "無法合併重疊的實體，它們在檔案中分別存在。",
   "status.exportSplinters": "未寫入檔案：切割留下的 {count} 個細小碎片。",
   "status.dismiss": "關閉訊息",
+  "editor.property.dragToChange": "向左或向右拖曳以變更數值",
   "export.drawing.label": "工程圖",
   "export.drawing.description": "前視圖、俯視圖與右側視圖，標註整體尺寸與圓孔位置，比例 1:1。",
   "export.drawing.note": "下載 SVG 或向量 PDF。圖紙會自動擴充以容納設計；請以 100% / 實際大小列印。孔表僅涵蓋與座標軸對齊的圓孔；斜孔、螺紋、深度與公差不會自動標註。",

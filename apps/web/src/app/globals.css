@@ -9420,6 +9420,17 @@ html[data-theme="dark"] .rotation-angle-badge {
   white-space: nowrap;
 }
 
+/* Dragging the name changes the value; the panel still scrolls up and down under a finger. */
+.range-property-name.scrubbable {
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.range-property-name.scrubbable .property-reset {
+  cursor: pointer;
+}
+
 .property-reset {
   display: inline-grid;
   width: 18px;

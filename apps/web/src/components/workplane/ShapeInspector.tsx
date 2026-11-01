@@ -6,7 +6,7 @@ import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
 import { ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Split, Tags, Unlock, Waves } from "lucide-react";
 import { createPortal } from "react-dom";
-import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
   DEFAULT_GEAR_HELIX_ANGLE,
   DEFAULT_GEAR_HELIX_QUALITY,
@@ -6532,6 +6532,10 @@ function CustomColorInput({ color, disabled, onCommit, onInteractionActiveChange
   );
 }
 
+/** How far the name of a value is dragged before it changes the value, and how many pixels make one step of the wheel. */
+const SCRUB_START_PX = 3;
+const SCRUB_PX_PER_STEP = 4;
+
 function RangeProperty({
   id,
   label,
@@ -6609,6 +6613,28 @@ function RangeProperty({
   const numberInputRef = useRef<HTMLInputElement>(null);
   const keepSelectedRef = useRef(false);
   const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
+  // The wheel stops at the field's lower limit, also for the figure shown: it went on below it, into negative sizes, which the body
+  // then kept at the limit and the field showed again as 0.01 only when it was left (#576, prmod3d). Returns the figure to show.
+  const setSteppedValue = (turned: number) => {
+    const next = freePosition ? turned : Math.max(turned, controlMin);
+    const nextModelValue = toModelValue(next);
+    onChange(freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
+    return formatShown(freePosition || allowsAboveSliderMax ? next : clamp(next, controlMin, controlMax));
+  };
+  // Dragging the field's name to the left or right changes the value, as in Blender or Figma: a wheel notch for every few pixels,
+  // with the same keys as the wheel. A drag that moved does not then put the cursor into the field, as a click on the name does.
+  const scrubRef = useRef<{ x: number; start: number; moved: boolean } | null>(null);
+  const scrubbedRef = useRef(false);
+  const scrubbable = !disabled && !editing;
+  const endScrub = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    const scrub = scrubRef.current;
+    if (!scrub) return;
+    scrubRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (!scrub.moved) return;
+    scrubbedRef.current = true;
+    holdInteraction(false);
+  };
   // Up and Down in the focused field do the same as the wheel: one step, Shift a larger one, Alt a finer one (#749, MartinShake).
   // In a size or position field Shift steps by the snap grid; with the grid off it stays ten steps.
   const stepFieldValue = (direction: 1 | -1, modifiers: { shift: boolean; ctrl: boolean; alt: boolean }) => {
@@ -6616,13 +6642,7 @@ function RangeProperty({
     const parsed = parseMeasurementInput(draft);
     const current = Number.isFinite(parsed) ? parsed : controlValue;
     const shiftStep = isLength && snapStepMm > 0 ? millimetersToDisplay(snapStepMm, workspace) : undefined;
-    const turned = wheelNextValue(current, direction, base, modifiers, shiftStep);
-    // The wheel stops at the field's lower limit, also for the figure shown: it went on below it, into negative sizes, which the body
-    // then kept at the limit and the field showed again as 0.01 only when it was left (#576, prmod3d).
-    const next = freePosition ? turned : Math.max(turned, controlMin);
-    const nextModelValue = toModelValue(next);
-    onChange(freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
-    const shown = formatShown(freePosition || allowsAboveSliderMax ? next : clamp(next, controlMin, controlMax));
+    const shown = setSteppedValue(wheelNextValue(current, direction, base, modifiers, shiftStep));
     // What is shown is the new starting point, so leaving the field keeps the exact value and does not read it again.
     openedWithRef.current = shown;
     setDraft(shown);
@@ -6699,7 +6719,36 @@ function RangeProperty({
   const row = (
     <label className="range-property" style={{ "--slider-pos": `${position}%` } as CSSProperties}>
       <span className="range-property-header">
-        <span className="range-property-name">{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
+        <span
+          className={`range-property-name${scrubbable ? " scrubbable" : ""}`}
+          title={scrubbable ? t("editor.property.dragToChange") : undefined}
+          onPointerDown={(event) => {
+            if (!scrubbable || event.button !== 0 || (event.target as HTMLElement).closest("button")) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            scrubRef.current = { x: event.clientX, start: controlValue, moved: false };
+          }}
+          onPointerMove={(event) => {
+            const scrub = scrubRef.current;
+            if (!scrub) return;
+            const dx = event.clientX - scrub.x;
+            if (!scrub.moved) {
+              if (Math.abs(dx) < SCRUB_START_PX) return;
+              scrub.moved = true;
+              holdInteraction(true);
+            }
+            const base = wheelBaseStep(controlMin, controlMax, controlStep, unit === "in");
+            const shiftStep = isLength && snapStepMm > 0 ? millimetersToDisplay(snapStepMm, workspace) : undefined;
+            const notches = Math.trunc(dx / SCRUB_PX_PER_STEP);
+            setSteppedValue(wheelNextValue(scrub.start, notches, base, { shift: event.shiftKey, ctrl: event.ctrlKey, alt: event.altKey }, shiftStep));
+          }}
+          onPointerUp={endScrub}
+          onPointerCancel={endScrub}
+          onClick={(event) => {
+            if (!scrubbedRef.current) return;
+            scrubbedRef.current = false;
+            event.preventDefault();
+          }}
+        >{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
         <span className="range-value-control">
           <input
             ref={numberInputRef}
