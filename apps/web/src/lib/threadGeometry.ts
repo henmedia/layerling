@@ -285,6 +285,23 @@ const BOTTLE_SIZES: readonly ThreadSizeSpec[] = [
     depth: 1.6,
     flankAngle: 30,
   },
+  /**
+   * Der Auslauf von IBC-Containern (Discussion #1094): S60x6, Zeile KS 60 der DIN 6063-1 -
+   * eingaengig, 6 mm Steigung, aussen 60 mm, Kern 54 mm, also 3 mm tief, mit 30 Grad
+   * zwischen den Flanken. Die Norm zeichnet das Profil ungleichseitig (eine Flanke etwa
+   * 10 Grad aus der Senkrechten, die andere dann 20); das eigene Profil hat zwei gleiche
+   * Flanken, trifft Tiefe und Winkel und passt mit etwas Spiel.
+   */
+  {
+    id: "S60x6 (IBC)",
+    system: "bottle",
+    diameter: 60,
+    pitch: 6,
+    ...proportionalHeadSizes(60),
+    profile: "custom",
+    depth: 3,
+    flankAngle: 30,
+  },
 ];
 
 /** Die Reihen im Groessenmenue: metrisches Regelgewinde, Zoll grob und fein, Rohrgewinde G, Flaschenhaelse. */

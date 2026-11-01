@@ -36,7 +36,7 @@ export const threadSizeNames = [
   "#4-48 UNF", "#6-40 UNF", "#8-36 UNF", "#10-32 UNF", "1/4\"-28 UNF", "5/16\"-24 UNF", "3/8\"-24 UNF", "7/16\"-20 UNF", "1/2\"-20 UNF", "5/8\"-18 UNF", "3/4\"-16 UNF", "1\"-12 UNF",
   "G1/16", "G1/8", "G1/4", "G3/8", "G1/2", "G5/8", "G3/4", "G7/8", "G1", "G1 1/8", "G1 1/4", "G1 1/2", "G1 3/4",
   "G2", "G2 1/4", "G2 1/2", "G2 3/4", "G3", "G3 1/2", "G4",
-  "PCO 1881",
+  "PCO 1881", "S60x6 (IBC)",
 ];
 
 /**
@@ -49,7 +49,7 @@ export const threadSizeSetting = {
   threadSize: {
     type: "string",
     enum: threadSizeNames,
-    description: "Thread only: a standard size by name, as the editor's size menu lists it. Sets threadDiameter and threadPitch; if those come along (as in a settings block read back), they must match the size. A G size is a Whitworth pipe thread (BSPP, ISO 228-1, for fittings, water, gas, hydraulics and pneumatics): G1/2 is 20.955 mm with 14 threads per inch. It switches a v profile to whitworth, and an M, UNC or UNF size switches whitworth back to v; trapezoidal and round stay, and a threadProfile in the same call wins. PCO 1881 is the 28 mm neck of most water and soda bottles (27.4 mm, pitch 2.7): it sets the custom profile with threadDepth 1.6 and threadFlankAngle 30 unless the call gives them; the neck is a rod, the cap a nut or bore.",
+    description: "Thread only: a standard size by name, as the editor's size menu lists it. Sets threadDiameter and threadPitch; if those come along (as in a settings block read back), they must match the size. A G size is a Whitworth pipe thread (BSPP, ISO 228-1, for fittings, water, gas, hydraulics and pneumatics): G1/2 is 20.955 mm with 14 threads per inch. It switches a v profile to whitworth, and an M, UNC or UNF size switches whitworth back to v; trapezoidal and round stay, and a threadProfile in the same call wins. PCO 1881 is the 28 mm neck of most water and soda bottles (27.4 mm, pitch 2.7): it sets the custom profile with threadDepth 1.6 and threadFlankAngle 30 unless the call gives them; the neck is a rod, the cap a nut or bore. S60x6 (IBC) is the outlet thread of IBC containers (DIN 6063-1, KS 60: 60 mm, pitch 6, core 54): it sets the custom profile with threadDepth 3 and threadFlankAngle 30 the same way.",
   },
 };
 

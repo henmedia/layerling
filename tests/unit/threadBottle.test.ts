@@ -38,7 +38,7 @@ describe("PCO 1881 bottle neck", () => {
 
   it("is its own series at the end of the size menu, with the neck's measures", () => {
     expect(THREAD_SIZE_GROUPS.at(-1)?.series).toBe("bottle");
-    expect(THREAD_SIZE_GROUPS.at(-1)?.sizes.map((size) => size.id)).toEqual(["PCO 1881"]);
+    expect(THREAD_SIZE_GROUPS.at(-1)?.sizes.map((size) => size.id)).toEqual(["PCO 1881", "S60x6 (IBC)"]);
     expect(pco.system).toBe("bottle");
     expect(pco.diameter).toBe(27.4);
     expect(pco.pitch).toBe(2.7);
@@ -79,6 +79,35 @@ describe("PCO 1881 bottle neck", () => {
     expect(settings.flankAngle).toBe(30);
     const footprint = threadNaturalFootprint(settings);
     const built = createThreadGeometry({ ...fields, width: footprint.width, depth: footprint.depth, height: 12 });
+    const position = built.getAttribute("position") as unknown as Position;
+    expect(position.count).toBeGreaterThan(1000);
+    expect(openOrDoubledEdges(position)).toBe(0);
+  });
+});
+
+describe("S60x6 IBC outlet (Discussion #1094)", () => {
+  const ibc = threadSizeById("S60x6 (IBC)")!;
+
+  it("has the measures of line KS 60 in DIN 6063-1", () => {
+    expect(ibc.system).toBe("bottle");
+    expect(ibc.diameter).toBe(60);
+    expect(ibc.pitch).toBe(6);
+    // Core 54 mm: 3 mm deep, 30 degrees between the flanks.
+    expect(ibc.diameter - 2 * ibc.depth!).toBeCloseTo(54, 9);
+    expect(ibc.flankAngle).toBe(30);
+    expect(threadSizeFor(60, 6)?.id).toBe("S60x6 (IBC)");
+  });
+
+  it("brings its own profile along and comes through the MCP bridge", () => {
+    expect(threadSizeSettings(ibc, "v", null)).toEqual({ diameter: 60, pitch: 6, profile: "custom", depth: 3, flankAngle: 30 });
+    expect(mcpThreadSizeParams({ threadSize: "S60x6 (IBC)" }, "v")).toMatchObject({ threadDiameter: 60, threadPitch: 6, threadProfile: "custom", threadDepth: 3, threadFlankAngle: 30 });
+    expect(mcpThreadSizeName({ kind: "thread", threadDiameter: 60, threadPitch: 6 })).toBe("S60x6 (IBC)");
+  });
+
+  it.each(["rod", "nut", "bore"] as const)("builds a closed %s", (role: ThreadRole) => {
+    const fields = { threadRole: role, threadDiameter: 60, threadPitch: 6, threadProfile: "custom", threadDepth: 3, threadFlankAngle: 30 } as const;
+    const footprint = threadNaturalFootprint(threadSettings(fields));
+    const built = createThreadGeometry({ ...fields, width: footprint.width, depth: footprint.depth, height: 24 });
     const position = built.getAttribute("position") as unknown as Position;
     expect(position.count).toBeGreaterThan(1000);
     expect(openOrDoubledEdges(position)).toBe(0);
