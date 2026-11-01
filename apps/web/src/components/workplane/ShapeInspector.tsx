@@ -5478,6 +5478,8 @@ export function SurfaceTextureCard({
   // A further layer needs faces of its own; the first, picking none, takes the faces the others leave.
   const layerWithoutFaces = layers.findIndex((layer, index) => index > 0 && !surfaceTextureLayerPlaced(layer));
   const needsFaces = shownLayer > 0 && !surfaceTextureLayerPlaced(settings);
+  // What the body carries, every layer's pattern: "Bricks + Knurling".
+  const appliedPatterns = applied ? [applied.pattern, ...(shape.surfaceTextureLayers ?? []).map((layer) => layer.pattern)].map(surfacePatternLabel).join(" + ") : "";
   // A texture that keeps the body under it shows its settings to change; one that does not only says what it is.
   const changeable = Boolean(applied && onRemove && surfaceTextureEntry(shape));
   const options = <T extends string>(values: readonly T[], label: (value: T) => string) => values.map((value) => ({ value, label: label(value) }));
@@ -5554,7 +5556,7 @@ export function SurfaceTextureCard({
         <div className="property-list cylinder-wrap-body" id={`surface-texture-${shape.id}`}>
           {applied && !changeable ? (
             <p className="cylinder-wrap-hint">
-              {t("inspector.surfaceApplied", { pattern: surfacePatternLabel(applied.pattern) })}
+              {t("inspector.surfaceApplied", { pattern: appliedPatterns })}
               <GuideHelpLink section="surfaceTexture" className="inspector-help-link" />
             </p>
           ) : (
@@ -6014,7 +6016,7 @@ export function SurfaceTextureCard({
                 </>
               ) : null}
               <p className="cylinder-wrap-hint">
-                {applied ? t("inspector.surfaceChangeHint", { pattern: surfacePatternLabel(applied.pattern) }) : t("inspector.surfaceHint")}
+                {applied ? t("inspector.surfaceChangeHint", { pattern: appliedPatterns }) : t("inspector.surfaceHint")}
                 <GuideHelpLink section="surfaceTexture" className="inspector-help-link" />
               </p>
               {layerWithoutFaces > 0 ? (

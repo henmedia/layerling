@@ -263,6 +263,7 @@ describe("the surface texture card in a shape's settings", () => {
     const { panel } = mount(textured);
     const tabs = () => [...card(panel).querySelectorAll<HTMLButtonElement>(".surface-layers [role=tab]")];
     expect(tabs().map((tab) => tab.textContent)).toEqual(["1Grooves", "2Knurling"]);
+    expect(card(panel).textContent).toContain("Grooves + Knurling");
     act(() => tabs()[1].click());
     expect(card(panel).textContent).toContain("Picked faces: 1. Only they get the pattern.");
     act(() => button(panel, "Remove this layer")!.click());
