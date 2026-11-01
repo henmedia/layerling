@@ -142,7 +142,7 @@ import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE } from "@/li
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
-import { PORT_PRESET_ORDER, PORT_PRESETS, type PortPreset } from "@/lib/portGeometry";
+import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { exportMeshesToStl } from "@/lib/stlExport";
@@ -10430,7 +10430,9 @@ export function LayerlingEditor({
         // Nur was ausdruecklich verlangt wurde: sonst gilt das Mass, mit dem der
         // Katalog diese Form auch von Hand auf die Ebene legt.
         // A port opening named by its socket takes that socket's opening, unless a size is given as well (#1049).
-        const portPreset = kind === "port" && typeof params.portPreset === "string" ? PORT_PRESETS[params.portPreset as PortPreset] : undefined;
+        // Extra room (portClearance) grows the socket's opening on every side, as the inspector does.
+        const portPreset = kind === "port" && typeof params.portPreset === "string" && PORT_PRESETS[params.portPreset as PortPreset]
+          ? portPresetSize(params.portPreset as PortPreset, params.portClearance) : undefined;
         if (kind === "port" && params.portPreset !== undefined && !portPreset) throw new Error(`portPreset must be one of ${PORT_PRESET_ORDER.join(", ")}`);
         // A tube named by a screw size is that size's washer (ISO 7089, #1052), unless a measure is given as well.
         const washer = kind === "tube" && isWasherSize(params.washer) ? washerTubeFields(params.washer) : undefined;

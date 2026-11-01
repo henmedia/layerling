@@ -1817,6 +1817,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (kind === "port" && definition.portProfile !== undefined && !PORT_PROFILES.includes(definition.portProfile as PortProfile)) {
     throw new Error(`${label}.portProfile is not supported`);
   }
+  if (kind === "port" && definition.portClearance !== undefined) {
+    const portClearance = finiteNumber(definition.portClearance, `${label}.portClearance`);
+    if (portClearance < 0 || portClearance > 2) throw new Error(`${label}.portClearance is outside the supported range`);
+  }
   if (kind === "port" && definition.cornerFillet !== undefined) {
     const cornerFillet = finiteNumber(definition.cornerFillet, `${label}.cornerFillet`);
     if (cornerFillet < 0 || cornerFillet > 1e6) throw new Error(`${label}.cornerFillet is outside the supported range`);
