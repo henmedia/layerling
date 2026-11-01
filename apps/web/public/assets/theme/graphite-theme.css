@@ -2971,6 +2971,105 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .inspector-bundle-note 
   color: #606060;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-status {
+  color: #505050;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-stale {
+  color: #8a4a00;
+  background: #f0f0f0;
+  border: 1px solid #f0b46a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row {
+  color: #2d2d2d;
+  background: #f7f7f7;
+  border: 1px solid #e2e2e2;
+  border-left: 4px solid #828282;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row svg {
+  color: #828282;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row-text span {
+  color: #5c5c5c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.overlap,
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.touching {
+  border-left-color: #d93a3f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.overlap svg,
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.touching svg {
+  color: #d93a3f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.tight {
+  border-left-color: #e8851a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.tight svg {
+  color: #e8851a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.fine {
+  border-left-color: #2f9e5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.fine svg {
+  color: #2f9e5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.active {
+  background: #efefef;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-row.active {
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-hint {
+  color: #656565;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-line {
+  stroke: #e8851a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-point {
+  fill: #e8851a;
+  stroke: #fff;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-ring {
+  fill: none;
+  stroke: #e8851a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.overlap .clearance-mark-line,
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.touching .clearance-mark-line,
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.overlap .clearance-mark-ring,
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.touching .clearance-mark-ring {
+  stroke: #d93a3f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.overlap .clearance-mark-point,
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.touching .clearance-mark-point {
+  fill: #d93a3f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.fine .clearance-mark-line,
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.fine .clearance-mark-ring {
+  stroke: #2f9e5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-overlay.fine .clearance-mark-point {
+  fill: #2f9e5b;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .section-measure-outline {
   stroke: #1677c8;
 }
@@ -5482,6 +5581,46 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-opening-options 
   color: #ffb866;
   background: #353535;
   border-color: #c7772a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-status {
+  color: #bebebe;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-stale {
+  color: #ffc78a;
+  background: #2b2b2b;
+  border-color: #a8601f;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row {
+  color: #dbdbdb;
+  background: #292929;
+  border-color: #434343;
+  border-left-color: #6c6c6c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row-text span,
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-hint {
+  color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row.overlap,
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row.touching {
+  border-left-color: #ef5b60;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row.tight {
+  border-left-color: #f39a3a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row.fine {
+  border-left-color: #4cbf7b;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row:hover:not(:disabled),
+html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row.active {
+  background: #343434;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-history-actions {

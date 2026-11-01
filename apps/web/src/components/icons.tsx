@@ -1,4 +1,4 @@
-import { Blend } from "lucide-react";
+import { Blend, SearchCheck } from "lucide-react";
 import type { CSSProperties, SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement>;
@@ -119,6 +119,11 @@ export function ToolbarLoftSketchesIcon(props: IconProps) {
 // bare theme colour alone left it looking live on the dark grounds.
 export function ToolbarIntersectPreviewIcon({ className, ...props }: IconProps) {
   return <Blend className={["toolbar-vector-art-icon", className].filter(Boolean).join(" ")} {...props} />;
+}
+
+/** The clearance check: two parts with the gap between them measured. */
+export function ToolbarClearanceIcon({ className, ...props }: IconProps) {
+  return <SearchCheck className={["toolbar-vector-art-icon", className].filter(Boolean).join(" ")} {...props} />;
 }
 
 export function ToolbarAlignIcon(props: IconProps) {

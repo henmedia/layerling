@@ -1470,6 +1470,20 @@ export const tools = [
     },
   },
   {
+    name: "layerling_check_clearance",
+    description: "Check clearance before printing, as the editor's Check clearance does: which bodies overlap (with the common volume), touch, or come closer than `threshold`, measured on the triangle meshes. Takes ids, else the selection, else every visible body, as an export does. With splitParts (default true) the separate parts of one object, a flexi toy or a hinge printed in place, are checked against each other. Changes nothing. Returns parts, overlaps, touching, near (gaps within searchLength, narrowest first, with tooTight and direction), clearCount and unchecked.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" }, description: "Objects to check against each other. Left out: the selection, or every visible object." },
+        threshold: { type: "number", minimum: 0.01, maximum: 5, description: "Minimum gap in mm; a gap below it is tooTight. Default 0.3 (0.4 is usual for print in place)." },
+        splitParts: { type: "boolean", description: "Check the separate parts of one object against each other. Default true." },
+        searchLength: { type: "number", minimum: 0.1, maximum: 100, description: "Gaps up to this many mm are measured and listed in `near`; pairs further apart only count in clearCount. Default 5." },
+      },
+    },
+  },
+  {
     name: "layerling_add_reference_points",
     description: "Mark reference points - bare marks in space that shapes snap to when they are dragged, like pencil marks and layout points in a workshop. They are not part of any body, are never printed or exported, and are saved with the design. Mark the centre, the four corners or the four edge middles of objects (on their top face), or pass exact positions with `points`. Points already marked are not added twice. Returns the new points with their ids; shapes can then be placed on them with layerling_update_object.",
     inputSchema: {

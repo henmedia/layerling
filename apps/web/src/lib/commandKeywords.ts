@@ -28,6 +28,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   loftSketches: ["loft", "transition", "two sketches", "two svgs", "blend", "uebergang", "übergang", "zwei skizzen", "skizzen verbinden", "trichter", "funnel"],
   hull: ["hull", "convex hull", "shrink wrap", "wrap", "hülle", "konvexe hülle", "schrumpffolie", "umhüllen"],
   "intersect-preview": ["preview", "common", "overlap", "venn", "vorschau", "gemeinsam", "gemeinsames", "ueberlappung", "schnittmenge"],
+  "clearance-check": ["clearance", "collision", "interference", "gap", "fit", "tolerance", "print in place", "too tight", "fused", "spiel", "passung", "kollision", "abstand", "spalt", "toleranz", "klemmt", "verklebt", "zu eng", "verschmolzen"],
   align: ["align", "ausrichten", "buendig", "bündig", "mitte", "center"],
   mirror: ["mirror", "flip", "spiegeln", "spiegelung"],
   pivot: ["pivot", "rotation point", "drehpunkt", "drehen", "rotate"],
