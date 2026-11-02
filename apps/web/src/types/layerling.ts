@@ -45,7 +45,7 @@ export type ShapeKind =
   | "mesh";
 
 /** Outline of a port opening (portGeometry.ts): rounded corners, or the lower corners cut as on these sockets. */
-export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort";
+export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort" | "xt60" | "xt30" | "mt60" | "dsub9";
 
 /** Cross-section of a bent tube; the inner one may also be "none" for a solid tube. */
 export type BentTubeProfile = "round" | "square" | "hexagon" | "octagon";

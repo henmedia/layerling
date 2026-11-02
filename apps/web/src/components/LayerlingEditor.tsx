@@ -32,6 +32,7 @@ import { IconTagPanel } from "@/components/workplane/IconTagPanel";
 import { QrCodePanel } from "@/components/workplane/QrCodePanel";
 import { qrCodeOf, qrCodeShape, regeneratedQrCodeShape } from "@/lib/editorQrCode";
 import { regeneratedSbcBoardShape, sbcBoardOf, sbcBoardShape } from "@/lib/editorSbcBoard";
+import { portWithScrewHolesGroup } from "@/lib/editorPortScrewHoles";
 import { DEFAULT_SBC_BOARD, MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { DEFAULT_QR_WIDTH, MAX_QR_HEIGHT, MAX_QR_WIDTH, MIN_QR_HEIGHT, MIN_QR_WIDTH, QR_BYTE_CAPACITY, QR_ERROR_CORRECTIONS, QR_STYLES, normalizeQrSettings, qrByteLength, qrMatrix, qrModuleSize, qrModuleTooSmall, qrTextFits, type QrCodeSettings, type QrErrorCorrection, type QrStyle } from "@/lib/qrCode";
 import { iconSourceFromFile, PICTURE_FILE_ACCEPT, picturePixels, type IconSource } from "@/lib/pictureIcon";
@@ -9461,6 +9462,18 @@ export function LayerlingEditor({
   }, [refuseLockedSelection, commitShapes, selectedIds, selectedShapes, activeRotationPivot]);
 
   /**
+   * A socket with screw holes (D-Sub 9) chosen for an opening: the opening takes it, and it and its
+   * two screw holes become one group in its place, selected, in one step to undo.
+   */
+  const choosePortPresetWithScrewHoles = useCallback((patch: Partial<WorkplaneShape>) => {
+    const port = selectedShapes.length === 1 ? selectedShape : null;
+    if (!port || port.locked || !shapesRef.current.some((shape) => shape.id === port.id)) return;
+    const group = portWithScrewHolesGroup(canonicalizeShape({ ...port, ...patch }));
+    if (!group) return;
+    commitShapes(shapesRef.current.map((shape) => (shape.id === port.id ? group : shape)), group.id, t("status.portScrewHolesAdded"));
+  }, [commitShapes, selectedShape, selectedShapes.length]);
+
+  /**
    * A key ring tab of its own (#598) fixed to the nearest tag in one click, where it was put: the
    * tag is built again with its hole there - the ear on the bottom layer, the hole through every
    * layer - and the tab is gone. "Free" brings it out again.
@@ -11045,6 +11058,13 @@ export function LayerlingEditor({
         const ownFont = shape.kind === "text" && typeof params.font === "string" ? mcpTextFont(params.font) : null;
         if (ownFont && isCustomFontId(ownFont)) shape = canonicalizeShape({ ...shape, font: ownFont });
         const committedShape = canonicalizeShape(bakeShapeTransformIntoMesh(shape));
+        // A D-Sub opening comes grouped with its two screw holes, as the editor's socket list makes it; portScrewHoles false leaves them out.
+        const withScrewHoles = committedShape.kind === "port" && params.portScrewHoles !== false ? portWithScrewHolesGroup(committedShape) : null;
+        if (committedShape.kind === "port" && params.portScrewHoles === true && !withScrewHoles) throw new Error("portScrewHoles needs a port opening whose socket has screw holes (portPreset dsub9)");
+        if (withScrewHoles) {
+          commitShapes([...currentShapes(), withScrewHoles], withScrewHoles.id, t("status.shapeAddedMcp", { name: displayShapeName(withScrewHoles) }));
+          return { object: mcpShapeSummary(withScrewHoles) };
+        }
         commitShapes([...currentShapes(), committedShape], committedShape.id, t("status.shapeAddedMcp", { name: displayShapeName(committedShape) }));
         if (committedShape.kind === "vase" && params.vaseParts === true) {
           const { parts, missing } = layOutVaseAccessories(committedShape.id);
@@ -15513,6 +15533,7 @@ export function LayerlingEditor({
           onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
           onTextTags={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? makeTextTags : undefined}
           onFixKeyringTab={selectedShapes.length === 1 && selectedShape?.keyringTab && !historyViewState ? () => void fixKeyringTab() : undefined}
+          onPortPresetWithScrewHoles={selectedShapes.length === 1 && selectedShape?.kind === "port" && !historyViewState ? choosePortPresetWithScrewHoles : undefined}
           textLayerStack={selectedNameTag}
           iconTag={historyViewState ? null : iconTagControls}
           qrCode={historyViewState ? null : qrCodeControls}

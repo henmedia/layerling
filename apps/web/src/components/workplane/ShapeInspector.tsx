@@ -399,6 +399,7 @@ const GEAR_TYPE_OPTIONS: Array<{ value: GearType; label: MessageKey }> = [
 const PORT_PRESET_LABELS: Record<PortPreset, MessageKey> = {
   usbC: "port.usbC", usbCPlug: "port.usbCPlug", microUsb: "port.microUsb", usbA: "port.usbA",
   hdmi: "port.hdmi", miniHdmi: "port.miniHdmi", microHdmi: "port.microHdmi", displayPort: "port.displayPort", miniDisplayPort: "port.miniDisplayPort", rj45: "port.rj45",
+  xt30: "port.xt30", xt60: "port.xt60", mt60: "port.mt60", mpx: "port.mpx", dsub9: "port.dsub9",
 };
 
 const VASE_CHOICES: Partial<Record<VaseChoiceKey, Record<string, MessageKey>>> = {
@@ -651,7 +652,12 @@ function torusSideProperties(
 }
 
 /** What the panel shows of a body that only the panel keeps: which section of a loft (#1034) its rows are about. */
-type ShapePropertyView = { loftSection: number; setLoftSection: (index: number) => void };
+type ShapePropertyView = {
+  loftSection: number;
+  setLoftSection: (index: number) => void;
+  /** Sets a socket that has screw holes (D-Sub 9) on the opening and groups it with them, where the editor can. */
+  portPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void;
+};
 const NO_PROPERTY_VIEW: ShapePropertyView = { loftSection: 0, setLoftSection: () => undefined };
 
 function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate, textWidthMax = 260, view: ShapePropertyView = NO_PROPERTY_VIEW): ShapePropertyConfig[] {
@@ -1189,7 +1195,10 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const applyPreset = (value: string) => {
       if (!PORT_PRESETS[value as PortPreset]) return;
       const chosen = portPresetSize(value as PortPreset, clearance);
-      onUpdate({ ...widthPatch(chosen.width), height: chosen.height, cornerFillet: chosen.corner, portProfile: chosen.profile });
+      const patch = { ...widthPatch(chosen.width), height: chosen.height, cornerFillet: chosen.corner, portProfile: chosen.profile };
+      // A socket with screw holes (D-Sub 9) comes with them, the opening and its holes one group.
+      if (PORT_PRESETS[value as PortPreset].screwHoles && view.portPresetWithScrewHoles) view.portPresetWithScrewHoles(patch);
+      else onUpdate(patch);
     };
     // Extra room grows the opening on every side by the change, so its middle stays on the socket:
     // an upright opening goes down by the change as it grows by twice that.
@@ -3556,6 +3565,7 @@ export function ShapeInspector({
   onLayerText,
   onTextTags,
   onFixKeyringTab,
+  onPortPresetWithScrewHoles,
   textLayerStack: nameTagStack,
   iconTag,
   qrCode,
@@ -3603,6 +3613,8 @@ export function ShapeInspector({
   onTextTags?: (names: string[], gap: number) => void;
   /** Fixes a key ring tab of its own to the nearest tag in one click, where it was put (#598). */
   onFixKeyringTab?: () => void;
+  /** Puts a D-Sub opening's two screw holes beside it, as holes of their own. */
+  onPortPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void;
   /** The selected name tag's words, font and layers, read from its layers as they stand (#215). */
   textLayerStack?: NameTagStack | null;
   /** The icon tag card's wiring, for a sketch body or an icon tag; null for anything else. */
@@ -3645,7 +3657,7 @@ export function ShapeInspector({
   // The section of a loft the rows are about (#1034), back to the first for another body.
   const [loftSection, setLoftSection] = useState(0);
   useEffect(() => setLoftSection(0), [shape.id]);
-  const properties = getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection });
+  const properties = getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles });
   const tiltedMeasures = orientedMeasures(shape).kind === "tilted";
   // What each value would be on a shape of this kind made new, with the saved defaults: the
   // small arrow next to a changed value takes it back there.
