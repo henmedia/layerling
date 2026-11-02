@@ -632,7 +632,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "vase.lidSlip": "Låg over kanten",
   "vase.lidSnap": "Snap-låg",
   "vase.lidScrew": "Skruelåg",
-  "vase.lidTeapot": "Tekandelåg (toppen som låg)",
+  "vase.lidTeapot": "Tekandelåg",
   "vase.lidHint": "Snap-låg og skruelåg kræver en hul vase: rillen eller gevindet går ind i væggen.",
   "vase.lidHeightHint": "Så meget af vasens top bliver låget, med vasens egen væg og mønster: riller og drejning fortsætter hen over samlingen. Under det ender kroppen åben.",
   "vase.fitHint": "Til tappe, indsatser og under-skåler; normalt 0,2 til 0,3 mm ved FDM-print.",

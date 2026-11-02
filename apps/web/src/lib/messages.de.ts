@@ -3122,7 +3122,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "vase.lidSlip": "Stülpdeckel",
   "vase.lidSnap": "Schnappdeckel",
   "vase.lidScrew": "Schraubdeckel",
-  "vase.lidTeapot": "Teekannendeckel (Oberteil als Deckel)",
+  "vase.lidTeapot": "Teekannendeckel",
   "vase.lidHint": "Schnapp- und Schraubdeckel brauchen eine hohle Vase: Nut bzw. Gewinde kommen in die Wand.",
   "vase.lidHeightHint": "So viel vom Oberteil der Vase wird der Deckel, mit ihrer eigenen Wand und ihrem Muster: Rillen und Drehung laufen über die Fuge weiter. Darunter endet der Körper offen.",
   "vase.fitHint": "Für Zapfen, Einsätze und Untersetzer; beim FDM-Druck meist 0,2 bis 0,3 mm.",

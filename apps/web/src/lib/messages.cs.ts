@@ -3166,7 +3166,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "vase.lidSlip": "Nasazovací víko",
   "vase.lidSnap": "Zaklapávací víko",
   "vase.lidScrew": "Šroubovací víko",
-  "vase.lidTeapot": "Víko jako u konvice (horní díl jako víko)",
+  "vase.lidTeapot": "Víko konvice",
   "vase.lidHint": "Zaklapávací a šroubovací víko potřebují dutou vázu: drážka nebo závit jde do stěny.",
   "vase.lidHeightHint": "Tolik z horní části vázy se stane víkem, s její vlastní stěnou a vzorem: drážky a zkroucení pokračují přes spoj. Pod ním tělo končí otevřené.",
   "vase.fitHint": "Pro čepy, vložky a podmisky; při tisku FDM obvykle 0,2 až 0,3 mm.",

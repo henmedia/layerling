@@ -3109,7 +3109,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "vase.lidSlip": "Couvercle à emboîter",
   "vase.lidSnap": "Couvercle à clipser",
   "vase.lidScrew": "Couvercle à vis",
-  "vase.lidTeapot": "Couvercle de théière (le haut comme couvercle)",
+  "vase.lidTeapot": "Couvercle de théière",
   "vase.lidHint": "Les couvercles à clipser et à vis demandent un vase creux : la rainure ou le filetage va dans la paroi.",
   "vase.lidHeightHint": "Cette hauteur du haut du vase devient le couvercle, avec la paroi et le motif du vase : rainures et torsion continuent au-delà du joint. Le corps se termine ouvert en dessous.",
   "vase.fitHint": "Pour tenons, inserts et soucoupes ; en impression FDM, en général 0,2 à 0,3 mm.",

@@ -2429,7 +2429,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "vase.lidSlip": "Nasadni pokrov",
   "vase.lidSnap": "Zaskočni pokrov",
   "vase.lidScrew": "Navojni pokrov",
-  "vase.lidTeapot": "Pokrov kot pri čajniku (zgornji del kot pokrov)",
+  "vase.lidTeapot": "Pokrov čajnika",
   "vase.lidHint": "Zaskočni in navojni pokrov potrebujeta votlo vazo: utor ali navoj gre v steno.",
   "vase.lidHeightHint": "Toliko zgornjega dela vaze postane pokrov, z njeno lastno steno in vzorcem: utori in zasuk se nadaljujejo čez spoj. Pod njim se telo konča odprto.",
   "vase.fitHint": "Za čepe, vložke in podstavke; pri tisku FDM navadno 0,2 do 0,3 mm.",

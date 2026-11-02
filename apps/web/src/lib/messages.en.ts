@@ -3123,7 +3123,7 @@ export const MESSAGES_EN = {
   "vase.lidSlip": "Slip-on lid",
   "vase.lidSnap": "Snap lid",
   "vase.lidScrew": "Screw lid",
-  "vase.lidTeapot": "Teapot lid (the top as lid)",
+  "vase.lidTeapot": "Teapot lid",
   "vase.lidHint": "Snap and screw lids need a hollow vase: the groove or thread goes into the wall.",
   "vase.lidHeightHint": "This much of the vase's top becomes the lid, with the vase's own wall and pattern: grooves and twist run on across the joint. The body ends open below it.",
   "vase.fitHint": "For pegs, inserts and saucers; usually 0.2 to 0.3 mm for FDM printing.",

@@ -3123,7 +3123,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "vase.lidSlip": "Opzetdeksel",
   "vase.lidSnap": "Klikdeksel",
   "vase.lidScrew": "Schroefdeksel",
-  "vase.lidTeapot": "Theepotdeksel (bovenkant als deksel)",
+  "vase.lidTeapot": "Theepotdeksel",
   "vase.lidHint": "Klik- en schroefdeksels hebben een holle vaas nodig: groef of schroefdraad komen in de wand.",
   "vase.lidHeightHint": "Zoveel van de bovenkant van de vaas wordt het deksel, met de eigen wand en het eigen patroon van de vaas: groeven en draaiing lopen over de naad door. Daaronder eindigt het lichaam open.",
   "vase.fitHint": "Voor pennen, inzetstukken en onderzetters; bij FDM-printen meestal 0,2 tot 0,3 mm.",
