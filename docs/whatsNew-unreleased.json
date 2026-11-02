@@ -38,5 +38,15 @@
       "de": "Wie die Schraube bekommt jetzt auch die Mutter einen runden Bund: Bundhöhe und Bunddurchmesser stehen bei Sechskant-, Vierkant-, Flansch-, Flügel- und Sterngriffmuttern in den Einstellungen. Der Bund sitzt oben auf der Mutter, schmaler als sie, und das Gewinde läuft hindurch; die Mutter druckt weiter auf ihrer Auflagefläche, der Bund ohne Stützen. Die Höhe zählt nur die Mutter selbst.",
       "en": "Like the screw, a nut can now take a round collar: Collar height and Collar diameter are in the settings of the hex, square, flange, wing and star knob nuts. The collar stands on top of the nut, narrower than it, with the thread running through; the nut still prints on its bearing face, the collar without supports. The height counts the nut itself only."
     }
+  },
+  {
+    "title": {
+      "de": "Teekannendeckel: Fuge nach Höhe vom Boden",
+      "en": "Teapot lid: the joint as a height from the bottom"
+    },
+    "body": {
+      "de": "Beim Teekannendeckel der Vase lässt sich die Fuge jetzt auch als Höhe vom Boden eintippen, im neuen Feld „Vase bis · Deckel ab“ neben der Höhe des Deckels. Beide ergeben zusammen die Höhe der Vase: Trägst du das eine ein, nimmt das andere den Rest.",
+      "en": "On the vase's teapot lid the joint can now be typed in as a height from the bottom, in the new field \"Body up to · lid from\" beside Lid height. The two add up to the vase's height: type one and the other takes the rest."
+    }
   }
 ]
