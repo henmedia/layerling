@@ -307,7 +307,10 @@ export function sketchPrimitiveGeometry(
   const minX = cx - radius;
   const maxX = cx + radius;
   // Nur das Rechteck darf tiefer oder flacher sein als breit; Dreieck und Sechseck bleiben gleichmaessig.
-  const halfDepth = primitive === "rectangle" ? (positiveSize(options.depth) ?? size) / 2 : radius;
+  // #1180: das Dreieck ist gleichseitig, also nur sqrt(3)/2 so hoch wie breit.
+  const halfDepth = primitive === "rectangle"
+    ? (positiveSize(options.depth) ?? size) / 2
+    : primitive === "triangle" ? radius * Math.sqrt(3) / 2 : radius;
   const minZ = cz - halfDepth;
   const maxZ = cz + halfDepth;
   const vertices: Array<{ x: number; z: number }> = primitive === "rectangle"

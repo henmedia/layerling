@@ -45,7 +45,7 @@ export type ShapeKind =
   | "mesh";
 
 /** Outline of a port opening (portGeometry.ts): rounded corners, or the lower corners cut as on these sockets. */
-export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort";
+export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort" | "xt60" | "xt30" | "mt60" | "dsub9";
 
 /** Cross-section of a bent tube; the inner one may also be "none" for a solid tube. */
 export type BentTubeProfile = "round" | "square" | "hexagon" | "octagon";
@@ -1406,6 +1406,10 @@ export type WorkplaneNote = {
   anchor?: WorkplaneNoteAnchor;
   /** Zugeklappt zeigt die Notiz nur ihre Nadel mit der Nummer. */
   collapsed?: boolean;
+  /** A request for the AI agent on the MCP bridge: it reads the note, does the work and answers in `reply` (#1191). */
+  forAi?: boolean;
+  /** The agent's answer to the note, shown under its text. */
+  reply?: string;
   /**
    * "point" makes this a reference point instead of a note: a mark in space
    * that other shapes snap to. It has no text and no anchor, is not counted as
@@ -1419,7 +1423,7 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
-export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12";
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini";
 
 export type SbcBoardSettings = {
   board: SbcBoardType;
@@ -1427,6 +1431,14 @@ export type SbcBoardSettings = {
   clearance: number;
   /** How much further out in mm the connectors at the edge reach, to cut through a case wall, 0 to 10; none on older boards. */
   reach?: number;
+  /** The ribbon cable connectors (camera, display, PCIe) open up through a lid, by `upReach`. */
+  ribbonUp?: boolean;
+  /** The ribbon cable connectors open out through the nearer wall, across their long side, by `reach`. */
+  ribbonSide?: boolean;
+  /** The GPIO header reaches up through a lid, by `upReach`. */
+  gpioUp?: boolean;
+  /** How far in mm the openings going up reach above their part, 20 to 100 (default 20). */
+  upReach?: number;
 };
 
 export type QrCodeSettings = {

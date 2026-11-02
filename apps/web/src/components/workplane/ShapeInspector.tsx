@@ -200,7 +200,7 @@ import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
-import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARDS, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -253,6 +253,7 @@ import {
   gridfinityDrawerPatch,
   gridfinityDrawerSize,
   gridfinityFloorFits,
+  gridfinityFloorFullHeight,
   gridfinityFloorHeight,
   gridfinityFloorMaxHeight,
   gridfinityFloorMinHeight,
@@ -399,6 +400,7 @@ const GEAR_TYPE_OPTIONS: Array<{ value: GearType; label: MessageKey }> = [
 const PORT_PRESET_LABELS: Record<PortPreset, MessageKey> = {
   usbC: "port.usbC", usbCPlug: "port.usbCPlug", microUsb: "port.microUsb", usbA: "port.usbA",
   hdmi: "port.hdmi", miniHdmi: "port.miniHdmi", microHdmi: "port.microHdmi", displayPort: "port.displayPort", miniDisplayPort: "port.miniDisplayPort", rj45: "port.rj45",
+  xt30: "port.xt30", xt60: "port.xt60", mt60: "port.mt60", mpx: "port.mpx", dsub9: "port.dsub9",
 };
 
 const VASE_CHOICES: Partial<Record<VaseChoiceKey, Record<string, MessageKey>>> = {
@@ -492,6 +494,8 @@ type RangePropertyConfig = {
   disabled?: boolean;
   /** A line under the row saying what the value measures (#215). */
   hint?: string;
+  /** Values the row skips, in millimetres for a length (#1126): one inside goes on to the end it moves towards. */
+  gap?: { from: number; to: number };
   onChange: (value: number) => void;
 };
 
@@ -570,7 +574,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceRingWidth", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -651,7 +655,12 @@ function torusSideProperties(
 }
 
 /** What the panel shows of a body that only the panel keeps: which section of a loft (#1034) its rows are about. */
-type ShapePropertyView = { loftSection: number; setLoftSection: (index: number) => void };
+type ShapePropertyView = {
+  loftSection: number;
+  setLoftSection: (index: number) => void;
+  /** Sets a socket that has screw holes (D-Sub 9) on the opening and groups it with them, where the editor can. */
+  portPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void;
+};
 const NO_PROPERTY_VIEW: ShapePropertyView = { loftSection: 0, setLoftSection: () => undefined };
 
 function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate, textWidthMax = 260, view: ShapePropertyView = NO_PROPERTY_VIEW): ShapePropertyConfig[] {
@@ -1189,7 +1198,10 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const applyPreset = (value: string) => {
       if (!PORT_PRESETS[value as PortPreset]) return;
       const chosen = portPresetSize(value as PortPreset, clearance);
-      onUpdate({ ...widthPatch(chosen.width), height: chosen.height, cornerFillet: chosen.corner, portProfile: chosen.profile });
+      const patch = { ...widthPatch(chosen.width), height: chosen.height, cornerFillet: chosen.corner, portProfile: chosen.profile };
+      // A socket with screw holes (D-Sub 9) comes with them, the opening and its holes one group.
+      if (PORT_PRESETS[value as PortPreset].screwHoles && view.portPresetWithScrewHoles) view.portPresetWithScrewHoles(patch);
+      else onUpdate(patch);
     };
     // Extra room grows the opening on every side by the change, so its middle stays on the socket:
     // an upright opening goes down by the change as it grows by twice that.
@@ -1548,8 +1560,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       properties.push(
         { id: "gridfinityUnitsY", label: t("prop.gridfinityUnitsY"), value: plan.count.y, min: MIN_GRIDFINITY_UNITS, max: MAX_GRIDFINITY_HEIGHT_UNITS, step: 1, onChange: (value) => apply({ y: Math.round(value) }) },
         { type: "toggle", id: "gridfinityLip", label: t("prop.gridfinityLip"), value: plan.lip, onChange: (value) => apply({ lip: value }) },
-        // The edge tool's chamfer on the lip's top, built in (#780).
-        ...(plan.lip ? [{ id: "gridfinityLipChamfer", label: t("prop.gridfinityLipChamfer"), value: gridfinityLipChamfer({ ...shape, depth }), min: 0, max: MAX_GRIDFINITY_LIP_CHAMFER, step: 0.05, hint: t("gridfinity.lipChamferHint"), onChange: (value: number) => onUpdate({ gridfinityLipChamfer: clamp(value, 0, MAX_GRIDFINITY_LIP_CHAMFER) }) }] : []),
+        // The edge tool's chamfer on the lip's top, built in (#780); none on a bin filled to the lip's top (#1126).
+        ...(plan.lip && !plan.filled ? [{ id: "gridfinityLipChamfer", label: t("prop.gridfinityLipChamfer"), value: gridfinityLipChamfer({ ...shape, depth }), min: 0, max: MAX_GRIDFINITY_LIP_CHAMFER, step: 0.05, hint: t("gridfinity.lipChamferHint"), onChange: (value: number) => onUpdate({ gridfinityLipChamfer: clamp(value, 0, MAX_GRIDFINITY_LIP_CHAMFER) }) }] : []),
         { type: "toggle", id: "gridfinityMagnets", label: t("prop.gridfinityMagnets"), value: plan.magnets, onChange: (value) => onUpdate({ gridfinityMagnets: value }) },
       );
       // The outer corners above the feet (#856), down to square; no row where open sides leave every corner square.
@@ -1565,9 +1577,13 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     }
     if (gridfinityFloorFits(fields) && !gridfinityWallSolid(fields)) {
       // The floor (#455): raised, it leaves a bin blank to cut shapes into; it decides what room the shelves and scoops have.
-      const maxFloor = gridfinityFloorMaxHeight(fields);
+      // With the lip it goes on to the lip's top, which fills the lip (#1126); between that and the highest floor a stacked
+      // bin clears, the row takes no value: going up it fills the lip, going down it stops where a bin still stacks.
+      const maxFloor = gridfinityFloorFullHeight(fields);
       const minFloor = gridfinityFloorMinHeight(fields);
-      properties.push({ id: "gridfinityFloorHeight", label: t("prop.gridfinityFloorHeight"), value: gridfinityFloorHeight(fields), min: minFloor, max: maxFloor, step: 0.05, hint: t("gridfinity.floorHeightHint"), onChange: (value) => onUpdate({ gridfinityFloorHeight: clamp(value, minFloor, maxFloor) }) });
+      const stackFloor = gridfinityFloorMaxHeight(fields);
+      const hint = plan.lip ? t("gridfinity.floorHeightLipHint", { height: stackFloor.toLocaleString(numberLocale()) }) : t("gridfinity.floorHeightHint");
+      properties.push({ id: "gridfinityFloorHeight", label: t("prop.gridfinityFloorHeight"), value: gridfinityFloorHeight(fields), min: minFloor, max: maxFloor, step: 0.05, hint, gap: { from: stackFloor, to: maxFloor }, onChange: (value) => onUpdate({ gridfinityFloorHeight: clamp(value, minFloor, maxFloor) }) });
     }
     const { switched } = plan;
     if (gridfinityOpenFits(fields)) {
@@ -3556,6 +3572,7 @@ export function ShapeInspector({
   onLayerText,
   onTextTags,
   onFixKeyringTab,
+  onPortPresetWithScrewHoles,
   textLayerStack: nameTagStack,
   iconTag,
   qrCode,
@@ -3603,6 +3620,8 @@ export function ShapeInspector({
   onTextTags?: (names: string[], gap: number) => void;
   /** Fixes a key ring tab of its own to the nearest tag in one click, where it was put (#598). */
   onFixKeyringTab?: () => void;
+  /** Puts a D-Sub opening's two screw holes beside it, as holes of their own. */
+  onPortPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void;
   /** The selected name tag's words, font and layers, read from its layers as they stand (#215). */
   textLayerStack?: NameTagStack | null;
   /** The icon tag card's wiring, for a sketch body or an icon tag; null for anything else. */
@@ -3645,7 +3664,7 @@ export function ShapeInspector({
   // The section of a loft the rows are about (#1034), back to the first for another body.
   const [loftSection, setLoftSection] = useState(0);
   useEffect(() => setLoftSection(0), [shape.id]);
-  const properties = getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection });
+  const properties = getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles });
   const tiltedMeasures = orientedMeasures(shape).kind === "tilted";
   // What each value would be on a shape of this kind made new, with the saved defaults: the
   // small arrow next to a changed value takes it back there.
@@ -5166,9 +5185,9 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const regenerate = (patch: Partial<SbcBoardSettings>) => {
-    const next = { ...controls.settings, ...patch };
-    const same = next.board === controls.settings.board && next.clearance === controls.settings.clearance && (next.reach ?? 0) === (controls.settings.reach ?? 0);
-    if (busy || disabled || same) return;
+    const next = normalizeSbcBoardSettings({ ...controls.settings, ...patch });
+    const same = !next || JSON.stringify(next) === JSON.stringify(normalizeSbcBoardSettings(controls.settings));
+    if (busy || disabled || same || !next) return;
     setBusy(true);
     setError("");
     controls.onRegenerate(next)
@@ -5225,7 +5244,41 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
               onInteractionActiveChange={onInteractionActiveChange}
             />
           </label>
-          <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.reachHint")}</p>
+          <p className="name-tag-hint">{t("sbcBoard.reachHint")}</p>
+          {sbcBoardHasRibbon(SBC_BOARDS[controls.settings.board]) ? (
+            <>
+              <label className="check-property sbc-board-ribbon-up">
+                <input type="checkbox" checked={controls.settings.ribbonUp === true} disabled={disabled || busy} data-testid="sbc-board-ribbon-up" onChange={(event) => regenerate({ ribbonUp: event.currentTarget.checked })} />
+                <span>{t("sbcBoard.ribbonUp")}</span>
+              </label>
+              <label className="check-property sbc-board-ribbon-side">
+                <input type="checkbox" checked={controls.settings.ribbonSide === true} disabled={disabled || busy} data-testid="sbc-board-ribbon-side" onChange={(event) => regenerate({ ribbonSide: event.currentTarget.checked })} />
+                <span>{t("sbcBoard.ribbonSide")}</span>
+              </label>
+            </>
+          ) : null}
+          {sbcBoardHasGpio(SBC_BOARDS[controls.settings.board]) ? (
+            <label className="check-property sbc-board-gpio-up">
+              <input type="checkbox" checked={controls.settings.gpioUp === true} disabled={disabled || busy} data-testid="sbc-board-gpio-up" onChange={(event) => regenerate({ gpioUp: event.currentTarget.checked })} />
+              <span>{t("sbcBoard.gpioUp")}</span>
+            </label>
+          ) : null}
+          {controls.settings.ribbonUp || controls.settings.gpioUp ? (
+            <label className="select-property sbc-board-up-reach">
+              <span>{t("sbcBoard.upReach")} ({unit})</span>
+              <CompactMeasureField
+                label={t("sbcBoard.upReach")}
+                value={controls.settings.upReach ?? MIN_SBC_UP_REACH}
+                min={MIN_SBC_UP_REACH}
+                max={MAX_SBC_UP_REACH}
+                workspace={workspace}
+                disabled={disabled || busy}
+                onChange={(upReach) => regenerate({ upReach })}
+                onInteractionActiveChange={onInteractionActiveChange}
+              />
+            </label>
+          ) : null}
+          <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.passagesHint")}</p>
           {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
         </div>
       ) : null}
@@ -5797,6 +5850,9 @@ export function SurfaceTextureCard({
   };
   // A text goes where it is put: what stays smooth for a pattern all over does not hold it back, so those fields go.
   const text = settings.pattern === "text";
+  // So does an image pressed on once (#1176): it is placed as a text is.
+  const once = image && settings.imageTiling === "once";
+  const placedHere = text || once;
   const picked = settings.faces.length > 0;
   const percent = (id: string, label: string, value: number, onChange: (value: number) => void) => range(id, label, Math.round(value * 100), [0, 100], 1, (share) => onChange(share / 100));
   const apply = async () => {
@@ -6002,7 +6058,7 @@ export function SurfaceTextureCard({
                   ) : (
                     range(
                       "surfaceSpacing",
-                      t(SURFACE_SPACING_LABEL[settings.pattern] ?? "inspector.surfaceSpacing"),
+                      t(once ? "inspector.surfaceImageWidth" : (SURFACE_SPACING_LABEL[settings.pattern] ?? "inspector.surfaceSpacing")),
                       settings.spacing,
                       [SURFACE_TEXTURE_LIMITS.spacing[0], image ? SURFACE_TEXTURE_LIMITS.spacing[1] : 50],
                       0.1,
@@ -6022,17 +6078,22 @@ export function SurfaceTextureCard({
                   ) : null}
                   {image ? (
                     <>
-                      {range("surfaceTileHeight", t("inspector.surfaceTileHeight"), settings.tileHeight, SURFACE_TEXTURE_LIMITS.tileHeight, 0.5, (tileHeight) => set({ tileHeight }))}
+                      {range("surfaceTileHeight", t(once ? "inspector.surfaceImageHeight" : "inspector.surfaceTileHeight"), settings.tileHeight, SURFACE_TEXTURE_LIMITS.tileHeight, 0.5, (tileHeight) => set({ tileHeight }))}
                       <SelectProperty
                         type="select"
                         label={t("inspector.surfaceImageTiling")}
                         value={settings.imageTiling}
                         options={options(SURFACE_TEXTURE_TILINGS, (value) => t(SURFACE_TEXTURE_LABELS.tiling[value]))}
                         disabled={disabled || busy}
-                        onChange={(value) => set({ imageTiling: value as SurfaceTextureSettings["imageTiling"] })}
+                        // Once starts no wider than 40 mm: a tile is often wider than the body it goes on.
+                        onChange={(value) => set({ imageTiling: value as SurfaceTextureSettings["imageTiling"], ...(value === "once" && settings.spacing > 40 ? { spacing: 40 } : {}) })}
                       />
+                      {/* Once: where its middle goes, as for a text; it turns with the image's own turn. */}
+                      {once ? range("surfaceTextAround", t("inspector.surfaceTextAround"), settings.textAround, SURFACE_TEXTURE_LIMITS.textAround, 1, (textAround) => set({ textAround })) : null}
+                      {once ? range("surfaceTextHeight", t("inspector.surfaceTextHeight"), settings.textHeight, SURFACE_TEXTURE_LIMITS.textHeight, 1, (textHeight) => set({ textHeight })) : null}
+                      {once ? range("surfaceImageTurn", t("inspector.surfaceImageTurn"), settings.imageTurn, SURFACE_TEXTURE_LIMITS.imageTurn, 1, (imageTurn) => set({ imageTurn })) : null}
                       <ToggleProperty label={t("inspector.surfaceImageInvert")} value={settings.imageInvert} disabled={disabled || busy} onChange={(imageInvert) => set({ imageInvert })} />
-                      <p className="cylinder-wrap-hint">{t("inspector.surfaceImageHint")}</p>
+                      <p className="cylinder-wrap-hint">{t(once ? "inspector.surfaceImageOnceHint" : "inspector.surfaceImageHint")}</p>
                     </>
                   ) : null}
                   {carbon ? (
@@ -6092,7 +6153,7 @@ export function SurfaceTextureCard({
                   {settings.crackGold ? range("surfaceCrackRecess", t("inspector.surfaceCrackRecess"), settings.crackRecess, SURFACE_TEXTURE_LIMITS.crackRecess, 0.05, (crackRecess) => set({ crackRecess })) : null}
                   {settings.crackGold ? <p className="cylinder-wrap-hint">{t("inspector.surfaceCrackGoldHint")}</p> : null}
                 </>
-              ) : text ? null : grain ? (
+              ) : placedHere ? null : grain ? (
                 <p className="cylinder-wrap-hint">{t("inspector.surfaceGrainHint")}</p>
               ) : wood ? (
                 <p className="cylinder-wrap-hint">{t("inspector.surfaceWoodHint")}</p>
@@ -6108,7 +6169,7 @@ export function SurfaceTextureCard({
                 />
               )}
               {/* A board's pith runs along its longest side: only a log asks for its axis. */}
-              {!grain && !(wood && settings.woodCut !== "log") && (cracks || text || wood || settings.projection !== "allRound") ? (
+              {!grain && !(wood && settings.woodCut !== "log") && (cracks || placedHere || wood || settings.projection !== "allRound") ? (
                 <SelectProperty
                   type="select"
                   label={t("inspector.surfaceAxis")}
@@ -6119,7 +6180,7 @@ export function SurfaceTextureCard({
                 />
               ) : null}
               {/* Where it goes: every face, or only the faces clicked in the view (a text goes where it is put). */}
-              {text || !onFacePick ? null : (
+              {placedHere || !onFacePick ? null : (
                 <>
                   <p className={`cylinder-wrap-hint ${needsFaces ? "surface-layer-missing" : ""}`}>
                     {picked
@@ -6186,7 +6247,7 @@ export function SurfaceTextureCard({
                     </>
                   ) : text || grain ? null : image ? (
                     <>
-                      {range("surfaceImageTurn", t("inspector.surfaceImageTurn"), settings.imageTurn, SURFACE_TEXTURE_LIMITS.imageTurn, 1, (imageTurn) => set({ imageTurn }))}
+                      {once ? null : range("surfaceImageTurn", t("inspector.surfaceImageTurn"), settings.imageTurn, SURFACE_TEXTURE_LIMITS.imageTurn, 1, (imageTurn) => set({ imageTurn }))}
                       {range("surfaceImageBlur", t("inspector.surfaceImageBlur"), settings.imageBlur, SURFACE_TEXTURE_LIMITS.imageBlur, 1, (imageBlur) => set({ imageBlur }))}
                     </>
                   ) : bricks ? (
@@ -6209,7 +6270,7 @@ export function SurfaceTextureCard({
                       (share) => set({ width: share / 100 }),
                     )
                   )}
-                  {text ? null : (
+                  {placedHere ? null : (
                     <>
                       {settings.pattern === "bumps" || grain || image || bark || wood ? null : (
                         <SelectProperty
@@ -6902,6 +6963,7 @@ function RangeProperty({
   max,
   step = 0.01,
   hint,
+  gap,
   workspace,
   disabled,
   onChange,
@@ -6914,6 +6976,8 @@ function RangeProperty({
   const holdInteraction = useInteractionHold(onInteractionActiveChange);
   const snapStepMm = useContext(SliderSnapContext);
   const draggingSliderRef = useRef(false);
+  // Where a drag of the slider started, for the side a value inside the gap goes to.
+  const sliderFromRef = useRef(0);
   // Firefox sends one last value after the pointer is up, so a drag ends a moment later than the pointer does.
   const sliderReleaseTimerRef = useRef<number | undefined>(undefined);
   const endSliderDrag = () => {
@@ -6931,6 +6995,12 @@ function RangeProperty({
   const controlMax = isLength ? millimetersToDisplay(max, workspace) : max;
   const controlStep = isLength ? displayStepFromMillimeters(step, workspace) : step;
   const sliderValue = clamp(controlValue, controlMin, controlMax);
+  // A value inside the gap goes on to its end on the side it is moving towards, seen from where it started.
+  const acrossGap = (next: number, from: number) => {
+    if (!gap) return next;
+    const [low, high] = isLength ? [millimetersToDisplay(gap.from, workspace), millimetersToDisplay(gap.to, workspace)] : [gap.from, gap.to];
+    return next <= low + 1e-9 || next >= high - 1e-9 ? next : next < from ? low : high;
+  };
   const position = ((sliderValue - controlMin) / Math.max(Number.EPSILON, controlMax - controlMin)) * 100;
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(ROTATION_PROPERTY_IDS.has(id) ? String(Number(controlValue.toFixed(2))) : formatPropertyNumber(controlValue, accuracy, controlStep));
@@ -6956,7 +7026,7 @@ function RangeProperty({
     const next = RELATIVE_SIZE_PROPERTY_IDS.has(id)
       ? resolveMeasurementInput(draft, controlValue)
       : parseMeasurementInput(draft);
-    const finiteNext = Number.isFinite(next) ? next : controlValue;
+    const finiteNext = Number.isFinite(next) ? acrossGap(next, controlValue) : controlValue;
     const nextModelValue = toModelValue(finiteNext);
     // The formula rides along with the value it set, in the same change; a plain number clears it.
     onFormula?.(Number.isFinite(next) ? formulaToRemember(draft) : null);
@@ -6973,8 +7043,8 @@ function RangeProperty({
   const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
   // The wheel stops at the field's lower limit, also for the figure shown: it went on below it, into negative sizes, which the body
   // then kept at the limit and the field showed again as 0.01 only when it was left (#576, prmod3d). Returns the figure to show.
-  const setSteppedValue = (turned: number) => {
-    const next = freePosition ? turned : Math.max(turned, controlMin);
+  const setSteppedValue = (turned: number, from: number) => {
+    const next = freePosition ? turned : Math.max(acrossGap(turned, from), controlMin);
     const nextModelValue = toModelValue(next);
     onChange(freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
     return formatShown(freePosition || allowsAboveSliderMax ? next : clamp(next, controlMin, controlMax));
@@ -7000,7 +7070,7 @@ function RangeProperty({
     const parsed = parseMeasurementInput(draft);
     const current = Number.isFinite(parsed) ? parsed : controlValue;
     const shiftStep = isLength && snapStepMm > 0 ? millimetersToDisplay(snapStepMm, workspace) : undefined;
-    const shown = setSteppedValue(wheelNextValue(current, direction, base, modifiers, shiftStep));
+    const shown = setSteppedValue(wheelNextValue(current, direction, base, modifiers, shiftStep), current);
     // What is shown is the new starting point, so leaving the field keeps the exact value and does not read it again.
     openedWithRef.current = shown;
     setDraft(shown);
@@ -7071,6 +7141,7 @@ function RangeProperty({
       const snappedMm = Math.round(toModelValue(next) / snapStepMm) * snapStepMm;
       next = clamp(millimetersToDisplay(clamp(snappedMm, min, max), workspace), controlMin, controlMax);
     }
+    next = acrossGap(next, draggingSliderRef.current ? sliderFromRef.current : controlValue);
     onChange(clamp(toModelValue(next), min, max));
     setDraft(formatShown(next));
   };
@@ -7097,7 +7168,7 @@ function RangeProperty({
             const base = wheelBaseStep(controlMin, controlMax, controlStep, unit === "in");
             const shiftStep = isLength && snapStepMm > 0 ? millimetersToDisplay(snapStepMm, workspace) : undefined;
             const notches = Math.trunc(dx / SCRUB_PX_PER_STEP);
-            setSteppedValue(wheelNextValue(scrub.start, notches, base, { shift: event.shiftKey, ctrl: event.ctrlKey, alt: event.altKey }, shiftStep));
+            setSteppedValue(wheelNextValue(scrub.start, notches, base, { shift: event.shiftKey, ctrl: event.ctrlKey, alt: event.altKey }, shiftStep), scrub.start);
           }}
           onPointerUp={endScrub}
           onPointerCancel={endScrub}
@@ -7163,6 +7234,7 @@ function RangeProperty({
           onPointerDown={() => {
             window.clearTimeout(sliderReleaseTimerRef.current);
             draggingSliderRef.current = true;
+            sliderFromRef.current = controlValue;
             holdInteraction(true);
           }}
           onPointerUp={() => {

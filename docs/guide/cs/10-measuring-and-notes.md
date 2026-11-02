@@ -79,6 +79,7 @@ Poznámka zachytí informace, které geometrie nevyjadřuje: „Šroub je o 0,3 
 - Poznámka umístěná **na těleso** se pohybuje spolu s ním.
 - Poznámka **vedle tělesa** zůstává na pracovní rovině, {{ui:note.free}}.
 - {{ui:note.detach}} odpojí poznámku od tělesa.
+- {{ui:note.forAi}} změní poznámku v zadání pro AI agenta na mostu MCP (viz „AI s MCP“): agent ji přečte přes `layerling_list_notes`, udělá práci a odpoví ve stejné poznámce, pod tvým textem. Může také na model dávat vlastní poznámky, aby se na místě na něco zeptal nebo něco ohlásil.
 - {{ui:editor.tool.group}} vezme připojenou poznámku do skupiny; {{ui:editor.tool.ungroup}} ji předá viditelné části pod ní, i vnořené skupině. Dokud je skupina otevřená přes {{ui:group.edit}}, její poznámky se pohybují s částí pod nimi a tlačítkem {{ui:group.done}} se vrátí ke skupině; zrušení je vrátí do původního stavu.
 - Když je její těleso smazáno nebo pod ní už není žádné viditelné těleso, poznámka zůstane, kde byla, na pracovní rovině.
 - Tažením za špendlík poznámku přesunete. Kliknutím na špendlík kartu sbalíte, zůstane jen malé číslo; dalším kliknutím ji zase otevřete. Kliknutím do textu ho upravíte.

@@ -15,6 +15,7 @@ import { shapeDefaultsFromShape } from "@/lib/shapeDefaults";
 import { canonicalizeShape, workplaneShapesEqual } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 import {
+  GRIDFINITY_FOOT_HEIGHT,
   GRIDFINITY_LABEL_WALL_KEYS,
   GRIDFINITY_LIP_HEIGHT,
   GRIDFINITY_OPEN_WALL_KEYS,
@@ -47,6 +48,7 @@ import {
   gridfinityDrawerPatch,
   gridfinityDrawerSize,
   gridfinityFloorFits,
+  gridfinityFloorFullHeight,
   gridfinityFloorHeight,
   gridfinityFloorMaxHeight,
   gridfinityFloorMinHeight,
@@ -94,6 +96,7 @@ import {
   gridfinityTriangles,
   gridfinityUnitCompartments,
   gridfinityUnits,
+  gridfinityWallFits,
   gridfinityWallMaxThickness,
   gridfinityWallProfile,
   gridfinityWallSolid,
@@ -1096,20 +1099,16 @@ describe("gridfinity floor height", () => {
   /** The inside of a 2 x 1 bin: 81.6 x 39.6 mm with corners of 2.8 mm. */
   const insideArea = 81.6 * 39.6 - (4 - Math.PI) * 2.8 * 2.8;
 
-  it("leaves a bin with the floor unset or at 5.95 mm, a bin of 1 height unit with the lip and a baseplate exactly as they were", () => {
+  it("leaves a bin with the floor unset or at 5.95 mm and a baseplate exactly as they were", () => {
     expect(gridfinityTriangles(bin({ gridfinityFloorHeight: 5.95 }))).toEqual(gridfinityTriangles(bin()));
     expect(gridfinityTriangles(bin({ gridfinityFloorHeight: 2 }))).toEqual(gridfinityTriangles(bin()));
-    // 1 unit with the lip: its support reaches the wall at 7 - 1.65 = 5.35, under the floor, so there is nothing to raise.
-    const low = { height: 7 + GRIDFINITY_LIP_HEIGHT };
-    expect(gridfinityFloorFits(bin(low))).toBe(false);
-    expect(gridfinityTriangles(bin({ ...low, gridfinityFloorHeight: 20 }))).toEqual(gridfinityTriangles(bin(low)));
     expect(gridfinityTriangles(plate({ gridfinityFloorHeight: 4 }))).toEqual(gridfinityTriangles(plate()));
   });
 
   it("rises to where the lip's support leaves the wall, 1.65 mm under the top, or to the top of a bin without the lip", () => {
     expect(gridfinityFloorHeight(bin())).toBeCloseTo(5.95, 9);
     expect(gridfinityFloorMaxHeight(bin())).toBeCloseTo(19.35, 9);
-    expect(gridfinityFloorHeight(bin({ gridfinityFloorHeight: 30 }))).toBeCloseTo(19.35, 9);
+    expect(gridfinityFloorHeight(bin({ gridfinityFloorHeight: 19.35 }))).toBeCloseTo(19.35, 9);
     expect(gridfinityFloorHeight(bin({ gridfinityFloorHeight: 12 }))).toBe(12);
     expect(gridfinityFloorMaxHeight(bin({ gridfinityLip: false, height: 21 }))).toBe(21);
     expect(gridfinityFloorFits(bin({ gridfinityLip: false, height: 7 }))).toBe(true);
@@ -1130,7 +1129,7 @@ describe("gridfinity floor height", () => {
     const plain = signedVolume(gridfinityTriangles(bin()));
     const raised = (gridfinityFloorHeight: number) => signedVolume(gridfinityTriangles(bin({ gridfinityFloorHeight }))) - plain;
     expect(raised(10) / (insideArea * (10 - 5.95))).toBeCloseTo(1, 3);
-    expect(raised(30) / (insideArea * (19.35 - 5.95))).toBeCloseTo(1, 3);
+    expect(raised(19.35) / (insideArea * (19.35 - 5.95))).toBeCloseTo(1, 3);
   });
 
   it("leaves a bin without the lip raised to the top as one solid block", () => {
@@ -1141,6 +1140,70 @@ describe("gridfinity floor height", () => {
     expect(bounds(triangles).max[1]).toBe(21);
   });
 
+  it("fills the lip too from the lip's top up: one solid block with a flat top at the lip's height", () => {
+    const full = 21 + GRIDFINITY_LIP_HEIGHT;
+    expect(gridfinityFloorFullHeight(bin())).toBeCloseTo(full, 9);
+    expect(gridfinityFloorFullHeight(bin({ gridfinityLip: false, height: 21 }))).toBe(21);
+    // From the lip's top up it is the lip's top; under it, up to the highest stacked floor as before.
+    const floor = (value: number, fields = {}) => gridfinityFloorHeight(bin({ ...fields, gridfinityFloorHeight: value }));
+    expect(floor(full)).toBeCloseTo(full, 9);
+    expect(floor(100)).toBeCloseTo(full, 9);
+    expect(floor(19.32)).toBeCloseTo(19.35, 9);
+    // The field's step onto 19.35 lands a hair over it, which still stacks.
+    expect(floor(5.95 + 0.05 * 268)).toBeCloseTo(19.35, 9);
+    expect(floor(full - 0.01)).toBeCloseTo(19.35, 9);
+    expect(floor(20.15, { gridfinityWallThickness: 2.5 })).toBeCloseTo(20.15, 9);
+    expect(floor(20.2, { gridfinityWallThickness: 2.5 })).toBeCloseTo(20.15, 9);
+    // 1 unit with the lip: its support reaches the wall at 7 - 1.65 = 5.35, under the floor, so a stacked bin leaves no
+    // room to raise it; it can only be filled to the lip's top.
+    const low = { height: 7 + GRIDFINITY_LIP_HEIGHT };
+    expect(gridfinityFloorMaxHeight(bin(low))).toBe(5.95);
+    expect(gridfinityFloorFits(bin(low))).toBe(true);
+    expect(floor(7 + GRIDFINITY_LIP_HEIGHT, low)).toBeCloseTo(7 + GRIDFINITY_LIP_HEIGHT, 9);
+    expect(floor(6, low)).toBe(5.95);
+    // A floor saved at the highest that then stands over it, by a thinner wall or the lip switched on, stays at the highest
+    // a stacked bin clears, as before; one unit lower, the highest of 4 units (26.35) is past the lip's top and fills.
+    expect(floor(19.35, { gridfinityWallThickness: 0.8 })).toBeCloseTo(19.2, 9);
+    expect(floor(21)).toBeCloseTo(19.35, 9);
+    expect(floor(26.35)).toBeCloseTo(full, 9);
+    // A thick wall's ledge, 20.15, stacks a floor over the 0.95 mm wall's 19.35 with its wall row and a side opened partly.
+    expect(gridfinityWallFits(bin({ gridfinityWallThickness: 2.5, gridfinityFloorHeight: 20 }))).toBe(true);
+    const opened = gridfinityPlan(bin({
+      gridfinityWallThickness: 2.5, gridfinityFloorHeight: 20, gridfinityOpenBack: true, gridfinityOpenFront: true, gridfinityOpenLeft: true,
+      gridfinityOpenRight: true, gridfinityOpenings: [{ side: "back", width: 20, align: "middle" }],
+    }));
+    expect([opened.floor, opened.wallThickness, opened.notches.length]).toEqual([20, 2.5, 1]);
+    // A bin whose walls meet, one without the lip, a tray and a baseplate are as they were.
+    expect(floor(30, { gridfinityWallThickness: 99 })).toBeCloseTo(20.15, 9);
+    expect(floor(30, { gridfinityLip: false, height: 21 })).toBe(21);
+    const tray = { gridfinityType: "tray" as const, width: 80, depth: 40, height: 20 };
+    expect(floor(100, tray)).toBe(20);
+    expect(gridfinityFloorFullHeight(plate())).toBe(5.95);
+    const triangles = gridfinityTriangles(bin({ gridfinityFloorHeight: full }));
+    // 2 mm under the lip's top a line crosses only the outer walls, and the top is at the lip's height.
+    const across = crossings(triangles, full - 2);
+    expect(across).toHaveLength(2);
+    across.forEach((x, i) => expect(x).toBeCloseTo([-41.75, 41.75][i], 9));
+    expect(bounds(triangles).max[1]).toBeCloseTo(full, 9);
+    // The lip adds the outline's area times its height to the block a bin without it makes.
+    const outlineArea = 83.5 * 41.5 - (4 - Math.PI) * 3.75 * 3.75;
+    const block = signedVolume(gridfinityTriangles(bin({ gridfinityLip: false, height: 21, gridfinityFloorHeight: 21 })));
+    expect((signedVolume(triangles) - block) / (outlineArea * GRIDFINITY_LIP_HEIGHT)).toBeCloseTo(1, 3);
+  });
+
+  it("builds nothing inside a filled bin: no shelves, scoops, dividers, open sides or lip chamfer", () => {
+    const filled = bin({ gridfinityFloorHeight: 30 });
+    const everything = bin({
+      gridfinityFloorHeight: 30, gridfinityLabelBack: true, gridfinityScoopFront: true, gridfinityCompartmentsX: 2,
+      gridfinityOpenLeft: true, gridfinityOpenRight: true, gridfinityLipChamfer: 0.5,
+    });
+    expect(gridfinityHasPieces(everything)).toBe(false);
+    expect(gridfinityPlan(everything).lipChamfer).toBe(0);
+    expect(gridfinityPlan(everything).notches).toHaveLength(0);
+    expect(gridfinityTriangles(everything)).toEqual(gridfinityTriangles(filled));
+    expect(gridfinityLabelledTriangles(runtime, everything)).toEqual(gridfinityTriangles(filled));
+  });
+
   it("is closed, wound outwards and one piece at any height, with the lip or without, shelves, scoops, magnets and the half-size grid", () => {
     for (const fields of [
       { gridfinityFloorHeight: 10 },
@@ -1148,6 +1211,10 @@ describe("gridfinity floor height", () => {
       { gridfinityFloorHeight: 19.345 },
       { gridfinityFloorHeight: 19.34 },
       { gridfinityFloorHeight: 30, gridfinityMagnets: true },
+      { gridfinityFloorHeight: 30, gridfinityBinCornerRadius: 1 },
+      { gridfinityFloorHeight: 30, gridfinityWallThickness: 2.5 },
+      { gridfinityHalfGrid: true, width: 20.5, depth: 41.5, gridfinityFloorHeight: 30 },
+      { height: 7 + GRIDFINITY_LIP_HEIGHT, gridfinityFloorHeight: 7 + GRIDFINITY_LIP_HEIGHT },
       { gridfinityLip: false, height: 21, gridfinityFloorHeight: 21 },
       { gridfinityLip: false, height: 21, gridfinityFloorHeight: 20.99 },
       { gridfinityLip: false, height: 21, gridfinityFloorHeight: 20.999 },
@@ -2684,7 +2751,8 @@ describe("gridfinity wall thickness", { timeout: 60_000 }, () => {
 
   it("ends a low bin's support on the floor exactly as before at the 0.95 mm wall", () => {
     // 2 height units with the lip at its highest floor: the support's foot is 2.6 - (14 - floor), 0.9499999999999997, as before the wall could be set.
-    for (const floor of [12.3, 12.33, 99]) {
+    // 12.35, the highest a stacked bin clears; from the lip's top, 18.4, up the lip is filled (#1126).
+    for (const floor of [12.3, 12.33, 12.35]) {
       for (const halfGrid of [false, true]) {
         const fields = { width: 41.5, depth: 41.5, height: 14 + GRIDFINITY_LIP_HEIGHT, gridfinityFloorHeight: floor, gridfinityHalfGrid: halfGrid };
         const plan = gridfinityPlan(bin(fields));
@@ -2711,7 +2779,9 @@ describe("gridfinity wall thickness", { timeout: 60_000 }, () => {
     expect(profile(1.75)[5][1]).toBeCloseTo(ledge, 9);
     for (const w of [2.5, 5]) expect(profile(w).slice(5), `${w}`).toEqual([[1.75, ledge], [w, ledge], [w, 5.95]]);
     // A floor at the ledge ends the support there.
-    expect(profile(2.5, { gridfinityFloorHeight: 30 }).slice(5)).toEqual([[1.75, ledge]]);
+    expect(profile(2.5, { gridfinityFloorHeight: ledge }).slice(5)).toEqual([[1.75, ledge]]);
+    // Filled to the lip's top: up the outside and flat across it.
+    expect(profile(2.5, { gridfinityFloorHeight: 30 })).toEqual([[0, GRIDFINITY_FOOT_HEIGHT], [0, top + GRIDFINITY_LIP_HEIGHT], [2.5, top + GRIDFINITY_LIP_HEIGHT]]);
     expect(gridfinityWallProfile(gridfinityPlan(bin({ gridfinityLip: false, height: 21, gridfinityWallThickness: 4 }))).slice(2)).toEqual([[4, 21], [4, 5.95]]);
   });
 
@@ -2725,7 +2795,8 @@ describe("gridfinity wall thickness", { timeout: 60_000 }, () => {
     expect(max(1, unit)).toBe(5.95);
     // Within 0.05 mm of the floor there is nothing to raise: up to a wall of 1.6 mm, and from just over it there is.
     expect(max(1.6, unit)).toBe(5.95);
-    expect(gridfinityFloorFits(bin({ ...unit, gridfinityWallThickness: 1.6 }))).toBe(false);
+    // A stacked bin leaves no room, but the floor can still fill the lip (#1126).
+    expect(gridfinityFloorFits(bin({ ...unit, gridfinityWallThickness: 1.6 }))).toBe(true);
     expect(max(1.62, unit)).toBeCloseTo(6.02, 9);
     expect(gridfinityFloorFits(bin({ ...unit, gridfinityWallThickness: 1.62 }))).toBe(true);
     // Where the support runs down to the floor, it never leaves the wall thinner than set.

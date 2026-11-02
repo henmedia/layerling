@@ -222,6 +222,8 @@ type WorkplaneViewportProps = {
   onTextTags?: (names: string[], gap: number) => void;
   /** Fixes the selected key ring tab to the nearest tag, where it was put (#598). */
   onFixKeyringTab?: () => void;
+  /** Puts the selected D-Sub opening's screw holes beside it. */
+  onPortPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void;
   /** The selected name tag as its card shows it (#215). */
   textLayerStack?: NameTagStack | null;
   /** The icon tag card's wiring for the selected sketch body or icon tag. */
@@ -1464,6 +1466,7 @@ export function WorkplaneViewport({
   onLayerText,
   onTextTags,
   onFixKeyringTab,
+  onPortPresetWithScrewHoles,
   textLayerStack,
   iconTag,
   qrCode,
@@ -8192,6 +8195,7 @@ export function WorkplaneViewport({
               // die Hand zwischendurch nie lange genug stillstand.
               onTextCommit={(id) => onNoteUpdate?.(id, {})}
               onDetach={(id) => onNoteUpdate?.(id, { anchor: undefined })}
+              onForAiChange={(id, forAi) => onNoteUpdate?.(id, { forAi })}
               onRemove={(id) => onNoteRemove?.(id)}
               onEditingIdChange={setEditingNoteId}
               workspace={workspace}
@@ -8377,6 +8381,7 @@ export function WorkplaneViewport({
           onLayerText={onLayerText}
           onTextTags={onTextTags}
           onFixKeyringTab={onFixKeyringTab}
+          onPortPresetWithScrewHoles={onPortPresetWithScrewHoles}
           textLayerStack={textLayerStack}
           iconTag={iconTag}
           qrCode={qrCode}

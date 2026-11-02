@@ -81,6 +81,7 @@ Una nota recoge lo que la geometría no dice: «Este tornillo va 0,3 mm demasiad
 - Si colocas la nota **sobre un cuerpo**, se desplaza con él.
 - Si la colocas **al lado**, se queda en el plano de trabajo ({{ui:note.free}}).
 - {{ui:note.detach}} suelta del cuerpo una nota unida a él.
+- {{ui:note.forAi}} convierte una nota en un encargo para un agente de IA en el puente MCP (véase «IA con MCP»): el agente la lee con `layerling_list_notes`, hace el trabajo y responde en la misma nota, debajo de tu texto. También puede poner notas propias en el modelo, para preguntar o informar de algo en un punto.
 - {{ui:editor.tool.group}} incluye en el grupo una nota unida; {{ui:editor.tool.ungroup}} se la pasa a la pieza visible que tenga debajo, aunque sea un grupo interior. Mientras un grupo está abierto con {{ui:group.edit}}, sus notas se mueven con la pieza que tienen debajo y vuelven al grupo con {{ui:group.done}}; si cancelas, vuelven a quedar como estaban.
 - Si se elimina su cuerpo, o ya no queda ningún cuerpo visible debajo, la nota se queda donde estaba, sobre el plano de trabajo.
 - Arrastrar la chincheta mueve la nota. Un clic en la chincheta pliega la tarjeta y solo queda el número pequeño; otro clic la vuelve a abrir. Un clic en el texto lo edita.

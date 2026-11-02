@@ -28,14 +28,14 @@ afterEach(() => {
   root = null;
 });
 
-function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}) {
+function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}, onPortPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void) {
   const asset = toolbarShapeAssets.find((entry) => entry.kind === "port")!;
   const shape = { ...makeShapeFromAsset(asset, { x: 0, z: 0, elevation: 0 }), ...fields } as WorkplaneShape;
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
   act(() => {
-    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace: DEFAULT_WORKPLANE_WORKSPACE, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {} }));
+    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace: DEFAULT_WORKPLANE_WORKSPACE, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {}, onPortPresetWithScrewHoles }));
   });
   return container;
 }
@@ -100,4 +100,32 @@ describe("a port opening's Micro-HDMI and extra clearance", () => {
     expect(patches.at(-1)).toMatchObject({ width: 16.7, height: 7.2, portProfile: "hdmi" });
     expect(patches.at(-1)!.cornerFillet).toBeCloseTo(0.8, 9);
   });
+
+describe("the plugs and the serial port in the socket list", () => {
+  it("lists XT30, XT60, MT60, MPX and D-Sub 9 after RJ45 and sets their outline", () => {
+    const patches: Partial<WorkplaneShape>[] = [];
+    const panel = mount({}, (patch) => patches.push(patch));
+    const list = selectNamed(panel, "Socket")!;
+    const values = [...list.options].map((option) => option.value);
+    expect(values.slice(values.indexOf("rj45") + 1, values.indexOf("rj45") + 6)).toEqual(["xt30", "xt60", "mt60", "mpx", "dsub9"]);
+    expect([...list.options].find((option) => option.value === "dsub9")!.textContent).toBe("D-Sub 9 (serial port, RS-232/RS-485)");
+    choose(list, "dsub9");
+    expect(patches.at(-1)).toMatchObject({ width: 19.74, height: 11.18, cornerFillet: 0.5, portProfile: "dsub9" });
+  });
+
+  it("hands D-Sub 9 to the editor to group with its screw holes, the other sockets not", () => {
+    const patches: Partial<WorkplaneShape>[] = [];
+    const grouped: Partial<WorkplaneShape>[] = [];
+    const panel = mount({}, (patch) => patches.push(patch), (patch) => grouped.push(patch));
+    const list = selectNamed(panel, "Socket")!;
+    choose(list, "dsub9");
+    expect(grouped).toHaveLength(1);
+    expect(grouped[0]).toMatchObject({ width: 19.74, height: 11.18, cornerFillet: 0.5, portProfile: "dsub9" });
+    expect(patches).toHaveLength(0);
+    choose(list, "xt60");
+    expect(grouped).toHaveLength(1);
+    expect(patches.at(-1)).toMatchObject({ portProfile: "xt60" });
+  });
+});
+
 });

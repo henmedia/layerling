@@ -104,10 +104,6 @@ describe("a revolved sketch as an exact solid, with the real OCCT kernel", () =>
     expect(kernel.getVolume(ring)).toBeCloseTo(expected, 0);
   });
 
-  it("refuses a profile that crosses the axis, so the caller can fall back to the mesh", () => {
-    expect(() => buildRevolvedSketchSolid(kernel, polygon([[-10, 0], [10, 0], [10, 20], [-10, 20]]), 0, 360)).toThrow(/axis/);
-  });
-
   // The reason for all this (#167): a revolved cup could not be hollowed.
   it("can be hollowed: a cup with the top open", () => {
     const solid = buildRevolvedSketchSolid(kernel, cup(), 0, 360);
@@ -135,5 +131,35 @@ describe("a revolved sketch as an exact solid, with the real OCCT kernel", () =>
     const bounds = kernel.getBoundingBox(solid, false);
     expect(bounds.xmax - bounds.xmin).toBeCloseTo(42, 3);
     expect(bounds.ymax - bounds.ymin).toBeCloseTo(30, 3);
+  });
+
+  it("cuts off at the axis what reaches past it, so the body stays exact and can be hollowed (#1183)", () => {
+    // The reporter's bowl: the top's curve has a handle 1.5 mm right of the axis, the curve itself stays left.
+    const point = (id: string, x: number, z: number, extra: Partial<SketchPoint> = {}): SketchPoint => ({ id, x, z, mode: "corner", ...extra });
+    const points = [
+      point("a", 0, 0),
+      point("b", -7, 0, { handleOut: { x: -8, z: -1.8333 } }),
+      point("c", -13.5, -4, { handleIn: { x: -12, z: -2 }, handleOut: { x: -14.5, z: -5.5 } }),
+      point("d", -14.5, -8, { handleIn: { x: -14.5, z: -5.5 }, handleOut: { x: -14, z: -10 } }),
+      point("e", -12.5, -11.5, { handleIn: { x: -14, z: -10 }, handleOut: { x: -8, z: -12 } }),
+      point("f", -6, -15, { handleIn: { x: -6.6, z: -15 }, handleOut: { x: 1.5453, z: -15 } }),
+      point("g", 0, -15, { handleIn: { x: -3.0879, z: -15 } }),
+    ];
+    const order = ["a", "b", "c", "d", "e", "f", "g"];
+    const bowl: SketchProfile = {
+      points,
+      segments: order.map((id, index) => ({ id: `s${index}`, kind: index === 0 || index === 6 ? "line" as const : "bezier" as const, startId: id, endId: order[(index + 1) % order.length] })),
+    };
+    const solid = buildRevolvedSketchSolid(kernel, bowl, 0, 360);
+    expect(kernel.isValid(solid)).toBe(true);
+    const bounds = kernel.getBoundingBox(solid, false);
+    expect(bounds.xmax - bounds.xmin).toBeCloseTo(29, 1);
+    expect(bounds.ymax - bounds.ymin).toBeCloseTo(15, 3);
+    expect(kernel.isValid(shellSolid(kernel, solid, 2, "top"))).toBe(true);
+    // A rectangle half past the axis keeps its left half, as the mesh revolve does.
+    const across = buildRevolvedSketchSolid(kernel, polygon([[-20, 0], [10, 0], [10, 30], [-20, 30]]), 0, 360);
+    expect(kernel.getVolume(across)).toBeCloseTo(Math.PI * 20 * 20 * 30, 1);
+    // Wholly right of the axis there is nothing to turn, and the caller falls back to the mesh revolve.
+    expect(() => buildRevolvedSketchSolid(kernel, polygon([[5, 0], [10, 0], [10, 30], [5, 30]]), 0, 360)).toThrow(/axis/);
   });
 });

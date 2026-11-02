@@ -796,7 +796,7 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
   const base = gridfinityBase(type);
   const dividerTop = gridfinityDividerTop(type, top);
   // The wall's inside face, set in from the outline; the outside never changes. Walls that leave an inside narrower
-  // than MIN_GRIDFINITY_INSIDE make the bin solid: the floor goes up to the highest it takes.
+  // than MIN_GRIDFINITY_INSIDE make the bin solid: the floor goes up to the highest a stacked bin clears.
   // A bin open on every side has no wall to set, nor walls left to meet; a side opened only partly keeps one (#455).
   const openings = normalizeGridfinityOpenings(shape.gridfinityOpenings) ?? [];
   // To 0.01 mm: a chamfer of a millionth of a millimetre left the exact body's cut with no solid.
@@ -826,7 +826,9 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
   // A bin's outer wall above the feet (#856), to 0.01 mm; within CORNER_SNAP of 3.75 it is built as 3.75. Anything else's wall is its outline.
   const setWallRadius = Math.round(clampLabel(shape.gridfinityBinCornerRadius, GRIDFINITY_BIN_RADIUS, 0, GRIDFINITY_BIN_RADIUS) * 100) / 100;
   const wallRadius = type !== "bin" || GRIDFINITY_BIN_RADIUS - setWallRadius < CORNER_SNAP ? cornerRadius : setWallRadius;
-  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, cornerRadius, wallRadius, lipChamfer, wallThickness, innerRadius, solid, reach: gridfinityOpenReach(wallThickness) };
+  // A bin filled to the lip's top (#1126) has no lip edge left to chamfer.
+  const filled = lip && floor === top + GRIDFINITY_LIP_HEIGHT;
+  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
 }
 
 /** A notch cut out of a side's wall, partly open (#455): from and to along the side (x across, z deep), its bottom's height. */
@@ -919,9 +921,9 @@ function wallMaxThickness(size: { width: number; depth: number }) {
 export type GridfinityPlan = ReturnType<typeof gridfinityPlan>;
 
 /**
- * The highest floor (#455): with the lip, where the lip's support leaves the wall, at most the ledge 0.85 mm under the
- * top, so a stacked bin's feet keep at least 0.5 mm clear; without it the top, a solid block. Within FLOOR_SNAP of the
- * 1.2 mm floor there is nothing to raise.
+ * The highest floor a stacked bin still clears (#455): with the lip, where the lip's support leaves the wall, at most
+ * the ledge 0.85 mm under the top, so a stacked bin's feet keep at least 0.5 mm clear; without it the top, a solid
+ * block. Within FLOOR_SNAP of the 1.2 mm floor there is nothing to raise.
  */
 function floorMaxHeight({ type, top, lip, wallThickness }: { type: GridfinityType; top: number; lip: boolean; wallThickness: number }) {
   const min = floorMinHeight(type);
@@ -930,8 +932,19 @@ function floorMaxHeight({ type, top, lip, wallThickness }: { type: GridfinityTyp
   return max < min + FLOOR_SNAP + 1e-9 ? min : max;
 }
 
-/** The floor as it is built: its own height within what the bin takes, raised onto the highest within FLOOR_SNAP of it. */
+/** The highest floor of all (#1126): with the lip, the lip's top, which fills the lip into a solid block no bin stacks on. */
+function floorFullHeight(plan: { type: GridfinityType; top: number; lip: boolean; wallThickness: number }) {
+  return plan.lip ? plan.top + GRIDFINITY_LIP_HEIGHT : floorMaxHeight(plan);
+}
+
+/**
+ * The floor as it is built: its own height within what a stacked bin clears, raised onto the highest within FLOOR_SNAP
+ * of it; with the lip, a value from the lip's top up is built at the lip's top (#1126). A height in between, saved
+ * before or left there by a thinner wall or the lip switched on, stays at the highest a stacked bin clears, as it did.
+ */
 function floorHeight(value: number | undefined, plan: { type: GridfinityType; top: number; lip: boolean; wallThickness: number }) {
+  const full = floorFullHeight(plan);
+  if (value !== undefined && value >= full - 1e-9) return full;
   const max = floorMaxHeight(plan);
   const min = floorMinHeight(plan.type);
   const height = clampLabel(value, min, min, max);
@@ -939,9 +952,14 @@ function floorHeight(value: number | undefined, plan: { type: GridfinityType; to
   return max - height < FLOOR_SNAP + 1e-9 ? max : height;
 }
 
-/** The highest floor this bin takes. */
+/** The highest floor a stacked bin still clears. */
 export function gridfinityFloorMaxHeight(shape: GridfinityShapeFields) {
   return floorMaxHeight(gridfinityPlan(shape));
+}
+
+/** The highest floor this bin takes, for its slider: with the lip, the lip's top (#1126). */
+export function gridfinityFloorFullHeight(shape: GridfinityShapeFields) {
+  return floorFullHeight(gridfinityPlan(shape));
 }
 
 /** The floor's height inside the bin as it is built, measured from the underside. */
@@ -975,9 +993,9 @@ export function gridfinityFloorMinHeight(shape: GridfinityShapeFields) {
   return floorMinHeight(normalizeGridfinityType(shape.gridfinityType));
 }
 
-/** Whether the bin's floor can be raised at all: not in a bin of 1 height unit with the lip, whose support reaches the floor. */
+/** Whether the bin's floor can be raised at all: in a bin of 1 height unit with the lip, whose support reaches the floor, only to the lip's top. */
 export function gridfinityFloorFits(shape: GridfinityShapeFields) {
-  return gridfinityFloorMaxHeight(shape) > gridfinityFloorMinHeight(shape);
+  return gridfinityFloorFullHeight(shape) > gridfinityFloorMinHeight(shape);
 }
 
 /** The thickest wall the bin takes, for its slider. */
@@ -1500,7 +1518,7 @@ function gridfinityOpenReach(wallThickness: number) {
   return Math.max(GRIDFINITY_OPEN_REACH, wallThickness + OPEN_CLEAR);
 }
 
-/** Whether a bin has sides to open: every bin but a solid block, one without the lip whose floor is raised to the top. */
+/** Whether a bin has sides to open: every bin but a solid block, one whose floor is raised to the top (with the lip, the lip's top). */
 function openFits({ type, top, lip, floor }: { type: GridfinityType; top: number; lip: boolean; floor: number }) {
   return type !== "baseplate" && floor < (lip ? top + GRIDFINITY_LIP_HEIGHT : top);
 }
@@ -2376,11 +2394,11 @@ export function gridfinityHasPieces(shape: GridfinityShapeFields) {
 /**
  * The bin's wall from the outside over the top to the floor inside, as insets
  * from the outline: up the outer wall, over the lip (or the flat top of a bin
- * without one), down the inside to the floor. The lip rests on a 45 degree
- * support that grows out of the wall below it; a wall thicker than 1.75 mm
- * stops at a flat ledge 0.85 mm under the top, where the support starts. A
- * chamfer on the lip's top takes `chamfer` off the outer wall and off the
- * slope, as the edge tool does.
+ * without one or filled to the lip's top), down the inside to the floor. The
+ * lip rests on a 45 degree support that grows out of the wall below it; a wall
+ * thicker than 1.75 mm stops at a flat ledge 0.85 mm under the top, where the
+ * support starts. A chamfer on the lip's top takes `chamfer` off the outer wall
+ * and off the slope, as the edge tool does.
  */
 export function gridfinityWallProfile(plan: GridfinityPlan, floorRounding = plan.floorRounding, chamfer = plan.lipChamfer): GridfinityStep[] {
   const floor = plan.floor;
@@ -2400,6 +2418,8 @@ export function gridfinityWallProfile(plan: GridfinityPlan, floorRounding = plan
     if (plan.solid) return [[0, plan.base], [0, top], [Math.min(wallThickness, Math.min(plan.size.width, plan.size.depth) / 2 - MIN_GRIDFINITY_INSIDE / 2), top]];
     return [[0, plan.base], [0, top], [wallThickness, top], ...toFloor()];
   }
+  // Filled to the lip's top (#1126): up the outside and flat across, as a solid bin without the lip.
+  if (plan.filled) return [[0, GRIDFINITY_FOOT_HEIGHT], [0, floor], [wallThickness, floor]];
   const profile: GridfinityStep[] = [[0, GRIDFINITY_FOOT_HEIGHT]];
   [...LIP].reverse().forEach(([inset, y]) => profile.push([inset, top + y]));
   if (chamfer > 0) profile.splice(1, 1, [0, top + GRIDFINITY_LIP_HEIGHT - chamfer], [chamfer * Math.SQRT1_2, top + GRIDFINITY_LIP_HEIGHT - chamfer * Math.SQRT1_2]);

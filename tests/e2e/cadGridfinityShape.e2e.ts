@@ -170,6 +170,11 @@ describe("exact Gridfinity bodies", () => {
       bin({ gridfinityLip: false, height: 21, gridfinityFloorHeight: 20.99 }),
       bin({ height: 42 + GRIDFINITY_LIP_HEIGHT, gridfinityFloorHeight: 20, gridfinityScoopFront: true, gridfinityScoopRight: true, gridfinityLabelBack: true }),
       bin({ gridfinityHalfGrid: true, width: 20.5, depth: 41.5, gridfinityFloorHeight: 12 }),
+      // With the lip filled too (#1126): from its top, 21 + 4.4, up.
+      bin({ gridfinityFloorHeight: 25.4 }),
+      bin({ gridfinityFloorHeight: 30, gridfinityMagnets: true, gridfinityLipChamfer: 0.5 }),
+      bin({ gridfinityFloorHeight: 25.4, gridfinityScoopFront: true, gridfinityLabelBack: true, gridfinityOpenLeft: true, gridfinityCompartmentsX: 2, gridfinityBinCornerRadius: 1 }),
+      bin({ width: 41.5, depth: 41.5, height: 7 + GRIDFINITY_LIP_HEIGHT, gridfinityFloorHeight: 7 + GRIDFINITY_LIP_HEIGHT }),
     ]) {
       const solid = gridfinityPartSolid(cad, part);
       expect(cad.isValid(solid)).toBe(true);
@@ -184,6 +189,10 @@ describe("exact Gridfinity bodies", () => {
     const block = gridfinityPartSolid(cad, bin({ gridfinityLip: false, height: 21, gridfinityFloorHeight: 21 }));
     const tops = cad.getSubShapes(block, "face").filter((face) => { const b = cad.getBoundingBox(face); return Math.abs(b.ymin - 21) < 1e-6 && Math.abs(b.ymax - 21) < 1e-6; });
     expect(tops).toHaveLength(1);
+    // Filled to the lip's top, one flat top too, where the lip's slopes and the ledge would have been.
+    const filled = gridfinityPartSolid(cad, bin({ gridfinityFloorHeight: 25.4 }));
+    expect(cad.getSubShapes(filled, "face").filter((face) => { const b = cad.getBoundingBox(face); return Math.abs(b.ymin - 25.4) < 1e-6 && Math.abs(b.ymax - 25.4) < 1e-6; })).toHaveLength(1);
+    expect(cad.getBoundingBox(filled).ymax).toBeCloseTo(25.4, 6);
     // A bin stacked on one raised to the highest sits as on a plain one, its feet 1.3 mm above the floor: pushed 1.25 mm
     // further down they cut into the lip only, as much as on a plain bin; 1.35 mm down they reach the floor.
     const plain = gridfinityPartSolid(cad, bin({ width: 41.5, depth: 41.5 }));

@@ -32,7 +32,8 @@ import { IconTagPanel } from "@/components/workplane/IconTagPanel";
 import { QrCodePanel } from "@/components/workplane/QrCodePanel";
 import { qrCodeOf, qrCodeShape, regeneratedQrCodeShape } from "@/lib/editorQrCode";
 import { regeneratedSbcBoardShape, sbcBoardOf, sbcBoardShape } from "@/lib/editorSbcBoard";
-import { DEFAULT_SBC_BOARD, MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { portWithScrewHolesGroup } from "@/lib/editorPortScrewHoles";
+import { DEFAULT_SBC_BOARD, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { DEFAULT_QR_WIDTH, MAX_QR_HEIGHT, MAX_QR_WIDTH, MIN_QR_HEIGHT, MIN_QR_WIDTH, QR_BYTE_CAPACITY, QR_ERROR_CORRECTIONS, QR_STYLES, normalizeQrSettings, qrByteLength, qrMatrix, qrModuleSize, qrModuleTooSmall, qrTextFits, type QrCodeSettings, type QrErrorCorrection, type QrStyle } from "@/lib/qrCode";
 import { iconSourceFromFile, PICTURE_FILE_ACCEPT, picturePixels, type IconSource } from "@/lib/pictureIcon";
 import { loadedManifoldRuntime, onManifoldReady } from "@/lib/manifoldHandle";
@@ -167,8 +168,9 @@ import type { CrossSection } from "manifold-3d";
 import { DrawingTooComplexError } from "@/lib/drawingProjection";
 import { DEFAULT_TAPER_DIMENSION_MAX, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, shapeDimensionLimit, workplaneSettingsFingerprint } from "@/lib/workplaneSettings";
 import { MCP_GRIDFINITY_LIST_KEYS, mcpGridfinityListParams, mcpGridfinityOutlinePatch, mcpGridfinityPaddingPatch, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
-import { normalizeNotes, referencePoints } from "@/lib/workplaneNotes";
-import { notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
+import { createNoteId, normalizeNotes, NOTE_COUNT_LIMIT, NOTE_TEXT_LIMIT, referencePoints } from "@/lib/workplaneNotes";
+import { findShapeInHistoryState } from "@/lib/historyRestore";
+import { noteAnchorFromWorld, notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
 import { noticeReportsLastChange } from "@/lib/noticeTiming";
 import { referencePointsForBox, unionReferenceBoxes, type ReferencePointSpot, type ReferencePosition } from "@/lib/referencePoints";
 import { normalizePlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFingerprint, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, horizontalPlacementWorkplane, translationToWorkplane, type PlacementPoint, REVOLVE_REFERENCE_WORKPLANE, revolveBodyStandsUpright, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -246,6 +248,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "estimate_print",
   "check_clearance",
   "list_reference_points",
+  "list_notes",
   "show_overhangs",
   "measure_section",
   "set_section_view",
@@ -2661,6 +2664,23 @@ function mcpString(value: unknown, fallback: string) {
 function mcpPointInfo(note: WorkplaneNote) {
   const round = (value: number) => Number(value.toFixed(4));
   return { id: note.id, x: round(note.x), z: round(note.z), elevation: round(note.y) };
+}
+
+/** A note as the AI agent reads it (#1191): its text, whether it is a request for the agent, the agent's answer, and the body it is pinned to. */
+function mcpNoteInfo(note: WorkplaneNote, shapes: readonly WorkplaneShape[]) {
+  const round = (value: number) => Number(value.toFixed(4));
+  const pinned = note.anchor ? findShapeInHistoryState(shapes, note.anchor.shapeId) : null;
+  return {
+    id: note.id,
+    text: note.text,
+    forAi: Boolean(note.forAi),
+    reply: note.reply ?? "",
+    object: note.anchor ? { id: note.anchor.shapeId, name: pinned?.name ?? null } : null,
+    x: round(note.x),
+    z: round(note.z),
+    elevation: round(note.y),
+    open: !note.collapsed,
+  };
 }
 
 function mcpStringArray(value: unknown): string[] {
@@ -9472,6 +9492,18 @@ export function LayerlingEditor({
   }, [refuseLockedSelection, commitShapes, selectedIds, selectedShapes, activeRotationPivot]);
 
   /**
+   * A socket with screw holes (D-Sub 9) chosen for an opening: the opening takes it, and it and its
+   * two screw holes become one group in its place, selected, in one step to undo.
+   */
+  const choosePortPresetWithScrewHoles = useCallback((patch: Partial<WorkplaneShape>) => {
+    const port = selectedShapes.length === 1 ? selectedShape : null;
+    if (!port || port.locked || !shapesRef.current.some((shape) => shape.id === port.id)) return;
+    const group = portWithScrewHolesGroup(canonicalizeShape({ ...port, ...patch }));
+    if (!group) return;
+    commitShapes(shapesRef.current.map((shape) => (shape.id === port.id ? group : shape)), group.id, t("status.portScrewHolesAdded"));
+  }, [commitShapes, selectedShape, selectedShapes.length]);
+
+  /**
    * A key ring tab of its own (#598) fixed to the nearest tag in one click, where it was put: the
    * tag is built again with its hole there - the ear on the bottom layer, the hole through every
    * layer - and the tab is gone. "Free" brings it out again.
@@ -10228,6 +10260,11 @@ export function LayerlingEditor({
       setNotice(t("status.surfaceTextMissed"));
       return;
     }
+    // So would an image once that came onto no such face.
+    if (stats.image && !stats.image.placed) {
+      setNotice(t("status.surfaceImageMissed"));
+      return;
+    }
     const gold = outcome.fill ? surfaceTextureGoldShape(textured, outcome.fill, `${displayShapeName(textured)} – ${t("surfaceTexture.goldPart")}`) : null;
     // Several layers are named together: "Bricks + Knurling".
     const pattern = [textured.surfaceTexture?.pattern ?? settings.pattern, ...(textured.surfaceTextureLayers ?? []).map((layer) => layer.pattern)].map(surfacePatternLabel).join(" + ");
@@ -10241,6 +10278,7 @@ export function LayerlingEditor({
       stats.cracks ? t("status.surfaceCracks", { count: stats.cracks.lines, length: Math.round(stats.cracks.length) }) : "",
       gold ? t("status.surfaceGold") : "",
       stats.text?.torn ? t("status.surfaceTextTorn") : "",
+      stats.image?.torn ? t("status.surfaceImageTorn") : "",
       stats.limited ? t("status.surfaceCoarser") : "",
       stats.tooDeep ? t("status.surfaceTooDeep") : "",
     ].filter(Boolean);
@@ -11056,6 +11094,13 @@ export function LayerlingEditor({
         const ownFont = shape.kind === "text" && typeof params.font === "string" ? mcpTextFont(params.font) : null;
         if (ownFont && isCustomFontId(ownFont)) shape = canonicalizeShape({ ...shape, font: ownFont });
         const committedShape = canonicalizeShape(bakeShapeTransformIntoMesh(shape));
+        // A D-Sub opening comes grouped with its two screw holes, as the editor's socket list makes it; portScrewHoles false leaves them out.
+        const withScrewHoles = committedShape.kind === "port" && params.portScrewHoles !== false ? portWithScrewHolesGroup(committedShape) : null;
+        if (committedShape.kind === "port" && params.portScrewHoles === true && !withScrewHoles) throw new Error("portScrewHoles needs a port opening whose socket has screw holes (portPreset dsub9)");
+        if (withScrewHoles) {
+          commitShapes([...currentShapes(), withScrewHoles], withScrewHoles.id, t("status.shapeAddedMcp", { name: displayShapeName(withScrewHoles) }));
+          return { object: mcpShapeSummary(withScrewHoles) };
+        }
         commitShapes([...currentShapes(), committedShape], committedShape.id, t("status.shapeAddedMcp", { name: displayShapeName(committedShape) }));
         if (committedShape.kind === "vase" && params.vaseParts === true) {
           const { parts, missing } = layOutVaseAccessories(committedShape.id);
@@ -11934,10 +11979,23 @@ export function LayerlingEditor({
         if (typeof clearance !== "number" || !Number.isFinite(clearance) || clearance < 0 || clearance > MAX_SBC_CLEARANCE) throw new Error(`clearance must be 0 to ${MAX_SBC_CLEARANCE} mm`);
         const reach = params.reach ?? 0;
         if (typeof reach !== "number" || !Number.isFinite(reach) || reach < 0 || reach > MAX_SBC_REACH) throw new Error(`reach must be 0 to ${MAX_SBC_REACH} mm`);
+        for (const key of ["ribbonUp", "ribbonSide", "gpioUp"] as const) {
+          if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
+        }
+        const upReach = params.upReach;
+        if (upReach !== undefined && (typeof upReach !== "number" || !Number.isFinite(upReach) || upReach < MIN_SBC_UP_REACH || upReach > MAX_SBC_UP_REACH)) throw new Error(`upReach must be ${MIN_SBC_UP_REACH} to ${MAX_SBC_UP_REACH} mm`);
         for (const axis of ["x", "z"] as const) {
           if (params[axis] !== undefined && (typeof params[axis] !== "number" || !Number.isFinite(params[axis]))) throw new Error(`${axis} must be a number`);
         }
-        const built = await sbcBoardShape({ board: board as SbcBoardType, clearance, reach }, workspaceSettingsRef.current.booleanTriangleLimit);
+        const built = await sbcBoardShape({
+          board: board as SbcBoardType,
+          clearance,
+          reach,
+          ...(params.ribbonUp === true ? { ribbonUp: true } : {}),
+          ...(params.ribbonSide === true ? { ribbonSide: true } : {}),
+          ...(params.gpioUp === true ? { gpioUp: true } : {}),
+          ...(typeof upReach === "number" ? { upReach } : {}),
+        }, workspaceSettingsRef.current.booleanTriangleLimit);
         const shape = canonicalizeShape({
           ...built,
           ...(typeof params.x === "number" ? { x: params.x } : {}),
@@ -12269,6 +12327,7 @@ export function LayerlingEditor({
         if (!textured) throw new Error("No part of this body gets the pattern: check faces, outside and inside, bottomFree and topFree, and zoneFrom and zoneTo");
         if (outcome.stats.cracks && outcome.stats.cracks.lines === 0) throw new Error("No crack found a way across this body: try another crackStart (anywhere goes on any body), more crackLength, or let the pattern reach more faces");
         if (outcome.stats.text && !outcome.stats.text.placed) throw new Error("The text came onto no face that may get it (a mask lies over it): move it with textAround and textHeight, or change the masks");
+        if (outcome.stats.image && !outcome.stats.image.placed) throw new Error("The image once came onto no face that may get it (a mask lies over it): move it with textAround and textHeight, or change the masks");
         const gold = outcome.fill ? surfaceTextureGoldShape(textured, outcome.fill, `${displayShapeName(textured)} – ${t("surfaceTexture.goldPart")}`) : null;
         commitShapes(
           sceneWithSurfaceBody(currentShapes(), target.id, textured, gold),
@@ -12732,6 +12791,64 @@ export function LayerlingEditor({
         const targets = referencePoints(current).filter((point) => ids.length === 0 || ids.includes(point.id));
         if (ids.length > 0 && targets.length === 0) throw new Error("No reference point has these ids");
         if (targets.length > 0) commitNotes(current.filter((note) => !targets.includes(note)), t("status.pointRemoved"));
+        return { removed: targets.length };
+      }
+
+      if (command.action === "list_notes") {
+        const notes = normalizeNotes(notesRef.current).filter((note) => note.kind !== "point");
+        const wanted = params.onlyForAi === true ? notes.filter((note) => note.forAi) : notes;
+        return { notes: wanted.map((note) => mcpNoteInfo(note, currentShapes())) };
+      }
+
+      if (command.action === "add_note") {
+        const text = typeof params.text === "string" ? params.text.trim() : "";
+        if (!text) throw new Error("text must be the note's words");
+        if (notesRef.current.length >= NOTE_COUNT_LIMIT) throw new Error(`The design holds as many notes and points as it can (${NOTE_COUNT_LIMIT})`);
+        const objectId = typeof params.objectId === "string" ? params.objectId : "";
+        const target = objectId ? currentShapes().find((shape) => shape.id === objectId) : undefined;
+        if (objectId && !target) throw new Error("No top-level object has this objectId");
+        const at = (params.at ?? null) as Record<string, unknown> | null;
+        let spot: { x: number; y: number; z: number };
+        if (at && typeof at === "object") {
+          spot = { x: Number(at.x), y: Number(at.elevation ?? 0), z: Number(at.z) };
+          if (![spot.x, spot.y, spot.z].every(Number.isFinite)) throw new Error("at needs a number for x and z, and optionally for elevation");
+        } else if (target) {
+          const box = meshAabb(target);
+          spot = { x: (box.minX + box.maxX) / 2, y: box.maxY, z: (box.minZ + box.maxZ) / 2 };
+        } else {
+          throw new Error("Give an objectId, or at with x and z");
+        }
+        const created: WorkplaneNote = { id: createNoteId(), text: text.slice(0, NOTE_TEXT_LIMIT), x: spot.x, y: spot.y, z: spot.z };
+        if (target) created.anchor = { shapeId: target.id, normalized: noteAnchorFromWorld(target, spot) };
+        if (params.forAi === true) created.forAi = true;
+        setNotesVisible(true);
+        commitNotes([...notesRef.current, created], target ? t("status.notePinned") : t("status.noteAdded"));
+        return { added: mcpNoteInfo(created, currentShapes()) };
+      }
+
+      if (command.action === "update_note") {
+        const id = typeof params.id === "string" ? params.id : "";
+        const existing = notesRef.current.find((note) => note.id === id && note.kind !== "point");
+        if (!existing) throw new Error("No note has this id; layerling_list_notes lists them");
+        const patch: Partial<WorkplaneNote> = {};
+        if (typeof params.text === "string") patch.text = params.text;
+        if (typeof params.reply === "string") patch.reply = params.reply;
+        if (typeof params.forAi === "boolean") patch.forAi = params.forAi;
+        // An answer closes the request unless the call says otherwise.
+        else if (typeof params.reply === "string" && params.reply) patch.forAi = false;
+        if (Object.keys(patch).length === 0) throw new Error("Give text, reply or forAi to change");
+        updateNote(id, patch);
+        const updated = normalizeNotes(notesRef.current).find((note) => note.id === id);
+        return { updated: updated ? mcpNoteInfo(updated, currentShapes()) : null };
+      }
+
+      if (command.action === "remove_notes") {
+        const ids = mcpStringArray(params.ids ?? params.id);
+        if (ids.length === 0) throw new Error("Name the notes to delete with ids");
+        const current = notesRef.current;
+        const targets = current.filter((note) => note.kind !== "point" && ids.includes(note.id));
+        if (targets.length === 0) throw new Error("No note has these ids");
+        commitNotes(current.filter((note) => !targets.includes(note)), t("status.noteRemoved"));
         return { removed: targets.length };
       }
 
@@ -15533,6 +15650,7 @@ export function LayerlingEditor({
           onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
           onTextTags={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? makeTextTags : undefined}
           onFixKeyringTab={selectedShapes.length === 1 && selectedShape?.keyringTab && !historyViewState ? () => void fixKeyringTab() : undefined}
+          onPortPresetWithScrewHoles={selectedShapes.length === 1 && selectedShape?.kind === "port" && !historyViewState ? choosePortPresetWithScrewHoles : undefined}
           textLayerStack={selectedNameTag}
           iconTag={historyViewState ? null : iconTagControls}
           qrCode={historyViewState ? null : qrCodeControls}

@@ -18,6 +18,7 @@ import {
   applySurfaceTexture,
   normalizeSurfaceTexture,
   surfaceTexturePositions,
+  stuckOn,
   SURFACE_TEXTURE_MAX_MASK_PLANES,
   type SurfaceTextureCarbonWeave,
   type SurfaceTextureBrickBond,
@@ -161,7 +162,7 @@ export const SURFACE_TEXTURE_LABELS: {
     rosettes: "surfaceTexture.imageRosettes",
     own: "surfaceTexture.imageOwn",
   },
-  tiling: { repeat: "surfaceTexture.tilingRepeat", mirror: "surfaceTexture.tilingMirror", staggered: "surfaceTexture.tilingStaggered" },
+  tiling: { repeat: "surfaceTexture.tilingRepeat", mirror: "surfaceTexture.tilingMirror", staggered: "surfaceTexture.tilingStaggered", once: "surfaceTexture.tilingOnce" },
   capStyle: { auto: "surfaceTexture.capAuto", rows: "surfaceTexture.capRows", rings: "surfaceTexture.capRings" },
   capEdge: { auto: "surfaceTexture.edgeAuto", sharp: "surfaceTexture.edgeSharp", over: "surfaceTexture.edgeOver", fold: "surfaceTexture.edgeFold", bead: "surfaceTexture.edgeBead" },
   capEdgeHint: { auto: "surfaceTexture.edgeAutoHint", sharp: "surfaceTexture.edgeSharpHint", over: "surfaceTexture.edgeOverHint", fold: "surfaceTexture.edgeFoldHint", bead: "surfaceTexture.edgeBeadHint" },
@@ -310,6 +311,7 @@ export function mergedSurfaceTextureStats(all: readonly SurfaceTextureOutcome["s
     around: all.find((stats) => stats.around)?.around ?? last.around,
     cracks: all.find((stats) => stats.cracks)?.cracks ?? last.cracks,
     text: all.find((stats) => stats.text)?.text ?? last.text,
+    image: all.find((stats) => stats.image)?.image ?? last.image,
     bricks: all.find((stats) => stats.bricks)?.bricks ?? last.bricks,
     limited: all.some((stats) => stats.limited),
     tooDeep: all.some((stats) => stats.tooDeep),
@@ -330,9 +332,9 @@ export function mergedSurfaceTextureFill(all: readonly (Float64Array | null)[]):
   return out;
 }
 
-/** Whether a further layer has a place of its own: faces picked for it, or a text, which goes where it is put. */
+/** Whether a further layer has a place of its own: faces picked for it, or a text or an image once, which go where they are put. */
 export function surfaceTextureLayerPlaced(layer: SurfaceTextureSettings) {
-  return layer.faces.length > 0 || layer.pattern === "text";
+  return layer.faces.length > 0 || stuckOn(layer);
 }
 
 /** Several layers made here and now, one after the other (tests, and where no worker can run). */

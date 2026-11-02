@@ -81,6 +81,7 @@ Notatka zapisuje to, czego geometria nie mówi: „Ta śruba jest o 0,3 mm za ci
 - Jeśli umieścisz notatkę **na bryle**, porusza się razem z nią.
 - Jeśli umieścisz ją **obok**, zostaje na płaszczyźnie roboczej ({{ui:note.free}}).
 - {{ui:note.detach}} odpina przypiętą notatkę od bryły.
+- {{ui:note.forAi}} zamienia notatkę w prośbę do agenta AI na moście MCP (zob. „AI z MCP”): agent czyta ją przez `layerling_list_notes`, wykonuje pracę i odpowiada w tej samej notatce, pod twoim tekstem. Może też stawiać na modelu własne notatki, żeby w jakimś miejscu o coś zapytać lub coś zgłosić.
 - {{ui:editor.tool.group}} zabiera przypiętą notatkę do grupy; {{ui:editor.tool.ungroup}} przekazuje ją widocznej części pod nią, także grupie w środku. Dopóki grupa jest otwarta przez {{ui:group.edit}}, jej notatki poruszają się z częścią pod nimi i wracają do grupy po {{ui:group.done}}; anulowanie przywraca je do stanu sprzed edycji.
 - Gdy jej bryła zostanie usunięta albo pod nią nie ma już widocznej bryły, notatka zostaje tam, gdzie stała, na płaszczyźnie roboczej.
 - Przeciągnięcie pinezki przesuwa notatkę. Kliknięcie pinezki zwija kartę, zostaje tylko mały numer; kolejne kliknięcie znów ją rozwija. Kliknięcie w tekst pozwala go edytować.

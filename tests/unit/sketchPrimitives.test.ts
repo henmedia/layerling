@@ -279,6 +279,17 @@ describe("Startgroesse aus den Formvorgaben (#1048)", () => {
 
   it("laesst Dreieck und Sechseck gleichmaessig, auch mit einer Tiefe", () => {
     const dreieck = sketchPrimitiveGeometry("triangle", { x: 0, z: 0 }, makeId, 20, { depth: 50 }).points;
-    expect(tiefe(dreieck)).toBeCloseTo(20, 6);
+    expect(tiefe(dreieck)).toBeCloseTo(20 * Math.sqrt(3) / 2, 6);
+  });
+
+  it("baut das Dreieck gleichseitig, mit der Mitte im Ursprung (#1180)", () => {
+    const dreieck = sketchPrimitiveGeometry("triangle", { x: 0, z: 0 }, makeId, 20).points;
+    const seiten = dreieck.map((p, i) => {
+      const q = dreieck[(i + 1) % 3];
+      return Math.hypot(q.x - p.x, q.z - p.z);
+    });
+    for (const seite of seiten) expect(seite).toBeCloseTo(20, 6);
+    expect(breite(dreieck)).toBeCloseTo(20, 6);
+    expect(Math.max(...dreieck.map((p) => p.z)) + Math.min(...dreieck.map((p) => p.z))).toBeCloseTo(0, 6);
   });
 });
