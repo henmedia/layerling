@@ -23,7 +23,8 @@ import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerText
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { LID_DEFAULTS, groupedWithMagnets, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { LID_DEFAULTS, groupedWithMagnets, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import type { CadLidRequest } from "@/lib/cadLid";
 import { cookieCutterFillets, cookieCutterProfiles, normalizeCookieCutterOptions, outlineFromCurves, outlineFromLoops, sampledCurveLoop, unitedFootprint, type CookieCutterOptions, type CurveLoop } from "@/lib/cookieCutter";
 import type { IconLayerPatch, IconTagControls, ReferenceImageControls, TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import { calibratedReferenceImage, dataUrlByteLength, isReferenceImage, LARGE_REFERENCE_IMAGE_BYTES, mirrorHidesReferenceImage, referenceImageOpacity, referenceImagePixelDistance, referenceImageShape } from "@/lib/referenceImage";
@@ -7862,6 +7863,38 @@ export function LayerlingEditor({
   }, [selectedIds]);
 
   /**
+   * The mesh lid built again as an exact body (#1154), so its edges round like any other: for one body the CAD kernel
+   * knows exactly (a rounded box hollowed with its top open), laid where the mesh lid lies. Null wherever it cannot be,
+   * and with posts for the magnets, which the lip has to go round: the mesh lid stays then.
+   */
+  const exactLid = useCallback(async (targets: readonly WorkplaneShape[], options: LidOptions, meshLid: WorkplaneShape, magnets?: { posts: WorkplaneShape[]; pockets: WorkplaneShape[] }): Promise<WorkplaneShape | null> => {
+    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length) return null;
+    const pocketDepth = magnetPocketDepth(options);
+    const request: CadLidRequest = {
+      type: options.type,
+      thickness: options.thickness,
+      gap: options.gap,
+      depth: options.depth,
+      wall: options.wall,
+      pockets: (magnets?.pockets ?? []).map((pocket) => ({ x: pocket.x, z: pocket.z, radius: shapeWidth(pocket) / 2, depth: pocketDepth, overcut: Math.max(0, pocket.height - pocketDepth) })),
+      place: { x: meshLid.x - shapeWidth(meshLid) / 2, y: meshLid.elevation ?? 0, z: meshLid.z - shapeDepth(meshLid) / 2 },
+    };
+    try {
+      invalidateCadModifierSession();
+      await prepareCadModifierForMcp(targets[0], 25);
+      const response = await postCadModifierRequestAsync({ type: "preview", kind: "lid", edgeIds: [], amount: options.thickness, quality: "standard", chamferAngle: 45, lid: request }, [], 60000);
+      if (response.type !== "preview") return null;
+      const exact = shapeFromCadMesh(meshLid, response.positions, response.normals, response.indices, response.brep, response.deflection);
+      return exact ? canonicalizeShape({ ...exact, cadDisplayEdges: cadDisplayEdgesForShape(exact, response.displayEdges), cadDisplayEdgesVersion: 2 as const }) : null;
+    } catch {
+      // Too many triangles, a body the kernel cannot read, an outline it cannot move: the mesh lid is still a lid.
+      return null;
+    } finally {
+      invalidateCadModifierSession();
+    }
+  }, [invalidateCadModifierSession, prepareCadModifierForMcp, postCadModifierRequestAsync]);
+
+  /**
    * A lid for the selection (#1009): the solids joined and the holes among them cut away, then a lid made for the
    * opening at the top and laid beside them, turned over, ready to print. The bodies stay; with magnets they are
    * grouped with the pockets (and the posts for thin corners), as Cut out does, so they stay editable inside the group.
@@ -7885,7 +7918,8 @@ export function LayerlingEditor({
     const result = await lidForShapesOffThread(targets, options);
     if (!result.lid) return fail(result.error);
     if (changed()) return fail(t("lid.error.changed"));
-    const lid = result.lid;
+    const lid = (await exactLid(targets, options, result.lid, result.magnets)) ?? result.lid;
+    if (changed()) return fail(t("lid.error.changed"));
     const type = t(`lid.type.${options.type}`);
     if (!result.magnets) {
       commitShapes([...shapesRef.current, lid], lid.id, t("status.lidMade", { type }));
@@ -7900,7 +7934,7 @@ export function LayerlingEditor({
     const remaining = shapesRef.current.filter((shape) => !consumed.has(shape.id));
     commitShapes([...remaining, body, lid], lid.id, withClosedHolesNote(t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: pockets.length }), grouped.closedHoles));
     return { ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: pockets.length, posts: posts.length > 0 };
-  }, [commitShapes, selectedShapes]);
+  }, [commitShapes, exactLid, selectedShapes]);
 
   const startLidTool = useCallback(() => {
     if (lidTool) {

@@ -1,3 +1,4 @@
+import type { CadLidRequest } from "@/lib/cadLid";
 import type { ThreadOutlineTier } from "@/lib/threadOutline";
 import type { ThreadHead } from "@/types/layerling";
 import type { ThreadDriveOutline } from "@/lib/threadGeometry";
@@ -455,7 +456,8 @@ export type CadModifierWorkerRequest =
   | {
       type: "preview";
       requestId: number;
-      kind: CadModifierKind;
+      // "lid" (#1154) changes nothing: it builds the exact lid for the prepared body.
+      kind: CadModifierKind | "lid";
       edgeIds: number[];
       amount: number;
       quality: CadModifierQuality;
@@ -471,6 +473,8 @@ export type CadModifierWorkerRequest =
       offsetSideways?: boolean;
       // Only for "deleteFace": the faces to delete, as the prepare numbered them.
       faceIds?: number[];
+      // Only for "lid" (#1154): the kind, sizes, pockets and place of the lid.
+      lid?: CadLidRequest;
       // The finest deflection the shape's edge-treatment history has needed
       // so far, if any - a floor beneath this operation's own deflection.
       minDeflection?: CadModifierDeflection;

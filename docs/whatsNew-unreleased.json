@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Deckel als exakter Körper: Kanten lassen sich verrunden",
+      "en": "Lids are exact bodies: their edges can be rounded"
+    },
+    "body": {
+      "de": "Ein Deckel für einen exakten Körper, etwa einen ausgehöhlten abgerundeten Quader, ist jetzt selbst ein exakter CAD-Körper. Seine Kanten verrundest oder fast du mit dem Kantenwerkzeug, und die Rundungen bleiben auch im STEP-Export rund.",
+      "en": "A lid for an exact body, such as a rounded box you hollowed, is now an exact CAD body itself. Round or chamfer its edges with the edge tool, and its curves stay round in a STEP export too."
+    }
+  },
+  {
+    "title": {
       "de": "Gedrehte Körper bleiben beim Ziehen gedreht",
       "en": "Turned shapes stay turned when you drag a handle"
     },

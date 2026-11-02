@@ -6,6 +6,7 @@ import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm"
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
+import { cadLidSolid } from "@/lib/cadLid";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
 import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { cadProfileSolidMismatch, profileExtrusionSolid } from "@/lib/cadProfileSolid";
@@ -972,12 +973,18 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     ? (request.faceIds ?? []).map((id) => ({ id, face: faceHandles[id], owner: faceOwners[id] })).filter((entry): entry is { id: number; face: ShapeHandle; owner: number } => entry.face !== undefined)
     : [];
   if (request.kind === "deleteFace" && selectedFaces.length === 0) throw new Error("Select at least one face");
-  if (selected.length === 0 && request.kind !== "shell" && request.kind !== "deleteFace" && request.kind !== "offset") throw new Error("Select at least one highlighted edge");
+  if (selected.length === 0 && request.kind !== "shell" && request.kind !== "deleteFace" && request.kind !== "offset" && request.kind !== "lid") throw new Error("Select at least one highlighted edge");
   if (request.kind === "fillet" && request.endAmount !== undefined && selected.length !== 1) throw new Error(VARIABLE_FILLET_ONE_EDGE_MESSAGE);
   const componentResults: ShapeHandle[] = [];
   let result: ShapeHandle | null = null;
   try {
-    for (let owner = 0; owner < baseSolids.length; owner += 1) {
+    // The lid (#1154) is a new body made from the whole one, not a change to each of its solids.
+    if (request.kind === "lid") {
+      const lid = request.lid ? cadLidSolid(activeCad, baseShape, request.lid) : null;
+      if (!lid) throw new Error("The lid cannot be built as an exact body");
+      componentResults.push(lid);
+    }
+    for (let owner = 0; request.kind !== "lid" && owner < baseSolids.length; owner += 1) {
       const solid = baseSolids[owner];
       const componentEntries = selected.filter((entry) => entry.owner === owner);
       const componentEdges = componentEntries.map((entry) => entry.edge);
