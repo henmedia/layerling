@@ -100,6 +100,10 @@ Ezután beállítod a vastagságot ({{ui:lid.thickness}}), az illesztést ({{ui:
 
 > **Tipp:** Hogy milyen szorosan ül a fedél, az a nyomtatótól függ. Előbb nyomtass egy kis dobozt fedéllel; ha túl szoros, válaszd a következő, lazább illesztést.
 
+## Kábelcsatorna egy testen át
+
+A {{ui:editor.tool.cableChannel}} kerek járatot vezet egy testen át egy kábelnek vagy LED-vezetéknek, onnan, ahol bemegy, odáig, ahol kijön, és maga keresi meg az utat. Jelöld ki a testet, kattints a {{ui:editor.tool.cableChannel}} gombra, majd a testre ott, ahol a kábel bemegy ({{ui:cable.entry}}), és ott, ahol kijön ({{ui:cable.exit}}). Az út egyenesen, a felületre merőlegesen kezdődik és végződik, egyenesen halad, ahol lehet, és ív, ahol kell, sosem szűkebben, mint {{ui:cable.minBend}}, és amennyire lehet, távol marad a külső felülettől, sosem közelebb, mint {{ui:cable.minWall}}. A panel megmutatja a csatorna hosszát, a legszűkebb ívet és a legvékonyabb falat, pirossal, ha valamelyiknek kisebbnek kellett lennie a kértnél. A {{ui:cable.apply}} bevágja a csatornát: {{ui:shape.bentTube}} lesz belőle lyukként, a testtel csoportosítva, így a test pontos marad, és a csoport bontása után a cső még módosítható.
+
 ## Testek eltolása
 
 A test minden lapja ugyanannyival tolható el kifelé vagy befelé. Erre van szüksége egy illesztésnek, fedélnek vagy pattintós kötésnek: 0,1-0,3 mm rés körben, miközben a részletek a helyükön maradnak, amit a méretezés nem ad.

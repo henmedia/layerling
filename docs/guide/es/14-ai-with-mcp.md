@@ -103,6 +103,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_cookie_cutter` | crea un cortador de galletas a partir de los objetos: una pared con filo y un reborde alrededor del contorno reflejado (Cortador de galletas) |
 | `layerling_flexi_joints` | corta un cuerpo plano en eslabones con articulaciones impresas ya montadas que giran hacia los lados (Articulaciones flexi) |
 | `layerling_make_lid` | crea una tapa para un cuerpo abierto por arriba: encajada dentro, por encima o plana, con el ajuste que elijas y, si quieres, con imanes (Tapa) |
+| `layerling_make_cable_channel` | abre un canal redondo para un cable a través de un cuerpo, de una entrada a una salida, y encuentra solo el camino con curvas suaves (Canal para cable) |
 | `layerling_loft_sketches` | une dos cuerpos de boceto en una transición de un contorno al otro (Transición entre bocetos) |
 | `layerling_separate_parts` | separa una forma en sus piezas sueltas, y un cuerpo de boceto en un cuerpo por contorno |
 | `layerling_split_objects` | corta sólidos u orificios en dos con un plano |

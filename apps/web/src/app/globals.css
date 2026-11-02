@@ -3319,6 +3319,50 @@ html[data-theme="dark"] .shell-openings-summary {
   accent-color: #d07313;
 }
 
+/* The cable channel's two ends: a label and a button to click on the body, or the hint that a click is awaited. */
+.cable-channel-end {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cable-channel-end button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  font-weight: 700;
+}
+
+.cable-channel-picking {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #b35f00;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cable-channel-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.cable-channel-status.warning {
+  color: #b42318;
+}
+
+html[data-theme="dark"] .cable-channel-picking {
+  color: #f3a452;
+}
+
+html[data-theme="dark"] .cable-channel-status.warning {
+  color: #ff8a80;
+}
+
 .edge-modifier-error {
   margin-top: 12px;
   padding: 8px 9px;
