@@ -159,10 +159,10 @@ type WorkplaneViewportProps = {
   initialWorkspace?: WorkplaneWorkspaceSettings;
   workspaceSettingsKey?: string | null;
   /** A new shape at `point`; `workplane` is the face it was dropped on, when not the current workplane (#195). */
-  onAddShape: (shape: ShapeAsset, point?: PlacementPoint, workplane?: PlacementWorkplane) => void;
+  onAddShape: (shape: ShapeAsset, point?: PlacementPoint, workplane?: PlacementWorkplane, sunk?: boolean) => void;
   /** Parts picked up with C, following the pointer over faces until a click sets them down (#195). */
   carryIds?: string[] | null;
-  onCarryDrop?: (target: { point: PlacementPoint; normal: PlacementPoint; workplane: PlacementWorkplane }) => void;
+  onCarryDrop?: (target: { point: PlacementPoint; normal: PlacementPoint; workplane: PlacementWorkplane; sunk?: boolean }) => void;
   /** A custom shape dropped on the workplane, by its id. */
   onDropMyShape?: (id: string, point: PlacementPoint) => void;
   /** Shape following the cursor until a click drops it. Null places immediately. */
@@ -1902,6 +1902,9 @@ export function WorkplaneViewport({
   } | null) | null>(null);
   /** Alt held while a shape is placed by click: it goes where the pointer is, not to a face's middle (#823). */
   const cruiseFreeRef = useRef(false);
+  /** Shift held while a shape is placed or carried onto a face: it goes into the face, its top flush with it (#940). */
+  const cruiseSinkRef = useRef(false);
+  const carryPointerRef = useRef<{ x: number; y: number } | null>(null);
   const cruisePreviewRef = useRef<{ object: THREE.Group; shape: WorkplaneShape } | null>(null);
   const cruisePointerRef = useRef<{ x: number; y: number } | null>(null);
   // A text is drawn with what is there when it is built: a font that arrives later - the Japanese
@@ -3345,11 +3348,11 @@ export function WorkplaneViewport({
     // pickPlacementSurface is declared further down; it is reached through its ref.
     // A new shape snaps to the middle of a face near it, unless Alt is held; carried parts never do (#823).
     const surface = pickPlacementSurfaceRef.current?.(clientX, clientY, false, skip, skip || cruiseFreeRef.current ? false : "near") ?? null;
-    if (surface) return { point: surface.workplane.origin, workplane: surface.workplane, normal: surface.workplane.normal };
+    if (surface) return { point: surface.workplane.origin, workplane: surface.workplane, normal: surface.workplane.normal, sunk: cruiseSinkRef.current };
     const point = toFreePlacementWorkplanePoint(clientX, clientY);
     if (!point) return null;
     const workplane = placementWorkplaneRef.current;
-    return { point, workplane, normal: workplane.normal };
+    return { point, workplane, normal: workplane.normal, sunk: false };
   }, [toFreePlacementWorkplanePoint]);
 
   const moveCruiseGhost = useCallback((clientX: number, clientY: number) => {
@@ -3361,7 +3364,7 @@ export function WorkplaneViewport({
     if (!target) return;
     const next = {
       ...preview.shape,
-      ...placementPatchForNewShape(preview.shape, target.workplane, target.point),
+      ...placementPatchForNewShape(preview.shape, target.workplane, target.point, target.sunk),
     };
     preview.shape = next;
     updateShapeObjectTransform(preview.object, next);
@@ -3378,13 +3381,30 @@ export function WorkplaneViewport({
     const target = cruiseTarget(clientX, clientY, new Set(ids));
     if (!target) return;
     const start = carryStartRef.current;
-    carriedOntoFace(start, ids, target, ids[0]).forEach((patch, id) => {
+    carriedOntoFace(start, ids, target, ids[0], target.sunk).forEach((patch, id) => {
       const shape = start.find((entry) => entry.id === id);
       const object = findShapeObject(state, id);
       if (shape && object) updateShapeObjectTransform(object, { ...shape, ...patch });
     });
     state.needsRender = true;
   }, [cruiseTarget]);
+
+  // Shift pressed or let go with the pointer still: the ghost goes into the face, or back onto it, at once (#940).
+  useEffect(() => {
+    if (!cruiseAsset && !carryIds?.length) return;
+    const follow = (event: KeyboardEvent) => {
+      if (event.key !== "Shift" || cruiseSinkRef.current === event.shiftKey) return;
+      cruiseSinkRef.current = event.shiftKey;
+      if (cruiseAssetRef.current && cruisePointerRef.current) moveCruiseGhost(cruisePointerRef.current.x, cruisePointerRef.current.y);
+      if (carryIdsRef.current && carryPointerRef.current) moveCarry(carryPointerRef.current.x, carryPointerRef.current.y);
+    };
+    window.addEventListener("keydown", follow);
+    window.addEventListener("keyup", follow);
+    return () => {
+      window.removeEventListener("keydown", follow);
+      window.removeEventListener("keyup", follow);
+    };
+  }, [carryIds, cruiseAsset, moveCarry, moveCruiseGhost]);
 
   useEffect(() => {
     if (!carryIds?.length) return;
@@ -5994,6 +6014,7 @@ export function WorkplaneViewport({
 
       if (carryIdsRef.current?.length) {
         event.preventDefault();
+        cruiseSinkRef.current = event.shiftKey;
         const target = cruiseTarget(event.clientX, event.clientY, new Set(carryIdsRef.current));
         if (target) onCarryDropRef.current?.(target);
         return;
@@ -6002,8 +6023,9 @@ export function WorkplaneViewport({
       if (cruiseAssetRef.current) {
         event.preventDefault();
         cruiseFreeRef.current = event.altKey;
+        cruiseSinkRef.current = event.shiftKey;
         const target = cruiseTarget(event.clientX, event.clientY);
-        if (target) onAddShape(cruiseAssetRef.current, target.point, target.workplane);
+        if (target) onAddShape(cruiseAssetRef.current, target.point, target.workplane, target.sunk);
         return;
       }
 
@@ -6378,6 +6400,8 @@ export function WorkplaneViewport({
       // schweben oder zu ziehen - die Finger bewegen die Ansicht.
       if (cameraTouchRef.current) return;
       cruiseFreeRef.current = event.altKey;
+      cruiseSinkRef.current = event.shiftKey;
+      carryPointerRef.current = { x: event.clientX, y: event.clientY };
       if (cruiseAssetRef.current) moveCruiseGhost(event.clientX, event.clientY);
       if (carryIdsRef.current) moveCarry(event.clientX, event.clientY);
       if (splitActiveRef.current) {

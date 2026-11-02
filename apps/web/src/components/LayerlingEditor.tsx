@@ -6000,7 +6000,7 @@ export function LayerlingEditor({
   }, []);
 
   const addShape = useCallback(
-    (asset: ShapeAsset, point?: PlacementPoint, onFace?: PlacementWorkplane) => {
+    (asset: ShapeAsset, point?: PlacementPoint, onFace?: PlacementWorkplane, sunk?: boolean) => {
       setCruiseAsset(null);
       if (asset.id === iconTagAsset.id) {
         setQrCodePanelOpen(false);
@@ -6022,7 +6022,7 @@ export function LayerlingEditor({
       const workplane = onFace ?? placementWorkplane;
       const nextShape = prepareNewShape(asset, {
         ...shape,
-        ...placementPatchForNewShape(shape, workplane, point ?? workplane.origin),
+        ...placementPatchForNewShape(shape, workplane, point ?? workplane.origin, sunk && onFace !== undefined),
       });
       commitShapes([...shapes, nextShape], nextShape.id, t("status.shapeAdded", { name: shapeAssetLabel(asset) }));
     },
@@ -6030,11 +6030,11 @@ export function LayerlingEditor({
   );
 
   /** Sets the parts picked up with C down on the face (or the workplane) that was clicked, as one step. */
-  const dropCarried = useCallback((target: { point: PlacementPoint; normal: PlacementPoint; workplane: PlacementWorkplane }) => {
+  const dropCarried = useCallback((target: { point: PlacementPoint; normal: PlacementPoint; workplane: PlacementWorkplane; sunk?: boolean }) => {
     const ids = carryIdsRef.current;
     setCarryIds(null);
     if (!ids?.length) return;
-    const patches = carriedOntoFace(shapes, ids, target, ids[0]);
+    const patches = carriedOntoFace(shapes, ids, target, ids[0], target.sunk);
     const next = shapes.map((shape) => {
       const patch = patches.get(shape.id);
       return patch ? canonicalizeShape({ ...shape, ...patch }) : shape;
@@ -8471,7 +8471,8 @@ export function LayerlingEditor({
     [refuseLockedSelection, commitShapes, hasSelection, placementWorkplane, selectedIds, shapes],
   );
 
-  const dropSelectedToWorkplane = useCallback(() => {
+  const dropSelectedToWorkplane = useCallback((modifiers?: { shift?: boolean }) => {
+    const top = modifiers?.shift === true;
     if (!hasSelection) {
       setNotice(t("status.selectShapeFirst"));
       return;
@@ -8484,6 +8485,7 @@ export function LayerlingEditor({
         const translation = translationToWorkplane(
           placementWorkplane,
           meshForShape(shape).vertices.map(([x, y, z]) => ({ x, y, z })),
+          top,
         );
         return {
           ...shape,
@@ -14566,7 +14568,8 @@ export function LayerlingEditor({
         nudgeSelected(0, step);
       } else if (key === "d" && hasSelection) {
         event.preventDefault();
-        dropSelectedToWorkplane();
+        // Shift+D drops the top of the selection to the workplane, the body below it (#940).
+        dropSelectedToWorkplane({ shift: event.shiftKey });
       } else if (key === "h") {
         event.preventDefault();
         setSelectionHoleMode(true);

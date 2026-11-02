@@ -216,10 +216,12 @@ export function placementPatchForNewShape(
   shape: Pick<WorkplaneShape, "height">,
   workplane: PlacementWorkplane,
   basePoint: PlacementPoint = workplane.origin,
+  /** Sunk into the face: the top of the shape on the point, the body below it, not the foot on it (#940). */
+  sunk = false,
 ): Pick<WorkplaneShape, "x" | "z" | "elevation" | "rotation" | "rotationX" | "rotationZ"> {
   const quaternion = placementWorkplaneQuaternion(workplane);
   const euler = new THREE.Euler().setFromQuaternion(quaternion, "XYZ");
-  const center = vector(basePoint).addScaledVector(vector(workplane.normal), shape.height / 2);
+  const center = vector(basePoint).addScaledVector(vector(workplane.normal), sunk ? -shape.height / 2 : shape.height / 2);
   return {
     x: clean(center.x),
     z: clean(center.z),
@@ -233,15 +235,17 @@ export function placementPatchForNewShape(
 export function translationToWorkplane(
   workplane: PlacementWorkplane,
   worldVertices: PlacementPoint[],
+  /** The top of the shape goes to the workplane, below it, in place of the base on it (#940). */
+  top = false,
 ): PlacementPoint {
   if (worldVertices.length === 0) return { x: 0, y: 0, z: 0 };
   const origin = vector(workplane.origin);
   const normal = vector(workplane.normal);
-  const minimumDistance = worldVertices.reduce(
-    (minimum, vertex) => Math.min(minimum, vector(vertex).sub(origin).dot(normal)),
-    Number.POSITIVE_INFINITY,
+  const distance = worldVertices.reduce(
+    (reached, vertex) => (top ? Math.max(reached, vector(vertex).sub(origin).dot(normal)) : Math.min(reached, vector(vertex).sub(origin).dot(normal))),
+    top ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY,
   );
-  const translation = normal.multiplyScalar(-minimumDistance);
+  const translation = normal.multiplyScalar(-distance);
   return point(translation);
 }
 
