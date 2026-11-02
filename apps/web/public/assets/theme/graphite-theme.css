@@ -8338,6 +8338,102 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .my-shapes-form-problem
   color: #ff8a80;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-search {
+  background: #fcfcfc;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-search > svg {
+  color: #5e5e5e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-search input {
+  color: #3a3a3a;
+  background: #fafafa;
+  border: 1px solid #cdcdcd;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-search input:focus-visible {
+  outline: 2px solid #dd7906;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-clear {
+  color: #464646;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-clear:hover {
+  background: #ededed;
+  border-color: #cdcdcd;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-section + .shape-library-section {
+  border-top: 1px solid #e4e4e4;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-toggle,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-heading {
+  color: #474747;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-toggle:hover {
+  background: #ededed;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-count {
+  color: #4f4f4f;
+  background: #e1e1e1;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-note {
+  color: #5e5e5e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shape-library-empty {
+  color: #5e5e5e;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-search {
+  background: rgba(36, 36, 36, 0.97);
+  border-color: #4b4b4b;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-search > svg,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-note,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-empty {
+  color: #bababa;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-search input {
+  color: #e4e4e4;
+  background: #2a2a2a;
+  border-color: #4c4c4c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-clear,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-toggle,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-heading {
+  color: #e4e4e4;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-clear:hover,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-toggle:hover {
+  background: #393939;
+  border-color: #4c4c4c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-count {
+  color: #e4e4e4;
+  background: #494949;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shape-library-section + .shape-library-section {
+  border-color: #4b4b4b;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .attachments-indicator {
   background: #d9730d;
   border: 2px solid #f9f9f9;

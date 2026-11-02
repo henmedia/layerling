@@ -2,6 +2,7 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
+import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
 import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { useWheelField } from "@/lib/useWheelField";
@@ -18,7 +19,7 @@ import { CommandPalette, type PaletteCommand } from "./CommandPalette";
 import { COMMAND_KEYWORDS, COMMAND_SHORTCUTS, SHAPE_KEYWORDS } from "@/lib/commandKeywords";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
-import { libraryShapeAssets, shapeAssetColor, shapeAssetLabel, shapeAssetMenuLabel } from "@/lib/shapeCatalog";
+import { libraryShapeAssets, shapeAssetColor, shapeAssetLabel, shapeAssetMenuLabel, type ToolbarShapeAsset } from "@/lib/shapeCatalog";
 import type { CadModifierKind } from "@/lib/cadModifierTypes";
 import type { ShapeAsset, SketchOperation, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { TopPanel } from "./TopActionPanel";
@@ -854,6 +855,82 @@ export function SecondaryToolbar({
   type ToolbarTool = (typeof leftTools)[number] | (typeof visibilityTools)[number] | (typeof combineTools)[number] | (typeof modifyTools)[number] | (typeof arrangeTools)[number]
     | Pick<(typeof leftTools)[number], "id" | "label" | "icon" | "action" | "enabled">;
   const renderToolButton = (tool: ToolbarTool) => toolButton(tool, false);
+  /** One shape of the library: a click puts it in, a drag drops it where it is let go, a tap does on a touch screen. */
+  function shapeTile(shape: ToolbarShapeAsset) {
+    return (
+      <button
+        className="shape-menu-item"
+        key={shape.id}
+        type="button"
+        title={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
+        aria-label={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
+        style={{ "--shape-default-color": shapeAssetColor(shape, shapeCustomizations[shape.kind]) } as CSSProperties}
+        draggable
+        onClick={() => {
+          if (suppressNextShapeClickRef.current) {
+            suppressNextShapeClickRef.current = false;
+            return;
+          }
+          addShapeFromMenu(shape);
+        }}
+        onPointerDown={(event) => {
+          if (event.pointerType === "touch") {
+            touchShapeStartRef.current = { id: shape.id, x: event.clientX, y: event.clientY };
+          }
+        }}
+        onPointerUp={(event) => {
+          if (event.pointerType !== "touch") {
+            return;
+          }
+          const start = touchShapeStartRef.current;
+          touchShapeStartRef.current = null;
+          if (!start || start.id !== shape.id || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) {
+            return;
+          }
+          event.preventDefault();
+          suppressNextShapeClickRef.current = true;
+          window.setTimeout(() => {
+            suppressNextShapeClickRef.current = false;
+          }, 350);
+          addShapeFromMenu(shape);
+        }}
+        onTouchStart={(event) => {
+          const touch = event.changedTouches[0];
+          if (touch) {
+            touchShapeStartRef.current = { id: shape.id, x: touch.clientX, y: touch.clientY };
+          }
+        }}
+        onTouchEnd={(event) => {
+          const touch = event.changedTouches[0];
+          const start = touchShapeStartRef.current;
+          touchShapeStartRef.current = null;
+          if (!touch || !start || start.id !== shape.id || Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 8) {
+            return;
+          }
+          event.preventDefault();
+          suppressNextShapeClickRef.current = true;
+          window.setTimeout(() => {
+            suppressNextShapeClickRef.current = false;
+          }, 350);
+          addShapeFromMenu(shape);
+        }}
+        onDragStart={(event) => {
+          event.dataTransfer.effectAllowed = "copy";
+          event.dataTransfer.setData("application/x-layerling-shape", JSON.stringify(shape));
+        }}
+        onDragEnd={closeShapesAfterPick}
+      >
+        <span
+          className="shape-menu-thumb"
+          style={{ "--shape-icon": `url(/${shape.menuIcon.replace(/^\/+/, "")})` } as CSSProperties}
+        >
+          <img src={shape.menuIcon} alt="" draggable={false} />
+        </span>
+        <span className={shapeAssetMenuLabel(shape).split(/\s+/).some((word) => word.length > 13) ? "long-word" : undefined}>{shapeAssetMenuLabel(shape)}</span>
+      </button>
+    );
+  }
+
   /** `inFold`: the copy on a folded group's button, which leaves the tool's name for MCP and tests to the one in the group. */
   function toolButton(tool: ToolbarTool, inFold: boolean) {
     const { id, icon: Icon, action, label } = tool;
@@ -1061,86 +1138,17 @@ export function SecondaryToolbar({
               resizable
             >
               <div className="shape-menu-body">
-              {renderMyShapes && !simpleMode ? (
-                <>
-                  {renderMyShapes(closeShapesAfterPick)}
-                  <div className="shape-menu-subtitle">{t("myShapes.basicShapes")}</div>
-                </>
-              ) : null}
-              <div className="shape-menu-list">
-                {shownShapeAssets.map((shape) => (
-                  <button
-                    className="shape-menu-item"
-                    key={shape.id}
-                    type="button"
-                    title={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
-                    aria-label={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
-                    style={{ "--shape-default-color": shapeAssetColor(shape, shapeCustomizations[shape.kind]) } as CSSProperties}
-                    draggable
-                    onClick={() => {
-                      if (suppressNextShapeClickRef.current) {
-                        suppressNextShapeClickRef.current = false;
-                        return;
-                      }
-                      addShapeFromMenu(shape);
-                    }}
-                    onPointerDown={(event) => {
-                      if (event.pointerType === "touch") {
-                        touchShapeStartRef.current = { id: shape.id, x: event.clientX, y: event.clientY };
-                      }
-                    }}
-                    onPointerUp={(event) => {
-                      if (event.pointerType !== "touch") {
-                        return;
-                      }
-                      const start = touchShapeStartRef.current;
-                      touchShapeStartRef.current = null;
-                      if (!start || start.id !== shape.id || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) {
-                        return;
-                      }
-                      event.preventDefault();
-                      suppressNextShapeClickRef.current = true;
-                      window.setTimeout(() => {
-                        suppressNextShapeClickRef.current = false;
-                      }, 350);
-                      addShapeFromMenu(shape);
-                    }}
-                    onTouchStart={(event) => {
-                      const touch = event.changedTouches[0];
-                      if (touch) {
-                        touchShapeStartRef.current = { id: shape.id, x: touch.clientX, y: touch.clientY };
-                      }
-                    }}
-                    onTouchEnd={(event) => {
-                      const touch = event.changedTouches[0];
-                      const start = touchShapeStartRef.current;
-                      touchShapeStartRef.current = null;
-                      if (!touch || !start || start.id !== shape.id || Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 8) {
-                        return;
-                      }
-                      event.preventDefault();
-                      suppressNextShapeClickRef.current = true;
-                      window.setTimeout(() => {
-                        suppressNextShapeClickRef.current = false;
-                      }, 350);
-                      addShapeFromMenu(shape);
-                    }}
-                    onDragStart={(event) => {
-                      event.dataTransfer.effectAllowed = "copy";
-                      event.dataTransfer.setData("application/x-layerling-shape", JSON.stringify(shape));
-                    }}
-                    onDragEnd={closeShapesAfterPick}
-                  >
-                    <span
-                      className="shape-menu-thumb"
-                      style={{ "--shape-icon": `url(/${shape.menuIcon.replace(/^\/+/, "")})` } as CSSProperties}
-                    >
-                      <img src={shape.menuIcon} alt="" draggable={false} />
-                    </span>
-                    <span className={shapeAssetMenuLabel(shape).split(/\s+/).some((word) => word.length > 13) ? "long-word" : undefined}>{shapeAssetMenuLabel(shape)}</span>
-                  </button>
-                ))}
-              </div>
+              {simpleMode ? (
+                // The simple mode keeps its short list as it was, without sections (#1170).
+                <div className="shape-menu-list">{shownShapeAssets.map(shapeTile)}</div>
+              ) : (
+                <ShapeLibraryList
+                  shapes={shownShapeAssets}
+                  label={(shape) => shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
+                  renderTile={shapeTile}
+                  customShapes={renderMyShapes ? renderMyShapes(closeShapesAfterPick) : null}
+                />
+              )}
               </div>
             </ShapeMenuPanel>
           ) : null}

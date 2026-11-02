@@ -11,6 +11,8 @@ Kliknutím na {{ui:editor.addShape}} otevřete knihovnu.
 
 ![Knihovna tvarů. Náhledy jsou vykreslené ze skutečné geometrie jednotlivých tvarů.](shot:shape-menu)
 
+Knihovna je jeden seznam po oddílech, od {{ui:library.section.basic}} po {{ui:library.section.helpers}}, každý s počtem svých tvarů. Kliknutím na název oddílu ho sbalíte a prohlížeč si zapamatuje, co jste sbalili; poprvé jsou otevřené všechny. Úplně nahoře jsou pod nadpisem {{ui:library.recent}} čtyři tvary, které jste vložili naposledy. Vyhledávací pole najde tvar podle názvu i podle jiných slov pro něj, také anglicky a německy: „USB“ najde {{ui:shape.port}}. Během psaní zůstanou jen oddíly se shodou; prázdné pole vrátí sbalené oddíly tak, jak byly. {{ui:myShapes.title}} nahoře zabírají jen jeden řádek, dokud si tam neuložíte žádný tvar.
+
 Knihovna se zavře po každém vybraném tvaru. Záhlavím ji přesunete tam, kde nezakrývá místo, na které míříte, třeba nad panel vlastností; dvojklik na záhlaví ji vrátí pod její tlačítko a kde jste ji nechali, si pamatuje prohlížeč. Připínáček v záhlaví drží knihovnu otevřenou, dokud umisťujete několik tvarů za sebou. Okraji a rohy měníte její velikost, tak široce a vysoko, jak vaše obrazovka dovolí; i tu si prohlížeč pamatuje a dvojklik na okraj ji vrátí zpět. Když knihovnu zúžíte, vynechá názvy a ukáže jen obrázky; název se objeví, když na tvar ukážete.
 
 Vybraný tvar sleduje myš a položí se kliknutím. Nad tělesem se orientuje podle plochy pod ukazatelem, i šikmé, podobně jako Cruise v Tinkercadu. Nad prázdnou podložkou dopadne na pracovní rovinu. [[Esc]] umísťování zruší. Nástroje čekající na kliknutí, například měření, úhelník, poznámka, {{ui:camera.placeWorkplane}}, {{ui:editor.tool.layFlat}} nebo úpravy hran, se při výběru tvaru vypnou. Kliknutí pak skutečně umístí tvar. Obráceně zapnutí takového nástroje ukončí umísťování tvaru. Chcete-li nové tvary rovnou uprostřed podložky, vypněte {{ui:workspace.cruise}} v části {{ui:workspace.appearance}}.
@@ -19,12 +21,15 @@ Na ploše se tvar přichytí k jejímu středu, jakmile se ukazatel přiblíží
 
 Knihovna nabízí:
 
-- **Základní tvary:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} se třemi až 24 stranami, {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} se třemi až 24 stranami, {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} a {{ui:shape.torus}}.
-- **Trubky:** {{ui:shape.tube}}, {{ui:shape.bentTube}} až z dvanácti přímých úseků spojených ohyby a {{ui:shape.loft}} mezi různými obrysy, například čtvercem a kruhem.
-- **Dekorace:** {{ui:shape.star}}, {{ui:shape.heart}} a {{ui:shape.crescent}}.
-- **Nápisy:** {{ui:shape.text}}, i po oblouku, viz [Text](chapter:text).
-- **Mechanické díly:** {{ui:shape.thread}} jako závitová tyč, šroub, matice a závitový otvor, dále {{ui:shape.spring}}, krabičky a nosné desky {{ui:shape.gridfinity}}, {{ui:shape.gear}} a {{ui:shape.knurl}} pro úchopy. Viz [Závity a mechanické díly](chapter:threads-and-mechanics).
-- **Konstrukční prvky:** {{ui:shape.hinge}} tisknutelný vcelku, {{ui:shape.dovetail}}, {{ui:shape.teardrop}} pro vodorovné otvory, {{ui:shape.counterbore}}, {{ui:shape.countersink}} pro hlavy šroubů a {{ui:shape.ruler}}, které pouze měří a neexportuje se.
+- **{{ui:library.section.basic}}:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} se třemi až 24 stranami, {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} se třemi až 24 stranami, {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}}, {{ui:shape.paraboloid}} (kopule, která se zužuje do zaoblené špičky; její výška klesá s druhou mocninou vzdálenosti od osy) a {{ui:shape.torus}}.
+- **{{ui:library.section.vessels}}:** {{ui:shape.loft}} mezi různými obrysy, například čtvercem a kruhem, {{ui:shape.vase}}, {{ui:shape.tube}} a {{ui:shape.bentTube}} až z dvanácti přímých úseků spojených ohyby.
+- **{{ui:library.section.holes}}:** {{ui:shape.counterbore}} a {{ui:shape.countersink}} pro hlavy šroubů, {{ui:shape.teardrop}} pro vodorovné otvory a {{ui:shape.port}} pro zásuvky USB, HDMI, DisplayPort a RJ45.
+- **{{ui:library.section.connections}}:** {{ui:shape.thread}} jako závitová tyč, šroub, matice a závitový otvor, {{ui:shape.finishingWasher}} pod šroub se zápustnou hlavou, {{ui:shape.hinge}} tisknutelný vcelku a {{ui:shape.dovetail}}. Viz [Závity a mechanické díly](chapter:threads-and-mechanics).
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} a {{ui:shape.hirth}}.
+- **{{ui:library.section.systems}}:** krabičky a nosné desky {{ui:shape.gridfinity}} a {{ui:shape.sbcBoard}}, jednodeskový počítač ve skutečné velikosti, kolem kterého postavíte krabičku.
+- **{{ui:library.section.lettering}}:** {{ui:shape.text}}, i po oblouku, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} a {{ui:shape.qrCode}}, viz [Text](chapter:text).
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} a {{ui:shape.knurl}} pro úchopy.
+- **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, které pouze měří a neexportuje se.
 
 Trojúhelník získáte dvěma způsoby. {{ui:shape.polygon}} se třemi stranami tvoří rovnoramenný trojúhelník, obdobu střechy v Tinkercadu. {{ui:shape.wedge}} má pravoúhlý trojúhelník. Oba jsou skutečné trojboké hranoly. Pro trojúhelníkový otvor tvar zkopírujte, zmenšete, přepněte na výřez a zarovnejte přes {{ui:editor.tool.centerOnWorkplane}} nebo {{ui:editor.tool.align}}. Při práci s ohraničením pamatujte, že jde o nejmenší kvádr obklopující tvar: i polovina čtverce má stejné krajní rozměry jako celý čtverec. Vyhledávání [[Ctrl]]+[[K]] najde oba tvary i pod názvy „triangle“ nebo „roof“.
 

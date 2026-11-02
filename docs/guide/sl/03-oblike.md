@@ -11,6 +11,8 @@ V orodni vrstici klikni {{ui:editor.addShape}}. Odpre se knjižnica oblik.
 
 ![Knjižnica oblik. Vsaka sličica je narisana iz prave geometrije oblike.](shot:shape-menu)
 
+Knjižnica je en sam seznam po razdelkih, od {{ui:library.section.basic}} do {{ui:library.section.helpers}}, vsak s številom svojih oblik. Klik na ime razdelka ga zloži, brskalnik pa si zapomni, kaj si zložil; prvič so vsi odprti. Čisto zgoraj so pod naslovom {{ui:library.recent}} štiri oblike, ki si jih nazadnje postavil. Iskalno polje najde obliko po imenu in po drugih besedah zanjo, tudi v angleščini in nemščini: »USB« najde {{ui:shape.port}}. Medtem ko tipkaš, ostanejo samo razdelki z zadetki; prazno polje vrne zložene razdelke, kakršni so bili. {{ui:myShapes.title}} zgoraj so samo ena vrstica, dokler tam ne shraniš nobene oblike.
+
 Knjižnica se zapre po vsaki izbrani obliki. Z naslovno vrstico jo premakneš tja, kjer ne zakriva mesta, na katero ciljaš, na primer nad ploščo lastnosti; dvoklik na naslovno vrstico jo vrne pod njen gumb, kje si jo pustil, pa si zapomni brskalnik. Žebljiček v naslovni vrstici drži knjižnico odprto, medtem ko postavljaš več oblik zapored. Z robovi in vogali spreminjaš njeno velikost, tako široko in visoko, kot dovoli tvoj zaslon; tudi to si brskalnik zapomni, dvoklik na rob pa jo povrne. Ko knjižnico zožiš, opusti imena in pokaže samo slike; ime se prikaže, ko pokažeš na obliko.
 
 Izberi obliko. Zdaj visi na kazalcu miške in pristane tja, kamor klikneš. Če pri tem zapelješ čez telo, se položi na ploskev pod kazalcem, tudi na poševno, kot pri Cruiseu v Tinkercadu; nad prazno ploščo pristane na delovni ravnini. Če pritisneš [[Esc]], se odlaganje prekine. Orodje, ki čaka na klik, na primer merilni trak, kotomer, opomba, {{ui:camera.placeWorkplane}}, {{ui:editor.tool.layFlat}} ali robna orodja, se ob izbiri oblike izklopi, da klik odloži obliko. Obratno vklop enega teh orodij obliko spet odloži. Kdor želi obliko raje kar na sredino plošče, lahko odlaganje s klikom izklopi v nastavitvah (področje {{ui:workspace.appearance}}, stikalo {{ui:workspace.cruise}}).
@@ -19,12 +21,15 @@ Na ploskvi se oblika pripne na njeno sredino, ko se ji kazalec približa, tako k
 
 Kaj ponuja knjižnica:
 
-- **Osnovne oblike:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (od treh do štiriindvajset stranic), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (s tremi do štiriindvajset stranicami, torej tudi tristrana), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} in {{ui:shape.torus}}.
-- **Cevi:** {{ui:shape.tube}} in {{ui:shape.bentTube}} iz do dvanajst ravnih kosov z ovinki vmes, poleg tega {{ui:shape.loft}} od enega obrisa do drugega, na primer od oglatega do okroglega.
-- **Okrasne oblike:** {{ui:shape.star}}, {{ui:shape.heart}} in {{ui:shape.crescent}}.
-- **Napisi:** {{ui:shape.text}}, tudi na krožnem loku. Več v poglavju [Besedilo](chapter:besedilo).
-- **Mehanika:** {{ui:shape.thread}} (navojna palica, vijak, matica in navojna luknja), {{ui:shape.spring}}, posode in podstavki {{ui:shape.gridfinity}}, {{ui:shape.gear}} in {{ui:shape.knurl}} za ročaje. Več v poglavju [Navoji in mehanika](chapter:navoji-in-mehanika).
-- **Za konstrukcije:** tiskljivi {{ui:shape.hinge}}, {{ui:shape.dovetail}}, {{ui:shape.teardrop}} za vodoravne luknje, {{ui:shape.counterbore}} in {{ui:shape.countersink}} za glave vijakov ter {{ui:shape.ruler}}, ki je samo merilno orodje in se v nobenem izvozu ne pojavi.
+- **{{ui:library.section.basic}}:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (od treh do štiriindvajset stranic), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (s tremi do štiriindvajset stranicami, torej tudi tristrana), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}}, {{ui:shape.paraboloid}} (kupola, ki se zoži v zaobljeno konico; njena višina pada s kvadratom razdalje od osi) in {{ui:shape.torus}}.
+- **{{ui:library.section.vessels}}:** {{ui:shape.loft}} od enega obrisa do drugega, na primer od oglatega do okroglega, {{ui:shape.vase}}, {{ui:shape.tube}} in {{ui:shape.bentTube}} iz do dvanajst ravnih kosov z ovinki vmes.
+- **{{ui:library.section.holes}}:** {{ui:shape.counterbore}} in {{ui:shape.countersink}} za glave vijakov, {{ui:shape.teardrop}} za vodoravne luknje in {{ui:shape.port}} za vtičnice USB, HDMI, DisplayPort in RJ45.
+- **{{ui:library.section.connections}}:** {{ui:shape.thread}} (navojna palica, vijak, matica in navojna luknja), {{ui:shape.finishingWasher}} pod vijak s pogreznjeno glavo, tiskljivi {{ui:shape.hinge}} in {{ui:shape.dovetail}}. Več v poglavju [Navoji in mehanika](chapter:navoji-in-mehanika).
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} in {{ui:shape.hirth}}.
+- **{{ui:library.section.systems}}:** posode in podstavki {{ui:shape.gridfinity}} ter {{ui:shape.sbcBoard}}, enoploščni računalnik v pravi velikosti, okoli katerega zgradiš ohišje.
+- **{{ui:library.section.lettering}}:** {{ui:shape.text}}, tudi na krožnem loku, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} in {{ui:shape.qrCode}}. Več v poglavju [Besedilo](chapter:besedilo).
+- **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} in {{ui:shape.knurl}} za ročaje.
+- **{{ui:library.section.helpers}}:** {{ui:shape.ruler}}, ki je samo merilno orodje in se v nobenem izvozu ne pojavi.
 
 Trikotnik dobiš na dva načina: {{ui:shape.polygon}} s tremi stranicami je enakokraki trikotnik, »streha« iz Tinkercada, {{ui:shape.wedge}} pa pravokotni. Oba sta prava trikotna prizma. Za trikotno luknjo oblike kopiraš, kopijo narediš manjšo, jo označiš kot luknjo in jo poravnaš z {{ui:editor.tool.centerOnWorkplane}} ali {{ui:editor.tool.align}}. Oboje dela z obdajajočo škatlo oblike, torej najmanjšim kvadrom, ki jo obdaja; razpolovljen kvadrat zato še vedno velja kot cel kvadrat. Z iskanjem ukazov ([[Ctrl]]+[[K]]) najdeš obe obliki tudi pod »trikotnik« ali »streha«.
 

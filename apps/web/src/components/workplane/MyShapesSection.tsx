@@ -64,7 +64,11 @@ function folderProblemMessage(name: string, taken: string[]) {
 export function MyShapesSection(props: MyShapesSectionProps) {
   const { shapes, folders, serverAvailable, canSave, defaultName, onInsert, onSave, onRename, onDelete, onMoveToServer, onMoveToFolder } = props;
   const { onCreateFolder, onRenameFolder, onDeleteFolder, onBackup, onLoad, onShown, onDragDone } = props;
-  const [collapsed, setCollapsed] = useState(false);
+  // Folded or open as last chosen; never chosen, it is folded while it holds nothing (#1170): then it is one line with
+  // its buttons, and the explanation shows on opening it or behind the question mark.
+  const [choice, setCollapsed] = useState<boolean | null>(null);
+  const empty = shapes.length === 0 && folders.length === 0;
+  const collapsed = choice ?? empty;
   const [openFolders, setOpenFolders] = useState<string[]>([]);
   const [saveName, setSaveName] = useState<string | null>(null);
   const [saveLocation, setSaveLocation] = useState<CustomShapeLocation>(serverAvailable ? "server" : "browser");
@@ -79,11 +83,12 @@ export function MyShapesSection(props: MyShapesSectionProps) {
 
   useEffect(() => {
     try {
-      setCollapsed(window.localStorage.getItem(COLLAPSED_STORAGE_KEY) === "true");
+      const stored = window.localStorage.getItem(COLLAPSED_STORAGE_KEY);
+      if (stored === "true" || stored === "false") setCollapsed(stored === "true");
       const open = JSON.parse(window.localStorage.getItem(OPEN_FOLDERS_STORAGE_KEY) ?? "[]") as unknown;
       if (Array.isArray(open)) setOpenFolders(open.filter((id): id is string => typeof id === "string"));
     } catch {
-      // Blocked storage: the section starts open, the folders closed.
+      // Blocked storage: the section starts folded while it holds nothing, the folders closed.
     }
     onShown();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -530,7 +535,7 @@ export function MyShapesSection(props: MyShapesSectionProps) {
   return (
     <section className="my-shapes-section" aria-label={t("myShapes.title")}>
       <div className="my-shapes-header">
-        <button className="my-shapes-toggle" type="button" aria-expanded={!collapsed} onClick={toggleCollapsed}>
+        <button className="my-shapes-toggle" type="button" aria-expanded={!collapsed} title={collapsed && empty ? t("myShapes.empty") : undefined} onClick={toggleCollapsed}>
           {collapsed ? <ChevronRight aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
           <span>{t("myShapes.title")}</span>
           {shapes.length > 0 ? <span className="my-shapes-count">{shapes.length}</span> : null}

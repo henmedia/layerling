@@ -5,6 +5,7 @@ import "./historyView.css";
 import "./notes.css";
 import "./tape.css";
 import "./myShapes.css";
+import "./shapeLibrary.css";
 import "./attachments.css";
 import "./viewCube.css";
 import "./secondView.css";
