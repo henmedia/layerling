@@ -3287,6 +3287,12 @@ html[data-theme="dark"] .shell-openings-summary {
   gap: 5px;
 }
 
+.edge-modifier-field.tool-roles button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .edge-modifier-field select {
   height: 31px;
   color: #533d26;
