@@ -77,6 +77,8 @@ const CHECKS: Note[] = [
   { pattern: new RegExp(`^Boden nur ${NUMBER} mm – unter 0,8 mm`), key: "vaseCheck.thinBottom", params: (m) => ({ mm: number(m[1]) }) },
   { pattern: /^Ein (Stülpdeckel|Schnappdeckel|Schraubdeckel) braucht eine hohle Vase/, key: "vaseCheck.lidNeedsHollow", params: (m) => ({ lid: t(LIDS[m[1]]) }) },
   { pattern: /^Ein Lampenschirm bekommt keinen Deckel\.$/, key: "vaseCheck.lampNoLid" },
+  { pattern: /^Der Teekannendeckel braucht eine hohle Vase/, key: "vaseCheck.teapotNeedsHollow", params: () => ({ hollow: t("vase.bodyHollow") }) },
+  { pattern: /^Der Teekannendeckel geht nicht zusammen mit Facetten\.$/, key: "vaseCheck.teapotLowpoly" },
   { pattern: /^Deckel und Steckeinsatz bzw\. Wasserröhrchen liegen beide auf dem Rand/, key: "vaseCheck.lidAndInsert" },
   { pattern: new RegExp(`^Neben dem Gewinde bleiben nur ${NUMBER} mm Wand`), key: "vaseCheck.threadWall", params: (m) => ({ mm: number(m[1]) }) },
   { pattern: new RegExp(`^Neben der Nut bleiben nur ${NUMBER} mm Wand`), key: "vaseCheck.grooveWall", params: (m) => ({ mm: number(m[1]) }) },

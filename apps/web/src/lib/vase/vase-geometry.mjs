@@ -14,7 +14,7 @@
  * Coordinates: millimetres, Z up (like STL and every slicer), the vase
  * stands with its bottom on z = 0, its axis is the Z axis.
  */
-import { capWithHoles, holeCeiling, holeWall, zipRings } from './mesh-tools.mjs'
+import { MeshBuilder, capWithHoles, holeCeiling, holeWall, zipRings } from './mesh-tools.mjs'
 import { CUTOUTS, CUTOUT_EDGES, cutoutPattern, wallZone } from './vase-cutout.mjs'
 import { REINFORCE, slitBody } from './vase-slits.mjs'
 
@@ -53,12 +53,12 @@ const SOCKET_HOLES = { e27: 41, e14: 29 }
 export const PART_KEYS = ['legMode', 'legCount', 'legHeight', 'legDiameter', 'legShape', 'legSplay', 'legInset', 'fitClearance',
   'saucerMode', 'saucerRibs', 'saucerSpout', 'saucerGrip', 'saucerGap', 'saucerHeight', 'saucerWall',
   'insertMode', 'insertWall', 'insertStandoff', 'reservoirHeight', 'tubeDiameter', 'frogHole',
-  'lidMode', 'lidClearance', 'lidThickness', 'lidDepth', 'threadPitch', 'lidGrip']
+  'lidMode', 'lidClearance', 'lidThickness', 'lidDepth', 'threadPitch', 'lidGrip', 'lidHeight', 'lidKnob']
 /**
  * Lid: slip lid (a plate with a lip that sits in the opening), snap lid (a lip with a bead, a groove
  * in the inner wall), screw lid (internal thread in the neck, threaded spigot on the lid).
  */
-export const LID_MODES = { keiner: 'Keiner', stuelp: 'Stülpdeckel', schnapp: 'Schnappdeckel', schraube: 'Schraubdeckel' }
+export const LID_MODES = { keiner: 'Keiner', stuelp: 'Stülpdeckel', schnapp: 'Schnappdeckel', schraube: 'Schraubdeckel', kanne: 'Teekannendeckel' }
 export const SYMMETRIES = { halb: 'Hälfte', viertel: 'Viertel', windmuehle: 'Windmühle', frei: 'Frei' }
 export const EFFECTS = { keine: 'Keine', rillen: 'Rillen', streifen: 'Streifen', voronoi: 'Voronoi', lowpoly: 'Low Poly' }
 /** Rotation of the cross-section over the height: even (twist + sway) or as a drawn curve. */
@@ -189,6 +189,9 @@ export const DEFAULTS = Object.freeze({
   lidDepth: 12,
   threadPitch: 4,
   lidGrip: 'ja',
+  // Teapot lid: the top of the vase, this tall, is the lid (its own wall and pattern); a knob on top, printed apart.
+  lidHeight: 30,
+  lidKnob: 'ja',
   quality: 'standard',
   // Pierced wall (hollow vase): pattern, cell size, web width, height range (%), stretch, arrangement,
   // cut holes off at the edge of the range or only whole holes.
@@ -310,6 +313,7 @@ export const LIMITS = {
   lidThickness: [1.2, 6],
   lidDepth: [5, 40],
   threadPitch: [2, 8],
+  lidHeight: [5, 200],
   cutoutSize: [4, 60],
   cutoutWeb: [1, 20],
   cutoutFrom: [0, 100],
@@ -378,6 +382,7 @@ export function normalizeParams(input = {}) {
   if (!INSERT_MODES[p.insertMode]) p.insertMode = DEFAULTS.insertMode
   if (!LID_MODES[p.lidMode]) p.lidMode = DEFAULTS.lidMode
   if (!YES_NO[p.lidGrip]) p.lidGrip = DEFAULTS.lidGrip
+  if (!YES_NO[p.lidKnob]) p.lidKnob = DEFAULTS.lidKnob
   for (const key of ['saucerRibs', 'saucerSpout', 'saucerGrip']) if (!YES_NO[p[key]]) p[key] = DEFAULTS[key]
   if (!PROFILES[p.profile] && p.profile !== 'gezeichnet') p.profile = DEFAULTS.profile
   if (!SECTIONS[p.section]) p.section = DEFAULTS.section
@@ -1443,6 +1448,17 @@ export function floorLayout(input) {
     if (lamp === 'stehend' && foot < top + 1) notes.push(`Für den Kabelschlitz (${fmtMm(p.lampNotchHeight)} mm hoch) braucht es einen hohlen Fuß von mindestens ${fmtMm(top + 1)} mm.`)
     else notchZone = { z0: 0, z1: top, open: true, kind: 'notch' }
   }
+  // Teapot lid: the top `lidHeight` of the vase is the lid, with the vase's own wall and pattern; the body ends
+  // open at the cut, and the lid's lip reaches this far into it (not into the bottom).
+  let teapot = null
+  if (p.lidMode === 'kanne' && hollow && lamp === 'keine' && p.insertMode !== 'stecker' && p.insertMode !== 'roehrchen') {
+    if (p.effect === 'lowpoly') notes.push('Der Teekannendeckel geht nicht zusammen mit Facetten.')
+    else {
+      const height = Math.min(Math.max(p.lidHeight, p.lidThickness + 2), p.height * 0.7)
+      const cut = p.height - height
+      teapot = { cut, height, lip: Math.max(2, Math.min(p.lidDepth, cut - (foot + floor) - 2)) }
+    }
+  }
   // Pierced wall: height range above the bottom and below the rim, each with a solid band.
   let cutoutZone = null
   if (p.cutout !== 'keine') {
@@ -1451,7 +1467,7 @@ export function floorLayout(input) {
     else {
       const band = Math.max(1.5, p.cutoutWeb)
       const z0 = Math.max((p.cutoutFrom / 100) * p.height, foot + floor + band, notchZone ? notchZone.z1 + band : 0)
-      const z1 = Math.min((p.cutoutTo / 100) * p.height, p.height - band)
+      const z1 = Math.min((p.cutoutTo / 100) * p.height, p.height - band, teapot ? teapot.cut - teapot.lip - band : Infinity)
       if (z1 - z0 < 2 * p.cutoutWeb + 2) notes.push('Der Bereich für die Durchbrüche ist zu klein – „ab“ und „bis Höhe“ weiter auseinanderstellen.')
       else {
         cutoutZone = { z0, z1 }
@@ -1475,7 +1491,7 @@ export function floorLayout(input) {
       else notes.push(`${lw} Wichtig: „Slice gap closing radius“ (PrusaSlicer, OrcaSlicer, Bambu Studio) auf höchstens ${mm(Math.max(0.001, p.slitWidth / 2 - 0.005), 3)} mm stellen – sonst schließt der Slicer die ${mm(p.slitWidth)}-mm-Schlitze und druckt eine einfache Wand.`)
     }
   }
-  return { shape, foot, floor, slope, drains, blind, legs, peg, notes, cutoutZone, notchZone, reinforce, lamp }
+  return { shape, foot, floor, slope, drains, blind, legs, peg, notes, cutoutZone, notchZone, reinforce, lamp, teapot }
 }
 
 /**
@@ -1520,7 +1536,8 @@ export function vaseChecks(input) {
     else if (p.bottom < 2 * NOZZLE && p.lamp !== 'puck') notes.push(`Boden nur ${fmtMm(p.bottom)} mm – unter 0,8 mm wird er leicht undicht oder reißt.`)
   }
   if (p.lidMode !== 'keiner') {
-    if (p.lidMode !== 'stuelp' && p.body !== 'hohl') notes.push(`Ein ${LID_MODES[p.lidMode]} braucht eine hohle Vase (Nut bzw. Gewinde in der Wand).`)
+    if (p.lidMode === 'kanne' && p.body !== 'hohl') notes.push('Der Teekannendeckel braucht eine hohle Vase (Bauart „Hohl mit Wand“).')
+    else if (p.lidMode !== 'stuelp' && p.body !== 'hohl') notes.push(`Ein ${LID_MODES[p.lidMode]} braucht eine hohle Vase (Nut bzw. Gewinde in der Wand).`)
     else if (p.lamp !== 'keine') notes.push('Ein Lampenschirm bekommt keinen Deckel.')
     else if (p.insertMode === 'stecker' || p.insertMode === 'roehrchen') notes.push('Deckel und Steckeinsatz bzw. Wasserröhrchen liegen beide auf dem Rand – nur eins von beiden.')
     else if (shape.lid) {
@@ -1552,11 +1569,18 @@ export function vaseChecks(input) {
  * The body is closed (watertight): every edge belongs to exactly two
  * triangles - as slicers and Layerling require.
  */
-export function buildVase(input) {
+/**
+ * The vase's body as a closed mesh. With a teapot lid (`layout.teapot`) the body ends open at the cut, and
+ * `part: 'lid'` builds the lid instead: the same wall from the cut to the rim, so pattern and twist run on across
+ * the joint.
+ */
+export function buildVase(input, { part = 'body' } = {}) {
   const layout = floorLayout(input)
-  const { shape } = layout
+  const { shape, teapot } = layout
   const { p, H, maxR, rotation, twistT, section, R, sectionAt } = shape
   const q = QUALITY[p.quality]
+  // Where the body ends: at the rim, or with a teapot lid at the cut.
+  const Htop = teapot ? teapot.cut : H
 
   const ribsActive = p.effect === 'rillen' && p.ribCount > 0 && p.ribDepth > 0
   const lowpoly = p.effect === 'lowpoly'
@@ -1667,13 +1691,14 @@ export function buildVase(input) {
     return base - effectAt(theta, z, base)
   }
   const slitted = Boolean(layout.reinforce) && !lowpoly
+  if (part === 'lid') return teapot ? teapotLidMesh({ p, shape, H, segments, rows, outerRadius, teapot }) : null
   // Smooth round body (any pattern comes later, as a texture on top): rows by the curvature of
   // the body shape instead of every mm - a bulbous vase then needs 30 instead of 170 rows, and the
   // pattern on it a quarter of the triangles. Cross-sections with corners, twist or a height range
   // and the vase's own effects still need the fixed rows.
   const adaptive = !lowpoly && !slitted && p.effect === 'keine' && p.section === 'kreis' && p.section2 === 'keiner' && !shape.lid
   // With slits, vase-slits.mjs builds the whole solid body; here only the lowest ring, for the bottom.
-  const zsOuter = slitted ? [] : adaptive ? adaptiveRows((z) => R(z), 0, H, q.tol, q.maxStep, zones) : rowHeights(0, H, H / rows, zones)
+  const zsOuter = slitted ? [] : adaptive ? adaptiveRows((z) => R(z), 0, Htop, q.tol, q.maxStep, zones) : rowHeights(0, Htop, H / rows, zones)
   if (adaptive) rows = zsOuter.length - 1
   const outer = []
   const outerAtZ = new Map()
@@ -1820,7 +1845,7 @@ export function buildVase(input) {
     // Without a bottom (lamp over an LED puck, or a bottom of 0 mm): inner wall all the way down.
     const floorTop = foot + floor
     const innerRows = lowpoly ? rows : Math.max(8, Math.ceil(rows / 4))
-    const inner = innerWall(floorTop, H, (H - floorTop) / innerRows)
+    const inner = innerWall(floorTop, Htop, (Htop - floorTop) / innerRows)
     const skirt = foot > 0 ? innerWall(0, foot, 4) : null
     // Zones: outer and inner wall with holes in between; open at the bottom for the cable slot.
     for (const zn of zones) {
@@ -1876,6 +1901,24 @@ export function buildVase(input) {
     }
   }
 
+  // With a teapot lid the body is lower than the vase, and the lid may be its widest part: the frame the editor fits
+  // the vase into is the whole vase's, lid included.
+  let extent = null
+  if (teapot) {
+    const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, H]
+    for (let i = 0; i < verts.length; i += 3) for (let k = 0; k < 3; k++) {
+      min[k] = Math.min(min[k], verts[i + k])
+      max[k] = Math.max(max[k], verts[i + k])
+    }
+    for (const z of rowHeights(teapot.cut, H, H / rows, [])) for (let j = 0; j < segments; j++) {
+      const theta = (2 * Math.PI * j) / segments, r = outerRadius(theta, z)
+      const x = r * Math.cos(theta), y = r * Math.sin(theta)
+      min[0] = Math.min(min[0], x); max[0] = Math.max(max[0], x)
+      min[1] = Math.min(min[1], y); max[1] = Math.max(max[1], y)
+    }
+    extent = { min, max }
+  }
+
   const positions = new Float32Array(tris.length * 3)
   for (let t = 0; t < tris.length; t++) {
     const v = tris[t] * 3
@@ -1898,7 +1941,91 @@ export function buildVase(input) {
     notes: layout.notes,
     // Triangles that are shape and should get no surface pattern (hole walls), 1 each.
     locked: lockedMask(tris.length / 3, locked),
+    extent,
   }
+}
+
+/** The knob of a teapot lid and the hole it sits in: as wide as the top allows, between 12 and 28 mm. */
+export function teapotKnob(p, shape) {
+  const d = clamp(0.9 * shape.minOuterAt(p.height), 12, 28)
+  const peg = clamp(0.16 * d, 2, 3.5)
+  // The hole goes into the lid's top, not through it: as deep as the top allows, the peg a little shorter.
+  const depth = Math.max(0.8, Math.min(p.lidThickness - 0.8, 3))
+  return { d, h: 0.75 * d, peg, hole: peg + 0.15, depth, pegLength: depth - 0.2 }
+}
+
+/**
+ * The teapot lid: the vase's own wall from the cut up to the rim, closed at the top (`lidThickness`), hollow inside
+ * as the vase is, and below the cut a lip (1.6 mm wall) that goes into the opening with `lidClearance` all round. It
+ * rests on the body's rim with its own wall, flush. With a knob, a blind hole in the middle of the top for its peg.
+ */
+function teapotLidMesh({ p, shape, H, segments, rows, outerRadius, teapot }) {
+  const b = new MeshBuilder()
+  const n = segments
+  const { cut, lip } = teapot
+  const top = Math.min(p.lidThickness, teapot.height - 1)
+  const LIP_WALL = 1.6, FLANGE = 1.6
+  const zf = cut + FLANGE
+  const angle = (j) => (2 * Math.PI * j) / n
+  const ringOf = (table, z) => Array.from(table, (r, j) => b.addVertex(r * Math.cos(angle(j)), r * Math.sin(angle(j)), z))
+  // Outer wall: the vase's own surface, at the body's angles - the joint's points are the body's rim.
+  const outerRows = rowHeights(cut, H, H / rows, []).map((z) => b.ring(n, (a) => outerRadius(a, z), z))
+  b.wall(outerRows)
+  // The lip follows the opening: per angle its narrowest place along the lip, less the clearance.
+  const lipO = new Float64Array(n), lipI = new Float64Array(n)
+  for (let j = 0; j < n; j++) {
+    let m = Infinity
+    for (let i = 0; i <= 8; i++) m = Math.min(m, shape.innerAt(angle(j), cut - lip + (lip * i) / 8))
+    lipO[j] = m - p.lidClearance
+    lipI[j] = Math.min(lipO[j] - LIP_WALL, shape.innerAt(angle(j), zf) - 0.6)
+  }
+  if (Math.min(...lipI) < 2) throw new Error('die Öffnung ist zu eng für eine Lippe')
+  const steps = Math.max(2, Math.ceil(lip / 2))
+  const lipOuter = Array.from({ length: steps + 1 }, (_, i) => ringOf(lipO, cut - lip + (lip * i) / steps))
+  const lipInner = Array.from({ length: steps + 1 }, (_, i) => ringOf(lipI, cut - lip + ((lip + FLANGE) * i) / steps))
+  b.wall(lipOuter)
+  b.wall(lipInner, true)
+  // The seat on the body's rim (facing down), and the lip's lower end.
+  b.band(outerRows[0], lipOuter[steps], false)
+  b.band(lipOuter[0], lipInner[0], false)
+  // Inside: the vase's inner wall up to the top's underside, standing on a flange that carries the lip.
+  const zt = H - top
+  if (zt - zf >= 1) {
+    const k = Math.max(2, Math.ceil((zt - zf) / Math.max(1, H / rows)))
+    const inner = Array.from({ length: k + 1 }, (_, i) => {
+      const z = zf + ((zt - zf) * i) / k
+      return b.ring(n, (a) => shape.innerAt(a, z), z)
+    })
+    b.band(inner[0], lipInner[steps], true)
+    b.wall(inner, true)
+    b.cap(inner[k], zt, [], true)
+  } else {
+    b.cap(lipInner[steps], zf, [], true)
+  }
+  // The top, with the knob's hole: a blind hole, its floor facing up.
+  const knob = p.lidKnob === 'ja' ? teapotKnob(p, shape) : null
+  const loops = b.cap(outerRows[outerRows.length - 1], H, knob ? [{ cx: 0, cy: 0, r: knob.hole }] : [], false)
+  if (knob) {
+    const rim = loops[0]
+    const floor = rim.map((v) => b.addVertex(b.verts[v * 3], b.verts[v * 3 + 1], H - knob.depth))
+    holeWall(floor, rim, b.tris)
+    const c = b.addVertex(0, 0, H - knob.depth)
+    for (let k = 0; k < floor.length; k++) b.tris.push(c, floor[k], floor[(k + 1) % floor.length])
+  }
+  return { ...b.mesh(), knob }
+}
+
+/** The knob of a teapot lid, standing on the lid's top with its peg in the hole: turned, a waist and a round head. */
+export function teapotKnobMesh(p, shape) {
+  const { d, h, peg, pegLength } = teapotKnob(p, shape)
+  const z = p.height
+  const b = new MeshBuilder()
+  // Profile counter-clockwise; printed upside down on its flat head, every flank at most about 45 degrees.
+  b.lathe([
+    [0, z - pegLength], [peg, z - pegLength], [peg, z], [0.4 * d, z], [0.4 * d, z + 0.1 * h], [0.22 * d, z + 0.38 * h],
+    [0.38 * d, z + 0.58 * h], [0.48 * d, z + 0.76 * h], [0.44 * d, z + 0.88 * h], [0.36 * d, z + h], [0, z + h],
+  ], 64)
+  return { ...b.mesh(), d }
 }
 
 function lockedMask(count, list) {
