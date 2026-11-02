@@ -28,5 +28,15 @@
       "de": "Alle Raspberry Pi und das BIGTREETECH Pi haben jetzt ihren microSD-Schlitz. Flachbandkabel lassen sich durch den Deckel oder seitlich durch die Wand führen, die GPIO-Leiste durch den Deckel. Dazu kommen drei kleine ESP32-Boards: XIAO ESP32-C6, ESP32-C3 Super Mini und ESP32-C6 Super Mini.",
       "en": "Every Raspberry Pi and the BIGTREETECH Pi have their microSD card slot now. Ribbon cables can leave through the lid or sideways through the wall, and the GPIO header through the lid. Three small ESP32 boards join: XIAO ESP32-C6, ESP32-C3 Super Mini and ESP32-C6 Super Mini."
     }
+  },
+  {
+    "title": {
+      "de": "Gridfinity-Behälter bis zur Oberkante des Stapelrands füllen",
+      "en": "Gridfinity bins filled to the top of the lip"
+    },
+    "body": {
+      "de": "„Bodenhöhe“ im Eigenschaften-Fenster reicht bei einem Gridfinity-Behälter mit Stapelrand jetzt bis zur Oberkante des Stapelrands. Oberhalb der Höhe, bis zu der sich noch ein Behälter darauf stapeln lässt, wird auch der Stapelrand gefüllt: Der Behälter ist ein massiver Block mit flacher Oberseite, so hoch wie die Behälter mit Stapelrand daneben, ein Rohling, in den du die Formen deiner Werkzeuge schneidest.",
+      "en": "\"Floor height\" in the Properties panel now goes on to the top of a Gridfinity bin's stacking lip. Above the highest floor another bin still stacks on, the lip is filled too: the bin is a solid block with a flat top, as tall as the bins with the lip beside it, a blank to cut the shapes of your tools into."
+    }
   }
 ]

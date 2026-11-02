@@ -3749,6 +3749,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityLargePlate": "Base grande (até 12 unidades)",
   "gridfinity.largePlateHint": "Até 12 unidades na largura e na profundidade em vez de 6, para mesas de impressão acima de 256 mm. Com a sua impressora escolhida nas configurações, uma base maior que a mesa dela é sinalizada.",
   "gridfinity.floorHeightHint": "A caixa é maciça da parte de baixo até esta altura, um bloco para recortar formas.",
+  "gridfinity.floorHeightLipHint": "A caixa é maciça da parte de baixo até esta altura, um bloco para recortar formas. Até {height} mm ainda dá para empilhar outra caixa em cima; acima disso, a borda de empilhamento também é preenchida, para um topo plano.",
   "prop.gridfinityWallThickness": "Espessura da parede",
   "gridfinity.wallThicknessHint": "A parede é medida a partir do lado de fora, que não muda. Com a borda de empilhamento, uma parede acima de 1,75 mm termina num degrau 0,85 mm abaixo de 7 mm por unidade de altura, sem tocar os pés de uma caixa empilhada em cima.",
   "gridfinity.labelLengthHint": "0 leva o apoio de parede a parede.",

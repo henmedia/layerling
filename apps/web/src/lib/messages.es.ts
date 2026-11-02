@@ -2717,6 +2717,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Hasta 12 unidades de ancho y de fondo en lugar de 6, para camas de impresión de más de 256 mm. Si eliges tu impresora en los ajustes, se marca una placa más grande que su cama.",
   "prop.gridfinityFloorHeight": "Altura del fondo",
   "gridfinity.floorHeightHint": "La caja es maciza desde la base hasta esta altura: un bloque en bruto en el que recortar formas.",
+  "gridfinity.floorHeightLipHint": "La caja es maciza desde la base hasta esta altura: un bloque en bruto en el que recortar formas. Hasta {height} mm todavía se puede apilar otra caja encima; por encima, también se rellena el borde para apilar, para una cara superior plana.",
   "prop.gridfinityWallThickness": "Grosor de pared",
   "gridfinity.wallThicknessHint": "La pared se mide desde el exterior, que no cambia. Con el borde para apilar, una pared de más de 1,75 mm termina en un escalón 0,85 mm por debajo de 7 mm por unidad de altura, sin tocar los pies de una caja apilada encima.",
   "prop.gridfinityOpenBack": "Abierta detrás",

@@ -2672,6 +2672,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Do 12 jednostek wszerz i w głąb zamiast 6, dla stołów drukarki powyżej 256 mm. Gdy drukarka jest wybrana w ustawieniach, podstawka większa niż jej stół zostanie oznaczona.",
   "prop.gridfinityFloorHeight": "Wysokość dna",
   "gridfinity.floorHeightHint": "Do tej wysokości, mierząc od spodu, pojemnik jest pełny: półfabrykat, w którym wytniesz kształty.",
+  "gridfinity.floorHeightLipHint": "Do tej wysokości, mierząc od spodu, pojemnik jest pełny: półfabrykat, w którym wytniesz kształty. Do {height} mm można jeszcze postawić na nim inny pojemnik; powyżej wypełnia się też kołnierz piętrowania, dając płaską górę.",
   "prop.gridfinityWallThickness": "Grubość ścianki",
   "gridfinity.wallThicknessHint": "Ścianka jest mierzona od strony zewnętrznej, która się nie zmienia. Z kołnierzem piętrowania ścianka grubsza niż 1,75 mm kończy się występem 0,85 mm poniżej 7 mm na jednostkę wysokości, nie dotykając stopek pojemnika postawionego na górze.",
   "prop.gridfinityOpenBack": "Otwarty z tyłu",

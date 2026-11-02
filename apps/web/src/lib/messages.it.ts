@@ -2702,6 +2702,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Fino a 12 unità in larghezza e profondità invece di 6, per piani di stampa oltre 256 mm. Seleziona la stampante nelle impostazioni: le piastre più grandi del piano verranno segnalate.",
   "prop.gridfinityFloorHeight": "Altezza del fondo",
   "gridfinity.floorHeightHint": "Fino a questa altezza, misurata dal lato inferiore, il contenitore è pieno: un grezzo in cui ritagliare forme.",
+  "gridfinity.floorHeightLipHint": "Fino a questa altezza, misurata dal lato inferiore, il contenitore è pieno: un grezzo in cui ritagliare forme. Fino a {height} mm si può ancora impilare sopra un altro contenitore; oltre, anche il bordo di impilamento viene riempito, per una faccia superiore piatta.",
   "prop.gridfinityWallThickness": "Spessore della parete",
   "gridfinity.wallThicknessHint": "La parete si misura dall'esterno, che non cambia. Con il bordo di impilamento, una parete oltre 1,75 mm si ferma su un gradino 0,85 mm sotto 7 mm per unità di altezza, senza toccare i piedini di un contenitore impilato sopra.",
   "prop.gridfinityOpenBack": "Aperto dietro",

@@ -3153,6 +3153,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Op til 12 enheder i bredden og dybden i stedet for 6, til byggeplader over 256 mm. Når din printer er valgt i indstillingerne, markeres en plade, der er større end dens byggeplade.",
   "prop.gridfinityFloorHeight": "Bundens højde",
   "gridfinity.floorHeightHint": "Op til denne højde, målt fra undersiden, er bakken massiv: et emne, du kan skære former ud i.",
+  "gridfinity.floorHeightLipHint": "Op til denne højde, målt fra undersiden, er bakken massiv: et emne, du kan skære former ud i. Op til {height} mm kan en anden bakke stadig stables ovenpå; derover fyldes stabelkraven også, så toppen bliver flad.",
   "prop.gridfinityWallThickness": "Vægtykkelse",
   "gridfinity.wallThicknessHint": "Væggen måles fra ydersiden, som forbliver uændret. Med stabelkrave stopper en væg over 1,75 mm ved en afsats 0,85 mm under 7 mm pr. højdeenhed, fri af fødderne på en bakke stablet ovenpå.",
   "prop.gridfinityOpenBack": "Åben bagtil",

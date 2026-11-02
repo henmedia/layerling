@@ -2714,6 +2714,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "gridfinity.largePlateHint": "Bis zu 12 Einheiten breit und tief statt 6, für Druckbetten über 256 mm. Ist dein Drucker in den Einstellungen gewählt, wird eine Platte markiert, die größer als sein Druckbett ist.",
   "prop.gridfinityFloorHeight": "Bodenhöhe",
   "gridfinity.floorHeightHint": "Bis zu dieser Höhe, von der Unterseite an gemessen, ist der Behälter massiv: ein Rohling, in den du Formen schneidest.",
+  "gridfinity.floorHeightLipHint": "Bis zu dieser Höhe, von der Unterseite an gemessen, ist der Behälter massiv: ein Rohling, in den du Formen schneidest. Bis {height} mm lässt sich noch ein Behälter darauf stapeln; darüber wird auch der Stapelrand gefüllt, und die Oberseite ist flach.",
   "prop.gridfinityWallThickness": "Wandstärke",
   "gridfinity.wallThicknessHint": "Die Wand wird von außen nach innen gemessen; die Außenseite bleibt, wie sie ist. Mit Stapelrand endet eine Wand von mehr als 1,75 mm an einem Absatz 0,85 mm unter 7 mm je Höheneinheit, mit Abstand zu den Füßen eines darauf gestapelten Behälters.",
   "prop.gridfinityOpenBack": "Hinten offen",

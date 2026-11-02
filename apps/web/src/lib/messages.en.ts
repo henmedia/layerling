@@ -2715,6 +2715,7 @@ export const MESSAGES_EN = {
   "gridfinity.largePlateHint": "Up to 12 units across and deep instead of 6, for print beds over 256 mm. With your printer chosen in the settings, a plate larger than the printer's bed is flagged.",
   "prop.gridfinityFloorHeight": "Floor height",
   "gridfinity.floorHeightHint": "The bin is solid from its underside up to this height, a blank to cut shapes into.",
+  "gridfinity.floorHeightLipHint": "The bin is solid from its underside up to this height, a blank to cut shapes into. Up to {height} mm another bin still stacks on it; above that the stacking lip is filled too, for a flat top.",
   "prop.gridfinityWallThickness": "Wall thickness",
   "gridfinity.wallThicknessHint": "The wall is set in from the outside, which stays as it is. With the stacking lip, a wall over 1.75 mm stops at a ledge 0.85 mm under 7 mm per height unit, clear of a stacked bin's feet.",
   "prop.gridfinityOpenBack": "Open at the back",

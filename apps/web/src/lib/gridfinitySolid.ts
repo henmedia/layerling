@@ -205,7 +205,7 @@ function binSolid(cad: OcctKernel, plan: GridfinityPlan, scoops: GridfinityScoop
   // The whole inside without the compartments, the floor's rounding or the scoops, for the dividers' check.
   const loft = upper ? oneSolid(cad, cad.fuse(below, upper), "bin's inside") : below;
   const block = body;
-  // A bin without the lip whose floor is raised to the top is one solid block, with no inside to cut.
+  // A bin whose floor is raised to the top (with the lip, the lip's top; #1126) is one solid block, with no inside to cut.
   if (plan.floor < wallTop) body = oneSolid(cad, apart.length > 0 ? cad.cutAll(cad.cut(body, cutter), apart) : cad.cut(body, cutter), "bin");
   // Checked before the magnet holes, which take volume the bound does not count; the loft's PAST over the top cuts nothing.
   if (compartments) {

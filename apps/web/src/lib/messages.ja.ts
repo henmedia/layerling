@@ -2358,6 +2358,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "横と奥行きを6マスではなく最大12マスにします。256 mmより大きいプリントベッド向けです。設定でプリンターを選んでいると、そのベッドより大きいプレートには印が付きます。",
   "prop.gridfinityFloorHeight": "底の高さ",
   "gridfinity.floorHeightHint": "ビンの底からこの高さまでが、中までつまっています。シェイプを切り取るための材料になります。",
+  "gridfinity.floorHeightLipHint": "ビンの底からこの高さまでが、中までつまっています。シェイプを切り取るための材料になります。{height} mmまでは、上に別のビンを重ねられます。それより高くすると、重ねるためのふちもつまって、上面が平らになります。",
   "prop.gridfinityWallThickness": "壁の厚さ",
   "gridfinity.wallThicknessHint": "壁を厚くしても外側の大きさは変わらず、中がせまくなります。重ねるためのふちがあるときは、1.75 mmより厚い壁は、ビンの上のはし（高さのマス数×7 mm）より0.85 mm下で平らな段になって止まります。こうすると、上に重ねたビンの足に当たりません。",
   "prop.gridfinityOpenBack": "奥を開ける",
