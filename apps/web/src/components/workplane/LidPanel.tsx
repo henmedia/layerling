@@ -8,8 +8,12 @@ import { Check, LoaderCircle, X } from "lucide-react";
 import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
 import {
   LID_FITS,
+  LID_HINGE_TYPES,
   LID_MAGNET_SIZES,
   LID_TYPES,
+  MAX_HINGE_GAP,
+  MAX_HINGE_KNUCKLES,
+  MAX_HINGE_PIN,
   MAX_LID_DEPTH,
   MAX_LID_GAP,
   MAX_LID_THICKNESS,
@@ -17,12 +21,16 @@ import {
   MAX_MAGNET_DIAMETER,
   MAX_MAGNET_GAP,
   MAX_MAGNET_HEIGHT,
+  MIN_HINGE_GAP,
+  MIN_HINGE_PIN,
   MIN_LID_DEPTH,
   MIN_LID_THICKNESS,
   MIN_LID_WALL,
   MIN_MAGNET_DIAMETER,
   MIN_MAGNET_HEIGHT,
+  hingeKnuckleRadius,
   lidThicknessForMagnets,
+  normalizeLidOptions,
   type LidOptions,
 } from "@/lib/lidTool";
 import { numberLocale, t } from "@/lib/i18n";
@@ -32,7 +40,8 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 /**
  * A lid for a body open at the top (#1009): pushed into the opening, put over the outside, gripping the wall from both
  * sides (#1062) or laid flat on it. It comes out as a body of its own beside the one it closes, ready to print. With
- * magnets, it holds by four round magnets in the corners, in pockets in the body's rim and in the lid.
+ * magnets, it holds by four round magnets in the corners, in pockets in the body's rim and in the lid. With a hinge, it
+ * swings open about a pin along the body's back.
  */
 export function LidPanel({
   targetName,
@@ -68,6 +77,8 @@ export function LidPanel({
   const needed = lidThicknessForMagnets(settings);
   const tooThin = settings.magnets && settings.thickness < needed - 1e-9;
   const millimetres = (value: number) => value.toLocaleString(numberLocale());
+  // A rim round the outside would hit the back wall as the lid swings open: the hinge goes with a lip or a flat lid.
+  const hingeFits = LID_HINGE_TYPES.includes(settings.type);
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -242,6 +253,52 @@ export function LidPanel({
           onChange={(value) => onChange({ magnetGap: value })}
         />
         <span className="shell-openings-summary">{t("lid.magnetsHint")}</span>
+      </>) : null}
+
+      <label className="edge-modifier-field offset-copy">
+        <input type="checkbox" checked={settings.hinge && hingeFits} disabled={busy || !hingeFits} onChange={(event) => onChange({ hinge: event.target.checked })} />
+        <span>{t("lid.hinge")}</span>
+      </label>
+      {!hingeFits ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
+      {settings.hinge && hingeFits ? (<>
+        <EdgeModifierSlider
+          label={t("lid.hingePin")}
+          value={settings.hingePin}
+          min={MIN_HINGE_PIN}
+          max={MAX_HINGE_PIN}
+          step={0.05}
+          workspace={workspace}
+          length
+          disabled={busy}
+          onChange={(value) => onChange({ hingePin: value })}
+        />
+        <EdgeModifierSlider
+          label={t("lid.hingeGap")}
+          value={settings.hingeGap}
+          min={MIN_HINGE_GAP}
+          max={MAX_HINGE_GAP}
+          step={0.05}
+          workspace={workspace}
+          length
+          disabled={busy}
+          onChange={(value) => onChange({ hingeGap: value })}
+        />
+        <EdgeModifierSlider
+          label={t("lid.hingeKnuckles")}
+          value={settings.hingeKnuckles}
+          min={0}
+          max={MAX_HINGE_KNUCKLES}
+          step={1}
+          workspace={workspace}
+          decimals={0}
+          disabled={busy}
+          onChange={(value) => onChange({ hingeKnuckles: normalizeLidOptions({ hingeKnuckles: value }).hingeKnuckles })}
+        />
+        <label className="edge-modifier-field offset-copy">
+          <input type="checkbox" checked={settings.hingePrintPin} disabled={busy} onChange={(event) => onChange({ hingePrintPin: event.target.checked })} />
+          <span>{t("lid.hingePrintPin")}</span>
+        </label>
+        <span className="shell-openings-summary">{t("lid.hingeHint", { diameter: millimetres(Math.round(2 * hingeKnuckleRadius(settings) * 10) / 10) })}</span>
       </>) : null}
 
       {error ? <div className="edge-modifier-error" role="alert">{error}</div> : null}
