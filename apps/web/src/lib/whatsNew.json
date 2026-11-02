@@ -1,5 +1,60 @@
 [
   {
+    "version": "1.132.2",
+    "items": [
+      {
+        "title": {
+          "de": "Einen Umriss durchstanzen",
+          "en": "Punch an outline through a body"
+        },
+        "body": {
+          "de": "Unter Kombinieren gibt es jetzt Stanzen: Wähle zuerst einen Körper als Stempel, dann den Körper, der die Öffnung bekommt. Der Umriss des Stempels geht entlang X, Y oder Z gerade hindurch, auch wenn der Stempel nur davor steht. Der Stempel bleibt, sodass du ihn verschieben oder drehen und gleich noch einmal stanzen kannst.",
+          "en": "Combine now has Punch: pick a body as the punch first, then the body that gets the opening. The punch's outline goes straight through along X, Y or Z, even when the punch only stands in front of it. The punch stays, so you can move or turn it and punch again right away."
+        }
+      },
+      {
+        "title": {
+          "de": "Die Skizzenfläche wächst mit",
+          "en": "The sketch plate grows with the sketch"
+        },
+        "body": {
+          "de": "Ein Drehprofil lässt sich jetzt über den Rand der Fläche hinausschieben, für einen größeren Radius, ohne die Arbeitsebene in den Einstellungen zu vergrößern. Das Raster wächst mit, Punkte dort draußen lassen sich wieder auswählen, und die Minus-Taste zoomt heraus, bis alles zu sehen ist.",
+          "en": "A revolve profile can now go past the edge of the plate, for a bigger radius, without making the workplane bigger in the settings. The grid grows with it, points out there can be picked again, and the minus button zooms out until all of it fits."
+        }
+      },
+      {
+        "title": {
+          "de": "Fasen über eine halb gefaste Ecke",
+          "en": "Chamfers across a half-chamfered corner"
+        },
+        "body": {
+          "de": "Scheitert eine Fase oder Rundung, versucht layerling es noch einmal mit den kurzen Kanten an den Enden der gewählten. So geht eine Ecke, an der eine frühere Fase auf eine noch scharfe Wand trifft, in einem Schritt durch; die Meldung sagt, wie viele Kanten mitgenommen wurden.",
+          "en": "When a chamfer or fillet fails, layerling tries once more with the short edges at the ends of the picked ones. A corner where an earlier chamfer meets a wall that is still sharp now goes through in one step; a message says how many edges were taken along."
+        }
+      },
+      {
+        "title": {
+          "de": "Ein Bund an der Mutter",
+          "en": "A collar on a nut"
+        },
+        "body": {
+          "de": "Wie die Schraube bekommt jetzt auch die Mutter einen runden Bund: Bundhöhe und Bunddurchmesser stehen bei Sechskant-, Vierkant-, Flansch-, Flügel- und Sterngriffmuttern in den Einstellungen. Der Bund sitzt oben auf der Mutter, schmaler als sie, und das Gewinde läuft hindurch; die Mutter druckt weiter auf ihrer Auflagefläche, der Bund ohne Stützen. Die Höhe zählt nur die Mutter selbst.",
+          "en": "Like the screw, a nut can now take a round collar: Collar height and Collar diameter are in the settings of the hex, square, flange, wing and star knob nuts. The collar stands on top of the nut, narrower than it, with the thread running through; the nut still prints on its bearing face, the collar without supports. The height counts the nut itself only."
+        }
+      },
+      {
+        "title": {
+          "de": "Teekannendeckel: Fuge nach Höhe vom Boden",
+          "en": "Teapot lid: the joint as a height from the bottom"
+        },
+        "body": {
+          "de": "Beim Teekannendeckel der Vase lässt sich die Fuge jetzt auch als Höhe vom Boden eintippen, im neuen Feld „Vase bis · Deckel ab“ neben der Höhe des Deckels. Beide ergeben zusammen die Höhe der Vase: Trägst du das eine ein, nimmt das andere den Rest.",
+          "en": "On the vase's teapot lid the joint can now be typed in as a height from the bottom, in the new field \"Body up to · lid from\" beside Lid height. The two add up to the vase's height: type one and the other takes the rest."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.132.1",
     "items": [
       {
