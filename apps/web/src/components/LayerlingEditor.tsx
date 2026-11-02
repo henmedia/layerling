@@ -12325,6 +12325,7 @@ export function LayerlingEditor({
           minBend: Number.isFinite(result.minBend) ? round(result.minBend) : null,
           minWall: round(result.minWall),
           segments: result.segments.length,
+          chain: result.segments.map((segment) => ({ length: round(segment.length), bendAngle: round(segment.bendAngle), bendRadius: round(segment.bendRadius), roll: round(segment.roll) })),
           tight: result.tight,
           thin: result.thin,
           entry: { x: round(entry.point[0]), y: round(entry.point[1]), z: round(entry.point[2]) },
