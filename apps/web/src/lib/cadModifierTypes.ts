@@ -256,8 +256,8 @@ export type CadModifierThreadPart = {
     /** The round collar (#1152) on the head's shaft face, up from `height`; on an outline head it is a tier instead. */
     collar?: { radius: number; height: number };
   };
-  /** Nut only: its hex across flats, and the face radius of its chamfered rims (0 for sharp). */
-  nut?: { acrossFlats: number; chamferFaceRadius: number };
+  /** Nut only: its hex across flats, and the face radius of its chamfered rims (0 for sharp). The collar (#1175) is a round part on its top face, up from the body, which is `height` less the collar. */
+  nut?: { acrossFlats: number; chamferFaceRadius: number; collar?: { radius: number; height: number } };
   transform?: number[];
   expected?: { bounds: number[]; volume: number };
 };

@@ -1648,7 +1648,13 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
       ...(plan.collarHeight > 0 && !plan.tiers ? { collar: { radius: plan.collarRadius, height: plan.collarHeight } } : {}),
     };
   }
-  if (settings.role === "nut") part.nut = { acrossFlats: spec.acrossFlats, chamferFaceRadius: plan.rimBroken ? plan.rimFaceRadius : 0 };
+  if (settings.role === "nut") {
+    part.nut = {
+      acrossFlats: spec.acrossFlats,
+      chamferFaceRadius: plan.rimBroken ? plan.rimFaceRadius : 0,
+      ...(plan.collarHeight > 0 ? { collar: { radius: plan.collarRadius, height: plan.collarHeight } } : {}),
+    };
+  }
   if (plan.tiers) part.tiers = plan.tiers;
   return part;
 }

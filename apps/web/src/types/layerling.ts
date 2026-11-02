@@ -169,7 +169,7 @@ export type ShapeCustomization = {
   threadDrive?: ThreadDrive;
   threadDriveSize?: number;
   threadDriveDepth?: number;
-  /** Screw only (#1152): a round collar between the head and the thread, this high in mm; unset or 0 = none. Its diameter unset = twice the thread. */
+  /** Screw (#1152): a round collar between the head and the thread; nut (#1175): on its top face. This high in mm; unset or 0 = none. Its diameter unset = twice the thread. */
   threadCollarHeight?: number;
   threadCollarDiameter?: number;
   springTurns?: number;
@@ -956,7 +956,7 @@ export type WorkplaneShape = {
   threadDrive?: ThreadDrive;
   threadDriveSize?: number;
   threadDriveDepth?: number;
-  /** Screw only (#1152): a round collar between the head and the thread, this high in mm; unset or 0 = none. Its diameter unset = twice the thread. */
+  /** Screw (#1152): a round collar between the head and the thread; nut (#1175): on its top face. This high in mm; unset or 0 = none. Its diameter unset = twice the thread. */
   threadCollarHeight?: number;
   threadCollarDiameter?: number;
   springTurns?: number;

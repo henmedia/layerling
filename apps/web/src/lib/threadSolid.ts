@@ -379,8 +379,12 @@ export function threadPartSolid(cad: OcctKernel, part: CadModifierThreadPart): S
       ...(part.chamfer > 0 ? [insideChamferCone(cad, part, height, -1, part.chamfer)] : []),
     ];
     if (role === "nut" && part.nut) {
-      let body = part.tiers ? tiersSolid(cad, part.tiers, "nut") : hexPrism(cad, part.nut.acrossFlats, height);
-      if (part.nut.chamferFaceRadius > 0) body = oneSolid(cad, cad.common(body, rimChamferBound(cad, part.nut.chamferFaceRadius, height)), "nut");
+      // The collar (#1175) stands on the body's top face; the body is the height less the collar, and the thread runs through both.
+      const collar = part.nut.collar;
+      const bodyHeight = collar ? height - collar.height : height;
+      let body = part.tiers ? tiersSolid(cad, part.tiers, "nut") : hexPrism(cad, part.nut.acrossFlats, bodyHeight);
+      if (part.nut.chamferFaceRadius > 0) body = oneSolid(cad, cad.common(body, rimChamferBound(cad, part.nut.chamferFaceRadius, bodyHeight)), "nut");
+      if (collar) body = oneSolid(cad, cad.fuse(body, cad.translate(cad.makeCylinder(collar.radius, collar.height), 0, 0, bodyHeight)), "nut");
       for (const cone of cones) body = oneSolid(cad, cad.cut(body, cone), "nut");
       solid = oneSolid(cad, cad.cut(body, tap), "nut");
     } else {

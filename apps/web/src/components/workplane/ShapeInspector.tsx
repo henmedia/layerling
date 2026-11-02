@@ -2660,6 +2660,32 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         onChange: (length) => applyThread({}, length),
       },
     );
+    const pushCollar = (hint?: string) => {
+      if (collarHeightLimits.max <= 0) return;
+      properties.push({
+        id: "collarHeight",
+        label: t("prop.collarHeight"),
+        value: settings.collarHeight,
+        min: collarHeightLimits.min,
+        max: collarHeightLimits.max,
+        step: 0.1,
+        hint,
+        onChange: (collarHeight) => applyThread({ collarHeight }),
+      });
+      if (settings.collarHeight > 0) {
+        properties.push({
+          id: "collarDiameter",
+          label: t("prop.collarDiameter"),
+          value: settings.collarDiameter,
+          min: collarDiameterLimits.min,
+          max: collarDiameterLimits.max,
+          step: 0.1,
+          onChange: (collarDiameter) => applyThread({ collarDiameter }),
+        });
+      }
+    };
+    // A nut's collar (#1175) stands on its top face, the height above it counted apart from the body's.
+    if (settings.role === "nut") pushCollar();
     if (settings.role === "screw") {
       properties.push({
         id: "headHeight",
@@ -2683,29 +2709,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         });
       }
       // A collar between head and thread (#1152): a spacer under a star knob, a shoulder under a head.
-      if (collarHeightLimits.max > 0) {
-        properties.push({
-          id: "collarHeight",
-          label: t("prop.collarHeight"),
-          value: settings.collarHeight,
-          min: collarHeightLimits.min,
-          max: collarHeightLimits.max,
-          step: 0.1,
-          hint: t("prop.collarHeightHint"),
-          onChange: (collarHeight) => applyThread({ collarHeight }),
-        });
-        if (settings.collarHeight > 0) {
-          properties.push({
-            id: "collarDiameter",
-            label: t("prop.collarDiameter"),
-            value: settings.collarDiameter,
-            min: collarDiameterLimits.min,
-            max: collarDiameterLimits.max,
-            step: 0.1,
-            onChange: (collarDiameter) => applyThread({ collarDiameter }),
-          });
-        }
-      }
+      pushCollar(t("prop.collarHeightHint"));
       if (settings.drive !== "none") {
         properties.push({
           id: "driveSize",

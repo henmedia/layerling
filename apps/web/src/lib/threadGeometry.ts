@@ -688,7 +688,7 @@ export type ThreadSettings = {
   drive: ThreadDrive;
   driveSize: number;
   driveDepth: number;
-  /** Screw only (#1152): the round collar between head and thread, its height (0 for none) and diameter. */
+  /** Screw (#1152): the round collar between head and thread; nut (#1175): the round collar on its top face. Its height (0 for none) and diameter. */
   collarHeight: number;
   collarDiameter: number;
 };
@@ -840,6 +840,15 @@ export function normalizeThreadHeadDiameter(value: number | undefined, settings:
  * limit it; a flange head's flange lies on top.
  */
 function headInscribedRadius(settings: HeadSizeShape & { headDiameter: number }) {
+  // A nut's collar stands on its top face: the hexagon, square or flange nut's hex part and a wing nut's hub reach
+  // half the width across flats, a star knob nut its scallops as the knob head does.
+  if (settings.role === "nut") {
+    if (threadNutShape(settings.head) === "knob") {
+      const outline = knobOutline(settings.diameter * 2.5);
+      return outline.kind === "knob" ? outline.scallopCenter - outline.scallopRadius : settings.diameter * 2.5;
+    }
+    return threadSizeSpec(settings.diameter, settings.pitch).acrossFlats / 2;
+  }
   if (settings.head === "knob") {
     const outline = knobOutline(settings.headDiameter / 2);
     return outline.kind === "knob" ? outline.scallopCenter - outline.scallopRadius : settings.headDiameter / 2;
@@ -850,9 +859,12 @@ function headInscribedRadius(settings: HeadSizeShape & { headDiameter: number })
   return settings.headDiameter / 2;
 }
 
-/** A collar under a countersunk head would hold it out of its countersink, so that head has none. */
+/**
+ * A collar under a countersunk head would hold it out of its countersink, so that head has none. A nut takes it on its
+ * top face, narrower than the nut so it prints on it without supports (Discussion #1175).
+ */
 function takesCollar(settings: Pick<ThreadSettings, "role" | "head">) {
-  return settings.role === "screw" && settings.head !== "countersunk";
+  return settings.role === "nut" || (settings.role === "screw" && settings.head !== "countersunk");
 }
 
 export function threadCollarHeightLimits(settings: HeadShape) {
@@ -867,9 +879,12 @@ export function normalizeThreadCollarHeight(value: number | undefined, settings:
   return height < 0.05 ? 0 : height;
 }
 
-/** Wider than the thread by 0.4 mm, and 0.4 mm narrower than the head where it is narrowest. */
+/**
+ * Wider than the thread by 0.4 mm, and 0.4 mm narrower than the head where it is narrowest. A nut's collar is
+ * walled round the thread's crests and the bore's chamfer, so it is at least 1.3 times the thread plus 0.4 mm.
+ */
 export function threadCollarDiameterLimits(settings: HeadSizeShape & { headDiameter: number }) {
-  const min = settings.diameter + 0.4;
+  const min = settings.role === "nut" ? settings.diameter * 1.3 + 0.4 : settings.diameter + 0.4;
   return { min, max: Math.max(min, headInscribedRadius(settings) * 2 - 0.4) };
 }
 
@@ -1190,7 +1205,10 @@ export function threadHeadChamferLimits(settings: HeadChamferShape) {
   const drive = settings.drive ?? defaultThreadDrive(settings.head);
   const driveCorner = threadDriveRadius(drive, settings.driveSize ?? threadSizeSpec(settings.diameter, settings.pitch).socket);
   const innen = settings.role === "nut"
-    ? settings.diameter / 2 + Math.max(normalizeThreadChamfer(settings.chamfer, settings), normalizeThreadChamfer(settings.chamferLow ?? settings.chamfer, settings))
+    ? Math.max(
+      settings.diameter / 2 + Math.max(normalizeThreadChamfer(settings.chamfer, settings), normalizeThreadChamfer(settings.chamferLow ?? settings.chamfer, settings)),
+      (settings.collarHeight ?? 0) > 0 ? (settings.collarDiameter ?? 0) / 2 : 0,
+    )
     : Math.max(driveCorner, settings.diameter / 2, (settings.collarHeight ?? 0) > 0 ? (settings.collarDiameter ?? 0) / 2 : 0);
   const roomToBore = Math.max(0, inscribed - innen - 0.2);
   const roomToHeight = Math.max(0, chamferRimHeight(settings) * 0.35 - (circumscribed - inscribed));
@@ -1206,7 +1224,7 @@ export function normalizeThreadHeadChamfer(value: number | undefined, settings: 
 
 /** Die Hoehe, mit der ein frisch gewaehlter Gewindetyp auf die Ebene kommt. */
 export function threadNaturalHeight(settings: Pick<ThreadSettings, "role" | "head" | "diameter" | "pitch" | "headHeight"> & { collarHeight?: number }) {
-  if (settings.role === "nut") return threadSizeSpec(settings.diameter, settings.pitch).nutHeight;
+  if (settings.role === "nut") return threadSizeSpec(settings.diameter, settings.pitch).nutHeight + (settings.collarHeight ?? 0);
   if (settings.role === "screw") return settings.headHeight + (settings.collarHeight ?? 0) + settings.diameter * 4;
   if (settings.role === "bore") return settings.diameter * 3;
   return settings.diameter * 5;
@@ -1775,9 +1793,11 @@ export function threadBuildPlan(options: ThreadGeometryOptions) {
   const handSign = settings.hand === "left" ? 1 : -1;
 
   const headHeight = Math.min(height * 0.9, settings.headHeight);
-  // The collar (#1152) sits on the head; a body pulled short keeps a piece of thread above it.
+  // The collar (#1152) sits on the head; a body pulled short keeps a piece of thread above it. A nut's (#1175) is its
+  // top part: the body under it is the height less the collar, and the thread runs through both.
   const collarRoom = Math.min(settings.collarHeight, Math.max(0, height * 0.9 - headHeight));
-  const collarHeight = settings.role === "screw" && collarRoom >= 0.05 ? collarRoom : 0;
+  const collarHeight = (settings.role === "screw" || settings.role === "nut") && collarRoom >= 0.05 ? collarRoom : 0;
+  const bodyHeight = settings.role === "nut" ? height - collarHeight : height;
   const collarRadius = settings.collarDiameter / 2;
   const shaftBottom = settings.role === "screw" ? headHeight + collarHeight : 0;
   const chamfer = Math.min(settings.chamfer, (height - shaftBottom) * 0.45);
@@ -1797,7 +1817,7 @@ export function threadBuildPlan(options: ThreadGeometryOptions) {
    * einmal nachgeschnitten, falls jemand den Koerper flacher gezogen hat.
    */
   const rimRadii = headRingRadii(settings);
-  const rimRoom = Math.max(0, height * 0.35 - (rimRadii.circumscribed - rimRadii.inscribed));
+  const rimRoom = Math.max(0, bodyHeight * 0.35 - (rimRadii.circumscribed - rimRadii.inscribed));
   const rimChamfer = Math.min(settings.headChamfer, rimRoom);
   // Dieselbe Fase wie an der Mutter, nur in der Hoehe des Kopfes.
   const headRoom = Math.max(0, headHeight * 0.35 - (rimRadii.circumscribed - rimRadii.inscribed));
@@ -1808,9 +1828,10 @@ export function threadBuildPlan(options: ThreadGeometryOptions) {
   const driveOutline = socketDepth > 0.05 ? threadDriveOutline(settings.drive, settings.driveSize) : null;
   const natural = threadNaturalFootprint(settings);
   return {
-    tiers: threadOutlineTiers(settings, height, headHeight, { radius: collarRadius, height: collarHeight }),
+    tiers: threadOutlineTiers(settings, bodyHeight, headHeight, { radius: collarRadius, height: collarHeight }),
     settings,
     height,
+    bodyHeight,
     spec,
     profile,
     axialPlay,
@@ -1843,7 +1864,7 @@ export function threadBuildPlan(options: ThreadGeometryOptions) {
 
 export function createThreadGeometry(options: ThreadGeometryOptions) {
   const plan = threadBuildPlan(options);
-  const { settings, height, spec, profile, major, minor, handSign, headHeight, shaftBottom, chamfer, chamferLow, chamferBottom, inward } = plan;
+  const { settings, height, bodyHeight, spec, profile, major, minor, handSign, headHeight, shaftBottom, chamfer, chamferLow, chamferBottom, inward } = plan;
   // Any chamfer above zero counts, however small: a zero-width cone leaves the mouth exactly as wide as the outer diameter (forum, 14.10.2026).
   const lowBroken = chamferBottom && chamferLow > 0;
   const topBroken = chamfer > 0;
@@ -1890,7 +1911,16 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
     const { bottom, top } = tierWalls(builder, plan.tiers);
     const bore = threadWall(builder, angles, 0, height, major, minor, settings.pitch, handSign, true, limitRadius, subdivisions, bandHeight, profile.points);
     zipRings(builder, bore.bottomEdge, columnOrder, bottom.ring, bottom.order);
-    zipRings(builder, bore.topEdge, columnOrder, top.ring, top.order, true);
+    if (plan.collarHeight > 0) {
+      // The nut's collar (#1175): a step in from the body's top, its wall, and the top face round the bore.
+      const collarBottom = ring(builder, angles, () => plan.collarRadius, bodyHeight);
+      const collarTop = ring(builder, angles, () => plan.collarRadius, height);
+      zipRings(builder, collarBottom, columnOrder, top.ring, top.order, true);
+      wall(builder, collarBottom, collarTop);
+      capRing(builder, bore.topEdge, collarTop, true);
+    } else {
+      zipRings(builder, bore.topEdge, columnOrder, top.ring, top.order, true);
+    }
   } else if (settings.role === "screw" && plan.tiers) {
     const shaft = threadWall(builder, angles, shaftBottom, height, major, minor, settings.pitch, handSign, false, limitRadius, subdivisions, bandHeight, profile.points);
     capFan(builder, shaft.topEdge, height, true);
@@ -1918,11 +1948,11 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
       ? ring(builder, angles, () => rimFaceRadius, 0)
       : ring(builder, angles, outerRadiusAt, 0);
     const outerTop = rimBroken
-      ? ring(builder, angles, () => rimFaceRadius, height)
-      : ring(builder, angles, outerRadiusAt, height);
+      ? ring(builder, angles, () => rimFaceRadius, bodyHeight)
+      : ring(builder, angles, outerRadiusAt, bodyHeight);
     if (rimBroken) {
       const flankeUnten = angles.map((angle) => pushVertex(builder, angle, outerRadiusAt(angle), outerRadiusAt(angle) - rimFaceRadius));
-      const flankeOben = angles.map((angle) => pushVertex(builder, angle, outerRadiusAt(angle), height - (outerRadiusAt(angle) - rimFaceRadius)));
+      const flankeOben = angles.map((angle) => pushVertex(builder, angle, outerRadiusAt(angle), bodyHeight - (outerRadiusAt(angle) - rimFaceRadius)));
       wall(builder, outerBottom, flankeUnten);
       wall(builder, flankeUnten, flankeOben);
       wall(builder, flankeOben, outerTop);
@@ -1931,7 +1961,16 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
     }
     const bore = threadWall(builder, angles, 0, height, major, minor, settings.pitch, handSign, true, limitRadius, subdivisions, bandHeight, profile.points);
     capRing(builder, bore.bottomEdge, outerBottom, false);
-    capRing(builder, bore.topEdge, outerTop, true);
+    if (plan.collarHeight > 0) {
+      // The nut's collar (#1175), as the screw's: a step in from the top face, its wall, the face round the bore.
+      const collarBottom = ring(builder, angles, () => plan.collarRadius, bodyHeight);
+      const collarTop = ring(builder, angles, () => plan.collarRadius, height);
+      capRing(builder, collarBottom, outerTop, true);
+      wall(builder, collarBottom, collarTop);
+      capRing(builder, bore.topEdge, collarTop, true);
+    } else {
+      capRing(builder, bore.topEdge, outerTop, true);
+    }
   } else if (settings.role === "screw") {
     const shaft = threadWall(builder, angles, shaftBottom, height, major, minor, settings.pitch, handSign, false, limitRadius, subdivisions, bandHeight, profile.points);
     capFan(builder, shaft.topEdge, height, true);

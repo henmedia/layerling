@@ -28,5 +28,15 @@
       "de": "Scheitert eine Fase oder Rundung, versucht layerling es noch einmal mit den kurzen Kanten an den Enden der gewählten. So geht eine Ecke, an der eine frühere Fase auf eine noch scharfe Wand trifft, in einem Schritt durch; die Meldung sagt, wie viele Kanten mitgenommen wurden.",
       "en": "When a chamfer or fillet fails, layerling tries once more with the short edges at the ends of the picked ones. A corner where an earlier chamfer meets a wall that is still sharp now goes through in one step; a message says how many edges were taken along."
     }
+  },
+  {
+    "title": {
+      "de": "Ein Bund an der Mutter",
+      "en": "A collar on a nut"
+    },
+    "body": {
+      "de": "Wie die Schraube bekommt jetzt auch die Mutter einen runden Bund: Bundhöhe und Bunddurchmesser stehen bei Sechskant-, Vierkant-, Flansch-, Flügel- und Sterngriffmuttern in den Einstellungen. Der Bund sitzt oben auf der Mutter, schmaler als sie, und das Gewinde läuft hindurch; die Mutter druckt weiter auf ihrer Auflagefläche, der Bund ohne Stützen. Die Höhe zählt nur die Mutter selbst.",
+      "en": "Like the screw, a nut can now take a round collar: Collar height and Collar diameter are in the settings of the hex, square, flange, wing and star knob nuts. The collar stands on top of the nut, narrower than it, with the thread running through; the nut still prints on its bearing face, the collar without supports. The height counts the nut itself only."
+    }
   }
 ]
