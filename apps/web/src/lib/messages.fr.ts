@@ -1191,6 +1191,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Modificateur de bord annulé car l'objet a changé",
   "status.edgeNeedsAdjustment": "Le traitement des bords doit être ajusté",
   "status.edgePreviewReady": "Aperçu du traitement des bords prêt",
+  "status.edgeCornerEdgeAdded": "Un court bord à un coin a été ajouté : sans lui, ce coin ne peut pas être traité.",
+  "status.edgeCornerEdgesAdded": "{count} courts bords aux coins ont été ajoutés : sans eux, ces coins ne peuvent pas être traités.",
   "status.finishBeforeRedo": "Terminez le glisser ou la transformation en cours avant de refaire",
   "status.finishBeforeRotate": "Terminez le glisser ou la transformation en cours avant de faire pivoter",
   "status.finishBeforeSave": "Terminez le glisser ou la transformation en cours avant d'enregistrer le fichier de conception",

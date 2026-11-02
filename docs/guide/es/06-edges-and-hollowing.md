@@ -39,6 +39,8 @@ Si el tamaño es demasiado grande para la arista, layerling te lo dice y te prop
 
 Si una selección que funcionaba falla al hacer clic en una arista más, esa arista se pone roja y se dibuja más gruesa: es la que no se puede tratar junto con las demás con ese tamaño. Vuelve a hacer clic en ella para quitarla, o reduce el tamaño. Si haces clic en más aristas mientras el mensaje sigue ahí, la primera sigue en rojo. Cuando no hay una selección anterior que funcionara (en el primerísimo clic, o con un tamaño que acabas de aumentar), se ponen en rojo las aristas que fallan incluso por sí solas, o todas, si lo que falla es solo su combinación.
 
+Antes de rendirse, layerling lo intenta una vez más con las aristas cortas en los extremos de las elegidas, de hasta el doble del tamaño. Una así aparece donde un chaflán anterior termina en una pared que sigue viva: una arista corta e inclinada en la esquina, y la esquina no se puede tratar mientras siga viva. Si eso ayuda, esas aristas quedan elegidas también y un mensaje dice cuántas se incluyeron.
+
 La arista que hay bajo el puntero también se dibuja más gruesa, para que veas cuál va a elegir el clic.
 
 Un orificio también admite {{ui:editor.tool.chamfer}} y {{ui:editor.tool.fillet}}, igual que {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} y {{ui:editor.tool.deleteFace}}: sigue siendo un orificio y corta con su nueva forma. Redondear las cuatro aristas verticales de un orificio en forma de caja da una cavidad con esquinas interiores redondeadas, y un orificio agrandado con {{ui:editor.tool.offset}} corta con ese margen de más. Para romper la arista donde un orificio se une a la pieza, trata el grupo terminado: esa arista es suya.

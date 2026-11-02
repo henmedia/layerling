@@ -997,6 +997,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "オブジェクトが変更されたため、エッジ処理をキャンセルしました",
   "status.edgeNeedsAdjustment": "エッジ処理には調整が必要です",
   "status.edgePreviewReady": "エッジ処理のプレビューができました",
+  "status.edgeCornerEdgeAdded": "角にある短いエッジを1本追加しました。これがないとこの角は処理できません。",
+  "status.edgeCornerEdgesAdded": "角にある短いエッジを{count}本追加しました。これがないとこれらの角は処理できません。",
   "status.finishBeforeRedo": "やり直す前に、現在のドラッグまたは変形を終えてください",
   "status.finishBeforeRotate": "回転する前に、現在のドラッグまたは変形を終えてください",
   "status.finishBeforeSave": "デザインファイルを保存する前に、現在のドラッグまたは変形を終えてください",

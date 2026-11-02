@@ -505,6 +505,8 @@ export type CadModifierWorkerResponse =
       // The deflection actually used for this operation - request.minDeflection
       // folded in, so the caller can carry it forward as the new floor.
       deflection: CadModifierDeflection;
+      // Short corner edges the worker took along so a refused chamfer or fillet went through (#1178).
+      cornerEdgeIds?: number[];
     }
   | { type: "disposed"; requestId: number }
   // failedEdgeIds: the selected edges the kernel could not treat together.

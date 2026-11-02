@@ -3137,6 +3137,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Tratamento de aresta cancelado porque o objeto mudou",
   "status.edgeNeedsAdjustment": "O tratamento de aresta precisa de ajuste",
   "status.edgePreviewReady": "Prévia do tratamento de aresta pronta",
+  "status.edgeCornerEdgeAdded": "Uma aresta curta em um canto foi incluída: sem ela, esse canto não pode ser tratado.",
+  "status.edgeCornerEdgesAdded": "{count} arestas curtas em cantos foram incluídas: sem elas, esses cantos não podem ser tratados.",
   "status.finishBeforeRedo": "Termine o arraste ou a transformação atual antes de refazer",
   "status.finishBeforeRotate": "Termine o arraste ou a transformação atual antes de girar",
   "status.finishBeforeSave": "Termine o arraste ou a transformação atual antes de salvar o arquivo do projeto",

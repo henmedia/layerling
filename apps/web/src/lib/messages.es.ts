@@ -1204,6 +1204,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Tratamiento de aristas cancelado porque el objeto ha cambiado",
   "status.edgeNeedsAdjustment": "Hay que ajustar el tratamiento de aristas",
   "status.edgePreviewReady": "Vista previa del tratamiento de aristas lista",
+  "status.edgeCornerEdgeAdded": "Se ha incluido una arista corta en una esquina: sin ella, esa esquina no se puede tratar.",
+  "status.edgeCornerEdgesAdded": "Se han incluido {count} aristas cortas en esquinas: sin ellas, esas esquinas no se pueden tratar.",
   "status.finishBeforeRedo": "Termina de arrastrar o transformar antes de rehacer",
   "status.finishBeforeRotate": "Termina de arrastrar o transformar antes de girar",
   "status.finishBeforeSave": "Termina de arrastrar o transformar antes de guardar el archivo del diseño",

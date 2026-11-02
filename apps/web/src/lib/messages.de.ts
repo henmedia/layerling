@@ -1201,6 +1201,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.edgeCancelledChanged": "Kantenbearbeitung abgebrochen, weil sich das Objekt geändert hat",
   "status.edgeNeedsAdjustment": "Die Kantenbearbeitung muss angepasst werden",
   "status.edgePreviewReady": "Vorschau der Kantenbearbeitung fertig",
+  "status.edgeCornerEdgeAdded": "Eine kurze Kante an einer Ecke wurde mitgenommen: Ohne sie lässt sich diese Ecke nicht bearbeiten.",
+  "status.edgeCornerEdgesAdded": "{count} kurze Kanten an Ecken wurden mitgenommen: Ohne sie lassen sich diese Ecken nicht bearbeiten.",
   "status.finishBeforeRedo": "Beende das Ziehen oder Umformen, bevor du wiederherstellst",
   "status.finishBeforeRotate": "Beende das Ziehen oder Umformen, bevor du drehst",
   "status.finishBeforeSave": "Beende das Ziehen oder Umformen, bevor du die Entwurfsdatei speicherst",

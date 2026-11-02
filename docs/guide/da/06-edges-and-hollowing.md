@@ -39,6 +39,8 @@ Hvis størrelsen er for stor til kanten, siger layerling det og foreslår en min
 
 Når en markering der virkede fejler efter du klikker én kant mere, bliver den kant rød og tegnes bredere: det er den der ikke kan behandles sammen med de andre ved denne størrelse. Klik den igen for at tage den ud, eller gør størrelsen mindre. Klikker du flere kanter mens beskeden står, bliver den første ved med at være rød. Når der ikke er en tidligere markering der virkede - det allerførste klik, eller en størrelse du lige hævede - bliver kanterne der fejler selv alene røde, eller alle sammen hvis det kun er deres kombination.
 
+Før den giver op, prøver layerling én gang til med de korte kanter ved enderne af de valgte, højst dobbelt så lange som størrelsen. Sådan en sidder, hvor en tidligere fas ender på en væg, der stadig er skarp: en kort skrå kant i hjørnet, og så længe den er skarp, kan hjørnet ikke bearbejdes. Hjælper det, er de kanter bagefter også valgt, og en besked fortæller, hvor mange der blev taget med.
+
 Kanten under markøren tegnes også bredere, så du kan se hvilken et klik vil vælge.
 
 Et hul tager også {{ui:editor.tool.chamfer}} og {{ui:editor.tool.fillet}}, og det samme gør {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} og {{ui:editor.tool.deleteFace}}: det forbliver et hul og skærer med sin nye form. Afrundes de fire lodrette kanter på et kassehul, får du en lomme med runde indvendige hjørner, og et hul gjort større med {{ui:editor.tool.offset}} skærer med så meget mere luft. Kanten, hvor et hul møder delen, bearbejder du i stedet på den færdige gruppe: den kant hører til den.

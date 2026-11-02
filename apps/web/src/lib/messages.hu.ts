@@ -895,6 +895,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Élművelet megszakítva, mert az objektum megváltozott",
   "status.edgeNeedsAdjustment": "Az élművelet beállításra szorul",
   "status.edgePreviewReady": "Az élművelet előnézete kész",
+  "status.edgeCornerEdgeAdded": "Egy rövid él egy saroknál bekerült: nélküle ez a sarok nem dolgozható meg.",
+  "status.edgeCornerEdgesAdded": "{count} rövid él a sarkoknál bekerült: nélkülük ezek a sarkok nem dolgozhatók meg.",
   "status.finishBeforeRedo": "Az ismétlés előtt fejezd be az aktuális húzást vagy átalakítást",
   "status.finishBeforeRotate": "A forgatás előtt fejezd be az aktuális húzást vagy átalakítást",
   "status.finishBeforeSave": "A tervfájl mentése előtt fejezd be az aktuális húzást vagy átalakítást",

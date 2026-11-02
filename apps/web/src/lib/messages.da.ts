@@ -1827,6 +1827,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Kantmodifikator annulleret fordi objektet ændrede sig",
   "status.edgeNeedsAdjustment": "Kantbehandling skal justeres",
   "status.edgePreviewReady": "Kantbehandlings-forhåndsvisning klar",
+  "status.edgeCornerEdgeAdded": "En kort kant ved et hjørne blev taget med: uden den kan hjørnet ikke bearbejdes.",
+  "status.edgeCornerEdgesAdded": "{count} korte kanter ved hjørner blev taget med: uden dem kan hjørnerne ikke bearbejdes.",
   "status.finishBeforeRedo": "Afslut det aktuelle træk eller transformér før du gendanner",
   "status.finishBeforeRotate": "Afslut det aktuelle træk eller transformér før du roterer",
   "status.finishBeforeSave": "Afslut det aktuelle træk eller transformér før du gemmer designfilen",

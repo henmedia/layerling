@@ -1322,6 +1322,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.edgeCancelledChanged": "Úprava hran byla zrušena, protože se objekt změnil",
   "status.edgeNeedsAdjustment": "Úprava hran potřebuje změnit nastavení",
   "status.edgePreviewReady": "Náhled úpravy hran je připraven",
+  "status.edgeCornerEdgeAdded": "Byla přibrána krátká hrana v rohu: bez ní nejde tento roh upravit.",
+  "status.edgeCornerEdgesAdded": "Byly přibrány krátké hrany v rozích ({count}): bez nich nejdou tyto rohy upravit.",
   "status.finishBeforeRedo": "Před opakováním akce dokončete aktuální tažení nebo transformaci",
   "status.finishBeforeRotate": "Před otáčením dokončete aktuální tažení nebo transformaci",
   "status.finishBeforeSave": "Před uložením projektu dokončete aktuální tažení nebo transformaci",

@@ -1198,6 +1198,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Обработка кромки отменена, так как объект изменился",
   "status.edgeNeedsAdjustment": "Обработку кромки нужно поправить",
   "status.edgePreviewReady": "Предпросмотр обработки кромки готов",
+  "status.edgeCornerEdgeAdded": "Добавлена короткая кромка в углу: без неё этот угол обработать нельзя.",
+  "status.edgeCornerEdgesAdded": "Добавлены короткие кромки в углах ({count}): без них эти углы обработать нельзя.",
   "status.finishBeforeRedo": "Завершите текущее перетаскивание или преобразование перед возвратом",
   "status.finishBeforeRotate": "Завершите текущее перетаскивание или преобразование перед поворотом",
   "status.finishBeforeSave": "Завершите текущее перетаскивание или преобразование перед сохранением файла проекта",

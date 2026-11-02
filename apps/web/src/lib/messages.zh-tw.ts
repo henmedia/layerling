@@ -1157,6 +1157,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "物件已變更，邊修改器已取消",
   "status.edgeNeedsAdjustment": "邊處理需要調整",
   "status.edgePreviewReady": "邊處理預覽已就緒",
+  "status.edgeCornerEdgeAdded": "已一併選上角落的一條短邊：沒有它，這個角無法處理。",
+  "status.edgeCornerEdgesAdded": "已一併選上角落的 {count} 條短邊：沒有它們，這些角無法處理。",
   "status.finishBeforeRedo": "先完成目前的拖曳或變換，再重做",
   "status.finishBeforeRotate": "先完成目前的拖曳或變換，再旋轉",
   "status.finishBeforeSave": "先完成目前的拖曳或變換，再儲存設計檔案",

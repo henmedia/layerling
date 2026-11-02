@@ -18,5 +18,15 @@
       "de": "Ein Drehprofil lässt sich jetzt über den Rand der Fläche hinausschieben, für einen größeren Radius, ohne die Arbeitsebene in den Einstellungen zu vergrößern. Das Raster wächst mit, Punkte dort draußen lassen sich wieder auswählen, und die Minus-Taste zoomt heraus, bis alles zu sehen ist.",
       "en": "A revolve profile can now go past the edge of the plate, for a bigger radius, without making the workplane bigger in the settings. The grid grows with it, points out there can be picked again, and the minus button zooms out until all of it fits."
     }
+  },
+  {
+    "title": {
+      "de": "Fasen über eine halb gefaste Ecke",
+      "en": "Chamfers across a half-chamfered corner"
+    },
+    "body": {
+      "de": "Scheitert eine Fase oder Rundung, versucht layerling es noch einmal mit den kurzen Kanten an den Enden der gewählten. So geht eine Ecke, an der eine frühere Fase auf eine noch scharfe Wand trifft, in einem Schritt durch; die Meldung sagt, wie viele Kanten mitgenommen wurden.",
+      "en": "When a chamfer or fillet fails, layerling tries once more with the short edges at the ends of the picked ones. A corner where an earlier chamfer meets a wall that is still sharp now goes through in one step; a message says how many edges were taken along."
+    }
   }
 ]

@@ -989,6 +989,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Spreminjanje robov preklicano, ker se je objekt spremenil",
   "status.edgeNeedsAdjustment": "Obdelavo robov je treba prilagoditi",
   "status.edgePreviewReady": "Predogled obdelave robov je pripravljen",
+  "status.edgeCornerEdgeAdded": "Dodan je kratek rob na vogalu: brez njega tega vogala ni mogoče obdelati.",
+  "status.edgeCornerEdgesAdded": "Dodani so kratki robovi na vogalih ({count}): brez njih teh vogalov ni mogoče obdelati.",
   "status.finishBeforeRedo": "Pred uveljavitvijo dokončaj trenutno vleko ali preoblikovanje",
   "status.finishBeforeRotate": "Pred vrtenjem dokončaj trenutno vleko ali preoblikovanje",
   "status.finishBeforeSave": "Pred shranjevanjem projekta dokončaj trenutno vleko ali preoblikovanje",

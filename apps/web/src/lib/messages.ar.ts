@@ -1206,6 +1206,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "تم إلغاء معالجة الحواف لأن الجسم تغيّر",
   "status.edgeNeedsAdjustment": "معالجة الحافة تحتاج إلى ضبط",
   "status.edgePreviewReady": "معاينة معالجة الحافة جاهزة",
+  "status.edgeCornerEdgeAdded": "أُضيفت حافة قصيرة عند زاوية: بدونها لا يمكن معالجة هذه الزاوية.",
+  "status.edgeCornerEdgesAdded": "أُضيفت حواف قصيرة عند الزوايا ({count}): بدونها لا يمكن معالجة هذه الزوايا.",
   "status.finishBeforeRedo": "أنهِ السحب أو التحويل الحالي قبل الإعادة",
   "status.finishBeforeRotate": "أنهِ السحب أو التحويل الحالي قبل التدوير",
   "status.finishBeforeSave": "أنهِ السحب أو التحويل الحالي قبل حفظ ملف التصميم",

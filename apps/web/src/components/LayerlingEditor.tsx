@@ -3430,19 +3430,27 @@ export function LayerlingEditor({
           cadDisplayEdgesVersion: 2 as const,
         } : null;
         const componentPreviews = cadModifierComponentPreviews(sourceParts, message.components, message.deflection, base ? { source: base, shape: preview } : undefined);
-        setEdgeModifier((current) => current ? {
-          ...current,
-          preview,
-          componentPreviews,
-          busy: false,
-          error: preview ? null : t("edge.emptyResult"),
+        // The short corner edges the worker took along join the picked ones, drawn and kept with them (#1178).
+        const cornerEdgeIds = preview ? message.cornerEdgeIds ?? [] : [];
+        setEdgeModifier((current) => {
+          if (!current) return current;
           // Edges cannot be toggled while a preview runs, so this is the selection it was made with.
-          workingEdgeIds: preview ? current.selectedEdgeIds : current.workingEdgeIds,
-          failedEdgeIds: [],
-        } : current);
+          const selectedEdgeIds = cornerEdgeIds.length ? [...current.selectedEdgeIds, ...cornerEdgeIds.filter((edgeId) => !current.selectedEdgeIds.includes(edgeId))] : current.selectedEdgeIds;
+          return {
+            ...current,
+            selectedEdgeIds,
+            preview,
+            componentPreviews,
+            busy: false,
+            error: preview ? null : t("edge.emptyResult"),
+            workingEdgeIds: preview ? selectedEdgeIds : current.workingEdgeIds,
+            failedEdgeIds: [],
+          };
+        });
         // Ein neuerer Wert kann waehrend der Rechnung eingetroffen sein - der geht jetzt raus.
         const nachgeschoben = cadPreviewQueueRef.current.settle(message.requestId);
-        if (preview && nachgeschoben.status !== "sent") setNotice(t("status.edgePreviewReady"));
+        if (preview && cornerEdgeIds.length) setNotice(cornerEdgeIds.length === 1 ? t("status.edgeCornerEdgeAdded") : t("status.edgeCornerEdgesAdded", { count: cornerEdgeIds.length }), true);
+        else if (preview && nachgeschoben.status !== "sent") setNotice(t("status.edgePreviewReady"));
         return;
       }
       if (message.type === "error") {
@@ -7373,7 +7381,8 @@ export function LayerlingEditor({
     const selectableIds = response.edges.filter((edge) => selectableCadModifierEdge(edge, sharpAngle)).map((edge) => edge.id);
     const requestedIds = mcpNumberArray(params.edgeIds);
     const selectedEdgeIds = params.edgeIds === "all" || params.allEdges === true
-      ? selectableIds
+      // A copy: corner edges taken along by the worker are added to it below.
+      ? [...selectableIds]
       : params.edgeIds === "top"
         // The rim along the very top, as the panel's "Top edges" picks it (#154).
         ? topCadModifierEdgeIds(response.edges, selectableIds)
@@ -7408,6 +7417,9 @@ export function LayerlingEditor({
     if (previewResponse.type !== "preview") {
       throw new Error("The CAD worker did not return an edge preview");
     }
+    // Short corner edges the worker took along so the treatment went through are kept with the picked ones (#1178).
+    const cornerEdgeIds = (previewResponse.cornerEdgeIds ?? []).filter((edgeId) => !selectedEdgeIds.includes(edgeId));
+    selectedEdgeIds.push(...cornerEdgeIds);
     const rawPreview = shapeFromCadMesh(shape, previewResponse.positions, previewResponse.normals, previewResponse.indices, previewResponse.brep, previewResponse.deflection);
     if (!rawPreview) {
       throw new Error("The CAD kernel returned an empty edge treatment");
@@ -7475,6 +7487,7 @@ export function LayerlingEditor({
     return {
       object: mcpShapeSummary(modifiedShape),
       selectedEdgeIds,
+      ...(cornerEdgeIds.length ? { cornerEdgeIds } : {}),
       selectableEdgeIds: selectableIds,
     };
   }, [commitShapes, invalidateCadModifierSession, prepareCadModifierForMcp, postCadModifierRequestAsync]);

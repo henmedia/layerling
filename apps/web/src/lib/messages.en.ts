@@ -1202,6 +1202,8 @@ export const MESSAGES_EN = {
   "status.edgeCancelledChanged": "Edge modifier cancelled because the object changed",
   "status.edgeNeedsAdjustment": "Edge treatment needs adjustment",
   "status.edgePreviewReady": "Edge treatment preview ready",
+  "status.edgeCornerEdgeAdded": "One short edge at a corner was taken along: without it the kernel cannot treat that corner.",
+  "status.edgeCornerEdgesAdded": "{count} short edges at corners were taken along: without them the kernel cannot treat those corners.",
   "status.finishBeforeRedo": "Finish the current drag or transform before redoing",
   "status.finishBeforeRotate": "Finish the current drag or transform before rotating",
   "status.finishBeforeSave": "Finish the current drag or transform before saving the design file",

@@ -1193,6 +1193,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Modifica degli spigoli annullata perché l'oggetto è cambiato",
   "status.edgeNeedsAdjustment": "La lavorazione degli spigoli richiede una regolazione",
   "status.edgePreviewReady": "Anteprima della lavorazione degli spigoli pronta",
+  "status.edgeCornerEdgeAdded": "È stato aggiunto uno spigolo corto in un angolo: senza di esso quell'angolo non si può lavorare.",
+  "status.edgeCornerEdgesAdded": "Sono stati aggiunti {count} spigoli corti negli angoli: senza di essi quegli angoli non si possono lavorare.",
   "status.finishBeforeRedo": "Termina il trascinamento o la trasformazione corrente prima di ripetere",
   "status.finishBeforeRotate": "Termina il trascinamento o la trasformazione corrente prima di ruotare",
   "status.finishBeforeSave": "Termina il trascinamento o la trasformazione corrente prima di salvare il file del progetto",

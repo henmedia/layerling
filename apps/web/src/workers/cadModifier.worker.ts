@@ -2,6 +2,7 @@
 
 import { cadHasSolidBody } from "@/lib/cadSolidBody";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
+import { cornerEdgeCandidates } from "@/lib/cadCornerEdges";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
@@ -34,6 +35,8 @@ let baseShape: ShapeHandle | null = null;
 let baseSolids: ShapeHandle[] = [];
 let edgeHandles: ShapeHandle[] = [];
 let edgeOwners: number[] = [];
+// The prepared edges with their points, for the short corner edges of a second try (#1178).
+let edgeInfos: CadModifierEdge[] = [];
 let faceHandles: ShapeHandle[] = [];
 let faceOwners: number[] = [];
 
@@ -79,6 +82,7 @@ function releaseSession(cad: OcctKernel) {
   baseSolids = [];
   edgeHandles = [];
   edgeOwners = [];
+  edgeInfos = [];
   faceHandles = [];
   faceOwners = [];
 }
@@ -869,6 +873,7 @@ function verwirfKernel(cad: OcctKernel | null) {
   baseSolids = [];
   edgeHandles = [];
   edgeOwners = [];
+  edgeInfos = [];
   faceHandles = [];
   faceOwners = [];
 }
@@ -933,6 +938,29 @@ function culpritEdgeIds(cad: OcctKernel, solid: ShapeHandle, entries: { id: numb
   return failing.length ? failing : all;
 }
 
+const CORNER_EDGE_BUDGET_MS = 3000;
+
+// A refused chamfer or fillet tried once more with the short edges at the ends of the picked ones
+// (#1178): the bridges between two picked edges together, then each short edge on its own. The first
+// that gives a body wins; none, and the refusal stands as it was.
+function treatWithCornerEdges(cad: OcctKernel, solid: ShapeHandle, entries: { id: number; edge: ShapeHandle }[], request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
+  if (request.kind !== "chamfer" && (request.kind !== "fillet" || request.endAmount !== undefined || request.concave)) return null;
+  const { bridges, others } = cornerEdgeCandidates(edgeInfos, entries.map((entry) => entry.id), request.amount);
+  const attempts = [...(bridges.length > 1 ? [bridges] : []), ...[...bridges, ...others].map((id) => [id])];
+  const deadline = performance.now() + CORNER_EDGE_BUDGET_MS;
+  for (const edgeIds of attempts) {
+    if (performance.now() > deadline) return null;
+    try {
+      const component = treatEdges(cad, solid, [...entries.map((entry) => entry.edge), ...edgeIds.map((id) => edgeHandles[id])], request);
+      if (cadHasSolidBody(cad, component)) return { component, edgeIds };
+      releaseHandles(cad, [component]);
+    } catch (error) {
+      if (isFatalKernelFault(error)) throw error;
+    }
+  }
+  return null;
+}
+
 // Which solid of the body each edge or face belongs to, found by hash and isSame.
 function componentOwners(cad: OcctKernel, handles: ShapeHandle[], type: "edge" | "face", unmappedMessage: string) {
   // One solid owns everything there is.
@@ -977,6 +1005,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     baseSolids = activeCad.isSolid(baseShape) ? [baseShape] : activeCad.getSubShapes(baseShape, "solid");
     if (baseSolids.length === 0) throw new Error("The selected group contains no closed solid components");
     edgeOwners = componentOwners(activeCad, edgeHandles, "edge", "A CAD edge could not be mapped to its solid component; restart the edge tool");
+    edgeInfos = collected.edges.map((edge) => ({ ...edge, owner: edgeOwners[edge.id] ?? 0 }));
     let faces: CadModifierFaces | undefined;
     if (request.faces) {
       faceHandles = activeCad.getSubShapes(baseShape, "face");
@@ -989,7 +1018,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     post({
       type: "ready",
       requestId: request.requestId,
-      edges: collected.edges.map((edge) => ({ ...edge, owner: edgeOwners[edge.id] ?? 0 })),
+      edges: edgeInfos,
       selectableEdgeIds: collected.selectableEdgeIds,
       sourceType: activeCad.getShapeType(baseShape),
       ...(faces ? { faces } : {}),
@@ -1005,6 +1034,8 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
   if (selected.length === 0 && request.kind !== "shell" && request.kind !== "deleteFace" && request.kind !== "offset" && request.kind !== "lid") throw new Error("Select at least one highlighted edge");
   if (request.kind === "fillet" && request.endAmount !== undefined && selected.length !== 1) throw new Error(VARIABLE_FILLET_ONE_EDGE_MESSAGE);
   const componentResults: ShapeHandle[] = [];
+  // Short corner edges a second try took along so the chamfer or fillet went through (#1178).
+  const cornerEdgeIds: number[] = [];
   let result: ShapeHandle | null = null;
   try {
     // The lid (#1154) is a new body made from the whole one, not a change to each of its solids.
@@ -1032,8 +1063,13 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           component = treatEdges(activeCad, solid, componentEdges, request);
         } catch (error) {
           if (isFatalKernelFault(error)) throw error;
-          const rawMessage = error instanceof Error ? error.message : String(error ?? "");
-          throw new EdgeTreatmentError(rawMessage, culpritEdgeIds(activeCad, solid, componentEntries, request, error));
+          const retried = treatWithCornerEdges(activeCad, solid, componentEntries, request);
+          if (!retried) {
+            const rawMessage = error instanceof Error ? error.message : String(error ?? "");
+            throw new EdgeTreatmentError(rawMessage, culpritEdgeIds(activeCad, solid, componentEntries, request, error));
+          }
+          component = retried.component;
+          cornerEdgeIds.push(...retried.edgeIds);
         }
       }
       if (request.kind !== "shell" && componentEdges.length > 0 && !cadHasSolidBody(activeCad, component)) {
@@ -1090,7 +1126,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       };
     });
     post(
-      { type: "preview", requestId: request.requestId, positions: mesh.positions, normals: mesh.normals, indices: mesh.indices, triangleCount: mesh.triangleCount, brep, displayEdges, components, deflection },
+      { type: "preview", requestId: request.requestId, positions: mesh.positions, normals: mesh.normals, indices: mesh.indices, triangleCount: mesh.triangleCount, brep, displayEdges, components, deflection, ...(cornerEdgeIds.length ? { cornerEdgeIds } : {}) },
       [
         mesh.positions.buffer,
         mesh.normals.buffer,

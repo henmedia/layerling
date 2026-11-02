@@ -40,6 +40,8 @@ If the size is too large for the edge, layerling says so and suggests a smaller 
 
 When a selection that worked fails after you click one more edge, that edge turns red and is drawn wider: it is the one that cannot be treated together with the others at this size. Click it again to take it out, or make the size smaller. If you click more edges while the message stands, the first one stays red. When there is no earlier selection that worked - the very first click, or a size you just raised - the edges that fail even on their own turn red, or all of them if it is only their combination.
 
+Before it gives up, layerling tries once more with the short edges at the ends of the picked ones, up to twice the size long. One sits where an earlier chamfer ends on a wall that is still sharp: a short slanted edge in the corner, and the corner cannot be treated while it stays sharp. If that helps, those edges are picked as well, and a message says how many were taken along.
+
 The edge under the pointer is drawn wider too, so you can see which one a click will pick.
 
 A hole takes {{ui:editor.tool.chamfer}} and {{ui:editor.tool.fillet}} as well, and so do {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} and {{ui:editor.tool.deleteFace}}: it stays a hole and cuts with its new shape. Rounding the four upright edges of a box hole cuts a pocket with round inside corners, and a hole grown with {{ui:editor.tool.offset}} cuts with that much more room. To break the edge where a hole meets the part, treat the finished group instead: that edge belongs to it.
