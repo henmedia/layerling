@@ -35,6 +35,14 @@ Instaluje to, czego potrzebuje layerling, pobiera layerling do folderu `layerlin
 
 **5. Powiedz Claude, co ma zbudować.** Na przykład: „Użyj narzędzi layerlinga i zbuduj mi okrągłe pudełko o średnicy 60 mm i wysokości 40 mm, ze ścianką 2,5 mm”. Jeśli żaden edytor nie jest otwarty, Claude otworzy go w przeglądarce, zbuduje tam pudełko krok po kroku i zrobi zdjęcia, żeby sprawdzić swoją pracę. Ty patrzysz i w każdej chwili możesz sam coś zmienić.
 
+**Na Macu** wygląda to tak samo, z tymi zmianami. W kroku 1 otwórz aplikację Terminal (naciśnij Cmd+spację, wpisz `Terminal` i naciśnij Enter), wklej ten wiersz i naciśnij Enter:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Jeśli brakuje Gita lub Node.js, skrypt powie ci, co zainstalować (Gita oferuje macOS w oknie, Node.js jest instalatorem na nodejs.org); potem uruchom ten sam wiersz jeszcze raz. W kroku 2 skrót na pulpicie też nazywa się „Start layerling”. W kroku 3 zainstaluj aplikację Claude na Maca.
+
 > **Wskazówka:** Jeśli coś nie działa, powiedz Claude, co widzisz. Potrafi odczytać błąd i zwykle sam go naprawia. Jeśli w edytorze nic się nie dzieje, najpierw sprawdź, czy layerling nadal działa (krok 2).
 
 ## Konfiguracja

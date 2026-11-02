@@ -35,6 +35,14 @@ Namesti, kar layerling potrebuje, prenese layerling v mapo `layerling` v tvoji u
 
 **5. Povej Claudu, kaj naj zgradi.** Na primer: »Uporabi orodja layerling in mi zgradi okroglo škatlo s premerom 60 mm in višino 40 mm, s steno 2,5 mm.« Če noben urejevalnik ni odprt, ga Claude odpre v tvojem brskalniku, tam korak za korakom zgradi škatlo in dela slike, da preveri svoje delo. Ti gledaš in lahko kadar koli sam kaj spremeniš.
 
+**Na Macu** gre enako, s temi spremembami. V 1. koraku odpri aplikacijo Terminal (pritisni Cmd+preslednica, vpiši `Terminal` in pritisni Enter), prilepi to vrstico in pritisni Enter:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Če manjka Git ali Node.js, ti skript pove, kaj naj namestiš (Git ponudi macOS v oknu, Node.js je namestitveni program na nodejs.org); nato isto vrstico zaženi še enkrat. V 2. koraku se bližnjica na namizju prav tako imenuje »Start layerling«. V 3. koraku namesti aplikacijo Claude za Mac.
+
 > **Namig:** Če kaj ne deluje, povej Claudu, kaj vidiš. Napako zna prebrati in jo večinoma odpravi sam. Če se v urejevalniku nič ne zgodi, najprej preveri, ali layerling še teče (korak 2).
 
 ## Nastavitev

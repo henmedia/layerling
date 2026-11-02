@@ -212,6 +212,18 @@ npm run dev
 
 Dann selbst `http://127.0.0.1:3000/` öffnen. `Strg+C` in diesem Fenster beendet layerling so oder so wieder.
 
+### Schnellstart auf dem Mac
+
+Öffne auf dem Mac die App **Terminal** (Cmd+Leertaste drücken, `Terminal` tippen, Enter drücken) und füge diese eine Zeile ein:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Dafür brauchst du Git und Node.js 22.18 oder neuer. Fehlt eines, sagt das Skript, was du installieren sollst (macOS bietet die Entwicklerwerkzeuge mit Git in einem Fenster an, Node.js gibt es als Installer auf [nodejs.org](https://nodejs.org); mit Homebrew installiert es beides selbst), und hält an, damit du dieselbe Zeile noch einmal ausführen kannst. Danach lädt es layerling nach `~/layerling` herunter, legt **„Start layerling“** auf den Schreibtisch und öffnet layerling im Browser unter `http://127.0.0.1:3000/`. Lass das Terminal-Fenster offen, solange du layerling benutzt; `Ctrl+C` in diesem Fenster beendet es wieder.
+
+Dieselbe Zeile später noch einmal ausführen **aktualisiert**: Der vorhandene Ordner bleibt, und beim Start holt layerling zuerst die neueste Fassung. Das Skript liegt unter [`scripts/mac-quickstart.sh`](scripts/mac-quickstart.sh); du kannst also nachlesen, was es tut, bevor du es ausführst. Für einen anderen Ordner: `LAYERLING_DIR=~/3D/layerling sh mac-quickstart.sh` (nach dem Herunterladen des Skripts). Auf einem echten Mac ist es noch nicht ausprobiert; wenn etwas schiefgeht, sag es bitte in den Diskussionen.
+
 ### Docker
 
 Um layerling auf einem Rechner, NAS (Synology, Unraid usw.) oder Heimserver ohne Node.js zu betreiben, nimmst du das fertige Image **`henmedia/layerling`** auf Docker Hub (auch unter **`ghcr.io/henmedia/layerling`**, dasselbe Image). Jedes Release veröffentlicht es für amd64 und arm64 (Raspberry Pi, ARM-NAS), unter seiner Versionsnummer und als `latest`. Die App lauscht auf Port **3000**.

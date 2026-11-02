@@ -35,6 +35,14 @@ Den installerer det, layerling har brug for, henter layerling ned i mappen `laye
 
 **5. Fortæl Claude, hvad den skal bygge.** For eksempel: "Brug layerling-værktøjerne og byg en rund dåse til mig, 60 mm i diameter og 40 mm høj, med en væg på 2,5 mm." Er der ingen editor åben, åbner Claude en i din browser, bygger dåsen der trin for trin og tager billeder for at tjekke sit arbejde. Du kigger med og kan selv ændre hvad som helst når som helst.
 
+**På en Mac** går det på samme måde med disse ændringer. Åbn i trin 1 appen Terminal (tryk på Cmd+mellemrum, skriv `Terminal` og tryk på Enter), indsæt denne linje og tryk på Enter:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Mangler Git eller Node.js, fortæller den dig, hvad du skal installere (macOS tilbyder Git i et vindue, Node.js findes som installationsprogram på nodejs.org); kør derefter den samme linje igen. I trin 2 hedder genvejen på skrivebordet også „Start layerling“. I trin 3 installerer du Claude-appen til Mac.
+
 > **Tip:** Hvis noget ikke virker, så fortæl Claude, hvad du ser. Den kan læse fejlen og retter den som regel selv. Sker der ikke noget i editoren, så tjek først, at layerling stadig kører (trin 2).
 
 ## Opsætning

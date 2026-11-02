@@ -35,6 +35,14 @@ irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-qu
 
 **5. 告訴 Claude 要建立什麼。**例如：「使用 layerling 工具，幫我建立一個直徑 60 mm、高 40 mm、壁厚 2.5 mm 的圓盒。」如果沒有開啟編輯器，Claude 會在你的瀏覽器中開啟一個，在其中一步步建立盒子，並拍圖檢查自己的工作。你在一旁觀看，隨時可以自己修改任何內容。
 
+**在 Mac 上**步驟相同，只有以下不同。第 1 步：開啟「終端機」App（按 Cmd+空白鍵，輸入 `Terminal`，按 Enter），貼上下面這一行並按 Enter：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+如果缺少 Git 或 Node.js，它會告訴你需要安裝什麼（macOS 會在視窗中提供 Git，Node.js 可從 nodejs.org 下載安裝程式）；裝好後再執行同一行。第 2 步：桌面上的捷徑同樣叫「Start layerling」。第 3 步：安裝適用於 Mac 的 Claude App。
+
 > **提示：**如果有什麼不正常，把你看到的情況告訴 Claude。它能讀取錯誤，通常會自己修復。如果編輯器裡沒有任何動靜，先檢查 layerling 是否仍在執行（第 2 步）。
 
 ## 設定

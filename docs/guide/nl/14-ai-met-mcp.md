@@ -35,6 +35,14 @@ De regel installeert wat layerling nodig heeft, downloadt layerling naar de map 
 
 **5. Claude zeggen wat hij moet bouwen.** Bijvoorbeeld: "Gebruik de layerling-gereedschappen en bouw een ronde doos, 60 mm doorsnede en 40 mm hoog, met een wand van 2,5 mm." Is er geen editor open, dan opent Claude er een in je browser, bouwt de doos daar stap voor stap en maakt afbeeldingen om zijn werk te controleren. Jij kijkt mee en kunt op elk moment zelf iets veranderen.
 
+**Op een Mac** gaat het net zo, met deze wijzigingen. Open in stap 1 de app Terminal (druk op Cmd+spatie, typ `Terminal` en druk op Enter), plak deze regel en druk op Enter:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Ontbreekt Git of Node.js, dan zegt het script wat je moet installeren (macOS biedt Git aan in een venster, Node.js is een installatieprogramma op nodejs.org); voer daarna dezelfde regel nog een keer uit. In stap 2 heet de snelkoppeling op je bureaublad ook "Start layerling". Installeer in stap 3 de Claude-app voor Mac.
+
 > **Tip:** Werkt iets niet, vertel Claude dan wat je ziet. Hij kan de fout lezen en lost hem meestal zelf op. Gebeurt er niets in de editor, controleer dan eerst of layerling nog draait (stap 2).
 
 ## Instellen

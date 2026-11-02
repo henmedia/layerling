@@ -35,6 +35,14 @@ Telepíti, amire a layerlingnek szüksége van, letölti a layerlinget a felhasz
 
 **5. Mondd meg a Claude-nak, mit építsen.** Például: „Használd a layerling eszközeit, és építs nekem egy kerek dobozt, 60 mm átmérővel és 40 mm magasan, 2,5 mm-es fallal.” Ha nincs nyitva szerkesztő, a Claude megnyit egyet a böngésződben, ott lépésről lépésre megépíti a dobozt, és képeket készít, hogy ellenőrizze a munkáját. Te nézed, és bármikor magad is módosíthatsz bármit.
 
+**Macen** ugyanígy megy, ezekkel a változtatásokkal. Az 1. lépésben nyisd meg a Terminal alkalmazást (nyomd meg a Cmd+szóköz billentyűt, írd be: `Terminal`, majd nyomj Entert), illeszd be ezt a sort, és nyomj Entert:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Ha a Git vagy a Node.js hiányzik, megmondja, mit telepíts (a Gitet a macOS egy ablakban kínálja fel, a Node.js telepítőként érhető el a nodejs.org oldalon); utána futtasd le ugyanazt a sort még egyszer. A 2. lépésben az asztali parancsikon neve itt is „Start layerling“. A 3. lépésben telepítsd a Claude alkalmazást Machez.
+
 > **Tipp:** Ha valami nem működik, mondd el a Claude-nak, mit látsz. El tudja olvasni a hibát, és többnyire maga kijavítja. Ha a szerkesztőben semmi sem történik, először nézd meg, fut-e még a layerling (2. lépés).
 
 ## Beállítás

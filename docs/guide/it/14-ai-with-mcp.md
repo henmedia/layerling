@@ -35,6 +35,14 @@ Installa ciò che serve a layerling, scarica layerling nella cartella `layerling
 
 **5. Di' a Claude cosa costruire.** Per esempio: «Usa gli strumenti di layerling e costruiscimi una scatola rotonda di 60 mm di diametro e 40 mm di altezza, con una parete di 2,5 mm». Se non c'è nessun editor aperto, Claude ne apre uno nel browser, ci costruisce la scatola passo dopo passo e scatta immagini per controllare il proprio lavoro. Tu guardi e puoi modificare qualsiasi cosa in qualsiasi momento.
 
+**Su un Mac** funziona allo stesso modo, con queste modifiche. Al passaggio 1 apri l'app Terminale (premi Cmd+Spazio, scrivi `Terminale` e premi Invio), incolla questa riga e premi Invio:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Se mancano Git o Node.js, ti dice cosa installare (macOS offre Git in una finestra, Node.js è un programma di installazione su nodejs.org); poi esegui di nuovo la stessa riga. Al passaggio 2 anche il collegamento sulla scrivania si chiama «Start layerling». Al passaggio 3 installa l'app Claude per Mac.
+
 > **Suggerimento:** Se qualcosa non funziona, di' a Claude cosa vedi. Può leggere l'errore e di solito lo corregge da solo. Se nell'editor non succede nulla, controlla prima che layerling sia ancora in esecuzione (passo 2).
 
 ## Configurazione

@@ -209,6 +209,18 @@ npm run dev
 
 then open `http://127.0.0.1:3000/` yourself. `Ctrl+C` in that window stops it either way.
 
+### macOS Quickstart
+
+On a Mac, open the **Terminal** app (press Cmd+Space, type `Terminal`, press Enter) and paste this one line:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+It needs Git and Node.js 22.18 or newer. If one is missing, the script says what to install (macOS offers the developer tools with Git in a window, Node.js comes as an installer from [nodejs.org](https://nodejs.org); with Homebrew it installs them itself) and stops, so you can run the same line again. Then it downloads layerling into `~/layerling`, puts **"Start layerling"** on your desktop and opens layerling in your browser at `http://127.0.0.1:3000/`. Leave the Terminal window open while you use layerling; `Ctrl+C` in that window stops it.
+
+Run the same line again whenever you want to **update**: the existing folder is kept, and starting layerling pulls the latest version first. The script lives at [`scripts/mac-quickstart.sh`](scripts/mac-quickstart.sh), so you can read what it does before you run it. For another folder: `LAYERLING_DIR=~/3D/layerling sh mac-quickstart.sh` (after downloading the script). It has not been tried on a real Mac yet; if something goes wrong, please tell us in the discussions.
+
 ### Docker
 
 To run layerling on a computer, NAS (Synology, Unraid, etc.) or home server without installing Node.js, use the ready-made image **`henmedia/layerling`** on Docker Hub (also at **`ghcr.io/henmedia/layerling`**, the same image). Every release publishes it for amd64 and arm64 (Raspberry Pi, ARM NAS) under its version number and as `latest`. The app listens on port **3000**.
