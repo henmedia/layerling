@@ -63,7 +63,7 @@ export type CableChannelPath = {
   minWall: number;
   /** Length of the centre line inside the body, in mm. */
   length: number;
-  /** A bend had to be tighter than asked, or the wall is thinner than asked somewhere. */
+  /** A bend had to be more than 5 % tighter than asked, or the wall is thinner than asked somewhere. */
   tight: boolean;
   thin: boolean;
   /** Where the tube starts (just outside the entry) and its own axes in the world: +X runs in, -Z is the first bend. */
@@ -515,7 +515,8 @@ function buildChain(grid: CableGrid, entry: CableEnd, exit: CableEnd, options: C
     minBend,
     minWall: Number.isFinite(minWall) ? minWall : 0,
     length: Math.max(0, length - 2 * outside),
-    tight: minBend < options.minBend - 0.5,
+    // The smallest bend is a rule of thumb (about five times the diameter): a bend a few per cent tighter still takes the cable.
+    tight: minBend < options.minBend * 0.95 - 1e-9,
     thin: minWall < options.minWall - Math.max(0.05, grid.step * 0.25),
     start,
     axes: { x: tangent0, y: yAxis, z: zAxis },
