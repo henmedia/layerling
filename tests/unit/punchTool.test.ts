@@ -1,7 +1,7 @@
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { MeshData, Vec3 } from "@/lib/editorMeshCore";
-import { meshSilhouette, punchAxisBetween, punchPlan } from "@/lib/punchTool";
+import { meshIsClosed, meshSilhouette, punchAxisBetween, punchPlan } from "@/lib/punchTool";
 import type { SketchProfile } from "@/types/layerling";
 
 /** A box from its two corners, as a loose mesh; several of them overlap without being joined, as a model with stray shells. */
@@ -79,6 +79,22 @@ describe("punch", () => {
     if (!plan.ok) throw new Error(plan.problem);
     const xs = plan.profile.points.map((point) => point.x);
     expect(Math.max(...xs) - Math.min(...xs)).toBeCloseTo(11, 2);
+  });
+
+  it("punches with an open surface, whichever way its triangles face", () => {
+    const closed = boxes([[-5, 10, -5], [5, 12, 5]]);
+    expect(meshIsClosed(closed)).toBe(true);
+    expect(meshIsClosed(ell)).toBe(true);
+    // Only the bottom of the box, facing down and away from above: a sheet with gaps all round.
+    const sheet: MeshData = { name: "sheet", vertices: closed.vertices, faces: closed.faces.slice(4, 6) };
+    expect(meshIsClosed(sheet)).toBe(false);
+    const outline = meshSilhouette(runtime, sheet, "y");
+    expect(outline.area()).toBeCloseTo(100, 3);
+    outline.delete();
+    const edgeOn = meshSilhouette(runtime, sheet, "x");
+    expect(edgeOn.isEmpty()).toBe(true);
+    edgeOn.delete();
+    expect(punchPlan(runtime, sheet, plate, "x", 0)).toEqual({ ok: false, problem: "empty" });
   });
 
   it("says when the outline misses the target", () => {

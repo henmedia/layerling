@@ -66,11 +66,52 @@ export function punchAxisBetween(punch: MeshData, target: MeshData): SectionPlan
 type CrossSection = InstanceType<ManifoldToplevel["CrossSection"]>;
 
 /**
- * The outline of a mesh seen along an axis, in the section view's u and v for that axis: every triangle laid flat
- * and all of them joined. That needs no closed surface, so an imported model with gaps punches as well.
+ * Whether a mesh is a closed surface: every edge, its corners found by where they are, is run once each way. Meshes
+ * of several parts (a group) count too, each part being closed.
+ */
+export function meshIsClosed(mesh: MeshData) {
+  const ids = new Map<string, number>();
+  const idOf = (index: number) => {
+    const [x, y, z] = mesh.vertices[index];
+    const key = `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(z * 1e4)}`;
+    let id = ids.get(key);
+    if (id === undefined) {
+      id = ids.size;
+      ids.set(key, id);
+    }
+    return id;
+  };
+  const corners = mesh.faces.map((face) => face.map(idOf));
+  const span = ids.size + 1;
+  const edges = new Map<number, number>();
+  for (const [a, b, c] of corners) {
+    for (const [from, to] of [[a, b], [b, c], [c, a]]) {
+      if (from === to) continue;
+      const reverse = to * span + from;
+      const open = edges.get(reverse);
+      if (open) {
+        if (open === 1) edges.delete(reverse);
+        else edges.set(reverse, open - 1);
+      } else {
+        const key = from * span + to;
+        edges.set(key, (edges.get(key) ?? 0) + 1);
+      }
+    }
+  }
+  return edges.size === 0;
+}
+
+/** How many triangles are joined in one go: one union over hundreds of thousands takes many times longer than unions of a few thousand joined afterwards. */
+const SILHOUETTE_BATCH = 2000;
+
+/**
+ * The outline of a mesh seen along an axis, in the section view's u and v for that axis: the triangles laid flat
+ * and joined, in batches. On a closed surface the triangles facing one way already cover the whole outline, so
+ * only those are joined (a crossed knurl of 337,000 triangles: about 1 s instead of 15 s for all at once); on an
+ * open one, an imported model with gaps, all of them are, so it punches as well.
  */
 export function meshSilhouette(runtime: ManifoldToplevel, mesh: MeshData, axis: SectionPlaneAxis): CrossSection {
-  const triangles: [number, number][][] = [];
+  const facing: [number, number][][][] = [[], []];
   for (const face of mesh.faces) {
     const flat = face.map((index) => {
       const point = projectSectionPoint(mesh.vertices[index], axis);
@@ -80,9 +121,22 @@ export function meshSilhouette(runtime: ManifoldToplevel, mesh: MeshData, axis: 
     const twice = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
     // Seen edge on, a triangle covers nothing; the others all run counter-clockwise, so Positive joins them.
     if (Math.abs(twice) < 1e-10) continue;
-    triangles.push(twice > 0 ? flat : [a, c, b]);
+    if (twice > 0) facing[0].push(flat);
+    else facing[1].push([a, c, b]);
   }
-  return new runtime.CrossSection(triangles, "Positive");
+  const used = meshIsClosed(mesh) && facing[0].length > 0 ? [facing[0]] : facing;
+  const parts: CrossSection[] = [];
+  try {
+    for (const triangles of used) {
+      for (let start = 0; start < triangles.length; start += SILHOUETTE_BATCH) {
+        parts.push(new runtime.CrossSection(triangles.slice(start, start + SILHOUETTE_BATCH), "Positive"));
+      }
+    }
+    // Seen only edge on, a mesh has no outline: a triangle of no size gives the empty one.
+    return parts.length ? runtime.CrossSection.union(parts) : new runtime.CrossSection([[[0, 0], [0, 0], [0, 0]]], "Positive");
+  } finally {
+    parts.forEach((part) => part.delete());
+  }
 }
 
 /** The outline's rings as the section view's loops. */
