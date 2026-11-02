@@ -18,5 +18,15 @@
       "de": "Ist das Fenster schmal, klappt der Verlauf zu einem Knopf mit dem Rückgängig-Symbol zusammen. Ein Klick darauf nimmt jetzt den letzten Schritt zurück; der kleine Pfeil darunter öffnet Wiederherstellen und den Verlauf.",
       "en": "In a narrow window, History folds into one button with the Undo icon. A click on it now takes back your last step; the small arrow under it opens Redo and the history."
     }
+  },
+  {
+    "title": {
+      "de": "Der Schnitt-Knopf schaltet den Schnitt aus",
+      "en": "The section button turns the cut off"
+    },
+    "body": {
+      "de": "Ein Klick auf den Knopf der Schnittansicht schließt bei offenem Fenster jetzt auch den Schnitt. Das X und Esc blenden nur das Fenster aus, der Schnitt bleibt dann an.",
+      "en": "With its window open, a click on the section view button now turns the cut off too. The X and Esc only hide the window and leave the cut on."
+    }
   }
 ]

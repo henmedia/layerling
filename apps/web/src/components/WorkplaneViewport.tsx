@@ -7169,6 +7169,10 @@ export function WorkplaneViewport({
             offset: bounds.center,
           }));
         }
+      } else {
+        // The button closes its open panel and turns the cut off with it, as an off switch would; the X and Esc only
+        // hide the panel and keep the cut (#1101).
+        setSectionSettings((prev) => (prev.enabled ? { ...prev, enabled: false } : prev));
       }
       return next;
     });

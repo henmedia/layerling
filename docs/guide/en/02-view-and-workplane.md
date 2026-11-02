@@ -74,7 +74,7 @@ You can also keep four views of your own in each design. [[Shift]]+[[7]], [[Shif
 
 The tool window hangs on its button. If it covers something, drag it by its title bar anywhere on the workplane; it opens there next time too. Double-click the title bar or drop it at the button to put it back.
 
-The X and [[Esc]] close the tool window; with a measuring running, [[Esc]] ends it first. The cut stays until you switch it off with {{ui:camera.sectionActive}} or go back to the design overview. While it is on, its button stays highlighted. Anything you place on the side that is cut away only shows once you switch the cut off. A tablet has no [[Esc]], so there the tool window has two more buttons: {{ui:camera.sectionBack}} ends the measuring if one is running and otherwise closes the tool window, and {{ui:camera.sectionConfirm}} closes the tool window in one step. A computer does not show them.
+The X and [[Esc]] close the tool window; with a measuring running, [[Esc]] ends it first. The cut stays until you switch it off with {{ui:camera.sectionActive}}, click its button in the bar while the window is open, or go back to the design overview. While it is on, its button stays highlighted. Anything you place on the side that is cut away only shows once you switch the cut off. A tablet has no [[Esc]], so there the tool window has two more buttons: {{ui:camera.sectionBack}} ends the measuring if one is running and otherwise closes the tool window, and {{ui:camera.sectionConfirm}} closes the tool window in one step. A computer does not show them.
 
 ## The workplane
 
