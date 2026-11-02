@@ -64,6 +64,13 @@ describe("the thread's exact body", () => {
     ["a screw with a wing head", { threadRole: "screw", threadHead: "wing" }],
     ["a screw with a star knob", { threadRole: "screw", threadHead: "knob" }],
     ["a star knob with a hex socket", { threadRole: "screw", threadHead: "knob", threadDrive: "hex" }],
+    // A collar between head and thread (#1152): a cylinder on the head, or a round tier on an outline head.
+    ["a star knob with a collar, height 30", { threadRole: "screw", threadHead: "knob", threadCollarHeight: 4, threadCollarDiameter: 14, height: 30 }],
+    ["a star knob with the widest collar and a hex socket", { threadRole: "screw", threadHead: "knob", threadDrive: "hex", threadCollarHeight: 3, threadCollarDiameter: 40, height: 30 }],
+    ["a cylinder head with a collar and a Torx drive", { threadRole: "screw", threadDrive: "torx", threadCollarHeight: 2, height: 26 }],
+    ["a hex head with both rims chamfered and a collar", { threadRole: "screw", threadHead: "hex", threadHeadChamfer: 0.4, threadCollarHeight: 1.5, threadCollarDiameter: 8, height: 26 }],
+    ["a wing head with a collar", { threadRole: "screw", threadHead: "wing", threadCollarHeight: 2.5, height: 28 }],
+    ["a flange head with a collar", { threadRole: "screw", threadHead: "flange", threadCollarHeight: 2, threadCollarDiameter: 11, height: 26 }],
   ];
 
   it.each(cases)("matches the drawn %s", (_name, extra) => {

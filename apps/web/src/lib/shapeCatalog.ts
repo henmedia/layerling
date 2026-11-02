@@ -54,6 +54,7 @@ import {
   threadNaturalFootprint,
   threadNaturalHeight,
   threadSettings,
+  threadCollarFields,
   threadDriveFields,
 } from "@/lib/threadGeometry";
 import {
@@ -720,6 +721,8 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     threadDrive: shape.threadDrive,
     threadDriveSize: shape.threadDriveSize,
     threadDriveDepth: shape.threadDriveDepth,
+    threadCollarHeight: shape.threadCollarHeight,
+    threadCollarDiameter: shape.threadCollarDiameter,
     springTurns: shape.springTurns,
     springWire: shape.springWire,
     springHand: shape.springHand,
@@ -927,6 +930,8 @@ export function makeShapeFromAsset(
     threadDrive: customization.threadDrive,
     threadDriveSize: customization.threadDriveSize,
     threadDriveDepth: customization.threadDriveDepth,
+    threadCollarHeight: customization.threadCollarHeight,
+    threadCollarDiameter: customization.threadCollarDiameter,
   }) : null;
   const threadFootprint = threadDefaults ? threadNaturalFootprint(threadDefaults) : null;
   // Ein gebogenes Rohr bekommt seinen Rahmen aus Profil und Segmenten. Ein
@@ -1080,6 +1085,7 @@ export function makeShapeFromAsset(
     threadChamferBottom: threadDefaults && customization.threadChamferBottom !== undefined ? threadDefaults.chamferLow : undefined,
     threadHeadChamfer: threadDefaults ? threadDefaults.headChamfer : undefined,
     ...(threadDefaults ? threadDriveFields(customization, threadDefaults) : {}),
+    ...(threadDefaults ? threadCollarFields(customization, threadDefaults) : {}),
     ...(asset.kind === "spring" ? springFields(customization, width, depth, height) : {}),
     starPoints: asset.kind === "star" ? normalizeStarPoints(customization.starPoints ?? DEFAULT_STAR_POINTS) : undefined,
     starInnerSize: asset.kind === "star" ? normalizeStarInnerSize(customization.starInnerSize ?? DEFAULT_STAR_INNER_SIZE, width) : undefined,

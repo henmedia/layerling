@@ -15,7 +15,7 @@ import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
 import { gridfinityListPatch } from "@/lib/gridfinityGeometry";
-import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
+import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_SPACING, MIN_TEXT_SPACING } from "@/lib/textGeometry";
 import { normalizeTextEdge } from "@/lib/textEdge";
@@ -2600,9 +2600,18 @@ function applyMcpThreadSettings(
     threadDriveSize: mcpOptionalNumber(params.threadDriveSize) ?? shape.threadDriveSize,
     threadDriveDepth: mcpOptionalNumber(params.threadDriveDepth) ?? shape.threadDriveDepth,
   }, sized);
-  const settings = { ...sized, ...threadDriveSettings(driveFields, sized) };
+  const withDrive = { ...sized, ...threadDriveSettings(driveFields, sized) };
+  // The collar (#1152) checked against the head as it now is; its diameter left unset follows the size.
+  const collarFields = threadCollarFields({
+    threadCollarHeight: mcpOptionalNumber(params.threadCollarHeight) ?? shape.threadCollarHeight,
+    threadCollarDiameter: mcpOptionalNumber(params.threadCollarDiameter) ?? shape.threadCollarDiameter,
+  }, withDrive);
+  const settings = { ...withDrive, ...threadCollarSettings(collarFields, withDrive) };
   const footprint = threadNaturalFootprint(settings);
   const keepFootprint = params.width !== undefined || params.depth !== undefined || params.size !== undefined;
+  // A collar set or changed without a height of its own keeps the thread as long as it was.
+  const collarGrowth = settings.collarHeight - threadSettings(shape).collarHeight;
+  const keepThreadLength = params.height === undefined && Math.abs(collarGrowth) > 1e-9;
   return {
     ...shape,
     threadRole: settings.role,
@@ -2622,6 +2631,8 @@ function applyMcpThreadSettings(
     threadChamferBottom: settings.chamferLow,
     threadHeadChamfer: settings.headChamfer,
     ...driveFields,
+    ...collarFields,
+    ...(keepThreadLength ? { height: Math.max(0.01, shape.height + collarGrowth) } : {}),
     ...(keepFootprint ? {} : {
       width: footprint.width,
       depth: footprint.depth,
@@ -11055,6 +11066,9 @@ export function LayerlingEditor({
             threadDrive: threaded.threadDrive,
             threadDriveSize: threaded.threadDriveSize,
             threadDriveDepth: threaded.threadDriveDepth,
+            threadCollarHeight: threaded.threadCollarHeight,
+            threadCollarDiameter: threaded.threadCollarDiameter,
+            height: threaded.height,
             width: threaded.width,
             depth: threaded.depth,
           });

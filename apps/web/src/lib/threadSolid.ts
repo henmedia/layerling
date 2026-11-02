@@ -332,6 +332,8 @@ function screwHead(cad: OcctKernel, head: NonNullable<CadModifierThreadPart["hea
   else body = cad.makeCylinder(head.radius, head.height);
   if (head.chamferFaceRadius > 0) body = oneSolid(cad, cad.common(body, rimChamferBound(cad, head.chamferFaceRadius, head.height)), "head");
   if (head.socketDepth > 0 && head.driveOutline) body = oneSolid(cad, cad.cut(body, drivePrism(cad, head.driveOutline, head.socketDepth)), "head");
+  // After the chamfer bound, which would clip it: the collar (#1152) stands on the head's shaft face.
+  if (head.collar) body = oneSolid(cad, cad.fuse(body, cad.translate(cad.makeCylinder(head.collar.radius, head.collar.height), 0, 0, head.height)), "head");
   return body;
 }
 

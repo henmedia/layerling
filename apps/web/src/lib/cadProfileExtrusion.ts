@@ -1608,6 +1608,8 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     threadDrive: shape.threadDrive,
     threadDriveSize: shape.threadDriveSize,
     threadDriveDepth: shape.threadDriveDepth,
+    threadCollarHeight: shape.threadCollarHeight,
+    threadCollarDiameter: shape.threadCollarDiameter,
   });
   const { settings, spec } = plan;
   const part: CadModifierThreadPart = {
@@ -1643,6 +1645,7 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
       chamferFaceRadius: plan.headBroken ? plan.headFaceRadius : 0,
       ...(plan.driveOutline ? { driveOutline: plan.driveOutline } : {}),
       socketDepth: plan.driveOutline ? plan.socketDepth : 0,
+      ...(plan.collarHeight > 0 && !plan.tiers ? { collar: { radius: plan.collarRadius, height: plan.collarHeight } } : {}),
     };
   }
   if (settings.role === "nut") part.nut = { acrossFlats: spec.acrossFlats, chamferFaceRadius: plan.rimBroken ? plan.rimFaceRadius : 0 };

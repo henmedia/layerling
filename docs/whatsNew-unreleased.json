@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Ein Bund unter dem Schraubenkopf",
+      "en": "A collar under the screw head"
+    },
+    "body": {
+      "de": "Eine Schraube hat jetzt Bundhöhe und Bunddurchmesser: ein runder Bund zwischen Kopf und Gewinde, etwa als Abstandhalter unter einem Sterngriff. Er bleibt innerhalb des Kopfes und druckt ohne Stützen.",
+      "en": "A screw now has Collar height and Collar diameter: a round collar between head and thread, for example a spacer under a star knob. It stays inside the head and prints without supports."
+    }
+  },
+  {
+    "title": {
       "de": "Deckel als exakter Körper: Kanten lassen sich verrunden",
       "en": "Lids are exact bodies: their edges can be rounded"
     },

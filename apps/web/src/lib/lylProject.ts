@@ -1524,7 +1524,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.threadDrive !== undefined && !["hex", "torx", "phillips", "slot", "robertson", "none"].includes(definition.threadDrive as string)) {
       throw new Error(`${label}.threadDrive is invalid`);
     }
-    for (const field of ["threadHeadDiameter", "threadDriveSize", "threadDriveDepth"] as const) {
+    for (const field of ["threadHeadDiameter", "threadDriveSize", "threadDriveDepth", "threadCollarHeight", "threadCollarDiameter"] as const) {
       if (definition[field] === undefined) continue;
       const value = finiteNumber(definition[field], `${label}.${field}`);
       if (value < 0 || value > 640) throw new Error(`${label}.${field} is outside the supported range`);

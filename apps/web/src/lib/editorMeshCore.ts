@@ -682,6 +682,8 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         threadDrive: shape.threadDrive,
         threadDriveSize: shape.threadDriveSize,
         threadDriveDepth: shape.threadDriveDepth,
+        threadCollarHeight: shape.threadCollarHeight,
+        threadCollarDiameter: shape.threadCollarDiameter,
       });
       break;
     case "spring":

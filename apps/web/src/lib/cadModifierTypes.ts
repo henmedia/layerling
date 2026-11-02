@@ -253,6 +253,8 @@ export type CadModifierThreadPart = {
     /** The drive in the free head face (#1052) as its outline in the x/z plane of the shape, and its depth; 0 depth for none. */
     driveOutline?: ThreadDriveOutline;
     socketDepth: number;
+    /** The round collar (#1152) on the head's shaft face, up from `height`; on an outline head it is a tier instead. */
+    collar?: { radius: number; height: number };
   };
   /** Nut only: its hex across flats, and the face radius of its chamfered rims (0 for sharp). */
   nut?: { acrossFlats: number; chamferFaceRadius: number };
