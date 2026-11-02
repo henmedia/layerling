@@ -128,6 +128,10 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_add_reference_points` | setzt Bezugspunkte - auf Mitte, Ecken oder Kantenmitten von Objekten oder an genauen Stellen -, an denen Formen einrasten |
 | `layerling_list_reference_points` | listet die Bezugspunkte mit Kennung und Lage auf |
 | `layerling_remove_reference_points` | löscht Bezugspunkte nach Kennung oder alle |
+| `layerling_list_notes` | liest die Notizen des Nutzers mit Text, dem Körper, an dem jede hängt, und ob sie ein Auftrag für die KI ist |
+| `layerling_add_note` | setzt eine Notiz ans Modell, an einen Körper geheftet oder frei auf der Arbeitsebene |
+| `layerling_update_note` | ändert eine Notiz oder beantwortet sie; eine Antwort schließt den Auftrag |
+| `layerling_remove_notes` | löscht Notizen nach Kennung |
 | `layerling_inspect_errors` | zeigt die letzte Meldung und den letzten Fehler, dazu die Meldungen und Fehler der Sitzung |
 | `layerling_wrap_around_cylinder` | wickelt einen flach liegenden Körper, etwa ein SVG oder Text, um einen Zylinder, nach außen oder als Gravur nach innen |
 | `layerling_texture_surface` | bringt eine Oberfläche auf einen Körper: Rillen, Rändel, Waben oder Noppen, für besseren Halt oder fürs Auge, und ändert oder entfernt sie später |

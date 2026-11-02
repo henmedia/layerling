@@ -81,6 +81,7 @@ Una nota registra informazioni che la geometria non può esprimere: “Questa vi
 - Se posizioni la nota **su un corpo**, si sposta insieme a esso.
 - Se la posizioni **accanto a un corpo**, resta sul piano di lavoro ({{ui:note.free}}).
 - {{ui:note.detach}} stacca dal corpo una nota associata.
+- {{ui:note.forAi}} trasforma una nota in una richiesta per un agente IA sul ponte MCP (vedi «IA con MCP»): l'agente la legge con `layerling_list_notes`, fa il lavoro e risponde nella stessa nota, sotto il tuo testo. Può anche mettere sul modello note proprie, per chiedere o segnalare qualcosa in un punto.
 - {{ui:editor.tool.group}} include nel gruppo una nota associata; {{ui:editor.tool.ungroup}} la assegna alla parte visibile sottostante, anche se si trova in un gruppo interno. Mentre modifichi un gruppo con {{ui:group.edit}}, le sue note si spostano insieme alle parti a cui sono associate e tornano nel gruppo con {{ui:group.done}}; annullando la modifica, tornano alla posizione originale.
 - Se il corpo viene eliminato, o se sotto la nota non resta più alcun corpo visibile, la nota rimane nella stessa posizione sul piano di lavoro.
 - Trascina il fermaglio per spostare la nota. Facendo clic sul fermaglio, la scheda si comprime e resta visibile solo il numero; fai di nuovo clic per riaprirla. Fai clic sul testo per modificarlo.

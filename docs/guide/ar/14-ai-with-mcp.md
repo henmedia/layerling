@@ -128,6 +128,10 @@ irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-qu
 | `layerling_add_reference_points` | تعلّم نقاطًا مرجعية - في مركز الأجسام أو زواياها أو منتصفات حوافها، أو في مواضع دقيقة - تلتقط إليها الأشكال |
 | `layerling_list_reference_points` | تسرد النقاط المرجعية مع معرّفاتها ومواضعها |
 | `layerling_remove_reference_points` | تحذف نقاطًا مرجعية حسب المعرّف، أو كلها |
+| `layerling_list_notes` | يقرأ ملاحظات المستخدم مع نصها والجسم المثبتة عليه كل واحدة وهل هي طلب للذكاء الاصطناعي |
+| `layerling_add_note` | يضع ملاحظة على النموذج، مثبتة على كائن أو حرة على اللوحة |
+| `layerling_update_note` | يعدّل ملاحظة أو يرد عليها؛ الرد يغلق الطلب |
+| `layerling_remove_notes` | يحذف ملاحظات بحسب المعرّف |
 | `layerling_inspect_errors` | تعرض آخر رسالة وآخر خطأ، إضافة إلى رسائل الجلسة وأخطائها |
 | `layerling_wrap_around_cylinder` | تلفّ جسمًا مستلقيًا مسطحًا، كملف SVG أو نص مثلًا، حول أسطوانة، للخارج أو للداخل كنقش محفور |
 | `layerling_texture_surface` | تضع على جسم نسيجًا للسطح: أخاديد أو تخريشًا أو خلايا سداسية أو نتوءات، لقبضة أفضل أو للمظهر، وتغيّره أو تزيله لاحقًا |

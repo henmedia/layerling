@@ -208,6 +208,14 @@ async function callTool(name, args) {
       return bridgeCommand("list_reference_points", args);
     case "layerling_remove_reference_points":
       return bridgeCommand("remove_reference_points", args);
+    case "layerling_list_notes":
+      return bridgeCommand("list_notes", args);
+    case "layerling_add_note":
+      return bridgeCommand("add_note", args);
+    case "layerling_update_note":
+      return bridgeCommand("update_note", args);
+    case "layerling_remove_notes":
+      return bridgeCommand("remove_notes", args);
     case "layerling_set_section_view":
       return bridgeCommand("set_section_view", args);
     case "layerling_set_history_view":

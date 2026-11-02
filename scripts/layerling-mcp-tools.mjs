@@ -1555,6 +1555,68 @@ export const tools = [
     },
   },
   {
+    name: "layerling_list_notes",
+    description: "Read the notes the user has put on the model, with the editor's Note tool. A note is a pin with text, free on the plate or pinned to an object. Each comes with its id, text, forAi (the user ticked For the AI: a request to you), reply (what you answered under it), object (the body it is pinned to, with id and name, or null), x, z and elevation in mm (the plate's X, its depth, positive towards the front, and the height), and open. Reference points are not notes; layerling_list_reference_points lists those. Use onlyForAi to get just the requests. Do the work a request asks for, then answer it with layerling_update_note.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        onlyForAi: { type: "boolean", description: "true lists only the notes ticked For the AI. Default false: all notes." },
+      },
+    },
+  },
+  {
+    name: "layerling_add_note",
+    description: "Put a note on the model, to answer or ask something at a spot, for example \"hole placed here, 15 mm deep. Is that right?\". Pin it to an object with objectId (at its top face's middle unless at says where), or put it free on the plate with at. The note shows as a numbered pin the user can open; it is saved with the design, never printed or exported, and undo takes it back. Returns the note. Leave forAi out for an answer or a remark to the user; set it only to leave a request that an agent should pick up later.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        text: { type: "string", maxLength: 2000, description: "The note's words." },
+        objectId: { type: "string", description: "A top-level object to pin the note to. The note follows the object when it moves." },
+        at: {
+          type: "object",
+          properties: {
+            x: { type: "number", description: "Position along the plate's X, in mm." },
+            z: { type: "number", description: "Position along the plate's depth, in mm, positive towards the front. The editor's Y counts the other way (towards the back), so Y = -z." },
+            elevation: { type: "number", description: "Height in mm, default 0." },
+          },
+          required: ["x", "z"],
+          description: "Where the pin stands. Needed without objectId; with objectId it picks the spot on or near the object instead of the top face's middle.",
+        },
+        forAi: { type: "boolean", description: "Mark the note as a request for the AI agent (the user's For the AI box). Default false." },
+      },
+      required: ["text"],
+    },
+  },
+  {
+    name: "layerling_update_note",
+    description: "Change a note: its text, your answer under it, or whether it is still a request. An answer (reply) closes a request by itself: forAi turns false, and the user sees your reply under their text. Pass forAi true to hand a note back as a request. Returns the note.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The note's id from layerling_list_notes." },
+        text: { type: "string", maxLength: 2000, description: "New text for the note. Leave the user's own words alone unless asked; answer with reply instead." },
+        reply: { type: "string", maxLength: 2000, description: "Your answer to the note, shown under its text. An empty string removes it." },
+        forAi: { type: "boolean", description: "true keeps or makes the note a request, false closes it." },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "layerling_remove_notes",
+    description: "Delete notes by id. Reference points are not touched; layerling_remove_reference_points deletes those.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" }, description: "The notes to delete." },
+      },
+      required: ["ids"],
+    },
+  },
+  {
     name: "layerling_show_workplane",
     description: "Show or hide the plate with its grid, labels and any workplane set on a face, like the eye over a grid in the editor's camera bar. Only the view changes: new shapes still land on the workplane, and nothing is saved with the design. Hide it before layerling_capture_image with view \"bottom\" to see the underside, for example with layerling_show_overhangs. Call without visible to read the state. Returns visible.",
     inputSchema: {

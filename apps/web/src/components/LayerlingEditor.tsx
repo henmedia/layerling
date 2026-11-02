@@ -168,8 +168,9 @@ import type { CrossSection } from "manifold-3d";
 import { DrawingTooComplexError } from "@/lib/drawingProjection";
 import { DEFAULT_TAPER_DIMENSION_MAX, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, shapeDimensionLimit, workplaneSettingsFingerprint } from "@/lib/workplaneSettings";
 import { MCP_GRIDFINITY_LIST_KEYS, mcpGridfinityListParams, mcpGridfinityOutlinePatch, mcpGridfinityPaddingPatch, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
-import { normalizeNotes, referencePoints } from "@/lib/workplaneNotes";
-import { notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
+import { createNoteId, normalizeNotes, NOTE_COUNT_LIMIT, NOTE_TEXT_LIMIT, referencePoints } from "@/lib/workplaneNotes";
+import { findShapeInHistoryState } from "@/lib/historyRestore";
+import { noteAnchorFromWorld, notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
 import { noticeReportsLastChange } from "@/lib/noticeTiming";
 import { referencePointsForBox, unionReferenceBoxes, type ReferencePointSpot, type ReferencePosition } from "@/lib/referencePoints";
 import { normalizePlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFingerprint, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, horizontalPlacementWorkplane, translationToWorkplane, type PlacementPoint, REVOLVE_REFERENCE_WORKPLANE, revolveBodyStandsUpright, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -247,6 +248,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "estimate_print",
   "check_clearance",
   "list_reference_points",
+  "list_notes",
   "show_overhangs",
   "measure_section",
   "set_section_view",
@@ -2662,6 +2664,23 @@ function mcpString(value: unknown, fallback: string) {
 function mcpPointInfo(note: WorkplaneNote) {
   const round = (value: number) => Number(value.toFixed(4));
   return { id: note.id, x: round(note.x), z: round(note.z), elevation: round(note.y) };
+}
+
+/** A note as the AI agent reads it (#1191): its text, whether it is a request for the agent, the agent's answer, and the body it is pinned to. */
+function mcpNoteInfo(note: WorkplaneNote, shapes: readonly WorkplaneShape[]) {
+  const round = (value: number) => Number(value.toFixed(4));
+  const pinned = note.anchor ? findShapeInHistoryState(shapes, note.anchor.shapeId) : null;
+  return {
+    id: note.id,
+    text: note.text,
+    forAi: Boolean(note.forAi),
+    reply: note.reply ?? "",
+    object: note.anchor ? { id: note.anchor.shapeId, name: pinned?.name ?? null } : null,
+    x: round(note.x),
+    z: round(note.z),
+    elevation: round(note.y),
+    open: !note.collapsed,
+  };
 }
 
 function mcpStringArray(value: unknown): string[] {
@@ -12752,6 +12771,64 @@ export function LayerlingEditor({
         const targets = referencePoints(current).filter((point) => ids.length === 0 || ids.includes(point.id));
         if (ids.length > 0 && targets.length === 0) throw new Error("No reference point has these ids");
         if (targets.length > 0) commitNotes(current.filter((note) => !targets.includes(note)), t("status.pointRemoved"));
+        return { removed: targets.length };
+      }
+
+      if (command.action === "list_notes") {
+        const notes = normalizeNotes(notesRef.current).filter((note) => note.kind !== "point");
+        const wanted = params.onlyForAi === true ? notes.filter((note) => note.forAi) : notes;
+        return { notes: wanted.map((note) => mcpNoteInfo(note, currentShapes())) };
+      }
+
+      if (command.action === "add_note") {
+        const text = typeof params.text === "string" ? params.text.trim() : "";
+        if (!text) throw new Error("text must be the note's words");
+        if (notesRef.current.length >= NOTE_COUNT_LIMIT) throw new Error(`The design holds as many notes and points as it can (${NOTE_COUNT_LIMIT})`);
+        const objectId = typeof params.objectId === "string" ? params.objectId : "";
+        const target = objectId ? currentShapes().find((shape) => shape.id === objectId) : undefined;
+        if (objectId && !target) throw new Error("No top-level object has this objectId");
+        const at = (params.at ?? null) as Record<string, unknown> | null;
+        let spot: { x: number; y: number; z: number };
+        if (at && typeof at === "object") {
+          spot = { x: Number(at.x), y: Number(at.elevation ?? 0), z: Number(at.z) };
+          if (![spot.x, spot.y, spot.z].every(Number.isFinite)) throw new Error("at needs a number for x and z, and optionally for elevation");
+        } else if (target) {
+          const box = meshAabb(target);
+          spot = { x: (box.minX + box.maxX) / 2, y: box.maxY, z: (box.minZ + box.maxZ) / 2 };
+        } else {
+          throw new Error("Give an objectId, or at with x and z");
+        }
+        const created: WorkplaneNote = { id: createNoteId(), text: text.slice(0, NOTE_TEXT_LIMIT), x: spot.x, y: spot.y, z: spot.z };
+        if (target) created.anchor = { shapeId: target.id, normalized: noteAnchorFromWorld(target, spot) };
+        if (params.forAi === true) created.forAi = true;
+        setNotesVisible(true);
+        commitNotes([...notesRef.current, created], target ? t("status.notePinned") : t("status.noteAdded"));
+        return { added: mcpNoteInfo(created, currentShapes()) };
+      }
+
+      if (command.action === "update_note") {
+        const id = typeof params.id === "string" ? params.id : "";
+        const existing = notesRef.current.find((note) => note.id === id && note.kind !== "point");
+        if (!existing) throw new Error("No note has this id; layerling_list_notes lists them");
+        const patch: Partial<WorkplaneNote> = {};
+        if (typeof params.text === "string") patch.text = params.text;
+        if (typeof params.reply === "string") patch.reply = params.reply;
+        if (typeof params.forAi === "boolean") patch.forAi = params.forAi;
+        // An answer closes the request unless the call says otherwise.
+        else if (typeof params.reply === "string" && params.reply) patch.forAi = false;
+        if (Object.keys(patch).length === 0) throw new Error("Give text, reply or forAi to change");
+        updateNote(id, patch);
+        const updated = normalizeNotes(notesRef.current).find((note) => note.id === id);
+        return { updated: updated ? mcpNoteInfo(updated, currentShapes()) : null };
+      }
+
+      if (command.action === "remove_notes") {
+        const ids = mcpStringArray(params.ids ?? params.id);
+        if (ids.length === 0) throw new Error("Name the notes to delete with ids");
+        const current = notesRef.current;
+        const targets = current.filter((note) => note.kind !== "point" && ids.includes(note.id));
+        if (targets.length === 0) throw new Error("No note has these ids");
+        commitNotes(current.filter((note) => !targets.includes(note)), t("status.noteRemoved"));
         return { removed: targets.length };
       }
 

@@ -56,6 +56,8 @@ export function normalizeNote(value: unknown): WorkplaneNote | null {
   const anchor = normalizeAnchor(raw.anchor);
   if (anchor) note.anchor = anchor;
   if (raw.collapsed) note.collapsed = true;
+  if (raw.forAi === true) note.forAi = true;
+  if (typeof raw.reply === "string" && raw.reply) note.reply = raw.reply.slice(0, NOTE_TEXT_LIMIT);
   return note;
 }
 
@@ -83,6 +85,9 @@ export function patchNote(notes: WorkplaneNote[], id: string, patch: Partial<Wor
     // `anchor: undefined` heisst „loese dich" und muss das Feld wirklich los
     // werden, sonst traegt die Notiz es nach dem Sichern wieder.
     if ("anchor" in patch && !patch.anchor) delete merged.anchor;
+    if (typeof patch.reply === "string") merged.reply = patch.reply.slice(0, NOTE_TEXT_LIMIT);
+    if (!merged.reply) delete merged.reply;
+    if (!merged.forAi) delete merged.forAi;
     return merged;
   });
 }
@@ -103,6 +108,8 @@ export function notesSignature(notes: WorkplaneNote[]) {
       `${note.x.toFixed(3)},${note.y.toFixed(3)},${note.z.toFixed(3)}`,
       note.collapsed ? "c" : "",
       note.kind === "point" ? "point" : "",
+      note.forAi ? "ai" : "",
+      note.reply ?? "",
     ].join("|"))
     .join("\n");
 }
