@@ -68,7 +68,7 @@ export function compactShapeSummary(shape: WorkplaneShape, index: number) {
     `${index}:${shape.kind}${shape.hole ? "H" : "S"}${shape.importedMesh ? "I" : ""}${shape.imagePlate ? "P" : ""}`,
     `g${shape.groupedShapes?.length ?? 0}`,
     `tri${shape.importedMesh?.triangleCount ?? 0}`,
-    `edge${shape.edgeTreatments?.map((feature) => `${feature.kind}:${feature.amount}:${feature.edgeCount}:${feature.chamferAngle ?? ""}${feature.endAmount !== undefined ? `>${feature.endAmount}` : ""}`).join("|") ?? ""}`,
+    `edge${shape.edgeTreatments?.map((feature) => `${feature.kind}:${feature.amount}:${feature.edgeCount}:${feature.chamferAngle ?? ""}${feature.endAmount !== undefined ? `>${feature.endAmount}` : ""}${feature.concave ? "~" : ""}`).join("|") ?? ""}`,
     `viewEdges${shape.cadDisplayEdges?.length ?? "auto"}v${shape.cadDisplayEdgesVersion ?? 0}`,
     `edgeResize${shape.edgeResizeMode ?? "scale"}`,
     `brep${shape.cadBrep?.length ?? 0}`,

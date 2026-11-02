@@ -7,6 +7,7 @@ import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
 import { cadLidSolid } from "@/lib/cadLid";
+import { concaveFilletSolid } from "@/lib/cadConcaveFillet";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
 import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { cadProfileSolidMismatch, profileExtrusionSolid } from "@/lib/cadProfileSolid";
@@ -861,6 +862,7 @@ function treatEdges(cad: OcctKernel, solid: ShapeHandle, edges: ShapeHandle[], r
   if (request.kind === "fillet" && request.endAmount !== undefined) {
     return cad.filletVariable(solid, edges[0], request.amount, request.endAmount);
   }
+  if (request.kind === "fillet" && request.concave) return concaveFilletSolid(cad, solid, edges, request.amount);
   if (request.kind === "fillet") return cad.fillet(solid, edges, request.amount);
   if (request.kind === "chamfillet") return chamfilletSolid(cad, solid, edges, request.amount, request.chamferAngle);
   return Math.abs(request.chamferAngle - 45) < 0.001

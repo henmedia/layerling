@@ -296,6 +296,8 @@ type EdgeModifierSession = {
   chamferAngle: number;
   // A fillet whose radius changes along its one edge (#687): the radius at the edge's end; null for one radius.
   endAmount?: number | null;
+  // A fillet that scoops the edge out instead of rounding it (#1160).
+  concave?: boolean;
   quality: CadModifierQuality;
   tangentChain: boolean;
   // Off: every edge shows through the body. On: only the ones facing the camera.
@@ -360,6 +362,7 @@ type EdgeFeatureRevertOption = {
   kind: EdgeTreatmentFeature["kind"];
   amount: number;
   endAmount?: number;
+  concave?: boolean;
   edgeCount: number;
   /** Only for a deletion of faces. */
   faceCount?: number;
@@ -702,6 +705,7 @@ function edgeTreatmentLabel(feature: NonNullable<WorkplaneShape["edgeTreatments"
   if (feature.kind === "offset") return `offset (${feature.offsetShrink ? "-" : "+"}${size}${feature.offsetSideways ? ", sideways" : ""})`;
   if (feature.kind === "deleteFace") return `face deletion (${feature.faceCount ?? 0} face${feature.faceCount === 1 ? "" : "s"})`;
   if (feature.kind === "surfaceTexture") return `surface texture (${feature.surfaceTexture?.pattern ?? "relief"}, ${size} deep)`;
+  if (feature.kind === "fillet" && feature.concave) return `concave fillet (${size}, ${feature.edgeCount} edge${feature.edgeCount === 1 ? "" : "s"})`;
   return `${feature.kind === "fillet" ? "fillet" : feature.kind === "chamfillet" ? "chamfillet" : "chamfer"} (${size}, ${feature.edgeCount} edge${feature.edgeCount === 1 ? "" : "s"})`;
 }
 
@@ -963,6 +967,7 @@ function edgeTreatmentHistoryOptions(shape: WorkplaneShape, path: number[] = [],
     kind: entry.feature.kind,
     amount: entry.feature.amount,
     ...(entry.feature.endAmount !== undefined ? { endAmount: entry.feature.endAmount } : {}),
+    ...(entry.feature.concave ? { concave: true } : {}),
     edgeCount: entry.feature.edgeCount,
     faceCount: entry.feature.faceCount,
     targetName,
@@ -3237,8 +3242,8 @@ export function LayerlingEditor({
   useEffect(() => onManifoldReady(() => setCustomFontRound((round) => round + 1)), []);
   const edgeModifierRef = useRef<EdgeModifierSession | null>(null);
   // "Edit" on a stored fillet or chamfer (#227): the body is taken back first, then the tool opens with these.
-  const edgeEditRequestRef = useRef<{ shapeId: string; historyLength: number; preset: { kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; edgeIds: number[] } } | null>(null);
-  const edgeModifierPresetRef = useRef<{ kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; edgeIds: number[] } | null>(null);
+  const edgeEditRequestRef = useRef<{ shapeId: string; historyLength: number; preset: { kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] } } | null>(null);
+  const edgeModifierPresetRef = useRef<{ kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] } | null>(null);
   const [edgeEditRound, setEdgeEditRound] = useState(0);
   const cadModifierWorkerRef = useRef<Worker | null>(null);
   const cadModifierPendingRef = useRef(new Map<number, {
@@ -4764,7 +4769,7 @@ export function LayerlingEditor({
       return;
     }
     // The Fillet or Chamfer tool stays open, so that several features can be taken back one after the other (#514).
-    const openTool = edgeModifier ? { kind: edgeModifier.kind, amount: edgeModifier.amount, chamferAngle: edgeModifier.chamferAngle, endAmount: edgeModifier.endAmount ?? null } : null;
+    const openTool = edgeModifier ? { kind: edgeModifier.kind, amount: edgeModifier.amount, chamferAngle: edgeModifier.chamferAngle, endAmount: edgeModifier.endAmount ?? null, concave: edgeModifier.concave === true } : null;
     invalidateCadModifierSession();
     commitShapes(
       shapesRef.current.map((shape) => shape.id === selectedShape.id ? restored.shape : shape),
@@ -4823,7 +4828,7 @@ export function LayerlingEditor({
       edgeEditRequestRef.current = {
         shapeId: restored.shape.id,
         historyLength: restored.shape.edgeTreatmentHistory?.length ?? 0,
-        preset: { kind: feature.kind, amount: feature.amount, chamferAngle: feature.chamferAngle ?? 45, endAmount: feature.endAmount ?? null, edgeIds: feature.edgeIds ?? [] },
+        preset: { kind: feature.kind, amount: feature.amount, chamferAngle: feature.chamferAngle ?? 45, endAmount: feature.endAmount ?? null, concave: feature.concave === true, edgeIds: feature.edgeIds ?? [] },
       };
       setEdgeEditRound((round) => round + 1);
     }
@@ -7335,7 +7340,9 @@ export function LayerlingEditor({
     const quality: CadModifierQuality = params.quality === "draft" || params.quality === "fine" ? params.quality : "standard";
     const preserveEdgeSize = typeof params.preserveEdgeSize === "boolean" ? params.preserveEdgeSize : shape.edgeResizeMode === "preserve";
     // A fillet whose radius runs from `amount` at the edge's start to `endAmount` at its end (#687).
-    const endAmount = kind === "fillet" && params.endAmount !== undefined && params.endAmount !== null ? Math.max(MIN_EDGE_MODIFIER_AMOUNT, mcpNumber(params.endAmount, amount)) : undefined;
+    // A fillet that scoops the edges out instead of rounding them (#1160).
+    const concave = kind === "fillet" && params.concave === true;
+    const endAmount = kind === "fillet" && !concave && params.endAmount !== undefined && params.endAmount !== null ? Math.max(MIN_EDGE_MODIFIER_AMOUNT, mcpNumber(params.endAmount, amount)) : undefined;
     const { response, sourceParts } = await prepareCadModifierForMcp(shape, sharpAngle);
     const selectableIds = response.edges.filter((edge) => selectableCadModifierEdge(edge, sharpAngle)).map((edge) => edge.id);
     const requestedIds = mcpNumberArray(params.edgeIds);
@@ -7380,6 +7387,7 @@ export function LayerlingEditor({
     }
     const preview = canonicalizeShape({
       ...rawPreview,
+      ...(concave ? { concave } : {}),
       cadDisplayEdges: cadDisplayEdgesForShape(rawPreview, previewResponse.displayEdges),
       cadDisplayEdgesVersion: 2 as const,
     });
@@ -7401,6 +7409,7 @@ export function LayerlingEditor({
       endAmount: endAmount ?? null,
       quality,
       tangentChain: false,
+      ...(concave ? { concave } : {}),
       preserveEdgeSize,
       busy: false,
       prepared: true,
@@ -7410,6 +7419,7 @@ export function LayerlingEditor({
     };
     const createdAt = Date.now();
     const groupedModifiedShape = groupedShapeWithComponentEdgeTreatment(shape, preview, sourceParts, session, feature, createdAt);
+      concave,
     const modifiedShape = groupedModifiedShape ?? shapeWithEdgeTreatmentRecord(
       bakedEdgeTreatmentPreview(preview, shape),
       shape,
@@ -7477,6 +7487,7 @@ export function LayerlingEditor({
    * BREP, und der Eintrag im Verlauf haelt den Zustand davor fest - so laesst
    * sich die Aushoehlung spaeter wieder entfernen wie jede Kantenbehandlung.
    * "Groesse beibehalten" ist fest an: die Wandstaerke soll beim Skalieren
+      ...(feature.concave ? { concave: true } : {}),
    * bleiben, was sie ist.
    */
   // `watched` is the body in the scene the result replaces; it is the shape
@@ -8176,6 +8187,7 @@ export function LayerlingEditor({
     });
     const groupedModifiedShape = groupedShapeWithComponentEdgeTreatment(
       base,
+      ...(edgeModifier.kind === "fillet" && edgeModifier.concave ? { concave: true } : {}),
       previewShape,
       cadModifierSourcePartsRef.current,
       edgeModifier,
@@ -8204,7 +8216,7 @@ export function LayerlingEditor({
     edgeEditRequestRef.current = {
       shapeId: base.id,
       historyLength: modifiedShape.edgeTreatmentHistory?.length ?? 0,
-      preset: { kind: edgeModifier.kind, amount: edgeModifier.amount, chamferAngle: edgeModifier.chamferAngle, endAmount: edgeModifier.endAmount ?? null, edgeIds: [] },
+      preset: { kind: edgeModifier.kind, amount: edgeModifier.amount, chamferAngle: edgeModifier.chamferAngle, endAmount: edgeModifier.endAmount ?? null, concave: edgeModifier.concave === true, edgeIds: [] },
     };
     setEdgeEditRound((round) => round + 1);
   }, [commitShapes, edgeModifier, invalidateCadModifierSession, shapes]);
@@ -8288,12 +8300,13 @@ export function LayerlingEditor({
       });
     }, 120);
     return () => window.clearTimeout(timer);
-  }, [discardPendingCadPreviews, edgeModifier?.amount, edgeModifier?.chamferAngle, edgeModifier?.endAmount, edgeModifier?.kind, edgeModifier?.prepared, edgeModifier?.quality, edgeModifier?.selectedEdgeIds]);
+  }, [discardPendingCadPreviews, edgeModifier?.amount, edgeModifier?.chamferAngle, edgeModifier?.concave, edgeModifier?.endAmount, edgeModifier?.kind, edgeModifier?.prepared, edgeModifier?.quality, edgeModifier?.selectedEdgeIds]);
 
   const snapSelected = useCallback(() => {
     if (!hasSelection) {
       setNotice(t("status.selectShapeFirst"));
       return;
+        ...(edgeModifier.kind === "fillet" && edgeModifier.concave ? { concave: true } : {}),
     }
     if (refuseLockedSelection()) return;
     const selected = new Set(selectedIds);
@@ -15761,6 +15774,12 @@ export function LayerlingEditor({
             if (!current?.prepared) return current;
             const chamferAngle = Math.max(current.kind === "chamfillet" ? 15 : 5, Math.min(current.kind === "chamfillet" ? 75 : 85, value));
             return chamferAngle === current.chamferAngle ? current : { ...current, chamferAngle, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
+          concave={edgeModifier.concave === true}
+          onConcaveChange={(value) => setEdgeModifier((current) => {
+            if (!current?.prepared || (current.concave === true) === value) return current;
+            // A scoop has one radius: the variable one goes out with it.
+            return { ...current, concave: value, endAmount: value ? null : current.endAmount, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
+          })}
           })}
           onKindChange={(kind) => setEdgeModifier((current) => {
             if (!current?.prepared || current.kind === kind) return current;

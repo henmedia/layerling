@@ -1203,7 +1203,7 @@ export const tools = [
   },
   {
     name: "layerling_apply_edge_treatment",
-    description: "Apply chamfer, chamfillet or fillet to specific edge ids returned by layerling_list_edges, on a solid or a hole (a hole stays a hole: a box hole with filleted vertical edges cuts a pocket with round inside corners), to \"all\" sharp edges, to the \"top\" edges (every edge along the body's highest level, such as the rim of a cookie cutter), to the \"bottom\" edges (every edge along its lowest level, such as the foot of a part), or to the \"vertical\" edges (every edge that stands straight up, such as the corners of a box), as the editor's Top edges, Bottom edges and Vertical edges buttons pick them. A chamfillet is the printable foot: a chamfer at the plate (chamferAngle 15 to 75, default 45) that blends tangentially into a fillet toward the wall, so the foot needs no support and ends soft; amount is the height it takes up, and it is mostly used with \"bottom\". A fillet with endAmount has a variable radius: it runs from amount at one end of the edge to endAmount at the other, on exactly one edge id; if the large end comes out where the small one should be, apply it again with the two values swapped.",
+    description: "Apply chamfer, chamfillet or fillet to specific edge ids returned by layerling_list_edges, on a solid or a hole (a hole stays a hole: a box hole with filleted vertical edges cuts a pocket with round inside corners), to \"all\" sharp edges, to the \"top\" edges (every edge along the body's highest level, such as the rim of a cookie cutter), to the \"bottom\" edges (every edge along its lowest level, such as the foot of a part), or to the \"vertical\" edges (every edge that stands straight up, such as the corners of a box), as the editor's Top edges, Bottom edges and Vertical edges buttons pick them. A chamfillet is the printable foot: a chamfer at the plate (chamferAngle 15 to 75, default 45) that blends tangentially into a fillet toward the wall, so the foot needs no support and ends soft; amount is the height it takes up, and it is mostly used with \"bottom\". A fillet with endAmount has a variable radius: it runs from amount at one end of the edge to endAmount at the other, on exactly one edge id; if the large end comes out where the small one should be, apply it again with the two values swapped. A fillet with concave true is the negative of a rounding: it scoops a quarter-round out of each straight edge (a cylinder of radius amount lying on the edge), as a notch in the corners of a box, instead of rounding the edge off.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id", "kind", "edgeIds", "amount"],
@@ -1222,6 +1222,7 @@ export const tools = [
         endAmount: { type: "number", description: "Fillet of one edge only: the radius at the edge's other end, for a radius that changes along it (#687)." },
         chamferAngle: { type: "number" },
         sharpAngle: { type: "number" },
+        concave: { type: "boolean", description: "Fillet only: scoop the straight edges out (a cylinder of radius amount on each edge) instead of rounding them (#1160)." },
         quality: { type: "string", enum: ["draft", "standard", "fine"] },
         preserveEdgeSize: { type: "boolean" },
       },

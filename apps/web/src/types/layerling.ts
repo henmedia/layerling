@@ -723,6 +723,8 @@ export type EdgeTreatmentFeature = {
   openings?: ShellOpenings;
   /** Only for "shell" and "offset"; missing means "round". */
   shellEdges?: ShellEdges;
+  /** Only for a fillet (#1160): the edges were scooped out (a concave fillet) instead of rounded. */
+  concave?: boolean;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
   /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */

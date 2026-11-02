@@ -11,6 +11,16 @@
   },
   {
     "title": {
+      "de": "Konkave Verrundung: Kanten ausschneiden statt abrunden",
+      "en": "Concave fillet: scoop edges out instead of rounding"
+    },
+    "body": {
+      "de": "Im Verrundungsfenster schneidet „Konkav (ausschneiden)“ eine Viertelkreis-Mulde aus jeder gewählten geraden Kante, wie die ausgehöhlten Ecken einer Box. Vorher ging das nur mit einem Zylinder als Loch von Hand.",
+      "en": "In the fillet window, “Concave (scoop out)” cuts a quarter-round scoop out of each picked straight edge, like the notched corners of a box. Before, that took a cylinder turned into a hole and lined up by hand."
+    }
+  },
+  {
+    "title": {
       "de": "Gedrehte Körper bleiben beim Ziehen gedreht",
       "en": "Turned shapes stay turned when you drag a handle"
     },
