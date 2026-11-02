@@ -81,6 +81,7 @@ A note records what the geometry does not say: "This screw is 0.3 mm too tight",
 - If you place the note **on a body**, it travels with it.
 - If you place it **beside**, it stays on the workplane ({{ui:note.free}}).
 - {{ui:note.detach}} releases an attached note from the body.
+- {{ui:note.forAi}} turns a note into a request for an AI agent on the MCP bridge (see "AI with MCP"): the agent reads it with `layerling_list_notes`, does the work and answers in the same note, under your text. It can also put notes of its own on the model, to ask or report something at a spot.
 - {{ui:editor.tool.group}} takes an attached note into the group; {{ui:editor.tool.ungroup}} hands it to the visible part under it, a group inside included. While a group is open with {{ui:group.edit}}, its notes move with the part under them and go back to the group with {{ui:group.done}}; cancelling puts them back as they were.
 - If its body is deleted, or no visible body is under it any more, the note stays where it stood, on the workplane.
 - Dragging the pin moves the note. A click on the pin folds the card away, only the small number stays; another click opens it again. A click into the text edits it.

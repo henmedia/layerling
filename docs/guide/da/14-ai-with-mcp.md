@@ -128,6 +128,10 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_add_reference_points` | markerer referencepunkter - på formens centrum, hjørner eller kantmidtpunkter, eller ved præcise positioner - som former snapper til |
 | `layerling_list_reference_points` | lister referencepunkterne med deres id'er og positioner |
 | `layerling_remove_reference_points` | sletter referencepunkter efter id, eller alle sammen |
+| `layerling_list_notes` | læser brugerens noter med tekst, det legeme hver er fæstnet til, og om den er en opgave til AI'en |
+| `layerling_add_note` | sætter en note på modellen, fæstnet til et objekt eller frit på pladen |
+| `layerling_update_note` | ændrer en note eller svarer på den; et svar lukker opgaven |
+| `layerling_remove_notes` | sletter noter efter id |
 | `layerling_inspect_errors` | viser den seneste besked og den seneste fejl, plus sessionens beskeder og fejl |
 | `layerling_wrap_around_cylinder` | vikler en form der ligger fladt, for eksempel en SVG eller tekst, rundt om en cylinder, udad eller indad som gravering |
 | `layerling_texture_surface` | lægger en overfladestruktur på en form: riller, riflinger, bikager eller knopper, for bedre greb eller for udseendet, og ændrer eller fjerner den senere |

@@ -124,6 +124,10 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_add_reference_points` | markeert referentiepunten - op het midden, de hoeken of de randmiddens van objecten, of op exacte posities - waarop vormen snappen |
 | `layerling_list_reference_points` | somt de referentiepunten op met hun id's en posities |
 | `layerling_remove_reference_points` | verwijdert referentiepunten op id, of allemaal |
+| `layerling_list_notes` | leest de notities van de gebruiker met hun tekst, het lichaam waaraan elke vastzit en of het een verzoek aan de AI is |
+| `layerling_add_note` | zet een notitie op het model, vast aan een object of los op het bouwplaat |
+| `layerling_update_note` | wijzigt een notitie of beantwoordt haar; een antwoord sluit het verzoek |
+| `layerling_remove_notes` | verwijdert notities op id |
 | `layerling_inspect_errors` | toont de laatste melding en de laatste fout, plus de meldingen en fouten van de sessie |
 | `layerling_wrap_around_cylinder` | wikkelt een plat liggend lichaam, bijvoorbeeld een SVG of tekst, om een cilinder, naar buiten of naar binnen als gravure |
 | `layerling_texture_surface` | brengt een oppervlaktestructuur aan op een lichaam: groeven, kartel, honingraat of noppen, voor grip of voor het oog, en wijzigt of verwijdert die later |

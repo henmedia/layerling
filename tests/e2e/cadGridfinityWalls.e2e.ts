@@ -64,8 +64,9 @@ describe("exact Gridfinity bins with a set wall", () => {
 
   it("keeps a bin stacked on a thick wall's ledge 0.5 mm clear, as on the shelves", () => {
     const plain = gridfinityPartSolid(cad, bin({ width: 41.5, depth: 41.5 }));
-    // From a wall of about 3 mm the ledge reaches in under the stacked bin's feet, which start 2.95 mm in.
-    for (const part of [bin({ width: 41.5, depth: 41.5, gridfinityWallThickness: 4 }), bin({ width: 41.5, depth: 41.5, gridfinityWallThickness: 4, gridfinityFloorHeight: 30 })]) {
+    // From a wall of about 3 mm the ledge reaches in under the stacked bin's feet, which start 2.95 mm in; the floor at most
+    // up to the ledge, 21 - 0.85; from the lip's top up it fills the lip (#1126).
+    for (const part of [bin({ width: 41.5, depth: 41.5, gridfinityWallThickness: 4 }), bin({ width: 41.5, depth: 41.5, gridfinityWallThickness: 4, gridfinityFloorHeight: 20.15 })]) {
       const thick = gridfinityPartSolid(cad, part);
       expect(overlap(thick, cad.translate(plain, 0, 21 - 0.34, 0))).toBeLessThan(0.01);
       // Pushed 0.45 mm further down the feet cut into the lip only, as much as on a plain bin; 0.55 mm down they reach the ledge.

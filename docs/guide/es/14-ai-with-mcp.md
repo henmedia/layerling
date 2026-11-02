@@ -128,6 +128,10 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_add_reference_points` | marca puntos de referencia (en el centro, las esquinas o los puntos medios de las aristas de los objetos, o en posiciones exactas) a los que se ajustan las formas |
 | `layerling_list_reference_points` | lista los puntos de referencia con sus id y posiciones |
 | `layerling_remove_reference_points` | elimina puntos de referencia por id, o todos |
+| `layerling_list_notes` | lee las notas del usuario con su texto, el cuerpo al que está fijada cada una y si es un encargo para la IA |
+| `layerling_add_note` | pone una nota en el modelo, fijada a un objeto o libre en la placa |
+| `layerling_update_note` | cambia una nota o la responde; una respuesta cierra el encargo |
+| `layerling_remove_notes` | borra notas por id |
 | `layerling_inspect_errors` | muestra el último mensaje y el último error, además de los mensajes y errores de la sesión |
 | `layerling_wrap_around_cylinder` | envuelve un cuerpo plano, como un SVG o un texto, alrededor de un cilindro, hacia fuera o hacia dentro como grabado |
 | `layerling_texture_surface` | aplica una textura de superficie a un cuerpo: estrías, moleteado, panal o bultos, para un mejor agarre o por estética, y la cambia o la quita después |

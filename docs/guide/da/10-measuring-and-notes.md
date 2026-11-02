@@ -85,6 +85,7 @@ En note registrerer hvad geometrien ikke siger: "Denne skrue er 0,3 mm for stram
 - Hvis du placerer noten **på en form**, følger den med den.
 - Hvis du placerer den **ved siden af**, bliver den på arbejdsplanet ({{ui:note.free}}).
 - {{ui:note.detach}} frigør en vedhæftet note fra formen.
+- {{ui:note.forAi}} gør en note til en opgave til en AI-agent på MCP-broen (se „AI med MCP“): Agenten læser den med `layerling_list_notes`, udfører arbejdet og svarer i samme note, under din tekst. Den kan også sætte egne noter på modellen for at spørge om eller melde noget et bestemt sted.
 - {{ui:editor.tool.group}} tager en vedhæftet note med ind i gruppen; {{ui:editor.tool.ungroup}} giver den videre til den synlige del under den, også en gruppe indeni. Mens en gruppe er åben med {{ui:group.edit}}, følger dens noter med den del, de sidder på, og går tilbage til gruppen med {{ui:group.done}}; annullering sætter dem tilbage, som de var.
 - Hvis dens form slettes, eller der ikke længere er en synlig form under den, bliver noten stående, hvor den var, på arbejdsplanet.
 - Træk i nålen flytter noten. Et klik på nålen folder kortet sammen, så kun det lille tal bliver stående, og et klik mere åbner det igen. Et klik i teksten redigerer den.

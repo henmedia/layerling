@@ -128,6 +128,10 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_add_reference_points` | stawia punkty odniesienia (na środku, narożnikach albo środkach krawędzi obiektów albo w dokładnych pozycjach), do których przyciągają się kształty |
 | `layerling_list_reference_points` | wypisuje punkty odniesienia z identyfikatorami i pozycjami |
 | `layerling_remove_reference_points` | usuwa punkty odniesienia według identyfikatora albo wszystkie |
+| `layerling_list_notes` | czyta notatki użytkownika z ich tekstem, bryłą, do której każda jest przypięta, i informacją, czy to prośba do AI |
+| `layerling_add_note` | stawia notatkę na modelu, przypiętą do obiektu lub swobodnie na płycie |
+| `layerling_update_note` | zmienia notatkę lub na nią odpowiada; odpowiedź zamyka prośbę |
+| `layerling_remove_notes` | usuwa notatki według identyfikatora |
 | `layerling_inspect_errors` | pokazuje ostatni komunikat i ostatni błąd oraz komunikaty i błędy sesji |
 | `layerling_wrap_around_cylinder` | owija leżącą płasko bryłę, na przykład SVG albo tekst, wokół walca, na zewnątrz albo do wewnątrz jako grawer |
 | `layerling_texture_surface` | nakłada na bryłę teksturę powierzchni: rowki, radełkowanie, plaster miodu albo wypustki, dla lepszego chwytu albo wyglądu, a później ją zmienia albo usuwa |

@@ -79,6 +79,7 @@ Egy jegyzet azt rögzíti, amit a geometria nem mond el: „Ez a csavar 0,3 mm-r
 - Ha a jegyzetet **egy testre** teszed, vele együtt utazik.
 - Ha **mellé** teszed, a munkasíkon marad ({{ui:note.free}}).
 - A {{ui:note.detach}} leválasztja a testről a hozzá csatolt jegyzetet.
+- A {{ui:note.forAi}} a jegyzetből kérést csinál egy MI-ügynöknek az MCP-hídon (lásd „MI az MCP-vel”): az ügynök a `layerling_list_notes` segítségével elolvassa, elvégzi a munkát, és ugyanabban a jegyzetben, a szöveged alatt válaszol. Saját jegyzeteket is tehet a modellre, hogy egy helyen kérdezzen vagy jelentsen valamit.
 - A {{ui:editor.tool.group}} a csatolt jegyzetet is beviszi a csoportba; a {{ui:editor.tool.ungroup}} az alatta lévő látható részhez adja tovább, akár egy belső csoporthoz is. Amíg egy csoport a {{ui:group.edit}} gombbal nyitva van, a jegyzetei az alattuk lévő résszel együtt mozognak, és a {{ui:group.done}} gombbal visszakerülnek a csoporthoz; a megszakítás visszaállítja őket az eredeti állapotukba.
 - Ha a testét törlöd, vagy már nincs alatta látható test, a jegyzet ott marad, ahol volt, a munkasíkon.
 - A tűt húzva a jegyzet elmozdul. Egy kattintás a tűre összecsukja a kártyát, csak a kis szám marad; egy újabb kattintás újra kinyitja. A szövegbe kattintva szerkesztheted.

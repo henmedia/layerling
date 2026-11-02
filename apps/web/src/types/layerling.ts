@@ -1406,6 +1406,10 @@ export type WorkplaneNote = {
   anchor?: WorkplaneNoteAnchor;
   /** Zugeklappt zeigt die Notiz nur ihre Nadel mit der Nummer. */
   collapsed?: boolean;
+  /** A request for the AI agent on the MCP bridge: it reads the note, does the work and answers in `reply` (#1191). */
+  forAi?: boolean;
+  /** The agent's answer to the note, shown under its text. */
+  reply?: string;
   /**
    * "point" makes this a reference point instead of a note: a mark in space
    * that other shapes snap to. It has no text and no anchor, is not counted as

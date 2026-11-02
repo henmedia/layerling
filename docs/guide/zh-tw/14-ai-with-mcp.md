@@ -128,6 +128,10 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_add_reference_points` | 標記參考點——可落在物件的中心、角落或邊中點，也可指定精確位置——形狀會吸附到這些點 |
 | `layerling_list_reference_points` | 列出參考點及其 id 與位置 |
 | `layerling_remove_reference_points` | 依 id 刪除參考點，或全部刪除 |
+| `layerling_list_notes` | 讀取使用者的備註，包括文字、每則所附著的實體，以及它是否是給 AI 的請求 |
+| `layerling_add_note` | 在模型上放一則備註，附著在物件上或自由放在工作板上 |
+| `layerling_update_note` | 修改一則備註或回覆它；回覆會關閉請求 |
+| `layerling_remove_notes` | 依 id 刪除備註 |
 | `layerling_inspect_errors` | 顯示最後一則訊息與最後一個錯誤，以及本次工作階段的訊息與錯誤 |
 | `layerling_wrap_around_cylinder` | 把平放的實體（例如 SVG 或文字）包覆到圓柱上，可向外，或向內作為雕刻 |
 | `layerling_texture_surface` | 為實體加上表面紋理：凹槽、滾花、蜂巢或凸點，用於止滑或美觀，之後仍可修改或移除 |

@@ -220,3 +220,34 @@
     width: 168px;
   }
 }
+
+/* The AI agent's answer under a note's text, and the box that sends the note to it (#1191). */
+.note-reply {
+  padding: 6px 7px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--tile-hover);
+  color: var(--foreground);
+  font: 400 12px/1.35 var(--font-ui);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.note-reply-label {
+  display: block;
+  color: var(--muted-strong);
+  font: 600 10px/1.4 var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.note-for-ai {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-strong);
+  font: 600 11px/1.2 var(--font-ui);
+  cursor: pointer;
+}

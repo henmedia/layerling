@@ -23,7 +23,7 @@ Hvad biblioteket tilbyder:
 - **Rør:** {{ui:shape.tube}} og {{ui:shape.bentTube}}, lavet af op til tolv lige stykker med bøjninger ind imellem, og {{ui:shape.loft}} fra ét omrids til et andet, for eksempel fra firkant til rundt.
 - **Dekorative former:** {{ui:shape.star}}, {{ui:shape.heart}} og {{ui:shape.crescent}}.
 - **Bogstaver:** {{ui:shape.text}}, også langs en cirkelbue. Mere i [Tekst](chapter:text).
-- **Mekanik:** {{ui:shape.thread}} (gevindstang, skrue, møtrik og gevindhul), {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} og {{ui:shape.knurl}} til greb. Mere i [Gevind og mekanik](chapter:threads-and-mechanics).
+- **Mekanik:** {{ui:shape.thread}} (gevindstang, skrue, møtrik og gevindhul), {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}}, {{ui:shape.finishingWasher}} under en undersænket skrue og {{ui:shape.knurl}} til greb. Mere i [Gevind og mekanik](chapter:threads-and-mechanics).
   Gridfinity-bakke og -grundplader vælger du med {{ui:shape.gridfinity}}.
 - **Til konstruktioner:** det print-in-place {{ui:shape.hinge}}, {{ui:shape.dovetail}}, {{ui:shape.teardrop}} til vandrette huller, {{ui:shape.port}} til USB-, HDMI-, DisplayPort- og RJ45-stik, {{ui:shape.counterbore}} og {{ui:shape.countersink}} til skruehoveder og {{ui:shape.ruler}}, som kun er et måleværktøj og aldrig vises i en eksport.
 

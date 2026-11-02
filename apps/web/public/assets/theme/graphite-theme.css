@@ -8007,6 +8007,20 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-inside {
   color: var(--muted-strong);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .note-reply {
+  border: 1px solid var(--border);
+  background: var(--tile-hover);
+  color: var(--foreground);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .note-reply-label {
+  color: var(--muted-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .note-for-ai {
+  color: var(--muted-strong);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .tape-segment {
   stroke: #5a3917;
 }
