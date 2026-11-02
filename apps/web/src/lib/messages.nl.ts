@@ -1356,6 +1356,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.meshTooDense": "Deze mesh heeft {triangles} driehoeken. Randbewerking kan {limit} aan; daarboven duurt het in de kernel langer dan het wachten waard is. Gebruik voor een vorm uit de vormenlijst voorlopig zijn eigen instellingen. Importeer een geïmporteerd onderdeel als STEP of sla het eerst op met minder driehoeken.",
   "status.meshDenseAsk": "Deze mesh heeft {triangles} driehoeken, meer dan de {limit} waarvoor de randbewerking is gemaakt. Daarboven kan het vele minuten duren, kan de pagina vastlopen en gaat alles wat niet is opgeslagen verloren als je haar moet sluiten. Sla je ontwerp eerst op.\n\nToch proberen?",
   "status.threadTooDense": "Een schroefdraad bestaat uit {triangles} driehoeken — te veel voor randbewerking, die stopt bij {limit}. Voeg de schroefdraad dus na de randbewerking toe: eerst het lichaam afschuinen of afronden, dan de schroefdraad. De kopafschuining in de eigenschappen breekt de rand van de schroefkop zonder deze omweg.",
+  "status.vaseTooDense": "Deze vaas heeft {triangles} driehoeken, meer dan de {limit} die uithollen en randbewerking aankunnen. De vaas wordt zelf hol en heeft een eigen deksel: kies “Hol met wand” onder Bouw en kies een deksel op de kaart Toebehoren.",
   "status.unlockImageDelete": "Ontgrendel de schetsafbeelding met L voordat je hem verwijdert",
   "status.unlockImageEdit": "Ontgrendel de schetsafbeelding met L voordat je hem bewerkt",
   "status.updatingRevolve": "Voorbeeld van omwenteling bijwerken…",

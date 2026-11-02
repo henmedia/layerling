@@ -1939,6 +1939,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.onlyOnePart": "Det valgte objekt har kun én sammenhængende del",
   "status.meshTooDense": "Dette mesh har {triangles} trekanter. Kantbehandling håndterer {limit}; ud over det tager kernen længere end noget ventetid er værd. For en form fra formlisten, brug dens egne indstillinger indtil videre. For en importeret del, importér den som STEP eller gem den med færre trekanter først.",
   "status.threadTooDense": "Et gevind er bygget af {triangles} trekanter – for mange til kantbehandling, som stopper ved {limit}. Så tilføj gevindet efter kantbehandlingen: fas eller rund formen først, så gevindet. Hovedfasen i egenskaberne bryder skruehovedets kant uden denne omvej.",
+  "status.vaseTooDense": "Denne vase har {triangles} trekanter, flere end de {limit}, som udhuling og kantbehandling kan klare. Vasen kan selv blive hul og har sit eget låg: vælg “Hul med væg” under Opbygning, og vælg et låg på kortet Tilbehør.",
   "status.unlockImageDelete": "Lås skitsebilledet op med L før du sletter det",
   "status.unlockImageEdit": "Lås skitsebilledet op med L før du redigerer det",
   "status.updatingRevolve": "Opdaterer revolver-forhåndsvisning …",

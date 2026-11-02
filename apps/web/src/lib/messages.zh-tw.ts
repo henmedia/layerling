@@ -1259,6 +1259,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.meshTooDense": "此網格有 {triangles} 個三角形。邊處理可處理 {limit} 個；超過後核心耗時會久到不值得等待。若是形狀清單中的形狀，目前請改用它自己的設定。若是匯入的零件，請先以 STEP 格式匯入，或以較少的三角形儲存。",
   "status.meshDenseAsk": "這個網格有 {triangles} 個三角形，超過了邊緣處理所能承受的 {limit} 個。再多就可能要花上好幾分鐘，頁面可能卡死，你不得不關閉它時，還沒儲存的內容都會遺失。請先儲存設計。\n\n仍要嘗試嗎？",
   "status.threadTooDense": "螺紋由 {triangles} 個三角形構成，對邊處理來說過多，上限為 {limit}。因此請在邊處理之後再加螺紋：先對實體倒角或倒圓角，再加螺紋。屬性面板中的頭部倒角不必這樣繞路，也能修整螺絲頭的邊緣。",
+  "status.vaseTooDense": "這個花瓶有 {triangles} 個三角形，超過了抽殼和邊處理能處理的 {limit} 個。花瓶本身就能變成空心，也有自己的蓋子：在「建構」中選擇「帶壁的空心」，並在「配件」卡片上選擇蓋子。",
   "status.unlockImageDelete": "刪除草圖影像前，先按 L 解鎖",
   "status.unlockImageEdit": "編輯草圖影像前，先按 L 解鎖",
   "status.updatingRevolve": "正在更新旋轉預覽…",

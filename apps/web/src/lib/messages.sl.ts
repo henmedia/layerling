@@ -1034,6 +1034,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.meshTooDense": "Ta mreža ima {triangles} trikotnikov. Obdelava robov jih obvlada {limit}; pri več jedro traja predolgo. Pri obliki s seznama oblik zaenkrat uporabi njene lastne nastavitve. Pri uvoženem delu ga uvozi kot STEP ali ga najprej shrani z manj trikotniki.",
   "status.meshDenseAsk": "Ta mreža ima {triangles} trikotnikov, več kot {limit}, za kolikor je obdelava robov narejena. Nad tem lahko traja več minut, stran se lahko zamrzne in vse neshranjeno izgine, če jo moraš zapreti. Najprej shrani načrt.\n\nVseeno poskusiti?",
   "status.threadTooDense": "Navoj je sestavljen iz {triangles} trikotnikov - preveč za obdelavo robov, ki se ustavi pri {limit}. Zato navoj dodaj po obdelavi robov: najprej posnemi ali zaobli telo, nato dodaj navoj. Posnetje glave v lastnostih zlomi rob glave vijaka brez tega ovinka.",
+  "status.vaseTooDense": "Ta vaza ima {triangles} trikotnikov, več kot {limit}, kolikor jih zmoreta izdolbenje in obdelava robov. Vaza se izdolbe sama in ima svoj pokrov: pod Izvedba izberi “Votla s steno”, pokrov pa na kartici Dodatki.",
   "status.unlockImageDelete": "Pred brisanjem odkleni sliko skice s tipko L",
   "status.unlockImageEdit": "Pred urejanjem odkleni sliko skice s tipko L",
   "status.updatingRevolve": "Posodabljanje predogleda vrtenja…",

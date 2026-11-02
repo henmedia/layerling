@@ -7129,6 +7129,11 @@ export function LayerlingEditor({
       // hier nicht mit, die Absage gilt dann einem anderen Teil.
       const istGewinde = partInputs.some((part) => part.mesh && part.shape.kind === "thread");
       const denseCounts = { triangles: formatTriangleCount(triangleCount), limit: formatTriangleCount(CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT) };
+      // A vase has its own way too: hollow and lid in its settings (#1153).
+      if (partInputs.some((part) => part.mesh && part.shape.kind === "vase")) {
+        setNotice(t("status.vaseTooDense", denseCounts), true);
+        return;
+      }
       // The limit is where the measurements turn (it can take minutes beyond it), not a wall: whoever
       // knows their machine may go on after a clear warning (#941). A thread has a better way, so it stays refused.
       const goOn = !istGewinde && typeof window !== "undefined" && window.confirm(t("status.meshDenseAsk", denseCounts));
@@ -7279,6 +7284,10 @@ export function LayerlingEditor({
         : "This body has no exact faces to delete: layerling keeps it as a mesh, as it does an imported STL, OBJ or 3MF, a split, wrapped or simplified body, or a very detailed shape such as a long text. A part imported as STEP has exact faces.");
     }
     if (triangleCount > CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT) {
+      // A vase hollows itself and has its own lid; the message says where, rather than "edge treatment" (#1153).
+      if (partInputs.some((part) => part.mesh && part.shape.kind === "vase")) {
+        throw new Error(`This vase has ${triangleCount} triangles; hollowing and edge treatment stop at ${CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT}. Choose Hollow with wall under Build, and a lid on the Accessories card.`);
+      }
       throw new Error(`This mesh has ${triangleCount} triangles; interactive edge treatment stops at ${CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT}. For a shape from the catalogue, use its own parameters for now. For an imported part, import it as STEP or with fewer triangles.`);
     }
     const parts: CadModifierMeshPart[] = partInputs.map((part) => {

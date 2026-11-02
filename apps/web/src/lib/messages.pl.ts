@@ -1265,6 +1265,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.meshTooDense": "Ta siatka ma {triangles} trójkątów. Obróbka krawędzi obsługuje {limit}, powyżej tego jądro liczy dłużej, niż warto czekać. Dla kształtu z listy kształtów użyj na razie jego własnych ustawień. Część zaimportowaną najpierw zaimportuj jako STEP albo zapisz z mniejszą liczbą trójkątów.",
   "status.meshDenseAsk": "Ta siatka ma {triangles} trójkątów, więcej niż {limit}, na które jest zbudowana obróbka krawędzi. Powyżej tego może to trwać wiele minut, strona może się zawiesić, a wszystko, czego nie zapisałeś, przepadnie, jeśli trzeba będzie ją zamknąć. Najpierw zapisz projekt.\n\nSpróbować mimo to?",
   "status.threadTooDense": "Gwint jest zbudowany z {triangles} trójkątów, za dużo dla obróbki krawędzi, która kończy się na {limit}. Dodaj więc gwint po obróbce krawędzi: najpierw sfazuj lub zaokrąglij bryłę, potem gwint. Fazka łba we właściwościach łamie krawędź łba śruby bez tego objazdu.",
+  "status.vaseTooDense": "Ten wazon ma {triangles} trójkątów, więcej niż {limit}, z którymi radzą sobie drążenie i obróbka krawędzi. Wazon sam robi się pusty i ma własną pokrywkę: w części Budowa wybierz „Pusty ze ścianką”, a na karcie Akcesoria wybierz pokrywkę.",
   "status.unlockImageDelete": "Odblokuj obraz szkicu klawiszem L przed jego usunięciem",
   "status.unlockImageEdit": "Odblokuj obraz szkicu klawiszem L przed jego edycją",
   "status.updatingRevolve": "Aktualizowanie podglądu obrotu…",

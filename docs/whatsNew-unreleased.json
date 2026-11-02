@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Vase: der Hinweis zeigt den Weg zu Hohl und Deckel",
+      "en": "Vase: the message shows the way to hollow and lid"
+    },
+    "body": {
+      "de": "Eine Vase hat zu viele Dreiecke zum Aushöhlen. Die Absage nennt jetzt den eigenen Weg der Vase: unter Bauart „Hohl mit Wand“ und einen Deckel auf der Karte Zubehör.",
+      "en": "A vase has too many triangles for Hollow. The message now names the vase's own way: “Hollow with wall” under Build, and a lid on the Accessories card."
+    }
+  },
+  {
+    "title": {
       "de": "Teile bündig in eine Fläche versenken (Umschalt)",
       "en": "Sink parts into a face, flush at the top (Shift)"
     },
