@@ -128,6 +128,10 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_add_reference_points` | marks reference points - on the centre, corners or edge middles of objects, or at exact positions - that shapes snap to |
 | `layerling_list_reference_points` | lists the reference points with their ids and positions |
 | `layerling_remove_reference_points` | deletes reference points by id, or all of them |
+| `layerling_list_notes` | reads the user's notes with their text, the body each is pinned to and whether it is a request for the AI |
+| `layerling_add_note` | puts a note on the model, pinned to an object or free on the plate |
+| `layerling_update_note` | changes a note or answers it; an answer closes the request |
+| `layerling_remove_notes` | deletes notes by id |
 | `layerling_inspect_errors` | shows the last message and the last error, plus the messages and errors of the session |
 | `layerling_wrap_around_cylinder` | wraps a body lying flat, an SVG or text for example, around a cylinder, outward or inward as an engraving |
 | `layerling_texture_surface` | lays a surface texture onto a body: grooves, knurling, honeycomb or bumps, for grip or for looks, and changes or removes it later |

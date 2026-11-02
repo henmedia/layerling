@@ -2218,6 +2218,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Genişlikte ve derinlikte 6 yerine 12 birime kadar, 256 mm'den büyük baskı tablaları için. Ayarlarda yazıcın seçiliyse, tablasından büyük bir plaka işaretlenir.",
   "prop.gridfinityFloorHeight": "Zemin yüksekliği",
   "gridfinity.floorHeightHint": "Alt yüzeyden ölçülen bu yüksekliğe kadar kutu doludur: içine şekiller oyabileceğin bir ham parça.",
+  "gridfinity.floorHeightLipHint": "Alt yüzeyden ölçülen bu yüksekliğe kadar kutu doludur: içine şekiller oyabileceğin bir ham parça. {height} mm'ye kadar üstüne hâlâ başka bir kutu istiflenebilir; bunun üstünde istifleme kenarı da doldurulur ve üst yüz düz olur.",
   "prop.gridfinityWallThickness": "Duvar kalınlığı",
   "gridfinity.wallThicknessHint": "Duvar, değişmeyen dış yüzeyden içeri doğru ölçülür. İstifleme kenarıyla 1,75 mm'den kalın bir duvar, yükseklik birimi başına 7 mm'nin 0,85 mm altında bir basamakta biter ve üstüne istiflenen kutunun ayaklarına değmez.",
   "prop.gridfinityOpenBack": "Arkası açık",

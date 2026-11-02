@@ -79,6 +79,7 @@ Une note enregistre ce que la géométrie ne dit pas : "Cette vis est trop serr�
 - Si vous placez le billet **sur un corps**, il voyage avec lui.
 - Si vous le placez **à côté**, il reste sur le plan de travail ({{ui:note.free}}).
 - {{ui:note.detach}} libère une note jointe du corps.
+- {{ui:note.forAi}} fait d'une note une demande pour un agent IA sur le pont MCP (voir « IA avec MCP ») : l'agent la lit avec `layerling_list_notes`, fait le travail et répond dans la même note, sous votre texte. Il peut aussi poser ses propres notes sur le modèle, pour demander ou signaler quelque chose à un endroit.
 - {{ui:editor.tool.group}} emporte une note jointe dans le groupe ; {{ui:editor.tool.ungroup}} la confie à la partie visible située dessous, y compris un groupe imbriqué. Tant qu'un groupe est ouvert avec {{ui:group.edit}}, ses notes suivent la partie située dessous et reviennent au groupe avec {{ui:group.done}} ; annuler les remet telles qu'elles étaient.
 - Si son corps est supprimé, ou si plus aucun corps visible ne se trouve dessous, la note reste là où elle était, sur le plan de travail.
 - Faire glisser l'épingle déplace la note. Un clic sur l'épingle replie la carte, seul le petit numéro reste ; un autre clic la rouvre. Un clic dans le texte permet de le modifier.

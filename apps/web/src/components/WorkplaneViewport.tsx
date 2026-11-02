@@ -8195,6 +8195,7 @@ export function WorkplaneViewport({
               // die Hand zwischendurch nie lange genug stillstand.
               onTextCommit={(id) => onNoteUpdate?.(id, {})}
               onDetach={(id) => onNoteUpdate?.(id, { anchor: undefined })}
+              onForAiChange={(id, forAi) => onNoteUpdate?.(id, { forAi })}
               onRemove={(id) => onNoteRemove?.(id)}
               onEditingIdChange={setEditingNoteId}
               workspace={workspace}

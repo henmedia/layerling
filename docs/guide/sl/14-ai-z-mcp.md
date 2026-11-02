@@ -124,6 +124,10 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_add_reference_points` | postavi referenčne točke - na sredine, vogale ali sredine robov objektov ali na natančna mesta -, na katere se oblike zaskočijo |
 | `layerling_list_reference_points` | našteje referenčne točke z oznako in lego |
 | `layerling_remove_reference_points` | izbriše referenčne točke po oznaki ali vse |
+| `layerling_list_notes` | prebere uporabnikove zapiske z besedilom, telesom, na katero je vsak pripet, in ali je naloga za UI |
+| `layerling_add_note` | postavi zapisek na model, pripet na predmet ali prost na plošči |
+| `layerling_update_note` | spremeni zapisek ali nanj odgovori; odgovor nalogo zaključi |
+| `layerling_remove_notes` | izbriše zapiske po id |
 | `layerling_inspect_errors` | pokaže zadnje sporočilo in zadnjo napako, poleg tega sporočila in napake seje |
 | `layerling_wrap_around_cylinder` | ovije ležeče telo, na primer SVG ali besedilo, okoli valja, navzven ali kot gravuro navznotraj |
 | `layerling_texture_surface` | nanese na telo površinsko teksturo: utore, narebričenje, satovje ali izbokline, za boljši oprijem ali za videz, pozneje pa jo tudi spremeni ali odstrani |

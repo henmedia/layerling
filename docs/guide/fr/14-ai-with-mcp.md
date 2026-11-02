@@ -124,6 +124,10 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_add_reference_points` | marque des points de référence - au centre, dans les coins ou au milieu des bords des objets, ou à des positions exactes - sur lesquels les formes s'accrochent |
 | `layerling_list_reference_points` | répertorie les points de référence avec leurs identifiants et positions |
 | `layerling_remove_reference_points` | supprime les points de référence par identifiant, ou tous |
+| `layerling_list_notes` | lit les notes de l'utilisateur avec leur texte, le corps auquel chacune est fixée et si c'est une demande pour l'IA |
+| `layerling_add_note` | pose une note sur le modèle, fixée à un objet ou libre sur le plateau |
+| `layerling_update_note` | modifie une note ou y répond ; une réponse clôt la demande |
+| `layerling_remove_notes` | supprime des notes par identifiant |
 | `layerling_inspect_errors` | affiche le dernier message et la dernière erreur, ainsi que les messages et erreurs de la session |
 | `layerling_wrap_around_cylinder` | enroule un corps posé à plat, un SVG ou un texte par exemple, autour d'un cylindre, vers l'extérieur ou vers l'intérieur comme une gravure |
 | `layerling_texture_surface` | applique une texture de surface sur un corps : rainures, moletage, nid d'abeille ou picots, pour la prise en main ou pour l'aspect, et la change ou la retire plus tard |

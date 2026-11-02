@@ -79,6 +79,7 @@ Een notitie legt vast wat de geometrie niet zegt: "Deze schroef zit 0,3 mm te kr
 - Plaats je de notitie **op een lichaam**, dan reist ze mee.
 - Plaats je haar **ernaast**, dan blijft ze op het werkvlak ({{ui:note.free}}).
 - {{ui:note.detach}} maakt een vastgemaakte notitie los van het lichaam.
+- {{ui:note.forAi}} maakt van een notitie een verzoek aan een AI-agent op de MCP-brug (zie „AI met MCP”): de agent leest haar met `layerling_list_notes`, doet het werk en antwoordt in dezelfde notitie, onder jouw tekst. Hij kan ook eigen notities op het model zetten, om op een plek iets te vragen of te melden.
 - {{ui:editor.tool.group}} neemt een vastgemaakte notitie mee in de groep; {{ui:editor.tool.ungroup}} geeft haar door aan het zichtbare onderdeel eronder, ook aan een groep daarbinnen. Zolang een groep met {{ui:group.edit}} open is, bewegen de notities van die groep mee met het onderdeel eronder en gaan ze met {{ui:group.done}} terug naar de groep; annuleren zet ze terug zoals ze waren.
 - Wordt haar lichaam verwijderd, of ligt er geen zichtbaar lichaam meer onder, dan blijft de notitie staan waar ze stond, op het werkvlak.
 - Slepen aan de speld verplaatst de notitie. Een klik op de speld klapt de kaart in, alleen het kleine nummer blijft staan; nog een klik klapt hem weer open. Een klik in de tekst bewerkt hem.

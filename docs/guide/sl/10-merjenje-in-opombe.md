@@ -79,6 +79,7 @@ Opomba zabeleži, česar geometrija ne pove: »Tu je vijak 0,3 mm preozek«, »P
 - Če opombo postaviš **na telo**, potuje z njim.
 - Če jo postaviš **zraven**, ostane na delovni ravnini ({{ui:note.free}}).
 - {{ui:note.detach}} prikovano opombo loči od telesa.
+- {{ui:note.forAi}} spremeni zapisek v nalogo za agenta UI na mostu MCP (glej „UI z MCP“): agent ga prebere z `layerling_list_notes`, opravi delo in odgovori v istem zapisku, pod vašim besedilom. Na model lahko postavi tudi svoje zapiske, da na nekem mestu kaj vpraša ali sporoči.
 - {{ui:editor.tool.group}} prikovano opombo vzame v skupino; {{ui:editor.tool.ungroup}} jo preda vidnemu delu pod njo, tudi skupini v njej. Dokler je skupina odprta z {{ui:group.edit}}, se njene opombe premikajo z delom pod njimi in se z {{ui:group.done}} vrnejo k skupini; preklic jih vrne, kakršne so bile.
 - Če je njeno telo izbrisano ali pod njo ni več vidnega telesa, opomba ostane, kjer je stala, na delovni ravnini.
 - Vlečenje bucike premakne opombo. Klik na buciko kartico zloži, ostane le majhna številka; še en klik jo spet odpre. Klik v besedilo ga uredi.
