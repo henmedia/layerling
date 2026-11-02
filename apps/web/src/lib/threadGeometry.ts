@@ -450,9 +450,7 @@ export function normalizeThreadHead(value?: string): ThreadHead {
   return THREAD_HEADS.includes(value as ThreadHead) ? value as ThreadHead : DEFAULT_THREAD_HEAD;
 }
 
-/** The outlines a nut can have (#1131): the head field, which a nut had no use for, says which; the screw heads that are no nut make a hex nut, as every nut was. */
-export const THREAD_NUT_SHAPES: readonly ThreadHead[] = ["hex", "square", "flange", "wing", "knob"];
-
+/** The outline of a nut (#1131): the head field, which a nut had no use for, says which; the screw heads that are no nut make a hex nut, as every nut was. */
 export function threadNutShape(head: ThreadHead): ThreadHead {
   return head === "square" || head === "flange" || head === "wing" || head === "knob" ? head : "hex";
 }

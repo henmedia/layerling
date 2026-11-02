@@ -32,7 +32,8 @@ export function tidiedIfValid(cad: OcctKernel, cut: ShapeHandle, isValid: (cad: 
   try {
     const tidied = cad.unifySameDomain(cad.simplify(cut));
     if (isValid(cad, tidied) || !isValid(cad, cut)) return tidied;
-  } catch {
+  } catch (error) {
+    if (isCadModifierWasmMemoryFault(error instanceof Error ? error.message : String(error ?? ""), error instanceof Error ? error.name : "")) throw error;
     // The tidying itself failed; the cut stands.
   }
   return cut;

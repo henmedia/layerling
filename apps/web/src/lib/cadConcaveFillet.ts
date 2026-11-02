@@ -34,12 +34,16 @@ export function concaveFilletSolid(cad: OcctKernel, solid: ShapeHandle, edges: S
       const matrix = zToDirectionMatrix(dir, start);
       if (!matrix) continue;
       const raw = cad.makeCylinder(radius, length);
-      const placed = cad.transform(raw, matrix);
-      const next = cad.cut(current, placed);
-      cad.release(raw);
-      cad.release(placed);
-      cad.release(current);
-      current = next;
+      let placed: ShapeHandle | null = null;
+      try {
+        placed = cad.transform(raw, matrix);
+        const next = cad.cut(current, placed);
+        cad.release(current);
+        current = next;
+      } finally {
+        cad.release(raw);
+        if (placed !== null) cad.release(placed);
+      }
     }
     return current;
   } catch (error) {

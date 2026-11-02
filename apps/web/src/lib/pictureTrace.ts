@@ -1361,8 +1361,3 @@ export function tracePathData(trace: Pick<PictureTrace, "rings">) {
     return `${parts.join("")}Z`;
   }).join("");
 }
-
-/** A traced picture as an SVG file of the picture's size, the outlines filled even-odd, as a drawing program writes one. */
-export function traceSvg(trace: Pick<PictureTrace, "rings">, picture: Pick<PreparedPicture, "width" | "height">) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${picture.width}" height="${picture.height}" viewBox="0 0 ${picture.width} ${picture.height}"><path fill="#000000" fill-rule="evenodd" d="${tracePathData(trace)}"/></svg>`;
-}

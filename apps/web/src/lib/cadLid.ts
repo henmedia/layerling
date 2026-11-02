@@ -1,4 +1,5 @@
 import { JoinType, type OcctKernel, type ShapeHandle } from "occt-wasm";
+import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import type { LidType } from "@/lib/lidTool";
 
 /*
@@ -162,7 +163,9 @@ export function cadLidSolid(kernel: OcctKernel, body: ShapeHandle, request: CadL
     if (solids.length !== 1 || !cad.isValid(solids[0]) || cad.getVolume(solids[0]) <= 0) return null;
     result = solids[0];
     return result;
-  } catch {
+  } catch (error) {
+    // A kernel that has run out of memory goes up to the worker, which starts it again; anything else leaves the mesh lid.
+    if (error instanceof Error && isCadModifierWasmMemoryFault(error.message, error.name)) throw error;
     return null;
   } finally {
     made.forEach((handle) => {

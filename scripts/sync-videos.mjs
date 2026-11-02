@@ -7,7 +7,7 @@ import { spawnSync } from "node:child_process";
 // chapter of the guide (docs/guide/<language>/16-*.md) carries it with a description per language.
 // Everything else is filled from the chapter, so that no copy falls behind:
 //
-//   npm run videos:sync                  the video lists of README.md, README.de.md and README.nl.md
+//   npm run videos:sync                  the video lists of the READMEs in README_LANGUAGES
 //   npm run videos:sync -- --check       only says whether they are current (exit code 1 if not)
 //   npm run videos:sync -- --discussion  the first post of Discussion #296 on GitHub: shows whether it is current
 //   npm run videos:sync -- --discussion --apply   and writes it (needs `gh`, logged in as the owner)

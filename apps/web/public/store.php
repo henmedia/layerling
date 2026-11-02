@@ -662,27 +662,27 @@ function search_store(string $root, string $term): void
 }
 
 /**
- * Every design in the store with the folder it is in, and the folders with nothing in them: what
- * "Back up all" on the start page's server tab packs. The same bounds as the search; the custom
- * shapes keep their own folder and are shapes, not designs.
+ * Every design in the store with the folder it is in, and the folders with nothing in them. The same bounds as the
+ * search; the custom shapes keep their own folder and are shapes, not designs.
+ *
+ * @return array{designs: list<array{folder: string, entry: string}>, emptyFolders: list<string>, truncated: bool}
  */
-function handle_all_designs(string $root): void
+function store_designs(string $root): array
 {
-    $projects = [];
+    $designs = [];
     $emptyFolders = [];
     $truncated = false;
     $visited = 0;
 
-    $walk = static function (string $folder, int $depth) use (&$walk, $root, &$projects, &$emptyFolders, &$truncated, &$visited): void {
+    $walk = static function (string $folder, int $depth) use (&$walk, $root, &$designs, &$emptyFolders, &$truncated, &$visited): void {
         if ($depth > SEARCH_DEPTH_LIMIT || $visited >= SEARCH_FOLDER_LIMIT) {
             $truncated = true;
             return;
         }
         $visited++;
-        $folderKey = folder_key($root, $folder);
         $entries = array_values(array_filter(scandir($folder) ?: [], static fn(string $entry): bool => $entry[0] !== '.'));
         if ($depth > 0 && $entries === []) {
-            $emptyFolders[] = $folderKey;
+            $emptyFolders[] = folder_key($root, $folder);
         }
         foreach ($entries as $entry) {
             $full = $folder . DIRECTORY_SEPARATOR . $entry;
@@ -693,23 +693,33 @@ function handle_all_designs(string $root): void
                 $walk($full, $depth + 1);
                 continue;
             }
-            if (!preg_match('/\.(lyl|skf)$/i', $entry)) {
-                continue;
+            if (preg_match('/\.(lyl|skf)$/i', $entry)) {
+                $designs[] = ['folder' => $folder, 'entry' => $entry];
             }
-            $stat = regular_file_stat($full);
-            if ($stat === null) {
-                continue;
-            }
-            $hasThumbnail = regular_file_stat(thumbnail_path($folder, $entry, revision_for($stat))) !== null;
-            $projects[] = project_record($entry, $stat, $hasThumbnail, $folderKey);
         }
     };
 
     $walk($root, 0);
+    return ['designs' => $designs, 'emptyFolders' => $emptyFolders, 'truncated' => $truncated];
+}
+
+/** What "Back up all" on the start page's server tab packs: every design with its folder, and the empty folders. */
+function handle_all_designs(string $root): void
+{
+    $store = store_designs($root);
+    $projects = [];
+    foreach ($store['designs'] as ['folder' => $folder, 'entry' => $entry]) {
+        $stat = regular_file_stat($folder . DIRECTORY_SEPARATOR . $entry);
+        if ($stat === null) {
+            continue;
+        }
+        $hasThumbnail = regular_file_stat(thumbnail_path($folder, $entry, revision_for($stat))) !== null;
+        $projects[] = project_record($entry, $stat, $hasThumbnail, folder_key($root, $folder));
+    }
     send_json([
         'enabled'      => true,
-        'truncated'    => $truncated,
-        'emptyFolders' => $emptyFolders,
+        'truncated'    => $store['truncated'],
+        'emptyFolders' => $store['emptyFolders'],
         'projects'     => $projects,
     ]);
 }
@@ -743,6 +753,8 @@ function handle_list(string $root, string $folder): void
     send_json([
         'enabled'  => true,
         'path'     => folder_key($root, $folder),
+        // Every design in the store, not only this folder's: the number on the start page's tab.
+        'total'    => count(store_designs($root)['designs']),
         'folders'  => array_values($folders),
         'projects' => array_values($projects),
     ]);

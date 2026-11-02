@@ -1,3 +1,4 @@
+import { CONCAVE_FILLET_STRAIGHT_MESSAGE } from "@/lib/cadConcaveFillet";
 import { t } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import type { CadModifierDeflection, CadModifierEdge, CadModifierQuality } from "@/lib/cadModifierTypes";
@@ -358,6 +359,9 @@ export function cadModifierUserErrorMessage(rawError: string | null | undefined)
   }
   if (rawError.includes(VARIABLE_FILLET_ONE_EDGE_MESSAGE)) {
     return t("edge.variableOneEdge");
+  }
+  if (rawError.includes(CONCAVE_FILLET_STRAIGHT_MESSAGE)) {
+    return t("edge.concaveStraightOnly");
   }
   if (
     rawError.includes("The CAD worker could not start") ||

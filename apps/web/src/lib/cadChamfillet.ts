@@ -1,4 +1,5 @@
 import type { OcctKernel, ShapeHandle, Vec3 } from "occt-wasm";
+import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { orientedFaceNormal } from "@/lib/cadShell";
 
 // Printable bottom-edge treatment ("chamfillet") for the CAD modifier worker:
@@ -317,7 +318,9 @@ export function chamfilletSolid(
           return result;
         }
         cad.release(result);
-      } catch {
+      } catch (error) {
+        // A kernel that has run out of memory is no case for a smaller radius; the worker restarts it.
+        if (error instanceof Error && isCadModifierWasmMemoryFault(error.message, error.name)) throw error;
         // Try a slightly smaller blend radius when adjacent geometry is tight.
       }
     }

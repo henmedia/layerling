@@ -31,6 +31,7 @@ const MORE = [
   ["welcome.moreHolePatternTitle", "welcome.moreHolePatternBody"],
   ["welcome.moreFaceTitle", "welcome.moreFaceBody"],
   ["welcome.moreOffsetTitle", "welcome.moreOffsetBody"],
+  ["welcome.moreClearanceTitle", "welcome.moreClearanceBody"],
   ["welcome.moreTextureTitle", "welcome.moreTextureBody"],
   ["welcome.moreVaseTitle", "welcome.moreVaseBody"],
   ["welcome.moreBundleTitle", "welcome.moreBundleBody"],

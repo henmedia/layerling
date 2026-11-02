@@ -55,7 +55,7 @@ export function CookieCutterPanel({
           <span>{t("cookieCutter.subtitle")}</span>
         </div>
         <div className="panel-header-actions">
-          <GuideHelpLink chapter="solids" />
+          <GuideHelpLink chapter="solids" section="intersection" />
           <button type="button" aria-label={t("cookieCutter.cancel")} onClick={onCancel}><X size={20} /></button>
         </div>
       </div>

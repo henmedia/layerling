@@ -122,7 +122,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "welcome.switchImport": "Anche i tuoi design di Tinkercad possono venire con te: uno strumento gratuito della community, non parte di layerling e non ancora provato da noi, li converte in file layerling.",
   "welcome.switchImportLink": "Export to layerling",
   "welcome.gapTitle": "Cosa offre in più layerling",
-  "welcome.gap1": "Smussa e arrotonda gli spigoli, con la possibilità di annullare o modificare l'operazione in qualsiasi momento, mantenendo una geometria CAD precisa fino al file STEP.",
+  "welcome.gap1": "Smussa e arrotonda gli spigoli, con la possibilità di annullare o modificare l'operazione in qualsiasi momento, mantenendo una geometria CAD precisa fino al file STEP. Il raccordo concavo invece scava uno spigolo diritto.",
   "welcome.gap2": "Svuota i solidi mantenendo uno spessore uniforme delle pareti e dividili con un piano, anche inclinato.",
   "welcome.gap3": "Crea schizzi con misure precise e angoli arrotondati e trasformali in solidi tramite estrusione o rivoluzione attorno a un asse.",
   "welcome.gap4": "Crea filettature: viti, dadi, barre filettate e fori maschiati, con standard metrici, UNC/UNF e Whitworth.",
@@ -164,7 +164,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "welcome.moreSnapTitle": "Aggancio ad altre forme",
   "welcome.moreWindowsTitle": "Una visuale più chiara",
   "welcome.moreWindowsBody": "Puoi spostare liberamente sul piano di lavoro l'elenco degli oggetti, le impostazioni e le finestre degli strumenti. Per cambiare prospettiva, usa il cubo di visualizzazione: facendo clic sui suoi angoli o spigoli puoi selezionare una vista inclinata. Puoi anche nascondere il piano di lavoro per osservare il modello dal basso. Con un clic destro su un solido apri il menu dei comandi più utilizzati. Infine, puoi salvare la vista corrente come immagine.",
-  "welcome.moreSnapBody": "Durante lo spostamento, gli spigoli e i centri si agganciano alle forme vicine e una linea guida indica la posizione. Tieni premuto Alt durante il trascinamento per sospendere l'aggancio. Shift mantiene lo spostamento su un solo asse, mentre tenendo premuto Alt dall'inizio trascini una copia, come in Tinkercad. Le nuove forme si appoggiano alla faccia sotto il puntatore, anche se inclinata. Con C puoi appoggiare allo stesso modo la selezione su un'altra faccia, come la funzione Cruise di Tinkercad.",
+  "welcome.moreSnapBody": "Durante lo spostamento, gli spigoli e i centri si agganciano alle forme vicine e una linea guida indica la posizione. Tieni premuto Alt durante il trascinamento per sospendere l'aggancio. Shift mantiene lo spostamento su un solo asse, mentre tenendo premuto Alt dall'inizio trascini una copia, come in Tinkercad. Le nuove forme si appoggiano alla faccia sotto il puntatore, anche se inclinata. Con C puoi appoggiare allo stesso modo la selezione su un'altra faccia, come la funzione Cruise di Tinkercad. Con Maiusc invece affonda, con la parte superiore a filo della faccia.",
   "welcome.moreGridTitle": "Griglie di aggancio personalizzate",
   "welcome.moreGridBody": "Aggiungi nelle impostazioni una misura personalizzata, ad esempio il passo di 2,54 mm dei pin dei circuiti integrati e delle basette millefori. Nel menu di aggancio troverai la misura intera, dimezzata e divisa per quattro.",
   "welcome.moreLayFlatTitle": "Appoggia una faccia sul piano",
@@ -499,7 +499,6 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.shadeSoft": "morbido",
   "workspace.shadePunchy": "marcato",
 
-  "editor.group.home": "Home",
   "editor.group.clipboard": "Appunti",
   "editor.group.history": "Cronologia",
   "editor.group.foldedHint": "{group}: fai clic per mostrare gli strumenti",
@@ -2490,7 +2489,6 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "area.ribbon": "Barra degli strumenti",
   "area.objectList": "Elenco degli oggetti",
   "area.statusMessage": "Messaggio di stato",
-  "area.toolWindow": "Finestra dello strumento",
   "camera.show": "Mostra la barra della vista",
   "camera.hide": "Nascondi la barra della vista",
   "camera.showShort": "Mostra controlli",
@@ -2780,7 +2778,6 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "sketch.select": "Seleziona",
   "sketch.addImage": "Aggiungi immagine",
   "sketch.addImageReady": "Aggiungi immagine",
-  "sketch.addImageBlocked": "Seleziona lo strumento Seleziona per aggiungere un'immagine",
   "sketch.refine": "Aggiungi o rimuovi punti",
   "sketch.erase": "Cancella",
   "sketch.undo": "Annulla nello schizzo",
@@ -3349,5 +3346,6 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "edge.swapEnds": "Scambia le estremità",
   "edge.swapEndsHint": "Sposta il raggio maggiore all’altra estremità dello spigolo.",
   "edge.variableOneEdge": "Il raggio variabile si applica a un solo spigolo alla volta. Seleziona un solo spigolo.",
+  "edge.concaveStraightOnly": "Il raccordo concavo si applica solo a spigoli diritti. Seleziona solo spigoli diritti.",
 
 };

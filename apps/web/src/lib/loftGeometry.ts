@@ -246,11 +246,6 @@ export function loftIsTurned(measures: Pick<LoftMeasures, "twist" | "tiltX" | "t
   return Math.abs(measures.twist) > 1e-9 || Math.abs(measures.tiltX) > 1e-9 || Math.abs(measures.tiltZ) > 1e-9;
 }
 
-/** Whether a transition goes through more than its two ends (#1034). */
-export function loftHasMiddles(measures: Pick<LoftMeasures, "middles">) {
-  return measures.middles.length > 0;
-}
-
 /** The stored values of a shape, as set (before the frame stretches them). */
 export function loftStoredMeasures(shape: LoftShapeFields): LoftMeasures {
   return normalizeLoftMeasures({

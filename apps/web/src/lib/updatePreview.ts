@@ -2,7 +2,7 @@ import { SOURCE_CODE_URL } from "@/lib/appUpdate";
 import { parseWhatsNewEntries, whatsNewSince, type WhatsNewEntry } from "@/lib/whatsNew";
 
 /** Where the highlights of a release live in the repository. */
-export const WHATS_NEW_FILE_PATH = "apps/web/src/lib/whatsNew.json";
+const WHATS_NEW_FILE_PATH = "apps/web/src/lib/whatsNew.json";
 
 /**
  * The address of whatsNew.json in the version of one release, read straight from
