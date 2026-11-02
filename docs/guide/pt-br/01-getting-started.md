@@ -98,11 +98,11 @@ Por exemplo, vamos montar um cubo com um furo.
 4. Selecione o cilindro e clique em {{ui:inspector.hole}} no painel de propriedades. Ele fica transparente: o sólido virou uma ferramenta que tira material.
 5. Selecione as duas formas e clique em {{ui:editor.tool.group}}. Agora o cubo tem um furo.
 
-![O cilindro é um orifício e sai pelo topo do cubo.](shot:hole-before)
+![O cilindro é um buraco e sai pelo topo do cubo.](shot:hole-before)
 
 ![Depois do agrupamento, o cubo tem um furo.](shot:hole-after)
 
-É assim que se fazem furos, rasgos e cavidades. O capítulo [Sólidos e orifícios](chapter:solids-and-holes) explica isso em detalhes.
+É assim que se fazem furos, rasgos e cavidades. O capítulo [Sólidos e buracos](chapter:solids-and-holes) explica isso em detalhes.
 
 ## Novidades desde a sua última visita
 
@@ -114,4 +114,4 @@ Numa cópia do layerling no seu próprio computador ou servidor, o aviso "Atuali
 
 Quando a peça estiver pronta, clique em {{ui:editor.export}}, escolha STL ou 3MF e baixe o arquivo. Abra-o no seu fatiador, por exemplo Bambu Studio, PrusaSlicer, OrcaSlicer ou Cura. Se você escolher sua impressora nas configurações, dá para ver enquanto modela se a peça cabe na mesa de impressão. Mais em [Impressão](chapter:printing).
 
-> **Dica:** Se você vem do Tinkercad, vai se achar rapidinho: a mesa, as formas, sólido e orifício, agrupar, alinhar e espelhar funcionam quase igual. As novidades são principalmente chanfro e arredondamento, vazar, roscas e esboços. Seus próprios projetos do Tinkercad também podem vir junto, veja [Arquivos e salvamento](chapter:files-and-saving).
+> **Dica:** Se você vem do Tinkercad, vai se achar rapidinho: a mesa, as formas, sólido e buraco, agrupar, alinhar e espelhar funcionam quase igual. As novidades são principalmente chanfro e arredondamento, vazar, roscas e esboços. Seus próprios projetos do Tinkercad também podem vir junto, veja [Arquivos e salvamento](chapter:files-and-saving).

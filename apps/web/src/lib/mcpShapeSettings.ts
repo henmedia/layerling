@@ -1,6 +1,6 @@
 import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
-import { GRIDFINITY_PADDING_KEYS, gridfinityPaddingPatch, gridfinityShapePatch, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_PADDING_KEYS, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
 import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings } from "@/lib/threadGeometry";
 
 /**
@@ -39,7 +39,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate",
   "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCorner", "gridfinityLabelCornerSize",
   "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
-  "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize",
+  "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize", "gridfinityOutline",
   "knurlPattern", "knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer",
   "dovetailNeckWidth", "dovetailClearance",
   "loftBottomOutline", "loftTopOutline", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments", "loftSections", "loftThrough", "slotEndRatio", "torusTubeRatio",
@@ -96,7 +96,7 @@ export function mcpThreadSizeName(shape: Pick<WorkplaneShape, "kind" | "threadDi
   return threadSizeFor(settings.diameter, settings.pitch)?.id;
 }
 
-export const MCP_GRIDFINITY_LIST_KEYS = ["gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings"] as const;
+export const MCP_GRIDFINITY_LIST_KEYS = ["gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOutline"] as const;
 
 /**
  * What an update writes for a Gridfinity part given a padding, or changing type
@@ -110,6 +110,8 @@ export function mcpGridfinityPaddingPatch(target: WorkplaneShape, patch: Partial
   const number = (value: unknown) => typeof value === "number" && Number.isFinite(value);
   const given = (Object.keys(GRIDFINITY_PADDING_KEYS) as GridfinityWall[]).filter((wall) => number(params[GRIDFINITY_PADDING_KEYS[wall]]));
   const type = normalizeGridfinityType(patch.gridfinityType ?? target.gridfinityType);
+  // Padding does not apply to a plate fitted into an outline (#1061), as its panel shows no padding.
+  if (type === "baseplate" && normalizeGridfinityOutline(target.gridfinityOutline)) return {};
   const retype = type !== normalizeGridfinityType(target.gridfinityType) && (given.length > 0 || Object.values(GRIDFINITY_PADDING_KEYS).some((key) => target[key] !== undefined));
   if (!given.length && !retype) return {};
   const retyped = retype ? gridfinityShapePatch(target, { type }) : undefined;
@@ -122,7 +124,33 @@ export function mcpGridfinityPaddingPatch(target: WorkplaneShape, patch: Partial
 }
 
 /**
- * A Gridfinity bin's lists as lists, also when they come as the text layerling_read_scene gives them, read as
+ * What a create or update writes for a baseplate given an outline (#1061), its points in the plate's own frame as
+ * points or as the text layerling_read_scene gives: the outline centred, its box, and the plate moved to its middle;
+ * an empty list takes the outline away, and so does a change of type, as in the editor. Refused for anything but a
+ * baseplate, for points that enclose no one area or more points than a plate keeps, for an outline larger than one
+ * plate takes or smaller than one can be, and for the Large plate switch turned off while the outline needs it.
+ */
+export function mcpGridfinityOutlinePatch(shape: WorkplaneShape, params: Record<string, unknown>): Partial<WorkplaneShape> {
+  // As in the editor, the Large plate switch stays on while the outline is wider than a plate without it.
+  if (params.gridfinityLargePlate === false && params.gridfinityOutline === undefined && gridfinityOutlineNeedsLargePlate(shape)) {
+    throw new Error(`gridfinityLargePlate can be switched off once the outline is at most ${gridfinityOutlineLimit({ ...shape, gridfinityLargePlate: false })} mm across and deep`);
+  }
+  if (params.gridfinityOutline === undefined) return shape.gridfinityOutline && normalizeGridfinityType(shape.gridfinityType) !== "baseplate" ? { gridfinityOutline: undefined } : {};
+  if (shape.kind !== "gridfinity" || normalizeGridfinityType(shape.gridfinityType) !== "baseplate") throw new Error("gridfinityOutline is for a Gridfinity baseplate (gridfinityType \"baseplate\")");
+  const points = mcpGridfinityListParams(params).gridfinityOutline;
+  if (Array.isArray(points) && points.length === 0) return gridfinityOutlineRemovalPatch(shape);
+  const fit = gridfinityOutlineFit(shape, Array.isArray(points) ? points : []);
+  if (fit.error) {
+    if (fit.error === "points") throw new Error("gridfinityOutline needs at least three points { x, z } in mm that enclose one area, its sides not crossing");
+    if (fit.error === "size") throw new Error(`gridfinityOutline is larger than one baseplate takes: at most ${fit.limit} mm across and deep${fit.large ? `, or ${fit.large} mm with gridfinityLargePlate` : ""}`);
+    throw new Error(fit.error === "small" ? `gridfinityOutline is smaller than a baseplate can be: at least ${fit.limit} mm across and deep` : `gridfinityOutline has too many points: at most ${fit.limit}`);
+  }
+  const place = gridfinityPlateToWorld(fit.centre, shape);
+  return { ...fit.patch, x: place.x, z: place.z };
+}
+
+/**
+ * A Gridfinity bin's or baseplate's lists as lists, also when they come as the text layerling_read_scene gives them, read as
  * mcpBentTubeSegments in LayerlingEditor reads a bent tube's segments; text that is no list is unset, and the counts
  * are numbers and stay as they are.
  */

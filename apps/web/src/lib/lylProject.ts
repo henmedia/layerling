@@ -27,10 +27,12 @@ import { normalizeDesignView, normalizeSavedViews, readDesignView, readSavedView
 import { normalizeSavedCornerRulers, readCornerRulers, type SavedCornerRuler } from "@/lib/cornerRulerStore";
 import { normalizeSavedTape, readTape, type SavedTape } from "@/lib/tapeStore";
 import { isSketchKeyring } from "@/lib/sketchKeyring";
+import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
 import { isReferenceImageOpacity } from "@/lib/referenceImage";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { PORT_PROFILES } from "@/lib/portGeometry";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
+import { MAX_GRIDFINITY_OUTLINE_POINTS } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
 import { normalizeSnapGrid, normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 import type { CadDisplayEdge, GridSize, ProjectAsset, ProjectAssetSourceFormat, ProjectAttachment, SketchOperation, SketchRevolveSettings, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -1748,6 +1750,17 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
         }
         if (entry.align !== undefined && entry.align !== "start" && entry.align !== "middle" && entry.align !== "end") throw new Error(`${entryLabel}.align is invalid`);
       });
+    }
+    if (definition.gridfinityOutline !== undefined) {
+      if (!Array.isArray(definition.gridfinityOutline)) throw new Error(`${label}.gridfinityOutline must be an array`);
+      const outline = definition.gridfinityOutline as unknown[];
+      if (outline.length > MAX_GRIDFINITY_OUTLINE_POINTS) throw new Error(`${label}.gridfinityOutline has too many points`);
+      const points = outline.map((raw, index) => {
+        const entryLabel = `${label}.gridfinityOutline[${index}]`;
+        const entry = objectRecord(raw, entryLabel);
+        return { x: finiteNumber(entry.x, `${entryLabel}.x`), y: finiteNumber(entry.z, `${entryLabel}.z`) };
+      });
+      if (findSketchOutlineIntersection([points])) throw new Error(`${label}.gridfinityOutline crosses itself`);
     }
   }
   if (kind === "hinge") {
