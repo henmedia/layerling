@@ -21,7 +21,7 @@ import { buildHoneycombHoles, normalizeHoneycombCellSize, normalizeHoneycombFram
 import { dovetailOutlineForShape } from "@/lib/dovetailGeometry";
 import { loftProfileLoops } from "@/lib/loftGeometry";
 import { teardropExactSection } from "@/lib/teardropGeometry";
-import { normalizePortCorner, portChamfer } from "@/lib/portGeometry";
+import { isPolygonPortProfile, normalizePortCorner, portChamfer, portPolygonCorners } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile } from "@/lib/screwHoleGeometry";
 import { finishingWasherMeasures } from "@/lib/finishingWasherGeometry";
@@ -974,6 +974,18 @@ function roundedRectLoop(width: number, depth: number, radius: number): CadModif
 }
 
 /**
+ * A port opening drawn as a rounded polygon (XT60, XT30, MT60, D-Sub): each corner one arc of the
+ * corner radius around its point, the sides straight between them (portContourPoints).
+ */
+function portPolygonLoop(profile: unknown, width: number, height: number, corner: number): CadModifierProfileLoop {
+  return loopFromCorners(portPolygonCorners(profile, width, height, corner).map((point): Corner => {
+    if (corner <= 1e-4) return { start: { x: point.x, z: point.y }, end: { x: point.x, z: point.y } };
+    const arc: Arc = { cx: point.x, cz: point.y, rx: corner, rz: corner, start: point.start, end: point.end };
+    return { start: profileArcPoint(arc, arc.start), end: profileArcPoint(arc, arc.end), arc };
+  }));
+}
+
+/**
  * The port opening's outline in its front view, standing on z = 0. Fully round
  * ends (a USB-C socket) are one half circle each, not two quarters, so each end
  * is one face; a round opening is one circle.
@@ -1059,6 +1071,7 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     case "port": {
       // A rounded rectangle in the front view (createPortGeometry), lifted to stand on z = 0 and pushed along the depth like the teardrop.
       const corner = normalizePortCorner(shape.cornerFillet, width, shape.height, shape.portProfile);
+      if (isPolygonPortProfile(shape.portProfile)) return { loops: [portPolygonLoop(shape.portProfile, width, shape.height, corner)], frame: alongDepthFrame(depth) };
       return { loops: [portProfileLoop(width, shape.height, corner, portChamfer(shape.portProfile, width, shape.height))], frame: alongDepthFrame(depth) };
     }
     case "wedge": {
