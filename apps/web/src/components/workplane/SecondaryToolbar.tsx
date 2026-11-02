@@ -644,12 +644,23 @@ export function SecondaryToolbar({
     }
   };
   useToolbarCollapse(toolbarContentRef, !simpleMode && !ribbonPinned);
-  /** The one button a folded group shows under its name, with the icon of the tool it is known by; its hint says it opens. */
-  const collapseBox = (label: string, Icon: ComponentType) => (
+  /**
+   * The one button a folded group shows under its name, with the icon of the tool it is known by; its hint says it opens.
+   * Given that tool, the button is the tool itself - History's Undo undoes, as its icon says (#1148) - and only the tab
+   * under it opens the group.
+   */
+  const collapseBox = (label: string, Icon: ComponentType, tool?: ToolbarTool) => (
     <div className="toolbar-section-tools toolbar-collapse-box">
-      <button className="toolbar-icon toolbar-collapse-trigger" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger>
-        <Icon />
-      </button>
+      {tool ? (
+        <>
+          {toolButton(tool, true)}
+          <button className="toolbar-collapse-trigger toolbar-collapse-tab" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger />
+        </>
+      ) : (
+        <button className="toolbar-icon toolbar-collapse-trigger" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger>
+          <Icon />
+        </button>
+      )}
     </div>
   );
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -834,7 +845,11 @@ export function SecondaryToolbar({
     { id: "sketch-duplicate", label: t("editor.tool.duplicate"), icon: ToolbarDuplicateIcon, action: onSketchDuplicate, enabled: sketchHasSelection, hint: sketchHasSelection ? null : t("editor.needs.sketchSelection") },
     { id: "sketch-delete", label: t("editor.tool.delete"), icon: ToolbarTrashIcon, action: onSketchDelete, enabled: sketchHasSelection, hint: sketchHasSelection ? null : t("editor.needs.sketchSelection") },
   ];
-  const renderToolButton = (tool: (typeof leftTools)[number] | (typeof visibilityTools)[number] | (typeof combineTools)[number] | (typeof modifyTools)[number] | (typeof arrangeTools)[number]) => {
+  type ToolbarTool = (typeof leftTools)[number] | (typeof visibilityTools)[number] | (typeof combineTools)[number] | (typeof modifyTools)[number] | (typeof arrangeTools)[number]
+    | Pick<(typeof leftTools)[number], "id" | "label" | "icon" | "action" | "enabled">;
+  const renderToolButton = (tool: ToolbarTool) => toolButton(tool, false);
+  /** `inFold`: the copy on a folded group's button, which leaves the tool's name for MCP and tests to the one in the group. */
+  function toolButton(tool: ToolbarTool, inFold: boolean) {
     const { id, icon: Icon, action, label } = tool;
     // Im Verlaufsblick schlaeft jedes Werkzeug ausser dem, das ihn beendet -
     // wirklich, nicht nur im Aussehen: eine Auswahl aus der Zeit davor darf
@@ -851,7 +866,8 @@ export function SecondaryToolbar({
       <button
         className={`toolbar-icon ${enabled ? "" : "disabled"} ${active ? "active" : ""}`}
         key={id}
-        data-layerling-tool={id}
+        data-layerling-tool={inFold ? undefined : id}
+        data-collapse-action={inFold ? true : undefined}
         aria-label={label}
         title={`${hint ? `${label}: ${hint}` : label}${COMMAND_SHORTCUTS[id] ? ` (${COMMAND_SHORTCUTS[id]})` : ""}`}
         onPointerEnter={onHover}
@@ -862,7 +878,7 @@ export function SecondaryToolbar({
         <Icon />
       </button>
     );
-  };
+  }
 
   // Everything the toolbar and its menus can do, as entries of the command
   // search. Built from the same lists as the buttons, so a new tool shows up in
@@ -1012,7 +1028,7 @@ export function SecondaryToolbar({
         </div>
         <div className="toolbar-section" data-group="history" data-collapse="3">
           <div className="toolbar-section-label">{t("editor.group.history")}</div>
-          {collapseBox(t("editor.group.history"), ToolbarUndoIcon)}
+          {collapseBox(t("editor.group.history"), ToolbarUndoIcon, leftTools.find((tool) => tool.id === "undo"))}
           <div className="toolbar-section-tools">{inSimpleMode(leftTools.slice(4)).map(renderToolButton)}</div>
         </div>
         <div className="toolbar-section toolbar-shapes-section" data-group="shapes" ref={shapesMenuRef} inert={historyViewActive}>
@@ -1423,7 +1439,7 @@ export function SecondaryToolbar({
                 </div>
                 <div className="toolbar-section sketch-history-section" data-group="history" data-collapse="2">
                   <div className="toolbar-section-label">{t("editor.group.history")}</div>
-                  {collapseBox(t("editor.group.history"), ToolbarUndoIcon)}
+                  {collapseBox(t("editor.group.history"), ToolbarUndoIcon, { id: "sketch-undo", label: t("sketch.undo"), icon: ToolbarUndoIcon, action: onSketchUndo, enabled: sketchCanUndo })}
                   <div className="toolbar-section-tools">
                     <button className={`toolbar-icon ${sketchCanUndo ? "" : "disabled"}`} type="button" aria-label={t("sketch.undo")} title={`${t("status.undo")} (${COMMAND_SHORTCUTS["sketch-undo"]})`} onClick={onSketchUndo} disabled={!sketchCanUndo}>
                       <ToolbarUndoIcon />

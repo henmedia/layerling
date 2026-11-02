@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Folded History undoes with one click (#1148):** When the window is too narrow, History folds into one button that shows the Undo icon, but a click on it only opened the group, and resting the mouse on it had already opened it, so the click closed it again and nothing seemed to happen. The folded button is now Undo itself (greyed out when there is nothing to undo, in the sketch too), and the tab with the arrow under it is a button of its own that opens Redo and the history; resting on Undo no longer opens the group. In every folded group, a click right after the resting pointer opened it keeps it open, and the next one closes it. Guide chapter 1 (en, de). Reported by @relegante.
 - **An open sketch survives a reload (Discussion #1146):** The design saves its bodies, but a sketch that is not finished is no body yet, so a reload - after an update, for one - took the picture traced over and the line drawn. The open sketch is now kept in this browser while it is drawn (`sketchDraftStore.ts`, in a database of its own, as a picture can be large), written at once when the window is left or the update reloads it, and opened again with the design; finishing or cancelling the sketch removes it. The sketch of an existing body comes back once the body is there. Unit test in `sketchDraftStore.test.ts`. Reported by @gquiring.
 ## 1.131.1
 

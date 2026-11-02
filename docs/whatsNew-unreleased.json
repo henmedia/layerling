@@ -8,5 +8,15 @@
       "de": "Wer mitten in einer Skizze war, etwa mit einem eingefügten Bild und einer nachgezeichneten Linie, verlor sie beim Neuladen, auch nach einem Update. Die offene Skizze wird jetzt in diesem Browser mitgespeichert und ist danach wieder da.",
       "en": "If you were in the middle of a sketch, with a picture inserted and a line traced over it, a reload took it, an update included. The open sketch is now kept in this browser as you draw and is there again afterwards."
     }
+  },
+  {
+    "title": {
+      "de": "Rückgängig mit einem Klick, auch eingeklappt",
+      "en": "Undo in one click, folded too"
+    },
+    "body": {
+      "de": "Ist das Fenster schmal, klappt der Verlauf zu einem Knopf mit dem Rückgängig-Symbol zusammen. Ein Klick darauf nimmt jetzt den letzten Schritt zurück; der kleine Pfeil darunter öffnet Wiederherstellen und den Verlauf.",
+      "en": "In a narrow window, History folds into one button with the Undo icon. A click on it now takes back your last step; the small arrow under it opens Redo and the history."
+    }
   }
 ]

@@ -4270,6 +4270,33 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   transform: translateX(-50%) scaleY(-1);
 }
 
+/* History's folded button is Undo itself (#1148): the tab is then a button of its own under it, a little larger than it
+   looks so it is easy to hit, and only it opens the group. */
+.toolbar-collapse-box:has(.toolbar-collapse-tab) {
+  position: relative;
+}
+
+/* It stays above the opened tools, whose frame it touches, so a second click on it closes them; it ends above the first
+   tool's top edge. */
+.toolbar-section[data-collapsed] .toolbar-collapse-tab {
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  z-index: 71;
+  width: 30px;
+  height: 13px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transform: translateX(-50%);
+}
+
+.toolbar-section[data-collapsed] .toolbar-collapse-tab::before {
+  top: 1px;
+  bottom: auto;
+}
+
 /* What the tools would show at a glance - something hidden, files attached - shows on the folded button as a dot. */
 .toolbar-section[data-collapsed]:has(.visibility-hidden-badge, .attachments-indicator) .toolbar-collapse-trigger::after {
   position: absolute;
