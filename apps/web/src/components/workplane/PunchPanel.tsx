@@ -65,7 +65,7 @@ export function PunchPanel({
         <span>{t("punch.help")}</span>
       </div>
 
-      <div className="edge-modifier-field">
+      <div className="edge-modifier-field tool-roles">
         <span>{t("punch.punch")}: <strong>{punchName}</strong></span>
         <span>{t("punch.target")}: <strong>{targetName}</strong></span>
         <button type="button" className="secondary" disabled={busy} onClick={onSwap}>
@@ -75,7 +75,7 @@ export function PunchPanel({
 
       <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("punch.axis")}>
         <span>{t("punch.axis")}</span>
-        <div className="shell-opening-options">
+        <div className="shell-opening-options punch-axis-options">
           {PUNCH_AXES.map((option) => (
             <button
               key={option}
