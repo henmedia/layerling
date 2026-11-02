@@ -64,8 +64,9 @@ export function zoomSketchViewAt(
   offset: { x: number; y: number },
   pixelsPerUnit: number,
   bounds: { width: number; depth: number },
+  minZoom = SKETCH_MIN_ZOOM,
 ): SketchView {
-  const zoom = Math.min(SKETCH_MANUAL_MAX_ZOOM, Math.max(SKETCH_MIN_ZOOM, view.zoom * factor));
+  const zoom = Math.min(SKETCH_MANUAL_MAX_ZOOM, Math.max(minZoom, view.zoom * factor));
   if (!(pixelsPerUnit > 0) || zoom === view.zoom) return { zoom, pan: view.pan };
   const shift = 1 / view.zoom - 1 / zoom;
   return {

@@ -8,5 +8,15 @@
       "de": "Unter Kombinieren gibt es jetzt Stanzen: Wähle zuerst einen Körper als Stempel, dann den Körper, der die Öffnung bekommt. Der Umriss des Stempels geht entlang X, Y oder Z gerade hindurch, auch wenn der Stempel nur davor steht. Der Stempel bleibt, sodass du ihn verschieben oder drehen und gleich noch einmal stanzen kannst.",
       "en": "Combine now has Punch: pick a body as the punch first, then the body that gets the opening. The punch's outline goes straight through along X, Y or Z, even when the punch only stands in front of it. The punch stays, so you can move or turn it and punch again right away."
     }
+  },
+  {
+    "title": {
+      "de": "Die Skizzenfläche wächst mit",
+      "en": "The sketch plate grows with the sketch"
+    },
+    "body": {
+      "de": "Ein Drehprofil lässt sich jetzt über den Rand der Fläche hinausschieben, für einen größeren Radius, ohne die Arbeitsebene in den Einstellungen zu vergrößern. Das Raster wächst mit, Punkte dort draußen lassen sich wieder auswählen, und die Minus-Taste zoomt heraus, bis alles zu sehen ist.",
+      "en": "A revolve profile can now go past the edge of the plate, for a bigger radius, without making the workplane bigger in the settings. The grid grows with it, points out there can be picked again, and the minus button zooms out until all of it fits."
+    }
   }
 ]
