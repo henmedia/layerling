@@ -19,6 +19,7 @@ import { pivotKeptAhead, ZOOM_PIVOT_REACH_MM } from "@/lib/zoomPivot";
 import { RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { RENDER_LAYER_HELPERS, type ShapeRenderRecord, type ThreeState, setObjectRenderLayer, freezeStaticObjectMatrices, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
 import { RENDER_LAYER_MODIFIERS, RENDER_LAYER_PREVIEWS, clamp, WORKPLANE_LABEL_FONT_STACK } from "./viewportShapeObjects";
+import { CAMERA_DAMPING_PER_60HZ_FRAME } from "@/lib/cameraInertia";
 
 export const WORKPLANE_WIDTH = 200;
 export const WORKPLANE_DEPTH = 140;
@@ -91,7 +92,7 @@ export function createThreeScene(host: HTMLDivElement): ThreeState {
   camera.layers.enable(RENDER_LAYER_PREVIEWS);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
+  controls.dampingFactor = CAMERA_DAMPING_PER_60HZ_FRAME;
   controls.rotateSpeed = 0.58;
   controls.zoomSpeed = orbitControlsZoomSpeed(DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed);
   controls.panSpeed = 0.65;

@@ -70,7 +70,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_hull_objects` | ovije objekte v eno izbočeno telo, kot bi jih skrčili v folijo (ovojnica) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | razstavi obliko z ločenimi deli, telo iz skice na eno telo za vsak obris |
 | `layerling_split_objects` | razdeli telesa ali luknje z ravnino na dva dela |
@@ -86,10 +86,12 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_layer_text` | iz besedila naredi sklad plasti za večbarvni tisk (črke, širši robovi, plošča brez lukenj) ali sklad zgradi znova, z luknjo za obesek za ključe, vogali za vsako plast in zaobljenim ali poševno odrezanim robom črk; s seznamom imen en napis na ime |
 | `layerling_layer_icon` | iz simbola SVG (besedilo datoteke ali iztisnjeno telo skice) naredi simbolno oznako v plasteh za večbarvni tisk – simbol, širši robovi, plošča brez lukenj – ali jo zgradi znova z novo širino ali plastmi; s številom napolni ploščo s kopijami |
 | `layerling_create_qr_code` | iz besedila ali spletnega naslova naredi kodo QR kot {{ui:shape.qrCode}} v knjižnici oblik – samo kodo, dvignjeno na plošči ali vgravirano, s popravkom napak, širino, višino, tihim območjem in po želji kot luknjo; opozori, ko je modul manjši od 0,8 mm |
+| `layerling_create_sbc_board` | postavi ploščo SBC v pravi velikosti kot {{ui:shape.sbcBoard}} v knjižnici oblik – Raspberry Pi 5, 4, 3 B+, Zero 2 W ali BIGTREETECH Pi, z luknjami in priključki, zračnostjo okoli robnih priključkov, položajem in kot luknjo za izrez ohišja |
 | `layerling_reference_image` | doda referenčno sliko iz slike kot {{ui:import.referenceImage}} ali eno premakne, zavrti, umeri (dve točki slike in njuna prava razdalja), zbledi ali zaklene - pomoč, ki se nikoli ne izvozi ali natisne; `trace` iz temnega ali svetlega dela naredi telo skice, ki stoji na njej |
 | `layerling_measure_section` | meri na ravnini prereza med dvema točkama, ki se zaskočita na obris – debeline sten, reže, prileganja |
 | `layerling_show_overhangs` | vklopi ali izklopi šrafuro previsov, nastavi kot in za vsako telo navede ploskev, ki bi potrebovala podpore |
 | `layerling_estimate_print` | oceni prostornino, težo in filament za izbor ali celoten načrt: za polno telo in kot grobo oceno s stenami in polnilom kot v oknu za izvoz |
+| `layerling_check_clearance` | pred tiskanjem preveri, kateri deli se prekrivajo, dotikajo ali so bližje od najmanjše zračnosti (Preveri zračnost), tudi ločene dele enega predmeta |
 | `layerling_add_reference_points` | postavi referenčne točke - na sredine, vogale ali sredine robov objektov ali na natančna mesta -, na katere se oblike zaskočijo |
 | `layerling_list_reference_points` | našteje referenčne točke z oznako in lego |
 | `layerling_remove_reference_points` | izbriše referenčne točke po oznaki ali vse |

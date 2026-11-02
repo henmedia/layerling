@@ -57,6 +57,23 @@ With {{ui:workspace.dimensionsAlwaysVisible}} the dimensions stay visible perman
 
 For a moment without them, press [[Q]]: the sizes and distances around the selection disappear, so a part you move is easy to see. [[Q]] again brings them back. A handle you point at still shows its size.
 
+## Checking clearance
+
+Parts that should move after printing - a flexi dragon, a hinge printed in place, a box and its lid, an axle in its bore - need a gap between them. Too little, and they stick together; overlapping, they print as one piece. {{ui:editor.tool.clearance}}, next to {{ui:editor.tool.intersectPreview}}, checks that before you print. It takes the selected objects, or every visible object when nothing is selected (the same ones an export takes), and checks each pair:
+
+- **{{ui:clearance.kind.overlap}}** (red): the two share a volume. It shows red inside the bodies, which turn see-through, and the list says how large it is.
+- **{{ui:clearance.kind.touching}}** (red): they touch and fuse when printed.
+- **{{ui:clearance.kind.tight}}** (orange): the narrowest gap is smaller than {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (green): the narrowest gap is at least that wide.
+
+Each row names the two parts and, for a gap, its width and where it lies: {{ui:clearance.direction.side}} (within one layer) or {{ui:clearance.direction.layer}} (above or below: there the slicer can only leave whole layers free, so a gap thinner than one layer closes). Click a row: the camera goes there, both parts are outlined, and a line with the number marks the narrowest place. Pairs further apart than 5 mm are not listed. Nothing in the design changes: the check saves nothing and leaves nothing to undo.
+
+{{ui:clearance.threshold}} starts at 0.3 mm; 0.3 is tight, 0.4 usual for a print in place. Changing it sorts the list again at once, without a new check, and the browser keeps the value. {{ui:clearance.splitParts}} (on to start) checks the separate parts of one object against each other too: a flexi dragon or a hinge imported as one STL is one object, but its links are separate parts. They are listed as "Name · Part 2". A part inside a cavity of another, a ball in a cage, is a part of its own.
+
+If you change the design while the panel is open, it shows {{ui:clearance.stale}}; click that or {{ui:clearance.checkAgain}}. [[Esc]] or {{ui:clearance.close}} closes the panel. Scaling changes the gaps too: a flexi model scaled to 70 % keeps 70 % of its gaps, so check again after scaling.
+
+The check measures the triangle mesh the slicer gets. A round axle and its bore are polygons with their corners on the circle, so a gap can come out a few hundredths smaller than the round numbers. A pair with too many triangles is listed as {{ui:clearance.kind.unchecked}}. An AI runs the same check with `layerling_check_clearance`.
+
 ## Notes
 
 A note records what the geometry does not say: "This screw is 0.3 mm too tight", "print the lid yet", "dimension from Peter". Place one with {{ui:editor.tool.note}} or the [[N]] key.

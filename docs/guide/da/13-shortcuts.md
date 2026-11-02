@@ -5,9 +5,9 @@ summary: Alle taster på ét sted, taget direkte fra programmet så listen altid
 
 Genvejene virker så længe arbejdsplanet har fokus. Mens du skriver i et felt holder de sig væk. På en Mac, brug [[Cmd]] hvor [[Ctrl]] er angivet her.
 
-I editoren åbner {{ui:editor.keyboardShortcuts}} i området {{ui:editor.group.help}} den samme liste som et vindue. Printerknappen i vinduet ({{ui:shortcuts.print}}) udskriver selve listen, sort på hvidt og med stor skrift; browserens udskrivningsdialog tilbyder også at gemme den som PDF.
+I editoren åbner {{ui:editor.keyboardShortcuts}} i området {{ui:editor.group.help}} den samme liste som et vindue. Printerknappen i vinduet ({{ui:shortcuts.print}}) udskriver selve listen, sort på hvidt, hele listen på én side af et A4- eller Letter-ark i tre spalter, så den er lige ved hånden som en hurtig reference; browserens udskrivningsdialog tilbyder også at gemme den som PDF.
 
-Feltet øverst i vinduet søger i listen: det beholder kun de genveje, hvis sætning, gruppe eller taster indeholder hvert ord, du skriver, så "ctrl+z" kun efterlader de rækker. Store og små bogstaver og accenter er ligegyldige, og et enkelt bogstav eller ciffer finder den tast og de ord, der begynder med det. X'et for enden af feltet tømmer det; med tomt felt er hele listen tilbage. Printerknappen udskriver det, vinduet viser, så efter en søgning udskriver den kun de fundne genveje.
+Feltet øverst i vinduet søger i listen: det beholder kun de genveje, hvis sætning, gruppe eller taster indeholder hvert ord, du skriver, så "rund" eller "ctrl+z" kun efterlader de rækker. Store og små bogstaver og accenter er ligegyldige, og et enkelt bogstav eller ciffer finder den tast og de ord, der begynder med det. X'et for enden af feltet tømmer det; med tomt felt er hele listen tilbage. Printerknappen udskriver det, vinduet viser, så efter en søgning udskriver den kun de fundne genveje.
 
 ![Tastaturgenvejsvinduet i editoren.](shot:shortcuts)
 

@@ -70,7 +70,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_hull_objects` | obalí objekty jedním vypouklým tělesem, jako by byly zataveny ve fólii (obal) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | rozdělí tvar na jeho nespojené části, těleso z náčrtu na jedno těleso za každý obrys |
 | `layerling_split_objects` | rozdělí tělesa nebo výřezy rovinou na dvě části |
@@ -86,10 +86,12 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_layer_text` | vytvoří vrstvenou jmenovku: písmena, širší okraje a souvislou podložku; podporuje otvor na kroužek, rohy po vrstvách, úpravu hran písmen a seznam jmen |
 | `layerling_layer_icon` | vytvoří vrstvený štítek ze SVG nebo vysunutého náčrtu, s rozšířenými okraji a souvislou podložkou; umožní změnit šířku a vrstvy i rozmístit více kopií na podložku |
 | `layerling_create_qr_code` | vytvoří z textu nebo webové adresy QR kód jako {{ui:shape.qrCode}} v knihovně tvarů – samotný kód, vystouplý na destičce nebo vyrytý, s opravou chyb, šířkou, výškou, klidovou zónou a na přání jako otvor; varuje, když modul klesne pod 0,8 mm |
+| `layerling_create_sbc_board` | vloží desku SBC ve skutečné velikosti jako {{ui:shape.sbcBoard}} v knihovně tvarů – Raspberry Pi 5, 4, 3 B+, Zero 2 W nebo BIGTREETECH Pi, s otvory a konektory, vůlí kolem okrajových konektorů, polohou a jako výřez pro krabičku |
 | `layerling_reference_image` | přidá referenční obrázek z obrázku jako {{ui:import.referenceImage}}, nebo jeden posune, otočí, kalibruje (dva body obrázku a jejich skutečná vzdálenost), zprůhlední nebo zamkne - pomůcka, která se nikdy neexportuje ani netiskne; `trace` udělá z tmavé nebo světlé části těleso náčrtu, které na něm stojí |
 | `layerling_measure_section` | změří tloušťku stěny, mezeru či vůli v řezu mezi body přichycenými k obrysu |
 | `layerling_show_overhangs` | zapne šrafování převisů, nastaví úhel a oznámí plochu vyžadující podpěry pro každé těleso |
 | `layerling_estimate_print` | odhadne objem, hmotnost a délku filamentu výběru nebo projektu, pro plný tisk i přibližně se stěnami a výplní |
+| `layerling_check_clearance` | před tiskem zkontroluje, které díly se překrývají, dotýkají nebo jsou blíž než minimální vůle (Zkontrolovat vůli), i oddělené díly jednoho objektu |
 | `layerling_add_reference_points` | vytvoří referenční body na středech, rozích, středech hran nebo zadaných souřadnicích |
 | `layerling_list_reference_points` | vypíše referenční body s identifikátory a polohami |
 | `layerling_remove_reference_points` | odstraní vybrané nebo všechny referenční body |

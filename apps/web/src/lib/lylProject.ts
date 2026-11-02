@@ -19,6 +19,7 @@ import {
   attachmentsFormatVersion,
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
+import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
@@ -26,9 +27,12 @@ import { normalizeDesignView, normalizeSavedViews, readDesignView, readSavedView
 import { normalizeSavedCornerRulers, readCornerRulers, type SavedCornerRuler } from "@/lib/cornerRulerStore";
 import { normalizeSavedTape, readTape, type SavedTape } from "@/lib/tapeStore";
 import { isSketchKeyring } from "@/lib/sketchKeyring";
+import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
 import { isReferenceImageOpacity } from "@/lib/referenceImage";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { PORT_PROFILES } from "@/lib/portGeometry";
+import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
+import { MAX_GRIDFINITY_OUTLINE_POINTS } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
 import { normalizeSnapGrid, normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 import type { CadDisplayEdge, GridSize, ProjectAsset, ProjectAssetSourceFormat, ProjectAttachment, SketchOperation, SketchRevolveSettings, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -59,7 +63,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.129.1";
+export const LYL_CREATED_WITH_VERSION = "1.132.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -77,7 +81,7 @@ export const LYL_LIMITS = {
 
 const SHAPE_KINDS = new Set([
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ]);
 
 const FEATURE_TYPES = new Set([
@@ -1407,6 +1411,19 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.qrCode !== undefined && !normalizeQrSettings(definition.qrCode)) {
     throw new Error(`${label}.qrCode must hold the code's text`);
   }
+  // An SBC board's settings (#1098): a known board, a clearance of 0 to 2 mm and a reach of 0 to 10 mm. Old projects have none.
+  if (definition.sbcBoard !== undefined) {
+    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown } | null;
+    if (!board || typeof board !== "object" || !SBC_BOARD_ORDER.includes(board.board as never)) {
+      throw new Error(`${label}.sbcBoard.board must be one of ${SBC_BOARD_ORDER.join(", ")}`);
+    }
+    if (board.clearance !== undefined && (typeof board.clearance !== "number" || !Number.isFinite(board.clearance) || board.clearance < 0 || board.clearance > MAX_SBC_CLEARANCE)) {
+      throw new Error(`${label}.sbcBoard.clearance is outside the supported range`);
+    }
+    if (board.reach !== undefined && (typeof board.reach !== "number" || !Number.isFinite(board.reach) || board.reach < 0 || board.reach > MAX_SBC_REACH)) {
+      throw new Error(`${label}.sbcBoard.reach is outside the supported range`);
+    }
+  }
   // The corners of a text's line (#215): a layer of a name tag can be bevelled or sharp now, so an
   // unknown corner is refused rather than read as sharp.
   const textJoin = (definition.textStroke as { join?: unknown } | undefined)?.join;
@@ -1447,7 +1464,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.threadRole !== undefined && !["rod", "screw", "nut", "bore"].includes(definition.threadRole as string)) {
       throw new Error(`${label}.threadRole is invalid`);
     }
-    if (definition.threadHead !== undefined && !["cylinder", "countersunk", "hex"].includes(definition.threadHead as string)) {
+    if (definition.threadHead !== undefined && !["cylinder", "countersunk", "hex", "square", "flange", "wing", "knob"].includes(definition.threadHead as string)) {
       throw new Error(`${label}.threadHead is invalid`);
     }
     if (definition.threadHand !== undefined && definition.threadHand !== "right" && definition.threadHand !== "left") {
@@ -1509,7 +1526,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.threadDrive !== undefined && !["hex", "torx", "phillips", "slot", "robertson", "none"].includes(definition.threadDrive as string)) {
       throw new Error(`${label}.threadDrive is invalid`);
     }
-    for (const field of ["threadHeadDiameter", "threadDriveSize", "threadDriveDepth"] as const) {
+    for (const field of ["threadHeadDiameter", "threadDriveSize", "threadDriveDepth", "threadCollarHeight", "threadCollarDiameter"] as const) {
       if (definition[field] === undefined) continue;
       const value = finiteNumber(definition[field], `${label}.${field}`);
       if (value < 0 || value > 640) throw new Error(`${label}.${field} is outside the supported range`);
@@ -1556,7 +1573,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "gear") {
     const teeth = finiteNumber(definition.teeth, `${label}.teeth`);
-    if (!Number.isInteger(teeth) || teeth < 6 || teeth > 150) throw new Error(`${label}.teeth is outside the supported range`);
+    if (!Number.isInteger(teeth) || teeth < MIN_GEAR_TEETH || teeth > MAX_GEAR_TEETH) throw new Error(`${label}.teeth is outside the supported range`);
     const toothSize = finiteNumber(definition.toothSize, `${label}.toothSize`);
     if (toothSize <= 0) throw new Error(`${label}.toothSize must be positive`);
     if (definition.toothWidth !== undefined) {
@@ -1646,7 +1663,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       }
     }
   }
-  if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") {
+  if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "finishingWasher") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
     for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle"] as const) {
       if (definition[key] === undefined) continue;
@@ -1734,6 +1751,17 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
         if (entry.align !== undefined && entry.align !== "start" && entry.align !== "middle" && entry.align !== "end") throw new Error(`${entryLabel}.align is invalid`);
       });
     }
+    if (definition.gridfinityOutline !== undefined) {
+      if (!Array.isArray(definition.gridfinityOutline)) throw new Error(`${label}.gridfinityOutline must be an array`);
+      const outline = definition.gridfinityOutline as unknown[];
+      if (outline.length > MAX_GRIDFINITY_OUTLINE_POINTS) throw new Error(`${label}.gridfinityOutline has too many points`);
+      const points = outline.map((raw, index) => {
+        const entryLabel = `${label}.gridfinityOutline[${index}]`;
+        const entry = objectRecord(raw, entryLabel);
+        return { x: finiteNumber(entry.x, `${entryLabel}.x`), y: finiteNumber(entry.z, `${entryLabel}.z`) };
+      });
+      if (findSketchOutlineIntersection([points])) throw new Error(`${label}.gridfinityOutline crosses itself`);
+    }
   }
   if (kind === "hinge") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
@@ -1816,6 +1844,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "port" && definition.portProfile !== undefined && !PORT_PROFILES.includes(definition.portProfile as PortProfile)) {
     throw new Error(`${label}.portProfile is not supported`);
+  }
+  if (kind === "port" && definition.portClearance !== undefined) {
+    const portClearance = finiteNumber(definition.portClearance, `${label}.portClearance`);
+    if (portClearance < 0 || portClearance > 2) throw new Error(`${label}.portClearance is outside the supported range`);
   }
   if (kind === "port" && definition.cornerFillet !== undefined) {
     const cornerFillet = finiteNumber(definition.cornerFillet, `${label}.cornerFillet`);

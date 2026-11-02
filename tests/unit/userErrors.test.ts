@@ -35,6 +35,16 @@ describe("error messages for people", () => {
     expect(localizedError("This view has no solid geometry")).toBe(MESSAGES_DE["error.drawingNoGeometry"]);
   });
 
+  it("tells a vase too dense to hollow where its own hollow and lid are, in German (#1153)", () => {
+    setLanguage("de");
+    expect(localizedError("This vase has 210106 triangles; hollowing and edge treatment stop at 4000. Choose Hollow with wall under Build, and a lid on the Accessories card.")).toBe(
+      MESSAGES_DE["status.vaseTooDense"].replace("{triangles}", "210.106").replace("{limit}", "4.000"),
+    );
+    expect(localizedError("This mesh has 9000 triangles; interactive edge treatment stops at 4000. For a shape from the catalogue, use its own parameters for now. For an imported part, import it as STEP or with fewer triangles.")).toBe(
+      MESSAGES_DE["status.meshTooDense"].replace("{triangles}", "9.000").replace("{limit}", "4.000"),
+    );
+  });
+
   it("translates the texts of the server routes, with the folder and setting kept", () => {
     setLanguage("de");
     expect(localizedError("That folder name is not allowed")).toBe(MESSAGES_DE["error.folderNameNotAllowed"]);

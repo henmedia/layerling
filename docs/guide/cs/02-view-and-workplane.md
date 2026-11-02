@@ -86,6 +86,8 @@ Kliknutí mimo podložku nebo [[Esc]] vrátí rovinu na základní podložku. Ry
 
 Při umístění na ploše se vedle {{ui:camera.placeWorkplane}} objeví oko. Skryje rovinu bez zrušení jejího umístění: nové tvary dál dopadají na příslušnou plochu a otáčení používá její orientaci. Znovu ji ukáže oko nebo nastavení nové roviny.
 
+Chceš-li se na pracovní rovinu podívat kolmo, stiskni [[P]] nebo klikni na {{ui:camera.lookOntoWorkplane}} vedle {{ui:camera.placeWorkplane}} v liště pohledu. Pohled se otočí, až rovinu vidíš zpříma, ze strany, kam rostou nové tvary, s jejím počátkem uprostřed. Na základní desce je to pohled shora.
+
 ## Mřížka a přichytávání
 
 Mřížka usnadňuje odhad rozměrů podložky. Vpravo dole se nastavuje **krok přichytávání**: posun a změna velikosti se provádějí v násobcích tohoto rozměru, například 1 mm. Pro jemnou práci krok zmenšete, pro hrubé rozmístění zvětšete. {{ui:editor.tool.snapToGrid}} dodatečně přesune vybrané tvary na nejbližší průsečík mřížky. Při přesouvání se přichytávají také k jiným tvarům, viz [Výběr a uspořádání](chapter:select-and-arrange). Bez myši: [[Alt]]+[[1]] až [[Alt]]+[[0]] vyberou položku s tímto číslem v nabídce ([[Alt]]+[[1]] přichytávání vypne) a [[,]] a [[.]] krok o stupeň zjemní nebo zhrubí. Funguje to i v náčrtu.

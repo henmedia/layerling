@@ -1,5 +1,8 @@
+import type { CadLidRequest } from "@/lib/cadLid";
+import type { ThreadOutlineTier } from "@/lib/threadOutline";
+import type { ThreadHead } from "@/types/layerling";
 import type { ThreadDriveOutline } from "@/lib/threadGeometry";
-import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityType, ShellEdges, ShellOpenings } from "@/types/layerling";
+import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, ShellEdges, ShellOpenings } from "@/types/layerling";
 
 export type CadModifierKind = "chamfer" | "chamfillet" | "fillet" | "shell" | "deleteFace" | "offset";
 
@@ -233,9 +236,11 @@ export type CadModifierThreadPart = {
   /** The chamfer at the bottom end, when the part has one (`chamferBottom`). */
   chamferLow: number;
   chamferBottom: boolean;
+  /** A nut body or screw head of outline tiers (#1131): square, flange, wing or star knob. It takes the place of the hexagon or head kind. */
+  tiers?: ThreadOutlineTier[];
   /** Screw only. */
   head?: {
-    kind: "cylinder" | "hex" | "countersunk";
+    kind: ThreadHead;
     height: number;
     /** Cylinder head radius, or the countersunk head's crown radius at y = 0. */
     radius: number;
@@ -248,6 +253,8 @@ export type CadModifierThreadPart = {
     /** The drive in the free head face (#1052) as its outline in the x/z plane of the shape, and its depth; 0 depth for none. */
     driveOutline?: ThreadDriveOutline;
     socketDepth: number;
+    /** The round collar (#1152) on the head's shaft face, up from `height`; on an outline head it is a tier instead. */
+    collar?: { radius: number; height: number };
   };
   /** Nut only: its hex across flats, and the face radius of its chamfered rims (0 for sharp). */
   nut?: { acrossFlats: number; chamferFaceRadius: number };
@@ -377,6 +384,7 @@ export type CadModifierGridfinityPart = {
   gridfinityOpenings?: GridfinityOpening[];
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   gridfinityOpeningCornerSize?: number;
+  gridfinityOutline?: GridfinityOutlinePoint[];
   transform?: number[];
   expected?: { bounds: number[]; volume: number };
 };
@@ -451,13 +459,16 @@ export type CadModifierWorkerRequest =
   | {
       type: "preview";
       requestId: number;
-      kind: CadModifierKind;
+      // "lid" (#1154) changes nothing: it builds the exact lid for the prepared body.
+      kind: CadModifierKind | "lid";
       edgeIds: number[];
       amount: number;
       quality: CadModifierQuality;
       chamferAngle: number;
       // Only for "fillet" of one edge (#687): the radius at the edge's end, `amount` the one at its start.
       endAmount?: number;
+      // Only for "fillet" (#1160): a scoop cut out of the edge instead of a rounding, `amount` the radius.
+      concave?: boolean;
       // Only for "shell": which faces stay open; `amount` is the wall thickness.
       shellOpenings?: ShellOpenings;
       shellEdges?: ShellEdges;
@@ -467,6 +478,8 @@ export type CadModifierWorkerRequest =
       offsetSideways?: boolean;
       // Only for "deleteFace": the faces to delete, as the prepare numbered them.
       faceIds?: number[];
+      // Only for "lid" (#1154): the kind, sizes, pockets and place of the lid.
+      lid?: CadLidRequest;
       // The finest deflection the shape's edge-treatment history has needed
       // so far, if any - a floor beneath this operation's own deflection.
       minDeflection?: CadModifierDeflection;

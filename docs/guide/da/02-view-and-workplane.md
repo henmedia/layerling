@@ -45,14 +45,14 @@ Træk i kuben for at dreje visningen rundt, ligesom at trække med højre musekn
 Ved venstre kant er en smal bjælke. Fra toppen:
 
 - {{ui:camera.home}} bringer hele scenen tilbage i visningen. Tasten er [[Home]]; [[F]] gør det også, når intet er markeret.
-- {{ui:camera.focusSelection}} zoomer til markeringen ([[F]] eller [[Shift]]+[[F]]).
+- {{ui:camera.focusSelection}} zoomer til markeringen ([[F]] eller [[Shift]]+[[F]]); med intet markeret bringer den hele scenen i visningen, som [[F]] gør.
 - {{ui:camera.zoomIn}} og {{ui:camera.zoomOut}} zoomer skridt for skridt, ligesom tasterne [[+]] og [[−]].
 - {{ui:camera.orthographic}} skifter til en flad visning hvor parallelle kanter forbliver parallelle. Til måling og justering af kanter er det ofte mere behageligt end perspektivvisningen. [[O]] skifter frem og tilbage, og endnu et klik vender tilbage.
 - {{ui:camera.secondView}} åbner en anden visning af designet i sit eget vindue, beskrevet nedenfor. Et klik mere lukker det.
 - {{ui:camera.hideWorkplane}} (øjet over et gitter) skjuler pladen med sit gitter, så du kan se undersiden af et design nedefra. Kun visningen ændres: nye former lander stadig på arbejdsplanet. Endnu et klik viser den igen.
 - {{ui:camera.placeWorkplane}}, målebåndet og vinkelmåleren er deres egne værktøjer, dækket nedenfor og i [Måling og noter](chapter:measuring-and-notes).
 
-Den lille pil helt øverst på bjælken skjuler den hvis den er i vejen.
+Den lille pil helt øverst på bjælken skjuler den hvis den er i vejen. Den samme knap kan trækkes, så bjælken flyttes rundt i editoren, også i en skitse; et dobbeltklik sætter den tilbage. 3D-forhåndsvisningen af en revolvering flyttes på samme måde med sin titel.
 
 Et design åbner som du forlod det: visningens vinkel, zoom og position gemmes med det i denne browser, så du fortsætter hvor du stoppede, også efter at have trykket Hjem eller lukket siden. En gemt fil (.lyl) tager visningen med sig, så den åbner i den andre steder også. Visningen er ikke del af fortryd-historikken.
 
@@ -79,7 +79,7 @@ Du kan også gemme fire af dine egne visninger i hvert design. [[Shift]]+[[7]], 
 
 Værktøjsvinduet hænger på sin knap. Hvis det dækker noget, så træk det i dets titellinje hvor som helst på arbejdsplanet; det åbner dér næste gang også. Dobbeltklik på titellinjen eller slip det ved knappen for at sætte det tilbage.
 
-X og [[Esc]] lukker vinduet; med en måling i gang afslutter [[Esc]] den først. Snittet bliver, indtil du slår det fra med {{ui:camera.sectionActive}} eller går tilbage til designoversigten. En tablet har ingen [[Esc]], så der har vinduet to knapper mere: {{ui:camera.sectionBack}} afslutter målingen, hvis en kører, og lukker ellers vinduet, og {{ui:camera.sectionConfirm}} lukker vinduet i ét skridt. En computer viser dem ikke.
+X og [[Esc]] lukker vinduet; med en måling i gang afslutter [[Esc]] den først. Snittet bliver, indtil du slår det fra med {{ui:camera.sectionActive}} eller går tilbage til designoversigten. Mens det er tændt, er dens knap markeret. Alt hvad du placerer på den side der er skåret væk, vises først når du slår snittet fra. En tablet har ingen [[Esc]], så der har vinduet to knapper mere: {{ui:camera.sectionBack}} afslutter målingen, hvis en kører, og lukker ellers vinduet, og {{ui:camera.sectionConfirm}} lukker vinduet i ét skridt. En computer viser dem ikke.
 
 ## Arbejdsplanet
 
@@ -96,6 +96,8 @@ På en flade snapper arbejdsplanets nulpunkt ellers til gitteret. Klik tæt på 
 Et klik ved siden af pladen eller [[Esc]] returnerer arbejdsplanet til grundpladen. Hurtigere er {{ui:camera.resetWorkplane}}: knappen med pilen nedad sidder i visningsbjælken under øjet mens arbejdsplanet ligger på en flade. [[Shift]]+[[W]] lægger det direkte på den aktuelt valgte flade. [[Alt]]+[[W]] lægger det altid tilbage på grundpladen, uanset om noget er valgt. Holder du [[Shift]] mens du klikker, peger planet den anden vej.
 
 Mens et arbejdsplan ligger på en flade, dukker et øje op ved siden af {{ui:camera.placeWorkplane}}. Det skjuler arbejdsplanet uden at droppe det, for et klart blik på designet: nye former lander stadig på den flade, og rotation drejer stadig omkring det. Et klik på øjet viser det igen, og det samme gør et nyt arbejdsplan.
+
+Vil du se lige ind på arbejdsplanet, så tryk [[P]] eller klik på {{ui:camera.lookOntoWorkplane}} ved siden af {{ui:camera.placeWorkplane}} i visningslinjen. Visningen drejer, til du ser planet lige forfra, fra den side nye former vokser mod, med dets nulpunkt i midten. På grundpladen er det visningen ovenfra.
 
 ## Gitter og snap
 

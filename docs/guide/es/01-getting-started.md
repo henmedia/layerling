@@ -19,13 +19,13 @@ Todos tus diseños aparecen después en la página de inicio, con una imagen de 
 
 ![El editor con sus zonas rotuladas: arriba la cinta, a la izquierda el cubo de vista con la barra de vista debajo, a su lado el mensaje de estado y la lista de objetos, a la derecha las propiedades de la forma seleccionada.](shot:editor-areas)
 
-- **Arriba** está la cinta, ordenada por tareas: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}}, {{ui:editor.group.file}} y {{ui:editor.group.help}}. Pasa el ratón por encima de un icono para ver su nombre. Allí donde veas un pequeño signo de interrogación, por ejemplo en los ajustes de una forma, en la biblioteca de formas o en las ventanas de herramientas, te lleva directamente al capítulo de esta guía que trata ese tema. El grupo {{ui:editor.group.modify}} se divide en cuatro secciones, cada una con su nombre encima de sus herramientas: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} y {{ui:editor.section.surface}}. Un icono en gris dice además qué le falta, por ejemplo {{ui:editor.needs.oneBody}} o {{ui:editor.needs.locked}}. ¿No encuentras una herramienta? Pulsa [[Ctrl]]+[[K]] y escribe su nombre; un diseño vacío te lo recuerda abajo en la vista.
+- **Arriba** está la **cinta**, ordenada por tareas: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.group.modify}}, {{ui:editor.group.arrange}} y {{ui:editor.group.file}}; {{ui:editor.group.help}} está encima, en la fila del título, y la casa junto a las pestañas te devuelve a la página de inicio. Cuando la ventana es demasiado estrecha para todos los grupos, los que menos se usan se pliegan en un solo botón bajo su nombre, con una flechita del color del grupo colgando debajo: señálalo o tócalo y sus herramientas se abren debajo. La chincheta de arriba a la derecha, a la izquierda de la lupa, mantiene en cambio todos los grupos abiertos. Pasa el ratón por encima de un icono para ver su nombre, también si está en gris; {{ui:interactiveHelp.title}} (el signo de interrogación de {{ui:editor.group.help}}, o Mayús+F1) explica cualquiera de ellos con un clic y te lleva a su apartado de esta guía. Allí donde veas un pequeño signo de interrogación, por ejemplo en los ajustes de una forma, en la biblioteca de formas o en las ventanas de herramientas, te lleva directamente al capítulo de esta guía que trata ese tema. El grupo {{ui:editor.group.modify}} se divide en cuatro secciones, cada una con su nombre encima de sus herramientas: {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} y {{ui:editor.section.surface}}. Un icono en gris dice además qué le falta, por ejemplo {{ui:editor.needs.oneBody}} o {{ui:editor.needs.locked}}. ¿No encuentras una herramienta? Pulsa [[Ctrl]]+[[K]] y escribe su nombre; un diseño vacío te lo recuerda abajo en la vista.
 - **En el centro** está el plano de trabajo. Ahí colocas las formas, las ajustas a tu gusto y ves el resultado.
-- **A la derecha** aparecen las **propiedades** de la forma seleccionada: color, medidas, posición y todo lo demás que define la forma. Escribir números es más exacto que arrastrar.
-- **A la izquierda** está la barra de vista, con el cubo de vista encima. Con ellos te mueves por la escena; tienes más detalles en [Vista y plano de trabajo](chapter:view-and-workplane).
+- **A la derecha** está el **panel de propiedades** de la forma seleccionada: color, medidas, posición y todo lo demás que define la forma. Escribir números es más exacto que arrastrar.
+- **A la izquierda** está la **barra de vista**, con el **cubo de vista** encima. Con ellos te mueves por la escena; tienes más detalles en [Vista y plano de trabajo](chapter:view-and-workplane).
 - **Junto a la barra de vista** se abre la **lista de objetos** ([[Ctrl]]+[[U]]), con todas las formas del diseño. Más en [Seleccionar y organizar](chapter:select-and-arrange).
 - **A la derecha del cubo de vista** aparece el **mensaje de estado** cuando layerling tiene algo que decirte, por ejemplo qué espera de ti una herramienta. Si no hay nada que decir, no está.
-- Las **ventanas de herramientas** se abren sobre el plano de trabajo cuando empiezas una herramienta como {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} o {{ui:editor.tool.hollow}}. Apártalas por su barra de título cuando tapen algo.
+- Las **ventanas de herramientas** se abren sobre el plano de trabajo cuando empiezas una herramienta como el redondeo, el patrón o el vaciado. Apártalas por su barra de título cuando tapen algo.
 - **Arriba del todo** cambias entre {{ui:editor.modeGeometry}} y {{ui:editor.modeSketch}}, cambias el nombre del diseño y eliges el idioma y el tema.
 
 ## Los botones alrededor de la zona de trabajo
@@ -34,7 +34,7 @@ Pasa el ratón por encima de un botón para ver su nombre. Si no tienes claro qu
 
 ### Pegar
 
-{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) añade al diseño lo que hayas copiado con {{ui:editor.tool.copy}}. {{ui:common.duplicate}} copia y pega en un solo paso.
+{{ui:editor.tool.paste}} ([[Ctrl]]+[[V]]) añade al diseño lo que hayas copiado con {{ui:editor.tool.copy}}. {{ui:common.duplicate}} copia y pega en un solo paso. Al pegar, cada pieza queda un poco al lado de donde estaba. Las piezas que vienen de otro programa pueden caer lejos de la placa, y para ellas está {{ui:workspace.pasteCentered}} en los ajustes, dentro de {{ui:workspace.appearance}}: al pegar, las piezas se juntan en el centro del plano de trabajo y bajan hasta él.
 
 ### Eliminar
 
@@ -74,7 +74,7 @@ El nombre del diseño ({{ui:confirm.projectName}}) está arriba del todo. Haz cl
 
 ### Ocultar la barra de vista
 
-{{ui:camera.hide}} recoge la barra de vista de la izquierda y deja más sitio a la zona de trabajo; {{ui:camera.show}} los vuelve a mostrar.
+{{ui:camera.hide}} recoge la barra de vista de la izquierda y deja más sitio a la zona de trabajo; {{ui:camera.show}} la vuelve a mostrar.
 
 ### Cuadrícula de ajuste
 

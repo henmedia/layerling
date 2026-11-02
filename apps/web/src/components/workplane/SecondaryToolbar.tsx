@@ -2,7 +2,7 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
-import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { useWheelField } from "@/lib/useWheelField";
 import { wheelNextValue } from "@/lib/wheelValueStep";
@@ -12,7 +12,7 @@ import { useLanguage } from "@/lib/useLanguage";
 import { useSimpleMode } from "@/lib/useSimpleMode";
 import { simpleModeKeepsShape, simpleModeKeepsTool } from "@/lib/simpleMode";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
-import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon, ToolbarIntersectPreviewIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarSurfaceTextureIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
+import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon, ToolbarIntersectPreviewIcon, ToolbarClearanceIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarSurfaceTextureIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
 import { type SketchPrimitive, type SketchTool } from "../SketchWorkspace";
 import { CommandPalette, type PaletteCommand } from "./CommandPalette";
 import { COMMAND_KEYWORDS, COMMAND_SHORTCUTS, SHAPE_KEYWORDS } from "@/lib/commandKeywords";
@@ -290,6 +290,9 @@ export function SecondaryToolbar({
   onLoftSketches,
   onIntersectPreview,
   intersectPreviewActive,
+  onClearanceCheck,
+  clearanceActive,
+  canCheckClearance,
   onFillet,
   onHollow,
   hollowActive,
@@ -444,6 +447,11 @@ export function SecondaryToolbar({
   onLoftSketches: () => void;
   onIntersectPreview: () => void;
   intersectPreviewActive: boolean;
+  /** The clearance check (Spiel prüfen): opens its panel, or closes it. */
+  onClearanceCheck: () => void;
+  clearanceActive: boolean;
+  /** A visible body to check: the selection's, or the design's when nothing is selected. */
+  canCheckClearance: boolean;
   onFillet: () => void;
   onHollow: () => void;
   hollowActive: boolean;
@@ -636,12 +644,23 @@ export function SecondaryToolbar({
     }
   };
   useToolbarCollapse(toolbarContentRef, !simpleMode && !ribbonPinned);
-  /** The one button a folded group shows under its name, with the icon of the tool it is known by; its hint says it opens. */
-  const collapseBox = (label: string, Icon: ComponentType) => (
+  /**
+   * The one button a folded group shows under its name, with the icon of the tool it is known by; its hint says it opens.
+   * Given that tool, the button is the tool itself - History's Undo undoes, as its icon says (#1148) - and only the tab
+   * under it opens the group.
+   */
+  const collapseBox = (label: string, Icon: ComponentType, tool?: ToolbarTool) => (
     <div className="toolbar-section-tools toolbar-collapse-box">
-      <button className="toolbar-icon toolbar-collapse-trigger" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger>
-        <Icon />
-      </button>
+      {tool ? (
+        <>
+          {toolButton(tool, true)}
+          <button className="toolbar-collapse-trigger toolbar-collapse-tab" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger />
+        </>
+      ) : (
+        <button className="toolbar-icon toolbar-collapse-trigger" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger>
+          <Icon />
+        </button>
+      )}
     </div>
   );
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -780,6 +799,7 @@ export function SecondaryToolbar({
     { id: "hull", label: t("editor.tool.hull"), icon: ToolbarHullIcon, action: onHull, enabled: canHull, needs: need("twoBodies") },
     { id: "loftSketches", label: t("editor.tool.loftSketches"), icon: ToolbarLoftSketchesIcon, action: onLoftSketches, enabled: canLoftSketches, needs: need("loft") },
     { id: "intersect-preview", label: t("editor.tool.intersectPreview"), icon: ToolbarIntersectPreviewIcon, action: onIntersectPreview, enabled: canIntersect || intersectPreviewActive, active: intersectPreviewActive, needs: need("intersect") },
+    { id: "clearance-check", label: t("editor.tool.clearance"), icon: ToolbarClearanceIcon, action: onClearanceCheck, enabled: canCheckClearance || clearanceActive, active: clearanceActive, needs: need("visibleBodies") },
   ];
   const modifyTools = [
     { id: "mirror", section: "pattern", label: t("editor.tool.mirror"), icon: ToolbarMirrorIcon, action: onMirror, enabled: canModifySelection, active: mirrorMode, needs: need("selection") },
@@ -825,7 +845,11 @@ export function SecondaryToolbar({
     { id: "sketch-duplicate", label: t("editor.tool.duplicate"), icon: ToolbarDuplicateIcon, action: onSketchDuplicate, enabled: sketchHasSelection, hint: sketchHasSelection ? null : t("editor.needs.sketchSelection") },
     { id: "sketch-delete", label: t("editor.tool.delete"), icon: ToolbarTrashIcon, action: onSketchDelete, enabled: sketchHasSelection, hint: sketchHasSelection ? null : t("editor.needs.sketchSelection") },
   ];
-  const renderToolButton = (tool: (typeof leftTools)[number] | (typeof visibilityTools)[number] | (typeof combineTools)[number] | (typeof modifyTools)[number] | (typeof arrangeTools)[number]) => {
+  type ToolbarTool = (typeof leftTools)[number] | (typeof visibilityTools)[number] | (typeof combineTools)[number] | (typeof modifyTools)[number] | (typeof arrangeTools)[number]
+    | Pick<(typeof leftTools)[number], "id" | "label" | "icon" | "action" | "enabled">;
+  const renderToolButton = (tool: ToolbarTool) => toolButton(tool, false);
+  /** `inFold`: the copy on a folded group's button, which leaves the tool's name for MCP and tests to the one in the group. */
+  function toolButton(tool: ToolbarTool, inFold: boolean) {
     const { id, icon: Icon, action, label } = tool;
     // Im Verlaufsblick schlaeft jedes Werkzeug ausser dem, das ihn beendet -
     // wirklich, nicht nur im Aussehen: eine Auswahl aus der Zeit davor darf
@@ -842,7 +866,8 @@ export function SecondaryToolbar({
       <button
         className={`toolbar-icon ${enabled ? "" : "disabled"} ${active ? "active" : ""}`}
         key={id}
-        data-layerling-tool={id}
+        data-layerling-tool={inFold ? undefined : id}
+        data-collapse-action={inFold ? true : undefined}
         aria-label={label}
         title={`${hint ? `${label}: ${hint}` : label}${COMMAND_SHORTCUTS[id] ? ` (${COMMAND_SHORTCUTS[id]})` : ""}`}
         onPointerEnter={onHover}
@@ -853,7 +878,7 @@ export function SecondaryToolbar({
         <Icon />
       </button>
     );
-  };
+  }
 
   // Everything the toolbar and its menus can do, as entries of the command
   // search. Built from the same lists as the buttons, so a new tool shows up in
@@ -965,6 +990,7 @@ export function SecondaryToolbar({
       ),
       plain("notes", t("visibility.notes"), visibilityGroup, noteCount > 0, onToggleNotes, { icon: notesVisible ? Eye : EyeOff, active: notesVisible }),
       plain("overhangs", t("visibility.overhangs", { angle: overhangAngle }), visibilityGroup, true, onToggleOverhangs, { icon: AlertTriangle, active: overhangsVisible }),
+      plain("look-onto-workplane", t("camera.lookOntoWorkplane"), t("shortcuts.group.view"), true, () => window.dispatchEvent(new Event("layerling:look-onto-workplane")), { icon: ScanEye }),
       ...combineTools.map((tool) => fromTool(tool, t("editor.group.combine"))),
       ...modifyTools.map((tool) => fromTool(tool, t("editor.group.modify"))),
       plain("carry", t("contextMenu.carry"), t("editor.group.arrange"), canModifySelection, onCarryOntoFace, { icon: ArrowDownToLine }),
@@ -1002,7 +1028,7 @@ export function SecondaryToolbar({
         </div>
         <div className="toolbar-section" data-group="history" data-collapse="3">
           <div className="toolbar-section-label">{t("editor.group.history")}</div>
-          {collapseBox(t("editor.group.history"), ToolbarUndoIcon)}
+          {collapseBox(t("editor.group.history"), ToolbarUndoIcon, leftTools.find((tool) => tool.id === "undo"))}
           <div className="toolbar-section-tools">{inSimpleMode(leftTools.slice(4)).map(renderToolButton)}</div>
         </div>
         <div className="toolbar-section toolbar-shapes-section" data-group="shapes" ref={shapesMenuRef} inert={historyViewActive}>
@@ -1413,7 +1439,7 @@ export function SecondaryToolbar({
                 </div>
                 <div className="toolbar-section sketch-history-section" data-group="history" data-collapse="2">
                   <div className="toolbar-section-label">{t("editor.group.history")}</div>
-                  {collapseBox(t("editor.group.history"), ToolbarUndoIcon)}
+                  {collapseBox(t("editor.group.history"), ToolbarUndoIcon, { id: "sketch-undo", label: t("sketch.undo"), icon: ToolbarUndoIcon, action: onSketchUndo, enabled: sketchCanUndo })}
                   <div className="toolbar-section-tools">
                     <button className={`toolbar-icon ${sketchCanUndo ? "" : "disabled"}`} type="button" aria-label={t("sketch.undo")} title={`${t("status.undo")} (${COMMAND_SHORTCUTS["sketch-undo"]})`} onClick={onSketchUndo} disabled={!sketchCanUndo}>
                       <ToolbarUndoIcon />

@@ -74,7 +74,7 @@ summary: كيف ينشئ مساعد ذكاء اصطناعي مثل Gemini أو C
 | `layerling_hull_objects` | تلف الأجسام في جسم واحد محدب، كأنها مغلفة بغشاء (الغلاف) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | تفصل شكلًا إلى أجزائه المنفصلة، وجسم الرسم التخطيطي إلى جسم لكل حد خارجي |
 | `layerling_split_objects` | تقطع أجسامًا صلبة أو ثقوبًا إلى قسمين بمستوى |
@@ -90,10 +90,12 @@ summary: كيف ينشئ مساعد ذكاء اصطناعي مثل Gemini أو C
 | `layerling_layer_text` | تحوّل نصًا إلى طبقات متراكبة لطباعة متعددة الألوان (حروف، وحواف أعرض، ولوحة بلا ثقوب) أو تعيد بناء هذه الطبقات، مع ثقب لحلقة مفاتيح، وزوايا لكل طبقة، وحافة حروف مستديرة أو مشطوفة؛ ومع قائمة أسماء، بطاقة لكل اسم |
 | `layerling_layer_icon` | تحوّل أيقونة SVG (نص الملف، أو جسم رسم تخطيطي مبثوق) إلى بطاقة أيقونة متعددة الطبقات لطباعة متعددة الألوان - الأيقونة، وحواف أعرض، ولوحة بلا ثقوب - أو تعيد بناءها بعرض أو طبقات جديدة؛ ومع عدد، تملأ اللوحة بنسخ منها |
 | `layerling_create_qr_code` | تنشئ رمز QR من نص أو عنوان ويب، مثل {{ui:shape.qrCode}} في مكتبة الأشكال - الرمز وحده، أو بارزًا على لوح، أو محفورًا، مع تصحيح الأخطاء والعرض والارتفاع والمنطقة الهادئة وكفراغ عند الطلب؛ وتحذّر عندما تصغر الوحدة عن 0.8 مم |
+| `layerling_create_sbc_board` | تضع لوحة SBC بحجمها الحقيقي، مثل {{ui:shape.sbcBoard}} في مكتبة الأشكال - Raspberry Pi 5 أو 4 أو 3 B+ أو Zero 2 W أو BIGTREETECH Pi، مع الثقوب والموصلات والخلوص حول موصلات الحافة والموضع، وكثقب لقطع علبة |
 | `layerling_reference_image` | تضيف صورة مرجعية من صورة، مثل {{ui:import.referenceImage}}، أو تنقل واحدة أو تديرها أو تعايرها (نقطتان من الصورة والمسافة الحقيقية بينهما) أو تجعلها شفافة أو تقفلها - أداة مساعدة لا تُصدَّر ولا تُطبع أبدًا؛ و`trace` يحوّل جزءها الداكن أو الفاتح إلى جسم رسم يقف عليها |
 | `layerling_measure_section` | تقيس على مستوى القطع بين نقطتين تلتقطان إلى الحد الخارجي - سمك الجدار، والفجوات، والتوافقات |
 | `layerling_show_overhangs` | تشغّل تظليل البروزات أو توقفه، وتضبط الزاوية، وتذكر لكل جسم المساحة التي ستحتاج إلى دعامات |
 | `layerling_estimate_print` | تقدّر الحجم والوزن وخيط الطباعة للتحديد أو للتصميم كله: لجسم صلب، وكتقدير تقريبي بجدران وحشوة كما في نافذة التصدير |
+| `layerling_check_clearance` | يتحقق قبل الطباعة من الأجزاء التي تتداخل أو تتلامس أو تقترب أكثر من الخلوص الأدنى، بما في ذلك الأجزاء المنفصلة لجسم واحد |
 | `layerling_add_reference_points` | تعلّم نقاطًا مرجعية - في مركز الأجسام أو زواياها أو منتصفات حوافها، أو في مواضع دقيقة - تلتقط إليها الأشكال |
 | `layerling_list_reference_points` | تسرد النقاط المرجعية مع معرّفاتها ومواضعها |
 | `layerling_remove_reference_points` | تحذف نقاطًا مرجعية حسب المعرّف، أو كلها |

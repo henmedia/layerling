@@ -99,6 +99,10 @@ Derefter indstiller du tykkelsen ({{ui:lid.thickness}}), pasningen ({{ui:lid.fit
 
 > **Tip:** Hvor stramt et låg sidder, afhænger af printeren. Print først en lille kasse med låg; sidder det for stramt, så vælg den næste, løsere pasning.
 
+Slå {{ui:lid.magnets}} til, så holder fire runde magneter låget i stedet for en stram pasning. Vælg en {{ui:lid.magnetSize}} (6 × 2, 8 × 3 eller 10 × 3 mm) eller indstil {{ui:lid.magnetDiameter}} og {{ui:lid.magnetHeight}} selv, og {{ui:lid.magnetGap}}: 0,1 mm for at trykke magneterne ind, 0,2 til 0,3 mm for at lime dem. Layerling skærer en lomme i hvert hjørne af legemets kant og en over for den i lågets plade, lidt dybere end magneten, så den aldrig stikker op. Hvor væggen er for tynd til en lomme, fylder en søjle hjørnet fra bunden op til kanten, og lågets læbe går uden om den. Legemet grupperes med sine lommer og søjler: opløser du gruppen, har du det igen, som det var. Pladen skal være mindst magnetens højde plus 0,8 mm tyk; når du slår magneterne til, bliver den det.
+
+> **Tip:** Tryk først magneterne ind i legemet. Sæt så en magnet mere på hver af dem, hvor den selv vender rigtigt, og tryk låget ned på dem (med en dråbe lim i lommerne, hvis de sidder løst): så kommer hver magnet ind i låget over for sin partner, og de tiltrækker hinanden.
+
 ## Forskyd legemer
 
 Hver flade på et legeme kan flyttes den samme afstand, udad eller indad. Det er, hvad en pasning, et låg eller en snapsamling har brug for: et spillerum på 0,1 til 0,3 mm hele vejen rundt, mens detaljerne bliver, hvor de er, hvad skalering ikke kan give.

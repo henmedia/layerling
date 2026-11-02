@@ -70,7 +70,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_hull_objects` | egyetlen domború testbe burkolja az objektumokat, mintha zsugorfóliába csomagolnák (Burok) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | egy alakzatot a különálló részeire bont, a vázlattestet körvonalanként egy testre |
 | `layerling_split_objects` | tömör testeket vagy lyukakat vág ketté egy síkkal |
@@ -86,10 +86,12 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_layer_text` | egy szöveget rétegekből álló kötegbe alakít többszínű nyomtatáshoz (betűk, szélesebb szegélyek, egy lyukak nélküli lap), vagy újraépít egy köteget, kulcstartólyukkal, rétegenkénti sarkokkal és lekerekített vagy letört betűéllel; névlistával nevenként egy címkét készít |
 | `layerling_layer_icon` | egy SVG-ikont (a fájl szövegét vagy egy kihúzott vázlattestet) rétegekből álló ikoncímkévé alakít többszínű nyomtatáshoz – az ikon, szélesebb szegélyek, egy lyukak nélküli lap –, vagy új szélességgel vagy rétegekkel újraépít egyet; darabszámmal másolatokkal tölti meg a tárgyasztalt |
 | `layerling_create_qr_code` | szövegből vagy webcímből QR-kódot készít, mint az alakzatkönyvtár {{ui:shape.qrCode}} eleme – csak a kódot, lapon kiemelve vagy gravírozva, hibajavítással, szélességgel, magassággal, csendes zónával és kérésre üregként; figyelmeztet, ha egy modul 0,8 mm alá kerül |
+| `layerling_create_sbc_board` | valódi méretű SBC lapot tesz le, mint az alakzatkönyvtár {{ui:shape.sbcBoard}} eleme – Raspberry Pi 5, 4, 3 B+, Zero 2 W vagy BIGTREETECH Pi, furatokkal és csatlakozókkal, a szélső csatlakozók holtjátékával, helyzettel, és kivágásként doboz vágásához |
 | `layerling_reference_image` | képből mintaképet ad hozzá, mint a {{ui:import.referenceImage}}, vagy egyet mozgat, forgat, kalibrál (a kép két pontja és valódi távolságuk), halványít vagy zárol - segédlet, amely sosem exportálódik és sosem nyomtatódik; a `trace` a sötét vagy világos részéből rajta álló vázlattestet készít |
 | `layerling_measure_section` | egy vágósíkon két, a körvonalhoz illeszkedő pont között mér – falvastagság, rések, illesztések |
 | `layerling_show_overhangs` | be- vagy kikapcsolja a túlnyúlások sraffozását, beállítja a szöget, és minden testnél megadja azt a területet, amelyhez támasz kellene |
 | `layerling_estimate_print` | megbecsüli a térfogatot, a tömeget és a filamentet a kijelöléshez vagy a teljes tervhez: tömör testre, és durva becslésként falakkal és kitöltéssel, mint az exportálási ablak |
+| `layerling_check_clearance` | nyomtatás előtt ellenőrzi, mely alkatrészek fedik át egymást, érnek össze vagy kerülnek közelebb egy minimális hézagnál, egy objektum különálló részeit is |
 | `layerling_add_reference_points` | referenciapontokat jelöl meg – objektumok középpontján, sarkain vagy élfelezőin, vagy pontos helyeken –, amelyekhez az alakzatok illeszkednek |
 | `layerling_list_reference_points` | felsorolja a referenciapontokat az azonosítójukkal és a helyzetükkel |
 | `layerling_remove_reference_points` | azonosító alapján vagy mindet törli a referenciapontokat |

@@ -220,8 +220,8 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     quotes: ["«", "»"],
     guideDir: "guia-es",
     communityUrl: GITHUB_DISCUSSIONS,
-    readme: "README.md",
-    quickstartAnchor: "windows-quickstart",
+    readme: "README.es.md",
+    quickstartAnchor: "inicio-rápido-en-windows",
     legal: { imprint: "Aviso legal", privacy: "Política de privacidad" },
     // The labels of a Spanish keyboard.
     keyNames: {

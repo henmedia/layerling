@@ -20,7 +20,7 @@ const END = "<!-- videos:end -->";
 const DISCUSSION_NUMBER = 296;
 
 /** README file -> the guide language its list is taken from. */
-export const README_LANGUAGES = { "README.md": "en", "README.de.md": "de", "README.nl.md": "nl", "README.ar.md": "ar", "README.zh-cn.md": "zh-cn", "README.zh-tw.md": "zh-tw" };
+export const README_LANGUAGES = { "README.md": "en", "README.de.md": "de", "README.es.md": "es", "README.nl.md": "nl", "README.ar.md": "ar", "README.zh-cn.md": "zh-cn", "README.zh-tw.md": "zh-tw" };
 
 /** The lines of the video chapter of a language: "- [title](https://...) - channel (language). description". */
 export function chapterVideoLines(language, base = root) {

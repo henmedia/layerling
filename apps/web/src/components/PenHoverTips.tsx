@@ -7,7 +7,7 @@ import { holdTitle, hoverTipFor, hoverTitled, hoverTitleOf, penTipPosition } fro
 /** The pointer has to rest on a control this long before its name appears, as a mouse waits for a tooltip. */
 const SHOW_DELAY_MS = 350;
 
-type Tip = { text: string; left: number; top: number };
+type Tip = { text: string; left: number; top: number; above: boolean };
 
 function runsAsInstalledApp() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -59,8 +59,12 @@ export function PenHoverTips() {
         // The text is read now: a control may have changed its title while the pointer waited.
         const text = hoverTitleOf(found.element);
         if (!text || !found.element.isConnected) return;
-        const position = penTipPosition(found.element.getBoundingClientRect(), { width: window.innerWidth, height: window.innerHeight });
-        setTip({ text, left: position.left, top: position.top });
+        const position = penTipPosition(
+          found.element.getBoundingClientRect(),
+          { width: window.innerWidth, height: window.innerHeight },
+          event.pointerType === "mouse",
+        );
+        setTip({ text, left: position.left, top: position.top, above: position.above });
       }, SHOW_DELAY_MS);
     };
     // A click or a key only puts the bubble away: like the browser's tooltip it stays away until the
@@ -88,7 +92,7 @@ export function PenHoverTips() {
 
   if (!tip) return null;
   return (
-    <div className="pen-hover-tip" role="tooltip" style={{ left: tip.left, top: tip.top }}>
+    <div className={tip.above ? "pen-hover-tip pen-hover-tip-above" : "pen-hover-tip"} role="tooltip" style={{ left: tip.left, top: tip.top }}>
       {tip.text}
     </div>
   );

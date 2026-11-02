@@ -75,6 +75,7 @@ import { readTape, writeTape } from "@/lib/tapeStore";
 import { useFileAccept } from "@/lib/fileAccept";
 import { lylFileAccessSupported, onLylFilesLaunched, pickFilesToImport, rememberLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName } from "@/lib/lylProject";
+import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
 import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
 import { downloadBackup, pngDataUrl, projectThumbnailBlob, projectThumbnailPngBytes, serverCustomShapesBackupEntries, writeServerBackup } from "@/lib/backupDownload";
@@ -428,6 +429,9 @@ function projectResourceRecordId(projectId: string, kind: ProjectShapeResourceRe
   return `${projectId}:${projectResourceKey(kind, resourceId)}`;
 }
 
+/** The kernel's worker is only loaded for a design that has a body to mesh lighter (lib/cadMeshRelief.ts). */
+const remeshCadBrepLater: RemeshCadBrep = (brep, deflection, capped) => import("@/lib/editorSketchCad").then(({ remeshCadBrep }) => remeshCadBrep(brep, deflection, capped));
+
 async function loadProjectShapes(projectId: string) {
   const database = await openProjectShapesDb();
   const record = await new Promise<ProjectShapeRecord | null>((resolve, reject) => {
@@ -444,7 +448,7 @@ async function loadProjectShapes(projectId: string) {
   const storedPackage = record.lylPackage ?? record.skfPackage;
   if (storedPackage) {
     database.close();
-    const restored = await importLylProject(storedPackage);
+    const { project: restored, relieved } = await relieveOverFineCadMeshes(await importLylProject(storedPackage), remeshCadBrepLater);
     return {
       ...record,
       shapes: restored.shapes,
@@ -452,6 +456,8 @@ async function loadProjectShapes(projectId: string) {
       historyIndex: restored.historyIndex,
       assets: restored.assets,
       attachments: restored.attachments,
+      // Bodies meshed lighter than they were stored (Discussion #1042): the design is saved so again.
+      relievedMeshes: relieved,
     };
   }
 
@@ -1375,7 +1381,12 @@ export default function Home() {
             [activeProjectId]: reconciled,
           };
         });
-        if (record && !record.lylPackage && !record.skfPackage && loadedRevision > 0) {
+        if (record && "relievedMeshes" in record && record.relievedMeshes > 0) {
+          // The lighter meshes are saved, so the design opens light from now on (Discussion #1042).
+          void saveProjectShapesWhenIdle(activeProjectId, loadedEntry, projectShapeSaveContext(activeProject)).catch(() => {
+            // The stored design stays as it was and is lightened again on the next opening.
+          });
+        } else if (record && !record.lylPackage && !record.skfPackage && loadedRevision > 0) {
           // Migrate the data at the revision it was actually read from disk. Using the
           // newer project metadata revision here can let stale shapes outrank a live edit.
           void saveProjectShapesWhenIdle(activeProjectId, loadedEntry, projectShapeSaveContext(activeProject)).catch(() => {
@@ -1724,7 +1735,7 @@ export default function Home() {
   const openLylProjectFromFile = useCallback(async (file: File, sharedProject?: SharedProject, fileHandle?: LylFileHandle) => {
     setDashboardNotice(t("notice.validatingFile", { name: file.name }));
     try {
-      const restored = await importLylProject(await file.arrayBuffer());
+      const restored = (await relieveOverFineCadMeshes(await importLylProject(await file.arrayBuffer()), remeshCadBrepLater)).project;
       const now = Date.now();
       // A project on the server has one working copy here, not one per opening.
       // Without this, every visit to the folder left another namesake behind.

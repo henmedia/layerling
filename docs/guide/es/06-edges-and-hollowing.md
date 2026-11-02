@@ -14,7 +14,7 @@ Las aristas vivas rara vez quedan bien en una pieza impresa, y tampoco son espec
 
 ![La herramienta «Redondear aristas»: todas las aristas vivas están seleccionadas y la imagen muestra la vista previa con un radio de 4 mm.](shot:fillet-preview)
 
-La ventana de herramienta está arriba a la derecha. Si tapa aristas en las que quieres hacer clic, arrástralo por su barra de título; la próxima vez se abrirá también ahí, y lo mismo pasa con {{ui:editor.tool.hollow}} y {{ui:editor.tool.array}}. Un doble clic en la barra de título lo devuelve a su sitio.
+La ventana de herramienta está arriba a la derecha. Si tapa aristas en las que quieres hacer clic, arrástrala por su barra de título; la próxima vez se abrirá también ahí, y lo mismo pasa con {{ui:editor.tool.hollow}} y {{ui:editor.tool.array}}. Un doble clic en la barra de título la devuelve a su sitio.
 
 Si eliges una forma de la lista de formas con la ventana abierta, esta se cierra sin aplicar nada y se olvidan las aristas en las que habías hecho clic. Entonces el clic coloca la forma nueva en lugar de elegir aristas.
 
@@ -41,7 +41,7 @@ Si una selección que funcionaba falla al hacer clic en una arista más, esa ari
 
 La arista que hay bajo el puntero también se dibuja más gruesa, para que veas cuál va a elegir el clic.
 
-Un hueco también admite {{ui:editor.tool.chamfer}} y {{ui:editor.tool.fillet}}, igual que {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} y {{ui:editor.tool.deleteFace}}: sigue siendo un hueco y corta con su nueva forma. Redondear las cuatro aristas verticales de un hueco en forma de caja da una cavidad con esquinas interiores redondeadas, y un hueco agrandado con {{ui:editor.tool.offset}} corta con ese margen de más. Para romper la arista donde un hueco se une a la pieza, trata el grupo terminado: esa arista es suya.
+Un orificio también admite {{ui:editor.tool.chamfer}} y {{ui:editor.tool.fillet}}, igual que {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} y {{ui:editor.tool.deleteFace}}: sigue siendo un orificio y corta con su nueva forma. Redondear las cuatro aristas verticales de un orificio en forma de caja da una cavidad con esquinas interiores redondeadas, y un orificio agrandado con {{ui:editor.tool.offset}} corta con ese margen de más. Para romper la arista donde un orificio se une a la pieza, trata el grupo terminado: esa arista es suya.
 
 ### Deshacer una operación de aristas
 
@@ -81,7 +81,7 @@ Un cuerpo con un hueco (un bloque con un orificio que no llega a atravesarlo, he
 
 **Los cuerpos que terminan en punta,** como un cono o un triángulo convertido en cuerpo de revolución, no tienen arriba una cara plana que pueda quedar abierta. Tampoco funciona una cavidad totalmente cerrada, porque una punta no se puede desfasar hacia dentro: incluso con una pared de 1 mm aparece el mensaje de que las paredes no pueden ser tan gruesas. En su lugar, dibuja la pared en el perfil antes de la revolución: duplica el contorno, reduce la copia de forma uniforme, colócala en el centro del contorno grande y corta el grande con ella; después aplica la revolución al resultado (capítulo Bocetos, apartado Revolución). La distancia entre los dos contornos es el grosor de la pared.
 
-Si más adelante cambias el tamaño de un cuerpo vaciado, layerling lo vuelve a vaciar al momento con el tamaño nuevo. La pared mantiene el grosor que elegiste, también en los cuerpos redondos. Un cilindro que estires más en una dirección que en la otra se convierte en una elipse.
+Si más adelante cambias el tamaño de un cuerpo vaciado, layerling lo vuelve a vaciar al momento con el tamaño nuevo. La pared mantiene el grosor que elegiste, también en los cuerpos redondos. Un cilindro que estires más en una dirección que en la otra se convierte en una elipse. Los redondeos y chaflanes que le aplicaste después del vaciado se vuelven a aplicar en las mismas aristas.
 
 > **Consejo:** Con una boquilla de 0,4 mm, una pared de 1,2 a 2 mm es un buen punto de partida: lo bastante fina para ahorrar material y lo bastante gruesa para que la pieza sea resistente.
 
@@ -90,27 +90,33 @@ Si más adelante cambias el tamaño de un cuerpo vaciado, layerling lo vuelve a 
 {{ui:editor.tool.lid}} crea la tapa de un cuerpo abierto por arriba: una caja que vaciaste con la parte de arriba abierta, una maceta, una bandeja. Selecciona el cuerpo y haz clic en {{ui:editor.tool.lid}}. En la ventana eliges el tipo:
 
 - {{ui:lid.type.plug}}: una placa tan grande como el cuerpo con un labio debajo que entra en la abertura.
-- {{ui:lid.type.cap}}: una placa una pared más ancha que el cuerpo con un borde debajo que abraza el exterior.
-- {{ui:lid.type.both}}: una placa una pared más ancha que el cuerpo con las dos cosas: un labio dentro de la abertura y un borde por fuera. La pared del cuerpo queda en una ranura entre ambos, como en un táper.
+- {{ui:lid.type.cap}}: una placa que sobresale del cuerpo el grosor de una pared, con un borde debajo que abraza el exterior.
+- {{ui:lid.type.both}}: una placa que sobresale del cuerpo el grosor de una pared, con las dos cosas: un labio dentro de la abertura y un borde por fuera. La pared del cuerpo queda en una ranura entre ambos, como en un táper.
 - {{ui:lid.type.flat}}: solo la placa, para apoyarla o pegarla.
 
-Después ajustas el grosor ({{ui:lid.thickness}}), el ajuste ({{ui:lid.fit}}, la holgura por lado entre tapa y cuerpo: 0,1 mm apretado, 0,2 mm normal, 0,3 mm suelto, o cualquier valor hasta 1 mm) y cuánto baja el labio o el borde y lo gruesa que es su pared. Haz clic en {{ui:lid.apply}}: la tapa queda junto al cuerpo, dada la vuelta con la placa abajo, así se imprime sin soportes. El cuerpo queda como está. La tapa sigue cualquier contorno, redondo o anguloso, porque se toma del propio cuerpo justo debajo de su borde. Un cuerpo sin abertura arriba solo recibe una tapa plana; para las demás, vacíalo antes con la parte de arriba abierta.
+Después ajustas {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} entre tapa y cuerpo: 0,1 mm apretado, 0,2 mm normal, 0,3 mm suelto, o cualquier valor hasta 1 mm) y cuánto baja el labio o el borde y lo gruesa que es su pared. Haz clic en {{ui:lid.apply}}: la tapa queda junto al cuerpo, dada la vuelta con la placa abajo, para que se imprima sin soportes. El cuerpo queda como está. La tapa sigue cualquier contorno, redondo o anguloso, porque se toma del propio cuerpo justo debajo de su borde. Un cuerpo sin abertura arriba solo recibe una tapa plana; para las demás, vacíalo antes con la parte de arriba abierta.
 
 > **Consejo:** Lo apretada que queda una tapa depende de la impresora. Imprime primero una caja pequeña con su tapa; si queda demasiado apretada, elige el siguiente ajuste más suelto.
 
+Marca {{ui:lid.magnets}} y la tapa se sujeta con cuatro imanes redondos en lugar de con un ajuste apretado. Elige un tamaño en {{ui:lid.magnetSize}} (6 × 2, 8 × 3 o 10 × 3 mm) o fija {{ui:lid.magnetDiameter}} y {{ui:lid.magnetHeight}}, y también {{ui:lid.magnetGap}}: 0,1 mm para meter los imanes a presión, de 0,2 a 0,3 mm para pegarlos. layerling abre un alojamiento en cada esquina del borde del cuerpo y otro enfrente en la placa de la tapa, algo más hondo que el imán, para que nunca sobresalga. Donde la pared es demasiado fina para un alojamiento, un pilar rellena la esquina desde el fondo hasta el borde, y el labio de la tapa lo rodea. El cuerpo queda agrupado con sus alojamientos y pilares: desagrúpalo y lo recuperas tal como estaba. La placa tiene que medir al menos la altura del imán más 0,8 mm de grosor; al activar los imanes se ajusta sola.
+
+> **Consejo:** Mete primero los imanes en el cuerpo a presión. Luego pon otro imán sobre cada uno, en el sentido en que se pega, y aprieta la tapa sobre ellos (con una gota de pegamento en sus alojamientos si quedan sueltos): cada imán entra en la tapa enfrentado a su pareja, así que se atraen.
+
 ## Desfasar cuerpos
 
-Cada cara de un cuerpo puede moverse la misma distancia, hacia fuera o hacia dentro. Eso necesita un ajuste, una tapa o una unión a presión: una holgura de 0,1 a 0,3 mm alrededor mientras los detalles quedan donde están, algo que el escalado no da.
+Cada cara de un cuerpo puede moverse la misma distancia, hacia fuera o hacia dentro. Es lo que necesitan un ajuste a presión, una tapa o un encaje elástico: una holgura de 0,1 a 0,3 mm alrededor sin que los detalles se muevan de su sitio, algo que el escalado no consigue.
 
 1. Selecciona un cuerpo y haz clic en {{ui:editor.tool.offset}}, o haz clic derecho en el cuerpo y elígelo ahí.
 2. Elige {{ui:offset.grow}} o {{ui:offset.shrink}} y fija la {{ui:offset.distance}}.
 3. Los {{ui:offset.edges}} deciden las esquinas exteriores: redondeado mantiene redonda la superficie desfasada, afilado deja que las caras sigan hasta encontrarse.
-4. Marca {{ui:offset.copy}} para conservar la pieza tal cual y obtener el cuerpo agrandado como una copia que ya es un hueco. Agrupa ese hueco con la pieza que encaja y corta exactamente la holgura elegida.
+4. Marca {{ui:offset.copy}} para conservar la pieza tal cual y obtener el cuerpo agrandado como una copia que ya es un orificio. Agrupa ese orificio con la pieza que encaja y corta exactamente la holgura elegida.
 5. Haz clic en {{ui:offset.apply}}.
 
 Marca {{ui:offset.sideways}} cuando solo deba crecer o encoger el contorno: los lados se mueven la distancia, y cada cara plana de arriba y de abajo se queda a su altura. Un cartel recibe un borde alrededor, una base se ensancha y el cuerpo no se hace más alto. En un cuerpo escalonado, cada escalón conserva su altura. Un texto que se desfasa a través de sus contornos también conserva entonces su altura.
 
-Sin la marca se desfasa el propio cuerpo. Pasa a ser un cuerpo exacto fijo, como tras un chaflán: la lista de arriba de la ventana deshace el desfase, y {{ui:edge.editAction}} abre de nuevo la herramienta con la distancia anterior. Solo se pueden desfasar cuerpos CAD exactos - cajas, cilindros y las demás formas, sus grupos, piezas STEP importadas. Un cuerpo que es solo una malla de triángulos, como muchas importaciones STL, a menudo no se puede. Una distancia demasiado grande para el cuerpo, por ejemplo reducir más allá de su pared más fina, se rechaza.
+Sin la marca se desfasa el propio cuerpo. Pasa a ser un cuerpo exacto fijo, como tras un chaflán: la lista de arriba de la ventana deshace el desfase, y {{ui:edge.editAction}} abre de nuevo la herramienta con la distancia anterior. Solo se pueden desfasar cuerpos CAD exactos: cajas, cilindros y las demás formas, sus grupos y las piezas STEP importadas. Un cuerpo que es solo una malla de triángulos, como muchas importaciones STL, a menudo no se puede. Una distancia demasiado grande para el cuerpo, por ejemplo reducir más allá de su pared más fina, se rechaza.
+
+Un texto cuyas letras el núcleo no puede desfasar como cuerpo (en algunas fuentes, una A, B, M, N, W o 9) se desfasa en cambio a través de sus contornos: recibe el relleno {{ui:prop.textWider}} con esa distancia (más estrecho si encoge) y crece lo mismo por arriba y por abajo. Sigue siendo un texto que puedes seguir editando. Esto funciona con un texto de letras rellenas y sin redondeo; uno que ya tiene un modo de relleno se rechaza, como antes.
 
 ## Eliminar caras
 

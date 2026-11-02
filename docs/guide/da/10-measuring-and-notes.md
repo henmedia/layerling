@@ -61,6 +61,23 @@ Med {{ui:workspace.dimensionsAlwaysVisible}} bliver dimensionerne permanent synl
 
 Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring markeringen forsvinder, så en del du flytter er nem at se. [[Q]] igen henter dem tilbage. Et håndtag du peger på viser stadig sit mål.
 
+## Tjek spillerum
+
+Dele, der skal kunne bevæge sig efter print - en flexi-drage, et hængsel printet i ét stykke, en æske med låg, en aksel i sit hul - skal have afstand til hinanden. Er den for lille, hænger de sammen; overlapper de, printes de som ét stykke. {{ui:editor.tool.clearance}} ved siden af {{ui:editor.tool.intersectPreview}} tjekker det, før du printer. Det tager de valgte objekter eller, når intet er valgt, alle synlige (de samme som en eksport tager) og tjekker hvert par:
+
+- **{{ui:clearance.kind.overlap}}** (rød): de to deler et rumfang. Det vises rødt inde i legemerne, som bliver gennemsigtige, og listen angiver dets størrelse.
+- **{{ui:clearance.kind.touching}}** (rød): de rører hinanden og smelter sammen ved print.
+- **{{ui:clearance.kind.tight}}** (orange): den smalleste afstand er mindre end {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (grøn): den smalleste afstand er mindst så bred.
+
+Hver linje nævner de to dele og, ved en spalte, dens bredde og hvor den ligger: {{ui:clearance.direction.side}} (i samme lag) eller {{ui:clearance.direction.layer}} (over eller under: der kan sliceren kun lade hele lag stå frie, så en spalte tyndere end ét lag lukker). Klik på en linje: kameraet kører derhen, begge dele får en kontur, og en linje med tallet markerer det smalleste sted. Par, der ligger mere end 5 mm fra hinanden, vises ikke. Intet i designet ændres: tjekket gemmer intet og efterlader intet at fortryde.
+
+{{ui:clearance.threshold}} starter ved 0,3 mm; 0,3 er stramt, 0,4 almindeligt ved print-in-place. Ændres det, sorteres listen straks igen uden nyt tjek, og browseren husker værdien. {{ui:clearance.splitParts}} (slået til fra start) tjekker også de adskilte dele af ét objekt mod hinanden: en flexi-drage eller et hængsel importeret som én STL er ét objekt, men leddene er adskilte dele. De står i listen som "Navn · Del 2". En del i et hulrum i en anden, en kugle i et bur, er en del for sig.
+
+Ændrer du designet, mens vinduet er åbent, viser det {{ui:clearance.stale}}; klik på det eller på {{ui:clearance.checkAgain}}. [[Esc]] eller {{ui:clearance.close}} lukker vinduet. Også skalering ændrer afstandene: en flexi-model skaleret til 70 % beholder kun 70 % af sit spillerum, så tjek igen efter skalering.
+
+Tjekket måler det trekantsnet, som sliceren også får. En rund aksel og dens hul er polygoner med hjørnerne på cirklen, så en spalte kan blive nogle få hundrededele mindre end de runde mål. Et par med for mange trekanter står som {{ui:clearance.kind.unchecked}} i listen. En AI kører samme tjek med `layerling_check_clearance`.
+
 ## Noter
 
 En note registrerer hvad geometrien ikke siger: "Denne skrue er 0,3 mm for stram", "print låget endnu", "mål fra Peter". Placér en med {{ui:editor.tool.note}} eller [[N]]-tasten.

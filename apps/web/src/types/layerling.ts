@@ -29,6 +29,7 @@ export type ShapeKind =
   | "counterbore"
   | "countersink"
   | "doubleCountersink"
+  | "finishingWasher"
   | "teardrop"
   | "port"
   | "loft"
@@ -44,7 +45,7 @@ export type ShapeKind =
   | "mesh";
 
 /** Outline of a port opening (portGeometry.ts): rounded corners, or the lower corners cut as on these sockets. */
-export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "displayPort" | "miniDisplayPort";
+export type PortProfile = "rounded" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort";
 
 /** Cross-section of a bent tube; the inner one may also be "none" for a solid tube. */
 export type BentTubeProfile = "round" | "square" | "hexagon" | "octagon";
@@ -168,6 +169,9 @@ export type ShapeCustomization = {
   threadDrive?: ThreadDrive;
   threadDriveSize?: number;
   threadDriveDepth?: number;
+  /** Screw only (#1152): a round collar between the head and the thread, this high in mm; unset or 0 = none. Its diameter unset = twice the thread. */
+  threadCollarHeight?: number;
+  threadCollarDiameter?: number;
   springTurns?: number;
   springWire?: number;
   springHand?: ThreadHand;
@@ -373,6 +377,8 @@ export type ShapeCustomization = {
   screwHoleAngle?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
+  /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
+  portClearance?: number;
   bentTubeProfile?: BentTubeProfile;
   bentTubeInnerProfile?: BentTubeInnerProfile;
   bentTubeSize?: number;
@@ -659,9 +665,12 @@ export type GridfinityOpening = {
   distance?: number;
 };
 
+/** A point of a Gridfinity baseplate's outline (#1061), in the plate's own frame: x across, z deep, in mm. */
+export type GridfinityOutlinePoint = { x: number; z: number };
+
 /** Was aus dem Gewinde wird: Stange, Schraube, Mutter oder das Loch dafuer. */
 export type ThreadRole = "rod" | "screw" | "nut" | "bore";
-export type ThreadHead = "cylinder" | "countersunk" | "hex";
+export type ThreadHead = "cylinder" | "countersunk" | "hex" | "square" | "flange" | "wing" | "knob";
 /** What drives a screw: a recess in its free head face (#1052). */
 export type ThreadDrive = "hex" | "torx" | "phillips" | "slot" | "robertson" | "none";
 export type ThreadHand = "right" | "left";
@@ -717,6 +726,8 @@ export type EdgeTreatmentFeature = {
   chamferAngle?: number;
   /** Only for a fillet of one edge (#687): the radius at the edge's end, `amount` the one at its start. */
   endAmount?: number;
+  /** Only for a fillet (#1160): the edges were scooped out (a concave fillet) instead of rounded. */
+  concave?: boolean;
   openings?: ShellOpenings;
   /** Only for "shell" and "offset"; missing means "round". */
   shellEdges?: ShellEdges;
@@ -945,6 +956,9 @@ export type WorkplaneShape = {
   threadDrive?: ThreadDrive;
   threadDriveSize?: number;
   threadDriveDepth?: number;
+  /** Screw only (#1152): a round collar between the head and the thread, this high in mm; unset or 0 = none. Its diameter unset = twice the thread. */
+  threadCollarHeight?: number;
+  threadCollarDiameter?: number;
   springTurns?: number;
   springWire?: number;
   springHand?: ThreadHand;
@@ -1104,6 +1118,8 @@ export type WorkplaneShape = {
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   /** Gridfinity bin: the size of that rounding or chamfer in mm; missing, 0 or under 0.5 leaves them square. */
   gridfinityOpeningCornerSize?: number;
+  /** Gridfinity baseplate: the outline it fills (#1061), centred on its bounds; built stretched to the box, whole cells inside, the rest solid. */
+  gridfinityOutline?: GridfinityOutlinePoint[];
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */
@@ -1166,6 +1182,8 @@ export type WorkplaneShape = {
   screwHoleAngle?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
+  /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
+  portClearance?: number;
   cornerFillet?: number;
   topBottomFillet?: number;
   roundedBoxQuality?: number;
@@ -1242,6 +1260,11 @@ export type WorkplaneShape = {
    */
   qrCode?: QrCodeSettings;
   /**
+   * An SBC board (#1098): which board and the extra room for its edge connectors, so the properties
+   * panel can make it again. On the group that holds the board and its parts.
+   */
+  sbcBoard?: SbcBoardSettings;
+  /**
    * Set on a body made by wrapping around a cylinder (#106): its box is
    * centred on the cylinder's axis, and aligning, snapping and centring use
    * that box rather than the arc the mesh actually covers.
@@ -1252,6 +1275,11 @@ export type WorkplaneShape = {
    * settings it was made with. The body is a mesh with the relief; undo takes it back.
    */
   surfaceTexture?: import("@/lib/surfaceTexture").SurfaceTextureSettings;
+  /**
+   * More patterns on the same body, each on the faces it picked (the first, surfaceTexture, takes the faces left over
+   * when it picks none): made one after the other on the body under the texture, changed and taken off with it.
+   */
+  surfaceTextureLayers?: import("@/lib/surfaceTexture").SurfaceTextureSettings[];
   /**
    * A helper for another body's surface texture: where this convex body reaches into it, the
    * texture stays away ("exclude") or goes only there ("only"). It counts when that body gets its
@@ -1390,6 +1418,17 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 /** What is built: the code alone, a plate with the code raised on it, or a plate with the code engraved. */
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
+/** The single-board computers the SBC board shape knows (#1098). */
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12";
+
+export type SbcBoardSettings = {
+  board: SbcBoardType;
+  /** Extra room in mm on every side (but the bottom) of the connectors at the edge, 0 to 2. */
+  clearance: number;
+  /** How much further out in mm the connectors at the edge reach, to cut through a case wall, 0 to 10; none on older boards. */
+  reach?: number;
+};
+
 export type QrCodeSettings = {
   text: string;
   errorCorrection: QrErrorCorrection;

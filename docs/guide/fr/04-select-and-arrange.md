@@ -155,7 +155,7 @@ Seul {{ui:scalePercent.apply}} modifie la conception et un pas en arrière l'ann
 
 ## Annulation
 
-{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) et {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] ou [[Ctrl]]+[[Y]]) parcourent votre historique. Combien de pas parcourent le design enregistré que vous avez défini dans les paramètres sous {{ui:workspace.history}}. Pointez l'un des deux boutons : son info-bulle nomme l'étape qu'il annulerait ou rétablirait, avec la mesure lorsque l'étape en a une, par exemple « Arêtes de Box arrondies (5 mm) » ; le message qui suit dit la même chose. Pour revenir plusieurs étapes en arrière d'un coup, utilisez la vue de l'historique ci-dessous.
+{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) et {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] ou [[Ctrl]]+[[Y]]) parcourent votre historique. Combien de pas parcourent le design enregistré que vous avez défini dans les paramètres sous {{ui:workspace.history}}. Pointez l'un des deux boutons : son info-bulle nomme l'étape qu'il annulerait ou rétablirait, avec la mesure lorsque l'étape en a une, par exemple « Arêtes de Box arrondies (5 mm) » ; le message qui suit dit la même chose. Pour revenir plusieurs étapes en arrière d'un coup, utilisez la vue de l'historique ci-dessous. Un message qui annonce une étape tout juste faite, comme « 3 formes supprimées », a un bouton Annuler qui défait exactement cette étape.
 
 ## Rétrospective : la vue historique
 

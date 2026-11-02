@@ -2,7 +2,9 @@ import * as THREE from "three";
 import { toCreasedNormals } from "@/lib/creasedNormals";
 import type { ManifoldToplevel } from "manifold-3d";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
-import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityType, WorkplaneShape } from "@/types/layerling";
+import { segmentSegmentDistance } from "@/lib/holePattern";
+import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
+import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, WorkplaneShape } from "@/types/layerling";
 
 /*
  * Gridfinity (#381), the open storage system by Zack Freedman: bins on a 42 mm grid
@@ -302,6 +304,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityOpenings?: GridfinityOpening[];
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   gridfinityOpeningCornerSize?: number;
+  gridfinityOutline?: GridfinityOutlinePoint[];
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -390,6 +393,7 @@ export function gridfinitySize(type: GridfinityType, count: { x: number; z: numb
  */
 export function gridfinityFootprintPatch(shape: GridfinityShapeFields) {
   if (normalizeGridfinityType(shape.gridfinityType) === "tray") return gridfinityTraySize(shape);
+  if (normalizeGridfinityType(shape.gridfinityType) === "baseplate" && normalizeGridfinityOutline(shape.gridfinityOutline)) return gridfinityOutlineSize(shape);
   return gridfinitySize(normalizeGridfinityType(shape.gridfinityType), gridfinityUnits(shape), shape.gridfinityLip !== false, gridfinityPitch(shape), gridfinityPadding(shape));
 }
 
@@ -410,11 +414,17 @@ export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?
   const type = next.type ?? currentType;
   const lip = next.lip ?? shape.gridfinityLip !== false;
   const halfGrid = next.halfGrid ?? shape.gridfinityHalfGrid === true;
+  const largePlate = next.largePlate ?? shape.gridfinityLargePlate === true;
+  // An outline is a baseplate's alone (#1061): a baseplate keeps it and its box, anything else drops it.
+  const outlined = currentType === "baseplate" && normalizeGridfinityOutline(shape.gridfinityOutline) !== undefined;
+  if (outlined && type === "baseplate") {
+    return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...(next.largePlate !== undefined ? { gridfinityLargePlate: largePlate } : {}), ...gridfinityOutlineSize({ ...shape, gridfinityLargePlate: largePlate }) };
+  }
+  const dropOutline = outlined ? { gridfinityOutline: undefined } : {};
   if (type === "tray") {
     const box = { width: shape.width, depth: shape.depth ?? shape.width, height: currentType === "baseplate" ? DEFAULT_GRIDFINITY_TRAY_SIZE.height : shape.height };
-    return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...gridfinityTraySize(box) };
+    return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...dropOutline, ...gridfinityTraySize(box) };
   }
-  const largePlate = next.largePlate ?? shape.gridfinityLargePlate === true;
   const grid = { gridfinityType: type, gridfinityHalfGrid: halfGrid, gridfinityLargePlate: largePlate };
   const pitch = gridfinityPitch(grid);
   const max = gridfinityMaxUnits(grid);
@@ -430,7 +440,7 @@ export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?
   };
   // A bin turned into a baseplate takes back the padding it kept.
   const size = gridfinitySize(type, count, lip, pitch, gridfinityPadding({ ...shape, ...grid }));
-  return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...(next.largePlate !== undefined ? { gridfinityLargePlate: largePlate } : {}), ...size };
+  return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...(next.largePlate !== undefined ? { gridfinityLargePlate: largePlate } : {}), ...dropOutline, ...size };
 }
 
 /** Each side's padding on a baseplate (#455). */
@@ -493,21 +503,282 @@ export function gridfinityDrawerPatch(shape: GridfinityShapeFields, axis: "x" | 
 /** An inside narrower than this (mm) would not print: the bin is solid instead. */
 const MIN_GRIDFINITY_INSIDE = 1;
 
+/** The most points an outline keeps (#1061). */
+export const MAX_GRIDFINITY_OUTLINE_POINTS = 1000;
+
+/** Half the side of the square a socket top's 4 mm corners are centred on. */
+const OUTLINE_SOCKET_HALF = GRIDFINITY_GRID / 2 - GRIDFINITY_BASEPLATE_RADIUS;
+
+/** How many of an outline's longest straight sides along each axis the grid is tried against. */
+const OUTLINE_GRID_SIDES = 8;
+
+/** The step (mm) the grid is moved by across one cell, on each axis, in search of the place that holds the most cells. */
+const OUTLINE_GRID_STEP = 2;
+
+/** How far a cell may reach past an outline: it is kept to 0.01 mm, and a straightened curve can leave a side that much aslant. */
+const OUTLINE_KEPT = 0.01;
+
+/** How far a drawn curve may be straightened when it becomes a baseplate's outline (#1061): far below printing. */
+const OUTLINE_SIMPLIFY = 0.05;
+
+/** The largest a baseplate's outline can be on either axis (#1061): as the largest drawer one plate fits, its units and 41 mm a side. */
+export function gridfinityOutlineLimit(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityHalfGrid" | "gridfinityLargePlate">) {
+  return gridfinityMaxUnits(shape) * GRIDFINITY_GRID + 2 * MAX_GRIDFINITY_PADDING;
+}
+
+/** Whether an outline plate is wider or deeper than one plate without the Large plate switch takes (#1061): it keeps the switch on then. */
+export function gridfinityOutlineNeedsLargePlate(shape: GridfinityShapeFields) {
+  if (normalizeGridfinityType(shape.gridfinityType) !== "baseplate" || !normalizeGridfinityOutline(shape.gridfinityOutline)) return false;
+  return Math.max(shape.width, shape.depth ?? shape.width) > gridfinityOutlineLimit({ ...shape, gridfinityLargePlate: false });
+}
+
+/** A baseplate's outline stretched to its box, centred on it, as a sketch body is (#1061); null for anything else. */
+export function gridfinityOutlinePoints(shape: Pick<GridfinityShapeFields, "width" | "depth" | "gridfinityOutline">): GridfinityOutlinePoint[] | null {
+  const outline = normalizeGridfinityOutline(shape.gridfinityOutline);
+  if (!outline) return null;
+  const xs = outline.map((p) => p.x);
+  const zs = outline.map((p) => p.z);
+  const minX = Math.min(...xs);
+  const minZ = Math.min(...zs);
+  const spanX = Math.max(...xs) - minX;
+  const spanZ = Math.max(...zs) - minZ;
+  const depth = shape.depth ?? shape.width;
+  return outline.map((p) => ({ x: ((p.x - minX) / spanX - 0.5) * shape.width, z: ((p.z - minZ) / spanZ - 0.5) * depth }));
+}
+
+/**
+ * The whole cells an outline holds (#1061): a cell counts when its socket's top, 42 mm square with the 4 mm corners,
+ * lies inside it. The grid is tried on the outline's middle, half a cell off it, every OUTLINE_GRID_STEP across a cell,
+ * and with a cell against each of its longest straight sides along x and z, as a drawer fit puts its units against the
+ * drawer's sides; the place that holds the most cells wins, then the one whose borders on opposite sides are most even.
+ * At most `maxUnits` across and deep.
+ */
+export function gridfinityOutlineCells(outline: readonly GridfinityOutlinePoint[], maxUnits: number) {
+  const xs = outline.map((p) => p.x);
+  const zs = outline.map((p) => p.z);
+  const bounds = { minX: Math.min(...xs), maxX: Math.max(...xs), minZ: Math.min(...zs), maxZ: Math.max(...zs) };
+  const middle = { x: (bounds.minX + bounds.maxX) / 2, z: (bounds.minZ + bounds.maxZ) / 2 };
+  const edges = outline.map((p, i) => {
+    const q = outline[(i + 1) % outline.length];
+    return { a: { u: p.x, v: p.z }, b: { u: q.x, v: q.z }, minU: Math.min(p.x, q.x), maxU: Math.max(p.x, q.x), minV: Math.min(p.z, q.z), maxV: Math.max(p.z, q.z) };
+  });
+  const half = GRIDFINITY_GRID / 2;
+  // Each line of cells is worked out once: where the outline crosses the line through the cells' corners, and which
+  // edges come within reach of them.
+  const rows = new Map<number, { crossings: number[]; near: typeof edges }>();
+  const row = (z: number) => {
+    let found = rows.get(z);
+    if (!found) {
+      const at = z - OUTLINE_SOCKET_HALF;
+      const crossings = edges.filter((e) => (e.a.v > at) !== (e.b.v > at)).map((e) => e.a.u + ((at - e.a.v) / (e.b.v - e.a.v)) * (e.b.u - e.a.u));
+      found = { crossings, near: edges.filter((e) => e.minV < z + half && e.maxV > z - half) };
+      rows.set(z, found);
+    }
+    return found;
+  };
+  const fits = (x: number, z: number) => {
+    const { crossings, near } = row(z);
+    // The socket's top is its straight-sided core grown by the corner radius: every edge keeps that far from the core. With a
+    // corner of the core inside the outline, that puts the whole core inside it; an outline wholly within the core leaves
+    // that corner outside.
+    if (crossings.reduce((count, c) => count + (c > x - OUTLINE_SOCKET_HALF ? 1 : 0), 0) % 2 === 0) return false;
+    const core = [{ u: x - OUTLINE_SOCKET_HALF, v: z - OUTLINE_SOCKET_HALF }, { u: x + OUTLINE_SOCKET_HALF, v: z - OUTLINE_SOCKET_HALF }, { u: x + OUTLINE_SOCKET_HALF, v: z + OUTLINE_SOCKET_HALF }, { u: x - OUTLINE_SOCKET_HALF, v: z + OUTLINE_SOCKET_HALF }];
+    // An edge whose box stays off the cell's square is that far from the core already, as holePatternCenters skips it.
+    return near.every((e) => e.minU >= x + half || e.maxU <= x - half
+      || core.every((c, i) => segmentSegmentDistance(e.a, e.b, c, core[(i + 1) % 4]) >= GRIDFINITY_BASEPLATE_RADIUS - OUTLINE_KEPT));
+  };
+  // Where the grid can stand along an axis, in cells from the middle: a cell against a side lies half a cell from it,
+  // on whichever side of it, which is the same place on the grid.
+  const places = (along: "u" | "v", from: number) => {
+    const across = along === "u" ? "v" : "u";
+    const sides = edges.filter((e) => Math.abs(e.a[along] - e.b[along]) < 1e-6).sort((p, q) => Math.abs(q.a[across] - q.b[across]) - Math.abs(p.a[across] - p.b[across]));
+    const steps = Array.from({ length: Math.round(GRIDFINITY_GRID / OUTLINE_GRID_STEP) }, (_, k) => (k * OUTLINE_GRID_STEP) / GRIDFINITY_GRID);
+    const all = [0, 0.5, ...steps, ...sides.slice(0, OUTLINE_GRID_SIDES).map((e) => ((((e.a[along] - from) / GRIDFINITY_GRID + 0.5) % 1) + 1) % 1)];
+    return all.filter((place, i) => all.findIndex((other) => Math.abs(other - place) < 1e-6 || Math.abs(Math.abs(other - place) - 1) < 1e-6) === i);
+  };
+  // Only lines a whole cell stands on within the outline's bounds.
+  const lines = (place: number, from: number, min: number, max: number) => {
+    const first = Math.ceil((min + half - OUTLINE_KEPT - from) / GRIDFINITY_GRID - place);
+    const last = Math.floor((max - half + OUTLINE_KEPT - from) / GRIDFINITY_GRID - place);
+    return Array.from({ length: Math.max(0, last - first + 1) }, (_, k) => from + (first + k + place) * GRIDFINITY_GRID);
+  };
+  let best = { cells: [] as GridfinityOutlinePoint[], off: Infinity };
+  const alongZ = places("v", middle.z).map((v) => lines(v, middle.z, bounds.minZ, bounds.maxZ));
+  for (const u of places("u", middle.x)) {
+    const across = lines(u, middle.x, bounds.minX, bounds.maxX);
+    for (const deep of alongZ) {
+      let cells: GridfinityOutlinePoint[] = [];
+      across.forEach((x) => deep.forEach((z) => {
+        if (fits(x, z)) cells.push({ x, z });
+      }));
+      cells = keepRows(keepRows(cells, "x", maxUnits, middle.x), "z", maxUnits, middle.z);
+      if (cells.length === 0) continue;
+      // How far the cells' span sits off the outline's middle: none when opposite borders are equal.
+      const span = cells.reduce((s, c) => ({ minX: Math.min(s.minX, c.x), maxX: Math.max(s.maxX, c.x), minZ: Math.min(s.minZ, c.z), maxZ: Math.max(s.maxZ, c.z) }), { minX: cells[0].x, maxX: cells[0].x, minZ: cells[0].z, maxZ: cells[0].z });
+      const off = Math.abs(span.minX + span.maxX - 2 * middle.x) + Math.abs(span.minZ + span.maxZ - 2 * middle.z);
+      if (cells.length > best.cells.length || (cells.length === best.cells.length && off < best.off - 1e-6)) best = { cells, off };
+    }
+  }
+  return best.cells.sort((a, b) => a.x - b.x || a.z - b.z);
+}
+
+/** The cells of each stored outline at its last size, found once: the plan is asked for many times a draw. */
+const outlineCellsAtSize = new WeakMap<readonly GridfinityOutlinePoint[], { key: string; cells: readonly GridfinityOutlinePoint[] }>();
+
+function cachedOutlineCells(shape: GridfinityShapeFields, stored: readonly GridfinityOutlinePoint[], outline: readonly GridfinityOutlinePoint[]) {
+  const maxUnits = gridfinityMaxUnits(shape);
+  const key = `${shape.width} ${shape.depth ?? shape.width} ${maxUnits}`;
+  const found = outlineCellsAtSize.get(stored);
+  if (found?.key === key) return found.cells;
+  const cells = gridfinityOutlineCells(outline, maxUnits);
+  outlineCellsAtSize.set(stored, { key, cells });
+  return cells;
+}
+
+/** The cells in at most `max` neighbouring lines along an axis: the run holding the most, then the one nearest the middle. */
+function keepRows(cells: GridfinityOutlinePoint[], axis: "x" | "z", max: number, middle: number) {
+  const lines = [...new Set(cells.map((c) => c[axis]))].sort((a, b) => a - b);
+  if (lines.length <= max) return cells;
+  let kept = cells;
+  let best = { count: -1, off: Infinity };
+  for (let start = lines[0]; start <= lines[lines.length - 1] - (max - 1) * GRIDFINITY_GRID + 1e-6; start += GRIDFINITY_GRID) {
+    const run = cells.filter((c) => c[axis] > start - 1e-6 && c[axis] < start + (max - 1) * GRIDFINITY_GRID + 1e-6);
+    const off = Math.abs(start + ((max - 1) * GRIDFINITY_GRID) / 2 - middle);
+    if (run.length > best.count || (run.length === best.count && off < best.off - 1e-6)) {
+      kept = run;
+      best = { count: run.length, off };
+    }
+  }
+  return kept;
+}
+
+/** An outline plate's box (#1061): as it is, within the largest outline and the smallest tray. */
+function gridfinityOutlineSize(shape: GridfinityShapeFields) {
+  const limit = gridfinityOutlineLimit(shape);
+  return {
+    width: clampLabel(shape.width, limit, MIN_GRIDFINITY_TRAY_SIZE, limit),
+    depth: clampLabel(shape.depth ?? shape.width, limit, MIN_GRIDFINITY_TRAY_SIZE, limit),
+    height: GRIDFINITY_BASEPLATE_HEIGHT,
+  };
+}
+
+/** Twice the area an outline encloses, positive when it runs from x towards z. */
+function outlineArea(points: readonly GridfinityOutlinePoint[]) {
+  return points.reduce((sum, p, i) => sum + p.x * points[(i + 1) % points.length].z - points[(i + 1) % points.length].x * p.z, 0);
+}
+
+/**
+ * A baseplate's outline from the closed loops drawn for it (#1061), in the plate's own frame: what they enclose set in
+ * by half the drawer clearance, as a drawer fit leaves 0.5 mm in all, with curves straightened to within
+ * OUTLINE_SIMPLIFY. Holes in it are filled; several separate areas, or none left, are refused.
+ */
+export function gridfinityOutlineFromLoops(runtime: ManifoldToplevel, loops: ReadonlyArray<readonly GridfinityOutlinePoint[]>): { points: GridfinityOutlinePoint[] } | { error: "empty" | "several" } {
+  if (loops.length === 0) return { error: "empty" };
+  const made: Array<{ delete: () => void }> = [];
+  const keep = <T extends { delete: () => void }>(value: T) => {
+    made.push(value);
+    return value;
+  };
+  try {
+    const region = keep(new runtime.CrossSection(loops.map((loop) => loop.map((p): [number, number] => [p.x, p.z])), "EvenOdd"));
+    const inset = keep(keep(region.offset(-GRIDFINITY_DRAWER_CLEARANCE / 2, "Miter", 2, 48)).simplify(OUTLINE_SIMPLIFY));
+    // Manifold gives outer rings one way round and holes the other.
+    const outer = inset.toPolygons().map((ring) => ring.map(([x, z]) => ({ x, z }))).filter((ring) => outlineArea(ring) > 1e-9);
+    if (outer.length === 0) return { error: "empty" };
+    if (outer.length > 1) return { error: "several" };
+    return { points: outer[0] };
+  } finally {
+    new Set(made).forEach((value) => value.delete());
+  }
+}
+
+/**
+ * What fitting a baseplate into an outline writes (#1061), from the outline in the plate's own frame: the outline
+ * centred on its bounds and the box they make, and where their middle is, to move the plate there. Refused when the
+ * points make no outline or more than a plate keeps, or when it is larger on either axis than one plate takes or
+ * smaller than a plate can be.
+ */
+export function gridfinityOutlineFit(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityHalfGrid" | "gridfinityLargePlate">, points: readonly unknown[]) {
+  if (points.length > MAX_GRIDFINITY_OUTLINE_POINTS) return { error: "complex" as const, limit: MAX_GRIDFINITY_OUTLINE_POINTS };
+  const outline = normalizeGridfinityOutline(points);
+  // An outline crossing itself encloses no one area, and the exact body could not be built from it.
+  if (!outline || findSketchOutlineIntersection([outline.map((p) => ({ x: p.x, y: p.z }))])) return { error: "points" as const };
+  const xs = outline.map((p) => p.x);
+  const zs = outline.map((p) => p.z);
+  // The middle to 0.01 mm, so the outline moved onto it keeps the points it was checked with.
+  const centre = { x: Math.round((Math.min(...xs) + Math.max(...xs)) * 50) / 100, z: Math.round((Math.min(...zs) + Math.max(...zs)) * 50) / 100 };
+  const width = Math.round((Math.max(...xs) - Math.min(...xs)) * 100) / 100;
+  const depth = Math.round((Math.max(...zs) - Math.min(...zs)) * 100) / 100;
+  const limit = gridfinityOutlineLimit(shape);
+  if (width > limit || depth > limit) {
+    // How large it could be with the Large plate switch, when that would take it.
+    const large = gridfinityOutlineLimit({ ...shape, gridfinityLargePlate: true });
+    return { error: "size" as const, limit, ...(large > limit && Math.max(width, depth) <= large ? { large } : {}) };
+  }
+  // A plate cannot be smaller, and stretched to its box it would be larger than the outline.
+  if (width < MIN_GRIDFINITY_TRAY_SIZE || depth < MIN_GRIDFINITY_TRAY_SIZE) return { error: "small" as const, limit: MIN_GRIDFINITY_TRAY_SIZE };
+  return { patch: { gridfinityOutline: outline.map((p) => ({ x: Math.round((p.x - centre.x) * 100) / 100, z: Math.round((p.z - centre.z) * 100) / 100 })), width, depth }, centre };
+}
+
+type GridfinityPlacement = Pick<WorkplaneShape, "x" | "z" | "rotation" | "rotationX" | "rotationZ" | "mirrorX" | "mirrorY" | "mirrorZ">;
+
+/** Whether a baseplate lies flat on the workplane, so a drawing can be read in its frame (#1061): not tipped over or upside down. */
+export function gridfinityPlateFlat(plate: GridfinityPlacement) {
+  return Math.abs(plate.rotationX ?? 0) <= 1e-9 && Math.abs(plate.rotationZ ?? 0) <= 1e-9 && !plate.mirrorY;
+}
+
+/**
+ * Loops seen from above, in the workplane's x and z, in the frame of a baseplate lying flat (#1061): less its place,
+ * turned back and mirrored as it is drawn (the mirror is its scale, under its turn).
+ */
+export function gridfinityOutlineToPlate(loops: ReadonlyArray<readonly GridfinityOutlinePoint[]>, plate: GridfinityPlacement) {
+  const angle = THREE.MathUtils.degToRad(-plate.rotation);
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return loops.map((loop) => loop.map((p) => {
+    const dx = p.x - plate.x;
+    const dz = p.z - plate.z;
+    return { x: (dx * cos + dz * sin) * (plate.mirrorX ? -1 : 1), z: (-dx * sin + dz * cos) * (plate.mirrorZ ? -1 : 1) };
+  }));
+}
+
+/** A point of a baseplate's own frame on the workplane (#1061), the other way from gridfinityOutlineToPlate. */
+export function gridfinityPlateToWorld(point: GridfinityOutlinePoint, plate: GridfinityPlacement) {
+  const angle = THREE.MathUtils.degToRad(plate.rotation);
+  const x = point.x * (plate.mirrorX ? -1 : 1);
+  const z = point.z * (plate.mirrorZ ? -1 : 1);
+  return { x: plate.x + x * Math.cos(angle) + z * Math.sin(angle), z: plate.z - x * Math.sin(angle) + z * Math.cos(angle) };
+}
+
+/** What taking a baseplate's outline away writes (#1061): the plate fitted to its box as a drawer, on each axis. */
+export function gridfinityOutlineRemovalPatch(shape: GridfinityShapeFields) {
+  const plain = { ...shape, gridfinityOutline: undefined };
+  const across = gridfinityDrawerPatch(plain, "x", plain.width + GRIDFINITY_DRAWER_CLEARANCE);
+  const deep = gridfinityDrawerPatch({ ...plain, ...across }, "z", (shape.depth ?? shape.width) + GRIDFINITY_DRAWER_CLEARANCE);
+  return { gridfinityOutline: undefined, ...across, ...deep };
+}
+
 /** Everything the body is built from, in the shape's own frame: x across, z deep, y up from 0, centred on x and z. */
 export function gridfinityPlan(shape: GridfinityShapeFields) {
   const type = normalizeGridfinityType(shape.gridfinityType);
-  const count = gridfinityUnits(shape);
+  // A baseplate fitted into an outline (#1061) has whole cells inside it and no padding: the rest of it is solid.
+  const outline = type === "baseplate" ? gridfinityOutlinePoints(shape) : null;
+  const outlineCells = outline && shape.gridfinityOutline ? cachedOutlineCells(shape, shape.gridfinityOutline, outline) : [];
+  const count = outline ? { x: new Set(outlineCells.map((c) => c.x)).size, z: new Set(outlineCells.map((c) => c.z)).size, y: 1 } : gridfinityUnits(shape);
   const lip = type === "bin" && shape.gridfinityLip !== false;
   const magnets = type === "bin" && Boolean(shape.gridfinityMagnets);
   const pitch = gridfinityPitch(shape);
-  const padding = gridfinityPadding(shape);
+  const padding = outline ? NO_GRIDFINITY_PADDING : gridfinityPadding(shape);
   const tray = type === "tray";
-  const size = tray ? gridfinityTraySize(shape) : gridfinitySize(type, count, lip, pitch, padding);
+  const size = tray ? gridfinityTraySize(shape) : outline ? gridfinityOutlineSize(shape) : gridfinitySize(type, count, lip, pitch, padding);
   // The grid moves away from the padded sides: its middle is half the difference off the box's.
   const centre = { x: (padding.left - padding.right) / 2, z: (padding.back - padding.front) / 2 };
   // A tray stands on a flat bottom, with no grid of feet under it.
   const cells: Array<{ x: number; z: number; i: number; j: number }> = [];
-  if (!tray) {
+  if (outline) {
+    const first = { x: Math.min(...outlineCells.map((c) => c.x)), z: Math.min(...outlineCells.map((c) => c.z)) };
+    outlineCells.forEach((c) => cells.push({ ...c, i: Math.round((c.x - first.x) / pitch), j: Math.round((c.z - first.z) / pitch) }));
+  } else if (!tray) {
     for (let i = 0; i < count.x; i += 1) {
       for (let j = 0; j < count.z; j += 1) {
         cells.push({ i, j, x: centre.x + (i - (count.x - 1) / 2) * pitch, z: centre.z + (j - (count.z - 1) / 2) * pitch });
@@ -555,7 +826,7 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
   // A bin's outer wall above the feet (#856), to 0.01 mm; within CORNER_SNAP of 3.75 it is built as 3.75. Anything else's wall is its outline.
   const setWallRadius = Math.round(clampLabel(shape.gridfinityBinCornerRadius, GRIDFINITY_BIN_RADIUS, 0, GRIDFINITY_BIN_RADIUS) * 100) / 100;
   const wallRadius = type !== "bin" || GRIDFINITY_BIN_RADIUS - setWallRadius < CORNER_SNAP ? cornerRadius : setWallRadius;
-  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, pitch, size, cells, magnetHoles, top, base, dividerTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, cornerRadius, wallRadius, lipChamfer, wallThickness, innerRadius, solid, reach: gridfinityOpenReach(wallThickness) };
+  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, cornerRadius, wallRadius, lipChamfer, wallThickness, innerRadius, solid, reach: gridfinityOpenReach(wallThickness) };
 }
 
 /** A notch cut out of a side's wall, partly open (#455): from and to along the side (x across, z deep), its bottom's height. */
@@ -1778,6 +2049,46 @@ export function gridfinityOpeningsEqual(a: readonly GridfinityOpening[] | undefi
 }
 
 /**
+ * A baseplate's outline as stored (#1061): finite points to 0.01 mm, none repeated in a row or on the line through its
+ * neighbours, at least three and at most MAX_GRIDFINITY_OUTLINE_POINTS, always the same way round; undefined for
+ * anything else.
+ */
+export function normalizeGridfinityOutline(value: unknown): GridfinityOutlinePoint[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const points: GridfinityOutlinePoint[] = [];
+  (value as unknown[]).forEach((entry) => {
+    if (!entry || typeof entry !== "object") return;
+    const { x, z } = entry as Record<string, unknown>;
+    if (typeof x !== "number" || typeof z !== "number" || !Number.isFinite(x) || !Number.isFinite(z)) return;
+    points.push({ x: Math.round(x * 100) / 100, z: Math.round(z * 100) / 100 });
+  });
+  if (points.length > 1 && points[0].x === points[points.length - 1].x && points[0].z === points[points.length - 1].z) points.pop();
+  // A point repeated, or on the line through its neighbours, changes nothing; kept to 0.01 mm a fine curve has many,
+  // and the slab's caps cannot be cut where three lie in a line.
+  for (let i = 0; points.length > 3 && i < points.length;) {
+    const a = points[(i + points.length - 1) % points.length];
+    const b = points[i];
+    const c = points[(i + 1) % points.length];
+    if (Math.abs((b.x - a.x) * (c.z - b.z) - (b.z - a.z) * (c.x - b.x)) < 1e-9) {
+      points.splice(i, 1);
+      i = Math.max(0, i - 1);
+    } else {
+      i += 1;
+    }
+  }
+  if (points.length < 3 || points.length > MAX_GRIDFINITY_OUTLINE_POINTS) return undefined;
+  const area = outlineArea(points);
+  if (Math.abs(area) < 1e-9) return undefined;
+  return area > 0 ? points : points.reverse();
+}
+
+export function gridfinityOutlinesEqual(a: readonly GridfinityOutlinePoint[] | undefined, b: readonly GridfinityOutlinePoint[] | undefined) {
+  if (a === b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((point, i) => point.x === b[i].x && point.z === b[i].z);
+}
+
+/**
  * A side's opening as the settings window shows it (#455): its depth from the lip's top, its width, its place and its
  * distance from that end, as built; the full depth and the full wall for a side open in full.
  */
@@ -2056,9 +2367,10 @@ export function gridfinityCompartmentLabelsEqual(a: readonly GridfinityCompartme
   });
 }
 
-/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, which need Manifold for the display mesh. */
+/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline: all need Manifold for the display mesh. */
 export function gridfinityHasPieces(shape: GridfinityShapeFields) {
-  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || gridfinityPlan(shape).notches.length > 0);
+  const plan = gridfinityPlan(shape);
+  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline);
 }
 
 /**
@@ -2409,6 +2721,17 @@ export function gridfinityTriangles(shape: GridfinityShapeFields) {
         cap(hole, [], GRIDFINITY_MAGNET_DEPTH, -1);
       });
     });
+  } else if (plan.outline) {
+    // An outline plate (#1061) as its plain slab: Manifold cuts its sockets (gridfinityOutlineTriangles).
+    const loop = plan.outline;
+    loop.forEach((p, k) => {
+      const q = loop[(k + 1) % loop.length];
+      const want: Vec3 = [q.z - p.z, 0, p.x - q.x];
+      push(at(p, 0), at(q, 0), at(q, GRIDFINITY_BASEPLATE_HEIGHT), want);
+      push(at(p, 0), at(q, GRIDFINITY_BASEPLATE_HEIGHT), at(p, GRIDFINITY_BASEPLATE_HEIGHT), want);
+    });
+    cap(loop, [], 0, -1);
+    cap(loop, [], GRIDFINITY_BASEPLATE_HEIGHT, 1);
   } else {
     sweep(outline, [[0, 0], [0, GRIDFINITY_BASEPLATE_HEIGHT]], 1);
     cells.forEach((cell) => {
@@ -2451,15 +2774,18 @@ const LABEL_SLIVER = 1e-4;
  * The bin with its label shelves and finger scoops as closed triangles: the bin's own mesh, and the
  * shelves' convex pieces and the scoops' prisms joined to it by Manifold, which keeps the result
  * closed. Without any of them it is gridfinityTriangles. A bin with dividers is filled up to their top
- * and each compartment taken out of the fill, rounded and with its scoops, as the exact body is cut.
+ * and each compartment taken out of the fill, rounded and with its scoops, as the exact body is cut. A plate
+ * fitted into an outline is gridfinityOutlineTriangles.
  */
 export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: GridfinityShapeFields): Vec3[][] {
   const base = gridfinityTriangles(shape);
+  const plan = gridfinityPlan(shape);
+  if (plan.outline) return gridfinityOutlineTriangles(runtime, plan, base);
   const pieces = gridfinityLabelPieces(shape);
   const compartments = gridfinityCompartmentPieces(shape);
   // A bin with dividers has its scoops in its compartments.
   const scoopPieces = compartments ? null : gridfinityScoopPieces(shape);
-  const { notches } = gridfinityPlan(shape);
+  const { notches } = plan;
   if (!pieces && !scoopPieces && !compartments && notches.length === 0) return base;
   const { Manifold } = runtime;
   const made: Array<{ delete: () => void }> = [];
@@ -2468,21 +2794,7 @@ export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: Gr
     return value;
   };
   try {
-    // The bin's triangles welded into an indexed mesh (meshDataToManifoldMesh would close an import cycle here).
-    const ids = new Map<string, number>();
-    const vertices: number[] = [];
-    const triVerts: number[] = [];
-    base.forEach((triangle) => triangle.forEach((v) => {
-      const key = v.map((n) => Math.round(n * 1e5)).join(",");
-      if (!ids.has(key)) {
-        ids.set(key, ids.size);
-        vertices.push(...v);
-      }
-      triVerts.push(ids.get(key)!);
-    }));
-    const mesh = new runtime.Mesh({ numProp: 3, vertProperties: new Float32Array(vertices), triVerts: new Uint32Array(triVerts) });
-    mesh.merge();
-    const bin = keep(new Manifold(mesh));
+    const bin = keep(manifoldOfTriangles(runtime, base));
     // The shelves, the scoops and the dividers are cut to the same inside, from the floor up past the highest of them.
     const { floor, inside: { hx, hz, radius } } = pieces ?? scoopPieces ?? { floor: compartments?.floor ?? gridfinityPlan(shape).floor, inside: { ...labelInside(gridfinityPlan(shape)), radius: gridfinityPlan(shape).innerRadius } };
     const y0 = floor - LABEL_INSIDE_OVERLAP;
@@ -2557,7 +2869,6 @@ export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: Gr
       return trim ? keep(kept.intersect(trim)) : kept;
     });
     // A side opened partly has its notch's section cut out along it, as the exact body has (#455).
-    const plan = gridfinityPlan(shape);
     const opening = gridfinityOpeningInside(plan, compartments);
     const notchPrisms = notches.map((notch) => {
       const outline = gridfinityOpeningOutline(plan, notch, opening);
@@ -2575,19 +2886,70 @@ export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: Gr
     const joined = keep(Manifold.union([bin, ...parts]));
     const notched = notchPrisms.length > 0 ? keep(joined.subtract(keep(Manifold.union(notchPrisms)))) : joined;
     const result = keep(notched.simplify(LABEL_SLIVER));
-    if (result.status() !== "NoError") return base;
-    const out = result.getMesh();
-    const triangles: Vec3[][] = [];
-    for (let t = 0; t < out.triVerts.length; t += 3) {
-      triangles.push([0, 1, 2].map((k) => {
-        const i = out.triVerts[t + k] * out.numProp;
-        return [out.vertProperties[i], out.vertProperties[i + 1], out.vertProperties[i + 2]] as Vec3;
-      }));
-    }
-    return triangles;
+    return result.status() === "NoError" ? trianglesOfManifold(result) : base;
   } catch {
     // The bin is drawn without its shelves, scoops and notches rather than not at all.
     return base;
+  } finally {
+    new Set(made).forEach((value) => value.delete());
+  }
+}
+
+/** Triangles welded into an indexed mesh as a Manifold (meshDataToManifoldMesh would close an import cycle here). */
+function manifoldOfTriangles(runtime: ManifoldToplevel, triangles: Vec3[][]) {
+  const ids = new Map<string, number>();
+  const vertices: number[] = [];
+  const triVerts: number[] = [];
+  triangles.forEach((triangle) => triangle.forEach((v) => {
+    const key = v.map((n) => Math.round(n * 1e5)).join(",");
+    if (!ids.has(key)) {
+      ids.set(key, ids.size);
+      vertices.push(...v);
+    }
+    triVerts.push(ids.get(key)!);
+  }));
+  const mesh = new runtime.Mesh({ numProp: 3, vertProperties: new Float32Array(vertices), triVerts: new Uint32Array(triVerts) });
+  mesh.merge();
+  return new runtime.Manifold(mesh);
+}
+
+/** A Manifold's mesh as triangles, the other way from manifoldOfTriangles. */
+function trianglesOfManifold(manifold: ReturnType<ManifoldToplevel["Manifold"]["cube"]>) {
+  const out = manifold.getMesh();
+  const triangles: Vec3[][] = [];
+  for (let t = 0; t < out.triVerts.length; t += 3) {
+    triangles.push([0, 1, 2].map((k) => {
+      const i = out.triVerts[t + k] * out.numProp;
+      return [out.vertProperties[i], out.vertProperties[i + 1], out.vertProperties[i + 2]] as Vec3;
+    }));
+  }
+  return triangles;
+}
+
+/**
+ * An outline plate (#1061) as closed triangles: the outline's slab less a socket in each of its cells, cut by Manifold
+ * as the exact body is; the plain slab if that fails.
+ */
+function gridfinityOutlineTriangles(runtime: ManifoldToplevel, plan: GridfinityPlan, slabTriangles: Vec3[][]): Vec3[][] {
+  if (plan.cells.length === 0) return slabTriangles;
+  const { Manifold } = runtime;
+  const made: Array<{ delete: () => void }> = [];
+  const keep = <T extends { delete: () => void }>(value: T) => {
+    made.push(value);
+    return value;
+  };
+  try {
+    const slab = keep(manifoldOfTriangles(runtime, slabTriangles));
+    // A socket is what a square-cornered plate of one cell lacks of its block.
+    const cell = keep(manifoldOfTriangles(runtime, gridfinityTriangles({ width: GRIDFINITY_GRID, depth: GRIDFINITY_GRID, height: GRIDFINITY_BASEPLATE_HEIGHT, gridfinityType: "baseplate", gridfinityCornerRadius: 0 })));
+    const block = keep(keep(Manifold.cube([GRIDFINITY_GRID, GRIDFINITY_BASEPLATE_HEIGHT, GRIDFINITY_GRID], true)).translate([0, GRIDFINITY_BASEPLATE_HEIGHT / 2, 0]));
+    const socket = keep(block.subtract(cell));
+    const sockets = keep(Manifold.union(plan.cells.map((c) => keep(socket.translate([c.x, 0, c.z])))));
+    const result = keep(keep(slab.subtract(sockets)).simplify(LABEL_SLIVER));
+    return result.status() === "NoError" ? trianglesOfManifold(result) : slabTriangles;
+  } catch {
+    // The plate is drawn as its plain slab rather than not at all.
+    return slabTriangles;
   } finally {
     new Set(made).forEach((value) => value.delete());
   }

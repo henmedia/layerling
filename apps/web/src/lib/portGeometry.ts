@@ -24,13 +24,15 @@ export const PORT_PROFILE_CHAMFERS: Record<Exclude<PortProfile, "rounded">, { x:
   hdmi: { x: 2.45 / 15.7, y: 1.2 / 6.2, sides: "both" },
   // Würth WR-COM 685119136923 shell 10.5 x 2.5; the slant read from its front view.
   miniHdmi: { x: 1 / 11.2, y: 0.7 / 3.1, sides: "both" },
+  // Würth WR-COM 685119248123 shell 6.2 x 3.0; the slant read from its front view, as on Mini-HDMI.
+  microHdmi: { x: 1 / 6.8, y: 0.9 / 3.6, sides: "both" },
   // VESA DisplayPort 1.2, figure 4-32: 17.10 x 5.76, one corner cut 1.80 x 1.80.
   displayPort: { x: 1.8 / 17.1, y: 1.8 / 5.76, sides: "left" },
   // VESA Mini DisplayPort 1.0, figure 2-16: shell 8.30 wide, both lower corners cut at 45 degrees.
   miniDisplayPort: { x: 1.4 / 8.8, y: 1.4 / 5.9, sides: "both" },
 };
 
-export type PortPreset = "usbC" | "usbCPlug" | "microUsb" | "usbA" | "hdmi" | "miniHdmi" | "displayPort" | "miniDisplayPort" | "rj45";
+export type PortPreset = "usbC" | "usbCPlug" | "microUsb" | "usbA" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort" | "rj45";
 
 export const PORT_PRESETS: Record<PortPreset, { width: number; height: number; corner: number; profile: PortProfile }> = {
   // Receptacle shell 8.94 x 3.26 mm (USB Type-C specification) plus 0.25 mm: the ends fully round.
@@ -45,6 +47,8 @@ export const PORT_PRESETS: Record<PortPreset, { width: number; height: number; c
   hdmi: { width: 15.7, height: 6.2, corner: 0.3, profile: "hdmi" },
   // Shell 10.5 x 2.5 mm (Würth WR-COM 685119136923) plus about 0.3 mm, as the HDMI cut-out has round its shell.
   miniHdmi: { width: 11.2, height: 3.1, corner: 0.3, profile: "miniHdmi" },
+  // Shell 6.2 x 3.0 mm (Würth WR-COM 685119248123) plus about 0.3 mm, as on Mini-HDMI: the socket of the Raspberry Pi 4 and 5.
+  microHdmi: { width: 6.8, height: 3.6, corner: 0.3, profile: "microHdmi" },
   // VESA reference panel cut-out: three corners R 0.80, the cut one sharp.
   displayPort: { width: 17.1, height: 5.76, corner: 0.8, profile: "displayPort" },
   // Shell 8.30 x 5.4 mm plus 0.25 mm.
@@ -53,8 +57,8 @@ export const PORT_PRESETS: Record<PortPreset, { width: number; height: number; c
   rj45: { width: 16.7, height: 14.4, corner: 1, profile: "rounded" },
 };
 
-export const PORT_PRESET_ORDER: PortPreset[] = ["usbC", "usbCPlug", "microUsb", "usbA", "hdmi", "miniHdmi", "displayPort", "miniDisplayPort", "rj45"];
-export const PORT_PROFILES: PortProfile[] = ["rounded", "hdmi", "miniHdmi", "displayPort", "miniDisplayPort"];
+export const PORT_PRESET_ORDER: PortPreset[] = ["usbC", "usbCPlug", "microUsb", "usbA", "hdmi", "miniHdmi", "microHdmi", "displayPort", "miniDisplayPort", "rj45"];
+export const PORT_PROFILES: PortProfile[] = ["rounded", "hdmi", "miniHdmi", "microHdmi", "displayPort", "miniDisplayPort"];
 export const DEFAULT_PORT_PRESET: PortPreset = "usbC";
 /** How far a new opening reaches through: more than most walls, so it cuts through when placed on one. */
 export const DEFAULT_PORT_DEPTH = 10;
@@ -85,12 +89,33 @@ export function normalizePortCorner(corner: number | undefined, width: number, h
   return Math.min(maxPortCorner(width, height, profile), Math.max(0, value));
 }
 
-/** The preset this opening matches, or null when its size was changed by hand. */
-export function portPresetFor(width: number, height: number, corner: number | undefined, profile?: unknown): PortPreset | null {
+/** Extra room on every side, on top of the room a preset has already: 0 to 2 mm. */
+export const MAX_PORT_CLEARANCE = 2;
+
+export function normalizePortClearance(clearance: unknown) {
+  const value = typeof clearance === "number" && Number.isFinite(clearance) ? clearance : 0;
+  return Math.min(MAX_PORT_CLEARANCE, Math.max(0, value));
+}
+
+/**
+ * A preset's opening with extra room on every side: wider and taller by twice
+ * the clearance, its corners rounder by the clearance, as the outline grown
+ * outwards. A cut corner keeps its share of the opening.
+ */
+export function portPresetSize(preset: PortPreset, clearance?: unknown) {
+  const chosen = PORT_PRESETS[preset];
+  const extra = normalizePortClearance(clearance);
+  const width = chosen.width + 2 * extra;
+  const height = chosen.height + 2 * extra;
+  return { width, height, corner: normalizePortCorner(chosen.corner + extra, width, height, chosen.profile), profile: chosen.profile };
+}
+
+/** The preset this opening matches with its extra room, or null when its size was changed by hand. */
+export function portPresetFor(width: number, height: number, corner: number | undefined, profile?: unknown, clearance?: unknown): PortPreset | null {
   const close = (a: number, b: number) => Math.abs(a - b) < 0.005;
   const shapeProfile = normalizePortProfile(profile);
   return PORT_PRESET_ORDER.find((key) => {
-    const preset = PORT_PRESETS[key];
+    const preset = portPresetSize(key, clearance);
     return preset.profile === shapeProfile && close(width, preset.width) && close(height, preset.height)
       && close(normalizePortCorner(corner, width, height, shapeProfile), preset.corner);
   }) ?? null;

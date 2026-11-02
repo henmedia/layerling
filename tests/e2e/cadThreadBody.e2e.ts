@@ -54,6 +54,23 @@ describe("the thread's exact body", () => {
     ["a nut with the own profile, 45 degrees", { threadRole: "nut", threadProfile: "custom", threadFlankAngle: 45, threadDepth: 0.6 }],
     ["a tapped hole with the own profile and a chamfer", { threadRole: "bore", hole: true, threadProfile: "custom", threadFlankAngle: 75, threadDepth: 0.5, threadChamfer: 0.4 }],
     ["a rod turned, tipped and lifted", { rotation: 30, rotationX: 90, elevation: 4, x: 12, z: -5 }],
+    // Nut shapes and heads from outlines (#1131).
+    ["a square nut", { threadRole: "nut", threadHead: "square" }],
+    ["a flange nut", { threadRole: "nut", threadHead: "flange" }],
+    ["a wing nut", { threadRole: "nut", threadHead: "wing" }],
+    ["a star knob nut, left hand", { threadRole: "nut", threadHead: "knob", threadHand: "left" }],
+    ["a screw with a square head", { threadRole: "screw", threadHead: "square" }],
+    ["a screw with a flange head", { threadRole: "screw", threadHead: "flange" }],
+    ["a screw with a wing head", { threadRole: "screw", threadHead: "wing" }],
+    ["a screw with a star knob", { threadRole: "screw", threadHead: "knob" }],
+    ["a star knob with a hex socket", { threadRole: "screw", threadHead: "knob", threadDrive: "hex" }],
+    // A collar between head and thread (#1152): a cylinder on the head, or a round tier on an outline head.
+    ["a star knob with a collar, height 30", { threadRole: "screw", threadHead: "knob", threadCollarHeight: 4, threadCollarDiameter: 14, height: 30 }],
+    ["a star knob with the widest collar and a hex socket", { threadRole: "screw", threadHead: "knob", threadDrive: "hex", threadCollarHeight: 3, threadCollarDiameter: 40, height: 30 }],
+    ["a cylinder head with a collar and a Torx drive", { threadRole: "screw", threadDrive: "torx", threadCollarHeight: 2, height: 26 }],
+    ["a hex head with both rims chamfered and a collar", { threadRole: "screw", threadHead: "hex", threadHeadChamfer: 0.4, threadCollarHeight: 1.5, threadCollarDiameter: 8, height: 26 }],
+    ["a wing head with a collar", { threadRole: "screw", threadHead: "wing", threadCollarHeight: 2.5, height: 28 }],
+    ["a flange head with a collar", { threadRole: "screw", threadHead: "flange", threadCollarHeight: 2, threadCollarDiameter: 11, height: 26 }],
   ];
 
   it.each(cases)("matches the drawn %s", (_name, extra) => {

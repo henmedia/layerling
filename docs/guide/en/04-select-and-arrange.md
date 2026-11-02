@@ -89,7 +89,7 @@ Two parts should meet face to face, or line up flush? Select the part that shoul
 
 Just as simple are {{ui:editor.tool.dropToWorkplane}} ([[D]]), which drops the selection onto the workplane, and {{ui:editor.tool.centerOnWorkplane}}. With the workplane on a face, it centres on the point you picked with [[W]] and moves the selection only along that face, so what stands on it stays on it.
 
-[[C]] picks the selection up, like Cruise in Tinkercad: it follows the mouse pointer and lies down on the face of another body you are over, sloped ones too. A click sets it down there, [[Esc]] leaves it where it was. Its underside then rests on the face, lined up with the face's edges as a new shape would be; it keeps its own turn about its up axis. Several parts travel together and keep their spacing. Over the empty plate, [[C]] stands a tilted part upright on the workplane again. Without a keyboard, the menu of a long press has {{ui:contextMenu.carry}} for the same.
+[[C]] picks the selection up, like Cruise in Tinkercad: it follows the mouse pointer and lies down on the face of another body you are over, sloped ones too. A click sets it down there, [[Esc]] leaves it where it was. Its underside then rests on the face, lined up with the face's edges as a new shape would be; it keeps its own turn about its up axis. Several parts travel together and keep their spacing. Over the empty plate, [[C]] stands a tilted part upright on the workplane again. Holding [[Shift]] while you carry sinks the part into the face instead: it stays upright, its top flush with the face and the body below it, which is how a countersink or a counterbore goes into a body; a new shape from the library is placed the same way with [[Shift]] held. [[Shift]]+[[D]] drops the selection with its top on the workplane instead of its base. Without a keyboard, the menu of a long press has {{ui:contextMenu.carry}} for the same.
 
 ## Patterns: row and circle
 
@@ -169,7 +169,7 @@ The percentage field has the focus when the window opens, so from the keyboard i
 
 ## Undoing
 
-{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) and {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] or [[Ctrl]]+[[Y]]) step through your history. How many steps travel with the saved design you set in the settings under {{ui:workspace.history}}. Point at either button and its tooltip names the step it would take back or bring again, with the measure where the step has one, such as "Rounded the edges of Box (5 mm)" or "Moved 3 objects (12 mm)"; the message after the step says the same. To go back several steps at once, use the history view below.
+{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) and {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] or [[Ctrl]]+[[Y]]) step through your history. How many steps travel with the saved design you set in the settings under {{ui:workspace.history}}. Point at either button and its tooltip names the step it would take back or bring again, with the measure where the step has one, such as "Rounded the edges of Box (5 mm)" or "Moved 3 objects (12 mm)"; the message after the step says the same. To go back several steps at once, use the history view below. A message that reports a step just taken, such as "3 shapes deleted", has an Undo button that takes exactly that step back.
 
 ## Looking back: the history view
 

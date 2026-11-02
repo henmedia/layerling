@@ -37,14 +37,14 @@ const cylinder = canonicalizeShape({
   size: 30, width: 30, depth: 30, height: 20, rotation: 0,
 });
 
-type Calls = { applied: SurfaceTextureSettings[]; removed: number; updates: Array<Partial<WorkplaneShape>>; picks: Array<SurfaceTextureFace[] | null> };
+type Calls = { applied: SurfaceTextureSettings[]; layers: SurfaceTextureSettings[][]; removed: number; updates: Array<Partial<WorkplaneShape>>; picks: Array<SurfaceTextureFace[] | null> };
 
 /**
  * The settings panel for this shape, with the surface texture card open as the editor holds it. `render` draws it again
  * with the editor's face picking as given.
  */
 function mount(shape: WorkplaneShape) {
-  const calls: Calls = { applied: [], removed: 0, updates: [], picks: [] };
+  const calls: Calls = { applied: [], layers: [], removed: 0, updates: [], picks: [] };
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
@@ -57,8 +57,9 @@ function mount(shape: WorkplaneShape) {
       onUpdate: (patch: Partial<WorkplaneShape>) => calls.updates.push(patch),
       onSnapChange: () => {},
       onSnapOpenChange: () => {},
-      onSurfaceTexture: (settings: SurfaceTextureSettings) => {
+      onSurfaceTexture: (settings: SurfaceTextureSettings, layers?: SurfaceTextureSettings[]) => {
         calls.applied.push(settings);
+        calls.layers.push(layers ?? []);
       },
       onRemoveSurfaceTexture: () => {
         calls.removed += 1;
@@ -224,5 +225,48 @@ describe("the surface texture card in a shape's settings", () => {
     expect(mask.value).toBe("none");
     choose(mask, "exclude");
     expect(calls.updates.at(-1)).toEqual({ surfaceTextureMask: "exclude", transparent: true });
+  });
+
+  it("puts a second pattern on faces of its own: a tab per layer, its faces asked for, every layer handed to the editor", async () => {
+    const { panel, calls, render } = mount(cylinder);
+    const tabs = () => [...card(panel).querySelectorAll<HTMLButtonElement>(".surface-layers [role=tab]")];
+    const apply = () => button(panel, "Apply texture")!;
+    expect(tabs()).toHaveLength(1);
+    choose(selectWith(panel, "knurl")!, "grooves");
+    // A new layer asks for its faces at once: picking starts with none.
+    act(() => button(panel, "Layer")!.click());
+    expect(tabs().map((tab) => tab.textContent)).toEqual(["1Grooves", "2Knurling"]);
+    expect(tabs()[1].getAttribute("aria-selected")).toBe("true");
+    expect(calls.picks.at(-1)).toEqual([]);
+    render({ surfaceFacePicking: true, surfacePickedFaces: [] });
+    expect(card(panel).textContent).toContain("Pick the faces for this layer");
+    expect(card(panel).textContent).toContain("Layer 2 has no faces yet");
+    expect(apply().disabled).toBe(true);
+    // The top clicked in the view belongs to the second layer; the first now takes the faces left over.
+    const top: SurfaceTextureFace = { at: [0.5, 1, 0.5], normal: [0, 1, 0] };
+    render({ surfaceFacePicking: true, surfacePickedFaces: [top] });
+    expect(card(panel).textContent).toContain("Picked faces: 1. Only they get the pattern.");
+    expect(apply().disabled).toBe(false);
+    act(() => tabs()[0].click());
+    expect(card(panel).textContent).toContain("The pattern goes on the faces the other layers leave free.");
+    expect(selectWith(panel, "knurl")?.value).toBe("grooves");
+    await act(async () => apply().click());
+    expect(calls.applied[0]).toMatchObject({ pattern: "grooves", faces: [] });
+    expect(calls.layers[0]).toHaveLength(1);
+    expect(calls.layers[0][0]).toMatchObject({ pattern: "knurl", faces: [top] });
+  });
+
+  it("takes a layer away again, and shows a textured body's layers to change", () => {
+    const grooves = normalizeSurfaceTexture({ pattern: "grooves" });
+    const knurl = normalizeSurfaceTexture({ pattern: "knurl", faces: [{ at: [0.5, 1, 0.5], normal: [0, 1, 0] }] });
+    const textured = surfaceTexturedShape(cylinder, textureSurfacePositions(surfaceTextureInput(cylinder), grooves, 150_000).positions, grooves, Date.now(), [knurl])!;
+    const { panel } = mount(textured);
+    const tabs = () => [...card(panel).querySelectorAll<HTMLButtonElement>(".surface-layers [role=tab]")];
+    expect(tabs().map((tab) => tab.textContent)).toEqual(["1Grooves", "2Knurling"]);
+    expect(card(panel).textContent).toContain("Grooves + Knurling");
+    act(() => tabs()[1].click());
+    expect(card(panel).textContent).toContain("Picked faces: 1. Only they get the pattern.");
+    act(() => button(panel, "Remove this layer")!.click());
+    expect(tabs().map((tab) => tab.textContent)).toEqual(["1Grooves"]);
   });
 });

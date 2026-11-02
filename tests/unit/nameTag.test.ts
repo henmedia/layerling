@@ -258,9 +258,9 @@ describe("finding the name tag (#215)", () => {
     const ids = libraryShapeAssets.map((asset) => asset.id);
     expect(ids.indexOf("nameTag")).toBe(ids.indexOf("text") + 1);
     expect(nameTagAsset.kind).toBe("text");
-    // The name tag, the icon tag and the QR code (#553) are the library's three entries beyond the kinds.
-    // The double countersink is not listed on its own (#621): one entry less.
-    expect(libraryShapeAssets).toHaveLength(toolbarShapeAssets.length + 2);
+    // The name tag, the icon tag, the QR code (#553) and the SBC board (#1098) are the library's four entries
+    // beyond the kinds. The double countersink is not listed on its own (#621): one entry less.
+    expect(libraryShapeAssets).toHaveLength(toolbarShapeAssets.length + 3);
     // The catalogue of kinds keeps one tile per kind.
     expect(toolbarShapeAssets.some((asset) => asset.id === "nameTag")).toBe(false);
     expect(parseDroppedShapeAsset(JSON.stringify(nameTagAsset))).toMatchObject({ id: "nameTag", kind: "text" });

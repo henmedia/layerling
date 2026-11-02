@@ -182,6 +182,10 @@ const THREAD_HEAD_OPTIONS: Array<{ value: ThreadHead; label: MessageKey }> = [
   { value: "cylinder", label: "thread.headCylinder" },
   { value: "countersunk", label: "thread.headCountersunk" },
   { value: "hex", label: "thread.headHex" },
+  { value: "square", label: "thread.headSquare" },
+  { value: "flange", label: "thread.headFlange" },
+  { value: "wing", label: "thread.headWing" },
+  { value: "knob", label: "thread.headKnob" },
 ];
 const THREAD_HAND_OPTIONS: Array<{ value: ThreadHand; label: MessageKey }> = [
   { value: "right", label: "thread.right" },
@@ -389,6 +393,14 @@ function specialFieldsForShape(
       kind === "counterbore"
         ? { type: "number", key: "screwHoleHeadDepth", label: t("prop.screwHoleHeadDepth"), defaultValue: defaults.screwHoleHeadDepth ?? 3.2, min: 0.1, max: Math.max(0.3, dimensions.height - 0.2), unit: "mm" }
         : { type: "number", key: "screwHoleAngle", label: t("prop.screwHoleAngle"), defaultValue: defaults.screwHoleAngle ?? 90, min: 30, max: 150, step: 1, unit: "°" },
+      { type: "number", key: "sides", label: t("prop.sides"), defaultValue: defaults.sides ?? automaticSideCount(dimensions.width, dimensions.depth), min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1 },
+    ];
+  }
+  if (kind === "finishingWasher") {
+    return [
+      { type: "number", key: "screwHoleShaft", label: t("prop.centerHole"), defaultValue: defaults.screwHoleShaft ?? 4.5, min: 0.1, max: Math.max(0.2, dimensions.width * 0.95), unit: "mm" },
+      { type: "number", key: "screwHoleHeadDepth", label: t("prop.finishingWasherSeatDepth"), defaultValue: defaults.screwHoleHeadDepth ?? 2.45, min: 0, max: Math.max(0.1, dimensions.height - 0.2), unit: "mm" },
+      { type: "number", key: "screwHoleAngle", label: t("prop.screwHoleAngle"), defaultValue: defaults.screwHoleAngle ?? 90, min: 30, max: 150, step: 1, unit: "°" },
       { type: "number", key: "sides", label: t("prop.sides"), defaultValue: defaults.sides ?? automaticSideCount(dimensions.width, dimensions.depth), min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1 },
     ];
   }

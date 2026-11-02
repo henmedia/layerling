@@ -49,6 +49,8 @@ export function useToolbarCollapse(contentRef: RefObject<HTMLElement | null>, en
     void document.fonts?.ready.then(refit);
 
     const timers = new Map<HTMLElement, number>();
+    // Groups the resting pointer opened: the click that follows keeps them open instead of closing them again (#1148).
+    const openedByHover = new WeakSet<HTMLElement>();
     const later = (section: HTMLElement, delay: number, action: () => void) => {
       window.clearTimeout(timers.get(section));
       timers.set(section, window.setTimeout(action, delay));
@@ -71,6 +73,7 @@ export function useToolbarCollapse(contentRef: RefObject<HTMLElement | null>, en
     };
     function close(section: HTMLElement) {
       window.clearTimeout(timers.get(section));
+      openedByHover.delete(section);
       section.removeAttribute("data-open");
       section.querySelector("[data-collapse-trigger]")?.setAttribute("aria-expanded", "false");
     }
@@ -78,7 +81,13 @@ export function useToolbarCollapse(contentRef: RefObject<HTMLElement | null>, en
     const onPointerOver = (event: PointerEvent) => {
       if (event.pointerType !== "mouse") return;
       const section = folded(event.target);
-      if (section) later(section, section.hasAttribute("data-open") ? 0 : OPEN_DELAY, () => open(section));
+      if (!section) return;
+      // A folded button that is a tool of its own is there to be clicked; the group opens from the tab under it.
+      if (!section.hasAttribute("data-open") && event.target instanceof Element && event.target.closest("[data-collapse-action]")) return;
+      later(section, section.hasAttribute("data-open") ? 0 : OPEN_DELAY, () => {
+        if (!section.hasAttribute("data-open")) openedByHover.add(section);
+        open(section);
+      });
     };
     const onPointerOut = (event: PointerEvent) => {
       if (event.pointerType !== "mouse") return;
@@ -91,7 +100,8 @@ export function useToolbarCollapse(contentRef: RefObject<HTMLElement | null>, en
       const section = folded(target);
       if (!section || !target) return;
       if (target.closest("[data-collapse-trigger]")) {
-        if (section.hasAttribute("data-open")) close(section);
+        if (openedByHover.has(section)) openedByHover.delete(section);
+        else if (section.hasAttribute("data-open")) close(section);
         else open(section);
         return;
       }

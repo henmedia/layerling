@@ -74,7 +74,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_hull_objects` | wraps the objects in one convex body, as if shrink-wrapped (Hull) |
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall with a cutting edge and a rim round the mirrored outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose (Lid) |
+| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separates a shape into its loose parts, a sketch body into one body per outline |
 | `layerling_split_objects` | cuts solids or holes in two with a plane |
@@ -90,10 +90,12 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_layer_text` | turns a text into a stack of layers for a multicolour print (letters, wider rims, a plate without holes) or builds a stack again, with a key ring hole, the corners per layer and a rounded or chamfered letter edge; with a name list, one tag per name |
 | `layerling_layer_icon` | turns an SVG icon (the text of the file, or an extruded sketch body) into a layered icon tag for a multicolour print - the icon, wider rims, a plate without holes - or builds one again with a new width or layers; with a count it fills the plate with copies |
 | `layerling_create_qr_code` | makes a QR code from a text or web address, like {{ui:shape.qrCode}} in the shape library - the code alone, raised on a plate or engraved, with error correction, width, height, quiet zone and as a hole if asked; it warns when a module gets under 0.8 mm |
+| `layerling_create_sbc_board` | places an SBC board true to size, like {{ui:shape.sbcBoard}} in the shape library - Raspberry Pi 5, 4, 3 B+, Zero 2 W or BIGTREETECH Pi, with its holes and connectors, the clearance round the edge connectors, the position and as a hole to cut a case |
 | `layerling_reference_image` | adds a reference image from a picture, as {{ui:import.referenceImage}} does, or moves, turns, calibrates (two points of the picture and their real distance), fades or locks one - a guide that is never exported or printed; `trace` turns its dark or light part into a sketch body standing on it |
 | `layerling_measure_section` | measures on a cutting plane between two points that snap to the outline - wall thickness, gaps, fits |
 | `layerling_show_overhangs` | switches the overhang hatching on or off, sets the angle and reports for each body the area that would need supports |
 | `layerling_estimate_print` | estimates volume, weight and filament for the selection or the whole design: for a solid body, and as a rough guess with walls and infill like the export window |
+| `layerling_check_clearance` | checks before printing which parts overlap, touch or come closer than a minimum gap (Check clearance), the separate parts of one object too |
 | `layerling_add_reference_points` | marks reference points - on the centre, corners or edge middles of objects, or at exact positions - that shapes snap to |
 | `layerling_list_reference_points` | lists the reference points with their ids and positions |
 | `layerling_remove_reference_points` | deletes reference points by id, or all of them |

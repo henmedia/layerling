@@ -12,3 +12,13 @@ export function hasOneToOneCadComponentMapping(sourceCount: number, componentOwn
   }
   return owners.size === sourceCount;
 }
+
+/**
+ * A bundle with a hole in it, inside the treated group (#1164): its hole cuts what it is grouped with but never its own solids,
+ * the opposite of a plain group's scope (#996). Its scope key is counted up from here, so the kernel can tell the two apart.
+ */
+export const BUNDLE_SCOPE_BASE = 1_000_000;
+
+export function isBundleScopeKey(key: number) {
+  return key >= BUNDLE_SCOPE_BASE;
+}

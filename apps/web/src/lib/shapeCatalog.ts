@@ -54,6 +54,7 @@ import {
   threadNaturalFootprint,
   threadNaturalHeight,
   threadSettings,
+  threadCollarFields,
   threadDriveFields,
 } from "@/lib/threadGeometry";
 import {
@@ -120,12 +121,18 @@ import {
   normalizeScrewHoleShaft,
 } from "@/lib/screwHoleGeometry";
 import {
+  DEFAULT_FINISHING_WASHER_HEIGHT,
+  DEFAULT_FINISHING_WASHER_SEAT_DEPTH,
+  DEFAULT_FINISHING_WASHER_SHAFT,
+  DEFAULT_FINISHING_WASHER_WIDTH,
+} from "@/lib/finishingWasherGeometry";
+import {
   DEFAULT_TEARDROP_DEPTH,
   DEFAULT_TEARDROP_TIP_ANGLE,
   DEFAULT_TEARDROP_WIDTH,
   teardropHeightForTipAngle,
 } from "@/lib/teardropGeometry";
-import { DEFAULT_PORT_DEPTH, DEFAULT_PORT_PRESET, normalizePortCorner, normalizePortProfile, PORT_PRESETS } from "@/lib/portGeometry";
+import { DEFAULT_PORT_DEPTH, DEFAULT_PORT_PRESET, normalizePortClearance, normalizePortCorner, normalizePortProfile, PORT_PRESETS } from "@/lib/portGeometry";
 import { DEFAULT_LOFT, loftFieldsFromMeasures, loftFrameSize, normalizeLoftMeasures } from "@/lib/loftGeometry";
 import { DEFAULT_VASE_SIZE, normalizeVaseSettings } from "@/lib/vaseSettings";
 import {
@@ -218,6 +225,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   nameTag: "shape.nameTag",
   iconTag: "shape.iconTag",
   qrCode: "shape.qrCode",
+  sbcBoard: "shape.sbcBoard",
   "round-roof": "shape.roundRoof",
   "half-sphere": "shape.halfSphere",
   paraboloid: "shape.paraboloid",
@@ -240,6 +248,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   counterbore: "shape.counterbore",
   countersink: "shape.countersink",
   doubleCountersink: "shape.doubleCountersink",
+  finishingWasher: "shape.finishingWasher",
   thread: "shape.thread",
   spring: "shape.spring",
   gridfinity: "shape.gridfinity",
@@ -268,13 +277,14 @@ export const toolbarShapeAssets: ToolbarShapeAsset[] = [
   { id: "vase", name: "Vase", src: "assets/editor/shape-icons-gray/vase.png", menuIcon: "assets/editor/shape-icons-gray/vase.png", kind: "vase", color: "#2e8b8b" },
   { id: "tube", name: "Tube", src: "assets/editor/shape-icons-gray/tube.png", menuIcon: "assets/editor/shape-icons-gray/tube.png", kind: "tube", color: "#ce7013" },
   { id: "bentTube", name: "Bent Tube", src: "assets/editor/shape-icons-gray/bentTube.png", menuIcon: "assets/editor/shape-icons-gray/bentTube.png", kind: "bentTube", color: "#b5651d" },
-  { id: "counterbore", name: "Counterbore", src: "assets/editor/shape-icons-gray/counterbore.png", menuIcon: "assets/editor/shape-icons-gray/counterbore.png", kind: "counterbore", color: "#5f7a8a" },
-  { id: "countersink", name: "Countersink", src: "assets/editor/shape-icons-gray/countersink.png", menuIcon: "assets/editor/shape-icons-gray/countersink.png", kind: "countersink", color: "#6b8a7a" },
-  { id: "doubleCountersink", name: "Double Countersink", src: "assets/editor/shape-icons-gray/doubleCountersink.png", menuIcon: "assets/editor/shape-icons-gray/doubleCountersink.png", kind: "doubleCountersink", color: "#6b8a8a" },
+  { id: "counterbore", name: "Counterbore", src: "assets/editor/shape-icons-gray/counterbore.png", menuIcon: "assets/editor/shape-icons-gray/counterbore.png", kind: "counterbore", color: "#5f7a8a", hole: true },
+  { id: "countersink", name: "Countersink", src: "assets/editor/shape-icons-gray/countersink.png", menuIcon: "assets/editor/shape-icons-gray/countersink.png", kind: "countersink", color: "#6b8a7a", hole: true },
+  { id: "doubleCountersink", name: "Double Countersink", src: "assets/editor/shape-icons-gray/doubleCountersink.png", menuIcon: "assets/editor/shape-icons-gray/doubleCountersink.png", kind: "doubleCountersink", color: "#6b8a8a", hole: true },
   { id: "teardrop", name: "Teardrop", src: "assets/editor/shape-icons-gray/teardrop.png", menuIcon: "assets/editor/shape-icons-gray/teardrop.png", kind: "teardrop", color: "#7d6a9c" },
   { id: "port", name: "Port opening", src: "assets/editor/shape-icons-gray/port.png", menuIcon: "assets/editor/shape-icons-gray/port.png", kind: "port", color: "#5b7d99", hole: true },
   { id: "text", name: "Text", src: "assets/editor/shape-icons-gray/text.png", menuIcon: "assets/editor/shape-icons-gray/text.png", kind: "text", color: "#cf101b" },
   { id: "thread", name: "Thread", src: "assets/editor/shape-icons-gray/thread.png", menuIcon: "assets/editor/shape-icons-gray/thread.png", kind: "thread", color: "#8a98a6" },
+  { id: "finishingWasher", name: "Finishing Washer", src: "assets/editor/shape-icons-gray/finishingWasher.png", menuIcon: "assets/editor/shape-icons-gray/finishingWasher.png", kind: "finishingWasher", color: "#9aa4ae" },
   { id: "spring", name: "Spring", src: "assets/editor/shape-icons-gray/spring.png", menuIcon: "assets/editor/shape-icons-gray/spring.png", kind: "spring", color: "#18b99a" },
   { id: "gridfinity", name: "Gridfinity", src: "assets/editor/shape-icons-gray/gridfinity.png", menuIcon: "assets/editor/shape-icons-gray/gridfinity.png", kind: "gridfinity", color: "#4f7fa8" },
   { id: "gear", name: "Gear", src: "assets/editor/gear-types/spur.png", menuIcon: "assets/editor/gear-types/spur.png", kind: "gear", color: "#6f7f8d" },
@@ -328,11 +338,25 @@ export const qrCodeAsset: ToolbarShapeAsset = {
 };
 
 /**
- * What the shape library lists: the catalogue, with the name tag, the icon tag and the QR code after the text.
+ * The SBC board (#1098): a single-board computer true to size, to build a case around. The library
+ * entry places the default board; the kind only names its picture.
+ */
+export const sbcBoardAsset: ToolbarShapeAsset = {
+  id: "sbcBoard",
+  name: "SBC board",
+  src: "assets/editor/shape-icons-gray/sbcBoard.png",
+  menuIcon: "assets/editor/shape-icons-gray/sbcBoard.png",
+  kind: "box",
+  color: "#1f7a3a",
+};
+
+/**
+ * What the shape library lists: the catalogue, with the name tag, the icon tag and the QR code after the text,
+ * and the SBC board after the port opening.
  * The double countersink is not listed on its own: it is the countersink with "Both sides" switched on (#621). The
  * kind stays in the catalogue, so bodies that already are one, and the MCP, keep working.
  */
-export const libraryShapeAssets: ToolbarShapeAsset[] = toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "doubleCountersink" ? [] : [asset]));
+export const libraryShapeAssets: ToolbarShapeAsset[] = toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "doubleCountersink" ? [] : [asset]));
 
 /**
  * The colour a new shape of this asset starts with: the asset's own, unless the shape
@@ -431,6 +455,9 @@ export function shapeAssetDefaultDimensions(kind: ShapeKind) {
   }
   if (kind === "doubleCountersink") {
     return { width: DEFAULT_DOUBLE_COUNTERSINK_WIDTH, depth: DEFAULT_DOUBLE_COUNTERSINK_WIDTH, height: DEFAULT_DOUBLE_COUNTERSINK_HEIGHT };
+  }
+  if (kind === "finishingWasher") {
+    return { width: DEFAULT_FINISHING_WASHER_WIDTH, depth: DEFAULT_FINISHING_WASHER_WIDTH, height: DEFAULT_FINISHING_WASHER_HEIGHT };
   }
   if (kind === "teardrop") {
     return { width: DEFAULT_TEARDROP_WIDTH, depth: DEFAULT_TEARDROP_DEPTH, height: Math.round(teardropHeightForTipAngle(DEFAULT_TEARDROP_WIDTH, DEFAULT_TEARDROP_TIP_ANGLE) * 100) / 100 };
@@ -539,6 +566,9 @@ export function shapeAssetSpecialDefaults(kind: ShapeKind, dimensions = shapeAss
   }
   if (kind === "countersink" || kind === "doubleCountersink") {
     return { screwHoleShaft: DEFAULT_SCREW_HOLE_SHAFT, screwHoleAngle: DEFAULT_SCREW_HOLE_ANGLE };
+  }
+  if (kind === "finishingWasher") {
+    return { screwHoleShaft: DEFAULT_FINISHING_WASHER_SHAFT, screwHoleHeadDepth: DEFAULT_FINISHING_WASHER_SEAT_DEPTH, screwHoleAngle: DEFAULT_SCREW_HOLE_ANGLE };
   }
   if (kind === "knurl") {
     return { knurlPattern: DEFAULT_KNURL_PATTERN, knurlCount: DEFAULT_KNURL_COUNT, knurlDepth: DEFAULT_KNURL_DEPTH, knurlAngle: DEFAULT_KNURL_ANGLE, knurlChamfer: DEFAULT_KNURL_CHAMFER };
@@ -691,6 +721,8 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     threadDrive: shape.threadDrive,
     threadDriveSize: shape.threadDriveSize,
     threadDriveDepth: shape.threadDriveDepth,
+    threadCollarHeight: shape.threadCollarHeight,
+    threadCollarDiameter: shape.threadCollarDiameter,
     springTurns: shape.springTurns,
     springWire: shape.springWire,
     springHand: shape.springHand,
@@ -779,6 +811,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     gridfinityOpenings: shape.gridfinityOpenings,
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
+    gridfinityOutline: shape.gridfinityOutline,
     knurlPattern: shape.knurlPattern,
     knurlCount: shape.knurlCount,
     knurlDepth: shape.knurlDepth,
@@ -810,6 +843,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
     portProfile: shape.portProfile,
+    portClearance: shape.portClearance,
     cornerFillet: shape.cornerFillet,
     topBottomFillet: shape.topBottomFillet,
     roundedBoxQuality: shape.roundedBoxQuality,
@@ -828,6 +862,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     textFlipped: shape.textFlipped,
     cylinderWrap: shape.cylinderWrap,
     surfaceTexture: shape.surfaceTexture,
+    surfaceTextureLayers: shape.surfaceTextureLayers,
     surfaceTextureMask: shape.surfaceTextureMask,
     surfaceFillOf: shape.surfaceFillOf,
     vase: shape.vase,
@@ -896,6 +931,8 @@ export function makeShapeFromAsset(
     threadDrive: customization.threadDrive,
     threadDriveSize: customization.threadDriveSize,
     threadDriveDepth: customization.threadDriveDepth,
+    threadCollarHeight: customization.threadCollarHeight,
+    threadCollarDiameter: customization.threadCollarDiameter,
   }) : null;
   const threadFootprint = threadDefaults ? threadNaturalFootprint(threadDefaults) : null;
   // Ein gebogenes Rohr bekommt seinen Rahmen aus Profil und Segmenten. Ein
@@ -1010,7 +1047,7 @@ export function makeShapeFromAsset(
     textFlipped: asset.kind === "text" ? customization.textFlipped : undefined,
     steps: asset.kind === "box" ? 10 : asset.kind === "sphere" ? customization.steps ?? 24 : asset.kind === "halfSphere" || asset.kind === "paraboloid" ? customization.steps ?? 32 : asset.kind === "torus" ? customization.steps : undefined,
     torusTubeRatio: asset.kind === "torus" ? customization.torusTubeRatio ?? torusTubeRatio({ width, depth, height }) : undefined,
-    sides: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" || asset.kind === "cone" || asset.kind === "tube" || asset.kind === "ring" || asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "teardrop" || asset.kind === "torus" ? customization.sides : asset.kind === "roundRoof" ? customization.sides ?? 64 : asset.kind === "pyramid" ? customization.sides ?? 4 : asset.kind === "polygon" ? customization.sides ?? 6 : undefined,
+    sides: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" || asset.kind === "cone" || asset.kind === "tube" || asset.kind === "ring" || asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "finishingWasher" || asset.kind === "teardrop" || asset.kind === "torus" ? customization.sides : asset.kind === "roundRoof" ? customization.sides ?? 64 : asset.kind === "pyramid" ? customization.sides ?? 4 : asset.kind === "polygon" ? customization.sides ?? 6 : undefined,
     bevel: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" ? 0 : asset.kind === "tube" || asset.kind === "ring" ? customization.bevel ?? 4 : asset.kind === "text" ? customization.bevel : undefined,
     segments: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" ? 1 : asset.kind === "text" ? customization.segments : undefined,
     topRadius: asset.kind === "cone" ? customization.topRadius ?? 0 : undefined,
@@ -1049,6 +1086,7 @@ export function makeShapeFromAsset(
     threadChamferBottom: threadDefaults && customization.threadChamferBottom !== undefined ? threadDefaults.chamferLow : undefined,
     threadHeadChamfer: threadDefaults ? threadDefaults.headChamfer : undefined,
     ...(threadDefaults ? threadDriveFields(customization, threadDefaults) : {}),
+    ...(threadDefaults ? threadCollarFields(customization, threadDefaults) : {}),
     ...(asset.kind === "spring" ? springFields(customization, width, depth, height) : {}),
     starPoints: asset.kind === "star" ? normalizeStarPoints(customization.starPoints ?? DEFAULT_STAR_POINTS) : undefined,
     starInnerSize: asset.kind === "star" ? normalizeStarInnerSize(customization.starInnerSize ?? DEFAULT_STAR_INNER_SIZE, width) : undefined,
@@ -1143,12 +1181,15 @@ export function makeShapeFromAsset(
     vase: asset.kind === "vase" ? normalizeVaseSettings(undefined) : undefined,
     dovetailNeckWidth: asset.kind === "dovetail" ? normalizeDovetailNeckWidth(customization.dovetailNeckWidth, width) : undefined,
     dovetailClearance: asset.kind === "dovetail" ? normalizeDovetailClearance(customization.dovetailClearance ?? DEFAULT_DOVETAIL_CLEARANCE) : undefined,
-    screwHoleShaft: asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "doubleCountersink" ? normalizeScrewHoleShaft(customization.screwHoleShaft ?? DEFAULT_SCREW_HOLE_SHAFT, width) : undefined,
-    screwHoleHeadDepth: asset.kind === "counterbore" ? normalizeScrewHoleHeadDepth(customization.screwHoleHeadDepth ?? DEFAULT_SCREW_HOLE_HEAD_DEPTH, height) : undefined,
-    screwHoleAngle: asset.kind === "countersink" || asset.kind === "doubleCountersink" ? normalizeScrewHoleAngle(customization.screwHoleAngle ?? DEFAULT_SCREW_HOLE_ANGLE) : undefined,
+    screwHoleShaft: asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "doubleCountersink" ? normalizeScrewHoleShaft(customization.screwHoleShaft ?? DEFAULT_SCREW_HOLE_SHAFT, width)
+      : asset.kind === "finishingWasher" ? customization.screwHoleShaft ?? DEFAULT_FINISHING_WASHER_SHAFT : undefined,
+    screwHoleHeadDepth: asset.kind === "counterbore" ? normalizeScrewHoleHeadDepth(customization.screwHoleHeadDepth ?? DEFAULT_SCREW_HOLE_HEAD_DEPTH, height)
+      : asset.kind === "finishingWasher" ? customization.screwHoleHeadDepth ?? DEFAULT_FINISHING_WASHER_SEAT_DEPTH : undefined,
+    screwHoleAngle: asset.kind === "countersink" || asset.kind === "doubleCountersink" || asset.kind === "finishingWasher" ? normalizeScrewHoleAngle(customization.screwHoleAngle ?? DEFAULT_SCREW_HOLE_ANGLE) : undefined,
     cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2)
       : asset.kind === "port" ? normalizePortCorner(customization.cornerFillet, width, height, customization.portProfile) : undefined,
     portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,
+    portClearance: asset.kind === "port" && normalizePortClearance(customization.portClearance) > 0 ? normalizePortClearance(customization.portClearance) : undefined,
     topBottomFillet: asset.kind === "roundedBox" ? normalizeTopBottomFillet(customization.topBottomFillet ?? DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, height / 2) : undefined,
     roundedBoxQuality: asset.kind === "roundedBox" ? normalizeRoundedBoxQuality(customization.roundedBoxQuality ?? DEFAULT_ROUNDED_BOX_QUALITY) : undefined,
     ...(bentTube ?? {}),
@@ -1180,6 +1221,7 @@ const GENERATED_NAME_KEYS: Record<string, MessageKey> = {
   "Icon tag": "shape.iconTag",
   "QR code": "shape.qrCode",
   "QR plate": "shape.qrPlate",
+  Board: "sbcBoard.board",
 };
 
 /**

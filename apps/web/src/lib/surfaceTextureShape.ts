@@ -286,6 +286,67 @@ export function textureSurfacePositions(positions: Float64Array, settings: Surfa
   return { positions: Float64Array.from(surfaceTexturePositions(result)), stats: result.stats, fill: result.fill ? Float64Array.from(surfaceTexturePositions(result.fill)) : null };
 }
 
+/**
+ * The layers of a body's texture as they are made (WorkplaneShape.surfaceTextureLayers): the first as it is, but one that
+ * picks no faces of its own leaves out the faces the others take; every further layer goes only on its own picked faces
+ * (one with none is left out, it would cover the first). They are made one after the other on the same body, each on
+ * the triangles the one before left, so a face keeps the pattern of the layer it belongs to.
+ */
+export function surfaceTextureLayersToMake(first: SurfaceTextureSettings, more: readonly SurfaceTextureSettings[]) {
+  const others = more.filter(surfaceTextureLayerPlaced);
+  const taken = others.flatMap((layer) => layer.faces);
+  const lead = normalizeSurfaceTexture({ ...first, exceptFaces: first.faces.length ? [] : taken });
+  return [lead, ...others];
+}
+
+/**
+ * What several layers made together: the triangles of the last, a pattern going round, cracks and text of the layer
+ * that has them, and coarser or too deep when any was; nothing only when every layer left nothing.
+ */
+export function mergedSurfaceTextureStats(all: readonly SurfaceTextureOutcome["stats"][]): SurfaceTextureOutcome["stats"] {
+  const last = all[all.length - 1];
+  return {
+    ...last,
+    around: all.find((stats) => stats.around)?.around ?? last.around,
+    cracks: all.find((stats) => stats.cracks)?.cracks ?? last.cracks,
+    text: all.find((stats) => stats.text)?.text ?? last.text,
+    bricks: all.find((stats) => stats.bricks)?.bricks ?? last.bricks,
+    limited: all.some((stats) => stats.limited),
+    tooDeep: all.some((stats) => stats.tooDeep),
+    nothing: all.every((stats) => stats.nothing),
+  };
+}
+
+/** The gold of every layer's cracks in one part, or none. */
+export function mergedSurfaceTextureFill(all: readonly (Float64Array | null)[]): Float64Array | null {
+  const parts = all.filter((fill): fill is Float64Array => Boolean(fill && fill.length));
+  if (!parts.length) return null;
+  const out = new Float64Array(parts.reduce((sum, part) => sum + part.length, 0));
+  let at = 0;
+  for (const part of parts) {
+    out.set(part, at);
+    at += part.length;
+  }
+  return out;
+}
+
+/** Whether a further layer has a place of its own: faces picked for it, or a text, which goes where it is put. */
+export function surfaceTextureLayerPlaced(layer: SurfaceTextureSettings) {
+  return layer.faces.length > 0 || layer.pattern === "text";
+}
+
+/** Several layers made here and now, one after the other (tests, and where no worker can run). */
+export function textureSurfaceLayerPositions(positions: Float64Array, layers: readonly SurfaceTextureSettings[], maxTriangles?: number): SurfaceTextureOutcome[] {
+  const outcomes: SurfaceTextureOutcome[] = [];
+  let current = positions;
+  for (const layer of layers) {
+    const outcome = textureSurfacePositions(current, layer, maxTriangles);
+    outcomes.push(outcome);
+    current = outcome.positions;
+  }
+  return outcomes;
+}
+
 /** Triangles where they stand in the design, as a mesh body's box (centred on x and z, its bottom at the elevation) and points within it. */
 function placedMesh(positions: ArrayLike<number>) {
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
@@ -373,9 +434,11 @@ export function sceneWithSurfaceBody(shapes: readonly WorkplaneShape[], id: stri
  * Turns and mirroring are in the mesh already; the new body starts upright. Null when the
  * texture left nothing.
  */
-export function surfaceTexturedShape(shape: WorkplaneShape, positions: ArrayLike<number>, settings: SurfaceTextureSettings, createdAt = Date.now()): WorkplaneShape | null {
+export function surfaceTexturedShape(shape: WorkplaneShape, positions: ArrayLike<number>, settings: SurfaceTextureSettings, createdAt = Date.now(), layers: readonly SurfaceTextureSettings[] = []): WorkplaneShape | null {
   if (positions.length < 9) return null;
-  const normalized = normalizeSurfaceTexture(settings);
+  // The first layer keeps what it was given: the faces it leaves to the others are worked out anew each time.
+  const normalized = normalizeSurfaceTexture({ ...settings, exceptFaces: [] });
+  const more = layers.filter(surfaceTextureLayerPlaced).map((layer) => normalizeSurfaceTexture(layer));
   const textured = canonicalizeShape({
     id: shape.id,
     name: shape.name,
@@ -387,6 +450,7 @@ export function surfaceTexturedShape(shape: WorkplaneShape, positions: ArrayLike
     rotationZ: 0,
     ...placedMesh(positions),
     surfaceTexture: normalized,
+    ...(more.length ? { surfaceTextureLayers: more } : {}),
     locked: false,
     hidden: shape.hidden,
   });

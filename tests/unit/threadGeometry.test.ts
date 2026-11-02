@@ -27,6 +27,10 @@ import {
   threadDriveRadius,
   threadDriveSizeLimits,
   threadFootprintPatch,
+  threadCollarDiameterLimits,
+  threadCollarFields,
+  threadCollarHeightLimits,
+  threadNaturalHeight,
 } from "@/lib/threadGeometry";
 import { THREAD_PROFILES } from "@/lib/threadProfiles";
 import type { ThreadDrive, ThreadRole } from "@/types/layerling";
@@ -162,6 +166,19 @@ describe("thread geometry", () => {
       expect([...edgeUseCounts(position).values()].every((uses) => uses === 2)).toBe(true);
       expect(signedVolume(position)).toBeGreaterThan(0);
     }
+  });
+
+  // Nut shapes and heads from outlines (#1131): closed, outward, and as wide as their footprint says.
+  it.each<[ThreadRole, string, number]>([
+    ["nut", "square", 5], ["nut", "flange", 5], ["nut", "wing", 5], ["nut", "knob", 5],
+    ["screw", "square", 24], ["screw", "flange", 24], ["screw", "wing", 24], ["screw", "knob", 24],
+  ])("stays closed as a %s of the %s shape and fills its footprint", (role, threadHead, height) => {
+    const { geometry, footprint } = geometryFor(role, height, { threadHead });
+    const position = geometry.getAttribute("position") as unknown as Position;
+    expect([...edgeUseCounts(position).values()].every((uses) => uses === 2)).toBe(true);
+    expect(signedVolume(position)).toBeGreaterThan(0);
+    expect((geometry.boundingBox?.max.x ?? 0) - (geometry.boundingBox?.min.x ?? 0)).toBeCloseTo(footprint.width, 2);
+    expect((geometry.boundingBox?.max.z ?? 0) - (geometry.boundingBox?.min.z ?? 0)).toBeCloseTo(footprint.depth, 2);
   });
 
   it("cuts the thread between the minor and the major diameter", () => {
@@ -821,5 +838,119 @@ describe("screw drives and head diameter (#1052)", () => {
     expect(loaded.threadDriveSize).toBe(6);
     expect(loaded.threadDriveDepth).toBe(3);
     expect(loaded.threadHeadDiameter).toBe(15);
+  });
+});
+
+describe("a collar between head and thread (#1152)", () => {
+  const closed = (geometry: ReturnType<typeof createThreadGeometry>) => {
+    const position = geometry.getAttribute("position") as unknown as Position;
+    return { open: [...edgeUseCounts(position).values()].filter((uses) => uses !== 2).length, volume: signedVolume(position) };
+  };
+
+  it.each([
+    ["cylinder", {}], ["cylinder", { threadHeadChamfer: 0.4, threadDrive: "torx" }], ["hex", {}], ["hex", { threadHeadChamfer: 0.4 }],
+    ["square", {}], ["flange", {}], ["wing", {}], ["knob", {}], ["knob", { threadDrive: "hex" }],
+  ] as Array<[string, Record<string, unknown>]>)("stays closed on a %s head %o and keeps its footprint", (threadHead, extra) => {
+    const plain = geometryFor("screw", 24, { threadHead, ...extra });
+    const { geometry, footprint } = geometryFor("screw", 27, { threadHead, threadCollarHeight: 3, ...extra });
+    const { open, volume } = closed(geometry);
+    expect(open).toBe(0);
+    expect(volume).toBeGreaterThan(0);
+    // The collar stays inside the head, so the frame is the head's as before.
+    expect(footprint.width).toBeCloseTo(plain.footprint.width, 6);
+    expect((geometry.boundingBox?.max.x ?? 0) - (geometry.boundingBox?.min.x ?? 0)).toBeCloseTo(footprint.width, 2);
+  });
+
+  it("adds the collar's cylinder and moves the thread up by its height", () => {
+    for (const threadHead of ["cylinder", "hex", "knob"]) {
+      const plain = closed(geometryFor("screw", 24, { threadHead }).geometry).volume;
+      const { geometry, settings } = geometryFor("screw", 28, { threadHead, threadCollarHeight: 4, threadCollarDiameter: 9 });
+      const added = closed(geometry).volume - plain;
+      const cylinder = Math.PI * 4.5 * 4.5 * 4;
+      expect(settings.collarDiameter).toBeCloseTo(9, 6);
+      // Within a percent: the ring is a polygon of many sides, the thread's phase moves a little.
+      expect(Math.abs(added - cylinder) / cylinder, threadHead).toBeLessThan(0.01);
+      const plan = threadBuildPlan({ width: 30, depth: 30, height: 28, threadRole: "screw", threadHead: threadHead as "cylinder", threadDiameter: 6, threadPitch: 1, threadCollarHeight: 4, threadCollarDiameter: 9 });
+      expect(plan.shaftBottom).toBeCloseTo(plan.headHeight + 4, 6);
+    }
+  });
+
+  it("is twice the thread wide unless set, and stays inside the head where it is narrowest", () => {
+    const knob = threadSettings({ threadRole: "screw", threadHead: "knob", threadDiameter: 6, threadPitch: 1, threadCollarHeight: 3 });
+    expect(knob.collarDiameter).toBeCloseTo(12, 6);
+    // A 30 mm star knob is 0.72 of its radius deep between its scallops.
+    const limits = threadCollarDiameterLimits(knob);
+    expect(limits.min).toBeCloseTo(6.4, 6);
+    expect(limits.max).toBeCloseTo(30 * 0.72 - 0.4, 6);
+    expect(threadSettings({ threadRole: "screw", threadHead: "knob", threadDiameter: 6, threadPitch: 1, threadCollarHeight: 3, threadCollarDiameter: 40 }).collarDiameter).toBeCloseTo(limits.max, 6);
+    // A wing head's hub, twice the thread, holds it.
+    expect(threadCollarDiameterLimits(threadSettings({ threadRole: "screw", threadHead: "wing", threadDiameter: 6, threadPitch: 1 })).max).toBeCloseTo(11.6, 6);
+  });
+
+  it("has none under a countersunk head, on a nut or on a rod", () => {
+    for (const shape of [{ threadRole: "screw" as const, threadHead: "countersunk" as const }, { threadRole: "nut" as const }, { threadRole: "rod" as const }]) {
+      const settings = threadSettings({ ...shape, threadDiameter: 6, threadPitch: 1, threadCollarHeight: 3 });
+      expect(settings.collarHeight).toBe(0);
+      expect(threadCollarHeightLimits(settings).max).toBe(0);
+    }
+  });
+
+  it("keeps the head chamfer off the collar's footing", () => {
+    const shape = { threadRole: "screw" as const, threadHead: "cylinder" as const, threadDiameter: 6, threadPitch: 1, threadDrive: "none" as const };
+    const without = threadHeadChamferLimits(threadSettings(shape)).max;
+    const settings = threadSettings({ ...shape, threadCollarHeight: 2, threadCollarDiameter: 9, threadHeadChamfer: 5 });
+    // The 10 mm head leaves 0.5 mm round a 9 mm collar, 0.2 mm of it kept as a ledge.
+    expect(settings.headChamfer).toBeCloseTo(0.3, 6);
+    expect(settings.headChamfer).toBeLessThan(without);
+  });
+
+  it("counts into the body's height, and a body pulled short keeps some thread above it", () => {
+    const settings = threadSettings({ threadRole: "screw", threadDiameter: 6, threadPitch: 1, threadCollarHeight: 3 });
+    expect(threadNaturalHeight(settings)).toBeCloseTo(settings.headHeight + 3 + 24, 6);
+    const plan = threadBuildPlan({ width: 10, depth: 10, height: 8, threadRole: "screw", threadDiameter: 6, threadPitch: 1, threadCollarHeight: 6 });
+    expect(plan.shaftBottom).toBeLessThan(8);
+    expect(plan.collarHeight).toBeCloseTo(8 * 0.9 - plan.headHeight, 6);
+  });
+
+  it("stores the diameter only when set off twice the thread", () => {
+    const head = { role: "screw", head: "cylinder", diameter: 6, pitch: 1, headHeight: 6, headDiameter: 10 } as const;
+    expect(threadCollarFields({}, head)).toEqual({ threadCollarHeight: undefined, threadCollarDiameter: undefined });
+    expect(threadCollarFields({ threadCollarHeight: 2, threadCollarDiameter: 12 }, head)).toEqual({ threadCollarHeight: 2, threadCollarDiameter: undefined });
+    expect(threadCollarFields({ threadCollarHeight: 2, threadCollarDiameter: 8 }, head)).toEqual({ threadCollarHeight: 2, threadCollarDiameter: 8 });
+  });
+
+  it("scales with the screw when its body is pulled bigger", () => {
+    const shape = { threadRole: "screw" as const, threadHead: "knob" as const, threadDiameter: 6, threadPitch: 1, threadCollarHeight: 3, threadCollarDiameter: 10 };
+    const footprint = threadNaturalFootprint(threadSettings(shape));
+    const patch = threadFootprintPatch({ ...shape, width: footprint.width * 2, depth: footprint.depth * 2 });
+    expect(patch.threadDiameter).toBeCloseTo(12, 6);
+    expect(patch.threadCollarHeight).toBeCloseTo(6, 6);
+    expect(patch.threadCollarDiameter).toBeCloseTo(20, 6);
+  });
+
+  it("carries the collar through a saved project", async () => {
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "thread")!;
+    const shape = makeShapeFromAsset(asset, { x: 0, z: 0 }, { threadRole: "screw", threadHead: "knob", threadDiameter: 6, threadPitch: 1, threadCollarHeight: 4, threadCollarDiameter: 14 });
+    expect(shape.threadCollarHeight).toBe(4);
+    expect(shape.threadCollarDiameter).toBe(14);
+    // A new screw keeps its standard thread length; the collar comes on top.
+    expect(shape.height).toBeCloseTo(threadSettings(shape).headHeight + 4 + 24, 6);
+    const bytes = await exportLylProject({
+      projectId: "project-collar",
+      projectName: "Bund",
+      createdAt: 1_700_000_000_000,
+      modifiedAt: 1_700_000_100_000,
+      shapes: [shape],
+      history: [editorHistoryEntry([shape], [])],
+      historyIndex: 0,
+      assets: [],
+      workspace: DEFAULT_WORKPLANE_WORKSPACE,
+      snapGrid: DEFAULT_SNAP_GRID,
+      placementElevation: 0,
+    });
+    const loaded = (await importLylProject(bytes)).shapes[0];
+    expect(loaded.threadCollarHeight).toBe(4);
+    expect(loaded.threadCollarDiameter).toBe(14);
+    expect(canonicalizeShape(loaded).threadCollarHeight).toBe(4);
   });
 });
