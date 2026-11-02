@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Gedrehte Körper bleiben beim Ziehen gedreht",
+      "en": "Turned shapes stay turned when you drag a handle"
+    },
+    "body": {
+      "de": "Lag die Arbeitsebene auf einer Fläche, drehte sich ein gedrehter Körper beim Ziehen an einem Griff scheinbar zurück, weil die Länge in die andere Seite ging. Die Griffe folgen jetzt der Drehung des Körpers.",
+      "en": "With the workplane on a face, a turned shape seemed to turn back when you dragged a handle, because the length went into the other side. The handles now follow the shape's turn."
+    }
+  },
+  {
+    "title": {
       "de": "Vase: der Hinweis zeigt den Weg zu Hohl und Deckel",
       "en": "Vase: the message shows the way to hollow and lid"
     },

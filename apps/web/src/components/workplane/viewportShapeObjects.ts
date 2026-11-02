@@ -839,8 +839,12 @@ export function selectionFrameForShapes(
   // axes, or a tilted cylinder distorts when dragged.
   // A shape's handles write their sizes to its own width, depth and height, so a workplane that stands across
   // its up axis (on a side face) must not give them its axes: the sizes would land on the wrong dimensions (#933).
+  // Nor one the shape is turned on (a box turned 90° on a raised face): its width would become the depth (#1163).
+  const singleQuaternion = singleShape ? quaternionForShape(singleShape) : null;
+  const alongWorkplane = (axis: THREE.Vector3, workplaneAxis: PlacementWorkplane["normal"]) =>
+    Math.abs(axis.applyQuaternion(singleQuaternion!).dot(new THREE.Vector3(workplaneAxis.x, workplaneAxis.y, workplaneAxis.z).normalize())) > 0.999;
   const useWorkplane = Boolean(workplane) && !placementWorkplaneIsBase(workplane!)
-    && (!singleShape || Math.abs(new THREE.Vector3(0, 1, 0).applyQuaternion(quaternionForShape(singleShape)).dot(new THREE.Vector3(workplane!.normal.x, workplane!.normal.y, workplane!.normal.z).normalize())) > 0.999);
+    && (!singleShape || (alongWorkplane(new THREE.Vector3(0, 1, 0), workplane!.normal) && alongWorkplane(new THREE.Vector3(1, 0, 0), workplane!.xAxis)));
   const quaternion = useWorkplane
     ? placementWorkplaneQuaternion(workplane!)
     : singleShape ? quaternionForShape(singleShape) : new THREE.Quaternion();
