@@ -26,6 +26,7 @@ import { createThreadGeometry } from "@/lib/threadGeometry";
 import { bentTubeNaturalDimensions, createBentTubeGeometry } from "@/lib/bentTubeGeometry";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
+import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import manifoldModule from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
@@ -462,6 +463,15 @@ describe("palette icons", () => {
       azimuth: 35,
       elevation: 32,
       build: () => createScrewHoleGeometry({ kind: "doubleCountersink", width: 16, depth: 16, height: 20, screwHoleShaft: 8, screwHoleAngle: 90 }),
+    });
+    render({
+      // Schraeg von oben, damit Woelbung und Senkung zu sehen sind.
+      name: "apps/web/public/assets/editor/shape-icons-gray/finishingWasher.png",
+      height: 7,
+      lay: false,
+      azimuth: 35,
+      elevation: 38,
+      build: () => createFinishingWasherGeometry({ width: 30, depth: 30, height: 7, screwHoleShaft: 9, screwHoleHeadDepth: 5, screwHoleAngle: 90, sides: 96 }),
     });
     render({
       // Schraeg von vorn auf die Stirnseite, damit Rundung und Spitze zu sehen sind.

@@ -274,7 +274,7 @@ function segmentsCross(a: Point2, b: Point2, c: Point2, d: Point2) {
   return o1 * o2 < 0 && o3 * o4 < 0;
 }
 
-function segmentSegmentDistance(a: Point2, b: Point2, c: Point2, d: Point2) {
+export function segmentSegmentDistance(a: Point2, b: Point2, c: Point2, d: Point2) {
   if (segmentsCross(a, b, c, d)) return 0;
   return Math.min(pointSegmentDistance(a, c, d), pointSegmentDistance(b, c, d), pointSegmentDistance(c, a, b), pointSegmentDistance(d, a, b));
 }

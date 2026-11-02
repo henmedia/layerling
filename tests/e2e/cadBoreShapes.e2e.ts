@@ -10,6 +10,8 @@ import type { CadModifierProfilePart } from "@/lib/cadModifierTypes";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
 import { createScrewHoleGeometry } from "@/lib/screwHoleGeometry";
 import { createPortGeometry } from "@/lib/portGeometry";
+import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
+import { finishingWasherFields } from "@/lib/screwHoleSizes";
 
 /*
  * The teardrop, the port opening and the two screw holes as exact bodies against the real
@@ -27,6 +29,8 @@ function worldMesh(source: WorkplaneShape) {
   const { width, depth, height } = source;
   const geometry = source.kind === "teardrop"
     ? createTeardropGeometry({ width, depth, height })
+    : source.kind === "finishingWasher"
+    ? createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: source.screwHoleShaft, screwHoleHeadDepth: source.screwHoleHeadDepth, screwHoleAngle: source.screwHoleAngle, sides: 192 })
     : source.kind === "port"
     ? createPortGeometry({ width, depth, height, cornerFillet: source.cornerFillet, portProfile: source.portProfile })
     : createScrewHoleGeometry({ kind: source.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: source.screwHoleShaft, screwHoleHeadDepth: source.screwHoleHeadDepth, screwHoleAngle: source.screwHoleAngle });
@@ -221,6 +225,32 @@ describe("exact bodies for the bore shapes with the real OCCT kernel", () => {
     expect(surfaceTypes(solid)).toEqual(["cone", "cone", "plane", "plane"]);
     const cone = (Math.PI * 1 / 3) * (4 ** 2 + 4 * 5 + 5 ** 2);
     expect(cad.getVolume(solid)).toBeCloseTo(2 * cone, 2);
+  });
+
+  it("finishing washer: bottom, rim, dome, seat and bore as five faces with a real cone, and a fillet works on the rim (#1131)", () => {
+    const source = shape("finishingWasher", { ...finishingWasherFields("M4"), x: 3, z: -2, elevation: 1 });
+    const { solid } = exact(source);
+    expect(cad.subShapeCount(solid, "face")).toBe(5);
+    const types = surfaceTypes(solid);
+    expect(types.filter((type) => type === "plane")).toHaveLength(1);
+    expect(types.filter((type) => type === "cone")).toHaveLength(1);
+    expect(types.filter((type) => type === "cylinder")).toHaveLength(2);
+    const box = cad.getBoundingBox(solid);
+    expect(box.xmin).toBeCloseTo(3 - 6.7, 4);
+    expect(box.ymin).toBeCloseTo(1, 4);
+    expect(box.ymax).toBeCloseTo(1 + 3.95, 4);
+    // The bottom rim, where the flat underside meets the upright edge.
+    const rim = cad.getSubShapes(solid, "edge").filter((edge) => {
+      const edgeBox = cad.getBoundingBox(edge);
+      return Math.abs(edgeBox.ymin - 1) < 1e-6 && Math.abs(edgeBox.ymax - 1) < 1e-6 && edgeBox.xmax - edgeBox.xmin > 12;
+    });
+    expect(rim).toHaveLength(1);
+    expect(cad.isValid(cad.fillet(solid, rim, 0.2))).toBe(true);
+  });
+
+  it("finishing washer: every size builds; an oval one keeps its mesh (#1131)", () => {
+    for (const size of ["M2", "M3", "M8", "M20"] as const) exact(shape("finishingWasher", finishingWasherFields(size)));
+    expect(cadModifierProfileForShape(shape("finishingWasher", { ...finishingWasherFields("M5"), depth: 18 }))).toBeNull();
   });
 
   it("screw holes: an oval footprint keeps the display mesh", () => {

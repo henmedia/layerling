@@ -95,6 +95,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_measure_section` | Misura su un piano di sezione tra due punti agganciati al contorno: spessore delle pareti, spazi e accoppiamenti. |
 | `layerling_show_overhangs` | Attiva o disattiva la visualizzazione dei sovrasbalzi, ne imposta l’angolo e indica per ogni corpo l’area che richiederebbe supporti. |
 | `layerling_estimate_print` | Stima volume, peso e filamento per la selezione o per l’intero progetto: calcola il corpo pieno e fornisce una stima approssimativa con pareti e riempimento, come nella finestra di esportazione. |
+| `layerling_check_clearance` | Controlla prima della stampa quali parti si sovrappongono, si toccano o sono più vicine di un gioco minimo, anche le parti separate di un oggetto |
 | `layerling_add_reference_points` | Aggiunge punti di riferimento — al centro, agli angoli o nei punti medi degli spigoli degli oggetti, oppure in posizioni precise — a cui si agganciano le forme. |
 | `layerling_list_reference_points` | Elenca i punti di riferimento con i rispettivi ID e posizioni. |
 | `layerling_remove_reference_points` | Elimina i punti di riferimento indicati tramite ID oppure li elimina tutti. |

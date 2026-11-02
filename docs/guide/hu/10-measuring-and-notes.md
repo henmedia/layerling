@@ -55,6 +55,23 @@ A {{ui:workspace.dimensionsAlwaysVisible}} beállítással a méretek állandóa
 
 Ha egy pillanatra zavarnak, nyomd meg a [[Q]] billentyűt: a kijelölés körüli méretek és távolságok eltűnnek, így jól látszik a mozgatott alkatrész. Újabb [[Q]] visszahozza őket. Az a fogantyú, amelyre mutatsz, így is megmutatja a méretét.
 
+## Hézag ellenőrzése
+
+Azoknak az alkatrészeknek, amelyeknek nyomtatás után mozogniuk kell - egy flexi sárkány, egy egyben nyomtatott zsanér, egy doboz a fedelével, egy tengely a furatában -, hézag kell egymás között. Ha túl kicsi, összeragadnak; ha átfedik egymást, egy darabként nyomtatódnak ki. A {{ui:editor.tool.clearance}} a {{ui:editor.tool.intersectPreview}} mellett ezt nyomtatás előtt ellenőrzi. A kijelölt objektumokat veszi, vagy ha nincs kijelölés, az összes láthatót (ugyanazokat, mint egy exportálás), és minden párt ellenőriz:
+
+- **{{ui:clearance.kind.overlap}}** (piros): a kettőnek közös térfogata van. Ez pirosan látszik a testek belsejében, amelyek átlátszóvá válnak, és a lista megadja a méretét.
+- **{{ui:clearance.kind.touching}}** (piros): összeérnek, és nyomtatáskor összeolvadnak.
+- **{{ui:clearance.kind.tight}}** (narancs): a legkeskenyebb rés kisebb, mint a(z) {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (zöld): a legkeskenyebb rés legalább ilyen széles.
+
+Minden sor megnevezi a két alkatrészt, résnél a szélességét és a helyét: {{ui:clearance.direction.side}} (ugyanabban a rétegben) vagy {{ui:clearance.direction.layer}} (felette vagy alatta: ott a szeletelő csak egész rétegeket hagyhat szabadon, így egy rétegnél vékonyabb rés bezárul). Egy sorra kattintva a kamera odamegy, mindkét alkatrész körvonalat kap, és egy vonal a számmal jelöli a legszűkebb helyet. Az 5 mm-nél távolabbi párok nem szerepelnek a listában. A terv nem változik: az ellenőrzés semmit sem ment, és nincs mit visszavonni.
+
+A(z) {{ui:clearance.threshold}} kezdetben 0,3 mm; a 0,3 szoros, a 0,4 az egyben nyomtatásnál szokásos. Módosítása azonnal újrarendezi a listát új ellenőrzés nélkül, és a böngésző megjegyzi az értéket. A(z) {{ui:clearance.splitParts}} (kezdetben bekapcsolva) egy objektum különálló részeit is ellenőrzi egymással szemben: egy egyetlen STL-ként importált flexi sárkány vagy zsanér egy objektum, de a tagjai különálló részek. Ezek „Név · 2. rész” formában szerepelnek. Egy másik üregében lévő rész, például egy golyó egy kalitkában, külön résznek számít.
+
+Ha a tervet módosítod, miközben az ablak nyitva van, megjelenik a(z) {{ui:clearance.stale}}; kattints rá vagy a(z) {{ui:clearance.checkAgain}} gombra. Az [[Esc]] vagy a(z) {{ui:clearance.close}} bezárja az ablakot. A méretezés is megváltoztatja a réseket: egy 70 %-ra kicsinyített flexi modell hézagának csak 70 %-a marad meg, ezért méretezés után ellenőrizz újra.
+
+Az ellenőrzés azt a háromszöghálót méri, amelyet a szeletelő is megkap. Egy kerek tengely és a furata sokszög, a csúcsaik a körön vannak, így egy rés néhány századdal kisebbre jöhet ki a kerek méreteknél. A túl sok háromszögből álló pár {{ui:clearance.kind.unchecked}} jelöléssel szerepel. Egy MI ugyanezt az ellenőrzést végzi a `layerling_check_clearance` eszközzel.
+
 ## Jegyzetek
 
 Egy jegyzet azt rögzíti, amit a geometria nem mond el: „Ez a csavar 0,3 mm-rel túl szoros”, „a fedelet még ki kell nyomtatni”, „méret Pétertől”. A {{ui:editor.tool.note}} gombbal vagy az [[N]] billentyűvel helyezel el egyet.

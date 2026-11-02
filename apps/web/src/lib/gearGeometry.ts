@@ -215,6 +215,33 @@ export function gearPairFitPatches(a: GearResizeShape, b: GearResizeShape, modul
   });
 }
 
+/**
+ * "Keep this gear" (Discussion #1136): `fixed` stays as it is and `other` is brought to its module and
+ * to the centre distance they mesh at, on the line from the fixed gear's centre through its own. So a
+ * third gear can be fitted to the second without undoing the first pair, which "Fit module" does by
+ * resizing both. `other` keeps its teeth, height and centre hole; with the centres on one another it
+ * moves along x. Null where the two do not make a pair (a rack, two ring gears, involute with round).
+ */
+export function gearPairKeepPatches(fixed: GearResizeShape, other: GearResizeShape) {
+  const pair = involuteGearPair(fixed, other);
+  if (!pair) return null;
+  const module = gearModuleOf({ ...fixed, width: fixed.width ?? fixed.size, depth: fixed.depth ?? fixed.size });
+  const isRing = (shape: GearPairShape) => normalizeGearType(shape.gearType) === "internal";
+  const teethFixed = normalizeGearTeeth(fixed.teeth);
+  const teethOther = normalizeGearTeeth(other.teeth);
+  const [ring, pinion] = isRing(fixed) ? [teethFixed, teethOther] : [teethOther, teethFixed];
+  const distance = pair.internal ? (module * Math.max(0, ring - pinion)) / 2 : involuteCentreDistance(module, teethFixed, teethOther);
+  const dx = other.x - fixed.x, dz = other.z - fixed.z;
+  const apart = Math.hypot(dx, dz);
+  const [ux, uz] = apart > 1e-6 ? [dx / apart, dz / apart] : [1, 0];
+  const [resized] = gearPairFitPatches(other, other, module);
+  return {
+    module,
+    distance,
+    patch: { id: other.id, patch: { ...resized.patch, x: fixed.x + ux * distance, z: fixed.z + uz * distance } },
+  };
+}
+
 /** inv(a) = tan a - a, the angle an involute has turned through at pressure angle a. */
 function involuteFunction(angle: number) {
   return Math.tan(angle) - angle;

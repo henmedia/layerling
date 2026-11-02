@@ -1,5 +1,260 @@
 [
   {
+    "version": "1.132.0",
+    "items": [
+      {
+        "title": {
+          "de": "Bodenplatte in einen Umriss einpassen",
+          "en": "Fit a baseplate into an outline"
+        },
+        "body": {
+          "de": "Eine Gridfinity-Bodenplatte füllt jetzt auch eine Schublade, die kein Rechteck ist. Wähle die Platte zusammen mit einer Form, die das Innere der Schublade nachbildet, und klicke in den Eigenschaften auf „Bodenplatte in Umriss einpassen“: ganze Zellen in einem Raster, das dorthin rückt, wo es die meisten aufnimmt, höchstens 6 in der Breite und 6 in der Tiefe (12 mit „Große Bodenplatte“), der Rest massiv, sodass jede Mulde weiter einen gewöhnlichen Behälter aufnimmt.",
+          "en": "A Gridfinity baseplate can now fill a drawer that is not a rectangle. Select the plate together with a shape of the drawer's inside and click \"Fit baseplate to outline\" in the properties panel: whole cells on one grid, placed where it holds the most, at most 6 across and 6 deep (12 with Large plate), the rest solid, so every socket still takes an ordinary bin."
+        }
+      },
+      {
+        "title": {
+          "de": "Fase und Rundung lassen das Loch eines Bündels offen",
+          "en": "Chamfer and fillet keep a bundle's hole open"
+        },
+        "body": {
+          "de": "Ein Bündel aus einem Stift und einem größeren Loch, mit einer Box gruppiert, schneidet die Box, aber nicht den eigenen Stift. Bei Fase und Rundung kam die Nut um den Stift zugefüllt zurück. Jetzt bleibt sie.",
+          "en": "A bundle of a peg and a bigger hole, grouped with a box, cuts the box but not its own peg. With a chamfer or fillet the groove round the peg came back filled in. Now it stays."
+        }
+      },
+      {
+        "title": {
+          "de": "Ein Bund unter dem Schraubenkopf",
+          "en": "A collar under the screw head"
+        },
+        "body": {
+          "de": "Eine Schraube hat jetzt Bundhöhe und Bunddurchmesser: ein runder Bund zwischen Kopf und Gewinde, etwa als Abstandhalter unter einem Sterngriff. Er bleibt innerhalb des Kopfes und druckt ohne Stützen.",
+          "en": "A screw now has Collar height and Collar diameter: a round collar between head and thread, for example a spacer under a star knob. It stays inside the head and prints without supports."
+        }
+      },
+      {
+        "title": {
+          "de": "Deckel als exakter Körper: Kanten lassen sich verrunden",
+          "en": "Lids are exact bodies: their edges can be rounded"
+        },
+        "body": {
+          "de": "Ein Deckel für einen exakten Körper, etwa einen ausgehöhlten abgerundeten Quader, ist jetzt selbst ein exakter CAD-Körper. Seine Kanten verrundest oder fast du mit dem Kantenwerkzeug, und die Rundungen bleiben auch im STEP-Export rund.",
+          "en": "A lid for an exact body, such as a rounded box you hollowed, is now an exact CAD body itself. Round or chamfer its edges with the edge tool, and its curves stay round in a STEP export too."
+        }
+      },
+      {
+        "title": {
+          "de": "Konkave Verrundung: Kanten ausschneiden statt abrunden",
+          "en": "Concave fillet: scoop edges out instead of rounding"
+        },
+        "body": {
+          "de": "Im Verrundungsfenster schneidet „Konkav (ausschneiden)“ eine Viertelkreis-Mulde aus jeder gewählten geraden Kante, wie die ausgehöhlten Ecken einer Box. Vorher ging das nur mit einem Zylinder als Loch von Hand.",
+          "en": "In the fillet window, “Concave (scoop out)” cuts a quarter-round scoop out of each picked straight edge, like the notched corners of a box. Before, that took a cylinder turned into a hole and lined up by hand."
+        }
+      },
+      {
+        "title": {
+          "de": "Gedrehte Körper bleiben beim Ziehen gedreht",
+          "en": "Turned shapes stay turned when you drag a handle"
+        },
+        "body": {
+          "de": "Lag die Arbeitsebene auf einer Fläche, drehte sich ein gedrehter Körper beim Ziehen an einem Griff scheinbar zurück, weil die Länge in die andere Seite ging. Die Griffe folgen jetzt der Drehung des Körpers.",
+          "en": "With the workplane on a face, a turned shape seemed to turn back when you dragged a handle, because the length went into the other side. The handles now follow the shape's turn."
+        }
+      },
+      {
+        "title": {
+          "de": "Vase: der Hinweis zeigt den Weg zu Hohl und Deckel",
+          "en": "Vase: the message shows the way to hollow and lid"
+        },
+        "body": {
+          "de": "Eine Vase hat zu viele Dreiecke zum Aushöhlen. Die Absage nennt jetzt den eigenen Weg der Vase: unter Bauart „Hohl mit Wand“ und einen Deckel auf der Karte Zubehör.",
+          "en": "A vase has too many triangles for Hollow. The message now names the vase's own way: “Hollow with wall” under Build, and a lid on the Accessories card."
+        }
+      },
+      {
+        "title": {
+          "de": "Teile bündig in eine Fläche versenken (Umschalt)",
+          "en": "Sink parts into a face, flush at the top (Shift)"
+        },
+        "body": {
+          "de": "Hältst du Umschalt, wenn du eine neue Form oder ein mit C aufgenommenes Teil auf eine Fläche setzt, sinkt es aufrecht in die Fläche, mit der Oberseite bündig: gut für Senkungen und Senkbohrungen. Umschalt+D setzt die Auswahl mit der Oberseite auf die Arbeitsebene. Senkung, Senkbohrung und Doppelsenkung entstehen jetzt gleich als Loch.",
+          "en": "Hold Shift when you place a new shape or a part picked up with C on a face and it sinks into the face, upright, with its top flush: good for countersinks and counterbores. Shift+D drops the selection with its top on the workplane. Countersink, counterbore and double countersink now start as a hole."
+        }
+      },
+      {
+        "title": {
+          "de": "Eine offene Skizze übersteht das Neuladen",
+          "en": "An open sketch survives a reload"
+        },
+        "body": {
+          "de": "Wer mitten in einer Skizze war, etwa mit einem eingefügten Bild und einer nachgezeichneten Linie, verlor sie beim Neuladen, auch nach einem Update. Die offene Skizze wird jetzt in diesem Browser mitgespeichert und ist danach wieder da.",
+          "en": "If you were in the middle of a sketch, with a picture inserted and a line traced over it, a reload took it, an update included. The open sketch is now kept in this browser as you draw and is there again afterwards."
+        }
+      },
+      {
+        "title": {
+          "de": "Rückgängig mit einem Klick, auch eingeklappt",
+          "en": "Undo in one click, folded too"
+        },
+        "body": {
+          "de": "Ist das Fenster schmal, klappt der Verlauf zu einem Knopf mit dem Rückgängig-Symbol zusammen. Ein Klick darauf nimmt jetzt den letzten Schritt zurück; der kleine Pfeil darunter öffnet Wiederherstellen und den Verlauf.",
+          "en": "In a narrow window, History folds into one button with the Undo icon. A click on it now takes back your last step; the small arrow under it opens Redo and the history."
+        }
+      },
+      {
+        "title": {
+          "de": "Der Schnitt-Knopf schaltet den Schnitt aus",
+          "en": "The section button turns the cut off"
+        },
+        "body": {
+          "de": "Ein Klick auf den Knopf der Schnittansicht schließt bei offenem Fenster jetzt auch den Schnitt. Das X und Esc blenden nur das Fenster aus, der Schnitt bleibt dann an.",
+          "en": "With its window open, a click on the section view button now turns the cut off too. The X and Esc only hide the window and leave the cut on."
+        }
+      },
+      {
+        "title": {
+          "de": "Entwürfe mit Chamfillet öffnen viel schneller",
+          "en": "Designs with Chamfillet open much faster"
+        },
+        "body": {
+          "de": "Chamfillet hat seine Körper viel feiner zerlegt als nötig, bis zu dreißigmal mehr Dreiecke als eine gleich große Rundung. Ein Entwurf mit vielen solchen Kanten wurde dadurch riesig und träge. Jetzt ist Chamfillet so fein wie die übrigen Kanten, und ältere Entwürfe werden beim Öffnen von selbst leicht.",
+          "en": "Chamfillet cut its bodies far finer than needed, up to thirty times the triangles of a fillet of the same size, so a design with many such edges got huge and slow. Chamfillet is now as fine as the other edges, and older designs get light by themselves when you open them."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.131.1",
+    "items": [
+      {
+        "title": {
+          "de": "Rechtsklick-Ziehen beendet die Linie nicht mehr (Mac)",
+          "en": "Dragging with the right button no longer ends the line (Mac)"
+        },
+        "body": {
+          "de": "Beim Zeichnen einer Linie oder glatten Kurve beendet ein Rechtsklick die Kette. Auf dem Mac geschah das schon beim Drücken der rechten Taste, also auch beim Verschieben der Ansicht mit Umschalt + rechter Maustaste, und der nächste Punkt hing nicht mehr am vorigen. Jetzt endet die Kette erst beim Loslassen, und nur wenn die Maus dabei stillstand.",
+          "en": "A right click ends a line or smooth curve being drawn. On a Mac this happened as soon as the right button went down, also when you moved the view with Shift and the right button, and the next point no longer joined the previous one. Now the line ends when the button is released, and only if the mouse did not move."
+        }
+      },
+      {
+        "title": {
+          "de": "Die Ansicht läuft auf langsamen Rechnern nicht mehr lange nach",
+          "en": "The view stops gliding quickly on slow computers too"
+        },
+        "body": {
+          "de": "Nach dem Verschieben oder Drehen läuft die Ansicht kurz nach. Auf Rechnern, die wenige Bilder pro Sekunde zeichnen, dauerte das bis zu zehn Sekunden. Jetzt ist es überall nach demselben kurzen Moment vorbei.",
+          "en": "After you pan or turn, the view glides on for a moment. On computers that draw few frames per second this took up to ten seconds. Now it ends after the same short moment everywhere."
+        }
+      },
+      {
+        "title": {
+          "de": "Zahnräder mit mehr als 150 Zähnen laden wieder",
+          "en": "Gears with more than 150 teeth load again"
+        },
+        "body": {
+          "de": "Ein gespeicherter Entwurf mit einem Zahnrad über 150 Zähnen ließ sich nicht mehr öffnen. Jetzt lädt er wieder, bis zu den 500 Zähnen, die der Editor erlaubt.",
+          "en": "A saved design with a gear of more than 150 teeth would not open. It loads again now, up to the 500 teeth the editor allows."
+        }
+      },
+      {
+        "title": {
+          "de": "Klappende Flexi-Glieder auch in höheren Körpern",
+          "en": "Folding flexi links in taller bodies too"
+        },
+        "body": {
+          "de": "Bei Flexi-Gliedern „Auf und ab“ wuchs das Scharnier mit der Höhe des Körpers mit, so dass ein hoher Körper sehr breit sein musste. Jetzt reichen etwa 20 mm Breite, egal wie hoch er ist, und die Meldung nennt die nötige Breite.",
+          "en": "With flexi links that fold up and down, the hinge grew with the body's height, so a tall body had to be very wide. Now about 20 mm of width is enough whatever the height, and the message tells you how wide it needs to be."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.131.0",
+    "items": [
+      {
+        "title": {
+          "de": "Flexi-Glieder klappen auf und ab",
+          "en": "Flexi links that fold up and down"
+        },
+        "body": {
+          "de": "Bei den Flexi-Gelenken wählst du jetzt, wie sich die Glieder bewegen: zur Seite wie bisher oder auf und ab. Auf und ab gibt Streifen wie bei einem Flexi-Schlüsselanhänger, einem Ei oder einem Armband: An jedem Schnitt entsteht ein flaches Scharnier, das gleich mitgedruckt wird.",
+          "en": "Flexi joints now let you choose how the links move: to the sides as before, or up and down. Up and down gives bands like a flexi keychain, an egg or a bracelet: every cut gets a flat hinge that is printed in place."
+        }
+      },
+      {
+        "title": {
+          "de": "Werte ziehen, Schritte gleich zurücknehmen",
+          "en": "Drag values, undo right away"
+        },
+        "body": {
+          "de": "In den Eigenschaften änderst du einen Wert, indem du seinen Namen, etwa „Breite“, nach links oder rechts ziehst. Und eine Meldung über einen gerade gemachten Schritt, etwa „3 Formen gelöscht“, hat jetzt einen Knopf „Rückgängig“.",
+          "en": "In the properties panel you change a value by dragging its name, such as \"Width\", left or right. And a message about a step just taken, such as \"3 shapes deleted\", now has an Undo button."
+        }
+      },
+      {
+        "title": {
+          "de": "Gerade auf die Arbeitsebene schauen",
+          "en": "Look straight onto the workplane"
+        },
+        "body": {
+          "de": "Drücke P oder klicke in der Ansichtsleiste auf den neuen Knopf neben „Arbeitsebene setzen“: Die Ansicht dreht sich, bis du die Arbeitsebene von vorn siehst, auch auf einer schrägen Fläche, mit ihrem Ursprung in der Mitte.",
+          "en": "Press P or click the new button next to Place workplane in the view bar: the view turns until you see the workplane square on, on a sloped face too, with its origin in the middle."
+        }
+      },
+      {
+        "title": {
+          "de": "Knopfnamen über dem Knopf",
+          "en": "Button names above the button"
+        },
+        "body": {
+          "de": "In der installierten App erscheint der Name eines Knopfs jetzt über dem Knopf statt darunter. So verdeckt ihn der Mauszeiger nicht mehr, auch wenn du ihn in den Systemeinstellungen größer gestellt hast.",
+          "en": "In the installed app, a button's name now appears above the button instead of below it, so the mouse pointer no longer covers it, even if you made the pointer larger in your system settings."
+        }
+      },
+      {
+        "title": {
+          "de": "Flügelmuttern, Sterngriffe, Rosetten",
+          "en": "Wing nuts, star knobs, finishing washers"
+        },
+        "body": {
+          "de": "Eine Mutter gibt es jetzt auch als Vierkant-, Flansch- und Flügelmutter oder mit Sterngriff, eine Schraube mit Vierkant-, Flansch- oder Flügelkopf oder Sterngriff. Flügel und Sterngriff liegen flach und drucken ohne Stützen. Neu ist auch die Rosette: die gewölbte Scheibe unter einer Senkschraube, in M2 bis M20.",
+          "en": "A nut now also comes square, with a flange, with wings or as a star knob, and a screw with a square, flange or wing head or a star knob. Wings and knobs lie flat and print without supports. New too is the finishing washer: the domed washer under a countersunk screw, in M2 to M20."
+        }
+      },
+      {
+        "title": {
+          "de": "Spiel prüfen",
+          "en": "Check clearance"
+        },
+        "body": {
+          "de": "Unter Verbinden findest du „Spiel prüfen“: Es zeigt vor dem Druck, welche Teile sich überschneiden, berühren oder zu eng beieinander liegen, etwa bei einem Flexi-Spielzeug, einem mitgedruckten Scharnier oder einem Deckel in seiner Dose.",
+          "en": "Combine has Check clearance: before you print, it shows which parts overlap, touch or sit too close together, such as a flexi toy, a hinge printed in place or a lid in its box."
+        }
+      },
+      {
+        "title": {
+          "de": "Mehrere Oberflächenmuster",
+          "en": "Several surface textures"
+        },
+        "body": {
+          "de": "Ein Körper kann jetzt mehrere Oberflächenmuster tragen, jedes auf eigenen Flächen: zum Beispiel Ziegel rundherum und Rändel oben.",
+          "en": "A body can now carry several surface textures, each on faces of its own: bricks all round and knurling on top, for example."
+        }
+      },
+      {
+        "title": {
+          "de": "Raspberry Pi in echter Größe",
+          "en": "Raspberry Pi true to size"
+        },
+        "body": {
+          "de": "Neu in den Formen: die Platine eines Raspberry Pi 5, 4, 3 B+ oder Zero 2 W oder eines BIGTREETECH Pi, mit Löchern und Anschlüssen. Als Aussparung mit einem Gehäuse gruppiert, schneidet sie die Öffnungen für die Anschlüsse.",
+          "en": "New in the shapes: the board of a Raspberry Pi 5, 4, 3 B+ or Zero 2 W or a BIGTREETECH Pi, with its holes and connectors. Grouped with a case as a hole, it cuts the openings for its connectors."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.130.0",
     "items": [
       {

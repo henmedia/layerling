@@ -10,7 +10,7 @@ layerling funciona en el navegador de una tableta, y también como aplicación d
 | Quieres… | En una tableta |
 | --- | --- |
 | Seleccionar un cuerpo | Tócalo. |
-| Seleccionar varios cuerpos | Mantén un dedo quieto medio segundo, elige {{ui:contextMenu.selectMultiple}} y toca un cuerpo tras otro. Un toque en un cuerpo ya seleccionado lo vuelve a quitar. |
+| Seleccionar varios cuerpos | Toca un cuerpo: abajo a la izquierda aparece un botón redondo. Tócalo, y cada cuerpo que toques después se añade a la selección; un toque en un cuerpo ya seleccionado lo vuelve a quitar. Un toque en un espacio vacío no cambia nada; un segundo toque en el botón termina el modo y quita la selección. O bien mantén un dedo quieto medio segundo, elige {{ui:contextMenu.selectMultiple}} y toca un cuerpo tras otro. |
 | Seleccionar todos los cuerpos | Mantén un dedo quieto medio segundo sobre un espacio vacío y elige {{ui:contextMenu.selectAll}}. |
 | Abrir el menú del clic derecho | Mantén un dedo quieto medio segundo sobre un cuerpo o sobre un espacio vacío. |
 | Mover un cuerpo | Arrástralo. |
@@ -41,9 +41,9 @@ Si los cuerpos se desplazan sin querer cuando los tocan niños o manos con prisa
 ## En un iPad o un iPhone
 
 - **Instálalo como aplicación.** En Safari, toca el icono de Compartir y elige «Añadir a pantalla de inicio». La aplicación se abre en una ventana propia sin barra de direcciones y funciona sin conexión; consulta [Sin conexión e instalación](chapter:offline-and-install).
-- **Tus diseños viven en el navegador.** No hay cuenta y no se sube nada. Safari tiene una norma propia contra el rastreo: borra lo que una web ha guardado después de siete días en los que no la hayas visitado en Safari. Una aplicación web añadida a la pantalla de inicio está exenta de esa norma, según la documentación de WebKit. Es un motivo más para usar la aplicación desde la pantalla de inicio y para hacer copias de seguridad de lo importante: {{ui:dashboard.backupAll}}, en la página de inicio, mete todos los diseños en un solo archivo.
+- **Tus diseños viven en el navegador** (salvo que alojes layerling tú mismo y configures una carpeta en el servidor). No hay cuenta y no se sube nada. Safari tiene una norma propia contra el rastreo: borra lo que una web ha guardado después de siete días en los que no la hayas visitado en Safari. Una aplicación web añadida a la pantalla de inicio está exenta de esa norma, según la documentación de WebKit. Es un motivo más para usar la aplicación desde la pantalla de inicio y para hacer copias de seguridad de lo importante: {{ui:dashboard.backupAll}}, en la página de inicio, mete todos los diseños en un solo archivo.
 - **Archivos.** Safari solo deja que una página escriba en un archivo mediante una descarga, así que {{ui:editor.export}} pone el archivo en Descargas, en la aplicación Archivos, y [[Ctrl]]+[[S]] con teclado lo vuelve a descargar; consulta [Archivos y guardado](chapter:files-and-saving).
-- **No hace falta teclado.** Cada herramienta tiene un botón en la cinta, y un campo numérico abre el teclado en pantalla. Con un teclado conectado al iPad tienes además los [atajos de teclado](chapter:shortcuts). Un recuadro de valor junto a un cuerpo abre su campo numérico con el segundo toque: el primero solo lo marca, así un dedo que cae allí por error no hace aparecer el teclado.
+- **No hace falta teclado.** Cada herramienta tiene un botón en la cinta, y un campo numérico abre el teclado en pantalla. Con un teclado conectado al iPad tienes además los [atajos de teclado](chapter:shortcuts). Un recuadro de valor junto a un cuerpo abre su campo numérico con el segundo toque: el primero solo lo marca, para que un dedo que cae allí por error no haga aparecer el teclado.
 
 ## Talleres con niños
 

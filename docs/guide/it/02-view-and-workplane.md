@@ -87,6 +87,8 @@ Fai clic accanto alla piastra o premi [[Esc]] per riportare il piano di lavoro s
 
 Quando il piano di lavoro è posizionato su una faccia, accanto a {{ui:camera.placeWorkplane}} appare un occhio. Puoi nascondere il piano di lavoro senza rimuoverlo, per osservare meglio il progetto: le nuove forme continueranno a essere posizionate su quella faccia e la rotazione continuerà a farle ruotare attorno a essa. Fai clic sull’occhio per mostrarlo di nuovo; anche impostare un nuovo piano di lavoro lo rende visibile.
 
+Per guardare il piano di lavoro di fronte, premi [[P]] o fai clic su {{ui:camera.lookOntoWorkplane}} accanto a {{ui:camera.placeWorkplane}} nella barra della vista. La vista ruota finché vedi il piano di fronte, dal lato verso cui crescono le nuove forme, con la sua origine al centro. Sulla piastra di base è la vista dall'alto.
+
 ## Griglia e aggancio
 
 La griglia mostra le dimensioni della piastra. In basso a destra trovi il **passo di aggancio**: spostamento e ridimensionamento procedono a scatti della misura impostata, per esempio 1 mm. Riducila per lavorare con precisione e aumentala per disporre gli elementi in modo approssimativo. {{ui:editor.tool.snapToGrid}} nella barra multifunzione sposta le forme selezionate sull’incrocio della griglia più vicino. Durante lo spostamento, le forme possono anche agganciarsi ad altre forme; vedi [Selezionare e disporre](chapter:select-and-arrange).

@@ -55,6 +55,23 @@ V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného k�
 
 Když na chvíli překážejí, stiskněte [[Q]]: rozměry a vzdálenosti kolem výběru zmizí a díl, který posouváte, je dobře vidět. Další [[Q]] je vrátí. Úchyt, na který ukážete, svůj rozměr ukáže i tak.
 
+## Kontrola vůle
+
+Díly, které se mají po tisku pohybovat - flexi drak, pant tištěný vcelku, krabička s víkem, osa v otvoru - potřebují mezi sebou mezeru. Když je příliš malá, slepí se; když se překrývají, vytisknou se jako jeden kus. {{ui:editor.tool.clearance}} vedle {{ui:editor.tool.intersectPreview}} to zkontroluje před tiskem. Vezme vybrané objekty, nebo všechny viditelné, když není nic vybráno (tytéž, které bere export), a zkontroluje každou dvojici:
+
+- **{{ui:clearance.kind.overlap}}** (červeně): oba díly sdílejí objem. Ten se ukáže červeně uvnitř těles, která zprůhlední, a seznam uvede jeho velikost.
+- **{{ui:clearance.kind.touching}}** (červeně): díly se dotýkají a při tisku se spojí.
+- **{{ui:clearance.kind.tight}}** (oranžově): nejužší mezera je menší než {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (zeleně): nejužší mezera je alespoň tak široká.
+
+Každý řádek jmenuje oba díly a u mezery její šířku a polohu: {{ui:clearance.direction.side}} (ve stejné vrstvě) nebo {{ui:clearance.direction.layer}} (nad nebo pod: tam může slicer nechat volné jen celé vrstvy, takže mezera tenčí než jedna vrstva se zavře). Klepnutí na řádek přesune kameru na místo, orámuje oba díly a vyznačí nejužší místo čárou s číslem. Dvojice vzdálené víc než 5 mm se neuvádějí. Na návrhu se nic nemění: kontrola nic neukládá a nezanechává nic k vrácení.
+
+{{ui:clearance.threshold}} začíná na 0,3 mm; 0,3 je těsné, 0,4 obvyklé pro tisk vcelku. Změna hned znovu seřadí seznam bez nové kontroly a prohlížeč si hodnotu zapamatuje. {{ui:clearance.splitParts}} (na začátku zapnuto) kontroluje proti sobě i oddělené díly jednoho objektu: flexi drak nebo pant importovaný jako jedno STL je jeden objekt, ale jeho články jsou oddělené díly. V seznamu jsou jako „Název · Díl 2“. Díl v dutině jiného, třeba kulička v kleci, je samostatný díl.
+
+Když návrh změníte, zatímco je okno otevřené, ukáže se {{ui:clearance.stale}}; klepněte na to nebo na {{ui:clearance.checkAgain}}. [[Esc]] nebo {{ui:clearance.close}} okno zavře. Mezery mění i změna velikosti: flexi model zmenšený na 70 % má jen 70 % své vůle, po změně velikosti proto kontrolujte znovu.
+
+Kontrola měří trojúhelníkovou síť, kterou dostane i slicer. Kulatá osa a její otvor jsou mnohoúhelníky s vrcholy na kružnici, takže mezera může vyjít o několik setin menší než kulaté rozměry. Dvojice s příliš mnoha trojúhelníky je uvedena jako {{ui:clearance.kind.unchecked}}. AI provede stejnou kontrolu pomocí `layerling_check_clearance`.
+
 ## Poznámky
 
 Poznámka zachytí informace, které geometrie nevyjadřuje: „Šroub je o 0,3 mm těsný“, „Ještě vytisknout víko“ nebo „Rozměr od Petra“. Vložíte ji pomocí {{ui:editor.tool.note}} nebo klávesy [[N]].

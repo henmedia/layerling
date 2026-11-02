@@ -27,9 +27,12 @@ import { normalizeDesignView, normalizeSavedViews, readDesignView, readSavedView
 import { normalizeSavedCornerRulers, readCornerRulers, type SavedCornerRuler } from "@/lib/cornerRulerStore";
 import { normalizeSavedTape, readTape, type SavedTape } from "@/lib/tapeStore";
 import { isSketchKeyring } from "@/lib/sketchKeyring";
+import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
 import { isReferenceImageOpacity } from "@/lib/referenceImage";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { PORT_PROFILES } from "@/lib/portGeometry";
+import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
+import { MAX_GRIDFINITY_OUTLINE_POINTS } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
 import { normalizeSnapGrid, normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 import type { CadDisplayEdge, GridSize, ProjectAsset, ProjectAssetSourceFormat, ProjectAttachment, SketchOperation, SketchRevolveSettings, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -60,7 +63,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.130.0";
+export const LYL_CREATED_WITH_VERSION = "1.132.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -78,7 +81,7 @@ export const LYL_LIMITS = {
 
 const SHAPE_KINDS = new Set([
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ]);
 
 const FEATURE_TYPES = new Set([
@@ -1461,7 +1464,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.threadRole !== undefined && !["rod", "screw", "nut", "bore"].includes(definition.threadRole as string)) {
       throw new Error(`${label}.threadRole is invalid`);
     }
-    if (definition.threadHead !== undefined && !["cylinder", "countersunk", "hex"].includes(definition.threadHead as string)) {
+    if (definition.threadHead !== undefined && !["cylinder", "countersunk", "hex", "square", "flange", "wing", "knob"].includes(definition.threadHead as string)) {
       throw new Error(`${label}.threadHead is invalid`);
     }
     if (definition.threadHand !== undefined && definition.threadHand !== "right" && definition.threadHand !== "left") {
@@ -1523,7 +1526,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.threadDrive !== undefined && !["hex", "torx", "phillips", "slot", "robertson", "none"].includes(definition.threadDrive as string)) {
       throw new Error(`${label}.threadDrive is invalid`);
     }
-    for (const field of ["threadHeadDiameter", "threadDriveSize", "threadDriveDepth"] as const) {
+    for (const field of ["threadHeadDiameter", "threadDriveSize", "threadDriveDepth", "threadCollarHeight", "threadCollarDiameter"] as const) {
       if (definition[field] === undefined) continue;
       const value = finiteNumber(definition[field], `${label}.${field}`);
       if (value < 0 || value > 640) throw new Error(`${label}.${field} is outside the supported range`);
@@ -1570,7 +1573,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "gear") {
     const teeth = finiteNumber(definition.teeth, `${label}.teeth`);
-    if (!Number.isInteger(teeth) || teeth < 6 || teeth > 150) throw new Error(`${label}.teeth is outside the supported range`);
+    if (!Number.isInteger(teeth) || teeth < MIN_GEAR_TEETH || teeth > MAX_GEAR_TEETH) throw new Error(`${label}.teeth is outside the supported range`);
     const toothSize = finiteNumber(definition.toothSize, `${label}.toothSize`);
     if (toothSize <= 0) throw new Error(`${label}.toothSize must be positive`);
     if (definition.toothWidth !== undefined) {
@@ -1660,7 +1663,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       }
     }
   }
-  if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") {
+  if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "finishingWasher") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
     for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle"] as const) {
       if (definition[key] === undefined) continue;
@@ -1747,6 +1750,17 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
         }
         if (entry.align !== undefined && entry.align !== "start" && entry.align !== "middle" && entry.align !== "end") throw new Error(`${entryLabel}.align is invalid`);
       });
+    }
+    if (definition.gridfinityOutline !== undefined) {
+      if (!Array.isArray(definition.gridfinityOutline)) throw new Error(`${label}.gridfinityOutline must be an array`);
+      const outline = definition.gridfinityOutline as unknown[];
+      if (outline.length > MAX_GRIDFINITY_OUTLINE_POINTS) throw new Error(`${label}.gridfinityOutline has too many points`);
+      const points = outline.map((raw, index) => {
+        const entryLabel = `${label}.gridfinityOutline[${index}]`;
+        const entry = objectRecord(raw, entryLabel);
+        return { x: finiteNumber(entry.x, `${entryLabel}.x`), y: finiteNumber(entry.z, `${entryLabel}.z`) };
+      });
+      if (findSketchOutlineIntersection([points])) throw new Error(`${label}.gridfinityOutline crosses itself`);
     }
   }
   if (kind === "hinge") {

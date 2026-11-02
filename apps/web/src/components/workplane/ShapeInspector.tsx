@@ -6,7 +6,7 @@ import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
 import { ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Split, Tags, Trash2, Unlock, Waves } from "lucide-react";
 import { createPortal } from "react-dom";
-import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
   DEFAULT_GEAR_HELIX_ANGLE,
   DEFAULT_GEAR_HELIX_QUALITY,
@@ -29,6 +29,7 @@ import {
   involuteGearModule,
   involuteGearPair,
   gearPairFitPatches,
+  gearPairKeepPatches,
   MAX_GEAR_BACKLASH,
   MAX_GEAR_PRESSURE_ANGLE,
   MIN_GEAR_PRESSURE_ANGLE,
@@ -92,6 +93,10 @@ import {
   threadDriveDepthLimits,
   threadDriveFields,
   threadDriveSettings,
+  threadCollarDiameterLimits,
+  threadCollarFields,
+  threadCollarHeightLimits,
+  threadCollarSettings,
   threadDriveOutline,
   threadDriveOutlinePoints,
   threadHeadHeightLimits,
@@ -103,8 +108,7 @@ import {
   threadSizeSettings,
   threadUsesInchPitch,
   threadsPerInchToPitch,
-  type ThreadSettings,
-} from "@/lib/threadGeometry";
+  type ThreadSettings, threadNutShape } from "@/lib/threadGeometry";
 import {
   DEFAULT_STAR_INNER_SIZE,
   DEFAULT_STAR_INNER_FILLET,
@@ -268,6 +272,9 @@ import {
   gridfinityOpeningLimits,
   gridfinityOpeningMaxCornerSize,
   gridfinityOpeningPatch,
+  gridfinityOutlineLimit,
+  gridfinityOutlineNeedsLargePlate,
+  gridfinityOutlineRemovalPatch,
   gridfinityPaddingPatch,
   gridfinityPlan,
   gridfinityScoopFits,
@@ -333,7 +340,8 @@ import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
 import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
-import { isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
+import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
+import { finishingWasherMeasures, finishingWasherSeatDepthFor } from "@/lib/finishingWasherGeometry";
 import { NUT_POCKET_SIZE_ORDER, isNutPocketSize, nutPocketFields, nutPocketSizeFor } from "@/lib/nutPocketSizes";
 import { MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
@@ -435,6 +443,18 @@ const THREAD_HEAD_OPTIONS: Array<{ value: ThreadHead; label: MessageKey }> = [
   { value: "cylinder", label: "thread.headCylinder" },
   { value: "countersunk", label: "thread.headCountersunk" },
   { value: "hex", label: "thread.headHex" },
+  { value: "square", label: "thread.headSquare" },
+  { value: "flange", label: "thread.headFlange" },
+  { value: "wing", label: "thread.headWing" },
+  { value: "knob", label: "thread.headKnob" },
+];
+/** The shape of a nut (#1131), kept in the head field a nut had no use for. */
+const THREAD_NUT_SHAPE_OPTIONS: Array<{ value: ThreadHead; label: MessageKey }> = [
+  { value: "hex", label: "thread.nutHex" },
+  { value: "square", label: "thread.nutSquare" },
+  { value: "flange", label: "thread.nutFlange" },
+  { value: "wing", label: "thread.nutWing" },
+  { value: "knob", label: "thread.nutKnob" },
 ];
 const THREAD_DRIVE_OPTIONS: Array<{ value: ThreadDrive; label: MessageKey }> = [
   { value: "hex", label: "thread.driveHex" },
@@ -480,6 +500,8 @@ type TogglePropertyConfig = {
   id: string;
   label: string;
   value: boolean;
+  /** Greyed out on its own, beside the whole panel's lock: a switch that cannot be turned off now. */
+  disabled?: boolean;
   /** Switches next to each other with the same layout, such as a bin's four open sides (#455), are drawn together in it. */
   layout?: "sides";
   /** Its place in that layout, named rather than counted: the row takes the class check-property-{area}. */
@@ -548,7 +570,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceRingWidth", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["textLineWidth", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceRingWidth", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -1075,6 +1097,63 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     ];
   }
 
+  if (shape.kind === "finishingWasher") {
+    // A finishing washer (#1131): one screw size sets it all; the seat is typed as the head's diameter, kept as its depth.
+    const measures = finishingWasherMeasures({ width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle });
+    const angle = normalizeScrewHoleAngle(shape.screwHoleAngle);
+    const applySize = (value: string) => {
+      if (!isFinishingWasherSize(value)) return;
+      const fields = finishingWasherFields(value);
+      onUpdate({ ...fields, ...widthPatch(fields.width), depth: fields.depth, size: resizedShapeSize(fields.width, fields.depth) }, { resizeAxis: "width" });
+    };
+    const size = finishingWasherSizeFor({ width, height: shape.height, screwHoleShaft: measures.shaft * 2, screwHoleHeadDepth: measures.seatDepth, screwHoleAngle: angle });
+    return [
+      {
+        type: "select" as const,
+        id: "screwHoleSize",
+        label: t("prop.screwHoleSize"),
+        value: size ?? "custom",
+        options: [
+          { value: "custom", label: t("port.custom") },
+          ...finishingWasherSizes().map((option) => ({ value: option, label: option })),
+        ],
+        hint: t("prop.finishingWasherSizeHint"),
+        onChange: applySize,
+      },
+      { id: "width", label: t("prop.diameter"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setCylinderDiameter },
+      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+      {
+        id: "screwHoleShaft",
+        label: t("prop.centerHole"),
+        value: measures.shaft * 2,
+        min: 0.1,
+        max: Math.max(0.2, width * 0.95),
+        step: 0.1,
+        onChange: (value) => onUpdate({ screwHoleShaft: value, screwHoleHeadDepth: finishingWasherSeatDepthFor(measures.seat * 2, value, angle) }),
+      },
+      {
+        id: "screwHoleHead",
+        label: t("prop.screwHoleHead"),
+        value: measures.seat * 2,
+        min: 0.1,
+        max: Math.max(0.2, width),
+        step: 0.1,
+        onChange: (value) => onUpdate({ screwHoleHeadDepth: finishingWasherSeatDepthFor(value, measures.shaft * 2, angle) }),
+      },
+      {
+        id: "screwHoleAngle",
+        label: t("prop.screwHoleAngle"),
+        value: angle,
+        min: MIN_SCREW_HOLE_ANGLE,
+        max: MAX_SCREW_HOLE_ANGLE,
+        step: 1,
+        // The head's diameter stays; the seat gets as deep as the new angle needs.
+        onChange: (value) => onUpdate({ screwHoleAngle: normalizeScrewHoleAngle(value), screwHoleHeadDepth: finishingWasherSeatDepthFor(measures.seat * 2, measures.shaft * 2, value) }),
+      },
+      ...roundSideProperties(shape, width, depth, onUpdate),
+    ];
+  }
+
   if (shape.kind === "teardrop") {
     // Changing the diameter keeps the tip angle, so the point stays where the printer needs it.
     const tipAngle = teardropTipAngle(width, shape.height);
@@ -1371,7 +1450,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 
   if (shape.kind === "gridfinity") {
     const plan = gridfinityPlan({ ...shape, depth });
-    // The size is whole grid units; every change writes the box they make; a tray's is free in mm.
+    const needsLargePlate = gridfinityOutlineNeedsLargePlate({ ...shape, depth });
+    // The size is whole grid units; every change writes the box they make; a tray's and an outline plate's are free in mm.
     const apply = (next: Parameters<typeof gridfinityShapePatch>[1]) => {
       const patch = gridfinityShapePatch({ ...shape, depth }, next);
       onUpdate({ ...patch, size: resizedShapeSize(patch.width, patch.depth) });
@@ -1390,9 +1470,23 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     if (plan.type === "bin") {
       properties.push({ type: "toggle", id: "gridfinityHalfGrid", label: t("prop.gridfinityHalfGrid"), value: plan.halfGrid, onChange: (value) => apply({ halfGrid: value }) });
     } else if (plan.type === "baseplate") {
-      properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, onChange: (value) => apply({ largePlate: value }) });
+      // An outline wider than a plate without the switch keeps it on (#1061).
+      properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, disabled: plan.largePlate && needsLargePlate, onChange: (value) => apply({ largePlate: value }) });
     }
-    if (plan.type === "tray") {
+    if (plan.outline) {
+      // A plate fitted into an outline (#1061): its box is free in mm and the outline stretches with it; switched off,
+      // it is a plate of whole units in that box again, the rest padding.
+      const limit = gridfinityOutlineLimit(shape);
+      const removeOutline = () => {
+        const patch = gridfinityOutlineRemovalPatch({ ...shape, depth });
+        onUpdate({ ...patch, size: resizedShapeSize(patch.width, patch.depth) });
+      };
+      properties.push(
+        { type: "toggle", id: "gridfinityOutline", label: t("prop.gridfinityOutline"), value: true, onChange: removeOutline },
+        { id: "length", label: t("prop.length"), value: plan.size.depth, min: MIN_GRIDFINITY_TRAY_SIZE, max: limit, onChange: setDepth },
+        { id: "width", label: t("prop.width"), value: plan.size.width, min: MIN_GRIDFINITY_TRAY_SIZE, max: limit, hint: [plan.cells.length > 0 ? t("gridfinity.outlineCells", { cells: plan.cells.length }) : t("gridfinity.outlineNoCells"), ...(needsLargePlate ? [t("gridfinity.outlineNeedsLargePlate", { size: gridfinityOutlineLimit({ ...shape, gridfinityLargePlate: false }) })] : [])].join(" "), onChange: setWidth },
+      );
+    } else if (plan.type === "tray") {
       // A tray (#837) has no grid: its size is free in mm, as a box's.
       properties.push(
         { id: "length", label: t("prop.length"), value: plan.size.depth, min: MIN_GRIDFINITY_TRAY_SIZE, max: MAX_GRIDFINITY_TRAY_SIZE, onChange: setDepth },
@@ -1406,7 +1500,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         { id: "gridfinityUnitsZ", label: t("prop.gridfinityUnitsZ"), value: plan.count.z, min: MIN_GRIDFINITY_UNITS, max: maxUnits, step: 1, onChange: (value) => apply({ z: Math.round(value) }) },
       );
     }
-    if (plan.type === "baseplate") {
+    if (plan.type === "baseplate" && !plan.outline) {
       // The drawer it fills (#455): typing a drawer's inside size works out the units and the paddings of that axis.
       const drawer = gridfinityDrawerSize({ ...shape, depth });
       const drawerMax = gridfinityDrawerMax(shape);
@@ -1416,7 +1510,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       };
       properties.push(
         { id: "gridfinityDrawerWidth", label: t("prop.gridfinityDrawerWidth"), value: drawer.width, min: MIN_GRIDFINITY_DRAWER, max: drawerMax, step: 0.1, hint: t("gridfinity.drawerHint", { size: drawerMax.toLocaleString(numberLocale()) }), onChange: (value) => fit("x", value) },
-        { id: "gridfinityDrawerDepth", label: t("prop.gridfinityDrawerDepth"), value: drawer.depth, min: MIN_GRIDFINITY_DRAWER, max: drawerMax, step: 0.1, onChange: (value) => fit("z", value) },
+        { id: "gridfinityDrawerDepth", label: t("prop.gridfinityDrawerDepth"), value: drawer.depth, min: MIN_GRIDFINITY_DRAWER, max: drawerMax, step: 0.1, hint: t("gridfinity.outlineFitHint"), onChange: (value) => fit("z", value) },
       );
       // Padding (#455): a solid border on each side, so the plate fills a drawer that is not whole units; the units stay as they are.
       const walls = [
@@ -2388,19 +2482,22 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const headDiameterLimits = threadHeadDiameterLimits(settings);
     const driveSizeLimits = threadDriveSizeLimits(settings);
     const driveDepthLimits = threadDriveDepthLimits(settings);
+    const collarHeightLimits = threadCollarHeightLimits(settings);
+    const collarDiameterLimits = threadCollarDiameterLimits(settings);
     // Zollgewinde werden in Gaengen je Zoll gedacht, nicht in Millimetern.
     const inchPitch = threadUsesInchPitch(settings.diameter);
+    // "Frei" steht vorn, sonst sieht man es erst ganz unten nach allen Reihen (Discussion #1142).
     const sizeOptions = [
+      { value: "custom", label: t("thread.customSize") },
       ...THREAD_SIZE_GROUPS.flatMap((group) => group.sizes.map((size) => ({
         value: size.id,
         label: size.id,
         group: t(THREAD_SERIES_TEXT[group.series].group),
       }))),
-      { value: "custom", label: t("thread.customSize") },
     ];
     // Die Hoehe des Koerpers bleibt Kopf plus Gewinde; abgefragt wird aber das
     // Gewinde, weil ein Mass, das den Kopf mitzaehlt, niemandem etwas sagt.
-    const threadLength = Math.max(MIN_SHAPE_SIZE, shape.height - settings.headHeight);
+    const threadLength = Math.max(MIN_SHAPE_SIZE, shape.height - settings.headHeight - settings.collarHeight);
     const headFollowsStandard = Math.abs(settings.headHeight - defaultThreadHeadHeight(settings)) < 1e-6;
     /**
      * Breite und Tiefe stehen nicht mehr zur Wahl - sie folgen dem Durchmesser
@@ -2442,9 +2539,16 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         threadDriveDepth: patch.driveDepth ?? (headChanged ? undefined : shape.threadDriveDepth),
       }, headSize);
       Object.assign(next, threadDriveSettings(driveFields, headSize));
+      // The collar (#1152) keeps its height on another head and stays within the head's width.
+      const collarHead = { ...headSize, headDiameter: next.headDiameter };
+      const collarFields = threadCollarFields({
+        threadCollarHeight: patch.collarHeight ?? shape.threadCollarHeight,
+        threadCollarDiameter: patch.collarDiameter ?? shape.threadCollarDiameter,
+      }, collarHead);
+      Object.assign(next, threadCollarSettings(collarFields, collarHead));
       // Die Kopffase haengt am Kopf: wer den Kopf flacher zieht oder auf
       // Senkkopf umschaltet, darf keine Fase behalten, die es dort nicht gibt.
-      next.headChamfer = normalizeThreadHeadChamfer(next.headChamfer, { ...headSize, headDiameter: next.headDiameter, drive: next.drive, driveSize: next.driveSize, chamferLow: next.chamferLow, profile: next.profile });
+      next.headChamfer = normalizeThreadHeadChamfer(next.headChamfer, { ...headSize, headDiameter: next.headDiameter, drive: next.drive, driveSize: next.driveSize, chamferLow: next.chamferLow, profile: next.profile, collarHeight: next.collarHeight, collarDiameter: next.collarDiameter });
       const footprint = threadNaturalFootprint(next);
       const update: Partial<WorkplaneShape> = {
         threadRole: next.role,
@@ -2465,12 +2569,13 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         threadChamferBottom: next.chamferLow,
         threadHeadChamfer: next.headChamfer,
         ...driveFields,
+        ...collarFields,
         width: footprint.width,
         depth: footprint.depth,
         size: resizedShapeSize(footprint.width, footprint.depth),
         height: resetHeight
           ? threadNaturalHeight(next)
-          : Math.max(MIN_SHAPE_SIZE, (nextLength ?? threadLength) + next.headHeight),
+          : Math.max(MIN_SHAPE_SIZE, (nextLength ?? threadLength) + next.headHeight + next.collarHeight),
       };
       // Ein Gewindeloch ist zum Abziehen da, alles andere ist Material.
       if (next.role === "bore") update.hole = true;
@@ -2508,6 +2613,16 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         value: settings.drive,
         options: THREAD_DRIVE_OPTIONS.map((option) => ({ value: option.value, label: t(option.label) })),
         onChange: (drive) => applyThread({ drive: normalizeThreadDrive(drive, settings.head) }),
+      });
+    }
+    if (settings.role === "nut") {
+      properties.push({
+        type: "select",
+        id: "threadNutShape",
+        label: t("inspector.threadNutShape"),
+        value: threadNutShape(settings.head),
+        options: THREAD_NUT_SHAPE_OPTIONS.map((option) => ({ value: option.value, label: t(option.label) })),
+        onChange: (head) => applyThread({ head: normalizeThreadHead(head) }),
       });
     }
     properties.push(
@@ -2559,13 +2674,37 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       if (settings.head !== "countersunk") {
         properties.push({
           id: "headDiameter",
-          label: t(settings.head === "hex" ? "prop.headAcrossFlats" : "prop.headDiameter"),
+          label: t(settings.head === "hex" || settings.head === "square" || settings.head === "flange" ? "prop.headAcrossFlats" : settings.head === "wing" ? "prop.headSpan" : "prop.headDiameter"),
           value: settings.headDiameter,
           min: headDiameterLimits.min,
           max: headDiameterLimits.max,
           step: 0.1,
           onChange: (headDiameter) => applyThread({ headDiameter }),
         });
+      }
+      // A collar between head and thread (#1152): a spacer under a star knob, a shoulder under a head.
+      if (collarHeightLimits.max > 0) {
+        properties.push({
+          id: "collarHeight",
+          label: t("prop.collarHeight"),
+          value: settings.collarHeight,
+          min: collarHeightLimits.min,
+          max: collarHeightLimits.max,
+          step: 0.1,
+          hint: t("prop.collarHeightHint"),
+          onChange: (collarHeight) => applyThread({ collarHeight }),
+        });
+        if (settings.collarHeight > 0) {
+          properties.push({
+            id: "collarDiameter",
+            label: t("prop.collarDiameter"),
+            value: settings.collarDiameter,
+            min: collarDiameterLimits.min,
+            max: collarDiameterLimits.max,
+            step: 0.1,
+            onChange: (collarDiameter) => applyThread({ collarDiameter }),
+          });
+        }
       }
       if (settings.drive !== "none") {
         properties.push({
@@ -3508,6 +3647,7 @@ export function ShapeInspector({
   const showTaperCards = !shapeIgnoresTaper && !shape.layeredText;
   const threadRoleProperty = isThread ? findSelectProperty(properties, "threadRole") : null;
   const threadHeadProperty = isThread ? findSelectProperty(properties, "threadHead") : null;
+  const threadNutShapeProperty = isThread ? findSelectProperty(properties, "threadNutShape") : null;
   const threadDriveProperty = isThread ? findSelectProperty(properties, "threadDrive") : null;
   // A vase: its measures here, its form and pattern and its bottom and wall on cards of their own.
   const vaseFormProperties = shape.kind === "vase" ? properties.filter((property) => property.id.startsWith("vase.")) : [];
@@ -3519,7 +3659,7 @@ export function ShapeInspector({
     : shape.kind === "gear"
     ? properties.filter((property) => ["centerHole", "length", "width", "height"].includes(property.id))
     : isThread
-      ? properties.filter((property) => ["threadSize", "diameter", "threadLength", "headHeight", "headDiameter", "driveSize", "driveDepth", "headChamfer"].includes(property.id))
+      ? properties.filter((property) => ["threadSize", "diameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "headChamfer"].includes(property.id))
       : properties.filter((property) => shape.kind !== "text" || !TEXT_FILL_MORE_IDS.has(property.id));
   // A text's fill (#215): the list and the line width in view, the rest under "More" right below them.
   const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
@@ -4198,6 +4338,20 @@ export function ShapeInspector({
                   preview: <ThreadHeadPreview head={option.value} />,
                 }))}
                 onChange={threadHeadProperty.onChange}
+              />
+            ) : null}
+            {threadNutShapeProperty ? (
+              <IconOptionSelector
+                label={t("inspector.threadNutShape")}
+                columns={3}
+                value={threadNutShapeProperty.value}
+                disabled={locked}
+                options={THREAD_NUT_SHAPE_OPTIONS.map((option) => ({
+                  value: option.value,
+                  label: t(option.label),
+                  preview: <ThreadNutShapePreview shape={option.value} />,
+                }))}
+                onChange={threadNutShapeProperty.onChange}
               />
             ) : null}
             {threadDriveProperty ? (
@@ -6522,8 +6676,9 @@ function ShapePropertyRows({
       return <SelectProperty {...property} key={property.id} disabled={disabled} onReset={onReset} />;
     }
     if (property.type === "toggle") {
-      const onReset = typeof fallback === "boolean" && fallback !== property.value ? () => property.onChange(fallback) : undefined;
-      return <ToggleProperty {...property} key={property.id} disabled={disabled} onReset={onReset} />;
+      // A switch greyed out on its own offers no reset either.
+      const onReset = !property.disabled && typeof fallback === "boolean" && fallback !== property.value ? () => property.onChange(fallback) : undefined;
+      return <ToggleProperty {...property} key={property.id} disabled={disabled || property.disabled} onReset={onReset} />;
     }
     const differs = typeof fallback === "number" && Math.abs(fallback - property.value) > Math.max(1e-6, (property.step ?? 0.01) / 10);
     const onReset = differs ? () => property.onChange(fallback as number) : undefined;
@@ -6717,6 +6872,10 @@ function CustomColorInput({ color, disabled, onCommit, onInteractionActiveChange
   );
 }
 
+/** How far the name of a value is dragged before it changes the value, and how many pixels make one step of the wheel. */
+const SCRUB_START_PX = 3;
+const SCRUB_PX_PER_STEP = 4;
+
 function RangeProperty({
   id,
   label,
@@ -6794,6 +6953,28 @@ function RangeProperty({
   const numberInputRef = useRef<HTMLInputElement>(null);
   const keepSelectedRef = useRef(false);
   const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
+  // The wheel stops at the field's lower limit, also for the figure shown: it went on below it, into negative sizes, which the body
+  // then kept at the limit and the field showed again as 0.01 only when it was left (#576, prmod3d). Returns the figure to show.
+  const setSteppedValue = (turned: number) => {
+    const next = freePosition ? turned : Math.max(turned, controlMin);
+    const nextModelValue = toModelValue(next);
+    onChange(freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
+    return formatShown(freePosition || allowsAboveSliderMax ? next : clamp(next, controlMin, controlMax));
+  };
+  // Dragging the field's name to the left or right changes the value, as in Blender or Figma: a wheel notch for every few pixels,
+  // with the same keys as the wheel. A drag that moved does not then put the cursor into the field, as a click on the name does.
+  const scrubRef = useRef<{ x: number; start: number; moved: boolean } | null>(null);
+  const scrubbedRef = useRef(false);
+  const scrubbable = !disabled && !editing;
+  const endScrub = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    const scrub = scrubRef.current;
+    if (!scrub) return;
+    scrubRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (!scrub.moved) return;
+    scrubbedRef.current = true;
+    holdInteraction(false);
+  };
   // Up and Down in the focused field do the same as the wheel: one step, Shift a larger one, Alt a finer one (#749, MartinShake).
   // In a size or position field Shift steps by the snap grid; with the grid off it stays ten steps.
   const stepFieldValue = (direction: 1 | -1, modifiers: { shift: boolean; ctrl: boolean; alt: boolean }) => {
@@ -6801,13 +6982,7 @@ function RangeProperty({
     const parsed = parseMeasurementInput(draft);
     const current = Number.isFinite(parsed) ? parsed : controlValue;
     const shiftStep = isLength && snapStepMm > 0 ? millimetersToDisplay(snapStepMm, workspace) : undefined;
-    const turned = wheelNextValue(current, direction, base, modifiers, shiftStep);
-    // The wheel stops at the field's lower limit, also for the figure shown: it went on below it, into negative sizes, which the body
-    // then kept at the limit and the field showed again as 0.01 only when it was left (#576, prmod3d).
-    const next = freePosition ? turned : Math.max(turned, controlMin);
-    const nextModelValue = toModelValue(next);
-    onChange(freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
-    const shown = formatShown(freePosition || allowsAboveSliderMax ? next : clamp(next, controlMin, controlMax));
+    const shown = setSteppedValue(wheelNextValue(current, direction, base, modifiers, shiftStep));
     // What is shown is the new starting point, so leaving the field keeps the exact value and does not read it again.
     openedWithRef.current = shown;
     setDraft(shown);
@@ -6884,7 +7059,36 @@ function RangeProperty({
   const row = (
     <label className="range-property" style={{ "--slider-pos": `${position}%` } as CSSProperties}>
       <span className="range-property-header">
-        <span className="range-property-name">{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
+        <span
+          className={`range-property-name${scrubbable ? " scrubbable" : ""}`}
+          title={scrubbable ? t("editor.property.dragToChange") : undefined}
+          onPointerDown={(event) => {
+            if (!scrubbable || event.button !== 0 || (event.target as HTMLElement).closest("button")) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            scrubRef.current = { x: event.clientX, start: controlValue, moved: false };
+          }}
+          onPointerMove={(event) => {
+            const scrub = scrubRef.current;
+            if (!scrub) return;
+            const dx = event.clientX - scrub.x;
+            if (!scrub.moved) {
+              if (Math.abs(dx) < SCRUB_START_PX) return;
+              scrub.moved = true;
+              holdInteraction(true);
+            }
+            const base = wheelBaseStep(controlMin, controlMax, controlStep, unit === "in");
+            const shiftStep = isLength && snapStepMm > 0 ? millimetersToDisplay(snapStepMm, workspace) : undefined;
+            const notches = Math.trunc(dx / SCRUB_PX_PER_STEP);
+            setSteppedValue(wheelNextValue(scrub.start, notches, base, { shift: event.shiftKey, ctrl: event.ctrlKey, alt: event.altKey }, shiftStep));
+          }}
+          onPointerUp={endScrub}
+          onPointerCancel={endScrub}
+          onClick={(event) => {
+            if (!scrubbedRef.current) return;
+            scrubbedRef.current = false;
+            event.preventDefault();
+          }}
+        >{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
         <span className="range-value-control">
           <input
             ref={numberInputRef}
@@ -7147,9 +7351,39 @@ function ThreadRolePreview({ role }: { role: ThreadRole }) {
   );
 }
 
+/** A nut's shape seen from above, round its bore (#1131). */
+function ThreadNutShapePreview({ shape }: { shape: ThreadHead }) {
+  const common = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinejoin: "round" as const, "aria-hidden": true };
+  const bore = <circle cx="12" cy="12" r="3" />;
+  if (shape === "square") return <svg {...common}><path d="M5 5h14v14H5z" />{bore}</svg>;
+  if (shape === "flange") return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M16.2 4.7L20.3 12l-4.1 7.3H7.8L3.7 12l4.1-7.3z" />{bore}</svg>;
+  if (shape === "wing") return <svg {...common}><path d="M8.3 9.5H4a2.5 2.5 0 0 0 0 5h4.3M15.7 9.5H20a2.5 2.5 0 0 1 0 5h-4.3" /><circle cx="12" cy="12" r="4.5" />{bore}</svg>;
+  if (shape === "knob") {
+    return (
+      <svg {...common}>
+        <path d="M12 2.5a2.6 2.6 0 0 1 2.4 1.6 4 4 0 0 0 4.3 2.5 2.6 2.6 0 0 1 2 4.1 4 4 0 0 0 0 5 2.6 2.6 0 0 1-2 4.1 4 4 0 0 0-4.3 2.5 2.6 2.6 0 0 1-4.8 0 4 4 0 0 0-4.3-2.5 2.6 2.6 0 0 1-2-4.1 4 4 0 0 0 0-5 2.6 2.6 0 0 1 2-4.1 4 4 0 0 0 4.3-2.5A2.6 2.6 0 0 1 12 2.5z" />
+        {bore}
+      </svg>
+    );
+  }
+  return <svg {...common}><path d="M16.6 4l4.6 8-4.6 8H7.4l-4.6-8 4.6-8z" />{bore}</svg>;
+}
+
 /** Der Kopf sitzt unten, weil die Schraube so auf der Ebene steht. */
 function ThreadHeadPreview({ head }: { head: ThreadHead }) {
   const common = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinejoin: "round" as const, "aria-hidden": true };
+  const shaft = (
+    <>
+      <path d="M9 16V3h6v13" />
+      <path d="M9 7.1l6-1.1M9 11.1l6-1.1" />
+    </>
+  );
+  // The new heads (#1131), seen from the side like the others: a square head plain, a flange head with its disc under
+  // the shaft, a wing head as a long flat bar, a star knob wide with its lobes as bumps.
+  if (head === "square") return <svg {...common}><path d="M5 22v-6h14v6z" />{shaft}</svg>;
+  if (head === "flange") return <svg {...common}><path d="M6 22v-4.5h12V22z" /><path d="M3 17.5V16h18v1.5z" /><path d="M10 17.5V22M14 17.5V22" />{shaft}</svg>;
+  if (head === "wing") return <svg {...common}><path d="M1.5 22v-4a2 2 0 0 1 2-2h17a2 2 0 0 1 2 2v4z" />{shaft}</svg>;
+  if (head === "knob") return <svg {...common}><path d="M3 22v-4.5a1.5 1.5 0 0 1 3 0 1.5 1.5 0 0 1 3 0V16h6v1.5a1.5 1.5 0 0 1 3 0 1.5 1.5 0 0 1 3 0V22z" />{shaft}</svg>;
   if (head === "countersunk") {
     return (
       <svg {...common}>
@@ -7231,6 +7465,7 @@ export function SelectionInspector({
   onSetHole,
   onSetColor,
   onUpdateShapes,
+  onFitGridfinityOutline,
   onToggleLocked,
   onToggleHidden,
   onInteractionActiveChange,
@@ -7248,6 +7483,8 @@ export function SelectionInspector({
   onSetColor: (color: string) => void;
   /** Changes to several of the selected parts in one step: "Fit module" for two gears (#645). */
   onUpdateShapes?: (changes: readonly { id: string; patch: Partial<WorkplaneShape> }[], message?: string) => void;
+  /** A baseplate and one other shape selected: fit the plate into what the other stands on (#1061). */
+  onFitGridfinityOutline?: (plateId: string, sourceId: string) => Promise<void> | void;
   onToggleLocked: () => void;
   /** Hides the selected parts, or shows them again when all of them are hidden (#491); the button of a single part's panel. */
   onToggleHidden?: () => void;
@@ -7289,6 +7526,17 @@ export function SelectionInspector({
     if (!fitModule || !onUpdateShapes) return;
     onUpdateShapes(gearPairFitPatches(shapes[0], shapes[1], fitModule), t("status.gearPairFitted", { module: plainNumber(fitModule) }));
   };
+  // One gear stays, the other is fitted to it, so a chain of gears can be fitted one pair at a time (Discussion #1136).
+  const gearPairOff = gearPair && (gearPair.distance === null || Math.abs(gearPair.distance - gearPair.current) > 0.005);
+  const keepGear = (index: 0 | 1) => {
+    if (!onUpdateShapes) return;
+    const kept = gearPairKeepPatches(shapes[index], shapes[1 - index]);
+    if (!kept) return;
+    onUpdateShapes([kept.patch], t("status.gearPairKept", { name: displayShapeName(shapes[index]), module: plainNumber(kept.module), distance: plainNumber(kept.distance) }));
+  };
+  // A baseplate and one other shape: the plate can be fitted into what the other stands on (#1061).
+  const outlinePlates = shapes.length === 2 ? shapes.filter((shape) => shape.kind === "gridfinity" && normalizeGridfinityType(shape.gridfinityType) === "baseplate") : [];
+  const outlineSource = outlinePlates.length === 1 ? shapes.find((shape) => shape !== outlinePlates[0]) : undefined;
   const pick = (color: string) => {
     onSetColor(color);
     rememberColor(color);
@@ -7406,6 +7654,16 @@ export function SelectionInspector({
       {fitModule && onUpdateShapes ? (
         <button type="button" className="inspector-action-button selection-gear-fit" disabled={anyLocked} title={t("inspector.gearPairFitHint")} onClick={fitGearPair}>
           {t("inspector.gearPairFitApply")}
+        </button>
+      ) : null}
+      {gearPairOff && onUpdateShapes ? ([0, 1] as const).map((index) => (
+        <button key={shapes[index].id} type="button" className="inspector-action-button selection-gear-fit" disabled={anyLocked} title={t("inspector.gearPairKeepHint")} onClick={() => keepGear(index)}>
+          {t("inspector.gearPairKeep", { name: displayShapeName(shapes[index]) })}
+        </button>
+      )) : null}
+      {outlineSource && onFitGridfinityOutline ? (
+        <button type="button" className="inspector-action-button" disabled={anyLocked} title={t("inspector.gridfinityOutlineFitHint")} onClick={() => void onFitGridfinityOutline(outlinePlates[0].id, outlineSource.id)}>
+          {t("inspector.gridfinityOutlineFit")}
         </button>
       ) : null}
       <p className="selection-inspector-hint">{t("inspector.selectionHint")}</p>

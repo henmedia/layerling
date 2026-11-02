@@ -9,6 +9,7 @@ import { torusTessellation } from "@/lib/torusTessellation";
 import { torusRadii, torusTubeRatio } from "@/lib/torusShape";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
+import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
 import { createHeartGeometry } from "@/lib/heartGeometry";
 import { createCrescentGeometry } from "@/lib/crescentGeometry";
@@ -482,6 +483,9 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
     case "doubleCountersink":
       geometry = createScrewHoleGeometry({ kind: shape.kind, width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) });
       break;
+    case "finishingWasher":
+      geometry = createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) });
+      break;
     case "teardrop":
       geometry = createTeardropGeometry({ width, depth, height, sides: roundSideCount(shape.sides, width, depth) });
       break;
@@ -584,6 +588,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gridfinityOpenings: shape.gridfinityOpenings,
         gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
         gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
+        gridfinityOutline: shape.gridfinityOutline,
       });
       break;
     case "loft":
@@ -678,6 +683,8 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         threadDrive: shape.threadDrive,
         threadDriveSize: shape.threadDriveSize,
         threadDriveDepth: shape.threadDriveDepth,
+        threadCollarHeight: shape.threadCollarHeight,
+        threadCollarDiameter: shape.threadCollarDiameter,
       });
       break;
     case "spring":

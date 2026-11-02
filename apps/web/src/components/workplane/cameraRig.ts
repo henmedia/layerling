@@ -226,6 +226,33 @@ export function setCameraToViewDirection(state: CameraRig, direction: THREE.Vect
   state.needsRender = true;
 }
 
+/**
+ * Looks straight onto a plane from the side its normal points to, with a point of it in the middle
+ * (#1128): a workplane on a face seen square, as the top view shows the base plate. The distance stays.
+ */
+export function setCameraOntoPlane(state: CameraRig, point: THREE.Vector3, normal: THREE.Vector3, animate = true) {
+  state.focusReach = (state.focusReach?.clone() ?? new THREE.Box3()).expandByPoint(point);
+  const offset = state.camera.position.clone().sub(state.controls.target);
+  const distance = clamp(offset.length(), CAMERA_MIN_DISTANCE, CAMERA_MAX_DISTANCE);
+  const toOffset = normal.clone().normalize().multiplyScalar(distance);
+
+  if (animate && !prefersReducedMotion()) {
+    const now = performance.now();
+    state.cameraTurn = { ...cameraTurn(offset, toOffset, now), slide: pivotSlide(state.controls.target, point, now) };
+    state.needsRender = true;
+    return;
+  }
+
+  state.cameraTurn = null;
+  state.controls.target.copy(point);
+  state.camera.up.set(0, 1, 0);
+  state.camera.position.copy(point).add(toOffset);
+  state.camera.lookAt(point);
+  state.camera.updateProjectionMatrix();
+  state.controls.update();
+  state.needsRender = true;
+}
+
 /** Slides the view so that a point comes to the middle of the screen and becomes the pivot, from the same angle and distance. */
 export function panCameraTo(state: CameraRig, point: THREE.Vector3, animate = true) {
   // constrainCamera holds the pivot on the plate; a spot beside it may be centred too, as with
@@ -256,6 +283,7 @@ export function stepCameraTurn(state: CameraRig, now: number): boolean {
     return true;
   }
   const { offset, done } = cameraTurnOffset(turn, now);
+  if (turn.slide) state.controls.target.copy(pivotSlidePoint(turn.slide, now).pivot);
   state.camera.up.set(0, 1, 0);
   state.camera.position.copy(state.controls.target).add(offset);
   state.camera.lookAt(state.controls.target);

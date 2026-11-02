@@ -17,6 +17,8 @@ export function useEditorNotice() {
   const [notice, setNoticeText] = useState("");
   // A message may carry one button, for what the person can do about it right away (#489).
   const [noticeAction, setNoticeAction] = useState<NoticeAction | null>(null);
+  // When the message came (performance.now()), so the editor can tell one that reports a change just made.
+  const [noticeAt, setNoticeAt] = useState(0);
   const noticeTimerRef = useRef<number | null>(null);
   // Fuer den Fehlerbericht: die letzten Meldungen dieser Sitzung.
   const reportNoticesRef = useRef<BugReportEvent[]>([]);
@@ -33,6 +35,7 @@ export function useEditorNotice() {
     reportNoticesRef.current = rememberBugReportEvent(reportNoticesRef.current, message);
     setNoticeText(message);
     setNoticeAction(action);
+    setNoticeAt(performance.now());
     clearLater(noticeDurationMs(message, patient));
   }, [clearLater]);
   // A message stays while the pointer rests on it, and goes a few seconds after it leaves (#422).
@@ -51,5 +54,5 @@ export function useEditorNotice() {
     if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
   }, []);
 
-  return { notice, noticeAction, setNotice, holdNotice, releaseNotice, dismissNotice, reportNoticesRef };
+  return { notice, noticeAction, noticeAt, setNotice, holdNotice, releaseNotice, dismissNotice, reportNoticesRef };
 }

@@ -419,12 +419,12 @@ describe("Rettungsschwelle fuer flache Kanten", () => {
 });
 
 describe("Vorgabe beim Wiederoeffnen des Kantenwerkzeugs (#1115)", () => {
-  const preset = { kind: "fillet" as string, amount: 3, chamferAngle: 45, endAmount: null, edgeIds: [] as number[] };
+  const preset = { kind: "fillet" as string, amount: 3, chamferAngle: 45, endAmount: null, concave: false, edgeIds: [] as number[] };
 
   it("keeps the size after Apply although no edge comes along", () => {
     expect(cadModifierPresetValues(preset, "fillet", new Set([1, 2]))).toEqual({
       edgeIds: [],
-      values: { amount: 3, chamferAngle: 45, endAmount: null },
+      values: { amount: 3, chamferAngle: 45, endAmount: null, concave: false },
     });
   });
 

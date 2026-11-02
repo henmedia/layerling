@@ -91,6 +91,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_measure_section` | meri na ravnini prereza med dvema točkama, ki se zaskočita na obris – debeline sten, reže, prileganja |
 | `layerling_show_overhangs` | vklopi ali izklopi šrafuro previsov, nastavi kot in za vsako telo navede ploskev, ki bi potrebovala podpore |
 | `layerling_estimate_print` | oceni prostornino, težo in filament za izbor ali celoten načrt: za polno telo in kot grobo oceno s stenami in polnilom kot v oknu za izvoz |
+| `layerling_check_clearance` | pred tiskanjem preveri, kateri deli se prekrivajo, dotikajo ali so bližje od najmanjše zračnosti (Preveri zračnost), tudi ločene dele enega predmeta |
 | `layerling_add_reference_points` | postavi referenčne točke - na sredine, vogale ali sredine robov objektov ali na natančna mesta -, na katere se oblike zaskočijo |
 | `layerling_list_reference_points` | našteje referenčne točke z oznako in lego |
 | `layerling_remove_reference_points` | izbriše referenčne točke po oznaki ali vse |

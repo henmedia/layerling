@@ -196,6 +196,36 @@ describe("texturing a body", () => {
     points.filter((p) => p.r < 13.5 && p.y > 0.01 && p.y < 17.99).forEach((p) => expect(Math.abs(p.r - 12)).toBeLessThan(0.01));
   });
 
+  it("textures a wedge's slope all over: past the middle it leans over it, yet no body stands across", () => {
+    // The editor's wedge (inside frame: y up), its slope rising from x = -10 to the ridge at x = 10, y = 20.
+    const wedge = [-10, 0, -10, 10, 20, -10, 10, 0, -10, -10, 0, 10, 10, 0, 10, 10, 20, 10, -10, 0, -10, 10, 0, -10, 10, 0, 10,
+      -10, 0, -10, 10, 0, 10, -10, 0, 10, 10, 0, -10, 10, 20, -10, 10, 20, 10, 10, 0, -10, 10, 20, 10, 10, 0, 10,
+      -10, 0, -10, -10, 0, 10, 10, 20, 10, -10, 0, -10, 10, 20, 10, 10, 20, -10];
+    for (const direction of ["inward", "outward"] as const) {
+      const result = applySurfaceTexture(wedge, { pattern: "knurl", direction }, SMALL);
+      expectClosed(result);
+      // How far each point of the slope lies off its plane (y = x + 10), in the upper half past the middle - where the
+      // slope faces the middle and was taken for an inner wall, so the pattern left a smooth triangle there.
+      const used = new Set<number>(Array.from(result.indices));
+      const off = Array.from(used, (i) => [result.vertices[i * 3], result.vertices[i * 3 + 1], result.vertices[i * 3 + 2]])
+        .filter(([x, y, z]) => x > 6 && x < 8.5 && Math.abs(z) < 2 && Math.abs(y - x - 10) < 2)
+        .map(([x, y]) => (y - x - 10) / Math.SQRT2);
+      expect(off.length).toBeGreaterThan(20);
+      if (direction === "inward") expect(Math.min(...off)).toBeLessThan(-0.2);
+      else expect(Math.max(...off)).toBeGreaterThan(0.2);
+    }
+  }, 60000);
+
+  it("still leaves an angular tube's inner walls alone: the body stands across them", () => {
+    // A square tube standing on a corner (four segments): its walls lie where |x| + |z| is 14 outside and 9 inside.
+    const result = applySurfaceTexture(tube(14, 9, 16, 4), { pattern: "knurl", spacing: 3, depth: 0.5 }, SMALL);
+    expectClosed(result);
+    const used = new Set<number>(Array.from(result.indices));
+    const points = Array.from(used, (i) => ({ diamond: Math.abs(result.vertices[i * 3]) + Math.abs(result.vertices[i * 3 + 2]), y: result.vertices[i * 3 + 1] }));
+    points.filter((p) => p.diamond < 11.5 && p.y > 0.01 && p.y < 15.99).forEach((p) => expect(Math.abs(p.diamond - 9)).toBeLessThan(0.01));
+    expect(Math.min(...points.filter((p) => p.diamond > 11.5 && p.y > 3 && p.y < 13).map((p) => p.diamond))).toBeLessThan(14 - 0.3);
+  }, 60000);
+
   it("cuts honeycomb along its joints: closed, and every joint reaches the full depth", () => {
     const result = applySurfaceTexture(tube(12, 0, 20), { pattern: "honeycomb", spacing: 5, depth: 0.5, width: 0.3, profile: "flat" }, SMALL);
     expectClosed(result);

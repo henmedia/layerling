@@ -198,14 +198,14 @@ export function rescueSharpAngleForEdges(
  * an Apply (#538) the value without edges (#1115). The value comes along whenever the kind is the same.
  */
 export function cadModifierPresetValues<Kind extends string>(
-  preset: { kind: Kind; amount: number; chamferAngle: number; endAmount?: number | null; edgeIds: number[] } | null,
+  preset: { kind: Kind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] } | null,
   kind: Kind,
   existingEdgeIds: ReadonlySet<number>,
 ) {
   if (!preset || preset.kind !== kind) return { edgeIds: [] as number[], values: null };
   return {
     edgeIds: preset.edgeIds.filter((edgeId) => existingEdgeIds.has(edgeId)),
-    values: { amount: preset.amount, chamferAngle: preset.chamferAngle, endAmount: preset.endAmount ?? null },
+    values: { amount: preset.amount, chamferAngle: preset.chamferAngle, endAmount: preset.endAmount ?? null, concave: preset.concave === true },
   };
 }
 

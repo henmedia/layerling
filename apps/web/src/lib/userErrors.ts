@@ -9,6 +9,11 @@ import type { MessageKey } from "@/lib/messages.en";
  * sentence in the person's language around it, instead of standing alone.
  */
 
+function denseTriangleCounts(match: RegExpMatchArray) {
+  const format = new Intl.NumberFormat(getLanguage());
+  return { triangles: format.format(Number(match[1])), limit: format.format(Number(match[2])) };
+}
+
 type ErrorRule = {
   pattern: RegExp;
   key: MessageKey;
@@ -86,6 +91,9 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /SVG is not valid XML/i, key: "error.svgInvalidXml" },
   { pattern: /Mesh does not contain complete triangles|Mesh contains non-finite/i, key: "error.meshBroken" },
   { pattern: /is too complex \(\d+ triangles/i, key: "error.meshTooComplex" },
+  // Too many triangles for hollowing or edge treatment (LayerlingEditor prepareCadModifierForMcp); a vase is told its own way (#1153).
+  { pattern: /This vase has (\d+) triangles; .*? stop at (\d+)/, key: "status.vaseTooDense", values: (m) => denseTriangleCounts(m) },
+  { pattern: /This mesh has (\d+) triangles; interactive edge treatment stops at (\d+)/, key: "status.meshTooDense", values: (m) => denseTriangleCounts(m) },
   { pattern: /contains \d+ zero-area triangle/i, key: "error.meshDegenerate" },
   { pattern: /is not a watertight manifold/i, key: "error.meshNotWatertight" },
   { pattern: /does not enclose a non-zero volume/i, key: "error.meshNoVolume" },

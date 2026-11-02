@@ -91,6 +91,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_measure_section` | mesure sur un plan de coupe entre deux points qui s'accrochent au contour - épaisseur de paroi, espaces, ajustements |
 | `layerling_show_overhangs` | active ou désactive les hachures en surplomb, définit l'angle et indique pour chaque corps la zone qui aurait besoin de supports |
 | `layerling_estimate_print` | estime le volume, le poids et le filament pour la sélection ou l'ensemble du dessin, élaboré aussi solidement que la fenêtre d'export |
+| `layerling_check_clearance` | vérifie avant l'impression quelles pièces se chevauchent, se touchent ou sont plus proches qu'un jeu minimal (Vérifier le jeu), y compris les pièces séparées d'un objet |
 | `layerling_add_reference_points` | marque des points de référence - au centre, dans les coins ou au milieu des bords des objets, ou à des positions exactes - sur lesquels les formes s'accrochent |
 | `layerling_list_reference_points` | répertorie les points de référence avec leurs identifiants et positions |
 | `layerling_remove_reference_points` | supprime les points de référence par identifiant, ou tous |

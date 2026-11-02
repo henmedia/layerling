@@ -10,9 +10,10 @@ summary: 能相互配合的螺絲、螺帽與螺紋孔，以及齒輪、彈簧�
 在形狀庫中選擇 {{ui:shape.thread}}。在 {{ui:inspector.threadRole}} 下決定它的類型：
 
 - **{{ui:thread.rod}}：** 帶螺紋的圓柱，例如沒有頭的螺絲。
-- **{{ui:thread.screw}}：** 帶頭部。頭部形狀在 {{ui:inspector.threadHead}} 選擇：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。
+- **{{ui:thread.screw}}：** 帶頭部。頭部形狀在 {{ui:inspector.threadHead}} 選擇：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。另有{{ui:thread.headSquare}}、{{ui:thread.headFlange}}（六角下帶一個圓盤）、{{ui:thread.headWing}}和{{ui:thread.headKnob}}：後兩種用手轉，初始寬度為螺紋直徑的五倍，可平放列印、不需支撐；其{{ui:prop.headDiameter}}（蝶形頭為{{ui:prop.headSpan}}）為螺紋直徑的三到八倍。
   再往下可以設定{{ui:prop.headDiameter}}(六角頭為{{ui:prop.headAcrossFlats}};沉頭的直徑隨高度而定)以及頭部端面的{{ui:inspector.threadDrive}}:{{ui:thread.driveHex}}、{{ui:thread.driveTorx}}、{{ui:thread.drivePhillips}}、{{ui:thread.driveSlot}}、{{ui:thread.driveRobertson}},或用手或扳手轉的螺絲選{{ui:thread.driveNone}}。{{ui:prop.driveSize}}是內六角的對邊寬度、星型的外徑或十字的跨度;{{ui:prop.driveDepth}}是它的深度,最多為頭部的十分之九,0 表示不要。只要不改動,這些值就隨尺寸變化;六角頭預設沒有驅動。驅動屬於精確實體,因此也會出現在 STEP 匯出中。選擇{{ui:thread.driveSlot}}時，{{ui:prop.driveSize}}是槽的長度，寬度為長度的五分之一，一字起子或硬幣都能轉；初始長度為頭部允許的最大值。 {{ui:thread.driveRobertson}}是加拿大常見的方頭驅動：{{ui:prop.driveSize}}是方孔的對邊寬度，預設取與規格相配的起子頭，M4 和 M5 為 2 號（2.84 公釐）。
-- **{{ui:thread.nut}}：** 對應的螺帽。配套的墊圈是一個{{ui:shape.tube}}：在{{ui:prop.washerSize}}中選擇螺絲規格，外徑、內徑和厚度即依 ISO 7089 設定。
+  {{ui:prop.collarHeight}} 在頭部與螺紋之間加一個圓形軸肩，例如作為星形旋鈕下的墊塊，或讓頭部離開零件的台階；0 表示不加。{{ui:prop.collarDiameter}} 起始為螺紋直徑的兩倍，並始終在頭部之內，因此軸肩無需支撐就能列印在頭部上；螺紋保持原長。沉頭沒有軸肩。
+- **{{ui:thread.nut}}：** 對應的螺帽。配套的墊圈是一個{{ui:shape.tube}}：在{{ui:prop.washerSize}}中選擇螺絲規格，外徑、內徑和厚度即依 ISO 7089 設定。在{{ui:inspector.threadNutShape}}中還可選{{ui:thread.nutSquare}}、{{ui:thread.nutFlange}}（六角下帶圓盤）、{{ui:thread.nutWing}}或用手轉的{{ui:thread.nutKnob}}；蝶翼平放，所以蝶形螺帽不需支撐即可列印。
 - **{{ui:thread.bore}}：** 螺紋孔。它是一個孔。把它拖進零件、將兩者群組，零件就有內螺紋。 要做鎖螺栓的孔，請一律使用{{ui:thread.bore}}：{{ui:thread.rod}}或{{ui:thread.screw}}作為孔時是螺栓的完整尺寸，沒有間隙，會太緊。如果仍把它設為孔，layerling 會提示你，點選{{ui:inspector.threadMakeTappedHole}}即可改為{{ui:thread.bore}}。
 
 ![帶圓柱頭的螺絲。右側：類型與頭部形狀，往下是規格、螺距與牙型。](shot:thread-screw)
@@ -128,6 +129,8 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 收納盒與底板的尺寸一律是整數網格單元（或下文半尺寸網格的 21 mm 格），最大 6 × 6（252 mm，可放進 256 mm 的列印平台）；拖曳把手會吸附到最近的單元。列印平台較大時，可以開啟 {{ui:prop.gridfinityLargePlate}}，底板最多 12 × 12 個單元（504 mm）；在 {{ui:workspace.title}} 中選好印表機後，比列印平台大的底板會被標出。關閉後，較大的底板會回到 6 個單元並保留留邊；12 × 12 時，計算它的邊或匯出 STEP 大約需要半分鐘。壁厚（0.95 mm）、底面（1.2 mm）與磁鐵孔深度（2.4 mm）不在規格內；孔深固定，壁厚可以設定，底面則可以抬高（見下文）。規格中的 M3 螺絲孔不會做出。唇緣頂端是尖的，與規格的畫法一致；如果你的印表機打出來有毛邊，用邊緣工具倒圓或倒角。收納盒、底板與托盤是精確實體，所以倒圓、倒角與 STEP 匯出都能用。要分隔收納盒，可把薄長方體當作隔牆群組進去：讓它們立在底面上，即高 5.95 mm 處（或抬高的底面上）；帶唇緣的收納盒，頂端至少保持在每個高度單元 7 mm 下方 0.5 mm，從收納盒底面量起（3 單元為 20.5 mm），因為下一個收納盒的支腳會向下伸入收納盒 0.35 mm。列印收納盒與底板時不需支撐，依它們在列印平台上的姿態直立列印。
 
+不是矩形的抽屜（切掉一角、後壁是圓的或呈 L 形）可以用貼合其輪廓的底板。把抽屜內部畫成草圖，或使用任何站在工作平面上的形狀，把它和一塊底板一起選取，然後在屬性中點選 {{ui:inspector.gridfinityOutlineFit}}。底板會填滿該形狀所在的底面區域，向內縮進 0.25 mm：42 mm 整格排在同一網格上，網格移到能放下最多格的位置（橫向和縱向各最多 6 格，開啟 {{ui:prop.gridfinityLargePlate}} 時各 12 格），其餘全部為實心，因此每個插槽仍能放一般收納盒。底板會移到那裡；形狀保持不動。之後底板的尺寸以 mm 計，{{ui:prop.length}} 和 {{ui:prop.width}} 會拉伸它的輪廓；{{ui:prop.width}} 下方的提示會說明它有多少格。關閉 {{ui:prop.gridfinityOutline}} 後，它會變回帶留邊的整單元底板。輪廓最大可以和一塊底板一樣大：每邊 334 mm，開啟 {{ui:prop.gridfinityLargePlate}} 時為 586 mm，只要輪廓需要，它就保持開啟；抽屜是斜的話，請在貼合前先把底板隨它轉過去。輪廓每邊至少 10 mm，最多 1000 個點。抽屜的照片也可以提供輪廓：先在兩個已量好距離的點上使用 {{ui:sketch.calibrateImage}}，再使用 {{ui:sketch.traceImage}}。斜著拍的照片尺寸並不準確，所以請把描出的輪廓當作起點，並檢查它的尺寸。
+
 收納盒也可以做在半尺寸網格上：開啟 {{ui:prop.gridfinityHalfGrid}}，此時 {{ui:prop.gridfinityUnitsX}} 與 {{ui:prop.gridfinityUnitsZ}} 以 21 mm 的格計數，最多 12（與 6 單元相同的 251.5 mm）。每個格都有自己的支腳，頂部寬 20.5 mm，帶有規格中的階梯，四個這樣的支腳站在普通底板的一個插槽裡，所以 1½ 或 2½ 單元的收納盒能與整數單元的並排使用。開啟 {{ui:prop.gridfinityHalfGrid}} 時，收納盒保持其輪廓（2 單元變成 4 格）；關閉時，奇數格會向上取整為整數單元。唇緣照舊跟隨收納盒的輪廓。啟用 {{ui:prop.gridfinityMagnets}} 後，每個支腳得到一個孔，從其中點朝位於 42 mm 網格上的那個格子角落，兩個方向各偏移 2.5 mm，從收納盒左後角算起：當這個角位於網格角上時，這些孔會與其他產生器所做、帶磁鐵的底板孔對齊；奇數格的收納盒還可以轉 180°，讓這個角位於右前方的網格角上。底板仍維持 42 mm 網格。半尺寸網格不屬於規格。
 
 高度 3 單元以上的收納盒，可以沿內壁設定標籤架：以任意組合開啟 {{ui:prop.gridfinityLabelBack}}、{{ui:prop.gridfinityLabelFront}}、{{ui:prop.gridfinityLabelLeft}} 或 {{ui:prop.gridfinityLabelRight}}。每個開啟的標籤架都有自己的 {{ui:prop.gridfinityLabelWidth}}、{{ui:prop.gridfinityLabelLength}}，較短的標籤架還有 {{ui:prop.gridfinityLabelOffset}}；下方的角落設定套用於全部。標籤架頂面平整可貼標籤，前緣有 1.2 mm 的下垂條，底面以 36 度上升。其頂端在每個高度單元 7 mm 下方 0.85 mm，從收納盒底面量起（3 單元為 20.15 mm），所以疊在唇緣上的收納盒支腳會與它保持 0.5 mm 的間隙。低於 3 單元的收納盒不顯示標籤架；回到 3 單元時會回復。標籤架不屬於規格。
@@ -159,6 +162,8 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 {{ui:editor.tool.flexi}} 把一個扁平的實體變成可以活動的小玩偶，例如魚、蛇或龍，一次列印成型（print-in-place）。實體由你自己畫或搭建，例如用草圖或擠出的 SVG。工具沿實體長度橫向把它切成若干節，並在每個切口處加一個關節：一節帶著一根直立的軸，中間比上下兩端粗，下一節帶間隙地把它包住。這樣關節既能卡住又不會黏連，所有斜面都是 45°，不需支撐即可列印。各節之間留出一道楔形缺口，寬度對應各節向兩側擺動的角度。
 
 選取實體（多個部件會合併，其中的孔會被減去），按下 {{ui:editor.tool.flexi}}。在視窗中設定沿哪一邊切分（{{ui:flexi.axis.auto}} 取較長的一邊）、{{ui:flexi.joints}} 的數量、{{ui:flexi.clearance}}（一般 0.4 mm 即可）以及 {{ui:flexi.swing}} 的角度。關節大小會依實體自動決定；取消 {{ui:flexi.autoSize}} 後可自己填寫 {{ui:flexi.size}}。取消 {{ui:flexi.evenLinks}} 後可以設定第一個關節離起點、最後一個離終點的距離，例如讓頭部保持為一整塊。關節所在處，實體至少應約 6 mm 高、12 mm 寬；放不下時，視窗會告訴你是哪一個。
+
+把 {{ui:flexi.bend}} 設為 {{ui:flexi.bend.fold}} 後，各節改為上下翻折，就像柔性鑰匙圈、彩蛋或手環上的條帶。每個切口會變成一個平躺著橫穿物件、位於一半高度的鉸鏈：三個或五個並排的鉸節，輪流屬於兩側的兩節，其中一節的每個鉸節上都有一個 45° 的錐體，伸進另一節相鄰的鉸節裡。鉸節旁邊的切口從側面看是一個 V 形，張開的角度由 {{ui:flexi.fold}} 決定。鉸鏈的尺寸取自物件的高度，因此這裡不需要設定關節大小；放鉸鏈的位置物件至少應高 3.5 公釐（5 公釐以上更牢固）、寬約 15–20 公釐。
 
 結果是一組關節節段（網格）的組合，照擺放的樣子直接列印。如果不滿意切分，復原後換別的數值再試。先用兩三個關節試印一次，就能看出間隙是否適合你的印表機。
 

@@ -10,9 +10,10 @@ summary: 相互配合的螺钉、螺母与螺纹孔，以及齿轮、弹簧、�
 在形状库中选择 {{ui:shape.thread}}。在 {{ui:inspector.threadRole}} 下决定它的类型：
 
 - **{{ui:thread.rod}}：** 带螺纹的圆柱体，例如没有头的螺钉。
-- **{{ui:thread.screw}}：** 带头部。你可以选择 {{ui:inspector.threadHead}}：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。
+- **{{ui:thread.screw}}：** 带头部。你可以选择 {{ui:inspector.threadHead}}：{{ui:thread.headCylinder}}、{{ui:thread.headCountersunk}} 或 {{ui:thread.headHex}}。另有{{ui:thread.headSquare}}、{{ui:thread.headFlange}}（六角下带一个圆盘）、{{ui:thread.headWing}}和{{ui:thread.headKnob}}：后两种用手拧，初始宽度为螺纹直径的五倍，可平放打印、无需支撑；其{{ui:prop.headDiameter}}（蝶形头为{{ui:prop.headSpan}}）为螺纹直径的三到八倍。
   再往下可以设置{{ui:prop.headDiameter}}(六角头为{{ui:prop.headAcrossFlats}};沉头的直径随高度而定)以及头部端面的{{ui:inspector.threadDrive}}:{{ui:thread.driveHex}}、{{ui:thread.driveTorx}}、{{ui:thread.drivePhillips}}、{{ui:thread.driveSlot}}、{{ui:thread.driveRobertson}},或用手或扳手拧的螺丝选{{ui:thread.driveNone}}。{{ui:prop.driveSize}}是内六角的对边宽度、梅花星形的外径或十字的跨度;{{ui:prop.driveDepth}}是它的深度,最多为头部的十分之九,0 表示不要。只要不改动,这些值就随尺寸变化;六角头默认没有驱动。驱动属于精确实体,因此也会出现在 STEP 导出中。选择{{ui:thread.driveSlot}}时，{{ui:prop.driveSize}}是槽的长度，宽度为长度的五分之一，一字螺丝刀或硬币都能拧；初始长度为头部允许的最大值。 {{ui:thread.driveRobertson}}是加拿大常见的方头驱动：{{ui:prop.driveSize}}是方孔的对边宽度，默认取与规格相配的批头，M4 和 M5 为 2 号（2.84 毫米）。
-- **{{ui:thread.nut}}：** 配套的螺母。配套的垫圈是一个{{ui:shape.tube}}：在{{ui:prop.washerSize}}中选择螺钉规格，外径、内径和厚度即按 ISO 7089 设置。
+  {{ui:prop.collarHeight}} 在头部与螺纹之间加一个圆形轴肩，例如作为星形旋钮下的垫块，或让头部离开零件的台阶；0 表示不加。{{ui:prop.collarDiameter}} 起始为螺纹直径的两倍，并始终在头部之内，因此轴肩无需支撑就能打印在头部上；螺纹保持原长。沉头没有轴肩。
+- **{{ui:thread.nut}}：** 配套的螺母。配套的垫圈是一个{{ui:shape.tube}}：在{{ui:prop.washerSize}}中选择螺钉规格，外径、内径和厚度即按 ISO 7089 设置。在{{ui:inspector.threadNutShape}}中还可选{{ui:thread.nutSquare}}、{{ui:thread.nutFlange}}（六角下带圆盘）、{{ui:thread.nutWing}}或用手拧的{{ui:thread.nutKnob}}；蝶翼平放，所以蝶形螺母无需支撑即可打印。
 - **{{ui:thread.bore}}：** 螺纹孔。它属于孔。把它拖进零件，将两者分组，零件就有内螺纹。 要做拧螺栓的孔，请始终使用{{ui:thread.bore}}：{{ui:thread.rod}}或{{ui:thread.screw}}作为孔时是螺栓的完整尺寸，没有间隙，会太紧。如果仍把它设为孔，layerling 会提示你，点击{{ui:inspector.threadMakeTappedHole}}即可改为{{ui:thread.bore}}。
 
 ![一个带圆柱头的螺钉。右侧：类型和头部形状，往下是规格、螺距和牙型。](shot:thread-screw)
@@ -128,6 +129,8 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 收纳盒和底板的尺寸始终是整数网格单元（或下文半尺寸网格的 21 mm 单元），最大 6 × 6（252 mm，适合 256 mm 的打印床）；拖动手柄会吸附到最近的单元。打印床更大时，可以打开 {{ui:prop.gridfinityLargePlate}}，底板最多 12 × 12 个单元（504 mm）；在 {{ui:workspace.title}} 中选好打印机后，比打印床大的底板会被标出。关闭后，更大的底板会回到 6 个单元并保留留边；12 × 12 时，计算它的边或导出 STEP 大约需要半分钟。壁厚（0.95 mm）、底面（1.2 mm）和磁铁孔深度（2.4 mm）不在规范中；孔深固定，壁厚可以设置，底面可以抬高（见下文）。规范中的 M3 螺钉孔不会做出。卡边顶部是尖的，与规范画法一致；如果你的打印机打出来有毛边，用边缘工具倒圆或倒角。收纳盒、底板和托盘是精确实体，所以圆角、倒角和 STEP 导出都能用。要给收纳盒分格，把薄长方体作为隔墙分组进去：让它们立在底面上，即高 5.95 mm 处（或抬高的底面上），对于带卡边的收纳盒，顶部至少保持在每个高度单元 7 mm 下方 0.5 mm 处，从收纳盒底面量起（3 单元为 20.5 mm），因为下一个收纳盒的支脚会向下伸入收纳盒 0.35 mm。打印收纳盒和底板时无需支撑，按它们在打印床上的姿态直立打印。
 
+不是矩形的抽屉（切掉一角、后壁是圆的或呈 L 形）可以用贴合其轮廓的底板。把抽屉内部画成草图，或使用任何站在工作平面上的形状，把它和一块底板一起选中，然后在属性中点击 {{ui:inspector.gridfinityOutlineFit}}。底板会填满该形状所在的底面区域，向内缩进 0.25 mm：42 mm 整格排在同一网格上，网格移到能放下最多格的位置（横向和纵向各最多 6 格，打开 {{ui:prop.gridfinityLargePlate}} 时各 12 格），其余全部为实心，因此每个插槽仍能放普通收纳盒。底板会移到那里；形状保持不动。之后底板的尺寸以 mm 计，{{ui:prop.length}} 和 {{ui:prop.width}} 会拉伸它的轮廓；{{ui:prop.width}} 下方的提示会说明它有多少格。关闭 {{ui:prop.gridfinityOutline}} 后，它会变回带留边的整单元底板。轮廓最大可以和一块底板一样大：每边 334 mm，打开 {{ui:prop.gridfinityLargePlate}} 时为 586 mm，只要轮廓需要，它就保持开启；抽屉是斜的话，请在贴合前先把底板随它转过去。轮廓每边至少 10 mm，最多 1000 个点。抽屉的照片也可以提供轮廓：先在两个已量好距离的点上使用 {{ui:sketch.calibrateImage}}，再使用 {{ui:sketch.traceImage}}。斜着拍的照片尺寸并不准确，所以请把描出的轮廓当作起点，并检查它的尺寸。
+
 收纳盒也可以做在半尺寸网格上：开启 {{ui:prop.gridfinityHalfGrid}}，此时 {{ui:prop.gridfinityUnitsX}} 和 {{ui:prop.gridfinityUnitsZ}} 按 21 mm 的单元计数，最多 12（与 6 单元相同的 251.5 mm）。每个单元都有自己的支脚，顶部宽 20.5 mm，带有规范中的台阶，四个这样的支脚站在普通底板的一个插槽里，所以 1½ 或 2½ 单元的收纳盒能与整数单元的并排使用。开启 {{ui:prop.gridfinityHalfGrid}} 时收纳盒保持其轮廓（2 单元变成 4 个单元）；关闭时，奇数个单元会向上取整为整数单元。卡边照旧跟随收纳盒的轮廓。启用 {{ui:prop.gridfinityMagnets}} 后，每个支脚得到一个孔，从其中点向位于 42 mm 网格上的那个单元角偏移两个方向各 2.5 mm，从收纳盒左后角算起：当该角位于网格的一个角上时，这些孔会与其他生成器做的带磁铁底板的孔对齐；奇数单元的收纳盒还可以转 180°，让这个角位于右前方的网格角上。底板仍保持 42 mm 网格。半尺寸网格不属于规范。
 
 高度为 3 个单元或以上的收纳盒可以沿内壁设置标签台：以任意组合开启 {{ui:prop.gridfinityLabelBack}}、{{ui:prop.gridfinityLabelFront}}、{{ui:prop.gridfinityLabelLeft}} 或 {{ui:prop.gridfinityLabelRight}}。每个开启的标签台都有自己的 {{ui:prop.gridfinityLabelWidth}}、{{ui:prop.gridfinityLabelLength}}，较短的标签台还有 {{ui:prop.gridfinityLabelOffset}}；它们下方的拐角设置适用于所有标签台。标签台顶部平整，可贴标签，前部有 1.2 mm 的下垂条，底面以 36 度上升。其顶部位于每个高度单元 7 mm 下方 0.85 mm 处，从收纳盒底面量起（3 单元为 20.15 mm），所以堆叠在卡边上的收纳盒支脚与其保持 0.5 mm 的间隙。低于 3 单元的收纳盒不显示标签台；回到 3 单元时它们会恢复。标签台不属于规范。
@@ -159,6 +162,8 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 {{ui:editor.tool.flexi}} 把一个扁平的实体变成可以活动的小玩偶，例如鱼、蛇或龙，一次打印成型（print-in-place）。实体由你自己画或搭建，例如用草图或拉伸的 SVG。工具沿实体长度横向把它切成若干节，并在每个切口处加一个关节：一节带着一根竖直的轴，中间比上下两端粗，下一节带间隙地把它包住。这样关节既能卡住又不会粘连，所有斜面都是 45°，无需支撑即可打印。各节之间留出一道楔形缺口，宽度对应各节向两侧摆动的角度。
 
 选中实体（多个部件会合并，其中的孔会被减去），点击 {{ui:editor.tool.flexi}}。在窗口中设置沿哪一边切分（{{ui:flexi.axis.auto}} 取较长的一边）、{{ui:flexi.joints}} 的数量、{{ui:flexi.clearance}}（一般 0.4 mm 即可）以及 {{ui:flexi.swing}} 的角度。关节大小会按实体自动确定；取消 {{ui:flexi.autoSize}} 后可自己填写 {{ui:flexi.size}}。取消 {{ui:flexi.evenLinks}} 后可以设定第一个关节离起点、最后一个离终点的距离，比如让头部保持为一整块。关节所在处，实体至少应约 6 mm 高、12 mm 宽；放不下时，窗口会告诉你是哪一个。
+
+把 {{ui:flexi.bend}} 设为 {{ui:flexi.bend.fold}} 后，各节改为上下翻折，就像柔性钥匙扣、彩蛋或手环上的条带。每个切口会变成一个平躺着横穿物体、位于一半高度的铰链：三个或五个并排的铰节，轮流属于两侧的两节，其中一节的每个铰节上都有一个 45° 的锥体，伸进另一节相邻的铰节里。铰节旁边的切口从侧面看是一个 V 形，张开的角度由 {{ui:flexi.fold}} 决定。铰链的尺寸取自物体的高度，因此这里不需要设置关节大小；放铰链的位置物体至少应高 3.5 毫米（5 毫米以上更牢固）、宽约 15–20 毫米。
 
 结果是一组关节节段（网格）的捆绑，按摆放的样子直接打印。如果不满意切分，撤销后换别的数值再试。先用两三个关节试打一次，就能看出间隙是否适合你的打印机。
 

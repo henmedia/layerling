@@ -102,7 +102,11 @@ export function restoreShapeBeforeEdgeTreatment(shape: WorkplaneShape, entry: Ed
     hidden: shape.hidden,
     x: applied ? before.x + shape.x - applied.x : before.x,
     z: applied ? before.z + shape.z - applied.z : before.z,
-    elevation: applied ? (before.elevation ?? 0) + (shape.elevation ?? 0) - applied.elevation : before.elevation,
+    // Kept by its middle, as x and z are: a body turned before it was baked has its bottom elsewhere, and kept by
+    // the bottom a teardrop stood up and hollowed sank 28 mm into the plate when it was made bigger (Discussion #1150).
+    elevation: applied
+      ? (before.elevation ?? 0) + before.height / 2 + ((shape.elevation ?? 0) + shape.height / 2) - (applied.elevation + applied.height / 2) - height / 2
+      : before.elevation,
     width,
     depth,
     height,

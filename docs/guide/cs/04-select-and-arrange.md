@@ -155,7 +155,7 @@ Změnu provede až {{ui:scalePercent.apply}} a jediný krok Zpět ji vrátí. Se
 
 ## Zpět a znovu
 
-{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) a {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] nebo [[Ctrl]]+[[Y]]) procházejí historii. Počet kroků ukládaných s projektem určuje {{ui:workspace.history}}. Když najedete na jedno z obou tlačítek, jeho popisek pojmenuje krok, který vrátí nebo zopakuje, a u kroku s rozměrem i ten rozměr, například „Zaobleny hrany: Box (5 mm)“; hlášení po kroku říká totéž. Chcete-li se vrátit o více kroků najednou, použijte zobrazení historie níže.
+{{ui:editor.tool.undo}} ([[Ctrl]]+[[Z]]) a {{ui:editor.tool.redo}} ([[Ctrl]]+[[Shift]]+[[Z]] nebo [[Ctrl]]+[[Y]]) procházejí historii. Počet kroků ukládaných s projektem určuje {{ui:workspace.history}}. Když najedete na jedno z obou tlačítek, jeho popisek pojmenuje krok, který vrátí nebo zopakuje, a u kroku s rozměrem i ten rozměr, například „Zaobleny hrany: Box (5 mm)“; hlášení po kroku říká totéž. Chcete-li se vrátit o více kroků najednou, použijte zobrazení historie níže. Zpráva, která hlásí právě provedený krok, třeba „Smazány 3 tvary“, má tlačítko Zpět, které vrátí právě tento krok.
 
 ## Prohlížení historie
 

@@ -29,6 +29,7 @@ export type ShapeKind =
   | "counterbore"
   | "countersink"
   | "doubleCountersink"
+  | "finishingWasher"
   | "teardrop"
   | "port"
   | "loft"
@@ -168,6 +169,9 @@ export type ShapeCustomization = {
   threadDrive?: ThreadDrive;
   threadDriveSize?: number;
   threadDriveDepth?: number;
+  /** Screw only (#1152): a round collar between the head and the thread, this high in mm; unset or 0 = none. Its diameter unset = twice the thread. */
+  threadCollarHeight?: number;
+  threadCollarDiameter?: number;
   springTurns?: number;
   springWire?: number;
   springHand?: ThreadHand;
@@ -661,9 +665,12 @@ export type GridfinityOpening = {
   distance?: number;
 };
 
+/** A point of a Gridfinity baseplate's outline (#1061), in the plate's own frame: x across, z deep, in mm. */
+export type GridfinityOutlinePoint = { x: number; z: number };
+
 /** Was aus dem Gewinde wird: Stange, Schraube, Mutter oder das Loch dafuer. */
 export type ThreadRole = "rod" | "screw" | "nut" | "bore";
-export type ThreadHead = "cylinder" | "countersunk" | "hex";
+export type ThreadHead = "cylinder" | "countersunk" | "hex" | "square" | "flange" | "wing" | "knob";
 /** What drives a screw: a recess in its free head face (#1052). */
 export type ThreadDrive = "hex" | "torx" | "phillips" | "slot" | "robertson" | "none";
 export type ThreadHand = "right" | "left";
@@ -719,6 +726,8 @@ export type EdgeTreatmentFeature = {
   chamferAngle?: number;
   /** Only for a fillet of one edge (#687): the radius at the edge's end, `amount` the one at its start. */
   endAmount?: number;
+  /** Only for a fillet (#1160): the edges were scooped out (a concave fillet) instead of rounded. */
+  concave?: boolean;
   openings?: ShellOpenings;
   /** Only for "shell" and "offset"; missing means "round". */
   shellEdges?: ShellEdges;
@@ -947,6 +956,9 @@ export type WorkplaneShape = {
   threadDrive?: ThreadDrive;
   threadDriveSize?: number;
   threadDriveDepth?: number;
+  /** Screw only (#1152): a round collar between the head and the thread, this high in mm; unset or 0 = none. Its diameter unset = twice the thread. */
+  threadCollarHeight?: number;
+  threadCollarDiameter?: number;
   springTurns?: number;
   springWire?: number;
   springHand?: ThreadHand;
@@ -1106,6 +1118,8 @@ export type WorkplaneShape = {
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   /** Gridfinity bin: the size of that rounding or chamfer in mm; missing, 0 or under 0.5 leaves them square. */
   gridfinityOpeningCornerSize?: number;
+  /** Gridfinity baseplate: the outline it fills (#1061), centred on its bounds; built stretched to the box, whole cells inside, the rest solid. */
+  gridfinityOutline?: GridfinityOutlinePoint[];
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */

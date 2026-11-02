@@ -24,6 +24,7 @@ import { teardropExactSection } from "@/lib/teardropGeometry";
 import { normalizePortCorner, portChamfer } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile } from "@/lib/screwHoleGeometry";
+import { finishingWasherMeasures } from "@/lib/finishingWasherGeometry";
 import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeRoundedBoxQuality, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
 import { textGlyphShapes, textKeyringOf } from "@/lib/textGeometry";
 import { normalizeSketchStroke } from "@/lib/sketchStroke";
@@ -49,7 +50,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -1180,6 +1181,18 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       // solid (x, y, z) -> local (x, z, -y): the turned body stands along z, the shape's height runs along y
       return { loops: [polygonLoop(section)], frame: { kind: "revolution", height: shape.height, local: new THREE.Matrix4().makeRotationX(-Math.PI / 2) } };
     }
+    case "finishingWasher": {
+      // createFinishingWasherGeometry: the bottom, the rim, the dome as its true quarter ellipse, the seat and the
+      // bore, turned around the axis. It is kept round; an oval one (only from outside the editor) stays a mesh.
+      if (Math.abs(width - depth) > 1e-6) return null;
+      const { outer, height, shaft, seatDepth, seat, rim } = finishingWasherMeasures({ width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle });
+      const segments: CadModifierProfileSegment[] = [{ kind: "line", x: outer, z: 0 }];
+      if (rim > 1e-6) segments.push({ kind: "line", x: outer, z: rim });
+      segments.push(arcSegment({ cx: seat, cz: rim, rx: outer - seat, rz: height - rim, start: 0, end: Math.PI / 2 }));
+      if (seatDepth > 1e-6) segments.push({ kind: "line", x: shaft, z: height - seatDepth });
+      segments.push({ kind: "line", x: shaft, z: 0 });
+      return { loops: [{ x: shaft, z: 0, segments }], frame: { kind: "revolution", height, local: upright() } };
+    }
     case "gear": {
       const gearType = normalizeGearType(shape.gearType);
       if (gearType === "internal") return { loops: internalGearLoops(width, depth, shape) };
@@ -1595,6 +1608,8 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     threadDrive: shape.threadDrive,
     threadDriveSize: shape.threadDriveSize,
     threadDriveDepth: shape.threadDriveDepth,
+    threadCollarHeight: shape.threadCollarHeight,
+    threadCollarDiameter: shape.threadCollarDiameter,
   });
   const { settings, spec } = plan;
   const part: CadModifierThreadPart = {
@@ -1630,9 +1645,11 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
       chamferFaceRadius: plan.headBroken ? plan.headFaceRadius : 0,
       ...(plan.driveOutline ? { driveOutline: plan.driveOutline } : {}),
       socketDepth: plan.driveOutline ? plan.socketDepth : 0,
+      ...(plan.collarHeight > 0 && !plan.tiers ? { collar: { radius: plan.collarRadius, height: plan.collarHeight } } : {}),
     };
   }
   if (settings.role === "nut") part.nut = { acrossFlats: spec.acrossFlats, chamferFaceRadius: plan.rimBroken ? plan.rimFaceRadius : 0 };
+  if (plan.tiers) part.tiers = plan.tiers;
   return part;
 }
 
@@ -1681,8 +1698,8 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight });
-  // Label shelves, finger scoops and dividers are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554).
+  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOutline: shape.gridfinityOutline });
+  // Label shelves, finger scoops and dividers, and an outline plate's sockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
   if (!loadedManifoldRuntime() && gridfinityHasPieces({ ...shape, width, depth })) return null;
   return {
     width: plan.size.width,
@@ -1738,6 +1755,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityOpenings: shape.gridfinityOpenings,
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
+    gridfinityOutline: shape.gridfinityOutline,
     // Mesh and body are built at the size of the grid units, which canonicalizeShape
     // keeps the shape's box at; a box that differs anyway stretches the body to it.
     transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / plan.size.width, shape.height / plan.size.height, depth / plan.size.depth)),

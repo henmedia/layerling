@@ -7,6 +7,7 @@ import { normalizeHexColor } from "@/lib/coloredImport";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO } from "@/lib/torusShape";
 import { MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT } from "@/lib/hirthGeometry";
 import { PORT_PROFILES } from "@/lib/portGeometry";
+import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
 import type { PortProfile } from "@/types/layerling";
 
 export const DEFAULT_SNAP_GRID: GridSize = "1.0 mm";
@@ -292,7 +293,7 @@ export function snapGridForUnits(units: string, snap: GridSize): GridSize {
 }
 const customizableShapeKinds: ShapeKind[] = [
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ];
 
 function numberOrDefault(value: unknown, fallback: number) {
@@ -366,7 +367,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.sides = optionalShapeNumber(source.sides, fallbackEntry?.sides, 12, MAX_HIGH_RESOLUTION_SIDES, true);
       entry.torusTubeRatio = optionalShapeNumber(source.torusTubeRatio, fallbackEntry?.torusTubeRatio, TORUS_MIN_TUBE_RATIO, TORUS_MAX_TUBE_RATIO);
     }
-    if (kind === "cylinder" || kind === "ellipse" || kind === "slot" || kind === "cone" || kind === "tube" || kind === "ring" || kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "teardrop") {
+    if (kind === "cylinder" || kind === "ellipse" || kind === "slot" || kind === "cone" || kind === "tube" || kind === "ring" || kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "finishingWasher" || kind === "teardrop") {
       entry.sides = optionalShapeNumber(source.sides, fallbackEntry?.sides, 3, MAX_HIGH_RESOLUTION_SIDES, true);
     } else if (kind === "pyramid" || kind === "polygon") {
       entry.sides = optionalShapeNumber(source.sides, fallbackEntry?.sides, 3, 24, true);
@@ -409,7 +410,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.honeycombWallThickness = optionalShapeNumber(source.honeycombWallThickness, fallbackEntry?.honeycombWallThickness, 0.4, 50);
       entry.honeycombFrameWidth = optionalShapeNumber(source.honeycombFrameWidth, fallbackEntry?.honeycombFrameWidth, 0, 100);
     }
-    if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") {
+    if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "finishingWasher") {
       entry.screwHoleShaft = optionalShapeNumber(source.screwHoleShaft, fallbackEntry?.screwHoleShaft, 0.1, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.screwHoleHeadDepth = optionalShapeNumber(source.screwHoleHeadDepth, fallbackEntry?.screwHoleHeadDepth, 0.1, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.screwHoleAngle = optionalShapeNumber(source.screwHoleAngle, fallbackEntry?.screwHoleAngle, 30, 150);
@@ -578,7 +579,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
           : fallbackEntry?.threadRole;
       entry.threadHead = source.threadHead === undefined
         ? fallbackEntry?.threadHead
-        : ["cylinder", "countersunk", "hex"].includes(source.threadHead)
+        : ["cylinder", "countersunk", "hex", "square", "flange", "wing", "knob"].includes(source.threadHead)
           ? source.threadHead
           : fallbackEntry?.threadHead;
       entry.threadHand = source.threadHand === undefined
@@ -609,7 +610,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
           : fallbackEntry?.threadDrive;
     }
     if (kind === "gear") {
-      entry.teeth = optionalShapeNumber(source.teeth, fallbackEntry?.teeth, 6, 150, true);
+      entry.teeth = optionalShapeNumber(source.teeth, fallbackEntry?.teeth, MIN_GEAR_TEETH, MAX_GEAR_TEETH, true);
       entry.toothSize = optionalShapeNumber(source.toothSize, fallbackEntry?.toothSize, 0.2, MAX_CUSTOM_SHAPE_DIMENSION / 2);
       entry.toothWidth = optionalShapeNumber(source.toothWidth, fallbackEntry?.toothWidth, MIN_CUSTOM_SHAPE_DIMENSION, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.centerHoleSize = optionalShapeNumber(source.centerHoleSize, fallbackEntry?.centerHoleSize, 0, MAX_CUSTOM_SHAPE_DIMENSION);

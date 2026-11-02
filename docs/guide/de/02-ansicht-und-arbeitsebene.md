@@ -74,7 +74,7 @@ Du kannst in jedem Entwurf außerdem vier eigene Ansichten festhalten. [[Umschal
 
 Das Fenster hängt an seinem Knopf. Verdeckt es etwas, ziehst du es an seiner Titelleiste frei über die Arbeitsfläche; dort öffnet es sich auch beim nächsten Mal. Ein Doppelklick auf die Titelleiste oder das Ablegen am Knopf bringt es zurück.
 
-Das X und [[Esc]] schließen das Werkzeugfenster; läuft gerade eine Messung, beendet [[Esc]] zuerst sie. Der Schnitt bleibt, bis du ihn mit {{ui:camera.sectionActive}} ausschaltest oder zur Entwurfsübersicht zurückgehst. Solange er an ist, ist der Knopf hervorgehoben. Was du dann auf der weggeschnittenen Seite ablegst, siehst du erst, wenn du den Schnitt ausschaltest. Ein Tablet hat kein [[Esc]], deshalb hat das Werkzeugfenster dort zwei Knöpfe mehr: {{ui:camera.sectionBack}} beendet die Messung, falls eine läuft, und schließt sonst das Fenster, {{ui:camera.sectionConfirm}} schließt das Fenster in einem Schritt. Ein Computer zeigt sie nicht.
+Das X und [[Esc]] schließen das Werkzeugfenster; läuft gerade eine Messung, beendet [[Esc]] zuerst sie. Der Schnitt bleibt, bis du ihn mit {{ui:camera.sectionActive}} ausschaltest, bei offenem Fenster seinen Knopf in der Leiste anklickst oder zur Entwurfsübersicht zurückgehst. Solange er an ist, ist der Knopf hervorgehoben. Was du dann auf der weggeschnittenen Seite ablegst, siehst du erst, wenn du den Schnitt ausschaltest. Ein Tablet hat kein [[Esc]], deshalb hat das Werkzeugfenster dort zwei Knöpfe mehr: {{ui:camera.sectionBack}} beendet die Messung, falls eine läuft, und schließt sonst das Fenster, {{ui:camera.sectionConfirm}} schließt das Fenster in einem Schritt. Ein Computer zeigt sie nicht.
 
 ## Die Arbeitsebene
 
@@ -91,6 +91,8 @@ Auf einer Fläche rastet der Ursprung der Arbeitsebene sonst am Raster ein. Klic
 Ein Klick neben die Platte oder [[Esc]] holt die Arbeitsebene zurück auf die Grundplatte. Schneller geht es mit {{ui:camera.resetWorkplane}}: Der Knopf mit dem Pfeil nach unten steht in der Ansichtsleiste unter dem Auge, solange die Ebene auf einer Fläche liegt. Mit [[Umschalt]]+[[W]] legst du sie direkt auf die gerade ausgewählte Fläche. [[Alt]]+[[W]] legt sie jederzeit zurück auf die Grundplatte, ob etwas ausgewählt ist oder nicht. Hältst du beim Klicken [[Umschalt]] gedrückt, zeigt die Ebene in die andere Richtung.
 
 Solange die Arbeitsebene auf einer Fläche liegt, erscheint neben {{ui:camera.placeWorkplane}} ein Auge. Es blendet die Ebene aus, ohne sie aufzuheben, damit du freie Sicht auf den Entwurf hast: Neue Formen landen weiter auf dieser Fläche, und gedreht wird weiter um sie. Ein Klick auf das Auge blendet sie wieder ein, ebenso das Setzen einer neuen Arbeitsebene.
+
+Um gerade auf die Arbeitsebene zu schauen, drücke [[P]] oder klicke in der Ansichtsleiste neben {{ui:camera.placeWorkplane}} auf {{ui:camera.lookOntoWorkplane}}. Die Ansicht dreht sich, bis du die Ebene von vorn siehst, von der Seite, zu der neue Formen wachsen, mit ihrem Ursprung in der Mitte. Auf der Grundplatte ist das die Ansicht von oben.
 
 ## Gitter und Raster
 

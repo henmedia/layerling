@@ -2,7 +2,7 @@ import { createLocalId } from "@/lib/localIds";
 import { repairClampedMeshBase } from "@/lib/importedMeshBase";
 import { fieldFormulasEqual } from "@/lib/fieldFormulas";
 import { threadFootprintPatch } from "@/lib/threadGeometry";
-import { GRIDFINITY_PADDING_KEYS, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_PADDING_KEYS, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
@@ -139,7 +139,7 @@ export function shapeTaperDimensions(shape: WorkplaneShape) {
  * Wabe und Schwalbenschwanz sie an. Die Liste steht hier, damit das Merkmalsfeld, die
  * Vorschau und die MCP-Bruecke nicht je ihre eigene fuehren.
  */
-const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity"]);
+const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity"]);
 
 export function shapeSupportsTaper(kind: WorkplaneShape["kind"]) {
   return !SHAPES_WITHOUT_TAPER.has(kind);
@@ -335,16 +335,44 @@ function edgeTreatmentPreserveZone(shape: WorkplaneShape): number {
  */
 export function hollowStretchSincePicture(shape: WorkplaneShape, entry: NonNullable<WorkplaneShape["edgeTreatmentHistory"]>[number]) {
   const applied = entry.appliedFrame;
-  const width = shapeWidth(shape);
-  const depth = shapeDepth(shape);
   if (!applied) return { x: 1, z: 1, height: 1 };
-  const turn = Math.abs((((entry.before.rotation ?? 0) - applied.rotation) % 180 + 180) % 180);
-  const swapped = Math.abs(turn - 90) < 0.5;
-  return {
-    x: swapped ? depth / Math.max(0.001, applied.depth) : width / Math.max(0.001, applied.width),
-    z: swapped ? width / Math.max(0.001, applied.width) : depth / Math.max(0.001, applied.depth),
-    height: shape.height / Math.max(0.001, applied.height),
+  // The body's own stretch along its width, height and depth.
+  const own = [shapeWidth(shape) / Math.max(0.001, applied.width), shape.height / Math.max(0.001, applied.height), shapeDepth(shape) / Math.max(0.001, applied.depth)];
+  // `before`'s axes in the body's frame: a turn about any axis, tipped over too, not only one about the vertical
+  // (Discussion #1150: a teardrop stood up and hollowed grew in its depth when its height was pulled, an oval).
+  const before = entry.before;
+  const turn = multiplyRotations(transposed(eulerRotation(applied.rotationX, applied.rotation, applied.rotationZ)), eulerRotation(before.rotationX ?? 0, before.rotation ?? 0, before.rotationZ ?? 0));
+  // Each of its axes takes the stretch of the body's axis it lies closest to: exact for quarter turns, and a turn by a
+  // few degrees keeps its axes as they are.
+  const along = (axis: number) => {
+    let closest = axis;
+    turn.forEach((row, index) => {
+      if (Math.abs(row[axis]) > Math.abs(turn[closest][axis]) + 1e-9) closest = index;
+    });
+    return own[closest];
   };
+  return { x: along(0), z: along(2), height: along(1) };
+}
+
+type Rotation = number[][];
+
+/** A turn as three.js makes it from the editor's angles in degrees: Euler "XYZ", the vertical turn about y. */
+function eulerRotation(xDegrees: number, yDegrees: number, zDegrees: number): Rotation {
+  const [a, b, c] = [xDegrees, yDegrees, zDegrees].map((degrees) => (degrees * Math.PI) / 180);
+  const [ca, sa, cb, sb, cc, sc] = [Math.cos(a), Math.sin(a), Math.cos(b), Math.sin(b), Math.cos(c), Math.sin(c)];
+  return [
+    [cb * cc, -cb * sc, sb],
+    [ca * sc + sa * sb * cc, ca * cc - sa * sb * sc, -sa * cb],
+    [sa * sc - ca * sb * cc, sa * cc + ca * sb * sc, ca * cb],
+  ];
+}
+
+function transposed(rotation: Rotation): Rotation {
+  return rotation[0].map((_, column) => rotation.map((row) => row[column]));
+}
+
+function multiplyRotations(left: Rotation, right: Rotation): Rotation {
+  return left.map((row) => right[0].map((_, column) => row.reduce((sum, value, index) => sum + value * right[index][column], 0)));
 }
 
 /**
@@ -536,7 +564,7 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
   // A gear set by module too, involute or round: its size is its module, the same both ways (#201) -
   // except the rack, a bar whose depth is its own. A Hirth joint interlocks only when it is round (#1016).
   const involuteGear = shape.kind === "gear" && shape.gearType !== "rack" && (shape.gearProfile === "involute" || shape.gearProfile === "round");
-  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "knurl" || shape.kind === "hirth" || involuteGear) && next.width !== next.depth) {
+  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "knurl" || shape.kind === "hirth" || shape.kind === "finishingWasher" || involuteGear) && next.width !== next.depth) {
     next.depth = next.width;
     next.size = next.width;
   }
@@ -648,6 +676,8 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.threadDrive === b.threadDrive &&
     a.threadDriveSize === b.threadDriveSize &&
     a.threadDriveDepth === b.threadDriveDepth &&
+    a.threadCollarHeight === b.threadCollarHeight &&
+    a.threadCollarDiameter === b.threadCollarDiameter &&
     a.parametricSource?.kind === b.parametricSource?.kind &&
     a.parametricSource?.rotation === b.parametricSource?.rotation &&
     a.parametricSource?.rotationX === b.parametricSource?.rotationX &&
@@ -743,6 +773,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     gridfinityOpeningsEqual(a.gridfinityOpenings, b.gridfinityOpenings) &&
     a.gridfinityOpeningCorner === b.gridfinityOpeningCorner &&
     a.gridfinityOpeningCornerSize === b.gridfinityOpeningCornerSize &&
+    gridfinityOutlinesEqual(a.gridfinityOutline, b.gridfinityOutline) &&
     a.dovetailNeckWidth === b.dovetailNeckWidth &&
     a.dovetailClearance === b.dovetailClearance &&
     a.loftBottomOutline === b.loftBottomOutline &&

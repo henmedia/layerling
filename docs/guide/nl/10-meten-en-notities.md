@@ -55,6 +55,23 @@ Met {{ui:workspace.dimensionsAlwaysVisible}} blijven de maten altijd zichtbaar. 
 
 Zitten ze even in de weg, druk dan op [[Q]]: de maten en afstanden rond de selectie verdwijnen, zodat een deel dat je verschuift goed te zien is. Nog eens [[Q]] haalt ze terug. Een greep waar je naar wijst, toont zijn maat toch.
 
+## Speling controleren
+
+Onderdelen die na het printen moeten bewegen - een flexi-draak, een in één keer geprint scharnier, een doos met deksel, een as in zijn boring - hebben ruimte tussen elkaar nodig. Te weinig en ze plakken aan elkaar; overlappen ze, dan worden ze als één stuk geprint. {{ui:editor.tool.clearance}}, naast {{ui:editor.tool.intersectPreview}}, controleert dat vóór het printen. Het neemt de geselecteerde objecten, of alle zichtbare als niets is geselecteerd (dezelfde als bij een export), en controleert elk paar:
+
+- **{{ui:clearance.kind.overlap}}** (rood): de twee delen een volume. Het verschijnt rood in de lichamen, die doorzichtig worden, en de lijst noemt de grootte.
+- **{{ui:clearance.kind.touching}}** (rood): ze raken elkaar en smelten samen bij het printen.
+- **{{ui:clearance.kind.tight}}** (oranje): de smalste spleet is kleiner dan de {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (groen): de smalste spleet is minstens zo breed.
+
+Elke regel noemt de twee onderdelen en, bij een spleet, de breedte en waar die ligt: {{ui:clearance.direction.side}} (in dezelfde laag) of {{ui:clearance.direction.layer}} (erboven of eronder: daar kan de slicer alleen hele lagen vrijlaten, dus een spleet dunner dan één laag sluit). Klik op een regel: de camera gaat erheen, beide onderdelen krijgen een omlijning en een lijn met het getal markeert de smalste plek. Paren die verder dan 5 mm uit elkaar liggen, staan niet in de lijst. Het ontwerp verandert niet: de controle slaat niets op en laat niets achter om ongedaan te maken.
+
+De {{ui:clearance.threshold}} begint bij 0,3 mm; 0,3 is krap, 0,4 gebruikelijk bij print-in-place. Aanpassen sorteert de lijst meteen opnieuw, zonder nieuwe controle, en de browser onthoudt de waarde. {{ui:clearance.splitParts}} (aan bij de start) controleert ook de losse delen van één object tegen elkaar: een flexi-draak of scharnier dat als één STL is geïmporteerd, is één object, maar de schakels zijn losse delen. Ze staan in de lijst als "Naam · Deel 2". Een deel in een holte van een ander, een bal in een kooi, is een eigen deel.
+
+Verander je het ontwerp terwijl het venster open is, dan toont het {{ui:clearance.stale}}; klik daarop of op {{ui:clearance.checkAgain}}. [[Esc]] of {{ui:clearance.close}} sluit het venster. Ook schalen verandert de spleten: een flexi-model op 70 % houdt 70 % van zijn speling, dus controleer na het schalen opnieuw.
+
+De controle meet het driehoeksnet dat ook de slicer krijgt. Een ronde as en zijn boring zijn veelhoeken met de hoeken op de cirkel, dus een spleet kan enkele honderdsten kleiner uitkomen dan de ronde maten. Een paar met te veel driehoeken staat als {{ui:clearance.kind.unchecked}} in de lijst. Een AI voert dezelfde controle uit met `layerling_check_clearance`.
+
 ## Notities
 
 Een notitie legt vast wat de geometrie niet zegt: "Deze schroef zit 0,3 mm te krap", "het deksel nog printen", "maat van Peter". Plaats er een met {{ui:editor.tool.note}} of de toets [[N]].

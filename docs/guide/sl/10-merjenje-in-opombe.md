@@ -55,6 +55,23 @@ Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne. Če telo 
 
 Če vas za trenutek motijo, pritisnite [[Q]]: mere in razdalje okoli izbora izginejo, zato je del, ki ga premikate, dobro viden. Ponovni [[Q]] jih vrne. Ročica, na katero pokažete, svojo mero vseeno pokaže.
 
+## Preverjanje zračnosti
+
+Deli, ki se morajo po tiskanju premikati - fleksi zmaj, tečaj, natisnjen v kosu, škatla s pokrovom, os v izvrtini - potrebujejo razmik med seboj. Če je premajhen, se zlepijo; če se prekrivajo, se natisnejo kot en kos. {{ui:editor.tool.clearance}} poleg {{ui:editor.tool.intersectPreview}} to preveri pred tiskanjem. Vzame izbrane predmete ali, če ni izbrano nič, vse vidne (iste kot izvoz) in preveri vsak par:
+
+- **{{ui:clearance.kind.overlap}}** (rdeče): dela si delita prostornino. Ta se pokaže rdeče v telesih, ki postanejo prosojna, seznam pa navede njeno velikost.
+- **{{ui:clearance.kind.touching}}** (rdeče): dela se dotikata in se pri tiskanju zlijeta.
+- **{{ui:clearance.kind.tight}}** (oranžno): najožji razmik je manjši od vrednosti {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (zeleno): najožji razmik je vsaj tako širok.
+
+Vsaka vrstica navede oba dela in pri razmiku njegovo širino in lego: {{ui:clearance.direction.side}} (v isti plasti) ali {{ui:clearance.direction.layer}} (zgoraj ali spodaj: tam lahko rezalnik pusti proste le cele plasti, zato se razmik, tanjši od ene plasti, zapre). Klik na vrstico pripelje kamero tja, obrobi oba dela in označi najožje mesto s črto in številom. Pari, ki so narazen več kot 5 mm, niso navedeni. Načrt se ne spremeni: preverjanje ničesar ne shrani in ne pusti ničesar za razveljavitev.
+
+{{ui:clearance.threshold}} se začne pri 0,3 mm; 0,3 je tesno, 0,4 običajno za tiskanje v kosu. Sprememba takoj znova razvrsti seznam brez novega preverjanja, brskalnik pa si vrednost zapomni. {{ui:clearance.splitParts}} (na začetku vklopljeno) med seboj preveri tudi ločene dele enega predmeta: fleksi zmaj ali tečaj, uvožen kot en STL, je en predmet, njegovi členi pa so ločeni deli. V seznamu so kot »Ime · Del 2«. Del v votlini drugega, kroglica v kletki, je samostojen del.
+
+Če načrt spremenite, medtem ko je okno odprto, se prikaže {{ui:clearance.stale}}; kliknite to ali {{ui:clearance.checkAgain}}. [[Esc]] ali {{ui:clearance.close}} zapre okno. Tudi povečava spremeni razmike: fleksi model, pomanjšan na 70 %, ohrani le 70 % svoje zračnosti, zato po povečavi preverite znova.
+
+Preverjanje meri trikotniško mrežo, ki jo dobi tudi rezalnik. Okrogla os in njena izvrtina sta mnogokotnika z oglišči na krogu, zato je razmik lahko za nekaj stotink manjši od okroglih mer. Par s preveč trikotniki je naveden kot {{ui:clearance.kind.unchecked}}. Umetna inteligenca opravi isto preverjanje z `layerling_check_clearance`.
+
 ## Opombe
 
 Opomba zabeleži, česar geometrija ne pove: »Tu je vijak 0,3 mm preozek«, »Pokrov še natisniti«, »Mera od Petra«. Postaviš jo z {{ui:editor.tool.note}} ali s tipko [[N]].

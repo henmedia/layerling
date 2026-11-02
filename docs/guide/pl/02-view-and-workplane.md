@@ -93,6 +93,8 @@ Kliknięcie obok płyty albo [[Esc]] przywraca płaszczyznę roboczą na płytę
 
 Dopóki płaszczyzna robocza leży na ścianie, obok {{ui:camera.placeWorkplane}} pojawia się oko. Ukrywa ono płaszczyznę roboczą, nie zdejmując jej, żeby projekt był lepiej widoczny: nowe kształty dalej trafiają na tę ścianę, a obracanie dalej odbywa się wokół niej. Kliknięcie oka pokazuje ją z powrotem, podobnie jak położenie nowej płaszczyzny roboczej.
 
+Aby spojrzeć prostopadle na płaszczyznę roboczą, naciśnij [[P]] albo kliknij {{ui:camera.lookOntoWorkplane}} obok {{ui:camera.placeWorkplane}} na pasku widoku. Widok obraca się, aż zobaczysz płaszczyznę na wprost, od strony, w którą rosną nowe kształty, z jej początkiem pośrodku. Na płycie bazowej to widok z góry.
+
 ## Siatka i przyciąganie
 
 Siatka pokazuje rozmiar płyty. W prawym dolnym rogu jest **krok przyciągania**: przesuwanie i skalowanie przyciągają się co tyle, na przykład co 1 mm. Zmniejsz go do precyzyjnej pracy, zwiększ do zgrubnego rozmieszczania. {{ui:editor.tool.snapToGrid}} na wstążce przesuwa potem zaznaczone kształty na najbliższe przecięcie siatki. Podczas przesuwania kształty przyciągają się też do innych kształtów, zobacz [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange). Bez myszy: [[Alt]]+[[1]] do [[Alt]]+[[0]] wybierają tę pozycję menu ([[Alt]]+[[1]] wyłącza przyciąganie), a [[,]] i [[.]] zmieniają krok o jeden rozmiar na drobniejszy albo grubszy. Działa to też w szkicu.

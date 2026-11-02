@@ -57,6 +57,23 @@ Z {{ui:workspace.dimensionsAlwaysVisible}} wymiary są widoczne cały czas. Bry�
 
 Jeśli na chwilę przeszkadzają, naciśnij [[Q]]: wymiary i odległości wokół zaznaczenia znikają, a przesuwana część jest dobrze widoczna. Ponowne [[Q]] przywraca je. Uchwyt, na który wskazujesz, nadal pokazuje swój wymiar.
 
+## Sprawdzanie luzu
+
+Części, które po druku mają się ruszać - smok flexi, zawias drukowany w całości, pudełko z pokrywką, oś w otworze - potrzebują luzu między sobą. Za mały i sklejają się; jeśli nachodzą na siebie, drukują się jako jeden kawałek. {{ui:editor.tool.clearance}} obok {{ui:editor.tool.intersectPreview}} sprawdza to przed drukiem. Bierze zaznaczone obiekty albo, gdy nic nie jest zaznaczone, wszystkie widoczne (te same, które bierze eksport), i sprawdza każdą parę:
+
+- **{{ui:clearance.kind.overlap}}** (czerwony): obie części mają wspólną objętość. Widać ją na czerwono wewnątrz brył, które stają się przezroczyste, a lista podaje jej wielkość.
+- **{{ui:clearance.kind.touching}}** (czerwony): stykają się i zleją się podczas druku.
+- **{{ui:clearance.kind.tight}}** (pomarańczowy): najwęższa szczelina jest mniejsza niż {{ui:clearance.threshold}}.
+- **{{ui:clearance.kind.fine}}** (zielony): najwęższa szczelina jest co najmniej tak szeroka.
+
+Każdy wiersz podaje obie części, a dla szczeliny jej szerokość i położenie: {{ui:clearance.direction.side}} (w tej samej warstwie) lub {{ui:clearance.direction.layer}} (nad lub pod: tam slicer może zostawić wolne tylko całe warstwy, więc szczelina cieńsza niż jedna warstwa się zamknie). Kliknięcie wiersza przenosi tam kamerę, obrysowuje obie części i zaznacza najwęższe miejsce linią z liczbą. Pary oddalone o więcej niż 5 mm nie są wymieniane. Projekt się nie zmienia: sprawdzenie niczego nie zapisuje i nie zostawia niczego do cofnięcia.
+
+{{ui:clearance.threshold}} zaczyna się od 0,3 mm; 0,3 to ciasno, 0,4 to typowo przy druku w całości. Zmiana od razu przestawia listę bez nowego sprawdzania, a przeglądarka zapamiętuje wartość. {{ui:clearance.splitParts}} (na początku włączone) sprawdza też względem siebie osobne części jednego obiektu: smok flexi lub zawias zaimportowany jako jeden plik STL to jeden obiekt, ale jego ogniwa to osobne części. Na liście mają postać "Nazwa · Część 2". Część we wnęce innej, kulka w klatce, jest osobną częścią.
+
+Jeśli zmienisz projekt przy otwartym oknie, pojawi się {{ui:clearance.stale}}; kliknij to lub {{ui:clearance.checkAgain}}. [[Esc]] lub {{ui:clearance.close}} zamyka okno. Skalowanie też zmienia szczeliny: model flexi zmniejszony do 70 % zachowuje tylko 70 % swojego luzu, więc po skalowaniu sprawdź ponownie.
+
+Sprawdzenie mierzy siatkę trójkątów, którą dostaje też slicer. Okrągła oś i jej otwór to wielokąty z wierzchołkami na okręgu, więc szczelina może wyjść o kilka setnych mniejsza od okrągłych wymiarów. Para ze zbyt wieloma trójkątami jest oznaczona jako {{ui:clearance.kind.unchecked}}. AI wykonuje to samo sprawdzenie za pomocą `layerling_check_clearance`.
+
 ## Notatki
 
 Notatka zapisuje to, czego geometria nie mówi: „Ta śruba jest o 0,3 mm za ciasna”, „jeszcze wydrukować pokrywkę”, „wymiar od Piotra”. Umieść ją przez {{ui:editor.tool.note}} albo klawiszem [[N]].

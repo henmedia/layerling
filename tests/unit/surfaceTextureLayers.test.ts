@@ -21,6 +21,9 @@ function near(positions: Float64Array, axis: 0 | 1 | 2, at: number, within: numb
   return out;
 }
 
+// Each builds a textured box: under a second of work alone, but past the 5 s limit beside the release build.
+const TEXTURE_TIMEOUT = 30_000;
+
 describe("surface texture layers", () => {
   it("lets a first layer without faces of its own leave out the faces the others take, and drops a later one without faces", () => {
     const first = normalizeSurfaceTexture({ pattern: "bricks" });
@@ -45,7 +48,7 @@ describe("surface texture layers", () => {
     expect(front(plain.positions)).toBeGreaterThan(0);
     expect(front(without.positions)).toBe(0);
     expect(back(without.positions)).toBeGreaterThan(0);
-  });
+  }, TEXTURE_TIMEOUT);
 
   it("makes the layers one after the other: bricks round the sides, knurling on the top", () => {
     const layers = surfaceTextureLayersToMake(normalizeSurfaceTexture({ pattern: "bricks" }), [normalizeSurfaceTexture({ pattern: "knurl", faces: ["top"] })]);
@@ -56,7 +59,7 @@ describe("surface texture layers", () => {
     expect(near(top.positions, 1, 39.6, 0.35).length).toBeGreaterThan(0);
     expect(near(top.positions, 0, 19.6, 0.35).length).toBeGreaterThan(0);
     expect(top.stats.triangles).toBeGreaterThan(sides.stats.triangles);
-  });
+  }, TEXTURE_TIMEOUT);
 });
 
 describe("a body with layers", () => {
@@ -80,5 +83,5 @@ describe("a body with layers", () => {
     expect(merged.bricks).toEqual(a.bricks);
     expect(mergedSurfaceTextureFill([null, new Float64Array(9), new Float64Array(18)])?.length).toBe(27);
     expect(mergedSurfaceTextureFill([null, null])).toBeNull();
-  });
+  }, TEXTURE_TIMEOUT);
 });

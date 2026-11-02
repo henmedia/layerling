@@ -9,6 +9,7 @@ import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeome
 import { type ResolvedAppTheme } from "@/lib/appTheme";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
+import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
 import { createHeartGeometry } from "@/lib/heartGeometry";
 import { createCrescentGeometry } from "@/lib/crescentGeometry";
@@ -300,6 +301,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     threadDrive: shape.threadDrive,
     threadDriveSize: shape.threadDriveSize,
     threadDriveDepth: shape.threadDriveDepth,
+    threadCollarHeight: shape.threadCollarHeight,
+    threadCollarDiameter: shape.threadCollarDiameter,
     springTurns: shape.springTurns,
     springWire: shape.springWire,
     springHand: shape.springHand,
@@ -392,8 +395,9 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityOpenings: shape.gridfinityOpenings,
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
-    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch is cut by it; until it has loaded the bin is drawn without them (#455, #554).
-    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 ? manifoldRevision() : undefined,
+    gridfinityOutline: shape.gridfinityOutline,
+    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch and an outline plate's sockets are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
+    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 ? manifoldRevision() : undefined,
     knurlPattern: shape.knurlPattern,
     knurlCount: shape.knurlCount,
     knurlDepth: shape.knurlDepth,
@@ -661,6 +665,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     threadDrive: shape.threadDrive,
     threadDriveSize: shape.threadDriveSize,
     threadDriveDepth: shape.threadDriveDepth,
+    threadCollarHeight: shape.threadCollarHeight,
+    threadCollarDiameter: shape.threadCollarDiameter,
     springTurns: shape.springTurns,
     springWire: shape.springWire,
     springHand: shape.springHand,
@@ -753,8 +759,9 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityOpenings: shape.gridfinityOpenings,
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
-    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch is cut by it; until it has loaded the bin is drawn without them (#455, #554).
-    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 ? manifoldRevision() : undefined,
+    gridfinityOutline: shape.gridfinityOutline,
+    // Label shelves, finger scoops and dividers are joined by Manifold, and a side's notch and an outline plate's sockets are cut by it; until it has loaded the bin is drawn without them (#455, #554, #1061).
+    labelKernel: shape.gridfinityLabelBack || shape.gridfinityLabelFront || shape.gridfinityLabelLeft || shape.gridfinityLabelRight || shape.gridfinityScoopBack || shape.gridfinityScoopFront || shape.gridfinityScoopLeft || shape.gridfinityScoopRight || (shape.gridfinityCompartmentsX ?? 1) > 1 || (shape.gridfinityCompartmentsZ ?? 1) > 1 || (shape.gridfinityOpenings?.length ?? 0) > 0 || (shape.gridfinityOutline?.length ?? 0) > 0 ? manifoldRevision() : undefined,
     knurlPattern: shape.knurlPattern,
     knurlCount: shape.knurlCount,
     knurlDepth: shape.knurlDepth,
@@ -838,8 +845,12 @@ export function selectionFrameForShapes(
   // axes, or a tilted cylinder distorts when dragged.
   // A shape's handles write their sizes to its own width, depth and height, so a workplane that stands across
   // its up axis (on a side face) must not give them its axes: the sizes would land on the wrong dimensions (#933).
+  // Nor one the shape is turned on (a box turned 90° on a raised face): its width would become the depth (#1163).
+  const singleQuaternion = singleShape ? quaternionForShape(singleShape) : null;
+  const alongWorkplane = (axis: THREE.Vector3, workplaneAxis: PlacementWorkplane["normal"]) =>
+    Math.abs(axis.applyQuaternion(singleQuaternion!).dot(new THREE.Vector3(workplaneAxis.x, workplaneAxis.y, workplaneAxis.z).normalize())) > 0.999;
   const useWorkplane = Boolean(workplane) && !placementWorkplaneIsBase(workplane!)
-    && (!singleShape || Math.abs(new THREE.Vector3(0, 1, 0).applyQuaternion(quaternionForShape(singleShape)).dot(new THREE.Vector3(workplane!.normal.x, workplane!.normal.y, workplane!.normal.z).normalize())) > 0.999);
+    && (!singleShape || (alongWorkplane(new THREE.Vector3(0, 1, 0), workplane!.normal) && alongWorkplane(new THREE.Vector3(1, 0, 0), workplane!.xAxis)));
   const quaternion = useWorkplane
     ? placementWorkplaneQuaternion(workplane!)
     : singleShape ? quaternionForShape(singleShape) : new THREE.Quaternion();
@@ -1843,6 +1854,9 @@ export function createShapeObject(
     case "doubleCountersink":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
       break;
+    case "finishingWasher":
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
+      break;
     case "teardrop":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createTeardropGeometry({ width, depth, height, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
       break;
@@ -1936,6 +1950,7 @@ export function createShapeObject(
         gridfinityOpenings: shape.gridfinityOpenings,
         gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
         gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
+        gridfinityOutline: shape.gridfinityOutline,
       })), material, shape);
       break;
     case "loft":
@@ -2108,6 +2123,8 @@ export function createShapeObject(
         threadDrive: shape.threadDrive,
         threadDriveSize: shape.threadDriveSize,
         threadDriveDepth: shape.threadDriveDepth,
+        threadCollarHeight: shape.threadCollarHeight,
+        threadCollarDiameter: shape.threadCollarDiameter,
       })), material, shape);
       break;
     case "spring":
@@ -2480,7 +2497,7 @@ export function addShapeEdgeDecorations(group: THREE.Group, mesh: THREE.Mesh, pr
   const complexEdges =
     shape.kind === "mesh" ||
     Boolean(shape.importedMesh) ||
-    ["cone", "pyramid", "roof", "roundRoof", "halfSphere", "paraboloid", "torus", "tube", "ring", "star", "gear", "hirth", "wedge", "polygon", "heart", "crescent", "slot", "dovetail", "hinge", "gridfinity", "knurl", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "honeycomb", "loft"].includes(shape.kind);
+    ["cone", "pyramid", "roof", "roundRoof", "halfSphere", "paraboloid", "torus", "tube", "ring", "star", "gear", "hirth", "wedge", "polygon", "heart", "crescent", "slot", "dovetail", "hinge", "gridfinity", "knurl", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "honeycomb", "loft"].includes(shape.kind);
   const importedTriangleCount = shape.importedMesh?.triangleCount ?? 0;
   // A vase's relief has an edge at every rib: drawn like a heavy imported mesh, without the lines.
   const skipHeavyImportedEdges = (Boolean(shape.importedMesh) && importedTriangleCount > IMPORTED_SELECTED_EDGE_TRIANGLE_LIMIT)

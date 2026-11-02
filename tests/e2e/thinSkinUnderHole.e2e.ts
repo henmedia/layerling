@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import manifoldModule from "manifold-3d";
+import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import type { WorkplaneShape } from "@/types/layerling";
 import { buildGroupedShapeFromSelection, exportSolidVolume } from "@/lib/editorBooleans";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
@@ -64,5 +64,55 @@ describe("a hole box raised above the bottom of a solid box", () => {
     const { volumeMm3 } = await exportSolidVolume([result.group!]);
     // The hole is a thousandth wider all round, so a little more than its own volume goes.
     expect(Math.abs(volumeMm3 - (20 * 20 * 20 - 10 * 20 * 15))).toBeLessThan(1);
+  });
+});
+
+/**
+ * A hole that sits on a face inside the body, to take off a peg down to the plate it stands on, cut a thousandth into
+ * that face as well: a ring of 0.001 mm stayed round the hole, drawn as a line on the plate (#1133).
+ */
+function heightsOf(positions: number[]) {
+  const heights = new Set<number>();
+  for (let index = 1; index < positions.length; index += 3) heights.add(Math.round(positions[index] * 1e5) / 1e5);
+  return [...heights].sort((a, b) => a - b);
+}
+
+/** A plate of 20 x 20 x 2 with a round peg of 6 mm standing on it up to 16.5 mm, as one imported mesh like the STL of the report. */
+async function plateWithPegPositions() {
+  const runtime = (await kernel.runtime) as ManifoldToplevel;
+  const { Manifold } = runtime;
+  const plate = Manifold.cube([20, 2, 20]).translate([-10, 0, -10]);
+  const peg = Manifold.cylinder(14.5, 3, 3, 48).rotate([-90, 0, 0]).translate([-3, 2, -6]);
+  const mesh = plate.add(peg).getMesh();
+  const positions: number[] = [];
+  for (let triangle = 0; triangle < mesh.numTri; triangle += 1) {
+    for (let corner = 0; corner < 3; corner += 1) {
+      const vertex = mesh.triVerts[triangle * 3 + corner];
+      positions.push(mesh.vertProperties[vertex * mesh.numProp], mesh.vertProperties[vertex * mesh.numProp + 1], mesh.vertProperties[vertex * mesh.numProp + 2]);
+    }
+  }
+  return positions;
+}
+
+describe("a hole resting on the top of a plate", () => {
+  it("takes the peg off without a step in the plate", async () => {
+    const plate = box("plate", false, 0, 2);
+    const peg = { ...box("peg", false, 2, 10, 6), depth: 6, size: 6 } as WorkplaneShape;
+    const hole = { ...box("hole", true, 2, 20, 10), depth: 10, size: 10 } as WorkplaneShape;
+    const result = await buildGroupedShapeFromSelection([plate, peg, hole], 100_000);
+    expect(result.group).not.toBeNull();
+    expect(heightsOf(result.group!.importedMesh!.positions)).toEqual([0, 2]);
+  });
+
+  it("takes the peg of an imported part off without a step in the plate", async () => {
+    const part = {
+      id: "part", name: "question", kind: "mesh", color: "#0098c7", x: 0, z: 0, elevation: 0, rotation: 0,
+      width: 20, depth: 20, height: 16.5, size: 20,
+      importedMesh: { positions: await plateWithPegPositions(), baseWidth: 20, baseDepth: 20, baseHeight: 16.5 },
+    } as WorkplaneShape;
+    const hole = { id: "hole", name: "Cylinder", kind: "cylinder", color: "#d97813", x: -3, z: -6, elevation: 2, rotation: 0, width: 10.3, depth: 10.3, height: 20, size: 10.3, hole: true } as WorkplaneShape;
+    const result = await buildGroupedShapeFromSelection([part, hole], 100_000);
+    expect(result.group).not.toBeNull();
+    expect(heightsOf(result.group!.importedMesh!.positions)).toEqual([0, 2]);
   });
 });

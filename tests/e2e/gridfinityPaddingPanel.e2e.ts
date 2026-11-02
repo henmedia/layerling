@@ -2,7 +2,7 @@
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import { ShapeInspector } from "@/components/workplane/ShapeInspector";
+import { SelectionInspector, ShapeInspector } from "@/components/workplane/ShapeInspector";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -15,6 +15,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * drawer rows show the drawer a baseplate fills and fit it to one typed in. The corner radius
  * row (#856) rounds the plate's outer corners less, down to square. The large plate switch
  * (#1061) lets a baseplate take up to 12 units.
+ * A plate fitted into an outline (#1061) has its size in mm and a switch to take the outline away; a
+ * baseplate and another shape selected together offer the fit.
  */
 beforeAll(() => {
   // jsdom lays nothing out; the panel only scrolls itself back to the top.
@@ -32,14 +34,14 @@ afterEach(() => {
 });
 
 /** The settings panel for a Gridfinity part with these fields. */
-function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}) {
+function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}, workspace = DEFAULT_WORKPLANE_WORKSPACE) {
   const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
   const shape = { ...makeShapeFromAsset(asset, { x: 0, z: 0 }), ...fields } as WorkplaneShape;
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
   act(() => {
-    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace: DEFAULT_WORKPLANE_WORKSPACE, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {} }));
+    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {} }));
   });
   return container;
 }
@@ -158,5 +160,78 @@ describe("a Gridfinity baseplate's large plate switch", () => {
     act(() => toggleNamed(panel, largePlate)!.querySelector("input")!.click());
     expect(updates).toHaveLength(1);
     expect(updates[0]).toMatchObject({ gridfinityLargePlate: false, width: 262, depth: 258 });
+  });
+});
+
+describe("a Gridfinity baseplate fitted into an outline", () => {
+  const l = [{ x: -84, z: -84 }, { x: 84, z: -84 }, { x: 84, z: 0 }, { x: 0, z: 0 }, { x: 0, z: 84 }, { x: -84, z: 84 }];
+  const outlined = { ...plate, width: 168, depth: 168, gridfinityOutline: l };
+
+  it("shows its size in mm and how many cells it holds, and no units, drawer, padding or corner rows", () => {
+    const panel = mount(outlined);
+    expect(toggleNamed(panel, "Fitted to an outline")!.querySelector("input")!.checked).toBe(true);
+    expect(rowNamed(panel, "Width")!.nextElementSibling!.textContent).toContain("Whole cells in the outline: 12");
+    for (const gone of ["Units across", "Units deep", "Drawer width", "Drawer depth", "Corner radius", ...sides]) expect(rowNamed(panel, gone)).toBeUndefined();
+  });
+
+  it("switching the outline off is one change back to whole units in the same box", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount(outlined, (patch) => updates.push(patch));
+    act(() => toggleNamed(panel, "Fitted to an outline")!.querySelector("input")!.click());
+    expect(updates).toHaveLength(1);
+    expect(updates[0]).toHaveProperty("gridfinityOutline", undefined);
+    expect(updates[0]).toMatchObject({ width: 168, depth: 168 });
+  });
+
+  it("keeps the Large plate switch on while the outline is wider than a plate without it, and says why", () => {
+    const wide = mount({ ...plate, width: 500, depth: 100, gridfinityLargePlate: true, gridfinityOutline: [{ x: -250, z: -50 }, { x: 250, z: -50 }, { x: 250, z: 50 }, { x: -250, z: 50 }] });
+    expect(toggleNamed(wide, "Large plate (up to 12 units)")!.querySelector("input")!.disabled).toBe(true);
+    expect(rowNamed(wide, "Width")!.nextElementSibling!.textContent).toContain("334 mm");
+    // With a baseplate saved as the default, its switch is off there: the switch offers no reset to it either.
+    const plateDefault = { ...DEFAULT_WORKPLANE_WORKSPACE, shapeCustomizations: { ...DEFAULT_WORKPLANE_WORKSPACE.shapeCustomizations, gridfinity: { gridfinityType: "baseplate" as const } } };
+    const changes: Partial<WorkplaneShape>[] = [];
+    const saved = mount({ ...plate, width: 500, depth: 100, gridfinityLargePlate: true, gridfinityOutline: [{ x: -250, z: -50 }, { x: 250, z: -50 }, { x: 250, z: 50 }, { x: -250, z: 50 }] }, (patch) => changes.push(patch), plateDefault);
+    expect(toggleNamed(saved, "Large plate (up to 12 units)")!.parentElement!.querySelector(".property-reset")).toBeNull();
+    expect(changes).toEqual([]);
+  });
+
+  it("lets the Large plate switch off when the outline fits a plate without it", () => {
+    const narrow = mount({ ...outlined, gridfinityLargePlate: true });
+    expect(toggleNamed(narrow, "Large plate (up to 12 units)")!.querySelector("input")!.disabled).toBe(false);
+  });
+
+  it("points a plain baseplate to the fit", () => {
+    expect(rowNamed(mount(plate), "Drawer depth")!.nextElementSibling!.textContent).toContain("Fit baseplate to outline");
+  });
+});
+
+describe("a baseplate and another shape selected together (#1061)", () => {
+  function mountSelection(shapes: WorkplaneShape[], onFit: (plateId: string, sourceId: string) => void = () => {}) {
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    root = createRoot(container);
+    act(() => {
+      root!.render(createElement(SelectionInspector, { shapes, onSetHole: () => {}, onSetColor: () => {}, onToggleLocked: () => {}, onFitGridfinityOutline: onFit, workspace: DEFAULT_WORKPLANE_WORKSPACE, snap: DEFAULT_SNAP_GRID, snapOpen: false, onSnapChange: () => {}, onSnapOpenChange: () => {} }));
+    });
+    return container;
+  }
+  const asset = (kind: string) => toolbarShapeAssets.find((entry) => entry.kind === kind)!;
+  const basePlate = { ...makeShapeFromAsset(asset("gridfinity"), { x: 0, z: 0 }), ...plate, id: "plate" } as WorkplaneShape;
+  const box = { ...makeShapeFromAsset(asset("box"), { x: 0, z: 0 }), id: "box" } as WorkplaneShape;
+  const fitButton = (panel: HTMLElement) => [...panel.querySelectorAll("button")].find((button) => button.textContent === "Fit baseplate to outline");
+
+  it("offers the fit and hands it the plate and the other shape", () => {
+    const fitted: string[][] = [];
+    const panel = mountSelection([box, basePlate], (plateId, sourceId) => fitted.push([plateId, sourceId]));
+    act(() => fitButton(panel)!.click());
+    expect(fitted).toEqual([["plate", "box"]]);
+  });
+
+  it("offers it for exactly one baseplate", () => {
+    expect(fitButton(mountSelection([basePlate, { ...basePlate, id: "other" }]))).toBeUndefined();
+  });
+
+  it("greys it out with a locked shape", () => {
+    expect(fitButton(mountSelection([basePlate, { ...box, locked: true }]))!.disabled).toBe(true);
   });
 });

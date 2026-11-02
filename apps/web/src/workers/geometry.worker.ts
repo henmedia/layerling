@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
 import { buildMessage } from "@/lib/buildStamp";
+import { checkClearance, type ClearanceOptions } from "@/lib/clearanceCheck";
 import { articulateShapes, type FlexiOptions } from "@/lib/flexiJoints";
 import { lidForShapes, type LidOptions } from "@/lib/lidTool";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadPositions, splitShapeIfCrossed } from "@/lib/editorBooleans";
@@ -45,6 +46,9 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
     } else if (request.task === "flexi") {
       const { targets, options } = args as { targets: WorkplaneShape[]; options: FlexiOptions };
       result = await articulateShapes(targets, options);
+    } else if (request.task === "clearance") {
+      const { source, options } = args as { source: WorkplaneShape[]; options: Partial<ClearanceOptions> };
+      result = await checkClearance(source, options);
     } else if (request.task === "lid") {
       const { targets, options } = args as { targets: WorkplaneShape[]; options: LidOptions };
       result = await lidForShapes(targets, options);

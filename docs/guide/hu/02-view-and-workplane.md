@@ -86,6 +86,8 @@ Egy kattintás a tárgyasztal mellé vagy az [[Esc]] visszateszi a munkasíkot a
 
 Amíg a munkasík egy lapon van, a {{ui:camera.placeWorkplane}} mellett megjelenik egy szem. Elrejti a munkasíkot anélkül, hogy eldobná, hogy tisztán lásd a tervet: az új alakzatok továbbra is arra a lapra kerülnek, és a forgatás is körülötte történik. A szemre kattintva újra megjelenik, és egy új munkasík megadása is megjeleníti.
 
+Ha merőlegesen akarsz a munkasíkra nézni, nyomd meg a [[P]] billentyűt, vagy kattints a nézetsávban a {{ui:camera.placeWorkplane}} melletti {{ui:camera.lookOntoWorkplane}} gombra. A nézet addig fordul, amíg szemből látod a síkot, arról az oldalról, amerre az új alakzatok nőnek, a kezdőpontjával középen. Az alaplapon ez a felülnézet.
+
 ## Rács és illesztés
 
 A rács a tárgyasztal méretét mutatja. Jobbra lent van az **illesztési lépés**: a mozgatás és a méretezés ekkora lépésekben illeszkedik, például 1 mm-esekben. Finom munkához vedd kisebbre, durva elrendezéshez nagyobbra. A szalagon a {{ui:editor.tool.snapToGrid}} utólag a legközelebbi rácspontra helyezi a kijelölt alakzatokat. Mozgatás közben az alakzatok más alakzatokhoz is illeszkednek, lásd a [Kijelölés és elrendezés](chapter:select-and-arrange) fejezetet.

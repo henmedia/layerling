@@ -74,7 +74,7 @@ You can also keep four views of your own in each design. [[Shift]]+[[7]], [[Shif
 
 The tool window hangs on its button. If it covers something, drag it by its title bar anywhere on the workplane; it opens there next time too. Double-click the title bar or drop it at the button to put it back.
 
-The X and [[Esc]] close the tool window; with a measuring running, [[Esc]] ends it first. The cut stays until you switch it off with {{ui:camera.sectionActive}} or go back to the design overview. While it is on, its button stays highlighted. Anything you place on the side that is cut away only shows once you switch the cut off. A tablet has no [[Esc]], so there the tool window has two more buttons: {{ui:camera.sectionBack}} ends the measuring if one is running and otherwise closes the tool window, and {{ui:camera.sectionConfirm}} closes the tool window in one step. A computer does not show them.
+The X and [[Esc]] close the tool window; with a measuring running, [[Esc]] ends it first. The cut stays until you switch it off with {{ui:camera.sectionActive}}, click its button in the bar while the window is open, or go back to the design overview. While it is on, its button stays highlighted. Anything you place on the side that is cut away only shows once you switch the cut off. A tablet has no [[Esc]], so there the tool window has two more buttons: {{ui:camera.sectionBack}} ends the measuring if one is running and otherwise closes the tool window, and {{ui:camera.sectionConfirm}} closes the tool window in one step. A computer does not show them.
 
 ## The workplane
 
@@ -91,6 +91,8 @@ On a face the origin of the workplane otherwise snaps to the grid. Click close t
 A click beside the plate or [[Esc]] returns the workplane to the base plate. Quicker still is {{ui:camera.resetWorkplane}}: the button with the downward arrow sits in the view bar below the eye while the workplane lies on a face. [[Shift]]+[[W]] puts it directly on the currently selected face. [[Alt]]+[[W]] puts it back on the base plate at any time, whether something is selected or not. If you hold [[Shift]] while clicking, the plane points the other way.
 
 While a workplane sits on a face, an eye appears next to {{ui:camera.placeWorkplane}}. It hides the workplane without dropping it, for a clear look at the design: new shapes still land on that face, and rotating still turns about it. A click on the eye shows it again, and so does setting a new workplane.
+
+To look straight at the workplane, press [[P]] or click {{ui:camera.lookOntoWorkplane}} next to {{ui:camera.placeWorkplane}} in the view bar. The view turns until you see the workplane square, from the side new shapes grow towards, with its origin in the middle. On the base plate that is the view from above.
 
 ## Grid and snapping
 

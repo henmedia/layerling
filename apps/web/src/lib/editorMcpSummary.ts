@@ -10,6 +10,7 @@ import { DEFAULT_SKETCH_STROKE, normalizeSketchStroke } from "@/lib/sketchStroke
 import { surfaceTextureEntry } from "@/lib/surfaceTextureShape";
 import { type LayerlingMcpShapeSummary } from "@/lib/layerlingMcpProtocol";
 import { vaseSettingsChanges } from "@/lib/vaseSettings";
+import { gridfinityOutlinePoints } from "@/lib/gridfinityGeometry";
 import type { ShapeKind, SketchProfile, WorkplaneShape } from "@/types/layerling";
 
 export function debugShapeSummary(shape: WorkplaneShape): Record<string, unknown> {
@@ -68,7 +69,7 @@ export function compactShapeSummary(shape: WorkplaneShape, index: number) {
     `${index}:${shape.kind}${shape.hole ? "H" : "S"}${shape.importedMesh ? "I" : ""}${shape.imagePlate ? "P" : ""}`,
     `g${shape.groupedShapes?.length ?? 0}`,
     `tri${shape.importedMesh?.triangleCount ?? 0}`,
-    `edge${shape.edgeTreatments?.map((feature) => `${feature.kind}:${feature.amount}:${feature.edgeCount}:${feature.chamferAngle ?? ""}${feature.endAmount !== undefined ? `>${feature.endAmount}` : ""}`).join("|") ?? ""}`,
+    `edge${shape.edgeTreatments?.map((feature) => `${feature.kind}:${feature.amount}:${feature.edgeCount}:${feature.chamferAngle ?? ""}${feature.endAmount !== undefined ? `>${feature.endAmount}` : ""}${feature.concave ? "~" : ""}`).join("|") ?? ""}`,
     `viewEdges${shape.cadDisplayEdges?.length ?? "auto"}v${shape.cadDisplayEdgesVersion ?? 0}`,
     `edgeResize${shape.edgeResizeMode ?? "scale"}`,
     `brep${shape.cadBrep?.length ?? 0}`,
@@ -90,6 +91,9 @@ function mcpShapeSettings(shape: WorkplaneShape): Record<string, string | number
     const value = shape[key];
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
       settings[key] = value;
+    } else if (key === "gridfinityOutline" && Array.isArray(value)) {
+      // As the plate's box stretches it (#1061), so that given back it keeps the box.
+      settings[key] = JSON.stringify(gridfinityOutlinePoints(shape)?.map((p) => ({ x: Math.round(p.x * 100) / 100, z: Math.round(p.z * 100) / 100 })));
     } else if ((key === "bentTubeSegments" || key === "gridfinityDividerPositionsX" || key === "gridfinityDividerPositionsZ" || key === "gridfinityCompartmentLabels" || key === "gridfinityOpenings") && Array.isArray(value)) {
       // Eine Liste passt nicht in die flache Auskunft; als Text geht sie
       // hinaus und wird so auch wieder angenommen.

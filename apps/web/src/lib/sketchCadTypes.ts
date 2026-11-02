@@ -2,7 +2,19 @@ import type { CadModifierDeflection } from "@/lib/cadModifierTypes";
 import type { SketchLoftSection } from "@/lib/cadSketchLoft";
 import type { SketchInset, SketchProfile, SketchStroke } from "@/types/layerling";
 
-export type SketchCadBuildRequest = {
+/**
+ * A stored body cut into facets again, at `deflection` (`capped` where the mesh would stray from a torus face, as the
+ * edge tool does): for bodies an old Chamfillet meshed far finer than needed (Discussion #1042, lib/cadMeshRelief.ts).
+ */
+export type SketchCadRemeshRequest = {
+  type: "remesh";
+  requestId: number;
+  brep: string;
+  deflection: CadModifierDeflection;
+  capped: CadModifierDeflection;
+};
+
+export type SketchCadBuildRequest = SketchCadRemeshRequest | {
   type: "build";
   requestId: number;
   profile: SketchProfile;

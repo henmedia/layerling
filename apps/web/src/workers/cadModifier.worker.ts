@@ -6,6 +6,9 @@ import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm"
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
+import { isBundleScopeKey } from "@/lib/cadModifierGroups";
+import { cadLidSolid } from "@/lib/cadLid";
+import { concaveFilletSolid } from "@/lib/cadConcaveFillet";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
 import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { cadProfileSolidMismatch, profileExtrusionSolid } from "@/lib/cadProfileSolid";
@@ -608,6 +611,20 @@ function joinedShellSolids(cad: OcctKernel, sewn: ShapeHandle) {
  * first built on their own (#996): such a group's holes cut only its own solids, not the neighbours it was
  * grouped with afterwards.
  */
+// The solids of a bundle's scope: its own solids and the groups inside it, its holes left to the level above.
+function combinedScopeSolids(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number): ShapeHandle[] {
+  const inner = new Map<number, CadModifierMeshPart[]>();
+  for (const part of parts) {
+    if ((part.scope?.length ?? 0) <= depth) continue;
+    const key = (part.scope as number[])[depth];
+    inner.set(key, [...(inner.get(key) ?? []), part]);
+  }
+  return [
+    ...parts.filter((part) => (part.scope?.length ?? 0) === depth && !part.hole).map((part) => reconstructSolid(cad, part)),
+    ...[...inner.values()].flatMap((nested) => combinedScope(cad, nested, depth + 1) ?? []),
+  ];
+}
+
 function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number): ShapeHandle | null {
   const here = parts.filter((part) => (part.scope?.length ?? 0) === depth);
   const inner = new Map<number, CadModifierMeshPart[]>();
@@ -616,20 +633,32 @@ function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: num
     const key = (part.scope as number[])[depth];
     inner.set(key, [...(inner.get(key) ?? []), part]);
   }
+  // A bundle with a hole in it (#1164): its hole cuts what it is grouped with, its solids are added afterwards.
+  const bundles = [...inner.entries()].filter(([key]) => isBundleScopeKey(key)).map(([, nested]) => nested);
+  const bundleSolids = bundles.flatMap((nested) => combinedScopeSolids(cad, nested, depth + 1));
+  const bundleHoles = bundles.flatMap((nested) => nested.filter((part) => part.hole && (part.scope?.length ?? 0) === depth + 1).map((part) => reconstructSolid(cad, part)));
   const solids = [
     ...here.filter((part) => !part.hole).map((part) => reconstructSolid(cad, part)),
-    ...[...inner.values()].flatMap((nested) => combinedScope(cad, nested, depth + 1) ?? []),
+    ...[...inner.entries()].filter(([key]) => !isBundleScopeKey(key)).flatMap(([, nested]) => combinedScope(cad, nested, depth + 1) ?? []),
   ];
   const holes = here.filter((part) => part.hole).map((part) => reconstructSolid(cad, part));
-  if (solids.length === 0) return null;
-  let result = solids[0];
-  for (let index = 1; index < solids.length; index += 1) {
-    result = cad.fuse(result, solids[index]);
-    result = cad.simplify(result);
-    result = cad.unifySameDomain(result);
+  if (solids.length === 0 && bundleSolids.length === 0) return null;
+  const fused = (shapes: ShapeHandle[]) => {
+    let joined = shapes[0];
+    for (let index = 1; index < shapes.length; index += 1) {
+      joined = cad.fuse(joined, shapes[index]);
+      joined = cad.simplify(joined);
+      joined = cad.unifySameDomain(joined);
+    }
+    return joined;
+  };
+  let result: ShapeHandle | null = solids.length ? fused(solids) : null;
+  if (result !== null) {
+    for (const hole of bundleHoles) result = tidiedIfValid(cad, fuzzyCut(cad, result, hole), cadShapeIsValid);
   }
+  if (bundleSolids.length) result = fused(result === null ? bundleSolids : [result, ...bundleSolids]);
   for (const hole of holes) {
-    result = tidiedIfValid(cad, fuzzyCut(cad, result, hole), cadShapeIsValid);
+    result = tidiedIfValid(cad, fuzzyCut(cad, result as ShapeHandle, hole), cadShapeIsValid);
   }
   return result;
 }
@@ -860,6 +889,7 @@ function treatEdges(cad: OcctKernel, solid: ShapeHandle, edges: ShapeHandle[], r
   if (request.kind === "fillet" && request.endAmount !== undefined) {
     return cad.filletVariable(solid, edges[0], request.amount, request.endAmount);
   }
+  if (request.kind === "fillet" && request.concave) return concaveFilletSolid(cad, solid, edges, request.amount);
   if (request.kind === "fillet") return cad.fillet(solid, edges, request.amount);
   if (request.kind === "chamfillet") return chamfilletSolid(cad, solid, edges, request.amount, request.chamferAngle);
   return Math.abs(request.chamferAngle - 45) < 0.001
@@ -972,12 +1002,18 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     ? (request.faceIds ?? []).map((id) => ({ id, face: faceHandles[id], owner: faceOwners[id] })).filter((entry): entry is { id: number; face: ShapeHandle; owner: number } => entry.face !== undefined)
     : [];
   if (request.kind === "deleteFace" && selectedFaces.length === 0) throw new Error("Select at least one face");
-  if (selected.length === 0 && request.kind !== "shell" && request.kind !== "deleteFace" && request.kind !== "offset") throw new Error("Select at least one highlighted edge");
+  if (selected.length === 0 && request.kind !== "shell" && request.kind !== "deleteFace" && request.kind !== "offset" && request.kind !== "lid") throw new Error("Select at least one highlighted edge");
   if (request.kind === "fillet" && request.endAmount !== undefined && selected.length !== 1) throw new Error(VARIABLE_FILLET_ONE_EDGE_MESSAGE);
   const componentResults: ShapeHandle[] = [];
   let result: ShapeHandle | null = null;
   try {
-    for (let owner = 0; owner < baseSolids.length; owner += 1) {
+    // The lid (#1154) is a new body made from the whole one, not a change to each of its solids.
+    if (request.kind === "lid") {
+      const lid = request.lid ? cadLidSolid(activeCad, baseShape, request.lid) : null;
+      if (!lid) throw new Error("The lid cannot be built as an exact body");
+      componentResults.push(lid);
+    }
+    for (let owner = 0; request.kind !== "lid" && owner < baseSolids.length; owner += 1) {
       const solid = baseSolids[owner];
       const componentEntries = selected.filter((entry) => entry.owner === owner);
       const componentEdges = componentEntries.map((entry) => entry.edge);
@@ -1017,12 +1053,11 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     if ((request.kind === "fillet" || request.kind === "chamfer") && cadFlatFaceMeshStraysFromOutline(activeCad, result)) {
       throw new Error("The chosen size creates invalid or overlapping edge geometry");
     }
-    const baseLoose = cadModifierTessellationDeflection(request.quality, Math.min(request.amount, request.endAmount ?? request.amount), request.minDeflection);
-    const baseCapped = cadModifierCappedDeflection(request.quality, baseLoose);
-    const loose = request.kind === "chamfillet"
-      ? { linear: Math.min(baseLoose.linear * 0.25, 0.0025), angular: Math.min(baseCapped.angular * 0.2, 0.028) }
-      : baseLoose;
-    const capped = request.kind === "chamfillet" ? loose : baseCapped;
+    // A Chamfillet is meshed as finely as the quality asks, like every other treatment: its own 0.0025 mm and 0.028 rad
+    // gave a 31 mm star 195,263 triangles and a design of 50 such bodies minutes to open (Discussion #1042). Its blend
+    // shades smooth from the kernel's normals; lib/cadMeshRelief.ts lightens the bodies it meshed before.
+    const loose = cadModifierTessellationDeflection(request.quality, Math.min(request.amount, request.endAmount ?? request.amount), request.minDeflection);
+    const capped = cadModifierCappedDeflection(request.quality, loose);
     const meshed = meshTreatedBody(activeCad, [...componentResults], result, loose, capped);
     // The body may have been replaced by fresh copies, meshed with the old angle.
     componentResults.splice(0, componentResults.length, ...meshed.components);

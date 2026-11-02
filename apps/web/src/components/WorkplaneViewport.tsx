@@ -1,7 +1,7 @@
 "use client";
 import type { SurfaceTextureFace, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, ChevronRight, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, MousePointer2, PanelsTopLeft, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, Ruler, RulerDimensionLine, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronLeft, ChevronRight, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, MousePointer2, PanelsTopLeft, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, Ruler, RulerDimensionLine, Slice, Spline, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { objectSnapOffset, shiftSnapBox, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { dragReach } from "@/lib/dragReach";
@@ -41,7 +41,8 @@ import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeS
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { highestTapeIdNumber, readTape, savedTape, writeTape } from "@/lib/tapeStore";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
-import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
+import { timedCameraDamping } from "@/lib/cameraInertia";
+import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
@@ -97,6 +98,7 @@ import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveD
 import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane } from "./workplane/viewportScene";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
+import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
 import { MIN_ELEVATION, MAX_ELEVATION, ResizeSigns, ResizeAnchorMemory, TransformDragState, TransformDragItem, snapValue, selectionWorldYBounds, resizeSignsForHandle, resizeAnchorPointForFrame, resizeCenterFromAnchor, resizeSignsForDimension, patchWithResizeAnchor, patchWithUniformHeightScale, resizeShapeFromFrameHandle, resizeShapeAlongFrameNormal, resizeSelectionFromHandle, scaleSelectionItems } from "./workplane/viewportResize";
@@ -157,10 +159,10 @@ type WorkplaneViewportProps = {
   initialWorkspace?: WorkplaneWorkspaceSettings;
   workspaceSettingsKey?: string | null;
   /** A new shape at `point`; `workplane` is the face it was dropped on, when not the current workplane (#195). */
-  onAddShape: (shape: ShapeAsset, point?: PlacementPoint, workplane?: PlacementWorkplane) => void;
+  onAddShape: (shape: ShapeAsset, point?: PlacementPoint, workplane?: PlacementWorkplane, sunk?: boolean) => void;
   /** Parts picked up with C, following the pointer over faces until a click sets them down (#195). */
   carryIds?: string[] | null;
-  onCarryDrop?: (target: { point: PlacementPoint; normal: PlacementPoint; workplane: PlacementWorkplane }) => void;
+  onCarryDrop?: (target: { point: PlacementPoint; normal: PlacementPoint; workplane: PlacementWorkplane; sunk?: boolean }) => void;
   /** A custom shape dropped on the workplane, by its id. */
   onDropMyShape?: (id: string, point: PlacementPoint) => void;
   /** Shape following the cursor until a click drops it. Null places immediately. */
@@ -182,6 +184,8 @@ type WorkplaneViewportProps = {
   onShapeContextMenu?: (request: { shapeId: string | null; clientX: number; clientY: number; stackIds: string[]; facePoint?: { x: number; y: number; z: number } }) => void;
   /** Bodies marked with an outline that shows through what stands in front: the one a row of "Select other" points at (#804). */
   highlightIds?: readonly string[];
+  /** The place a row of the clearance check stands for: a line with the gap, or the middle of an overlap; the camera goes there. */
+  clearanceMark?: ClearanceMark | null;
   onSetPlacementWorkplane: (workplane: PlacementWorkplane, source: "shape" | "base") => void;
   onToggleWorkplaneTool: () => void;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -196,6 +200,8 @@ type WorkplaneViewportProps = {
   onSelectionColor?: (color: string) => void;
   /** Changes to several selected shapes in one step - "Fit module" for two gears (#645). */
   onSelectionUpdateShapes?: (changes: readonly { id: string; patch: Partial<WorkplaneShape> }[], message?: string) => void;
+  /** Fits the selected baseplate into the outline of the other selected shape (#1061). */
+  onSelectionFitGridfinityOutline?: (plateId: string, sourceId: string) => Promise<void> | void;
   onSelectionLock?: () => void;
   onSelectionHide?: () => void;
   /** Wraps the selected body around a cylinder of this diameter (#106). */
@@ -456,7 +462,7 @@ declare global {
     /** The measurements of the tape measure for MCP: shows or hides them when asked, returns what is there (#881). */
     layerlingMeasurements?: (request?: { visible?: boolean; dimensions?: boolean }) => { visible: boolean; dimensions: boolean; measurements: Array<{ id: string; length: number }> };
     /** The four saved views (keys 7, 8, 9, 0) for MCP: saves or shows one when asked, returns which keys hold a view. */
-    layerlingSavedViews?: (request?: { save?: number; show?: number; startView?: "save" | "reset" }) => { keys: { key: string; saved: boolean }[]; shown?: boolean; startView: boolean };
+    layerlingSavedViews?: (request?: { save?: number; show?: number; startView?: "save" | "reset"; ontoWorkplane?: boolean }) => { keys: { key: string; saved: boolean }[]; shown?: boolean; startView: boolean };
   }
 }
 
@@ -1431,6 +1437,7 @@ export function WorkplaneViewport({
   onSelectShape,
   onShapeContextMenu,
   highlightIds,
+  clearanceMark = null,
   onSetPlacementWorkplane,
   onToggleWorkplaneTool,
   onInteractionActiveChange,
@@ -1442,6 +1449,7 @@ export function WorkplaneViewport({
   onSelectionHole,
   onSelectionColor,
   onSelectionUpdateShapes,
+  onSelectionFitGridfinityOutline,
   onSelectionLock,
   onSelectionHide,
   onWrapAroundCylinder,
@@ -1637,6 +1645,10 @@ export function WorkplaneViewport({
   const [sectionMeasureResult, setSectionMeasureResult] = useState<ReturnType<typeof sectionMeasurement> | null>(null);
   const [sectionMeasureOverlay, setSectionMeasureOverlay] = useState<SectionMeasureOverlayState | null>(null);
   const sectionMeasureOverlayRef = useRef<SectionMeasureOverlayState | null>(null);
+  const [clearanceMarkOverlay, setClearanceMarkOverlay] = useState<ClearanceMarkOverlayState | null>(null);
+  const clearanceMarkOverlayRef = useRef<ClearanceMarkOverlayState | null>(null);
+  const clearanceMarkRef = useRef<ClearanceMark | null>(clearanceMark);
+  clearanceMarkRef.current = clearanceMark;
   // Mitte des Feinreglers: folgt jeder Aenderung, die nicht vom Feinregler selbst kommt.
   const [sectionFineAnchor, setSectionFineAnchor] = useState(DEFAULT_SECTION_SETTINGS.offset);
   // The section position as typed, until Enter or leaving the field takes it (#210); Escape drops it.
@@ -1893,6 +1905,9 @@ export function WorkplaneViewport({
   } | null) | null>(null);
   /** Alt held while a shape is placed by click: it goes where the pointer is, not to a face's middle (#823). */
   const cruiseFreeRef = useRef(false);
+  /** Shift held while a shape is placed or carried onto a face: it goes into the face, its top flush with it (#940). */
+  const cruiseSinkRef = useRef(false);
+  const carryPointerRef = useRef<{ x: number; y: number } | null>(null);
   const cruisePreviewRef = useRef<{ object: THREE.Group; shape: WorkplaneShape } | null>(null);
   const cruisePointerRef = useRef<{ x: number; y: number } | null>(null);
   // A text is drawn with what is there when it is built: a font that arrives later - the Japanese
@@ -2974,10 +2989,14 @@ export function WorkplaneViewport({
     rebuildShapes(state, shapesRef.current, shapeOutlineIds(), false, placementWorkplaneRef.current);
     syncSplitPlane(state, splitPlaneRef.current, false, selectedIdsRef.current);
 
+    // The camera's glide brakes by the time since the last frame, not per frame (Discussion #1143).
+    let lastFrameAt = performance.now();
     const animate = () => {
       state.animationId = window.requestAnimationFrame(animate);
       const now = performance.now();
       const turning = stepCameraTurn(state, now);
+      state.controls.dampingFactor = timedCameraDamping(now - lastFrameAt);
+      lastFrameAt = now;
       const controlsChanged = state.controls.update();
       fitCameraDepthRange(state.camera, state.controls.target);
       const cameraSettled = state.wasCameraMoving && !controlsChanged;
@@ -3013,6 +3032,7 @@ export function WorkplaneViewport({
         syncMirrorOverlay(state, mirrorReferenceShapesRef.current, selectedIdsRef.current, mirrorModeRef.current, mirrorOverlayRef, setMirrorOverlay);
         syncTapeOverlay(state, tapeModelRef.current, tapeOverlayRef, setTapeOverlay, workspaceRef.current.accuracy);
         syncSectionMeasureOverlay(state, sectionMeasureModeRef.current && sectionSettingsRef.current.enabled, sectionMeasureRef.current, sectionMeasureOverlayRef, setSectionMeasureOverlay, workspaceRef.current.accuracy);
+        syncClearanceMarkOverlay(state, clearanceMarkRef.current, clearanceMarkOverlayRef, setClearanceMarkOverlay);
         syncRulerDimensionOverlay(state, previewShapes, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspaceRef.current.accuracy);
         syncCornerRulerToolOverlay(state, cornerRulerModelRef.current, previewShapes, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspaceRef.current.accuracy);
         syncNoteOverlay(state, notesRef.current, notesVisibleRef.current, noteOverlayRef, setNoteOverlay);
@@ -3130,6 +3150,22 @@ export function WorkplaneViewport({
     setOrthographicView(state.camera instanceof THREE.OrthographicCamera);
   }, [workspaceSettingsKey]);
 
+  // Straight onto the workplane, its origin in the middle (#1128): P, the button beside the workplane's, the command search and MCP.
+  const lookOntoWorkplane = useCallback(() => {
+    const state = threeRef.current;
+    if (!state) return false;
+    const { origin, normal } = placementWorkplaneRef.current;
+    setCameraOntoPlane(state, new THREE.Vector3(origin.x, origin.y, origin.z), new THREE.Vector3(normal.x, normal.y, normal.z));
+    syncViewCube(state, viewCubeRef.current);
+    return true;
+  }, []);
+
+  useEffect(() => {
+    const look = () => lookOntoWorkplane();
+    window.addEventListener("layerling:look-onto-workplane", look);
+    return () => window.removeEventListener("layerling:look-onto-workplane", look);
+  }, [lookOntoWorkplane]);
+
   const { saveView, showSavedView } = useDesignViews({
     threeRef, projectIdRef, viewCubeRef, designViewRestoredRef, orthographicView, setOrthographicView, onNotice,
   });
@@ -3156,6 +3192,7 @@ export function WorkplaneViewport({
       const shown = request.show !== undefined ? showSavedView(request.show) : undefined;
       if (request.startView === "save" && !saveStartView()) throw new Error("The view is not ready yet");
       if (request.startView === "reset") resetStartView();
+      if (request.ontoWorkplane && !lookOntoWorkplane()) throw new Error("The view is not ready yet");
       const views = readSavedViews(projectIdRef.current);
       return {
         keys: SAVED_VIEW_KEYS.map((key, slot) => ({ key, saved: Boolean(views[slot]) })),
@@ -3166,7 +3203,7 @@ export function WorkplaneViewport({
     return () => {
       delete window.layerlingSavedViews;
     };
-  }, [saveView, showSavedView, saveStartView, resetStartView]);
+  }, [saveView, showSavedView, saveStartView, resetStartView, lookOntoWorkplane]);
 
   useEffect(() => {
     const state = threeRef.current;
@@ -3314,11 +3351,11 @@ export function WorkplaneViewport({
     // pickPlacementSurface is declared further down; it is reached through its ref.
     // A new shape snaps to the middle of a face near it, unless Alt is held; carried parts never do (#823).
     const surface = pickPlacementSurfaceRef.current?.(clientX, clientY, false, skip, skip || cruiseFreeRef.current ? false : "near") ?? null;
-    if (surface) return { point: surface.workplane.origin, workplane: surface.workplane, normal: surface.workplane.normal };
+    if (surface) return { point: surface.workplane.origin, workplane: surface.workplane, normal: surface.workplane.normal, sunk: cruiseSinkRef.current };
     const point = toFreePlacementWorkplanePoint(clientX, clientY);
     if (!point) return null;
     const workplane = placementWorkplaneRef.current;
-    return { point, workplane, normal: workplane.normal };
+    return { point, workplane, normal: workplane.normal, sunk: false };
   }, [toFreePlacementWorkplanePoint]);
 
   const moveCruiseGhost = useCallback((clientX: number, clientY: number) => {
@@ -3330,7 +3367,7 @@ export function WorkplaneViewport({
     if (!target) return;
     const next = {
       ...preview.shape,
-      ...placementPatchForNewShape(preview.shape, target.workplane, target.point),
+      ...placementPatchForNewShape(preview.shape, target.workplane, target.point, target.sunk),
     };
     preview.shape = next;
     updateShapeObjectTransform(preview.object, next);
@@ -3347,13 +3384,30 @@ export function WorkplaneViewport({
     const target = cruiseTarget(clientX, clientY, new Set(ids));
     if (!target) return;
     const start = carryStartRef.current;
-    carriedOntoFace(start, ids, target, ids[0]).forEach((patch, id) => {
+    carriedOntoFace(start, ids, target, ids[0], target.sunk).forEach((patch, id) => {
       const shape = start.find((entry) => entry.id === id);
       const object = findShapeObject(state, id);
       if (shape && object) updateShapeObjectTransform(object, { ...shape, ...patch });
     });
     state.needsRender = true;
   }, [cruiseTarget]);
+
+  // Shift pressed or let go with the pointer still: the ghost goes into the face, or back onto it, at once (#940).
+  useEffect(() => {
+    if (!cruiseAsset && !carryIds?.length) return;
+    const follow = (event: KeyboardEvent) => {
+      if (event.key !== "Shift" || cruiseSinkRef.current === event.shiftKey) return;
+      cruiseSinkRef.current = event.shiftKey;
+      if (cruiseAssetRef.current && cruisePointerRef.current) moveCruiseGhost(cruisePointerRef.current.x, cruisePointerRef.current.y);
+      if (carryIdsRef.current && carryPointerRef.current) moveCarry(carryPointerRef.current.x, carryPointerRef.current.y);
+    };
+    window.addEventListener("keydown", follow);
+    window.addEventListener("keyup", follow);
+    return () => {
+      window.removeEventListener("keydown", follow);
+      window.removeEventListener("keyup", follow);
+    };
+  }, [carryIds, cruiseAsset, moveCarry, moveCruiseGhost]);
 
   useEffect(() => {
     if (!carryIds?.length) return;
@@ -4639,7 +4693,7 @@ export function WorkplaneViewport({
       } else {
         // A cylinder is always circular - the diameter mark writes both
         // fields, the same as the inspector's diameter field does.
-        const patch: Partial<WorkplaneShape> = shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth"
+        const patch: Partial<WorkplaneShape> = shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "finishingWasher"
           ? { width: nextValue, depth: nextValue, size: nextValue }
           : { width: nextValue, size: resizedShapeSize(nextValue, shapeDepth(shape)) };
         if (shape.kind === "cone") {
@@ -4668,7 +4722,7 @@ export function WorkplaneViewport({
         // Defense in depth: the cylinder's dimension mark never offers this
         // axis (see makeFootprintDimensionMark above), but keep it circular
         // regardless of how the patch got here.
-        const patch: Partial<WorkplaneShape> = shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth"
+        const patch: Partial<WorkplaneShape> = shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "finishingWasher"
           ? { width: nextValue, depth: nextValue, size: nextValue }
           : { depth: nextValue, size: resizedShapeSize(shapeWidth(shape), nextValue) };
         return patchWithResizeAnchor(shape, kept(patch, axis), axis, anchor);
@@ -5126,6 +5180,20 @@ export function WorkplaneViewport({
     if (!state) return;
     syncPickHighlight(state, highlightKey ? highlightKey.split("\0") : [], "menu-pick-highlight");
   }, [highlightKey, shapes]);
+  // A row of the clearance check clicked: the camera goes to its place, from the side the view looks from.
+  const clearanceRequest = clearanceMark?.request ?? 0;
+  useEffect(() => {
+    const state = threeRef.current;
+    const mark = clearanceMarkRef.current;
+    if (!state) return;
+    state.needsRender = true;
+    if (!mark || !clearanceRequest) return;
+    frameBounds(state, clearanceFocusBox(mark));
+    syncViewCube(state, viewCubeRef.current);
+  }, [clearanceRequest]);
+  useEffect(() => {
+    if (threeRef.current) threeRef.current.needsRender = true;
+  }, [clearanceMark]);
   const pickOnlyPointer = usePickOnlyPointer(pickOnly, pickShape);
   useViewportKeyboardHooks(threeRef);
   const pickOnlyKey = pickOnly ? pickOnly.ids.join("\0") : null;
@@ -5949,6 +6017,7 @@ export function WorkplaneViewport({
 
       if (carryIdsRef.current?.length) {
         event.preventDefault();
+        cruiseSinkRef.current = event.shiftKey;
         const target = cruiseTarget(event.clientX, event.clientY, new Set(carryIdsRef.current));
         if (target) onCarryDropRef.current?.(target);
         return;
@@ -5957,8 +6026,9 @@ export function WorkplaneViewport({
       if (cruiseAssetRef.current) {
         event.preventDefault();
         cruiseFreeRef.current = event.altKey;
+        cruiseSinkRef.current = event.shiftKey;
         const target = cruiseTarget(event.clientX, event.clientY);
-        if (target) onAddShape(cruiseAssetRef.current, target.point, target.workplane);
+        if (target) onAddShape(cruiseAssetRef.current, target.point, target.workplane, target.sunk);
         return;
       }
 
@@ -6333,6 +6403,8 @@ export function WorkplaneViewport({
       // schweben oder zu ziehen - die Finger bewegen die Ansicht.
       if (cameraTouchRef.current) return;
       cruiseFreeRef.current = event.altKey;
+      cruiseSinkRef.current = event.shiftKey;
+      carryPointerRef.current = { x: event.clientX, y: event.clientY };
       if (cruiseAssetRef.current) moveCruiseGhost(event.clientX, event.clientY);
       if (carryIdsRef.current) moveCarry(event.clientX, event.clientY);
       if (splitActiveRef.current) {
@@ -7124,6 +7196,10 @@ export function WorkplaneViewport({
             offset: bounds.center,
           }));
         }
+      } else {
+        // The button closes its open panel and turns the cut off with it, as an off switch would; the X and Esc only
+        // hide the panel and keep the cut (#1101).
+        setSectionSettings((prev) => (prev.enabled ? { ...prev, enabled: false } : prev));
       }
       return next;
     });
@@ -7465,6 +7541,9 @@ export function WorkplaneViewport({
       } else if (event.key === "Home") {
         event.preventDefault();
         resetView();
+      } else if (key === "p" && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey) {
+        event.preventDefault();
+        lookOntoWorkplane();
       } else if (key === "o" && !event.ctrlKey && !event.metaKey && !event.altKey) {
         event.preventDefault();
         toggleProjection();
@@ -7485,7 +7564,7 @@ export function WorkplaneViewport({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [chooseSnapGrid, focusSelection, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
+  }, [chooseSnapGrid, focusSelection, lookOntoWorkplane, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
 
   return (
     <main className="workplane-stage">
@@ -7591,6 +7670,14 @@ export function WorkplaneViewport({
                 onClick={togglePlacementWorkplane}
               >
                 <PanelsTopLeft size={25} strokeWidth={2.1} aria-hidden="true" />
+              </button>
+              <button
+                aria-label={t("camera.lookOntoWorkplane")}
+                aria-keyshortcuts="P"
+                title={t("camera.shortcut", { label: t("camera.lookOntoWorkplane"), keys: "P" })}
+                onClick={lookOntoWorkplane}
+              >
+                <ScanEye size={24} strokeWidth={2.1} aria-hidden="true" />
               </button>
               {!placementWorkplaneIsBase(placementWorkplane) && onToggleWorkplaneHidden ? (
                 <button
@@ -8131,6 +8218,7 @@ export function WorkplaneViewport({
           ) : null}
           {!workplaneMode && !splitActive && mirrorOverlay ? <MirrorOverlay overlay={mirrorOverlay} onMirror={onMirrorSelection} onPreview={onMirrorPreview} onPreviewClear={onMirrorPreviewClear} /> : null}
           {!splitActive && sectionMeasureOverlay ? <SectionMeasureOverlay overlay={sectionMeasureOverlay} /> : null}
+          {clearanceMarkOverlay ? <ClearanceMarkOverlay overlay={clearanceMarkOverlay} /> : null}
           {!workplaneMode && !splitActive && tapeOverlay && (tapeOverlay.points.length > 0 || tapeOverlay.hover) ? (
             <TapeOverlay
               overlay={tapeOverlay}
@@ -8305,6 +8393,7 @@ export function WorkplaneViewport({
           onSetHole={onSelectionHole}
           onSetColor={onSelectionColor}
           onUpdateShapes={onSelectionUpdateShapes}
+          onFitGridfinityOutline={onSelectionFitGridfinityOutline}
           onToggleLocked={onSelectionLock}
           onToggleHidden={onSelectionHide}
           onInteractionActiveChange={onInteractionActiveChange}

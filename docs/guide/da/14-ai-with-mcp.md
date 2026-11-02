@@ -95,6 +95,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_measure_section` | måler på et skæreplan mellem to punkter der snapper til omridset - vægtykkelse, mellemrum, pasninger |
 | `layerling_show_overhangs` | slår overhængsskraveringen til eller fra, sætter vinklen og rapporterer for hver form det areal der ville have brug for støtte |
 | `layerling_estimate_print` | estimerer volumen, vægt og filament for markeringen eller hele designet: for en solid form, og som et groft gæt med vægge og fyldning som eksportvinduet |
+| `layerling_check_clearance` | tjekker før print, hvilke dele der overlapper, rører hinanden eller kommer tættere på end et mindste spillerum (Tjek spillerum), også de adskilte dele af ét objekt |
 | `layerling_add_reference_points` | markerer referencepunkter - på formens centrum, hjørner eller kantmidtpunkter, eller ved præcise positioner - som former snapper til |
 | `layerling_list_reference_points` | lister referencepunkterne med deres id'er og positioner |
 | `layerling_remove_reference_points` | sletter referencepunkter efter id, eller alle sammen |
