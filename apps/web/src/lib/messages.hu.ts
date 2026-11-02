@@ -2208,6 +2208,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "6 helyett legfeljebb 12 egység szélességben és mélységben, 256 mm-nél nagyobb tárgyasztalokhoz. Ha a beállításokban kiválasztottad a nyomtatódat, a tárgyasztalánál nagyobb keret jelölést kap.",
   "prop.gridfinityFloorHeight": "Fenékmagasság",
   "gridfinity.floorHeightHint": "Eddig a magasságig, az aljától mérve, a rekesz tömör: nyersdarab, amelybe formákat vághatsz.",
+  "gridfinity.floorHeightLipHint": "Eddig a magasságig, az aljától mérve, a rekesz tömör: nyersdarab, amelybe formákat vághatsz. {height} mm-ig még rakható rá egy másik rekesz; efölött a halmozóperem is kitöltődik, így a teteje sík lesz.",
   "prop.gridfinityWallThickness": "Falvastagság",
   "gridfinity.wallThicknessHint": "A falat kívülről befelé mérjük, a külső oldal nem változik. Halmozóperemmel az 1,75 mm-nél vastagabb fal egy párkánynál ér véget, 0,85 mm-rel a magassági egységenkénti 7 mm alatt, nem érve a ráhalmozott rekesz lábaihoz.",
   "prop.gridfinityOpenBack": "Nyitott hátul",

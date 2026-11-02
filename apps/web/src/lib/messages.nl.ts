@@ -2715,6 +2715,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "gridfinity.largePlateHint": "Tot 12 eenheden breed en diep in plaats van 6, voor printbedden boven 256 mm. Als je printer in de instellingen gekozen is, wordt een plaat gemarkeerd die groter is dan het printbed.",
   "prop.gridfinityFloorHeight": "Bodemhoogte",
   "gridfinity.floorHeightHint": "Tot deze hoogte, gemeten vanaf de onderkant, is de bak massief: een blok om vormen in uit te snijden.",
+  "gridfinity.floorHeightLipHint": "Tot deze hoogte, gemeten vanaf de onderkant, is de bak massief: een blok om vormen in uit te snijden. Tot {height} mm past er nog een bak bovenop; daarboven wordt ook de stapellip gevuld, voor een vlakke bovenkant.",
   "prop.gridfinityWallThickness": "Wanddikte",
   "gridfinity.wallThicknessHint": "De wand wordt gemeten vanaf de buitenkant, die blijft zoals hij is. Met stapellip stopt een wand boven 1,75 mm bij een richel 0,85 mm onder 7 mm per hoogte-eenheid, vrij van de voeten van een bak die erop staat.",
   "prop.gridfinityOpenBack": "Achter open",

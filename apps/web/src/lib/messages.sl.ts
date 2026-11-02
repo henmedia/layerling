@@ -2017,6 +2017,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Do 12 enot v širino in globino namesto 6, za tiskalne plošče nad 256 mm. Ko je tvoj tiskalnik izbran v nastavitvah, je podstavek, večji od njegove plošče, označen.",
   "prop.gridfinityFloorHeight": "Višina dna",
   "gridfinity.floorHeightHint": "Do te višine, merjeno od spodnje strani, je posoda polna: surovec, v katerega izrežeš oblike.",
+  "gridfinity.floorHeightLipHint": "Do te višine, merjeno od spodnje strani, je posoda polna: surovec, v katerega izrežeš oblike. Do {height} mm se nanjo še da zložiti drugo posodo; nad tem se zapolni tudi obroba za zlaganje, za raven vrh.",
   "prop.gridfinityWallThickness": "Debelina stene",
   "gridfinity.wallThicknessHint": "Stena se meri od zunanje strani, ki ostane enaka. Z obrobo za zlaganje se stena, debelejša od 1,75 mm, konča na stopnici 0,85 mm pod višino 7 mm na višinsko enoto, stran od nogic posode, zložene na vrh.",
   "prop.gridfinityOpenBack": "Odprto zadaj",

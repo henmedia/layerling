@@ -2658,6 +2658,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "橫向與縱向最多 12 個單元，而非 6 個，適用於大於 256 mm 的列印平台。在工作區設定中選好你的印表機後，比列印平台大的底板會被標示出來。",
   "prop.gridfinityFloorHeight": "底部高度",
   "gridfinity.floorHeightHint": "收納盒從底面向上到這個高度是實心，可作為挖出形狀的粗坯。",
+  "gridfinity.floorHeightLipHint": "收納盒從底面向上到這個高度是實心，可作為挖出形狀的粗坯。到 {height} mm 為止，上面仍可堆疊另一個收納盒；超過後堆疊唇緣也會被填滿，頂面平整。",
   "prop.gridfinityWallThickness": "壁厚",
   "gridfinity.wallThicknessHint": "壁從外側向內收，外形保持不變。帶堆疊唇緣時，超過 1.75 mm 的壁會停在一個凸台上，位於每個高度單元 7 mm 下方 0.85 mm 處，避開疊放收納盒的底腳。",
   "prop.gridfinityOpenBack": "後側開口",

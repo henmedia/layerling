@@ -253,6 +253,7 @@ import {
   gridfinityDrawerPatch,
   gridfinityDrawerSize,
   gridfinityFloorFits,
+  gridfinityFloorFullHeight,
   gridfinityFloorHeight,
   gridfinityFloorMaxHeight,
   gridfinityFloorMinHeight,
@@ -493,6 +494,8 @@ type RangePropertyConfig = {
   disabled?: boolean;
   /** A line under the row saying what the value measures (#215). */
   hint?: string;
+  /** Values the row skips, in millimetres for a length (#1126): one inside goes on to the end it moves towards. */
+  gap?: { from: number; to: number };
   onChange: (value: number) => void;
 };
 
@@ -1557,8 +1560,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       properties.push(
         { id: "gridfinityUnitsY", label: t("prop.gridfinityUnitsY"), value: plan.count.y, min: MIN_GRIDFINITY_UNITS, max: MAX_GRIDFINITY_HEIGHT_UNITS, step: 1, onChange: (value) => apply({ y: Math.round(value) }) },
         { type: "toggle", id: "gridfinityLip", label: t("prop.gridfinityLip"), value: plan.lip, onChange: (value) => apply({ lip: value }) },
-        // The edge tool's chamfer on the lip's top, built in (#780).
-        ...(plan.lip ? [{ id: "gridfinityLipChamfer", label: t("prop.gridfinityLipChamfer"), value: gridfinityLipChamfer({ ...shape, depth }), min: 0, max: MAX_GRIDFINITY_LIP_CHAMFER, step: 0.05, hint: t("gridfinity.lipChamferHint"), onChange: (value: number) => onUpdate({ gridfinityLipChamfer: clamp(value, 0, MAX_GRIDFINITY_LIP_CHAMFER) }) }] : []),
+        // The edge tool's chamfer on the lip's top, built in (#780); none on a bin filled to the lip's top (#1126).
+        ...(plan.lip && !plan.filled ? [{ id: "gridfinityLipChamfer", label: t("prop.gridfinityLipChamfer"), value: gridfinityLipChamfer({ ...shape, depth }), min: 0, max: MAX_GRIDFINITY_LIP_CHAMFER, step: 0.05, hint: t("gridfinity.lipChamferHint"), onChange: (value: number) => onUpdate({ gridfinityLipChamfer: clamp(value, 0, MAX_GRIDFINITY_LIP_CHAMFER) }) }] : []),
         { type: "toggle", id: "gridfinityMagnets", label: t("prop.gridfinityMagnets"), value: plan.magnets, onChange: (value) => onUpdate({ gridfinityMagnets: value }) },
       );
       // The outer corners above the feet (#856), down to square; no row where open sides leave every corner square.
@@ -1574,9 +1577,13 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     }
     if (gridfinityFloorFits(fields) && !gridfinityWallSolid(fields)) {
       // The floor (#455): raised, it leaves a bin blank to cut shapes into; it decides what room the shelves and scoops have.
-      const maxFloor = gridfinityFloorMaxHeight(fields);
+      // With the lip it goes on to the lip's top, which fills the lip (#1126); between that and the highest floor a stacked
+      // bin clears, the row takes no value: going up it fills the lip, going down it stops where a bin still stacks.
+      const maxFloor = gridfinityFloorFullHeight(fields);
       const minFloor = gridfinityFloorMinHeight(fields);
-      properties.push({ id: "gridfinityFloorHeight", label: t("prop.gridfinityFloorHeight"), value: gridfinityFloorHeight(fields), min: minFloor, max: maxFloor, step: 0.05, hint: t("gridfinity.floorHeightHint"), onChange: (value) => onUpdate({ gridfinityFloorHeight: clamp(value, minFloor, maxFloor) }) });
+      const stackFloor = gridfinityFloorMaxHeight(fields);
+      const hint = plan.lip ? t("gridfinity.floorHeightLipHint", { height: stackFloor.toLocaleString(numberLocale()) }) : t("gridfinity.floorHeightHint");
+      properties.push({ id: "gridfinityFloorHeight", label: t("prop.gridfinityFloorHeight"), value: gridfinityFloorHeight(fields), min: minFloor, max: maxFloor, step: 0.05, hint, gap: { from: stackFloor, to: maxFloor }, onChange: (value) => onUpdate({ gridfinityFloorHeight: clamp(value, minFloor, maxFloor) }) });
     }
     const { switched } = plan;
     if (gridfinityOpenFits(fields)) {
@@ -6956,6 +6963,7 @@ function RangeProperty({
   max,
   step = 0.01,
   hint,
+  gap,
   workspace,
   disabled,
   onChange,
@@ -6968,6 +6976,8 @@ function RangeProperty({
   const holdInteraction = useInteractionHold(onInteractionActiveChange);
   const snapStepMm = useContext(SliderSnapContext);
   const draggingSliderRef = useRef(false);
+  // Where a drag of the slider started, for the side a value inside the gap goes to.
+  const sliderFromRef = useRef(0);
   // Firefox sends one last value after the pointer is up, so a drag ends a moment later than the pointer does.
   const sliderReleaseTimerRef = useRef<number | undefined>(undefined);
   const endSliderDrag = () => {
@@ -6985,6 +6995,12 @@ function RangeProperty({
   const controlMax = isLength ? millimetersToDisplay(max, workspace) : max;
   const controlStep = isLength ? displayStepFromMillimeters(step, workspace) : step;
   const sliderValue = clamp(controlValue, controlMin, controlMax);
+  // A value inside the gap goes on to its end on the side it is moving towards, seen from where it started.
+  const acrossGap = (next: number, from: number) => {
+    if (!gap) return next;
+    const [low, high] = isLength ? [millimetersToDisplay(gap.from, workspace), millimetersToDisplay(gap.to, workspace)] : [gap.from, gap.to];
+    return next <= low + 1e-9 || next >= high - 1e-9 ? next : next < from ? low : high;
+  };
   const position = ((sliderValue - controlMin) / Math.max(Number.EPSILON, controlMax - controlMin)) * 100;
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(ROTATION_PROPERTY_IDS.has(id) ? String(Number(controlValue.toFixed(2))) : formatPropertyNumber(controlValue, accuracy, controlStep));
@@ -7010,7 +7026,7 @@ function RangeProperty({
     const next = RELATIVE_SIZE_PROPERTY_IDS.has(id)
       ? resolveMeasurementInput(draft, controlValue)
       : parseMeasurementInput(draft);
-    const finiteNext = Number.isFinite(next) ? next : controlValue;
+    const finiteNext = Number.isFinite(next) ? acrossGap(next, controlValue) : controlValue;
     const nextModelValue = toModelValue(finiteNext);
     // The formula rides along with the value it set, in the same change; a plain number clears it.
     onFormula?.(Number.isFinite(next) ? formulaToRemember(draft) : null);
@@ -7027,8 +7043,8 @@ function RangeProperty({
   const wheelHandlerRef = useRef<((event: WheelEvent) => void) | null>(null);
   // The wheel stops at the field's lower limit, also for the figure shown: it went on below it, into negative sizes, which the body
   // then kept at the limit and the field showed again as 0.01 only when it was left (#576, prmod3d). Returns the figure to show.
-  const setSteppedValue = (turned: number) => {
-    const next = freePosition ? turned : Math.max(turned, controlMin);
+  const setSteppedValue = (turned: number, from: number) => {
+    const next = freePosition ? turned : Math.max(acrossGap(turned, from), controlMin);
     const nextModelValue = toModelValue(next);
     onChange(freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
     return formatShown(freePosition || allowsAboveSliderMax ? next : clamp(next, controlMin, controlMax));
@@ -7054,7 +7070,7 @@ function RangeProperty({
     const parsed = parseMeasurementInput(draft);
     const current = Number.isFinite(parsed) ? parsed : controlValue;
     const shiftStep = isLength && snapStepMm > 0 ? millimetersToDisplay(snapStepMm, workspace) : undefined;
-    const shown = setSteppedValue(wheelNextValue(current, direction, base, modifiers, shiftStep));
+    const shown = setSteppedValue(wheelNextValue(current, direction, base, modifiers, shiftStep), current);
     // What is shown is the new starting point, so leaving the field keeps the exact value and does not read it again.
     openedWithRef.current = shown;
     setDraft(shown);
@@ -7125,6 +7141,7 @@ function RangeProperty({
       const snappedMm = Math.round(toModelValue(next) / snapStepMm) * snapStepMm;
       next = clamp(millimetersToDisplay(clamp(snappedMm, min, max), workspace), controlMin, controlMax);
     }
+    next = acrossGap(next, draggingSliderRef.current ? sliderFromRef.current : controlValue);
     onChange(clamp(toModelValue(next), min, max));
     setDraft(formatShown(next));
   };
@@ -7151,7 +7168,7 @@ function RangeProperty({
             const base = wheelBaseStep(controlMin, controlMax, controlStep, unit === "in");
             const shiftStep = isLength && snapStepMm > 0 ? millimetersToDisplay(snapStepMm, workspace) : undefined;
             const notches = Math.trunc(dx / SCRUB_PX_PER_STEP);
-            setSteppedValue(wheelNextValue(scrub.start, notches, base, { shift: event.shiftKey, ctrl: event.ctrlKey, alt: event.altKey }, shiftStep));
+            setSteppedValue(wheelNextValue(scrub.start, notches, base, { shift: event.shiftKey, ctrl: event.ctrlKey, alt: event.altKey }, shiftStep), scrub.start);
           }}
           onPointerUp={endScrub}
           onPointerCancel={endScrub}
@@ -7217,6 +7234,7 @@ function RangeProperty({
           onPointerDown={() => {
             window.clearTimeout(sliderReleaseTimerRef.current);
             draggingSliderRef.current = true;
+            sliderFromRef.current = controlValue;
             holdInteraction(true);
           }}
           onPointerUp={() => {

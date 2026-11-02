@@ -2758,6 +2758,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "gridfinity.largePlateHint": "Až 12 jednotek do šířky i hloubky místo 6, pro tiskové podložky nad 256 mm. Když je v nastavení vybraná tiskárna, deska větší než její podložka se označí.",
   "prop.gridfinityFloorHeight": "Výška dna",
   "gridfinity.floorHeightHint": "Až do této výšky, měřeno od spodku, je krabička plná: polotovar, do kterého vyříznete tvary.",
+  "gridfinity.floorHeightLipHint": "Až do této výšky, měřeno od spodku, je krabička plná: polotovar, do kterého vyříznete tvary. Do {height} mm na ni jde ještě postavit další krabičku; nad tím se vyplní i stohovací okraj a vršek je rovný.",
   "prop.gridfinityWallThickness": "Tloušťka stěny",
   "gridfinity.wallThicknessHint": "Stěna se měří od vnější strany, která zůstává stejná. Se stohovacím okrajem končí stěna silnější než 1,75 mm u římsy 0,85 mm pod výškou 7 mm na výškovou jednotku, mimo nožky krabičky postavené navrch.",
   "prop.gridfinityOpenBack": "Otevřeno vzadu",

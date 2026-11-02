@@ -2701,6 +2701,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Jusqu'à 12 unités en largeur et en profondeur au lieu de 6, pour les plateaux d'impression de plus de 256 mm. Si votre imprimante est choisie dans les paramètres, un socle plus grand que son plateau est signalé.",
   "prop.gridfinityFloorHeight": "Hauteur du fond",
   "gridfinity.floorHeightHint": "Jusqu'à cette hauteur, mesurée depuis le dessous, le bac est plein : une ébauche dans laquelle découper des formes.",
+  "gridfinity.floorHeightLipHint": "Jusqu'à cette hauteur, mesurée depuis le dessous, le bac est plein : une ébauche dans laquelle découper des formes. Jusqu'à {height} mm, un autre bac s'empile encore dessus ; au-delà, le rebord d'empilage est rempli aussi, pour un dessus plat.",
   "prop.gridfinityWallThickness": "Épaisseur de paroi",
   "gridfinity.wallThicknessHint": "La paroi est mesurée depuis l'extérieur, qui ne change pas. Avec le rebord d'empilage, une paroi de plus de 1,75 mm s'arrête à un palier 0,85 mm sous 7 mm par unité de hauteur, sans toucher les pieds d'un bac empilé dessus.",
   "prop.gridfinityOpenBack": "Ouvert à l'arrière",
