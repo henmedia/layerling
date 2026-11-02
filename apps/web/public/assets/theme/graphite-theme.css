@@ -7221,6 +7221,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .color-recent {
   outline: none;
 }
 
+@media (min-width: 901px) {
+  :where(html[data-theme="dark"][data-palette="graphite"]) .vase-drawing-window .vz > .vz-side {
+    scrollbar-color: #bbbbbb transparent;
+  }
+
+  html[data-theme="dark"]:where([data-palette="graphite"]) .vase-drawing-window .vz > .vz-side {
+    scrollbar-color: #4c4c4c transparent;
+  }
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-panel > .edge-modifier-footer {
   background: inherit;
 }
