@@ -116,6 +116,27 @@ export function vaseShapePatchOffThread(
   ensureWorker().postMessage(request);
 }
 
+/**
+ * The box the vase fills, in the core's coordinates: its body's, and with a teapot lid the whole vase's (the body ends
+ * at the cut, and the lid may be the widest part), so the body keeps its size and place in the frame.
+ */
+function vaseBox(body: VaseBody) {
+  const source = body.vertices;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  for (let i = 0; i < source.length; i += 3) {
+    minX = Math.min(minX, source[i]); maxX = Math.max(maxX, source[i]);
+    minY = Math.min(minY, source[i + 1]); maxY = Math.max(maxY, source[i + 1]);
+    minZ = Math.min(minZ, source[i + 2]); maxZ = Math.max(maxZ, source[i + 2]);
+  }
+  const extent = body.extent;
+  if (extent) {
+    minX = Math.min(minX, extent.min[0]); maxX = Math.max(maxX, extent.max[0]);
+    minY = Math.min(minY, extent.min[1]); maxY = Math.max(maxY, extent.max[1]);
+    minZ = Math.min(minZ, extent.min[2]); maxZ = Math.max(maxZ, extent.max[2]);
+  }
+  return { minX, maxX, minY, maxY, minZ, maxZ };
+}
+
 /** How the core's coordinates map into the shape's frame: centred, scaled, z up turned into y up. */
 type VaseFrameMap = { cx: number; cy: number; minZ: number; sx: number; sy: number; sz: number };
 
@@ -143,12 +164,7 @@ export function fittedVaseMesh(shape: { width: number; depth: number; height: nu
   }
   const mesh = buildVaseCached(settings);
   const source = mesh.vertices;
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
-  for (let i = 0; i < source.length; i += 3) {
-    minX = Math.min(minX, source[i]); maxX = Math.max(maxX, source[i]);
-    minY = Math.min(minY, source[i + 1]); maxY = Math.max(maxY, source[i + 1]);
-    minZ = Math.min(minZ, source[i + 2]); maxZ = Math.max(maxZ, source[i + 2]);
-  }
+  const { minX, maxX, minY, maxY, minZ, maxZ } = vaseBox(mesh);
   // The core stands the vase on z = 0 with z up; the editor's y is up and its z points to the viewer.
   // (x, y, z) -> (x, z, -y) is a turn, not a mirror, so the triangles keep facing out.
   const sx = width / Math.max(1e-9, maxX - minX);
@@ -194,13 +210,7 @@ export function createVaseGeometry(shape: { width: number; depth: number; height
 export function vaseNaturalFrame(vase: unknown, width: number, depth: number, height: number) {
   const size = Math.max(width, depth);
   const settings = vaseSettingsInFrame(vase, size, size, height);
-  const mesh = buildVaseCached(settings);
-  const source = mesh.vertices;
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (let i = 0; i < source.length; i += 3) {
-    minX = Math.min(minX, source[i]); maxX = Math.max(maxX, source[i]);
-    minY = Math.min(minY, source[i + 1]); maxY = Math.max(maxY, source[i + 1]);
-  }
+  const { minX, maxX, minY, maxY } = vaseBox(buildVaseCached(settings));
   const spanX = Math.max(1e-6, maxX - minX);
   const spanY = Math.max(1e-6, maxY - minY);
   const scale = size / Math.max(spanX, spanY);
@@ -216,12 +226,7 @@ export function vaseShapePatch(shape: { width: number; depth: number; height: nu
 
 /** How far the core's vase reaches across, in x and y, for these settings (its widest diameter is settings.diameter). */
 function vaseSpans(settings: VaseSettings) {
-  const vertices = buildVaseCached(settings).vertices;
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (let i = 0; i < vertices.length; i += 3) {
-    minX = Math.min(minX, vertices[i]); maxX = Math.max(maxX, vertices[i]);
-    minY = Math.min(minY, vertices[i + 1]); maxY = Math.max(maxY, vertices[i + 1]);
-  }
+  const { minX, maxX, minY, maxY } = vaseBox(buildVaseCached(settings));
   return { x: Math.max(1e-6, maxX - minX), y: Math.max(1e-6, maxY - minY) };
 }
 
@@ -288,7 +293,7 @@ export function vasePrintReport(shape: { width: number; depth: number; height: n
 /** An accessory of a vase, laid out for printing beside it: triangles in the vase shape's frame. */
 export type VaseAccessory = { id: string; kind: VaseAccessoryKind; index: number; positions: number[] };
 
-export type VaseAccessoryKind = "leg" | "stand" | "saucer" | "hiddenSaucer" | "plantInsert" | "wateringInsert" | "frog" | "tube" | "lid";
+export type VaseAccessoryKind = "leg" | "stand" | "saucer" | "hiddenSaucer" | "plantInsert" | "wateringInsert" | "frog" | "tube" | "lid" | "knob";
 
 function accessoryKind(part: VasePart, settings: VaseSettings): VaseAccessoryKind {
   if (part.id.startsWith("bein-")) return "leg";
@@ -298,6 +303,7 @@ function accessoryKind(part: VasePart, settings: VaseSettings): VaseAccessoryKin
   if (part.id === "einsatz") return settings.insertMode === "bewaesserung" ? "wateringInsert" : "plantInsert";
   if (part.id === "stecker") return "frog";
   if (part.id === "roehrchen") return "tube";
+  if (part.id === "knauf") return "knob";
   return "lid";
 }
 
@@ -407,6 +413,7 @@ function askedAccessories(settings: unknown): VaseAccessoryKind[] {
   const inserts: Record<string, VaseAccessoryKind> = { pflanze: "plantInsert", bewaesserung: "wateringInsert", stecker: "frog", roehrchen: "tube" };
   if (inserts[vase.insertMode]) asked.push(inserts[vase.insertMode]);
   if (vase.lidMode !== "keiner") asked.push("lid");
+  if (vase.lidMode === "kanne" && vase.lidKnob === "ja") asked.push("knob");
   return asked;
 }
 
@@ -420,6 +427,7 @@ const ACCESSORY_NAMES: Record<VaseAccessoryKind, MessageKey> = {
   frog: "vase.partFrog",
   tube: "vase.partTube",
   lid: "vase.partLid",
+  knob: "vase.partKnob",
 };
 
 /** An accessory's name in the current language, legs numbered. */
