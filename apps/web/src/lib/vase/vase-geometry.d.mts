@@ -9,7 +9,7 @@ export type VaseNumberKey =
   | "drainHoles" | "drainDiameter" | "floorSlope" | "footHeight" | "rubberFeet" | "rubberFootDiameter" | "rubberFootDepth"
   | "legCount" | "legHeight" | "legDiameter" | "legSplay" | "legInset" | "fitClearance"
   | "saucerGap" | "saucerHeight" | "saucerWall" | "insertWall" | "insertStandoff" | "reservoirHeight" | "tubeDiameter" | "frogHole"
-  | "lidClearance" | "lidThickness" | "lidDepth" | "threadPitch"
+  | "lidClearance" | "lidThickness" | "lidDepth" | "threadPitch" | "lidHeight"
   | "cutoutSize" | "cutoutWeb" | "cutoutFrom" | "cutoutTo" | "cutoutAspect" | "cutoutSeed"
   | "lampHole" | "puckDiameter" | "lampNotch" | "lampNotchHeight"
   | "reinforceCount" | "reinforceDepth" | "slitWidth" | "lineWidth"
@@ -22,7 +22,7 @@ export type VaseChoiceKey =
   | "profile" | "ribShape" | "twistMode" | "twistAlong" | "material" | "sectionOutside"
   | "section2" | "section2WaveStyle" | "body" | "innerShape"
   | "legMode" | "legShape" | "saucerMode" | "saucerRibs" | "saucerSpout" | "saucerGrip" | "insertMode"
-  | "lidMode" | "lidGrip" | "quality" | "cutout" | "cutoutEdge" | "watertight" | "lamp" | "lampSocket" | "reinforce"
+  | "lidMode" | "lidGrip" | "lidKnob" | "quality" | "cutout" | "cutoutEdge" | "watertight" | "lamp" | "lampSocket" | "reinforce"
   | "section" | "sectionWaveStyle" | "drawSymmetry" | "effect" | "stripeStyle";
 
 /** A point of a drawn cross-section in the unit circle: a corner, or round with an optional handle (tx, ty; ix, iy before it). */
@@ -75,6 +75,8 @@ export type VaseMesh = {
   flat: boolean;
   section: { starShaped: boolean; valid: boolean };
   notes: string[];
+  /** With a teapot lid: the whole vase's box, lid included (the body itself ends lower, at the cut). */
+  extent: { min: number[]; max: number[] } | null;
 };
 
 export function buildVase(input?: unknown): VaseMesh;

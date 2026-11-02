@@ -17,7 +17,7 @@
  * `layoutParts` lays everything out side by side for printing - preview and file use the same.
  */
 import { MeshBuilder } from './mesh-tools.mjs'
-import { LID_MODES, floorLayout, normalizeParams, threadDepthAt } from './vase-geometry.mjs'
+import { LID_MODES, buildVase, floorLayout, normalizeParams, teapotKnobMesh, threadDepthAt } from './vase-geometry.mjs'
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v))
 const ml = (mm3) => Math.round(mm3 / 1000)
@@ -497,6 +497,18 @@ export function buildParts(input, { outward = 0 } = {}) {
   // a lip or a threaded plug that sits in the opening. Printed with the plate down: lip, bead and
   // thread point upwards, their flanks at 45 degrees - no supports needed.
   if (p.lidMode !== 'keiner') safely('Der Deckel', () => {
+    // Teapot lid: the vase's own top, cut off (the body ends there), with a lip into the opening and a knob apart.
+    if (p.lidMode === 'kanne') {
+      if (!layout.teapot) return
+      const { cut, height, lip } = layout.teapot
+      const lid = buildVase(p, { part: 'lid' })
+      parts.push({ id: 'deckel', name: LID_MODES.kanne, mesh: { vertices: lid.vertices, indices: lid.indices }, z: 0, merge: false, flip: true, info: `Oberteil ab ${fmt(cut)} mm (${fmt(height)} mm hoch), Lippe ${fmt(lip)} mm, ${fmt(p.lidClearance, 2)} mm Spiel` })
+      if (lid.knob) {
+        const knob = teapotKnobMesh(p, layout.shape)
+        parts.push({ id: 'knauf', name: 'Knauf', mesh: { vertices: knob.vertices, indices: knob.indices }, z: 0, merge: false, flip: true, info: `Ø ${fmt(knob.d)} mm – mit dem Zapfen ins Loch oben im Deckel kleben` })
+      }
+      return
+    }
     if (p.lamp !== 'keine') return
     if (p.insertMode === 'stecker' || p.insertMode === 'roehrchen') return
     const lid = shape.lid

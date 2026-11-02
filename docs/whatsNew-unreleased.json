@@ -1,6 +1,36 @@
 [
   {
     "title": {
+      "de": "Ein Teekannendeckel für die Vase",
+      "en": "A teapot lid for the vase"
+    },
+    "body": {
+      "de": "Unter Zubehör gibt es jetzt den Teekannendeckel: Das Oberteil einer hohlen Vase wird zum Deckel, mit ihrer eigenen Wand und ihrem Muster, sodass Rillen und Verdrehung über die Fuge weiterlaufen. Ein Rand greift in die Öffnung, und auf Wunsch kommt ein Knauf als eigenes Teil dazu.",
+      "en": "Accessories now has a teapot lid: the top of a hollow vase becomes its lid, with the vase's own wall and pattern, so grooves and twist run on across the joint. A lip goes into the opening, and a knob can come with it as a part of its own."
+    }
+  },
+  {
+    "title": {
+      "de": "Ziegel bleiben an der Kante zur Oberseite sauber",
+      "en": "Bricks keep a clean rim to the top"
+    },
+    "body": {
+      "de": "Bekamen die Seiten und die Oberseite eines Körpers Ziegel, zog sich die oberste Ziegelreihe an der Kante zu langen Keilen. Jetzt bleibt diese Kante glatt, und die Fugen laufen weiter um die senkrechten Ecken.",
+      "en": "With bricks on a body's sides and on its top, the top course of the wall was pulled into long wedges along the rim. Now that rim stays smooth, and the joints still run round the upright corners."
+    }
+  },
+  {
+    "title": {
+      "de": "layerling ganz auf Italienisch",
+      "en": "layerling fully in Italian"
+    },
+    "body": {
+      "de": "Alle Texte des Programms sind jetzt ins Italienische übersetzt.",
+      "en": "Every text of the program is translated into Italian now."
+    }
+  },
+  {
+    "title": {
       "de": "Der Server-Reiter zählt alle Entwürfe, auch auf PHP-Servern",
       "en": "The server tab counts every design on PHP servers too"
     },

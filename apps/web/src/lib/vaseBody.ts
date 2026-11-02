@@ -6,11 +6,18 @@ import type { VaseSettings } from "@/lib/vaseSettings";
  * The vase's body in the core's coordinates: one closed mesh, with legs moulded on when it has them.
  * Apart from vaseShape.ts so the vase worker can build it without the editor's texts and three.
  */
-export type VaseBody = { vertices: Float64Array; indices: Uint32Array; triangleCount: number; notes: string[] };
+export type VaseBody = {
+  vertices: Float64Array;
+  indices: Uint32Array;
+  triangleCount: number;
+  notes: string[];
+  /** With a teapot lid: the box of the whole vase, lid included, which the editor fits into its frame. */
+  extent?: { min: number[]; max: number[] } | null;
+};
 
 export function buildVaseBody(settings: VaseSettings): VaseBody {
   const mesh = buildVase(settings);
-  let body: VaseBody = { vertices: mesh.vertices, indices: mesh.indices, triangleCount: mesh.triangleCount, notes: mesh.notes ?? [] };
+  let body: VaseBody = { vertices: mesh.vertices, indices: mesh.indices, triangleCount: mesh.triangleCount, notes: mesh.notes ?? [], extent: mesh.extent ?? null };
   if (settings.legMode === "angeformt") {
     // Moulded legs are part of the vase's own object: built alone (the other parts are not needed here), joined on.
     const legs = buildParts({ ...settings, saucerMode: "keine", insertMode: "keine", lidMode: "keiner" }).parts.filter((part) => part.merge);
@@ -28,7 +35,7 @@ function joinMeshes(a: VaseBody, b: { vertices: Float64Array; indices: Uint32Arr
   const indices = new Uint32Array(a.indices.length + b.indices.length);
   indices.set(a.indices, 0);
   for (let i = 0; i < b.indices.length; i += 1) indices[a.indices.length + i] = b.indices[i] + offset;
-  return { vertices, indices, triangleCount: indices.length / 3, notes: a.notes };
+  return { vertices, indices, triangleCount: indices.length / 3, notes: a.notes, extent: a.extent };
 }
 
 export type VaseBodyWorkerRequest = { requestId: number; settings: VaseSettings };
