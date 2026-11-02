@@ -9,7 +9,7 @@ import { cadProfileSolidMismatch, profileExtrusionSolid } from "@/lib/cadProfile
 import type { CadModifierProfilePart } from "@/lib/cadModifierTypes";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
 import { createScrewHoleGeometry } from "@/lib/screwHoleGeometry";
-import { createPortGeometry } from "@/lib/portGeometry";
+import { createPortGeometry, PORT_PROFILE_POLYGONS, portPolygonCorners, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { finishingWasherFields } from "@/lib/screwHoleSizes";
 
@@ -170,6 +170,34 @@ describe("exact bodies for the bore shapes with the real OCCT kernel", () => {
       const cx = width / 6.8, cy = (0.9 / 3.6) * height;
       const section = width * height - 2 * (corner * corner - Math.PI * corner * corner / 4) - 2 * (cx * cy / 2);
       expect(cad.getVolume(solid)).toBeCloseTo(section * 10, 2);
+    }
+  });
+
+  it("port opening: XT30, XT60, MT60 and D-Sub 9 as rounded polygons, plain and grown by extra clearance", () => {
+    for (const key of ["xt30", "xt60", "mt60", "dsub9"] as PortPreset[]) {
+      for (const clearance of [0, 0.3]) {
+        const preset = portPresetSize(key, clearance);
+        const source = shape("port", { width: preset.width, depth: 10, height: preset.height, cornerFillet: preset.corner, portProfile: preset.profile });
+        const { solid } = exact(source);
+        const corners = PORT_PROFILE_POLYGONS[preset.profile as keyof typeof PORT_PROFILE_POLYGONS](1, 1).length;
+        // one round face for each corner, a flat one for each side and the two end caps
+        expect(surfaceTypes(solid), `${key} ${clearance}`).toEqual([...Array(corners).fill("cylinder"), ...Array(corners + 2).fill("plane")]);
+        const box = cad.getBoundingBox(solid);
+        expect(box.xmax - box.xmin, `${key} ${clearance}`).toBeCloseTo(preset.width, 3);
+        expect(box.ymax - box.ymin, `${key} ${clearance}`).toBeCloseTo(preset.height, 3);
+        // The section: the polygon inside the rounding, its sides pushed out by the radius, and a whole circle at the corners.
+        const inner = portPolygonCorners(preset.profile, preset.width, preset.height, preset.corner);
+        const area = inner.reduce((sum, point, index) => {
+          const next = inner[(index + 1) % inner.length];
+          return sum + (point.x * next.y - next.x * point.y) / 2;
+        }, 0);
+        const perimeter = inner.reduce((sum, point, index) => {
+          const next = inner[(index + 1) % inner.length];
+          return sum + Math.hypot(next.x - point.x, next.y - point.y);
+        }, 0);
+        const section = area + perimeter * preset.corner + Math.PI * preset.corner * preset.corner;
+        expect(cad.getVolume(solid), `${key} ${clearance}`).toBeCloseTo(section * 10, 2);
+      }
     }
   });
 
