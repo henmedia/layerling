@@ -376,7 +376,7 @@ function closestBetweenLines(a: Vec3, b: Vec3, c: Vec3, d: Vec3) {
   return { onFirst, onSecond, gap: len(sub(onFirst, onSecond)) };
 }
 
-function solveWithLead(grid: CableGrid, entry: CableEnd, exit: CableEnd, options: CableChannelOptions, lead: number, tolerance: number): CableChannelResult {
+function solveWithLead(grid: CableGrid, entry: CableEnd, exit: CableEnd, options: CableChannelOptions, lead: number, tolerance: number, spare: number, walks: Map<number, number[] | null>): CableChannelResult {
   const radius = options.diameter / 2;
   const need = radius + options.minWall;
   const inward = unit(mul(entry.normal, -1)), outward = unit(exit.normal);
@@ -384,14 +384,16 @@ function solveWithLead(grid: CableGrid, entry: CableEnd, exit: CableEnd, options
   const t0 = add(exit.point, mul(outward, -lead));
   const from = cubeAt(grid, s0), to = cubeAt(grid, t0);
   if (from < 0 || to < 0 || sampleDistance(grid, s0) < need || sampleDistance(grid, t0) < need) return { ok: false, error: "endTooThin" };
-  const walk = cheapestWalk(grid, from, to, radius, need);
+  // The walk depends only on the lead; the ways of straightening it are tried on the same walk.
+  if (!walks.has(lead)) walks.set(lead, cheapestWalk(grid, from, to, radius, need));
+  const walk = walks.get(lead)!;
   if (!walk) return { ok: false, error: "noWay" };
   const room = (a: Vec3, b: Vec3, margin: number) => {
     const n = Math.max(2, Math.ceil(len(sub(b, a)) / (grid.step * 0.5)));
     for (let q = 0; q <= n; q += 1) if (sampleDistance(grid, add(a, mul(sub(b, a), q / n))) - radius < options.minWall + margin) return false;
     return true;
   };
-  // Straight pieces along the walk; corners a straight line passes with a millimetre to spare go.
+  // Straight pieces along the walk; corners a straight line passes with `spare` millimetres to spare go.
   const middle = simplify([s0, ...walk.slice(1, -1).map((index) => cubeCentre(grid, index)), t0], tolerance);
   const corners: Vec3[] = [entry.point, ...middle, exit.point];
   const turnAt = (i: number) => {
@@ -402,7 +404,7 @@ function solveWithLead(grid: CableGrid, entry: CableEnd, exit: CableEnd, options
     changed = false;
     for (let i = 2; i < corners.length - 2 && !changed; i += 1) {
       // A corner goes when a straight line passes it with a millimetre to spare, or when it hardly turns at all.
-      if (room(corners[i - 1], corners[i + 1], 1) || (turnAt(i) < (4 * Math.PI) / 180 && room(corners[i - 1], corners[i + 1], 0))) {
+      if (room(corners[i - 1], corners[i + 1], spare) || (turnAt(i) < (4 * Math.PI) / 180 && room(corners[i - 1], corners[i + 1], 0))) {
         corners.splice(i, 1);
         changed = true;
       }
@@ -522,6 +524,8 @@ function buildChain(grid: CableGrid, entry: CableEnd, exit: CableEnd, options: C
 
 /** Lengths of the straight piece at the surface to try, in mm; the best channel wins. */
 const LEADS = [8, 10, 12, 15];
+/** How much room, in mm beyond the wall, a straight line must leave to replace a corner of the walk. */
+const SPARES = [1, 4, 8];
 
 /**
  * The channel from `entry` to `exit` through the body whose triangles are given (world, nine numbers each). Several
@@ -535,9 +539,12 @@ export function findCableChannel(triangles: ArrayLike<number> | CableGrid, entry
   if (len(sub(entry.point, exit.point)) < settings.diameter * 2) return { ok: false, error: "endsTooClose" };
   let best: CableChannelPath | null = null;
   let failure: CableChannelError = "endTooThin";
-  for (const lead of LEADS) {
+  const walks = new Map<number, number[] | null>();
+  // Pulling the string tight cuts corners close; in a narrow part (a chimney, a leg) that can leave no room for the
+  // bend that follows. So the string is also pulled less tight, keeping more of the walk's own corners.
+  for (const lead of LEADS) for (const spare of SPARES) {
     for (const tolerance of [1.5, 3]) {
-      const result = solveWithLead(grid, { point: entry.point, normal: unit(entry.normal) }, { point: exit.point, normal: unit(exit.normal) }, settings, Math.max(lead, settings.diameter), tolerance);
+      const result = solveWithLead(grid, { point: entry.point, normal: unit(entry.normal) }, { point: exit.point, normal: unit(exit.normal) }, settings, Math.max(lead, settings.diameter), tolerance, spare, walks);
       if (!result.ok) {
         if (failure !== "noWay" && failure !== "tooWinding") failure = result.error;
         continue;
