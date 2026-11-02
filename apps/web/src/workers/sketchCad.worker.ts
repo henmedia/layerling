@@ -11,6 +11,7 @@ import { buildSketchLoftSolid } from "@/lib/cadSketchLoft";
 import { buildInsetSketchSolid } from "@/lib/cadSketchInset";
 import { pathWire } from "@/lib/sketchCadWire";
 import { buildMessage } from "@/lib/buildStamp";
+import { meshTreatedBody } from "@/lib/cadMeshAccuracy";
 import { SKETCH_EDGE_FAILED, SKETCH_INSET_UNSUPPORTED, SKETCH_STROKE_UNSUPPORTED, type SketchCadBuildRequest, type SketchCadBuildResponse } from "@/lib/sketchCadTypes";
 
 /** Past this many edges in a sketch's outlines the kernel's validity check is skipped (it takes seconds to minutes there). */
@@ -49,6 +50,15 @@ self.onmessage = async (event: MessageEvent<SketchCadBuildRequest>) => {
   try {
     cad = await kernel();
     cad.releaseAll();
+    if (request.type === "remesh") {
+      const solid = cad.fromBREP(request.brep);
+      const meshed = meshTreatedBody(cad, [solid], solid, request.deflection, request.capped);
+      const positions = new Float32Array(meshed.mesh.positions);
+      const normals = new Float32Array(meshed.mesh.normals);
+      const indices = new Uint32Array(meshed.mesh.indices);
+      post({ type: "built", requestId: request.requestId, positions, normals, indices, triangleCount: meshed.mesh.triangleCount, brep: request.brep, deflection: meshed.deflection }, [positions.buffer, normals.buffer, indices.buffer]);
+      return;
+    }
     let result: ShapeHandle;
     if (request.loft) {
       result = buildSketchLoftSolid(cad, request.loft.bottom, request.loft.top);

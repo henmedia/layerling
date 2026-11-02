@@ -91,6 +91,12 @@ function requestSketchCad(message: Record<string, unknown>, timeoutMs = SKETCH_C
   });
 }
 
+/** A stored body meshed again on the sketch worker (lib/cadMeshRelief.ts): its triangles in the body's own place, or null when the kernel could not. */
+export async function remeshCadBrep(brep: string, deflection: CadModifierDeflection, capped: CadModifierDeflection) {
+  const response = await requestSketchCad({ type: "remesh", brep, deflection, capped });
+  return response.type === "built" ? response : null;
+}
+
 export async function cadShapeFromSketchProfile(profile: SketchProfile, height: number, existing?: WorkplaneShape | null) {
   const safeHeight = Math.max(MIN_SHAPE_DIMENSION, height);
   // A silhouette leaves its holes out first, so its outer line runs round the outside only (#197).

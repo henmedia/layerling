@@ -1017,12 +1017,11 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     if ((request.kind === "fillet" || request.kind === "chamfer") && cadFlatFaceMeshStraysFromOutline(activeCad, result)) {
       throw new Error("The chosen size creates invalid or overlapping edge geometry");
     }
-    const baseLoose = cadModifierTessellationDeflection(request.quality, Math.min(request.amount, request.endAmount ?? request.amount), request.minDeflection);
-    const baseCapped = cadModifierCappedDeflection(request.quality, baseLoose);
-    const loose = request.kind === "chamfillet"
-      ? { linear: Math.min(baseLoose.linear * 0.25, 0.0025), angular: Math.min(baseCapped.angular * 0.2, 0.028) }
-      : baseLoose;
-    const capped = request.kind === "chamfillet" ? loose : baseCapped;
+    // A Chamfillet is meshed as finely as the quality asks, like every other treatment: its own 0.0025 mm and 0.028 rad
+    // gave a 31 mm star 195,263 triangles and a design of 50 such bodies minutes to open (Discussion #1042). Its blend
+    // shades smooth from the kernel's normals; lib/cadMeshRelief.ts lightens the bodies it meshed before.
+    const loose = cadModifierTessellationDeflection(request.quality, Math.min(request.amount, request.endAmount ?? request.amount), request.minDeflection);
+    const capped = cadModifierCappedDeflection(request.quality, loose);
     const meshed = meshTreatedBody(activeCad, [...componentResults], result, loose, capped);
     // The body may have been replaced by fresh copies, meshed with the old angle.
     componentResults.splice(0, componentResults.length, ...meshed.components);

@@ -28,5 +28,15 @@
       "de": "Ein Klick auf den Knopf der Schnittansicht schließt bei offenem Fenster jetzt auch den Schnitt. Das X und Esc blenden nur das Fenster aus, der Schnitt bleibt dann an.",
       "en": "With its window open, a click on the section view button now turns the cut off too. The X and Esc only hide the window and leave the cut on."
     }
+  },
+  {
+    "title": {
+      "de": "Entwürfe mit Chamfillet öffnen viel schneller",
+      "en": "Designs with Chamfillet open much faster"
+    },
+    "body": {
+      "de": "Chamfillet hat seine Körper viel feiner zerlegt als nötig, bis zu dreißigmal mehr Dreiecke als eine gleich große Rundung. Ein Entwurf mit vielen solchen Kanten wurde dadurch riesig und träge. Jetzt ist Chamfillet so fein wie die übrigen Kanten, und ältere Entwürfe werden beim Öffnen von selbst leicht.",
+      "en": "Chamfillet cut its bodies far finer than needed, up to thirty times the triangles of a fillet of the same size, so a design with many such edges got huge and slow. Chamfillet is now as fine as the other edges, and older designs get light by themselves when you open them."
+    }
   }
 ]
