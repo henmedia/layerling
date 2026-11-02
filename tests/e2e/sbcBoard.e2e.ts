@@ -60,9 +60,11 @@ describe("the SBC board as a group", () => {
     const pcb = children[0];
     expect(pcb.name).toBe("Board");
     expect(pcb.color).toBe(board.color);
-    const pcbParts = pcb.groupedShapes ?? [];
+    // A board without mounting holes is the plate itself, a plain box when its corners are square.
+    const pcbParts = pcb.groupedShapes?.length ? pcb.groupedShapes : [pcb];
     expect(pcbParts.filter((part) => part.hole && part.kind === "cylinder")).toHaveLength(board.holes.length);
-    expect(pcbParts.filter((part) => !part.hole && part.kind === "roundedBox")).toHaveLength(1);
+    expect(pcbParts.filter((part) => !part.hole && part.kind === (board.cornerRadius > 0 ? "roundedBox" : "box"))).toHaveLength(1);
+    if (board.holes.length === 0) expect(pcb.groupedShapes ?? []).toEqual([]);
     expect(children.slice(1).map((child) => child.name)).toEqual(solids.map((solid) => solid.name));
     // A socket is a solid Port opening in its outline, everything else a box.
     children.slice(1).forEach((child, index) => {
@@ -80,7 +82,8 @@ describe("the SBC board as a group", () => {
     const extent = sbcBoardExtent(board, 0);
     expect(shape.width).toBeCloseTo(extent.maxX - extent.minX, 3);
     expect(shape.depth).toBeCloseTo(extent.maxY - extent.minY, 3);
-    expect(shape.height).toBeCloseTo(extent.height, 3);
+    // From its lowest point, the card slot under the board (none on the Zero), to its highest; standing on it.
+    expect(shape.height).toBeCloseTo(extent.height - extent.bottom, 3);
     expect(shape.elevation ?? 0).toBeCloseTo(0, 6);
   });
 
@@ -120,7 +123,8 @@ describe("the SBC board as a group", () => {
     const soc = (shape: WorkplaneShape) => shape.groupedShapes!.find((child) => child.name === "SoC")!;
     expect([soc(grown).width, soc(grown).depth, soc(grown).height]).toEqual([soc(plain).width, soc(plain).depth, soc(plain).height]);
     expect(grown.groupedShapes![0].width).toBeCloseTo(plain.groupedShapes![0].width, 6);
-    expect(grown.height).toBeCloseTo(plain.height + 0.4, 3);
+    // 0.4 mm higher on top, and the card slot 0.4 mm deeper under the board.
+    expect(grown.height).toBeCloseTo(plain.height + 0.8, 3);
     // The micro-HDMI keeps its cut lower corners.
     expect(grown.groupedShapes!.find((child) => child.name === "micro-HDMI 0")!.portProfile).toBe("microHdmi");
   });
@@ -185,5 +189,43 @@ describe("the SBC board as a group", () => {
     const wallVolume = 100 * 3 * 20;
     expect(await reachWall(0)).toBeCloseTo(wallVolume - partly, 0);
     expect(await reachWall(3)).toBeCloseTo(wallVolume - through, 0);
+  });
+
+  it("cuts the microSD card's way through the left wall under the board, with the reach", async () => {
+    const cut = async (reach: number) => {
+      const board = await sbcBoardShape({ board: "pi5", clearance: 0, reach }, LIMIT);
+      const extent = sbcBoardExtent(SBC_BOARDS.pi5, 0, reach);
+      const midX = (extent.minX + extent.maxX) / 2;
+      const midY = (extent.minY + extent.maxY) / 2;
+      // A 2 mm wall 1 to 3 mm left of the board, 1 mm high from the bottom: under the board, past the power button.
+      const wall = {
+        id: "wall", name: "wall", kind: "box", color: "#cccccc", x: -2 - midX, z: midY - 28, elevation: 0,
+        size: 40, width: 2, depth: 40, height: 1, rotation: 0,
+      } as unknown as WorkplaneShape;
+      const result = await buildGroupedShapeFromSelection([wall, { ...board, hole: true }], LIMIT);
+      // Nothing to cut: the grouping is refused, as for any hole that misses its body.
+      return result.group ? meshVolume(result.group.importedMesh!.positions) : null;
+    };
+    // Without the reach the slot ends at the board's edge and misses the wall.
+    expect(await cut(0)).toBeNull();
+    // The slot is 11.95 mm wide (22.11 to 34.06 in the model) and stands under the board from the bottom.
+    expect(await cut(3)).toBeCloseTo(2 * 40 * 1 - 2 * 11.95 * 1, 1);
+  });
+
+  it("cuts the GPIO header through a lid when it is asked to open up", async () => {
+    const cut = async (gpioUp: boolean) => {
+      const board = await sbcBoardShape({ board: "pi5", clearance: 0, ...(gpioUp ? { gpioUp } : {}) }, LIMIT);
+      // A 2 mm lid 20 mm over the bottom, above every part (the USB-A housings end at 18.9).
+      const lid = {
+        id: "lid", name: "lid", kind: "box", color: "#cccccc", x: 0, z: 0, elevation: 20,
+        size: 100, width: 100, depth: 70, height: 2, rotation: 0,
+      } as unknown as WorkplaneShape;
+      const result = await buildGroupedShapeFromSelection([lid, { ...board, hole: true }], LIMIT);
+      return result.group ? meshVolume(result.group.importedMesh!.positions) : null;
+    };
+    // Without it nothing reaches the lid.
+    expect(await cut(false)).toBeNull();
+    // The header is 50.8 x 5 mm and now reaches 20 mm over its top (9.88 + 1.42 + 20 = 31.3 from the bottom).
+    expect(await cut(true)).toBeCloseTo(100 * 70 * 2 - 50.8 * 5 * 2, 0);
   });
 });

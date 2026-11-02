@@ -62,7 +62,7 @@ export function sbcBoardOf(shape: WorkplaneShape | null | undefined): SbcBoardSe
 
 /**
  * An SBC board as a new shape, standing on the plate's middle: a group of the board - a rounded
- * plate with its mounting holes cut through - and its parts, each its own colour: a socket in its
+ * plate with its mounting holes cut through, or a plain plate for a board without them - and its parts, each its own colour: a socket in its
  * own front outline, housings with their openings, an audio jack with its collar, pin headers with
  * a dot for every pin, the chips as boxes (`sbcBoardSolids`). Every part is a shape the edge tool
  * and the STEP export build exactly, so the group is an exact body too. The connectors at the edge are grown by the clearance and reach
@@ -71,7 +71,7 @@ export function sbcBoardOf(shape: WorkplaneShape | null | undefined): SbcBoardSe
 export async function sbcBoardShape(input: SbcBoardSettings, triangleLimit: number): Promise<WorkplaneShape> {
   const settings = normalizeSbcBoardSettings(input) ?? { board: DEFAULT_SBC_BOARD, clearance: 0, reach: 0 };
   const board = SBC_BOARDS[settings.board];
-  const solids = sbcBoardSolids(board, settings.clearance, settings.reach);
+  const solids = sbcBoardSolids(board, settings.clearance, settings.reach, settings);
   const extent = sbcSolidsExtent(board, solids);
   // The board's frame laid on the workplane: x across, its front edge (y = 0) towards the viewer at +z,
   // the middle of everything on it at the origin.
@@ -80,27 +80,33 @@ export async function sbcBoardShape(input: SbcBoardSettings, triangleLimit: numb
   const toX = (x: number) => x - midX;
   const toZ = (y: number) => midY - y;
 
-  const plate = makeShapeFromAsset(asset("roundedBox"), { x: toX(board.width / 2), z: toZ(board.depth / 2), elevation: 0 }, {
-    width: board.width,
-    depth: board.depth,
-    height: board.thickness,
-    cornerFillet: board.cornerRadius,
-    topBottomFillet: 0,
-  });
+  // Square corners (the ESP32 boards) make a plain box.
+  const plateAt = { x: toX(board.width / 2), z: toZ(board.depth / 2), elevation: 0 };
+  const plateSize = { width: board.width, depth: board.depth, height: board.thickness };
+  const plate = board.cornerRadius > 0
+    ? makeShapeFromAsset(asset("roundedBox"), plateAt, { ...plateSize, cornerFillet: board.cornerRadius, topBottomFillet: 0 })
+    : makeShapeFromAsset(asset("box"), plateAt, plateSize);
   const holes = board.holes.map(([hx, hy]) => makeShapeFromAsset(asset("cylinder"), { x: toX(hx), z: toZ(hy), elevation: -HOLE_OVERSHOOT }, {
     width: board.holeDiameter,
     depth: board.holeDiameter,
     height: board.thickness + 2 * HOLE_OVERSHOOT,
   })).map((hole) => ({ ...hole, hole: true }));
-  const drilled = await buildGroupedShapeFromSelection([{ ...plate, color: board.color }, ...holes], triangleLimit);
-  if (!drilled.group) throw new Error(drilled.failureNotice || t("sbcBoard.failed"));
-  const pcb = canonicalizeShape({ ...drilled.group, id: createLocalId("sbc-pcb"), name: "Board", color: board.color, groupOperation: "group" });
+  // A board without mounting holes (the ESP32 boards) is the plate itself; there is nothing to cut.
+  let pcb: WorkplaneShape;
+  if (holes.length > 0) {
+    const drilled = await buildGroupedShapeFromSelection([{ ...plate, color: board.color }, ...holes], triangleLimit);
+    if (!drilled.group) throw new Error(drilled.failureNotice || t("sbcBoard.failed"));
+    pcb = canonicalizeShape({ ...drilled.group, id: createLocalId("sbc-pcb"), name: "Board", color: board.color, groupOperation: "group" });
+  } else {
+    pcb = canonicalizeShape({ ...plate, id: createLocalId("sbc-pcb"), name: "Board", color: board.color });
+  }
 
   const parts = solids.map((solid) => canonicalizeShape({ ...partShape(solid, toX, toZ), id: createLocalId("sbc-part"), name: solid.name, color: PART_COLORS[solid.role] }));
 
   const group = groupedShape([pcb, ...parts]);
   if (!group) throw new Error(t("sbcBoard.failed"));
-  return canonicalizeShape({ ...group, id: createLocalId("sbc-board"), name: board.name, color: board.color, groupOperation: "group", sbcBoard: settings });
+  // Standing on its lowest point: the board's underside, or the card slot under it.
+  return canonicalizeShape({ ...group, id: createLocalId("sbc-board"), name: board.name, color: board.color, groupOperation: "group", sbcBoard: settings, elevation: 0 });
 }
 
 /**
