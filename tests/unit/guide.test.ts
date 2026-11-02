@@ -190,7 +190,7 @@ describe("guide content", () => {
     // one (interface keys, pictures) stay the same in a translation: a section
     // put in the wrong place, or two of them the other way round, shows up here.
     const names = (text: string) =>
-      [...text.matchAll(/\{\{ui:[^}]+\}\}|\[\[[^\]]+\]\]|\(shot:[\w-]+\)/g)].map((match) => match[0].toLowerCase());
+      [...text.matchAll(/\{\{ui:[^}]+\}\}|\[\[[^\]]+\]\]|\((?:shot|still):[\w-]+\)/g)].map((match) => match[0].toLowerCase());
     const sectionsOf = (body: string) =>
       body
         .split(/\r?\n(?=## )/)
@@ -227,7 +227,7 @@ describe("guide content", () => {
     const shots = async (language: (typeof LANGUAGES)[number]) => {
       const names = new Set<string>();
       for (const chapter of await readChapters(language)) {
-        for (const match of chapter.body.matchAll(/\(shot:([\w-]+)\)/g)) names.add(match[1]);
+        for (const match of chapter.body.matchAll(/\((?:shot|still):([\w-]+)\)/g)) names.add(match[1]);
       }
       return [...names].sort();
     };

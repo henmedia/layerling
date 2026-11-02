@@ -9,6 +9,34 @@ Broen mellem AI-klient og editor kører **lokalt på din computer**. Husk dog: h
 
 > **Vigtigt:** MCP-broen findes i udviklingsserveren som du selv starter på din computer. På layerling.com og i installationer med statisk hosting er den slået fra. En kopi du selv hoster, såsom Docker-imaget på en NAS, kan slå den til med et adgangstoken; se "En kopi på en NAS eller server" nedenunder.
 
+## Trin for trin for begyndere
+
+Du behøver ikke at kunne programmere for at gøre det.
+
+**Den korteste vej:** giv din foretrukne AI adressen på projektet, `https://github.com/henmedia/layerling`, og bed den: "Sæt layerling op på min computer, så jeg kan bygge 3D-modeller med dig gennem dens MCP-server." Den henter og installerer selv det hele og siger til, når den er færdig. Det virker med en AI, der kan arbejde på din computer, for eksempel fanen Code i Claude-appen, Codex, Antigravity eller Gemini CLI. En chat i browseren kan ikke gøre det, fordi den ikke kan installere noget på din computer.
+
+**Eller gør det selv, på Windows med Claude-appen, i fem trin:**
+
+**1. Installer layerling.** Åbn startmenuen, skriv `PowerShell` og åbn Windows PowerShell. Kopiér denne linje, indsæt den i vinduet med et højreklik og tryk Enter:
+
+```powershell
+irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-quickstart.ps1 | iex
+```
+
+Den installerer det, layerling har brug for, henter layerling ned i mappen `layerling` i din brugermappe (`C:\Users\<dit navn>\layerling`) og åbner det i din browser. Første gang tager det et par minutter.
+
+![Windows PowerShell med linjen indsat. Tryk Enter, så går det i gang.](still:ai-quickstart-powershell)
+
+**2. Lad layerling køre.** layerling kører, så længe PowerShell-vinduet er åbent, og AI'en kan kun bygge, mens det kører. Næste gang dobbeltklikker du i stedet på "Start layerling" på skrivebordet.
+
+**3. Installer Claude-appen.** Installer Claude-appen til Windows og log ind. Fanen Code fra næste trin hører til de betalte Claude-abonnementer.
+
+**4. Åbn layerling-mappen i fanen Code.** Skift øverst i Claude-appen til Code, og vælg mappen `layerling` i din brugermappe som den mappe, der skal arbejdes i. layerling har allerede alt med, som Claude skal bruge for at finde sine værktøjer. Spørger Claude, om den må bruge MCP-serveren "layerling" i denne mappe, så tillad det.
+
+**5. Fortæl Claude, hvad den skal bygge.** For eksempel: "Brug layerling-værktøjerne og byg en rund dåse til mig, 60 mm i diameter og 40 mm høj, med en væg på 2,5 mm." Er der ingen editor åben, åbner Claude en i din browser, bygger dåsen der trin for trin og tager billeder for at tjekke sit arbejde. Du kigger med og kan selv ændre hvad som helst når som helst.
+
+> **Tip:** Hvis noget ikke virker, så fortæl Claude, hvad du ser. Den kan læse fejlen og retter den som regel selv. Sker der ikke noget i editoren, så tjek først, at layerling stadig kører (trin 2).
+
 ## Opsætning
 
 1. Hent layerling fra [GitHub](https://github.com/henmedia/layerling) og start det i projektmappen med `npm run dev`. Node.js skal være installeret. På Windows tager hurtigstart-linjen i README sig af det.

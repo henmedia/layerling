@@ -9,6 +9,34 @@ Most med odjemalcem z umetno inteligenco in urejevalnikom teče **lokalno na tvo
 
 > **Pomembno:** Most MCP je v razvojnem strežniku, ki ga sam zaženeš na svojem računalniku. Na layerling.com in v namestitvah s statičnim gostovanjem je izklopljen. Kopija, ki jo upravljaš sam, na primer slika Docker na NAS, ga lahko vklopi z dostopnim ključem; glej »Kopija na NAS ali strežniku« spodaj.
 
+## Korak za korakom za začetnike
+
+Za to ti ni treba znati programirati.
+
+**Najkrajša pot:** svoji najljubši umetni inteligenci daj naslov projekta, `https://github.com/henmedia/layerling`, in jo prosi: »Namesti layerling na moj računalnik, da bom lahko s tabo prek njegovega strežnika MCP gradil 3D-modele.« Vse sama prenese in namesti ter ti pove, ko je končala. To deluje z umetno inteligenco, ki lahko dela na tvojem računalniku, na primer z zavihkom Code v aplikaciji Claude, s Codexom, Antigravity ali Gemini CLI. Klepet v brskalniku tega ne zmore, ker na tvoj računalnik ne more ničesar namestiti.
+
+**Ali pa to narediš sam, v sistemu Windows z aplikacijo Claude, v petih korakih:**
+
+**1. Namesti layerling.** Odpri meni Start, vtipkaj `PowerShell` in odpri Windows PowerShell. Kopiraj to vrstico, jo z desnim klikom prilepi v okno in pritisni Enter:
+
+```powershell
+irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-quickstart.ps1 | iex
+```
+
+Namesti, kar layerling potrebuje, prenese layerling v mapo `layerling` v tvoji uporabniški mapi (`C:\Users\<tvoje ime>\layerling`) in ga odpre v brskalniku. Prvič to traja nekaj minut.
+
+![Windows PowerShell s prilepljeno vrstico. Pritisni Enter in začne se.](still:ai-quickstart-powershell)
+
+**2. Pusti layerling teči.** layerling teče, dokler je okno PowerShell odprto, in umetna inteligenca lahko gradi samo, ko teče. Naslednjič namesto tega dvakrat klikni »Start layerling« na namizju.
+
+**3. Namesti aplikacijo Claude.** Namesti aplikacijo Claude za Windows in se prijavi. Zavihek Code iz naslednjega koraka je del plačljivih paketov Claude.
+
+**4. Odpri mapo layerling v zavihku Code.** V aplikaciji Claude zgoraj preklopi na Code in kot delovno mapo izberi mapo `layerling` v svoji uporabniški mapi. layerling že prinaša vse, kar Claude potrebuje, da najde njegova orodja. Če Claude vpraša, ali sme uporabljati strežnik MCP »layerling« iz te mape, mu to dovoli.
+
+**5. Povej Claudu, kaj naj zgradi.** Na primer: »Uporabi orodja layerling in mi zgradi okroglo škatlo s premerom 60 mm in višino 40 mm, s steno 2,5 mm.« Če noben urejevalnik ni odprt, ga Claude odpre v tvojem brskalniku, tam korak za korakom zgradi škatlo in dela slike, da preveri svoje delo. Ti gledaš in lahko kadar koli sam kaj spremeniš.
+
+> **Namig:** Če kaj ne deluje, povej Claudu, kaj vidiš. Napako zna prebrati in jo večinoma odpravi sam. Če se v urejevalniku nič ne zgodi, najprej preveri, ali layerling še teče (korak 2).
+
 ## Nastavitev
 
 1. Prenesi layerling z [GitHuba](https://github.com/henmedia/layerling) in ga v mapi projekta zaženi z `npm run dev`. Nameščen mora biti Node.js. V Windowsih to opravi hitra vrstica za začetek v README.

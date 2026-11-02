@@ -9,6 +9,34 @@ Most mezi AI klientem a editorem běží **lokálně na vašem počítači**. Co
 
 > **Důležité:** MCP je dostupné ve vývojovém serveru, který si spustíte sami. Na layerling.com a statickém hostingu je vypnuté. Vlastní server, například Docker na NASu, jej může zpřístupnit s přístupovým tokenem; viz část o instalaci na NASu níže.
 
+## Krok za krokem pro začátečníky
+
+Nemusíte k tomu umět programovat.
+
+**Nejkratší cesta:** dejte své oblíbené AI adresu projektu, `https://github.com/henmedia/layerling`, a požádejte ji: „Nastav layerling na mém počítači, abych s tebou mohl přes jeho MCP server stavět 3D modely.“ AI vše sama stáhne a nainstaluje a řekne vám, až bude hotová. Funguje to s AI, která umí pracovat na vašem počítači, například záložka Code v aplikaci Claude, Codex, Antigravity nebo Gemini CLI. Chat v prohlížeči to nezvládne, protože na váš počítač nic nainstaluje.
+
+**Nebo to udělejte sami, ve Windows s aplikací Claude, v pěti krocích:**
+
+**1. Nainstalujte layerling.** Otevřete nabídku Start, napište `PowerShell` a otevřete Windows PowerShell. Zkopírujte tento řádek, vložte ho do okna pravým tlačítkem myši a stiskněte Enter:
+
+```powershell
+irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-quickstart.ps1 | iex
+```
+
+Nainstaluje, co layerling potřebuje, stáhne layerling do složky `layerling` ve vaší uživatelské složce (`C:\Users\<vaše jméno>\layerling`) a otevře ho v prohlížeči. Poprvé to trvá několik minut.
+
+![Windows PowerShell s vloženým řádkem. Stiskněte Enter a začne to.](still:ai-quickstart-powershell)
+
+**2. Nechte layerling běžet.** layerling běží, dokud je okno PowerShellu otevřené, a AI může stavět jen tehdy, když běží. Příště místo toho poklepejte na „Start layerling“ na ploše.
+
+**3. Nainstalujte aplikaci Claude.** Nainstalujte aplikaci Claude pro Windows a přihlaste se. Záložka Code z dalšího kroku je součástí placených tarifů Claude.
+
+**4. Otevřete složku layerling v záložce Code.** V aplikaci Claude se nahoře přepněte na Code a jako pracovní složku zvolte složku `layerling` ve své uživatelské složce. layerling už obsahuje vše, co Claude potřebuje, aby našel jeho nástroje. Pokud se Claude zeptá, zda smí použít MCP server „layerling“ z této složky, povolte to.
+
+**5. Řekněte Claudovi, co má postavit.** Například: „Použij nástroje layerlingu a postav mi kulatou krabičku o průměru 60 mm a výšce 40 mm se stěnou 2,5 mm.“ Pokud není otevřený žádný editor, Claude ho otevře ve vašem prohlížeči, postaví tam krabičku krok za krokem a pořizuje snímky, aby svou práci zkontroloval. Vy se díváte a kdykoli můžete sami něco změnit.
+
+> **Tip:** Když něco nefunguje, řekněte Claudovi, co vidíte. Umí chybu přečíst a většinou ji sám opraví. Pokud se v editoru nic neděje, nejdřív zkontrolujte, zda layerling stále běží (krok 2).
+
 ## Nastavení
 
 1. Stáhněte Layerling z [GitHubu](https://github.com/henmedia/layerling) a ve složce projektu spusťte `npm run dev`. Je potřeba Node.js. Ve Windows jeho instalaci zajistí příkaz pro rychlé spuštění z README.

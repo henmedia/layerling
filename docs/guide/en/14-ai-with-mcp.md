@@ -9,6 +9,34 @@ The bridge between AI client and editor runs **locally on your computer**. Keep 
 
 > **Important:** The MCP bridge exists in the development server that you start yourself on your computer. On layerling.com and in installations with static hosting it is switched off. A copy you host yourself, such as the Docker image on a NAS, can switch it on with an access token; see "A copy on a NAS or server" below.
 
+## Step by step for beginners
+
+You do not need to know anything about programming for this.
+
+**The shortest way:** give your favourite AI the address of the project, `https://github.com/henmedia/layerling`, and ask it: "Set up layerling on my computer so that I can build 3D models with you through its MCP server." It downloads and installs everything itself and tells you when it is done. This works with an AI that can work on your computer, such as the Code tab of the Claude app, Codex, Antigravity or Gemini CLI. A chat in the browser cannot do it, because it cannot install anything on your computer.
+
+**Or do it yourself, on Windows with the Claude app, in five steps:**
+
+**1. Install layerling.** Open the Start menu, type `PowerShell` and open Windows PowerShell. Copy this line, paste it into the window with a right-click and press Enter:
+
+```powershell
+irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-quickstart.ps1 | iex
+```
+
+It installs what layerling needs, downloads layerling into the folder `layerling` in your user folder (`C:\Users\<your name>\layerling`) and opens it in your browser. The first time this takes a few minutes.
+
+![Windows PowerShell with the line pasted in. Press Enter, and it starts.](still:ai-quickstart-powershell)
+
+**2. Keep layerling running.** layerling runs as long as the PowerShell window stays open, and the AI can only build while it runs. Next time, double-click "Start layerling" on your desktop instead.
+
+**3. Install the Claude app.** Install the Claude app for Windows and sign in. The Code tab used in the next step is part of the paid Claude plans.
+
+**4. Open the layerling folder in the Code tab.** In the Claude app, switch to Code at the top and choose the folder `layerling` in your user folder as the folder to work in. layerling already brings everything Claude needs to find its tools. If Claude asks whether it may use the MCP server "layerling" of this folder, allow it.
+
+**5. Tell Claude what to build.** For example: "Use the layerling tools and build me a round box, 60 mm across and 40 mm high, with a 2.5 mm wall." If no editor is open, Claude opens one in your browser, builds the box there step by step and takes pictures to check its work. You watch and can change anything yourself at any time.
+
+> **Tip:** If something does not work, tell Claude what you see. It can read the error and usually fixes it itself. If nothing happens in the editor, check first that layerling is still running (step 2).
+
 ## Setting up
 
 1. Get layerling from [GitHub](https://github.com/henmedia/layerling) and start it in the project folder with `npm run dev`. Node.js must be installed. On Windows the quick-start line in the README takes care of that.

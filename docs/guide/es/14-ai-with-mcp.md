@@ -9,6 +9,34 @@ El puente entre el cliente de IA y el editor funciona **en local, en tu ordenado
 
 > **Importante:** El puente MCP existe en el servidor de desarrollo que arrancas tú mismo en tu ordenador. En layerling.com y en las instalaciones con alojamiento estático está desactivado. Una copia que alojes tú, como la imagen de Docker en un NAS, puede activarlo con un token de acceso; consulta «Una copia en un NAS o un servidor», más abajo.
 
+## Paso a paso para principiantes
+
+No necesitas saber nada de programación para esto.
+
+**El camino más corto:** dale a tu IA favorita la dirección del proyecto, `https://github.com/henmedia/layerling`, y pídele: «Instala layerling en mi ordenador para que pueda construir modelos 3D contigo a través de su servidor MCP». Descarga e instala todo ella sola y te avisa cuando termina. Funciona con una IA que puede trabajar en tu ordenador, como la pestaña Code de la app de Claude, Codex, Antigravity o Gemini CLI. Un chat en el navegador no puede hacerlo, porque no puede instalar nada en tu ordenador.
+
+**O hazlo tú mismo, en Windows con la app de Claude, en cinco pasos:**
+
+**1. Instala layerling.** Abre el menú Inicio, escribe `PowerShell` y abre Windows PowerShell. Copia esta línea, pégala en la ventana con un clic derecho y pulsa Intro:
+
+```powershell
+irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-quickstart.ps1 | iex
+```
+
+Instala lo que layerling necesita, descarga layerling en la carpeta `layerling` de tu carpeta de usuario (`C:\Users\<tu nombre>\layerling`) y lo abre en tu navegador. La primera vez tarda unos minutos.
+
+![Windows PowerShell con la línea pegada. Pulsa Intro y empieza.](still:ai-quickstart-powershell)
+
+**2. Deja layerling en marcha.** layerling funciona mientras la ventana de PowerShell siga abierta, y la IA solo puede construir mientras funciona. La próxima vez, haz doble clic en «Start layerling» en tu escritorio.
+
+**3. Instala la app de Claude.** Instala la app de Claude para Windows e inicia sesión. La pestaña Code del siguiente paso forma parte de los planes de pago de Claude.
+
+**4. Abre la carpeta layerling en la pestaña Code.** En la app de Claude, cambia arriba a Code y elige la carpeta `layerling` de tu carpeta de usuario como carpeta de trabajo. layerling ya trae todo lo que Claude necesita para encontrar sus herramientas. Si Claude pregunta si puede usar el servidor MCP «layerling» de esta carpeta, permíteselo.
+
+**5. Dile a Claude qué construir.** Por ejemplo: «Usa las herramientas de layerling y constrúyeme una caja redonda de 60 mm de diámetro y 40 mm de alto, con una pared de 2,5 mm». Si no hay ningún editor abierto, Claude abre uno en tu navegador, construye allí la caja paso a paso y hace capturas para comprobar su trabajo. Tú miras y puedes cambiar cualquier cosa en cualquier momento.
+
+> **Consejo:** Si algo no funciona, dile a Claude lo que ves. Puede leer el error y normalmente lo arregla solo. Si no pasa nada en el editor, comprueba primero que layerling sigue en marcha (paso 2).
+
 ## Configuración
 
 1. Descarga layerling de [GitHub](https://github.com/henmedia/layerling) y arráncalo en la carpeta del proyecto con `npm run dev`. Necesitas tener instalado Node.js. En Windows, de eso se encarga la línea de inicio rápido del README.

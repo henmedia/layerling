@@ -9,6 +9,34 @@ Az MI-kliens és a szerkesztő közötti híd **helyben, a számítógépeden** 
 
 > **Fontos:** Az MCP-híd abban a fejlesztői szerverben létezik, amelyet magad indítasz el a számítógépeden. A layerling.com-on és a statikus tárhelyű telepítésekben ki van kapcsolva. Egy magad üzemeltetett példány, például a NAS-on futó Docker-image, hozzáférési tokennel bekapcsolhatja; lásd lent az „Egy példány NAS-on vagy szerveren” részt.
 
+## Lépésről lépésre kezdőknek
+
+Ehhez semmit nem kell tudnod a programozásról.
+
+**A legrövidebb út:** add meg kedvenc MI-dnek a projekt címét, `https://github.com/henmedia/layerling`, és kérd meg: „Állítsd be a layerlinget a számítógépemen, hogy az MCP-szerverén keresztül 3D-modelleket építhessek veled.” Mindent maga tölt le és telepít, és szól, ha kész. Ez olyan MI-vel működik, amely a számítógépeden tud dolgozni, például a Claude alkalmazás Code lapjával, a Codexszel, az Antigravityvel vagy a Gemini CLI-vel. Egy böngészőbeli chat erre nem képes, mert nem tud semmit telepíteni a számítógépedre.
+
+**Vagy csináld magad, Windowson a Claude alkalmazással, öt lépésben:**
+
+**1. Telepítsd a layerlinget.** Nyisd meg a Start menüt, írd be: `PowerShell`, és nyisd meg a Windows PowerShellt. Másold ki ezt a sort, illeszd be az ablakba jobb kattintással, és nyomj Entert:
+
+```powershell
+irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-quickstart.ps1 | iex
+```
+
+Telepíti, amire a layerlingnek szüksége van, letölti a layerlinget a felhasználói mappádban lévő `layerling` mappába (`C:\Users\<a neved>\layerling`), és megnyitja a böngésződben. Első alkalommal ez néhány percig tart.
+
+![Windows PowerShell a beillesztett sorral. Nyomj Entert, és indul.](still:ai-quickstart-powershell)
+
+**2. Hagyd futni a layerlinget.** A layerling addig fut, amíg a PowerShell-ablak nyitva van, és az MI csak akkor tud építeni, amikor fut. Legközelebb inkább kattints duplán az asztalon a „Start layerling” ikonra.
+
+**3. Telepítsd a Claude alkalmazást.** Telepítsd a Claude alkalmazást Windowsra, és jelentkezz be. A következő lépés Code lapja a Claude fizetős csomagjainak része.
+
+**4. Nyisd meg a layerling mappát a Code lapon.** A Claude alkalmazásban válts fent a Code lapra, és munkamappaként válaszd a felhasználói mappádban lévő `layerling` mappát. A layerling már mindent hoz, amire a Claude-nak szüksége van az eszközei megtalálásához. Ha a Claude megkérdezi, használhatja-e ennek a mappának a „layerling” MCP-szerverét, engedélyezd.
+
+**5. Mondd meg a Claude-nak, mit építsen.** Például: „Használd a layerling eszközeit, és építs nekem egy kerek dobozt, 60 mm átmérővel és 40 mm magasan, 2,5 mm-es fallal.” Ha nincs nyitva szerkesztő, a Claude megnyit egyet a böngésződben, ott lépésről lépésre megépíti a dobozt, és képeket készít, hogy ellenőrizze a munkáját. Te nézed, és bármikor magad is módosíthatsz bármit.
+
+> **Tipp:** Ha valami nem működik, mondd el a Claude-nak, mit látsz. El tudja olvasni a hibát, és többnyire maga kijavítja. Ha a szerkesztőben semmi sem történik, először nézd meg, fut-e még a layerling (2. lépés).
+
 ## Beállítás
 
 1. Töltsd le a layerlinget a [GitHubról](https://github.com/henmedia/layerling), és indítsd el a projekt mappájában az `npm run dev` paranccsal. Ehhez telepítve kell lennie a Node.js-nek. Windowson a README gyorsindító sora ezt elintézi.

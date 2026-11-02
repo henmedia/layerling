@@ -217,7 +217,9 @@ function renderTable(rows, context) {
 
 /**
  * Block level. Understands headings, paragraphs, lists, block quotes (used for
- * tips), tables, fenced code, rules and pictures written as ![text](shot:name).
+ * tips), tables, fenced code, rules and pictures written as ![text](shot:name),
+ * or ![text](still:name) for one taken by hand that no scene retakes (a window
+ * outside layerling, say).
  * Returns the HTML and the h2 headings for the page's own table of contents.
  */
 /** The ids the headings of a chapter get, in order: what slugify makes of each, outside code blocks. */
@@ -284,7 +286,7 @@ export function renderBlocks(markdown, context) {
   let index = 0;
   // Counted across the tips rendered inside this chapter as well, as headingIds counts them.
   context.headingCount ??= { value: 0 };
-  const startsBlock = (line) => /^(#{1,3} |> ?|\s*[-*] |\s*\d+\. |```|---+$|\|)/.test(line) || /^!\[[^\]]*\]\(shot:/.test(line);
+  const startsBlock = (line) => /^(#{1,3} |> ?|\s*[-*] |\s*\d+\. |```|---+$|\|)/.test(line) || /^!\[[^\]]*\]\((?:shot|still):/.test(line);
 
   while (index < lines.length) {
     const line = lines[index];
@@ -320,7 +322,7 @@ export function renderBlocks(markdown, context) {
       continue;
     }
 
-    const picture = /^!\[([^\]]*)\]\(shot:([\w-]+)\)\s*$/.exec(line);
+    const picture = /^!\[([^\]]*)\]\((?:shot|still):([\w-]+)\)\s*$/.exec(line);
     if (picture) {
       const [, alt, name] = picture;
       context.references?.shots.add(name);

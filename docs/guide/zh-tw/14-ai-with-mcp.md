@@ -9,6 +9,34 @@ AI 用戶端與編輯器之間的橋接**在你自己的電腦上本機執行**�
 
 > **重要：** MCP 橋接只存在於你在自己電腦上啟動的開發伺服器。在 layerling.com 以及採用靜態主機代管的安裝中，它是關閉的。自行架設的副本（例如 NAS 上的 Docker 映像檔）可以用存取權杖開啟；參見下文「NAS 或伺服器上的副本」。
 
+## 新手逐步指南
+
+你不需要懂任何程式設計。
+
+**最簡單的方法：**把專案網址 `https://github.com/henmedia/layerling` 交給你喜歡的 AI，並請它：「在我的電腦上設定好 layerling，讓我能透過它的 MCP 伺服器和你一起建立 3D 模型。」它會自己下載並安裝所有東西，完成後告訴你。這需要一個能在你電腦上工作的 AI，例如 Claude 應用程式的 Code 分頁、Codex、Antigravity 或 Gemini CLI。瀏覽器裡的聊天做不到，因為它無法在你的電腦上安裝任何東西。
+
+**或者自己動手，在 Windows 上使用 Claude 應用程式，分五步：**
+
+**1. 安裝 layerling。**開啟開始功能表，輸入 `PowerShell`，然後開啟 Windows PowerShell。複製下面這一行，在視窗中按右鍵貼上，然後按 Enter：
+
+```powershell
+irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-quickstart.ps1 | iex
+```
+
+它會安裝 layerling 所需的一切，把 layerling 下載到你使用者資料夾中的 `layerling` 資料夾（`C:\Users\<你的使用者名稱>\layerling`），並在瀏覽器中開啟。第一次需要幾分鐘。
+
+![已貼上這一行的 Windows PowerShell。按 Enter 就開始了。](still:ai-quickstart-powershell)
+
+**2. 讓 layerling 保持執行。**只要 PowerShell 視窗開著，layerling 就在執行，而 AI 只能在它執行時建立模型。下次改為按兩下桌面上的「Start layerling」。
+
+**3. 安裝 Claude 應用程式。**安裝 Windows 版 Claude 應用程式並登入。下一步用到的 Code 分頁屬於 Claude 的付費方案。
+
+**4. 在 Code 分頁中開啟 layerling 資料夾。**在 Claude 應用程式上方切換到 Code，選擇你使用者資料夾中的 `layerling` 資料夾作為工作資料夾。layerling 已內建 Claude 找到其工具所需的一切。如果 Claude 詢問是否可以使用此資料夾的 MCP 伺服器「layerling」，請允許。
+
+**5. 告訴 Claude 要建立什麼。**例如：「使用 layerling 工具，幫我建立一個直徑 60 mm、高 40 mm、壁厚 2.5 mm 的圓盒。」如果沒有開啟編輯器，Claude 會在你的瀏覽器中開啟一個，在其中一步步建立盒子，並拍圖檢查自己的工作。你在一旁觀看，隨時可以自己修改任何內容。
+
+> **提示：**如果有什麼不正常，把你看到的情況告訴 Claude。它能讀取錯誤，通常會自己修復。如果編輯器裡沒有任何動靜，先檢查 layerling 是否仍在執行（第 2 步）。
+
 ## 設定
 
 1. 從 [GitHub](https://github.com/henmedia/layerling) 取得 layerling，並在專案資料夾中以 `npm run dev` 啟動。必須安裝 Node.js。在 Windows 上，README 中的快速開始指令會幫你處理。
