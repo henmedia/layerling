@@ -1,4 +1,5 @@
-import { cadModifierBaseDeflection, cadModifierCappedDeflection, SKETCH_CAD_DEFLECTION } from "@/lib/cadModifierRuntime";
+import { cadModifierBaseDeflection, cadModifierCappedDeflection } from "@/lib/cadModifierRuntime";
+import { sketchCadDeflection } from "@/lib/sketchCadDeflection";
 import type { CadModifierDeflection } from "@/lib/cadModifierTypes";
 import type { EditorHistoryEntry } from "@/lib/editorHistory";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -46,7 +47,7 @@ export function relievedCadDeflection(shape: WorkplaneShape): CadModifierDeflect
     if (kind === "fillet" || kind === "chamfer" || kind === "chamfillet") fold(cadModifierBaseDeflection("standard", Math.min(amount, endAmount ?? amount)));
     fold(entry.before.cadMeshDeflection);
   });
-  if (shape.sketchProfile) fold(SKETCH_CAD_DEFLECTION);
+  if (shape.sketchProfile) fold(sketchCadDeflection(shape.sketchProfile));
   if (!Number.isFinite(linear)) return cadModifierBaseDeflection("standard", 1);
   return { linear, angular };
 }
