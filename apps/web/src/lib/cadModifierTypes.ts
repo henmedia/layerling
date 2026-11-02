@@ -466,10 +466,10 @@ export type CadModifierWorkerRequest =
       chamferAngle: number;
       // Only for "fillet" of one edge (#687): the radius at the edge's end, `amount` the one at its start.
       endAmount?: number;
-      // Only for "shell": which faces stay open; `amount` is the wall thickness.
-      shellOpenings?: ShellOpenings;
       // Only for "fillet" (#1160): a scoop cut out of the edge instead of a rounding, `amount` the radius.
       concave?: boolean;
+      // Only for "shell": which faces stay open; `amount` is the wall thickness.
+      shellOpenings?: ShellOpenings;
       shellEdges?: ShellEdges;
       // Only for "offset" (#919): `amount` is the distance, moved inward when this is set.
       offsetShrink?: boolean;

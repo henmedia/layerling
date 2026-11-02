@@ -7387,6 +7387,7 @@ export function LayerlingEditor({
       quality,
       chamferAngle,
       ...(endAmount !== undefined ? { endAmount } : {}),
+      ...(concave ? { concave } : {}),
       minDeflection: shape.cadMeshDeflection,
     }, [], 30000);
     if (previewResponse.type !== "preview") {
@@ -7398,7 +7399,6 @@ export function LayerlingEditor({
     }
     const preview = canonicalizeShape({
       ...rawPreview,
-      ...(concave ? { concave } : {}),
       cadDisplayEdges: cadDisplayEdgesForShape(rawPreview, previewResponse.displayEdges),
       cadDisplayEdgesVersion: 2 as const,
     });
@@ -7409,6 +7409,7 @@ export function LayerlingEditor({
       edgeIds: [...selectedEdgeIds],
       ...(kind === "chamfer" || kind === "chamfillet" ? { chamferAngle } : {}),
       ...(endAmount !== undefined ? { endAmount } : {}),
+      ...(concave ? { concave } : {}),
     } satisfies NonNullable<WorkplaneShape["edgeTreatments"]>[number];
     const session: EdgeModifierSession = {
       kind,
@@ -7418,9 +7419,9 @@ export function LayerlingEditor({
       sharpAngle,
       chamferAngle,
       endAmount: endAmount ?? null,
+      concave,
       quality,
       tangentChain: false,
-      ...(concave ? { concave } : {}),
       preserveEdgeSize,
       busy: false,
       prepared: true,
@@ -7430,7 +7431,6 @@ export function LayerlingEditor({
     };
     const createdAt = Date.now();
     const groupedModifiedShape = groupedShapeWithComponentEdgeTreatment(shape, preview, sourceParts, session, feature, createdAt);
-      concave,
     const modifiedShape = groupedModifiedShape ?? shapeWithEdgeTreatmentRecord(
       bakedEdgeTreatmentPreview(preview, shape),
       shape,
@@ -7487,6 +7487,7 @@ export function LayerlingEditor({
       preserveEdgeSize: true,
       ...(feature.chamferAngle !== undefined ? { chamferAngle: feature.chamferAngle } : {}),
       ...(feature.endAmount !== undefined ? { endAmount: feature.endAmount } : {}),
+      ...(feature.concave ? { concave: true } : {}),
     }, (modified) => { laid = modified; });
     if (!laid) throw new Error("The edge treatment returned nothing");
     return laid as WorkplaneShape;
@@ -7498,7 +7499,6 @@ export function LayerlingEditor({
    * BREP, und der Eintrag im Verlauf haelt den Zustand davor fest - so laesst
    * sich die Aushoehlung spaeter wieder entfernen wie jede Kantenbehandlung.
    * "Groesse beibehalten" ist fest an: die Wandstaerke soll beim Skalieren
-      ...(feature.concave ? { concave: true } : {}),
    * bleiben, was sie ist.
    */
   // `watched` is the body in the scene the result replaces; it is the shape
@@ -8187,6 +8187,7 @@ export function LayerlingEditor({
       edgeIds: [...edgeModifier.selectedEdgeIds],
       ...(edgeModifier.kind === "chamfer" || edgeModifier.kind === "chamfillet" ? { chamferAngle: edgeModifier.chamferAngle } : {}),
       ...(edgeModifier.kind === "fillet" && edgeModifier.endAmount != null ? { endAmount: edgeModifier.endAmount } : {}),
+      ...(edgeModifier.kind === "fillet" && edgeModifier.concave ? { concave: true } : {}),
     } satisfies NonNullable<WorkplaneShape["edgeTreatments"]>[number];
     const createdAt = Date.now();
     const previewShape = canonicalizeShape({
@@ -8198,7 +8199,6 @@ export function LayerlingEditor({
     });
     const groupedModifiedShape = groupedShapeWithComponentEdgeTreatment(
       base,
-      ...(edgeModifier.kind === "fillet" && edgeModifier.concave ? { concave: true } : {}),
       previewShape,
       cadModifierSourcePartsRef.current,
       edgeModifier,
@@ -8306,6 +8306,7 @@ export function LayerlingEditor({
         quality: edgeModifier.quality,
         chamferAngle: edgeModifier.chamferAngle,
         ...(edgeModifier.kind === "fillet" && edgeModifier.endAmount != null ? { endAmount: edgeModifier.endAmount } : {}),
+        ...(edgeModifier.kind === "fillet" && edgeModifier.concave ? { concave: true } : {}),
         minDeflection: cadModifierBaseShapeRef.current?.cadMeshDeflection,
         ...(addedEdgeIds.length ? { addedEdgeIds } : {}),
       });
@@ -8317,7 +8318,6 @@ export function LayerlingEditor({
     if (!hasSelection) {
       setNotice(t("status.selectShapeFirst"));
       return;
-        ...(edgeModifier.kind === "fillet" && edgeModifier.concave ? { concave: true } : {}),
     }
     if (refuseLockedSelection()) return;
     const selected = new Set(selectedIds);
@@ -15774,6 +15774,12 @@ export function LayerlingEditor({
             return amount === current.amount ? current : { ...current, amount, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
           })}
           endAmount={edgeModifier.endAmount ?? null}
+          concave={edgeModifier.concave === true}
+          onConcaveChange={(value) => setEdgeModifier((current) => {
+            if (!current?.prepared || (current.concave === true) === value) return current;
+            // A scoop has one radius: the variable one goes out with it.
+            return { ...current, concave: value, endAmount: value ? null : current.endAmount, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
+          })}
           // Switching it on starts the end at twice the start, so the change shows at once (#687).
           onEndAmountChange={(value) => setEdgeModifier((current) => {
             if (!current?.prepared) return current;
@@ -15788,12 +15794,6 @@ export function LayerlingEditor({
             if (!current?.prepared) return current;
             const chamferAngle = Math.max(current.kind === "chamfillet" ? 15 : 5, Math.min(current.kind === "chamfillet" ? 75 : 85, value));
             return chamferAngle === current.chamferAngle ? current : { ...current, chamferAngle, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
-          concave={edgeModifier.concave === true}
-          onConcaveChange={(value) => setEdgeModifier((current) => {
-            if (!current?.prepared || (current.concave === true) === value) return current;
-            // A scoop has one radius: the variable one goes out with it.
-            return { ...current, concave: value, endAmount: value ? null : current.endAmount, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
-          })}
           })}
           onKindChange={(kind) => setEdgeModifier((current) => {
             if (!current?.prepared || current.kind === kind) return current;
