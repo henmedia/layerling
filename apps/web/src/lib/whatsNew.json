@@ -1,5 +1,60 @@
 [
   {
+    "version": "1.132.1",
+    "items": [
+      {
+        "title": {
+          "de": "Ein Teekannendeckel für die Vase",
+          "en": "A teapot lid for the vase"
+        },
+        "body": {
+          "de": "Unter Zubehör gibt es jetzt den Teekannendeckel: Das Oberteil einer hohlen Vase wird zum Deckel, mit ihrer eigenen Wand und ihrem Muster, sodass Rillen und Verdrehung über die Fuge weiterlaufen. Ein Rand greift in die Öffnung, und auf Wunsch kommt ein Knauf als eigenes Teil dazu.",
+          "en": "Accessories now has a teapot lid: the top of a hollow vase becomes its lid, with the vase's own wall and pattern, so grooves and twist run on across the joint. A lip goes into the opening, and a knob can come with it as a part of its own."
+        }
+      },
+      {
+        "title": {
+          "de": "Ziegel bleiben an der Kante zur Oberseite sauber",
+          "en": "Bricks keep a clean rim to the top"
+        },
+        "body": {
+          "de": "Bekamen die Seiten und die Oberseite eines Körpers Ziegel, zog sich die oberste Ziegelreihe an der Kante zu langen Keilen. Jetzt bleibt diese Kante glatt, und die Fugen laufen weiter um die senkrechten Ecken.",
+          "en": "With bricks on a body's sides and on its top, the top course of the wall was pulled into long wedges along the rim. Now that rim stays smooth, and the joints still run round the upright corners."
+        }
+      },
+      {
+        "title": {
+          "de": "layerling ganz auf Italienisch",
+          "en": "layerling fully in Italian"
+        },
+        "body": {
+          "de": "Alle Texte des Programms sind jetzt ins Italienische übersetzt.",
+          "en": "Every text of the program is translated into Italian now."
+        }
+      },
+      {
+        "title": {
+          "de": "Der Server-Reiter zählt alle Entwürfe, auch auf PHP-Servern",
+          "en": "The server tab counts every design on PHP servers too"
+        },
+        "body": {
+          "de": "Auf einem Server mit PHP zeigte der Reiter auf der Startseite nur die Entwürfe des offenen Ordners, kam nie von selbst nach vorn und öffnete die Willkommensseite, obwohl dort Entwürfe lagen. Jetzt zählt er alle Entwürfe in allen Ordnern, wie mit Docker.",
+          "en": "On a server running PHP, the tab on the start page showed only the designs of the open folder, never came to the front by itself and opened the welcome page although there were designs. Now it counts every design in every folder, as with Docker."
+        }
+      },
+      {
+        "title": {
+          "de": "Mehr übersetzt: Spanisch, Arabisch, Polnisch, Chinesisch und Dänisch",
+          "en": "More translated: Spanish, Arabic, Polish, Chinese and Danish"
+        },
+        "body": {
+          "de": "Spiel prüfen, die Magnete im Deckel, Schichten der Oberflächentextur, klappende Flexi-Glieder und weitere neue Fenster standen in diesen Sprachen noch auf Englisch. Jetzt sind sie übersetzt, ebenso die Meldung, wenn konkaves Verrunden eine gebogene Kante trifft.",
+          "en": "Check clearance, the lid's magnets, surface texture layers, folding flexi links and other new windows were still in English in these languages. They are translated now, and so is the message when a concave fillet meets a curved edge."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.132.0",
     "items": [
       {

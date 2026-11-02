@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.132.1
+
 - **A teapot lid for the vase, made from its own top (Discussion #1153):** A twisted, grooved vase whose top should become its lid could only be split, and the split-off top is a mesh that Hollow and the Lid tool stop at. The vase's Accessories card now has Teapot lid: the top Lid height mm of a hollow vase becomes the lid, built by `buildVase` itself at the body's own angles and heights, so cross-section, pattern and twist run on across the joint; it is closed on top, rests flush on the body's rim and has a lip with Lid clearance into the opening. Knob (printed apart) adds a turned knob with a peg to glue into the lid. The vase's frame stays the whole vase's (`extent`), so the body is not stretched. A hollow vase only and not with facets, each with a note. Through MCP `lidMode: "kanne"` with `lidHeight` and `lidKnob`. Asked in Discussion #1153, contributed by @marcus040473 in #1168.
 - **Bricks keep the rim to a top with bricks of its own clean:** With Bricks on a box's sides and top, the wall's top course was pulled into long wedges along the rim and the joints of top and wall did not meet, the same at a bottom with bricks. While Keep sharp edges smooth is off, the rim between a wall and a top or bottom with bricks of its own now stays smooth (`brickRims` in `weightsFor`); the upright corners keep their joints running round them. Contributed by @marcus040473 in #1137.
 - **Italian, complete for 1.132.0:** All 4,319 texts of the program in Italian. Contributed by @maxciava in #1165.
