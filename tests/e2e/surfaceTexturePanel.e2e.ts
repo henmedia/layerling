@@ -132,6 +132,27 @@ describe("the surface texture card in a shape's settings", () => {
     expect(button(panel, "Load your own image…")).toBeDefined();
   });
 
+  it("presses an image on once where it is put, as a text: width, place and turn, and the projection and faces gone", async () => {
+    const { panel, calls } = mount(cylinder);
+    choose(selectWith(panel, "knurl")!, "image");
+    expect(rangeNamed(panel, "Tile width")).toBeTruthy();
+    expect(selectWith(panel, "allRound")).toBeDefined();
+    expect(rangeNamed(panel, "Around (°)")).toBeUndefined();
+    choose(selectWith(panel, "staggered")!, "once");
+    expect(rangeNamed(panel, "Tile width")).toBeUndefined();
+    expect(rangeNamed(panel, "Image width")).toBeTruthy();
+    expect(rangeNamed(panel, "Image height")).toBeTruthy();
+    expect(rangeNamed(panel, "Image width")?.value).toBe("40.00");
+    expect(rangeNamed(panel, "Around (°)")).toBeTruthy();
+    expect(rangeNamed(panel, "Height (%)")).toBeTruthy();
+    expect(rangeNamed(panel, "Turned (°)")).toBeTruthy();
+    // It goes where it is put: no projection, no faces to pick.
+    expect(selectWith(panel, "allRound")).toBeUndefined();
+    expect(button(panel, "Pick faces")).toBeUndefined();
+    await act(async () => button(panel, "Apply texture")!.click());
+    expect(calls.applied[0]).toMatchObject({ pattern: "image", imageTiling: "once", textAround: 0, textHeight: 50 });
+  });
+
   it("lays bricks in a bond, with a course's height and the joint's width in mm", async () => {
     const { panel, calls } = mount(cylinder);
     choose(selectWith(panel, "knurl")!, "bricks");

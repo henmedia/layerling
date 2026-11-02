@@ -146,8 +146,11 @@ export type SurfaceTextureWoodCut = (typeof SURFACE_TEXTURE_WOOD_CUTS)[number];
 /** Image: a ready image (see surfaceTextureImages.ts) or one's own. */
 export const SURFACE_TEXTURE_IMAGES = [...SURFACE_TEXTURE_IMAGE_PRESETS, "own"] as const;
 export type SurfaceTextureImage = (typeof SURFACE_TEXTURE_IMAGES)[number];
-/** Image tiles: repeated, mirrored (no seam at their borders) or every other row half a tile along. */
-export const SURFACE_TEXTURE_TILINGS = ["repeat", "mirror", "staggered"] as const;
+/**
+ * Image tiles: repeated, mirrored (no seam at their borders), every other row half a tile along - or once: a single image
+ * pressed on where it is put, like a text (see imageOnce).
+ */
+export const SURFACE_TEXTURE_TILINGS = ["repeat", "mirror", "staggered", "once"] as const;
 export type SurfaceTextureTiling = (typeof SURFACE_TEXTURE_TILINGS)[number];
 /** Bumps: every other row half a spacing along (a hexagon grid), or in straight rows and columns (issue #1030). */
 export const SURFACE_TEXTURE_BUMP_GRIDS = ["staggered", "straight"] as const;
@@ -1097,6 +1100,8 @@ function imageValue(u: number, v: number, s: SurfaceTextureSettings, layout: Sur
     uu = ru;
   }
   let tu = uu / layout.cell, tv = vv / (layout.tileHeight || layout.cell);
+  // Once: a single tile (the session lays it on round its anchor; see onceValues), nothing beside it.
+  if (s.imageTiling === "once" && (tu < 0 || tu > 1 || tv < 0 || tv > 1)) return 0;
   const mirror = s.imageTiling === "mirror";
   if (mirror) {
     tu = mirrorTile(tu);
@@ -1497,7 +1502,7 @@ function beadValue(c: number, along: number, length: number, s: SurfaceTextureSe
  * rings, folded over one in rows), a border, or nothing (null: sharp).
  */
 function capEdgeMode(s: SurfaceTextureSettings, layout: SurfaceTextureLayout): "over" | "fold" | "bead" | null {
-  if (!layout.flatCaps || s.pattern === "text" || s.pattern === "cracks" || s.pattern === "grain" || s.pattern === "wood") return null;
+  if (!layout.flatCaps || stuckOn(s) || s.pattern === "cracks" || s.pattern === "grain" || s.pattern === "wood") return null;
   const canRunOver = RING_PATTERNS.includes(s.pattern) && (!layout.outline || layout.outline.ringable);
   if (s.capEdge === "bead") return "bead";
   if (!canRunOver || s.capEdge === "sharp") return null;
@@ -1985,7 +1990,7 @@ function wrapsOutline(s: SurfaceTextureSettings, outline: SurfaceOutline) {
   // Any other side (a hexagon's slanted ones) saw them projected from aside, stretched, and their joints cut in teeth:
   // there they go round the outline. Bark and wood belong to a log or a board.
   if (s.pattern === "bricks") return !sidesAlongAxes(outline);
-  return !["text", "cracks", "grain", "bark", "wood"].includes(s.pattern);
+  return !stuckOn(s) && !["cracks", "grain", "bark", "wood"].includes(s.pattern);
 }
 
 /** Whether every side of an outline runs along one of the two axes across (within about 2 degrees). */
@@ -2039,7 +2044,49 @@ function capFaces(base: SurfaceBase, smoothFace: Uint8Array, ax: number) {
 
 /** Whether the pattern stands out of the body and so runs out right up to the edge (see RUN_OUT_STEPS); bumps are left off whole at a border instead. */
 function standsOut(s: SurfaceTextureSettings) {
-  return s.direction !== "inward" && s.pattern !== "bumps" && s.pattern !== "text" && s.pattern !== "cracks";
+  return s.direction !== "inward" && s.pattern !== "bumps" && !stuckOn(s) && s.pattern !== "cracks";
+}
+
+/** An image pressed on a single time (its tiles "once"): it goes where it is put, as a text does, and nowhere else. */
+export function imageOnce(s: Pick<SurfaceTextureSettings, "pattern" | "imageTiling">) {
+  return s.pattern === "image" && s.imageTiling === "once";
+}
+
+/** Stuck on at one place - a text, an image once: the surface round an anchor is rolled out, the pattern laid onto it. */
+export function stuckOn(s: Pick<SurfaceTextureSettings, "pattern" | "imageTiling">) {
+  return s.pattern === "text" || imageOnce(s);
+}
+
+/** How a stuck-on pattern is turned on the surface, degrees: a text by its own turn, an image by the image's. */
+function stuckTurn(s: SurfaceTextureSettings) {
+  return imageOnce(s) ? s.imageTurn : s.textTurn;
+}
+
+/** An image once: its width and height on the surface (mm), the height as the image's proportions ask unless set. */
+function onceSize(s: SurfaceTextureSettings, image: GreyImage | null | undefined) {
+  const width = s.spacing;
+  const height = s.tileHeight > 0 ? s.tileHeight : image ? (width * image.height) / image.width : width;
+  return { width, height };
+}
+
+/**
+ * An image once at the points of a mesh rolled out round its anchor: its grey value inside the image's box, 0 outside it
+ * (the surface stays smooth there), and whether the point lies in the box.
+ */
+function onceValues(U: Float64Array, V: Float64Array, s: SurfaceTextureSettings, image: GreyImage, size: { width: number; height: number }) {
+  const a = (s.imageTurn * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a);
+  const values = new Float32Array(U.length);
+  const inside = new Uint8Array(U.length);
+  for (let i = 0; i < U.length; i += 1) {
+    if (!Number.isFinite(U[i])) continue;
+    const x = U[i] * c + V[i] * sn, y = -U[i] * sn + V[i] * c;
+    const tu = x / size.width + 0.5, tv = y / size.height + 0.5;
+    if (tu < 0 || tu > 1 || tv < 0 || tv > 1) continue;
+    inside[i] = 1;
+    const grey = sampleGreyImage(image, tu, tv, true);
+    values[i] = s.imageInvert ? 1 - grey : grey;
+  }
+  return { values, inside };
 }
 
 /**
@@ -3191,6 +3238,10 @@ function sliceBricks(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfa
 
 const FLANK_JUMP = 0.3;
 const FLANK_ROUNDS = 3;
+/** An image once is refined finer across an edge whose ends' grey values differ by this much (an outline in the image). */
+const ONCE_JUMP = 0.25;
+/** An image once is not refined below this edge (mm), its outlines not below half of it: a 0.4 mm nozzle prints no finer. */
+const ONCE_MIN_EDGE = 0.15;
 
 /**
  * Refine the flanks: where the pattern value jumps by more than FLANK_JUMP along an edge (the rim
@@ -3368,7 +3419,8 @@ type RefinedState = {
   limited: boolean;
   slice: { smoothFace: Uint8Array } | null;
   /** Text: the value per point (0 smooth, 1 the full depth), the mesh cut along the letters' walls, and the points torn. */
-  text?: { values: Float32Array; torn: number } | null;
+  /** A text's or an image's once values at the points, how many tear, and (an image) which points lie in its box. */
+  text?: { values: Float32Array; torn: number; inside?: Uint8Array | null } | null;
   /** Bumps laid anew: the value of their points (NaN: from the pattern), by point number; points added later have none. */
   fixed?: Float32Array | null;
   /** Per input triangle: the axis (0, 1, 2) of the straight face it was cut on as flat (all round on an angular body), else 255. */
@@ -3400,6 +3452,8 @@ export type SurfaceTextureStats = {
    * not agree (the text tears there, as a label would); null for the other patterns.
    */
   text: { placed: boolean; torn: number } | null;
+  /** An image once: whether its box came onto the body, and how many of its points tear over a corner; null otherwise. */
+  image: { placed: boolean; torn: number } | null;
   /** Bricks: how many courses fit the height and how high each is as made, mm; null for the other patterns. */
   bricks: { courses: number; height: number } | null;
   /** How the pattern was laid on: what "auto" chose, or what was asked for. */
@@ -4501,7 +4555,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
    * text. The window round the text gets a margin: the unrolling and the finer grid reach a little beyond the letters.
    */
   function textPlacement(s: SurfaceTextureSettings, layout: SurfaceTextureLayout): SurfaceTextPlacement | null {
-    const box = outlineBox(s.textOutline);
+    // An image once: its box round the middle, as wide as set and as high as the image's proportions ask.
+    const size = imageOnce(s) ? (layout.image ? onceSize(s, layout.image) : null) : null;
+    const box = imageOnce(s) ? (size ? { minX: -size.width / 2, maxX: size.width / 2, minY: -size.height / 2, maxY: size.height / 2 } : null) : outlineBox(s.textOutline);
     if (!box) return null;
     const ax = AXIS_INDEX[s.axis];
     const [i1, i2] = acrossAxes(s.axis);
@@ -4526,7 +4582,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
    * looked for anew in a refined mesh: its triangles are numbered differently.
    */
   function unrolled(mesh: { vertices: Float64Array; indices: Uint32Array }, place: SurfaceTextPlacement, s: SurfaceTextureSettings, face = -1) {
-    return unfoldSurface(mesh, place.point, { axis: s.axis, face, reach: place.reach, window: { halfW: place.halfW, halfH: place.halfH, turn: s.textTurn } });
+    return unfoldSurface(mesh, place.point, { axis: s.axis, face, reach: place.reach, window: { halfW: place.halfW, halfH: place.halfH, turn: stuckTurn(s) } });
   }
 
   /**
@@ -4641,12 +4697,19 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     let raised = false;
     const cracks = s.pattern === "cracks";
     const text = s.pattern === "text";
+    const once = imageOnce(s);
     if (cracks) {
       // Cracks: the body's own grid, refined only in the band round the lines (below).
       edge = Math.max(0.06, s.crackWidth / 2 / CRACK_STEPS[s.detail]) * scale;
     } else if (text) {
       // Text: the body's own grid, refined only in the window round the letters (below).
       edge = Math.max(0.05, (layout.text?.height ?? s.textSize) / TEXT_STEPS[s.detail]) * scale;
+    } else if (once) {
+      // An image once: the body's own grid, refined only in the window round the image (below), about 20 points across
+      // its longer side per step of detail - more than a tile's, since it is only this once - and not finer than a nozzle
+      // could print (the image's outlines get finer still, see below).
+      const size = layout.text ?? onceSize(s, layout.image);
+      edge = Math.max(ONCE_MIN_EDGE, Math.max(size.width, size.height) / (DETAIL_STEPS[s.detail] * 20)) * scale;
     } else if (slice) {
       // Across: the places of the profile, while cutting. Along, the pattern does not change, and the body's roundness is in
       // its own rows already - at most 6 mm (a 6 mm chord on 80 mm radius strays 0.06 mm), so refining where the pattern
@@ -4667,6 +4730,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       ? JSON.stringify([s.pattern, crackCache?.key ?? null])
       : text
         ? JSON.stringify([s.pattern, layout.text ? [layout.text.point, layout.text.face] : null, s.axis, s.textTurn, outlineKey(s.textOutline)])
+        : once
+          ? JSON.stringify([s.pattern, s.imageTiling, layout.text ? [layout.text.point, layout.text.face, layout.text.width, layout.text.height] : null, s.axis, patternExtras(s, layout)])
         : JSON.stringify([s.pattern, s.spacing, s.width, s.profile, s.projection, s.axis, layout.cell, layout.period, layout.angle, layout.radius, layout.center, s.faceTurn, Boolean(layout.flatCaps), s.capStyle, layout.capEdge ?? null, layout.rims ?? null, patternExtras(s, layout)]);
     // A raised pattern round an outline's corners is cut along arcs as deep as the pattern stands out (cornerCuts).
     const cornerReach = s.projection === "cylinder" && layout.outline?.corners.length && standsOut(s) ? Math.max(1, s.depth) : 0;
@@ -4676,7 +4741,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const net = layout.crack;
     const place = layout.text;
     let unrolledText: RefinedState["text"] = null;
-    if (text) {
+    if (text || once) {
       mesh = baseMesh(base);
       if (place) {
         // Only where the window reaches, not the inner wall of a thin vase behind it: an edge at a point of the body
@@ -4694,10 +4759,24 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         }
         const [px, py, pz] = place.point;
         const reach2 = place.reach ** 2;
+        // An image once fills its box, not the circle round it: an edge is split only where it reaches the window seen in the
+        // plane at the anchor (on a curved body that plane takes less than the surface, so it rather reaches too far).
+        const ta = (stuckTurn(s) * Math.PI) / 180, tc = Math.cos(ta), ts = Math.sin(ta);
+        const inPlane = (verts: ArrayLike<number>, i: number) => {
+          const ox = verts[i * 3] - px, oy = verts[i * 3 + 1] - py, oz = verts[i * 3 + 2] - pz;
+          const du = ox * first.right[0] + oy * first.right[1] + oz * first.right[2];
+          const dv = ox * first.up[0] + oy * first.up[1] + oz * first.up[2];
+          return [du * tc + dv * ts, -du * ts + dv * tc];
+        };
+        const inWindow = (verts: ArrayLike<number>, a: number, b: number) => {
+          const [ax, ay] = inPlane(verts, a), [bx, by] = inPlane(verts, b);
+          return Math.max(ax, bx) >= -place.halfW && Math.min(ax, bx) <= place.halfW && Math.max(ay, by) >= -place.halfH && Math.min(ay, by) <= place.halfH;
+        };
         // Asked the same way from both triangles of an edge, or they would split it differently.
         const near = (verts: ArrayLike<number>, p: number, q: number) => {
           const a = Math.min(p, q), b = Math.max(p, q);
           if ((a < nBase && !Number.isFinite(first.U[a])) || (b < nBase && !Number.isFinite(first.U[b]))) return false;
+          if (once && !inWindow(verts, a, b)) return false;
           const ox = verts[a * 3] - px, oy = verts[a * 3 + 1] - py, oz = verts[a * 3 + 2] - pz;
           const dx = verts[b * 3] - verts[a * 3], dy = verts[b * 3 + 1] - verts[a * 3 + 1], dz = verts[b * 3 + 2] - verts[a * 3 + 2];
           const l2 = dx * dx + dy * dy + dz * dz;
@@ -4706,54 +4785,90 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         };
         const split = subdivide(mesh, edge, maxTriangles, null, null, near);
         mesh = { ...split, parents: Uint32Array.from(split.parents, (f) => mesh.parents[f]) };
-        // The letters' edges: finer where an edge crosses a letter's wall (as at the flanks of bumps), unrolled anew each
-        // round. The distance is exact up to `cap`, beyond the longest edge crossing a wall.
-        const fineEdge = edge / 2.5;
-        const fine2 = (fineEdge * 1.01) ** 2;
-        const cap = Math.max(1.5 * edge, 4 * TEXT_WALL);
-        const crosses = (F: Float64Array, a: number, b: number) => (F[a] < TEXT_WALL) !== (F[b] < TEXT_WALL) || (F[a] > -TEXT_WALL) !== (F[b] > -TEXT_WALL);
-        let uv = unrolled(mesh, place, s);
-        for (let round = 0; round < FLANK_ROUNDS && !mesh.limited; round += 1) {
-          const F = textField(uv.U, uv.V, s.textOutline, s.textTurn, cap);
-          const v = mesh.vertices, I = mesh.indices;
-          const flags = new Uint8Array(v.length / 3);
-          let any = false;
-          for (let t = 0; t < I.length; t += 3) {
-            for (const [a, b] of [[I[t], I[t + 1]], [I[t + 1], I[t + 2]], [I[t + 2], I[t]]]) {
-              if (!crosses(F, a, b)) continue;
-              const dx = v[a * 3] - v[b * 3], dy = v[a * 3 + 1] - v[b * 3 + 1], dz = v[a * 3 + 2] - v[b * 3 + 2];
-              if (dx * dx + dy * dy + dz * dz <= fine2) continue;
-              flags[a] = 1;
-              flags[b] = 1;
-              any = true;
+        if (once) {
+          // The image: finer where its grey value jumps (an outline drawn in it), rolled out anew each round. Softened to
+          // the mesh as a tile is (see textureImage), over its width.
+          const image = textureImage(s, edge, place.width);
+          layout.image = image;
+          const size = { width: place.width, height: place.height };
+          let uv = unrolled(mesh, place, s);
+          let got = image ? onceValues(uv.U, uv.V, s, image, size) : null;
+          const fineEdge = Math.max(edge / 2.5, ONCE_MIN_EDGE / 2);
+          const fine2 = (fineEdge * 1.01) ** 2;
+          for (let round = 0; image && got && round < FLANK_ROUNDS && !mesh.limited; round += 1) {
+            const F = got.values;
+            const v = mesh.vertices, I = mesh.indices;
+            const flags = new Uint8Array(v.length / 3);
+            let any = false;
+            for (let t = 0; t < I.length; t += 3) {
+              for (const [a, b] of [[I[t], I[t + 1]], [I[t + 1], I[t + 2]], [I[t + 2], I[t]]]) {
+                if (Math.abs(F[a] - F[b]) < ONCE_JUMP) continue;
+                const dx = v[a * 3] - v[b * 3], dy = v[a * 3 + 1] - v[b * 3 + 1], dz = v[a * 3 + 2] - v[b * 3 + 2];
+                if (dx * dx + dy * dy + dz * dz <= fine2) continue;
+                flags[a] = 1;
+                flags[b] = 1;
+                any = true;
+              }
             }
+            if (!any) break;
+            const next = subdivide(mesh, fineEdge, maxTriangles, null, flags);
+            if (next.indices.length === mesh.indices.length) break;
+            const parents = Uint32Array.from(next.parents, (f) => mesh.parents[f]);
+            mesh = { vertices: next.vertices, indices: next.indices, parents, limited: Boolean(mesh.limited || next.limited) };
+            uv = unrolled(mesh, place, s);
+            got = onceValues(uv.U, uv.V, s, image, size);
           }
-          if (!any) break;
-          const next = subdivide(mesh, fineEdge, maxTriangles, null, flags);
-          if (next.indices.length === mesh.indices.length) break;
-          const parents = Uint32Array.from(next.parents, (f) => mesh.parents[f]);
-          mesh = { vertices: next.vertices, indices: next.indices, parents, limited: Boolean(mesh.limited || next.limited) };
-          uv = unrolled(mesh, place, s);
+          unrolledText = { values: got ? got.values : new Float32Array(mesh.vertices.length / 3), torn: uv.torn, inside: got ? got.inside : null };
+        } else {
+          // The letters' edges: finer where an edge crosses a letter's wall (as at the flanks of bumps), unrolled anew each
+          // round. The distance is exact up to `cap`, beyond the longest edge crossing a wall.
+          const fineEdge = edge / 2.5;
+          const fine2 = (fineEdge * 1.01) ** 2;
+          const cap = Math.max(1.5 * edge, 4 * TEXT_WALL);
+          const crosses = (F: Float64Array, a: number, b: number) => (F[a] < TEXT_WALL) !== (F[b] < TEXT_WALL) || (F[a] > -TEXT_WALL) !== (F[b] > -TEXT_WALL);
+          let uv = unrolled(mesh, place, s);
+          for (let round = 0; round < FLANK_ROUNDS && !mesh.limited; round += 1) {
+            const F = textField(uv.U, uv.V, s.textOutline, s.textTurn, cap);
+            const v = mesh.vertices, I = mesh.indices;
+            const flags = new Uint8Array(v.length / 3);
+            let any = false;
+            for (let t = 0; t < I.length; t += 3) {
+              for (const [a, b] of [[I[t], I[t + 1]], [I[t + 1], I[t + 2]], [I[t + 2], I[t]]]) {
+                if (!crosses(F, a, b)) continue;
+                const dx = v[a * 3] - v[b * 3], dy = v[a * 3 + 1] - v[b * 3 + 1], dz = v[a * 3 + 2] - v[b * 3 + 2];
+                if (dx * dx + dy * dy + dz * dz <= fine2) continue;
+                flags[a] = 1;
+                flags[b] = 1;
+                any = true;
+              }
+            }
+            if (!any) break;
+            const next = subdivide(mesh, fineEdge, maxTriangles, null, flags);
+            if (next.indices.length === mesh.indices.length) break;
+            const parents = Uint32Array.from(next.parents, (f) => mesh.parents[f]);
+            mesh = { vertices: next.vertices, indices: next.indices, parents, limited: Boolean(mesh.limited || next.limited) };
+            uv = unrolled(mesh, place, s);
+          }
+          // Then cut along both sides of every wall: the letters' edges become edges of the mesh, following the outlines
+          // instead of the grid (on the grid they came out as steps). Between the cuts the wall rises; points carry the
+          // distance they were cut at.
+          const F = textField(uv.U, uv.V, s.textOutline, s.textTurn, cap);
+          const I = mesh.indices;
+          const sliced = new Uint8Array(I.length / 3);
+          for (let f = 0; f < sliced.length; f += 1) {
+            const a = F[I[f * 3]], b = F[I[f * 3 + 1]], c = F[I[f * 3 + 2]];
+            if (Math.min(a, b, c) <= TEXT_WALL && Math.max(a, b, c) >= -TEXT_WALL) sliced[f] = 1;
+          }
+          const cut = sliceByField(mesh, F, (i, j) => F[j] - F[i], 1e6, [-TEXT_WALL, TEXT_WALL], sliced, null, true);
+          const field = cut.field ?? F;
+          // A point closer to a cut than SURFACE_MIN_EDGE is not cut beside but counts as on it: it gets the cut's depth
+          // too, or it pulled a little tooth into the letter's edge.
+          const slope = 2 * (TEXT_WALL - SURFACE_MIN_EDGE);
+          const values = new Float32Array(field.length);
+          for (let i = 0; i < field.length; i += 1) values[i] = clamp(0.5 - field[i] / slope, 0, 1);
+          mesh = { vertices: cut.vertices, indices: cut.indices, parents: cut.parents, limited: mesh.limited };
+          unrolledText = { values, torn: uv.torn };
         }
-        // Then cut along both sides of every wall: the letters' edges become edges of the mesh, following the outlines
-        // instead of the grid (on the grid they came out as steps). Between the cuts the wall rises; points carry the
-        // distance they were cut at.
-        const F = textField(uv.U, uv.V, s.textOutline, s.textTurn, cap);
-        const I = mesh.indices;
-        const sliced = new Uint8Array(I.length / 3);
-        for (let f = 0; f < sliced.length; f += 1) {
-          const a = F[I[f * 3]], b = F[I[f * 3 + 1]], c = F[I[f * 3 + 2]];
-          if (Math.min(a, b, c) <= TEXT_WALL && Math.max(a, b, c) >= -TEXT_WALL) sliced[f] = 1;
-        }
-        const cut = sliceByField(mesh, F, (i, j) => F[j] - F[i], 1e6, [-TEXT_WALL, TEXT_WALL], sliced, null, true);
-        const field = cut.field ?? F;
-        // A point closer to a cut than SURFACE_MIN_EDGE is not cut beside but counts as on it: it gets the cut's depth
-        // too, or it pulled a little tooth into the letter's edge.
-        const slope = 2 * (TEXT_WALL - SURFACE_MIN_EDGE);
-        const values = new Float32Array(field.length);
-        for (let i = 0; i < field.length; i += 1) values[i] = clamp(0.5 - field[i] / slope, 0, 1);
-        mesh = { vertices: cut.vertices, indices: cut.indices, parents: cut.parents, limited: mesh.limited };
-        unrolledText = { values, torn: uv.torn };
       }
     } else if (cracks) {
       mesh = baseMesh(base);
@@ -5213,7 +5328,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // A top or bottom round the axis with the pattern (picked, or not kept smooth): the pattern lies flat there or runs
     // in rings (see SurfaceTextureLayout.flatCaps). With only such faces picked, nothing goes round the axis.
     let goesRound = layout.around !== null;
-    if (s.projection === "cylinder" && s.pattern !== "text") {
+    if (s.projection === "cylinder" && !stuckOn(s)) {
       const chosen = chosenFaces(s);
       layout.flatCaps = Boolean(capFaces(base, chosen ? chosen.map((c) => (c ? 0 : 1)) : smoothBaseVertices(s, layout).faces, AXIS_INDEX[s.axis]));
       if (chosen && layout.flatCaps) {
@@ -5234,12 +5349,12 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       }
     }
     if (s.pattern === "cracks") layout.crack = crackLines(s, layout, maskFree);
-    if (s.pattern === "text") layout.text = textPlacement(s, layout);
+    if (stuckOn(s)) layout.text = textPlacement(s, layout);
     const r = refined(s, layout, maxTriangles, preview ? 1.5 : 1);
 
-    // A text goes where it was put: what stays smooth for a pattern all over (bottom, top, a wall, the height band, sharp
-    // edges) does not hold it back - masks do.
-    const placed = s.pattern === "text";
+    // A text goes where it was put, and so does an image once: what stays smooth for a pattern all over (bottom, top, a
+    // wall, the height band, sharp edges) does not hold it back - masks do.
+    const placed = stuckOn(s);
     const sidePoints = (mesh: SurfaceMesh) => sidePointsFor(mesh, AXIS_INDEX[s.axis]);
     /** Weight per point: 0 = smooth, 1 = the full pattern, faded in over `fade` mm (straight faces: see BORDER_WALL). */
     const weightsFor = (state: RefinedState) => {
@@ -5461,8 +5576,10 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // Cracks with gold: how deep the notch is at each point; the points moved along `moves`.
     const gold = s.pattern === "cracks" && s.crackGold && s.direction === "inward" && Boolean(layout.crack?.count);
     const notch = gold ? new Float64Array(n) : null;
-    // Text: the values come from the unrolled plane, not from a projection.
-    const textValue = s.pattern === "text" && state.text ? state.text.values : null;
+    // Text and an image once: the values come from the unrolled plane, not from a projection.
+    const textValue = stuckOn(s) && state.text ? state.text.values : null;
+    // An image once has landed where points of its box got it (its dark parts count too).
+    const onceInside = imageOnce(s) && state.text ? (state.text.inside ?? null) : null;
     const fixedValue = state.fixed ?? null;
     // Bark cut along its levels comes with its values (see barkLevelCuts): smoothed over neighbours, they would leave the
     // cuts. Over the budget it was not cut and is smoothed as wood is.
@@ -5502,7 +5619,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
             : !Number.isNaN(known)
               ? layout.capEdge === "bead" ? beadOver(known, surfaceTextureBeadAt(x, y, z, [nx, ny, nz][AXIS_INDEX[s.axis]], s, layout)) : known
               : surfaceTextureValueAt(x, y, z, nx, ny, nz, s, layout);
-        if (textValue && value > 0.5) lettered += used[i];
+        if (textValue && (onceInside ? onceInside[i] : value > 0.5)) lettered += used[i];
         d = wi * moveFor(value);
         if (notch) notch[i] = wi * s.depth * value;
       }
@@ -5579,6 +5696,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         removed: base.removed,
         cracks: layout.crack ? { lines: layout.crack.lines.length, length: layout.crack.length } : null,
         text: s.pattern === "text" ? { placed: lettered > 0, torn: state.text?.torn ?? 0 } : null,
+        image: imageOnce(s) ? { placed: lettered > 0, torn: state.text?.torn ?? 0 } : null,
         bricks: s.pattern === "bricks" && layout.rows && layout.rowHeight ? { courses: layout.rows, height: layout.rowHeight } : null,
         projection: s.projection as Exclude<SurfaceTextureProjection, "auto">,
       },
