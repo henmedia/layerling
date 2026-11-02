@@ -5,8 +5,8 @@
       "en": "Sink parts into a face, flush at the top (Shift)"
     },
     "body": {
-      "de": "Hältst du Umschalt, wenn du eine neue Form oder ein mit C aufgenommenes Teil auf eine Fläche setzt, sinkt es aufrecht in die Fläche, mit der Oberseite bündig: gut für Senkungen und Senkbohrungen. Umschalt+D setzt die Auswahl mit der Oberseite auf die Arbeitsebene.",
-      "en": "Hold Shift when you place a new shape or a part picked up with C on a face and it sinks into the face, upright, with its top flush: good for countersinks and counterbores. Shift+D drops the selection with its top on the workplane."
+      "de": "Hältst du Umschalt, wenn du eine neue Form oder ein mit C aufgenommenes Teil auf eine Fläche setzt, sinkt es aufrecht in die Fläche, mit der Oberseite bündig: gut für Senkungen und Senkbohrungen. Umschalt+D setzt die Auswahl mit der Oberseite auf die Arbeitsebene. Senkung, Senkbohrung und Doppelsenkung entstehen jetzt gleich als Loch.",
+      "en": "Hold Shift when you place a new shape or a part picked up with C on a face and it sinks into the face, upright, with its top flush: good for countersinks and counterbores. Shift+D drops the selection with its top on the workplane. Countersink, counterbore and double countersink now start as a hole."
     }
   },
   {
