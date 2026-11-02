@@ -10120,6 +10120,11 @@ export function LayerlingEditor({
       setNotice(t("status.surfaceTextMissed"));
       return;
     }
+    // So would an image once that came onto no such face.
+    if (stats.image && !stats.image.placed) {
+      setNotice(t("status.surfaceImageMissed"));
+      return;
+    }
     const gold = outcome.fill ? surfaceTextureGoldShape(textured, outcome.fill, `${displayShapeName(textured)} – ${t("surfaceTexture.goldPart")}`) : null;
     // Several layers are named together: "Bricks + Knurling".
     const pattern = [textured.surfaceTexture?.pattern ?? settings.pattern, ...(textured.surfaceTextureLayers ?? []).map((layer) => layer.pattern)].map(surfacePatternLabel).join(" + ");
@@ -10133,6 +10138,7 @@ export function LayerlingEditor({
       stats.cracks ? t("status.surfaceCracks", { count: stats.cracks.lines, length: Math.round(stats.cracks.length) }) : "",
       gold ? t("status.surfaceGold") : "",
       stats.text?.torn ? t("status.surfaceTextTorn") : "",
+      stats.image?.torn ? t("status.surfaceImageTorn") : "",
       stats.limited ? t("status.surfaceCoarser") : "",
       stats.tooDeep ? t("status.surfaceTooDeep") : "",
     ].filter(Boolean);
@@ -12152,6 +12158,7 @@ export function LayerlingEditor({
         if (!textured) throw new Error("No part of this body gets the pattern: check faces, outside and inside, bottomFree and topFree, and zoneFrom and zoneTo");
         if (outcome.stats.cracks && outcome.stats.cracks.lines === 0) throw new Error("No crack found a way across this body: try another crackStart (anywhere goes on any body), more crackLength, or let the pattern reach more faces");
         if (outcome.stats.text && !outcome.stats.text.placed) throw new Error("The text came onto no face that may get it (a mask lies over it): move it with textAround and textHeight, or change the masks");
+        if (outcome.stats.image && !outcome.stats.image.placed) throw new Error("The image once came onto no face that may get it (a mask lies over it): move it with textAround and textHeight, or change the masks");
         const gold = outcome.fill ? surfaceTextureGoldShape(textured, outcome.fill, `${displayShapeName(textured)} – ${t("surfaceTexture.goldPart")}`) : null;
         commitShapes(
           sceneWithSurfaceBody(currentShapes(), target.id, textured, gold),

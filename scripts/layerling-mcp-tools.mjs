@@ -957,8 +957,8 @@ export const tools = [
         textContent: { type: "string", description: "Text: the words, up to 200 characters. Default Layerling." },
         textFont: { type: "string", description: "Text: Multilanguage, Sans, Serif, Script, Monospace, Rounded, Stencil or Japanese, or the name of a font of one's own. Default Multilanguage." },
         textSize: { type: "number", description: "Text: letter size in mm (the height of a capital), 2 to 200. Default 10." },
-        textAround: { type: "number", description: "Text: where it sits round the axis in degrees, -180 to 180: 0 the front, 90 the right, -90 the left (with axis x or y, 0 is the top and 180 the bottom). Default 0." },
-        textHeight: { type: "number", description: "Text: where its middle sits along the axis, in % of the body's size along it, 0 to 100. Default 50." },
+        textAround: { type: "number", description: "Text, and an image once: where it sits round the axis in degrees, -180 to 180: 0 the front, 90 the right, -90 the left (with axis x or y, 0 is the top and 180 the bottom). Default 0." },
+        textHeight: { type: "number", description: "Text, and an image once: where its middle sits along the axis, in % of the body's size along it, 0 to 100. Default 50." },
         textTurn: { type: "number", description: "Text: turned on the surface in degrees, -180 to 180, counterclockwise seen from outside. Default 0." },
         textVertical: { type: "boolean", description: "Text: true stacks the letters top to bottom instead of side by side. Default false." },
         carbonWeave: { type: "string", enum: ["twill22", "twill21", "twill31"], description: "Carbon: twill22 (each band over two crossing bands, then under two: the even diagonal of most carbon parts), twill21 (over two, under one: the upright bands show long, the crossing ones short) or twill31 (over three, under one). Default twill22." },
@@ -985,7 +985,7 @@ export const tools = [
         imageTurn: { type: "number", description: "Image: the tiles turned on the surface in degrees, -180 to 180. Default 0." },
         imageInvert: { type: "boolean", description: "Image: light and dark swapped. Default false." },
         imageBlur: { type: "number", description: "Image: softened over this many of its points, 0 to 8. Default 0." },
-        imageTiling: { type: "string", enum: ["repeat", "mirror", "staggered"], description: "Image: tiles repeated, mirrored (no seam at their borders), or every other row half a tile along. Default repeat." },
+        imageTiling: { type: "string", enum: ["repeat", "mirror", "staggered", "once"], description: "Image: tiles repeated, mirrored (no seam at their borders), or every other row half a tile along - or once: a single image pressed on like a label, its middle placed with textAround and textHeight, spacing its width and tileHeight its height (0: as the image); the surface beside it stays smooth. Default repeat." },
         faces: {
           type: "array",
           items: {
