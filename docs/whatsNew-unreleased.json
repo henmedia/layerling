@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "title": {
+      "de": "Der Server-Reiter zählt alle Entwürfe, auch auf PHP-Servern",
+      "en": "The server tab counts every design on PHP servers too"
+    },
+    "body": {
+      "de": "Auf einem Server mit PHP zeigte der Reiter auf der Startseite nur die Entwürfe des offenen Ordners, kam nie von selbst nach vorn und öffnete die Willkommensseite, obwohl dort Entwürfe lagen. Jetzt zählt er alle Entwürfe in allen Ordnern, wie mit Docker.",
+      "en": "On a server running PHP, the tab on the start page showed only the designs of the open folder, never came to the front by itself and opened the welcome page although there were designs. Now it counts every design in every folder, as with Docker."
+    }
+  },
+  {
+    "title": {
+      "de": "Mehr übersetzt: Spanisch, Arabisch, Polnisch, Chinesisch und Dänisch",
+      "en": "More translated: Spanish, Arabic, Polish, Chinese and Danish"
+    },
+    "body": {
+      "de": "Spiel prüfen, die Magnete im Deckel, Schichten der Oberflächentextur, klappende Flexi-Glieder und weitere neue Fenster standen in diesen Sprachen noch auf Englisch. Jetzt sind sie übersetzt, ebenso die Meldung, wenn konkaves Verrunden eine gebogene Kante trifft.",
+      "en": "Check clearance, the lid's magnets, surface texture layers, folding flexi links and other new windows were still in English in these languages. They are translated now, and so is the message when a concave fillet meets a curved edge."
+    }
+  }
+]
