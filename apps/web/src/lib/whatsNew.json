@@ -1,5 +1,40 @@
 [
   {
+    "version": "1.133.0",
+    "items": [
+      {
+        "title": {
+          "de": "Ein Bild nur einmal aufprägen",
+          "en": "Press an image on just once"
+        },
+        "body": {
+          "de": "Die Bildtextur hat neben den Kacheln eine vierte Wahl: Einmal. Das Bild wird genau einmal aufgebracht, wo du es hinsetzt: Um und Höhe legen die Mitte fest, Gedreht dreht es, Bildbreite und Bildhöhe bestimmen die Größe. Rundherum bleibt die Fläche glatt, und die Kanten bleiben sauber.",
+          "en": "The image texture has a fourth choice next to the tiles: Once. The image is pressed on a single time where you put it: Around and Height place its middle, Turned turns it, Image width and Image height set its size. The surface stays smooth around it, and the edges stay clean."
+        }
+      },
+      {
+        "title": {
+          "de": "Stecker für Akkus, Motoren und die serielle Schnittstelle",
+          "en": "Plugs for batteries, motors and the serial port"
+        },
+        "body": {
+          "de": "Die Port-Öffnung kennt jetzt XT30, XT60, MT60, MPX und D-Sub 9, nach den Zeichnungen der Hersteller bemessen, mit etwa 0,25 mm Luft rundum. Bei D-Sub 9 kommen die zwei Schraubenlöcher gleich mit: Öffnung und Löcher bewegen und drehen sich als eine Gruppe.",
+          "en": "The port opening now knows XT30, XT60, MT60, MPX and D-Sub 9, sized from the makers' drawings with about 0.25 mm of room all round. D-Sub 9 brings its two screw holes along: the opening and the holes move and turn as one group."
+        }
+      },
+      {
+        "title": {
+          "de": "SBC-Boards: microSD, Flachbandkabel, GPIO und ESP32",
+          "en": "SBC boards: microSD, ribbon cables, GPIO and ESP32"
+        },
+        "body": {
+          "de": "Alle Raspberry Pi und das BIGTREETECH Pi haben jetzt ihren microSD-Schlitz. Flachbandkabel lassen sich durch den Deckel oder seitlich durch die Wand führen, die GPIO-Leiste durch den Deckel. Dazu kommen drei kleine ESP32-Boards: XIAO ESP32-C6, ESP32-C3 Super Mini und ESP32-C6 Super Mini.",
+          "en": "Every Raspberry Pi and the BIGTREETECH Pi have their microSD card slot now. Ribbon cables can leave through the lid or sideways through the wall, and the GPIO header through the lid. Three small ESP32 boards join: XIAO ESP32-C6, ESP32-C3 Super Mini and ESP32-C6 Super Mini."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.132.2",
     "items": [
       {
