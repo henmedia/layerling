@@ -209,6 +209,8 @@ Zmień otwór łezkowy w otwór i zgrupuj go z częścią. Jego długość biegn
 
 Obudowa do elektroniki potrzebuje otworu na kabel. {{ui:shape.port}} to właśnie taki otwór: leżące wycięcie z zaokrąglonymi narożnikami. W polu {{ui:prop.portPreset}} wybierz złącze - {{ui:port.usbC}}, {{ui:port.microUsb}} lub {{ui:port.usbA}} - a otwór dostanie jego wymiar z luzem ok. 0,25 mm z każdej strony. {{ui:port.usbCPlug}} jest dla złącza schowanego za ścianką, gdzie musi wejść obudowa wtyczki. Szerokość, wysokość i {{ui:prop.portCorner}} można zmienić ręcznie; lista pokazuje wtedy {{ui:port.custom}}. {{ui:port.hdmi}}, {{ui:port.miniHdmi}}, {{ui:port.microHdmi}}, {{ui:port.displayPort}} i {{ui:port.miniDisplayPort}} mają, jak gniazdo, ukośnie ścięte dolne narożniki, DisplayPort tylko lewy, a {{ui:port.rj45}} pasuje do gniazda sieciowego; te wymiary pochodzą z zalecanych przez producentów wycięć w panelu i z rysunków VESA.
 
+Dla akumulatorów i silników modelarskich lista ma {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} i {{ui:port.mpx}}, leżące i dookoła o około 0,25 mm większe od wtyku, żeby wtyk przeszedł - wymiary z rysunków Amass i Multiplex. {{ui:port.dsub9}} to wycięcie w panelu na wtyk portu szeregowego (RS-232 lub RS-485), z bokami skośnymi jak we wtyku. Jego dwa otwory na śruby (3,18 mm) dochodzą od razu, w odstępie 24,99 mm na połowie wysokości otworu: otwór i dziury tworzą jedną grupę, przesuwają się i obracają razem, a zgrupowane ze ścianą wycinają się wszystkie trzy.
+
 Otwór pojawia się jako wycięcie skierowane do przodu. Ustaw {{ui:prop.portDepth}} nieco większą niż grubość ścianki, przesuń go tam, gdzie złącze siedzi na płytce, i zgrupuj z obudową. Dla ścianki bocznej obróć go o 90° wokół osi pionowej.
 
 ## Pogłębienie walcowe i stożkowe

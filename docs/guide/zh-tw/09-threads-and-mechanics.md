@@ -191,6 +191,8 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 電子產品外殼需要為線材留開孔。{{ui:shape.port}} 就是這種開孔：一個橫放、帶圓角的挖空體。在 {{ui:prop.portPreset}} 中選擇接頭（{{ui:port.usbC}}、{{ui:port.microUsb}} 或 {{ui:port.usbA}}），它就會取得該接頭的尺寸，並在每邊多留約 0.25 mm 間隙。{{ui:port.usbCPlug}} 用於裝在壁後方的接頭，插頭外殼需要伸進來。寬度、高度和 {{ui:prop.portCorner}} 都可以手動修改，此時清單會顯示 {{ui:port.custom}}。{{ui:port.hdmi}}、{{ui:port.miniHdmi}}、{{ui:port.microHdmi}}、{{ui:port.displayPort}} 和 {{ui:port.miniDisplayPort}} 像接頭本身一樣把下方的角斜切掉，DisplayPort 只切左下角；{{ui:port.rj45}} 適用於網路接頭。這些尺寸來自廠商建議的面板開孔和 VESA 圖紙。
 
+對於航模電池和馬達，清單裡有{{ui:port.xt30}}、{{ui:port.xt60}}、{{ui:port.mt60}}和{{ui:port.mpx}}，橫放，四周比插頭大約寬 0.25 mm，讓插頭能穿過——尺寸取自 Amass 和 Multiplex 的圖紙。{{ui:port.dsub9}}是序列埠（RS-232 或 RS-485）插頭的面板開孔，兩側像插頭一樣傾斜。它的兩個螺絲孔（3.18 mm）一併帶上，相距 24.99 mm，位於開口的中間高度：開口和孔是一個群組，會一起移動和旋轉，與牆壁成組後三者一起被切開。
+
 它預設為挖空體，朝向前方。把 {{ui:prop.portDepth}} 設得比壁厚稍大，移到電路板上接頭所在的位置，再與外殼組合。用於側壁時，繞垂直軸旋轉 90°。
 
 ## 沉頭孔與錐形沉頭孔
