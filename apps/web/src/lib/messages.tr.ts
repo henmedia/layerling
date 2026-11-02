@@ -898,6 +898,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Nesne değiştiği için kenar işlemi iptal edildi",
   "status.edgeNeedsAdjustment": "Kenar işleminin ayarlanması gerekiyor",
   "status.edgePreviewReady": "Kenar işlemi önizlemesi hazır",
+  "status.edgeCornerEdgeAdded": "Bir köşedeki kısa bir kenar da eklendi: o olmadan bu köşe işlenemez.",
+  "status.edgeCornerEdgesAdded": "Köşelerdeki {count} kısa kenar da eklendi: onlar olmadan bu köşeler işlenemez.",
   "status.finishBeforeRedo": "Yinelemeden önce geçerli sürükleme veya dönüşümü bitir",
   "status.finishBeforeRotate": "Döndürmeden önce geçerli sürükleme veya dönüşümü bitir",
   "status.finishBeforeSave": "Tasarım dosyasını kaydetmeden önce geçerli sürükleme veya dönüşümü bitir",

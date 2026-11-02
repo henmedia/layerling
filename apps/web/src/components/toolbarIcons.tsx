@@ -413,6 +413,19 @@ export function ToolbarCutOutIcon(props: IconProps) {
   );
 }
 
+/** A star held over a plate, its outline running down in dashes to the star-shaped opening it leaves: a punch. */
+export function ToolbarPunchIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M24 5l3 6h6l-5 4 2 6-6-4-6 4 2-6-5-4h6Z" {...SOLID} />
+      <path d="M24 5l3 6h6l-5 4 2 6-6-4-6 4 2-6-5-4h6Z" />
+      <path d="M18 21v9M30 21v9" strokeDasharray="3 3" />
+      <path d="M6 30h12v10H6ZM30 30h12v10H30Z" {...SOLID} />
+      <path d="M6 30h12M30 30h12M42 30v10H6V30M18 40h12" />
+    </ToolbarVectorIcon>
+  );
+}
+
 /** A block whose boss on top is drawn dashed: the faces that go, the top closed again. */
 export function ToolbarDeleteFaceIcon(props: IconProps) {
   return (

@@ -51,6 +51,7 @@ import { displayY, insideZ } from "@/lib/displayAxes";
 import { clampNudge, constrainToAxis, sketchSegmentDragPointIds, sketchSelectedPointIds, sketchSelectedSegmentIds, sketchSelectionMovePointIds, type SketchSelectableEntity, type SketchSelection } from "@/lib/sketchSelection";
 import { closedPathAt, closedPathRegions, cubicPoint, curveControls, isInsideEdges, orderedPaths, pathEdges, type DisplayPath, type PlaneEdge } from "@/lib/sketchPaths";
 import { capturePointer } from "@/lib/pointerCapture";
+import { sketchBoardSize, sketchFarthestReach, sketchMinZoom, sketchPointerReach } from "@/lib/sketchBoard";
 import { arcPreviewPoints, arcThroughThreePoints, type SketchArcEnd } from "@/lib/sketchArc";
 import { constrainToAngle, sketchLineAngle, sketchPolarPoint, splitTypedLine } from "@/lib/sketchPolar";
 
@@ -1072,7 +1073,8 @@ export function SketchWorkspace({
     const moving = new Set(sketchSelectionMovePointIds(profile, selected));
     const startPoints = profile.points.filter((point) => moving.has(point.id));
     if (!startPoints.length) return;
-    const allowed = clampNudge(startPoints, dx, dz, workspace.width / 2, workspace.depth / 2);
+    const farthest = sketchFarthestReach(workspace);
+    const allowed = clampNudge(startPoints, dx, dz, farthest.halfWidth, farthest.halfDepth);
     if (Math.abs(allowed.dx) < 1e-9 && Math.abs(allowed.dz) < 1e-9) return;
     onTransformPoints(translateSketchPoints(startPoints, allowed.dx, allowed.dz), t("sketch.shapeMoved"));
   };
@@ -1297,18 +1299,26 @@ export function SketchWorkspace({
   // Counted from the origin, like the plate's own grid: a stronger line every
   // fifth millimetre step, or on every whole inch.
   const gridLineClass = (value: number) => (Math.abs(value) < 0.0001 ? "axis" : Math.round(value / gridStep) % gridLayout.majorInterval === 0 ? "major" : "minor");
+  // The plate grows with the sketch, in whole major grid steps (#1177): a profile moved off the workplane, for the
+  // wide radius of a revolve, stays on the grid, and the pointer reaches a workplane further still.
+  const board = useMemo(
+    () => sketchBoardSize(workspace, profile, gridStep * gridLayout.majorInterval),
+    [gridLayout.majorInterval, gridStep, profile, workspace],
+  );
+  const reach = sketchPointerReach(workspace, board);
+  const minZoom = sketchMinZoom(workspace, board, SKETCH_MIN_ZOOM);
   const verticalLines = useMemo(() => {
     const lines: number[] = [];
-    const start = Math.ceil((-workspace.width / 2) / gridStep) * gridStep;
-    for (let x = start; x <= workspace.width / 2 + 0.0001; x += gridStep) lines.push(Number(x.toFixed(6)));
+    const start = Math.ceil((-board.width / 2) / gridStep) * gridStep;
+    for (let x = start; x <= board.width / 2 + 0.0001; x += gridStep) lines.push(Number(x.toFixed(6)));
     return lines;
-  }, [gridStep, workspace.width]);
+  }, [gridStep, board.width]);
   const horizontalLines = useMemo(() => {
     const lines: number[] = [];
-    const start = Math.ceil((-workspace.depth / 2) / gridStep) * gridStep;
-    for (let z = start; z <= workspace.depth / 2 + 0.0001; z += gridStep) lines.push(Number(z.toFixed(6)));
+    const start = Math.ceil((-board.depth / 2) / gridStep) * gridStep;
+    for (let z = start; z <= board.depth / 2 + 0.0001; z += gridStep) lines.push(Number(z.toFixed(6)));
     return lines;
-  }, [gridStep, workspace.depth]);
+  }, [gridStep, board.depth]);
 
   const unsnappedPointFromEvent = (event: { clientX: number; clientY: number }) => {
     const svg = svgRef.current;
@@ -1351,8 +1361,8 @@ export function SketchWorkspace({
     }
     const step = snapStep(snap);
     return {
-      x: clamp(snapValue(local.x, step), -workspace.width / 2, workspace.width / 2),
-      z: clamp(snapValue(local.z, step), -workspace.depth / 2, workspace.depth / 2),
+      x: clamp(snapValue(local.x, step), -reach.halfWidth, reach.halfWidth),
+      z: clamp(snapValue(local.z, step), -reach.halfDepth, reach.halfDepth),
     };
   };
 
@@ -1504,8 +1514,8 @@ export function SketchWorkspace({
       setView((current) => ({
         ...current,
         pan: {
-          x: clamp(current.pan.x - deltaX / scaleX, -workspace.width / 2, workspace.width / 2),
-          z: clamp(current.pan.z - deltaY / scaleY, -workspace.depth / 2, workspace.depth / 2),
+          x: clamp(current.pan.x - deltaX / scaleX, -board.width / 2, board.width / 2),
+          z: clamp(current.pan.z - deltaY / scaleY, -board.depth / 2, board.depth / 2),
         },
       }));
       setPointerAction({ ...pointerAction, clientX: event.clientX, clientY: event.clientY });
@@ -1535,7 +1545,7 @@ export function SketchWorkspace({
       const current = turning
         ? unsnappedPointFromEvent(event) ?? point
         : unsnapped && pointerAction.kind === "resize-selection" && pointerAction.grab
-        ? resizePointerOnGrid(unsnapped, pointerAction.grab, snapStep(snap), workspace.width / 2, workspace.depth / 2)
+        ? resizePointerOnGrid(unsnapped, pointerAction.grab, snapStep(snap), reach.halfWidth, reach.halfDepth)
         : event.shiftKey && lockOrigin ? constrainToAxis(lockOrigin, point) : point;
       setPointerAction({
         ...pointerAction,
@@ -1642,7 +1652,7 @@ export function SketchWorkspace({
     const offset = { x: event.clientX - (bounds.left + bounds.width / 2), y: event.clientY - (bounds.top + bounds.height / 2) };
     const pixelsPerUnit = Math.min(bounds.width / workspace.width, bounds.height / workspace.depth);
     const factor = sketchWheelZoomFactor(event, orbitControlsZoomSpeed(workspace.zoomSpeed) * SKETCH_WHEEL_ZOOM_BOOST);
-    setView((current) => zoomSketchViewAt(current, factor, offset, pixelsPerUnit, workspace));
+    setView((current) => zoomSketchViewAt(current, factor, offset, pixelsPerUnit, board, minZoom));
   };
 
   // Safari on a Mac sends no wheel steps for a pinch on the trackpad, only gestures with a scale, and zooms the whole
@@ -1669,17 +1679,17 @@ export function SketchWorkspace({
       };
       const pixelsPerUnit = Math.min(bounds.width / workspace.width, bounds.height / workspace.depth);
       const factor = sketchPinchZoomFactor(ratio, orbitControlsZoomSpeed(workspace.zoomSpeed), orbitControlsZoomSpeed(DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed));
-      setView((current) => zoomSketchViewAt(current, factor, offset, pixelsPerUnit, workspace));
+      setView((current) => zoomSketchViewAt(current, factor, offset, pixelsPerUnit, board, minZoom));
     };
     const names = ["gesturestart", "gesturechange", "gestureend"] as const;
     names.forEach((name) => wrap.addEventListener(name, onGesture, { passive: false }));
     return () => names.forEach((name) => wrap.removeEventListener(name, onGesture));
-  }, [workspace]);
+  }, [board, minZoom, workspace]);
 
   // Matches the 3D editor's buttons: a fixed step at the slowest zoom speed, whatever the slider says.
   const zoomByButton = (distanceStep: number) => {
     const scaled = zoomDistanceScale(distanceStep);
-    setView((current) => ({ ...current, zoom: clamp(current.zoom / scaled, SKETCH_MIN_ZOOM, SKETCH_MANUAL_MAX_ZOOM) }));
+    setView((current) => ({ ...current, zoom: clamp(current.zoom / scaled, minZoom, SKETCH_MANUAL_MAX_ZOOM) }));
   };
 
   const resetView = useCallback(() => setView({ zoom: 1, pan: { x: 0, z: 0 } }), []);
@@ -1699,14 +1709,14 @@ export function SketchWorkspace({
     const spanX = Math.max((focusBounds.maxX - focusBounds.minX) * margin, minimumSpan);
     const spanZ = Math.max((focusBounds.maxZ - focusBounds.minZ) * margin, minimumSpan);
     setView({
-      zoom: clamp(Math.min(workspace.width / spanX, workspace.depth / spanZ), SKETCH_MIN_ZOOM, SKETCH_MAX_ZOOM),
+      zoom: clamp(Math.min(workspace.width / spanX, workspace.depth / spanZ), minZoom, SKETCH_MAX_ZOOM),
       pan: {
-        x: clamp((focusBounds.minX + focusBounds.maxX) / 2, -workspace.width / 2, workspace.width / 2),
-        z: clamp((focusBounds.minZ + focusBounds.maxZ) / 2, -workspace.depth / 2, workspace.depth / 2),
+        x: clamp((focusBounds.minX + focusBounds.maxX) / 2, -board.width / 2, board.width / 2),
+        z: clamp((focusBounds.minZ + focusBounds.maxZ) / 2, -board.depth / 2, board.depth / 2),
       },
     });
     return true;
-  }, [focusBounds, workspace.depth, workspace.width]);
+  }, [board.depth, board.width, focusBounds, minZoom, workspace.depth, workspace.width]);
 
   // The keys 1 to 3 on a selection with the Select tool (#347). False when the selection has nothing to
   // change this way, so the key goes on to pick the drawing tool.
@@ -1770,8 +1780,8 @@ export function SketchWorkspace({
           return {
             ...current,
             pan: {
-              x: clamp(current.pan.x - panStep[0] * height, -workspace.width / 2, workspace.width / 2),
-              z: clamp(current.pan.z + panStep[1] * height, -workspace.depth / 2, workspace.depth / 2),
+              x: clamp(current.pan.x - panStep[0] * height, -board.width / 2, board.width / 2),
+              z: clamp(current.pan.z + panStep[1] * height, -board.depth / 2, board.depth / 2),
             },
           };
         });
@@ -1833,7 +1843,7 @@ export function SketchWorkspace({
         const handleAt = handlePoint && selectedHandle ? (selectedHandle.handle === "in" ? handlePoint.handleIn : handlePoint.handleOut) : undefined;
         if (selectedHandle && handleAt) {
           event.preventDefault();
-          const moved = { x: clamp(handleAt.x + dx, -workspace.width / 2, workspace.width / 2), z: clamp(handleAt.z + dz, -workspace.depth / 2, workspace.depth / 2) };
+          const moved = { x: clamp(handleAt.x + dx, -reach.halfWidth, reach.halfWidth), z: clamp(handleAt.z + dz, -reach.halfDepth, reach.halfDepth) };
           if (moved.x === handleAt.x && moved.z === handleAt.z) return;
           // A run of arrow presses is one step of the history, as for points (#370).
           onMoveHandle(selectedHandle.pointId, selectedHandle.handle, moved, `handle:${selectedHandle.pointId}:${selectedHandle.handle}`);
@@ -1844,8 +1854,8 @@ export function SketchWorkspace({
           if (!image || image.locked) return;
           event.preventDefault();
           onUpdateImage(image.id, {
-            x: clamp(image.x + dx, -workspace.width / 2, workspace.width / 2),
-            z: clamp(image.z + dz, -workspace.depth / 2, workspace.depth / 2),
+            x: clamp(image.x + dx, -reach.halfWidth, reach.halfWidth),
+            z: clamp(image.z + dz, -reach.halfDepth, reach.halfDepth),
           }, t("sketch.imageMoved"), `image:${image.id}`);
           return;
         }
@@ -1853,7 +1863,7 @@ export function SketchWorkspace({
         const startPoints = profile.points.filter((point) => moving.has(point.id));
         if (!startPoints.length) return;
         event.preventDefault();
-        const allowed = clampNudge(startPoints, dx, dz, workspace.width / 2, workspace.depth / 2);
+        const allowed = clampNudge(startPoints, dx, dz, reach.halfWidth, reach.halfDepth);
         if (allowed.dx === 0 && allowed.dz === 0) return;
         // A run of arrow presses is one step of the history (#370).
         onTransformPoints(translateSketchPoints(startPoints, allowed.dx, allowed.dz), t("sketch.shapeMoved"), `points:${startPoints.map((point) => point.id).join(",")}`);
@@ -1871,7 +1881,7 @@ export function SketchWorkspace({
       window.removeEventListener("keyup", handleKeyUp);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- editSelectionByKey is rebuilt from the selection, which is listed
-  }, [activePoint, focusSelection, onMoveHandle, onSetPointMode, onSetPointsMode, onCurveSegment, onCurveSegments, onStraightenSegment, onStraightenSegments, selectedLines, selectedCornerIds, canCurveLines, canStraightenLines, onSelectTool, onTransformPoints, onUpdateImage, pendingMeasurementStart, pointerAction, profile, chooseSnap, resetView, selected, selectedHandle, snap, tool, workspace.customSnapGrids, workspace.depth, workspace.units, workspace.width]);
+  }, [activePoint, focusSelection, onMoveHandle, onSetPointMode, onSetPointsMode, onCurveSegment, onCurveSegments, onStraightenSegment, onStraightenSegments, selectedLines, selectedCornerIds, canCurveLines, canStraightenLines, onSelectTool, onTransformPoints, onUpdateImage, pendingMeasurementStart, pointerAction, profile, chooseSnap, resetView, selected, selectedHandle, snap, tool, workspace.customSnapGrids, workspace.depth, workspace.units, workspace.width, board.depth, board.width]);
 
   const beginEntityDrag = (event: ReactPointerEvent<SVGElement>, action: PointerAction) => {
     if (event.button !== 0) return;
@@ -1901,7 +1911,7 @@ export function SketchWorkspace({
     const typedAngle = typedLine.angle.trim() ? parseMeasurementInput(typedLine.angle) : pointerAngle;
     return Number.isFinite(typedAngle) ? sketchPolarPoint(activePoint, length, typedAngle) : null;
   })();
-  const typedLineOffPlate = Boolean(typedLineTarget && (Math.abs(typedLineTarget.x) > workspace.width / 2 + 1e-6 || Math.abs(typedLineTarget.z) > workspace.depth / 2 + 1e-6));
+  const typedLineOffPlate = Boolean(typedLineTarget && (Math.abs(typedLineTarget.x) > reach.halfWidth + 1e-6 || Math.abs(typedLineTarget.z) > reach.halfDepth + 1e-6));
   const commitTypedLine = () => {
     if (!typedLineTarget || typedLineOffPlate) return;
     setTypedLine(null);
@@ -2273,8 +2283,8 @@ export function SketchWorkspace({
             const spot = unsnappedPointFromEvent(event);
             if (!spot) return;
             viewSlide.slideTo(pan, {
-              x: clamp(spot.x, -workspace.width / 2, workspace.width / 2),
-              z: clamp(spot.z, -workspace.depth / 2, workspace.depth / 2),
+              x: clamp(spot.x, -board.width / 2, board.width / 2),
+              z: clamp(spot.z, -board.depth / 2, board.depth / 2),
             });
           }}
           onContextMenu={(event) => {
@@ -2293,18 +2303,18 @@ export function SketchWorkspace({
             if (point) onAddPrimitive(primitive, point);
           }}
         >
-          <rect className="sketch-plate-background" x={-workspace.width / 2} y={-workspace.depth / 2} width={workspace.width} height={workspace.depth} />
+          <rect className="sketch-plate-background" x={-board.width / 2} y={-board.depth / 2} width={board.width} height={board.depth} />
           {workspace.showGrid ? (
             <g className="sketch-grid" pointerEvents="none">
-              {verticalLines.map((x) => <line className={gridLineClass(x)} key={`x-${x}`} x1={x} y1={-workspace.depth / 2} x2={x} y2={workspace.depth / 2} />)}
-              {horizontalLines.map((z) => <line className={gridLineClass(z)} key={`z-${z}`} x1={-workspace.width / 2} y1={z} x2={workspace.width / 2} y2={z} />)}
+              {verticalLines.map((x) => <line className={gridLineClass(x)} key={`x-${x}`} x1={x} y1={-board.depth / 2} x2={x} y2={board.depth / 2} />)}
+              {horizontalLines.map((z) => <line className={gridLineClass(z)} key={`z-${z}`} x1={-board.width / 2} y1={z} x2={board.width / 2} y2={z} />)}
             </g>
           ) : null}
           {operation === "revolve" ? (
             <g className="sketch-revolve-guide" pointerEvents="none">
-              <rect x={0} y={-workspace.depth / 2} width={workspace.width / 2} height={workspace.depth} />
-              <line x1={0} y1={-workspace.depth / 2} x2={0} y2={workspace.depth / 2} />
-              <text x={-5 * screenUnit} y={-workspace.depth / 2 + 18 * screenUnit} fontSize={12 * screenUnit}>{t("sketch.revolveAxis")}</text>
+              <rect x={0} y={-board.depth / 2} width={board.width / 2} height={board.depth} />
+              <line x1={0} y1={-board.depth / 2} x2={0} y2={board.depth / 2} />
+              <text x={-5 * screenUnit} y={-board.depth / 2 + 18 * screenUnit} fontSize={12 * screenUnit}>{t("sketch.revolveAxis")}</text>
             </g>
           ) : null}
           <g className="sketch-reference-images">
@@ -2474,7 +2484,7 @@ export function SketchWorkspace({
             })}
           </g>
           {showReferenceEdges && referenceEdges ? <path className="sketch-reference-edges" d={referenceEdges} fill="none" vectorEffect="non-scaling-stroke" pointerEvents="none" /> : null}
-          <rect className="sketch-plate-border" x={-workspace.width / 2} y={-workspace.depth / 2} width={workspace.width} height={workspace.depth} pointerEvents="none" />
+          <rect className="sketch-plate-border" x={-board.width / 2} y={-board.depth / 2} width={board.width} height={board.depth} pointerEvents="none" />
           {pointerAction?.kind === "marquee" ? (
             <rect
               className="sketch-selection-marquee"

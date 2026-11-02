@@ -39,6 +39,8 @@ Jeśli rozmiar jest za duży dla krawędzi, layerling o tym informuje i proponuj
 
 Gdy wybór, który działał, przestaje działać po kliknięciu jeszcze jednej krawędzi, ta krawędź robi się czerwona i grubsza: to ona nie daje się obrobić razem z pozostałymi w tym rozmiarze. Kliknij ją ponownie, aby ją wyłączyć, albo zmniejsz rozmiar. Jeśli klikasz kolejne krawędzie, gdy komunikat jest widoczny, pierwsza zostaje czerwona. Gdy nie ma wcześniejszego wyboru, który działał (pierwsze kliknięcie albo rozmiar, który właśnie zwiększyłeś), na czerwono robią się krawędzie, które nie działają nawet same, albo wszystkie, jeśli problemem jest tylko ich połączenie.
 
+Zanim się podda, layerling próbuje jeszcze raz z krótkimi krawędziami na końcach wybranych, długimi najwyżej na dwa rozmiary. Taka krawędź jest tam, gdzie wcześniejsza faza kończy się na ściance, która jest jeszcze ostra: krótka ukośna krawędź w narożniku, a dopóki pozostaje ostra, narożnika nie da się obrobić. Jeśli to pomoże, te krawędzie zostają też wybrane, a komunikat mówi, ile ich dołączono.
+
 Krawędź pod wskaźnikiem też jest rysowana grubiej, więc widać, którą wybierze kliknięcie.
 
 Otwór także przyjmuje {{ui:editor.tool.chamfer}} i {{ui:editor.tool.fillet}}, podobnie jak {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} i {{ui:editor.tool.deleteFace}}: pozostaje otworem i wycina swoim nowym kształtem. Zaokrąglenie czterech pionowych krawędzi otworu w kształcie prostopadłościanu daje kieszeń z zaokrąglonymi narożnikami wewnętrznymi, a otwór powiększony przez {{ui:editor.tool.offset}} wycina z odpowiednio większym luzem. Krawędź, w której otwór styka się z częścią, obrabiaj na gotowej grupie: ta krawędź należy do niej.

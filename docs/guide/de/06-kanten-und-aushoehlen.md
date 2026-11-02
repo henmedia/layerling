@@ -40,6 +40,8 @@ Wenn das Maß zu groß für die Kante ist, sagt layerling das und schlägt einen
 
 Scheitert eine Auswahl, die eben noch ging, nachdem du eine weitere Kante angeklickt hast, wird diese Kante rot und breiter gezeichnet: Sie ist die, die sich bei diesem Maß nicht zusammen mit den anderen bearbeiten lässt. Klicke sie noch einmal an, um sie herauszunehmen, oder nimm ein kleineres Maß. Klickst du weitere Kanten an, solange die Meldung steht, bleibt die erste rot. Gibt es keine frühere Auswahl, die ging - beim allerersten Klick oder nach einem größeren Maß -, werden die Kanten rot, die schon allein scheitern, oder alle, wenn nur ihr Zusammenspiel scheitert.
 
+Bevor es aufgibt, versucht layerling es noch einmal mit den kurzen Kanten an den Enden der gewählten, höchstens doppelt so lang wie die Größe. So eine sitzt dort, wo eine frühere Fase an einer noch scharfen Wand endet: eine kurze, schräge Kante in der Ecke, und solange sie scharf bleibt, lässt sich die Ecke nicht bearbeiten. Hilft das, sind diese Kanten danach mit gewählt, und eine Meldung sagt, wie viele mitgenommen wurden.
+
 Auch die Kante unter dem Mauszeiger wird breiter gezeichnet, damit du siehst, welche ein Klick wählt.
 
 Auch eine Aussparung nimmt {{ui:editor.tool.chamfer}} und {{ui:editor.tool.fillet}} an, ebenso {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} und {{ui:editor.tool.deleteFace}}: Sie bleibt eine Aussparung und schneidet mit ihrer neuen Form. Werden die vier senkrechten Kanten einer Quader-Aussparung verrundet, entsteht eine Tasche mit runden Innenecken, und eine mit {{ui:editor.tool.offset}} vergrößerte Aussparung schneidet mit entsprechend mehr Luft. Die Kante, an der eine Aussparung auf das Teil trifft, brichst du dagegen an der fertigen Gruppe: Diese Kante gehört ihr.

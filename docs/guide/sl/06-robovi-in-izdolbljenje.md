@@ -37,6 +37,8 @@ Medtem ko vrtiš mero, layerling predogled preračuna. To lahko traja trenutek. 
 
 Če izbor, ki je deloval, odpove, ko klikneš še en rob, ta rob postane rdeč in se nariše širše: to je rob, ki ga pri tej meri ni mogoče obdelati skupaj z drugimi. Klikni ga znova, da ga odstraniš, ali pa zmanjšaj mero. Če med prikazanim sporočilom klikneš še več robov, prvi ostane rdeč. Kadar ni prejšnjega izbora, ki bi deloval – pri prvem kliku ali pri meri, ki si jo ravnokar povečal – rdeči postanejo robovi, ki odpovedo že sami, ali vsi, če gre le za njihovo kombinacijo.
 
+Preden obupa, layerling poskusi še enkrat s kratkimi robovi na koncih izbranih, dolgimi največ dvakratno velikost. Tak rob je tam, kjer se prejšnje posnetje konča na steni, ki je še ostra: kratek poševen rob v vogalu, in dokler ostane oster, vogala ni mogoče obdelati. Če to pomaga, so ti robovi nato prav tako izbrani in sporočilo pove, koliko jih je bilo dodanih.
+
 Rob pod kazalcem je prav tako narisan širše, da vidiš, kateri se bo izbral s klikom.
 
 Tudi luknja sprejme {{ui:editor.tool.chamfer}} in {{ui:editor.tool.fillet}}, prav tako {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} in {{ui:editor.tool.deleteFace}}: ostane luknja in reže s svojo novo obliko. Če zaobliš štiri navpične robove luknje v obliki kvadra, dobiš žep z zaobljenimi notranjimi vogali, luknja, povečana z {{ui:editor.tool.offset}}, pa reže s toliko več zračnosti. Rob, kjer luknja sreča del, raje obdelaj na končani skupini: ta rob pripada njej.

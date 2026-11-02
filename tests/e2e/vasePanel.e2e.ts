@@ -71,6 +71,15 @@ function choose(select: HTMLSelectElement, value: string) {
   });
 }
 
+function type(input: HTMLInputElement, value: string) {
+  act(() => input.focus());
+  act(() => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, value);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  act(() => input.blur());
+}
+
 describe("a vase in its settings", () => {
   it("is in the shape library and comes out plain, as a bottle", () => {
     const { shape } = mount();
@@ -101,5 +110,33 @@ describe("a vase in its settings", () => {
     const button = [...panel.querySelectorAll<HTMLButtonElement>("button")].find((entry) => entry.textContent === "Lay out accessories")!;
     act(() => button.click());
     expect(calls.accessories).toBe(1);
+  });
+
+  it("fills the teapot lid's height and the joint up to the vase's height, whichever is typed", () => {
+    const plain = mount().shape;
+    const teapot = (lidHeight: number) => {
+      const opened = mount({ height: 140, vase: { ...plain.vase!, body: "hohl", lidMode: "kanne", lidHeight } });
+      // The card stays open once opened.
+      if (!rangeNamed(opened.panel, "Lid height")) act(() => header(opened.panel, "Accessories").click());
+      const field = (name: string) => rangeNamed(opened.panel, name)!.querySelector<HTMLInputElement>("input[type=text]")!;
+      return { ...opened, lid: field("Lid height"), joint: field("Body up to · lid from") };
+    };
+    const vase = teapot(35);
+    expect(Number(vase.lid.value)).toBe(35);
+    expect(Number(vase.joint.value)).toBe(105);
+    // The joint typed in: the lid is the rest.
+    type(vase.joint, "90");
+    expect(vase.calls.updates.at(-1)?.vase?.lidHeight).toBe(50);
+    // The lid typed in: the joint follows.
+    const typed = teapot(35);
+    type(typed.lid, "42");
+    expect(typed.calls.updates.at(-1)?.vase?.lidHeight).toBe(42);
+    expect(Number(teapot(42).joint.value)).toBe(98);
+    // At most seven tenths of the vase is the lid, and both show what is built.
+    const tall = teapot(200);
+    expect(Number(tall.lid.value)).toBe(98);
+    expect(Number(tall.joint.value)).toBe(42);
+    type(tall.joint, "10");
+    expect(tall.calls.updates.at(-1)?.vase?.lidHeight).toBe(98);
   });
 });

@@ -3090,6 +3090,11 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
   cursor: pointer;
 }
 
+/* The punch's three axes side by side. */
+.punch-axis-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 /* Five hole shapes: three to a row. */
 .hole-pattern-panel .hole-pattern-forms {
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3272,6 +3277,20 @@ html[data-theme="dark"] .shell-openings-summary {
   color: #6e5841;
   font-size: 12px;
   font-weight: 700;
+}
+
+/* The two bodies of Cut out and Punch, each on a line of its own, and the swap button under them. */
+.edge-modifier-field.tool-roles {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.edge-modifier-field.tool-roles button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .edge-modifier-field select {

@@ -60,7 +60,7 @@ export function CutOutPanel({
         <span>{t("cutOut.help")}</span>
       </div>
 
-      <div className="edge-modifier-field">
+      <div className="edge-modifier-field tool-roles">
         <span>{t("cutOut.part")}: <strong>{partName}</strong></span>
         <span>{t("cutOut.host")}: <strong>{hostName}</strong></span>
         <button type="button" className="secondary" disabled={busy} onClick={onSwap}>

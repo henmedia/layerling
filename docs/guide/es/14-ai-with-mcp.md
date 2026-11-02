@@ -82,6 +82,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_apply_edge_treatment` | achaflana o redondea las aristas elegidas |
 | `layerling_hollow_object` | vacía un cuerpo con una pared uniforme |
 | `layerling_cut_out` | recorta un sólido de otro para que encajen: la pieza se queda, una copia ampliada con la holgura se resta del otro cuerpo |
+| `layerling_punch` | troquela el contorno de un sólido, visto a lo largo de x, y o z, en línea recta a través de otro; el troquel se queda y no tiene que tocarlo |
 | `layerling_offset_object` | desfasa todas las caras de un cuerpo para la holgura de un ajuste: lo agranda o reduce, o añade la copia agrandada como orificio, o mueve solo los lados |
 | `layerling_list_faces` | lista las caras de un cuerpo exacto |
 | `layerling_delete_faces` | elimina caras y cierra el hueco |

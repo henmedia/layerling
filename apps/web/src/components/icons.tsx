@@ -150,6 +150,7 @@ export {
   ToolbarHollowIcon,
   ToolbarOffsetIcon,
   ToolbarCutOutIcon,
+  ToolbarPunchIcon,
   ToolbarDeleteFaceIcon,
   ToolbarSimplifyIcon,
   ToolbarSurfaceTextureIcon,

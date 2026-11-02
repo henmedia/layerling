@@ -130,6 +130,7 @@ export type LayerlingMcpCommandName =
   | "hollow_object"
   | "offset_object"
   | "cut_out"
+  | "punch"
   | "array_objects"
   | "inspect_errors"
   | "estimate_print"

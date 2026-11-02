@@ -37,6 +37,8 @@ Is de maat te groot voor de rand, dan meldt layerling dat en stelt een kleinere 
 
 Mislukt een selectie die eerst werkte nadat je op nog een rand hebt geklikt, dan wordt die rand rood en breder getekend: dat is de rand die bij deze maat niet samen met de andere kan worden bewerkt. Klik er nog een keer op om hem eruit te halen, of maak de maat kleiner. Klik je meer randen aan terwijl de melding staat, dan blijft de eerste rood. Is er geen eerdere selectie die werkte, bij de allereerste klik of een maat die je net hebt verhoogd, dan worden de randen rood die ook op zichzelf mislukken, of allemaal als het alleen aan hun combinatie ligt.
 
+Voordat het opgeeft, probeert layerling het nog een keer met de korte randen aan de uiteinden van de gekozen randen, hoogstens twee keer zo lang als de maat. Zo'n rand zit waar een eerdere afschuining eindigt op een wand die nog scherp is: een korte schuine rand in de hoek, en zolang die scherp blijft kan de hoek niet bewerkt worden. Helpt dat, dan zijn die randen daarna ook gekozen en zegt een melding hoeveel er zijn meegenomen.
+
 Ook de rand onder de aanwijzer wordt breder getekend, zodat je ziet welke een klik zal kiezen.
 
 Ook een gat neemt {{ui:editor.tool.chamfer}} en {{ui:editor.tool.fillet}} aan, net als {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} en {{ui:editor.tool.deleteFace}}: het blijft een gat en snijdt met zijn nieuwe vorm. Rond je de vier staande randen van een kubusvormig gat af, dan krijg je een kamer met ronde binnenhoeken, en een gat dat met {{ui:editor.tool.offset}} groter is gemaakt, snijdt met zoveel meer ruimte. De rand waar een gat het onderdeel raakt, bewerk je juist op de afgewerkte groep: die rand hoort bij haar.

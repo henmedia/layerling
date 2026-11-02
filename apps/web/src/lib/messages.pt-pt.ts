@@ -866,6 +866,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "status.edgeCancelledChanged": "Modificação de arestas cancelada porque o objeto foi alterado",
   "status.edgeNeedsAdjustment": "A alteração de arestas precisa de ajustes",
   "status.edgePreviewReady": "Pré-visualização da alteração de arestas pronta",
+  "status.edgeCornerEdgeAdded": "Foi incluída uma aresta curta num canto: sem ela, esse canto não pode ser tratado.",
+  "status.edgeCornerEdgesAdded": "Foram incluídas {count} arestas curtas em cantos: sem elas, esses cantos não podem ser tratados.",
   "status.finishBeforeRedo": "Termina o arrastamento ou a transformação em curso antes de refazeres",
   "status.finishBeforeRotate": "Termina o arrastamento ou a transformação em curso antes de rodares",
   "status.finishBeforeSave": "Termina o arrastamento ou a transformação em curso antes de guardares o ficheiro do projeto",

@@ -37,6 +37,8 @@ Pokud je úprava pro danou hranu příliš velká, Layerling navrhne menší hod
 
 Jestliže dříve funkční výběr přestane fungovat po přidání další hrany, tato hrana zčervená a zesílí. Při dané velikosti ji nelze upravit společně s ostatními. Odeberte ji dalším kliknutím nebo zmenšete velikost. Přidáváte-li při zobrazené chybě další hrany, červeně zůstává první problémová. Neexistuje-li předchozí funkční výběr, například při prvním kliknutí nebo po zvětšení poloměru, zčervenají hrany selhávající samostatně, případně celý výběr, pokud vadí až jejich kombinace.
 
+Než to vzdá, zkusí to layerling ještě jednou s krátkými hranami na koncích vybraných, dlouhými nejvýš dvojnásobek velikosti. Taková hrana je tam, kde dřívější sražení končí na stěně, která je ještě ostrá: krátká šikmá hrana v rohu, a dokud zůstane ostrá, roh nejde upravit. Pokud to pomůže, jsou tyto hrany potom vybrané také a zpráva řekne, kolik jich bylo přibráno.
+
 Hrana pod ukazatelem se také kreslí silněji, abyste věděli, kterou kliknutí vybere.
 
 Také díra přijme {{ui:editor.tool.chamfer}} a {{ui:editor.tool.fillet}}, stejně jako {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} a {{ui:editor.tool.deleteFace}}: zůstane dírou a řeže svým novým tvarem. Zaoblením čtyř svislých hran díry ve tvaru kvádru vznikne kapsa se zaoblenými vnitřními rohy a díra zvětšená pomocí {{ui:editor.tool.offset}} řeže s o tolik větší vůlí. Hranu, kde se díra setkává s dílem, upravte raději na hotové skupině: tato hrana patří jí.

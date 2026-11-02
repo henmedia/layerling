@@ -37,6 +37,8 @@ Si la taille est trop grande pour le bord, layerling l'indique et suggère une v
 
 Lorsqu'une sélection qui a fonctionné échoue après avoir cliqué sur un bord supplémentaire, ce bord devient rouge et s'élargit : c'est celui qui ne peut pas être traité avec les autres à cette taille. Cliquez à nouveau dessus pour le retirer ou réduisez la taille. Si vous cliquez sur plusieurs bords pendant que le message est affiché, le premier reste rouge. Lorsqu'aucune sélection antérieure n'a fonctionné - au tout premier clic ou à une taille que vous venez d'augmenter - les bords qui échouent même d'eux-mêmes deviennent rouges, ou tous s'il ne s'agit que de leur combinaison.
 
+Avant d'abandonner, layerling essaie encore une fois en ajoutant les bords courts aux extrémités de ceux choisis, jusqu'à deux fois la taille. On en trouve là où un chanfrein précédent se termine sur une paroi encore vive : un court bord oblique dans le coin, et le coin ne peut pas être traité tant qu'il reste vif. Si cela aide, ces bords sont ensuite choisis aussi, et un message indique combien ont été ajoutés.
+
 Le bord sous le pointeur est également plus large, afin que vous puissiez voir lequel un clic sélectionnera.
 
 Un perçage accepte aussi {{ui:editor.tool.chamfer}} et {{ui:editor.tool.fillet}}, de même que {{ui:editor.tool.hollow}}, {{ui:editor.tool.offset}} et {{ui:editor.tool.deleteFace}} : il reste un perçage et découpe avec sa nouvelle forme. Arrondir les quatre arêtes verticales d'un perçage en boîte donne une poche aux coins intérieurs arrondis, et un perçage agrandi avec {{ui:editor.tool.offset}} découpe avec autant de jeu en plus. Pour casser l'arête là où un perçage rencontre la pièce, traitez plutôt le groupe terminé : cette arête lui appartient.

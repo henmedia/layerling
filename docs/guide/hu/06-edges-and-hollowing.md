@@ -39,6 +39,8 @@ Ha a méret túl nagy az élhez, a layerling ezt jelzi, és kisebb értéket jav
 
 Ha egy addig működő kijelölés egy újabb élre kattintva hibára fut, az az él pirosra vált, és vastagabban rajzolódik: ez az, amelyet ekkora méretben nem lehet a többivel együtt megmunkálni. Kattints rá újra, hogy kivedd, vagy csökkentsd a méretet. Ha az üzenet fennállása alatt további élekre kattintasz, az első piros marad. Ha nincs korábbi működő kijelölés – a legelső kattintásnál, vagy egy épp megemelt méretnél –, azok az élek válnak pirossá, amelyek önmagukban sem működnek, vagy mind, ha csak az együttesük a gond.
 
+Mielőtt feladná, a layerling még egyszer megpróbálja a kiválasztott élek végén lévő rövid élekkel, amelyek legfeljebb kétszer olyan hosszúak, mint a méret. Ilyen él ott van, ahol egy korábbi élletörés egy még éles falon ér véget: egy rövid, ferde él a sarokban, és amíg éles marad, a sarok nem dolgozható meg. Ha ez segít, ezek az élek is kiválasztva maradnak, és egy üzenet megmondja, hányat vett fel.
+
 A mutató alatti él is vastagabban rajzolódik, így látod, melyiket választja ki egy kattintás.
 
 Egy furat is elfogadja a {{ui:editor.tool.chamfer}} és a {{ui:editor.tool.fillet}} műveletet, akárcsak a {{ui:editor.tool.hollow}}, a {{ui:editor.tool.offset}} és a {{ui:editor.tool.deleteFace}} eszközt: furat marad, és az új alakjával vág. Ha egy hasáb alakú furat négy függőleges élét lekerekíted, lekerekített belső sarkú zsebet vág, a {{ui:editor.tool.offset}} eszközzel megnövelt furat pedig ennyivel több hézaggal vág. Azt az élt, ahol a furat a darabhoz ér, inkább a kész csoporton munkáld meg: az az él hozzá tartozik.
