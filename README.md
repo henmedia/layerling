@@ -101,6 +101,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Slope and narrow along** – run the top of a box, cylinder, polygon, tube, wedge or round roof down to one end, or the sides of all but the tube in towards one end, straight or curved, by number or with a dot on the end: a roof sloping along its length, a ramp, a slanted pipe end, a boat's bow. A slope stays exact for chamfers, fillets and STEP, and so does a narrowed box, wedge or round roof. By @plazmabokor.
 - **Lids** – the lid for a box, a pot or a tray that is open at the top, from its own outline, round or angular: pushed into the opening, put over the outside, gripping the wall from both sides like a food container or laid flat on it, with a tight, normal or loose fit (0.1, 0.2 or 0.3 mm per side) or a gap of your own, lid thickness and the depth and wall of the lip. It comes out beside the body, turned over with its plate down, ready to print without support.
 - **Offset and cut out** – grow or shrink an exact body along all its faces by 0.01 to 10 mm, or only sideways so it keeps its height, for the clearance of a press fit or a snap joint, or cut one part out of another with a gap all round in one step, the part staying where it is.
+- **Punch** – cut the outline of one body straight through another, along X, Y or Z, wherever the punch stands in front of it: a teapot's silhouette through a sign, a logo through a lid. The punch stays to be moved and used again, a clearance lets a printed part pass through, and the opening is an exact sketch body.
 - **Check clearance** – before printing parts that should move, a hinge printed in place, a flexi toy, a lid in its box, check the selection or every visible object pair by pair: overlapping, touching, too tight or fine against a minimum gap you set, between layers or side by side; a click on a pair shows the spot. By @marcus040473.
 - **Surface texture** – lay a relief onto any body, for grip or for looks: grooves, knurling, honeycomb, bumps, Voronoi cells, bricks, knitting, rope, basket weave, carbon fibre, tree bark, wood grain, cracks, a picture as a height map or text, around round bodies or flat along an axis. Up to six patterns go on one body, each on faces of its own: bricks round the walls and knurling on top. By @marcus040473.
 - **Delete face** – click the faces of a fillet, a hole or a boss and delete them: the faces around them grow to close the gap, and the body stays exact for more fillets and the STEP export.
@@ -437,7 +438,7 @@ server switches it on with an access token ([see below](#letting-an-ai-client-re
 
 The main tool names are `layerling_list_editors`, `layerling_read_scene`, `layerling_list_objects`,
 `layerling_create_shape`, `layerling_update_object`, `layerling_list_edges`, `layerling_apply_edge_treatment`,
-`layerling_hollow_object`, `layerling_make_lid`, `layerling_offset_object`, `layerling_cut_out`, `layerling_array_objects`, `layerling_set_section_view` and `layerling_capture_image`.
+`layerling_hollow_object`, `layerling_make_lid`, `layerling_offset_object`, `layerling_cut_out`, `layerling_punch`, `layerling_array_objects`, `layerling_set_section_view` and `layerling_capture_image`.
 
 ### Claude Code
 

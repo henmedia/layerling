@@ -98,6 +98,7 @@ layerling 比 Tinkercad 再往 Fusion 360 靠近一步：操作方式相同，�
 - **斜坡與漸窄** – 讓盒子、圓柱、多邊形、管、楔形或圓頂的頂面往一端傾斜，或讓管以外的形狀側面往一端收窄，直線或曲線，用數值或拖曳端點：沿長度傾斜的屋頂、坡道、斜切的管端、船頭。斜坡對倒角、圓角和 STEP 保持精確，收窄的盒子、楔形和圓頂也一樣。由 @plazmabokor 貢獻。
 - **蓋子** – 為頂部開口的盒子、罐子或托盤依其輪廓產生蓋子，圓形或方形均可：插入開口、罩在外面或平放其上，配合可選緊、一般或鬆（每邊 0.1、0.2 或 0.3 mm）或自訂間隙，還可設定蓋厚以及止口的深度和壁厚。蓋子出現在實體旁邊，板面朝下，無需支撐即可列印。
 - **偏移與挖出** – 讓精確實體沿所有面增大或縮小 0.01 到 10 mm，或只在側向偏移以保持高度，用於壓配或卡扣的間隙；或一步把一個零件從另一個零件中挖出並四周留隙，零件本身保持原位。
+- **沖孔** – 沿 X、Y 或 Z 方向，把一個實體的輪廓筆直沖穿另一個實體，無論沖頭放在前面哪裡：把茶壺的剪影沖穿標牌，把標誌沖穿蓋子。沖頭保留，可移動後再次使用；設定間隙後列印件可以穿過；開口是精確的草圖實體。
 - **檢查間隙** – 列印需要活動的零件之前（一體列印的鉸鏈、柔性玩具、盒中的蓋子），逐對檢查選取的或所有可見的物件：是否重疊、接觸、相對你設定的最小間隙過緊或正常，層與層之間還是並排；點擊一對即可顯示位置。由 @marcus040473 貢獻。
 - **表面紋理** – 在任何實體上加浮雕，用於防滑或美觀：凹槽、滾花、蜂巢、凸點、Voronoi 單元、磚塊、針織、繩紋、籃編、碳纖維、樹皮、木紋、裂紋、作為高度圖的圖片或文字，可繞圓形實體一周或沿某一軸平鋪。一個實體上最多可放六種圖樣，各占自己的面：四壁磚塊，頂部滾花。由 @marcus040473 貢獻。
 - **刪除面**——點擊圓角、孔或凸台的面並刪除：周圍的面會延伸過來補上缺口，實體仍保持精確，可以繼續倒圓角並用於 STEP 匯出。
@@ -445,7 +446,7 @@ layerling 內建一個本機 MCP 伺服器，供支援 MCP 工具的 AI 用戶�
 
 主要工具名稱包括 `layerling_list_editors`、`layerling_read_scene`、`layerling_list_objects`、
 `layerling_create_shape`、`layerling_update_object`、`layerling_list_edges`、`layerling_apply_edge_treatment`、
-`layerling_hollow_object`、`layerling_make_lid`、`layerling_offset_object`、`layerling_cut_out`、`layerling_array_objects`、`layerling_set_section_view` 和 `layerling_capture_image`。
+`layerling_hollow_object`、`layerling_make_lid`、`layerling_offset_object`、`layerling_cut_out`、`layerling_punch`、`layerling_array_objects`、`layerling_set_section_view` 和 `layerling_capture_image`。
 
 ### Claude Code
 

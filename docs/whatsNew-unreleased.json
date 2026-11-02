@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Einen Umriss durchstanzen",
+      "en": "Punch an outline through a body"
+    },
+    "body": {
+      "de": "Unter Kombinieren gibt es jetzt Stanzen: Wähle zuerst einen Körper als Stempel, dann den Körper, der die Öffnung bekommt. Der Umriss des Stempels geht entlang X, Y oder Z gerade hindurch, auch wenn der Stempel nur davor steht. Der Stempel bleibt, sodass du ihn verschieben oder drehen und gleich noch einmal stanzen kannst.",
+      "en": "Combine now has Punch: pick a body as the punch first, then the body that gets the opening. The punch's outline goes straight through along X, Y or Z, even when the punch only stands in front of it. The punch stays, so you can move or turn it and punch again right away."
+    }
+  }
+]

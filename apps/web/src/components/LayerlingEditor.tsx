@@ -54,6 +54,8 @@ import { EdgeModifierPanel } from "./workplane/EdgeModifierPanel";
 import { ShellPanel } from "./workplane/ShellPanel";
 import { OffsetPanel } from "./workplane/OffsetPanel";
 import { CutOutPanel } from "./workplane/CutOutPanel";
+import { PunchPanel } from "./workplane/PunchPanel";
+import { MAX_PUNCH_CLEARANCE, MAX_PUNCH_SEGMENTS, punchAxisBetween, punchHoleShape, punchPlan } from "@/lib/punchTool";
 import { COOKIE_CUTTER_SETTINGS_DEFAULTS, CookieCutterPanel, type CookieCutterSettings } from "./workplane/CookieCutterPanel";
 import { FlexiPanel, type FlexiToolSettings } from "./workplane/FlexiPanel";
 import { LidPanel } from "./workplane/LidPanel";
@@ -3246,6 +3248,7 @@ export function LayerlingEditor({
   const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; sideways?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; busy: boolean; error: string | null } | null>(null);
   /** Cut out (#927): `partId` stays, a copy of it grown by `clearance` is cut out of `hostId`. */
   const [cutOutTool, setCutOutTool] = useState<{ partId: string; hostId: string; clearance: number; busy: boolean; error: string | null } | null>(null);
+  const [punchTool, setPunchTool] = useState<{ punchId: string; targetId: string; axis: SectionPlaneAxis; clearance: number; busy: boolean; error: string | null } | null>(null);
   /** Flexi joints (Liane's mail, 29.10.2026): the bodies `targetIds` are cut into links with a joint at every cut. */
   const [flexiTool, setFlexiTool] = useState<(FlexiToolSettings & { targetIds: string[]; busy: boolean; error: string | null }) | null>(null);
   /** A lid (#1009) for the bodies `targetIds`, open at the top; it comes out beside them. */
@@ -7800,6 +7803,87 @@ export function LayerlingEditor({
   }, [selectedIds]);
 
   /**
+   * Punch (#703): the outline of `punch` seen along `axis`, grown by `clearance`, cut straight through `target` as a
+   * sketch body set to hole and grouped with it. The punch stays where it is, to be moved, turned and used again.
+   */
+  const punchShape = useCallback(async (punch: WorkplaneShape, target: WorkplaneShape, axis: SectionPlaneAxis, clearance: number) => {
+    for (const shape of [punch, target]) {
+      if (shape.locked) throw new Error("Unlock both objects before punching one through the other");
+      if (shape.hole || isNonSolidShape(shape)) throw new Error("Punching needs two solids");
+      if (shape.groupOperation === "bundle") throw new Error("A bundle is not one body; group it (layerling_group_objects) first");
+    }
+    if (punch.id === target.id) throw new Error("The punch and the body to punch must be two different objects");
+    const names = { punch: displayShapeName(punch), target: displayShapeName(target), axis: sectionAxisLetter(axis) };
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const changed = () => projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint;
+    const plan = punchPlan(await getManifoldRuntime(), meshForShape(punch), meshForShape(target), axis, clearance);
+    if (!plan.ok) {
+      throw new Error(plan.problem === "miss"
+        ? t("status.punchMiss", names)
+        : plan.problem === "tooMany" ? t("status.punchTooMany", { ...names, count: MAX_PUNCH_SEGMENTS }) : t("status.punchEmpty", names));
+    }
+    const hole = await punchHoleShape(plan, { name: t("punch.holeName", { name: names.punch }), color: punch.color });
+    if (changed()) throw new Error(t("status.punchChanged"));
+    const result = await buildGroupedShapeOffThread([target, hole], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+    if (changed()) throw new Error(t("status.punchChanged"));
+    if (!result.group && !result.consumed) throw new Error(result.failureNotice);
+    return {
+      group: result.group ? canonicalizeShape({ ...result.group, groupOperation: "group" }) : null,
+      closedHoles: result.closedHoles,
+    };
+  }, []);
+
+  /** A body's name as the panels show it, empty when it is gone. */
+  const shapeNameById = (id: string) => {
+    const shape = shapesRef.current.find((candidate) => candidate.id === id);
+    return shape ? displayShapeName(shape) : "";
+  };
+
+  const startPunchTool = useCallback(() => {
+    if (punchTool) {
+      setPunchTool(null);
+      return;
+    }
+    if (refuseLockedSelection()) return;
+    // The punch is the body picked first, as one holds the stamp before choosing what to stamp.
+    const [punch, target] = selectedIds.map((id) => selectedShapes.find((shape) => shape.id === id)).filter((shape): shape is WorkplaneShape => Boolean(shape));
+    if (selectedShapes.length !== 2 || !punch || !target || [punch, target].some((shape) => shape.hole || isNonSolidShape(shape) || shape.groupOperation === "bundle")) {
+      setNotice(t("status.punchSelectTwo"));
+      return;
+    }
+    if (edgeModifier) invalidateCadModifierSession();
+    closeSplit();
+    setPunchTool({ punchId: punch.id, targetId: target.id, axis: punchAxisBetween(meshForShape(punch), meshForShape(target)), clearance: 0, busy: false, error: null });
+  }, [closeSplit, edgeModifier, invalidateCadModifierSession, punchTool, refuseLockedSelection, selectedIds, selectedShapes]);
+
+  const applyPunchTool = useCallback(() => {
+    if (!punchTool || punchTool.busy) return;
+    const punch = shapesRef.current.find((shape) => shape.id === punchTool.punchId);
+    const target = shapesRef.current.find((shape) => shape.id === punchTool.targetId);
+    if (!punch || !target) {
+      setPunchTool(null);
+      return;
+    }
+    const { axis, clearance } = punchTool;
+    setPunchTool((current) => current ? { ...current, busy: true, error: null } : current);
+    void punchShape(punch, target, axis, clearance)
+      .then(({ group, closedHoles }) => {
+        const remaining = shapesRef.current.filter((shape) => shape.id !== target.id);
+        commitShapes(group ? [...remaining, group] : remaining, group ? group.id : punch.id, withClosedHolesNote(t("status.punchDone", { punch: displayShapeName(punch), target: displayShapeName(target) }), closedHoles));
+        setPunchTool(null);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? localizedError(error.message) : String(error);
+        setPunchTool((current) => current ? { ...current, busy: false, error: message } : current);
+      });
+  }, [commitShapes, punchShape, punchTool]);
+
+  useEffect(() => {
+    setPunchTool((current) => current && !current.busy && !(selectedIds.length === 2 && selectedIds.includes(current.punchId) && selectedIds.includes(current.targetId)) ? null : current);
+  }, [selectedIds]);
+
+  /**
    * Flexi joints from the selection (Liane's mail, 29.10.2026): the solids joined and the holes among them cut away, then cut
    * into links with a joint printed in place at every cut, as a bundle in place of what they are made from. The same code
    * the MCP action uses.
@@ -9467,7 +9551,7 @@ export function LayerlingEditor({
   // and does not open over it.
   const otherToolPanelOpen = Boolean(
     arrayTool || scalePercentTool || simplifyToolId || holePatternTool || faceTool || mateTool || cookieCutterTool || flexiTool
-    || lidTool || cutOutTool || shellTool || deleteFaceTool || splitSession || edgeModifier,
+    || lidTool || cutOutTool || punchTool || shellTool || deleteFaceTool || splitSession || edgeModifier,
   );
   /**
    * Checks the selection, or every visible object when nothing is selected (as the export takes them). A new check
@@ -12373,6 +12457,21 @@ export function LayerlingEditor({
         return group ? { object: mcpShapeSummary(group), part: mcpShapeSummary(part), clearance, ...(closedHoles ? { closedHoles } : {}) } : { consumed: true, part: mcpShapeSummary(part), clearance };
       }
 
+      if (command.action === "punch") {
+        const punch = findShape(params.punchId);
+        const target = findShape(params.targetId);
+        if (!punch || !target) throw new Error("Object not found: pass punchId and targetId of two solids");
+        // As in the other tools' parameters, z is up: the scene's y.
+        const given = typeof params.direction === "string" ? params.direction.toLowerCase() : "";
+        const axis: SectionPlaneAxis = given === "x" ? "x" : given === "y" ? "z" : given === "z" ? "y" : punchAxisBetween(meshForShape(punch), meshForShape(target));
+        const clearance = Math.min(MAX_PUNCH_CLEARANCE, Math.max(0, mcpNumber(params.clearance, 0)));
+        const { group, closedHoles } = await punchShape(punch, target, axis, clearance);
+        const remaining = shapesRef.current.filter((shape) => shape.id !== target.id);
+        commitShapes(group ? [...remaining, group] : remaining, group ? group.id : punch.id, withClosedHolesNote(t("status.punchMcp", { punch: displayShapeName(punch), target: displayShapeName(target) }), closedHoles));
+        const direction = axis === "x" ? "x" : axis === "z" ? "y" : "z";
+        return group ? { object: mcpShapeSummary(group), punch: mcpShapeSummary(punch), direction, clearance, ...(closedHoles ? { closedHoles } : {}) } : { consumed: true, punch: mcpShapeSummary(punch), direction, clearance };
+      }
+
       if (command.action === "array_objects") {
         const requestedIds = mcpStringArray(params.ids);
         const ids = requestedIds.length > 0 ? requestedIds : selectedIdsRef.current;
@@ -14933,7 +15032,10 @@ export function LayerlingEditor({
         : { key: "hole", label: t("contextMenu.toHole"), shortcut: "H", separated: true, onSelect: () => setSelectionHoleMode(true) });
     }
     if (selectedShapes.length >= 2 && !selectionLocked) items.push({ key: "group", label: t("contextMenu.group"), shortcut: "Ctrl+G", onSelect: () => void groupSelected() });
-    if (selectedShapes.length === 2 && !selectionLocked && selectedShapes.every((shape) => !shape.hole && !isNonSolidShape(shape) && shape.groupOperation !== "bundle")) items.push({ key: "cutOut", label: t("editor.tool.cutOut"), onSelect: startCutOutTool });
+    if (selectedShapes.length === 2 && !selectionLocked && selectedShapes.every((shape) => !shape.hole && !isNonSolidShape(shape) && shape.groupOperation !== "bundle")) {
+      items.push({ key: "cutOut", label: t("editor.tool.cutOut"), onSelect: startCutOutTool });
+      items.push({ key: "punch", label: t("editor.tool.punch"), onSelect: startPunchTool });
+    }
     if (single && (single.groupedShapes?.length || wasGroupBeforeEdgeTreatments(single)) && !selectionLocked) items.push({ key: "ungroup", label: t("contextMenu.ungroup"), shortcut: "Ctrl+Shift+G", onSelect: ungroupSelected });
     if (canSeparateSelectedParts && !selectionLocked) items.push({ key: "separateParts", label: t("inspector.separateParts"), onSelect: separateSelectedParts });
     if (single && !selectionLocked) {
@@ -15104,6 +15206,8 @@ export function LayerlingEditor({
         onCutOut={startCutOutTool}
         canCutOut={!selectionLocked && selectedShapes.length === 2 && selectedShapes.every((shape) => !shape.hole && !isNonSolidShape(shape) && shape.groupOperation !== "bundle")}
         cutOutActive={Boolean(cutOutTool)}
+        onPunch={startPunchTool}
+        punchActive={Boolean(punchTool)}
         onDeleteFace={startDeleteFaceTool}
         deleteFaceActive={Boolean(deleteFaceTool)}
         canSimplify={selectedShapes.length === 1 && offersMeshSimplify(selectedShape) && !selectedShape?.locked}
@@ -15709,6 +15813,22 @@ export function LayerlingEditor({
           onSwap={() => setCutOutTool((current) => current ? { ...current, partId: current.hostId, hostId: current.partId, error: null } : current)}
           onApply={applyCutOutTool}
           onCancel={() => setCutOutTool(null)}
+        />
+      ) : null}
+      {punchTool ? (
+        <PunchPanel
+          punchName={shapeNameById(punchTool.punchId)}
+          targetName={shapeNameById(punchTool.targetId)}
+          axis={punchTool.axis}
+          clearance={punchTool.clearance}
+          workspace={workspaceSettings}
+          busy={punchTool.busy}
+          error={punchTool.error}
+          onAxisChange={(axis) => setPunchTool((current) => current ? { ...current, axis, error: null } : current)}
+          onClearanceChange={(value) => setPunchTool((current) => current ? { ...current, clearance: value, error: null } : current)}
+          onSwap={() => setPunchTool((current) => current ? { ...current, punchId: current.targetId, targetId: current.punchId, error: null } : current)}
+          onApply={applyPunchTool}
+          onCancel={() => setPunchTool(null)}
         />
       ) : null}
       {shellTool?.mode === "offset" && selectedShape ? (

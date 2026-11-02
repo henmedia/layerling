@@ -78,6 +78,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_apply_edge_treatment` | chanfreins ou congés arêtes choisies |
 | `layerling_hollow_object` | creuse un corps avec une paroi plane |
 | `layerling_cut_out` | découpe un solide dans un autre pour qu'ils s'ajustent : la pièce reste, une copie agrandie du jeu est soustraite de l'autre corps |
+| `layerling_punch` | poinçonne le contour d'un solide, vu selon x, y ou z, tout droit à travers un autre ; le poinçon reste et n'a pas besoin de le toucher |
 | `layerling_offset_object` | décale toutes les faces d'un corps pour le jeu d'un ajustement : l'agrandit ou le réduit, ou ajoute la copie agrandie comme trou, ou ne déplace que les côtés |
 | `layerling_list_faces` | répertorie les faces d'un corps exact |
 | `layerling_delete_faces` | supprime des faces et referme le vide |

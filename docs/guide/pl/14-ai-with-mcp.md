@@ -82,6 +82,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_apply_edge_treatment` | fazuje albo zaokrągla wybrane krawędzie |
 | `layerling_hollow_object` | drąży bryłę z równą ścianką |
 | `layerling_cut_out` | wycina jedną bryłę z drugiej, aby do siebie pasowały: część zostaje, kopia powiększona o luz jest odejmowana od drugiej bryły |
+| `layerling_punch` | wykrawa zarys jednej bryły, widziany wzdłuż x, y lub z, na wylot przez drugą; stempel zostaje i nie musi jej dotykać |
 | `layerling_offset_object` | odsuwa wszystkie ściany bryły na luz pasowania: powiększa lub zmniejsza ją albo dodaje powiększoną kopię jako otwór albo przesuwa tylko boki |
 | `layerling_list_faces` | wypisuje ściany dokładnej bryły |
 | `layerling_delete_faces` | usuwa ściany i zamyka lukę |

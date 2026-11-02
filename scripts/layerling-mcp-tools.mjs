@@ -1181,6 +1181,21 @@ export const tools = [
     },
   },
   {
+    name: "layerling_punch",
+    description: "Punch the outline of one solid straight through another, like the editor's Punch tool: the punch's silhouette, seen along `direction`, is cut through the whole target, wherever the punch stands in front of it - the two need not touch. A teapot held over a plate leaves a teapot-shaped opening; move or turn the punch and call again for another. The opening is an exact sketch body set to hole and grouped with the target, so ungrouping takes it out again; the punch is returned unchanged. Coordinates are as in a slicer: X to the right, Y to the back, Z up. Without `direction` the axis along which the punch stands furthest from the target is taken (the result names it). `clearance` (millimetres, 0 to 10, default 0) grows the outline on every side, so a printed part passes through (0.2 is usual). Fails with a message when the outline misses the target along that direction. Both must be unlocked solids, neither a hole nor a bundle.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["punchId", "targetId"],
+      properties: {
+        ...editorTargetSchema.properties,
+        punchId: { type: "string", description: "The body whose outline is punched; it stays as it is." },
+        targetId: { type: "string", description: "The body that gets the opening, such as a plate, a lid or a wall." },
+        direction: { type: "string", enum: ["x", "y", "z"], description: "Axis the punch goes along: x left/right, y front/back, z up/down. Picked from where the punch stands when omitted." },
+        clearance: { type: "number", description: "Extra room all round in millimetres, 0 to 10; 0 when omitted." },
+      },
+    },
+  },
+  {
     name: "layerling_array_objects",
     description: "Repeat objects n times in a row or around a circle - hole rows, hole grids, bolt circles, the teeth of a ring - like the editor's Pattern tool. `count` includes the originals. Coordinates are as in a slicer: X to the right, Y to the back, Z up. A row steps `spacing` millimetres along `direction` (negative runs the other way), or along several axes at once with `spacingX`, `spacingY` and `spacingZ` (a diagonal row, a staircase; give any of them and the others count as 0). With `fitAxis` a row is spread evenly over a body instead - holes along a plate: the last piece ends as far from the body's far end as the original stands from its nearer one, and `edgeGap` sets that gap first. A circle turns about the vertical axis through (`centerX`, `centerY`) over `angle` degrees: 360 (default) spreads the pieces evenly, a smaller angle puts the first and last piece on its ends; positive runs counter-clockwise seen from above. `rise` lifts every copy that many millimetres more than the one before (a screw, an ascending spiral) and `radiusChange` moves it that far further from the centre (negative: closer) for a flat or conical spiral. `rotateCopies` (default true) turns each copy with the circle. The copies are added as one undo step and returned with their ids; the originals stay where they are, unless `edgeGap` moves them. A circle leaves its centre as the pieces' pivot (their selection's, or the group's with `group: true`), halfway up the pieces, and returns it as `pivot` (X, Y, Z), so another part can be aligned to the true centre rather than the middle of the pieces' box.",
     inputSchema: {
