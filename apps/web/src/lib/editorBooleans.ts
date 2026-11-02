@@ -1,5 +1,6 @@
 
 import { bentTubeParameterPatch, bentTubeProfileRadii, bentTubeSettings } from "@/lib/bentTubeGeometry";
+import { BUNDLE_SCOPE_BASE } from "@/lib/cadModifierGroups";
 import { removeLooseSplinters } from "@/lib/meshSplinters";
 import { closeSmallMeshHoles } from "@/lib/meshHoleFill";
 import { meshIsConvex } from "@/lib/meshConvexity";
@@ -2479,6 +2480,21 @@ export function restoreGroupedChildrenForEdges(group: WorkplaneShape, scope: num
       && grandChildren.some((part) => part.hole)
       && grandChildren.some((part) => !part.hole);
     if (opensInOwnScope) return restoreGroupedChildrenForEdges(child, [...scope, nestedScopes.count++], { count: 0 });
+    // A bundle that mixes solids and holes: its holes cut what it is grouped with, not its own solids (#646). Left closed it
+    // went as its mesh, which has the hole already taken out of its own solids and so no hole at all: a peg standing in its
+    // own hole came out of a chamfer with the hole filled (#1164).
+    const opensAsBundle = grandChildren.length > 0
+      && child.groupOperation === "bundle"
+      && !shapeHasShapeDeform(child)
+      && !child.hole
+      && !child.edgeTreatments?.length
+      && !child.cadBrep
+      && !child.surfaceTexture
+      && !child.cylinderWrap
+      && !child.vase
+      && grandChildren.some((part) => part.hole)
+      && grandChildren.some((part) => !part.hole);
+    if (opensAsBundle) return restoreGroupedChildrenForEdges(child, [...scope, BUNDLE_SCOPE_BASE + nestedScopes.count++], { count: 0 });
     return [{ shape: child, scope }];
   });
 }

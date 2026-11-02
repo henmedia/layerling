@@ -6,6 +6,7 @@ import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm"
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
+import { isBundleScopeKey } from "@/lib/cadModifierGroups";
 import { cadLidSolid } from "@/lib/cadLid";
 import { concaveFilletSolid } from "@/lib/cadConcaveFillet";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
@@ -610,6 +611,20 @@ function joinedShellSolids(cad: OcctKernel, sewn: ShapeHandle) {
  * first built on their own (#996): such a group's holes cut only its own solids, not the neighbours it was
  * grouped with afterwards.
  */
+// The solids of a bundle's scope: its own solids and the groups inside it, its holes left to the level above.
+function combinedScopeSolids(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number): ShapeHandle[] {
+  const inner = new Map<number, CadModifierMeshPart[]>();
+  for (const part of parts) {
+    if ((part.scope?.length ?? 0) <= depth) continue;
+    const key = (part.scope as number[])[depth];
+    inner.set(key, [...(inner.get(key) ?? []), part]);
+  }
+  return [
+    ...parts.filter((part) => (part.scope?.length ?? 0) === depth && !part.hole).map((part) => reconstructSolid(cad, part)),
+    ...[...inner.values()].flatMap((nested) => combinedScope(cad, nested, depth + 1) ?? []),
+  ];
+}
+
 function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number): ShapeHandle | null {
   const here = parts.filter((part) => (part.scope?.length ?? 0) === depth);
   const inner = new Map<number, CadModifierMeshPart[]>();
@@ -618,20 +633,32 @@ function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: num
     const key = (part.scope as number[])[depth];
     inner.set(key, [...(inner.get(key) ?? []), part]);
   }
+  // A bundle with a hole in it (#1164): its hole cuts what it is grouped with, its solids are added afterwards.
+  const bundles = [...inner.entries()].filter(([key]) => isBundleScopeKey(key)).map(([, nested]) => nested);
+  const bundleSolids = bundles.flatMap((nested) => combinedScopeSolids(cad, nested, depth + 1));
+  const bundleHoles = bundles.flatMap((nested) => nested.filter((part) => part.hole && (part.scope?.length ?? 0) === depth + 1).map((part) => reconstructSolid(cad, part)));
   const solids = [
     ...here.filter((part) => !part.hole).map((part) => reconstructSolid(cad, part)),
-    ...[...inner.values()].flatMap((nested) => combinedScope(cad, nested, depth + 1) ?? []),
+    ...[...inner.entries()].filter(([key]) => !isBundleScopeKey(key)).flatMap(([, nested]) => combinedScope(cad, nested, depth + 1) ?? []),
   ];
   const holes = here.filter((part) => part.hole).map((part) => reconstructSolid(cad, part));
-  if (solids.length === 0) return null;
-  let result = solids[0];
-  for (let index = 1; index < solids.length; index += 1) {
-    result = cad.fuse(result, solids[index]);
-    result = cad.simplify(result);
-    result = cad.unifySameDomain(result);
+  if (solids.length === 0 && bundleSolids.length === 0) return null;
+  const fused = (shapes: ShapeHandle[]) => {
+    let joined = shapes[0];
+    for (let index = 1; index < shapes.length; index += 1) {
+      joined = cad.fuse(joined, shapes[index]);
+      joined = cad.simplify(joined);
+      joined = cad.unifySameDomain(joined);
+    }
+    return joined;
+  };
+  let result: ShapeHandle | null = solids.length ? fused(solids) : null;
+  if (result !== null) {
+    for (const hole of bundleHoles) result = tidiedIfValid(cad, fuzzyCut(cad, result, hole), cadShapeIsValid);
   }
+  if (bundleSolids.length) result = fused(result === null ? bundleSolids : [result, ...bundleSolids]);
   for (const hole of holes) {
-    result = tidiedIfValid(cad, fuzzyCut(cad, result, hole), cadShapeIsValid);
+    result = tidiedIfValid(cad, fuzzyCut(cad, result as ShapeHandle, hole), cadShapeIsValid);
   }
   return result;
 }

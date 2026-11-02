@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Fase und Rundung lassen das Loch eines Bündels offen",
+      "en": "Chamfer and fillet keep a bundle's hole open"
+    },
+    "body": {
+      "de": "Ein Bündel aus einem Stift und einem größeren Loch, mit einer Box gruppiert, schneidet die Box, aber nicht den eigenen Stift. Bei Fase und Rundung kam die Nut um den Stift zugefüllt zurück. Jetzt bleibt sie.",
+      "en": "A bundle of a peg and a bigger hole, grouped with a box, cuts the box but not its own peg. With a chamfer or fillet the groove round the peg came back filled in. Now it stays."
+    }
+  },
+  {
+    "title": {
       "de": "Ein Bund unter dem Schraubenkopf",
       "en": "A collar under the screw head"
     },
