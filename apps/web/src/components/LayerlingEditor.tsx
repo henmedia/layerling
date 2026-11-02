@@ -32,7 +32,7 @@ import { IconTagPanel } from "@/components/workplane/IconTagPanel";
 import { QrCodePanel } from "@/components/workplane/QrCodePanel";
 import { qrCodeOf, qrCodeShape, regeneratedQrCodeShape } from "@/lib/editorQrCode";
 import { regeneratedSbcBoardShape, sbcBoardOf, sbcBoardShape } from "@/lib/editorSbcBoard";
-import { DEFAULT_SBC_BOARD, MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { DEFAULT_SBC_BOARD, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { DEFAULT_QR_WIDTH, MAX_QR_HEIGHT, MAX_QR_WIDTH, MIN_QR_HEIGHT, MIN_QR_WIDTH, QR_BYTE_CAPACITY, QR_ERROR_CORRECTIONS, QR_STYLES, normalizeQrSettings, qrByteLength, qrMatrix, qrModuleSize, qrModuleTooSmall, qrTextFits, type QrCodeSettings, type QrErrorCorrection, type QrStyle } from "@/lib/qrCode";
 import { iconSourceFromFile, PICTURE_FILE_ACCEPT, picturePixels, type IconSource } from "@/lib/pictureIcon";
 import { loadedManifoldRuntime, onManifoldReady } from "@/lib/manifoldHandle";
@@ -11923,10 +11923,23 @@ export function LayerlingEditor({
         if (typeof clearance !== "number" || !Number.isFinite(clearance) || clearance < 0 || clearance > MAX_SBC_CLEARANCE) throw new Error(`clearance must be 0 to ${MAX_SBC_CLEARANCE} mm`);
         const reach = params.reach ?? 0;
         if (typeof reach !== "number" || !Number.isFinite(reach) || reach < 0 || reach > MAX_SBC_REACH) throw new Error(`reach must be 0 to ${MAX_SBC_REACH} mm`);
+        for (const key of ["ribbonUp", "ribbonSide", "gpioUp"] as const) {
+          if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
+        }
+        const upReach = params.upReach;
+        if (upReach !== undefined && (typeof upReach !== "number" || !Number.isFinite(upReach) || upReach < MIN_SBC_UP_REACH || upReach > MAX_SBC_UP_REACH)) throw new Error(`upReach must be ${MIN_SBC_UP_REACH} to ${MAX_SBC_UP_REACH} mm`);
         for (const axis of ["x", "z"] as const) {
           if (params[axis] !== undefined && (typeof params[axis] !== "number" || !Number.isFinite(params[axis]))) throw new Error(`${axis} must be a number`);
         }
-        const built = await sbcBoardShape({ board: board as SbcBoardType, clearance, reach }, workspaceSettingsRef.current.booleanTriangleLimit);
+        const built = await sbcBoardShape({
+          board: board as SbcBoardType,
+          clearance,
+          reach,
+          ...(params.ribbonUp === true ? { ribbonUp: true } : {}),
+          ...(params.ribbonSide === true ? { ribbonSide: true } : {}),
+          ...(params.gpioUp === true ? { gpioUp: true } : {}),
+          ...(typeof upReach === "number" ? { upReach } : {}),
+        }, workspaceSettingsRef.current.booleanTriangleLimit);
         const shape = canonicalizeShape({
           ...built,
           ...(typeof params.x === "number" ? { x: params.x } : {}),

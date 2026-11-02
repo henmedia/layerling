@@ -200,7 +200,7 @@ import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
-import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, SBC_BOARDS, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -5166,9 +5166,9 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const regenerate = (patch: Partial<SbcBoardSettings>) => {
-    const next = { ...controls.settings, ...patch };
-    const same = next.board === controls.settings.board && next.clearance === controls.settings.clearance && (next.reach ?? 0) === (controls.settings.reach ?? 0);
-    if (busy || disabled || same) return;
+    const next = normalizeSbcBoardSettings({ ...controls.settings, ...patch });
+    const same = !next || JSON.stringify(next) === JSON.stringify(normalizeSbcBoardSettings(controls.settings));
+    if (busy || disabled || same || !next) return;
     setBusy(true);
     setError("");
     controls.onRegenerate(next)
@@ -5225,7 +5225,41 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
               onInteractionActiveChange={onInteractionActiveChange}
             />
           </label>
-          <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.reachHint")}</p>
+          <p className="name-tag-hint">{t("sbcBoard.reachHint")}</p>
+          {sbcBoardHasRibbon(SBC_BOARDS[controls.settings.board]) ? (
+            <>
+              <label className="check-property sbc-board-ribbon-up">
+                <input type="checkbox" checked={controls.settings.ribbonUp === true} disabled={disabled || busy} data-testid="sbc-board-ribbon-up" onChange={(event) => regenerate({ ribbonUp: event.currentTarget.checked })} />
+                <span>{t("sbcBoard.ribbonUp")}</span>
+              </label>
+              <label className="check-property sbc-board-ribbon-side">
+                <input type="checkbox" checked={controls.settings.ribbonSide === true} disabled={disabled || busy} data-testid="sbc-board-ribbon-side" onChange={(event) => regenerate({ ribbonSide: event.currentTarget.checked })} />
+                <span>{t("sbcBoard.ribbonSide")}</span>
+              </label>
+            </>
+          ) : null}
+          {sbcBoardHasGpio(SBC_BOARDS[controls.settings.board]) ? (
+            <label className="check-property sbc-board-gpio-up">
+              <input type="checkbox" checked={controls.settings.gpioUp === true} disabled={disabled || busy} data-testid="sbc-board-gpio-up" onChange={(event) => regenerate({ gpioUp: event.currentTarget.checked })} />
+              <span>{t("sbcBoard.gpioUp")}</span>
+            </label>
+          ) : null}
+          {controls.settings.ribbonUp || controls.settings.gpioUp ? (
+            <label className="select-property sbc-board-up-reach">
+              <span>{t("sbcBoard.upReach")} ({unit})</span>
+              <CompactMeasureField
+                label={t("sbcBoard.upReach")}
+                value={controls.settings.upReach ?? MIN_SBC_UP_REACH}
+                min={MIN_SBC_UP_REACH}
+                max={MAX_SBC_UP_REACH}
+                workspace={workspace}
+                disabled={disabled || busy}
+                onChange={(upReach) => regenerate({ upReach })}
+                onInteractionActiveChange={onInteractionActiveChange}
+              />
+            </label>
+          ) : null}
+          <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.passagesHint")}</p>
           {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
         </div>
       ) : null}

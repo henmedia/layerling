@@ -80,7 +80,7 @@ describe("the SBC board card", () => {
     const panel = mount({ board: "pi5", clearance: 0.3 }, async (settings) => { asked.push(settings); });
     choose(boardList(panel), "bttPi12");
     await act(async () => {});
-    expect(asked).toEqual([{ board: "bttPi12", clearance: 0.3 }]);
+    expect(asked).toEqual([{ board: "bttPi12", clearance: 0.3, reach: 0 }]);
   });
 
   it("makes the board again with a new clearance, kept between 0 and 2 mm", async () => {
@@ -90,7 +90,7 @@ describe("the SBC board card", () => {
     await act(async () => {});
     type(clearanceField(panel), "7");
     await act(async () => {});
-    expect(asked).toEqual([{ board: "pi5", clearance: 0.4 }, { board: "pi5", clearance: 2 }]);
+    expect(asked).toEqual([{ board: "pi5", clearance: 0.4, reach: 0 }, { board: "pi5", clearance: 2, reach: 0 }]);
   });
 
   it("asks for nothing when the value does not change, and shows a failure", async () => {
@@ -121,5 +121,39 @@ describe("the SBC board card", () => {
     type(reachField, "25");
     await act(async () => {});
     expect(asked).toEqual([{ board: "pi5", clearance: 0.3, reach: 3 }, { board: "pi5", clearance: 0.3, reach: 10 }]);
+  });
+
+  it("asks for the ribbon cable and GPIO openings, and how far up, at least 20 mm", async () => {
+    const asked: SbcBoardSettings[] = [];
+    const panel = mount({ board: "pi5", clearance: 0, reach: 3 }, async (settings) => { asked.push(settings); });
+    const box = (id: string) => card(panel).querySelector<HTMLInputElement>(`[data-testid=${id}]`)!;
+    expect(box("sbc-board-ribbon-up").closest("label")!.textContent).toBe("Ribbon cables up through the lid");
+    expect(box("sbc-board-ribbon-side").closest("label")!.textContent).toBe("Ribbon cables out through the wall");
+    expect(box("sbc-board-gpio-up").closest("label")!.textContent).toBe("GPIO header up through the lid");
+    // The reach up shows only once something opens up.
+    expect(card(panel).querySelector(".sbc-board-up-reach")).toBeNull();
+    act(() => box("sbc-board-gpio-up").click());
+    await act(async () => {});
+    act(() => box("sbc-board-ribbon-side").click());
+    await act(async () => {});
+    expect(asked).toEqual([{ board: "pi5", clearance: 0, reach: 3, gpioUp: true }, { board: "pi5", clearance: 0, reach: 3, ribbonSide: true }]);
+  });
+
+  it("shows the reach up when an opening goes up, kept between 20 and 100 mm", async () => {
+    const asked: SbcBoardSettings[] = [];
+    const panel = mount({ board: "pi4", clearance: 0, gpioUp: true }, async (settings) => { asked.push(settings); });
+    const field = card(panel).querySelector<HTMLInputElement>(".sbc-board-up-reach input")!;
+    expect(field.value).toBe("20.00");
+    type(field, "35");
+    await act(async () => {});
+    type(field, "5");
+    await act(async () => {});
+    expect(asked).toEqual([{ board: "pi4", clearance: 0, reach: 0, gpioUp: true, upReach: 35 }, { board: "pi4", clearance: 0, reach: 0, gpioUp: true, upReach: 20 }]);
+  });
+
+  it("offers only what the board has: no ribbon cables on the BIGTREETECH Pi", () => {
+    const panel = mount({ board: "bttPi12", clearance: 0 }, async () => {});
+    expect(card(panel).querySelector("[data-testid=sbc-board-ribbon-up]")).toBeNull();
+    expect(card(panel).querySelector("[data-testid=sbc-board-gpio-up]")).not.toBeNull();
   });
 });

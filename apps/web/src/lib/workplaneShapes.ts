@@ -843,6 +843,10 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     (a.sbcBoard?.board ?? null) === (b.sbcBoard?.board ?? null) &&
     (a.sbcBoard?.clearance ?? 0) === (b.sbcBoard?.clearance ?? 0) &&
     (a.sbcBoard?.reach ?? 0) === (b.sbcBoard?.reach ?? 0) &&
+    Boolean(a.sbcBoard?.ribbonUp) === Boolean(b.sbcBoard?.ribbonUp) &&
+    Boolean(a.sbcBoard?.ribbonSide) === Boolean(b.sbcBoard?.ribbonSide) &&
+    Boolean(a.sbcBoard?.gpioUp) === Boolean(b.sbcBoard?.gpioUp) &&
+    (a.sbcBoard?.upReach ?? 0) === (b.sbcBoard?.upReach ?? 0) &&
     a.importedMesh === b.importedMesh &&
     a.imagePlate === b.imagePlate &&
     a.sketchProfile === b.sketchProfile &&
