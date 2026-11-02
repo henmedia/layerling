@@ -151,9 +151,10 @@ Pro nápis podél okraje mince, víčka nebo prstence zapněte {{ui:prop.textCur
 
 ![Text po kružnici. Všechna písmena mají společné účaří.](shot:curved-text)
 
-Písmena se rozmístí po kružnici se společným účařím stejně rovnoměrně jako v přímém textu. K dispozici jsou čtyři volby:
+Písmena se rozmístí po kružnici se společným účařím stejně rovnoměrně jako v přímém textu. K dispozici je pět voleb:
 
 - **{{ui:prop.textRadius}}**, 5 až 500 mm: poloměr kružnice, po níž vede účaří. Písmena přitom zůstávají na svém místě, mění se jen jejich zakřivení.
+- **{{ui:prop.textLetterWidth}}**, 25 až 400 %: jak široce se každé písmeno kreslí, v procentech jeho vlastní šířky. Pod 100 jsou písmena užší, nad 100 širší; jejich výška zůstává a oblouk, který zabírají, se s nimi prodlouží nebo zkrátí. Hodí se třeba pro vysoký úzký nápis na minci. U přímého textu to dělá {{ui:prop.textStretch}} s rámečkem.
 - **{{ui:nameTag.letterSize}}:** velikost písmen nezávislá na šířce tvaru.
 - **{{ui:prop.textInward}}:** přesune text z horního na spodní oblouk; vršky písmen míří do středu.
 - **{{ui:prop.textFlipped}}:** převrátí pouze písmena pro čtení z druhé strany. Poloha textu na kružnici zůstane zachovaná.

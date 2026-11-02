@@ -157,9 +157,10 @@ Escanea el código con el móvil antes de imprimirlo, y otra vez después. Oscur
 
 ![Un texto que sigue un círculo. Todas las letras se apoyan en una misma línea.](shot:curved-text)
 
-En cuanto lo activas, el texto recorre el círculo. Todas las letras se apoyan en la misma línea base, tan regulares como en un texto normal. Hay cuatro ajustes:
+En cuanto lo activas, el texto recorre el círculo. Todas las letras se apoyan en la misma línea base, tan regulares como en un texto normal. Hay cinco ajustes:
 
 - **{{ui:prop.textRadius}}** (de 5 a 500 mm): El radio del círculo por el que va la línea base de las letras. Las letras se quedan donde están; solo cambia su curvatura.
+- **{{ui:prop.textLetterWidth}}** (de 25 a 400 %): Qué tan ancha se dibuja cada letra, en porcentaje de su propio ancho. Por debajo de 100 las letras se estrechan, por encima se ensanchan; su altura se mantiene y el arco que ocupan crece o se acorta con ellas. Por ejemplo, para un rótulo alto y estrecho en una moneda. En el texto recto lo hace {{ui:prop.textStretch}} con el marco.
 - **{{ui:nameTag.letterSize}}:** La altura de las letras. Ya no depende de la anchura de la forma.
 - **{{ui:prop.textInward}}:** Lleva el texto de la parte de arriba del círculo a la de abajo. Las letras apuntan entonces con la cabeza hacia el centro.
 - **{{ui:prop.textFlipped}}:** Da la vuelta solo a las letras, para que puedas leerlas desde el otro lado. El texto se queda en su sitio en el círculo.

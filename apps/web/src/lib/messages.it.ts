@@ -2548,6 +2548,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.textCurved": "Su arco",
   "prop.textSpacing": "Spaziatura lettere (%)",
   "prop.textSpacingHint": "Spazio aggiunto tra le lettere rispetto a quello previsto dal carattere, espresso in percentuale rispetto alla dimensione delle lettere. Un valore negativo le avvicina. Le lettere mantengono le dimensioni, mentre si adatta la larghezza del riquadro.",
+  "prop.textLetterWidth": "Larghezza lettere (%)",
+  "prop.textLetterWidthHint": "Quanto è larga ogni lettera sull'arco, in percentuale rispetto alla sua larghezza originale; sotto 100 più stretta, sopra più larga. Le lettere mantengono l'altezza, l'arco e il riquadro si adattano.",
   "prop.textStretch": "Adatta le lettere alla cornice",
   "prop.textVertical": "Lettere dall'alto in basso",
   "prop.textRadius": "Raggio dell'arco",

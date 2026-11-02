@@ -150,9 +150,10 @@ A felirat ne egyenesen fusson, hanem kövesse egy érme, egy fedél vagy egy gy�
 
 ![A szöveg egy kört követ. Minden betű egy közös vonalon áll.](shot:curved-text)
 
-Amint bekapcsolod, a szöveg a kör mentén fut. Minden betű ugyanazon az alapvonalon áll, olyan egyenletesen, mint normál szövegnél. Négy beállítás van:
+Amint bekapcsolod, a szöveg a kör mentén fut. Minden betű ugyanazon az alapvonalon áll, olyan egyenletesen, mint normál szövegnél. Öt beállítás van:
 
 - **{{ui:prop.textRadius}}** (5–500 mm): Annak a körnek a sugara, amelyen a betűk alapvonala fut. A betűk a helyükön maradnak, csak a hajlításuk változik.
+- **{{ui:prop.textLetterWidth}}** (25–400 %): Milyen szélesre rajzolódik minden betű, a saját szélessége százalékában. 100 alatt keskenyebbek a betűk, fölötte szélesebbek; a magasságuk marad, és az általuk elfoglalt ív velük együtt nő vagy csökken. Például magas, keskeny felirathoz egy érmén. Egyenes szövegnél ezt a {{ui:prop.textStretch}} végzi a kerettel.
 - **{{ui:nameTag.letterSize}}:** Milyen magasak a betűk. Már nem függ az alakzat szélességétől.
 - **{{ui:prop.textInward}}:** A szöveget a kör tetejéről az aljára viszi. A betűk ilyenkor a fejükkel a középpont felé mutatnak.
 - **{{ui:prop.textFlipped}}:** Csak a betűket fordítja meg, hogy a másik oldalról olvashasd őket. A szöveg a helyén marad a körön.

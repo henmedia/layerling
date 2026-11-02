@@ -2526,6 +2526,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.textCurved": "Na łuku",
   "prop.textSpacing": "Odstęp między literami (%)",
   "prop.textSpacingHint": "Odstęp między literami ponad własny odstęp czcionki, w procentach wielkości liter. Poniżej 0 ciaśniej. Litery zachowują rozmiar, a ramka podąża za nimi.",
+  "prop.textLetterWidth": "Szerokość liter (%)",
+  "prop.textLetterWidthHint": "Jak szeroko rysowana jest każda litera na łuku, w procentach jej własnej szerokości; poniżej 100 węższa, powyżej szersza. Litery zachowują wysokość, a łuk i ramka podążają za nimi.",
   "prop.textStretch": "Rozciągnij litery do ramki",
   "prop.textVertical": "Litery jedna pod drugą",
   "prop.textRadius": "Promień łuku",

@@ -157,9 +157,10 @@ Should the lettering not run straight but follow the edge of a coin, a lid or a 
 
 ![Text follows a circle. All letters stand on one common line.](shot:curved-text)
 
-Once you switch it on, the text runs along the circle. All letters stand on the same baseline, as evenly as with normal text. There are four settings:
+Once you switch it on, the text runs along the circle. All letters stand on the same baseline, as evenly as with normal text. There are five settings:
 
 - **{{ui:prop.textRadius}}** (5 to 500 mm): The radius of the circle the letters' baseline runs on. The letters stay where they are; only their bend changes.
+- **{{ui:prop.textLetterWidth}}** (25 to 400 %): How wide each letter is drawn, in per cent of its own width. Below 100 the letters get narrower, above it wider; their height stays, and the arc they take grows or shrinks with them. For a tall, narrow lettering on a coin, for example. On straight text {{ui:prop.textStretch}} does this with the frame.
 - **{{ui:nameTag.letterSize}}:** How tall the letters are. It no longer depends on the width of the shape.
 - **{{ui:prop.textInward}}:** Moves the text from the top of the circle to its bottom. The letters then point with their heads to the centre.
 - **{{ui:prop.textFlipped}}:** Turns only the letters over so you can read them from the other side. The text stays in its place on the circle.

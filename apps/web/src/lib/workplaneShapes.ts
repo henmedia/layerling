@@ -837,6 +837,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     Boolean(a.textStretch) === Boolean(b.textStretch) &&
     Boolean(a.textVertical) === Boolean(b.textVertical) &&
     (a.textSpacing ?? 0) === (b.textSpacing ?? 0) &&
+    (a.textLetterWidth ?? 100) === (b.textLetterWidth ?? 100) &&
     JSON.stringify(a.textKeyring ?? null) === JSON.stringify(b.textKeyring ?? null) &&
     JSON.stringify(a.textEdge ?? null) === JSON.stringify(b.textEdge ?? null) &&
     qrSettingsEqual(a.qrCode, b.qrCode) &&

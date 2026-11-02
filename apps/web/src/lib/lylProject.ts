@@ -1390,6 +1390,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.textSpacing !== undefined && !(typeof definition.textSpacing === "number" && Number.isFinite(definition.textSpacing) && definition.textSpacing >= -50 && definition.textSpacing <= 300)) {
     throw new Error(`${label}.textSpacing must be a number from -50 to 300`);
   }
+  // How wide curved text's letters are drawn (#1196), in per cent of their own width.
+  if (definition.textLetterWidth !== undefined && !(typeof definition.textLetterWidth === "number" && Number.isFinite(definition.textLetterWidth) && definition.textLetterWidth >= 25 && definition.textLetterWidth <= 400)) {
+    throw new Error(`${label}.textLetterWidth must be a number from 25 to 400`);
+  }
   // The top edge of a text's letters (#225): round or chamfer, with a size.
   if (definition.textEdge !== undefined && !normalizeTextEdge(definition.textEdge)) {
     throw new Error(`${label}.textEdge must be a round or chamfer edge with a size`);

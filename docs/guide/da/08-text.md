@@ -158,9 +158,10 @@ Skal bogstaverne ikke løbe lige, men følge kanten af en mønt, et låg eller e
 
 ![Tekst følger en cirkel. Alle bogstaver står på en fælles linje.](shot:curved-text)
 
-Når du slår den til, løber teksten langs cirklen. Alle bogstaver står på den samme grundlinje, lige jævnt som med normal tekst. Der er fire indstillinger:
+Når du slår den til, løber teksten langs cirklen. Alle bogstaver står på den samme grundlinje, lige jævnt som med normal tekst. Der er fem indstillinger:
 
 - **{{ui:prop.textRadius}}** (5 til 500 mm): Radius af den cirkel bogstavernes grundlinje løber på. Bogstaverne bliver hvor de er, kun deres bue ændrer sig.
+- **{{ui:prop.textLetterWidth}}** (25 til 400 %): Hvor bredt hvert bogstav tegnes, i procent af dets egen bredde. Under 100 bliver bogstaverne smallere, over bredere; deres højde bliver, og buen de fylder vokser eller skrumper med. For eksempel til en høj, smal skrift på en mønt. På lige tekst gør {{ui:prop.textStretch}} det med rammen.
 - **{{ui:nameTag.letterSize}}:** Hvor høje bogstaverne er. Den afhænger ikke længere af formens bredde.
 - **{{ui:prop.textInward}}:** Flytter teksten fra toppen af cirklen til dens bund. Bogstaverne peger så med toppene mod midten.
 - **{{ui:prop.textFlipped}}:** Vender kun bogstaverne om, så du kan læse dem fra den anden side. Teksten bliver på sin plads på cirklen.

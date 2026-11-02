@@ -1230,6 +1230,11 @@ export type WorkplaneShape = {
    */
   textSpacing?: number;
   /**
+   * Curved text only (#1196): how wide each letter is drawn, in per cent of its own width - 100 or left out as the
+   * font has it, below narrower, above wider (25 to 400). The letters keep their height; the arc and the box follow.
+   */
+  textLetterWidth?: number;
+  /**
    * Text only (#225): the top edge of the letters rounded or chamfered by `size` mm, as a name
    * tag's letters on top are finished. Built from the outline stepped inwards, so it works for
    * every font and word; the edge tool takes such a text as a mesh.

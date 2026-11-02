@@ -2613,6 +2613,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.textCurved": "Po oblouku",
   "prop.textSpacing": "Mezery mezi písmeny (%)",
   "prop.textSpacingHint": "Mezera mezi písmeny navíc k mezerám písma, v procentech velikosti písmen; pod 0 užší. Písmena si zachovají velikost, rámeček se přizpůsobí.",
+  "prop.textLetterWidth": "Šířka písmen (%)",
+  "prop.textLetterWidthHint": "Jak široce se každé písmeno na oblouku kreslí, v procentech jeho vlastní šířky; pod 100 užší, nad 100 širší. Písmena si zachovají výšku, oblouk a rámeček se přizpůsobí.",
   "prop.textStretch": "Roztáhnout písmena na rámeček",
   "prop.textVertical": "Písmena pod sebou",
   "prop.textRadius": "Poloměr oblouku",
