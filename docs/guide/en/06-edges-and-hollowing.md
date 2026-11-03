@@ -107,6 +107,12 @@ Tick {{ui:lid.hinge}} and the lid swings open about a pin along the body's strai
 
 > **Tip:** Press the magnets into the body first. Then set one more magnet on each of them, where it snaps on the right way round, and press the lid down onto them (with a drop of glue in its pockets if they are loose): each magnet goes into the lid facing its partner, so they attract.
 
+## A cable channel through a body
+
+{{ui:editor.tool.cableChannel}} runs a round tunnel through a body for a cable or an LED lead, from where it goes in to where it comes out, and finds the way itself. Select the body and click {{ui:editor.tool.cableChannel}}, then click on the body where the cable goes in ({{ui:cable.entry}}) and where it comes out ({{ui:cable.exit}}). The way starts and ends straight along the surface, runs straight where it can and bends where it must, never tighter than {{ui:cable.minBend}}, and keeps as far from the outside as it can, never closer than {{ui:cable.minWall}}. A cable pushes through a bend of about five times its diameter; {{ui:cable.diameter}} is the channel's own.
+
+While the panel is open the body is seen through, with the channel inside it and a mark on each end. The panel says how long the channel is, its tightest bend and its thinnest wall, and in red when a bend or the wall had to be smaller than asked; a smaller value for {{ui:cable.minBend}} or another entry or exit helps then. {{ui:cable.pickAgain}} moves an end. {{ui:cable.apply}} cuts the channel in: it becomes a {{ui:shape.bentTube}} as a hole, grouped with the body, so the body stays exact, and after ungrouping the tube can still be changed. A bent tube has at most eleven bends; a way that needs more asks for another entry or exit.
+
 ## Offsetting bodies
 
 Every face of a body can be moved by the same distance, out or in. That is what a press fit, a lid or a snap joint needs: a gap of 0.1 to 0.3 mm all round while the features stay where they are, which scaling cannot give you.

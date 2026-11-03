@@ -505,6 +505,18 @@ export function ToolbarLidIcon(props: IconProps) {
   );
 }
 
+/** A block with a round channel through it: in at the side, a gentle bend, out at the top. */
+export function ToolbarCableChannelIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M7 12h34v28H7Z" {...SOLID} />
+      <path d="M7 12h34v28H7Z" />
+      <path d="M7 33.5h12a11.5 11.5 0 0 0 11.5-11.5V12" />
+      <path d="M7 28.5h12a6.5 6.5 0 0 0 6.5-6.5V12" />
+    </ToolbarVectorIcon>
+  );
+}
+
 export function ToolbarSnapGridIcon(props: IconProps) {
   return (
     <ToolbarVectorIcon {...props}>

@@ -112,6 +112,7 @@ export type LayerlingMcpCommandName =
   | "cookie_cutter"
   | "flexi_joints"
   | "make_lid"
+  | "make_cable_channel"
   | "loft_sketches"
   | "boolean_cut"
   | "separate_parts"

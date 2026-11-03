@@ -858,6 +858,24 @@ export const tools = [
     },
   },
   {
+    name: "layerling_make_cable_channel",
+    description: "Cut a round channel for a cable or an LED lead through one body, like the editor's Cable channel tool: from `entry` to `exit`, two points {x, y, z} in the editor's coordinates (y is the height, as elevation) on or near the body's surface, each moved to the nearest point of the surface. The way is found by itself: it starts and ends straight along the surface's normal, runs straight where it can and bends where it must, no tighter than `minBend` (centre-line radius in mm, default 25; a cable pushes through about five times its diameter), keeping at least `minWall` mm of material to the hull (1.5) and as far from the hull as it can. `diameter` in mm (5). The channel becomes a bent tube (solid, as a hole, at most 11 bends) grouped with the body, so the body stays exact and the tube can be changed after `layerling_ungroup_objects`. Returns the group and `channel`: its `length`, `minBend` (null when straight), `minWall`, the number of `segments` and the bent tube's `chain` (each a straight `length`, then a bend of `bendAngle` degrees round `bendRadius`, turned by `roll`), the `entry` and `exit` on the surface, and `tight`/`thin` when a bend or the wall had to be smaller than asked. `apply: false` only reports what it would make. Fails with a message when the ends are too close, the body is too thin at an end, no way keeps the wall, or the way needs more than 11 bends.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["id", "entry", "exit"],
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The body to run the channel through." },
+        entry: { type: "object", properties: { x: { type: "number" }, y: { type: "number" }, z: { type: "number" } }, required: ["x", "y", "z"] },
+        exit: { type: "object", properties: { x: { type: "number" }, y: { type: "number" }, z: { type: "number" } }, required: ["x", "y", "z"] },
+        diameter: { type: "number" },
+        minBend: { type: "number" },
+        minWall: { type: "number" },
+        apply: { type: "boolean" },
+      },
+    },
+  },
+  {
     name: "layerling_loft_sketches",
     description: "Loft between two sketch bodies, like the editor's Loft sketches button: two extruded sketch or SVG bodies, each with one outline (a ring with holes in both is fine, as long as both have as many), become one exact body whose bottom is the outline of the lower body at its bottom and whose top is the outline of the upper body at its top, with straight walls between them - for a funnel, a transition piece or a tapered frame. Each outline is taken where its body stands, turned about the vertical and stretched as the body is; bodies tipped over are refused. The two bodies stay inside the result as a group with groupOperation loft: layerling_open_group opens them, and closing the group builds the loft again. Returns the new object.",
     inputSchema: {

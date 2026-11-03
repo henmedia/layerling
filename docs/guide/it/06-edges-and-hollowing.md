@@ -100,6 +100,10 @@ Poi imposti lo spessore ({{ui:lid.thickness}}), l'accoppiamento ({{ui:lid.fit}},
 
 > **Suggerimento:** Quanto un coperchio è stretto dipende dalla stampante. Stampa prima una piccola scatola con il suo coperchio; se è troppo stretto, scegli l'accoppiamento successivo, più largo.
 
+## Un canale per cavo attraverso un corpo
+
+{{ui:editor.tool.cableChannel}} apre un passaggio rotondo attraverso un corpo per un cavo o il filo di un LED, da dove entra a dove esce, e trova la strada da solo. Seleziona il corpo e fai clic su {{ui:editor.tool.cableChannel}}, poi fai clic sul corpo dove entra il cavo ({{ui:cable.entry}}) e dove esce ({{ui:cable.exit}}). La strada inizia e finisce dritta, perpendicolare alla superficie, va dritta dove può e curva dove deve, mai più stretta di {{ui:cable.minBend}}, e resta il più lontano possibile dall'esterno, mai più vicina di {{ui:cable.minWall}}. Il pannello mostra la lunghezza del canale, la curva più stretta e la parete più sottile, in rosso quando una delle due ha dovuto essere più piccola del richiesto. {{ui:cable.apply}} taglia il canale: diventa un {{ui:shape.bentTube}} come foro, raggruppato con il corpo, che resta così esatto, e dopo aver separato il gruppo il tubo si può ancora modificare.
+
 ## Offset dei corpi
 
 Ogni faccia di un corpo può essere spostata della stessa distanza, verso l'esterno o l'interno. È ciò che serve a un accoppiamento, a un coperchio o a un incastro a scatto: un gioco di 0,1-0,3 mm tutto intorno mentre i dettagli restano dove sono, cosa che il ridimensionamento non dà.

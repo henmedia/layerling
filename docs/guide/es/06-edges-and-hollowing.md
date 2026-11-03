@@ -106,6 +106,12 @@ Marca {{ui:lid.hinge}} y la tapa se abre alrededor de un pasador a lo largo del 
 
 > **Consejo:** Mete primero los imanes en el cuerpo a presión. Luego pon otro imán sobre cada uno, en el sentido en que se pega, y aprieta la tapa sobre ellos (con una gota de pegamento en sus alojamientos si quedan sueltos): cada imán entra en la tapa enfrentado a su pareja, así que se atraen.
 
+## Un canal para cable a través de un cuerpo
+
+{{ui:editor.tool.cableChannel}} abre un paso redondo a través de un cuerpo para un cable o el hilo de un LED, desde donde entra hasta donde sale, y encuentra el camino solo. Selecciona el cuerpo y haz clic en {{ui:editor.tool.cableChannel}}; luego haz clic en el cuerpo donde entra el cable ({{ui:cable.entry}}) y donde sale ({{ui:cable.exit}}). El camino empieza y termina recto, perpendicular a la superficie, va recto donde puede y se curva donde debe, nunca más cerrado que {{ui:cable.minBend}}, y se mantiene tan lejos del exterior como puede, nunca más cerca que {{ui:cable.minWall}}. Un cable pasa por una curva de unas cinco veces su diámetro; {{ui:cable.diameter}} es el del canal.
+
+Mientras el panel está abierto, el cuerpo se ve en transparencia, con el canal dentro y una marca en cada extremo. El panel dice cuánto mide el canal, su curva más cerrada y su pared más fina, en rojo cuando una curva o la pared han tenido que ser menores de lo pedido; entonces ayuda bajar {{ui:cable.minBend}} o poner otra entrada o salida. {{ui:cable.pickAgain}} mueve un extremo. {{ui:cable.apply}} corta el canal: se convierte en un {{ui:shape.bentTube}} como orificio, agrupado con el cuerpo, que así sigue siendo exacto, y al desagrupar el tubo aún se puede cambiar. Un tubo curvado tiene como mucho once curvas; un camino que necesita más pide otra entrada o salida.
+
 ## Desfasar cuerpos
 
 Cada cara de un cuerpo puede moverse la misma distancia, hacia fuera o hacia dentro. Es lo que necesitan un ajuste a presión, una tapa o un encaje elástico: una holgura de 0,1 a 0,3 mm alrededor sin que los detalles se muevan de su sitio, algo que el escalado no consigue.

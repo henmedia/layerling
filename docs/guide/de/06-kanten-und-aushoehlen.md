@@ -107,6 +107,12 @@ Schaltest du {{ui:lid.hinge}} ein, klappt der Deckel um einen Stift entlang der 
 
 > **Tipp:** Presse zuerst die Magnete in den Körper. Setze dann auf jeden noch einen Magneten, der dort richtig herum einrastet, und drücke den Deckel darauf (mit einem Tropfen Kleber in den Taschen, falls sie locker sitzen): So kommt jeder Magnet passend zu seinem Partner in den Deckel, und sie ziehen sich an.
 
+## Ein Kabelkanal durch einen Körper
+
+{{ui:editor.tool.cableChannel}} legt einen runden Gang durch einen Körper, für ein Kabel oder eine LED-Leitung, von dort, wo es hineingeht, bis dort, wo es herauskommt, und sucht den Weg selbst. Wähle den Körper aus und klicke auf {{ui:editor.tool.cableChannel}}, dann auf den Körper, wo das Kabel hineingeht ({{ui:cable.entry}}), und wo es herauskommt ({{ui:cable.exit}}). Der Weg beginnt und endet gerade, senkrecht zur Oberfläche, läuft gerade, wo es geht, und biegt, wo er muss, nie enger als {{ui:cable.minBend}}, und bleibt so weit von der Außenhaut weg, wie es geht, nie näher als {{ui:cable.minWall}}. Ein Kabel lässt sich durch einen Bogen von etwa dem Fünffachen seines Durchmessers schieben; {{ui:cable.diameter}} ist der des Kanals.
+
+Solange das Fenster offen ist, siehst du durch den Körper hindurch, mit dem Kanal darin und einer Marke an jedem Ende. Das Fenster sagt, wie lang der Kanal ist, wie eng sein engster Bogen und wie dünn seine dünnste Wand, und das in Rot, wenn ein Bogen oder die Wand kleiner sein musste als gewünscht; dann hilft ein kleinerer Wert bei {{ui:cable.minBend}} oder ein anderer Eingang oder Ausgang. {{ui:cable.pickAgain}} versetzt ein Ende. {{ui:cable.apply}} schneidet den Kanal ein: Er wird ein {{ui:shape.bentTube}} als Aussparung, mit dem Körper gruppiert, der Körper bleibt also exakt, und nach dem Aufheben der Gruppe lässt sich das Rohr noch ändern. Ein gebogenes Rohr hat höchstens elf Bögen; ein Weg, der mehr braucht, verlangt einen anderen Eingang oder Ausgang.
+
 ## Körper versetzen
 
 Jede Fläche eines Körpers lässt sich um dieselbe Strecke nach außen oder innen verschieben. Das braucht eine Passung, ein Deckel oder eine Schnappverbindung: ein Spalt von 0,1 bis 0,3 mm ringsum, während die Merkmale an ihrem Platz bleiben, was Skalieren nicht kann.

@@ -100,6 +100,10 @@ Następnie ustawiasz grubość ({{ui:lid.thickness}}), pasowanie ({{ui:lid.fit}}
 
 > **Wskazówka:** To, jak ciasno siedzi pokrywka, zależy od drukarki. Najpierw wydrukuj małe pudełko z pokrywką; jeśli jest za ciasna, wybierz następne, luźniejsze pasowanie.
 
+## Kanał na kabel przez bryłę
+
+{{ui:editor.tool.cableChannel}} prowadzi przez bryłę okrągłe przejście na kabel albo przewód LED, od miejsca, gdzie wchodzi, do miejsca, gdzie wychodzi, i sam znajduje drogę. Zaznacz bryłę i kliknij {{ui:editor.tool.cableChannel}}, potem kliknij na bryłę tam, gdzie kabel wchodzi ({{ui:cable.entry}}), i tam, gdzie wychodzi ({{ui:cable.exit}}). Droga zaczyna się i kończy prosto, prostopadle do powierzchni, biegnie prosto, gdzie się da, i skręca, gdzie musi, nigdy ciaśniej niż {{ui:cable.minBend}}, i trzyma się jak najdalej od powierzchni, nigdy bliżej niż {{ui:cable.minWall}}. Panel pokazuje długość kanału, najciaśniejszy łuk i najcieńszą ściankę, na czerwono, gdy któreś musiało być mniejsze niż żądane. {{ui:cable.apply}} wycina kanał: staje się {{ui:shape.bentTube}} jako otwór, zgrupowaną z bryłą, która zostaje dokładna, a po rozgrupowaniu rurę można jeszcze zmienić.
+
 ## Odsuwanie brył
 
 Każdą ścianę bryły można przesunąć o tę samą odległość na zewnątrz lub do środka. Tego potrzebuje pasowanie, pokrywka lub połączenie zatrzaskowe: luz 0,1-0,3 mm dookoła, podczas gdy detale zostają na miejscu, czego skalowanie nie daje.

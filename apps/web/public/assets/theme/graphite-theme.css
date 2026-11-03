@@ -1216,6 +1216,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   accent-color: #d07313;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .cable-channel-picking {
+  color: #b35f00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .cable-channel-status.warning {
+  color: #b42318;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .cable-channel-picking {
+  color: #f3a452;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .cable-channel-status.warning {
+  color: #ff8a80;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-error {
   color: #9f2730;
   background: #fff0f1;

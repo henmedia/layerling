@@ -104,6 +104,12 @@ Coche {{ui:lid.hinge}} et le couvercle s'ouvre autour d'un axe le long du côté
 
 > **Astuce :** Insère d'abord les aimants dans le corps. Pose ensuite un autre aimant sur chacun d'eux, où il s'accroche dans le bon sens, et appuie le couvercle dessus (avec une goutte de colle dans ses cavités s'ils ont du jeu) : chaque aimant entre dans le couvercle face à son partenaire, et ils s'attirent.
 
+## Un passage de câble à travers un corps
+
+{{ui:editor.tool.cableChannel}} perce un conduit rond à travers un corps pour un câble ou un fil de LED, de l'endroit où il entre à celui où il sort, et trouve le chemin tout seul. Sélectionnez le corps et cliquez sur {{ui:editor.tool.cableChannel}}, puis cliquez sur le corps là où le câble entre ({{ui:cable.entry}}) et là où il sort ({{ui:cable.exit}}). Le chemin commence et finit droit, perpendiculaire à la surface, reste droit quand il le peut et se courbe quand il le doit, jamais plus serré que {{ui:cable.minBend}}, et reste aussi loin de l'extérieur que possible, jamais plus près que {{ui:cable.minWall}}. Un câble passe dans une courbe d'environ cinq fois son diamètre ; {{ui:cable.diameter}} est celui du passage.
+
+Tant que le panneau est ouvert, le corps est vu en transparence, avec le passage à l'intérieur et une marque à chaque bout. Le panneau indique la longueur du passage, sa courbe la plus serrée et sa paroi la plus mince, en rouge quand une courbe ou la paroi a dû être plus petite que demandé ; réduire {{ui:cable.minBend}}, ou choisir une autre entrée ou sortie, aide alors. {{ui:cable.pickAgain}} déplace un bout. {{ui:cable.apply}} découpe le passage : il devient un {{ui:shape.bentTube}} en perçage, groupé avec le corps, qui reste donc exact, et une fois le groupe dissocié le tube reste modifiable. Un tube cintré a au plus onze courbes ; un chemin qui en demande plus réclame une autre entrée ou sortie.
+
 ## Décaler des corps
 
 Chaque face d'un corps peut être déplacée de la même distance, vers l'extérieur ou l'intérieur. C'est ce qu'il faut pour un ajustement, un couvercle ou un assemblage à clip : un jeu de 0,1 à 0,3 mm tout autour, les éléments restant à leur place, ce que la mise à l'échelle ne donne pas.

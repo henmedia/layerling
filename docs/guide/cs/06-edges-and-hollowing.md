@@ -104,6 +104,12 @@ Když zapneš {{ui:lid.hinge}}, víko se otevírá kolem čepu podél rovné zad
 
 > **Tip:** Nejdřív zalisuj magnety do tělesa. Pak na každý polož ještě jeden magnet, který se na něm sám otočí správně, a přitlač na ně víko (s kapkou lepidla v kapsách, pokud sedí volně): každý magnet tak skončí ve víku naproti svému protějšku a budou se přitahovat.
 
+## Kabelový kanál tělesem
+
+{{ui:editor.tool.cableChannel}} vede tělesem kulatý průchod pro kabel nebo vodič LED, od místa, kde vstupuje, k místu, kde vychází, a cestu najde sám. Vyberte těleso a klikněte na {{ui:editor.tool.cableChannel}}, pak klikněte na těleso tam, kde kabel vstupuje ({{ui:cable.entry}}), a kde vychází ({{ui:cable.exit}}). Cesta začíná a končí rovně, kolmo k povrchu, vede rovně, kde to jde, a ohýbá se, kde musí, nikdy ostřeji než {{ui:cable.minBend}}, a drží se co nejdál od vnějšího povrchu, nikdy blíž než {{ui:cable.minWall}}. Kabel se dá protlačit obloukem o poloměru asi pětinásobku jeho průměru; {{ui:cable.diameter}} je průměr kanálu.
+
+Dokud je panel otevřený, těleso je průhledné, s kanálem uvnitř a značkou na každém konci. Panel ukáže délku kanálu, nejostřejší oblouk a nejtenčí stěnu, červeně, když musel být oblouk nebo stěna menší, než bylo žádáno; pak pomůže menší hodnota u {{ui:cable.minBend}} nebo jiný vstup či výstup. {{ui:cable.pickAgain}} přesune konec. {{ui:cable.apply}} kanál vyřízne: stane se z něj {{ui:shape.bentTube}} jako výřez, seskupená s tělesem, takže těleso zůstane přesné, a po zrušení skupiny se trubka dá ještě změnit. Ohnutá trubka má nejvýš jedenáct oblouků; cesta, která jich potřebuje víc, chce jiný vstup nebo výstup.
+
 ## Odsazení těles
 
 Každou plochu tělesa lze posunout o stejnou vzdálenost ven nebo dovnitř. To potřebuje lícovaný spoj, víko nebo zacvakávací spoj: mezera 0,1 až 0,3 mm dokola, zatímco prvky zůstanou na místě, což změna měřítka nedá.

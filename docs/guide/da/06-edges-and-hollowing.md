@@ -108,6 +108,12 @@ Slå {{ui:lid.hinge}} til, så klapper låget op om en stift langs kroppens lige
 
 > **Tip:** Tryk først magneterne ind i legemet. Sæt så en magnet mere på hver af dem, hvor den selv vender rigtigt, og tryk låget ned på dem (med en dråbe lim i lommerne, hvis de sidder løst): så kommer hver magnet ind i låget over for sin partner, og de tiltrækker hinanden.
 
+## En kabelkanal gennem et legeme
+
+{{ui:editor.tool.cableChannel}} lægger en rund gang gennem et legeme til et kabel eller en LED-ledning, fra der hvor det går ind, til der hvor det kommer ud, og finder selv vejen. Vælg legemet og klik på {{ui:editor.tool.cableChannel}}, og klik så på legemet der, hvor kablet går ind ({{ui:cable.entry}}), og der, hvor det kommer ud ({{ui:cable.exit}}). Vejen begynder og ender lige, vinkelret på overfladen, går lige, hvor den kan, og bøjer, hvor den må, aldrig skarpere end {{ui:cable.minBend}}, og holder sig så langt fra ydersiden som muligt, aldrig tættere end {{ui:cable.minWall}}. Et kabel kan skubbes gennem en bøjning på cirka fem gange dets diameter; {{ui:cable.diameter}} er kanalens egen.
+
+Mens panelet er åbent, ser du gennem legemet, med kanalen indeni og et mærke i hver ende. Panelet fortæller, hvor lang kanalen er, dens skarpeste bøjning og dens tyndeste væg, med rødt, når en bøjning eller væggen måtte blive mindre end ønsket; så hjælper en mindre værdi ved {{ui:cable.minBend}} eller en anden ind- eller udgang. {{ui:cable.pickAgain}} flytter en ende. {{ui:cable.apply}} skærer kanalen ind: den bliver et {{ui:shape.bentTube}} som hul, grupperet med legemet, så legemet forbliver eksakt, og efter at gruppen er opløst, kan røret stadig ændres. Et bøjet rør har højst elleve bøjninger; en vej, der kræver flere, beder om en anden ind- eller udgang.
+
 ## Forskyd legemer
 
 Hver flade på et legeme kan flyttes den samme afstand, udad eller indad. Det er, hvad en pasning, et låg eller en snapsamling har brug for: et spillerum på 0,1 til 0,3 mm hele vejen rundt, mens detaljerne bliver, hvor de er, hvad skalering ikke kan give.

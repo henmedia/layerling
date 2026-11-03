@@ -104,6 +104,12 @@ Vink {{ui:lid.hinge}} aan en het deksel klapt open om een pen langs de rechte ac
 
 > **Tip:** Druk eerst de magneten in de vorm. Zet dan op elk ervan nog een magneet, die daar goed om vastklikt, en druk het deksel erop (met een druppel lijm in de kuiltjes als ze los zitten): zo komt elke magneet tegenover zijn partner in het deksel, en trekken ze elkaar aan.
 
+## Een kabelkanaal door een vorm
+
+{{ui:editor.tool.cableChannel}} maakt een ronde gang door een vorm voor een kabel of een LED-draad, van waar hij erin gaat tot waar hij eruit komt, en zoekt de weg zelf. Selecteer de vorm en klik op {{ui:editor.tool.cableChannel}}, klik dan op de vorm waar de kabel erin gaat ({{ui:cable.entry}}) en waar hij eruit komt ({{ui:cable.exit}}). De weg begint en eindigt recht, loodrecht op het oppervlak, loopt recht waar het kan en buigt waar het moet, nooit krapper dan {{ui:cable.minBend}}, en blijft zo ver van de buitenkant als het kan, nooit dichter dan {{ui:cable.minWall}}. Een kabel laat zich door een bocht van ongeveer vijf keer zijn diameter duwen; {{ui:cable.diameter}} is die van het kanaal.
+
+Zolang het paneel open is, kijk je door de vorm heen, met het kanaal erin en een merkteken aan elk eind. Het paneel zegt hoe lang het kanaal is, hoe krap de krapste bocht en hoe dun de dunste wand, in rood als een bocht of de wand kleiner moest dan gevraagd; dan helpt een kleinere waarde bij {{ui:cable.minBend}} of een andere in- of uitgang. {{ui:cable.pickAgain}} verplaatst een eind. {{ui:cable.apply}} snijdt het kanaal in: het wordt een {{ui:shape.bentTube}} als gat, gegroepeerd met de vorm, die dus exact blijft, en na het opheffen van de groep is de buis nog te wijzigen. Een gebogen buis heeft hoogstens elf bochten; een weg die meer nodig heeft, vraagt om een andere in- of uitgang.
+
 ## Lichamen verschuiven
 
 Elk vlak van een lichaam kan over dezelfde afstand naar buiten of naar binnen worden verschoven. Dat is wat een pasvorm, een deksel of een klikverbinding nodig heeft: een spleet van 0,1 tot 0,3 mm rondom terwijl de onderdelen op hun plaats blijven, wat schalen niet kan.

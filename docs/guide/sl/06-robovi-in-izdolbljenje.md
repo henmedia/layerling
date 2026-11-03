@@ -104,6 +104,12 @@ Ko vklopiš {{ui:lid.hinge}}, se pokrov odpira okoli zatiča vzdolž ravne zadnj
 
 > **Namig:** Najprej vtisni magnete v telo. Nato na vsakega postavi še en magnet, ki se nanj sam obrne prav, in nanje pritisni pokrov (s kapljico lepila v žepih, če so ohlapni): tako gre vsak magnet v pokrov nasproti svojemu paru in se privlačita.
 
+## Kabelski kanal skozi telo
+
+{{ui:editor.tool.cableChannel}} napelje okrogel prehod skozi telo za kabel ali žico LED, od mesta, kjer vstopi, do mesta, kjer izstopi, in sam najde pot. Izberi telo in klikni {{ui:editor.tool.cableChannel}}, nato klikni na telo, kjer kabel vstopi ({{ui:cable.entry}}), in kjer izstopi ({{ui:cable.exit}}). Pot se začne in konča naravnost, pravokotno na površino, gre naravnost, kjer gre, in se ukrivi, kjer mora, nikoli ožje od {{ui:cable.minBend}}, in ostane čim dlje od zunanje površine, nikoli bliže od {{ui:cable.minWall}}. Kabel se da potisniti skozi lok s polmerom približno petkratnika njegovega premera; {{ui:cable.diameter}} je premer kanala.
+
+Dokler je plošča odprta, vidiš skozi telo, s kanalom v njem in oznako na vsakem koncu. Plošča pove, kako dolg je kanal, kako ozek je najožji lok in kako tanka najtanjša stena, z rdečo, ko sta morala biti lok ali stena manjša od želenih; takrat pomaga manjša vrednost pri {{ui:cable.minBend}} ali drug vhod ali izhod. {{ui:cable.pickAgain}} premakne konec. {{ui:cable.apply}} izreže kanal: postane {{ui:shape.bentTube}} kot luknja, združena s telesom, ki tako ostane natančno, in po razdružitvi lahko cev še spremeniš. Ukrivljena cev ima največ enajst lokov; pot, ki jih potrebuje več, zahteva drug vhod ali izhod.
+
 ## Odmik teles
 
 Vsako ploskev telesa lahko premakneš za isto razdaljo navzven ali navznoter. To potrebuje nasedanje, pokrov ali zaskočni spoj: reža 0,1 do 0,3 mm naokrog, medtem ko značilnosti ostanejo na mestu, česar spreminjanje merila ne zmore.
