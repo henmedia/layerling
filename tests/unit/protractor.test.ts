@@ -1,5 +1,7 @@
+import * as THREE from "three";
 import { describe, expect, it } from "vitest";
-import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
+import { angleAtVertex, angleBetweenFaces, facetOfCurvedSurface, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
+import { planarFaceTriangles } from "@/lib/rotationPivot";
 
 const point = (x: number, y: number, z: number) => ({ x, y, z });
 
@@ -52,6 +54,60 @@ describe("angleBetweenFaces", () => {
 
   it("has no angle without a normal", () => {
     expect(angleBetweenFaces(point(0, 0, 0), point(0, 1, 0))).toBeNull();
+  });
+});
+
+describe("facetOfCurvedSurface", () => {
+  /** Nine numbers per triangle, as the editor reads a display mesh. */
+  const trianglesOf = (geometry: THREE.BufferGeometry) => Array.from((geometry.index ? geometry.toNonIndexed() : geometry).getAttribute("position").array);
+  /** The flat patch around the triangle whose middle lies furthest along `direction`. */
+  const patchFacing = (positions: number[], direction: THREE.Vector3) => {
+    let best = 0;
+    let bestReach = Number.NEGATIVE_INFINITY;
+    for (let triangle = 0; triangle < positions.length / 9; triangle += 1) {
+      const middle = new THREE.Vector3(
+        (positions[triangle * 9] + positions[triangle * 9 + 3] + positions[triangle * 9 + 6]) / 3,
+        (positions[triangle * 9 + 1] + positions[triangle * 9 + 4] + positions[triangle * 9 + 7]) / 3,
+        (positions[triangle * 9 + 2] + positions[triangle * 9 + 5] + positions[triangle * 9 + 8]) / 3,
+      );
+      if (middle.dot(direction) > bestReach) {
+        bestReach = middle.dot(direction);
+        best = triangle;
+      }
+    }
+    return planarFaceTriangles(positions, best)?.triangles ?? [];
+  };
+
+  it("takes the side of a box as flat", () => {
+    const box = trianglesOf(new THREE.BoxGeometry(20, 10, 30));
+    const side = patchFacing(box, new THREE.Vector3(1, 0, 0));
+    expect(side).toHaveLength(2);
+    expect(facetOfCurvedSurface(box, side)).toBe(false);
+  });
+
+  it("takes the end of a wedge, one triangle, as flat", () => {
+    const wedge = [
+      // The two ends, one triangle each.
+      -20, 0, 20, 20, 0, 20, 20, 40, 20,
+      -20, 0, -20, 20, 40, -20, 20, 0, -20,
+      // The floor, the back and the slope, two each.
+      -20, 0, -20, 20, 0, -20, 20, 0, 20, -20, 0, -20, 20, 0, 20, -20, 0, 20,
+      20, 0, -20, 20, 40, -20, 20, 40, 20, 20, 0, -20, 20, 40, 20, 20, 0, 20,
+      -20, 0, -20, -20, 0, 20, 20, 40, 20, -20, 0, -20, 20, 40, 20, 20, 40, -20,
+    ];
+    expect(facetOfCurvedSurface(wedge, planarFaceTriangles(wedge, 0)?.triangles ?? [])).toBe(false);
+    expect(facetOfCurvedSurface(wedge, planarFaceTriangles(wedge, 6)?.triangles ?? [])).toBe(false);
+  });
+
+  it("takes a facet of a round wall as curved, and the cap as flat", () => {
+    const cylinder = trianglesOf(new THREE.CylinderGeometry(10, 10, 20, 32));
+    expect(facetOfCurvedSurface(cylinder, patchFacing(cylinder, new THREE.Vector3(1, 0, 0.01)))).toBe(true);
+    expect(facetOfCurvedSurface(cylinder, patchFacing(cylinder, new THREE.Vector3(0, 1, 0)))).toBe(false);
+  });
+
+  it("takes the sides of a hexagonal prism as flat", () => {
+    const prism = trianglesOf(new THREE.CylinderGeometry(10, 10, 20, 6));
+    expect(facetOfCurvedSurface(prism, patchFacing(prism, new THREE.Vector3(1, 0, 0.3)))).toBe(false);
   });
 });
 

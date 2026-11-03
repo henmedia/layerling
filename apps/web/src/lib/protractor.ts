@@ -50,6 +50,54 @@ export function angleBetweenFaces(normalA: ProtractorVector, normalB: Protractor
   return { angle, other: 180 - angle };
 }
 
+/** Neighbouring triangles flatter than this (degrees) are one surface bending, as round a cylinder; at a real edge they meet steeper. */
+const SMOOTH_NEIGHBOUR_DEGREES = 20;
+
+/**
+ * Whether a flat patch of a display mesh (`region`, triangle indexes into `positions`, nine numbers per
+ * triangle, as planarFaceTriangles finds it) is a facet of a curved surface: a triangle beside it, sharing
+ * an edge, turns away by less than SMOOTH_NEIGHBOUR_DEGREES. A lone triangle can be a whole flat face (the
+ * end of a wedge), so the count of triangles says nothing.
+ */
+export function facetOfCurvedSurface(positions: ArrayLike<number>, region: readonly number[]) {
+  const triangleCount = Math.floor(positions.length / 9);
+  if (region.length === 0) return false;
+  let extent = 1;
+  for (let axis = 0; axis < 3; axis += 1) {
+    let min = Number.POSITIVE_INFINITY;
+    let max = Number.NEGATIVE_INFINITY;
+    for (let offset = axis; offset < triangleCount * 9; offset += 3) {
+      min = Math.min(min, positions[offset]);
+      max = Math.max(max, positions[offset]);
+    }
+    extent = Math.max(extent, max - min);
+  }
+  // Corners closer than this count as one; the mesh stores float32 positions.
+  const weld = extent * 1e-6;
+  const corner = (triangle: number, index: number) => {
+    const offset = triangle * 9 + index * 3;
+    return `${Math.round(positions[offset] / weld)},${Math.round(positions[offset + 1] / weld)},${Math.round(positions[offset + 2] / weld)}`;
+  };
+  const normal = (triangle: number): ProtractorVector => {
+    const o = triangle * 9;
+    const u = { x: positions[o + 3] - positions[o], y: positions[o + 4] - positions[o + 1], z: positions[o + 5] - positions[o + 2] };
+    const v = { x: positions[o + 6] - positions[o], y: positions[o + 7] - positions[o + 1], z: positions[o + 8] - positions[o + 2] };
+    return { x: u.y * v.z - u.z * v.y, y: u.z * v.x - u.x * v.z, z: u.x * v.y - u.y * v.x };
+  };
+  const inRegion = new Set(region);
+  const regionCorners = new Set(region.flatMap((triangle) => [0, 1, 2].map((index) => corner(triangle, index))));
+  const faceNormal = normal(region[0]);
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+    if (inRegion.has(triangle)) continue;
+    const shared = [0, 1, 2].filter((index) => regionCorners.has(corner(triangle, index))).length;
+    if (shared < 2) continue;
+    const turn = angleOfDirections(faceNormal, normal(triangle));
+    // The winding of display meshes is not always consistent, so a neighbour may point either way.
+    if (turn !== null && Math.min(turn, 180 - turn) < SMOOTH_NEIGHBOUR_DEGREES) return true;
+  }
+  return false;
+}
+
 /** An angle as the editor shows it: to a tenth of a degree, without a trailing ".0". */
 export function formatProtractorAngle(degrees: number) {
   return `${Number(degrees.toFixed(1))}°`;

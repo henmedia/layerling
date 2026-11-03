@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { outwardFaceNormal } from "@/lib/layFlat";
-import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
+import { angleAtVertex, angleBetweenFaces, facetOfCurvedSurface, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { planarFaceTriangles } from "@/lib/rotationPivot";
 import { findShapeObject, projectToScreen, tapePointWorld, type TapePoint, type ThreeState } from "./ViewportOverlays";
 import { aimPickRay, firstShapeHit, RENDER_LAYER_SHAPES, worldTrianglePositions } from "./viewportPicking";
@@ -72,7 +72,7 @@ export function protractorFaceFromWorld(state: ThreeState, shapeId: string | nul
 
 /**
  * The flat face under the pointer, or `curved` when the pointer is on a body but not on a flat face: a
- * lone facet of a round surface has no angle worth reading.
+ * facet of a round surface has no angle worth reading.
  */
 export function pickProtractorFace(state: ThreeState, clientX: number, clientY: number): { shapeId: string; point: THREE.Vector3; normal: THREE.Vector3 } | "curved" | null {
   aimPickRay(state, clientX, clientY, RENDER_LAYER_SHAPES);
@@ -81,7 +81,7 @@ export function pickProtractorFace(state: ThreeState, clientX: number, clientY: 
   const mesh = hit.object as THREE.Mesh<THREE.BufferGeometry>;
   const positions = worldTrianglePositions(mesh);
   const face = planarFaceTriangles(positions, hit.faceIndex);
-  if (!face || face.triangles.length < 2) return "curved";
+  if (!face || facetOfCurvedSurface(positions, face.triangles)) return "curved";
   const corner = (offset: number) => new THREE.Vector3().fromArray(positions, (hit.faceIndex! * 3 + offset) * 3);
   const normal = outwardFaceNormal(corner(0), corner(1), corner(2), state.raycaster.ray.direction);
   if (!normal) return "curved";
