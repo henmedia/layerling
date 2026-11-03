@@ -4,7 +4,7 @@ import { LID_DEFAULTS, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_MAGNET_GAP, MIN_LID_W
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back" });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -20,6 +20,13 @@ describe("lid options (#1009)", () => {
     expect(normalizeLidOptions({ hingeSide: "left" }).hingeSide).toBe("left");
     expect(normalizeLidOptions({ hingeSide: "top" }).hingeSide).toBe("back");
     expect(normalizeLidOptions({ hingeSide: 3 }).hingeSide).toBe("back");
+  });
+
+  it("makes teardrop pin holes unless told not to", () => {
+    expect(normalizeLidOptions().hingeTeardrop).toBe(true);
+    expect(normalizeLidOptions({ hingeTeardrop: false }).hingeTeardrop).toBe(false);
+    expect(normalizeLidOptions({ hingeTeardrop: "false" }).hingeTeardrop).toBe(false);
+    expect(normalizeLidOptions({ hingeTeardrop: "no" }).hingeTeardrop).toBe(true);
   });
 
   it("brings sizes into range and ignores what is not a number", () => {

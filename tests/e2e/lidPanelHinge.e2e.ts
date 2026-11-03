@@ -57,6 +57,11 @@ describe("the lid's panel with a hinge", () => {
     const on = mount({ hinge: true });
     for (const label of ["Hinge side", "Pin diameter", "Hinge clearance", "Knuckles (0 = automatic)"]) expect(texts(on.panel)).toContain(label);
     expect(checkbox(on.panel, "Print the pin too")).not.toBeNull();
+    // Teardrop holes are on to start with, and can be turned off.
+    const teardrop = checkbox(on.panel, "Teardrop pin holes (no droop when printed)")!;
+    expect(teardrop.checked).toBe(true);
+    act(() => teardrop.click());
+    expect(on.changes.at(-1)).toEqual({ hingeTeardrop: false });
     // The knuckles' size for a 1.75 mm pin: its hole with 0.15 mm play and a 1.6 mm wall round it.
     expect(texts(on.panel)).toContain("Knuckles 5.3 mm");
   });

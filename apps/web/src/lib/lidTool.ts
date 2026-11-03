@@ -37,7 +37,8 @@ export type LidHingeSide = "back" | "right" | "front" | "left";
  * is, in mm. With `magnets`, pockets for four round magnets of that diameter and height, with `magnetGap` of play per
  * side (a little to press them in, more to glue them). With `hinge`, a hinge along the `hingeSide` (the back unless
  * another is picked) for a pin of `hingePin` mm, `hingeGap` between its knuckles, `hingeKnuckles` of them (0: as many as
- * suit its length), and the pin printed apart with `hingePrintPin`.
+ * suit its length), and the pin printed apart with `hingePrintPin`. With `hingeTeardrop` (the default) the pin's holes
+ * have a point on top as each part is printed, so they do not droop.
  */
 export type LidOptions = {
   type: LidType;
@@ -55,12 +56,13 @@ export type LidOptions = {
   hingeKnuckles: number;
   hingePrintPin: boolean;
   hingeSide: LidHingeSide;
+  hingeTeardrop: boolean;
 };
 
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat"];
 export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
-  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back",
+  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true,
 };
 export const LID_FITS = [0.1, 0.2, 0.3] as const;
 export const MIN_LID_THICKNESS = 0.4;
@@ -108,6 +110,12 @@ const HINGE_KNUCKLE_WALL = 1.6;
 const MIN_KNUCKLE_WIDTH = 3;
 /** How far the hinge stays from the ends of the straight back side, in mm (its corners may be rounded). */
 const HINGE_END_MARGIN = 0.5;
+/** How much of a knuckle a teardrop hole leaves above its point, in mm: a point that would reach closer is cut flat. */
+const TEARDROP_WALL = 0.8;
+/** How much of a printed pin's diameter is taken off underneath, so it lies on a flat and does not roll. */
+const PIN_FLAT = 0.1;
+/** How far a body's knuckles reach into a straight wall, in mm; on a round one, as far again as the wall falls away. */
+const HINGE_WALL_REACH = 0.4;
 /** How many sides a knuckle's and a pin's circle has. */
 const HINGE_SIDES = 48;
 /** How far the lid lies from a pin printed apart, in mm. */
@@ -161,6 +169,7 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (value?.hingePrintPin === true || value?.hingePrintPin === "true") result.hingePrintPin = true;
   const hingeSide = typeof value?.hingeSide === "string" ? value.hingeSide.trim().toLowerCase() : "";
   if ((LID_HINGE_SIDES as readonly string[]).includes(hingeSide)) result.hingeSide = hingeSide as LidHingeSide;
+  if (value?.hingeTeardrop === false || value?.hingeTeardrop === "false") result.hingeTeardrop = false;
   return result;
 }
 
@@ -171,12 +180,15 @@ export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin">) {
 
 /**
  * Where the hinge goes along the back side (the outline's largest y) of an outline seen from above: its axis (y along
- * the frame, z the height), its knuckles from end to end (even ones the body's, odd ones the lid's), and how low the
- * body's knuckles reach down its back wall. An error when the back side has no straight stretch long enough for three
- * knuckles, or the body is too low for the slope under them.
+ * the frame, z the height), its knuckles from end to end (even ones the body's, odd ones the lid's), how low the
+ * body's knuckles reach down its back wall, and how far they reach into it (`reach`). Along a straight stretch long
+ * enough for three knuckles, that is where it goes. A round back (a pot, a tube) has none: then the hinge runs along
+ * the part of the outline that stays within a knuckle's radius of the back (`curved`), and the body's knuckles and the
+ * lid's web reach as far in as the wall falls away there. An error when even that is too short for three knuckles, or
+ * the body is too low for the slope under them.
  */
 export function hingePlan(polygons: readonly (readonly Point[])[], options: LidOptions, top: number, bottom: number):
-  | { backY: number; axisY: number; axisZ: number; radius: number; hole: number; segments: [number, number][]; low: number; start: number; end: number }
+  | { backY: number; axisY: number; axisZ: number; radius: number; hole: number; segments: [number, number][]; low: number; start: number; end: number; reach: number; curved: boolean }
   | { error: LidError } {
   const back = Math.max(...polygons.flat().map(([, y]) => y));
   // The straight stretches along the back: edges whose both ends lie on it, joined where they meet.
@@ -196,23 +208,54 @@ export function hingePlan(polygons: readonly (readonly Point[])[], options: LidO
   }
   const longest = joined.reduce<[number, number] | null>((best, stretch) => (!best || stretch[1] - stretch[0] > best[1] - best[0] ? stretch : best), null);
   const gap = options.hingeGap;
-  if (!longest) return { error: { code: "hingeNoBack" } };
-  const start = longest[0] + HINGE_END_MARGIN, end = longest[1] - HINGE_END_MARGIN;
-  const length = end - start;
-  let count = options.hingeKnuckles || Math.min(MAX_HINGE_KNUCKLES, Math.max(3, 2 * Math.round((length / 10 - 1) / 2) + 1));
-  const width = (knuckles: number) => (length - (knuckles - 1) * gap) / knuckles;
-  while (count > 3 && width(count) < MIN_KNUCKLE_WIDTH) count -= 2;
-  if (width(count) < MIN_KNUCKLE_WIDTH) return { error: { code: "hingeNoBack" } };
   const radius = hingeKnuckleRadius(options);
+  // How many knuckles a stretch takes, and how wide they are; none when not even three fit.
+  const knuckles = (range: [number, number] | null) => {
+    if (!range) return null;
+    const length = range[1] - range[0] - 2 * HINGE_END_MARGIN;
+    const width = (count: number) => (length - (count - 1) * gap) / count;
+    let count = options.hingeKnuckles || Math.min(MAX_HINGE_KNUCKLES, Math.max(3, 2 * Math.round((length / 10 - 1) / 2) + 1));
+    while (count > 3 && width(count) < MIN_KNUCKLE_WIDTH) count -= 2;
+    return width(count) < MIN_KNUCKLE_WIDTH ? null : { count, width: width(count), start: range[0] + HINGE_END_MARGIN, end: range[1] - HINGE_END_MARGIN };
+  };
+  const straight = knuckles(longest);
+  const cap = straight ? null : outlineCapAtBack(polygons, back, radius);
+  const fit = straight ?? knuckles(cap);
+  if (!fit) return { error: { code: "hingeNoBack" } };
+  const { count, start, end } = fit;
+  const curved = !straight;
+  const reach = curved ? radius + HINGE_WALL_REACH : HINGE_WALL_REACH;
   // Flush with the lid's top, behind the back side by the gap.
   const axisY = back + radius + gap;
   const axisZ = top + options.thickness - radius;
   // A 45 degree slope from the back wall to the bottom of the knuckle.
   const low = axisZ - (radius + gap) - radius * Math.SQRT2;
   if (low < bottom + 0.4) return { error: { code: "hingeTooLow" } };
-  const w = width(count);
+  const w = fit.width;
   const segments = Array.from({ length: count }, (_, index): [number, number] => [start + index * (w + gap), start + index * (w + gap) + w]);
-  return { backY: back, axisY, axisZ, radius, hole: options.hingePin / 2 + HINGE_PIN_PLAY, segments, low, start, end };
+  return { backY: back, axisY, axisZ, radius, hole: options.hingePin / 2 + HINGE_PIN_PLAY, segments, low, start, end, reach, curved };
+}
+
+/**
+ * The stretch of x round the outline's backmost point where the outline stays within `dip` of the back: where it
+ * crosses the line `dip` in front of it, to either side of that point. Null when it does not cross on both sides.
+ */
+function outlineCapAtBack(polygons: readonly (readonly Point[])[], back: number, dip: number): [number, number] | null {
+  const level = back - dip;
+  const backmost = polygons.flat().reduce<Point | null>((best, point) => (!best || point[1] > best[1] ? point : best), null);
+  if (!backmost) return null;
+  let left = -Infinity;
+  let right = Infinity;
+  for (const polygon of polygons) {
+    polygon.forEach((point, index) => {
+      const next = polygon[(index + 1) % polygon.length];
+      if ((point[1] - level) * (next[1] - level) >= 0) return;
+      const x = point[0] + ((level - point[1]) / (next[1] - point[1])) * (next[0] - point[0]);
+      if (x <= backmost[0]) left = Math.max(left, x);
+      else right = Math.min(right, x);
+    });
+  }
+  return Number.isFinite(left) && Number.isFinite(right) ? [left, right] : null;
 }
 
 /** How deep a magnet's pocket is, in the body and in the lid, in mm. */
@@ -519,16 +562,39 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     let bodyKnuckles: ManifoldSolid | null = null;
     const along = (from: number, to: number, radius: number, y: number, z: number) =>
       keep(created, keep(created, keep(created, runtime.Manifold.cylinder(to - from, radius, radius, HINGE_SIDES)).rotate([0, 90, 0])).translate([from, y, z]));
+    // A profile given as (y, z) points drawn out along x from `from` to `to`: extruded along its own z, then turned so
+    // that z runs along x (its x becomes -z, its y stays y).
+    const acrossAlong = (from: number, to: number, points: [number, number][]) => {
+      const profile = keep(created, new runtime.CrossSection([points.map(([y, z]): [number, number] => [-z, y])], "NonZero"));
+      if (profile.area() < 1e-6) return null;
+      return keep(created, keep(created, keep(created, profile.extrude(to - from)).rotate([0, 90, 0])).translate([from, 0, 0]));
+    };
+    // A round hole with a point on the `tip` side (+1 up, -1 down) at 45 degrees, cut flat at `reach` from its middle.
+    const teardropAlong = (from: number, to: number, radius: number, tip: 1 | -1, reach: number, y: number, z: number) => {
+      const height = Math.max(radius, Math.min(radius * Math.SQRT2, reach));
+      const half = radius * Math.SQRT2 - height;
+      const point: [number, number][] = half > 1e-6 ? [[-tip * height, -half], [-tip * height, half]] : [[-tip * height, 0]];
+      const profile = keep(created, runtime.CrossSection.hull([keep(created, runtime.CrossSection.circle(radius, HINGE_SIDES)), point]));
+      return keep(created, keep(created, keep(created, profile.extrude(to - from)).rotate([0, 90, 0])).translate([from, y, z]));
+    };
     if (plan) {
       const lidPieces: ManifoldSolid[] = [];
       const bodyPieces: ManifoldSolid[] = [];
       const stripTop = Math.min(plan.axisZ, top - options.hingeGap);
+      // On a round side the wall falls away from the hinge's line: the lid's web reaches in to its plate's edge, and
+      // under each of the body's knuckles a block reaches in to the wall, its underside on the same 45 degree slope.
+      const webReach = plan.curved ? plan.reach : 0.3;
+      const blockLow = Math.max(box.min[2] + 0.4, plan.low - plan.reach);
       plan.segments.forEach(([from, to], index) => {
         const round = along(from, to, plan.radius, plan.axisY, plan.axisZ);
         if (index % 2) {
-          const web = keep(created, keep(created, runtime.Manifold.cube([to - from, plan.axisY - plan.backY + 0.3, options.thickness])).translate([from, plan.backY - 0.3, top]));
+          const web = keep(created, keep(created, runtime.Manifold.cube([to - from, plan.axisY - plan.backY + webReach, options.thickness])).translate([from, plan.backY - webReach, top]));
           lidPieces.push(round, web);
         } else {
+          if (plan.curved) {
+            const block = acrossAlong(from, to, [[plan.backY - plan.reach, blockLow], [plan.backY, plan.low], [plan.backY, stripTop], [plan.backY - plan.reach, stripTop]]);
+            if (block) bodyPieces.push(block);
+          }
           const strip = keep(created, keep(created, runtime.Manifold.cube([to - from, 0.4, stripTop - plan.low])).translate([from, plan.backY - 0.4, plan.low]));
           // The hull rises steeply from the strip to the knuckle, close past the plate's back edge: what lies within
           // the gap behind the back and above the gap below the plate is taken off, so the gap is kept there too.
@@ -537,9 +603,14 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
         }
       });
       const unturned = (solid: ManifoldSolid) => (turn ? keep(created, solid.rotate([0, 0, -turn])) : solid);
-      const hole = unturned(along(plan.start - 1, plan.end + 1, plan.hole, plan.axisY, plan.axisZ));
-      made = keep(created, keep(created, made.add(unturned(keep(created, runtime.Manifold.union(lidPieces))))).subtract(hole));
-      bodyKnuckles = keep(created, keep(created, unturned(keep(created, runtime.Manifold.union(bodyPieces)))).subtract(hole));
+      // A teardrop hole points up as each part is printed: the body stands upright, the lid lies turned over, so its
+      // point faces the lid's inside. The pin turns in the round part, with the same play.
+      const holeFor = (tip: 1 | -1) => unturned(options.hingeTeardrop ? teardropAlong(plan.start - 1, plan.end + 1, plan.hole, tip, plan.radius - TEARDROP_WALL, plan.axisY, plan.axisZ) : along(plan.start - 1, plan.end + 1, plan.hole, plan.axisY, plan.axisZ));
+      made = keep(created, keep(created, made.add(unturned(keep(created, runtime.Manifold.union(lidPieces))))).subtract(holeFor(-1)));
+      let knuckleBody = unturned(keep(created, runtime.Manifold.union(bodyPieces)));
+      // A block reaching in past a thin round wall is kept out of the opening.
+      if (plan.curved) knuckleBody = keep(created, knuckleBody.subtract(keep(created, keep(created, opening.extrude(top - box.min[2] + 2)).translate([0, 0, box.min[2] - 1]))));
+      bodyKnuckles = keep(created, knuckleBody.subtract(holeFor(1)));
     }
     // The lid's pockets face the body's: they open in the plate's underside, where it lies on the rim.
     if (magnetCentres.length) {
@@ -567,7 +638,12 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
         const placedBox = placed.boundingBox();
         const radius = options.hingePin / 2;
         const length = plan.end - plan.start - 1;
-        pin = keep(created, along(placedBox.min[0], placedBox.min[0] + length, radius, placedBox.max[1] + PIN_SPACING + radius, box.min[2] + radius)).transform(UP_TO_SCENE);
+        // Lying on a flat a tenth of its diameter wide, so it does not roll and its underside prints clean.
+        const flat = PIN_FLAT * 2 * radius;
+        const y = placedBox.max[1] + PIN_SPACING + radius;
+        const round = along(placedBox.min[0], placedBox.min[0] + length, radius, y, box.min[2] + radius - flat);
+        const above = keep(created, keep(created, runtime.Manifold.cube([length + 2, 2 * radius + 2, 2 * radius + 1])).translate([placedBox.min[0] - 1, y - radius - 1, box.min[2]]));
+        pin = keep(created, round.intersect(above)).transform(UP_TO_SCENE);
         handed.add(pin);
       }
       hinge = { knuckles, pin, count: plan.segments.length };

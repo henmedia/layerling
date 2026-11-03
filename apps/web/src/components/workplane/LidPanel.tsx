@@ -315,6 +315,10 @@ export function LidPanel({
           onChange={(value) => onChange({ hingeKnuckles: normalizeLidOptions({ hingeKnuckles: value }).hingeKnuckles })}
         />
         <label className="edge-modifier-field offset-copy">
+          <input type="checkbox" checked={settings.hingeTeardrop} disabled={busy} onChange={(event) => onChange({ hingeTeardrop: event.target.checked })} />
+          <span>{t("lid.hingeTeardrop")}</span>
+        </label>
+        <label className="edge-modifier-field offset-copy">
           <input type="checkbox" checked={settings.hingePrintPin} disabled={busy} onChange={(event) => onChange({ hingePrintPin: event.target.checked })} />
           <span>{t("lid.hingePrintPin")}</span>
         </label>

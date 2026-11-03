@@ -8244,9 +8244,9 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin, hingeSide } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    void makeLid({ type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin, hingeSide }, targets).then((result) => {
+    void makeLid({ type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
     });
@@ -12505,6 +12505,7 @@ export function LayerlingEditor({
           hingeKnuckles: params.hingeKnuckles,
           hingePrintPin: params.hingePrintPin,
           hingeSide: params.hingeSide,
+          hingeTeardrop: params.hingeTeardrop,
         }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);

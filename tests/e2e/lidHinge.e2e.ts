@@ -110,6 +110,112 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
     }
   });
 
+  it("gives the pin's holes a point on top as each part is printed: up in the body, towards the inside in the lid", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    // Whether a tiny cube at (x, y, z) lies in the solid.
+    const solidAt = (solid: Body, x: number, y: number, z: number) => {
+      const probe = kernel.Manifold.cube([0.1, 0.1, 0.1], true).translate([x, y, z]);
+      const hit = solid.intersect(probe);
+      created.push(probe, hit);
+      return hit.volume() > 0.0005;
+    };
+    try {
+      const radius = hingeKnuckleRadius({ hingePin: 1.75 });
+      const axisY = 30 + 2 - radius;
+      const axisZ = -(20 + radius + 0.3);
+      // Past the round hole (1.025 mm) but within its point (1.45 mm).
+      const off = 1.25;
+      // The middle of the first knuckle (the body's) and of the second (the lid's) along the 60 mm back.
+      const bodyX = -23.7;
+      const lidX = -11.9;
+      for (const teardrop of [true, false]) {
+        const body = openBox(kernel, created);
+        const result = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeTeardrop: teardrop }));
+        if ("error" in result) throw new Error(JSON.stringify(result.error));
+        const knuckles = result.hinge!.knuckles;
+        const closed = closing(body, result.lid, 2, created);
+        created.push(result.lid, knuckles);
+        expect(solidAt(knuckles, bodyX, axisY + off, axisZ), `body above, teardrop ${teardrop}`).toBe(!teardrop);
+        expect(solidAt(knuckles, bodyX, axisY - off, axisZ), `body below, teardrop ${teardrop}`).toBe(true);
+        expect(solidAt(closed, lidX, axisY - off, axisZ), `lid below, teardrop ${teardrop}`).toBe(!teardrop);
+        expect(solidAt(closed, lidX, axisY + off, axisZ), `lid above, teardrop ${teardrop}`).toBe(true);
+        // The round part is the same either way: the pin's hole with its play.
+        expect(solidAt(knuckles, bodyX, axisY, axisZ + 1)).toBe(false);
+        expect(solidAt(knuckles, bodyX, axisY, axisZ + 1.1)).toBe(true);
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("goes along a round pot too: its knuckles on a block reaching in to the wall, and it swings open clear of the pot", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      // A pot 40 across and 30 high, its wall 2 mm.
+      const outer = kernel.Manifold.cylinder(30, 20, 20, 96).rotate([-90, 0, 0]);
+      const cavity = kernel.Manifold.cylinder(30, 18, 18, 96).rotate([-90, 0, 0]).translate([0, 2, 0]);
+      const pot = outer.subtract(cavity);
+      created.push(outer, cavity, pot);
+      const result = lidForSolid(kernel, pot, normalizeLidOptions(HINGED));
+      if ("error" in result) throw new Error(JSON.stringify(result.error));
+      const { knuckles, count } = result.hinge!;
+      created.push(result.lid, knuckles);
+      // Where the wall stays within a knuckle's radius of the hinge's line: about 19 mm, three knuckles.
+      expect(count).toBe(3);
+      const knuckleBox = knuckles.boundingBox();
+      expect(knuckleBox.max[0] - knuckleBox.min[0]).toBeGreaterThan(17);
+      expect(knuckleBox.max[0] - knuckleBox.min[0]).toBeLessThan(20);
+      // At the outer end of the first knuckle the wall has fallen away from the hinge's line: the block under it fills
+      // the room between them (the wall at z = -17.9 there, the knuckle's own strip from -19.6).
+      const solidAt = (solid: Body, x: number, y: number, z: number) => {
+        const probe = kernel.Manifold.cube([0.1, 0.1, 0.1], true).translate([x, y, z]);
+        const hit = solid.intersect(probe);
+        created.push(probe, hit);
+        return hit.volume() > 0.0005;
+      };
+      expect(solidAt(knuckles, -9, 27, -19)).toBe(true);
+      // One piece with the pot, and nothing of it inside the pot.
+      const whole = pot.add(knuckles);
+      const inside = knuckles.intersect(cavity);
+      created.push(whole, inside);
+      expect(whole.decompose().length).toBe(1);
+      expect(inside.volume()).toBeLessThan(0.01);
+      // The lid is one piece with its knuckles, closes without overlapping and swings open clear of the pot.
+      const closed = closing(pot, result.lid, 2, created);
+      const parts = closed.decompose();
+      created.push(...parts);
+      expect(parts.length).toBe(1);
+      const overlap = closed.intersect(whole);
+      created.push(overlap);
+      expect(overlap.volume()).toBeLessThan(0.01);
+      const radius = hingeKnuckleRadius({ hingePin: 1.75 });
+      const axisY = 30 + 2 - radius;
+      const axisZ = -(20 + radius + 0.3);
+      for (const degrees of [10, 30, 60, 90, 120, 150, 170]) {
+        const open = swung(closed, axisY, axisZ, degrees, created);
+        const hit = open.intersect(whole);
+        created.push(hit);
+        expect(hit.volume(), `open ${degrees} degrees`).toBeLessThan(0.01);
+      }
+      // With five knuckles the lid's outer ones sit where its plate has curved away (its edge at z = -19.3 at x = -5.3):
+      // their web reaches in to it.
+      const five = lidForSolid(kernel, pot, normalizeLidOptions({ ...HINGED, hingeKnuckles: 5 }));
+      if ("error" in five) throw new Error(JSON.stringify(five.error));
+      created.push(five.lid, five.hinge!.knuckles);
+      const fiveClosed = closing(pot, five.lid, 2, created);
+      expect(solidAt(fiveClosed, -5.3, 31, -19.5)).toBe(true);
+      const filament = kernel.Manifold.cylinder(40, 0.875, 0.875, 48).rotate([0, 90, 0]).translate([-20, axisY, axisZ]);
+      created.push(filament);
+      const onPin = [closed.intersect(filament), whole.intersect(filament)];
+      created.push(...onPin);
+      onPin.forEach((part) => expect(part.volume()).toBeLessThan(0.001));
+    } finally {
+      dispose(created);
+    }
+  });
+
   it("goes along the side picked: the hinge of the body turned that side to the back, turned back", async () => {
     const kernel = await runtime();
     const created: Solid[] = [];
@@ -166,7 +272,7 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
     }
   });
 
-  it("prints its pin apart when asked, beside the lid and a millimetre shorter than the hinge", async () => {
+  it("prints its pin apart when asked, beside the lid, a millimetre shorter than the hinge and on a flat", async () => {
     const kernel = await runtime();
     const created: Solid[] = [];
     try {
@@ -176,8 +282,10 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
       const pin = result.hinge!.pin!;
       created.push(result.lid, result.hinge!.knuckles, pin);
       const box = pin.boundingBox();
-      expect(box.max[1] - box.min[1]).toBeCloseTo(3, 1);
+      // It lies on a flat a tenth of its diameter wide, so it is that much lower than round.
+      expect(box.max[1] - box.min[1]).toBeCloseTo(2.7, 2);
       expect(box.min[1]).toBeCloseTo(0, 3);
+      expect(box.max[2] - box.min[2]).toBeCloseTo(3, 1);
       // The back's 60 mm less half a millimetre at each end, less one.
       expect(box.max[0] - box.min[0]).toBeCloseTo(58, 1);
       expect(pin.intersect(result.lid).volume()).toBeLessThan(0.001);
@@ -200,10 +308,10 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
       const low = kernel.Manifold.cube([60, 6, 40], true).translate([0, 3, 0]).subtract(kernel.Manifold.cube([56, 6, 36], true).translate([0, 5, 0]));
       created.push(low);
       expect(lidForSolid(kernel, low, normalizeLidOptions({ ...HINGED, depth: 2 }))).toEqual({ error: { code: "hingeTooLow" } });
-      // A round pot has no straight back.
-      const pot = kernel.Manifold.cylinder(30, 20, 20, 64).rotate([-90, 0, 0]).subtract(kernel.Manifold.cylinder(30, 18, 18, 64).rotate([-90, 0, 0]).translate([0, 2, 0]));
-      created.push(pot);
-      expect(lidForSolid(kernel, pot, normalizeLidOptions(HINGED))).toEqual({ error: { code: "hingeNoBack" } });
+      // A pot too small for three knuckles where its wall stays near the hinge's line.
+      const small = kernel.Manifold.cylinder(30, 4, 4, 64).rotate([-90, 0, 0]).subtract(kernel.Manifold.cylinder(30, 3, 3, 64).rotate([-90, 0, 0]).translate([0, 2, 0]));
+      created.push(small);
+      expect(lidForSolid(kernel, small, normalizeLidOptions(HINGED))).toEqual({ error: { code: "hingeNoBack" } });
     } finally {
       dispose(created);
     }
