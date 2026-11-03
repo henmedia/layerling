@@ -202,7 +202,9 @@ export async function importModelFiles(
         // Read off the page: several solids come in as one body each (#830), anything else as one body.
         const step = await (await import("@/lib/geometryWorker")).importedShapesFromStepOffThread(file.name, buffer);
         if (step.assembly) {
-          result.shapes.push(...step.shapes);
+          // The file's assemblies become bundles, one inside the other, so a whole one hides or moves at once (#830).
+          const placed = step.tree ? await (await import("@/lib/stepAssemblyBundles")).bundledStepAssembly(step.shapes, step.tree) : step.shapes;
+          result.shapes.push(...placed);
           result.importedFileNames.push(file.name);
           result.notes.push(t("status.importStepParts", { name: file.name, count: step.shapes.length }));
           continue;

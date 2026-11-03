@@ -1,7 +1,11 @@
 import type { WorkplaneShape } from "@/types/layerling";
+import type { StepAssemblyLevel } from "@/lib/stepAssemblyImport";
 
-/** What a STEP file brings: its parts, one body each, or (`assembly` false) the whole file as one body. */
-export type StepFileImport = { shapes: WorkplaneShape[]; assembly: boolean };
+/**
+ * What a STEP file brings: its parts, one body each, with the assemblies each sits in (`tree`), or (`assembly` false)
+ * the whole file as one body.
+ */
+export type StepFileImport = { shapes: WorkplaneShape[]; assembly: boolean; tree?: StepAssemblyLevel[][] };
 
 /**
  * A STEP file read with the CAD kernel. Several solids in one file, as an assembly from another CAD program: one body
@@ -10,7 +14,7 @@ export type StepFileImport = { shapes: WorkplaneShape[]; assembly: boolean };
  */
 export async function importedShapesFromStepFile(fileName: string, buffer: ArrayBuffer): Promise<StepFileImport> {
   const assembly = await (await import("@/lib/stepAssemblyImport")).importedShapesFromStepAssembly(fileName, buffer).catch(() => null);
-  if (assembly) return { shapes: assembly.shapes, assembly: true };
+  if (assembly) return { shapes: assembly.shapes, assembly: true, tree: assembly.tree };
   const { importedShapeFromStep } = await import("@/lib/stepImport");
   return { shapes: [await importedShapeFromStep(fileName, buffer)], assembly: false };
 }

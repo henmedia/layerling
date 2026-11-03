@@ -40,10 +40,13 @@ function hexColor([red, green, blue]: [number, number, number]) {
   return normalizeHexColor(`#${channel(red)}${channel(green)}${channel(blue)}`);
 }
 
+/** One assembly of the file's tree on the way down to a part: `key` tells two assemblies of the same name apart. */
+export type StepAssemblyLevel = { key: number; name: string };
+
 export type StepAssemblyResult = {
   shapes: WorkplaneShape[];
-  /** The groups of the file's tree, by the name of the part's first group. */
-  groups: number;
+  /** For each part, the assemblies it sits in, from the file's root down (see lib/stepAssemblyBundles). */
+  tree: StepAssemblyLevel[][];
 };
 
 /**
@@ -57,11 +60,12 @@ export async function importedShapesFromStepAssembly(fileName: string, buffer: A
   const text = new TextDecoder().decode(buffer);
   const doc = kernel.importXCAFFromSTEP(text);
   const bodyColors = stepBodyColors(text);
-  type Leaf = { name: string; group: string; shape: NonNullable<ReturnType<typeof doc.getLabelInfo>["shapeHandle"]>; matrix: Matrix; color?: string };
+  type Leaf = { name: string; path: StepAssemblyLevel[]; shape: NonNullable<ReturnType<typeof doc.getLabelInfo>["shapeHandle"]>; matrix: Matrix; color?: string };
   const leaves: Leaf[] = [];
   const handles: Array<Leaf["shape"]> = [];
+  let assemblies = 0;
   try {
-    const walk = (label: ReturnType<typeof doc.getRoots>[number], parent: Matrix, group: string) => {
+    const walk = (label: ReturnType<typeof doc.getRoots>[number], parent: Matrix, path: StepAssemblyLevel[]) => {
       if (leaves.length > MAX_STEP_ASSEMBLY_PARTS) return;
       const info = doc.getLabelInfo(label);
       if (info.shapeHandle) handles.push(info.shapeHandle);
@@ -73,7 +77,8 @@ export async function importedShapesFromStepAssembly(fileName: string, buffer: A
       const name = (info.name || targetInfo.name || "").trim();
       const children = doc.getChildren(target);
       if (children.length) {
-        children.forEach((child) => walk(child, matrix, name || group));
+        const inside = [...path, { key: (assemblies += 1), name }];
+        children.forEach((child) => walk(child, matrix, inside));
         return;
       }
       if (!targetInfo.shapeHandle) return;
@@ -84,7 +89,7 @@ export async function importedShapesFromStepAssembly(fileName: string, buffer: A
       const bodyColor = (index: number) =>
         colors?.length === pieces.length ? colors[index] : colors && new Set(colors).size === 1 ? colors[0] : undefined;
       pieces.forEach((shape, index) =>
-        leaves.push({ name: pieces.length > 1 && name ? `${name} ${index + 1}` : name, group, shape, matrix, color: color ?? bodyColor(index) }));
+        leaves.push({ name: pieces.length > 1 && name ? `${name} ${index + 1}` : name, path, shape, matrix, color: color ?? bodyColor(index) }));
     };
     // One entry of the tree can hold several bodies: several solids, or several shells where the file writes its bodies
     // as surface models (#830: 85 entries holding 390 bodies, the screws of a part under one entry). Each becomes a part.
@@ -99,11 +104,12 @@ export async function importedShapesFromStepAssembly(fileName: string, buffer: A
       }
       return [shape];
     };
-    doc.getRoots().forEach((root) => walk(root, Z_UP_TO_Y_UP, ""));
+    doc.getRoots().forEach((root) => walk(root, Z_UP_TO_Y_UP, []));
     if (leaves.length < 2 || leaves.length > MAX_STEP_ASSEMBLY_PARTS) return null;
 
     const parts: ColoredPart[] = [];
     const steps: string[] = [];
+    const tree: StepAssemblyLevel[][] = [];
     for (const leaf of leaves) {
       const placed = kernel.located(leaf.shape, leaf.matrix);
       handles.push(placed);
@@ -128,6 +134,7 @@ export async function importedShapesFromStepAssembly(fileName: string, buffer: A
       handles.push(centred);
       steps.push(kernel.exportStep(centred));
       parts.push({ label: leaf.name || undefined, color: leaf.color, positions, normals });
+      tree.push(leaf.path);
     }
     if (parts.length < 2) return null;
     const baseName = fileName.replace(/\.[^.]+$/, "") || "STEP";
@@ -138,7 +145,7 @@ export async function importedShapesFromStepAssembly(fileName: string, buffer: A
         name: parts[index].label ?? `${baseName} ${index + 1}`,
         importedMesh: { ...shape.importedMesh!, brepStep: steps[index] },
       }));
-    return { shapes, groups: new Set(leaves.map((leaf) => leaf.group)).size };
+    return { shapes, tree };
   } finally {
     handles.forEach((handle) => {
       try { kernel.release(handle); } catch { /* already released with its document */ }

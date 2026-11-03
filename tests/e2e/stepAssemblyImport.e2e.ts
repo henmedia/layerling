@@ -79,6 +79,52 @@ describe("a STEP file with several solids", () => {
     expect(xs[2] - xs[1]).toBeCloseTo(20, 2);
   }, 60000);
 
+  it("brings the file's assemblies along as bundles, one inside the other", async () => {
+    const { occtKernel } = await import("@/lib/brepKernel");
+    const { bundledStepAssembly } = await import("@/lib/stepAssemblyBundles");
+    const kernel = occtKernel()!;
+    // Stand > [Base plate, Legs > [Front leg, Back leg], Wheels > [Left wheel, Axle > [Axle rod, Axle nut]]]
+    // A part turns into an assembly on its first child, its own body moving into a first component; the names go onto
+    // the components, the placed instances, which is where the file's tree carries them.
+    const doc = kernel.createXCAFDocument();
+    const stand = doc.addShape(kernel.makeBox(80, 40, 4), { name: "Stand" });
+    const subAssembly = (parent: Parameters<typeof doc.addChild>[0], name: string, first: string, shape: Parameters<typeof doc.addChild>[1]) => {
+      const component = doc.addChild(parent, shape);
+      doc.setName(component, name);
+      const prototype = doc.getReferredLabel(component)!;
+      return { prototype, first };
+    };
+    const nameFirst = (parent: Parameters<typeof doc.addChild>[0], name: string) => doc.setName(doc.getChildren(parent)[0], name);
+    const legs = subAssembly(stand, "Legs", "Front leg", kernel.translate(kernel.makeBox(4, 4, 20), 0, 0, 4));
+    nameFirst(stand, "Base plate");
+    doc.setName(doc.addChild(legs.prototype, kernel.translate(kernel.makeBox(4, 4, 20), 70, 0, 4)), "Back leg");
+    nameFirst(legs.prototype, legs.first);
+    const wheels = subAssembly(stand, "Wheels", "Left wheel", kernel.translate(kernel.makeCylinder(6, 3), 20, -10, 0));
+    const axle = subAssembly(wheels.prototype, "Axle", "Axle rod", kernel.translate(kernel.makeBox(2, 50, 2), 30, -5, 0));
+    nameFirst(wheels.prototype, wheels.first);
+    doc.setName(doc.addChild(axle.prototype, kernel.translate(kernel.makeBox(3, 3, 3), 30, 46, 0)), "Axle nut");
+    nameFirst(axle.prototype, axle.first);
+    const text = doc.exportSTEP();
+    doc.close();
+
+    const result = await importedShapesFromStepAssembly("stand.step", new TextEncoder().encode(text).buffer);
+    expect(result).not.toBeNull();
+    expect(result!.shapes).toHaveLength(6);
+    const outline = (shape: WorkplaneShape): unknown =>
+      shape.groupOperation === "bundle" ? { [shape.name]: shape.groupedShapes!.map(outline) } : shape.name;
+    const bundled = bundledStepAssembly(result!.shapes, result!.tree);
+    // The stand holds the whole file and is left out; an assembly keeps its parts in the file's order.
+    expect(bundled.map(outline)).toEqual([
+      "Base plate",
+      { Legs: ["Front leg", "Back leg"] },
+      { Wheels: ["Left wheel", { Axle: ["Axle rod", "Axle nut"] }] },
+    ]);
+    // A bundle stands where its parts stood: the legs from one end of the plate to the other.
+    const legBundle = bundled.find((shape) => shape.name === "Legs")!;
+    expect(legBundle.width).toBeCloseTo(74, 2);
+    expect(legBundle.height).toBeCloseTo(20, 2);
+  }, 60000);
+
   it("stays one body when it holds one solid", async () => {
     const { blob } = await exportShapesToStep([shape({ kind: "box", name: "Only", width: 10, depth: 6, height: 4 })]);
     expect(await importedShapesFromStepAssembly("one.step", await blob.arrayBuffer())).toBeNull();

@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "STEP-Baugruppen kommen als Bündel",
+      "en": "STEP assemblies come in as bundles"
+    },
+    "body": {
+      "de": "Eine STEP-Datei aus einem anderen CAD-Programm bringt jetzt ihre Baugruppen mit: Jede wird ein Bündel unter ihrem Namen, eine Baugruppe darin ein Bündel im Bündel. So blendest du eine ganze Baugruppe mit Strg+H aus oder verschiebst sie auf einmal.",
+      "en": "A STEP file from another CAD program now brings its assemblies along: each becomes a bundle under its name, an assembly inside it a bundle inside the bundle. So you hide a whole assembly with Ctrl+H or move it in one go."
+    }
+  }
+]
