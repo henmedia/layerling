@@ -1,5 +1,40 @@
 [
   {
+    "version": "1.135.1",
+    "items": [
+      {
+        "title": {
+          "de": "STEP-Baugruppen kommen als Bündel",
+          "en": "STEP assemblies come in as bundles"
+        },
+        "body": {
+          "de": "Eine STEP-Datei aus einem anderen CAD-Programm bringt jetzt ihre Baugruppen mit: Jede wird ein Bündel unter ihrem Namen, eine Baugruppe darin ein Bündel im Bündel. So blendest du eine ganze Baugruppe mit Strg+H aus oder verschiebst sie auf einmal.",
+          "en": "A STEP file from another CAD program now brings its assemblies along: each becomes a bundle under its name, an assembly inside it a bundle inside the bundle. So you hide a whole assembly with Ctrl+H or move it in one go."
+        }
+      },
+      {
+        "title": {
+          "de": "Vorschaubild in der .lyl-Datei",
+          "en": "A picture in the .lyl file"
+        },
+        "body": {
+          "de": "Jede .lyl-Datei trägt jetzt das Bild deines Entwurfs, wie es seine Karte auf der Startseite zeigt. So können andere Programme, etwa eine Modellbibliothek oder der Dateimanager, eine Vorschau zeigen, ohne den Entwurf zu öffnen.",
+          "en": "Every .lyl file now carries the picture of your design, as its card on the start page shows it. Other programs, a library of models or a file manager, can show a preview without opening the design."
+        }
+      },
+      {
+        "title": {
+          "de": "Muster als Raster",
+          "en": "Pattern as a grid"
+        },
+        "body": {
+          "de": "Das Muster-Werkzeug hat neben Reihe und Kreis jetzt ein Raster: Spalten entlang X und Reihen entlang Y, jeweils mit eigener Anzahl und eigenem Abstand. So entstehen 4 × 3 Teile in einem Schritt, etwa für die Löcher einer Lochplatte.",
+          "en": "Besides a row and a circle, the Pattern tool now lays a grid: columns along X and rows along Y, each with its own count and spacing. That makes 4 × 3 pieces in one step, for the holes of a perforated plate, say."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.135.0",
     "items": [
       {
