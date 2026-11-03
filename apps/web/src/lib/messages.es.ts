@@ -3323,6 +3323,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "vase.printHollow": "Calculado con paredes y fondo macizos, sin relleno.",
   "vase.printFine": "Nada impide imprimirlo.",
   "vaseCheck.overhang": "Voladizo de hasta {angle}° entre {from} y {to} mm de altura (más de 45°): ahí necesita soportes, o haz la forma más vertical.",
+  "vaseCheck.teapotOverhang": "Tapa de tetera, impresa boca abajo: voladizo de hasta {angle}° entre {from} y {to} mm de altura del jarrón (más de 45°): ahí necesita soportes, o haz la forma más vertical ahí.",
+  "vaseCheck.teapotOverhangAt": "Tapa de tetera, impresa boca abajo: voladizo de hasta {angle}° a {at} mm de altura del jarrón (más de 45°): ahí necesita soportes, o haz la forma más vertical ahí.",
   "vaseCheck.thinWall": "La pared solo tiene {mm} mm: por debajo de dos líneas de una boquilla de 0,4 mm no se imprime con fiabilidad.",
   "vaseCheck.thinBottom": "El fondo solo tiene {mm} mm: por debajo de 0,8 mm pierde agua o se rompe con facilidad.",
   "vaseCheck.lidNeedsHollow": "«{lid}» necesita un jarrón hueco (la ranura o la rosca van en la pared).",

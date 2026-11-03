@@ -3247,6 +3247,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "vase.printHollow": "按实心壁和底计算，不含填充。",
   "vase.printFine": "没有阻碍打印的问题。",
   "vaseCheck.overhang": "在高度 {from} 到 {to} mm 之间最多有 {angle}° 的悬垂（超过 45°）——那里需要支撑，或者把造型做得更陡。",
+  "vaseCheck.teapotOverhang": "茶壶盖倒过来打印：在花瓶高度 {from} 到 {to} mm 之间最多有 {angle}° 的悬垂（超过 45°）——那里需要支撑，或者把那里的造型做得更陡。",
+  "vaseCheck.teapotOverhangAt": "茶壶盖倒过来打印：在花瓶高度 {at} mm 处最多有 {angle}° 的悬垂（超过 45°）——那里需要支撑，或者把那里的造型做得更陡。",
   "vaseCheck.thinWall": "壁只有 {mm} mm——低于 0.4 mm 喷嘴的两条线，打印不可靠。",
   "vaseCheck.thinBottom": "底部只有 {mm} mm——低于 0.8 mm 容易渗漏或破裂。",
   "vaseCheck.lidNeedsHollow": "{lid}需要空心花瓶（沟槽或螺纹开在壁里）。",

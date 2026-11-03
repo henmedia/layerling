@@ -3321,6 +3321,8 @@ export const MESSAGES_EN = {
   "vase.printHollow": "Worked out with solid walls and bottom, without infill.",
   "vase.printFine": "Nothing stands in the way of printing it.",
   "vaseCheck.overhang": "Overhang of up to {angle}° between {from} and {to} mm of height (more than 45°) – it needs supports there, or make the form steeper.",
+  "vaseCheck.teapotOverhang": "Teapot lid, printed upside down: overhang of up to {angle}° between {from} and {to} mm of the vase's height (more than 45°) – it needs supports there, or make the form steeper there.",
+  "vaseCheck.teapotOverhangAt": "Teapot lid, printed upside down: overhang of up to {angle}° at {at} mm of the vase's height (more than 45°) – it needs supports there, or make the form steeper there.",
   "vaseCheck.thinWall": "The wall is only {mm} mm – below two lines of a 0.4 mm nozzle it does not print reliably.",
   "vaseCheck.thinBottom": "The bottom is only {mm} mm – below 0.8 mm it easily leaks or tears.",
   "vaseCheck.lidNeedsHollow": "A {lid} needs a hollow vase (the groove or thread goes into the wall).",

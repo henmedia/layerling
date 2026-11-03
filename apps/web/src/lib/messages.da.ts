@@ -824,6 +824,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "vase.printHollow": "Beregnet med solide vægge og bund, uden fyldning.",
   "vase.printFine": "Der står intet i vejen for at printe den.",
   "vaseCheck.overhang": "Overhæng på op til {angle}° mellem {from} og {to} mm højde (mere end 45°) – der skal være støtte der, eller gør formen stejlere.",
+  "vaseCheck.teapotOverhang": "Tekandelåg, printet på hovedet: overhæng på op til {angle}° mellem {from} og {to} mm af vasens højde (mere end 45°) – det skal have støtte der, eller gør formen stejlere der.",
+  "vaseCheck.teapotOverhangAt": "Tekandelåg, printet på hovedet: overhæng på op til {angle}° ved {at} mm af vasens højde (mere end 45°) – det skal have støtte der, eller gør formen stejlere der.",
   "vaseCheck.thinWall": "Væggen er kun {mm} mm – under to linjer fra en 0,4 mm dyse printer den ikke stabilt.",
   "vaseCheck.thinBottom": "Bunden er kun {mm} mm – under 0,8 mm lækker den let eller revner.",
   "vaseCheck.lidNeedsHollow": "Der kræves en hul vase til {lid} (rillen eller gevindet går ind i væggen).",

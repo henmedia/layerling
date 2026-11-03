@@ -3321,6 +3321,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "vase.printHollow": "Berekend met volle wanden en bodem, zonder vulling.",
   "vase.printFine": "Er zijn geen bezwaren voor het printen.",
   "vaseCheck.overhang": "Overhang tot {angle}° tussen {from} en {to} mm hoogte (meer dan 45°) – daar zijn steunen nodig, of maak de vorm steiler.",
+  "vaseCheck.teapotOverhang": "Theepotdeksel, ondersteboven geprint: overhang tot {angle}° tussen {from} en {to} mm hoogte van de vaas (meer dan 45°) – daar zijn steunen nodig, of maak de vorm daar steiler.",
+  "vaseCheck.teapotOverhangAt": "Theepotdeksel, ondersteboven geprint: overhang tot {angle}° op {at} mm hoogte van de vaas (meer dan 45°) – daar zijn steunen nodig, of maak de vorm daar steiler.",
   "vaseCheck.thinWall": "De wand is maar {mm} mm – onder twee lijnen van een 0,4-mm-nozzle print hij onzeker.",
   "vaseCheck.thinBottom": "De bodem is maar {mm} mm – onder 0,8 mm lekt of scheurt hij snel.",
   "vaseCheck.lidNeedsHollow": "Een {lid} heeft een holle vaas nodig (groef of schroefdraad in de wand).",
