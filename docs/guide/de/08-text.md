@@ -19,6 +19,8 @@ Wähle in der Formenbibliothek {{ui:shape.text}} und setze ihn ab. Im Feld {{ui:
 
 Ein Text ist zunächst ein einzelner Körper. Willst du die Buchstaben einzeln behandeln, klicke auf {{ui:inspector.separateParts}}. Dann ist jeder Buchstabe eine eigene Form.
 
+**Mehrere Zeilen:** Ein Text hat eine Zeile. Für ein Schild oder eine Tafel mit mehreren Zeilen öffnest du unter den Einstellungen die Karte {{ui:textBlock.title}}: Gib die Zeilen unter {{ui:textBlock.lines}} ein, wähle {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} oder {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} und {{ui:textBlock.step}} - bei 80 % ist jede Zeile ein Fünftel kleiner als die darüber. Der Knopf macht jede Zeile zu einem eigenen Text unter der darüber, in Schrift, Höhe und Füllung dieses Textes; die erste nimmt den Platz dieses Textes ein. Danach kann jede Zeile eine eigene Größe, Schrift oder Farbe bekommen.
+
 Auch die Kanten einer Schrift lassen sich fasen oder verrunden, gerade oder gebogen, siehe [Kanten brechen und Körper aushöhlen](chapter:kanten-und-aushoehlen). Nimm dafür kleine Maße wie 0,2 bis 0,5 mm, denn die Striche der Buchstaben sind schmal.
 
 ## Eigene Schriften

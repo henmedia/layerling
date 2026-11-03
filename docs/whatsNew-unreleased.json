@@ -28,5 +28,15 @@
       "de": "Text auf dem Kreisbogen hat jetzt das Feld „Buchstabenbreite“. Damit zeichnest du die Buchstaben schmaler oder breiter, etwa für eine hohe, schmale Schrift auf einer Münze. Die Höhe bleibt, und der Text bleibt auf dem Bogen.",
       "en": "Text on an arc now has a Letter width field. It draws the letters narrower or wider, say for tall, narrow lettering on a coin. Their height stays, and the text stays on the arc."
     }
+  },
+  {
+    "title": {
+      "de": "Textblock: mehrere Zeilen, links, mittig oder rechts",
+      "en": "Text block: several lines, left, centred or right"
+    },
+    "body": {
+      "de": "Ein Text hat jetzt die Karte „Textblock“. Gib mehrere Zeilen ein, wähle die Ausrichtung, den Abstand und ob jede Zeile kleiner werden soll. Jede Zeile wird ein eigener Text, den du danach einzeln ändern kannst, etwa für ein Schild oder eine Tafel.",
+      "en": "A text now has a Text block card. Type several lines, choose the alignment, the gap and whether each line gets smaller. Every line becomes a text of its own that you can change on its own afterwards, for a sign or a plaque, say."
+    }
   }
 ]

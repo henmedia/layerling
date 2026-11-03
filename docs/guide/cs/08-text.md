@@ -18,6 +18,8 @@ V knihovně vyberte {{ui:shape.text}} a položte jej na plochu. Do pole {{ui:pro
 
 Text začíná jako jediné těleso. Pro samostatnou práci s písmeny použijte {{ui:inspector.separateParts}}. Každé písmeno pak bude vlastním tvarem.
 
+**Více řádků:** Text má jeden řádek. Pro ceduli nebo tabulku s více řádky otevřete pod nastavením kartu {{ui:textBlock.title}}: zadejte řádky do {{ui:textBlock.lines}}, zvolte {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} nebo {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} a {{ui:textBlock.step}} - při 80 % je každý řádek o pětinu menší než ten nad ním. Tlačítko udělá z každého řádku samostatný text pod tím nad ním, s písmem, výškou a výplní tohoto textu; první zaujme místo tohoto textu. Potom může každý řádek dostat vlastní velikost, písmo nebo barvu.
+
 Hrany přímého i obloukového textu lze zkosit a zaoblit, viz [Úpravy hran a vytváření dutin](chapter:edges-and-hollowing). Kvůli úzkým tahům používejte malé hodnoty, například 0,2 až 0,5 mm.
 
 ## Vlastní písma

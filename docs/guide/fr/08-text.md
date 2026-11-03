@@ -17,6 +17,8 @@ Choisissez {{ui:shape.text}} dans la bibliothèque de formes et placez-le. Dans 
 
 Le texte est d’abord un seul corps. Si vous souhaitez traiter les lettres individuellement, cliquez sur {{ui:inspector.separateParts}}. Chaque lettre est alors une forme qui lui est propre.
 
+**Plusieurs lignes :** Un texte tient sur une ligne. Pour un panneau ou une plaque de plusieurs lignes, ouvrez la carte {{ui:textBlock.title}} sous les paramètres : saisissez les lignes dans {{ui:textBlock.lines}}, choisissez {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} ou {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} et {{ui:textBlock.step}} - à 80 %, chaque ligne est plus petite d'un cinquième que celle du dessus. Le bouton fait de chaque ligne un texte à part sous celle du dessus, avec la police, la hauteur et le remplissage de ce texte ; la première prend la place de ce texte. Ensuite, chaque ligne peut avoir sa propre taille, police ou couleur.
+
 Les bords du texte peuvent également être chanfreinés ou arrondis, droits ou incurvés, voir [Casser les bords et creuser les corps] (chapter:edges-and-hollowing). Utilisez des petites tailles telles que 0,2 à 0,5 mm, car les traits des lettres sont étroits.
 
 ## Vos propres polices

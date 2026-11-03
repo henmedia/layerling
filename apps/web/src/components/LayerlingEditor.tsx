@@ -230,6 +230,7 @@ import { debugShapeSummary, mcpPivotRequest, compactShapeSummary, mcpShapeSummar
 import { sweepAnchorFromParams, sweepPathFromParams, sweepSectionFromParams, sweepSketchProfile } from "@/lib/sweepSketch";
 import { emptySketchProfile, cadShapeFromSketchProfile, cadShapeFromSketchSweep, revolveBuildProfile, shapeFromRevolvedSketchProfile, shapeFromCadMesh, sketchBodyAsOperation, sketchBodyOperation, sketchProfileLeftOfAxis, sketchReferenceShapeOnWorkplane, defaultMcpSketchProfile, type SketchMirrorAbout } from "@/lib/editorSketchCad";
 import { drawingLabelsInLanguage } from "@/lib/drawingLabels";
+import { DEFAULT_TEXT_BLOCK_GAP, offersTextBlock, TEXT_BLOCK_ALIGNS, textBlockFor, textBlockLines, type TextBlockAlign, type TextBlockOptions } from "@/lib/textBlock";
 import { offersTextLayers, textLayerStack, layeredTextShape, nameTagSource, nameTagsFor, offersIconLayers, iconLayerStack, iconTagArea, layeredIconShape, iconTagCopies, svgIconArea, iconTagFromSvg, keyringTabShape, keyringTabTag, keyringTabAt, keyringTabPlace, textFreeKeyring, textFreeKeyringPlace, iconFreeKeyring, iconFreeKeyringPlace } from "@/lib/editorTextTags";
 import { DEFAULT_KEYRING_DIAMETER } from "@/lib/textGeometry";
 import { TopPanel, DirectExportFormat, SvgExportView, DxfExportView, ViewImageOptions, LylHistoryLimit, LylExportTarget, TopActionPanel } from "./workplane/TopActionPanel";
@@ -10362,6 +10363,20 @@ export function LayerlingEditor({
     );
   }, [commitShapes, selectedShape, selectedShapes.length]);
 
+  /**
+   * The text block (#1207): the selected text becomes the first of several lines, each a text of its own under the
+   * one above, aligned left, centred or right. All of them are selected afterwards, so they move as one.
+   */
+  const makeTextBlock = useCallback((lines: string[], options: TextBlockOptions) => {
+    if (selectedShapes.length !== 1 || !offersTextBlock(selectedShape) || lines.length === 0) return;
+    const block = textBlockFor(selectedShape, lines, options);
+    if (!block.length) return;
+    const index = shapesRef.current.findIndex((shape) => shape.id === selectedShape.id);
+    const next = [...shapesRef.current];
+    next.splice(index < 0 ? next.length : index, index < 0 ? 0 : 1, ...block);
+    commitShapes(next, block.map((line) => line.id), t("status.textBlockMade", { count: block.length }));
+  }, [commitShapes, selectedShape, selectedShapes.length]);
+
   /** The selected icon tag, or a sketch body that can become one, as its card shows it. */
   const selectedIconStack = useMemo(
     () => (selectedShapes.length === 1 && selectedShape && offersIconLayers(selectedShape) ? iconLayerStack(selectedShape) : null),
@@ -11767,6 +11782,28 @@ export function LayerlingEditor({
         const bundle = canonicalizeShape({ ...group, name: "Bundle", groupOperation: "bundle" });
         commitShapes([...currentShapes().filter((shape) => !ids.has(shape.id)), bundle], bundle.id, t("status.mcpBundled", { count: parts.length }));
         return { object: mcpShapeSummary(bundle) };
+      }
+
+      if (command.action === "text_block") {
+        const id = typeof params.id === "string" ? params.id : null;
+        const target = id ? currentShapes().find((shape) => shape.id === id) : null;
+        if (!target) throw new Error("text_block needs the id of a text");
+        if (target.locked) throw new Error("Unlock the object first");
+        if (!offersTextBlock(target)) throw new Error("Only a plain straight text can become a text block: not curved, not stacked top to bottom, without a key ring");
+        const lines = Array.isArray(params.lines) ? textBlockLines(mcpStringArray(params.lines).join(String.fromCharCode(10))) : [];
+        if (!lines.length) throw new Error("lines needs at least one line of text");
+        const align = typeof params.align === "string" ? params.align : "center";
+        if (!TEXT_BLOCK_ALIGNS.includes(align as TextBlockAlign)) throw new Error("align must be left, center or right");
+        const block = textBlockFor(target, lines, {
+          align: align as TextBlockAlign,
+          gap: typeof params.gap === "number" ? params.gap : DEFAULT_TEXT_BLOCK_GAP,
+          step: typeof params.step === "number" ? params.step : 100,
+        });
+        const index = currentShapes().findIndex((shape) => shape.id === target.id);
+        const next = [...currentShapes()];
+        next.splice(index, 1, ...block);
+        commitShapes(next, block.map((line) => line.id), t("status.textBlockMade", { count: block.length }));
+        return { objects: block.map(mcpShapeSummary) };
       }
 
       if (command.action === "layer_text") {
@@ -15635,6 +15672,7 @@ export function LayerlingEditor({
           onVaseAccessories={selectedShapes.length === 1 && selectedShape?.kind === "vase" && !selectedShape.locked ? () => layOutVaseAccessories(selectedShape.id) : undefined}
           onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
           onTextTags={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? makeTextTags : undefined}
+          onTextBlock={selectedShapes.length === 1 && offersTextBlock(selectedShape) && !historyViewState ? makeTextBlock : undefined}
           onFixKeyringTab={selectedShapes.length === 1 && selectedShape?.keyringTab && !historyViewState ? () => void fixKeyringTab() : undefined}
           onPortPresetWithScrewHoles={selectedShapes.length === 1 && selectedShape?.kind === "port" && !historyViewState ? choosePortPresetWithScrewHoles : undefined}
           textLayerStack={selectedNameTag}

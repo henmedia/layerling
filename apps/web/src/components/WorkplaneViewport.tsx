@@ -1,4 +1,5 @@
 "use client";
+import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
 import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, MousePointer2, PanelsTopLeft, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, Ruler, RulerDimensionLine, Slice, Spline, Trash2, X } from "lucide-react";
@@ -220,6 +221,8 @@ type WorkplaneViewportProps = {
   onVaseAccessories?: () => void;
   onLayerText?: (patch: TextLayerPatch) => void;
   onTextTags?: (names: string[], gap: number) => void;
+  /** Several lines of text under one another, one text each (#1207). */
+  onTextBlock?: (lines: string[], options: TextBlockOptions) => void;
   /** Fixes the selected key ring tab to the nearest tag, where it was put (#598). */
   onFixKeyringTab?: () => void;
   /** Puts the selected D-Sub opening's screw holes beside it. */
@@ -1465,6 +1468,7 @@ export function WorkplaneViewport({
   onVaseAccessories,
   onLayerText,
   onTextTags,
+  onTextBlock,
   onFixKeyringTab,
   onPortPresetWithScrewHoles,
   textLayerStack,
@@ -8380,6 +8384,7 @@ export function WorkplaneViewport({
           onVaseAccessories={onVaseAccessories}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
+          onTextBlock={onTextBlock}
           onFixKeyringTab={onFixKeyringTab}
           onPortPresetWithScrewHoles={onPortPresetWithScrewHoles}
           textLayerStack={textLayerStack}

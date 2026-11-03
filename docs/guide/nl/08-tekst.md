@@ -18,6 +18,8 @@ Kies {{ui:shape.text}} in de vormenbibliotheek en plaats de tekst. Typ rechts in
 
 Tekst is eerst één lichaam. Wil je de letters afzonderlijk bewerken, klik dan op {{ui:inspector.separateParts}}. Dan is elke letter een eigen vorm.
 
+**Meerdere regels:** Een tekst heeft één regel. Voor een bord of plaat met meerdere regels open je onder de instellingen de kaart {{ui:textBlock.title}}: typ de regels onder {{ui:textBlock.lines}}, kies {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} of {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} en {{ui:textBlock.step}} - bij 80 % is elke regel een vijfde kleiner dan de vorige. De knop maakt van elke regel een eigen tekst onder de vorige, in het lettertype, de hoogte en de vulling van deze tekst; de eerste neemt de plaats van deze tekst in. Daarna kan elke regel een eigen grootte, lettertype of kleur krijgen.
+
 Ook de randen van tekst kun je afschuinen of afronden, recht of gebogen, zie [Randen breken en lichamen uithollen](chapter:randen-en-uithollen). Gebruik kleine maten zoals 0,2 tot 0,5 mm, want de streken van de letters zijn smal.
 
 ## Je eigen lettertypen
@@ -153,9 +155,10 @@ Moet de belettering niet recht lopen, maar de rand van een munt, een deksel of e
 
 ![Tekst volgt een cirkel. Alle letters staan op één gemeenschappelijke lijn.](shot:curved-text)
 
-Zodra je die aanzet, loopt de tekst langs de cirkel. Alle letters staan op dezelfde basislijn, net zo gelijkmatig als bij gewone tekst. Er zijn vier instellingen:
+Zodra je die aanzet, loopt de tekst langs de cirkel. Alle letters staan op dezelfde basislijn, net zo gelijkmatig als bij gewone tekst. Er zijn vijf instellingen:
 
 - **{{ui:prop.textRadius}}** (5 tot 500 mm): De straal van de cirkel waarover de basislijn van de letters loopt. De letters blijven op hun plek staan; alleen hun buiging verandert.
+- **{{ui:prop.textLetterWidth}}** (25 tot 400 %): Hoe breed elke letter wordt getekend, in procent van de eigen breedte. Onder 100 worden de letters smaller, erboven breder; hun hoogte blijft, en de boog die ze innemen groeit of krimpt mee. Bijvoorbeeld voor een hoge, smalle tekst op een munt. Bij rechte tekst doet {{ui:prop.textStretch}} dit met het kader.
 - **{{ui:nameTag.letterSize}}:** Hoe hoog de letters zijn. Dit hangt niet meer af van de breedte van de vorm.
 - **{{ui:prop.textInward}}:** Verplaatst de tekst van de bovenkant van de cirkel naar de onderkant. De letters wijzen dan met hun kop naar het middelpunt.
 - **{{ui:prop.textFlipped}}:** Draait alleen de letters om, zodat je ze van de andere kant kunt lezen. De tekst blijft op zijn plaats op de cirkel.

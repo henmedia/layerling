@@ -19,6 +19,8 @@ Elige {{ui:shape.text}} en la biblioteca de formas y colócalo. En el campo {{ui
 
 Al principio, un texto es un solo cuerpo. Si quieres trabajar con las letras por separado, haz clic en {{ui:inspector.separateParts}}. Entonces cada letra pasa a ser una forma independiente.
 
+**Varias líneas:** Un texto tiene una línea. Para un cartel o una placa con varias líneas, abre la tarjeta {{ui:textBlock.title}} debajo de los ajustes: escribe las líneas en {{ui:textBlock.lines}}, elige {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} o {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} y {{ui:textBlock.step}}: con 80 % cada línea es una quinta parte más pequeña que la de arriba. El botón convierte cada línea en un texto propio debajo de la anterior, con la fuente, la altura y el relleno de este texto; la primera ocupa el lugar de este texto. Después cada línea puede tener su propio tamaño, fuente o color.
+
 Las aristas del texto también se pueden achaflanar o redondear, tanto si es recto como si es curvado: consulta [Romper aristas y vaciar cuerpos](chapter:edges-and-hollowing). Usa medidas pequeñas, de 0,2 a 0,5 mm, porque los trazos de las letras son estrechos.
 
 ## Tus fuentes

@@ -16,6 +16,8 @@ Válaszd az alakzattárban a {{ui:shape.text}} alakzatot, és helyezd el. Jobbra
 
 A szöveg kezdetben egyetlen test. Ha a betűket egyenként kezelnéd, kattints a {{ui:inspector.separateParts}} gombra. Ekkor minden betű önálló alakzat lesz.
 
+**Több sor:** Egy szöveg egy sorból áll. Több soros táblához vagy feliratos laphoz nyisd meg a beállítások alatt a {{ui:textBlock.title}} kártyát: írd be a sorokat a {{ui:textBlock.lines}} mezőbe, válaszd ki: {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} vagy {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} és {{ui:textBlock.step}} - 80 %-nál minden sor egyötödével kisebb a felette lévőnél. A gomb minden sort önálló szöveggé tesz a felette lévő alatt, ennek a szövegnek a betűtípusával, magasságával és kitöltésével; az első ennek a szövegnek a helyére kerül. Utána minden sor kaphat saját méretet, betűtípust vagy színt.
+
 A szöveg élei is letörhetők vagy lekerekíthetők, egyenes és íves szövegnél egyaránt, lásd az [Élek letörése és testek kiüregelése](chapter:edges-and-hollowing) fejezetet. Kis méreteket használj, például 0,2–0,5 mm-t, mert a betűk vonalai keskenyek.
 
 ## Saját betűtípusok

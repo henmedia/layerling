@@ -19,6 +19,8 @@ Choose {{ui:shape.text}} in the shape library and place it. In the {{ui:prop.tex
 
 Text is at first a single body. If you want to treat the letters individually, click {{ui:inspector.separateParts}}. Then every letter is a shape of its own.
 
+**Several lines:** A text holds one line. For a sign or a plaque with several lines, open the {{ui:textBlock.title}} card below the settings: type the lines under {{ui:textBlock.lines}}, choose {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} or {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} and {{ui:textBlock.step}} - at 80 % each line is a fifth smaller than the one above. The button makes every line a text of its own under the one above, in this text's font, height and fill; the first takes this text's place. Afterwards each line can get its own size, font or colour.
+
 The edges of text can be chamfered or filleted too, straight or curved, see [Breaking edges and hollowing bodies](chapter:edges-and-hollowing). Use small sizes such as 0.2 to 0.5 mm, because the strokes of the letters are narrow.
 
 ## Your own fonts

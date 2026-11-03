@@ -19,6 +19,8 @@ Wybierz {{ui:shape.text}} w bibliotece kształtów i umieść go. W polu {{ui:pr
 
 Tekst jest na początku jedną bryłą. Jeśli chcesz obrabiać litery osobno, kliknij {{ui:inspector.separateParts}}. Wtedy każda litera jest osobnym kształtem.
 
+**Kilka wierszy:** Tekst ma jeden wiersz. Na szyld lub tabliczkę z kilkoma wierszami otwórz pod ustawieniami kartę {{ui:textBlock.title}}: wpisz wiersze w {{ui:textBlock.lines}}, wybierz {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} lub {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} i {{ui:textBlock.step}} - przy 80 % każdy wiersz jest o jedną piątą mniejszy od poprzedniego. Przycisk robi z każdego wiersza osobny tekst pod poprzednim, w czcionce, wysokości i wypełnieniu tego tekstu; pierwszy zajmuje miejsce tego tekstu. Potem każdy wiersz może dostać własny rozmiar, czcionkę lub kolor.
+
 Krawędzie tekstu też można fazować albo zaokrąglać, prostego i na łuku, zobacz [Łamanie krawędzi i drążenie brył](chapter:edges-and-hollowing). Używaj małych rozmiarów, takich jak od 0,2 do 0,5 mm, bo kreski liter są wąskie.
 
 ## Twoje czcionki

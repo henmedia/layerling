@@ -1271,6 +1271,22 @@ export const tools = [
     },
   },
   {
+    name: "layerling_text_block",
+    description: "Several lines of text under one another, as the editor's Text block card does (#1207): a plain straight text (not curved, not stacked top to bottom, without a key ring) becomes the first of the lines, and every further line is a text of its own under the one above, in the same font, height, fill and colour. The lines are lined up on the left edge, the middle or the right edge of the text (align), `gap` mm apart, and each is `step` per cent the letter size of the one above (100 all alike, 80 each a fifth smaller). The block's top stays where the text's top was; a turned text turns the block with it. Each line can be changed on its own afterwards (update_object: text, letterSize through width and depth, font). One undo step. Returns the lines, top to bottom, the first keeping the text's id.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The plain straight text to start from; it becomes the first line." },
+        lines: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 20, description: "The lines, top to bottom, at most 24 characters each; blank ones are left out." },
+        align: { type: "string", enum: ["left", "center", "right"], description: "Where the lines line up: the text's left edge, its middle or its right edge. Default center." },
+        gap: { type: "number", minimum: 0, maximum: 100, description: "Room between the boxes of two lines in mm. Default 2." },
+        step: { type: "number", minimum: 25, maximum: 200, description: "Each line's letter size in per cent of the one above. Default 100." },
+      },
+      required: ["id", "lines"],
+    },
+  },
+  {
     name: "layerling_layer_text",
     description: "Layered text for a multicolour print (#215): one text as a stack of bodies - the letters on top, under them the same letters a little wider in another colour, at the bottom a plate wider still, usually as a silhouette without the holes in the letters. Every layer is an ordinary text with a 'Wider' fill (so each has its own colour, height and edge treatments) and the stack is a bundle flagged as layered text, whose properties panel edits words, font and layers together. Pass the id of a text (it is replaced by the stack) or of such a bundle (it is built again); layers top to bottom, each with grow (mm wider than the letters, 0 for the letters), height, color and silhouette. Left out, the layers stay as they are, or a new stack takes the classic three: white letters, a red rim 1.5 mm wider, a dark plate 3 mm wider without holes. A layer may take join (round, bevel or miter): how it goes round the corners of the letters; left out it is round, as before. keyring { side, diameter, along } gives the bottom layer a tab with a round end and a key ring hole on the left, right or top, cut through every layer it reaches, along mm off the middle of that side (up on the left and right, to the right on top); the tab is the hole plus a 1.75 mm wall either side wide (6.5 mm for 3 mm) and the hole's edge 2 mm beyond the bottom layer's outline, so it sticks out 6.75 mm; it follows the words and the font, true puts a 3 mm hole on the left, false takes it off, and left out it stays as it is. With names, one stack per name is made instead, laid out in rows under the first, each as its own object - a list of name tags in one go.",
     inputSchema: {

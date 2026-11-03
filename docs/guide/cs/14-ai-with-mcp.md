@@ -121,6 +121,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_array_objects` | opakuje objekty v řadě nebo po kružnici |
 | `layerling_bundle_objects` | seskupí objekty jako Ctrl+B: společný pohyb, zachované barvy a typy, samostatná tělesa při exportu |
 | `layerling_layer_text` | vytvoří vrstvenou jmenovku: písmena, širší okraje a souvislou podložku; podporuje otvor na kroužek, rohy po vrstvách, úpravu hran písmen a seznam jmen |
+| `layerling_text_block` | vytvoří textový blok: text se stane prvním z několika řádků, každý samostatným textem pod tím nad ním, zarovnaných vlevo, na střed nebo vpravo, každý řádek stejně velký nebo menší |
 | `layerling_layer_icon` | vytvoří vrstvený štítek ze SVG nebo vysunutého náčrtu, s rozšířenými okraji a souvislou podložkou; umožní změnit šířku a vrstvy i rozmístit více kopií na podložku |
 | `layerling_create_qr_code` | vytvoří z textu nebo webové adresy QR kód jako {{ui:shape.qrCode}} v knihovně tvarů – samotný kód, vystouplý na destičce nebo vyrytý, s opravou chyb, šířkou, výškou, klidovou zónou a na přání jako otvor; varuje, když modul klesne pod 0,8 mm |
 | `layerling_create_sbc_board` | vloží desku SBC ve skutečné velikosti jako {{ui:shape.sbcBoard}} v knihovně tvarů – Raspberry Pi 5, 4, 3 B+, Zero 2 W nebo BIGTREETECH Pi, s otvory a konektory, vůlí kolem okrajových konektorů, polohou a jako výřez pro krabičku |

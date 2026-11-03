@@ -18,6 +18,8 @@ Scegli {{ui:shape.text}} nella libreria delle forme e posizionalo. Nel campo {{u
 
 Inizialmente il testo è un unico corpo. Se vuoi modificare le lettere singolarmente, fai clic su {{ui:inspector.separateParts}}: ogni lettera diventa una forma separata.
 
+**Più righe:** Un testo ha una riga. Per un cartello o una targa con più righe, apri la scheda {{ui:textBlock.title}} sotto le impostazioni: scrivi le righe in {{ui:textBlock.lines}}, scegli {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} o {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} e {{ui:textBlock.step}}: all'80 % ogni riga è più piccola di un quinto rispetto a quella sopra. Il pulsante rende ogni riga un testo a sé sotto quella sopra, con il carattere, l'altezza e il riempimento di questo testo; la prima prende il posto di questo testo. Poi ogni riga può avere dimensione, carattere o colore propri.
+
 Puoi applicare smussi e raccordi anche agli spigoli del testo, diritto o curvo; vedi [Smussare gli spigoli e svuotare i corpi](chapter:edges-and-hollowing). Usa misure piccole, per esempio da 0,2 a 0,5 mm, perché i tratti delle lettere sono stretti.
 
 ## Caratteri tipografici personalizzati

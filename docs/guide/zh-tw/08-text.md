@@ -18,6 +18,8 @@ summary: 以八種字型或自訂字型製作凸起或凹刻的文字，還可�
 
 文字一開始是單一實體。若想個別處理每個字母，點擊 {{ui:inspector.separateParts}}。之後每個字母都會成為獨立形狀。
 
+**多行文字：** 一段文字只有一行。要做多行的招牌或銘牌，請打開設定下方的 {{ui:textBlock.title}} 卡片：在 {{ui:textBlock.lines}} 中輸入各行，選擇 {{ui:textBlock.align}}（{{ui:textBlock.align.left}}、{{ui:textBlock.align.center}} 或 {{ui:textBlock.align.right}}）、{{ui:textBlock.gap}} 和 {{ui:textBlock.step}}——設為 80 % 時每行比上一行小五分之一。按鈕會把每行做成上一行下方的獨立文字，使用此文字的字型、高度和填充；第一行佔據此文字的位置。之後每行都可以有自己的大小、字型或顏色。
+
 文字的邊也能倒角或加圓角，直線或弧形文字皆可，見[邊緣倒角與抽殼實體](chapter:edges-and-hollowing)。請使用 0.2 至 0.5 mm 這類小尺寸，因為字母的筆畫很窄。
 
 ## 自訂字型
