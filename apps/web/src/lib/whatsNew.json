@@ -1,5 +1,100 @@
 [
   {
+    "version": "1.136.0",
+    "items": [
+      {
+        "title": {
+          "de": "Objektliste: Formen verschieben",
+          "en": "Object list: move shapes"
+        },
+        "body": {
+          "de": "Jede Zeile der Objektliste hat links einen Griff mit sechs Punkten. Zieh ihn nach oben oder unten, mit der Maus oder dem Finger, oder fokussiere ihn und drücke die Pfeiltasten: Die Form steht dann an einer anderen Stelle der Liste. Rückgängig macht es wieder rückgängig. Bei A–Z-Sortierung oder Suche sind die Griffe ausgeblendet.",
+          "en": "Each row of the object list has a handle with six dots at its left. Drag it up or down, with the mouse or a finger, or focus it and press the arrow keys, and the shape moves to another place in the list. Undo takes it back. With the A–Z sort or a search the handles are hidden."
+        }
+      },
+      {
+        "title": {
+          "de": "Löcher am Rand und eigene Formen",
+          "en": "Holes along the edge, and shapes of your own"
+        },
+        "body": {
+          "de": "Das Lochmuster setzt Löcher jetzt auch als Kranz entlang der Kante einer Fläche: ein Loch auf jeder Ecke und die Seiten gleichmäßig aufgeteilt, nach Abstand oder Anzahl, auf runden Flächen mit verschiebbarem Start. Runde Löcher können eine Stufen- oder Senkbohrung bekommen, mit metrischen Schraubengrößen. Und mit „Eigene Form“ wiederholt es eine Form aus der Szene über die Fläche, aufgesetzt oder eingeschnitten: Nieten, Noppen, ein Riffelblech.",
+          "en": "The hole pattern can now set its holes in a ring along the edge of a face: a hole on every corner and the sides shared out evenly, by spacing or by number, with a start you can move on round faces. Round holes can get a counterbore or countersink, with metric screw sizes. And with Own shape it repeats a shape from the scene over the face, raised or cut in: rivets, studs, a diamond plate."
+        }
+      },
+      {
+        "title": {
+          "de": "KI wartet auf deine Notizen",
+          "en": "The AI waits for your notes"
+        },
+        "body": {
+          "de": "Ein KI-Agent an der MCP-Brücke kann jetzt auf deine Notizen warten: Bitte ihn einmal darum, dann greift er jeden Auftrag auf, sobald du an einer Notiz „Für die KI“ ankreuzt, und antwortet am Modell.",
+          "en": "An AI agent on the MCP bridge can now wait for your notes: ask it once, and it picks up every request as soon as you tick For the AI on a note, and answers on the model."
+        }
+      },
+      {
+        "title": {
+          "de": "Winkelmesser",
+          "en": "Protractor"
+        },
+        "body": {
+          "de": "Neben dem Winkellineal misst der Winkelmesser jetzt Winkel: die Ecke und auf jedem Schenkel einen Punkt anklicken, oder zwei ebene Flächen. Er rastet an Ecken und Kanten ein und folgt den Körpern, wenn sie sich bewegen.",
+          "en": "Beside the framing square, the protractor now measures angles: click the corner and a point on each side, or two flat faces. It snaps to corners and edges and follows the bodies when they move."
+        }
+      },
+      {
+        "title": {
+          "de": "Verjüngung im Verhältnis",
+          "en": "Taper in proportion"
+        },
+        "body": {
+          "de": "Die Karte Verjüngung hat jetzt den Schalter Proportionen beibehalten: Länge und Breite desselben Endes ändern sich dann gemeinsam, ein quadratisches Oberteil bleibt quadratisch.",
+          "en": "The Taper card now has a Keep proportions switch: Length and Width of the same end then change together, so a square top stays square."
+        }
+      },
+      {
+        "title": {
+          "de": "Schnittmenge zeigt erst, was bleibt",
+          "en": "Intersection shows first what stays"
+        },
+        "body": {
+          "de": "Der erste Klick auf Schnittmenge zeigt das gemeinsame Stück grün, die Formen lassen sich noch verschieben; der zweite Klick wendet es an, Esc bricht ab. Der eigene Knopf „Gemeinsames Stück zeigen“ ist dafür weg, die Leiste ist einen Knopf schmaler.",
+          "en": "The first click on Intersection shows the common part in green, and the shapes can still be moved; the second click applies it, Esc cancels. The separate \"Show common part\" button is gone, so the bar is one button narrower."
+        }
+      },
+      {
+        "title": {
+          "de": "Körper mit Fasen und Rundungen folgen sofort",
+          "en": "Bodies with chamfers and fillets follow at once"
+        },
+        "body": {
+          "de": "Ein Körper mit gefasten oder gerundeten Kanten reagierte beim Verschieben, mit der Maus wie mit den Pfeiltasten, spürbar verzögert, weil seine ganze Kanten-Vorgeschichte bei jedem Schritt neu durchgerechnet wurde. Jetzt folgt er so schnell wie ein einfacher Quader, und auch das Speichern danach geht schneller.",
+          "en": "A body with chamfered or rounded edges reacted with a noticeable delay when moved, with the mouse as with the arrow keys, because its whole edge history was worked through again at every step. It now follows as quickly as a plain box, and saving afterwards is faster too."
+        }
+      },
+      {
+        "title": {
+          "de": "Kreise und Rechtecke rasten mit ihrer Mitte ein",
+          "en": "Circles and rectangles snap with their middle"
+        },
+        "body": {
+          "de": "Ziehst du in der Skizze einen Kreis oder ein Rechteck, rastet seine Mitte auf den Enden, Ecken und Mitten der anderen Linien, auf Kreismittelpunkten und auf Kreuzungen von Hilfslinien ein, ein blauer Ring zeigt die Stelle. So sitzt ein Loch genau auf der Mitte einer Linie. Alt schaltet das Einrasten ab.",
+          "en": "Drag a circle or a rectangle in the sketch and its middle snaps to the ends, corners and middles of the other lines, to circle centres and to crossings of construction lines, with a blue ring to show where. So a hole sits exactly on the middle of a line. Alt turns the snapping off."
+        }
+      },
+      {
+        "title": {
+          "de": "STEP behält keine falsche Form mehr",
+          "en": "STEP no longer writes the wrong shape"
+        },
+        "body": {
+          "de": "Wurde ein Körper erst verrundet oder ausgehöhlt und danach verjüngt oder verdreht, schrieb die STEP-Ausfuhr ihn ohne die Verdrehung, ohne Hinweis. Jetzt lässt sie ihn weg und sagt es, damit du ihn als STL ausgibst. In der Objektliste steht unter solchen Körpern jetzt Exakter Körper oder Netz, so siehst du vorher, was als STEP hinausgeht.",
+          "en": "A body that was rounded or hollowed first and tapered or twisted after went into the STEP file without the twist, and nothing said so. Now the export leaves it out and tells you, so you can save it as STL. The object list now says Exact body or Mesh under such bodies, so you see beforehand what goes into STEP."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.135.1",
     "items": [
       {
