@@ -9,7 +9,7 @@ import { vaseSettingsEqual } from "@/lib/vaseSettings";
 import { qrSettingsEqual } from "@/lib/qrCode";
 import { torusTubeRatio } from "@/lib/torusShape";
 import { shapeHasAlongDeform } from "@/lib/slopeAlong";
-import type { SketchStroke, WorkplaneShape } from "@/types/layerling";
+import type { EdgeTreatmentHistoryEntry, SketchStroke, WorkplaneShape } from "@/types/layerling";
 
 /** Bauwerte der Wabengitter, die es nur noch in alten Entwuerfen gibt: Die Form wird nicht mehr angeboten (#223), bleibt aber bearbeitbar. */
 const LEGACY_BODY_PARAMETER_KEYS = ["honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth"] as const;
@@ -585,11 +585,27 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
     };
   }
   if (shape.edgeTreatmentHistory) {
-    next.edgeTreatmentHistory = shape.edgeTreatmentHistory.map((entry) => ({
-      ...entry,
-      before: canonicalizeShape(entry.before),
-    }));
+    next.edgeTreatmentHistory = canonicalEdgeTreatmentHistory(shape.edgeTreatmentHistory);
   }
+  return next;
+}
+
+const canonicalEdgeTreatmentHistories = new WeakMap<readonly EdgeTreatmentHistoryEntry[], EdgeTreatmentHistoryEntry[]>();
+
+/**
+ * A body's edge history canonicalized once (#1042). Moving a body keeps its history array, and handing back the same
+ * array keeps the fingerprint cache in editorHistory.ts hitting; a new one each time made every step hash all the
+ * stored bodies and meshes of the history again, a quarter of a second for each arrow key on a chamfered group.
+ */
+function canonicalEdgeTreatmentHistory(history: readonly EdgeTreatmentHistoryEntry[]): EdgeTreatmentHistoryEntry[] {
+  const cached = canonicalEdgeTreatmentHistories.get(history);
+  if (cached) return cached;
+  const next = history.map((entry) => ({
+    ...entry,
+    before: canonicalizeShape(entry.before),
+  }));
+  canonicalEdgeTreatmentHistories.set(history, next);
+  canonicalEdgeTreatmentHistories.set(next, next);
   return next;
 }
 

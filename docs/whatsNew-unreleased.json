@@ -48,5 +48,15 @@
       "de": "Der erste Klick auf Schnittmenge zeigt das gemeinsame Stück grün, die Formen lassen sich noch verschieben; der zweite Klick wendet es an, Esc bricht ab. Der eigene Knopf „Gemeinsames Stück zeigen“ ist dafür weg, die Leiste ist einen Knopf schmaler.",
       "en": "The first click on Intersection shows the common part in green, and the shapes can still be moved; the second click applies it, Esc cancels. The separate \"Show common part\" button is gone, so the bar is one button narrower."
     }
+  },
+  {
+    "title": {
+      "de": "Körper mit Fasen und Rundungen folgen sofort",
+      "en": "Bodies with chamfers and fillets follow at once"
+    },
+    "body": {
+      "de": "Ein Körper mit gefasten oder gerundeten Kanten reagierte beim Verschieben, mit der Maus wie mit den Pfeiltasten, spürbar verzögert, weil seine ganze Kanten-Vorgeschichte bei jedem Schritt neu durchgerechnet wurde. Jetzt folgt er so schnell wie ein einfacher Quader, und auch das Speichern danach geht schneller.",
+      "en": "A body with chamfered or rounded edges reacted with a noticeable delay when moved, with the mouse as with the arrow keys, because its whole edge history was worked through again at every step. It now follows as quickly as a plain box, and saving afterwards is faster too."
+    }
   }
 ]
