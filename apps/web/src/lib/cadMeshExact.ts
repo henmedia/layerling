@@ -14,7 +14,7 @@ import {
   type V3,
 } from "@/lib/meshSurfaceFit";
 import { type MeshSegmentation, segmentMesh, summarizeSegmentation, type SegmentationSummary, weldMesh } from "@/lib/meshSurfaceSegments";
-import { buildTopology, type MeshTopology, type Piece, solveOnto } from "@/lib/meshSurfaceTopology";
+import { angleRound, buildTopology, type ForcedCuts, type MeshTopology, type Piece, solveOnto } from "@/lib/meshSurfaceTopology";
 
 /*
  * A triangle mesh rebuilt as an exact solid: its planes, cylinders, cones, spheres and tori as real faces, the edges
@@ -55,7 +55,33 @@ export function exactSolidFromMesh(cad: OcctKernel, positions: ArrayLike<number>
   const meshVolume = signedVolume(seg);
   const meshArea = seg.areas.reduce((s, a) => s + a, 0);
   for (let attempt = 0; attempt < 4; attempt += 1) {
-    const topology = buildTopology(seg);
+    // A curved face with a hole in it (a bore crossing another) cannot be built in one: cut it through each hole.
+    const forced: ForcedCuts = new Map();
+    let topology = buildTopology(seg, forced);
+    for (let round = 0; topology && round < 3; round += 1) {
+      let added = false;
+      const loopsOf = new Map<number, number>();
+      for (const loop of topology.loops) loopsOf.set(loop.piece, (loopsOf.get(loop.piece) ?? 0) + 1);
+      for (const piece of topology.pieces) {
+        if ((loopsOf.get(piece.id) ?? 0) < 2 || piece.facet) continue;
+        const s = piece.surface;
+        if (s.kind !== "cylinder" && s.kind !== "cone" && s.kind !== "torus") continue;
+        const origin = s.kind === "cone" ? s.apex : s.kind === "cylinder" ? s.origin : s.center;
+        const loops = topology.loops.filter((l) => l.piece === piece.id).map((l) => ({ l, area: loopArea(topology!, piece, l.parts) }));
+        loops.sort((x, y) => y.area - x.area);
+        for (const { l } of loops.slice(1)) {
+          const pts = l.parts.flatMap((part) => topology!.chainPoints.get(part.chain)!);
+          const mean = scale(pts.reduce((m, p) => add(m, p), [0, 0, 0] as V3), 1 / pts.length);
+          const list = forced.get(piece.region) ?? [];
+          list.push(angleRound(origin, s.axis, mean));
+          forced.set(piece.region, list);
+          added = true;
+        }
+      }
+      if (!added) break;
+      options.debug?.(`forced cuts ${[...forced].map(([r, a]) => `${r}: ${a.map((x) => x.toFixed(2)).join(",")}`).join("; ")}`);
+      topology = buildTopology(seg, forced);
+    }
     if (!topology) return null;
     const built = buildSolid(cad, seg, topology, meshVolume, meshArea, options.debug);
     if (built.solid) {
@@ -134,7 +160,12 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
       const [outer, ...holes] = wires;
       let face: ShapeHandle;
       if (piece.surface.kind === "plane") {
-        face = cad.makeFace(outer.wire);
+        try {
+          face = cad.makeFace(outer.wire);
+        } catch {
+          // Spline or ellipse edges a hair off the plane: build on the plane itself.
+          face = cad.makeFaceOnSurface(planeFace(cad, piece.surface, piece, seg), outer.wire);
+        }
       } else {
         // On a bounded surface a wire can bound the piece or everything round it: the one near the mesh's area wins.
         const base = surfaceFace(cad, piece, topo, seg);
@@ -155,7 +186,11 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
           if (Math.abs(other - meshAreaOfPiece) < Math.abs(area - meshAreaOfPiece)) face = flipped;
         }
       }
-      if (holes.length > 0) face = cad.addHolesInFace(face, holes.map((h) => h.wire));
+      if (holes.length > 0) {
+        // A face built on a curved surface has no extent until it is fixed; holes go in after.
+        if (piece.surface.kind !== "plane") face = cad.fixShape(face);
+        face = cad.addHolesInFace(face, holes.map((h) => h.wire));
+      }
       face = facingOut(cad, face, piece, seg);
       if (debug) {
         const meshAreaOfPiece = piece.triangles.reduce((sum, t) => sum + seg.areas[t], 0);
@@ -255,6 +290,11 @@ function chainEdges(cad: OcctKernel, topo: MeshTopology, id: number, tolerance: 
     dense.push(solveOnto(mid, surfaces, tolerance * 4) ?? mid);
   }
   dense.push(ring[ring.length - 1]);
+  const ellipse = a.region !== b.region ? planeCylinderEllipse(a.surface, b.surface) : null;
+  if (ellipse && !tangent) {
+    const edges = ellipseEdges(cad, ellipse, dense, closed);
+    if (edges) return edges;
+  }
   if (!closed) {
     const start = dense[0], end = dense[dense.length - 1];
     if (offLine(dense, start, end) <= tolerance) return [cad.makeLineEdge(vec(start), vec(end))];
@@ -278,6 +318,43 @@ function chainEdges(cad: OcctKernel, topo: MeshTopology, id: number, tolerance: 
     ];
   }
   return [splineEdge(cad, firstHalf), splineEdge(cad, secondHalf)];
+}
+
+type Ellipse = { center: V3; normal: V3; xDir: V3; yDir: V3; major: number; minor: number };
+
+/** Where a plane cuts a cylinder at a slant: an ellipse, its minor radius the cylinder's. Null when square or along it. */
+function planeCylinderEllipse(a: AnalyticSurface, b: AnalyticSurface): Ellipse | null {
+  const plane = a.kind === "plane" ? a : b.kind === "plane" ? b : null;
+  const cyl = a.kind === "cylinder" ? a : b.kind === "cylinder" ? b : null;
+  if (!plane || !cyl) return null;
+  const c = Math.abs(dot(plane.normal, cyl.axis));
+  if (c > 1 - 1e-6 || c < 1e-3) return null;
+  const t = (plane.offset - dot(plane.normal, cyl.origin)) / dot(plane.normal, cyl.axis);
+  const center = add(cyl.origin, scale(cyl.axis, t));
+  const xDir = unit(sub(cyl.axis, scale(plane.normal, dot(cyl.axis, plane.normal))));
+  return { center, normal: plane.normal, xDir, yDir: cross(plane.normal, xDir), major: cyl.radius / c, minor: cyl.radius };
+}
+
+function ellipseEdges(cad: OcctKernel, e: Ellipse, pts: V3[], closed: boolean): ShapeHandle[] | null {
+  const param = (p: V3) => {
+    const d = sub(p, e.center);
+    return Math.atan2(dot(d, e.yDir) / e.minor, dot(d, e.xDir) / e.major);
+  };
+  const TWO_PI = 2 * Math.PI;
+  const arc = (from: V3, through: V3, to: V3) => {
+    const t0 = param(from), tm = param(through), t1 = param(to);
+    const span = (((t1 - t0) % TWO_PI) + TWO_PI) % TWO_PI;
+    const mid = (((tm - t0) % TWO_PI) + TWO_PI) % TWO_PI;
+    if (mid < span) return cad.makeEllipseArc(vec(e.center), vec(e.normal), e.major, e.minor, t0, t0 + span, vec(e.xDir));
+    return cad.makeEllipseArc(vec(e.center), vec(e.normal), e.major, e.minor, t1, t1 + (TWO_PI - span), vec(e.xDir));
+  };
+  try {
+    if (!closed) return [arc(pts[0], pts[Math.floor(pts.length / 2)], pts[pts.length - 1])];
+    const half = Math.floor((pts.length - 1) / 2);
+    return [arc(pts[0], pts[Math.floor(half / 2)], pts[half]), arc(pts[half], pts[Math.floor((half + pts.length - 1) / 2)], pts[0])];
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -479,6 +556,21 @@ function facingOut(cad: OcctKernel, face: ShapeHandle, piece: Piece, seg: MeshSe
     // keep it as built
   }
   return face;
+}
+
+/** A square of the plane larger than the piece. */
+function planeFace(cad: OcctKernel, plane: { normal: V3; offset: number }, piece: Piece, seg: MeshSegmentation): ShapeHandle {
+  const [u, v] = perpendicularFrame(plane.normal);
+  let lo = [Infinity, Infinity], hi = [-Infinity, -Infinity];
+  for (const t of piece.triangles) for (const w of seg.mesh.triangles[t]) {
+    const p = seg.mesh.points[w];
+    lo = [Math.min(lo[0], dot(p, u)), Math.min(lo[1], dot(p, v))];
+    hi = [Math.max(hi[0], dot(p, u)), Math.max(hi[1], dot(p, v))];
+  }
+  const m = Math.max(1, (hi[0] - lo[0] + hi[1] - lo[1]) * 0.2);
+  const at = (x: number, y: number) => vec(add(scale(plane.normal, plane.offset), add(scale(u, x), scale(v, y))));
+  const corners = [at(lo[0] - m, lo[1] - m), at(hi[0] + m, lo[1] - m), at(hi[0] + m, hi[1] + m), at(lo[0] - m, hi[1] + m)];
+  return cad.makeFace(cad.makeWire(corners.map((c, i) => cad.makeLineEdge(c, corners[(i + 1) % 4]))));
 }
 
 /** The 3x4 matrix that carries the primitive's frame (x seam, z axis) to the given one. */

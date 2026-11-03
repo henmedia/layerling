@@ -1,5 +1,6 @@
 import {
   type AnalyticSurface,
+  perpendicularFrame as perpendicularFrameOf,
   dot,
   fitCone,
   fitCylinder,
@@ -370,6 +371,38 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     }
     return { tris, surface };
   };
+  const spanOf = (angles: number[]) => {
+    const sorted = angles.slice().sort((x, y) => x - y);
+    let gap = sorted[0] + 2 * Math.PI - sorted[sorted.length - 1];
+    for (let i = 1; i < sorted.length; i += 1) gap = Math.max(gap, sorted[i] - sorted[i - 1]);
+    return 2 * Math.PI - gap;
+  };
+  const bendsEnough = (s: AnalyticSurface, tris: number[]) => {
+    const pts = cornersOf(tris);
+    const area = tris.reduce((sum, t) => sum + areas[t], 0);
+    if (area < totalArea * 2e-4) return false;
+    // Cylinders rarely fit where they should not, tori and spheres on any small piece of a freeform surface.
+    const MIN = s.kind === "cylinder" ? 3 * DEG : s.kind === "cone" ? 8 * DEG : 12 * DEG;
+    if (s.kind === "sphere") {
+      const dirs = pts.map((p) => unit(sub(p, s.center)));
+      const mean = unit(dirs.reduce((m, d) => add(m, d), [0, 0, 0] as V3));
+      return Math.max(...dirs.map((d) => Math.acos(Math.max(-1, Math.min(1, dot(d, mean)))))) >= MIN / 2;
+    }
+    if (s.kind === "plane") return true;
+    const origin = s.kind === "cone" ? s.apex : s.kind === "cylinder" ? s.origin : s.center;
+    const [u, v] = perpendicularFrameOf(s.axis);
+    const theta = pts.map((p) => { const d = sub(p, origin); return Math.atan2(dot(d, v), dot(d, u)); });
+    if (spanOf(theta) < MIN) return false;
+    if (s.kind === "torus") {
+      const phi = pts.map((p) => {
+        const d = sub(p, s.center);
+        const h = dot(d, s.axis);
+        return Math.atan2(h, norm(sub(d, scale(s.axis, h))) - s.major);
+      });
+      if (spanOf(phi) < MIN) return false;
+    }
+    return true;
+  };
   const attempted = new Set<number>();
   const remaining = [...Array(T).keys()].filter(isFree).sort((a, b) => interiorScore(b) - interiorScore(a));
   function interiorScore(t: number) {
@@ -409,8 +442,9 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     contenders.sort((a, b) => a.candidate.chord - b.candidate.chord);
     const found = contenders[0].candidate;
     const grown = growCurved(found.tris, found);
-    // A curved face needs a few triangles and must really bend; a lone strip stays facets.
-    if (grown.tris.length < 4) continue;
+    // A curved face needs a few triangles and must really bend: round its axis (and round a torus's tube) at least a
+    // little, a sphere over a small cap. A wrong surface that fits a small patch of a freeform one does not.
+    if (grown.tris.length < 4 || !bendsEnough(grown.surface, grown.tris)) continue;
     addRegion(grown.surface, grown.tris, false);
   }
 

@@ -93,7 +93,10 @@ function cutPlane(origin: V3, axis: V3, theta: number): PlaneSurface {
   return { kind: "plane", normal, offset: dot(normal, origin) };
 }
 
-export function buildTopology(seg: MeshSegmentation): MeshTopology | null {
+/** Extra cuts round a region's axis, by angle (in the frame `perpendicularFrame(axis)` gives), to break up holes. */
+export type ForcedCuts = Map<number, number[]>;
+
+export function buildTopology(seg: MeshSegmentation, forced: ForcedCuts = new Map()): MeshTopology | null {
   const { mesh, neighbors } = seg;
   const P = mesh.points;
   const centroid = (t: number) => scale(add(add(P[mesh.triangles[t][0]], P[mesh.triangles[t][1]]), P[mesh.triangles[t][2]]), 1 / 3);
@@ -101,6 +104,28 @@ export function buildTopology(seg: MeshSegmentation): MeshTopology | null {
   // 1. Pieces.
   const pieces: Piece[] = [];
   const cuts: Cut[] = [];
+  const sectorOf = new Map<number, { region: number; k: number }>();
+  const sectorsOf = new Map<number, { origin: V3; axis: V3; start: number; bounds: number[] }>();
+  /** The triangles in connected parts: a sector of a face, or a face, can come in several. */
+  const components = (tris: number[]) => {
+    const inSet = new Set(tris);
+    const seen = new Set<number>();
+    const out: number[][] = [];
+    for (const t0 of tris) {
+      if (seen.has(t0)) continue;
+      const part = [t0];
+      seen.add(t0);
+      for (let i = 0; i < part.length; i += 1) {
+        const t = part[i];
+        for (let k = 0; k < 3; k += 1) {
+          const o = neighbors[t * 3 + k];
+          if (inSet.has(o) && !seen.has(o)) { seen.add(o); part.push(o); }
+        }
+      }
+      out.push(part);
+    }
+    return out;
+  };
   const pieceOfTriangle = new Int32Array(mesh.triangles.length).fill(-1);
   const addPiece = (region: number, surface: AnalyticSurface, facet: boolean, triangles: number[], middle?: V3) => {
     const id = pieces.length;
@@ -122,21 +147,31 @@ export function buildTopology(seg: MeshSegmentation): MeshTopology | null {
       const width = sectors === 1 ? Math.max(span, 1e-6) : (2 * Math.PI - Math.min(gap, 2 * Math.PI - SPAN_LIMIT)) / sectors;
       const start = sectors === 1 ? gapEnd : gapEnd - (width * sectors - span) / 2;
       const [u, v] = perpendicularFrame(rot.axis);
-      const buckets: number[][] = Array.from({ length: sectors }, () => []);
-      region.triangles.forEach((t, i) => {
-        const rel = (((angles[i] - start) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-        buckets[Math.min(sectors - 1, Math.floor(rel / width))].push(t);
-      });
-      const ids = buckets.map((tris, i) => {
-        if (tris.length === 0) return -1;
-        const mid = start + (i + 0.5) * width;
-        return addPiece(region.id, s, region.facet, tris, add(scale(u, Math.cos(mid)), scale(v, Math.sin(mid))));
-      });
-      for (let i = 0; i < sectors && sectors > 1; i += 1) {
-        const j = (i + 1) % sectors;
-        if (ids[i] < 0 || ids[j] < 0) continue;
-        cuts.push({ a: ids[i], b: ids[j], plane: cutPlane(rot.origin, rot.axis, start + (i + 1) * width) });
+      const rel = (angle: number) => (((angle - start) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      // Boundaries round the axis, measured from `start`: the sectors' and any forced through a hole.
+      const bounds = [...Array(sectors).keys()].map((i) => i * width);
+      for (const angle of forced.get(region.id) ?? []) {
+        const r = rel(angle);
+        if (bounds.every((b) => Math.abs(b - r) > 1e-3)) bounds.push(r);
       }
+      bounds.sort((x, y) => x - y);
+      const intervalOf = (r: number) => {
+        let k = bounds.length - 1;
+        for (let i = 0; i < bounds.length; i += 1) if (bounds[i] <= r) k = i;
+        return k;
+      };
+      const buckets: number[][] = bounds.map(() => []);
+      region.triangles.forEach((t, i) => buckets[intervalOf(rel(angles[i]))].push(t));
+      sectorsOf.set(region.id, { origin: rot.origin, axis: rot.axis, start, bounds });
+      buckets.forEach((tris, k) => {
+        for (const part of components(tris)) {
+          // The middle of the triangles actually there (a partial face does not fill its last interval).
+          const relAngles = part.map((t) => rel(angleRound(rot.origin, rot.axis, centroid(t))));
+          const mid = start + (Math.min(...relAngles) + Math.max(...relAngles)) / 2;
+          const id = addPiece(region.id, s, region.facet, part, add(scale(u, Math.cos(mid)), scale(v, Math.sin(mid))));
+          if (bounds.length > 1) sectorOf.set(id, { region: region.id, k });
+        }
+      });
       continue;
     }
     if (s.kind === "sphere") {
@@ -165,7 +200,7 @@ export function buildTopology(seg: MeshSegmentation): MeshTopology | null {
         splitPlanes.push({ plane, sideA: new Set(sideA), sideB: new Set(sideB) });
         return [...split(sideA), ...split(sideB)];
       };
-      const parts = split(region.triangles);
+      const parts = split(region.triangles).flatMap((part) => components(part.tris).map((tris) => ({ tris, middle: part.middle })));
       const ids = parts.map((part) => addPiece(region.id, s, region.facet, part.tris, part.middle));
       // A cut between two parts: the split plane that has one on each side.
       for (let i = 0; i < ids.length; i += 1) for (let j = i + 1; j < ids.length; j += 1) {
@@ -175,10 +210,32 @@ export function buildTopology(seg: MeshSegmentation): MeshTopology | null {
       }
       continue;
     }
-    addPiece(region.id, s, region.facet, region.triangles.slice());
+    for (const part of components(region.triangles)) addPiece(region.id, s, region.facet, part);
   }
   if (pieceOfTriangle.some((p) => p < 0)) return null;
-  const cutOf = (a: number, b: number) => cuts.find((c) => (c.a === a && c.b === b) || (c.a === b && c.b === a))?.plane;
+  /**
+   * The plane two pieces of one face were cut apart along, the one nearest `near`: two halves of a cylinder meet
+   * along two cuts, one each side.
+   */
+  const cutOf = (a: number, b: number, near: V3) => {
+    const candidates: PlaneSurface[] = cuts.filter((c) => (c.a === a && c.b === b) || (c.a === b && c.b === a)).map((c) => c.plane);
+    const sa = sectorOf.get(a), sb = sectorOf.get(b);
+    if (sa && sb && sa.region === sb.region) {
+      const info = sectorsOf.get(sa.region)!;
+      const n = info.bounds.length;
+      // The cut at the start of a sector lies between it and the sector before.
+      if ((sa.k + 1) % n === sb.k) candidates.push(cutPlane(info.origin, info.axis, info.start + info.bounds[sb.k]));
+      if ((sb.k + 1) % n === sa.k) candidates.push(cutPlane(info.origin, info.axis, info.start + info.bounds[sa.k]));
+    }
+    let best: PlaneSurface | undefined;
+    let bestDistance = Infinity;
+    for (const plane of candidates) {
+      // A cutting plane through an axis is only the half on its own side: measure from the half-line too.
+      const d = Math.abs(surfaceDistance(plane, near));
+      if (d < bestDistance) { bestDistance = d; best = plane; }
+    }
+    return best;
+  };
 
   // 2. Outlines: boundary half-edges, walked round each piece.
   type Half = { from: number; to: number; tri: number; k: number; other: number; used: boolean };
@@ -275,7 +332,7 @@ export function buildTopology(seg: MeshSegmentation): MeshTopology | null {
       if (id === undefined) {
         id = chains.length;
         chainByKey.set(key, id);
-        chains.push({ id, left: piece, right: other, vertices, closed, cut: pieces[piece].region === pieces[other].region ? cutOf(piece, other) : undefined });
+        chains.push({ id, left: piece, right: other, vertices, closed, cut: pieces[piece].region === pieces[other].region ? cutOf(piece, other, P[vertices[Math.floor(vertices.length / 2)]]) : undefined });
       } else {
         // Seen from the other piece: the stored chain runs the other way here.
         reversed = true;
@@ -301,7 +358,7 @@ export function buildTopology(seg: MeshSegmentation): MeshTopology | null {
     }
     for (let i = 0; i < around.length; i += 1) for (let j = i + 1; j < around.length; j += 1) {
       if (pieces[around[i]].region !== pieces[around[j]].region) continue;
-      const plane = cutOf(around[i], around[j]);
+      const plane = cutOf(around[i], around[j], P[v]);
       if (plane) out.push(plane);
     }
     return out;
