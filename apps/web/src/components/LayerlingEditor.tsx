@@ -150,6 +150,7 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE } from "@/lib/lylProject";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
+import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
@@ -6324,13 +6325,14 @@ export function LayerlingEditor({
       const continuing = chain?.chainId === shape.id;
       const movedSinceCreation = continuing ? shapeMoveDeltaBetween(chain.baseline, shapeTransformSnapshot(shape)) : ZERO_MOVE_DELTA;
       const delta = continuing && isZeroMoveDelta(movedSinceCreation) ? chain.delta : movedSinceCreation;
-      const duplicate = applyShapeMoveDelta(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), delta);
+      const duplicate = applyShapeMoveDelta(withCopyName(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), shapeNamesIn(shapes), copyNamePatterns()), delta);
       commitShapes([...shapes, duplicate], [duplicate.id], t("status.duplicatedOne"));
       smartDuplicateRef.current = { chainId: duplicate.id, baseline: shapeTransformSnapshot(duplicate), delta };
       return;
     }
     smartDuplicateRef.current = null;
-    const duplicates = selectedShapes.map((shape) => cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"));
+    const takenNames = shapeNamesIn(shapes);
+    const duplicates = selectedShapes.map((shape) => withCopyName(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), takenNames, copyNamePatterns()));
     commitShapes([...shapes, ...duplicates], duplicates.map((shape) => shape.id), t("status.duplicatedMany", { count: duplicates.length }));
   }, [commitShapes, hasSelection, selectedShapes, shapes]);
 
@@ -6441,15 +6443,16 @@ export function LayerlingEditor({
   const duplicateShapeAt = useCallback((id: string, position: { x: number; z: number }) => {
     const shape = shapesRef.current.find((entry) => entry.id === id);
     if (!shape) return;
-    const duplicate = { ...cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), x: position.x, z: position.z };
+    const duplicate = { ...withCopyName(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), shapeNamesIn(shapesRef.current), copyNamePatterns()), x: position.x, z: position.z };
     commitShapes([...shapesRef.current, duplicate], [duplicate.id], t("status.duplicatedOne"));
   }, [commitShapes]);
 
   /** Alt-drag: copies of the dragged shapes at the place they were dropped, selected like the drag was. */
   const duplicateShapesMoved = useCallback((ids: string[], delta: { dx: number; dz: number; delevation: number }) => {
+    const takenNames = shapeNamesIn(shapesRef.current);
     const duplicates = ids.flatMap((id) => {
       const shape = shapesRef.current.find((entry) => entry.id === id);
-      return shape ? [applyShapeMoveDelta(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), { ...ZERO_MOVE_DELTA, ...delta })] : [];
+      return shape ? [applyShapeMoveDelta(withCopyName(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), takenNames, copyNamePatterns()), { ...ZERO_MOVE_DELTA, ...delta })] : [];
     });
     if (duplicates.length === 0) return;
     smartDuplicateRef.current = null;
@@ -6497,7 +6500,8 @@ export function LayerlingEditor({
       clipboardCopiedAtRef.current = newest.copiedAt;
       setClipboard(sourceClipboard);
     }
-    const copies = sourceClipboard.map((shape) => cloneWorkplaneShapeTreeWithFreshIds(shape, "paste"));
+    const takenNames = shapeNamesIn(shapesRef.current);
+    const copies = sourceClipboard.map((shape) => withCopyName(cloneWorkplaneShapeTreeWithFreshIds(shape, "paste"), takenNames, copyNamePatterns(), true));
     // With "Paste in the middle and drop" the parts come together to the middle of the workplane and stand on it,
     // wherever the other program had them (#876); else each is moved a little from where it was.
     const centering = workspaceSettings.pasteCentered ? pasteCenteringShift(copies, placementWorkplaneRef.current) : null;
