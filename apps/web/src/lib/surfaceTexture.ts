@@ -3097,8 +3097,8 @@ function sliceCells(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfac
  * Bricks: cut along their joints in strips (see sliceByField) rather than cell by cell as honeycomb - their joints are
  * straight lines, and a brick's face is flat, so the body's own coarse grid is all a face needs. In three steps:
  * 1. Along the courses: every joint between two courses, at its middle and at the profile's levels either side.
- * 2. Across, course by course: a course's own joints the same way. Every triangle lies in one course after step 1;
- *    those of the other courses take the points on the edges they share.
+ * 2. Across: the joints of every course the same way, all in one cut over the bond's period, so a course's joints run on
+ *    through the courses beside it (on flat faces there, or in joints).
  * 3. Where a course's joint meets the joint between the courses, the depth follows the nearer of the two: cut along the
  *    line where both are equally far (every other course at a time, so a point on the border between two courses is
  *    measured in the course being cut). Then the depth is linear in every triangle.
@@ -3173,23 +3173,27 @@ function sliceBricks(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfa
     // 1. The joints between the courses.
     let F = unrolled(mesh);
     let cur: SurfaceMesh = sliceByField(mesh, F.V, F.dv, H, placesOf([v0], levels, H), cuttable(mesh, F), F.du);
-    // 2. Each course's joints. A quad over an edge along a joint between courses stays two triangles.
-    for (let c = 0; c < courses.length; c += 1) {
-      F = unrolled(cur);
-      const I = cur.indices;
-      const sliced = cuttable(cur, F);
-      for (let f = 0; f < sliced.length; f += 1) if (sliced[f] && modulo(courseOf(F.V, I, f), courses.length) !== c) sliced[f] = 0;
-      const { lengths, offset } = courses[c];
+    // 2. The joints across, of every course in one cut over the bond's period. Cut course by course, the triangles of the
+    //    next course took the points on the edges they shared as fans to one corner - across a coarse face slivers a
+    //    hundred millimetres long - and cutting those again put points a thousandth of a millimetre apart on neighbouring
+    //    edges, where the mesh tore open (Discussion #1204). A course's joints running on through the courses beside it
+    //    lie on flat brick faces or in joints there, so the depth stays linear in every triangle all the same. A quad over
+    //    an edge along a joint between courses stays two triangles.
+    F = unrolled(cur);
+    const period = BRICK_PERIOD[s.brickBond] * L;
+    const ends: number[] = [];
+    for (const { lengths, offset } of courses) {
       const length = lengths.reduce((sum, value) => sum + value, 0);
-      const ends: number[] = [];
-      let along = offset;
-      for (const value of lengths) {
-        ends.push(origin + along * L);
-        along += value;
+      for (let k = 0; k < Math.round(BRICK_PERIOD[s.brickBond] / length); k += 1) {
+        let along = offset + k * length;
+        for (const value of lengths) {
+          ends.push(origin + along * L);
+          along += value;
+        }
       }
-      const V = F.V;
-      cur = sliceByField(cur, F.U, F.du, length * L, placesOf(ends, levels, length * L), sliced, F.dv, false, (p, q) => Math.abs(V[p] - V[q]) < 1e-9);
     }
+    const V = F.V;
+    cur = sliceByField(cur, F.U, F.du, period, placesOf(ends, levels, period), cuttable(cur, F), F.dv, false, (p, q) => Math.abs(V[p] - V[q]) < 1e-9);
     // 3. The creases at the corners: nearer to the joint between the courses, or to the course's own.
     for (let parity = 0; parity < 2; parity += 1) {
       F = unrolled(cur);
