@@ -119,7 +119,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_offset_object` | eltolja a test minden lapját az illesztés játékához: nagyítja vagy kicsinyíti, vagy lyukként adja hozzá a megnagyobbított másolatot, vagy csak az oldalakat tolja el |
 | `layerling_list_faces` | felsorolja egy pontos test lapjait |
 | `layerling_delete_faces` | lapokat töröl, és bezárja a rést |
-| `layerling_array_objects` | sorban vagy körön sokszoroz |
+| `layerling_array_objects` | sorban, rácsban vagy körön sokszoroz |
 | `layerling_bundle_objects` | objektumokat fog kötegbe, mint a Ctrl+B: együtt mozognak, megtartják a színüket és a fajtájukat, és exportáláskor külön kerülnek ki |
 | `layerling_layer_text` | egy szöveget rétegekből álló kötegbe alakít többszínű nyomtatáshoz (betűk, szélesebb szegélyek, egy lyukak nélküli lap), vagy újraépít egy köteget, kulcstartólyukkal, rétegenkénti sarkokkal és lekerekített vagy letört betűéllel; névlistával nevenként egy címkét készít |
 | `layerling_text_block` | szövegblokkot készít: egy szöveg lesz több sor közül az első, mindegyik önálló szöveg a felette lévő alatt, balra, középre vagy jobbra igazítva, minden sor ugyanakkora vagy kisebb |
@@ -135,6 +135,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_list_reference_points` | felsorolja a referenciapontokat az azonosítójukkal és a helyzetükkel |
 | `layerling_remove_reference_points` | azonosító alapján vagy mindet törli a referenciapontokat |
 | `layerling_list_notes` | kiolvassa a felhasználó jegyzeteit a szövegükkel, azzal a testtel, amelyhez tartoznak, és hogy kérés-e az MI-nek |
+| `layerling_wait_for_notes` | megvárja, amíg egy jegyzeten bejelölöd a(z) {{ui:note.forAi}} lehetőséget, és azonnal továbbadja a kérést |
 | `layerling_add_note` | jegyzetet tesz a modellre, objektumhoz rögzítve vagy szabadon a lapon |
 | `layerling_update_note` | módosít egy jegyzetet vagy válaszol rá; a válasz lezárja a kérést |
 | `layerling_remove_notes` | azonosító alapján töröl jegyzeteket |
@@ -149,6 +150,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_show_workplane` | elrejti és megmutatja a tárgyasztalt a rácsával, például az alsó oldalról készülő képhez (csak a nézet) |
 | `layerling_set_section_view` | egy sík mentén felnyitja a nézetet, hogy belenézz (csak a nézet, semmi sem vágódik szét) |
 | `layerling_measurements` | megjeleníti vagy elrejti a mérőszalag méréseit, és felsorolja őket a hosszukkal, és elrejti vagy megjeleníti a kijelölés körüli méreteket, mint a [[Q]] |
+| `layerling_measure_angle` | szöget mér, mint a szögmérő: három pont csúcsánál vagy két sík lap között, és megmutatja a nézetben |
 | `layerling_saved_view` | elmenti az aktuális nézetet a 7, 8, 9 vagy 0 billentyű alá, és visszaállítja, mint a Shift+billentyű és a billentyű (csak a nézet); az új tervek indulási nézetét is beállítja |
 | `layerling_clear_history` | véglegesen töröl minden visszavonási lépést, ahogy az előzménynézet „Előzmények törlése” gombja; `confirm: true` kell hozzá |
 | `layerling_set_history_view` | visszatekint a projekt egy korábbi állapotára, mint az előzménynézet (a valódi terv érintetlen marad; a módosító eszközök várnak, amíg bezárul) |

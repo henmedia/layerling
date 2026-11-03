@@ -1,22 +1,42 @@
 [
   {
     "title": {
-      "de": "STEP-Baugruppen kommen als Bündel",
-      "en": "STEP assemblies come in as bundles"
+      "de": "KI wartet auf deine Notizen",
+      "en": "The AI waits for your notes"
     },
     "body": {
-      "de": "Eine STEP-Datei aus einem anderen CAD-Programm bringt jetzt ihre Baugruppen mit: Jede wird ein Bündel unter ihrem Namen, eine Baugruppe darin ein Bündel im Bündel. So blendest du eine ganze Baugruppe mit Strg+H aus oder verschiebst sie auf einmal.",
-      "en": "A STEP file from another CAD program now brings its assemblies along: each becomes a bundle under its name, an assembly inside it a bundle inside the bundle. So you hide a whole assembly with Ctrl+H or move it in one go."
+      "de": "Ein KI-Agent an der MCP-Brücke kann jetzt auf deine Notizen warten: Bitte ihn einmal darum, dann greift er jeden Auftrag auf, sobald du an einer Notiz „Für die KI“ ankreuzt, und antwortet am Modell.",
+      "en": "An AI agent on the MCP bridge can now wait for your notes: ask it once, and it picks up every request as soon as you tick For the AI on a note, and answers on the model."
     }
   },
   {
     "title": {
-      "de": "Vorschaubild in der .lyl-Datei",
-      "en": "A picture in the .lyl file"
+      "de": "Winkelmesser",
+      "en": "Protractor"
     },
     "body": {
-      "de": "Jede .lyl-Datei trägt jetzt das Bild deines Entwurfs, wie es seine Karte auf der Startseite zeigt. So können andere Programme, etwa eine Modellbibliothek oder der Dateimanager, eine Vorschau zeigen, ohne den Entwurf zu öffnen.",
-      "en": "Every .lyl file now carries the picture of your design, as its card on the start page shows it. Other programs, a library of models or a file manager, can show a preview without opening the design."
+      "de": "Neben dem Winkellineal misst der Winkelmesser jetzt Winkel: die Ecke und auf jedem Schenkel einen Punkt anklicken, oder zwei ebene Flächen. Er rastet an Ecken und Kanten ein und folgt den Körpern, wenn sie sich bewegen.",
+      "en": "Beside the framing square, the protractor now measures angles: click the corner and a point on each side, or two flat faces. It snaps to corners and edges and follows the bodies when they move."
+    }
+  },
+  {
+    "title": {
+      "de": "Verjüngung im Verhältnis",
+      "en": "Taper in proportion"
+    },
+    "body": {
+      "de": "Die Karte Verjüngung hat jetzt den Schalter Proportionen beibehalten: Länge und Breite desselben Endes ändern sich dann gemeinsam, ein quadratisches Oberteil bleibt quadratisch.",
+      "en": "The Taper card now has a Keep proportions switch: Length and Width of the same end then change together, so a square top stays square."
+    }
+  },
+  {
+    "title": {
+      "de": "Schnittmenge zeigt erst, was bleibt",
+      "en": "Intersection shows first what stays"
+    },
+    "body": {
+      "de": "Der erste Klick auf Schnittmenge zeigt das gemeinsame Stück grün, die Formen lassen sich noch verschieben; der zweite Klick wendet es an, Esc bricht ab. Der eigene Knopf „Gemeinsames Stück zeigen“ ist dafür weg, die Leiste ist einen Knopf schmaler.",
+      "en": "The first click on Intersection shows the common part in green, and the shapes can still be moved; the second click applies it, Esc cancels. The separate \"Show common part\" button is gone, so the bar is one button narrower."
     }
   }
 ]

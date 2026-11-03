@@ -4,6 +4,7 @@ import { mkdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, resolve as resolvePath } from "node:path";
 import { tools } from "./layerling-mcp-tools.mjs";
 import { isLocalBridgeUrl, openEditorAndWait } from "./layerling-mcp-open.mjs";
+import { createNotesSeen, notesWaitMs, waitForNotes } from "./layerling-mcp-notes-wait.mjs";
 
 const DEFAULT_BASE_URL = "http://127.0.0.1:3000";
 const MCP_ROUTE = "/api/layerling-mcp";
@@ -83,6 +84,9 @@ async function bridgeCommand(action, args = {}, defaultTimeoutMs = 15000) {
   }
   return payload.data;
 }
+
+// The requests layerling_wait_for_notes has handed over, and the notes the agent wrote itself (#1191).
+const notesSeen = createNotesSeen();
 
 async function callTool(name, args) {
   switch (name) {
@@ -214,10 +218,20 @@ async function callTool(name, args) {
       return bridgeCommand("remove_reference_points", args);
     case "layerling_list_notes":
       return bridgeCommand("list_notes", args);
-    case "layerling_add_note":
-      return bridgeCommand("add_note", args);
-    case "layerling_update_note":
-      return bridgeCommand("update_note", args);
+    case "layerling_wait_for_notes": {
+      const { seconds, ...target } = args || {};
+      return waitForNotes({ listNotes: () => bridgeCommand("list_notes", { ...target, onlyForAi: true }), seen: notesSeen, timeoutMs: notesWaitMs(seconds) });
+    }
+    case "layerling_add_note": {
+      const data = await bridgeCommand("add_note", args);
+      notesSeen.mark(data?.added);
+      return data;
+    }
+    case "layerling_update_note": {
+      const data = await bridgeCommand("update_note", args);
+      notesSeen.mark(data?.updated);
+      return data;
+    }
     case "layerling_remove_notes":
       return bridgeCommand("remove_notes", args);
     case "layerling_set_section_view":
@@ -230,6 +244,8 @@ async function callTool(name, args) {
       return bridgeCommand("show_workplane", args);
     case "layerling_measurements":
       return bridgeCommand("measurements", args);
+    case "layerling_measure_angle":
+      return bridgeCommand("measure_angle", args, 30000);
     case "layerling_saved_view":
       return bridgeCommand("saved_view", args);
     case "layerling_export_section_svg":

@@ -123,7 +123,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_offset_object` | odsuwa wszystkie ściany bryły na luz pasowania: powiększa lub zmniejsza ją albo dodaje powiększoną kopię jako otwór albo przesuwa tylko boki |
 | `layerling_list_faces` | wypisuje ściany dokładnej bryły |
 | `layerling_delete_faces` | usuwa ściany i zamyka lukę |
-| `layerling_array_objects` | powiela w rzędzie albo na okręgu |
+| `layerling_array_objects` | powiela w rzędzie, w siatce albo na okręgu |
 | `layerling_bundle_objects` | łączy obiekty w zestaw jak Ctrl+B: poruszają się razem, zachowują kolor i rodzaj, a w eksporcie wychodzą osobno |
 | `layerling_layer_text` | zmienia tekst w stos warstw do druku wielokolorowego (litery, szersze obrzeża, płytka bez otworów) albo buduje stos ponownie, z otworem na kółko do kluczy, narożnikami dla każdej warstwy i zaokrągloną lub sfazowaną krawędzią liter. Z listą imion jedna plakietka na imię |
 | `layerling_text_block` | tworzy blok tekstu: tekst staje się pierwszym z kilku wierszy, każdy osobnym tekstem pod poprzednim, wyrównanych do lewej, do środka lub do prawej, każdy wiersz tej samej wielkości lub mniejszy |
@@ -139,6 +139,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_list_reference_points` | wypisuje punkty odniesienia z identyfikatorami i pozycjami |
 | `layerling_remove_reference_points` | usuwa punkty odniesienia według identyfikatora albo wszystkie |
 | `layerling_list_notes` | czyta notatki użytkownika z ich tekstem, bryłą, do której każda jest przypięta, i informacją, czy to prośba do AI |
+| `layerling_wait_for_notes` | czeka, aż zaznaczysz {{ui:note.forAi}} przy notatce, i od razu przekazuje prośbę |
 | `layerling_add_note` | stawia notatkę na modelu, przypiętą do obiektu lub swobodnie na płycie |
 | `layerling_update_note` | zmienia notatkę lub na nią odpowiada; odpowiedź zamyka prośbę |
 | `layerling_remove_notes` | usuwa notatki według identyfikatora |
@@ -153,6 +154,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_show_workplane` | ukrywa i pokazuje płytę z siatką, na przykład do zdjęcia spodu (tylko widok) |
 | `layerling_set_section_view` | rozcina widok wzdłuż płaszczyzny, żeby zajrzeć do środka (tylko widok, nic nie jest cięte) |
 | `layerling_measurements` | pokazuje lub ukrywa pomiary narzędzia Zmierz i wypisuje je z ich długościami, oraz ukrywa lub pokazuje wymiary wokół zaznaczenia jak [[Q]] |
+| `layerling_measure_angle` | mierzy kąt jak kątomierz: w wierzchołku z trzech punktów lub między dwiema płaskimi ścianami, i pokazuje go w widoku |
 | `layerling_saved_view` | zapisuje bieżący widok pod klawiszem 7, 8, 9 lub 0 i do niego wraca, jak Shift+klawisz i sam klawisz (tylko widok); ustawia też widok startowy nowych projektów |
 | `layerling_clear_history` | usuwa na dobre wszystkie kroki cofania, tak jak przycisk „Usuń historię” w widoku historii. Wymaga `confirm: true` |
 | `layerling_set_history_view` | pokazuje wcześniejszy stan projektu, jak widok historii (prawdziwy projekt zostaje nietknięty, a narzędzia zmieniające czekają, aż widok zostanie zamknięty) |

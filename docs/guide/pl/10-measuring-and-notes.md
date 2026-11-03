@@ -46,6 +46,15 @@ Przy punkcie środkowym zielone liczby liczą do środka bryły, także w wysoko
 
 Zarówno narzędzie Zmierz, jak i kątownik zostają tam, gdzie są, gdy szkicujesz i wracasz do widoku 3D. Żadne z nich nie trafia do historii. Kątownik jest zapisywany z projektem, tak samo jak pomiary narzędzia Zmierz, w przeglądarce i w pliku .lyl: po otwarciu projektu znowu tam są. Przycisk z okiem wśród przycisków narzędzia Zmierz ukrywa wszystkie pomiary i znowu je pokazuje; zapisywane jest też to, czy są ukryte, a dodanie, przesunięcie lub usunięcie pomiaru najpierw je pokazuje.
 
+## Kątomierz
+
+Kliknij {{ui:camera.protractor}} na pasku widoku, aby zmierzyć kąt. Obok otworzy się rząd przycisków i dopóki nie klikniesz przycisku ponownie albo nie naciśniesz [[Esc]], każde kliknięcie w widoku mierzy kątomierzem. Podobnie jak narzędzie Zmierz przyciąga się do narożników i krawędzi brył; obok brył stawia punkt na płycie.
+
+- {{ui:camera.protractorPoints}}: najpierw kliknij wierzchołek kąta, potem punkt na każdym ramieniu. Podczas stawiania ostatniego punktu kąt już widać; po trzecim kliknięciu zostaje, z łukiem między ramionami. To kąt w wierzchołku, od 0° do 180°.
+- {{ui:camera.protractorFaces}}: kliknij dwie płaskie ściany. Krótka niebieska kreska na każdej pokazuje, w którą stronę jest zwrócona, a etykieta podaje oba kąty, jakie tworzą ściany, najpierw mniejszy: fazka 45° względem góry daje 45° · 135°, dwa boki prostopadłościanu tylko 90°. Zakrzywiona ściana nie ma jednego kierunku, dlatego kątomierz prosi o płaską.
+
+Następne kliknięcie po gotowym kącie zaczyna nowy, a {{ui:camera.protractorClear}} go usuwa. Kąt podąża za bryłami, gdy się je przesuwa lub obraca. Nic z niego nie jest zapisywane ani nie trafia do historii: znika, gdy odłożysz kątomierz.
+
 ## Odległości od początku układu i podczas przesuwania
 
 W ustawieniach w sekcji {{ui:workspace.appearance}} są dwa przełączniki wymiarów na żywo:
@@ -59,7 +68,7 @@ Jeśli na chwilę przeszkadzają, naciśnij [[Q]]: wymiary i odległości wokó�
 
 ## Sprawdzanie luzu
 
-Części, które po druku mają się ruszać - smok flexi, zawias drukowany w całości, pudełko z pokrywką, oś w otworze - potrzebują luzu między sobą. Za mały i sklejają się; jeśli nachodzą na siebie, drukują się jako jeden kawałek. {{ui:editor.tool.clearance}} obok {{ui:editor.tool.intersectPreview}} sprawdza to przed drukiem. Bierze zaznaczone obiekty albo, gdy nic nie jest zaznaczone, wszystkie widoczne (te same, które bierze eksport), i sprawdza każdą parę:
+Części, które po druku mają się ruszać - smok flexi, zawias drukowany w całości, pudełko z pokrywką, oś w otworze - potrzebują luzu między sobą. Za mały i sklejają się; jeśli nachodzą na siebie, drukują się jako jeden kawałek. {{ui:editor.tool.clearance}} obok {{ui:editor.tool.loftSketches}} sprawdza to przed drukiem. Bierze zaznaczone obiekty albo, gdy nic nie jest zaznaczone, wszystkie widoczne (te same, które bierze eksport), i sprawdza każdą parę:
 
 - **{{ui:clearance.kind.overlap}}** (czerwony): obie części mają wspólną objętość. Widać ją na czerwono wewnątrz brył, które stają się przezroczyste, a lista podaje jej wielkość.
 - **{{ui:clearance.kind.touching}}** (czerwony): stykają się i zleją się podczas druku.
@@ -81,7 +90,7 @@ Notatka zapisuje to, czego geometria nie mówi: „Ta śruba jest o 0,3 mm za ci
 - Jeśli umieścisz notatkę **na bryle**, porusza się razem z nią.
 - Jeśli umieścisz ją **obok**, zostaje na płaszczyźnie roboczej ({{ui:note.free}}).
 - {{ui:note.detach}} odpina przypiętą notatkę od bryły.
-- {{ui:note.forAi}} zamienia notatkę w prośbę do agenta AI na moście MCP (zob. „AI z MCP”): agent czyta ją przez `layerling_list_notes`, wykonuje pracę i odpowiada w tej samej notatce, pod twoim tekstem. Może też stawiać na modelu własne notatki, żeby w jakimś miejscu o coś zapytać lub coś zgłosić.
+- {{ui:note.forAi}} zamienia notatkę w prośbę do agenta AI na moście MCP (zob. „AI z MCP”): agent czyta ją przez `layerling_list_notes`, wykonuje pracę i odpowiada w tej samej notatce, pod twoim tekstem. Może też stawiać na modelu własne notatki, żeby w jakimś miejscu o coś zapytać lub coś zgłosić. Poproś agenta, by pilnował twoich notatek, a będzie na nie czekał za pomocą `layerling_wait_for_notes`: wtedy pracujesz już tylko na modelu, a każda nowa prośba zostaje podjęta, gdy tylko zaznaczysz pole, bez wracania do okna agenta.
 - {{ui:editor.tool.group}} zabiera przypiętą notatkę do grupy; {{ui:editor.tool.ungroup}} przekazuje ją widocznej części pod nią, także grupie w środku. Dopóki grupa jest otwarta przez {{ui:group.edit}}, jej notatki poruszają się z częścią pod nimi i wracają do grupy po {{ui:group.done}}; anulowanie przywraca je do stanu sprzed edycji.
 - Gdy jej bryła zostanie usunięta albo pod nią nie ma już widocznej bryły, notatka zostaje tam, gdzie stała, na płaszczyźnie roboczej.
 - Przeciągnięcie pinezki przesuwa notatkę. Kliknięcie pinezki zwija kartę, zostaje tylko mały numer; kolejne kliknięcie znów ją rozwija. Kliknięcie w tekst pozwala go edytować.

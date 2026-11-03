@@ -44,6 +44,15 @@ V režimu středu vedou zelené rozměry do středu tělesa, včetně výšky. S
 
 Měřicí nástroj i úhelník zůstávají na místě při přechodu do náčrtu a zpět do 3D. Ani jeden se neukládá do historie. Úhelník se s projektem ukládá, stejně jako měření měřicího nástroje, v prohlížeči i v souboru .lyl: po otevření projektu jsou zase tam. Tlačítko s okem mezi tlačítky měřicího nástroje všechna měření skryje a znovu zobrazí; uloží se i to, zda jsou skrytá, a kdo měření přidá, posune nebo smaže, uvidí je předtím znovu.
 
+## Úhloměr
+
+Úhel změříte tlačítkem {{ui:camera.protractor}} v liště pohledu. Vedle něj se otevře řada tlačítek, a dokud na tlačítko znovu nekliknete nebo nestisknete [[Esc]], měří každé kliknutí do pohledu úhloměrem. Stejně jako měření vzdáleností se přichytává k rohům a hranám těles; vedle těles položí bod na podložku.
+
+- {{ui:camera.protractorPoints}}: nejprve klikněte na vrchol úhlu, pak na bod na každém rameni. Už při umisťování posledního bodu se úhel zobrazuje; po třetím kliknutí zůstane, s obloukem mezi rameny. Je to úhel ve vrcholu, od 0° do 180°.
+- {{ui:camera.protractorFaces}}: klikněte na dvě rovné plochy. Krátká modrá čárka na každé ukazuje, kam plocha směřuje, a popisek uvádí oba úhly, které plochy svírají, menší jako první: zkosení 45° proti horní ploše dá 45° · 135°, dvě stěny kvádru jen 90°. Zakřivená plocha nemá jediný směr, proto úhloměr žádá rovnou plochu.
+
+Další kliknutí po hotovém úhlu začne nový a {{ui:camera.protractorClear}} jej odstraní. Úhel sleduje tělesa, když je posunete nebo otočíte. Nic z něj se neukládá ani nejde do historie: zmizí, jakmile úhloměr odložíte.
+
 ## Vzdálenosti od počátku a při přesouvání
 
 V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného kótování:
@@ -57,7 +66,7 @@ Když na chvíli překážejí, stiskněte [[Q]]: rozměry a vzdálenosti kolem 
 
 ## Kontrola vůle
 
-Díly, které se mají po tisku pohybovat - flexi drak, pant tištěný vcelku, krabička s víkem, osa v otvoru - potřebují mezi sebou mezeru. Když je příliš malá, slepí se; když se překrývají, vytisknou se jako jeden kus. {{ui:editor.tool.clearance}} vedle {{ui:editor.tool.intersectPreview}} to zkontroluje před tiskem. Vezme vybrané objekty, nebo všechny viditelné, když není nic vybráno (tytéž, které bere export), a zkontroluje každou dvojici:
+Díly, které se mají po tisku pohybovat - flexi drak, pant tištěný vcelku, krabička s víkem, osa v otvoru - potřebují mezi sebou mezeru. Když je příliš malá, slepí se; když se překrývají, vytisknou se jako jeden kus. {{ui:editor.tool.clearance}} vedle {{ui:editor.tool.loftSketches}} to zkontroluje před tiskem. Vezme vybrané objekty, nebo všechny viditelné, když není nic vybráno (tytéž, které bere export), a zkontroluje každou dvojici:
 
 - **{{ui:clearance.kind.overlap}}** (červeně): oba díly sdílejí objem. Ten se ukáže červeně uvnitř těles, která zprůhlední, a seznam uvede jeho velikost.
 - **{{ui:clearance.kind.touching}}** (červeně): díly se dotýkají a při tisku se spojí.
@@ -79,7 +88,7 @@ Poznámka zachytí informace, které geometrie nevyjadřuje: „Šroub je o 0,3 
 - Poznámka umístěná **na těleso** se pohybuje spolu s ním.
 - Poznámka **vedle tělesa** zůstává na pracovní rovině, {{ui:note.free}}.
 - {{ui:note.detach}} odpojí poznámku od tělesa.
-- {{ui:note.forAi}} změní poznámku v zadání pro AI agenta na mostu MCP (viz „AI s MCP“): agent ji přečte přes `layerling_list_notes`, udělá práci a odpoví ve stejné poznámce, pod tvým textem. Může také na model dávat vlastní poznámky, aby se na místě na něco zeptal nebo něco ohlásil.
+- {{ui:note.forAi}} změní poznámku v zadání pro AI agenta na mostu MCP (viz „AI s MCP“): agent ji přečte přes `layerling_list_notes`, udělá práci a odpoví ve stejné poznámce, pod tvým textem. Může také na model dávat vlastní poznámky, aby se na místě na něco zeptal nebo něco ohlásil. Požádejte agenta, aby hlídal vaše poznámky, a bude na ně čekat pomocí `layerling_wait_for_notes`: pak pracujete jen na modelu a každý nový požadavek se převezme, jakmile políčko zaškrtnete, bez návratu do okna agenta.
 - {{ui:editor.tool.group}} vezme připojenou poznámku do skupiny; {{ui:editor.tool.ungroup}} ji předá viditelné části pod ní, i vnořené skupině. Dokud je skupina otevřená přes {{ui:group.edit}}, její poznámky se pohybují s částí pod nimi a tlačítkem {{ui:group.done}} se vrátí ke skupině; zrušení je vrátí do původního stavu.
 - Když je její těleso smazáno nebo pod ní už není žádné viditelné těleso, poznámka zůstane, kde byla, na pracovní rovině.
 - Tažením za špendlík poznámku přesunete. Kliknutím na špendlík kartu sbalíte, zůstane jen malé číslo; dalším kliknutím ji zase otevřete. Kliknutím do textu ho upravíte.

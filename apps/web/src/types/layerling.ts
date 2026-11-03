@@ -957,6 +957,8 @@ export type WorkplaneShape = {
   /** Legacy local-dev taper fields kept for compatibility with in-progress projects. */
   taperTopScale?: number;
   taperBottomScale?: number;
+  /** Keep proportions in the Taper card (#1229): Length and Width of one end change together. */
+  taperKeepProportions?: boolean;
   /** Rotates the top face relative to the base, in degrees, for a twisted extrusion. */
   extrudeTwist?: number;
   /** Shifts the top face along the shape's local X axis, in mm. */

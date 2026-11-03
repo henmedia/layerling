@@ -46,6 +46,15 @@ With the midpoint, the green numbers count to the middle of the body, in height 
 
 Both the tape measure and the framing square stay where they are while you sketch and come back to the 3D view. Neither is in the history. The framing square is kept with the design, and so are the measurements of the tape measure, in the browser and in the .lyl file: they are there again when you open the design. The eye button among the tape measure's buttons hides all measurements and shows them again; whether they are hidden is kept as well, and adding, moving or deleting a measurement shows them first.
 
+## The protractor
+
+Click {{ui:camera.protractor}} in the view bar to measure an angle. A row of buttons opens beside it, and until you click the button again or press [[Esc]], a click in the view measures with the protractor. Like the tape measure, it snaps to the corners and edges of bodies; beside the bodies it sets a point on the plate.
+
+- {{ui:camera.protractorPoints}}: click the corner of the angle first, then a point on each side. While you place the last point, the angle shows already; after the third click it stays, with an arc between the sides. It is the angle at the corner, from 0° to 180°.
+- {{ui:camera.protractorFaces}}: click two flat faces. A short blue line on each shows which way it faces, and the label gives both angles the faces make, the smaller first: a 45° chamfer against the top reads 45° · 135°, two sides of a box just 90°. A curved face has no single direction, so the protractor asks for a flat one.
+
+The next click after a finished angle starts a new one, and {{ui:camera.protractorClear}} removes it. The angle follows the bodies when they move or turn. Nothing of it is saved or goes into the history: it is gone when you put the protractor away.
+
 ## Distances to the origin and while moving
 
 In the settings under {{ui:workspace.appearance}} there are two switches for live dimensions:
@@ -59,7 +68,7 @@ For a moment without them, press [[Q]]: the sizes and distances around the selec
 
 ## Checking clearance
 
-Parts that should move after printing - a flexi dragon, a hinge printed in place, a box and its lid, an axle in its bore - need a gap between them. Too little, and they stick together; overlapping, they print as one piece. {{ui:editor.tool.clearance}}, next to {{ui:editor.tool.intersectPreview}}, checks that before you print. It takes the selected objects, or every visible object when nothing is selected (the same ones an export takes), and checks each pair:
+Parts that should move after printing - a flexi dragon, a hinge printed in place, a box and its lid, an axle in its bore - need a gap between them. Too little, and they stick together; overlapping, they print as one piece. {{ui:editor.tool.clearance}}, next to {{ui:editor.tool.loftSketches}}, checks that before you print. It takes the selected objects, or every visible object when nothing is selected (the same ones an export takes), and checks each pair:
 
 - **{{ui:clearance.kind.overlap}}** (red): the two share a volume. It shows red inside the bodies, which turn see-through, and the list says how large it is.
 - **{{ui:clearance.kind.touching}}** (red): they touch and fuse when printed.
@@ -81,7 +90,7 @@ A note records what the geometry does not say: "This screw is 0.3 mm too tight",
 - If you place the note **on a body**, it travels with it.
 - If you place it **beside**, it stays on the workplane ({{ui:note.free}}).
 - {{ui:note.detach}} releases an attached note from the body.
-- {{ui:note.forAi}} turns a note into a request for an AI agent on the MCP bridge (see "AI with MCP"): the agent reads it with `layerling_list_notes`, does the work and answers in the same note, under your text. It can also put notes of its own on the model, to ask or report something at a spot.
+- {{ui:note.forAi}} turns a note into a request for an AI agent on the MCP bridge (see "AI with MCP"): the agent reads it with `layerling_list_notes`, does the work and answers in the same note, under your text. It can also put notes of its own on the model, to ask or report something at a spot. Ask the agent to watch your notes, and it waits for them with `layerling_wait_for_notes`: you then only work on the model, and every new request is picked up as soon as you tick the box, without going back to the agent's window.
 - {{ui:editor.tool.group}} takes an attached note into the group; {{ui:editor.tool.ungroup}} hands it to the visible part under it, a group inside included. While a group is open with {{ui:group.edit}}, its notes move with the part under them and go back to the group with {{ui:group.done}}; cancelling puts them back as they were.
 - If its body is deleted, or no visible body is under it any more, the note stays where it stood, on the workplane.
 - Dragging the pin moves the note. A click on the pin folds the card away, only the small number stays; another click opens it again. A click into the text edits it.

@@ -1241,19 +1241,20 @@ export const tools = [
   },
   {
     name: "layerling_array_objects",
-    description: "Repeat objects n times in a row or around a circle - hole rows, hole grids, bolt circles, the teeth of a ring - like the editor's Pattern tool. `count` includes the originals. Coordinates are as in a slicer: X to the right, Y to the back, Z up. A row steps `spacing` millimetres along `direction` (negative runs the other way), or along several axes at once with `spacingX`, `spacingY` and `spacingZ` (a diagonal row, a staircase; give any of them and the others count as 0). With `fitAxis` a row is spread evenly over a body instead - holes along a plate: the last piece ends as far from the body's far end as the original stands from its nearer one, and `edgeGap` sets that gap first. A circle turns about the vertical axis through (`centerX`, `centerY`) over `angle` degrees: 360 (default) spreads the pieces evenly, a smaller angle puts the first and last piece on its ends; positive runs counter-clockwise seen from above. `rise` lifts every copy that many millimetres more than the one before (a screw, an ascending spiral) and `radiusChange` moves it that far further from the centre (negative: closer) for a flat or conical spiral. `rotateCopies` (default true) turns each copy with the circle. The copies are added as one undo step and returned with their ids; the originals stay where they are, unless `edgeGap` moves them. A circle leaves its centre as the pieces' pivot (their selection's, or the group's with `group: true`), halfway up the pieces, and returns it as `pivot` (X, Y, Z), so another part can be aligned to the true centre rather than the middle of the pieces' box.",
+    description: "Repeat objects n times in a row, in a grid or around a circle - hole rows, hole grids, bolt circles, the teeth of a ring - like the editor's Pattern tool. `count` includes the originals. Coordinates are as in a slicer: X to the right, Y to the back, Z up. A row steps `spacing` millimetres along `direction` (negative runs the other way), or along several axes at once with `spacingX`, `spacingY` and `spacingZ` (a diagonal row, a staircase; give any of them and the others count as 0). A grid lays `count` columns along X, `spacingX` apart, and `rows` rows along Y, `spacingY` apart (negative runs to the left or the front; left out, the pieces' size plus 5 mm). Each can be 1, for a single line along Y or X; columns times rows is at most 100, past that the rows are cut back. The answer's `grid` gives the columns and rows made, with `capped: true` when the rows were cut. With `fitAxis` a row is spread evenly over a body instead - holes along a plate: the last piece ends as far from the body's far end as the original stands from its nearer one, and `edgeGap` sets that gap first. A circle turns about the vertical axis through (`centerX`, `centerY`) over `angle` degrees: 360 (default) spreads the pieces evenly, a smaller angle puts the first and last piece on its ends; positive runs counter-clockwise seen from above. `rise` lifts every copy that many millimetres more than the one before (a screw, an ascending spiral) and `radiusChange` moves it that far further from the centre (negative: closer) for a flat or conical spiral. `rotateCopies` (default true) turns each copy with the circle. The copies are added as one undo step and returned with their ids; the originals stay where they are, unless `edgeGap` moves them. A circle leaves its centre as the pieces' pivot (their selection's, or the group's with `group: true`), halfway up the pieces, and returns it as `pivot` (X, Y, Z), so another part can be aligned to the true centre rather than the middle of the pieces' box.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["mode", "count"],
       properties: {
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" }, description: "Objects to repeat; the current selection when omitted." },
-        mode: { type: "string", enum: ["row", "circle"] },
-        count: { type: "number", description: "Pieces including the originals, 2 to 100." },
+        mode: { type: "string", enum: ["row", "grid", "circle"] },
+        count: { type: "number", description: "Pieces including the originals, 2 to 100. Grid: the columns along X, 1 to 100." },
+        rows: { type: "number", description: "Grid: rows along Y including the originals' row, 1 to 100, default 1." },
         spacing: { type: "number", description: "Row: centre-to-centre distance in millimetres." },
         direction: { type: "string", enum: ["x", "y", "z"], description: "Row: axis to step along (z is up). Used with `spacing`." },
-        spacingX: { type: "number", description: "Row: step along X in millimetres per copy. With spacingY / spacingZ the row runs along several axes at once." },
-        spacingY: { type: "number", description: "Row: step along Y (towards the back) in millimetres per copy." },
+        spacingX: { type: "number", description: "Row: step along X in millimetres per copy. With spacingY / spacingZ the row runs along several axes at once. Grid: from column to column." },
+        spacingY: { type: "number", description: "Row: step along Y (towards the back) in millimetres per copy. Grid: from row to row." },
         spacingZ: { type: "number", description: "Row: step along Z (up) in millimetres per copy." },
         angle: { type: "number", description: "Circle: total angle in degrees, default 360." },
         centerX: { type: "number", description: "Circle: centre X in millimetres, default 0." },
@@ -1625,6 +1626,17 @@ export const tools = [
     },
   },
   {
+    name: "layerling_wait_for_notes",
+    description: "Wait until the user puts a request on the model: a note ticked For the AI that you have not had yet, or one the user changed since. Returns as soon as there is one, with the notes as layerling_list_notes gives them, or after the time is up with notes empty and timedOut true. Use it when the user asks you to watch their notes: do the work each request asks for, answer it with layerling_update_note, then call this again, so the user only has to work on the model. A request is handed over once; what you write into a note yourself counts as seen, so a note you keep open with a question comes back only when the user changes it.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        seconds: { type: "number", minimum: 1, maximum: 600, description: "How long to wait at most, in seconds. Default 50, which stays under the time most clients give a tool call; raise it only if your client waits longer." },
+      },
+    },
+  },
+  {
     name: "layerling_add_note",
     description: "Put a note on the model, to answer or ask something at a spot, for example \"hole placed here, 15 mm deep. Is that right?\". Pin it to an object with objectId (at its top face's middle unless at says where), or put it free on the plate with at. The note shows as a numbered pin the user can open; it is saved with the design, never printed or exported, and undo takes it back. Returns the note. Leave forAi out for an answer or a remark to the user; set it only to leave a request that an agent should pick up later.",
     inputSchema: {
@@ -1695,6 +1707,39 @@ export const tools = [
         ...editorTargetSchema.properties,
         visible: { type: "boolean", description: "true shows the measurements, false hides them. Left out they stay as they are." },
         dimensions: { type: "boolean", description: "false hides the sizes and distances around the selection (key Q), true shows them again. Left out they stay as they are." },
+      },
+    },
+  },
+  {
+    name: "layerling_measure_angle",
+    description: "Measure an angle with the editor's protractor. points: three points in world coordinates (y up, as layerling_list_faces and layerling_list_edges give them), the corner first and then one point on each side; the answer is the angle at the corner, 0 to 180 degrees. faces: two flat faces, each { id, faceId } with a face id from layerling_list_faces; the answer is angle, the smaller of the two angles the planes make (0 to 90, what a chamfer or a slope is called by), and other, the one beside it (180 minus angle): a 45 degree chamfer against the top gives 45 and 135, two sides of a box 90, parallel faces 0. A round face has no normal and is refused. text is what the editor shows. show (default true) draws the angle in the view, with the protractor open, as if it had been clicked; measured faces follow their bodies when they move. Nothing is saved and nothing goes into the undo history. clear true puts the protractor away with its measurement. Combine with layerling_capture_image to see it.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        points: {
+          type: "array",
+          minItems: 3,
+          maxItems: 3,
+          items: { type: "array", minItems: 3, maxItems: 3, items: { type: "number" } },
+          description: "Three [x, y, z] points in world coordinates (y up): the corner first, then one point on each side.",
+        },
+        faces: {
+          type: "array",
+          minItems: 2,
+          maxItems: 2,
+          items: {
+            type: "object",
+            required: ["id", "faceId"],
+            properties: {
+              id: { type: "string", description: "The object the face belongs to." },
+              faceId: { type: "integer", description: "A flat face's id from layerling_list_faces." },
+            },
+          },
+          description: "Two flat faces to measure between.",
+        },
+        show: { type: "boolean", description: "false only measures and leaves the view as it is. Default true." },
+        clear: { type: "boolean", description: "true puts the protractor away with its measurement; nothing else is needed." },
       },
     },
   },

@@ -159,6 +159,7 @@ export type LayerlingMcpCommandName =
   | "show_workplane"
   | "saved_view"
   | "measurements"
+  | "measure_angle"
   | "export_section_svg"
   | "sketch_from_section"
   | "export_drawing"

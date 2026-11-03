@@ -44,6 +44,15 @@ Középpontnál a zöld számok a test közepéig számolnak, magasságban is. �
 
 A mérőszalag és a derékszögvonalzó is a helyén marad, amíg vázlatot készítesz, és visszatér a 3D nézetbe. Egyik sem kerül az előzményekbe. A derékszögvonalzó a tervvel együtt mentődik, és a mérőszalag mérései is, a böngészőben és a .lyl fájlban: a terv megnyitásakor újra ott vannak. A mérőszalag gombjai közötti szem gomb elrejti az összes mérést, és újra megmutatja őket; az is mentődik, hogy el vannak-e rejtve, és mérés felvétele, mozgatása vagy törlése előtt újra megjelennek.
 
+## A szögmérő
+
+Szöget a nézetsáv {{ui:camera.protractor}} gombjával mérsz. Mellette gombsor nyílik, és amíg újra rá nem kattintasz a gombra, vagy meg nem nyomod az [[Esc]] billentyűt, a nézetbe kattintva a szögmérővel mérsz. A mérőszalaghoz hasonlóan a testek sarkaihoz és éleihez illeszkedik; a testek mellett pontot tesz a lapra.
+
+- {{ui:camera.protractorPoints}}: először a szög csúcsára kattints, aztán mindkét szárán egy-egy pontra. Az utolsó pont elhelyezése közben a szög már látszik; a harmadik kattintás után megmarad, a szárak közti ívvel. Ez a csúcsnál lévő szög, 0° és 180° között.
+- {{ui:camera.protractorFaces}}: kattints két sík lapra. Mindegyiken egy rövid kék vonal mutatja, merre néz, a felirat pedig mindkét szöget megadja, amelyet a lapok bezárnak, a kisebbet elöl: egy 45°-os letörés a felső laphoz képest 45° · 135°, egy hasáb két oldala csak 90°. Egy ívelt lapnak nincs egyetlen iránya, ezért a szögmérő sík lapot kér.
+
+Egy kész szög utáni következő kattintás újat kezd, a {{ui:camera.protractorClear}} pedig eltávolítja. A szög követi a testeket, ha elmozdulnak vagy elfordulnak. Semmi sem mentődik belőle, és az előzményekbe sem kerül: eltűnik, amikor elteszed a szögmérőt.
+
 ## Távolságok az origótól és mozgatás közben
 
 A beállításokban a {{ui:workspace.appearance}} alatt két kapcsoló van az élő méretekhez:
@@ -57,7 +66,7 @@ Ha egy pillanatra zavarnak, nyomd meg a [[Q]] billentyűt: a kijelölés körül
 
 ## Hézag ellenőrzése
 
-Azoknak az alkatrészeknek, amelyeknek nyomtatás után mozogniuk kell - egy flexi sárkány, egy egyben nyomtatott zsanér, egy doboz a fedelével, egy tengely a furatában -, hézag kell egymás között. Ha túl kicsi, összeragadnak; ha átfedik egymást, egy darabként nyomtatódnak ki. A {{ui:editor.tool.clearance}} a {{ui:editor.tool.intersectPreview}} mellett ezt nyomtatás előtt ellenőrzi. A kijelölt objektumokat veszi, vagy ha nincs kijelölés, az összes láthatót (ugyanazokat, mint egy exportálás), és minden párt ellenőriz:
+Azoknak az alkatrészeknek, amelyeknek nyomtatás után mozogniuk kell - egy flexi sárkány, egy egyben nyomtatott zsanér, egy doboz a fedelével, egy tengely a furatában -, hézag kell egymás között. Ha túl kicsi, összeragadnak; ha átfedik egymást, egy darabként nyomtatódnak ki. A {{ui:editor.tool.clearance}} az {{ui:editor.tool.loftSketches}} mellett ezt nyomtatás előtt ellenőrzi. A kijelölt objektumokat veszi, vagy ha nincs kijelölés, az összes láthatót (ugyanazokat, mint egy exportálás), és minden párt ellenőriz:
 
 - **{{ui:clearance.kind.overlap}}** (piros): a kettőnek közös térfogata van. Ez pirosan látszik a testek belsejében, amelyek átlátszóvá válnak, és a lista megadja a méretét.
 - **{{ui:clearance.kind.touching}}** (piros): összeérnek, és nyomtatáskor összeolvadnak.
@@ -79,7 +88,7 @@ Egy jegyzet azt rögzíti, amit a geometria nem mond el: „Ez a csavar 0,3 mm-r
 - Ha a jegyzetet **egy testre** teszed, vele együtt utazik.
 - Ha **mellé** teszed, a munkasíkon marad ({{ui:note.free}}).
 - A {{ui:note.detach}} leválasztja a testről a hozzá csatolt jegyzetet.
-- A {{ui:note.forAi}} a jegyzetből kérést csinál egy MI-ügynöknek az MCP-hídon (lásd „MI az MCP-vel”): az ügynök a `layerling_list_notes` segítségével elolvassa, elvégzi a munkát, és ugyanabban a jegyzetben, a szöveged alatt válaszol. Saját jegyzeteket is tehet a modellre, hogy egy helyen kérdezzen vagy jelentsen valamit.
+- A {{ui:note.forAi}} a jegyzetből kérést csinál egy MI-ügynöknek az MCP-hídon (lásd „MI az MCP-vel”): az ügynök a `layerling_list_notes` segítségével elolvassa, elvégzi a munkát, és ugyanabban a jegyzetben, a szöveged alatt válaszol. Saját jegyzeteket is tehet a modellre, hogy egy helyen kérdezzen vagy jelentsen valamit. Kérd meg az ügynököt, hogy figyelje a jegyzeteidet, és `layerling_wait_for_notes` segítségével várja őket: ezután csak a modellen dolgozol, és minden új kérést azonnal felvesz, amint bejelölöd a négyzetet, anélkül hogy visszamennél az ügynök ablakába.
 - A {{ui:editor.tool.group}} a csatolt jegyzetet is beviszi a csoportba; a {{ui:editor.tool.ungroup}} az alatta lévő látható részhez adja tovább, akár egy belső csoporthoz is. Amíg egy csoport a {{ui:group.edit}} gombbal nyitva van, a jegyzetei az alattuk lévő résszel együtt mozognak, és a {{ui:group.done}} gombbal visszakerülnek a csoporthoz; a megszakítás visszaállítja őket az eredeti állapotukba.
 - Ha a testét törlöd, vagy már nincs alatta látható test, a jegyzet ott marad, ahol volt, a munkasíkon.
 - A tűt húzva a jegyzet elmozdul. Egy kattintás a tűre összecsukja a kártyát, csak a kis szám marad; egy újabb kattintás újra kinyitja. A szövegbe kattintva szerkesztheted.

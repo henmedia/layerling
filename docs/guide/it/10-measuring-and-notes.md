@@ -46,6 +46,15 @@ Usando il punto medio, i numeri verdi misurano fino al centro del corpo, anche i
 
 Il metro a nastro e la squadra restano al loro posto mentre lavori nello schizzo e ricompaiono quando torni alla vista 3D. Nessuno dei due entra nella cronologia. La squadra viene salvata con il progetto, e così le misurazioni del metro a nastro, nel browser e nel file .lyl: quando apri il progetto sono di nuovo al loro posto. Il pulsante con l’occhio tra i pulsanti del metro a nastro nasconde tutte le misurazioni e le mostra di nuovo; viene salvato anche se sono nascoste, e aggiungere, spostare o eliminare una misurazione le mostra prima.
 
+## Il goniometro
+
+Fai clic su {{ui:camera.protractor}} nella barra della vista per misurare un angolo. Accanto si apre una fila di pulsanti e, finché non fai di nuovo clic sul pulsante o premi [[Esc]], ogni clic nella vista misura con il goniometro. Come il metro, si aggancia a vertici e spigoli dei corpi; accanto ai corpi mette un punto sul piano.
+
+- {{ui:camera.protractorPoints}}: fai clic prima sul vertice dell'angolo, poi su un punto di ciascun lato. Mentre posizioni l'ultimo punto l'angolo è già visibile; dopo il terzo clic resta, con un arco tra i lati. È l'angolo al vertice, da 0° a 180°.
+- {{ui:camera.protractorFaces}}: fai clic su due facce piane. Un breve tratto blu su ciascuna mostra verso dove è rivolta, e l'etichetta riporta entrambi gli angoli che formano le facce, prima il minore: uno smusso di 45° rispetto alla faccia superiore dà 45° · 135°, due lati di un parallelepipedo solo 90°. Una faccia curva non ha un'unica direzione, quindi il goniometro ne chiede una piana.
+
+Il clic successivo a un angolo completato ne inizia uno nuovo, e {{ui:camera.protractorClear}} lo rimuove. L'angolo segue i corpi quando vengono spostati o ruotati. Nulla viene salvato né entra nella cronologia: sparisce quando chiudi il goniometro.
+
 ## Distanze dall’origine e durante lo spostamento
 
 Nelle impostazioni, sotto {{ui:workspace.appearance}}, trovi due interruttori per visualizzare le misure in tempo reale:
@@ -59,7 +68,7 @@ Se per un momento danno fastidio, premi [[Q]]: le misure e le distanze attorno a
 
 ## Controllare il gioco
 
-Le parti che devono muoversi dopo la stampa - un drago flexi, una cerniera stampata già montata, una scatola con il suo coperchio, un perno nel suo foro - hanno bisogno di gioco tra loro. Se è troppo poco si incollano; se si sovrappongono, vengono stampate come un pezzo unico. {{ui:editor.tool.clearance}}, accanto a {{ui:editor.tool.intersectPreview}}, lo controlla prima della stampa. Prende gli oggetti selezionati o, se non è selezionato nulla, tutti quelli visibili (gli stessi di un'esportazione) e controlla ogni coppia:
+Le parti che devono muoversi dopo la stampa - un drago flexi, una cerniera stampata già montata, una scatola con il suo coperchio, un perno nel suo foro - hanno bisogno di gioco tra loro. Se è troppo poco si incollano; se si sovrappongono, vengono stampate come un pezzo unico. {{ui:editor.tool.clearance}}, accanto a {{ui:editor.tool.loftSketches}}, lo controlla prima della stampa. Prende gli oggetti selezionati o, se non è selezionato nulla, tutti quelli visibili (gli stessi di un'esportazione) e controlla ogni coppia:
 
 - **{{ui:clearance.kind.overlap}}** (rosso): le due parti condividono un volume. Appare in rosso dentro i corpi, che diventano trasparenti, e l'elenco ne indica la grandezza.
 - **{{ui:clearance.kind.touching}}** (rosso): si toccano e si fondono in stampa.
@@ -81,7 +90,7 @@ Una nota registra informazioni che la geometria non può esprimere: “Questa vi
 - Se posizioni la nota **su un corpo**, si sposta insieme a esso.
 - Se la posizioni **accanto a un corpo**, resta sul piano di lavoro ({{ui:note.free}}).
 - {{ui:note.detach}} stacca dal corpo una nota associata.
-- {{ui:note.forAi}} trasforma una nota in una richiesta per un agente IA sul ponte MCP (vedi «IA con MCP»): l'agente la legge con `layerling_list_notes`, fa il lavoro e risponde nella stessa nota, sotto il tuo testo. Può anche mettere sul modello note proprie, per chiedere o segnalare qualcosa in un punto.
+- {{ui:note.forAi}} trasforma una nota in una richiesta per un agente IA sul ponte MCP (vedi «IA con MCP»): l'agente la legge con `layerling_list_notes`, fa il lavoro e risponde nella stessa nota, sotto il tuo testo. Può anche mettere sul modello note proprie, per chiedere o segnalare qualcosa in un punto. Chiedi all'agente di tenere d'occhio le tue note e le attenderà con `layerling_wait_for_notes`: così lavori solo sul modello, e ogni nuova richiesta viene presa appena spunti la casella, senza tornare alla finestra dell'agente.
 - {{ui:editor.tool.group}} include nel gruppo una nota associata; {{ui:editor.tool.ungroup}} la assegna alla parte visibile sottostante, anche se si trova in un gruppo interno. Mentre modifichi un gruppo con {{ui:group.edit}}, le sue note si spostano insieme alle parti a cui sono associate e tornano nel gruppo con {{ui:group.done}}; annullando la modifica, tornano alla posizione originale.
 - Se il corpo viene eliminato, o se sotto la nota non resta più alcun corpo visibile, la nota rimane nella stessa posizione sul piano di lavoro.
 - Trascina il fermaglio per spostare la nota. Facendo clic sul fermaglio, la scheda si comprime e resta visibile solo il numero; fai di nuovo clic per riaprirla. Fai clic sul testo per modificarlo.

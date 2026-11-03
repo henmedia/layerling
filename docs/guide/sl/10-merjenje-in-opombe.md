@@ -44,6 +44,15 @@ S središčem zelene številke štejejo do sredine telesa, tudi v višini. Tako 
 
 Merilni trak in kotno ravnilo ostaneta tam, kjer sta, ko skiciraš in se vrneš v 3D pogled. Nobenega ni v zgodovini. Kotno ravnilo se shrani z načrtom, prav tako meritve merilnega traku, v brskalniku in v datoteki .lyl: ko načrt odpreš, so spet tam. Gumb z očesom med gumbi merilnega traku skrije vse meritve in jih spet pokaže; shrani se tudi, ali so skrite, in kdor meritev doda, premakne ali izbriše, jih najprej spet vidi.
 
+## Kotomer
+
+Kot izmeriš z gumbom {{ui:camera.protractor}} v vrstici pogleda. Ob njem se odpre vrsta gumbov, in dokler gumba ne klikneš znova ali ne pritisneš [[Esc]], vsak klik v pogled meri s kotomerom. Kot merilni trak se pripne na oglišča in robove teles; ob telesih postavi točko na ploščo.
+
+- {{ui:camera.protractorPoints}}: najprej klikni oglišče kota, nato točko na vsakem kraku. Že med postavljanjem zadnje točke se kot prikaže; po tretjem kliku ostane, z lokom med krakoma. To je kot v oglišču, od 0° do 180°.
+- {{ui:camera.protractorFaces}}: klikni dve ravni ploskvi. Kratka modra črta na vsaki pokaže, kam je obrnjena, oznaka pa navede oba kota, ki ju ploskvi oklepata, najprej manjšega: 45° posnetje proti zgornji ploskvi da 45° · 135°, dve stranici kvadra le 90°. Ukrivljena ploskev nima ene same smeri, zato kotomer zahteva ravno.
+
+Naslednji klik po končanem kotu začne novega, {{ui:camera.protractorClear}} pa ga odstrani. Kot sledi telesom, ko jih premakneš ali zavrtiš. Nič od tega se ne shrani in ne gre v zgodovino: ko kotomer odložiš, ga ni več.
+
 ## Razdalje do ničle in pri premikanju
 
 V nastavitvah pod {{ui:workspace.appearance}} sta dve stikali za tekoče mere:
@@ -57,7 +66,7 @@ Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne. Če telo 
 
 ## Preverjanje zračnosti
 
-Deli, ki se morajo po tiskanju premikati - fleksi zmaj, tečaj, natisnjen v kosu, škatla s pokrovom, os v izvrtini - potrebujejo razmik med seboj. Če je premajhen, se zlepijo; če se prekrivajo, se natisnejo kot en kos. {{ui:editor.tool.clearance}} poleg {{ui:editor.tool.intersectPreview}} to preveri pred tiskanjem. Vzame izbrane predmete ali, če ni izbrano nič, vse vidne (iste kot izvoz) in preveri vsak par:
+Deli, ki se morajo po tiskanju premikati - fleksi zmaj, tečaj, natisnjen v kosu, škatla s pokrovom, os v izvrtini - potrebujejo razmik med seboj. Če je premajhen, se zlepijo; če se prekrivajo, se natisnejo kot en kos. {{ui:editor.tool.clearance}} poleg {{ui:editor.tool.loftSketches}} to preveri pred tiskanjem. Vzame izbrane predmete ali, če ni izbrano nič, vse vidne (iste kot izvoz) in preveri vsak par:
 
 - **{{ui:clearance.kind.overlap}}** (rdeče): dela si delita prostornino. Ta se pokaže rdeče v telesih, ki postanejo prosojna, seznam pa navede njeno velikost.
 - **{{ui:clearance.kind.touching}}** (rdeče): dela se dotikata in se pri tiskanju zlijeta.
@@ -79,7 +88,7 @@ Opomba zabeleži, česar geometrija ne pove: »Tu je vijak 0,3 mm preozek«, »P
 - Če opombo postaviš **na telo**, potuje z njim.
 - Če jo postaviš **zraven**, ostane na delovni ravnini ({{ui:note.free}}).
 - {{ui:note.detach}} prikovano opombo loči od telesa.
-- {{ui:note.forAi}} spremeni zapisek v nalogo za agenta UI na mostu MCP (glej „UI z MCP“): agent ga prebere z `layerling_list_notes`, opravi delo in odgovori v istem zapisku, pod vašim besedilom. Na model lahko postavi tudi svoje zapiske, da na nekem mestu kaj vpraša ali sporoči.
+- {{ui:note.forAi}} spremeni zapisek v nalogo za agenta UI na mostu MCP (glej „UI z MCP“): agent ga prebere z `layerling_list_notes`, opravi delo in odgovori v istem zapisku, pod vašim besedilom. Na model lahko postavi tudi svoje zapiske, da na nekem mestu kaj vpraša ali sporoči. Prosite agenta, naj spremlja vaše opombe, in nanje bo čakal z `layerling_wait_for_notes`: potem delate samo na modelu, vsaka nova zahteva pa se prevzame takoj, ko označite polje, brez vračanja v okno agenta.
 - {{ui:editor.tool.group}} prikovano opombo vzame v skupino; {{ui:editor.tool.ungroup}} jo preda vidnemu delu pod njo, tudi skupini v njej. Dokler je skupina odprta z {{ui:group.edit}}, se njene opombe premikajo z delom pod njimi in se z {{ui:group.done}} vrnejo k skupini; preklic jih vrne, kakršne so bile.
 - Če je njeno telo izbrisano ali pod njo ni več vidnega telesa, opomba ostane, kjer je stala, na delovni ravnini.
 - Vlečenje bucike premakne opombo. Klik na buciko kartico zloži, ostane le majhna številka; še en klik jo spet odpre. Klik v besedilo ga uredi.

@@ -6982,7 +6982,8 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   display: contents;
 }
 
-.tape-control-group {
+.tape-control-group,
+.protractor-control-group {
   position: relative;
 }
 
@@ -7739,6 +7740,60 @@ html[data-theme="dark"] .inspector-bundle-note {
 }
 
 .workplane-wrap.section-measure-mode canvas {
+  cursor: crosshair;
+}
+
+/* The protractor (#1228): its legs and arc in the measuring orange, the normals of measured faces in blue. */
+.protractor-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.protractor-leg,
+.protractor-arc {
+  stroke: #c86a12;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.protractor-leg.preview {
+  stroke-dasharray: 5 4;
+}
+
+.protractor-normal {
+  stroke: #1677c8;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.protractor-point {
+  fill: #c86a12;
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.protractor-hover {
+  fill: rgba(200, 106, 18, 0.22);
+  stroke: #c86a12;
+  stroke-width: 2;
+}
+
+/* Behind a body: dashed and faint, so a point on the far side does not look as if it sat on the near one. */
+.protractor-leg.hidden,
+.protractor-arc.hidden,
+.protractor-normal.hidden {
+  stroke-dasharray: 3 4;
+  opacity: 0.45;
+}
+
+.protractor-point.hidden,
+.protractor-hover.hidden {
+  opacity: 0.45;
+}
+
+.workplane-wrap.protractor-mode canvas {
   cursor: crosshair;
 }
 
@@ -13228,7 +13283,8 @@ html[data-theme="dark"] .section-measure-help {
   color: #a89787;
 }
 
-html[data-theme="dark"] .section-measure-outline {
+html[data-theme="dark"] .section-measure-outline,
+html[data-theme="dark"] .protractor-normal {
   stroke: #4ba3ec;
 }
 
@@ -13970,7 +14026,7 @@ html[data-theme="dark"] .grid-settings {
    2038, 1728 und 1582 px, ohne den Knopf der Interaktiven Hilfe 1990, 1688
    und 1544 px: Jeder neue Knopf verschiebt alle drei Schwellen um das, was
    er braucht - neu messen. */
-@media (max-width: 2180px) {
+@media (max-width: 2215px) {
   :root {
     --toolbar-icon-size: calc(37px * var(--toolbar-scale));
   }
@@ -13991,7 +14047,7 @@ html[data-theme="dark"] .grid-settings {
   }
 }
 
-@media (max-width: 1850px) {
+@media (max-width: 1897px) {
   :root {
     --toolbar-icon-size: calc(34px * var(--toolbar-scale));
   }
@@ -14006,14 +14062,15 @@ html[data-theme="dark"] .grid-settings {
   }
 }
 
-/* Below the width even the smallest step needs (1690 px, measured with the
-   command search, guide, shortcuts, Interactive Help, Delete face and Hull buttons;
-   the middle step needs 1842 px and the full size 2172 px) the groups wrap onto a
+/* Below the width even the smallest step needs (1734 px, measured with the
+   command search, guide, shortcuts, Interactive Help, Delete face and Hull buttons,
+   after Show common part went into Intersection, #372; the middle step needs
+   1894 px and the full size 2212 px) the groups wrap onto a
    further row instead of scrolling sideways: a scrolling bar hides tools and
    cuts off every menu that hangs beneath it. The bar grows, and the editor
    passes its real height on (see --editor-toolbar-height). A new button in
    the bar moves all three thresholds up: measure again. */
-@media (max-width: 1698px) {
+@media (max-width: 1737px) {
   .toolbar-mode-content,
   .sketch-toolbar-ribbon {
     flex-wrap: wrap;
@@ -14091,8 +14148,9 @@ html[data-theme="dark"] .theme-check {
 }
 
 /* Die Kameraleiste ist mit den beiden Notizknoepfen (31.10.2026) um zwei Knoepfe laenger geworden, und die Flaeche eines 900 Pixel hohen Fensters
-   ist rund 750 hoch: Bei Normalgroesse lief sie unten ins Fussband. Bis 900 Pixel wird sie darum schon verkleinert, wie unter 780. */
-@media (min-height: 781px) and (max-height: 900px) {
+   ist rund 750 hoch: Bei Normalgroesse lief sie unten ins Fussband. Bis 900 Pixel wird sie darum schon verkleinert, wie unter 780.
+   Mit dem Winkelmesser (#1228) braucht sie ungeschrumpft 800 Pixel unter der Oberkante der Flaeche, also bis 970 Pixel Fensterhoehe. */
+@media (min-height: 781px) and (max-height: 970px) {
   .camera-controls {
     transform: scale(0.88);
     transform-origin: top left;
@@ -14135,7 +14193,8 @@ html[data-theme="dark"] .theme-check {
    nur gut 500 Pixel hoch, und die einspaltige Leiste (120 + 460 Pixel) lief
    unten aus dem Bild - samt dem Knopf, der eine eingeschaltete
    Schnittansicht anzeigt. */
-@container workplane (max-height: 660px) {
+/* Verkleinert braucht die einspaltige Leiste seit dem Winkelmesser (#1228) 718 Pixel der Flaeche; bis 740 steht sie zweispaltig. */
+@container workplane (max-height: 740px) {
   .camera-controls {
     display: grid;
     grid-template-columns: repeat(2, auto);
@@ -14157,8 +14216,9 @@ html[data-theme="dark"] .theme-check {
 }
 
 /* At Large the column is a quarter taller, so it needs two columns from a taller
-   workplane on - 600 px was measured for Medium (#241). */
-@container workplane (max-height: 870px) {
+   workplane on - 600 px was measured for Medium (#241). With the protractor (#1228)
+   it needs 960 px of the workplane at full size. */
+@container workplane (max-height: 980px) {
   html[data-toolbar-size="large"] .camera-controls {
     display: grid;
     grid-template-columns: repeat(2, auto);

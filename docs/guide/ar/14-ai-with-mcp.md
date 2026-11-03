@@ -123,7 +123,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_offset_object` | تزيح كل أوجه الجسم لخلوص التركيب: تكبّره أو تصغّره أو تضيف النسخة المكبّرة كثقب، أو يحرّك الجوانب فقط |
 | `layerling_list_faces` | تسرد أوجه جسم دقيق |
 | `layerling_delete_faces` | تحذف أوجهًا وتسدّ الفجوة |
-| `layerling_array_objects` | تكرّر في صف أو على دائرة |
+| `layerling_array_objects` | تكرّر في صف أو شبكة أو على دائرة |
 | `layerling_bundle_objects` | تحزم الأجسام كما يفعل Ctrl+B: تتحرك معًا، وتحتفظ بلونها ونوعها، وتخرج منفصلة في التصدير |
 | `layerling_layer_text` | تحوّل نصًا إلى طبقات متراكبة لطباعة متعددة الألوان (حروف، وحواف أعرض، ولوحة بلا ثقوب) أو تعيد بناء هذه الطبقات، مع ثقب لحلقة مفاتيح، وزوايا لكل طبقة، وحافة حروف مستديرة أو مشطوفة؛ ومع قائمة أسماء، بطاقة لكل اسم |
 | `layerling_text_block` | تنشئ كتلة نص: يصبح النص أول عدة أسطر، كل سطر نص مستقل تحت الذي فوقه، بمحاذاة لليسار أو للوسط أو لليمين، وكل سطر بالحجم نفسه أو أصغر |
@@ -139,6 +139,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_list_reference_points` | تسرد النقاط المرجعية مع معرّفاتها ومواضعها |
 | `layerling_remove_reference_points` | تحذف نقاطًا مرجعية حسب المعرّف، أو كلها |
 | `layerling_list_notes` | يقرأ ملاحظات المستخدم مع نصها والجسم المثبتة عليه كل واحدة وهل هي طلب للذكاء الاصطناعي |
+| `layerling_wait_for_notes` | ينتظر حتى تضع علامة {{ui:note.forAi}} على ملاحظة، ثم يسلّم الطلب فورًا |
 | `layerling_add_note` | يضع ملاحظة على النموذج، مثبتة على كائن أو حرة على اللوحة |
 | `layerling_update_note` | يعدّل ملاحظة أو يرد عليها؛ الرد يغلق الطلب |
 | `layerling_remove_notes` | يحذف ملاحظات بحسب المعرّف |
@@ -153,6 +154,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_show_workplane` | تخفي اللوحة بشبكتها وتظهرها، لالتقاط صورة للجانب السفلي مثلًا (العرض فقط) |
 | `layerling_set_section_view` | تفتح العرض بقطعه على طول مستوى للنظر إلى الداخل (العرض فقط، لا يُقطع شيء فعليًا) |
 | `layerling_measurements` | يُظهر قياسات شريط القياس أو يخفيها ويسردها مع أطوالها، ويخفي الأبعاد حول التحديد أو يظهرها مثل [[Q]] |
+| `layerling_measure_angle` | يقيس زاوية مثل المنقلة: عند ركن ثلاث نقاط أو بين وجهين مستويين، ويعرضها في العرض |
 | `layerling_saved_view` | يحفظ العرض الحالي تحت المفتاح 7 أو 8 أو 9 أو 0 ويعود إليه، مثل Shift+المفتاح والمفتاح وحده (العرض فقط)؛ ويضبط أيضًا عرض البداية للتصاميم الجديدة |
 | `layerling_clear_history` | تحذف كل خطوات التراجع نهائيًا، كما يفعل زر "حذف السجل" في عرض السجل؛ وتحتاج `confirm: true` |
 | `layerling_set_history_view` | تعرض حالة سابقة للمشروع، كعرض السجل (يبقى التصميم الحقيقي دون تغيير؛ وتنتظر الأدوات التي تغيّر التصميم حتى يُغلق) |

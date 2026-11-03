@@ -119,7 +119,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_offset_object` | odsadí všechny plochy tělesa pro vůli lícovaného spoje: zvětší nebo zmenší těleso, nebo přidá zvětšenou kopii jako díru, nebo posune jen boky |
 | `layerling_list_faces` | vypíše plochy přesného tělesa |
 | `layerling_delete_faces` | smaže plochy a uzavře mezeru |
-| `layerling_array_objects` | opakuje objekty v řadě nebo po kružnici |
+| `layerling_array_objects` | opakuje objekty v řadě, v mřížce nebo po kružnici |
 | `layerling_bundle_objects` | seskupí objekty jako Ctrl+B: společný pohyb, zachované barvy a typy, samostatná tělesa při exportu |
 | `layerling_layer_text` | vytvoří vrstvenou jmenovku: písmena, širší okraje a souvislou podložku; podporuje otvor na kroužek, rohy po vrstvách, úpravu hran písmen a seznam jmen |
 | `layerling_text_block` | vytvoří textový blok: text se stane prvním z několika řádků, každý samostatným textem pod tím nad ním, zarovnaných vlevo, na střed nebo vpravo, každý řádek stejně velký nebo menší |
@@ -135,6 +135,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_list_reference_points` | vypíše referenční body s identifikátory a polohami |
 | `layerling_remove_reference_points` | odstraní vybrané nebo všechny referenční body |
 | `layerling_list_notes` | čte poznámky uživatele s textem, tělesem, ke kterému je každá připnutá, a zda jde o zadání pro AI |
+| `layerling_wait_for_notes` | čeká, až u poznámky zaškrtnete {{ui:note.forAi}}, a požadavek hned předá |
 | `layerling_add_note` | dá na model poznámku, připnutou k objektu nebo volnou na desce |
 | `layerling_update_note` | změní poznámku nebo na ni odpoví; odpověď zadání uzavře |
 | `layerling_remove_notes` | smaže poznámky podle id |
@@ -149,6 +150,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_show_workplane` | skryje nebo zobrazí podložku s mřížkou, pouze změna pohledu |
 | `layerling_set_section_view` | zapne pohled v řezu, aniž by skutečně rozdělil tělesa |
 | `layerling_measurements` | zobrazí nebo skryje měření měřicího nástroje a vypíše je s jejich délkami, a skryje nebo zobrazí rozměry kolem výběru jako [[Q]] |
+| `layerling_measure_angle` | měří úhel jako úhloměr: ve vrcholu ze tří bodů nebo mezi dvěma rovnými plochami, a ukáže ho v pohledu |
 | `layerling_saved_view` | uloží aktuální pohled pod klávesu 7, 8, 9 nebo 0 a vrátí se k němu, jako Shift+klávesa a klávesa (jen pohled); nastaví také úvodní pohled nových návrhů |
 | `layerling_clear_history` | trvale vymaže historii kroků zpět, vyžaduje `confirm: true` |
 | `layerling_set_history_view` | zobrazí starší stav projektu bez změny současného; editační nástroje počkají na zavření historie |

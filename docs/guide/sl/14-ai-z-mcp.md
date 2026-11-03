@@ -119,7 +119,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_offset_object` | odmakne vse ploskve telesa za zračnost nasedanja: telo poveča ali zmanjša ali doda povečano kopijo kot luknjo ali premakne le stranice |
 | `layerling_list_faces` | našteje ploskve natančnega telesa |
 | `layerling_delete_faces` | izbriše ploskve in zapre vrzel |
-| `layerling_array_objects` | pomnoži v vrsti ali na krogu |
+| `layerling_array_objects` | pomnoži v vrsti, v mreži ali na krogu |
 | `layerling_bundle_objects` | poveže objekte v sveženj kot Ctrl+B: premikajo se skupaj, obdržijo barvo in vrsto ter gredo posamezno v izvoz |
 | `layerling_layer_text` | iz besedila naredi sklad plasti za večbarvni tisk (črke, širši robovi, plošča brez lukenj) ali sklad zgradi znova, z luknjo za obesek za ključe, vogali za vsako plast in zaobljenim ali poševno odrezanim robom črk; s seznamom imen en napis na ime |
 | `layerling_text_block` | naredi blok besedila: besedilo postane prva od več vrstic, vsaka samostojno besedilo pod zgornjo, poravnane levo, na sredino ali desno, vsaka vrstica enako velika ali manjša |
@@ -135,6 +135,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_list_reference_points` | našteje referenčne točke z oznako in lego |
 | `layerling_remove_reference_points` | izbriše referenčne točke po oznaki ali vse |
 | `layerling_list_notes` | prebere uporabnikove zapiske z besedilom, telesom, na katero je vsak pripet, in ali je naloga za UI |
+| `layerling_wait_for_notes` | počaka, da pri opombi označite {{ui:note.forAi}}, in zahtevo takoj preda |
 | `layerling_add_note` | postavi zapisek na model, pripet na predmet ali prost na plošči |
 | `layerling_update_note` | spremeni zapisek ali nanj odgovori; odgovor nalogo zaključi |
 | `layerling_remove_notes` | izbriše zapiske po id |
@@ -149,6 +150,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_show_workplane` | skrije ploščo z njeno mrežo in jo spet prikaže, na primer za sliko spodnje strani (samo pogled) |
 | `layerling_set_section_view` | prereže pogled vzdolž ravnine, da se vidi notranjost (samo pogled, nič se ne razreže) |
 | `layerling_measurements` | prikaže ali skrije meritve merilnega traku in jih našteje z njihovimi dolžinami, ter skrije ali prikaže mere okoli izbora kot [[Q]] |
+| `layerling_measure_angle` | izmeri kot, kakor kotomer: v oglišču treh točk ali med dvema ravnima ploskvama, in ga pokaže v pogledu |
 | `layerling_saved_view` | shrani trenutni pogled pod tipko 7, 8, 9 ali 0 in se vrne nanj, kot Shift+tipka in tipka (samo pogled); nastavi tudi začetni pogled novih osnutkov |
 | `layerling_clear_history` | za vedno izbriše vse korake razveljavitve, kot gumb »Izbriši zgodovino« v pogledu zgodovine; potrebuje `confirm: true` |
 | `layerling_set_history_view` | pogleda nazaj na prejšnje stanje projekta, kot pogled zgodovine (pravi načrt ostane nedotaknjen; orodja, ki spreminjajo, počakajo, da se zapre) |
