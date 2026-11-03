@@ -11,7 +11,7 @@ import { isBundleScopeKey } from "@/lib/cadModifierGroups";
 import { cadLidSolid } from "@/lib/cadLid";
 import { concaveFilletSolid } from "@/lib/cadConcaveFillet";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
-import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierFaces, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
+import type { CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierExactReport, CadModifierFaces, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { cadProfileSolidMismatch, profileExtrusionSolid } from "@/lib/cadProfileSolid";
 import { importedStepBody } from "@/lib/cadImportedStep";
 import { threadPartSolid } from "@/lib/threadSolid";
@@ -22,6 +22,7 @@ import { helicalGearPartSolid } from "@/lib/gearSolid";
 import { hirthPartSolid } from "@/lib/hirthSolid";
 import { meshTreatedBody } from "@/lib/cadMeshAccuracy";
 import { planarMeshFaces } from "@/lib/cadPlanarMesh";
+import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, type ExactMeshReport } from "@/lib/cadMeshExact";
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
 import { buildMessage } from "@/lib/buildStamp";
 import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
@@ -453,21 +454,27 @@ const PLANAR_FACE_TRIANGLE_LIMIT = 6000;
  * and sewn instead; whatever goes wrong there leaves the plain result.
  */
 function reconstructMeshSolid(cad: OcctKernel, part: CadModifierMeshPart) {
+  // Make exact may find what the edge tool, with its smaller limits, left as a mesh: it does not take the kept one.
   const key = meshSolidKey(part);
   const kept = key === null ? undefined : meshSolids.get(key);
-  if (key !== null && kept !== undefined) {
+  if (key !== null && kept !== undefined && (!exactRequested || kept.report)) {
     try {
-      const restored = cad.fromBREP(kept);
-      if (cad.isSolid(restored) && cadShapeIsValid(cad, restored)) return restored;
+      const restored = cad.fromBREP(kept.brep);
+      if (cad.isSolid(restored) && cadShapeIsValid(cad, restored)) {
+        if (kept.report) exactReports.push(kept.report);
+        return restored;
+      }
     } catch (error) {
       if (isFatalKernelFault(error)) throw error;
     }
     meshSolids.delete(key);
   }
-  const solid = rebuiltMeshSolid(cad, part);
+  const rebuilt = rebuiltMeshSolid(cad, part);
+  const solid = rebuilt.solid;
+  if (rebuilt.report) exactReports.push(rebuilt.report);
   if (key !== null) {
     try {
-      meshSolids.set(key, storedBrep(cad, solid));
+      meshSolids.set(key, { brep: storedBrep(cad, solid), report: rebuilt.report });
       while (meshSolids.size > MESH_SOLID_KEPT) meshSolids.delete(meshSolids.keys().next().value as string);
     } catch (error) {
       if (isFatalKernelFault(error)) throw error;
@@ -482,7 +489,7 @@ function reconstructMeshSolid(cad: OcctKernel, part: CadModifierMeshPart) {
  * its BREP for the next time (forum: a pocket in a filleted body took 21 seconds each time).
  */
 const MESH_SOLID_KEPT = 4;
-const meshSolids = new Map<string, string>();
+const meshSolids = new Map<string, { brep: string; report?: CadModifierExactReport }>();
 
 /** What identifies a mesh part: its own triangles, however they got there. Null when the part carries no mesh. */
 function meshSolidKey(part: CadModifierMeshPart) {
@@ -501,7 +508,76 @@ function meshSolidKey(part: CadModifierMeshPart) {
   return `${part.positions.length}:${part.indices.length}:${(first >>> 0).toString(36)}${(second >>> 0).toString(36)}`;
 }
 
-function rebuiltMeshSolid(cad: OcctKernel, part: CadModifierMeshPart) {
+/** Meshes up to this many triangles are looked through for their cylinders, cones, spheres and tori first. */
+const EXACT_MESH_TRIANGLE_LIMIT = 40000;
+/** How long the edge tool waits for that before it takes the mesh as it is. */
+const EXACT_MESH_BUDGET_MS = 6000;
+/** Make exact asks for it: larger meshes, more time. */
+const EXACT_REQUEST_TRIANGLE_LIMIT = 400000;
+const EXACT_REQUEST_BUDGET_MS = 90000;
+/** While a prepare runs: whether it is Make exact, and what its mesh parts were rebuilt from. */
+let exactRequested = false;
+let exactReports: CadModifierExactReport[] = [];
+
+/** The reports of a prepare's mesh parts added up, or undefined when none was rebuilt exactly. */
+function sumExactReports(reports: CadModifierExactReport[]): CadModifierExactReport | undefined {
+  if (reports.length === 0) return undefined;
+  const sum = { plane: 0, cylinder: 0, cone: 0, sphere: 0, torus: 0, facets: 0, facetShare: 0, faces: 0, triangles: 0 };
+  for (const r of reports) {
+    sum.plane += r.plane; sum.cylinder += r.cylinder; sum.cone += r.cone; sum.sphere += r.sphere; sum.torus += r.torus;
+    sum.facets += r.facets; sum.faces += r.faces; sum.triangles += r.triangles;
+    sum.facetShare += r.facetShare * r.triangles;
+  }
+  sum.facetShare = sum.triangles > 0 ? sum.facetShare / sum.triangles : 0;
+  return sum;
+}
+
+function exactReportOf(report: ExactMeshReport): CadModifierExactReport {
+  return {
+    plane: report.plane,
+    cylinder: report.cylinder,
+    cone: report.cone,
+    sphere: report.sphere,
+    torus: report.torus,
+    facets: report.facets,
+    facetShare: report.area > 0 ? report.facetArea / report.area : 0,
+    faces: report.faces,
+    triangles: report.triangles,
+  };
+}
+
+/**
+ * A mesh with round faces in it (a group of cylinders, an STL of a CAD part) rebuilt as the exact solid it was made
+ * of: then a fillet follows one round edge, not a hundred short ones. Null when there is nothing round in it (the
+ * flat faces are built whole below) or it does not come out as a valid solid.
+ */
+function exactMeshSolid(cad: OcctKernel, part: CadModifierMeshPart): { solid: ShapeHandle; report: CadModifierExactReport } | null {
+  const limit = exactRequested ? EXACT_REQUEST_TRIANGLE_LIMIT : EXACT_MESH_TRIANGLE_LIMIT;
+  if (!part.positions || !part.indices || part.indices.length / 3 > limit) return null;
+  try {
+    // Make exact says so when a mesh is mostly free-form, rather than build its triangles over again as faces.
+    const exact = exactSolidFromMesh(cad, part.positions, part.indices, { budgetMs: exactRequested ? EXACT_REQUEST_BUDGET_MS : EXACT_MESH_BUDGET_MS, refuseFreeform: exactRequested });
+    if (!exact) return null;
+    const round = exact.report.cylinder + exact.report.cone + exact.report.sphere + exact.report.torus;
+    // Without anything round, the edge tool keeps its own way below; Make exact takes the flat result too.
+    if ((round > 0 || exactRequested) && cad.isSolid(exact.solid) && cadShapeIsValid(cad, exact.solid)) return { solid: exact.solid, report: exactReportOf(exact.report) };
+    releaseHandles(cad, [exact.solid]);
+  } catch (error) {
+    if (isFatalKernelFault(error)) throw error;
+    if (exactRequested && error instanceof Error && exactMeshFreeformShare(error.message) !== null) throw error;
+  }
+  return null;
+}
+
+function rebuiltMeshSolid(cad: OcctKernel, part: CadModifierMeshPart): { solid: ShapeHandle; report?: CadModifierExactReport } {
+  const exact = exactMeshSolid(cad, part);
+  if (exact) return exact;
+  // Make exact wants the exact body or nothing: the plain rebuild below would only be thrown away.
+  if (exactRequested) throw new Error(EXACT_MESH_FAILED_MESSAGE);
+  return { solid: flatRebuiltMeshSolid(cad, part) };
+}
+
+function flatRebuiltMeshSolid(cad: OcctKernel, part: CadModifierMeshPart) {
   let plain: ShapeHandle | null = null;
   let plainError: unknown = null;
   try {
@@ -999,7 +1075,14 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
   }
   if (request.type === "prepare") {
     releaseSession(activeCad);
-    baseShape = reconstructPartsWithFallback(activeCad, request.parts);
+    exactRequested = request.exact === true;
+    exactReports = [];
+    try {
+      baseShape = reconstructPartsWithFallback(activeCad, request.parts);
+    } finally {
+      exactRequested = false;
+    }
+    const exactReport = sumExactReports(exactReports);
     const collected = collectEdges(activeCad, baseShape, request.sharpAngle, Boolean(request.suppressTreatmentDetailEdges), true);
     edgeHandles = collected.handles;
     baseSolids = activeCad.isSolid(baseShape) ? [baseShape] : activeCad.getSubShapes(baseShape, "solid");
@@ -1022,6 +1105,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       selectableEdgeIds: collected.selectableEdgeIds,
       sourceType: activeCad.getShapeType(baseShape),
       ...(faces ? { faces } : {}),
+      ...(exactReport ? { exactReport } : {}),
     }, faces?.mesh ? [faces.mesh.positions.buffer, faces.mesh.indices.buffer, faces.mesh.triangleFaces.buffer] : []);
     return;
   }
@@ -1031,7 +1115,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     ? (request.faceIds ?? []).map((id) => ({ id, face: faceHandles[id], owner: faceOwners[id] })).filter((entry): entry is { id: number; face: ShapeHandle; owner: number } => entry.face !== undefined)
     : [];
   if (request.kind === "deleteFace" && selectedFaces.length === 0) throw new Error("Select at least one face");
-  if (selected.length === 0 && request.kind !== "shell" && request.kind !== "deleteFace" && request.kind !== "offset" && request.kind !== "lid") throw new Error("Select at least one highlighted edge");
+  if (selected.length === 0 && request.kind !== "shell" && request.kind !== "deleteFace" && request.kind !== "offset" && request.kind !== "lid" && request.kind !== "exact") throw new Error("Select at least one highlighted edge");
   if (request.kind === "fillet" && request.endAmount !== undefined && selected.length !== 1) throw new Error(VARIABLE_FILLET_ONE_EDGE_MESSAGE);
   const componentResults: ShapeHandle[] = [];
   // Short corner edges a second try took along so the chamfer or fillet went through (#1178).

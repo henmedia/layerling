@@ -53,7 +53,7 @@ Pri skupini, na primer valju z izvrtino, obdelani rob spada k dokončanemu teles
 
 > **Dobro je vedeti:** layerling pri zaokrožitvah in posnetjih računa z resnično geometrijo CAD, ne samo z mrežo trikotnikov. Zato zaokrožen rob ostane zaokrožen tudi v izvozu STEP.
 
-Del, uvožen kot STEP, prav tako obdrži svojo geometrijo CAD: posnetja, zaokrožitve in izdolbljenje delujejo na telesu iz datoteke, ne glede na to, kako fino je del narisan na zaslonu. STL, OBJ in 3MF prinesejo samo trikotnike, fino narisan del pa je lahko za obdelavo robov preveč gost. Če del obstaja tudi kot STEP, raje uvozi tega.
+Del, uvožen kot STEP, prav tako obdrži svojo geometrijo CAD: posnetja, zaokrožitve in izdolbljenje delujejo na telesu iz datoteke, ne glede na to, kako fino je del narisan na zaslonu. STL, OBJ in 3MF prinesejo samo trikotnike, fino narisan del pa je lahko za obdelavo robov preveč gost. Če del obstaja tudi kot STEP, raje uvozi tega. {{ui:editor.tool.makeExact}} tak del najprej spremeni v natančno telo s pravimi ravninami in valji, glej [Datoteke, shranjevanje in deljenje](chapter:datoteke-in-shranjevanje), »Uvoženo mrežo naredi natančno«.
 
 ## Izdolbljenje teles
 

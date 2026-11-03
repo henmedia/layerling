@@ -53,7 +53,7 @@ Na sloučeném celku, například válci s otvorem, patří upravovaná hrana v�
 
 > **Dobré vědět:** Layerling při zkosení a zaoblení používá skutečnou CAD geometrii. Zaoblená hrana proto zůstává oblou plochou i při exportu STEP.
 
-Přesnou geometrii si zachová i import STEP. Úpravy hran a dutiny pracují s tělesem ze souboru bez ohledu na jemnost zobrazení. STL, OBJ a 3MF obsahují pouze trojúhelníky a příliš hustá síť může překročit možnosti nástroje. Je-li díl dostupný i jako STEP, použijte jej.
+Přesnou geometrii si zachová i import STEP. Úpravy hran a dutiny pracují s tělesem ze souboru bez ohledu na jemnost zobrazení. STL, OBJ a 3MF obsahují pouze trojúhelníky a příliš hustá síť může překročit možnosti nástroje. Je-li díl dostupný i jako STEP, použijte jej. {{ui:editor.tool.makeExact}} z takového dílu nejdřív udělá přesné těleso se skutečnými rovinami a válci, viz [Soubory, ukládání a sdílení](chapter:files-and-saving), „Převod importované sítě na přesné těleso“.
 
 ## Vytváření dutin
 

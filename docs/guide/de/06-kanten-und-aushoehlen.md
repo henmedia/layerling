@@ -56,7 +56,7 @@ Bei einer Gruppe, etwa einem Zylinder mit einer Bohrung, gehört die bearbeitete
 
 > **Gut zu wissen:** layerling rechnet bei Rundungen und Fasen mit echter CAD-Geometrie, nicht nur mit einem Dreiecksnetz. Deshalb bleibt eine verrundete Kante auch im STEP-Export eine verrundete Kante.
 
-Ein als STEP importiertes Teil behält seine CAD-Geometrie ebenfalls: Fasen, Rundungen und das Aushöhlen arbeiten am Körper aus der Datei, egal wie fein das Teil auf dem Bildschirm gezeichnet ist. STL, OBJ und 3MF bringen nur Dreiecke mit, und ein fein gezeichnetes Teil kann für die Kantenbearbeitung zu dicht sein. Gibt es ein Teil auch als STEP, importiere lieber das.
+Ein als STEP importiertes Teil behält seine CAD-Geometrie ebenfalls: Fasen, Rundungen und das Aushöhlen arbeiten am Körper aus der Datei, egal wie fein das Teil auf dem Bildschirm gezeichnet ist. STL, OBJ und 3MF bringen nur Dreiecke mit, und ein fein gezeichnetes Teil kann für die Kantenbearbeitung zu dicht sein. Gibt es ein Teil auch als STEP, importiere lieber das. {{ui:editor.tool.makeExact}} macht aus so einem Teil zuerst einen exakten Körper mit echten Ebenen und Zylindern, siehe [Dateien, Speichern und Weitergeben](chapter:dateien-und-speichern), „Ein importiertes Netz exakt machen“.
 
 ## Körper aushöhlen
 

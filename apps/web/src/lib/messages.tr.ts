@@ -2458,7 +2458,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "export.obj.description": "Evrensel 3D ağ",
   "export.obj.note": "Modelleme, görselleştirme ve alışveriş için geniş uyumlu bir ağ biçimi. Renkler, Bambu Studio ve OrcaSlicer'ın okuduğu şekilde köşe noktalarında saklanır.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "Kutuları, silindirleri, küreleri ve konileri, kenarları yuvarlatılmış veya pahlanmış her şeyi ve STEP olarak gelen gövdeleri tam CAD geometrisi olarak korur. Dişler, yaylar ve dişli çarklar da tam gövdeleri olarak gider. Daralan, eğik ve burgulu şekiller de tam gider. Örneğin içe aktarılmış ağlar STEP'in kapsamı dışındadır — bunlar STL olarak gider.",
+  "export.step.note": "Kutuları, silindirleri, küreleri ve konileri, kenarları yuvarlatılmış veya pahlanmış her şeyi ve STEP olarak gelen gövdeleri tam CAD geometrisi olarak korur. Dişler, yaylar ve dişli çarklar da tam gövdeleri olarak gider. Daralan, eğik ve burgulu şekiller de tam gider. İçe aktarılmış ağlar tam gövdeye dönüştürülerek gider; düzlemleri, silindirleri, konileri, küreleri ve torusları gerçek yüzler olur. Figür gibi serbest biçimli bir ağ STL olarak gider.",
   "export.svg.description": "Üstten görünüş vektörü",
   "export.svg.note": "Delikler ve kavisli konturlar dahil, milimetre cinsinden temiz bir üstten görünüş silüeti dışa aktarır.",
   "export.svg.noteFootprint": "Yalnızca nesnelerin çalışma düzlemine oturduğu dış hatları milimetre cinsinden çizgiler olarak dışa aktarır; lazer kesim ve şablonlar için.",

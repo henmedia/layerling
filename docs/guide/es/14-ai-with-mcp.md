@@ -146,6 +146,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_wrap_around_cylinder` | envuelve un cuerpo plano, como un SVG o un texto, alrededor de un cilindro, hacia fuera o hacia dentro como grabado |
 | `layerling_texture_surface` | aplica una textura de superficie a un cuerpo: estrías, moleteado, panal o bultos, para un mejor agarre o por estética, y la cambia o la quita después |
 | `layerling_simplify_mesh` | reduce el número de triángulos de una malla importada, a un porcentaje o a un número de triángulos |
+| `layerling_make_exact` | convierte una malla importada en un cuerpo CAD exacto: planos, cilindros, conos, esferas y toros pasan a ser caras reales, para redondear aristas limpiamente y que STEP las lleve |
 | `layerling_save_custom_shape` | guarda cuerpos como forma personalizada, en el servidor o en el navegador, para insertarlos en otros diseños |
 | `layerling_list_custom_shapes` | lista las formas personalizadas del servidor y del navegador |
 | `layerling_insert_custom_shape` | inserta una forma personalizada en el diseño abierto, en un punto x/z si quieres |

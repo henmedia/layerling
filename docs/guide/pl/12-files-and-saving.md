@@ -72,7 +72,7 @@ Na górze jest nazwa pliku, pod nią wybierasz format. Gdy coś jest zaznaczone,
 
 Otwór, którego nie zgrupowałeś, jest przy eksporcie wycinany z każdej bryły, do której sięga, tak jak pokazuje to widok. Nie trzeba więc grupować przed każdym eksportem. Przy zaznaczeniu liczą się tylko zaznaczone otwory. Otworu nie da się wyeksportować samego, o czym layerling informuje.
 
-STEP niesie tylko dokładne bryły CAD. To, czego nie da się zapisać dokładnie, na przykład siatka zaimportowana jako STL, zostaje pominięte. Komunikat po eksporcie wymienia te bryły i mówi dlaczego. Do drukarki używaj STL albo 3MF, które niosą wszystko.
+STEP niesie tylko dokładne bryły CAD. Zaimportowana siatka jest na potrzeby pliku zamieniana na dokładną bryłę, tak jak robi to {{ui:editor.tool.makeExact}} (zobacz „Zamiana zaimportowanej siatki na dokładną bryłę” niżej), więc eksport może potrwać do minuty; siatka o głównie swobodnym kształcie, jak figurka, zostaje pominięta, podobnie jak wszystko inne, czego nie da się zapisać dokładnie. Komunikat po eksporcie wymienia te bryły i mówi dlaczego. Do drukarki używaj STL albo 3MF, które niosą wszystko.
 
 ### SVG dla lasera lub plotera
 
@@ -112,9 +112,17 @@ Obrazy wzorcowe dodaje się w trybie szkicu, zobacz [Szkice](chapter:sketches).
 
 ## Upraszczanie zaimportowanej siatki
 
-Zeskanowana albo rzeźbiona siatka często ma dużo więcej trójkątów, niż potrzebuje jej kształt, a każdy z nich jest przenoszony podczas przesuwania, cięcia i zapisu. {{ui:simplify.title}} w grupie Modyfikuj (albo w menu prawego przycisku na bryle) pokazuje siatkę taką, jaka jest, obok tego, co zostałoby z niej przy wybranym odsetku trójkątów. Oba widoki obracają się i przybliżają razem przyciskami myszy jak na płaszczyźnie roboczej. Ustaw, ile zachować, w procentach albo jako liczbę trójkątów, a {{ui:simplify.apply}} bierze lżejszą siatkę. Wynik to zwykła siatka: dla wyniku cięcia albo scalenia rezygnujesz z {{ui:group.edit}} i jego oryginalnych części.
+Zeskanowana albo rzeźbiona siatka często ma dużo więcej trójkątów, niż potrzebuje jej kształt, a każdy z nich jest przenoszony podczas przesuwania, cięcia i zapisu. {{ui:simplify.title}} w grupie Modyfikuj (albo w menu prawego przycisku na bryle) pokazuje siatkę taką, jaka jest, obok tego, co zostałoby z niej przy wybranym odsetku trójkątów. Oba widoki obracają się i przybliżają razem przyciskami myszy jak na płaszczyźnie roboczej. Ustaw, ile zachować, w procentach albo jako liczbę trójkątów, a {{ui:simplify.apply}} bierze lżejszą siatkę. Wynik to zwykła siatka: dla wyniku cięcia albo scalenia rezygnujesz z {{ui:group.edit}} i jego oryginalnych części. Z włączoną opcją {{ui:simplify.keepEdges}}, jak na początku, ostre krawędzie i brzegi otworów zostają dokładnie na miejscu, a płaskie ściany i tak tracą większość trójkątów; po wyłączeniu upraszczanie może je zaokrąglić, by zejść niżej.
 
 Cięcie, scalanie i część wspólna zaimportowanej siatki są liczone w przeglądarce, dlatego ustawienia obszaru roboczego ograniczają, ile trójkątów może mieć taka siatka ({{ui:workspace.booleanTriangleLimit}}). Siatka powyżej limitu nie jest przetwarzana, a komunikat podaje liczbę jej trójkątów. Najpierw uprość siatkę albo podnieś limit, jeśli Twój komputer to udźwignie.
+
+## Zamiana zaimportowanej siatki na dokładną bryłę
+
+Plik STL, OBJ lub 3MF zawiera tylko trójkąty, nawet jeśli część narysowano w CAD z płaskimi ścianami i okrągłymi otworami. {{ui:editor.tool.makeExact}} w grupie {{ui:editor.group.modify}} (albo w menu prawego przycisku na bryle) szuka w tych trójkątach płaszczyzn, walców, stożków, kul i torusów, z których powstały, i odbudowuje z nich bryłę jako dokładną bryłę CAD: otwór staje się jednym prawdziwym walcem z okrągłą krawędzią zamiast setki wąskich pasków. Potem {{ui:editor.tool.fillet}} i {{ui:editor.tool.chamfer}} idą wzdłuż jednej czystej krawędzi, {{ui:editor.tool.deleteFace}} usuwa całe zaokrąglenie albo ściankę otworu, a eksport STEP niesie prawdziwe ściany. Pasek stanu mówi, co znaleziono, np. „płaszczyzny: 9, walce: 4”.
+
+To, co nie pasuje do żadnej z tych powierzchni, zostaje małymi płaskimi fasetkami, a komunikat mówi, jaka to część powierzchni. Bryła o głównie swobodnym kształcie, jak figurka albo rzeźbiona forma, zostaje siatką, podobnie jak siatka z dziurami lub przecinającymi się ściankami, która nie może zamknąć się w bryłę. Przyjmowanych jest do 400 000 trójkątów, a duża siatka może zająć kilka minut. Większą siatkę sprowadzisz poniżej tej granicy przez {{ui:simplify.title}} z włączoną opcją {{ui:simplify.keepEdges}}; w innym razie użyj siatki takiej, jaka przyszła, wtedy wychodzi najczyściej. Jedno cofnięcie przywraca siatkę.
+
+Przy małej siatce z okrągłymi ścianami, do 4000 trójkątów, narzędzia krawędzi robią to same: zaokrąglenie krawędzi takiego STL najpierw odbudowuje go w ten sam sposób.
 
 ## Zgłaszanie błędu
 

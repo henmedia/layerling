@@ -1045,7 +1045,7 @@ export const tools = [
   },
   {
     name: "layerling_simplify_mesh",
-    description: "Reduce the triangle count of one imported mesh (decimation), as the editor's \"Simplify mesh\" does - for a dense STL, OBJ, 3MF or STEP import, or the mesh a cut, merge or wrap left behind. Use it when a mesh is too complex to cut (the cut reports the triangle count and the limit) or makes the editor slow. Pass either keepPercent or targetTriangles. Fine detail goes first; the body keeps its size and position, and the simplifier stops early rather than close holes or merge walls, so the count reached can stay above a very low target. The result is one plain mesh body: a group simplified this way can no longer be ungrouped or opened. One undo step brings the old mesh back. Shapes from the catalogue have no mesh to simplify; lower their sides or quality instead. Returns the object with trianglesBefore and trianglesAfter.",
+    description: "Reduce the triangle count of one imported mesh (decimation), as the editor's \"Simplify mesh\" does - for a dense STL, OBJ, 3MF or STEP import, or the mesh a cut, merge or wrap left behind. Use it when a mesh is too complex to cut (the cut reports the triangle count and the limit) or makes the editor slow. Pass either keepPercent or targetTriangles. Fine detail goes first; the body keeps its size and position, and the simplifier stops early rather than close holes or merge walls, so the count reached can stay above a very low target. Sharp edges (faces meeting at more than 30 degrees) and the rims of holes stay exactly where they are, as the panel's \"Keep edges and holes\" does: flat faces lose most of their triangles, a bore stays as round as it was; pass keepEdges false to let them be rounded off for a lower count. The result is one plain mesh body: a group simplified this way can no longer be ungrouped or opened. One undo step brings the old mesh back. Shapes from the catalogue have no mesh to simplify; lower their sides or quality instead. Returns the object with trianglesBefore, trianglesAfter and keepEdges.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -1053,6 +1053,18 @@ export const tools = [
         id: { type: "string", description: "The mesh to simplify; defaults to the one selected body." },
         keepPercent: { type: "number", description: "Share of the triangles to keep, above 0 and below 100. 50 halves the count." },
         targetTriangles: { type: "number", description: "Number of triangles to aim for, below the current count (importedTriangles in layerling_list_objects)." },
+        keepEdges: { type: "boolean", description: "Keep sharp edges and the rims of holes exactly. Default true." },
+      },
+    },
+  },
+  {
+    name: "layerling_make_exact",
+    description: "Turn one imported mesh (STL, OBJ, 3MF, or the mesh a split or wrap left behind) into an exact CAD body, as the editor's \"Make exact\" does: its planes, cylinders, cones, spheres and tori are recognised and rebuilt as real faces, the edges between them as lines, arcs and curves. Afterwards layerling_list_edges lists one edge per real edge (a bore's rim is one circle, not a hundred segments), so chamfers and fillets follow it cleanly, layerling_list_faces and layerling_delete_faces work on its faces, and a STEP export carries the real cylinders. What fits no surface stays flat facets; a mostly free-form mesh (a figure, a sculpted shape) is refused and stays a mesh. Up to 400,000 triangles; a larger mesh goes below that with layerling_simplify_mesh (keepEdges on), a smaller one comes out cleanest as it came. Takes up to a few minutes for a large mesh. One undo step brings the mesh back. Returns the object, the number of faces, what was found (planes, cylinders, cones, spheres, tori), the facets left and their share of the surface in percent.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The mesh to make exact; defaults to the one selected body." },
       },
     },
   },

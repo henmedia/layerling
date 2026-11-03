@@ -55,7 +55,7 @@ Na grupie, na przykład walcu z otworem, obrobiona krawędź należy do gotowej 
 
 > **Warto wiedzieć:** layerling używa do zaokrągleń i fazek prawdziwej geometrii CAD, a nie tylko siatki trójkątów. Dlatego zaokrąglona krawędź pozostaje zaokrągloną krawędzią w eksporcie STEP.
 
-Część zaimportowana jako STEP też zachowuje geometrię CAD: fazowanie, zaokrąglanie i drążenie działają na bryle z pliku, niezależnie od tego, jak dokładnie część jest rysowana na ekranie. STL, OBJ i 3MF niosą tylko trójkąty, a dokładnie narysowana część może być dla narzędzia krawędzi zbyt gęsta. Jeśli część jest dostępna także jako STEP, zaimportuj STEP.
+Część zaimportowana jako STEP też zachowuje geometrię CAD: fazowanie, zaokrąglanie i drążenie działają na bryle z pliku, niezależnie od tego, jak dokładnie część jest rysowana na ekranie. STL, OBJ i 3MF niosą tylko trójkąty, a dokładnie narysowana część może być dla narzędzia krawędzi zbyt gęsta. Jeśli część jest dostępna także jako STEP, zaimportuj STEP. {{ui:editor.tool.makeExact}} najpierw zamienia taką część w dokładną bryłę z prawdziwymi płaszczyznami i walcami, zobacz [Pliki, zapis i udostępnianie](chapter:files-and-saving), „Zamiana zaimportowanej siatki na dokładną bryłę”.
 
 ## Drążenie brył
 

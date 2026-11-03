@@ -13,8 +13,11 @@ import {
   unit,
   type V3,
 } from "@/lib/meshSurfaceFit";
-import { type MeshSegmentation, segmentMesh, summarizeSegmentation, type SegmentationSummary, weldMesh } from "@/lib/meshSurfaceSegments";
+import { defaultTolerance, freeformShare, meshDiagonal, type MeshSegmentation, segmentMesh, summarizeSegmentation, type SegmentationSummary, weldMesh } from "@/lib/meshSurfaceSegments";
 import { angleRound, buildTopology, type ForcedCuts, type MeshTopology, type Piece, solveOnto } from "@/lib/meshSurfaceTopology";
+import { EXACT_MESH_FREEFORM_MESSAGE } from "@/lib/cadMeshExactMessages";
+
+export { EXACT_MESH_FAILED_MESSAGE, EXACT_MESH_FREEFORM_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
 
 /*
  * A triangle mesh rebuilt as an exact solid: its planes, cylinders, cones, spheres and tori as real faces, the edges
@@ -45,19 +48,48 @@ export type ExactMeshOptions = {
   maxTriangles?: number;
   /** Told why a step failed, for tests. */
   debug?: (message: string) => void;
+  /** Stop looking for curved faces after this long; what is left becomes facets. */
+  budgetMs?: number;
+  /**
+   * Throw EXACT_MESH_FREEFORM_MESSAGE instead of building a mesh that is mostly free-form (more than half its surface
+   * fits no plane, cylinder, cone, sphere or torus): its solid would be the mesh's triangles over again, one face each.
+   */
+  refuseFreeform?: boolean;
 };
 
+
 export function exactSolidFromMesh(cad: OcctKernel, positions: ArrayLike<number>, indices?: ArrayLike<number>, options: ExactMeshOptions = {}): ExactMeshResult | null {
+  // Every primitive, edge and face made on the way is let go at the end; only the solid is kept, as a fresh copy.
+  const mark = cad.checkpoint();
+  let brep: string | null = null;
+  let report: ExactMeshReport | null = null;
+  try {
+    const result = rebuild(cad, positions, indices, options);
+    if (result) {
+      brep = cad.toBREP(result.solid);
+      report = result.report;
+    }
+  } finally {
+    cad.releaseSince(mark);
+  }
+  return brep && report ? { solid: cad.fromBREP(brep), report } : null;
+}
+
+function rebuild(cad: OcctKernel, positions: ArrayLike<number>, indices: ArrayLike<number> | undefined, options: ExactMeshOptions): ExactMeshResult | null {
   const welded = weldMesh(positions, indices);
   if (welded.triangles.length > (options.maxTriangles ?? 200_000)) return null;
-  let seg = segmentMesh(welded, { tolerance: options.tolerance, debug: options.debug });
-  if (!seg) return null;
+  const found = bestSegmentation(welded, options);
+  if (!found) return null;
+  let seg = found.seg;
   const meshVolume = signedVolume(seg);
   const meshArea = seg.areas.reduce((s, a) => s + a, 0);
   // Mostly freeform (a figure, a sculpted shape): no surfaces to find, and thousands of facets are what the mesh is
   // already. One try for what there is; no second.
-  const first = summarizeSegmentation(seg);
-  const freeform = first.facetArea > first.area * 0.5;
+  const doubtful = found.doubtful;
+  const freeform = doubtful > 0.5;
+  if (freeform && options.refuseFreeform) {
+    throw new Error(`${EXACT_MESH_FREEFORM_MESSAGE} (${Math.floor(100 * (1 - doubtful))} %)`);
+  }
   for (let attempt = 0; attempt < (freeform ? 1 : 4); attempt += 1) {
     // A curved face with a hole in it (a bore crossing another) cannot be built in one: cut it through each hole.
     const forced: ForcedCuts = new Map();
@@ -100,6 +132,41 @@ export function exactSolidFromMesh(cad: OcctKernel, positions: ArrayLike<number>
     seg = demote(seg, failed);
   }
   return null;
+}
+
+/** The looser tolerances tried when the first leaves faces in doubt, as multiples of it. */
+const LOOSER_TOLERANCES = [4, 16];
+
+/**
+ * The mesh cut into its faces at the tightest tolerance that finds them. A CAD program's STL has its corners on the
+ * surfaces to float accuracy, and the first try finds every face. A mesh divided again after it was exported (a
+ * remesher, a repair, a boolean that split its long triangles) has corners on the straight chords between the old
+ * ones, a few µm off a cylinder: the tight tolerance breaks its cylinders into hundreds of strips, a looser one finds
+ * them whole. Looser is only taken when it is stable: the real faces of a part come out alike at four and at sixteen
+ * times the tolerance, while on a free-form surface every tolerance fits other patches. A given tolerance is
+ * taken as it is. Each try has a third of the time.
+ */
+function bestSegmentation(welded: ReturnType<typeof weldMesh>, options: ExactMeshOptions) {
+  const base = options.tolerance ?? defaultTolerance(meshDiagonal(welded));
+  const share = options.budgetMs === undefined ? undefined : options.budgetMs / (options.tolerance === undefined ? 1 + LOOSER_TOLERANCES.length : 1);
+  const tryAt = (tolerance: number) => {
+    const seg = segmentMesh(welded, { tolerance, debug: options.debug, budgetMs: share });
+    if (!seg) return null;
+    const doubtful = freeformShare(seg);
+    options.debug?.(`tolerance ${tolerance.toFixed(4)}: ${(doubtful * 100).toFixed(1)} % in doubt, ${seg.regions.length} regions`);
+    return { seg, doubtful };
+  };
+  // Not closed, or not manifold: no tolerance mends that.
+  const first = tryAt(base);
+  if (!first || first.doubtful <= 0.01 || options.tolerance !== undefined) return first;
+  const looser = LOOSER_TOLERANCES.map((step) => tryAt(base * step));
+  const [near, far] = looser;
+  if (!near || !far) return first;
+  // Stable: as many faces, give or take a tenth (a cylinder may come out as a cone of a fraction of a degree), and as
+  // much left in doubt.
+  const faces = (seg: MeshSegmentation) => seg.regions.filter((r) => !r.facet).length;
+  const stable = Math.abs(faces(near.seg) - faces(far.seg)) <= Math.max(1, faces(near.seg) * 0.1) && Math.abs(near.doubtful - far.doubtful) <= 0.01;
+  return stable && near.doubtful < first.doubtful - 0.005 ? near : first;
 }
 
 /** The mesh's volume by the divergence theorem (positive for an outward-facing mesh). */

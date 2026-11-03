@@ -55,7 +55,7 @@ Su un gruppo, per esempio un cilindro con un foro, lo spigolo trattato appartien
 
 > **Da sapere:** per raccordi e smussi layerling usa la vera geometria CAD, non solo una mesh di triangoli. Perciò nell’esportazione STEP uno spigolo arrotondato resta uno spigolo arrotondato.
 
-Anche una parte importata da STEP conserva la propria geometria CAD: smussi, raccordi e svuotamento agiscono sul corpo del file, indipendentemente dal livello di dettaglio con cui viene disegnato sullo schermo. I file STL, OBJ e 3MF contengono solo triangoli e, se la mesh è molto dettagliata, lo strumento per gli spigoli potrebbe non riuscire a elaborarla. Se la parte è disponibile anche in formato STEP, importa quel file.
+Anche una parte importata da STEP conserva la propria geometria CAD: smussi, raccordi e svuotamento agiscono sul corpo del file, indipendentemente dal livello di dettaglio con cui viene disegnato sullo schermo. I file STL, OBJ e 3MF contengono solo triangoli e, se la mesh è molto dettagliata, lo strumento per gli spigoli potrebbe non riuscire a elaborarla. Se la parte è disponibile anche in formato STEP, importa quel file. {{ui:editor.tool.makeExact}} trasforma prima un pezzo simile in un corpo esatto con piani e cilindri veri, vedi [File, salvataggio e condivisione](chapter:files-and-saving), «Rendere esatta una mesh importata».
 
 ## Svuotare i corpi
 

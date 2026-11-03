@@ -13,13 +13,15 @@ import { profileExtrusionSolid } from "@/lib/cadProfileSolid";
 import { applyCadTransform } from "@/lib/cadModifierRuntime";
 import { hingeWorldParts } from "@/lib/hingeParts";
 import { restoreGroupedChildren } from "@/lib/editorBooleans";
+import { meshForShape } from "@/lib/editorMeshCore";
+import { exactMeshFreeformShare, exactSolidFromMesh } from "@/lib/cadMeshExact";
 
 /**
  * Why a body did not go into the STEP file, in a word the editor can say in the user's language
  * (#184): a twist has no exact form yet, a mesh has no CAD source, a hole was left out, or the
  * kernel could not build it.
  */
-export type SkipCode = "twist" | "deform" | "mesh" | "oval" | "hole" | "holeCut" | "failed" | "noExact";
+export type SkipCode = "twist" | "deform" | "mesh" | "freeform" | "meshFailed" | "oval" | "hole" | "holeCut" | "failed" | "noExact";
 
 export type SkippedShape = {
   name: string;
@@ -327,6 +329,52 @@ function buildPlacedBody(brep: Brep, part: { transform?: number[] } | null, buil
   }
 }
 
+/** All meshes of one export are made exact within this time, so a design full of scans still gets its file. */
+const EXACT_EXPORT_BUDGET_MS = 60_000;
+/** One mesh at most this long, so one hard mesh leaves time for the others. */
+const EXACT_EXPORT_MESH_BUDGET_MS = 20_000;
+/** A denser mesh is left out: Make exact in the editor takes up to 400,000 triangles with more time. */
+const EXACT_EXPORT_TRIANGLE_LIMIT = 200_000;
+const FREEFORM_REASON = "mostly free-form mesh";
+const MESH_NOT_EXACT_REASON = "mesh not made exact";
+
+export type ExactExportBudget = { until: number };
+
+/**
+ * An imported mesh (STL, OBJ, 3MF, the mesh of a cut) made exact for the file, as Make exact does in the editor: its
+ * planes, cylinders, cones, spheres and tori become real faces (lib/cadMeshExact.ts). A mesh that is mostly free-form
+ * stays out, as does one that does not close into a solid or would take longer than the export has left.
+ */
+function buildMeshMadeExact(brep: Brep, shape: WorkplaneShape, budget: ExactExportBudget): BuildOutcome {
+  const kernel = occtKernel();
+  if (!kernel) return { skip: `${MESH_NOT_EXACT_REASON}: the CAD kernel is not loaded` };
+  const left = budget.until - performance.now();
+  if (left < 2000) return { skip: `${MESH_NOT_EXACT_REASON}: no time left in this export` };
+  const mesh = meshForShape(shape);
+  if (mesh.faces.length > EXACT_EXPORT_TRIANGLE_LIMIT) return { skip: `${MESH_NOT_EXACT_REASON}: ${mesh.faces.length} triangles, more than ${EXACT_EXPORT_TRIANGLE_LIMIT}` };
+  const positions = new Float64Array(mesh.vertices.length * 3);
+  mesh.vertices.forEach((vertex, index) => positions.set(vertex, index * 3));
+  const indices = new Uint32Array(mesh.faces.length * 3);
+  mesh.faces.forEach((face, index) => indices.set(face, index * 3));
+  try {
+    const exact = exactSolidFromMesh(kernel, positions, indices, { budgetMs: Math.min(EXACT_EXPORT_MESH_BUDGET_MS, left), refuseFreeform: true });
+    if (!exact) return { skip: `${MESH_NOT_EXACT_REASON}: its faces did not close into a solid` };
+    const text = kernel.toBREP(exact.solid);
+    try {
+      kernel.release(exact.solid);
+    } catch {
+      // A released handle is no reason to lose the export.
+    }
+    const restored = brep.fromBREP(text);
+    if (!restored.ok) return { skip: `${MESH_NOT_EXACT_REASON}: ${String(restored.error.message ?? restored.error)}` };
+    return { solid: restored.value as unknown as BrepSolid };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (exactMeshFreeformShare(message) !== null) return { skip: FREEFORM_REASON };
+    return { skip: `${MESH_NOT_EXACT_REASON}: ${message}` };
+  }
+}
+
 /** A thread, rod, screw, nut or tapped hole as its exact body, built and placed as the CAD worker does. */
 function buildThreadBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
   const part = cadModifierThreadForShape(shape);
@@ -389,6 +437,8 @@ function buildHingeBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
 
 export function skipCodeFor(shape: WorkplaneShape, reason: string): SkipCode {
   if (reason.startsWith("hole subtraction")) return "holeCut";
+  if (reason.startsWith(FREEFORM_REASON)) return "freeform";
+  if (reason.startsWith(MESH_NOT_EXACT_REASON)) return "meshFailed";
   if (shape.hole) return "hole";
   if (/failed|could not/i.test(reason)) return "failed";
   if (Math.abs(shape.extrudeTwist ?? 0) > 1e-9) return "twist";
@@ -480,7 +530,7 @@ function collectHoles(brep: Brep, shapes: WorkplaneShape[], skipped: SkippedShap
 }
 
 /** The solids of these shapes with the holes among them cut out; a group is a scope of its own. */
-async function buildScope(brep: Brep, shapes: WorkplaneShape[], skipped: SkippedShape[]): Promise<ScopePart[]> {
+async function buildScope(brep: Brep, shapes: WorkplaneShape[], skipped: SkippedShape[], budget: ExactExportBudget): Promise<ScopePart[]> {
   const holes: { box: Aabb; solid: BrepSolid }[] = [];
   collectHoles(brep, shapes, skipped, holes);
 
@@ -490,7 +540,7 @@ async function buildScope(brep: Brep, shapes: WorkplaneShape[], skipped: Skipped
     const source = stepSourceForShape(shape);
     if (source === "unsupported" && isOpenableGroup(shape)) {
       // Its holes were cut inside; the holes around it still reach its bodies below.
-      parts.push(...await buildScope(brep, restoreGroupedChildren(shape).filter((child) => !child.hidden), skipped));
+      parts.push(...await buildScope(brep, restoreGroupedChildren(shape).filter((child) => !child.hidden), skipped, budget));
       continue;
     }
     if (shape.kind === "hinge" && !shape.cadBrep && !shapeHasShapeDeform(shape)) {
@@ -513,6 +563,8 @@ async function buildScope(brep: Brep, shapes: WorkplaneShape[], skipped: Skipped
       built = buildGridfinityBody(brep, shape);
     } else if (source === "hirth") {
       built = buildHirthBody(brep, shape);
+    } else if (shape.importedMesh && !shape.importedMesh.brepStep) {
+      built = buildMeshMadeExact(brep, shape, budget);
     } else {
       const reason = shape.kind === "mesh" ? "imported mesh has no B-Rep source; re-import as STEP to round-trip" : unsupportedReason();
       skipped.push(describe(shape, reason));
@@ -550,7 +602,7 @@ export async function exportShapesToStep(shapes: WorkplaneShape[]): Promise<Step
   const brep = await loadBrepWithOcct();
 
   const skipped: SkippedShape[] = [];
-  const parts = (await buildScope(brep, shapes, skipped)).map((part) => ({ shape: toCadZUp(brep, part.solid), name: part.name, color: part.color }));
+  const parts = (await buildScope(brep, shapes, skipped, { until: performance.now() + EXACT_EXPORT_BUDGET_MS })).map((part) => ({ shape: toCadZUp(brep, part.solid), name: part.name, color: part.color }));
 
   if (parts.length === 0) {
     // Der Aufrufer uebersetzt diesen Fall; der Text hier ist nur fuer Protokolle.

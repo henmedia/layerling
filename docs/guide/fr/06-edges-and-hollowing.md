@@ -53,7 +53,7 @@ Sur un groupe, par exemple un cylindre percé d'un trou, le bord traité apparti
 
 > **Bon à savoir :** layerling fonctionne avec une véritable géométrie CAO pour les congés et les chanfreins, et pas seulement avec un maillage triangulaire. C'est pourquoi un bord arrondi reste un bord arrondi dans l'exportation STEP.
 
-Une pièce importée en STEP conserve également sa géométrie CAO : chanfreins, congés et travaux d'évidement sur le corps à partir du fichier, quelle que soit la finesse avec laquelle la pièce est dessinée à l'écran. STL, OBJ et 3MF n'apportent que des triangles, et une pièce finement dessinée peut être trop dense pour l'outil de bord. Si une pièce est également disponible en STEP, importez-la.
+Une pièce importée en STEP conserve également sa géométrie CAO : chanfreins, congés et travaux d'évidement sur le corps à partir du fichier, quelle que soit la finesse avec laquelle la pièce est dessinée à l'écran. STL, OBJ et 3MF n'apportent que des triangles, et une pièce finement dessinée peut être trop dense pour l'outil de bord. Si une pièce est également disponible en STEP, importez-la. {{ui:editor.tool.makeExact}} transforme d'abord une telle pièce en corps exact avec de vrais plans et cylindres, voir [Fichiers, sauvegarde et partage](chapter:files-and-saving), "Rendre exact un maillage importé".
 
 ## Corps creux
 

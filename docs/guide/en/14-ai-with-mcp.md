@@ -146,6 +146,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_wrap_around_cylinder` | wraps a body lying flat, an SVG or text for example, around a cylinder, outward or inward as an engraving |
 | `layerling_texture_surface` | lays a surface texture onto a body: grooves, knurling, honeycomb or bumps, for grip or for looks, and changes or removes it later |
 | `layerling_simplify_mesh` | reduces the triangle count of an imported mesh, to a share in percent or to a number of triangles |
+| `layerling_make_exact` | turns an imported mesh into an exact CAD body: planes, cylinders, cones, spheres and tori become real faces, so edges round cleanly and STEP carries them |
 | `layerling_save_custom_shape` | keeps bodies as a custom shape, on the server or in the browser, to insert them into other designs |
 | `layerling_list_custom_shapes` | lists the custom shapes on the server and in the browser |
 | `layerling_insert_custom_shape` | inserts a custom shape into the open design, at a spot x/z if you like |

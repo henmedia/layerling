@@ -146,6 +146,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_wrap_around_cylinder` | vikler en form der ligger fladt, for eksempel en SVG eller tekst, rundt om en cylinder, udad eller indad som gravering |
 | `layerling_texture_surface` | lægger en overfladestruktur på en form: riller, riflinger, bikager eller knopper, for bedre greb eller for udseendet, og ændrer eller fjerner den senere |
 | `layerling_simplify_mesh` | reducerer trekantsantallet i et importeret mesh, til en andel i procent eller til et antal trekanter |
+| `layerling_make_exact` | gør et importeret mesh til en eksakt CAD-form: planer, cylindre, kegler, kugler og tori bliver rigtige flader, så kanter rundes rent, og STEP bærer dem |
 | `layerling_save_custom_shape` | beholder former som en egen form, på serveren eller i browseren, for at indsætte dem i andre designs |
 | `layerling_list_custom_shapes` | lister de egne former på serveren og i browseren |
 | `layerling_insert_custom_shape` | indsætter en egen form i det åbne design, evt. på en position x/z |

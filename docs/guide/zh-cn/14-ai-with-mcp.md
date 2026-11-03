@@ -146,6 +146,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_wrap_around_cylinder` | 把平躺的实体（例如 SVG 或文字）包裹到圆柱上，可向外，也可向内作为雕刻 |
 | `layerling_texture_surface` | 给实体加上表面纹理：凹槽、滚花、蜂窝或凸点，用于防滑或美观，之后还可以修改或去除 |
 | `layerling_simplify_mesh` | 减少导入网格的三角面数，可缩减到百分比比例或指定三角面数量 |
+| `layerling_make_exact` | 将导入网格转为精确的 CAD 实体：平面、圆柱面、圆锥面、球面和圆环面成为真正的面，边能干净地倒圆角，STEP 也会带上它们 |
 | `layerling_save_custom_shape` | 把实体保存为自定义形状，可存到服务器或浏览器，以便插入其他设计 |
 | `layerling_list_custom_shapes` | 列出服务器和浏览器中的自定义形状 |
 | `layerling_insert_custom_shape` | 把自定义形状插入当前设计，可指定 x/z 位置 |

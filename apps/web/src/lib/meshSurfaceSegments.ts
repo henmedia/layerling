@@ -116,6 +116,21 @@ const SMOOTH_ANGLE = 50 * DEG;
 /** A triangle of a curved face faces this close to the surface's own normal at its middle. */
 const NORMAL_SLACK = 35 * DEG;
 
+/** How far a corner may lie off its surface, unless told otherwise: float accuracy of an STL of this size, at least 2 µm. */
+export function defaultTolerance(diagonal: number) {
+  return Math.max(0.002, diagonal * 1e-5);
+}
+
+/** The diagonal of a welded mesh's bounding box. */
+export function meshDiagonal(mesh: WeldedMesh) {
+  let lo: V3 = [Infinity, Infinity, Infinity], hi: V3 = [-Infinity, -Infinity, -Infinity];
+  for (const p of mesh.points) {
+    lo = [Math.min(lo[0], p[0]), Math.min(lo[1], p[1]), Math.min(lo[2], p[2])];
+    hi = [Math.max(hi[0], p[0]), Math.max(hi[1], p[1]), Math.max(hi[2], p[2])];
+  }
+  return norm(sub(hi, lo));
+}
+
 export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {}): MeshSegmentation | null {
   const T = mesh.triangles.length;
   if (T < 4) return null;
@@ -131,7 +146,7 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     hi = [Math.max(hi[0], p[0]), Math.max(hi[1], p[1]), Math.max(hi[2], p[2])];
   }
   const diagonal = norm(sub(hi, lo));
-  const tolerance = options.tolerance ?? Math.max(0.002, diagonal * 1e-5);
+  const tolerance = options.tolerance ?? defaultTolerance(diagonal);
   for (const [a, b, c] of mesh.triangles) {
     const n = cross(sub(P[b], P[a]), sub(P[c], P[a]));
     areas.push(norm(n) / 2);
@@ -605,4 +620,50 @@ export function summarizeSegmentation(seg: MeshSegmentation): SegmentationSummar
     out[r.surface.kind] += 1;
   }
   return out;
+}
+
+/**
+ * How much of the surface is in doubt, 0 to 1: the facets, flat pieces of one triangle, and small curved pieces that
+ * turn by less than a quarter round their axis. A CAD part has its area in a few large faces and in bores and fillets
+ * that run all the way round or along an edge; on a free-form surface (a figure, a sculpted or lofted shape) the
+ * fitting finds only small patches here and there, each of some surface or other, and that is what this measures.
+ * A perforated plate's hundred small bores each go all the way round and are not in doubt.
+ */
+export function freeformShare(seg: MeshSegmentation): number {
+  let total = 0;
+  let doubtful = 0;
+  const regionAreas = seg.regions.map((r) => r.triangles.reduce((s, t) => s + seg.areas[t], 0));
+  for (const area of regionAreas) total += area;
+  if (total <= 0) return 1;
+  seg.regions.forEach((r, index) => {
+    const area = regionAreas[index];
+    if (r.facet) {
+      doubtful += area;
+      return;
+    }
+    const s = r.surface;
+    if (s.kind === "plane") {
+      if (r.triangles.length === 1) doubtful += area;
+      return;
+    }
+    if (area >= total * 0.01) return;
+    if (s.kind === "sphere") {
+      doubtful += area;
+      return;
+    }
+    const origin = s.kind === "cone" ? s.apex : s.kind === "cylinder" ? s.origin : s.center;
+    const [u, v] = perpendicularFrameOf(s.axis);
+    const angles: number[] = [];
+    for (const t of r.triangles) {
+      for (const corner of seg.mesh.triangles[t]) {
+        const d = sub(seg.mesh.points[corner], origin);
+        angles.push(Math.atan2(dot(d, v), dot(d, u)));
+      }
+    }
+    angles.sort((x, y) => x - y);
+    let gap = angles[0] + 2 * Math.PI - angles[angles.length - 1];
+    for (let i = 1; i < angles.length; i += 1) gap = Math.max(gap, angles[i] - angles[i - 1]);
+    if (2 * Math.PI - gap < Math.PI / 2) doubtful += area;
+  });
+  return doubtful / total;
 }

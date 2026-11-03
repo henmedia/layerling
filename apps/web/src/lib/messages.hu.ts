@@ -2448,7 +2448,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "export.obj.description": "Univerzális 3D háló",
   "export.obj.note": "Széles körben támogatott hálóformátum modellezéshez, rendereléshez és adatcseréhez. A színek a csúcspontokon tárolódnak, ezeket a Bambu Studio és az OrcaSlicer beolvassa.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "A dobozokat, hengereket, gömböket és kúpokat pontos CAD-geometriaként őrzi meg, minden olyannal együtt, aminek az éleit lekerekítették vagy letörték, valamint a STEP-ként érkezett testekkel. A menetek, rugók és fogaskerekek is a pontos testükkel mennek. A kúposított, döntött és csavart alakzatok is pontosan mennek. Az importált hálók viszont például nem férnek bele a STEP-be — ezek STL-ként mennek.",
+  "export.step.note": "A dobozokat, hengereket, gömböket és kúpokat pontos CAD-geometriaként őrzi meg, minden olyannal együtt, aminek az éleit lekerekítették vagy letörték, valamint a STEP-ként érkezett testekkel. A menetek, rugók és fogaskerekek is a pontos testükkel mennek. A kúposított, döntött és csavart alakzatok is pontosan mennek. Az importált hálók pontossá alakítva mennek, síkjaik, hengereik, kúpjaik, gömbjeik és tóruszaik valódi lapként; a szabad formájú háló, például egy figura, STL-ként megy.",
   "export.svg.description": "Felülnézeti vektor",
   "export.svg.note": "Tiszta felülnézeti sziluettet exportál milliméterben, a lyukakkal és az íves kontúrokkal együtt.",
   "export.svg.noteFootprint": "Csak azokat a körvonalakat exportálja, amelyekkel a tárgyak a munkasíkon állnak, vonalakként milliméterben, lézervágáshoz és sablonokhoz.",

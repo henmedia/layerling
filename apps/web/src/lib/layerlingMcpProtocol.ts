@@ -120,6 +120,7 @@ export type LayerlingMcpCommandName =
   | "wrap_around_cylinder"
   | "texture_surface"
   | "simplify_mesh"
+  | "make_exact"
   | "save_custom_shape"
   | "list_custom_shapes"
   | "insert_custom_shape"

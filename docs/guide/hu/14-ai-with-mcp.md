@@ -142,6 +142,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_wrap_around_cylinder` | egy laposan fekvő testet, például egy SVG-t vagy szöveget egy henger köré teker, kifelé vagy befelé gravírozásként |
 | `layerling_texture_surface` | felületi mintázatot visz fel egy testre: hornyokat, recézést, méhsejtet vagy bütyköket, a jobb fogásért vagy a látványért, és később módosítja vagy eltávolítja |
 | `layerling_simplify_mesh` | csökkenti egy importált háló háromszögeinek számát, százalékos arányra vagy egy háromszögszámra |
+| `layerling_make_exact` | egy importált hálót pontos CAD-testté alakít: a síkok, hengerek, kúpok, gömbök és tóruszok valódi lapokká válnak, így az élek tisztán lekerekíthetők, és a STEP is viszi őket |
 | `layerling_save_custom_shape` | testeket őriz meg saját alakzatként, a szerveren vagy a böngészőben, hogy más tervekbe beilleszthetők legyenek |
 | `layerling_list_custom_shapes` | felsorolja a szerveren és a böngészőben lévő saját alakzatokat |
 | `layerling_insert_custom_shape` | beilleszt egy saját alakzatot a nyitott tervbe, ha kell, egy x/z helyre |

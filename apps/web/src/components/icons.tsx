@@ -153,6 +153,7 @@ export {
   ToolbarPunchIcon,
   ToolbarDeleteFaceIcon,
   ToolbarSimplifyIcon,
+  ToolbarMakeExactIcon,
   ToolbarSurfaceTextureIcon,
   ToolbarBundleIcon,
   ToolbarGroupIcon,
