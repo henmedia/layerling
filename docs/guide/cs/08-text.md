@@ -18,6 +18,8 @@ V knihovně vyberte {{ui:shape.text}} a položte jej na plochu. Do pole {{ui:pro
 
 Text začíná jako jediné těleso. Pro samostatnou práci s písmeny použijte {{ui:inspector.separateParts}}. Každé písmeno pak bude vlastním tvarem.
 
+**Více řádků:** Text má jeden řádek. Pro ceduli nebo tabulku s více řádky otevřete pod nastavením kartu {{ui:textBlock.title}}: zadejte řádky do {{ui:textBlock.lines}}, zvolte {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} nebo {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} a {{ui:textBlock.step}} - při 80 % je každý řádek o pětinu menší než ten nad ním. Tlačítko udělá z každého řádku samostatný text pod tím nad ním, s písmem, výškou a výplní tohoto textu; první zaujme místo tohoto textu. Potom může každý řádek dostat vlastní velikost, písmo nebo barvu.
+
 Hrany přímého i obloukového textu lze zkosit a zaoblit, viz [Úpravy hran a vytváření dutin](chapter:edges-and-hollowing). Kvůli úzkým tahům používejte malé hodnoty, například 0,2 až 0,5 mm.
 
 ## Vlastní písma
@@ -151,9 +153,10 @@ Pro nápis podél okraje mince, víčka nebo prstence zapněte {{ui:prop.textCur
 
 ![Text po kružnici. Všechna písmena mají společné účaří.](shot:curved-text)
 
-Písmena se rozmístí po kružnici se společným účařím stejně rovnoměrně jako v přímém textu. K dispozici jsou čtyři volby:
+Písmena se rozmístí po kružnici se společným účařím stejně rovnoměrně jako v přímém textu. K dispozici je pět voleb:
 
 - **{{ui:prop.textRadius}}**, 5 až 500 mm: poloměr kružnice, po níž vede účaří. Písmena přitom zůstávají na svém místě, mění se jen jejich zakřivení.
+- **{{ui:prop.textLetterWidth}}**, 25 až 400 %: jak široce se každé písmeno kreslí, v procentech jeho vlastní šířky. Pod 100 jsou písmena užší, nad 100 širší; jejich výška zůstává a oblouk, který zabírají, se s nimi prodlouží nebo zkrátí. Hodí se třeba pro vysoký úzký nápis na minci. U přímého textu to dělá {{ui:prop.textStretch}} s rámečkem.
 - **{{ui:nameTag.letterSize}}:** velikost písmen nezávislá na šířce tvaru.
 - **{{ui:prop.textInward}}:** přesune text z horního na spodní oblouk; vršky písmen míří do středu.
 - **{{ui:prop.textFlipped}}:** převrátí pouze písmena pro čtení z druhé strany. Poloha textu na kružnici zůstane zachovaná.

@@ -9,6 +9,7 @@ import { createSpringGeometry } from "@/lib/springGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
 import { createHeartGeometry } from "@/lib/heartGeometry";
 import { createCrescentGeometry } from "@/lib/crescentGeometry";
+import { createCurvedConeGeometry } from "@/lib/curvedCone";
 import { createParaboloidGeometry } from "@/lib/roundBodyGeometry";
 import { createSlotGeometry } from "@/lib/slotGeometry";
 import { createDovetailGeometry } from "@/lib/dovetailGeometry";
@@ -425,6 +426,15 @@ describe("palette icons", () => {
       azimuth: 35,
       elevation: 28,
       build: () => createParaboloidGeometry(24, 22, 24, 32),
+    });
+    render({
+      // The trumpet it starts as, a little from above so the flat top shows.
+      name: "apps/web/public/assets/editor/shape-icons-gray/curvedCone.png",
+      height: 26,
+      lay: false,
+      azimuth: 35,
+      elevation: 24,
+      build: () => createCurvedConeGeometry(26, 26, 26, 0.25, -0.8, 96),
     });
     render({
       // Steiler von oben, damit das Trapez als Schwalbenschwanz zu lesen ist.

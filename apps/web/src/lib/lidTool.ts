@@ -18,6 +18,10 @@ import type { WorkplaneShape } from "@/types/layerling";
  * With magnets, the lid holds by four round magnets in the corners: a pocket for each in the body's rim and one facing
  * it in the lid's plate. A wall too thin for a pocket gets a post in that corner, from the bottom up to the rim, which
  * the lid's lip then goes round.
+ * With a hinge, the lid swings open about an axis along the body's straight back side, flush with the lid's top: knuckles
+ * take turns along it, the outer ones the body's, those between the lid's, a gap apart, and a pin goes through them all
+ * (a piece of filament, or a pin printed apart). The body's knuckles stand out from its back wall on a 45 degree slope,
+ * so the body prints upright without support; the lid's lie on the plate when it is printed turned over.
  * The lid comes out as a body of its own beside the one it closes, turned over with its plate on the plate, ready to
  * print. Everything is worked out with Manifold, in a frame where z is up (the scene's y).
  */
@@ -27,7 +31,9 @@ export type LidType = "plug" | "cap" | "both" | "flat";
 /**
  * The kind of lid; the plate's thickness, the gap per side, how deep the lip or rim reaches down and how thick its wall
  * is, in mm. With `magnets`, pockets for four round magnets of that diameter and height, with `magnetGap` of play per
- * side (a little to press them in, more to glue them).
+ * side (a little to press them in, more to glue them). With `hinge`, a hinge along the back for a pin of `hingePin` mm,
+ * `hingeGap` between its knuckles, `hingeKnuckles` of them (0: as many as suit its length), and the pin printed apart
+ * with `hingePrintPin`.
  */
 export type LidOptions = {
   type: LidType;
@@ -39,10 +45,18 @@ export type LidOptions = {
   magnetDiameter: number;
   magnetHeight: number;
   magnetGap: number;
+  hinge: boolean;
+  hingePin: number;
+  hingeGap: number;
+  hingeKnuckles: number;
+  hingePrintPin: boolean;
 };
 
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat"];
-export const LID_DEFAULTS: LidOptions = { type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1 };
+export const LID_DEFAULTS: LidOptions = {
+  type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
+  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false,
+};
 export const LID_FITS = [0.1, 0.2, 0.3] as const;
 export const MIN_LID_THICKNESS = 0.4;
 export const MAX_LID_THICKNESS = 10;
@@ -68,6 +82,25 @@ const MAGNET_WALL = 1.2;
 const MAGNET_SIDES = 48;
 /** How far a pocket reaches beyond the face it opens in, so the cut leaves no sheet of no thickness. */
 const MAGNET_OVERCUT = 1;
+/** The lid types a hinge goes with: a rim round the outside would hit the back wall as the lid swings open. */
+export const LID_HINGE_TYPES: readonly LidType[] = ["plug", "flat"];
+export const MIN_HINGE_PIN = 1;
+export const MAX_HINGE_PIN = 8;
+export const MIN_HINGE_GAP = 0.1;
+export const MAX_HINGE_GAP = 1;
+export const MAX_HINGE_KNUCKLES = 15;
+/** How much play the pin has in its hole, per side, in mm. */
+const HINGE_PIN_PLAY = 0.15;
+/** How much a knuckle keeps round the pin's hole, in mm. */
+const HINGE_KNUCKLE_WALL = 1.6;
+/** A knuckle is at least this wide along the axis, in mm. */
+const MIN_KNUCKLE_WIDTH = 3;
+/** How far the hinge stays from the ends of the straight back side, in mm (its corners may be rounded). */
+const HINGE_END_MARGIN = 0.5;
+/** How many sides a knuckle's and a pin's circle has. */
+const HINGE_SIDES = 48;
+/** How far the lid lies from a pin printed apart, in mm. */
+const PIN_SPACING = 5;
 /** How far apart the lid lies from the body it closes, in mm. */
 const LID_SPACING = 10;
 /** An opening smaller than this, in mm², is no opening: the body is closed at the top. */
@@ -103,7 +136,70 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (magnetHeight !== null) result.magnetHeight = clamp(magnetHeight, MIN_MAGNET_HEIGHT, MAX_MAGNET_HEIGHT);
   const magnetGap = finiteNumber(value?.magnetGap);
   if (magnetGap !== null) result.magnetGap = clamp(magnetGap, 0, MAX_MAGNET_GAP);
+  if (value?.hinge === true || value?.hinge === "true") result.hinge = true;
+  const hingePin = finiteNumber(value?.hingePin);
+  if (hingePin !== null) result.hingePin = clamp(hingePin, MIN_HINGE_PIN, MAX_HINGE_PIN);
+  const hingeGap = finiteNumber(value?.hingeGap);
+  if (hingeGap !== null) result.hingeGap = clamp(hingeGap, MIN_HINGE_GAP, MAX_HINGE_GAP);
+  // An odd number, so the body holds both ends; 0 leaves it to the hinge's length.
+  const hingeKnuckles = finiteNumber(value?.hingeKnuckles);
+  if (hingeKnuckles !== null) {
+    const whole = Math.round(clamp(hingeKnuckles, 0, MAX_HINGE_KNUCKLES));
+    result.hingeKnuckles = whole === 0 ? 0 : Math.max(3, whole % 2 ? whole : whole + 1);
+  }
+  if (value?.hingePrintPin === true || value?.hingePrintPin === "true") result.hingePrintPin = true;
   return result;
+}
+
+/** A knuckle's radius for this pin: its hole with the pin's play and a wall round it, in mm. */
+export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin">) {
+  return options.hingePin / 2 + HINGE_PIN_PLAY + HINGE_KNUCKLE_WALL;
+}
+
+/**
+ * Where the hinge goes along the back side (the outline's largest y) of an outline seen from above: its axis (y along
+ * the frame, z the height), its knuckles from end to end (even ones the body's, odd ones the lid's), and how low the
+ * body's knuckles reach down its back wall. An error when the back side has no straight stretch long enough for three
+ * knuckles, or the body is too low for the slope under them.
+ */
+export function hingePlan(polygons: readonly (readonly Point[])[], options: LidOptions, top: number, bottom: number):
+  | { backY: number; axisY: number; axisZ: number; radius: number; hole: number; segments: [number, number][]; low: number; start: number; end: number }
+  | { error: LidError } {
+  const back = Math.max(...polygons.flat().map(([, y]) => y));
+  // The straight stretches along the back: edges whose both ends lie on it, joined where they meet.
+  const stretches: [number, number][] = [];
+  for (const polygon of polygons) {
+    polygon.forEach((point, index) => {
+      const next = polygon[(index + 1) % polygon.length];
+      if (point[1] >= back - 0.05 && next[1] >= back - 0.05) stretches.push([Math.min(point[0], next[0]), Math.max(point[0], next[0])]);
+    });
+  }
+  stretches.sort((a, b) => a[0] - b[0]);
+  const joined: [number, number][] = [];
+  for (const stretch of stretches) {
+    const last = joined[joined.length - 1];
+    if (last && stretch[0] <= last[1] + 1e-6) last[1] = Math.max(last[1], stretch[1]);
+    else joined.push([...stretch]);
+  }
+  const longest = joined.reduce<[number, number] | null>((best, stretch) => (!best || stretch[1] - stretch[0] > best[1] - best[0] ? stretch : best), null);
+  const gap = options.hingeGap;
+  if (!longest) return { error: { code: "hingeNoBack" } };
+  const start = longest[0] + HINGE_END_MARGIN, end = longest[1] - HINGE_END_MARGIN;
+  const length = end - start;
+  let count = options.hingeKnuckles || Math.min(MAX_HINGE_KNUCKLES, Math.max(3, 2 * Math.round((length / 10 - 1) / 2) + 1));
+  const width = (knuckles: number) => (length - (knuckles - 1) * gap) / knuckles;
+  while (count > 3 && width(count) < MIN_KNUCKLE_WIDTH) count -= 2;
+  if (width(count) < MIN_KNUCKLE_WIDTH) return { error: { code: "hingeNoBack" } };
+  const radius = hingeKnuckleRadius(options);
+  // Flush with the lid's top, behind the back side by the gap.
+  const axisY = back + radius + gap;
+  const axisZ = top + options.thickness - radius;
+  // A 45 degree slope from the back wall to the bottom of the knuckle.
+  const low = axisZ - (radius + gap) - radius * Math.SQRT2;
+  if (low < bottom + 0.4) return { error: { code: "hingeTooLow" } };
+  const w = width(count);
+  const segments = Array.from({ length: count }, (_, index): [number, number] => [start + index * (w + gap), start + index * (w + gap) + w]);
+  return { backY: back, axisY, axisZ, radius, hole: options.hingePin / 2 + HINGE_PIN_PLAY, segments, low, start, end };
 }
 
 /** How deep a magnet's pocket is, in the body and in the lid, in mm. */
@@ -117,7 +213,7 @@ export function lidThicknessForMagnets(options: Pick<LidOptions, "magnetHeight">
 }
 
 export type LidError =
-  | { code: "notClosed" | "notOpen" | "tooSmall" | "tooShallow" | "empty" | "magnetsNoRoom" }
+  | { code: "notClosed" | "notOpen" | "tooSmall" | "tooShallow" | "empty" | "magnetsNoRoom" | "hingeLidType" | "hingeNoBack" | "hingeTooLow" }
   | { code: "magnetsThinLid"; thickness: number }
   | { code: "kernel"; message?: string };
 
@@ -284,7 +380,13 @@ export type MagnetPostPart = { kind: "cylinder" | "box"; x: number; z: number; e
  */
 export type LidMagnets = { posts: ManifoldSolid | null; postParts: MagnetPostPart[]; pockets: MagnetPocket[] };
 
-export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets } | { error: LidError };
+/**
+ * With a hinge: the body's knuckles with their slope (to be grouped with it), a pin printed apart if asked for, lying
+ * beside the lid, both in the scene's frame, and how many knuckles the hinge has.
+ */
+export type LidHinge = { knuckles: ManifoldSolid; pin: ManifoldSolid | null; count: number };
+
+export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge } | { error: LidError };
 
 /**
  * The lid for `body` (in the scene's frame, y up), lying turned over beside it: its plate on the workplane at the
@@ -309,6 +411,9 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const hasOpening = opening.area() >= MIN_OPENING_AREA;
     if (options.type !== "flat" && !hasOpening) return { error: { code: "notOpen" } };
     if (options.type !== "flat" && options.depth >= height) return { error: { code: "tooShallow" } };
+    if (options.hinge && !LID_HINGE_TYPES.includes(options.type)) return { error: { code: "hingeLidType" } };
+    const plan = options.hinge ? hingePlan(outline.toPolygons() as Point[][], options, top, box.min[2]) : null;
+    if (plan && "error" in plan) return { error: plan.error };
 
     // The magnets: a pocket in each corner with a wall round it, and a post where the body's wall cannot hold that.
     const pocketRadius = options.magnetDiameter / 2 + options.magnetGap;
@@ -386,6 +491,33 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     }
     let made = parts.length === 1 ? parts[0] : keep(created, runtime.Manifold.union(parts));
     if (made.isEmpty()) return { error: { code: "empty" } };
+    // The hinge: the lid's knuckles join its plate by a web as thick as the plate; the body's stand on a slope from its
+    // back wall (the hull of the knuckle and a strip of the wall), kept below the plate by the gap. The pin's hole goes
+    // through them all.
+    let bodyKnuckles: ManifoldSolid | null = null;
+    const along = (from: number, to: number, radius: number, y: number, z: number) =>
+      keep(created, keep(created, keep(created, runtime.Manifold.cylinder(to - from, radius, radius, HINGE_SIDES)).rotate([0, 90, 0])).translate([from, y, z]));
+    if (plan) {
+      const lidPieces: ManifoldSolid[] = [];
+      const bodyPieces: ManifoldSolid[] = [];
+      const stripTop = Math.min(plan.axisZ, top - options.hingeGap);
+      plan.segments.forEach(([from, to], index) => {
+        const round = along(from, to, plan.radius, plan.axisY, plan.axisZ);
+        if (index % 2) {
+          const web = keep(created, keep(created, runtime.Manifold.cube([to - from, plan.axisY - plan.backY + 0.3, options.thickness])).translate([from, plan.backY - 0.3, top]));
+          lidPieces.push(round, web);
+        } else {
+          const strip = keep(created, keep(created, runtime.Manifold.cube([to - from, 0.4, stripTop - plan.low])).translate([from, plan.backY - 0.4, plan.low]));
+          // The hull rises steeply from the strip to the knuckle, close past the plate's back edge: what lies within
+          // the gap behind the back and above the gap below the plate is taken off, so the gap is kept there too.
+          const clear = keep(created, keep(created, runtime.Manifold.cube([to - from + 2, options.hingeGap + 1, options.thickness + options.hingeGap + 2 * plan.radius])).translate([from - 1, plan.backY - 1, top - options.hingeGap]));
+          bodyPieces.push(keep(created, keep(created, runtime.Manifold.hull([round, strip])).subtract(clear)));
+        }
+      });
+      const hole = along(plan.start - 1, plan.end + 1, plan.hole, plan.axisY, plan.axisZ);
+      made = keep(created, keep(created, made.add(keep(created, runtime.Manifold.union(lidPieces)))).subtract(hole));
+      bodyKnuckles = keep(created, keep(created, runtime.Manifold.union(bodyPieces)).subtract(hole));
+    }
     // The lid's pockets face the body's: they open in the plate's underside, where it lies on the rim.
     if (magnetCentres.length) {
       const pockets = magnetCentres.map(([x, y]) => keep(created, keep(created, runtime.Manifold.cylinder(pocketDepth + MAGNET_OVERCUT, pocketRadius, pocketRadius, MAGNET_SIDES)).translate([x, y, top - MAGNET_OVERCUT])));
@@ -402,7 +534,22 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const placed = keep(created, turned.translate(shift));
     const lid = placed.transform(UP_TO_SCENE);
     handed.add(lid);
-    if (!options.magnets) return { lid };
+    let hinge: LidHinge | undefined;
+    if (plan && bodyKnuckles) {
+      const knuckles = bodyKnuckles.transform(UP_TO_SCENE);
+      handed.add(knuckles);
+      let pin: ManifoldSolid | null = null;
+      // A pin printed apart lies beside the lid, a millimetre shorter than the hinge, so it does not stand out.
+      if (options.hingePrintPin) {
+        const placedBox = placed.boundingBox();
+        const radius = options.hingePin / 2;
+        const length = plan.end - plan.start - 1;
+        pin = keep(created, along(placedBox.min[0], placedBox.min[0] + length, radius, placedBox.max[1] + PIN_SPACING + radius, box.min[2] + radius)).transform(UP_TO_SCENE);
+        handed.add(pin);
+      }
+      hinge = { knuckles, pin, count: plan.segments.length };
+    }
+    if (!options.magnets) return hinge ? { lid, hinge } : { lid };
     handed.add(posts);
     // Back in the scene's frame: up is y, and the frame's y is the scene's z turned round.
     const pockets = magnetCentres.map(([x, y]): MagnetPocket => ({
@@ -412,7 +559,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       height: pocketDepth + MAGNET_OVERCUT,
       diameter: 2 * pocketRadius,
     }));
-    return { lid, magnets: { posts, postParts, pockets } };
+    return { lid, magnets: { posts, postParts, pockets }, ...(hinge ? { hinge } : {}) };
   } catch (error) {
     return { error: { code: "kernel", message: error instanceof Error ? error.message : String(error ?? "") } };
   } finally {
@@ -439,6 +586,12 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.magnetsNoRoom");
     case "magnetsThinLid":
       return t("lid.error.magnetsThinLid", { thickness: error.thickness.toLocaleString(numberLocale()) });
+    case "hingeLidType":
+      return t("lid.error.hingeLidType");
+    case "hingeNoBack":
+      return t("lid.error.hingeNoBack");
+    case "hingeTooLow":
+      return t("lid.error.hingeTooLow");
     default:
       return error.message ? t("lid.error.kernel", { message: error.message }) : t("lid.error.kernelUnknown");
   }
@@ -459,7 +612,10 @@ function positionsOf(mesh: ReturnType<ManifoldSolid["getMesh"]>) {
  */
 export type LidShapeMagnets = { posts: WorkplaneShape[]; pockets: WorkplaneShape[] };
 
-export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets } | { lid: null; error: string };
+/** With a hinge, the body's knuckles (grouped with it, as the posts are) and the pin printed apart, if asked for. */
+export type LidShapeHinge = { knuckles: WorkplaneShape; pin: WorkplaneShape | null; count: number };
+
+export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge } | { lid: null; error: string };
 
 /**
  * The lid for the selected bodies: the solids joined and the holes among them cut away, then the lid made for what is
@@ -491,11 +647,19 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     if ("error" in result) return { lid: null, error: lidErrorMessage(result.error) };
     created.push(result.lid);
     if (result.magnets?.posts) created.push(result.magnets.posts);
+    if (result.hinge) created.push(result.hinge.knuckles, ...(result.hinge.pin ? [result.hinge.pin] : []));
     const source = solids[0];
     const shape = splitShapeFromWorldPositions(source, positionsOf(result.lid.getMesh()), createLocalId(`${source.id}-lid`), t("lid.name", { name: source.name }));
     if (!shape) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
     const lid = canonicalizeShape({ ...shape, hidden: false });
-    if (!result.magnets) return { lid };
+    let hinge: LidShapeHinge | undefined;
+    if (result.hinge) {
+      const knuckles = splitShapeFromWorldPositions(source, positionsOf(result.hinge.knuckles.getMesh()), createLocalId(`${source.id}-hinge`), t("lid.hingeKnucklesName", { name: source.name }));
+      if (!knuckles) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
+      const pin = result.hinge.pin ? splitShapeFromWorldPositions(source, positionsOf(result.hinge.pin.getMesh()), createLocalId(`${source.id}-hinge-pin`), t("lid.hingePinName", { name: source.name })) : null;
+      hinge = { knuckles: canonicalizeShape({ ...knuckles, hidden: false }), pin: pin ? canonicalizeShape({ ...pin, hidden: false }) : null, count: result.hinge.count };
+    }
+    if (!result.magnets) return hinge ? { lid, hinge } : { lid };
     const postName = t("lid.magnetPosts", { name: source.name });
     const meshPost = result.magnets.posts
       ? splitShapeFromWorldPositions(source, positionsOf(result.magnets.posts.getMesh()), createLocalId(`${source.id}-magnet-posts`), postName)
@@ -530,7 +694,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       height: pocket.height,
       sides: MAGNET_SIDES,
     }));
-    return { lid, magnets: { posts, pockets } };
+    return { lid, magnets: { posts, pockets }, ...(hinge ? { hinge } : {}) };
   } catch (error) {
     return { lid: null, error: lidErrorMessage({ code: "kernel", message: error instanceof Error ? error.message : String(error ?? "") }) };
   } finally {

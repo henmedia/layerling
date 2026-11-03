@@ -249,6 +249,22 @@ describe("bricks", () => {
     expect(leaning(result, 28, (x, z) => Math.abs(x) < 20 - 1.5 && Math.abs(z) < 12.5 - 1.5)).toBeLessThan(5);
   }, 30000);
 
+  it("stays closed on flat boxes whatever their size, the top alone or with the sides (Discussion #1204)", () => {
+    // 7 mm high, two courses on the sides: cut course by course, the second course's joints tore the mesh open where the
+    // first course's cut had left slivers across the whole face. These sizes all did, the top alone or with the sides.
+    for (const [width, depth, brickBond, faces] of [
+      [150, 125, "running", ["top", "front", "back", "left", "right"]],
+      [125, 150, "running", ["top"]],
+      [175, 120, "running", ["top"]],
+      [175, 120, "englishCross", ["top"]],
+      [125, 55, "english", ["top", "front", "back", "left", "right"]],
+      [175, 120, "flemish", ["top"]],
+    ] as const) {
+      const result = applySurfaceTexture(box(width, 7, depth), { pattern: "bricks", brickBond, faces: [...faces] });
+      expectClosed(result);
+    }
+  }, 120000);
+
   it("lays bricks round a hexagonal prism along its outline, its joints not cut in teeth", () => {
     const hexagon: number[] = [];
     const at = (k: number, y: number): Vec3 => [20 * Math.cos((Math.PI * k) / 3), y, 20 * Math.sin((Math.PI * k) / 3)];

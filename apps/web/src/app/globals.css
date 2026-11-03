@@ -15400,20 +15400,34 @@ html[data-theme="dark"] .color-recent {
   min-height: 220px;
 }
 
+/* Wide: the board on the left, the settings in a column on the right. The column scrolls on its own when the
+   window is lower than it (Discussion #1186: with a photo, its settings ran out of a low window). */
 @media (min-width: 901px) {
   .vase-drawing-window .vz {
     grid-template-columns: minmax(0, 1fr) minmax(220px, 270px);
-    grid-template-rows: repeat(5, min-content) minmax(0, 1fr);
     column-gap: 14px;
   }
 
   .vase-drawing-window .vz > .vz-board {
-    grid-row: 1 / -1;
     grid-column: 1;
   }
 
-  .vase-drawing-window .vz > :not(.vz-board) {
+  .vase-drawing-window .vz > .vz-side {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     grid-column: 2;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 2px 4px 2px 2px;
+    /* A thin bar that shows, as on the properties panel: it says there is more below. */
+    scrollbar-color: #cdbfa9 transparent;
+    scrollbar-width: thin;
+  }
+
+  html[data-theme="dark"] .vase-drawing-window .vz > .vz-side {
+    scrollbar-color: #5a4a3a transparent;
   }
 }
 

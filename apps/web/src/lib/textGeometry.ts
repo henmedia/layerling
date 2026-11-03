@@ -48,6 +48,16 @@ export function textSpacingOf(shape: Pick<WorkplaneShape, "textSpacing">): numbe
   return Number.isFinite(value) ? clamp(value, MIN_TEXT_SPACING, MAX_TEXT_SPACING) : 0;
 }
 
+/** How wide the letters of curved text are drawn (#1196), in per cent of their own width, either way. */
+export const MIN_TEXT_LETTER_WIDTH = 25;
+export const MAX_TEXT_LETTER_WIDTH = 400;
+
+/** The letter width a shape asks for, as a factor: 1 when it has none. */
+export function textLetterWidthOf(shape: Pick<WorkplaneShape, "textLetterWidth">): number {
+  const value = Number(shape.textLetterWidth);
+  return Number.isFinite(value) && value > 0 ? clamp(value, MIN_TEXT_LETTER_WIDTH, MAX_TEXT_LETTER_WIDTH) / 100 : 1;
+}
+
 const spacedFonts = new WeakMap<Font, Map<number, Font>>();
 
 /**
@@ -469,9 +479,12 @@ export function curvedTextLayout(shape: WorkplaneShape) {
   const font = textLayoutFont(shape);
   let size = curvedSize(shape);
   const chars = [...text];
+  // Wider or narrower letters (#1196): the glyph and its own advance stretch along the arc, the spacing stays as set.
+  const stretch = textLetterWidthOf(shape);
+  const advanceAt = (char: string, letterSize: number) => advanceOf(font, char, letterSize) + (stretch - 1) * advanceOf(baseFont, char, letterSize);
 
   // Too long for the circle: shrink the letters rather than let the ends overlap.
-  const naturalLength = chars.reduce((sum, char) => sum + advanceOf(font, char, size), 0);
+  const naturalLength = chars.reduce((sum, char) => sum + advanceAt(char, size), 0);
   const maxLength = 2 * Math.PI * radius * MAX_ARC_SHARE;
   if (naturalLength > maxLength) size *= maxLength / naturalLength;
 
@@ -480,7 +493,7 @@ export function curvedTextLayout(shape: WorkplaneShape) {
   // so the line keeps its place on the circle and reads from the other side.
   const flipped = Boolean(shape.textFlipped);
   const ordered = flipped ? [...chars].reverse() : chars;
-  const advances = ordered.map((char) => advanceOf(font, char, size));
+  const advances = ordered.map((char) => advanceAt(char, size));
   const totalLength = advances.reduce((sum, advance) => sum + advance, 0);
   const bandMiddle = capHeightOf(font, size) / 2;
   const inward = Boolean(shape.textInward);
@@ -511,9 +524,10 @@ export function curvedTextLayout(shape: WorkplaneShape) {
     }
     // Centre the glyph's own width on its arc point - horizontally only, the baseline stays at z = 0. With spacing the
     // arc point is the middle of the wider box, so the extra room lies half before and half behind the glyph.
-    matrix.multiply(new THREE.Matrix4().makeTranslation(-advanceOf(baseFont, char, size) / 2, 0, 0));
+    matrix.multiply(new THREE.Matrix4().makeTranslation(-(stretch * advanceOf(baseFont, char, size)) / 2, 0, 0));
     // Flat on the workplane: letter height points to -Z, thickness to +Y.
     matrix.multiply(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+    if (stretch !== 1) matrix.multiply(new THREE.Matrix4().makeScale(stretch, 1, 1));
     glyphs.push({ char, matrix });
   });
   return { options, glyphs };
@@ -562,8 +576,11 @@ function curvedColumnLayout(shape: WorkplaneShape, text: string, radius: number,
     start += letter.height + layout.gap;
     if (!letter.char) return;
     const matrix = new THREE.Matrix4().makeTranslation((inward ? 1 : -1) * radius * Math.cos(angle), 0, radius * Math.sin(angle));
-    // Flat on the workplane: letter height points to -Z, thickness to +Y; the glyph's own middle sits on the arc point.
+    // Flat on the workplane: letter height points to -Z, thickness to +Y; the glyph's own middle sits on the arc point,
+    // as wide as the letter width asks (#1196).
     matrix.multiply(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+    const stretch = textLetterWidthOf(shape);
+    if (stretch !== 1) matrix.multiply(new THREE.Matrix4().makeScale(stretch, 1, 1));
     matrix.multiply(new THREE.Matrix4().makeTranslation(-letter.cx, -letter.cy, 0));
     glyphs.push({ char: letter.char, matrix });
   });
@@ -613,7 +630,7 @@ const footprintCache = new Map<string, { width: number; depth: number }>();
 
 /** The width and depth curved text takes at its own radius and letter size. */
 export function curvedTextFootprint(shape: WorkplaneShape): { width: number; depth: number } {
-  const key = JSON.stringify([textOf(shape), shape.font ?? "Multilanguage", customFontRevision(shape.font), curvedSize(shape), curvedRadius(shape), Boolean(shape.textInward), Boolean(shape.textFlipped), Boolean(shape.textVertical), shape.bevel ?? 0, textSpacingOf(shape)]);
+  const key = JSON.stringify([textOf(shape), shape.font ?? "Multilanguage", customFontRevision(shape.font), curvedSize(shape), curvedRadius(shape), Boolean(shape.textInward), Boolean(shape.textFlipped), Boolean(shape.textVertical), shape.bevel ?? 0, textSpacingOf(shape), textLetterWidthOf(shape)]);
   const cached = footprintCache.get(key);
   if (cached) return cached;
   const geometry = buildCurvedText({ ...shape, height: 1 });
@@ -636,7 +653,7 @@ function straightTextExtent(shape: WorkplaneShape) {
   return extent;
 }
 
-const CURVE_KEYS = ["textCurved", "textVertical", "textRadius", "textInward", "textFlipped", "textSize", "text", "font", "bevel", "textStroke", "textSpacing"] as const;
+const CURVE_KEYS = ["textCurved", "textVertical", "textRadius", "textInward", "textFlipped", "textSize", "text", "font", "bevel", "textStroke", "textSpacing", "textLetterWidth"] as const;
 
 /**
  * Keeps curved text and its box in step. Straight text simply fills its box;

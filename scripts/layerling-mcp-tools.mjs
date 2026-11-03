@@ -19,7 +19,7 @@ export const editorTargetSchema = {
  */
 export const creatableShapeKinds = [
   "box", "roundedBox", "cube", "cylinder", "slot", "ellipse", "polygon", "sphere", "cone", "pyramid", "wedge",
-  "roundRoof", "halfSphere", "paraboloid", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "text", "thread", "spring", "gridfinity", "gear", "hirth",
+  "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "text", "thread", "spring", "gridfinity", "gear", "hirth",
   "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
 ];
 
@@ -60,12 +60,14 @@ export const threadSizeSetting = {
  * geprueft wie in den Einstellungen; was daneben liegt, wird eingefangen.
  */
 export const shapeSettingSchema = {
-  sides: { type: "number", description: "Cylinder, slot, cone, tube, polygon, pyramid, round roof, teardrop, counterbore, countersink, doubleCountersink, torus (around the ring). Left out on a round body, the side count follows the diameter." },
+  sides: { type: "number", description: "Cylinder, slot, cone, curved cone, tube, polygon, pyramid, round roof, teardrop, counterbore, countersink, doubleCountersink, torus (around the ring). Left out on a round body, the side count follows the diameter." },
   steps: { type: "number", description: "Sphere and half sphere: how finely the surface is divided. Torus: how finely the tube is divided; left out, it follows the size." },
   bevel: { type: "number", description: "Tube: wall thickness. Text: rounding of the lettering." },
   segments: { type: "number", description: "Text only: steps in the rounding." },
   topRadius: { type: "number", description: "Cone only: radius of the flat top. 0 runs to a point." },
   baseRadius: { type: "number", description: "Cone only: radius at the base." },
+  curvedConeTop: { type: "number", description: "Curved cone only: the top's diameter as a share of the bottom's (the width), 0 to 1; 0 runs to a point, 1 is a cylinder. Default 0.25." },
+  curvedConeBend: { type: "number", description: "Curved cone only: how far the side bends, -1 to 1. Negative bends it inward into a trumpet like a pseudosphere, 0 is a straight cone, positive bulges it outward into a dome with a flat top. Default -0.8." },
   topWidth: { type: "number", description: "Pyramid only: width of the flat top. 0 runs to a point." },
   topDepth: { type: "number", description: "Pyramid only: depth of the flat top. 0 runs to a point." },
   taperTopWidth: { type: "number", description: "Taper, on every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the top face. Setting one value of a face pins the other." },
@@ -548,6 +550,7 @@ export const tools = [
         stretch: { type: "boolean", description: "Straight text only: true stretches the letters to fill the whole box in both directions, so a capital can be made lower or narrower as in Tinkercad; false (the default) fits them into the box with their proportions kept, centred. Set the box with width and depth." },
         vertical: { type: "boolean", description: "true stacks the letters top to bottom, each centred on one upright line. Straight text: the box turns upright and the letters keep their size. Curved text: the column runs along the circle of textRadius, its middle at the circle's left side (textInward: the right side), the letters standing upright, so a name follows the rim of a disk; textFlipped does nothing then. Spacing widens or narrows the gap between the letters." },
         spacing: { type: "number", minimum: -50, maximum: 300, description: "Text only: the space between the letters on top of the font's own, in per cent of the letter size - 0 as the font has it, above it wider, below it tighter (down to -50), up to 300. Straight and curved text; the letters keep their size and the box follows. Not applied to Arabic and Hebrew, whose letters join up." },
+        letterWidth: { type: "number", minimum: 25, maximum: 400, description: "Curved text only: how wide each letter is drawn, in per cent of its own width - 100 as the font has it, below narrower (down to 25), above wider (up to 400). The letters keep their height and the arc they take grows or shrinks with them; the box follows. For straight text use stretch with width and depth instead." },
         letterEdge: {
           anyOf: [
             { type: "null" },
@@ -846,6 +849,11 @@ export const tools = [
         magnetDiameter: { type: "number" },
         magnetHeight: { type: "number" },
         magnetGap: { type: "number" },
+        hinge: { type: "boolean", description: "A hinge along the body's straight back side (-z), for a plug or flat lid: knuckles take turns on the body (both ends) and the lid, flush with the lid's top, a hole for a pin through all of them. The body's knuckles are grouped with it (returned as body). Default false." },
+        hingePin: { type: "number", description: "The pin's diameter in mm, 1 to 8 (1.75: a piece of filament). Default 1.75." },
+        hingeGap: { type: "number", description: "The gap between the knuckles and round the lid's back edge in mm, 0.1 to 1. Default 0.3." },
+        hingeKnuckles: { type: "number", description: "How many knuckles, odd, 3 to 15; 0 lets the hinge's length decide (about one per 10 mm). Default 0." },
+        hingePrintPin: { type: "boolean", description: "Also make the pin as a body of its own, lying beside the lid (strong from about 3 mm). Default false." },
       },
     },
   },
@@ -1267,6 +1275,22 @@ export const tools = [
         ids: { type: "array", items: { type: "string" }, description: "At least two objects to bundle." },
       },
       required: ["ids"],
+    },
+  },
+  {
+    name: "layerling_text_block",
+    description: "Several lines of text under one another, as the editor's Text block card does (#1207): a plain straight text (not curved, not stacked top to bottom, without a key ring) becomes the first of the lines, and every further line is a text of its own under the one above, in the same font, height, fill and colour. The lines are lined up on the left edge, the middle or the right edge of the text (align), `gap` mm apart, and each is `step` per cent the letter size of the one above (100 all alike, 80 each a fifth smaller). The block's top stays where the text's top was; a turned text turns the block with it. Each line can be changed on its own afterwards (update_object: text, letterSize through width and depth, font). One undo step. Returns the lines, top to bottom, the first keeping the text's id.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The plain straight text to start from; it becomes the first line." },
+        lines: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 20, description: "The lines, top to bottom, at most 24 characters each; blank ones are left out." },
+        align: { type: "string", enum: ["left", "center", "right"], description: "Where the lines line up: the text's left edge, its middle or its right edge. Default center." },
+        gap: { type: "number", minimum: 0, maximum: 100, description: "Room between the boxes of two lines in mm. Default 2." },
+        step: { type: "number", minimum: 25, maximum: 200, description: "Each line's letter size in per cent of the one above. Default 100." },
+      },
+      required: ["id", "lines"],
     },
   },
   {

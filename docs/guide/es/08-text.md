@@ -19,6 +19,8 @@ Elige {{ui:shape.text}} en la biblioteca de formas y colócalo. En el campo {{ui
 
 Al principio, un texto es un solo cuerpo. Si quieres trabajar con las letras por separado, haz clic en {{ui:inspector.separateParts}}. Entonces cada letra pasa a ser una forma independiente.
 
+**Varias líneas:** Un texto tiene una línea. Para un cartel o una placa con varias líneas, abre la tarjeta {{ui:textBlock.title}} debajo de los ajustes: escribe las líneas en {{ui:textBlock.lines}}, elige {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} o {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} y {{ui:textBlock.step}}: con 80 % cada línea es una quinta parte más pequeña que la de arriba. El botón convierte cada línea en un texto propio debajo de la anterior, con la fuente, la altura y el relleno de este texto; la primera ocupa el lugar de este texto. Después cada línea puede tener su propio tamaño, fuente o color.
+
 Las aristas del texto también se pueden achaflanar o redondear, tanto si es recto como si es curvado: consulta [Romper aristas y vaciar cuerpos](chapter:edges-and-hollowing). Usa medidas pequeñas, de 0,2 a 0,5 mm, porque los trazos de las letras son estrechos.
 
 ## Tus fuentes
@@ -157,9 +159,10 @@ Escanea el código con el móvil antes de imprimirlo, y otra vez después. Oscur
 
 ![Un texto que sigue un círculo. Todas las letras se apoyan en una misma línea.](shot:curved-text)
 
-En cuanto lo activas, el texto recorre el círculo. Todas las letras se apoyan en la misma línea base, tan regulares como en un texto normal. Hay cuatro ajustes:
+En cuanto lo activas, el texto recorre el círculo. Todas las letras se apoyan en la misma línea base, tan regulares como en un texto normal. Hay cinco ajustes:
 
 - **{{ui:prop.textRadius}}** (de 5 a 500 mm): El radio del círculo por el que va la línea base de las letras. Las letras se quedan donde están; solo cambia su curvatura.
+- **{{ui:prop.textLetterWidth}}** (de 25 a 400 %): Qué tan ancha se dibuja cada letra, en porcentaje de su propio ancho. Por debajo de 100 las letras se estrechan, por encima se ensanchan; su altura se mantiene y el arco que ocupan crece o se acorta con ellas. Por ejemplo, para un rótulo alto y estrecho en una moneda. En el texto recto lo hace {{ui:prop.textStretch}} con el marco.
 - **{{ui:nameTag.letterSize}}:** La altura de las letras. Ya no depende de la anchura de la forma.
 - **{{ui:prop.textInward}}:** Lleva el texto de la parte de arriba del círculo a la de abajo. Las letras apuntan entonces con la cabeza hacia el centro.
 - **{{ui:prop.textFlipped}}:** Da la vuelta solo a las letras, para que puedas leerlas desde el otro lado. El texto se queda en su sitio en el círculo.

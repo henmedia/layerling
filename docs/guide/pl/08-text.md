@@ -19,6 +19,8 @@ Wybierz {{ui:shape.text}} w bibliotece kształtów i umieść go. W polu {{ui:pr
 
 Tekst jest na początku jedną bryłą. Jeśli chcesz obrabiać litery osobno, kliknij {{ui:inspector.separateParts}}. Wtedy każda litera jest osobnym kształtem.
 
+**Kilka wierszy:** Tekst ma jeden wiersz. Na szyld lub tabliczkę z kilkoma wierszami otwórz pod ustawieniami kartę {{ui:textBlock.title}}: wpisz wiersze w {{ui:textBlock.lines}}, wybierz {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} lub {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} i {{ui:textBlock.step}} - przy 80 % każdy wiersz jest o jedną piątą mniejszy od poprzedniego. Przycisk robi z każdego wiersza osobny tekst pod poprzednim, w czcionce, wysokości i wypełnieniu tego tekstu; pierwszy zajmuje miejsce tego tekstu. Potem każdy wiersz może dostać własny rozmiar, czcionkę lub kolor.
+
 Krawędzie tekstu też można fazować albo zaokrąglać, prostego i na łuku, zobacz [Łamanie krawędzi i drążenie brył](chapter:edges-and-hollowing). Używaj małych rozmiarów, takich jak od 0,2 do 0,5 mm, bo kreski liter są wąskie.
 
 ## Twoje czcionki
@@ -157,9 +159,10 @@ Napis ma biec nie prosto, tylko wzdłuż krawędzi monety, pokrywki albo pierśc
 
 ![Tekst podąża za okręgiem. Wszystkie litery stoją na jednej wspólnej linii.](shot:curved-text)
 
-Gdy je włączysz, tekst biegnie wzdłuż okręgu. Wszystkie litery stoją na tej samej linii bazowej, tak równo jak w zwykłym tekście. Są cztery ustawienia:
+Gdy je włączysz, tekst biegnie wzdłuż okręgu. Wszystkie litery stoją na tej samej linii bazowej, tak równo jak w zwykłym tekście. Jest pięć ustawień:
 
 - **{{ui:prop.textRadius}}** (od 5 do 500 mm): promień okręgu, po którym biegnie linia bazowa liter. Litery zostają na swoim miejscu, zmienia się tylko ich wygięcie.
+- **{{ui:prop.textLetterWidth}}** (od 25 do 400 %): jak szeroko rysowana jest każda litera, w procentach jej własnej szerokości. Poniżej 100 litery są węższe, powyżej szersze; ich wysokość zostaje, a łuk, który zajmują, wydłuża się lub skraca razem z nimi. Na przykład dla wysokiego, wąskiego napisu na monecie. W prostym tekście robi to {{ui:prop.textStretch}} z ramką.
 - **{{ui:nameTag.letterSize}}:** jak wysokie są litery. Nie zależy już od szerokości kształtu.
 - **{{ui:prop.textInward}}:** przenosi tekst z góry okręgu na jego dół. Litery są wtedy zwrócone głowami do środka.
 - **{{ui:prop.textFlipped}}:** odwraca tylko litery, żeby dało się je czytać z drugiej strony. Tekst zostaje na swoim miejscu na okręgu.
