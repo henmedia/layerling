@@ -4,7 +4,7 @@ import { LID_DEFAULTS, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_MAGNET_GAP, MIN_LID_W
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1 });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {

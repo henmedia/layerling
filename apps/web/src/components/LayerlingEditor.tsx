@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SAVED_VIEW_KEYS } from "@/lib/designView";
 import * as THREE from "three";
 import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
-import { getLanguage, t, type MessageKey } from "@/lib/i18n";
+import { getLanguage, numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { isObjectListOrder, sortObjectList } from "@/lib/objectListSearch";
 import { useLanguage } from "@/lib/useLanguage";
 import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/loftGeometry";
@@ -8024,7 +8024,8 @@ export function LayerlingEditor({
    * and with posts for the magnets, which the lip has to go round: the mesh lid stays then.
    */
   const exactLid = useCallback(async (targets: readonly WorkplaneShape[], options: LidOptions, meshLid: WorkplaneShape, magnets?: { posts: WorkplaneShape[]; pockets: WorkplaneShape[] }): Promise<WorkplaneShape | null> => {
-    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length) return null;
+    // A hinged lid stays the mesh lid for now: the exact one has no knuckles.
+    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge) return null;
     const pocketDepth = magnetPocketDepth(options);
     const request: CadLidRequest = {
       type: options.type,
@@ -8064,9 +8065,9 @@ export function LayerlingEditor({
     const targets = (only ?? selectedShapes).filter((shape) => !isNonSolidShape(shape));
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
     const options = normalizeLidOptions(given);
-    // The pockets go into the body, so it must be free to change and one body.
-    if (options.magnets && targets.some((shape) => shape.locked)) return fail(t("status.objectLocked"));
-    if (options.magnets && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
+    // The pockets and the hinge's knuckles go into the body, so it must be free to change and one body.
+    if ((options.magnets || options.hinge) && targets.some((shape) => shape.locked)) return fail(t("status.objectLocked"));
+    if ((options.magnets || options.hinge) && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
     const sourceProjectId = projectInfoRef.current.projectId;
     const changed = () => projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint;
@@ -8077,19 +8078,29 @@ export function LayerlingEditor({
     const lid = (await exactLid(targets, options, result.lid, result.magnets)) ?? result.lid;
     if (changed()) return fail(t("lid.error.changed"));
     const type = t(`lid.type.${options.type}`);
-    if (!result.magnets) {
+    const hinge = result.hinge;
+    if (!result.magnets && !hinge) {
       commitShapes([...shapesRef.current, lid], lid.id, t("status.lidMade", { type }));
       return { ok: true as const, id: lid.id, type: options.type };
     }
-    const { posts, pockets } = result.magnets;
-    const grouped = await groupedWithMagnets(targets, result.magnets, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
+    const posts = result.magnets?.posts ?? [];
+    const pockets = result.magnets?.pockets ?? [];
+    // The body's knuckles are grouped with it as the magnets' posts are.
+    const grouped = await groupedWithMagnets(targets, { posts: [...posts, ...(hinge ? [hinge.knuckles] : [])], pockets }, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
     if (changed()) return fail(t("lid.error.changed"));
-    if (!grouped.group) return fail(grouped.failureNotice || t("lid.error.magnetsKernel"));
+    if (!grouped.group) return fail(grouped.failureNotice || t(hinge ? "lid.error.hingeKernel" : "lid.error.magnetsKernel"));
     const body = canonicalizeShape({ ...grouped.group, groupOperation: "group", name: targets.find((shape) => !shape.hole)?.name ?? grouped.group.name });
     const consumed = new Set(targets.map((shape) => shape.id));
     const remaining = shapesRef.current.filter((shape) => !consumed.has(shape.id));
-    commitShapes([...remaining, body, lid], lid.id, withClosedHolesNote(t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: pockets.length }), grouped.closedHoles));
-    return { ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: pockets.length, posts: posts.length > 0 };
+    const pin = options.hingePin.toLocaleString(numberLocale());
+    const message = hinge
+      ? t(pockets.length ? "status.lidMadeHingeMagnets" : "status.lidMadeHinge", { type, count: hinge.count, pin, magnets: pockets.length })
+      : t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: pockets.length });
+    commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : [])], lid.id, withClosedHolesNote(message, grouped.closedHoles));
+    return {
+      ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: pockets.length, posts: posts.length > 0,
+      ...(hinge ? { hinge: { knuckles: hinge.count, pinDiameter: options.hingePin, pinId: hinge.pin?.id ?? null } } : {}),
+    };
   }, [commitShapes, exactLid, selectedShapes]);
 
   const startLidTool = useCallback(() => {
@@ -8114,9 +8125,9 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    void makeLid({ type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap }, targets).then((result) => {
+    void makeLid({ type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
     });
@@ -12162,12 +12173,21 @@ export function LayerlingEditor({
           magnetDiameter: params.magnetDiameter,
           magnetHeight: params.magnetHeight,
           magnetGap: params.magnetGap,
+          hinge: params.hinge,
+          hingePin: params.hingePin,
+          hingeGap: params.hingeGap,
+          hingeKnuckles: params.hingeKnuckles,
+          hingePrintPin: params.hingePrintPin,
         }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
         if (!("bodyId" in result)) return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type };
         const body = currentShapes().find((shape) => shape.id === result.bodyId);
-        return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, body: body ? mcpShapeSummary(body) : { id: result.bodyId }, magnets: result.magnets, posts: result.posts };
+        const pin = "hinge" in result && result.hinge?.pinId ? currentShapes().find((shape) => shape.id === result.hinge!.pinId) : null;
+        return {
+          object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, body: body ? mcpShapeSummary(body) : { id: result.bodyId }, magnets: result.magnets, posts: result.posts,
+          ...("hinge" in result && result.hinge ? { hinge: { knuckles: result.hinge.knuckles, pinDiameter: result.hinge.pinDiameter, pin: pin ? mcpShapeSummary(pin) : null } } : {}),
+        };
       }
 
       if (command.action === "loft_sketches") {
