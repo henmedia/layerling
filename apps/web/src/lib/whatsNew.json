@@ -1,5 +1,100 @@
 [
   {
+    "version": "1.134.0",
+    "items": [
+      {
+        "title": {
+          "de": "Gridfinity-Behälter bis zur Oberkante des Stapelrands füllen",
+          "en": "Gridfinity bins filled to the top of the lip"
+        },
+        "body": {
+          "de": "„Bodenhöhe“ im Eigenschaften-Fenster reicht bei einem Gridfinity-Behälter mit Stapelrand jetzt bis zur Oberkante des Stapelrands. Oberhalb der Höhe, bis zu der sich noch ein Behälter darauf stapeln lässt, wird auch der Stapelrand gefüllt: Der Behälter ist ein massiver Block mit flacher Oberseite, so hoch wie die Behälter mit Stapelrand daneben, ein Rohling, in den du die Formen deiner Werkzeuge schneidest.",
+          "en": "\"Floor height\" in the Properties panel now goes on to the top of a Gridfinity bin's stacking lip. Above the highest floor another bin still stacks on, the lip is filled too: the bin is a solid block with a flat top, as tall as the bins with the lip beside it, a blank to cut the shapes of your tools into."
+        }
+      },
+      {
+        "title": {
+          "de": "Notizen als Gespräch mit der KI",
+          "en": "Notes as a conversation with the AI"
+        },
+        "body": {
+          "de": "An einer Notiz gibt es jetzt das Feld „Für die KI“. Ein KI-Agent an der MCP-Brücke liest solche Notizen, erledigt die Arbeit und antwortet unter deinem Text. Er kann auch selbst Notizen ans Modell setzen, um an einer Stelle etwas zu fragen. Du zeigst also einfach aufs Modell, statt Flächen und Kanten zu beschreiben.",
+          "en": "A note has a For the AI box now. An AI agent on the MCP bridge reads such notes, does the work and answers under your text. It can also put notes of its own on the model, to ask something at a spot. So you can simply point at the model instead of describing faces and edges."
+        }
+      },
+      {
+        "title": {
+          "de": "Schmalere oder breitere Buchstaben auf dem Bogen",
+          "en": "Narrower or wider letters on an arc"
+        },
+        "body": {
+          "de": "Text auf dem Kreisbogen hat jetzt das Feld „Buchstabenbreite“. Damit zeichnest du die Buchstaben schmaler oder breiter, etwa für eine hohe, schmale Schrift auf einer Münze. Die Höhe bleibt, und der Text bleibt auf dem Bogen.",
+          "en": "Text on an arc now has a Letter width field. It draws the letters narrower or wider, say for tall, narrow lettering on a coin. Their height stays, and the text stays on the arc."
+        }
+      },
+      {
+        "title": {
+          "de": "Textblock: mehrere Zeilen, links, mittig oder rechts",
+          "en": "Text block: several lines, left, centred or right"
+        },
+        "body": {
+          "de": "Ein Text hat jetzt die Karte „Textblock“. Gib mehrere Zeilen ein, wähle die Ausrichtung, den Abstand und ob jede Zeile kleiner werden soll. Jede Zeile wird ein eigener Text, den du danach einzeln ändern kannst, etwa für ein Schild oder eine Tafel.",
+          "en": "A text now has a Text block card. Type several lines, choose the alignment, the gap and whether each line gets smaller. Every line becomes a text of its own that you can change on its own afterwards, for a sign or a plaque, say."
+        }
+      },
+      {
+        "title": {
+          "de": "Gebogener Kegel",
+          "en": "Curved cone"
+        },
+        "body": {
+          "de": "Neu bei den Grundformen: ein Kegel, dessen Seite sich biegt. Mit „Biegung“ wird er nach innen zur Trompete wie eine Pseudosphäre oder nach außen zur Kuppel, „Durchmesser oben“ reicht von einer Spitze bis zur vollen Breite. Er ist ein exakter Körper, den du aushöhlen und verrunden kannst.",
+          "en": "New among the basic shapes: a cone whose side bends. Bend turns it inward into a trumpet like a pseudosphere or outward into a dome, and Top diameter goes from a point to the full width. It is an exact body you can hollow out and fillet."
+        }
+      },
+      {
+        "title": {
+          "de": "Kopien heißen wie ihr Vorbild",
+          "en": "Copies are named after their original"
+        },
+        "body": {
+          "de": "Duplizierst oder fügst du ein Objekt ein, dem du einen Namen gegeben hast, heißt die Kopie jetzt „Halter (Kopie)“, dann „Halter (Kopie 2)“. So stehen in der Objektliste keine zwei gleichen Namen mehr.",
+          "en": "When you duplicate or paste an object you have named, the copy is now called \"Holder (copy)\", then \"Holder (copy 2)\". So the object list no longer shows two of the same name."
+        }
+      },
+      {
+        "title": {
+          "de": "Den Verlauf abspielen",
+          "en": "Play the history"
+        },
+        "body": {
+          "de": "In der Verlaufsansicht spielen zwei Knöpfe unter dem Schieber die Schritte wie einen Film ab, vorwärts oder rückwärts, langsam, normal oder schnell. Gut für eine Bildschirmaufnahme, wie ein Teil entstanden ist.",
+          "en": "In the history view, two buttons under the slider play the steps like a film, forwards or backwards, slow, normal or fast. Good for a screen recording of how a part came about."
+        }
+      },
+      {
+        "title": {
+          "de": "Schnellstart mit KI auch auf dem Mac",
+          "en": "The AI quickstart on a Mac too"
+        },
+        "body": {
+          "de": "Die Schritt-für-Schritt-Anleitung im KI-Kapitel und die Einrichtung mit einer Zeile gibt es jetzt auch für den Mac: Sie prüft Git und Node.js, lädt layerling herunter und legt „Start layerling“ auf den Schreibtisch.",
+          "en": "The step-by-step part of the AI chapter and the one-line setup now work on a Mac too: it checks Git and Node.js, downloads layerling and puts \"Start layerling\" on the desktop."
+        }
+      },
+      {
+        "title": {
+          "de": "Die Platte unter einem eingelesenen QR-Code ist wieder ganz",
+          "en": "The plate under a traced QR code is whole again"
+        },
+        "body": {
+          "de": "Bei einem Symbolschild aus einem eingelesenen Bild eines QR-Codes deckte die Grundplatte nur die Ecken ab. Jetzt liegt sie wieder unter dem ganzen Code.",
+          "en": "On an icon tag made from a picture of a QR code, the bottom plate covered only the corners. Now it lies under the whole code again."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.133.0",
     "items": [
       {
