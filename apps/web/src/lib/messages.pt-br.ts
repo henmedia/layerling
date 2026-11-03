@@ -3534,7 +3534,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "welcome.moreFaceTitle": "Empurrar uma face",
   "welcome.moreFaceBody": "puxe uma face plana de um sólido para fora ou corte um bolso nela, com recuo da borda, cantos arredondados e profundidade, com prévia - também em STL importados.",
   "welcome.moreTextureTitle": "Textura de superfície",
-  "welcome.moreTextureBody": "aplique um relevo a qualquer sólido para dar aderência ou enfeitar, em volta de sólidos redondos ou por projeção plana na direção de um eixo: serrilhado, ranhuras, colmeia, tijolos, fibra de carbono, casca de árvore, veio da madeira, corda, uma imagem como mapa de altura ou um texto. Até seis padrões em um mesmo corpo, cada um em suas próprias faces.",
+  "welcome.moreTextureBody": "aplique um relevo em qualquer sólido para dar aderência ou enfeitar, em volta de sólidos redondos ou por projeção plana na direção de um eixo: serrilhado, ranhuras, colmeia, tijolos, fibra de carbono, casca de árvore, veio da madeira, corda, uma imagem como mapa de altura ou um texto. Até seis padrões em um mesmo sólido, cada um em suas próprias faces.",
   "welcome.moreVaseTitle": "Vasos e cachepôs",
   "welcome.moreVaseBody": "uma forma própria para vasos, cachepôs e cúpulas de luminária, com formato, seção transversal, torção, padrões, furos de drenagem, um prato e uma tampa. A forma pode ser maciça para o modo vaso do fatiador ou oca. Uma tampa de bule é o topo do próprio vaso, e o padrão continua através da junta.",
   "welcome.moreOffsetTitle": "Deslocamento e recorte",
