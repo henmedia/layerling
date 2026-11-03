@@ -3,12 +3,16 @@ import { faceFrameWorkplane } from "@/lib/carryOntoFace";
 import {
   faceOutlineFromTriangles,
   holeFootprintSize,
+  holeHasHead,
+  holeHeadDepth,
+  holeHeadSize,
   holePatternCenters,
   type FaceOutline,
   type HolePatternSettings,
 } from "@/lib/holePattern";
 import { placementPatchForNewShape, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { nearestFaceTriangle, planarFaceTriangles } from "@/lib/rotationPivot";
+import { METRIC_COUNTERSINK_ANGLE, screwHoleFields, screwHoleSizesFor, type ScrewHoleSize } from "@/lib/screwHoleSizes";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { canonicalizeShape, withHoleMode } from "@/lib/workplaneShapes";
 import type { ShapeKind, WorkplaneShape } from "@/types/layerling";
@@ -72,6 +76,28 @@ export function readPerforableFace(positions: ArrayLike<number>, point: Vec, nor
   return { ok: true, face: { workplane, outline, thickness: Math.max(0, planeOffset - lowest) } };
 }
 
+/** The screw sizes a hole with this head offers (a countersink only those ISO 15065 has). */
+export function holePatternScrewSizes(type: "counterbore" | "countersink"): ScrewHoleSize[] {
+  return screwHoleSizesFor(type);
+}
+
+/** Shaft, head and depth for a screw of this size, as the counterbore and countersink shapes take them (#1232). */
+export function holePatternScrewPatch(type: "counterbore" | "countersink", size: ScrewHoleSize): Pick<HolePatternSettings, "size" | "headSize" | "headDepth"> {
+  const fields = screwHoleFields(type, size, 0);
+  return { size: fields.screwHoleShaft, headSize: fields.width, ...(fields.screwHoleHeadDepth !== undefined ? { headDepth: fields.screwHoleHeadDepth } : {}) };
+}
+
+/** The screw size whose hole the settings make, or null for measures of their own. */
+export function holePatternScrewSize(settings: Pick<HolePatternSettings, "form" | "size" | "holeType" | "headSize" | "headDepth">): ScrewHoleSize | null {
+  if (!holeHasHead(settings)) return null;
+  const type = settings.holeType as "counterbore" | "countersink";
+  const near = (a: number | undefined, b: number | undefined) => a !== undefined && b !== undefined && Math.abs(a - b) < 0.005;
+  return holePatternScrewSizes(type).find((size) => {
+    const patch = holePatternScrewPatch(type, size);
+    return near(settings.size, patch.size) && near(holeHeadSize(settings), patch.headSize) && (type === "countersink" || near(holeHeadDepth(settings), patch.headDepth));
+  }) ?? null;
+}
+
 const FORM_KIND: Record<HolePatternSettings["form"], ShapeKind> = {
   round: "cylinder",
   square: "box",
@@ -88,6 +114,8 @@ export function holeDepth(face: Pick<PerforableFace, "thickness">, settings: Pic
 export type HolePatternPlan = {
   holes: WorkplaneShape[];
   tooMany: boolean;
+  /** Holes round the edge: the length of the line they go round on, and whether they sit on its corners. */
+  ring?: { length: number; onCorners: boolean };
 };
 
 /**
@@ -102,15 +130,25 @@ export function holePatternShapes(
   /** Ids that stay the same from one call to the next, for a preview that is redrawn while the numbers change. */
   previewIdPrefix?: string,
 ): HolePatternPlan {
-  const { centers, tooMany } = holePatternCenters(face.outline, settings);
-  if (tooMany || centers.length === 0) return { holes: [], tooMany };
+  const { centers, tooMany, ring } = holePatternCenters(face.outline, settings);
+  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}) };
 
-  const kind = FORM_KIND[settings.form];
+  // A round hole with a head is a counterbore or countersink shape (#1232), its head on the face.
+  const headType = holeHasHead(settings) ? settings.holeType as "counterbore" | "countersink" : null;
+  const kind = headType ?? FORM_KIND[settings.form];
   const asset = toolbarShapeAssets.find((entry) => entry.kind === kind);
   if (!asset) return { holes: [], tooMany: false };
-  const size = holeFootprintSize(settings);
   const depth = holeDepth(face, settings);
   const height = depth + HOLE_OVERSHOOT;
+  // The shape's top stands HOLE_OVERSHOOT out of the face: the counterbore reaches that much deeper, and the
+  // countersink's cone, opening at 90 degrees, is that much wider up there, so both meet the face as set.
+  const head: { width: number; screwHoleShaft: number; screwHoleHeadDepth?: number; screwHoleAngle?: number } | null = headType ? {
+    screwHoleShaft: Math.max(0.5, settings.size),
+    ...(headType === "counterbore"
+      ? { screwHoleHeadDepth: holeHeadDepth(settings) + HOLE_OVERSHOOT, width: holeHeadSize(settings) }
+      : { screwHoleAngle: METRIC_COUNTERSINK_ANGLE, width: holeHeadSize(settings) + 2 * HOLE_OVERSHOOT }),
+  } : null;
+  const size = head ? { width: head.width, height: head.width } : holeFootprintSize(settings);
   const { workplane } = face;
   const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
   const origin = new THREE.Vector3(workplane.origin.x, workplane.origin.y, workplane.origin.z);
@@ -123,11 +161,17 @@ export function holePatternShapes(
     const made = makeShapeFromAsset(
       { ...asset, name: `${namePrefix} ${index + 1}` },
       { x: 0, z: 0, elevation: 0 },
-      { width: size.width, depth: size.height, height, sides: settings.form === "hexagon" ? 6 : undefined },
+      {
+        width: size.width,
+        depth: size.height,
+        height,
+        sides: settings.form === "hexagon" ? 6 : undefined,
+        ...(head ? { screwHoleShaft: head.screwHoleShaft, screwHoleHeadDepth: head.screwHoleHeadDepth, screwHoleAngle: head.screwHoleAngle } : {}),
+      },
     );
     const sized = { ...made, width: size.width, depth: size.height, height, size: Math.max(size.width, size.height) };
     const placed = { ...sized, ...placementPatchForNewShape(sized, workplane, base), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
     return canonicalizeShape(withHoleMode(placed, true));
   });
-  return { holes, tooMany: false };
+  return { holes, tooMany: false, ...(ring ? { ring } : {}) };
 }

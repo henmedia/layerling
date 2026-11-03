@@ -72,7 +72,7 @@ import { FaceToolPanel } from "./workplane/FaceToolPanel";
 import { DEFAULT_FACE_TOOL, faceToolSettingsOn, normalizeFaceTool, type FaceToolSettings } from "@/lib/faceTool";
 import { faceToolBody } from "@/lib/faceToolBody";
 import { DEFAULT_HOLE_PATTERN, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
-import { holePatternShapes, readPerforableFace, type PerforableFace } from "@/lib/holePatternShapes";
+import { holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, readPerforableFace, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
 import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
 import { MeshSimplifyPanel } from "./workplane/MeshSimplifyPanel";
@@ -159,7 +159,7 @@ import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCode
 import { storeRecentShape } from "@/lib/shapeLibrarySections";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
-import { finishingWasherFields, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizesFor } from "@/lib/screwHoleSizes";
+import { finishingWasherFields, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizesFor, type ScrewHoleSize } from "@/lib/screwHoleSizes";
 import { NUT_POCKET_SIZE_ORDER, isNutPocketSize, nutPocketFields } from "@/lib/nutPocketSizes";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { exportMeshesToStl } from "@/lib/stlExport";
@@ -11835,9 +11835,21 @@ export function LayerlingEditor({
           throw new Error("perforate_face form must be round, square, rectangle, hexagon or slot");
         }
         const arrangement = params.arrangement === undefined ? DEFAULT_HOLE_PATTERN.arrangement : params.arrangement;
-        if (arrangement !== "grid" && arrangement !== "staggered") throw new Error("perforate_face arrangement must be grid or staggered");
+        if (arrangement !== "grid" && arrangement !== "staggered" && arrangement !== "perimeter") throw new Error("perforate_face arrangement must be grid, staggered or perimeter");
+        const holeType = params.holeType === undefined ? "plain" : params.holeType;
+        if (holeType !== "plain" && holeType !== "counterbore" && holeType !== "countersink") throw new Error("perforate_face holeType must be plain, counterbore or countersink");
+        if (holeType !== "plain" && form !== "round") throw new Error("perforate_face holeType counterbore and countersink need form round");
+        // A screw size sets shaft, head and its depth at once (#1232); size, headSize and headDepth given as well win.
+        let screw: ReturnType<typeof holePatternScrewPatch> | null = null;
+        if (params.screwSize !== undefined) {
+          if (holeType === "plain") throw new Error("perforate_face screwSize needs holeType counterbore or countersink");
+          const sizes = holePatternScrewSizes(holeType);
+          if (!sizes.includes(params.screwSize as ScrewHoleSize)) throw new Error(`perforate_face screwSize for a ${holeType} must be one of ${sizes.join(", ")}`);
+          screw = holePatternScrewPatch(holeType, params.screwSize as ScrewHoleSize);
+        }
         const depth = mcpOptionalNumber(params.depth);
-        const size = mcpNumber(params.size, DEFAULT_HOLE_PATTERN.size);
+        const size = mcpNumber(params.size, screw?.size ?? DEFAULT_HOLE_PATTERN.size);
+        const count = mcpOptionalNumber(params.count);
         const settings = normalizeHolePattern({
           form,
           arrangement,
@@ -11847,6 +11859,13 @@ export function LayerlingEditor({
           rowSpacing: mcpOptionalNumber(params.rowSpacing),
           margin: mcpNumber(params.margin, DEFAULT_HOLE_PATTERN.margin),
           depth: depth !== undefined && depth > 0 ? depth : null,
+          holeType,
+          headSize: mcpOptionalNumber(params.headSize) ?? screw?.headSize,
+          headDepth: mcpOptionalNumber(params.headDepth) ?? screw?.headDepth,
+          perimeterBy: count !== undefined ? "count" : "spacing",
+          perimeterCount: count,
+          perimeterCorners: params.corners !== false,
+          perimeterStart: mcpOptionalNumber(params.start),
         });
         // Taken before the face is read: joining a group's or bundle's parts takes a moment, and the scene may change meanwhile.
         const sourceFingerprint = projectShapesFingerprint(currentShapes());
@@ -11867,6 +11886,7 @@ export function LayerlingEditor({
           object: mcpShapeSummary(editableGroup),
           holes: plan.holes.length,
           settings,
+          ...(plan.ring ? { ring: { length: Number(plan.ring.length.toFixed(2)), onCorners: plan.ring.onCorners } } : {}),
           normal: [normal.x, normal.y, normal.z].map((value) => Number(value.toFixed(4))),
         };
       }
@@ -16229,6 +16249,7 @@ export function LayerlingEditor({
           thickness={holePatternTool.face?.thickness ?? 0}
           holeCount={holePatternPreview?.holes.length ?? 0}
           tooMany={Boolean(holePatternPreview?.tooMany)}
+          ring={holePatternPreview?.ring}
           busy={holePatternTool.busy}
           onChange={changeHolePatternSettings}
           onRepick={() => {

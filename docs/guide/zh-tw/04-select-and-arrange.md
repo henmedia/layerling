@@ -108,9 +108,11 @@ summary: 選取形狀、在物件清單中找到它們、對齊、鏡像、旋�
 2. 在視窗中設定孔的外觀和排列：
    - **{{ui:holePattern.form}}：** {{ui:holePattern.form.round}}、{{ui:holePattern.form.square}}、{{ui:holePattern.form.rectangle}}、{{ui:holePattern.form.hexagon}} 或 {{ui:holePattern.form.slot}}。
    - **大小：** 圓孔用 {{ui:holePattern.size.diameter}}，方孔用 {{ui:holePattern.size.side}}，矩形和槽孔用 {{ui:holePattern.size.width}} 與 {{ui:holePattern.size.height}}。六邊形的大小是 {{ui:holePattern.size.corners}}。
+   - **{{ui:holePattern.holeType}}：** 僅限圓孔。{{ui:holePattern.holeType.plain}} 是直孔，{{ui:shape.counterbore}} 為圓柱頭螺絲的頭部加一個沉台，{{ui:shape.countersink}} 為沉頭螺絲加一個 90° 錐面。此時大小就是 {{ui:prop.screwHoleShaft}}；{{ui:prop.screwHoleHead}} 以及沉台的 {{ui:prop.screwHoleHeadDepth}} 設定頭部。{{ui:prop.screwHoleSize}} 會依公制螺絲填好所有數值。
    - **{{ui:holePattern.spacing}}：** 從一個孔的中心到下一個孔中心的距離。如果它小於孔所允許的最小值，layerling 會將其提高到最小可能值，以便孔之間保留壁。
    - **{{ui:holePattern.wall}}：** 同一距離的另一種說法：相鄰兩個孔之間留下的壁，也就是列印件中的壁厚。設定它，中心距會隨之變化，反之亦然。對於六邊形、矩形和槽孔，layerling 會量測它們邊緣之間的最短距離。
    - **{{ui:holePattern.arrangement}}：** {{ui:holePattern.arrangement.grid}} 將孔排成列與欄。{{ui:holePattern.arrangement.staggered}} 將每隔一列錯開半個間距，並讓列更靠近，使每個孔到相鄰孔的距離相同——用於六邊形時便形成蜂巢。
+   - **{{ui:holePattern.arrangement.perimeter}}：** 改為沿面的外邊緣放一圈孔，向內縮進 {{ui:holePattern.margin}}——例如蓋子或板子四周的螺絲孔。{{ui:holePattern.perimeterBy}} {{ui:holePattern.perimeterBy.spacing}} 大致保持間距，{{ui:holePattern.perimeterBy.count}} 則設定 {{ui:holePattern.perimeterCount}}；兩種方式都會把間距調勻，讓這一圈無縫閉合。{{ui:holePattern.perimeterCorners}}（預設開啟）在每個角放一個孔，並把角之間的每條邊平均分配。在圓形面上，或取消勾選時，孔從頂部開始平均繞一圈，{{ui:holePattern.perimeterStart}} 可沿邊緣移動整圈孔。
    - **{{ui:holePattern.margin}}：** 孔與面邊緣之間的淨距離。只有完全位於「面減去此邊距」範圍內的孔才會製作；任何會超出該範圍的孔都會被略過。面中的開口周圍也會保留此邊距。
    - **{{ui:holePattern.depth}}：** {{ui:holePattern.depth.through}}（預設）會切穿整面壁。使用 {{ui:holePattern.depth.custom}} 時，以公釐為單位給出深度，例如用於凹槽。
 3. 孔會立即在面上以預覽形式顯示，並跟隨每個數值變化。視窗會說明能容納多少個孔。{{ui:holePattern.repick}} 可選擇另一個面，[[Esc]] 關閉工具；和其他工具視窗一樣，可拖曳其標題列移動。

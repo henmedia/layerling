@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Löcher am Rand",
+      "en": "Holes along the edge"
+    },
+    "body": {
+      "de": "Das Lochmuster setzt Löcher jetzt auch als Kranz entlang der Kante einer Fläche: ein Loch auf jeder Ecke und die Seiten gleichmäßig aufgeteilt, nach Abstand oder Anzahl, auf runden Flächen mit verschiebbarem Start. Runde Löcher können eine Stufen- oder Senkbohrung bekommen, mit metrischen Schraubengrößen.",
+      "en": "The hole pattern can now set its holes in a ring along the edge of a face: a hole on every corner and the sides shared out evenly, by spacing or by number, with a start you can move on round faces. Round holes can get a counterbore or countersink, with metric screw sizes."
+    }
+  },
+  {
+    "title": {
       "de": "KI wartet auf deine Notizen",
       "en": "The AI waits for your notes"
     },
