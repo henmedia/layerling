@@ -167,7 +167,7 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 
 {{ui:workspace.zoomSpeed}} to suwak od wolno do szybko: jak szybko przybliżają kółko i touchpad. Przyciski i klawisze przybliżania zachowują własne małe kroki. {{ui:workspace.cameraInertia}}: gdy puścisz mysz, widok obraca się jeszcze przez chwilę i łagodnie zwalnia. Po wyłączeniu zatrzymuje się od razu, jak w Tinkercadzie i Fusion 360.
 
-{{ui:workspace.overhangAngle}} to kąt, od którego ściana liczy się jako nawis, gdy włączysz Pokaż nawisy w menu widoczności: takie ściany są kreskowane na czerwono i biało. 30° to ostrożnie, 70° zakłada dobre chłodzenie wydruku, a 45° to zwykły punkt wyjścia.
+{{ui:workspace.overhangAngle}} to kąt, od którego ściana liczy się jako nawis, gdy włączysz Pokaż nawisy w menu widoczności: takie ściany są kreskowane na czerwono i biało. 30° to ostrożnie, 70° zakłada dobre chłodzenie wydruku, a 45° to zwykły punkt wyjścia. Dopóki są pokazane, wiersz pod widokiem podaje najbardziej stromy nawis i ile cm² wymaga podpór.
 
 {{ui:workspace.booleanTriangleLimit}} ogranicza, ile trójkątów może mieć zaimportowana siatka przy cięciu, scalaniu albo części wspólnej, bo jest to liczone w przeglądarce. Siatka powyżej limitu nie jest przetwarzana. Najpierw uprość siatkę albo podnieś limit, jeśli Twój komputer to udźwignie. Wyższy limit może zamrozić edytor na kilka sekund.
 

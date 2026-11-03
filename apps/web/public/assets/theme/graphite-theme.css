@@ -4640,6 +4640,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .font-picker-option.act
   border: 0;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .overhang-figures {
+  color: #464646;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #d0d0d0;
+  box-shadow: 0 2px 12px rgba(52, 52, 52, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .overhang-figures-swatch {
+  border: 1px solid #c8372d;
+  background: repeating-linear-gradient(135deg, #e0453a 0 3px, #ffffff 3px 6px);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .bed-overhang-dismiss:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .bed-overhang-dismiss:focus-visible {
   background: rgba(216, 106, 0, 0.14);
@@ -5568,6 +5580,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .split-panel-footer .se
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-info {
   color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .overhang-figures {
+  color: #e2e2e2;
+  background: rgba(38, 38, 38, 0.94);
+  border-color: rgba(227, 181, 122, 0.35);
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .bed-overhang-warning {
