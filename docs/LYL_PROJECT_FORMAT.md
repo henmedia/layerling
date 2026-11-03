@@ -13,6 +13,7 @@ This was selected over pure JSON because imported STL/STEP data and exact B-Rep 
 ```text
 project.lyl
 ├── project.json
+├── thumbnail.png        Picture of the design, as its card shows it (optional)
 └── assets/
     ├── source/          Original imported STL, OBJ, 3MF, SVG, or STEP files
     ├── derived-mesh/    Exact caches for baked operations or legacy imports
@@ -34,6 +35,8 @@ project.lyl
 - `workplanes`: base and selected offset workplanes
 - `exactCad`: objects with exact B-Rep or imported STEP sources
 - `editor`: workspace dimensions, units, snap grid, and selected workplane elevation
+
+`thumbnail.png` is a PNG of the design as the card on the start page shows it, all its bodies framed from the side the view looked from, at most 512 × 320 pixels. It is there for other programs, a file manager or a library of models, to show the design without building it; layerling writes it when it saves or downloads a design, or puts one on the server, and does not read it. It is not listed in `project.json` and has no hash there. A file written by an older version, through an AI agent while the view has no size, or from the start page's backup has none.
 
 Object nodes keep stable layerling object IDs. Groups refer to child node IDs instead of array positions. Fillet/chamfer history refers to explicit “before” nodes. Feature dependencies are explicit and checked for cycles.
 
