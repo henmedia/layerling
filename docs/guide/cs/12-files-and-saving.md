@@ -68,7 +68,7 @@ Nahoře je název souboru, pod ním formát. Je-li něco vybráno, exportuje se 
 
 Nesloučený výřez se při exportu odečte od všech těles, která protíná, tak jako v zobrazení. Před každým exportem tedy nemusíte slučovat. U exportu výběru se zohlední jen vybrané výřezy. Samotný výřez exportovat nelze a program na to upozorní.
 
-STEP přenáší pouze přesná CAD tělesa. Tvary bez přesné geometrie, například síť importovanou z STL, vynechá. Závěrečné hlášení uvede jejich názvy a důvody. Pro tisk použijte STL nebo 3MF, které zahrnou všechny díly.
+STEP přenáší pouze přesná CAD tělesa. Importovaná síť se pro soubor převede na přesné těleso, jako to dělá {{ui:editor.tool.makeExact}} (viz „Převod importované sítě na přesné těleso“ níže), takže export může trvat až minutu; síť převážně volného tvaru, třeba figurku, vynechá, stejně jako vše ostatní bez přesné geometrie. Závěrečné hlášení uvede jejich názvy a důvody. Pro tisk použijte STL nebo 3MF, které zahrnou všechny díly.
 
 ### Výkres pro dílnu
 
@@ -102,9 +102,17 @@ Obrázkové podklady se přidávají v režimu náčrtu, viz [Náčrty](chapter:
 
 ## Zjednodušení importované sítě
 
-Skenovaná či sochařsky vytvořená síť mívá zbytečně mnoho trojúhelníků, které se zpracovávají při přesunu, řezání i ukládání. {{ui:simplify.title}} v části Úpravy nebo nabídce pravého tlačítka zobrazí vedle sebe originál a zjednodušený náhled. Oba se současně otáčejí a přibližují stejnými tlačítky jako pracovní plocha. Zadejte zachované procento nebo počet trojúhelníků a potvrďte {{ui:simplify.apply}}. Výsledkem je obyčejná síť. U výsledku řezu či sloučení tím přijdete o původní části a {{ui:group.edit}}.
+Skenovaná či sochařsky vytvořená síť mívá zbytečně mnoho trojúhelníků, které se zpracovávají při přesunu, řezání i ukládání. {{ui:simplify.title}} v části Úpravy nebo nabídce pravého tlačítka zobrazí vedle sebe originál a zjednodušený náhled. Oba se současně otáčejí a přibližují stejnými tlačítky jako pracovní plocha. Zadejte zachované procento nebo počet trojúhelníků a potvrďte {{ui:simplify.apply}}. Výsledkem je obyčejná síť. U výsledku řezu či sloučení tím přijdete o původní části a {{ui:group.edit}}. Se zapnutým {{ui:simplify.keepEdges}}, jak je nastaveno na začátku, zůstanou ostré hrany a okraje otvorů přesně na místě, zatímco rovné plochy i tak přijdou o většinu trojúhelníků; vypnuté je zjednodušení smí zaoblit kvůli menšímu počtu.
 
 Řezání, slučování a průnik importovaných sítí se počítají v prohlížeči. Nastavení {{ui:workspace.booleanTriangleLimit}} omezuje povolený počet trojúhelníků. Nad limitem se operace neprovede a hlášení uvede velikost sítě. Nejprve ji zjednodušte nebo limit přiměřeně výkonu počítače zvyšte.
+
+## Převod importované sítě na přesné těleso
+
+Soubor STL, OBJ nebo 3MF obsahuje jen trojúhelníky, i když byl díl nakreslen v CAD s rovnými plochami a kulatými otvory. {{ui:editor.tool.makeExact}} v části {{ui:editor.group.modify}} (nebo v nabídce pravého tlačítka na tělese) v těchto trojúhelnících najde roviny, válce, kužele, koule a toroidy, ze kterých vznikly, a postaví z nich těleso znovu jako přesné CAD těleso: z otvoru se stane jeden skutečný válec s kulatým okrajem místo stovky úzkých pruhů. Potom {{ui:editor.tool.fillet}} a {{ui:editor.tool.chamfer}} sledují jednu čistou hranu, {{ui:editor.tool.deleteFace}} odebere celé zaoblení nebo stěnu otvoru a export STEP ponese skutečné plochy. Stavový řádek řekne, co se našlo, například „rovin: 9, válců: 4“.
+
+Co nesedí na žádnou z těchto ploch, zůstane jako malé rovinné plošky a hlášení řekne, jakou část povrchu tvoří. Těleso převážně volného tvaru, jako figurka nebo modelovaný tvar, zůstane sítí, stejně jako síť s dírami nebo protínajícími se stěnami, která se nemůže uzavřít v těleso. Přijme se až 400 000 trojúhelníků a velká síť může trvat několik minut. Větší síť pod tuto hranici dostanete pomocí {{ui:simplify.title}} se zapnutým {{ui:simplify.keepEdges}}; jinak použijte síť tak, jak přišla, vyjde nejčistěji. Jeden krok zpět vrátí síť.
+
+U malé sítě s kulatými plochami, do 4 000 trojúhelníků, to nástroje hran udělají samy: zaoblení hrany takového STL ho nejdřív stejným způsobem přestaví.
 
 ## Hlášení chyby
 

@@ -56,7 +56,7 @@ På en gruppe, for eksempel en cylinder med et hul, hører den behandlede kant t
 
 > **Godt at vide:** layerling arbejder med rigtig CAD-geometri til runding og fas, ikke kun et mesh af trekanter. Det er derfor en rundet kant stadig er en rundet kant i STEP-eksporten.
 
-En del importeret som STEP beholder også sin CAD-geometri: fas, rund og udhuling virker på formen fra filen, uanset hvor fint delen er tegnet på skærmen. STL, OBJ og 3MF bringer kun trekanter, og en fint tegnet del kan være for tæt for kantværktøjet. Hvis en del også er tilgængelig som STEP, importér den.
+En del importeret som STEP beholder også sin CAD-geometri: fas, rund og udhuling virker på formen fra filen, uanset hvor fint delen er tegnet på skærmen. STL, OBJ og 3MF bringer kun trekanter, og en fint tegnet del kan være for tæt for kantværktøjet. Hvis en del også er tilgængelig som STEP, importér den. {{ui:editor.tool.makeExact}} gør først sådan en del til en eksakt form med rigtige planer og cylindre, se [Filer, lagring og deling](chapter:files-and-saving), "Gør et importeret mesh eksakt".
 
 ## Udhuling af former
 

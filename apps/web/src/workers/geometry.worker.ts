@@ -9,7 +9,7 @@ import { getManifoldRuntime, setManifoldAssetBase } from "@/lib/editorMeshCore";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { resultMeshes, type GeometryWorkerRequest, type GeometryWorkerResponse } from "@/lib/geometryWorkerTypes";
 import { prepareImportedMeshDisplay } from "@/lib/importedMeshDisplay";
-import { simplifyTrianglePositions } from "@/lib/meshSimplify";
+import { simplifyTrianglePositions, type SimplifyOptions } from "@/lib/meshSimplify";
 import { importedShapesFromObj } from "@/lib/objImport";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapesFromStepFile } from "@/lib/stepFileImport";
@@ -72,8 +72,8 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
       const { source } = args as { source: WorkplaneShape[] };
       result = await exportSolidVolume(source);
     } else if (request.task === "simplify") {
-      const { positions, target } = args as { positions: number[]; target: number };
-      result = await simplifyTrianglePositions(positions, target);
+      const { positions, target, options } = args as { positions: number[]; target: number; options?: SimplifyOptions };
+      result = await simplifyTrianglePositions(positions, target, options);
     } else if (request.task === "face") {
       const { shape } = args as { shape: WorkplaneShape };
       result = await faceReadPositions(shape);

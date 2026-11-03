@@ -148,6 +148,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_wrap_around_cylinder` | 把平放的實體（例如 SVG 或文字）包覆到圓柱上，可向外，或向內作為雕刻 |
 | `layerling_texture_surface` | 為實體加上表面紋理：凹槽、滾花、蜂巢或凸點，用於止滑或美觀，之後仍可修改或移除 |
 | `layerling_simplify_mesh` | 減少匯入網格的三角面數量，可縮減到某個百分比，或指定三角面數 |
+| `layerling_make_exact` | 將匯入網格轉為精確的 CAD 實體：平面、圓柱面、圓錐面、球面和圓環面成為真正的面，邊能乾淨地倒圓角，STEP 也會帶上它們 |
 | `layerling_save_custom_shape` | 把實體儲存為自訂形狀，可儲存在伺服器或瀏覽器，之後插入其他設計 |
 | `layerling_list_custom_shapes` | 列出伺服器與瀏覽器中的自訂形狀 |
 | `layerling_insert_custom_shape` | 把自訂形狀插入開啟中的設計，可指定 x/z 位置 |

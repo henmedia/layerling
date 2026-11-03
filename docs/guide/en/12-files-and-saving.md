@@ -72,7 +72,7 @@ At the top is the file name, below it you choose the format. With something sele
 
 A hole you have not grouped is taken out of every body it reaches when you export, as the view shows it. So there is no need to group before each export. With a selection, only the selected holes count. A hole cannot be exported on its own; layerling points that out.
 
-STEP only carries exact CAD bodies. What cannot be written exactly, such as a mesh imported as STL, is left out. The message after the export names those bodies and says why. For the printer, use STL or 3MF, which carry everything.
+STEP only carries exact CAD bodies. An imported mesh is made exact for the file, as {{ui:editor.tool.makeExact}} does (see "Making an imported mesh exact" below), which can make the export take up to a minute; a mesh that is mostly free-form, such as a figure, is left out, as is anything else that cannot be written exactly. The message after the export names those bodies and says why. For the printer, use STL or 3MF, which carry everything.
 
 ### SVG for a laser or plotter
 
@@ -112,9 +112,17 @@ Template pictures are added in sketch mode, see [Sketches](chapter:sketches).
 
 ## Simplifying an imported mesh
 
-A scanned or sculpted mesh often has far more triangles than its shape needs, and every one of them is carried along while you move, cut and save. {{ui:simplify.title}} in the Modify group (or in the right-click menu of the body) shows the mesh as it is next to what a chosen share of its triangles would leave of it; both views turn and zoom together with the mouse buttons of the workplane. Set how much to keep as a percentage or a number of triangles, and {{ui:simplify.apply}} takes the lighter mesh. The result is a plain mesh: for the result of a cut or merge, {{ui:group.edit}} and its original parts are given up.
+A scanned or sculpted mesh often has far more triangles than its shape needs, and every one of them is carried along while you move, cut and save. {{ui:simplify.title}} in the Modify group (or in the right-click menu of the body) shows the mesh as it is next to what a chosen share of its triangles would leave of it; both views turn and zoom together with the mouse buttons of the workplane. Set how much to keep as a percentage or a number of triangles, and {{ui:simplify.apply}} takes the lighter mesh. The result is a plain mesh: for the result of a cut or merge, {{ui:group.edit}} and its original parts are given up. With {{ui:simplify.keepEdges}} switched on, as it is to begin with, sharp edges and the rims of holes stay exactly where they are while flat faces still lose most of their triangles; switched off, the simplifier may round them off to reach a lower count.
 
 Cutting, merging and intersecting an imported mesh is calculated in your browser, so the workspace settings limit how many triangles such a mesh may have ({{ui:workspace.booleanTriangleLimit}}). A mesh above the limit is not processed, and the message names its triangle count; simplify the mesh first, or raise the limit if your computer can take it.
+
+## Making an imported mesh exact
+
+An STL, OBJ or 3MF file holds only triangles, even when the part was drawn in CAD with flat faces and round bores. {{ui:editor.tool.makeExact}} in the {{ui:editor.group.modify}} group (or in the right-click menu of the body) looks through those triangles for the planes, cylinders, cones, spheres and tori they were made of and rebuilds the body from them as an exact CAD body: a bore becomes one real cylinder with a round rim instead of a hundred narrow strips. After that, {{ui:editor.tool.fillet}} and {{ui:editor.tool.chamfer}} follow one clean edge, {{ui:editor.tool.deleteFace}} takes away a whole rounding or the wall of a hole, and a STEP export carries the real faces. The status line says what was found, such as "planes: 9, cylinders: 4".
+
+What fits none of these surfaces stays as small flat facets, and the message says how much of the surface that is. A body that is mostly free-form, such as a figure or a sculpted shape, stays a mesh, and so does a mesh with gaps or crossed walls, which cannot close into a solid. Up to 400,000 triangles are taken, and a large mesh can take a few minutes. A larger mesh goes below that with {{ui:simplify.title}} and {{ui:simplify.keepEdges}} switched on; otherwise take the mesh as it came, it comes out cleanest. One undo step brings the mesh back.
+
+For a small mesh with round faces, up to 4,000 triangles, the edge tools do this by themselves: rounding an edge of such an STL rebuilds it the same way first.
 
 ## Reporting a bug
 

@@ -68,7 +68,7 @@ Bovenaan staat de bestandsnaam, daaronder kies je het formaat. Is er iets gesele
 
 Een gat dat je niet hebt gegroepeerd, wordt bij het exporteren uit elk lichaam gehaald dat het raakt, zoals de weergave het toont. Je hoeft dus niet voor elke export te groeperen. Met een selectie tellen alleen de geselecteerde gaten. Een gat kan niet op zichzelf worden geëxporteerd; layerling wijst je daarop.
 
-STEP bevat alleen exacte CAD-lichamen. Wat niet exact kan worden geschreven, zoals een als STL geïmporteerde mesh, wordt weggelaten. De melding na de export noemt die lichamen en zegt waarom. Gebruik voor de printer STL of 3MF, die alles bevatten.
+STEP bevat alleen exacte CAD-lichamen. Een geïmporteerde mesh wordt voor het bestand exact gemaakt, zoals {{ui:editor.tool.makeExact}} dat doet (zie "Een geïmporteerde mesh exact maken" hieronder), waardoor de export tot een minuut kan duren; een mesh die grotendeels vrije vorm is, zoals een figuur, wordt weggelaten, net als al het andere dat niet exact kan worden geschreven. De melding na de export noemt die lichamen en zegt waarom. Gebruik voor de printer STL of 3MF, die alles bevatten.
 
 ### Een tekening voor de werkplaats
 
@@ -102,9 +102,17 @@ Sjabloonafbeeldingen voeg je toe in de schetsmodus, zie [Schetsen](chapter:schet
 
 ## Een geïmporteerde mesh vereenvoudigen
 
-Een gescande of geboetseerde mesh heeft vaak veel meer driehoeken dan zijn vorm nodig heeft, en elk daarvan wordt meegesleept terwijl je verplaatst, snijdt en opslaat. {{ui:simplify.title}} in de groep Aanpassen (of in het rechtsklikmenu van het lichaam) toont de mesh zoals hij is naast wat een gekozen deel van zijn driehoeken ervan zou overlaten; beide weergaven draaien en zoomen samen met de muisknoppen van het werkvlak. Stel in hoeveel er moet blijven, als percentage of als aantal driehoeken, en {{ui:simplify.apply}} neemt de lichtere mesh over. Het resultaat is een gewone mesh: bij het resultaat van een snede of samenvoeging worden {{ui:group.edit}} en de oorspronkelijke onderdelen opgegeven.
+Een gescande of geboetseerde mesh heeft vaak veel meer driehoeken dan zijn vorm nodig heeft, en elk daarvan wordt meegesleept terwijl je verplaatst, snijdt en opslaat. {{ui:simplify.title}} in de groep Aanpassen (of in het rechtsklikmenu van het lichaam) toont de mesh zoals hij is naast wat een gekozen deel van zijn driehoeken ervan zou overlaten; beide weergaven draaien en zoomen samen met de muisknoppen van het werkvlak. Stel in hoeveel er moet blijven, als percentage of als aantal driehoeken, en {{ui:simplify.apply}} neemt de lichtere mesh over. Het resultaat is een gewone mesh: bij het resultaat van een snede of samenvoeging worden {{ui:group.edit}} en de oorspronkelijke onderdelen opgegeven. Met {{ui:simplify.keepEdges}} aan, zoals het in het begin staat, blijven scherpe randen en de randen van gaten precies waar ze zijn, terwijl vlakke delen toch de meeste driehoeken verliezen; uit mag het vereenvoudigen ze afronden om lager uit te komen.
 
 Snijden, samenvoegen en doorsnijden van een geïmporteerde mesh wordt in je browser berekend, dus de werkruimte-instellingen beperken hoeveel driehoeken zo'n mesh mag hebben ({{ui:workspace.booleanTriangleLimit}}). Een mesh boven de limiet wordt niet verwerkt, en de melding noemt zijn aantal driehoeken; vereenvoudig de mesh eerst, of verhoog de limiet als je computer het aankan.
+
+## Een geïmporteerde mesh exact maken
+
+Een STL-, OBJ- of 3MF-bestand bevat alleen driehoeken, ook als het onderdeel in CAD is getekend met vlakke vlakken en ronde boringen. {{ui:editor.tool.makeExact}} in de groep {{ui:editor.group.modify}} (of in het rechtsklikmenu van het lichaam) zoekt in die driehoeken naar de vlakken, cilinders, kegels, bollen en tori waaruit ze zijn ontstaan en bouwt het lichaam daaruit opnieuw op als exact CAD-lichaam: een boring wordt één echte cilinder met een ronde rand in plaats van honderd smalle stroken. Daarna volgen {{ui:editor.tool.fillet}} en {{ui:editor.tool.chamfer}} één nette rand, haalt {{ui:editor.tool.deleteFace}} een hele afronding of de wand van een gat weg, en draagt een STEP-export de echte vlakken. De statusregel zegt wat er is gevonden, zoals "platte vlakken: 9, cilinders: 4".
+
+Wat bij geen van deze vlakken past, blijft als kleine vlakke facetten, en de melding zegt hoeveel van het oppervlak dat is. Een lichaam dat grotendeels vrije vorm is, zoals een figuur of een geboetseerde vorm, blijft een mesh, net als een mesh met gaten of elkaar kruisende wanden, die niet tot een lichaam kan sluiten. Tot 400.000 driehoeken worden aangenomen, en een grote mesh kan een paar minuten duren. Een grotere mesh breng je daaronder met {{ui:simplify.title}} en {{ui:simplify.keepEdges}} aan; neem anders de mesh zoals hij kwam, zo komt hij het schoonst uit. Eén keer ongedaan maken brengt de mesh terug.
+
+Bij een kleine mesh met ronde vlakken, tot 4.000 driehoeken, doen de randgereedschappen dit vanzelf: een rand van zo'n STL afronden bouwt hem eerst op dezelfde manier opnieuw op.
 
 ## Een fout melden
 

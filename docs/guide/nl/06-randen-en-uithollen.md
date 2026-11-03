@@ -53,7 +53,7 @@ Bij een groep, bijvoorbeeld een cilinder met een gat, hoort de bewerkte rand bij
 
 > **Goed om te weten:** layerling werkt voor afrondingen en afschuiningen met echte CAD-geometrie, niet alleen met een driehoeksmesh. Daarom is een afgeronde rand in de STEP-export nog steeds een afgeronde rand.
 
-Een onderdeel dat als STEP is geïmporteerd houdt ook zijn CAD-geometrie: afschuiningen, afrondingen en uithollen werken op het lichaam uit het bestand, hoe fijn het onderdeel op het scherm ook getekend is. STL, OBJ en 3MF brengen alleen driehoeken mee, en een fijn getekend onderdeel kan te dicht zijn voor het randgereedschap. Is een onderdeel ook als STEP beschikbaar, importeer dat dan.
+Een onderdeel dat als STEP is geïmporteerd houdt ook zijn CAD-geometrie: afschuiningen, afrondingen en uithollen werken op het lichaam uit het bestand, hoe fijn het onderdeel op het scherm ook getekend is. STL, OBJ en 3MF brengen alleen driehoeken mee, en een fijn getekend onderdeel kan te dicht zijn voor het randgereedschap. Is een onderdeel ook als STEP beschikbaar, importeer dat dan. {{ui:editor.tool.makeExact}} maakt van zo'n onderdeel eerst een exact lichaam met echte vlakken en cilinders, zie [Bestanden, opslaan en delen](chapter:bestanden-en-opslaan), "Een geïmporteerde mesh exact maken".
 
 ## Lichamen uithollen
 

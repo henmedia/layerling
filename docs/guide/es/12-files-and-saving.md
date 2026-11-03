@@ -72,7 +72,7 @@ Arriba está el nombre del archivo y, debajo, eliges el formato. Si hay algo sel
 
 Al exportar, un orificio que no hayas agrupado se resta de todos los cuerpos a los que llega, tal como lo muestra la vista. Así que no hace falta agrupar antes de cada exportación. Con una selección, solo cuentan los orificios seleccionados. Un orificio no se puede exportar solo; layerling te lo indica.
 
-STEP solo admite cuerpos CAD exactos. Lo que no se puede escribir de forma exacta, como una malla importada en STL, se queda fuera. El mensaje que aparece tras exportar nombra esos cuerpos y explica por qué. Para la impresora, usa STL o 3MF, que lo llevan todo.
+STEP solo admite cuerpos CAD exactos. Una malla importada se hace exacta para el archivo, como hace {{ui:editor.tool.makeExact}} (ver «Hacer exacta una malla importada» más abajo), por lo que la exportación puede tardar hasta un minuto; una malla sobre todo de forma libre, como una figura, se queda fuera, igual que todo lo que no se puede escribir de forma exacta. El mensaje que aparece tras exportar nombra esos cuerpos y explica por qué. Para la impresora, usa STL o 3MF, que lo llevan todo.
 
 ### SVG para láser o plóter
 
@@ -112,9 +112,17 @@ Las imágenes de plantilla se añaden en el modo de boceto; consulta [Bocetos](c
 
 ## Simplificar una malla importada
 
-Una malla escaneada o esculpida suele tener muchos más triángulos de los que necesita su forma, y todos ellos se arrastran cada vez que mueves, cortas y guardas. {{ui:simplify.title}}, en el grupo Modificar (o en el menú del clic derecho del cuerpo), muestra la malla tal como es junto a lo que quedaría de ella con la proporción de triángulos que elijas; las dos vistas giran y se acercan a la vez con los mismos botones del ratón que la zona de trabajo. Indica cuánto quieres conservar, en porcentaje o en número de triángulos, y {{ui:simplify.apply}} se queda con la malla más ligera. El resultado es una malla simple: si era el resultado de un corte o una fusión, se pierden {{ui:group.edit}} y sus piezas originales.
+Una malla escaneada o esculpida suele tener muchos más triángulos de los que necesita su forma, y todos ellos se arrastran cada vez que mueves, cortas y guardas. {{ui:simplify.title}}, en el grupo Modificar (o en el menú del clic derecho del cuerpo), muestra la malla tal como es junto a lo que quedaría de ella con la proporción de triángulos que elijas; las dos vistas giran y se acercan a la vez con los mismos botones del ratón que la zona de trabajo. Indica cuánto quieres conservar, en porcentaje o en número de triángulos, y {{ui:simplify.apply}} se queda con la malla más ligera. El resultado es una malla simple: si era el resultado de un corte o una fusión, se pierden {{ui:group.edit}} y sus piezas originales. Con {{ui:simplify.keepEdges}} activado, como viene de inicio, las aristas vivas y los bordes de los agujeros se quedan exactamente donde están, mientras que las caras planas pierden igualmente la mayoría de sus triángulos; desactivado, la simplificación puede redondearlos para bajar más.
 
 Cortar, fusionar e intersecar una malla importada se calcula en tu navegador, así que los ajustes del espacio de trabajo limitan cuántos triángulos puede tener una malla así ({{ui:workspace.booleanTriangleLimit}}). Una malla que supere el límite no se procesa, y el mensaje indica su número de triángulos; simplifica antes la malla, o sube el límite si tu ordenador lo aguanta.
+
+## Hacer exacta una malla importada
+
+Un archivo STL, OBJ o 3MF solo contiene triángulos, aunque la pieza se dibujara en CAD con caras planas y taladros redondos. {{ui:editor.tool.makeExact}}, en el grupo {{ui:editor.group.modify}} (o en el menú del clic derecho del cuerpo), busca en esos triángulos los planos, cilindros, conos, esferas y toros de los que salieron y reconstruye con ellos el cuerpo como un cuerpo CAD exacto: un taladro pasa a ser un cilindro real con borde redondo en lugar de cien tiras estrechas. Después, {{ui:editor.tool.fillet}} y {{ui:editor.tool.chamfer}} siguen una arista limpia, {{ui:editor.tool.deleteFace}} quita un redondeo entero o la pared de un agujero, y una exportación STEP lleva las caras reales. La barra de estado dice qué se encontró, por ejemplo «planos: 9, cilindros: 4».
+
+Lo que no encaja en ninguna de estas superficies queda como pequeñas facetas planas, y el mensaje dice qué parte de la superficie es. Un cuerpo sobre todo de forma libre, como una figura o una forma esculpida, sigue siendo una malla, igual que una malla con huecos o paredes que se cruzan, que no puede cerrarse en un sólido. Se admiten hasta 400 000 triángulos, y una malla grande puede tardar unos minutos. Una malla más grande baja de ese límite con {{ui:simplify.title}} y {{ui:simplify.keepEdges}} activado; si no, usa la malla tal como llegó, así sale más limpia. Un paso de deshacer devuelve la malla.
+
+Con una malla pequeña con caras redondas, de hasta 4000 triángulos, las herramientas de aristas lo hacen solas: al redondear una arista de un STL así, primero se reconstruye de la misma manera.
 
 ## Informar de un error
 

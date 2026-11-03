@@ -68,7 +68,7 @@ Felül van a fájlnév, alatta választod ki a formátumot. Ha valami ki van jel
 
 Egy csoportosítatlan lyuk exportáláskor minden olyan testből kivágódik, amelyet elér, ahogy a nézet is mutatja. Így nem kell minden exportálás előtt csoportosítani. Kijelölésnél csak a kijelölt lyukak számítanak. Egy lyuk önmagában nem exportálható; a layerling ezt jelzi.
 
-A STEP csak pontos CAD-testeket visz. Ami nem írható ki pontosan, például egy STL-ként importált háló, az kimarad. Az exportálás utáni üzenet megnevezi ezeket a testeket, és megmondja, miért. A nyomtatóhoz STL-t vagy 3MF-et használj, ezek mindent visznek.
+A STEP csak pontos CAD-testeket visz. Egy importált háló a fájlhoz pontossá válik, ahogy a {{ui:editor.tool.makeExact}} teszi (lásd lent: „Importált háló pontossá tétele”), ezért az exportálás akár egy percig is tarthat; a főként szabad formájú háló, például egy figura, kimarad, ahogy minden más is, ami nem írható ki pontosan. Az exportálás utáni üzenet megnevezi ezeket a testeket, és megmondja, miért. A nyomtatóhoz STL-t vagy 3MF-et használj, ezek mindent visznek.
 
 ### Rajz a műhelynek
 
@@ -102,9 +102,17 @@ A mintaképeket vázlatmódban adod hozzá, lásd a [Vázlatok](chapter:sketches
 
 ## Importált háló egyszerűsítése
 
-Egy szkennelt vagy szobrászprogramban készült háló gyakran sokkal több háromszögből áll, mint amennyi az alakjához kell, és mindegyiket magával cipeli mozgatáskor, vágáskor és mentéskor. A Módosítás csoportban (vagy a test jobb gombos menüjében) a {{ui:simplify.title}} a hálót a jelenlegi állapotában mutatja amellé, ami a háromszögek kiválasztott hányadából maradna belőle; mindkét nézet együtt forog és nagyít a munkasík egérgombjaival. Add meg százalékban vagy háromszögszámban, mennyi maradjon meg, és az {{ui:simplify.apply}} a könnyebb hálót veszi át. Az eredmény egyszerű háló: egy vágás vagy egyesítés eredményénél a {{ui:group.edit}} és az eredeti részek elvesznek.
+Egy szkennelt vagy szobrászprogramban készült háló gyakran sokkal több háromszögből áll, mint amennyi az alakjához kell, és mindegyiket magával cipeli mozgatáskor, vágáskor és mentéskor. A Módosítás csoportban (vagy a test jobb gombos menüjében) a {{ui:simplify.title}} a hálót a jelenlegi állapotában mutatja amellé, ami a háromszögek kiválasztott hányadából maradna belőle; mindkét nézet együtt forog és nagyít a munkasík egérgombjaival. Add meg százalékban vagy háromszögszámban, mennyi maradjon meg, és az {{ui:simplify.apply}} a könnyebb hálót veszi át. Az eredmény egyszerű háló: egy vágás vagy egyesítés eredményénél a {{ui:group.edit}} és az eredeti részek elvesznek. Bekapcsolt {{ui:simplify.keepEdges}} mellett – kezdetben így áll – az éles élek és a furatok peremei pontosan a helyükön maradnak, a sík lapok viszont így is elveszítik háromszögeik nagy részét; kikapcsolva az egyszerűsítés le is kerekítheti őket, hogy kevesebb háromszög maradjon.
 
 Egy importált háló vágása, egyesítése és metszése a böngésződben számolódik, ezért a munkaterület beállításai korlátozzák, hány háromszöge lehet egy ilyen hálónak ({{ui:workspace.booleanTriangleLimit}}). A határ fölötti hálót nem dolgozza fel, és az üzenet megnevezi a háromszögszámát; előbb egyszerűsítsd a hálót, vagy emeld a határt, ha a géped bírja.
+
+## Importált háló pontossá tétele
+
+Egy STL-, OBJ- vagy 3MF-fájl csak háromszögeket tartalmaz, akkor is, ha az alkatrészt CAD-ben rajzolták sík lapokkal és kerek furatokkal. A {{ui:editor.group.modify}} csoportban (vagy a test jobb gombos menüjében) a {{ui:editor.tool.makeExact}} megkeresi ezekben a háromszögekben azokat a síkokat, hengereket, kúpokat, gömböket és tóruszokat, amelyekből készültek, és belőlük pontos CAD-testként építi újra a testet: egy furat egyetlen valódi henger lesz kerek peremmel száz keskeny csík helyett. Ezután a {{ui:editor.tool.fillet}} és a {{ui:editor.tool.chamfer}} egyetlen tiszta élt követ, a {{ui:editor.tool.deleteFace}} egy egész lekerekítést vagy egy furat falát veszi el, a STEP-export pedig a valódi lapokat viszi. Az állapotsor megmondja, hány síkot, hengert és egyéb felületet talált.
+
+Ami egyik ilyen felülethez sem illik, kis sík lapocskákként marad, és az üzenet megmondja, a felület mekkora része ez. Egy főként szabad formájú test, például egy figura vagy egy mintázott forma, háló marad, ahogy az a háló is, amelyben rések vagy egymást keresztező falak vannak, mert nem zárulhat testté. Legfeljebb 400 000 háromszöget fogad el, és egy nagy háló néhány percig is eltarthat. Egy nagyobb hálót előbb a {{ui:simplify.title}} eszközzel, bekapcsolt {{ui:simplify.keepEdges}} mellett vihetsz e határ alá; egyébként a hálót úgy használd, ahogy érkezett, így lesz a legtisztább. Egy visszavonás visszahozza a hálót.
+
+Kerek lapokat tartalmazó kis hálónál, legfeljebb 4000 háromszögig, az élszerszámok maguktól megteszik ezt: egy ilyen STL élének lekerekítése előbb ugyanígy építi újra.
 
 ## Hiba jelentése
 

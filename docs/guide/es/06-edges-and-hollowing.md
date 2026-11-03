@@ -55,7 +55,7 @@ En un grupo, por ejemplo un cilindro con un orificio, la arista tratada pertenec
 
 > **Conviene saber:** Para los redondeos y chaflanes, layerling trabaja con geometría CAD real, no solo con una malla de triángulos. Por eso una arista redondeada sigue siendo una arista redondeada en la exportación STEP.
 
-Una pieza importada en STEP también conserva su geometría CAD: los chaflanes, los redondeos y el vaciado trabajan sobre el cuerpo del archivo, por muy detallada que se dibuje la pieza en pantalla. STL, OBJ y 3MF solo traen triángulos, y una pieza dibujada con mucho detalle puede ser demasiado densa para la herramienta de aristas. Si una pieza también está disponible en STEP, importa esa.
+Una pieza importada en STEP también conserva su geometría CAD: los chaflanes, los redondeos y el vaciado trabajan sobre el cuerpo del archivo, por muy detallada que se dibuje la pieza en pantalla. STL, OBJ y 3MF solo traen triángulos, y una pieza dibujada con mucho detalle puede ser demasiado densa para la herramienta de aristas. Si una pieza también está disponible en STEP, importa esa. {{ui:editor.tool.makeExact}} convierte primero una pieza así en un cuerpo exacto con planos y cilindros reales, ver [Archivos: guardar y compartir](chapter:files-and-saving), «Hacer exacta una malla importada».
 
 ## Vaciar cuerpos
 

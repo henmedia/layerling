@@ -144,6 +144,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_wrap_around_cylinder` | obtočí rovinné těleso, SVG nebo text kolem válce jako reliéf či rytinu |
 | `layerling_texture_surface` | nanese na těleso povrchovou texturu: drážky, vroubkování, plástev nebo výstupky; později ji také změní nebo odebere |
 | `layerling_simplify_mesh` | sníží počet trojúhelníků sítě na zadané procento nebo počet |
+| `layerling_make_exact` | převede importovanou síť na přesné CAD těleso: roviny, válce, kužele, koule a toroidy se stanou skutečnými plochami, hrany se čistě zaoblí a STEP je ponese |
 | `layerling_save_custom_shape` | uloží tělesa jako vlastní tvar na serveru nebo v prohlížeči pro další projekty |
 | `layerling_list_custom_shapes` | vypíše vlastní tvary na serveru i v prohlížeči |
 | `layerling_insert_custom_shape` | vloží vlastní tvar do otevřeného projektu, případně na zadanou polohu x/z |

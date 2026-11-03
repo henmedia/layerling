@@ -8,7 +8,7 @@ import { resultMeshes, type GeometryTask, type GeometryWorkerRequest, type Geome
 import { rememberPreparedDisplay } from "@/lib/importedMeshDisplay";
 import { getLanguage, t } from "@/lib/i18n";
 import type { ModelSplitPlane } from "@/lib/modelSplit";
-import { simplifyTrianglePositions, type SimplifiedMesh } from "@/lib/meshSimplify";
+import { simplifyTrianglePositions, type SimplifiedMesh, type SimplifyOptions } from "@/lib/meshSimplify";
 import { importedShapesFromObj, type ObjImportResult } from "@/lib/objImport";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapesFromStepFile, type StepFileImport } from "@/lib/stepFileImport";
@@ -350,8 +350,8 @@ export function exportSolidVolumeOffThread(source: readonly WorkplaneShape[]): P
  * page for a 300,000-triangle import, at every rest of the slider. A new value calls off the one
  * before through `signal`. The panel shows its own progress.
  */
-export function simplifyTrianglePositionsOffThread(positions: ArrayLike<number>, target: number, signal?: AbortSignal): Promise<SimplifiedMesh> {
-  return runGeometryTask("simplify", { positions: Array.isArray(positions) ? positions : Array.from(positions), target }, () => simplifyTrianglePositions(positions, target), () => {
+export function simplifyTrianglePositionsOffThread(positions: ArrayLike<number>, target: number, signal?: AbortSignal, options: SimplifyOptions = {}): Promise<SimplifiedMesh> {
+  return runGeometryTask("simplify", { positions: Array.isArray(positions) ? positions : Array.from(positions), target, options }, () => simplifyTrianglePositions(positions, target, options), () => {
     throw new Error(t("status.computeTimedOut"));
   }, signal, true);
 }
