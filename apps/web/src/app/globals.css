@@ -14026,7 +14026,7 @@ html[data-theme="dark"] .grid-settings {
    2038, 1728 und 1582 px, ohne den Knopf der Interaktiven Hilfe 1990, 1688
    und 1544 px: Jeder neue Knopf verschiebt alle drei Schwellen um das, was
    er braucht - neu messen. */
-@media (max-width: 2258px) {
+@media (max-width: 2215px) {
   :root {
     --toolbar-icon-size: calc(37px * var(--toolbar-scale));
   }
@@ -14047,7 +14047,7 @@ html[data-theme="dark"] .grid-settings {
   }
 }
 
-@media (max-width: 1934px) {
+@media (max-width: 1897px) {
   :root {
     --toolbar-icon-size: calc(34px * var(--toolbar-scale));
   }
@@ -14062,14 +14062,15 @@ html[data-theme="dark"] .grid-settings {
   }
 }
 
-/* Below the width even the smallest step needs (1768 px, measured with the
-   command search, guide, shortcuts, Interactive Help, Delete face and Hull buttons;
-   the middle step needs 1931 px and the full size 2255 px) the groups wrap onto a
+/* Below the width even the smallest step needs (1734 px, measured with the
+   command search, guide, shortcuts, Interactive Help, Delete face and Hull buttons,
+   after Show common part went into Intersection, #372; the middle step needs
+   1894 px and the full size 2212 px) the groups wrap onto a
    further row instead of scrolling sideways: a scrolling bar hides tools and
    cuts off every menu that hangs beneath it. The bar grows, and the editor
    passes its real height on (see --editor-toolbar-height). A new button in
    the bar moves all three thresholds up: measure again. */
-@media (max-width: 1771px) {
+@media (max-width: 1737px) {
   .toolbar-mode-content,
   .sketch-toolbar-ribbon {
     flex-wrap: wrap;

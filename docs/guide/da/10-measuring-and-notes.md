@@ -72,7 +72,7 @@ Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring mark
 
 ## Tjek spillerum
 
-Dele, der skal kunne bevæge sig efter print - en flexi-drage, et hængsel printet i ét stykke, en æske med låg, en aksel i sit hul - skal have afstand til hinanden. Er den for lille, hænger de sammen; overlapper de, printes de som ét stykke. {{ui:editor.tool.clearance}} ved siden af {{ui:editor.tool.intersectPreview}} tjekker det, før du printer. Det tager de valgte objekter eller, når intet er valgt, alle synlige (de samme som en eksport tager) og tjekker hvert par:
+Dele, der skal kunne bevæge sig efter print - en flexi-drage, et hængsel printet i ét stykke, en æske med låg, en aksel i sit hul - skal have afstand til hinanden. Er den for lille, hænger de sammen; overlapper de, printes de som ét stykke. {{ui:editor.tool.clearance}} ved siden af {{ui:editor.tool.loftSketches}} tjekker det, før du printer. Det tager de valgte objekter eller, når intet er valgt, alle synlige (de samme som en eksport tager) og tjekker hvert par:
 
 - **{{ui:clearance.kind.overlap}}** (rød): de to deler et rumfang. Det vises rødt inde i legemerne, som bliver gennemsigtige, og listen angiver dets størrelse.
 - **{{ui:clearance.kind.touching}}** (rød): de rører hinanden og smelter sammen ved print.

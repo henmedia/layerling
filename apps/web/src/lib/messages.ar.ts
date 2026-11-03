@@ -803,7 +803,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.lidMadeHinge": "تم صنع الغطاء ({type}) بمفصلة في الخلف: {count} عُقد وثقب لمسمار {pin} مم. الغطاء مقلوب بجانب الجسم، جاهز للطباعة.",
   "status.lidMadeHingeMagnets": "تم صنع الغطاء ({type}) بمفصلة في الخلف ({count} عُقد، مسمار {pin} مم) و{magnets} جيوب للمغناطيس. الغطاء مقلوب بجانب الجسم، جاهز للطباعة.",
   "editor.tool.intersectPreview": "إظهار الجزء المشترك",
-  "status.intersectPreviewOn": "عرض ما تشترك فيه الأشكال المحددة. حرّك شكلًا لترى التغيير؛ {tool} يطبّقه، وEsc يغلق المعاينة.",
+  "status.intersectPreviewOn": "عرض ما تشترك فيه الأشكال المحددة. حرّك شكلًا لترى التغيير؛ نقرة ثانية على {tool} تطبّقه، وEsc يغلق المعاينة.",
   "status.intersectPreviewOff": "أُغلقت المعاينة: بقي أقل من شكلين يمكن أن يشتركا في شيء",
   "status.intersectPreviewEmpty": "هذه الأشكال لا تشترك في أي شيء حاليًا",
   "status.intersectPreviewTooBig": "عدد كبير جدًا من المثلثات لمعاينة الجزء المشترك",

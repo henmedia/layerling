@@ -422,7 +422,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "status.cookieCutterTooComplex": "O contorno tem pontos demais para um cortador. Use uma forma mais simples.",
   "status.cookieCutterMadeFlat": "Cortador de biscoito criado, com topo plano: o contorno tem degraus curtos demais para o fio de corte. Ajuste a parede no painel de propriedades.",
   "editor.tool.intersectPreview": "Mostrar parte em comum",
-  "status.intersectPreviewOn": "Mostrando o que as formas selecionadas têm em comum. Mova uma forma para ver a mudança; {tool} aplica, Esc fecha a prévia.",
+  "status.intersectPreviewOn": "Mostrando o que as formas selecionadas têm em comum. Mova uma forma para ver a mudança; outro clique em {tool} aplica, Esc fecha a prévia.",
   "status.intersectPreviewOff": "A prévia foi fechada: restam menos de duas formas para ter algo em comum",
   "status.intersectPreviewEmpty": "Estas formas não têm nada em comum agora",
   "status.intersectPreviewTooBig": "Triângulos demais para a prévia da parte em comum",

@@ -68,7 +68,7 @@ For a moment without them, press [[Q]]: the sizes and distances around the selec
 
 ## Checking clearance
 
-Parts that should move after printing - a flexi dragon, a hinge printed in place, a box and its lid, an axle in its bore - need a gap between them. Too little, and they stick together; overlapping, they print as one piece. {{ui:editor.tool.clearance}}, next to {{ui:editor.tool.intersectPreview}}, checks that before you print. It takes the selected objects, or every visible object when nothing is selected (the same ones an export takes), and checks each pair:
+Parts that should move after printing - a flexi dragon, a hinge printed in place, a box and its lid, an axle in its bore - need a gap between them. Too little, and they stick together; overlapping, they print as one piece. {{ui:editor.tool.clearance}}, next to {{ui:editor.tool.loftSketches}}, checks that before you print. It takes the selected objects, or every visible object when nothing is selected (the same ones an export takes), and checks each pair:
 
 - **{{ui:clearance.kind.overlap}}** (red): the two share a volume. It shows red inside the bodies, which turn see-through, and the list says how large it is.
 - **{{ui:clearance.kind.touching}}** (red): they touch and fuse when printed.

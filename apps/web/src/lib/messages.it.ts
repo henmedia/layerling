@@ -797,7 +797,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.lidMadeHinge": "Coperchio creato ({type}) con cerniera sul retro: {count} nocche e un foro per un perno da {pin} mm. Il coperchio è capovolto accanto al corpo, pronto per la stampa.",
   "status.lidMadeHingeMagnets": "Coperchio creato ({type}) con cerniera sul retro ({count} nocche, perno da {pin} mm) e {magnets} alloggiamenti per magneti. Il coperchio è capovolto accanto al corpo, pronto per la stampa.",
   "editor.tool.intersectPreview": "Mostra la parte comune",
-  "status.intersectPreviewOn": "È visualizzata la parte comune alle forme selezionate. Sposta una forma per vedere come cambia; {tool} applica l'operazione, Esc chiude l'anteprima.",
+  "status.intersectPreviewOn": "È visualizzata la parte comune alle forme selezionate. Sposta una forma per vedere come cambia; un secondo clic su {tool} applica l'operazione, Esc chiude l'anteprima.",
   "status.intersectPreviewOff": "Anteprima chiusa: sono rimaste meno di due forme che possano avere una parte in comune",
   "status.intersectPreviewEmpty": "Al momento queste forme non hanno alcuna parte in comune",
   "status.intersectPreviewTooBig": "Troppe triangolazioni per visualizzare l'anteprima della parte comune",

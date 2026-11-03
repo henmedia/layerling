@@ -2741,6 +2741,8 @@ const LOCKED_SHAPE_PATCH_KEYS = new Set(["locked", "hidden", "name"]);
 
 /** A preview of an intersection is not calculated for more triangles than this: it would stutter while a shape is moved (#372). */
 const INTERSECT_PREVIEW_MAX_TRIANGLES = 40000;
+const intersectPreviewTriangles = (shapes: WorkplaneShape[]) =>
+  shapes.reduce((sum, shape) => sum + (shape.importedMesh?.triangleCount ?? meshForShape(shape).faces.length), 0);
 
 /** The files of a design that has none: one list, so that nothing sees a change where there is none. */
 const NO_ATTACHMENTS: ProjectAttachment[] = [];
@@ -9791,22 +9793,6 @@ export function LayerlingEditor({
     setIntersectPreviewShape(null);
   }, []);
 
-  /** Shows what the selected shapes share, and keeps showing it while they are moved one by one (#372). */
-  const toggleIntersectPreview = useCallback(() => {
-    if (intersectPreviewIdsRef.current) {
-      exitIntersectPreview();
-      setNotice("");
-      return;
-    }
-    const operands = selectedShapes.filter((shape) => !isNonSolidShape(shape));
-    if (!canIntersectShapes(operands)) {
-      setNotice(t("status.selectSolidAndHole"));
-      return;
-    }
-    setIntersectPreviewIds(operands.map((shape) => shape.id));
-    setNotice(t("status.intersectPreviewOn", { tool: t("editor.tool.intersect") }));
-  }, [exitIntersectPreview, selectedShapes]);
-
   // The common part is calculated again a moment after every change of the shapes, so moving one stays smooth.
   useEffect(() => {
     if (!intersectPreviewIds) return;
@@ -9819,8 +9805,7 @@ export function LayerlingEditor({
     const run = intersectPreviewRunRef.current + 1;
     intersectPreviewRunRef.current = run;
     const timer = window.setTimeout(async () => {
-      const triangles = operands.reduce((sum, shape) => sum + (shape.importedMesh?.triangleCount ?? meshForShape(shape).faces.length), 0);
-      if (triangles > INTERSECT_PREVIEW_MAX_TRIANGLES) {
+      if (intersectPreviewTriangles(operands) > INTERSECT_PREVIEW_MAX_TRIANGLES) {
         setIntersectPreviewShape(null);
         setNotice(t("status.intersectPreviewTooBig"));
         return;
@@ -9963,6 +9948,29 @@ export function LayerlingEditor({
     exitIntersectPreview();
     commitShapes([...remainingShapes, intersection], intersection.id, t("status.intersectedMany", { count: groupable.length }));
   }, [refuseLockedSelection, commitShapes, exitIntersectPreview, selectedShapes]);
+
+  /**
+   * The Intersection button: the first click shows what the selected shapes share, and keeps showing it while they are moved
+   * one by one; the second click applies it (#372). Shapes too heavy for the preview are intersected at once.
+   */
+  const intersectFromToolbar = useCallback(() => {
+    if (intersectPreviewIdsRef.current) {
+      void intersectSelected();
+      return;
+    }
+    if (refuseLockedSelection()) return;
+    const operands = selectedShapes.filter((shape) => !isNonSolidShape(shape));
+    if (!canIntersectShapes(operands)) {
+      setNotice(t("status.selectSolidAndHole"));
+      return;
+    }
+    if (intersectPreviewTriangles(operands) > INTERSECT_PREVIEW_MAX_TRIANGLES) {
+      void intersectSelected();
+      return;
+    }
+    setIntersectPreviewIds(operands.map((shape) => shape.id));
+    setNotice(t("status.intersectPreviewOn", { tool: t("editor.tool.intersect") }));
+  }, [intersectSelected, refuseLockedSelection, selectedShapes]);
 
   /** Hull: the selected shapes wrapped into one convex body, kept as a group to open again (#863). */
   const hullSelected = useCallback(async () => {
@@ -15703,13 +15711,12 @@ export function LayerlingEditor({
         canFaceTool={selectedShapes.length === 1 && Boolean(selectedShape && !selectedShape.locked && !selectedShape.hole && !isNonSolidShape(selectedShape))}
         onGroup={groupSelected}
         onBundle={bundleSelected}
-        onIntersect={intersectSelected}
+        onIntersect={intersectFromToolbar}
         onHull={hullSelected}
         onCookieCutter={startCookieCutterTool}
         onFlexi={startFlexiTool}
         onLid={startLidTool}
         onLoftSketches={() => void loftSketches()}
-        onIntersectPreview={toggleIntersectPreview}
         intersectPreviewActive={Boolean(intersectPreviewIds)}
         onClearanceCheck={toggleClearanceCheck}
         clearanceActive={Boolean(clearanceTool)}

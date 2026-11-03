@@ -4442,7 +4442,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.importObjVertexColors": "{name} har sin egen farve ved næsten hvert punkt, en farvegradient som scanninger og AI-modeller har. layerling kan ikke vise det og bragte det ind som én krop i én farve.",
   "status.intersectPreviewEmpty": "Disse former deler intet lige nu",
   "status.intersectPreviewOff": "Forhåndsvisningen lukkede: færre end to former er tilbage til at dele noget",
-  "status.intersectPreviewOn": "Viser hvad de valgte former deler. Flyt en form for at se det ændre sig; {tool} anvender det, Esc lukker forhåndsvisningen.",
+  "status.intersectPreviewOn": "Viser hvad de valgte former deler. Flyt en form for at se det ændre sig; et klik mere på {tool} anvender det, Esc lukker forhåndsvisningen.",
   "status.intersectPreviewTooBig": "For mange trekanter til forhåndsvisningen af den fælles del",
   "editor.tool.clearance": "Tjek spillerum",
   "clearance.title": "Tjek spillerum",

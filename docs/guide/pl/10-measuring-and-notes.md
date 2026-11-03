@@ -68,7 +68,7 @@ Jeśli na chwilę przeszkadzają, naciśnij [[Q]]: wymiary i odległości wokó�
 
 ## Sprawdzanie luzu
 
-Części, które po druku mają się ruszać - smok flexi, zawias drukowany w całości, pudełko z pokrywką, oś w otworze - potrzebują luzu między sobą. Za mały i sklejają się; jeśli nachodzą na siebie, drukują się jako jeden kawałek. {{ui:editor.tool.clearance}} obok {{ui:editor.tool.intersectPreview}} sprawdza to przed drukiem. Bierze zaznaczone obiekty albo, gdy nic nie jest zaznaczone, wszystkie widoczne (te same, które bierze eksport), i sprawdza każdą parę:
+Części, które po druku mają się ruszać - smok flexi, zawias drukowany w całości, pudełko z pokrywką, oś w otworze - potrzebują luzu między sobą. Za mały i sklejają się; jeśli nachodzą na siebie, drukują się jako jeden kawałek. {{ui:editor.tool.clearance}} obok {{ui:editor.tool.loftSketches}} sprawdza to przed drukiem. Bierze zaznaczone obiekty albo, gdy nic nie jest zaznaczone, wszystkie widoczne (te same, które bierze eksport), i sprawdza każdą parę:
 
 - **{{ui:clearance.kind.overlap}}** (czerwony): obie części mają wspólną objętość. Widać ją na czerwono wewnątrz brył, które stają się przezroczyste, a lista podaje jej wielkość.
 - **{{ui:clearance.kind.touching}}** (czerwony): stykają się i zleją się podczas druku.

@@ -66,7 +66,7 @@ Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne. Če telo 
 
 ## Preverjanje zračnosti
 
-Deli, ki se morajo po tiskanju premikati - fleksi zmaj, tečaj, natisnjen v kosu, škatla s pokrovom, os v izvrtini - potrebujejo razmik med seboj. Če je premajhen, se zlepijo; če se prekrivajo, se natisnejo kot en kos. {{ui:editor.tool.clearance}} poleg {{ui:editor.tool.intersectPreview}} to preveri pred tiskanjem. Vzame izbrane predmete ali, če ni izbrano nič, vse vidne (iste kot izvoz) in preveri vsak par:
+Deli, ki se morajo po tiskanju premikati - fleksi zmaj, tečaj, natisnjen v kosu, škatla s pokrovom, os v izvrtini - potrebujejo razmik med seboj. Če je premajhen, se zlepijo; če se prekrivajo, se natisnejo kot en kos. {{ui:editor.tool.clearance}} poleg {{ui:editor.tool.loftSketches}} to preveri pred tiskanjem. Vzame izbrane predmete ali, če ni izbrano nič, vse vidne (iste kot izvoz) in preveri vsak par:
 
 - **{{ui:clearance.kind.overlap}}** (rdeče): dela si delita prostornino. Ta se pokaže rdeče v telesih, ki postanejo prosojna, seznam pa navede njeno velikost.
 - **{{ui:clearance.kind.touching}}** (rdeče): dela se dotikata in se pri tiskanju zlijeta.

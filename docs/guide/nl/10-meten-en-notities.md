@@ -66,7 +66,7 @@ Zitten ze even in de weg, druk dan op [[Q]]: de maten en afstanden rond de selec
 
 ## Speling controleren
 
-Onderdelen die na het printen moeten bewegen - een flexi-draak, een in één keer geprint scharnier, een doos met deksel, een as in zijn boring - hebben ruimte tussen elkaar nodig. Te weinig en ze plakken aan elkaar; overlappen ze, dan worden ze als één stuk geprint. {{ui:editor.tool.clearance}}, naast {{ui:editor.tool.intersectPreview}}, controleert dat vóór het printen. Het neemt de geselecteerde objecten, of alle zichtbare als niets is geselecteerd (dezelfde als bij een export), en controleert elk paar:
+Onderdelen die na het printen moeten bewegen - een flexi-draak, een in één keer geprint scharnier, een doos met deksel, een as in zijn boring - hebben ruimte tussen elkaar nodig. Te weinig en ze plakken aan elkaar; overlappen ze, dan worden ze als één stuk geprint. {{ui:editor.tool.clearance}}, naast {{ui:editor.tool.loftSketches}}, controleert dat vóór het printen. Het neemt de geselecteerde objecten, of alle zichtbare als niets is geselecteerd (dezelfde als bij een export), en controleert elk paar:
 
 - **{{ui:clearance.kind.overlap}}** (rood): de twee delen een volume. Het verschijnt rood in de lichamen, die doorzichtig worden, en de lijst noemt de grootte.
 - **{{ui:clearance.kind.touching}}** (rood): ze raken elkaar en smelten samen bij het printen.

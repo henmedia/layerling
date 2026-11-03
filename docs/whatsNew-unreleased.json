@@ -18,5 +18,15 @@
       "de": "Die Karte Verjüngung hat jetzt den Schalter Proportionen beibehalten: Länge und Breite desselben Endes ändern sich dann gemeinsam, ein quadratisches Oberteil bleibt quadratisch.",
       "en": "The Taper card now has a Keep proportions switch: Length and Width of the same end then change together, so a square top stays square."
     }
+  },
+  {
+    "title": {
+      "de": "Schnittmenge zeigt erst, was bleibt",
+      "en": "Intersection shows first what stays"
+    },
+    "body": {
+      "de": "Der erste Klick auf Schnittmenge zeigt das gemeinsame Stück grün, die Formen lassen sich noch verschieben; der zweite Klick wendet es an, Esc bricht ab. Der eigene Knopf „Gemeinsames Stück zeigen“ ist dafür weg, die Leiste ist einen Knopf schmaler.",
+      "en": "The first click on Intersection shows the common part in green, and the shapes can still be moved; the second click applies it, Esc cancels. The separate \"Show common part\" button is gone, so the bar is one button narrower."
+    }
   }
 ]

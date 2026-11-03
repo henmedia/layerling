@@ -68,7 +68,7 @@ Wenn sie kurz stören, drück [[Q]]: Die Maße und Abstände um die Auswahl vers
 
 ## Spiel prüfen
 
-Teile, die sich nach dem Druck bewegen sollen - ein Flexi-Drache, ein am Stück gedrucktes Scharnier, Kasten und Deckel, eine Achse in ihrer Bohrung - brauchen Abstand zueinander. Ist er zu klein, kleben sie zusammen; überschneiden sie sich, werden sie als ein Stück gedruckt. {{ui:editor.tool.clearance}} neben {{ui:editor.tool.intersectPreview}} prüft das vor dem Druck. Es nimmt die ausgewählten Objekte oder, wenn nichts ausgewählt ist, alle sichtbaren (dieselben, die ein Export nimmt) und prüft jedes Paar:
+Teile, die sich nach dem Druck bewegen sollen - ein Flexi-Drache, ein am Stück gedrucktes Scharnier, Kasten und Deckel, eine Achse in ihrer Bohrung - brauchen Abstand zueinander. Ist er zu klein, kleben sie zusammen; überschneiden sie sich, werden sie als ein Stück gedruckt. {{ui:editor.tool.clearance}} neben {{ui:editor.tool.loftSketches}} prüft das vor dem Druck. Es nimmt die ausgewählten Objekte oder, wenn nichts ausgewählt ist, alle sichtbaren (dieselben, die ein Export nimmt) und prüft jedes Paar:
 
 - **{{ui:clearance.kind.overlap}}** (rot): Die beiden teilen sich ein Volumen. Es erscheint rot in den Körpern, die dafür durchsichtig werden, und die Liste nennt seine Größe.
 - **{{ui:clearance.kind.touching}}** (rot): Sie berühren sich und verschmelzen beim Druck.

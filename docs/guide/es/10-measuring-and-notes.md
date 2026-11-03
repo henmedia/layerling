@@ -68,7 +68,7 @@ Si estorban un momento, pulsa [[Q]]: las medidas y distancias alrededor de la se
 
 ## Comprobar la holgura
 
-Las piezas que deben moverse después de imprimir - un dragón flexi, una bisagra impresa en su sitio, una caja con su tapa, un eje en su agujero - necesitan holgura entre sí. Si es demasiado poca, se pegan; si se solapan, se imprimen como una sola pieza. {{ui:editor.tool.clearance}}, junto a {{ui:editor.tool.intersectPreview}}, lo comprueba antes de imprimir. Toma los objetos seleccionados o, si no hay nada seleccionado, todos los visibles (los mismos que toma una exportación) y comprueba cada pareja:
+Las piezas que deben moverse después de imprimir - un dragón flexi, una bisagra impresa en su sitio, una caja con su tapa, un eje en su agujero - necesitan holgura entre sí. Si es demasiado poca, se pegan; si se solapan, se imprimen como una sola pieza. {{ui:editor.tool.clearance}}, junto a {{ui:editor.tool.loftSketches}}, lo comprueba antes de imprimir. Toma los objetos seleccionados o, si no hay nada seleccionado, todos los visibles (los mismos que toma una exportación) y comprueba cada pareja:
 
 - **{{ui:clearance.kind.overlap}}** (rojo): las dos comparten un volumen. Aparece en rojo dentro de los cuerpos, que se vuelven transparentes, y la lista indica su tamaño.
 - **{{ui:clearance.kind.touching}}** (rojo): se tocan y se funden al imprimir.

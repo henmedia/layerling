@@ -4453,7 +4453,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "camera.tapeWholeEdges": "Meri cele robove",
   "camera.tapeWholeEdgesHint": "Meri cele robove: klik na rob izmeri ves rob, na primer obseg kroga. Ko je izklopljeno, klik postavi točko na rob, za premer ali katero koli drugo razdaljo. Alt ga obrne za en klik. Pri krogu se točka nasproti pripne, zato je premer natančen.",
   "editor.tool.intersectPreview": "Pokaži skupni del",
-  "status.intersectPreviewOn": "Prikazuje, kaj imajo izbrane oblike skupnega. Premakni obliko in videl boš spremembo; {tool} jo uporabi, Esc zapre predogled.",
+  "status.intersectPreviewOn": "Prikazuje, kaj imajo izbrane oblike skupnega. Premakni obliko in videl boš spremembo; drugi klik na {tool} jo uporabi, Esc zapre predogled.",
   "status.intersectPreviewOff": "Predogled se je zaprl: ostali sta manj kot dve obliki, ki bi imeli kaj skupnega",
   "status.intersectPreviewEmpty": "Te oblike zdaj nimajo nič skupnega",
   "status.intersectPreviewTooBig": "Preveč trikotnikov za predogled skupnega dela",

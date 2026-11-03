@@ -761,7 +761,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.lidMadeHinge": "已製作蓋子（{type}），背面帶鉸鏈：{count} 個鉸節和一個 {pin} mm 銷釘孔。蓋子翻轉後放在主體旁邊，可直接列印。",
   "status.lidMadeHingeMagnets": "已製作蓋子（{type}），背面帶鉸鏈（{count} 個鉸節，{pin} mm 銷釘）和 {magnets} 個磁鐵槽。蓋子翻轉後放在主體旁邊，可直接列印。",
   "editor.tool.intersectPreview": "顯示共同部分",
-  "status.intersectPreviewOn": "正在顯示所選形狀的共同部分。移動形狀即可看到變化；{tool} 會套用，Esc 關閉預覽。",
+  "status.intersectPreviewOn": "正在顯示所選形狀的共同部分。移動形狀即可看到變化；再次點擊 {tool} 會套用，Esc 關閉預覽。",
   "status.intersectPreviewOff": "預覽已關閉：剩餘形狀不足兩個，無法求共同部分",
   "status.intersectPreviewEmpty": "這些形狀目前沒有共同部分",
   "status.intersectPreviewTooBig": "三角形過多，無法預覽共同部分",

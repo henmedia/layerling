@@ -66,7 +66,7 @@ Ha egy pillanatra zavarnak, nyomd meg a [[Q]] billentyűt: a kijelölés körül
 
 ## Hézag ellenőrzése
 
-Azoknak az alkatrészeknek, amelyeknek nyomtatás után mozogniuk kell - egy flexi sárkány, egy egyben nyomtatott zsanér, egy doboz a fedelével, egy tengely a furatában -, hézag kell egymás között. Ha túl kicsi, összeragadnak; ha átfedik egymást, egy darabként nyomtatódnak ki. A {{ui:editor.tool.clearance}} a {{ui:editor.tool.intersectPreview}} mellett ezt nyomtatás előtt ellenőrzi. A kijelölt objektumokat veszi, vagy ha nincs kijelölés, az összes láthatót (ugyanazokat, mint egy exportálás), és minden párt ellenőriz:
+Azoknak az alkatrészeknek, amelyeknek nyomtatás után mozogniuk kell - egy flexi sárkány, egy egyben nyomtatott zsanér, egy doboz a fedelével, egy tengely a furatában -, hézag kell egymás között. Ha túl kicsi, összeragadnak; ha átfedik egymást, egy darabként nyomtatódnak ki. A {{ui:editor.tool.clearance}} az {{ui:editor.tool.loftSketches}} mellett ezt nyomtatás előtt ellenőrzi. A kijelölt objektumokat veszi, vagy ha nincs kijelölés, az összes láthatót (ugyanazokat, mint egy exportálás), és minden párt ellenőriz:
 
 - **{{ui:clearance.kind.overlap}}** (piros): a kettőnek közös térfogata van. Ez pirosan látszik a testek belsejében, amelyek átlátszóvá válnak, és a lista megadja a méretét.
 - **{{ui:clearance.kind.touching}}** (piros): összeérnek, és nyomtatáskor összeolvadnak.

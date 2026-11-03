@@ -933,7 +933,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.lidMadeHinge": "Víko hotovo ({type}) s pantem vzadu: {count} kloubků a otvor pro čep {pin} mm. Víko leží obrácené vedle těla, připravené k tisku.",
   "status.lidMadeHingeMagnets": "Víko hotovo ({type}) s pantem vzadu ({count} kloubků, čep {pin} mm) a {magnets} kapsami na magnety. Víko leží obrácené vedle těla, připravené k tisku.",
   "editor.tool.intersectPreview": "Zobrazit společnou část",
-  "status.intersectPreviewOn": "Zobrazuje, co mají vybrané tvary společné. Posuňte tvar a uvidíte změnu; {tool} ji použije, Esc náhled zavře.",
+  "status.intersectPreviewOn": "Zobrazuje, co mají vybrané tvary společné. Posuňte tvar a uvidíte změnu; druhé kliknutí na {tool} ji použije, Esc náhled zavře.",
   "status.intersectPreviewOff": "Náhled se zavřel: zbývají méně než dva tvary, které by mohly mít něco společného",
   "status.intersectPreviewEmpty": "Tyto tvary nyní nemají nic společného",
   "status.intersectPreviewTooBig": "Příliš mnoho trojúhelníků pro náhled společné části",

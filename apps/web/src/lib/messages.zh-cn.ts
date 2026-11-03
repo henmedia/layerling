@@ -761,7 +761,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "status.lidMadeHinge": "已制作盖子（{type}），背面带铰链：{count} 个铰节和一个 {pin} mm 销钉孔。盖子翻转后放在主体旁边，可直接打印。",
   "status.lidMadeHingeMagnets": "已制作盖子（{type}），背面带铰链（{count} 个铰节，{pin} mm 销钉）和 {magnets} 个磁铁槽。盖子翻转后放在主体旁边，可直接打印。",
   "editor.tool.intersectPreview": "显示公共部分",
-  "status.intersectPreviewOn": "正在显示所选形状的公共部分。移动形状可看到变化；{tool} 可应用，Esc 关闭预览。",
+  "status.intersectPreviewOn": "正在显示所选形状的公共部分。移动形状可看到变化；再次点击 {tool} 可应用，Esc 关闭预览。",
   "status.intersectPreviewOff": "预览已关闭：所剩形状不足两个，无法求公共部分",
   "status.intersectPreviewEmpty": "这些形状目前没有公共部分",
   "status.intersectPreviewTooBig": "三角形太多，无法预览公共部分",

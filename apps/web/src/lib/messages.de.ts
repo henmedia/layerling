@@ -804,7 +804,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.lidMadeHinge": "Deckel gemacht ({type}) mit Scharnier hinten: {count} Knöchel und ein Loch für einen Stift von {pin} mm. Der Deckel liegt umgedreht neben dem Körper, fertig zum Drucken.",
   "status.lidMadeHingeMagnets": "Deckel gemacht ({type}) mit Scharnier hinten ({count} Knöchel, Stift {pin} mm) und {magnets} Magnettaschen. Der Deckel liegt umgedreht neben dem Körper, fertig zum Drucken.",
   "editor.tool.intersectPreview": "Gemeinsames Stück zeigen",
-  "status.intersectPreviewOn": "Zeigt, was die markierten Formen gemeinsam haben. Verschiebe eine Form, um die Änderung zu sehen; {tool} wendet es an, Esc schließt die Vorschau.",
+  "status.intersectPreviewOn": "Zeigt, was die markierten Formen gemeinsam haben. Verschiebe eine Form, um die Änderung zu sehen; ein zweiter Klick auf {tool} wendet es an, Esc schließt die Vorschau.",
   "status.intersectPreviewOff": "Die Vorschau ist geschlossen: Es sind weniger als zwei Formen übrig, die etwas gemeinsam haben könnten",
   "status.intersectPreviewEmpty": "Diese Formen haben im Moment nichts gemeinsam",
   "status.intersectPreviewTooBig": "Zu viele Dreiecke für die Vorschau des gemeinsamen Stücks",

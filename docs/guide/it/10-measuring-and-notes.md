@@ -68,7 +68,7 @@ Se per un momento danno fastidio, premi [[Q]]: le misure e le distanze attorno a
 
 ## Controllare il gioco
 
-Le parti che devono muoversi dopo la stampa - un drago flexi, una cerniera stampata già montata, una scatola con il suo coperchio, un perno nel suo foro - hanno bisogno di gioco tra loro. Se è troppo poco si incollano; se si sovrappongono, vengono stampate come un pezzo unico. {{ui:editor.tool.clearance}}, accanto a {{ui:editor.tool.intersectPreview}}, lo controlla prima della stampa. Prende gli oggetti selezionati o, se non è selezionato nulla, tutti quelli visibili (gli stessi di un'esportazione) e controlla ogni coppia:
+Le parti che devono muoversi dopo la stampa - un drago flexi, una cerniera stampata già montata, una scatola con il suo coperchio, un perno nel suo foro - hanno bisogno di gioco tra loro. Se è troppo poco si incollano; se si sovrappongono, vengono stampate come un pezzo unico. {{ui:editor.tool.clearance}}, accanto a {{ui:editor.tool.loftSketches}}, lo controlla prima della stampa. Prende gli oggetti selezionati o, se non è selezionato nulla, tutti quelli visibili (gli stessi di un'esportazione) e controlla ogni coppia:
 
 - **{{ui:clearance.kind.overlap}}** (rosso): le due parti condividono un volume. Appare in rosso dentro i corpi, che diventano trasparenti, e l'elenco ne indica la grandezza.
 - **{{ui:clearance.kind.touching}}** (rosso): si toccano e si fondono in stampa.

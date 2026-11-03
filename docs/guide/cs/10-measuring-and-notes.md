@@ -66,7 +66,7 @@ Když na chvíli překážejí, stiskněte [[Q]]: rozměry a vzdálenosti kolem 
 
 ## Kontrola vůle
 
-Díly, které se mají po tisku pohybovat - flexi drak, pant tištěný vcelku, krabička s víkem, osa v otvoru - potřebují mezi sebou mezeru. Když je příliš malá, slepí se; když se překrývají, vytisknou se jako jeden kus. {{ui:editor.tool.clearance}} vedle {{ui:editor.tool.intersectPreview}} to zkontroluje před tiskem. Vezme vybrané objekty, nebo všechny viditelné, když není nic vybráno (tytéž, které bere export), a zkontroluje každou dvojici:
+Díly, které se mají po tisku pohybovat - flexi drak, pant tištěný vcelku, krabička s víkem, osa v otvoru - potřebují mezi sebou mezeru. Když je příliš malá, slepí se; když se překrývají, vytisknou se jako jeden kus. {{ui:editor.tool.clearance}} vedle {{ui:editor.tool.loftSketches}} to zkontroluje před tiskem. Vezme vybrané objekty, nebo všechny viditelné, když není nic vybráno (tytéž, které bere export), a zkontroluje každou dvojici:
 
 - **{{ui:clearance.kind.overlap}}** (červeně): oba díly sdílejí objem. Ten se ukáže červeně uvnitř těles, která zprůhlední, a seznam uvede jeho velikost.
 - **{{ui:clearance.kind.touching}}** (červeně): díly se dotýkají a při tisku se spojí.

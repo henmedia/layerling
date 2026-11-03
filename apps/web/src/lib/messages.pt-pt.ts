@@ -533,7 +533,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "editor.tool.bundle": "Reunir",
   "editor.tool.intersect": "Interseção booleana",
   "editor.tool.intersectPreview": "Mostrar parte comum",
-  "status.intersectPreviewOn": "A mostrar a parte comum às formas selecionadas. Move uma forma para veres o resultado mudar; {tool} aplica a operação e Esc fecha a pré-visualização.",
+  "status.intersectPreviewOn": "A mostrar a parte comum às formas selecionadas. Move uma forma para veres o resultado mudar; outro clique em {tool} aplica a operação e Esc fecha a pré-visualização.",
   "status.intersectPreviewOff": "A pré-visualização foi fechada: restam menos de duas formas para calcular uma parte comum",
   "status.intersectPreviewEmpty": "Estas formas não têm nenhuma parte em comum neste momento",
   "status.intersectPreviewTooBig": "Demasiados triângulos para pré-visualizar a parte comum",

@@ -66,7 +66,7 @@ Pour vous en passer un instant, appuyez sur [[Q]] : les cotes et distances autou
 
 ## Vérifier le jeu
 
-Les pièces qui doivent bouger après l'impression - un dragon flexi, une charnière imprimée en place, une boîte et son couvercle, un axe dans son alésage - ont besoin d'un écart entre elles. Trop petit, elles collent ; si elles se chevauchent, elles s'impriment en une seule pièce. {{ui:editor.tool.clearance}}, à côté de {{ui:editor.tool.intersectPreview}}, le vérifie avant l'impression. L'outil prend les objets sélectionnés, ou tous les objets visibles si rien n'est sélectionné (les mêmes qu'un export), et vérifie chaque paire :
+Les pièces qui doivent bouger après l'impression - un dragon flexi, une charnière imprimée en place, une boîte et son couvercle, un axe dans son alésage - ont besoin d'un écart entre elles. Trop petit, elles collent ; si elles se chevauchent, elles s'impriment en une seule pièce. {{ui:editor.tool.clearance}}, à côté de {{ui:editor.tool.loftSketches}}, le vérifie avant l'impression. L'outil prend les objets sélectionnés, ou tous les objets visibles si rien n'est sélectionné (les mêmes qu'un export), et vérifie chaque paire :
 
 - **{{ui:clearance.kind.overlap}}** (rouge) : les deux partagent un volume. Il apparaît en rouge dans les corps, qui deviennent transparents, et la liste indique sa taille.
 - **{{ui:clearance.kind.touching}}** (rouge) : elles se touchent et fusionnent à l'impression.

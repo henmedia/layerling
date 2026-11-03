@@ -760,7 +760,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.lidMadeHinge": "Pokrywa gotowa ({type}) z zawiasem z tyłu: {count} kostek i otwór na sworzeń {pin} mm. Pokrywa leży odwrócona obok korpusu, gotowa do druku.",
   "status.lidMadeHingeMagnets": "Pokrywa gotowa ({type}) z zawiasem z tyłu ({count} kostek, sworzeń {pin} mm) i {magnets} gniazdami na magnesy. Pokrywa leży odwrócona obok korpusu, gotowa do druku.",
   "editor.tool.intersectPreview": "Pokaż część wspólną",
-  "status.intersectPreviewOn": "Pokazuje to, co zaznaczone kształty mają wspólnego. Przesuń kształt, aby zobaczyć zmianę. {tool} to stosuje, Esc zamyka podgląd.",
+  "status.intersectPreviewOn": "Pokazuje to, co zaznaczone kształty mają wspólnego. Przesuń kształt, aby zobaczyć zmianę. Ponowne kliknięcie {tool} to stosuje, Esc zamyka podgląd.",
   "status.intersectPreviewOff": "Podgląd zamknięty: zostało mniej niż dwa kształty, które mogłyby mieć coś wspólnego",
   "status.intersectPreviewEmpty": "Te kształty nie mają teraz nic wspólnego",
   "status.intersectPreviewTooBig": "Za dużo trójkątów do podglądu części wspólnej",

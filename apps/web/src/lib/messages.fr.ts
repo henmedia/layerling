@@ -795,7 +795,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.lidMadeHinge": "Couvercle créé ({type}) avec une charnière à l'arrière : {count} nœuds et un trou pour un axe de {pin} mm. Le couvercle est posé retourné à côté du corps, prêt à imprimer.",
   "status.lidMadeHingeMagnets": "Couvercle créé ({type}) avec une charnière à l'arrière ({count} nœuds, axe de {pin} mm) et {magnets} logements d'aimant. Le couvercle est posé retourné à côté du corps, prêt à imprimer.",
   "editor.tool.intersectPreview": "Afficher la partie commune",
-  "status.intersectPreviewOn": "Affiche ce que les formes sélectionnées ont en commun. Déplacez une forme pour voir le changement ; {tool} l'applique, Échap ferme l'aperçu.",
+  "status.intersectPreviewOn": "Affiche ce que les formes sélectionnées ont en commun. Déplacez une forme pour voir le changement ; un second clic sur {tool} l'applique, Échap ferme l'aperçu.",
   "status.intersectPreviewOff": "L'aperçu est fermé : il reste moins de deux formes pouvant avoir quelque chose en commun",
   "status.intersectPreviewEmpty": "Ces formes n'ont rien en commun pour le moment",
   "status.intersectPreviewTooBig": "Trop de triangles pour l'aperçu de la partie commune",

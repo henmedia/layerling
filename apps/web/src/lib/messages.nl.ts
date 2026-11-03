@@ -804,7 +804,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.lidMadeHinge": "Deksel gemaakt ({type}) met een scharnier achter: {count} knokkels en een gat voor een pen van {pin} mm. Het deksel ligt omgekeerd naast het lichaam, klaar om te printen.",
   "status.lidMadeHingeMagnets": "Deksel gemaakt ({type}) met een scharnier achter ({count} knokkels, pen {pin} mm) en {magnets} magneetvakken. Het deksel ligt omgekeerd naast het lichaam, klaar om te printen.",
   "editor.tool.intersectPreview": "Gemeenschappelijk deel tonen",
-  "status.intersectPreviewOn": "Toont wat de geselecteerde vormen gemeen hebben. Verplaats een vorm om het te zien veranderen; {tool} past het toe, Esc sluit de voorvertoning.",
+  "status.intersectPreviewOn": "Toont wat de geselecteerde vormen gemeen hebben. Verplaats een vorm om het te zien veranderen; nog een klik op {tool} past het toe, Esc sluit de voorvertoning.",
   "status.intersectPreviewOff": "De voorvertoning is gesloten: er zijn minder dan twee vormen over die iets gemeen kunnen hebben",
   "status.intersectPreviewEmpty": "Deze vormen hebben nu niets gemeen",
   "status.intersectPreviewTooBig": "Te veel driehoeken voor de voorvertoning van het gemeenschappelijke deel",

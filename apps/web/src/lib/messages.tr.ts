@@ -538,7 +538,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "editor.tool.loftSketches": "Eskizler arası geçiş",
   "loft.name": "Geçiş",
   "editor.tool.intersectPreview": "Ortak kısmı göster",
-  "status.intersectPreviewOn": "Seçili şekillerin ortak kısmı gösteriliyor. Değişimi görmek için bir şekli taşı; {tool} uygular, Esc önizlemeyi kapatır.",
+  "status.intersectPreviewOn": "Seçili şekillerin ortak kısmı gösteriliyor. Değişimi görmek için bir şekli taşı; uygulamak için {tool} düğmesine yeniden tıkla, Esc önizlemeyi kapatır.",
   "status.intersectPreviewOff": "Önizleme kapandı: ortak bir şeyi olacak iki şekilden az kaldı",
   "status.intersectPreviewEmpty": "Bu şekillerin şu an ortak bir kısmı yok",
   "status.intersectPreviewTooBig": "Ortak kısmın önizlemesi için çok fazla üçgen",

@@ -807,7 +807,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.lidMadeHinge": "Tapa hecha ({type}) con bisagra atrás: {count} nudillos y un agujero para un pasador de {pin} mm. La tapa queda al revés junto al cuerpo, lista para imprimir.",
   "status.lidMadeHingeMagnets": "Tapa hecha ({type}) con bisagra atrás ({count} nudillos, pasador de {pin} mm) y {magnets} huecos para imanes. La tapa queda al revés junto al cuerpo, lista para imprimir.",
   "editor.tool.intersectPreview": "Mostrar la parte común",
-  "status.intersectPreviewOn": "Se muestra lo que comparten las formas seleccionadas. Mueve una forma para ver cómo cambia; {tool} lo aplica y Esc cierra la vista previa.",
+  "status.intersectPreviewOn": "Se muestra lo que comparten las formas seleccionadas. Mueve una forma para ver cómo cambia; otro clic en {tool} lo aplica y Esc cierra la vista previa.",
   "status.intersectPreviewOff": "La vista previa se ha cerrado: quedan menos de dos formas que puedan compartir algo",
   "status.intersectPreviewEmpty": "Ahora mismo estas formas no comparten nada",
   "status.intersectPreviewTooBig": "Demasiados triángulos para la vista previa de la parte común",

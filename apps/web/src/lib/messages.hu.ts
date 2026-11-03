@@ -529,7 +529,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "editor.tool.loftSketches": "Átmenet vázlatok között",
   "loft.name": "Átmenet",
   "editor.tool.intersectPreview": "Közös rész mutatása",
-  "status.intersectPreviewOn": "A kijelölt alakzatok közös része látszik. Mozgass egy alakzatot, és látod, hogyan változik. Alkalmazás: {tool}; az Esc bezárja az előnézetet.",
+  "status.intersectPreviewOn": "A kijelölt alakzatok közös része látszik. Mozgass egy alakzatot, és látod, hogyan változik. Alkalmazás: kattints újra erre: {tool}; az Esc bezárja az előnézetet.",
   "status.intersectPreviewOff": "Az előnézet bezárult: kevesebb mint két alakzat maradt, amelyeknek közös része lehetne",
   "status.intersectPreviewEmpty": "Ezeknek az alakzatoknak most nincs közös részük",
   "status.intersectPreviewTooBig": "Túl sok háromszög a közös rész előnézetéhez",

@@ -805,7 +805,7 @@ export const MESSAGES_EN = {
   "status.lidMadeHinge": "Lid made ({type}) with a hinge at the back: {count} knuckles and a hole for a {pin} mm pin. The lid lies turned over beside the body, ready to print.",
   "status.lidMadeHingeMagnets": "Lid made ({type}) with a hinge at the back ({count} knuckles, {pin} mm pin) and {magnets} magnet pockets. The lid lies turned over beside the body, ready to print.",
   "editor.tool.intersectPreview": "Show common part",
-  "status.intersectPreviewOn": "Showing what the selected shapes share. Move a shape to see it change; {tool} applies it, Esc closes the preview.",
+  "status.intersectPreviewOn": "Showing what the selected shapes share. Move a shape to see it change; click {tool} again to apply it, Esc closes the preview.",
   "status.intersectPreviewOff": "The preview closed: fewer than two shapes are left to share something",
   "status.intersectPreviewEmpty": "These shapes share nothing right now",
   "status.intersectPreviewTooBig": "Too many triangles for the preview of the common part",

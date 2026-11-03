@@ -587,7 +587,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "editor.tool.loftSketches": "スケッチ間のロフト",
   "loft.name": "ロフト",
   "editor.tool.intersectPreview": "共通部分を表示",
-  "status.intersectPreviewOn": "選んだシェイプが重なっている部分を表示しています。シェイプを動かすと変わります。{tool}で反映し、Escでプレビューを閉じます。",
+  "status.intersectPreviewOn": "選んだシェイプが重なっている部分を表示しています。シェイプを動かすと変わります。もう一度{tool}をクリックすると反映し、Escでプレビューを閉じます。",
   "status.intersectPreviewOff": "プレビューを閉じました。重なりを調べるシェイプが2つより少なくなりました",
   "status.intersectPreviewEmpty": "今、これらのシェイプは重なっていません",
   "status.intersectPreviewTooBig": "三角形が多すぎて、共通部分のプレビューができません",
