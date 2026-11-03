@@ -14,6 +14,7 @@ export type ShapeKind =
   | "roundRoof"
   | "halfSphere"
   | "paraboloid"
+  | "curvedCone"
   | "torus"
   | "tube"
   | "bentTube"
@@ -128,6 +129,10 @@ export type ShapeCustomization = {
   segments?: number;
   topRadius?: number;
   baseRadius?: number;
+  /** Curved cone (#1211): the top's diameter as a share of the bottom's, 0 to 1. */
+  curvedConeTop?: number;
+  /** Curved cone: how far the side bends, -1 inward (a trumpet) to 1 outward (a dome). */
+  curvedConeBend?: number;
   topWidth?: number;
   topDepth?: number;
   teeth?: number;
@@ -882,6 +887,10 @@ export type WorkplaneShape = {
   segments?: number;
   topRadius?: number;
   baseRadius?: number;
+  /** Curved cone (#1211): the top's diameter as a share of the bottom's, 0 to 1. */
+  curvedConeTop?: number;
+  /** Curved cone: how far the side bends, -1 inward (a trumpet) to 1 outward (a dome). */
+  curvedConeBend?: number;
   topWidth?: number;
   topDepth?: number;
   taperTopWidth?: number;

@@ -19,7 +19,7 @@ På en flade fanges formen i fladens midte, når markøren kommer tæt på, lige
 
 Hvad biblioteket tilbyder:
 
-- **Basiske former:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (tre til fireogtyve sider), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (med tre til fireogtyve sider, så også tresidet), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}}, {{ui:shape.paraboloid}} (en kuppel, der bliver smallere op til en rund spids, og hvis højde falder med kvadratet på afstanden fra aksen) og {{ui:shape.torus}}.
+- **Basiske former:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (tre til fireogtyve sider), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.curvedCone}} (dens side buer indad til en trompet som en pseudosfære eller udad til en kuppel; {{ui:prop.curvedConeTop}} og {{ui:prop.curvedConeBend}} indstiller det, og som ethvert eksakt legeme kan den udhules og afrundes), {{ui:shape.pyramid}} (med tre til fireogtyve sider, så også tresidet), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}}, {{ui:shape.paraboloid}} (en kuppel, der bliver smallere op til en rund spids, og hvis højde falder med kvadratet på afstanden fra aksen) og {{ui:shape.torus}}.
 - **Rør:** {{ui:shape.tube}} og {{ui:shape.bentTube}}, lavet af op til tolv lige stykker med bøjninger ind imellem, og {{ui:shape.loft}} fra ét omrids til et andet, for eksempel fra firkant til rundt.
 - **Dekorative former:** {{ui:shape.star}}, {{ui:shape.heart}} og {{ui:shape.crescent}}.
 - **Bogstaver:** {{ui:shape.text}}, også langs en cirkelbue. Mere i [Tekst](chapter:text).

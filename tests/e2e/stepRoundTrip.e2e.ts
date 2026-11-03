@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import type { WorkplaneShape } from "@/types/layerling";
+import { curvedConeSection } from "@/lib/curvedCone";
 
 // Drive the REAL exporter/importer against the REAL OpenCascade kernel, loaded
 // from node_modules instead of the browser-only /occt/ URL. Everything else in
@@ -514,6 +515,25 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     expect(cut.skipped).toEqual([]);
     const removed = (10 * 6 * 8) / 2 + (12 * 12 * 9) / 3 + (PI * 7 ** 2 * 10) / 2;
     expect(near(await reimportVolume(cut.blob), 40 * 40 * 30 - removed, 0.001)).toBe(true);
+  });
+
+  it("exports a curved cone as its exact turned body (#1211)", async () => {
+    // Without a bend it is a frustum of radii 10 and 5, 12 high; bent in, its volume is the turned section's.
+    const straight = shape({ kind: "curvedCone", name: "Straight", x: -30, width: 20, depth: 20, height: 12, curvedConeTop: 0.5, curvedConeBend: 0 });
+    const trumpet = shape({ kind: "curvedCone", name: "Trumpet", x: 30, width: 20, depth: 20, height: 12, curvedConeTop: 0.25, curvedConeBend: -0.8 });
+    const { base, top, height, control } = curvedConeSection(20, 12, 0.25, -0.8);
+    const steps = 2000;
+    const at = (s: number) => {
+      const r = (1 - s) ** 2 * base + 2 * (1 - s) * s * control.x + s * s * top;
+      return r * r * (2 * (1 - s) * control.z + 2 * s * (height - control.z));
+    };
+    let sum = at(0) + at(1);
+    for (let index = 1; index < steps; index += 1) sum += at(index / steps) * (index % 2 ? 4 : 2);
+    const volume = (PI * 12 * (10 ** 2 + 10 * 5 + 5 ** 2)) / 3 + (PI * sum) / (3 * steps);
+    const { blob, exportedCount, skipped } = await exportShapesToStep([straight, trumpet]);
+    expect(skipped).toEqual([]);
+    expect(exportedCount).toBe(2);
+    expect(near(await reimportVolume(blob), volume, 0.001)).toBe(true);
   });
 
   it("cuts a counterbore out of a plate", async () => {

@@ -19,7 +19,7 @@ Op een vlak klikt de vorm vast in het midden van dat vlak zodra de aanwijzer erb
 
 Wat de bibliotheek te bieden heeft:
 
-- **Basisvormen:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (drie tot vierentwintig zijden), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (met drie tot vierentwintig zijden, dus ook driezijdig), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} en {{ui:shape.torus}}.
+- **Basisvormen:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (drie tot vierentwintig zijden), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.curvedCone}} (de zijkant buigt naar binnen tot een trompet zoals een pseudosfeer of naar buiten tot een koepel; {{ui:prop.curvedConeTop}} en {{ui:prop.curvedConeBend}} stellen dat in, en zoals elk exact lichaam kan hij worden uitgehold en afgerond), {{ui:shape.pyramid}} (met drie tot vierentwintig zijden, dus ook driezijdig), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} en {{ui:shape.torus}}.
 - **Buizen:** {{ui:shape.tube}} en {{ui:shape.bentTube}}, opgebouwd uit maximaal twaalf rechte stukken met bochten ertussen, en de {{ui:shape.loft}} van de ene omtrek naar de andere, bijvoorbeeld van vierkant naar rond.
 - **Decoratieve vormen:** {{ui:shape.star}}, {{ui:shape.heart}} en {{ui:shape.crescent}}.
 - **Belettering:** {{ui:shape.text}}, ook langs een cirkelboog. Meer in [Tekst](chapter:tekst).

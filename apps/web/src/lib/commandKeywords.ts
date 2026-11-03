@@ -115,6 +115,7 @@ export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   slot: ["capsule", "kapsel", "langloch", "oblong"],
   "half-sphere": ["dome", "halbkugel", "kuppel"],
   paraboloid: ["parabola", "parabel", "bullet", "kuppe"],
+  curvedCone: ["pseudosphere", "hyperbolic", "trumpet", "horn", "flared cone", "funnel", "gebogener kegel", "trompete", "trichter", "horn"],
   ellipse: ["oval", "elliptic", "ovale", "elliptisch"],
   vase: ["pot", "planter", "bowl", "cup", "vase mode", "topf", "blumentopf", "schale", "becher", "gefäß", "gefaess"],
   iconTag: ["icon", "symbol", "emoji", "badge", "tag", "keychain", "symbolschild", "anhänger", "anhaenger", "plakette"],

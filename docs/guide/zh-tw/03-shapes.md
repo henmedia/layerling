@@ -19,7 +19,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 形狀庫提供：
 
-- **基本形狀：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四邊）、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.pyramid}}（三到二十四邊，因此也有三角錐）、{{ui:shape.wedge}}、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}} 和 {{ui:shape.torus}}。
+- **基本形狀：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四邊）、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.curvedCone}}（側面向內彎成像偽球面那樣的喇叭形，或向外鼓成圓頂；由 {{ui:prop.curvedConeTop}} 與 {{ui:prop.curvedConeBend}} 設定，並且像所有精確實體一樣可以薄殼與導圓角）、{{ui:shape.pyramid}}（三到二十四邊，因此也有三角錐）、{{ui:shape.wedge}}、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}} 和 {{ui:shape.torus}}。
 - **管：** {{ui:shape.tube}} 和 {{ui:shape.bentTube}}，由最多十二段直管與其間的彎角組成，以及從一個輪廓過渡到另一個輪廓的 {{ui:shape.loft}}，例如從方形到圓形。
 - **裝飾形狀：** {{ui:shape.star}}、{{ui:shape.heart}} 和 {{ui:shape.crescent}}。
 - **文字：** {{ui:shape.text}}，也可沿圓弧排列。更多內容見[文字](chapter:text)。

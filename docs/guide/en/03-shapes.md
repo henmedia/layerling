@@ -19,7 +19,7 @@ On a face the shape snaps to the middle of that face when the pointer comes near
 
 What the library offers:
 
-- **Basic shapes:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (three to twenty-four sides), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (with three to twenty-four sides, so three-sided too), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}}, {{ui:shape.paraboloid}} (a dome that narrows to a rounded tip, its height falling with the square of the distance from the axis) and {{ui:shape.torus}}.
+- **Basic shapes:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (three to twenty-four sides), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.curvedCone}} (its side bends inward into a trumpet like a pseudosphere or outward into a dome; {{ui:prop.curvedConeTop}} and {{ui:prop.curvedConeBend}} set it, and it can be hollowed out and filleted like any exact body), {{ui:shape.pyramid}} (with three to twenty-four sides, so three-sided too), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}}, {{ui:shape.paraboloid}} (a dome that narrows to a rounded tip, its height falling with the square of the distance from the axis) and {{ui:shape.torus}}.
 - **Tubes:** {{ui:shape.tube}} and {{ui:shape.bentTube}}, made of up to twelve straight pieces with bends in between, and the {{ui:shape.loft}} from one outline to another, say from square to round.
 - **Decorative shapes:** {{ui:shape.star}}, {{ui:shape.heart}} and {{ui:shape.crescent}}.
 - **Lettering:** {{ui:shape.text}}, also along a circular arc. More in [Text](chapter:text).

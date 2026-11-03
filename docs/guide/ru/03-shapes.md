@@ -19,7 +19,7 @@ summary: Библиотека фигур, размеры числами и ма�
 
 Что предлагает библиотека:
 
-- Основные фигуры: {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (от трёх до двадцати четырёх сторон), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (от трёх до двадцати четырёх сторон, значит бывает и треугольная), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} и {{ui:shape.torus}}.
+- Основные фигуры: {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (от трёх до двадцати четырёх сторон), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.curvedCone}} (его бок изгибается внутрь в форму трубы, как у псевдосферы, или наружу в купол; это задают {{ui:prop.curvedConeTop}} и {{ui:prop.curvedConeBend}}, и, как любое точное тело, его можно сделать полым и скруглить), {{ui:shape.pyramid}} (от трёх до двадцати четырёх сторон, значит бывает и треугольная), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} и {{ui:shape.torus}}.
 - Трубы: {{ui:shape.tube}} и {{ui:shape.bentTube}}, собранные из прямых участков с изгибами между ними — до двенадцати, — и {{ui:shape.loft}}, переходящий от одного контура к другому, скажем от квадрата к кругу.
 - Декоративные фигуры: {{ui:shape.star}}, {{ui:shape.heart}} и {{ui:shape.crescent}}.
 - Надписи: {{ui:shape.text}}, в том числе по дуге окружности. Подробнее в разделе Текст.

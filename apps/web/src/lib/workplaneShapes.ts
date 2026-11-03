@@ -626,6 +626,8 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.bevel === b.bevel &&
     a.segments === b.segments &&
     a.topRadius === b.topRadius &&
+    a.curvedConeTop === b.curvedConeTop &&
+    a.curvedConeBend === b.curvedConeBend &&
     a.baseRadius === b.baseRadius &&
     a.topWidth === b.topWidth &&
     a.topDepth === b.topDepth &&

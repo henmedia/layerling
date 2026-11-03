@@ -19,7 +19,7 @@ Sur une face, la forme s'aligne au milieu de cette face quand le pointeur s'en a
 
 Ce que propose la bibliothèque :
 
-- **Formes de base :** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (trois à vingt-quatre côtés), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (avec trois à vingt-quatre côtés, donc à trois côtés également), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} et {{ui:shape.torus}}.
+- **Formes de base :** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (trois à vingt-quatre côtés), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.curvedCone}} (son côté se courbe vers l'intérieur en trompette comme une pseudosphère ou vers l'extérieur en dôme ; {{ui:prop.curvedConeTop}} et {{ui:prop.curvedConeBend}} le règlent, et comme tout corps exact il peut être évidé et arrondi), {{ui:shape.pyramid}} (avec trois à vingt-quatre côtés, donc à trois côtés également), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} et {{ui:shape.torus}}.
 - **Tubes :** {{ui:shape.tube}} et {{ui:shape.bentTube}}, composés d'un maximum de douze pièces droites avec des coudes entre les deux, et le {{ui:shape.loft}} d'un contour à l'autre, disons du carré au rond.
 - **Formes décoratives :** {{ui:shape.star}}, {{ui:shape.heart}} et {{ui:shape.crescent}}.
 - **Lettrage :** {{ui:shape.text}}, également selon un arc de cercle. Plus dans [Texte](chapter:text).
