@@ -58,5 +58,15 @@
       "de": "Ein Körper mit gefasten oder gerundeten Kanten reagierte beim Verschieben, mit der Maus wie mit den Pfeiltasten, spürbar verzögert, weil seine ganze Kanten-Vorgeschichte bei jedem Schritt neu durchgerechnet wurde. Jetzt folgt er so schnell wie ein einfacher Quader, und auch das Speichern danach geht schneller.",
       "en": "A body with chamfered or rounded edges reacted with a noticeable delay when moved, with the mouse as with the arrow keys, because its whole edge history was worked through again at every step. It now follows as quickly as a plain box, and saving afterwards is faster too."
     }
+  },
+  {
+    "title": {
+      "de": "Kreise und Rechtecke rasten mit ihrer Mitte ein",
+      "en": "Circles and rectangles snap with their middle"
+    },
+    "body": {
+      "de": "Ziehst du in der Skizze einen Kreis oder ein Rechteck, rastet seine Mitte auf den Enden, Ecken und Mitten der anderen Linien, auf Kreismittelpunkten und auf Kreuzungen von Hilfslinien ein, ein blauer Ring zeigt die Stelle. So sitzt ein Loch genau auf der Mitte einer Linie. Alt schaltet das Einrasten ab.",
+      "en": "Drag a circle or a rectangle in the sketch and its middle snaps to the ends, corners and middles of the other lines, to circle centres and to crossings of construction lines, with a blue ring to show where. So a hole sits exactly on the middle of a line. Alt turns the snapping off."
+    }
   }
 ]
