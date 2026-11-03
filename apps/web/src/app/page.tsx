@@ -74,7 +74,7 @@ import { writeCornerRulers } from "@/lib/cornerRulerStore";
 import { readTape, writeTape } from "@/lib/tapeStore";
 import { useFileAccept } from "@/lib/fileAccept";
 import { lylFileAccessSupported, onLylFilesLaunched, pickFilesToImport, rememberLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
-import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName } from "@/lib/lylProject";
+import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
 import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
@@ -2027,7 +2027,8 @@ export default function Home() {
 
   /** Puts a project into a folder of the store as a file that is not there yet. */
   const putProjectOnServer = useCallback(async (project: DashboardProject, targetPath: string) => {
-    const bytes = await projectPackageBytes(project);
+    // The file carries the card's picture, for other programs to show (#1226).
+    const bytes = await withLylThumbnail(await projectPackageBytes(project), await projectThumbnailPngBytes(project.thumbnailUrl).catch(() => null));
     const { fileName } = sharedProjectSaveTarget({ projectName: project.name, exportName: project.name, binding: undefined });
     const body = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
     const projectBlob = new Blob([body], { type: LYL_MEDIA_TYPE });

@@ -150,7 +150,8 @@ import { revolveAxisShift } from "@/lib/revolveAxis";
 import { buildSketchRevolveMesh, DEFAULT_SKETCH_REVOLVE_SETTINGS, normalizeSketchRevolveSettings, type SketchRevolveMesh } from "@/lib/sketchRevolve";
 import { AppFooter } from "@/components/AppFooter";
 import { useFileAccept } from "@/lib/fileAccept";
-import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE } from "@/lib/lylProject";
+import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, lylThumbnailFiles } from "@/lib/lylProject";
+import { projectThumbnailPngBytes } from "@/lib/backupDownload";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
@@ -2745,6 +2746,18 @@ function withSelectionPivot(shape: WorkplaneShape, pivot: PivotPoint | null): Wo
 /** Where the cookie cutter panel keeps its settings for the next cutter (#982). */
 const COOKIE_CUTTER_SETTINGS_STORAGE_KEY = "layerling.cookieCutterSettings";
 
+
+/**
+ * The picture of the design as its card shows it, for the file it is saved in (#1226), or "" when the view cannot give
+ * one: a view of no size (a hidden tab) throws at once. The file then goes without it; saving never fails over it.
+ */
+async function capturedDesignPicture(): Promise<string> {
+  try {
+    return (await window.layerlingCaptureCanvasAsync?.()) ?? "";
+  } catch {
+    return "";
+  }
+}
 export function LayerlingEditor({
   initialAssets = [],
   initialAttachments,
@@ -13534,11 +13547,13 @@ export function LayerlingEditor({
           ? editorHistoryBranch(historyRef.current, view.index, historyLimit)
           : editorHistoryForExport(historyRef.current, historyIndexRef.current, historyLimit);
         const projectShapes = view ? view.shapes : shapesRef.current;
+        const picture = await capturedDesignPicture();
         const bytes = await exportLylProject({
           projectId: projectInfoRef.current.projectId,
           projectName,
           createdAt: projectCreatedAt,
           modifiedAt: projectModifiedAt,
+          extraFiles: lylThumbnailFiles(await projectThumbnailPngBytes(picture)),
           shapes: projectShapes,
           notes: view ? view.notes : notesRef.current,
           history: exportedHistory.entries,
@@ -14300,9 +14315,8 @@ export function LayerlingEditor({
     setLylExporting(true);
     setNotice(target === "shared" ? t("status.packagingShared") : t("status.packagingProject"));
     try {
-      const thumbnailDataUrl = target === "shared"
-        ? await (window.layerlingCaptureCanvasAsync?.() ?? Promise.resolve(""))
-        : "";
+      // Every file carries the picture of the design for other programs to show (#1226); the server needs it.
+      const thumbnailDataUrl = await capturedDesignPicture();
       if (target === "shared" && (!thumbnailDataUrl.startsWith("data:image/png;base64,") || thumbnailDataUrl.length <= 100)) {
         throw new Error("Could not capture the current project preview");
       }
@@ -14320,6 +14334,7 @@ export function LayerlingEditor({
         projectName: packageName,
         createdAt: projectCreatedAt,
         modifiedAt: projectModifiedAt,
+        extraFiles: lylThumbnailFiles(await projectThumbnailPngBytes(thumbnailDataUrl)),
         shapes: view ? view.shapes : shapesRef.current,
         notes: view ? view.notes : notesRef.current,
         history: exportedHistory.entries,
@@ -14538,6 +14553,7 @@ export function LayerlingEditor({
         projectName,
         createdAt: projectCreatedAt,
         modifiedAt: Date.now(),
+        extraFiles: lylThumbnailFiles(await projectThumbnailPngBytes(thumbnailDataUrl)),
         shapes: shapesRef.current,
         notes: notesRef.current,
         history: exportedHistory.entries,
