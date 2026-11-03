@@ -1683,6 +1683,39 @@ export const tools = [
     },
   },
   {
+    name: "layerling_measure_angle",
+    description: "Measure an angle with the editor's protractor. points: three points in world coordinates (y up, as layerling_list_faces and layerling_list_edges give them), the corner first and then one point on each side; the answer is the angle at the corner, 0 to 180 degrees. faces: two flat faces, each { id, faceId } with a face id from layerling_list_faces; the answer is angle, the smaller of the two angles the planes make (0 to 90, what a chamfer or a slope is called by), and other, the one beside it (180 minus angle): a 45 degree chamfer against the top gives 45 and 135, two sides of a box 90, parallel faces 0. A round face has no normal and is refused. text is what the editor shows. show (default true) draws the angle in the view, with the protractor open, as if it had been clicked; measured faces follow their bodies when they move. Nothing is saved and nothing goes into the undo history. clear true puts the protractor away with its measurement. Combine with layerling_capture_image to see it.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        points: {
+          type: "array",
+          minItems: 3,
+          maxItems: 3,
+          items: { type: "array", minItems: 3, maxItems: 3, items: { type: "number" } },
+          description: "Three [x, y, z] points in world coordinates (y up): the corner first, then one point on each side.",
+        },
+        faces: {
+          type: "array",
+          minItems: 2,
+          maxItems: 2,
+          items: {
+            type: "object",
+            required: ["id", "faceId"],
+            properties: {
+              id: { type: "string", description: "The object the face belongs to." },
+              faceId: { type: "integer", description: "A flat face's id from layerling_list_faces." },
+            },
+          },
+          description: "Two flat faces to measure between.",
+        },
+        show: { type: "boolean", description: "false only measures and leaves the view as it is. Default true." },
+        clear: { type: "boolean", description: "true puts the protractor away with its measurement; nothing else is needed." },
+      },
+    },
+  },
+  {
     name: "layerling_saved_view",
     description: "The four views a design keeps under the keys 7, 8, 9 and 0, like Shift+key (save) and the key alone (show) in the editor. save stores the current view - angle, pan, zoom and flat or perspective - under that key; show turns the camera back to the view saved there and answers with an error if none is. Both may be given; save comes first. Call with neither to read which keys hold a view. Saved views belong to the design: they stay in the browser and travel in a .lyl file, never in the undo history. Combine with layerling_capture_image (face \"current\") for pictures from the same angle every time. startView \"save\" makes the current view the start view of this browser, like \"Use current view\" under Settings > Appearance: new designs open in it and Home (and layerling_capture_image face \"home\") goes back to it; \"reset\" goes back to the standard start view. lookOntoWorkplane true turns the camera straight onto the workplane, its origin in the middle, like the key P: the workplane on a face (layerling_set_workplane) seen square, or the base plate from above; it comes after show. Returns keys (key, saved), startView (whether a start view of the user's own is set) and, after show, shown.",
     inputSchema: {

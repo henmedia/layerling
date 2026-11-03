@@ -170,7 +170,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "welcome.morePivotTitle": "Dönme noktası",
   "welcome.morePivotBody": "gövdenin merkezi yerine bir boru ucunun eksenine veya bir yüzeyin merkezine göre döndür. Tek bir gövdede dönme noktası onunla birlikte kalır.",
   "welcome.moreMeasureTitle": "Ölç",
-  "welcome.moreMeasureBody": "şerit metre, cetvel ve gönye, orijine uzaklıklar - birden fazla seçili gövde için de -, doğrudan çalışma düzleminde notlar ve modeli içine bakmak için açan, kesitte et kalınlığını ve boşlukları ölçen ve lazer veya şablon için SVG olarak kaydeden bir kesit görünümü.",
+  "welcome.moreMeasureBody": "şerit metre, cetvel, gönye ve iletki (bir köşedeki ya da iki yüz arasındaki açı), orijine uzaklıklar - birden fazla seçili gövde için de -, doğrudan çalışma düzleminde notlar ve modeli içine bakmak için açan, kesitte et kalınlığını ve boşlukları ölçen ve lazer veya şablon için SVG olarak kaydeden bir kesit görünümü.",
   "welcome.moreSaveTitle": "Kendi klasörüne kaydet",
   "welcome.moreSaveBody": "Chrome ve Edge'de klasörü ve adı kendin seçersin ve Ctrl+S tasarımı yeniden o dosyaya kaydeder - açtığın bir dosya yerinde değiştirilir. Diğer tarayıcılar indirir.",
   "welcome.moreBackupTitle": "Tüm tasarımları yedekle",

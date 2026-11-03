@@ -44,6 +44,15 @@ V režimu středu vedou zelené rozměry do středu tělesa, včetně výšky. S
 
 Měřicí nástroj i úhelník zůstávají na místě při přechodu do náčrtu a zpět do 3D. Ani jeden se neukládá do historie. Úhelník se s projektem ukládá, stejně jako měření měřicího nástroje, v prohlížeči i v souboru .lyl: po otevření projektu jsou zase tam. Tlačítko s okem mezi tlačítky měřicího nástroje všechna měření skryje a znovu zobrazí; uloží se i to, zda jsou skrytá, a kdo měření přidá, posune nebo smaže, uvidí je předtím znovu.
 
+## Úhloměr
+
+Úhel změříte tlačítkem {{ui:camera.protractor}} v liště pohledu. Vedle něj se otevře řada tlačítek, a dokud na tlačítko znovu nekliknete nebo nestisknete [[Esc]], měří každé kliknutí do pohledu úhloměrem. Stejně jako měření vzdáleností se přichytává k rohům a hranám těles; vedle těles položí bod na podložku.
+
+- {{ui:camera.protractorPoints}}: nejprve klikněte na vrchol úhlu, pak na bod na každém rameni. Už při umisťování posledního bodu se úhel zobrazuje; po třetím kliknutí zůstane, s obloukem mezi rameny. Je to úhel ve vrcholu, od 0° do 180°.
+- {{ui:camera.protractorFaces}}: klikněte na dvě rovné plochy. Krátká modrá čárka na každé ukazuje, kam plocha směřuje, a popisek uvádí oba úhly, které plochy svírají, menší jako první: zkosení 45° proti horní ploše dá 45° · 135°, dvě stěny kvádru jen 90°. Zakřivená plocha nemá jediný směr, proto úhloměr žádá rovnou plochu.
+
+Další kliknutí po hotovém úhlu začne nový a {{ui:camera.protractorClear}} jej odstraní. Úhel sleduje tělesa, když je posunete nebo otočíte. Nic z něj se neukládá ani nejde do historie: zmizí, jakmile úhloměr odložíte.
+
 ## Vzdálenosti od počátku a při přesouvání
 
 V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného kótování:

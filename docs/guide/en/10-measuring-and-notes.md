@@ -46,6 +46,15 @@ With the midpoint, the green numbers count to the middle of the body, in height 
 
 Both the tape measure and the framing square stay where they are while you sketch and come back to the 3D view. Neither is in the history. The framing square is kept with the design, and so are the measurements of the tape measure, in the browser and in the .lyl file: they are there again when you open the design. The eye button among the tape measure's buttons hides all measurements and shows them again; whether they are hidden is kept as well, and adding, moving or deleting a measurement shows them first.
 
+## The protractor
+
+Click {{ui:camera.protractor}} in the view bar to measure an angle. A row of buttons opens beside it, and until you click the button again or press [[Esc]], a click in the view measures with the protractor. Like the tape measure, it snaps to the corners and edges of bodies; beside the bodies it sets a point on the plate.
+
+- {{ui:camera.protractorPoints}}: click the corner of the angle first, then a point on each side. While you place the last point, the angle shows already; after the third click it stays, with an arc between the sides. It is the angle at the corner, from 0° to 180°.
+- {{ui:camera.protractorFaces}}: click two flat faces. A short blue line on each shows which way it faces, and the label gives both angles the faces make, the smaller first: a 45° chamfer against the top reads 45° · 135°, two sides of a box just 90°. A curved face has no single direction, so the protractor asks for a flat one.
+
+The next click after a finished angle starts a new one, and {{ui:camera.protractorClear}} removes it. The angle follows the bodies when they move or turn. Nothing of it is saved or goes into the history: it is gone when you put the protractor away.
+
 ## Distances to the origin and while moving
 
 In the settings under {{ui:workspace.appearance}} there are two switches for live dimensions:

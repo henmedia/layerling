@@ -6982,7 +6982,8 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   display: contents;
 }
 
-.tape-control-group {
+.tape-control-group,
+.protractor-control-group {
   position: relative;
 }
 
@@ -7739,6 +7740,47 @@ html[data-theme="dark"] .inspector-bundle-note {
 }
 
 .workplane-wrap.section-measure-mode canvas {
+  cursor: crosshair;
+}
+
+/* The protractor (#1228): its legs and arc in the measuring orange, the normals of measured faces in blue. */
+.protractor-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.protractor-leg,
+.protractor-arc {
+  stroke: #c86a12;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.protractor-leg.preview {
+  stroke-dasharray: 5 4;
+}
+
+.protractor-normal {
+  stroke: #1677c8;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.protractor-point {
+  fill: #c86a12;
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.protractor-hover {
+  fill: rgba(200, 106, 18, 0.22);
+  stroke: #c86a12;
+  stroke-width: 2;
+}
+
+.workplane-wrap.protractor-mode canvas {
   cursor: crosshair;
 }
 
@@ -13228,7 +13270,8 @@ html[data-theme="dark"] .section-measure-help {
   color: #a89787;
 }
 
-html[data-theme="dark"] .section-measure-outline {
+html[data-theme="dark"] .section-measure-outline,
+html[data-theme="dark"] .protractor-normal {
   stroke: #4ba3ec;
 }
 

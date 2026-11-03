@@ -153,6 +153,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_show_workplane` | oculta y muestra la placa con su cuadrícula, por ejemplo para una captura de la parte de abajo (solo la vista) |
 | `layerling_set_section_view` | abre la vista en corte por un plano para mirar dentro (solo la vista: no se corta nada) |
 | `layerling_measurements` | muestra u oculta las mediciones de la cinta métrica y las lista con sus longitudes, y oculta o muestra las medidas alrededor de la selección como [[Q]] |
+| `layerling_measure_angle` | mide un ángulo como el transportador: en el vértice de tres puntos o entre dos caras planas, y lo muestra en la vista |
 | `layerling_saved_view` | guarda la vista actual en la tecla 7, 8, 9 o 0 y vuelve a ella, como Mayús+tecla y la tecla (solo la vista); también fija la vista de arranque de los diseños nuevos |
 | `layerling_clear_history` | elimina para siempre todos los pasos de deshacer, como el botón «Eliminar historial» de la vista del historial; necesita `confirm: true` |
 | `layerling_set_history_view` | consulta un estado anterior del proyecto, como la vista del historial (el diseño real no se toca; las herramientas que cambian algo esperan a que se cierre) |

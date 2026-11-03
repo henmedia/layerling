@@ -46,6 +46,15 @@ Przy punkcie środkowym zielone liczby liczą do środka bryły, także w wysoko
 
 Zarówno narzędzie Zmierz, jak i kątownik zostają tam, gdzie są, gdy szkicujesz i wracasz do widoku 3D. Żadne z nich nie trafia do historii. Kątownik jest zapisywany z projektem, tak samo jak pomiary narzędzia Zmierz, w przeglądarce i w pliku .lyl: po otwarciu projektu znowu tam są. Przycisk z okiem wśród przycisków narzędzia Zmierz ukrywa wszystkie pomiary i znowu je pokazuje; zapisywane jest też to, czy są ukryte, a dodanie, przesunięcie lub usunięcie pomiaru najpierw je pokazuje.
 
+## Kątomierz
+
+Kliknij {{ui:camera.protractor}} na pasku widoku, aby zmierzyć kąt. Obok otworzy się rząd przycisków i dopóki nie klikniesz przycisku ponownie albo nie naciśniesz [[Esc]], każde kliknięcie w widoku mierzy kątomierzem. Podobnie jak narzędzie Zmierz przyciąga się do narożników i krawędzi brył; obok brył stawia punkt na płycie.
+
+- {{ui:camera.protractorPoints}}: najpierw kliknij wierzchołek kąta, potem punkt na każdym ramieniu. Podczas stawiania ostatniego punktu kąt już widać; po trzecim kliknięciu zostaje, z łukiem między ramionami. To kąt w wierzchołku, od 0° do 180°.
+- {{ui:camera.protractorFaces}}: kliknij dwie płaskie ściany. Krótka niebieska kreska na każdej pokazuje, w którą stronę jest zwrócona, a etykieta podaje oba kąty, jakie tworzą ściany, najpierw mniejszy: fazka 45° względem góry daje 45° · 135°, dwa boki prostopadłościanu tylko 90°. Zakrzywiona ściana nie ma jednego kierunku, dlatego kątomierz prosi o płaską.
+
+Następne kliknięcie po gotowym kącie zaczyna nowy, a {{ui:camera.protractorClear}} go usuwa. Kąt podąża za bryłami, gdy się je przesuwa lub obraca. Nic z niego nie jest zapisywane ani nie trafia do historii: znika, gdy odłożysz kątomierz.
+
 ## Odległości od początku układu i podczas przesuwania
 
 W ustawieniach w sekcji {{ui:workspace.appearance}} są dwa przełączniki wymiarów na żywo:

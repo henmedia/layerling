@@ -180,7 +180,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "welcome.morePivotTitle": "Ponto de rotação",
   "welcome.morePivotBody": "rodar em torno do eixo da extremidade de um tubo ou do centro de uma face, em vez do centro do sólido. Num sólido individual, o ponto de rotação mantém-se associado a ele.",
   "welcome.moreMeasureTitle": "Medir",
-  "welcome.moreMeasureBody": "fita métrica, régua e esquadro, distâncias à origem, também para vários sólidos selecionados, notas diretamente no plano de trabalho, imagens de referência para alinhar peças (por exemplo, uma fotografia de uma placa eletrónica sob a respetiva caixa, calibrada à escala) e uma vista em corte que permite observar o interior do modelo, medir espessuras de paredes e folgas no corte e guardá-lo em SVG para corte a laser ou para criar um molde.",
+  "welcome.moreMeasureBody": "fita métrica, régua, esquadro e transferidor (o ângulo num vértice ou entre duas faces), distâncias à origem, também para vários sólidos selecionados, notas diretamente no plano de trabalho, imagens de referência para alinhar peças (por exemplo, uma fotografia de uma placa eletrónica sob a respetiva caixa, calibrada à escala) e uma vista em corte que permite observar o interior do modelo, medir espessuras de paredes e folgas no corte e guardá-lo em SVG para corte a laser ou para criar um molde.",
   "welcome.moreSaveTitle": "Guardar na tua pasta",
   "welcome.moreSaveBody": "no Chrome e no Edge, escolhes a pasta e o nome do ficheiro, e Ctrl+S volta a guardar o projeto nesse ficheiro. Se abriste um ficheiro existente, este é substituído no mesmo local. Nos restantes navegadores, o ficheiro é transferido.",
   "welcome.moreBackupTitle": "Criar cópia de segurança de todos os projetos",

@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Winkelmesser",
+      "en": "Protractor"
+    },
+    "body": {
+      "de": "Neben dem Winkellineal misst der Winkelmesser jetzt Winkel: die Ecke und auf jedem Schenkel einen Punkt anklicken, oder zwei ebene Flächen. Er rastet an Ecken und Kanten ein und folgt den Körpern, wenn sie sich bewegen.",
+      "en": "Beside the framing square, the protractor now measures angles: click the corner and a point on each side, or two flat faces. It snaps to corners and edges and follows the bodies when they move."
+    }
+  }
+]

@@ -46,6 +46,15 @@ Usando il punto medio, i numeri verdi misurano fino al centro del corpo, anche i
 
 Il metro a nastro e la squadra restano al loro posto mentre lavori nello schizzo e ricompaiono quando torni alla vista 3D. Nessuno dei due entra nella cronologia. La squadra viene salvata con il progetto, e così le misurazioni del metro a nastro, nel browser e nel file .lyl: quando apri il progetto sono di nuovo al loro posto. Il pulsante con l’occhio tra i pulsanti del metro a nastro nasconde tutte le misurazioni e le mostra di nuovo; viene salvato anche se sono nascoste, e aggiungere, spostare o eliminare una misurazione le mostra prima.
 
+## Il goniometro
+
+Fai clic su {{ui:camera.protractor}} nella barra della vista per misurare un angolo. Accanto si apre una fila di pulsanti e, finché non fai di nuovo clic sul pulsante o premi [[Esc]], ogni clic nella vista misura con il goniometro. Come il metro, si aggancia a vertici e spigoli dei corpi; accanto ai corpi mette un punto sul piano.
+
+- {{ui:camera.protractorPoints}}: fai clic prima sul vertice dell'angolo, poi su un punto di ciascun lato. Mentre posizioni l'ultimo punto l'angolo è già visibile; dopo il terzo clic resta, con un arco tra i lati. È l'angolo al vertice, da 0° a 180°.
+- {{ui:camera.protractorFaces}}: fai clic su due facce piane. Un breve tratto blu su ciascuna mostra verso dove è rivolta, e l'etichetta riporta entrambi gli angoli che formano le facce, prima il minore: uno smusso di 45° rispetto alla faccia superiore dà 45° · 135°, due lati di un parallelepipedo solo 90°. Una faccia curva non ha un'unica direzione, quindi il goniometro ne chiede una piana.
+
+Il clic successivo a un angolo completato ne inizia uno nuovo, e {{ui:camera.protractorClear}} lo rimuove. L'angolo segue i corpi quando vengono spostati o ruotati. Nulla viene salvato né entra nella cronologia: sparisce quando chiudi il goniometro.
+
 ## Distanze dall’origine e durante lo spostamento
 
 Nelle impostazioni, sotto {{ui:workspace.appearance}}, trovi due interruttori per visualizzare le misure in tempo reale:

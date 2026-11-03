@@ -50,6 +50,15 @@ Med midtpunktet tæller de grønne tal til formens midte, også i højden. Såda
 
 Både målebåndet og vinkelmåleren bliver hvor de er mens du skitser og kommer tilbage til 3D-visningen. Ingen af dem er i historikken. Vinkelmåleren gemmes med designet, og det samme gør målebåndets målinger, i browseren og i .lyl-filen: de er der igen, når du åbner designet. Øjeknappen blandt målebåndets knapper skjuler alle målinger og viser dem igen; om de er skjult, gemmes også, og hvis du sætter, flytter eller sletter en måling, vises de først.
 
+## Gradskiven
+
+Klik på {{ui:camera.protractor}} i visningsbjælken for at måle en vinkel. Ved siden af åbner en række knapper, og indtil du klikker på knappen igen eller trykker [[Esc]], måler et klik i visningen med gradskiven. Ligesom målebåndet fanger den hjørner og kanter på former; ved siden af formerne sætter den et punkt på pladen.
+
+- {{ui:camera.protractorPoints}}: klik først på vinklens hjørne, derefter på et punkt på hvert ben. Mens du sætter det sidste punkt, vises vinklen allerede; efter det tredje klik bliver den stående med en bue mellem benene. Det er vinklen i hjørnet, fra 0° til 180°.
+- {{ui:camera.protractorFaces}}: klik på to plane flader. En kort blå streg på hver viser, hvilken vej fladen vender, og mærkaten angiver begge vinkler, fladerne danner, den mindste først: en 45°-affasning mod toppen giver 45° · 135°, to sider af en kasse kun 90°. En krum flade har ikke én retning, så gradskiven beder om en plan flade.
+
+Det næste klik efter en færdig vinkel starter en ny, og {{ui:camera.protractorClear}} fjerner den. Vinklen følger formerne, når de flyttes eller drejes. Intet af den gemmes eller kommer i historikken: den er væk, når du lægger gradskiven fra dig.
+
 ## Afstande til nulpunktet og under flytning
 
 Under {{ui:workspace.appearance}} i indstillingerne er der to kontakter for levende dimensioner:

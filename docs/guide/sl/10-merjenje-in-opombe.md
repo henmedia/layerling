@@ -44,6 +44,15 @@ S središčem zelene številke štejejo do sredine telesa, tudi v višini. Tako 
 
 Merilni trak in kotno ravnilo ostaneta tam, kjer sta, ko skiciraš in se vrneš v 3D pogled. Nobenega ni v zgodovini. Kotno ravnilo se shrani z načrtom, prav tako meritve merilnega traku, v brskalniku in v datoteki .lyl: ko načrt odpreš, so spet tam. Gumb z očesom med gumbi merilnega traku skrije vse meritve in jih spet pokaže; shrani se tudi, ali so skrite, in kdor meritev doda, premakne ali izbriše, jih najprej spet vidi.
 
+## Kotomer
+
+Kot izmeriš z gumbom {{ui:camera.protractor}} v vrstici pogleda. Ob njem se odpre vrsta gumbov, in dokler gumba ne klikneš znova ali ne pritisneš [[Esc]], vsak klik v pogled meri s kotomerom. Kot merilni trak se pripne na oglišča in robove teles; ob telesih postavi točko na ploščo.
+
+- {{ui:camera.protractorPoints}}: najprej klikni oglišče kota, nato točko na vsakem kraku. Že med postavljanjem zadnje točke se kot prikaže; po tretjem kliku ostane, z lokom med krakoma. To je kot v oglišču, od 0° do 180°.
+- {{ui:camera.protractorFaces}}: klikni dve ravni ploskvi. Kratka modra črta na vsaki pokaže, kam je obrnjena, oznaka pa navede oba kota, ki ju ploskvi oklepata, najprej manjšega: 45° posnetje proti zgornji ploskvi da 45° · 135°, dve stranici kvadra le 90°. Ukrivljena ploskev nima ene same smeri, zato kotomer zahteva ravno.
+
+Naslednji klik po končanem kotu začne novega, {{ui:camera.protractorClear}} pa ga odstrani. Kot sledi telesom, ko jih premakneš ali zavrtiš. Nič od tega se ne shrani in ne gre v zgodovino: ko kotomer odložiš, ga ni več.
+
 ## Razdalje do ničle in pri premikanju
 
 V nastavitvah pod {{ui:workspace.appearance}} sta dve stikali za tekoče mere:

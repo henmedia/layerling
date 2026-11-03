@@ -176,7 +176,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "welcome.morePivotTitle": "Forgatási pont",
   "welcome.morePivotBody": "forgatás egy csővég tengelye vagy egy lap közepe körül a test közepe helyett. Egyetlen testnél a forgatási pont vele marad.",
   "welcome.moreMeasureTitle": "Mérés",
-  "welcome.moreMeasureBody": "mérőszalag, vonalzó és derékszögvonalzó, távolságok az origótól – több kijelölt testnél is –, jegyzetek közvetlenül a munkasíkon, és metszeti nézet, amely felvágja a modellt, hogy belenézhess, a vágáson falvastagságot és hézagokat mér, és SVG-ként menti lézerhez vagy sablonnak.",
+  "welcome.moreMeasureBody": "mérőszalag, vonalzó, derékszögvonalzó és szögmérő (a szög egy csúcsnál vagy két lap között), távolságok az origótól – több kijelölt testnél is –, jegyzetek közvetlenül a munkasíkon, és metszeti nézet, amely felvágja a modellt, hogy belenézhess, a vágáson falvastagságot és hézagokat mér, és SVG-ként menti lézerhez vagy sablonnak.",
   "welcome.moreSaveTitle": "Mentés a saját mappádba",
   "welcome.moreSaveBody": "Chrome-ban és Edge-ben te választod a mappát és a nevet, a Ctrl+S pedig újra abba a fájlba menti a tervet – egy megnyitott fájl a helyén cserélődik. Más böngészők letöltik.",
   "welcome.moreBackupTitle": "Minden terv mentése",

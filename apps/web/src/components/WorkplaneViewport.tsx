@@ -14,6 +14,7 @@ import { sectionMeasurement, sectionPointToWorld, snapSectionPoint, type Section
 import * as THREE from "three";
 import { triangleTouchesRect, type ScreenRect } from "@/lib/screenRectHit";
 import { FramingSquareIcon } from "@/components/FramingSquareIcon";
+import { ProtractorIcon } from "@/components/ProtractorIcon";
 import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { ToolbarNoteIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
@@ -100,6 +101,7 @@ import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineSty
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane } from "./workplane/viewportScene";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
+import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
 import { MIN_ELEVATION, MAX_ELEVATION, ResizeSigns, ResizeAnchorMemory, TransformDragState, TransformDragItem, snapValue, selectionWorldYBounds, resizeSignsForHandle, resizeAnchorPointForFrame, resizeCenterFromAnchor, resizeSignsForDimension, patchWithResizeAnchor, patchWithUniformHeightScale, resizeShapeFromFrameHandle, resizeShapeAlongFrameNormal, resizeSelectionFromHandle, scaleSelectionItems } from "./workplane/viewportResize";
@@ -466,6 +468,12 @@ declare global {
     layerlingWorkplaneDisplay?: (visible?: boolean) => { visible: boolean };
     /** The measurements of the tape measure for MCP: shows or hides them when asked, returns what is there (#881). */
     layerlingMeasurements?: (request?: { visible?: boolean; dimensions?: boolean }) => { visible: boolean; dimensions: boolean; measurements: Array<{ id: string; length: number }> };
+    /** The protractor for MCP (#1228): shows an angle from three world points (the corner first) or two faces, or puts the protractor away. */
+    layerlingProtractor?: (request: {
+      points?: Array<{ x: number; y: number; z: number }>;
+      faces?: Array<{ shapeId: string; point: { x: number; y: number; z: number }; normal: { x: number; y: number; z: number } }>;
+      clear?: boolean;
+    }) => { shown: boolean; angle?: number; other?: number; text?: string };
     /** The four saved views (keys 7, 8, 9, 0) for MCP: saves or shows one when asked, returns which keys hold a view. */
     layerlingSavedViews?: (request?: { save?: number; show?: number; startView?: "save" | "reset"; ontoWorkplane?: boolean }) => { keys: { key: string; saved: boolean }[]; shown?: boolean; startView: boolean };
   }
@@ -1365,6 +1373,30 @@ function MovableTapePanel({ children }: { children: ReactNode }) {
   );
 }
 
+/** The protractor's buttons, a strip like the tape measure's, moved on its own grip (#1228). */
+function MovableProtractorPanel({ children }: { children: ReactNode }) {
+  const movable = useMovablePanel<HTMLDivElement>("layerling.editor.protractorPanelPosition", TAPE_PANEL);
+  return (
+    <div
+      id="protractor-tool-popover"
+      ref={movable.panelRef}
+      className={`tape-tool-popover protractor-tool-popover ${movable.moved ? "floating" : ""} ${movable.dragging ? "moving" : ""}`}
+      style={movable.style}
+      aria-label={t("camera.protractor")}
+    >
+      <span className="panel-grip" title={t("panel.moveHint")} aria-hidden="true" {...movable.handleProps}>
+        <GripVertical size={16} strokeWidth={2.2} />
+      </span>
+      {children}
+    </div>
+  );
+}
+
+/** What the protractor asks for next, said when it opens and when its kind changes. */
+function protractorHint(kind: ProtractorKind) {
+  return t(kind === "faces" ? "status.protractorFaces" : "status.protractorPoints");
+}
+
 /**
  * Das Schnittfenster haengt an seinem Knopf in der Kameraleiste und laesst
  * sich an seiner Titelleiste frei ueber die Arbeitsflaeche ziehen, wie
@@ -1606,6 +1638,10 @@ export function WorkplaneViewport({
   const [rulerDimensionOverlay, setRulerDimensionOverlay] = useState<RulerDimensionOverlayState | null>(null);
   const [cornerRulerMode, setCornerRulerMode] = useState(false);
   const [cornerRulerOverlay, setCornerRulerOverlay] = useState<CornerRulerOverlayState | null>(null);
+  // The protractor (#1228): open while its buttons show; then a click measures with it.
+  const [protractorOpen, setProtractorOpen] = useState(false);
+  const [protractorKind, setProtractorKind] = useState<ProtractorKind>("points");
+  const [protractorOverlay, setProtractorOverlay] = useState<ProtractorOverlayState | null>(null);
   const [rulerDimensionEditing, setRulerDimensionEditing] = useState<{ shapeId: string; field: RulerDimensionField; x: number; y: number; value: string; base: number } | null>(null);
   const [rulerDuplicatePreview, setRulerDuplicatePreview] = useState<{ x: number; y: number; label: string } | null>(null);
   const [rulerDuplicateEditing, setRulerDuplicateEditing] = useState<{ rulerId: string; shapeId: string; baseAlong: number; x: number; y: number; value: string } | null>(null);
@@ -1823,7 +1859,7 @@ export function WorkplaneViewport({
   const touchMultiSelectAvailable = touchMultiSelectVisible
     && !workplaneMode && !splitActive && !pickOnly
     && !alignMode && !mirrorMode
-    && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !cornerRulerMode
+    && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !cornerRulerMode && !protractorOpen
     && !modifierActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !cadFacePick;
   useEffect(() => {
     // A button that is not on the screen cannot be locked any more.
@@ -1881,6 +1917,10 @@ export function WorkplaneViewport({
   const cornerRulerOverlayRef = useRef<CornerRulerOverlayState | null>(null);
   const cornerRulerIdRef = useRef(toolMemory?.current.cornerRulerId ?? storedCornerRulers.current.length);
   const cornerRulerDragRef = useRef<{ id: string; pointerId: number; moved: boolean } | null>(null);
+  const protractorOpenRef = useRef(false);
+  const protractorModelRef = useRef<ProtractorModel>(EMPTY_PROTRACTOR);
+  const protractorOverlayRef = useRef<ProtractorOverlayState | null>(null);
+  const protractorIdRef = useRef(0);
   const rulerDuplicateDragRef = useRef<{ pointerId: number; rulerId: string; shapeId: string; baseAlong: number; planeY: number; sourceX: number; sourceZ: number } | null>(null);
   const alignModeRef = useRef(alignMode);
   const multiSelectRef = useRef(multiSelect);
@@ -2809,6 +2849,7 @@ export function WorkplaneViewport({
         workspace.dimensionsAlwaysVisible,
       );
       syncTapeOverlay(threeRef.current, tapeModelRef.current, tapeOverlayRef, setTapeOverlay, workspace.accuracy);
+      syncProtractorOverlay(threeRef.current, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
       syncRulerDimensionOverlay(threeRef.current, shapesRef.current, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspace.accuracy);
       syncCornerRulerToolOverlay(threeRef.current, cornerRulerModelRef.current, shapesRef.current, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspace.accuracy);
       syncNoteOverlay(threeRef.current, notesRef.current, notesVisibleRef.current, noteOverlayRef, setNoteOverlay);
@@ -3039,6 +3080,7 @@ export function WorkplaneViewport({
         syncMirrorOverlay(state, mirrorReferenceShapesRef.current, selectedIdsRef.current, mirrorModeRef.current, mirrorOverlayRef, setMirrorOverlay);
         syncTapeOverlay(state, tapeModelRef.current, tapeOverlayRef, setTapeOverlay, workspaceRef.current.accuracy);
         syncSectionMeasureOverlay(state, sectionMeasureModeRef.current && sectionSettingsRef.current.enabled, sectionMeasureRef.current, sectionMeasureOverlayRef, setSectionMeasureOverlay, workspaceRef.current.accuracy);
+        syncProtractorOverlay(state, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
         syncClearanceMarkOverlay(state, clearanceMarkRef.current, clearanceMarkOverlayRef, setClearanceMarkOverlay);
         syncRulerDimensionOverlay(state, previewShapes, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspaceRef.current.accuracy);
         syncCornerRulerToolOverlay(state, cornerRulerModelRef.current, previewShapes, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspaceRef.current.accuracy);
@@ -3577,6 +3619,22 @@ export function WorkplaneViewport({
     }
   }, [storeTapeModel]);
 
+  /** The protractor's measurement, on screen at once; the render loop follows it while the view turns. */
+  const storeProtractorModel = useCallback((next: ProtractorModel) => {
+    protractorModelRef.current = next;
+    const state = threeRef.current;
+    if (!state) return;
+    syncProtractorOverlay(state, protractorOpenRef.current, next, protractorOverlayRef, setProtractorOverlay);
+    state.needsRender = true;
+  }, []);
+
+  /** Opens or puts away the protractor; put away, its measurement goes with it, as nothing of it is saved. */
+  const setProtractorActive = useCallback((active: boolean) => {
+    protractorOpenRef.current = active;
+    setProtractorOpen(active);
+    if (!active) storeProtractorModel({ ...EMPTY_PROTRACTOR, kind: protractorModelRef.current.kind });
+  }, [storeProtractorModel]);
+
   // A shape taken up for placing puts down the measuring tools that would
   // otherwise catch its click (the editor does the same for its own tools).
   useEffect(() => {
@@ -3587,7 +3645,8 @@ export function WorkplaneViewport({
     cornerRulerModeRef.current = false;
     setCornerRulerMode(false);
     setSectionMeasureMode(false);
-  }, [cruiseAsset, setTapeActive]);
+    setProtractorActive(false);
+  }, [cruiseAsset, setProtractorActive, setTapeActive]);
 
   const resolveTapeCandidate = useCallback(
     (
@@ -5667,10 +5726,125 @@ export function WorkplaneViewport({
   const toggleCornerRulerTool = useCallback(() => {
     if (splitActiveRef.current) return;
     const next = !cornerRulerModeRef.current;
-    if (next) onCancelCruise?.();
+    if (next) {
+      onCancelCruise?.();
+      setProtractorActive(false);
+    }
     cornerRulerModeRef.current = next;
     setCornerRulerMode(next);
-  }, [onCancelCruise]);
+  }, [onCancelCruise, setProtractorActive]);
+
+  /** A point for the protractor: a corner or an edge of a body, a spot on it, or a place on the plate. */
+  const resolveProtractorPoint = useCallback((clientX: number, clientY: number) => {
+    const state = threeRef.current;
+    if (!state) return null;
+    const visibleIds = shapesRef.current.filter((shape) => !shape.hidden).map((shape) => shape.id);
+    const candidate = visibleIds.length > 0 ? pickModelTapeCandidate(state, visibleIds, clientX, clientY) : null;
+    const id = `protractor-point-${++protractorIdRef.current}`;
+    if (candidate) return { id, x: candidate.x, y: candidate.y, z: candidate.z, ...(candidate.attachment ? { attachment: candidate.attachment } : {}) };
+    const raw = toRawPlanePoint(clientX, clientY, state.dragPlane);
+    if (!raw) return null;
+    const step = snapStep(snapRef.current);
+    return { id, x: snapValue(raw.x, step), y: 0, z: snapValue(raw.z, step) };
+  }, [toRawPlanePoint]);
+
+  /** Opens the protractor; one measuring tool takes the clicks at a time, so the others are put down. */
+  const openProtractor = useCallback(() => {
+    setTapeActive(false);
+    leaveTapeSubModes();
+    setTapeToolsOpen(false);
+    cornerRulerModeRef.current = false;
+    setCornerRulerMode(false);
+    setSectionMeasureMode(false);
+    onWorkplaneModeChange(false);
+    onCancelCruise?.();
+    setProtractorActive(true);
+  }, [onCancelCruise, onWorkplaneModeChange, setProtractorActive, setTapeActive]);
+
+  const toggleProtractor = useCallback(() => {
+    if (splitActiveRef.current) return;
+    if (protractorOpenRef.current) {
+      setProtractorActive(false);
+      return;
+    }
+    openProtractor();
+    onNotice?.(protractorHint(protractorModelRef.current.kind));
+  }, [onNotice, openProtractor, setProtractorActive]);
+
+  // MCP: an angle shown with the protractor, from three points or two faces given in the world (#1228).
+  useEffect(() => {
+    window.layerlingProtractor = (request) => {
+      const state = threeRef.current;
+      if (request.clear || !state) {
+        setProtractorActive(false);
+        return { shown: false };
+      }
+      const vector = ({ x, y, z }: { x: number; y: number; z: number }) => new THREE.Vector3(x, y, z);
+      const model: ProtractorModel = request.faces
+        ? {
+            ...EMPTY_PROTRACTOR,
+            kind: "faces",
+            faces: request.faces.map((face) => protractorFaceFromWorld(state, face.shapeId, vector(face.point), vector(face.normal), `protractor-face-${++protractorIdRef.current}`)),
+          }
+        : {
+            ...EMPTY_PROTRACTOR,
+            kind: "points",
+            points: (request.points ?? []).map((point) => ({ id: `protractor-point-${++protractorIdRef.current}`, x: point.x, y: point.y, z: point.z })),
+          };
+      if (!protractorOpenRef.current) openProtractor();
+      setProtractorKind(model.kind);
+      storeProtractorModel(model);
+      return { shown: true, ...(protractorReading(state, model) ?? {}) };
+    };
+    return () => {
+      delete window.layerlingProtractor;
+    };
+  }, [openProtractor, setProtractorActive, storeProtractorModel]);
+
+  const chooseProtractorKind = useCallback((kind: ProtractorKind) => {
+    setProtractorKind(kind);
+    storeProtractorModel({ ...EMPTY_PROTRACTOR, kind });
+    onNotice?.(protractorHint(kind));
+  }, [onNotice, storeProtractorModel]);
+
+  const clearProtractor = useCallback(() => {
+    storeProtractorModel({ ...EMPTY_PROTRACTOR, kind: protractorModelRef.current.kind });
+  }, [storeProtractorModel]);
+
+  /** What the next click would measure, while the pointer moves; a finished angle waits for the click that starts the next. */
+  const updateProtractorHover = useCallback((clientX: number, clientY: number) => {
+    const state = threeRef.current;
+    if (!state) return;
+    const model = protractorModelRef.current;
+    if (model.kind === "points") {
+      storeProtractorModel({ ...model, hoverPoint: model.points.length < 3 ? resolveProtractorPoint(clientX, clientY) : null });
+      return;
+    }
+    const face = model.faces.length < 2 ? pickProtractorFace(state, clientX, clientY) : null;
+    const hoverFace = face && face !== "curved" ? protractorFaceFromWorld(state, face.shapeId, face.point, face.normal, "protractor-hover") : null;
+    storeProtractorModel({ ...model, hoverFace });
+  }, [resolveProtractorPoint, storeProtractorModel]);
+
+  /** A click with the protractor: the next point or face; after a finished angle, the first of a new one. */
+  const placeProtractorAt = useCallback((clientX: number, clientY: number) => {
+    const state = threeRef.current;
+    if (!state) return;
+    const model = protractorModelRef.current;
+    if (model.kind === "points") {
+      const point = resolveProtractorPoint(clientX, clientY);
+      if (!point) return;
+      storeProtractorModel({ ...model, points: model.points.length >= 3 ? [point] : [...model.points, point], hoverPoint: null });
+      return;
+    }
+    const face = pickProtractorFace(state, clientX, clientY);
+    if (face === "curved") {
+      onNotice?.(t("status.protractorFlatFace"));
+      return;
+    }
+    if (!face) return;
+    const picked = protractorFaceFromWorld(state, face.shapeId, face.point, face.normal, `protractor-face-${++protractorIdRef.current}`);
+    storeProtractorModel({ ...model, faces: model.faces.length >= 2 ? [picked] : [...model.faces, picked], hoverFace: null });
+  }, [onNotice, resolveProtractorPoint, storeProtractorModel]);
 
   /** Der Griff ist immer direkt ziehbar, ohne eigenen Verschieben-Modus - wie bei einer Notiz-Nadel, nicht wie beim Massband (das mehrere Punkte je Strecke verwaltet und deshalb einen Modus braucht). Ein Klick ohne Zug dreht die Instanz um 90 Grad - wie in similar tools. */
   const handleCornerRulerHandlePointerDown = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string) => {
@@ -5917,6 +6091,12 @@ export function WorkplaneViewport({
         event.preventDefault();
         const snap = pickSectionMeasurePoint(event.clientX, event.clientY);
         if (snap) placeSectionMeasurePoint(snap.point);
+        return;
+      }
+
+      if (protractorOpenRef.current) {
+        event.preventDefault();
+        placeProtractorAt(event.clientX, event.clientY);
         return;
       }
 
@@ -6373,6 +6553,7 @@ export function WorkplaneViewport({
       beginLiftDuplicate,
       clearMoveDimensions,
       modifierActive,
+      placeProtractorAt,
       onAlignAnchorChange,
       onDuplicateShapesMoved,
       onInteractionActiveChange,
@@ -6490,6 +6671,10 @@ export function WorkplaneViewport({
       if (sectionMeasureModeRef.current && sectionSettingsRef.current.enabled) {
         sectionMeasureRef.current = { ...sectionMeasureRef.current, hover: pickSectionMeasurePoint(event.clientX, event.clientY) };
         if (threeRef.current) threeRef.current.needsRender = true;
+        return;
+      }
+      if (protractorOpenRef.current) {
+        updateProtractorHover(event.clientX, event.clientY);
         return;
       }
       if (tapeModeRef.current) {
@@ -6621,7 +6806,7 @@ export function WorkplaneViewport({
         threeRef.current.needsRender = true;
       }
     },
-    [pickPlacementSurface, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateTapeHover, updateTransform],
+    [pickPlacementSurface, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
   );
 
   useEffect(() => {
@@ -7094,13 +7279,14 @@ export function WorkplaneViewport({
     setTapeToolsOpen(next);
     if (next) {
       setSectionViewOpen(false);
+      setProtractorActive(false);
     }
     setTapeActive(false);
     leaveTapeSubModes();
     if (next) {
       onWorkplaneModeChange(false);
     }
-  }, [onWorkplaneModeChange, tapeToolsOpen, setTapeActive]);
+  }, [onWorkplaneModeChange, tapeToolsOpen, setProtractorActive, setTapeActive]);
 
   const activateTapeAdd = useCallback(() => {
     if (splitActiveRef.current) return;
@@ -7156,7 +7342,8 @@ export function WorkplaneViewport({
     setTapeActive(false);
     leaveTapeSubModes();
     tapePointDragRef.current = null;
-  }, [setTapeActive]);
+    setProtractorActive(false);
+  }, [setProtractorActive, setTapeActive]);
 
   const syncSectionClippingState = useCallback((settings: SectionPlaneSettings) => {
     const state = threeRef.current;
@@ -7506,6 +7693,9 @@ export function WorkplaneViewport({
         leaveTapeSubModes();
         tapePointDragRef.current = null;
         setTapeToolsOpen(false);
+      } else if (event.key === "Escape" && protractorOpenRef.current) {
+        event.preventDefault();
+        setProtractorActive(false);
       } else if (event.key === "Escape" && cornerRulerModeRef.current) {
         event.preventDefault();
         cornerRulerModeRef.current = false;
@@ -7571,7 +7761,7 @@ export function WorkplaneViewport({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [chooseSnapGrid, focusSelection, lookOntoWorkplane, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
+  }, [chooseSnapGrid, focusSelection, lookOntoWorkplane, onNotice, resetPlacementWorkplane, resetView, tapeToolsOpen, sectionViewOpen, setPlacementWorkplaneAtSelection, setProtractorActive, setTapeActive, setViewCubeFace, showDimensions, togglePlacementWorkplane, toggleProjection, zoomCamera]);
 
   return (
     <main className="workplane-stage">
@@ -7758,6 +7948,33 @@ export function WorkplaneViewport({
               >
                 <FramingSquareIcon size={24} strokeWidth={2.15} aria-hidden="true" />
               </button>
+            </div>
+            <div className="protractor-control-group">
+              <button
+                className={protractorOpen ? "active" : ""}
+                aria-label={t("camera.protractor")}
+                title={t("camera.protractor")}
+                aria-expanded={protractorOpen}
+                aria-controls="protractor-tool-popover"
+                disabled={splitActive}
+                onClick={toggleProtractor}
+              >
+                <ProtractorIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+              </button>
+              {protractorOpen ? (
+                <MovableProtractorPanel>
+                  <button className={protractorKind === "points" ? "active" : ""} aria-label={t("camera.protractorPoints")} title={t("camera.protractorPointsHint")} aria-pressed={protractorKind === "points"} onClick={() => chooseProtractorKind("points")}>
+                    <ProtractorIcon size={20} strokeWidth={2.25} aria-hidden="true" />
+                  </button>
+                  <button className={protractorKind === "faces" ? "active" : ""} aria-label={t("camera.protractorFaces")} title={t("camera.protractorFacesHint")} aria-pressed={protractorKind === "faces"} onClick={() => chooseProtractorKind("faces")}>
+                    <Cuboid size={20} strokeWidth={2.25} aria-hidden="true" />
+                  </button>
+                  <button className="tape-clear-button" aria-label={t("camera.protractorClear")} title={t("camera.protractorClear")} onClick={clearProtractor}>
+                    <Trash2 size={19} strokeWidth={2.25} aria-hidden="true" />
+                  </button>
+                  <GuideHelpLink section="protractor" className="tape-popover-help" iconSize={20} strokeWidth={2.25} />
+                </MovableProtractorPanel>
+              ) : null}
             </div>
             <div className="section-control-group">
               <button
@@ -7973,7 +8190,10 @@ export function WorkplaneViewport({
                           className={`section-action-btn section-measure-btn ${sectionMeasureMode ? "active" : ""}`}
                           aria-pressed={sectionMeasureMode}
                           onClick={() => {
-                            if (!sectionMeasureModeRef.current) onCancelCruise?.();
+                            if (!sectionMeasureModeRef.current) {
+                              onCancelCruise?.();
+                              setProtractorActive(false);
+                            }
                             setSectionMeasureMode((current) => !current);
                           }}
                           title={t("camera.sectionMeasureHint")}
@@ -8118,7 +8338,7 @@ export function WorkplaneViewport({
         )}
       </div>
 
-      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || cadFacePick ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""}`} aria-label={t("aria.workplane")}>
+      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${protractorOpen ? "protractor-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || cadFacePick ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""}`} aria-label={t("aria.workplane")}>
         <div className="workplane-plane">
           <div
             className="three-workplane-host"
@@ -8252,6 +8472,7 @@ export function WorkplaneViewport({
               onHandlePointerUp={handleRulerDuplicatePointerUp}
             />
           ) : null}
+          {!workplaneMode && !splitActive && protractorOverlay ? <ProtractorOverlay overlay={protractorOverlay} /> : null}
           {!workplaneMode && !splitActive && cornerRulerOverlay && cornerRulerOverlay.items.length > 0 ? (
             <CornerRulerToolOverlay
               overlay={cornerRulerOverlay}

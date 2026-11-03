@@ -204,6 +204,7 @@ import { projectedEdgesPath } from "@/lib/sketchEdges";
 import { useRememberedFlag } from "@/lib/useRememberedFlag";
 import { BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportEvent } from "@/lib/bugReport";
 import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
+import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
@@ -13276,6 +13277,49 @@ export function LayerlingEditor({
           ...(typeof params.visible === "boolean" ? { visible: params.visible } : {}),
           ...(typeof params.dimensions === "boolean" ? { dimensions: params.dimensions } : {}),
         });
+      }
+
+      if (command.action === "measure_angle") {
+        // The protractor (#1228): the angle at the first of three points, or between two flat faces from list_faces.
+        if (params.clear === true) {
+          window.layerlingProtractor?.({ clear: true });
+          return { shown: false };
+        }
+        const show = params.show !== false;
+        const shownWith = (request: Parameters<NonNullable<typeof window.layerlingProtractor>>[0]) => {
+          if (!show) return false;
+          if (!window.layerlingProtractor) throw new Error("The protractor is not available in this editor (a sketch is open, or the second view); give show false to only measure");
+          return window.layerlingProtractor(request).shown;
+        };
+        const round = (value: number) => Number(value.toFixed(4));
+        if (params.points !== undefined) {
+          const points = Array.isArray(params.points) ? params.points.map((entry: unknown) => mcpFiniteNumberArray(entry)) : [];
+          if (points.length !== 3 || points.some((point: number[]) => point.length !== 3)) {
+            throw new Error("points must be three [x, y, z] points in world coordinates (y up), the corner first");
+          }
+          const [vertex, a, b] = points.map(([x, y, z]: number[]) => ({ x, y, z }));
+          const angle = angleAtVertex(vertex, a, b);
+          if (angle === null) throw new Error("A side point lies on the corner, so there is no angle");
+          return { angle: round(angle), text: formatProtractorAngle(angle), shown: shownWith({ points: [vertex, a, b] }) };
+        }
+        if (params.faces !== undefined) {
+          if (!Array.isArray(params.faces) || params.faces.length !== 2) throw new Error("faces must be two entries, each { id, faceId } from layerling_list_faces");
+          const faces: Array<{ shapeId: string; point: { x: number; y: number; z: number }; normal: { x: number; y: number; z: number } }> = [];
+          for (const entry of params.faces as Array<{ id?: unknown; faceId?: unknown }>) {
+            const target = findShape(entry?.id);
+            if (!target) throw new Error("Object not found");
+            invalidateCadModifierSession();
+            const { response } = await prepareCadModifierForMcp(target, 25, { faces: true });
+            const face = (response.faces?.list ?? []).find((candidate) => candidate.id === entry?.faceId);
+            if (!face) throw new Error(`Face ${String(entry?.faceId)} not found on ${target.id}; take the ids from layerling_list_faces`);
+            if (!face.normal) throw new Error(`Face ${face.id} is not flat (${face.kind}); the protractor measures between flat faces`);
+            faces.push({ shapeId: target.id, point: face.center, normal: face.normal });
+          }
+          const angles = angleBetweenFaces(faces[0].normal, faces[1].normal);
+          if (!angles) throw new Error("A face has no normal to measure by");
+          return { angle: round(angles.angle), other: round(angles.other), text: formatFaceAngles(angles), shown: shownWith({ faces }) };
+        }
+        throw new Error("Give points (three [x, y, z], the corner first) or faces (two { id, faceId } from layerling_list_faces), or clear true");
       }
 
       if (command.action === "set_section_view") {

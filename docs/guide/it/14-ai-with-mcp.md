@@ -153,6 +153,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_show_workplane` | Nasconde o mostra il piano con la griglia, per esempio per fotografare la parte inferiore (modifica solo la vista). |
 | `layerling_set_section_view` | Apre la vista lungo un piano di sezione per mostrare l’interno; non taglia realmente il pezzo (modifica solo la vista). |
 | `layerling_measurements` | mostra o nasconde le misurazioni del metro a nastro e le elenca con le loro lunghezze, e nasconde o mostra le misure attorno alla selezione come [[Q]] |
+| `layerling_measure_angle` | misura un angolo come il goniometro: al vertice di tre punti o tra due facce piane, e lo mostra nella vista |
 | `layerling_saved_view` | Salva la vista corrente con il tasto 7, 8, 9 o 0 e la richiama in seguito, come con Maiusc+tasto e poi il tasto (modifica solo la vista). Imposta anche la vista di avvio dei nuovi progetti. |
 | `layerling_clear_history` | Elimina definitivamente tutti i passaggi annullabili, come il pulsante «Elimina cronologia» nella vista Cronologia; richiede `confirm: true`. |
 | `layerling_set_history_view` | Mostra uno stato precedente del progetto, come la vista Cronologia. Il progetto vero e proprio non viene modificato; gli strumenti di modifica restano in attesa finché la vista non viene chiusa. |

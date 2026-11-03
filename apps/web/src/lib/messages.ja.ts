@@ -207,7 +207,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "welcome.morePivotTitle": "回転の中心",
   "welcome.morePivotBody": "ボディの中心ではなく、パイプ端の軸や面の中心のまわりで回転します。単一のボディでは、その中心がボディに付いて回ります。",
   "welcome.moreMeasureTitle": "計測",
-  "welcome.moreMeasureBody": "メジャー、定規、角定規、原点までの距離（複数のボディを選択した場合も）、作業平面上のメモ、そしてモデルを切り開いて内側を見る断面表示。断面上で壁の厚さや隙間を測り、レーザー加工やテンプレート用にSVGとして保存できます。",
+  "welcome.moreMeasureBody": "メジャー、定規、角定規、分度器（頂点や2つの面の間の角度）、原点までの距離（複数のボディを選択した場合も）、作業平面上のメモ、そしてモデルを切り開いて内側を見る断面表示。断面上で壁の厚さや隙間を測り、レーザー加工やテンプレート用にSVGとして保存できます。",
   "welcome.moreAttachmentsTitle": "デザインといっしょのファイル",
   "welcome.moreAttachmentsBody": ".mdや.txtのメモや一覧、プリントしたパーツの写真（.png、.jpg、.webp）、PDFのデータシートを、デザインの中に入れておけます。.lylファイルといっしょに運ばれます。目のボタンで、テキストや画像をウィンドウで見られます。PDFはダウンロードされます。",
   "welcome.moreSaveTitle": "自分のフォルダーに保存",

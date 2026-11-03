@@ -46,6 +46,15 @@ Mit dem Mittelpunkt zählen die grünen Zahlen bis zur Mitte des Körpers, auch 
 
 Das Maßband und das Winkellineal bleiben stehen, wenn du eine Skizze machst und in die 3D-Ansicht zurückkehrst. Beide stehen nicht im Verlauf. Das Winkellineal wird mit dem Entwurf gespeichert, ebenso die Messungen des Maßbands, im Browser und in der .lyl-Datei: Beim Öffnen des Entwurfs sind sie wieder da. Der Augenknopf unter den Maßband-Knöpfen blendet alle Messungen aus und wieder ein; ob sie ausgeblendet sind, wird mitgespeichert, und wer eine Messung setzt, verschiebt oder löscht, sieht sie vorher wieder.
 
+## Der Winkelmesser
+
+Mit {{ui:camera.protractor}} in der Ansichtsleiste misst du Winkel. Daneben öffnet sich eine Knopfreihe, und bis du den Knopf noch einmal anklickst oder [[Esc]] drückst, misst ein Klick in die Ansicht mit dem Winkelmesser. Wie das Maßband rastet er an Ecken und Kanten von Körpern ein; neben den Körpern setzt er einen Punkt auf die Platte.
+
+- {{ui:camera.protractorPoints}}: erst die Ecke des Winkels anklicken, dann auf jedem Schenkel einen Punkt. Schon beim Setzen des letzten Punkts steht der Winkel da; nach dem dritten Klick bleibt er, mit einem Bogen zwischen den Schenkeln. Gemessen wird der Winkel an der Ecke, von 0° bis 180°.
+- {{ui:camera.protractorFaces}}: zwei ebene Flächen anklicken. Ein kurzer blauer Strich auf jeder zeigt, wohin sie schaut, und die Beschriftung nennt beide Winkel, die die Flächen bilden, den kleineren zuerst: eine 45°-Fase gegen die Oberseite ergibt 45° · 135°, zwei Seiten eines Quaders nur 90°. Eine gewölbte Fläche hat keine einzelne Richtung, deshalb verlangt der Winkelmesser eine ebene.
+
+Der nächste Klick nach einem fertigen Winkel beginnt einen neuen, {{ui:camera.protractorClear}} entfernt ihn. Der Winkel folgt den Körpern, wenn sie verschoben oder gedreht werden. Gespeichert wird nichts davon, auch nicht im Verlauf: Legst du den Winkelmesser weg, ist der Winkel fort.
+
 ## Abstände zum Nullpunkt und beim Verschieben
 
 In den Einstellungen unter {{ui:workspace.appearance}} gibt es zwei Schalter für laufende Maße:

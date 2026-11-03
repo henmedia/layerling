@@ -44,6 +44,15 @@ Met het middelpunt tellen de groene getallen tot het midden van het lichaam, ook
 
 Zowel het meetlint als de winkelhaak blijven staan terwijl je schetst en terugkeert naar de 3D-weergave. Geen van beide komt in de geschiedenis. De winkelhaak wordt met het ontwerp opgeslagen, en de metingen van het meetlint ook, in de browser en in het .lyl-bestand: als je het ontwerp opent, zijn ze er weer. De oogknop tussen de knoppen van het meetlint verbergt alle metingen en toont ze weer; of ze verborgen zijn, wordt ook bewaard, en wie een meting zet, verplaatst of verwijdert, ziet ze eerst weer.
 
+## De gradenboog
+
+Met {{ui:camera.protractor}} in de weergavebalk meet je hoeken. Ernaast gaat een rij knoppen open, en tot je de knop opnieuw aanklikt of op [[Esc]] drukt, meet een klik in de weergave met de gradenboog. Net als het meetlint klikt hij vast op hoeken en randen van lichamen; naast de lichamen zet hij een punt op de plaat.
+
+- {{ui:camera.protractorPoints}}: klik eerst op het hoekpunt van de hoek, dan op een punt op elk been. Terwijl je het laatste punt plaatst, staat de hoek er al; na de derde klik blijft hij staan, met een boog tussen de benen. Het is de hoek in het hoekpunt, van 0° tot 180°.
+- {{ui:camera.protractorFaces}}: klik op twee platte vlakken. Een kort blauw streepje op elk vlak toont welke kant het op kijkt, en het label geeft beide hoeken die de vlakken maken, de kleinste eerst: een afschuining van 45° tegen de bovenkant geeft 45° · 135°, twee zijden van een blok alleen 90°. Een gebogen vlak heeft geen enkele richting, dus vraagt de gradenboog om een plat vlak.
+
+De volgende klik na een afgemaakte hoek begint een nieuwe, en {{ui:camera.protractorClear}} verwijdert hem. De hoek volgt de lichamen als ze verschuiven of draaien. Niets ervan wordt opgeslagen of komt in de geschiedenis: hij is weg zodra je de gradenboog wegzet.
+
 ## Afstanden tot de oorsprong en tijdens het verplaatsen
 
 In de instellingen onder {{ui:workspace.appearance}} staan twee schakelaars voor live maten:
