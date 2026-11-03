@@ -11330,6 +11330,48 @@ html[data-theme="dark"] .font-picker-option.action {
   pointer-events: auto;
 }
 
+/* While overhangs are shown: how much needs supports and the steepest overhang, under the view. */
+.overhang-figures {
+  position: fixed;
+  bottom: 44px;
+  left: 50%;
+  z-index: 29;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 7px 14px 7px 10px;
+  color: #5c442b;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #ded0c2;
+  border-radius: 999px;
+  box-shadow: 0 2px 12px rgba(68, 49, 28, 0.16);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Above the warning that a body leaves the build volume, and above the open group's bar with it. */
+.overhang-figures.stacked-1 {
+  bottom: 88px;
+}
+
+.overhang-figures.stacked-2 {
+  bottom: 132px;
+}
+
+/* The hatching's own red and white, so the line reads as the hatched faces' figure. */
+.overhang-figures-swatch {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #c8372d;
+  border-radius: 4px;
+  background: repeating-linear-gradient(135deg, #e0453a 0 3px, #ffffff 3px 6px);
+}
+
 .bed-overhang-dismiss:hover,
 .bed-overhang-dismiss:focus-visible {
   background: rgba(216, 106, 0, 0.14);
@@ -12932,6 +12974,12 @@ html[data-theme="dark"] .split-panel-footer .secondary {
 
 html[data-theme="dark"] .workspace-printer-info {
   color: #b9a58f;
+}
+
+html[data-theme="dark"] .overhang-figures {
+  color: #f1e4d3;
+  background: rgba(40, 32, 24, 0.94);
+  border-color: rgba(227, 181, 122, 0.35);
 }
 
 html[data-theme="dark"] .bed-overhang-warning {
@@ -15444,20 +15492,34 @@ html[data-theme="dark"] .color-recent {
   min-height: 220px;
 }
 
+/* Wide: the board on the left, the settings in a column on the right. The column scrolls on its own when the
+   window is lower than it (Discussion #1186: with a photo, its settings ran out of a low window). */
 @media (min-width: 901px) {
   .vase-drawing-window .vz {
     grid-template-columns: minmax(0, 1fr) minmax(220px, 270px);
-    grid-template-rows: repeat(5, min-content) minmax(0, 1fr);
     column-gap: 14px;
   }
 
   .vase-drawing-window .vz > .vz-board {
-    grid-row: 1 / -1;
     grid-column: 1;
   }
 
-  .vase-drawing-window .vz > :not(.vz-board) {
+  .vase-drawing-window .vz > .vz-side {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     grid-column: 2;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 2px 4px 2px 2px;
+    /* A thin bar that shows, as on the properties panel: it says there is more below. */
+    scrollbar-color: #cdbfa9 transparent;
+    scrollbar-width: thin;
+  }
+
+  html[data-theme="dark"] .vase-drawing-window .vz > .vz-side {
+    scrollbar-color: #5a4a3a transparent;
   }
 }
 

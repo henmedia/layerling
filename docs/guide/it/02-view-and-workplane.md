@@ -159,7 +159,7 @@ Con {{ui:workspace.startInPerspective}} l’editor si apre nella vista prospetti
 
 {{ui:workspace.zoomSpeed}} è un cursore da lento a veloce e regola la velocità dello zoom con rotellina e trackpad; i pulsanti e i tasti dello zoom mantengono i propri piccoli incrementi. Con {{ui:workspace.cameraInertia}}, dopo che rilasci il mouse la vista continua a ruotare per un momento e poi rallenta gradualmente. Se disattivi l’opzione, si ferma subito, come in Tinkercad e Fusion 360.
 
-{{ui:workspace.overhangAngle}} imposta l’angolo oltre il quale una faccia viene considerata uno sbalzo quando attivi Mostra sbalzi nel menu della visibilità: quelle facce sono tratteggiate in rosso e bianco. 30° è un’impostazione prudente; 70° presuppone un buon raffreddamento della stampa. Il valore iniziale consigliato è 45°.
+{{ui:workspace.overhangAngle}} imposta l’angolo oltre il quale una faccia viene considerata uno sbalzo quando attivi Mostra sbalzi nel menu della visibilità: quelle facce sono tratteggiate in rosso e bianco. 30° è un’impostazione prudente; 70° presuppone un buon raffreddamento della stampa. Il valore iniziale consigliato è 45°. Finché sono mostrate, una riga sotto la vista indica la sporgenza più ripida e quanti cm² richiedono supporti.
 
 {{ui:workspace.booleanTriangleLimit}} limita il numero di triangoli che può avere una mesh importata quando la tagli, la unisci o ne calcoli l’intersezione, perché queste operazioni vengono elaborate nel browser. Le mesh che superano il limite non vengono elaborate: semplifica prima la mesh oppure aumenta il limite se il computer è abbastanza potente. Un limite più alto può bloccare l’editor per alcuni secondi.
 

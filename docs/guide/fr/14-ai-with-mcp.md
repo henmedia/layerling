@@ -35,6 +35,14 @@ Elle installe ce dont layerling a besoin, télécharge layerling dans le dossier
 
 **5. Dire à Claude quoi construire.** Par exemple : « Utilise les outils de layerling et construis-moi une boîte ronde de 60 mm de diamètre et 40 mm de haut, avec une paroi de 2,5 mm. » Si aucun éditeur n'est ouvert, Claude en ouvre un dans votre navigateur, y construit la boîte pas à pas et prend des images pour vérifier son travail. Vous regardez et pouvez tout modifier vous-même à tout moment.
 
+**Sur un Mac**, c'est pareil, avec ces changements. À l'étape 1, ouvre l'application Terminal (appuie sur Cmd+Espace, tape `Terminal` et appuie sur Entrée), colle cette ligne et appuie sur Entrée :
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Si Git ou Node.js manque, elle te dit quoi installer (macOS propose Git dans une fenêtre, Node.js s'installe avec le programme d'installation de nodejs.org) ; ensuite, relance la même ligne. À l'étape 2, le raccourci sur le bureau s'appelle aussi « Start layerling ». À l'étape 3, installe l'application Claude pour Mac.
+
 > **Conseil :** Si quelque chose ne fonctionne pas, dites à Claude ce que vous voyez. Il peut lire l'erreur et la corrige le plus souvent lui-même. S'il ne se passe rien dans l'éditeur, vérifiez d'abord que layerling tourne toujours (étape 2).
 
 ## Configuration
@@ -114,6 +122,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_array_objects` | se multiplie en ligne ou sur un cercle |
 | `layerling_bundle_objects` | regroupe les objets comme Ctrl+B : ils se déplacent ensemble, gardent leur couleur et leur nature et sortent séparément lors d'un export |
 | `layerling_layer_text` | transforme un texte en une pile de calques pour une impression multicolore (lettres, bords plus larges, plaque sans trous) ou reconstitue une pile, avec un trou en porte-clés, les coins par calque et un bord de lettre arrondi ou chanfreiné ; avec une liste de noms, une balise par nom |
+| `layerling_text_block` | crée un bloc de texte : un texte devient la première de plusieurs lignes, chacune un texte à part sous celle du dessus, alignées à gauche, au centre ou à droite, chaque ligne de même taille ou plus petite |
 | `layerling_layer_icon` | transforme une icône SVG (le texte du fichier ou un corps d'esquisse extrudé) en une balise d'icône en couches pour une impression multicolore - l'icône, des bords plus larges, une plaque sans trous - ou en construit une à nouveau avec une nouvelle largeur ou des nouveaux calques ; avec un compte il remplit l'assiette de copies |
 | `layerling_create_qr_code` | crée un code QR à partir d'un texte ou d'une adresse web, comme {{ui:shape.qrCode}} dans la bibliothèque de formes - le code seul, en relief sur une plaque ou gravé, avec correction d'erreur, largeur, hauteur, zone de silence et en trou si demandé ; avertit quand un module passe sous 0,8 mm |
 | `layerling_create_sbc_board` | place une carte SBC en taille réelle, comme {{ui:shape.sbcBoard}} dans la bibliothèque de formes - Raspberry Pi 5, 4, 3 B+, Zero 2 W ou BIGTREETECH Pi, avec trous et connecteurs, le jeu autour des connecteurs du bord, la position et en trou pour découper un boîtier |

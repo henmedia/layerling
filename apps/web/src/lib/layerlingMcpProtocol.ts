@@ -147,6 +147,7 @@ export type LayerlingMcpCommandName =
   | "measure_section"
   | "bundle_objects"
   | "layer_text"
+  | "text_block"
   | "layer_icon"
   | "create_qr_code"
   | "create_sbc_board"

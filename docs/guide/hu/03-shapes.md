@@ -19,7 +19,7 @@ Egy lapon az alakzat a lap közepére ugrik, amint a mutató a közelébe ér, a
 
 Amit a tár kínál:
 
-- **Alapalakzatok:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (három-huszonnégy oldallal), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (három-huszonnégy oldallal, így háromoldalú is), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} és {{ui:shape.torus}}.
+- **Alapalakzatok:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (három-huszonnégy oldallal), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.curvedCone}} (oldala befelé trombitává hajlik, mint egy pszeudoszféra, vagy kifelé kupolává; ezt a {{ui:prop.curvedConeTop}} és a {{ui:prop.curvedConeBend}} állítja, és mint minden pontos test, kivájható és lekerekíthető), {{ui:shape.pyramid}} (három-huszonnégy oldallal, így háromoldalú is), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} és {{ui:shape.torus}}.
 - **Csövek:** {{ui:shape.tube}} és {{ui:shape.bentTube}}, ez utóbbi legfeljebb tizenkét egyenes darabból áll, köztük hajlításokkal, valamint az {{ui:shape.loft}}, amely egyik körvonalból a másikba vezet át, mondjuk négyzetből körbe.
 - **Díszítő alakzatok:** {{ui:shape.star}}, {{ui:shape.heart}} és {{ui:shape.crescent}}.
 - **Feliratok:** {{ui:shape.text}}, körív mentén is. Bővebben a [Szöveg](chapter:text) fejezetben.

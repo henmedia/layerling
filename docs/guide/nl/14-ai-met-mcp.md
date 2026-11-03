@@ -35,6 +35,14 @@ De regel installeert wat layerling nodig heeft, downloadt layerling naar de map 
 
 **5. Claude zeggen wat hij moet bouwen.** Bijvoorbeeld: "Gebruik de layerling-gereedschappen en bouw een ronde doos, 60 mm doorsnede en 40 mm hoog, met een wand van 2,5 mm." Is er geen editor open, dan opent Claude er een in je browser, bouwt de doos daar stap voor stap en maakt afbeeldingen om zijn werk te controleren. Jij kijkt mee en kunt op elk moment zelf iets veranderen.
 
+**Op een Mac** gaat het net zo, met deze wijzigingen. Open in stap 1 de app Terminal (druk op Cmd+spatie, typ `Terminal` en druk op Enter), plak deze regel en druk op Enter:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Ontbreekt Git of Node.js, dan zegt het script wat je moet installeren (macOS biedt Git aan in een venster, Node.js is een installatieprogramma op nodejs.org); voer daarna dezelfde regel nog een keer uit. In stap 2 heet de snelkoppeling op je bureaublad ook "Start layerling". Installeer in stap 3 de Claude-app voor Mac.
+
 > **Tip:** Werkt iets niet, vertel Claude dan wat je ziet. Hij kan de fout lezen en lost hem meestal zelf op. Gebeurt er niets in de editor, controleer dan eerst of layerling nog draait (stap 2).
 
 ## Instellen
@@ -114,6 +122,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_array_objects` | vermenigvuldigt in een rij of op een cirkel |
 | `layerling_bundle_objects` | bundelt objecten zoals Ctrl+B: ze bewegen samen, houden hun kleur en soort en gaan bij een export apart mee |
 | `layerling_layer_text` | maakt van een tekst een stapel lagen voor een meerkleurenprint (letters, bredere randen, een plaat zonder gaten) of bouwt een stapel opnieuw op, met een sleutelringgat, de hoeken per laag en een afgeronde of afgeschuinde letterrand; met een namenlijst één label per naam |
+| `layerling_text_block` | maakt een tekstblok: een tekst wordt de eerste van meerdere regels, elk een eigen tekst onder de vorige, links, gecentreerd of rechts uitgelijnd, elke regel even groot of kleiner |
 | `layerling_layer_icon` | maakt van een SVG-pictogram (de tekst van het bestand, of een geëxtrudeerd schetslichaam) een gelaagd pictogramlabel voor een meerkleurenprint - het pictogram, bredere randen, een plaat zonder gaten - of bouwt er een opnieuw op met een nieuwe breedte of nieuwe lagen; met een aantal vult het de plaat met kopieën |
 | `layerling_create_qr_code` | maakt van een tekst of webadres een QR-code, zoals {{ui:shape.qrCode}} in de vormenbibliotheek - alleen de code, verhoogd op een plaat of gegraveerd, met foutcorrectie, breedte, hoogte, stille zone en desgewenst als gat; waarschuwt als een module kleiner wordt dan 0,8 mm |
 | `layerling_create_sbc_board` | plaatst een SBC-bord op ware grootte, zoals {{ui:shape.sbcBoard}} in de vormenbibliotheek - Raspberry Pi 5, 4, 3 B+, Zero 2 W of BIGTREETECH Pi, met gaten en aansluitingen, de speling rond de randaansluitingen, de positie en als gat voor een behuizing |

@@ -35,6 +35,14 @@ It installs what layerling needs, downloads layerling into the folder `layerling
 
 **5. Tell Claude what to build.** For example: "Use the layerling tools and build me a round box, 60 mm across and 40 mm high, with a 2.5 mm wall." If no editor is open, Claude opens one in your browser, builds the box there step by step and takes pictures to check its work. You watch and can change anything yourself at any time.
 
+**On a Mac** it goes the same way, with these changes. In step 1, open the Terminal app (press Cmd+Space, type `Terminal` and press Enter), paste this line and press Enter:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+If Git or Node.js is missing, it tells you what to install (macOS offers Git in a window, Node.js comes as an installer from nodejs.org); afterwards run the same line again. In step 2, the shortcut on your desktop is also called "Start layerling". In step 3, install the Claude app for Mac.
+
 > **Tip:** If something does not work, tell Claude what you see. It can read the error and usually fixes it itself. If nothing happens in the editor, check first that layerling is still running (step 2).
 
 ## Setting up
@@ -118,6 +126,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_array_objects` | multiplies in a row or on a circle |
 | `layerling_bundle_objects` | bundles objects like Ctrl+B: they move together, keep their colour and kind and go out separately in an export |
 | `layerling_layer_text` | turns a text into a stack of layers for a multicolour print (letters, wider rims, a plate without holes) or builds a stack again, with a key ring hole, the corners per layer and a rounded or chamfered letter edge; with a name list, one tag per name |
+| `layerling_text_block` | makes a text block: a text becomes the first of several lines, each a text of its own under the one above, aligned left, centred or right, each line the same size or smaller |
 | `layerling_layer_icon` | turns an SVG icon (the text of the file, or an extruded sketch body) into a layered icon tag for a multicolour print - the icon, wider rims, a plate without holes - or builds one again with a new width or layers; with a count it fills the plate with copies |
 | `layerling_create_qr_code` | makes a QR code from a text or web address, like {{ui:shape.qrCode}} in the shape library - the code alone, raised on a plate or engraved, with error correction, width, height, quiet zone and as a hole if asked; it warns when a module gets under 0.8 mm |
 | `layerling_create_sbc_board` | places an SBC board true to size, like {{ui:shape.sbcBoard}} in the shape library - Raspberry Pi 5, 4, 3 B+, Zero 2 W or BIGTREETECH Pi, with its holes and connectors, the clearance round the edge connectors, the position and as a hole to cut a case |

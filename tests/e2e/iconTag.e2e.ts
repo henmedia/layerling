@@ -127,4 +127,32 @@ describe("icon tag layers with the real OCCT kernel", () => {
     expect(size(icon)[0]).toBeCloseTo(30 * (2 * 278 + 1) / side, 0);
     expect(size(plate)[0]).toBeGreaterThan(size(icon)[0] + 5.9);
   });
+
+  it("lays the plate under all of a traced QR code, whose big outline the kernel cannot move out (#1195)", () => {
+    // The picture of the report: 29 modules of 20 px with 20 px of white round them.
+    const modules = [
+      "#######..###.#..#.##..#######", "#.....#.##.#..####.##.#.....#", "#.###.#..#..###.#..#..#.###.#", "#.###.#..##..###..##..#.###.#",
+      "#.###.#.#.#...#..###..#.###.#", "#.....#..#...#...###..#.....#", "#######.#.#.#.#.#.#.#.#######", ".............##.##.##........",
+      "#.#.#.#..#....####......#..#.", "..###..##.##..##....###..#..#", "#.#..##...##.#..#...##.##.###", ".#..#.....#.#..###...#.....#.",
+      ".#..#.##.#.#.....#...##..#.##", "..##.#..##...#..##..###..#..#", "..###.#.....#.#.#......###.##", ".#..##.#..#####..###.....#.#.",
+      "##....#.....#.#..#..###..#.##", "...###.#.####.#.###.#.#..##.#", "#..##.##.##..#...##..##....##", ".#.......#..#..#.#.###.#.#.#.",
+      "#.##.##.##..#...##..#####....", "........##.#.#..#..##...#.###", "#######..####.#.#.###.#.##.##", "#.....#......##.###.#...##.##",
+      "#.###.#.##.#..####..#####...#", "#.###.#...#...#..#.#....#.###", "#.###.#.#..........#.#.###..#", "#.....#.....#....####..##..#.",
+      "#######.#.##..#..#.##.###..##",
+    ];
+    const side = 620;
+    const data = new Uint8ClampedArray(side * side * 4).fill(255);
+    modules.forEach((row, rowIndex) => [...row].forEach((module, column) => {
+      if (module !== "#") return;
+      for (let y = 20 + rowIndex * 20; y < 40 + rowIndex * 20; y += 1) {
+        for (let x = 20 + column * 20; x < 40 + column * 20; x += 1) data.fill(0, (y * side + x) * 4, (y * side + x) * 4 + 3);
+      }
+    }));
+    const source = scaledIconProfile(iconSourceProfile(sketchProfileFromSvg(traceRaster({ width: side, height: side, data }).svg)!), 50 / 580);
+    const bottom = ICON_TAG_LAYERS[ICON_TAG_LAYERS.length - 1];
+    const plate = build(iconLayerProfile(source, bottom));
+    // The whole of it, as the polygon stroke of the outline without its holes has it: one area with no gap.
+    const whole = strokedSketchProfile(runtime, silhouetteSketchProfile(iconLayerProfile(source, bottom)))!;
+    near(cad.getVolume(plate), cad.getVolume(area(whole)));
+  });
 });

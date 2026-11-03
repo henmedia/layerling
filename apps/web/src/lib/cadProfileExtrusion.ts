@@ -24,6 +24,7 @@ import { teardropExactSection } from "@/lib/teardropGeometry";
 import { isPolygonPortProfile, normalizePortCorner, portChamfer, portPolygonCorners } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile } from "@/lib/screwHoleGeometry";
+import { curvedConeSection } from "@/lib/curvedCone";
 import { finishingWasherMeasures } from "@/lib/finishingWasherGeometry";
 import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeRoundedBoxQuality, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
 import { textGlyphShapes, textKeyringOf } from "@/lib/textGeometry";
@@ -50,7 +51,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "curvedCone", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -1128,6 +1129,16 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       const loop: CadModifierProfileLoop = { x: 0, z: 0, segments: [{ kind: "line", x: radius, z: 0 }, { kind: "bezier", x: 0, z: shape.height, controls: [{ x: radius / 2, z: shape.height }] }, { kind: "line", x: 0, z: 0 }] };
       return { loops: [loop], frame: { kind: "revolution", height: shape.height, local: upright(depth / width) } };
     }
+    case "curvedCone": {
+      // The side's section is the quadratic Bezier curve of createCurvedConeGeometry, turned around the axis and
+      // stretched to the depth when the footprint is oval. Drawn with few sides it is faceted and stays on its display mesh.
+      if (!drawnRound(shape.sides, ROUND_FROM_SIDES, Math.floor(roundSideCount(shape.sides, width, depth)), width, depth)) return null;
+      const section = curvedConeSection(width, shape.height, shape.curvedConeTop, shape.curvedConeBend);
+      const segments: CadModifierProfileSegment[] = [{ kind: "line", x: section.base, z: 0 }, { kind: "bezier", x: section.top, z: shape.height, controls: [section.control] }];
+      if (section.top > 1e-9) segments.push({ kind: "line", x: 0, z: shape.height });
+      segments.push({ kind: "line", x: 0, z: 0 });
+      return { loops: [{ x: 0, z: 0, segments }], frame: { kind: "revolution", height: shape.height, local: upright(depth / width) } };
+    }
     case "sphere": {
       // SphereGeometry scaled to width, height and depth, standing on y = 0: a
       // half ellipse from the bottom pole over the equator to the top one,
@@ -1267,7 +1278,7 @@ function profileTransformForShape(shape: WorkplaneShape, local?: THREE.Matrix4) 
  * of the exact-body plan), an imported or grouped body, or a body that already
  * carries its own BREP.
  */
-const SIDED_ROUND_KINDS = new Set<WorkplaneShape["kind"]>(["cylinder", "ellipse", "cone", "tube", "ring", "roundRoof", "sphere", "halfSphere", "paraboloid"]);
+const SIDED_ROUND_KINDS = new Set<WorkplaneShape["kind"]>(["cylinder", "ellipse", "cone", "tube", "ring", "roundRoof", "sphere", "halfSphere", "paraboloid", "curvedCone"]);
 
 /**
  * The shape as designed round: a round kind's side or step count left unset,

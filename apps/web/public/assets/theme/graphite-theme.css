@@ -4656,6 +4656,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .font-picker-option.act
   border: 0;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .overhang-figures {
+  color: #464646;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #d0d0d0;
+  box-shadow: 0 2px 12px rgba(52, 52, 52, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .overhang-figures-swatch {
+  border: 1px solid #c8372d;
+  background: repeating-linear-gradient(135deg, #e0453a 0 3px, #ffffff 3px 6px);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .bed-overhang-dismiss:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .bed-overhang-dismiss:focus-visible {
   background: rgba(216, 106, 0, 0.14);
@@ -5584,6 +5596,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .split-panel-footer .se
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-info {
   color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .overhang-figures {
+  color: #e2e2e2;
+  background: rgba(38, 38, 38, 0.94);
+  border-color: rgba(227, 181, 122, 0.35);
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .bed-overhang-warning {
@@ -7237,6 +7255,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .color-recent {
   outline: none;
 }
 
+@media (min-width: 901px) {
+  :where(html[data-theme="dark"][data-palette="graphite"]) .vase-drawing-window .vz > .vz-side {
+    scrollbar-color: #bbbbbb transparent;
+  }
+
+  html[data-theme="dark"]:where([data-palette="graphite"]) .vase-drawing-window .vz > .vz-side {
+    scrollbar-color: #4c4c4c transparent;
+  }
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-panel > .edge-modifier-footer {
   background: inherit;
 }
@@ -7751,6 +7779,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note > 
   outline: 2px solid #d07313;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-play > button {
+  color: #535353;
+  background: #fff;
+  border: 1px solid #c8c8c8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-play > button.active {
+  color: #fff;
+  background: #d07313;
+  border-color: #d07313;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-play label {
+  color: #535353;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-step > svg {
   color: #797979;
 }
@@ -7906,6 +7950,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list-now 
   color: #5fd394;
 }
 
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-play > button:not(.active),
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-slider > button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-actions .secondary,
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-inside button {

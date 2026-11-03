@@ -35,6 +35,14 @@ Instala lo que layerling necesita, descarga layerling en la carpeta `layerling` 
 
 **5. Dile a Claude qué construir.** Por ejemplo: «Usa las herramientas de layerling y constrúyeme una caja redonda de 60 mm de diámetro y 40 mm de alto, con una pared de 2,5 mm». Si no hay ningún editor abierto, Claude abre uno en tu navegador, construye allí la caja paso a paso y hace capturas para comprobar su trabajo. Tú miras y puedes cambiar cualquier cosa en cualquier momento.
 
+**En un Mac** es igual, con estos cambios. En el paso 1, abre la aplicación Terminal (pulsa Cmd+Espacio, escribe `Terminal` y pulsa Intro), pega esta línea y pulsa Intro:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Si falta Git o Node.js, te dice qué instalar (macOS ofrece Git en una ventana, Node.js se instala con el instalador de nodejs.org); después ejecuta la misma línea otra vez. En el paso 2, el acceso directo del escritorio también se llama «Start layerling». En el paso 3, instala la aplicación Claude para Mac.
+
 > **Consejo:** Si algo no funciona, dile a Claude lo que ves. Puede leer el error y normalmente lo arregla solo. Si no pasa nada en el editor, comprueba primero que layerling sigue en marcha (paso 2).
 
 ## Configuración
@@ -118,6 +126,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_array_objects` | multiplica en una fila o en un círculo |
 | `layerling_bundle_objects` | crea un conjunto con objetos, como Ctrl+B: se mueven juntos, conservan su color y su tipo, y en una exportación salen por separado |
 | `layerling_layer_text` | convierte un texto en una pila de capas para una impresión multicolor (letras, contornos más anchos, una placa sin orificios) o vuelve a construir una pila, con orificio para llavero, las esquinas de cada capa y un canto de letra redondeado o achaflanado; con una lista de nombres, hace una placa por nombre |
+| `layerling_text_block` | crea un bloque de texto: un texto pasa a ser la primera de varias líneas, cada una un texto propio debajo de la anterior, alineadas a la izquierda, al centro o a la derecha, cada línea del mismo tamaño o más pequeña |
 | `layerling_layer_icon` | convierte un icono SVG (el texto del archivo o un cuerpo de boceto extruido) en una placa con icono por capas para una impresión multicolor (el icono, contornos más anchos, una placa sin orificios) o vuelve a construir una con otra anchura u otras capas; con un número, llena la placa de copias |
 | `layerling_create_qr_code` | crea un código QR a partir de un texto o una dirección web, como {{ui:shape.qrCode}} en la biblioteca de formas: el código solo, en relieve sobre una placa o grabado, con corrección de errores, anchura, altura, zona de silencio y, si se pide, como orificio; avisa cuando un módulo baja de 0,8 mm |
 | `layerling_create_sbc_board` | coloca una placa SBC a tamaño real, como {{ui:shape.sbcBoard}} en la biblioteca de formas: Raspberry Pi 5, 4, 3 B+, Zero 2 W o BIGTREETECH Pi, con orificios y conectores, la holgura alrededor de los conectores del borde, la posición y como orificio para recortar una caja |

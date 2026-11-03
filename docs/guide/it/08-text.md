@@ -18,6 +18,8 @@ Scegli {{ui:shape.text}} nella libreria delle forme e posizionalo. Nel campo {{u
 
 Inizialmente il testo è un unico corpo. Se vuoi modificare le lettere singolarmente, fai clic su {{ui:inspector.separateParts}}: ogni lettera diventa una forma separata.
 
+**Più righe:** Un testo ha una riga. Per un cartello o una targa con più righe, apri la scheda {{ui:textBlock.title}} sotto le impostazioni: scrivi le righe in {{ui:textBlock.lines}}, scegli {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} o {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} e {{ui:textBlock.step}}: all'80 % ogni riga è più piccola di un quinto rispetto a quella sopra. Il pulsante rende ogni riga un testo a sé sotto quella sopra, con il carattere, l'altezza e il riempimento di questo testo; la prima prende il posto di questo testo. Poi ogni riga può avere dimensione, carattere o colore propri.
+
 Puoi applicare smussi e raccordi anche agli spigoli del testo, diritto o curvo; vedi [Smussare gli spigoli e svuotare i corpi](chapter:edges-and-hollowing). Usa misure piccole, per esempio da 0,2 a 0,5 mm, perché i tratti delle lettere sono stretti.
 
 ## Caratteri tipografici personalizzati
@@ -153,9 +155,10 @@ Vuoi che il testo segua il bordo di una moneta, un coperchio o un anello invece 
 
 ![Il testo segue un cerchio. Tutte le lettere poggiano sulla stessa linea.](shot:curved-text)
 
-Attivandola, il testo segue il cerchio. Tutte le lettere poggiano sulla stessa linea di base e hanno una spaziatura uniforme, come nel testo normale. Ci sono quattro impostazioni:
+Attivandola, il testo segue il cerchio. Tutte le lettere poggiano sulla stessa linea di base e hanno una spaziatura uniforme, come nel testo normale. Ci sono cinque impostazioni:
 
 - **{{ui:prop.textRadius}}** (da 5 a 500 mm): raggio del cerchio su cui si dispone la linea di base delle lettere. Le lettere restano al loro posto; cambia solo la loro curvatura.
+- **{{ui:prop.textLetterWidth}}** (da 25 a 400 %): quanto è larga ogni lettera, in percentuale rispetto alla sua larghezza originale. Sotto 100 le lettere si stringono, sopra si allargano; l'altezza resta, e l'arco che occupano si allunga o si accorcia con loro. Per esempio per una scritta alta e stretta su una moneta. Nel testo dritto lo fa {{ui:prop.textStretch}} con la cornice.
 - **{{ui:nameTag.letterSize}}:** altezza delle lettere. Non dipende più dalla larghezza della forma.
 - **{{ui:prop.textInward}}:** sposta il testo dalla parte superiore a quella inferiore del cerchio. Le lettere sono rivolte verso il centro.
 - **{{ui:prop.textFlipped}}:** capovolge solo le lettere, per renderle leggibili dall’altro lato. Il testo resta nella stessa posizione sul cerchio.

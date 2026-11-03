@@ -14,6 +14,7 @@ export type ShapeKind =
   | "roundRoof"
   | "halfSphere"
   | "paraboloid"
+  | "curvedCone"
   | "torus"
   | "tube"
   | "bentTube"
@@ -128,6 +129,10 @@ export type ShapeCustomization = {
   segments?: number;
   topRadius?: number;
   baseRadius?: number;
+  /** Curved cone (#1211): the top's diameter as a share of the bottom's, 0 to 1. */
+  curvedConeTop?: number;
+  /** Curved cone: how far the side bends, -1 inward (a trumpet) to 1 outward (a dome). */
+  curvedConeBend?: number;
   topWidth?: number;
   topDepth?: number;
   teeth?: number;
@@ -882,6 +887,10 @@ export type WorkplaneShape = {
   segments?: number;
   topRadius?: number;
   baseRadius?: number;
+  /** Curved cone (#1211): the top's diameter as a share of the bottom's, 0 to 1. */
+  curvedConeTop?: number;
+  /** Curved cone: how far the side bends, -1 inward (a trumpet) to 1 outward (a dome). */
+  curvedConeBend?: number;
   topWidth?: number;
   topDepth?: number;
   taperTopWidth?: number;
@@ -1229,6 +1238,11 @@ export type WorkplaneShape = {
    * advance - 0 or left out as the font has it, above it wider, below it (down to -50) tighter. Straight and curved text.
    */
   textSpacing?: number;
+  /**
+   * Curved text only (#1196): how wide each letter is drawn, in per cent of its own width - 100 or left out as the
+   * font has it, below narrower, above wider (25 to 400). The letters keep their height; the arc and the box follow.
+   */
+  textLetterWidth?: number;
   /**
    * Text only (#225): the top edge of the letters rounded or chamfered by `size` mm, as a name
    * tag's letters on top are finished. Built from the outline stepped inwards, so it works for

@@ -19,7 +19,7 @@ summary: مكتبة الأشكال، الأبعاد بالأرقام وبالم�
 
 ما تقدمه المكتبة:
 
-- **الأشكال الأساسية:** {{ui:shape.box}}، {{ui:shape.roundedBox}}، {{ui:shape.cylinder}}، {{ui:shape.slot}}، {{ui:shape.ellipse}}، {{ui:shape.polygon}} (من ثلاثة إلى أربعة وعشرين ضلعًا)، {{ui:shape.sphere}}، {{ui:shape.cone}}، {{ui:shape.pyramid}} (من ثلاثة إلى أربعة وعشرين ضلعًا، لذا ثلاثية الأضلاع أيضًا)، {{ui:shape.wedge}}، {{ui:shape.roundRoof}}، {{ui:shape.halfSphere}}، {{ui:shape.paraboloid}} (قبة تضيق إلى رأس مستدير، وينخفض ارتفاعها بمربع المسافة عن المحور) و{{ui:shape.torus}}.
+- **الأشكال الأساسية:** {{ui:shape.box}}، {{ui:shape.roundedBox}}، {{ui:shape.cylinder}}، {{ui:shape.slot}}، {{ui:shape.ellipse}}، {{ui:shape.polygon}} (من ثلاثة إلى أربعة وعشرين ضلعًا)، {{ui:shape.sphere}}، {{ui:shape.cone}}، {{ui:shape.curvedCone}} (ينحني جانبه إلى الداخل على شكل بوق مثل السطح الكاذب الكروي أو إلى الخارج على شكل قبة؛ يضبط ذلك {{ui:prop.curvedConeTop}} و{{ui:prop.curvedConeBend}}، ويمكن تجويفه وتدوير حوافه مثل أي جسم دقيق)، {{ui:shape.pyramid}} (من ثلاثة إلى أربعة وعشرين ضلعًا، لذا ثلاثية الأضلاع أيضًا)، {{ui:shape.wedge}}، {{ui:shape.roundRoof}}، {{ui:shape.halfSphere}}، {{ui:shape.paraboloid}} (قبة تضيق إلى رأس مستدير، وينخفض ارتفاعها بمربع المسافة عن المحور) و{{ui:shape.torus}}.
 - **الأنابيب:** {{ui:shape.tube}} و{{ui:shape.bentTube}}، المكوّن من اثنتي عشرة قطعة مستقيمة كحد أقصى بينها انحناءات، و{{ui:shape.loft}} من حد خارجي إلى آخر، من مربع إلى دائرة مثلًا.
 - **الأشكال الزخرفية:** {{ui:shape.star}}، {{ui:shape.heart}} و{{ui:shape.crescent}}.
 - **الكتابة:** {{ui:shape.text}}، وأيضًا على طول قوس دائري. المزيد في [النص](chapter:text).

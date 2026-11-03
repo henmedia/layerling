@@ -35,6 +35,14 @@ irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-qu
 
 **5. 告訴 Claude 要建立什麼。**例如：「使用 layerling 工具，幫我建立一個直徑 60 mm、高 40 mm、壁厚 2.5 mm 的圓盒。」如果沒有開啟編輯器，Claude 會在你的瀏覽器中開啟一個，在其中一步步建立盒子，並拍圖檢查自己的工作。你在一旁觀看，隨時可以自己修改任何內容。
 
+**在 Mac 上**步驟相同，只有以下不同。第 1 步：開啟「終端機」App（按 Cmd+空白鍵，輸入 `Terminal`，按 Enter），貼上下面這一行並按 Enter：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+如果缺少 Git 或 Node.js，它會告訴你需要安裝什麼（macOS 會在視窗中提供 Git，Node.js 可從 nodejs.org 下載安裝程式）；裝好後再執行同一行。第 2 步：桌面上的捷徑同樣叫「Start layerling」。第 3 步：安裝適用於 Mac 的 Claude App。
+
 > **提示：**如果有什麼不正常，把你看到的情況告訴 Claude。它能讀取錯誤，通常會自己修復。如果編輯器裡沒有任何動靜，先檢查 layerling 是否仍在執行（第 2 步）。
 
 ## 設定
@@ -118,6 +126,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_array_objects` | 以直線排列或環繞圓周複製 |
 | `layerling_bundle_objects` | 像 Ctrl+B 一樣綁定物件：它們一起移動、保留各自的顏色與類型，匯出時分開輸出 |
 | `layerling_layer_text` | 把文字變成多色列印用的分層堆疊（字母、較寬的外框、無孔底板），或再次重建這樣的堆疊，可加入鑰匙圈孔、設定每層轉角，以及圓角或倒角的字母邊緣；給出名稱清單時，每個名稱做一個名牌 |
+| `layerling_text_block` | 產生文字區塊：一段文字成為多行中的第一行，每行都是上一行下方的獨立文字，靠左、置中或靠右對齊，每行大小相同或更小 |
 | `layerling_layer_icon` | 把 SVG 圖示（檔案中的文字，或擠出後的草圖實體）變成多色列印用的分層圖示牌——圖示、較寬的外框、無孔底板——或以新的寬度或層數重建；給出數量時，用副本鋪滿平台 |
 | `layerling_create_qr_code` | 從文字或網址產生 QR Code，就像形狀庫中的 {{ui:shape.qrCode}}——可只留 QR Code 本身、在平台上凸起或雕刻，並設定糾錯等級、寬度、高度與靜區，也能指定做成孔；模組小於 0.8 mm 時會提出警告 |
 | `layerling_create_sbc_board` | 放置按實際尺寸的 SBC 主機板，就像形狀庫中的 {{ui:shape.sbcBoard}}——Raspberry Pi 5、4、3 B+、Zero 2 W 或 BIGTREETECH Pi，帶孔和接頭，可設定邊緣接頭的間隙與位置，也可作為孔來切割外殼 |

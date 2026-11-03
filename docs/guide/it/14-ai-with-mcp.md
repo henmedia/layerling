@@ -35,6 +35,14 @@ Installa ciò che serve a layerling, scarica layerling nella cartella `layerling
 
 **5. Di' a Claude cosa costruire.** Per esempio: «Usa gli strumenti di layerling e costruiscimi una scatola rotonda di 60 mm di diametro e 40 mm di altezza, con una parete di 2,5 mm». Se non c'è nessun editor aperto, Claude ne apre uno nel browser, ci costruisce la scatola passo dopo passo e scatta immagini per controllare il proprio lavoro. Tu guardi e puoi modificare qualsiasi cosa in qualsiasi momento.
 
+**Su un Mac** funziona allo stesso modo, con queste modifiche. Al passaggio 1 apri l'app Terminale (premi Cmd+Spazio, scrivi `Terminale` e premi Invio), incolla questa riga e premi Invio:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Se mancano Git o Node.js, ti dice cosa installare (macOS offre Git in una finestra, Node.js è un programma di installazione su nodejs.org); poi esegui di nuovo la stessa riga. Al passaggio 2 anche il collegamento sulla scrivania si chiama «Start layerling». Al passaggio 3 installa l'app Claude per Mac.
+
 > **Suggerimento:** Se qualcosa non funziona, di' a Claude cosa vedi. Può leggere l'errore e di solito lo corregge da solo. Se nell'editor non succede nulla, controlla prima che layerling sia ancora in esecuzione (passo 2).
 
 ## Configurazione
@@ -118,6 +126,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_array_objects` | Crea copie in fila o disposte in cerchio. |
 | `layerling_bundle_objects` | Raggruppa gli oggetti come con Ctrl+B: si spostano insieme, mantengono colore e tipo e vengono esportati separatamente. |
 | `layerling_layer_text` | Trasforma un testo in una serie di livelli per la stampa multicolore (lettere, bordi più larghi e piastra senza fori) oppure ricostruisce la serie, con foro per portachiavi, angoli per livello e bordo delle lettere arrotondato o smussato. Se fornisci un elenco di nomi, crea un’etichetta per ciascuno. |
+| `layerling_text_block` | crea un blocco di testo: un testo diventa la prima di più righe, ognuna un testo a sé sotto quella sopra, allineate a sinistra, al centro o a destra, ogni riga uguale o più piccola |
 | `layerling_layer_icon` | Trasforma un’icona SVG (il testo del file o un corpo da schizzo estruso) in un’etichetta a livelli per la stampa multicolore — icona, bordi più larghi e piastra senza fori — oppure la ricrea con una nuova larghezza o nuovi livelli. Se specifichi una quantità, riempie la piastra con copie. |
 | `layerling_create_qr_code` | Crea un codice QR da un testo o da un indirizzo web, come {{ui:shape.qrCode}} nella raccolta di forme: il solo codice, in rilievo su una piastra oppure inciso, con correzione degli errori, larghezza, altezza e zona libera; può anche creare un foro. Avvisa se un modulo è più piccolo di 0,8 mm. |
 | `layerling_create_sbc_board` | Posiziona una scheda SBC in grandezza reale, come {{ui:shape.sbcBoard}} nella raccolta di forme: Raspberry Pi 5, 4, 3 B+, Zero 2 W o BIGTREETECH Pi, con fori e connettori, il gioco attorno ai connettori sul bordo, la posizione e come foro per ritagliare un case |

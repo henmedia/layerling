@@ -35,6 +35,14 @@ Sie installiert, was layerling braucht, lädt layerling in den Ordner `layerling
 
 **5. Claude sagen, was es bauen soll.** Zum Beispiel: „Nutze die layerling-Werkzeuge und bau mir eine runde Dose, 60 mm Durchmesser und 40 mm hoch, mit 2,5 mm Wand.“ Ist kein Editor offen, öffnet Claude einen in deinem Browser, baut die Dose dort Schritt für Schritt und macht Bilder, um seine Arbeit zu prüfen. Du schaust zu und kannst jederzeit selbst etwas ändern.
 
+**Auf dem Mac** geht es genauso, mit diesen Änderungen. Öffne in Schritt 1 die App Terminal (Cmd+Leertaste drücken, `Terminal` tippen und Enter drücken), füge diese Zeile ein und drücke Enter:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+Fehlt Git oder Node.js, sagt sie dir, was du installieren sollst (Git bietet macOS in einem Fenster an, Node.js gibt es als Installer auf nodejs.org); danach führst du dieselbe Zeile noch einmal aus. In Schritt 2 heißt die Verknüpfung auf dem Schreibtisch ebenfalls „Start layerling“. Installiere in Schritt 3 die Claude-App für den Mac.
+
 > **Tipp:** Wenn etwas nicht klappt, sag Claude, was du siehst. Es kann den Fehler lesen und behebt ihn meist selbst. Passiert im Editor nichts, prüfe zuerst, ob layerling noch läuft (Schritt 2).
 
 ## Einrichten
@@ -118,6 +126,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_array_objects` | vervielfältigt in einer Reihe oder auf einem Kreis |
 | `layerling_bundle_objects` | bündelt Objekte wie Strg+B: sie bewegen sich zusammen, behalten Farbe und Art und gehen einzeln in den Export |
 | `layerling_layer_text` | macht aus einem Text einen Stapel aus Schichten für den Mehrfarbdruck (Buchstaben, breitere Ränder, Platte ohne Löcher) oder baut einen Stapel neu, mit Loch für den Schlüsselring, Ecken je Schicht und gerundeter oder abgeschrägter Buchstabenkante; mit einer Namensliste ein Schild je Name |
+| `layerling_text_block` | macht einen Textblock: Ein Text wird die erste von mehreren Zeilen, jede ein eigener Text unter der darüber, links, mittig oder rechts ausgerichtet, jede Zeile gleich groß oder kleiner |
 | `layerling_layer_icon` | macht aus einem SVG-Symbol (dem Text der Datei oder einem extrudierten Skizzenkörper) ein Symbolschild in Schichten für den Mehrfarbdruck - Symbol, breitere Ränder, Platte ohne Löcher - oder baut eines mit neuer Breite oder neuen Schichten neu; mit einer Anzahl füllt es die Platte mit Kopien |
 | `layerling_create_qr_code` | erzeugt aus einem Text oder einer Webadresse einen QR-Code wie {{ui:shape.qrCode}} in der Formenbibliothek - den Code allein, erhaben auf einer Platte oder graviert, mit Fehlerkorrektur, Breite, Höhe, Ruhezone und auf Wunsch als Aussparung; warnt, wenn ein Modul unter 0,8 mm kommt |
 | `layerling_create_sbc_board` | setzt eine SBC-Platine in echter Größe, wie {{ui:shape.sbcBoard}} in der Formenbibliothek - Raspberry Pi 5, 4, 3 B+, Zero 2 W oder BIGTREETECH Pi, mit Löchern und Anschlüssen, dem Spiel um die Randanschlüsse, der Position und als Aussparung für ein Gehäuse |

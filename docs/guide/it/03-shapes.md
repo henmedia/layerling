@@ -19,7 +19,7 @@ Su una faccia la forma si aggancia al centro della faccia quando il puntatore si
 
 La libreria contiene:
 
-- **Forme di base:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (da tre a ventiquattro lati), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.pyramid}} (da tre a ventiquattro lati, anche triangolare), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} e {{ui:shape.torus}}.
+- **Forme di base:** {{ui:shape.box}}, {{ui:shape.roundedBox}}, {{ui:shape.cylinder}}, {{ui:shape.slot}}, {{ui:shape.ellipse}}, {{ui:shape.polygon}} (da tre a ventiquattro lati), {{ui:shape.sphere}}, {{ui:shape.cone}}, {{ui:shape.curvedCone}} (il suo lato si curva verso l'interno a tromba come una pseudosfera o verso l'esterno a cupola; lo impostano {{ui:prop.curvedConeTop}} e {{ui:prop.curvedConeBend}}, e come ogni corpo esatto si può svuotare e raccordare), {{ui:shape.pyramid}} (da tre a ventiquattro lati, anche triangolare), {{ui:shape.wedge}}, {{ui:shape.roundRoof}}, {{ui:shape.halfSphere}} e {{ui:shape.torus}}.
 - **Tubi:** {{ui:shape.tube}} e {{ui:shape.bentTube}}, composti da un massimo di dodici tratti rettilinei con curve intermedie, e {{ui:shape.loft}}, che passa da un profilo a un altro, per esempio da quadrato a rotondo.
 - **Forme decorative:** {{ui:shape.star}}, {{ui:shape.heart}} e {{ui:shape.crescent}}.
 - **Testo:** {{ui:shape.text}}, anche disposto lungo un arco circolare. Altre informazioni in [Testo](chapter:text).

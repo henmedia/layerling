@@ -166,7 +166,7 @@ Die Skizzenansicht hat eigene Farben: {{ui:workspace.sketchBackground}} für das
 
 {{ui:workspace.zoomSpeed}} ist ein Regler von langsam bis schnell: wie schnell Rad und Trackpad zoomen; die Zoomknöpfe und -tasten behalten ihre eigenen kleinen Schritte. {{ui:workspace.cameraInertia}}: Lässt du die Maus nach dem Drehen los, dreht die Ansicht noch kurz weiter und bremst sanft ab. Ausgeschaltet bleibt sie sofort stehen, wie in Tinkercad und Fusion 360.
 
-{{ui:workspace.overhangAngle}} ist der Winkel, ab dem eine Fläche als Überhang gilt, wenn du im Sichtbarkeitsmenü Überhänge zeigen einschaltest: Diese Flächen sind rot und weiß schraffiert. 30° ist vorsichtig, 70° rechnet mit guter Kühlung des Drucks; 45° ist der übliche Start.
+{{ui:workspace.overhangAngle}} ist der Winkel, ab dem eine Fläche als Überhang gilt, wenn du im Sichtbarkeitsmenü Überhänge zeigen einschaltest: Diese Flächen sind rot und weiß schraffiert. 30° ist vorsichtig, 70° rechnet mit guter Kühlung des Drucks; 45° ist der übliche Start. Solange sie gezeigt werden, nennt eine Zeile unter der Ansicht den steilsten Überhang und wie viele cm² Stützen brauchen.
 
 {{ui:workspace.booleanTriangleLimit}} begrenzt, wie viele Dreiecke ein importiertes Netz haben darf, wenn du es schneidest, verschmilzt oder zu einer Schnittmenge machst, denn das wird in deinem Browser gerechnet. Ein Netz über dem Limit wird nicht verarbeitet; vereinfache es zuerst oder hebe das Limit an, wenn dein Rechner es verträgt. Ein höheres Limit kann den Editor für einige Sekunden einfrieren.
 

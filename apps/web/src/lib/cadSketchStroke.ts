@@ -41,6 +41,9 @@ function filledLoop(cad: OcctKernel, path: OrderedCadSketchPath, delta: number, 
   if (delta === 0) return cad.extrude(base, 0, height, 0);
   const offset = cad.offsetWire2D(wire, delta, join);
   const face = cad.makeFace(offset);
+  // A long outline that runs close past itself, as a traced QR code does, can come out crossing itself: the fuse then drops
+  // the piece without a word and the rest is still a valid solid (#1195). The polygon stroke does it then.
+  if (!cad.isValid(face)) return null;
   const baseArea = cad.getSurfaceArea(base);
   const area = cad.getSurfaceArea(face);
   // Out must be wider, in narrower and not gone: a collapsed or turned-inside-out offset is no result.

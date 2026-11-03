@@ -1509,7 +1509,9 @@ export function vaseChecks(input) {
   const limit = Math.sin(Math.PI / 4)
   let worst = 0
   const ranges = []
-  for (let z = dz; z < H - dz; z += 1) {
+  // With a teapot lid the body ends at the cut; the lid prints upside down and is checked as it lies (below).
+  const teapot = p.lidMode === 'kanne' ? floorLayout(p).teapot : null
+  for (let z = dz; z < (teapot ? teapot.cut : H) - dz; z += 1) {
     let rowWorst = 0
     for (let k = 0; k < N; k++) {
       const th = (2 * Math.PI * k) / N
@@ -1529,6 +1531,13 @@ export function vaseChecks(input) {
   for (const r of ranges.slice(0, 3)) {
     const deg = Math.round((Math.asin(Math.min(1, r.max)) * 180) / Math.PI)
     notes.push(`Überhang bis ${deg}° zwischen ${fmtMm(r.from)} und ${fmtMm(r.to)} mm Höhe (mehr als 45°) – dort braucht es Stützen, oder die Form steiler machen.`)
+  }
+  if (teapot) {
+    for (const r of teapotOverhangs(p, shape, teapot).slice(0, 3)) {
+      const deg = Math.round((Math.asin(Math.min(1, r.max)) * 180) / Math.PI)
+      const where = Math.abs(r.to - r.from) < 0.05 ? `bei ${fmtMm(r.from)} mm` : `zwischen ${fmtMm(r.from)} und ${fmtMm(r.to)} mm`
+      notes.push(`Teekannendeckel, umgedreht gedruckt: Überhang bis ${deg}° ${where} Höhe der Vase (mehr als 45°) – dort braucht er Stützen, oder die Form dort steiler machen.`)
+    }
   }
   if (p.body === 'hohl') {
     if (p.wall < 2 * NOZZLE) notes.push(`Wand nur ${fmtMm(p.wall)} mm – unter zwei Linien einer 0,4-mm-Düse druckt sie sich unsicher.`)
@@ -1959,26 +1968,86 @@ export function teapotKnob(p, shape) {
  * as the vase is, and below the cut a lip (1.6 mm wall) that goes into the opening with `lidClearance` all round. It
  * rests on the body's rim with its own wall, flush. With a knob, a blind hole in the middle of the top for its peg.
  */
+/**
+ * The teapot lid's lip at `n` angles: its outer radius follows the opening (per angle the narrowest place along
+ * the lip, less the clearance), its inner radius is 1.6 mm in from that and at least 0.6 mm inside the lid's inner
+ * wall at the flange `zf`, which carries the lip; `zt` is the underside of the lid's top.
+ */
+function teapotLip(p, shape, teapot, n) {
+  const { cut, lip } = teapot
+  const LIP_WALL = 1.6, FLANGE = 1.6
+  const zf = cut + FLANGE
+  const zt = p.height - Math.min(p.lidThickness, teapot.height - 1)
+  const lipO = new Float64Array(n), lipI = new Float64Array(n)
+  for (let j = 0; j < n; j++) {
+    const a = (2 * Math.PI * j) / n
+    let m = Infinity
+    for (let i = 0; i <= 8; i++) m = Math.min(m, shape.innerAt(a, cut - lip + (lip * i) / 8))
+    lipO[j] = m - p.lidClearance
+    lipI[j] = Math.min(lipO[j] - LIP_WALL, shape.innerAt(a, zf) - 0.6)
+  }
+  return { lipO, lipI, zf, zt }
+}
+
+/**
+ * A ledge facing down that a printer still lays without supports: the flange under the lip is one when the lid
+ * prints upside down, at least the lip's wall and the clearance wide (about 2 mm), wider where the vase widens
+ * inside above the joint.
+ */
+const TEAPOT_LEDGE = 3
+
+/**
+ * Where the teapot lid overhangs more than 45 degrees as it is printed, upside down on its top: an outer wall that
+ * narrows towards the rim leans out there, an inner wall that widens towards it leans in, and the flange that carries
+ * the lip is a ledge facing down (counted from `TEAPOT_LEDGE` mm). Ranges in the vase's heights, as for the body,
+ * each with its steepest share of the normal pointing down (the sine of the angle).
+ */
+function teapotOverhangs(p, shape, teapot) {
+  const H = p.height, N = 180, dz = 0.5
+  const limit = Math.sin(Math.PI / 4)
+  const { lipI, zf, zt } = teapotLip(p, shape, teapot, N)
+  // Share of a wall's normal that points down once the lid is turned over: the part pointing up on the vase.
+  const turned = (at, th, z, sign) => {
+    const r = at(th, z)
+    const rTheta = (at(th + 1e-3, z) - at(th - 1e-3, z)) / 2e-3
+    const rZ = (at(th, z + dz) - at(th, z - dz)) / (2 * dz)
+    return (sign * -r * rZ) / Math.hypot(r, rTheta, r * rZ)
+  }
+  const rows = []
+  for (let z = teapot.cut + dz; z < H - dz; z += 1) {
+    let worst = 0
+    for (let k = 0; k < N; k++) {
+      const th = (2 * Math.PI * k) / N
+      // The outer wall faces away from the axis, the inner wall towards it.
+      worst = Math.max(worst, turned(shape.outerAt, th, z, 1))
+      if (z - dz > zf && z + dz < zt) worst = Math.max(worst, turned(shape.innerAt, th, z, -1))
+    }
+    if (worst > limit) rows.push({ z, worst })
+  }
+  let ledge = 0
+  for (let j = 0; j < N; j++) ledge = Math.max(ledge, shape.innerAt((2 * Math.PI * j) / N, zf) - lipI[j])
+  if (ledge > TEAPOT_LEDGE) rows.push({ z: zf, worst: 1 })
+  rows.sort((a, b) => a.z - b.z)
+  const ranges = []
+  for (const { z, worst } of rows) {
+    const last = ranges.at(-1)
+    if (last && z - last.to <= 1.01) { last.to = z; last.max = Math.max(last.max, worst) } else ranges.push({ from: z, to: z, max: worst })
+  }
+  return ranges
+}
+
 function teapotLidMesh({ p, shape, H, segments, rows, outerRadius, teapot }) {
   const b = new MeshBuilder()
   const n = segments
   const { cut, lip } = teapot
-  const top = Math.min(p.lidThickness, teapot.height - 1)
-  const LIP_WALL = 1.6, FLANGE = 1.6
-  const zf = cut + FLANGE
+  const FLANGE = 1.6
   const angle = (j) => (2 * Math.PI * j) / n
   const ringOf = (table, z) => Array.from(table, (r, j) => b.addVertex(r * Math.cos(angle(j)), r * Math.sin(angle(j)), z))
   // Outer wall: the vase's own surface, at the body's angles - the joint's points are the body's rim.
   const outerRows = rowHeights(cut, H, H / rows, []).map((z) => b.ring(n, (a) => outerRadius(a, z), z))
   b.wall(outerRows)
-  // The lip follows the opening: per angle its narrowest place along the lip, less the clearance.
-  const lipO = new Float64Array(n), lipI = new Float64Array(n)
-  for (let j = 0; j < n; j++) {
-    let m = Infinity
-    for (let i = 0; i <= 8; i++) m = Math.min(m, shape.innerAt(angle(j), cut - lip + (lip * i) / 8))
-    lipO[j] = m - p.lidClearance
-    lipI[j] = Math.min(lipO[j] - LIP_WALL, shape.innerAt(angle(j), zf) - 0.6)
-  }
+  // The lip follows the opening.
+  const { lipO, lipI, zf, zt } = teapotLip(p, shape, teapot, n)
   if (Math.min(...lipI) < 2) throw new Error('die Öffnung ist zu eng für eine Lippe')
   const steps = Math.max(2, Math.ceil(lip / 2))
   const lipOuter = Array.from({ length: steps + 1 }, (_, i) => ringOf(lipO, cut - lip + (lip * i) / steps))
@@ -1989,7 +2058,6 @@ function teapotLidMesh({ p, shape, H, segments, rows, outerRadius, teapot }) {
   b.band(outerRows[0], lipOuter[steps], false)
   b.band(lipOuter[0], lipInner[0], false)
   // Inside: the vase's inner wall up to the top's underside, standing on a flange that carries the lip.
-  const zt = H - top
   if (zt - zf >= 1) {
     const k = Math.max(2, Math.ceil((zt - zf) / Math.max(1, H / rows)))
     const inner = Array.from({ length: k + 1 }, (_, i) => {

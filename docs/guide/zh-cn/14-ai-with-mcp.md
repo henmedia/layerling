@@ -35,6 +35,14 @@ irm https://raw.githubusercontent.com/henmedia/layerling/main/scripts/windows-qu
 
 **5. 告诉 Claude 要搭建什么。**例如：“使用 layerling 工具，给我搭建一个直径 60 mm、高 40 mm、壁厚 2.5 mm 的圆盒。”如果没有打开编辑器，Claude 会在你的浏览器中打开一个，在其中一步步搭建盒子，并拍图检查自己的工作。你在一旁观看，随时可以自己修改任何内容。
 
+**在 Mac 上**步骤相同，只有以下不同。第 1 步：打开“终端”应用（按 Cmd+空格，输入 `Terminal`，按回车），粘贴下面这一行并按回车：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac-quickstart.sh | sh
+```
+
+如果缺少 Git 或 Node.js，它会告诉你需要安装什么（macOS 会在弹窗中提供 Git，Node.js 可从 nodejs.org 下载安装程序）；装好后再运行同一行。第 2 步：桌面上的快捷方式同样叫“Start layerling”。第 3 步：安装适用于 Mac 的 Claude 应用。
+
 > **提示：**如果有什么不正常，把你看到的情况告诉 Claude。它能读取错误，通常会自己修复。如果编辑器里没有任何动静，先检查 layerling 是否仍在运行（第 2 步）。
 
 ## 设置
@@ -118,6 +126,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_array_objects` | 按行或沿圆周复制 |
 | `layerling_bundle_objects` | 像 Ctrl+B 一样捆绑对象：它们一起移动，保留各自颜色和类型，导出时分开输出 |
 | `layerling_layer_text` | 把文字变成用于多色打印的分层堆叠（字母、更宽的边沿、无孔底板），或重新构建堆叠，可加钥匙孔、设置每层圆角和圆角或倒角的字母边缘；给出名称列表时，每个名称生成一个名牌 |
+| `layerling_text_block` | 生成文本块：一段文字成为多行中的第一行，每行都是上一行下方的独立文字，左对齐、居中或右对齐，每行大小相同或更小 |
 | `layerling_layer_icon` | 把 SVG 图标（文件文本或拉伸的草图实体）变成用于多色打印的分层图标牌——图标、更宽的边沿、无孔底板——或用新的宽度或层数重新构建；给出数量时用副本铺满底板 |
 | `layerling_create_qr_code` | 从文字或网址生成二维码，如同形状库中的 {{ui:shape.qrCode}}——可仅二维码、在底板上凸起或雕刻，可设置纠错级别、宽度、高度、静区，也可按需作为孔；模块小于 0.8 mm 时会发出警告 |
 | `layerling_create_sbc_board` | 放置按实际尺寸的 SBC 主板，如同形状库中的 {{ui:shape.sbcBoard}}——Raspberry Pi 5、4、3 B+、Zero 2 W 或 BIGTREETECH Pi，带孔和接口，可设置边缘接口的间隙和位置，也可作为孔来切割外壳 |

@@ -17,6 +17,8 @@ V knjižnici oblik izberi {{ui:shape.text}} in ga odloži. V polje {{ui:prop.tex
 
 Besedilo je sprva eno samo telo. Če želiš črke obravnavati posamezno, klikni {{ui:inspector.separateParts}}. Potem je vsaka črka lastna oblika.
 
+**Več vrstic:** Besedilo ima eno vrstico. Za tablo ali ploščo z več vrsticami pod nastavitvami odpri kartico {{ui:textBlock.title}}: vnesi vrstice v {{ui:textBlock.lines}}, izberi {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} ali {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} in {{ui:textBlock.step}} - pri 80 % je vsaka vrstica za petino manjša od zgornje. Gumb naredi iz vsake vrstice samostojno besedilo pod zgornjo, v pisavi, višini in polnilu tega besedila; prva zasede mesto tega besedila. Nato lahko vsaka vrstica dobi svojo velikost, pisavo ali barvo.
+
 Tudi robove pisave lahko posnameš ali zaobliš, ravno ali ukrivljeno, glej [Posnetje robov in izdolbljenje teles](chapter:robovi-in-izdolbljenje). Vzemi majhne mere, kot 0,2 do 0,5 mm, saj so poteze črk ozke.
 
 ## Lastne pisave
@@ -151,9 +153,10 @@ Naj napis ne teče naravnost, ampak sledi robu kovanca, pokrova ali obroča? Za 
 
 ![Besedilo sledi krogu. Vse črke stojijo na skupni črti.](shot:curved-text)
 
-Takoj ko jo vklopiš, besedilo teče vzdolž kroga. Vse črke stojijo na isti osnovni črti, tako enakomerno kot pri običajnem besedilu. Poleg so štiri nastavitve:
+Takoj ko jo vklopiš, besedilo teče vzdolž kroga. Vse črke stojijo na isti osnovni črti, tako enakomerno kot pri običajnem besedilu. Poleg je pet nastavitev:
 
 - **{{ui:prop.textRadius}}** (5 do 500 mm): Polmer kroga, na katerem teče osnovna črta črk. Črke ostanejo na svojem mestu, spremeni se le njihova ukrivljenost.
+- **{{ui:prop.textLetterWidth}}** (25 do 400 %): Kako široko je narisana vsaka črka, v odstotkih njene lastne širine. Pod 100 so črke ožje, nad 100 širše; njihova višina ostane, lok, ki ga zasedajo, pa se z njimi podaljša ali skrajša. Na primer za visok, ozek napis na kovancu. Pri ravnem besedilu to naredi {{ui:prop.textStretch}} z okvirjem.
 - **{{ui:nameTag.letterSize}}:** Kako visoke so črke. Ne visi več na širini oblike.
 - **{{ui:prop.textInward}}:** Preklopi besedilo z zgornje strani kroga na spodnjo. Črke potem kažejo z glavo proti središču.
 - **{{ui:prop.textFlipped}}:** Obrne samo črke, da jih lahko bereš z druge strani. Besedilo pri tem ostane na svojem mestu na krogu.

@@ -19,6 +19,8 @@ Wähle in der Formenbibliothek {{ui:shape.text}} und setze ihn ab. Im Feld {{ui:
 
 Ein Text ist zunächst ein einzelner Körper. Willst du die Buchstaben einzeln behandeln, klicke auf {{ui:inspector.separateParts}}. Dann ist jeder Buchstabe eine eigene Form.
 
+**Mehrere Zeilen:** Ein Text hat eine Zeile. Für ein Schild oder eine Tafel mit mehreren Zeilen öffnest du unter den Einstellungen die Karte {{ui:textBlock.title}}: Gib die Zeilen unter {{ui:textBlock.lines}} ein, wähle {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} oder {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} und {{ui:textBlock.step}} - bei 80 % ist jede Zeile ein Fünftel kleiner als die darüber. Der Knopf macht jede Zeile zu einem eigenen Text unter der darüber, in Schrift, Höhe und Füllung dieses Textes; die erste nimmt den Platz dieses Textes ein. Danach kann jede Zeile eine eigene Größe, Schrift oder Farbe bekommen.
+
 Auch die Kanten einer Schrift lassen sich fasen oder verrunden, gerade oder gebogen, siehe [Kanten brechen und Körper aushöhlen](chapter:kanten-und-aushoehlen). Nimm dafür kleine Maße wie 0,2 bis 0,5 mm, denn die Striche der Buchstaben sind schmal.
 
 ## Eigene Schriften
@@ -157,9 +159,10 @@ Soll die Beschriftung nicht gerade laufen, sondern dem Rand einer Münze, eines 
 
 ![Ein Text folgt einem Kreis. Die Buchstaben stehen alle auf einer gemeinsamen Linie.](shot:curved-text)
 
-Sobald du sie einschaltest, läuft der Text am Kreis entlang. Alle Buchstaben stehen auf derselben Grundlinie, so gleichmäßig wie bei normalem Text. Dazu gibt es vier Einstellungen:
+Sobald du sie einschaltest, läuft der Text am Kreis entlang. Alle Buchstaben stehen auf derselben Grundlinie, so gleichmäßig wie bei normalem Text. Dazu gibt es fünf Einstellungen:
 
 - **{{ui:prop.textRadius}}** (5 bis 500 mm): Der Radius des Kreises, auf dem die Grundlinie der Buchstaben läuft. Die Buchstaben bleiben dabei an ihrer Stelle, nur ihre Biegung ändert sich.
+- **{{ui:prop.textLetterWidth}}** (25 bis 400 %): Wie breit jeder Buchstabe gezeichnet wird, in Prozent seiner eigenen Breite. Unter 100 werden die Buchstaben schmaler, darüber breiter; ihre Höhe bleibt, und der Bogen, den sie einnehmen, wächst oder schrumpft mit. Etwa für eine hohe, schmale Schrift auf einer Münze. Bei gerader Schrift macht das {{ui:prop.textStretch}} mit dem Rahmen.
 - **{{ui:nameTag.letterSize}}:** Wie hoch die Buchstaben sind. Sie hängt nicht mehr an der Breite der Form.
 - **{{ui:prop.textInward}}:** Schaltet den Text von der Oberseite des Kreises auf die Unterseite. Die Buchstaben zeigen dann mit dem Kopf zur Mitte.
 - **{{ui:prop.textFlipped}}:** Dreht nur die Buchstaben um, damit du sie von der anderen Seite lesen kannst. Der Text bleibt dabei an seiner Stelle auf dem Kreis.

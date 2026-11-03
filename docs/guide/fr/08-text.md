@@ -17,6 +17,8 @@ Choisissez {{ui:shape.text}} dans la bibliothèque de formes et placez-le. Dans 
 
 Le texte est d’abord un seul corps. Si vous souhaitez traiter les lettres individuellement, cliquez sur {{ui:inspector.separateParts}}. Chaque lettre est alors une forme qui lui est propre.
 
+**Plusieurs lignes :** Un texte tient sur une ligne. Pour un panneau ou une plaque de plusieurs lignes, ouvrez la carte {{ui:textBlock.title}} sous les paramètres : saisissez les lignes dans {{ui:textBlock.lines}}, choisissez {{ui:textBlock.align}} ({{ui:textBlock.align.left}}, {{ui:textBlock.align.center}} ou {{ui:textBlock.align.right}}), {{ui:textBlock.gap}} et {{ui:textBlock.step}} - à 80 %, chaque ligne est plus petite d'un cinquième que celle du dessus. Le bouton fait de chaque ligne un texte à part sous celle du dessus, avec la police, la hauteur et le remplissage de ce texte ; la première prend la place de ce texte. Ensuite, chaque ligne peut avoir sa propre taille, police ou couleur.
+
 Les bords du texte peuvent également être chanfreinés ou arrondis, droits ou incurvés, voir [Casser les bords et creuser les corps] (chapter:edges-and-hollowing). Utilisez des petites tailles telles que 0,2 à 0,5 mm, car les traits des lettres sont étroits.
 
 ## Vos propres polices
@@ -152,9 +154,10 @@ Le lettrage ne doit-il pas être droit mais suivre le bord d'une pièce de monna
 
 ![Le texte suit un cercle. Toutes les lettres se trouvent sur une ligne commune.](shot:curved-text)
 
-Une fois allumé, le texte parcourt le cercle. Toutes les lettres reposent sur la même ligne de base, aussi uniformément qu'avec un texte normal. Il existe quatre paramètres :
+Une fois allumé, le texte parcourt le cercle. Toutes les lettres reposent sur la même ligne de base, aussi uniformément qu'avec un texte normal. Il existe cinq paramètres :
 
 - **{{ui:prop.textRadius}}** (5 à 500 mm) : Le rayon du cercle sur lequel s'étend la ligne de base des lettres. Les lettres restent à leur place ; seule leur courbure change.
+- **{{ui:prop.textLetterWidth}}** (25 à 400 %) : La largeur de chaque lettre, en pour cent de sa propre largeur. Au-dessous de 100 les lettres s'affinent, au-dessus elles s'élargissent ; leur hauteur reste, et l'arc qu'elles occupent s'allonge ou se raccourcit avec elles. Par exemple pour une inscription haute et étroite sur une pièce. Sur un texte droit, {{ui:prop.textStretch}} le fait avec le cadre.
 - **{{ui:nameTag.letterSize}} :** Quelle est la hauteur des lettres. Cela ne dépend plus de la largeur de la forme.
 - **{{ui:prop.textInward}} :** Déplace le texte du haut du cercle vers le bas. Les lettres pointent alors la tête vers le centre.
 - **{{ui:prop.textFlipped}} :** Retourne uniquement les lettres pour que vous puissiez les lire de l'autre côté. Le texte reste à sa place sur le cercle.

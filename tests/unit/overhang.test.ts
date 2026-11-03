@@ -90,6 +90,18 @@ describe("overhangArea", () => {
     expect(overhangArea(steeper.vertices, steeper.faces, 45).areaMm2).toBeGreaterThan(0);
   });
 
+  it("says how steep the steepest overhang is, and that a box standing on the plate has none", () => {
+    const standing = box([0, 0, 0], [20, 20, 20]);
+    expect(overhangArea(standing.vertices, standing.faces).steepestDegrees).toBeNull();
+    const floating = box([0, 5, 0], [20, 25, 20]);
+    expect(overhangArea(floating.vertices, floating.faces).steepestDegrees).toBeCloseTo(90, 6);
+    // A lean of 30° counts as the steepest overhang even though it needs no supports.
+    for (const degrees of [30, 60]) {
+      const ramp = overhangingRamp(10, 10 * Math.tan((degrees * Math.PI) / 180));
+      expect(overhangArea(ramp.vertices, ramp.faces).steepestDegrees).toBeCloseTo(degrees, 6);
+    }
+  });
+
   it("keeps the angle in its range", () => {
     expect(normalizeOverhangAngle(10)).toBe(30);
     expect(normalizeOverhangAngle(89)).toBe(70);
