@@ -1,5 +1,70 @@
 [
   {
+    "version": "1.135.0",
+    "items": [
+      {
+        "title": {
+          "de": "Formenbibliothek in Abschnitten, mit Suche und „Zuletzt benutzt“",
+          "en": "Shape library in sections, with a search and Recently used"
+        },
+        "body": {
+          "de": "Die Formenbibliothek ist in Abschnitte gegliedert (Grundformen, Gefäße, Rohre & Übergänge, Löcher & Aussparungen und weitere), die du mit einem Klick auf den Namen einklappst. Oben stehen die vier zuletzt benutzten Formen und ein Suchfeld: „USB“ findet die Anschlussöffnung, „Rohr“ den Zylinder und das Rohr. Ziehen, Verschieben und Anheften gehen wie bisher.",
+          "en": "The shape library is in sections now (Basic shapes, Vessels, tubes & transitions, Holes & cut-outs and more), which you fold with a click on the name. On top are the last four shapes you used and a search field: \"USB\" finds the port opening, \"pipe\" the cylinder and the tube. Dragging, moving and pinning work as before."
+        }
+      },
+      {
+        "title": {
+          "de": "Kabelkanal durch einen Körper",
+          "en": "Cable channel through a body"
+        },
+        "body": {
+          "de": "Unter „Kanten & Wände“ gibt es den Kabelkanal: Körper wählen, Eintritt und Austritt anklicken, und layerling findet den Weg allein, in der Mitte des Körpers, mit der Wand, die du vorgibst, und mit Biegungen, die nicht enger sind als eingestellt. Der Kanal ist ein gebogenes Rohr als Loch, gruppiert mit dem Körper. Gut für LEDs in einer gedruckten Figur.",
+          "en": "Under Edges & walls there is the cable channel: select the body, click where the cable goes in and where it comes out, and layerling finds the way by itself, through the middle of the body, with the wall you ask for and bends no tighter than set. The channel is a bent tube as a hole, grouped with the body. Good for LEDs in a printed figure."
+        }
+      },
+      {
+        "title": {
+          "de": "Deckel mit Scharnier an der Rückseite",
+          "en": "Lid with a hinge at the back"
+        },
+        "body": {
+          "de": "Der Deckel-Assistent kann ein Scharnier an die gerade Rückseite setzen: Die Gelenkteile wechseln sich an Körper und Deckel ab, ein gerades Loch nimmt den Stift auf (1,75 mm, also ein Stück Filament), auf Wunsch wird der Stift gleich mitgedruckt. Der Deckel klappt auf, statt abgenommen zu werden.",
+          "en": "The lid tool can put a hinge along the straight back: the knuckles take turns on the body and the lid, a straight hole takes the pin (1.75 mm, so a piece of filament), and the pin can be printed too. The lid swings open instead of coming off."
+        }
+      },
+      {
+        "title": {
+          "de": "Überhänge: wie steil und wie viel",
+          "en": "Overhangs: how steep and how much"
+        },
+        "body": {
+          "de": "Bei „Überhänge zeigen“ steht unter der Ansicht jetzt eine Zeile mit dem steilsten Überhang und der Fläche, die Stützen braucht, zum Beispiel „44 cm² über 45° brauchen Stützen“. Der Deckel einer Vasenteekanne wird dabei so geprüft, wie er gedruckt wird: auf dem Kopf.",
+          "en": "With Show overhangs, a line under the view now gives the steepest overhang and the area that needs supports, for example \"44 cm² beyond 45° need supports\". A vase teapot lid is checked the way it prints: upside down."
+        }
+      },
+      {
+        "title": {
+          "de": "Ziegel auf flachen Kästen bleiben dicht",
+          "en": "Bricks on flat boxes stay closed"
+        },
+        "body": {
+          "de": "Ziegel auf einem flachen Kasten (zum Beispiel 7 mm hoch, oben und an allen Seiten) wurden bei manchen Größen undicht. Die Fugen aller Reihen werden jetzt in einem Zug geschnitten; die Ziegel sehen aus wie vorher, aber das Netz bleibt geschlossen.",
+          "en": "Bricks on a flat box (7 mm high, say, on the top and all sides) came out open at some sizes. The joints of all courses are cut in one go now; the bricks look as before, but the mesh stays closed."
+        }
+      },
+      {
+        "title": {
+          "de": "SBC-Platine: Flachbandkabel übereinander",
+          "en": "SBC board: ribbon cables one above the other"
+        },
+        "body": {
+          "de": "Beim Raspberry Pi 5 führten die Kamera- und Display-Kabel durch die Wand zur Ethernet-Buchse hinaus. Jetzt kommen sie am PCIe-Ende heraus, die drei Öffnungen übereinander; beim Pi 4 und 3 B+ sitzt die Kameraöffnung über der des Displays am linken Ende.",
+          "en": "On the Raspberry Pi 5 the camera and display cables went out through the wall at the Ethernet jack. They now come out at the PCIe end, the three openings one above the other; on the Pi 4 and 3 B+ the camera's opening sits over the display's at the left end."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.134.0",
     "items": [
       {
