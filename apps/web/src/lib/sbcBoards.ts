@@ -85,6 +85,8 @@ export type SbcPart = {
   ribbon?: boolean;
   /** The GPIO header: it can reach up through a lid. */
   gpio?: boolean;
+  /** The edge a ribbon cable's way out goes to, where the nearer one would cross other connectors. */
+  ribbonExit?: "left" | "right" | "front" | "back";
 };
 
 export type SbcBoard = {
@@ -123,8 +125,9 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "USB-C power", x0: 6.7, x1: 15.7, y0: -1.2, y1: 6.6, height: 3.3, kind: "connector", profile: "usbC" },
       { name: "micro-HDMI 0", x0: 22.1, x1: 29.6, y0: -1.4, y1: 6.5, height: 3.5, kind: "connector", profile: "microHdmi" },
       { name: "micro-HDMI 1", x0: 35.5, x1: 43.0, y0: -1.4, y1: 6.5, height: 3.5, kind: "connector", profile: "microHdmi" },
-      { name: "camera/display 0", x0: 47.1, x1: 50.7, y0: 0.2, y1: 16.9, height: 4.0, kind: "header", ribbon: true },
-      { name: "camera/display 1", x0: 53.3, x1: 56.9, y0: 0.2, y1: 16.9, height: 4.0, kind: "header", ribbon: true },
+      // Their cables go out at the left end, with the PCIe cable's: the right end holds the Ethernet and USB.
+      { name: "camera/display 0", x0: 47.1, x1: 50.7, y0: 0.2, y1: 16.9, height: 4.0, kind: "header", ribbon: true, ribbonExit: "left" },
+      { name: "camera/display 1", x0: 53.3, x1: 56.9, y0: 0.2, y1: 16.9, height: 4.0, kind: "header", ribbon: true, ribbonExit: "left" },
       { name: "Ethernet", x0: 66.5, x1: 88.1, y0: 1.5, y1: 19.0, height: 13.3, kind: "connector", profile: "rj45" },
       { name: "USB-A (middle)", x0: 70.5, x1: 88.0, y0: 21.8, y1: 36.3, height: 16.2, kind: "connector", profile: "usbA2" },
       { name: "USB-A (back)", x0: 70.3, x1: 87.8, y0: 39.8, y1: 54.3, height: 16.1, kind: "connector", profile: "usbA2" },
@@ -158,7 +161,7 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "USB-C power", x0: 6.88, x1: 15.53, y0: -1.25, y1: 6.15, height: 3.2, kind: "connector", profile: "usbC" },
       { name: "micro-HDMI 0", x0: 22.4, x1: 29.6, y0: -1.43, y1: 6.52, height: 3.0, kind: "connector", profile: "microHdmi" },
       { name: "micro-HDMI 1", x0: 35.9, x1: 43.1, y0: -1.43, y1: 6.52, height: 3.0, kind: "connector", profile: "microHdmi" },
-      { name: "camera", x0: 45.05, x1: 49.0, y0: 0.3, y1: 22.7, height: 5.5, kind: "header", ribbon: true },
+      { name: "camera", x0: 45.05, x1: 49.0, y0: 0.3, y1: 22.7, height: 5.5, kind: "header", ribbon: true, ribbonExit: "left" },
       { name: "audio/video jack", x0: 50.5, x1: 57.5, y0: -2.5, y1: 12.5, height: 6.0, kind: "connector", profile: "audio" },
       { name: "USB 2.0", x0: 70.3, x1: 88.0, y0: 1.65, y1: 15.57, height: 16.0, kind: "connector", profile: "usbA2" },
       { name: "USB 3.0", x0: 70.5, x1: 88.0, y0: 20.43, y1: 34.25, height: 16.0, kind: "connector", profile: "usbA2" },
@@ -187,7 +190,7 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
     parts: [
       { name: "micro-USB power", x0: 6.85, x1: 14.35, y0: -0.6, y1: 4.71, height: 3.0, kind: "connector", estimated: true, profile: "microUsb" },
       { name: "HDMI", x0: 24.75, x1: 39.25, y0: -1.5, y1: 10.65, height: 6.5, kind: "connector", profile: "hdmi" },
-      { name: "camera", x0: 43.55, x1: 47.5, y0: 0.3, y1: 22.7, height: 5.5, kind: "header", ribbon: true },
+      { name: "camera", x0: 43.55, x1: 47.5, y0: 0.3, y1: 22.7, height: 5.5, kind: "header", ribbon: true, ribbonExit: "left" },
       { name: "audio/video jack", x0: 50.0, x1: 57.0, y0: -2.5, y1: 12.5, height: 6.0, kind: "connector", profile: "audio" },
       { name: "Ethernet", x0: 65.65, x1: 87.0, y0: 2.5, y1: 18.0, height: 13.5, kind: "connector", profile: "rj45" },
       { name: "USB 2.0 (middle)", x0: 69.3, x1: 87.0, y0: 21.65, y1: 35.57, height: 16.0, kind: "connector", profile: "usbA2" },
@@ -521,11 +524,13 @@ function facing(board: SbcBoard, part: SbcPart) {
 export function sbcBoardSolids(board: SbcBoard, clearance = 0, reach = 0, passages: SbcPassages = {}): SbcSolid[] {
   const extra = normalizeSbcClearance(clearance);
   const blocks = sbcBoardBlocks(board, extra, reach, passages);
+  const cableWays = passages.ribbonSide === true ? ribbonWays(board, extra, reach) : new Map<SbcPart, SbcSolid>();
   return board.parts.flatMap((part, index): SbcSolid[] => {
     const block = blocks[index];
     const plain: SbcSolid = { name: part.name, role: part.kind, x0: block.x0, x1: block.x1, y0: block.y0, y1: block.y1, bottom: block.bottom, top: block.top };
     // A ribbon cable's way out through a wall, asked for, beside its connector.
-    const sideway = part.ribbon && passages.ribbonSide === true && part.kind !== "connector" ? [ribbonSideway(board, part, extra, reach)] : [];
+    const way = cableWays.get(part);
+    const sideway = way ? [way] : [];
     const side = part.kind === "connector" ? facing(board, part) : null;
     const along = side === "front" || side === "back" ? "y" as const : "x" as const;
     // Across the face: x for a part on the front or back edge, y on a side edge.
@@ -622,9 +627,44 @@ export function sbcSolidsExtent(board: SbcBoard, solids: readonly SbcSolid[]) {
 }
 
 /**
+ * The ribbon cables' ways out through the walls. Each cable leaves across its connector's long side
+ * (`ribbonSideway`); the cables that go out at the same edge come out there one above the other, in
+ * one plane: the connector nearest that edge keeps its own opening, and each further one is laid on
+ * top of it, centred on it, as wide as its own connector is long and as high as it stands.
+ */
+export function ribbonWays(board: SbcBoard, clearance = 0, reach = 0): Map<SbcPart, SbcSolid> {
+  const grow = normalizeSbcClearance(clearance);
+  const ways = new Map<SbcPart, SbcSolid>();
+  const byEdge = new Map<string, Array<{ part: SbcPart; way: SbcSolid; distance: number }>>();
+  for (const part of board.parts.filter((entry) => entry.ribbon && entry.kind !== "connector")) {
+    const way = ribbonSideway(board, part, grow, reach);
+    const edge = way.x0 < 0 ? "left" : way.x1 > board.width ? "right" : way.y0 < 0 ? "front" : "back";
+    const distance = edge === "left" ? part.x0 : edge === "right" ? board.width - part.x1 : edge === "front" ? part.y0 : board.depth - part.y1;
+    byEdge.set(edge, [...(byEdge.get(edge) ?? []), { part, way, distance }]);
+  }
+  for (const [edge, list] of byEdge) {
+    list.sort((a, b) => a.distance - b.distance);
+    const base = list[0].way;
+    ways.set(list[0].part, base);
+    let top = base.top;
+    const sideways = edge === "left" || edge === "right";
+    for (const { part } of list.slice(1)) {
+      const half = Math.max(part.x1 - part.x0, part.y1 - part.y0) / 2 + grow;
+      const middle = sideways ? (base.y0 + base.y1) / 2 : (base.x0 + base.x1) / 2;
+      const across = sideways ? { y0: middle - half, y1: middle + half, x0: base.x0, x1: base.x1 } : { x0: middle - half, x1: middle + half, y0: base.y0, y1: base.y1 };
+      const bottom = top;
+      top = bottom + part.height + grow;
+      ways.set(part, { name: `${part.name} cable way`, role: "connector", ...across, bottom, top });
+    }
+  }
+  return ways;
+}
+
+/**
  * A ribbon cable's way out through a wall: the cable leaves its connector across the connector's
- * long side, so the opening runs that way to the nearer edge of the board and on by the reach, as
- * wide as the connector is long and as high as it stands, both grown by the clearance.
+ * long side, so the opening runs that way to the nearer edge of the board (or the edge the part
+ * names, `ribbonExit`, where the nearer one holds other connectors) and on by the reach, as wide as
+ * the connector is long and as high as it stands, both grown by the clearance.
  */
 export function ribbonSideway(board: SbcBoard, part: SbcPart, clearance = 0, reach = 0): SbcSolid {
   const grow = normalizeSbcClearance(clearance);
@@ -634,12 +674,12 @@ export function ribbonSideway(board: SbcBoard, part: SbcPart, clearance = 0, rea
   const top = board.thickness + part.height + grow;
   if (alongX) {
     // Long side along x: the cable leaves along y, to the front (y = 0) or the back edge.
-    const toFront = (part.y0 + part.y1) / 2 <= board.depth / 2;
+    const toFront = part.ribbonExit ? part.ribbonExit === "front" : (part.y0 + part.y1) / 2 <= board.depth / 2;
     const y0 = toFront ? -grow - out : (part.y0 + part.y1) / 2;
     const y1 = toFront ? (part.y0 + part.y1) / 2 : board.depth + grow + out;
     return { name: `${part.name} cable way`, role: "connector", x0: part.x0 - grow, x1: part.x1 + grow, y0, y1, bottom, top };
   }
-  const toLeft = (part.x0 + part.x1) / 2 <= board.width / 2;
+  const toLeft = part.ribbonExit ? part.ribbonExit === "left" : (part.x0 + part.x1) / 2 <= board.width / 2;
   const x0 = toLeft ? -grow - out : (part.x0 + part.x1) / 2;
   const x1 = toLeft ? (part.x0 + part.x1) / 2 : board.width + grow + out;
   return { name: `${part.name} cable way`, role: "connector", x0, x1, y0: part.y0 - grow, y1: part.y1 + grow, bottom, top };
