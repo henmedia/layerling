@@ -135,6 +135,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_list_reference_points` | felsorolja a referenciapontokat az azonosítójukkal és a helyzetükkel |
 | `layerling_remove_reference_points` | azonosító alapján vagy mindet törli a referenciapontokat |
 | `layerling_list_notes` | kiolvassa a felhasználó jegyzeteit a szövegükkel, azzal a testtel, amelyhez tartoznak, és hogy kérés-e az MI-nek |
+| `layerling_wait_for_notes` | megvárja, amíg egy jegyzeten bejelölöd a(z) {{ui:note.forAi}} lehetőséget, és azonnal továbbadja a kérést |
 | `layerling_add_note` | jegyzetet tesz a modellre, objektumhoz rögzítve vagy szabadon a lapon |
 | `layerling_update_note` | módosít egy jegyzetet vagy válaszol rá; a válasz lezárja a kérést |
 | `layerling_remove_notes` | azonosító alapján töröl jegyzeteket |

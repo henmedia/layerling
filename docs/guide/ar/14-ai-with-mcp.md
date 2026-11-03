@@ -139,6 +139,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_list_reference_points` | تسرد النقاط المرجعية مع معرّفاتها ومواضعها |
 | `layerling_remove_reference_points` | تحذف نقاطًا مرجعية حسب المعرّف، أو كلها |
 | `layerling_list_notes` | يقرأ ملاحظات المستخدم مع نصها والجسم المثبتة عليه كل واحدة وهل هي طلب للذكاء الاصطناعي |
+| `layerling_wait_for_notes` | ينتظر حتى تضع علامة {{ui:note.forAi}} على ملاحظة، ثم يسلّم الطلب فورًا |
 | `layerling_add_note` | يضع ملاحظة على النموذج، مثبتة على كائن أو حرة على اللوحة |
 | `layerling_update_note` | يعدّل ملاحظة أو يرد عليها؛ الرد يغلق الطلب |
 | `layerling_remove_notes` | يحذف ملاحظات بحسب المعرّف |

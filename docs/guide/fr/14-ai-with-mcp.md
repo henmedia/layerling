@@ -135,6 +135,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_list_reference_points` | répertorie les points de référence avec leurs identifiants et positions |
 | `layerling_remove_reference_points` | supprime les points de référence par identifiant, ou tous |
 | `layerling_list_notes` | lit les notes de l'utilisateur avec leur texte, le corps auquel chacune est fixée et si c'est une demande pour l'IA |
+| `layerling_wait_for_notes` | attend que vous cochiez {{ui:note.forAi}} sur une note et transmet aussitôt la demande |
 | `layerling_add_note` | pose une note sur le modèle, fixée à un objet ou libre sur le plateau |
 | `layerling_update_note` | modifie une note ou y répond ; une réponse clôt la demande |
 | `layerling_remove_notes` | supprime des notes par identifiant |

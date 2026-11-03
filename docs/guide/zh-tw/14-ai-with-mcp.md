@@ -139,6 +139,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_list_reference_points` | 列出參考點及其 id 與位置 |
 | `layerling_remove_reference_points` | 依 id 刪除參考點，或全部刪除 |
 | `layerling_list_notes` | 讀取使用者的備註，包括文字、每則所附著的實體，以及它是否是給 AI 的請求 |
+| `layerling_wait_for_notes` | 等待你在註記上勾選 {{ui:note.forAi}}，並立即轉交該請求 |
 | `layerling_add_note` | 在模型上放一則備註，附著在物件上或自由放在工作板上 |
 | `layerling_update_note` | 修改一則備註或回覆它；回覆會關閉請求 |
 | `layerling_remove_notes` | 依 id 刪除備註 |

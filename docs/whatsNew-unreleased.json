@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "KI wartet auf deine Notizen",
+      "en": "The AI waits for your notes"
+    },
+    "body": {
+      "de": "Ein KI-Agent an der MCP-Brücke kann jetzt auf deine Notizen warten: Bitte ihn einmal darum, dann greift er jeden Auftrag auf, sobald du an einer Notiz „Für die KI“ ankreuzt, und antwortet am Modell.",
+      "en": "An AI agent on the MCP bridge can now wait for your notes: ask it once, and it picks up every request as soon as you tick For the AI on a note, and answers on the model."
+    }
+  },
+  {
+    "title": {
       "de": "Winkelmesser",
       "en": "Protractor"
     },

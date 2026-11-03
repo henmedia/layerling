@@ -139,6 +139,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_list_reference_points` | listet die Bezugspunkte mit Kennung und Lage auf |
 | `layerling_remove_reference_points` | löscht Bezugspunkte nach Kennung oder alle |
 | `layerling_list_notes` | liest die Notizen des Nutzers mit Text, dem Körper, an dem jede hängt, und ob sie ein Auftrag für die KI ist |
+| `layerling_wait_for_notes` | wartet, bis du an einer Notiz {{ui:note.forAi}} ankreuzt, und gibt den Auftrag sofort weiter |
 | `layerling_add_note` | setzt eine Notiz ans Modell, an einen Körper geheftet oder frei auf der Arbeitsebene |
 | `layerling_update_note` | ändert eine Notiz oder beantwortet sie; eine Antwort schließt den Auftrag |
 | `layerling_remove_notes` | löscht Notizen nach Kennung |

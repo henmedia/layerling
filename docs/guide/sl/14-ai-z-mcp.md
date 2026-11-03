@@ -135,6 +135,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_list_reference_points` | našteje referenčne točke z oznako in lego |
 | `layerling_remove_reference_points` | izbriše referenčne točke po oznaki ali vse |
 | `layerling_list_notes` | prebere uporabnikove zapiske z besedilom, telesom, na katero je vsak pripet, in ali je naloga za UI |
+| `layerling_wait_for_notes` | počaka, da pri opombi označite {{ui:note.forAi}}, in zahtevo takoj preda |
 | `layerling_add_note` | postavi zapisek na model, pripet na predmet ali prost na plošči |
 | `layerling_update_note` | spremeni zapisek ali nanj odgovori; odgovor nalogo zaključi |
 | `layerling_remove_notes` | izbriše zapiske po id |

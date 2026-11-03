@@ -139,6 +139,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_list_reference_points` | 列出参考点及其 id 和位置 |
 | `layerling_remove_reference_points` | 按 id 删除参考点，或删除全部 |
 | `layerling_list_notes` | 读取用户的备注，包括文字、每条所附着的实体，以及它是否是给 AI 的请求 |
+| `layerling_wait_for_notes` | 等待你在注释上勾选 {{ui:note.forAi}}，并立即转交该请求 |
 | `layerling_add_note` | 在模型上放一条备注，附着在对象上或自由放在工作板上 |
 | `layerling_update_note` | 修改一条备注或回复它；回复会关闭请求 |
 | `layerling_remove_notes` | 按 id 删除备注 |

@@ -139,6 +139,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_list_reference_points` | lister referencepunkterne med deres id'er og positioner |
 | `layerling_remove_reference_points` | sletter referencepunkter efter id, eller alle sammen |
 | `layerling_list_notes` | læser brugerens noter med tekst, det legeme hver er fæstnet til, og om den er en opgave til AI'en |
+| `layerling_wait_for_notes` | venter, til du sætter flueben i {{ui:note.forAi}} på en note, og giver straks opgaven videre |
 | `layerling_add_note` | sætter en note på modellen, fæstnet til et objekt eller frit på pladen |
 | `layerling_update_note` | ændrer en note eller svarer på den; et svar lukker opgaven |
 | `layerling_remove_notes` | sletter noter efter id |

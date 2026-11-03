@@ -139,6 +139,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_list_reference_points` | lista los puntos de referencia con sus id y posiciones |
 | `layerling_remove_reference_points` | elimina puntos de referencia por id, o todos |
 | `layerling_list_notes` | lee las notas del usuario con su texto, el cuerpo al que está fijada cada una y si es un encargo para la IA |
+| `layerling_wait_for_notes` | espera hasta que marques {{ui:note.forAi}} en una nota y entrega la petición al momento |
 | `layerling_add_note` | pone una nota en el modelo, fijada a un objeto o libre en la placa |
 | `layerling_update_note` | cambia una nota o la responde; una respuesta cierra el encargo |
 | `layerling_remove_notes` | borra notas por id |

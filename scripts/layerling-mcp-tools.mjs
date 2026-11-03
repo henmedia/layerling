@@ -1609,6 +1609,17 @@ export const tools = [
     },
   },
   {
+    name: "layerling_wait_for_notes",
+    description: "Wait until the user puts a request on the model: a note ticked For the AI that you have not had yet, or one the user changed since. Returns as soon as there is one, with the notes as layerling_list_notes gives them, or after the time is up with notes empty and timedOut true. Use it when the user asks you to watch their notes: do the work each request asks for, answer it with layerling_update_note, then call this again, so the user only has to work on the model. A request is handed over once; what you write into a note yourself counts as seen, so a note you keep open with a question comes back only when the user changes it.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        seconds: { type: "number", minimum: 1, maximum: 600, description: "How long to wait at most, in seconds. Default 50, which stays under the time most clients give a tool call; raise it only if your client waits longer." },
+      },
+    },
+  },
+  {
     name: "layerling_add_note",
     description: "Put a note on the model, to answer or ask something at a spot, for example \"hole placed here, 15 mm deep. Is that right?\". Pin it to an object with objectId (at its top face's middle unless at says where), or put it free on the plate with at. The note shows as a numbered pin the user can open; it is saved with the design, never printed or exported, and undo takes it back. Returns the note. Leave forAi out for an answer or a remark to the user; set it only to leave a request that an agent should pick up later.",
     inputSchema: {

@@ -139,6 +139,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_list_reference_points` | lists the reference points with their ids and positions |
 | `layerling_remove_reference_points` | deletes reference points by id, or all of them |
 | `layerling_list_notes` | reads the user's notes with their text, the body each is pinned to and whether it is a request for the AI |
+| `layerling_wait_for_notes` | waits until you tick {{ui:note.forAi}} on a note, and hands the request over at once |
 | `layerling_add_note` | puts a note on the model, pinned to an object or free on the plate |
 | `layerling_update_note` | changes a note or answers it; an answer closes the request |
 | `layerling_remove_notes` | deletes notes by id |

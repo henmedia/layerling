@@ -135,6 +135,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_list_reference_points` | vypíše referenční body s identifikátory a polohami |
 | `layerling_remove_reference_points` | odstraní vybrané nebo všechny referenční body |
 | `layerling_list_notes` | čte poznámky uživatele s textem, tělesem, ke kterému je každá připnutá, a zda jde o zadání pro AI |
+| `layerling_wait_for_notes` | čeká, až u poznámky zaškrtnete {{ui:note.forAi}}, a požadavek hned předá |
 | `layerling_add_note` | dá na model poznámku, připnutou k objektu nebo volnou na desce |
 | `layerling_update_note` | změní poznámku nebo na ni odpoví; odpověď zadání uzavře |
 | `layerling_remove_notes` | smaže poznámky podle id |
