@@ -9045,7 +9045,7 @@ export function LayerlingEditor({
             : shape,
         ),
         selectedIds,
-        delta > 0 ? t("status.selectionRaised") : t("status.selectionLowered"),
+        t(delta > 0 ? "status.selectionRaisedBy" : "status.selectionLoweredBy", { distance: `${formatLengthMm(Math.abs(delta), workspaceSettingsRef.current.accuracy)} ${lengthDisplayUnit(workspaceSettingsRef.current).label}` }),
         `move:${selectedIds.join(",")}`,
       );
     },
@@ -15177,6 +15177,7 @@ export function LayerlingEditor({
       }
       if (refuseLockedSelection()) return;
       const selected = new Set(selectedIds);
+      const distance = `${formatLengthMm(Math.abs(deltaX) + Math.abs(deltaZ), workspaceSettingsRef.current.accuracy)} ${lengthDisplayUnit(workspaceSettingsRef.current).label}`;
       // Right and up on the keys mean right and away on the screen: each picks
       // the workplane axis that points that way most, so after turning the
       // view the keys still go where the arrows point (as in similar tools).
@@ -15199,7 +15200,7 @@ export function LayerlingEditor({
             : shape,
         ),
         selectedIds,
-        selectedShapes.length === 1 ? t("status.movedOne") : t("status.movedMany", { count: selectedShapes.length }),
+        selectedShapes.length === 1 ? t("status.movedOneBy", { distance }) : t("status.movedManyBy", { count: selectedShapes.length, distance }),
         `move:${selectedIds.join(",")}`,
       );
     },
