@@ -45,9 +45,9 @@ const checkbox = (panel: HTMLElement, name: string) => [...panel.querySelectorAl
 const texts = (panel: HTMLElement) => panel.textContent ?? "";
 
 describe("the lid's panel with a hinge", () => {
-  it("offers a hinge at the back and asks for its pin, clearance, knuckles and a printed pin once it is on", () => {
+  it("offers a hinge and asks for its side, pin, clearance, knuckles and a printed pin once it is on", () => {
     const off = mount();
-    const hinge = checkbox(off.panel, "Hinge at the back")!;
+    const hinge = checkbox(off.panel, "Hinge")!;
     expect(hinge).not.toBeNull();
     expect(hinge.checked).toBe(false);
     expect(texts(off.panel)).not.toContain("Pin diameter");
@@ -55,22 +55,36 @@ describe("the lid's panel with a hinge", () => {
     expect(off.changes.at(-1)).toEqual({ hinge: true });
     act(() => root?.unmount());
     const on = mount({ hinge: true });
-    for (const label of ["Pin diameter", "Hinge clearance", "Knuckles (0 = automatic)"]) expect(texts(on.panel)).toContain(label);
+    for (const label of ["Hinge side", "Pin diameter", "Hinge clearance", "Knuckles (0 = automatic)"]) expect(texts(on.panel)).toContain(label);
     expect(checkbox(on.panel, "Print the pin too")).not.toBeNull();
     // The knuckles' size for a 1.75 mm pin: its hole with 0.15 mm play and a 1.6 mm wall round it.
     expect(texts(on.panel)).toContain("Knuckles 5.3 mm");
   });
 
+  it("puts the hinge at the back unless another side is picked", () => {
+    const { panel, changes } = mount({ hinge: true });
+    const group = panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Hinge side"]')!;
+    expect(group).not.toBeNull();
+    const sides = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
+    expect(sides.map((button) => button.textContent)).toEqual(["Back", "Right", "Front", "Left"]);
+    expect(sides.filter((button) => button.getAttribute("aria-checked") === "true").map((button) => button.textContent)).toEqual(["Back"]);
+    act(() => sides[1].click());
+    expect(changes.at(-1)).toEqual({ hingeSide: "right" });
+    act(() => root?.unmount());
+    const left = mount({ hinge: true, hingeSide: "left" });
+    expect(left.panel.querySelector('[aria-label="Hinge side"] [role="radio"][aria-checked="true"]')?.textContent).toBe("Left");
+  });
+
   it("goes with a lid that pushes in or a flat one, and says so for one with a rim round the outside", () => {
     const cap = mount({ type: "cap", hinge: true });
-    const hinge = checkbox(cap.panel, "Hinge at the back")!;
+    const hinge = checkbox(cap.panel, "Hinge")!;
     expect(hinge.disabled).toBe(true);
     expect(hinge.checked).toBe(false);
     expect(texts(cap.panel)).toContain("A hinge goes with a lid that pushes in or a flat one.");
     expect(texts(cap.panel)).not.toContain("Pin diameter");
     act(() => root?.unmount());
     const flat = mount({ type: "flat", hinge: true });
-    expect(checkbox(flat.panel, "Hinge at the back")!.disabled).toBe(false);
+    expect(checkbox(flat.panel, "Hinge")!.disabled).toBe(false);
     expect(texts(flat.panel)).toContain("Pin diameter");
   });
 });

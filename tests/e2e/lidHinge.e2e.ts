@@ -50,7 +50,7 @@ function swung(lid: Body, y: number, z: number, degrees: number, created: Solid[
 
 const HINGED = { type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, hinge: true, hingePin: 1.75, hingeGap: 0.3 };
 
-describe("a lid with a hinge along the back (real Manifold kernel)", () => {
+describe("a lid with a hinge along the back or another side (real Manifold kernel)", () => {
   it("knows its options: off unless asked for, an odd number of knuckles, sizes in range", () => {
     expect(normalizeLidOptions().hinge).toBe(false);
     expect(normalizeLidOptions({ hinge: "true" }).hinge).toBe(true);
@@ -105,6 +105,62 @@ describe("a lid with a hinge along the back (real Manifold kernel)", () => {
       const onPin = [closed.intersect(filament), whole.intersect(filament)];
       created.push(...onPin);
       onPin.forEach((part) => expect(part.volume()).toBeLessThan(0.001));
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("goes along the side picked: the hinge of the body turned that side to the back, turned back", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    const atOrigin = (solid: Body) => {
+      const min = solid.boundingBox().min;
+      const moved = solid.translate([-min[0], -min[1], -min[2]]);
+      created.push(moved);
+      return moved;
+    };
+    const sameShape = (a: Body, b: Body, what: string) => {
+      const extra = a.subtract(b);
+      const missing = b.subtract(a);
+      created.push(extra, missing);
+      expect(extra.volume(), what).toBeLessThan(0.01);
+      expect(missing.volume(), what).toBeLessThan(0.01);
+    };
+    try {
+      const body = openBox(kernel, created);
+      // The turn about the scene's up axis that brings each side to the back (-z), and where its knuckles stand.
+      const sides = [
+        { side: "right", degrees: 90, outside: (box: { min: number[]; max: number[] }) => box.min[0] > 29.5 },
+        { side: "front", degrees: 180, outside: (box: { min: number[]; max: number[] }) => box.min[2] > 19.5 },
+        { side: "left", degrees: -90, outside: (box: { min: number[]; max: number[] }) => box.max[0] < -29.5 },
+      ];
+      for (const { side, degrees, outside } of sides) {
+        const result = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeSide: side }));
+        if ("error" in result) throw new Error(`${side}: ${JSON.stringify(result.error)}`);
+        const turned = body.rotate([0, degrees, 0]);
+        created.push(turned);
+        const atBack = lidForSolid(kernel, turned, normalizeLidOptions(HINGED));
+        if ("error" in atBack) throw new Error(`${side}: ${JSON.stringify(atBack.error)}`);
+        created.push(result.lid, result.hinge!.knuckles, atBack.lid, atBack.hinge!.knuckles);
+        expect(outside(result.hinge!.knuckles.boundingBox()), `${side}: knuckles outside that side`).toBe(true);
+        // The right and the left side are 40 mm long, the front 60 mm like the back: knuckles by length.
+        expect(result.hinge!.count, side).toBe(atBack.hinge!.count);
+        expect(result.hinge!.count, side).toBe(side === "front" ? 5 : 3);
+        // The body's knuckles are those of the turned body, turned back; the lid is that one's, turned the same way as
+        // it lies (turned over, so the other way round).
+        const knuckles = result.hinge!.knuckles.rotate([0, degrees, 0]);
+        created.push(knuckles);
+        sameShape(knuckles, atBack.hinge!.knuckles, `${side}: knuckles`);
+        const lid = result.lid.rotate([0, -degrees, 0]);
+        created.push(lid);
+        sameShape(atOrigin(lid), atOrigin(atBack.lid), `${side}: lid`);
+        // On the body they grow out of its wall, and the lid lies beside both, clear of them.
+        const whole = body.add(result.hinge!.knuckles);
+        const hit = result.lid.intersect(whole);
+        created.push(whole, hit);
+        expect(whole.decompose().length, side).toBe(1);
+        expect(hit.volume(), side).toBeLessThan(0.001);
+      }
     } finally {
       dispose(created);
     }

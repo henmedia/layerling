@@ -18,7 +18,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * With magnets, the lid holds by four round magnets in the corners: a pocket for each in the body's rim and one facing
  * it in the lid's plate. A wall too thin for a pocket gets a post in that corner, from the bottom up to the rim, which
  * the lid's lip then goes round.
- * With a hinge, the lid swings open about an axis along the body's straight back side, flush with the lid's top: knuckles
+ * With a hinge, the lid swings open about an axis along a straight side of the body (the back, or the side picked), flush
+ * with the lid's top: knuckles
  * take turns along it, the outer ones the body's, those between the lid's, a gap apart, and a pin goes through them all
  * (a piece of filament, or a pin printed apart). The body's knuckles stand out from its back wall on a 45 degree slope,
  * so the body prints upright without support; the lid's lie on the plate when it is printed turned over.
@@ -28,12 +29,15 @@ import type { WorkplaneShape } from "@/types/layerling";
 
 export type LidType = "plug" | "cap" | "both" | "flat";
 
+/** The side of the body a hinge goes along, as seen in the starting view (the back faces away, -z). */
+export type LidHingeSide = "back" | "right" | "front" | "left";
+
 /**
  * The kind of lid; the plate's thickness, the gap per side, how deep the lip or rim reaches down and how thick its wall
  * is, in mm. With `magnets`, pockets for four round magnets of that diameter and height, with `magnetGap` of play per
- * side (a little to press them in, more to glue them). With `hinge`, a hinge along the back for a pin of `hingePin` mm,
- * `hingeGap` between its knuckles, `hingeKnuckles` of them (0: as many as suit its length), and the pin printed apart
- * with `hingePrintPin`.
+ * side (a little to press them in, more to glue them). With `hinge`, a hinge along the `hingeSide` (the back unless
+ * another is picked) for a pin of `hingePin` mm, `hingeGap` between its knuckles, `hingeKnuckles` of them (0: as many as
+ * suit its length), and the pin printed apart with `hingePrintPin`.
  */
 export type LidOptions = {
   type: LidType;
@@ -50,12 +54,13 @@ export type LidOptions = {
   hingeGap: number;
   hingeKnuckles: number;
   hingePrintPin: boolean;
+  hingeSide: LidHingeSide;
 };
 
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat"];
 export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
-  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false,
+  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back",
 };
 export const LID_FITS = [0.1, 0.2, 0.3] as const;
 export const MIN_LID_THICKNESS = 0.4;
@@ -84,6 +89,12 @@ const MAGNET_SIDES = 48;
 const MAGNET_OVERCUT = 1;
 /** The lid types a hinge goes with: a rim round the outside would hit the back wall as the lid swings open. */
 export const LID_HINGE_TYPES: readonly LidType[] = ["plug", "flat"];
+export const LID_HINGE_SIDES: readonly LidHingeSide[] = ["back", "right", "front", "left"];
+/**
+ * The turn about the up axis, in degrees, that brings each side to the back, where the hinge is worked out: the frame's
+ * +y is the scene's -z (the back), +x the scene's +x (the right).
+ */
+const HINGE_SIDE_TURN: Record<LidHingeSide, number> = { back: 0, right: 90, front: 180, left: -90 };
 export const MIN_HINGE_PIN = 1;
 export const MAX_HINGE_PIN = 8;
 export const MIN_HINGE_GAP = 0.1;
@@ -148,6 +159,8 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
     result.hingeKnuckles = whole === 0 ? 0 : Math.max(3, whole % 2 ? whole : whole + 1);
   }
   if (value?.hingePrintPin === true || value?.hingePrintPin === "true") result.hingePrintPin = true;
+  const hingeSide = typeof value?.hingeSide === "string" ? value.hingeSide.trim().toLowerCase() : "";
+  if ((LID_HINGE_SIDES as readonly string[]).includes(hingeSide)) result.hingeSide = hingeSide as LidHingeSide;
   return result;
 }
 
@@ -228,6 +241,13 @@ function signedArea(polygon: readonly (readonly [number, number])[]) {
     area += x * ny - nx * y;
   });
   return area / 2;
+}
+
+/** The outline's points turned by `degrees` (whole quarter turns) about the up axis, counterclockwise seen from above. */
+function turnedPolygons(polygons: readonly (readonly Point[])[], degrees: number): Point[][] {
+  const cos = Math.round(Math.cos((degrees * Math.PI) / 180));
+  const sin = Math.round(Math.sin((degrees * Math.PI) / 180));
+  return polygons.map((polygon) => polygon.map(([x, y]): Point => [x * cos - y * sin, x * sin + y * cos]));
 }
 
 /** The outline round a cut with every hole in it filled: the body as seen from above at that height. */
@@ -412,7 +432,9 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     if (options.type !== "flat" && !hasOpening) return { error: { code: "notOpen" } };
     if (options.type !== "flat" && options.depth >= height) return { error: { code: "tooShallow" } };
     if (options.hinge && !LID_HINGE_TYPES.includes(options.type)) return { error: { code: "hingeLidType" } };
-    const plan = options.hinge ? hingePlan(outline.toPolygons() as Point[][], options, top, box.min[2]) : null;
+    // A hinge on another side is worked out with that side turned to the back, and its pieces turned back after.
+    const turn = HINGE_SIDE_TURN[options.hingeSide];
+    const plan = options.hinge ? hingePlan(turnedPolygons(outline.toPolygons() as Point[][], turn), options, top, box.min[2]) : null;
     if (plan && "error" in plan) return { error: plan.error };
 
     // The magnets: a pocket in each corner with a wall round it, and a post where the body's wall cannot hold that.
@@ -514,9 +536,10 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
           bodyPieces.push(keep(created, keep(created, runtime.Manifold.hull([round, strip])).subtract(clear)));
         }
       });
-      const hole = along(plan.start - 1, plan.end + 1, plan.hole, plan.axisY, plan.axisZ);
-      made = keep(created, keep(created, made.add(keep(created, runtime.Manifold.union(lidPieces)))).subtract(hole));
-      bodyKnuckles = keep(created, keep(created, runtime.Manifold.union(bodyPieces)).subtract(hole));
+      const unturned = (solid: ManifoldSolid) => (turn ? keep(created, solid.rotate([0, 0, -turn])) : solid);
+      const hole = unturned(along(plan.start - 1, plan.end + 1, plan.hole, plan.axisY, plan.axisZ));
+      made = keep(created, keep(created, made.add(unturned(keep(created, runtime.Manifold.union(lidPieces))))).subtract(hole));
+      bodyKnuckles = keep(created, keep(created, unturned(keep(created, runtime.Manifold.union(bodyPieces)))).subtract(hole));
     }
     // The lid's pockets face the body's: they open in the plate's underside, where it lies on the rim.
     if (magnetCentres.length) {
