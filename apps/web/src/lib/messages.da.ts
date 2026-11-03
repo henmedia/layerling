@@ -1890,6 +1890,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.edgePreviewReady": "Kantbehandlings-forhåndsvisning klar",
   "status.edgeCornerEdgeAdded": "En kort kant ved et hjørne blev taget med: uden den kan hjørnet ikke bearbejdes.",
   "status.edgeCornerEdgesAdded": "{count} korte kanter ved hjørner blev taget med: uden dem kan hjørnerne ikke bearbejdes.",
+  "status.edgeInnerCornersRounded": "Indvendige hjørner rundet først ({count} med {size}): ellers har rundingen ikke plads i de spidse hjørner, hvor kanterne mødes.",
+  "status.edgeInnerCornersChamfered": "Indvendige hjørner faset først ({count} med {size}): ellers har fasen ikke plads i de spidse hjørner, hvor kanterne mødes.",
   "status.finishBeforeRedo": "Afslut det aktuelle træk eller transformér før du gendanner",
   "status.finishBeforeRotate": "Afslut det aktuelle træk eller transformér før du roterer",
   "status.finishBeforeSave": "Afslut det aktuelle træk eller transformér før du gemmer designfilen",

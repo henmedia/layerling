@@ -1251,6 +1251,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.edgePreviewReady": "Vorschau der Kantenbearbeitung fertig",
   "status.edgeCornerEdgeAdded": "Eine kurze Kante an einer Ecke wurde mitgenommen: Ohne sie lässt sich diese Ecke nicht bearbeiten.",
   "status.edgeCornerEdgesAdded": "{count} kurze Kanten an Ecken wurden mitgenommen: Ohne sie lassen sich diese Ecken nicht bearbeiten.",
+  "status.edgeInnerCornersRounded": "Innenecken zuerst gerundet ({count} mit {size}): An den spitzen Ecken, wo die Kanten sich treffen, hat die Rundung sonst keinen Platz.",
+  "status.edgeInnerCornersChamfered": "Innenecken zuerst angefast ({count} mit {size}): An den spitzen Ecken, wo die Kanten sich treffen, hat die Fase sonst keinen Platz.",
   "status.finishBeforeRedo": "Beende das Ziehen oder Umformen, bevor du wiederherstellst",
   "status.finishBeforeRotate": "Beende das Ziehen oder Umformen, bevor du drehst",
   "status.finishBeforeSave": "Beende das Ziehen oder Umformen, bevor du die Entwurfsdatei speicherst",

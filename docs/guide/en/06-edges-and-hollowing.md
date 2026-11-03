@@ -40,7 +40,7 @@ If the size is too large for the edge, layerling says so and suggests a smaller 
 
 When a selection that worked fails after you click one more edge, that edge turns red and is drawn wider: it is the one that cannot be treated together with the others at this size. Click it again to take it out, or make the size smaller. If you click more edges while the message stands, the first one stays red. When there is no earlier selection that worked - the very first click, or a size you just raised - the edges that fail even on their own turn red, or all of them if it is only their combination.
 
-Before it gives up, layerling tries once more with the short edges at the ends of the picked ones, up to twice the size long. One sits where an earlier chamfer ends on a wall that is still sharp: a short slanted edge in the corner, and the corner cannot be treated while it stays sharp. If that helps, those edges are picked as well, and a message says how many were taken along.
+Before it gives up, layerling tries once more with the short edges at the ends of the picked ones, up to twice the size long. One sits where an earlier chamfer ends on a wall that is still sharp: a short slanted edge in the corner, and the corner cannot be treated while it stays sharp. If that helps, those edges are picked as well, and a message says how many were taken along. And where the picked edges meet in a sharp inner corner, as two discs of a cloud do, a fillet has no room at any size: layerling then rounds those corners first, at the same size or a smaller one, and the message says how many and how much (a chamfer chamfers them).
 
 The edge under the pointer is drawn wider too, so you can see which one a click will pick.
 

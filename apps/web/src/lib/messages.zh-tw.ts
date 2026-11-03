@@ -1207,6 +1207,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.edgePreviewReady": "邊處理預覽已就緒",
   "status.edgeCornerEdgeAdded": "已一併選上角落的一條短邊：沒有它，這個角無法處理。",
   "status.edgeCornerEdgesAdded": "已一併選上角落的 {count} 條短邊：沒有它們，這些角無法處理。",
+  "status.edgeInnerCornersRounded": "已先對內角倒圓角（{count} 處，{size}）：否則在稜邊相交的尖角處，圓角沒有空間。",
+  "status.edgeInnerCornersChamfered": "已先對內角倒角（{count} 處，{size}）：否則在稜邊相交的尖角處，倒角沒有空間。",
   "status.finishBeforeRedo": "先完成目前的拖曳或變換，再重做",
   "status.finishBeforeRotate": "先完成目前的拖曳或變換，再旋轉",
   "status.finishBeforeSave": "先完成目前的拖曳或變換，再儲存設計檔案",

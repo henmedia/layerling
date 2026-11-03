@@ -1375,6 +1375,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.edgePreviewReady": "Náhled úpravy hran je připraven",
   "status.edgeCornerEdgeAdded": "Byla přibrána krátká hrana v rohu: bez ní nejde tento roh upravit.",
   "status.edgeCornerEdgesAdded": "Byly přibrány krátké hrany v rozích ({count}): bez nich nejdou tyto rohy upravit.",
+  "status.edgeInnerCornersRounded": "Nejdřív byly zaobleny vnitřní rohy ({count}, {size}): jinak zaoblení nemá v ostrých rozích, kde se hrany stýkají, místo.",
+  "status.edgeInnerCornersChamfered": "Nejdřív byly zkoseny vnitřní rohy ({count}, {size}): jinak zkosení nemá v ostrých rozích, kde se hrany stýkají, místo.",
   "status.finishBeforeRedo": "Před opakováním akce dokončete aktuální tažení nebo transformaci",
   "status.finishBeforeRotate": "Před otáčením dokončete aktuální tažení nebo transformaci",
   "status.finishBeforeSave": "Před uložením projektu dokončete aktuální tažení nebo transformaci",

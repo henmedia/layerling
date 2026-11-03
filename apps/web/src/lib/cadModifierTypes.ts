@@ -507,6 +507,8 @@ export type CadModifierWorkerResponse =
       deflection: CadModifierDeflection;
       // Short corner edges the worker took along so a refused chamfer or fillet went through (#1178).
       cornerEdgeIds?: number[];
+      /** Sharp inner corners at the ends of the picked edges, rounded or chamfered first at `amount` so they went through. */
+      innerCorners?: { count: number; amount: number };
     }
   | { type: "disposed"; requestId: number }
   // failedEdgeIds: the selected edges the kernel could not treat together.

@@ -1256,6 +1256,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.edgePreviewReady": "معاينة معالجة الحافة جاهزة",
   "status.edgeCornerEdgeAdded": "أُضيفت حافة قصيرة عند زاوية: بدونها لا يمكن معالجة هذه الزاوية.",
   "status.edgeCornerEdgesAdded": "أُضيفت حواف قصيرة عند الزوايا ({count}): بدونها لا يمكن معالجة هذه الزوايا.",
+  "status.edgeInnerCornersRounded": "نُعّمت الزوايا الداخلية أولًا ({count}، {size}): وإلا فلا مكان للتنعيم في الزوايا الحادة حيث تلتقي الحواف.",
+  "status.edgeInnerCornersChamfered": "شُطفت الزوايا الداخلية أولًا ({count}، {size}): وإلا فلا مكان للشطف في الزوايا الحادة حيث تلتقي الحواف.",
   "status.finishBeforeRedo": "أنهِ السحب أو التحويل الحالي قبل الإعادة",
   "status.finishBeforeRotate": "أنهِ السحب أو التحويل الحالي قبل التدوير",
   "status.finishBeforeSave": "أنهِ السحب أو التحويل الحالي قبل حفظ ملف التصميم",
