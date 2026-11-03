@@ -30,6 +30,9 @@ import { createPrismGeometry } from "@/lib/prismGeometry";
 import { shapeHasAlongDeform, slopeMesh } from "@/lib/slopeAlong";
 import { createBooleanHalfSphereGeometry, createBooleanHollowCylinderGeometry, createBooleanRoundRoofGeometry, createParaboloidGeometry } from "@/lib/roundBodyGeometry";
 import { createCurvedConeGeometry } from "@/lib/curvedCone";
+import { createScrewBossGeometry } from "@/lib/screwBoss";
+import { createSnapFitGeometry } from "@/lib/snapFit";
+import { createRibGeometry } from "@/lib/rib";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createThreadGeometry } from "@/lib/threadGeometry";
@@ -434,6 +437,15 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       break;
     case "curvedCone":
       geometry = createCurvedConeGeometry(width, height, depth, shape.curvedConeTop, shape.curvedConeBend, roundSideCount(shape.sides, width, depth));
+      break;
+    case "screwBoss":
+      geometry = createScrewBossGeometry({ ...shape, width, depth, height });
+      break;
+    case "snapFit":
+      geometry = createSnapFitGeometry({ ...shape, width, depth, height });
+      break;
+    case "rib":
+      geometry = createRibGeometry({ ...shape, width, depth, height });
       break;
     case "torus":
       geometry = createBooleanTorusGeometry(width, height, depth, shape);

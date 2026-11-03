@@ -67,7 +67,7 @@ describe("shape catalog", () => {
     expect(kinds.indexOf("gridfinity")).toBe(kinds.indexOf("spring") + 1);
   });
 
-  it("exposes the Hirth joint, knurl, hinge and dovetail between gear and the decorative shapes in the toolbar catalog", () => {
+  it("exposes the Hirth joint, knurl, hinge, dovetail and the enclosure parts between gear and the decorative shapes in the toolbar catalog", () => {
     const kinds = toolbarShapeAssets.map((asset) => asset.kind);
 
     const gearIndex = kinds.indexOf("gear");
@@ -76,7 +76,9 @@ describe("shape catalog", () => {
     expect(kinds.indexOf("knurl")).toBe(gearIndex + 2);
     expect(kinds.indexOf("hinge")).toBe(gearIndex + 3);
     expect(dovetailIndex).toBe(gearIndex + 4);
-    expect(kinds.indexOf("star")).toBe(dovetailIndex + 1);
+    // The enclosure parts come next, then the decorative shapes.
+    expect(kinds.slice(dovetailIndex + 1, dovetailIndex + 4)).toEqual(["screwBoss", "snapFit", "rib"]);
+    expect(kinds.indexOf("star")).toBe(dovetailIndex + 4);
   });
 
   it("no longer offers the honeycomb: the hole pattern tool replaced it (#223)", () => {

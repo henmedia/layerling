@@ -202,3 +202,25 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 {{ui:shape.doubleCountersink}} 是兩面都倒角的孔，用於正面與背面都要整潔的板件。它在形狀庫裡沒有獨立項目：取用 {{ui:shape.countersink}}，並在其屬性中開啟 {{ui:prop.screwHoleBothSides}}（本身就是雙面錐形沉頭孔的實體已顯示該開關開啟）：兩端各有一個錐面張開到 {{ui:prop.screwHoleHead}}，中間是 {{ui:prop.screwHoleShaft}}。你照舊設定 {{ui:prop.screwHoleAngle}} 與 {{ui:prop.screwHoleLength}}。如果孔太短，容不下兩個完整的錐面，它們會以該角度在中央相接，桿部會比你設定的更寬：10 mm 的頭部、6 mm 的桿部、90° 與 2 mm 的長度，會形成兩個從 10 mm 收窄到 8 mm 的錐面。作為孔，它像其他孔一樣被推穿零件。
 
 把形狀設為孔，並與零件群組。讓它的頂端略高於頭部應貼合的表面，使沉頭孔開口乾淨。要為六角螺帽做沉頭孔，就用六邊的 {{ui:shape.polygon}} 當作孔。 在{{ui:prop.screwHoleSize}}中可選 M2 到 M30（錐形沉孔到 M20），軸徑（ISO 273 中等通孔）、頭部直徑以及深度或角度即依標準設定（DIN 974-1、ISO 15065），長度不變。對於六角柱，{{ui:prop.nutPocketSize}}依 ISO 4032 設定螺帽的對邊寬度和高度，並留 0.4 mm 列印餘量。
+
+## 螺絲柱
+
+{{ui:shape.screwBoss}} 是外殼裡用來鎖固蓋子或電路板的柱子：圓形，從頂部開孔。在 {{ui:prop.screwBossFastener}} 中選擇裝入什麼。{{ui:screwBoss.insert}} 是用烙鐵壓入的黃銅螺帽：{{ui:prop.screwBossSize}} 提供 M2 到 M5 以及 #2-56 到 1/4-20，孔依常見熱熔螺帽的要求（M3：長 5.7 mm 的螺帽用 4.0 mm 孔），比螺帽深一公釐，讓被擠開的塑膠有地方去，柱子約為孔的兩倍粗。{{ui:screwBoss.selfTapping}} 自己攻出螺紋：ST2.2 到 ST4.2（DIN 7981）、2.5 到 5 mm (K25–K50) 的塑膠螺絲或 #2 到 #10，底孔約為螺絲的 0.8 倍，柱子 2.5 倍，孔深約 2.5 個螺絲直徑。{{ui:screwBoss.custom}} 使用你輸入的孔徑和孔深。
+
+{{ui:prop.screwBossHole}}、{{ui:prop.screwBossHoleDepth}} 和 {{ui:prop.screwBossDiameter}} 都可以手動修改；直徑下方會顯示孔周壁厚，如果比固定方式要求的薄會提示。孔與柱子一樣深時為通孔。孔口有一個小倒角，方便螺帽或螺絲進入。{{ui:prop.screwBossGussets}} 從柱子到底面加上兩到六條細肋；{{ui:prop.screwBossReach}}、{{ui:prop.screwBossGussetHeight}} 和 {{ui:prop.screwBossGussetThickness}} 設定它們伸出多遠、多高、多厚。
+
+把螺絲柱立在已薄殼的盒子底面上並與盒子群組；在蓋子上，其上方作為孔的 {{ui:shape.counterbore}} 用來容納螺絲頭。列印出來的孔會比圖面略小：先列印一個柱子試試，再把 {{ui:prop.screwBossHole}} 調整零點一兩公釐。
+
+## 卡扣
+
+能扣合的蓋子不需要螺絲。{{ui:shape.snapFit}} 是帶底座的卡鉤及其配對件卡座。{{ui:prop.snapFitPart}} 設為 {{ui:snapFit.both}} 時，兩者都位於扣合後的位置，可以一起放到蓋子和盒子上；{{ui:snapFit.hook}} 或 {{ui:snapFit.catch}} 只產生其中一個。卡齒下方是讓它滑入的斜面，即 {{ui:prop.snapFitLeadAngle}}（30° 容易插入），上方是保持面：{{ui:prop.snapFitRetainAngle}} 為 90° 時永久卡住，45° 時還能拆開。{{ui:prop.snapFitUndercut}} 是卡齒伸到卡座下方的深度，{{ui:prop.snapFitClearance}} 是兩者之間的間隙。
+
+扣合時懸臂會彎曲一個倒扣深度。{{ui:prop.snapFitThickness}} 下方顯示根部的拉伸量：PLA 約 2 % 以上會斷，PETG 和 ABS 可承受約 4 %。懸臂更長或更薄，或倒扣更小，拉伸就更小。這一對的擺放就像在直立列印的盒子裡，蓋子在上：卡鉤掛在底座下面，卡座頂面傾斜 45°，只有與倒扣深度一樣寬的保持面平伸出來，所以在壁上列印不需支撐。
+
+把這一對放在蓋子與盒壁相接的地方：卡鉤底座在蓋子下面，卡座背面貼在盒壁內側。然後用 {{ui:inspector.separateParts}} 把它們分成兩個實體；卡鉤與蓋子群組，卡座與盒子群組。盡量讓蓋子列印時懸臂平躺：直立的懸臂會垂直於層彎曲，更容易斷。
+
+## 加強肋
+
+{{ui:shape.rib}} 用來加強底面或側壁。作為 {{ui:rib.straight}}，長度、高度和厚度都依你的設定，{{ui:prop.ribTop}} 可以是平的、圓的或倒角的。作為 {{ui:rib.gusset}}，它是把側壁撐在底面上的三角形：{{ui:prop.ribGussetFoot}} 沿底面，{{ui:prop.ribGussetLeg}} 沿壁面向上，兩端都切短一點，方便乾淨地列印。
+
+厚度與壁厚相當或略薄、為線寬整數倍（0.4 mm 噴嘴用 0.8 或 1.6 mm）、高度為厚度幾倍的加強肋，既能加強又不會讓壁面變形。多條排成一列用 {{ui:editor.tool.array}}；把它們與盒子群組。

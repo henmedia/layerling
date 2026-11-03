@@ -25,6 +25,7 @@ What the library offers:
 - **{{ui:library.section.vessels}}:** the {{ui:shape.loft}} from one outline to another, say from square to round, the {{ui:shape.tube}}, the {{ui:shape.bentTube}}, made of up to twelve straight pieces with bends in between, and the {{ui:shape.vase}}.
 - **{{ui:library.section.holes}}:** the {{ui:shape.counterbore}} and {{ui:shape.countersink}} for screw heads, the {{ui:shape.teardrop}} for horizontal holes and the {{ui:shape.port}} for USB, HDMI, DisplayPort and RJ45 sockets.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (threaded rod, screw, nut and tapped hole), the {{ui:shape.finishingWasher}} under a countersunk screw, the print-in-place {{ui:shape.hinge}} and the {{ui:shape.dovetail}}. More in [Threads and mechanics](chapter:threads-and-mechanics).
+- **{{ui:library.section.enclosure}}:** the {{ui:shape.screwBoss}} for heat-set inserts and self-tapping screws, the {{ui:shape.snapFit}} with its catch and the {{ui:shape.rib}} or gusset. More in [Threads and mechanics](chapter:threads-and-mechanics).
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} and the {{ui:shape.hirth}}.
 - **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}} bins and baseplates, and the {{ui:shape.sbcBoard}}, a single-board computer true to size to build a case around.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, also along a circular arc, the {{ui:shape.nameTag}}, the {{ui:shape.iconTag}} and the {{ui:shape.qrCode}}. More in [Text](chapter:text).

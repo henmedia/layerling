@@ -3,6 +3,9 @@ import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { normalizePyramidTop } from "@/lib/pyramidGeometry";
 import { createLocalId } from "@/lib/localIds";
 import { DEFAULT_CURVED_CONE_BEND, DEFAULT_CURVED_CONE_TOP, normalizeCurvedConeBend, normalizeCurvedConeTop } from "@/lib/curvedCone";
+import { DEFAULT_SCREW_BOSS_FASTENER, DEFAULT_SCREW_BOSS_SIZE, normalizeScrewBossFastener } from "@/lib/screwBoss";
+import { DEFAULT_SNAP_FIT_CLEARANCE, DEFAULT_SNAP_FIT_FOOT, DEFAULT_SNAP_FIT_LEAD_ANGLE, DEFAULT_SNAP_FIT_RETAIN_ANGLE, DEFAULT_SNAP_FIT_THICKNESS, DEFAULT_SNAP_FIT_UNDERCUT, normalizeSnapFitPart } from "@/lib/snapFit";
+import { normalizeRibStyle, normalizeRibTop } from "@/lib/rib";
 import {
   DEFAULT_GEAR_BACKLASH,
   DEFAULT_GEAR_CENTER_HOLE_SIZE,
@@ -243,6 +246,9 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   hinge: "shape.hinge",
   knurl: "shape.knurl",
   dovetail: "shape.dovetail",
+  screwBoss: "shape.screwBoss",
+  snapFit: "shape.snapFit",
+  rib: "shape.rib",
   teardrop: "shape.teardrop",
   port: "shape.port",
   loft: "shape.loft",
@@ -295,6 +301,9 @@ export const toolbarShapeAssets: ToolbarShapeAsset[] = [
   { id: "knurl", name: "Knurl", src: "assets/editor/shape-icons-gray/knurl.png", menuIcon: "assets/editor/shape-icons-gray/knurl.png", kind: "knurl", color: "#7a8a99" },
   { id: "hinge", name: "Hinge", src: "assets/editor/shape-icons-gray/hinge.png", menuIcon: "assets/editor/shape-icons-gray/hinge.png", kind: "hinge", color: "#3f8f6b" },
   { id: "dovetail", name: "Dovetail", src: "assets/editor/shape-icons-gray/dovetail.png", menuIcon: "assets/editor/shape-icons-gray/dovetail.png", kind: "dovetail", color: "#a0522d" },
+  { id: "screwBoss", name: "Screw boss", src: "assets/editor/shape-icons-gray/screwBoss.png", menuIcon: "assets/editor/shape-icons-gray/screwBoss.png", kind: "screwBoss", color: "#8c7b6b" },
+  { id: "snapFit", name: "Snap-fit", src: "assets/editor/shape-icons-gray/snapFit.png", menuIcon: "assets/editor/shape-icons-gray/snapFit.png", kind: "snapFit", color: "#4f8f7a" },
+  { id: "rib", name: "Rib", src: "assets/editor/shape-icons-gray/rib.png", menuIcon: "assets/editor/shape-icons-gray/rib.png", kind: "rib", color: "#7b8794" },
   { id: "star", name: "Star", src: "assets/editor/shape-icons-gray/star.png", menuIcon: "assets/editor/shape-icons-gray/star.png", kind: "star", color: "#f5a623" },
   { id: "heart", name: "Heart", src: "assets/editor/shape-icons-gray/heart.png", menuIcon: "assets/editor/shape-icons-gray/heart.png", kind: "heart", color: "#e0245e" },
   { id: "crescent", name: "Crescent", src: "assets/editor/shape-icons-gray/crescent.png", menuIcon: "assets/editor/shape-icons-gray/crescent.png", kind: "crescent", color: "#f5c518" },
@@ -506,6 +515,10 @@ export function shapeAssetDefaultDimensions(kind: ShapeKind) {
   }
   if (kind === "hirth") return { width: DEFAULT_HIRTH_DIAMETER, depth: DEFAULT_HIRTH_DIAMETER, height: DEFAULT_HIRTH_HEIGHT };
   if (kind === "curvedCone") return { width: 30, depth: 30, height: 30 };
+  // An M3 heat-set insert's boss, a hook with its catch that bends about 1.6 %, a rib 1.6 mm (four lines) thick.
+  if (kind === "screwBoss") return { width: 8, depth: 8, height: 10 };
+  if (kind === "snapFit") return { width: 8, depth: 9, height: 16 };
+  if (kind === "rib") return { width: 40, depth: 1.6, height: 8 };
   const roundProfile = kind === "sphere" || kind === "torus" || kind === "ring" || kind === "halfSphere" || kind === "paraboloid";
   const flatProfile = kind === "torus" || kind === "ring" || kind === "text" || kind === "gear";
   // A gear starts as 12 involute teeth of module 2 (#201).
@@ -540,6 +553,19 @@ export function shapeAssetSpecialDefaults(kind: ShapeKind, dimensions = shapeAss
   if (kind === "halfSphere" || kind === "paraboloid") return { steps: 32 };
   if (kind === "cone") return { topRadius: 0, baseRadius: dimensions.width / 2 };
   if (kind === "curvedCone") return { curvedConeTop: DEFAULT_CURVED_CONE_TOP, curvedConeBend: DEFAULT_CURVED_CONE_BEND };
+  if (kind === "screwBoss") return { screwBossFastener: DEFAULT_SCREW_BOSS_FASTENER, screwBossSize: DEFAULT_SCREW_BOSS_SIZE };
+  if (kind === "snapFit") {
+    return {
+      snapFitPart: "both",
+      snapFitThickness: DEFAULT_SNAP_FIT_THICKNESS,
+      snapFitUndercut: DEFAULT_SNAP_FIT_UNDERCUT,
+      snapFitClearance: DEFAULT_SNAP_FIT_CLEARANCE,
+      snapFitLeadAngle: DEFAULT_SNAP_FIT_LEAD_ANGLE,
+      snapFitRetainAngle: DEFAULT_SNAP_FIT_RETAIN_ANGLE,
+      snapFitFoot: DEFAULT_SNAP_FIT_FOOT,
+    };
+  }
+  if (kind === "rib") return { ribStyle: "straight", ribTop: "flat" };
   if (kind === "pyramid") return { sides: 4, topWidth: 0, topDepth: 0 };
   if (kind === "polygon") return { sides: 6 };
   if (kind === "roundRoof") return { sides: 64 };
@@ -689,6 +715,23 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     baseRadius: shape.baseRadius,
     curvedConeTop: shape.curvedConeTop,
     curvedConeBend: shape.curvedConeBend,
+    screwBossFastener: shape.screwBossFastener,
+    screwBossSize: shape.screwBossSize,
+    screwBossHole: shape.screwBossHole,
+    screwBossHoleDepth: shape.screwBossHoleDepth,
+    screwBossDiameter: shape.screwBossDiameter,
+    screwBossGussets: shape.screwBossGussets,
+    screwBossGussetHeight: shape.screwBossGussetHeight,
+    screwBossGussetThickness: shape.screwBossGussetThickness,
+    snapFitPart: shape.snapFitPart,
+    snapFitThickness: shape.snapFitThickness,
+    snapFitUndercut: shape.snapFitUndercut,
+    snapFitClearance: shape.snapFitClearance,
+    snapFitLeadAngle: shape.snapFitLeadAngle,
+    snapFitRetainAngle: shape.snapFitRetainAngle,
+    snapFitFoot: shape.snapFitFoot,
+    ribStyle: shape.ribStyle,
+    ribTop: shape.ribTop,
     topWidth: shape.topWidth,
     topDepth: shape.topDepth,
     taperTopWidth: shape.taperTopWidth,
@@ -1061,6 +1104,23 @@ export function makeShapeFromAsset(
     baseRadius: asset.kind === "cone" ? customization.baseRadius ?? width / 2 : undefined,
     curvedConeTop: asset.kind === "curvedCone" ? normalizeCurvedConeTop(customization.curvedConeTop) : undefined,
     curvedConeBend: asset.kind === "curvedCone" ? normalizeCurvedConeBend(customization.curvedConeBend) : undefined,
+    screwBossFastener: asset.kind === "screwBoss" ? normalizeScrewBossFastener(customization.screwBossFastener) : undefined,
+    screwBossSize: asset.kind === "screwBoss" ? customization.screwBossSize ?? DEFAULT_SCREW_BOSS_SIZE : undefined,
+    screwBossHole: asset.kind === "screwBoss" ? customization.screwBossHole : undefined,
+    screwBossHoleDepth: asset.kind === "screwBoss" ? customization.screwBossHoleDepth : undefined,
+    screwBossDiameter: asset.kind === "screwBoss" ? customization.screwBossDiameter : undefined,
+    screwBossGussets: asset.kind === "screwBoss" ? customization.screwBossGussets : undefined,
+    screwBossGussetHeight: asset.kind === "screwBoss" ? customization.screwBossGussetHeight : undefined,
+    screwBossGussetThickness: asset.kind === "screwBoss" ? customization.screwBossGussetThickness : undefined,
+    snapFitPart: asset.kind === "snapFit" ? normalizeSnapFitPart(customization.snapFitPart) : undefined,
+    snapFitThickness: asset.kind === "snapFit" ? customization.snapFitThickness ?? DEFAULT_SNAP_FIT_THICKNESS : undefined,
+    snapFitUndercut: asset.kind === "snapFit" ? customization.snapFitUndercut ?? DEFAULT_SNAP_FIT_UNDERCUT : undefined,
+    snapFitClearance: asset.kind === "snapFit" ? customization.snapFitClearance ?? DEFAULT_SNAP_FIT_CLEARANCE : undefined,
+    snapFitLeadAngle: asset.kind === "snapFit" ? customization.snapFitLeadAngle ?? DEFAULT_SNAP_FIT_LEAD_ANGLE : undefined,
+    snapFitRetainAngle: asset.kind === "snapFit" ? customization.snapFitRetainAngle ?? DEFAULT_SNAP_FIT_RETAIN_ANGLE : undefined,
+    snapFitFoot: asset.kind === "snapFit" ? customization.snapFitFoot ?? DEFAULT_SNAP_FIT_FOOT : undefined,
+    ribStyle: asset.kind === "rib" ? normalizeRibStyle(customization.ribStyle) : undefined,
+    ribTop: asset.kind === "rib" ? normalizeRibTop(customization.ribTop) : undefined,
     topWidth: asset.kind === "pyramid" ? normalizePyramidTop(customization.topWidth, width) : undefined,
     topDepth: asset.kind === "pyramid" ? normalizePyramidTop(customization.topDepth, depth) : undefined,
     teeth: gearTeeth,

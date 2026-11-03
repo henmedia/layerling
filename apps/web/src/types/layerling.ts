@@ -15,6 +15,9 @@ export type ShapeKind =
   | "halfSphere"
   | "paraboloid"
   | "curvedCone"
+  | "screwBoss"
+  | "snapFit"
+  | "rib"
   | "torus"
   | "tube"
   | "bentTube"
@@ -133,6 +136,33 @@ export type ShapeCustomization = {
   curvedConeTop?: number;
   /** Curved cone: how far the side bends, -1 inward (a trumpet) to 1 outward (a dome). */
   curvedConeBend?: number;
+  /** Screw boss: what goes into its hole - a heat-set insert, a self-tapping screw, or a hole of one's own. */
+  screwBossFastener?: "insert" | "selfTapping" | "custom";
+  /** Screw boss: the size from its list (M3, #4-40, ST2.9 ...); the hole follows it unless typed in. */
+  screwBossSize?: string;
+  /** Screw boss: the hole's diameter and depth in mm, when typed in. */
+  screwBossHole?: number;
+  screwBossHoleDepth?: number;
+  /** Screw boss: the post's outer diameter in mm (the footprint may be wider for the gussets). */
+  screwBossDiameter?: number;
+  /** Screw boss: how many gussets brace it (0 to 6), how high they reach and how thick they are, in mm. */
+  screwBossGussets?: number;
+  screwBossGussetHeight?: number;
+  screwBossGussetThickness?: number;
+  /** Snap-fit: the hook and its catch together, or one of them. */
+  snapFitPart?: "both" | "hook" | "catch";
+  /** Snap-fit: the arm's thickness, the barb's undercut and the clearance to the catch, in mm. */
+  snapFitThickness?: number;
+  snapFitUndercut?: number;
+  snapFitClearance?: number;
+  /** Snap-fit: the barb's entry angle and the angle of the face that holds, in degrees from the direction it goes in. */
+  snapFitLeadAngle?: number;
+  snapFitRetainAngle?: number;
+  /** Snap-fit: the foot's thickness under the arm in mm (0: no foot). */
+  snapFitFoot?: number;
+  /** Rib: a straight rib or a gusset, and a straight rib's top. */
+  ribStyle?: "straight" | "gusset";
+  ribTop?: "flat" | "round" | "chamfer";
   topWidth?: number;
   topDepth?: number;
   teeth?: number;
@@ -891,6 +921,33 @@ export type WorkplaneShape = {
   curvedConeTop?: number;
   /** Curved cone: how far the side bends, -1 inward (a trumpet) to 1 outward (a dome). */
   curvedConeBend?: number;
+  /** Screw boss: what goes into its hole - a heat-set insert, a self-tapping screw, or a hole of one's own. */
+  screwBossFastener?: "insert" | "selfTapping" | "custom";
+  /** Screw boss: the size from its list (M3, #4-40, ST2.9 ...); the hole follows it unless typed in. */
+  screwBossSize?: string;
+  /** Screw boss: the hole's diameter and depth in mm, when typed in. */
+  screwBossHole?: number;
+  screwBossHoleDepth?: number;
+  /** Screw boss: the post's outer diameter in mm (the footprint may be wider for the gussets). */
+  screwBossDiameter?: number;
+  /** Screw boss: how many gussets brace it (0 to 6), how high they reach and how thick they are, in mm. */
+  screwBossGussets?: number;
+  screwBossGussetHeight?: number;
+  screwBossGussetThickness?: number;
+  /** Snap-fit: the hook and its catch together, or one of them. */
+  snapFitPart?: "both" | "hook" | "catch";
+  /** Snap-fit: the arm's thickness, the barb's undercut and the clearance to the catch, in mm. */
+  snapFitThickness?: number;
+  snapFitUndercut?: number;
+  snapFitClearance?: number;
+  /** Snap-fit: the barb's entry angle and the angle of the face that holds, in degrees from the direction it goes in. */
+  snapFitLeadAngle?: number;
+  snapFitRetainAngle?: number;
+  /** Snap-fit: the foot's thickness under the arm in mm (0: no foot). */
+  snapFitFoot?: number;
+  /** Rib: a straight rib or a gusset, and a straight rib's top. */
+  ribStyle?: "straight" | "gusset";
+  ribTop?: "flat" | "round" | "chamfer";
   topWidth?: number;
   topDepth?: number;
   taperTopWidth?: number;

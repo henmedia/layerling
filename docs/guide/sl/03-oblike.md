@@ -25,6 +25,7 @@ Kaj ponuja knjižnica:
 - **{{ui:library.section.vessels}}:** {{ui:shape.loft}} od enega obrisa do drugega, na primer od oglatega do okroglega, {{ui:shape.tube}}, {{ui:shape.bentTube}} iz do dvanajst ravnih kosov z ovinki vmes in {{ui:shape.vase}}.
 - **{{ui:library.section.holes}}:** {{ui:shape.counterbore}} in {{ui:shape.countersink}} za glave vijakov, {{ui:shape.teardrop}} za vodoravne luknje in {{ui:shape.port}} za vtičnice USB, HDMI, DisplayPort in RJ45.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (navojna palica, vijak, matica in navojna luknja), {{ui:shape.finishingWasher}} pod vijak s pogreznjeno glavo, tiskljivi {{ui:shape.hinge}} in {{ui:shape.dovetail}}. Več v poglavju [Navoji in mehanika](chapter:navoji-in-mehanika).
+- **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} za vtisne vložke in samorezne vijake, {{ui:shape.snapFit}} z zaskočko ter {{ui:shape.rib}} ali vozlovna pločevina. Več v poglavju [Navoji in mehanika](chapter:navoji-in-mehanika).
 - **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} in {{ui:shape.hirth}}.
 - **{{ui:library.section.systems}}:** posode in podstavki {{ui:shape.gridfinity}} ter {{ui:shape.sbcBoard}}, enoploščni računalnik v pravi velikosti, okoli katerega zgradiš ohišje.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, tudi na krožnem loku, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} in {{ui:shape.qrCode}}. Več v poglavju [Besedilo](chapter:besedilo).

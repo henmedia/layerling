@@ -628,6 +628,23 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.topRadius === b.topRadius &&
     a.curvedConeTop === b.curvedConeTop &&
     a.curvedConeBend === b.curvedConeBend &&
+    a.screwBossFastener === b.screwBossFastener &&
+    a.screwBossSize === b.screwBossSize &&
+    a.screwBossHole === b.screwBossHole &&
+    a.screwBossHoleDepth === b.screwBossHoleDepth &&
+    a.screwBossDiameter === b.screwBossDiameter &&
+    a.screwBossGussets === b.screwBossGussets &&
+    a.screwBossGussetHeight === b.screwBossGussetHeight &&
+    a.screwBossGussetThickness === b.screwBossGussetThickness &&
+    a.snapFitPart === b.snapFitPart &&
+    a.snapFitThickness === b.snapFitThickness &&
+    a.snapFitUndercut === b.snapFitUndercut &&
+    a.snapFitClearance === b.snapFitClearance &&
+    a.snapFitLeadAngle === b.snapFitLeadAngle &&
+    a.snapFitRetainAngle === b.snapFitRetainAngle &&
+    a.snapFitFoot === b.snapFitFoot &&
+    a.ribStyle === b.ribStyle &&
+    a.ribTop === b.ribTop &&
     a.baseRadius === b.baseRadius &&
     a.topWidth === b.topWidth &&
     a.topDepth === b.topDepth &&

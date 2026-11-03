@@ -20,7 +20,7 @@ export const editorTargetSchema = {
 export const creatableShapeKinds = [
   "box", "roundedBox", "cube", "cylinder", "slot", "ellipse", "polygon", "sphere", "cone", "pyramid", "wedge",
   "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "text", "thread", "spring", "gridfinity", "gear", "hirth",
-  "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
+  "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
 ];
 
 /**
@@ -68,6 +68,23 @@ export const shapeSettingSchema = {
   baseRadius: { type: "number", description: "Cone only: radius at the base." },
   curvedConeTop: { type: "number", description: "Curved cone only: the top's diameter as a share of the bottom's (the width), 0 to 1; 0 runs to a point, 1 is a cylinder. Default 0.25." },
   curvedConeBend: { type: "number", description: "Curved cone only: how far the side bends, -1 to 1. Negative bends it inward into a trumpet like a pseudosphere, 0 is a straight cone, positive bulges it outward into a dome with a flat top. Default -0.8." },
+  screwBossFastener: { type: "string", enum: ["insert", "selfTapping", "custom"], description: "Screw boss only: what goes into its hole - a heat-set insert (default), a self-tapping screw for plastics, or a hole of your own (screwBossHole and screwBossHoleDepth)." },
+  screwBossSize: { type: "string", description: "Screw boss only: the size from the fastener's list. Inserts: M2, M2.5, M3, M3S (short), M4, M5, #2-56, #4-40, #6-32, #8-32, #10-24, 1/4-20 (M3: hole 4.0 mm, insert 5.7 mm). Self-tapping screws: ST2.2, K25, ST2.9, K30, ST3.5, K40, ST4.2, K50, #2, #4, #6, #8, #10 (pilot hole 0.8 times the screw). Default M3, or K30 for screws." },
+  screwBossHole: { type: "number", description: "Screw boss only: the hole's diameter in mm, instead of the size's." },
+  screwBossHoleDepth: { type: "number", description: "Screw boss only: the hole's depth from the top in mm, instead of the size's (an insert's length + 1); as deep as the post goes through." },
+  screwBossDiameter: { type: "number", description: "Screw boss only: the post's outer diameter in mm (about twice an insert's hole, 2.5 times a screw). With gussets the width and depth are the footprint they reach to." },
+  screwBossGussets: { type: "number", description: "Screw boss only: thin ribs from the post down to the floor, 0 to 6 (default 0); they reach out to the footprint (width), screwBossGussetHeight high (default 0.6 of the post) and screwBossGussetThickness thick (1.6 mm)." },
+  screwBossGussetHeight: { type: "number", description: "Screw boss only: how high the gussets reach up the post, mm." },
+  screwBossGussetThickness: { type: "number", description: "Screw boss only: the gussets' thickness, mm." },
+  snapFitPart: { type: "string", enum: ["both", "hook", "catch"], description: "Snap-fit only: both (default) puts the hook and its catch where they sit snapped in under a lid on top - the hook's foot at the top (under the lid), its barb at the bottom, the catch's back at +z (the inside of the wall it goes on); hook or catch makes one of them. separate_parts splits both into two bodies." },
+  snapFitThickness: { type: "number", description: "Snap-fit only: the arm's thickness, mm (1.6). The answer's strain at the root is 1.5 * thickness * undercut / length^2: PLA up to about 2 %, PETG and ABS about 4 %." },
+  snapFitUndercut: { type: "number", description: "Snap-fit only: how far the barb reaches under the catch, mm (1)." },
+  snapFitClearance: { type: "number", description: "Snap-fit only: the play between barb and catch, mm (0.2)." },
+  snapFitLeadAngle: { type: "number", description: "Snap-fit only: the barb's entry slope, degrees from the direction it goes in, 10-60 (30 slides in easily)." },
+  snapFitRetainAngle: { type: "number", description: "Snap-fit only: the angle of the face that holds, 30-90: 90 holds for good, 45 lets it be pulled apart again." },
+  snapFitFoot: { type: "number", description: "Snap-fit only: the foot's thickness under the arm, mm (1.6; 0: no foot)." },
+  ribStyle: { type: "string", enum: ["straight", "gusset"], description: "Rib only: a straight rib (width its length, depth its thickness) or a gusset, a right triangle that braces a wall against the floor (width along the floor, height up the wall at -x, depth its thickness)." },
+  ribTop: { type: "string", enum: ["flat", "round", "chamfer"], description: "Straight rib only: its top." },
   topWidth: { type: "number", description: "Pyramid only: width of the flat top. 0 runs to a point." },
   topDepth: { type: "number", description: "Pyramid only: depth of the flat top. 0 runs to a point." },
   taperTopWidth: { type: "number", description: "Taper, on every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the top face. Setting one value of a face pins the other." },

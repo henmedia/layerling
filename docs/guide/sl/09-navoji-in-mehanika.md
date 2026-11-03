@@ -216,3 +216,25 @@ Glava vijaka pogosto ne sme štrleti. {{ui:shape.counterbore}} za to izreže okr
 {{ui:shape.doubleCountersink}} je luknja s posnetim robom na obeh straneh, za ploščo, ki mora biti spredaj in zadaj lepa: na vsakem koncu se stožec odpre na {{ui:prop.screwHoleHead}}, vmes pa je {{ui:prop.screwHoleShaft}}. {{ui:prop.screwHoleAngle}} in {{ui:prop.screwHoleLength}} nastaviš kot doslej. Če je luknja prekratka za dva cela stožca, se srečata na sredini pri tem kotu in telo ostane širše, kot si nastavil: glava 10 mm, telo 6 mm, 90° in dolžina 2 mm dajo dva stožca od 10 do 8 mm. Kot izrez jo porineš skozi del kot druge.
 
 Obliko naredi za luknjo in jo združi v skupino z delom. Njeno zgornjo stran pusti končati malo nad ploskvijo, na kateri naj sedi glava, da je žep čisto odprt. Za žep šestrobne matice vzameš {{ui:shape.polygon}} s šestimi stranicami kot luknjo. Pod {{ui:prop.screwHoleSize}} izbereš M2 do M30 (ugrezna poglobitev do M20), in steblo (prehodna luknja po ISO 273, srednja), premer ter globina ali kot glave sledijo standardu (DIN 974-1, ISO 15065); dolžina ostane. Pri šesterokotniku {{ui:prop.nutPocketSize}} nastavi velikost ključa in višino matice po ISO 4032, z 0,4 mm zračnosti za tisk.
+
+## Vijačni steber
+
+{{ui:shape.screwBoss}} je steber, na katerega se v ohišju privije pokrov ali tiskanina: okrogel, z luknjo od zgoraj. Pri {{ui:prop.screwBossFastener}} izbereš, kaj pride vanj. {{ui:screwBoss.insert}} je medeninast vložek, ki ga vtisneš s spajkalnikom: {{ui:prop.screwBossSize}} ponuja M2 do M5 in #2-56 do 1/4-20, luknjo takšno, kot jo želijo običajni vložki (M3: 4,0 mm za vložek dolžine 5,7 mm), milimeter globljo od vložka, da ima izrinjena plastika prostor, in steber približno dvakrat debelejši od luknje. {{ui:screwBoss.selfTapping}} si navoj ureže sam: ST2,2 do ST4,2 (DIN 7981), vijaki za plastiko od 2,5 do 5 mm (K25–K50) ali #2 do #10, s predvrtino približno 0,8 × vijak, stebrom 2,5 × in luknjo, globoko 2,5 vijaka. {{ui:screwBoss.custom}} vzame premer in globino, ki ju vpišeš.
+
+{{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} in {{ui:prop.screwBossDiameter}} lahko spremeniš ročno; pod premerom piše, kako debela je stena okoli luknje, z opozorilom, če je tanjša, kot jo potrebuje pritrditev. Luknja, globoka kot steber, gre skozi. Ustje luknje ima majhen posnetek, da vložek ali vijak najde pot. {{ui:prop.screwBossGussets}} doda dve do šest tankih reber od stebra do dna; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} in {{ui:prop.screwBossGussetThickness}} določajo, kako daleč, kako visoka in kako debela so.
+
+Postavi steber na dno izdolbljene škatle in ga združi z njo; v pokrovu nad njim sprejme glavo vijaka {{ui:shape.counterbore}} kot luknja. Natisnjene luknje so nekoliko manjše, kot so narisane: najprej natisni en steber za preizkus in {{ui:prop.screwBossHole}} popravi za desetinko ali dve.
+
+## Zaskočna kljukica
+
+Pokrov, ki zaskoči, ne potrebuje vijakov. {{ui:shape.snapFit}} je kljukica na podnožju s svojim parom, zaskočko. Ko je {{ui:prop.snapFitPart}} na {{ui:snapFit.both}}, stojita oba tam, kjer sedita zaskočena, zato ju postaviš na pokrov in škatlo hkrati; {{ui:snapFit.hook}} ali {{ui:snapFit.catch}} naredi samo enega. Zob ima spodaj poševnino, po kateri zdrsne noter, {{ui:prop.snapFitLeadAngle}} (30° gre lahko), zgoraj pa ploskev, ki drži: pri {{ui:prop.snapFitRetainAngle}} 90° drži trajno, pri 45° se da spet razstaviti. {{ui:prop.snapFitUndercut}} pove, kako daleč seže zob pod zaskočko, {{ui:prop.snapFitClearance}} pa razmik med njima.
+
+Pri zaskoku se ročica upogne za podrez. Pod {{ui:prop.snapFitThickness}} piše, koliko se ob korenu raztegne: PLA poči nad približno 2 %, PETG in ABS preneseta približno 4 %. Daljša ali tanjša ročica ali manjši podrez se raztegne manj. Par stoji tako, kot sedi v škatli, natisnjeni pokonci, pokrov zgoraj: kljukica visi s podnožja, zgornja stran zaskočke je nagnjena za 45° in ravno štrli le zadrževalna ploskev, široka kot podrez, zato se natisne na steni brez podpor.
+
+Postavi par tja, kjer se pokrov sreča s steno: podnožje kljukice pod pokrov, hrbet zaskočke na notranjo stran stene. {{ui:inspector.separateParts}} nato naredi iz njiju dve telesi; kljukico združi s pokrovom, zaskočko s škatlo. Če gre, natisni pokrov tako, da ročica leži: pokončna ročica se upogiba prečno na plasti in se laže zlomi.
+
+## Rebra
+
+{{ui:shape.rib}} ojača dno ali steno. Kot {{ui:rib.straight}} je dolgo, visoko in debelo, kot nastaviš, {{ui:prop.ribTop}} raven, zaobljen ali posnet. Kot {{ui:rib.gusset}} je trikotnik, ki podpre steno ob dno: {{ui:prop.ribGussetFoot}} vzdolž dna, {{ui:prop.ribGussetLeg}} navzgor po steni, oba konca na kratko odrezana, da se lepo natisneta.
+
+Rebro približno tako debelo kot stena ali nekoliko tanjše, mnogokratnik širine linije (0,8 ali 1,6 mm pri šobi 0,4 mm) in nekajkrat višje kot debelo ojača, ne da bi steno zvilo. Več v vrsti naredi {{ui:editor.tool.array}}; združi jih s škatlo.

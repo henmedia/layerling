@@ -224,3 +224,25 @@ Pro zapuštěnou hlavu šroubu slouží {{ui:shape.counterbore}} jako válcová 
 {{ui:shape.doubleCountersink}} je otvor se zkosením na obou stranách pro desku, která má vepředu i vzadu vypadat čistě: na každém konci se kužel otevírá na {{ui:prop.screwHoleHead}} a mezi nimi je {{ui:prop.screwHoleShaft}}. {{ui:prop.screwHoleAngle}} a {{ui:prop.screwHoleLength}} nastavíte jako dosud. Je-li otvor příliš krátký na dva celé kužely, setkají se uprostřed s tímto úhlem a dřík zůstane širší, než jste nastavili: hlava 10 mm, dřík 6 mm, 90° a délka 2 mm dají dva kužely z 10 na 8 mm. Jako výřez ji protáhnete dílem jako ostatní.
 
 Přepněte tvar na výřez a slučte s dílem. Horní konec nechte trochu vyčnívat nad povrch, aby se kapsa čistě otevřela. Pro šestihrannou matici použijte {{ui:shape.polygon}} se šesti stranami jako výřez. V {{ui:prop.screwHoleSize}} zvolíte M2 až M30 (zápustné zahloubení do M20) a dřík (průchozí díra podle ISO 273, střední), průměr a hloubka nebo úhel hlavy se řídí normou (DIN 974-1, ISO 15065); délka zůstane. U šestihranu nastaví {{ui:prop.nutPocketSize}} rozměr klíče a výšku matice podle ISO 4032, s vůlí 0,4 mm pro tisk.
+
+## Šroubový sloupek
+
+{{ui:shape.screwBoss}} je sloupek, ke kterému se v krabičce přišroubuje víko nebo deska: kulatý, s dírou shora. V poli {{ui:prop.screwBossFastener}} zvolíte, co do něj přijde. {{ui:screwBoss.insert}} je mosazná vložka, kterou zatavíte páječkou: {{ui:prop.screwBossSize}} nabízí M2 až M5 a #2-56 až 1/4-20, díru takovou, jakou chtějí běžné vložky (M3: 4,0 mm pro vložku dlouhou 5,7 mm), o milimetr hlubší než vložka, aby vytlačený plast měl kam, a sloupek zhruba dvakrát silnější než díra. {{ui:screwBoss.selfTapping}} si závit vyřízne sám: ST2,2 až ST4,2 (DIN 7981), šrouby do plastu 2,5 až 5 mm (K25–K50) nebo #2 až #10, s předvrtáním asi 0,8 × šroub, sloupkem 2,5 × a dírou hlubokou 2,5 šroubu. {{ui:screwBoss.custom}} vezme průměr a hloubku, které zadáte.
+
+{{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} a {{ui:prop.screwBossDiameter}} lze měnit ručně; pod průměrem je uvedeno, jak silná je stěna kolem díry, s varováním, když je tenčí, než upevnění chce. Díra hluboká jako sloupek je průchozí. Ústí díry má malé zkosení, aby vložka nebo šroub našly cestu. {{ui:prop.screwBossGussets}} přidá dvě až šest tenkých žeber ze sloupku ke dnu; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} a {{ui:prop.screwBossGussetThickness}} určují jejich dosah, výšku a tloušťku.
+
+Postavte sloupek na dno vydlabané krabičky a seskupte ho s ní; ve víku nad ním přijme hlavu šroubu {{ui:shape.counterbore}} jako díra. Tištěné díry vycházejí o něco menší, než jsou nakreslené: nejdřív vytiskněte jeden sloupek na zkoušku a {{ui:prop.screwBossHole}} upravte o desetinu či dvě.
+
+## Zaklapávací háček
+
+Víko, které zaklapne, nepotřebuje šrouby. {{ui:shape.snapFit}} je háček na patce s protikusem, západkou. Když je {{ui:prop.snapFitPart}} na {{ui:snapFit.both}}, stojí oba tam, kde budou po zaklapnutí, takže je umístíte na víko a krabičku najednou; {{ui:snapFit.hook}} nebo {{ui:snapFit.catch}} udělá jen jeden. Zobáček má dole šikminu, po které vklouzne, {{ui:prop.snapFitLeadAngle}} (30° jde snadno), a nahoře plochu, která drží: při {{ui:prop.snapFitRetainAngle}} 90° drží natrvalo, při 45° jde znovu rozepnout. {{ui:prop.snapFitUndercut}} je, jak daleko zobáček zajede pod západku, {{ui:prop.snapFitClearance}} mezera mezi nimi.
+
+Při zaklapnutí se rameno ohne o podříznutí. Pod {{ui:prop.snapFitThickness}} je uvedeno, jak se u kořene natáhne: PLA praská nad asi 2 %, PETG a ABS snesou asi 4 %. Delší nebo tenčí rameno nebo menší podříznutí se natáhne méně. Dvojice stojí tak, jak sedí v krabičce tištěné nastojato, víko nahoře: háček visí na patce, horní strana západky je skloněná o 45° a naplocho vystupuje jen přídržná plocha široká jako podříznutí, takže se západka tiskne na stěně bez podpěr.
+
+Dejte pár tam, kde se víko potkává se stěnou: patku háčku pod víko, záda západky na vnitřní stranu stěny. {{ui:inspector.separateParts}} z nich pak udělá dvě tělesa; háček seskupte s víkem a západku s krabičkou. Pokud to jde, tiskněte víko tak, aby rameno leželo: stojící rameno se ohýbá napříč vrstvami a snáz praskne.
+
+## Žebra
+
+{{ui:shape.rib}} vyztuží dno nebo stěnu. Jako {{ui:rib.straight}} je tak dlouhé, vysoké a silné, jak nastavíte, {{ui:prop.ribTop}} rovná, zaoblená nebo zkosená. Jako {{ui:rib.gusset}} je to trojúhelník, který podepře stěnu proti dnu: {{ui:prop.ribGussetFoot}} podél dna, {{ui:prop.ribGussetLeg}} nahoru po stěně, oba konce krátce useknuté, aby se čistě tiskly.
+
+Žebro zhruba tak silné jako stěna nebo trochu tenčí, násobek šířky linky (0,8 nebo 1,6 mm s tryskou 0,4 mm) a několikrát vyšší než silné vyztuží, aniž by stěnu zkroutilo. Několik vedle sebe udělá {{ui:editor.tool.array}}; seskupte je s krabičkou.

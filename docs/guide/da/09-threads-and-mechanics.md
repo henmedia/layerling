@@ -242,3 +242,25 @@ Gør formen til et hul og gruppér den med delen. Lad dens øverste ende nå lid
 {{ui:shape.finishingWasher}} (en rosette, Discussion #1131) er den hvælvede skive der kommer under en undersænket skrue eller en skrue med hævet hoved, for et pænt udseende på træ eller et låg. Det er et massivt stykke, fladt underst; fra en lav kant stiger en hvælvning op til sædet, en kegle til skruehovedet, med boringen under det. Under {{ui:prop.screwHoleSize}} vælger du M2 til M20: boringen er frigangshullet og sædet undersænkningen af den størrelse, og {{ui:prop.diameter}} og {{ui:prop.height}} følger deraf (M3: 10,3 x 2,95 mm, M6: 16,6 x 4,5 mm). Du kan også selv sætte {{ui:prop.diameter}}, {{ui:prop.height}}, {{ui:prop.centerHole}}, {{ui:prop.screwHoleHead}} i toppen af sædet og dets {{ui:prop.screwHoleAngle}}. Den forbliver rund, og den er en eksakt legeme, så kantværktøjet og STEP virker på den.
 
 > **Tip:** Ligesom gevindhuller, så læg forsænkninger og undersænkninger lidt ind i materialet når de overlapper en kant af den del de er i, ellers skærer de ikke helt.
+
+## Skruetap
+
+{{ui:shape.screwBoss}} er tappen, som et låg eller et printkort skrues fast på i et kabinet: rund, med et hul fra oven. Under {{ui:prop.screwBossFastener}} vælger du, hvad der skal i. En {{ui:screwBoss.insert}} er en messingindsats, der presses i med en loddekolbe: {{ui:prop.screwBossSize}} tilbyder M2 til M5 og #2-56 til 1/4-20, hullet som de almindelige indsatser vil have det (M3: 4,0 mm til en indsats på 5,7 mm), en millimeter dybere end indsatsen, så den fortrængte plast har plads, og tappen omtrent dobbelt så tyk som hullet. En {{ui:screwBoss.selfTapping}} skærer selv sit gevind: ST2,2 til ST4,2 (DIN 7981), plastskruer på 2,5 til 5 mm (K25–K50) eller #2 til #10, med en forboring på cirka 0,8 × skruen, tappen 2,5 × og hullet 2,5 skruer dybt. {{ui:screwBoss.custom}} tager den diameter og dybde, du skriver.
+
+{{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} og {{ui:prop.screwBossDiameter}} kan ændres i hånden; under diameteren står, hvor tyk væggen om hullet er, med en advarsel, hvis den er tyndere, end fastgørelsen vil have. Et hul så dybt som tappen går igennem. Hullets munding har en lille affasning, så indsatsen eller skruen finder vej. {{ui:prop.screwBossGussets}} sætter to til seks tynde ribber fra tappen ned til bunden; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} og {{ui:prop.screwBossGussetThickness}} bestemmer, hvor langt, hvor højt og hvor tykt.
+
+Stil tappen på bunden af en udhulet kasse og gruppér den med kassen; i låget tager en {{ui:shape.counterbore}} som hul over den skruehovedet. Printede huller bliver lidt mindre end tegnet: print først én tap som prøve og justér {{ui:prop.screwBossHole}} en eller to tiendedele.
+
+## Snaplås
+
+Et låg, der klikker i, behøver ingen skruer. {{ui:shape.snapFit}} er en krog på en fod med sin modpart, låsen. Med {{ui:prop.snapFitPart}} sat til {{ui:snapFit.both}} står de to, hvor de sidder, når de er klikket i, så du placerer dem på låg og kasse sammen; {{ui:snapFit.hook}} eller {{ui:snapFit.catch}} laver kun den ene. Næsen har en skrå flade forneden, som den glider ind over, {{ui:prop.snapFitLeadAngle}} (30° går let ind), og foroven fladen, der holder: ved en {{ui:prop.snapFitRetainAngle}} på 90° holder den for altid, ved 45° kan den skilles ad igen. {{ui:prop.snapFitUndercut}} er, hvor langt næsen griber ind under låsen, {{ui:prop.snapFitClearance}} afstanden mellem dem.
+
+Når den klikker i, bøjer armen med underskæringen. Under {{ui:prop.snapFitThickness}} står, hvor meget den strækkes ved roden: PLA knækker over cirka 2 %, PETG og ABS tåler cirka 4 %. En længere eller tyndere arm eller en mindre underskæring strækkes mindre. Parret står, som det sidder i en kasse printet opretstående, med låget øverst: krogen hænger fra sin fod, låsens overside hælder 45°, og kun holdefladen, så bred som underskæringen, stikker fladt ud, så den printes på væggen uden support.
+
+Sæt parret, hvor låget møder kassens væg: krogens fod under låget, låsens ryg mod indersiden af væggen. {{ui:inspector.separateParts}} gør dem derefter til to legemer; gruppér krogen med låget og låsen med kassen. Print om muligt låget, så armen ligger ned: en stående arm bøjer på tværs af sine lag og knækker lettere.
+
+## Ribber
+
+{{ui:shape.rib}} afstiver en bund eller en væg. Som {{ui:rib.straight}} er den så lang, høj og tyk, som du indstiller, {{ui:prop.ribTop}} flad, rund eller affaset. Som {{ui:rib.gusset}} er den en trekant, der afstiver en væg mod bunden: {{ui:prop.ribGussetFoot}} langs bunden, {{ui:prop.ribGussetLeg}} op ad væggen, begge ender skåret kort af, så de printes pænt.
+
+En ribbe omtrent så tyk som væggen eller lidt tyndere, et multiplum af linjebredden (0,8 eller 1,6 mm med en 0,4 mm dyse) og et par gange så høj som tyk afstiver uden at trække væggen skæv. Flere på række laver {{ui:editor.tool.array}}; gruppér dem med kassen.
