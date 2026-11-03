@@ -809,11 +809,11 @@ export function SecondaryToolbar({
     { id: "bundle", label: t("editor.tool.bundle"), icon: ToolbarBundleIcon, action: onBundle, enabled: canGroup, needs: need("twoBodies") },
     { id: "ungroup", label: t("editor.tool.ungroup"), icon: ToolbarUngroupIcon, action: onUngroup, enabled: canUngroup, needs: need("group") },
     { id: "intersect", label: t("editor.tool.intersect"), icon: ToolbarIntersectionIcon, action: onIntersect, enabled: canIntersect || intersectPreviewActive, needs: need("intersect") },
+    { id: "intersect-preview", label: t("editor.tool.intersectPreview"), icon: ToolbarIntersectPreviewIcon, action: onIntersectPreview, enabled: canIntersect || intersectPreviewActive, active: intersectPreviewActive, needs: need("intersect") },
     { id: "cutOut", label: t("editor.tool.cutOut"), icon: ToolbarCutOutIcon, action: onCutOut, enabled: canCutOut || cutOutActive, active: cutOutActive, needs: need("twoSolids") },
     { id: "punch", label: t("editor.tool.punch"), icon: ToolbarPunchIcon, action: onPunch, enabled: canCutOut || punchActive, active: punchActive, needs: need("twoSolids") },
     { id: "hull", label: t("editor.tool.hull"), icon: ToolbarHullIcon, action: onHull, enabled: canHull, needs: need("twoBodies") },
     { id: "loftSketches", label: t("editor.tool.loftSketches"), icon: ToolbarLoftSketchesIcon, action: onLoftSketches, enabled: canLoftSketches, needs: need("loft") },
-    { id: "intersect-preview", label: t("editor.tool.intersectPreview"), icon: ToolbarIntersectPreviewIcon, action: onIntersectPreview, enabled: canIntersect || intersectPreviewActive, active: intersectPreviewActive, needs: need("intersect") },
     { id: "clearance-check", label: t("editor.tool.clearance"), icon: ToolbarClearanceIcon, action: onClearanceCheck, enabled: canCheckClearance || clearanceActive, active: clearanceActive, needs: need("visibleBodies") },
   ];
   const modifyTools = [
