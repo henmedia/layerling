@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Objektliste: Formen verschieben",
+      "en": "Object list: move shapes"
+    },
+    "body": {
+      "de": "Jede Zeile der Objektliste hat links einen Griff mit sechs Punkten. Zieh ihn nach oben oder unten, mit der Maus oder dem Finger, oder fokussiere ihn und drücke die Pfeiltasten: Die Form steht dann an einer anderen Stelle der Liste. Rückgängig macht es wieder rückgängig. Bei A–Z-Sortierung oder Suche sind die Griffe ausgeblendet.",
+      "en": "Each row of the object list has a handle with six dots at its left. Drag it up or down, with the mouse or a finger, or focus it and press the arrow keys, and the shape moves to another place in the list. Undo takes it back. With the A–Z sort or a search the handles are hidden."
+    }
+  },
+  {
+    "title": {
       "de": "Löcher am Rand und eigene Formen",
       "en": "Holes along the edge, and shapes of your own"
     },
