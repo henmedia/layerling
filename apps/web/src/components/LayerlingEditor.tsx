@@ -8,7 +8,7 @@ import { SAVED_VIEW_KEYS } from "@/lib/designView";
 import * as THREE from "three";
 import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
 import { getLanguage, numberLocale, t, type MessageKey } from "@/lib/i18n";
-import { isObjectListOrder, sortObjectList } from "@/lib/objectListSearch";
+import { isObjectListOrder, moveShapeBefore, sortObjectList } from "@/lib/objectListSearch";
 import { useLanguage } from "@/lib/useLanguage";
 import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/loftGeometry";
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
@@ -8803,6 +8803,17 @@ export function LayerlingEditor({
     );
   }, [commitShapes, selectedIds, shapes]);
 
+  /** The object list's handle (#1233): a shape put in front of another one, or last, in the design's own order. */
+  const moveShapeInList = useCallback((id: string, beforeId: string | null) => {
+    // From the refs, so a move that follows another command at once (the AI bridge) sees its result.
+    const current = shapesRef.current;
+    const target = current.find((shape) => shape.id === id);
+    if (!target) return;
+    const moved = moveShapeBefore(current, id, beforeId);
+    if (moved === current) return;
+    commitShapes([...moved], selectedIdsRef.current, t("status.shapeMoved", { name: displayShapeName(target) }));
+  }, [commitShapes]);
+
   const renameShapeById = useCallback((id: string, name: string) => {
     updateShape(id, { name });
   }, [updateShape]);
@@ -11246,6 +11257,16 @@ export function LayerlingEditor({
         commitShapes(currentShapes().filter((shape) => !ids.has(shape.id)), [], deleted.length === 1 ? t("status.mcpDeletedOne") : t("status.mcpDeletedMany", { count: deleted.length }));
         selectedIdsRef.current = [];
         return { deletedIds: deleted.map((shape) => shape.id), deletedCount: deleted.length };
+      }
+
+      if (command.action === "move_object") {
+        const id = mcpString(params.id, "");
+        const before = mcpString(params.before, "");
+        const current = currentShapes();
+        if (!current.some((shape) => shape.id === id)) throw new Error("No object with this id");
+        if (before && !current.some((shape) => shape.id === before)) throw new Error("No object with the id given as before");
+        moveShapeInList(id, before || null);
+        return { order: currentShapes().map((shape) => shape.id) };
       }
 
       if (command.action === "create_shape") {
@@ -13796,6 +13817,7 @@ export function LayerlingEditor({
     applyCadModifierForMcp,
     cancelOpenGroup,
     commitShapes,
+    moveShapeInList,
     finishOpenGroup,
     initialSnap,
     openGroupForEditing,
@@ -15905,6 +15927,7 @@ export function LayerlingEditor({
             onToggleLock={toggleShapeLockById}
             onToggleHidden={toggleShapeHiddenById}
             onRenameShape={renameShapeById}
+            onMoveShape={moveShapeInList}
             onOpenGroup={openGroupForEditing}
             openGroupPartIds={openGroup?.childIds}
             onClose={() => setOutlinerOpen(false)}

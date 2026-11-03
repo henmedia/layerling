@@ -400,6 +400,19 @@ export const tools = [
     },
   },
   {
+    name: "layerling_move_object",
+    description: "Move an object to another place in the object list (#1233), like the handle on its row in the editor: the design's own order, the one the list shows when it is not sorted A-Z. `before` is the id of the object it goes in front of; without it the object goes last. Only the order changes, never the shape. One undo step.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["id"],
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string" },
+        before: { type: "string" },
+      },
+    },
+  },
+  {
     name: "layerling_create_shape",
     description: "Create any of Layerling's shapes: boxes, cylinders, slots, polygons, spheres, cones, pyramids, wedges, roofs, tori, tubes, stars, hearts, crescents, print-in-place hinges, Gridfinity bins and baseplates, knurled grips, raised text, threads (rod, screw, nut, tapped hole), springs, gears, Hirth joints (face teeth that lock two parts at any multiple of one tooth), port openings for USB, HDMI, DisplayPort and RJ45 sockets, or a simple extruded sketch. Width, depth and height default to what the editor uses for that shape; everything a shape has beyond its size is optional and falls back to the same defaults as a shape placed by hand. With a workplane set on a face (layerling_set_workplane), the shape stands on that face and x and z count on it (0, 0 is where the workplane sits) - unless elevation or a rotation is given, which mean the base plate.",
     inputSchema: {

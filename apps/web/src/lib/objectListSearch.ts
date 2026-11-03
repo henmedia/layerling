@@ -53,3 +53,16 @@ export function sortObjectList<T>(
   const unnamed = shapes.filter((shape) => !hasOwnName(shape));
   return [...named.sort((a, b) => collator.compare(name(a), name(b))), ...unnamed];
 }
+
+/**
+ * The shapes with one of them moved in front of another, or to the end when `beforeId` is null (#1233).
+ * Returns the same array when nothing would change: an unknown id, or a shape put where it already stands.
+ */
+export function moveShapeBefore<T extends { id: string }>(shapes: readonly T[], id: string, beforeId: string | null): readonly T[] {
+  const from = shapes.findIndex((shape) => shape.id === id);
+  if (from < 0 || id === beforeId) return shapes;
+  const rest = shapes.filter((shape) => shape.id !== id);
+  const to = beforeId === null ? rest.length : rest.findIndex((shape) => shape.id === beforeId);
+  if (to < 0 || to === from) return shapes;
+  return [...rest.slice(0, to), shapes[from], ...rest.slice(to)];
+}

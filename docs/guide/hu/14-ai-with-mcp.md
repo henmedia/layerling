@@ -83,6 +83,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_list_objects` | felsorolja az összes objektumot méretekkel, helyzettel, elforgatással és azonosítóval |
 | `layerling_select_objects` | objektumokat jelöl ki |
 | `layerling_delete_objects` | objektumokat töröl |
+| `layerling_move_object` | áthelyez egy objektumot az objektumlista egy másik helyére |
 | `layerling_create_shape` | alakzatot hoz létre: dobozt, hengert, szöveget (íveset is), menetet, fogaskereket, vázlattestet és az összes többit |
 | `layerling_import_file` | fájlt importál, ahogy az importálási ablak: egy színes OBJ-t vagy 3MF-et színenként egy testként, egy több objektumot tartalmazó 3MF-et objektumonként egy testként |
 | `layerling_add_font` | saját betűtípust ad hozzá szöveghez egy TrueType, OpenType vagy WOFF fájlból; a böngészőben marad, egy terv csak az általa használt betűket tartja meg |

@@ -87,6 +87,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_list_objects` | تسرد جميع الأجسام مع الأبعاد والموضع والتدوير والمعرّف (id) |
 | `layerling_select_objects` | تحدد أجسامًا |
 | `layerling_delete_objects` | تحذف أجسامًا |
+| `layerling_move_object` | تنقل جسمًا إلى مكان آخر في قائمة الأجسام |
 | `layerling_create_shape` | تنشئ شكلًا: صندوقًا، أسطوانة، نصًا (منحنيًا أيضًا)، سنًا لولبيًا، ترسًا، جسم رسم تخطيطي وكل الأشكال الأخرى |
 | `layerling_import_file` | تستورد ملفًا كما تفعل نافذة الاستيراد: ملف OBJ أو 3MF الملوّن كجسم واحد لكل لون، وملف 3MF الذي فيه عدة أجسام كجسم واحد لكل منها |
 | `layerling_add_font` | تضيف خطًا خاصًا للنص من ملف TrueType أو OpenType أو WOFF؛ يبقى في المتصفح، ولا يحتفظ التصميم إلا بالحروف التي يستخدمها |
