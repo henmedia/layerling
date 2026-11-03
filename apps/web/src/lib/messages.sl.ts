@@ -2652,6 +2652,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "vase.printHollow": "Izračunano s polnimi stenami in dnom, brez polnila.",
   "vase.printFine": "Tisku nič ne stoji na poti.",
   "vaseCheck.overhang": "Previs do {angle}° med {from} in {to} mm višine (več kot 45°) – tam so potrebne podpore, ali pa naredi obliko strmejšo.",
+  "vaseCheck.teapotOverhang": "Pokrov čajnika, natisnjen na glavo: previs do {angle}° med {from} in {to} mm višine vaze (več kot 45°) – tam potrebuje podpore, ali pa naredi obliko tam strmejšo.",
+  "vaseCheck.teapotOverhangAt": "Pokrov čajnika, natisnjen na glavo: previs do {angle}° pri {at} mm višine vaze (več kot 45°) – tam potrebuje podpore, ali pa naredi obliko tam strmejšo.",
   "vaseCheck.thinWall": "Stena ima le {mm} mm – pod dvema linijama 0,4-mm šobe se tiska negotovo.",
   "vaseCheck.thinBottom": "Dno ima le {mm} mm – pod 0,8 mm hitro pušča ali poči.",
   "vaseCheck.lidNeedsHollow": "{lid} potrebuje votlo vazo (utor oz. navoj v steni).",

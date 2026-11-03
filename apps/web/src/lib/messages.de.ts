@@ -3363,6 +3363,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "vase.printHollow": "Gerechnet mit vollen Wänden und Boden, ohne Füllung.",
   "vase.printFine": "Für den Druck gibt es keine Bedenken.",
   "vaseCheck.overhang": "Überhang bis {angle}° zwischen {from} und {to} mm Höhe (mehr als 45°) – dort braucht es Stützen, oder die Form steiler machen.",
+  "vaseCheck.teapotOverhang": "Teekannendeckel, umgedreht gedruckt: Überhang bis {angle}° zwischen {from} und {to} mm Höhe der Vase (mehr als 45°) – dort braucht er Stützen, oder die Form dort steiler machen.",
+  "vaseCheck.teapotOverhangAt": "Teekannendeckel, umgedreht gedruckt: Überhang bis {angle}° bei {at} mm Höhe der Vase (mehr als 45°) – dort braucht er Stützen, oder die Form dort steiler machen.",
   "vaseCheck.thinWall": "Wand nur {mm} mm – unter zwei Linien einer 0,4-mm-Düse druckt sie sich unsicher.",
   "vaseCheck.thinBottom": "Boden nur {mm} mm – unter 0,8 mm wird er leicht undicht oder reißt.",
   "vaseCheck.lidNeedsHollow": "Ein {lid} braucht eine hohle Vase (Nut bzw. Gewinde in der Wand).",

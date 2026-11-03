@@ -3350,6 +3350,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "vase.printHollow": "Calculé avec parois et fond pleins, sans remplissage.",
   "vase.printFine": "Rien ne s'oppose à l'impression.",
   "vaseCheck.overhang": "Surplomb jusqu'à {angle}° entre {from} et {to} mm de hauteur (plus de 45°) – il faut des supports à cet endroit, ou rendre la forme plus raide.",
+  "vaseCheck.teapotOverhang": "Couvercle de théière, imprimé à l'envers : surplomb jusqu'à {angle}° entre {from} et {to} mm de hauteur du vase (plus de 45°) – il lui faut des supports à cet endroit, ou rendre la forme plus raide à cet endroit.",
+  "vaseCheck.teapotOverhangAt": "Couvercle de théière, imprimé à l'envers : surplomb jusqu'à {angle}° à {at} mm de hauteur du vase (plus de 45°) – il lui faut des supports à cet endroit, ou rendre la forme plus raide à cet endroit.",
   "vaseCheck.thinWall": "Paroi de {mm} mm seulement – en dessous de deux lignes d'une buse de 0,4 mm, elle s'imprime mal.",
   "vaseCheck.thinBottom": "Fond de {mm} mm seulement – en dessous de 0,8 mm, il fuit ou se déchire facilement.",
   "vaseCheck.lidNeedsHollow": "Un {lid} demande un vase creux (rainure ou filetage dans la paroi).",

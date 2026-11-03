@@ -3407,6 +3407,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "vase.printHollow": "Spočteno s plnými stěnami a dnem, bez výplně.",
   "vase.printFine": "Tisku nic nebrání.",
   "vaseCheck.overhang": "Převis až {angle}° mezi {from} a {to} mm výšky (více než 45°) – tam jsou potřeba podpěry, nebo tvar udělejte strmější.",
+  "vaseCheck.teapotOverhang": "Víko konvice, tištěné vzhůru nohama: převis až {angle}° mezi {from} a {to} mm výšky vázy (více než 45°) – tam potřebuje podpěry, nebo tam tvar udělejte strmější.",
+  "vaseCheck.teapotOverhangAt": "Víko konvice, tištěné vzhůru nohama: převis až {angle}° ve výšce vázy {at} mm (více než 45°) – tam potřebuje podpěry, nebo tam tvar udělejte strmější.",
   "vaseCheck.thinWall": "Stěna má jen {mm} mm – pod dvěma linkami trysky 0,4 mm se tiskne nespolehlivě.",
   "vaseCheck.thinBottom": "Dno má jen {mm} mm – pod 0,8 mm snadno propouští nebo praská.",
   "vaseCheck.lidNeedsHollow": "{lid} potřebuje dutou vázu (drážka nebo závit ve stěně).",

@@ -3344,6 +3344,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "vase.printHollow": "Calcolato con pareti e fondo pieni, senza riempimento interno.",
   "vase.printFine": "Nessun ostacolo alla stampa.",
   "vaseCheck.overhang": "Sporgenza fino a {angle}° tra {from} e {to} mm di altezza: in questa zona servono supporti oppure una forma più inclinata.",
+  "vaseCheck.teapotOverhang": "Coperchio da teiera, stampato capovolto: sporgenza fino a {angle}° tra {from} e {to} mm di altezza del vaso (oltre 45°): in questa zona servono supporti oppure una forma più inclinata.",
+  "vaseCheck.teapotOverhangAt": "Coperchio da teiera, stampato capovolto: sporgenza fino a {angle}° a {at} mm di altezza del vaso (oltre 45°): in questo punto servono supporti oppure una forma più inclinata.",
   "vaseCheck.thinWall": "La parete è spessa solo {mm} mm: con un ugello da 0,4 mm, meno di due linee di estrusione non garantiscono una stampa affidabile.",
   "vaseCheck.thinBottom": "Il fondo è spesso solo {mm} mm: sotto 0,8 mm può facilmente perdere acqua o strapparsi.",
   "vaseCheck.lidNeedsHollow": "Un coperchio {lid} richiede un vaso cavo: la scanalatura o la filettatura viene ricavata nella parete.",

@@ -3297,6 +3297,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "vase.printHollow": "Liczone z pełnymi ściankami i dnem, bez wypełnienia.",
   "vase.printFine": "Nic nie stoi na przeszkodzie, żeby go wydrukować.",
   "vaseCheck.overhang": "Nawis do {angle}° na wysokości od {from} do {to} mm (ponad 45°): potrzebuje tam podpór albo zrób formę bardziej stromą.",
+  "vaseCheck.teapotOverhang": "Pokrywka jak w czajniku, drukowana do góry dnem: nawis do {angle}° na wysokości wazonu od {from} do {to} mm (ponad 45°): potrzebuje tam podpór albo zrób tam formę bardziej stromą.",
+  "vaseCheck.teapotOverhangAt": "Pokrywka jak w czajniku, drukowana do góry dnem: nawis do {angle}° na wysokości wazonu {at} mm (ponad 45°): potrzebuje tam podpór albo zrób tam formę bardziej stromą.",
   "vaseCheck.thinWall": "Ścianka ma tylko {mm} mm. Poniżej dwóch ścieżek dyszy 0,4 mm nie drukuje się pewnie.",
   "vaseCheck.thinBottom": "Dno ma tylko {mm} mm. Poniżej 0,8 mm łatwo przecieka albo się rwie.",
   "vaseCheck.lidNeedsHollow": "{lid} wymaga pustego wazonu (rowek albo gwint wchodzi w ściankę).",

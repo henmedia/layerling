@@ -5,6 +5,8 @@ import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { normalizeVaseSettings } from "@/lib/vaseSettings";
 import { fittedVaseMesh, vaseAccessories } from "@/lib/vaseShape";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
+import { setLanguage } from "@/lib/i18n";
+import { vaseNote } from "@/lib/vaseNotes";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /** A hollow vase with a teapot lid: 120 mm tall, the top 30 mm the lid. */
@@ -135,5 +137,42 @@ describe("the vase's teapot lid", () => {
     for (let i = 1; i < fitted.vertices.length; i += 3) top = Math.max(top, fitted.vertices[i]);
     expect(top).toBeCloseTo(CUT, 3);
     expect(vaseAccessories(vase).map((accessory) => accessory.kind)).toEqual(["lid", "knob"]);
+  });
+});
+
+describe("the teapot lid's overhang, as it prints upside down", () => {
+  const overhangs = (settings: Record<string, unknown>) => vaseChecks(settings).filter((note: string) => note.includes("Überhang"));
+  const BOTTLE = { ...TEAPOT, profile: "flasche", lidHeight: 50 };
+
+  it("finds the bottle's shoulder, which leans out once the lid is turned over, in the vase's heights", async () => {
+    // Standing, the bottle prints without supports; its lid, the top 50 mm turned over, has the shoulder overhanging.
+    expect(overhangs({ ...BOTTLE, lidMode: "keiner" })).toEqual([]);
+    const notes = overhangs(BOTTLE);
+    expect(notes).toEqual(["Teekannendeckel, umgedreht gedruckt: Überhang bis 52° zwischen 77,5 und 91,5 mm Höhe der Vase (mehr als 45°) – dort braucht er Stützen, oder die Form dort steiler machen."]);
+    await setLanguage("en", false);
+    expect(vaseNote(notes[0])).toBe("Teapot lid, printed upside down: overhang of up to 52° between 77.5 and 91.5 mm of the vase's height (more than 45°) – it needs supports there, or make the form steeper there.");
+  });
+
+  it("has nothing to say about a lid that prints without supports", () => {
+    for (const profile of ["bauchig", "zylinder", "fass"]) expect(overhangs({ ...TEAPOT, profile }), profile).toEqual([]);
+  });
+
+  it("checks the body only up to the joint, and the lid's inside, which leans in where the vase flares", () => {
+    // Narrow below, flaring out between 84 and 102 mm: standing, that is an overhang of 62°.
+    const flared = { ...TEAPOT, profile: "gezeichnet", profilePoints: [[0, 0.5], [0.7, 0.5], [0.85, 1], [1, 1]] };
+    expect(overhangs({ ...flared, lidMode: "keiner" })).toEqual(["Überhang bis 62° zwischen 87,5 und 98,5 mm Höhe (mehr als 45°) – dort braucht es Stützen, oder die Form steiler machen."]);
+    // With the joint at 90 mm the body's overhang ends there; above it the lid, turned over, has the flare inside.
+    const notes = overhangs(flared);
+    expect(notes[0]).toBe("Überhang bis 55° zwischen 87,5 und 88,5 mm Höhe (mehr als 45°) – dort braucht es Stützen, oder die Form steiler machen.");
+    expect(notes[1]).toMatch(/^Teekannendeckel, umgedreht gedruckt: Überhang bis 90° zwischen 91,6 und 99,5 mm Höhe der Vase/);
+    expect(notes).toHaveLength(2);
+  });
+
+  it("counts the flange under the lip as a ledge once it is wider than a printer lays without supports", async () => {
+    // A funnel widens inside above the joint, so the flange that carries the lip is a wide ledge facing down.
+    const notes = overhangs({ ...TEAPOT, profile: "trichter" });
+    expect(notes).toEqual(["Teekannendeckel, umgedreht gedruckt: Überhang bis 90° bei 91,6 mm Höhe der Vase (mehr als 45°) – dort braucht er Stützen, oder die Form dort steiler machen."]);
+    await setLanguage("en", false);
+    expect(vaseNote(notes[0])).toBe("Teapot lid, printed upside down: overhang of up to 90° at 91.6 mm of the vase's height (more than 45°) – it needs supports there, or make the form steeper there.");
   });
 });

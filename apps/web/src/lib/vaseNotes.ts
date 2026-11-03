@@ -73,6 +73,16 @@ const CHECKS: Note[] = [
     key: "vaseCheck.overhang",
     params: (m) => ({ angle: m[1], from: number(m[2]), to: number(m[3]) }),
   },
+  {
+    pattern: new RegExp(`^Teekannendeckel, umgedreht gedruckt: Überhang bis (\\d+)° zwischen ${NUMBER} und ${NUMBER} mm Höhe der Vase`),
+    key: "vaseCheck.teapotOverhang",
+    params: (m) => ({ angle: m[1], from: number(m[2]), to: number(m[3]) }),
+  },
+  {
+    pattern: new RegExp(`^Teekannendeckel, umgedreht gedruckt: Überhang bis (\\d+)° bei ${NUMBER} mm Höhe der Vase`),
+    key: "vaseCheck.teapotOverhangAt",
+    params: (m) => ({ angle: m[1], at: number(m[2]) }),
+  },
   { pattern: new RegExp(`^Wand nur ${NUMBER} mm – unter zwei Linien`), key: "vaseCheck.thinWall", params: (m) => ({ mm: number(m[1]) }) },
   { pattern: new RegExp(`^Boden nur ${NUMBER} mm – unter 0,8 mm`), key: "vaseCheck.thinBottom", params: (m) => ({ mm: number(m[1]) }) },
   { pattern: /^Ein (Stülpdeckel|Schnappdeckel|Schraubdeckel) braucht eine hohle Vase/, key: "vaseCheck.lidNeedsHollow", params: (m) => ({ lid: t(LIDS[m[1]]) }) },
