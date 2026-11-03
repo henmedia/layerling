@@ -33,7 +33,7 @@ import { holePatternScrewPatch, holePatternScrewSize, holePatternScrewSizes } fr
 import type { ScrewHoleSize } from "@/lib/screwHoleSizes";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 
-const HOLE_FORMS: readonly HoleForm[] = ["round", "square", "rectangle", "hexagon", "slot"];
+const HOLE_FORMS: readonly HoleForm[] = ["round", "square", "rectangle", "hexagon", "slot", "custom"];
 const ARRANGEMENTS: readonly HoleArrangement[] = ["grid", "staggered", "perimeter"];
 const HOLE_TYPES: readonly HoleType[] = ["plain", "counterbore", "countersink"];
 
@@ -51,6 +51,8 @@ export function HolePatternPanel({
   holeCount,
   tooMany,
   ring,
+  customChoices,
+  customIsHole,
   busy,
   onChange,
   onRepick,
@@ -67,6 +69,9 @@ export function HolePatternPanel({
   tooMany: boolean;
   /** Holes round the edge (#1232): the length of the line they go round on, and whether they sit on its corners. */
   ring?: { length: number; onCorners: boolean };
+  /** Own shape (#1235): the other objects of the scene that can be repeated, and whether the chosen one is a hole. */
+  customChoices: { id: string; name: string }[];
+  customIsHole: boolean;
   busy: boolean;
   onChange: (patch: Partial<HolePatternSettings>) => void;
   onRepick: () => void;
@@ -81,6 +86,9 @@ export function HolePatternPanel({
   const perimeter = settings.arrangement === "perimeter";
   const byCount = perimeter && settings.perimeterBy === "count";
   const screwSize = holePatternScrewSize(settings);
+  const custom = settings.form === "custom";
+  const customMissing = custom && customChoices.length === 0;
+  const pieces = custom && !customIsHole;
   const sizeLabel = head
     ? t("prop.screwHoleShaft")
     : settings.form === "round"
@@ -90,13 +98,17 @@ export function HolePatternPanel({
       : settings.form === "hexagon"
         ? t("holePattern.size.corners")
         : t("holePattern.size.width");
-  const status = !ready
+  const status = customMissing
+    ? t("holePattern.customNone")
+    : !ready
     ? t("holePattern.step.pick")
     : tooMany
       ? t("holePattern.tooMany", { limit: settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES })
       : holeCount === 0
         ? t("holePattern.none")
-        : t(holeCount === 1 ? "holePattern.count.one" : "holePattern.count.many", { count: holeCount });
+        : pieces
+          ? t(holeCount === 1 ? "holePattern.countPieces.one" : "holePattern.countPieces.many", { count: holeCount })
+          : t(holeCount === 1 ? "holePattern.count.one" : "holePattern.count.many", { count: holeCount });
   const maxDepth = Math.max(1, Math.ceil(thickness * 2) / 2);
 
   return (
@@ -136,6 +148,16 @@ export function HolePatternPanel({
         </div>
       </div>
 
+      {/* Own shape (#1235): a shape of the scene repeated in place of a hole; its width and depth are its room. */}
+      {custom && !customMissing ? (
+        <label className="edge-modifier-field">
+          <span>{t("holePattern.customShape")}</span>
+          <select value={settings.customId ?? ""} onChange={(event) => onChange({ customId: event.target.value })}>
+            {customChoices.map((choice) => <option key={choice.id} value={choice.id}>{choice.name}</option>)}
+          </select>
+        </label>
+      ) : null}
+
       {/* A round hole can take a screw's head (#1232). */}
       {settings.form === "round" ? (
         <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.holeType")}>
@@ -172,7 +194,7 @@ export function HolePatternPanel({
         </label>
       ) : null}
 
-      <EdgeModifierSlider
+      {custom ? null : <EdgeModifierSlider
         label={sizeLabel}
         value={settings.size}
         min={HOLE_PATTERN_MIN_SIZE}
@@ -181,7 +203,7 @@ export function HolePatternPanel({
         workspace={workspace}
         length
         onChange={(value) => onChange({ size: value })}
-      />
+      />}
       {head ? (
         <EdgeModifierSlider
           label={t("prop.screwHoleHead")}
@@ -344,7 +366,7 @@ export function HolePatternPanel({
         onChange={(value) => onChange({ margin: value })}
       />
 
-      <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
+      {custom ? null : <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
         <span>{t("holePattern.depth")}</span>
         <div className="shell-opening-options">
           {[true, false].map((through) => (
@@ -360,8 +382,8 @@ export function HolePatternPanel({
             </button>
           ))}
         </div>
-      </div>
-      {settings.depth !== null ? (
+      </div>}
+      {settings.depth !== null && !custom ? (
         <EdgeModifierSlider
           label={t("holePattern.depthValue")}
           value={settings.depth}
@@ -393,7 +415,7 @@ export function HolePatternPanel({
         <button type="button" className="secondary" onClick={ready ? onRepick : onCancel}>
           {ready ? t("holePattern.repick") : t("common.cancel")}
         </button>
-        <button type="button" className="primary" disabled={!ready || holeCount === 0 || tooMany || busy} onClick={onApply}>
+        <button type="button" className="primary" disabled={!ready || holeCount === 0 || tooMany || busy || customMissing} onClick={onApply}>
           <Check size={17} />
           {t("holePattern.apply")}
         </button>

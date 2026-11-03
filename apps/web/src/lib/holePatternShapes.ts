@@ -14,7 +14,8 @@ import { placementPatchForNewShape, type PlacementWorkplane } from "@/lib/placem
 import { nearestFaceTriangle, planarFaceTriangles } from "@/lib/rotationPivot";
 import { METRIC_COUNTERSINK_ANGLE, screwHoleFields, screwHoleSizesFor, type ScrewHoleSize } from "@/lib/screwHoleSizes";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
-import { canonicalizeShape, withHoleMode } from "@/lib/workplaneShapes";
+import { createLocalId } from "@/lib/localIds";
+import { canonicalizeShape, shapeDepth, shapeWidth, withHoleMode } from "@/lib/workplaneShapes";
 import type { ShapeKind, WorkplaneShape } from "@/types/layerling";
 
 type Vec = { x: number; y: number; z: number };
@@ -104,11 +105,26 @@ const FORM_KIND: Record<HolePatternSettings["form"], ShapeKind> = {
   rectangle: "box",
   hexagon: "polygon",
   slot: "slot",
+  // An own shape is a copy of itself; the kind is not used for it.
+  custom: "box",
 };
 
 /** The depth the holes actually get: the body's thickness plus a skin's worth, or what was asked for. */
 export function holeDepth(face: Pick<PerforableFace, "thickness">, settings: Pick<HolePatternSettings, "depth">) {
   return settings.depth === null ? face.thickness + HOLE_OVERSHOOT : settings.depth;
+}
+
+/** Kinds that are round seen from above, so an own shape of one takes a round room on the face (#1235). */
+const ROUND_KINDS = new Set<ShapeKind>(["cylinder", "sphere", "halfSphere", "cone", "curvedCone", "paraboloid", "tube", "ring", "torus", "counterbore", "countersink", "doubleCountersink", "finishingWasher"]);
+
+/** The footprint settings of a shape repeated over the face: its own width and depth, round for the round kinds. */
+export function holePatternCustomFootprint(shape: WorkplaneShape): Pick<HolePatternSettings, "customId" | "customWidth" | "customDepth" | "customRound"> {
+  return { customId: shape.id, customWidth: shapeWidth(shape), customDepth: shapeDepth(shape), customRound: ROUND_KINDS.has(shape.kind) && Math.abs(shapeWidth(shape) - shapeDepth(shape)) < 1e-6 };
+}
+
+/** A shape and its parts with ids made by `idFor`, so a preview keeps the same ids while the numbers change. */
+function cloneTree(shape: WorkplaneShape, idFor: (id: string) => string): WorkplaneShape {
+  return { ...shape, id: idFor(shape.id), groupedShapes: shape.groupedShapes?.map((child) => cloneTree(child, idFor)) };
 }
 
 export type HolePatternPlan = {
@@ -129,9 +145,39 @@ export function holePatternShapes(
   namePrefix: string,
   /** Ids that stay the same from one call to the next, for a preview that is redrawn while the numbers change. */
   previewIdPrefix?: string,
+  /** Own shape (#1235): the shape from the scene that is repeated in place of a hole. */
+  custom?: WorkplaneShape | null,
 ): HolePatternPlan {
+  if (settings.form === "custom" && !custom) return { holes: [], tooMany: false };
   const { centers, tooMany, ring } = holePatternCenters(face.outline, settings);
   if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}) };
+
+  if (settings.form === "custom" && custom) {
+    // A copy of the shape stands upright on every place, turned with the face: a body a little sunk in so it joins, a
+    // hole reaching its own height into the face and a little out of it. Its own turn is not taken along.
+    const { workplane } = face;
+    const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
+    const origin = new THREE.Vector3(workplane.origin.x, workplane.origin.y, workplane.origin.z);
+    const xAxis = new THREE.Vector3(workplane.xAxis.x, workplane.xAxis.y, workplane.xAxis.z);
+    const zAxis = new THREE.Vector3(workplane.zAxis.x, workplane.zAxis.y, workplane.zAxis.z);
+    const name = custom.name || namePrefix;
+    const pieces = centers.map((center, index) => {
+      const onFace = origin.clone().addScaledVector(xAxis, center.u).addScaledVector(zAxis, center.v);
+      const base = custom.hole
+        ? onFace.addScaledVector(normal, HOLE_OVERSHOOT - custom.height)
+        : onFace.addScaledVector(normal, -HOLE_OVERSHOOT);
+      const copy = cloneTree(custom, (id) => (previewIdPrefix ? `${previewIdPrefix}-${index}-${id}` : createLocalId(`${id}-pattern`)));
+      const placed: WorkplaneShape = {
+        ...copy,
+        ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}),
+        name: `${name} ${index + 1}`,
+        locked: false,
+        ...placementPatchForNewShape(copy, workplane, base),
+      };
+      return canonicalizeShape(placed);
+    });
+    return { holes: pieces, tooMany: false, ...(ring ? { ring } : {}) };
+  }
 
   // A round hole with a head is a counterbore or countersink shape (#1232), its head on the face.
   const headType = holeHasHead(settings) ? settings.holeType as "counterbore" | "countersink" : null;

@@ -108,6 +108,7 @@ summary: 選取形狀、在物件清單中找到它們、對齊、鏡像、旋�
 2. 在視窗中設定孔的外觀和排列：
    - **{{ui:holePattern.form}}：** {{ui:holePattern.form.round}}、{{ui:holePattern.form.square}}、{{ui:holePattern.form.rectangle}}、{{ui:holePattern.form.hexagon}} 或 {{ui:holePattern.form.slot}}。
    - **大小：** 圓孔用 {{ui:holePattern.size.diameter}}，方孔用 {{ui:holePattern.size.side}}，矩形和槽孔用 {{ui:holePattern.size.width}} 與 {{ui:holePattern.size.height}}。六邊形的大小是 {{ui:holePattern.size.corners}}。
+   - **{{ui:holePattern.form.custom}}：** 用場景中的一個形狀代替孔來重複：鉚釘、凸點，或花紋板上的花紋。在 {{ui:holePattern.customShape}} 中選擇它。它的寬度和深度就是它佔用的位置；它按原樣豎立在面上，不帶自身的旋轉。實體會放到面上並與之合併，孔則依其高度切入。形狀本身保持原位。
    - **{{ui:holePattern.holeType}}：** 僅限圓孔。{{ui:holePattern.holeType.plain}} 是直孔，{{ui:shape.counterbore}} 為圓柱頭螺絲的頭部加一個沉台，{{ui:shape.countersink}} 為沉頭螺絲加一個 90° 錐面。此時大小就是 {{ui:prop.screwHoleShaft}}；{{ui:prop.screwHoleHead}} 以及沉台的 {{ui:prop.screwHoleHeadDepth}} 設定頭部。{{ui:prop.screwHoleSize}} 會依公制螺絲填好所有數值。
    - **{{ui:holePattern.spacing}}：** 從一個孔的中心到下一個孔中心的距離。如果它小於孔所允許的最小值，layerling 會將其提高到最小可能值，以便孔之間保留壁。
    - **{{ui:holePattern.wall}}：** 同一距離的另一種說法：相鄰兩個孔之間留下的壁，也就是列印件中的壁厚。設定它，中心距會隨之變化，反之亦然。對於六邊形、矩形和槽孔，layerling 會量測它們邊緣之間的最短距離。

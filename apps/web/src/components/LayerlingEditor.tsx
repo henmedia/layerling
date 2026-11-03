@@ -72,7 +72,7 @@ import { FaceToolPanel } from "./workplane/FaceToolPanel";
 import { DEFAULT_FACE_TOOL, faceToolSettingsOn, normalizeFaceTool, type FaceToolSettings } from "@/lib/faceTool";
 import { faceToolBody } from "@/lib/faceToolBody";
 import { DEFAULT_HOLE_PATTERN, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
-import { holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, readPerforableFace, type PerforableFace } from "@/lib/holePatternShapes";
+import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, readPerforableFace, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
 import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
 import { MeshSimplifyPanel } from "./workplane/MeshSimplifyPanel";
@@ -2767,6 +2767,15 @@ async function capturedDesignPicture(): Promise<string> {
     return "";
   }
 }
+/** The shapes a hole pattern can repeat as its own shape (#1235): every other object of the scene that is a body or a hole. */
+function holePatternCustomChoices(shapes: readonly WorkplaneShape[], sourceId: string) {
+  return shapes.filter((shape) => shape.id !== sourceId && !isNonSolidShape(shape));
+}
+
+function holePatternCustomShape(shapes: readonly WorkplaneShape[], sourceId: string, id: string | undefined) {
+  return id ? holePatternCustomChoices(shapes, sourceId).find((shape) => shape.id === id) ?? null : null;
+}
+
 export function LayerlingEditor({
   initialAssets = [],
   initialAttachments,
@@ -3985,12 +3994,23 @@ export function LayerlingEditor({
     () => (arrayTool && selectedShapes.length > 0 ? arrayCopies(selectedShapes, arraySettingsResolved(arrayTool, selectedShapes, shapes)) : null),
     [arrayTool, selectedShapes, shapes],
   );
+  // An own shape (#1235): the shape from the scene a hole pattern repeats, as it stands now.
+  const holePatternCustom = useMemo(
+    () => (holePatternTool?.settings.form === "custom" ? holePatternCustomShape(shapes, holePatternTool.sourceId, holePatternTool.settings.customId) : null),
+    [holePatternTool?.settings.form, holePatternTool?.settings.customId, holePatternTool?.sourceId, shapes],
+  );
   // The holes a hole pattern would cut, shown on the face until "Create".
   const holePatternPreview = useMemo(
     () => (holePatternTool?.face
-      ? holePatternShapes(holePatternTool.face, holePatternTool.settings, t("holePattern.holeName"), "hole-pattern-preview")
+      ? holePatternShapes(
+        holePatternTool.face,
+        holePatternCustom ? { ...holePatternTool.settings, ...holePatternCustomFootprint(holePatternCustom) } : holePatternTool.settings,
+        t("holePattern.holeName"),
+        "hole-pattern-preview",
+        holePatternCustom,
+      )
       : null),
-    [holePatternTool?.face, holePatternTool?.settings],
+    [holePatternTool?.face, holePatternTool?.settings, holePatternCustom],
   );
   const baseViewportShapes = useMemo(
     () =>
@@ -9112,6 +9132,13 @@ export function LayerlingEditor({
   const changeHolePatternSettings = useCallback((patch: Partial<HolePatternSettings>) => {
     setHolePatternTool((current) => {
       if (!current) return current;
+      // An own shape (#1235) starts with the newest shape of the scene, and takes the room it needs on the face.
+      const form = patch.form ?? current.settings.form;
+      const custom = form === "custom"
+        ? holePatternCustomShape(shapesRef.current, current.sourceId, patch.customId ?? current.settings.customId)
+          ?? holePatternCustomChoices(shapesRef.current, current.sourceId).at(-1) ?? null
+        : null;
+      if (custom) patch = { ...patch, ...holePatternCustomFootprint(custom) };
       // A slot or a rectangle starts out longer than high, with room for it, unless it was sized by hand.
       const longForm = (patch.form === "slot" || patch.form === "rectangle")
         && current.settings.form !== "slot" && current.settings.form !== "rectangle"
@@ -9130,7 +9157,14 @@ export function LayerlingEditor({
     if (!tool?.face || tool.busy) return;
     const source = shapesRef.current.find((shape) => shape.id === tool.sourceId);
     if (!source) return;
-    const plan = holePatternShapes(tool.face, tool.settings, t("holePattern.holeName"));
+    const custom = tool.settings.form === "custom" ? holePatternCustomShape(shapesRef.current, tool.sourceId, tool.settings.customId) : null;
+    const plan = holePatternShapes(
+      tool.face,
+      custom ? { ...tool.settings, ...holePatternCustomFootprint(custom) } : tool.settings,
+      t("holePattern.holeName"),
+      undefined,
+      custom,
+    );
     if (plan.tooMany || plan.holes.length === 0) {
       setNotice(t(plan.tooMany ? "status.holePatternTooMany" : "status.holePatternNone"));
       return;
@@ -9154,7 +9188,7 @@ export function LayerlingEditor({
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== source.id), editableGroup],
       editableGroup.id,
-      t("status.holePatternCreated", { count: plan.holes.length }),
+      t(custom && !custom.hole ? "status.holePatternCreatedPieces" : "status.holePatternCreated", { count: plan.holes.length }),
     );
   }, [commitShapes, holePatternTool]);
 
@@ -11831,8 +11865,15 @@ export function LayerlingEditor({
           point = center.clone().addScaledVector(normal, reach - center.dot(normal));
         }
         const form = params.form === undefined ? DEFAULT_HOLE_PATTERN.form : params.form;
-        if (form !== "round" && form !== "square" && form !== "rectangle" && form !== "hexagon" && form !== "slot") {
-          throw new Error("perforate_face form must be round, square, rectangle, hexagon or slot");
+        if (form !== "round" && form !== "square" && form !== "rectangle" && form !== "hexagon" && form !== "slot" && form !== "custom") {
+          throw new Error("perforate_face form must be round, square, rectangle, hexagon, slot or custom");
+        }
+        // An own shape (#1235): a shape of the scene repeated in place of a hole.
+        let custom: WorkplaneShape | null = null;
+        if (form === "custom") {
+          if (typeof params.shapeId !== "string") throw new Error("perforate_face form custom needs shapeId, the shape to repeat");
+          custom = holePatternCustomShape(currentShapes(), target.id, params.shapeId);
+          if (!custom) throw new Error("perforate_face shapeId must be another object of the scene, not the body itself");
         }
         const arrangement = params.arrangement === undefined ? DEFAULT_HOLE_PATTERN.arrangement : params.arrangement;
         if (arrangement !== "grid" && arrangement !== "staggered" && arrangement !== "perimeter") throw new Error("perforate_face arrangement must be grid, staggered or perimeter");
@@ -11866,13 +11907,14 @@ export function LayerlingEditor({
           perimeterCount: count,
           perimeterCorners: params.corners !== false,
           perimeterStart: mcpOptionalNumber(params.start),
+          ...(custom ? holePatternCustomFootprint(custom) : {}),
         });
         // Taken before the face is read: joining a group's or bundle's parts takes a moment, and the scene may change meanwhile.
         const sourceFingerprint = projectShapesFingerprint(currentShapes());
         const sourceProjectId = projectInfoRef.current.projectId;
         const read = readPerforableFace(await faceReadPositionsOffThread(target, geometryAbortRef.current?.signal), point, normal);
         if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved; perforate_face needs a flat face" : "perforate_face found no flat face there");
-        const plan = holePatternShapes(read.face, settings, t("holePattern.holeName"));
+        const plan = holePatternShapes(read.face, settings, t("holePattern.holeName"), undefined, custom);
         if (plan.tooMany) throw new Error("That would be too many holes; make them bigger or the spacing wider");
         if (plan.holes.length === 0) throw new Error("No hole fits on that face with this size and margin");
         const result = await buildGroupedShapeOffThread([target, ...plan.holes], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
@@ -11881,7 +11923,11 @@ export function LayerlingEditor({
         }
         if (!result.group) throw new Error(result.failureNotice);
         const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
-        commitShapes([...currentShapes().filter((shape) => shape.id !== target.id), editableGroup], editableGroup.id, t("status.holePatternCreated", { count: plan.holes.length }));
+        commitShapes(
+          [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
+          editableGroup.id,
+          t(custom && !custom.hole ? "status.holePatternCreatedPieces" : "status.holePatternCreated", { count: plan.holes.length }),
+        );
         return {
           object: mcpShapeSummary(editableGroup),
           holes: plan.holes.length,
@@ -16250,6 +16296,8 @@ export function LayerlingEditor({
           holeCount={holePatternPreview?.holes.length ?? 0}
           tooMany={Boolean(holePatternPreview?.tooMany)}
           ring={holePatternPreview?.ring}
+          customChoices={holePatternCustomChoices(shapes, holePatternTool.sourceId).map((shape) => ({ id: shape.id, name: displayShapeName(shape) }))}
+          customIsHole={Boolean(holePatternCustom?.hole)}
           busy={holePatternTool.busy}
           onChange={changeHolePatternSettings}
           onRepick={() => {

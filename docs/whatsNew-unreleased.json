@@ -1,12 +1,12 @@
 [
   {
     "title": {
-      "de": "Löcher am Rand",
-      "en": "Holes along the edge"
+      "de": "Löcher am Rand und eigene Formen",
+      "en": "Holes along the edge, and shapes of your own"
     },
     "body": {
-      "de": "Das Lochmuster setzt Löcher jetzt auch als Kranz entlang der Kante einer Fläche: ein Loch auf jeder Ecke und die Seiten gleichmäßig aufgeteilt, nach Abstand oder Anzahl, auf runden Flächen mit verschiebbarem Start. Runde Löcher können eine Stufen- oder Senkbohrung bekommen, mit metrischen Schraubengrößen.",
-      "en": "The hole pattern can now set its holes in a ring along the edge of a face: a hole on every corner and the sides shared out evenly, by spacing or by number, with a start you can move on round faces. Round holes can get a counterbore or countersink, with metric screw sizes."
+      "de": "Das Lochmuster setzt Löcher jetzt auch als Kranz entlang der Kante einer Fläche: ein Loch auf jeder Ecke und die Seiten gleichmäßig aufgeteilt, nach Abstand oder Anzahl, auf runden Flächen mit verschiebbarem Start. Runde Löcher können eine Stufen- oder Senkbohrung bekommen, mit metrischen Schraubengrößen. Und mit „Eigene Form“ wiederholt es eine Form aus der Szene über die Fläche, aufgesetzt oder eingeschnitten: Nieten, Noppen, ein Riffelblech.",
+      "en": "The hole pattern can now set its holes in a ring along the edge of a face: a hole on every corner and the sides shared out evenly, by spacing or by number, with a start you can move on round faces. Round holes can get a counterbore or countersink, with metric screw sizes. And with Own shape it repeats a shape from the scene over the face, raised or cut in: rivets, studs, a diamond plate."
     }
   },
   {

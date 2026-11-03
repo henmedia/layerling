@@ -8,7 +8,8 @@ import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHan
 
 export type Point2 = { u: number; v: number };
 
-export type HoleForm = "round" | "square" | "rectangle" | "hexagon" | "slot";
+/** custom repeats a shape from the scene over the face (#1235): a rivet, a tread, any body or hole. */
+export type HoleForm = "round" | "square" | "rectangle" | "hexagon" | "slot" | "custom";
 /** Grid and staggered fill the face; perimeter puts the holes in a ring along its outer edge (#1232). */
 export type HoleArrangement = "grid" | "staggered" | "perimeter";
 /** A round hole can take a screw's head (#1232): a counterbore for a cap screw, a countersink for a countersunk one. */
@@ -46,6 +47,12 @@ export type HolePatternSettings = {
   perimeterCorners?: boolean;
   /** Perimeter only, without corner holes: how far along the edge the first hole sits, in mm. */
   perimeterStart?: number;
+  /** Own shape (#1235): the id of the shape from the scene that is repeated. */
+  customId?: string;
+  /** Own shape: its width and depth, the room it takes on the face, and whether it is round seen from above. */
+  customWidth?: number;
+  customDepth?: number;
+  customRound?: boolean;
   /** Depth of the holes in mm; null cuts through the whole body. */
   depth: number | null;
   /** Set after the user was warned and chose to go on: the pattern may then hold up to `HOLE_PATTERN_MANY_HOLES` holes (#941). */
@@ -117,10 +124,15 @@ export function holePatternRowSpacing(settings: Pick<HolePatternSettings, "form"
 const MAX_CANDIDATES = 60000;
 const EPSILON = 1e-7;
 
-type FootprintSettings = Pick<HolePatternSettings, "form" | "size" | "height"> & Partial<Pick<HolePatternSettings, "holeType" | "headSize">>;
+type FootprintSettings = Pick<HolePatternSettings, "form" | "size" | "height">
+  & Partial<Pick<HolePatternSettings, "holeType" | "headSize" | "customWidth" | "customDepth" | "customRound">>;
 
-/** The room a hole takes on the face: a hole with a head takes its head's. */
+/** The room a hole takes on the face: a hole with a head takes its head's, an own shape its width and depth. */
 export function holeFootprintSize(settings: FootprintSettings): { width: number; height: number } {
+  if (settings.form === "custom") {
+    const side = (value: number | undefined) => Math.max(HOLE_PATTERN_MIN_SIZE, typeof value === "number" && Number.isFinite(value) ? value : DEFAULT_HOLE_PATTERN.size);
+    return { width: side(settings.customWidth), height: side(settings.customDepth) };
+  }
   if (holeHasHead(settings)) {
     const head = holeHeadSize(settings);
     return { width: head, height: head };
@@ -142,7 +154,7 @@ export function holeFootprintPolygon(settings: FootprintSettings): Point2[] {
   const { width, height } = holeFootprintSize(settings);
   const halfW = width / 2;
   const halfH = height / 2;
-  switch (settings.form) {
+  switch (settings.form === "custom" ? (settings.customRound ? "round" : "square") : settings.form) {
     case "round": {
       const count = 24;
       return Array.from({ length: count }, (_, index) => {
@@ -712,7 +724,7 @@ export function holePatternWall(settings: FootprintSettings & Pick<HolePatternSe
 /** Keeps every number of the settings inside what the tool offers. */
 export function normalizeHolePattern(input: Partial<HolePatternSettings>): HolePatternSettings {
   const base = DEFAULT_HOLE_PATTERN;
-  const forms: HoleForm[] = ["round", "square", "rectangle", "hexagon", "slot"];
+  const forms: HoleForm[] = ["round", "square", "rectangle", "hexagon", "slot", "custom"];
   const number = (value: unknown, fallback: number, min: number, max: number) =>
     typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
   const form = forms.includes(input.form as HoleForm) ? input.form as HoleForm : base.form;
@@ -720,9 +732,15 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
   const size = number(input.size, base.size, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SIZE);
   const height = number(input.height, size, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SIZE);
   const holeType: HoleType = input.holeType === "counterbore" || input.holeType === "countersink" ? input.holeType : "plain";
+  const custom = {
+    ...(typeof input.customId === "string" && input.customId ? { customId: input.customId } : {}),
+    ...(typeof input.customWidth === "number" && Number.isFinite(input.customWidth) ? { customWidth: Math.max(HOLE_PATTERN_MIN_SIZE, input.customWidth) } : {}),
+    ...(typeof input.customDepth === "number" && Number.isFinite(input.customDepth) ? { customDepth: Math.max(HOLE_PATTERN_MIN_SIZE, input.customDepth) } : {}),
+    ...(input.customRound === true ? { customRound: true } : {}),
+  };
   const head = { headSize: holeHeadSize({ size, headSize: input.headSize }), headDepth: holeHeadDepth({ size, headDepth: input.headDepth }) };
   // Holes that overlap would only merge into one wide cut.
-  const minSpacing = holePatternMinSpacing({ form, size, height, arrangement, holeType, ...head });
+  const minSpacing = holePatternMinSpacing({ form, size, height, arrangement, holeType, ...head, ...custom });
   const spacing = Math.max(minSpacing, number(input.spacing, base.spacing, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SPACING));
   // A rectangle or slot without a row spacing of its own (saved before #975) keeps the rows where its spacing put them.
   const rowSpacing = holePatternHasRowSpacing(form)
@@ -746,6 +764,7 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     perimeterCount: Math.round(number(input.perimeterCount, 8, HOLE_PATTERN_MIN_PERIMETER_COUNT, HOLE_PATTERN_MAX_PERIMETER_COUNT)),
     perimeterCorners: input.perimeterCorners !== false,
     perimeterStart: number(input.perimeterStart, 0, 0, HOLE_PATTERN_MAX_PERIMETER_START),
+    ...custom,
     depth: typeof input.depth === "number" && Number.isFinite(input.depth) && input.depth > 0 ? Math.min(input.depth, 1000) : null,
     ...(input.allowMany === true ? { allowMany: true } : {}),
   };
