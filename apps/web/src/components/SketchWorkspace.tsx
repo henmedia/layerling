@@ -15,7 +15,7 @@ import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchV
 import { ToolbarConstructionLineIcon, ToolbarNoteIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
 import { constructionCrossings } from "@/lib/sketchConstruction";
-import { outlineSideMiddles, sketchSnapPoints } from "@/lib/sketchSnapPoints";
+import { movingSelectionCentre, outlineSideMiddles, selectionSnapTargets, sketchSnapPoints, snappedSelectionTarget } from "@/lib/sketchSnapPoints";
 import { openEndPoints } from "@/lib/sketchPointJoin";
 import { canApplySketchCornerTreatment } from "@/lib/sketchFilletChamfer";
 import { t } from "@/lib/i18n";
@@ -806,6 +806,8 @@ export function SketchWorkspace({
   // double click there centres the view, as in the 3D view.
   const emptyPressRef = useRef<{ x: number; y: number } | null>(null);
   const [hover, setHover] = useState<{ x: number; z: number } | null>(null);
+  // Where a shape dragged in from the Shapes menu would land on a snap point (#1236).
+  const [dropSnap, setDropSnap] = useState<{ x: number; z: number } | null>(null);
   // The three-point arc (#643): the two ends clicked so far; the third click sets the bend.
   const [arcPicks, setArcPicks] = useState<SketchArcEnd[]>([]);
   useEffect(() => {
@@ -1542,11 +1544,20 @@ export function SketchWorkspace({
       // Turning measures an angle around the pivot: a pointer on the grid made it jump in uneven steps, so an
       // exact 90° was out of reach on a 1 mm grid (forum, 621358). The angle snaps by itself instead.
       const turning = pointerAction.kind === "rotate-selection" || pointerAction.kind === "rotate-image";
-      const current = turning
+      let current = turning
         ? unsnappedPointFromEvent(event) ?? point
         : unsnapped && pointerAction.kind === "resize-selection" && pointerAction.grab
         ? resizePointerOnGrid(unsnapped, pointerAction.grab, snapStep(snap), reach.halfWidth, reach.halfDepth)
         : event.shiftKey && lockOrigin ? constrainToAxis(lockOrigin, point) : point;
+      // The middle of a moved selection - a circle's centre, a rectangle's middle - snaps to the ends, middles and
+      // crossings of the rest of the sketch (#1236). Shift keeps to an axis instead, Alt moves on the grid only.
+      if (pointerAction.kind === "move-selection" && moveSnap?.centre && !event.shiftKey && !event.altKey) {
+        const free = unsnappedPointFromEvent(event);
+        const target = free
+          ? snappedSelectionTarget(moveSnap.centre, { x: free.x - pointerAction.origin.x, z: free.z - pointerAction.origin.z }, moveSnap.targets, REFERENCE_SNAP_PX * screenUnit)
+          : null;
+        if (target) current = { x: pointerAction.origin.x + target.x - moveSnap.centre.x, z: pointerAction.origin.z + target.z - moveSnap.centre.z };
+      }
       setPointerAction({
         ...pointerAction,
         current,
@@ -2131,6 +2142,34 @@ export function SketchWorkspace({
   const ownSnapPoints = useMemo(() => sketchSnapPoints(displayProfile), [displayProfile]);
   const snapTargets = useMemo(() => [...referenceSnapPoints, ...crossingSnapPoints, ...ownSnapPoints], [crossingSnapPoints, ownSnapPoints, referenceSnapPoints]);
   const hoverOnReference = hover ? snapTargets.some((point) => point.x === hover.x && point.z === hover.z) : false;
+  // What the middle of a moved selection snaps to (#1236), worked out once as the move starts.
+  const movingStartPoints = pointerAction?.kind === "move-selection" ? pointerAction.startPoints : null;
+  const moveSnap = useMemo(() => {
+    if (!movingStartPoints) return null;
+    return {
+      centre: movingSelectionCentre(profile, movingStartPoints),
+      targets: [...referenceSnapPoints, ...selectionSnapTargets(profile, new Set(movingStartPoints.map((point) => point.id)))],
+    };
+  }, [movingStartPoints, profile, referenceSnapPoints]);
+  const movedCentre = pointerAction?.kind === "move-selection" && moveSnap?.centre
+    ? { x: moveSnap.centre.x + pointerAction.current.x - pointerAction.origin.x, z: moveSnap.centre.z + pointerAction.current.z - pointerAction.origin.z }
+    : null;
+  const movedCentreSnapped = movedCentre && moveSnap
+    ? moveSnap.targets.find((point) => Math.abs(point.x - movedCentre.x) < 1e-6 && Math.abs(point.z - movedCentre.z) < 1e-6) ?? null
+    : null;
+  // A shape dragged in from the Shapes menu lands with its middle on a point of the sketch too, its ends and
+  // corners among them (#1236), and the ring shows where while it is dragged. Alt drops it on the grid.
+  const dropPointFromEvent = (event: { clientX: number; clientY: number; altKey: boolean }) => {
+    const local = unsnappedPointFromEvent(event);
+    if (!local) return null;
+    if (!event.altKey) {
+      const ends = profile.points.map((point) => ({ x: Number(point.x.toFixed(4)) || 0, z: Number(point.z.toFixed(4)) || 0 }));
+      const target = snappedSelectionTarget(local, { x: 0, z: 0 }, [...snapTargets, ...ends], REFERENCE_SNAP_PX * screenUnit);
+      if (target) return { point: target, snapped: true };
+    }
+    const point = pointFromEvent(event);
+    return point ? { point, snapped: snapTargets.some((target) => target.x === point.x && target.z === point.z) } : null;
+  };
 
   // Colours picked in the settings reach the light theme through variables; the stylesheet
   // falls back to its own colours for what was not changed, and the dark themes ignore them.
@@ -2294,13 +2333,20 @@ export function SketchWorkspace({
             if (!event.dataTransfer.types.includes("application/x-layerling-sketch-primitive")) return;
             event.preventDefault();
             event.dataTransfer.dropEffect = "copy";
+            const landing = dropPointFromEvent(event);
+            const ring = landing?.snapped ? landing.point : null;
+            if (ring?.x !== dropSnap?.x || ring?.z !== dropSnap?.z) setDropSnap(ring);
+          }}
+          onDragLeave={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDropSnap(null);
           }}
           onDrop={(event) => {
+            setDropSnap(null);
             const primitive = event.dataTransfer.getData("application/x-layerling-sketch-primitive");
             if (!isSketchPrimitive(primitive)) return;
             event.preventDefault();
-            const point = pointFromEvent(event);
-            if (point) onAddPrimitive(primitive, point);
+            const landing = dropPointFromEvent(event);
+            if (landing) onAddPrimitive(primitive, landing.point);
           }}
         >
           <rect className="sketch-plate-background" x={-board.width / 2} y={-board.depth / 2} width={board.width} height={board.depth} />
@@ -2806,7 +2852,9 @@ export function SketchWorkspace({
               </g>
             );
           })() : null}
-          {hover && hoverOnReference ? <circle className="sketch-reference-snap" cx={hover.x} cy={hover.z} r={7 * screenUnit} pointerEvents="none" /> : null}
+          {hover && hoverOnReference && pointerAction?.kind !== "move-selection" ? <circle className="sketch-reference-snap" cx={hover.x} cy={hover.z} r={7 * screenUnit} pointerEvents="none" /> : null}
+          {movedCentreSnapped ? <circle className="sketch-reference-snap" cx={movedCentreSnapped.x} cy={movedCentreSnapped.z} r={7 * screenUnit} pointerEvents="none" /> : null}
+          {dropSnap ? <circle className="sketch-reference-snap" cx={dropSnap.x} cy={dropSnap.z} r={7 * screenUnit} pointerEvents="none" /> : null}
           {activePoint && previewEnd && pointerAction?.kind !== "bezier" && ["line", "bezier", "smooth"].includes(tool) ? <line className="sketch-preview-line" x1={activePoint.x} y1={activePoint.z} x2={previewEnd.x} y2={previewEnd.z} pointerEvents="none" /> : null}
           {tool === "arc" && arcPicks.length === 1 && hover ? (
             <line className="sketch-preview-line" x1={arcPicks[0].x} y1={arcPicks[0].z} x2={hover.x} y2={hover.z} pointerEvents="none" />

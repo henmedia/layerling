@@ -1,13 +1,14 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
-import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type ReactElement } from "react";
-import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, ListTree, Lock, Pencil, Search, Unlock, X } from "lucide-react";
+import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactElement } from "react";
+import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, GripVertical, ListTree, Lock, Pencil, Search, Unlock, X } from "lucide-react";
 import { ToolbarBundleIcon, ToolbarGroupIcon } from "@/components/toolbarIcons";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { getLanguage, t, type MessageKey } from "@/lib/i18n";
 import { displayShapeName, hasOwnShapeName } from "@/lib/shapeCatalog";
+import { stepSourceForShape } from "@/lib/stepExport";
 import {
   hasMatchingPart as partMatchesSearch,
   isObjectListOrder,
@@ -30,6 +31,8 @@ export interface ObjectListPanelProps {
   onRenameShape?: (id: string, name: string) => void;
   /** Starts editing a group, so its parts can be changed one by one. */
   onOpenGroup?: (id: string) => void;
+  /** Moves a shape in front of another one, or to the end when `beforeId` is null (#1233). */
+  onMoveShape?: (id: string, beforeId: string | null) => void;
   /** The loose parts of the innermost group being edited; only groups among them can be edited next. */
   openGroupPartIds?: string[];
   onClose: () => void;
@@ -52,6 +55,7 @@ export function ObjectListPanel({
   onToggleHidden,
   onRenameShape,
   onOpenGroup,
+  onMoveShape,
   openGroupPartIds,
   onClose,
 }: ObjectListPanelProps) {
@@ -132,6 +136,8 @@ export function ObjectListPanel({
       const kindName = t(shape.groupOperation === "bundle" ? "shape.bundle" : "shape.group");
       return `${kindName} · ${t("outliner.children", { count: shape.groupedShapes.length })}`;
     }
+    // A rounded, hollowed or imported body says whether the STEP export can write it exactly (#1237).
+    if (shape.kind === "mesh") return t(stepSourceForShape(shape) === "unsupported" ? "shape.mesh" : "shape.exactBody");
     const key = `shape.${shape.kind}` as MessageKey;
     const translated = t(key);
     return translated || shape.kind;
@@ -184,6 +190,56 @@ export function ObjectListPanel({
   // Sorted on every render, as the shown names follow the interface language.
   const sortShapes = (list: WorkplaneShape[]) => sortObjectList(list, order, hasOwnShapeName, getShapeDisplayName, getLanguage());
   const listedShapes = sortShapes(filteredShapes);
+
+  // The handle on each row puts a shape elsewhere in the design's own order; a sorted or filtered list has no such order to change.
+  const canReorder = Boolean(onMoveShape) && order === "added" && !query && listedShapes.length > 1;
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  // The shape the dragged one would go in front of; null is the end of the list, undefined none yet.
+  const [dropBeforeId, setDropBeforeId] = useState<string | null | undefined>(undefined);
+  // The same id as a ref, so a quick press and release still finds it before the next render.
+  const draggedRef = useRef<string | null>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  const dropTargetAt = (clientY: number): string | null => {
+    const rows = Array.from(listRef.current?.querySelectorAll<HTMLElement>(":scope > li[data-shape-id]") ?? []);
+    const row = rows.find((candidate) => {
+      const box = candidate.getBoundingClientRect();
+      return clientY < box.top + box.height / 2;
+    });
+    return row?.dataset.shapeId ?? null;
+  };
+
+  const startDrag = (id: string, e: PointerEvent<HTMLElement>) => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    draggedRef.current = id;
+    setDraggedId(id);
+    setDropBeforeId(undefined);
+  };
+
+  const moveDrag = (e: PointerEvent<HTMLElement>) => {
+    if (draggedRef.current) setDropBeforeId(dropTargetAt(e.clientY));
+  };
+
+  const endDrag = (e: PointerEvent<HTMLElement>, drop: boolean) => {
+    if (draggedRef.current && drop) onMoveShape?.(draggedRef.current, dropTargetAt(e.clientY));
+    draggedRef.current = null;
+    setDraggedId(null);
+    setDropBeforeId(undefined);
+  };
+
+  /** Arrow keys on a focused handle move the shape one place. */
+  const handleKeyDown = (id: string, e: KeyboardEvent<HTMLElement>) => {
+    const index = listedShapes.findIndex((shape) => shape.id === id);
+    if (e.key === "ArrowUp" && index > 0) {
+      e.preventDefault();
+      onMoveShape?.(id, listedShapes[index - 1].id);
+    } else if (e.key === "ArrowDown" && index >= 0 && index < listedShapes.length - 1) {
+      e.preventDefault();
+      onMoveShape?.(id, listedShapes[index + 2]?.id ?? null);
+    }
+  };
 
   /**
    * A group's parts; while searching, only the matches and the groups that lead to them, nested as deep as needed.
@@ -296,7 +352,7 @@ export function ObjectListPanel({
               <span>{filterText ? t("outliner.noMatches") : t("outliner.empty")}</span>
             </div>
           ) : (
-            <ul className="outliner-list" role="listbox" aria-multiselectable="true">
+            <ul ref={listRef} className="outliner-list" role="listbox" aria-multiselectable="true">
               {listedShapes.map((shape) => {
                 const isSelected = selectedSet.has(shape.id);
                 const isGroup = Boolean(shape.groupedShapes && shape.groupedShapes.length > 0);
@@ -310,7 +366,8 @@ export function ObjectListPanel({
                 return (
                   <li
                     key={shape.id}
-                    className={`outliner-item ${isSelected ? "selected" : ""} ${shape.hidden ? "hidden-shape" : ""} ${shape.locked ? "locked-shape" : ""} ${openParts.has(shape.id) ? "open-group-part" : ""}`}
+                    data-shape-id={shape.id}
+                    className={`outliner-item ${draggedId === shape.id ? "dragging" : ""} ${draggedId && dropBeforeId === shape.id ? "drop-before" : ""} ${draggedId && dropBeforeId === null && shape.id === listedShapes[listedShapes.length - 1].id ? "drop-after" : ""} ${isSelected ? "selected" : ""} ${shape.hidden ? "hidden-shape" : ""} ${shape.locked ? "locked-shape" : ""} ${openParts.has(shape.id) ? "open-group-part" : ""}`}
                     role="option"
                     aria-selected={isSelected}
                     onMouseDown={(e) => {
@@ -320,6 +377,22 @@ export function ObjectListPanel({
                     onClick={(e) => handleRowClick(shape.id, e)}
                   >
                     <div className="outliner-row-main">
+                      {canReorder ? (
+                        <button
+                          type="button"
+                          className="outliner-drag-handle"
+                          title={t("outliner.moveShape")}
+                          aria-label={t("outliner.moveShape")}
+                          onClick={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => startDrag(shape.id, e)}
+                          onPointerMove={moveDrag}
+                          onPointerUp={(e) => endDrag(e, true)}
+                          onPointerCancel={(e) => endDrag(e, false)}
+                          onKeyDown={(e) => handleKeyDown(shape.id, e)}
+                        >
+                          <GripVertical size={14} />
+                        </button>
+                      ) : null}
                       {isGroup ? (
                         <button
                           type="button"

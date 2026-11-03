@@ -1,5 +1,7 @@
 import { circularArcCenter } from "@/lib/sketchCircularArc";
-import type { SketchProfile } from "@/types/layerling";
+import { constructionCrossings } from "@/lib/sketchConstruction";
+import { cubicPoint } from "@/lib/sketchPaths";
+import type { SketchPoint, SketchProfile } from "@/types/layerling";
 
 type Plane = { x: number; z: number };
 
@@ -44,4 +46,65 @@ export function outlineSideMiddles(corners: readonly Plane[]): Plane[] {
     const next = corners[(index + 1) % corners.length];
     return { x: (corner.x + next.x) / 2, z: (corner.z + next.z) / 2 };
   });
+}
+
+/**
+ * Where the middle of a moved selection snaps to (#1236): the ends and corners of the rest of the sketch, the middles
+ * of its lines and centres of its circles, and where its construction lines cross. What moves is left out, and so is
+ * every line with an end among it, as it would move along under the selection.
+ */
+export function selectionSnapTargets(profile: SketchProfile, movingIds: ReadonlySet<string>): Plane[] {
+  const rest: SketchProfile = {
+    ...profile,
+    points: profile.points.filter((point) => !movingIds.has(point.id)),
+    segments: profile.segments.filter((segment) => !movingIds.has(segment.startId) && !movingIds.has(segment.endId)),
+  };
+  const found = new Map<string, Plane>();
+  const add = (point: Plane) => {
+    const x = round(point.x);
+    const z = round(point.z);
+    found.set(`${x}:${z}`, { x, z });
+  };
+  rest.points.forEach(add);
+  sketchSnapPoints(rest).forEach(add);
+  constructionCrossings(rest).forEach(add);
+  return [...found.values()];
+}
+
+/**
+ * The middle of what moves, as the selection frame shows it: the box round its points and its curves. A circle's or
+ * a rectangle's middle is its centre. Null when nothing moves.
+ */
+export function movingSelectionCentre(profile: SketchProfile, startPoints: readonly SketchPoint[]): Plane | null {
+  if (startPoints.length === 0) return null;
+  const byId = new Map(startPoints.map((point) => [point.id, point]));
+  const extent: Plane[] = [...startPoints];
+  profile.segments.forEach((segment) => {
+    const start = byId.get(segment.startId);
+    const end = byId.get(segment.endId);
+    if (!start || !end || (segment.kind ?? "line") === "line" || !start.handleOut || !end.handleIn) return;
+    for (let index = 1; index < 16; index += 1) extent.push(cubicPoint(start, start.handleOut, end.handleIn, end, index / 16));
+  });
+  const xs = extent.map((point) => point.x);
+  const zs = extent.map((point) => point.z);
+  return { x: (Math.min(...xs) + Math.max(...xs)) / 2, z: (Math.min(...zs) + Math.max(...zs)) / 2 };
+}
+
+/**
+ * The target the moved middle lands on, if one lies within `reach` of where the pointer would put it, the nearest.
+ * `centre` is the middle before the move, `delta` the move the pointer makes, off the grid.
+ */
+export function snappedSelectionTarget(centre: Plane, delta: Plane, targets: readonly Plane[], reach: number): Plane | null {
+  const x = centre.x + delta.x;
+  const z = centre.z + delta.z;
+  let nearest: Plane | null = null;
+  let nearestDistance = reach;
+  targets.forEach((target) => {
+    const distance = Math.hypot(target.x - x, target.z - z);
+    if (distance <= nearestDistance) {
+      nearest = target;
+      nearestDistance = distance;
+    }
+  });
+  return nearest;
 }

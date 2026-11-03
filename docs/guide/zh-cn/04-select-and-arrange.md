@@ -19,9 +19,11 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 
 - 单击条目即可选中形状，包括分组内部的零件。按住 [[Shift]] 可添加或移除条目，与在视图中一样。箭头可展开和收起分组。
 - 标签显示零件是 {{ui:outliner.solid}} 还是 {{ui:outliner.hole}}。
+- 名称下方显示形状的类型。不再是简单形状的实体（已倒圆、已抽壳或导入的）在 STEP 导出能精确写出时显示 {{ui:shape.exactBody}}，只由三角形组成、以 STL 导出时显示 {{ui:shape.mesh}}。在倒圆或抽壳之后才加上的收缩、倾斜或扭转只会弯曲它的网格，这时会显示 {{ui:shape.mesh}}。
 - 挂锁和眼睛图标可锁定和隐藏单个零件。
 - {{ui:outliner.rename}} 可给零件单独命名；设置顶部名称旁的铅笔按钮对选中形状起同样作用。合理的名称在较大设计中非常有帮助。
 - 标题栏中的 A–Z 按钮（{{ui:outliner.sortByName}}）会把你命名过的形状按字母顺序排列，数字按数值比较（零件 2 排在零件 10 之前）。仍使用默认名称的形状排在下面，按添加顺序排列，最新的在最后；组内的零件也同样排序。只改变列表，不会改变设计。再点一次会重新按添加顺序显示，浏览器会记住你的选择。
+- 行左侧的手柄(六个点)可在列表中移动形状:向上或向下拖动,或让它获得焦点后按 [[↑]] 或 [[↓]]。这会改变设计本身的顺序,关闭 A–Z 排序后列表会回到这个顺序,“撤销”可以还原。开启 A–Z 排序或搜索时,手柄会隐藏。
 - 搜索框按名称和种类查找形状，因此也可以搜“圆柱体”或“孔”。它还会搜索分组内部，无论嵌套多深：包含匹配项的分组会留在列表中并展开，显示匹配的零件以及通向它们的各层分组。按自身名称找到的分组，展开后会显示其全部零件。
 - 标题栏最左侧的箭头可将列表折叠到标题栏，再展开。
 
@@ -108,9 +110,12 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 2. 在窗口中设置孔的外观和排布：
    - **{{ui:holePattern.form}}：** {{ui:holePattern.form.round}}、{{ui:holePattern.form.square}}、{{ui:holePattern.form.rectangle}}、{{ui:holePattern.form.hexagon}} 或 {{ui:holePattern.form.slot}}。
    - **大小：** 圆孔用 {{ui:holePattern.size.diameter}}，方孔用 {{ui:holePattern.size.side}}，矩形和槽孔用 {{ui:holePattern.size.width}} 与 {{ui:holePattern.size.height}}。六边形的大小是 {{ui:holePattern.size.corners}}。
+   - **{{ui:holePattern.form.custom}}：** 用场景中的一个形状代替孔来重复：铆钉、凸点，或花纹板上的花纹。在 {{ui:holePattern.customShape}} 中选择它。它的宽度和深度就是它占用的位置；它按原样竖立在面上，不带自身的旋转。实体会放到面上并与之合并，孔则按其高度切入。形状本身保持原位。
+   - **{{ui:holePattern.holeType}}：** 仅限圆孔。{{ui:holePattern.holeType.plain}} 是直孔，{{ui:shape.counterbore}} 为圆柱头螺钉的头部加一个沉台，{{ui:shape.countersink}} 为沉头螺钉加一个 90° 锥面。此时大小就是 {{ui:prop.screwHoleShaft}}；{{ui:prop.screwHoleHead}} 以及沉台的 {{ui:prop.screwHoleHeadDepth}} 设定头部。{{ui:prop.screwHoleSize}} 会按公制螺钉填好所有值。
    - **{{ui:holePattern.spacing}}：** 从一个孔的中心到下一个孔中心的距离。如果它小于孔所允许的最小值，layerling 会将其提高到最小可能值，以便孔之间保留壁。
    - **{{ui:holePattern.wall}}：** 同一距离的另一种说法：相邻两个孔之间留下的壁，也就是打印件中的壁厚。设定它，中心距会随之变化，反之亦然。对于六边形、矩形和槽孔，layerling 测量它们边缘之间的最短距离。
    - **{{ui:holePattern.arrangement}}：** {{ui:holePattern.arrangement.grid}} 将孔排成行与列。{{ui:holePattern.arrangement.staggered}} 将每隔一行错开半个间距，并让行更靠近，使每个孔到相邻孔的距离相同——用于六边形时便形成蜂窝。
+   - **{{ui:holePattern.arrangement.perimeter}}：** 改为沿面的外边缘放一圈孔，向内缩进 {{ui:holePattern.margin}}——比如盖子或板子四周的螺钉孔。{{ui:holePattern.perimeterBy}} {{ui:holePattern.perimeterBy.spacing}} 大致保持间距，{{ui:holePattern.perimeterBy.count}} 则设定 {{ui:holePattern.perimeterCount}}；两种方式都会把间距调匀，让这一圈无缝闭合。{{ui:holePattern.perimeterCorners}}（默认开启）在每个角放一个孔，并把角之间的每条边均匀分配。在圆形面上，或取消勾选时，孔从顶部开始均匀绕一圈，{{ui:holePattern.perimeterStart}} 可沿边缘移动整圈孔。
    - **{{ui:holePattern.margin}}：** 孔与面边缘之间的净距离。只有完全位于“面减去此边距”范围内的孔才会生成；任何会超出该范围的孔都会被略过。面中的开口周围也会保留此边距。
    - **{{ui:holePattern.depth}}：** {{ui:holePattern.depth.through}}（默认）会切穿整面壁。使用 {{ui:holePattern.depth.custom}} 时，以毫米为单位给出深度，例如用于凹槽。
 3. 孔会立即在面上以预览形式显示，并跟随每个数值变化。窗口会说明能容纳多少个孔。{{ui:holePattern.repick}} 可选择另一个面，[[Esc]] 关闭工具；和其他工具窗口一样，可拖动其标题栏移动。

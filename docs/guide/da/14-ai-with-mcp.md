@@ -87,6 +87,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_list_objects` | lister alle objekter med dimensioner, position, rotation og id |
 | `layerling_select_objects` | vælger objekter |
 | `layerling_delete_objects` | sletter objekter |
+| `layerling_move_object` | flytter et objekt til et andet sted i objektlisten |
 | `layerling_create_shape` | skaber en form: kasse, cylinder, tekst (også buet), gevind, tandhjul, skitseform og alle de andre |
 | `layerling_import_file` | importerer en fil som importvinduet gør, en farvet OBJ eller 3MF som én form pr. farve, en 3MF med flere objekter som én form pr. objekt |
 | `layerling_add_font` | tilføjer en font du selv har til tekst fra en TrueType-, OpenType- eller WOFF-fil; den bliver i browseren, et design beholder kun de bogstaver det bruger |

@@ -417,6 +417,19 @@ export const tools = [
     },
   },
   {
+    name: "layerling_move_object",
+    description: "Move an object to another place in the object list (#1233), like the handle on its row in the editor: the design's own order, the one the list shows when it is not sorted A-Z. `before` is the id of the object it goes in front of; without it the object goes last. Only the order changes, never the shape. One undo step.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["id"],
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string" },
+        before: { type: "string" },
+      },
+    },
+  },
+  {
     name: "layerling_create_shape",
     description: "Create any of Layerling's shapes: boxes, cylinders, slots, polygons, spheres, cones, pyramids, wedges, roofs, tori, tubes, stars, hearts, crescents, print-in-place hinges, Gridfinity bins and baseplates, knurled grips, raised text, threads (rod, screw, nut, tapped hole), springs, gears, Hirth joints (face teeth that lock two parts at any multiple of one tooth), port openings for USB, HDMI, DisplayPort and RJ45 sockets, or a simple extruded sketch. Width, depth and height default to what the editor uses for that shape; everything a shape has beyond its size is optional and falls back to the same defaults as a shape placed by hand. With a workplane set on a face (layerling_set_workplane), the shape stands on that face and x and z count on it (0, 0 is where the workplane sits) - unless elevation or a rotation is given, which mean the base plate.",
     inputSchema: {
@@ -686,7 +699,7 @@ export const tools = [
   },
   {
     name: "layerling_perforate_face",
-    description: "Cut a pattern of holes into a flat face of a solid body - the editor's Hole pattern tool (vents, speaker grilles, baskets). The holes are ordinary hole shapes standing on the face and grouped with the body (nothing is baked: ungroup frees them again). Name the body and a side of its own box (targetFace, snapped to the nearest real face; the whole flat face around its middle is used) or give point and normal on the face yourself. Only holes that lie wholly inside the face, at least margin away from its edge, are made. form: round (size = diameter), square (size = side), rectangle and slot (size = width, height = height), hexagon (size = diameter across the corners). spacing is centre to centre (for rectangle and slot: along the row, with rowSpacing between the rows); staggered shifts every second row by half a spacing and packs the rows so each hole has neighbours one spacing away. Without depth the holes go through the whole body. A curved face is refused. One undo step.",
+    description: "Cut a pattern of holes into a flat face of a solid body - the editor's Hole pattern tool (vents, speaker grilles, baskets). The holes are ordinary hole shapes standing on the face and grouped with the body (nothing is baked: ungroup frees them again). Name the body and a side of its own box (targetFace, snapped to the nearest real face; the whole flat face around its middle is used) or give point and normal on the face yourself. Only holes that lie wholly inside the face, at least margin away from its edge, are made. form: round (size = diameter), square (size = side), rectangle and slot (size = width, height = height), hexagon (size = diameter across the corners). spacing is centre to centre (for rectangle and slot: along the row, with rowSpacing between the rows); staggered shifts every second row by half a spacing and packs the rows so each hole has neighbours one spacing away. perimeter puts the holes in a ring along the face's outer edge instead, margin in from it (screw holes round a lid or a plate): a hole on every corner and each side shared out evenly by spacing, or `count` holes round the edge (shared out over the sides, still one on every corner); round faces and corners: false go evenly round from the topmost point, moved `start` mm along the edge. The spacing is evened out so the ring closes without a gap; the answer's ring gives the line's length and onCorners. form custom repeats the object shapeId from the scene instead of a hole, raised as a solid or cut in as a hole (rivets, a diamond plate). A round hole can be a counterbore or countersink (holeType): size is then the shaft, headSize the head's diameter at the face, headDepth the counterbore's depth; screwSize (M2 to M30) sets all three for a metric screw. Without depth the holes go through the whole body. A curved face is refused. One undo step.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -695,14 +708,22 @@ export const tools = [
         targetFace: { type: "string", enum: ["bottom", "top", "left", "right", "front", "back"], description: "Side of the body's own box, taken in its current turn (default top)." },
         point: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "A point on the face, [x, y, z] in world coordinates (y up). With normal, wins over targetFace." },
         normal: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "Outward normal [x, y, z] of the face at point, in world coordinates." },
-        form: { type: "string", enum: ["round", "square", "rectangle", "hexagon", "slot"], description: "Shape of the holes (default hexagon)." },
+        form: { type: "string", enum: ["round", "square", "rectangle", "hexagon", "slot", "custom"], description: "Shape of the holes (default hexagon). custom repeats the object shapeId instead: a rivet, a stud, the tread of a diamond plate." },
+        shapeId: { type: "string", description: "form custom only: the object of the scene to repeat over the face. Its width and depth are the room each copy takes; every copy stands upright on the face (its own turn is not taken along). A solid copy is set onto the face and joins the body, a hole is cut in by its own height. size, height, depth and holeType do not count for it; the object itself stays." },
         size: { type: "number", minimum: 0.5, maximum: 200, description: "Diameter, side or width of a hole in millimetres (default 6)." },
         height: { type: "number", minimum: 0.5, maximum: 200, description: "Height of a rectangle or slot in millimetres (default: size)." },
         spacing: { type: "number", minimum: 0.5, maximum: 400, description: "Centre to centre in millimetres (default 9); raised to just over the hole size if smaller." },
-        arrangement: { type: "string", enum: ["grid", "staggered"], description: "grid (rows and columns) or staggered (default)." },
+        arrangement: { type: "string", enum: ["grid", "staggered", "perimeter"], description: "grid (rows and columns), staggered (default) or perimeter (a ring along the outer edge)." },
         rowSpacing: { type: "number", minimum: 0.5, maximum: 400, description: "Rectangle and slot only: centre to centre of the rows in millimetres, so narrow holes can sit close in the row (default: the spacing); raised to just over the hole height if smaller." },
         margin: { type: "number", minimum: 0, maximum: 100, description: "Clear distance between the holes and the face's edge in millimetres (default 4)." },
         depth: { type: "number", minimum: 0.1, description: "Depth of the holes in millimetres. Omit to go through the whole body." },
+        count: { type: "integer", minimum: 2, maximum: 200, description: "Perimeter only: this many holes round the edge instead of following the spacing; never more than fit without overlapping." },
+        corners: { type: "boolean", description: "Perimeter only: a hole on every corner of the edge (default true). false goes evenly round from start." },
+        start: { type: "number", minimum: 0, maximum: 2000, description: "Perimeter only, when the holes do not sit on corners (a round face, or corners: false): how far along the edge from its topmost point the first hole sits, in mm (default 0)." },
+        holeType: { type: "string", enum: ["plain", "counterbore", "countersink"], description: "Round holes only: plain (default), counterbore (a pocket for a cap screw's head) or countersink (a 90 degree cone for a countersunk screw)." },
+        screwSize: { type: "string", enum: ["M2", "M2.5", "M3", "M4", "M5", "M6", "M8", "M10", "M12", "M14", "M16", "M20", "M24", "M30"], description: "With holeType counterbore or countersink: shaft, head and depth for a metric screw of this size (clearance hole to ISO 273, counterbore to DIN 974-1, countersink to ISO 15065, which ends at M20)." },
+        headSize: { type: "number", minimum: 1, maximum: 200, description: "Counterbore or countersink: the head's diameter at the face in millimetres (default twice the shaft)." },
+        headDepth: { type: "number", minimum: 0.2, maximum: 200, description: "Counterbore only: how deep the pocket for the head reaches into the face in millimetres (default the shaft's diameter)." },
       },
     },
   },
