@@ -25,8 +25,8 @@ export type ShapeLibrarySectionId =
  * that no section names lands in "other", at the end, so a new shape is never missing from the library.
  */
 export const SHAPE_LIBRARY_SECTIONS: readonly { id: Exclude<ShapeLibrarySectionId, "other">; shapes: readonly string[] }[] = [
-  { id: "basic", shapes: ["box", "roundedBox", "cylinder", "slot", "ellipse", "polygon", "sphere", "cone", "curvedCone", "pyramid", "wedge", "round-roof", "half-sphere", "paraboloid", "torus"] },
-  { id: "vessels", shapes: ["loft", "vase", "tube", "bentTube"] },
+  { id: "basic", shapes: ["box", "roundedBox", "cylinder", "slot", "ellipse", "polygon", "wedge", "sphere", "cone", "curvedCone", "pyramid", "round-roof", "half-sphere", "paraboloid", "torus"] },
+  { id: "vessels", shapes: ["loft", "tube", "bentTube", "vase"] },
   { id: "holes", shapes: ["counterbore", "countersink", "teardrop", "port"] },
   { id: "connections", shapes: ["thread", "finishingWasher", "hinge", "dovetail"] },
   { id: "mechanics", shapes: ["spring", "gear", "hirth"] },
