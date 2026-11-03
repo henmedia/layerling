@@ -1720,7 +1720,7 @@ const CORNER_RULER_LINE_LIFT = 0.05;
  * Whether a body stands between the camera and the point. What the section view cuts away, see-through bodies
  * and holes hide nothing; neither does `ignoredShapeId`, the body a measurement runs across.
  */
-function worldPointHidden(point: THREE.Vector3, state: ThreeState, ignoredShapeId?: string) {
+export function worldPointHidden(point: THREE.Vector3, state: ThreeState, ignoredShapeId?: string) {
   state.camera.updateMatrixWorld();
   const ndc = point.clone().project(state.camera);
   if (!Number.isFinite(ndc.x) || !Number.isFinite(ndc.y) || Math.abs(ndc.x) > 1.2 || Math.abs(ndc.y) > 1.2) return false;

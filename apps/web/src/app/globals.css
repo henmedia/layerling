@@ -7780,6 +7780,19 @@ html[data-theme="dark"] .inspector-bundle-note {
   stroke-width: 2;
 }
 
+/* Behind a body: dashed and faint, so a point on the far side does not look as if it sat on the near one. */
+.protractor-leg.hidden,
+.protractor-arc.hidden,
+.protractor-normal.hidden {
+  stroke-dasharray: 3 4;
+  opacity: 0.45;
+}
+
+.protractor-point.hidden,
+.protractor-hover.hidden {
+  opacity: 0.45;
+}
+
 .workplane-wrap.protractor-mode canvas {
   cursor: crosshair;
 }

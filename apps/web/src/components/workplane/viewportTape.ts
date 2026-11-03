@@ -10,7 +10,7 @@ import { pointerReach } from "@/lib/pointerReach";
 import { outwardFaceNormal } from "@/lib/layFlat";
 import { axisLockedPoint, circleOfEdgePoints, perpendicularFootOnPlane, perpendicularFootOnSegment, perpendicularPointsOnCircle, pointAcrossCircle } from "@/lib/tapeCircle";
 import { aimPickRay, RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
-import { type ThreeState, type TapeAttachment, type TapeEdgeAttachment, type TapeCandidate, projectToScreen, tapeShapeDimensions, formatMeasure, findShapeObject } from "@/components/workplane/ViewportOverlays";
+import { type ThreeState, type TapeAttachment, type TapeEdgeAttachment, type TapeCandidate, projectToScreen, tapeShapeDimensions, formatMeasure, findShapeObject, worldPointHidden } from "@/components/workplane/ViewportOverlays";
 import { clamp } from "./viewportShapeObjects";
 
 export function tapeAttachmentFromWorld(state: ThreeState, shapeId: string, world: THREE.Vector3, kind: TapeAttachment["kind"] = "surface"): TapeAttachment | null {
@@ -233,6 +233,8 @@ export function pickModelTapeCandidate(
   startWorld?: THREE.Vector3 | null,
   startNormal?: THREE.Vector3 | null,
   shiftKey = false,
+  /** Leave out corners and edges a body hides, so a click lands on what is seen (the protractor, #1228). */
+  skipHidden = false,
 ): TapeCandidate | null {
   const rect = state.renderer.domElement.getBoundingClientRect();
   const pointerX = clientX - rect.left;
@@ -427,9 +429,12 @@ export function pickModelTapeCandidate(
 
   vertexCandidates.sort((a, b) => a.distance - b.distance);
   edgeCandidates.sort((a, b) => a.distance - b.distance);
-  if (shiftKey && edgeCandidates[0]?.perpendicular) return edgeCandidates[0].candidate;
-  if (vertexCandidates[0]) return vertexCandidates[0].candidate;
-  if (edgeCandidates[0]) return edgeCandidates[0].candidate;
+  const inView = (entry: { candidate: TapeCandidate }) => !skipHidden || !worldPointHidden(new THREE.Vector3(entry.candidate.x, entry.candidate.y, entry.candidate.z), state);
+  if (shiftKey && edgeCandidates[0]?.perpendicular && inView(edgeCandidates[0])) return edgeCandidates[0].candidate;
+  const vertex = vertexCandidates.find(inView);
+  if (vertex) return vertex.candidate;
+  const edgeCandidate = edgeCandidates.find(inView);
+  if (edgeCandidate) return edgeCandidate.candidate;
 
   aimPickRay(state, clientX, clientY, RENDER_LAYER_SHAPES);
   const surfaceHit = state.raycaster.intersectObjects(targets, true).find(

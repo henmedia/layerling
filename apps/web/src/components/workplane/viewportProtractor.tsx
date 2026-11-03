@@ -3,7 +3,7 @@ import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { outwardFaceNormal } from "@/lib/layFlat";
 import { angleAtVertex, angleBetweenFaces, facetOfCurvedSurface, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { planarFaceTriangles } from "@/lib/rotationPivot";
-import { findShapeObject, projectToScreen, tapePointWorld, type TapePoint, type ThreeState } from "./ViewportOverlays";
+import { findShapeObject, projectToScreen, tapePointWorld, worldPointHidden, type TapePoint, type ThreeState } from "./ViewportOverlays";
 import { aimPickRay, firstShapeHit, RENDER_LAYER_SHAPES, worldTrianglePositions } from "./viewportPicking";
 import { tapeAttachmentFromWorld } from "./viewportTape";
 
@@ -30,20 +30,60 @@ export type ProtractorModel = {
 
 export const EMPTY_PROTRACTOR: ProtractorModel = { kind: "points", points: [], faces: [], hoverPoint: null, hoverFace: null };
 
+/** A run of a line on screen. `hidden`: a body stands in front of it, so it is drawn dashed and faint. */
+type ProtractorPiece = { points: string; hidden: boolean };
+
 export type ProtractorOverlayState = {
   signature: string;
-  legs: Array<{ x1: number; y1: number; x2: number; y2: number; preview: boolean }>;
+  legs: Array<ProtractorPiece & { preview: boolean }>;
   /** The arc between the legs, drawn in 3D and projected, so it stays true in perspective. */
-  arc: string | null;
-  dots: Array<{ x: number; y: number }>;
+  arc: ProtractorPiece[];
+  dots: Array<{ x: number; y: number; hidden: boolean }>;
   /** The outward normals of the clicked faces, as short strokes. */
-  normals: Array<{ x1: number; y1: number; x2: number; y2: number }>;
-  hover: { x: number; y: number } | null;
+  normals: Array<{ x1: number; y1: number; x2: number; y2: number; hidden: boolean }>;
+  hover: { x: number; y: number; hidden: boolean } | null;
   label: { x: number; y: number; text: string } | null;
 };
 
 /** How long a face's normal stroke is drawn, in screen pixels. */
 const PROTRACTOR_NORMAL_PIXELS = 30;
+/** How many places along a leg or the arc are tested for a body in front: a few raycasts each, as for the tape measure's labels. */
+const PROTRACTOR_HIDDEN_TESTS = 8;
+
+/** `count` pieces from `a` to `b`. */
+const along = (a: THREE.Vector3, b: THREE.Vector3, count: number) => Array.from({ length: count + 1 }, (_, index) => a.clone().lerp(b, index / count));
+
+const screenPoints = (points: Array<{ x: number; y: number }>) => points.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" ");
+
+/**
+ * A line in the room as screen runs, split where bodies hide it. Each of at most `tests` places is raycast
+ * and stands for the pieces around it, so a long arc costs no more than a short one.
+ */
+function screenPieces(state: ThreeState, points: THREE.Vector3[], tests = PROTRACTOR_HIDDEN_TESTS): ProtractorPiece[] {
+  const pieceCount = points.length - 1;
+  if (pieceCount < 1) return [];
+  const screens = points.map((point) => projectToScreen(point, state));
+  const every = Math.max(1, Math.ceil(pieceCount / tests));
+  const tested = new Map<number, boolean>();
+  const hidden = (piece: number) => {
+    const probe = Math.min(pieceCount - 1, Math.floor(piece / every) * every + Math.floor(every / 2));
+    if (!tested.has(probe)) tested.set(probe, worldPointHidden(points[probe].clone().lerp(points[probe + 1], 0.5), state));
+    return tested.get(probe) as boolean;
+  };
+  const pieces: ProtractorPiece[] = [];
+  let run = [screens[0]];
+  let runHidden = hidden(0);
+  for (let piece = 0; piece < pieceCount; piece += 1) {
+    if (hidden(piece) !== runHidden) {
+      pieces.push({ points: screenPoints(run), hidden: runHidden });
+      run = [screens[piece]];
+      runHidden = !runHidden;
+    }
+    run.push(screens[piece + 1]);
+  }
+  pieces.push({ points: screenPoints(run), hidden: runHidden });
+  return pieces;
+}
 
 const vectorOf = ([x, y, z]: [number, number, number]) => new THREE.Vector3(x, y, z);
 
@@ -133,24 +173,26 @@ export function syncProtractorOverlay(
     }
     return;
   }
-  const next: ProtractorOverlayState = { signature: "", legs: [], arc: null, dots: [], normals: [], hover: null, label: null };
+  const next: ProtractorOverlayState = { signature: "", legs: [], arc: [], dots: [], normals: [], hover: null, label: null };
   const toScreen = (point: THREE.Vector3) => projectToScreen(point, state);
+  const marker = (point: THREE.Vector3) => ({ ...toScreen(point), hidden: worldPointHidden(point, state) });
   if (model.kind === "points") {
     const placed = model.points.map((point) => tapePointWorld(state, point));
     const hover = model.hoverPoint && placed.length < 3 ? tapePointWorld(state, model.hoverPoint) : null;
     const all = hover ? [...placed, hover] : placed;
     const screens = all.map(toScreen);
     for (let index = 1; index < all.length; index += 1) {
-      next.legs.push({ x1: screens[0].x, y1: screens[0].y, x2: screens[index].x, y2: screens[index].y, preview: hover !== null && index === all.length - 1 });
+      const preview = hover !== null && index === all.length - 1;
+      next.legs.push(...screenPieces(state, along(all[0], all[index], PROTRACTOR_HIDDEN_TESTS)).map((piece) => ({ ...piece, preview })));
     }
-    next.dots = screens.slice(0, placed.length);
-    next.hover = hover ? screens[screens.length - 1] : null;
+    next.dots = placed.map(marker);
+    next.hover = hover ? marker(hover) : null;
     if (all.length === 3) {
       const [vertex, a, b] = all;
       const angle = angleAtVertex(vertex, a, b);
       const radius = 0.3 * Math.min(vertex.distanceTo(a), vertex.distanceTo(b));
       const arc = angle !== null && radius > 1e-6 ? arcPoints(vertex, a, b, radius) : null;
-      if (arc) next.arc = arc.map(toScreen).map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" ");
+      if (arc) next.arc = screenPieces(state, arc);
       if (angle !== null) {
         // Beside the middle of the arc, out from the corner, so it does not sit on a leg.
         const middle = arc ? toScreen(arc[Math.floor(arc.length / 2)]) : screens[0];
@@ -171,23 +213,24 @@ export function syncProtractorOverlay(
       // A normal pointing straight at the camera has no stroke to draw.
       if (reach < 1e-3) return;
       const scale = PROTRACTOR_NORMAL_PIXELS / reach;
-      next.normals.push({ x1: start.x, y1: start.y, x2: start.x + (unit.x - start.x) * scale, y2: start.y + (unit.y - start.y) * scale });
+      next.normals.push({ x1: start.x, y1: start.y, x2: start.x + (unit.x - start.x) * scale, y2: start.y + (unit.y - start.y) * scale, hidden: worldPointHidden(points[index], state) });
     });
-    next.dots = screens.slice(0, model.faces.length);
-    next.hover = model.hoverFace && model.faces.length < 2 ? screens[screens.length - 1] : null;
+    next.dots = points.slice(0, model.faces.length).map(marker);
+    next.hover = model.hoverFace && model.faces.length < 2 ? marker(points[points.length - 1]) : null;
     if (screens.length === 2) {
-      next.legs.push({ x1: screens[0].x, y1: screens[0].y, x2: screens[1].x, y2: screens[1].y, preview: next.hover !== null });
+      const preview = next.hover !== null;
+      next.legs.push(...screenPieces(state, along(points[0], points[1], PROTRACTOR_HIDDEN_TESTS)).map((piece) => ({ ...piece, preview })));
       const angles = angleBetweenFaces(protractorFaceNormalWorld(state, faces[0]), protractorFaceNormalWorld(state, faces[1]));
       if (angles) next.label = { x: (screens[0].x + screens[1].x) / 2, y: (screens[0].y + screens[1].y) / 2 - 18, text: formatFaceAngles(angles) };
     }
   }
   const round = (value: number) => value.toFixed(1);
   next.signature = JSON.stringify([
-    next.legs.map((leg) => [round(leg.x1), round(leg.y1), round(leg.x2), round(leg.y2), leg.preview]),
+    next.legs,
     next.arc,
-    next.dots.map((dot) => [round(dot.x), round(dot.y)]),
-    next.normals.map((stroke) => [round(stroke.x2), round(stroke.y2)]),
-    next.hover && [round(next.hover.x), round(next.hover.y)],
+    next.dots.map((dot) => [round(dot.x), round(dot.y), dot.hidden]),
+    next.normals.map((stroke) => [round(stroke.x1), round(stroke.y1), round(stroke.x2), round(stroke.y2), stroke.hidden]),
+    next.hover && [round(next.hover.x), round(next.hover.y), next.hover.hidden],
     next.label && [round(next.label.x), round(next.label.y), next.label.text],
   ]);
   if (overlayRef.current?.signature === next.signature) return;
@@ -200,16 +243,18 @@ export function ProtractorOverlay({ overlay }: { overlay: ProtractorOverlayState
     <div className="protractor-overlay" aria-hidden="true">
       <svg className="tape-guides" width="100%" height="100%">
         {overlay.legs.map((leg, index) => (
-          <line key={index} className={`protractor-leg ${leg.preview ? "preview" : ""}`} x1={leg.x1} y1={leg.y1} x2={leg.x2} y2={leg.y2} />
+          <polyline key={index} className={`protractor-leg ${leg.preview ? "preview" : ""} ${leg.hidden ? "hidden" : ""}`} points={leg.points} fill="none" />
         ))}
-        {overlay.arc ? <polyline className="protractor-arc" points={overlay.arc} fill="none" /> : null}
+        {overlay.arc.map((piece, index) => (
+          <polyline key={`arc-${index}`} className={`protractor-arc ${piece.hidden ? "hidden" : ""}`} points={piece.points} fill="none" />
+        ))}
         {overlay.normals.map((stroke, index) => (
-          <line key={`normal-${index}`} className="protractor-normal" x1={stroke.x1} y1={stroke.y1} x2={stroke.x2} y2={stroke.y2} />
+          <line key={`normal-${index}`} className={`protractor-normal ${stroke.hidden ? "hidden" : ""}`} x1={stroke.x1} y1={stroke.y1} x2={stroke.x2} y2={stroke.y2} />
         ))}
         {overlay.dots.map((dot, index) => (
-          <circle key={`dot-${index}`} className="protractor-point" cx={dot.x} cy={dot.y} r="4.5" />
+          <circle key={`dot-${index}`} className={`protractor-point ${dot.hidden ? "hidden" : ""}`} cx={dot.x} cy={dot.y} r="4.5" />
         ))}
-        {overlay.hover ? <circle className="protractor-hover" cx={overlay.hover.x} cy={overlay.hover.y} r="5" /> : null}
+        {overlay.hover ? <circle className={`protractor-hover ${overlay.hover.hidden ? "hidden" : ""}`} cx={overlay.hover.x} cy={overlay.hover.y} r="5" /> : null}
       </svg>
       {overlay.label ? <span className="tape-label protractor-label" style={{ left: overlay.label.x, top: overlay.label.y }}>{overlay.label.text}</span> : null}
     </div>

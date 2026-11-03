@@ -5739,7 +5739,7 @@ export function WorkplaneViewport({
     const state = threeRef.current;
     if (!state) return null;
     const visibleIds = shapesRef.current.filter((shape) => !shape.hidden).map((shape) => shape.id);
-    const candidate = visibleIds.length > 0 ? pickModelTapeCandidate(state, visibleIds, clientX, clientY) : null;
+    const candidate = visibleIds.length > 0 ? pickModelTapeCandidate(state, visibleIds, clientX, clientY, null, null, false, true) : null;
     const id = `protractor-point-${++protractorIdRef.current}`;
     if (candidate) return { id, x: candidate.x, y: candidate.y, z: candidate.z, ...(candidate.attachment ? { attachment: candidate.attachment } : {}) };
     const raw = toRawPlanePoint(clientX, clientY, state.dragPlane);
