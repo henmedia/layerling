@@ -128,11 +128,16 @@ function hasExactGridfinity(shape: WorkplaneShape) {
 }
 
 export function stepSourceForShape(shape: WorkplaneShape): StepSource {
-  if (shape.kind === "mesh" && shape.importedMesh?.brepStep) return "imported";
   // A taper or lean is no part of the primitives: the box would go out as a
-  // plain box. A tapered or leaning prism goes out as its loft; a twist, or a
-  // deformed round body, has no exact form yet.
-  if (shapeHasShapeDeform(shape)) return shape.cadBrep ? "baked" : hasExactProfile(shape) ? "profile" : "unsupported";
+  // plain box. A tapered, leaning or twisted prism goes out as its loft. A
+  // stored or imported B-Rep never holds one: an edge treatment bakes the
+  // deformation in and clears it, so one set after that only bends the mesh,
+  // and the B-Rep would go out as it was before (#1237).
+  if (shapeHasShapeDeform(shape)) {
+    if (shape.cadBrep || shape.importedMesh) return "unsupported";
+    return hasExactProfile(shape) ? "profile" : "unsupported";
+  }
+  if (shape.kind === "mesh" && shape.importedMesh?.brepStep) return "imported";
   const oval = (shape.kind === "cylinder" || shape.kind === "cone") && Math.abs(shapeWidth(shape) - shapeDepth(shape)) >= SIZE_EPS;
   if (EXACT_KINDS.has(shape.kind) && !oval) return "primitive";
   if (shape.cadBrep) return "baked";

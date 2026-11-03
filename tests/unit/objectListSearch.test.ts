@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   hasMatchingPart,
   isObjectListOrder,
+  moveShapeBefore,
   normalizeObjectListQuery,
   shapeMatchesSearch,
   showInObjectList,
@@ -154,5 +155,27 @@ describe("the object list panel", () => {
   it("sorts its rows and the parts of groups in the chosen order", () => {
     expect(panel).toContain("const listedShapes = sortShapes(filteredShapes)");
     expect(panel).toContain("sortShapes(parts).flatMap(");
+  });
+});
+
+describe("moving a shape in the list (#1233)", () => {
+  const list = ["a", "b", "c", "d"].map((id) => ({ id }));
+  const ids = (shapes: readonly { id: string }[]) => shapes.map((shape) => shape.id).join("");
+
+  it("puts a shape in front of another one", () => {
+    expect(ids(moveShapeBefore(list, "d", "b"))).toBe("adbc");
+    expect(ids(moveShapeBefore(list, "a", "c"))).toBe("bacd");
+  });
+
+  it("puts a shape last when no shape follows it", () => {
+    expect(ids(moveShapeBefore(list, "a", null))).toBe("bcda");
+  });
+
+  it("leaves the list as it is when nothing would change", () => {
+    expect(moveShapeBefore(list, "b", "c")).toBe(list);
+    expect(moveShapeBefore(list, "d", null)).toBe(list);
+    expect(moveShapeBefore(list, "b", "b")).toBe(list);
+    expect(moveShapeBefore(list, "x", "a")).toBe(list);
+    expect(moveShapeBefore(list, "a", "x")).toBe(list);
   });
 });

@@ -3,10 +3,19 @@
  * the 2D frame of the face - `u` along the frame's x axis, `v` along its z
  * axis - so the editor and the tests share one calculation.
  */
+import type { ManifoldToplevel } from "manifold-3d";
+import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
+
 export type Point2 = { u: number; v: number };
 
-export type HoleForm = "round" | "square" | "rectangle" | "hexagon" | "slot";
-export type HoleArrangement = "grid" | "staggered";
+/** custom repeats a shape from the scene over the face (#1235): a rivet, a tread, any body or hole. */
+export type HoleForm = "round" | "square" | "rectangle" | "hexagon" | "slot" | "custom";
+/** Grid and staggered fill the face; perimeter puts the holes in a ring along its outer edge (#1232). */
+export type HoleArrangement = "grid" | "staggered" | "perimeter";
+/** A round hole can take a screw's head (#1232): a counterbore for a cap screw, a countersink for a countersunk one. */
+export type HoleType = "plain" | "counterbore" | "countersink";
+/** Around the edge the holes follow the spacing or come to a set number. */
+export type HolePerimeterBy = "spacing" | "count";
 
 export type HolePatternSettings = {
   form: HoleForm;
@@ -24,6 +33,26 @@ export type HolePatternSettings = {
   arrangement: HoleArrangement;
   /** Clear distance between a hole and the edge of the face (and any opening in it). */
   margin: number;
+  /** Round holes only: a plain hole, or one with a counterbore or countersink of `headSize` for the screw's head. */
+  holeType?: HoleType;
+  /** Diameter of the counterbore or countersink at the face; `size` is then the shaft. */
+  headSize?: number;
+  /** How deep the counterbore reaches into the face (a countersink's depth follows from its 90 degrees). */
+  headDepth?: number;
+  /** Perimeter only: whether the holes keep to `spacing` or come to `perimeterCount`. */
+  perimeterBy?: HolePerimeterBy;
+  /** Perimeter only: how many holes go round the edge. */
+  perimeterCount?: number;
+  /** Perimeter only: a hole on every corner of the edge, each side shared out evenly between them. */
+  perimeterCorners?: boolean;
+  /** Perimeter only, without corner holes: how far along the edge the first hole sits, in mm. */
+  perimeterStart?: number;
+  /** Own shape (#1235): the id of the shape from the scene that is repeated. */
+  customId?: string;
+  /** Own shape: its width and depth, the room it takes on the face, and whether it is round seen from above. */
+  customWidth?: number;
+  customDepth?: number;
+  customRound?: boolean;
   /** Depth of the holes in mm; null cuts through the whole body. */
   depth: number | null;
   /** Set after the user was warned and chose to go on: the pattern may then hold up to `HOLE_PATTERN_MANY_HOLES` holes (#941). */
@@ -37,6 +66,13 @@ export const HOLE_PATTERN_MIN_SIZE = 0.5;
 export const HOLE_PATTERN_MAX_SIZE = 200;
 export const HOLE_PATTERN_MAX_SPACING = 400;
 export const HOLE_PATTERN_MAX_MARGIN = 100;
+export const HOLE_PATTERN_MIN_PERIMETER_COUNT = 2;
+export const HOLE_PATTERN_MAX_PERIMETER_COUNT = 200;
+export const HOLE_PATTERN_MAX_PERIMETER_START = 2000;
+/** The turn at which a bend of the edge counts as a corner that gets its own hole; a circle's facets turn far less. */
+const PERIMETER_CORNER_TURN = (25 * Math.PI) / 180;
+/** How much wider than the shaft a screw's head is at least. */
+const HEAD_OVER_SHAFT = 0.5;
 
 export const DEFAULT_HOLE_PATTERN: HolePatternSettings = {
   form: "hexagon",
@@ -47,6 +83,24 @@ export const DEFAULT_HOLE_PATTERN: HolePatternSettings = {
   margin: 4,
   depth: null,
 };
+
+/** Whether the holes have a head: round ones with a counterbore or countersink. */
+export function holeHasHead(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType">>) {
+  return settings.form === "round" && (settings.holeType === "counterbore" || settings.holeType === "countersink");
+}
+
+/** The head of a counterbore or countersink at the face: twice the shaft unless set, always a little wider than it. */
+export function holeHeadSize(settings: Pick<HolePatternSettings, "size"> & Partial<Pick<HolePatternSettings, "headSize">>) {
+  const shaft = Math.max(HOLE_PATTERN_MIN_SIZE, settings.size);
+  const head = typeof settings.headSize === "number" && Number.isFinite(settings.headSize) ? settings.headSize : shaft * 2;
+  return Math.min(HOLE_PATTERN_MAX_SIZE, Math.max(shaft + HEAD_OVER_SHAFT, head));
+}
+
+/** How deep a counterbore is: the shaft's diameter unless set (a cap screw's head is about as high as it is thick). */
+export function holeHeadDepth(settings: Pick<HolePatternSettings, "size"> & Partial<Pick<HolePatternSettings, "headDepth">>) {
+  const depth = typeof settings.headDepth === "number" && Number.isFinite(settings.headDepth) ? settings.headDepth : Math.max(HOLE_PATTERN_MIN_SIZE, settings.size);
+  return Math.min(HOLE_PATTERN_MAX_SIZE, Math.max(0.2, depth));
+}
 
 /** Across-flats width of a hexagon whose corners point along v, as a share of the corner-to-corner size. */
 export const HEXAGON_FLAT_RATIO = Math.sqrt(3) / 2;
@@ -70,7 +124,19 @@ export function holePatternRowSpacing(settings: Pick<HolePatternSettings, "form"
 const MAX_CANDIDATES = 60000;
 const EPSILON = 1e-7;
 
-export function holeFootprintSize(settings: Pick<HolePatternSettings, "form" | "size" | "height">): { width: number; height: number } {
+type FootprintSettings = Pick<HolePatternSettings, "form" | "size" | "height">
+  & Partial<Pick<HolePatternSettings, "holeType" | "headSize" | "customWidth" | "customDepth" | "customRound">>;
+
+/** The room a hole takes on the face: a hole with a head takes its head's, an own shape its width and depth. */
+export function holeFootprintSize(settings: FootprintSettings): { width: number; height: number } {
+  if (settings.form === "custom") {
+    const side = (value: number | undefined) => Math.max(HOLE_PATTERN_MIN_SIZE, typeof value === "number" && Number.isFinite(value) ? value : DEFAULT_HOLE_PATTERN.size);
+    return { width: side(settings.customWidth), height: side(settings.customDepth) };
+  }
+  if (holeHasHead(settings)) {
+    const head = holeHeadSize(settings);
+    return { width: head, height: head };
+  }
   const size = Math.max(HOLE_PATTERN_MIN_SIZE, settings.size);
   switch (settings.form) {
     case "round":
@@ -84,11 +150,11 @@ export function holeFootprintSize(settings: Pick<HolePatternSettings, "form" | "
 }
 
 /** The outline of one hole around its centre, as a convex polygon. */
-export function holeFootprintPolygon(settings: Pick<HolePatternSettings, "form" | "size" | "height">): Point2[] {
+export function holeFootprintPolygon(settings: FootprintSettings): Point2[] {
   const { width, height } = holeFootprintSize(settings);
   const halfW = width / 2;
   const halfH = height / 2;
-  switch (settings.form) {
+  switch (settings.form === "custom" ? (settings.customRound ? "round" : "square") : settings.form) {
     case "round": {
       const count = 24;
       return Array.from({ length: count }, (_, index) => {
@@ -300,6 +366,8 @@ export type HolePatternResult = {
   tooMany: boolean;
   /** Rows and columns of the lattice that was used (rows that carry at least one hole). */
   rows: number;
+  /** Perimeter only: how long the line is the holes go round on, and whether they sit on its corners. */
+  ring?: { length: number; onCorners: boolean };
 };
 
 /**
@@ -334,12 +402,6 @@ export function holePatternCenters(outline: FaceOutline, settings: HolePatternSe
       maxV = Math.max(maxV, point.v);
     }
   }
-  const centerU = (minU + maxU) / 2;
-  const centerV = (minV + maxV) / 2;
-  const halfSpanU = Math.ceil((maxU - minU) / 2 / pitchU) + 1;
-  const halfSpanV = Math.ceil((maxV - minV) / 2 / pitchV) + 1;
-  if ((halfSpanU * 2 + 1) * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return { ...empty, tooMany: true };
-
   const segments = loopSegments(loops);
   const reach = Math.max(size.width, size.height) / 2 + margin;
 
@@ -358,6 +420,25 @@ export function holePatternCenters(outline: FaceOutline, settings: HolePatternSe
     }
     return true;
   };
+
+  if (settings.arrangement === "perimeter") {
+    const runtime = loadedManifoldRuntime();
+    if (!runtime) {
+      // The ring is laid on the edge set in by the kernel; the editor has it loaded long before a face is picked.
+      requestManifoldRuntime();
+      return empty;
+    }
+    const ring = perimeterRing(runtime, loops, settings);
+    if (ring.tooMany) return { ...empty, tooMany: true };
+    const centers = ring.centers.filter(fits);
+    return { centers, tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
+  }
+
+  const centerU = (minU + maxU) / 2;
+  const centerV = (minV + maxV) / 2;
+  const halfSpanU = Math.ceil((maxU - minU) / 2 / pitchU) + 1;
+  const halfSpanV = Math.ceil((maxV - minV) / 2 / pitchV) + 1;
+  if ((halfSpanU * 2 + 1) * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return { ...empty, tooMany: true };
 
   let best: Point2[] = [];
   let bestRows = 0;
@@ -388,6 +469,132 @@ export function holePatternCenters(outline: FaceOutline, settings: HolePatternSe
 
   if (best.length > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { centers: [], tooMany: true, rows: 0 };
   return { centers: best, tooMany: false, rows: bestRows };
+}
+
+function loopArea(loop: readonly Point2[]) {
+  let area = 0;
+  for (let i = 0, j = loop.length - 1; i < loop.length; j = i, i += 1) area += (loop[j].u - loop[i].u) * (loop[j].v + loop[i].v);
+  return area / 2;
+}
+
+/** A closed line measured along its length: its corners, and how far each one lies along it from the first. */
+type MeasuredPath = { points: Point2[]; along: number[]; length: number };
+
+function measuredPath(points: Point2[]): MeasuredPath {
+  const along = [0];
+  for (let i = 1; i <= points.length; i += 1) {
+    const a = points[i - 1];
+    const b = points[i % points.length];
+    along.push(along[i - 1] + Math.hypot(b.u - a.u, b.v - a.v));
+  }
+  return { points, along, length: along[points.length] };
+}
+
+/** The point `distance` along the closed line from its first corner. */
+function pointAlong(path: MeasuredPath, distance: number): Point2 {
+  const d = ((distance % path.length) + path.length) % path.length;
+  let index = 0;
+  while (index < path.points.length - 1 && path.along[index + 1] <= d) index += 1;
+  const a = path.points[index];
+  const b = path.points[(index + 1) % path.points.length];
+  const span = path.along[index + 1] - path.along[index];
+  const t = span > EPSILON ? (d - path.along[index]) / span : 0;
+  return { u: a.u + (b.u - a.u) * t, v: a.v + (b.v - a.v) * t };
+}
+
+/** Shares `total` out over the sides in proportion to their lengths, every side at least one (largest remainder). */
+function shareOut(lengths: readonly number[], total: number) {
+  const sum = lengths.reduce((a, b) => a + b, 0);
+  const exact = lengths.map((length) => (length / sum) * total);
+  const counts = exact.map((value) => Math.max(1, Math.floor(value)));
+  let left = total - counts.reduce((a, b) => a + b, 0);
+  const order = exact.map((value, index) => ({ index, rest: value - Math.floor(value) })).sort((a, b) => b.rest - a.rest);
+  for (let k = 0; left > 0; k = (k + 1) % order.length, left -= 1) counts[order[k].index] += 1;
+  return counts;
+}
+
+/**
+ * The hole centres of a ring along the face's outer edge (#1232), before they are checked against the face: the
+ * edge is set in by the margin and half a hole, so each hole keeps the margin to it, and the holes go round that
+ * line evenly with no gap where the ring closes. With corner holes every bend sharper than a circle's facets gets a
+ * hole and each side between two is shared out on its own; else the first hole sits `perimeterStart` along the
+ * line from its topmost point. The spacing is evened out to fit the line, and never comes below what keeps two
+ * holes apart.
+ */
+function perimeterRing(
+  runtime: ManifoldToplevel,
+  loops: readonly Point2[][],
+  settings: HolePatternSettings,
+): { centers: Point2[]; tooMany: boolean; length: number; onCorners: boolean } {
+  const none = { centers: [], tooMany: false, length: 0, onCorners: false };
+  const outer = loops.reduce((best, loop) => (Math.abs(loopArea(loop)) > Math.abs(loopArea(best)) ? loop : best));
+  const size = holeFootprintSize(settings);
+  const inset = Math.max(0, settings.margin) + Math.max(size.width, size.height) / 2;
+  const made: { delete(): void }[] = [];
+  let polygons: Point2[][];
+  try {
+    const region = new runtime.CrossSection([outer.map((point): [number, number] => [point.u, point.v])], "EvenOdd");
+    made.push(region);
+    // Round keeps a notch in the edge a smooth bend for the ring; the face's own corners stay corners.
+    const shrunk = inset > 0 ? region.offset(-inset, "Round", 2, 48) : region;
+    if (shrunk !== region) made.push(shrunk);
+    const simple = shrunk.simplify(1e-6);
+    made.push(simple);
+    polygons = simple.toPolygons().map((polygon) => polygon.map((point) => ({ u: point[0], v: point[1] })));
+  } finally {
+    made.forEach((section) => section.delete());
+  }
+  if (!polygons.length) return none;
+  let line = polygons.reduce((best, polygon) => (Math.abs(loopArea(polygon)) > Math.abs(loopArea(best)) ? polygon : best));
+  if (line.length < 3) return none;
+  // Counter-clockwise in the face's frame, so the ring runs the same way on every face.
+  if (loopArea(line) < 0) line = [...line].reverse();
+
+  const turnAt = (index: number) => {
+    const a = line[(index - 1 + line.length) % line.length];
+    const b = line[index];
+    const c = line[(index + 1) % line.length];
+    const into = Math.atan2(b.v - a.v, b.u - a.u);
+    const out = Math.atan2(c.v - b.v, c.u - b.u);
+    return Math.abs(Math.atan2(Math.sin(out - into), Math.cos(out - into)));
+  };
+  const corners = settings.perimeterCorners === false ? [] : line.map((_, index) => index).filter((index) => turnAt(index) >= PERIMETER_CORNER_TURN);
+  // The topmost corner (the left one of two at the same height) starts the ring: on a plate, a corner at the top.
+  const topmost = (indices: number[]) => indices.reduce((best, index) => {
+    const p = line[index];
+    const q = line[best];
+    return p.v > q.v + 1e-4 || (Math.abs(p.v - q.v) <= 1e-4 && p.u < q.u) ? index : best;
+  }, indices[0]);
+  const first = topmost(corners.length ? corners : line.map((_, index) => index));
+  const path = measuredPath([...line.slice(first), ...line.slice(0, first)]);
+  if (path.length < EPSILON) return none;
+
+  const minStep = holePatternMinSpacing({ ...settings, arrangement: "grid" });
+  const spacing = Math.max(minStep, settings.spacing);
+  // What the line holds at the least spacing; more would overlap.
+  const most = Math.max(1, Math.floor(path.length / minStep + EPSILON));
+  const wanted = settings.perimeterBy === "count"
+    ? Math.max(1, Math.round(settings.perimeterCount ?? HOLE_PATTERN_MIN_PERIMETER_COUNT))
+    : Math.max(1, Math.round(path.length / spacing));
+  const total = Math.min(wanted, most);
+  if (total > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { ...none, tooMany: true };
+
+  const cornerAlong = corners.map((index) => path.along[(index - first + line.length) % line.length]).sort((a, b) => a - b);
+  const centers: Point2[] = [];
+  // By spacing every side gets at least its corner's hole; a number too small for the corners goes round evenly.
+  const onCorners = cornerAlong.length >= 2 && (settings.perimeterBy !== "count" || total >= cornerAlong.length);
+  if (onCorners) {
+    const sides = cornerAlong.map((start, index) => (index + 1 < cornerAlong.length ? cornerAlong[index + 1] : path.length) - start);
+    const counts = settings.perimeterBy === "count" ? shareOut(sides, total) : sides.map((side) => Math.max(1, Math.round(side / spacing)));
+    sides.forEach((side, index) => {
+      const pieces = Math.max(1, Math.min(counts[index], Math.floor(side / minStep + EPSILON)));
+      for (let k = 0; k < pieces; k += 1) centers.push(pointAlong(path, cornerAlong[index] + (side * k) / pieces));
+    });
+  } else {
+    const start = Math.max(0, settings.perimeterStart ?? 0);
+    for (let k = 0; k < total; k += 1) centers.push(pointAlong(path, start + (path.length * k) / total));
+  }
+  return { centers, tooMany: false, length: path.length, onCorners };
 }
 
 /** A rectangle as an outline, for tests and for faces known to be plain rectangles. */
@@ -427,6 +634,8 @@ function footprintsCloserThan(polygon: readonly Point2[], dU: number, dV: number
  */
 function neighbourOffsets(settings: Pick<HolePatternSettings, "form" | "arrangement" | "spacing" | "rowSpacing">): Point2[] {
   const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
+  // Round the edge a hole's neighbours are the ones before and after it.
+  if (settings.arrangement === "perimeter") return [{ u: spacing, v: 0 }];
   const row = holePatternRowSpacing(settings);
   return settings.arrangement === "staggered"
     ? [{ u: spacing, v: 0 }, { u: spacing / 2, v: row }, { u: 0, v: row * 2 }]
@@ -453,7 +662,7 @@ function leastClearDistance(polygon: readonly Point2[], gap: number, high: numbe
  * slot spaces its rows on its own (#975), so only its neighbour in the row counts.
  */
 export function holePatternMinSpacing(
-  settings: Pick<HolePatternSettings, "form" | "size" | "height" | "arrangement">,
+  settings: FootprintSettings & Pick<HolePatternSettings, "arrangement">,
   wall = HOLE_PATTERN_MIN_WALL,
 ) {
   const polygon = holeFootprintPolygon(settings);
@@ -477,7 +686,7 @@ export function holePatternMinSpacing(
  * along the row that is set: straight above in a grid, half a spacing over in a staggered pattern.
  */
 export function holePatternMinRowSpacing(
-  settings: Pick<HolePatternSettings, "form" | "size" | "height" | "arrangement" | "spacing">,
+  settings: FootprintSettings & Pick<HolePatternSettings, "arrangement" | "spacing">,
   wall = HOLE_PATTERN_MIN_WALL,
 ) {
   const polygon = holeFootprintPolygon(settings);
@@ -497,7 +706,7 @@ export function holePatternMinRowSpacing(
  * follows: `holePatternMinSpacing(settings, wall)` is the spacing for a wanted wall (and
  * `holePatternMinRowSpacing` the row spacing of a rectangle or slot).
  */
-export function holePatternWall(settings: Pick<HolePatternSettings, "form" | "size" | "height" | "arrangement" | "spacing" | "rowSpacing">) {
+export function holePatternWall(settings: FootprintSettings & Pick<HolePatternSettings, "arrangement" | "spacing" | "rowSpacing">) {
   const polygon = holeFootprintPolygon(settings);
   let wall = Infinity;
   for (const offset of neighbourOffsets(settings)) {
@@ -515,15 +724,23 @@ export function holePatternWall(settings: Pick<HolePatternSettings, "form" | "si
 /** Keeps every number of the settings inside what the tool offers. */
 export function normalizeHolePattern(input: Partial<HolePatternSettings>): HolePatternSettings {
   const base = DEFAULT_HOLE_PATTERN;
-  const forms: HoleForm[] = ["round", "square", "rectangle", "hexagon", "slot"];
+  const forms: HoleForm[] = ["round", "square", "rectangle", "hexagon", "slot", "custom"];
   const number = (value: unknown, fallback: number, min: number, max: number) =>
     typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
   const form = forms.includes(input.form as HoleForm) ? input.form as HoleForm : base.form;
-  const arrangement: HoleArrangement = input.arrangement === "grid" ? "grid" : input.arrangement === "staggered" ? "staggered" : base.arrangement;
+  const arrangement: HoleArrangement = input.arrangement === "grid" || input.arrangement === "staggered" || input.arrangement === "perimeter" ? input.arrangement : base.arrangement;
   const size = number(input.size, base.size, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SIZE);
   const height = number(input.height, size, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SIZE);
+  const holeType: HoleType = input.holeType === "counterbore" || input.holeType === "countersink" ? input.holeType : "plain";
+  const custom = {
+    ...(typeof input.customId === "string" && input.customId ? { customId: input.customId } : {}),
+    ...(typeof input.customWidth === "number" && Number.isFinite(input.customWidth) ? { customWidth: Math.max(HOLE_PATTERN_MIN_SIZE, input.customWidth) } : {}),
+    ...(typeof input.customDepth === "number" && Number.isFinite(input.customDepth) ? { customDepth: Math.max(HOLE_PATTERN_MIN_SIZE, input.customDepth) } : {}),
+    ...(input.customRound === true ? { customRound: true } : {}),
+  };
+  const head = { headSize: holeHeadSize({ size, headSize: input.headSize }), headDepth: holeHeadDepth({ size, headDepth: input.headDepth }) };
   // Holes that overlap would only merge into one wide cut.
-  const minSpacing = holePatternMinSpacing({ form, size, height, arrangement });
+  const minSpacing = holePatternMinSpacing({ form, size, height, arrangement, holeType, ...head, ...custom });
   const spacing = Math.max(minSpacing, number(input.spacing, base.spacing, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SPACING));
   // A rectangle or slot without a row spacing of its own (saved before #975) keeps the rows where its spacing put them.
   const rowSpacing = holePatternHasRowSpacing(form)
@@ -540,6 +757,14 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     ...(rowSpacing !== undefined ? { rowSpacing } : {}),
     arrangement,
     margin: number(input.margin, base.margin, 0, HOLE_PATTERN_MAX_MARGIN),
+    // Kept while another form or arrangement is chosen, so going back finds them as they were.
+    holeType,
+    ...head,
+    perimeterBy: input.perimeterBy === "count" ? "count" : "spacing",
+    perimeterCount: Math.round(number(input.perimeterCount, 8, HOLE_PATTERN_MIN_PERIMETER_COUNT, HOLE_PATTERN_MAX_PERIMETER_COUNT)),
+    perimeterCorners: input.perimeterCorners !== false,
+    perimeterStart: number(input.perimeterStart, 0, 0, HOLE_PATTERN_MAX_PERIMETER_START),
+    ...custom,
     depth: typeof input.depth === "number" && Number.isFinite(input.depth) && input.depth > 0 ? Math.min(input.depth, 1000) : null,
     ...(input.allowMany === true ? { allowMany: true } : {}),
   };

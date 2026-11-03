@@ -102,6 +102,8 @@ async function callTool(name, args) {
       return bridgeCommand("select_objects", args);
     case "layerling_delete_objects":
       return bridgeCommand("delete_objects", args);
+    case "layerling_move_object":
+      return bridgeCommand("move_object", args);
     case "layerling_create_shape":
       return bridgeCommand("create_shape", args);
     case "layerling_import_mesh":

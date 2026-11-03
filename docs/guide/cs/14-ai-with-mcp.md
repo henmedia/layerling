@@ -83,6 +83,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_list_objects` | vypíše objekty s rozměry, polohou, natočením a identifikátorem |
 | `layerling_select_objects` | vybere objekty |
 | `layerling_delete_objects` | odstraní objekty |
+| `layerling_move_object` | přesune objekt na jiné místo v seznamu objektů |
 | `layerling_create_shape` | vytvoří kvádr, válec, text i po oblouku, závit, ozubené kolo, těleso z náčrtu a další tvary |
 | `layerling_import_file` | importuje soubor stejně jako okno importu; barevné OBJ či 3MF po barvách, víceobjektové 3MF po objektech |
 | `layerling_add_font` | přidá vlastní písmo TrueType, OpenType nebo WOFF; zůstane v prohlížeči, projekt uchová jen použité znaky |

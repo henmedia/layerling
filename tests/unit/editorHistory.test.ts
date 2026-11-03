@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { appendEditorHistorySnapshot, boundedEditorHistory, continuesKeyRun, KEY_RUN_GAP_MS, editorHistoryBranch, editorHistoryEntry, editorHistoryForExport, historyStateAt, hydrateEditorHistoryState, immutableResourceFingerprint, projectShapesFingerprint } from "@/lib/editorHistory";
 import type { WorkplaneShape } from "@/types/layerling";
+import { canonicalizeShape } from "@/lib/workplaneShapes";
 
 function box(overrides: Partial<WorkplaneShape> = {}): WorkplaneShape {
   return {
@@ -358,5 +359,34 @@ describe("a run of arrow-key presses is one history step (#370)", () => {
     expect(continuesKeyRun(run, "move:box-1", 10_100, entry, false)).toBe(false);
     expect(continuesKeyRun(null, "move:box-1", 10_100, entry, true)).toBe(false);
     expect(continuesKeyRun(run, "move:box-1", 10_100, undefined, true)).toBe(false);
+  });
+});
+
+describe("edge history fingerprints (#1042)", () => {
+  const feature = { kind: "chamfer" as const, amount: 1, edgeCount: 2, edgeIds: [3, 4], chamferAngle: 45 };
+  const chamfered = () => box({
+    kind: "mesh",
+    edgeTreatments: [feature],
+    edgeTreatmentHistory: [{ id: "h", createdAt: 1, feature, before: box({ id: "before" }) }],
+    importedMesh: { positions: [-10, 0, 0, 10, 20, 0], baseWidth: 20, baseDepth: 20, baseHeight: 20, triangleCount: 1, sourceFormat: "json" },
+  });
+
+  it("keeps a moved body's canonical history, so its fingerprint comes from the cache", () => {
+    const body = chamfered();
+    const canonical = canonicalizeShape(body);
+    const moved = { ...canonical, x: canonical.x + 1 };
+
+    expect(canonicalizeShape(body).edgeTreatmentHistory).toBe(canonical.edgeTreatmentHistory);
+    expect(canonicalizeShape(moved).edgeTreatmentHistory).toBe(canonical.edgeTreatmentHistory);
+    expect(canonicalizeShape(canonical).edgeTreatmentHistory).toBe(canonical.edgeTreatmentHistory);
+    expect(projectShapesFingerprint([moved])).not.toBe(projectShapesFingerprint([canonical]));
+  });
+
+  it("still tells a changed history apart", () => {
+    const body = chamfered();
+    const other = { ...body, edgeTreatmentHistory: [{ ...body.edgeTreatmentHistory![0], before: box({ id: "before", width: 30 }) }] };
+
+    expect(projectShapesFingerprint([other])).not.toBe(projectShapesFingerprint([body]));
+    expect(projectShapesFingerprint([{ ...body, edgeTreatmentHistory: [...body.edgeTreatmentHistory!] }])).toBe(projectShapesFingerprint([body]));
   });
 });

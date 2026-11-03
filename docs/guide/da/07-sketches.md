@@ -74,6 +74,7 @@ En konstruktionslinje hjælper dig med at placere punkter uden at blive del af f
 - En linje du allerede har tegnet bliver til en konstruktionslinje når du klikker den og vælger {{ui:sketch.makeConstruction}}. {{ui:sketch.makeSolid}} gør den til en normal linje igen.
 - Nye punkter snapper til hvor en konstruktionslinje krydser en anden linje, en blå ring viser det, og til enderne af konstruktionslinjen. Sådan sætter du et hjørne på en midte, i en bestemt afstand fra en kant eller på et kryds, uden at beregne.
 - Nye punkter snapper også til midten af enhver lige linje i skitsen, til centrum af enhver cirkel og afrundet hjørne, og til midterne af siderne på en form der vises underved (#624). Et punkt der trækkes, ignorerer midten af sine egne linjer.
+- En markering, du trækker, griber fat med sin midte (#1236): midten af en cirkel eller et rektangel lander på enderne, hjørnerne og midterne af de andre linjer, på cirklers centre, hvor hjælpelinjer krydser, og på hjørnerne af et legeme nedenunder; en blå ring viser hvor. En form, du trækker ind fra {{ui:sketch.addShape}}, lander også med sin midte på disse punkter. Hold [[Alt]] nede for kun at følge gitteret.
 - {{ui:sketch.fromMiddle}} i {{ui:sketch.group.draw}}-gruppen tegner en linje fra dens midte: klik først på midten, så på enden, og linjen løber lige langt til den anden side. Midten bliver et punkt for sig selv. Klik på knappen igen for at tegne normale linjer.
 - En konstruktionslinje skærer ikke omridset over hvor den krydser det. Ved revolvering kan den ligge til højre for aksen også.
 

@@ -92,6 +92,7 @@ export type LayerlingMcpCommandName =
   | "list_objects"
   | "select_objects"
   | "delete_objects"
+  | "move_object"
   | "create_shape"
   | "import_mesh"
   | "update_object"
