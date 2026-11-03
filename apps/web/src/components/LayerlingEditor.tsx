@@ -4,6 +4,7 @@ import { normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeSide, shapeSup
 import { AlertTriangle, X } from "lucide-react";
 import { ObjectListPanel } from "@/components/workplane/ObjectListPanel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { SAVED_VIEW_KEYS } from "@/lib/designView";
 import * as THREE from "three";
 import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
@@ -230,6 +231,7 @@ import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { frameAabb, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
 import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, expandBundles, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
+import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
 import { escapeWasHandled } from "@/lib/escapeHandled";
 import { handleSketchEditorKey } from "@/lib/sketchEditorKeys";
 import { sketchEscapeAction } from "@/lib/sketchEscape";
@@ -9033,8 +9035,9 @@ export function LayerlingEditor({
       if (refuseLockedSelection()) return;
       const selected = new Set(selectedIds);
       const normal = placementWorkplane.normal;
+      // As last committed: a held Ctrl+arrow moves once a frame (keyRepeatBatch).
       commitShapes(
-        shapes.map((shape) =>
+        shapesRef.current.map((shape) =>
           selected.has(shape.id) && !shape.locked
             ? {
                 ...shape,
@@ -9049,7 +9052,7 @@ export function LayerlingEditor({
         `move:${selectedIds.join(",")}`,
       );
     },
-    [refuseLockedSelection, commitShapes, hasSelection, placementWorkplane, selectedIds, shapes],
+    [refuseLockedSelection, commitShapes, hasSelection, placementWorkplane, selectedIds],
   );
 
   const dropSelectedToWorkplane = useCallback((modifiers?: { shift?: boolean }) => {
@@ -15171,7 +15174,7 @@ export function LayerlingEditor({
   }, []);
 
   const nudgeSelected = useCallback(
-    (deltaX: number, deltaZ: number) => {
+    (deltaX: number, deltaZ: number, rise = 0) => {
       if (!hasSelection) {
         return;
       }
@@ -15182,14 +15185,18 @@ export function LayerlingEditor({
       // the workplane axis that points that way most, so after turning the
       // view the keys still go where the arrows point (as in similar tools).
       const { xStep, zStep } = screenAlignedNudge(placementWorkplane, deltaX, deltaZ, window.layerlingScreenDirections?.());
+      // `rise` is a held Ctrl+arrow added up in the same frame (keyRepeatBatch).
+      const normal = placementWorkplane.normal;
       const translation = {
-        x: placementWorkplane.xAxis.x * xStep + placementWorkplane.zAxis.x * zStep,
-        y: placementWorkplane.xAxis.y * xStep + placementWorkplane.zAxis.y * zStep,
-        z: placementWorkplane.xAxis.z * xStep + placementWorkplane.zAxis.z * zStep,
+        x: placementWorkplane.xAxis.x * xStep + placementWorkplane.zAxis.x * zStep + normal.x * rise,
+        y: placementWorkplane.xAxis.y * xStep + placementWorkplane.zAxis.y * zStep + normal.y * rise,
+        z: placementWorkplane.xAxis.z * xStep + placementWorkplane.zAxis.z * zStep + normal.z * rise,
       };
       window.layerlingFollowMove?.(selectedShapes.filter((shape) => !shape.locked).map((shape) => shape.id), translation);
+      // The shapes as last committed, not as last drawn: a held key moves once a
+      // frame, and the next move may come before React has drawn the last one.
       commitShapes(
-        shapes.map((shape) =>
+        shapesRef.current.map((shape) =>
           selected.has(shape.id) && !shape.locked
             ? {
                 ...shape,
@@ -15204,8 +15211,34 @@ export function LayerlingEditor({
         `move:${selectedIds.join(",")}`,
       );
     },
-    [refuseLockedSelection, commitShapes, hasSelection, placementWorkplane, selectedIds, selectedShapes, shapes],
+    [refuseLockedSelection, commitShapes, hasSelection, placementWorkplane, selectedIds, selectedShapes],
   );
+
+  const nudgeSelectedRef = useRef(nudgeSelected);
+  nudgeSelectedRef.current = nudgeSelected;
+  const raiseSelectedRef = useRef(raiseSelected);
+  raiseSelectedRef.current = raiseSelected;
+  // Repeats of a held arrow key move once a frame, by their sum (#1042).
+  const keyRepeatBatchRef = useRef<ReturnType<typeof createKeyRepeatBatch> | null>(null);
+  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z, rise }) => {
+    // Drawn at once, as a key press is: otherwise the effect that keeps
+    // shapesRef in step could run late with the shapes before this move,
+    // and the next frame's move would start from there and lose this one.
+    flushSync(() => {
+      if (x || z) nudgeSelectedRef.current(x, z, rise);
+      else raiseSelectedRef.current(rise);
+    });
+  });
+  useEffect(() => {
+    const flush = () => keyRepeatBatchRef.current?.flush();
+    window.addEventListener("keyup", flush);
+    window.addEventListener("blur", flush);
+    return () => {
+      window.removeEventListener("keyup", flush);
+      window.removeEventListener("blur", flush);
+      keyRepeatBatchRef.current?.cancel();
+    };
+  }, []);
 
   const rotateSelectedBy = useCallback((angleDegrees: number) => {
     if (!hasSelection) {
@@ -15588,24 +15621,25 @@ export function LayerlingEditor({
       // a pointer drag snaps to. Falls back to the old millimetre when the
       // grid is off.
       const step = keyboardNudgeStep(snapGridRef.current, event.shiftKey, keyboardNudgeCoarseFactor(workspaceSettingsRef.current), event.altKey);
+      const nudge = (x: number, z: number, rise: number) => keyRepeatBatchRef.current?.add({ x, z, rise }, event.repeat);
       if (shortcut && event.key === "ArrowUp") {
         event.preventDefault();
-        raiseSelected(step);
+        nudge(0, 0, step);
       } else if (shortcut && event.key === "ArrowDown") {
         event.preventDefault();
-        raiseSelected(-step);
+        nudge(0, 0, -step);
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        nudgeSelected(-step, 0);
+        nudge(-step, 0, 0);
       } else if (event.key === "ArrowRight") {
         event.preventDefault();
-        nudgeSelected(step, 0);
+        nudge(step, 0, 0);
       } else if (event.key === "ArrowUp") {
         event.preventDefault();
-        nudgeSelected(0, -step);
+        nudge(0, -step, 0);
       } else if (event.key === "ArrowDown") {
         event.preventDefault();
-        nudgeSelected(0, step);
+        nudge(0, step, 0);
       } else if (key === "d" && hasSelection) {
         event.preventDefault();
         // Shift+D drops the top of the selection to the workplane, the body below it (#940).
