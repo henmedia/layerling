@@ -114,6 +114,40 @@
   border-radius: 999px;
 }
 
+.history-view-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.history-view-play > button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: #745e48;
+  background: #fff;
+  border: 1px solid #d8c8b7;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.history-view-play > button.active {
+  color: #fff;
+  background: #d07313;
+  border-color: #d07313;
+}
+
+.history-view-play label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  color: #745e48;
+  font-size: 13px;
+}
+
 .history-view-steps {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -457,6 +491,7 @@ html[data-theme="dark"] .history-view-list-now {
   color: #5fd394;
 }
 
+html[data-theme="dark"] .history-view-play > button:not(.active),
 html[data-theme="dark"] .history-view-slider > button,
 html[data-theme="dark"] .history-view-actions .secondary,
 html[data-theme="dark"] .history-view-inside button {

@@ -1,11 +1,11 @@
 "use client";
 
-import { ArchiveRestore, ChevronLeft, ChevronRight, CornerLeftUp, Download, FilePlus2, FolderOpen, ListOrdered, LoaderCircle, Trash2, X } from "lucide-react";
+import { ArchiveRestore, ChevronLeft, ChevronRight, CornerLeftUp, Download, FilePlus2, FolderOpen, ListOrdered, LoaderCircle, Pause, Play, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import type { HistoryStepDescription } from "@/lib/historyStepDescription";
 import { historyStepText } from "@/lib/historyStepText";
-import { historyKeyTarget, historyWheelSteps } from "@/lib/historyStepping";
+import { HISTORY_PLAY_DELAYS, historyKeyTarget, historyPlayNext, historyPlayStart, historyWheelSteps, type HistoryPlayDirection, type HistoryPlaySpeed } from "@/lib/historyStepping";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -29,6 +29,19 @@ function readStepListOpen() {
   } catch {
     return false;
   }
+}
+
+/** The speed of playing, kept for the next time the view opens (#1210). */
+const PLAY_SPEED_STORAGE_KEY = "layerling.editor.historyViewSpeed";
+
+function readPlaySpeed(): HistoryPlaySpeed {
+  try {
+    const stored = window.localStorage.getItem(PLAY_SPEED_STORAGE_KEY);
+    if (stored === "slow" || stored === "normal" || stored === "fast") return stored;
+  } catch {
+    // Not read then; the normal speed.
+  }
+  return "normal";
 }
 
 /**
@@ -136,6 +149,50 @@ export function HistoryViewOverlay({
   const lastText = lastStep ? historyStepText(lastStep, accuracy) : t("historyView.lastStepNone");
   const nextText = nextStep ? historyStepText(nextStep, accuracy) : t("historyView.nextStepNone");
   const distance = index - liveIndex;
+
+  // Playing the history like a film (#1210): the state shown changes by itself, one at a time,
+  // forwards or backwards, until the end; any other way of changing the state stops it.
+  const [playing, setPlaying] = useState<HistoryPlayDirection>(0);
+  const [speed, setSpeed] = useState<HistoryPlaySpeed>(readPlaySpeed);
+  const playedIndexRef = useRef<number | null>(null);
+  const onIndexChangeRef = useRef(onIndexChange);
+  onIndexChangeRef.current = onIndexChange;
+  const startPlaying = (direction: -1 | 1) => {
+    if (playing === direction) {
+      setPlaying(0);
+      return;
+    }
+    const start = historyPlayStart(index, max, direction);
+    playedIndexRef.current = start;
+    if (start !== index) onIndexChangeRef.current(start);
+    setPlaying(direction);
+  };
+  useEffect(() => {
+    if (playing === 0) return;
+    if (playedIndexRef.current !== index) {
+      // The slider, the keys, the wheel or the list moved it: that is the viewer taking over.
+      setPlaying(0);
+      return;
+    }
+    const target = historyPlayNext(index, max, playing);
+    if (target === null) {
+      setPlaying(0);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      playedIndexRef.current = target;
+      onIndexChangeRef.current(target);
+    }, HISTORY_PLAY_DELAYS[speed]);
+    return () => window.clearTimeout(timer);
+  }, [playing, index, max, speed]);
+  const changeSpeed = (next: HistoryPlaySpeed) => {
+    setSpeed(next);
+    try {
+      window.localStorage.setItem(PLAY_SPEED_STORAGE_KEY, next);
+    } catch {
+      // Not kept then; the speed still changes.
+    }
+  };
 
   // The steps as a list, newest at the top, to jump to any of them with one click (#1023).
   // Reading a step compares two states, so they are read only while the list is open.
@@ -284,6 +341,39 @@ export function HistoryViewOverlay({
         <button type="button" aria-label={t("historyView.later")} title={t("historyView.later")} disabled={index >= max} onClick={() => onIndexChange(index + 1)}>
           <ChevronRight size={18} />
         </button>
+      </div>
+
+      <div className="history-view-play" data-testid="history-view-play">
+        <button
+          type="button"
+          className={playing < 0 ? "active" : ""}
+          aria-pressed={playing < 0}
+          aria-label={playing < 0 ? t("historyView.pause") : t("historyView.playBackwards")}
+          title={playing < 0 ? t("historyView.pause") : t("historyView.playBackwards")}
+          data-testid="history-view-play-backwards"
+          onClick={() => startPlaying(-1)}
+        >
+          {playing < 0 ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" style={{ transform: "scaleX(-1)" }} />}
+        </button>
+        <button
+          type="button"
+          className={playing > 0 ? "active" : ""}
+          aria-pressed={playing > 0}
+          aria-label={playing > 0 ? t("historyView.pause") : t("historyView.playForwards")}
+          title={playing > 0 ? t("historyView.pause") : t("historyView.playForwards")}
+          data-testid="history-view-play-forwards"
+          onClick={() => startPlaying(1)}
+        >
+          {playing > 0 ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
+        </button>
+        <label>
+          <span>{t("historyView.speed")}</span>
+          <select value={speed} data-testid="history-view-speed" onChange={(event) => changeSpeed(event.currentTarget.value as HistoryPlaySpeed)}>
+            <option value="slow">{t("historyView.speedSlow")}</option>
+            <option value="normal">{t("historyView.speedNormal")}</option>
+            <option value="fast">{t("historyView.speedFast")}</option>
+          </select>
+        </label>
       </div>
 
       <div className="history-view-steps" data-testid="history-view-steps">

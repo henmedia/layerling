@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { historyKeyTarget, historyWheelSteps } from "@/lib/historyStepping";
+import { HISTORY_PLAY_DELAYS, historyKeyTarget, historyPlayNext, historyPlayStart, historyWheelSteps } from "@/lib/historyStepping";
 
 describe("historyKeyTarget (#688)", () => {
   it("jumps ten states with Page Up and Page Down, held at both ends", () => {
@@ -37,5 +37,27 @@ describe("historyWheelSteps (#688)", () => {
     }
     expect(steps).toBe(2);
     expect(carry).toBeCloseTo(20);
+  });
+});
+
+describe("playing the history (#1210)", () => {
+  it("steps one state in the direction and stops at either end", () => {
+    expect(historyPlayNext(2, 5, 1)).toBe(3);
+    expect(historyPlayNext(2, 5, -1)).toBe(1);
+    expect(historyPlayNext(5, 5, 1)).toBeNull();
+    expect(historyPlayNext(0, 5, -1)).toBeNull();
+    expect(historyPlayNext(2, 5, 0)).toBeNull();
+  });
+
+  it("starts again from the other end when it begins at the end of its way", () => {
+    expect(historyPlayStart(5, 5, 1)).toBe(0);
+    expect(historyPlayStart(0, 5, -1)).toBe(5);
+    expect(historyPlayStart(2, 5, 1)).toBe(2);
+    expect(historyPlayStart(2, 5, -1)).toBe(2);
+  });
+
+  it("goes faster the higher the speed", () => {
+    expect(HISTORY_PLAY_DELAYS.fast).toBeLessThan(HISTORY_PLAY_DELAYS.normal);
+    expect(HISTORY_PLAY_DELAYS.normal).toBeLessThan(HISTORY_PLAY_DELAYS.slow);
   });
 });
