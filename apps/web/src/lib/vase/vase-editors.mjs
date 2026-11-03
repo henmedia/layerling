@@ -64,6 +64,7 @@ function injectStyle() {
   .vz { display: grid; gap: 8px; min-width: 0; --vz-accent: var(--accent, #d27009); --vz-bg: var(--surface, #fffdf9);
     --vz-grid: var(--grid, #e6d6b0); --vz-major: var(--grid-major, #c9a45a); --vz-label: var(--label, #8a7a66); --vz-edge: var(--field-edge, #e1d6c6); }
   .vz-board { position: relative; }
+  .vz-side { display: contents; }
   .vz svg { display: block; width: 100%; height: var(--vz-height, 320px); background: var(--vz-bg); border: 1px solid var(--vz-edge);
     border-radius: 8px; touch-action: none; user-select: none; cursor: grab; outline: none; }
   .vz svg:focus-visible { box-shadow: 0 0 0 2px var(--vz-accent); }
@@ -151,7 +152,12 @@ function drawingBoard(api) {
   const traceRow = document.createElement('div')
   traceRow.className = 'vz-row'
   traceRow.hidden = true
-  el.append(wrap, pointRow, numRow, editRow, photoRow, traceRow, hint)
+  // The rows beside the board, together: in the drawing window they are its right column, which scrolls on its own
+  // when the window is lower than they are (Discussion #1186). Elsewhere they stand under the board as before.
+  const side = document.createElement('div')
+  side.className = 'vz-side'
+  side.append(pointRow, numRow, editRow, photoRow, traceRow, hint)
+  el.append(wrap, side)
 
   const button = (parent, text, title, fn) => {
     const b = document.createElement('button')
