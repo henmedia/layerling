@@ -492,10 +492,26 @@ describe("the openings up and out", () => {
     expect([pcie.y0, pcie.y1]).toEqual([expect.closeTo(23.0, 9), expect.closeTo(37.0, 9)]);
     expect(pcie.bottom).toBe(board.thickness);
     expect(pcie.top).toBeCloseTo(board.thickness + 4 + 0.2, 9);
-    // Pi 4: the display connector goes out to the left, the camera to the right.
+    // The camera/display cables go out at the left end too, one above the other over the PCIe cable, in one
+    // plane: centred on it, each as wide as its connector is long (16.7 mm) and as high as it stands (4 mm).
+    const [cam0, cam1] = ways;
+    for (const way of [cam0, cam1]) {
+      expect([way.x0, way.x1], way.name).toEqual([expect.closeTo(pcie.x0, 9), expect.closeTo(pcie.x1, 9)]);
+      expect((way.y0 + way.y1) / 2).toBeCloseTo((pcie.y0 + pcie.y1) / 2, 9);
+      expect(way.y1 - way.y0).toBeCloseTo(16.7 + 0.4, 9);
+    }
+    expect(cam0.bottom).toBeCloseTo(pcie.top, 9);
+    expect(cam0.top).toBeCloseTo(pcie.top + 4 + 0.2, 9);
+    expect(cam1.bottom).toBeCloseTo(cam0.top, 9);
+    expect(cam1.top).toBeCloseTo(cam0.top + 4 + 0.2, 9);
+    // Pi 4: the camera's cable comes out over the display's, at the left end, away from the USB and Ethernet.
     const pi4 = sbcBoardSolids(SBC_BOARDS.pi4, 0, 2, { ribbonSide: true }).filter((solid) => solid.name.endsWith("cable way"));
-    expect(pi4.find((way) => way.name === "display cable way")!.x0).toBeCloseTo(-2, 9);
-    expect(pi4.find((way) => way.name === "camera cable way")!.x1).toBeCloseTo(87, 9);
+    const display = pi4.find((way) => way.name === "display cable way")!;
+    const camera = pi4.find((way) => way.name === "camera cable way")!;
+    expect(display.x0).toBeCloseTo(-2, 9);
+    expect([camera.x0, camera.x1]).toEqual([expect.closeTo(display.x0, 9), expect.closeTo(display.x1, 9)]);
+    expect(camera.bottom).toBeCloseTo(display.top, 9);
+    expect(pi4.every((way) => way.x1 < 66)).toBe(true);
     // None unless asked for, and none for a connector that reaches its edge anyway (the Zero's camera).
     expect(sbcBoardSolids(board, 0.2, 3).some((solid) => solid.name.endsWith("cable way"))).toBe(false);
     expect(sbcBoardSolids(SBC_BOARDS.zero2w, 0, 3, { ribbonSide: true }).some((solid) => solid.name.endsWith("cable way"))).toBe(false);
