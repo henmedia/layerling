@@ -123,7 +123,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_offset_object` | forskyder alle flader på et legeme til spillerummet i en pasning: forstørrer eller formindsker det, eller tilføjer den forstørrede kopi som hul, eller flytter kun siderne |
 | `layerling_list_faces` | lister fladerne på en eksakt form |
 | `layerling_delete_faces` | sletter flader og lukker åbningen |
-| `layerling_array_objects` | mangfoldiggør i en række eller på en cirkel |
+| `layerling_array_objects` | mangfoldiggør i en række, et gitter eller på en cirkel |
 | `layerling_bundle_objects` | bundter objekter som Ctrl+B: de flytter sammen, beholder deres farve og slags og går ud hver for sig i en eksport |
 | `layerling_layer_text` | laver en tekst om til en stak lag til et flerfarvet print (bogstaver, bredere kanter, en plade uden huller) eller bygger en stak igen, med et nøgleringshul, hjørnerne pr. lag og en rundet eller faset bogstavkant; med en navneliste, ét tag pr. navn |
 | `layerling_text_block` | laver en tekstblok: en tekst bliver den første af flere linjer, hver en tekst for sig under den ovenover, venstre-, midter- eller højrejusteret, hver linje lige stor eller mindre |

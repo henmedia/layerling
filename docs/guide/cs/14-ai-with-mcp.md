@@ -119,7 +119,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_offset_object` | odsadí všechny plochy tělesa pro vůli lícovaného spoje: zvětší nebo zmenší těleso, nebo přidá zvětšenou kopii jako díru, nebo posune jen boky |
 | `layerling_list_faces` | vypíše plochy přesného tělesa |
 | `layerling_delete_faces` | smaže plochy a uzavře mezeru |
-| `layerling_array_objects` | opakuje objekty v řadě nebo po kružnici |
+| `layerling_array_objects` | opakuje objekty v řadě, v mřížce nebo po kružnici |
 | `layerling_bundle_objects` | seskupí objekty jako Ctrl+B: společný pohyb, zachované barvy a typy, samostatná tělesa při exportu |
 | `layerling_layer_text` | vytvoří vrstvenou jmenovku: písmena, širší okraje a souvislou podložku; podporuje otvor na kroužek, rohy po vrstvách, úpravu hran písmen a seznam jmen |
 | `layerling_text_block` | vytvoří textový blok: text se stane prvním z několika řádků, každý samostatným textem pod tím nad ním, zarovnaných vlevo, na střed nebo vpravo, každý řádek stejně velký nebo menší |

@@ -123,7 +123,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_offset_object` | 移動實體的所有面以得到配合間隙：放大或縮小實體，或把放大的副本作為孔加入，或只移動側面 |
 | `layerling_list_faces` | 列出精確實體的面 |
 | `layerling_delete_faces` | 刪除面並補平缺口 |
-| `layerling_array_objects` | 以直線排列或環繞圓周複製 |
+| `layerling_array_objects` | 以直線、網格排列或環繞圓周複製 |
 | `layerling_bundle_objects` | 像 Ctrl+B 一樣綁定物件：它們一起移動、保留各自的顏色與類型，匯出時分開輸出 |
 | `layerling_layer_text` | 把文字變成多色列印用的分層堆疊（字母、較寬的外框、無孔底板），或再次重建這樣的堆疊，可加入鑰匙圈孔、設定每層轉角，以及圓角或倒角的字母邊緣；給出名稱清單時，每個名稱做一個名牌 |
 | `layerling_text_block` | 產生文字區塊：一段文字成為多行中的第一行，每行都是上一行下方的獨立文字，靠左、置中或靠右對齊，每行大小相同或更小 |

@@ -123,7 +123,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_offset_object` | sposta tutte le facce di un corpo per il gioco di un accoppiamento: lo ingrandisce o riduce, o aggiunge la copia ingrandita come vuoto, o sposta solo i lati |
 | `layerling_list_faces` | Elenca le facce di un corpo CAD esatto. |
 | `layerling_delete_faces` | Elimina le facce e chiude l’apertura. |
-| `layerling_array_objects` | Crea copie in fila o disposte in cerchio. |
+| `layerling_array_objects` | Crea copie in fila, a griglia o disposte in cerchio. |
 | `layerling_bundle_objects` | Raggruppa gli oggetti come con Ctrl+B: si spostano insieme, mantengono colore e tipo e vengono esportati separatamente. |
 | `layerling_layer_text` | Trasforma un testo in una serie di livelli per la stampa multicolore (lettere, bordi più larghi e piastra senza fori) oppure ricostruisce la serie, con foro per portachiavi, angoli per livello e bordo delle lettere arrotondato o smussato. Se fornisci un elenco di nomi, crea un’etichetta per ciascuno. |
 | `layerling_text_block` | crea un blocco di testo: un testo diventa la prima di più righe, ognuna un testo a sé sotto quella sopra, allineate a sinistra, al centro o a destra, ogni riga uguale o più piccola |

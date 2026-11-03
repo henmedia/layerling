@@ -123,7 +123,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_offset_object` | desfasa todas las caras de un cuerpo para la holgura de un ajuste: lo agranda o reduce, o añade la copia agrandada como orificio, o mueve solo los lados |
 | `layerling_list_faces` | lista las caras de un cuerpo exacto |
 | `layerling_delete_faces` | elimina caras y cierra el hueco |
-| `layerling_array_objects` | multiplica en una fila o en un círculo |
+| `layerling_array_objects` | multiplica en una fila, una cuadrícula o un círculo |
 | `layerling_bundle_objects` | crea un conjunto con objetos, como Ctrl+B: se mueven juntos, conservan su color y su tipo, y en una exportación salen por separado |
 | `layerling_layer_text` | convierte un texto en una pila de capas para una impresión multicolor (letras, contornos más anchos, una placa sin orificios) o vuelve a construir una pila, con orificio para llavero, las esquinas de cada capa y un canto de letra redondeado o achaflanado; con una lista de nombres, hace una placa por nombre |
 | `layerling_text_block` | crea un bloque de texto: un texto pasa a ser la primera de varias líneas, cada una un texto propio debajo de la anterior, alineadas a la izquierda, al centro o a la derecha, cada línea del mismo tamaño o más pequeña |

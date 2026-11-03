@@ -44,7 +44,7 @@ layerling ist ein Stück weiter als Tinkercad in Richtung Fusion 360 und wird ge
 
 - **Kanten fasen und verrunden.** Kante auswählen und brechen oder abrunden – das, wonach am häufigsten gefragt wird, sobald ein gedrucktes Teil fertig aussehen oder irgendwo hineinpassen soll. Bearbeitete Kanten bleiben veränderbar: Du nimmst Fase oder Rundung jederzeit wieder weg oder änderst mit „Ändern“ ihren Wert auf denselben Kanten.
 - **Aushöhlen, Teilen, Skizzen, Gewinde.** Körper mit gleichmäßiger Wand aushöhlen, mit einer Ebene teilen, Skizzen mit genauen Längen und Winkeln ziehen oder drehen, dazu Schrauben, Muttern und Gewindelöcher.
-- **Muster und Wickeln.** Eine Form in Reihe, Kreis oder Spirale wiederholen, oder ein Muster und Schrift um einen Zylinder wickeln.
+- **Muster und Wickeln.** Eine Form in Reihe, im Raster aus Spalten und Reihen, im Kreis oder als Spirale wiederholen, oder ein Muster und Schrift um einen Zylinder wickeln.
 - **Lochmuster.** Eine ebene Fläche anklicken und runde, quadratische, rechteckige, sechseckige oder Langlöcher darauf verteilen, im Raster oder versetzt, mit Abstand, Rand und Tiefe - Lüftungsgitter, Lautsprecher und Körbe in einem Schritt.
 - **Um Prozent skalieren.** Ein oder viele Teile um einen Prozentwert größer oder kleiner machen - zusammen, so dass die Anordnung mitwächst, oder jedes an seinem Platz.
 - **Größe angleichen.** Mit Alt auf einem Ausrichtungspunkt werden die Teile gestreckt statt verschoben: bis an die Kante eines anderen Teils oder auf seine Breite, Länge oder Höhe - etwa um einen Quader gegen einen gleich großen Zylinder zu tauschen.

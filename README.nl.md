@@ -44,7 +44,7 @@ layerling zit een stap verder dan Tinkercad, richting Fusion 360: het werkt op d
 
 - **Afschuining en afronding.** Kies een rand en schuin hem af of rond hem af – het ding waar mensen het vaakst om vragen zodra een geprint onderdeel er af moet uitzien of ergens in moet passen. Bewerkte randen blijven aanpasbaar: haal een bewerking weer weg of klik op Bewerken om de waarde op dezelfde randen te veranderen.
 - **Uithollen, splitsen, schetsen, schroefdraad.** Hol een lichaam uit tot een gelijkmatige wand, splits het met een vlak, teken schetsen met exacte lengtes en hoeken en extrudeer of draai ze rond (revolve), en voeg schroeven, moeren en getapte gaten toe.
-- **Patronen en omwikkelen.** Herhaal een vorm in een rij, cirkel of spiraal, of wikkel een patroon of tekst om een cilinder.
+- **Patronen en omwikkelen.** Herhaal een vorm in een rij, een raster van kolommen en rijen, een cirkel of een spiraal, of wikkel een patroon of tekst om een cilinder.
 - **Gatenpatronen.** Klik op een vlak oppervlak en verdeel er ronde, vierkante, rechthoekige, zeshoekige of slobgaten over, in een raster of verspringend, met tussenafstand, marge en diepte - ventilatieroosters, luidsprekerroosters en mandjes in één stap.
 - **Schalen in procenten.** Maak een of meer onderdelen een percentage groter of kleiner - samen, zodat de opstelling meegroeit, of elk op zijn eigen plek.
 - **Maten gelijkmaken.** Houd Alt ingedrukt op een uitlijnpunt en de onderdelen rekken uit in plaats van te verschuiven: tot de zijkant van een ander onderdeel, of tot zijn breedte, lengte of hoogte - om bijvoorbeeld een doos te ruilen voor een cilinder van dezelfde grootte.

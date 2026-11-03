@@ -44,7 +44,7 @@ layerling está un paso más allá de Tinkercad, camino de Fusion 360: se maneja
 
 - **Chaflán y redondeo.** Elige una arista y achaflánala o redondéala: es lo que más pide la gente en cuanto una pieza impresa tiene que verse acabada o encajar en algo. Las aristas tratadas se pueden seguir cambiando: quita el tratamiento o pulsa Editar para cambiar su valor en las mismas aristas.
 - **Vaciar, dividir, bocetos, roscas.** Vacía un cuerpo con una pared uniforme, divídelo con un plano, dibuja bocetos con longitudes y ángulos exactos y extrúyelos o haz con ellos un cuerpo de revolución, y añade tornillos, tuercas y orificios roscados.
-- **Patrones y envolver.** Repite una forma en fila, en círculo o en espiral, o envuelve un dibujo o un texto alrededor de un cilindro.
+- **Patrones y envolver.** Repite una forma en fila, en una cuadrícula de columnas y filas, en círculo o en espiral, o envuelve un dibujo o un texto alrededor de un cilindro.
 - **Patrones de orificios.** Haz clic en una cara plana y reparte por ella orificios redondos, cuadrados, rectangulares, hexagonales o alargados, en cuadrícula o al tresbolillo, con separación, margen y profundidad: rejillas de ventilación, de altavoz y cestas en un solo paso.
 - **Escalar en porcentaje.** Agranda o reduce una o varias piezas en un porcentaje: juntas, para que la disposición crezca con ellas, o cada una en su sitio.
 - **Igualar tamaños.** Mantén pulsado Alt sobre un punto de alineación y las piezas se estiran en vez de moverse: hasta el lado de otra pieza, o hasta su anchura, longitud o altura; por ejemplo, para cambiar una caja por un cilindro del mismo tamaño.

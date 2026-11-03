@@ -123,7 +123,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_offset_object` | 移动实体的所有面以得到配合间隙：放大或缩小实体，或把放大的副本作为孔添加，或只移动侧面 |
 | `layerling_list_faces` | 列出精确实体的面 |
 | `layerling_delete_faces` | 删除面并闭合缺口 |
-| `layerling_array_objects` | 按行或沿圆周复制 |
+| `layerling_array_objects` | 按行、按网格或沿圆周复制 |
 | `layerling_bundle_objects` | 像 Ctrl+B 一样捆绑对象：它们一起移动，保留各自颜色和类型，导出时分开输出 |
 | `layerling_layer_text` | 把文字变成用于多色打印的分层堆叠（字母、更宽的边沿、无孔底板），或重新构建堆叠，可加钥匙孔、设置每层圆角和圆角或倒角的字母边缘；给出名称列表时，每个名称生成一个名牌 |
 | `layerling_text_block` | 生成文本块：一段文字成为多行中的第一行，每行都是上一行下方的独立文字，左对齐、居中或右对齐，每行大小相同或更小 |

@@ -123,7 +123,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_offset_object` | odsuwa wszystkie ściany bryły na luz pasowania: powiększa lub zmniejsza ją albo dodaje powiększoną kopię jako otwór albo przesuwa tylko boki |
 | `layerling_list_faces` | wypisuje ściany dokładnej bryły |
 | `layerling_delete_faces` | usuwa ściany i zamyka lukę |
-| `layerling_array_objects` | powiela w rzędzie albo na okręgu |
+| `layerling_array_objects` | powiela w rzędzie, w siatce albo na okręgu |
 | `layerling_bundle_objects` | łączy obiekty w zestaw jak Ctrl+B: poruszają się razem, zachowują kolor i rodzaj, a w eksporcie wychodzą osobno |
 | `layerling_layer_text` | zmienia tekst w stos warstw do druku wielokolorowego (litery, szersze obrzeża, płytka bez otworów) albo buduje stos ponownie, z otworem na kółko do kluczy, narożnikami dla każdej warstwy i zaokrągloną lub sfazowaną krawędzią liter. Z listą imion jedna plakietka na imię |
 | `layerling_text_block` | tworzy blok tekstu: tekst staje się pierwszym z kilku wierszy, każdy osobnym tekstem pod poprzednim, wyrównanych do lewej, do środka lub do prawej, każdy wiersz tej samej wielkości lub mniejszy |

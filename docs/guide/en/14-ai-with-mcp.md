@@ -123,7 +123,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_offset_object` | builds the clearance of a press fit: grows or shrinks a solid, or adds the grown copy as a hole, or moves only the sides |
 | `layerling_list_faces` | lists the faces of an exact body |
 | `layerling_delete_faces` | deletes faces and closes the gap |
-| `layerling_array_objects` | multiplies in a row or on a circle |
+| `layerling_array_objects` | multiplies in a row, in a grid or on a circle |
 | `layerling_bundle_objects` | bundles objects like Ctrl+B: they move together, keep their colour and kind and go out separately in an export |
 | `layerling_layer_text` | turns a text into a stack of layers for a multicolour print (letters, wider rims, a plate without holes) or builds a stack again, with a key ring hole, the corners per layer and a rounded or chamfered letter edge; with a name list, one tag per name |
 | `layerling_text_block` | makes a text block: a text becomes the first of several lines, each a text of its own under the one above, aligned left, centred or right, each line the same size or smaller |

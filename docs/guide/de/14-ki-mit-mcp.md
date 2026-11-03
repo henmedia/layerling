@@ -123,7 +123,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_offset_object` | versetzt alle Flächen eines Körpers, für das Spiel einer Passung: vergrößert oder verkleinert ihn, oder legt die vergrößerte Kopie als Loch an, oder verschiebt nur die Seiten |
 | `layerling_list_faces` | listet die Flächen eines exakten Körpers |
 | `layerling_delete_faces` | löscht Flächen und schließt die Lücke |
-| `layerling_array_objects` | vervielfältigt in einer Reihe oder auf einem Kreis |
+| `layerling_array_objects` | vervielfältigt in einer Reihe, einem Raster oder auf einem Kreis |
 | `layerling_bundle_objects` | bündelt Objekte wie Strg+B: sie bewegen sich zusammen, behalten Farbe und Art und gehen einzeln in den Export |
 | `layerling_layer_text` | macht aus einem Text einen Stapel aus Schichten für den Mehrfarbdruck (Buchstaben, breitere Ränder, Platte ohne Löcher) oder baut einen Stapel neu, mit Loch für den Schlüsselring, Ecken je Schicht und gerundeter oder abgeschrägter Buchstabenkante; mit einer Namensliste ein Schild je Name |
 | `layerling_text_block` | macht einen Textblock: Ein Text wird die erste von mehreren Zeilen, jede ein eigener Text unter der darüber, links, mittig oder rechts ausgerichtet, jede Zeile gleich groß oder kleiner |

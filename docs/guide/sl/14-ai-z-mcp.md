@@ -119,7 +119,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_offset_object` | odmakne vse ploskve telesa za zračnost nasedanja: telo poveča ali zmanjša ali doda povečano kopijo kot luknjo ali premakne le stranice |
 | `layerling_list_faces` | našteje ploskve natančnega telesa |
 | `layerling_delete_faces` | izbriše ploskve in zapre vrzel |
-| `layerling_array_objects` | pomnoži v vrsti ali na krogu |
+| `layerling_array_objects` | pomnoži v vrsti, v mreži ali na krogu |
 | `layerling_bundle_objects` | poveže objekte v sveženj kot Ctrl+B: premikajo se skupaj, obdržijo barvo in vrsto ter gredo posamezno v izvoz |
 | `layerling_layer_text` | iz besedila naredi sklad plasti za večbarvni tisk (črke, širši robovi, plošča brez lukenj) ali sklad zgradi znova, z luknjo za obesek za ključe, vogali za vsako plast in zaobljenim ali poševno odrezanim robom črk; s seznamom imen en napis na ime |
 | `layerling_text_block` | naredi blok besedila: besedilo postane prva od več vrstic, vsaka samostojno besedilo pod zgornjo, poravnane levo, na sredino ali desno, vsaka vrstica enako velika ali manjša |

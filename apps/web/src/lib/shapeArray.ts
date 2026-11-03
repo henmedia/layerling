@@ -1,18 +1,26 @@
 /**
- * Patterns: the selection repeated n times in a row or around a circle - hole
- * rows, bolt circles, the teeth of a ring, and with a rise or a growing radius
- * stairs, screws and spirals. Pure numbers; the editor turns them into copies.
+ * Patterns: the selection repeated n times in a row, in a grid of columns and
+ * rows or around a circle - hole rows, hole grids, bolt circles, the teeth of a
+ * ring, and with a rise or a growing radius stairs, screws and spirals. Pure
+ * numbers; the editor turns them into copies.
  *
  * Coordinates as the user sees them, like a slicer: X to the right, Y to the
  * back, Z up. In the scene that is x, -z and y.
  */
-export type ArrayMode = "row" | "circle";
+export type ArrayMode = "row" | "grid" | "circle";
 export type ArrayDirection = "x" | "y" | "z";
 
 export type ArraySettings = {
   mode: ArrayMode;
-  /** Pieces in the pattern, the original included. */
+  /** Pieces in the pattern, the original included; in a grid the columns along X. */
   count: number;
+  /** Grid (#1227): rows along Y, the original's included; the columns step by spacingX. */
+  rows?: number;
+  /**
+   * Grid: centre to centre from row to row along Y; negative runs to the front. Its own number, not spacingY: that one
+   * would turn the row diagonal after a look at the grid.
+   */
+  rowSpacing?: number;
   /** Row: centre to centre along X, Y and Z (up) at once; negative runs the other way. */
   spacingX: number;
   spacingY: number;
@@ -72,8 +80,15 @@ export function arrayFitShift(piece: ArraySpan, body: ArraySpan, gap: number) {
 export const ARRAY_AUTO_GROUP_ABOVE = 5;
 
 /** Whether creating the pattern also groups its pieces: the person's choice, or by count while there is none. */
-export function arrayGroupsCopies(settings: Pick<ArraySettings, "count" | "groupCopies">) {
-  return settings.groupCopies ?? settings.count > ARRAY_AUTO_GROUP_ABOVE;
+export function arrayGroupsCopies(settings: Pick<ArraySettings, "count" | "groupCopies"> & Partial<Pick<ArraySettings, "mode" | "rows">>) {
+  return settings.groupCopies ?? arrayPieceCount(settings) > ARRAY_AUTO_GROUP_ABOVE;
+}
+
+/** How many pieces the pattern makes, the original included: a grid's columns times its rows, else the count. */
+export function arrayPieceCount(settings: Pick<ArraySettings, "count"> & Partial<Pick<ArraySettings, "mode" | "rows">>) {
+  if (settings.mode !== "grid") return settings.count;
+  const { columns, rows } = arrayGridSize(settings);
+  return columns * rows;
 }
 
 /**
@@ -105,6 +120,32 @@ export const ARRAY_MAX_COUNT = 100;
 export function clampArrayCount(count: number) {
   if (!Number.isFinite(count)) return ARRAY_MIN_COUNT;
   return Math.min(ARRAY_MAX_COUNT, Math.max(ARRAY_MIN_COUNT, Math.round(count)));
+}
+
+/**
+ * A grid's columns and rows, each at least 1 - one column of rows is a line along Y - and together at most
+ * ARRAY_MAX_COUNT pieces, as many as a row or a circle may have: past that the rows are cut back (`capped`).
+ */
+export function arrayGridSize(settings: Pick<ArraySettings, "count"> & Partial<Pick<ArraySettings, "rows">>) {
+  const whole = (value: number | undefined, fallback: number) => (Number.isFinite(value) ? Math.round(value as number) : fallback);
+  const columns = Math.min(ARRAY_MAX_COUNT, Math.max(1, whole(settings.count, 1)));
+  const asked = Math.min(ARRAY_MAX_COUNT, Math.max(1, whole(settings.rows, 1)));
+  const rows = Math.min(asked, Math.floor(ARRAY_MAX_COUNT / columns));
+  return { columns, rows, capped: rows < asked };
+}
+
+/** Scene offsets of a grid's copies, row by row from the original's corner: the original itself (0, 0) is left out. */
+export function gridOffsets(settings: Pick<ArraySettings, "count" | "spacingX"> & Partial<Pick<ArraySettings, "rows" | "rowSpacing">>) {
+  const { columns, rows } = arrayGridSize(settings);
+  const offsets: { dx: number; dz: number }[] = [];
+  for (let row = 0; row < rows; row += 1) {
+    for (let column = 0; column < columns; column += 1) {
+      if (row === 0 && column === 0) continue;
+      // Y points to the back, which is -z in the scene.
+      offsets.push({ dx: settings.spacingX * column, dz: -(settings.rowSpacing ?? 0) * row || 0 });
+    }
+  }
+  return offsets;
 }
 
 /** The three spacings of a row that steps `spacing` along one axis only - what a row was before it could use all three. */

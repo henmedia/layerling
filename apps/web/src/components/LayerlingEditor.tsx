@@ -90,7 +90,7 @@ import { isSameSize, resizedCopy, SAME_SIZE, shapeSize, sizeFactorsBetween, type
 import { canToggleGroupColors, colorForParts, groupShowsPartColors } from "@/lib/groupColors";
 import { disposeBoundsTree } from "three-mesh-bvh";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
-import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
+import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { bedOverhangs, keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
 import { SplitPanel, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
 import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitOrientationForNormal, splitAxisFromLabel, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
@@ -1701,9 +1701,15 @@ function arraySettingsResolved(settings: ArraySettings, sources: WorkplaneShape[
 
 /**
  * The copies of a pattern: every selected shape, once per extra piece, moved
- * along the row or turned around the circle centre. The originals stay put.
+ * along the row, over the grid or turned around the circle centre. The originals stay put.
  */
 function arrayCopies(sources: WorkplaneShape[], settings: ArraySettings): WorkplaneShape[] {
+  if (settings.mode === "grid") {
+    return gridOffsets(settings).flatMap(({ dx, dz }) => sources.map((source) => {
+      const clone = cloneWorkplaneShapeTreeWithFreshIds(source, "copy");
+      return { ...clone, x: clone.x + dx, z: clone.z + dz };
+    }));
+  }
   const count = clampArrayCount(settings.count);
   const step = circleStepDegrees(count, settings.angle);
   const center = { x: settings.centerX, y: settings.centerY };
@@ -4353,6 +4359,9 @@ export function LayerlingEditor({
       count: 4,
       // Next to each other with a little air, whatever the size of the part.
       ...singleAxisSpacing("x", Math.round((bounds.maxX - bounds.minX + 5) * 2) / 2),
+      // A grid's rows likewise, front to back (#1227).
+      rows: 3,
+      rowSpacing: Math.round((bounds.maxZ - bounds.minZ + 5) * 2) / 2,
       angle: 360,
       centerX: activeRotationPivot ? activeRotationPivot.x : 0,
       centerY: activeRotationPivot ? -activeRotationPivot.z : 0,
@@ -6469,6 +6478,11 @@ export function LayerlingEditor({
   const applyArrayTool = useCallback(async () => {
     if (!arrayTool || selectedShapes.length === 0) return;
     const copies = arrayCopies(selectedShapes, arraySettingsResolved(arrayTool, selectedShapes, shapes));
+    // A grid of one column and one row is the original alone.
+    if (copies.length === 0) {
+      setNotice(t("status.arrayNothing"));
+      return;
+    }
     const groupPieces = arrayGroupsCopies(arrayTool) && !selectedShapes.some((shape) => isNonSolidShape(shape));
     // A circle leaves its centre as the pieces' pivot, to align another part to or mark it (#990).
     const piecesBounds = boundsForShapes([...selectedShapes, ...copies]);
@@ -12869,7 +12883,7 @@ export function LayerlingEditor({
         const picked = ids.map((id) => findShape(id)).filter((shape): shape is WorkplaneShape => Boolean(shape));
         if (picked.length === 0) throw new Error("No objects to repeat - pass ids or select something first");
         if (picked.some((shape) => shape.locked)) throw new Error("A locked object cannot be repeated - unlock it first");
-        const mode = params.mode === "circle" ? "circle" : "row";
+        const mode = params.mode === "circle" || params.mode === "grid" ? params.mode : "row";
         // `fitAxis` spreads a row over a body as the Pattern window does (#1037): `fitTo`, or else the body under the
         // pieces; `edgeGap` first moves the originals that far in from the body's nearer end.
         let fit: ArraySettings["fit"] = null;
@@ -12895,12 +12909,18 @@ export function LayerlingEditor({
         // spacingX / spacingY / spacingZ step along several axes at once; the
         // older spacing + direction pair still steps along one.
         const perAxis = params.spacingX !== undefined || params.spacingY !== undefined || params.spacingZ !== undefined;
-        const spacings = perAxis
-          ? { spacingX: mcpNumber(params.spacingX, 0), spacingY: mcpNumber(params.spacingY, 0), spacingZ: mcpNumber(params.spacingZ, 0) }
-          : singleAxisSpacing(direction, mcpNumber(params.spacing, bounds.maxX - bounds.minX + 5));
+        // A grid (#1227): `count` columns along X at spacingX, `rows` along Y at spacingY, each at least 1;
+        // spacings left out leave 5 mm of air between the pieces, as the Pattern window starts.
+        const grid = mode === "grid";
+        const spacings = grid
+          ? { spacingX: mcpNumber(params.spacingX, bounds.maxX - bounds.minX + 5), spacingY: 0, spacingZ: 0 }
+          : perAxis
+            ? { spacingX: mcpNumber(params.spacingX, 0), spacingY: mcpNumber(params.spacingY, 0), spacingZ: mcpNumber(params.spacingZ, 0) }
+            : singleAxisSpacing(direction, mcpNumber(params.spacing, bounds.maxX - bounds.minX + 5));
         const settings: ArraySettings = arraySettingsResolved({
           mode,
-          count: clampArrayCount(mcpNumber(params.count, 2)),
+          count: grid ? mcpNumber(params.count, 1) : clampArrayCount(mcpNumber(params.count, 2)),
+          ...(grid ? { rows: mcpNumber(params.rows, 1), rowSpacing: mcpNumber(params.spacingY, bounds.maxZ - bounds.minZ + 5) } : {}),
           ...spacings,
           angle: mcpNumber(params.angle, 360),
           centerX: mcpNumber(params.centerX, 0),
@@ -12911,9 +12931,14 @@ export function LayerlingEditor({
           fit,
         }, sources, currentShapes());
         const copies = arrayCopies(sources, settings);
+        if (copies.length === 0) throw new Error("One column and one row is the original alone - ask for more columns or rows");
         const piecesBounds = boundsForShapes([...sources, ...copies]);
         const circlePivot = arrayCirclePivot(settings, piecesBounds.minY, piecesBounds.maxY);
-        const pivotAnswer = circlePivot ? { pivot: { x: circlePivot.x, y: -circlePivot.z, z: circlePivot.y } } : {};
+        // A grid says what it made: the rows are cut back past 100 pieces.
+        const gridSize = grid ? arrayGridSize(settings) : null;
+        const pivotAnswer = circlePivot
+          ? { pivot: { x: circlePivot.x, y: -circlePivot.z, z: circlePivot.y } }
+          : gridSize ? { grid: { columns: gridSize.columns, rows: gridSize.rows, ...(gridSize.capped ? { capped: true } : {}) } } : {};
         const looseResult = (message: string, warning?: string) => {
           const ids = [...sources.map((shape) => shape.id), ...copies.map((shape) => shape.id)];
           commitShapes([...withMovedSources(shapesRef.current), ...copies], ids, message);

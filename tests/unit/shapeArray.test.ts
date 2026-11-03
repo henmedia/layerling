@@ -1,7 +1,39 @@
 import { describe, expect, it } from "vitest";
-import { ARRAY_AUTO_GROUP_ABOVE, arrayFitGap, arrayFitShift, arrayFitStep, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing } from "@/lib/shapeArray";
+import { ARRAY_AUTO_GROUP_ABOVE, arrayFitGap, arrayFitShift, arrayFitStep, arrayGridSize, arrayGroupsCopies, arrayPieceCount, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing } from "@/lib/shapeArray";
 
 describe("shape arrays", () => {
+  it("lays a grid of columns along X and rows along Y (#1227)", () => {
+    // The example of the discussion: 4 columns 100 mm apart, 3 rows 150 mm apart.
+    const offsets = gridOffsets({ count: 4, spacingX: 100, rows: 3, rowSpacing: 150 });
+    expect(offsets).toHaveLength(11);
+    expect(offsets[0]).toEqual({ dx: 100, dz: 0 });
+    // Row by row; Y points to the back, which is -z in the scene.
+    expect(offsets[3]).toEqual({ dx: 0, dz: -150 });
+    expect(offsets[10]).toEqual({ dx: 300, dz: -300 });
+    expect(new Set(offsets.map(({ dx, dz }) => `${dx}|${dz}`)).size).toBe(11);
+    expect(arrayPieceCount({ mode: "grid", count: 4, rows: 3 })).toBe(12);
+  });
+
+  it("makes one column of rows a line along Y, and one row a line along X", () => {
+    expect(gridOffsets({ count: 1, spacingX: 100, rows: 3, rowSpacing: -20 })).toEqual([{ dx: 0, dz: 20 }, { dx: 0, dz: 40 }]);
+    expect(gridOffsets({ count: 3, spacingX: 10, rows: 1, rowSpacing: 50 })).toEqual([{ dx: 10, dz: 0 }, { dx: 20, dz: 0 }]);
+    // One column and one row is the original alone.
+    expect(gridOffsets({ count: 1, spacingX: 10, rows: 1, rowSpacing: 10 })).toEqual([]);
+  });
+
+  it("keeps a grid at a hundred pieces by cutting back the rows", () => {
+    expect(arrayGridSize({ count: 12, rows: 10 })).toEqual({ columns: 12, rows: 8, capped: true });
+    expect(arrayGridSize({ count: 10, rows: 10 })).toEqual({ columns: 10, rows: 10, capped: false });
+    expect(arrayGridSize({ count: 0, rows: Number.NaN })).toEqual({ columns: 1, rows: 1, capped: false });
+    expect(gridOffsets({ count: 50, spacingX: 1, rows: 50, rowSpacing: 1 })).toHaveLength(99);
+  });
+
+  it("groups a grid by all its pieces, not by its columns", () => {
+    expect(arrayGroupsCopies({ mode: "grid", count: 3, rows: 2 })).toBe(true);
+    expect(arrayGroupsCopies({ mode: "grid", count: 5, rows: 1 })).toBe(false);
+    expect(arrayGroupsCopies({ mode: "row", count: 3, rows: 4 })).toBe(false);
+  });
+
   it("groups the pieces by itself above five, until the person chooses", () => {
     expect(ARRAY_AUTO_GROUP_ABOVE).toBe(5);
     expect(arrayGroupsCopies({ count: 4 })).toBe(false);

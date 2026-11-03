@@ -119,7 +119,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_offset_object` | eltolja a test minden lapját az illesztés játékához: nagyítja vagy kicsinyíti, vagy lyukként adja hozzá a megnagyobbított másolatot, vagy csak az oldalakat tolja el |
 | `layerling_list_faces` | felsorolja egy pontos test lapjait |
 | `layerling_delete_faces` | lapokat töröl, és bezárja a rést |
-| `layerling_array_objects` | sorban vagy körön sokszoroz |
+| `layerling_array_objects` | sorban, rácsban vagy körön sokszoroz |
 | `layerling_bundle_objects` | objektumokat fog kötegbe, mint a Ctrl+B: együtt mozognak, megtartják a színüket és a fajtájukat, és exportáláskor külön kerülnek ki |
 | `layerling_layer_text` | egy szöveget rétegekből álló kötegbe alakít többszínű nyomtatáshoz (betűk, szélesebb szegélyek, egy lyukak nélküli lap), vagy újraépít egy köteget, kulcstartólyukkal, rétegenkénti sarkokkal és lekerekített vagy letört betűéllel; névlistával nevenként egy címkét készít |
 | `layerling_text_block` | szövegblokkot készít: egy szöveg lesz több sor közül az első, mindegyik önálló szöveg a felette lévő alatt, balra, középre vagy jobbra igazítva, minden sor ugyanakkora vagy kisebb |

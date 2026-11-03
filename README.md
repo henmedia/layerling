@@ -44,7 +44,7 @@ layerling sits a step beyond Tinkercad towards Fusion 360: it is operated the sa
 
 - **Chamfer and fillet.** Pick an edge and break it or round it – the one thing people ask for most once a printed part has to feel finished or slot into something. Applied edges stay changeable: take a treatment off again or press Edit to change its value on the same edges.
 - **Hollow, split, sketch, thread.** Hollow a body to an even wall, split it with a plane, draw sketches with exact lengths and angles and extrude or revolve them, and add screws, nuts and tapped holes.
-- **Patterns and wrapping.** Repeat a shape in a row, circle or spiral, or wrap a pattern or text around a cylinder.
+- **Patterns and wrapping.** Repeat a shape in a row, a grid of columns and rows, a circle or a spiral, or wrap a pattern or text around a cylinder.
 - **Hole patterns.** Click a flat face and spread round, square, rectangular, hexagonal or slot holes over it, in a grid or staggered, with spacing, margin and depth - vents, speaker grilles and baskets in one step.
 - **Scale by percent.** Make one or many parts larger or smaller by a percentage - together, so the layout grows with them, or each in place.
 - **Match sizes.** Hold Alt on an align dot and the parts stretch instead of moving: to the side of another part, or to its width, length or height - to swap a box for a cylinder of the same size, for instance.
