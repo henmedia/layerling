@@ -166,7 +166,7 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.
 
-{{ui:workspace.overhangAngle}} is the angle from which a face counts as an overhang when you switch on Show overhangs in the visibility menu: those faces are hatched red and white. 30° is careful, 70° counts on good cooling of the print; 45° is the usual start.
+{{ui:workspace.overhangAngle}} is the angle from which a face counts as an overhang when you switch on Show overhangs in the visibility menu: those faces are hatched red and white. 30° is careful, 70° counts on good cooling of the print; 45° is the usual start. While they are shown, a line under the view says the steepest overhang and how many cm² need supports.
 
 {{ui:workspace.booleanTriangleLimit}} limits how many triangles an imported mesh may have when you cut, merge or intersect it, because that is calculated in your browser. A mesh above the limit is not processed; simplify the mesh first, or raise the limit if your computer can take it. A higher limit can freeze the editor for a few seconds.
 

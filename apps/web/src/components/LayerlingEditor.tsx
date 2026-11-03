@@ -107,7 +107,8 @@ import { projectShapesExtent } from "@/components/workplane/ViewportOverlays";
 import { bakeCadMetadataForShapeTransform, cadBrepTransformForShape, cadModifierPrimitiveForAnalyticShape, cadModifierPrimitiveForBakedShape, importedStepPartForShape } from "@/lib/cadBakeMetadata";
 import { hasOneToOneCadComponentMapping } from "@/lib/cadModifierGroups";
 import { cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape, cadProfileExpectation, cadProfileSegmentCount, textGlyphProfiles, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
-import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle, overhangArea } from "@/lib/overhang";
+import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle } from "@/lib/overhang";
+import { bodyOverhang, overhangBodies, overhangFigures, overhangFiguresText, type OverhangFigures } from "@/lib/overhangFigures";
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
 import { matchingEdgeIds } from "@/lib/edgeMatching";
@@ -4778,6 +4779,25 @@ export function LayerlingEditor({
       return next;
     });
   }, [setNotice, stopCruise]);
+
+  // While overhangs are shown, a line under the view says how much needs supports and the steepest overhang; it
+  // follows every change a moment later, as the hatching does.
+  const [overhangLine, setOverhangLine] = useState<OverhangFigures | null>(null);
+  const overhangAngle = workspaceSettings.overhangAngle;
+  useEffect(() => {
+    if (!overhangsVisible) {
+      setOverhangLine(null);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      try {
+        setOverhangLine(overhangFigures(shapes, overhangAngle));
+      } catch {
+        setOverhangLine(null);
+      }
+    }, 200);
+    return () => window.clearTimeout(timer);
+  }, [overhangsVisible, shapes, overhangAngle]);
 
   const toggleOverhangsVisible = useCallback(() => {
     setOverhangsVisible((current) => {
@@ -12768,22 +12788,14 @@ export function LayerlingEditor({
         }
         const angle = workspaceSettingsRef.current.overhangAngle;
         const requestedIds = mcpStringArray(params.ids ?? params.id);
-        const solids = currentShapes().filter((shape) => !shape.hidden && !shape.hole && !isNonSolidShape(shape)
-          && (requestedIds.length === 0 || requestedIds.includes(shape.id)));
-        const objects = solids.map((shape) => {
-          const parts = expandBundles([shape]).filter((part) => !part.hole && !part.hidden);
-          const mesh = parts.length === 1 ? meshForShape(parts[0]) : (() => {
-            const vertices: Vec3[] = [];
-            const faces: [number, number, number][] = [];
-            parts.forEach((part) => appendMeshData(vertices, faces, meshForShape(part)));
-            return { name: shape.name, vertices, faces };
-          })();
-          const found = overhangArea(mesh.vertices, mesh.faces, angle);
+        const objects = overhangBodies(currentShapes(), requestedIds).map((shape) => {
+          const found = bodyOverhang(shape, angle);
           return {
             id: shape.id,
             name: shape.name,
             overhangAreaMm2: Number(found.areaMm2.toFixed(2)),
             lowestOverhangHeight: found.lowestY === null ? null : Number(found.lowestY.toFixed(3)),
+            steepestOverhangAngle: found.steepestDegrees === null ? null : Number(found.steepestDegrees.toFixed(1)),
           };
         });
         return {
@@ -15804,6 +15816,12 @@ export function LayerlingEditor({
           </span>
           <button type="button" className="open-group-cancel" onClick={cancelOpenGroup} disabled={openGroupBusy}>{t("common.cancel")}</button>
           <button type="button" className="open-group-done" onClick={() => void finishOpenGroup()} disabled={openGroupBusy}>{t("group.done")}</button>
+        </div>
+      ) : null}
+      {overhangLine ? (
+        <div className={`overhang-figures${overhangWarning ? (openGroup ? " stacked-2" : " stacked-1") : ""}`} role="status" data-testid="overhang-figures">
+          <span className="overhang-figures-swatch" aria-hidden="true" />
+          <span>{overhangFiguresText(overhangLine)}</span>
         </div>
       ) : null}
       {overhangWarning ? (

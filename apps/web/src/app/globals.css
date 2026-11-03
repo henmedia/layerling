@@ -11286,6 +11286,48 @@ html[data-theme="dark"] .font-picker-option.action {
   pointer-events: auto;
 }
 
+/* While overhangs are shown: how much needs supports and the steepest overhang, under the view. */
+.overhang-figures {
+  position: fixed;
+  bottom: 44px;
+  left: 50%;
+  z-index: 29;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 7px 14px 7px 10px;
+  color: #5c442b;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #ded0c2;
+  border-radius: 999px;
+  box-shadow: 0 2px 12px rgba(68, 49, 28, 0.16);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Above the warning that a body leaves the build volume, and above the open group's bar with it. */
+.overhang-figures.stacked-1 {
+  bottom: 88px;
+}
+
+.overhang-figures.stacked-2 {
+  bottom: 132px;
+}
+
+/* The hatching's own red and white, so the line reads as the hatched faces' figure. */
+.overhang-figures-swatch {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #c8372d;
+  border-radius: 4px;
+  background: repeating-linear-gradient(135deg, #e0453a 0 3px, #ffffff 3px 6px);
+}
+
 .bed-overhang-dismiss:hover,
 .bed-overhang-dismiss:focus-visible {
   background: rgba(216, 106, 0, 0.14);
@@ -12888,6 +12930,12 @@ html[data-theme="dark"] .split-panel-footer .secondary {
 
 html[data-theme="dark"] .workspace-printer-info {
   color: #b9a58f;
+}
+
+html[data-theme="dark"] .overhang-figures {
+  color: #f1e4d3;
+  background: rgba(40, 32, 24, 0.94);
+  border-color: rgba(227, 181, 122, 0.35);
 }
 
 html[data-theme="dark"] .bed-overhang-warning {

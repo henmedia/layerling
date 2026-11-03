@@ -1498,7 +1498,7 @@ export const tools = [
   },
   {
     name: "layerling_show_overhangs",
-    description: "Find overhangs that would need supports, like \"Show overhangs\" in the editor's visibility menu: faces that lean towards the plate more steeply than angle (degrees from vertical; a wall is 0, a flat ceiling 90). enabled switches the red tint in the view on or off; angle (30-70, default 45) is kept in the design's settings. Faces lying on the plate do not count. Returns enabled, angle and, for each visible solid (or the given ids), overhangAreaMm2 and lowestOverhangHeight - 0 means it prints without supports at that angle. A face resting on another body still counts. Use layerling_capture_image afterwards to see where the red is.",
+    description: "Find overhangs that would need supports, like \"Show overhangs\" in the editor's visibility menu: faces that lean towards the plate more steeply than angle (degrees from vertical; a wall is 0, a flat ceiling 90). enabled switches the red tint in the view on or off; angle (30-70, default 45) is kept in the design's settings. Faces lying on the plate do not count. Returns enabled, angle and, for each visible solid (or the given ids), overhangAreaMm2, lowestOverhangHeight and steepestOverhangAngle (the steepest face leaning towards the plate, degrees from vertical; null when none does) - an area of 0 means it prints without supports at that angle. A face resting on another body still counts. Use layerling_capture_image afterwards to see where the red is.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {

@@ -170,7 +170,7 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 {{ui:workspace.zoomSpeed}} er en skyder fra langsom til hurtig: hvor hurtigt hjulet og trackpad'en zoomer; zoomknapperne og tasterne beholder deres egne små trin. {{ui:workspace.cameraInertia}}: når du slipper musen, drejer visningen videre et øjeblik og falder blødt af. Slået fra stopper den med det samme, som i Tinkercad og Fusion 360.
 
-{{ui:workspace.overhangAngle}} er den vinkel, hvorfra en flade tæller som et overhæng, når du slår **Vis overhæng** til i menuen ved siden af øjet: de flader skraveres rødt og hvidt. 30° er det forsigtige valg, 70° regnes på god køling af printet; 45° er det sædvanlige startpunkt.
+{{ui:workspace.overhangAngle}} er den vinkel, hvorfra en flade tæller som et overhæng, når du slår **Vis overhæng** til i menuen ved siden af øjet: de flader skraveres rødt og hvidt. 30° er det forsigtige valg, 70° regnes på god køling af printet; 45° er det sædvanlige startpunkt. Så længe de vises, siger en linje under visningen det stejleste overhæng og hvor mange cm² der skal have støtte.
 
 {{ui:workspace.booleanTriangleLimit}} sætter en grænse for, hvor mange trekanter et importeret mesh må have, når du skærer det, samler det eller tager et snit i det, fordi det beregnes i din browser. Et mesh over grænsen behandles ikke; forenkler meshet først, eller hæv grænsen, hvis din computer kan klare det. En højere grænse kan få editoren til at hænge i nogle få sekunder.
 

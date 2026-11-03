@@ -166,7 +166,7 @@ La vista de boceto tiene sus propios colores: {{ui:workspace.sketchBackground}} 
 
 {{ui:workspace.zoomSpeed}} es un control deslizante que va de lento a rápido: la rapidez con que hacen zoom la rueda y el panel táctil; los botones y las teclas de zoom mantienen sus propios pasos pequeños. {{ui:workspace.cameraInertia}}: después de soltar el ratón, la vista sigue girando un momento y frena con suavidad. Si lo desactivas, se para en seco, como en Tinkercad y Fusion 360.
 
-{{ui:workspace.overhangAngle}} es el ángulo a partir del cual una cara cuenta como voladizo cuando activas Mostrar voladizos en el menú de visibilidad: esas caras se rayan en rojo y blanco. 30° es prudente y 70° cuenta con una buena refrigeración de capa; 45° es lo habitual para empezar.
+{{ui:workspace.overhangAngle}} es el ángulo a partir del cual una cara cuenta como voladizo cuando activas Mostrar voladizos en el menú de visibilidad: esas caras se rayan en rojo y blanco. 30° es prudente y 70° cuenta con una buena refrigeración de capa; 45° es lo habitual para empezar. Mientras se muestran, una línea bajo la vista indica el voladizo más pronunciado y cuántos cm² necesitan soportes.
 
 {{ui:workspace.booleanTriangleLimit}} limita cuántos triángulos puede tener una malla importada cuando la cortas, la fusionas o haces una intersección con ella, porque ese cálculo se hace en tu navegador. Una malla que pasa del límite no se procesa: simplifícala antes, o sube el límite si tu ordenador lo aguanta. Un límite más alto puede dejar el editor congelado unos segundos.
 
