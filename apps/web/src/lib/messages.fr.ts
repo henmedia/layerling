@@ -2146,6 +2146,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "makeExact.tooSlow": "Rendre ce corps exact a pris trop de temps. Exportez à nouveau la pièce avec moins de triangles, ou simplifiez-la avec \"Conserver arêtes et trous\" activé, puis réessayez.",
   "makeExact.changed": "Le corps ou le dessin a changé pendant qu'il était rendu exact. Veuillez réessayer.",
   "makeExact.tooLarge": "Ce maillage a {count} triangles ; Rendre exact en accepte jusqu'à {limit}. Simplifiez-le d'abord avec \"Conserver arêtes et trous\" activé.",
+  "makeExact.denseHint": "Ou cliquez sur Rendre exact : en corps exact, il peut être arrondi et chanfreiné.",
   "makeExact.done": "Rendu exact : {kinds}",
   "makeExact.facets": " – {percent} % de la surface restent de petites facettes planes",
   "makeExact.kind.plane": "plans : {count}",

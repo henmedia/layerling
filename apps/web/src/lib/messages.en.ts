@@ -2160,6 +2160,7 @@ export const MESSAGES_EN = {
   "makeExact.tooSlow": "Making this body exact took too long. Export the part again with fewer triangles, or simplify it with \"Keep edges and holes\" switched on, and try again.",
   "makeExact.changed": "The body or the design changed while it was being made exact. Please try again.",
   "makeExact.tooLarge": "This mesh has {count} triangles; Make exact takes up to {limit}. Simplify it first with \"Keep edges and holes\" switched on.",
+  "makeExact.denseHint": "Or click Make exact: as an exact body it can be rounded and chamfered.",
   "makeExact.done": "Made exact: {kinds}",
   "makeExact.facets": " – {percent} % of the surface stays as small flat facets",
   "makeExact.kind.plane": "planes: {count}",

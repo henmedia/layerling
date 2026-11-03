@@ -2227,6 +2227,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "makeExact.tooSlow": "Převod na přesné těleso trval příliš dlouho. Exportujte díl znovu s menším počtem trojúhelníků nebo ho zjednodušte se zapnutým „Zachovat hrany a otvory“ a zkuste to znovu.",
   "makeExact.changed": "Těleso nebo návrh se během převodu změnil. Zkuste to prosím znovu.",
   "makeExact.tooLarge": "Tato síť má {count} trojúhelníků; „Udělat přesným“ zvládne až {limit}. Nejdřív ji zjednodušte se zapnutým „Zachovat hrany a otvory“.",
+  "makeExact.denseHint": "Nebo klikněte na „Udělat přesným“: přesné těleso lze zaoblit i zkosit.",
   "makeExact.done": "Převedeno na přesné těleso: {kinds}",
   "makeExact.facets": " – {percent} % povrchu zůstává malými rovinnými ploškami",
   "makeExact.kind.plane": "rovin: {count}",

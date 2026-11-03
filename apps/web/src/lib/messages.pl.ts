@@ -2118,6 +2118,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "makeExact.tooSlow": "Zamiana na dokładną bryłę trwała zbyt długo. Wyeksportuj część ponownie z mniejszą liczbą trójkątów albo uprość ją z włączoną opcją „Zachowaj krawędzie i otwory” i spróbuj ponownie.",
   "makeExact.changed": "Bryła lub projekt zmieniły się w trakcie zamiany. Spróbuj ponownie.",
   "makeExact.tooLarge": "Ta siatka ma {count} trójkątów; „Uczyń dokładnym” przyjmuje do {limit}. Najpierw uprość ją z włączoną opcją „Zachowaj krawędzie i otwory”.",
+  "makeExact.denseHint": "Albo kliknij „Uczyń dokładnym”: jako dokładną bryłę można ją zaokrąglać i fazować.",
   "makeExact.done": "Zamieniono na dokładną bryłę: {kinds}",
   "makeExact.facets": " – {percent} % powierzchni zostaje małymi płaskimi fasetkami",
   "makeExact.kind.plane": "płaszczyzny: {count}",

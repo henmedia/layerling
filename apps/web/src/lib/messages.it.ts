@@ -2140,6 +2140,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "makeExact.tooSlow": "Rendere esatto questo corpo ha richiesto troppo tempo. Esporta di nuovo il pezzo con meno triangoli o semplificalo con «Mantieni spigoli e fori» attivo, poi riprova.",
   "makeExact.changed": "Il corpo o il progetto è cambiato mentre veniva reso esatto. Riprova.",
   "makeExact.tooLarge": "Questa mesh ha {count} triangoli; Rendi esatto ne accetta fino a {limit}. Semplificala prima con «Mantieni spigoli e fori» attivo.",
+  "makeExact.denseHint": "Oppure fai clic su Rendi esatto: come corpo esatto si può raccordare e smussare.",
   "makeExact.done": "Reso esatto: {kinds}",
   "makeExact.facets": " – il {percent} % della superficie resta in piccole faccette piane",
   "makeExact.kind.plane": "piani: {count}",

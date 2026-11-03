@@ -2625,6 +2625,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "makeExact.tooSlow": "Det tog for lang tid at gøre formen eksakt. Eksportér delen igen med færre trekanter, eller forenkl den med \"Bevar kanter og huller\" slået til, og prøv igen.",
   "makeExact.changed": "Formen eller designet ændrede sig, mens den blev gjort eksakt. Prøv igen.",
   "makeExact.tooLarge": "Dette mesh har {count} trekanter; Gør eksakt tager op til {limit}. Forenkl det først med \"Bevar kanter og huller\" slået til.",
+  "makeExact.denseHint": "Eller klik på Gør eksakt: som eksakt form kan den rundes og fases.",
   "makeExact.done": "Gjort eksakt: {kinds}",
   "makeExact.facets": " – {percent} % af overfladen forbliver små plane facetter",
   "makeExact.kind.plane": "planer: {count}",

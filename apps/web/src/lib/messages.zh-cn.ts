@@ -2104,6 +2104,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "makeExact.tooSlow": "转为精确实体耗时过长。请以更少的三角形重新导出该零件，或开启“保留边缘和孔”后简化它，然后再试一次。",
   "makeExact.changed": "转换过程中物体或设计发生了变化。请再试一次。",
   "makeExact.tooLarge": "此网格有 {count} 个三角形；“转为精确实体”最多处理 {limit} 个。请先开启“保留边缘和孔”简化它。",
+  "makeExact.denseHint": "或者点击“转为精确实体”：转为精确实体后即可倒圆角和倒角。",
   "makeExact.done": "已转为精确实体：{kinds}",
   "makeExact.facets": "——{percent} % 的表面仍为小平面片",
   "makeExact.kind.plane": "平面：{count}",

@@ -7344,7 +7344,9 @@ export function LayerlingEditor({
       // knows their machine may go on after a clear warning (#941). A thread has a better way, so it stays refused.
       const goOn = !istGewinde && typeof window !== "undefined" && window.confirm(t("status.meshDenseAsk", denseCounts));
       if (!goOn) {
-        setNotice(t(istGewinde ? "status.threadTooDense" : "status.meshTooDense", denseCounts), true);
+        // An imported mesh has a way to its edges: Make exact, which takes far more triangles.
+        const exactHint = !istGewinde && offersMakeExact(selectedShape) ? ` ${t("makeExact.denseHint")}` : "";
+        setNotice(t(istGewinde ? "status.threadTooDense" : "status.meshTooDense", denseCounts) + exactHint, true);
         return;
       }
     }

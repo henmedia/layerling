@@ -2155,6 +2155,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "makeExact.tooSlow": "Hacer exacto este cuerpo tardó demasiado. Exporta de nuevo la pieza con menos triángulos o simplifícala con «Conservar aristas y agujeros» activado y vuelve a intentarlo.",
   "makeExact.changed": "El cuerpo o el diseño cambió mientras se hacía exacto. Vuelve a intentarlo.",
   "makeExact.tooLarge": "Esta malla tiene {count} triángulos; Hacer exacto admite hasta {limit}. Simplifícala primero con «Conservar aristas y agujeros» activado.",
+  "makeExact.denseHint": "O pulsa Hacer exacto: como cuerpo exacto se puede redondear y achaflanar.",
   "makeExact.done": "Hecho exacto: {kinds}",
   "makeExact.facets": " – el {percent} % de la superficie queda como pequeñas facetas planas",
   "makeExact.kind.plane": "planos: {count}",

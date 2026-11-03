@@ -2159,6 +2159,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "makeExact.tooSlow": "Das Exakt-Machen hat zu lange gedauert. Exportiere das Teil mit weniger Dreiecken neu oder vereinfache es mit eingeschaltetem „Kanten und Bohrungen beibehalten“ und versuche es dann noch einmal.",
   "makeExact.changed": "Der Körper oder der Entwurf hat sich beim Exakt-Machen geändert. Bitte versuche es noch einmal.",
   "makeExact.tooLarge": "Dieses Netz hat {count} Dreiecke; „Exakt machen“ nimmt bis zu {limit}. Vereinfache es zuerst mit eingeschaltetem „Kanten und Bohrungen beibehalten“.",
+  "makeExact.denseHint": "Oder klicke auf „Exakt machen“: Als exakter Körper lässt es sich runden und fasen.",
   "makeExact.done": "Exakt gemacht: {kinds}",
   "makeExact.facets": " – {percent} % der Oberfläche bleiben kleine ebene Facetten",
   "makeExact.kind.plane": "Ebenen: {count}",

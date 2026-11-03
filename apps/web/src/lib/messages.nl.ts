@@ -2160,6 +2160,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "makeExact.tooSlow": "Exact maken duurde te lang. Exporteer het onderdeel opnieuw met minder driehoeken, of vereenvoudig het met \"Randen en gaten behouden\" aan, en probeer het opnieuw.",
   "makeExact.changed": "Het lichaam of het ontwerp veranderde terwijl het exact werd gemaakt. Probeer het opnieuw.",
   "makeExact.tooLarge": "Deze mesh heeft {count} driehoeken; Exact maken neemt er tot {limit}. Vereenvoudig hem eerst met \"Randen en gaten behouden\" aan.",
+  "makeExact.denseHint": "Of klik op Exact maken: als exact lichaam kan het worden afgerond en afgeschuind.",
   "makeExact.done": "Exact gemaakt: {kinds}",
   "makeExact.facets": " – {percent} % van het oppervlak blijft kleine vlakke facetten",
   "makeExact.kind.plane": "platte vlakken: {count}",

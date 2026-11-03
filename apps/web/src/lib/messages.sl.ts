@@ -1720,6 +1720,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "makeExact.tooSlow": "Pretvorba v natančno telo je trajala predolgo. Del znova izvozi z manj trikotniki ali ga poenostavi z vklopljenim »Ohrani robove in luknje« in poskusi znova.",
   "makeExact.changed": "Telo ali projekt se je med pretvorbo spremenil. Poskusi znova.",
   "makeExact.tooLarge": "Ta mreža ima {count} trikotnikov; »Naredi natančno« jih vzame do {limit}. Najprej jo poenostavi z vklopljenim »Ohrani robove in luknje«.",
+  "makeExact.denseHint": "Ali klikni »Naredi natančno«: kot natančno telo ga lahko zaokrožiš in posnameš.",
   "makeExact.done": "Narejeno natančno: {kinds}",
   "makeExact.facets": " – {percent} % površine ostane majhnih ravnih fasetk",
   "makeExact.kind.plane": "ravnine: {count}",
