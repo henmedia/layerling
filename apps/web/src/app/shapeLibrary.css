@@ -1,0 +1,172 @@
+/*
+ * The shape library in sections (#1170): ShapeLibraryList.tsx. A search field on top, "Recently used", then the
+ * sections, each with its count and a fold. Loaded right after myShapes.css by layout.tsx.
+ */
+
+.shape-library-search {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fffdf9;
+  border-bottom: 1px solid #efe7d9;
+}
+
+.shape-library-search > svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: #8a6d4c;
+}
+
+.shape-library-search input {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  color: #4d3820;
+  background: #fbfaf8;
+  border: 1px solid #dccdbe;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 14px;
+}
+
+.shape-library-search input:focus-visible {
+  outline: 2px solid #dd7906;
+  outline-offset: 0;
+}
+
+/* The field's own cross would sit beside ours. */
+.shape-library-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.shape-library-clear {
+  display: inline-flex;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #5c442c;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.shape-library-clear:hover {
+  background: #f6efe4;
+  border-color: #dccdbe;
+}
+
+.shape-library-clear svg {
+  width: 16px;
+  height: 16px;
+}
+
+.shape-library-section + .shape-library-section {
+  border-top: 1px solid #efe7d9;
+}
+
+.shape-library-toggle,
+.shape-library-heading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 2px 12px;
+  color: #604529;
+  background: transparent;
+  border: 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.shape-library-toggle {
+  padding-left: 8px;
+  cursor: pointer;
+}
+
+.shape-library-toggle[aria-expanded="false"] {
+  padding-bottom: 8px;
+}
+
+.shape-library-toggle:hover {
+  background: #f6efe4;
+}
+
+.shape-library-toggle svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.shape-library-count {
+  min-width: 20px;
+  padding: 1px 6px;
+  color: #6b4f30;
+  background: #efe4d3;
+  border-radius: 999px;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.shape-library-note {
+  margin: 4px 12px 0;
+  color: #8a6d4c;
+  font-size: 12.5px;
+}
+
+.shape-library-empty {
+  margin: 0;
+  padding: 18px 12px;
+  color: #8a6d4c;
+  font-size: 14px;
+  text-align: center;
+}
+
+html[data-theme="dark"] .shape-library-search {
+  background: rgba(40, 30, 20, 0.97);
+  border-color: #594a3a;
+}
+
+html[data-theme="dark"] .shape-library-search > svg,
+html[data-theme="dark"] .shape-library-note,
+html[data-theme="dark"] .shape-library-empty {
+  color: #cdbca6;
+}
+
+html[data-theme="dark"] .shape-library-search input {
+  color: #f0e7d9;
+  background: #2f241a;
+  border-color: #5b4b3a;
+}
+
+html[data-theme="dark"] .shape-library-clear,
+html[data-theme="dark"] .shape-library-toggle,
+html[data-theme="dark"] .shape-library-heading {
+  color: #f0e7d9;
+}
+
+html[data-theme="dark"] .shape-library-clear:hover,
+html[data-theme="dark"] .shape-library-toggle:hover {
+  background: #463625;
+  border-color: #5b4b3a;
+}
+
+html[data-theme="dark"] .shape-library-count {
+  color: #f0e7d9;
+  background: #5b4733;
+}
+
+html[data-theme="dark"] .shape-library-section + .shape-library-section {
+  border-color: #594a3a;
+}
