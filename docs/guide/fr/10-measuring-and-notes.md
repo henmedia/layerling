@@ -44,6 +44,15 @@ Au milieu, les chiffres verts comptent jusqu'au milieu du corps, également en h
 
 Le ruban à mesurer et l'équerre de cadrage restent là où ils se trouvent pendant que vous dessinez et revenez à la vue 3D. Aucun des deux n'entre dans l'historique. L'équerre de cadrage est enregistrée avec le design, tout comme les mesures du ruban à mesurer, dans le navigateur et dans le fichier .lyl : elles sont de nouveau là quand vous ouvrez le design. Le bouton en forme d'œil parmi les boutons du ruban masque toutes les mesures et les réaffiche ; le fait qu'elles soient masquées est aussi enregistré, et ajouter, déplacer ou supprimer une mesure les réaffiche d'abord.
 
+## Le rapporteur
+
+Cliquez sur {{ui:camera.protractor}} dans la barre de vue pour mesurer un angle. Une rangée de boutons s'ouvre à côté et, jusqu'à ce que vous cliquiez à nouveau sur le bouton ou appuyiez sur [[Esc]], chaque clic dans la vue mesure avec le rapporteur. Comme le ruban à mesurer, il s'accroche aux coins et aux bords des corps ; à côté des corps, il pose un point sur le plateau.
+
+- {{ui:camera.protractorPoints}} : cliquez d'abord sur le sommet de l'angle, puis sur un point de chaque côté. Pendant que vous placez le dernier point, l'angle s'affiche déjà ; après le troisième clic, il reste, avec un arc entre les côtés. C'est l'angle au sommet, de 0° à 180°.
+- {{ui:camera.protractorFaces}} : cliquez sur deux faces planes. Un court trait bleu sur chacune montre de quel côté elle est tournée, et l'étiquette donne les deux angles que forment les faces, le plus petit d'abord : un chanfrein de 45° contre le dessus donne 45° · 135°, deux côtés d'un pavé seulement 90°. Une face courbe n'a pas de direction unique, le rapporteur demande donc une face plane.
+
+Le clic suivant après un angle terminé en commence un nouveau, et {{ui:camera.protractorClear}} le supprime. L'angle suit les corps quand ils sont déplacés ou tournés. Rien n'en est enregistré ni n'entre dans l'historique : il disparaît quand vous refermez le rapporteur.
+
 ## Distances jusqu'à l'origine et en déplacement
 
 Dans les paramètres sous {{ui:workspace.appearance}}, il y a deux commutateurs pour les cotes dynamiques :
@@ -57,7 +66,7 @@ Pour vous en passer un instant, appuyez sur [[Q]] : les cotes et distances autou
 
 ## Vérifier le jeu
 
-Les pièces qui doivent bouger après l'impression - un dragon flexi, une charnière imprimée en place, une boîte et son couvercle, un axe dans son alésage - ont besoin d'un écart entre elles. Trop petit, elles collent ; si elles se chevauchent, elles s'impriment en une seule pièce. {{ui:editor.tool.clearance}}, à côté de {{ui:editor.tool.intersectPreview}}, le vérifie avant l'impression. L'outil prend les objets sélectionnés, ou tous les objets visibles si rien n'est sélectionné (les mêmes qu'un export), et vérifie chaque paire :
+Les pièces qui doivent bouger après l'impression - un dragon flexi, une charnière imprimée en place, une boîte et son couvercle, un axe dans son alésage - ont besoin d'un écart entre elles. Trop petit, elles collent ; si elles se chevauchent, elles s'impriment en une seule pièce. {{ui:editor.tool.clearance}}, à côté de {{ui:editor.tool.loftSketches}}, le vérifie avant l'impression. L'outil prend les objets sélectionnés, ou tous les objets visibles si rien n'est sélectionné (les mêmes qu'un export), et vérifie chaque paire :
 
 - **{{ui:clearance.kind.overlap}}** (rouge) : les deux partagent un volume. Il apparaît en rouge dans les corps, qui deviennent transparents, et la liste indique sa taille.
 - **{{ui:clearance.kind.touching}}** (rouge) : elles se touchent et fusionnent à l'impression.
@@ -79,7 +88,7 @@ Une note enregistre ce que la géométrie ne dit pas : "Cette vis est trop serr�
 - Si vous placez le billet **sur un corps**, il voyage avec lui.
 - Si vous le placez **à côté**, il reste sur le plan de travail ({{ui:note.free}}).
 - {{ui:note.detach}} libère une note jointe du corps.
-- {{ui:note.forAi}} fait d'une note une demande pour un agent IA sur le pont MCP (voir « IA avec MCP ») : l'agent la lit avec `layerling_list_notes`, fait le travail et répond dans la même note, sous votre texte. Il peut aussi poser ses propres notes sur le modèle, pour demander ou signaler quelque chose à un endroit.
+- {{ui:note.forAi}} fait d'une note une demande pour un agent IA sur le pont MCP (voir « IA avec MCP ») : l'agent la lit avec `layerling_list_notes`, fait le travail et répond dans la même note, sous votre texte. Il peut aussi poser ses propres notes sur le modèle, pour demander ou signaler quelque chose à un endroit. Demandez à l'agent de surveiller vos notes, et il les attend avec `layerling_wait_for_notes` : vous ne travaillez alors plus que sur le modèle, et chaque nouvelle demande est prise dès que vous cochez la case, sans repasser par la fenêtre de l'agent.
 - {{ui:editor.tool.group}} emporte une note jointe dans le groupe ; {{ui:editor.tool.ungroup}} la confie à la partie visible située dessous, y compris un groupe imbriqué. Tant qu'un groupe est ouvert avec {{ui:group.edit}}, ses notes suivent la partie située dessous et reviennent au groupe avec {{ui:group.done}} ; annuler les remet telles qu'elles étaient.
 - Si son corps est supprimé, ou si plus aucun corps visible ne se trouve dessous, la note reste là où elle était, sur le plan de travail.
 - Faire glisser l'épingle déplace la note. Un clic sur l'épingle replie la carte, seul le petit numéro reste ; un autre clic la rouvre. Un clic dans le texte permet de le modifier.

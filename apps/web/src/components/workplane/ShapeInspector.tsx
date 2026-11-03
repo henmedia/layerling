@@ -3762,14 +3762,26 @@ export function ShapeInspector({
     : [];
   const taper = shapeTaperDimensions(shape);
   const taperDimensionMax = shapeDimensionLimit(workspace, shape.kind, DEFAULT_TAPER_DIMENSION_MAX);
+  // Keep proportions (#1229): length and width of one end change together, in the ratio they have now.
+  // Top and bottom stay apart, or there would be nothing left to taper.
+  const taperKeepsProportions = shape.taperKeepProportions === true;
+  const taperPartner = (changed: number, before: number, partner: number) =>
+    taperKeepsProportions ? Math.min(taperDimensionMax, Math.max(MIN_SHAPE_SIZE, partner * (changed / Math.max(MIN_SHAPE_SIZE, before)))) : partner;
   const taperProperties: ShapePropertyConfig[] = shapeIgnoresTaper ? [] : [
+    {
+      type: "toggle",
+      id: "taperKeepProportions",
+      label: t("inspector.keepProportions"),
+      value: taperKeepsProportions,
+      onChange: (keep) => onUpdate({ taperKeepProportions: keep || undefined }),
+    },
     {
       id: "topLength",
       label: t("prop.topLength"),
       value: taper.topDepth,
       min: MIN_SHAPE_SIZE,
       max: taperDimensionMax,
-      onChange: (taperTopDepth) => onUpdate({ taperTopDepth, taperTopWidth: taper.topWidth, taperTopScale: undefined }),
+      onChange: (taperTopDepth) => onUpdate({ taperTopDepth, taperTopWidth: taperPartner(taperTopDepth, taper.topDepth, taper.topWidth), taperTopScale: undefined }),
     },
     {
       id: "topWidth",
@@ -3777,7 +3789,7 @@ export function ShapeInspector({
       value: taper.topWidth,
       min: MIN_SHAPE_SIZE,
       max: taperDimensionMax,
-      onChange: (taperTopWidth) => onUpdate({ taperTopWidth, taperTopDepth: taper.topDepth, taperTopScale: undefined }),
+      onChange: (taperTopWidth) => onUpdate({ taperTopWidth, taperTopDepth: taperPartner(taperTopWidth, taper.topWidth, taper.topDepth), taperTopScale: undefined }),
     },
     {
       id: "bottomLength",
@@ -3785,7 +3797,7 @@ export function ShapeInspector({
       value: taper.bottomDepth,
       min: MIN_SHAPE_SIZE,
       max: taperDimensionMax,
-      onChange: (taperBottomDepth) => onUpdate({ taperBottomDepth, taperBottomWidth: taper.bottomWidth, taperBottomScale: undefined }),
+      onChange: (taperBottomDepth) => onUpdate({ taperBottomDepth, taperBottomWidth: taperPartner(taperBottomDepth, taper.bottomDepth, taper.bottomWidth), taperBottomScale: undefined }),
     },
     {
       id: "bottomWidth",
@@ -3793,7 +3805,7 @@ export function ShapeInspector({
       value: taper.bottomWidth,
       min: MIN_SHAPE_SIZE,
       max: taperDimensionMax,
-      onChange: (taperBottomWidth) => onUpdate({ taperBottomWidth, taperBottomDepth: taper.bottomDepth, taperBottomScale: undefined }),
+      onChange: (taperBottomWidth) => onUpdate({ taperBottomWidth, taperBottomDepth: taperPartner(taperBottomWidth, taper.bottomWidth, taper.bottomDepth), taperBottomScale: undefined }),
     },
   ];
   /*

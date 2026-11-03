@@ -139,6 +139,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_list_reference_points` | 列出參考點及其 id 與位置 |
 | `layerling_remove_reference_points` | 依 id 刪除參考點，或全部刪除 |
 | `layerling_list_notes` | 讀取使用者的備註，包括文字、每則所附著的實體，以及它是否是給 AI 的請求 |
+| `layerling_wait_for_notes` | 等待你在註記上勾選 {{ui:note.forAi}}，並立即轉交該請求 |
 | `layerling_add_note` | 在模型上放一則備註，附著在物件上或自由放在工作板上 |
 | `layerling_update_note` | 修改一則備註或回覆它；回覆會關閉請求 |
 | `layerling_remove_notes` | 依 id 刪除備註 |
@@ -154,6 +155,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_show_workplane` | 隱藏或顯示帶格線的平台，例如為了拍攝底面（只影響檢視） |
 | `layerling_set_section_view` | 沿平面剖開檢視以查看內部（只影響檢視，不會真的切開任何東西） |
 | `layerling_measurements` | 顯示或隱藏捲尺的量測，並列出它們及其長度，並像 [[Q]] 一樣隱藏或顯示所選物件周圍的尺寸 |
+| `layerling_measure_angle` | 像量角器一樣量測角度：三點的頂點處或兩個平面之間，並在檢視中顯示 |
 | `layerling_saved_view` | 把目前檢視儲存到按鍵 7、8、9 或 0，之後可回到該檢視，就像 Shift+按鍵與單按該鍵（只影響檢視）；也可設定新設計的起始視圖 |
 | `layerling_clear_history` | 永久刪除所有復原步驟，就像歷史記錄檢視的「刪除歷史記錄」按鈕；需要 `confirm: true` |
 | `layerling_set_history_view` | 回看專案較早的狀態，就像歷史記錄檢視（實際設計不受影響；會修改設計的工具會等到它關閉） |

@@ -204,6 +204,7 @@ import { projectedEdgesPath } from "@/lib/sketchEdges";
 import { useRememberedFlag } from "@/lib/useRememberedFlag";
 import { BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportEvent } from "@/lib/bugReport";
 import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
+import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
@@ -2783,6 +2784,8 @@ const LOCKED_SHAPE_PATCH_KEYS = new Set(["locked", "hidden", "name"]);
 
 /** A preview of an intersection is not calculated for more triangles than this: it would stutter while a shape is moved (#372). */
 const INTERSECT_PREVIEW_MAX_TRIANGLES = 40000;
+const intersectPreviewTriangles = (shapes: WorkplaneShape[]) =>
+  shapes.reduce((sum, shape) => sum + (shape.importedMesh?.triangleCount ?? meshForShape(shape).faces.length), 0);
 
 /** The files of a design that has none: one list, so that nothing sees a change where there is none. */
 const NO_ATTACHMENTS: ProjectAttachment[] = [];
@@ -9881,22 +9884,6 @@ export function LayerlingEditor({
     setIntersectPreviewShape(null);
   }, []);
 
-  /** Shows what the selected shapes share, and keeps showing it while they are moved one by one (#372). */
-  const toggleIntersectPreview = useCallback(() => {
-    if (intersectPreviewIdsRef.current) {
-      exitIntersectPreview();
-      setNotice("");
-      return;
-    }
-    const operands = selectedShapes.filter((shape) => !isNonSolidShape(shape));
-    if (!canIntersectShapes(operands)) {
-      setNotice(t("status.selectSolidAndHole"));
-      return;
-    }
-    setIntersectPreviewIds(operands.map((shape) => shape.id));
-    setNotice(t("status.intersectPreviewOn", { tool: t("editor.tool.intersect") }));
-  }, [exitIntersectPreview, selectedShapes]);
-
   // The common part is calculated again a moment after every change of the shapes, so moving one stays smooth.
   useEffect(() => {
     if (!intersectPreviewIds) return;
@@ -9909,8 +9896,7 @@ export function LayerlingEditor({
     const run = intersectPreviewRunRef.current + 1;
     intersectPreviewRunRef.current = run;
     const timer = window.setTimeout(async () => {
-      const triangles = operands.reduce((sum, shape) => sum + (shape.importedMesh?.triangleCount ?? meshForShape(shape).faces.length), 0);
-      if (triangles > INTERSECT_PREVIEW_MAX_TRIANGLES) {
+      if (intersectPreviewTriangles(operands) > INTERSECT_PREVIEW_MAX_TRIANGLES) {
         setIntersectPreviewShape(null);
         setNotice(t("status.intersectPreviewTooBig"));
         return;
@@ -10053,6 +10039,29 @@ export function LayerlingEditor({
     exitIntersectPreview();
     commitShapes([...remainingShapes, intersection], intersection.id, t("status.intersectedMany", { count: groupable.length }));
   }, [refuseLockedSelection, commitShapes, exitIntersectPreview, selectedShapes]);
+
+  /**
+   * The Intersection button: the first click shows what the selected shapes share, and keeps showing it while they are moved
+   * one by one; the second click applies it (#372). Shapes too heavy for the preview are intersected at once.
+   */
+  const intersectFromToolbar = useCallback(() => {
+    if (intersectPreviewIdsRef.current) {
+      void intersectSelected();
+      return;
+    }
+    if (refuseLockedSelection()) return;
+    const operands = selectedShapes.filter((shape) => !isNonSolidShape(shape));
+    if (!canIntersectShapes(operands)) {
+      setNotice(t("status.selectSolidAndHole"));
+      return;
+    }
+    if (intersectPreviewTriangles(operands) > INTERSECT_PREVIEW_MAX_TRIANGLES) {
+      void intersectSelected();
+      return;
+    }
+    setIntersectPreviewIds(operands.map((shape) => shape.id));
+    setNotice(t("status.intersectPreviewOn", { tool: t("editor.tool.intersect") }));
+  }, [intersectSelected, refuseLockedSelection, selectedShapes]);
 
   /** Hull: the selected shapes wrapped into one convex body, kept as a group to open again (#863). */
   const hullSelected = useCallback(async () => {
@@ -13422,6 +13431,49 @@ export function LayerlingEditor({
         });
       }
 
+      if (command.action === "measure_angle") {
+        // The protractor (#1228): the angle at the first of three points, or between two flat faces from list_faces.
+        if (params.clear === true) {
+          window.layerlingProtractor?.({ clear: true });
+          return { shown: false };
+        }
+        const show = params.show !== false;
+        const shownWith = (request: Parameters<NonNullable<typeof window.layerlingProtractor>>[0]) => {
+          if (!show) return false;
+          if (!window.layerlingProtractor) throw new Error("The protractor is not available in this editor (a sketch is open, or the second view); give show false to only measure");
+          return window.layerlingProtractor(request).shown;
+        };
+        const round = (value: number) => Number(value.toFixed(4));
+        if (params.points !== undefined) {
+          const points = Array.isArray(params.points) ? params.points.map((entry: unknown) => mcpFiniteNumberArray(entry)) : [];
+          if (points.length !== 3 || points.some((point: number[]) => point.length !== 3)) {
+            throw new Error("points must be three [x, y, z] points in world coordinates (y up), the corner first");
+          }
+          const [vertex, a, b] = points.map(([x, y, z]: number[]) => ({ x, y, z }));
+          const angle = angleAtVertex(vertex, a, b);
+          if (angle === null) throw new Error("A side point lies on the corner, so there is no angle");
+          return { angle: round(angle), text: formatProtractorAngle(angle), shown: shownWith({ points: [vertex, a, b] }) };
+        }
+        if (params.faces !== undefined) {
+          if (!Array.isArray(params.faces) || params.faces.length !== 2) throw new Error("faces must be two entries, each { id, faceId } from layerling_list_faces");
+          const faces: Array<{ shapeId: string; point: { x: number; y: number; z: number }; normal: { x: number; y: number; z: number } }> = [];
+          for (const entry of params.faces as Array<{ id?: unknown; faceId?: unknown }>) {
+            const target = findShape(entry?.id);
+            if (!target) throw new Error("Object not found");
+            invalidateCadModifierSession();
+            const { response } = await prepareCadModifierForMcp(target, 25, { faces: true });
+            const face = (response.faces?.list ?? []).find((candidate) => candidate.id === entry?.faceId);
+            if (!face) throw new Error(`Face ${String(entry?.faceId)} not found on ${target.id}; take the ids from layerling_list_faces`);
+            if (!face.normal) throw new Error(`Face ${face.id} is not flat (${face.kind}); the protractor measures between flat faces`);
+            faces.push({ shapeId: target.id, point: face.center, normal: face.normal });
+          }
+          const angles = angleBetweenFaces(faces[0].normal, faces[1].normal);
+          if (!angles) throw new Error("A face has no normal to measure by");
+          return { angle: round(angles.angle), other: round(angles.other), text: formatFaceAngles(angles), shown: shownWith({ faces }) };
+        }
+        throw new Error("Give points (three [x, y, z], the corner first) or faces (two { id, faceId } from layerling_list_faces), or clear true");
+      }
+
       if (command.action === "set_section_view") {
         if (!window.layerlingSectionView) throw new Error("The section view is not available in this editor");
         const axis = params.axis === undefined ? undefined : mcpString(params.axis, "x").toLowerCase();
@@ -15805,13 +15857,12 @@ export function LayerlingEditor({
         canFaceTool={selectedShapes.length === 1 && Boolean(selectedShape && !selectedShape.locked && !selectedShape.hole && !isNonSolidShape(selectedShape))}
         onGroup={groupSelected}
         onBundle={bundleSelected}
-        onIntersect={intersectSelected}
+        onIntersect={intersectFromToolbar}
         onHull={hullSelected}
         onCookieCutter={startCookieCutterTool}
         onFlexi={startFlexiTool}
         onLid={startLidTool}
         onLoftSketches={() => void loftSketches()}
-        onIntersectPreview={toggleIntersectPreview}
         intersectPreviewActive={Boolean(intersectPreviewIds)}
         onClearanceCheck={toggleClearanceCheck}
         clearanceActive={Boolean(clearanceTool)}

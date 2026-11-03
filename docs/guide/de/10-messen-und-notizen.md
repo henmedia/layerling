@@ -46,6 +46,15 @@ Mit dem Mittelpunkt zählen die grünen Zahlen bis zur Mitte des Körpers, auch 
 
 Das Maßband und das Winkellineal bleiben stehen, wenn du eine Skizze machst und in die 3D-Ansicht zurückkehrst. Beide stehen nicht im Verlauf. Das Winkellineal wird mit dem Entwurf gespeichert, ebenso die Messungen des Maßbands, im Browser und in der .lyl-Datei: Beim Öffnen des Entwurfs sind sie wieder da. Der Augenknopf unter den Maßband-Knöpfen blendet alle Messungen aus und wieder ein; ob sie ausgeblendet sind, wird mitgespeichert, und wer eine Messung setzt, verschiebt oder löscht, sieht sie vorher wieder.
 
+## Der Winkelmesser
+
+Mit {{ui:camera.protractor}} in der Ansichtsleiste misst du Winkel. Daneben öffnet sich eine Knopfreihe, und bis du den Knopf noch einmal anklickst oder [[Esc]] drückst, misst ein Klick in die Ansicht mit dem Winkelmesser. Wie das Maßband rastet er an Ecken und Kanten von Körpern ein; neben den Körpern setzt er einen Punkt auf die Platte.
+
+- {{ui:camera.protractorPoints}}: erst die Ecke des Winkels anklicken, dann auf jedem Schenkel einen Punkt. Schon beim Setzen des letzten Punkts steht der Winkel da; nach dem dritten Klick bleibt er, mit einem Bogen zwischen den Schenkeln. Gemessen wird der Winkel an der Ecke, von 0° bis 180°.
+- {{ui:camera.protractorFaces}}: zwei ebene Flächen anklicken. Ein kurzer blauer Strich auf jeder zeigt, wohin sie schaut, und die Beschriftung nennt beide Winkel, die die Flächen bilden, den kleineren zuerst: eine 45°-Fase gegen die Oberseite ergibt 45° · 135°, zwei Seiten eines Quaders nur 90°. Eine gewölbte Fläche hat keine einzelne Richtung, deshalb verlangt der Winkelmesser eine ebene.
+
+Der nächste Klick nach einem fertigen Winkel beginnt einen neuen, {{ui:camera.protractorClear}} entfernt ihn. Der Winkel folgt den Körpern, wenn sie verschoben oder gedreht werden. Gespeichert wird nichts davon, auch nicht im Verlauf: Legst du den Winkelmesser weg, ist der Winkel fort.
+
 ## Abstände zum Nullpunkt und beim Verschieben
 
 In den Einstellungen unter {{ui:workspace.appearance}} gibt es zwei Schalter für laufende Maße:
@@ -59,7 +68,7 @@ Wenn sie kurz stören, drück [[Q]]: Die Maße und Abstände um die Auswahl vers
 
 ## Spiel prüfen
 
-Teile, die sich nach dem Druck bewegen sollen - ein Flexi-Drache, ein am Stück gedrucktes Scharnier, Kasten und Deckel, eine Achse in ihrer Bohrung - brauchen Abstand zueinander. Ist er zu klein, kleben sie zusammen; überschneiden sie sich, werden sie als ein Stück gedruckt. {{ui:editor.tool.clearance}} neben {{ui:editor.tool.intersectPreview}} prüft das vor dem Druck. Es nimmt die ausgewählten Objekte oder, wenn nichts ausgewählt ist, alle sichtbaren (dieselben, die ein Export nimmt) und prüft jedes Paar:
+Teile, die sich nach dem Druck bewegen sollen - ein Flexi-Drache, ein am Stück gedrucktes Scharnier, Kasten und Deckel, eine Achse in ihrer Bohrung - brauchen Abstand zueinander. Ist er zu klein, kleben sie zusammen; überschneiden sie sich, werden sie als ein Stück gedruckt. {{ui:editor.tool.clearance}} neben {{ui:editor.tool.loftSketches}} prüft das vor dem Druck. Es nimmt die ausgewählten Objekte oder, wenn nichts ausgewählt ist, alle sichtbaren (dieselben, die ein Export nimmt) und prüft jedes Paar:
 
 - **{{ui:clearance.kind.overlap}}** (rot): Die beiden teilen sich ein Volumen. Es erscheint rot in den Körpern, die dafür durchsichtig werden, und die Liste nennt seine Größe.
 - **{{ui:clearance.kind.touching}}** (rot): Sie berühren sich und verschmelzen beim Druck.
@@ -81,7 +90,7 @@ Eine Notiz hält fest, was die Geometrie nicht sagt: „Hier ist eine Schraube 0
 - Setzt du die Notiz **auf einen Körper**, wandert sie mit ihm.
 - Setzt du sie **daneben**, bleibt sie auf der Arbeitsebene ({{ui:note.free}}).
 - {{ui:note.detach}} löst eine angeheftete Notiz vom Körper.
-- {{ui:note.forAi}} macht eine Notiz zu einem Auftrag für einen KI-Agenten an der MCP-Brücke (siehe „KI mit MCP“): Der Agent liest sie mit `layerling_list_notes`, erledigt die Arbeit und antwortet in derselben Notiz, unter deinem Text. Er kann auch eigene Notizen ans Modell setzen, um an einer Stelle etwas zu fragen oder zu melden.
+- {{ui:note.forAi}} macht eine Notiz zu einem Auftrag für einen KI-Agenten an der MCP-Brücke (siehe „KI mit MCP“): Der Agent liest sie mit `layerling_list_notes`, erledigt die Arbeit und antwortet in derselben Notiz, unter deinem Text. Er kann auch eigene Notizen ans Modell setzen, um an einer Stelle etwas zu fragen oder zu melden. Bitte den Agenten, auf deine Notizen aufzupassen, dann wartet er mit `layerling_wait_for_notes` auf sie: Du arbeitest nur noch am Modell, und jeder neue Auftrag wird aufgegriffen, sobald du das Kästchen ankreuzt, ohne Umweg über das Fenster des Agenten.
 - {{ui:editor.tool.group}} nimmt eine angeheftete Notiz mit in die Gruppe; {{ui:editor.tool.ungroup}} gibt sie an das sichtbare Teil darunter weiter, auch an eine Gruppe darin. Solange eine Gruppe mit {{ui:group.edit}} offen ist, wandern ihre Notizen mit dem Teil darunter und kehren mit {{ui:group.done}} zur Gruppe zurück; Abbrechen stellt sie wieder her, wie sie waren.
 - Wird ihr Körper gelöscht oder liegt kein sichtbarer Körper mehr darunter, bleibt die Notiz stehen, wo sie war, auf der Arbeitsebene.
 - Ziehen an der Nadel verschiebt die Notiz. Ein Klick auf die Nadel klappt die Karte zu, nur die kleine Nummer bleibt; ein weiterer Klick klappt sie wieder auf. Ein Klick in den Text bearbeitet ihn.

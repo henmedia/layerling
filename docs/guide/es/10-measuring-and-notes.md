@@ -46,6 +46,15 @@ Con el punto medio, los números verdes cuentan hasta el centro del cuerpo, tamb
 
 Tanto la cinta métrica como la escuadra se quedan donde están mientras dibujas un boceto y vuelves a la vista 3D. Ninguna de las dos entra en el historial. La escuadra se guarda con el diseño, y también las mediciones de la cinta métrica, en el navegador y en el archivo .lyl: vuelven a estar ahí al abrir el diseño. El botón del ojo entre los botones de la cinta métrica oculta todas las mediciones y las vuelve a mostrar; también se guarda si están ocultas, y al añadir, mover o borrar una medición se muestran primero.
 
+## El transportador
+
+Haz clic en {{ui:camera.protractor}} en la barra de vista para medir un ángulo. Junto a él se abre una fila de botones y, hasta que vuelvas a hacer clic en el botón o pulses [[Esc]], cada clic en la vista mide con el transportador. Como la cinta métrica, se ajusta a las esquinas y aristas de los cuerpos; fuera de los cuerpos pone un punto en la placa.
+
+- {{ui:camera.protractorPoints}}: haz clic primero en el vértice del ángulo y luego en un punto de cada lado. Mientras colocas el último punto, el ángulo ya se ve; tras el tercer clic se queda, con un arco entre los lados. Es el ángulo en el vértice, de 0° a 180°.
+- {{ui:camera.protractorFaces}}: haz clic en dos caras planas. Una línea azul corta en cada una muestra hacia dónde mira, y la etiqueta da los dos ángulos que forman las caras, el menor primero: un chaflán de 45° contra la cara superior da 45° · 135°, dos lados de una caja solo 90°. Una cara curva no tiene una sola dirección, así que el transportador pide una plana.
+
+El siguiente clic tras un ángulo terminado empieza uno nuevo, y {{ui:camera.protractorClear}} lo quita. El ángulo sigue a los cuerpos cuando se mueven o giran. No se guarda nada de él ni entra en el historial: desaparece al cerrar el transportador.
+
 ## Distancias al origen y al mover
 
 En los ajustes, en {{ui:workspace.appearance}}, hay dos interruptores para ver medidas en directo:
@@ -59,7 +68,7 @@ Si estorban un momento, pulsa [[Q]]: las medidas y distancias alrededor de la se
 
 ## Comprobar la holgura
 
-Las piezas que deben moverse después de imprimir - un dragón flexi, una bisagra impresa en su sitio, una caja con su tapa, un eje en su agujero - necesitan holgura entre sí. Si es demasiado poca, se pegan; si se solapan, se imprimen como una sola pieza. {{ui:editor.tool.clearance}}, junto a {{ui:editor.tool.intersectPreview}}, lo comprueba antes de imprimir. Toma los objetos seleccionados o, si no hay nada seleccionado, todos los visibles (los mismos que toma una exportación) y comprueba cada pareja:
+Las piezas que deben moverse después de imprimir - un dragón flexi, una bisagra impresa en su sitio, una caja con su tapa, un eje en su agujero - necesitan holgura entre sí. Si es demasiado poca, se pegan; si se solapan, se imprimen como una sola pieza. {{ui:editor.tool.clearance}}, junto a {{ui:editor.tool.loftSketches}}, lo comprueba antes de imprimir. Toma los objetos seleccionados o, si no hay nada seleccionado, todos los visibles (los mismos que toma una exportación) y comprueba cada pareja:
 
 - **{{ui:clearance.kind.overlap}}** (rojo): las dos comparten un volumen. Aparece en rojo dentro de los cuerpos, que se vuelven transparentes, y la lista indica su tamaño.
 - **{{ui:clearance.kind.touching}}** (rojo): se tocan y se funden al imprimir.
@@ -81,7 +90,7 @@ Una nota recoge lo que la geometría no dice: «Este tornillo va 0,3 mm demasiad
 - Si colocas la nota **sobre un cuerpo**, se desplaza con él.
 - Si la colocas **al lado**, se queda en el plano de trabajo ({{ui:note.free}}).
 - {{ui:note.detach}} suelta del cuerpo una nota unida a él.
-- {{ui:note.forAi}} convierte una nota en un encargo para un agente de IA en el puente MCP (véase «IA con MCP»): el agente la lee con `layerling_list_notes`, hace el trabajo y responde en la misma nota, debajo de tu texto. También puede poner notas propias en el modelo, para preguntar o informar de algo en un punto.
+- {{ui:note.forAi}} convierte una nota en un encargo para un agente de IA en el puente MCP (véase «IA con MCP»): el agente la lee con `layerling_list_notes`, hace el trabajo y responde en la misma nota, debajo de tu texto. También puede poner notas propias en el modelo, para preguntar o informar de algo en un punto. Pide al agente que vigile tus notas y las esperará con `layerling_wait_for_notes`: así solo trabajas en el modelo, y cada petición nueva se recoge en cuanto marcas la casilla, sin volver a la ventana del agente.
 - {{ui:editor.tool.group}} incluye en el grupo una nota unida; {{ui:editor.tool.ungroup}} se la pasa a la pieza visible que tenga debajo, aunque sea un grupo interior. Mientras un grupo está abierto con {{ui:group.edit}}, sus notas se mueven con la pieza que tienen debajo y vuelven al grupo con {{ui:group.done}}; si cancelas, vuelven a quedar como estaban.
 - Si se elimina su cuerpo, o ya no queda ningún cuerpo visible debajo, la nota se queda donde estaba, sobre el plano de trabajo.
 - Arrastrar la chincheta mueve la nota. Un clic en la chincheta pliega la tarjeta y solo queda el número pequeño; otro clic la vuelve a abrir. Un clic en el texto lo edita.

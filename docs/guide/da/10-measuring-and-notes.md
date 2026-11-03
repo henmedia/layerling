@@ -50,6 +50,15 @@ Med midtpunktet tæller de grønne tal til formens midte, også i højden. Såda
 
 Både målebåndet og vinkelmåleren bliver hvor de er mens du skitser og kommer tilbage til 3D-visningen. Ingen af dem er i historikken. Vinkelmåleren gemmes med designet, og det samme gør målebåndets målinger, i browseren og i .lyl-filen: de er der igen, når du åbner designet. Øjeknappen blandt målebåndets knapper skjuler alle målinger og viser dem igen; om de er skjult, gemmes også, og hvis du sætter, flytter eller sletter en måling, vises de først.
 
+## Gradskiven
+
+Klik på {{ui:camera.protractor}} i visningsbjælken for at måle en vinkel. Ved siden af åbner en række knapper, og indtil du klikker på knappen igen eller trykker [[Esc]], måler et klik i visningen med gradskiven. Ligesom målebåndet fanger den hjørner og kanter på former; ved siden af formerne sætter den et punkt på pladen.
+
+- {{ui:camera.protractorPoints}}: klik først på vinklens hjørne, derefter på et punkt på hvert ben. Mens du sætter det sidste punkt, vises vinklen allerede; efter det tredje klik bliver den stående med en bue mellem benene. Det er vinklen i hjørnet, fra 0° til 180°.
+- {{ui:camera.protractorFaces}}: klik på to plane flader. En kort blå streg på hver viser, hvilken vej fladen vender, og mærkaten angiver begge vinkler, fladerne danner, den mindste først: en 45°-affasning mod toppen giver 45° · 135°, to sider af en kasse kun 90°. En krum flade har ikke én retning, så gradskiven beder om en plan flade.
+
+Det næste klik efter en færdig vinkel starter en ny, og {{ui:camera.protractorClear}} fjerner den. Vinklen følger formerne, når de flyttes eller drejes. Intet af den gemmes eller kommer i historikken: den er væk, når du lægger gradskiven fra dig.
+
 ## Afstande til nulpunktet og under flytning
 
 Under {{ui:workspace.appearance}} i indstillingerne er der to kontakter for levende dimensioner:
@@ -63,7 +72,7 @@ Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring mark
 
 ## Tjek spillerum
 
-Dele, der skal kunne bevæge sig efter print - en flexi-drage, et hængsel printet i ét stykke, en æske med låg, en aksel i sit hul - skal have afstand til hinanden. Er den for lille, hænger de sammen; overlapper de, printes de som ét stykke. {{ui:editor.tool.clearance}} ved siden af {{ui:editor.tool.intersectPreview}} tjekker det, før du printer. Det tager de valgte objekter eller, når intet er valgt, alle synlige (de samme som en eksport tager) og tjekker hvert par:
+Dele, der skal kunne bevæge sig efter print - en flexi-drage, et hængsel printet i ét stykke, en æske med låg, en aksel i sit hul - skal have afstand til hinanden. Er den for lille, hænger de sammen; overlapper de, printes de som ét stykke. {{ui:editor.tool.clearance}} ved siden af {{ui:editor.tool.loftSketches}} tjekker det, før du printer. Det tager de valgte objekter eller, når intet er valgt, alle synlige (de samme som en eksport tager) og tjekker hvert par:
 
 - **{{ui:clearance.kind.overlap}}** (rød): de to deler et rumfang. Det vises rødt inde i legemerne, som bliver gennemsigtige, og listen angiver dets størrelse.
 - **{{ui:clearance.kind.touching}}** (rød): de rører hinanden og smelter sammen ved print.
@@ -85,7 +94,7 @@ En note registrerer hvad geometrien ikke siger: "Denne skrue er 0,3 mm for stram
 - Hvis du placerer noten **på en form**, følger den med den.
 - Hvis du placerer den **ved siden af**, bliver den på arbejdsplanet ({{ui:note.free}}).
 - {{ui:note.detach}} frigør en vedhæftet note fra formen.
-- {{ui:note.forAi}} gør en note til en opgave til en AI-agent på MCP-broen (se „AI med MCP“): Agenten læser den med `layerling_list_notes`, udfører arbejdet og svarer i samme note, under din tekst. Den kan også sætte egne noter på modellen for at spørge om eller melde noget et bestemt sted.
+- {{ui:note.forAi}} gør en note til en opgave til en AI-agent på MCP-broen (se „AI med MCP“): Agenten læser den med `layerling_list_notes`, udfører arbejdet og svarer i samme note, under din tekst. Den kan også sætte egne noter på modellen for at spørge om eller melde noget et bestemt sted. Bed agenten holde øje med dine noter, så venter den på dem med `layerling_wait_for_notes`: du arbejder så kun på modellen, og hver ny opgave bliver taget op, så snart du sætter fluebenet, uden at gå tilbage til agentens vindue.
 - {{ui:editor.tool.group}} tager en vedhæftet note med ind i gruppen; {{ui:editor.tool.ungroup}} giver den videre til den synlige del under den, også en gruppe indeni. Mens en gruppe er åben med {{ui:group.edit}}, følger dens noter med den del, de sidder på, og går tilbage til gruppen med {{ui:group.done}}; annullering sætter dem tilbage, som de var.
 - Hvis dens form slettes, eller der ikke længere er en synlig form under den, bliver noten stående, hvor den var, på arbejdsplanet.
 - Træk i nålen flytter noten. Et klik på nålen folder kortet sammen, så kun det lille tal bliver stående, og et klik mere åbner det igen. Et klik i teksten redigerer den.

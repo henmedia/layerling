@@ -44,6 +44,15 @@ Met het middelpunt tellen de groene getallen tot het midden van het lichaam, ook
 
 Zowel het meetlint als de winkelhaak blijven staan terwijl je schetst en terugkeert naar de 3D-weergave. Geen van beide komt in de geschiedenis. De winkelhaak wordt met het ontwerp opgeslagen, en de metingen van het meetlint ook, in de browser en in het .lyl-bestand: als je het ontwerp opent, zijn ze er weer. De oogknop tussen de knoppen van het meetlint verbergt alle metingen en toont ze weer; of ze verborgen zijn, wordt ook bewaard, en wie een meting zet, verplaatst of verwijdert, ziet ze eerst weer.
 
+## De gradenboog
+
+Met {{ui:camera.protractor}} in de weergavebalk meet je hoeken. Ernaast gaat een rij knoppen open, en tot je de knop opnieuw aanklikt of op [[Esc]] drukt, meet een klik in de weergave met de gradenboog. Net als het meetlint klikt hij vast op hoeken en randen van lichamen; naast de lichamen zet hij een punt op de plaat.
+
+- {{ui:camera.protractorPoints}}: klik eerst op het hoekpunt van de hoek, dan op een punt op elk been. Terwijl je het laatste punt plaatst, staat de hoek er al; na de derde klik blijft hij staan, met een boog tussen de benen. Het is de hoek in het hoekpunt, van 0° tot 180°.
+- {{ui:camera.protractorFaces}}: klik op twee platte vlakken. Een kort blauw streepje op elk vlak toont welke kant het op kijkt, en het label geeft beide hoeken die de vlakken maken, de kleinste eerst: een afschuining van 45° tegen de bovenkant geeft 45° · 135°, twee zijden van een blok alleen 90°. Een gebogen vlak heeft geen enkele richting, dus vraagt de gradenboog om een plat vlak.
+
+De volgende klik na een afgemaakte hoek begint een nieuwe, en {{ui:camera.protractorClear}} verwijdert hem. De hoek volgt de lichamen als ze verschuiven of draaien. Niets ervan wordt opgeslagen of komt in de geschiedenis: hij is weg zodra je de gradenboog wegzet.
+
 ## Afstanden tot de oorsprong en tijdens het verplaatsen
 
 In de instellingen onder {{ui:workspace.appearance}} staan twee schakelaars voor live maten:
@@ -57,7 +66,7 @@ Zitten ze even in de weg, druk dan op [[Q]]: de maten en afstanden rond de selec
 
 ## Speling controleren
 
-Onderdelen die na het printen moeten bewegen - een flexi-draak, een in één keer geprint scharnier, een doos met deksel, een as in zijn boring - hebben ruimte tussen elkaar nodig. Te weinig en ze plakken aan elkaar; overlappen ze, dan worden ze als één stuk geprint. {{ui:editor.tool.clearance}}, naast {{ui:editor.tool.intersectPreview}}, controleert dat vóór het printen. Het neemt de geselecteerde objecten, of alle zichtbare als niets is geselecteerd (dezelfde als bij een export), en controleert elk paar:
+Onderdelen die na het printen moeten bewegen - een flexi-draak, een in één keer geprint scharnier, een doos met deksel, een as in zijn boring - hebben ruimte tussen elkaar nodig. Te weinig en ze plakken aan elkaar; overlappen ze, dan worden ze als één stuk geprint. {{ui:editor.tool.clearance}}, naast {{ui:editor.tool.loftSketches}}, controleert dat vóór het printen. Het neemt de geselecteerde objecten, of alle zichtbare als niets is geselecteerd (dezelfde als bij een export), en controleert elk paar:
 
 - **{{ui:clearance.kind.overlap}}** (rood): de twee delen een volume. Het verschijnt rood in de lichamen, die doorzichtig worden, en de lijst noemt de grootte.
 - **{{ui:clearance.kind.touching}}** (rood): ze raken elkaar en smelten samen bij het printen.
@@ -79,7 +88,7 @@ Een notitie legt vast wat de geometrie niet zegt: "Deze schroef zit 0,3 mm te kr
 - Plaats je de notitie **op een lichaam**, dan reist ze mee.
 - Plaats je haar **ernaast**, dan blijft ze op het werkvlak ({{ui:note.free}}).
 - {{ui:note.detach}} maakt een vastgemaakte notitie los van het lichaam.
-- {{ui:note.forAi}} maakt van een notitie een verzoek aan een AI-agent op de MCP-brug (zie „AI met MCP”): de agent leest haar met `layerling_list_notes`, doet het werk en antwoordt in dezelfde notitie, onder jouw tekst. Hij kan ook eigen notities op het model zetten, om op een plek iets te vragen of te melden.
+- {{ui:note.forAi}} maakt van een notitie een verzoek aan een AI-agent op de MCP-brug (zie „AI met MCP”): de agent leest haar met `layerling_list_notes`, doet het werk en antwoordt in dezelfde notitie, onder jouw tekst. Hij kan ook eigen notities op het model zetten, om op een plek iets te vragen of te melden. Vraag de agent je notities in de gaten te houden, dan wacht hij erop met `layerling_wait_for_notes`: je werkt dan alleen nog aan het model, en elk nieuw verzoek wordt opgepakt zodra je het vakje aanvinkt, zonder terug te gaan naar het venster van de agent.
 - {{ui:editor.tool.group}} neemt een vastgemaakte notitie mee in de groep; {{ui:editor.tool.ungroup}} geeft haar door aan het zichtbare onderdeel eronder, ook aan een groep daarbinnen. Zolang een groep met {{ui:group.edit}} open is, bewegen de notities van die groep mee met het onderdeel eronder en gaan ze met {{ui:group.done}} terug naar de groep; annuleren zet ze terug zoals ze waren.
 - Wordt haar lichaam verwijderd, of ligt er geen zichtbaar lichaam meer onder, dan blijft de notitie staan waar ze stond, op het werkvlak.
 - Slepen aan de speld verplaatst de notitie. Een klik op de speld klapt de kaart in, alleen het kleine nummer blijft staan; nog een klik klapt hem weer open. Een klik in de tekst bewerkt hem.
