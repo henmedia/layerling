@@ -1251,6 +1251,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.edgePreviewReady": "Voorbeeld van randbewerking gereed",
   "status.edgeCornerEdgeAdded": "Eén korte rand op een hoek is meegenomen: zonder die rand kan deze hoek niet bewerkt worden.",
   "status.edgeCornerEdgesAdded": "{count} korte randen op hoeken zijn meegenomen: zonder die randen kunnen deze hoeken niet bewerkt worden.",
+  "status.edgeInnerCornersRounded": "Binnenhoeken eerst afgerond ({count} met {size}): anders heeft de afronding geen ruimte in de scherpe hoeken waar de randen samenkomen.",
+  "status.edgeInnerCornersChamfered": "Binnenhoeken eerst afgeschuind ({count} met {size}): anders heeft de afschuining geen ruimte in de scherpe hoeken waar de randen samenkomen.",
   "status.finishBeforeRedo": "Rond het huidige slepen of transformeren af voordat je opnieuw uitvoert",
   "status.finishBeforeRotate": "Rond het huidige slepen of transformeren af voordat je draait",
   "status.finishBeforeSave": "Rond het huidige slepen of transformeren af voordat je het ontwerpbestand opslaat",

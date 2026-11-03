@@ -1248,6 +1248,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.edgePreviewReady": "Предпросмотр обработки кромки готов",
   "status.edgeCornerEdgeAdded": "Добавлена короткая кромка в углу: без неё этот угол обработать нельзя.",
   "status.edgeCornerEdgesAdded": "Добавлены короткие кромки в углах ({count}): без них эти углы обработать нельзя.",
+  "status.edgeInnerCornersRounded": "Сначала скруглены внутренние углы ({count}, {size}): иначе скруглению не хватает места в острых углах, где сходятся кромки.",
+  "status.edgeInnerCornersChamfered": "Сначала со внутренних углов снята фаска ({count}, {size}): иначе фаске не хватает места в острых углах, где сходятся кромки.",
   "status.finishBeforeRedo": "Завершите текущее перетаскивание или преобразование перед возвратом",
   "status.finishBeforeRotate": "Завершите текущее перетаскивание или преобразование перед поворотом",
   "status.finishBeforeSave": "Завершите текущее перетаскивание или преобразование перед сохранением файла проекта",

@@ -300,6 +300,12 @@ type OpenGroupOutcome = { ok: boolean; message: string; partIds?: string[]; grou
 type WithoutRequestId<T> = T extends unknown ? Omit<T, "requestId"> : never;
 type CadModifierWorkerPayload = WithoutRequestId<CadModifierWorkerRequest>;
 type CadPreviewPayload = Extract<CadModifierWorkerPayload, { type: "preview" }>;
+/** What the status line says when the sharp inner corners at the picked edges were treated first (lib/cadInnerCorners.ts). */
+function innerCornersNotice(corners: { count: number; amount: number }, kind: CadModifierKind | undefined, workspace: WorkplaneWorkspaceSettings) {
+  const size = `${formatLengthMm(corners.amount, workspace.accuracy)} ${lengthDisplayUnit(workspace).label}`;
+  return t(kind === "chamfer" ? "status.edgeInnerCornersChamfered" : "status.edgeInnerCornersRounded", { count: corners.count, size });
+}
+
 type EdgeModifierSession = {
   kind: CadModifierKind;
   edges: CadModifierEdge[];
@@ -3511,7 +3517,10 @@ export function LayerlingEditor({
         });
         // Ein neuerer Wert kann waehrend der Rechnung eingetroffen sein - der geht jetzt raus.
         const nachgeschoben = cadPreviewQueueRef.current.settle(message.requestId);
-        if (preview && cornerEdgeIds.length) setNotice(cornerEdgeIds.length === 1 ? t("status.edgeCornerEdgeAdded") : t("status.edgeCornerEdgesAdded", { count: cornerEdgeIds.length }), true);
+        // The sharp inner corners the worker rounded or chamfered first so the picked edges went through.
+        const innerCorners = preview ? message.innerCorners : undefined;
+        if (preview && innerCorners) setNotice(innerCornersNotice(innerCorners, edgeModifierRef.current?.kind, workspaceSettingsRef.current), true);
+        else if (preview && cornerEdgeIds.length) setNotice(cornerEdgeIds.length === 1 ? t("status.edgeCornerEdgeAdded") : t("status.edgeCornerEdgesAdded", { count: cornerEdgeIds.length }), true);
         else if (preview && nachgeschoben.status !== "sent") setNotice(t("status.edgePreviewReady"));
         return;
       }
@@ -7632,6 +7641,8 @@ export function LayerlingEditor({
       object: mcpShapeSummary(modifiedShape),
       selectedEdgeIds,
       ...(cornerEdgeIds.length ? { cornerEdgeIds } : {}),
+      // The sharp inner corners at the picked edges' ends, rounded or chamfered first at this size so they went through.
+      ...(previewResponse.innerCorners ? { innerCorners: previewResponse.innerCorners } : {}),
       selectableEdgeIds: selectableIds,
     };
   }, [commitShapes, invalidateCadModifierSession, prepareCadModifierForMcp, postCadModifierRequestAsync]);

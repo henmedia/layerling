@@ -1213,6 +1213,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.edgePreviewReady": "Podgląd obróbki krawędzi gotowy",
   "status.edgeCornerEdgeAdded": "Dołączono krótką krawędź w narożniku: bez niej tego narożnika nie da się obrobić.",
   "status.edgeCornerEdgesAdded": "Dołączono krótkie krawędzie w narożnikach ({count}): bez nich tych narożników nie da się obrobić.",
+  "status.edgeInnerCornersRounded": "Najpierw zaokrąglono narożniki wewnętrzne ({count}, {size}): inaczej zaokrąglenie nie ma miejsca w ostrych narożnikach, gdzie spotykają się krawędzie.",
+  "status.edgeInnerCornersChamfered": "Najpierw sfazowano narożniki wewnętrzne ({count}, {size}): inaczej fazowanie nie ma miejsca w ostrych narożnikach, gdzie spotykają się krawędzie.",
   "status.finishBeforeRedo": "Zakończ bieżące przeciąganie lub przekształcenie przed ponowieniem",
   "status.finishBeforeRotate": "Zakończ bieżące przeciąganie lub przekształcenie przed obracaniem",
   "status.finishBeforeSave": "Zakończ bieżące przeciąganie lub przekształcenie przed zapisem pliku projektu",

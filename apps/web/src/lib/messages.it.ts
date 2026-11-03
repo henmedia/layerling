@@ -1243,6 +1243,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.edgePreviewReady": "Anteprima della lavorazione degli spigoli pronta",
   "status.edgeCornerEdgeAdded": "È stato aggiunto uno spigolo corto in un angolo: senza di esso quell'angolo non si può lavorare.",
   "status.edgeCornerEdgesAdded": "Sono stati aggiunti {count} spigoli corti negli angoli: senza di essi quegli angoli non si possono lavorare.",
+  "status.edgeInnerCornersRounded": "Prima sono stati raccordati gli angoli interni ({count} a {size}): altrimenti il raccordo non ha spazio negli angoli acuti dove si incontrano gli spigoli.",
+  "status.edgeInnerCornersChamfered": "Prima sono stati smussati gli angoli interni ({count} a {size}): altrimenti lo smusso non ha spazio negli angoli acuti dove si incontrano gli spigoli.",
   "status.finishBeforeRedo": "Termina il trascinamento o la trasformazione corrente prima di ripetere",
   "status.finishBeforeRotate": "Termina il trascinamento o la trasformazione corrente prima di ruotare",
   "status.finishBeforeSave": "Termina il trascinamento o la trasformazione corrente prima di salvare il file del progetto",

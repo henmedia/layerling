@@ -2,7 +2,8 @@
 
 import { cadHasSolidBody } from "@/lib/cadSolidBody";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
-import { cornerEdgeCandidates } from "@/lib/cadCornerEdges";
+import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
+import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
@@ -961,6 +962,32 @@ function treatWithCornerEdges(cad: OcctKernel, solid: ShapeHandle, entries: { id
   return null;
 }
 
+const INNER_CORNER_BUDGET_MS = 4000;
+
+function polylineLength(points: number[]) {
+  let length = 0;
+  for (let index = 3; index + 2 < points.length; index += 3) {
+    length += Math.hypot(points[index] - points[index - 3], points[index + 1] - points[index - 2], points[index + 2] - points[index - 1]);
+  }
+  return length;
+}
+
+// A refused chamfer or fillet tried once more past the sharp inner corners at the ends of the picked edges (the notches
+// where the discs of a cloud meet): the corners taken along, or rounded first a little (lib/cadInnerCorners.ts).
+function treatPastInnerCorners(cad: OcctKernel, solid: ShapeHandle, entries: { id: number; edge: ShapeHandle }[], request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
+  if (request.kind !== "chamfer" && (request.kind !== "fillet" || request.endAmount !== undefined || request.concave)) return null;
+  const deadline = performance.now() + INNER_CORNER_BUDGET_MS;
+  const touchingIds = edgesTouchingEnds(edgeInfos, entries.map((entry) => entry.id));
+  // An edge shorter than the size, a sliver where one disc barely shows between two others, leaves the kernel nothing
+  // to hold on to: forced past it, it made faces that crossed or crashed outright. Then the refusal stands.
+  if ([...entries.map((entry) => entry.id), ...touchingIds].some((id) => polylineLength(edgeInfos[id]?.points ?? []) < request.amount)) return null;
+  const touching = touchingIds.map((id) => edgeHandles[id]).filter((edge): edge is ShapeHandle => edge !== undefined);
+  const corners = innerCornerEdges(cad, solid, touching, request.amount);
+  if (corners.length === 0) return null;
+  const result = treatAfterInnerCorners(cad, solid, entries.map((entry) => entry.edge), corners, request.amount, (body, edges, amount) => treatEdges(cad, body, edges, { ...request, amount }), deadline, isFatalKernelFault);
+  return result ? { ...result, count: corners.length } : null;
+}
+
 // Which solid of the body each edge or face belongs to, found by hash and isSame.
 function componentOwners(cad: OcctKernel, handles: ShapeHandle[], type: "edge" | "face", unmappedMessage: string) {
   // One solid owns everything there is.
@@ -1036,6 +1063,8 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
   const componentResults: ShapeHandle[] = [];
   // Short corner edges a second try took along so the chamfer or fillet went through (#1178).
   const cornerEdgeIds: number[] = [];
+  // Sharp inner corners rounded or chamfered first so the picked edges went through, and the size they got.
+  const innerCorners = { count: 0, amount: Infinity };
   let result: ShapeHandle | null = null;
   try {
     // The lid (#1154) is a new body made from the whole one, not a change to each of its solids.
@@ -1064,12 +1093,19 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
         } catch (error) {
           if (isFatalKernelFault(error)) throw error;
           const retried = treatWithCornerEdges(activeCad, solid, componentEntries, request);
-          if (!retried) {
+          const pastCorners = retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
+          if (!retried && !pastCorners) {
             const rawMessage = error instanceof Error ? error.message : String(error ?? "");
             throw new EdgeTreatmentError(rawMessage, culpritEdgeIds(activeCad, solid, componentEntries, request, error));
           }
-          component = retried.component;
-          cornerEdgeIds.push(...retried.edgeIds);
+          if (retried) {
+            component = retried.component;
+            cornerEdgeIds.push(...retried.edgeIds);
+          } else {
+            component = pastCorners!.component;
+            innerCorners.count += pastCorners!.count;
+            innerCorners.amount = Math.min(innerCorners.amount, pastCorners!.cornerAmount);
+          }
         }
       }
       if (request.kind !== "shell" && componentEdges.length > 0 && !cadHasSolidBody(activeCad, component)) {
@@ -1126,7 +1162,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       };
     });
     post(
-      { type: "preview", requestId: request.requestId, positions: mesh.positions, normals: mesh.normals, indices: mesh.indices, triangleCount: mesh.triangleCount, brep, displayEdges, components, deflection, ...(cornerEdgeIds.length ? { cornerEdgeIds } : {}) },
+      { type: "preview", requestId: request.requestId, positions: mesh.positions, normals: mesh.normals, indices: mesh.indices, triangleCount: mesh.triangleCount, brep, displayEdges, components, deflection, ...(cornerEdgeIds.length ? { cornerEdgeIds } : {}), ...(innerCorners.count ? { innerCorners: { count: innerCorners.count, amount: innerCorners.amount } } : {}) },
       [
         mesh.positions.buffer,
         mesh.normals.buffer,

@@ -1252,6 +1252,8 @@ export const MESSAGES_EN = {
   "status.edgePreviewReady": "Edge treatment preview ready",
   "status.edgeCornerEdgeAdded": "One short edge at a corner was taken along: without it the kernel cannot treat that corner.",
   "status.edgeCornerEdgesAdded": "{count} short edges at corners were taken along: without them the kernel cannot treat those corners.",
+  "status.edgeInnerCornersRounded": "Inner corners rounded first ({count} at {size}): the sharp corners where the edges meet leave the fillet no room otherwise.",
+  "status.edgeInnerCornersChamfered": "Inner corners chamfered first ({count} at {size}): the sharp corners where the edges meet leave the chamfer no room otherwise.",
   "status.finishBeforeRedo": "Finish the current drag or transform before redoing",
   "status.finishBeforeRotate": "Finish the current drag or transform before rotating",
   "status.finishBeforeSave": "Finish the current drag or transform before saving the design file",

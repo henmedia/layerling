@@ -1254,6 +1254,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.edgePreviewReady": "Vista previa del tratamiento de aristas lista",
   "status.edgeCornerEdgeAdded": "Se ha incluido una arista corta en una esquina: sin ella, esa esquina no se puede tratar.",
   "status.edgeCornerEdgesAdded": "Se han incluido {count} aristas cortas en esquinas: sin ellas, esas esquinas no se pueden tratar.",
+  "status.edgeInnerCornersRounded": "Primero se redondearon las esquinas interiores ({count} a {size}): si no, el redondeo no tiene sitio en las esquinas agudas donde se juntan las aristas.",
+  "status.edgeInnerCornersChamfered": "Primero se achaflanaron las esquinas interiores ({count} a {size}): si no, el chaflán no tiene sitio en las esquinas agudas donde se juntan las aristas.",
   "status.finishBeforeRedo": "Termina de arrastrar o transformar antes de rehacer",
   "status.finishBeforeRotate": "Termina de arrastrar o transformar antes de girar",
   "status.finishBeforeSave": "Termina de arrastrar o transformar antes de guardar el archivo del diseño",

@@ -1039,6 +1039,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.edgePreviewReady": "Predogled obdelave robov je pripravljen",
   "status.edgeCornerEdgeAdded": "Dodan je kratek rob na vogalu: brez njega tega vogala ni mogoče obdelati.",
   "status.edgeCornerEdgesAdded": "Dodani so kratki robovi na vogalih ({count}): brez njih teh vogalov ni mogoče obdelati.",
+  "status.edgeInnerCornersRounded": "Najprej so bili zaokroženi notranji vogali ({count}, {size}): sicer zaokrožitev v ostrih vogalih, kjer se robovi stikajo, nima prostora.",
+  "status.edgeInnerCornersChamfered": "Najprej so bili posneti notranji vogali ({count}, {size}): sicer posnetje v ostrih vogalih, kjer se robovi stikajo, nima prostora.",
   "status.finishBeforeRedo": "Pred uveljavitvijo dokončaj trenutno vleko ali preoblikovanje",
   "status.finishBeforeRotate": "Pred vrtenjem dokončaj trenutno vleko ali preoblikovanje",
   "status.finishBeforeSave": "Pred shranjevanjem projekta dokončaj trenutno vleko ali preoblikovanje",
