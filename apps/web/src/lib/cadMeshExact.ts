@@ -50,11 +50,15 @@ export type ExactMeshOptions = {
 export function exactSolidFromMesh(cad: OcctKernel, positions: ArrayLike<number>, indices?: ArrayLike<number>, options: ExactMeshOptions = {}): ExactMeshResult | null {
   const welded = weldMesh(positions, indices);
   if (welded.triangles.length > (options.maxTriangles ?? 200_000)) return null;
-  let seg = segmentMesh(welded, { tolerance: options.tolerance });
+  let seg = segmentMesh(welded, { tolerance: options.tolerance, debug: options.debug });
   if (!seg) return null;
   const meshVolume = signedVolume(seg);
   const meshArea = seg.areas.reduce((s, a) => s + a, 0);
-  for (let attempt = 0; attempt < 4; attempt += 1) {
+  // Mostly freeform (a figure, a sculpted shape): no surfaces to find, and thousands of facets are what the mesh is
+  // already. One try for what there is; no second.
+  const first = summarizeSegmentation(seg);
+  const freeform = first.facetArea > first.area * 0.5;
+  for (let attempt = 0; attempt < (freeform ? 1 : 4); attempt += 1) {
     // A curved face with a hole in it (a bore crossing another) cannot be built in one: cut it through each hole.
     const forced: ForcedCuts = new Map();
     let topology = buildTopology(seg, forced);
@@ -88,9 +92,12 @@ export function exactSolidFromMesh(cad: OcctKernel, positions: ArrayLike<number>
       const summary = summarizeSegmentation(seg);
       return { solid: built.solid, report: { ...summary, faces: cad.subShapeCount(built.solid, "face"), triangles: welded.triangles.length } };
     }
-    if (built.failedRegions.size === 0) return null;
-    options.debug?.(`demoting regions ${[...built.failedRegions].join(",")}`);
-    seg = demote(seg, built.failedRegions);
+    if (freeform) return null;
+    // Nothing in particular failed, but the whole did not close: last, every curved face given up for facets.
+    const failed = built.failedRegions.size > 0 ? built.failedRegions : new Set(seg.regions.filter((r) => !r.facet && r.surface.kind !== "plane").map((r) => r.id));
+    if (failed.size === 0) return null;
+    options.debug?.(`demoting regions ${[...failed].join(",")}`);
+    seg = demote(seg, failed);
   }
   return null;
 }

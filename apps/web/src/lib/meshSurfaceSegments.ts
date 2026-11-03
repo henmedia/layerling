@@ -55,7 +55,12 @@ export type MeshSegmentation = {
   tolerance: number;
 };
 
-export type SegmentationOptions = { tolerance?: number };
+export type SegmentationOptions = {
+  tolerance?: number;
+  debug?: (message: string) => void;
+  /** Stop looking for curved faces after this long (the rest become facets); default no limit. */
+  budgetMs?: number;
+};
 
 /** Corners at the same place (to a tenth of a micrometre) become one point. */
 export function weldMesh(positions: ArrayLike<number>, indices?: ArrayLike<number>): WeldedMesh {
@@ -269,11 +274,13 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
   const fitKind = (kind: (typeof KINDS)[number], tris: number[]): AnalyticSurface | null => {
     const { points, normals: vn } = cornersWithNormals(tris);
     if (points.length < 6) return null;
+    // A closed-form fit far off is not refined: on a freeform patch most kinds are, and refining them all is slow.
+    const fit = { gate: Math.max(tolerance * 50, diagonal * 2e-3), iterations: 15 };
     try {
-      if (kind === "cylinder") return fitCylinder(points, vn);
-      if (kind === "cone") return fitCone(points, vn);
-      if (kind === "sphere") return fitSphere(points);
-      return fitTorus(points, vn);
+      if (kind === "cylinder") return fitCylinder(points, vn, fit);
+      if (kind === "cone") return fitCone(points, vn, fit);
+      if (kind === "sphere") return fitSphere(points, fit);
+      return fitTorus(points, vn, fit);
     } catch {
       return null;
     }
@@ -377,31 +384,40 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     for (let i = 1; i < sorted.length; i += 1) gap = Math.max(gap, sorted[i] - sorted[i - 1]);
     return 2 * Math.PI - gap;
   };
-  const bendsEnough = (s: AnalyticSurface, tris: number[]) => {
+  const bendsEnough = (given: AnalyticSurface, tris: number[]) => {
     const pts = cornersOf(tris);
+    // Judged on the surface fitted to all its corners, not the one it grew from.
+    let s = given;
+    try {
+      const refined = refine(given, pts, 20);
+      if (maxDistance(refined, pts) <= maxDistance(given, pts)) s = refined;
+    } catch {
+      s = given;
+    }
     const area = tris.reduce((sum, t) => sum + areas[t], 0);
-    if (area < totalArea * 2e-4) return false;
+    if (area < totalArea * 2e-4) return null;
+    if (s.kind === "torus" && s.major < s.minor * 1.05) return null;
     // Cylinders rarely fit where they should not, tori and spheres on any small piece of a freeform surface.
     const MIN = s.kind === "cylinder" ? 3 * DEG : s.kind === "cone" ? 8 * DEG : 12 * DEG;
     if (s.kind === "sphere") {
       const dirs = pts.map((p) => unit(sub(p, s.center)));
       const mean = unit(dirs.reduce((m, d) => add(m, d), [0, 0, 0] as V3));
-      return Math.max(...dirs.map((d) => Math.acos(Math.max(-1, Math.min(1, dot(d, mean)))))) >= MIN / 2;
+      return Math.max(...dirs.map((d) => Math.acos(Math.max(-1, Math.min(1, dot(d, mean)))))) >= MIN / 2 ? s : null;
     }
-    if (s.kind === "plane") return true;
+    if (s.kind === "plane") return s;
     const origin = s.kind === "cone" ? s.apex : s.kind === "cylinder" ? s.origin : s.center;
     const [u, v] = perpendicularFrameOf(s.axis);
     const theta = pts.map((p) => { const d = sub(p, origin); return Math.atan2(dot(d, v), dot(d, u)); });
-    if (spanOf(theta) < MIN) return false;
+    if (spanOf(theta) < MIN) return null;
     if (s.kind === "torus") {
       const phi = pts.map((p) => {
         const d = sub(p, s.center);
         const h = dot(d, s.axis);
         return Math.atan2(h, norm(sub(d, scale(s.axis, h))) - s.major);
       });
-      if (spanOf(phi) < MIN) return false;
+      if (spanOf(phi) < MIN) return null;
     }
-    return true;
+    return s;
   };
   const attempted = new Set<number>();
   const remaining = [...Array(T).keys()].filter(isFree).sort((a, b) => interiorScore(b) - interiorScore(a));
@@ -410,17 +426,31 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     for (let k = 0; k < 3; k += 1) if (crease(t, k) < SMOOTH_ANGLE) score += 1;
     return score * 1e6 + areas[t];
   }
+  const startedAt = Date.now();
   for (const seed of remaining) {
+    if (options.budgetMs !== undefined && Date.now() - startedAt > options.budgetMs) break;
     if (!isFree(seed)) continue;
     if (attempted.has(seed)) continue;
     // Every kind that fits a patch round the seed (two patch shapes, two sizes) grows a little on trial; the one that
     // gets furthest is the face. A wrong kind that fits a narrow band (a cone on a ring of a sphere, a cylinder on a
     // ring of a torus) stops at the band's edge, the right one goes on.
     const candidates: Candidate[] = [];
-    for (const alongLongEdges of [true, false]) for (const size of [24, 10]) {
-      const patch = patchAround(seed, size, alongLongEdges);
-      if (patch.length >= 3) candidates.push(...fitCurved(seed, patch));
+    for (const size of [24, 10]) {
+      for (const alongLongEdges of [true, false]) {
+        const patch = patchAround(seed, size, alongLongEdges);
+        if (patch.length >= 3) candidates.push(...fitCurved(seed, patch));
+      }
+      // The smaller patches only where the larger ones found nothing (a narrow face between two others).
+      if (candidates.length > 0) break;
     }
+    // One of each kind (the one standing off least): the same cylinder found from four patches is one trial.
+    const byKind = new Map<string, Candidate>();
+    for (const c of candidates) {
+      const kept = byKind.get(c.surface.kind);
+      if (!kept || c.chord < kept.chord || (c.chord === kept.chord && c.tris.length > kept.tris.length)) byKind.set(c.surface.kind, c);
+    }
+    candidates.length = 0;
+    candidates.push(...byKind.values());
     if (candidates.length === 0) {
       // Nothing fits here: do not seed again from the triangles right round it.
       for (const t of breadthPatch(seed, 6)) attempted.add(t);
@@ -444,8 +474,10 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
     const grown = growCurved(found.tris, found);
     // A curved face needs a few triangles and must really bend: round its axis (and round a torus's tube) at least a
     // little, a sphere over a small cap. A wrong surface that fits a small patch of a freeform one does not.
-    if (grown.tris.length < 4 || !bendsEnough(grown.surface, grown.tris)) continue;
-    addRegion(grown.surface, grown.tris, false);
+    if (grown.tris.length < 4) continue;
+    const accepted = bendsEnough(grown.surface, grown.tris);
+    if (!accepted) continue;
+    addRegion(accepted, grown.tris, false);
   }
 
   // 3. What is left: flat pieces, a triangle or a few coplanar ones each.

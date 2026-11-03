@@ -213,7 +213,18 @@ export function fitCircle3D(points: V3[]): { center: V3; normal: V3; radius: num
   return { center: circle.center, normal: plane.normal, radius: circle.radius, error };
 }
 
-export function fitSphere(points: V3[]): SphereSurface | null {
+/**
+ * How close a closed-form fit must come before it is refined: refinement makes a good start exact, it does not
+ * rescue a bad one. Infinity refines always.
+ */
+export type FitOptions = { gate?: number; iterations?: number };
+
+function gated<S extends AnalyticSurface>(start: S, points: V3[], options: FitOptions): S | null {
+  if (options.gate !== undefined && maxDistance(start, points) > options.gate) return null;
+  return refine(start, points, options.iterations ?? 25);
+}
+
+export function fitSphere(points: V3[], options: FitOptions = {}): SphereSurface | null {
   // x^2+y^2+z^2 + D x + E y + F z + G = 0
   const AtA = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
   const Atb = [0, 0, 0, 0];
@@ -232,10 +243,10 @@ export function fitSphere(points: V3[]): SphereSurface | null {
   const center: V3 = [-sol[0] / 2, -sol[1] / 2, -sol[2] / 2];
   const r2 = dot(center, center) - sol[3];
   if (!(r2 > 0)) return null;
-  return refine({ kind: "sphere", center: add(c0, center), radius: Math.sqrt(r2) }, points);
+  return gated({ kind: "sphere", center: add(c0, center), radius: Math.sqrt(r2) }, points, options);
 }
 
-export function fitCylinder(points: V3[], normals: V3[]): CylinderSurface | null {
+export function fitCylinder(points: V3[], normals: V3[], options: FitOptions = {}): CylinderSurface | null {
   // The normals of a cylinder are all at right angles to its axis.
   const m = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
   for (const n of normals) for (let i = 0; i < 3; i += 1) for (let j = 0; j < 3; j += 1) m[i][j] += n[i] * n[j];
@@ -244,10 +255,10 @@ export function fitCylinder(points: V3[], normals: V3[]): CylinderSurface | null
   const c = centroid(points);
   const circle = fitCircleInPlane(points, c, u, v);
   if (!circle) return null;
-  return refine({ kind: "cylinder", origin: circle.center, axis, radius: circle.radius }, points);
+  return gated({ kind: "cylinder", origin: circle.center, axis, radius: circle.radius }, points, options);
 }
 
-export function fitCone(points: V3[], normals: V3[]): ConeSurface | null {
+export function fitCone(points: V3[], normals: V3[], options: FitOptions = {}): ConeSurface | null {
   // The normals of a cone make one angle with its axis: their tips lie on a circle of the unit sphere, in a plane.
   const nc = centroid(normals);
   const { vectors } = symmetricEigen(covariance(normals, nc));
@@ -279,14 +290,14 @@ export function fitCone(points: V3[], normals: V3[]): ConeSurface | null {
   }
   const halfAngle = sumAngle / points.length;
   if (!(halfAngle > 1e-3 && halfAngle < Math.PI / 2 - 1e-3)) return null;
-  return refine({ kind: "cone", apex, axis, halfAngle }, points);
+  return gated({ kind: "cone", apex, axis, halfAngle }, points, options);
 }
 
 /**
  * The torus: each point less its tube radius along its normal lies on the spine circle. The tube radius is searched
  * for (both sides: a fillet on an outside or an inside edge), the spine fitted as a circle in 3D for each.
  */
-export function fitTorus(points: V3[], normals: V3[]): TorusSurface | null {
+export function fitTorus(points: V3[], normals: V3[], options: FitOptions = {}): TorusSurface | null {
   if (points.length < 7) return null;
   let extent = 0;
   const c0 = centroid(points);
@@ -314,7 +325,7 @@ export function fitTorus(points: V3[], normals: V3[]): TorusSurface | null {
   if (!spine) return null;
   const minor = Math.abs(best.r);
   if (!(minor > 0) || !(spine.radius > 0)) return null;
-  return refine({ kind: "torus", center: spine.center, axis: spine.normal, major: spine.radius, minor }, points);
+  return gated({ kind: "torus", center: spine.center, axis: spine.normal, major: spine.radius, minor }, points, options);
 }
 
 /** The surface's free parameters as a vector, for Levenberg-Marquardt, and back. */
