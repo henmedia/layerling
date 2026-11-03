@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Moving with the arrow keys says by how much (Discussion #1240):** The status line only said "Moved 1 shape" after an arrow key, so there was no telling how far the shape had gone. It now names the distance in the workspace unit, for example "Moved 1 shape by 5 mm", and the same for Ctrl+Up and Ctrl+Down ("Moved selection up by 5 mm"). Texts in en, de, fr, nl, ru, cs, sl, da, es, it, pl, ar, zh-cn and zh-tw.
+
 ## 1.136.0
 
 - **Object list: move a shape up or down (Discussion #1233):** The list showed the shapes in the order they were added, and only the A–Z button changed that, for the named ones. Each row now has a handle at its left, six dots: drag it up or down, with the mouse or a finger, or focus it and press the arrow keys, and the shape stands elsewhere in the design's own order, which Undo takes back. The handles are hidden while the list is sorted A–Z or searched, as neither shows that order. The same is open to an AI agent as the MCP action `layerling_move_object` (`id`, and `before`, the shape it goes in front of). Reported by @uninteressant2026 in #1233.
