@@ -339,6 +339,7 @@ export type CadModifierGridfinityPart = {
   gridfinityMagnets: boolean;
   gridfinityHalfGrid?: boolean;
   gridfinityLargePlate?: boolean;
+  gridfinitySwallowtail?: boolean;
   gridfinityLabelBack?: boolean;
   gridfinityLabelFront?: boolean;
   gridfinityLabelLeft?: boolean;

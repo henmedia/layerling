@@ -1500,6 +1500,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     } else if (plan.type === "baseplate") {
       // An outline wider than a plate without the switch keeps it on (#1061).
       properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, disabled: plan.largePlate && needsLargePlate, onChange: (value) => apply({ largePlate: value }) });
+      // Swallowtail (#1061): not on a plate fitted to an outline, one piece for its drawer. The floor's 2.4 mm come with the switch.
+      if (!plan.outline) properties.push({ type: "toggle", id: "gridfinitySwallowtail", label: t("prop.gridfinitySwallowtail"), value: plan.swallowtail, onChange: (value) => apply({ swallowtail: value }) });
     }
     if (plan.outline) {
       // A plate fitted into an outline (#1061): its box is free in mm and the outline stretches with it; switched off,
@@ -3616,6 +3618,7 @@ export function ShapeInspector({
   surfacePickedFaces,
   onSurfaceFacePick,
   onVaseAccessories,
+  onGridfinityKeys,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -3662,6 +3665,8 @@ export function ShapeInspector({
   onSurfaceFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number) => void;
   /** Lays this vase's accessories out beside it, ready to print. */
   onVaseAccessories?: () => void;
+  /** Lays this Swallowtail baseplate's keys out in front of it, ready to print (#1061). */
+  onGridfinityKeys?: () => void;
   /** Splits a text into layers, or builds a layered text again with new words, font or layers (#215). */
   onLayerText?: (patch: TextLayerPatch) => void;
   /** One tag like this text or stack per name, laid out in rows (#215). */
@@ -4497,6 +4502,17 @@ export function ShapeInspector({
             )}
             {tiltedMeasures && primaryProperties.some((property) => ["width", "length", "height"].includes(property.id)) ? (
               <p className="cylinder-wrap-hint">{t("prop.tiltedMeasures")}</p>
+            ) : null}
+            {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).swallowtail ? (
+              <>
+                <p className="cylinder-wrap-hint">{t("gridfinity.swallowtailHint")}</p>
+                {onGridfinityKeys ? (
+                  <button className="inspector-action-button" type="button" disabled={locked} onClick={onGridfinityKeys}>
+                    <Plus size={17} strokeWidth={2.5} />
+                    <span>{t("inspector.gridfinityKeys")}</span>
+                  </button>
+                ) : null}
+              </>
             ) : null}
             {onShapeDefaultsChange && propertyDefaults ? (
               <div className="property-defaults-actions">

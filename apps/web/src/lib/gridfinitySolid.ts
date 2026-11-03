@@ -13,6 +13,7 @@ import {
   GRIDFINITY_MAGNET_DEPTH,
   GRIDFINITY_MAGNET_DIAMETER,
   GRIDFINITY_SOCKET,
+  GRIDFINITY_SWALLOWTAIL_FLOOR,
   type GridfinityCompartmentPieces,
   type GridfinityLabelCornerShape,
   type GridfinityLabelPieces,
@@ -40,6 +41,7 @@ import {
   gridfinityScoopPieces,
   gridfinityScoopPoint,
   gridfinityScoopSection,
+  gridfinitySwallowtailCuts,
   gridfinityWallProfile,
 } from "@/lib/gridfinityGeometry";
 
@@ -292,11 +294,16 @@ function baseplateSolid(cad: OcctKernel, plan: GridfinityPlan) {
   // A plate fitted into an outline (#1061) is that outline's slab; the shape's depth (z) is the kernel's -y, as in roundedWire.
   const slab = plan.outline
     ? cad.extrude(polygonFace(cad, plan.outline.map((p) => ({ x: p.x, y: -p.z, z: 0 }))), 0, 0, GRIDFINITY_BASEPLATE_HEIGHT)
-    : prism(cad, plan.size.width / 2, plan.size.depth / 2, plan.cornerRadius, 0, GRIDFINITY_BASEPLATE_HEIGHT);
+    : prism(cad, plan.size.width / 2, plan.size.depth / 2, plan.cornerRadius, 0, plan.size.height);
+  // A Swallowtail plate (#1061) stands on its floor: its sockets end on it, and its pockets are cut up into it from below.
+  const floor = plan.swallowtail ? GRIDFINITY_SWALLOWTAIL_FLOOR : 0;
   const last = GRIDFINITY_SOCKET[GRIDFINITY_SOCKET.length - 1];
-  const steps: GridfinityStep[] = [[GRIDFINITY_SOCKET[0][0], -PAST], ...GRIDFINITY_SOCKET, [last[0], last[1] + PAST]];
+  const socket = GRIDFINITY_SOCKET.map(([inset, y]): GridfinityStep => [inset, y + floor]);
+  const top: GridfinityStep = [last[0], last[1] + floor + PAST];
+  const steps: GridfinityStep[] = floor > 0 ? [...socket, top] : [[GRIDFINITY_SOCKET[0][0], -PAST], ...socket, top];
   const sockets = plan.cells.map((cell) => steppedSolid(cad, cell.x, cell.z, half, half, GRIDFINITY_BASEPLATE_RADIUS, steps));
-  return oneSolid(cad, cad.cutAll(slab, sockets), "baseplate");
+  const pockets = gridfinitySwallowtailCuts(plan, PAST).map(({ outline, y0, y1 }) => cad.extrude(polygonFace(cad, outline.map((p) => ({ x: p.x, y: -p.z, z: y0 }))), 0, 0, y1 - y0));
+  return oneSolid(cad, cad.cutAll(slab, [...sockets, ...pockets]), "baseplate");
 }
 
 /** A closed polygon of points (x, y, z) as a face. */

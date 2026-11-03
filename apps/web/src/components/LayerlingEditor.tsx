@@ -14,7 +14,7 @@ import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/l
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
-import { gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlateToWorld } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys } from "@/lib/gridfinityGeometry";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
@@ -2568,6 +2568,7 @@ function mcpLoftChange(params: Record<string, unknown>): Partial<LoftMeasures> {
   return change;
 }
 
+const MCP_GRIDFINITY_KEYS_NEEDS = "gridfinityKeys needs a Gridfinity baseplate with gridfinitySwallowtail and pockets at its back or right, sides without padding";
 const MCP_BENT_TUBE_KEYS = ["bentTubeProfile", "bentTubeInnerProfile", "bentTubeSize", "bentTubeWall", "bentTubeQuality", "bentTubeSegments"] as const;
 
 /**
@@ -10698,6 +10699,36 @@ export function LayerlingEditor({
   }, [commitShapes, selectedShape, selectedShapes.length]);
 
   /**
+   * A Swallowtail plate's keys (#1061), laid flat in a row in front of it, 4 mm apart, as sketch bodies ready to print: one for
+   * each pocket at its back and right, so that every pocket across a seam with the next plate gets one; the keys laid out
+   * for it before give way. The same code the MCP's gridfinityKeys uses.
+   */
+  const makeSwallowtailKeys = useCallback(async (plateId: string) => {
+    const fail = (message: string) => {
+      setNotice(message, true);
+      return { ok: false as const, message };
+    };
+    const plate = shapesRef.current.find((shape) => shape.id === plateId);
+    if (!plate) return { ok: false as const, message: MCP_GRIDFINITY_KEYS_NEEDS };
+    if (plate.locked) return fail(t("status.objectLocked"));
+    const count = gridfinitySwallowtailKeyCount({ ...plate, depth: shapeDepth(plate) });
+    if (count === 0) return fail(t("status.gridfinityKeysNone"));
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    try {
+      const built = await cadShapeFromSketchProfile(gridfinitySwallowtailKeyProfile(), GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, null);
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return fail(t("status.gridfinityKeysChanged"));
+      if (historyViewStateRef.current) return fail(t("status.historyViewBlocksEdits"));
+      const box = boundsForShapes([plate]);
+      const keys = gridfinitySwallowtailKeys(plate, box, built, shapeDepth(built), count, t("gridfinity.swallowtailKey"), () => createLocalId("swallowtail-key")).map(canonicalizeShape);
+      commitShapes(gridfinitySceneWithKeys(shapesRef.current, plate.id, keys), keys.map((key) => key.id), t("status.gridfinityKeysMade", { count }));
+      return { ok: true as const, keys };
+    } catch (error) {
+      return fail(error instanceof Error ? localizedError(error.message) : t("status.sketchCannotExtrude"));
+    }
+  }, [commitShapes]);
+
+  /**
    * A vase's accessories (legs to plug in, a stand, a saucer, an insert, a lid), laid out beside it ready to
    * print; the ones laid out for it before give way, so changed settings come out new. Returns the new parts
    * and the kinds asked for that this vase does not allow.
@@ -11540,6 +11571,7 @@ export function LayerlingEditor({
         // A D-Sub opening comes grouped with its two screw holes, as the editor's socket list makes it; portScrewHoles false leaves them out.
         const withScrewHoles = committedShape.kind === "port" && params.portScrewHoles !== false ? portWithScrewHolesGroup(committedShape) : null;
         if (committedShape.kind === "port" && params.portScrewHoles === true && !withScrewHoles) throw new Error("portScrewHoles needs a port opening whose socket has screw holes (portPreset dsub9)");
+        if (params.gridfinityKeys === true && gridfinitySwallowtailKeyCount({ ...committedShape, depth: shapeDepth(committedShape) }) === 0) throw new Error(MCP_GRIDFINITY_KEYS_NEEDS);
         if (withScrewHoles) {
           commitShapes([...currentShapes(), withScrewHoles], withScrewHoles.id, t("status.shapeAddedMcp", { name: displayShapeName(withScrewHoles) }));
           return { object: mcpShapeSummary(withScrewHoles) };
@@ -11548,6 +11580,10 @@ export function LayerlingEditor({
         if (committedShape.kind === "vase" && params.vaseParts === true) {
           const { parts, missing } = layOutVaseAccessories(committedShape.id);
           return { object: mcpShapeSummary(committedShape), parts: parts.map(mcpShapeSummary), ...(missing.length ? { notPossible: missing } : {}) };
+        }
+        if (params.gridfinityKeys === true) {
+          const made = await makeSwallowtailKeys(committedShape.id);
+          return made.ok ? { object: mcpShapeSummary(committedShape), parts: made.keys.map(mcpShapeSummary) } : { object: mcpShapeSummary(committedShape), parts: [], notPossible: [made.message] };
         }
         return { object: mcpShapeSummary(committedShape) };
       }
@@ -11797,6 +11833,7 @@ export function LayerlingEditor({
           return rotationWasRequested ? canonicalizeShape(bakeShapeTransformIntoMesh(canonical)) : canonical;
         });
         let updated = nextShapes.find((shape) => shape.id === target.id) as WorkplaneShape;
+        if (params.gridfinityKeys === true && gridfinitySwallowtailKeyCount({ ...updated, depth: shapeDepth(updated) }) === 0) throw new Error(MCP_GRIDFINITY_KEYS_NEEDS);
         commitShapes(nextShapes, target.id, t("status.shapeUpdatedMcp", { name: displayShapeName(updated) }));
         // The fill of an extruded sketch (#197): built again from its sketch, as the inspector does.
         const fillProfile = updated.sketchProfile && updated.sketchOperation !== "revolve" && updated.sketchOperation !== "sweep"
@@ -11823,6 +11860,10 @@ export function LayerlingEditor({
         if (updated.kind === "vase" && params.vaseParts === true) {
           const { parts, missing } = layOutVaseAccessories(updated.id);
           return { object: mcpShapeSummary(updated), parts: parts.map(mcpShapeSummary), ...(missing.length ? { notPossible: missing } : {}) };
+        }
+        if (params.gridfinityKeys === true) {
+          const made = await makeSwallowtailKeys(updated.id);
+          return made.ok ? { object: mcpShapeSummary(updated), parts: made.keys.map(mcpShapeSummary) } : { object: mcpShapeSummary(updated), parts: [], notPossible: [made.message] };
         }
         return { object: mcpShapeSummary(updated) };
       }
@@ -13992,6 +14033,7 @@ export function LayerlingEditor({
     runCustomShapeMcp,
     updateProjectAttachments,
     layOutVaseAccessories,
+    makeSwallowtailKeys,
   ]);
 
   useEffect(() => {
@@ -16271,6 +16313,7 @@ export function LayerlingEditor({
           surfacePickedFaces={surfaceFacePick?.faces ?? null}
           onSurfaceFacePick={selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) ? pickSurfaceFaces : undefined}
           onVaseAccessories={selectedShapes.length === 1 && selectedShape?.kind === "vase" && !selectedShape.locked ? () => layOutVaseAccessories(selectedShape.id) : undefined}
+          onGridfinityKeys={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && selectedShape.gridfinitySwallowtail === true && !historyViewState ? () => void makeSwallowtailKeys(selectedShape.id) : undefined}
           onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
           onTextTags={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? makeTextTags : undefined}
           onTextBlock={selectedShapes.length === 1 && offersTextBlock(selectedShape) && !historyViewState ? makeTextBlock : undefined}

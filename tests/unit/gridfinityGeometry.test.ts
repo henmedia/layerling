@@ -92,7 +92,12 @@ import {
   gridfinityScoopPieces,
   gridfinityScoopRadius,
   gridfinityScoopsLeftOut,
+  gridfinitySceneWithKeys,
   gridfinityShapePatch,
+  gridfinitySwallowtailKeyCount,
+  gridfinitySwallowtailKeyOutline,
+  gridfinitySwallowtailKeyPlaces,
+  gridfinitySwallowtailKeys,
   gridfinityTriangles,
   gridfinityUnitCompartments,
   gridfinityUnits,
@@ -4102,5 +4107,130 @@ describe("gridfinity outline", () => {
     expect(gridfinityShapePatch(shape, { type: "bin" })).toMatchObject({ gridfinityType: "bin", gridfinityOutline: undefined });
     expect(gridfinityShapePatch(shape, { type: "tray" })).toMatchObject({ gridfinityType: "tray", gridfinityOutline: undefined });
     expect(gridfinityShapePatch(outlined(rectangle(168, 84)), { lip: false })).not.toHaveProperty("gridfinityOutline");
+  });
+});
+
+describe("gridfinity swallowtail", () => {
+  let runtime: ManifoldToplevel;
+
+  beforeAll(async () => {
+    runtime = await manifoldModule();
+    runtime.setup();
+  });
+
+  const swallowtail = (fields: Record<string, unknown> = {}) => plate({ gridfinitySwallowtail: true, ...fields });
+  const sides = (fields: Record<string, unknown> = {}) => gridfinityPlan(swallowtail(fields)).pockets.map((p) => `${p.side} ${p.x} ${p.z}`).sort();
+  /** The area of the faces lying at y, as the mesh draws its rounded corners. */
+  const areaAt = (triangles: V[][], y: number) => triangles.filter((t) => t.every((v) => Math.abs(v[1] - y) < 1e-9)).reduce((sum, [a, b, c]) => sum + Math.abs((b[0] - a[0]) * (c[2] - a[2]) - (c[0] - a[0]) * (b[2] - a[2])) / 2, 0);
+  // A pocket half: 7 mm in from the side, 6 mm wide there and 10 at its end, 1.4 mm of it over the lip, 7 x 8 mm2; the lip
+  // 0.6 mm, from 0.2 mm in to the end, 5.6 mm wide there and 9.6 at the end, 6.8 x 7.6 mm2.
+  const pocketVolume = 56 * 1.4 + 51.68 * 0.6;
+
+  it("puts the plate on a 2.4 mm floor, 7.4 mm tall, with the switch, and leaves it as it was without", () => {
+    expect(gridfinityTriangles(plate({ gridfinitySwallowtail: false }))).toEqual(gridfinityTriangles(plate()));
+    expect(gridfinityFootprintPatch(swallowtail())).toEqual({ width: 84, depth: 42, height: 7.4 });
+    expect(gridfinityPlan(swallowtail()).size.height).toBe(7.4);
+    expect(gridfinityShapePatch(plate(), { swallowtail: true })).toMatchObject({ gridfinitySwallowtail: true, height: 7.4 });
+    expect(gridfinityShapePatch(swallowtail(), { swallowtail: false })).toMatchObject({ gridfinitySwallowtail: false, height: 5 });
+    // A bin keeps the setting and is built as one; a baseplate made from it is 7.4 mm tall.
+    expect(gridfinityPlan({ width: 83.5, depth: 41.5, height: 25.4, gridfinityType: "bin", gridfinitySwallowtail: true }).size.height).toBe(25.4);
+    expect(gridfinityShapePatch({ width: 83.5, depth: 41.5, height: 25.4, gridfinityType: "bin", gridfinitySwallowtail: true }, { type: "baseplate" })).toMatchObject({ height: 7.4 });
+  });
+
+  it("has a pocket at the middle of each cell on every side without padding", () => {
+    expect(sides()).toEqual(["back -21 -21", "back 21 -21", "front -21 21", "front 21 21", "left -42 0", "right 42 0"]);
+    expect(sides({ gridfinityPaddingRight: 10, width: 94 })).toEqual(["back -26 -21", "back 16 -21", "front -26 21", "front 16 21", "left -47 0"]);
+    expect(gridfinityPlan(swallowtail({ width: 504, depth: 504, gridfinityLargePlate: true })).pockets).toHaveLength(48);
+    expect(gridfinityPlan(swallowtail({ gridfinityPaddingBack: 1, gridfinityPaddingFront: 1, gridfinityPaddingLeft: 1, gridfinityPaddingRight: 1, width: 86, depth: 44 })).pockets).toHaveLength(0);
+    expect(gridfinityPlan(plate()).pockets).toHaveLength(0);
+  });
+
+  it("carries the switch to every place that builds or keeps the plate", async () => {
+    rememberManifoldRuntime(runtime);
+    const shape = canonicalizeShape(binShape(swallowtail({ height: 5 })));
+    expect(shape).toMatchObject({ height: 7.4, gridfinitySwallowtail: true });
+    expect(gridfinityHasPieces(shape)).toBe(true);
+    expect(workplaneShapesEqual(shape, { ...shape, gridfinitySwallowtail: false })).toBe(false);
+    expect(shapeGeometrySignature(shape)).not.toBe(shapeGeometrySignature({ ...shape, gridfinitySwallowtail: false }));
+    expect(tapeShapeTopologyKey(shape)).not.toBe(tapeShapeTopologyKey({ ...shape, gridfinitySwallowtail: false }));
+    const drawn = new THREE.Box3().setFromObject(createShapeObject(shape, false, undefined, false));
+    expect(drawn.max.y - drawn.min.y).toBeCloseTo(7.4, 3);
+    expect(Math.max(...meshForShape(shape).vertices.map(([, y]) => y))).toBeCloseTo(7.4, 6);
+    expect(cadModifierGridfinityForShape(shape)).toMatchObject({ gridfinitySwallowtail: true, height: 7.4 });
+    expect(sceneShape(shape)).toMatchObject({ gridfinitySwallowtail: true });
+    expect(mcpShapeSummary(shape)).toMatchObject({ settings: { gridfinitySwallowtail: true } });
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinitySwallowtail: true } }, {})).toMatchObject({ gridfinity: { gridfinitySwallowtail: true } });
+    expect(shapeDefaultsFromShape(shape)).toMatchObject({ gridfinitySwallowtail: true });
+    const key = { ...shape, id: "key", gridfinityKeyOf: shape.id };
+    expect(sceneShape(key)).toMatchObject({ gridfinityKeyOf: shape.id });
+    expect(workplaneShapesEqual(key, { ...key, gridfinityKeyOf: undefined })).toBe(false);
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
+    expect(canonicalizeShape(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityType: "baseplate", gridfinitySwallowtail: true }))).toMatchObject({ height: 7.4 });
+    const save = (shapes: WorkplaneShape[]) => exportLylProject({ projectId: "swallowtail", projectName: "Swallowtail", createdAt: 1, modifiedAt: 2, shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [], workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0 });
+    const [loaded, loadedKey] = (await importLylProject(await save([shape, key]))).shapes;
+    expect(loaded).toMatchObject({ height: 7.4, gridfinitySwallowtail: true });
+    expect(loadedKey).toMatchObject({ gridfinityKeyOf: shape.id });
+    await expect(importLylProject(await save([{ ...shape, gridfinitySwallowtail: "yes" } as unknown as WorkplaneShape]))).rejects.toThrow("gridfinitySwallowtail must be true or false");
+  });
+
+  it("is not built on a plate fitted to an outline, which stays 5 mm", () => {
+    const outline = [{ x: -60, z: -30 }, { x: 60, z: -30 }, { x: 60, z: 30 }, { x: -60, z: 30 }];
+    const fitted = { width: 120, depth: 60, height: 5, gridfinityType: "baseplate" as const, gridfinityOutline: outline, gridfinitySwallowtail: true };
+    expect(gridfinityPlan(fitted).swallowtail).toBe(false);
+    expect(gridfinityPlan(fitted).pockets).toHaveLength(0);
+    expect(gridfinityFootprintPatch(fitted)).toMatchObject({ height: 5 });
+  });
+
+  it("brings one key for each pocket at its back and right, laid in a row 4 mm in front of the plate", () => {
+    const count = (fields: Record<string, unknown>) => gridfinitySwallowtailKeyCount({ kind: "gridfinity", ...swallowtail(fields) });
+    expect(count({})).toBe(3);
+    expect(count({ width: 42 })).toBe(2);
+    expect(count({ gridfinityPaddingRight: 10, width: 94 })).toBe(2);
+    expect(count({ gridfinityPaddingBack: 10, gridfinityPaddingRight: 10, width: 94, depth: 52 })).toBe(0);
+    expect(count({ gridfinitySwallowtail: false })).toBe(0);
+    expect(gridfinitySwallowtailKeyCount({ kind: "box", ...swallowtail() })).toBe(0);
+    expect(gridfinitySwallowtailKeyPlaces({ minX: -42, maxZ: 21 }, { width: 14, depth: 10 }, 3)).toEqual([{ x: -35, z: 30 }, { x: -17, z: 30 }, { x: 1, z: 30 }]);
+    // Laid out again, a plate's keys replace the ones laid out for it before, and leave another plate's alone.
+    const key = (id: string, of: string) => ({ ...binShape(plate()), id, gridfinityKeyOf: of });
+    const scene = [binShape(plate()), key("old", "a"), key("other", "b")];
+    expect(gridfinitySceneWithKeys(scene, "a", [key("new", "a")]).map((shape) => shape.id)).toEqual([scene[0].id, "other", "new"]);
+    // The editor's keys: copies of the built key in the plate's colour on its level, each marked as the plate's.
+    const ids = ["k1", "k2", "k3"];
+    const made = gridfinitySwallowtailKeys({ id: "a", color: "#123456" }, { minX: -42, maxZ: 21, minY: 2 }, { ...binShape(plate()), width: 14, hole: true }, 10, 3, "Swallowtail key", () => ids.shift()!);
+    expect(made.map(({ id, name, gridfinityKeyOf, color, hole, x, z, elevation }) => ({ id, name, gridfinityKeyOf, color, hole, x, z, elevation }))).toEqual([-35, -17, 1].map((x, k) => ({ id: `k${k + 1}`, name: "Swallowtail key", gridfinityKeyOf: "a", color: "#123456", hole: false, x, z: 30, elevation: 2 })));
+  });
+
+  it("makes the key two pocket halves 0.025 mm smaller, with a slot of 1.2 x 4.5 mm into each end", () => {
+    const key = gridfinitySwallowtailKeyOutline();
+    const area = key.reduce((sum, p, k) => sum + p.x * key[(k + 1) % key.length].z - key[(k + 1) % key.length].x * p.z, 0) / 2;
+    expect(Math.abs(area)).toBeCloseTo(2 * 6.975 * (4.975 + 2.975) - 2 * 1.2 * 4.5, 9);
+    expect(Math.max(...key.map((p) => p.x)) - Math.min(...key.map((p) => p.x))).toBeCloseTo(13.95, 9);
+    expect(Math.max(...key.map((p) => p.z)) - Math.min(...key.map((p) => p.z))).toBeCloseTo(9.95, 9);
+  });
+
+  it("draws the plate on its floor closed before Manifold has loaded, its sockets ending on the floor", () => {
+    const triangles = gridfinityTriangles(swallowtail());
+    expect(edgeProblems(triangles)).toBe(0);
+    expect(components(triangles)).toBe(1);
+    expect(bounds(triangles).max[1]).toBeCloseTo(7.4, 9);
+    // The floor under the whole plate: its underside's area times 2.4 more than the plate without it.
+    expect(areaAt(triangles, 0)).toBeCloseTo(84 * 42 - (4 - Math.PI) * 16, 0);
+    expect(signedVolume(triangles) - signedVolume(gridfinityTriangles(plate()))).toBeCloseTo(areaAt(triangles, 0) * 2.4, 6);
+  });
+
+  it("cuts the pockets with Manifold: closed, one piece, the pockets' volume less", () => {
+    for (const fields of [{}, { width: 42 }, { gridfinityPaddingRight: 10, width: 94 }, { gridfinityCornerRadius: 0 }, { width: 126, depth: 84 }]) {
+      const triangles = gridfinityLabelledTriangles(runtime, swallowtail(fields));
+      expect(edgeProblems(triangles)).toBe(0);
+      expect(components(triangles)).toBe(1);
+      const pockets = gridfinityPlan(swallowtail(fields)).pockets.length;
+      // Within 0.005 mm3: Manifold's sliver clean-up moves a few points by up to 1e-4 mm.
+      expect(signedVolume(gridfinityTriangles(swallowtail(fields))) - signedVolume(triangles)).toBeCloseTo(pockets * pocketVolume, 2);
+    }
+    // At 1 mm up a line through the middle of the side pockets crosses the plate at their ends, 7 mm in. At 0.3 mm the lip
+    // ends there too and starts 0.2 mm in from the side, so the line crosses 0.2 mm of plate at each side first.
+    const triangles = gridfinityLabelledTriangles(runtime, swallowtail());
+    expect(crossings(triangles, 1, 0.5).map((x) => Math.round(x * 100) / 100)).toEqual([-35, 35]);
+    expect(crossings(triangles, 0.3, 0.5).map((x) => Math.round(x * 100) / 100)).toEqual([-42, -41.8, -35, 35, 41.8, 42]);
   });
 });

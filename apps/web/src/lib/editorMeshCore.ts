@@ -547,6 +547,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gridfinityMagnets: shape.gridfinityMagnets,
         gridfinityHalfGrid: shape.gridfinityHalfGrid,
         gridfinityLargePlate: shape.gridfinityLargePlate,
+        gridfinitySwallowtail: shape.gridfinitySwallowtail,
         gridfinityLabelBack: shape.gridfinityLabelBack,
         gridfinityLabelFront: shape.gridfinityLabelFront,
         gridfinityLabelLeft: shape.gridfinityLabelLeft,

@@ -246,6 +246,8 @@ export type ShapeCustomization = {
   gridfinityHalfGrid?: boolean;
   /** Gridfinity baseplate: up to 12 units across and deep instead of 6, for print beds over 256 mm (#1061); missing means 6. */
   gridfinityLargePlate?: boolean;
+  /** Gridfinity baseplate: Swallowtail, on a 2.4 mm floor with a pocket for a key under each side without padding (#1061); missing means off. */
+  gridfinitySwallowtail?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -1039,6 +1041,8 @@ export type WorkplaneShape = {
   gridfinityHalfGrid?: boolean;
   /** Gridfinity baseplate: up to 12 units across and deep instead of 6, for print beds over 256 mm (#1061); missing means 6. */
   gridfinityLargePlate?: boolean;
+  /** Gridfinity baseplate: Swallowtail, on a 2.4 mm floor with a pocket for a key under each side without padding (#1061); missing means off. */
+  gridfinitySwallowtail?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -1308,6 +1312,8 @@ export type WorkplaneShape = {
   vase?: import("@/lib/vase/vase-geometry.mjs").VaseSettings;
   /** An accessory laid out for a vase (its id): laying them out again replaces it. */
   vasePartOf?: string;
+  /** A Swallowtail key laid out for a Gridfinity plate (its id, #1061): laying them out again replaces it. */
+  gridfinityKeyOf?: string;
   importedMesh?: {
     positions: number[];
     normals?: number[];

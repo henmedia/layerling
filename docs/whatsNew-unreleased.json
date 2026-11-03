@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Gridfinity-Bodenplatten, die zusammenrasten",
+      "en": "Gridfinity baseplates that click together"
+    },
+    "body": {
+      "de": "Schalte im Eigenschaften-Fenster einer Bodenplatte „Swallowtail“ ein, und die Platte bekommt unter jeder Seite ohne Ausgleich halbe Taschen. „Verbinder anlegen“ legt kleine Verbinder zum Drucken an; von unten über der Fuge eingedrückt, rastet jeder ein und hält zwei Platten zusammen. Die Platte steht dann auf einem Boden und ist 7,4 mm hoch.",
+      "en": "Switch on \"Swallowtail\" in a baseplate's Properties panel and the plate gets half pockets under each side without padding. \"Add keys\" lays out small keys to print; pressed in from below across the seam, each clicks in and holds two plates together. The plate then stands on a floor, 7.4 mm tall."
+    }
+  }
+]

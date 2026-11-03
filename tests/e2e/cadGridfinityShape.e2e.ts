@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { GRIDFINITY_LIP_HEIGHT, gridfinityTriangles } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_LIP_HEIGHT, GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT, gridfinitySwallowtailKeyOutline, gridfinityTriangles } from "@/lib/gridfinityGeometry";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
-import { cad, bin, plate, meshVolume, trianglesVolume, meshBounds, overlap, material } from "./helpers/gridfinityHarness";
+import { cad, bin, plate, meshVolume, trianglesVolume, meshBounds, overlap, material, expectBuilt } from "./helpers/gridfinityHarness";
 
 
 /*
@@ -22,6 +22,29 @@ describe("exact Gridfinity bodies", () => {
       const { min, max } = meshBounds(part);
       [box.xmin - min[0], box.ymin - min[1], box.zmin - min[2], box.xmax - max[0], box.ymax - max[1], box.zmax - max[2]].forEach((d) => expect(Math.abs(d)).toBeLessThan(0.01));
     }
+  });
+
+  it("builds Swallowtail plates on their floor with their pockets as one valid solid with the mesh's volume and box", () => {
+    for (const part of [plate({ gridfinitySwallowtail: true }), plate({ width: 42, gridfinitySwallowtail: true }), plate({ width: 136, depth: 84, gridfinityPaddingRight: 10, gridfinitySwallowtail: true }), plate({ gridfinityCornerRadius: 0, gridfinitySwallowtail: true })]) expectBuilt(part);
+  });
+
+  it("builds a Swallowtail plate of 12 x 12 units, its 48 pockets in the same cut as its sockets", () => {
+    expectBuilt(plate({ width: 504, depth: 504, gridfinityLargePlate: true, gridfinitySwallowtail: true }));
+  });
+
+  it("holds a key across the seam of two Swallowtail plates: clear above the lip, caught by it below", () => {
+    const left = gridfinityPartSolid(cad, plate({ gridfinitySwallowtail: true }));
+    const right = cad.translate(left, 84, 0, 0);
+    // The key's outline lying flat at the seam (x = 42, z = 0), 1.4 mm thick from y0 up, in the plates' own frame (y up).
+    const key = (y0: number) => {
+      const points = gridfinitySwallowtailKeyOutline().map((p) => ({ x: 42 + p.x, y: y0, z: p.z }));
+      const face = cad.makeFace(cad.makeWire(points.map((p, i) => cad.makeLineEdge(p, points[(i + 1) % points.length]))));
+      return cad.extrude(face, 0, GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, 0);
+    };
+    const pressedIn = key(GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT);
+    expect(overlap(pressedIn, left) + overlap(pressedIn, right)).toBeLessThan(1e-6);
+    const atTheLip = key(0);
+    expect(overlap(atTheLip, left) + overlap(atTheLip, right)).toBeGreaterThan(1);
   });
 
   it("fits bins in baseplates 0.25 mm up, where a bigger bin rests on the ridges, and 0.3 mm sideways they overlap", () => {

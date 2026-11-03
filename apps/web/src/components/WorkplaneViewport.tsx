@@ -221,6 +221,8 @@ type WorkplaneViewportProps = {
   onSurfaceFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number) => void;
   /** Lays the selected vase's accessories out beside it. */
   onVaseAccessories?: () => void;
+  /** Lays the selected Swallowtail baseplate's keys out in front of it (#1061). */
+  onGridfinityKeys?: () => void;
   onLayerText?: (patch: TextLayerPatch) => void;
   onTextTags?: (names: string[], gap: number) => void;
   /** Several lines of text under one another, one text each (#1207). */
@@ -1498,6 +1500,7 @@ export function WorkplaneViewport({
   surfacePickedFaces,
   onSurfaceFacePick,
   onVaseAccessories,
+  onGridfinityKeys,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -8603,6 +8606,7 @@ export function WorkplaneViewport({
           surfacePickedFaces={surfacePickedFaces}
           onSurfaceFacePick={onSurfaceFacePick}
           onVaseAccessories={onVaseAccessories}
+          onGridfinityKeys={onGridfinityKeys}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
           onTextBlock={onTextBlock}
