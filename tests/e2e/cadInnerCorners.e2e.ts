@@ -54,12 +54,12 @@ function meshVolume(positions: ArrayLike<number>, indices: ArrayLike<number>) {
 const HEIGHT = 4;
 const DISCS = [[-22, 4, 26], [-4, -6, 32], [16, 0, 28], [30, 8, 20], [4, 12, 24]];
 
-async function cloudParts() {
+async function cloudParts(discs = DISCS) {
   const { groupedShape, restoreGroupedChildrenForEdges } = await import("@/lib/editorBooleans");
   const { cadModifierPrimitiveForBakedShape, cadModifierPrimitiveForAnalyticShape } = await import("@/lib/cadBakeMetadata");
   const base = { color: "#f55", size: 20, rotation: 0, locked: false, hidden: false, elevation: 0 } as const;
-  const discs = DISCS.map(([x, z, d], index) => ({ ...base, id: `disc${index}`, name: "Cylinder", kind: "cylinder", x, z, width: d, depth: d, height: HEIGHT } as WorkplaneShape));
-  const group = groupedShape(discs);
+  const shapes = discs.map(([x, z, d], index) => ({ ...base, id: `disc${index}`, name: "Cylinder", kind: "cylinder", x, z, width: d, depth: d, height: HEIGHT } as WorkplaneShape));
+  const group = groupedShape(shapes);
   if (!group) throw new Error("no group");
   return restoreGroupedChildrenForEdges(group).map(({ shape, scope }) => {
     const primitive = cadModifierPrimitiveForBakedShape(shape) ?? cadModifierPrimitiveForAnalyticShape(shape);
@@ -98,6 +98,18 @@ describe("a fillet past sharp inner corners", () => {
     const preview = await ask({ type: "preview", kind: "chamfer", edgeIds: top.map((edge) => edge.id), amount: 1, quality: "draft", chamferAngle: 45 });
     if (preview.type !== "preview") throw new Error("no preview");
     expect(preview.innerCorners?.count).toBe(7);
+  });
+
+  it("keeps the refusal where a disc barely shows between two others, rather than a body whose faces cross", async () => {
+    vi.stubGlobal("WebAssembly", WebAssembly);
+    await import("@/workers/cadModifier.worker");
+    // The same discs in a row: the one at 4 shows only as a sliver above and below the two it lies between.
+    const ready = await ask({ type: "prepare", parts: await cloudParts(DISCS.map(([x, , d]) => [x, 0, d])), sharpAngle: 25 });
+    if (ready.type !== "ready") throw new Error("not ready");
+    const top = ready.edges.filter((edge) => edge.selectable && heights(edge).every((y) => Math.abs(y - HEIGHT) < 1e-3));
+    for (const amount of [0.67, 1, 2]) {
+      await expect(ask({ type: "preview", kind: "fillet", edgeIds: top.map((edge) => edge.id), amount, quality: "standard", chamferAngle: 45 })).rejects.toThrow(/cannot be filleted together/);
+    }
   });
 
   it("leaves a body whose edges go through as they are", async () => {

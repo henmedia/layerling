@@ -964,12 +964,24 @@ function treatWithCornerEdges(cad: OcctKernel, solid: ShapeHandle, entries: { id
 
 const INNER_CORNER_BUDGET_MS = 4000;
 
+function polylineLength(points: number[]) {
+  let length = 0;
+  for (let index = 3; index + 2 < points.length; index += 3) {
+    length += Math.hypot(points[index] - points[index - 3], points[index + 1] - points[index - 2], points[index + 2] - points[index - 1]);
+  }
+  return length;
+}
+
 // A refused chamfer or fillet tried once more past the sharp inner corners at the ends of the picked edges (the notches
 // where the discs of a cloud meet): the corners taken along, or rounded first a little (lib/cadInnerCorners.ts).
 function treatPastInnerCorners(cad: OcctKernel, solid: ShapeHandle, entries: { id: number; edge: ShapeHandle }[], request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
   if (request.kind !== "chamfer" && (request.kind !== "fillet" || request.endAmount !== undefined || request.concave)) return null;
   const deadline = performance.now() + INNER_CORNER_BUDGET_MS;
-  const touching = edgesTouchingEnds(edgeInfos, entries.map((entry) => entry.id)).map((id) => edgeHandles[id]).filter((edge): edge is ShapeHandle => edge !== undefined);
+  const touchingIds = edgesTouchingEnds(edgeInfos, entries.map((entry) => entry.id));
+  // An edge shorter than the size, a sliver where one disc barely shows between two others, leaves the kernel nothing
+  // to hold on to: forced past it, it made faces that crossed or crashed outright. Then the refusal stands.
+  if ([...entries.map((entry) => entry.id), ...touchingIds].some((id) => polylineLength(edgeInfos[id]?.points ?? []) < request.amount)) return null;
+  const touching = touchingIds.map((id) => edgeHandles[id]).filter((edge): edge is ShapeHandle => edge !== undefined);
   const corners = innerCornerEdges(cad, solid, touching, request.amount);
   if (corners.length === 0) return null;
   const result = treatAfterInnerCorners(cad, solid, entries.map((entry) => entry.edge), corners, request.amount, (body, edges, amount) => treatEdges(cad, body, edges, { ...request, amount }), deadline, isFatalKernelFault);

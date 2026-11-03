@@ -10,6 +10,10 @@ import { cadHasSolidBody } from "@/lib/cadSolidBody";
  * failing that, rounded first at a half and then a quarter of the size, before the picked edges, found again on the
  * rounded body, are treated as asked. Only edges the solid wraps round by more than half a turn count as inner
  * corners: an outer corner is the user's to round or keep sharp.
+ *
+ * Forced past a corner, the kernel can answer with a body whose faces run through each other and still call it valid,
+ * or crash. So nothing is tried where an edge is shorter than the size (a sliver of a disc that barely shows between
+ * two others), and a result only counts when its mesh is closed.
  */
 
 /** The share of a small circle round the edge's middle that lies inside the solid: about 0.25 for a box edge, 0.75 for a notch. */
@@ -98,7 +102,9 @@ export function treatAfterInnerCorners(
   const attempt = (make: () => ShapeHandle) => {
     try {
       const body = make();
-      if (cadHasSolidBody(cad, body)) return body;
+      // A forced fillet can come out "valid" with its faces running through each other: a closed mesh shows it is not.
+      if (cadHasSolidBody(cad, body) && meshIsClosed(cad, body)) return body;
+      release(cad, [body]);
     } catch (error) {
       if (isFatal(error)) throw error;
     }
@@ -117,6 +123,28 @@ export function treatAfterInnerCorners(
     if (finished) return { component: finished, cornerAmount };
   }
   return null;
+}
+
+/**
+ * Whether the body's coarse mesh is closed: every edge between two triangles, matched by its corners' places. The
+ * kernel meshes the faces of a sound body along shared edges, so a body whose faces cross each other shows open or
+ * tripled edges here where its topology looks fine.
+ */
+export function meshIsClosed(cad: OcctKernel, body: ShapeHandle) {
+  const mesh = cad.tessellate(body, { linearDeflection: 0.1, angularDeflection: 0.5 });
+  const { positions, indices } = mesh;
+  const key = (index: number) => `${positions[index * 3].toFixed(4)},${positions[index * 3 + 1].toFixed(4)},${positions[index * 3 + 2].toFixed(4)}`;
+  const uses = new Map<string, number>();
+  for (let triangle = 0; triangle < indices.length; triangle += 3) {
+    const corners = [key(indices[triangle]), key(indices[triangle + 1]), key(indices[triangle + 2])];
+    if (corners[0] === corners[1] || corners[1] === corners[2] || corners[0] === corners[2]) continue;
+    for (let side = 0; side < 3; side += 1) {
+      const edge = [corners[side], corners[(side + 1) % 3]].sort().join("|");
+      uses.set(edge, (uses.get(edge) ?? 0) + 1);
+    }
+  }
+  for (const count of uses.values()) if (count !== 2) return false;
+  return uses.size > 0;
 }
 
 function release(cad: OcctKernel, handles: ShapeHandle[]) {
