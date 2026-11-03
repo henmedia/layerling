@@ -2318,6 +2318,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "inspector.bundleNote": "Ein Bündel hält seine Teile nur zusammen: Jedes behält Farbe und Art, Aussparungen schneiden nicht, und im Export ist jedes Teil ein eigener Körper. E öffnet es zum Bearbeiten, Strg+Umschalt+G löst es auf.",
   "shape.intersection": "Schnittmenge",
   "shape.importedMesh": "Importiertes Netz",
+  "shape.mesh": "Netz",
+  "shape.exactBody": "Exakter Körper",
   "shape.sketchExtrusion": "Skizzenkörper",
   "shape.sketchRevolve": "Drehkörper",
   "shape.threadMenu": "Gewinde\nSchraube\nMutter",

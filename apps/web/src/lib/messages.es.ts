@@ -2314,6 +2314,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "Un conjunto solo mantiene unidas sus piezas: cada una conserva su color y su tipo, los orificios no cortan nada y, al exportar, cada pieza es un cuerpo independiente. E lo abre para editarlo; Ctrl+Mayús+G lo deshace.",
   "shape.intersection": "Intersección",
   "shape.importedMesh": "Malla importada",
+  "shape.mesh": "Malla",
+  "shape.exactBody": "Cuerpo exacto",
   "shape.sketchExtrusion": "Cuerpo de boceto",
   "shape.sketchRevolve": "Cuerpo de revolución",
   "shape.threadMenu": "Rosca\nTornillo\nTuerca",

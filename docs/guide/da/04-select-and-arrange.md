@@ -23,6 +23,7 @@ Den bliver åben eller lukket, som du lod den være, for hvert design, indtil du
 
 - Et klik på en post vælger formen, inklusive dele inde i en gruppe. Med [[Shift]] holdt tilføjer du flere poster eller tager dem væk igen, ligesom i visningen. Pilene folder grupper åbne og i.
 - Etiketten viser om en del er {{ui:outliner.solid}} eller {{ui:outliner.hole}}.
+- Under navnet står, hvilken slags form det er. En form, der ikke længere er en simpel form (afrundet, udhulet eller importeret), viser {{ui:shape.exactBody}}, når STEP-eksporten skriver den eksakt, og {{ui:shape.mesh}}, når den kun består af trekanter og går ud som STL. En tilspidsning, hældning eller vridning, der først kommer til efter afrunding eller udhuling, bøjer kun dens mesh, så viser den {{ui:shape.mesh}}.
 - Hængelås og øje låser og skjuler enkelte dele.
 - {{ui:outliner.rename}} giver en del sit eget navn; blyanten ved siden af navnet øverst i indstillingerne gør det samme for den valgte form. Fornuftige navne hjælper enormt i større designs.
 - Knappen A–Z i titellinjen ({{ui:outliner.sortByName}}) sorterer de former, du har navngivet, alfabetisk, med tal talt som tal (Del 2 før Del 10). Former, der stadig har deres standardnavn, bliver nedenunder i den rækkefølge, du tilføjede dem, den nyeste sidst, og dele inde i grupper sorteres på samme måde. Kun listen ændres, aldrig designet. Et klik mere viser alt i den rækkefølge, det blev tilføjet, og browseren husker valget.

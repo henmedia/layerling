@@ -19,6 +19,7 @@ Pri mnogih delih v pogledu zlahka izgubiš pregled. Seznam objektov ({{ui:editor
 
 - Klik na vnos izbere obliko, tudi dele znotraj skupine. S [[Shift]] dodaš še druge vnose ali jih spet odvzameš, popolnoma enako kot v pogledu. Puščice zložijo in razpro skupine.
 - Oznaka kaže, ali je del {{ui:outliner.solid}} ali {{ui:outliner.hole}}.
+- Pod imenom piše, kakšna oblika je. Telo, ki ni več preprosta oblika (zaobljeno, izdolbeno ali uvoženo), kaže {{ui:shape.exactBody}}, ko ga izvoz STEP zapiše natančno, in {{ui:shape.mesh}}, ko je sestavljeno le iz trikotnikov in gre ven kot STL. Zoženje, nagib ali zasuk, dodan šele po zaobljanju ali dolbenju telesa, upogne samo njegovo mrežo, zato takrat piše {{ui:shape.mesh}}.
 - Ključavnica in oko zaklenita in skrijeta posamezne dele.
 - Z {{ui:outliner.rename}} daš delu lastno ime; svinčnik ob imenu zgoraj v nastavitvah naredi isto za izbrano obliko. Smiselna imena pri večjih načrtih zelo pomagajo.
 - Gumb A–Ž v naslovni vrstici ({{ui:outliner.sortByName}}) razvrsti oblike, ki si jim dal ime, po abecedi, številke pa šteje kot številke (Del 2 pred Delom 10). Oblike s privzetim imenom ostanejo spodaj v vrstnem redu dodajanja, najnovejša zadnja, deli v skupinah pa se razvrstijo enako. Spremeni se le seznam, nikoli načrt. Drugi klik spet pokaže vse v vrstnem redu dodajanja, brskalnik pa si izbiro zapomni.

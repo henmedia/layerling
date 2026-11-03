@@ -2312,6 +2312,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "Связка только удерживает детали вместе: каждая сохраняет свой цвет и тип, отверстия ничего не вырезают, а при экспорте каждая деталь — отдельное тело. E открывает её для правки, Ctrl+Shift+G развязывает её.",
   "shape.intersection": "Пересечение",
   "shape.importedMesh": "Импортированная сетка",
+  "shape.mesh": "Сетка",
+  "shape.exactBody": "Точное тело",
   "shape.sketchExtrusion": "Тело из эскиза",
   "shape.sketchRevolve": "Тело вращения",
   "shape.threadMenu": "Резьба\nВинт\nГайка",

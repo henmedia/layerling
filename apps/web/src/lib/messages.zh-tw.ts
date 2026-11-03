@@ -2263,6 +2263,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "綁定只是把部件固定在一起：每個部件各自保留顏色與類型，孔不會挖除任何材料，匯出時每個部件都是獨立實體。按 E 可開啟編輯，Ctrl+Shift+G 可取消綁定。",
   "shape.intersection": "交集",
   "shape.importedMesh": "匯入的網格",
+  "shape.mesh": "網格",
+  "shape.exactBody": "精確實體",
   "shape.sketchExtrusion": "草圖實體",
   "shape.sketchRevolve": "旋轉實體",
   "shape.threadMenu": "螺紋\n螺絲\n螺帽",

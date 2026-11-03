@@ -2263,6 +2263,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "捆绑只是把部件固定在一起：每个部件保留自己的颜色和类型，孔不挖任何东西，导出时每个部件都是独立实体。按 E 可打开编辑，Ctrl+Shift+G 可取消捆绑。",
   "shape.intersection": "交集",
   "shape.importedMesh": "导入的网格",
+  "shape.mesh": "网格",
+  "shape.exactBody": "精确实体",
   "shape.sketchExtrusion": "草图实体",
   "shape.sketchRevolve": "旋转实体",
   "shape.threadMenu": "螺纹\n螺钉\n螺母",

@@ -2277,6 +2277,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "Zestaw tylko trzyma swoje części razem: każda zachowuje swój kolor i rodzaj, otwory niczego nie wycinają, a w eksporcie każda część jest osobną bryłą. E otwiera go do edycji, Ctrl+Shift+G rozdziela go.",
   "shape.intersection": "Część wspólna",
   "shape.importedMesh": "Zaimportowana siatka",
+  "shape.mesh": "Siatka",
+  "shape.exactBody": "Dokładna bryła",
   "shape.sketchExtrusion": "Bryła ze szkicu",
   "shape.sketchRevolve": "Bryła obrotowa",
   "shape.threadMenu": "Gwint\nŚruba\nNakrętka",

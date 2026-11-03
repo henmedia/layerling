@@ -21,6 +21,7 @@ Przy wielu częściach łatwo zgubić się w widoku. Lista obiektów ({{ui:edito
 
 - Kliknięcie wpisu zaznacza kształt, także części wewnątrz grupy. Z wciśniętym [[Shift]] dodajesz kolejne wpisy albo je odznaczasz, tak jak w widoku. Strzałki rozwijają i zwijają grupy.
 - Etykieta pokazuje, czy część jest {{ui:outliner.solid}}, czy {{ui:outliner.hole}}.
+- Pod nazwą widać, jaki to kształt. Bryła, która nie jest już prostym kształtem (zaokrąglona, wydrążona lub zaimportowana), pokazuje {{ui:shape.exactBody}}, gdy eksport STEP zapisuje ją dokładnie, i {{ui:shape.mesh}}, gdy składa się tylko z trójkątów i trafia do STL. Zwężenie, pochylenie lub skręt dodane dopiero po zaokrągleniu lub wydrążeniu bryły wyginają tylko jej siatkę, więc wtedy pokazuje {{ui:shape.mesh}}.
 - Kłódka i oko blokują i ukrywają pojedyncze części.
 - {{ui:outliner.rename}} nadaje części własną nazwę. Ołówek obok nazwy na górze ustawień robi to samo dla zaznaczonego kształtu. Sensowne nazwy bardzo pomagają w większych projektach.
 - Przycisk A–Z na pasku tytułu ({{ui:outliner.sortByName}}) sortuje alfabetycznie kształty, którym nadano nazwy, licząc liczby jako liczby (Część 2 przed Częścią 10). Kształty z domyślną nazwą zostają poniżej w kolejności dodania, najnowszy na końcu, a części w grupach są sortowane tak samo. Zmienia się tylko lista, nigdy projekt. Drugie kliknięcie znów pokazuje wszystko w kolejności dodania, a przeglądarka zapamiętuje wybór.

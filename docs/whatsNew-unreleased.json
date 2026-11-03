@@ -68,5 +68,15 @@
       "de": "Ziehst du in der Skizze einen Kreis oder ein Rechteck, rastet seine Mitte auf den Enden, Ecken und Mitten der anderen Linien, auf Kreismittelpunkten und auf Kreuzungen von Hilfslinien ein, ein blauer Ring zeigt die Stelle. So sitzt ein Loch genau auf der Mitte einer Linie. Alt schaltet das Einrasten ab.",
       "en": "Drag a circle or a rectangle in the sketch and its middle snaps to the ends, corners and middles of the other lines, to circle centres and to crossings of construction lines, with a blue ring to show where. So a hole sits exactly on the middle of a line. Alt turns the snapping off."
     }
+  },
+  {
+    "title": {
+      "de": "STEP behält keine falsche Form mehr",
+      "en": "STEP no longer writes the wrong shape"
+    },
+    "body": {
+      "de": "Wurde ein Körper erst verrundet oder ausgehöhlt und danach verjüngt oder verdreht, schrieb die STEP-Ausfuhr ihn ohne die Verdrehung, ohne Hinweis. Jetzt lässt sie ihn weg und sagt es, damit du ihn als STL ausgibst. In der Objektliste steht unter solchen Körpern jetzt Exakter Körper oder Netz, so siehst du vorher, was als STEP hinausgeht.",
+      "en": "A body that was rounded or hollowed first and tapered or twisted after went into the STEP file without the twist, and nothing said so. Now the export leaves it out and tells you, so you can save it as STL. The object list now says Exact body or Mesh under such bodies, so you see beforehand what goes into STEP."
+    }
   }
 ]

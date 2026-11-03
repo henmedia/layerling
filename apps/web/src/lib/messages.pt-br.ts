@@ -703,6 +703,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "shape.bundle": "Conjunto",
   "shape.intersection": "Interseção",
   "shape.importedMesh": "Malha importada",
+  "shape.mesh": "Malha",
+  "shape.exactBody": "Corpo exato",
   "shape.sketchExtrusion": "Extrusão de esboço",
   "shape.sketchRevolve": "Revolução de esboço",
   "shape.threadMenu": "Rosca\nParafuso\nPorca",

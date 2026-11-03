@@ -21,6 +21,7 @@ With many parts it is easy to lose track in the view. The object list ({{ui:edit
 
 - A click on an entry selects the shape, including parts inside a group. With [[Shift]] held you add more entries or take them away again, just as in the view. The arrows fold groups open and shut.
 - The label shows whether a part is {{ui:outliner.solid}} or {{ui:outliner.hole}}.
+- Under the name stands what kind of shape it is. A body that is no longer a plain shape (rounded, hollowed or imported) says {{ui:shape.exactBody}} when the STEP export writes it exactly, and {{ui:shape.mesh}} when it is only triangles and goes as STL. A taper, lean or twist set after rounding or hollowing a body bends only its mesh, so it then says {{ui:shape.mesh}}.
 - Padlock and eye lock and hide single parts.
 - {{ui:outliner.rename}} gives a part a name of its own; the pencil beside the name at the top of the settings does the same for the selected shape. Sensible names help enormously in larger designs.
 - The A–Z button in the title bar ({{ui:outliner.sortByName}}) sorts the shapes you have named alphabetically, with numbers counted as numbers (Part 2 before Part 10). Shapes that still carry their default name stay below in the order you added them, the newest last, and parts inside groups are sorted the same way. Only the list changes, never the design. A second click shows everything in the order added again, and the browser remembers the choice.

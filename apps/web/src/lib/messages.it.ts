@@ -2299,6 +2299,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "Un insieme mantiene unite le sue parti: ognuna conserva colore e tipo, i fori non eseguono tagli e, durante l'esportazione, ogni parte rimane un corpo separato. Premi E per modificarlo e Ctrl+Shift+G per separarne le parti.",
   "shape.intersection": "Intersezione",
   "shape.importedMesh": "Mesh importata",
+  "shape.mesh": "Mesh",
+  "shape.exactBody": "Corpo esatto",
   "shape.sketchExtrusion": "Corpo estruso da schizzo",
   "shape.sketchRevolve": "Corpo di rivoluzione",
   "shape.threadMenu": "Filettatura\nVite\nDado",

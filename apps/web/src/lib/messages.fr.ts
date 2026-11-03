@@ -2305,6 +2305,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "Un paquet ne maintient que ses parties ensemble : chacune garde sa couleur et son type, les trous ne coupent rien, et dans une exportation, chaque partie est un corps qui lui est propre. E l'ouvre pour l'éditer, Ctrl+Shift+G le démonte.",
   "shape.intersection": "Intersection",
   "shape.importedMesh": "Maillage importé",
+  "shape.mesh": "Maillage",
+  "shape.exactBody": "Corps exact",
   "shape.sketchExtrusion": "Corps d'esquisse",
   "shape.sketchRevolve": "Corps tourné",
   "shape.threadMenu": "Filetage\nVis\nÉcrou",

@@ -2319,6 +2319,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "inspector.bundleNote": "Een bundel houdt alleen de delen bij elkaar: elk deel houdt zijn kleur en soort, gaten snijden niets weg, en bij exporteren is elk deel een eigen lichaam. E opent de bundel om te bewerken, Ctrl+Shift+G haalt hem uit elkaar.",
   "shape.intersection": "Doorsnijding",
   "shape.importedMesh": "Geïmporteerde mesh",
+  "shape.mesh": "Mesh",
+  "shape.exactBody": "Exact lichaam",
   "shape.sketchExtrusion": "Schetslichaam",
   "shape.sketchRevolve": "Omwentelingslichaam",
   "shape.threadMenu": "Draad\nSchroef\nMoer",

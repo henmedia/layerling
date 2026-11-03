@@ -1768,6 +1768,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "A köteg csak összetartja a részeit: mindegyik megtartja a színét és a fajtáját, a lyukak nem vágnak semmit, exportáláskor pedig minden rész külön test. Az E megnyitja szerkesztésre, a Ctrl+Shift+G szétszedi.",
   "shape.intersection": "Metszet",
   "shape.importedMesh": "Importált háló",
+  "shape.mesh": "Háló",
+  "shape.exactBody": "Pontos test",
   "shape.sketchExtrusion": "Vázlattest",
   "shape.sketchRevolve": "Forgatott test",
   "shape.threadMenu": "Menet\nCsavar\nAnya",

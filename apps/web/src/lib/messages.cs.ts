@@ -2382,6 +2382,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "inspector.bundleNote": "Seskupení drží části pohromadě. Každá zachovává barvu i typ, výřezy nic neodečítají a při exportu zůstává každý díl samostatným tělesem. E otevře úpravy, Ctrl+Shift+G seskupení rozdělí.",
   "shape.intersection": "Průnik",
   "shape.importedMesh": "Importovaná polygonová síť",
+  "shape.mesh": "Polygonová síť",
+  "shape.exactBody": "Přesné těleso",
   "shape.sketchExtrusion": "Těleso z náčrtu",
   "shape.sketchRevolve": "Rotační těleso",
   "shape.threadMenu": "Závit\nŠroub\nMatice",

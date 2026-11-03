@@ -19,6 +19,7 @@ U složitého modelu pomůže seznam všech tvarů: {{ui:editor.tool.showOutline
 
 - Kliknutí vybere tvar, i uvnitř sloučení. [[Shift]] přidává a odebírá položky jako v pohledu. Šipky rozbalují a sbalují vnořené části.
 - Popisek rozlišuje {{ui:outliner.solid}} a {{ui:outliner.hole}}.
+- Pod názvem stojí, o jaký tvar jde. Těleso, které už není jednoduchým tvarem (zaoblené, vydutěné nebo importované), ukazuje {{ui:shape.exactBody}}, když ho export STEP zapíše přesně, a {{ui:shape.mesh}}, když je jen z trojúhelníků a jde ven jako STL. Zúžení, náklon nebo zkroucení přidané až po zaoblení nebo vydutění ohne jen jeho síť, takže pak ukazuje {{ui:shape.mesh}}.
 - Zámek a oko ovládají zamknutí a skrytí jednotlivých částí.
 - {{ui:outliner.rename}} přiřadí vlastní název. Stejně funguje tužka nahoře v nastavení vybraného tvaru. Smysluplné názvy usnadňují práci ve velkém projektu.
 - Tlačítko A–Z v záhlaví ({{ui:outliner.sortByName}}) seřadí pojmenované tvary abecedně, čísla počítá jako čísla (Díl 2 před Dílem 10). Tvary s výchozím názvem zůstanou pod nimi v pořadí přidání, nejnovější na konci, a díly ve skupinách se řadí stejně. Mění se jen seznam, nikdy projekt. Druhé kliknutí ukáže vše znovu v pořadí přidání a prohlížeč si volbu zapamatuje.

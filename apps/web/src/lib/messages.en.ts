@@ -2319,6 +2319,8 @@ export const MESSAGES_EN = {
   "inspector.bundleNote": "A bundle only holds its parts together: each keeps its colour and kind, holes cut nothing, and in an export every part is a body of its own. E opens it for editing, Ctrl+Shift+G takes it apart.",
   "shape.intersection": "Intersection",
   "shape.importedMesh": "Imported Mesh",
+  "shape.mesh": "Mesh",
+  "shape.exactBody": "Exact body",
   "shape.sketchExtrusion": "Sketch body",
   "shape.sketchRevolve": "Revolved body",
   "shape.threadMenu": "Thread\nScrew\nNut",

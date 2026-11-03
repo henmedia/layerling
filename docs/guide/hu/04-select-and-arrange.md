@@ -19,6 +19,7 @@ Sok résznél a nézetben könnyű elveszíteni a fonalat. Az objektumlista ({{u
 
 - Egy bejegyzésre kattintva kijelölöd az alakzatot, a csoporton belüli részeket is. Nyomva tartott [[Shift]] billentyűvel további bejegyzéseket adsz hozzá vagy veszel el, mint a nézetben. A nyilak kinyitják és összecsukják a csoportokat.
 - A címke mutatja, hogy egy rész {{ui:outliner.solid}} vagy {{ui:outliner.hole}}.
+- A név alatt az áll, milyen alakzatról van szó. Az a test, amely már nem egyszerű alakzat (lekerekített, kiüregelt vagy importált), {{ui:shape.exactBody}} feliratot kap, ha a STEP-export pontosan kiírja, és {{ui:shape.mesh}} feliratot, ha csak háromszögekből áll, és STL-ként megy ki. A lekerekítés vagy kiüregelés után hozzáadott szűkítés, döntés vagy csavarás csak a hálóját hajlítja meg, ezért ekkor {{ui:shape.mesh}} áll ott.
 - A lakat és a szem egyes részeket zárol és rejt el.
 - Az {{ui:outliner.rename}} saját nevet ad egy résznek; a beállítások tetején a név melletti ceruza ugyanezt teszi a kijelölt alakzattal. Nagyobb terveknél az értelmes nevek rengeteget segítenek.
 - A címsor A–Z gombja ({{ui:outliner.sortByName}}) ábécérendbe rendezi az általad elnevezett alakzatokat, a számokat számként kezelve (2. rész a 10. rész előtt). Az alapértelmezett nevüket viselő alakzatok alattuk maradnak a hozzáadás sorrendjében, a legújabb a végén, és a csoportokon belüli részek ugyanígy rendeződnek. Csak a lista változik, a terv soha. Egy második kattintás ismét a hozzáadás sorrendjében mutat mindent, és a böngésző megjegyzi a választást.

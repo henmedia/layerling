@@ -8,6 +8,7 @@ import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { getLanguage, t, type MessageKey } from "@/lib/i18n";
 import { displayShapeName, hasOwnShapeName } from "@/lib/shapeCatalog";
+import { stepSourceForShape } from "@/lib/stepExport";
 import {
   hasMatchingPart as partMatchesSearch,
   isObjectListOrder,
@@ -135,6 +136,8 @@ export function ObjectListPanel({
       const kindName = t(shape.groupOperation === "bundle" ? "shape.bundle" : "shape.group");
       return `${kindName} · ${t("outliner.children", { count: shape.groupedShapes.length })}`;
     }
+    // A rounded, hollowed or imported body says whether the STEP export can write it exactly (#1237).
+    if (shape.kind === "mesh") return t(stepSourceForShape(shape) === "unsupported" ? "shape.mesh" : "shape.exactBody");
     const key = `shape.${shape.kind}` as MessageKey;
     const translated = t(key);
     return translated || shape.kind;

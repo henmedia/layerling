@@ -1852,6 +1852,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "Sveženj le drži dele skupaj: vsak ohrani svojo barvo in vrsto, luknje ničesar ne izrežejo, pri izvozu pa je vsak del svoje telo. E ga odpre za urejanje, Ctrl+Shift+G ga razstavi.",
   "shape.intersection": "Presek",
   "shape.importedMesh": "Uvožena mreža",
+  "shape.mesh": "Mreža",
+  "shape.exactBody": "Natančno telo",
   "shape.sketchExtrusion": "Telo iz skice",
   "shape.sketchRevolve": "Zasukano telo",
   "shape.threadMenu": "Navoj\nVijak\nMatica",

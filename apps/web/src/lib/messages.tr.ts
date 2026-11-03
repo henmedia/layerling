@@ -1786,6 +1786,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "Bir paket sadece parçalarını bir arada tutar: her biri rengini ve türünü korur, delikler hiçbir şeyi kesmez ve dışa aktarımda her parça ayrı bir gövdedir. E onu düzenlemek için açar, Ctrl+Shift+G onu dağıtır.",
   "shape.intersection": "Kesişim",
   "shape.importedMesh": "İçe aktarılmış ağ",
+  "shape.mesh": "Ağ",
+  "shape.exactBody": "Kesin gövde",
   "shape.sketchExtrusion": "Eskiz gövdesi",
   "shape.sketchRevolve": "Döndürülmüş gövde",
   "shape.threadMenu": "Diş\nVida\nSomun",

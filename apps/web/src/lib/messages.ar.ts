@@ -2320,6 +2320,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "inspector.bundleNote": "الحزمة تمسك أجزاءها معًا فقط: يحتفظ كل جزء بلونه ونوعه، والثقوب لا تقطع شيئًا، وفي التصدير يكون كل جزء جسمًا مستقلًا. E يفتحها للتعديل، وCtrl+Shift+G يفككها.",
   "shape.intersection": "تقاطع",
   "shape.importedMesh": "شبكة مستوردة",
+  "shape.mesh": "شبكة",
+  "shape.exactBody": "جسم دقيق",
   "shape.sketchExtrusion": "جسم رسم تخطيطي",
   "shape.sketchRevolve": "جسم دوراني",
   "shape.threadMenu": "سن لولبي\nبرغي\nصامولة",
