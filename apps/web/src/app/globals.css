@@ -6822,6 +6822,11 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   opacity: 0.52;
 }
 
+/* "Handle X" is two words: they stay on one line next to their field (#1250). */
+.sketch-selection-position > span {
+  white-space: nowrap;
+}
+
 .sketch-corner-dialog {
   display: inline-flex;
   align-items: center;

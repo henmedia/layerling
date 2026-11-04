@@ -18,5 +18,15 @@
       "de": "Bleiben nach „Exakt machen“ haarfeine Flächen zwischen Flächen in einer Ebene, nimmt „Fläche löschen“ sie mit den gewählten Flächen mit, sodass eine in Streifen zerfallene Seite wieder eine Fläche werden kann.",
       "en": "When Make exact leaves hair-thin faces between faces in one plane, Delete face takes them along with the picked faces, so a side that came out as strips can become one face again."
     }
+  },
+  {
+    "title": {
+      "de": "Punkte und Kurvengriffe eintippen",
+      "en": "Type points and curve handles"
+    },
+    "body": {
+      "de": "In der Skizze zeigt ein gewählter Punkt seine Lage als X und Y, ein angeklickter Kurvengriff seine Lage zu seinem Punkt. Beides lässt sich eintippen, so wird eine Kurve genau und auf beiden Seiten gleich.",
+      "en": "In a sketch, a selected point shows where it lies as X and Y, and a clicked curve handle where it lies from its point. Both can be typed, so a curve comes out exact and the same on both sides."
+    }
   }
 ]
