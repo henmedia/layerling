@@ -107,3 +107,34 @@ describe("the thread sizes and profiles the MCP bridge offers", () => {
     }
   });
 });
+
+describe("tool schemas every MCP client can load (#1285)", () => {
+  // A list of types ("type": ["object", "string"]) is legal JSON Schema, but some clients drop the whole tool for it:
+  // create_shape and update_object went missing that way. anyOf with one type per branch says the same.
+  function typeLists(schema: unknown, path: string, found: string[]) {
+    if (Array.isArray(schema)) {
+      schema.forEach((entry, index) => typeLists(entry, `${path}[${index}]`, found));
+      return;
+    }
+    if (!schema || typeof schema !== "object") return;
+    const record = schema as Record<string, unknown>;
+    if (Array.isArray(record.type)) found.push(path);
+    for (const [key, value] of Object.entries(record)) {
+      if (key !== "description") typeLists(value, `${path}.${key}`, found);
+    }
+  }
+
+  it("gives every property a single type", () => {
+    const found: string[] = [];
+    for (const tool of toolList) typeLists(tool.inputSchema, tool.name, found);
+    expect(found).toEqual([]);
+  });
+
+  it("still takes a vase as settings or as JSON text, and a trace as true or settings", () => {
+    const vase = toolByName("layerling_create_shape").inputSchema.properties?.vase as { anyOf: { type: string }[] };
+    expect(vase.anyOf.map((branch) => branch.type)).toEqual(["object", "string"]);
+    const trace = toolByName("layerling_reference_image").inputSchema.properties?.trace as { anyOf: { type: string; properties?: Record<string, unknown> }[] };
+    expect(trace.anyOf.map((branch) => branch.type)).toEqual(["object", "boolean"]);
+    expect(Object.keys(trace.anyOf[0].properties ?? {})).toEqual(["part", "threshold", "height"]);
+  });
+});

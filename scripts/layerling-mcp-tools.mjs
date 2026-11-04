@@ -346,7 +346,8 @@ export const shapeSettingSchema = {
     description: "Bent tube only: the chain of segments, each a straight run followed by an arc bend. The tube starts along +X; roll 0 bends within the workplane, roll 90 bends upward. layerling_read_scene reports this list as JSON text, which is accepted here as well.",
   },
   vase: {
-    type: ["object", "string"],
+    // anyOf, not a list of types: some MCP clients drop a tool whose schema has one (#1285).
+    anyOf: [{ type: "object" }, { type: "string" }],
     description: "Vase only: its settings, by the vase tool's own (German) names, for example { profile: \"bauchig\" (or flasche, schale, fass, zylinder, trichter), section: \"vieleck\" (or kreis, welle), polySides: 6, sectionWaves: 12, sectionWaveStyle: \"weich\" (or spitz, bogen, lamellen), twist: 90, swayAngle: 10, body: \"voll\" (one wall for the slicer's vase mode) or \"hohl\" with wall and bottom in mm (bottom 0: no bottom, a tube open at both ends, for bells and mouthpieces), effect: \"rillen\" (or keine, streifen, voronoi, lowpoly), ribCount: 48, ribDepth: 1.6, stripeCount, voronoiCell, lowpolyAround, zoneFrom/zoneTo in % of the height, quality: \"entwurf\", \"standard\" or \"fein\" }. Also: section2 (a second cross-section the first blends into, between section2From and section2To %), waveAmplitude/waveCount (winding grooves), and bottom and wall: watertight: \"ja\", drainHoles, drainDiameter, floorSlope, footHeight, rubberFeet, cutout (keine, voronoi, waben, rauten, kreise; cutoutSize, cutoutWeb, cutoutFrom, cutoutTo) and lamp (keine, haengend, stehend, puck; lampSocket e27, e14 or eigen with lampHole) for a hollow vase, reinforce (keine, rippen, doppelwand; reinforceCount, reinforceDepth) for a solid one. Drawn shapes: profile \"gezeichnet\" with profilePoints [[height 0..1, radius 0..1, kind?, slope?], ...] (kind 1 a corner, 2 a handle with its slope; the widest point is the diameter), section or section2 \"gezeichnet\" with drawSymmetry (halb, viertel, windmuehle with drawRepeat blades, frei) and drawPoints [{ x, y, corner, tx?, ty? }, ...] in the unit circle (the part the symmetry repeats), twistMode \"kurve\" with twistPoints [[height 0..1, angle in degrees, kind?, slope?], ...]. Accessories: legMode (keine, stecken = legs to plug in, angeformt = moulded on, staender = a stand; legCount, legHeight, legDiameter, legShape kegel/zylinder/kantig, legSplay, legInset), saucerMode (keine, schale = a saucer, versteckt = hidden in the foot; saucerHeight, saucerGap, saucerWall, saucerRibs/saucerSpout/saucerGrip \"ja\" or \"nein\"), insertMode (keine, pflanze, bewaesserung, stecker, roehrchen; insertWall, insertStandoff, reservoirHeight, frogHole, tubeDiameter) for a hollow vase, lidMode (keiner, stuelp, schnapp, schraube, kanne = a teapot lid: the top lidHeight mm of a hollow vase is the lid, its pattern and twist running on, a lip into the opening, lidKnob \"ja\" a knob apart; lidClearance, lidThickness, lidDepth, threadPitch, lidGrip) and fitClearance; vaseParts lays them out as objects. For printing: material (pla, petg, abs, asa, tpu) and lineWidth (the slicer's line in vase mode, mm), which the editor's Print card weighs. Settings not given stay as they were (when creating: the vase tool's defaults). The height is the object's height and the widest diameter its larger side; the other side follows the outline. layerling_read_scene reports the settings that differ from the defaults as JSON text, which is accepted here as well.",
   },
   text: { type: "string", description: "Text only: the lettering itself." },
@@ -1547,13 +1548,18 @@ export const tools = [
         },
         locked: { type: "boolean", description: "true locks it (it stays put and lets clicks through), false unlocks it." },
         trace: {
-          type: ["object", "boolean"],
           description: "Trace the picture into a sketch body standing on it (#1060), as Trace on the sketch's reference image does: true, or { part, threshold, height }. Only a reference image lying flat (on the plate or a level face).",
-          properties: {
-            part: { type: "string", enum: ["dark", "light"], description: "Which part of the picture becomes the body (default dark)." },
-            threshold: { type: "number", minimum: 0.05, maximum: 0.95, description: "Where dark turns light, 0.05 to 0.95 (default 0.5)." },
-            height: { type: "number", minimum: 0.2, maximum: 500, description: "How high the body is in mm (default 2)." },
-          },
+          anyOf: [
+            {
+              type: "object",
+              properties: {
+                part: { type: "string", enum: ["dark", "light"], description: "Which part of the picture becomes the body (default dark)." },
+                threshold: { type: "number", minimum: 0.05, maximum: 0.95, description: "Where dark turns light, 0.05 to 0.95 (default 0.5)." },
+                height: { type: "number", minimum: 0.2, maximum: 500, description: "How high the body is in mm (default 2)." },
+              },
+            },
+            { type: "boolean" },
+          ],
         },
       },
     },
