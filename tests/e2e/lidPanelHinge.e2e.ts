@@ -80,6 +80,26 @@ describe("the lid's panel with a hinge", () => {
     expect(left.panel.querySelector('[aria-label="Hinge side"] [role="radio"][aria-checked="true"]')?.textContent).toBe("Left");
   });
 
+  it("offers the hinge outside, flush in the wall or as pivot pins, and hides the knuckle count for pivot pins", () => {
+    const { panel, changes } = mount({ hinge: true });
+    const group = panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Hinge type"]')!;
+    expect(group).not.toBeNull();
+    const styles = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
+    expect(styles.map((button) => button.textContent)).toEqual(["Outside", "Flush", "Pivot pins"]);
+    expect(group.querySelector('[role="radio"][aria-checked="true"]')?.textContent).toBe("Outside");
+    expect(texts(panel)).toContain("the lid opens all the way");
+    act(() => styles[1].click());
+    expect(changes.at(-1)).toEqual({ hingeStyle: "flush" });
+    act(() => root?.unmount());
+    const flush = mount({ hinge: true, hingeStyle: "flush" });
+    expect(texts(flush.panel)).toContain("the box keeps its size");
+    expect(texts(flush.panel)).toContain("Knuckles (0 = automatic)");
+    act(() => root?.unmount());
+    const pivot = mount({ hinge: true, hingeStyle: "pivot" });
+    expect(texts(pivot.panel)).toContain("turns on two pins through the side walls");
+    expect(texts(pivot.panel)).not.toContain("Knuckles (0 = automatic)");
+  });
+
   it("goes with a lid that pushes in or a flat one, and says so for one with a rim round the outside", () => {
     const cap = mount({ type: "cap", hinge: true });
     const hinge = checkbox(cap.panel, "Hinge")!;

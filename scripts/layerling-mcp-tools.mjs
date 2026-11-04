@@ -883,6 +883,7 @@ export const tools = [
         hingeKnuckles: { type: "number", description: "How many knuckles, odd, 3 to 15; 0 lets the hinge's length decide (about one per 10 mm). Default 0." },
         hingePrintPin: { type: "boolean", description: "Also make the pin as a body of its own, lying beside the lid (strong from about 3 mm). Default false." },
         hingeSide: { type: "string", enum: ["back", "right", "front", "left"], description: "The side the hinge goes along, as in the starting view: back (-z), right (+x), front (+z) or left (-x). A round side (a pot, a tube) gets its knuckles on a block reaching in to the wall. Default back." },
+        hingeStyle: { type: "string", enum: ["outside", "flush", "pivot"], description: "Where the hinge sits: outside (default) behind the side, the lid opens all the way; flush in the wall, the box keeps its size and the lid opens to about 140 degrees; pivot, the lid lies in the opening and turns on two pins through the side walls, held by a ledge inside, opening to about 95 degrees. flush and pivot need a straight side and go without magnets." },
         hingeTeardrop: { type: "boolean", description: "Teardrop pin holes, pointing up as each part is printed (the body upright, the lid turned over), so they do not droop. Default true." },
       },
     },
