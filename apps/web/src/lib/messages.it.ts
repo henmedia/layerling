@@ -3141,7 +3141,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceImageHint": "Le zone chiare diventano rilievi fino alla profondità massima, mentre quelle scure rimangono invariate. L'immagine personalizzata viene salvata nel progetto in scala di grigi, con un massimo di 256 punti per lato. La texture mantiene la larghezza impostata e l'altezza proporzionale all'immagine.",
   "inspector.surfaceTileHeight": "Altezza della texture (0 = come nell'immagine)",
   "inspector.surfaceImageHeight": "Altezza dell'immagine",
-  "inspector.surfaceImageOnceHint": "L'immagine viene impressa una sola volta, come un'etichetta: «Disposizione intorno» e «Altezza» ne fissano il centro, come per un testo. Al di fuori la superficie resta liscia; «Profondità» e «Direzione» stabiliscono quanto sporge o è incisa. Un'altezza dell'immagine pari a 0 ne mantiene le proporzioni.",
+  "inspector.surfaceImageOnceHint": "L'immagine viene impressa una sola volta, come un'etichetta: «Disposizione intorno» e «Altezza» ne fissano il centro, come per un testo. Al di fuori la superficie resta liscia; «Profondità» e «Direzione» stabiliscono quanto sporge o è incisa. Un'altezza dell'immagine pari a 0 ne mantiene le proporzioni. Se sono selezionate delle facce, l'immagine finisce sempre su di esse.",
   "inspector.surfaceImageTurn": "Rotazione (°)",
   "inspector.surfaceImageInvert": "Inverti chiaro e scuro",
   "inspector.surfaceImageBlur": "Ammorbidisci",

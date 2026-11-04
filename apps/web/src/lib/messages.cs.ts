@@ -3200,7 +3200,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "inspector.surfaceImageHint": "Světlá místa dostanou plnou hloubku, tmavá zůstanou, jak jsou. Vlastní obrázek se uloží s návrhem ve stupních šedi, nejvýš 256 bodů na stranu; dlaždice je široká, jak je nastaveno, a vysoká, jak k tomu obrázek pasuje.",
   "inspector.surfaceTileHeight": "Výška dlaždice (0 = podle obrázku)",
   "inspector.surfaceImageHeight": "Výška obrázku",
-  "inspector.surfaceImageOnceHint": "Obrázek se otiskne jednou, jako nálepka: „Dokola“ a „Výška“ určují jeho střed, stejně jako u textu. Mimo něj zůstává plocha hladká; „Hloubka“ a „Směr“ určují, jak moc vystupuje nebo je vtlačený. Výška obrázku 0 zachová jeho poměr stran.",
+  "inspector.surfaceImageOnceHint": "Obrázek se otiskne jednou, jako nálepka: „Dokola“ a „Výška“ určují jeho střed, stejně jako u textu. Mimo něj zůstává plocha hladká; „Hloubka“ a „Směr“ určují, jak moc vystupuje nebo je vtlačený. Výška obrázku 0 zachová jeho poměr stran. Jsou-li vybrané plochy, obrázek vždy dopadne na ně.",
   "inspector.surfaceImageTurn": "Otočeno (°)",
   "inspector.surfaceImageInvert": "Prohodit světlé a tmavé",
   "inspector.surfaceImageBlur": "Změkčit",

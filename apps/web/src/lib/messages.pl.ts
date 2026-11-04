@@ -3111,7 +3111,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceImageHint": "Jasne miejsca dostają pełną głębokość, ciemne zostają bez zmian. Własny obraz jest przechowywany z projektem w odcieniach szarości, najwyżej 256 punktów na bok. Kafel ma ustawioną szerokość i taką wysokość, jaką ma obraz przy tej szerokości.",
   "inspector.surfaceTileHeight": "Wysokość kafla (0 = jak obraz)",
   "inspector.surfaceImageHeight": "Wysokość obrazu",
-  "inspector.surfaceImageOnceHint": "Obraz zostaje odciśnięty raz, jak naklejka: „Dookoła” i „Wysokość” ustawiają jego środek, jak przy tekście. Poza nim powierzchnia pozostaje gładka; „Głębokość” i „Kierunek” określają, jak bardzo wystaje lub jest wciśnięty. Wysokość obrazu 0 zachowuje jego proporcje.",
+  "inspector.surfaceImageOnceHint": "Obraz zostaje odciśnięty raz, jak naklejka: „Dookoła” i „Wysokość” ustawiają jego środek, jak przy tekście. Poza nim powierzchnia pozostaje gładka; „Głębokość” i „Kierunek” określają, jak bardzo wystaje lub jest wciśnięty. Wysokość obrazu 0 zachowuje jego proporcje. Gdy wybrano ściany, obraz zawsze trafia na nie.",
   "inspector.surfaceImageTurn": "Obrót (°)",
   "inspector.surfaceImageInvert": "Zamień jasne i ciemne",
   "inspector.surfaceImageBlur": "Zmiękcz",

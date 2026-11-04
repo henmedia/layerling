@@ -1110,7 +1110,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceImageHint": "As áreas claras ganham a profundidade total; as escuras ficam como estão. Sua imagem fica salva com o projeto, em tons de cinza e com no máximo 256 pontos por lado. Cada ladrilho usa a largura definida e mantém a proporção da imagem.",
   "inspector.surfaceTileHeight": "Altura do ladrilho (0 = a da imagem)",
   "inspector.surfaceImageHeight": "Altura da imagem",
-  "inspector.surfaceImageOnceHint": "A imagem é estampada uma única vez, como uma etiqueta: \"Na volta\" e \"Altura\" posicionam o centro dela, como num texto. Fora dela a superfície fica lisa; \"Profundidade\" e \"Direção\" definem quanto ela se destaca ou fica rebaixada. Uma altura de imagem 0 mantém as proporções dela.",
+  "inspector.surfaceImageOnceHint": "A imagem é estampada uma única vez, como uma etiqueta: \"Na volta\" e \"Altura\" posicionam o centro dela, como num texto. Fora dela a superfície fica lisa; \"Profundidade\" e \"Direção\" definem quanto ela se destaca ou fica rebaixada. Uma altura de imagem 0 mantém as proporções dela. Com faces escolhidas, a imagem sempre cai sobre elas.",
   "inspector.surfaceImageTurn": "Rotação (°)",
   "inspector.surfaceImageInvert": "Inverter claro e escuro",
   "inspector.surfaceImageBlur": "Suavizar",

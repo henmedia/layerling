@@ -3097,7 +3097,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceImageHint": "亮的部分变成最大深度，暗的部分保持不变。你自己的图片以灰度保存在设计里，每边最多 256 个点；贴片宽度按设置，高度按图片在该宽度下的比例。",
   "inspector.surfaceTileHeight": "贴片高度（0 = 按图片）",
   "inspector.surfaceImageHeight": "图片高度",
-  "inspector.surfaceImageOnceHint": "图片像标签一样只压印一次：“环绕”和“高度”确定它的中心，和文字一样。图片之外的表面保持平滑；“深度”和“方向”决定它凸出或压入多少。图片高度为 0 时保持图片比例。",
+  "inspector.surfaceImageOnceHint": "图片像标签一样只压印一次：“环绕”和“高度”确定它的中心，和文字一样。图片之外的表面保持平滑；“深度”和“方向”决定它凸出或压入多少。图片高度为 0 时保持图片比例。选中了面时，图像总是落在这些面上。",
   "inspector.surfaceImageTurn": "旋转（°）",
   "inspector.surfaceImageInvert": "交换明暗",
   "inspector.surfaceImageBlur": "柔化",

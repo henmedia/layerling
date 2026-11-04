@@ -3156,7 +3156,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceImageHint": "Lo claro se convierte en la profundidad completa y lo oscuro se queda como está. Tu propia imagen se guarda con el diseño en gris, con 256 puntos por lado como máximo; una tesela tiene la anchura fijada y la altura que le corresponde a la imagen con esa anchura.",
   "inspector.surfaceTileHeight": "Altura de tesela (0 = la de la imagen)",
   "inspector.surfaceImageHeight": "Altura de la imagen",
-  "inspector.surfaceImageOnceHint": "La imagen se estampa una sola vez, como una etiqueta: «Alrededor» y «Altura» colocan su centro, como en un texto. Fuera de ella la superficie queda lisa; «Profundidad» y «Dirección» fijan cuánto sobresale o se hunde. Una altura de imagen de 0 mantiene sus proporciones.",
+  "inspector.surfaceImageOnceHint": "La imagen se estampa una sola vez, como una etiqueta: «Alrededor» y «Altura» colocan su centro, como en un texto. Fuera de ella la superficie queda lisa; «Profundidad» y «Dirección» fijan cuánto sobresale o se hunde. Una altura de imagen de 0 mantiene sus proporciones. Si hay caras elegidas, la imagen siempre cae sobre ellas.",
   "inspector.surfaceImageTurn": "Giro (°)",
   "inspector.surfaceImageInvert": "Invertir claro y oscuro",
   "inspector.surfaceImageBlur": "Suavizar",
