@@ -794,6 +794,7 @@ export const MESSAGES_EN = {
   "lid.hingeSide": "Hinge side",
   "lid.hingePin": "Pin diameter",
   "lid.hingeGap": "Hinge clearance",
+  "lid.hingePinPlay": "Pin play (per side)",
   "lid.hingeKnuckles": "Knuckles (0 = automatic)",
   "lid.hingePrintPin": "Print the pin too",
   "lid.hingeTeardrop": "Teardrop pin holes (no droop when printed)",

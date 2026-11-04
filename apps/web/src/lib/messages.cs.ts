@@ -922,6 +922,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.hingeSide": "Strana pantu",
   "lid.hingePin": "Průměr čepu",
   "lid.hingeGap": "Vůle v pantu",
+  "lid.hingePinPlay": "Vůle čepu (na každé straně)",
   "lid.hingeKnuckles": "Kloubky (0 = automaticky)",
   "lid.hingePrintPin": "Vytisknout i čep",
   "lid.hingeTeardrop": "Otvory pro čep ve tvaru kapky (při tisku neprověsí)",

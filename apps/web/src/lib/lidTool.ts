@@ -45,8 +45,8 @@ export type LidHingeStyle = "outside" | "flush" | "pivot";
  * is, in mm. With `magnets`, pockets for four round magnets of that diameter and height, with `magnetGap` of play per
  * side (a little to press them in, more to glue them). With `hinge`, a hinge along the `hingeSide` (the back unless
  * another is picked) for a pin of `hingePin` mm, `hingeGap` between its knuckles, `hingeKnuckles` of them (0: as many as
- * suit its length), and the pin printed apart with `hingePrintPin`. With `hingeTeardrop` (the default) the pin's holes
- * have a point on top as each part is printed, so they do not droop.
+ * suit its length), and the pin printed apart with `hingePrintPin`. `hingePinPlay` is the pin's play in its holes, per
+ * side. With `hingeTeardrop` (the default) the pin's holes have a point on top as each part is printed, so they do not droop.
  */
 export type LidOptions = {
   type: LidType;
@@ -61,6 +61,7 @@ export type LidOptions = {
   hinge: boolean;
   hingePin: number;
   hingeGap: number;
+  hingePinPlay: number;
   hingeKnuckles: number;
   hingePrintPin: boolean;
   hingeSide: LidHingeSide;
@@ -71,7 +72,7 @@ export type LidOptions = {
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat"];
 export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
-  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside",
+  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside",
 };
 export const LID_FITS = [0.1, 0.2, 0.3] as const;
 export const MIN_LID_THICKNESS = 0.4;
@@ -118,8 +119,9 @@ export const MAX_HINGE_PIN = 8;
 export const MIN_HINGE_GAP = 0.1;
 export const MAX_HINGE_GAP = 1;
 export const MAX_HINGE_KNUCKLES = 15;
-/** How much play the pin has in its hole, per side, in mm. */
-const HINGE_PIN_PLAY = 0.15;
+/** How much play the pin may have in its hole, per side, in mm (0.2 to begin with: a 3 mm pin went in hard at 0.15, #1220). */
+export const MIN_HINGE_PIN_PLAY = 0.05;
+export const MAX_HINGE_PIN_PLAY = 0.5;
 /** How much a knuckle keeps round the pin's hole, in mm. */
 const HINGE_KNUCKLE_WALL = 1.6;
 /** A knuckle is at least this wide along the axis, in mm. */
@@ -176,6 +178,8 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (hingePin !== null) result.hingePin = clamp(hingePin, MIN_HINGE_PIN, MAX_HINGE_PIN);
   const hingeGap = finiteNumber(value?.hingeGap);
   if (hingeGap !== null) result.hingeGap = clamp(hingeGap, MIN_HINGE_GAP, MAX_HINGE_GAP);
+  const hingePinPlay = finiteNumber(value?.hingePinPlay);
+  if (hingePinPlay !== null) result.hingePinPlay = clamp(hingePinPlay, MIN_HINGE_PIN_PLAY, MAX_HINGE_PIN_PLAY);
   // An odd number, so the body holds both ends; 0 leaves it to the hinge's length.
   const hingeKnuckles = finiteNumber(value?.hingeKnuckles);
   if (hingeKnuckles !== null) {
@@ -191,9 +195,9 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   return result;
 }
 
-/** A knuckle's radius for this pin: its hole with the pin's play and a wall round it, in mm. */
-export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin">) {
-  return options.hingePin / 2 + HINGE_PIN_PLAY + HINGE_KNUCKLE_WALL;
+/** A knuckle's radius for this pin: its hole with the pin's play (the default's unless given) and a wall round it, in mm. */
+export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin"> & Partial<Pick<LidOptions, "hingePinPlay">>) {
+  return options.hingePin / 2 + (options.hingePinPlay ?? LID_DEFAULTS.hingePinPlay) + HINGE_KNUCKLE_WALL;
 }
 
 /**
@@ -257,7 +261,7 @@ export function hingePlan(polygons: readonly (readonly Point[])[], options: LidO
   if (low < bottom + 0.4) return { error: { code: "hingeTooLow" } };
   const w = fit.width;
   const segments = Array.from({ length: count }, (_, index): [number, number] => [start + index * (w + gap), start + index * (w + gap) + w]);
-  return { backY: back, axisY, axisZ, radius, hole: options.hingePin / 2 + HINGE_PIN_PLAY, segments, low, start, end, reach, curved, innerBack: inner };
+  return { backY: back, axisY, axisZ, radius, hole: options.hingePin / 2 + options.hingePinPlay, segments, low, start, end, reach, curved, innerBack: inner };
 }
 
 /** Where a level line at `y` crosses the outline: its leftmost and rightmost crossing, or null when it does not. */
@@ -306,7 +310,7 @@ export function pivotPlan(outline: readonly (readonly Point[])[], opening: reado
   if (barTo - barFrom < 4 * radius) return { error: { code: "pivotNoSides" } };
   if (axisZ - radius < bottom + 0.4 + PIVOT_LEDGE) return { error: { code: "hingeTooLow" } };
   const depth = Math.min(PIVOT_PIN_DEPTH, (barTo - barFrom) / 4);
-  return { axisY, axisZ, radius, hole: options.hingePin / 2 + HINGE_PIN_PLAY, outer, inner, barFrom, barTo, depth, innerBack };
+  return { axisY, axisZ, radius, hole: options.hingePin / 2 + options.hingePinPlay, outer, inner, barFrom, barTo, depth, innerBack };
 }
 
 /**

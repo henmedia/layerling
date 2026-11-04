@@ -784,6 +784,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "Côté de la charnière",
   "lid.hingePin": "Diamètre de l'axe",
   "lid.hingeGap": "Jeu de la charnière",
+  "lid.hingePinPlay": "Jeu de la goupille (par côté)",
   "lid.hingeKnuckles": "Nœuds (0 = automatique)",
   "lid.hingePrintPin": "Imprimer aussi l'axe",
   "lid.hingeTeardrop": "Trous d'axe en goutte (ne s'affaissent pas à l'impression)",

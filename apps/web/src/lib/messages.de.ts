@@ -793,6 +793,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.hingeSide": "Scharnierseite",
   "lid.hingePin": "Stiftdurchmesser",
   "lid.hingeGap": "Spiel im Scharnier",
+  "lid.hingePinPlay": "Spiel am Stift (pro Seite)",
   "lid.hingeKnuckles": "Knöchel (0 = automatisch)",
   "lid.hingePrintPin": "Stift mitdrucken",
   "lid.hingeTeardrop": "Tropfenförmige Stiftlöcher (hängen beim Druck nicht durch)",

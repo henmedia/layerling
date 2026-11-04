@@ -749,6 +749,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "Strona zawiasu",
   "lid.hingePin": "Średnica sworznia",
   "lid.hingeGap": "Luz w zawiasie",
+  "lid.hingePinPlay": "Luz sworznia (na stronę)",
   "lid.hingeKnuckles": "Kostki (0 = automatycznie)",
   "lid.hingePrintPin": "Wydrukuj też sworzeń",
   "lid.hingeTeardrop": "Otwory na sworzeń w kształcie kropli (nie opadają przy druku)",

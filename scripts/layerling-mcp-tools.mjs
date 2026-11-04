@@ -898,6 +898,7 @@ export const tools = [
         hinge: { type: "boolean", description: "A hinge along a side of the body (hingeSide, the back -z by default; straight, or round like a pot), for a plug or flat lid: knuckles take turns on the body (both ends) and the lid, flush with the lid's top, a hole for a pin through all of them. The body's knuckles are grouped with it (returned as body). Default false." },
         hingePin: { type: "number", description: "The pin's diameter in mm, 1 to 8 (1.75: a piece of filament). Default 1.75." },
         hingeGap: { type: "number", description: "The gap between the knuckles and round the lid's back edge in mm, 0.1 to 1. Default 0.3." },
+        hingePinPlay: { type: "number", description: "The pin's play in its holes per side in mm, 0.05 to 0.5; more if a printed or filament pin goes in hard. Default 0.2." },
         hingeKnuckles: { type: "number", description: "How many knuckles, odd, 3 to 15; 0 lets the hinge's length decide (about one per 10 mm). Default 0." },
         hingePrintPin: { type: "boolean", description: "Also make the pin as a body of its own, lying beside the lid (strong from about 3 mm). Default false." },
         hingeSide: { type: "string", enum: ["back", "right", "front", "left"], description: "The side the hinge goes along, as in the starting view: back (-z), right (+x), front (+z) or left (-x). A round side (a pot, a tube) gets its knuckles on a block reaching in to the wall. Default back." },

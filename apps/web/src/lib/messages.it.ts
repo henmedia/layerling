@@ -786,6 +786,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "Lato della cerniera",
   "lid.hingePin": "Diametro del perno",
   "lid.hingeGap": "Gioco della cerniera",
+  "lid.hingePinPlay": "Gioco del perno (per lato)",
   "lid.hingeKnuckles": "Nocche (0 = automatico)",
   "lid.hingePrintPin": "Stampa anche il perno",
   "lid.hingeTeardrop": "Fori del perno a goccia (non cedono in stampa)",

@@ -796,6 +796,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "Lado de la bisagra",
   "lid.hingePin": "Diámetro del pasador",
   "lid.hingeGap": "Holgura de la bisagra",
+  "lid.hingePinPlay": "Holgura del pasador (por lado)",
   "lid.hingeKnuckles": "Nudillos (0 = automático)",
   "lid.hingePrintPin": "Imprimir también el pasador",
   "lid.hingeTeardrop": "Agujeros del pasador en forma de gota (no se descuelgan al imprimir)",

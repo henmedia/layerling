@@ -191,6 +191,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "Hængslets side",
   "lid.hingePin": "Stiftdiameter",
   "lid.hingeGap": "Spil i hængslet",
+  "lid.hingePinPlay": "Spil om stiften (pr. side)",
   "lid.hingeKnuckles": "Knoer (0 = automatisk)",
   "lid.hingePrintPin": "Print også stiften",
   "lid.hingeTeardrop": "Dråbeformede stifthuller (hænger ikke ned ved print)",

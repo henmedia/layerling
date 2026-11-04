@@ -792,6 +792,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "جانب المفصلة",
   "lid.hingePin": "قطر المسمار",
   "lid.hingeGap": "خلوص المفصلة",
+  "lid.hingePinPlay": "خلوص المسمار (لكل جانب)",
   "lid.hingeKnuckles": "العُقد (0 = تلقائي)",
   "lid.hingePrintPin": "اطبع المسمار أيضًا",
   "lid.hingeTeardrop": "ثقوب المسمار على شكل قطرة (لا تتدلى عند الطباعة)",

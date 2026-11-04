@@ -793,6 +793,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "lid.hingeSide": "Kant van het scharnier",
   "lid.hingePin": "Pendiameter",
   "lid.hingeGap": "Speling in het scharnier",
+  "lid.hingePinPlay": "Speling van de pen (per kant)",
   "lid.hingeKnuckles": "Knokkels (0 = automatisch)",
   "lid.hingePrintPin": "Pen ook printen",
   "lid.hingeTeardrop": "Druppelvormige pengaten (zakken niet door bij het printen)",

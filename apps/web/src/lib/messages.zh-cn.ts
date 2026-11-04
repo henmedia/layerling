@@ -750,6 +750,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "铰链所在侧",
   "lid.hingePin": "销钉直径",
   "lid.hingeGap": "铰链间隙",
+  "lid.hingePinPlay": "销钉间隙（每侧）",
   "lid.hingeKnuckles": "铰节（0 = 自动）",
   "lid.hingePrintPin": "同时打印销钉",
   "lid.hingeTeardrop": "泪滴形销孔（打印时不下垂）",

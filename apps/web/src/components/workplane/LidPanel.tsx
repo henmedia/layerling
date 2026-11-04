@@ -16,6 +16,7 @@ import {
   MAX_HINGE_GAP,
   MAX_HINGE_KNUCKLES,
   MAX_HINGE_PIN,
+  MAX_HINGE_PIN_PLAY,
   MAX_LID_DEPTH,
   MAX_LID_GAP,
   MAX_LID_THICKNESS,
@@ -25,6 +26,7 @@ import {
   MAX_MAGNET_HEIGHT,
   MIN_HINGE_GAP,
   MIN_HINGE_PIN,
+  MIN_HINGE_PIN_PLAY,
   MIN_LID_DEPTH,
   MIN_LID_THICKNESS,
   MIN_LID_WALL,
@@ -323,6 +325,17 @@ export function LidPanel({
           length
           disabled={busy}
           onChange={(value) => onChange({ hingeGap: value })}
+        />
+        <EdgeModifierSlider
+          label={t("lid.hingePinPlay")}
+          value={settings.hingePinPlay}
+          min={MIN_HINGE_PIN_PLAY}
+          max={MAX_HINGE_PIN_PLAY}
+          step={0.05}
+          workspace={workspace}
+          length
+          disabled={busy}
+          onChange={(value) => onChange({ hingePinPlay: value })}
         />
         {/* A pivot lid turns on two pins and has no knuckles to count. */}
         {settings.hingeStyle === "pivot" ? null : (

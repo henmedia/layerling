@@ -793,6 +793,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "Сторона шарнира",
   "lid.hingePin": "Диаметр оси",
   "lid.hingeGap": "Зазор в шарнире",
+  "lid.hingePinPlay": "Зазор штифта (с каждой стороны)",
   "lid.hingeKnuckles": "Петли (0 = автоматически)",
   "lid.hingePrintPin": "Напечатать и ось",
   "lid.hingeTeardrop": "Отверстия-капли под ось (не провисают при печати)",

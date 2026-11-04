@@ -661,6 +661,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.hingeSide": "Stran tečaja",
   "lid.hingePin": "Premer zatiča",
   "lid.hingeGap": "Zračnost v tečaju",
+  "lid.hingePinPlay": "Zračnost zatiča (na vsaki strani)",
   "lid.hingeKnuckles": "Členki (0 = samodejno)",
   "lid.hingePrintPin": "Natisni tudi zatič",
   "lid.hingeTeardrop": "Luknje za zatič v obliki kapljice (pri tisku se ne povesijo)",
