@@ -39,7 +39,7 @@ Je kunt een vorm voorbij de rand van de plaat slepen en hem daar laten liggen, t
 
 ## Uitlijnen tijdens het verplaatsen
 
-Als je een vorm over het werkvlak sleept, lijnt hij uit op andere vormen: zijn linker-, rechter-, voor- of achterrand of zijn midden komt precies op een rand of midden van een andere vorm te liggen. Een roze hulplijn laat zien waaraan hij zich vasthoudt. Zo staan twee onderdelen strak naast elkaar of gecentreerd achter elkaar zonder dat je getallen hoeft te typen. Het werkt ook als het raster uitstaat.
+Als je een vorm over het werkvlak sleept, lijnt hij uit op andere vormen: zijn linker-, rechter-, voor- of achterrand of zijn midden komt precies op een rand of midden van een andere vorm te liggen. Een roze hulplijn laat zien waaraan hij zich vasthoudt. Zo staan twee onderdelen strak naast elkaar of gecentreerd achter elkaar zonder dat je getallen hoeft te typen. Het werkt ook als het raster uitstaat. Het midden van het werkvlak telt ook mee: de roze lijnen laten zien wanneer de vorm langs X, langs Y of beide midden op de plaat staat.
 
 Houd [[Shift]] ingedrukt tijdens het slepen om de verplaatsing op één as te houden: de vorm volgt de richting, X of Y, waarin je het verst hebt gesleept, en laat de andere met rust. Druk [[Shift]] het best pas in als je al aan het slepen bent; bij een vorm die nog niet geselecteerd is, voegt een klik met [[Shift]] hem alleen aan de selectie toe.
 

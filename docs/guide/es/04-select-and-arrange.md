@@ -41,7 +41,7 @@ Puedes arrastrar una forma más allá del borde de la placa y dejarla ahí, hast
 
 ## Ajuste al mover
 
-Cuando arrastras una forma por el plano de trabajo, se ajusta a otras formas: su lado izquierdo, derecho, delantero o trasero, o su centro, cae exactamente sobre un lado o el centro de otra forma. Una línea guía rosa muestra a qué se está ajustando. Así dejas dos piezas a ras una junto a otra, o centradas una detrás de otra, sin escribir números. También funciona con la cuadrícula desactivada.
+Cuando arrastras una forma por el plano de trabajo, se ajusta a otras formas: su lado izquierdo, derecho, delantero o trasero, o su centro, cae exactamente sobre un lado o el centro de otra forma. Una línea guía rosa muestra a qué se está ajustando. Así dejas dos piezas a ras una junto a otra, o centradas una detrás de otra, sin escribir números. También funciona con la cuadrícula desactivada. También cuenta el centro del plano de trabajo: las líneas rosas muestran cuándo la forma queda en el centro de la placa en X, en Y o en ambos.
 
 Mantén pulsado [[Mayús]] mientras arrastras para que el movimiento siga un solo eje: la forma sigue la dirección, X o Y, en la que más hayas arrastrado y no se mueve en la otra. Lo mejor es pulsar [[Mayús]] cuando ya estás arrastrando; sobre una forma que aún no está seleccionada, un clic con [[Mayús]] solo la añade a la selección.
 

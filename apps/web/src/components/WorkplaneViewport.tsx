@@ -6531,6 +6531,8 @@ export function WorkplaneViewport({
           ...(notesVisibleRef.current
             ? referencePoints(notesRef.current).map((point) => ({ minX: point.x, maxX: point.x, minZ: point.z, maxZ: point.z }))
             : []),
+          // The middle of the workplane, so a part can be put in its centre along X, Z or both (Discussion #1266).
+          { minX: activeWorkplane.origin.x, maxX: activeWorkplane.origin.x, minZ: activeWorkplane.origin.z, maxZ: activeWorkplane.origin.z },
         ];
       }
       if (moveDimensionsEnabledRef.current && usesWorldHorizontalAxes) {
@@ -6776,8 +6778,9 @@ export function WorkplaneViewport({
       }
 
       drag.items.forEach((item) => {
-        item.nextX = item.startX + deltaX;
-        item.nextZ = item.startZ + deltaZ;
+        // Snapped onto the workplane centre, a part lands on 0, not on a rounding rest like -3e-16 (#1266).
+        item.nextX = cleanNearZero(item.startX + deltaX, 1e-9);
+        item.nextZ = cleanNearZero(item.startZ + deltaZ, 1e-9);
         item.nextElevation = item.startElevation + deltaY;
         if (threeRef.current) applyDragItemPreview(threeRef.current, item);
       });

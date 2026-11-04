@@ -39,7 +39,7 @@ Puoi trascinare una forma oltre il bordo della piastra e lasciarla lì, fino a c
 
 ## Aggancio durante lo spostamento
 
-Quando trascini una forma sul piano di lavoro, questa si aggancia alle altre forme: il bordo sinistro, destro, anteriore o posteriore, oppure il centro, coincide esattamente con un bordo o con il centro di un’altra forma. Una guida rosa indica il punto di aggancio. Così puoi affiancare due parti senza spazi o centrarne una dietro l’altra senza digitare valori. Funziona anche con la griglia disattivata.
+Quando trascini una forma sul piano di lavoro, questa si aggancia alle altre forme: il bordo sinistro, destro, anteriore o posteriore, oppure il centro, coincide esattamente con un bordo o con il centro di un’altra forma. Una guida rosa indica il punto di aggancio. Così puoi affiancare due parti senza spazi o centrarne una dietro l’altra senza digitare valori. Funziona anche con la griglia disattivata. Conta anche il centro del piano di lavoro: le linee rosa mostrano quando la forma sta al centro del piano lungo X, lungo Y o entrambi.
 
 Tieni premuto [[Shift]] mentre trascini per vincolare lo spostamento a un asse: la forma segue la direzione in cui ti sei spostato di più, X oppure Y, e non si muove lungo l’altro asse. È preferibile premere [[Shift]] dopo aver iniziato a trascinare; se la forma non è ancora selezionata, un clic con [[Shift]] la aggiunge soltanto alla selezione.
 

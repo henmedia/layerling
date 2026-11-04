@@ -203,7 +203,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "welcome.moreSnapTitle": "吸附到其他形狀",
   "welcome.moreWindowsTitle": "清晰的檢視",
   "welcome.moreWindowsBody": "物件清單、設定與工具視窗可以拖到工作平面上的任何位置，拖曳視圖立方體可轉動檢視，點擊其角與邊可從斜角顯示模型，平台也可隱藏，方便從下方觀察。在實體上按右鍵會顯示最常用的指令，檢視還能存成圖片。",
-  "welcome.moreSnapBody": "移動時，邊與中心會鎖定到鄰近形狀，並以參考線顯示位置——拖曳時按住 Alt 可暫停吸附。按住 Shift 可讓移動限制在單一軸向，一開始就按住 Alt 則會拖出副本，與 Tinkercad 相同。新形狀會貼放在指標下方的面上，斜面也一樣；按 C 可將選取範圍以同樣方式放到另一個面上，就像 Tinkercad 的巡航（Cruise）。按住 Shift 則會沉入面中，頂部與面齊平。",
+  "welcome.moreSnapBody": "移動時，邊與中心會鎖定到鄰近形狀，並以參考線顯示位置——拖曳時按住 Alt 可暫停吸附。按住 Shift 可讓移動限制在單一軸向，一開始就按住 Alt 則會拖出副本，與 Tinkercad 相同。新形狀會貼放在指標下方的面上，斜面也一樣；按 C 可將選取範圍以同樣方式放到另一個面上，就像 Tinkercad 的巡航（Cruise）。按住 Shift 則會沉入面中，頂部與面齊平。工作平面的中心也算在內。",
   "welcome.moreGridTitle": "自訂吸附格線",
   "welcome.moreGridBody": "在設定中新增量測單位，例如晶片與洞洞板的 2.54 mm 腳距；吸附選單會提供整格、半格與四分之一格。",
   "welcome.moreLayFlatTitle": "平放在面上",

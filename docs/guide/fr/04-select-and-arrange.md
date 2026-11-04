@@ -39,7 +39,7 @@ Vous pouvez faire glisser une forme au-delà du bord de la plaque et la laisser 
 
 ## Capturer en bougeant
 
-Lorsque vous faites glisser une forme sur le plan de travail, elle s'aligne sur d'autres formes : son bord gauche, droit, avant ou arrière ou son centre atterrit exactement sur un bord ou le centre d'une autre forme. Une ligne de guidage rose montre à quoi il s'accroche. De cette façon, deux pièces sont alignées côte à côte ou centrées l’une derrière l’autre sans taper de chiffres. Cela fonctionne également avec le réseau éteint.
+Lorsque vous faites glisser une forme sur le plan de travail, elle s'aligne sur d'autres formes : son bord gauche, droit, avant ou arrière ou son centre atterrit exactement sur un bord ou le centre d'une autre forme. Une ligne de guidage rose montre à quoi il s'accroche. De cette façon, deux pièces sont alignées côte à côte ou centrées l’une derrière l’autre sans taper de chiffres. Cela fonctionne également avec le réseau éteint. Le centre du plan de travail compte aussi : les lignes roses montrent quand la forme est au milieu du plateau selon X, selon Y ou les deux.
 
 Maintenez [[Shift]] tout en faisant glisser pour conserver le déplacement sur un axe : la forme suit la direction, X ou Y, dans laquelle vous avez tiré plus loin et laisse l'autre seule. Il est préférable d'appuyer sur [[Shift]] une fois que vous faites déjà glisser ; sur une forme qui n'est pas encore sélectionnée, un clic avec [[Shift]] ne fait que l'ajouter à la sélection.
 

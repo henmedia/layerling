@@ -39,7 +39,7 @@ Egy alakzatot áthúzhatsz a tárgyasztal szélén túlra, és ott hagyhatod, mi
 
 ## Illesztés mozgatás közben
 
-Amikor egy alakzatot a munkasíkon húzol, más alakzatokhoz illeszkedik: a bal, jobb, első vagy hátsó éle vagy a közepe pontosan egy másik alakzat élére vagy közepére kerül. Egy rózsaszín segédvonal mutatja, mihez tartja magát. Így két rész számok begépelése nélkül egy síkban egymás mellé vagy egymás mögé középre kerül. Kikapcsolt rácsnál is működik.
+Amikor egy alakzatot a munkasíkon húzol, más alakzatokhoz illeszkedik: a bal, jobb, első vagy hátsó éle vagy a közepe pontosan egy másik alakzat élére vagy közepére kerül. Egy rózsaszín segédvonal mutatja, mihez tartja magát. Így két rész számok begépelése nélkül egy síkban egymás mellé vagy egymás mögé középre kerül. Kikapcsolt rácsnál is működik. A munkasík közepe is számít: a rózsaszín vonalak mutatják, mikor áll az alakzat a lap közepén X, Y vagy mindkét irányban.
 
 Húzás közben tartsd nyomva a [[Shift]] billentyűt, hogy a mozgás egy tengelyen maradjon: az alakzat abba az irányba, X-be vagy Y-ba megy, amerre jobban elhúztad, a másikat pedig békén hagyja. A [[Shift]] billentyűt legjobb akkor megnyomni, amikor már húzod; egy még ki nem jelölt alakzaton a nyomva tartott [[Shift]] billentyűvel végzett kattintás csak a kijelöléshez adja hozzá.
 

@@ -191,7 +191,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "welcome.moreSnapTitle": "Pripenjanje na druge oblike",
   "welcome.moreWindowsTitle": "Pregleden pogled",
   "welcome.moreWindowsBody": "seznam objektov, nastavitve in okna orodij je mogoče povleči kamor koli na delovni ravnini, vlečenje kocke pogleda zavrti pogled, ploščo pa je mogoče skriti za pogled od spodaj. Desni klik na telo prikaže najpogostejše ukaze, pogled pa je mogoče shraniti kot sliko.",
-  "welcome.moreSnapBody": "med premikanjem se robovi in središča pripnejo na sosednje oblike, vodilna črta pa pokaže kam – Alt med vlečenjem to začasno izklopi. Shift ohrani premik na eni osi, Alt, držan od začetka, pa povleče kopijo, kot v Tinkercadu. S Shiftom se namesto tega pogrezne, z vrhom poravnano s ploskvijo.",
+  "welcome.moreSnapBody": "med premikanjem se robovi in središča pripnejo na sosednje oblike, vodilna črta pa pokaže kam – Alt med vlečenjem to začasno izklopi. Shift ohrani premik na eni osi, Alt, držan od začetka, pa povleče kopijo, kot v Tinkercadu. S Shiftom se namesto tega pogrezne, z vrhom poravnano s ploskvijo. Šteje tudi sredina delovne ravnine.",
   "welcome.moreGridTitle": "Lastne pripenjalne mreže",
   "welcome.moreGridBody": "v nastavitvah dodaj mero, na primer 2,54 mm razmak nožic čipov in perforirane plošče; meni za pripenjanje jo ponudi celo, razpolovljeno in četrtinjeno.",
   "welcome.moreLayFlatTitle": "Položi na ploskev",

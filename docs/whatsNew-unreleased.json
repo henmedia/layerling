@@ -38,5 +38,25 @@
       "de": "Ein Gewinde kann jetzt kegelig sein, 1:16 wie ein Rohrgewinde, und das Größenmenü hat die amerikanischen NPT-Rohrgewinde von 1/16\" bis 4\". Stange und Schraube werden zur Spitze schmaler, Mutter und Gewindeloch zur Öffnung weiter.",
       "en": "A thread can now be tapered, 1 in 16 as a pipe thread is, and the size menu has the American NPT pipe threads from 1/16\" to 4\". Rod and screw narrow towards the tip, nut and tapped hole widen towards the mouth."
     }
+  },
+  {
+    "title": {
+      "de": "Ausrichten mit verdrehten Teilen sofort da",
+      "en": "Align comes up at once with twisted parts"
+    },
+    "body": {
+      "de": "Mit verdrehten Teilen in der Auswahl brauchte das Ausrichten-Werkzeug einige Sekunden, bis seine Punkte erschienen, und ebenso lange für jeden Klick. Jetzt misst es jedes Teil nur noch einmal und ist sofort da.",
+      "en": "With twisted parts in the selection, the align tool took a few seconds before its dots appeared, and as long again for each click. It now measures each part only once and comes up at once."
+    }
+  },
+  {
+    "title": {
+      "de": "Einrasten in der Mitte der Arbeitsebene",
+      "en": "Snap to the centre of the workplane"
+    },
+    "body": {
+      "de": "Beim Ziehen rastet eine Form jetzt auch an der Mitte der Arbeitsebene ein, auf X, auf Y oder auf beiden; die rosa Hilfslinien zeigen es. Alt zieht ohne Einrasten.",
+      "en": "When you drag a shape it now also snaps to the centre of the workplane, along X, along Y or both, and the pink guide lines show it. Alt drags without snapping."
+    }
   }
 ]

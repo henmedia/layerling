@@ -338,7 +338,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "welcome.moreSnapTitle": "Přichytávání k jiným tvarům",
   "welcome.moreWindowsTitle": "Přehledné zobrazení",
   "welcome.moreWindowsBody": "seznam objektů, nastavení i okna nástrojů můžete přetáhnout po pracovní ploše. Tažením orientační krychle otočíte pohled, kliknutím na její rohy a hrany přejdete na šikmý pohled. Podložku lze skrýt při pohledu zespodu. Pravé tlačítko na tělese otevře nejčastější příkazy a pohled lze uložit jako obrázek.",
-  "welcome.moreSnapBody": "při posunu se hrany a středy přichytávají k sousedním tvarům a vodicí čára ukazuje místo přichycení. Alt během tažení přichytávání pozastaví, Shift omezí posun na jednu osu a Alt držený od začátku vytvoří kopii. Nové tvary se pokládají na plochu pod ukazatelem, i šikmou. Klávesa C stejným způsobem přesadí výběr na jinou plochu, podobně jako Cruise v Tinkercadu. Se Shiftem se místo toho zanoří, horní stranou v rovině s plochou.",
+  "welcome.moreSnapBody": "při posunu se hrany a středy přichytávají k sousedním tvarům a vodicí čára ukazuje místo přichycení. Alt během tažení přichytávání pozastaví, Shift omezí posun na jednu osu a Alt držený od začátku vytvoří kopii. Nové tvary se pokládají na plochu pod ukazatelem, i šikmou. Klávesa C stejným způsobem přesadí výběr na jinou plochu, podobně jako Cruise v Tinkercadu. Se Shiftem se místo toho zanoří, horní stranou v rovině s plochou. Počítá se i střed pracovní roviny.",
   "welcome.moreGridTitle": "Vlastní kroky přichytávání",
   "welcome.moreGridBody": "v nastavení přidejte rozměr, například rozteč vývodů 2,54 mm pro součástky a univerzální plošné spoje. Nabídka přichytávání nabídne celý krok, jeho polovinu a čtvrtinu.",
   "welcome.moreLayFlatTitle": "Položit na plochu",

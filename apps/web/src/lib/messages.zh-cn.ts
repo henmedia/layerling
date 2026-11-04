@@ -203,7 +203,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "welcome.moreSnapTitle": "吸附到其他形状",
   "welcome.moreWindowsTitle": "清晰的视图",
   "welcome.moreWindowsBody": "对象列表、设置和工具窗口可以拖到工作平面上的任意位置，拖动视图立方体可旋转视图，点击其角和边可以倾斜角度显示模型，还可以隐藏平台以从下方观察。右键单击实体会弹出最常用的命令，视图还可以保存为图片。",
-  "welcome.moreSnapBody": "移动时，边和中心会锁定到相邻形状上，并由参考线显示位置——拖动时按住 Alt 可暂停吸附。按住 Shift 可将移动限制在一个轴上，从一开始就按住 Alt 则拖动副本，与 Tinkercad 相同。新形状会贴放在指针下方的面上，斜面也一样，按 C 可将选中项以同样方式放到另一个面上，就像 Tinkercad 中的 Cruise。按住 Shift 则会沉入面中，顶部与面齐平。",
+  "welcome.moreSnapBody": "移动时，边和中心会锁定到相邻形状上，并由参考线显示位置——拖动时按住 Alt 可暂停吸附。按住 Shift 可将移动限制在一个轴上，从一开始就按住 Alt 则拖动副本，与 Tinkercad 相同。新形状会贴放在指针下方的面上，斜面也一样，按 C 可将选中项以同样方式放到另一个面上，就像 Tinkercad 中的 Cruise。按住 Shift 则会沉入面中，顶部与面齐平。工作平面的中心也算在内。",
   "welcome.moreGridTitle": "自定义吸附网格",
   "welcome.moreGridBody": "在设置中添加度量，例如芯片和洞洞板的 2.54 mm 引脚间距；吸附菜单会提供整格、半格和四分之一格。",
   "welcome.moreLayFlatTitle": "平放在面上",

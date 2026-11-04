@@ -41,7 +41,7 @@ Kształt możesz przeciągnąć poza krawędź płyty i tam zostawić, mniej wi�
 
 ## Przyciąganie podczas przesuwania
 
-Gdy przeciągasz kształt po płaszczyźnie roboczej, przyciąga się on do innych kształtów: jego lewa, prawa, przednia lub tylna krawędź albo środek ląduje dokładnie na krawędzi albo środku innego kształtu. Różowa linia pomocnicza pokazuje, czego się trzyma. Dzięki temu dwie części stają na równo obok siebie albo wyśrodkowane jedna za drugą bez wpisywania liczb. Działa to także przy wyłączonej siatce.
+Gdy przeciągasz kształt po płaszczyźnie roboczej, przyciąga się on do innych kształtów: jego lewa, prawa, przednia lub tylna krawędź albo środek ląduje dokładnie na krawędzi albo środku innego kształtu. Różowa linia pomocnicza pokazuje, czego się trzyma. Dzięki temu dwie części stają na równo obok siebie albo wyśrodkowane jedna za drugą bez wpisywania liczb. Działa to także przy wyłączonej siatce. Liczy się też środek płaszczyzny roboczej: różowe linie pokazują, kiedy kształt stoi na środku płyty wzdłuż X, Y albo obu.
 
 Przytrzymaj [[Shift]] podczas przeciągania, aby ruch został na jednej osi: kształt podąża w tym kierunku, X albo Y, w którym przeciągnąłeś dalej, a drugiego nie rusza. Najlepiej naciśnij [[Shift]] dopiero w trakcie przeciągania, bo na kształcie, który nie jest jeszcze zaznaczony, kliknięcie z [[Shift]] tylko dodaje go do zaznaczenia.
 
