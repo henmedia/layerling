@@ -1399,14 +1399,15 @@ export function SketchWorkspace({
     return lines;
   }, [gridStep, board.depth]);
 
-  const unsnappedPointFromEvent = (event: { clientX: number; clientY: number }) => {
+  /** `toSketch`, the screen-to-sketch matrix, can be given when many points of one move are taken at once (a pen's coalesced events). */
+  const unsnappedPointFromEvent = (event: { clientX: number; clientY: number }, toSketch?: DOMMatrix | null) => {
     const svg = svgRef.current;
-    const matrix = svg?.getScreenCTM();
+    const matrix = toSketch ?? svg?.getScreenCTM()?.inverse();
     if (!svg || !matrix) return null;
     const screenPoint = svg.createSVGPoint();
     screenPoint.x = event.clientX;
     screenPoint.y = event.clientY;
-    const local = screenPoint.matrixTransform(matrix.inverse());
+    const local = screenPoint.matrixTransform(matrix);
     return { x: local.x, z: local.y };
   };
 
@@ -1564,11 +1565,22 @@ export function SketchWorkspace({
     // A pen reports many more positions than there are frames; the browser gathers them into one move.
     const native = event.nativeEvent as PointerEvent;
     const moves = typeof native.getCoalescedEvents === "function" ? native.getCoalescedEvents() : [];
+    // The matrix once per move, not per coalesced event; the preview line only gets the new points, so a long stroke
+    // does not write all of its points out again at every move.
+    const svg = svgRef.current;
+    const toSketch = svg?.getScreenCTM()?.inverse();
+    const preview = freehandLineRef.current;
     (moves.length ? moves : [native]).forEach((move) => {
-      const at = unsnappedPointFromEvent(move);
-      if (at) stroke.samples.push(at);
+      const at = unsnappedPointFromEvent(move, toSketch);
+      if (!at) return;
+      stroke.samples.push(at);
+      if (svg && preview) {
+        const point = svg.createSVGPoint();
+        point.x = at.x;
+        point.y = at.z;
+        preview.points.appendItem(point);
+      }
     });
-    freehandLineRef.current?.setAttribute("points", stroke.samples.map((point) => `${point.x},${point.z}`).join(" "));
     return true;
   };
 

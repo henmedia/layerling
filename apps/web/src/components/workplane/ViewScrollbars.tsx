@@ -55,26 +55,95 @@ export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeS
     };
   };
 
-  // The thumbs follow the view every frame it changes, written straight to their style (no render per frame).
+  // The properties panel lies over the right of the view: the bars end at its left edge, and reach the edge when it is
+  // closed. Measured when the view, the panel or its place change, not every frame (that laid out the page 60 times a
+  // second while nothing moved).
+  useEffect(() => {
+    const box = root.current;
+    const stage = box?.parentElement;
+    if (!box || !stage || typeof ResizeObserver === "undefined" || typeof MutationObserver === "undefined") return;
+    let lastRight = -1;
+    const measure = () => {
+      const panel = stage.querySelector<HTMLElement>(":scope > .shape-inspector");
+      const stageRect = stage.getBoundingClientRect();
+      const panelRect = panel?.getBoundingClientRect();
+      const right = panelRect && panelRect.width > 0 ? Math.max(0, Math.round(stageRect.right - panelRect.left)) : 0;
+      if (right === lastRight) return;
+      lastRight = right;
+      box.style.setProperty("--view-scrollbar-right", `${right}px`);
+    };
+    const sizes = new ResizeObserver(measure);
+    // A panel dragged away from the edge moves by its style, minimised by its class: neither changes a size.
+    const panelPlace = new MutationObserver(measure);
+    let watched: HTMLElement | null = null;
+    const watchPanel = () => {
+      const panel = stage.querySelector<HTMLElement>(":scope > .shape-inspector");
+      if (panel !== watched) {
+        if (watched) sizes.unobserve(watched);
+        panelPlace.disconnect();
+        watched = panel;
+        if (panel) {
+          sizes.observe(panel);
+          panelPlace.observe(panel, { attributes: true, attributeFilter: ["style", "class"] });
+        }
+      }
+      measure();
+    };
+    const panelComesAndGoes = new MutationObserver(watchPanel);
+    sizes.observe(stage);
+    panelComesAndGoes.observe(stage, { childList: true });
+    watchPanel();
+    return () => {
+      sizes.disconnect();
+      panelPlace.disconnect();
+      panelComesAndGoes.disconnect();
+    };
+  }, []);
+
+  // The thumbs follow the view every frame it changes, written straight to their style (no render per frame). A frame in
+  // which camera, pivot, zoom, limits and canvas are as they were is skipped before anything is worked out or allocated.
   useEffect(() => {
     let frameId = 0;
     let last = "";
-    let lastRight = -1;
+    const seen = new Float64Array(22).fill(Number.NaN);
+    let seenLimits: ThreeState["pivotLimits"] | null = null;
+    let changed = false;
+    const put = (index: number, value: number) => {
+      if (seen[index] === value) return;
+      seen[index] = value;
+      changed = true;
+    };
+    const viewChanged = (state: ThreeState) => {
+      changed = state.pivotLimits !== seenLimits;
+      seenLimits = state.pivotLimits;
+      const { camera, controls } = state;
+      const canvas = state.renderer.domElement;
+      put(0, camera.position.x);
+      put(1, camera.position.y);
+      put(2, camera.position.z);
+      put(3, camera.quaternion.x);
+      put(4, camera.quaternion.y);
+      put(5, camera.quaternion.z);
+      put(6, camera.quaternion.w);
+      put(7, camera.zoom);
+      put(8, "fov" in camera ? camera.fov : 0);
+      put(9, "top" in camera ? camera.top : 0);
+      put(10, "bottom" in camera ? camera.bottom : 0);
+      put(11, controls.target.x);
+      put(12, controls.target.y);
+      put(13, controls.target.z);
+      put(14, canvas.clientWidth);
+      put(15, canvas.clientHeight);
+      put(16, state.pivotLimits?.halfWidth ?? 0);
+      put(17, state.pivotLimits?.halfDepth ?? 0);
+      put(18, state.pivotLimits?.minY ?? 0);
+      put(19, state.pivotLimits?.maxY ?? 0);
+      return changed;
+    };
     const tick = () => {
       frameId = requestAnimationFrame(tick);
-      // The properties panel lies over the right of the view: the bars end at its left edge, and reach the edge when it is closed.
-      const box = root.current;
-      const stage = box?.parentElement;
-      if (box && stage) {
-        const panel = stage.querySelector<HTMLElement>(":scope > .shape-inspector");
-        const stageRect = stage.getBoundingClientRect();
-        const panelRect = panel?.getBoundingClientRect();
-        const right = panelRect && panelRect.width > 0 ? Math.max(0, Math.round(stageRect.right - panelRect.left)) : 0;
-        if (right !== lastRight) {
-          lastRight = right;
-          box.style.setProperty("--view-scrollbar-right", `${right}px`);
-        }
-      }
+      const state = threeRef.current;
+      if (!state?.pivotLimits || !viewChanged(state)) return;
       const now = read();
       if (!now) return;
       const key = `${now.x.start.toFixed(4)},${now.x.size.toFixed(4)},${now.y.start.toFixed(4)},${now.y.size.toFixed(4)}`;
