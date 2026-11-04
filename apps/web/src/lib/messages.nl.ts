@@ -2955,6 +2955,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "gridfinity.largePlateHint": "Tot 12 eenheden breed en diep in plaats van 6, voor printbedden boven 256 mm. Als je printer in de instellingen gekozen is, wordt een plaat gemarkeerd die groter is dan het printbed.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: de plaat staat op een bodem van 2,4 mm, is 7,4 mm hoog en heeft een halve uitsparing onder elke kant zonder opvulling, zodat twee platen naast elkaar hele uitsparingen over de naad vormen. Een verbinder die je van onderen indrukt, klikt vast en houdt ze bij elkaar. Verbinders toevoegen maakt er een voor elke uitsparing achter en rechts, zodat elke uitsparing over een naad met de volgende plaat er een krijgt.",
+  "prop.gridfinitySwallowtailClearance": "Speling van de verbinders",
+  "gridfinity.swallowtailClearanceHint": "Hoeveel kleiner dan zijn uitsparing elke verbinder aan elke kant is. Maak de speling groter als de verbinders klemmen of breken en kleiner als ze los zitten; hij gaat tot 0,15 mm. De speling verandert de verbinders die Verbinders toevoegen hierna maakt, niet de plaat; klik dus na een wijziging opnieuw op Verbinders toevoegen.",
   "prop.gridfinityFloorHeight": "Bodemhoogte",
   "gridfinity.floorHeightHint": "Tot deze hoogte, gemeten vanaf de onderkant, is de bak massief: een blok om vormen in uit te snijden.",
   "gridfinity.floorHeightLipHint": "Tot deze hoogte, gemeten vanaf de onderkant, is de bak massief: een blok om vormen in uit te snijden. Tot {height} mm past er nog een bak bovenop; daarboven wordt ook de stapellip gevuld, voor een vlakke bovenkant.",

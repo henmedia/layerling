@@ -15,7 +15,7 @@ import type { WorkplaneShape } from "@/types/layerling";
  * drawer rows show the drawer a baseplate fills and fit it to one typed in. The corner radius
  * row (#856) rounds the plate's outer corners less, down to square. The large plate switch
  * (#1061) lets a baseplate take up to 12 units, and the Swallowtail switch (#1061) puts it on a floor
- * with pockets for keys, which Add keys lays out beside it.
+ * with pockets for keys, which Add keys lays out beside it with the clearance set under the switch.
  * A plate fitted into an outline (#1061) has its size in mm and a switch to take the outline away; a
  * baseplate and another shape selected together offer the fit.
  */
@@ -185,6 +185,20 @@ describe("a Gridfinity baseplate's Swallowtail switch (#1061)", () => {
     expect(updates).toHaveLength(2);
     expect(updates[0]).toMatchObject({ gridfinitySwallowtail: true, width: 252, depth: 42, height: 7.4 });
     expect(updates[1]).toMatchObject({ gridfinitySwallowtail: false, width: 252, depth: 42, height: 5 });
+  });
+
+  it("shows the keys' clearance under the switch only while it is on, and writes one typed in as one change, at most 0.15 mm", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...plate, height: 7.4, gridfinitySwallowtail: true, gridfinitySwallowtailClearance: 0.08 }, (patch) => updates.push(patch));
+    const row = rowNamed(panel, "Key clearance")!;
+    expect(row.querySelector<HTMLInputElement>("input:not([type=range])")!.value).toContain("0.08");
+    const slider = row.querySelector<HTMLInputElement>("input[type=range]")!;
+    expect([slider.min, slider.max]).toEqual(["0", "0.15"]);
+    expect(toggleNamed(panel, swallowtail)!.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    type(row.querySelector<HTMLInputElement>("input:not([type=range])")!, "0.4");
+    expect(updates).toEqual([{ gridfinitySwallowtailClearance: 0.15 }]);
+    act(() => root?.unmount());
+    expect(rowNamed(mount(plate), "Key clearance")).toBeUndefined();
   });
 
   it("says what the plate becomes, and offers Add keys when the editor hands it in and hands the click on", () => {

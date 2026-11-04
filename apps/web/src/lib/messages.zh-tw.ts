@@ -2898,6 +2898,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "橫向與縱向最多 12 個單元，而非 6 個，適用於大於 256 mm 的列印平台。在工作區設定中選好你的印表機後，比列印平台大的底板會被標示出來。",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail：底板立在 2.4 mm 厚的底面上，高 7.4 mm，每條沒有留邊的側邊下方有半個凹槽，兩塊底板並排時就在接縫處合成完整的凹槽。從下方壓入的連接件會卡入定位，把兩塊底板連在一起。「新增連接件」會為後側和右側的每個凹槽各建立一個，這樣跨越與下一塊底板接縫的每個凹槽都有一個。",
+  "prop.gridfinitySwallowtailClearance": "連接件間隙",
+  "gridfinity.swallowtailClearanceHint": "每個連接件在每一側比它的凹槽小多少。連接件卡住或斷裂時調大，鬆動時調小；最大可調到 0.15 mm。它改變的是「新增連接件」下一次建立的連接件，而不是底板，所以變更後請再次點擊「新增連接件」。",
   "prop.gridfinityFloorHeight": "底部高度",
   "gridfinity.floorHeightHint": "收納盒從底面向上到這個高度是實心，可作為挖出形狀的粗坯。",
   "gridfinity.floorHeightLipHint": "收納盒從底面向上到這個高度是實心，可作為挖出形狀的粗坯。到 {height} mm 為止，上面仍可堆疊另一個收納盒；超過後堆疊唇緣也會被填滿，頂面平整。",

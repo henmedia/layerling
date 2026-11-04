@@ -3395,6 +3395,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Op til 12 enheder i bredden og dybden i stedet for 6, til byggeplader over 256 mm. Når din printer er valgt i indstillingerne, markeres en plade, der er større end dens byggeplade.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: pladen står på en bund på 2,4 mm, 7,4 mm høj, med en halv lomme under hver side uden stribe, så to plader side om side danner hele lommer over samlingen. Et samlestykke, der trykkes ind nedefra, klikker på plads og holder dem sammen. Tilføj samlestykker laver et til hver lomme bagtil og til højre, så hver lomme over en samling med den næste plade får et.",
+  "prop.gridfinitySwallowtailClearance": "Frirum for samlestykker",
+  "gridfinity.swallowtailClearanceHint": "Hvor meget mindre end sin lomme hvert samlestykke er på hver side. Gør det større, hvis samlestykkerne sætter sig fast eller knækker, og mindre, hvis de sidder løst; det går op til 0,15 mm. Det ændrer de samlestykker, Tilføj samlestykker laver næste gang, ikke pladen, så klik på Tilføj samlestykker igen, når du har ændret det.",
   "prop.gridfinityFloorHeight": "Bundens højde",
   "gridfinity.floorHeightHint": "Op til denne højde, målt fra undersiden, er bakken massiv: et emne, du kan skære former ud i.",
   "gridfinity.floorHeightLipHint": "Op til denne højde, målt fra undersiden, er bakken massiv: et emne, du kan skære former ud i. Op til {height} mm kan en anden bakke stadig stables ovenpå; derover fyldes stabelkraven også, så toppen bliver flad.",

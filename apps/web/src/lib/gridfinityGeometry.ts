@@ -115,11 +115,11 @@ import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpeni
  * A baseplate can also stand on a 2.4 mm floor (Swallowtail, #1061), so plates
  * printed side by side click together: under the middle of each cell along a
  * side without padding the floor has half a dovetail pocket, 2 mm deep. Its
- * bottom 0.6 mm is a lip: the pocket 0.2 mm smaller on each side, from 0.2 mm in
- * from the plate's side to the pocket's end, as the test prints had it. A printed
- * key, two pocket halves back to back with a slot into each end, is pressed into
- * the pockets across a seam from below and held by the lips. A plate fitted into
- * an outline has none.
+ * bottom 0.6 mm is a lip along its sides from where the key's slots begin, 2.5 mm
+ * in, growing to 0.2 mm at its end; the seam is open. A printed key, two pocket
+ * halves back to back with a slot into each end, smaller by the plate's clearance
+ * on every side, is pressed into the pockets across a seam from below and held by
+ * the lips. A plate fitted into an outline has none.
  *
  * The lip's top can be chamfered (#780) as the edge tool would: the chamfer
  * takes its size off the outer wall and off the slope a stacked bin's feet rest
@@ -184,7 +184,10 @@ const SWALLOWTAIL_LIP = 0.2;
 const SWALLOWTAIL_NECK = 6;
 const SWALLOWTAIL_WIDE = 10;
 const SWALLOWTAIL_LENGTH = 7;
-const SWALLOWTAIL_KEY_CLEARANCE = 0.025;
+/** A key's clearance on every side unless the plate sets one. */
+export const DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE = 0.05;
+/** The most: beyond it the lip, 0.2 mm at the pocket's end, hardly catches the key. */
+export const MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE = 0.15;
 const SWALLOWTAIL_SLOT_WIDTH = 1.2;
 const SWALLOWTAIL_SLOT_LENGTH = 4.5;
 const SWALLOWTAIL_KEY_SPACING = 4;
@@ -284,6 +287,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityHalfGrid?: boolean;
   gridfinityLargePlate?: boolean;
   gridfinitySwallowtail?: boolean;
+  gridfinitySwallowtailClearance?: number;
   gridfinityLabelBack?: boolean;
   gridfinityLabelFront?: boolean;
   gridfinityLabelLeft?: boolean;
@@ -876,23 +880,26 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
 export type GridfinityPocket = { side: GridfinityWall; x: number; z: number };
 
 /**
- * The cutters of a Swallowtail plate's pockets (#1061), as outlines in the plate's x and z: the lip from below the
- * underside to just over 0.6 mm, from 0.2 mm in from the plate's side, and the full pocket above it to 2 mm, running
- * `past` beyond the side, so no face is shared.
+ * The cutters of a Swallowtail plate's pockets (#1061), as outlines in the plate's x and z, each running `past` beyond the
+ * side, so none shares a face with the plate: the lip from below the underside to just over 0.6 mm, the whole pocket up
+ * to the key's slots and from there narrowing evenly to 0.2 mm smaller on each side at the end, and the whole pocket above
+ * it to 2 mm. The key's middle has no slot, so the lip leaves it alone and holds the slotted ends, most where they bend
+ * most.
  */
 export function gridfinitySwallowtailCuts(plan: Pick<GridfinityPlan, "pockets">, past: number) {
-  // u runs in from the side, v along it: the pocket made `inset` smaller on each side, from `inset` in to its end, or
-  // whole from `past` outside the side.
-  const outline = (pocket: GridfinityPocket, inset: number) => {
-    const u0 = inset > 0 ? inset : -past;
-    const half = (u: number) => SWALLOWTAIL_NECK / 2 - inset + ((SWALLOWTAIL_WIDE - SWALLOWTAIL_NECK) / 2) * (u - inset) / (SWALLOWTAIL_LENGTH - inset);
-    const local: Array<[number, number]> = [[u0, -half(u0)], [SWALLOWTAIL_LENGTH, -half(SWALLOWTAIL_LENGTH)], [SWALLOWTAIL_LENGTH, half(SWALLOWTAIL_LENGTH)], [u0, half(u0)]];
+  // u runs in from the side, v along it.
+  const half = (u: number) => SWALLOWTAIL_NECK / 2 + ((SWALLOWTAIL_WIDE - SWALLOWTAIL_NECK) / 2) * u / SWALLOWTAIL_LENGTH;
+  const root = SWALLOWTAIL_LENGTH - SWALLOWTAIL_SLOT_LENGTH;
+  const whole: Array<[number, number]> = [[-past, half(-past)], [SWALLOWTAIL_LENGTH, half(SWALLOWTAIL_LENGTH)]];
+  const lip: Array<[number, number]> = [[-past, half(-past)], [root, half(root)], [SWALLOWTAIL_LENGTH, half(SWALLOWTAIL_LENGTH) - SWALLOWTAIL_LIP]];
+  const outline = (pocket: GridfinityPocket, edge: Array<[number, number]>) => {
+    const local = [...edge.map(([u, v]) => [u, -v]), ...[...edge].reverse()];
     const { side, x, z } = pocket;
     return local.map(([u, v]) => (side === "right" ? { x: x - u, z: z + v } : side === "left" ? { x: x + u, z: z - v } : side === "back" ? { x: x - v, z: z + u } : { x: x + v, z: z - u }));
   };
   return plan.pockets.flatMap((pocket) => [
-    { outline: outline(pocket, SWALLOWTAIL_LIP), y0: -past, y1: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT + past },
-    { outline: outline(pocket, 0), y0: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT, y1: SWALLOWTAIL_DEPTH },
+    { outline: outline(pocket, lip), y0: -past, y1: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT + past },
+    { outline: outline(pocket, whole), y0: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT, y1: SWALLOWTAIL_DEPTH },
   ]);
 }
 
@@ -923,14 +930,19 @@ export function gridfinitySceneWithKeys(shapes: WorkplaneShape[], plateId: strin
   return [...shapes.filter((shape) => shape.gridfinityKeyOf !== plateId), ...keys];
 }
 
+/** The clearance of a Swallowtail plate's keys on every side (#1061), to 0.01 mm. */
+export function gridfinitySwallowtailClearance(shape: Pick<GridfinityShapeFields, "gridfinitySwallowtailClearance">) {
+  return Math.round(clampLabel(shape.gridfinitySwallowtailClearance, DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE, 0, MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE) * 100) / 100;
+}
+
 /**
  * A Swallowtail key's outline (#1061), lying flat, its length along x and its middle at 0: two pocket halves back to
- * back, 0.025 mm smaller than the pocket on every side, with a slot into each end so the end squeezes past the lip.
+ * back, smaller than the pocket by the clearance on every side, with a slot into each end so the end squeezes past the lip.
  */
-export function gridfinitySwallowtailKeyOutline() {
-  const a = SWALLOWTAIL_LENGTH - SWALLOWTAIL_KEY_CLEARANCE;
-  const w = SWALLOWTAIL_WIDE / 2 - SWALLOWTAIL_KEY_CLEARANCE;
-  const n = SWALLOWTAIL_NECK / 2 - SWALLOWTAIL_KEY_CLEARANCE;
+export function gridfinitySwallowtailKeyOutline(clearance: number) {
+  const a = SWALLOWTAIL_LENGTH - clearance;
+  const w = SWALLOWTAIL_WIDE / 2 - clearance;
+  const n = SWALLOWTAIL_NECK / 2 - clearance;
   const s = SWALLOWTAIL_SLOT_WIDTH / 2;
   const b = a - SWALLOWTAIL_SLOT_LENGTH;
   return [
@@ -939,9 +951,9 @@ export function gridfinitySwallowtailKeyOutline() {
   ];
 }
 
-/** The key's outline as a sketch, for the key bodies a plate's Add keys lays out (#1061). */
-export function gridfinitySwallowtailKeyProfile(): SketchProfile {
-  const outline = gridfinitySwallowtailKeyOutline();
+/** The key's outline as a sketch at the plate's clearance, for the key bodies its Add keys lays out (#1061). */
+export function gridfinitySwallowtailKeyProfile(plate: Pick<GridfinityShapeFields, "gridfinitySwallowtailClearance">): SketchProfile {
+  const outline = gridfinitySwallowtailKeyOutline(gridfinitySwallowtailClearance(plate));
   const ids = outline.map((_, k) => `swallowtail-key-${k}`);
   return {
     points: outline.map((p, k) => ({ id: ids[k], x: p.x, z: p.z, mode: "corner" as const })),

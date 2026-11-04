@@ -280,6 +280,8 @@ export type ShapeCustomization = {
   gridfinityLargePlate?: boolean;
   /** Gridfinity baseplate: Swallowtail, on a 2.4 mm floor with a pocket for a key under each side without padding (#1061); missing means off. */
   gridfinitySwallowtail?: boolean;
+  /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
+  gridfinitySwallowtailClearance?: number;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -1114,6 +1116,8 @@ export type WorkplaneShape = {
   gridfinityLargePlate?: boolean;
   /** Gridfinity baseplate: Swallowtail, on a 2.4 mm floor with a pocket for a key under each side without padding (#1061); missing means off. */
   gridfinitySwallowtail?: boolean;
+  /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
+  gridfinitySwallowtailClearance?: number;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */

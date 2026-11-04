@@ -2225,6 +2225,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Do 12 enot v širino in globino namesto 6, za tiskalne plošče nad 256 mm. Ko je tvoj tiskalnik izbran v nastavitvah, je podstavek, večji od njegove plošče, označen.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: podstavek stoji na 2,4 mm debelem dnu, visok je 7,4 mm in ima pod vsako stranjo brez pasu polovico žepa, tako da dva podstavka drug ob drugem tvorita cele žepe čez stik. Spojnik, vtisnjen od spodaj, se zaskoči in ju drži skupaj. Dodaj spojnike naredi enega za vsak žep zadaj in desno, tako da vsak žep čez stik z naslednjim podstavkom dobi enega.",
+  "prop.gridfinitySwallowtailClearance": "Zračnost spojnikov",
+  "gridfinity.swallowtailClearanceHint": "Za koliko je vsak spojnik na vsaki strani manjši od svojega žepa. Povečaj jo, če se spojniki zatikajo ali lomijo, in zmanjšaj, če sedijo ohlapno; gre do 0,15 mm. Spremeni spojnike, ki jih Dodaj spojnike naredi naslednjič, ne podstavka, zato po spremembi znova klikni Dodaj spojnike.",
   "prop.gridfinityFloorHeight": "Višina dna",
   "gridfinity.floorHeightHint": "Do te višine, merjeno od spodnje strani, je posoda polna: surovec, v katerega izrežeš oblike.",
   "gridfinity.floorHeightLipHint": "Do te višine, merjeno od spodnje strani, je posoda polna: surovec, v katerega izrežeš oblike. Do {height} mm se nanjo še da zložiti drugo posodo; nad tem se zapolni tudi obroba za zlaganje, za raven vrh.",

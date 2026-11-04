@@ -2957,6 +2957,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Hasta 12 unidades de ancho y de fondo en lugar de 6, para camas de impresión de más de 256 mm. Si eliges tu impresora en los ajustes, se marca una placa más grande que su cama.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: la placa se apoya en un fondo de 2,4 mm, con 7,4 mm de alto, y tiene media cavidad bajo cada lado sin franja, así que dos placas una junto a otra forman cavidades enteras a través de la junta. Un conector encajado desde abajo hace clic y las mantiene unidas. Añadir conectores crea uno por cada cavidad detrás y a la derecha, así que cada cavidad a través de una junta con la placa siguiente recibe uno.",
+  "prop.gridfinitySwallowtailClearance": "Holgura de los conectores",
+  "gridfinity.swallowtailClearanceHint": "Cuánto más pequeño que su cavidad es cada conector por cada lado. Súbela si los conectores se atascan o se rompen y bájala si quedan sueltos; llega hasta 0,15 mm. Cambia los conectores que Añadir conectores crea a continuación, no la placa, así que después de cambiarla haz clic de nuevo en Añadir conectores.",
   "prop.gridfinityFloorHeight": "Altura del fondo",
   "gridfinity.floorHeightHint": "La caja es maciza desde la base hasta esta altura: un bloque en bruto en el que recortar formas.",
   "gridfinity.floorHeightLipHint": "La caja es maciza desde la base hasta esta altura: un bloque en bruto en el que recortar formas. Hasta {height} mm todavía se puede apilar otra caja encima; por encima, también se rellena el borde para apilar, para una cara superior plana.",

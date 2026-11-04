@@ -2231,6 +2231,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Genişlikte ve derinlikte 6 yerine 12 birime kadar, 256 mm'den büyük baskı tablaları için. Ayarlarda yazıcın seçiliyse, tablasından büyük bir plaka işaretlenir.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: plaka 2,4 mm'lik bir taban üzerinde durur, 7,4 mm yüksekliğindedir ve şeridi olmayan her kenarın altında yarım bir cep vardır; böylece yan yana iki plaka birleşim yerinin üzerinde tam cepler oluşturur. Alttan bastırılan bir bağlantı parçası yerine oturur ve onları bir arada tutar. Bağlantı parçaları ekle, arkadaki ve sağdaki her cep için bir tane yapar; böylece sonraki plakayla bir birleşim yerinin üzerindeki her cebe bir tane düşer.",
+  "prop.gridfinitySwallowtailClearance": "Bağlantı parçası boşluğu",
+  "gridfinity.swallowtailClearanceHint": "Her bağlantı parçasının her kenarda cebinden ne kadar küçük olduğu. Bağlantı parçaları sıkışıyor veya kırılıyorsa artır, gevşek oturuyorsa azalt; 0,15 mm'ye kadar çıkar. Plakayı değil, Bağlantı parçaları ekle'nin bundan sonra yapacağı bağlantı parçalarını değiştirir; bu yüzden değiştirdikten sonra Bağlantı parçaları ekle'ye yeniden tıkla.",
   "prop.gridfinityFloorHeight": "Zemin yüksekliği",
   "gridfinity.floorHeightHint": "Alt yüzeyden ölçülen bu yüksekliğe kadar kutu doludur: içine şekiller oyabileceğin bir ham parça.",
   "gridfinity.floorHeightLipHint": "Alt yüzeyden ölçülen bu yüksekliğe kadar kutu doludur: içine şekiller oyabileceğin bir ham parça. {height} mm'ye kadar üstüne hâlâ başka bir kutu istiflenebilir; bunun üstünde istifleme kenarı da doldurulur ve üst yüz düz olur.",
