@@ -87,14 +87,36 @@ export function deleteFacesSolid(cad: OcctKernel, solid: ShapeHandle, faces: Sha
 
 const round6 = (value: number) => Math.round(value * 1e6) / 1e6 || 0;
 
-/** The faces of a body, for the panel's check of the picked faces and the MCP's face list. */
+/**
+ * The faces of a body, for the panel's check of the picked faces and the
+ * MCP's face list, with each face's width and the faces it shares an edge
+ * with, which say which thin faces go along when faces are deleted
+ * (cadThinFaces).
+ */
 export function cadFaceList(cad: OcctKernel, solid: ShapeHandle): CadFaceInfo[] {
   const faces = cad.getSubShapes(solid, "face");
   try {
+    // Each face's own edges, not the kernel's edge-to-face map: that one grows with the square of the faces.
+    const facesByEdge = new Map<number, number[]>();
+    const neighbours = faces.map(() => new Set<number>());
+    faces.forEach((face, id) => {
+      cad.subShapeHashes(face, "edge", HASH_UPPER_BOUND).forEach((hash) => {
+        const others = facesByEdge.get(hash) ?? [];
+        others.filter((other) => other !== id).forEach((other) => {
+          neighbours[id].add(other);
+          neighbours[other].add(id);
+        });
+        others.push(id);
+        facesByEdge.set(hash, others);
+      });
+    });
     return faces.map((face, id) => {
       const kind = cad.surfaceType(face);
       const center = cad.getSurfaceCenterOfMass(face);
-      const info: CadFaceInfo = { id, kind, area: cad.getSurfaceArea(face), center: { x: center.x, y: center.y, z: center.z } };
+      const area = cad.getSurfaceArea(face);
+      // getLength of a face is the length of its edges.
+      const width = (2 * area) / cad.getLength(face);
+      const info: CadFaceInfo = { id, kind, area, center: { x: center.x, y: center.y, z: center.z }, width, neighbours: [...neighbours[id]] };
       if (kind === "plane") {
         const normal = orientedFaceNormal(cad, face, center);
         info.normal = { x: round6(normal.x), y: round6(normal.y), z: round6(normal.z) };

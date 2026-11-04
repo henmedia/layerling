@@ -143,7 +143,7 @@ To take a feature off an exact body - a fillet, a hole, a boss, a step - delete 
 2. Pick every face of the feature: the four faces of a box's rounded top edges, the cylinder of a hole, the side and the top of a boss.
 3. Call `layerling_delete_faces({ editorNumber, id, faceIds })`.
 
-The faces around them grow until they close the gap, and the body stays exact: fillet, chamfer and STEP export still work on it. When they cannot close it - a main side of a box, for example - nothing changes and the call fails with that reason. Deleting only the floor of a pocket makes it a hole straight through. Whatever layerling keeps as a mesh has no exact faces: an imported STL, OBJ or 3MF, a split, wrapped or simplified body, a very detailed shape such as a long text. A STEP import has. One undo step, undone like an edge treatment.
+The faces around them grow until they close the gap, and the body stays exact: fillet, chamfer and STEP export still work on it. When they cannot close it - a main side of a box, for example - nothing changes and the call fails with that reason. Deleting only the floor of a pocket makes it a hole straight through. Faces under 0.05 mm wide are marked `thin: true`; such a face goes along with a picked face when it touches it and leads on to another face in the picked face's plane, with the thin faces joined to it that touch a face in that plane too (a mesh made exact can keep them between the strips of one side), and the answer lists them, when there are any, as `takenAlongFaceIds`. Whatever layerling keeps as a mesh has no exact faces: an imported STL, OBJ or 3MF, a split, wrapped or simplified body, a very detailed shape such as a long text. A STEP import has. One undo step, undone like an edge treatment.
 
 ## Patterns
 

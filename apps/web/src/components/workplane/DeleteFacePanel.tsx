@@ -15,6 +15,7 @@ import { useLanguage } from "@/lib/useLanguage";
 export function DeleteFacePanel({
   targetName,
   faceCount,
+  thinCount,
   preparing,
   busy,
   error,
@@ -28,6 +29,8 @@ export function DeleteFacePanel({
 }: {
   targetName: string;
   faceCount: number;
+  /** Hair-thin faces that go with the picked ones (cadThinFaces). */
+  thinCount: number;
   /** The worker is still reading the body's faces. */
   preparing: boolean;
   busy: boolean;
@@ -64,6 +67,7 @@ export function DeleteFacePanel({
       </div>
 
       <div className="edge-modifier-selection-help">{preparing ? t("deleteFace.preparing") : count}</div>
+      {thinCount > 0 ? <div className="edge-modifier-selection-help">{thinCount === 1 ? t("deleteFace.thinOne") : t("deleteFace.thinMany", { count: thinCount })}</div> : null}
       <div className="edge-modifier-quick-actions">
         <button type="button" disabled={busy || faceCount === 0} onClick={onClear}>{t("edge.clear")}</button>
       </div>

@@ -116,6 +116,7 @@ import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
 import { matchingEdgeIds } from "@/lib/edgeMatching";
 import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
+import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
@@ -7885,9 +7886,11 @@ export function LayerlingEditor({
     if (unknownIds.length > 0) {
       throw new Error(`These face IDs are not on the body: ${unknownIds.join(", ")}`);
     }
+    // Hair-thin faces that lead from a picked flat face to another face in its plane go with it (cadThinFaces).
+    const deletedIds = [...faceIds, ...thinFacesWith(faceIds, faces)];
     const sameFace = (a: CadFaceInfo, b: CadFaceInfo) => a.kind === b.kind && Math.abs(a.area - b.area) <= 1e-6 * Math.max(1, a.area) &&
       Math.hypot(a.center.x - b.center.x, a.center.y - b.center.y, a.center.z - b.center.z) <= 1e-4;
-    if (picked && faceIds.some((id) => !picked[id] || !sameFace(picked[id], faces[id]))) {
+    if (picked && deletedIds.some((id) => !picked[id] || !sameFace(picked[id], faces[id]))) {
       throw new Error("The object or project changed while the faces were being deleted; try again");
     }
     // The preview stops after 45 s, so the editor usually answers before the MCP bridge gives up after a minute.
@@ -7895,7 +7898,7 @@ export function LayerlingEditor({
       type: "preview",
       kind: "deleteFace",
       edgeIds: [],
-      faceIds,
+      faceIds: deletedIds,
       // Only sets how finely the result is meshed: the standard quality's limit.
       amount: 1,
       quality: "standard",
@@ -7920,7 +7923,7 @@ export function LayerlingEditor({
       cadDisplayEdges: cadDisplayEdgesForShape(rawPreview, previewResponse.displayEdges),
       cadDisplayEdgesVersion: 2 as const,
     });
-    const feature = { kind: "deleteFace" as const, amount: 0, edgeCount: 0, faceIds: [...faceIds], faceCount: faceIds.length } satisfies NonNullable<WorkplaneShape["edgeTreatments"]>[number];
+    const feature = { kind: "deleteFace" as const, amount: 0, edgeCount: 0, faceIds: deletedIds, faceCount: deletedIds.length } satisfies NonNullable<WorkplaneShape["edgeTreatments"]>[number];
     const preserveEdgeSize = shape.edgeResizeMode === "preserve";
     const session: EdgeModifierSession = {
       kind: "deleteFace",
@@ -7949,7 +7952,7 @@ export function LayerlingEditor({
     ) {
       throw new Error("The object or project changed while the faces were being deleted; try again");
     }
-    return modifiedShape;
+    return { shape: modifiedShape, deletedIds };
   }, [invalidateCadModifierSession, prepareCadModifierForMcp, postCadModifierRequestAsync]);
 
   const startShellTool = useCallback(() => {
@@ -9581,11 +9584,11 @@ export function LayerlingEditor({
     deleteFaceRunRef.current = run;
     setDeleteFaceTool((current) => current ? { ...current, busy: true, error: null } : current);
     void deleteFacesShape(target, selectedFaceIds, faces.list)
-      .then((modifiedShape) => {
+      .then(({ shape: modifiedShape, deletedIds }) => {
         commitShapes(
           shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
           modifiedShape.id,
-          selectedFaceIds.length === 1 ? t("status.facesDeletedOne") : t("status.facesDeletedMany", { count: selectedFaceIds.length }),
+          deletedIds.length === 1 ? t("status.facesDeletedOne") : t("status.facesDeletedMany", { count: deletedIds.length }),
         );
         setDeleteFaceTool(null);
       })
@@ -9629,13 +9632,16 @@ export function LayerlingEditor({
     return () => window.clearTimeout(timer);
   }, [deleteFaceTool, readDeleteFaces, shapes]);
 
+  // The hair-thin faces that go with the picked ones (cadThinFaces), shown picked with them.
+  const deleteFaceTakenAlong = useMemo(() => deleteFaceTool?.faces ? thinFacesWith(deleteFaceTool.selectedFaceIds, deleteFaceTool.faces.list) : [], [deleteFaceTool]);
+
   const cadFacePick = useMemo(() => deleteFaceTool?.faces?.mesh
     ? {
         shapeId: deleteFaceTool.shapeId,
         positions: deleteFaceTool.faces.mesh.positions,
         indices: deleteFaceTool.faces.mesh.indices,
         triangleFaces: deleteFaceTool.faces.mesh.triangleFaces,
-        selectedFaceIds: deleteFaceTool.selectedFaceIds,
+        selectedFaceIds: [...deleteFaceTool.selectedFaceIds, ...deleteFaceTakenAlong],
       }
     : surfaceFacePick && !deleteFaceTool
       ? {
@@ -9645,7 +9651,7 @@ export function LayerlingEditor({
           triangleFaces: surfaceFacePick.pick.triangleFaces,
           selectedFaceIds: surfaceTexturePickedFaceIds(surfaceFacePick.pick, surfaceFacePick.faces).filter((id) => id >= 0),
         }
-      : null, [deleteFaceTool, surfaceFacePick]);
+      : null, [deleteFaceTakenAlong, deleteFaceTool, surfaceFacePick]);
 
   // Picking faces for the texture (#954): on the body the texture is made on - under a texture there is - where the
   // selected body stands. Started again with other faces (all of them again) on the same body, the faces it has stay.
@@ -13092,6 +13098,7 @@ export function LayerlingEditor({
           area: round(face.area),
           center: [round(face.center.x), round(face.center.y), round(face.center.z)],
           ...(face.normal ? { normal: [face.normal.x, face.normal.y, face.normal.z] } : {}),
+          ...(isThinFace(face) ? { thin: true } : {}),
         }));
         return { object: mcpShapeSummary(target), faces };
       }
@@ -13102,13 +13109,14 @@ export function LayerlingEditor({
         if (target.groupOperation === "bundle") throw new Error("A bundle is not one body; group it (layerling_group_objects) or delete faces of its parts one by one");
         const faceIds = [...new Set(mcpNumberArray(params.faceIds))];
         if (faceIds.length === 0) throw new Error("Give faceIds from layerling_list_faces");
-        const modifiedShape = await deleteFacesShape(target, faceIds);
+        const { shape: modifiedShape, deletedIds } = await deleteFacesShape(target, faceIds);
         commitShapes(
           shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
           modifiedShape.id,
-          faceIds.length === 1 ? t("status.facesDeletedMcpOne") : t("status.facesDeletedMcpMany", { count: faceIds.length }),
+          deletedIds.length === 1 ? t("status.facesDeletedMcpOne") : t("status.facesDeletedMcpMany", { count: deletedIds.length }),
         );
-        return { object: mcpShapeSummary(modifiedShape), deletedFaceIds: faceIds };
+        const takenAlong = deletedIds.slice(faceIds.length);
+        return { object: mcpShapeSummary(modifiedShape), deletedFaceIds: deletedIds, ...(takenAlong.length ? { takenAlongFaceIds: takenAlong } : {}) };
       }
 
       if (command.action === "hollow_object") {
@@ -16771,6 +16779,7 @@ export function LayerlingEditor({
         <DeleteFacePanel
           targetName={selectedShape.name}
           faceCount={deleteFaceTool.selectedFaceIds.length}
+          thinCount={deleteFaceTakenAlong.length}
           preparing={!deleteFaceTool.faces && !deleteFaceTool.error}
           busy={deleteFaceTool.busy}
           error={deleteFaceTool.error}

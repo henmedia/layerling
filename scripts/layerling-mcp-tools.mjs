@@ -1169,7 +1169,7 @@ export const tools = [
   },
   {
     name: "layerling_list_faces",
-    description: "List the faces of one object's exact body, for layerling_delete_faces: each with its id, its kind (plane, cylinder, cone, sphere, torus, bspline, ...), its area in square millimetres, its middle and, for a flat face, its outward normal, in world coordinates (y up). Only for exact bodies, STEP imports and layerling's shapes; whatever layerling keeps as a mesh (an imported STL, OBJ or 3MF, a split, wrapped or simplified body, a very detailed shape such as a long text) has no exact faces.",
+    description: "List the faces of one object's exact body, for layerling_delete_faces: each with its id, its kind (plane, cylinder, cone, sphere, torus, bspline, ...), its area in square millimetres, its middle and, for a flat face, its outward normal, in world coordinates (y up); a hair-thin face (under 0.05 mm wide) has thin: true. Only for exact bodies, STEP imports and layerling's shapes; whatever layerling keeps as a mesh (an imported STL, OBJ or 3MF, a split, wrapped or simplified body, a very detailed shape such as a long text) has no exact faces.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id"],
@@ -1181,7 +1181,7 @@ export const tools = [
   },
   {
     name: "layerling_delete_faces",
-    description: "Delete faces of an exact body, solid or hole, as the editor's Delete face tool does: the faces around them grow until they close the gap, so a fillet, a hole, a boss or a step is gone and the body stays exact (fillet, chamfer and STEP export still work on it). Give every face of the feature, with ids from layerling_list_faces - the four faces of a box's rounded top edges, the wall of a hole, the side and top of a boss. When the faces around them cannot close the gap, nothing changes and the answer says so. Deleting only the floor of a pocket makes it a hole straight through. One undo step; undone like an edge treatment.",
+    description: "Delete faces of an exact body, solid or hole, as the editor's Delete face tool does: the faces around them grow until they close the gap, so a fillet, a hole, a boss or a step is gone and the body stays exact (fillet, chamfer and STEP export still work on it). Give every face of the feature, with ids from layerling_list_faces - the four faces of a box's rounded top edges, the wall of a hole, the side and top of a boss. When the faces around them cannot close the gap, nothing changes and the answer says so. Deleting only the floor of a pocket makes it a hole straight through. A thin face (thin: true in layerling_list_faces) goes with a picked face when it touches it and leads on to another face in the picked face's plane, with the thin faces joined to it that touch a face in that plane too, as a mesh made exact can keep them between the strips of one side; the answer lists them, when there are any, as takenAlongFaceIds and every deleted face as deletedFaceIds. One undo step; undone like an edge treatment.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id", "faceIds"],

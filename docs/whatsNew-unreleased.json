@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Haarfeine Flächen bei „Fläche löschen“",
+      "en": "Hair-thin faces in Delete face"
+    },
+    "body": {
+      "de": "Bleiben nach „Exakt machen“ haarfeine Flächen zwischen Flächen in einer Ebene, nimmt „Fläche löschen“ sie mit den gewählten Flächen mit, sodass eine in Streifen zerfallene Seite wieder eine Fläche werden kann.",
+      "en": "When Make exact leaves hair-thin faces between faces in one plane, Delete face takes them along with the picked faces, so a side that came out as strips can become one face again."
+    }
+  }
+]
