@@ -1974,7 +1974,7 @@ export const tools = [
         id: { type: "string", description: "Object whose face takes the workplane." },
         face: { type: "string", enum: ["top", "bottom", "left", "right", "front", "back"], description: "Side of the object's own box, taken in its current turn. Defaults to top." },
         flip: { type: "boolean", description: "Let the workplane face into the object instead of out of it." },
-        onSection: { type: "boolean", description: "Put the workplane on the cut of the section view (layerling_section_view must have it switched on), facing out of the body that stays; a sketch started there shows the outline of the cut." },
+        onSection: { type: "boolean", description: "Put the workplane on the cut of the section view (layerling_set_section_view must have it switched on), facing out of the body that stays; a sketch started there shows the outline of the cut." },
         reset: { type: "boolean", description: "Put the workplane back on the base plate." },
         visible: { type: "boolean", description: "Show (true) or hide (false) a workplane set on a face." },
       },

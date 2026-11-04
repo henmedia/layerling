@@ -1,7 +1,6 @@
 import type { OcctKernel, ShapeHandle } from "occt-wasm";
 import {
   type AnalyticSurface,
-  surfaceNormal,
   add,
   cross,
   dot,

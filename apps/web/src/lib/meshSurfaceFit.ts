@@ -161,11 +161,6 @@ export function surfaceNormal(s: AnalyticSurface, p: V3): V3 {
   }
 }
 
-/** The point of the surface nearest `p` (exact for all five: their distances are Euclidean). */
-export function projectToSurface(s: AnalyticSurface, p: V3): V3 {
-  return sub(p, scale(surfaceNormal(s, p), surfaceDistance(s, p)));
-}
-
 export function fitPlane(points: V3[]): PlaneSurface {
   const c = centroid(points);
   const { vectors } = symmetricEigen(covariance(points, c));

@@ -48,6 +48,7 @@ layerling está un paso más allá de Tinkercad, camino de Fusion 360: se maneja
 - **Patrones de orificios.** Haz clic en una cara plana y reparte por ella orificios redondos, cuadrados, rectangulares, hexagonales o alargados, en cuadrícula o al tresbolillo, con separación, margen y profundidad: rejillas de ventilación, de altavoz y cestas en un solo paso.
 - **Escalar en porcentaje.** Agranda o reduce una o varias piezas en un porcentaje: juntas, para que la disposición crezca con ellas, o cada una en su sitio.
 - **Igualar tamaños.** Mantén pulsado Alt sobre un punto de alineación y las piezas se estiran en vez de moverse: hasta el lado de otra pieza, o hasta su anchura, longitud o altura; por ejemplo, para cambiar una caja por un cilindro del mismo tamaño.
+- **Espaciado igual.** Reparte piezas de distintos tamaños para que el espacio entre ellas sea el mismo en todas partes: entre las dos de los extremos, sobre una tabla con el mismo espacio en sus bordes, o fila a fila, como en un puzle de encajar; o escribe la separación.
 - **Medir y mirar dentro.** Cinta métrica, reglas, una vista de sección que abre el modelo y un control deslizante del historial para volver a mirar estados anteriores.
 - **Geometría de verdad por debajo.** layerling guarda formas CAD exactas, no solo una malla, así que una arista redondeada sigue siendo una arista redondeada, hasta en un archivo STEP para un programa de CAD completo.
 

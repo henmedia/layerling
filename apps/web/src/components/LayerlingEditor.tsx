@@ -224,14 +224,14 @@ import { SECTION_CUT_FACES, type SectionCutFace } from "@/lib/sectionCaps";
 import { MAX_SECTION_SKETCH_SEGMENTS, sectionSketchProfile } from "@/lib/sectionSketch";
 import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_VIEW_FACE, sectionSvgDocument, sliceMeshContours } from "@/lib/sectionSvg";
 import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
-import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, appendMeshData, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
+import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
 import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, articulateShapesOffThread, lidForShapesOffThread, checkClearanceOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
 import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
-import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, expandBundles, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
+import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
 import { escapeWasHandled } from "@/lib/escapeHandled";
@@ -14067,7 +14067,7 @@ export function LayerlingEditor({
         // On the plane of the section view, as the button there does (#154).
         if (params.onSection === true) {
           const section = window.layerlingSectionView?.({}).settings;
-          if (!section?.enabled) throw new Error("Switch the section view on first (layerling_section_view), then the workplane can lie on its cut");
+          if (!section?.enabled) throw new Error("Switch the section view on first (layerling_set_section_view), then the workplane can lie on its cut");
           placed = sectionPlacementWorkplane(section);
           setActivePlacementWorkplane(placed, "shape");
         }

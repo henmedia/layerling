@@ -48,6 +48,7 @@ layerling zit een stap verder dan Tinkercad, richting Fusion 360: het werkt op d
 - **Gatenpatronen.** Klik op een vlak oppervlak en verdeel er ronde, vierkante, rechthoekige, zeshoekige of slobgaten over, in een raster of verspringend, met tussenafstand, marge en diepte - ventilatieroosters, luidsprekerroosters en mandjes in één stap.
 - **Schalen in procenten.** Maak een of meer onderdelen een percentage groter of kleiner - samen, zodat de opstelling meegroeit, of elk op zijn eigen plek.
 - **Maten gelijkmaken.** Houd Alt ingedrukt op een uitlijnpunt en de onderdelen rekken uit in plaats van te verschuiven: tot de zijkant van een ander onderdeel, of tot zijn breedte, lengte of hoogte - om bijvoorbeeld een doos te ruilen voor een cilinder van dezelfde grootte.
+- **Gelijke tussenruimte.** Verdeel onderdelen van verschillende grootte zo dat de ruimte ertussen overal even groot is - tussen de twee buitenste, op een bord met dezelfde ruimte aan de randen, of rij voor rij, zoals bij een insteekpuzzel; of typ de tussenruimte in.
 - **Meten en naar binnen kijken.** Meetlint, linialen, een doorsnede die het model openknipt, en een geschiedenisschuif om terug te kijken naar eerdere toestanden.
 - **Echte geometrie eronder.** layerling bewaart exacte CAD-vormen, niet alleen een mesh, dus een afgeronde rand blijft een afgeronde rand – helemaal tot in een STEP-bestand voor een volwaardig CAD-programma.
 
