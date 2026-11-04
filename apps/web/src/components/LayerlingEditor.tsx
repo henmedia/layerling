@@ -25,7 +25,7 @@ import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerText
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { LID_DEFAULTS, groupedWithMagnets, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { LID_DEFAULTS, groupedWithMagnets, lidClickBumpsFit, lidHandleFits, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
 import { CABLE_DEFAULTS, cableChannelShapeFields, cableEndNear, cableGrid, findCableChannel, normalizeCableOptions, type CableChannelError, type CableChannelOptions, type CableChannelResult, type CableEnd, type CableGrid, type Vec3 as CableVec3 } from "@/lib/cableChannel";
 import { CableChannelPanel, type CableChannelEndName, type CableChannelPanelResult } from "./workplane/CableChannelPanel";
 import type { CadLidRequest } from "@/lib/cadLid";
@@ -8370,8 +8370,8 @@ export function LayerlingEditor({
    * and with posts for the magnets, which the lip has to go round: the mesh lid stays then.
    */
   const exactLid = useCallback(async (targets: readonly WorkplaneShape[], options: LidOptions, meshLid: WorkplaneShape, magnets?: { posts: WorkplaneShape[]; pockets: WorkplaneShape[] }): Promise<WorkplaneShape | null> => {
-    // A hinged lid stays the mesh lid for now: the exact one has no knuckles.
-    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge) return null;
+    // A hinged lid stays the mesh lid for now: the exact one has no knuckles, nor click bumps or a pull tab.
+    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge || options.clickBumps || options.handle === "tab") return null;
     const pocketDepth = magnetPocketDepth(options);
     const request: CadLidRequest = {
       type: options.type,
@@ -8411,9 +8411,11 @@ export function LayerlingEditor({
     const targets = (only ?? selectedShapes).filter((shape) => !isNonSolidShape(shape));
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
     const options = normalizeLidOptions(given);
-    // The pockets and the hinge's knuckles go into the body, so it must be free to change and one body.
-    if ((options.magnets || options.hinge) && targets.some((shape) => bodyLocked(shape))) return fail(t("status.objectLocked"));
-    if ((options.magnets || options.hinge) && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
+    // The pockets, the hinge's knuckles, the click bumps' dimples and a finger notch go into the body, so it must be free
+    // to change and one body.
+    const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch";
+    if (changesBody && targets.some((shape) => bodyLocked(shape))) return fail(t("status.objectLocked"));
+    if (changesBody && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
     const sourceProjectId = projectInfoRef.current.projectId;
     const changed = () => projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint;
@@ -8425,17 +8427,26 @@ export function LayerlingEditor({
     if (changed()) return fail(t("lid.error.changed"));
     const type = t(`lid.type.${options.type}`);
     const hinge = result.hinge;
-    if (!result.magnets && !hinge) {
-      commitShapes([...shapesRef.current, lid], lid.id, t("status.lidMade", { type }));
-      return { ok: true as const, id: lid.id, type: options.type };
+    // What else the lid has, said after what it is: its click bumps, its tab, or the notch in the body.
+    const extras = [
+      ...(result.clickBumps ? [t("status.lidClickBumps", { count: result.clickBumps.count })] : []),
+      ...(result.handle?.style === "tab" ? [t("status.lidHandleTab")] : result.handle?.style === "notch" ? [t("status.lidHandleNotch")] : []),
+    ];
+    const withExtras = (message: string) => [message, ...extras].join(" ");
+    const handle = result.handle?.style ?? "none";
+    // The click bumps' dimples and the finger notch are cut into the body as the magnets' pockets are.
+    const bodyCuts = [...(result.clickBumps ? [result.clickBumps.dimples] : []), ...(result.handle?.notch ? [result.handle.notch] : [])];
+    if (!result.magnets && !hinge && !bodyCuts.length) {
+      commitShapes([...shapesRef.current, lid], lid.id, withExtras(t("status.lidMade", { type })));
+      return { ok: true as const, id: lid.id, type: options.type, handle };
     }
     const posts = result.magnets?.posts ?? [];
     // A flush hinge's slots and a pivot lid's pin holes are cut into the body as the magnets' pockets are.
-    const pockets = [...(result.magnets?.pockets ?? []), ...(hinge?.cuts ? [hinge.cuts] : [])];
+    const pockets = [...(result.magnets?.pockets ?? []), ...(hinge?.cuts ? [hinge.cuts] : []), ...bodyCuts];
     // The body's knuckles are grouped with it as the magnets' posts are.
     const grouped = await groupedWithMagnets(targets, { posts: [...posts, ...(hinge ? [hinge.knuckles] : [])], pockets }, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
     if (changed()) return fail(t("lid.error.changed"));
-    if (!grouped.group) return fail(grouped.failureNotice || t(hinge ? "lid.error.hingeKernel" : "lid.error.magnetsKernel"));
+    if (!grouped.group) return fail(grouped.failureNotice || t(hinge ? "lid.error.hingeKernel" : result.magnets ? "lid.error.magnetsKernel" : "lid.error.cutsKernel"));
     const body = canonicalizeShape({ ...grouped.group, groupOperation: "group", name: targets.find((shape) => !shape.hole)?.name ?? grouped.group.name });
     const consumed = new Set(targets.map((shape) => shape.id));
     const remaining = shapesRef.current.filter((shape) => !consumed.has(shape.id));
@@ -8445,10 +8456,12 @@ export function LayerlingEditor({
       ? hinge.style === "pivot"
         ? t("status.lidMadePivot", { pin })
         : t(magnetCount ? "status.lidMadeHingeMagnets" : hinge.style === "flush" ? "status.lidMadeHingeFlush" : "status.lidMadeHinge", { type, count: hinge.count, pin, magnets: magnetCount })
-      : t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: pockets.length });
-    commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : [])], lid.id, withClosedHolesNote(message, grouped.closedHoles));
+      : magnetCount
+        ? t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: magnetCount })
+        : t("status.lidMade", { type });
+    commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : [])], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
     return {
-      ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: magnetCount, posts: posts.length > 0,
+      ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: magnetCount, posts: posts.length > 0, clickBumps: result.clickBumps?.count ?? 0, handle,
       ...(hinge ? { hinge: { knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);
@@ -8475,9 +8488,13 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, clickBumps, handle } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    void makeLid({ type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle }, targets).then((result) => {
+    // Click bumps and a handle the panel shows switched off (a flat lid, a pivot lid) are not asked for.
+    void makeLid({
+      type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
+      clickBumps: clickBumps && lidClickBumpsFit(lidTool), handle: lidHandleFits(lidTool) ? handle : "none",
+    }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
     });
@@ -12865,14 +12882,17 @@ export function LayerlingEditor({
           hingeSide: params.hingeSide,
           hingeTeardrop: params.hingeTeardrop,
           hingeStyle: params.hingeStyle,
+          clickBumps: params.clickBumps,
+          handle: params.handle,
         }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
-        if (!("bodyId" in result)) return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type };
+        if (!("bodyId" in result)) return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, ...(result.handle !== "none" ? { handle: result.handle } : {}) };
         const body = currentShapes().find((shape) => shape.id === result.bodyId);
         const pin = "hinge" in result && result.hinge?.pinId ? currentShapes().find((shape) => shape.id === result.hinge!.pinId) : null;
         return {
           object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, body: body ? mcpShapeSummary(body) : { id: result.bodyId }, magnets: result.magnets, posts: result.posts,
+          ...(result.clickBumps ? { clickBumps: result.clickBumps } : {}), ...(result.handle !== "none" ? { handle: result.handle } : {}),
           ...("hinge" in result && result.hinge ? { hinge: { knuckles: result.hinge.knuckles, pins: result.hinge.pins, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, style: result.hinge.style, pin: pin ? mcpShapeSummary(pin) : null } } : {}),
         };
       }

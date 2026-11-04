@@ -106,6 +106,8 @@ Když zapneš {{ui:lid.hinge}}, víko se otevírá kolem čepu podél rovné str
 
 > **Tip:** Nejdřív zalisuj magnety do tělesa. Pak na každý polož ještě jeden magnet, který se na něm sám otočí správně, a přitlač na ně víko (s kapkou lepidla v kapsách, pokud sedí volně): každý magnet tak skončí ve víku naproti svému protějšku a budou se přitahovat.
 
+Když zapneš {{ui:lid.clickBumps}}, víko zacvakne: malé kulaté výstupky na vnější straně jeho límce (u nasazeného víka na vnitřní straně okraje) zapadnou do důlků, které Layerling na stejných místech vyřízne do stěny tělesa, jeden uprostřed každé rovné strany od 12 mm, dva na straně delší než 80 mm, čtyři kolem kulatého otvoru a žádný na straně pantu. V části {{ui:lid.handle}} dá {{ui:lid.handle.tab}} desce jazýček silný jako deska, který přesahuje 6 mm za její přední hranu (nebo hranu naproti pantu), takže se víko dál tiskne otočené, a {{ui:lid.handle.notch}} vyřízne těsně pod hranou víka prohlubeň pro prst do přední stěny tělesa a vždy nechá 0,8 mm stěny; ani jedno nejde s otočným víkem a výstupky ani s plochým.
+
 ## Kabelový kanál tělesem
 
 {{ui:editor.tool.cableChannel}} vede tělesem kulatý průchod pro kabel nebo vodič LED, od místa, kde vstupuje, k místu, kde vychází, a cestu najde sám. Vyberte těleso a klikněte na {{ui:editor.tool.cableChannel}}, pak klikněte na těleso tam, kde kabel vstupuje ({{ui:cable.entry}}), a kde vychází ({{ui:cable.exit}}). Cesta začíná a končí rovně, kolmo k povrchu, vede rovně, kde to jde, a ohýbá se, kde musí, nikdy ostřeji než {{ui:cable.minBend}}, a drží se co nejdál od vnějšího povrchu, nikdy blíž než {{ui:cable.minWall}}. Kabel se dá protlačit obloukem o poloměru asi pětinásobku jeho průměru; {{ui:cable.diameter}} je průměr kanálu.
