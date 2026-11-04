@@ -29,6 +29,7 @@ type Drag = { axis: Axis; pointerId: number; startPx: number; trackPx: number; m
 
 export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeState | null> }) {
   useLanguage();
+  const root = useRef<HTMLDivElement>(null);
   const thumbX = useRef<HTMLDivElement>(null);
   const thumbY = useRef<HTMLDivElement>(null);
   const trackX = useRef<HTMLDivElement>(null);
@@ -58,8 +59,22 @@ export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeS
   useEffect(() => {
     let frameId = 0;
     let last = "";
+    let lastRight = -1;
     const tick = () => {
       frameId = requestAnimationFrame(tick);
+      // The properties panel lies over the right of the view: the bars end at its left edge, and reach the edge when it is closed.
+      const box = root.current;
+      const stage = box?.parentElement;
+      if (box && stage) {
+        const panel = stage.querySelector<HTMLElement>(":scope > .shape-inspector");
+        const stageRect = stage.getBoundingClientRect();
+        const panelRect = panel?.getBoundingClientRect();
+        const right = panelRect && panelRect.width > 0 ? Math.max(0, Math.round(stageRect.right - panelRect.left)) : 0;
+        if (right !== lastRight) {
+          lastRight = right;
+          box.style.setProperty("--view-scrollbar-right", `${right}px`);
+        }
+      }
       const now = read();
       if (!now) return;
       const key = `${now.x.start.toFixed(4)},${now.x.size.toFixed(4)},${now.y.start.toFixed(4)},${now.y.size.toFixed(4)}`;
@@ -204,9 +219,9 @@ export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeS
   };
 
   return (
-    <>
+    <div ref={root} className="view-scrollbars">
       {bar("x")}
       {bar("y")}
-    </>
+    </div>
   );
 }
