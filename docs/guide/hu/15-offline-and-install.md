@@ -16,6 +16,8 @@ A kezdőlapon megjelenik egy {{ui:installHint.install}} feliratú jelzés, ha a 
 
 A kezdőlapon lévő jelzést az {{ui:installHint.dismiss}} gombbal zárhatod be. Ha Chrome-ban vagy Edge-ben másodszor is elindítod a telepített alkalmazást, egy újabb ablak megnyitása helyett a nyitott ablakot hozza előre.
 
+Számítógépen egy Chrome-ban vagy Edge-ben telepített layerling a `.lyl` fájlok programjaként is regisztrál: egy tervre a fájlkezelőben duplán kattintva a layerlingben nyílik meg, a [[Ctrl]]+[[S]] pedig visszament ebbe a fájlba. Androidon ez nem működik, ott a böngésző nem kínál fájltársítást a telepített webalkalmazásokhoz; egy tervet a kezdőlapon a(z) {{ui:dashboard.importGeometry}} gombbal nyiss meg.
+
 ## Frissítések
 
 Ha van újabb verzió, a layerling a kezdőlapon jelzi. A {{ui:dashboard.updateBannerLink}} linken elolvashatod, mi változott. A verziószám jobbra lent található. Az oldal újratöltése után az új verzió van előtted.
