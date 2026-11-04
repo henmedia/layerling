@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Module from "manifold-3d";
-import { dropSplitSlivers, unionSplitManifoldComponents, type ManifoldSolid } from "@/lib/manifoldSplit";
+import { dropSplitSlivers, splitByPlaneClearOfFaces, unionSplitManifoldComponents, type ManifoldSolid } from "@/lib/manifoldSplit";
 
 function dispose(values: unknown[]) {
   Array.from(new Set(values)).forEach((value) => (value as { delete?: () => void })?.delete?.());
@@ -146,6 +146,74 @@ describe("model split topology (real Manifold kernel)", () => {
       created.push(...kept.created);
       expect(kept.solid).toBe(bottom);
     }
+    dispose(created);
+  });
+
+  it("cuts a lid at its plate without leaving the plate's brim on the rim (#1263)", async () => {
+    const runtime = await Module();
+    runtime.setup();
+    const { Manifold } = runtime;
+    const plate = Manifold.cylinder(2, 100, 100, 128);
+    const outer = Manifold.cylinder(4, 97.8, 97.8, 128);
+    const inner = Manifold.cylinder(4, 95.8, 95.8, 128);
+    const rim = outer.subtract(inner);
+    const lidUp = plate.add(rim.translate([0, 0, 2]));
+    const lidDown = rim.add(plate.translate([0, 0, 4]));
+    const created: ManifoldSolid[] = [plate, outer, inner, rim, lidUp, lidDown];
+    const plateVolume = plate.volume();
+    const rimVolume = rim.volume();
+    const width = (solid: ManifoldSolid) => solid.boundingBox().max[0] - solid.boundingBox().min[0];
+
+    // Lying as the lid tool lays it out: plate down, rim up; cut on the plate's top.
+    // A plain split hands the rim a brim 200 wide (the bug); the normal's length does not matter.
+    const [plainTop, plainBottom] = lidUp.splitByPlane([0, 0, 1], 2);
+    created.push(plainTop, plainBottom);
+    expect(width(plainTop)).toBeCloseTo(200, 1);
+    for (const normal of [[0, 0, 1], [0, 0, 3]] as [number, number, number][]) {
+      const [top, bottom] = splitByPlaneClearOfFaces(lidUp, normal, 2);
+      created.push(top, bottom);
+      expect(top.status()).toBe("NoError");
+      expect(bottom.status()).toBe("NoError");
+      expect(width(top)).toBeCloseTo(2 * 97.8, 1);
+      expect(top.boundingBox().min[2]).toBeCloseTo(2, 6);
+      expect(top.volume()).toBeCloseTo(rimVolume, 1);
+      expect(width(bottom)).toBeCloseTo(200, 1);
+      expect(bottom.boundingBox().max[2]).toBeCloseTo(2, 6);
+      expect(bottom.volume()).toBeCloseTo(plateVolume, 1);
+    }
+
+    // The other way up: the brim would go to the lower half.
+    const [top, bottom] = splitByPlaneClearOfFaces(lidDown, [0, 0, 1], 4);
+    created.push(top, bottom);
+    expect(width(bottom)).toBeCloseTo(2 * 97.8, 1);
+    expect(bottom.volume()).toBeCloseTo(rimVolume, 1);
+    expect(top.volume()).toBeCloseTo(plateVolume, 1);
+    expect(top.boundingBox().min[2]).toBeCloseTo(4, 6);
+    dispose(created);
+  });
+
+  it("cuts on a step of a body and leaves a plain cut as Manifold makes it (#1263)", async () => {
+    const runtime = await Module();
+    runtime.setup();
+    const base = runtime.Manifold.cube([40, 10, 20], false);
+    const tower = runtime.Manifold.cube([10, 20, 20], false);
+    const shape = runtime.Manifold.union([base, tower]);
+    const created: ManifoldSolid[] = [base, tower, shape];
+    // On the step: the tower's half is the tower only, 10 wide, in one piece.
+    const [top, bottom] = splitByPlaneClearOfFaces(shape, [0, 1, 0], 10);
+    created.push(top, bottom);
+    const trimmed = dropSplitSlivers(runtime, top);
+    created.push(...trimmed.created);
+    expect(trimmed.solid?.volume()).toBeCloseTo(2_000, 3);
+    expect(trimmed.solid?.boundingBox().max[0]).toBeCloseTo(10, 6);
+    expect(bottom.volume()).toBeCloseTo(8_000, 3);
+    // Through the middle of a slanted plane, away from every corner: the same as Manifold's own split.
+    const normal: [number, number, number] = [0.3, 1, 0.2];
+    const [ownTop, ownBottom] = shape.splitByPlane(normal, 7.3);
+    const [clearTop, clearBottom] = splitByPlaneClearOfFaces(shape, normal, 7.3);
+    created.push(ownTop, ownBottom, clearTop, clearBottom);
+    expect(clearTop.volume()).toBeCloseTo(ownTop.volume(), 6);
+    expect(clearBottom.volume()).toBeCloseTo(ownBottom.volume(), 6);
     dispose(created);
   });
 

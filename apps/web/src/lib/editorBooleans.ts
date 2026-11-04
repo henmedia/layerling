@@ -13,7 +13,7 @@ import { sphereTessellation } from "@/lib/sphereTessellation";
 import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices } from "@/lib/groupScale";
-import { dropSplitSlivers, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { dropSplitSlivers, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { canonicalizeShape, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, mirrorSign, normalizeDegrees, resizedImportedCoordinates, resizedShapeSize, shapeDepth, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth, withHoleMode } from "@/lib/workplaneShapes";
@@ -840,7 +840,7 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<Model
       return { parts: null, error: t("split.error.overlapping") };
     }
     solid = normalized.solid;
-    const [rawPositive, rawNegative] = solid.splitByPlane(plane.normal, plane.position);
+    const [rawPositive, rawNegative] = splitByPlaneClearOfFaces(solid, plane.normal, plane.position);
     created.push(rawPositive, rawNegative);
     const trimmedPositive = dropSplitSlivers(runtime, rawPositive);
     const trimmedNegative = dropSplitSlivers(runtime, rawNegative);
