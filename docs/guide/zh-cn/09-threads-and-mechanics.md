@@ -129,7 +129,7 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 ## Gridfinity
 
-{{ui:shape.gridfinity}} 形状用来制作 Zack Freedman 的开放式收纳系统的零件：42 mm 网格上的收纳盒，放在底板里，并且可以彼此堆叠。尺寸遵循已发布的 Gridfinity 规范，所以 layerling 做的收纳盒能装进其他生成器做的底板，反之亦然。在 {{ui:prop.gridfinityType}} 下选择：
+{{ui:shape.gridfinity}} 形状用来制作 Gridfinity（Zack Freedman 的开放式收纳系统）的零件：42 mm 网格上的收纳盒，放在底板里，并且可以彼此堆叠。尺寸遵循已发布的 Gridfinity 规范，所以 layerling 做的收纳盒能装进其他生成器做的底板，反之亦然。layerling 不属于 Gridfinity 项目，该项目以 MIT 许可证发布。在 {{ui:prop.gridfinityType}} 下选择：
 
 - **{{ui:gridfinity.bin}}：** 每个网格单元下方都有支脚的收纳盒。{{ui:prop.gridfinityUnitsX}} 和 {{ui:prop.gridfinityUnitsZ}} 按 42 mm 的网格单元计数（收纳盒小 0.5 mm，一个单元为 41.5 mm）；{{ui:prop.gridfinityUnitsY}} 按 7 mm 的高度单元计数，最多 20。壁顶的 {{ui:prop.gridfinityLip}} 托住下一个收纳盒的支脚，并使收纳盒增高 4.4 mm：3 单元带卡边的收纳盒高 25.4 mm。启用 {{ui:prop.gridfinityMagnets}} 后，每个支脚的每个角都会得到一个用于 6 × 2 mm 磁铁的孔。
 - **{{ui:gridfinity.baseplate}}：** 收纳盒所站的底板，高 5 mm，每个网格单元有一个插槽。它是没有底面、没有磁铁孔的开放框架；开启 {{ui:prop.gridfinitySwallowtail}} 后，它立在底面上（见下文）。

@@ -129,7 +129,7 @@ The loft is an exact body, twisted and tilted too: its edges can be chamfered an
 
 ## Gridfinity
 
-The {{ui:shape.gridfinity}} shape makes parts for the open storage system by Zack Freedman: bins on a 42 mm grid that stand in a baseplate and stack on one another. The measures follow the published Gridfinity specification, so a bin from layerling fits a baseplate made with another generator, and the other way round. Under {{ui:prop.gridfinityType}} you choose:
+The {{ui:shape.gridfinity}} shape makes parts for Gridfinity, the open storage system by Zack Freedman: bins on a 42 mm grid that stand in a baseplate and stack on one another. The measures follow the published Gridfinity specification, so a bin from layerling fits a baseplate made with another generator, and the other way round. layerling is not part of the Gridfinity project, which is released under the MIT licence. Under {{ui:prop.gridfinityType}} you choose:
 
 - **{{ui:gridfinity.bin}}:** a bin with a foot under every grid unit. {{ui:prop.gridfinityUnitsX}} and {{ui:prop.gridfinityUnitsZ}} count grid units of 42 mm (a bin is 0.5 mm smaller, 41.5 mm for one unit); {{ui:prop.gridfinityUnitsY}} counts height units of 7 mm, up to 20. The {{ui:prop.gridfinityLip}} on top of the wall holds the feet of the next bin and makes the bin 4.4 mm taller: a bin of 3 units with the lip is 25.4 mm tall. With {{ui:prop.gridfinityMagnets}} every foot gets a hole for a 6 × 2 mm magnet in each corner.
 - **{{ui:gridfinity.baseplate}}:** the plate the bins stand in, 5 mm tall, with a socket for every grid unit. It is an open frame with no floor and no magnet holes; with {{ui:prop.gridfinitySwallowtail}} it stands on a floor (see below).

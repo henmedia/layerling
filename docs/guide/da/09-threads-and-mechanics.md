@@ -131,7 +131,7 @@ Loftet er en eksakt form, snoet og hældende også: dens kanter kan fases og run
 
 ## Gridfinity
 
-Formen {{ui:shape.gridfinity}} laver dele til det åbne opbevaringssystem af Zack Freedman: bakker på et 42 mm gitter som står i en grundplade og stables på hinanden. Målene følger den publicerede Gridfinity-specifikation, så en bakke fra layerling passer i en grundplade lavet med en anden generator, og omvendt. Under {{ui:prop.gridfinityType}} vælger du:
+Formen {{ui:shape.gridfinity}} laver dele til Gridfinity, det åbne opbevaringssystem af Zack Freedman: bakker på et 42 mm gitter som står i en grundplade og stables på hinanden. Målene følger den publicerede Gridfinity-specifikation, så en bakke fra layerling passer i en grundplade lavet med en anden generator, og omvendt. layerling er ikke en del af Gridfinity-projektet, som er udgivet under MIT-licensen. Under {{ui:prop.gridfinityType}} vælger du:
 
 - **{{ui:gridfinity.bin}}:** en bakke med en fod under hver gitterenhed. {{ui:prop.gridfinityUnitsX}} og {{ui:prop.gridfinityUnitsZ}} tæller enheder på tværs og i dybet i gitteret på 42 mm (en bakke er 0,5 mm mindre, 41,5 mm for én enhed); {{ui:prop.gridfinityUnitsY}} tæller enheder i højden på 7 mm, op til 20. {{ui:prop.gridfinityLip}} oven på væggen holder fødderne på den næste bakke og gør bakken 4,4 mm højere: en bakke på 3 enheder er med stabelkanten 25,4 mm høj. Med {{ui:prop.gridfinityMagnets}} får hver fod et hul til en 6 × 2 mm magnet i hvert hjørne.
 - **{{ui:gridfinity.baseplate}}:** pladen bakkerne står i, 5 mm høj, med en fordybning for hver gitterenhed. Det er en åben ramme uden bund og uden magnet-huller; med {{ui:prop.gridfinitySwallowtail}} står den på en bund (se nedenfor).

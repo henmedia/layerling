@@ -129,7 +129,7 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 ## Gridfinity
 
-{{ui:shape.gridfinity}} 形狀用來製作 Zack Freedman 的開放式收納系統零件：42 mm 網格上的收納盒，可放在底板裡，也能彼此堆疊。尺寸遵循公開的 Gridfinity 規格，所以 layerling 做的收納盒能裝進其他產生器做的底板，反之亦然。在 {{ui:prop.gridfinityType}} 下選擇：
+{{ui:shape.gridfinity}} 形狀用來製作 Gridfinity（Zack Freedman 的開放式收納系統）的零件：42 mm 網格上的收納盒，可放在底板裡，也能彼此堆疊。尺寸遵循公開的 Gridfinity 規格，所以 layerling 做的收納盒能裝進其他產生器做的底板，反之亦然。layerling 不屬於 Gridfinity 專案，該專案以 MIT 授權條款釋出。在 {{ui:prop.gridfinityType}} 下選擇：
 
 - **{{ui:gridfinity.bin}}：** 每個網格單元下方都有支腳的收納盒。{{ui:prop.gridfinityUnitsX}} 與 {{ui:prop.gridfinityUnitsZ}} 以 42 mm 的網格單元計數（收納盒小 0.5 mm，一個單元為 41.5 mm）；{{ui:prop.gridfinityUnitsY}} 以 7 mm 的高度單元計數，最多 20。壁頂的 {{ui:prop.gridfinityLip}} 托住下一個收納盒的支腳，並使收納盒增高 4.4 mm：3 單元帶唇緣的收納盒高 25.4 mm。啟用 {{ui:prop.gridfinityMagnets}} 後，每個支腳的每個角都會有一個 6 × 2 mm 磁鐵孔。
 - **{{ui:gridfinity.baseplate}}：** 收納盒所站的底板，高 5 mm，每個網格單元有一個插槽。它是沒有底面、沒有磁鐵孔的開放框架；開啟 {{ui:prop.gridfinitySwallowtail}} 後，它立在底面上（見下文）。
