@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { alignAxesForWorkplane } from "@/lib/alignFrame";
-import { distributedShapesForSelection, distributionState } from "@/lib/alignDistribute";
+import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distributionState } from "@/lib/alignDistribute";
 import { alignBounds } from "@/lib/alignSize";
 import { meshAabb } from "@/lib/editorMeshCore";
 import type { PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -181,6 +181,20 @@ describe("equal gaps", () => {
     expect(left(result.nextShapes, "p1")).toBeCloseTo(30, 6);
     expect(left(result.nextShapes, "p2")).toBeCloseTo(50, 6);
     expect(spread(shapes, "x", null, 80).problem).toBe("noRoom");
+  });
+
+  it("spreads the parts over the whole plate when the plate is the reference", () => {
+    // A plate 200 x 200 round the origin; parts 10, 20 and 30 wide crowded on the left: 140 of room, gaps of 35.
+    const parts = [box("a", -90, 0, 10), box("b", -70, 10, 20), box("c", -40, -10, 30)];
+    const selection = [...parts, alignPlateShape(200, 200)];
+    const result = distributedShapesForSelection(parts, selection, ALIGN_PLATE_ID, "x");
+    expect(result.frameId).toBe(ALIGN_PLATE_ID);
+    expect(result.gaps[0]).toBeCloseTo(35, 6);
+    expect(left(result.nextShapes, "a")).toBeCloseTo(-65, 6);
+    expect(left(result.nextShapes, "b")).toBeCloseTo(-20, 6);
+    expect(left(result.nextShapes, "c")).toBeCloseTo(35, 6);
+    // The plate is in no design: only the parts come back.
+    expect(result.nextShapes).toHaveLength(3);
   });
 
   it("spreads upwards too", () => {

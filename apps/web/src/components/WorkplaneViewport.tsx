@@ -19,6 +19,7 @@ import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { ToolbarNoteIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
+import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
 import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
@@ -6989,6 +6990,7 @@ export function WorkplaneViewport({
         // A click on empty space that did not turn the view clears the selection, as a click there always did.
         if (Math.hypot(event.clientX - slicerEmptyPress.x, event.clientY - slicerEmptyPress.y) < 5) {
           if (multiSelectRef.current) onMultiSelectEndRef.current?.();
+          else if (alignModeRef.current) onAlignAnchorChange(ALIGN_PLATE_ID);
           else onSelectShape(null);
         }
         return;
@@ -7066,7 +7068,8 @@ export function WorkplaneViewport({
             onSelectShape(selected);
           }
         } else if (!marquee.additive) {
-          onSelectShape(null);
+          if (alignModeRef.current) onAlignAnchorChange(ALIGN_PLATE_ID);
+          else onSelectShape(null);
         }
         if (state) {
           state.controls.enabled = true;
@@ -7150,7 +7153,7 @@ export function WorkplaneViewport({
       }
       onInteractionActiveChange?.(false);
     },
-    [cancelGestureForCamera, clearMoveDimensions, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt],
+    [cancelGestureForCamera, clearMoveDimensions, onAlignAnchorChange, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt],
   );
 
   const handleDrop = useCallback(

@@ -1354,6 +1354,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Hizalama iptal edildi",
   "status.alignAnchorSet": "Hizalama referansı ayarlandı",
   "status.alignAnchorNamed": "Hizalama referansı: {name}",
+  "status.alignAnchorPlate": "Hizalama referansı: tabla - noktalar ona hizalar, eşit aralık onun üzerine dağıtır",
+  "status.alignAnchorPlateOff": "Hizalama referansı: yok, tabla bırakıldı",
   "status.mirrorStart": "Aynala: bir eksen oku seç",
   "status.mirrorCancelled": "Aynalama iptal edildi",
   "status.pivotPickStart": "Dönme noktası: bir yüzeye tıkla - düz bir yüzey merkezini ayarlar, örn. bir boru ucunun ekseni",

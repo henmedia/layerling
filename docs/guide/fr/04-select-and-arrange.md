@@ -61,6 +61,8 @@ La clé est [[L]]. [[Esc]] annule.
 
 Si une plaque fait partie de la sélection, plus longue dans cette direction que toutes les autres formes, les formes se répartissent sur elle : l'écart à ses bords est aussi grand que celui entre les formes, et une forme seule vient en son milieu. Les formes en plusieurs rangées, comme les animaux d'un puzzle à encastrer, sont réparties rangée par rangée ; les formes dont les boîtes se chevauchent en travers de la direction forment une rangée. Là où les formes ne sont pas en colonnes nettes, comme les animaux d'avant en arrière, les formes côte à côte se déplacent plutôt comme une rangée entière.
 
+Sans plaque, cliquez d'abord sur un endroit libre du plateau : le plateau devient alors la forme fixe, l'espacement égal répartit les formes sur tout le plateau avec le même écart à ses bords, et les autres points les alignent sur ses bords ou son milieu. Un nouveau clic sur le plateau libre le relâche.
+
 Maintenez [[Alt]] et cliquez sur le point pour saisir l'écart vous-même, par exemple 5 mm : les formes s'alignent à cette distance, à partir de la première forme ou de celle cliquée en premier ; sur une plaque, la rangée vient en son milieu. Une forme verrouillée reste en place ; entre les formes extérieures, elle empêche donc l'espacement égal.
 
 ## Mise en miroir

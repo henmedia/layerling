@@ -1878,6 +1878,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.alignCancelled": "Zarovnání bylo zrušeno",
   "status.alignAnchorSet": "Referenční objekt zarovnání byl nastaven",
   "status.alignAnchorNamed": "Referenční objekt zarovnání: {name}",
+  "status.alignAnchorPlate": "Reference zarovnání: podložka - body zarovnávají k ní, stejné mezery rozmisťují po ní",
+  "status.alignAnchorPlateOff": "Reference zarovnání: žádná, podložka uvolněna",
   "status.mirrorStart": "Zrcadlení: vyberte šipku osy",
   "status.mirrorCancelled": "Zrcadlení bylo zrušeno",
   "status.pivotPickStart": "Střed otáčení: klikněte na plochu. Rovná plocha určí svůj střed, například osu konce trubky",

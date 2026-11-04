@@ -1760,6 +1760,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Alignement annulé",
   "status.alignAnchorSet": "Aligner le jeu d'ancrage",
   "status.alignAnchorNamed": "Aligner l'ancre : {name}",
+  "status.alignAnchorPlate": "Référence d'alignement : la plaque - les points s'alignent sur elle, l'espacement égal répartit sur elle",
+  "status.alignAnchorPlateOff": "Référence d'alignement : aucune, la plaque est libérée",
   "status.mirrorStart": "Miroir : choisissez une flèche d'axe",
   "status.mirrorCancelled": "Miroir annulé",
   "status.pivotPickStart": "Pivot : cliquez sur une face - une face plate définit son centre, par ex. l'axe d'une extrémité de tuyau",

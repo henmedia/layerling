@@ -2341,6 +2341,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Justering annulleret",
   "status.alignAnchorSet": "Justeringsanker sat",
   "status.alignAnchorNamed": "Justeringsanker: {name}",
+  "status.alignAnchorPlate": "Justeringsreference: pladen - punkterne justerer efter den, lige store mellemrum fordeler over den",
+  "status.alignAnchorPlateOff": "Justeringsreference: ingen, pladen er sluppet",
   "status.mirrorStart": "Spejl: vælg en akse-pil",
   "status.mirrorCancelled": "Spejling annulleret",
   "status.pivotPickStart": "Rotationspunkt: klik en flade – en flad flade sætter dens centrum, f.eks. aksen på en rørende",

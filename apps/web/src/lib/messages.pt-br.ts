@@ -2926,6 +2926,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Alinhamento cancelado",
   "status.alignAnchorSet": "Âncora do alinhamento definida",
   "status.alignAnchorNamed": "Âncora do alinhamento: {name}",
+  "status.alignAnchorPlate": "Referência de alinhamento: a mesa - os pontos alinham a ela, o espaçamento igual distribui sobre ela",
+  "status.alignAnchorPlateOff": "Referência de alinhamento: nenhuma, a mesa foi solta",
   "status.mirrorStart": "Espelhar: escolha uma seta de eixo",
   "status.mirrorCancelled": "Espelhamento cancelado",
   "status.pivotPickStart": "Ponto de rotação: clique numa face - uma face plana define o seu centro, por exemplo o eixo da ponta de um tubo",

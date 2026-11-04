@@ -608,7 +608,7 @@ export const tools = [
       properties: {
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" }, description: "Object ids to align. If omitted, uses the current selection." },
-        anchorId: { type: "string", description: "Optional object id to keep fixed as the alignment reference." },
+        anchorId: { type: "string", description: "Optional object id to keep fixed as the alignment reference, or \"plate\": the build plate is the reference - the objects line up on its edges or middle, and mode spread spreads them over the whole plate with the same gap to its edges." },
         axis: { type: "string", enum: ["x", "y", "z"], description: "x=left/right, z=front/back, y=bottom/top - or along the set workplane's x, z and normal." },
         target: { type: "string", enum: ["min", "center", "max"], description: "Which side/center to align. Required for position and size." },
         mode: { type: "string", enum: ["position", "size", "spread"], description: "position (default) moves the objects; size stretches them to the reference instead; spread gives them equal gaps along the axis." },

@@ -1772,6 +1772,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.alignCancelled": "Uitlijnen geannuleerd",
   "status.alignAnchorSet": "Uitlijnanker ingesteld",
   "status.alignAnchorNamed": "Uitlijnanker: {name}",
+  "status.alignAnchorPlate": "Uitlijnreferentie: de plaat - de punten lijnen erop uit, gelijke tussenruimte verdeelt erover",
+  "status.alignAnchorPlateOff": "Uitlijnreferentie: geen, de plaat is losgelaten",
   "status.mirrorStart": "Spiegelen: kies een aspijl",
   "status.mirrorCancelled": "Spiegelen geannuleerd",
   "status.pivotPickStart": "Draaipunt: klik op een vlak - een plat vlak bepaalt zijn middelpunt, bijv. de as van een buiseinde",

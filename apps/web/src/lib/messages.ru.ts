@@ -1767,6 +1767,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Выравнивание отменено",
   "status.alignAnchorSet": "Опорная точка выравнивания задана",
   "status.alignAnchorNamed": "Опорная точка выравнивания: {name}",
+  "status.alignAnchorPlate": "Опора выравнивания: стол - точки выравнивают по нему, равные промежутки распределяют по нему",
+  "status.alignAnchorPlateOff": "Опора выравнивания: нет, стол отпущен",
   "status.mirrorStart": "Отражение: выберите стрелку оси",
   "status.mirrorCancelled": "Отражение отменено",
   "status.pivotPickStart": "Центр вращения: щёлкните по грани — плоская грань задаёт свой центр, например ось конца трубы",

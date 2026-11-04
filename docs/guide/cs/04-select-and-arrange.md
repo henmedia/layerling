@@ -61,6 +61,8 @@ Vedle prostředního bodu každé čáry stojí širší bod s čárkou na každ
 
 Je-li mezi vybranými tvary deska, která je v tomto směru delší než všechny ostatní, tvary se rozmístí na ní: mezera k jejím okrajům je stejná jako mezi tvary a jediný tvar přijde doprostřed. Tvary v několika řadách, jako zvířátka vkládací skládačky, se rozmístí řadu po řadě; tvary, jejichž kvádry se překrývají napříč směrem, tvoří jednu řadu. Kde tvary nestojí v čistých sloupcích, jako zvířátka zepředu dozadu, posouvají se tvary stojící vedle sebe místo toho jako celá řada.
 
+Bez desky nejdřív klikněte na volné místo podložky: podložka je pak pevný tvar, stejné mezery rozmístí tvary po celé podložce se stejnou mezerou k jejím okrajům a ostatní body je zarovnají k jejím okrajům nebo středu. Další klik na volnou podložku ji uvolní.
+
 Podržte [[Alt]] a klikněte na bod, chcete-li mezeru zadat sami, třeba 5 mm: tvary se seřadí v této vzdálenosti, od prvního tvaru nebo od toho, na který jste klikli jako první; na desce přijde řada doprostřed. Zamčený tvar zůstane na místě, takže jeden mezi krajními tvary stejným mezerám zabrání.
 
 ## Zrcadlení

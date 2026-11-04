@@ -1773,6 +1773,8 @@ export const MESSAGES_EN = {
   "status.alignCancelled": "Align cancelled",
   "status.alignAnchorSet": "Align anchor set",
   "status.alignAnchorNamed": "Align anchor: {name}",
+  "status.alignAnchorPlate": "Align reference: the plate - the dots line up on it, equal gaps spread over it",
+  "status.alignAnchorPlateOff": "Align reference: none, the plate is let go",
   "status.mirrorStart": "Mirror: choose an axis arrow",
   "status.mirrorCancelled": "Mirror cancelled",
   "status.pivotPickStart": "Pivot: click a face - a flat face sets its centre, e.g. the axis of a pipe end",

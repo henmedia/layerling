@@ -1396,6 +1396,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Poravnava preklicana",
   "status.alignAnchorSet": "Sidro poravnave nastavljeno",
   "status.alignAnchorNamed": "Sidro poravnave: {name}",
+  "status.alignAnchorPlate": "Sklic poravnave: plošča - točke poravnavajo nanjo, enaki razmiki razporedijo po njej",
+  "status.alignAnchorPlateOff": "Sklic poravnave: nobeden, plošča je izpuščena",
   "status.mirrorStart": "Zrcali: izberi puščico osi",
   "status.mirrorCancelled": "Zrcaljenje preklicano",
   "status.pivotPickStart": "Os vrtenja: klikni ploskev - ravna ploskev določi svoje središče, npr. os konca cevi",

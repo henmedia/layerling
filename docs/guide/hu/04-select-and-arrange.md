@@ -61,6 +61,8 @@ Minden vonal középső pontja mellett egy szélesebb pont áll, mindkét oldal�
 
 Ha a kijelölt formák között van egy lap, amely abban az irányban hosszabb az összes többinél, a formák ezen oszlanak el: a széleitől mért köz ugyanakkora, mint a formák közötti, és egyetlen forma a közepére kerül. Több sorban álló formák, például egy fogós kirakó állatai, soronként oszlanak el; azok a formák, amelyek dobozai az irányra keresztben átfedik egymást, egy sort alkotnak. Ahol a formák nem állnak tiszta oszlopokban, mint az állatok elölről hátrafelé, ott az egymás mellett álló formák egész sorként mozdulnak el.
 
+Lap nélkül előbb kattints a tálca egy üres pontjára: ekkor a tálca a rögzített forma, az egyenlő közök az egész tálcán osztják el a formákat, a szélektől is ugyanakkora közzel, a többi pont pedig a széleihez vagy a közepéhez igazítja őket. Egy újabb kattintás az üres tálcára elengedi.
+
 Tartsd lenyomva az [[Alt]] billentyűt, és kattints a pontra, ha magad írnád be a közt, például 5 mm-t: a formák ilyen távolságra sorakoznak, az első formától vagy attól, amelyre először kattintottál; egy lapon a sor a közepére kerül. Egy zárolt forma helyben marad, így ha a szélső formák között van, megakadályozza az egyenlő közöket.
 
 ## Tükrözés

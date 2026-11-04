@@ -69,6 +69,8 @@ Beside the middle point of each line stands a wider dot with a bar on each side.
 
 If a board is among the selected shapes, longer in that direction than all the others, the shapes are spread on it: the gap at its edges is as large as the one between them, and a single shape comes to its middle. Shapes in several rows, such as the animals of a peg puzzle, are spread row by row; shapes whose boxes overlap across the direction form one row. Where the shapes stand in no clean columns, as the animals do from front to back, the shapes standing side by side move as a whole row instead. The whole puzzle then takes one click from left to right and one from front to back.
 
+Without a board, click an empty spot of the plate first: the plate is then the fixed shape, equal gaps spread the shapes over the whole plate with the same gap to its edges, and the other dots line them up on its edges or its middle. Click the empty plate again to let it go.
+
 Hold [[Alt]] and click the dot to type the gap yourself, say 5 mm: the shapes line up that far apart, starting at the first shape or at the one you clicked first; on a board the row comes to its middle. A locked shape stays where it is, so one between the outer shapes stops the equal gaps.
 
 ## Mirroring

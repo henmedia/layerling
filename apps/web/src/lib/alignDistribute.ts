@@ -32,6 +32,18 @@ import type { AlignAxis, WorkplaneShape } from "@/types/layerling";
 
 const EPSILON = 0.0005;
 
+/**
+ * The plate as the align tool's reference: a click on empty space in Align mode makes it the fixed part.
+ * It joins the selection as a thin locked box of the plate's size round the origin, so equal gaps take it
+ * as the frame and spread the parts over the whole plate, and the other dots line them up on its edges or
+ * its middle. It is never in the design, so nothing ever moves it or draws it.
+ */
+export const ALIGN_PLATE_ID = "align-plate";
+
+export function alignPlateShape(width: number, depth: number): WorkplaneShape {
+  return { id: ALIGN_PLATE_ID, name: "plate", kind: "box", color: "#000000", x: 0, z: 0, elevation: 0, size: Math.max(width, depth), width, depth, height: 0.001, rotation: 0, locked: true } as WorkplaneShape;
+}
+
 type Range = { min: number; max: number };
 type Member = { shape: WorkplaneShape; bounds: Cuboid; along: Range; fixed: boolean };
 /** What moves as one along the axis: a part, or a block of parts that overlap along it. */

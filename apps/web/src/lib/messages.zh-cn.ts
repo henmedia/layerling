@@ -1719,6 +1719,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "已取消对齐",
   "status.alignAnchorSet": "已设置对齐基准",
   "status.alignAnchorNamed": "对齐基准：{name}",
+  "status.alignAnchorPlate": "对齐基准：打印平台 - 各点对齐到平台，等间距在整个平台上分布",
+  "status.alignAnchorPlateOff": "对齐基准：无，已松开平台",
   "status.mirrorStart": "镜像：选择一个轴向箭头",
   "status.mirrorCancelled": "已取消镜像",
   "status.pivotPickStart": "旋转中心：点击一个面，平面会以其中点为准，例如管端的轴心",

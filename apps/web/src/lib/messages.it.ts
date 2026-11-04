@@ -1755,6 +1755,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Allineamento annullato",
   "status.alignAnchorSet": "Punto di riferimento per l'allineamento impostato",
   "status.alignAnchorNamed": "Punto di riferimento per l'allineamento: {name}",
+  "status.alignAnchorPlate": "Riferimento di allineamento: il piano - i punti allineano su di esso, la spaziatura uguale distribuisce su di esso",
+  "status.alignAnchorPlateOff": "Riferimento di allineamento: nessuno, il piano è rilasciato",
   "status.mirrorStart": "Specchio: scegli una freccia dell'asse",
   "status.mirrorCancelled": "Operazione specchio annullata",
   "status.pivotPickStart": "Punto di rotazione: fai clic su una faccia; una faccia piana ne imposta il centro, ad esempio l'asse di un'estremità di un tubo",

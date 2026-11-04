@@ -1728,6 +1728,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Wyrównywanie anulowane",
   "status.alignAnchorSet": "Ustawiono kotwicę wyrównania",
   "status.alignAnchorNamed": "Kotwica wyrównania: {name}",
+  "status.alignAnchorPlate": "Odniesienie wyrównania: płyta - punkty wyrównują do niej, równe odstępy rozkładają na niej",
+  "status.alignAnchorPlateOff": "Odniesienie wyrównania: brak, płyta zwolniona",
   "status.mirrorStart": "Odbicie lustrzane: wybierz strzałkę osi",
   "status.mirrorCancelled": "Odbicie lustrzane anulowane",
   "status.pivotPickStart": "Punkt obrotu: kliknij ścianę. Płaska ściana daje swój środek, np. oś końca rury",

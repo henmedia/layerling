@@ -230,7 +230,7 @@ import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
-import { distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
+import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
 import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, expandBundles, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
@@ -2084,6 +2084,8 @@ function alignedShapesForSelection(
 }
 
 function effectiveAlignmentAnchorId(selection: WorkplaneShape[], requestedAnchorId: string | null) {
+  // The plate, clicked as the reference, wins over a locked part: the part stays anyway.
+  if (requestedAnchorId === ALIGN_PLATE_ID) return ALIGN_PLATE_ID;
   return selection.find((shape) => shape.locked)?.id
     ?? (requestedAnchorId && selection.some((shape) => shape.id === requestedAnchorId) ? requestedAnchorId : null);
 }
@@ -4068,15 +4070,20 @@ export function LayerlingEditor({
   );
   // A workplane set on a face lets the align tool measure along its axes (#232); on the plate it is the world's.
   const alignAxes = useMemo(() => alignAxesForWorkplane(placementWorkplane), [placementWorkplane]);
-  const alignHandleStatuses = useMemo(() => (alignMode ? alignmentStatuses(selectedShapes, effectiveAlignAnchorId, alignAxes) : []), [alignAxes, alignMode, effectiveAlignAnchorId, selectedShapes]);
+  // With the plate as the reference it joins the parts the align tool measures, as a locked part of its own.
+  const alignSelection = useMemo(
+    () => (effectiveAlignAnchorId === ALIGN_PLATE_ID ? [...selectedShapes, alignPlateShape(workspaceSettings.width, workspaceSettings.depth)] : selectedShapes),
+    [effectiveAlignAnchorId, selectedShapes, workspaceSettings.depth, workspaceSettings.width],
+  );
+  const alignHandleStatuses = useMemo(() => (alignMode ? alignmentStatuses(alignSelection, effectiveAlignAnchorId, alignAxes) : []), [alignAxes, alignMode, alignSelection, effectiveAlignAnchorId]);
   // Align by size (#998) stretches no part past the largest size the settings allow, as scaling by percent.
   const alignSizeLimit = useCallback((shape: WorkplaneShape) => shapeDimensionLimit(workspaceSettingsRef.current, shape.kind, 1000), []);
   // The box the handles stand on along those axes, of the anchor or of the whole selection, from the shapes as they are (no preview).
   const alignFrameBounds = useMemo(() => {
     if (!alignMode || !alignAxes || selectedShapes.length < 2) return null;
-    const anchor = effectiveAlignAnchorId ? selectedShapes.find((shape) => shape.id === effectiveAlignAnchorId) : null;
+    const anchor = effectiveAlignAnchorId ? alignSelection.find((shape) => shape.id === effectiveAlignAnchorId) : null;
     return boundsForCuboids((anchor ? [anchor] : selectedShapes).map((shape) => alignBounds(shape, alignAxes)));
-  }, [alignAxes, alignMode, effectiveAlignAnchorId, selectedShapes]);
+  }, [alignAxes, alignMode, alignSelection, effectiveAlignAnchorId, selectedShapes]);
   // The copies a pattern would add, shown on the workplane until "Create".
   const arrayPreview = useMemo(
     () => (arrayTool && selectedShapes.length > 0 ? arrayCopies(selectedShapes, arraySettingsResolved(arrayTool, selectedShapes, shapes)) : null),
@@ -4111,15 +4118,15 @@ export function LayerlingEditor({
         : edgeModifier?.preview && cadModifierBaseShapeRef.current
         ? shapes.map((shape) => shape.id === cadModifierBaseShapeRef.current?.id ? edgeModifier.preview as WorkplaneShape : shape)
         : alignMode && alignPreview?.spread
-        ? distributedShapesForSelection(shapes, selectedShapes, effectiveAlignAnchorId, alignPreview.axis, alignAxes, alignPreview.spread.gap).nextShapes
+        ? distributedShapesForSelection(shapes, alignSelection, effectiveAlignAnchorId, alignPreview.axis, alignAxes, alignPreview.spread.gap).nextShapes
         : alignMode && alignPreview?.size
-        ? sizedShapesForSelection(shapes, selectedIds, selectedShapes, effectiveAlignAnchorId, alignPreview.axis, alignPreview.target, alignAxes, alignSizeLimit).nextShapes
+        ? sizedShapesForSelection(shapes, selectedIds, alignSelection, effectiveAlignAnchorId, alignPreview.axis, alignPreview.target, alignAxes, alignSizeLimit).nextShapes
         : alignMode && alignPreview
-        ? alignedShapesForSelection(shapes, selectedIds, selectedShapes, effectiveAlignAnchorId, alignPreview.axis, alignPreview.target, alignAxes).nextShapes
+        ? alignedShapesForSelection(shapes, selectedIds, alignSelection, effectiveAlignAnchorId, alignPreview.axis, alignPreview.target, alignAxes).nextShapes
         : mirrorMode && mirrorPreviewAxis
           ? mirroredShapesForSelection(shapes, selectedIds, selectedShapes, mirrorPreviewAxis).nextShapes
           : shapes,
-    [alignAxes, alignMode, alignPreview, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, holePatternPreview, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
+    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, holePatternPreview, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
   );
   // The preview of an intersection (#372): the operands see-through, and what they share as a body of its own on top.
   const [intersectPreviewIds, setIntersectPreviewIds] = useState<string[] | null>(null);
@@ -4399,7 +4406,7 @@ export function LayerlingEditor({
       setAlignAnchorId(null);
       setAlignPreview(null);
     }
-    if (alignAnchorId && !selectedIds.includes(alignAnchorId)) {
+    if (alignAnchorId && alignAnchorId !== ALIGN_PLATE_ID && !selectedIds.includes(alignAnchorId)) {
       setAlignAnchorId(null);
       setAlignPreview(null);
     }
@@ -6935,6 +6942,14 @@ export function LayerlingEditor({
 
   const chooseAlignAnchor = useCallback(
     (id: string) => {
+      // Empty space: the plate is the reference, and a second click there lets it go again.
+      if (id === ALIGN_PLATE_ID) {
+        const off = alignAnchorId === ALIGN_PLATE_ID;
+        setAlignAnchorId(off ? null : ALIGN_PLATE_ID);
+        setAlignPreview(null);
+        setNotice(off ? t("status.alignAnchorPlateOff") : t("status.alignAnchorPlate"));
+        return;
+      }
       if (!selectedIds.includes(id)) {
         return;
       }
@@ -6948,7 +6963,7 @@ export function LayerlingEditor({
       setAlignPreview(null);
       setNotice(shape ? t("status.alignAnchorNamed", { name: displayShapeName(shape) }) : t("status.alignAnchorSet"));
     },
-    [selectedIds, selectedShapes, shapes],
+    [alignAnchorId, selectedIds, selectedShapes, shapes],
   );
 
   const alignSelectionTo = useCallback(
@@ -6959,7 +6974,7 @@ export function LayerlingEditor({
       }
 
       if (spread) {
-        const result = distributedShapesForSelection(shapes, selectedShapes, effectiveAlignAnchorId, axis, alignAxes, spread.gap);
+        const result = distributedShapesForSelection(shapes, alignSelection, effectiveAlignAnchorId, axis, alignAxes, spread.gap);
         setAlignPreview(null);
         const message = spreadMessage(result, axis, workspaceSettingsRef.current);
         if (result.moved === 0) {
@@ -6971,7 +6986,7 @@ export function LayerlingEditor({
       }
 
       if (size) {
-        const sized = sizedShapesForSelection(shapes, selectedIds, selectedShapes, effectiveAlignAnchorId, axis, target, alignAxes, alignSizeLimit);
+        const sized = sizedShapesForSelection(shapes, selectedIds, alignSelection, effectiveAlignAnchorId, axis, target, alignAxes, alignSizeLimit);
         setAlignPreview(null);
         const message = sizedAlignmentMessage(sized, sizeAlignmentLabel(axis, target));
         if (sized.resized === 0) {
@@ -6982,7 +6997,7 @@ export function LayerlingEditor({
         return;
       }
 
-      const { nextShapes, moved } = alignedShapesForSelection(shapes, selectedIds, selectedShapes, effectiveAlignAnchorId, axis, target, alignAxes);
+      const { nextShapes, moved } = alignedShapesForSelection(shapes, selectedIds, alignSelection, effectiveAlignAnchorId, axis, target, alignAxes);
       setAlignPreview(null);
 
       if (moved === 0) {
@@ -6994,7 +7009,7 @@ export function LayerlingEditor({
         ? t("status.alignedOne", { alignment: alignmentLabel(axis, target) })
         : t("status.alignedMany", { count: moved, alignment: alignmentLabel(axis, target) }));
     },
-    [alignAxes, alignSizeLimit, commitShapes, effectiveAlignAnchorId, selectedIds, selectedShapes, shapes],
+    [alignAxes, alignSelection, alignSizeLimit, commitShapes, effectiveAlignAnchorId, selectedIds, selectedShapes, shapes],
   );
 
   const previewAlignSelection = useCallback((axis: AlignAxis, target: AlignTarget, size = false, spread?: AlignSpread) => {
@@ -12269,8 +12284,12 @@ export function LayerlingEditor({
         const selectedForAlign = currentShapes().filter((shape) => ids.includes(shape.id));
         if (selectedForAlign.length < 2) throw new Error("Select at least two objects to align");
         const validIds = selectedForAlign.map((shape) => shape.id);
-        const requestedAnchorId = typeof params.anchorId === "string" ? params.anchorId : null;
+        const requestedAnchorId = params.anchorId === "plate" ? ALIGN_PLATE_ID : typeof params.anchorId === "string" ? params.anchorId : null;
         const anchorId = effectiveAlignmentAnchorId(selectedForAlign, requestedAnchorId);
+        if (anchorId === ALIGN_PLATE_ID) {
+          const workspace = workspaceSettingsRef.current;
+          selectedForAlign.push(alignPlateShape(workspace.width, workspace.depth));
+        }
         if (params.mode === "spread") {
           const gap = params.gap === undefined || params.gap === null ? null : Number(params.gap);
           if (gap !== null && !(Number.isFinite(gap) && gap >= 0)) throw new Error("align_objects gap must be a length of 0 mm or more");

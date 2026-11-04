@@ -1333,6 +1333,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Igazítás megszakítva",
   "status.alignAnchorSet": "Igazítási horgony beállítva",
   "status.alignAnchorNamed": "Igazítási horgony: {name}",
+  "status.alignAnchorPlate": "Igazítási viszonyítás: a tálca - a pontok hozzá igazítanak, az egyenlő közök rajta osztanak el",
+  "status.alignAnchorPlateOff": "Igazítási viszonyítás: nincs, a tálca elengedve",
   "status.mirrorStart": "Tükrözés: válassz egy tengelynyilat",
   "status.mirrorCancelled": "Tükrözés megszakítva",
   "status.pivotPickStart": "Forgatási pont: kattints egy lapra – egy sík lap a közepét adja, pl. egy csővég tengelyét",

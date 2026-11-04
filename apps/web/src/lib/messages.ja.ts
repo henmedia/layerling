@@ -1469,6 +1469,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "整列をキャンセルしました",
   "status.alignAnchorSet": "整列の基準を設定しました",
   "status.alignAnchorNamed": "整列の基準: {name}",
+  "status.alignAnchorPlate": "整列の基準：ベッド - 点はベッドに揃え、等間隔はベッド全体に並べます",
+  "status.alignAnchorPlateOff": "整列の基準：なし、ベッドを解除しました",
   "status.mirrorStart": "ミラー: 軸の矢印を選んでください",
   "status.mirrorCancelled": "ミラーをキャンセルしました",
   "status.pivotPickStart": "回転の中心: 面をクリックしてください。平らな面ならその中心（例: パイプの端の軸）が設定されます",

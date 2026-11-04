@@ -1772,6 +1772,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.alignCancelled": "Ausrichten abgebrochen",
   "status.alignAnchorSet": "Ausrichtungsanker gesetzt",
   "status.alignAnchorNamed": "Ausrichtungsanker: {name}",
+  "status.alignAnchorPlate": "Bezug beim Ausrichten: die Platte - die Punkte richten an ihr aus, gleiche Abstände verteilen über sie",
+  "status.alignAnchorPlateOff": "Bezug beim Ausrichten: keiner mehr, die Platte ist losgelassen",
   "status.mirrorStart": "Spiegeln: einen Achsenpfeil wählen",
   "status.mirrorCancelled": "Spiegeln abgebrochen",
   "status.pivotPickStart": "Drehpunkt: eine Fläche anklicken - eine ebene Fläche setzt ihren Mittelpunkt, z. B. die Achse eines Rohrendes",

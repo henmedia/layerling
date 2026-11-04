@@ -1764,6 +1764,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "تم إلغاء المحاذاة",
   "status.alignAnchorSet": "تم تعيين مرجع المحاذاة",
   "status.alignAnchorNamed": "مرجع المحاذاة: {name}",
+  "status.alignAnchorPlate": "مرجع المحاذاة: اللوحة - تحاذي النقاط إليها وتوزّع المسافات المتساوية عليها",
+  "status.alignAnchorPlateOff": "مرجع المحاذاة: لا شيء، تُركت اللوحة",
   "status.mirrorStart": "انعكاس: اختر سهم محور",
   "status.mirrorCancelled": "تم إلغاء الانعكاس",
   "status.pivotPickStart": "محور الدوران: انقر على وجه - الوجه المسطح يحدد مركزه، مثل محور طرف أنبوب",

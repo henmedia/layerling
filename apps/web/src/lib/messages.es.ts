@@ -1768,6 +1768,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.alignCancelled": "Alineación cancelada",
   "status.alignAnchorSet": "Ancla de alineación fijada",
   "status.alignAnchorNamed": "Ancla de alineación: {name}",
+  "status.alignAnchorPlate": "Referencia de alineación: la placa - los puntos alinean con ella, el espaciado igual reparte sobre ella",
+  "status.alignAnchorPlateOff": "Referencia de alineación: ninguna, se suelta la placa",
   "status.mirrorStart": "Reflejar: elige una flecha de eje",
   "status.mirrorCancelled": "Reflejar: cancelado",
   "status.pivotPickStart": "Punto de giro: haz clic en una cara; una cara plana fija su centro, por ejemplo el eje del extremo de un tubo",

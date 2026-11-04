@@ -71,6 +71,8 @@ Ved siden af det midterste punkt på hver linje står et bredere punkt med en st
 
 Er der blandt de valgte figurer en plade, der er længere i den retning end alle de andre, fordeles figurerne på den: mellemrummet til dens kanter er lige så stort som mellemrummet mellem figurerne, og en enkelt figur kommer i midten. Figurer i flere rækker, som dyrene i et knoppuslespil, fordeles række for række; figurer, hvis kasser overlapper på tværs af retningen, udgør én række. Står figurerne ikke i rene kolonner, som dyrene forfra og bagud, flytter figurerne ved siden af hinanden i stedet som en hel række.
 
+Uden en plade klikker du først på et tomt sted på byggepladen: så er den den faste figur, lige store mellemrum fordeler figurerne over hele pladen med samme mellemrum til kanterne, og de andre punkter justerer dem efter dens kanter eller midte. Et nyt klik på den tomme plade slipper den igen.
+
 Hold [[Alt]] nede og klik på punktet for selv at indtaste mellemrummet, fx 5 mm: figurerne stilles så langt fra hinanden, fra den første figur eller fra den, du klikkede først; på en plade kommer rækken i midten. En låst figur bliver stående, så en mellem de yderste figurer forhindrer lige store mellemrum.
 
 ## Spejling
