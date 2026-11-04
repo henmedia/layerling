@@ -59,7 +59,7 @@ Der nächste Klick nach einem fertigen Winkel beginnt einen neuen, {{ui:camera.p
 
 In den Einstellungen unter {{ui:workspace.appearance}} gibt es zwei Schalter für laufende Maße:
 
-- {{ui:workspace.showMoveDimensions}} zeigt beim Verschieben, um wie viel du dich bewegst. Das gilt auch beim Heben mit dem schwarzen Pfeil über einem Körper; der Weg steht dann an seiner vorderen Ecke. Nach dem Loslassen klickst du auf so eine Zahl und tippst den genauen Weg ein; ein Minus geht nach unten.
+- {{ui:workspace.showMoveDimensions}} zeigt beim Verschieben, um wie viel du dich bewegst. Das gilt auch beim Heben mit dem schwarzen Pfeil über einem Körper; der Weg steht dann an seiner vorderen Ecke. Auch die Pfeiltasten zeigen ihren Weg: Die Tastendrücke zählen zusammen, bis du etwas anderes auswählst oder ziehst, und [[Strg]]+[[↑]] und [[Strg]]+[[↓]] zeigen den Weg nach oben oder unten. Nach dem Loslassen klickst du auf so eine Zahl und tippst den genauen Weg ein; ein Minus geht nach unten.
 - {{ui:workspace.showOriginDimensions}} zeigt die Abstände der Auswahl zum Nullpunkt der Platte, auch bei mehreren markierten Körpern.
 
 Mit {{ui:workspace.dimensionsAlwaysVisible}} bleiben die Maße dauerhaft sichtbar. Steht ein Körper nicht auf der Arbeitsebene, steht auch seine Höhe darüber dabei; ein Klick auf die Zahl nimmt einen neuen Wert.

@@ -147,7 +147,7 @@ Die Skizzenansicht hat eigene Farben: {{ui:workspace.sketchBackground}} für das
 
 ### Darstellung: Maße auf der Arbeitsebene
 
-{{ui:workspace.showMoveDimensions}} zeigt beim Verschieben, um wie viel du dich bewegst, {{ui:workspace.showOriginDimensions}} die Abstände der Auswahl zum Nullpunkt der Platte, auch bei mehreren markierten Körpern. Mit {{ui:workspace.dimensionsAlwaysVisible}} bleiben diese Maße dauerhaft sichtbar und nicht nur, solange du ziehst. Ist ein gedrehter Körper ausgewählt, stehen seine Winkel unter ihm auf der Arbeitsebene; {{ui:workspace.showRotationAngles}} schaltet das aus. Mehr unter [Messen und Notizen](chapter:messen-und-notizen).
+{{ui:workspace.showMoveDimensions}} zeigt beim Verschieben mit der Maus oder den Pfeiltasten, um wie viel du dich bewegst, {{ui:workspace.showOriginDimensions}} die Abstände der Auswahl zum Nullpunkt der Platte, auch bei mehreren markierten Körpern. Mit {{ui:workspace.dimensionsAlwaysVisible}} bleiben diese Maße dauerhaft sichtbar und nicht nur, solange du ziehst. Ist ein gedrehter Körper ausgewählt, stehen seine Winkel unter ihm auf der Arbeitsebene; {{ui:workspace.showRotationAngles}} schaltet das aus. Mehr unter [Messen und Notizen](chapter:messen-und-notizen).
 
 ### Darstellung: Auswählen und Verschieben
 

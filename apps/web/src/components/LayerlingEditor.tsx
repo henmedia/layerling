@@ -9171,6 +9171,11 @@ export function LayerlingEditor({
       if (refuseLockedSelection()) return;
       const selected = new Set(selectedIds);
       const normal = placementWorkplane.normal;
+      window.layerlingKeyboardMove?.(
+        shapesRef.current.filter((shape) => selected.has(shape.id) && !shape.locked).map((shape) => shape.id),
+        { x: normal.x * delta, y: normal.y * delta, z: normal.z * delta },
+        true,
+      );
       // As last committed: a held Ctrl+arrow moves once a frame (keyRepeatBatch).
       commitShapes(
         shapesRef.current.map((shape) =>
@@ -15375,7 +15380,9 @@ export function LayerlingEditor({
         y: placementWorkplane.xAxis.y * xStep + placementWorkplane.zAxis.y * zStep + normal.y * rise,
         z: placementWorkplane.xAxis.z * xStep + placementWorkplane.zAxis.z * zStep + normal.z * rise,
       };
-      window.layerlingFollowMove?.(selectedShapes.filter((shape) => !shape.locked).map((shape) => shape.id), translation);
+      const movedIds = selectedShapes.filter((shape) => !shape.locked).map((shape) => shape.id);
+      window.layerlingKeyboardMove?.(movedIds, translation, false);
+      window.layerlingFollowMove?.(movedIds, translation);
       // The shapes as last committed, not as last drawn: a held key moves once a
       // frame, and the next move may come before React has drawn the last one.
       commitShapes(

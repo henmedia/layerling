@@ -59,7 +59,7 @@ The next click after a finished angle starts a new one, and {{ui:camera.protract
 
 In the settings under {{ui:workspace.appearance}} there are two switches for live dimensions:
 
-- {{ui:workspace.showMoveDimensions}} shows by how much you move while dragging. That includes lifting with the black arrow above a body; the way up or down shows at its front corner. Once you let go, click such a number and type the exact distance; a minus goes down.
+- {{ui:workspace.showMoveDimensions}} shows by how much you move while dragging. That includes lifting with the black arrow above a body; the way up or down shows at its front corner. The arrow keys show their way as well: the presses add up until you select something else or drag, and [[Ctrl]]+[[↑]] and [[Ctrl]]+[[↓]] show the way up or down. Once you let go, click such a number and type the exact distance; a minus goes down.
 - {{ui:workspace.showOriginDimensions}} shows the distances of the selection to the origin of the plate, also with several selected bodies.
 
 With {{ui:workspace.dimensionsAlwaysVisible}} the dimensions stay visible permanently. A body that does not stand on the workplane also shows its height above it; click the number to type a new one.

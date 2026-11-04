@@ -2296,6 +2296,84 @@ export function WorkplaneViewport({
     [commitLiftDimension, onInteractionActiveChange, onUpdateShape],
   );
 
+  // The arrow keys show their way in the movement dimensions as a drag does, added up over the
+  // steps until something else is picked or dragged; the numbers can then be typed (Discussion #1289).
+  // Called before the move, while shapesRef still holds where the bodies start.
+  useEffect(() => {
+    window.layerlingKeyboardMove = (ids, translation, rise) => {
+      const state = threeRef.current;
+      if (!state || !ids.length || !moveDimensionsEnabledRef.current || workplaneModeRef.current || splitActiveRef.current) return;
+      const shapes = shapesRef.current;
+      const workplane = placementWorkplaneRef.current;
+      const current = moveDimensionSessionRef.current;
+      const continues = (itemIds: string[]) => Boolean(current?.keyboard)
+        && itemIds.length === ids.length
+        && itemIds.every((id, index) => id === ids[index]);
+      const starts = ids.flatMap((id) => {
+        const entry = shapes.find((shape) => shape.id === id);
+        return entry ? [entry] : [];
+      });
+      if (rise) {
+        const axis = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z).normalize();
+        const amount = axis.dot(new THREE.Vector3(translation.x, translation.y, translation.z));
+        if (current?.lift && continues(current.lift.items.map((item) => item.id))) {
+          current.lift.delta += amount;
+        } else {
+          const frame = selectionFrameForShapes(shapes, ids, workplane);
+          if (!frame) return;
+          const session = liftMoveDimensionSession(
+            state,
+            { selectionFrame: frame, items: starts.map((entry) => ({ id: entry.id, startShape: entry, startCenter: shapeCenter(entry) })) },
+            axis,
+          );
+          session.active = false;
+          session.keyboard = true;
+          if (session.lift) session.lift.delta = amount;
+          moveDimensionSessionRef.current = session;
+        }
+      } else {
+        // As with a drag, only on a workplane that lies flat with its axes along X and Y.
+        const flat = Math.abs(workplane.normal.y - 1) < 1e-6
+          && Math.abs(workplane.xAxis.x - 1) < 1e-6
+          && Math.abs(workplane.zAxis.z - 1) < 1e-6;
+        if (!flat) {
+          clearMoveDimensions();
+          return;
+        }
+        if (current && !current.lift && continues(current.items.map((item) => item.id))) {
+          current.deltaX += translation.x;
+          current.deltaZ += translation.z;
+        } else {
+          const frame = selectionFrameForShapes(shapes, ids, workplane);
+          if (!frame) return;
+          const anchor = moveDimensionAnchorForCamera(state, frame);
+          moveDimensionSessionRef.current = {
+            active: false,
+            keyboard: true,
+            originX: anchor.x,
+            originZ: anchor.z,
+            planeY: anchor.y,
+            deltaX: translation.x,
+            deltaZ: translation.z,
+            items: starts.map((entry) => ({ id: entry.id, startX: entry.x, startZ: entry.z })),
+          };
+        }
+      }
+      syncMoveDimensionOverlay(
+        state,
+        moveDimensionSessionRef.current,
+        moveDimensionOverlayRef,
+        setMoveDimensionOverlay,
+        workspaceRef.current.accuracy,
+        resolvedThemeRef.current,
+      );
+      state.needsRender = true;
+    };
+    return () => {
+      delete window.layerlingKeyboardMove;
+    };
+  }, [clearMoveDimensions]);
+
   const rememberResizeAnchor = useCallback((shapeId: string, kind: TransformHandleKind, handleKey: string) => {
     if (kind === "scale") {
       const signs = resizeSignsForHandle(handleKey);

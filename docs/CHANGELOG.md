@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Movement dimensions with the arrow keys (Discussion #1289):** With "Show movement dimensions" on, only a drag drew the movement lines; a nudge with the arrow keys went through `nudgeSelected` and `raiseSelected` in `LayerlingEditor` and showed nothing. Both now call `window.layerlingKeyboardMove` before they commit, and `WorkplaneViewport` builds a move-dimension session marked `keyboard`: the first press anchors it at the selection's corner as a drag does, the next presses on the same bodies add to it, and a click, a drag or another selection ends it. Ctrl+arrow builds the lift session of the black arrow. The session is settled at once, so the numbers can be typed as after a drag. As with dragging, X and Y only show on a workplane that lies flat with its axes along X and Y.
+
 ## 1.140.0
 
 - **Open STL and 3MF from the file manager (Discussion #1287):** The installed app registered only for `.lyl` files, so an STL or 3MF still opened in another program. The manifest's file handler now also accepts `.stl` (model/stl) and `.3mf` (model/3mf); such a file, opened with layerling, goes through the start page's import and becomes a new design, while a `.lyl` opens as before.

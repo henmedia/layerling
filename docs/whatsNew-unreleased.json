@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Maße beim Verschieben auch mit den Pfeiltasten",
+      "en": "Movement dimensions with the arrow keys too"
+    },
+    "body": {
+      "de": "Ist „Maße beim Verschieben zeigen“ an, zeigen jetzt auch die Pfeiltasten, um wie viel du die Auswahl verschiebst, wie beim Ziehen mit der Maus. Die Tastendrücke zählen zusammen, bis du etwas anderes auswählst oder ziehst; Strg+↑ und Strg+↓ zeigen den Weg nach oben oder unten. Danach kannst du die Zahl anklicken und den genauen Weg eintippen.",
+      "en": "With \"Show movement dimensions\" on, the arrow keys now show by how much you move the selection too, as a drag with the mouse does. The presses add up until you select something else or drag; Ctrl+↑ and Ctrl+↓ show the way up or down. Then click the number to type the exact distance."
+    }
+  }
+]

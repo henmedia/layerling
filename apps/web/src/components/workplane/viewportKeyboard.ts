@@ -15,6 +15,11 @@ declare global {
     layerlingScreenDirections?: () => { right: Direction; away: Direction };
     /** Moves the view along when bodies moved by keyboard would leave it. */
     layerlingFollowMove?: (ids: string[], translation: Direction) => void;
+    /**
+     * Tells the view that the arrow keys are about to move these bodies, so the movement
+     * dimensions show the way, added up over the key steps (Discussion #1289).
+     */
+    layerlingKeyboardMove?: (ids: string[], translation: Direction, rise: boolean) => void;
   }
 }
 

@@ -128,6 +128,8 @@ export type MoveDimensionSession = {
   deltaX: number;
   deltaZ: number;
   items: Array<Pick<DragItem, "id" | "startX" | "startZ">>;
+  /** Built by the arrow keys (Discussion #1289): the next key step adds to it instead of starting afresh. */
+  keyboard?: boolean;
   /** Set while lifting with the arrow (#979): the way up or down, and where each body's centre started. */
   lift?: MoveDimensionLift & {
     items: Array<{ id: string; centerX: number; centerY: number; centerZ: number; height: number }>;

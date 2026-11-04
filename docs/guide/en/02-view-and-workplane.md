@@ -147,7 +147,7 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 ### Appearance: measures on the workplane
 
-{{ui:workspace.showMoveDimensions}} shows by how much you move while dragging, {{ui:workspace.showOriginDimensions}} the distances of the selection to the origin of the plate, also with several bodies selected. With {{ui:workspace.dimensionsAlwaysVisible}} these measures stay visible permanently, and not only while you drag. While a turned body is selected, its angles show below it on the workplane; {{ui:workspace.showRotationAngles}} switches that off. More in [Measuring and notes](chapter:measuring-and-notes).
+{{ui:workspace.showMoveDimensions}} shows by how much you move while dragging or with the arrow keys, {{ui:workspace.showOriginDimensions}} the distances of the selection to the origin of the plate, also with several bodies selected. With {{ui:workspace.dimensionsAlwaysVisible}} these measures stay visible permanently, and not only while you drag. While a turned body is selected, its angles show below it on the workplane; {{ui:workspace.showRotationAngles}} switches that off. More in [Measuring and notes](chapter:measuring-and-notes).
 
 ### Appearance: selecting and moving
 
