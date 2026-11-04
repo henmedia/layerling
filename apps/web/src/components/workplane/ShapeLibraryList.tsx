@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { ChevronDown, ChevronRight, Search, X } from "lucide-react";
 import { t } from "@/lib/i18n";
 import {
@@ -48,6 +48,14 @@ export function ShapeLibraryList<T extends LibraryShape>({
     return () => window.removeEventListener(RECENT_SHAPES_EVENT, update);
   }, []);
 
+  // Ready to type into the search when the library opens, as the command search and the shortcuts are (Discussion #1276) -
+  // except on a touch screen, where focusing it would pop up the keyboard. A pinned library stays mounted, so this is once per opening.
+  const searchRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const touch = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
+    if (!touch) searchRef.current?.focus({ preventScroll: true });
+  }, []);
+
   const sections = useMemo(() => shapeLibrarySections(shapes), [shapes]);
   const sectionLabel = (id: ShapeLibrarySectionId) => t(SHAPE_LIBRARY_SECTION_LABELS[id]);
   const searching = query.trim().length > 0;
@@ -80,6 +88,7 @@ export function ShapeLibraryList<T extends LibraryShape>({
       <div className="shape-library-search" role="search">
         <Search aria-hidden="true" />
         <input
+          ref={searchRef}
           type="search"
           value={query}
           placeholder={t("library.search")}

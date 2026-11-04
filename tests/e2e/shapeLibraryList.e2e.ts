@@ -130,6 +130,23 @@ describe("the shape library in sections (#1170)", () => {
     expect(section(panel, "Recently used")).toBeNull();
     expect(tiles(panel).filter((id) => id === "box")).toHaveLength(1);
   });
+
+  it("puts the cursor in the search when it opens, but not on a touch screen (Discussion #1276)", () => {
+    const original = window.matchMedia;
+    try {
+      window.matchMedia = ((query: string) => ({ matches: false, media: query })) as typeof window.matchMedia;
+      let panel = library();
+      expect(document.activeElement).toBe(panel.querySelector(".shape-library-search input"));
+      act(() => root?.unmount());
+      container?.remove();
+
+      window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)", media: query })) as typeof window.matchMedia;
+      panel = library();
+      expect(document.activeElement).not.toBe(panel.querySelector(".shape-library-search input"));
+    } finally {
+      window.matchMedia = original;
+    }
+  });
 });
 
 describe("the custom shapes above the library (#1170)", () => {

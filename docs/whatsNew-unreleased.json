@@ -28,5 +28,15 @@
       "de": "Mit zwei oder mehr ausgewählten Teilen steht Ausrichten jetzt auch im Menü, das ein Rechtsklick an der Maus öffnet, gleich über Spiegeln. So musst du nicht erst zur Leiste fahren oder dir die Taste L merken.",
       "en": "With two or more parts selected, Align is now also in the menu a right-click opens at the pointer, just above Mirror. No trip to the toolbar, and no need to remember the L key."
     }
+  },
+  {
+    "title": {
+      "de": "Formenbibliothek: gleich lostippen",
+      "en": "Shape library: type right away"
+    },
+    "body": {
+      "de": "Wenn du die Formenbibliothek öffnest, steht der Cursor jetzt gleich im Suchfeld, wie bei der Befehlssuche. Auf einem Touchgerät nicht, damit keine Tastatur aufspringt.",
+      "en": "When you open the shape library, the cursor is now in its search field right away, as in the command search. Not on a touch screen, so no keyboard pops up."
+    }
   }
 ]
