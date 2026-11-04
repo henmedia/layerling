@@ -52,6 +52,13 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /The (thread|gear|spring|Hirth joint)'s .* (came out as|sewed into|did not close|did not sweep)/i, key: "error.solidNotValid" },
   { pattern: /The (thread|gear|spring|Hirth joint)'s measures are out of range/i, key: "error.measuresOutOfRange" },
   { pattern: /(gear|Hirth joint)( with its bore)? came out as/i, key: "error.solidNotValid" },
+  // Measures a profile cannot be built from (cadProfileSolid.ts): an outline, a loft or a sweep path that does not hold together.
+  { pattern: /The profile (has no height|has no outline|outline (is incomplete|has an invalid|has a zero-length|is not closed))|A profile arc does not meet|The loft's (point is not a number|top does not match)|A section of the loft does not match|A loft to a point (needs|cannot)|The sweep has no centre line|A sweep (piece|bend)|A straight sweep piece has no length/i, key: "error.primitiveDimensions" },
+  { pattern: /(loft|sweep|swept|tapered)[\w' ]{0,40} did not (become|close|make)|moved outlines are not a valid face|elliptical arc differently than expected|The profile did not become one solid|^sweep:invalid|letter could not be widened|widened text (has no letters|is not a valid solid|does not keep)/i, key: "error.solidNotValid" },
+  { pattern: /Gridfinity \w+ came out as|Gridfinity bin's [\w ]+ could not be (cut|joined)/i, key: "error.solidNotValid" },
+  { pattern: /thread's \w+ has no tiers|tapered thread narrows to its axis/i, key: "error.measuresOutOfRange" },
+  { pattern: /The lid cannot be built as an exact body/i, key: "lid.error.kernelUnknown" },
+  { pattern: /Drawing source contains/i, key: "error.drawingNoGeometry" },
   // Profiles turned, swept, lofted, trimmed or with rounded or chamfered ends (cadProfileSolid.ts), and lofts.
   { pattern: /profile solid (is not valid|is inside out|are not valid|does not keep)|A loft through its sections did not become one solid/i, key: "error.solidNotValid" },
   { pattern: /thread's chamfer reaches its axis/i, key: "error.threadChamferAxis" },
@@ -75,7 +82,8 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /stored STEP body holds no solid/i, key: "error.storedStepNoSolid" },
   { pattern: /Text fonts are not loaded yet/i, key: "error.fontsNotLoaded" },
   // sketch
-  { pattern: /Draw at least one closed profile on the left side/i, key: "error.revolveNoProfile" },
+  { pattern: /Draw at least one closed profile on the left side|profile crosses the revolve axis|profile lies right of the revolve axis|No closed profile found/i, key: "error.revolveNoProfile" },
+  { pattern: /OpenCascade produced invalid sketch topology/i, key: "error.revolveNotValid" },
   { pattern: /revolve profile has no filled area/i, key: "error.revolveNoArea" },
   { pattern: /profile could not be revolved into a valid solid/i, key: "error.revolveNotValid" },
   { pattern: /All profile paths are open/i, key: "error.sketchOpenPaths" },

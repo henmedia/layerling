@@ -35,6 +35,21 @@ describe("error messages for people", () => {
       ["This imported STEP body could not be restored for edge treatment, and its mesh is too dense to use instead. x", "error.solidNotValid"],
       ["DXF export contains no readable contours", "error.svgProjectionEmpty"],
       ["SVG top view contains no visible edges", "error.svgProjectionEmpty"],
+      ["The profile outline has a zero-length line", "error.primitiveDimensions"],
+      ["A loft to a point cannot be turned, tilted, smoothed or chamfered", "error.primitiveDimensions"],
+      ["A sweep bend axis is not a unit vector", "error.primitiveDimensions"],
+      ["The tapered sides did not close into one shell (2)", "error.solidNotValid"],
+      ["The loft through its sections with its opening did not become one solid", "error.solidNotValid"],
+      ["The twisted loft with its openings did not become one solid", "error.solidNotValid"],
+      ["sweep:invalid", "error.solidNotValid"],
+      ["The widened text does not keep the outline's volume", "error.solidNotValid"],
+      ["The Gridfinity bin's finger scoop could not be cut", "error.solidNotValid"],
+      ["The Gridfinity bin came out as 2 solids", "error.solidNotValid"],
+      ["The tapered thread narrows to its axis", "error.measuresOutOfRange"],
+      ["The profile crosses the revolve axis", "error.revolveNoProfile"],
+      ["OpenCascade produced invalid sketch topology", "error.revolveNotValid"],
+      ["Drawing source contains no usable triangles", "error.drawingNoGeometry"],
+      ["The lid cannot be built as an exact body", "lid.error.kernelUnknown"],
     ];
     for (const [raw, key] of cases) expect(localizedError(raw), raw).toBe(MESSAGES_DE[key]);
   });
