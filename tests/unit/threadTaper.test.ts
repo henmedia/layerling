@@ -13,7 +13,11 @@ import {
   threadUsesInchPitch,
 } from "@/lib/threadGeometry";
 import { mcpThreadSizeName, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
-import { workplaneShapesEqual } from "@/lib/workplaneShapes";
+import { canonicalizeShape, workplaneShapesEqual } from "@/lib/workplaneShapes";
+import { editorHistoryEntry } from "@/lib/editorHistory";
+import { exportLylProject, importLylProject } from "@/lib/lylProject";
+import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { ThreadRole, WorkplaneShape } from "@/types/layerling";
 
 /*
@@ -176,5 +180,33 @@ describe("a tapered thread through the bridge", () => {
   it("tells a tapered thread from a straight one", () => {
     const base = { id: "t", name: "Thread", kind: "thread", color: "#888", x: 0, z: 0, elevation: 0, rotation: 0, width: 10, depth: 10, size: 10, height: 10 } as WorkplaneShape;
     expect(workplaneShapesEqual(base, { ...base, threadTaper: true })).toBe(false);
+  });
+});
+
+describe("a tapered thread in a saved package", () => {
+  it("keeps the taper through placing, tidying, saving and loading", async () => {
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "thread")!;
+    const fields = nptFields("rod", 20);
+    const shape = canonicalizeShape(makeShapeFromAsset(asset, { x: 0, z: 0 }, fields));
+    expect(shape.threadTaper).toBe(true);
+    const shapes = [shape];
+    const bytes = await exportLylProject({
+      projectId: "project-npt",
+      projectName: "NPT",
+      createdAt: 1_700_000_000_000,
+      modifiedAt: 1_700_000_100_000,
+      shapes,
+      history: [editorHistoryEntry(shapes, [])],
+      historyIndex: 0,
+      assets: [],
+      workspace: DEFAULT_WORKPLANE_WORKSPACE,
+      snapGrid: DEFAULT_SNAP_GRID,
+      placementElevation: 0,
+    });
+    const loaded = (await importLylProject(bytes)).shapes[0];
+    expect(loaded.threadTaper).toBe(true);
+    expect(mcpThreadSizeName(loaded)).toBe('1/2" NPT');
+    // A straight thread stays without the field, as before.
+    expect(canonicalizeShape(makeShapeFromAsset(asset, { x: 0, z: 0 }, { threadDiameter: 6, threadPitch: 1 })).threadTaper).toBeUndefined();
   });
 });
