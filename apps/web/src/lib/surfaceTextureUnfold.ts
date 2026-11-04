@@ -56,11 +56,13 @@ function closestOnTriangle(p: Vec3, v: ArrayLike<number>, ia: number, ib: number
 /**
  * The surface point nearest to `point`: its triangle, the point and how far it is. Each triangle is first
  * judged roughly by a sphere round it (its centroid, its farthest corner), exactly only when it can be nearer.
+ * With `only`, just the triangles it marks count.
  */
-export function nearestSurfacePoint(mesh: Mesh, point: Vec3): { face: number; point: Vec3; distance: number } | null {
+export function nearestSurfacePoint(mesh: Mesh, point: Vec3, only?: ArrayLike<number>): { face: number; point: Vec3; distance: number } | null {
   const v = mesh.vertices, I = mesh.indices;
   let best = -1, bestD = Infinity;
   for (let t = 0; t < I.length / 3; t++) {
+    if (only && !only[t]) continue;
     const a = I[t * 3] * 3, b = I[t * 3 + 1] * 3, c = I[t * 3 + 2] * 3;
     const cx = (v[a] + v[b] + v[c]) / 3, cy = (v[a + 1] + v[b + 1] + v[c + 1]) / 3, cz = (v[a + 2] + v[b + 2] + v[c + 2]) / 3;
     const r = Math.sqrt(Math.max((v[a] - cx) ** 2 + (v[a + 1] - cy) ** 2 + (v[a + 2] - cz) ** 2, (v[b] - cx) ** 2 + (v[b + 1] - cy) ** 2 + (v[b + 2] - cz) ** 2, (v[c] - cx) ** 2 + (v[c + 1] - cy) ** 2 + (v[c + 2] - cz) ** 2));

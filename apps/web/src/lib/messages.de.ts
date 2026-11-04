@@ -3170,7 +3170,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "inspector.surfaceImageHint": "Helles wird voll tief, Dunkles bleibt, wie es ist. Ein eigenes Bild wird in Graustufen mit dem Entwurf gespeichert, höchstens 256 Punkte je Seite; eine Kachel ist so breit wie eingestellt und so hoch, wie das Bild dazu passt.",
   "inspector.surfaceTileHeight": "Kachelhöhe (0 = wie das Bild)",
   "inspector.surfaceImageHeight": "Bildhöhe",
-  "inspector.surfaceImageOnceHint": "Das Bild wird einmal aufgedrückt wie ein Etikett: „Rundherum“ und „Höhe“ setzen seine Mitte, wie beim Text. Außerhalb bleibt die Fläche glatt; „Tiefe“ und „Richtung“ legen fest, wie weit es heraussteht oder eingeprägt ist. Bildhöhe 0 behält die Proportionen des Bildes.",
+  "inspector.surfaceImageOnceHint": "Das Bild wird einmal aufgedrückt wie ein Etikett: „Rundherum“ und „Höhe“ setzen seine Mitte, wie beim Text. Außerhalb bleibt die Fläche glatt; „Tiefe“ und „Richtung“ legen fest, wie weit es heraussteht oder eingeprägt ist. Bildhöhe 0 behält die Proportionen des Bildes. Sind Flächen gewählt, landet es immer auf ihnen.",
   "inspector.surfaceImageTurn": "Gedreht (°)",
   "inspector.surfaceImageInvert": "Hell und dunkel tauschen",
   "inspector.surfaceImageBlur": "Weichzeichnen",

@@ -3171,7 +3171,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "inspector.surfaceImageHint": "Licht krijgt de volle diepte, donker blijft zoals het is. Een eigen afbeelding wordt in grijstinten met het ontwerp bewaard, hoogstens 256 punten per zijde; een tegel is zo breed als ingesteld en zo hoog als de afbeelding daarbij past.",
   "inspector.surfaceTileHeight": "Tegelhoogte (0 = zoals de afbeelding)",
   "inspector.surfaceImageHeight": "Afbeeldingshoogte",
-  "inspector.surfaceImageOnceHint": "De afbeelding wordt één keer opgedrukt, als een etiket: „Rondom” en „Hoogte” plaatsen haar midden, zoals bij een tekst. Daarbuiten blijft het oppervlak glad; „Diepte” en „Richting” bepalen hoe ver ze uitsteekt of erin gedrukt is. Een afbeeldingshoogte van 0 houdt de verhoudingen van de afbeelding.",
+  "inspector.surfaceImageOnceHint": "De afbeelding wordt één keer opgedrukt, als een etiket: „Rondom” en „Hoogte” plaatsen haar midden, zoals bij een tekst. Daarbuiten blijft het oppervlak glad; „Diepte” en „Richting” bepalen hoe ver ze uitsteekt of erin gedrukt is. Een afbeeldingshoogte van 0 houdt de verhoudingen van de afbeelding. Zijn er vlakken gekozen, dan komt de afbeelding altijd daarop.",
   "inspector.surfaceImageTurn": "Gedraaid (°)",
   "inspector.surfaceImageInvert": "Licht en donker omwisselen",
   "inspector.surfaceImageBlur": "Verzachten",
