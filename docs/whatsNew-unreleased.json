@@ -58,5 +58,15 @@
       "de": "Beim Ziehen rastet eine Form jetzt auch an der Mitte der Arbeitsebene ein, auf X, auf Y oder auf beiden; die rosa Hilfslinien zeigen es. Alt zieht ohne Einrasten.",
       "en": "When you drag a shape it now also snaps to the centre of the workplane, along X, along Y or both, and the pink guide lines show it. Alt drags without snapping."
     }
+  },
+  {
+    "title": {
+      "de": "Deckelscharnier: Seite wählen, Tropfenlöcher, runde Dosen",
+      "en": "Lid hinge: pick the side, teardrop holes, round pots"
+    },
+    "body": {
+      "de": "Das Scharnier eines Deckels lässt sich jetzt hinten, rechts, vorn oder links setzen, etwa an die lange Seite einer Schachtel. Die Löcher für den Stift bekommen oben eine Spitze, damit sie beim Drucken nicht durchhängen, und auch runde Dosen bekommen ein Scharnier.",
+      "en": "A lid's hinge can now go at the back, right, front or left, along the long side of a box, say. The pin holes get a point on top so they do not droop when printed, and round pots take a hinge too."
+    }
   }
 ]
