@@ -11,6 +11,16 @@
   },
   {
     "title": {
+      "de": "Schraubdom, Schnapphaken und Rippe",
+      "en": "Screw boss, snap-fit and rib"
+    },
+    "body": {
+      "de": "Für Gehäuse gibt es in der Formenbibliothek einen eigenen Abschnitt mit drei neuen Formen. Der Schraubdom nimmt eine Einschmelzmutter oder eine Kunststoffschraube auf und warnt, wenn die Wand um das Loch zu dünn wird. Der Schnapphaken hält einen Deckel und sagt dir, ob der Arm in PLA, PETG oder ABS hält. Die Rippe steift eine Wand aus, auch als schräge Stütze zum Boden.",
+      "en": "Enclosures get a section of their own in the shape library, with three new shapes. The screw boss takes a heat-set insert or a screw for plastics and warns when the wall round the hole gets too thin. The snap-fit holds a lid and tells you whether its arm will take it in PLA, PETG or ABS. The rib stiffens a wall, also as a sloped gusset to the floor."
+    }
+  },
+  {
+    "title": {
       "de": "Freihand zeichnen in der Skizze",
       "en": "Freehand drawing in sketches"
     },
