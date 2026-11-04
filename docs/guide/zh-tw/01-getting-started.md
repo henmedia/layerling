@@ -19,7 +19,7 @@ layerling 是一款直接在瀏覽器中執行的 3D 列印設計程式。你用
 
 ![標示了各區域的編輯器：上方是功能區，左側是視圖立方體，其下是檢視列，旁邊是狀態訊息與物件清單，右側是所選形狀的屬性。](shot:editor-areas)
 
-- **上方**是功能區。它依任務分類：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}}、{{ui:editor.group.file}} 和 {{ui:editor.group.help}}。將滑鼠移到圖示上就能看到名稱。凡是看到小問號的地方，例如形狀的設定裡、形狀庫中或工具視窗裡，它都會直接帶你到本指南對應的章節。 {{ui:editor.group.modify}} 群組分為四個部分，各自的名稱寫在工具上方：{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 與 {{ui:editor.section.surface}}。灰色的圖示還會說明它在等什麼，例如 {{ui:editor.needs.oneBody}} 或 {{ui:editor.needs.locked}}。找不到某個工具？按 [[Ctrl]]+[[K]] 並輸入它的名稱；空白設計會在檢視底部提醒你。
+- **上方**是**功能區**。它依任務分類：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}} 與 {{ui:editor.group.file}}；{{ui:editor.group.help}} 位於其上方的標題列，分頁旁的小房子圖示可回到起始頁。視窗太窄、放不下所有群組時，最少用的群組會收進一個寫著群組名稱的按鈕，下方掛著一個群組顏色的小箭頭：指向或點按它，它的工具就在下方展開。收起的 {{ui:editor.group.history}} 是例外：它的按鈕就是 {{ui:editor.tool.undo}} 本身，只有下方的箭頭才會開啟 {{ui:editor.tool.redo}} 與其餘工具。右上角放大鏡左邊的圖釘則讓所有群組保持展開。將滑鼠移到圖示上就能看到名稱，灰色的也一樣；{{ui:interactiveHelp.title}}（{{ui:editor.group.help}} 下的問號，或 Shift+F1）點一下就能解釋任何圖示，並帶你到本指南中對應的小節。凡是看到小問號的地方，例如形狀的設定裡、形狀庫中或工具視窗裡，它都會直接帶你到本指南對應的章節。{{ui:editor.group.modify}} 群組分為四個部分，各自的名稱寫在工具上方：{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 與 {{ui:editor.section.surface}}。灰色的圖示還會說明它在等什麼，例如 {{ui:editor.needs.oneBody}} 或 {{ui:editor.needs.locked}}。找不到某個工具？按 [[Ctrl]]+[[K]] 並輸入它的名稱；空白設計會在檢視底部提醒你。
 - **中間**是工作平面。你在這裡放置形狀、把它們拉成想要的樣子，並看到結果。
 - **右側**會顯示所選形狀的**屬性**：顏色、尺寸、位置，以及構成該形狀的其他內容。輸入數字比拖曳更精確。
 - **左側**是檢視列，上方是視圖立方體。它們帶你在場景中移動，詳見[視圖與工作平面](chapter:view-and-workplane)。
@@ -34,7 +34,7 @@ layerling 是一款直接在瀏覽器中執行的 3D 列印設計程式。你用
 
 ### 貼上
 
-{{ui:editor.tool.paste}}（[[Ctrl]]+[[V]]）會把用 {{ui:editor.tool.copy}} 複製的內容加入設計。{{ui:common.duplicate}} 則一步完成複製與貼上。
+{{ui:editor.tool.paste}}（[[Ctrl]]+[[V]]）會把用 {{ui:editor.tool.copy}} 複製的內容加入設計。{{ui:common.duplicate}} 則一步完成複製與貼上。 貼上時，每個零件會放在原位置稍旁邊一點。來自其他程式的零件可能落在離平台很遠的地方，為此設定中 {{ui:workspace.appearance}} 下有 {{ui:workspace.pasteCentered}}：貼上時，這些零件會一起放到工作平面中央並落在上面。
 
 ### 刪除
 

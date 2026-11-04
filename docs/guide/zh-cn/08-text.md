@@ -15,6 +15,7 @@ summary: 用八种字体或你自己的字体创建凸起或凹刻的文字，�
 - **尺寸：** 与任何形状一样设置这一行的长度和宽度。拖动手柄或输入尺寸。
 - **{{ui:prop.textSpacing}}：** 在字体原有间距之上增加的字母间距，以字母大小的百分比表示：0 表示保持字体原本的间距，大于 0 时字母分得更开，小于 0 时（最低 -50）更紧凑，你自己的字体常常需要这样。字母大小不变，外框随这一行变化，直线文字和弧形文字都是如此。阿拉伯文和希伯来文的字母相互连写，不应用此间距。
 - **{{ui:prop.textStretch}}：** 初始为关闭：字母保持原有比例并位于外框中间，因此把外框拉得比文字所需更宽或更深时，外框会比字母大。开启后，字母会在两个方向上拉伸以填满整个外框：大写字母可以变矮或变窄，与 Tinkercad 中一样。它适用于直线文字；弧形文字有自己的字母大小。
+- **{{ui:prop.textVertical}}：** 把字母从上到下堆叠，每个字母位于一条竖线的中间，用于门框上的标牌或沿笔杆写的名字。外框变为竖直，字母保持大小；{{ui:prop.textSpacing}} 设定它们之间的间距。在弧形文字上，字母沿圆的左侧排成一列，每个都直立；{{ui:prop.textInwardColumn}} 把这一列放到右侧。
 
 文字最初是一个实体。如果想单独处理每个字母，点击 {{ui:inspector.separateParts}}。之后每个字母都是独立的形状。
 
@@ -99,6 +100,7 @@ layerling 无法读取 WOFF2 文件（几乎总能找到 TTF 或 OTF 版本）�
 
 - **{{ui:prop.text}}** 和 **{{ui:prop.font}}**，也包括自己的字体。名牌会随文字增长。
 - **{{ui:nameTag.letterSize}}：** 大写字母的高度，单位为 mm。所有层都会跟随并保持对齐。
+- **{{ui:prop.textVertical}}：** 把名牌竖起来，字母上下排列，所有层一起跟随。
 - **{{ui:nameTag.layers}}：** 每层一行，从上到下排列。每行包含颜色（点击色块）、该层比字母宽出多少、高度以及 {{ui:nameTag.noHoles}}（用于填平 O、A 等字母中的孔）。{{ui:nameTag.corners}} 设置较宽的层如何绕过字母的拐角：{{ui:nameTag.corner.round}}、{{ui:nameTag.corner.bevel}} 或 {{ui:nameTag.corner.miter}}。最上面一行就是字母本身。**+** 在底部添加一层，**–** 移除最底层。名牌可有两到六层。
 - **{{ui:nameTag.keyring}}：** 在底层加上一个末端为圆形的直舌片，并开一个钥匙圈孔；舌片会随孔一起变大。默认的 3 mm 孔会生成一个宽 6.5 mm、伸出 6.75 mm 的舌片，孔边缘距底层边缘 2 mm。选择 {{ui:nameTag.keyringDiameter}} 和 {{ui:nameTag.keyringSide}}：{{ui:nameTag.side.left}}、{{ui:nameTag.side.right}} 或 {{ui:nameTag.side.top}}。{{ui:nameTag.side.free}} 会把孔从名牌上取下，在旁边放一个独立的 {{ui:nameTag.keyringTab}}，颜色和高度与底层相同：这是一个普通形状，你可以用手柄移动和旋转它到名牌需要的任何位置。放好之后，其属性中的 {{ui:nameTag.keyringTabFix}} 会把它并入最近的名牌，并保持在当前位置：孔会穿过它到达的每一层，耳片并入底层，而且文字或尺寸变化时，两者都会保持在该字母的拐角处。{{ui:nameTag.side.free}} 会把舌片重新放回原来的位置，以便再次移动。孔会穿过它接触的每一层，改变文字、字母大小或字体时舌片也会跟着移动。{{ui:nameTag.keyringAlong}} 让舌片沿所在边上下移动（在顶边上则是左右移动），直到将要离开该边的位置；0 表示中间。当边的中点正好遇到空隙时（例如 J 旁边），可以用它把舌片移到字母伸出的部位。
 - **{{ui:nameTag.letterEdge}}：** 对顶层的字母顶边做圆角或倒角，就像打印出的名牌那样收边：{{ui:nameTag.edge.none}}、{{ui:nameTag.edge.round}} 或 {{ui:nameTag.edge.chamfer}}，并设置 {{ui:nameTag.letterEdgeSize}}（初始为 0.4 mm，最大不超过层高）。它适用于所有字体和文字。该边是字母网格的一部分，因此边工具会把这样的文字当作网格处理，对如此精细的文字来说负担很重；请改为在这里选择边处理。

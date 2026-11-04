@@ -110,6 +110,8 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 
 {{ui:sketch.sweep}} 把轮廓沿路径拉伸：拐弯的线缆槽、导管、皮带周围的护罩、绕六边形的环。它在 {{ui:sketch.group.create}} 组里，位于 {{ui:sketch.extrude}} 和 {{ui:sketch.revolve}} 旁边。
 
+- **截面**：和平常一样是一个封闭轮廓。按从路径起点沿路径望去所看到的样子画它：横跨路径的是草图的左右，向上就是成品实体的上方。空心截面（槽或管）是一个轮廓里套着另一个轮廓。默认情况下截面以路径为中心。顶部模式标记旁的菜单可以改为把它的左边缘或右边缘放在路径上（{{ui:sketch.sweepAnchorLeft}}、{{ui:sketch.sweepAnchorRight}}，沿路径望去），这样导轨可以位于线的一侧，或沿零件的边缘走。实体以截面的最低点立在草图平面上。
+
 在同一张图板上画两样东西：
 
 - **横截面**照常作为闭合轮廓。按从路径起点沿路径看过去的样子来画：横向是草图的左右，向上就是完成实体的上方。空心截面，比如槽或管，是轮廓里再套一个轮廓。截面以路径为中心，实体以截面的最低点立在草图平面上。
@@ -132,7 +134,7 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 
 ## 填充与剪影
 
-不用打开草图也能设置描边：在草图实体的属性里，在 {{ui:prop.sketchFill}} 下选择 {{ui:prop.sketchFill.area}}、{{ui:prop.sketchFill.outside}}、{{ui:prop.sketchFill.inside}} 或 {{ui:prop.sketchFill.center}}，并设置 {{ui:prop.sketchLineWidth}} 和 {{ui:sketch.strokeJoin}}。实体会立刻在原位重建。这些对应 Tinkercad 导入 SVG 的填充模式：默认、外线和内线。{{ui:prop.sketchFill.grow}} 保持区域填充，并向四周扩展一个线宽，角可以是尖角、圆角或斜角：多色打印时标志下方的一层底色，仅用外侧描边只会得到一个环。{{ui:prop.sketchFill.shrink}} 相反：区域保持填充，边缘向四周内缩一个线宽，孔也算在内（孔会变大）。在同一草图的副本上两者都用，可以做配合：孔保持画的尺寸，穿过它的零件用 {{ui:prop.sketchFill.shrink}} 缩 0.5 mm，或者在同一轮廓切出的形状里做一层壁。宽度超过轮廓允许的范围就什么都不剩。在草图的描边窗口里，这两个选项位于 {{ui:sketch.strokeAlign}} 下。
+不用打开草图也能设置描边：在草图实体的属性里，在 {{ui:prop.sketchFill}} 下选择 {{ui:prop.sketchFill.area}}、{{ui:prop.sketchFill.outside}}、{{ui:prop.sketchFill.inside}} 或 {{ui:prop.sketchFill.center}}，并设置 {{ui:prop.sketchLineWidth}} 和 {{ui:sketch.strokeJoin}}。实体会立刻在原位重建。这些对应 Tinkercad 导入 SVG 的填充模式：默认、外线和内线。{{ui:prop.sketchFill.grow}} 保持区域填充，并向四周扩展一个线宽，角可以是尖角、圆角或斜角：多色打印时标志下方的一层底色，仅用外侧描边只会得到一个环。{{ui:prop.sketchFill.shrink}} 相反：区域保持填充，边缘向四周内缩一个线宽，孔也算在内（孔会变大）。在同一草图的副本上两者都用，可以做配合：孔保持画的尺寸，穿过它的零件用 {{ui:prop.sketchFill.shrink}} 缩 0.5 mm，或者在同一轮廓切出的形状里做一层壁。宽度超过轮廓允许的范围就什么都不剩。在草图的描边窗口里，这两个选项位于 {{ui:sketch.strokeAlign}} 下。 使用外侧、内侧或居中的线时，{{ui:prop.sketchCuttingEdge}} 会让壁的顶部变锋利：顶部以两侧各 45° 的倒角收窄到该宽度，就像饼干模一样。0 保持平顶；更改线宽时刃口保持不变。
 
 {{ui:prop.sketchSilhouette}} 略过所有位于其他轮廓内部的轮廓：孔以及孔里的东西。只保留外侧轮廓。与 {{ui:prop.sketchFill.outside}} 一起就能做出饼干模具：把同一个 SVG 导入两次，一次用剪影作为底部的面，一次用剪影加外侧 1 到 2 mm 描边作为壁。在草图模式下，这个开关也在 {{ui:sketch.stroke}} 窗口里。
 
@@ -167,6 +169,10 @@ summary: 画出平面轮廓，给角点做圆角或倒角，再把它拉伸或�
 对于照片——比如白色桌面上的玩具——在 {{ui:sketch.tracePart}} 下选择 **{{ui:sketch.traceObject}}**：背景是图片边缘的颜色，所有与之不同的部分都会成为一个轮廓，不论颜色；此时 {{ui:sketch.traceThreshold}} 决定它要多明显地与背景区分。纯色背景上的彩色图片默认就这样开始。{{ui:sketch.tracePickAreas}} 可以勾出更多：在图片上点击一个区域，比如窗户，点击处周围颜色相近的一块就会被勾出轮廓（{{ui:sketch.traceAreaTolerance}} 决定多相近）。孔和点选的区域列在 {{ui:sketch.traceList}} 下；指向其中一个会在预览中显示，✕ 将其移除，关闭 {{ui:sketch.traceCut}} 时它画成构造线而不是孔。碰到图片边缘的区域是背景，不会被采用。没有任何阈值或颜色能区分的部分——比如和上方车轮一样深的阴影——用 {{ui:sketch.traceTrim}} 去掉：围绕它点击角点（点击第一个角点、双击或按 [[Enter]] 闭合），轮廓就沿着裁切线走；它列为“裁切 1”。
 
 房子旁的树、杂乱背景前的人物——没有颜色能把形状与其他部分分开时，用 **{{ui:sketch.traceLasso}}** 抓住它：沿着它的边缘大致点击，两次点击之间线条会自动沿边缘走，拐弯处也一样；移动指针时，预览已经显示它将经过哪里。点击第一个点、双击或按 [[Enter]] 闭合，按 [[Esc]] 放弃。它列为“套索 1”，可选 {{ui:sketch.traceRegionAdd}}（该区域并入形状）或 {{ui:sketch.traceTrim}}（被去掉）；每个裁切都有同样的选择。在 {{ui:sketch.tracePart}} 下，**{{ui:sketch.traceLassoOnly}}** 只用这样抓住的部分做形状——图片的其他部分都不要。
+
+![把一幅画的房子作为对象描摹，阈值调低以照顾它浅色的墙：磁性套索已把树切掉，八块窗玻璃被选为孔。](shot:trace-house)
+
+![作为实体的房子：没有树，窗户穿透。](shot:trace-house-body)
 
 ## 草图模式下的按键
 

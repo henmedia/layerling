@@ -114,7 +114,9 @@ In seguito i pezzi mantengono il centro del cerchio come punto di rotazione, anc
 
 ![Lo schema in modalità “Cerchio”, con un incremento di altezza e una variazione del raggio per ogni copia: le copie salgono e si allargano formando una spirale.](shot:pattern-spiral)
 
-Inizialmente le copie sono mostrate come anteprima. Solo {{ui:array.apply}} le crea. Con {{ui:array.groupCopies}} spuntato, {{ui:array.apply}} raggruppa l'originale e tutte le copie in un unico oggetto nello stesso passaggio, come farebbe {{ui:editor.tool.group}}: un anello di 36 pezzi è allora una sola parte che puoi spostare, colorare o usare per tagliare. Oltre 5 pezzi la casella si spunta da sola; quando la spunti o la togli tu, resta come l'hai impostata. {{ui:editor.tool.ungroup}} riporta i pezzi separati. Se il raggruppamento non riesce, il motivo arriva comunque in pezzi separati e il messaggio dice perché.
+Inizialmente le copie sono mostrate come anteprima. Solo {{ui:array.apply}} le crea. Se sono fori, al termine raggruppali con il corpo da tagliare.
+
+Con {{ui:array.groupCopies}} spuntato, {{ui:array.apply}} raggruppa l'originale e tutte le copie in un unico oggetto nello stesso passaggio, come farebbe {{ui:editor.tool.group}}: un anello di 36 pezzi è allora una sola parte che puoi spostare, colorare o usare per tagliare. Oltre 5 pezzi la casella si spunta da sola; quando la spunti o la togli tu, resta come l'hai impostata. {{ui:editor.tool.ungroup}} riporta i pezzi separati. Se il raggruppamento non riesce, il motivo arriva comunque in pezzi separati e il messaggio dice perché.
 
 ## Schema di fori su una faccia
 
