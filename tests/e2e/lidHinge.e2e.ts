@@ -124,7 +124,7 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
       const radius = hingeKnuckleRadius({ hingePin: 1.75 });
       const axisY = 30 + 2 - radius;
       const axisZ = -(20 + radius + 0.3);
-      // Past the round hole (1.025 mm) but within its point (1.45 mm).
+      // Past the round hole (1.075 mm with the pin's 0.2 mm of play) but within its point (1.52 mm).
       const off = 1.25;
       // The middle of the first knuckle (the body's) and of the second (the lid's) along the 60 mm back.
       const bodyX = -23.7;
@@ -143,6 +143,34 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
         // The round part is the same either way: the pin's hole with its play.
         expect(solidAt(knuckles, bodyX, axisY, axisZ + 1)).toBe(false);
         expect(solidAt(knuckles, bodyX, axisY, axisZ + 1.1)).toBe(true);
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("widens the pin's holes by the play asked for (#1220)", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    const solidAt = (solid: Body, x: number, y: number, z: number) => {
+      const probe = kernel.Manifold.cube([0.1, 0.1, 0.1], true).translate([x, y, z]);
+      const hit = solid.intersect(probe);
+      created.push(probe, hit);
+      return hit.volume() > 0.0009;
+    };
+    try {
+      expect(normalizeLidOptions().hingePinPlay).toBe(0.2);
+      for (const [play, free] of [[0.1, false], [0.4, true]] as const) {
+        const radius = hingeKnuckleRadius({ hingePin: 1.75, hingePinPlay: play });
+        const axisY = 30 + 2 - radius;
+        const axisZ = -(20 + radius + 0.3);
+        const body = openBox(kernel, created);
+        const result = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingePinPlay: play }));
+        if ("error" in result) throw new Error(JSON.stringify(result.error));
+        created.push(result.lid, result.hinge!.knuckles);
+        // 1.125 mm from the axis, beside it in the first knuckle (the body's): inside the hole with 0.4 mm of play
+        // (1.275 mm), in the knuckle's wall with 0.1 mm (0.975 mm).
+        expect(solidAt(result.hinge!.knuckles, -23.7, axisY, axisZ + 1.125), `play ${play}`).toBe(!free);
       }
     } finally {
       dispose(created);

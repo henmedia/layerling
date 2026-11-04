@@ -45,7 +45,7 @@ const checkbox = (panel: HTMLElement, name: string) => [...panel.querySelectorAl
 const texts = (panel: HTMLElement) => panel.textContent ?? "";
 
 describe("the lid's panel with a hinge", () => {
-  it("offers a hinge and asks for its side, pin, clearance, knuckles and a printed pin once it is on", () => {
+  it("offers a hinge and asks for its side, pin, clearance, pin play, knuckles and a printed pin once it is on", () => {
     const off = mount();
     const hinge = checkbox(off.panel, "Hinge")!;
     expect(hinge).not.toBeNull();
@@ -55,7 +55,7 @@ describe("the lid's panel with a hinge", () => {
     expect(off.changes.at(-1)).toEqual({ hinge: true });
     act(() => root?.unmount());
     const on = mount({ hinge: true });
-    for (const label of ["Hinge side", "Pin diameter", "Hinge clearance", "Knuckles (0 = automatic)"]) expect(texts(on.panel)).toContain(label);
+    for (const label of ["Hinge side", "Pin diameter", "Hinge clearance", "Pin play (per side)", "Knuckles (0 = automatic)"]) expect(texts(on.panel)).toContain(label);
     expect(checkbox(on.panel, "Print the pin too")).not.toBeNull();
     // Teardrop holes are on to start with, and can be turned off.
     const teardrop = checkbox(on.panel, "Teardrop pin holes (no droop when printed)")!;
@@ -63,7 +63,8 @@ describe("the lid's panel with a hinge", () => {
     act(() => teardrop.click());
     expect(on.changes.at(-1)).toEqual({ hingeTeardrop: false });
     // The knuckles' size for a 1.75 mm pin: its hole with 0.15 mm play and a 1.6 mm wall round it.
-    expect(texts(on.panel)).toContain("Knuckles 5.3 mm");
+    // 1.75 mm pin, 0.2 mm of play and a 1.6 mm wall round it: 5.35 mm across.
+    expect(texts(on.panel)).toContain("Knuckles 5.4 mm");
   });
 
   it("puts the hinge at the back unless another side is picked", () => {
@@ -78,6 +79,26 @@ describe("the lid's panel with a hinge", () => {
     act(() => root?.unmount());
     const left = mount({ hinge: true, hingeSide: "left" });
     expect(left.panel.querySelector('[aria-label="Hinge side"] [role="radio"][aria-checked="true"]')?.textContent).toBe("Left");
+  });
+
+  it("offers the hinge outside, flush in the wall or as pivot pins, and hides the knuckle count for pivot pins", () => {
+    const { panel, changes } = mount({ hinge: true });
+    const group = panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Hinge type"]')!;
+    expect(group).not.toBeNull();
+    const styles = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
+    expect(styles.map((button) => button.textContent)).toEqual(["Outside", "Flush", "Pivot pins"]);
+    expect(group.querySelector('[role="radio"][aria-checked="true"]')?.textContent).toBe("Outside");
+    expect(texts(panel)).toContain("the lid opens all the way");
+    act(() => styles[1].click());
+    expect(changes.at(-1)).toEqual({ hingeStyle: "flush" });
+    act(() => root?.unmount());
+    const flush = mount({ hinge: true, hingeStyle: "flush" });
+    expect(texts(flush.panel)).toContain("the box keeps its size");
+    expect(texts(flush.panel)).toContain("Knuckles (0 = automatic)");
+    act(() => root?.unmount());
+    const pivot = mount({ hinge: true, hingeStyle: "pivot" });
+    expect(texts(pivot.panel)).toContain("turns on two pins through the side walls");
+    expect(texts(pivot.panel)).not.toContain("Knuckles (0 = automatic)");
   });
 
   it("goes with a lid that pushes in or a flat one, and says so for one with a rim round the outside", () => {
