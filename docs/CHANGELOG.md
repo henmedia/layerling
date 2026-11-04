@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.140.0
+
 - **Open STL and 3MF from the file manager (Discussion #1287):** The installed app registered only for `.lyl` files, so an STL or 3MF still opened in another program. The manifest's file handler now also accepts `.stl` (model/stl) and `.3mf` (model/3mf); such a file, opened with layerling, goes through the start page's import and becomes a new design, while a `.lyl` opens as before.
 - **MCP tools load in every client (Discussion #1285):** Two properties, `vase` on create_shape and update_object and `trace` on reference_image, gave their type as a list (`["object", "string"]`, `["object", "boolean"]`). That is legal JSON Schema, but some MCP clients drop a tool whose schema has one, so create_shape and update_object went missing. Both are now `anyOf` with one type per branch, and a test keeps type lists out of every tool schema.
 - **A pinned shape library lies under the inspector (Discussion #1283):** The shape library hangs from the toolbar, whose layer is above the inspector's, so pinned and moved to the right it covered the properties of the selection. Pinned in the 3D editor, it now moves into the workplane, under the inspector, at the same spot; opened without the pin it still comes on top.

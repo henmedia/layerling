@@ -1,5 +1,90 @@
 [
   {
+    "version": "1.140.0",
+    "items": [
+      {
+        "title": {
+          "de": "Maßkästchen in Achsenfarben",
+          "en": "Dimension boxes in axis colours"
+        },
+        "body": {
+          "de": "In den Arbeitsbereich-Einstellungen gibt es einen neuen Schalter: Damit bekommt jedes Maßkästchen neben der Auswahl die Farbe seiner Achse, wie die Griffe, X rot, Y grün und Z blau. So siehst du auch an kleinen Teilen auf einen Blick, welche Zahl welche ist. Er ist anfangs aus.",
+          "en": "A new switch in the workspace settings gives each value box beside the selection the colour of its axis, as the handles have: red X, green Y and blue Z. So even on small parts you see at a glance which number is which. It is off to begin with."
+        }
+      },
+      {
+        "title": {
+          "de": "Schraubdom, Schnapphaken und Rippe",
+          "en": "Screw boss, snap-fit and rib"
+        },
+        "body": {
+          "de": "Für Gehäuse gibt es in der Formenbibliothek einen eigenen Abschnitt mit drei neuen Formen. Der Schraubdom nimmt eine Einschmelzmutter oder eine Kunststoffschraube auf und warnt, wenn die Wand um das Loch zu dünn wird. Der Schnapphaken hält einen Deckel und sagt dir, ob der Arm in PLA, PETG oder ABS hält. Die Rippe steift eine Wand aus, auch als schräge Stütze zum Boden.",
+          "en": "Enclosures get a section of their own in the shape library, with three new shapes. The screw boss takes a heat-set insert or a screw for plastics and warns when the wall round the hole gets too thin. The snap-fit holds a lid and tells you whether its arm will take it in PLA, PETG or ABS. The rib stiffens a wall, also as a sloped gusset to the floor."
+        }
+      },
+      {
+        "title": {
+          "de": "Freihand zeichnen in der Skizze",
+          "en": "Freehand drawing in sketches"
+        },
+        "body": {
+          "de": "Das neue Skizzenwerkzeug Freihand (Taste 5) nimmt einen Strich mit Stift, Finger oder Maus und macht beim Absetzen wenige Punkte daraus, die du danach ziehen kannst: Ecken, wo er scharf abbog, weiche Kurven dazwischen. Endet er an seinem Anfang, wird ein Umriss daraus, der zum Körper werden kann.",
+          "en": "The new sketch tool Freehand (key 5) takes a stroke drawn with a pen, a finger or the mouse and, when you lift it, makes a few points of it that you can drag afterwards: corners where it turned sharply, smooth curves in between. If it ends where it began, it becomes an outline that can turn into a body."
+        }
+      },
+      {
+        "title": {
+          "de": "Getippte Maße lassen gesperrte Punkte stehen",
+          "en": "Typed sizes keep locked points"
+        },
+        "body": {
+          "de": "Tippst du in der Skizze eine Länge oder einen Winkel ein, bleibt ein gesperrter Punkt (Strg+L) jetzt stehen: Die Länge bewegt das freie Ende der Linie, der Winkel dreht die Linie, deren anderes Ende frei ist. So machst du einen Umriss Ecke für Ecke genau: Ecke sperren, Länge und Winkel der nächsten Linie eintippen, ihr Ende sperren und weiter.",
+          "en": "When you type a length or an angle in a sketch, a locked point (Ctrl+L) now stays where it is: the length moves the free end of the line, the angle turns the line whose far end is free. So you can make an outline exact corner by corner: lock a corner, type the length and the angle of the next line, lock its end, and go on."
+        }
+      },
+      {
+        "title": {
+          "de": "Rechtsklick im Auswahlrahmen",
+          "en": "Right-click inside the selection frame"
+        },
+        "body": {
+          "de": "Ein Rechtsklick auf eine leere Stelle innerhalb des Rahmens einer Auswahl öffnet jetzt das Menü der Auswahl, mit Gruppieren, Ausrichten und allem anderen. Vorher kam dort nur das kurze Menü mit Einfügen, sobald der Klick zwischen die Teile fiel.",
+          "en": "A right-click on empty space inside the frame of a selection now opens the menu of the selection, with Group, Align and the rest. Before, a click between the parts only brought up the short menu with Paste."
+        }
+      },
+      {
+        "title": {
+          "de": "Angeheftete Formen verdecken nichts mehr",
+          "en": "A pinned shape library no longer covers the properties"
+        },
+        "body": {
+          "de": "Die angeheftete Formenbibliothek liegt jetzt unter den Eigenschaften des gewählten Objekts statt darüber, auch wenn du sie an den rechten Rand schiebst. Nur kurz geöffnet, ohne Anheften, liegt sie wie bisher obenauf.",
+          "en": "A pinned shape library now lies under the properties of the selected object instead of over them, even when you move it to the right edge. Opened briefly without pinning, it still comes on top as before."
+        }
+      },
+      {
+        "title": {
+          "de": "KI-Werkzeuge laden in jedem Client",
+          "en": "AI tools load in every client"
+        },
+        "body": {
+          "de": "Manche KI-Clients ließen die Werkzeuge zum Anlegen und Ändern von Formen und für Vorlagenbilder weg, weil zwei ihrer Einstellungen mehrere Typen auf einmal angaben. Sie sind jetzt so beschrieben, dass jeder Client sie lädt.",
+          "en": "Some AI clients left out the tools that create and change shapes and the one for reference images, because two of their settings named several types at once. They are now described so that every client loads them."
+        }
+      },
+      {
+        "title": {
+          "de": "STL und 3MF per Doppelklick öffnen",
+          "en": "Open STL and 3MF with a double click"
+        },
+        "body": {
+          "de": "Die installierte App in Chrome oder Edge meldet sich jetzt auch für STL- und 3MF-Dateien an. Ein Doppelklick auf eine solche Datei öffnet sie als neuen Entwurf, wie Importieren auf der Startseite. Unter „Öffnen mit“ kannst du layerling für diese Dateien als Standard festlegen.",
+          "en": "The app installed from Chrome or Edge now also signs up for STL and 3MF files. A double click on one opens it as a new design, as Import on the start page does. Under \"Open with\" you can make layerling the default for these files."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.139.0",
     "items": [
       {
