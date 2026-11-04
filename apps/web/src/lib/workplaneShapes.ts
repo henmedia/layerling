@@ -136,10 +136,11 @@ export function shapeTaperDimensions(shape: WorkplaneShape) {
  * Lineal haben feste Masse, die eine Verjuengung nur verdurbe. Der Tropfen ist
  * der Querschnitt eines waagerechten Lochs; oben und unten gibt es fuer ihn
  * nicht. Seit #111 nehmen Kapsel, abgerundeter Quader, Stern, Herz, Halbmond,
- * Wabe und Schwalbenschwanz sie an. Die Liste steht hier, damit das Merkmalsfeld, die
+ * Wabe und Schwalbenschwanz sie an. Schraubdom, Schnapphaken und Rippe (#1246)
+ * haben feste Masse fuer Einsatz, Haken und Fuss. Die Liste steht hier, damit das Merkmalsfeld, die
  * Vorschau und die MCP-Bruecke nicht je ihre eigene fuehren.
  */
-const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity"]);
+const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity", "screwBoss", "snapFit", "rib"]);
 
 export function shapeSupportsTaper(kind: WorkplaneShape["kind"]) {
   return !SHAPES_WITHOUT_TAPER.has(kind);

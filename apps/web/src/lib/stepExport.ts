@@ -2,7 +2,7 @@ import type { OcctKernel, ShapeHandle } from "occt-wasm";
 import type { WorkplaneShape } from "@/types/layerling";
 import { shapeDepth, shapeHasShapeDeform, shapeWidth } from "@/lib/workplaneShapes";
 import { cadBrepTransformForShape } from "@/lib/cadBakeMetadata";
-import { loadBrepWithOcct, occtKernel, type Brep, type BrepSolid } from "@/lib/brepKernel";
+import { dropOcctKernel, loadBrepWithOcct, occtKernel, type Brep, type BrepSolid } from "@/lib/brepKernel";
 import { asDesignedRound, cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape } from "@/lib/cadProfileExtrusion";
 import { threadPartSolid } from "@/lib/threadSolid";
 import { springPartSolid } from "@/lib/springSolid";
@@ -10,7 +10,7 @@ import { helicalGearPartSolid } from "@/lib/gearSolid";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
 import { hirthPartSolid } from "@/lib/hirthSolid";
 import { profileExtrusionSolid } from "@/lib/cadProfileSolid";
-import { applyCadTransform } from "@/lib/cadModifierRuntime";
+import { applyCadTransform, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { hingeWorldParts } from "@/lib/hingeParts";
 import { restoreGroupedChildren } from "@/lib/editorBooleans";
 import { meshForShape } from "@/lib/editorMeshCore";
@@ -312,25 +312,47 @@ function buildProfileBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
   return buildPlacedBody(brep, part, (kernel) => profileExtrusionSolid(kernel, part!));
 }
 
+/** Lets the kernel's handles go; a handle already released is no reason to lose the export. */
+function releaseKernelHandles(kernel: OcctKernel, handles: Array<ShapeHandle | null>) {
+  for (const handle of new Set(handles)) {
+    if (handle === null) continue;
+    try {
+      kernel.release(handle);
+    } catch {
+      // Already gone.
+    }
+  }
+}
+
+/**
+ * A kernel whose WebAssembly memory broke is not tried on with the next body: the export stops with the error and
+ * the next one loads a fresh kernel. Any other error only leaves this body out.
+ */
+function throwIfKernelBroken(error: unknown) {
+  if (!isCadModifierWasmMemoryFault(error instanceof Error ? error.message : String(error ?? ""), error instanceof Error ? error.name : "")) return;
+  dropOcctKernel();
+  throw error;
+}
+
 /** A part's exact body in its own frame, placed and handed over as the CAD worker does. */
 function buildPlacedBody(brep: Brep, part: { transform?: number[] } | null, build: (kernel: OcctKernel) => ShapeHandle, what = "exact body"): BuildOutcome {
   const kernel = occtKernel();
   if (!kernel || !part) return { skip: unsupportedReason() };
+  let local: ShapeHandle | null = null;
+  let placed: ShapeHandle | null = null;
   try {
-    const local = build(kernel);
-    const placed = applyCadTransform(kernel, local, part.transform);
+    local = build(kernel);
+    placed = applyCadTransform(kernel, local, part.transform);
     const text = kernel.toBREP(placed);
-    try {
-      if (placed !== local) kernel.release(local);
-      kernel.release(placed);
-    } catch {
-      // A released handle is no reason to lose the export.
-    }
     const restored = brep.fromBREP(text);
     if (!restored.ok) return { skip: `${what} failed to load: ${String(restored.error.message ?? restored.error)}` };
     return { solid: restored.value as unknown as BrepSolid };
   } catch (error) {
+    throwIfKernelBroken(error);
     return { skip: `${what} could not be built: ${error instanceof Error ? error.message : String(error)}` };
+  } finally {
+    // Also when placing or writing failed: the kernel is kept for the whole session, so a lost handle stays lost.
+    if (occtKernel() === kernel) releaseKernelHandles(kernel, [local, placed]);
   }
 }
 
@@ -361,22 +383,22 @@ function buildMeshMadeExact(brep: Brep, shape: WorkplaneShape, budget: ExactExpo
   mesh.vertices.forEach((vertex, index) => positions.set(vertex, index * 3));
   const indices = new Uint32Array(mesh.faces.length * 3);
   mesh.faces.forEach((face, index) => indices.set(face, index * 3));
+  let solid: ShapeHandle | null = null;
   try {
     const exact = exactSolidFromMesh(kernel, positions, indices, { budgetMs: Math.min(EXACT_EXPORT_MESH_BUDGET_MS, left), refuseFreeform: true });
     if (!exact) return { skip: `${MESH_NOT_EXACT_REASON}: its faces did not close into a solid` };
+    solid = exact.solid;
     const text = kernel.toBREP(exact.solid);
-    try {
-      kernel.release(exact.solid);
-    } catch {
-      // A released handle is no reason to lose the export.
-    }
     const restored = brep.fromBREP(text);
     if (!restored.ok) return { skip: `${MESH_NOT_EXACT_REASON}: ${String(restored.error.message ?? restored.error)}` };
     return { solid: restored.value as unknown as BrepSolid };
   } catch (error) {
+    throwIfKernelBroken(error);
     const message = error instanceof Error ? error.message : String(error);
     if (exactMeshFreeformShare(message) !== null) return { skip: FREEFORM_REASON };
     return { skip: `${MESH_NOT_EXACT_REASON}: ${message}` };
+  } finally {
+    if (occtKernel() === kernel) releaseKernelHandles(kernel, [solid]);
   }
 }
 
