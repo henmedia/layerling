@@ -8,5 +8,15 @@
       "de": "Beim Ausrichten steht neben jeder Linie ein neuer Punkt: Er verteilt verschieden große Teile so, dass zwischen ihnen überall derselbe Abstand ist. Auf einem Brett bleibt derselbe Abstand zum Rand, mehrere Reihen werden Reihe für Reihe verteilt, und mit Alt tippst du den Abstand selbst ein.",
       "en": "Align has a new dot beside each line: it spreads parts of different sizes so the space between them is the same everywhere. On a board the same gap stays at its edges, several rows are spread row by row, and with Alt you type the gap yourself."
     }
+  },
+  {
+    "title": {
+      "de": "Gruppieren lässt Kanten, wie sie sind",
+      "en": "Grouping leaves edges as they are"
+    },
+    "body": {
+      "de": "Beim Gruppieren mit Löchern konnte eine Ecke neben einer Rundung schräg abgeschnitten werden, weil das Aufräumen hauchdünner Stufen zu weit ging. Jetzt prüft layerling, dass die Form dabei gleich bleibt.",
+      "en": "When grouping with holes, a corner beside a rounding could come out cut off at a slant, because tidying away hair-thin steps went too far. layerling now checks that the shape stays the same."
+    }
   }
 ]
