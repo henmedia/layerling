@@ -2941,6 +2941,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Jusqu'à 12 unités en largeur et en profondeur au lieu de 6, pour les plateaux d'impression de plus de 256 mm. Si votre imprimante est choisie dans les paramètres, un socle plus grand que son plateau est signalé.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail : le socle repose sur un fond de 2,4 mm, 7,4 mm de haut, avec une demi-cavité sous chaque côté sans bordure, si bien que deux socles côte à côte forment des cavités entières à cheval sur le joint. Une agrafe enfoncée par-dessous s'enclenche et les tient ensemble. Ajouter les agrafes en crée une pour chaque cavité à l'arrière et à droite, si bien que chaque cavité à cheval sur un joint avec le socle suivant en reçoit une.",
+  "prop.gridfinitySwallowtailClearance": "Jeu des agrafes",
+  "gridfinity.swallowtailClearanceHint": "De combien chaque agrafe est plus petite que sa cavité, de chaque côté. Augmentez-le si les agrafes coincent ou cassent, diminuez-le si elles ont du jeu ; il va jusqu'à 0,15 mm. Il modifie les agrafes que crée ensuite Ajouter les agrafes, pas le socle ; cliquez donc à nouveau sur Ajouter les agrafes après l'avoir modifié.",
   "prop.gridfinityFloorHeight": "Hauteur du fond",
   "gridfinity.floorHeightHint": "Jusqu'à cette hauteur, mesurée depuis le dessous, le bac est plein : une ébauche dans laquelle découper des formes.",
   "gridfinity.floorHeightLipHint": "Jusqu'à cette hauteur, mesurée depuis le dessous, le bac est plein : une ébauche dans laquelle découper des formes. Jusqu'à {height} mm, un autre bac s'empile encore dessus ; au-delà, le rebord d'empilage est rempli aussi, pour un dessus plat.",

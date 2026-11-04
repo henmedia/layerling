@@ -15,6 +15,7 @@ import { shapeDefaultsFromShape } from "@/lib/shapeDefaults";
 import { canonicalizeShape, workplaneShapesEqual } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 import {
+  DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE,
   GRIDFINITY_FOOT_HEIGHT,
   GRIDFINITY_LABEL_WALL_KEYS,
   GRIDFINITY_LIP_HEIGHT,
@@ -94,9 +95,11 @@ import {
   gridfinityScoopsLeftOut,
   gridfinitySceneWithKeys,
   gridfinityShapePatch,
+  gridfinitySwallowtailClearance,
   gridfinitySwallowtailKeyCount,
   gridfinitySwallowtailKeyOutline,
   gridfinitySwallowtailKeyPlaces,
+  gridfinitySwallowtailKeyProfile,
   gridfinitySwallowtailKeys,
   gridfinityTriangles,
   gridfinityUnitCompartments,
@@ -4123,8 +4126,9 @@ describe("gridfinity swallowtail", () => {
   /** The area of the faces lying at y, as the mesh draws its rounded corners. */
   const areaAt = (triangles: V[][], y: number) => triangles.filter((t) => t.every((v) => Math.abs(v[1] - y) < 1e-9)).reduce((sum, [a, b, c]) => sum + Math.abs((b[0] - a[0]) * (c[2] - a[2]) - (c[0] - a[0]) * (b[2] - a[2])) / 2, 0);
   // A pocket half: 7 mm in from the side, 6 mm wide there and 10 at its end, 1.4 mm of it over the lip, 7 x 8 mm2; the lip
-  // 0.6 mm, from 0.2 mm in to the end, 5.6 mm wide there and 9.6 at the end, 6.8 x 7.6 mm2.
-  const pocketVolume = 56 * 1.4 + 51.68 * 0.6;
+  // 0.6 mm, the whole pocket up to the key's slots 2.5 mm in (2.5 x 6.71 mm2), then narrowing to 0.2 mm less on each side at
+  // the end (4.5 x 8.51 mm2): 55.1 mm2.
+  const pocketVolume = 56 * 1.4 + 55.1 * 0.6;
 
   it("puts the plate on a 2.4 mm floor, 7.4 mm tall, with the switch, and leaves it as it was without", () => {
     expect(gridfinityTriangles(plate({ gridfinitySwallowtail: false }))).toEqual(gridfinityTriangles(plate()));
@@ -4200,12 +4204,51 @@ describe("gridfinity swallowtail", () => {
     expect(made.map(({ id, name, gridfinityKeyOf, color, hole, x, z, elevation }) => ({ id, name, gridfinityKeyOf, color, hole, x, z, elevation }))).toEqual([-35, -17, 1].map((x, k) => ({ id: `k${k + 1}`, name: "Swallowtail key", gridfinityKeyOf: "a", color: "#123456", hole: false, x, z: 30, elevation: 2 })));
   });
 
-  it("makes the key two pocket halves 0.025 mm smaller, with a slot of 1.2 x 4.5 mm into each end", () => {
-    const key = gridfinitySwallowtailKeyOutline();
-    const area = key.reduce((sum, p, k) => sum + p.x * key[(k + 1) % key.length].z - key[(k + 1) % key.length].x * p.z, 0) / 2;
-    expect(Math.abs(area)).toBeCloseTo(2 * 6.975 * (4.975 + 2.975) - 2 * 1.2 * 4.5, 9);
-    expect(Math.max(...key.map((p) => p.x)) - Math.min(...key.map((p) => p.x))).toBeCloseTo(13.95, 9);
-    expect(Math.max(...key.map((p) => p.z)) - Math.min(...key.map((p) => p.z))).toBeCloseTo(9.95, 9);
+  it("makes the key two pocket halves smaller by its clearance on every side, with a slot of 1.2 x 4.5 mm into each end", () => {
+    for (const clearance of [0, 0.05, 0.15]) {
+      const key = gridfinitySwallowtailKeyOutline(clearance);
+      const area = key.reduce((sum, p, k) => sum + p.x * key[(k + 1) % key.length].z - key[(k + 1) % key.length].x * p.z, 0) / 2;
+      // Each half a trapezoid 7 mm long, 6 mm wide at the middle and 10 at the end, all less the clearance on every side.
+      expect(Math.abs(area)).toBeCloseTo(2 * (7 - clearance) * (8 - 2 * clearance) - 2 * 1.2 * 4.5, 9);
+      expect(Math.max(...key.map((p) => p.x)) - Math.min(...key.map((p) => p.x))).toBeCloseTo(14 - 2 * clearance, 9);
+      expect(Math.max(...key.map((p) => p.z)) - Math.min(...key.map((p) => p.z))).toBeCloseTo(10 - 2 * clearance, 9);
+    }
+  });
+
+  it("draws the plate's keys at its clearance, the default unless it is set", () => {
+    const width = (plate: Record<string, unknown>) => { const xs = gridfinitySwallowtailKeyProfile(swallowtail(plate)).points.map((p) => p.x); return Math.max(...xs) - Math.min(...xs); };
+    expect(width({ gridfinitySwallowtailClearance: 0.1 })).toBeCloseTo(13.8, 9);
+    expect(width({})).toBeCloseTo(14 - 2 * DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE, 9);
+  });
+
+  it("reads the keys' clearance from the plate: the default unless set, 0 to 0.15 mm, to 0.01 mm", () => {
+    expect(gridfinitySwallowtailClearance(swallowtail())).toBe(DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE);
+    expect(gridfinitySwallowtailClearance(swallowtail({ gridfinitySwallowtailClearance: 0.08 }))).toBe(0.08);
+    expect(gridfinitySwallowtailClearance(swallowtail({ gridfinitySwallowtailClearance: 0.123 }))).toBe(0.12);
+    expect(gridfinitySwallowtailClearance(swallowtail({ gridfinitySwallowtailClearance: 0.4 }))).toBe(0.15);
+    expect(gridfinitySwallowtailClearance(swallowtail({ gridfinitySwallowtailClearance: -1 }))).toBe(0);
+    expect(gridfinitySwallowtailClearance(swallowtail({ gridfinitySwallowtailClearance: Number.NaN }))).toBe(DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE);
+  });
+
+  it("carries the keys' clearance to every place that keeps the plate, and leaves the plate itself as it was", async () => {
+    const shape = canonicalizeShape(binShape(swallowtail({ gridfinitySwallowtailClearance: 0.1 })));
+    const other = { ...shape, gridfinitySwallowtailClearance: 0.05 };
+    // A change of clearance is a change for the editor, so it is committed; the plate is built the same.
+    expect(workplaneShapesEqual(shape, other)).toBe(false);
+    expect(shapeGeometrySignature(shape)).toBe(shapeGeometrySignature(other));
+    const settings = { gridfinitySwallowtail: true, gridfinitySwallowtailClearance: 0.1 };
+    const save = (shapes: WorkplaneShape[]) => exportLylProject({ projectId: "keys", projectName: "Keys", createdAt: 1, modifiedAt: 2, shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [], workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0 });
+    const [loaded] = (await importLylProject(await save([shape]))).shapes;
+    expect(workplaneShapesEqual(loaded, shape)).toBe(true);
+    await expect(importLylProject(await save([{ ...shape, gridfinitySwallowtailClearance: "loose" } as unknown as WorkplaneShape]))).rejects.toThrow("gridfinitySwallowtailClearance must be a finite number");
+    await expect(importLylProject(await save([{ ...shape, gridfinitySwallowtailClearance: -1 }]))).rejects.toThrow("gridfinitySwallowtailClearance is outside the supported range");
+    expect(sceneShape(shape)).toMatchObject(settings);
+    expect(normalizeShapeCustomizations({ gridfinity: settings }, {})).toMatchObject({ gridfinity: settings });
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinitySwallowtailClearance: -1 } }, {}).gridfinity?.gridfinitySwallowtailClearance).toBe(0);
+    expect(shapeDefaultsFromShape(shape)).toMatchObject(settings);
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, settings)).toMatchObject(settings);
+    expect(mcpShapeSummary(shape).settings).toMatchObject(settings);
   });
 
   it("draws the plate on its floor closed before Manifold has loaded, its sockets ending on the floor", () => {
@@ -4227,10 +4270,17 @@ describe("gridfinity swallowtail", () => {
       // Within 0.005 mm3: Manifold's sliver clean-up moves a few points by up to 1e-4 mm.
       expect(signedVolume(gridfinityTriangles(swallowtail(fields))) - signedVolume(triangles)).toBeCloseTo(pockets * pocketVolume, 2);
     }
-    // At 1 mm up a line through the middle of the side pockets crosses the plate at their ends, 7 mm in. At 0.3 mm the lip
-    // ends there too and starts 0.2 mm in from the side, so the line crosses 0.2 mm of plate at each side first.
+    // Lines along the side pockets, over the lip and in it. 3.2 mm off their middle, outside the pocket's 3 mm at the side,
+    // the pocket starts 0.7 mm in both times: no lip at the seam, where the key's middle has no slot. 4.9 mm off it the
+    // pocket is reached 6.65 mm in over the lip, and not at all in it: the lip, 0.2 mm wide at the end, holds the key's
+    // slotted ends.
     const triangles = gridfinityLabelledTriangles(runtime, swallowtail());
-    expect(crossings(triangles, 1, 0.5).map((x) => Math.round(x * 100) / 100)).toEqual([-35, 35]);
-    expect(crossings(triangles, 0.3, 0.5).map((x) => Math.round(x * 100) / 100)).toEqual([-42, -41.8, -35, 35, 41.8, 42]);
+    const at = (y: number, z: number) => crossings(triangles, y, z).map((x) => Math.round(x * 100) / 100);
+    expect(at(1, 0.5)).toEqual([-35, 35]);
+    expect(at(1, 3.2)).toEqual([-42, -41.3, -35, 35, 41.3, 42]);
+    expect(at(0.3, 0.5)).toEqual([-35, 35]);
+    expect(at(0.3, 3.2)).toEqual([-42, -41.3, -35, 35, 41.3, 42]);
+    expect(at(1, 4.9)).toEqual([-42, -35.35, -35, 35, 35.35, 42]);
+    expect(at(0.3, 4.9)).toEqual([-42, 42]);
   });
 });

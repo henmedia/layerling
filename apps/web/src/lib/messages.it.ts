@@ -2942,6 +2942,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "Fino a 12 unità in larghezza e profondità invece di 6, per piani di stampa oltre 256 mm. Seleziona la stampante nelle impostazioni: le piastre più grandi del piano verranno segnalate.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: la piastra poggia su un fondo di 2,4 mm, è alta 7,4 mm e ha mezza cavità sotto ogni lato senza fascia, così due piastre affiancate formano cavità intere a cavallo della giunzione. Un tassello premuto dal basso scatta in posizione e le tiene unite. Aggiungi tasselli ne crea uno per ogni cavità dietro e a destra, così ogni cavità a cavallo di una giunzione con la piastra successiva ne riceve uno.",
+  "prop.gridfinitySwallowtailClearance": "Gioco dei tasselli",
+  "gridfinity.swallowtailClearanceHint": "Di quanto ogni tassello è più piccolo della sua cavità su ogni lato. Aumentalo se i tasselli si bloccano o si rompono, riducilo se stanno larghi; arriva fino a 0,15 mm. Cambia i tasselli che Aggiungi tasselli crea la prossima volta, non la piastra, quindi dopo averlo cambiato fai di nuovo clic su Aggiungi tasselli.",
   "prop.gridfinityFloorHeight": "Altezza del fondo",
   "gridfinity.floorHeightHint": "Fino a questa altezza, misurata dal lato inferiore, il contenitore è pieno: un grezzo in cui ritagliare forme.",
   "gridfinity.floorHeightLipHint": "Fino a questa altezza, misurata dal lato inferiore, il contenitore è pieno: un grezzo in cui ritagliare forme. Fino a {height} mm si può ancora impilare sopra un altro contenitore; oltre, anche il bordo di impilamento viene riempito, per una faccia superiore piatta.",

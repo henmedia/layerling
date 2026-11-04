@@ -3001,6 +3001,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "gridfinity.largePlateHint": "Až 12 jednotek do šířky i hloubky místo 6, pro tiskové podložky nad 256 mm. Když je v nastavení vybraná tiskárna, deska větší než její podložka se označí.",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: deska stojí na dně o tloušťce 2,4 mm, je vysoká 7,4 mm a pod každou stranou bez pruhu má polovinu kapsy, takže dvě desky vedle sebe tvoří přes spáru celé kapsy. Spojka zatlačená zespodu zacvakne a drží je u sebe. Tlačítko Přidat spojky vytvoří jednu pro každou kapsu vzadu a vpravo, takže každá kapsa přes spáru s další deskou dostane jednu.",
+  "prop.gridfinitySwallowtailClearance": "Vůle spojek",
+  "gridfinity.swallowtailClearanceHint": "O kolik je každá spojka na každé straně menší než její kapsa. Zvětšete ji, když se spojky zasekávají nebo lámou, a zmenšete, když sedí volně; jde až do 0,15 mm. Mění spojky, které Přidat spojky vytvoří příště, ne desku, takže po změně klikněte znovu na Přidat spojky.",
   "prop.gridfinityFloorHeight": "Výška dna",
   "gridfinity.floorHeightHint": "Až do této výšky, měřeno od spodku, je krabička plná: polotovar, do kterého vyříznete tvary.",
   "gridfinity.floorHeightLipHint": "Až do této výšky, měřeno od spodku, je krabička plná: polotovar, do kterého vyříznete tvary. Do {height} mm na ni jde ještě postavit další krabičku; nad tím se vyplní i stohovací okraj a vršek je rovný.",

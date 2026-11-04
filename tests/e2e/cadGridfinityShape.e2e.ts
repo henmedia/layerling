@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GRIDFINITY_LIP_HEIGHT, GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT, gridfinitySwallowtailKeyOutline, gridfinityTriangles } from "@/lib/gridfinityGeometry";
+import { DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE, GRIDFINITY_LIP_HEIGHT, GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT, MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE, gridfinitySwallowtailKeyOutline, gridfinityTriangles } from "@/lib/gridfinityGeometry";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
 import { cad, bin, plate, meshVolume, trianglesVolume, meshBounds, overlap, material, expectBuilt } from "./helpers/gridfinityHarness";
 
@@ -32,19 +32,27 @@ describe("exact Gridfinity bodies", () => {
     expectBuilt(plate({ width: 504, depth: 504, gridfinityLargePlate: true, gridfinitySwallowtail: true }));
   });
 
-  it("holds a key across the seam of two Swallowtail plates: clear above the lip, caught by it below", () => {
+  it("holds a key across the seam of two Swallowtail plates: clear above the lip, caught by it below up to the most clearance", () => {
     const left = gridfinityPartSolid(cad, plate({ gridfinitySwallowtail: true }));
     const right = cad.translate(left, 84, 0, 0);
     // The key's outline lying flat at the seam (x = 42, z = 0), 1.4 mm thick from y0 up, in the plates' own frame (y up).
-    const key = (y0: number) => {
-      const points = gridfinitySwallowtailKeyOutline().map((p) => ({ x: 42 + p.x, y: y0, z: p.z }));
+    const key = (y0: number, clearance = DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE) => {
+      const points = gridfinitySwallowtailKeyOutline(clearance).map((p) => ({ x: 42 + p.x, y: y0, z: p.z }));
       const face = cad.makeFace(cad.makeWire(points.map((p, i) => cad.makeLineEdge(p, points[(i + 1) % points.length]))));
       return cad.extrude(face, 0, GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, 0);
     };
     const pressedIn = key(GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT);
     expect(overlap(pressedIn, left) + overlap(pressedIn, right)).toBeLessThan(1e-6);
-    const atTheLip = key(0);
-    expect(overlap(atTheLip, left) + overlap(atTheLip, right)).toBeGreaterThan(1);
+    // Below, only the slotted ends meet the lip, which grows to 0.2 mm at the pocket's end: the most clearance, 0.15 mm,
+    // still leaves a little of it to catch. The key's sides close in on the pocket's towards its ends (5/7 of the clearance
+    // there), so only at about 0.26 mm would nothing be caught.
+    const caught = (clearance: number) => { const atTheLip = key(0, clearance); return overlap(atTheLip, left) + overlap(atTheLip, right); };
+    // The key's middle, up to its slots 2.45 mm either side of the seam, meets nothing on the way in: the seam is open.
+    const middle = cad.intersect(key(0), cad.translate(cad.makeBox(4.9, 3, 12), 42 - 2.45, -1, -6));
+    expect(overlap(middle, left) + overlap(middle, right)).toBeLessThan(1e-6);
+    expect(caught(DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE)).toBeGreaterThan(0.5);
+    expect(caught(MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE)).toBeGreaterThan(0.02);
+    expect(caught(0.3)).toBeLessThan(1e-6);
   });
 
   it("fits bins in baseplates 0.25 mm up, where a bigger bin rests on the ridges, and 0.3 mm sideways they overlap", () => {
