@@ -223,13 +223,14 @@ import { getSectionBounds, sectionAxisLetter, sectionMeshInFrame, sectionPlaceme
 import { SECTION_CUT_FACES, type SectionCutFace } from "@/lib/sectionCaps";
 import { MAX_SECTION_SKETCH_SEGMENTS, sectionSketchProfile } from "@/lib/sectionSketch";
 import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_VIEW_FACE, sectionSvgDocument, sliceMeshContours } from "@/lib/sectionSvg";
-import type { AlignAxis, AlignHandleStatus, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, appendMeshData, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
 import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, articulateShapesOffThread, lidForShapesOffThread, checkClearanceOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
+import { distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
 import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, expandBundles, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
@@ -1956,6 +1957,35 @@ function sizeAlignmentLabel(axis: AlignAxis, target: AlignTarget) {
   return alignmentLabel(axis, target);
 }
 
+/** Why equal gaps cannot spread the parts, for the dot's tooltip and the message (alignDistribute.ts). */
+function spreadProblemMessage(problem: DistributeProblem) {
+  return problem === "noRoom" ? t("status.spreadNoRoom") : problem === "lockedBetween" ? t("status.spreadLocked") : t("status.spreadTooFew");
+}
+
+/** What equal gaps say when done: the gap, or in how many rows the parts were spread. */
+function spreadMessage(result: DistributeResult, axis: AlignAxis, workspace: WorkplaneWorkspaceSettings) {
+  if (result.problem) return spreadProblemMessage(result.problem);
+  if (result.moved === 0) return t("status.spreadAlready");
+  const label = mirrorAxisLabel(axis);
+  if (result.gaps.length > 1) return t("status.spreadRows", { label, count: result.gaps.length });
+  return t("status.spreadOne", { label, gap: `${formatLengthMm(result.gaps[0] ?? 0, workspace.accuracy)} ${lengthDisplayUnit(workspace).label}` });
+}
+
+/** The equal-gaps dot beside an axis' line: what a click does, and what Alt on it does. */
+function spreadStatus(selection: WorkplaneShape[], anchorId: string | null, axis: AlignAxis, axes: AlignAxes | null): NonNullable<AlignHandleStatus["spread"]> {
+  const state = distributionState(selection, anchorId, axis, axes);
+  const label = mirrorAxisLabel(axis);
+  const typed = distributedShapesForSelection(selection, selection, anchorId, axis, axes, 0).problem;
+  const gapDisabled = typed === "tooFew" || typed === "lockedBetween";
+  return {
+    disabled: !state.wouldMove,
+    aligned: state.equal,
+    title: state.problem ? spreadProblemMessage(state.problem) : state.equal ? t("align.spreadAlready", { label }) : t("align.spreadDo", { label }),
+    gapDisabled,
+    gapTitle: gapDisabled && typed ? spreadProblemMessage(typed) : t("align.spreadGap", { label }),
+  };
+}
+
 function alignmentStatuses(selection: WorkplaneShape[], anchorId: string | null, axes: AlignAxes | null = null): AlignHandleStatus[] {
   if (selection.length < 2) {
     return [];
@@ -1994,6 +2024,7 @@ function alignmentStatuses(selection: WorkplaneShape[], anchorId: string | null,
           disabled: !size.wouldChange,
           title: size.aligned ? t("align.sizeAlready", { label: sizeAlignmentLabel(axis, target) }) : t("align.sizeDo", { label: sizeAlignmentLabel(axis, target) }),
         },
+        ...(target === "center" ? { spread: spreadStatus(selection, anchorId, axis, axes) } : {}),
       };
     }),
   );
@@ -3088,7 +3119,7 @@ export function LayerlingEditor({
   const [alignMode, setAlignMode] = useState(false);
   const [multiSelect, setMultiSelect] = useState(false);
   const [alignAnchorId, setAlignAnchorId] = useState<string | null>(null);
-  const [alignPreview, setAlignPreview] = useState<{ axis: AlignAxis; target: AlignTarget; size?: boolean } | null>(null);
+  const [alignPreview, setAlignPreview] = useState<{ axis: AlignAxis; target: AlignTarget; size?: boolean; spread?: AlignSpread } | null>(null);
   const [mirrorMode, setMirrorMode] = useState(false);
   const [splitSession, setSplitSession] = useState<SplitSession | null>(null);
   const [mirrorPreviewAxis, setMirrorPreviewAxis] = useState<AlignAxis | null>(null);
@@ -4079,6 +4110,8 @@ export function LayerlingEditor({
         ? [...shapes, faceToolPreview.shape]
         : edgeModifier?.preview && cadModifierBaseShapeRef.current
         ? shapes.map((shape) => shape.id === cadModifierBaseShapeRef.current?.id ? edgeModifier.preview as WorkplaneShape : shape)
+        : alignMode && alignPreview?.spread
+        ? distributedShapesForSelection(shapes, selectedShapes, effectiveAlignAnchorId, alignPreview.axis, alignAxes, alignPreview.spread.gap).nextShapes
         : alignMode && alignPreview?.size
         ? sizedShapesForSelection(shapes, selectedIds, selectedShapes, effectiveAlignAnchorId, alignPreview.axis, alignPreview.target, alignAxes, alignSizeLimit).nextShapes
         : alignMode && alignPreview
@@ -6919,9 +6952,21 @@ export function LayerlingEditor({
   );
 
   const alignSelectionTo = useCallback(
-    (axis: AlignAxis, target: AlignTarget, size = false) => {
+    (axis: AlignAxis, target: AlignTarget, size = false, spread?: AlignSpread) => {
       if (selectedShapes.length < 2) {
         setNotice(t("status.selectTwoToAlign"));
+        return;
+      }
+
+      if (spread) {
+        const result = distributedShapesForSelection(shapes, selectedShapes, effectiveAlignAnchorId, axis, alignAxes, spread.gap);
+        setAlignPreview(null);
+        const message = spreadMessage(result, axis, workspaceSettingsRef.current);
+        if (result.moved === 0) {
+          setNotice(message);
+          return;
+        }
+        commitShapes(result.nextShapes, selectedIds, message);
         return;
       }
 
@@ -6952,8 +6997,8 @@ export function LayerlingEditor({
     [alignAxes, alignSizeLimit, commitShapes, effectiveAlignAnchorId, selectedIds, selectedShapes, shapes],
   );
 
-  const previewAlignSelection = useCallback((axis: AlignAxis, target: AlignTarget, size = false) => {
-    setAlignPreview({ axis, target, size });
+  const previewAlignSelection = useCallback((axis: AlignAxis, target: AlignTarget, size = false, spread?: AlignSpread) => {
+    setAlignPreview({ axis, target, size, spread });
   }, []);
 
   const clearAlignPreview = useCallback(() => {
@@ -12217,7 +12262,8 @@ export function LayerlingEditor({
       if (command.action === "align_objects") {
         const axis = params.axis === "x" || params.axis === "y" || params.axis === "z" ? params.axis : null;
         const target = params.target === "min" || params.target === "center" || params.target === "max" ? params.target : null;
-        if (!axis || !target) throw new Error("align_objects requires axis x/y/z and target min/center/max");
+        if (!axis) throw new Error("align_objects requires axis x/y/z");
+        if (!target && params.mode !== "spread") throw new Error("align_objects requires target min/center/max (or mode spread)");
         const requestedIds = mcpStringArray(params.ids);
         const ids = requestedIds.length ? requestedIds : selectedIdsRef.current;
         const selectedForAlign = currentShapes().filter((shape) => ids.includes(shape.id));
@@ -12225,6 +12271,29 @@ export function LayerlingEditor({
         const validIds = selectedForAlign.map((shape) => shape.id);
         const requestedAnchorId = typeof params.anchorId === "string" ? params.anchorId : null;
         const anchorId = effectiveAlignmentAnchorId(selectedForAlign, requestedAnchorId);
+        if (params.mode === "spread") {
+          const gap = params.gap === undefined || params.gap === null ? null : Number(params.gap);
+          if (gap !== null && !(Number.isFinite(gap) && gap >= 0)) throw new Error("align_objects gap must be a length of 0 mm or more");
+          const result = distributedShapesForSelection(currentShapes(), selectedForAlign, anchorId, axis, alignAxesForWorkplane(placementWorkplaneRef.current), gap);
+          const message = spreadMessage(result, axis, workspaceSettingsRef.current);
+          if (result.moved === 0) {
+            setSelectedIds(validIds);
+            selectedIdsRef.current = validIds;
+            setNotice(message);
+          } else {
+            commitShapes(result.nextShapes, validIds, message);
+          }
+          return {
+            moved: result.moved,
+            problem: result.problem,
+            gaps: result.gaps.map((value) => Number(value.toFixed(4))),
+            frameId: result.frameId,
+            selectedIds: validIds,
+            anchorId,
+            objects: (result.moved ? result.nextShapes : selectedForAlign).filter((shape) => validIds.includes(shape.id)).map(mcpShapeSummary),
+          };
+        }
+        if (!target) throw new Error("align_objects requires target min/center/max");
         if (params.mode === "size") {
           const sized = sizedShapesForSelection(currentShapes(), validIds, selectedForAlign, anchorId, axis, target, alignAxesForWorkplane(placementWorkplaneRef.current), alignSizeLimit);
           const message = sizedAlignmentMessage(sized, sizeAlignmentLabel(axis, target));
@@ -12243,7 +12312,7 @@ export function LayerlingEditor({
             objects: (sized.resized ? sized.nextShapes : selectedForAlign).filter((shape) => validIds.includes(shape.id)).map(mcpShapeSummary),
           };
         }
-        if (params.mode !== undefined && params.mode !== "position") throw new Error("align_objects mode must be position or size");
+        if (params.mode !== undefined && params.mode !== "position") throw new Error("align_objects mode must be position, size or spread");
         const { nextShapes, moved } = alignedShapesForSelection(currentShapes(), validIds, selectedForAlign, anchorId, axis, target, alignAxesForWorkplane(placementWorkplaneRef.current));
         if (moved === 0) {
           setSelectedIds(validIds);

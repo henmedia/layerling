@@ -790,6 +790,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "shortcuts.chamfer": "Ferramenta Chanfrar para o sólido selecionado (premir novamente para fechar)",
   "shortcuts.align": "Modo de alinhamento",
   "shortcuts.alignSize": "Num ponto de alinhamento: igualar o tamanho em vez de mover",
+  "shortcuts.alignSpread": "No ponto de espaçamento igual: escrever o espaço",
   "shortcuts.note": "Colocar uma nota",
   "shortcuts.carryOntoFace": "Levantar a seleção e pousá-la numa face (como a função Cruise do Tinkercad)",
   "shortcuts.dropToWorkplane": "Pousar a seleção no plano de trabalho",

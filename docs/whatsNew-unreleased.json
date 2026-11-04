@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Gleiche Abstände",
+      "en": "Equal gaps"
+    },
+    "body": {
+      "de": "Beim Ausrichten steht neben jeder Linie ein neuer Punkt: Er verteilt verschieden große Teile so, dass zwischen ihnen überall derselbe Abstand ist. Auf einem Brett bleibt derselbe Abstand zum Rand, mehrere Reihen werden Reihe für Reihe verteilt, und mit Alt tippst du den Abstand selbst ein.",
+      "en": "Align has a new dot beside each line: it spreads parts of different sizes so the space between them is the same everywhere. On a board the same gap stays at its edges, several rows are spread row by row, and with Alt you type the gap yourself."
+    }
+  }
+]

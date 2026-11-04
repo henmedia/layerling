@@ -48,6 +48,7 @@ layerling sits a step beyond Tinkercad towards Fusion 360: it is operated the sa
 - **Hole patterns.** Click a flat face and spread round, square, rectangular, hexagonal or slot holes over it, in a grid or staggered, with spacing, margin and depth - vents, speaker grilles and baskets in one step. Or set a ring of screw holes along its edge, with counterbores or countersinks if you like, or repeat a shape of your own over it, rivets or a diamond plate.
 - **Scale by percent.** Make one or many parts larger or smaller by a percentage - together, so the layout grows with them, or each in place.
 - **Match sizes.** Hold Alt on an align dot and the parts stretch instead of moving: to the side of another part, or to its width, length or height - to swap a box for a cylinder of the same size, for instance.
+- **Equal gaps.** Spread parts of different sizes so the space between them is the same everywhere - between the outer two, on a board with the same gap at its edges, or row by row, as for a peg puzzle; or type the gap.
 - **Measure and look inside.** Tape measure, rulers, a section view that cuts the model open, and a history slider to look back at earlier states.
 - **Real geometry underneath.** layerling keeps exact CAD shapes, not just a mesh, so a rounded edge stays a rounded edge – all the way into a STEP file for a full CAD program.
 

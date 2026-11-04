@@ -55,6 +55,14 @@ Une forme tournée selon un angle, disons de 45°, a sa boîte autour d'elle pou
 
 La clé est [[L]]. [[Esc]] annule.
 
+### Espacement égal
+
+À côté du point du milieu de chaque ligne se trouve un point plus large avec une barre de chaque côté. Il répartit trois formes ou plus dans cette direction pour que l'espace entre les bords voisins soit partout le même, quelle que soit la taille de chaque forme. La première et la dernière forme restent en place, celles du milieu se déplacent. Une rangée de trous de tailles différentes reçoit ainsi la même paroi entre eux. Survolez le point pour voir d'avance où vont les formes ; la barre d'état indique ensuite l'écart.
+
+Si une plaque fait partie de la sélection, plus longue dans cette direction que toutes les autres formes, les formes se répartissent sur elle : l'écart à ses bords est aussi grand que celui entre les formes, et une forme seule vient en son milieu. Les formes en plusieurs rangées, comme les animaux d'un puzzle à encastrer, sont réparties rangée par rangée ; les formes dont les boîtes se chevauchent en travers de la direction forment une rangée.
+
+Maintenez [[Alt]] et cliquez sur le point pour saisir l'écart vous-même, par exemple 5 mm : les formes s'alignent à cette distance, à partir de la première forme ou de celle cliquée en premier ; sur une plaque, la rangée vient en son milieu. Une forme verrouillée reste en place ; entre les formes extérieures, elle empêche donc l'espacement égal.
+
 ## Mise en miroir
 
 {{ui:editor.tool.mirror}} ([[M]], ou cliquez avec le bouton droit sur la sélection et choisissez-la) retourne la sélection sur un plan : {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} ou {{ui:mirror.topBottom}}. Cliquez sur la flèche de l'axe correspondant. C'est pratique pour les pièces symétriques : construisez une moitié, copiez-la et mettez la copie en miroir.

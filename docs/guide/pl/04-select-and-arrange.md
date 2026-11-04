@@ -63,6 +63,14 @@ Przytrzymaj [[Alt]] podczas wyrównywania, a kropki zmienią się w kwadraty: kl
 
 Odniesieniem jest kształt kliknięty jako pierwszy, a zmieniają się tylko pozostałe. Bez niego kropki przy bokach rozciągają wszystkie kształty do najdalszego boku, a kropka na środku nadaje im wszystkim rozmiar największego. Walec zostaje okrągły, więc rośnie też w drugim kierunku. Kształt obrócony pod kątem zostaje bez zmian, a kształty obrócone o 90° działają.
 
+### Równe odstępy
+
+Obok środkowego punktu każdej linii stoi szerszy punkt z kreską po każdej stronie. Rozkłada on trzy lub więcej kształtów w tym kierunku tak, żeby odstęp między sąsiednimi krawędziami był wszędzie taki sam, niezależnie od rozmiaru każdego kształtu. Pierwszy i ostatni kształt zostają na miejscu, te pomiędzy się przesuwają. Rząd otworów różnej wielkości dostaje w ten sposób tę samą ściankę między nimi. Najedź na punkt, a zobaczysz wcześniej, dokąd trafią kształty; pasek stanu poda potem odstęp.
+
+Jeśli wśród zaznaczonych kształtów jest płyta dłuższa w tym kierunku niż wszystkie inne, kształty rozkładają się na niej: odstęp od jej brzegów jest taki sam jak między kształtami, a pojedynczy kształt trafia na jej środek. Kształty w kilku rzędach, jak zwierzęta z układanki z uchwytami, są rozkładane rząd po rzędzie; kształty, których prostopadłościany zachodzą na siebie w poprzek kierunku, tworzą jeden rząd.
+
+Przytrzymaj [[Alt]] i kliknij punkt, żeby samemu wpisać odstęp, np. 5 mm: kształty ustawią się w takiej odległości, od pierwszego kształtu albo od tego, który kliknięto najpierw; na płycie rząd trafia na jej środek. Zablokowany kształt zostaje na miejscu, więc taki między skrajnymi kształtami uniemożliwia równe odstępy.
+
 ## Odbicie lustrzane
 
 {{ui:editor.tool.mirror}} ([[M]] albo prawy klik na zaznaczeniu i wybór tej opcji) odbija zaznaczenie względem płaszczyzny: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} albo {{ui:mirror.topBottom}}. Kliknij odpowiednią strzałkę osi. Przydaje się przy częściach symetrycznych: zbuduj jedną połowę, skopiuj ją i odbij kopię.

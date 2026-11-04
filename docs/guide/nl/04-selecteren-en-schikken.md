@@ -55,6 +55,14 @@ Een vorm die schuin staat, zeg 45° gedraaid, wordt uitgelijnd op het kader erom
 
 De toets is [[L]]. [[Esc]] annuleert.
 
+### Gelijke tussenruimte
+
+Naast de middelste punt van elke lijn staat een bredere punt met een streepje aan elke kant. Die verdeelt drie of meer vormen in die richting zo dat de ruimte tussen naburige randen overal gelijk is, hoe groot elke vorm ook is. De eerste en de laatste vorm blijven staan, die ertussen schuiven. Een rij gaten van verschillende maten krijgt zo overal dezelfde wand ertussen. Beweeg over de punt en je ziet vooraf waar de vormen heen gaan; de statusbalk noemt daarna de tussenruimte.
+
+Zit er tussen de gekozen vormen een plaat die in die richting langer is dan alle andere, dan worden de vormen daarop verdeeld: de ruimte tot de randen is even groot als die tussen de vormen, en één vorm komt in het midden. Vormen in meerdere rijen, zoals de dieren van een insteekpuzzel, worden rij voor rij verdeeld; vormen waarvan de kaders dwars op de richting overlappen, vormen één rij.
+
+Houd [[Alt]] ingedrukt en klik op de punt om de tussenruimte zelf in te typen, bijvoorbeeld 5 mm: de vormen komen dan zo ver uit elkaar te staan, vanaf de eerste vorm of vanaf de vorm die je eerst aanklikte; op een plaat komt de rij in het midden. Een vergrendelde vorm blijft staan, dus een tussen de buitenste vormen verhindert gelijke tussenruimte.
+
 ## Spiegelen
 
 {{ui:editor.tool.mirror}} ([[M]], of klik met rechts op de selectie en kies het) klapt de selectie om over een vlak: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} of {{ui:mirror.topBottom}}. Klik op de bijbehorende aspijl. Dat is handig voor symmetrische onderdelen: bouw één helft, kopieer die en spiegel de kopie.

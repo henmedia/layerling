@@ -523,7 +523,15 @@ export type AlignHandleStatus = {
   title: string;
   /** The same dot with Alt held: it stretches the parts to the reference instead of moving them (#998). */
   size?: { disabled: boolean; aligned: boolean; title: string };
+  /**
+   * On the middle dot of an axis: the dot beside the line that spreads the parts with equal gaps between them
+   * (alignDistribute.ts). `gapDisabled` and `gapTitle` are for Alt on it, which asks for a gap to type in.
+   */
+  spread?: { disabled: boolean; aligned: boolean; title: string; gapDisabled: boolean; gapTitle: string };
 };
+
+/** Equal gaps on the align dots: null spreads them evenly, a number is the gap typed in, in millimetres. */
+export type AlignSpread = { gap: number | null };
 
 export type SketchPoint = {
   id: string;

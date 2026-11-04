@@ -65,6 +65,14 @@ Hold [[Alt]] nede under justering, og punkterne bliver firkantede: et klik flytt
 
 Referencen er den form, du klikkede på først; kun de andre ændres. Uden en reference strækker sidepunkterne alle former til den yderste side, og midtpunktet giver dem alle den størstes størrelse. En cylinder bliver rund, så den vokser i den anden retning også. En form vendt i en vinkel forbliver som den er; former vendt 90° virker.
 
+### Lige store mellemrum
+
+Ved siden af det midterste punkt på hver linje står et bredere punkt med en streg på hver side. Det fordeler tre eller flere figurer i den retning, så mellemrummet mellem nabokanterne er det samme overalt, uanset hvor store figurerne er. Den første og den sidste figur bliver stående, dem imellem flytter sig. En række huller i forskellige størrelser får på den måde samme væg imellem sig. Hold musen over punktet, så ser du på forhånd, hvor figurerne havner; statuslinjen viser bagefter mellemrummet.
+
+Er der blandt de valgte figurer en plade, der er længere i den retning end alle de andre, fordeles figurerne på den: mellemrummet til dens kanter er lige så stort som mellemrummet mellem figurerne, og en enkelt figur kommer i midten. Figurer i flere rækker, som dyrene i et knoppuslespil, fordeles række for række; figurer, hvis kasser overlapper på tværs af retningen, udgør én række.
+
+Hold [[Alt]] nede og klik på punktet for selv at indtaste mellemrummet, fx 5 mm: figurerne stilles så langt fra hinanden, fra den første figur eller fra den, du klikkede først; på en plade kommer rækken i midten. En låst figur bliver stående, så en mellem de yderste figurer forhindrer lige store mellemrum.
+
 ## Spejling
 
 {{ui:editor.tool.mirror}} ([[M]], eller højreklik på markeringen og vælg den) vender markeringen over et plan: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} eller {{ui:mirror.topBottom}}. Klik den tilsvarende akse-pil. Det er handy for symmetriske dele: byg én halvdel, kopier den og spejl kopien.

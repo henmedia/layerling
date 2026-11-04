@@ -63,6 +63,14 @@ Hältst du beim Ausrichten [[Alt]] gedrückt, werden die Punkte zu Quadraten, un
 
 Bezug ist die Form, die du zuerst angeklickt hast; nur die anderen ändern sich. Ohne sie strecken die Seitenpunkte alle Formen bis an die äußerste Seite, und der Mittelpunkt gibt allen die Größe der größten. Ein Zylinder bleibt dabei rund, er wird also auch in der anderen Richtung breiter. Eine Form, die schräg gedreht ist, bleibt, wie sie ist; um 90° gedrehte Formen gehen.
 
+### Gleiche Abstände
+
+Neben dem mittleren Punkt jeder Linie steht ein breiterer Punkt mit einem Strich an jeder Seite. Er verteilt drei oder mehr Formen in dieser Richtung so, dass zwischen benachbarten Kanten überall derselbe Abstand ist, egal wie groß jede Form ist. Die erste und die letzte Form bleiben stehen, die dazwischen rücken. Eine Reihe verschieden großer Löcher bekommt so zum Beispiel überall dieselbe Wand dazwischen. Fährst du über den Punkt, siehst du vorher, wohin die Formen rücken; die Statuszeile nennt danach den Abstand.
+
+Ist unter den gewählten Formen ein Brett, das in dieser Richtung länger ist als alle anderen, verteilen sich die Formen darauf: Der Abstand zu seinen Rändern ist so groß wie der zwischen den Formen, und eine einzelne Form kommt in seine Mitte. Formen in mehreren Reihen, etwa die Tiere eines Steckpuzzles, werden Reihe für Reihe verteilt; Formen, deren Kästen sich quer zur Richtung überlappen, bilden eine Reihe. Das ganze Puzzle braucht dann einen Klick von links nach rechts und einen von vorn nach hinten.
+
+Halte [[Alt]] und klicke den Punkt, um den Abstand selbst einzutippen, etwa 5 mm: Die Formen reihen sich dann so weit auseinander auf, ab der ersten Form oder ab der, die du zuerst angeklickt hast; auf einem Brett kommt die Reihe in seine Mitte. Eine gesperrte Form bleibt stehen, eine zwischen den äußeren Formen verhindert also gleiche Abstände.
+
 ## Spiegeln
 
 {{ui:editor.tool.mirror}} ([[M]], oder per Rechtsklick auf die Auswahl) kippt die Auswahl an einer Ebene: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} oder {{ui:mirror.topBottom}}. Klicke dazu auf den passenden Achsenpfeil. Das ist praktisch für symmetrische Teile: Baue eine Hälfte, kopiere sie und spiegele die Kopie.

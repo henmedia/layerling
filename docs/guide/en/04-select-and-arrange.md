@@ -63,6 +63,14 @@ Hold [[Alt]] while aligning and the dots turn into squares: a click no longer mo
 
 The reference is the shape you clicked first; only the others change. Without one, the side dots stretch all shapes to the farthest side, and the middle dot gives them all the size of the largest. A cylinder stays round, so it grows in the other direction too. A shape turned at an angle stays as it is; shapes turned by 90° work.
 
+### Equal gaps
+
+Beside the middle point of each line stands a wider dot with a bar on each side. It spreads three or more shapes in that direction so that the space between neighbouring edges is the same everywhere, whatever size each shape is. The first and the last shape stay where they are, the ones between move. A row of holes of different sizes gets the same wall between them, for example. Move over the dot and you see beforehand where the shapes go; the status bar then tells you the gap.
+
+If a board is among the selected shapes, longer in that direction than all the others, the shapes are spread on it: the gap at its edges is as large as the one between them, and a single shape comes to its middle. Shapes in several rows, such as the animals of a peg puzzle, are spread row by row; shapes whose boxes overlap across the direction form one row. The whole puzzle then takes one click from left to right and one from front to back.
+
+Hold [[Alt]] and click the dot to type the gap yourself, say 5 mm: the shapes line up that far apart, starting at the first shape or at the one you clicked first; on a board the row comes to its middle. A locked shape stays where it is, so one between the outer shapes stops the equal gaps.
+
 ## Mirroring
 
 {{ui:editor.tool.mirror}} ([[M]], or right-click the selection and choose it) flips the selection across a plane: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} or {{ui:mirror.topBottom}}. Click the matching axis arrow. That is handy for symmetric parts: build one half, copy it and mirror the copy.

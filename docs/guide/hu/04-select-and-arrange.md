@@ -55,6 +55,14 @@ Egy szögben, mondjuk 45°-kal elforgatott alakzatnál a körülötte lévő dob
 
 A billentyűje az [[L]]. Az [[Esc]] megszakítja.
 
+### Egyenlő közök
+
+Minden vonal középső pontja mellett egy szélesebb pont áll, mindkét oldalán egy vonással. Ez három vagy több formát úgy oszt el abban az irányban, hogy a szomszédos élek közti hely mindenhol ugyanakkora legyen, akármekkora is egy-egy forma. Az első és az utolsó forma helyben marad, a köztük lévők elmozdulnak. Egy sor különböző méretű lyuk így mindenhol ugyanolyan falat kap. Vidd az egeret a pont fölé, és előre látod, hová kerülnek a formák; az állapotsor utána megadja a közt.
+
+Ha a kijelölt formák között van egy lap, amely abban az irányban hosszabb az összes többinél, a formák ezen oszlanak el: a széleitől mért köz ugyanakkora, mint a formák közötti, és egyetlen forma a közepére kerül. Több sorban álló formák, például egy fogós kirakó állatai, soronként oszlanak el; azok a formák, amelyek dobozai az irányra keresztben átfedik egymást, egy sort alkotnak.
+
+Tartsd lenyomva az [[Alt]] billentyűt, és kattints a pontra, ha magad írnád be a közt, például 5 mm-t: a formák ilyen távolságra sorakoznak, az első formától vagy attól, amelyre először kattintottál; egy lapon a sor a közepére kerül. Egy zárolt forma helyben marad, így ha a szélső formák között van, megakadályozza az egyenlő közöket.
+
 ## Tükrözés
 
 A {{ui:editor.tool.mirror}} ([[M]], vagy jobb kattintás a kijelölésen és kiválasztás) egy síkra tükrözi a kijelölést: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} vagy {{ui:mirror.topBottom}}. Kattints a megfelelő tengelynyílra. Ez szimmetrikus alkatrészeknél hasznos: építsd meg az egyik felét, másold le, és tükrözd a másolatot.

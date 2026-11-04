@@ -63,6 +63,14 @@ Si mantienes pulsado [[Alt]] al alinear, los puntos se convierten en cuadrados: 
 
 La referencia es la forma en la que hiciste clic primero; solo cambian las demás. Sin referencia, los puntos de los lados estiran todas las formas hasta el lado más alejado, y el punto del centro les da a todas el tamaño de la más grande. Un cilindro sigue siendo redondo, así que también crece en la otra dirección. Una forma girada en ángulo se queda como está; las giradas 90° sí funcionan.
 
+### Espaciado igual
+
+Junto al punto central de cada línea hay un punto más ancho con una barra a cada lado. Reparte tres o más formas en esa dirección para que el espacio entre bordes vecinos sea el mismo en todas partes, sea cual sea el tamaño de cada forma. La primera y la última forma se quedan donde están; las de en medio se mueven. Así una fila de agujeros de distintos tamaños tiene la misma pared entre ellos. Pasa por encima del punto y verás antes adónde van las formas; la barra de estado indica luego la separación.
+
+Si entre las formas seleccionadas hay una base más larga en esa dirección que todas las demás, las formas se reparten sobre ella: la separación a sus bordes es igual a la que hay entre las formas, y una sola forma queda en su centro. Las formas en varias filas, como los animales de un puzle de encajar, se reparten fila por fila; las formas cuyas cajas se solapan en sentido transversal forman una fila.
+
+Mantén [[Alt]] y haz clic en el punto para escribir tú la separación, por ejemplo 5 mm: las formas se alinean a esa distancia, desde la primera forma o desde la que pulsaste primero; sobre una base, la fila queda en su centro. Una forma bloqueada no se mueve, así que una entre las formas exteriores impide el espaciado igual.
+
 ## Reflejar
 
 {{ui:editor.tool.mirror}} ([[M]], o haz clic derecho en la selección y elígelo) refleja la selección respecto a un plano: {{ui:mirror.leftRight}}, {{ui:mirror.frontBack}} o {{ui:mirror.topBottom}}. Haz clic en la flecha del eje correspondiente. Es muy práctico para piezas simétricas: construye una mitad, cópiala y refleja la copia.

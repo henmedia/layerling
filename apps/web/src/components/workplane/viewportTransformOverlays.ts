@@ -716,6 +716,9 @@ export function drawnShapesBounds(state: ThreeState, ids: string[]): THREE.Box3 
   return bounds.isEmpty() ? null : bounds;
 }
 
+/** How far, in screen pixels, the equal-gaps dot of an axis stands out from the middle dot of its line. */
+const ALIGN_SPREAD_OFFSET = 26;
+
 export function syncAlignOverlay(
   state: ThreeState,
   shapes: WorkplaneShape[],
@@ -824,6 +827,7 @@ export function syncAlignOverlay(
   const targets: AlignTarget[] = ["min", "center", "max"];
   const handles: AlignOverlayState["handles"] = [];
   const guides: AlignOverlayState["guides"] = [];
+  const spreads: AlignOverlayState["spreads"] = [];
   groups.forEach(({ axis, points, bases, along }) => {
     const projected = points.map(project);
     const baseScreen = bases.map(project);
@@ -845,13 +849,27 @@ export function syncAlignOverlay(
       if (!status) return;
       handles.push({ ...status, key: `${axis}-${target}`, x: spread[index].x, y: spread[index].y });
     });
+    // Equal gaps: a dot of its own beside the middle of the line, further out from the box, where it is clear
+    // of the other two lines that meet this one at its ends.
+    const even = statusByKey.get(`${axis}:center`)?.spread;
+    if (even) {
+      const base = baseScreen[1]!;
+      let out = { x: spread[1].x - base.x, y: spread[1].y - base.y };
+      let length = Math.hypot(out.x, out.y);
+      if (length < 1) {
+        out = { x: -direction.y, y: direction.x };
+        length = Math.hypot(out.x, out.y) || 1;
+      }
+      const angle = (Math.atan2(spread[2].y - spread[0].y, spread[2].x - spread[0].x) * 180) / Math.PI;
+      spreads.push({ ...even, axis, key: `${axis}-spread`, x: spread[1].x + (out.x / length) * ALIGN_SPREAD_OFFSET, y: spread[1].y + (out.y / length) * ALIGN_SPREAD_OFFSET, angle });
+    }
   });
   if (handles.length === 0) {
     clear();
     return;
   }
 
-  const next = { guides, handles };
+  const next = { guides, handles, spreads };
 
   overlayRef.current = next;
   setOverlay(next);

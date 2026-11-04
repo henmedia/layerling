@@ -48,6 +48,7 @@ layerling ist ein Stück weiter als Tinkercad in Richtung Fusion 360 und wird ge
 - **Lochmuster.** Eine ebene Fläche anklicken und runde, quadratische, rechteckige, sechseckige oder Langlöcher darauf verteilen, im Raster oder versetzt, mit Abstand, Rand und Tiefe - Lüftungsgitter, Lautsprecher und Körbe in einem Schritt. Oder einen Kranz von Schraubenlöchern entlang der Kante setzen, auf Wunsch mit Stufen- oder Senkbohrung, oder eine eigene Form darüber wiederholen, Nieten oder ein Riffelblech.
 - **Um Prozent skalieren.** Ein oder viele Teile um einen Prozentwert größer oder kleiner machen - zusammen, so dass die Anordnung mitwächst, oder jedes an seinem Platz.
 - **Größe angleichen.** Mit Alt auf einem Ausrichtungspunkt werden die Teile gestreckt statt verschoben: bis an die Kante eines anderen Teils oder auf seine Breite, Länge oder Höhe - etwa um einen Quader gegen einen gleich großen Zylinder zu tauschen.
+- **Gleiche Abstände.** Verschieden große Teile so verteilen, dass zwischen ihnen überall derselbe Abstand ist - zwischen den beiden äußeren, auf einem Brett mit demselben Abstand zum Rand oder Reihe für Reihe, etwa für ein Steckpuzzle; oder den Abstand eintippen.
 - **Messen und hineinschauen.** Maßband, Lineale, eine Schnittansicht, die das Modell aufschneidet, und ein Verlauf-Schieber zum Zurückschauen.
 - **Echte Geometrie darunter.** layerling führt exakte CAD-Körper mit, nicht nur ein Dreiecksnetz. Eine verrundete Kante bleibt deshalb eine verrundete Kante – bis in eine STEP-Datei für ein vollwertiges CAD.
 

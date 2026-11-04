@@ -76,7 +76,7 @@ import { showsTouchMultiSelect } from "@/lib/touchMultiSelect";
 import { narrowCrossWidth, narrowEndWidth, normalizeSlopeSide, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight } from "@/lib/slopeAlong";
 import { TransformOverlay, continuousSnappedWheelRotation, getElevationMeasureKey, measureKeyForHandle, ROTATION_WHEEL_SHIFT_SNAP_DEGREES, ROTATION_WHEEL_SNAP_DEGREES, snappedRotationDelta, snappedWheelRotation, type DimensionMark, type EditingCorner, type EditingDimension, type EditingRotation, type PinnedRotationWheelView, type RotationAxis, type RotationPlaneView, type RotationReadout, type TransformHandleKind, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
-import type { AlignAxis, AlignHandleStatus, AlignTarget, GridSize, MeasurementAccuracy, ShapeAsset, WorkplaneNote, WorkplaneNoteAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, GridSize, MeasurementAccuracy, ShapeAsset, WorkplaneNote, WorkplaneNoteAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { referencePoints } from "@/lib/workplaneNotes";
 import { pivotHeightRange, pivotPlateReach } from "@/lib/zoomPivot";
 import { pointerReach } from "@/lib/pointerReach";
@@ -174,9 +174,9 @@ type WorkplaneViewportProps = {
   onCancelCruise?: () => void;
   onAlignAnchorChange: (id: string) => void;
   /** `size`: Alt is held, and the dot stretches the parts instead of moving them (#998). */
-  onAlignPreview: (axis: AlignAxis, target: AlignTarget, size: boolean) => void;
+  onAlignPreview: (axis: AlignAxis, target: AlignTarget, size: boolean, spread?: AlignSpread) => void;
   onAlignPreviewClear: () => void;
-  onAlignSelection: (axis: AlignAxis, target: AlignTarget, size: boolean) => void;
+  onAlignSelection: (axis: AlignAxis, target: AlignTarget, size: boolean, spread?: AlignSpread) => void;
   onMirrorPreview: (axis: AlignAxis) => void;
   onMirrorPreviewClear: () => void;
   onMirrorSelection: (axis: AlignAxis) => void;
@@ -8440,9 +8440,9 @@ export function WorkplaneViewport({
             <AlignOverlay
               overlay={alignOverlay}
               onAlign={onAlignSelection}
-              onPreview={(axis, target, size) => {
+              onPreview={(axis, target, size, spread) => {
                 if (threeRef.current) threeRef.current.alignPreviewActive = true;
-                onAlignPreview(axis, target, size);
+                onAlignPreview(axis, target, size, spread);
               }}
               onPreviewClear={() => {
                 if (threeRef.current) threeRef.current.alignPreviewActive = false;
