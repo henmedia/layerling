@@ -20,7 +20,7 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 
 **與切片軟體一致的滑鼠按鍵。** 如果你習慣了 Bambu Studio 或 OrcaSlicer，在設定的 {{ui:workspace.appearance}} 下把 {{ui:workspace.mouseScheme}} 設為 {{ui:workspace.mouseSchemeSlicer}}。這樣在空白處左鍵拖曳會轉動檢視，右鍵像中鍵一樣平移檢視，Shift 加左鍵拖曳會畫出選取框。拖曳實體仍會移動它，短按右鍵仍會開啟選單。在草圖中右鍵同樣平移檢視。
 
-**3D 滑鼠。** SpaceMouse 或其他 3D 滑鼠可以轉動、平移和縮放 3D 檢視：把帽往前推即可放大，滑動它平移檢視，傾斜它傾斜檢視，扭轉它轉動檢視。在設定的 {{ui:workspace.appearance}} 下點擊 {{ui:workspace.spaceMouseConnect}}，並在瀏覽器開啟的視窗中選擇裝置；瀏覽器會記住這個選擇，所以只需做一次。這在能存取此類裝置的 Chrome 與 Edge 中可用；Firefox 與 Safari 不行。
+**3D 滑鼠。** SpaceMouse 或其他 3D 滑鼠可以轉動、平移和縮放 3D 檢視：把帽往前推即可放大，滑動它平移檢視，傾斜它傾斜檢視，扭轉它轉動檢視。在設定的 {{ui:workspace.appearance}} 下點擊 {{ui:workspace.spaceMouseConnect}}，並在瀏覽器開啟的視窗中選擇裝置；瀏覽器會記住這個選擇，所以只需做一次。這在能存取此類裝置的 Chrome 與 Edge 中可用；Firefox 與 Safari 不行。如果某個方向的操作反了，請在按鈕下方勾選它：左右平移、上下平移、縮放、傾斜或扭轉。
 
 在平板或手機上，兩根手指可縮放（張開與捏合）並平移檢視（併攏滑動）。一根手指在空白處會轉動檢視，在那裡輕點則清除選取；落在形狀或控制點上時，則如同滑鼠左鍵般操作設計。若要讓從形狀上開始的手指也能轉動檢視，請開啟檢視列中的 {{ui:camera.touchRotate}}。這個開關只會在具有觸控螢幕的裝置上顯示。
 

@@ -42,22 +42,59 @@ const TURN_PER_SECOND = 2.2;
 const SHIFT_PER_SECOND = 0.9;
 const ZOOM_PER_SECOND = 3;
 
+/** The directions a person can turn round (#1013): shifting sideways, shifting up and down, zooming, tilting and twisting. */
+export type SpaceMouseInvert = { shift: boolean; lift: boolean; zoom: boolean; tilt: boolean; twist: boolean };
+
+export const SPACE_MOUSE_NO_INVERT: SpaceMouseInvert = { shift: false, lift: false, zoom: false, tilt: false, twist: false };
+
+const INVERT_KEY = "layerling.spaceMouseInvert";
+export const SPACE_MOUSE_INVERT_EVENT = "layerling:spacemouse-invert";
+
+/** The reversed directions the person ticked in the settings; none where the browser keeps nothing. */
+export function readSpaceMouseInvert(): SpaceMouseInvert {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(INVERT_KEY) ?? "{}") as Partial<SpaceMouseInvert>;
+    return {
+      shift: stored.shift === true,
+      lift: stored.lift === true,
+      zoom: stored.zoom === true,
+      tilt: stored.tilt === true,
+      twist: stored.twist === true,
+    };
+  } catch {
+    return SPACE_MOUSE_NO_INVERT;
+  }
+}
+
+export function saveSpaceMouseInvert(invert: SpaceMouseInvert) {
+  try {
+    window.localStorage.setItem(INVERT_KEY, JSON.stringify(invert));
+  } catch {
+    // The choice then holds until the page is closed.
+  }
+  window.dispatchEvent(new Event(SPACE_MOUSE_INVERT_EVENT));
+}
+
 /**
- * Moves the camera for `seconds` of the cap held as `axes`, around `target`, the way a 3D mouse moves the model in CAD
- * programs: shifting the cap left, right, up or down shifts the view, pushing it away zooms in, tilting it forward or back
- * tilts the view, and twisting it turns the view about the up axis. Returns whether anything moved.
+ * Moves the camera for `seconds` of the cap held as `axes`, around `target`, the way a 3D mouse moves the view in CAD
+ * programs: shifting the cap left, right, up or down shifts the model that way on the screen, pushing it away zooms in,
+ * tilting it forward or back tilts the view, and twisting it turns the view about the up axis. `invert` turns single
+ * directions round. Returns whether anything moved.
  */
 export function moveCameraBySpaceMouse(
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera,
   target: THREE.Vector3,
   axes: SpaceMouseAxes,
   seconds: number,
+  invert: SpaceMouseInvert = SPACE_MOUSE_NO_INVERT,
 ): boolean {
-  const shiftX = spaceMouseAmount(axes.tx);
-  const shiftUp = -spaceMouseAmount(axes.tz);
-  const push = spaceMouseAmount(axes.ty);
-  const tilt = spaceMouseAmount(axes.rx);
-  const twist = spaceMouseAmount(axes.rz);
+  const way = (turned: boolean) => (turned ? -1 : 1);
+  // First reports from a real device (Ciwa, 04.11.2026): the four shifts and turns below ran the wrong way round, zoom was right.
+  const shiftX = -spaceMouseAmount(axes.tx) * way(invert.shift);
+  const shiftUp = spaceMouseAmount(axes.tz) * way(invert.lift);
+  const push = spaceMouseAmount(axes.ty) * way(invert.zoom);
+  const tilt = -spaceMouseAmount(axes.rx) * way(invert.tilt);
+  const twist = -spaceMouseAmount(axes.rz) * way(invert.twist);
   if (!shiftX && !shiftUp && !push && !tilt && !twist) return false;
   const offset = camera.position.clone().sub(target);
   const distance = offset.length();

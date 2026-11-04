@@ -1,5 +1,13 @@
 import { useEffect, type RefObject } from "react";
-import { moveCameraBySpaceMouse, readSpaceMouseReport, SPACE_MOUSE_FILTERS, SPACE_MOUSE_REST, type SpaceMouseAxes } from "@/lib/spaceMouse";
+import {
+  moveCameraBySpaceMouse,
+  readSpaceMouseInvert,
+  readSpaceMouseReport,
+  SPACE_MOUSE_FILTERS,
+  SPACE_MOUSE_INVERT_EVENT,
+  SPACE_MOUSE_REST,
+  type SpaceMouseAxes,
+} from "@/lib/spaceMouse";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 
 /** The parts of WebHID used here; TypeScript's own library does not describe it yet. */
@@ -59,6 +67,10 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
     const hid = webHid();
     if (!hid) return;
     let axes: SpaceMouseAxes = SPACE_MOUSE_REST;
+    let invert = readSpaceMouseInvert();
+    const onInvert = () => {
+      invert = readSpaceMouseInvert();
+    };
     let frame = 0;
     let last = 0;
     let disposed = false;
@@ -69,7 +81,7 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
       last = now;
       const state = threeRef.current;
       if (!state || document.visibilityState !== "visible") return;
-      if (!moveCameraBySpaceMouse(state.camera, state.controls.target, axes, seconds)) return;
+      if (!moveCameraBySpaceMouse(state.camera, state.controls.target, axes, seconds, invert)) return;
       state.cameraTurn = null;
       state.controls.update();
       state.needsRender = true;
@@ -113,12 +125,14 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
     hid.addEventListener("connect", onConnect);
     hid.addEventListener("disconnect", onDisconnect);
     window.addEventListener(SPACE_MOUSE_EVENT, scan);
+    window.addEventListener(SPACE_MOUSE_INVERT_EVENT, onInvert);
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
       hid.removeEventListener("connect", onConnect);
       hid.removeEventListener("disconnect", onDisconnect);
       window.removeEventListener(SPACE_MOUSE_EVENT, scan);
+      window.removeEventListener(SPACE_MOUSE_INVERT_EVENT, onInvert);
       devices.forEach((device) => {
         device.removeEventListener("inputreport", onReport);
         void device.close().catch(() => {});

@@ -4876,6 +4876,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .font-picker-option.act
   color: #5a5a5a;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-space-mouse-invert {
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-space-mouse-invert-title {
+  color: #5a5a5a;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .workspace-history-range-control input {
   accent-color: #cf710f;
 }

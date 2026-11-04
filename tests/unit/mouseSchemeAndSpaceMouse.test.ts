@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { describe, expect, it } from "vitest";
 import { cameraButtonsFor, slicerLeftTurn } from "@/lib/cameraMouseButtons";
 import { isSketchPanGesture } from "@/lib/sketchPointerControls";
-import { moveCameraBySpaceMouse, readSpaceMouseReport, SPACE_MOUSE_REST, spaceMouseAmount } from "@/lib/spaceMouse";
+import { moveCameraBySpaceMouse, readSpaceMouseReport, SPACE_MOUSE_NO_INVERT, SPACE_MOUSE_REST, spaceMouseAmount } from "@/lib/spaceMouse";
 import { DEFAULT_WORKPLANE_WORKSPACE, normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 
 describe("mouse buttons as in Bambu Studio and OrcaSlicer (#1013)", () => {
@@ -97,11 +97,33 @@ describe("a 3D mouse over WebHID (#1013)", () => {
     expect(Math.abs(camera.position.x)).toBeGreaterThan(1);
   });
 
-  it("shifts camera and target together when the cap is shifted sideways", () => {
+  it("shifts camera and target together when the cap is shifted sideways, the model following the cap", () => {
     const { camera, target } = view();
     moveCameraBySpaceMouse(camera, target, { ...SPACE_MOUSE_REST, tx: 350 }, 0.1);
-    expect(target.x).toBeGreaterThan(0);
+    // Cap to the right: the model goes right, so the view looks to the left (the first real device, Ciwa, 04.11.2026).
+    expect(target.x).toBeLessThan(0);
     expect(camera.position.x).toBeCloseTo(target.x, 6);
     expect(camera.position.clone().sub(target).length()).toBeCloseTo(Math.hypot(100, 200), 6);
+  });
+
+  it("goes the other way for every direction the person turned round, and only for that one", () => {
+    const run = (axes: Partial<typeof SPACE_MOUSE_REST>, invert = SPACE_MOUSE_NO_INVERT) => {
+      const { camera, target } = view();
+      moveCameraBySpaceMouse(camera, target, { ...SPACE_MOUSE_REST, ...axes }, 0.1, invert);
+      return { camera, target };
+    };
+    expect(run({ tx: 350 }, { ...SPACE_MOUSE_NO_INVERT, shift: true }).target.x).toBeGreaterThan(0);
+    expect(run({ tx: 350 }, { ...SPACE_MOUSE_NO_INVERT, zoom: true }).target.x).toBeLessThan(0);
+    // Lifting the cap lifts the model, so the view goes down; turned round it goes up.
+    expect(run({ tz: -350 }).target.y).toBeLessThan(0);
+    expect(run({ tz: -350 }, { ...SPACE_MOUSE_NO_INVERT, lift: true }).target.y).toBeGreaterThan(0);
+    const before = view().camera.position.distanceTo(new THREE.Vector3());
+    expect(run({ ty: 350 }).camera.position.distanceTo(new THREE.Vector3())).toBeLessThan(before);
+    expect(run({ ty: 350 }, { ...SPACE_MOUSE_NO_INVERT, zoom: true }).camera.position.distanceTo(new THREE.Vector3())).toBeGreaterThan(before);
+    const twisted = run({ rz: 350 }).camera.position.x;
+    expect(run({ rz: 350 }, { ...SPACE_MOUSE_NO_INVERT, twist: true }).camera.position.x).toBeCloseTo(-twisted, 6);
+    const tilted = run({ rx: 350 }).camera.position.y;
+    const tiltedBack = run({ rx: 350 }, { ...SPACE_MOUSE_NO_INVERT, tilt: true }).camera.position.y;
+    expect(Math.sign(tiltedBack - 100)).toBe(-Math.sign(tilted - 100));
   });
 });

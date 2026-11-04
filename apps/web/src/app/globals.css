@@ -11859,6 +11859,30 @@ html[data-theme="dark"] .font-picker-option.action {
   font-weight: 700;
 }
 
+.workspace-space-mouse-invert {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.workspace-space-mouse-invert-title {
+  flex-basis: 100%;
+  color: #756657;
+  font-weight: 700;
+}
+
+.workspace-space-mouse-invert label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .workspace-history-setting {
   display: grid;
   gap: 12px;
