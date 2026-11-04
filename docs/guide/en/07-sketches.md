@@ -54,6 +54,8 @@ Values can be typed too. A selected point shows {{ui:sketch.selectionX}} and {{u
 
 Click a corner point where **two straight lines** meet: next to the lengths, layerling shows the **angle** between them in degrees, with a small arc. On a closed outline it is the angle inside the shape, so a dent reads above 180°. Click the value and type a new angle. One of the two lines then turns about the corner and keeps its length, and the other stays where it is. The line that turns is drawn dashed; [[Tab]] switches to the other one, [[Enter]] applies and [[Esc]] cancels. What hangs at the far end of the turned line goes with it.
 
+A locked point stays where it is, and a typed value works round it: a length moves the free end of the line, and an angle turns the line whose far end is free. A single point can be locked as well: select it and press [[Ctrl]]+[[L]]. That way you can make an outline exact one corner after the other: lock a corner, type the length and the angle of the next line, lock its end, and go on.
+
 Moving a point changes three angles: at the point itself and at the two neighbouring corners at the far ends of its lines. So layerling shows those two as well, and each can be clicked and typed. That way you set, say, the bottom left corner to 75.5° while the top left point, which moves for it, is selected. You can calculate here too, e.g. "90-14.5".
 
 A corner shows no angle where a curve meets it, or where more than two lines meet. The {{ui:sketch.showMeasurements}} button on the sketch toolbar hides the angle together with the lengths.

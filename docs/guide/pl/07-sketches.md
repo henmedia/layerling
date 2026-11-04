@@ -54,6 +54,8 @@ Wartości można też wpisać. Zaznaczony punkt pokazuje na pasku {{ui:sketch.se
 
 Kliknij punkt narożny, w którym spotykają się **dwie proste linie**: obok długości layerling pokazuje **kąt** między nimi w stopniach, z małym łukiem. Na zamkniętym konturze to kąt wewnątrz kształtu, więc wcięcie ma ponad 180°. Kliknij wartość i wpisz nowy kąt. Jedna z dwóch linii obraca się wtedy wokół narożnika i zachowuje długość, a druga zostaje na miejscu. Obracana linia jest rysowana przerywaną kreską. [[Tab]] przełącza na drugą, [[Enter]] stosuje, a [[Esc]] anuluje. To, co wisi na dalszym końcu obracanej linii, obraca się razem z nią.
 
+Zablokowany punkt zostaje na miejscu, a wpisana wartość się do tego dostosowuje: długość przesuwa wolny koniec linii, a kąt obraca linię, której dalszy koniec jest wolny. Można też zablokować pojedynczy punkt: zaznacz go i naciśnij [[Ctrl]]+[[L]]. Tak dokładnie ustawisz kontur narożnik po narożniku: zablokuj narożnik, wpisz długość i kąt następnej linii, zablokuj jej koniec i idź dalej.
+
 Przesunięcie punktu zmienia trzy kąty: przy samym punkcie i przy dwóch sąsiednich narożnikach na dalszych końcach jego linii. Dlatego layerling pokazuje także te dwa, a każdy można kliknąć i wpisać. Tak ustawisz na przykład lewy dolny narożnik na 75,5°, gdy zaznaczony jest lewy górny punkt, który się przy tym przesuwa. Tu też możesz liczyć, np. „90-14.5”.
 
 Narożnik nie pokazuje kąta tam, gdzie dochodzi do niego krzywa albo gdzie spotykają się więcej niż dwie linie. Przycisk {{ui:sketch.showMeasurements}} na pasku narzędzi szkicu ukrywa kąt razem z długościami.

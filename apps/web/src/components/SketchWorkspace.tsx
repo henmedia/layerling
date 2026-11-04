@@ -38,7 +38,7 @@ import { resizePointerOnGrid } from "@/lib/sketchFrameResize";
 import { viewArrowStep } from "@/lib/viewArrowKeys";
 import { resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type SelectionBounds } from "@/lib/sketchSelectionResize";
 import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } from "@/lib/sketchAlign";
-import { changesLockedOutline, sketchLockState } from "@/lib/sketchLock";
+import { changesLockedOutline, lockedCornerTurn, lockedLengthAnchor, sketchLockState } from "@/lib/sketchLock";
 import { dragRotationDegrees, rotateSketchPointsAbout, sketchPointsPivot, sketchTurnRing, sketchTurnStep, SKETCH_TURN_RING_STEP } from "@/lib/sketchRotation";
 import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, uncropImage } from "@/lib/sketchImageTransform";
 import { MAX_TRACE_CORNER_ANGLE, MIN_TRACE_CORNER_ANGLE, type PictureTrace, type TracePart } from "@/lib/pictureTrace";
@@ -1221,11 +1221,12 @@ export function SketchWorkspace({
     const length = parseLengthMm(editingDimension.value);
     const segment = profile.segments.find((entry) => entry.id === editingDimension.segmentId);
     if (segment && Number.isFinite(length) && length > 0.001) {
-      const anchor = symmetric
+      // A locked end (#629) stays, whatever end the selection asks to keep.
+      const anchor = lockedLengthAnchor(segment, profile.points, symmetric
         ? SEGMENT_DIMENSION_CENTER
         : selectedPoint?.id === segment.endId ? segment.startId
         : selectedPoint?.id === segment.startId ? segment.endId
-        : segment.startId;
+        : segment.startId);
       const updatedPoints = applySegmentDimension(segment, profile.points, length, anchor);
       if (updatedPoints !== profile.points) onTransformPoints(updatedPoints, t("sketch.dimensionUpdated"));
     }
@@ -1253,8 +1254,10 @@ export function SketchWorkspace({
   const angleEditDoneRef = useRef(false);
   const startAngleEdit = useCallback((pointId: string, value: string, sketchPos: { x: number; z: number }) => {
     angleEditDoneRef.current = false;
-    setEditingAngle({ pointId, value, turn: "after", sketchPos });
-  }, []);
+    // The line that turns is the one whose far end is free (#629), and it is shown while typing.
+    const corner = sketchCornerAt(profile, pointId);
+    setEditingAngle({ pointId, value, turn: corner ? lockedCornerTurn(corner, "after") : "after", sketchPos });
+  }, [profile]);
   const cancelAngleEdit = useCallback(() => {
     angleEditDoneRef.current = true;
     setEditingAngle(null);
@@ -1266,7 +1269,7 @@ export function SketchWorkspace({
     const degrees = parseMeasurementInput(editingAngle.value);
     const corner = sketchCornerAt(profile, editingAngle.pointId);
     if (corner && Number.isFinite(degrees)) {
-      const updatedPoints = applyCornerAngle(profile.points, corner, degrees, turnOverride ?? editingAngle.turn);
+      const updatedPoints = applyCornerAngle(profile.points, corner, degrees, lockedCornerTurn(corner, turnOverride ?? editingAngle.turn));
       if (updatedPoints !== profile.points) onTransformPoints(updatedPoints, t("sketch.angleUpdated"));
     }
     setEditingAngle(null);
@@ -3366,7 +3369,12 @@ export function SketchWorkspace({
                 }
                 if (event.key === "Tab") {
                   event.preventDefault();
-                  setEditingAngle((prev) => prev ? { ...prev, turn: prev.turn === "after" ? "before" : "after" } : null);
+                  // A line whose far end is locked (#629) cannot turn, so Tab stays on the free one.
+                  setEditingAngle((prev) => {
+                    if (!prev) return null;
+                    const toggled = prev.turn === "after" ? "before" : "after";
+                    return { ...prev, turn: editingCorner ? lockedCornerTurn(editingCorner, toggled) : toggled };
+                  });
                 }
                 if (event.key === "Escape") {
                   event.preventDefault();

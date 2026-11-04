@@ -18,5 +18,15 @@
       "de": "Das neue Skizzenwerkzeug Freihand (Taste 5) nimmt einen Strich mit Stift, Finger oder Maus und macht beim Absetzen wenige Punkte daraus, die du danach ziehen kannst: Ecken, wo er scharf abbog, weiche Kurven dazwischen. Endet er an seinem Anfang, wird ein Umriss daraus, der zum Körper werden kann.",
       "en": "The new sketch tool Freehand (key 5) takes a stroke drawn with a pen, a finger or the mouse and, when you lift it, makes a few points of it that you can drag afterwards: corners where it turned sharply, smooth curves in between. If it ends where it began, it becomes an outline that can turn into a body."
     }
+  },
+  {
+    "title": {
+      "de": "Getippte Maße lassen gesperrte Punkte stehen",
+      "en": "Typed sizes keep locked points"
+    },
+    "body": {
+      "de": "Tippst du in der Skizze eine Länge oder einen Winkel ein, bleibt ein gesperrter Punkt (Strg+L) jetzt stehen: Die Länge bewegt das freie Ende der Linie, der Winkel dreht die Linie, deren anderes Ende frei ist. So machst du einen Umriss Ecke für Ecke genau: Ecke sperren, Länge und Winkel der nächsten Linie eintippen, ihr Ende sperren und weiter.",
+      "en": "When you type a length or an angle in a sketch, a locked point (Ctrl+L) now stays where it is: the length moves the free end of the line, the angle turns the line whose far end is free. So you can make an outline exact corner by corner: lock a corner, type the length and the angle of the next line, lock its end, and go on."
+    }
   }
 ]

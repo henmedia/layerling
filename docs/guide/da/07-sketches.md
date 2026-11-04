@@ -54,6 +54,8 @@ Værdier kan også tastes. Et markeret punkt viser {{ui:sketch.selectionX}} og {
 
 Klik et hjørnepunkt hvor to **lige linjer** mødes: ved siden af længderne viser layerling **vinklen** mellem dem i grader, med en lille bue. På et lukket omrids er det vinklen inden i formen, så en bule læses over 180°. Klik værdien og tast en ny vinkel. En af de to linjer drejer så om hjørnet og bevarer sin længde, og den anden bliver hvor den er. Linjen der drejer er tegnet stiplet; [[Tab]] skifter til den anden, [[Enter]] anvender og [[Esc]] annullerer. Hvad der hænger i den yderste ende af den drejede linje følger med.
 
+Et låst punkt bliver, hvor det er, og en indtastet værdi tager hensyn til det: en længde flytter linjens frie ende, og en vinkel drejer den linje, hvis yderste ende er fri. Også et enkelt punkt kan låses: vælg det og tryk [[Ctrl]]+[[L]]. Sådan gør du et omrids nøjagtigt hjørne for hjørne: lås et hjørne, skriv længden og vinklen på den næste linje, lås dens ende og fortsæt.
+
 At flytte et punkt ændrer tre vinkler: ved punktet selv og ved de to nabohjørner i enderne af dets linjer. Så layerling viser også dem, og hver kan klikkes og tastes. Sådan sætter du for eksempel det nederste venstre hjørne til 75,5° mens det øverste venstre punkt, som flytter for det, er valgt. Du kan beregne her også, f.eks. "90-14,5".
 
 Et hjørne viser ingen vinkel hvor en kurve møder det, eller hvor mere end to linjer mødes. {{ui:sketch.showMeasurements}} på skitsebjælken skjuler vinklen sammen med længderne.

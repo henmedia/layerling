@@ -59,3 +59,25 @@ export function sketchLockState(profile: SketchProfile, pointIds: readonly strin
   const count = points.filter((point) => point.locked).length;
   return count === 0 ? "none" : count === points.length ? "all" : "some";
 }
+
+/**
+ * The point a typed length keeps in place (#629): the one asked for, unless that would move a
+ * locked end while the other end is free - then the locked end stays and the free one moves.
+ * With both ends locked the request stands, and the editor refuses it as any other change.
+ */
+export function lockedLengthAnchor(segment: SketchSegment, points: readonly SketchPoint[], requested: string): string {
+  const start = points.find((point) => point.id === segment.startId);
+  const end = points.find((point) => point.id === segment.endId);
+  if (!start || !end || Boolean(start.locked) === Boolean(end.locked)) return requested;
+  return start.locked ? start.id : end.id;
+}
+
+/**
+ * Which of a corner's two lines a typed angle turns (#629): the one asked for, unless its far
+ * end is locked and the other line's is free - then the other line turns.
+ */
+export function lockedCornerTurn(corner: { before: { far: SketchPoint }; after: { far: SketchPoint } }, requested: "after" | "before"): "after" | "before" {
+  const turning = requested === "after" ? corner.after.far : corner.before.far;
+  const other = requested === "after" ? corner.before.far : corner.after.far;
+  return turning.locked && !other.locked ? (requested === "after" ? "before" : "after") : requested;
+}

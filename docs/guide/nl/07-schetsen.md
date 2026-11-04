@@ -54,6 +54,8 @@ Waarden kun je ook typen. Een geselecteerd punt toont {{ui:sketch.selectionX}} e
 
 Klik op een hoekpunt waar **twee rechte lijnen** samenkomen: naast de lengtes toont layerling de **hoek** ertussen in graden, met een kleine boog. Bij een gesloten omtrek is het de hoek binnen de vorm, dus een inham geeft meer dan 180°. Klik op de waarde en typ een nieuwe hoek. Een van de twee lijnen draait dan om de hoek en houdt zijn lengte, en de andere blijft waar hij is. De lijn die draait is gestreept getekend; [[Tab]] wisselt naar de andere, [[Enter]] past toe en [[Esc]] annuleert. Wat aan het verre eind van de gedraaide lijn hangt, gaat mee.
 
+Een vergrendeld punt blijft waar het is, en een getypte waarde houdt daar rekening mee: een lengte verplaatst het vrije eind van de lijn, een hoek draait de lijn waarvan het verre eind vrij is. Ook één punt kun je vergrendelen: selecteer het en druk op [[Ctrl]]+[[L]]. Zo maak je een omtrek hoek voor hoek precies: vergrendel een hoek, typ de lengte en de hoek van de volgende lijn, vergrendel het eind ervan en ga zo door.
+
 Het verplaatsen van een punt verandert drie hoeken: bij het punt zelf en bij de twee buurhoeken aan de verre uiteinden van zijn lijnen. Daarom toont layerling die twee ook, en elk ervan kun je aanklikken en intypen. Zo zet je bijvoorbeeld de hoek linksonder op 75.5° terwijl het punt linksboven, dat daarvoor beweegt, geselecteerd is. Ook hier kun je rekenen, bijv. "90-14.5".
 
 Een hoek toont geen waarde waar een curve erop aansluit, of waar meer dan twee lijnen samenkomen. De knop {{ui:sketch.showMeasurements}} in de schetswerkbalk verbergt de hoek samen met de lengtes.

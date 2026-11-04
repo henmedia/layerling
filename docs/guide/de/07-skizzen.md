@@ -54,6 +54,8 @@ Werte lassen sich auch eintippen. Ein gewählter Punkt zeigt in der Leiste {{ui:
 
 Klickst du einen Eckpunkt an, an dem **zwei gerade Linien** zusammentreffen, zeigt layerling neben den Längen den **Winkel** dazwischen in Grad, mit einem kleinen Bogen. In einem geschlossenen Umriss ist es der Winkel im Inneren der Form, eine Einbuchtung liest sich also über 180°. Klicke auf den Wert und tippe einen neuen Winkel. Dann dreht sich eine der beiden Linien um die Ecke und behält ihre Länge, die andere bleibt, wo sie ist. Die Linie, die sich dreht, ist gestrichelt; mit [[Tab]] wechselst du zur anderen, [[Enter]] übernimmt und [[Esc]] bricht ab. Was am anderen Ende der gedrehten Linie hängt, geht mit.
 
+Ein gesperrter Punkt bleibt, wo er ist, und ein getippter Wert richtet sich danach: Eine Länge bewegt das freie Ende der Linie, ein Winkel dreht die Linie, deren anderes Ende frei ist. Auch ein einzelner Punkt lässt sich sperren: markieren und [[Strg]]+[[L]] drücken. So machst du einen Umriss Ecke für Ecke genau: eine Ecke sperren, Länge und Winkel der nächsten Linie eintippen, ihr Ende sperren und weiter.
+
 Verschiebst du einen Punkt, ändern sich drei Winkel: an ihm selbst und an den beiden Nachbarecken am anderen Ende seiner Linien. Darum zeigt layerling auch diese beiden, und jeder lässt sich anklicken und eintippen. So stellst du etwa eine Ecke unten links auf 75,5°, während oben links der Punkt gewählt ist, der dafür wandert. Auch hier darfst du rechnen, z. B. „90-14,5“.
 
 Wo eine Kurve an die Ecke stößt oder mehr als zwei Linien zusammenlaufen, gibt es keinen Winkel. Der Knopf {{ui:sketch.showMeasurements}} in der Skizzenleiste blendet den Winkel zusammen mit den Längen aus.

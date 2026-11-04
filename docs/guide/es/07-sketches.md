@@ -54,6 +54,8 @@ Los valores también se pueden escribir. Un punto seleccionado muestra {{ui:sket
 
 Haz clic en un punto de esquina donde se juntan **dos líneas rectas**: junto a las longitudes, layerling muestra en grados el **ángulo** que forman, con un pequeño arco. En un contorno cerrado es el ángulo interior de la forma, así que en un entrante pasa de 180°. Haz clic en el valor y escribe un ángulo nuevo. Una de las dos líneas gira entonces alrededor de la esquina y conserva su longitud, y la otra se queda donde está. La línea que gira se dibuja discontinua; [[Tab]] cambia a la otra, [[Intro]] aplica y [[Esc]] cancela. Lo que cuelga del otro extremo de la línea girada se mueve con ella.
 
+Un punto bloqueado se queda donde está, y un valor escrito lo respeta: una longitud mueve el extremo libre de la línea y un ángulo gira la línea cuyo otro extremo está libre. También se puede bloquear un solo punto: selecciónalo y pulsa [[Ctrl]]+[[L]]. Así puedes dejar un contorno exacto esquina a esquina: bloquea una esquina, escribe la longitud y el ángulo de la línea siguiente, bloquea su extremo y continúa.
+
 Al mover un punto cambian tres ángulos: el del propio punto y los de las dos esquinas vecinas, en el otro extremo de sus líneas. Por eso layerling muestra también esos dos, y en cada uno puedes hacer clic y escribir. Así puedes poner, por ejemplo, la esquina inferior izquierda a 75,5° mientras tienes seleccionado el punto superior izquierdo, que es el que se mueve para conseguirlo. Aquí también puedes hacer cálculos, como «90-14,5».
 
 Una esquina no muestra ningún ángulo si llega a ella una curva o si se juntan en ella más de dos líneas. El botón {{ui:sketch.showMeasurements}} de la barra de herramientas del boceto oculta el ángulo junto con las longitudes.

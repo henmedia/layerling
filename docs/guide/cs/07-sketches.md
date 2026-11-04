@@ -54,6 +54,8 @@ Hodnoty lze i zadat. Vybraný bod ukazuje na liště {{ui:sketch.selectionX}} a 
 
 U bodu spojujícího **dvě úsečky** se vedle délek zobrazuje **úhel** s malým obloukem. Na uzavřeném obrysu jde o vnitřní úhel, proto může být v prohlubni větší než 180°. Kliknutím zadáte nový. Jedna úsečka se otočí kolem rohu se zachováním délky, druhá zůstane. Pohyblivá se kreslí čárkovaně; [[Tab]] je prohodí, [[Enter]] potvrdí a [[Esc]] zruší. Geometrie připojená na vzdáleném konci se posune spolu s ním.
 
+Zamčený bod zůstává na místě a zadaná hodnota se tomu přizpůsobí: délka posune volný konec čáry a úhel otočí tu čáru, jejíž vzdálený konec je volný. Zamknout lze i jediný bod: vyberte ho a stiskněte [[Ctrl]]+[[L]]. Tak lze obrys zpřesnit roh po rohu: zamkněte roh, zadejte délku a úhel další čáry, zamkněte její konec a pokračujte.
+
 Posun bodu mění úhel v něm i ve dvou sousedních rozích. Zobrazují se proto všechny tři a každý lze zadat. Můžete například nastavit levý spodní roh na 75,5°, i když vybíráte levý horní bod, který se tím posune. Fungují i výpočty, například „90-14.5“.
 
 Úhel se nezobrazuje, když do rohu vstupuje křivka nebo více než dvě čáry. {{ui:sketch.showMeasurements}} jej skryje spolu s délkami.

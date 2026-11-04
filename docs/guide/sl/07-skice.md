@@ -54,6 +54,8 @@ Vrednosti lahko tudi vpišeš. Izbrana točka v vrstici pokaže {{ui:sketch.sele
 
 Če klikneš oglišče, v katerem se srečata **dve ravni črti**, layerling poleg dolžin pokaže **kot** med njima v stopinjah, z majhnim lokom. V sklenjenem obrisu je to kot v notranjosti oblike, vboklina se torej bere nad 180°. Klikni vrednost in vpiši nov kot. Potem se ena od obeh črt zavrti okoli vogala in obdrži dolžino, druga ostane, kjer je. Črta, ki se vrti, je črtkana; s [[Tab]] preskočiš na drugo, [[Enter]] sprejme in [[Esc]] prekine. Kar visi na drugem koncu zavrtene črte, gre zraven.
 
+Zaklenjena točka ostane, kjer je, in vpisana vrednost se temu prilagodi: dolžina premakne prosti konec črte, kot pa zavrti črto, katere drugi konec je prost. Zakleneš lahko tudi eno samo točko: izberi jo in pritisni [[Ctrl]]+[[L]]. Tako obris natančno urediš vogal za vogalom: zakleni vogal, vpiši dolžino in kot naslednje črte, zakleni njen konec in nadaljuj.
+
 Če premakneš točko, se spremenijo trije koti: pri njej sami in pri obeh sosednjih ogliščih na drugem koncu njenih črt. Zato layerling pokaže tudi ta dva in vsakega lahko klikneš in vpišeš. Tako nastaviš na primer vogal spodaj levo na 75,5°, medtem ko je zgoraj levo izbrana točka, ki se zato premakne. Tudi tu smeš računati, npr. »90-14,5«.
 
 Kjer krivulja trči ob vogal ali se steka več kot dve črti, kota ni. Gumb {{ui:sketch.showMeasurements}} v vrstici skice skrije kot skupaj z dolžinami.

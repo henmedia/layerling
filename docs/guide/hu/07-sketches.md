@@ -49,6 +49,8 @@ Az értékek be is írhatók. Egy kijelölt pont a sávban {{ui:sketch.selection
 
 Kattints egy olyan sarokpontra, ahol **két egyenes vonal** találkozik: a hosszak mellett a layerling fokban mutatja a köztük lévő **szöget** is, egy kis ívvel. Zárt körvonalon ez az alakzaton belüli szög, így egy behorpadás 180° fölötti értéket mutat. Kattints az értékre, és gépelj be új szöget. A két vonal közül az egyik ilyenkor a sarok körül fordul, és megtartja a hosszát, a másik a helyén marad. A forduló vonal szaggatottan rajzolódik; a [[Tab]] a másikra vált, az [[Enter]] alkalmazza, az [[Esc]] elveti. Ami a forduló vonal túlsó végén lóg, az vele megy.
 
+A zárolt pont a helyén marad, és a beírt érték ehhez igazodik: a hossz a vonal szabad végét mozgatja, a szög pedig azt a vonalat fordítja, amelynek túlsó vége szabad. Egyetlen pont is zárolható: jelöld ki, és nyomd meg a [[Ctrl]]+[[L]] billentyűt. Így sarokról sarokra pontossá teheted a körvonalat: zárolj egy sarkot, írd be a következő vonal hosszát és szögét, zárold a végét, és folytasd.
+
 Egy pont mozgatása három szöget változtat meg: magánál a pontnál és a vonalai túlsó végén lévő két szomszédos saroknál. Ezért a layerling ezt a kettőt is mutatja, és mindkettő kattintható és begépelhető. Így állíthatod be például a bal alsó sarkot 75,5°-ra, miközben a bal felső pont, amely ehhez elmozdul, ki van jelölve. Itt is számolhatsz, pl. „90-14,5”.
 
 Egy sarok nem mutat szöget, ha egy görbe találkozik vele, vagy ha kettőnél több vonal találkozik ott. A vázlat eszköztárán lévő {{ui:sketch.showMeasurements}} gomb a hosszakkal együtt a szöget is elrejti.
