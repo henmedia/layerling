@@ -32,11 +32,6 @@ export const SHAPE_LOCK_PATCH_KEYS = new Set([
   "bakeTransform",
 ]);
 
-/** The part's own shape is locked. */
-export function shapeLockedSelf(shape: Pick<WorkplaneShape, "shapeLocked"> | null | undefined): boolean {
-  return Boolean(shape?.shapeLocked);
-}
-
 /** The part, or any part inside it, has its shape locked. */
 export function holdsShapeLock(shape: Pick<WorkplaneShape, "shapeLocked" | "groupedShapes"> | null | undefined): boolean {
   if (!shape) return false;

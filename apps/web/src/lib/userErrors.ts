@@ -45,11 +45,15 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /Finish the current action before opening the history view/i, key: "error.finishBeforeHistory" },
   // CAD kernel: stored and rebuilt bodies
   { pattern: /could not be restored as a valid solid/i, key: "error.storedBodyRestore" },
-  { pattern: /The exact (profile|thread|spring|gear) body (is not|does not)/i, key: "error.exactBodyInvalid" },
-  { pattern: /The (thread|gear|spring) body is not a valid solid/i, key: "error.solidNotValid" },
-  { pattern: /The (thread|gear|spring)'s .* (came out as|sewed into|did not close|did not sweep)/i, key: "error.solidNotValid" },
-  { pattern: /The (thread|gear|spring)'s measures are out of range/i, key: "error.measuresOutOfRange" },
-  { pattern: /gear with its bore came out as/i, key: "error.solidNotValid" },
+  { pattern: /The exact (profile body|thread body|spring body|gear body|Hirth joint|Gridfinity body) (is not|does not)|The imported STEP body does not match/i, key: "error.exactBodyInvalid" },
+  // No exact body, and the mesh too dense to stand in for it (cadModifier.worker.ts).
+  { pattern: /could not be (re)?built as an exact( CAD)? body, and its mesh is too dense|could not be restored for edge treatment, and its mesh is too dense/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|spring) body is not a valid solid|The (Hirth joint|Gridfinity body) is not a valid solid/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|spring|Hirth joint)'s .* (came out as|sewed into|did not close|did not sweep)/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|spring|Hirth joint)'s measures are out of range/i, key: "error.measuresOutOfRange" },
+  { pattern: /(gear|Hirth joint)( with its bore)? came out as/i, key: "error.solidNotValid" },
+  // Profiles turned, swept, lofted, trimmed or with rounded or chamfered ends (cadProfileSolid.ts), and lofts.
+  { pattern: /profile solid (is not valid|is inside out|are not valid|does not keep)|A loft through its sections did not become one solid/i, key: "error.solidNotValid" },
   { pattern: /thread's chamfer reaches its axis/i, key: "error.threadChamferAxis" },
   { pattern: /gear's centre hole reaches its teeth/i, key: "error.gearHoleTeeth" },
   { pattern: /crescent horn rounding does not fit/i, key: "error.crescentRounding" },
@@ -97,7 +101,7 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /contains \d+ zero-area triangle/i, key: "error.meshDegenerate" },
   { pattern: /is not a watertight manifold/i, key: "error.meshNotWatertight" },
   { pattern: /does not enclose a non-zero volume/i, key: "error.meshNoVolume" },
-  { pattern: /SVG projection (contains no readable contours|does not enclose)/i, key: "error.svgProjectionEmpty" },
+  { pattern: /SVG projection (contains no readable contours|does not enclose)|DXF export contains no readable contours|SVG top view contains no visible edges/i, key: "error.svgProjectionEmpty" },
   // OBJ, STL, 3MF, STEP import
   { pattern: /^OBJ (has no readable mesh geometry|geometry is empty)/i, key: "error.objEmpty" },
   { pattern: /^OBJ /i, key: "error.objBroken" },

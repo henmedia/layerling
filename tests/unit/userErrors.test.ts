@@ -15,6 +15,30 @@ describe("error messages for people", () => {
     expect(localizedError("OBJ contains a degenerate face")).toBe(MESSAGES_DE["error.objBroken"]);
   });
 
+  it("shows the kernel's errors for Hirth joints, Gridfinity, STEP bodies, profiles, lofts and flat exports in German", () => {
+    setLanguage("de");
+    const cases: Array<[string, keyof typeof MESSAGES_DE]> = [
+      ["The exact Hirth joint is not valid after placing it", "error.exactBodyInvalid"],
+      ["The exact Gridfinity body does not match the shape (width)", "error.exactBodyInvalid"],
+      ["The imported STEP body does not match the shape (depth)", "error.exactBodyInvalid"],
+      ["The Hirth joint is not a valid solid", "error.solidNotValid"],
+      ["The Gridfinity body is not a valid solid", "error.solidNotValid"],
+      ["The Hirth joint's crown sewed into 2 shells", "error.solidNotValid"],
+      ["The Hirth joint with its bore came out as 3 solids", "error.solidNotValid"],
+      ["The Hirth joint's measures are out of range", "error.measuresOutOfRange"],
+      ["The turned or swept profile solid is not valid", "error.solidNotValid"],
+      ["The chamfered ends of the lofted profile solid are not valid", "error.solidNotValid"],
+      ["The repaired profile solid does not keep the outline's volume", "error.solidNotValid"],
+      ["A loft through its sections did not become one solid", "error.solidNotValid"],
+      ["This Gridfinity part could not be built as an exact body, and its mesh is too dense for edge treatment. x", "error.solidNotValid"],
+      ["This shape could not be rebuilt as an exact CAD body, and its mesh is too dense for edge treatment. x", "error.solidNotValid"],
+      ["This imported STEP body could not be restored for edge treatment, and its mesh is too dense to use instead. x", "error.solidNotValid"],
+      ["DXF export contains no readable contours", "error.svgProjectionEmpty"],
+      ["SVG top view contains no visible edges", "error.svgProjectionEmpty"],
+    ];
+    for (const [raw, key] of cases) expect(localizedError(raw), raw).toBe(MESSAGES_DE[key]);
+  });
+
   it("explains that the browser ran out of memory, in the person's language (#383)", () => {
     for (const raw of ["Array buffer allocation failed", "RangeError: Invalid array length", "Out of memory"]) {
       setLanguage("en");

@@ -357,6 +357,9 @@ export function cadModifierUserErrorMessage(rawError: string | null | undefined)
   if (rawError.includes("The edge preview timed out")) {
     return t("edge.errorPreviewTimeout");
   }
+  if (rawError.includes("Select at least one highlighted edge")) {
+    return t("edge.selectAtLeastOne");
+  }
   if (rawError.includes(VARIABLE_FILLET_ONE_EDGE_MESSAGE)) {
     return t("edge.variableOneEdge");
   }
