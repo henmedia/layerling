@@ -288,6 +288,8 @@ docker run -d --name layerling -p 3000:3000 -v layerling-thumbnails:/app/.codex/
 文件夹会显示在起始页上，但什么都存不进去。修改后运行 `docker compose up -d`：`docker compose restart` 会保留旧设置。
 `docker exec <container> printenv LAYERLING_SHARED_PROJECTS_DIR` 会显示正在使用的值。
 
+如果要把所有设计都放在这个文件夹里、一个也不留在浏览器中，有一份完整的英文和德文指南，附带自己的 compose 文件和一个更新脚本：它会检查配置、备份文件夹，并回滚失败的更新：[docs/docker](docs/docker/README.md)，作者 Jürgen Keller。设置 `LAYERLING_NEW_DESIGNS_ON_SERVER: "always"` 后，所有新建设计的操作都会进入服务器文件夹：磁贴、打开或导入文件、恢复备份（连同其文件夹）、复制以及从历史中取出的状态；起始页上的“新建文件夹”会建立服务器文件夹。
+
 要选择人们首次访问时看到的配色主题，把 `LAYERLING_DEFAULT_THEME` 设为 `system`、`light`、`dark` 或 `graphite`
 （同样在 `compose.yml` 中或 `npm run start` 的环境变量里设置）。之前打开过 layerling 的人会保留浏览器已有的主题，
 任何人都仍可用主题开关更改。不设置时主题跟随系统。以纯文件方式提供的副本没有可读取该设置的服务器，所以在那里不生效。
