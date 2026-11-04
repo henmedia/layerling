@@ -74,6 +74,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["Ctrl+Shift+G"], label: "shortcuts.ungroup" },
       { combos: ["E"], label: "shortcuts.editGroup" },
       { combos: ["Ctrl+L"], label: "shortcuts.lock" },
+      { combos: ["Ctrl+Shift+L"], label: "shortcuts.lockShape" },
       { combos: ["Ctrl+H"], label: "shortcuts.hide" },
       { combos: ["Ctrl+Shift+H"], label: "shortcuts.showHidden" },
       { combos: ["Shift+N"], label: "shortcuts.toggleNotes" },

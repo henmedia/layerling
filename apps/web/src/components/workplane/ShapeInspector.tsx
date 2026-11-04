@@ -4,7 +4,8 @@ import { displayY, displayYTurn, insideZ, insideZTurn } from "@/lib/displayAxes"
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { AlignCenter, ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Split, Tags, Trash2, Unlock, Waves } from "lucide-react";
+import { AlignCenter, ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Shield, ShieldCheck, Split, Tags, Trash2, Unlock, Waves } from "lucide-react";
+import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
@@ -3714,6 +3715,9 @@ export function ShapeInspector({
   // Picking one colour for a group means one colour for all of it, as in similar tools.
   const singleColorPatch: Partial<WorkplaneShape> = canToggleGroupColors(shape) ? { multicolor: false } : {};
   const locked = Boolean(shape.locked);
+  // Lock shape (#1277): where the part stands and how it turns stay free; its size, settings and name do not.
+  const shapeLocked = Boolean(shape.shapeLocked);
+  const frozen = locked || holdsShapeLock(shape);
   // A calculation typed into a field (#180) is noted just before the field's change and rides
   // along in that one change, so undo takes value and formula back together. A note nobody
   // picks up is dropped again right after.
@@ -4134,7 +4138,7 @@ export function ShapeInspector({
             <>
               {/* One long word ("Schwalbenschwanz") cannot wrap; it gets a smaller size instead. */}
               <strong className={displayShapeName(shape).split(/\s+/).some((word) => word.length > 11) ? "long-word" : undefined}>{displayShapeName(shape)}</strong>
-              <button className="inspector-rename-button" title={t("outliner.rename")} aria-label={t("outliner.rename")} onClick={() => setNameDraft(displayShapeName(shape))}>
+              <button className="inspector-rename-button" title={frozen ? t("status.shapeLockRefused") : t("outliner.rename")} aria-label={t("outliner.rename")} disabled={frozen} onClick={() => setNameDraft(displayShapeName(shape))}>
                 <Pencil size={14} />
               </button>
             </>
@@ -4145,6 +4149,11 @@ export function ShapeInspector({
           <button className={locked ? "inspector-header-icon active" : "inspector-header-icon"} aria-label={locked ? t("outliner.unlock") : t("outliner.lock")} aria-keyshortcuts="Control+L" title={t("camera.shortcut", { label: locked ? t("outliner.unlock") : t("outliner.lock"), keys: "Ctrl+L" })} onClick={() => onUpdate({ locked: !locked })}>
             {locked ? <Lock size={16} /> : <Unlock size={16} />}
           </button>
+          {locked ? null : (
+            <button className={shapeLocked ? "inspector-header-icon active" : "inspector-header-icon"} aria-label={shapeLocked ? t("contextMenu.unlockShape") : t("contextMenu.lockShape")} aria-keyshortcuts="Control+Shift+L" title={t("camera.shortcut", { label: shapeLocked ? t("contextMenu.unlockShape") : t("contextMenu.lockShapeHint"), keys: "Ctrl+Shift+L" })} data-testid="inspector-shape-lock" onClick={() => onUpdate({ shapeLocked: !shapeLocked })}>
+              {shapeLocked ? <ShieldCheck size={16} /> : <Shield size={16} />}
+            </button>
+          )}
           <button className={shape.hidden ? "inspector-header-icon active" : "inspector-header-icon"} aria-label={shape.hidden ? t("outliner.show") : t("outliner.hide")} aria-keyshortcuts="Control+H" title={t("camera.shortcut", { label: shape.hidden ? t("outliner.show") : t("outliner.hide"), keys: "Ctrl+H" })} onClick={() => onUpdate({ hidden: !shape.hidden })}>
             {shape.hidden ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
@@ -4160,21 +4169,21 @@ export function ShapeInspector({
           shapeId={shape.id}
           stack={nameTagStack}
           workspace={workspace}
-          disabled={locked}
+          disabled={frozen}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
           onInteractionActiveChange={onInteractionActiveChange}
         />
       ) : null}
-      {shape.keyringTab && onFixKeyringTab ? <KeyringTabFixButton disabled={locked} onFix={onFixKeyringTab} /> : null}
-      {shape.kind === "text" && onLayerText ? <MakeLayersButton disabled={locked} onLayerText={onLayerText} /> : null}
-      {qrCode ? <QrCodeCard key={`qr-code-${shape.id}`} shapeId={shape.id} controls={qrCode} disabled={locked} /> : null}
-      {sbcBoard ? <SbcBoardCard key={`sbc-board-${shape.id}`} shapeId={shape.id} controls={sbcBoard} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} /> : null}
-      {referenceImage ? <ReferenceImageCard key={`reference-image-${shape.id}`} shapeId={shape.id} controls={referenceImage} workspace={workspace} locked={locked} onInteractionActiveChange={onInteractionActiveChange} /> : null}
+      {shape.keyringTab && onFixKeyringTab ? <KeyringTabFixButton disabled={frozen} onFix={onFixKeyringTab} /> : null}
+      {shape.kind === "text" && onLayerText ? <MakeLayersButton disabled={frozen} onLayerText={onLayerText} /> : null}
+      {qrCode ? <QrCodeCard key={`qr-code-${shape.id}`} shapeId={shape.id} controls={qrCode} disabled={frozen} /> : null}
+      {sbcBoard ? <SbcBoardCard key={`sbc-board-${shape.id}`} shapeId={shape.id} controls={sbcBoard} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
+      {referenceImage ? <ReferenceImageCard key={`reference-image-${shape.id}`} shapeId={shape.id} controls={referenceImage} workspace={workspace} locked={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {iconTag?.isTag ? (
-        <IconTagCard key={`icon-tag-${shape.id}`} shapeId={shape.id} controls={iconTag} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+        <IconTagCard key={`icon-tag-${shape.id}`} shapeId={shape.id} controls={iconTag} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
       ) : iconTag ? (
-        <MakeIconLayersButton disabled={locked} onLayer={iconTag.onLayer} />
+        <MakeIconLayersButton disabled={frozen} onLayer={iconTag.onLayer} />
       ) : null}
       {shape.groupOperation === "bundle" || !isNonSolidShape(shape) ? (
       <div className="shape-state-card" role="group" aria-label={t("inspector.shapeMode")}>
@@ -4186,7 +4195,7 @@ export function ShapeInspector({
             onUpdate(shape.groupedShapes?.length ? { hole: false } : { hole: false, color: solidColor });
             setColorOpen((open) => (wasHole ? false : !open));
           }}
-          disabled={locked}
+          disabled={frozen}
           aria-pressed={!shape.hole}
           aria-expanded={colorOpen}
         >
@@ -4199,7 +4208,7 @@ export function ShapeInspector({
             onUpdate({ hole: true });
             setColorOpen(false);
           }}
-          disabled={locked}
+          disabled={frozen}
           aria-pressed={shape.hole}
         >
           <span className="large-hole-swatch" />
@@ -4216,7 +4225,7 @@ export function ShapeInspector({
           <ToggleProperty
             label={`${t("inspector.multicolor")} (Shift+M)`}
             value={groupShowsPartColors(shape)}
-            disabled={locked}
+            disabled={frozen}
             onChange={(multicolor) => onUpdate({ multicolor })}
           />
         ) : null}
@@ -4238,17 +4247,17 @@ export function ShapeInspector({
                 style={{ "--shape-swatch": color } as CSSProperties}
                 title={color.toUpperCase()}
                 aria-label={t("aria.setColor", { color })}
-                disabled={locked}
+                disabled={frozen}
                 onClick={() => {
                   onUpdate({ color, hole: false, ...singleColorPatch });
                   setColorOpen(false);
                 }}
               />
             ))}
-            <label className={locked ? "custom-color disabled" : "custom-color"} title={t("inspector.customColor")}>
+            <label className={frozen ? "custom-color disabled" : "custom-color"} title={t("inspector.customColor")}>
               <CustomColorInput
                 color={solidColor}
-                disabled={locked}
+                disabled={frozen}
                 onCommit={(color) => {
                   onUpdate({ color, hole: false, ...singleColorPatch });
                   rememberColor(color);
@@ -4263,7 +4272,7 @@ export function ShapeInspector({
             kept={keptColors}
             current={shape.hole ? null : solidColor}
             palette={SOLID_COLORS}
-            disabled={locked}
+            disabled={frozen}
             isSelected={(color) => solidColor.toLowerCase() === color && !shape.hole}
             onPick={(color) => {
               onUpdate({ color, hole: false, ...singleColorPatch });
@@ -4276,29 +4285,29 @@ export function ShapeInspector({
       ) : null}
 
       {shape.kind === "vase" ? (
-        <button className="edit-sketch-button" type="button" disabled={locked} aria-pressed={vaseDrawOpen} onClick={() => setVaseDrawOpen((open) => !open)}>
+        <button className="edit-sketch-button" type="button" disabled={frozen} aria-pressed={vaseDrawOpen} onClick={() => setVaseDrawOpen((open) => !open)}>
           <Pencil size={17} strokeWidth={2.5} />
           <span>{t("inspector.vaseDraw")}</span>
         </button>
       ) : null}
       {shape.kind === "vase" && vaseDrawOpen ? (
-        <VaseDrawingWindow shape={shape} disabled={locked} onUpdate={onUpdate} onInteractionActiveChange={onInteractionActiveChange} onClose={() => setVaseDrawOpen(false)} />
+        <VaseDrawingWindow shape={shape} disabled={frozen} onUpdate={onUpdate} onInteractionActiveChange={onInteractionActiveChange} onClose={() => setVaseDrawOpen(false)} />
       ) : null}
 
       {shape.sketchProfile && onEditSketch ? (
-        <button className="edit-sketch-button" type="button" disabled={locked} onClick={onEditSketch}>
+        <button className="edit-sketch-button" type="button" disabled={frozen} onClick={onEditSketch}>
           {t("inspector.editSketch")}
         </button>
       ) : null}
 
       {onOpenGroup ? (
-        <button className="inspector-action-button" type="button" disabled={locked} onClick={onOpenGroup}>
+        <button className="inspector-action-button" type="button" disabled={frozen} onClick={onOpenGroup}>
           {t(shape.groupOperation === "bundle" ? "group.editBundle" : "group.edit")} (E)
         </button>
       ) : null}
 
       {canSeparateParts && onSeparateParts ? (
-        <button className="inspector-action-button" type="button" disabled={locked} onClick={onSeparateParts}>
+        <button className="inspector-action-button" type="button" disabled={frozen} onClick={onSeparateParts}>
           <Split size={17} strokeWidth={2.5} />
           <span>{t("inspector.separateParts")}</span>
         </button>
@@ -4313,7 +4322,7 @@ export function ShapeInspector({
           key={shape.id}
           shape={shape}
           workspace={workspace}
-          disabled={locked}
+          disabled={frozen}
           onWrap={onWrapAroundCylinder}
           onInteractionActiveChange={onInteractionActiveChange}
         />
@@ -4324,7 +4333,7 @@ export function ShapeInspector({
           key={`surface-${shape.id}`}
           shape={shape}
           workspace={workspace}
-          disabled={locked}
+          disabled={frozen}
           onApply={onSurfaceTexture}
           onRemove={onRemoveSurfaceTexture}
           open={surfaceTextureOpen}
@@ -4344,7 +4353,7 @@ export function ShapeInspector({
               label={t("inspector.surfaceMask")}
               value={shape.surfaceTextureMask ?? "none"}
               options={(["none", ...SURFACE_TEXTURE_MASK_MODES] as const).map((value) => ({ value, label: t(SURFACE_TEXTURE_LABELS.mask[value]) }))}
-              disabled={locked}
+              disabled={frozen}
               // A mask is a helper one looks through: it turns transparent on the way.
               onChange={(value) => onUpdate(value === "none" ? { surfaceTextureMask: undefined } : { surfaceTextureMask: value as SurfaceTextureMaskMode, transparent: true })}
             />
@@ -4359,18 +4368,18 @@ export function ShapeInspector({
       ) : null}
 
       {onTextTags && shape.kind === "text" ? (
-        <NameListCard key={`names-${shape.id}`} shapeId={shape.id} disabled={locked} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
+        <NameListCard key={`names-${shape.id}`} shapeId={shape.id} disabled={frozen} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
       ) : null}
 
       {onTextBlock ? (
-        <TextBlockCard key={`lines-${shape.id}`} shapeId={shape.id} text={shape.text ?? ""} workspace={workspace} disabled={locked} onTextBlock={onTextBlock} onInteractionActiveChange={onInteractionActiveChange} />
+        <TextBlockCard key={`lines-${shape.id}`} shapeId={shape.id} text={shape.text ?? ""} workspace={workspace} disabled={frozen} onTextBlock={onTextBlock} onInteractionActiveChange={onInteractionActiveChange} />
       ) : null}
 
       {cylinderToEllipsePatch(shape) ? (
         <button
           className="inspector-action-button"
           type="button"
-          disabled={locked}
+          disabled={frozen}
           title={t("inspector.makeEllipseHint")}
           onClick={() => {
             const patch = cylinderToEllipsePatch(shape);
@@ -4398,7 +4407,7 @@ export function ShapeInspector({
             {gearType ? (
               <GearTypeSelector
                 value={gearType}
-                disabled={locked}
+                disabled={frozen}
                 onChange={(nextType) => {
                   // The module stays across the types (#201): a ring gear adds its rim round the same
                   // teeth, a rack lays them out straight with a 3 mm bar, a gear is module x (teeth + 2) again.
@@ -4425,7 +4434,7 @@ export function ShapeInspector({
                 label={t("inspector.threadRole")}
                 columns={2}
                 value={threadRoleProperty.value}
-                disabled={locked}
+                disabled={frozen}
                 options={THREAD_ROLE_OPTIONS.map((option) => ({
                   value: option.value,
                   label: t(option.label),
@@ -4438,7 +4447,7 @@ export function ShapeInspector({
             {threadRoleProperty && shape.hole && (threadRoleProperty.value === "rod" || threadRoleProperty.value === "screw") ? (
               <>
                 <p className="cylinder-wrap-hint">{t("inspector.threadBoltAsHoleHint")}</p>
-                <button className="inspector-action-button" type="button" disabled={locked} onClick={() => threadRoleProperty.onChange("bore")}>
+                <button className="inspector-action-button" type="button" disabled={frozen} onClick={() => threadRoleProperty.onChange("bore")}>
                   <RefreshCw size={17} strokeWidth={2.5} />
                   <span>{t("inspector.threadMakeTappedHole")}</span>
                 </button>
@@ -4449,7 +4458,7 @@ export function ShapeInspector({
                 label={t("inspector.threadHead")}
                 columns={3}
                 value={threadHeadProperty.value}
-                disabled={locked}
+                disabled={frozen}
                 options={THREAD_HEAD_OPTIONS.map((option) => ({
                   value: option.value,
                   label: t(option.label),
@@ -4463,7 +4472,7 @@ export function ShapeInspector({
                 label={t("inspector.threadNutShape")}
                 columns={3}
                 value={threadNutShapeProperty.value}
-                disabled={locked}
+                disabled={frozen}
                 options={THREAD_NUT_SHAPE_OPTIONS.map((option) => ({
                   value: option.value,
                   label: t(option.label),
@@ -4477,7 +4486,7 @@ export function ShapeInspector({
                 label={t("inspector.threadDrive")}
                 columns={2}
                 value={threadDriveProperty.value}
-                disabled={locked}
+                disabled={frozen}
                 options={THREAD_DRIVE_OPTIONS.map((option) => ({
                   value: option.value,
                   label: t(option.label),
@@ -4490,25 +4499,25 @@ export function ShapeInspector({
               <ToggleProperty
                 label={t("inspector.keepProportions")}
                 value={proportionLock}
-                disabled={locked}
+                disabled={frozen}
                 onChange={onProportionLockChange}
               />
             ) : null}
             {textFillMore.length ? (
               <>
-                <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(0, textFillEnd)} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(0, textFillEnd)} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
                 {/* A text's rarer fill settings (#215) fold away under "More". */}
                 <button className="name-tag-more" type="button" aria-expanded={textFillMoreOpen} onClick={() => setTextFillMoreOpen((open) => !open)}>
                   <ChevronDown className={textFillMoreOpen ? "open" : ""} size={15} strokeWidth={2.6} />
                   <span>{t(textFillMoreOpen ? "inspector.less" : "inspector.more")}</span>
                 </button>
                 {textFillMoreOpen ? (
-                  <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={textFillMore} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                  <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={textFillMore} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
                 ) : null}
-                <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(textFillEnd)} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(textFillEnd)} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
               </>
             ) : (
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties} defaults={propertyDefaults?.main} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
             )}
             {tiltedMeasures && primaryProperties.some((property) => ["width", "length", "height"].includes(property.id)) ? (
               <p className="cylinder-wrap-hint">{t("prop.tiltedMeasures")}</p>
@@ -4517,7 +4526,7 @@ export function ShapeInspector({
               <>
                 <p className="cylinder-wrap-hint">{t("gridfinity.swallowtailHint")}</p>
                 {onGridfinityKeys ? (
-                  <button className="inspector-action-button" type="button" disabled={locked} onClick={onGridfinityKeys}>
+                  <button className="inspector-action-button" type="button" disabled={frozen} onClick={onGridfinityKeys}>
                     <Plus size={17} strokeWidth={2.5} />
                     <span>{t("inspector.gridfinityKeys")}</span>
                   </button>
@@ -4526,7 +4535,7 @@ export function ShapeInspector({
             ) : null}
             {onShapeDefaultsChange && propertyDefaults ? (
               <div className="property-defaults-actions">
-                <button type="button" disabled={locked || sameDefaults} title={t("inspector.saveDefaultsHint")} onClick={() => onShapeDefaultsChange(shape.kind, defaultsToSave)}>
+                <button type="button" disabled={frozen || sameDefaults} title={t("inspector.saveDefaultsHint")} onClick={() => onShapeDefaultsChange(shape.kind, defaultsToSave)}>
                   {t("inspector.saveDefaults")}
                 </button>
                 <button type="button" disabled={!savedDefaults || Object.keys(savedDefaults).length === 0} title={t("inspector.resetDefaultsHint")} onClick={() => onShapeDefaultsChange(shape.kind, null)}>
@@ -4538,7 +4547,7 @@ export function ShapeInspector({
         ) : null}
       </div>
       {shape.kind === "gridfinity" ? (
-        <GridfinityCompartmentsCard shape={shape} workspace={workspace} locked={locked} defaults={propertyDefaults?.compartments} onUpdate={onUpdate} onInteractionActiveChange={onInteractionActiveChange} />
+        <GridfinityCompartmentsCard shape={shape} workspace={workspace} locked={frozen} defaults={propertyDefaults?.compartments} onUpdate={onUpdate} onInteractionActiveChange={onInteractionActiveChange} />
       ) : null}
       <div className={`property-card ${positionOpen ? "" : "collapsed"}`}>
         <button
@@ -4598,7 +4607,7 @@ export function ShapeInspector({
         <BentTubeSegmentsCard
           shape={shape}
           workspace={workspace}
-          locked={locked}
+          locked={frozen}
           onUpdate={onUpdate}
           onInteractionActiveChange={onInteractionActiveChange}
           onSegmentChange={onBentTubeSegmentChange}
@@ -4618,7 +4627,7 @@ export function ShapeInspector({
           </button>
           {taperOpen ? (
             <div className="property-list" id={`taper-${shape.id}`}>
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={taperProperties} defaults={propertyDefaults?.taper} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={taperProperties} defaults={propertyDefaults?.taper} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -4637,7 +4646,7 @@ export function ShapeInspector({
           </button>
           {twistOpen ? (
             <div className="property-list" id={`twist-${shape.id}`}>
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={twistProperties} defaults={propertyDefaults?.twist} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={twistProperties} defaults={propertyDefaults?.twist} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -4656,7 +4665,7 @@ export function ShapeInspector({
           </button>
           {slopeOpen ? (
             <div className="property-list" id={`slope-${shape.id}`}>
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={slopeProperties} defaults={slopeDefaults} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={slopeProperties} defaults={slopeDefaults} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -4675,7 +4684,7 @@ export function ShapeInspector({
           </button>
           {narrowOpen ? (
             <div className="property-list" id={`narrow-${shape.id}`}>
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={narrowProperties} defaults={narrowDefaults} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={narrowProperties} defaults={narrowDefaults} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -4694,7 +4703,7 @@ export function ShapeInspector({
           </button>
           {threadOpen ? (
             <div className="property-list" id={`thread-${shape.id}`}>
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={threadProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={threadProperties} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -4708,7 +4717,7 @@ export function ShapeInspector({
             </button>
             {vaseFormOpen ? (
               <div className="property-list" id={`vase-form-${shape.id}`}>
-                <ShapePropertyRows properties={vaseFormProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                <ShapePropertyRows properties={vaseFormProperties} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
               </div>
             ) : null}
           </div>
@@ -4719,7 +4728,7 @@ export function ShapeInspector({
             </button>
             {vaseFloorOpen ? (
               <div className="property-list" id={`vase-floor-${shape.id}`}>
-                <ShapePropertyRows properties={vaseFloorProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                <ShapePropertyRows properties={vaseFloorProperties} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
               </div>
             ) : null}
           </div>
@@ -4730,11 +4739,11 @@ export function ShapeInspector({
             </button>
             {vasePartsOpen ? (
               <div className="property-list" id={`vase-parts-${shape.id}`}>
-                <ShapePropertyRows properties={vasePartProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                <ShapePropertyRows properties={vasePartProperties} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
                 {onVaseAccessories ? (
                   <>
                     <p className="cylinder-wrap-hint">{t("inspector.vasePartsHint")}</p>
-                    <button className="inspector-action-button" type="button" disabled={locked} onClick={onVaseAccessories}>
+                    <button className="inspector-action-button" type="button" disabled={frozen} onClick={onVaseAccessories}>
                       <Plus size={17} strokeWidth={2.5} />
                       <span>{t("inspector.vasePartsMake")}</span>
                     </button>
@@ -4750,7 +4759,7 @@ export function ShapeInspector({
             </button>
             {vasePrintOpen ? (
               <div className="property-list" id={`vase-print-${shape.id}`}>
-                <ShapePropertyRows properties={vasePrintProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+                <ShapePropertyRows properties={vasePrintProperties} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
                 <VasePrintReport shape={shape} />
               </div>
             ) : null}
@@ -4771,7 +4780,7 @@ export function ShapeInspector({
           </button>
           {gearTeethOpen ? (
             <div className="property-list" id={`gear-teeth-${shape.id}`}>
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={gearTeethProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={gearTeethProperties} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>
@@ -4790,7 +4799,7 @@ export function ShapeInspector({
           </button>
           {gearHelixOpen ? (
             <div className="property-list" id={`gear-helix-${shape.id}`}>
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={gearHelixProperties} workspace={workspace} disabled={locked} onInteractionActiveChange={onInteractionActiveChange} />
+              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={gearHelixProperties} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
             </div>
           ) : null}
         </div>

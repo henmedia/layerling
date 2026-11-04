@@ -442,6 +442,8 @@ export type TransformOverlayProps = {
   angleBadge?: string | null;
   /** The selection is locked: handles are greyed and only show dimensions on hover. */
   locked?: boolean;
+  /** Lock shape (#1277): the size handles and size labels are left out; moving and turning stay. */
+  sizeLocked?: boolean;
   showRotationWheel: boolean;
   hideSelectionChrome: boolean;
   hideDimensionMarks: boolean;

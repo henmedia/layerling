@@ -1409,6 +1409,11 @@ export type WorkplaneShape = {
    */
   multicolor?: boolean;
   locked?: boolean;
+  /**
+   * Lock shape (#1277): the part still moves, turns and groups with others, but its size, settings,
+   * name and body stay as they are, and a copy keeps the lock. See lib/shapeLock.
+   */
+  shapeLocked?: boolean;
   hidden?: boolean;
   /** Drawn see-through in its own colour, like the usual "Transparent". Display only - a solid stays a solid. */
   transparent?: boolean;

@@ -16,6 +16,8 @@ export type LayerlingMcpShapeSummary = {
   color: string;
   hole: boolean;
   locked: boolean;
+  /** Lock shape (#1277): moves, turns and groups, but keeps its size, settings, name and body. */
+  shapeLocked?: boolean;
   hidden: boolean;
   position: {
     x: number;

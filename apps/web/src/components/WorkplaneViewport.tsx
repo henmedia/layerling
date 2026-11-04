@@ -1,4 +1,5 @@
 "use client";
+import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
@@ -1605,6 +1606,11 @@ export function WorkplaneViewport({
   // One locked shape holds the whole selection still, as beginTransform refuses it.
   const selectionLocked = useMemo(
     () => selectedIds.some((id) => shapes.find((shape) => shape.id === id)?.locked),
+    [selectedIds, shapes],
+  );
+  // Lock shape (#1277): the selection moves and turns, but its size handles stay away.
+  const selectionSizeLocked = useMemo(
+    () => selectedIds.some((id) => holdsShapeLock(shapes.find((shape) => shape.id === id))),
     [selectedIds, shapes],
   );
   const suppressNextRotationEditRef = useRef(false);
@@ -4071,6 +4077,9 @@ export function WorkplaneViewport({
       if (!frame || !shape || ids.length === 0 || ids.some((id) => shapesRef.current.find((entry) => entry.id === id)?.locked)) {
         return;
       }
+      if ((kind === "scale" || kind === "height") && ids.some((id) => holdsShapeLock(shapesRef.current.find((entry) => entry.id === id)))) {
+        return;
+      }
 
       const rotationAxis = rotationAxisForHandle(handleKey);
       const resizeHandleKey = handleKey;
@@ -6249,6 +6258,9 @@ export function WorkplaneViewport({
         if (!shape || !frame || shape.locked || selectionHeld || (!point && handle.kind !== "height" && handle.kind !== "lift" && handle.kind !== "rotate")) {
           return;
         }
+        if ((handle.kind === "scale" || handle.kind === "height") && selectedIdsRef.current.some((id) => holdsShapeLock(shapesRef.current.find((entry) => entry.id === id)))) {
+          return;
+        }
         const handlesLowerSide = handle.handleKey === "bottom-height" || handle.handleKey === "lower-shape";
         const lift = liftGeometryForFrame(frame, activeWorkplane);
         const liftOffset = handle.kind === "lift" ? liftHandleOffset(lift.height) * (handlesLowerSide ? -1 : 1) : 0;
@@ -8409,6 +8421,7 @@ export function WorkplaneViewport({
               rotationReadout={rotationReadout}
               angleBadge={dimensionsHidden ? null : angleBadge}
               locked={selectionLocked}
+              sizeLocked={selectionSizeLocked}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}
               hideDimensionMarks={false}

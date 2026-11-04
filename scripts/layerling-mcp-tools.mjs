@@ -520,7 +520,7 @@ export const tools = [
   },
   {
     name: "layerling_update_object",
-    description: "Update one object: exact dimensions, position, color, name, hole state, see-through display, rotations, locked and hidden state, and everything the shape has beyond its size - the side count of a cylinder, the diameter of a thread, the turns of a spring, the lettering of a text. Changing a thread's diameter or pitch moves width and depth with it.",
+    description: "Update one object: exact dimensions, position, color, name, hole state, see-through display, rotations, locked, shape-locked and hidden state, and everything the shape has beyond its size - the side count of a cylinder, the diameter of a thread, the turns of a spring, the lettering of a text. Changing a thread's diameter or pitch moves width and depth with it.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id"],
@@ -545,6 +545,7 @@ export const tools = [
           description: "The point this body turns about, in workplane coordinates like x, z and elevation. It stays with the body: it moves, turns and scales with it, and the rotate handle and R key turn the body about it. null removes it.",
         },
         locked: { type: "boolean" },
+        shapeLocked: { type: "boolean", description: "Lock shape (#1277), the second level of locking: the object can still be moved, turned, lifted, aligned, copied and grouped with others, but its size, its settings, its name and its body stay as they are - no resizing, ungrouping, mirroring, edge tools or deleting, and a group holding such a part keeps its size. A copy keeps the lock. While it is on, update_object takes only x, z, elevation, rotation, rotationX, rotationZ, rotationPivot, hidden, transparent and locked; pass shapeLocked: false in the same call to change anything else." },
         hidden: { type: "boolean" },
         stroke: {
           anyOf: [
