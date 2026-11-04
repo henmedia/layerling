@@ -129,7 +129,7 @@ De loft is een exact lichaam, ook gedraaid en gekanteld: de randen kunnen worden
 
 ## Gridfinity
 
-De vorm {{ui:shape.gridfinity}} maakt onderdelen voor het open opbergsysteem van Zack Freedman: bakken op een raster van 42 mm die in een draagplaat staan en op elkaar stapelen. De maten volgen de gepubliceerde Gridfinity-specificatie, dus een bak uit layerling past in een draagplaat uit een andere generator, en andersom. Onder {{ui:prop.gridfinityType}} kies je:
+De vorm {{ui:shape.gridfinity}} maakt onderdelen voor Gridfinity, het open opbergsysteem van Zack Freedman: bakken op een raster van 42 mm die in een draagplaat staan en op elkaar stapelen. De maten volgen de gepubliceerde Gridfinity-specificatie, dus een bak uit layerling past in een draagplaat uit een andere generator, en andersom. layerling hoort niet bij het Gridfinity-project, dat onder de MIT-licentie valt. Onder {{ui:prop.gridfinityType}} kies je:
 
 - **{{ui:gridfinity.bin}}:** een bak met een voet onder elke rastereenheid. {{ui:prop.gridfinityUnitsX}} en {{ui:prop.gridfinityUnitsZ}} tellen rastereenheden van 42 mm (een bak is 0,5 mm kleiner, 41,5 mm bij één eenheid); {{ui:prop.gridfinityUnitsY}} telt hoogte-eenheden van 7 mm, tot 20. De {{ui:prop.gridfinityLip}} boven op de wand houdt de voeten van de volgende bak vast en maakt de bak 4,4 mm hoger: een bak van 3 eenheden met lip is 25,4 mm hoog. Zet je {{ui:prop.gridfinityMagnets}} aan, dan krijgt elke voet in elke hoek een gat voor een magneet van 6 × 2 mm.
 - **{{ui:gridfinity.baseplate}}:** de plaat waarin de bakken staan, 5 mm hoog, met een vak voor elke rastereenheid. Het is een open raam zonder bodem en zonder magneetgaten; met {{ui:prop.gridfinitySwallowtail}} staat de plaat op een bodem (zie verderop).

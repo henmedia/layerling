@@ -129,7 +129,7 @@ Przejście profili jest dokładną bryłą, także skręcone i pochylone: jego k
 
 ## Gridfinity
 
-Kształt {{ui:shape.gridfinity}} tworzy części do otwartego systemu przechowywania Zacka Freedmana: pojemniki na siatce 42 mm, które stoją w podstawce i układają się jeden na drugim. Wymiary są zgodne z opublikowaną specyfikacją Gridfinity, więc pojemnik z layerling pasuje do podstawki zrobionej innym generatorem, i odwrotnie. W {{ui:prop.gridfinityType}} wybierasz:
+Kształt {{ui:shape.gridfinity}} tworzy części do Gridfinity, otwartego systemu przechowywania Zacka Freedmana: pojemniki na siatce 42 mm, które stoją w podstawce i układają się jeden na drugim. Wymiary są zgodne z opublikowaną specyfikacją Gridfinity, więc pojemnik z layerling pasuje do podstawki zrobionej innym generatorem, i odwrotnie. layerling nie należy do projektu Gridfinity, który jest udostępniony na licencji MIT. W {{ui:prop.gridfinityType}} wybierasz:
 
 - **{{ui:gridfinity.bin}}:** pojemnik ze stopką pod każdą jednostką siatki. {{ui:prop.gridfinityUnitsX}} i {{ui:prop.gridfinityUnitsZ}} liczą jednostki siatki po 42 mm (pojemnik jest o 0,5 mm mniejszy, 41,5 mm na jedną jednostkę), a {{ui:prop.gridfinityUnitsY}} liczą jednostki wysokości po 7 mm, do 20. {{ui:prop.gridfinityLip}} na górze ścianki trzyma stopki następnego pojemnika i podwyższa pojemnik o 4,4 mm: pojemnik na 3 jednostki z kołnierzem ma 25,4 mm wysokości. Z {{ui:prop.gridfinityMagnets}} każda stopka dostaje w każdym narożniku otwór na magnes 6 × 2 mm.
 - **{{ui:gridfinity.baseplate}}:** płytka, w której stoją pojemniki, o wysokości 5 mm, z gniazdem na każdą jednostkę siatki. To otwarta rama bez dna i bez otworów na magnesy; z {{ui:prop.gridfinitySwallowtail}} stoi na dnie (patrz niżej).

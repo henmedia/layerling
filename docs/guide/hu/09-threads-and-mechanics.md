@@ -123,7 +123,7 @@ Az átmenet pontos test, csavarva és döntve is: az élei letörhetők és leke
 
 ## Gridfinity
 
-A {{ui:shape.gridfinity}} alakzat Zack Freedman nyílt tárolórendszeréhez készít alkatrészeket: 42 mm-es rácsra épülő rekeszeket, amelyek alapkeretbe állnak és egymásra rakhatók. A méretek a közzétett Gridfinity-specifikációt követik, így egy layerlingben készült rekesz illik egy más generátorral készült alapkeretbe, és fordítva. A {{ui:prop.gridfinityType}} mezőben választhatsz:
+A {{ui:shape.gridfinity}} alakzat a Gridfinityhez, Zack Freedman nyílt tárolórendszeréhez készít alkatrészeket: 42 mm-es rácsra épülő rekeszeket, amelyek alapkeretbe állnak és egymásra rakhatók. A méretek a közzétett Gridfinity-specifikációt követik, így egy layerlingben készült rekesz illik egy más generátorral készült alapkeretbe, és fordítva. A layerling nem része a Gridfinity-projektnek, amely MIT-licenc alatt áll. A {{ui:prop.gridfinityType}} mezőben választhatsz:
 
 - **{{ui:gridfinity.bin}}:** rekesz, minden rácsegység alatt egy lábbal. Az {{ui:prop.gridfinityUnitsX}} és az {{ui:prop.gridfinityUnitsZ}} 42 mm-es rácsegységeket számol (a rekesz 0,5 mm-rel kisebb, egy egységnél 41,5 mm); minden magassági egység ({{ui:prop.gridfinityUnitsY}}) 7 mm, legfeljebb 20. A fal tetején lévő {{ui:prop.gridfinityLip}} fogadja a következő rekesz lábait, és 4,4 mm-rel magasabbá teszi a rekeszt: egy 3 egységes, peremes rekesz 25,4 mm magas. A {{ui:prop.gridfinityMagnets}} bekapcsolásával minden láb minden sarkába lyuk kerül egy 6 × 2 mm-es mágnesnek.
 - **{{ui:gridfinity.baseplate}}:** a keret, amelybe a rekeszek állnak, 5 mm magas, minden rácsegységhez egy fészekkel. Nyitott keret, fenék és mágneslyukak nélkül; a {{ui:prop.gridfinitySwallowtail}} bekapcsolásával fenéken áll (lásd lent).

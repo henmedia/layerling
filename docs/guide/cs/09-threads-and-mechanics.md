@@ -123,7 +123,7 @@ Přesná geometrie platí i při zkroucení a náklonu, takže lze zaoblovat, zk
 
 ## Gridfinity
 
-Tvar {{ui:shape.gridfinity}} vytváří díly pro otevřený úložný systém Zacka Freedmana: krabičky v mřížce po 42 mm, které stojí v nosné desce a dají se stohovat na sebe. Rozměry odpovídají zveřejněné specifikaci Gridfinity, takže krabička z layerlingu sedí v nosné desce z jiného generátoru a naopak. V poli {{ui:prop.gridfinityType}} vyberete:
+Tvar {{ui:shape.gridfinity}} vytváří díly pro Gridfinity, otevřený úložný systém Zacka Freedmana: krabičky v mřížce po 42 mm, které stojí v nosné desce a dají se stohovat na sebe. Rozměry odpovídají zveřejněné specifikaci Gridfinity, takže krabička z layerlingu sedí v nosné desce z jiného generátoru a naopak. layerling není součástí projektu Gridfinity, který je vydán pod licencí MIT. V poli {{ui:prop.gridfinityType}} vyberete:
 
 - **{{ui:gridfinity.bin}}:** krabičku s nožkou pod každou jednotkou mřížky. {{ui:prop.gridfinityUnitsX}} a {{ui:prop.gridfinityUnitsZ}} počítají jednotky mřížky po 42 mm (krabička je o 0,5 mm menší, 41,5 mm na jednu jednotku); každá výšková jednotka ({{ui:prop.gridfinityUnitsY}}) měří 7 mm, nejvýš 20. {{ui:prop.gridfinityLip}} nahoře na stěně drží nožky další krabičky a krabičku zvýší o 4,4 mm: krabička o 3 jednotkách s okrajem je vysoká 25,4 mm. Když zapnete {{ui:prop.gridfinityMagnets}}, dostane každá nožka v každém rohu otvor pro magnet 6 × 2 mm.
 - **{{ui:gridfinity.baseplate}}:** desku, ve které krabičky stojí, vysokou 5 mm, s lůžkem pro každou jednotku mřížky. Je to otevřený rám bez dna a bez otvorů pro magnety; s {{ui:prop.gridfinitySwallowtail}} stojí na dně (viz níže).

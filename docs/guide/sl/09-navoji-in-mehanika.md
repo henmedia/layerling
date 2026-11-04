@@ -123,7 +123,7 @@ Prehod je natančno telo, tudi zasukan in nagnjen: njegove robove lahko posname�
 
 ## Gridfinity
 
-Oblika {{ui:shape.gridfinity}} izdela dele za odprti sistem za shranjevanje Zacka Freedmana: posode na mreži po 42 mm, ki stojijo v podstavku in se zlagajo druga na drugo. Mere sledijo objavljeni specifikaciji Gridfinity, zato posoda iz layerlinga ustreza podstavku iz drugega generatorja in obratno. Pod {{ui:prop.gridfinityType}} izbereš:
+Oblika {{ui:shape.gridfinity}} izdela dele za Gridfinity, odprti sistem za shranjevanje Zacka Freedmana: posode na mreži po 42 mm, ki stojijo v podstavku in se zlagajo druga na drugo. Mere sledijo objavljeni specifikaciji Gridfinity, zato posoda iz layerlinga ustreza podstavku iz drugega generatorja in obratno. layerling ni del projekta Gridfinity, ki je izdan pod licenco MIT. Pod {{ui:prop.gridfinityType}} izbereš:
 
 - **{{ui:gridfinity.bin}}:** posodo z nogo pod vsako enoto mreže. {{ui:prop.gridfinityUnitsX}} in {{ui:prop.gridfinityUnitsZ}} štejeta enote mreže po 42 mm (posoda je za 0,5 mm manjša, 41,5 mm za eno enoto); vsaka višinska enota ({{ui:prop.gridfinityUnitsY}}) meri 7 mm, največ 20. {{ui:prop.gridfinityLip}} na vrhu stene sprejme noge naslednje posode in posodo zviša za 4,4 mm: posoda s 3 enotami in obrobo je visoka 25,4 mm. Če vklopiš {{ui:prop.gridfinityMagnets}}, dobi vsaka noga v vsakem kotu luknjo za magnet 6 × 2 mm.
 - **{{ui:gridfinity.baseplate}}:** podstavek, v katerem stojijo posode, visok 5 mm, z ležiščem za vsako enoto mreže. Je odprt okvir brez dna in brez lukenj za magnete; z {{ui:prop.gridfinitySwallowtail}} stoji na dnu (glej spodaj).
