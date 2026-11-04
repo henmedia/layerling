@@ -25,6 +25,7 @@ summary: Библиотека фигур, размеры числами и ма�
 - {{ui:library.section.vessels}}: {{ui:shape.loft}}, переходящий от одного контура к другому, скажем от квадрата к кругу, {{ui:shape.tube}}, {{ui:shape.bentTube}}, собранная из прямых участков с изгибами между ними — до двенадцати, и {{ui:shape.vase}}.
 - {{ui:library.section.holes}}: {{ui:shape.counterbore}} и {{ui:shape.countersink}} под головки винтов, {{ui:shape.teardrop}} для горизонтальных отверстий и {{ui:shape.port}} для гнёзд USB, HDMI, DisplayPort и RJ45.
 - {{ui:library.section.connections}}: {{ui:shape.thread}} (резьбовой стержень, винт, гайка и резьбовое отверстие), {{ui:shape.finishingWasher}} под винт с потайной головкой, печатающаяся в сборе {{ui:shape.hinge}} и {{ui:shape.dovetail}}. Подробнее в разделе Резьба и механика.
+- {{ui:library.section.enclosure}}: {{ui:shape.screwBoss}} для термовставок и саморезов, {{ui:shape.snapFit}} с упором и {{ui:shape.rib}} или косынка. Подробнее в главе [Резьба и механика](chapter:threads-and-mechanics).
 - {{ui:library.section.mechanics}}: {{ui:shape.spring}}, {{ui:shape.gear}} и {{ui:shape.hirth}}.
 - {{ui:library.section.systems}}: контейнеры и базовые плиты {{ui:shape.gridfinity}} и {{ui:shape.sbcBoard}} — одноплатный компьютер в натуральную величину, чтобы построить вокруг него корпус.
 - {{ui:library.section.lettering}}: {{ui:shape.text}}, в том числе по дуге окружности, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} и {{ui:shape.qrCode}}. Подробнее в разделе Текст.
