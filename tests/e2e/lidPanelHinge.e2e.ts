@@ -114,3 +114,53 @@ describe("the lid's panel with a hinge", () => {
     expect(texts(flat.panel)).toContain("Pin diameter");
   });
 });
+
+describe("the lid's panel with click bumps and a handle (#1234, #1230)", () => {
+  it("offers click bumps, off to begin with, says what they do once on, and not for a flat lid or pivot pins", () => {
+    const off = mount();
+    const bumps = checkbox(off.panel, "Click bumps")!;
+    expect(bumps).not.toBeNull();
+    expect(bumps.checked).toBe(false);
+    expect(bumps.disabled).toBe(false);
+    expect(texts(off.panel)).not.toContain("snap into dimples in the body");
+    act(() => bumps.click());
+    expect(off.changes.at(-1)).toEqual({ clickBumps: true });
+    act(() => root?.unmount());
+    const on = mount({ clickBumps: true, type: "cap" });
+    expect(checkbox(on.panel, "Click bumps")!.checked).toBe(true);
+    expect(texts(on.panel)).toContain("snap into dimples in the body");
+    act(() => root?.unmount());
+    for (const settings of [{ type: "flat" as const }, { hinge: true, hingeStyle: "pivot" as const }]) {
+      const refused = mount({ ...settings, clickBumps: true });
+      const box = checkbox(refused.panel, "Click bumps")!;
+      expect(box.disabled).toBe(true);
+      expect(box.checked).toBe(false);
+      expect(texts(refused.panel)).toContain("Not for a flat lid or pivot pins.");
+      act(() => root?.unmount());
+    }
+  });
+
+  it("offers no handle, a pull tab or a finger notch, and none for a pivot lid", () => {
+    const { panel, changes } = mount();
+    const group = panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Handle"]')!;
+    expect(group).not.toBeNull();
+    const options = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
+    expect(options.map((button) => button.textContent)).toEqual(["None", "Pull tab", "Finger notch"]);
+    expect(group.querySelector('[role="radio"][aria-checked="true"]')?.textContent).toBe("None");
+    act(() => options[1].click());
+    expect(changes.at(-1)).toEqual({ handle: "tab" });
+    act(() => root?.unmount());
+    const tab = mount({ handle: "tab" });
+    expect(texts(tab.panel)).toContain("6 mm out from its front edge");
+    act(() => root?.unmount());
+    const notch = mount({ handle: "notch" });
+    expect(notch.panel.querySelector('[role="radiogroup"][aria-label="Handle"] [aria-checked="true"]')?.textContent).toBe("Finger notch");
+    expect(texts(notch.panel)).toContain("for a finger to lift it");
+    act(() => root?.unmount());
+    const pivot = mount({ hinge: true, hingeStyle: "pivot", handle: "tab" });
+    const pivotGroup = pivot.panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Handle"]')!;
+    expect(pivotGroup.querySelector('[aria-checked="true"]')?.textContent).toBe("None");
+    expect([...pivotGroup.querySelectorAll<HTMLButtonElement>('[role="radio"]')].map((button) => button.disabled)).toEqual([false, true, true]);
+    expect(texts(pivot.panel)).toContain("A pivot lid lies in the opening");
+  });
+});

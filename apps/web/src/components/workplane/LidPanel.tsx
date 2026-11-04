@@ -8,6 +8,7 @@ import { Check, LoaderCircle, X } from "lucide-react";
 import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
 import {
   LID_FITS,
+  LID_HANDLES,
   LID_HINGE_SIDES,
   LID_HINGE_STYLES,
   LID_HINGE_TYPES,
@@ -33,6 +34,8 @@ import {
   MIN_MAGNET_DIAMETER,
   MIN_MAGNET_HEIGHT,
   hingeKnuckleRadius,
+  lidClickBumpsFit,
+  lidHandleFits,
   lidThicknessForMagnets,
   normalizeLidOptions,
   type LidOptions,
@@ -45,7 +48,8 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * A lid for a body open at the top (#1009): pushed into the opening, put over the outside, gripping the wall from both
  * sides (#1062) or laid flat on it. It comes out as a body of its own beside the one it closes, ready to print. With
  * magnets, it holds by four round magnets in the corners, in pockets in the body's rim and in the lid. With a hinge, it
- * swings open about a pin along the body's back.
+ * swings open about a pin along the body's back. With click bumps it snaps into dimples in the body (#1234); a handle is
+ * a pull tab on the lid or a finger notch in the body (#1230).
  */
 export function LidPanel({
   targetName,
@@ -83,6 +87,10 @@ export function LidPanel({
   const millimetres = (value: number) => value.toLocaleString(numberLocale());
   // A rim round the outside would hit the back wall as the lid swings open: the hinge goes with a lip or a flat lid.
   const hingeFits = LID_HINGE_TYPES.includes(settings.type);
+  // Click bumps stand on a lip or a rim; a pivot lid has neither, nor an edge for a tab or a finger.
+  const bumpsFit = lidClickBumpsFit(settings);
+  const handleFits = lidHandleFits(settings);
+  const handle = handleFits ? settings.handle : "none";
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -361,6 +369,37 @@ export function LidPanel({
         </label>
         <span className="shell-openings-summary">{t("lid.hingeHint", { diameter: millimetres(Math.round(2 * hingeKnuckleRadius(settings) * 10) / 10) })}</span>
       </>) : null}
+
+      <label className="edge-modifier-field offset-copy">
+        <input type="checkbox" checked={settings.clickBumps && bumpsFit} disabled={busy || !bumpsFit} onChange={(event) => onChange({ clickBumps: event.target.checked })} />
+        <span>{t("lid.clickBumps")}</span>
+      </label>
+      {settings.clickBumps || !bumpsFit ? <span className="shell-openings-summary">{t("lid.clickBumpsHint")}</span> : null}
+
+      {/* On the side the lid opens at: the front, or opposite the hinge. */}
+      <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.handle")}>
+        <span>{t("lid.handle")}</span>
+        <div className="shell-opening-options">
+          {LID_HANDLES.map((option) => (
+            <button
+              key={option}
+              type="button"
+              role="radio"
+              aria-checked={handle === option}
+              className={handle === option ? "active" : ""}
+              disabled={busy || (!handleFits && option !== "none")}
+              onClick={() => onChange({ handle: option })}
+            >
+              {t(`lid.handle.${option}`)}
+            </button>
+          ))}
+        </div>
+        {!handleFits ? (
+          <span className="shell-openings-summary">{t("lid.error.handlePivot")}</span>
+        ) : handle !== "none" ? (
+          <span className="shell-openings-summary">{t(`lid.handleHint.${handle}`)}</span>
+        ) : null}
+      </div>
 
       {error ? <div className="edge-modifier-error" role="alert">{error}</div> : null}
       <div className="edge-modifier-footer">
