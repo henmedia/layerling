@@ -101,6 +101,8 @@ export function screwBossSize(fastener: ScrewBossFastener, id: unknown): ScrewBo
 }
 
 export type ScrewBossFields = {
+  /** Grouped as a hole, the boss cuts only its hole, the insert's or the screw's pocket, not the whole post (#1288). */
+  hole?: boolean;
   width: number;
   depth?: number;
   height: number;
@@ -296,6 +298,41 @@ export function screwBossMesh(shape: ScrewBossFields, sides = 48) {
   return { mesh, plan };
 }
 
+/**
+ * The boss's hole alone as a closed body, for a boss grouped as a hole: from the hole's floor (or the boss's foot, for a
+ * hole going through) up to the top, with the lead-in chamfer at its mouth. Cut into a block, it leaves the pocket for
+ * the insert or the screw and nothing else (#1288): the post round it is the block itself.
+ */
+export function screwBossCavityMesh(shape: ScrewBossFields, sides = 48) {
+  const plan = screwBossPlan(shape);
+  const { holeRadius: rh, holeDepth, through, chamfer, height: H } = plan;
+  const mesh = new IndexedMesh();
+  const n = Math.max(12, Math.round(Math.max(12, Math.round(sides)) * 0.75));
+  const ring = (y: number, r: number) => Array.from({ length: n }, (_, k) => {
+    const angle = (2 * Math.PI * k) / n;
+    return mesh.point(r * Math.cos(angle), y, r * Math.sin(angle));
+  });
+  const floorY = through ? 0 : H - holeDepth;
+  const bottom = ring(floorY, rh);
+  const neck = chamfer > 0 ? ring(H - chamfer, rh) : bottom;
+  const mouth = chamfer > 0 ? ring(H, rh + chamfer) : ring(H, rh);
+  for (let k = 0; k < n; k += 1) {
+    const j = (k + 1) % n;
+    if (chamfer > 0) {
+      mesh.quad(bottom[k], neck[k], neck[j], bottom[j]);
+      mesh.quad(neck[k], mouth[k], mouth[j], neck[j]);
+    } else mesh.quad(bottom[k], mouth[k], mouth[j], bottom[j]);
+  }
+  const low = mesh.point(0, floorY, 0), high = mesh.point(0, H, 0);
+  for (let k = 0; k < n; k += 1) {
+    const j = (k + 1) % n;
+    mesh.tri(low, bottom[k], bottom[j]);
+    mesh.tri(high, mouth[j], mouth[k]);
+  }
+  mesh.orient();
+  return { mesh, plan };
+}
+
 export function createScrewBossGeometry(shape: ScrewBossFields, sides = 48): THREE.BufferGeometry {
-  return screwBossMesh(shape, sides).mesh.geometry(35);
+  return (shape.hole ? screwBossCavityMesh(shape, sides) : screwBossMesh(shape, sides)).mesh.geometry(35);
 }

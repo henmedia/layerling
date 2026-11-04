@@ -8,5 +8,15 @@
       "de": "Ist „Maße beim Verschieben zeigen“ an, zeigen jetzt auch die Pfeiltasten, um wie viel du die Auswahl verschiebst, wie beim Ziehen mit der Maus. Die Tastendrücke zählen zusammen, bis du etwas anderes auswählst oder ziehst; Strg+↑ und Strg+↓ zeigen den Weg nach oben oder unten. Danach kannst du die Zahl anklicken und den genauen Weg eintippen.",
       "en": "With \"Show movement dimensions\" on, the arrow keys now show by how much you move the selection too, as a drag with the mouse does. The presses add up until you select something else or drag; Ctrl+↑ and Ctrl+↓ show the way up or down. Then click the number to type the exact distance."
     }
+  },
+  {
+    "title": {
+      "de": "Swallowtail-Verbinder, die passen",
+      "en": "Swallowtail keys that fit"
+    },
+    "body": {
+      "de": "Die Verbinder für Swallowtail-Bodenplatten gehen leichter hinein: Die Fuge ist offen, und der Absatz hält nur noch die geschlitzten Enden. Mit „Spiel der Verbinder“ unter „Swallowtail“ im Eigenschaften-Fenster machst du sie für deinen Drucker lockerer oder strammer; klicke danach noch einmal auf „Verbinder anlegen“.",
+      "en": "The keys for Swallowtail baseplates go in more easily: the seam is open, and the lip only holds their slotted ends. With \"Key clearance\" under \"Swallowtail\" in the Properties panel you make them looser or tighter for your printer; click \"Add keys\" again afterwards."
+    }
   }
 ]

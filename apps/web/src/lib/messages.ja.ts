@@ -2376,6 +2376,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "gridfinity.largePlateHint": "横と奥行きを6マスではなく最大12マスにします。256 mmより大きいプリントベッド向けです。設定でプリンターを選んでいると、そのベッドより大きいプレートには印が付きます。",
   "prop.gridfinitySwallowtail": "Swallowtail",
   "gridfinity.swallowtailHint": "Swallowtail: プレートを厚さ2.4 mmの床にのせ、高さを7.4 mmにします。余白のない各辺の下にはポケットが半分ずつあり、2枚を並べると継ぎ目をまたいで丸ごとのポケットができます。下から押しこんだ連結ピースがカチッとはまり、2枚をつなぎます。「連結ピースを追加」で、奥と右のポケットごとに1つずつ作るので、次のプレートとの継ぎ目をまたぐポケットのすべてに1つずつ行きわたります。",
+  "prop.gridfinitySwallowtailClearance": "連結ピースのクリアランス",
+  "gridfinity.swallowtailClearanceHint": "各連結ピースが、どの辺でもポケットよりどれだけ小さいかです。連結ピースが詰まったり割れたりするときは大きく、ゆるいときは小さくします。0.15 mmまで上げられます。変わるのはプレートではなく、次に「連結ピースを追加」で作る連結ピースなので、変更したら「連結ピースを追加」をもう一度クリックしてください。",
   "prop.gridfinityFloorHeight": "底の高さ",
   "gridfinity.floorHeightHint": "ビンの底からこの高さまでが、中までつまっています。シェイプを切り取るための材料になります。",
   "gridfinity.floorHeightLipHint": "ビンの底からこの高さまでが、中までつまっています。シェイプを切り取るための材料になります。{height} mmまでは、上に別のビンを重ねられます。それより高くすると、重ねるためのふちもつまって、上面が平らになります。",

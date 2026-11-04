@@ -4554,6 +4554,38 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
   }
 
   /**
+   * The middle of the picked faces, on them: seen straight on from the side they face together (the area-weighted mean of
+   * their normals), else the point of them nearest to their area-weighted middle.
+   */
+  function onChosenFaces(chosen: Uint8Array, far: number): { face: number; point: number[] } | null {
+    const v = base.vertices, I = base.indices;
+    const middle = [0, 0, 0], normal = [0, 0, 0];
+    let area = 0;
+    for (let t = 0; t < I.length; t += 3) {
+      if (!chosen[t / 3]) continue;
+      const cross = faceCross(v, I[t], I[t + 1], I[t + 2]);
+      const a = Math.hypot(cross[0], cross[1], cross[2]) / 2;
+      if (!(a > 0)) continue;
+      area += a;
+      for (let k = 0; k < 3; k += 1) {
+        middle[k] += (a * (v[I[t] * 3 + k] + v[I[t + 1] * 3 + k] + v[I[t + 2] * 3 + k])) / 3;
+        normal[k] += cross[k] / 2;
+      }
+    }
+    if (!(area > 0)) return null;
+    for (let k = 0; k < 3; k += 1) middle[k] /= area;
+    const n = Math.hypot(normal[0], normal[1], normal[2]);
+    // Facing one way together (a top, a side, a gentle dome): the ray from that side meets them first.
+    if (n > 0.3 * area) {
+      const dir = normal.map((c) => c / n);
+      const seen = firstHit(base, middle.map((m, k) => m + dir[k] * far), dir.map((d) => -d));
+      if (seen && chosen[seen.face]) return seen;
+    }
+    const nearest = nearestSurfacePoint(base, middle as [number, number, number], chosen);
+    return nearest ? { face: nearest.face, point: nearest.point } : null;
+  }
+
+  /**
    * Where a text is stuck on: a ray from far out, `textAround` degrees round the axis (0 the front, 90 the right; lying
    * along x or y, 0 the top) and `textHeight` % up it, towards the axis - the first face it meets is the middle of the
    * text. The window round the text gets a margin: the unrolling and the finer grid reach a little beyond the letters.
@@ -4573,7 +4605,11 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     middle[i1] = layout.center[0];
     middle[i2] = layout.center[1];
     const far = Math.hypot(...base.size) + 10;
-    const hit = firstHit(base, middle.map((m, k) => m + dir[k] * far), dir.map((d) => -d)) ?? nearestSurfacePoint(base, middle.map((m, k) => m + dir[k] * layout.rMax));
+    let hit = firstHit(base, middle.map((m, k) => m + dir[k] * far), dir.map((d) => -d)) ?? nearestSurfacePoint(base, middle.map((m, k) => m + dir[k] * layout.rMax));
+    // Faces picked, and Around and Height aim past them (issue #1206): the middle goes onto the picked faces instead.
+    // Beside them the surface stays smooth, so a text or an image there was pressed only into the edge they share.
+    const chosen = chosenFaces(s);
+    if (hit && chosen && !chosen[hit.face]) hit = onChosenFaces(chosen, far) ?? hit;
     if (!hit) return null;
     const width = box.maxX - box.minX, height = box.maxY - box.minY;
     const margin = Math.max(0.05 * Math.max(width, height), 1) + 1;
@@ -5056,14 +5092,16 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       }
     }
     // A border round the rims: cut along it (see beadCuts).
-    if (layout.capEdge === "bead" && !mesh.limited && !cracks && !text) mesh = beadCuts(mesh, s, layout, maxTriangles, smooth.faces);
+    // Not for a text or an image once: their values are worked out per point above, and a point added now would have none
+    // (it went with no move, and a long triangle closed the gap through the body, issue #1268).
+    if (layout.capEdge === "bead" && !mesh.limited && !cracks && !stuckOn(s)) mesh = beadCuts(mesh, s, layout, maxTriangles, smooth.faces);
     // Not refined at the flanks: faces cut exactly already, and faces that stay smooth (the top of a box: its grid only
     // went finer and finer along the pattern's lines, and no point there moves).
     const cutFaces = straight ? Uint8Array.from(straight, (k, f) => (k === 255 && !smooth.faces[f] ? 0 : 1)) : smooth.faces;
     if (s.pattern === "weave" && s.projection === "cylinder" && !mesh.limited) mesh = weaveCuts(mesh, s, layout, maxTriangles, smooth.faces);
     if (s.pattern === "carbon" && s.projection === "cylinder" && !mesh.limited) mesh = carbonCuts(mesh, s, layout, maxTriangles, smooth.faces);
     if (s.projection === "cylinder" && layout.outline?.corners.length && standsOut(s) && !mesh.limited) mesh = cornerCuts(mesh, s, layout, maxTriangles, smooth.faces);
-    if (!slice && !cracks && !text && !mesh.limited && !cellSliced) mesh = refineFlanks(mesh, s, layout, edge / 2.5, maxTriangles, cutFaces);
+    if (!slice && !cracks && !stuckOn(s) && !mesh.limited && !cellSliced) mesh = refineFlanks(mesh, s, layout, edge / 2.5, maxTriangles, cutFaces);
     // Cut even where the budget stopped refining (a long log): as long as the cuts still fit in (see barkLevelCuts).
     if (s.pattern === "bark") {
       const cut = barkLevelCuts(mesh, s, layout, BARK_BLUR * edge, maxTriangles, cutFaces);

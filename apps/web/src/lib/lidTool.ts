@@ -18,8 +18,12 @@ import type { WorkplaneShape } from "@/types/layerling";
  * With magnets, the lid holds by four round magnets in the corners: a pocket for each in the body's rim and one facing
  * it in the lid's plate. A wall too thin for a pocket gets a post in that corner, from the bottom up to the rim, which
  * the lid's lip then goes round.
+ * With click bumps (#1234), small round bumps on the lip's outer face (a cap: its rim's inner face) snap into dimples cut
+ * into the body's wall at the same places. A handle (#1230) is a pull tab on the plate's front edge, or a finger notch in
+ * the body's front wall below the lid's edge: the front, or the side opposite the hinge.
  * With a hinge, the lid swings open about an axis along a straight side of the body (the back, or the side picked), flush
- * with the lid's top: knuckles
+ * with the lid's top, behind that side (outside) or in its wall (flush, see `LidHingeStyle`); or, as a pivot lid, it lies
+ * in the opening and turns on two pins through the side walls. Outside and flush: knuckles
  * take turns along it, the outer ones the body's, those between the lid's, a gap apart, and a pin goes through them all
  * (a piece of filament, or a pin printed apart). The body's knuckles stand out from its back wall on a 45 degree slope,
  * so the body prints upright without support; the lid's lie on the plate when it is printed turned over.
@@ -33,12 +37,27 @@ export type LidType = "plug" | "cap" | "both" | "flat";
 export type LidHingeSide = "back" | "right" | "front" | "left";
 
 /**
+ * Where the hinge sits: `outside` behind the back wall (the lid opens all the way), `flush` in the back wall (the box
+ * keeps its size; each part notched round the other's knuckles), or `pivot`: the lid lies in the opening and turns on
+ * two pins through the side walls, held up by a ledge inside.
+ */
+export type LidHingeStyle = "outside" | "flush" | "pivot";
+
+/**
+ * A handle on the side the lid opens at (the front, or the side opposite the hinge): `tab` a pull tab on the plate's edge,
+ * as thick as the plate; `notch` a finger recess in the body's outer wall just below the lid's edge.
+ */
+export type LidHandle = "none" | "tab" | "notch";
+
+/**
  * The kind of lid; the plate's thickness, the gap per side, how deep the lip or rim reaches down and how thick its wall
  * is, in mm. With `magnets`, pockets for four round magnets of that diameter and height, with `magnetGap` of play per
  * side (a little to press them in, more to glue them). With `hinge`, a hinge along the `hingeSide` (the back unless
  * another is picked) for a pin of `hingePin` mm, `hingeGap` between its knuckles, `hingeKnuckles` of them (0: as many as
- * suit its length), and the pin printed apart with `hingePrintPin`. With `hingeTeardrop` (the default) the pin's holes
- * have a point on top as each part is printed, so they do not droop.
+ * suit its length), and the pin printed apart with `hingePrintPin`. `hingePinPlay` is the pin's play in its holes, per
+ * side. With `hingeTeardrop` (the default) the pin's holes have a point on top as each part is printed, so they do not droop.
+ * With `clickBumps`, bumps on the lip or rim and dimples for them in the body, so the lid clicks into place; `handle` a pull
+ * tab or a finger notch.
  */
 export type LidOptions = {
   type: LidType;
@@ -53,16 +72,21 @@ export type LidOptions = {
   hinge: boolean;
   hingePin: number;
   hingeGap: number;
+  hingePinPlay: number;
   hingeKnuckles: number;
   hingePrintPin: boolean;
   hingeSide: LidHingeSide;
   hingeTeardrop: boolean;
+  hingeStyle: LidHingeStyle;
+  clickBumps: boolean;
+  handle: LidHandle;
 };
 
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat"];
 export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
-  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true,
+  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside",
+  clickBumps: false, handle: "none",
 };
 export const LID_FITS = [0.1, 0.2, 0.3] as const;
 export const MIN_LID_THICKNESS = 0.4;
@@ -92,6 +116,13 @@ const MAGNET_OVERCUT = 1;
 /** The lid types a hinge goes with: a rim round the outside would hit the back wall as the lid swings open. */
 export const LID_HINGE_TYPES: readonly LidType[] = ["plug", "flat"];
 export const LID_HINGE_SIDES: readonly LidHingeSide[] = ["back", "right", "front", "left"];
+export const LID_HINGE_STYLES: readonly LidHingeStyle[] = ["outside", "flush", "pivot"];
+/** How wide the ledge is that holds a pivot lid up inside the opening, in mm; its underside steps back at 45 degrees. */
+const PIVOT_LEDGE = 1.2;
+/** How deep a pivot pin goes into the lid's bar at most, in mm. */
+const PIVOT_PIN_DEPTH = 6;
+/** The thinnest side wall a pivot pin goes through, in mm. */
+const PIVOT_MIN_WALL = 0.8;
 /**
  * The turn about the up axis, in degrees, that brings each side to the back, where the hinge is worked out: the frame's
  * +y is the scene's -z (the back), +x the scene's +x (the right).
@@ -102,8 +133,9 @@ export const MAX_HINGE_PIN = 8;
 export const MIN_HINGE_GAP = 0.1;
 export const MAX_HINGE_GAP = 1;
 export const MAX_HINGE_KNUCKLES = 15;
-/** How much play the pin has in its hole, per side, in mm. */
-const HINGE_PIN_PLAY = 0.15;
+/** How much play the pin may have in its hole, per side, in mm (0.2 to begin with: a 3 mm pin went in hard at 0.15, #1220). */
+export const MIN_HINGE_PIN_PLAY = 0.05;
+export const MAX_HINGE_PIN_PLAY = 0.5;
 /** How much a knuckle keeps round the pin's hole, in mm. */
 const HINGE_KNUCKLE_WALL = 1.6;
 /** A knuckle is at least this wide along the axis, in mm. */
@@ -118,6 +150,37 @@ const PIN_FLAT = 0.1;
 const HINGE_WALL_REACH = 0.4;
 /** How many sides a knuckle's and a pin's circle has. */
 const HINGE_SIDES = 48;
+export const LID_HANDLES: readonly LidHandle[] = ["none", "tab", "notch"];
+/** A click bump's radius, in mm: a piece of a ball standing out of the lip's or the rim's face. */
+const BUMP_RADIUS = 1.5;
+/** How far a click bump reaches into the body's wall, past the gap, in mm: how far it holds. */
+const BUMP_REACH = 0.4;
+/** How much larger a dimple's ball is than its bump's, in mm, so the bump sits in it without pressing. */
+const DIMPLE_PLAY = 0.1;
+/** How much of the body's wall a dimple always leaves, in mm. */
+const DIMPLE_SKIN = 0.4;
+/** A straight side of the lip or rim at least this long gets a bump in its middle; one longer than BUMP_TWO_FROM two. */
+const BUMP_MIN_SIDE = 12;
+const BUMP_TWO_FROM = 80;
+/** How many bumps go round a lip or rim without straight sides (a round pot). */
+const BUMP_ROUND_COUNT = 4;
+/** How far inside the lip or rim a bump's cut-off back lies, in mm, so it does not lie in the lip's or rim's own face. */
+const FACE_HAIR = 0.05;
+/** How many sides a bump's and a dimple's ball has round. */
+const BUMP_SIDES = 32;
+/** A pull tab: how wide (at most half its side), how far it reaches beyond the plate and how round its outer corners are, in mm. */
+const TAB_WIDTH = 20;
+const TAB_REACH = 6;
+const TAB_CORNER = 3;
+/** A pull tab narrower than this is refused, in mm. */
+const MIN_TAB_WIDTH = 8;
+/** A finger notch: the radius of its round, how wide it is (at most the side less 2 mm at each end), in mm. */
+const NOTCH_RADIUS = 5;
+const NOTCH_WIDTH = 16;
+/** How much of the wall a finger notch always leaves, in mm. */
+const NOTCH_SKIN = 0.8;
+/** A finger notch shallower than this on average is no notch, in mm. */
+const MIN_NOTCH_DEPTH = 0.4;
 /** How far the lid lies from a pin printed apart, in mm. */
 const PIN_SPACING = 5;
 /** How far apart the lid lies from the body it closes, in mm. */
@@ -160,6 +223,8 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (hingePin !== null) result.hingePin = clamp(hingePin, MIN_HINGE_PIN, MAX_HINGE_PIN);
   const hingeGap = finiteNumber(value?.hingeGap);
   if (hingeGap !== null) result.hingeGap = clamp(hingeGap, MIN_HINGE_GAP, MAX_HINGE_GAP);
+  const hingePinPlay = finiteNumber(value?.hingePinPlay);
+  if (hingePinPlay !== null) result.hingePinPlay = clamp(hingePinPlay, MIN_HINGE_PIN_PLAY, MAX_HINGE_PIN_PLAY);
   // An odd number, so the body holds both ends; 0 leaves it to the hinge's length.
   const hingeKnuckles = finiteNumber(value?.hingeKnuckles);
   if (hingeKnuckles !== null) {
@@ -170,12 +235,27 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   const hingeSide = typeof value?.hingeSide === "string" ? value.hingeSide.trim().toLowerCase() : "";
   if ((LID_HINGE_SIDES as readonly string[]).includes(hingeSide)) result.hingeSide = hingeSide as LidHingeSide;
   if (value?.hingeTeardrop === false || value?.hingeTeardrop === "false") result.hingeTeardrop = false;
+  const hingeStyle = typeof value?.hingeStyle === "string" ? value.hingeStyle.trim().toLowerCase() : "";
+  if ((LID_HINGE_STYLES as readonly string[]).includes(hingeStyle)) result.hingeStyle = hingeStyle as LidHingeStyle;
+  if (value?.clickBumps === true || value?.clickBumps === "true") result.clickBumps = true;
+  const handle = typeof value?.handle === "string" ? value.handle.trim().toLowerCase() : "";
+  if ((LID_HANDLES as readonly string[]).includes(handle)) result.handle = handle as LidHandle;
   return result;
 }
 
-/** A knuckle's radius for this pin: its hole with the pin's play and a wall round it, in mm. */
-export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin">) {
-  return options.hingePin / 2 + HINGE_PIN_PLAY + HINGE_KNUCKLE_WALL;
+/** Whether click bumps go with these options: they need a lip or a rim, and a pivot lid has neither. */
+export function lidClickBumpsFit(options: Pick<LidOptions, "type" | "hinge" | "hingeStyle">) {
+  return options.type !== "flat" && !(options.hinge && LID_HINGE_TYPES.includes(options.type) && options.hingeStyle === "pivot");
+}
+
+/** Whether a pull tab or a finger notch goes with these options: a pivot lid lies in the opening, with no edge to take. */
+export function lidHandleFits(options: Pick<LidOptions, "type" | "hinge" | "hingeStyle">) {
+  return !(options.hinge && LID_HINGE_TYPES.includes(options.type) && options.hingeStyle === "pivot");
+}
+
+/** A knuckle's radius for this pin: its hole with the pin's play (the default's unless given) and a wall round it, in mm. */
+export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin"> & Partial<Pick<LidOptions, "hingePinPlay">>) {
+  return options.hingePin / 2 + (options.hingePinPlay ?? LID_DEFAULTS.hingePinPlay) + HINGE_KNUCKLE_WALL;
 }
 
 /**
@@ -187,8 +267,8 @@ export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin">) {
  * lid's web reach as far in as the wall falls away there. An error when even that is too short for three knuckles, or
  * the body is too low for the slope under them.
  */
-export function hingePlan(polygons: readonly (readonly Point[])[], options: LidOptions, top: number, bottom: number):
-  | { backY: number; axisY: number; axisZ: number; radius: number; hole: number; segments: [number, number][]; low: number; start: number; end: number; reach: number; curved: boolean }
+export function hingePlan(polygons: readonly (readonly Point[])[], options: LidOptions, top: number, bottom: number, innerBack?: number):
+  | { backY: number; axisY: number; axisZ: number; radius: number; hole: number; segments: [number, number][]; low: number; start: number; end: number; reach: number; curved: boolean; innerBack: number }
   | { error: LidError } {
   const back = Math.max(...polygons.flat().map(([, y]) => y));
   // The straight stretches along the back: edges whose both ends lie on it, joined where they meet.
@@ -209,14 +289,17 @@ export function hingePlan(polygons: readonly (readonly Point[])[], options: LidO
   const longest = joined.reduce<[number, number] | null>((best, stretch) => (!best || stretch[1] - stretch[0] > best[1] - best[0] ? stretch : best), null);
   const gap = options.hingeGap;
   const radius = hingeKnuckleRadius(options);
+  // In the wall, the knuckles run right into the corners: a strip of plate or wall left at an end would stand in the
+  // other part's way as the lid turns.
+  const margin = options.hingeStyle === "flush" ? 0 : HINGE_END_MARGIN;
   // How many knuckles a stretch takes, and how wide they are; none when not even three fit.
   const knuckles = (range: [number, number] | null) => {
     if (!range) return null;
-    const length = range[1] - range[0] - 2 * HINGE_END_MARGIN;
+    const length = range[1] - range[0] - 2 * margin;
     const width = (count: number) => (length - (count - 1) * gap) / count;
     let count = options.hingeKnuckles || Math.min(MAX_HINGE_KNUCKLES, Math.max(3, 2 * Math.round((length / 10 - 1) / 2) + 1));
     while (count > 3 && width(count) < MIN_KNUCKLE_WIDTH) count -= 2;
-    return width(count) < MIN_KNUCKLE_WIDTH ? null : { count, width: width(count), start: range[0] + HINGE_END_MARGIN, end: range[1] - HINGE_END_MARGIN };
+    return width(count) < MIN_KNUCKLE_WIDTH ? null : { count, width: width(count), start: range[0] + margin, end: range[1] - margin };
   };
   const straight = knuckles(longest);
   const cap = straight ? null : outlineCapAtBack(polygons, back, radius);
@@ -225,15 +308,67 @@ export function hingePlan(polygons: readonly (readonly Point[])[], options: LidO
   const { count, start, end } = fit;
   const curved = !straight;
   const reach = curved ? radius + HINGE_WALL_REACH : HINGE_WALL_REACH;
-  // Flush with the lid's top, behind the back side by the gap.
-  const axisY = back + radius + gap;
+  // Flush with the lid's top: outside, behind the back side by the gap; flush, inside it, flush with its outer face.
+  const flush = options.hingeStyle === "flush";
+  const axisY = flush ? back - radius : back + radius + gap;
   const axisZ = top + options.thickness - radius;
-  // A 45 degree slope from the back wall to the bottom of the knuckle.
-  const low = axisZ - (radius + gap) - radius * Math.SQRT2;
+  // A 45 degree slope from the wall to the bottom of the knuckle: outside, from the back face; flush, from the wall's
+  // inner face, where a knuckle reaches into the opening past a wall thinner than it.
+  const inner = innerBack ?? back - 2 * radius;
+  const low = flush ? axisZ - radius * Math.SQRT2 + (axisY - inner) : axisZ - (radius + gap) - radius * Math.SQRT2;
   if (low < bottom + 0.4) return { error: { code: "hingeTooLow" } };
   const w = fit.width;
   const segments = Array.from({ length: count }, (_, index): [number, number] => [start + index * (w + gap), start + index * (w + gap) + w]);
-  return { backY: back, axisY, axisZ, radius, hole: options.hingePin / 2 + HINGE_PIN_PLAY, segments, low, start, end, reach, curved };
+  return { backY: back, axisY, axisZ, radius, hole: options.hingePin / 2 + options.hingePinPlay, segments, low, start, end, reach, curved, innerBack: inner };
+}
+
+/** Where a level line at `y` crosses the outline: its leftmost and rightmost crossing, or null when it does not. */
+function acrossAt(polygons: readonly (readonly Point[])[], y: number): [number, number] | null {
+  let left = Infinity;
+  let right = -Infinity;
+  for (const polygon of polygons) {
+    polygon.forEach((point, index) => {
+      const next = polygon[(index + 1) % polygon.length];
+      if ((point[1] - y) * (next[1] - y) > 0 || point[1] === next[1]) return;
+      const x = point[0] + ((y - point[1]) / (next[1] - point[1])) * (next[0] - point[0]);
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+    });
+  }
+  return Number.isFinite(left) && Number.isFinite(right) ? [left, right] : null;
+}
+
+/**
+ * A pivot lid, worked out with the hinge's side at the back (largest y): the lid lies in the opening, its back edge a
+ * round bar under the plate, turning about an axis just in front of the back wall; a pin goes through each side wall
+ * into the bar's end. The side walls are where the opening and the outline are crossed level with the axis, and they
+ * must run straight there for the bar's whole radius. An error when there are no such walls or the body is too low.
+ */
+export function pivotPlan(outline: readonly (readonly Point[])[], opening: readonly (readonly Point[])[], options: LidOptions, top: number, bottom: number):
+  | { axisY: number; axisZ: number; radius: number; hole: number; outer: [number, number]; inner: [number, number]; barFrom: number; barTo: number; depth: number; innerBack: number }
+  | { error: LidError } {
+  if (!opening.length) return { error: { code: "pivotNoSides" } };
+  const radius = hingeKnuckleRadius(options);
+  const innerBack = Math.max(...opening.flat().map(([, y]) => y));
+  const axisY = innerBack - options.hingeGap - radius;
+  const axisZ = top - radius;
+  const outer = acrossAt(outline, axisY);
+  const inner = acrossAt(opening, axisY);
+  if (!outer || !inner) return { error: { code: "pivotNoSides" } };
+  // Straight walls: the outline's and the opening's sides are crossed in the same place a bar's radius in front of the
+  // axis and behind it, so the bar turns along them and the pins go through them square.
+  for (const y of [axisY - radius, axisY + radius]) {
+    const o = acrossAt(outline, y);
+    const i = acrossAt(opening, y);
+    if (!o || !i || [o[0] - outer[0], o[1] - outer[1], i[0] - inner[0], i[1] - inner[1]].some((d) => Math.abs(d) > 0.05)) return { error: { code: "pivotNoSides" } };
+  }
+  if (inner[0] - outer[0] < PIVOT_MIN_WALL || outer[1] - inner[1] < PIVOT_MIN_WALL) return { error: { code: "pivotNoSides" } };
+  const barFrom = inner[0] + options.hingeGap;
+  const barTo = inner[1] - options.hingeGap;
+  if (barTo - barFrom < 4 * radius) return { error: { code: "pivotNoSides" } };
+  if (axisZ - radius < bottom + 0.4 + PIVOT_LEDGE) return { error: { code: "hingeTooLow" } };
+  const depth = Math.min(PIVOT_PIN_DEPTH, (barTo - barFrom) / 4);
+  return { axisY, axisZ, radius, hole: options.hingePin / 2 + options.hingePinPlay, outer, inner, barFrom, barTo, depth, innerBack };
 }
 
 /**
@@ -258,6 +393,193 @@ function outlineCapAtBack(polygons: readonly (readonly Point[])[], back: number,
   return Number.isFinite(left) && Number.isFinite(right) ? [left, right] : null;
 }
 
+/**
+ * The polygon with each straight stretch as one edge: a point that lies within `tolerance` of the line from where the
+ * stretch began to the point after it is left out (a slice through a mesh has a point wherever it crosses a triangle's
+ * edge, also along a flat wall). It begins at the sharpest corner, so no stretch runs on through the start.
+ */
+function straightened(polygon: readonly Point[], tolerance = 0.02): Point[] {
+  const count = polygon.length;
+  if (count < 4) return [...polygon];
+  const turnAt = (index: number) => {
+    const [px, py] = polygon[(index - 1 + count) % count];
+    const [x, y] = polygon[index];
+    const [nx, ny] = polygon[(index + 1) % count];
+    const change = Math.atan2(ny - y, nx - x) - Math.atan2(y - py, x - px);
+    return Math.abs(Math.atan2(Math.sin(change), Math.cos(change)));
+  };
+  let start = 0;
+  for (let index = 1; index < count; index += 1) if (turnAt(index) > turnAt(start)) start = index;
+  const ring = Array.from({ length: count + 1 }, (_, index) => polygon[(start + index) % count]);
+  const onLine = (from: number, to: number) => {
+    const [ax, ay] = ring[from];
+    const [bx, by] = ring[to];
+    const length = Math.hypot(bx - ax, by - ay);
+    if (length < 1e-9) return true;
+    for (let index = from + 1; index < to; index += 1) {
+      if (Math.abs((bx - ax) * (ring[index][1] - ay) - (by - ay) * (ring[index][0] - ax)) / length > tolerance) return false;
+    }
+    return true;
+  };
+  const kept: Point[] = [ring[0]];
+  for (let anchor = 0; anchor < count;) {
+    let end = anchor + 1;
+    while (end < count && onLine(anchor, end + 1)) end += 1;
+    if (end < count) kept.push(ring[end]);
+    anchor = end;
+  }
+  return kept;
+}
+
+/**
+ * Where click bumps go on the face of a lip or a rim, given as the outline of what that face bounds seen from above (outer
+ * contours anticlockwise, holes clockwise, as Manifold hands them): each place with the way out of that outline there.
+ * One in the middle of each straight side of BUMP_MIN_SIDE mm or more, two (at a quarter and three quarters) on one longer
+ * than BUMP_TWO_FROM. A side counts as straight where the outline turns sharply at both its ends or goes on there in pieces
+ * much shorter than it: a box's sides do, with round corners too, a round pot's many short sides do not, however large
+ * the pot. An outline without straight sides gets BUMP_ROUND_COUNT evenly round its largest contour, the first at its front
+ * (the least y, in the middle across).
+ */
+export function clickBumpPlaces(polygons: readonly (readonly Point[])[]): { point: Point; outward: Point }[] {
+  const places: { point: Point; outward: Point }[] = [];
+  const sharp = (20 * Math.PI) / 180;
+  const turn = (from: number, to: number) => Math.abs(Math.atan2(Math.sin(to - from), Math.cos(to - from)));
+  const edgesOf = (points: readonly Point[]) => points.map((from, index) => {
+    const to = points[(index + 1) % points.length];
+    return { from, to, length: Math.hypot(to[0] - from[0], to[1] - from[1]), angle: Math.atan2(to[1] - from[1], to[0] - from[0]) };
+  });
+  // To the right along the outline: out of it, for an outer contour and a hole alike.
+  const outwardOf = (angle: number): Point => [Math.sin(angle), -Math.cos(angle)];
+  for (const polygon of polygons) {
+    const edges = edgesOf(straightened(polygon));
+    if (edges.length < 3) continue;
+    edges.forEach((edge, index) => {
+      const ends = (other: (typeof edges)[number]) => turn(other.angle, edge.angle) >= sharp || other.length <= edge.length / 3;
+      if (edge.length < BUMP_MIN_SIDE || !ends(edges[(index - 1 + edges.length) % edges.length]) || !ends(edges[(index + 1) % edges.length])) return;
+      for (const along of edge.length > BUMP_TWO_FROM ? [0.25, 0.75] : [0.5]) {
+        places.push({ point: [edge.from[0] + along * (edge.to[0] - edge.from[0]), edge.from[1] + along * (edge.to[1] - edge.from[1])], outward: outwardOf(edge.angle) });
+      }
+    });
+  }
+  if (places.length) return places;
+  const largest = polygons.reduce<readonly Point[] | null>((best, polygon) => (signedArea(polygon) > (best ? signedArea(best) : 0) ? polygon : best), null);
+  if (!largest || largest.length < 3) return [];
+  const edges = edgesOf(largest);
+  const total = edges.reduce((sum, edge) => sum + edge.length, 0);
+  // The first at the front: where the line along y through the middle across meets the contour at its least y.
+  const xs = largest.map(([x]) => x);
+  const middle = (Math.min(...xs) + Math.max(...xs)) / 2;
+  let first = 0;
+  let frontY = Infinity;
+  let run = 0;
+  for (const edge of edges) {
+    if ((edge.from[0] - middle) * (edge.to[0] - middle) <= 0 && edge.from[0] !== edge.to[0]) {
+      const along = (middle - edge.from[0]) / (edge.to[0] - edge.from[0]);
+      const y = edge.from[1] + along * (edge.to[1] - edge.from[1]);
+      if (y < frontY) {
+        frontY = y;
+        first = run + along * edge.length;
+      }
+    }
+    run += edge.length;
+  }
+  for (let number = 0; number < BUMP_ROUND_COUNT; number += 1) {
+    let distance = (first + (number * total) / BUMP_ROUND_COUNT) % total;
+    for (const [index, edge] of edges.entries()) {
+      if (distance <= edge.length || index === edges.length - 1) {
+        const along = edge.length > 1e-9 ? Math.min(1, distance / edge.length) : 0;
+        places.push({ point: [edge.from[0] + along * (edge.to[0] - edge.from[0]), edge.from[1] + along * (edge.to[1] - edge.from[1])], outward: outwardOf(edge.angle) });
+        break;
+      }
+      distance -= edge.length;
+    }
+  }
+  return places;
+}
+
+/** The front of an outline seen from above (its least y), the middle of its frontmost stretch, and how wide it is across. */
+function frontOf(polygons: readonly (readonly Point[])[]) {
+  const points = polygons.flat();
+  const front = Math.min(...points.map(([, y]) => y));
+  const near = points.filter(([, y]) => y <= front + 0.05).map(([x]) => x);
+  const xs = points.map(([x]) => x);
+  return { front, middle: (Math.min(...near) + Math.max(...near)) / 2, width: Math.max(...xs) - Math.min(...xs) };
+}
+
+/** Where the line along y at `x` first meets the outline from the front: the least y of its crossings, or null when it misses. */
+function frontAt(polygons: readonly (readonly Point[])[], x: number) {
+  let least = Infinity;
+  for (const polygon of polygons) {
+    polygon.forEach((point, index) => {
+      const next = polygon[(index + 1) % polygon.length];
+      if ((point[0] - x) * (next[0] - x) > 0 || point[0] === next[0]) return;
+      least = Math.min(least, point[1] + ((x - point[0]) / (next[0] - point[0])) * (next[1] - point[1]));
+    });
+  }
+  return Number.isFinite(least) ? least : null;
+}
+
+/**
+ * A pull tab on the front (least y) of the lid's plate, seen from above: TAB_WIDTH wide, or half as wide as the plate if
+ * that is less, reaching TAB_REACH beyond the plate's frontmost point, its outer corners rounded, and in past the plate's
+ * edge over its whole width, so the two are one. An error when the plate is too narrow for one.
+ */
+function pullTabArea(runtime: ManifoldToplevel, plate: CrossSection, created: { delete?: () => void }[]): { area: CrossSection } | { error: LidError } {
+  const polygons = plate.toPolygons() as Point[][];
+  if (!polygons.length) return { error: { code: "handleSideShort" } };
+  const { front, middle, width } = frontOf(polygons);
+  const tabWidth = Math.min(TAB_WIDTH, width / 2);
+  if (tabWidth < MIN_TAB_WIDTH) return { error: { code: "handleSideShort" } };
+  const left = middle - tabWidth / 2;
+  const right = middle + tabWidth / 2;
+  const edges = [left, middle, right].map((x) => frontAt(polygons, x));
+  if (edges.some((y) => y === null)) return { error: { code: "handleSideShort" } };
+  const inward = Math.max(...(edges as number[])) + 1;
+  const out = front - TAB_REACH;
+  const corner = (x: number) => keep(created, keep(created, runtime.CrossSection.circle(TAB_CORNER, 32)).translate([x, out + TAB_CORNER]));
+  const area = keep(created, runtime.CrossSection.hull([corner(left + TAB_CORNER), corner(right - TAB_CORNER), [[left, inward], [right, inward]]]));
+  return { area };
+}
+
+/**
+ * A finger notch in the body's outer wall at its front (least y): seen from the front, a half round of NOTCH_RADIUS drawn
+ * out to NOTCH_WIDTH (less where the front is narrow), hanging from `edge`, the lid's lowest edge on the outside; cut in
+ * along y as deep as the wall allows less NOTCH_SKIN, and NOTCH_RADIUS at most. `over` takes a millimetre above the edge
+ * too, where the edge is the body's top, so the cut leaves no sheet of no thickness there. Its footprint from above comes
+ * with it, and how deep it is on average. An error when the front is too narrow or the wall too thin for one.
+ */
+function fingerNotch(runtime: ManifoldToplevel, outline: CrossSection, opening: CrossSection | null, edge: number, over: boolean, created: { delete?: () => void }[]):
+  | { solid: ManifoldSolid; area: CrossSection; depth: number }
+  | { error: LidError } {
+  const polygons = outline.toPolygons() as Point[][];
+  if (!polygons.length) return { error: { code: "handleSideShort" } };
+  const { front, middle, width } = frontOf(polygons);
+  const notchWidth = Math.min(NOTCH_WIDTH, width - 4);
+  if (notchWidth < 2 * NOTCH_RADIUS) return { error: { code: "handleSideShort" } };
+  const left = middle - notchWidth / 2;
+  // From above: from a millimetre in front of the wall in to NOTCH_RADIUS behind its front, less what lies within
+  // NOTCH_SKIN of the opening, and of that only what opens to the front.
+  const reach = keep(created, keep(created, runtime.CrossSection.square([notchWidth, NOTCH_RADIUS + 1])).translate([left, front - 1]));
+  const clear = opening ? keep(created, reach.subtract(keep(created, opening.offset(NOTCH_SKIN, "Round", 2, 48)))) : reach;
+  const pieces = clear.decompose().map((piece) => keep(created, piece)).filter((piece) => piece.bounds().min[1] < front - 0.5);
+  if (!pieces.length) return { error: { code: "handleNotchNoRoom" } };
+  const area = pieces.length === 1 ? pieces[0] : keep(created, runtime.CrossSection.union(pieces));
+  const depth = keep(created, area.intersect(outline)).area() / notchWidth;
+  if (depth < MIN_NOTCH_DEPTH) return { error: { code: "handleNotchNoRoom" } };
+  // From the front (x across, then the height): the half round drawn out, below the edge.
+  const round = (x: number) => keep(created, keep(created, runtime.CrossSection.circle(NOTCH_RADIUS, 48)).translate([x, edge]));
+  const drawn = keep(created, runtime.CrossSection.hull([round(left + NOTCH_RADIUS), round(left + notchWidth - NOTCH_RADIUS)]));
+  const below = keep(created, keep(created, runtime.CrossSection.square([notchWidth + 2, NOTCH_RADIUS + 1])).translate([left - 1, edge - NOTCH_RADIUS - 1]));
+  let profile = keep(created, drawn.intersect(below));
+  if (over) profile = keep(created, profile.add(keep(created, keep(created, runtime.CrossSection.square([notchWidth, 1])).translate([left, edge]))));
+  // Drawn out along its own z and turned so that z runs along -y (its y becomes the height), from behind the reach to
+  // in front of the wall.
+  const along = NOTCH_RADIUS + 2;
+  const cutter = keep(created, keep(created, keep(created, profile.extrude(along)).rotate([90, 0, 0])).translate([0, front + NOTCH_RADIUS + 0.5, 0]));
+  const footprint = keep(created, keep(created, area.extrude(NOTCH_RADIUS + 4)).translate([0, 0, edge - NOTCH_RADIUS - 1]));
+  return { solid: keep(created, cutter.intersect(footprint)), area, depth };
+}
+
 /** How deep a magnet's pocket is, in the body and in the lid, in mm. */
 export function magnetPocketDepth(options: Pick<LidOptions, "magnetHeight">) {
   return options.magnetHeight + MAGNET_DEPTH_EXTRA;
@@ -269,7 +591,8 @@ export function lidThicknessForMagnets(options: Pick<LidOptions, "magnetHeight">
 }
 
 export type LidError =
-  | { code: "notClosed" | "notOpen" | "tooSmall" | "tooShallow" | "empty" | "magnetsNoRoom" | "hingeLidType" | "hingeNoBack" | "hingeTooLow" }
+  | { code: "notClosed" | "notOpen" | "tooSmall" | "tooShallow" | "empty" | "magnetsNoRoom" | "hingeLidType" | "hingeNoBack" | "hingeTooLow" | "hingeStyleStraight" | "hingeStyleMagnets" | "pivotNoSides" }
+  | { code: "clickBumpsNoLip" | "clickBumpsNoRoom" | "handlePivot" | "handleSideShort" | "handleNotchNoRoom" }
   | { code: "magnetsThinLid"; thickness: number }
   | { code: "kernel"; message?: string };
 
@@ -447,9 +770,15 @@ export type LidMagnets = { posts: ManifoldSolid | null; postParts: MagnetPostPar
  * With a hinge: the body's knuckles with their slope (to be grouped with it), a pin printed apart if asked for, lying
  * beside the lid, both in the scene's frame, and how many knuckles the hinge has.
  */
-export type LidHinge = { knuckles: ManifoldSolid; pin: ManifoldSolid | null; count: number };
+export type LidHinge = { knuckles: ManifoldSolid; pin: ManifoldSolid | null; count: number; cuts: ManifoldSolid | null; style: LidHingeStyle };
 
-export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge } | { error: LidError };
+/** With click bumps: how many the lid has, and the dimples for them as one solid to cut out of the body, in the scene's frame. */
+export type LidClickBumps = { count: number; dimples: ManifoldSolid };
+
+/** With a handle: which, and for a finger notch the recess to cut out of the body, in the scene's frame. */
+export type LidHandleResult = { style: Exclude<LidHandle, "none">; notch: ManifoldSolid | null };
+
+export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; clickBumps?: LidClickBumps; handle?: LidHandleResult } | { error: LidError };
 
 /**
  * The lid for `body` (in the scene's frame, y up), lying turned over beside it: its plate on the workplane at the
@@ -475,10 +804,23 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     if (options.type !== "flat" && !hasOpening) return { error: { code: "notOpen" } };
     if (options.type !== "flat" && options.depth >= height) return { error: { code: "tooShallow" } };
     if (options.hinge && !LID_HINGE_TYPES.includes(options.type)) return { error: { code: "hingeLidType" } };
+    // A flush hinge's slots and a pivot lid's pins go where magnets' pockets would sit, in the corners.
+    const style: LidHingeStyle = options.hinge ? options.hingeStyle : "outside";
+    if (style !== "outside" && options.magnets) return { error: { code: "hingeStyleMagnets" } };
+    // Click bumps stand on a lip or a rim; a pivot lid lies in the opening, with no edge for a tab or a finger to take.
+    if (options.clickBumps && !lidClickBumpsFit(options)) return { error: { code: "clickBumpsNoLip" } };
+    if (options.handle !== "none" && !lidHandleFits(options)) return { error: { code: "handlePivot" } };
     // A hinge on another side is worked out with that side turned to the back, and its pieces turned back after.
     const turn = HINGE_SIDE_TURN[options.hingeSide];
-    const plan = options.hinge ? hingePlan(turnedPolygons(outline.toPolygons() as Point[][], turn), options, top, box.min[2]) : null;
+    const turnedOutline = turnedPolygons(outline.toPolygons() as Point[][], turn);
+    const turnedOpening = hasOpening ? turnedPolygons(opening.toPolygons() as Point[][], turn) : [];
+    const innerBack = turnedOpening.length ? Math.max(...turnedOpening.flat().map(([, y]) => y)) : undefined;
+    const plan = options.hinge && style !== "pivot" ? hingePlan(turnedOutline, options, top, box.min[2], innerBack) : null;
     if (plan && "error" in plan) return { error: plan.error };
+    // In the wall, a knuckle needs the wall to run straight along it.
+    if (plan && style === "flush" && plan.curved) return { error: { code: "hingeStyleStraight" } };
+    const pivot = options.hinge && style === "pivot" ? pivotPlan(turnedOutline, turnedOpening, options, top, box.min[2]) : null;
+    if (pivot && "error" in pivot) return { error: pivot.error };
 
     // The magnets: a pocket in each corner with a wall round it, and a post where the body's wall cannot hold that.
     const pocketRadius = options.magnetDiameter / 2 + options.magnetGap;
@@ -539,11 +881,12 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
 
     const prism = (area: CrossSection, low: number, high: number) => keep(created, keep(created, area.extrude(high - low)).translate([0, 0, low]));
     const parts: ManifoldSolid[] = [];
+    // The rim's inside and outside, for a cap and both.
+    const inner = keep(created, outline.offset(options.gap, "Round", 2, 48));
+    const outer = keep(created, outline.offset(options.gap + options.wall, "Round", 2, 48));
     if (options.type === "flat") {
       parts.push(prism(outline, top, top + options.thickness));
     } else {
-      const inner = keep(created, outline.offset(options.gap, "Round", 2, 48));
-      const outer = keep(created, outline.offset(options.gap + options.wall, "Round", 2, 48));
       parts.push(prism(options.type === "plug" ? outline : outer, top, top + options.thickness));
       if (options.type !== "cap") {
         const lip = keep(created, opening.offset(-options.gap, "Round", 2, 48));
@@ -555,11 +898,19 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       if (options.type !== "plug") parts.push(prism(keep(created, outer.subtract(inner)), top - options.depth, top));
     }
     let made = parts.length === 1 ? parts[0] : keep(created, runtime.Manifold.union(parts));
+    // A pivot lid is only a plate lying in the opening, the gap all round, its top level with the rim.
+    if (pivot) {
+      const inset = keep(created, opening.offset(-options.gap, "Round", 2, 48));
+      if (inset.area() < MIN_OPENING_AREA) return { error: { code: "tooSmall" } };
+      made = prism(inset, top - options.thickness, top);
+    }
     if (made.isEmpty()) return { error: { code: "empty" } };
     // The hinge: the lid's knuckles join its plate by a web as thick as the plate; the body's stand on a slope from its
     // back wall (the hull of the knuckle and a strip of the wall), kept below the plate by the gap. The pin's hole goes
     // through them all.
     let bodyKnuckles: ManifoldSolid | null = null;
+    // What a flush hinge or a pivot lid takes out of the body: the slots for the lid's knuckles, the pins' holes.
+    let bodyCuts: ManifoldSolid | null = null;
     const along = (from: number, to: number, radius: number, y: number, z: number) =>
       keep(created, keep(created, keep(created, runtime.Manifold.cylinder(to - from, radius, radius, HINGE_SIDES)).rotate([0, 90, 0])).translate([from, y, z]));
     // A profile given as (y, z) points drawn out along x from `from` to `to`: extruded along its own z, then turned so
@@ -577,7 +928,73 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       const profile = keep(created, runtime.CrossSection.hull([keep(created, runtime.CrossSection.circle(radius, HINGE_SIDES)), point]));
       return keep(created, keep(created, keep(created, profile.extrude(to - from)).rotate([0, 90, 0])).translate([from, y, z]));
     };
-    if (plan) {
+    const unturned = (solid: ManifoldSolid) => (turn ? keep(created, solid.rotate([0, 0, -turn])) : solid);
+    const unionOf = (solids: ManifoldSolid[]) => (solids.length === 1 ? solids[0] : keep(created, runtime.Manifold.union(solids)));
+    if (plan && style === "flush") {
+      // In the wall: the knuckles take turns as outside, flush with the back face and the lid's top. The body's grow out
+      // of the wall's inner face on a 45 degree slope where they reach into the opening; the wall is cut round the lid's
+      // and the lid's plate round the body's, by the gap, and behind the axis only the round knuckles stay. The lid's lip
+      // stops short of the body's knuckles.
+      const clearance = plan.radius + options.hingeGap;
+      const lidPieces: ManifoldSolid[] = [];
+      const bodyPieces: ManifoldSolid[] = [];
+      const notches: ManifoldSolid[] = [];
+      const slots: ManifoldSolid[] = [];
+      plan.segments.forEach(([from, to], index) => {
+        const round = along(from, to, plan.radius, plan.axisY, plan.axisZ);
+        const room = along(from - options.hingeGap + 0.01, to + options.hingeGap - 0.01, clearance, plan.axisY, plan.axisZ);
+        if (index % 2) {
+          lidPieces.push(round);
+          slots.push(room);
+        } else {
+          const strip = keep(created, keep(created, runtime.Manifold.cube([to - from, 0.4, plan.axisZ - plan.low])).translate([from, plan.innerBack, plan.low]));
+          bodyPieces.push(keep(created, runtime.Manifold.hull([round, strip])));
+          notches.push(room);
+        }
+      });
+      // Where the back runs on past the straight stretch into rounded corners, plate and wall are both cut round the axis
+      // there, so neither stands in the other's way.
+      const across = acrossAt(turnedOutline, plan.axisY);
+      if (across) {
+        for (const [from, to] of [[across[0] - 1, plan.start - options.hingeGap], [plan.end + options.hingeGap, across[1] + 1]] as const) {
+          if (to - from < 1.01) continue;
+          const room = along(from, to, clearance, plan.axisY, plan.axisZ);
+          slots.push(room);
+          notches.push(room);
+        }
+      }
+      const lipCut = keep(created, keep(created, runtime.Manifold.cube([plan.end - plan.start + 2 * options.hingeGap + 1, plan.backY - (plan.axisY - clearance) + 1, top - box.min[2] + 1])).translate([plan.start - options.hingeGap - 0.5, plan.axisY - clearance, box.min[2] - 1]));
+      const holeFor = (tip: 1 | -1) => unturned(options.hingeTeardrop ? teardropAlong(plan.start - 1, plan.end + 1, plan.hole, tip, plan.radius - TEARDROP_WALL, plan.axisY, plan.axisZ) : along(plan.start - 1, plan.end + 1, plan.hole, plan.axisY, plan.axisZ));
+      // Behind the axis only the knuckles stay, round about it: a square corner of the plate there would swing down into
+      // the wall as the lid opens.
+      const behind = keep(created, keep(created, runtime.Manifold.cube([(across ? across[1] - across[0] : plan.end - plan.start) + 20, plan.backY - plan.axisY + 1, options.thickness + 2])).translate([(across ? across[0] : plan.start) - 10, plan.axisY, top - 1]));
+      made = keep(created, keep(created, made.subtract(unturned(lipCut))).subtract(unturned(behind)));
+      made = keep(created, keep(created, keep(created, made.add(unturned(unionOf(lidPieces)))).subtract(unturned(unionOf(notches)))).subtract(holeFor(-1)));
+      bodyKnuckles = keep(created, unturned(unionOf(bodyPieces)).subtract(holeFor(1)));
+      // The pin's hole runs through the wall too, where the knuckles reach into it.
+      bodyCuts = keep(created, unturned(unionOf(slots)).add(holeFor(1)));
+    } else if (pivot) {
+      // The plate's back edge becomes a round bar the plate turns about, clear of the back wall by the gap; a pin from
+      // outside through each side wall into the bar's end (teardrops, each pointing up as its part is printed). A ledge
+      // round the opening's other sides, a plate's thickness down, holds the lid level; its underside steps back at
+      // 45 degrees, so the body still prints upright without support.
+      const back = keep(created, keep(created, runtime.Manifold.cube([pivot.outer[1] - pivot.outer[0] + 20, 100, top - box.min[2] + 20])).translate([pivot.outer[0] - 10, pivot.axisY, box.min[2] - 10]));
+      const bar = along(pivot.barFrom, pivot.barTo, pivot.radius, pivot.axisY, pivot.axisZ);
+      const pinHole = (from: number, to: number, tip: 1 | -1) => (options.hingeTeardrop ? teardropAlong(from, to, pivot.hole, tip, pivot.radius - TEARDROP_WALL, pivot.axisY, pivot.axisZ) : along(from, to, pivot.hole, pivot.axisY, pivot.axisZ));
+      const barHoles = unionOf([pinHole(pivot.barFrom - 1, pivot.barFrom + pivot.depth, -1), pinHole(pivot.barTo - pivot.depth, pivot.barTo + 1, -1)]);
+      made = keep(created, keep(created, keep(created, made.subtract(unturned(back))).add(unturned(bar))).subtract(unturned(barHoles)));
+      bodyCuts = unturned(unionOf([pinHole(pivot.outer[0] - 1, pivot.inner[0] + 0.5, 1), pinHole(pivot.inner[1] - 0.5, pivot.outer[1] + 1, 1)]));
+      // The ledge, in three steps of a third of its width each, kept clear of the bar's turn at the back.
+      const ledgeTop = top - options.thickness;
+      const steps: ManifoldSolid[] = [];
+      for (let step = 0; step < 3; step += 1) {
+        const width = PIVOT_LEDGE * (3 - step) / 3;
+        const ring = keep(created, opening.subtract(keep(created, opening.offset(-width, "Miter", 2, 48))));
+        steps.push(prism(ring, ledgeTop - PIVOT_LEDGE * (step + 1) / 3, ledgeTop - PIVOT_LEDGE * step / 3));
+      }
+      const barRoom = keep(created, keep(created, runtime.Manifold.cube([pivot.outer[1] - pivot.outer[0] + 20, 100, top - box.min[2] + 20])).translate([pivot.outer[0] - 10, pivot.axisY - pivot.radius - options.hingeGap, box.min[2] - 10]));
+      bodyKnuckles = keep(created, unionOf(steps).subtract(unturned(barRoom)));
+    } else if (plan) {
       const lidPieces: ManifoldSolid[] = [];
       const bodyPieces: ManifoldSolid[] = [];
       const stripTop = Math.min(plan.axisZ, top - options.hingeGap);
@@ -602,7 +1019,6 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
           bodyPieces.push(keep(created, keep(created, runtime.Manifold.hull([round, strip])).subtract(clear)));
         }
       });
-      const unturned = (solid: ManifoldSolid) => (turn ? keep(created, solid.rotate([0, 0, -turn])) : solid);
       // A teardrop hole points up as each part is printed: the body stands upright, the lid lies turned over, so its
       // point faces the lid's inside. The pin turns in the round part, with the same play.
       const holeFor = (tip: 1 | -1) => unturned(options.hingeTeardrop ? teardropAlong(plan.start - 1, plan.end + 1, plan.hole, tip, plan.radius - TEARDROP_WALL, plan.axisY, plan.axisZ) : along(plan.start - 1, plan.end + 1, plan.hole, plan.axisY, plan.axisZ));
@@ -611,6 +1027,81 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       // A block reaching in past a thin round wall is kept out of the opening.
       if (plan.curved) knuckleBody = keep(created, knuckleBody.subtract(keep(created, keep(created, opening.extrude(top - box.min[2] + 2)).translate([0, 0, box.min[2] - 1]))));
       bodyKnuckles = keep(created, knuckleBody.subtract(holeFor(1)));
+    }
+    // The handle, on the side the lid opens at: worked out with that side turned to the front (least y), opposite the
+    // hinge's, and turned back after.
+    const handleTurn = options.hinge ? turn : 0;
+    const handleUnturned = (solid: ManifoldSolid) => (handleTurn ? keep(created, solid.rotate([0, 0, -handleTurn])) : solid);
+    // A finger notch's recess, its footprint seen from above and its heights: the click bumps keep clear of it.
+    let notch: { solid: ManifoldSolid; area: CrossSection; low: number; high: number } | null = null;
+    if (options.handle === "tab") {
+      // In the plate, as thick as it, so the lid still prints turned over without support.
+      const plate = keep(created, (options.type === "plug" || options.type === "flat" ? outline : outer).rotate(handleTurn));
+      const tab = pullTabArea(runtime, plate, created);
+      if ("error" in tab) return { error: tab.error };
+      made = keep(created, made.add(handleUnturned(prism(tab.area, top, top + options.thickness))));
+    } else if (options.handle === "notch") {
+      // Below the lid's lowest edge on the outside: the plate's, lying on the rim, or a rim's that goes over the wall.
+      const edge = options.type === "cap" || options.type === "both" ? top - options.depth : top;
+      if (edge - NOTCH_RADIUS < box.min[2] + NOTCH_SKIN) return { error: { code: "handleNotchNoRoom" } };
+      const cut = fingerNotch(runtime, keep(created, outline.rotate(handleTurn)), hasOpening ? keep(created, opening.rotate(handleTurn)) : null, edge, edge >= top, created);
+      if ("error" in cut) return { error: cut.error };
+      notch = { solid: handleUnturned(cut.solid), area: handleTurn ? keep(created, cut.area.rotate(-handleTurn)) : cut.area, low: edge - NOTCH_RADIUS, high: edge };
+    }
+    // Click bumps: balls standing out of the lip's outer face into the body's wall (a cap's out of its rim's inner face,
+    // pointing in), by BUMP_REACH past the gap, halfway down the lip or rim; the body gets a dimple a little larger round
+    // each, which always leaves DIMPLE_SKIN of its wall.
+    let dimples: ManifoldSolid | null = null;
+    let bumpCount = 0;
+    if (options.clickBumps) {
+      const onLip = options.type !== "cap";
+      const middle = top - options.depth / 2;
+      const inward = options.gap + BUMP_REACH - BUMP_RADIUS;
+      const hingeWay: Point = [Math.sin((turn * Math.PI) / 180), Math.cos((turn * Math.PI) / 180)];
+      const round = (offset: number) => keep(created, opening.offset(offset, "Round", 2, 48));
+      // The faces they stand on: the lip in each part of the opening, or the rim's inside. A bump facing a wall between two
+      // parts is left out where that wall could not keep DIMPLE_SKIN with a dimple from the other side as well.
+      const pieces = onLip ? opening.decompose().map((piece) => keep(created, piece)) : [];
+      const faces: { contour: CrossSection; others: CrossSection | null }[] = !onLip
+        ? [{ contour: inner, others: null }]
+        : pieces.length > 1
+          ? pieces.map((piece) => ({ contour: keep(created, piece.offset(-options.gap, "Round", 2, 48)), others: keep(created, keep(created, opening.subtract(piece)).offset(DIMPLE_SKIN + BUMP_REACH + DIMPLE_PLAY, "Round", 2, 48)) }))
+          : [{ contour: round(-options.gap), others: null }];
+      const clearOfNotch = notch ? keep(created, notch.area.offset(NOTCH_SKIN, "Round", 2, 48)) : null;
+      const dimpleReach = BUMP_RADIUS + DIMPLE_PLAY;
+      const besideNotch = notch ? middle - dimpleReach < notch.high && middle + dimpleReach > notch.low : false;
+      const centres: Point[] = [];
+      for (const face of faces) {
+        for (const { point, outward } of clickBumpPlaces(face.contour.toPolygons() as Point[][])) {
+          // The lid turns on the hinge's side, so none goes there.
+          if (options.hinge && outward[0] * hingeWay[0] + outward[1] * hingeWay[1] > Math.SQRT1_2) continue;
+          const way = onLip ? outward : [-outward[0], -outward[1]];
+          const centre: Point = [point[0] + way[0] * inward, point[1] + way[1] * inward];
+          const room = keep(created, keep(created, runtime.CrossSection.circle(dimpleReach, BUMP_SIDES)).translate([centre[0], centre[1]]));
+          if (face.others && keep(created, room.intersect(face.others)).area() > 1e-3) continue;
+          // A dimple in the wall behind a finger notch would leave less of it than either keeps.
+          if (clearOfNotch && besideNotch && keep(created, room.intersect(clearOfNotch)).area() > 1e-3) continue;
+          centres.push(centre);
+        }
+      }
+      if (!centres.length) return { error: { code: "clickBumpsNoRoom" } };
+      const balls = (radius: number) => unionOf(centres.map(([x, y]) => keep(created, keep(created, runtime.Manifold.sphere(radius, BUMP_SIDES)).translate([x, y, middle]))));
+      const low = middle - dimpleReach - 1;
+      const high = middle + dimpleReach + 1;
+      let bumps = balls(BUMP_RADIUS);
+      if (onLip) {
+        // Within the lip's height, short of where a thin wall's dimple stops by the play, and out of the lid's inside (a
+        // hair more, so the bump's back does not lie in the lip's inner face).
+        bumps = keep(created, bumps.intersect(prism(keep(created, outline.offset(-(DIMPLE_SKIN + DIMPLE_PLAY), "Round", 2, 48)), top - options.depth, top)));
+        const inside = round(-(options.gap + options.wall));
+        if (inside.area() >= MIN_OPENING_AREA) bumps = keep(created, bumps.subtract(prism(keep(created, inside.offset(FACE_HAIR, "Round", 2, 48)), low, high)));
+        dimples = keep(created, balls(dimpleReach).intersect(prism(keep(created, outline.offset(-DIMPLE_SKIN, "Round", 2, 48)), low, high)));
+      } else {
+        bumps = keep(created, keep(created, bumps.intersect(prism(keep(created, outer.offset(-FACE_HAIR, "Round", 2, 48)), top - options.depth, top))).subtract(prism(round(DIMPLE_SKIN + DIMPLE_PLAY), low, high)));
+        dimples = keep(created, balls(dimpleReach).subtract(prism(round(DIMPLE_SKIN), low, high)));
+      }
+      made = keep(created, made.add(bumps));
+      bumpCount = centres.length;
     }
     // The lid's pockets face the body's: they open in the plate's underside, where it lies on the rim.
     if (magnetCentres.length) {
@@ -629,26 +1120,45 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const lid = placed.transform(UP_TO_SCENE);
     handed.add(lid);
     let hinge: LidHinge | undefined;
-    if (plan && bodyKnuckles) {
+    if ((plan || pivot) && bodyKnuckles) {
       const knuckles = bodyKnuckles.transform(UP_TO_SCENE);
       handed.add(knuckles);
+      const cuts = bodyCuts ? bodyCuts.transform(UP_TO_SCENE) : null;
+      if (cuts) handed.add(cuts);
       let pin: ManifoldSolid | null = null;
-      // A pin printed apart lies beside the lid, a millimetre shorter than the hinge, so it does not stand out.
+      // A pin printed apart lies beside the lid, a millimetre shorter than the hinge, so it does not stand out; a pivot
+      // lid's two lie side by side, each half a millimetre shorter than wall, gap and the bar's hole together.
       if (options.hingePrintPin) {
         const placedBox = placed.boundingBox();
         const radius = options.hingePin / 2;
-        const length = plan.end - plan.start - 1;
+        const lengths = pivot
+          ? [pivot.inner[0] - pivot.outer[0], pivot.outer[1] - pivot.inner[1]].map((wall) => wall + options.hingeGap + pivot.depth - 0.5)
+          : [plan!.end - plan!.start - 1];
         // Lying on a flat a tenth of its diameter wide, so it does not roll and its underside prints clean.
         const flat = PIN_FLAT * 2 * radius;
-        const y = placedBox.max[1] + PIN_SPACING + radius;
-        const round = along(placedBox.min[0], placedBox.min[0] + length, radius, y, box.min[2] + radius - flat);
-        const above = keep(created, keep(created, runtime.Manifold.cube([length + 2, 2 * radius + 2, 2 * radius + 1])).translate([placedBox.min[0] - 1, y - radius - 1, box.min[2]]));
-        pin = keep(created, round.intersect(above)).transform(UP_TO_SCENE);
+        const pins = lengths.map((length, index) => {
+          const y = placedBox.max[1] + PIN_SPACING + radius + index * (2 * radius + PIN_SPACING);
+          const round = along(placedBox.min[0], placedBox.min[0] + length, radius, y, box.min[2] + radius - flat);
+          const above = keep(created, keep(created, runtime.Manifold.cube([length + 2, 2 * radius + 2, 2 * radius + 1])).translate([placedBox.min[0] - 1, y - radius - 1, box.min[2]]));
+          return keep(created, round.intersect(above));
+        });
+        pin = unionOf(pins).transform(UP_TO_SCENE);
         handed.add(pin);
       }
-      hinge = { knuckles, pin, count: plan.segments.length };
+      hinge = { knuckles, pin, count: pivot ? 2 : plan!.segments.length, cuts, style };
     }
-    if (!options.magnets) return hinge ? { lid, hinge } : { lid };
+    let clickBumps: LidClickBumps | undefined;
+    if (dimples) {
+      clickBumps = { count: bumpCount, dimples: dimples.transform(UP_TO_SCENE) };
+      handed.add(clickBumps.dimples);
+    }
+    let handle: LidHandleResult | undefined;
+    if (options.handle !== "none") {
+      handle = { style: options.handle, notch: notch ? notch.solid.transform(UP_TO_SCENE) : null };
+      if (handle.notch) handed.add(handle.notch);
+    }
+    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}) };
+    if (!options.magnets) return { lid, ...extras };
     handed.add(posts);
     // Back in the scene's frame: up is y, and the frame's y is the scene's z turned round.
     const pockets = magnetCentres.map(([x, y]): MagnetPocket => ({
@@ -658,7 +1168,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       height: pocketDepth + MAGNET_OVERCUT,
       diameter: 2 * pocketRadius,
     }));
-    return { lid, magnets: { posts, postParts, pockets }, ...(hinge ? { hinge } : {}) };
+    return { lid, magnets: { posts, postParts, pockets }, ...extras };
   } catch (error) {
     return { error: { code: "kernel", message: error instanceof Error ? error.message : String(error ?? "") } };
   } finally {
@@ -691,6 +1201,22 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.hingeNoBack");
     case "hingeTooLow":
       return t("lid.error.hingeTooLow");
+    case "hingeStyleStraight":
+      return t("lid.error.hingeStyleStraight");
+    case "hingeStyleMagnets":
+      return t("lid.error.hingeStyleMagnets");
+    case "pivotNoSides":
+      return t("lid.error.pivotNoSides");
+    case "clickBumpsNoLip":
+      return t("lid.error.clickBumpsNoLip");
+    case "clickBumpsNoRoom":
+      return t("lid.error.clickBumpsNoRoom");
+    case "handlePivot":
+      return t("lid.error.handlePivot");
+    case "handleSideShort":
+      return t("lid.error.handleSideShort");
+    case "handleNotchNoRoom":
+      return t("lid.error.handleNotchNoRoom");
     default:
       return error.message ? t("lid.error.kernel", { message: error.message }) : t("lid.error.kernelUnknown");
   }
@@ -712,9 +1238,15 @@ function positionsOf(mesh: ReturnType<ManifoldSolid["getMesh"]>) {
 export type LidShapeMagnets = { posts: WorkplaneShape[]; pockets: WorkplaneShape[] };
 
 /** With a hinge, the body's knuckles (grouped with it, as the posts are) and the pin printed apart, if asked for. */
-export type LidShapeHinge = { knuckles: WorkplaneShape; pin: WorkplaneShape | null; count: number };
+export type LidShapeHinge = { knuckles: WorkplaneShape; pin: WorkplaneShape | null; count: number; cuts: WorkplaneShape | null; style: LidHingeStyle };
 
-export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge } | { lid: null; error: string };
+/** With click bumps, how many the lid has and the dimples for them, a hole to group with the body. */
+export type LidShapeClickBumps = { count: number; dimples: WorkplaneShape };
+
+/** With a handle, which, and for a finger notch its recess, a hole to group with the body. */
+export type LidShapeHandle = { style: Exclude<LidHandle, "none">; notch: WorkplaneShape | null };
+
+export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle } | { lid: null; error: string };
 
 /**
  * The lid for the selected bodies: the solids joined and the holes among them cut away, then the lid made for what is
@@ -749,19 +1281,43 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     if ("error" in result) return { lid: null, error: lidErrorMessage(result.error) };
     created.push(result.lid);
     if (result.magnets?.posts) created.push(result.magnets.posts);
-    if (result.hinge) created.push(result.hinge.knuckles, ...(result.hinge.pin ? [result.hinge.pin] : []));
+    if (result.hinge) created.push(result.hinge.knuckles, ...(result.hinge.pin ? [result.hinge.pin] : []), ...(result.hinge.cuts ? [result.hinge.cuts] : []));
+    if (result.clickBumps) created.push(result.clickBumps.dimples);
+    if (result.handle?.notch) created.push(result.handle.notch);
     const source = solids[0];
     const shape = splitShapeFromWorldPositions(source, positionsOf(result.lid.getMesh()), createLocalId(`${source.id}-lid`), t("lid.name", { name: source.name }));
     if (!shape) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
     const lid = canonicalizeShape({ ...shape, hidden: false });
     let hinge: LidShapeHinge | undefined;
     if (result.hinge) {
-      const knuckles = splitShapeFromWorldPositions(source, positionsOf(result.hinge.knuckles.getMesh()), createLocalId(`${source.id}-hinge`), t("lid.hingeKnucklesName", { name: source.name }));
+      // A pivot lid's part for the body is the ledge it rests on.
+      const knuckles = splitShapeFromWorldPositions(source, positionsOf(result.hinge.knuckles.getMesh()), createLocalId(`${source.id}-hinge`), t(result.hinge.style === "pivot" ? "lid.pivotLedgeName" : "lid.hingeKnucklesName", { name: source.name }));
       if (!knuckles) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
       const pin = result.hinge.pin ? splitShapeFromWorldPositions(source, positionsOf(result.hinge.pin.getMesh()), createLocalId(`${source.id}-hinge-pin`), t("lid.hingePinName", { name: source.name })) : null;
-      hinge = { knuckles: canonicalizeShape({ ...knuckles, hidden: false }), pin: pin ? canonicalizeShape({ ...pin, hidden: false }) : null, count: result.hinge.count };
+      // The slots or pin holes are a hole grouped with the body, as the magnets' pockets are.
+      const cutShape = result.hinge.cuts ? splitShapeFromWorldPositions(source, positionsOf(result.hinge.cuts.getMesh()), createLocalId(`${source.id}-hinge-cuts`), t("lid.hingeCutsName", { name: source.name })) : null;
+      const cuts = cutShape ? canonicalizeShape({ ...cutShape, hole: true, hidden: false }) : null;
+      hinge = { knuckles: canonicalizeShape({ ...knuckles, hidden: false }), pin: pin ? canonicalizeShape({ ...pin, hidden: false }) : null, count: result.hinge.count, cuts, style: result.hinge.style };
     }
-    if (!result.magnets) return hinge ? { lid, hinge } : { lid };
+    // The dimples and the finger notch are holes grouped with the body too.
+    const holeShape = (solid: ManifoldSolid, suffix: string, name: string) => {
+      const shape = splitShapeFromWorldPositions(source, positionsOf(solid.getMesh()), createLocalId(`${source.id}-${suffix}`), name);
+      return shape ? canonicalizeShape({ ...shape, hole: true, hidden: false }) : null;
+    };
+    let clickBumps: LidShapeClickBumps | undefined;
+    if (result.clickBumps) {
+      const dimples = holeShape(result.clickBumps.dimples, "click-dimples", t("lid.clickDimplesName", { name: source.name }));
+      if (!dimples) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
+      clickBumps = { count: result.clickBumps.count, dimples };
+    }
+    let handle: LidShapeHandle | undefined;
+    if (result.handle) {
+      const notch = result.handle.notch ? holeShape(result.handle.notch, "finger-notch", t("lid.fingerNotchName", { name: source.name })) : null;
+      if (result.handle.notch && !notch) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
+      handle = { style: result.handle.style, notch };
+    }
+    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}) };
+    if (!result.magnets) return { lid, ...extras };
     const postName = t("lid.magnetPosts", { name: source.name });
     const meshPost = result.magnets.posts
       ? splitShapeFromWorldPositions(source, positionsOf(result.magnets.posts.getMesh()), createLocalId(`${source.id}-magnet-posts`), postName)
@@ -796,7 +1352,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       height: pocket.height,
       sides: MAGNET_SIDES,
     }));
-    return { lid, magnets: { posts, pockets }, ...(hinge ? { hinge } : {}) };
+    return { lid, magnets: { posts, pockets }, ...extras };
   } catch (error) {
     return { lid: null, error: lidErrorMessage({ code: "kernel", message: error instanceof Error ? error.message : String(error ?? "") }) };
   } finally {
