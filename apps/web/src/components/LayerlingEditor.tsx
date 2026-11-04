@@ -8328,7 +8328,7 @@ export function LayerlingEditor({
     commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : [])], lid.id, withClosedHolesNote(message, grouped.closedHoles));
     return {
       ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: pockets.length, posts: posts.length > 0,
-      ...(hinge ? { hinge: { knuckles: hinge.count, pinDiameter: options.hingePin, pinId: hinge.pin?.id ?? null } } : {}),
+      ...(hinge ? { hinge: { knuckles: hinge.count, pinDiameter: options.hingePin, side: options.hingeSide, pinId: hinge.pin?.id ?? null } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);
 
@@ -8354,9 +8354,9 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    void makeLid({ type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin }, targets).then((result) => {
+    void makeLid({ type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
     });
@@ -12684,6 +12684,8 @@ export function LayerlingEditor({
           hingeGap: params.hingeGap,
           hingeKnuckles: params.hingeKnuckles,
           hingePrintPin: params.hingePrintPin,
+          hingeSide: params.hingeSide,
+          hingeTeardrop: params.hingeTeardrop,
         }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
@@ -12692,7 +12694,7 @@ export function LayerlingEditor({
         const pin = "hinge" in result && result.hinge?.pinId ? currentShapes().find((shape) => shape.id === result.hinge!.pinId) : null;
         return {
           object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, body: body ? mcpShapeSummary(body) : { id: result.bodyId }, magnets: result.magnets, posts: result.posts,
-          ...("hinge" in result && result.hinge ? { hinge: { knuckles: result.hinge.knuckles, pinDiameter: result.hinge.pinDiameter, pin: pin ? mcpShapeSummary(pin) : null } } : {}),
+          ...("hinge" in result && result.hinge ? { hinge: { knuckles: result.hinge.knuckles, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, pin: pin ? mcpShapeSummary(pin) : null } } : {}),
         };
       }
 
