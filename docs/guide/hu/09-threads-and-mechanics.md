@@ -243,7 +243,7 @@ A {{ui:shape.screwBoss}} az az oszlop, amelyre egy dobozban a fedelet vagy a pan
 
 A {{ui:prop.screwBossHole}}, a {{ui:prop.screwBossHoleDepth}} és a {{ui:prop.screwBossDiameter}} kézzel is módosítható; az átmérő alatt látszik, milyen vastag a fal a furat körül, és figyelmeztetés jön, ha vékonyabb, mint amit a rögzítés kér. Az oszlopnyi mély furat átmenő. A furat szája kis letörést kap, hogy a betét vagy a csavar betaláljon. A {{ui:prop.screwBossGussets}} kettő–hat vékony bordát tesz az oszloptól az aljig; a {{ui:prop.screwBossReach}}, a {{ui:prop.screwBossGussetHeight}} és a {{ui:prop.screwBossGussetThickness}} szabja meg, milyen messzire, magasra és vastagra.
 
-Állítsd az oszlopot egy kiüregelt doboz aljára, és csoportosítsd vele; a fedélben fölötte egy furatként használt {{ui:shape.counterbore}} fogadja a csavarfejet. A nyomtatott furatok kicsit kisebbek a rajzoltnál: először nyomtass egy próbaoszlopot, és állíts a {{ui:prop.screwBossHole}} értékén egy-két tizedet.
+Állítsd az oszlopot egy kiüregelt doboz aljára, és csoportosítsd vele; a fedélben fölötte egy furatként használt {{ui:shape.counterbore}} fogadja a csavarfejet. Furatként beállítva és tömör alkatrésszel csoportosítva csak a saját furatát vágja ki – a betét vagy a csavar fészkét, a letöréssel együtt –, így egy saját tömb vagy oszlop zsákfuratot kap a betétnek; a furat ott kezdődik, ahol a teteje van. A nyomtatott furatok kicsit kisebbek a rajzoltnál: először nyomtass egy próbaoszlopot, és állíts a {{ui:prop.screwBossHole}} értékén egy-két tizedet.
 
 ## Pattintós kampó
 

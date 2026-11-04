@@ -239,7 +239,7 @@ microSD 卡槽也是左邊緣的接頭，位於電路板下方（Zero 2 W 上在
 
 {{ui:prop.screwBossHole}}、{{ui:prop.screwBossHoleDepth}} 和 {{ui:prop.screwBossDiameter}} 都可以手動修改；直徑下方會顯示孔周壁厚，如果比固定方式要求的薄會提示。孔與柱子一樣深時為通孔。孔口有一個小倒角，方便螺帽或螺絲進入。{{ui:prop.screwBossGussets}} 從柱子到底面加上兩到六條細肋；{{ui:prop.screwBossReach}}、{{ui:prop.screwBossGussetHeight}} 和 {{ui:prop.screwBossGussetThickness}} 設定它們伸出多遠、多高、多厚。
 
-把螺絲柱立在已薄殼的盒子底面上並與盒子群組；在蓋子上，其上方作為孔的 {{ui:shape.counterbore}} 用來容納螺絲頭。列印出來的孔會比圖面略小：先列印一個柱子試試，再把 {{ui:prop.screwBossHole}} 調整零點一兩公釐。
+把螺絲柱立在已薄殼的盒子底面上並與盒子群組；在蓋子上，其上方作為孔的 {{ui:shape.counterbore}} 用來容納螺絲頭。設為孔並與實心零件組合時，它只切出自己的孔——放嵌件或螺絲的孔腔及其倒角——這樣你自己的塊或立柱就得到一個用於嵌件的盲孔；孔從它的頂面開始。列印出來的孔會比圖面略小：先列印一個柱子試試，再把 {{ui:prop.screwBossHole}} 調整零點一兩公釐。
 
 ## 卡扣
 

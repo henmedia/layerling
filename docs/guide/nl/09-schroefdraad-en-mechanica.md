@@ -243,7 +243,7 @@ De {{ui:shape.screwBoss}} is de paal waaraan in een behuizing een deksel of een 
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} en {{ui:prop.screwBossDiameter}} pas je met de hand aan; onder de diameter staat hoe dik de wand rond het gat is, met een waarschuwing als die dunner is dan de bevestiging wil. Een gat zo diep als de paal gaat erdoor. De opening heeft een kleine afschuining, zodat insert of schroef de weg vinden. {{ui:prop.screwBossGussets}} zet twee tot zes dunne ribben van de paal naar de bodem; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} en {{ui:prop.screwBossGussetThickness}} bepalen hoe ver, hoe hoog en hoe dik.
 
-Zet de paal op de bodem van een uitgeholde doos en groepeer hem ermee; in het deksel neemt een {{ui:shape.counterbore}} als gat erboven de schroefkop op. Geprinte gaten worden iets kleiner dan getekend: print eerst één paal als proef en pas {{ui:prop.screwBossHole}} een of twee tiende aan.
+Zet de paal op de bodem van een uitgeholde doos en groepeer hem ermee; in het deksel neemt een {{ui:shape.counterbore}} als gat erboven de schroefkop op. Als gat ingesteld en gegroepeerd met een massief deel snijdt hij alleen zijn gat – de holte voor het inzetstuk of de schroef, met de afschuining –, zodat een eigen blok of paaltje een blind gat voor een inzetstuk krijgt; het gat begint waar zijn bovenkant ligt. Geprinte gaten worden iets kleiner dan getekend: print eerst één paal als proef en pas {{ui:prop.screwBossHole}} een of twee tiende aan.
 
 ## Klikhaak
 

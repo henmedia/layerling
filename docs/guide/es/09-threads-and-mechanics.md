@@ -243,7 +243,7 @@ La {{ui:shape.screwBoss}} es el poste al que se atornilla una tapa o una placa d
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} y {{ui:prop.screwBossDiameter}} se cambian a mano; bajo el diámetro se indica el grosor de la pared alrededor del orificio, con un aviso si es más fina de lo que pide la fijación. Un orificio tan profundo como la torreta es pasante. La boca del orificio tiene un pequeño chaflán para que el inserto o el tornillo entren. {{ui:prop.screwBossGussets}} añade de dos a seis nervios finos desde la torreta hasta el fondo; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} y {{ui:prop.screwBossGussetThickness}} fijan su alcance, altura y grosor.
 
-Pon la torreta en el fondo de una caja vaciada y agrúpala con ella; en la tapa, un {{ui:shape.counterbore}} como orificio encima aloja la cabeza del tornillo. Los orificios impresos salen algo más pequeños de lo dibujado: imprime primero una torreta de prueba y ajusta {{ui:prop.screwBossHole}} una o dos décimas.
+Pon la torreta en el fondo de una caja vaciada y agrúpala con ella; en la tapa, un {{ui:shape.counterbore}} como orificio encima aloja la cabeza del tornillo. Puesto como agujero y agrupado con una pieza maciza, solo corta su agujero – el alojamiento del inserto o del tornillo, con su chaflán –, así un bloque o un poste propio recibe un agujero ciego para un inserto; el agujero se abre donde queda su parte superior. Los orificios impresos salen algo más pequeños de lo dibujado: imprime primero una torreta de prueba y ajusta {{ui:prop.screwBossHole}} una o dos décimas.
 
 ## Clip de encaje
 

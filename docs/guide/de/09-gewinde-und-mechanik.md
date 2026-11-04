@@ -243,7 +243,7 @@ Der {{ui:shape.screwBoss}} ist die Säule, an die in einem Gehäuse ein Deckel o
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} und {{ui:prop.screwBossDiameter}} lassen sich von Hand ändern; unter dem Durchmesser steht, wie dick die Wand um das Loch ist, mit einer Warnung, wenn sie dünner ist, als die Befestigung braucht. Ein Loch so tief wie der Dom geht durch. Die Öffnung hat eine kleine Fase, damit Einsatz oder Schraube hineinfinden. {{ui:prop.screwBossGussets}} setzt zwei bis sechs dünne Rippen vom Dom zum Boden; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} und {{ui:prop.screwBossGussetThickness}} sagen, wie weit, wie hoch und wie dick.
 
-Stell den Dom auf den Boden einer ausgehöhlten Kiste und gruppiere ihn mit ihr; im Deckel nimmt eine {{ui:shape.counterbore}} als Aussparung darüber den Schraubenkopf auf. Gedruckte Löcher werden etwas kleiner als gezeichnet: erst einen Dom zur Probe drucken und {{ui:prop.screwBossHole}} um ein, zwei Zehntel anpassen.
+Stell den Dom auf den Boden einer ausgehöhlten Kiste und gruppiere ihn mit ihr; im Deckel nimmt eine {{ui:shape.counterbore}} als Aussparung darüber den Schraubenkopf auf. Als Loch gesetzt und mit einem vollen Teil gruppiert, schneidet er nur sein Loch – die Tasche für den Einsatz oder die Schraube, mit ihrer Fase –, so bekommt ein eigener Block oder Pfosten ein Sackloch für einen Einsatz; das Loch öffnet sich dort, wo seine Oberseite liegt. Gedruckte Löcher werden etwas kleiner als gezeichnet: erst einen Dom zur Probe drucken und {{ui:prop.screwBossHole}} um ein, zwei Zehntel anpassen.
 
 ## Schnapphaken
 

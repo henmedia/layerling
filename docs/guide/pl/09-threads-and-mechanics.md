@@ -243,7 +243,7 @@ Zmień kształt w otwór i zgrupuj go z częścią. Niech jego górny koniec wys
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} i {{ui:prop.screwBossDiameter}} można zmienić ręcznie; pod średnicą podana jest grubość ścianki wokół otworu, z ostrzeżeniem, gdy jest cieńsza, niż wymaga mocowanie. Otwór tak głęboki jak tulejka jest przelotowy. Wlot otworu ma małą fazę, żeby wkładka albo wkręt trafiły. {{ui:prop.screwBossGussets}} dodaje od dwóch do sześciu cienkich żeber od tulejki do dna; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} i {{ui:prop.screwBossGussetThickness}} ustalają ich zasięg, wysokość i grubość.
 
-Postaw tulejkę na dnie wydrążonego pudełka i zgrupuj z nim; w pokrywie nad nią {{ui:shape.counterbore}} jako otwór przyjmie łeb śruby. Drukowane otwory wychodzą nieco mniejsze niż narysowane: najpierw wydrukuj jedną tulejkę na próbę i popraw {{ui:prop.screwBossHole}} o jedną, dwie dziesiąte.
+Postaw tulejkę na dnie wydrążonego pudełka i zgrupuj z nim; w pokrywie nad nią {{ui:shape.counterbore}} jako otwór przyjmie łeb śruby. Ustawiony jako otwór i zgrupowany z pełną częścią wycina tylko swój otwór – gniazdo na wkładkę lub wkręt, z fazą – więc własny blok lub słupek dostaje ślepy otwór na wkładkę; otwór zaczyna się tam, gdzie jest jego góra. Drukowane otwory wychodzą nieco mniejsze niż narysowane: najpierw wydrukuj jedną tulejkę na próbę i popraw {{ui:prop.screwBossHole}} o jedną, dwie dziesiąte.
 
 ## Zatrzask
 

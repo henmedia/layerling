@@ -243,7 +243,7 @@ Přepněte tvar na výřez a slučte s dílem. Horní konec nechte trochu vyčn�
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} a {{ui:prop.screwBossDiameter}} lze měnit ručně; pod průměrem je uvedeno, jak silná je stěna kolem díry, s varováním, když je tenčí, než upevnění chce. Díra hluboká jako sloupek je průchozí. Ústí díry má malé zkosení, aby vložka nebo šroub našly cestu. {{ui:prop.screwBossGussets}} přidá dvě až šest tenkých žeber ze sloupku ke dnu; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} a {{ui:prop.screwBossGussetThickness}} určují jejich dosah, výšku a tloušťku.
 
-Postavte sloupek na dno vydlabané krabičky a seskupte ho s ní; ve víku nad ním přijme hlavu šroubu {{ui:shape.counterbore}} jako díra. Tištěné díry vycházejí o něco menší, než jsou nakreslené: nejdřív vytiskněte jeden sloupek na zkoušku a {{ui:prop.screwBossHole}} upravte o desetinu či dvě.
+Postavte sloupek na dno vydlabané krabičky a seskupte ho s ní; ve víku nad ním přijme hlavu šroubu {{ui:shape.counterbore}} jako díra. Nastavený jako díra a seskupený s plným dílem vyřízne jen svůj otvor – kapsu pro vložku nebo šroub i se sražením –, takže vlastní blok nebo sloupek dostane slepý otvor pro vložku; otvor začíná tam, kde je jeho horní plocha. Tištěné díry vycházejí o něco menší, než jsou nakreslené: nejdřív vytiskněte jeden sloupek na zkoušku a {{ui:prop.screwBossHole}} upravte o desetinu či dvě.
 
 ## Zaklapávací háček
 

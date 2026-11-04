@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { IndexedMesh } from "@/lib/enclosureMesh";
-import { screwBossMesh, screwBossPlan, screwBossSize } from "@/lib/screwBoss";
+import { screwBossCavityMesh, screwBossMesh, screwBossPlan, screwBossSize } from "@/lib/screwBoss";
 import { snapFitMesh, snapFitPlan } from "@/lib/snapFit";
 import { ribMesh } from "@/lib/rib";
 import { meshForShape } from "@/lib/editorMeshCore";
@@ -73,6 +73,34 @@ describe("the screw boss", () => {
     const through = screwBossMesh({ width: 8, height: 5, screwBossFastener: "selfTapping", screwBossSize: "K30" });
     expect(through.plan.through).toBe(true);
     expect(closedParts(through.mesh)).toBe(1);
+  });
+
+  it("grouped as a hole, cuts only the insert's pocket, not the whole post (#1288)", () => {
+    const { mesh, plan } = screwBossCavityMesh({ width: 8, height: 10, screwBossGussets: 4 }, 96);
+    expect(closedParts(mesh)).toBe(1);
+    const cylinder = (r: number, h: number) => Math.PI * r * r * h;
+    // The M3 insert's hole, 4 mm across and 6.7 mm deep from the top, with its chamfer: no post, no gussets.
+    const expected = cylinder(2, plan.holeDepth - plan.chamfer) + (Math.PI * plan.chamfer * (2 * 2 + 2 * 2.5 + 2.5 * 2.5)) / 3;
+    expect(plan.holeDepth).toBeCloseTo(6.7, 5);
+    expect(mesh.volume()).toBeGreaterThan(expected * 0.98);
+    expect(mesh.volume()).toBeLessThan(expected * 1.001);
+    const ys = Array.from({ length: mesh.positions.length / 3 }, (_, i) => mesh.positions[i * 3 + 1]);
+    const rs = Array.from({ length: mesh.positions.length / 3 }, (_, i) => Math.hypot(mesh.positions[i * 3], mesh.positions[i * 3 + 2]));
+    expect(Math.min(...ys)).toBeCloseTo(10 - 6.7, 5);
+    expect(Math.max(...ys)).toBeCloseTo(10, 5);
+    expect(Math.max(...rs)).toBeCloseTo(2 + plan.chamfer, 5);
+    // Through when it is as deep as the boss; and the editor builds a boss marked as a hole this way.
+    const through = screwBossCavityMesh({ width: 8, height: 5, screwBossFastener: "selfTapping", screwBossSize: "K30" });
+    expect(through.plan.through).toBe(true);
+    expect(closedParts(through.mesh)).toBe(1);
+    const shape = makeShapeFromAsset(toolbarShapeAssets.find((asset) => asset.kind === "screwBoss")!, { x: 0, z: 0 });
+    // Across the body as the editor builds it, half its width in x and z.
+    const halfWidth = (vertices: number[][]) => {
+      const xs = vertices.map((v) => v[0]);
+      return (Math.max(...xs) - Math.min(...xs)) / 2;
+    };
+    expect(halfWidth(meshForShape(shape).vertices)).toBeCloseTo(4, 1);
+    expect(halfWidth(meshForShape({ ...shape, hole: true }).vertices)).toBeLessThan(2.6);
   });
 
   it("braces the post with gussets out to its footprint, and leaves them out where they do not fit", () => {

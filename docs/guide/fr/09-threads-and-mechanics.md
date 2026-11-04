@@ -241,7 +241,7 @@ Le {{ui:shape.screwBoss}} est le plot sur lequel on visse un couvercle ou une ca
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} et {{ui:prop.screwBossDiameter}} se changent à la main ; sous le diamètre, le panneau indique l'épaisseur de paroi autour du trou et avertit si elle est trop fine pour la fixation. Un trou aussi profond que le plot le traverse. L'entrée du trou a un petit chanfrein pour guider l'insert ou la vis. {{ui:prop.screwBossGussets}} ajoute deux à six fines nervures du plot jusqu'au fond ; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} et {{ui:prop.screwBossGussetThickness}} règlent leur portée, leur hauteur et leur épaisseur.
 
-Posez le bossage sur le fond d'une boîte évidée et groupez-le avec elle ; dans le couvercle, un {{ui:shape.counterbore}} en trou au-dessus reçoit la tête de vis. Les trous imprimés sortent un peu plus petits que dessinés : imprimez d'abord un bossage d'essai et ajustez {{ui:prop.screwBossHole}} d'un ou deux dixièmes.
+Posez le bossage sur le fond d'une boîte évidée et groupez-le avec elle ; dans le couvercle, un {{ui:shape.counterbore}} en trou au-dessus reçoit la tête de vis. Mis en trou et groupé avec une pièce pleine, il ne découpe que son trou – le logement de l'insert ou de la vis, avec son chanfrein –, ainsi un bloc ou un plot à vous reçoit un trou borgne pour un insert ; le trou s'ouvre là où se trouve son sommet. Les trous imprimés sortent un peu plus petits que dessinés : imprimez d'abord un bossage d'essai et ajustez {{ui:prop.screwBossHole}} d'un ou deux dixièmes.
 
 ## Clip à encliqueter
 

@@ -242,7 +242,7 @@ La {{ui:shape.screwBoss}} è il perno a cui in una scatola si avvita un coperchi
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} e {{ui:prop.screwBossDiameter}} si cambiano a mano; sotto il diametro è indicato lo spessore della parete intorno al foro, con un avviso se è più sottile di quanto chiede il fissaggio. Un foro profondo quanto la torretta è passante. L'imbocco del foro ha un piccolo smusso, così l'inserto o la vite trovano la strada. {{ui:prop.screwBossGussets}} aggiunge da due a sei sottili nervature dalla torretta al fondo; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} e {{ui:prop.screwBossGussetThickness}} ne fissano sporgenza, altezza e spessore.
 
-Metti la torretta sul fondo di una scatola svuotata e raggruppala con essa; nel coperchio, un {{ui:shape.counterbore}} come foro sopra accoglie la testa della vite. I fori stampati vengono un po' più piccoli del disegno: stampa prima una torretta di prova e correggi {{ui:prop.screwBossHole}} di un decimo o due.
+Metti la torretta sul fondo di una scatola svuotata e raggruppala con essa; nel coperchio, un {{ui:shape.counterbore}} come foro sopra accoglie la testa della vite. Impostato come foro e raggruppato con un pezzo pieno, taglia solo il suo foro – la sede dell'inserto o della vite, con lo smusso –, così un blocco o un montante tuo riceve un foro cieco per un inserto; il foro si apre dove sta la sua sommità. I fori stampati vengono un po' più piccoli del disegno: stampa prima una torretta di prova e correggi {{ui:prop.screwBossHole}} di un decimo o due.
 
 ## Gancio a scatto
 
