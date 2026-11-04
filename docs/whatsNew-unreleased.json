@@ -28,5 +28,45 @@
       "de": "Tippst du in der Skizze eine Länge oder einen Winkel ein, bleibt ein gesperrter Punkt (Strg+L) jetzt stehen: Die Länge bewegt das freie Ende der Linie, der Winkel dreht die Linie, deren anderes Ende frei ist. So machst du einen Umriss Ecke für Ecke genau: Ecke sperren, Länge und Winkel der nächsten Linie eintippen, ihr Ende sperren und weiter.",
       "en": "When you type a length or an angle in a sketch, a locked point (Ctrl+L) now stays where it is: the length moves the free end of the line, the angle turns the line whose far end is free. So you can make an outline exact corner by corner: lock a corner, type the length and the angle of the next line, lock its end, and go on."
     }
+  },
+  {
+    "title": {
+      "de": "Rechtsklick im Auswahlrahmen",
+      "en": "Right-click inside the selection frame"
+    },
+    "body": {
+      "de": "Ein Rechtsklick auf eine leere Stelle innerhalb des Rahmens einer Auswahl öffnet jetzt das Menü der Auswahl, mit Gruppieren, Ausrichten und allem anderen. Vorher kam dort nur das kurze Menü mit Einfügen, sobald der Klick zwischen die Teile fiel.",
+      "en": "A right-click on empty space inside the frame of a selection now opens the menu of the selection, with Group, Align and the rest. Before, a click between the parts only brought up the short menu with Paste."
+    }
+  },
+  {
+    "title": {
+      "de": "Angeheftete Formen verdecken nichts mehr",
+      "en": "A pinned shape library no longer covers the properties"
+    },
+    "body": {
+      "de": "Die angeheftete Formenbibliothek liegt jetzt unter den Eigenschaften des gewählten Objekts statt darüber, auch wenn du sie an den rechten Rand schiebst. Nur kurz geöffnet, ohne Anheften, liegt sie wie bisher obenauf.",
+      "en": "A pinned shape library now lies under the properties of the selected object instead of over them, even when you move it to the right edge. Opened briefly without pinning, it still comes on top as before."
+    }
+  },
+  {
+    "title": {
+      "de": "KI-Werkzeuge laden in jedem Client",
+      "en": "AI tools load in every client"
+    },
+    "body": {
+      "de": "Manche KI-Clients ließen die Werkzeuge zum Anlegen und Ändern von Formen und für Vorlagenbilder weg, weil zwei ihrer Einstellungen mehrere Typen auf einmal angaben. Sie sind jetzt so beschrieben, dass jeder Client sie lädt.",
+      "en": "Some AI clients left out the tools that create and change shapes and the one for reference images, because two of their settings named several types at once. They are now described so that every client loads them."
+    }
+  },
+  {
+    "title": {
+      "de": "STL und 3MF per Doppelklick öffnen",
+      "en": "Open STL and 3MF with a double click"
+    },
+    "body": {
+      "de": "Die installierte App in Chrome oder Edge meldet sich jetzt auch für STL- und 3MF-Dateien an. Ein Doppelklick auf eine solche Datei öffnet sie als neuen Entwurf, wie Importieren auf der Startseite. Unter „Öffnen mit“ kannst du layerling für diese Dateien als Standard festlegen.",
+      "en": "The app installed from Chrome or Edge now also signs up for STL and 3MF files. A double click on one opens it as a new design, as Import on the start page does. Under \"Open with\" you can make layerling the default for these files."
+    }
   }
 ]

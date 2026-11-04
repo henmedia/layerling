@@ -1793,17 +1793,17 @@ export default function Home() {
     }
   }, [openFolderId, projects, refreshSharedProjects]);
 
-  // A .lyl opened from the file manager with the installed app (#605). Only the first file: a design
-  // opens the editor, so a second one could not be shown anyway.
-  const openLaunchedFileRef = useRef(openLylProjectFromFile);
-  openLaunchedFileRef.current = openLylProjectFromFile;
+  // A .lyl opened from the file manager with the installed app (#605), or an .stl or .3mf (#1287), which
+  // becomes a new design as with Import on the start page. Only the first file: a design opens the editor,
+  // so a second one could not be shown anyway.
+  const openLaunchedFileRef = useRef<(file: File, handle: LylFileHandle) => Promise<unknown>>((file, handle) => openLylProjectFromFile(file, undefined, handle));
   useEffect(() => {
     if (!mounted) return;
     let taken = false;
     onLylFilesLaunched((file, handle) => {
       if (taken) return;
       taken = true;
-      void openLaunchedFileRef.current(file, undefined, handle).finally(() => { taken = false; });
+      void openLaunchedFileRef.current(file, handle).finally(() => { taken = false; });
     });
   }, [mounted]);
 
@@ -2561,6 +2561,7 @@ export default function Home() {
     },
     [openFolderId, openLylProjectFromFile, placeNewDesign, projects.length, refreshSharedProjects, restoreBackup],
   );
+  openLaunchedFileRef.current = (file, handle) => importFilesFromDashboard([file], handle);
 
   /** Chrome and Edge: a file dialog that hands over the file's place, so Save can write back into it (#251). */
   const pickDashboardImport = async () => {

@@ -16,7 +16,7 @@ On the start page a hint with {{ui:installHint.install}} appears if your browser
 
 You can close the hint on the start page with {{ui:installHint.dismiss}}. Starting the installed app a second time in Chrome or Edge brings the open window to the front instead of opening another one.
 
-On a computer, an installed layerling in Chrome or Edge also registers as a program for `.lyl` files: a double click on a design in the file manager opens it in layerling, and [[Ctrl]]+[[S]] saves back into that file. On Android this does not work, there the browser offers no file association for installed web apps; open a design with {{ui:dashboard.importGeometry}} on the start page.
+On a computer, an installed layerling in Chrome or Edge also registers as a program for `.lyl` files: a double click on a design in the file manager opens it in layerling, and [[Ctrl]]+[[S]] saves back into that file. It does the same for `.stl` and `.3mf` files, which open as a new design, as with {{ui:dashboard.importGeometry}} on the start page. To make layerling the default for them, choose it under Open with and let the system always use it. On Android this does not work, there the browser offers no file association for installed web apps; open a design with {{ui:dashboard.importGeometry}} on the start page.
 
 ## Updates
 

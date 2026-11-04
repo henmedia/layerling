@@ -12,7 +12,11 @@
   "file_handlers": [
     {
       "action": "./",
-      "accept": { "application/vnd.layerling.project+zip": [".lyl"] }
+      "accept": {
+        "application/vnd.layerling.project+zip": [".lyl"],
+        "model/stl": [".stl"],
+        "model/3mf": [".3mf"]
+      }
     }
   ],
   "orientation": "any",
