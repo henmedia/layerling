@@ -9,6 +9,7 @@ import "./shapeLibrary.css";
 import "./attachments.css";
 import "./viewCube.css";
 import "./secondView.css";
+import "./viewScrollbars.css";
 import "./shortcuts.css";
 import "./sketchImage.css";
 import "./sketchLock.css";

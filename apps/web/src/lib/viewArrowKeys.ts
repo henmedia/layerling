@@ -11,7 +11,7 @@ declare global {
 
 type ArrowKeyEvent = { key: string; shiftKey: boolean; ctrlKey: boolean; metaKey: boolean; altKey: boolean };
 
-type ViewCamera = {
+export type ViewCamera = {
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
   controls: { target: THREE.Vector3; minPolarAngle: number; maxPolarAngle: number; update: () => unknown };
 };

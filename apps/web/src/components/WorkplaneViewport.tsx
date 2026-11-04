@@ -31,6 +31,9 @@ import type { ModelSplitPlane } from "@/lib/modelSplit";
 import { useLanguage } from "@/lib/useLanguage";
 import { viewDirectionFromName, viewFaceForKey, type ViewCubeFace } from "@/lib/viewCubeDrag";
 import { ViewCube } from "@/components/workplane/ViewCube";
+import { ViewScrollbars } from "@/components/workplane/ViewScrollbars";
+import { ViewScrollbarsIcon } from "@/components/ViewScrollbarsIcon";
+import { readViewScrollbars, storeViewScrollbars } from "@/lib/viewScroll";
 import { openSecondViewWindow, SecondViewWindow, useSecondViewSupported } from "@/components/workplane/SecondViewWindow";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
@@ -1570,6 +1573,15 @@ export function WorkplaneViewport({
   const [snap, setSnap] = useState<GridSize>(() => normalizeSnapGrid(initialSnap, DEFAULT_SNAP_GRID));
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [workspace, setWorkspace] = useState<WorkspaceSettings>(() => normalizeWorkspaceSettings(initialWorkspace));
+  // The scrollbars of the 3D view (Discussion #1241), switched in the view bar; read after mounting, as the page is built without storage.
+  const [viewScrollbarsOn, setViewScrollbarsOn] = useState(false);
+  useEffect(() => setViewScrollbarsOn(readViewScrollbars()), []);
+  const toggleViewScrollbars = useCallback(() => {
+    setViewScrollbarsOn((on) => {
+      storeViewScrollbars(!on);
+      return !on;
+    });
+  }, []);
   const [transformOverlay, setTransformOverlay] = useState<TransformOverlayState | null>(null);
   const [alignOverlay, setAlignOverlay] = useState<AlignOverlayState | null>(null);
   const [mirrorOverlay, setMirrorOverlay] = useState<MirrorOverlayState | null>(null);
@@ -7775,6 +7787,8 @@ export function WorkplaneViewport({
   return (
     <main className="workplane-stage">
       <ViewCube getRig={getViewCubeRig} cubeRef={viewCubeRef} />
+      {/* Scrollbars that slide the view, switched in the view bar (Discussion #1241). */}
+      {viewScrollbarsOn && !pickOnly ? <ViewScrollbars threeRef={threeRef} /> : null}
       {/* An empty design says where to start, and that a tool can be found by its name (31.10.2026). */}
       {shapes.length === 0 && !pickOnly ? <p className="workplane-empty-hint">{t("editor.emptyHint")}</p> : null}
       {secondViewWindow ? <SecondViewWindow popup={secondViewWindow} threeRef={threeRef} projectId={projectId} getSelectedIds={getSelectedIds} onClosed={closeSecondView} /> : null}
@@ -7853,6 +7867,15 @@ export function WorkplaneViewport({
                 <PictureInPicture2 size={24} strokeWidth={2.15} aria-hidden="true" />
               </button>
             ) : null}
+            <button
+              className={viewScrollbarsOn ? "active" : ""}
+              aria-label={viewScrollbarsOn ? t("camera.hideScrollbars") : t("camera.showScrollbars")}
+              title={viewScrollbarsOn ? t("camera.hideScrollbars") : t("camera.showScrollbars")}
+              aria-pressed={viewScrollbarsOn}
+              onClick={toggleViewScrollbars}
+            >
+              <ViewScrollbarsIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+            </button>
             </div>
             <div className="camera-group">
             <div className="workplane-display-control-group">
