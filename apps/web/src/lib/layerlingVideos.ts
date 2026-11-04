@@ -55,10 +55,11 @@ export const LAYERLING_VIDEOS = [
     url: "https://youtu.be/kzV7fQ3rXhw",
   },
   {
-    title: "Layerling en español: el CAD gratis que reemplaza a Tinkercad (2026)",
+    // A whole playlist, so new videos in it arrive here without a release.
+    title: "Layerling en español | Del primer contacto al proyecto completo",
     channel: "Random Maker",
     lang: "ES",
-    url: "https://youtu.be/iroftGBX-0Y",
+    url: "https://www.youtube.com/playlist?list=PLVWA8wsStnyw",
   },
   {
     // A whole playlist, so new videos in it arrive here without a release.
