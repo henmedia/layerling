@@ -672,6 +672,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         threadHead: shape.threadHead,
         threadHand: shape.threadHand,
         threadProfile: shape.threadProfile,
+        threadTaper: shape.threadTaper,
         threadDiameter: shape.threadDiameter,
         threadPitch: shape.threadPitch,
         threadClearance: shape.threadClearance,

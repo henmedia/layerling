@@ -2700,6 +2700,7 @@ function applyMcpThreadSettings(
     threadHead: settings.head,
     threadHand: settings.hand,
     threadProfile: settings.profile,
+    threadTaper: settings.taper ? true : undefined,
     threadDiameter: settings.diameter,
     threadPitch: settings.pitch,
     threadClearance: settings.clearance,
@@ -11700,7 +11701,7 @@ export function LayerlingEditor({
         // Alles Formeigene in einem Zug, mit denselben Grenzen wie im
         // Merkmalsfeld: Seitenzahl, Kegelradien, Zahnrad, Gewinde, Feder,
         // Beschriftung. Was die Art gar nicht kennt, faellt dabei weg.
-        const shapeParams = target.kind === "thread" ? mcpThreadSizeParams(params, threadSettings(target).profile) : params;
+        const shapeParams = target.kind === "thread" ? mcpThreadSizeParams(params, threadSettings(target).profile, threadSettings(target).taper) : params;
         const settings = mcpShapeCustomization(target.kind, shapeParams);
         (Object.keys(settings) as (keyof ShapeCustomization)[]).forEach((key) => {
           const value = settings[key];
@@ -11752,6 +11753,7 @@ export function LayerlingEditor({
             threadHead: threaded.threadHead,
             threadHand: threaded.threadHand,
             threadProfile: threaded.threadProfile,
+            threadTaper: threaded.threadTaper,
             threadDiameter: threaded.threadDiameter,
             threadPitch: threaded.threadPitch,
             threadClearance: threaded.threadClearance,

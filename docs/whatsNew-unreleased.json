@@ -28,5 +28,15 @@
       "de": "In der Skizze zeigt ein gewählter Punkt seine Lage als X und Y, ein angeklickter Kurvengriff seine Lage zu seinem Punkt. Beides lässt sich eintippen, so wird eine Kurve genau und auf beiden Seiten gleich.",
       "en": "In a sketch, a selected point shows where it lies as X and Y, and a clicked curve handle where it lies from its point. Both can be typed, so a curve comes out exact and the same on both sides."
     }
+  },
+  {
+    "title": {
+      "de": "Kegelige Gewinde und NPT",
+      "en": "Tapered threads and NPT"
+    },
+    "body": {
+      "de": "Ein Gewinde kann jetzt kegelig sein, 1:16 wie ein Rohrgewinde, und das Größenmenü hat die amerikanischen NPT-Rohrgewinde von 1/16\" bis 4\". Stange und Schraube werden zur Spitze schmaler, Mutter und Gewindeloch zur Öffnung weiter.",
+      "en": "A thread can now be tapered, 1 in 16 as a pipe thread is, and the size menu has the American NPT pipe threads from 1/16\" to 4\". Rod and screw narrow towards the tip, nut and tapped hole widen towards the mouth."
+    }
   }
 ]

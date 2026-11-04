@@ -1484,6 +1484,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.threadProfile !== undefined && !isThreadProfile(definition.threadProfile)) {
       throw new Error(`${label}.threadProfile is invalid`);
     }
+    if (definition.threadTaper !== undefined && typeof definition.threadTaper !== "boolean") {
+      throw new Error(`${label}.threadTaper is invalid`);
+    }
     if (definition.threadDiameter !== undefined) {
       const threadDiameter = finiteNumber(definition.threadDiameter, `${label}.threadDiameter`);
       if (threadDiameter < 1 || threadDiameter > 160) throw new Error(`${label}.threadDiameter is outside the supported range`);

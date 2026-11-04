@@ -679,6 +679,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.threadHead === b.threadHead &&
     a.threadHand === b.threadHand &&
     a.threadProfile === b.threadProfile &&
+    a.threadTaper === b.threadTaper &&
     a.threadDiameter === b.threadDiameter &&
     a.threadPitch === b.threadPitch &&
     a.threadClearance === b.threadClearance &&

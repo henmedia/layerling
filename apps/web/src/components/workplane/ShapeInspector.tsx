@@ -103,7 +103,7 @@ import {
   threadNaturalHeight,
   threadPitchLimits,
   threadSettings,
-  threadSizeFor,
+  threadStandardSize,
   threadSizeById,
   threadSizeSettings,
   threadUsesInchPitch,
@@ -2537,7 +2537,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 
   if (shape.kind === "thread") {
     const settings = threadSettings(shape);
-    const standard = threadSizeFor(settings.diameter, settings.pitch);
+    // A size of the menu only as it is tapered (#1267): a straight thread at an NPT size's measures is a free one.
+    const standard = threadStandardSize(settings);
     const standardSeries = standard ? threadSeriesFor(standard) : null;
     const pitchLimits = threadPitchLimits(settings.diameter);
     const headLimits = threadHeadHeightLimits(settings);
@@ -2619,6 +2620,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         threadHead: next.head,
         threadHand: next.hand,
         threadProfile: next.profile,
+        threadTaper: next.taper ? true : undefined,
         threadDiameter: next.diameter,
         threadPitch: next.pitch,
         threadClearance: next.clearance,
@@ -2850,6 +2852,14 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         value: settings.profile,
         options: THREAD_PROFILE_OPTIONS.map((option) => ({ value: option.value, label: t(option.label) })),
         onChange: (profile) => applyThread({ profile: normalizeThreadProfile(profile) }),
+      },
+      // Tapered 1 in 16, as NPT (Discussion #1267): any profile; an NPT size turns it on.
+      {
+        type: "toggle",
+        id: "threadTaper",
+        label: t("prop.threadTaper"),
+        value: settings.taper,
+        onChange: (taper) => applyThread({ taper }),
       },
     );
     if (settings.profile === "custom") {
@@ -3757,7 +3767,7 @@ export function ShapeInspector({
   const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
   const textFillEnd = primaryProperties.reduce((end, property, index) => (TEXT_FILL_IN_VIEW_IDS.has(property.id) ? index + 1 : end), 0);
   const threadProperties = isThread
-    ? properties.filter((property) => ["pitch", "threadsPerInch", "threadHand", "threadProfile", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
+    ? properties.filter((property) => ["pitch", "threadsPerInch", "threadHand", "threadProfile", "threadTaper", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
     : [];
   const gearTeethProperties = shape.kind === "gear"
     ? properties.filter((property) => ["gearProfile", "teeth", "gearModule", "gearPressureAngle", "gearBacklash", "gearRim", "toothSize", "toothWidth"].includes(property.id))

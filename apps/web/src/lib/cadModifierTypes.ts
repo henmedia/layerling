@@ -236,6 +236,11 @@ export type CadModifierThreadPart = {
   /** The chamfer at the bottom end, when the part has one (`chamferBottom`). */
   chamferLow: number;
   chamferBottom: boolean;
+  /**
+   * A tapered thread (NPT, #1267): every radius at height y (above the shape's bottom) is shifted
+   * by `slope * (y - at)`, as the mesh draws it. Absent for a straight thread.
+   */
+  taper?: { slope: number; at: number };
   /** A nut body or screw head of outline tiers (#1131): square, flange, wing or star knob. It takes the place of the hexagon or head kind. */
   tiers?: ThreadOutlineTier[];
   /** Screw only. */
