@@ -95,6 +95,16 @@ describe("loose splinters of an export (#352)", () => {
     expect(result.mesh.faces.length).toBe(mesh.faces.length - sheet.faces.length);
   });
 
+  it("keeps a drawn piece with some volume whose corners the weld did not join (#1258)", () => {
+    // A dot of 4.5 mm3 of 92 triangles with one triangle missing: open by the edge count, but it holds a body.
+    const dot = prism(24, 1.2, 1);
+    const open: Part = { vertices: dot.vertices.map(([x, y, z]) => [x + 30, y, z] as Vec), faces: dot.faces.slice(0, dot.faces.length - 1) };
+    const mesh = join("dot", [plate, open]);
+    const result = removeLooseSplinters(mesh);
+    expect(result.removed).toBe(0);
+    expect(result.mesh.faces.length).toBe(mesh.faces.length);
+  });
+
   it("always keeps the piece with the most triangles", () => {
     const mesh = join("specks", [
       tetra([0, 0, 0], [0.4, 0, 0], [0, 0.4, 0], [0, 0, 0.4]),

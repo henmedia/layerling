@@ -72,7 +72,7 @@ Dækker vinduet noget, trækker du det i titellinjen hen til et andet sted; impo
 
 Et hul du ikke har grupperet tages ud af hver form det når når du eksporterer, som visningen viser det. Så der er ingen grund til at gruppere før hver eksport. Med en markering tæller kun de valgte huller. Et hul kan ikke eksporteres alene; layerling gør opmærksom på det.
 
-STEP bærer kun eksakte CAD-former. Det der ikke kan skrives eksakt, såsom et mesh importeret som STL, udelades. Beskeden efter eksporten navngiver de former og siger hvorfor. Til printeren, brug STL eller 3MF, som bærer alt.
+STEP bærer kun eksakte CAD-former. Et importeret mesh gøres eksakt til filen, som {{ui:editor.tool.makeExact}} gør det (se "Gør et importeret mesh eksakt" nedenfor), så eksporten kan tage op til et minut; et mesh, der mest er fri form, som en figur, udelades, ligesom alt andet, der ikke kan skrives eksakt. Beskeden efter eksporten navngiver de former og siger hvorfor. Til printeren, brug STL eller 3MF, som bærer alt.
 
 ### SVG til en laserskærer eller plotter
 
@@ -112,9 +112,17 @@ Skabelonbilleder tilføjes i skitsetilstand, se [Skitser](chapter:sketches).
 
 ## Forenkling af et importeret mesh
 
-Et scannet eller skulptureret mesh har ofte langt flere trekanter end dets form har brug for, og hver eneste af dem bæres med mens du flytter, skærer og gemmer. {{ui:simplify.title}} i Modificér-gruppen (eller i højreklik-menuen på formen) viser meshet som det er ved siden af hvad en valgt andel af dets trekanter ville efterlade af det; begge visninger drejer og zoomer sammen med arbejdsplanets museknapper. Sæt hvor meget der skal beholdes som en procent eller et antal trekanter, og {{ui:simplify.apply}} tager det lettere mesh. Resultatet er et almindeligt mesh: for resultatet af en skæring eller sammenfletning opgives {{ui:group.edit}} og dets originale dele.
+Et scannet eller skulptureret mesh har ofte langt flere trekanter end dets form har brug for, og hver eneste af dem bæres med mens du flytter, skærer og gemmer. {{ui:simplify.title}} i Modificér-gruppen (eller i højreklik-menuen på formen) viser meshet som det er ved siden af hvad en valgt andel af dets trekanter ville efterlade af det; begge visninger drejer og zoomer sammen med arbejdsplanets museknapper. Sæt hvor meget der skal beholdes som en procent eller et antal trekanter, og {{ui:simplify.apply}} tager det lettere mesh. Resultatet er et almindeligt mesh: for resultatet af en skæring eller sammenfletning opgives {{ui:group.edit}} og dets originale dele. Med {{ui:simplify.keepEdges}} slået til, som det er fra start, bliver skarpe kanter og kanterne af huller præcis, hvor de er, mens plane flader stadig mister de fleste trekanter; slået fra må forenklingen runde dem af for et lavere antal.
 
 At skære, flette og finde fælles med et importeret mesh beregnes i din browser, så arbejdsområdeindstillingerne begrænser hvor mange trekanter et sådant mesh må have ({{ui:workspace.booleanTriangleLimit}}). Et mesh over grænsen behandles ikke, og beskeden navngiver dets trekantsantal; forenkl meshet først, eller hæv grænsen hvis din computer kan klare det.
+
+## Gør et importeret mesh eksakt
+
+En STL-, OBJ- eller 3MF-fil rummer kun trekanter, også når delen blev tegnet i CAD med plane flader og runde huller. {{ui:editor.tool.makeExact}} i {{ui:editor.group.modify}}-gruppen (eller i formens højreklikmenu) leder i trekanterne efter de planer, cylindre, kegler, kugler og tori, de blev lavet af, og bygger formen op igen af dem som en eksakt CAD-form: et hul bliver én rigtig cylinder med rund kant i stedet for hundrede smalle strimler. Derefter følger {{ui:editor.tool.fillet}} og {{ui:editor.tool.chamfer}} én ren kant, {{ui:editor.tool.deleteFace}} fjerner en hel afrunding eller væggen i et hul, og en STEP-eksport bærer de rigtige flader. Statuslinjen fortæller, hvad der blev fundet, f.eks. "planer: 9, cylindre: 4".
+
+Det, der ikke passer til nogen af disse flader, bliver som små plane facetter, og beskeden fortæller, hvor meget af overfladen det er. En form, der mest er fri form, som en figur eller en modelleret form, forbliver et mesh, og det samme gør et mesh med huller eller vægge, der krydser hinanden, og som ikke kan lukke sig til en form. Op til 400.000 trekanter tages imod, og et stort mesh kan tage et par minutter. Et større mesh bringer du under grænsen med {{ui:simplify.title}} og {{ui:simplify.keepEdges}} slået til; ellers tag meshet, som det kom, så bliver det renest. Ét fortryd-trin bringer meshet tilbage.
+
+For et lille mesh med runde flader, op til 4.000 trekanter, gør kantværktøjerne det selv: at runde en kant af sådan en STL bygger den først op på samme måde.
 
 ## Fejlrapportering
 

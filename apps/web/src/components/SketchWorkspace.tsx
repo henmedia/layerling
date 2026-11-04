@@ -2,7 +2,7 @@
 
 import { previewLabelSpot } from "@/lib/sketchPreviewLabel";
 import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, Eye, EyeOff, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Magnet, Minus, Plus, Ruler, RulerDimensionLine, Scissors, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
-import { displayedHandle } from "@/lib/sketchBezierHandles";
+import { displayedHandle, handleAtOffset, handleOffset } from "@/lib/sketchBezierHandles";
 import { curveStretches } from "@/lib/sketchCurveThroughPoints";
 import { markEscapeHandled } from "@/lib/escapeHandled";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type SetStateAction, type FocusEvent as ReactFocusEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
@@ -1308,6 +1308,73 @@ export function SketchWorkspace({
     [gridLayout.majorInterval, gridStep, profile, workspace],
   );
   const reach = sketchPointerReach(workspace, board);
+  // Typed coordinates (#1250): a clicked handle shows where it lies from its own point, a single selected point where it
+  // lies from the sketch's origin. Y counts up the screen, as in the fields of a selection (#1064).
+  const handleFieldPoint = selectedHandle ? pointById.get(selectedHandle.pointId) ?? null : null;
+  const handleFieldOffset = handleFieldPoint && selectedHandle ? handleOffset(displayProfile, handleFieldPoint, selectedHandle.handle) : undefined;
+  const setHandleOffset = (dx: number, dz: number) => {
+    if (!handleFieldPoint || !selectedHandle || handleFieldPoint.locked) return;
+    if (handleFieldOffset && Math.abs(dx - handleFieldOffset.x) < 1e-9 && Math.abs(dz - handleFieldOffset.z) < 1e-9) return;
+    onMoveHandle(selectedHandle.pointId, selectedHandle.handle, handleAtOffset(handleFieldPoint, { x: dx, z: dz }, reach));
+  };
+  const movePointTo = (point: SketchPoint, x: number, z: number) => {
+    if (point.locked) return;
+    const moved = { x: clamp(x, -reach.halfWidth, reach.halfWidth), z: clamp(z, -reach.halfDepth, reach.halfDepth) };
+    if (Math.abs(moved.x - point.x) < 1e-9 && Math.abs(moved.z - point.z) < 1e-9) return;
+    onMovePoint(point.id, moved);
+  };
+  const coordinateFields = (point: SketchPoint | null) => {
+    if (handleFieldPoint && handleFieldOffset) {
+      const { x: dx, z: dz } = handleFieldOffset;
+      return (
+        <>
+          <span className="sketch-point-divider" />
+          <SketchImagePositionField
+            className="sketch-selection-position sketch-handle-position"
+            label={t("sketch.handleX")}
+            title={t("sketch.handlePositionHint")}
+            value={dx}
+            accuracy={workspace.accuracy}
+            disabled={Boolean(handleFieldPoint.locked)}
+            onChange={(x) => setHandleOffset(x, dz)}
+          />
+          <SketchImagePositionField
+            className="sketch-selection-position sketch-handle-position"
+            label={t("sketch.handleY")}
+            title={t("sketch.handlePositionHint")}
+            value={displayY(dz)}
+            accuracy={workspace.accuracy}
+            disabled={Boolean(handleFieldPoint.locked)}
+            onChange={(y) => setHandleOffset(dx, insideZ(y))}
+          />
+        </>
+      );
+    }
+    if (!point) return null;
+    return (
+      <>
+        <span className="sketch-point-divider" />
+        <SketchImagePositionField
+          className="sketch-selection-position sketch-point-position"
+          label={t("sketch.selectionX")}
+          title={t("sketch.pointPositionHint")}
+          value={point.x}
+          accuracy={workspace.accuracy}
+          disabled={Boolean(point.locked)}
+          onChange={(x) => movePointTo(point, x, point.z)}
+        />
+        <SketchImagePositionField
+          className="sketch-selection-position sketch-point-position"
+          label={t("sketch.selectionY")}
+          title={t("sketch.pointPositionHint")}
+          value={displayY(point.z)}
+          accuracy={workspace.accuracy}
+          disabled={Boolean(point.locked)}
+          onChange={(y) => movePointTo(point, point.x, insideZ(y))}
+        />
+      </>
+    );
+  };
   const minZoom = sketchMinZoom(workspace, board, SKETCH_MIN_ZOOM);
   const verticalLines = useMemo(() => {
     const lines: number[] = [];
@@ -3406,6 +3473,7 @@ export function SketchWorkspace({
                 </>
               ) : null}
               {mirrorButton}
+              {coordinateFields(selectedPoint)}
               <GuideHelpLink section="sketchCurve" className="sketch-corner-help" iconSize={17} />
             </>
           )}
@@ -3547,6 +3615,7 @@ export function SketchWorkspace({
             </button>
           ) : null}
           {mirrorButton}
+          {coordinateFields(null)}
           <GuideHelpLink section="sketchCurve" className="sketch-corner-help" iconSize={17} />
         </div>
       ) : null}

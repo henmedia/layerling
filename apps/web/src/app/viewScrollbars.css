@@ -1,0 +1,114 @@
+/* The scrollbars of the 3D view (components/workplane/ViewScrollbars.tsx, Discussion #1241): one down the right
+   edge, one along the bottom, each with an arrow at both ends. Thin and see-through until the pointer is on them,
+   so the view stays the view; colours from the theme, so the dark and graphite themes follow. */
+
+/* Spans the view; the properties panel's width, measured by the component, keeps the bars clear of it. */
+.view-scrollbars {
+  --view-scrollbar-right: 0px;
+  --view-scrollbar-size: 14px;
+  position: absolute;
+  inset: 0;
+  /* Over the canvas and the hints on it, under the view bar (11); the properties panel (8) is kept clear of. */
+  z-index: 9;
+  pointer-events: none;
+}
+
+.view-scrollbar {
+  position: absolute;
+  pointer-events: auto;
+  display: flex;
+  align-items: stretch;
+  gap: 1px;
+  padding: 1px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--panel) 85%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--border-strong) 70%, transparent);
+  opacity: 0.78;
+  transition: opacity 120ms ease;
+  touch-action: none;
+  user-select: none;
+}
+
+.view-scrollbar:hover,
+.view-scrollbar:has(.dragging) {
+  opacity: 1;
+}
+
+/* Along the bottom, leaving the corner to the upright bar. */
+.view-scrollbar-x {
+  left: 64px;
+  right: calc(var(--view-scrollbar-right) + var(--view-scrollbar-size) + 12px);
+  bottom: 4px;
+  height: var(--view-scrollbar-size);
+  flex-direction: row;
+}
+
+/* Down the right edge, below the hints at the top. */
+.view-scrollbar-y {
+  top: 64px;
+  bottom: calc(var(--view-scrollbar-size) + 12px);
+  right: calc(var(--view-scrollbar-right) + 4px);
+  width: var(--view-scrollbar-size);
+  flex-direction: column;
+}
+
+.view-scrollbar-arrow {
+  flex: 0 0 var(--view-scrollbar-size);
+  display: grid;
+  place-items: center;
+  width: var(--view-scrollbar-size);
+  height: var(--view-scrollbar-size);
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted-strong);
+  cursor: pointer;
+}
+
+.view-scrollbar-arrow:hover {
+  background: var(--tile-hover);
+  color: var(--foreground);
+}
+
+.view-scrollbar-arrow svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.6;
+}
+
+.view-scrollbar-track {
+  position: relative;
+  flex: 1 1 auto;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--border-strong) 55%, transparent);
+  cursor: pointer;
+}
+
+.view-scrollbar-thumb {
+  --scroll-start: 0.25;
+  --scroll-size: 0.5;
+  position: absolute;
+  border-radius: 5px;
+  background: var(--muted-strong);
+  pointer-events: none;
+}
+
+.view-scrollbar-x .view-scrollbar-thumb {
+  top: 2px;
+  bottom: 2px;
+  left: calc(var(--scroll-start) * 100%);
+  width: calc(var(--scroll-size) * 100%);
+}
+
+.view-scrollbar-y .view-scrollbar-thumb {
+  left: 2px;
+  right: 2px;
+  top: calc(var(--scroll-start) * 100%);
+  height: calc(var(--scroll-size) * 100%);
+}
+
+.view-scrollbar-track:hover .view-scrollbar-thumb,
+.view-scrollbar-track.dragging .view-scrollbar-thumb {
+  background: var(--primary);
+}

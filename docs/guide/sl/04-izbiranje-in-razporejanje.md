@@ -7,7 +7,7 @@ summary: Izbiranje oblik, iskanje v seznamu objektov, poravnava, zrcaljenje, vrt
 
 Klik na obliko jo izbere. S [[Shift]] dodaš še druge ali jih spet odvzameš. Dokler držiš [[Shift]] in sta izbrani dve obliki ali več, ju šteje majhna številka pod kazalcem miške. Klik v prazno izbor prekliče, prav tako [[Esc]]. Če na prazni delovni ravnini povlečeš okvir, izbereš vse, česar se dotakne; s pridržanim [[Shift]] okvir doda, česar ni bilo izbranega, in odvzame, kar je bilo. [[Ctrl]]+[[A]] pa izbere vsa vidna telesa. Medtem ko vlečeš telo ali ročaj okvirja, [[Esc]] prekliče dejanje, dokler je tipka miške še pritisnjena: vse se vrne, kot je bilo, in v zgodovino se ne doda nič.
 
-Kar ti je v napoto, skriješ ({{ui:editor.tool.hideSelected}}, [[Ctrl]]+[[H]]). Skrite oblike ostanejo v načrtu, samo niso vidne in ne pridejo v izvoz; okno izvoza vnaprej pove, koliko jih je. S [[Ctrl]]+[[Shift]]+[[H]] vrneš vse nazaj. Kar naj ostane na mestu, zakleneš s ključavnico zgoraj v nastavitvah ali s [[Ctrl]]+[[L]]. Zaklenjene oblike ni mogoče premikati, spreminjati velikosti, vrteti, barvati ali izbrisati: njene ročice posivijo, ob puščici zgoraj se pokaže ključavnica, orodja, ki bi jo spremenila, pa so zatemnjena. Ko miško pelješ čez ročico, se mere še vedno pokažejo, tipka, ki bi jo spremenila, pa pove »Objekt zaklenjen«. Dokler je v izboru ena zaklenjena oblika, se tudi pri drugih nič ne spremeni. Skrivanje, preimenovanje, kopiranje in podvajanje še delujejo.
+Kar ti je v napoto, skriješ ({{ui:editor.tool.hideSelected}}, [[Ctrl]]+[[H]]). Skrite oblike ostanejo v načrtu, samo niso vidne in ne pridejo v izvoz; okno izvoza vnaprej pove, koliko jih je. S [[Ctrl]]+[[Shift]]+[[H]] vrneš vse nazaj. Kar naj ostane na mestu, zakleneš s ključavnico zgoraj v nastavitvah ali s [[Ctrl]]+[[L]]. Zaklenjene oblike ni mogoče premikati, spreminjati velikosti, vrteti, barvati ali izbrisati: njene ročice posivijo, ob puščici zgoraj se pokaže ključavnica, orodja, ki bi jo spremenila, pa so zatemnjena. Ko miško pelješ čez ročico, se mere še vedno pokažejo, tipka, ki bi jo spremenila, pa pove »Objekt zaklenjen«. Dokler je v izboru ena zaklenjena oblika, se tudi pri drugih nič ne spremeni. Skrivanje, preimenovanje, kopiranje in podvajanje še delujejo. Če želiš del pustiti, kakršen je, in z njim še naprej graditi, zakleni samo njegovo obliko: s ščitom poleg ključavnice, z {{ui:contextMenu.lockShape}} v meniju desnega klika ali z [[Ctrl]]+[[Shift]]+[[L]]. Še vedno ga lahko premikaš, vrtiš, dvigaš, poravnavaš, kopiraš in združuješ z drugimi, velikost, nastavitve in ime pa ostanejo, kot so: ročaji za velikost izginejo, njihova polja posivijo, spreminjanje velikosti, zrcaljenje, razdruževanje, orodja za robove in brisanje pa so zavrnjeni. Kopija obdrži zaklep, prav tako del v skupini: skupino lahko premikaš in spet razdružiš, ne moreš pa ji spremeniti velikosti. Ščit obliko spet odklene.
 
 Število na gumbu skupine {{ui:editor.group.visibility}} pove, koliko oblik je skritih, klik nanj pa jih spet prikaže vse. Projekt, odprt s skritimi oblikami, to enkrat sporoči z obvestilom z gumbom za prikaz.
 
@@ -39,7 +39,7 @@ Obliko lahko povlečeš čez rob plošče in jo pustiš tam, približno za širi
 
 ## Zaskakovanje med premikanjem
 
-Če oblika vlečeš čez delovno ravnino, se zaskoči na druge oblike: njen levi, desni, sprednji ali zadnji rob ali njena sredina se položi natanko na rob ali sredino druge oblike. Roza pomožna črta kaže, na kaj je ravno pripeta. Tako postaviš dva dela poravnana drug ob drugega ali sredinsko drug za drugim, ne da bi vpisoval številke. To velja tudi, če je mreža izklopljena.
+Če oblika vlečeš čez delovno ravnino, se zaskoči na druge oblike: njen levi, desni, sprednji ali zadnji rob ali njena sredina se položi natanko na rob ali sredino druge oblike. Roza pomožna črta kaže, na kaj je ravno pripeta. Tako postaviš dva dela poravnana drug ob drugega ali sredinsko drug za drugim, ne da bi vpisoval številke. To velja tudi, če je mreža izklopljena. Šteje tudi sredina delovne ravnine: rožnate črte pokažejo, kdaj oblika stoji na sredini plošče vzdolž X, Y ali obeh.
 
 Če pri vlečenju držiš [[Shift]], ostane gibanje na eni osi: oblika sledi smeri, X ali Y, v katero si vlekel dalje, drugo pa pusti nedotaknjeno. Najbolje je, da [[Shift]] pritisneš šele, ko že vlečeš; na obliki, ki še ni izbrana, klik s [[Shift]] samo doda k izboru.
 
@@ -47,13 +47,23 @@ Obliko lahko povlečeš čez rob plošče in jo pustiš tam, približno za širi
 
 ## Poravnava
 
-Dve ali več izbranih oblik poravnaš med seboj z {{ui:editor.tool.align}}: na robu izbora se pokažejo točke za levo, sredino in desno, spredaj, sredino in zadaj ter zgoraj, sredino in spodaj. Klik na točko premakne vse oblike tja. Če najprej klikneš eno od izbranih oblik, ta ostane na mestu in se druge ravnajo po njej. Zaklenjena oblika v izboru je sama ta nepremična oblika. Levo, desno, spredaj, zadaj, zgoraj in spodaj gredo po okvirju okoli oblike; sredina trikotnika, petkotnika ali zvezde je njena lastna sredina, zato luknja, centrirana na tako obliko, leži na sredini oblike in ne njenega okvirja.
+Dve ali več izbranih oblik poravnaš med seboj z {{ui:editor.tool.align}} ([[L]] ali desni klik na izbor in izbira ukaza): na robu izbora se pokažejo točke za levo, sredino in desno, spredaj, sredino in zadaj ter zgoraj, sredino in spodaj. Klik na točko premakne vse oblike tja. Če najprej klikneš eno od izbranih oblik, ta ostane na mestu in se druge ravnajo po njej. Zaklenjena oblika v izboru je sama ta nepremična oblika. Levo, desno, spredaj, zadaj, zgoraj in spodaj gredo po okvirju okoli oblike; sredina trikotnika, petkotnika ali zvezde je njena lastna sredina, zato luknja, centrirana na tako obliko, leži na sredini oblike in ne njenega okvirja.
 
 Poševno zavrtena oblika, na primer za 45°, ima za izhodišče okvir okoli sebe, ne svojih lastnih robov. Za poravnavo po robovih najprej postaviš delovno ravnino na ploskev te oblike ({{ui:camera.placeWorkplane}}, nato klik na ploskev): točke potem stojijo na oseh te ravnine, oblike pa se merijo in premikajo vzdolž njih, kot v Tinkercadu. Če delovno ravnino ponastaviš, spet poravnavaš po plošči.
 
 ![Poravnava na robovih izbora kaže možne cilje kot točke.](shot:align)
 
 Tipka za to je [[L]]. [[Esc]] prekine.
+
+### Enaki razmiki
+
+Ob srednji točki vsake črte stoji širša točka s črtico na vsaki strani. Razporedi tri ali več oblik v tej smeri tako, da je prostor med sosednjimi robovi povsod enak, ne glede na velikost oblik. Prva in zadnja oblika ostaneta na mestu, tiste vmes se premaknejo. Vrsta lukenj različnih velikosti tako dobi povsod enako steno vmes. Pojdi z miško čez točko in vnaprej vidiš, kam gredo oblike; vrstica stanja nato pove razmik.
+
+Če je med izbranimi oblikami plošča, ki je v tej smeri daljša od vseh drugih, se oblike razporedijo po njej: razmik do njenih robov je enak razmiku med oblikami, ena sama oblika pa pride na sredino. Oblike v več vrstah, kot živali sestavljanke z gumbki, se razporedijo vrsto za vrsto; oblike, katerih škatle se prekrivajo prečno na smer, tvorijo eno vrsto. Kjer oblike ne stojijo v čistih stolpcih, kot živali od spredaj nazaj, se oblike, ki stojijo druga ob drugi, premaknejo kot cela vrsta.
+
+Brez plošče najprej klikni prazno mesto podlage: podlaga je nato fiksna oblika, enaki razmiki razporedijo oblike po vsej podlagi z enakim razmikom do robov, druge točke pa jih poravnajo na njene robove ali sredino. Ponoven klik na prazno podlago jo izpusti.
+
+Drži [[Alt]] in klikni točko, da sam vpišeš razmik, na primer 5 mm: oblike se postavijo tako daleč narazen, od prve oblike ali od tiste, ki si jo kliknil najprej; na plošči pride vrsta na sredino. Zaklenjena oblika ostane na mestu, zato ena med zunanjima oblikama prepreči enake razmike.
 
 ## Zrcaljenje
 

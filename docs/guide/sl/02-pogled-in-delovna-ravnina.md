@@ -39,6 +39,7 @@ Ob levem robu je ozka vrstica. Od zgoraj navzdol:
 - {{ui:camera.zoomIn}} in {{ui:camera.zoomOut}} zumirata po korakih, prav tako tipki [[+]] in [[−]].
 - {{ui:camera.orthographic}} preklopi na ploski pogled, v katerem vzporedni robovi ostanejo vzporedni. To je za merjenje in za poravnavanje robov pogosto prijetnejše kot perspektivni pogled. S [[O]] preklapljaš sem in tja, drugi klik gre nazaj.
 - {{ui:camera.secondView}} odpre drugi pogled na načrt v lastnem oknu, opisanem spodaj. Drugi klik ga zapre.
+- {{ui:camera.showScrollbars}} pokaže drsnik ob spodnjem robu pogleda in drugega ob desnem robu. Povleci drsnik, da pogled gladko premakneš, klikni puščico na njegovem koncu za majhen premik (če jo držiš, se premika naprej) ali klikni ob drsnik za skoraj cel pogled. Nič se ne zavrti, in za razliko od smernih tipk drsnika delujeta tudi, ko je izbran del - priročno od blizu pri drobnih podrobnostih. Drugi klik ju skrije; ta brskalnik si izbiro zapomni.
 - {{ui:camera.hideWorkplane}} (oko nad mrežo) skrije ploščo z mrežo, da lahko spodnjo stran načrta pogledaš od spodaj. Spremeni se samo pogled: nove oblike še naprej pristanejo na delovni ravnini. Drugi klik jo spet prikaže.
 - {{ui:camera.placeWorkplane}}, merilni trak in kotomer so lastna orodja, ki so opisana spodaj in v poglavju [Merjenje in opombe](chapter:merjenje-in-opombe).
 

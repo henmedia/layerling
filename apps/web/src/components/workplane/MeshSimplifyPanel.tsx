@@ -28,6 +28,16 @@ type CompareState = {
 
 const MIN_KEEP_PERCENT = 1;
 const MAX_KEEP_PERCENT = 99;
+const KEEP_EDGES_KEY = "layerling.editor.simplifyKeepEdges";
+
+/** "Keep edges and holes" is on until it is switched off once; then it stays off for the next mesh too. */
+function storedKeepEdges() {
+  try {
+    return window.localStorage.getItem(KEEP_EDGES_KEY) !== "false";
+  } catch {
+    return true;
+  }
+}
 
 // Docked, the panel stretches between the toolbar, the inspector and the
 // bottom bar; moved, it floats at the size it had and lets the window's lower
@@ -68,8 +78,8 @@ export function MeshSimplifyPanel({
   onCancel,
 }: {
   shape: WorkplaneShape;
-  /** Takes the simplified triangle soup, in the frame of the shape's mesh. */
-  onApply: (positions: number[]) => void;
+  /** Takes the simplified triangle soup, in the frame of the shape's mesh, and whether its edges were kept. */
+  onApply: (positions: number[], keepEdges: boolean) => void;
   onCancel: () => void;
 }) {
   useLanguage();
@@ -91,6 +101,7 @@ export function MeshSimplifyPanel({
   const [result, setResult] = useState<SimplifiedMesh | null>(null);
   const [busy, setBusy] = useState(true);
   const [showTriangles, setShowTriangles] = useState(true);
+  const [keepEdges, setKeepEdges] = useState(storedKeepEdges);
   // The panel leaves the settings panel free, so the body's name and size stay in view.
   const [rightInset, setRightInset] = useState(16);
   const percent = sourceTriangles > 0 ? target / sourceTriangles * 100 : 0;
@@ -110,7 +121,7 @@ export function MeshSimplifyPanel({
     setBusy(true);
     // The slider reports every step of a drag; only where it rests is worked out.
     const timer = window.setTimeout(() => {
-      simplifyTrianglePositionsOffThread(positions, target, controller.signal)
+      simplifyTrianglePositionsOffThread(positions, target, controller.signal, { keepEdges })
         .then((next) => {
           if (stale) return;
           setResult(next);
@@ -127,7 +138,7 @@ export function MeshSimplifyPanel({
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [positions, target]);
+  }, [keepEdges, positions, target]);
 
   useEffect(() => {
     const measure = () => {
@@ -357,6 +368,22 @@ export function MeshSimplifyPanel({
             <span>{t("simplify.groupNote")}</span>
           </p>
         ) : null}
+        <label className="mesh-compare-check keep-edges" title={t("simplify.keepEdgesHint")}>
+          <input
+            type="checkbox"
+            checked={keepEdges}
+            onChange={(event) => {
+              const next = event.currentTarget.checked;
+              setKeepEdges(next);
+              try {
+                window.localStorage.setItem(KEEP_EDGES_KEY, String(next));
+              } catch {
+                // A browser that keeps nothing still simplifies; the box starts ticked next time.
+              }
+            }}
+          />
+          <span>{t("simplify.keepEdges")}</span>
+        </label>
         <label className="mesh-compare-slider">
           <span>{t("simplify.keep")}</span>
           <input
@@ -395,7 +422,7 @@ export function MeshSimplifyPanel({
         </label>
         <div className="mesh-compare-actions">
           <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>
-          <button type="button" className="primary" disabled={busy || !result || !reduces || Boolean(shape.locked)} onClick={() => result && onApply(result.positions)}>
+          <button type="button" className="primary" disabled={busy || !result || !reduces || Boolean(shape.locked)} onClick={() => result && onApply(result.positions, keepEdges)}>
             {busy ? <LoaderCircle className="edge-modifier-spinner" size={17} /> : <Check size={17} />}
             {t("simplify.apply")}
           </button>

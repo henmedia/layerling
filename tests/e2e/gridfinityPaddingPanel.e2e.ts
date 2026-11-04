@@ -14,7 +14,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * none on a bin, and a change of padding writes the plate's size with it, keeping the units. The
  * drawer rows show the drawer a baseplate fills and fit it to one typed in. The corner radius
  * row (#856) rounds the plate's outer corners less, down to square. The large plate switch
- * (#1061) lets a baseplate take up to 12 units.
+ * (#1061) lets a baseplate take up to 12 units, and the Swallowtail switch (#1061) puts it on a floor
+ * with pockets for keys, which Add keys lays out beside it.
  * A plate fitted into an outline (#1061) has its size in mm and a switch to take the outline away; a
  * baseplate and another shape selected together offer the fit.
  */
@@ -33,15 +34,15 @@ afterEach(() => {
   root = null;
 });
 
-/** The settings panel for a Gridfinity part with these fields. */
-function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}, workspace = DEFAULT_WORKPLANE_WORKSPACE) {
+/** The settings panel for a Gridfinity part with these fields, and any of the editor's actions handed in. */
+function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}, workspace = DEFAULT_WORKPLANE_WORKSPACE, actions: Partial<Parameters<typeof ShapeInspector>[0]> = {}) {
   const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
   const shape = { ...makeShapeFromAsset(asset, { x: 0, z: 0 }), ...fields } as WorkplaneShape;
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
   act(() => {
-    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {} }));
+    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {}, ...actions }));
   });
   return container;
 }
@@ -160,6 +161,47 @@ describe("a Gridfinity baseplate's large plate switch", () => {
     act(() => toggleNamed(panel, largePlate)!.querySelector("input")!.click());
     expect(updates).toHaveLength(1);
     expect(updates[0]).toMatchObject({ gridfinityLargePlate: false, width: 262, depth: 258 });
+  });
+});
+
+describe("a Gridfinity baseplate's Swallowtail switch (#1061)", () => {
+  const swallowtail = "Swallowtail";
+  const addKeys = (panel: HTMLElement) => [...panel.querySelectorAll<HTMLButtonElement>("button.inspector-action-button")].find((button) => button.textContent === "Add keys");
+
+  it("shows the switch on a baseplate, off, and none on a bin or a plate fitted to an outline", () => {
+    expect(toggleNamed(mount(plate), swallowtail)!.querySelector("input")!.checked).toBe(false);
+    expect(toggleNamed(mount({ gridfinityType: "bin" }), swallowtail)).toBeUndefined();
+    const l = [{ x: -84, z: -84 }, { x: 84, z: -84 }, { x: 84, z: 0 }, { x: 0, z: 0 }, { x: 0, z: 84 }, { x: -84, z: 84 }];
+    expect(toggleNamed(mount({ ...plate, width: 168, depth: 168, gridfinityOutline: l }), swallowtail)).toBeUndefined();
+  });
+
+  it("switching it on or off is one change with the plate's height, 7.4 or 5 mm", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const off = mount(plate, (patch) => updates.push(patch));
+    act(() => toggleNamed(off, swallowtail)!.querySelector("input")!.click());
+    act(() => root?.unmount());
+    const on = mount({ ...plate, height: 7.4, gridfinitySwallowtail: true }, (patch) => updates.push(patch));
+    act(() => toggleNamed(on, swallowtail)!.querySelector("input")!.click());
+    expect(updates).toHaveLength(2);
+    expect(updates[0]).toMatchObject({ gridfinitySwallowtail: true, width: 252, depth: 42, height: 7.4 });
+    expect(updates[1]).toMatchObject({ gridfinitySwallowtail: false, width: 252, depth: 42, height: 5 });
+  });
+
+  it("says what the plate becomes, and offers Add keys when the editor hands it in and hands the click on", () => {
+    let made = 0;
+    const on = { ...plate, height: 7.4, gridfinitySwallowtail: true };
+    const panel = mount(on, undefined, undefined, { onGridfinityKeys: () => { made += 1; } });
+    expect(panel.textContent).toContain("7.4 mm tall");
+    act(() => addKeys(panel)!.click());
+    expect(made).toBe(1);
+    act(() => root?.unmount());
+    expect(addKeys(mount({ ...on, locked: true }, undefined, undefined, { onGridfinityKeys: () => {} }))!.disabled).toBe(true);
+    act(() => root?.unmount());
+    const bare = mount(on);
+    expect(bare.textContent).toContain("7.4 mm tall");
+    expect(addKeys(bare)).toBeUndefined();
+    act(() => root?.unmount());
+    expect(mount(plate).textContent).not.toContain("7.4 mm tall");
   });
 });
 

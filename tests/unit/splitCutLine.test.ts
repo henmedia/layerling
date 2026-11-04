@@ -14,6 +14,26 @@ describe("the cut line of the split tool (#615)", () => {
     }
   });
 
+  it("draws the edges of a step when the plane lies on its face (#1263)", () => {
+    // A plate 2 high with a narrower block on it, cut exactly at the plate's top.
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(20, 2, 20));
+    plate.position.set(0, 1, 0);
+    const block = new THREE.Mesh(new THREE.BoxGeometry(10, 4, 10));
+    block.position.set(0, 4, 0);
+    const points = planeCrossingSegments([plate, block], [0, 2, 0], [0, 1, 0]);
+    const reach = (size: number) => {
+      let found = false;
+      for (let i = 0; i < points.length; i += 3) {
+        expect(points[i + 1]).toBeCloseTo(2);
+        if (Math.abs(Math.max(Math.abs(points[i]), Math.abs(points[i + 2])) - size) < 1e-6) found = true;
+      }
+      return found;
+    };
+    // The plate's outline and the block's foot both show.
+    expect(reach(10)).toBe(true);
+    expect(reach(5)).toBe(true);
+  });
+
   it("draws nothing for a plane that misses the body", () => {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(20, 10, 20));
     expect(planeCrossingSegments([mesh], [0, 50, 0], [0, 1, 0])).toEqual([]);

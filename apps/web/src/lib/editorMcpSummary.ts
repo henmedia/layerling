@@ -127,6 +127,7 @@ export function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary
     color: shape.color,
     hole: Boolean(shape.hole),
     locked: Boolean(shape.locked),
+    ...(shape.shapeLocked ? { shapeLocked: true } : {}),
     hidden: Boolean(shape.hidden),
     position: {
       x: shape.x,

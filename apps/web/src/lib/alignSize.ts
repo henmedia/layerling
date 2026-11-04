@@ -45,8 +45,35 @@ export function frameAabb(shape: WorkplaneShape, axes: AlignAxes): Cuboid {
   return cuboidAlongAxes(corners, axes) ?? box;
 }
 
+/**
+ * The boxes already measured, per part and per set of axes. A twisted part is cut into thousands of
+ * bands each time its mesh is built, and the align tool asks for every part's box once for each of its
+ * nine dots: with two twisted boxes that took seconds before the tool came up (Discussion #1266). A part
+ * in the editor's state is replaced, never changed, when it moves or changes, so its object is the key.
+ */
+const measuredBounds = new WeakMap<WorkplaneShape, Map<string, Cuboid>>();
+
+function axesKey(axes: AlignAxes | null) {
+  return axes ? [axes.x, axes.y, axes.z].map((axis) => `${axis.x},${axis.y},${axis.z}`).join(";") : "world";
+}
+
+/** The box of a part as the alignment measures it, along a workplane's axes or the world's, measured once per part. */
+export function alignBounds(shape: WorkplaneShape, axes: AlignAxes | null = null): Cuboid {
+  let byAxes = measuredBounds.get(shape);
+  if (!byAxes) {
+    byAxes = new Map();
+    measuredBounds.set(shape, byAxes);
+  }
+  const key = axesKey(axes);
+  const known = byAxes.get(key);
+  if (known) return { ...known };
+  const bounds = axes ? frameAabb(shape, axes) : meshAabb(shape);
+  byAxes.set(key, { ...bounds });
+  return bounds;
+}
+
 function boundsOf(shape: WorkplaneShape, axes: AlignAxes | null) {
-  return axes ? frameAabb(shape, axes) : meshAabb(shape);
+  return alignBounds(shape, axes);
 }
 
 function range(bounds: Cuboid, axis: AlignAxis) {

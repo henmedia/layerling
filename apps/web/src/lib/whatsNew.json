@@ -1,5 +1,125 @@
 [
   {
+    "version": "1.138.0",
+    "items": [
+      {
+        "title": {
+          "de": "3MF/OBJ-Export: keine Teile mehr verloren",
+          "en": "3MF/OBJ export: no more parts lost"
+        },
+        "body": {
+          "de": "Bei Entwürfen mit mehreren Farben fehlten im 3MF- oder OBJ-Export manchmal kleine Teile, etwa Punkte oder Bretter eines Logos, die für winzige Reste gehalten wurden. Jetzt bleiben alle Teile mit etwas Volumen erhalten, und nur echte Splitter werden weggelassen.",
+          "en": "In designs with several colours, the 3MF or OBJ export sometimes left out small parts, such as the dots or planks of a logo, taking them for tiny leftovers. Now every part with some volume is kept and only real slivers are left out."
+        }
+      },
+      {
+        "title": {
+          "de": "Haarfeine Flächen bei „Fläche löschen“",
+          "en": "Hair-thin faces in Delete face"
+        },
+        "body": {
+          "de": "Bleiben nach „Exakt machen“ haarfeine Flächen zwischen Flächen in einer Ebene, nimmt „Fläche löschen“ sie mit den gewählten Flächen mit, sodass eine in Streifen zerfallene Seite wieder eine Fläche werden kann.",
+          "en": "When Make exact leaves hair-thin faces between faces in one plane, Delete face takes them along with the picked faces, so a side that came out as strips can become one face again."
+        }
+      },
+      {
+        "title": {
+          "de": "Punkte und Kurvengriffe eintippen",
+          "en": "Type points and curve handles"
+        },
+        "body": {
+          "de": "In der Skizze zeigt ein gewählter Punkt seine Lage als X und Y, ein angeklickter Kurvengriff seine Lage zu seinem Punkt. Beides lässt sich eintippen, so wird eine Kurve genau und auf beiden Seiten gleich.",
+          "en": "In a sketch, a selected point shows where it lies as X and Y, and a clicked curve handle where it lies from its point. Both can be typed, so a curve comes out exact and the same on both sides."
+        }
+      },
+      {
+        "title": {
+          "de": "Kegelige Gewinde und NPT",
+          "en": "Tapered threads and NPT"
+        },
+        "body": {
+          "de": "Ein Gewinde kann jetzt kegelig sein, 1:16 wie ein Rohrgewinde, und das Größenmenü hat die amerikanischen NPT-Rohrgewinde von 1/16\" bis 4\". Stange und Schraube werden zur Spitze schmaler, Mutter und Gewindeloch zur Öffnung weiter.",
+          "en": "A thread can now be tapered, 1 in 16 as a pipe thread is, and the size menu has the American NPT pipe threads from 1/16\" to 4\". Rod and screw narrow towards the tip, nut and tapped hole widen towards the mouth."
+        }
+      },
+      {
+        "title": {
+          "de": "Ausrichten mit verdrehten Teilen sofort da",
+          "en": "Align comes up at once with twisted parts"
+        },
+        "body": {
+          "de": "Mit verdrehten Teilen in der Auswahl brauchte das Ausrichten-Werkzeug einige Sekunden, bis seine Punkte erschienen, und ebenso lange für jeden Klick. Jetzt misst es jedes Teil nur noch einmal und ist sofort da.",
+          "en": "With twisted parts in the selection, the align tool took a few seconds before its dots appeared, and as long again for each click. It now measures each part only once and comes up at once."
+        }
+      },
+      {
+        "title": {
+          "de": "Einrasten in der Mitte der Arbeitsebene",
+          "en": "Snap to the centre of the workplane"
+        },
+        "body": {
+          "de": "Beim Ziehen rastet eine Form jetzt auch an der Mitte der Arbeitsebene ein, auf X, auf Y oder auf beiden; die rosa Hilfslinien zeigen es. Alt zieht ohne Einrasten.",
+          "en": "When you drag a shape it now also snaps to the centre of the workplane, along X, along Y or both, and the pink guide lines show it. Alt drags without snapping."
+        }
+      },
+      {
+        "title": {
+          "de": "Deckelscharnier: Seite wählen, Tropfenlöcher, runde Dosen",
+          "en": "Lid hinge: pick the side, teardrop holes, round pots"
+        },
+        "body": {
+          "de": "Das Scharnier eines Deckels lässt sich jetzt hinten, rechts, vorn oder links setzen, etwa an die lange Seite einer Schachtel. Die Löcher für den Stift bekommen oben eine Spitze, damit sie beim Drucken nicht durchhängen, und auch runde Dosen bekommen ein Scharnier.",
+          "en": "A lid's hinge can now go at the back, right, front or left, along the long side of a box, say. The pin holes get a point on top so they do not droop when printed, and round pots take a hinge too."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.137.0",
+    "items": [
+      {
+        "title": {
+          "de": "Gridfinity-Bodenplatten, die zusammenrasten",
+          "en": "Gridfinity baseplates that click together"
+        },
+        "body": {
+          "de": "Schalte im Eigenschaften-Fenster einer Bodenplatte „Swallowtail“ ein, und die Platte bekommt unter jeder Seite ohne Ausgleich halbe Taschen. „Verbinder anlegen“ legt kleine Verbinder zum Drucken an; von unten über der Fuge eingedrückt, rastet jeder ein und hält zwei Platten zusammen. Die Platte steht dann auf einem Boden und ist 7,4 mm hoch.",
+          "en": "Switch on \"Swallowtail\" in a baseplate's Properties panel and the plate gets half pockets under each side without padding. \"Add keys\" lays out small keys to print; pressed in from below across the seam, each clicks in and holds two plates together. The plate then stands on a floor, 7.4 mm tall."
+        }
+      },
+      {
+        "title": {
+          "de": "Importierte Netze als exakte Körper",
+          "en": "Imported meshes as exact bodies"
+        },
+        "body": {
+          "de": "Eine STL-, OBJ- oder 3MF-Datei besteht nur aus Dreiecken. „Make exact“ (Ändern, Fläche) erkennt Ebenen, Zylinder, Kegel, Kugeln und Ringe darin und baut einen exakten Körper daraus. Danach folgen Verrunden und Fasen einer sauberen Kante, „Fläche löschen“ nimmt eine ganze Bohrung weg, und STEP enthält die echten Flächen. Beim Vereinfachen bleiben Kanten und Löcher auf Wunsch erhalten.",
+          "en": "An STL, OBJ or 3MF file is only triangles. \"Make exact\" (Modify, Surface) finds the planes, cylinders, cones, spheres and tori in it and rebuilds an exact body. Fillet and Chamfer then follow one clean edge, Delete face takes away a whole bore, and STEP carries the real faces. Simplify can keep edges and holes."
+        }
+      },
+      {
+        "title": {
+          "de": "Verrunden trotz scharfer Innenecken",
+          "en": "Rounding past sharp inner corners"
+        },
+        "body": {
+          "de": "Verrunden und Fasen scheiterten an Einkerbungen, etwa bei mehreren zusammengesetzten Scheiben. Jetzt werden diese Innenecken zuerst etwas gerundet und die gewählten Kanten danach wie verlangt bearbeitet. Die Statuszeile sagt, wie groß die Innenrundung wurde.",
+          "en": "Fillet and Chamfer failed at notches, for example on several joined discs. Now these inner corners are rounded a little first and the picked edges are then treated as asked. The status line says how large the inner rounding became."
+        }
+      },
+      {
+        "title": {
+          "de": "Pfeiltasten: ruhiger und mit Weite",
+          "en": "Arrow keys: smoother, and with the distance"
+        },
+        "body": {
+          "de": "Eine gehaltene Pfeiltaste bewegt den Körper jetzt flüssig und hält an, sobald man sie loslässt, auch auf einem langsamen Rechner. Die Statuszeile nennt außerdem, wie weit er sich bewegt hat, zum Beispiel „um 5 mm“.",
+          "en": "A held arrow key now moves the body smoothly and stops as soon as it is let go, even on a slow computer. The status line also says how far it moved, for example \"by 5 mm\"."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.136.0",
     "items": [
       {

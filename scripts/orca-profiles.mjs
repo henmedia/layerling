@@ -252,6 +252,7 @@ export const PRINTERS = [
   ["SeeMeCNC", "SeeMeCNC BOSSdelta 500 0521"],
   ["Anycubic", "Anycubic Predator"],
   ["RolohaunDesign", "Rolohaun Delta Flyer Refit"],
+  ["BenFab", "BenFab 450"],
 ];
 
 /** How the vendor is written in the menu. */

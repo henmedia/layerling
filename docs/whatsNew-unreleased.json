@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "title": {
+      "de": "Gleiche Abstände",
+      "en": "Equal gaps"
+    },
+    "body": {
+      "de": "Beim Ausrichten steht neben jeder Linie ein neuer Punkt: Er verteilt verschieden große Teile so, dass zwischen ihnen überall derselbe Abstand ist. Auf einem Brett bleibt derselbe Abstand zum Rand, mehrere Reihen werden Reihe für Reihe verteilt, ein Klick auf die freie Platte verteilt über die ganze Platte, und mit Alt tippst du den Abstand selbst ein.",
+      "en": "Align has a new dot beside each line: it spreads parts of different sizes so the space between them is the same everywhere. On a board the same gap stays at its edges, several rows are spread row by row, a click on the empty plate spreads them over the whole plate, and with Alt you type the gap yourself."
+    }
+  },
+  {
+    "title": {
+      "de": "Gruppieren lässt Kanten, wie sie sind",
+      "en": "Grouping leaves edges as they are"
+    },
+    "body": {
+      "de": "Beim Gruppieren mit Löchern konnte eine Ecke neben einer Rundung schräg abgeschnitten werden, weil das Aufräumen hauchdünner Stufen zu weit ging. Jetzt prüft layerling, dass die Form dabei gleich bleibt.",
+      "en": "When grouping with holes, a corner beside a rounding could come out cut off at a slant, because tidying away hair-thin steps went too far. layerling now checks that the shape stays the same."
+    }
+  },
+  {
+    "title": {
+      "de": "Ausrichten per Rechtsklick",
+      "en": "Align from the right-click menu"
+    },
+    "body": {
+      "de": "Mit zwei oder mehr ausgewählten Teilen steht Ausrichten jetzt auch im Menü, das ein Rechtsklick an der Maus öffnet, gleich über Spiegeln. So musst du nicht erst zur Leiste fahren oder dir die Taste L merken.",
+      "en": "With two or more parts selected, Align is now also in the menu a right-click opens at the pointer, just above Mirror. No trip to the toolbar, and no need to remember the L key."
+    }
+  },
+  {
+    "title": {
+      "de": "Formenbibliothek: gleich lostippen",
+      "en": "Shape library: type right away"
+    },
+    "body": {
+      "de": "Wenn du die Formenbibliothek öffnest, steht der Cursor jetzt gleich im Suchfeld, wie bei der Befehlssuche. Auf einem Touchgerät nicht, damit keine Tastatur aufspringt.",
+      "en": "When you open the shape library, the cursor is now in its search field right away, as in the command search. Not on a touch screen, so no keyboard pops up."
+    }
+  },
+  {
+    "title": {
+      "de": "Bildlaufleisten für die Ansicht",
+      "en": "Scrollbars for the view"
+    },
+    "body": {
+      "de": "Ein neuer Schalter in der Ansichtenleiste blendet unten und rechts Bildlaufleisten ein. Damit schiebst du die Ansicht ruhig und in kleinen Schritten, ohne dass sie sich dreht, auch während ein Teil ausgewählt ist. Praktisch, wenn du nah an kleinen Details arbeitest.",
+      "en": "A new switch in the view bar shows scrollbars along the bottom and the right of the view. They slide the view calmly and in small steps without turning it, also while a part is selected. Handy when you work close up on small details."
+    }
+  },
+  {
+    "title": {
+      "de": "Form sperren",
+      "en": "Lock shape"
+    },
+    "body": {
+      "de": "Neben dem Schloss gibt es jetzt ein Schild (Strg+Umschalt+L): Ein Teil mit gesperrter Form lässt sich weiter verschieben, drehen, kopieren und mit anderen gruppieren, behält aber Größe, Einstellungen und Namen. Auch Kopien und Gruppen behalten die Sperre.",
+      "en": "Beside the padlock there is now a shield (Ctrl+Shift+L): a part with its shape locked still moves, turns, copies and groups with others, but keeps its size, settings and name. Copies and groups keep the lock too."
+    }
+  }
+]

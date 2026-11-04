@@ -69,6 +69,7 @@ export function TransformOverlay({
   rotationReadout,
   angleBadge = null,
   locked = false,
+  sizeLocked = false,
   showRotationWheel,
   hideSelectionChrome,
   hideDimensionMarks,
@@ -224,7 +225,7 @@ export function TransformOverlay({
           className={armed === mark.key ? "dimension-label armed" : "dimension-label"}
           type="button"
           style={overlayPoint(keepVisible, mark.labelX, mark.labelY)}
-          disabled={locked}
+          disabled={locked || sizeLocked}
           onPointerDown={(event) => event.stopPropagation()}
           onClick={() => { if (accept(mark.key)) onBeginDimensionEdit(mark); }}
         >
@@ -302,7 +303,8 @@ export function TransformOverlay({
           <span>&deg;</span>
         </label>
       ) : null}
-      {box.handles.map((handle) => (
+      {/* Lock shape (#1277): no handle that changes the size; the lift arrow and the turns stay. */}
+      {box.handles.filter((handle) => !sizeLocked || (handle.kind !== "scale" && handle.kind !== "height")).map((handle) => (
         <button
           key={handle.key}
           className={`transform-handle ${handle.className}`}

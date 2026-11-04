@@ -16,6 +16,8 @@ export type LayerlingMcpShapeSummary = {
   color: string;
   hole: boolean;
   locked: boolean;
+  /** Lock shape (#1277): moves, turns and groups, but keeps its size, settings, name and body. */
+  shapeLocked?: boolean;
   hidden: boolean;
   position: {
     x: number;
@@ -121,6 +123,7 @@ export type LayerlingMcpCommandName =
   | "wrap_around_cylinder"
   | "texture_surface"
   | "simplify_mesh"
+  | "make_exact"
   | "save_custom_shape"
   | "list_custom_shapes"
   | "insert_custom_shape"

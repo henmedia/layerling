@@ -5,7 +5,7 @@ summary: Wybór własnej drukarki, ostrzeżenie, gdy coś się nie mieści, i w�
 
 ## Wybór drukarki
 
-Otwórz ustawienia (koło zębate na wstążce, {{ui:editor.workspaceSettings}}) i przejdź do sekcji {{ui:workspace.workplane}}. W {{ui:workspace.printer}} wybierasz swoją drukarkę z listy ponad 230 popularnych modeli, między innymi Bambu Lab, Prusa, Creality, Anycubic, Elegoo i wielu innych.
+Otwórz ustawienia (koło zębate w wierszu tytułu, {{ui:editor.workspaceSettings}}) i przejdź do sekcji {{ui:workspace.workplane}}. W {{ui:workspace.printer}} wybierasz swoją drukarkę z listy ponad 230 popularnych modeli, między innymi Bambu Lab, Prusa, Creality, Anycubic, Elegoo i wielu innych.
 
 ![Ustawienia płaszczyzny roboczej z wybraną drukarką. Stół i maksymalna wysokość wydruku pochodzą z profilu slicera.](shot:settings-workplane)
 

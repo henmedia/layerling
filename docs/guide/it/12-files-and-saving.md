@@ -68,7 +68,7 @@ In alto trovi il nome del file; sotto puoi scegliere il formato. Se hai selezion
 
 Un foro non raggruppato viene sottratto da tutti i corpi che interseca quando esporti, proprio come nella vista: non serve quindi raggrupparlo prima di ogni esportazione. Se c’è una selezione, vengono considerati solo i fori selezionati. Non puoi esportare un foro da solo; layerling te lo segnala.
 
-STEP include solo i corpi CAD esatti. Gli elementi che non possono essere rappresentati con precisione, come una mesh importata da STL, vengono esclusi. Il messaggio al termine dell’esportazione indica quali corpi sono stati esclusi e il motivo. Per la stampante usa STL o 3MF, che includono tutto.
+STEP include solo i corpi CAD esatti. Una mesh importata viene resa esatta per il file, come fa {{ui:editor.tool.makeExact}} (vedi «Rendere esatta una mesh importata» più sotto), quindi l'esportazione può durare fino a un minuto; una mesh per lo più a forma libera, come una figura, viene esclusa, come tutto ciò che non può essere rappresentato con precisione. Il messaggio al termine dell’esportazione indica quali corpi sono stati esclusi e il motivo. Per la stampante usa STL o 3MF, che includono tutto.
 
 ### Un disegno per l’officina
 
@@ -102,9 +102,17 @@ Le immagini modello si aggiungono in modalità schizzo; vedi [Schizzi](chapter:s
 
 ## Semplificare una mesh importata
 
-Una mesh acquisita con una scansione o creata scolpendo spesso ha molti più triangoli del necessario; tutti vengono elaborati quando sposti, tagli o salvi il modello. {{ui:simplify.title}}, nel gruppo Modifica o nel menu contestuale del corpo, mostra la mesh originale accanto al risultato che si otterrebbe mantenendo la percentuale scelta di triangoli. Puoi ruotare e ingrandire entrambe le viste insieme con i pulsanti del mouse usati sul piano di lavoro. Imposta la percentuale o il numero di triangoli da conservare e {{ui:simplify.apply}} crea la mesh alleggerita. Il risultato è una mesh semplice: se semplifichi il risultato di un taglio o di un’unione, {{ui:group.edit}} e le parti originali vengono eliminati.
+Una mesh acquisita con una scansione o creata scolpendo spesso ha molti più triangoli del necessario; tutti vengono elaborati quando sposti, tagli o salvi il modello. {{ui:simplify.title}}, nel gruppo Modifica o nel menu contestuale del corpo, mostra la mesh originale accanto al risultato che si otterrebbe mantenendo la percentuale scelta di triangoli. Puoi ruotare e ingrandire entrambe le viste insieme con i pulsanti del mouse usati sul piano di lavoro. Imposta la percentuale o il numero di triangoli da conservare e {{ui:simplify.apply}} crea la mesh alleggerita. Il risultato è una mesh semplice: se semplifichi il risultato di un taglio o di un’unione, {{ui:group.edit}} e le parti originali vengono eliminati. Con {{ui:simplify.keepEdges}} attivo, come è all'inizio, gli spigoli vivi e i bordi dei fori restano esattamente dove sono, mentre le facce piane perdono comunque la maggior parte dei triangoli; disattivato, la semplificazione può arrotondarli per scendere di più.
 
 Il taglio, l’unione e l’intersezione di una mesh importata vengono calcolati nel browser. Per questo, nelle impostazioni dello spazio di lavoro è previsto un limite al numero di triangoli di queste mesh ({{ui:workspace.booleanTriangleLimit}}). Le mesh che superano il limite non vengono elaborate e un messaggio ne indica il numero di triangoli. Semplifica prima la mesh oppure aumenta il limite, se il tuo computer è in grado di gestirlo.
+
+## Rendere esatta una mesh importata
+
+Un file STL, OBJ o 3MF contiene solo triangoli, anche quando il pezzo è stato disegnato in CAD con facce piane e fori rotondi. {{ui:editor.tool.makeExact}}, nel gruppo {{ui:editor.group.modify}} (o nel menu contestuale del corpo), cerca in quei triangoli i piani, cilindri, coni, sfere e tori da cui sono nati e ricostruisce il corpo come corpo CAD esatto: un foro diventa un vero cilindro con bordo rotondo invece di cento strisce sottili. Dopo, {{ui:editor.tool.fillet}} e {{ui:editor.tool.chamfer}} seguono uno spigolo pulito, {{ui:editor.tool.deleteFace}} toglie un intero raccordo o la parete di un foro e un'esportazione STEP porta le facce vere. La barra di stato dice cosa è stato trovato, ad esempio «piani: 9, cilindri: 4».
+
+Ciò che non corrisponde a nessuna di queste superfici resta in piccole faccette piane, e il messaggio dice quanta parte della superficie è. Un corpo per lo più a forma libera, come una figura o una forma scolpita, resta una mesh, così come una mesh con buchi o pareti che si incrociano, che non può chiudersi in un solido. Si accettano fino a 400.000 triangoli e una mesh grande può richiedere qualche minuto. Una mesh più grande scende sotto quel limite con {{ui:simplify.title}} e {{ui:simplify.keepEdges}} attivo; altrimenti usa la mesh così com'è arrivata, viene più pulita. Un passo di annullamento riporta la mesh.
+
+Per una mesh piccola con facce rotonde, fino a 4.000 triangoli, gli strumenti per gli spigoli lo fanno da soli: arrotondare uno spigolo di un tale STL lo ricostruisce prima allo stesso modo.
 
 ## Segnalare un problema
 

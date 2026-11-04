@@ -696,6 +696,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.threadHead === b.threadHead &&
     a.threadHand === b.threadHand &&
     a.threadProfile === b.threadProfile &&
+    a.threadTaper === b.threadTaper &&
     a.threadDiameter === b.threadDiameter &&
     a.threadPitch === b.threadPitch &&
     a.threadClearance === b.threadClearance &&
@@ -764,6 +765,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityMagnets === b.gridfinityMagnets &&
     a.gridfinityHalfGrid === b.gridfinityHalfGrid &&
     a.gridfinityLargePlate === b.gridfinityLargePlate &&
+    a.gridfinitySwallowtail === b.gridfinitySwallowtail &&
     a.gridfinityLabelBack === b.gridfinityLabelBack &&
     a.gridfinityLabelFront === b.gridfinityLabelFront &&
     a.gridfinityLabelLeft === b.gridfinityLabelLeft &&
@@ -864,6 +866,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.surfaceFillOf === b.surfaceFillOf &&
     vaseSettingsEqual(a.vase, b.vase) &&
     a.vasePartOf === b.vasePartOf &&
+    a.gridfinityKeyOf === b.gridfinityKeyOf &&
     a.textRadius === b.textRadius &&
     a.textSize === b.textSize &&
     a.textInward === b.textInward &&
@@ -907,6 +910,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.rotationPivot === b.rotationPivot &&
     fieldFormulasEqual(a.formulas, b.formulas) &&
     a.locked === b.locked &&
+    Boolean(a.shapeLocked) === Boolean(b.shapeLocked) &&
     a.hidden === b.hidden &&
     a.transparent === b.transparent
   );

@@ -7,7 +7,7 @@ summary: Výběr objektů, seznam objektů, zarovnání, zrcadlení, otáčení,
 
 Kliknutí vybere tvar, [[Shift]] přidává nebo odebírá další. Dokud držíte [[Shift]] a jsou vybrány dva nebo více tvarů, počítá je malé číslo pod ukazatelem myši. Kliknutí na prázdné místo a [[Esc]] výběr zruší. Tažením rámečku na prázdné pracovní ploše vyberete všechny dotčené tvary. Se [[Shift]] se dosud nevybrané přidají a vybrané odeberou. [[Ctrl]]+[[A]] vybere všechna viditelná tělesa. Když táhneš těleso nebo úchyt rámečku, [[Esc]] akci zruší, dokud je tlačítko myši ještě stisknuté: vše se vrátí do původního stavu a do historie se nic nepřidá.
 
-Překážející objekt skryjte pomocí {{ui:editor.tool.hideSelected}}, [[Ctrl]]+[[H]]. V projektu zůstane, ale nebude viditelný ani zahrnutý v exportu. Exportní okno předem uvede počet skrytých dílů. [[Ctrl]]+[[Shift]]+[[H]] všechny zobrazí. Proti nechtěným změnám chrání zámek nahoře v nastavení nebo [[Ctrl]]+[[L]]. Zamčený tvar nelze přesouvat, měnit jeho rozměry, otáčet, přebarvovat ani mazat. Úchyty zešednou, u horní šipky se objeví zámek a editační nástroje se vypnou. Rozměry lze stále zjistit najetím na úchyt. Klávesa pro změnu ohlásí zamčený objekt. Obsahuje-li výběr zamčený tvar, nemění se ani ostatní části. Skrytí, přejmenování, kopírování a duplikování zůstávají dostupné.
+Překážející objekt skryjte pomocí {{ui:editor.tool.hideSelected}}, [[Ctrl]]+[[H]]. V projektu zůstane, ale nebude viditelný ani zahrnutý v exportu. Exportní okno předem uvede počet skrytých dílů. [[Ctrl]]+[[Shift]]+[[H]] všechny zobrazí. Proti nechtěným změnám chrání zámek nahoře v nastavení nebo [[Ctrl]]+[[L]]. Zamčený tvar nelze přesouvat, měnit jeho rozměry, otáčet, přebarvovat ani mazat. Úchyty zešednou, u horní šipky se objeví zámek a editační nástroje se vypnou. Rozměry lze stále zjistit najetím na úchyt. Klávesa pro změnu ohlásí zamčený objekt. Obsahuje-li výběr zamčený tvar, nemění se ani ostatní části. Skrytí, přejmenování, kopírování a duplikování zůstávají dostupné. Chceš-li díl nechat, jak je, a přesto s ním stavět, zamkni jen jeho tvar: štítem vedle zámku, položkou {{ui:contextMenu.lockShape}} v nabídce pravého tlačítka nebo [[Ctrl]]+[[Shift]]+[[L]]. Dál se dá posouvat, otáčet, zvedat, zarovnávat, kopírovat a seskupovat s ostatními, ale velikost, nastavení a název zůstávají beze změny: úchyty velikosti zmizí, jejich pole zešednou a změna velikosti, zrcadlení, zrušení skupiny, nástroje hran a mazání se odmítnou. Kopie zámek zachová, stejně jako díl ve skupině: skupinu lze posouvat a znovu rozdělit, ale ne měnit její velikost. Štít tvar zase odemkne.
 
 Číslo na tlačítku skupiny {{ui:editor.group.visibility}} říká, kolik tvarů je skrytých, a kliknutím na něj se všechny znovu zobrazí. Projekt otevřený se skrytými tvary to jednou oznámí zprávou s tlačítkem pro jejich zobrazení.
 
@@ -39,7 +39,7 @@ Tvar lze odtáhnout za okraj, přibližně o jednu šířku podložky na každou
 
 ## Přichytávání při přesouvání
 
-Při tažení po pracovní rovině se levý, pravý, přední a zadní okraj i střed přichytávají na odpovídající okraje či středy jiných tvarů. Růžová vodicí čára ukazuje místo přichycení. Bez zadávání čísel tak díly položíte těsně vedle sebe nebo je vystředíte. Funguje to i při vypnuté mřížce.
+Při tažení po pracovní rovině se levý, pravý, přední a zadní okraj i střed přichytávají na odpovídající okraje či středy jiných tvarů. Růžová vodicí čára ukazuje místo přichycení. Bez zadávání čísel tak díly položíte těsně vedle sebe nebo je vystředíte. Funguje to i při vypnuté mřížce. Počítá se i střed pracovní roviny: růžové čáry ukážou, kdy tvar sedí uprostřed desky ve směru X, Y nebo v obou.
 
 [[Shift]] během tažení omezí posun na osu X nebo Y podle toho, v kterém směru jste táhli více. Druhá souřadnice se zachová. Klávesu stiskněte nejlépe až po zahájení pohybu, protože Shift+klik na nevybraný tvar jej pouze přidá do výběru.
 
@@ -47,13 +47,23 @@ Přidržíte-li [[Alt]] už před zahájením tažení, přesouváte kopii jako 
 
 ## Zarovnání
 
-Vyberte nejméně dva tvary a zapněte {{ui:editor.tool.align}}. Kolem výběru se objeví body pro levý okraj, střed, pravý okraj, předek, střed, zadek a horní, střední či spodní výšku. Kliknutí přesune tvary na zvolenou úroveň. Pokud nejprve kliknete na jedno vybrané těleso, zůstane pevné a ostatní se zarovnají podle něj. Zamčené těleso se stane pevným základem automaticky. Krajní zarovnání používá ohraničující kvádr, ale střed trojúhelníku, pětiúhelníku nebo hvězdy je vlastním středem tvaru. Otvor tak bude uprostřed tvaru, nikoli jeho obálky.
+Vyberte nejméně dva tvary a zapněte {{ui:editor.tool.align}} ([[L]] nebo příkaz v místní nabídce). Kolem výběru se objeví body pro levý okraj, střed, pravý okraj, předek, střed, zadek a horní, střední či spodní výšku. Kliknutí přesune tvary na zvolenou úroveň. Pokud nejprve kliknete na jedno vybrané těleso, zůstane pevné a ostatní se zarovnají podle něj. Zamčené těleso se stane pevným základem automaticky. Krajní zarovnání používá ohraničující kvádr, ale střed trojúhelníku, pětiúhelníku nebo hvězdy je vlastním středem tvaru. Otvor tak bude uprostřed tvaru, nikoli jeho obálky.
 
 U šikmo natočeného tvaru, například o 45°, se jinak zarovnává podle obálky, nikoli jeho vlastních hran. Chcete-li použít jeho osy, položte nejprve na jeho plochu pracovní rovinu přes {{ui:camera.placeWorkplane}}. Zarovnávací body pak používají osy této roviny jako v Tinkercadu. Pro návrat k osám podložky pracovní rovinu obnovte.
 
 ![Zarovnání zobrazuje cílové polohy jako body kolem výběru.](shot:align)
 
 Zkratka je [[L]], [[Esc]] nástroj ukončí.
+
+### Stejné mezery
+
+Vedle prostředního bodu každé čáry stojí širší bod s čárkou na každé straně. Rozmístí tři nebo více tvarů v tomto směru tak, aby mezera mezi sousedními hranami byla všude stejná, ať je každý tvar jakkoli velký. První a poslední tvar zůstanou na místě, ty mezi nimi se posunou. Řada různě velkých otvorů tak dostane mezi sebou všude stejnou stěnu. Najeďte na bod a předem uvidíte, kam se tvary posunou; stavový řádek pak uvede mezeru.
+
+Je-li mezi vybranými tvary deska, která je v tomto směru delší než všechny ostatní, tvary se rozmístí na ní: mezera k jejím okrajům je stejná jako mezi tvary a jediný tvar přijde doprostřed. Tvary v několika řadách, jako zvířátka vkládací skládačky, se rozmístí řadu po řadě; tvary, jejichž kvádry se překrývají napříč směrem, tvoří jednu řadu. Kde tvary nestojí v čistých sloupcích, jako zvířátka zepředu dozadu, posouvají se tvary stojící vedle sebe místo toho jako celá řada.
+
+Bez desky nejdřív klikněte na volné místo podložky: podložka je pak pevný tvar, stejné mezery rozmístí tvary po celé podložce se stejnou mezerou k jejím okrajům a ostatní body je zarovnají k jejím okrajům nebo středu. Další klik na volnou podložku ji uvolní.
+
+Podržte [[Alt]] a klikněte na bod, chcete-li mezeru zadat sami, třeba 5 mm: tvary se seřadí v této vzdálenosti, od prvního tvaru nebo od toho, na který jste klikli jako první; na desce přijde řada doprostřed. Zamčený tvar zůstane na místě, takže jeden mezi krajními tvary stejným mezerám zabrání.
 
 ## Zrcadlení
 

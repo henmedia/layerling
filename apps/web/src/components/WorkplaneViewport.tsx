@@ -1,4 +1,5 @@
 "use client";
+import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
@@ -19,6 +20,7 @@ import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { ToolbarNoteIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
+import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
 import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
@@ -30,6 +32,9 @@ import type { ModelSplitPlane } from "@/lib/modelSplit";
 import { useLanguage } from "@/lib/useLanguage";
 import { viewDirectionFromName, viewFaceForKey, type ViewCubeFace } from "@/lib/viewCubeDrag";
 import { ViewCube } from "@/components/workplane/ViewCube";
+import { ViewScrollbars } from "@/components/workplane/ViewScrollbars";
+import { ViewScrollbarsIcon } from "@/components/ViewScrollbarsIcon";
+import { readViewScrollbars, storeViewScrollbars } from "@/lib/viewScroll";
 import { openSecondViewWindow, SecondViewWindow, useSecondViewSupported } from "@/components/workplane/SecondViewWindow";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
@@ -76,7 +81,7 @@ import { showsTouchMultiSelect } from "@/lib/touchMultiSelect";
 import { narrowCrossWidth, narrowEndWidth, normalizeSlopeSide, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight } from "@/lib/slopeAlong";
 import { TransformOverlay, continuousSnappedWheelRotation, getElevationMeasureKey, measureKeyForHandle, ROTATION_WHEEL_SHIFT_SNAP_DEGREES, ROTATION_WHEEL_SNAP_DEGREES, snappedRotationDelta, snappedWheelRotation, type DimensionMark, type EditingCorner, type EditingDimension, type EditingRotation, type PinnedRotationWheelView, type RotationAxis, type RotationPlaneView, type RotationReadout, type TransformHandleKind, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
-import type { AlignAxis, AlignHandleStatus, AlignTarget, GridSize, MeasurementAccuracy, ShapeAsset, WorkplaneNote, WorkplaneNoteAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, GridSize, MeasurementAccuracy, ShapeAsset, WorkplaneNote, WorkplaneNoteAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { referencePoints } from "@/lib/workplaneNotes";
 import { pivotHeightRange, pivotPlateReach } from "@/lib/zoomPivot";
 import { pointerReach } from "@/lib/pointerReach";
@@ -174,9 +179,9 @@ type WorkplaneViewportProps = {
   onCancelCruise?: () => void;
   onAlignAnchorChange: (id: string) => void;
   /** `size`: Alt is held, and the dot stretches the parts instead of moving them (#998). */
-  onAlignPreview: (axis: AlignAxis, target: AlignTarget, size: boolean) => void;
+  onAlignPreview: (axis: AlignAxis, target: AlignTarget, size: boolean, spread?: AlignSpread) => void;
   onAlignPreviewClear: () => void;
-  onAlignSelection: (axis: AlignAxis, target: AlignTarget, size: boolean) => void;
+  onAlignSelection: (axis: AlignAxis, target: AlignTarget, size: boolean, spread?: AlignSpread) => void;
   onMirrorPreview: (axis: AlignAxis) => void;
   onMirrorPreviewClear: () => void;
   onMirrorSelection: (axis: AlignAxis) => void;
@@ -221,6 +226,8 @@ type WorkplaneViewportProps = {
   onSurfaceFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number) => void;
   /** Lays the selected vase's accessories out beside it. */
   onVaseAccessories?: () => void;
+  /** Lays the selected Swallowtail baseplate's keys out in front of it (#1061). */
+  onGridfinityKeys?: () => void;
   onLayerText?: (patch: TextLayerPatch) => void;
   onTextTags?: (names: string[], gap: number) => void;
   /** Several lines of text under one another, one text each (#1207). */
@@ -1498,6 +1505,7 @@ export function WorkplaneViewport({
   surfacePickedFaces,
   onSurfaceFacePick,
   onVaseAccessories,
+  onGridfinityKeys,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -1566,6 +1574,15 @@ export function WorkplaneViewport({
   const [snap, setSnap] = useState<GridSize>(() => normalizeSnapGrid(initialSnap, DEFAULT_SNAP_GRID));
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [workspace, setWorkspace] = useState<WorkspaceSettings>(() => normalizeWorkspaceSettings(initialWorkspace));
+  // The scrollbars of the 3D view (Discussion #1241), switched in the view bar; read after mounting, as the page is built without storage.
+  const [viewScrollbarsOn, setViewScrollbarsOn] = useState(false);
+  useEffect(() => setViewScrollbarsOn(readViewScrollbars()), []);
+  const toggleViewScrollbars = useCallback(() => {
+    setViewScrollbarsOn((on) => {
+      storeViewScrollbars(!on);
+      return !on;
+    });
+  }, []);
   const [transformOverlay, setTransformOverlay] = useState<TransformOverlayState | null>(null);
   const [alignOverlay, setAlignOverlay] = useState<AlignOverlayState | null>(null);
   const [mirrorOverlay, setMirrorOverlay] = useState<MirrorOverlayState | null>(null);
@@ -1589,6 +1606,11 @@ export function WorkplaneViewport({
   // One locked shape holds the whole selection still, as beginTransform refuses it.
   const selectionLocked = useMemo(
     () => selectedIds.some((id) => shapes.find((shape) => shape.id === id)?.locked),
+    [selectedIds, shapes],
+  );
+  // Lock shape (#1277): the selection moves and turns, but its size handles stay away.
+  const selectionSizeLocked = useMemo(
+    () => selectedIds.some((id) => holdsShapeLock(shapes.find((shape) => shape.id === id))),
     [selectedIds, shapes],
   );
   const suppressNextRotationEditRef = useRef(false);
@@ -4055,6 +4077,9 @@ export function WorkplaneViewport({
       if (!frame || !shape || ids.length === 0 || ids.some((id) => shapesRef.current.find((entry) => entry.id === id)?.locked)) {
         return;
       }
+      if ((kind === "scale" || kind === "height") && ids.some((id) => holdsShapeLock(shapesRef.current.find((entry) => entry.id === id)))) {
+        return;
+      }
 
       const rotationAxis = rotationAxisForHandle(handleKey);
       const resizeHandleKey = handleKey;
@@ -6233,6 +6258,9 @@ export function WorkplaneViewport({
         if (!shape || !frame || shape.locked || selectionHeld || (!point && handle.kind !== "height" && handle.kind !== "lift" && handle.kind !== "rotate")) {
           return;
         }
+        if ((handle.kind === "scale" || handle.kind === "height") && selectedIdsRef.current.some((id) => holdsShapeLock(shapesRef.current.find((entry) => entry.id === id)))) {
+          return;
+        }
         const handlesLowerSide = handle.handleKey === "bottom-height" || handle.handleKey === "lower-shape";
         const lift = liftGeometryForFrame(frame, activeWorkplane);
         const liftOffset = handle.kind === "lift" ? liftHandleOffset(lift.height) * (handlesLowerSide ? -1 : 1) : 0;
@@ -6528,6 +6556,8 @@ export function WorkplaneViewport({
           ...(notesVisibleRef.current
             ? referencePoints(notesRef.current).map((point) => ({ minX: point.x, maxX: point.x, minZ: point.z, maxZ: point.z }))
             : []),
+          // The middle of the workplane, so a part can be put in its centre along X, Z or both (Discussion #1266).
+          { minX: activeWorkplane.origin.x, maxX: activeWorkplane.origin.x, minZ: activeWorkplane.origin.z, maxZ: activeWorkplane.origin.z },
         ];
       }
       if (moveDimensionsEnabledRef.current && usesWorldHorizontalAxes) {
@@ -6773,8 +6803,9 @@ export function WorkplaneViewport({
       }
 
       drag.items.forEach((item) => {
-        item.nextX = item.startX + deltaX;
-        item.nextZ = item.startZ + deltaZ;
+        // Snapped onto the workplane centre, a part lands on 0, not on a rounding rest like -3e-16 (#1266).
+        item.nextX = cleanNearZero(item.startX + deltaX, 1e-9);
+        item.nextZ = cleanNearZero(item.startZ + deltaZ, 1e-9);
         item.nextElevation = item.startElevation + deltaY;
         if (threeRef.current) applyDragItemPreview(threeRef.current, item);
       });
@@ -6983,6 +7014,7 @@ export function WorkplaneViewport({
         // A click on empty space that did not turn the view clears the selection, as a click there always did.
         if (Math.hypot(event.clientX - slicerEmptyPress.x, event.clientY - slicerEmptyPress.y) < 5) {
           if (multiSelectRef.current) onMultiSelectEndRef.current?.();
+          else if (alignModeRef.current) onAlignAnchorChange(ALIGN_PLATE_ID);
           else onSelectShape(null);
         }
         return;
@@ -7060,7 +7092,8 @@ export function WorkplaneViewport({
             onSelectShape(selected);
           }
         } else if (!marquee.additive) {
-          onSelectShape(null);
+          if (alignModeRef.current) onAlignAnchorChange(ALIGN_PLATE_ID);
+          else onSelectShape(null);
         }
         if (state) {
           state.controls.enabled = true;
@@ -7144,7 +7177,7 @@ export function WorkplaneViewport({
       }
       onInteractionActiveChange?.(false);
     },
-    [cancelGestureForCamera, clearMoveDimensions, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt],
+    [cancelGestureForCamera, clearMoveDimensions, onAlignAnchorChange, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt],
   );
 
   const handleDrop = useCallback(
@@ -7766,6 +7799,8 @@ export function WorkplaneViewport({
   return (
     <main className="workplane-stage">
       <ViewCube getRig={getViewCubeRig} cubeRef={viewCubeRef} />
+      {/* Scrollbars that slide the view, switched in the view bar (Discussion #1241). */}
+      {viewScrollbarsOn && !pickOnly ? <ViewScrollbars threeRef={threeRef} /> : null}
       {/* An empty design says where to start, and that a tool can be found by its name (31.10.2026). */}
       {shapes.length === 0 && !pickOnly ? <p className="workplane-empty-hint">{t("editor.emptyHint")}</p> : null}
       {secondViewWindow ? <SecondViewWindow popup={secondViewWindow} threeRef={threeRef} projectId={projectId} getSelectedIds={getSelectedIds} onClosed={closeSecondView} /> : null}
@@ -7844,6 +7879,15 @@ export function WorkplaneViewport({
                 <PictureInPicture2 size={24} strokeWidth={2.15} aria-hidden="true" />
               </button>
             ) : null}
+            <button
+              className={viewScrollbarsOn ? "active" : ""}
+              aria-label={viewScrollbarsOn ? t("camera.hideScrollbars") : t("camera.showScrollbars")}
+              title={viewScrollbarsOn ? t("camera.hideScrollbars") : t("camera.showScrollbars")}
+              aria-pressed={viewScrollbarsOn}
+              onClick={toggleViewScrollbars}
+            >
+              <ViewScrollbarsIcon size={24} strokeWidth={2.15} aria-hidden="true" />
+            </button>
             </div>
             <div className="camera-group">
             <div className="workplane-display-control-group">
@@ -8377,6 +8421,7 @@ export function WorkplaneViewport({
               rotationReadout={rotationReadout}
               angleBadge={dimensionsHidden ? null : angleBadge}
               locked={selectionLocked}
+              sizeLocked={selectionSizeLocked}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}
               hideDimensionMarks={false}
@@ -8434,9 +8479,9 @@ export function WorkplaneViewport({
             <AlignOverlay
               overlay={alignOverlay}
               onAlign={onAlignSelection}
-              onPreview={(axis, target, size) => {
+              onPreview={(axis, target, size, spread) => {
                 if (threeRef.current) threeRef.current.alignPreviewActive = true;
-                onAlignPreview(axis, target, size);
+                onAlignPreview(axis, target, size, spread);
               }}
               onPreviewClear={() => {
                 if (threeRef.current) threeRef.current.alignPreviewActive = false;
@@ -8603,6 +8648,7 @@ export function WorkplaneViewport({
           surfacePickedFaces={surfacePickedFaces}
           onSurfaceFacePick={onSurfaceFacePick}
           onVaseAccessories={onVaseAccessories}
+          onGridfinityKeys={onGridfinityKeys}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
           onTextBlock={onTextBlock}

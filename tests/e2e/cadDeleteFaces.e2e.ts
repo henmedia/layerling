@@ -3,6 +3,8 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { cadFaceList, cadFaceTessellation, DELETE_FACES_UNCHANGED_MESSAGE, deleteFacesSolid } from "@/lib/cadDeleteFaces";
+import { exactSolidFromMesh } from "@/lib/cadMeshExact";
+import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 
 /*
  * Deleting faces of an exact body (#451): the faces around them grow to close
@@ -135,6 +137,21 @@ describe("deleting faces of an exact body", () => {
     expect(faces.map((face) => face.id)).toEqual([0, 1, 2, 3, 4, 5, 6]);
   });
 
+  it("measures a face's width as twice its area over its perimeter, and lists the faces it shares an edge with", () => {
+    const top = cadFaceList(cad, cad.makeBox(10, 20, 5)).find((face) => Math.abs(face.area - 200) < 1e-6)!;
+    expect(top.width).toBeCloseTo((2 * 200) / 60, 9);
+    expect(top.neighbours).toHaveLength(4);
+    // A pyramid's opposite sides meet only at the tip: they share no edge, so they are not neighbours.
+    const corners = [[0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0]];
+    const tip = [5, 5, 8];
+    const triangles = [[0, 2, 1], [0, 3, 2]].map((k) => k.map((i) => corners[i])).concat(corners.map((corner, k) => [corner, corners[(k + 1) % 4], tip]));
+    const pyramid = exactSolidFromMesh(cad, new Float32Array(triangles.flat(2)));
+    if (!pyramid) throw new Error("not made exact");
+    const faces = cadFaceList(cad, pyramid.solid);
+    expect(faces).toHaveLength(5);
+    expect(faces.map((face) => face.neighbours.length).sort()).toEqual([3, 3, 3, 3, 4]);
+  });
+
   it("knows the face of every triangle it draws, a curved face as one piece", () => {
     const b = box();
     const filleted = cad.fillet(b, cad.getSubShapes(b, "edge").filter((edge) => cad.getBoundingBox(edge).zmin > 19.99), 3);
@@ -162,5 +179,66 @@ describe("deleting faces of an exact body", () => {
       const own = bounds[triangleFaces[triangle]];
       expect(middle[0] >= own.xmin - 1e-3 && middle[0] <= own.xmax + 1e-3 && middle[1] >= own.ymin - 1e-3 && middle[1] <= own.ymax + 1e-3 && middle[2] >= own.zmin - 1e-3 && middle[2] <= own.zmax + 1e-3).toBe(true);
     }
+  });
+});
+
+/*
+ * Hair-thin faces taken along (#451). An STL with bad triangles comes out of
+ * Make exact with them as faces: a block with a corner cut off at 45 degrees
+ * whose slanted side is three strips, the middle one 0.0015 mm out of the
+ * plane, with slivers 0.002 mm wide between them. The strips cannot be
+ * deleted without the slivers, and nobody can click those.
+ */
+describe("deleting faces of a mesh made exact", () => {
+  const cut = 12 * Math.SQRT2;
+  // Along the slanted side from (48, 0) to (60, 12): strip, sliver, strip, sliver, strip, each point moved off the plane by its offset.
+  // The middle and far strips lean 0.00002 mm at their start: with them quite flat the kernel deletes the strips alone.
+  const along = [0, 5, 5.002, 10, 10.002, cut];
+  const offset = [0, 0, 0.0015 + 2e-5, 0.0015, 2e-5, 0];
+  const outline: Array<[number, number]> = [[0, 0], ...along.map((u, k): [number, number] => [48 + (u + offset[k]) * Math.SQRT1_2, (u - offset[k]) * Math.SQRT1_2]), [60, 30], [0, 30]];
+  const exactBlock = () => {
+    const corners: number[] = [];
+    const triangle = (...points: Array<[number, number, number]>) => points.forEach((point) => corners.push(...point));
+    outline.forEach(([x, y], k) => {
+      const [nx, ny] = outline[(k + 1) % outline.length];
+      triangle([x, y, 0], [nx, ny, 0], [nx, ny, 25]);
+      triangle([x, y, 0], [nx, ny, 25], [x, y, 25]);
+    });
+    const [ox, oy] = outline[outline.length - 1];
+    for (let k = 0; k + 2 < outline.length; k += 1) {
+      const [ax, ay] = outline[k];
+      const [bx, by] = outline[k + 1];
+      triangle([ox, oy, 0], [bx, by, 0], [ax, ay, 0]);
+      triangle([ox, oy, 25], [ax, ay, 25], [bx, by, 25]);
+    }
+    const exact = exactSolidFromMesh(cad, new Float32Array(corners));
+    if (!exact) throw new Error("not made exact");
+    return exact.solid;
+  };
+  const slanted = (list: ReturnType<typeof cadFaceList>) => list.filter((face) => face.normal && Math.abs(face.normal.x - Math.SQRT1_2) < 0.01 && Math.abs(face.normal.y + Math.SQRT1_2) < 0.01);
+  const strips = (list: ReturnType<typeof cadFaceList>) => slanted(list).filter((face) => !isThinFace(face)).sort((a, b) => a.area - b.area);
+
+  it("finds the two slivers thin, each between two strips, and takes them along with the smaller strips", () => {
+    const list = cadFaceList(cad, exactBlock());
+    const thin = list.filter(isThinFace);
+    expect(thin).toHaveLength(2);
+    const side = strips(list);
+    expect(side).toHaveLength(3);
+    thin.forEach((sliver) => expect(sliver.neighbours.filter((id) => side.some((strip) => strip.id === id))).toHaveLength(2));
+    expect(thinFacesWith([side[0].id, side[1].id], list)).toEqual(thin.map((face) => face.id));
+  });
+
+  it("leaves one slanted face when the two smaller strips go with the slivers, and refuses the strips alone", () => {
+    const solid = exactBlock();
+    const list = cadFaceList(cad, solid);
+    const side = strips(list);
+    const picked = [side[0].id, side[1].id];
+    const faces = cad.getSubShapes(solid, "face");
+    expect(() => deleteFacesSolid(cad, solid, picked.map((id) => faces[id]))).toThrow(DELETE_FACES_UNCHANGED_MESSAGE);
+    const result = deleteFacesSolid(cad, solid, [...picked, ...thinFacesWith(picked, list)].map((id) => faces[id]));
+    expect(cad.isValid(result)).toBe(true);
+    const left = slanted(cadFaceList(cad, result));
+    expect(left).toHaveLength(1);
+    expect(left[0].area).toBeCloseTo(cut * 25, 1);
   });
 });

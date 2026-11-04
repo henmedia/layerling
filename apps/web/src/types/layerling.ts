@@ -184,6 +184,8 @@ export type ShapeCustomization = {
   threadHead?: ThreadHead;
   threadHand?: ThreadHand;
   threadProfile?: ThreadProfile;
+  /** Tapered 1 in 16 on the diameter, as the pipe thread NPT (#1267); missing means straight. */
+  threadTaper?: boolean;
   threadDiameter?: number;
   threadPitch?: number;
   threadClearance?: number;
@@ -276,6 +278,8 @@ export type ShapeCustomization = {
   gridfinityHalfGrid?: boolean;
   /** Gridfinity baseplate: up to 12 units across and deep instead of 6, for print beds over 256 mm (#1061); missing means 6. */
   gridfinityLargePlate?: boolean;
+  /** Gridfinity baseplate: Swallowtail, on a 2.4 mm floor with a pocket for a key under each side without padding (#1061); missing means off. */
+  gridfinitySwallowtail?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -549,7 +553,15 @@ export type AlignHandleStatus = {
   title: string;
   /** The same dot with Alt held: it stretches the parts to the reference instead of moving them (#998). */
   size?: { disabled: boolean; aligned: boolean; title: string };
+  /**
+   * On the middle dot of an axis: the dot beside the line that spreads the parts with equal gaps between them
+   * (alignDistribute.ts). `gapDisabled` and `gapTitle` are for Alt on it, which asks for a gap to type in.
+   */
+  spread?: { disabled: boolean; aligned: boolean; title: string; gapDisabled: boolean; gapTitle: string };
 };
+
+/** Equal gaps on the align dots: null spreads them evenly, a number is the gap typed in, in millimetres. */
+export type AlignSpread = { gap: number | null };
 
 export type SketchPoint = {
   id: string;
@@ -1004,6 +1016,8 @@ export type WorkplaneShape = {
   threadHead?: ThreadHead;
   threadHand?: ThreadHand;
   threadProfile?: ThreadProfile;
+  /** Tapered 1 in 16 on the diameter, as the pipe thread NPT (#1267); missing means straight. */
+  threadTaper?: boolean;
   threadDiameter?: number;
   threadPitch?: number;
   threadClearance?: number;
@@ -1096,6 +1110,8 @@ export type WorkplaneShape = {
   gridfinityHalfGrid?: boolean;
   /** Gridfinity baseplate: up to 12 units across and deep instead of 6, for print beds over 256 mm (#1061); missing means 6. */
   gridfinityLargePlate?: boolean;
+  /** Gridfinity baseplate: Swallowtail, on a 2.4 mm floor with a pocket for a key under each side without padding (#1061); missing means off. */
+  gridfinitySwallowtail?: boolean;
   /** Gridfinity bin: a label shelf along the back wall. */
   gridfinityLabelBack?: boolean;
   /** Gridfinity bin: a label shelf along the front wall. */
@@ -1365,6 +1381,8 @@ export type WorkplaneShape = {
   vase?: import("@/lib/vase/vase-geometry.mjs").VaseSettings;
   /** An accessory laid out for a vase (its id): laying them out again replaces it. */
   vasePartOf?: string;
+  /** A Swallowtail key laid out for a Gridfinity plate (its id, #1061): laying them out again replaces it. */
+  gridfinityKeyOf?: string;
   importedMesh?: {
     positions: number[];
     normals?: number[];
@@ -1448,6 +1466,11 @@ export type WorkplaneShape = {
    */
   multicolor?: boolean;
   locked?: boolean;
+  /**
+   * Lock shape (#1277): the part still moves, turns and groups with others, but its size, settings,
+   * name and body stay as they are, and a copy keeps the lock. See lib/shapeLock.
+   */
+  shapeLocked?: boolean;
   hidden?: boolean;
   /** Drawn see-through in its own colour, like the usual "Transparent". Display only - a solid stays a solid. */
   transparent?: boolean;

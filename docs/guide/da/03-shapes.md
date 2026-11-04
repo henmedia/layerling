@@ -132,7 +132,7 @@ Snap-trinnet er nederst til højre i editoren og kan ændres når som helst.
 
 ## Kopiering og duplikering
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} og {{ui:editor.tool.duplicate}} er i båndet ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplikerer en markering. layerling husker hvordan du sidst flyttede eller roterede kopien og anvender det samme igen ved næste duplikering. Det giver en række huller eller trin i få tastetryk. For regelmæssige arrangementer er der også mønsteret, beskrevet i [Valg og arrangering](chapter:select-and-arrange). Har du også ændret kopiens størrelse, vokser hver ny kopi igen med samme faktor, som i Tinkercad.
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} og {{ui:editor.tool.duplicate}} er i båndet ({{ui:editor.group.clipboard}}). [[Ctrl]]+[[D]] duplikerer en markering. layerling husker hvordan du sidst flyttede eller roterede kopien og anvender det samme igen ved næste duplikering. Det giver en række huller eller trin i få tastetryk. For regelmæssige arrangementer er der også mønsteret, beskrevet i [Valg og arrangering](chapter:select-and-arrange). Har du også ændret kopiens størrelse, vokser hver ny kopi igen med samme faktor, som i Tinkercad. En form du selv har navngivet får en kopi, der hedder det samme som den, "Holder (kopi)", så "Holder (kopi 2)" og sådan, så objektlisten bliver læsbar; en form der kun har det navn layerling har givet den ("Kasse"), beholder det.
 
 > **Tip:** Hvis en form nægter at tage den størrelse du vil have, er det ofte grænserne for nye former. Under {{ui:workspace.shapeDefaults}} i indstillingerne bestemmer du hvordan hver form starter og hvor stor den må blive.
 

@@ -144,6 +144,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_wrap_around_cylinder` | ovije ležeče telo, na primer SVG ali besedilo, okoli valja, navzven ali kot gravuro navznotraj |
 | `layerling_texture_surface` | nanese na telo površinsko teksturo: utore, narebričenje, satovje ali izbokline, za boljši oprijem ali za videz, pozneje pa jo tudi spremeni ali odstrani |
 | `layerling_simplify_mesh` | zmanjša število trikotnikov uvožene mreže, na delež v odstotkih ali na število trikotnikov |
+| `layerling_make_exact` | uvoženo mrežo spremeni v natančno telo CAD: ravnine, valji, stožci, krogle in torusi postanejo prave ploskve, da se robovi čisto zaokrožijo in jih STEP nosi |
 | `layerling_save_custom_shape` | shrani telesa kot lastno obliko, na strežniku ali v brskalniku, da jih vstavi v druge načrte |
 | `layerling_list_custom_shapes` | našteje lastne oblike na strežniku in v brskalniku |
 | `layerling_insert_custom_shape` | vstavi lastno obliko v odprti načrt, po želji na mesto x/z |

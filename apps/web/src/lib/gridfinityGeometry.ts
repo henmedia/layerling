@@ -4,7 +4,7 @@ import type { ManifoldToplevel } from "manifold-3d";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { segmentSegmentDistance } from "@/lib/holePattern";
 import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
-import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, WorkplaneShape } from "@/types/layerling";
+import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, SketchProfile, WorkplaneShape } from "@/types/layerling";
 
 /*
  * Gridfinity (#381), the open storage system by Zack Freedman: bins on a 42 mm grid
@@ -112,6 +112,15 @@ import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpeni
  * of 6, for print beds over 256 mm. More would take too long to build as an
  * exact body.
  *
+ * A baseplate can also stand on a 2.4 mm floor (Swallowtail, #1061), so plates
+ * printed side by side click together: under the middle of each cell along a
+ * side without padding the floor has half a dovetail pocket, 2 mm deep. Its
+ * bottom 0.6 mm is a lip: the pocket 0.2 mm smaller on each side, from 0.2 mm in
+ * from the plate's side to the pocket's end, as the test prints had it. A printed
+ * key, two pocket halves back to back with a slot into each end, is pressed into
+ * the pockets across a seam from below and held by the lips. A plate fitted into
+ * an outline has none.
+ *
  * The lip's top can be chamfered (#780) as the edge tool would: the chamfer
  * takes its size off the outer wall and off the slope a stacked bin's feet rest
  * on. The bin keeps its height setting, and its top comes down by 0.71 times it.
@@ -166,6 +175,21 @@ export const MAX_GRIDFINITY_LARGE_PLATE_UNITS = 12;
 export const MAX_GRIDFINITY_HEIGHT_UNITS = 20;
 /** The most padding on a side of a baseplate: 42 mm would be room for another unit of grid. */
 export const MAX_GRIDFINITY_PADDING = GRIDFINITY_GRID - 1;
+/** Swallowtail (#1061): the floor under a plate, and the pocket's and key's sizes, from two test prints. */
+export const GRIDFINITY_SWALLOWTAIL_FLOOR = 2.4;
+const SWALLOWTAIL_DEPTH = 2;
+export const GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT = 0.6;
+export const GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS = 1.4;
+const SWALLOWTAIL_LIP = 0.2;
+const SWALLOWTAIL_NECK = 6;
+const SWALLOWTAIL_WIDE = 10;
+const SWALLOWTAIL_LENGTH = 7;
+const SWALLOWTAIL_KEY_CLEARANCE = 0.025;
+const SWALLOWTAIL_SLOT_WIDTH = 1.2;
+const SWALLOWTAIL_SLOT_LENGTH = 4.5;
+const SWALLOWTAIL_KEY_SPACING = 4;
+/** How far a Swallowtail pocket's cutter runs on below the plate and out past its side, so it shares no face with it. */
+const SWALLOWTAIL_PAST = 0.1;
 /** How much smaller than the drawer a baseplate fitted to it is, so that it drops in. */
 export const GRIDFINITY_DRAWER_CLEARANCE = 0.5;
 /** The smallest drawer one baseplate fits: 1 unit. */
@@ -259,6 +283,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityMagnets?: boolean;
   gridfinityHalfGrid?: boolean;
   gridfinityLargePlate?: boolean;
+  gridfinitySwallowtail?: boolean;
   gridfinityLabelBack?: boolean;
   gridfinityLabelFront?: boolean;
   gridfinityLabelLeft?: boolean;
@@ -375,10 +400,13 @@ export function gridfinityUnits(shape: GridfinityShapeFields) {
   };
 }
 
-/** The size of a bin or baseplate of so many units; a bin on the half-size grid counts units of 21 mm, and a baseplate's box takes its padding in. */
-export function gridfinitySize(type: GridfinityType, count: { x: number; z: number; y: number }, lip = true, pitch = GRIDFINITY_GRID, padding = NO_GRIDFINITY_PADDING) {
+/**
+ * The size of a bin or baseplate of so many units; a bin on the half-size grid counts units of 21 mm, and a baseplate's
+ * box takes its padding in, and with Swallowtail its floor (#1061).
+ */
+export function gridfinitySize(type: GridfinityType, count: { x: number; z: number; y: number }, lip = true, pitch = GRIDFINITY_GRID, padding = NO_GRIDFINITY_PADDING, swallowtail = false) {
   // To 0.01 mm, as the padding is stored, so 252 + 22.98 + 22.97 is 297.95.
-  if (type === "baseplate") return { width: Math.round((count.x * GRIDFINITY_GRID + padding.left + padding.right) * 100) / 100, depth: Math.round((count.z * GRIDFINITY_GRID + padding.back + padding.front) * 100) / 100, height: GRIDFINITY_BASEPLATE_HEIGHT };
+  if (type === "baseplate") return { width: Math.round((count.x * GRIDFINITY_GRID + padding.left + padding.right) * 100) / 100, depth: Math.round((count.z * GRIDFINITY_GRID + padding.back + padding.front) * 100) / 100, height: GRIDFINITY_BASEPLATE_HEIGHT + (swallowtail ? GRIDFINITY_SWALLOWTAIL_FLOOR : 0) };
   return {
     width: count.x * pitch - 2 * GRIDFINITY_CLEARANCE,
     depth: count.z * pitch - 2 * GRIDFINITY_CLEARANCE,
@@ -394,7 +422,7 @@ export function gridfinitySize(type: GridfinityType, count: { x: number; z: numb
 export function gridfinityFootprintPatch(shape: GridfinityShapeFields) {
   if (normalizeGridfinityType(shape.gridfinityType) === "tray") return gridfinityTraySize(shape);
   if (normalizeGridfinityType(shape.gridfinityType) === "baseplate" && normalizeGridfinityOutline(shape.gridfinityOutline)) return gridfinityOutlineSize(shape);
-  return gridfinitySize(normalizeGridfinityType(shape.gridfinityType), gridfinityUnits(shape), shape.gridfinityLip !== false, gridfinityPitch(shape), gridfinityPadding(shape));
+  return gridfinitySize(normalizeGridfinityType(shape.gridfinityType), gridfinityUnits(shape), shape.gridfinityLip !== false, gridfinityPitch(shape), gridfinityPadding(shape), shape.gridfinitySwallowtail === true);
 }
 
 /**
@@ -408,13 +436,14 @@ export function gridfinityFootprintPatch(shape: GridfinityShapeFields) {
  * on the grid, its height counted in height units as a bin's. A large plate
  * switched off goes back to at most 6 units and keeps its padding.
  */
-export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?: GridfinityType; x?: number; z?: number; y?: number; lip?: boolean; halfGrid?: boolean; largePlate?: boolean }) {
+export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?: GridfinityType; x?: number; z?: number; y?: number; lip?: boolean; halfGrid?: boolean; largePlate?: boolean; swallowtail?: boolean }) {
   const current = gridfinityUnits(shape);
   const currentType = normalizeGridfinityType(shape.gridfinityType);
   const type = next.type ?? currentType;
   const lip = next.lip ?? shape.gridfinityLip !== false;
   const halfGrid = next.halfGrid ?? shape.gridfinityHalfGrid === true;
   const largePlate = next.largePlate ?? shape.gridfinityLargePlate === true;
+  const swallowtail = next.swallowtail ?? shape.gridfinitySwallowtail === true;
   // An outline is a baseplate's alone (#1061): a baseplate keeps it and its box, anything else drops it.
   const outlined = currentType === "baseplate" && normalizeGridfinityOutline(shape.gridfinityOutline) !== undefined;
   if (outlined && type === "baseplate") {
@@ -439,8 +468,8 @@ export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?
     y: units(next.y ?? (currentType === "bin" ? current.y : currentType === "tray" ? (shape.height - GRIDFINITY_LIP_HEIGHT / 2) / GRIDFINITY_HEIGHT_UNIT : DEFAULT_GRIDFINITY_UNITS.y), DEFAULT_GRIDFINITY_UNITS.y, MAX_GRIDFINITY_HEIGHT_UNITS),
   };
   // A bin turned into a baseplate takes back the padding it kept.
-  const size = gridfinitySize(type, count, lip, pitch, gridfinityPadding({ ...shape, ...grid }));
-  return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...(next.largePlate !== undefined ? { gridfinityLargePlate: largePlate } : {}), ...dropOutline, ...size };
+  const size = gridfinitySize(type, count, lip, pitch, gridfinityPadding({ ...shape, ...grid }), swallowtail);
+  return { gridfinityType: type, gridfinityLip: lip, ...(next.halfGrid !== undefined ? { gridfinityHalfGrid: halfGrid } : {}), ...(next.largePlate !== undefined ? { gridfinityLargePlate: largePlate } : {}), ...(next.swallowtail !== undefined ? { gridfinitySwallowtail: swallowtail } : {}), ...dropOutline, ...size };
 }
 
 /** Each side's padding on a baseplate (#455). */
@@ -770,7 +799,9 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
   const pitch = gridfinityPitch(shape);
   const padding = outline ? NO_GRIDFINITY_PADDING : gridfinityPadding(shape);
   const tray = type === "tray";
-  const size = tray ? gridfinityTraySize(shape) : outline ? gridfinityOutlineSize(shape) : gridfinitySize(type, count, lip, pitch, padding);
+  // Swallowtail (#1061) on a grid baseplate: an outline plate is one piece for the whole drawer.
+  const swallowtail = type === "baseplate" && !outline && shape.gridfinitySwallowtail === true;
+  const size = tray ? gridfinityTraySize(shape) : outline ? gridfinityOutlineSize(shape) : gridfinitySize(type, count, lip, pitch, padding, swallowtail);
   // The grid moves away from the padded sides: its middle is half the difference off the box's.
   const centre = { x: (padding.left - padding.right) / 2, z: (padding.back - padding.front) / 2 };
   // A tray stands on a flat bottom, with no grid of feet under it.
@@ -784,6 +815,16 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
         cells.push({ i, j, x: centre.x + (i - (count.x - 1) / 2) * pitch, z: centre.z + (j - (count.z - 1) / 2) * pitch });
       }
     }
+  }
+  // A Swallowtail pocket at the middle of each cell's side on a side of the plate without padding (#1061).
+  const pockets: GridfinityPocket[] = [];
+  if (swallowtail) {
+    cells.forEach((c) => {
+      if (c.j === 0 && padding.back === 0) pockets.push({ side: "back", x: c.x, z: -size.depth / 2 });
+      if (c.j === count.z - 1 && padding.front === 0) pockets.push({ side: "front", x: c.x, z: size.depth / 2 });
+      if (c.i === 0 && padding.left === 0) pockets.push({ side: "left", x: -size.width / 2, z: c.z });
+      if (c.i === count.x - 1 && padding.right === 0) pockets.push({ side: "right", x: size.width / 2, z: c.z });
+    });
   }
   // On the half-size grid one hole a foot, towards its cell's corner on the 42 mm grid, as far from it as on a whole unit.
   const halfOffset = pitch / 2 - (GRIDFINITY_GRID / 2 - GRIDFINITY_MAGNET_OFFSET);
@@ -828,7 +869,84 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
   const wallRadius = type !== "bin" || GRIDFINITY_BIN_RADIUS - setWallRadius < CORNER_SNAP ? cornerRadius : setWallRadius;
   // A bin filled to the lip's top (#1126) has no lip edge left to chamfer.
   const filled = lip && floor === top + GRIDFINITY_LIP_HEIGHT;
-  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
+  return { type, count, lip, magnets, halfGrid: pitch !== GRIDFINITY_GRID, largePlate: type === "baseplate" && shape.gridfinityLargePlate === true, swallowtail, pockets, pitch, size, cells, outline, magnetHoles, top, base, dividerTop, floor, floorRounding, open, switched, notches, openingCorner, openingCornerSize, padding, centre, cornerRadius, wallRadius, lipChamfer: filled ? 0 : lipChamfer, wallThickness, innerRadius, solid, filled, reach: gridfinityOpenReach(wallThickness) };
+}
+
+/** Half a Swallowtail pocket (#1061): its side of the plate and the middle of that side's cell edge, in the plate's x and z. */
+export type GridfinityPocket = { side: GridfinityWall; x: number; z: number };
+
+/**
+ * The cutters of a Swallowtail plate's pockets (#1061), as outlines in the plate's x and z: the lip from below the
+ * underside to just over 0.6 mm, from 0.2 mm in from the plate's side, and the full pocket above it to 2 mm, running
+ * `past` beyond the side, so no face is shared.
+ */
+export function gridfinitySwallowtailCuts(plan: Pick<GridfinityPlan, "pockets">, past: number) {
+  // u runs in from the side, v along it: the pocket made `inset` smaller on each side, from `inset` in to its end, or
+  // whole from `past` outside the side.
+  const outline = (pocket: GridfinityPocket, inset: number) => {
+    const u0 = inset > 0 ? inset : -past;
+    const half = (u: number) => SWALLOWTAIL_NECK / 2 - inset + ((SWALLOWTAIL_WIDE - SWALLOWTAIL_NECK) / 2) * (u - inset) / (SWALLOWTAIL_LENGTH - inset);
+    const local: Array<[number, number]> = [[u0, -half(u0)], [SWALLOWTAIL_LENGTH, -half(SWALLOWTAIL_LENGTH)], [SWALLOWTAIL_LENGTH, half(SWALLOWTAIL_LENGTH)], [u0, half(u0)]];
+    const { side, x, z } = pocket;
+    return local.map(([u, v]) => (side === "right" ? { x: x - u, z: z + v } : side === "left" ? { x: x + u, z: z - v } : side === "back" ? { x: x - v, z: z + u } : { x: x + v, z: z - u }));
+  };
+  return plan.pockets.flatMap((pocket) => [
+    { outline: outline(pocket, SWALLOWTAIL_LIP), y0: -past, y1: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT + past },
+    { outline: outline(pocket, 0), y0: GRIDFINITY_SWALLOWTAIL_LIP_HEIGHT, y1: SWALLOWTAIL_DEPTH },
+  ]);
+}
+
+/**
+ * How many keys a shape brings as a Swallowtail plate (#1061): one for each pocket at its back and right, so that every
+ * pocket across a seam with the next plate gets one; none for any other shape.
+ */
+export function gridfinitySwallowtailKeyCount(shape: GridfinityShapeFields & Pick<WorkplaneShape, "kind">) {
+  if (shape.kind !== "gridfinity" || shape.gridfinitySwallowtail !== true) return 0;
+  return gridfinityPlan(shape).pockets.filter((pocket) => pocket.side === "back" || pocket.side === "right").length;
+}
+
+/** Where a plate's keys lie (#1061): in a row in front of its box, from its left, 4 mm apart, the key's middle at each. */
+export function gridfinitySwallowtailKeyPlaces(box: { minX: number; maxZ: number }, key: { width: number; depth: number }, count: number) {
+  return Array.from({ length: count }, (_, k) => ({ x: box.minX + key.width / 2 + k * (key.width + SWALLOWTAIL_KEY_SPACING), z: box.maxZ + SWALLOWTAIL_KEY_SPACING + key.depth / 2 }));
+}
+
+/**
+ * A plate's keys (#1061): copies of the built key in a row in front of the plate's box, in its colour on its level, each
+ * marked as the plate's, so that laying them out again replaces them (gridfinitySceneWithKeys).
+ */
+export function gridfinitySwallowtailKeys(plate: Pick<WorkplaneShape, "id" | "color">, box: { minX: number; maxZ: number; minY: number }, key: WorkplaneShape, keyDepth: number, count: number, name: string, newId: () => string): WorkplaneShape[] {
+  return gridfinitySwallowtailKeyPlaces(box, { width: key.width, depth: keyDepth }, count).map((place) => ({ ...key, id: newId(), name, gridfinityKeyOf: plate.id, color: plate.color, hole: false, x: place.x, z: place.z, elevation: box.minY }));
+}
+
+/** The scene with a plate's keys laid out (#1061): the keys laid out for it before give way. */
+export function gridfinitySceneWithKeys(shapes: WorkplaneShape[], plateId: string, keys: WorkplaneShape[]) {
+  return [...shapes.filter((shape) => shape.gridfinityKeyOf !== plateId), ...keys];
+}
+
+/**
+ * A Swallowtail key's outline (#1061), lying flat, its length along x and its middle at 0: two pocket halves back to
+ * back, 0.025 mm smaller than the pocket on every side, with a slot into each end so the end squeezes past the lip.
+ */
+export function gridfinitySwallowtailKeyOutline() {
+  const a = SWALLOWTAIL_LENGTH - SWALLOWTAIL_KEY_CLEARANCE;
+  const w = SWALLOWTAIL_WIDE / 2 - SWALLOWTAIL_KEY_CLEARANCE;
+  const n = SWALLOWTAIL_NECK / 2 - SWALLOWTAIL_KEY_CLEARANCE;
+  const s = SWALLOWTAIL_SLOT_WIDTH / 2;
+  const b = a - SWALLOWTAIL_SLOT_LENGTH;
+  return [
+    { x: 0, z: -n }, { x: a, z: -w }, { x: a, z: -s }, { x: b, z: -s }, { x: b, z: s }, { x: a, z: s }, { x: a, z: w },
+    { x: 0, z: n }, { x: -a, z: w }, { x: -a, z: s }, { x: -b, z: s }, { x: -b, z: -s }, { x: -a, z: -s }, { x: -a, z: -w },
+  ];
+}
+
+/** The key's outline as a sketch, for the key bodies a plate's Add keys lays out (#1061). */
+export function gridfinitySwallowtailKeyProfile(): SketchProfile {
+  const outline = gridfinitySwallowtailKeyOutline();
+  const ids = outline.map((_, k) => `swallowtail-key-${k}`);
+  return {
+    points: outline.map((p, k) => ({ id: ids[k], x: p.x, z: p.z, mode: "corner" as const })),
+    segments: outline.map((_, k) => ({ id: `${ids[k]}-s`, startId: ids[k], endId: ids[(k + 1) % ids.length], kind: "line" as const })),
+  };
 }
 
 /** A notch cut out of a side's wall, partly open (#455): from and to along the side (x across, z deep), its bottom's height. */
@@ -2385,10 +2503,10 @@ export function gridfinityCompartmentLabelsEqual(a: readonly GridfinityCompartme
   });
 }
 
-/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline: all need Manifold for the display mesh. */
+/** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline or has Swallowtail pockets: all need Manifold for the display mesh. */
 export function gridfinityHasPieces(shape: GridfinityShapeFields) {
   const plan = gridfinityPlan(shape);
-  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline);
+  return Boolean(gridfinityLabelPieces(shape) || gridfinityScoopPieces(shape) || gridfinityCompartments(shape) || plan.notches.length > 0 || plan.outline || plan.pockets.length > 0);
 }
 
 /**
@@ -2753,11 +2871,15 @@ export function gridfinityTriangles(shape: GridfinityShapeFields) {
     cap(loop, [], 0, -1);
     cap(loop, [], GRIDFINITY_BASEPLATE_HEIGHT, 1);
   } else {
-    sweep(outline, [[0, 0], [0, GRIDFINITY_BASEPLATE_HEIGHT]], 1);
+    // On a Swallowtail plate's floor (#1061) each socket ends on it; Manifold cuts the pockets (gridfinitySwallowtailTriangles).
+    const floor = plan.swallowtail ? GRIDFINITY_SWALLOWTAIL_FLOOR : 0;
+    sweep(outline, [[0, 0], [0, size.height]], 1);
+    if (floor) cap(distinctPoints(outline(0)), [], 0, -1);
     cells.forEach((cell) => {
-      sweep((inset) => cellOf(cell, inset), GRIDFINITY_SOCKET, -1);
-      ring(cellOf(cell, 0), cellBox(cell), GRIDFINITY_BASEPLATE_HEIGHT, 1);
-      ring(cellOf(cell, GRIDFINITY_SOCKET[0][0]), cellBox(cell), 0, -1, cellOf(cell, 0));
+      sweep((inset) => cellOf(cell, inset), GRIDFINITY_SOCKET.map(([inset, y]) => [inset, y + floor]), -1);
+      ring(cellOf(cell, 0), cellBox(cell), size.height, 1);
+      if (floor) cap(distinctPoints(cellOf(cell, GRIDFINITY_SOCKET[0][0])), [], floor, 1);
+      else ring(cellOf(cell, GRIDFINITY_SOCKET[0][0]), cellBox(cell), 0, -1, cellOf(cell, 0));
     });
   }
 
@@ -2795,12 +2917,13 @@ const LABEL_SLIVER = 1e-4;
  * shelves' convex pieces and the scoops' prisms joined to it by Manifold, which keeps the result
  * closed. Without any of them it is gridfinityTriangles. A bin with dividers is filled up to their top
  * and each compartment taken out of the fill, rounded and with its scoops, as the exact body is cut. A plate
- * fitted into an outline is gridfinityOutlineTriangles.
+ * fitted into an outline is gridfinityOutlineTriangles, a Swallowtail plate gridfinitySwallowtailTriangles.
  */
 export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: GridfinityShapeFields): Vec3[][] {
   const base = gridfinityTriangles(shape);
   const plan = gridfinityPlan(shape);
   if (plan.outline) return gridfinityOutlineTriangles(runtime, plan, base);
+  if (plan.pockets.length > 0) return gridfinitySwallowtailTriangles(runtime, plan, base);
   const pieces = gridfinityLabelPieces(shape);
   const compartments = gridfinityCompartmentPieces(shape);
   // A bin with dividers has its scoops in its compartments.
@@ -2970,6 +3093,30 @@ function gridfinityOutlineTriangles(runtime: ManifoldToplevel, plan: GridfinityP
   } catch {
     // The plate is drawn as its plain slab rather than not at all.
     return slabTriangles;
+  } finally {
+    new Set(made).forEach((value) => value.delete());
+  }
+}
+
+/**
+ * A Swallowtail plate (#1061) as closed triangles: the plate on its floor less its pockets, each cutter the hull of its
+ * outline's corners, cut by Manifold as the exact body is; the plate without them if that fails.
+ */
+function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: GridfinityPlan, plateTriangles: Vec3[][]): Vec3[][] {
+  const { Manifold } = runtime;
+  const made: Array<{ delete: () => void }> = [];
+  const keep = <T extends { delete: () => void }>(value: T) => {
+    made.push(value);
+    return value;
+  };
+  try {
+    const plate = keep(manifoldOfTriangles(runtime, plateTriangles));
+    const cutters = gridfinitySwallowtailCuts(plan, SWALLOWTAIL_PAST).map(({ outline, y0, y1 }) => keep(Manifold.hull(outline.flatMap((p): Vec3[] => [[p.x, y0, p.z], [p.x, y1, p.z]]))));
+    const result = keep(keep(plate.subtract(keep(Manifold.union(cutters)))).simplify(LABEL_SLIVER));
+    return result.status() === "NoError" ? trianglesOfManifold(result) : plateTriangles;
+  } catch {
+    // The plate is drawn on its floor without its pockets rather than not at all.
+    return plateTriangles;
   } finally {
     new Set(made).forEach((value) => value.delete());
   }

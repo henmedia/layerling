@@ -3,9 +3,13 @@ import * as THREE from "three";
 /** More triangles than this are not walked for the cut line: the plane is drawn all the same, and the line is left out. */
 export const SPLIT_OUTLINE_MAX_TRIANGLES = 600_000;
 
+/** A corner this close to the plane (mm) lies on it. */
+const ON_PLANE = 1e-5;
+
 /**
  * Where a plane meets the surfaces of some meshes: pairs of points (x, y, z, x, y, z) in world space, one pair
- * for each triangle the plane crosses. The cut line of the split tool (#615).
+ * for each triangle the plane crosses. The cut line of the split tool (#615). A plane laid exactly on a face - a
+ * lid cut at its plate's thickness (#1263) - meets the walls along their edges: those edges are the line.
  */
 export function planeCrossingSegments(meshes: readonly THREE.Mesh[], origin: readonly [number, number, number], planeNormal: readonly [number, number, number]): number[] {
   const points: number[] = [];
@@ -34,8 +38,17 @@ export function planeCrossingSegments(meshes: readonly THREE.Mesh[], origin: rea
         const vertex = index ? index.getX(triangle * 3 + k) : triangle * 3 + k;
         corner[k].fromBufferAttribute(position, vertex).applyMatrix4(mesh.matrixWorld);
         distance[k] = normal.dot(crossing.copy(corner[k]).sub(start));
+        if (Math.abs(distance[k]) < ON_PLANE) distance[k] = 0;
       }
       if ((distance[0] > 0 && distance[1] > 0 && distance[2] > 0) || (distance[0] < 0 && distance[1] < 0 && distance[2] < 0)) continue;
+      const onPlane = [0, 1, 2].filter((k) => distance[k] === 0);
+      // A triangle lying in the plane draws nothing; its border is drawn by the walls round it.
+      if (onPlane.length === 3) continue;
+      if (onPlane.length === 2) {
+        const [a, b] = onPlane;
+        points.push(corner[a].x, corner[a].y, corner[a].z, corner[b].x, corner[b].y, corner[b].z);
+        continue;
+      }
       const found: number[] = [];
       for (let k = 0; k < 3; k += 1) {
         const next = (k + 1) % 3;

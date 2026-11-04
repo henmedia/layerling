@@ -3411,6 +3411,60 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
   box-shadow: none;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread {
+  border: 2px solid #fafafa;
+  background: #2a2a2a;
+  color: #fafafa;
+  box-shadow: 0 1px 5px rgba(33, 33, 33, 0.32);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread-icon {
+  fill: none;
+  stroke: currentColor;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread:focus-visible:not(:disabled) {
+  background: #e17709;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(173, 89, 0, 0.18), 0 1px 5px rgba(33, 33, 33, 0.32);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread.disabled,
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread:disabled {
+  background: #909090;
+  box-shadow: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-gap-field {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  color: var(--foreground);
+  box-shadow: 0 4px 16px rgba(33, 33, 33, 0.22);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-gap-field input {
+  border: 1px solid var(--border-strong);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-gap-unit {
+  color: var(--muted-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-gap-field button[type="submit"] {
+  border: 0;
+  background: var(--primary);
+  color: #fff;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-gap-close {
+  border: 0;
+  background: none;
+  color: var(--muted-strong);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .mirror-guides line {
   stroke: rgba(173, 89, 0, 0.78);
 }

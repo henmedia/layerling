@@ -72,7 +72,7 @@ Oben steht der Dateiname, darunter wählst du das Format. Ist etwas markiert, wi
 
 Eine Aussparung, die du nicht gruppiert hast, zieht der Export von jedem Körper ab, den sie berührt, so wie die Ansicht es zeigt. Du musst also nicht vor jedem Export gruppieren. Mit einer Auswahl zählen nur die ausgewählten Aussparungen. Allein lässt sich eine Aussparung nicht exportieren; darauf weist dich layerling hin.
 
-STEP enthält nur exakte CAD-Körper. Was sich nicht exakt abbilden lässt, etwa ein als STL importiertes Netz, bleibt draußen. Die Meldung nach dem Export nennt diese Körper beim Namen und sagt, warum. Für den Drucker nimmst du dann STL oder 3MF, die tragen alles.
+STEP enthält nur exakte CAD-Körper. Ein importiertes Netz wird für die Datei exakt gemacht, wie es {{ui:editor.tool.makeExact}} tut (siehe „Ein importiertes Netz exakt machen“ weiter unten); dadurch kann der Export bis zu einer Minute dauern. Ein überwiegend freiförmiges Netz wie eine Figur bleibt draußen, ebenso alles andere, was sich nicht exakt abbilden lässt. Die Meldung nach dem Export nennt diese Körper beim Namen und sagt, warum. Für den Drucker nimmst du dann STL oder 3MF, die tragen alles.
 
 ### SVG für Laser und Plotter
 
@@ -112,9 +112,17 @@ Bilder als Vorlage fügst du im Skizzenmodus ein, siehe [Skizzen](chapter:skizze
 
 ## Ein importiertes Netz vereinfachen
 
-Ein gescanntes oder modelliertes Netz hat oft weit mehr Dreiecke, als seine Form braucht, und jedes davon wird beim Verschieben, Schneiden und Speichern mitgeschleppt. {{ui:simplify.title}} in der Gruppe Ändern (oder im Rechtsklickmenü des Körpers) zeigt das Netz, wie es ist, neben dem, was ein gewählter Anteil seiner Dreiecke davon übrig lässt; beide Ansichten drehen und zoomen gemeinsam, mit den Maustasten der Arbeitsebene. Lege fest, wie viel bleiben soll, als Prozentsatz oder als Zahl von Dreiecken, und {{ui:simplify.apply}} übernimmt das leichtere Netz. Das Ergebnis ist ein einfaches Netz: Beim Ergebnis eines Schnitts oder einer Vereinigung entfallen {{ui:group.edit}} und die ursprünglichen Teile.
+Ein gescanntes oder modelliertes Netz hat oft weit mehr Dreiecke, als seine Form braucht, und jedes davon wird beim Verschieben, Schneiden und Speichern mitgeschleppt. {{ui:simplify.title}} in der Gruppe Ändern (oder im Rechtsklickmenü des Körpers) zeigt das Netz, wie es ist, neben dem, was ein gewählter Anteil seiner Dreiecke davon übrig lässt; beide Ansichten drehen und zoomen gemeinsam, mit den Maustasten der Arbeitsebene. Lege fest, wie viel bleiben soll, als Prozentsatz oder als Zahl von Dreiecken, und {{ui:simplify.apply}} übernimmt das leichtere Netz. Das Ergebnis ist ein einfaches Netz: Beim Ergebnis eines Schnitts oder einer Vereinigung entfallen {{ui:group.edit}} und die ursprünglichen Teile. Mit eingeschaltetem {{ui:simplify.keepEdges}}, wie es anfangs ist, bleiben scharfe Kanten und die Ränder von Bohrungen genau, wo sie sind, während ebene Flächen trotzdem die meisten Dreiecke verlieren; ausgeschaltet darf das Vereinfachen sie für weniger Dreiecke abrunden.
 
 Schneiden, Vereinigen und Schnittmengen mit einem importierten Netz werden in deinem Browser berechnet, darum begrenzen die Arbeitsbereich-Einstellungen, wie viele Dreiecke so ein Netz haben darf ({{ui:workspace.booleanTriangleLimit}}). Ein Netz über der Grenze wird nicht verarbeitet, und die Meldung nennt seine Dreieckszahl; vereinfache das Netz zuerst oder hebe die Grenze an, wenn dein Rechner das verträgt.
+
+## Ein importiertes Netz exakt machen
+
+Eine STL-, OBJ- oder 3MF-Datei enthält nur Dreiecke, auch wenn das Teil im CAD mit ebenen Flächen und runden Bohrungen gezeichnet wurde. {{ui:editor.tool.makeExact}} in der Gruppe {{ui:editor.group.modify}} (oder im Rechtsklickmenü des Körpers) sucht in diesen Dreiecken die Ebenen, Zylinder, Kegel, Kugeln und Tori, aus denen sie entstanden sind, und baut den Körper daraus als exakten CAD-Körper neu: Eine Bohrung wird ein echter Zylinder mit rundem Rand statt hundert schmaler Streifen. Danach folgen {{ui:editor.tool.fillet}} und {{ui:editor.tool.chamfer}} einer sauberen Kante, {{ui:editor.tool.deleteFace}} nimmt eine ganze Rundung oder die Wand einer Bohrung weg, und ein STEP-Export trägt die echten Flächen. Die Statuszeile sagt, was gefunden wurde, etwa „Ebenen: 9, Zylinder: 4“.
+
+Was zu keiner dieser Flächen passt, bleibt als kleine ebene Facetten, und die Meldung sagt, wie viel der Oberfläche das ist. Ein überwiegend freiförmiger Körper wie eine Figur oder eine modellierte Form bleibt ein Netz, ebenso ein Netz mit Lücken oder sich kreuzenden Wänden, das sich nicht zu einem Körper schließen kann. Bis zu 400.000 Dreiecke werden angenommen, und ein großes Netz kann ein paar Minuten brauchen. Ein größeres Netz bringst du vorher mit {{ui:simplify.title}} und eingeschaltetem {{ui:simplify.keepEdges}} darunter; sonst nimm das Netz, wie es kam, so wird es am saubersten. Ein Rückgängig-Schritt holt das Netz zurück.
+
+Bei einem kleinen Netz mit runden Flächen, bis 4.000 Dreiecke, machen die Kantenwerkzeuge das von selbst: Wer eine Kante einer solchen STL abrundet, bekommt sie zuerst auf dieselbe Weise neu gebaut.
 
 ## Einen Fehler melden
 

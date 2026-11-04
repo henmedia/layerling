@@ -133,8 +133,9 @@ export function removeLooseSplinters(mesh: MeshData): { mesh: MeshData; removed:
       // A handful of triangles is never a part, open or closed, when it is tiny or a thin shard.
       if (solid < SPLINTER_MAX_VOLUME || solid < boxVolume * SPLINTER_THIN_SHARE) splinters.add(root);
     } else if ((triangles.get(root) ?? 0) <= SPLINTER_MAX_TRIANGLES_TINY && openRoots.has(root)) {
-      // An open shell holds no volume at all: the leftover of a cut, a sheet of no thickness.
-      splinters.add(root);
+      // An open shell holds (almost) no volume: the leftover of a cut, a sheet of no thickness. A piece that does hold
+      // something is a part someone drew whose corners the weld did not join (a dot, a plank of a logo, #1258).
+      if (solid < SPLINTER_MAX_VOLUME || solid < boxVolume * SPLINTER_THIN_SHARE) splinters.add(root);
     } else if (solid < SPLINTER_MAX_VOLUME) {
       // A closed shell, or one of many triangles, goes when it is that tiny; a thin ring stays.
       splinters.add(root);

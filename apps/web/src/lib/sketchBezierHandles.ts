@@ -87,3 +87,20 @@ export function displayedHandle(profile: SketchProfile, point: SketchPoint, whic
   const neighbour = neighbourId ? profile.points.find((entry) => entry.id === neighbourId) : null;
   return neighbour ? thirdToward(point, neighbour) : handle;
 }
+
+/**
+ * Where a handle lies from its own point, as it is drawn (#1250): the numbers its fields show. Undefined when the
+ * point has no such handle.
+ */
+export function handleOffset(profile: SketchProfile, point: SketchPoint, which: "in" | "out"): Pt | undefined {
+  const at = displayedHandle(profile, point, which);
+  return at ? { x: at.x - point.x, z: at.z - point.z } : undefined;
+}
+
+/** Where a handle goes for a typed offset from its point, kept on the plate as a dragged one is (#1250). */
+export function handleAtOffset(point: Pt, offset: Pt, reach: { halfWidth: number; halfDepth: number }): Pt {
+  return {
+    x: Math.min(reach.halfWidth, Math.max(-reach.halfWidth, point.x + offset.x)),
+    z: Math.min(reach.halfDepth, Math.max(-reach.halfDepth, point.z + offset.z)),
+  };
+}

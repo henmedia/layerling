@@ -13,7 +13,7 @@ import { sphereTessellation } from "@/lib/sphereTessellation";
 import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices } from "@/lib/groupScale";
-import { dropSplitSlivers, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { dropSplitSlivers, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { canonicalizeShape, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, mirrorSign, normalizeDegrees, resizedImportedCoordinates, resizedShapeSize, shapeDepth, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth, withHoleMode } from "@/lib/workplaneShapes";
@@ -840,7 +840,7 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<Model
       return { parts: null, error: t("split.error.overlapping") };
     }
     solid = normalized.solid;
-    const [rawPositive, rawNegative] = solid.splitByPlane(plane.normal, plane.position);
+    const [rawPositive, rawNegative] = splitByPlaneClearOfFaces(solid, plane.normal, plane.position);
     created.push(rawPositive, rawNegative);
     const trimmedPositive = dropSplitSlivers(runtime, rawPositive);
     const trimmedNegative = dropSplitSlivers(runtime, rawNegative);
@@ -1612,14 +1612,36 @@ async function manifoldBooleanMeshShape(selection: WorkplaneShape[], triangleLim
  */
 const CUT_STEP_TOLERANCE = CUTTER_PADDING * 2;
 
+/**
+ * Whether folding thin walls away left the solid's shape alone. Folding a step a few thousandths high moves next to no
+ * volume and surface, but the kernel can also fold a whole corner into one slanted face: in a housing grouped with its
+ * holes, the corner of a block beside a round dent lost 51 mm³ and 371 mm² that way (Discussion #1272). Such a fold
+ * is not taken; the solid then keeps its thin steps, which only show as fine lines.
+ */
+export function foldKeptShape(before: { volume: number; area: number }, after: { volume: number; area: number }) {
+  const volumeChange = Math.abs(after.volume - before.volume);
+  const areaChange = Math.abs(after.area - before.area);
+  return volumeChange <= Math.max(0.05, Math.abs(before.volume) * 1e-4) && areaChange <= Math.max(1, before.area * 1e-3);
+}
+
+function measured(solid: ManifoldSolid) {
+  return { volume: solid.volume(), area: solid.surfaceArea() };
+}
+
+/** The solid with walls thinner than `tolerance` folded away by the kernel, or the solid as it was when that fails or changes its shape. */
+function foldedThinWalls(source: ManifoldSolid, result: ManifoldSolid, tolerance: number, created: ManifoldSolid[]): ManifoldSolid {
+  const tidy = source.setTolerance(tolerance);
+  created.push(tidy);
+  if (tidy.status() !== "NoError" || tidy.numTri() < 1) return result;
+  return foldKeptShape(measured(result), measured(tidy)) ? tidy : result;
+}
+
 function foldCutterPaddingSteps(result: ManifoldSolid, created: ManifoldSolid[]): ManifoldSolid {
   // The step's floor comes from the hole and its rim from the part: the kernel folds only within one source mesh, so
   // the result is taken as a mesh of its own first. Nothing reads the triangles' source afterwards.
   const whole = result.asOriginal();
   created.push(whole);
-  const tidy = whole.setTolerance(CUT_STEP_TOLERANCE);
-  created.push(tidy);
-  return tidy.status() === "NoError" && tidy.numTri() > 0 ? tidy : result;
+  return foldedThinWalls(whole, result, CUT_STEP_TOLERANCE, created);
 }
 
 /** How thin (mm) a triangle of a merged group may be before the kernel folds it away: well above the viewer's 1/10,000 mm, far below anything printable. */
@@ -1660,9 +1682,7 @@ function manifoldUnionMeshShapeWithRuntime(
     // edge lines drew the unpaired edges as stray strokes across a see-through group. The kernel folds them away,
     // keeping the merged boundary cleaner.
     if (options.requireImported === false) {
-      const tidy = result.setTolerance(MERGE_SLIVER_TOLERANCE);
-      created.push(tidy);
-      if (tidy.status() === "NoError" && tidy.numTri() > 0) result = tidy;
+      result = foldedThinWalls(result, result, MERGE_SLIVER_TOLERANCE, created);
     }
     const positions = manifoldMeshToPositions(result.getMesh());
     const group = meshPositionsToGroupShape(selection, solids, positions, "grouped-manifold-union", groupChildren);

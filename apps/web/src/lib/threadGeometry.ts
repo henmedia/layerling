@@ -65,6 +65,8 @@ const V_DEPTH_PER_PITCH = (5 / 8) * (Math.sqrt(3) / 2);
 const MAX_FLANK_SHARE_PER_PITCH = 0.9;
 const MIN_DEPTH_PER_PITCH = 0.1;
 const MAX_DEPTH_PER_DIAMETER = 0.4;
+/** A tapered pipe thread (NPT, also BSPT and R) narrows 1 in 16 on the diameter. */
+export const THREAD_TAPER_PER_DIAMETER = 1 / 16;
 export const MIN_THREAD_QUALITY = 12;
 export const MAX_THREAD_QUALITY = 96;
 
@@ -101,6 +103,8 @@ export type ThreadSizeSpec = {
   /** Ein eigenes Profil ("custom"): Gewindetiefe in mm und Flankenwinkel in Grad, wie die Norm sie vorgibt. */
   depth?: number;
   flankAngle?: number;
+  /** Tapered 1 in 16, as NPT: the diameter is the wide end's. */
+  taper?: boolean;
   /** Schluesselweite des Innensechskants. */
   socket: number;
   /** Zylinderkopf nach ISO 4762. */
@@ -263,6 +267,48 @@ const PIPE_SIZES: readonly ThreadSizeSpec[] = PIPE_ROWS.map((row) => ({
 }));
 
 /**
+ * The American tapered pipe thread NPT (ASME B1.20.1, Discussion #1267): 60 degree flanks, flat
+ * crests and roots, tapered 1 in 16 on the diameter. The diameter is the pipe's outside diameter,
+ * which the thread has at its wide end; the threads per inch are the standard's, 11.5 from 1" to 2".
+ * The standard's thread height is 0.8 pitch; at 60 degrees the own profile leaves crest and root a
+ * tenth of the pitch, which makes it 0.779 pitch - within the standard's truncation.
+ */
+const NPT_ROWS: ReadonlyArray<{ label: string; outside: number; threadsPerInch: number }> = [
+  { label: "1/16", outside: 0.3125, threadsPerInch: 27 },
+  { label: "1/8", outside: 0.405, threadsPerInch: 27 },
+  { label: "1/4", outside: 0.54, threadsPerInch: 18 },
+  { label: "3/8", outside: 0.675, threadsPerInch: 18 },
+  { label: "1/2", outside: 0.84, threadsPerInch: 14 },
+  { label: "3/4", outside: 1.05, threadsPerInch: 14 },
+  { label: "1", outside: 1.315, threadsPerInch: 11.5 },
+  { label: "1 1/4", outside: 1.66, threadsPerInch: 11.5 },
+  { label: "1 1/2", outside: 1.9, threadsPerInch: 11.5 },
+  { label: "2", outside: 2.375, threadsPerInch: 11.5 },
+  { label: "2 1/2", outside: 2.875, threadsPerInch: 8 },
+  { label: "3", outside: 3.5, threadsPerInch: 8 },
+  { label: "3 1/2", outside: 4, threadsPerInch: 8 },
+  { label: "4", outside: 4.5, threadsPerInch: 8 },
+];
+
+const NPT_DEPTH_PER_PITCH = 0.779;
+
+const NPT_SIZES: readonly ThreadSizeSpec[] = NPT_ROWS.map((row) => {
+  const diameter = Math.round(row.outside * MILLIMETRES_PER_INCH * 1000) / 1000;
+  const pitch = MILLIMETRES_PER_INCH / row.threadsPerInch;
+  return {
+    id: `${row.label}" NPT`,
+    system: "pipe",
+    diameter,
+    pitch,
+    ...proportionalHeadSizes(diameter),
+    profile: "custom",
+    depth: Math.round(pitch * NPT_DEPTH_PER_PITCH * 1000) / 1000,
+    flankAngle: 60,
+    taper: true,
+  };
+});
+
+/**
  * Flaschenhaelse (#1079). PCO 1881 ist der 28-mm-Hals der meisten Wasser- und
  * Limoflaschen: eingaengig, 2,7 mm Steigung, aussen 27,4 mm, Kern 24,2 mm, also
  * 1,6 mm tief, mit 15 Grad je Flanke und breiten flachen Kuppen - kein
@@ -305,8 +351,8 @@ const BOTTLE_SIZES: readonly ThreadSizeSpec[] = [
   },
 ];
 
-/** Die Reihen im Groessenmenue: metrisches Regelgewinde, Zoll grob und fein, Rohrgewinde G, Flaschenhaelse. */
-export type ThreadSeries = "metric" | "UNC" | "UNF" | "G" | "bottle";
+/** Die Reihen im Groessenmenue: metrisches Regelgewinde, Zoll grob und fein, Rohrgewinde G und NPT, Flaschenhaelse. */
+export type ThreadSeries = "metric" | "UNC" | "UNF" | "G" | "NPT" | "bottle";
 
 /**
  * Was das Groessenmenue zu jeder Reihe zeigt: eine kurze Ueberschrift ueber
@@ -319,6 +365,7 @@ export const THREAD_SERIES_TEXT = {
   UNC: { group: "thread.group.UNC", hint: "thread.hint.UNC" },
   UNF: { group: "thread.group.UNF", hint: "thread.hint.UNF" },
   G: { group: "thread.group.G", hint: "thread.hint.G" },
+  NPT: { group: "thread.group.NPT", hint: "thread.hint.NPT" },
   bottle: { group: "thread.group.bottle", hint: "thread.hint.bottle" },
 } as const satisfies Record<ThreadSeries, { group: MessageKey; hint: MessageKey }>;
 
@@ -327,6 +374,7 @@ export const THREAD_SIZE_GROUPS: ReadonlyArray<{ series: ThreadSeries; sizes: re
   { series: "UNC", sizes: INCH_COARSE_SIZES },
   { series: "UNF", sizes: INCH_FINE_SIZES },
   { series: "G", sizes: PIPE_SIZES },
+  { series: "NPT", sizes: NPT_SIZES },
   { series: "bottle", sizes: BOTTLE_SIZES },
 ];
 
@@ -343,11 +391,14 @@ function pipeSizeAt(diameter: number) {
  * Ob die Steigung als Gaenge je Zoll abgefragt wird. Entschieden wird das am
  * Durchmesser, nicht an der gewaehlten Groesse: so bleibt das Feld stehen,
  * waehrend man die Gangzahl von einem Normwert wegdreht. Auch das
- * Rohrgewinde zaehlt seine Gaenge je Zoll.
+ * Rohrgewinde zaehlt seine Gaenge je Zoll, G wie NPT. (NPT bleibt aus
+ * `pipeSizeAt` heraus: 1/16" NPT hat den Durchmesser von 5/16" UNC, und der
+ * soll seine Schraubensteigung behalten.)
  */
 export function threadUsesInchPitch(diameter: number) {
   return INCH_ROWS.some((row) => Math.abs(row.diameter * MILLIMETRES_PER_INCH - diameter) < SIZE_MATCH_TOLERANCE)
-    || pipeSizeAt(diameter) !== null;
+    || pipeSizeAt(diameter) !== null
+    || NPT_SIZES.some((size) => Math.abs(size.diameter - diameter) < SIZE_MATCH_TOLERANCE);
 }
 
 /** Aus Millimetern Steigung werden Gaenge je Zoll - und zurueck. */
@@ -383,6 +434,16 @@ export function threadSizeFor(diameter: number, pitch: number): ThreadSizeSpec |
   )) ?? null;
 }
 
+/**
+ * The standard size a thread is, as the size menu and the bridge name it: diameter and pitch of
+ * the size, and tapered as it is (#1267) - a straight thread at an NPT size's measures, or a
+ * tapered M6, is no standard size.
+ */
+export function threadStandardSize(settings: Pick<ThreadSettings, "diameter" | "pitch" | "taper">): ThreadSizeSpec | null {
+  const size = threadSizeFor(settings.diameter, settings.pitch);
+  return size && Boolean(size.taper) === settings.taper ? size : null;
+}
+
 /** Kopf- und Mutternmasse: aus der Norm, wo der Durchmesser eine ist, sonst gerechnet. */
 export function threadSizeSpec(diameter: number, pitch: number): ThreadSizeSpec {
   return threadSizeFor(diameter, pitch) ?? derivedSizeSpec(diameter);
@@ -408,7 +469,9 @@ export function threadProfileForSize(size: ThreadSizeSpec, current: ThreadProfil
  * Was die Wahl einer Normgroesse am Gewinde setzt. Ein Flaschenhals bringt sein
  * eigenes Profil mit Tiefe und Flankenwinkel mit, immer - sonst passt der
  * Deckel nicht. Wer von dort zu einer anderen Groesse geht, bekommt deren
- * Normprofil zurueck, denn das eigene Profil war ja das des Halses.
+ * Normprofil zurueck, denn das eigene Profil war ja das des Halses. Ebenso
+ * der Kegel (#1267): eine NPT-Groesse schaltet ihn ein, wer von dort zu einer
+ * anderen Groesse geht, bekommt ein gerades Gewinde; sonst bleibt er, wie er ist.
  */
 export function threadSizeSettings(size: ThreadSizeSpec, current: ThreadProfile, from: ThreadSizeSpec | null) {
   const profile = size.depth !== undefined
@@ -420,6 +483,7 @@ export function threadSizeSettings(size: ThreadSizeSpec, current: ThreadProfile,
     profile,
     ...(size.depth !== undefined ? { depth: size.depth } : {}),
     ...(size.flankAngle !== undefined ? { flankAngle: size.flankAngle } : {}),
+    ...(size.taper ? { taper: true } : from?.taper ? { taper: false } : {}),
   };
 }
 
@@ -643,6 +707,7 @@ export type ThreadShapeFields = {
   threadHead?: ThreadHead;
   threadHand?: ThreadHand;
   threadProfile?: ThreadProfile;
+  threadTaper?: boolean;
   threadDiameter?: number;
   threadPitch?: number;
   threadClearance?: number;
@@ -668,6 +733,8 @@ export type ThreadSettings = {
   head: ThreadHead;
   hand: ThreadHand;
   profile: ThreadProfile;
+  /** Tapered 1 in 16 on the diameter, as the pipe thread NPT (Discussion #1267); `diameter` is then the wide end's. */
+  taper: boolean;
   diameter: number;
   pitch: number;
   clearance: number;
@@ -713,6 +780,7 @@ export function threadSettings(shape: ThreadShapeFields): ThreadSettings {
     ...head,
     hand: normalizeThreadHand(shape.threadHand),
     profile,
+    taper: shape.threadTaper === true,
     clearance: normalizeThreadClearance(shape.threadClearance),
     boltClearance: normalizeThreadBoltClearance(shape.threadBoltClearance),
     axialClearance: normalizeThreadAxialClearance(shape.threadAxialClearance, head.pitch),
@@ -1807,6 +1875,16 @@ export function threadBuildPlan(options: ThreadGeometryOptions) {
   // Nach innen geschnittene Gewinde bekommen die Fase andersherum: dort muss
   // der Werkzeugkoerper weiter werden, nicht schmaler.
   const inward = settings.role === "bore" || settings.role === "nut";
+  /*
+   * A tapered thread (Discussion #1267) is 1 in 16 on the diameter: every radius of it, crest,
+   * flank and root, shrinks by 1/32 of the way from its wide end. That end has the set diameter, so
+   * nothing grows past the straight thread. An outside thread is wide where it starts (at the head
+   * or the bottom) and narrows to its tip at the top; an inside one is wide at its mouth at the top,
+   * where the pipe comes in from above, and narrows downwards. The shift at height y is
+   * `taperSlope * (y - taperAt)`; mesh and exact body both take it from here.
+   */
+  const taperSlope = settings.taper ? ((inward ? 1 : -1) * THREAD_TAPER_PER_DIAMETER) / 2 : 0;
+  const taperAt = inward ? height : shaftBottom;
 
   /*
    * Die Aussenfase: zwei Kegel um die Achse, einer an jedem Ende. Jeder
@@ -1846,6 +1924,8 @@ export function threadBuildPlan(options: ThreadGeometryOptions) {
     chamferLow,
     chamferBottom,
     inward,
+    taperSlope,
+    taperAt,
     rimRadii,
     rimChamfer,
     rimBroken: rimChamfer > 0.001,
@@ -1870,22 +1950,28 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
   const topBroken = chamfer > 0;
   // A cone at a mouth of an inside thread goes on, at 45 degrees, down to the core: it ends where
   // it has cut the crests away, not on a ledge at the outer diameter (#269).
-  const reach = major - minor;
+  // A tapered thread (#1267): every radius at height y shifted alike (every point of the thread wall goes through
+  // limitRadius, so the shift goes in there), and each chamfer cone starts at 45 degrees from the outer diameter at its
+  // own end face, as the exact body cuts it.
+  const { taperSlope, taperAt } = plan;
+  const shift = (y: number) => taperSlope * (y - taperAt);
+  const majorLow = major + shift(shaftBottom);
+  const majorTop = major + shift(height);
   const limitRadius = !lowBroken && !topBroken
-    ? (_y: number, radius: number) => radius
+    ? (y: number, radius: number) => Math.max(0.02, radius + shift(y))
     : inward
       ? (y: number, radius: number) => {
-        const fromBottom = lowBroken ? chamferLow - (y - shaftBottom) : -Infinity;
-        const fromTop = topBroken ? chamfer - (height - y) : -Infinity;
-        const cut = Math.max(fromBottom, fromTop);
-        return cut <= -reach ? radius : Math.max(radius, major + cut);
+        const fromBottom = lowBroken ? majorLow + chamferLow - (y - shaftBottom) : -Infinity;
+        const fromTop = topBroken ? majorTop + chamfer - (height - y) : -Infinity;
+        // Below the core the cone cuts nothing: the larger radius is the wall's own.
+        return Math.max(radius + shift(y), fromBottom, fromTop);
       }
       : (y: number, radius: number) => {
-        const fromBottom = lowBroken ? chamferLow - (y - shaftBottom) : 0;
-        const fromTop = topBroken ? chamfer - (height - y) : 0;
-        const cut = Math.max(0, fromBottom, fromTop);
-        if (cut <= 0) return radius;
-        return Math.min(radius, Math.max(0.05, major - cut));
+        const fromBottom = lowBroken ? majorLow - chamferLow + (y - shaftBottom) : Infinity;
+        const fromTop = topBroken ? majorTop - chamfer + (height - y) : Infinity;
+        const cone = Math.min(fromBottom, fromTop);
+        const here = Math.max(0.02, radius + shift(y));
+        return here <= cone ? here : Math.min(here, Math.max(0.05, cone));
       };
   const spanTurns = Math.ceil((height - shaftBottom) / settings.pitch) + 4;
   const bandHeight = !lowBroken && !topBroken ? 0 : Math.max(topBroken ? chamfer : 0, lowBroken ? chamferLow : 0) + settings.pitch;

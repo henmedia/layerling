@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ownSizeAlong, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
+import { alignBounds, ownSizeAlong, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
 import { meshAabb } from "@/lib/editorMeshCore";
 import type { AlignAxis, AlignTarget, WorkplaneShape } from "@/types/layerling";
 
@@ -131,5 +131,29 @@ describe("align by size (#998)", () => {
     expect(sizeAlignmentState(shapes, null, "x", "max")).toEqual({ aligned: false, wouldChange: true });
     const tilted = [box("a", -20, 0, 10, 10, 10, { rotation: 30 }), box("b", 20, 0, 30)];
     expect(sizeAlignmentState(tilted, "b", "x", "center")).toEqual({ aligned: false, wouldChange: false });
+  });
+});
+
+describe("alignBounds (Discussion #1266)", () => {
+  it("measures a twisted part once and gives the same box as meshAabb, along the world and along a workplane", () => {
+    const twisted = box("t", 5, -3, 40, 40, 40, { extrudeTwist: 180 });
+    const world = alignBounds(twisted);
+    expect(world).toEqual(meshAabb(twisted));
+    const started = performance.now();
+    for (let i = 0; i < 20; i += 1) alignBounds(twisted);
+    expect(performance.now() - started).toBeLessThan(50);
+    const turned = { x: { x: 0, y: 0, z: 1 }, y: { x: 0, y: 1, z: 0 }, z: { x: -1, y: 0, z: 0 } };
+    const along = alignBounds(twisted, turned);
+    expect(along.minX).toBeCloseTo(world.minZ, 6);
+    expect(along.maxX).toBeCloseTo(world.maxZ, 6);
+  });
+
+  it("hands out a copy, and a changed part (a new object) is measured again", () => {
+    const part = box("p", 0, 0, 10);
+    const first = alignBounds(part);
+    first.maxX = 999;
+    expect(alignBounds(part).maxX).toBeCloseTo(5, 6);
+    const moved = { ...part, x: 20 };
+    expect(alignBounds(moved).maxX).toBeCloseTo(25, 6);
   });
 });

@@ -1,7 +1,7 @@
 import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { GRIDFINITY_PADDING_KEYS, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
-import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings } from "@/lib/threadGeometry";
+import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings, threadStandardSize } from "@/lib/threadGeometry";
 
 /**
  * Die formeigenen Werte, die eine Zusammenfassung sonst verschweigt: Ohne sie
@@ -29,7 +29,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "taperTopWidth", "taperTopDepth", "taperBottomWidth", "taperBottomDepth",
   "extrudeTwist", "extrudeTopOffsetX", "extrudeTopOffsetZ", "slopeEnd", "slopeSide", "slopeCurve", "narrowEnd", "narrowSide", "narrowCurve", "narrowStart",
   "teeth", "toothSize", "toothWidth", "centerHoleSize", "gearType", "helixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
-  "threadRole", "threadHead", "threadHand", "threadProfile", "threadDiameter", "threadPitch",
+  "threadRole", "threadHead", "threadHand", "threadProfile", "threadTaper", "threadDiameter", "threadPitch",
   "threadClearance", "threadBoltClearance", "threadAxialClearance", "threadDepth", "threadFlankAngle", "threadQuality", "threadHeadHeight", "threadChamfer", "threadChamferBottom",
   "threadHeadChamfer", "threadHeadDiameter", "threadDrive", "threadDriveSize", "threadDriveDepth", "threadCollarHeight", "threadCollarDiameter",
   "springTurns", "springWire", "springQuality", "springHand", "springForm", "springPattern", "springEnds",
@@ -37,7 +37,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "heartTipFillet", "heartQuality",
   "crescentThickness", "crescentTipFillet", "crescentQuality",
   "tubeBoreHole", "hingeKnuckles", "hingeKnuckleWidth", "hingeStyle", "hingeConeSize", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingePinless", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeScrewCountersink", "hingeCornerRadius", "hingeLeafStyle", "hingeScrewHead", "hingeNutWidth",
-  "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate",
+  "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail",
   "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCorner", "gridfinityLabelCornerSize",
   "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
   "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize", "gridfinityOutline",
@@ -64,7 +64,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
  * unveraendert zurueck. Passen sie nicht, ist das ein Widerspruch, den
  * niemand still aufloesen sollte.
  */
-export function mcpThreadSizeParams(params: Record<string, unknown>, currentProfile: ThreadProfile): Record<string, unknown> {
+export function mcpThreadSizeParams(params: Record<string, unknown>, currentProfile: ThreadProfile, currentTaper = false): Record<string, unknown> {
   const requested = params.threadSize;
   if (requested === undefined) return params;
   if (typeof requested !== "string") throw new Error("threadSize must be the name of a standard size, for example \"M6\" or \"G1/2\"");
@@ -87,14 +87,17 @@ export function mcpThreadSizeParams(params: Record<string, unknown>, currentProf
     // A bottle neck brings its own profile's depth and flank angle along, unless the call sets them.
     ...(chosen.depth !== undefined && params.threadDepth === undefined ? { threadDepth: chosen.depth } : {}),
     ...(chosen.flankAngle !== undefined && params.threadFlankAngle === undefined ? { threadFlankAngle: chosen.flankAngle } : {}),
+    // An NPT size is tapered (#1267), and a tapered thread set to another size goes straight, as in the size menu - unless
+    // the call sets it.
+    ...(params.threadTaper === undefined && size.taper ? { threadTaper: true } : {}),
+    ...(params.threadTaper === undefined && !size.taper && currentTaper ? { threadTaper: false } : {}),
   };
 }
 
 /** Der Name der Normgroesse eines Gewindes, wie ihn das Menue zeigt - oder nichts bei freien Werten. */
-export function mcpThreadSizeName(shape: Pick<WorkplaneShape, "kind" | "threadDiameter" | "threadPitch">): string | undefined {
+export function mcpThreadSizeName(shape: Pick<WorkplaneShape, "kind" | "threadDiameter" | "threadPitch" | "threadTaper">): string | undefined {
   if (shape.kind !== "thread") return undefined;
-  const settings = threadSettings(shape);
-  return threadSizeFor(settings.diameter, settings.pitch)?.id;
+  return threadStandardSize(threadSettings(shape))?.id;
 }
 
 export const MCP_GRIDFINITY_LIST_KEYS = ["gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOutline"] as const;

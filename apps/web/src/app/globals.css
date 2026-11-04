@@ -6822,6 +6822,11 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   opacity: 0.52;
 }
 
+/* "Handle X" is two words: they stay on one line next to their field (#1250). */
+.sketch-selection-position > span {
+  white-space: nowrap;
+}
+
 .sketch-corner-dialog {
   display: inline-flex;
   align-items: center;
@@ -8441,6 +8446,121 @@ html[data-theme="dark"] .touch-multi-select {
 /* With Alt held the dots are squares, like the size handles: they stretch the parts instead of moving them (#998). */
 .align-overlay.size-mode .align-dot {
   border-radius: 2px;
+}
+
+/* Equal gaps: a pill beside the middle dot of each line, turned along it; with Alt it asks for a gap (dashed). */
+.align-spread {
+  position: absolute;
+  width: 26px;
+  height: 16px;
+  padding: 0;
+  border: 2px solid #fcfbf8;
+  border-radius: 999px;
+  background: #312519;
+  color: #fcfbf8;
+  box-shadow: 0 1px 5px rgba(40, 27, 13, 0.32);
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) rotate(var(--spread-angle, 0deg));
+}
+
+.align-spread::before {
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+  content: "";
+}
+
+.align-spread-icon {
+  display: block;
+  width: 18px;
+  height: 9px;
+  margin: 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.align-spread:hover:not(:disabled),
+.align-spread:focus-visible:not(:disabled) {
+  background: #e17709;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(173, 89, 0, 0.18), 0 1px 5px rgba(40, 27, 13, 0.32);
+}
+
+.align-spread.disabled,
+.align-spread:disabled {
+  background: #b0a498;
+  box-shadow: none;
+  cursor: default;
+  opacity: 0.72;
+}
+
+.align-overlay.size-mode .align-spread:not(:disabled) {
+  border-style: dashed;
+}
+
+.align-gap-field {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--foreground);
+  box-shadow: 0 4px 16px rgba(40, 27, 13, 0.22);
+  font: 13px var(--font-ui);
+  pointer-events: auto;
+  transform: translate(-50%, calc(-100% - 14px));
+  white-space: nowrap;
+}
+
+.align-gap-field label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.align-gap-field input {
+  width: 64px;
+  padding: 3px 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+}
+
+.align-gap-unit {
+  color: var(--muted-strong);
+}
+
+.align-gap-field button[type="submit"] {
+  padding: 3px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--primary);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.align-gap-field button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.align-gap-close {
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--muted-strong);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .mirror-overlay {

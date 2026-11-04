@@ -48,3 +48,22 @@ function edgeLength(points: number[]) {
 function near(first: number[], second: number[], tolerance: number) {
   return Math.abs(first[0] - second[0]) <= tolerance && Math.abs(first[1] - second[1]) <= tolerance && Math.abs(first[2] - second[2]) <= tolerance;
 }
+
+/**
+ * Every edge, however long, with an end at an end of a picked one: the candidates for the sharp inner corners a
+ * fillet or chamfer cannot get past (see lib/cadInnerCorners.ts).
+ */
+export function edgesTouchingEnds(edges: CadModifierEdge[], selectedIds: number[]) {
+  const tolerance = 1e-3;
+  const picked = new Set(selectedIds);
+  const ends = selectedIds.flatMap((id) => {
+    const edge = edges[id];
+    return edge && edge.points.length >= 6 ? [{ owner: edge.owner ?? 0, ...edgeEnds(edge.points) }] : [];
+  });
+  return edges.filter((edge) => {
+    if (picked.has(edge.id) || !edge.selectable || edge.points.length < 6) return false;
+    const { start, end } = edgeEnds(edge.points);
+    const owner = edge.owner ?? 0;
+    return ends.some((other) => other.owner === owner && [other.start, other.end].some((point) => near(point, start, tolerance) || near(point, end, tolerance)));
+  }).map((edge) => edge.id);
+}

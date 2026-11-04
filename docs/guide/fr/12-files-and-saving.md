@@ -68,7 +68,7 @@ En haut se trouve le nom du fichier, en dessous vous choisissez le format. Avec 
 
 Un trou que vous n'avez pas regroupé est retiré de chaque corps qu'il atteint lors de l'exportation, comme le montre la vue. Il n’est donc pas nécessaire de regrouper avant chaque export. Avec une sélection, seuls les trous sélectionnés comptent. Un trou ne peut pas être exporté seul ; layerling le signale.
 
-STEP ne propose que des corps CAO exacts. Ce qui ne peut pas être écrit exactement, comme un maillage importé en STL, est laissé de côté. Le message après l'exportation nomme ces corps et explique pourquoi. Pour l'imprimante, utilisez STL ou 3MF, qui transportent tout.
+STEP ne propose que des corps CAO exacts. Un maillage importé est rendu exact pour le fichier, comme le fait {{ui:editor.tool.makeExact}} (voir "Rendre exact un maillage importé" plus bas), ce qui peut faire durer l'exportation jusqu'à une minute ; un maillage surtout de forme libre, comme une figurine, est laissé de côté, comme tout ce qui ne peut pas être écrit exactement. Le message après l'exportation nomme ces corps et explique pourquoi. Pour l'imprimante, utilisez STL ou 3MF, qui transportent tout.
 
 ### Un dessin pour l'atelier
 
@@ -102,9 +102,17 @@ Les images modèles sont ajoutées en mode esquisse, voir [Esquisses](chapter:sk
 
 ## Simplifier un maillage importé
 
-Un maillage numérisé ou sculpté comporte souvent beaucoup plus de triangles que sa forme n'en a besoin, et chacun d'entre eux est emporté pendant que vous le déplacez, le coupez et l'enregistrez. {{ui:simplify.title}} dans le groupe Modifier (ou dans le menu contextuel du corps) montre le maillage tel qu'il se trouve à côté de ce qu'en laisserait une part choisie de ses triangles ; les deux vues tournent et zooment ensemble avec les boutons de la souris sur le plan de travail. Définissez la quantité à conserver en pourcentage ou en nombre de triangles, et {{ui:simplify.apply}} prend le maillage le plus clair. Le résultat est un maillage simple : pour le résultat d'une coupe ou d'une fusion, {{ui:group.edit}} et ses parties d'origine sont abandonnées.
+Un maillage numérisé ou sculpté comporte souvent beaucoup plus de triangles que sa forme n'en a besoin, et chacun d'entre eux est emporté pendant que vous le déplacez, le coupez et l'enregistrez. {{ui:simplify.title}} dans le groupe Modifier (ou dans le menu contextuel du corps) montre le maillage tel qu'il se trouve à côté de ce qu'en laisserait une part choisie de ses triangles ; les deux vues tournent et zooment ensemble avec les boutons de la souris sur le plan de travail. Définissez la quantité à conserver en pourcentage ou en nombre de triangles, et {{ui:simplify.apply}} prend le maillage le plus clair. Le résultat est un maillage simple : pour le résultat d'une coupe ou d'une fusion, {{ui:group.edit}} et ses parties d'origine sont abandonnées. Avec {{ui:simplify.keepEdges}} activé, comme au départ, les arêtes vives et les bords des trous restent exactement à leur place tandis que les faces planes perdent quand même la plupart de leurs triangles ; désactivé, la simplification peut les arrondir pour descendre plus bas.
 
 La coupe, la fusion et l'intersection d'un maillage importé sont calculées dans votre navigateur, de sorte que les paramètres de l'espace de travail limitent le nombre de triangles qu'un tel maillage peut avoir ({{ui:workspace.booleanTriangleLimit}}). Un maillage au-dessus de la limite n'est pas traité et le message nomme son nombre de triangles ; simplifiez d'abord le maillage ou augmentez la limite si votre ordinateur peut le supporter.
+
+## Rendre exact un maillage importé
+
+Un fichier STL, OBJ ou 3MF ne contient que des triangles, même quand la pièce a été dessinée en CAO avec des faces planes et des perçages ronds. {{ui:editor.tool.makeExact}} dans le groupe {{ui:editor.group.modify}} (ou dans le menu contextuel du corps) cherche dans ces triangles les plans, cylindres, cônes, sphères et tores dont ils sont issus et reconstruit le corps à partir d'eux en corps CAO exact : un perçage devient un vrai cylindre au bord rond au lieu d'une centaine de bandes étroites. Ensuite, {{ui:editor.tool.fillet}} et {{ui:editor.tool.chamfer}} suivent une arête nette, {{ui:editor.tool.deleteFace}} enlève tout un arrondi ou la paroi d'un trou, et un export STEP transporte les vraies faces. La barre d'état indique ce qui a été trouvé, par exemple "plans : 9, cylindres : 4".
+
+Ce qui ne correspond à aucune de ces surfaces reste en petites facettes planes, et le message indique quelle part de la surface cela représente. Un corps surtout de forme libre, comme une figurine ou une forme sculptée, reste un maillage, tout comme un maillage avec des trous ou des parois qui se croisent, qui ne peut pas se refermer en solide. Jusqu'à 400 000 triangles sont acceptés, et un gros maillage peut prendre quelques minutes. Un maillage plus gros passe sous cette limite avec {{ui:simplify.title}} et {{ui:simplify.keepEdges}} activé ; sinon, prenez le maillage tel qu'il est venu, c'est ainsi qu'il sort le plus propre. Une annulation ramène le maillage.
+
+Pour un petit maillage avec des faces rondes, jusqu'à 4 000 triangles, les outils d'arêtes le font d'eux-mêmes : arrondir une arête d'un tel STL le reconstruit d'abord de la même façon.
 
 ## Signaler un bug
 

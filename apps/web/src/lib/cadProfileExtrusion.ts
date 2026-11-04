@@ -1616,6 +1616,7 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     threadHead: shape.threadHead,
     threadHand: shape.threadHand,
     threadProfile: shape.threadProfile,
+    threadTaper: shape.threadTaper,
     threadDiameter: shape.threadDiameter,
     threadPitch: shape.threadPitch,
     threadClearance: shape.threadClearance,
@@ -1636,6 +1637,7 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     threadCollarDiameter: shape.threadCollarDiameter,
   });
   const { settings, spec } = plan;
+  const tapered = plan.taperSlope !== 0;
   const part: CadModifierThreadPart = {
     role: settings.role,
     profile: plan.profile.points.map((point) => ({ u: point.u, level: point.level })),
@@ -1648,6 +1650,7 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     chamfer: plan.chamfer > 0 ? plan.chamfer : 0,
     chamferLow: plan.chamferLow > 0 ? plan.chamferLow : 0,
     chamferBottom: plan.chamferBottom,
+    ...(tapered ? { taper: { slope: plan.taperSlope, at: plan.taperAt } } : {}),
     // The mesh is drawn at its natural footprint and stretched to the shape's
     // width and depth; the body takes the same stretch.
     transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(plan.scaleX, 1, plan.scaleZ)),
@@ -1655,8 +1658,9 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
   // The Whitworth points sample arcs; the body takes the arcs themselves, five
   // faces per turn instead of one per chord. They are circles only at the
   // profile's full depth, which a very coarse pitch on a thin rod can cut
-  // short - then the points stay the profile.
-  if (settings.profile === "whitworth" && !plan.axialPlay && Math.abs(plan.major - plan.minor - settings.pitch * plan.profile.depthPerPitch) < 1e-9) {
+  // short - then the points stay the profile. A tapered thread takes the
+  // points too: its faces are ruled between the points' tapered helices.
+  if (settings.profile === "whitworth" && !tapered && !plan.axialPlay && Math.abs(plan.major - plan.minor - settings.pitch * plan.profile.depthPerPitch) < 1e-9) {
     part.curve = { kind: "whitworth", radius: WHITWORTH_PROFILE_CONSTANTS.radiusPerPitch, halfAngle: (WHITWORTH_PROFILE_CONSTANTS.flankAngleDegrees / 2) * (Math.PI / 180) };
   }
   if (settings.role === "screw") {
@@ -1728,8 +1732,8 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOutline: shape.gridfinityOutline });
-  // Label shelves, finger scoops and dividers, and an outline plate's sockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
+  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOutline: shape.gridfinityOutline });
+  // Label shelves, finger scoops and dividers, an outline plate's sockets and a Swallowtail plate's pockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
   if (!loadedManifoldRuntime() && gridfinityHasPieces({ ...shape, width, depth })) return null;
   return {
     width: plan.size.width,
@@ -1740,6 +1744,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityMagnets: plan.magnets,
     gridfinityHalfGrid: plan.halfGrid,
     gridfinityLargePlate: plan.largePlate,
+    gridfinitySwallowtail: plan.swallowtail,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,

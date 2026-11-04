@@ -68,7 +68,7 @@ Zgoraj je ime datoteke, pod njim izbereš obliko. Če je kaj označeno, se izvoz
 
 Luknjo, ki je nisi združil v skupino, izvoz odšteje od vsakega telesa, ki se je dotika, tako kot kaže pogled. Pred vsakim izvozom torej ni treba združevati. Pri izboru štejejo samo izbrane luknje. Samo za sebe luknje ni mogoče izvoziti; na to te opozori layerling.
 
-STEP vsebuje samo natančna telesa CAD. Kar ni mogoče natančno prikazati, na primer mreža, uvožena kot STL, ostane zunaj. Sporočilo po izvozu ta telesa imenuje po imenu in pove, zakaj. Za tiskalnik potem vzameš STL ali 3MF, ki prenesta vse.
+STEP vsebuje samo natančna telesa CAD. Uvožena mreža se za datoteko naredi natančna, kot to stori {{ui:editor.tool.makeExact}} (glej »Uvoženo mrežo naredi natančno« spodaj), zato lahko izvoz traja do minute; večinoma prostooblikovana mreža, kot je figura, ostane zunaj, prav tako vse drugo, česar ni mogoče natančno prikazati. Sporočilo po izvozu ta telesa imenuje po imenu in pove, zakaj. Za tiskalnik potem vzameš STL ali 3MF, ki prenesta vse.
 
 ### Risba za delavnico
 
@@ -102,9 +102,17 @@ Slike kot predlogo vstaviš v skicirnem načinu, glej [Skice](chapter:skice).
 
 ## Poenostavitev uvožene mreže
 
-Skenirana ali modelirana mreža ima pogosto bistveno več trikotnikov, kot jih njena oblika potrebuje, in vsakega se vleče zraven pri premikanju, rezanju in shranjevanju. {{ui:simplify.title}} v skupini Spreminjanje (ali v meniju z desnim klikom na telo) pokaže mrežo, kakršna je, ob tistem, kar od nje ostane pri izbranem deležu njenih trikotnikov; oba pogleda se vrtita in zumirata skupaj, z miškinimi gumbi delovne ravnine. Določiš, koliko naj ostane, kot odstotek ali kot število trikotnikov, in {{ui:simplify.apply}} prevzame lažjo mrežo. Rezultat je preprosta mreža: pri rezultatu reza ali združitve odpadeta {{ui:group.edit}} in prvotni deli.
+Skenirana ali modelirana mreža ima pogosto bistveno več trikotnikov, kot jih njena oblika potrebuje, in vsakega se vleče zraven pri premikanju, rezanju in shranjevanju. {{ui:simplify.title}} v skupini Spreminjanje (ali v meniju z desnim klikom na telo) pokaže mrežo, kakršna je, ob tistem, kar od nje ostane pri izbranem deležu njenih trikotnikov; oba pogleda se vrtita in zumirata skupaj, z miškinimi gumbi delovne ravnine. Določiš, koliko naj ostane, kot odstotek ali kot število trikotnikov, in {{ui:simplify.apply}} prevzame lažjo mrežo. Rezultat je preprosta mreža: pri rezultatu reza ali združitve odpadeta {{ui:group.edit}} in prvotni deli. Z vklopljenim {{ui:simplify.keepEdges}}, kot je na začetku, ostanejo ostri robovi in robovi lukenj natanko tam, kjer so, ravne ploskve pa vseeno izgubijo večino trikotnikov; izklopljeno jih poenostavitev sme zaobliti za manjše število.
 
 Rezanje, združevanje in preseki z uvoženo mrežo se izračunajo v tvojem brskalniku, zato nastavitve delovnega prostora omejujejo, koliko trikotnikov lahko taka mreža ima ({{ui:workspace.booleanTriangleLimit}}). Mreža čez mejo se ne obdela in sporočilo navede število njenih trikotnikov; mrežo najprej poenostavi ali mejo dvigni, če tvoj računalnik to zmore.
+
+## Uvoženo mrežo naredi natančno
+
+Datoteka STL, OBJ ali 3MF vsebuje le trikotnike, tudi če je bil del narisan v CAD z ravnimi ploskvami in okroglimi izvrtinami. {{ui:editor.tool.makeExact}} v skupini {{ui:editor.group.modify}} (ali v meniju z desnim klikom na telesu) v teh trikotnikih poišče ravnine, valje, stožce, krogle in toruse, iz katerih so nastali, in iz njih znova zgradi telo kot natančno telo CAD: izvrtina postane en pravi valj z okroglim robom namesto stotih ozkih trakov. Nato {{ui:editor.tool.fillet}} in {{ui:editor.tool.chamfer}} sledita enemu čistemu robu, {{ui:editor.tool.deleteFace}} odstrani celo zaokrožitev ali steno luknje, izvoz STEP pa nosi prave ploskve. Vrstica stanja pove, kaj je bilo najdeno, na primer »ravnine: 9, valji: 4«.
+
+Kar ne ustreza nobeni od teh ploskev, ostane kot majhne ravne fasetke, sporočilo pa pove, kolikšen del površine je to. Telo, ki je večinoma prostooblikovano, kot figura ali oblikovana skulptura, ostane mreža, prav tako mreža z luknjami ali stenami, ki se sekajo, saj se ne more skleniti v telo. Sprejme se do 400.000 trikotnikov, velika mreža pa lahko traja nekaj minut. Večjo mrežo spraviš pod to mejo s {{ui:simplify.title}} in vklopljenim {{ui:simplify.keepEdges}}; sicer vzemi mrežo, kakršna je prišla, tako je rezultat najčistejši. En korak razveljavitve vrne mrežo.
+
+Pri majhni mreži z okroglimi ploskvami, do 4.000 trikotnikov, to orodja za robove naredijo sama: zaokrožitev roba takšne STL jo najprej na enak način znova zgradi.
 
 ## Prijava napake
 

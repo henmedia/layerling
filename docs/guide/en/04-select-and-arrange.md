@@ -9,7 +9,7 @@ A click on a shape selects it. With [[Shift]] you add more or take them away aga
 
 A shape behind another one, such as a hole inside a body, you reach without turning the view: right-click the spot and choose {{ui:contextMenu.selectOther}}. The menu then lists every shape under the pointer, from front to back. The one your pointer is on is outlined in the view, even through the shapes in front of it; a click selects it, and with [[Shift]] it is added to the selection. The entry is there whenever more than one shape lies under the pointer; on a tablet, a long press opens the same menu.
 
-What is in your way you hide ({{ui:editor.tool.hideSelected}}, [[Ctrl]]+[[H]]). Hidden shapes stay in the design, they are just not visible and stay out of the export; the export window says beforehand how many there are. [[Ctrl]]+[[Shift]]+[[H]] brings them all back. What should stay put you lock with the padlock at the top of the settings or with [[Ctrl]]+[[L]]. A locked shape cannot be moved, resized, turned, recoloured or deleted: its handles turn grey, a padlock shows beside the arrow on top, and the tools that would change it are greyed out. Hovering a handle still shows its sizes, and a key that would change it says "Object locked". While one locked shape is in the selection, nothing changes for the others either. Hiding, renaming, copying and duplicating still work.
+What is in your way you hide ({{ui:editor.tool.hideSelected}}, [[Ctrl]]+[[H]]). Hidden shapes stay in the design, they are just not visible and stay out of the export; the export window says beforehand how many there are. [[Ctrl]]+[[Shift]]+[[H]] brings them all back. What should stay put you lock with the padlock at the top of the settings or with [[Ctrl]]+[[L]]. A locked shape cannot be moved, resized, turned, recoloured or deleted: its handles turn grey, a padlock shows beside the arrow on top, and the tools that would change it are greyed out. Hovering a handle still shows its sizes, and a key that would change it says "Object locked". While one locked shape is in the selection, nothing changes for the others either. Hiding, renaming, copying and duplicating still work. To keep a part as it is and still build with it, lock only its shape: the shield beside the padlock, {{ui:contextMenu.lockShape}} in the right-click menu, or [[Ctrl]]+[[Shift]]+[[L]]. It can still be moved, turned, lifted, lined up, copied and grouped with others, but its size, its settings and its name stay as they are: the handles that change its size are gone, the fields for them are greyed out, and resizing, mirroring, ungrouping, the edge tools and deleting are refused. A copy keeps the lock, and so does the part inside a group, which can then be moved and taken apart again but not resized. The shield unlocks the shape again.
 
 A number on the button of the group {{ui:editor.group.visibility}} says how many shapes are hidden, and a click on it shows them all again. A design that is opened with hidden shapes says so once, with a button to show them.
 
@@ -41,7 +41,7 @@ You can drag a shape past the edge of the plate and leave it there, about one pl
 
 ## Snapping while moving
 
-When you drag a shape across the workplane, it snaps to other shapes: its left, right, front or back edge or its centre lands exactly on an edge or centre of another shape. A pink guide line shows what it is holding on to. That way two parts sit flush side by side or centred one behind the other without typing numbers. It works with the grid switched off, too.
+When you drag a shape across the workplane, it snaps to other shapes: its left, right, front or back edge or its centre lands exactly on an edge or centre of another shape. A pink guide line shows what it is holding on to. That way two parts sit flush side by side or centred one behind the other without typing numbers. It works with the grid switched off, too. The centre of the workplane counts too: the pink lines show when the shape sits in the middle of the plate along X, along Y or both.
 
 Hold [[Shift]] while dragging to keep the move on one axis: the shape follows whichever direction, X or Y, you have dragged further in, and leaves the other alone. Best press [[Shift]] once you are already dragging; on a shape that is not selected yet, a click with [[Shift]] only adds it to the selection.
 
@@ -49,7 +49,7 @@ With [[Alt]] already held when the drag begins, you drag a copy, as in Tinkercad
 
 ## Aligning
 
-Two or more selected shapes are lined up with {{ui:editor.tool.align}}: points appear around the selection for left, centre and right, front, centre and back, and top, centre and bottom. A click on a point moves all shapes there. If you first click one of the selected shapes, it stays in place and the others line up with it. A locked shape in the selection is that fixed shape by itself. Left, right, front, back, top and bottom go by the box round a shape; the centre of a triangle, a pentagon or a star is its own middle, so a hole centred on one sits in the middle of the shape and not of its box.
+Two or more selected shapes are lined up with {{ui:editor.tool.align}} ([[L]], or right-click the selection and choose it): points appear around the selection for left, centre and right, front, centre and back, and top, centre and bottom. A click on a point moves all shapes there. If you first click one of the selected shapes, it stays in place and the others line up with it. A locked shape in the selection is that fixed shape by itself. Left, right, front, back, top and bottom go by the box round a shape; the centre of a triangle, a pentagon or a star is its own middle, so a hole centred on one sits in the middle of the shape and not of its box.
 
 A shape turned at an angle, say by 45°, has its box round it to line up with, not its own edges. To line up with the edges, set a workplane on a face of that shape first ({{ui:camera.placeWorkplane}}, then click the face): the points then stand on the axes of that plane, and the shapes are measured and moved along them, as in Tinkercad. Reset the workplane to line up along the plate again.
 
@@ -62,6 +62,16 @@ The key is [[L]]. [[Esc]] cancels.
 Hold [[Alt]] while aligning and the dots turn into squares: a click no longer moves the shapes but changes their size. A dot at a side stretches each shape to that side, its other side staying where it is, as if you had dragged its handle there. The dot in the middle leaves each shape in its place and gives it the width, length or height in that direction. That way you swap a box for a cylinder of the same size, say, or replace a broken piece of a mesh with a clean shape. Move over a dot with [[Alt]] held and you see beforehand how large the shapes become.
 
 The reference is the shape you clicked first; only the others change. Without one, the side dots stretch all shapes to the farthest side, and the middle dot gives them all the size of the largest. A cylinder stays round, so it grows in the other direction too. A shape turned at an angle stays as it is; shapes turned by 90° work.
+
+### Equal gaps
+
+Beside the middle point of each line stands a wider dot with a bar on each side. It spreads three or more shapes in that direction so that the space between neighbouring edges is the same everywhere, whatever size each shape is. The first and the last shape stay where they are, the ones between move. A row of holes of different sizes gets the same wall between them, for example. Move over the dot and you see beforehand where the shapes go; the status bar then tells you the gap.
+
+If a board is among the selected shapes, longer in that direction than all the others, the shapes are spread on it: the gap at its edges is as large as the one between them, and a single shape comes to its middle. Shapes in several rows, such as the animals of a peg puzzle, are spread row by row; shapes whose boxes overlap across the direction form one row. Where the shapes stand in no clean columns, as the animals do from front to back, the shapes standing side by side move as a whole row instead. The whole puzzle then takes one click from left to right and one from front to back.
+
+Without a board, click an empty spot of the plate first: the plate is then the fixed shape, equal gaps spread the shapes over the whole plate with the same gap to its edges, and the other dots line them up on its edges or its middle. Click the empty plate again to let it go.
+
+Hold [[Alt]] and click the dot to type the gap yourself, say 5 mm: the shapes line up that far apart, starting at the first shape or at the one you clicked first; on a board the row comes to its middle. A locked shape stays where it is, so one between the outer shapes stops the equal gaps.
 
 ## Mirroring
 

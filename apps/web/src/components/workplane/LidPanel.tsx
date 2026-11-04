@@ -8,6 +8,7 @@ import { Check, LoaderCircle, X } from "lucide-react";
 import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
 import {
   LID_FITS,
+  LID_HINGE_SIDES,
   LID_HINGE_TYPES,
   LID_MAGNET_SIZES,
   LID_TYPES,
@@ -261,6 +262,25 @@ export function LidPanel({
       </label>
       {!hingeFits ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
       {settings.hinge && hingeFits ? (<>
+        {/* The side it goes along, as in the starting view (the view cube's Front faces you). */}
+        <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.hingeSide")}>
+          <span>{t("lid.hingeSide")}</span>
+          <div className="shell-opening-options">
+            {LID_HINGE_SIDES.map((side) => (
+              <button
+                key={side}
+                type="button"
+                role="radio"
+                aria-checked={settings.hingeSide === side}
+                className={settings.hingeSide === side ? "active" : ""}
+                disabled={busy}
+                onClick={() => onChange({ hingeSide: side })}
+              >
+                {t(`shell.side.${side}`)}
+              </button>
+            ))}
+          </div>
+        </div>
         <EdgeModifierSlider
           label={t("lid.hingePin")}
           value={settings.hingePin}
@@ -294,6 +314,10 @@ export function LidPanel({
           disabled={busy}
           onChange={(value) => onChange({ hingeKnuckles: normalizeLidOptions({ hingeKnuckles: value }).hingeKnuckles })}
         />
+        <label className="edge-modifier-field offset-copy">
+          <input type="checkbox" checked={settings.hingeTeardrop} disabled={busy} onChange={(event) => onChange({ hingeTeardrop: event.target.checked })} />
+          <span>{t("lid.hingeTeardrop")}</span>
+        </label>
         <label className="edge-modifier-field offset-copy">
           <input type="checkbox" checked={settings.hingePrintPin} disabled={busy} onChange={(event) => onChange({ hingePrintPin: event.target.checked })} />
           <span>{t("lid.hingePrintPin")}</span>
