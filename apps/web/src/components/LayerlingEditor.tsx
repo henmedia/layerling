@@ -10879,7 +10879,7 @@ export function LayerlingEditor({
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
     const sourceProjectId = projectInfoRef.current.projectId;
     try {
-      const built = await cadShapeFromSketchProfile(gridfinitySwallowtailKeyProfile(), GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, null);
+      const built = await cadShapeFromSketchProfile(gridfinitySwallowtailKeyProfile(plate), GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, null);
       if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return fail(t("status.gridfinityKeysChanged"));
       if (historyViewStateRef.current) return fail(t("status.historyViewBlocksEdits"));
       const box = boundsForShapes([plate]);

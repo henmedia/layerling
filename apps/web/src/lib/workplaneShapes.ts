@@ -767,6 +767,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityHalfGrid === b.gridfinityHalfGrid &&
     a.gridfinityLargePlate === b.gridfinityLargePlate &&
     a.gridfinitySwallowtail === b.gridfinitySwallowtail &&
+    a.gridfinitySwallowtailClearance === b.gridfinitySwallowtailClearance &&
     a.gridfinityLabelBack === b.gridfinityLabelBack &&
     a.gridfinityLabelFront === b.gridfinityLabelFront &&
     a.gridfinityLabelLeft === b.gridfinityLabelLeft &&

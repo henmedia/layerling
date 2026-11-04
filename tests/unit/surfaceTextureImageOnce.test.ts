@@ -40,6 +40,35 @@ function cylinder(radius: number, height: number, segments = 96, rings = 8): num
   return out;
 }
 
+/** A closed sphere standing on the plate (inside frame, y up), its centre at y = radius, faces wound outward. */
+function sphere(radius: number, segments = 64, rings = 32): number[] {
+  const out: number[] = [];
+  const at = (k: number, j: number): Vec3 => {
+    const a = (2 * Math.PI * k) / segments, b = (Math.PI * j) / rings;
+    return [radius * Math.sin(b) * Math.cos(a), radius - radius * Math.cos(b), radius * Math.sin(b) * Math.sin(a)];
+  };
+  for (let k = 0; k < segments; k += 1) {
+    for (let j = 0; j < rings; j += 1) {
+      const [a, b, c, d] = [at(k, j), at(k + 1, j), at(k + 1, j + 1), at(k, j + 1)];
+      if (j > 0) out.push(...a, ...d, ...b);
+      if (j < rings - 1) out.push(...b, ...d, ...c);
+    }
+  }
+  return out;
+}
+
+/** The longest edge of a result's triangles (mm), and whether every point is a number. */
+function longestEdge(result: Pick<SurfaceTextureResult, "vertices" | "indices">) {
+  const v = result.vertices, I = result.indices;
+  let longest = 0;
+  for (let t = 0; t < I.length; t += 3) {
+    for (const [a, b] of [[I[t], I[t + 1]], [I[t + 1], I[t + 2]], [I[t + 2], I[t]]]) {
+      longest = Math.max(longest, Math.hypot(v[a * 3] - v[b * 3], v[a * 3 + 1] - v[b * 3 + 1], v[a * 3 + 2] - v[b * 3 + 2]));
+    }
+  }
+  return { longest, finite: Array.from(v).every(Number.isFinite) };
+}
+
 function signedVolume(positions: ArrayLike<number>) {
   let volume = 0;
   for (let i = 0; i < positions.length; i += 9) {
@@ -150,4 +179,34 @@ describe("an image pressed on once", () => {
     expect(Math.max(...along) - Math.min(...along)).toBeGreaterThan(27);
     expect(Math.max(...along.map(Math.abs))).toBeLessThan(15.5);
   });
+
+  it("goes onto the picked faces when Around and Height aim past them (#1206)", () => {
+    // A flat plate with its top picked: Around 0 and Height 100 % aim at the top of the front wall.
+    const result = applySurfaceTexture(box(60, 10, 40), { ...ONCE, faces: ["top"], textHeight: 100, direction: "inward" });
+    expect(result.stats.image?.placed).toBe(true);
+    expectClosed(result);
+    const pressed: Vec3[] = [];
+    const v = result.vertices;
+    for (let i = 0; i < v.length; i += 3) {
+      const [x, y, z] = [v[i], v[i + 1], v[i + 2]];
+      if (Math.max(Math.abs(x) - 30, Math.abs(z) - 20, y - 10, -y) < -0.01) pressed.push([x, y, z]);
+    }
+    // Pressed into the top round its middle (the light square, 15 mm), not into the front wall or along its edge.
+    expect(pressed.length).toBeGreaterThan(20);
+    expect(pressed.every(([x, y, z]) => y > 8.9 && Math.abs(x) <= 9 && Math.abs(z) <= 9)).toBe(true);
+    expect(Math.min(...pressed.map(([, y]) => y))).toBeCloseTo(9, 1);
+  });
+
+  it("keeps a sphere whole: no point left without its value, no long triangle through the body (#1268)", () => {
+    for (const imageOwn of [SQUARE, WHITE]) {
+      for (const direction of ["inward", "outward"]) {
+        const result = applySurfaceTexture(sphere(50), { ...ONCE, imageOwn, direction, spacing: 60 });
+        expect(result.stats.image?.placed).toBe(true);
+        const edges = longestEdge(result);
+        expect(edges.finite).toBe(true);
+        expect(edges.longest).toBeLessThan(15);
+        expectClosed(result);
+      }
+    }
+  }, 60_000);
 });
