@@ -2041,6 +2041,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "sketch.cadTimedOut": "O núcleo CAD demorou demais para este esboço e foi interrompido. Contornos com muitíssimos pontos são os que mais demoram: um SVG com menos nós (exportado do desenho original, não de uma malha) costuma ser construído rápido.",
   "sketch.finishSketch": "Concluir esboço",
   "sketch.cancel": "Cancelar",
+  "sketch.to3d": "Esboço para 3D",
   "sketch.extrude": "Extrusão do esboço",
   "sketch.extrudeHint": "Dá profundidade ao perfil para criar uma forma 3D",
   "sketch.revolve": "Revolução do esboço",
@@ -2936,6 +2937,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "status.pivotCleared": "Ponto de rotação removido - girando em torno do centro de novo",
 
   "myShapes.title": "Formas personalizadas",
+  "myShapes.basicShapes": "Formas básicas",
   "myShapes.saveSelection": "Salvar seleção",
   "myShapes.saveSelectionHint": "Guarda aqui os sólidos selecionados, para inseri-los de novo em qualquer projeto",
   "myShapes.selectFirst": "Selecione primeiro os sólidos a guardar",

@@ -25,6 +25,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 - **文字：** {{ui:shape.text}}，也可沿圓弧排列。更多內容見[文字](chapter:text)。
 - **機械件：** {{ui:shape.thread}}（螺桿、螺絲、螺帽與螺紋孔）、{{ui:shape.spring}}、{{ui:shape.gridfinity}} 收納盒與底板、{{ui:shape.gear}}，以及用於握把的 {{ui:shape.knurl}}。更多內容見[螺紋與機械件](chapter:threads-and-mechanics)。
 - **結構用：** 可一體列印的 {{ui:shape.hinge}}、{{ui:shape.dovetail}}、用於水平孔的 {{ui:shape.teardrop}}、用於螺絲頭的 {{ui:shape.counterbore}} 與 {{ui:shape.countersink}}，以及 {{ui:shape.ruler}}，它只是量測工具，永遠不會出現在匯出結果中。
+- **{{ui:library.section.enclosure}}：** 用於熱熔螺母與自攻螺絲的 {{ui:shape.screwBoss}}、附卡座的 {{ui:shape.snapFit}}，以及 {{ui:shape.rib}} 或角撐板。更多內容見[螺紋與機械件](chapter:threads-and-mechanics)。
 
 要得到三角形有兩種方式：三邊的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的「Roof」；{{ui:shape.wedge}} 則是直角三角形。兩者都是真正的三角柱。想挖出三角形孔，可複製該形狀、把副本縮小、標記為孔，再用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 對齊。兩者都按形狀的邊界框運作，也就是包住它的最小方框，所以切掉一半的正方形仍算作完整正方形。命令搜尋（[[Ctrl]]+[[K]]）在「triangle」或「roof」下也找得到這兩種形狀。
 

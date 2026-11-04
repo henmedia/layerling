@@ -25,6 +25,7 @@ summary: مكتبة الأشكال، الأبعاد بالأرقام وبالم�
 - **الكتابة:** {{ui:shape.text}}، وأيضًا على طول قوس دائري. المزيد في [النص](chapter:text).
 - **الميكانيكا:** {{ui:shape.thread}} (قضيب ملولب، برغي، صامولة وثقب ملولب)، {{ui:shape.spring}}، علب وألواح شبكة {{ui:shape.gridfinity}}، {{ui:shape.gear}}، و{{ui:shape.hirth}} و{{ui:shape.knurl}} للمقابض. المزيد في [الأسنان اللولبية والميكانيكا](chapter:threads-and-mechanics).
 - **للتركيبات:** {{ui:shape.hinge}} التي تُطبع جاهزة للحركة، و{{ui:shape.dovetail}}، و{{ui:shape.teardrop}} للثقوب الأفقية، و{{ui:shape.port}} لمقابس USB وHDMI وDisplayPort وRJ45، و{{ui:shape.counterbore}} و{{ui:shape.countersink}} لرؤوس البراغي، و{{ui:shape.ruler}}، وهي أداة قياس فقط ولا تظهر أبدًا في التصدير.
+- **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} للحشوات الملولبة التي تُثبَّت بالحرارة وللبراغي ذاتية التنصيص، و{{ui:shape.snapFit}} مع نتوء الإمساك المقابل له، و{{ui:shape.rib}} أو الدعامة الزاوية. المزيد في [الأسنان اللولبية والميكانيكا](chapter:threads-and-mechanics).
 
 تحصل على مثلث بطريقتين: {{ui:shape.polygon}} بثلاثة أضلاع هو مثلث متساوي الساقين، وهو "Roof" في Tinkercad، و{{ui:shape.wedge}} هو مثلث قائم الزاوية. كلاهما منشورات ثلاثية حقيقية. لثقب مثلث، انسخ الشكل، واجعل النسخة أصغر، وعلمها كثقب وقم بمحاذاتها مع {{ui:editor.tool.centerOnWorkplane}} أو {{ui:editor.tool.align}}. كلاهما يعمل مع مربع الإحاطة للشكل، وهو أصغر صندوق يحيط به، لذا فإن المربع المنصف يظل محسوبًا كمربع كامل. البحث عن الأوامر ([[Ctrl]]+[[K]]) يجد كلا الشكلين أيضًا تحت "مثلث" أو "سقف".
 

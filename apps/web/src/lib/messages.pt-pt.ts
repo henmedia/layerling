@@ -1695,6 +1695,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "shapeMenu.resize": "Redimensionar a biblioteca de formas",
   "shapeMenu.resizeHint": "Arrasta um bordo ou canto para redimensionar; faz duplo clique para repor o tamanho. Quando o painel é estreito, só aparecem as imagens",
   "myShapes.title": "Formas personalizadas",
+  "myShapes.basicShapes": "Formas básicas",
   "myShapes.saveSelection": "Guardar seleção",
   "myShapes.saveSelectionHint": "Guarda aqui os sólidos selecionados para os voltares a inserir em qualquer projeto",
   "myShapes.selectFirst": "Seleciona primeiro os sólidos que queres guardar",
