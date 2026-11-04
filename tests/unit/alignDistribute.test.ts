@@ -107,8 +107,33 @@ describe("equal gaps", () => {
     }
   });
 
-  it("takes all the parts as one row when one part joins two rows along the axis", () => {
-    // tall stands across both rows, under top-left, so the two rows would come to stand on top of each other.
+  it("spreads the same puzzle's rows as wholes from front to back", () => {
+    // The animals stand in no clean columns, so each row moves as one block: rows 7..25, 37..53 and 66..84 (z),
+    // 18 + 16 + 18 = 52 deep in a tray 90 deep: four gaps of 9.5.
+    const tray = box("tray", 60, 45, 120, 90, 5);
+    const rows = [
+      [box("cat", 10, 16, 20, 16), box("dog", 40, 16, 30, 18), box("cow", 80, 16, 25, 18)],
+      [box("hen", 12, 45, 14, 14), box("pig", 30, 45, 22, 16), box("fox", 55, 45, 18, 12), box("owl", 90, 45, 16, 14)],
+      [box("cow2", 20, 75, 26, 18), box("eel", 50, 75, 34, 10), box("bee", 100, 75, 12, 12)],
+    ];
+    const shapes = [tray, ...rows.flat()];
+    const result = spread(shapes, "z");
+    expect(result.problem).toBeNull();
+    expect(result.gaps).toHaveLength(1);
+    expect(result.gaps[0]).toBeCloseTo(9.5, 6);
+    const front = (id: string) => meshAabb(byId(result.nextShapes, id)).minZ;
+    // The first row's front edge comes to 9.5, the second's to 9.5 + 18 + 9.5 = 37, the third's to 37 + 16 + 9.5.
+    expect(Math.min(...rows[0].map((shape) => front(shape.id)))).toBeCloseTo(9.5, 6);
+    expect(Math.min(...rows[1].map((shape) => front(shape.id)))).toBeCloseTo(37, 6);
+    expect(Math.min(...rows[2].map((shape) => front(shape.id)))).toBeCloseTo(62.5, 6);
+    // A row moves as a whole: its parts keep their places to each other, and nothing moves sideways.
+    expect(byId(result.nextShapes, "cat").z - byId(result.nextShapes, "dog").z).toBeCloseTo(0, 6);
+    rows.flat().forEach((shape) => expect(byId(result.nextShapes, shape.id).x).toBe(shape.x));
+  });
+
+  it("moves parts side by side as one block when a third part joins their rows", () => {
+    // tall lies in both left parts and joins the two rows, so they would come to stand on top of each other:
+    // t1 and b1, side by side, become one block 0..10; tall, lying in them, is spread apart like a heap.
     const shapes = [
       box("t1", 5, 0), box("t2", 30, 0), box("t3", 200, 0),
       box("b1", 5, 30), box("b2", 40, 30), box("b3", 200, 30),
@@ -117,8 +142,14 @@ describe("equal gaps", () => {
     const result = spread(shapes);
     expect(result.problem).toBeNull();
     expect(result.gaps).toHaveLength(1);
-    // One row of seven from t1 (0..10) to b3 (195..205): 195 - 10 - 48 = 137 of room in six gaps.
-    expect(result.gaps[0]).toBeCloseTo(137 / 6, 6);
+    // Blocks 0..10, tall 2..10, t2 25..35, b2 35..45 and 195..205: 195 - 10 - 28 = 157 of room in four gaps.
+    const gap = 157 / 4;
+    expect(result.gaps[0]).toBeCloseTo(gap, 6);
+    expect(left(result.nextShapes, "tall")).toBeCloseTo(10 + gap, 6);
+    expect(left(result.nextShapes, "t2")).toBeCloseTo(18 + 2 * gap, 6);
+    expect(left(result.nextShapes, "b2")).toBeCloseTo(28 + 3 * gap, 6);
+    expect(byId(result.nextShapes, "t1")).toBe(shapes[0]);
+    expect(byId(result.nextShapes, "b1")).toBe(shapes[3]);
   });
 
   it("takes parts in a staggered line as one row", () => {

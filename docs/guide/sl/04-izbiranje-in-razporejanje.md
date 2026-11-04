@@ -59,7 +59,7 @@ Tipka za to je [[L]]. [[Esc]] prekine.
 
 Ob srednji točki vsake črte stoji širša točka s črtico na vsaki strani. Razporedi tri ali več oblik v tej smeri tako, da je prostor med sosednjimi robovi povsod enak, ne glede na velikost oblik. Prva in zadnja oblika ostaneta na mestu, tiste vmes se premaknejo. Vrsta lukenj različnih velikosti tako dobi povsod enako steno vmes. Pojdi z miško čez točko in vnaprej vidiš, kam gredo oblike; vrstica stanja nato pove razmik.
 
-Če je med izbranimi oblikami plošča, ki je v tej smeri daljša od vseh drugih, se oblike razporedijo po njej: razmik do njenih robov je enak razmiku med oblikami, ena sama oblika pa pride na sredino. Oblike v več vrstah, kot živali sestavljanke z gumbki, se razporedijo vrsto za vrsto; oblike, katerih škatle se prekrivajo prečno na smer, tvorijo eno vrsto.
+Če je med izbranimi oblikami plošča, ki je v tej smeri daljša od vseh drugih, se oblike razporedijo po njej: razmik do njenih robov je enak razmiku med oblikami, ena sama oblika pa pride na sredino. Oblike v več vrstah, kot živali sestavljanke z gumbki, se razporedijo vrsto za vrsto; oblike, katerih škatle se prekrivajo prečno na smer, tvorijo eno vrsto. Kjer oblike ne stojijo v čistih stolpcih, kot živali od spredaj nazaj, se oblike, ki stojijo druga ob drugi, premaknejo kot cela vrsta.
 
 Drži [[Alt]] in klikni točko, da sam vpišeš razmik, na primer 5 mm: oblike se postavijo tako daleč narazen, od prve oblike ali od tiste, ki si jo kliknil najprej; na plošči pride vrsta na sredino. Zaklenjena oblika ostane na mestu, zato ena med zunanjima oblikama prepreči enake razmike.
 

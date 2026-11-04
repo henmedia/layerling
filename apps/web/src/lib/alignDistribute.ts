@@ -15,10 +15,13 @@ import type { AlignAxis, WorkplaneShape } from "@/types/layerling";
  * past every other part's along the axis. It is found by itself, clicked as the anchor or not, and then the
  * parts spread inside it with the same gap at its edges as between them; a single part comes to its middle.
  *
- * Parts in several rows (the puzzle's three rows of animals) spread row by row: two parts are in one row
- * when their boxes overlap across the axis, on both other axes. Where that finds nothing to spread (every
- * part a row of its own, as in a staggered line) or a row whose parts overlap along the axis (one tall
- * part joining two rows), all the parts are one row.
+ * Parts in several rows (the puzzle's three rows of animals, spread from left to right) spread row by row:
+ * two parts are in one row when their boxes overlap across the axis, on both other axes. Where that finds
+ * no rows to spread (every part a row of its own, or a row whose parts overlap along the axis while they
+ * stand beside each other across it, as when the same puzzle is spread from front to back and its animals
+ * stand in no clean columns), the parts that overlap along the axis side by side move together as one
+ * block - a whole row of the puzzle - and the blocks are spread instead; a staggered line is then simply one
+ * part per block. Parts that lie in each other, dropped in a heap, are never a block: they are spread apart.
  *
  * With a gap typed in (Alt on the dot) the parts line up that far apart instead: the anchor or a locked
  * part in a row stays and the others line up from it, otherwise the first part stays; in a frame the row
@@ -31,6 +34,8 @@ const EPSILON = 0.0005;
 
 type Range = { min: number; max: number };
 type Member = { shape: WorkplaneShape; bounds: Cuboid; along: Range; fixed: boolean };
+/** What moves as one along the axis: a part, or a block of parts that overlap along it. */
+type Unit = { members: Member[]; along: Range; fixed: boolean };
 
 export type DistributeProblem = "tooFew" | "noRoom" | "lockedBetween";
 
@@ -82,18 +87,13 @@ function frameOf(members: Member[], anchorId: string | null): Member | null {
   return members.find(encloses) ?? null;
 }
 
-/** The rows across the axis, as described above. */
-function rowsOf(members: Member[], axis: AlignAxis): Member[][] {
-  if (members.length < 2) return [members];
-  const [first, second] = otherAxes(axis);
+/** The groups of parts joined, directly or through others, by `linked`. */
+function clusters(members: Member[], linked: (a: Member, b: Member) => boolean): Member[][] {
   const parent = members.map((_, index) => index);
   const root = (index: number): number => (parent[index] === index ? index : (parent[index] = root(parent[index])));
   for (let a = 0; a < members.length; a += 1) {
     for (let b = a + 1; b < members.length; b += 1) {
-      if (overlap(rangeAlong(members[a].bounds, first), rangeAlong(members[b].bounds, first))
-        && overlap(rangeAlong(members[a].bounds, second), rangeAlong(members[b].bounds, second))) {
-        parent[root(a)] = root(b);
-      }
+      if (linked(members[a], members[b])) parent[root(a)] = root(b);
     }
   }
   const byRoot = new Map<number, Member[]>();
@@ -101,22 +101,40 @@ function rowsOf(members: Member[], axis: AlignAxis): Member[][] {
     const key = root(index);
     byRoot.set(key, [...(byRoot.get(key) ?? []), member]);
   });
-  const rows = Array.from(byRoot.values());
-  const crowded = rows.some((row) => row.some((a, i) => row.some((b, j) => j > i && overlap(a.along, b.along))));
-  if (crowded || rows.every((row) => row.length === 1)) return [members];
-  return rows;
+  return Array.from(byRoot.values());
 }
 
-const sizeOf = (member: Member) => member.along.max - member.along.min;
+const single = (member: Member): Unit => ({ members: [member], along: member.along, fixed: member.fixed });
+
+/** The rows to spread, each a list of what moves as one, as described above. */
+function rowsOf(members: Member[], axis: AlignAxis): Unit[][] {
+  const [first, second] = otherAxes(axis);
+  const across = (a: Member, b: Member) =>
+    overlap(rangeAlong(a.bounds, first), rangeAlong(b.bounds, first)) && overlap(rangeAlong(a.bounds, second), rangeAlong(b.bounds, second));
+  const rows = clusters(members, across);
+  // Parts that lie in each other (dropped in a heap) are simply spread; a row is muddled when two of its
+  // parts overlap along the axis while standing beside each other across it - they belong to two rows that
+  // a third part joined.
+  const muddled = rows.some((row) => row.some((a, i) => row.some((b, j) => j > i && overlap(a.along, b.along) && !across(a, b))));
+  if (!muddled && rows.some((row) => row.length > 1)) return rows.map((row) => row.map(single));
+  const blocks = clusters(members, (a, b) => overlap(a.along, b.along) && !across(a, b)).map((block): Unit => ({
+    members: block,
+    along: { min: Math.min(...block.map((member) => member.along.min)), max: Math.max(...block.map((member) => member.along.max)) },
+    fixed: block.some((member) => member.fixed),
+  }));
+  return [blocks];
+}
+
+const sizeOf = (unit: Unit) => unit.along.max - unit.along.min;
 const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
-/** Where each part of one row starts along the axis, the row in order; or a problem. */
-function placeRow(row: Member[], frame: Range | null, gap: number | null): { starts: number[]; gap: number } | DistributeProblem {
+/** Where each unit of one row starts along the axis, the row in order; or a problem. */
+function placeRow(row: Unit[], frame: Range | null, gap: number | null): { starts: number[]; gap: number } | DistributeProblem {
   const count = row.length;
   const sizes = row.map(sizeOf);
   const total = sum(sizes);
-  const fixed = row.map((member, index) => (member.fixed ? index : -1)).filter((index) => index >= 0);
-  // Parts laid one after the other from a start, `step` apart.
+  const fixed = row.map((unit, index) => (unit.fixed ? index : -1)).filter((index) => index >= 0);
+  // Units laid one after the other from a start, `step` apart.
   const laidFrom = (start: number, step: number) => {
     const starts: number[] = [];
     let cursor = start;
@@ -126,7 +144,7 @@ function placeRow(row: Member[], frame: Range | null, gap: number | null): { sta
     });
     return starts;
   };
-  // Parts laid out round the part at `pivot`, which keeps its place.
+  // Units laid out round the one at `pivot`, which keeps its place.
   const laidRound = (pivot: number, step: number) => {
     const shift = row[pivot].along.min - laidFrom(0, step)[pivot];
     return laidFrom(shift, step);
@@ -139,7 +157,7 @@ function placeRow(row: Member[], frame: Range | null, gap: number | null): { sta
       if (even < -EPSILON) return "noRoom";
       return { starts: laidFrom(frame.min + even, even), gap: even };
     }
-    if (count < 3) return { starts: row.map((member) => member.along.min), gap: 0 };
+    if (count < 3) return { starts: row.map((unit) => unit.along.min), gap: 0 };
     if (fixed.some((index) => index > 0 && index < count - 1)) return "lockedBetween";
     const first = row[0];
     const last = row[count - 1];
@@ -177,11 +195,12 @@ export function distributedShapesForSelection(
   });
   const frame = frameOf(members, anchorId);
   const parts = frame ? members.filter((member) => member !== frame) : members;
-  if (parts.length < (frame ? 1 : gap !== null ? 2 : 3)) return none("tooFew");
+  const least = frame ? 1 : gap !== null ? 2 : 3;
+  if (parts.length < least) return none("tooFew");
 
   const rows = rowsOf(parts, axis)
     .map((row) => [...row].sort((a, b) => (a.along.min + a.along.max) - (b.along.min + b.along.max) || a.along.min - b.along.min))
-    .filter((row) => row.length >= (frame || gap !== null ? 1 : 3));
+    .filter((row) => row.length >= least);
   if (rows.length === 0) return none("tooFew");
 
   const deltas = new Map<string, number>();
@@ -190,9 +209,10 @@ export function distributedShapesForSelection(
     const placed = placeRow(row, frame ? frame.along : null, gap);
     if (typeof placed === "string") return { ...none(placed), frameId: frame?.shape.id ?? null };
     gaps.push(Math.max(0, placed.gap));
-    row.forEach((member, index) => {
-      const delta = placed.starts[index] - member.along.min;
-      if (!member.fixed && Math.abs(delta) > EPSILON) deltas.set(member.shape.id, delta);
+    row.forEach((unit, index) => {
+      const delta = placed.starts[index] - unit.along.min;
+      if (unit.fixed || Math.abs(delta) <= EPSILON) return;
+      unit.members.forEach((member) => deltas.set(member.shape.id, delta));
     });
   }
 
