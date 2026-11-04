@@ -193,6 +193,12 @@ function drawingBoard(api) {
     view = { x0: (bx0 + bx1) / 2 - w / 2, y0: (by0 + by1) / 2 - h / 2, w }
     render()
   }
+  // Whether the whole shape lies inside the view: only a view that shows all of it follows the shape as it grows.
+  function shapeInView() {
+    if (!view) return false
+    const [bx0, by0, bx1, by1] = api.bounds()
+    return bx0 >= view.x0 && by0 >= view.y0 && bx1 <= view.x0 + view.w && by1 <= view.y0 + view.h
+  }
   function zoomAt(factor, mx, my) {
     const w = clamp(view.w * factor, 5, 3000)
     const f = w / view.w
@@ -848,7 +854,7 @@ function drawingBoard(api) {
           event.preventDefault()
           event.stopPropagation()
           selected = i
-          drag = { kind: 'point', index: i }
+          drag = { kind: 'point', index: i, whole: shapeInView() }
           svg.setPointerCapture(event.pointerId)
           svg.focus({ preventScroll: true })
           render()
@@ -868,7 +874,7 @@ function drawingBoard(api) {
           hit.addEventListener('pointerdown', (event) => {
             event.preventDefault()
             event.stopPropagation()
-            drag = { kind: 'tangent', index: selected, sign }
+            drag = { kind: 'tangent', index: selected, sign, whole: shapeInView() }
             svg.setPointerCapture(event.pointerId)
           })
         }
@@ -944,9 +950,9 @@ function drawingBoard(api) {
     }
     if (was.kind === 'point' || was.kind === 'tangent') {
       api.finish() // recompute finely
-      // If the shape has grown beyond the view (diameter, height), let the view follow.
-      const [bx0, by0, bx1, by1] = api.bounds()
-      if (bx0 < view.x0 || by0 < view.y0 || bx1 > view.x0 + view.w || by1 > view.y0 + view.h) fit()
+      // If the shape has grown beyond a view that showed all of it (diameter, height), let the view follow; zoomed in
+      // on a part, the view stays where it was put (Discussion #1278).
+      if (was.whole && !shapeInView()) fit()
     }
   }
   svg.addEventListener('pointerup', end)
