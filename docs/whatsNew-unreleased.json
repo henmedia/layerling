@@ -8,5 +8,15 @@
       "de": "In den Arbeitsbereich-Einstellungen gibt es einen neuen Schalter: Damit bekommt jedes Maßkästchen neben der Auswahl die Farbe seiner Achse, wie die Griffe, X rot, Y grün und Z blau. So siehst du auch an kleinen Teilen auf einen Blick, welche Zahl welche ist. Er ist anfangs aus.",
       "en": "A new switch in the workspace settings gives each value box beside the selection the colour of its axis, as the handles have: red X, green Y and blue Z. So even on small parts you see at a glance which number is which. It is off to begin with."
     }
+  },
+  {
+    "title": {
+      "de": "Freihand zeichnen in der Skizze",
+      "en": "Freehand drawing in sketches"
+    },
+    "body": {
+      "de": "Das neue Skizzenwerkzeug Freihand (Taste 5) nimmt einen Strich mit Stift, Finger oder Maus und macht beim Absetzen wenige Punkte daraus, die du danach ziehen kannst: Ecken, wo er scharf abbog, weiche Kurven dazwischen. Endet er an seinem Anfang, wird ein Umriss daraus, der zum Körper werden kann.",
+      "en": "The new sketch tool Freehand (key 5) takes a stroke drawn with a pen, a finger or the mouse and, when you lift it, makes a few points of it that you can drag afterwards: corners where it turned sharply, smooth curves in between. If it ends where it began, it becomes an outline that can turn into a body."
+    }
   }
 ]

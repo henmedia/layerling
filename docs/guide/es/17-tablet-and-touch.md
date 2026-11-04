@@ -36,6 +36,8 @@ El cubo de vista de arriba a la izquierda gira la vista cuando lo arrastras, y u
 
 La yema del dedo tapa aquello a lo que apunta. layerling deja que un dedo alcance tiradores, puntos, líneas y aristas desde un poco más lejos que el puntero del ratón, pero un lápiz es más fino. Esto vale para un lápiz que la tableta reconoce como tal, como un Apple Pencil o un S Pen. Un lápiz sencillo con punta de goma cuenta para la pantalla como un dedo y no es más fino que uno, así que trabaja con él como con el dedo. En un iPad, un Apple Pencil que se mantiene sobre la pantalla sin tocarla también muestra al cabo de un momento el nombre de un control en una pequeña burbuja, igual que el puntero del ratón muestra una etiqueta emergente.
 
+En el modo boceto, {{ui:sketch.freehand}} dibuja con el lápiz o un dedo como en papel; al levantarlo, la línea se convierte en puntos del boceto que puedes editar, consulta [Bocetos](chapter:sketches).
+
 Si los cuerpos se desplazan sin querer cuando los tocan niños o manos con prisa, activa {{ui:workspace.selectBeforeMoving}} en los ajustes: con este ajuste, primero hay que seleccionar un cuerpo, y solo el siguiente arrastre lo mueve.
 
 ## En un iPad o un iPhone

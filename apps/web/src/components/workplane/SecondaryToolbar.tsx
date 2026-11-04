@@ -36,6 +36,7 @@ export const sketchReferenceIcons = {
   arc: "sketch-tool-arc.png",
   bezier: "sketch-tool-bezier-curve.png",
   smooth: "sketch-tool-smooth-curve.png",
+  freehand: "sketch-tool-freehand.png",
   select: "sketch-tool-select.png",
   image: "sketch-tool-add-image.png",
   refine: "sketch-tool-add-or-remove-points.png",
@@ -135,6 +136,7 @@ export const SKETCH_PALETTE_ICONS = {
   arc: sketchPaletteIcon("arc"),
   bezier: sketchPaletteIcon("bezier"),
   smooth: sketchPaletteIcon("smooth"),
+  freehand: sketchPaletteIcon("freehand"),
   select: sketchPaletteIcon("select"),
   image: sketchPaletteIcon("image"),
   refine: sketchPaletteIcon("refine"),
@@ -1035,6 +1037,7 @@ export function SecondaryToolbar({
         plain("sketch-arc", t("sketch.arc"), drawGroup, true, () => onSketchTool("arc"), { icon: SKETCH_PALETTE_ICONS.arc, active: sketchTool === "arc" }),
         plain("sketch-bezier", t("sketch.bezier"), drawGroup, true, () => onSketchTool("bezier"), { icon: SKETCH_PALETTE_ICONS.bezier, active: sketchTool === "bezier" }),
         plain("sketch-smooth", t("sketch.smooth"), drawGroup, true, () => onSketchTool("smooth"), { icon: SKETCH_PALETTE_ICONS.smooth, active: sketchTool === "smooth" }),
+        plain("sketch-freehand", t("sketch.freehand"), drawGroup, true, () => onSketchTool("freehand"), { icon: SKETCH_PALETTE_ICONS.freehand, active: sketchTool === "freehand" }),
         plain("note", t("editor.tool.note"), t("editor.group.visibility"), true, onNoteTool, { icon: ToolbarNoteIcon, active: noteMode }),
         plain("notes", t("visibility.notes"), t("editor.group.visibility"), true, onToggleNotes, { icon: notesVisible ? Eye : EyeOff, active: notesVisible }),
         plain("sketch-construction", t("sketch.construction"), drawGroup, true, () => onSketchConstruction?.(), { icon: ToolbarConstructionLineIcon, active: Boolean(sketchConstruction), keywords: ["construction", "guide", "helper", "hilfslinie", "hilfs", "konstruktion"] }),
@@ -1331,6 +1334,9 @@ export function SecondaryToolbar({
                     </button>
                     <button className={`toolbar-icon sketch-tool-icon ${sketchTool === "smooth" ? "active" : ""}`} type="button" aria-label={t("sketch.smooth")} title={t("sketch.smooth")} onClick={() => onSketchTool("smooth")}>
                       <SketchReferenceIcon name="smooth" />
+                    </button>
+                    <button className={`toolbar-icon sketch-tool-icon ${sketchTool === "freehand" ? "active" : ""}`} type="button" aria-label={t("sketch.freehand")} title={`${t("status.sketchTool.freehand")} (5)`} aria-keyshortcuts="5" onClick={() => onSketchTool("freehand")}>
+                      <SketchReferenceIcon name="freehand" />
                     </button>
                     <button className={`toolbar-icon sketch-tool-icon sketch-construction-toggle ${sketchConstruction ? "active" : ""}`} type="button" aria-pressed={Boolean(sketchConstruction)} aria-label={t("sketch.construction")} title={t("sketch.constructionHint")} onClick={onSketchConstruction}>
                       <ToolbarConstructionLineIcon />

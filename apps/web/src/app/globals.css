@@ -6519,6 +6519,16 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   stroke-width: 3;
 }
 
+/* Freehand (#1280): the line under the pen while it is drawn, before it becomes points. */
+.sketch-freehand-preview {
+  fill: none;
+  stroke: #ce7416;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
 .sketch-preview-line {
   stroke: #ce7416;
   stroke-width: 2;

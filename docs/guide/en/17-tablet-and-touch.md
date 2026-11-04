@@ -36,6 +36,8 @@ The view cube in the top left turns the view when you drag it, and a tap on one 
 
 A fingertip covers what it aims at. layerling lets a finger reach a little further to handles, points, lines and edges than a mouse pointer does, but a stylus is finer. This holds for a pen the tablet knows as a pen, such as an Apple Pencil or an S Pen. A plain stylus with a rubber tip counts as a finger for the screen and is not finer than one, so work with it as with a finger. An Apple Pencil that hovers above the screen on an iPad also shows the name of a control after a moment, in a small bubble, as the mouse pointer does with a tooltip.
 
+In sketch mode, {{ui:sketch.freehand}} draws with the pen or a finger as on paper; when you lift it, the line becomes sketch points you can edit, see [Sketches](chapter:sketches).
+
 If bodies slip when children or hurried hands touch them, switch on {{ui:workspace.selectBeforeMoving}} in the settings: a body then has to be selected first, and only the next drag moves it.
 
 ## On an iPad or iPhone

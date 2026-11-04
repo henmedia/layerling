@@ -56,9 +56,9 @@ import { arcPreviewPoints, arcThroughThreePoints, type SketchArcEnd } from "@/li
 import { constrainToAngle, sketchLineAngle, sketchPolarPoint, splitTypedLine } from "@/lib/sketchPolar";
 
 export type { SketchPrimitive } from "@/lib/sketchPrimitives";
-export type SketchTool = "line" | "arc" | "bezier" | "smooth" | SketchPrimitive | "select" | "refine" | "erase" | "measure";
+export type SketchTool = "line" | "arc" | "bezier" | "smooth" | "freehand" | SketchPrimitive | "select" | "refine" | "erase" | "measure";
 /** The keys 1 to 4 and the drawing tool each picks, in the order of the tools on the left (#347). */
-export const SKETCH_TOOL_KEYS: Readonly<Record<string, SketchTool>> = { "1": "line", "2": "bezier", "3": "smooth", "4": "refine" };
+export const SKETCH_TOOL_KEYS: Readonly<Record<string, SketchTool>> = { "1": "line", "2": "bezier", "3": "smooth", "4": "refine", "5": "freehand" };
 /** With the Select tool and something selected, the same keys change it instead (#347): 1 straight / corner, 2 curve, 3 smooth. */
 export const SKETCH_EDIT_KEYS: Readonly<Record<string, "straight" | "curve" | "smooth">> = { "1": "straight", "2": "curve", "3": "smooth" };
 export type { SketchSelection } from "@/lib/sketchSelection";
@@ -94,6 +94,8 @@ type SketchWorkspaceProps = {
   onAddPrimitive: (primitive: SketchPrimitive, center: { x: number; z: number }) => void;
   /** The three-point arc (#643): first the two ends, then a point the arc runs through. */
   onAddArc?: (start: SketchArcEnd, through: { x: number; z: number }, end: SketchArcEnd) => void;
+  /** Freehand (#1280): the line drawn with the pen, a finger or the mouse, unsnapped, and the size of a screen pixel in mm. */
+  onFreehandStroke?: (samples: Array<{ x: number; z: number }>, screenUnit: number) => void;
   onPointPress: (id: string) => void;
   /** Ends the chain of points being drawn, keeping the tool: a right click on the plane or a double click on the last point (#520). */
   onFinishLine?: () => void;
@@ -731,6 +733,7 @@ export function SketchWorkspace({
   fromMiddle,
   onAddPrimitive,
   onAddArc,
+  onFreehandStroke,
   onPointPress,
   onFinishLine,
   onSelectSegment,
@@ -839,6 +842,10 @@ export function SketchWorkspace({
   const lastPointerRef = useRef<{ clientX: number; clientY: number } | null>(null);
   const [refinePreview, setRefinePreview] = useState<{ segmentId: string; placement: SketchSegmentPlacement } | null>(null);
   const [pointerAction, setPointerAction] = useState<PointerAction | null>(null);
+  // A freehand stroke (#1280) in progress: its samples in a ref, not in state, so no move of a fast pen is lost
+  // between two renders, and its preview drawn straight into the polyline, without rendering the workspace.
+  const freehandRef = useRef<{ pointerId: number; samples: Array<{ x: number; z: number }> } | null>(null);
+  const freehandLineRef = useRef<SVGPolylineElement>(null);
   // The reference image's crop mode and calibration (#216): both belong to the selected image.
   const [cropMode, setCropMode] = useState(false);
   const [calibration, setCalibration] = useState<{ imageId: string; points: Array<{ x: number; z: number }> } | null>(null);
@@ -1531,7 +1538,46 @@ export function SketchWorkspace({
     }
     if (event.button === 2) rightPressRef.current = { x: event.clientX, y: event.clientY };
     if (isSketchPanGesture(event, workspace.mouseScheme)) beginPan(event);
+    else if (tool === "freehand") beginFreehand(event);
     else retargetTouchPress(event);
+  };
+
+  // Freehand (#1280): the stroke starts wherever the pen goes down - on a line, a point or a picture
+  // as well, so a template can be drawn over - and a finger is not moved onto the nearest point.
+  const beginFreehand = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (event.button !== 0 || freehandRef.current || pointerAction) return;
+    const at = unsnappedPointFromEvent(event);
+    if (!at) return;
+    event.preventDefault();
+    event.stopPropagation();
+    capturePointer(svgRef.current, event.pointerId);
+    freehandRef.current = { pointerId: event.pointerId, samples: [at] };
+    freehandLineRef.current?.setAttribute("points", `${at.x},${at.z}`);
+  };
+
+  const extendFreehand = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const stroke = freehandRef.current;
+    if (!stroke || stroke.pointerId !== event.pointerId) return false;
+    // A pen reports many more positions than there are frames; the browser gathers them into one move.
+    const native = event.nativeEvent as PointerEvent;
+    const moves = typeof native.getCoalescedEvents === "function" ? native.getCoalescedEvents() : [];
+    (moves.length ? moves : [native]).forEach((move) => {
+      const at = unsnappedPointFromEvent(move);
+      if (at) stroke.samples.push(at);
+    });
+    freehandLineRef.current?.setAttribute("points", stroke.samples.map((point) => `${point.x},${point.z}`).join(" "));
+    return true;
+  };
+
+  /** Ends the stroke: lifted, it becomes sketch points; cancelled, it is dropped. */
+  const endFreehand = (event: ReactPointerEvent<SVGSVGElement>, keep: boolean) => {
+    const stroke = freehandRef.current;
+    if (!stroke || stroke.pointerId !== event.pointerId) return false;
+    freehandRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    freehandLineRef.current?.setAttribute("points", "");
+    if (keep) onFreehandStroke?.(stroke.samples, screenUnit);
+    return true;
   };
 
   // The context menu event comes with the press on macOS and with the release on Windows, so it cannot tell a click from a pan.
@@ -1574,6 +1620,7 @@ export function SketchWorkspace({
 
   const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
     lastPointerRef.current = { clientX: event.clientX, clientY: event.clientY };
+    if (extendFreehand(event)) return;
     if (pointerAction?.kind === "pan") {
       const matrix = svgRef.current?.getScreenCTM();
       const scaleX = matrix ? Math.max(0.0001, Math.hypot(matrix.a, matrix.b)) : 1;
@@ -2370,10 +2417,14 @@ export function SketchWorkspace({
           onPointerDown={handlePlanePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={(event) => {
+            if (endFreehand(event, true)) return;
             endChainOnRightRelease(event);
             finishPointerAction(event);
           }}
-          onPointerCancel={() => setPointerAction(null)}
+          onPointerCancel={(event) => {
+            endFreehand(event, false);
+            setPointerAction(null);
+          }}
           onPointerLeave={() => {
             lastPointerRef.current = null;
             if (!pointerAction) setHover(null);
@@ -3200,6 +3251,7 @@ export function SketchWorkspace({
             ) : null;
           }) : null}
           {hover && ["line", "arc", "bezier", "smooth", "measure"].includes(tool) ? <circle className="sketch-cursor-point" cx={hover.x} cy={hover.z} r={hoverPointRadius} pointerEvents="none" /> : null}
+          {tool === "freehand" ? <polyline ref={freehandLineRef} className="sketch-freehand-preview" points="" pointerEvents="none" /> : null}
         </svg>
         {notes?.length && onUpdateNote && onRemoveNote ? (
           <SketchNotes

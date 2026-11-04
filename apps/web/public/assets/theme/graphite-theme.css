@@ -2524,6 +2524,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-shape-options .
   stroke: #ff8a00;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-freehand-preview {
+  fill: none;
+  stroke: #ce7416;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-preview-line {
   stroke: #ce7416;
 }
