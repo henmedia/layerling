@@ -51,7 +51,7 @@ Med [[Alt]] allerede holdt når trækket begynder, trækker du en kopi, som i Ti
 
 ## Justering
 
-To eller flere valgte former justeres med {{ui:editor.tool.align}}: punkter dukker op omkring markeringen for venstre, centrum og højre, for, centrum og bag, og top, centrum og bund. Et klik på et punkt flytter alle former derhen. Klikker du først på en af de valgte former, bliver den hvor den er, og de andre justeres med den. En låst form i markeringen er den faste form for sig selv. Venstre, højre, for, bag, top og bund går efter kassen omkring en form; midten af en trekant, en pentagon eller en stjerne er dens egen midte, så et hul centreret på en sidder i midten af formen og ikke af dens kasse.
+To eller flere valgte former justeres med {{ui:editor.tool.align}} ([[L]], eller højreklik på markeringen og vælg den): punkter dukker op omkring markeringen for venstre, centrum og højre, for, centrum og bag, og top, centrum og bund. Et klik på et punkt flytter alle former derhen. Klikker du først på en af de valgte former, bliver den hvor den er, og de andre justeres med den. En låst form i markeringen er den faste form for sig selv. Venstre, højre, for, bag, top og bund går efter kassen omkring en form; midten af en trekant, en pentagon eller en stjerne er dens egen midte, så et hul centreret på en sidder i midten af formen og ikke af dens kasse.
 
 En form vendt i en vinkel, for eksempel med 45°, har sin kasse omkring sig at justere med, ikke dens egne kanter. For at justere med kanterne, sæt et arbejdsplan på en flade af den form først ({{ui:camera.placeWorkplane}}, klik så fladen): punkterne står så på det plans akser, og formerne måles og flyttes langs dem, som i Tinkercad. Nulstil arbejdsplanet for at justere langs pladen igen.
 

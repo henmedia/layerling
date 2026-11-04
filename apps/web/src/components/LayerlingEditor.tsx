@@ -15995,9 +15995,12 @@ export function LayerlingEditor({
         items.push({ key: "faceTool", label: t("faceTool.title"), onSelect: toggleFaceTool });
       }
     }
+    // Align from the menu at the pointer (Discussion #1275): with two or more parts, as the L key; locked parts stay put as there.
+    const canAlign = selectedShapes.length >= 2 && !allLocked;
+    if (canAlign) items.push({ key: "align", label: t("editor.tool.align"), shortcut: "L", separated: true, onSelect: toggleAlignMode });
     if (!selectionLocked) {
       items.push(
-        { key: "mirror", label: t("editor.tool.mirror"), shortcut: "M", separated: true, onSelect: toggleMirrorMode },
+        { key: "mirror", label: t("editor.tool.mirror"), shortcut: "M", separated: !canAlign, onSelect: toggleMirrorMode },
         { key: "scalePercent", label: t("scalePercent.title"), onSelect: toggleScalePercentTool },
       );
     }

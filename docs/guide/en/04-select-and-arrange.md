@@ -49,7 +49,7 @@ With [[Alt]] already held when the drag begins, you drag a copy, as in Tinkercad
 
 ## Aligning
 
-Two or more selected shapes are lined up with {{ui:editor.tool.align}}: points appear around the selection for left, centre and right, front, centre and back, and top, centre and bottom. A click on a point moves all shapes there. If you first click one of the selected shapes, it stays in place and the others line up with it. A locked shape in the selection is that fixed shape by itself. Left, right, front, back, top and bottom go by the box round a shape; the centre of a triangle, a pentagon or a star is its own middle, so a hole centred on one sits in the middle of the shape and not of its box.
+Two or more selected shapes are lined up with {{ui:editor.tool.align}} ([[L]], or right-click the selection and choose it): points appear around the selection for left, centre and right, front, centre and back, and top, centre and bottom. A click on a point moves all shapes there. If you first click one of the selected shapes, it stays in place and the others line up with it. A locked shape in the selection is that fixed shape by itself. Left, right, front, back, top and bottom go by the box round a shape; the centre of a triangle, a pentagon or a star is its own middle, so a hole centred on one sits in the middle of the shape and not of its box.
 
 A shape turned at an angle, say by 45°, has its box round it to line up with, not its own edges. To line up with the edges, set a workplane on a face of that shape first ({{ui:camera.placeWorkplane}}, then click the face): the points then stand on the axes of that plane, and the shapes are measured and moved along them, as in Tinkercad. Reset the workplane to line up along the plate again.
 

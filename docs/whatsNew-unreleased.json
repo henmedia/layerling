@@ -18,5 +18,15 @@
       "de": "Beim Gruppieren mit Löchern konnte eine Ecke neben einer Rundung schräg abgeschnitten werden, weil das Aufräumen hauchdünner Stufen zu weit ging. Jetzt prüft layerling, dass die Form dabei gleich bleibt.",
       "en": "When grouping with holes, a corner beside a rounding could come out cut off at a slant, because tidying away hair-thin steps went too far. layerling now checks that the shape stays the same."
     }
+  },
+  {
+    "title": {
+      "de": "Ausrichten per Rechtsklick",
+      "en": "Align from the right-click menu"
+    },
+    "body": {
+      "de": "Mit zwei oder mehr ausgewählten Teilen steht Ausrichten jetzt auch im Menü, das ein Rechtsklick an der Maus öffnet, gleich über Spiegeln. So musst du nicht erst zur Leiste fahren oder dir die Taste L merken.",
+      "en": "With two or more parts selected, Align is now also in the menu a right-click opens at the pointer, just above Mirror. No trip to the toolbar, and no need to remember the L key."
+    }
   }
 ]

@@ -47,7 +47,7 @@ Přidržíte-li [[Alt]] už před zahájením tažení, přesouváte kopii jako 
 
 ## Zarovnání
 
-Vyberte nejméně dva tvary a zapněte {{ui:editor.tool.align}}. Kolem výběru se objeví body pro levý okraj, střed, pravý okraj, předek, střed, zadek a horní, střední či spodní výšku. Kliknutí přesune tvary na zvolenou úroveň. Pokud nejprve kliknete na jedno vybrané těleso, zůstane pevné a ostatní se zarovnají podle něj. Zamčené těleso se stane pevným základem automaticky. Krajní zarovnání používá ohraničující kvádr, ale střed trojúhelníku, pětiúhelníku nebo hvězdy je vlastním středem tvaru. Otvor tak bude uprostřed tvaru, nikoli jeho obálky.
+Vyberte nejméně dva tvary a zapněte {{ui:editor.tool.align}} ([[L]] nebo příkaz v místní nabídce). Kolem výběru se objeví body pro levý okraj, střed, pravý okraj, předek, střed, zadek a horní, střední či spodní výšku. Kliknutí přesune tvary na zvolenou úroveň. Pokud nejprve kliknete na jedno vybrané těleso, zůstane pevné a ostatní se zarovnají podle něj. Zamčené těleso se stane pevným základem automaticky. Krajní zarovnání používá ohraničující kvádr, ale střed trojúhelníku, pětiúhelníku nebo hvězdy je vlastním středem tvaru. Otvor tak bude uprostřed tvaru, nikoli jeho obálky.
 
 U šikmo natočeného tvaru, například o 45°, se jinak zarovnává podle obálky, nikoli jeho vlastních hran. Chcete-li použít jeho osy, položte nejprve na jeho plochu pracovní rovinu přes {{ui:camera.placeWorkplane}}. Zarovnávací body pak používají osy této roviny jako v Tinkercadu. Pro návrat k osám podložky pracovní rovinu obnovte.
 

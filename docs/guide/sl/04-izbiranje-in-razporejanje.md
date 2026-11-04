@@ -47,7 +47,7 @@ Obliko lahko povlečeš čez rob plošče in jo pustiš tam, približno za širi
 
 ## Poravnava
 
-Dve ali več izbranih oblik poravnaš med seboj z {{ui:editor.tool.align}}: na robu izbora se pokažejo točke za levo, sredino in desno, spredaj, sredino in zadaj ter zgoraj, sredino in spodaj. Klik na točko premakne vse oblike tja. Če najprej klikneš eno od izbranih oblik, ta ostane na mestu in se druge ravnajo po njej. Zaklenjena oblika v izboru je sama ta nepremična oblika. Levo, desno, spredaj, zadaj, zgoraj in spodaj gredo po okvirju okoli oblike; sredina trikotnika, petkotnika ali zvezde je njena lastna sredina, zato luknja, centrirana na tako obliko, leži na sredini oblike in ne njenega okvirja.
+Dve ali več izbranih oblik poravnaš med seboj z {{ui:editor.tool.align}} ([[L]] ali desni klik na izbor in izbira ukaza): na robu izbora se pokažejo točke za levo, sredino in desno, spredaj, sredino in zadaj ter zgoraj, sredino in spodaj. Klik na točko premakne vse oblike tja. Če najprej klikneš eno od izbranih oblik, ta ostane na mestu in se druge ravnajo po njej. Zaklenjena oblika v izboru je sama ta nepremična oblika. Levo, desno, spredaj, zadaj, zgoraj in spodaj gredo po okvirju okoli oblike; sredina trikotnika, petkotnika ali zvezde je njena lastna sredina, zato luknja, centrirana na tako obliko, leži na sredini oblike in ne njenega okvirja.
 
 Poševno zavrtena oblika, na primer za 45°, ima za izhodišče okvir okoli sebe, ne svojih lastnih robov. Za poravnavo po robovih najprej postaviš delovno ravnino na ploskev te oblike ({{ui:camera.placeWorkplane}}, nato klik na ploskev): točke potem stojijo na oseh te ravnine, oblike pa se merijo in premikajo vzdolž njih, kot v Tinkercadu. Če delovno ravnino ponastaviš, spet poravnavaš po plošči.
 

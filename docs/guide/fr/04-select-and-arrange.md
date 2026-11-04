@@ -47,7 +47,7 @@ Avec [[Alt]] déjà maintenu lorsque le glisser commence, vous faites glisser un
 
 ## Alignement
 
-Deux formes sélectionnées ou plus sont alignées avec {{ui:editor.tool.align}} : des points apparaissent autour de la sélection pour la gauche, le centre et la droite, l'avant, le centre et l'arrière, et le haut, le centre et le bas. Un clic sur un point y déplace toutes les formes. Si vous cliquez d'abord sur l'une des formes sélectionnées, elle reste en place et les autres s'alignent avec elle. Une forme verrouillée dans la sélection est cette forme fixe en elle-même.
+Deux formes sélectionnées ou plus sont alignées avec {{ui:editor.tool.align}} ([[L]], ou cliquez avec le bouton droit sur la sélection et choisissez-le) : des points apparaissent autour de la sélection pour la gauche, le centre et la droite, l'avant, le centre et l'arrière, et le haut, le centre et le bas. Un clic sur un point y déplace toutes les formes. Si vous cliquez d'abord sur l'une des formes sélectionnées, elle reste en place et les autres s'alignent avec elle. Une forme verrouillée dans la sélection est cette forme fixe en elle-même.
 
 Une forme tournée selon un angle, disons de 45°, a sa boîte autour d'elle pour s'aligner, et non ses propres bords. Pour aligner les bords, définissez d'abord un plan de travail sur une face de cette forme ({{ui:camera.placeWorkplane}}, puis cliquez sur la face) : les points se trouvent ensuite sur les axes de ce plan, et les formes sont mesurées et déplacées le long d'eux, comme dans Tinkercad. Réinitialisez le plan de travail pour l'aligner à nouveau le long de la plaque.
 
