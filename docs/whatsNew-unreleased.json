@@ -38,5 +38,15 @@
       "de": "Wenn du die Formenbibliothek öffnest, steht der Cursor jetzt gleich im Suchfeld, wie bei der Befehlssuche. Auf einem Touchgerät nicht, damit keine Tastatur aufspringt.",
       "en": "When you open the shape library, the cursor is now in its search field right away, as in the command search. Not on a touch screen, so no keyboard pops up."
     }
+  },
+  {
+    "title": {
+      "de": "Bildlaufleisten für die Ansicht",
+      "en": "Scrollbars for the view"
+    },
+    "body": {
+      "de": "Ein neuer Schalter in der Ansichtenleiste blendet unten und rechts Bildlaufleisten ein. Damit schiebst du die Ansicht ruhig und in kleinen Schritten, ohne dass sie sich dreht, auch während ein Teil ausgewählt ist. Praktisch, wenn du nah an kleinen Details arbeitest.",
+      "en": "A new switch in the view bar shows scrollbars along the bottom and the right of the view. They slide the view calmly and in small steps without turning it, also while a part is selected. Handy when you work close up on small details."
+    }
   }
 ]
