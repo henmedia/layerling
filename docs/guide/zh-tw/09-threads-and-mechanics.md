@@ -81,7 +81,7 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 ## 齒輪
 
-{{ui:shape.gear}} 有 {{ui:gear.spur}}、{{ui:gear.helical}}、{{ui:gear.herringbone}} 與 {{ui:gear.bevel}}，以及 {{ui:gear.internal}} 與 {{ui:gear.rack}}（見下文）。新齒輪在 {{ui:prop.gearProfile}} 下為 {{ui:gear.profileInvolute}}：齒面為漸開線的齒，與齒輪產生器及工程上的用法一致。這種齒能平順地互相滾動。你設定 {{ui:prop.teeth}} 的齒數（6 到 500）與 {{ui:prop.gearModule}}，尺寸隨之決定：外徑為模數 ×（齒數 + 2），節圓為模數 × 齒數。新齒輪從模數 2 開始。兩個齒輪要嚙合，必須模數相同、{{ui:prop.gearPressureAngle}} 相同（通常為 20°），且中心距為（齒數 + 齒數）× 模數 / 2。同時選取兩個齒輪，屬性面板會給出該中心距以及目前實際的中心距。如果齒輪應該留在原位，它也會給出讓它們在該處嚙合的模數，{{ui:inspector.gearPairFitApply}} 一步就能讓兩個齒輪都採用該模數；各自的齒數、高度與中心孔維持不變。如果此時齒對齒而不是齒對齒槽，就把其中一個齒輪轉半個齒，也就是 180° 除以它的齒數。{{ui:prop.gearBacklash}} 會從齒上削去一點，避免列印出來的成對齒輪卡死。這個值針對整對齒輪，每個齒輪承擔一半；0.2 mm 是不錯的起點，0 則是精確的齒輪。基圓以下，齒面筆直向下延伸到齒根，不像刀具加工那樣有根切。這適合列印，但齒數低於約 17 的極小齒輪可能會在齒根處輕微摩擦。
+{{ui:shape.gear}} 有 {{ui:gear.spur}}、{{ui:gear.helical}}、{{ui:gear.herringbone}} 與 {{ui:gear.bevel}}，以及 {{ui:gear.internal}} 與 {{ui:gear.rack}}（見下文）。新齒輪在 {{ui:prop.gearProfile}} 下為 {{ui:gear.profileInvolute}}：齒面為漸開線的齒，與齒輪產生器及工程上的用法一致。這種齒能平順地互相滾動。你設定 {{ui:prop.teeth}} 的齒數（6 到 500）與 {{ui:prop.gearModule}}，尺寸隨之決定：外徑為模數 ×（齒數 + 2），節圓為模數 × 齒數。新齒輪從模數 2 開始。兩個齒輪要嚙合，必須模數相同、{{ui:prop.gearPressureAngle}} 相同（通常為 20°），且中心距為（齒數 + 齒數）× 模數 / 2。同時選取兩個齒輪，屬性面板會給出該中心距以及目前實際的中心距。如果齒輪應該留在原位，它也會給出讓它們在該處嚙合的模數，{{ui:inspector.gearPairFitApply}} 一步就能讓兩個齒輪都採用該模數；各自的齒數、高度與中心孔維持不變。如果有兩個以上的齒輪，這樣做會破壞前一對：中間齒輪的模數又會改變。這時改用 {{ui:inspector.gearPairKeep}}，對兩個齒輪各用一次：該齒輪保持原樣，另一個齒輪採用它的模數，並沿兩個中心的連線移到兩者嚙合的距離。齒輪鏈要一對一對地調整，每次都保留已經就位的那個齒輪。如果此時齒對齒而不是齒對齒槽，就把其中一個齒輪轉半個齒，也就是 180° 除以它的齒數。{{ui:prop.gearBacklash}} 會從齒上削去一點，避免列印出來的成對齒輪卡死。這個值針對整對齒輪，每個齒輪承擔一半；0.2 mm 是不錯的起點，0 則是精確的齒輪。基圓以下，齒面筆直向下延伸到齒根，不像刀具加工那樣有根切。這適合列印，但齒數低於約 17 的極小齒輪可能會在齒根處輕微摩擦。
 
 斜齒輪多了 {{ui:prop.helixAngle}}。使用漸開線齒時，它是節圓上的真實螺旋角：兩個斜齒輪要嚙合，必須模數相同、角度相同，一個為正、一個為負。{{ui:gear.herringbone}} 是兩半旋向相反的斜齒輪：齒以同一方向上升到一半高度，再折返回來，像箭頭一樣。這對 3D 列印有兩個好處：齒輪會在軸上自行對正，而且沒有軸向推力，因為兩半的力相互抵消。相對地，斜齒輪會沿軸線向側面推。你像設定斜齒輪那樣設定 {{ui:prop.helixAngle}} 與 {{ui:prop.helixQuality}}；角度對每一半都適用。兩個人字齒輪要嚙合，必須模數相同、角度相同但符號相反，一個為正、一個為負。中間沒有銑削人字齒輪那樣的退刀槽：兩半無階差地相接。
 
@@ -92,6 +92,8 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 {{ui:gear.profileSimple}} 是目前所有齒輪都用的直齒。在那裡手動設定 {{ui:prop.toothSize}} 與 {{ui:prop.toothWidth}}。舊設計會一直保留直齒，直到你更改齒形。三種齒形都有 {{ui:prop.centerHole}}。
 
 {{ui:gear.internal}} 的齒朝內：一個讓較小齒輪在裡面運轉的齒圈，就像行星齒輪組的外環。它像漸開線或圓齒輪那樣，用 {{ui:prop.teeth}}、{{ui:prop.gearModule}} 與 {{ui:prop.gearBacklash}} 設定，另外還有 {{ui:prop.gearRim}}，即齒外側的輪緣。外徑為模數 ×（齒數 + 2.5）加上兩倍輪緣；圓齒則為模數 ×（齒數 + 1.7）。相同模數的齒輪要在其中運轉，中心必須位於距齒圈中心（齒圈齒數 − 其齒數）× 模數 / 2 處；同時選取兩者，屬性面板會給出該距離。行星齒輪組中，齒圈齒數 = 太陽齒輪齒數 + 2 × 行星齒輪齒數，例如 30 = 12 + 2 × 9。齒圈沒有中心孔，它本身就是環。齒數介於 26 到 33 時，齒頂最多短四分之一模數，因為否則基圓處會形成極小的邊；嚙合不受影響。
+
+{{ui:shape.hirth}} 是一個圓盤，頂面是一圈從中心向外放射的 V 形齒。把它的副本翻過來，就能在一個齒的任意整數倍角度上與它嚙合：可用於可調角度的鉸鏈、三腳架雲台或會喀噠定位的旋鈕。每條齒頂線與齒根線都是穿過軸上同一點的直線，因此齒從中心的零高度增長到邊緣的全高，兩半會彼此自動對中。你設定 {{ui:prop.teeth}} 的數量（6 到 90）、邊緣處的 {{ui:prop.hirthToothHeight}}、{{ui:prop.centerHole}}（0 表示無）與 {{ui:prop.diameter}}；齒頂達到全高，齒根下方至少保留 0.4 mm。新接頭的齒為直角，改變齒數或尺寸時會保持齒面之間的夾角，屬性面板會顯示該角度；只有齒高會改變它。接頭像圓柱一樣保持圓形，因為拉伸後齒就無法在整圈上嚙合：工作平面上的每個控制點都只改變它唯一的直徑。要做配對件，複製接頭，繞 X（前後方向）轉 180°，放到第一個上面，中心對中心，抬高其高度減去齒高：這樣每個齒頂都落在齒根裡。繞其他軸旋轉可能對不上，因為那樣會齒頂對齒頂。Hirth 接頭對邊緣工具與 STEP 匯出來說是精確實體。
 
 {{ui:gear.rack}} 是半徑無窮大的齒輪：一根單側帶齒的條，使用漸開線齒時齒面是壓力角下的直線。寬度（沿 X）為齒數 × 齒距，齒距為 π × 模數，所以同模數的齒條可以首尾相接，每一端都落在齒槽中。長度（沿 Y）是齒條的厚度，可自由設定，只要齒與半公釐的條身放得下。齒朝前，即朝向主視圖的觀察者；視需要轉動齒條。相同模數的齒輪要在其上滾動，中心必須位於節線前方齒數 × 模數 / 2 處；節線在齒頂後方一個模數處，圓齒則為 0.6 個模數。齒圈與齒條有漸開線齒與圓齒兩種，沒有簡單齒；切換齒輪類型會保留模數。
 
@@ -117,13 +119,17 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 {{ui:prop.loftSmooth}} 讓過渡變得平滑。為 0 時，側面從底部到頂部筆直延伸，像圓錐一樣。為 100 時，兩端先筆直向上，再以 S 曲線在中間改變尺寸：軟管接頭從窄管平滑地擴張到寬管，而不是像漏斗那樣斜張。中間的數值在兩者之間混合。平滑過渡可與 {{ui:prop.loftWall}}、扭轉、傾斜及側向偏移一起使用；帶壁的管兩端仍保持開口。它和直邊放樣一樣是精確實體，因此邊可以倒角與倒圓，但它由多個斷面構成，計算會稍久。
 
+{{ui:prop.loftSegments}} 設定圓與圓角繪製得有多精細：一個整圓在檢視以及 STL、OBJ 與 3MF 中由多少段直線組成。初始值為 96，對大多數零件已足夠平滑；對於想看起來沒有小平面的大圓端，可調高到 360。段數越多檔案越大。多邊形保持你設定的 {{ui:prop.loftBottomSides}}。當某端是圓形或帶圓角時會顯示該欄位。
+
 {{ui:prop.loftTwist}} 在上升過程中讓斷面繞垂直軸均勻旋轉，任一方向最多 360°；側面於是盤旋而上。{{ui:prop.loftTiltX}} 與 {{ui:prop.loftTiltZ}} 讓頂端傾斜，最多 45°：正值會抬高其前緣或右側。中間的斷面依比例傾斜，所以壁面平順地接到斜面上。最高點維持在設定高度。如果之後高度變得太小，傾斜端會伸到平台下方，傾斜就會退讓到剛好放得下。沿路徑彎曲（例如管彎頭）不是放樣能做到的。
+
+{{ui:prop.loftSectionCount}} 在底部與頂部之間最多加入十二個截面，用於不只是從一個輪廓過渡到另一個輪廓的實體：機身、帶瓶頸的瓶子、有腰身的花瓶。每個截面都有自己的輪廓、寬度與長度、圓角半徑或角數、離底部的高度，以及相對底端中心的側向偏移；{{ui:prop.loftSection}} 選擇下方欄位所針對的截面，和彎管的各段一樣。新截面放在最大的間隙中，尺寸介於相鄰截面之間，並成為接下來顯示的那個。{{ui:prop.loftThrough}} 設定實體如何穿過它們：{{ui:loft.throughSmooth}} 讓一個曲面穿過每個截面，並且在兩個截面之間保持在它們的尺寸之內，不會鼓出去；{{ui:loft.throughStraight}} 在截面之間用平直的壁連接。{{ui:prop.loftWall}} 在這裡也適用。扭轉、傾斜與 {{ui:prop.loftSmooth}} 只用於只有兩端的放樣，在中間有截面時隱藏。沒有截面的放樣保持原樣。
 
 放樣是精確實體，扭轉與傾斜後也是：邊可以倒角與倒圓，STEP 匯出也會保留。照常加上帶螺絲孔的法蘭再群組。
 
 ## Gridfinity
 
-{{ui:shape.gridfinity}} 形狀用來製作 Zack Freedman 的開放式收納系統零件：42 mm 網格上的收納盒，可放在底板裡，也能彼此堆疊。尺寸遵循公開的 Gridfinity 規格，所以 layerling 做的收納盒能裝進其他產生器做的底板，反之亦然。在 {{ui:prop.gridfinityType}} 下選擇：
+{{ui:shape.gridfinity}} 形狀用來製作 Gridfinity（Zack Freedman 的開放式收納系統）的零件：42 mm 網格上的收納盒，可放在底板裡，也能彼此堆疊。尺寸遵循公開的 Gridfinity 規格，所以 layerling 做的收納盒能裝進其他產生器做的底板，反之亦然。layerling 不屬於 Gridfinity 專案，該專案以 MIT 授權條款釋出。在 {{ui:prop.gridfinityType}} 下選擇：
 
 - **{{ui:gridfinity.bin}}：** 每個網格單元下方都有支腳的收納盒。{{ui:prop.gridfinityUnitsX}} 與 {{ui:prop.gridfinityUnitsZ}} 以 42 mm 的網格單元計數（收納盒小 0.5 mm，一個單元為 41.5 mm）；{{ui:prop.gridfinityUnitsY}} 以 7 mm 的高度單元計數，最多 20。壁頂的 {{ui:prop.gridfinityLip}} 托住下一個收納盒的支腳，並使收納盒增高 4.4 mm：3 單元帶唇緣的收納盒高 25.4 mm。啟用 {{ui:prop.gridfinityMagnets}} 後，每個支腳的每個角都會有一個 6 × 2 mm 磁鐵孔。
 - **{{ui:gridfinity.baseplate}}：** 收納盒所站的底板，高 5 mm，每個網格單元有一個插槽。它是沒有底面、沒有磁鐵孔的開放框架；開啟 {{ui:prop.gridfinitySwallowtail}} 後，它立在底面上（見下文）。
@@ -145,9 +151,17 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 收納盒也可以有抬高的底面，當作可切出形狀的實心坯料：{{ui:prop.gridfinityFloorHeight}} 設定底面的高度，從收納盒底面量起（在你設定之前為 5.95 mm，即支腳上的 1.2 mm 底面），收納盒到該高度為止都是實心。帶唇緣時，只要底面不高於唇緣支撐離開牆面處，即每個高度單元 7 mm 下方 1.65 mm（3 單元為 19.35 mm），收納盒上仍可堆疊，這樣唇緣保持完整，疊在其上的收納盒支腳也保有 1.3 mm 的間隙。高於該高度時唇緣也會填滿，收納盒成為實心塊，頂面平齊於唇緣頂端，即每個高度單元 7 mm 上方 4.4 mm（3 單元為 25.4 mm）：與旁邊帶唇緣的收納盒一樣高，沒有供上方收納盒堆疊的唇緣，也沒有可倒角的邊緣，所以 {{ui:prop.gridfinityLipChamfer}} 會消失；由於沒有內部空間，{{ui:prop.gridfinityWallThickness}} 也會消失。在兩者之間，該欄位不接受任何高度：向上時，無論輸入、逐步調整或拖曳，都會繼續到唇緣頂端；從已填滿的收納盒向下時，會停在仍可堆疊的最高底面。從較早版本的收納盒保留下來，或由較薄的壁厚留下的兩者之間的高度，同樣以這個最高底面建構。沒有唇緣時可升到頂部，收納盒成為實心塊。把工具形狀的孔群組進去，深度依需要而定。取物口從抬高的底面開始，標籤架伸入收納盒的深度會減少，使其底面仍止於底面之上；一旦底面讓它們沒有空間，相關開關就會消失（帶唇緣的 3 單元收納盒中，取物口高於 15.35 mm 時消失，標籤架高於 15.54 mm 時消失），降低底面後又會回復。帶唇緣、壁厚不超過 1.6 mm 的 1 單元高收納盒沒有空間容納仍可堆疊的底面：其中抬高的任何底面都會把它填到唇緣頂端，即 11.4 mm。抬高底面同樣不屬於規格。
 
+對於收納盒，{{ui:prop.gridfinityCornerRadius}} 會讓外角的圓角小於規範的 3.75 mm，最小到 0 即直角，這樣在抽屜裡並排的收納盒在四個相交處只留下 0.5 mm 的縫隙。只有外壁採用它，從腳上方 0.5 mm 開始：腳、內部以及疊放時收納盒所靠的唇邊斜面都保持原來的圓角，因此收納盒仍能放進底板並像以前一樣疊放，單格收納盒也仍能落在其插座的斜面上。在直角處，壁以平面結束，與唇邊頂部齊平（沒有唇邊時與收納盒頂部齊平），或與其倒角的底部齊平。開放側上的角本來就是直角。
+
 收納盒也可以分隔成隔間，而不必把隔牆群組進去：在 {{ui:inspector.gridfinityCompartments}} 下，就在 {{ui:inspector.properties}} 下方，{{ui:prop.gridfinityCompartmentsX}} 與 {{ui:prop.gridfinityCompartmentsZ}} 設定數量，每個方向每個網格單元最多 4 個（半尺寸網格的每格 2 個），總共最多 40 個。隔板貫穿整個高度，從底面（或抬高的底面）一直到每個高度單元 7 mm 下方 0.85 mm 處，標籤架也止於那裡，所以疊在唇緣上的收納盒照常安放。隔板要求收納盒至少有 2 個高度單元，且底面至少低於其頂部 3 mm；空間不足時，收納盒會在不做隔板的情況下建構，等又有空間時再回復。{{ui:prop.gridfinityDividerThickness}} 在設定前為 1.2 mm，範圍 0.8 到 3 mm。隔板初始均勻分布。要移動某一塊，在 {{ui:prop.gridfinityDividerAcross}} 或 {{ui:prop.gridfinityDividerDeep}} 下選取它（從左或從後計數），並設定其 {{ui:prop.gridfinityDividerPosition}}，從左牆或後牆內側量到隔板中央；每個隔間至少保持 6 mm 寬。一旦移動過隔板，調整收納盒尺寸時，該方向的隔板會以公釐為單位保持位置；重新設定隔間數量會讓該方向的隔板再次均勻分布。每個隔間都有收納盒的內角，按 2.8 mm 倒圓，其底面邊也按 2.8 mm 倒圓，無論有沒有取物口。取物口會在每個隔間重複：後牆有取物口時，每個隔間的後側都有一個，靠著牆或隔板。在狹窄的隔間裡，半徑會縮小，以留下 2 mm 平的底面；若隔間窄到連 3.5 mm 都放不下，該方向的取物口就會消失；{{ui:prop.gridfinityScoopRadius}} 下方的說明會指出這一點。隔板同樣不屬於規格。
 
 帶隔板的收納盒可以在每個隔間裡設定標籤架，而不是沿牆的標籤架：沿牆的標籤架是給沒有隔間的收納盒用的，當收納盒回到單一隔間時，那些開關會回復。在高度 3 單元以上的收納盒中，用 {{ui:prop.gridfinityCompartmentRow}} 與 {{ui:prop.gridfinityCompartmentColumn}} 選擇隔間（各在隔間數多於一個時顯示），並在 {{ui:prop.gridfinityCompartmentLabel}} 下選擇標籤架所靠的一側，即收納盒的牆或某塊隔板；只有當該側的標籤架仍能讓隔間保持開口時，才會提供這一側。{{ui:prop.gridfinityCompartmentLabelLength}} 的範圍是 10 到 100；若標籤架會短於 4 mm 就不做，並在其下方加註說明。較短的標籤架會顯示 {{ui:prop.gridfinityLabelOffset}}：在後側或前側時為 {{ui:gridfinity.alignLeft}}、{{ui:gridfinity.alignMiddle}} 或 {{ui:gridfinity.alignRight}}；在左側或右側時為 {{ui:gridfinity.alignBack}}、{{ui:gridfinity.alignMiddle}} 或 {{ui:gridfinity.alignFront}}。{{ui:prop.gridfinityLabelWidth}} 在設定前為 14 mm，狹窄隔間中更小；標籤架絕不會伸到把隔間封死：前方至少保持 6 mm 開口。這些標籤架的斷面與沿牆的標籤架相同，{{ui:inspector.properties}} 下的 {{ui:prop.gridfinityLabelCorner}} 與 {{ui:prop.gridfinityLabelCornerSize}} 也套用於它們。
+
+收納盒還可以在任意一側開放，這樣並排放置的收納盒能連成一長條：開啟 {{ui:prop.gridfinityOpenBack}}、{{ui:prop.gridfinityOpenFront}}、{{ui:prop.gridfinityOpenLeft}} 或 {{ui:prop.gridfinityOpenRight}}，可任意組合；四個全開時只剩腳上的底板。開放側在底板以上沒有壁，也沒有疊放唇邊。旁邊的壁與它們的唇邊筆直延伸到收納盒的外形並以直角結束，因此兩個相鄰的開放收納盒和任意兩個收納盒一樣相距 0.5 mm，底板也平直延伸到邊緣並在那裡以直角結束。開放側上的標籤架或指槽不會產生，其開關也會消失，該側靠隔板的指槽也一樣；該設定會保留，等你再次關閉該側時使用。旁邊壁上的標籤架與指槽，以及與之相接的隔板，都會延伸到邊緣；隔間在開放側不提供標籤架，已經在那裡選擇的會被略去，{{ui:prop.gridfinityCompartmentLabel}} 下的提示會說明。腳與磁鐵孔保持不變。疊放在開放收納盒上的收納盒只靠封閉側的唇邊支撐。底板抬到頂部（有唇邊時抬到唇邊頂部）的收納盒是實心塊，不顯示開放側的開關。開放側同樣不屬於規範。
+
+開啟的一側也可以只部分開放，做成伸手進去的槽口或前面較低的壁。在開關下方，每個開放側都有自己的幾列，這裡以前側為例：{{ui:prop.gridfinityOpeningDepthFront}} 是開口的深度，從唇邊頂部向下量（沒有唇邊時從收納盒頂部），至少 2 mm；{{ui:prop.gridfinityOpeningWidthFront}} 是它沿該側的寬度，至少 5 mm；{{ui:prop.gridfinityOpeningPositionFront}} 是它的位置：{{ui:gridfinity.alignLeft}}、{{ui:gridfinity.alignMiddle}} 或 {{ui:gridfinity.alignRight}}；位於一端時，{{ui:prop.gridfinityOpeningDistanceFront}} 是它離該端的距離。起初開口就是向下到底板的整個側面，即上面描述的開放側。深度距底板不到 0.5 mm 時會直通到底板，寬度與整個側面相差不到 0.5 mm 時就是整個側面。小於這些的開口會保留該側的壁、圓角與唇邊，並從中切出一個平底直角端的缺口：直通到底板就是槽口，橫貫整個側面就是較低的壁。開口留在兩個角之間的直壁部分，或在完全開放的相鄰側旁延伸到邊緣（那裡的壁沒有圓角）；直段短於 5 mm 的側面會完全開放。缺口兩側的底板、隔板與唇邊都保留，因此疊放在上面的收納盒仍坐在唇邊上，而該側的標籤架、指槽與隔間標籤架和任何開放側一樣保持關閉。對於因壁而成為實心的收納盒，開啟的一側會完全開放。部分開放的一側仍有壁，因此即使四側都開啟，{{ui:prop.gridfinityWallThickness}} 也會保留。一旦某側部分開放，開放側各列下方會出現 {{ui:prop.gridfinityOpeningCorner}}（{{ui:gridfinity.labelRound}} 或 {{ui:gridfinity.labelChamfer}}）與 {{ui:prop.gridfinityOpeningCornerSize}}（在你設定之前為 0 即直角；最大 10 mm，該列提供的最大值以最大的角所能容納的為準），它們對從壁外看到的缺口角——上面兩個與下面兩個——進行倒圓或倒角，所有部分開放的側面都一樣。上面的角先取用尺寸，下面的角得到深度剩下的部分，因此尺寸超過深度一半時下面的角會更小，一旦上面的角用完全部尺寸，下面的角就保持直角。每個角取用的尺寸以缺口及其旁邊的壁所能容納的為限，因此對於放在一端的開口，那一端的上角不會大於開口到該端的距離；如果某個角會恰好結束在壁邊緣旁，它會縮小最多 0.5 mm 以避開邊緣，小於 0.5 mm 時保持直角。橫貫整個側面的開口沒有上角，在完全開放的相鄰側旁延伸到邊緣的開口在那一端也沒有。有唇邊時，上角只在外壁上完整地倒圓或倒角，在倒角唇邊下稍小一些；再往裡，唇邊向下傾斜的地方會更小。
+
+底板可以加襯邊，用於寬度不是整數個網格單元的抽屜：{{ui:prop.gridfinityPaddingBack}}、{{ui:prop.gridfinityPaddingFront}}、{{ui:prop.gridfinityPaddingLeft}} 與 {{ui:prop.gridfinityPaddingRight}} 在網格外加上與底板 5 mm 高度（使用 {{ui:prop.gridfinitySwallowtail}} 時為 7.4 mm）相同的實心邊框，每側 0 到 41 mm。網格仍是整數個 42 mm 的單元，並遠離加了襯邊的一側移動，外角保持圓角，除非 {{ui:prop.gridfinityCornerRadius}} 改變它。底板尺寸是包括襯邊的整塊底板；改變襯邊會保持單元數，拖曳一側會改變單元數並保持襯邊。要填滿一個抽屜，在 {{ui:prop.gridfinityDrawerWidth}} 與 {{ui:prop.gridfinityDrawerDepth}} 中輸入它的內部尺寸：每個方向上底板取能放下的單元數，最多 6 個（使用 {{ui:prop.gridfinityLargePlate}} 時為 12 個），並把剩餘部分減去 0.5 mm（讓底板能放進去）後平均分給該方向兩側的襯邊；這兩列顯示底板所填滿的抽屜。寬 230 mm 的抽屜得到 5 個單元即 210 mm，加上 19.5 mm 的襯邊，總共 229.5 mm；請確認底板放得進你的列印床。一塊底板在你的列印床上填不滿的抽屜，就用幾塊底板並排，每塊只在朝向抽屜壁的那幾側加襯邊；用襯邊那幾列設定它們的襯邊。收納盒會保留襯邊設定，但產生時不使用；變回底板時它們會恢復。
 
 ## 鉸鏈
 
@@ -160,6 +174,10 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 {{ui:hinge.styleLiftOff}} 做出像許多門上那樣的可拆式鉸鏈：兩個鉸節，下方的帶著銷子一直到端部，上方的是可以從銷子上拔出的套筒，所以蓋子或門可以取下再掛回去。它總是兩個鉸節。它和其他樣式一樣平放整體列印；要直立列印、銷子朝上，就用 {{ui:inspector.separateParts}} 把它拆開，把帶銷的那件立在它的鉸節上，另一件立在它的套筒上：這樣兩件都不需要支撐。另一側用鏡像。在 {{ui:prop.hingeScrewHead}} 下，所有樣式都可選 {{ui:hinge.screwNut}}：在每個孔上方開一個六角螺帽槽，位於闔上時朝向另一片的那一面，這樣從下方鎖入的螺栓能固定；{{ui:hinge.screwCountersunkNut}} 把後片（帶銷的那片）做成沉頭，前片開螺帽槽。{{ui:prop.hingeNutWidth}} 是螺帽的對邊寬度；為 0 時依孔取值（M3 5.8 mm，M4 7.3 mm，含間隙）。槽深等於螺帽高度，但下面留 0.6 mm 的葉片，所以葉片越厚，螺帽嵌得越深。
 
 {{ui:prop.hingeStyle}}有三個選項：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（為自備銷留的孔）和{{ui:hinge.styleCone}}。選圓錐時，{{ui:prop.hingeConeSize}}決定圓錐從關節長出處的大小；圓錐越大越牢固，預設取能放下的最大值。帶圓錐的鉸鏈沒有銷也沒有孔，所以它的翼板可以和整個關節一樣厚：把{{ui:prop.hingeLeafThickness}}設為關節直徑，翼板就與關節齊平；這樣的鉸鏈最多開啟約 90°，因為厚翼板會相碰。
+
+要用螺絲固定鉸鏈，設定 {{ui:prop.hingeScrewHoles}}：沿軸最多六個孔，孔徑為你選擇的 {{ui:prop.hingeScrewDiameter}}。在 {{ui:prop.hingeScrewHead}} 下，它們預設為 {{ui:hinge.screwCountersunk}}，90° 用於沉頭螺絲，位於鉸鏈合上時朝向另一片的那一面，因此螺絲頭齊平；{{ui:hinge.screwStraight}} 則保持直孔。不設其他數值時，孔平均分配長度並位於每片的中間；{{ui:prop.hingeScrewSpacing}} 與 {{ui:prop.hingeScrewAcross}} 依中心距設定它們，例如為了對上你要替換的購買鉸鏈。每個孔到邊緣、鉸節與下一個孔之間都至少保留半毫米的片；放不下那麼多時就少放，欄位會說明。{{ui:prop.hingeCornerRadius}} 會把兩片的四個外角倒圓。無論有無銷軸，孔與圓角在 STEP 匯出與邊緣工具中都保持精確。
+
+在 {{ui:prop.hingeLeafStyle}} 下，{{ui:hinge.leafFingers}} 讓每個鉸節有自己的指片，寬度與鉸節相同，而不是每側一片整板；兩側的指片像兩把梳子一樣交錯。由於沒有指片位於另一側鉸節的下方，鉸鏈可以完全翻轉，使用 {{ui:hinge.styleCone}} 樣式且指片與鉸節一樣厚（{{ui:prop.hingeLeafThickness}} 達到 {{ui:prop.hingeKnuckleDiameter}}）時，它能平平地合上，一側的指片夾在另一側的指片之間。沒有板把一側的指片連起來：用列印銷軸時它們掛在銷軸上，用錐體或在裝上你自己的銷軸之前，它們是鬆散的零件。把每一側連接到你的模型上，例如一把梳子連到盒子，另一把連到盒蓋，或與模型群組。這時 {{ui:prop.hingeCornerRadius}} 會把指尖倒圓；指片不帶螺絲孔。
 
 ## 彈性關節（Flexi）
 
@@ -193,9 +211,15 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 ## 接頭開孔
 
-電子產品外殼需要為線材留開孔。{{ui:shape.port}} 就是這種開孔：一個橫放、帶圓角的挖空體。在 {{ui:prop.portPreset}} 中選擇接頭（{{ui:port.usbC}}、{{ui:port.microUsb}} 或 {{ui:port.usbA}}），它就會取得該接頭的尺寸，並在每邊多留約 0.25 mm 間隙。{{ui:port.usbCPlug}} 用於裝在壁後方的接頭，插頭外殼需要伸進來。寬度、高度和 {{ui:prop.portCorner}} 都可以手動修改，此時清單會顯示 {{ui:port.custom}}。{{ui:port.hdmi}}、{{ui:port.miniHdmi}}、{{ui:port.microHdmi}}、{{ui:port.displayPort}} 和 {{ui:port.miniDisplayPort}} 像接頭本身一樣把下方的角斜切掉，DisplayPort 只切左下角；{{ui:port.rj45}} 適用於網路接頭。這些尺寸來自廠商建議的面板開孔和 VESA 圖紙。
+電子產品外殼需要為線材留開孔。{{ui:shape.port}} 就是這種開孔：一個橫放、帶圓角的挖空體。在 {{ui:prop.portPreset}} 中選擇接頭（{{ui:port.usbC}}、{{ui:port.microUsb}} 或 {{ui:port.usbA}}），它就會取得該接頭的尺寸，並在每邊多留約 0.25 mm 間隙。{{ui:port.usbCPlug}} 用於裝在壁後方的接頭，插頭外殼需要伸進來。寬度、高度和 {{ui:prop.portCorner}} 都可以手動修改，此時清單會顯示 {{ui:port.custom}}。{{ui:port.hdmi}}、{{ui:port.miniHdmi}}、{{ui:port.microHdmi}}、{{ui:port.displayPort}} 和 {{ui:port.miniDisplayPort}} 像接頭本身一樣把下方的角斜切掉，DisplayPort 只切左下角；{{ui:port.rj45}} 適用於網路接頭。這些尺寸來自廠商建議的面板開孔和 VESA 圖紙。 {{ui:prop.portClearance}} 會在此基礎上在每一側再加間隙，清單仍顯示該接頭：列印的盒子用 0.2 到 0.5 mm，讓電路板能滑進去。
 
 對於航模電池和馬達，清單裡有{{ui:port.xt30}}、{{ui:port.xt60}}、{{ui:port.mt60}}和{{ui:port.mpx}}，橫放，四周比插頭大約寬 0.25 mm，讓插頭能穿過——尺寸取自 Amass 和 Multiplex 的圖紙。{{ui:port.dsub9}}是序列埠（RS-232 或 RS-485）插頭的面板開孔，兩側像插頭一樣傾斜。它的兩個螺絲孔（3.18 mm）一併帶上，相距 24.99 mm，位於開口的中間高度：開口和孔是一個群組，會一起移動和旋轉，與牆壁成組後三者一起被切開。
+
+{{ui:shape.sbcBoard}} 是依實際尺寸製作的單板電腦，用來圍繞它設計外殼：帶四個安裝孔的電路板，以及各自上色的元件：輪廓各異的插座——兩端圓形的 USB-C、下角切掉的 HDMI 插座——帶開口的 USB 與網路外殼、帶圓形套環的音訊插孔、每針一個圓點的排針、作為方塊的較大晶片。在 {{ui:sbcBoard.board}} 下選擇：Raspberry Pi 5、4 Model B、3 Model B+ 或 Zero 2 W、BIGTREETECH Pi V1.2，或小型 ESP32 板之一：Seeed Studio XIAO ESP32-C6、ESP32-C3 Super Mini 或 ESP32-C6 Super Mini——這些沒有安裝孔，USB-C 在右端，郵票孔接腳顯示為圓點。兩塊 Super Mini 沒有廠商圖紙；它們的尺寸來自社群發布的模型，全部是估計值。帶 USB-C 與 HDMI 的前邊緣朝向你。輪廓與孔來自廠商的圖紙與模型；沒有圖紙給出的高度是估計的。
+
+電路板顯示其螺絲柱應放在哪裡，以及外殼需要多高。對於開口，在 {{ui:sbcBoard.clearance}} 下給接頭留出餘量——列印外殼用 0.2 到 0.5 mm——把電路板的副本設為孔，放到電路板在外殼中的位置並與外殼群組：邊緣的每個接頭都會在壁上切出它的開口。真實接頭只伸出電路板 1 到 3 mm，比許多壁都薄：{{ui:sbcBoard.reach}} 讓邊緣的每個接頭在其一側再向外伸出這麼多，從而完全切穿——比壁厚稍多一點。換一塊板或改變設定會在原位重新產生它。每塊板都以同樣的方式使用這兩個設定。
+
+microSD 卡槽也是左邊緣的接頭，位於電路板下方（Zero 2 W 上在上方），因此延伸量會切出卡穿過壁的通道；這時電路板立在卡槽上，比其底面低 1.4 mm。排線也可以引出：{{ui:sbcBoard.ribbonUp}} 讓攝影機、顯示器與 PCIe 接頭向上穿過蓋子開口，{{ui:sbcBoard.ribbonSide}} 讓每個接頭的開口沿其長邊——排線離開的方向——延伸到較近的邊緣，再加上延伸量；在 Raspberry Pi 5 上，攝影機與顯示器排線從 PCIe 一端引出，三個開口上下疊放，在 Pi 4 與 3 B+ 上攝影機的開口在顯示器的上方。{{ui:sbcBoard.gpioUp}} 讓排針向上穿過蓋子，用於 HAT 或杜邦線。向上的部分會伸出其頂部 {{ui:sbcBoard.upReach}}，至少 20 mm，並在周圍留出餘量。
 
 它預設為挖空體，朝向前方。把 {{ui:prop.portDepth}} 設得比壁厚稍大，移到電路板上接頭所在的位置，再與外殼組合。用於側壁時，繞垂直軸旋轉 90°。
 
@@ -206,3 +230,27 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 {{ui:shape.doubleCountersink}} 是兩面都倒角的孔，用於正面與背面都要整潔的板件。它在形狀庫裡沒有獨立項目：取用 {{ui:shape.countersink}}，並在其屬性中開啟 {{ui:prop.screwHoleBothSides}}（本身就是雙面錐形沉頭孔的實體已顯示該開關開啟）：兩端各有一個錐面張開到 {{ui:prop.screwHoleHead}}，中間是 {{ui:prop.screwHoleShaft}}。你照舊設定 {{ui:prop.screwHoleAngle}} 與 {{ui:prop.screwHoleLength}}。如果孔太短，容不下兩個完整的錐面，它們會以該角度在中央相接，桿部會比你設定的更寬：10 mm 的頭部、6 mm 的桿部、90° 與 2 mm 的長度，會形成兩個從 10 mm 收窄到 8 mm 的錐面。作為孔，它像其他孔一樣被推穿零件。
 
 把形狀設為孔，並與零件群組。讓它的頂端略高於頭部應貼合的表面，使沉頭孔開口乾淨。要為六角螺帽做沉頭孔，就用六邊的 {{ui:shape.polygon}} 當作孔。 在{{ui:prop.screwHoleSize}}中可選 M2 到 M30（錐形沉孔到 M20），軸徑（ISO 273 中等通孔）、頭部直徑以及深度或角度即依標準設定（DIN 974-1、ISO 15065），長度不變。對於六角柱，{{ui:prop.nutPocketSize}}依 ISO 4032 設定螺帽的對邊寬度和高度，並留 0.4 mm 列印餘量。
+
+{{ui:shape.finishingWasher}}（一種裝飾墊圈，Discussion #1131）是放在沉頭或半沉頭螺絲下面的拱形墊圈，用於在木頭或蓋板上顯得整潔。它是實心件，底面平；從較低的邊緣起，拱頂升到座面，座面是承托螺絲頭的錐面，下面是孔。在 {{ui:prop.screwHoleSize}} 下選擇 M2 到 M20：孔是該規格的過孔，座面是該規格的沉頭孔，{{ui:prop.diameter}} 與 {{ui:prop.height}} 由此得出（M3：10.3 × 2.95 mm，M6：16.6 × 4.5 mm）。你也可以自己設定 {{ui:prop.diameter}}、{{ui:prop.height}}、{{ui:prop.centerHole}}、座面頂部的 {{ui:prop.screwHoleHead}} 及其 {{ui:prop.screwHoleAngle}}。它保持圓形，並且是精確實體，因此邊緣工具與 STEP 都能處理它。
+
+## 螺絲柱
+
+{{ui:shape.screwBoss}} 是外殼裡用來鎖固蓋子或電路板的柱子：圓形，從頂部開孔。在 {{ui:prop.screwBossFastener}} 中選擇裝入什麼。{{ui:screwBoss.insert}} 是用烙鐵壓入的黃銅螺帽：{{ui:prop.screwBossSize}} 提供 M2 到 M5 以及 #2-56 到 1/4-20，孔依常見熱熔螺帽的要求（M3：長 5.7 mm 的螺帽用 4.0 mm 孔），比螺帽深一公釐，讓被擠開的塑膠有地方去，柱子約為孔的兩倍粗。{{ui:screwBoss.selfTapping}} 自己攻出螺紋：ST2.2 到 ST4.2（DIN 7981）、2.5 到 5 mm (K25–K50) 的塑膠螺絲或 #2 到 #10，底孔約為螺絲的 0.8 倍，柱子 2.5 倍，孔深約 2.5 個螺絲直徑。{{ui:screwBoss.custom}} 使用你輸入的孔徑和孔深。
+
+{{ui:prop.screwBossHole}}、{{ui:prop.screwBossHoleDepth}} 和 {{ui:prop.screwBossDiameter}} 都可以手動修改；直徑下方會顯示孔周壁厚，如果比固定方式要求的薄會提示。孔與柱子一樣深時為通孔。孔口有一個小倒角，方便螺帽或螺絲進入。{{ui:prop.screwBossGussets}} 從柱子到底面加上兩到六條細肋；{{ui:prop.screwBossReach}}、{{ui:prop.screwBossGussetHeight}} 和 {{ui:prop.screwBossGussetThickness}} 設定它們伸出多遠、多高、多厚。
+
+把螺絲柱立在已薄殼的盒子底面上並與盒子群組；在蓋子上，其上方作為孔的 {{ui:shape.counterbore}} 用來容納螺絲頭。列印出來的孔會比圖面略小：先列印一個柱子試試，再把 {{ui:prop.screwBossHole}} 調整零點一兩公釐。
+
+## 卡扣
+
+能扣合的蓋子不需要螺絲。{{ui:shape.snapFit}} 是帶底座的卡鉤及其配對件卡座。{{ui:prop.snapFitPart}} 設為 {{ui:snapFit.both}} 時，兩者都位於扣合後的位置，可以一起放到蓋子和盒子上；{{ui:snapFit.hook}} 或 {{ui:snapFit.catch}} 只產生其中一個。卡齒下方是讓它滑入的斜面，即 {{ui:prop.snapFitLeadAngle}}（30° 容易插入），上方是保持面：{{ui:prop.snapFitRetainAngle}} 為 90° 時永久卡住，45° 時還能拆開。{{ui:prop.snapFitUndercut}} 是卡齒伸到卡座下方的深度，{{ui:prop.snapFitClearance}} 是兩者之間的間隙。
+
+扣合時懸臂會彎曲一個倒扣深度。{{ui:prop.snapFitThickness}} 下方顯示根部的拉伸量：PLA 約 2 % 以上會斷，PETG 和 ABS 可承受約 4 %。懸臂更長或更薄，或倒扣更小，拉伸就更小。這一對的擺放就像在直立列印的盒子裡，蓋子在上：卡鉤掛在底座下面，卡座頂面傾斜 45°，只有與倒扣深度一樣寬的保持面平伸出來，所以在壁上列印不需支撐。
+
+把這一對放在蓋子與盒壁相接的地方：卡鉤底座在蓋子下面，卡座背面貼在盒壁內側。然後用 {{ui:inspector.separateParts}} 把它們分成兩個實體；卡鉤與蓋子群組，卡座與盒子群組。盡量讓蓋子列印時懸臂平躺：直立的懸臂會垂直於層彎曲，更容易斷。
+
+## 加強肋
+
+{{ui:shape.rib}} 用來加強底面或側壁。作為 {{ui:rib.straight}}，長度、高度和厚度都依你的設定，{{ui:prop.ribTop}} 可以是平的、圓的或倒角的。作為 {{ui:rib.gusset}}，它是把側壁撐在底面上的三角形：{{ui:prop.ribGussetFoot}} 沿底面，{{ui:prop.ribGussetLeg}} 沿壁面向上，兩端都切短一點，方便乾淨地列印。
+
+厚度與壁厚相當或略薄、為線寬整數倍（0.4 mm 噴嘴用 0.8 或 1.6 mm）、高度為厚度幾倍的加強肋，既能加強又不會讓壁面變形。多條排成一列用 {{ui:editor.tool.array}}；把它們與盒子群組。

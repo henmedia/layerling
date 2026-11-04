@@ -45,11 +45,22 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /Finish the current action before opening the history view/i, key: "error.finishBeforeHistory" },
   // CAD kernel: stored and rebuilt bodies
   { pattern: /could not be restored as a valid solid/i, key: "error.storedBodyRestore" },
-  { pattern: /The exact (profile|thread|spring|gear) body (is not|does not)/i, key: "error.exactBodyInvalid" },
-  { pattern: /The (thread|gear|spring) body is not a valid solid/i, key: "error.solidNotValid" },
-  { pattern: /The (thread|gear|spring)'s .* (came out as|sewed into|did not close|did not sweep)/i, key: "error.solidNotValid" },
-  { pattern: /The (thread|gear|spring)'s measures are out of range/i, key: "error.measuresOutOfRange" },
-  { pattern: /gear with its bore came out as/i, key: "error.solidNotValid" },
+  { pattern: /The exact (profile body|thread body|spring body|gear body|Hirth joint|Gridfinity body) (is not|does not)|The imported STEP body does not match/i, key: "error.exactBodyInvalid" },
+  // No exact body, and the mesh too dense to stand in for it (cadModifier.worker.ts).
+  { pattern: /could not be (re)?built as an exact( CAD)? body, and its mesh is too dense|could not be restored for edge treatment, and its mesh is too dense/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|spring) body is not a valid solid|The (Hirth joint|Gridfinity body) is not a valid solid/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|spring|Hirth joint)'s .* (came out as|sewed into|did not close|did not sweep)/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|spring|Hirth joint)'s measures are out of range/i, key: "error.measuresOutOfRange" },
+  { pattern: /(gear|Hirth joint)( with its bore)? came out as/i, key: "error.solidNotValid" },
+  // Measures a profile cannot be built from (cadProfileSolid.ts): an outline, a loft or a sweep path that does not hold together.
+  { pattern: /The profile (has no height|has no outline|outline (is incomplete|has an invalid|has a zero-length|is not closed))|A profile arc does not meet|The loft's (point is not a number|top does not match)|A section of the loft does not match|A loft to a point (needs|cannot)|The sweep has no centre line|A sweep (piece|bend)|A straight sweep piece has no length/i, key: "error.primitiveDimensions" },
+  { pattern: /(loft|sweep|swept|tapered)[\w' ]{0,40} did not (become|close|make)|moved outlines are not a valid face|elliptical arc differently than expected|The profile did not become one solid|^sweep:invalid|letter could not be widened|widened text (has no letters|is not a valid solid|does not keep)/i, key: "error.solidNotValid" },
+  { pattern: /Gridfinity \w+ came out as|Gridfinity bin's [\w ]+ could not be (cut|joined)/i, key: "error.solidNotValid" },
+  { pattern: /thread's \w+ has no tiers|tapered thread narrows to its axis/i, key: "error.measuresOutOfRange" },
+  { pattern: /The lid cannot be built as an exact body/i, key: "lid.error.kernelUnknown" },
+  { pattern: /Drawing source contains/i, key: "error.drawingNoGeometry" },
+  // Profiles turned, swept, lofted, trimmed or with rounded or chamfered ends (cadProfileSolid.ts), and lofts.
+  { pattern: /profile solid (is not valid|is inside out|are not valid|does not keep)|A loft through its sections did not become one solid/i, key: "error.solidNotValid" },
   { pattern: /thread's chamfer reaches its axis/i, key: "error.threadChamferAxis" },
   { pattern: /gear's centre hole reaches its teeth/i, key: "error.gearHoleTeeth" },
   { pattern: /crescent horn rounding does not fit/i, key: "error.crescentRounding" },
@@ -71,7 +82,8 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /stored STEP body holds no solid/i, key: "error.storedStepNoSolid" },
   { pattern: /Text fonts are not loaded yet/i, key: "error.fontsNotLoaded" },
   // sketch
-  { pattern: /Draw at least one closed profile on the left side/i, key: "error.revolveNoProfile" },
+  { pattern: /Draw at least one closed profile on the left side|profile crosses the revolve axis|profile lies right of the revolve axis|No closed profile found/i, key: "error.revolveNoProfile" },
+  { pattern: /OpenCascade produced invalid sketch topology/i, key: "error.revolveNotValid" },
   { pattern: /revolve profile has no filled area/i, key: "error.revolveNoArea" },
   { pattern: /profile could not be revolved into a valid solid/i, key: "error.revolveNotValid" },
   { pattern: /All profile paths are open/i, key: "error.sketchOpenPaths" },
@@ -97,7 +109,7 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /contains \d+ zero-area triangle/i, key: "error.meshDegenerate" },
   { pattern: /is not a watertight manifold/i, key: "error.meshNotWatertight" },
   { pattern: /does not enclose a non-zero volume/i, key: "error.meshNoVolume" },
-  { pattern: /SVG projection (contains no readable contours|does not enclose)/i, key: "error.svgProjectionEmpty" },
+  { pattern: /SVG projection (contains no readable contours|does not enclose)|DXF export contains no readable contours|SVG top view contains no visible edges/i, key: "error.svgProjectionEmpty" },
   // OBJ, STL, 3MF, STEP import
   { pattern: /^OBJ (has no readable mesh geometry|geometry is empty)/i, key: "error.objEmpty" },
   { pattern: /^OBJ /i, key: "error.objBroken" },

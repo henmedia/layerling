@@ -64,6 +64,31 @@ describe("exporting a project again", () => {
     expect(Buffer.from(fresh).equals(Buffer.from(first))).toBe(true);
   });
 
+  // After an undo the active state is one kept from an earlier save; its indexes are kept with it instead of parsed again.
+  it("gives the same package after an undo whether the active state was kept or is new", async () => {
+    const { entries, shapes } = history();
+    const undone = { ...exportInput(entries, shapes), historyIndex: 3, shapes: entries[3].shapes };
+    await exportLylProject(exportInput(entries, shapes));
+    const first = await exportLylProject(undone);
+    const again = await exportLylProject(undone);
+    const fresh = await exportLylProject({ ...undone, history: structuredClone(entries), shapes: structuredClone(entries[3].shapes) });
+    expect(Buffer.from(again).equals(Buffer.from(first))).toBe(true);
+    expect(Buffer.from(fresh).equals(Buffer.from(first))).toBe(true);
+    const restored = await importLylProject(again);
+    expect(restored.shapes.map((shape) => shape.id)).toEqual(["box-0", "box-1", "box-2", "box-3"]);
+  });
+
+  // An autosave walks the bodies of a state in the same order each time; seven or more exact bodies used to push each other out.
+  it("keeps the exact bodies of a design with many of them in one package as before", async () => {
+    const many = Array.from({ length: 12 }, (_, index) => box(`exact-${index}`, index * 25, { cadBrep: `BREP-${index}\n${"x".repeat(200)}` }));
+    const entries = [editorHistoryEntry(many, [], [], undefined, 1_700_000_000_000)];
+    const first = await exportLylProject(exportInput(entries, many));
+    const fresh = await exportLylProject(exportInput(structuredClone(entries), structuredClone(many)));
+    expect(Buffer.from(fresh).equals(Buffer.from(first))).toBe(true);
+    const restored = await importLylProject(first);
+    expect(restored.shapes.map((shape) => shape.cadBrep?.slice(0, 7))).toEqual(many.map((shape) => shape.cadBrep?.slice(0, 7)));
+  });
+
   it("picks up a new state added after the last export and keeps the old ones intact", async () => {
     const { entries, shapes } = history();
     await exportLylProject(exportInput(entries, shapes));

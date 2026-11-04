@@ -63,6 +63,7 @@ W ustawieniach w sekcji {{ui:workspace.appearance}} są dwa przełączniki wymia
 - {{ui:workspace.showOriginDimensions}} pokazuje odległości zaznaczenia od początku układu płyty, także przy kilku zaznaczonych bryłach.
 
 Z {{ui:workspace.dimensionsAlwaysVisible}} wymiary są widoczne cały czas. Bryła, która nie stoi na płaszczyźnie roboczej, pokazuje też swoją wysokość nad nią; kliknij liczbę, by wpisać nową.
+Z opcją {{ui:workspace.dimensionAxisColors}} każde pole ma kolor swojej osi, jak uchwyty: czerwony dla X, zielony dla Y i niebieski dla Z. Dzięki temu nawet przy małej części od razu widzisz, która liczba jest która.
 
 Jeśli na chwilę przeszkadzają, naciśnij [[Q]]: wymiary i odległości wokół zaznaczenia znikają, a przesuwana część jest dobrze widoczna. Ponowne [[Q]] przywraca je. Uchwyt, na który wskazujesz, nadal pokazuje swój wymiar.
 

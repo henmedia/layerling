@@ -61,6 +61,7 @@ A beállításokban a {{ui:workspace.appearance}} alatt két kapcsoló van az é
 - Az {{ui:workspace.showOriginDimensions}} a kijelölés távolságait mutatja a tárgyasztal origójától, több kijelölt testnél is.
 
 A {{ui:workspace.dimensionsAlwaysVisible}} beállítással a méretek állandóan láthatók maradnak. Ha egy test nem a munkasíkon áll, a fölötte lévő magassága is látszik; a számra kattintva újat írhatsz be.
+A {{ui:workspace.dimensionAxisColors}} beállítással minden mező a tengelye színét kapja, mint a fogantyúk: X piros, Y zöld, Z kék. Így egy kis alkatrésznél is egy pillantással látod, melyik szám melyik.
 
 Ha egy pillanatra zavarnak, nyomd meg a [[Q]] billentyűt: a kijelölés körüli méretek és távolságok eltűnnek, így jól látszik a mozgatott alkatrész. Újabb [[Q]] visszahozza őket. Az a fogantyú, amelyre mutatsz, így is megmutatja a méretét.
 

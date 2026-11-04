@@ -4908,6 +4908,19 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   max-height: calc(var(--shape-menu-height) - 46px);
 }
 
+/* Pinned, the 3D editor's Shapes panel lies in the workplane under the inspector (#1283), at the spot it hung
+   from its button (window pixels, divided by the zoom like every length of the panel). */
+.shape-menu-home {
+  display: contents;
+}
+
+.shape-menu-dropdown.shape-menu-under-inspector {
+  position: fixed;
+  z-index: 7;
+  top: calc(var(--shape-menu-home-top) / var(--toolbar-scale));
+  left: calc(var(--shape-menu-home-left) / var(--toolbar-scale));
+}
+
 /* Narrow: only the pictures stay, as in Tinkercad. The name is in each tile's tooltip. */
 .shape-menu-dropdown.shape-menu-icons-only .shape-menu-list {
   grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
@@ -6517,6 +6530,16 @@ html[data-theme="dark"] .sketch-shape-options .unit {
 .sketch-segments path.construction.selected {
   stroke: #ff8a00;
   stroke-width: 3;
+}
+
+/* Freehand (#1280): the line under the pen while it is drawn, before it becomes points. */
+.sketch-freehand-preview {
+  fill: none;
+  stroke: #ce7416;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .sketch-preview-line {
@@ -8662,6 +8685,24 @@ html[data-theme="dark"] .touch-multi-select {
 .dimension-label.armed {
   border-color: rgba(166, 86, 0, 0.85);
   box-shadow: 0 0 0 3px rgba(173, 89, 0, 0.22), 0 1px 4px rgba(58, 40, 20, 0.09);
+}
+
+/* Workspace setting "Dimension boxes in axis colours" (#1279): each value box in the colour of its axis,
+   as the size handles: a light tint, a strong edge and dark text, the same in the dark theme so the number stays easy to read. */
+.workplane-wrap.dimension-axis-colors .dimension-label[data-axis],
+.workplane-wrap.dimension-axis-colors .dimension-input[data-axis] {
+  background: var(--dimension-axis-tint);
+  border: 1px solid var(--dimension-axis-edge);
+  color: var(--dimension-axis-text);
+  opacity: 1;
+}
+
+.workplane-wrap.dimension-axis-colors [data-axis="x"] { --dimension-axis-tint: #fde4e4; --dimension-axis-edge: #d6363c; --dimension-axis-text: #6e1418; }
+.workplane-wrap.dimension-axis-colors [data-axis="y"] { --dimension-axis-tint: #dff3e4; --dimension-axis-edge: #2f9a4b; --dimension-axis-text: #144a24; }
+.workplane-wrap.dimension-axis-colors [data-axis="z"] { --dimension-axis-tint: #e0eafc; --dimension-axis-edge: #2f6fe0; --dimension-axis-text: #12357a; }
+
+.workplane-wrap.dimension-axis-colors .dimension-label[data-axis].armed {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dimension-axis-edge) 30%, transparent), 0 1px 4px rgba(58, 40, 20, 0.09);
 }
 
 .dimension-input {

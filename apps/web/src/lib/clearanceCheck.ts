@@ -172,7 +172,12 @@ export function clearanceSourceShapes(source: readonly WorkplaneShape[]) {
   return visibleExportShapes(source).visible.filter((shape) => !shape.hole && !isNonSolidShape(shape));
 }
 
-type Part = ClearancePart & { solid: ManifoldSolid; geometry: THREE.BufferGeometry };
+/** `geometry` is built the first time a pair near enough needs it: parts far from every other never get their tree. */
+type Part = ClearancePart & { solid: ManifoldSolid; geometry: THREE.BufferGeometry | null };
+
+function partGeometry(part: Part) {
+  return (part.geometry ??= geometryOf(part.solid));
+}
 
 function boxOf(solid: ManifoldSolid): ClearanceBox {
   const box = solid.boundingBox();
@@ -261,7 +266,7 @@ export async function checkClearance(source: readonly WorkplaneShape[], given: P
           box: boxOf(piece),
           triangles: piece.numTri(),
           solid: piece,
-          geometry: geometryOf(piece),
+          geometry: null,
         });
       });
     }
@@ -303,8 +308,8 @@ export async function checkClearance(source: readonly WorkplaneShape[], given: P
           }
           const hitA = { point: new THREE.Vector3(), distance: 0, faceIndex: 0 };
           const hitB = { point: new THREE.Vector3(), distance: 0, faceIndex: 0 };
-          const bvh = a.geometry.boundsTree as MeshBVH;
-          const found = bvh.closestPointToGeometry(b.geometry, identity, hitA, hitB, 0, options.searchLength);
+          const bvh = partGeometry(a).boundsTree as MeshBVH;
+          const found = bvh.closestPointToGeometry(partGeometry(b), identity, hitA, hitB, 0, options.searchLength);
           if (!found && volume <= 0) {
             result.clearCount += 1;
             continue;
@@ -323,6 +328,7 @@ export async function checkClearance(source: readonly WorkplaneShape[], given: P
     return sortClearanceResult(result);
   } finally {
     for (const part of parts) {
+      if (!part.geometry) continue;
       part.geometry.boundsTree = undefined;
       part.geometry.dispose();
     }

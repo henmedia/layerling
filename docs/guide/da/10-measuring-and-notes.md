@@ -67,6 +67,7 @@ Under {{ui:workspace.appearance}} i indstillingerne er der to kontakter for leve
 - {{ui:workspace.showOriginDimensions}} viser afstandene fra markeringen til pladens nulpunkt, også med flere valgte former.
 
 Med {{ui:workspace.dimensionsAlwaysVisible}} bliver dimensionerne permanent synlige. Et legeme, der ikke står på arbejdsplanet, viser også sin højde over det; klik på tallet for at skrive en ny.
+Med {{ui:workspace.dimensionAxisColors}} får hvert felt farven på sin akse, ligesom håndtagene: rød for X, grøn for Y og blå for Z. Så ser du også på en lille del med det samme, hvilket tal der er hvilket.
 
 Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring markeringen forsvinder, så en del du flytter er nem at se. [[Q]] igen henter dem tilbage. Et håndtag du peger på viser stadig sit mål.
 

@@ -18,6 +18,10 @@ Ovládání myší:
 
 Rychlost přiblížení nastavuje {{ui:workspace.zoomSpeed}} v části {{ui:workspace.appearance}}. Posuvník má rozsah 1 až 14, výchozí je 5; nad 10 se zrychluje jen kolečko.
 
+**Tlačítka myši jako ve sliceru.** Pokud jste zvyklí na Bambu Studio nebo OrcaSlicer, nastavte v nastavení, v {{ui:workspace.appearance}}, {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Tažení levým tlačítkem po prázdném místě pak otáčí pohled, pravé tlačítko ho posouvá jako prostřední a Shift s tažením levým kreslí výběrový rámeček. Tažení tělesa ho stále posouvá a krátké kliknutí pravým stále otevře nabídku. V náčrtu posouvá pohled i pravé tlačítko.
+
+**3D myš.** SpaceMouse nebo jiná 3D myš otáčí, posouvá a přibližuje 3D pohled: odtlačte čepičku od sebe pro přiblížení, posuňte ji pro posun pohledu, nakloňte ji pro naklonění pohledu a otočte ji pro otočení pohledu. V nastavení, v {{ui:workspace.appearance}}, klikněte na {{ui:workspace.spaceMouseConnect}} a vyberte zařízení v okně, které prohlížeč otevře; volbu si zapamatuje, takže to stačí udělat jednou. Funguje to v Chrome a Edge, které k takovým zařízením mají přístup; Firefox a Safari ne.
+
 Na tabletu nebo telefonu dvěma prsty přibližujete a oddalujete a společným posunem prstů posouváte pohled. Jeden prst pracuje s modelem jako levé tlačítko myši. Pro otáčení jedním prstem zapněte {{ui:camera.touchRotate}} v liště pohledu. Volba se zobrazuje jen na dotykových zařízeních.
 
 Grafický tablet s perem se chová jako myš: hrot zastupuje levé tlačítko, boční tlačítko pravé, tedy otáčení a místní nabídku. Tlačítkům tabletu lze v jeho ovladači přiřadit [klávesové zkratky](chapter:shortcuts) Layerlingu.
@@ -67,6 +71,8 @@ V každém projektu si také můžete uložit čtyři vlastní pohledy. [[Shift]
 - {{ui:camera.sectionMeasure}} měří v řezu dvěma kliknutími. Body se přichytávají k obrysu, přednostně k rohům. Druhý bod na protější stěně se umístí kolmo proti prvnímu. Bez přesného míření tak změříte tloušťku stěny, mezeru nebo vůli. Třetí kliknutí začne další měření, [[Esc]] měření ukončí. Posun řezné roviny měření vymaže.
 - {{ui:camera.sectionExportSvg}} uloží obrysy v řezu jako SVG v měřítku 1:1 pro laser, plotr, šablonu nebo těsnění. Řez X je viděn zprava, Y zepředu a Z shora. Zahrnou se jen viditelná tělesa s již odečtenými výřezy. Tělesa stejné barvy se sjednotí do jednoho obrysu. Každá barva zůstává samostatnou nevyplněnou cestou pro oddělené vrstvy v laserovém programu.
 
+Křížek a [[Esc]] zavřou okno nástroje; probíhá-li měření, [[Esc]] nejdřív ukončí to. Řez zůstane, dokud ho nevypnete přes {{ui:camera.sectionActive}}, nekliknete na jeho tlačítko v liště, zatímco je okno otevřené, nebo se nevrátíte do přehledu projektů. Dokud je zapnutý, jeho tlačítko zůstává zvýrazněné. Co postavíte na odříznuté straně, se ukáže až po vypnutí řezu. Tablet nemá [[Esc]], proto má okno nástroje na něm dvě tlačítka navíc: {{ui:camera.sectionBack}} ukončí měření, pokud probíhá, a jinak zavře okno nástroje, a {{ui:camera.sectionConfirm}} zavře okno nástroje jedním krokem. Počítač je nezobrazuje.
+
 Okno nástroje je u svého tlačítka. Přetažením záhlaví ho přesunete kamkoliv na pracovní plochu a příště se tam otevře znovu. Dvojklik nebo vrácení k tlačítku obnoví jeho ukotvení.
 
 [[Esc]] okno zavře, ale řez zůstane aktivní do vypnutí nebo návratu do přehledu projektů. Tlačítko řezu zůstává zvýrazněné. Objekty vložené do odříznuté části uvidíte až po vypnutí řezu.
@@ -93,29 +99,107 @@ Chceš-li se na pracovní rovinu podívat kolmo, stiskni [[P]] nebo klikni na {{
 
 Mřížka usnadňuje odhad rozměrů podložky. Vpravo dole se nastavuje **krok přichytávání**: posun a změna velikosti se provádějí v násobcích tohoto rozměru, například 1 mm. Pro jemnou práci krok zmenšete, pro hrubé rozmístění zvětšete. {{ui:editor.tool.snapToGrid}} dodatečně přesune vybrané tvary na nejbližší průsečík mřížky. Při přesouvání se přichytávají také k jiným tvarům, viz [Výběr a uspořádání](chapter:select-and-arrange). Bez myši: [[Alt]]+[[1]] až [[Alt]]+[[0]] vyberou položku s tímto číslem v nabídce ([[Alt]]+[[1]] přichytávání vypne) a [[,]] a [[.]] krok o stupeň zjemní nebo zhrubí. Funguje to i v náčrtu.
 
+> **Tip:** Při přesném lícování dílů přestaňte pohledem otáčet. Číselnou klávesou zvolte pohled shora nebo zepředu a [[O]] přepněte na rovnoběžné promítání. Snadněji pak poznáte, zda jsou hrany skutečně v jedné rovině.
+
+### Okno nastavení
+
+Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nastavení. Vlevo je pět oblastí: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} a {{ui:workspace.history}}. Změna platí okamžitě. {{ui:workspace.makeDefault}} dole uloží současné nastavení jako výchozí, takže nový projekt začne s ním. Otevřený soubor si přinese vlastní nastavení; {{ui:workspace.useMyDefault}} vedle něj použije na otevřený projekt vaše uložené barvy, mřížku a ostatní, přičemž zachová jeho jednotky. Pokud vaše výchozí nastavení obsahuje tiskárnu, přijde i s velikostí své podložky; bez tiskárny si projekt ponechá svou podložku a tiskárnu. {{ui:workspace.close}} vpravo nahoře okno zavře. Tato část prochází nastavení jedno po druhém.
+
+### Vzhled: motiv, pás nástrojů a krychle
+
+{{ui:workspace.theme}} určuje barevné schéma celého programu: {{ui:workspace.themeSystem}} se řídí počítačem, další jsou {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} a {{ui:workspace.themeGraphite}}. Změnit ho lze i vpravo nahoře v editoru.
+
+{{ui:workspace.toolbarSize}} v {{ui:workspace.appearance}} mění velikost pásu nástrojů, nabídky tvarů, lišty pohledu vlevo a panelu vlastností vpravo: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} nebo {{ui:workspace.toolbarSizeLarge}}. Malé ovládání nechá více místa na notebooku, velké usnadňuje dotyk i použití na velké obrazovce. Nevejdou-li se velká tlačítka, skupiny pásu se zalomí do dalšího řádku. Nastavení se uchovává v tomto prohlížeči pro všechny projekty.
+
+{{ui:workspace.shapeColors}} zobrazí na obrázcích knihovny tvarů barvu, se kterou nový tvar začíná (barvu jeho druhu, nebo tu, kterou jste uložili přes {{ui:inspector.saveDefaults}}). Pokud dáváte přednost šedým obrázkům, vypněte to; prohlížeč si volbu zapamatuje.
+
+{{ui:workspace.viewCubePosition}} v {{ui:workspace.appearance}} přesune orientační krychli do jiného rohu pracovní plochy: {{ui:workspace.viewCubePositionTopLeft}} (jako dosud), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} nebo {{ui:workspace.viewCubePositionBottomRight}}. V každém rohu kromě levého horního se lišta pohledu posune nahoru na místo, které krychle uvolnila. Vpravo dole stojí krychle těsně nad ovládáním {{ui:inspector.snapGrid}}. Dokud jsou vpravo otevřené vlastnosti tvaru, krychle na pravé straně uhne vlevo od nich. Roh se uchovává v tomto prohlížeči pro všechny projekty. V úzkém okně, třeba na telefonu, je nastavení skryté a krychle zůstává vlevo nahoře.
+
+### Vzhled: rychlý režim
+
+{{ui:workspace.fastMode}} je pro pomalejší počítače. Vypne stíny, obrysy na všech tělesech a setrvačnost kamery a vykresluje pohled jen v rozlišení obrazovky. Vaše vlastní nastavení zůstanou uložená na později a přepínače, které přebírá, ukazují {{ui:workspace.offInFastMode}}, dokud je zapnutý. Co dalšího pomáhá na pomalém počítači, najdete níže v části „Když je Layerling pomalý“.
+
+### Vzhled: barvy pracovní plochy a náčrtu
+
+Barvy pracovní plochy se nastavují v {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} a {{ui:workspace.surfaceColor}} pro světlý motiv (tmavé motivy mají vlastní), vedle barvy mřížky v {{ui:workspace.workplane}}. Každá barva je tlačítko, které ji ukazuje. Kliknutí otevře malé okno s barevným polem, řadou hotových barev, polem pro hexadecimální hodnotu a šipkou, která barvu vrátí na výchozí hodnotu Layerlingu. [[Enter]] převezme zadanou hexadecimální hodnotu, stejně jako kliknutí mimo okno.
+
+Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno kolem listu, {{ui:workspace.sketchPlateColor}} pro list pod mřížkou a {{ui:workspace.sketchGridColor}}, vše pro světlý motiv. {{ui:workspace.sketchMatch}} převezme jedním kliknutím tři barvy pracovní plochy.
+
+{{ui:workspace.classicLook}} nastaví pracovní plochu tak, jak ji ukazuje Tinkercad: bílý podklad, světle modrá milimetrová mřížka s tmavší čarou po každém centimetru, černé obrysy, světlo shora s měkkými stíny. Každou hodnotu lze potom ještě změnit zvlášť. Všechny začínají tak, jak Layerling vždy vypadal, a co vám vyhovuje, záleží na vašem monitoru.
+
+![Nastavení vzhledu: barvy pozadí a pracovní roviny pro světlý motiv a zapnutí obrysů těles.](shot:settings-appearance)
+
+![Editor v tmavém motivu. Vpravo nahoře lze vybrat systémový, světlý, tmavý nebo grafitový motiv.](shot:editor-dark)
+
+### Vzhled: šipky os a obrysy
+
+{{ui:workspace.showAxes}}, výchozí zapnuto, kreslí v rohu podložky tři šipky: **X** červeně doprava, **Y** zeleně dozadu a **Z** modře vzhůru, podle údajů polohy. Jde o pravotočivou soustavu jako v Tinkercadu, CAD programech a slicerech. Na pracovní rovině umístěné na ploše se osy přizpůsobí její orientaci. Pokud překážejí, vypněte je.
+
+{{ui:workspace.edgeLines}} kreslí obrys na každém tělese barvou {{ui:workspace.edgeColor}} (nejprve černou, jako v Tinkercadu): pomáhá, když tmavé barvy splývají. Ve výchozím stavu je vypnuto a velmi velké importované sítě se vynechávají.
+
+![Tři tmavá tělesa se zapnutými obrysy, které je navzájem oddělují.](shot:edge-lines)
+
+{{ui:workspace.strongHoles}} vykreslí díry tmavší šedou, méně průhledně a s tmavou čarou kolem. Pomůže, když se díra mezi průhlednými tělesy špatně hledá. Na rozdíl od hran zůstává zapnuté i v rychlém režimu.
+
+### Vzhled: světlo a stíny
+
+{{ui:workspace.showShadows}} zapíná a vypíná vržené stíny. Dva posuvníky určují, jak jsou tělesa osvětlena. {{ui:workspace.shadowStrength}} říká, jak tmavé jsou vržené stíny, a {{ui:workspace.shadeContrast}} přesouvá světlo z rovnoměrného okolního světla na hlavní světlo: směrem k „výraznému“ jsou stinné strany tmavší a stíny výraznější, směrem k „jemnému“ je vše plošší. Úplně nahoře je kontrast velmi silný, takže stinné strany i stíny jsou opravdu tmavé. {{ui:workspace.shadowSoftness}} změkčí okraje stínů místo ostrých. {{ui:workspace.lightAzimuth}} otáčí hlavní světlo kolem podložky (0° zepředu, 90° zprava) a {{ui:workspace.lightElevation}} ho zvedá; při 90° stojí přímo nad podložkou jako v Tinkercadu a stíny padají přímo pod tělesa. {{ui:workspace.softLighting}} přivádí většinu světla odtud, odkud se díváte, a otáčí se s pohledem: žádná plocha nezůstane tmavá a plocha tmavé barvy obrácená vzhůru už se nepřepálí do bílé. Hlavní světlo zůstává trochu pro stíny a posuvník kontrastu stále funguje. Pokud je při nízkém světle ještě vidět jasný odlesk, zvedněte {{ui:workspace.lightElevation}} na 90°: pak to vypadá jako Tinkercad. {{ui:workspace.lightReset}} vše vrátí zpět.
+
+### Vzhled: rozměry na pracovní rovině
+
+{{ui:workspace.showMoveDimensions}} ukazuje, o kolik posouváte při tažení, {{ui:workspace.showOriginDimensions}} vzdálenosti výběru od počátku podložky, i při více vybraných tělesech. S {{ui:workspace.dimensionsAlwaysVisible}} zůstávají tyto rozměry vidět trvale, ne jen při tažení. Dokud je vybráno natočené těleso, jeho úhly se zobrazují pod ním na pracovní rovině; {{ui:workspace.showRotationAngles}} to vypne. Více v kapitole [Měření a poznámky](chapter:measuring-and-notes).
+
+### Vzhled: výběr a přesouvání
+
+{{ui:workspace.selectBeforeMoving}}: těleso je pak nutné nejprve vybrat a teprve další tažení ho posune. Pomáhá to, když na tělesa sahají děti nebo spěchající ruce, a na dotykové obrazovce.
+
+{{ui:workspace.frameByDirection}}: rámeček tažený doprava vybere jen to, co leží celé uvnitř, tažený doleva vše, čeho se dotkne (kreslí se čárkovaně), jako ve SketchUpu.
+
+{{ui:workspace.doubleClickOpensSketch}} určuje, zda dvojklik na vysunutý náčrt znovu otevře náčrt jako v Tinkercadu, a {{ui:workspace.doubleClickOpensGroup}}, zda dvojklik na skupinu nebo svazek otevře úpravy. {{ui:workspace.doubleClickCentersView}} určuje, zda dvojklik na prázdnou pracovní rovinu posune pohled na toto místo.
+
+{{ui:workspace.objectSnap}} nechá okraje a střed tvaru při tažení přichytávat k jiným tvarům; nabídka mřížky vpravo dole má stejný přepínač. {{ui:workspace.cruise}} nechá nový tvar viset na ukazateli myši a položí ho na plochu pod ním, jako Cruise v Tinkercadu; vypnuté znamená, že se nový tvar objeví uprostřed podložky. Více v kapitole [Výběr a uspořádání](chapter:select-and-arrange).
+
+### Vzhled: pohled
+
+{{ui:workspace.startInPerspective}}: editor se pak otevře v perspektivním pohledu, ne v plochém.
+
+{{ui:workspace.startView}} určuje úhel, ve kterém se otevře nový projekt a ke kterému se vrací {{ui:camera.home}}. Otočte a přibližte pohled, jak se vám líbí, a pak klikněte na {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrátí obvyklý pohled zepředu zprava. Platí pro každý projekt v tomto prohlížeči. Projekt, který znovu otevřete, se stále otevře tak, jak jste ho opustili.
+
+{{ui:workspace.zoomSpeed}} je posuvník od pomalého po rychlé: jak rychle přibližuje kolečko a touchpad; tlačítka a klávesy přiblížení si ponechávají vlastní malé kroky. {{ui:workspace.cameraInertia}}: po puštění myši se pohled ještě chvíli otáčí a jemně zpomalí. Vypnuté znamená, že se zastaví hned, jako v Tinkercadu a Fusion 360.
+
+{{ui:workspace.overhangAngle}} je úhel, od kterého plocha platí za převis, když v nabídce viditelnosti zapnete zobrazení převisů: takové plochy jsou šrafované červeně a bíle. 30° je opatrné, 70° počítá s dobrým chlazením tisku; 45° je obvyklý začátek. Dokud se zobrazují, řádek pod pohledem uvádí nejstrmější převis a kolik cm² potřebuje podpěry.
+
+{{ui:workspace.booleanTriangleLimit}} omezuje, kolik trojúhelníků smí mít importovaná síť, když ji řežete, sjednocujete nebo protínáte, protože se to počítá ve vašem prohlížeči. Síť nad limitem se nezpracuje; nejdřív síť zjednodušte, nebo limit zvyšte, pokud to počítač zvládne. Vyšší limit může editor na pár sekund zmrazit.
+
+### Měření: jednotky, měřítko a kroky přichytávání
+
+V {{ui:workspace.measurement}} nastavíte {{ui:workspace.units}}, jednotku, ve které se rozměry zobrazují ({{ui:workspace.scale}}: milimetry, centimetry nebo metry v metrické soustavě, palce nebo stopy v imperiální), kolik desetinných míst číslo ukazuje ({{ui:workspace.accuracy}}), {{ui:workspace.snapGrid}}, ke kterému se přichytává přesouvání a změna velikosti, a vlastní kroky přichytávání v {{ui:workspace.customSnapGrids}}.
+
 V části {{ui:workspace.measurement}} nastavíte {{ui:workspace.units}}. Při {{ui:units.imperial}} se rozměry na tělese, v nastavení, měření i pravítku zobrazují v palcích. Přichytávání nabízí kroky od 1/64 do 1 palce a mřížka rozteče od 1/8 do 1 palce, výchozí 1/4 palce, se silnější čárou po celém palci. {{ui:workspace.inchFormat}} přepíná zlomky jako v Tinkercadu, například 1 5/8 se zaokrouhlením na 1/64, nebo desetinný zápis 1.625 s přesností {{ui:workspace.accuracy}}. Zadávat lze oba formáty včetně „1 5/8“. Rychleji se mezi milimetry a palci přepíná malým přepínačem **mm | in** vedle {{ui:inspector.snapGrid}} dole v okně vlastností: změní jednotku, mřížku desky a krok přichytávání stejně jako nastavení, pro tento projekt.
 
 V {{ui:workspace.customSnapGrids}} přidáte vlastní pojmenovanou rozteč v milimetrech, například „Rozteč vývodů 2,54 mm“ pro pouzdra DIP, kolíkové lišty a univerzální desky nebo „Jednotka klávesy MX“ s 19,05 mm. Nabídka přichytávání pak obsahuje celý krok, polovinu a čtvrtinu, tedy 1 ×, ½ × a ¼ ×. Chcete-li nabízet pouze celý krok, vypněte u příslušné rozteče {{ui:workspace.customSnapGridParts}}. U již uložených roztečí zůstává volba zapnutá. Vlastní kroky se ukládají s projektem i přes {{ui:workspace.makeDefault}}.
 
-Rozměry, rozteč a barvu podložky měníte ozubeným kolem v pásu nástrojů. Nastavení obsahuje {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} a {{ui:workspace.history}}. V {{ui:workspace.appearance}} jsou například {{ui:workspace.startInPerspective}} a {{ui:workspace.showShadows}}, v {{ui:workspace.workplane}} volba {{ui:workspace.showGrid}}. Barvy {{ui:workspace.backgroundColor}} a {{ui:workspace.surfaceColor}} se uplatňují ve světlém motivu; tmavé motivy mají vlastní. Barva mřížky je v části {{ui:workspace.workplane}}. {{ui:workspace.gridMajorEvery}} určuje silnější čáru po pěti či deseti krocích, {{ui:workspace.gridMajorColor}} její barvu, kterou používá i středový kříž a okraj podložky. Čáry při přibližování zesilují jako v Tinkercadu a zůstávají viditelné při oddálení. Vypnutím {{ui:workspace.gridLinesGrow}} zachováte tloušťku jeden pixel jako v náčrtu. Hexadecimální barvu potvrdíte [[Enter]]. {{ui:workspace.edgeLines}} zvýrazní obrysy těles barvou {{ui:workspace.edgeColor}}, zpočátku černou. Pomáhá oddělit tmavá tělesa. Výchozí stav je vypnuto a velmi husté importované sítě se vynechávají. Mřížka vždy prochází počátkem, takže hlavní čáry leží na osách bez ohledu na rozměry podložky. Pokud mřížka zmizela, například proto, že barva byla nastavena na barvu desky, {{ui:workspace.resetGrid}} na konci oblasti {{ui:workspace.workplane}} vrátí viditelnost, barvy, rozestup a tloušťku čar na standard, zde i ve výchozím nastavení uloženém tlačítkem {{ui:workspace.makeDefault}}.
+### Pracovní rovina: podložka a tiskárna
 
-{{ui:workspace.strongHoles}} vykreslí díry tmavší šedou, méně průhledně a s tmavou čarou kolem. Pomůže, když se díra mezi průhlednými tělesy špatně hledá. Na rozdíl od hran zůstává zapnuté i v rychlém režimu.
+{{ui:workspace.printer}} přizpůsobí pracovní rovinu tiskové podložce vaší tiskárny a označí tělesa, která přes ni přesahují, viz [Tisk](chapter:printing). {{ui:workspace.showPlateLabels}} napíše na podložku název projektu, a při zvolené tiskárně i její název a tiskový prostor.
 
-{{ui:workspace.showAxes}}, výchozí zapnuto, kreslí v rohu podložky tři šipky: **X** červeně doprava, **Y** zeleně dozadu a **Z** modře vzhůru, podle údajů polohy. Jde o pravotočivou soustavu jako v Tinkercadu, CAD programech a slicerech. Na pracovní rovině umístěné na ploše se osy přizpůsobí její orientaci. Pokud překážejí, vypněte je.
+{{ui:workspace.size}} dá podložce vlastní velikost, {{ui:workspace.width}} a {{ui:workspace.length}} v milimetrech nebo zvolené jednotce. Mřížka vždy prochází počátkem, takže silnější čáry leží na osách bez ohledu na rozměr podložky.
 
-V {{ui:workspace.appearance}} upravujete i osvětlení. {{ui:workspace.shadowStrength}} určuje tmavost vržených stínů. {{ui:workspace.shadeContrast}} mění poměr rovnoměrného okolního a hlavního světla: výraznější nastavení ztmaví odvrácené strany a zvýrazní stíny, měkčí je zploští. Na horním konci je kontrast velmi silný. {{ui:workspace.shadowSoftness}} změkčí okraje stínů. {{ui:workspace.lightAzimuth}} otáčí hlavním světlem kolem podložky, 0° zepředu a 90° zprava. {{ui:workspace.lightElevation}} mění jeho výšku; při 90° svítí shora jako v Tinkercadu a stíny leží přímo pod tělesy. {{ui:workspace.lightReset}} vše obnoví. {{ui:workspace.classicLook}} nastaví bílou podložku, světle modrou milimetrovou mřížku s tmavší centimetrovou čárou, černé obrysy a horní světlo s měkkými stíny. Každou hodnotu můžete následně změnit samostatně. Výchozí hodnoty odpovídají původnímu vzhledu Layerlingu; vhodné nastavení záleží i na monitoru. Náčrt má vlastní barvy světlého motivu: {{ui:workspace.sketchBackground}} pro okolí listu, {{ui:workspace.sketchPlateColor}} pro list a {{ui:workspace.sketchGridColor}} pro mřížku. {{ui:workspace.sketchMatch}} převezme všechny tři barvy z 3D plochy jedním kliknutím.
+### Pracovní rovina: mřížka
 
-![Nastavení vzhledu: barvy pozadí a pracovní roviny pro světlý motiv a zapnutí obrysů těles.](shot:settings-appearance)
+{{ui:workspace.showGrid}} zobrazí nebo skryje mřížku na podložce. {{ui:workspace.gridBlockSize}} nastavuje rozestup jejích čar a {{ui:workspace.gridMajorEvery}}, zda tmavší čára přijde po každých 5, nebo 10 krocích mřížky; {{ui:workspace.gridMajorColor}} dá této čáře vlastní barvu, kterou převezme i středový kříž a okraj podložky. {{ui:workspace.gridColor}} je barva běžných čar.
 
-![Tři tmavá tělesa se zapnutými obrysy, které je navzájem oddělují.](shot:edge-lines)
+Každá čára mřížky se při přiblížení rozšiřuje jako v Tinkercadu a při oddálení zůstává viditelná. Je-li to na vás moc, vypněte {{ui:workspace.gridLinesGrow}} a čáry zůstanou při každém přiblížení široké jeden pixel, jako v náčrtu.
 
-![Editor v tmavém motivu. Vpravo nahoře lze vybrat systémový, světlý, tmavý nebo grafitový motiv.](shot:editor-dark)
+Pokud mřížka zmizela, třeba proto, že byla barva nastavena na barvu podložky, {{ui:workspace.resetGrid}} na konci oblasti {{ui:workspace.workplane}} vrátí její viditelnost, barvy, rozestup a tloušťku čar na standard, zde i ve výchozím nastavení uloženém přes {{ui:workspace.makeDefault}}.
 
-{{ui:workspace.toolbarSize}} v {{ui:workspace.appearance}} mění velikost pásu nástrojů, nabídky tvarů, lišty pohledu vlevo a panelu vlastností vpravo: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} nebo {{ui:workspace.toolbarSizeLarge}}. Malé ovládání nechá více místa na notebooku, velké usnadňuje dotyk i použití na velké obrazovce. Nevejdou-li se velká tlačítka, skupiny pásu se zalomí do dalšího řádku. Nastavení se uchovává v tomto prohlížeči pro všechny projekty.
+### Výchozí hodnoty tvarů
 
-{{ui:workspace.viewCubePosition}} v {{ui:workspace.appearance}} přesune orientační krychli do jiného rohu pracovní plochy: {{ui:workspace.viewCubePositionTopLeft}} (jako dosud), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} nebo {{ui:workspace.viewCubePositionBottomRight}}. V každém rohu kromě levého horního se lišta pohledu posune nahoru na místo, které krychle uvolnila. Vpravo dole stojí krychle těsně nad ovládáním {{ui:inspector.snapGrid}}. Dokud jsou vpravo otevřené vlastnosti tvaru, krychle na pravé straně uhne vlevo od nich. Roh se uchovává v tomto prohlížeči pro všechny projekty. V úzkém okně, třeba na telefonu, je nastavení skryté a krychle zůstává vlevo nahoře.
+V {{ui:workspace.shapeDefaults}} vyberete tvar v {{ui:workspace.shape}} a nastavíte, s čím začne, když ho přidáte: jeho šířku, délku a výšku. {{ui:workspace.useAppDefaults}} vrátí tvar na hodnoty, se kterými ho začíná aplikace. Tvary s vlastním nastavením ho ukazují v {{ui:workspace.shapeDetails}}. Hodnoty platí pro nové tvary, ne pro ty, které už na podložce stojí. {{ui:workspace.customLimit}} nastaví vlastní horní mez toho, jak velký mohou tento tvar udělat úchyty a vlastnosti; ponecháte-li prázdné, platí obvyklé meze.
 
-> **Tip:** Při přesném lícování dílů přestaňte pohledem otáčet. Číselnou klávesou zvolte pohled shora nebo zepředu a [[O]] přepněte na rovnoběžné promítání. Snadněji pak poznáte, zda jsou hrany skutečně v jedné rovině.
+### Uložená historie
+
+V {{ui:workspace.history}} posuvník {{ui:workspace.savedHistory}} určuje, kolik dokončených akcí zůstane k dispozici pro Zpět po uložení nebo znovuotevření projektu. Výchozí hodnota je 100 akcí na projekt. Nižší limit starší kroky Zpět projektu natrvalo zahodí.
 
 ## Když je Layerling pomalý
 

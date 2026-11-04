@@ -1,5 +1,6 @@
 import type { Mesh, OcctKernel, ShapeHandle } from "occt-wasm";
 import type { CadModifierDeflection } from "@/lib/cadModifierTypes";
+import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 
 /**
  * Surface kinds the edge tool meshes with the looser angle of a small
@@ -32,6 +33,11 @@ type TessellateOptions = { linearDeflection: number; angularDeflection: number }
 
 function optionsFor(deflection: CadModifierDeflection): TessellateOptions {
   return { linearDeflection: deflection.linear, angularDeflection: deflection.angular };
+}
+
+/** WebAssembly out of memory or trapped: the kernel is lost and must be restarted, so such an error is never caught here. */
+function isWasmMemoryFault(error: unknown) {
+  return isCadModifierWasmMemoryFault(error instanceof Error ? error.message : String(error ?? ""), error instanceof Error ? error.name : "");
 }
 
 function releaseAll(cad: OcctKernel, handles: ShapeHandle[]) {
@@ -153,11 +159,14 @@ function resewnCopies(cad: OcctKernel, components: ShapeHandle[], deflection: Ca
   try {
     for (const component of components) {
       const faces = cad.getSubShapes(component, "face");
+      const copies: ShapeHandle[] = [];
       let solid: ShapeHandle;
       try {
-        solid = cad.sewAndSolidify(faces.map((face) => cad.copy(face)), RESEW_TOLERANCE);
+        faces.forEach((face) => copies.push(cad.copy(face)));
+        solid = cad.sewAndSolidify(copies, RESEW_TOLERANCE);
       } finally {
-        releaseAll(cad, faces);
+        // The copies too: the sewn solid holds its faces itself, the handles only took kernel memory.
+        releaseAll(cad, [...faces, ...copies]);
       }
       sewn.push(solid);
       const before = cad.getVolume(component);
@@ -167,9 +176,11 @@ function resewnCopies(cad: OcctKernel, components: ShapeHandle[], deflection: Ca
     const mesh = cad.tessellate(sewnResult, optionsFor(deflection));
     if (cadMeshHasOpenEdges(mesh)) throw new Error("resewn mesh still open");
     return { components: sewn, result: sewnResult, deflection, mesh };
-  } catch {
+  } catch (error) {
     if (sewnResult !== null && sewn.length > 1) releaseAll(cad, [sewnResult]);
     releaseAll(cad, sewn);
+    // A kernel out of memory is restarted by the worker, not passed off as a mesh that stays open.
+    if (isWasmMemoryFault(error)) throw error;
     return null;
   }
 }
@@ -210,7 +221,8 @@ function accurateMeshBody(cad: OcctKernel, components: ShapeHandle[], result: Sh
   const straysWith = (body: { result: ShapeHandle }, options: CadModifierDeflection) => {
     try {
       return cadMeshStraysFromFaces(cad, body.result, optionsFor(options));
-    } catch {
+    } catch (error) {
+      if (isWasmMemoryFault(error)) throw error;
       // A face the check cannot measure counts as straying.
       return true;
     }
@@ -222,7 +234,11 @@ function accurateMeshBody(cad: OcctKernel, components: ShapeHandle[], result: Sh
     let next: MeshedBody;
     try {
       next = meshCopies(cad, components, { linear: capped.linear, angular });
-    } catch {
+    } catch (error) {
+      if (isWasmMemoryFault(error)) {
+        if (current) releaseMeshed(cad, current);
+        throw error;
+      }
       // The treatment itself succeeded; keep the mesh it has rather than fail it.
       break;
     }

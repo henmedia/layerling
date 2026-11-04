@@ -63,6 +63,7 @@ In the settings under {{ui:workspace.appearance}} there are two switches for liv
 - {{ui:workspace.showOriginDimensions}} shows the distances of the selection to the origin of the plate, also with several selected bodies.
 
 With {{ui:workspace.dimensionsAlwaysVisible}} the dimensions stay visible permanently. A body that does not stand on the workplane also shows its height above it; click the number to type a new one.
+With {{ui:workspace.dimensionAxisColors}} each box takes the colour of its axis, as the handles do: red for X, green for Y and blue for Z. So on a small part you see at a glance which number is which.
 
 For a moment without them, press [[Q]]: the sizes and distances around the selection disappear, so a part you move is easy to see. [[Q]] again brings them back. A handle you point at still shows its size.
 

@@ -7,6 +7,8 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 ## 添加形状
 
+形状库是一份分成若干部分的列表，从 {{ui:library.section.basic}} 到 {{ui:library.section.helpers}}，每部分旁边标有其中形状的数量。点击某部分的名称会把它折叠起来，浏览器会记住你折叠了哪些；第一次时全部展开。最上方的 {{ui:library.recent}} 保存你最近放入的四个形状。搜索框可以按名称和其他相关词查找形状，英文和德文也可以：输入 "USB" 会找到 {{ui:shape.port}}。输入时只显示有匹配结果的部分；清空搜索框后，你折叠的部分会恢复原样。顶部的 {{ui:myShapes.title}} 在你保存形状之前只占一行。
+
 单击功能区中的 {{ui:editor.addShape}}。形状库随即打开。
 
 ![形状库。每一张小图都是由形状的真实几何体渲染出来的。](shot:shape-menu)
@@ -19,12 +21,16 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 形状库提供：
 
-- **基本形状：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四条边）、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.curvedCone}}（侧面向内弯成像伪球面那样的喇叭形，或向外鼓成圆顶；由 {{ui:prop.curvedConeTop}} 和 {{ui:prop.curvedConeBend}} 设置，并且像所有精确实体一样可以抽壳和倒圆角）、{{ui:shape.pyramid}}（三到二十四条边，因此也有三棱锥）、{{ui:shape.wedge}}、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}} 和 {{ui:shape.torus}}。
-- **管：** {{ui:shape.tube}} 和 {{ui:shape.bentTube}}，由最多十二段直管及之间的弯头组成，以及从一种轮廓过渡到另一种的 {{ui:shape.loft}}，比如从方形到圆形。
-- **装饰形状：** {{ui:shape.star}}、{{ui:shape.heart}} 和 {{ui:shape.crescent}}。
-- **文字：** {{ui:shape.text}}，也可沿圆弧排列。更多见[文字](chapter:text)。
-- **机械件：** {{ui:shape.thread}}（螺杆、螺钉、螺母和螺纹孔）、{{ui:shape.spring}}、{{ui:shape.gridfinity}} 收纳盒和底板、{{ui:shape.gear}}，以及用于握持的 {{ui:shape.knurl}}。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
-- **用于结构件：** 一体打印的 {{ui:shape.hinge}}、{{ui:shape.dovetail}}、用于水平孔的 {{ui:shape.teardrop}}、用于螺钉头的 {{ui:shape.counterbore}} 和 {{ui:shape.countersink}}，以及 {{ui:shape.ruler}}，它只是测量工具，永远不会出现在导出结果中。
+- **{{ui:library.section.basic}}：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四条边）、{{ui:shape.wedge}}、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.curvedCone}}（侧面向内弯成像伪球面那样的喇叭形，或向外鼓成圆顶；由 {{ui:prop.curvedConeTop}} 和 {{ui:prop.curvedConeBend}} 设置，并且像所有精确实体一样可以抽壳和倒圆角）、{{ui:shape.pyramid}}（三到二十四条边，因此也有三棱锥）、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}}、{{ui:shape.paraboloid}}（收窄成圆头的穹顶，高度随离轴距离的平方下降）和 {{ui:shape.torus}}。
+- **{{ui:library.section.vessels}}：** 从一个轮廓过渡到另一个轮廓的 {{ui:shape.loft}}，比如从方形到圆形，{{ui:shape.tube}}，由最多十二段直管及之间的弯头组成的 {{ui:shape.bentTube}}，以及 {{ui:shape.vase}}。
+- **{{ui:library.section.holes}}：** 用于螺钉头的 {{ui:shape.counterbore}} 和 {{ui:shape.countersink}}、用于水平孔的 {{ui:shape.teardrop}}，以及用于 USB、HDMI、DisplayPort 和 RJ45 插座的 {{ui:shape.port}}。
+- **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺杆、螺钉、螺母和螺纹孔）、沉头螺钉下的 {{ui:shape.finishingWasher}}、一体打印的 {{ui:shape.hinge}} 和 {{ui:shape.dovetail}}。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
+- **{{ui:library.section.enclosure}}：** 用于热熔螺母和自攻螺钉的 {{ui:shape.screwBoss}}、带卡座的 {{ui:shape.snapFit}}，以及 {{ui:shape.rib}} 或角撑板。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
+- **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}} 和 {{ui:shape.hirth}}。
+- **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收纳盒和底板，以及 {{ui:shape.sbcBoard}}，一块按实际尺寸做的单板计算机，用来围绕它设计外壳。
+- **{{ui:library.section.lettering}}：** {{ui:shape.text}}，也可沿圆弧排列，以及 {{ui:shape.nameTag}}、{{ui:shape.iconTag}} 和 {{ui:shape.qrCode}}。更多见[文字](chapter:text)。
+- **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用于握持的 {{ui:shape.knurl}}。
+- **{{ui:library.section.helpers}}：** {{ui:shape.ruler}}，它只是测量工具，永远不会出现在导出文件中。
 
 有两种方式可以得到三角形：三边的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的“Roof”；{{ui:shape.wedge}} 是直角三角形。两者都是真正的三棱柱。要挖出三角形孔，复制该形状，把副本缩小，标记为孔，然后用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 对齐。两者都按形状的边界框工作，也就是包围它的最小方框，所以被切掉一半的正方形仍按完整正方形计算。命令搜索（[[Ctrl]]+[[K]]）在“triangle”或“roof”下也能找到这两种形状。
 
@@ -171,6 +177,8 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 如果只想给部分面加图案，比如只给盒子的顶面，单击 {{ui:inspector.surfaceFacesPick}}，再在视图中单击这些面：顶面、底面或某个侧面。一个面一直延伸到实体的锐利棱边；圆柱的侧面是一个面，顶面和底面各是一个面。选中的面会高亮，再单击一次可以取消，{{ui:inspector.surfaceFacesClear}} 让图案重新覆盖整个实体。只有选中的面得到图案，其他面保持原样，三角形也很少。在顶面或底面上图案是平铺的；在圆形顶面上，凹槽、绳纹和针织纹绕中心排成一圈圈，像树的年轮。{{ui:inspector.surfaceFaceTurn}} 转动顶面和底面上的图案：0° 时各行沿前边缘，90° 时沿侧边缘。{{ui:inspector.surfaceCapStyle}} 让那里的凹槽、绳纹和针织纹在行与环之间切换；在棱角实体上，环会沿外轮廓走。{{ui:inspector.surfaceCapEdge}} 决定侧面与带图案的顶面或底面之间的棱边怎样处理：{{ui:surfaceTexture.edgeSharp}} 让两者都止于棱边。选 {{ui:surfaceTexture.edgeOver}} 时，侧面的图案绕过棱边铺满整个顶面：绳纹、针织纹和水平凹槽的各行以环的形式延续，竖直和斜向的凹槽则作为射线几乎延伸到中心。{{ui:surfaceTexture.edgeFold}} 效果相同，但只作为一圈边；里面是顶面自己的图案，按 {{ui:inspector.surfaceCapStyle}} 的设置。{{ui:surfaceTexture.edgeBead}} 为任何图案在棱边加一圈饰边：一根绳、一条收针链或一道圆珠边。较窄的圆角也会结束一个面：杯沿带圆角的杯子，其外侧、圆角、杯沿、内侧和杯底各自是独立的面，所以单击外侧只选中外侧。较宽的圆角（约占实体四分之一或更多）属于该面，就像球是一个面。选了面时，{{ui:inspector.surfaceOutside}} 和 {{ui:inspector.surfaceInside}} 不起作用。
 
+一个实体上的多种图案——四周是砖墙，顶面是滚花——就是图层：第一个旁边的 {{ui:inspector.surfaceLayerAddShort}} 会添加一层，并立即为它开启选面；点击它应覆盖的面。之后的每一层只作用于它自己的面，第一层作用于其余所有面。选项卡一次显示一个图层及其设置，{{ui:inspector.surfaceLayerRemove}} 删除一层。所有图层都在纹理下方的实体上一起生成，因此修改其中一层或去掉纹理，和单一图案时一样。文字作为图层不需要选面：放在哪里就在哪里。
+
 在 {{ui:inspector.more}} 下选择图案铺在哪里：外壁和内壁，底部和顶部各留多少光滑（光滑的底部让实体平稳地放在热床上），高度上的一条带，以及锐利棱边是否保持光滑。在所有保持光滑的地方旁边，图案会柔和地过渡出现；{{ui:inspector.surfaceFade}} 设定过渡的毫米数。数值越小，图案越靠近棱边；凸起的图案会一直延伸到棱边。在立方体这类棱角实体的平面上，图案则在这个距离处以一条直边结束：凹槽和菱形以一小段壁收尾，只保留完整的凸点。{{ui:inspector.surfaceProfile}} 决定凹槽或接缝的截面：尖形和平形是精确的，圆形则按 {{ui:inspector.surfaceDetail}} 给出的级数分段。
 
 除了 {{ui:surfaceTexture.grooves}}、{{ui:surfaceTexture.knurl}}、{{ui:surfaceTexture.honeycomb}} 和 {{ui:surfaceTexture.bumps}}，还有更多图案。{{ui:surfaceTexture.cells}} 是像铺路石或干裂泥土那样的不规则单元；接缝像蜂窝一样切得干净，换一个 {{ui:inspector.surfaceSeed}} 就重新排布。{{ui:surfaceTexture.knit}}、{{ui:surfaceTexture.rope}} 和 {{ui:surfaceTexture.weave}} 模仿针织线圈、缠绕的绳子以及由立条和编条编成的篮子；它们默认凸起、圆润，大小与原物相当。{{ui:surfaceTexture.grain}} 让表面变得细微粗糙，像喷砂过一样；颗粒分布在空间中，没有接缝，也不会拉伸。{{ui:surfaceTexture.image}} 把一张灰度图当作高度图：可用现成的木纹、地形或水磨石，也可用 {{ui:inspector.surfaceImageLoad}} 载入自己的图。亮处成为完整深度；{{ui:inspector.surfaceSpacingImage}} 设定一块拼贴的宽度，在 {{ui:inspector.surfaceImageTiling}} 下，拼贴可以重复、镜像或错位。选择 {{ui:surfaceTexture.tilingOnce}} 时，图片像标签一样只压印一次：{{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 像文字一样确定它的中心，{{ui:inspector.surfaceImageWidth}} 设定它的宽度，旁边的表面保持平滑。
@@ -204,7 +212,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 {{ui:inspector.vaseFloor}} 卡片收纳实体在形状之外还需要的东西。空心花瓶上：带朝向排水孔坡度的排水孔、空心底脚、镂空的壁（{{ui:prop.vaseCutout}}：Voronoi、蜂窝、菱形或圆形，适合灯笼和篮子），以及 {{ui:prop.vaseLamp}}：吊挂、装在灯座上或罩在 LED 灯片上。实心花瓶上，{{ui:prop.vaseReinforce}} 会切出细缝，切片软件在花瓶模式下借此一次打印出内部加强筋或双层壁。橡胶脚垫的凹槽两种都可用。{{ui:prop.vaseWatertight}} 把空心花瓶的壁和底加厚到至少 1.6 mm。
 
-在 {{ui:inspector.vaseParts}} 卡片上为花瓶添加配件。{{ui:prop.vaseLegs}} 可以一体成型（成为花瓶的一部分），也可以做成插接式，在底部留插座；支架从下面托住花瓶。{{ui:prop.vaseSaucer}} 接住水，或藏在底脚里。空心花瓶可以放 {{ui:prop.vaseInsert}}：植物内胆、带储水层的自动浇水内胆、花茎或试管架。{{ui:prop.vaseLid}} 可以盖在瓶口上、卡进凹槽，或拧在壁内的螺纹上。{{ui:inspector.vasePartsMake}} 把这些零件作为独立对象摆在花瓶旁边，可直接打印，倒过来打印更好的会倒放。花瓶上已经有插座、凹槽或螺纹。更改设置后请重新摆放：之前的零件会被替换。如果某个零件不适合这个花瓶，编辑器会提示，例如内胆穿不过窄瓶颈时。
+在 {{ui:inspector.vaseParts}} 卡片上为花瓶添加配件。{{ui:prop.vaseLegs}} 可以一体成型（成为花瓶的一部分），也可以做成插接式，在底部留插座；支架从下面托住花瓶。{{ui:prop.vaseSaucer}} 接住水，或藏在底脚里。空心花瓶可以放 {{ui:prop.vaseInsert}}：植物内胆、带储水层的自动浇水内胆、花茎或试管架。{{ui:prop.vaseLid}} 可以盖在瓶口上、卡进凹槽，或拧在壁内的螺纹上。选择 {{ui:vase.lidTeapot}} 时，花瓶本身的顶部就成为盖子，像茶壶那样：{{ui:prop.vaseLidHeight}}（或从底部算起的 {{ui:prop.vaseLidJoint}}）决定多少，图案和扭转会延续过接缝，一圈唇边把它固定在开口里，{{ui:prop.vaseLidKnob}} 会加上一个粘进顶部孔里的把手。{{ui:inspector.vasePartsMake}} 把这些零件作为独立对象摆在花瓶旁边，可直接打印，倒过来打印更好的会倒放。花瓶上已经有插座、凹槽或螺纹。更改设置后请重新摆放：之前的零件会被替换。如果某个零件不适合这个花瓶，编辑器会提示，例如内胆穿不过窄瓶颈时。
 
 {{ui:inspector.vasePrint}} 卡片告诉你打印这个花瓶需要什么：以所选 {{ui:prop.vaseMaterial}} 计的重量和耗材长度；实心花瓶按切片软件的花瓶模式计算，即沿壁的一条线。下方是打印提示：超过 45° 的悬垂及其位置、太薄的壁、盖子、灯具或支脚需要什么，以及加强筋和双层壁的切片设置。
 

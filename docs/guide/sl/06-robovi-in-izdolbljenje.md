@@ -22,6 +22,8 @@ V oknu najdeš:
 
 - {{ui:edge.allSharpEdges}} izbere vse robove naenkrat, {{ui:edge.clear}} izprazni izbor.
 - **{{ui:edge.radius}}** pri zaokrožitvi. Pri posnetju nastaviš {{ui:edge.distance}} ali {{ui:edge.angle}}.
+- {{ui:edge.variableRadius}} (samo zaokrožitev) pusti polmeru, da se spreminja vzdolž enega roba: majhen na enem koncu, večji na drugem, enakomerno vmes, kot tam, kjer ravna stena sreča poševno. Klikni en rob, nato nastavi {{ui:edge.radiusStart}} in {{ui:edge.radiusEnd}}. Kateri konec je začetek, sledi iz tega, kako je bil rob zgrajen; če večji polmer pride na napačen konec, ga {{ui:edge.swapEnds}} obrne. Deluje na enem robu naenkrat, zato več robov zaokroži enega za drugim. {{ui:edge.editAction}} vrne obe vrednosti.
+- {{ui:edge.concave}} (samo zaokrožitev) zaokrožitev obrne: namesto da rob zaobli, iz njega izreže žleb v obliki četrtine kroga, kot izrezani vogali škatle. Žleb je valj izbranega {{ui:edge.radius}}, ki leži vzdolž roba, zato deluje pri vsakem kotu med ploskvama, a samo na ravnih robovih in ne skupaj z {{ui:edge.variableRadius}}. {{ui:edge.editAction}} ga vrne.
 - {{ui:edge.sharpThreshold}} določa, kateri robovi sploh veljajo za ostre. Vrednost 25° obravnava kot rob samo izrazite pregibe in pusti ploske prehode pri miru.
 - {{ui:edge.topEdges}} izbere samo robove čisto na vrhu telesa. To je hitra pot za modelček za piškote: obris v skici zgradiš kot konturo, nato posneš zgornje robove. Kako strmo je posnetje, nastaviš z {{ui:edge.angle}}; daljše kot je stena debela, ne more postati.
 - {{ui:edge.bottomEdges}} izbere samo robove čisto na dnu telesa, nasprotje gumba {{ui:edge.topEdges}}. Tako hitro zaobliš ali posnameš samo vznožje dela.
@@ -123,6 +125,8 @@ Vsako ploskev telesa lahko premakneš za isto razdaljo navzven ali navznoter. To
 Označi {{ui:offset.sideways}}, ko naj se poveča ali zmanjša le obris: stranice se premaknejo za razdaljo, vsaka ravna zgornja in spodnja ploskev pa ostane na svoji višini. Tabla dobi rob naokoli, podstavek postane širši, telo pa ne postane višje. Pri stopničastem telesu vsaka stopnica obdrži svojo višino. Tudi besedilo, ki se odmakne prek svojih obrisov, takrat obdrži svojo višino.
 
 Brez kljukice se odmakne samo telo. Postane fiksno natančno telo, kot po posnetju: seznam na vrhu okna odmik vzame nazaj, {{ui:edge.editAction}} pa orodje znova odpre s staro razdaljo. Odmakniti je mogoče le natančna telesa CAD - kvadre, valje in druge oblike, njihove skupine, uvožene dele STEP. Telo, ki je samo trikotniška mreža, kot mnogi uvozi STL, pogosto ne gre. Razdalja, ki je za telo prevelika, na primer zmanjšanje čez najtanjšo steno, se zavrne.
+
+Besedilo, katerega črk jedro ne more odmakniti kot telo - v nekaterih pisavah A, B, M, N, W ali 9 -, se namesto tega odmakne prek svojih obrisov: dobi polnilo {{ui:prop.textWider}} za to razdaljo (ožje, ko se krči) in za toliko zraste zgoraj in spodaj. Ostane besedilo, ki ga lahko še naprej urejaš. To deluje za besedilo s polnimi črkami brez zaokroževanja; besedilo, ki že ima način polnila, se zavrne kot doslej.
 
 ## Brisanje ploskev
 

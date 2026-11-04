@@ -24,6 +24,8 @@ layerling teče v brskalniku tablice in kot aplikacija z domačega zaslona. Prst
 
 Brez tipke Shift naredi {{ui:contextMenu.selectMultiple}} v meniju dolgega pritiska to, kar na računalniku Shift+klik. Dokler je vklopljeno, to pove sporočilo, vsak tap na telo pa ga doda izboru ali ga spet odstrani. Tap na prazno mesto ali [[Esc]] na tipkovnici ga konča in pusti izbor, kakršen je. Prst na praznem mestu medtem še naprej vrti pogled. Nato {{ui:editor.tool.group}}, {{ui:editor.tool.align}} ali premik delujejo na vsa izbrana telesa.
 
+Isti meni ima {{ui:contextMenu.carry}}, tipko [[C]] za zaslon na dotik. Izbor potem sledi prstu čez ploskve drugih teles; tap ga odloži na ploskev, ki jo tapneš, tudi na poševno, in zadošča prvi tap. Vnos menija najdeš tudi z iskanjem »odloži« ali »cruise« (iskanje ukazov, na tipkovnici [[Ctrl]]+[[K]]).
+
 ## Vrtenje in približevanje pogleda
 
 En prst na praznem mestu vrti pogled, dva prsta ga približujeta in premikata. Prst, ki se začne na telesu, dela s telesom, ne s pogledom. Če želite, da namesto tega vrti pogled, vklopite {{ui:camera.touchRotate}} v vrstici pogleda: en prst potem vrti pogled namesto izbiranja, kjerkoli se začne. To stikalo se pokaže samo na napravi z zaslonom na dotik.
@@ -33,6 +35,8 @@ Kocka pogleda zgoraj levo vrti pogled, če jo vlečete, tap na eno od njenih str
 ## Ročice, majhne točke in pisalo
 
 Konica prsta zakriva, na kar cilja. layerling pusti prstu seči do ročic, točk, črt in robov malo dlje kot kazalcu miške, vendar je pisalo natančnejše. To velja za pisalo, ki ga tablica pozna kot pisalo, na primer Apple Pencil ali S Pen. Preprosto pisalo z gumijasto konico šteje za zaslon kot prst in ni natančnejše od njega, zato z njim delajte kot s prstom. Če Apple Pencil na iPadu lebdi nad gumbom, se čez trenutek v majhnem oblačku pokaže njegovo ime, kakor namig pri miški.
+
+V načinu skice {{ui:sketch.freehand}} riše s pisalom ali prstom kot na papir; ko ga dvignete, črta postane točke skice, ki jih lahko urejate, glejte [Skice](chapter:skice).
 
 Če se telesa premikajo, ker se jih dotaknejo otroci ali hitre roke, vklopite v nastavitvah {{ui:workspace.selectBeforeMoving}}: telo mora biti potem najprej izbrano in šele naslednji poteg ga premakne.
 
@@ -46,3 +50,5 @@ Konica prsta zakriva, na kar cilja. layerling pusti prstu seči do ročic, točk
 ## Delavnice z otroki
 
 Prsti in pisala z gumijasto konico delujejo tu enako. Dve nastavitvi olajšata razred: {{ui:workspace.selectBeforeMoving}}, da dotik telesa ne premakne po pomoti, in {{ui:camera.touchRotate}}, da en prst vedno vrti pogled. Gumb z vprašajem v skupini Pomoč na traku vklopi {{ui:interactiveHelp.title}}: tap na poljuben gumb, polje ali ročico ga potem razloži, isti gumb ali [[Esc]] pa pomoč konča.
+
+Za cel razred v nastavitvah vklopi {{ui:workspace.simpleMode}}. Orodna vrstica potem obdrži samo orodja, ki jih uporablja delavnica (kopiraj, prilepi, podvoji, izbriši, razveljavi, združi, zrcali, posnemi, zaokroži, izdolbi, poravnaj, izvozi), knjižnica oblik kratek seznam, gumbi so večji, začetna stran pa kaže načrte in nič drugega: brez novic, brez pozdravnega besedila, brez gumbov za pomoč in brez povezav iz layerlinga. Vklop je en tap; izklop je pritisk, ki ga dve sekundi držiš na gumbu, ki potem stoji na njegovem mestu. Povezava, ki se konča z `?mode=simple`, ga vklopi za napravo, ki jo odpre, `?mode=full` ga spet izklopi. Kdor poganja layerling na strežniku, lahko v njem vse zažene z `LAYERLING_SIMPLE_MODE=true` ali ga za vse določi z `always`, tako da program nima stikala, s katerim bi ga zapustil; glej README.

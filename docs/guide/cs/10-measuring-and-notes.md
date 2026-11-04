@@ -61,6 +61,7 @@ V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného k�
 - {{ui:workspace.showOriginDimensions}} zobrazuje vzdálenosti výběru od počátku podložky, i při výběru více těles.
 
 {{ui:workspace.dimensionsAlwaysVisible}} ponechá rozměry zobrazené trvale. Když těleso nestojí na pracovní rovině, zobrazí se i jeho výška nad ní; kliknutím na číslo zadáš novou.
+S volbou {{ui:workspace.dimensionAxisColors}} dostane každé políčko barvu své osy jako úchyty: červenou pro X, zelenou pro Y a modrou pro Z. I u malého dílu tak hned vidíš, které číslo je které.
 
 Když na chvíli překážejí, stiskněte [[Q]]: rozměry a vzdálenosti kolem výběru zmizí a díl, který posouváte, je dobře vidět. Další [[Q]] je vrátí. Úchyt, na který ukážete, svůj rozměr ukáže i tak.
 

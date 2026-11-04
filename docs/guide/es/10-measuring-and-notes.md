@@ -63,6 +63,7 @@ En los ajustes, en {{ui:workspace.appearance}}, hay dos interruptores para ver m
 - {{ui:workspace.showOriginDimensions}} muestra las distancias de la selección al origen de la placa, también con varios cuerpos seleccionados.
 
 Con {{ui:workspace.dimensionsAlwaysVisible}}, las medidas se ven siempre. Un cuerpo que no está sobre el plano de trabajo muestra también su altura sobre él; haz clic en el número para escribir otra.
+Con {{ui:workspace.dimensionAxisColors}} cada casilla toma el color de su eje, como los tiradores: rojo para X, verde para Y y azul para Z. Así, incluso en una pieza pequeña, ves de un vistazo qué número es cuál.
 
 Si estorban un momento, pulsa [[Q]]: las medidas y distancias alrededor de la selección desaparecen y la pieza que mueves se ve bien. Otra vez [[Q]] las recupera. Un tirador al que apuntas sigue mostrando su medida.
 

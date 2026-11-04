@@ -75,6 +75,10 @@ describe("workplane settings helpers", () => {
     expect(normalizeWorkspaceSettings({}).dimensionsAlwaysVisible).toBe(true);
     expect(normalizeWorkspaceSettings({ dimensionsAlwaysVisible: false }).dimensionsAlwaysVisible).toBe(false);
     expect(normalizeWorkspaceSettings({ dimensionsAlwaysVisible: "yes" }).dimensionsAlwaysVisible).toBe(true);
+    expect(DEFAULT_WORKPLANE_WORKSPACE.dimensionAxisColors).toBe(false);
+    expect(normalizeWorkspaceSettings({}).dimensionAxisColors).toBe(false);
+    expect(normalizeWorkspaceSettings({ dimensionAxisColors: true }).dimensionAxisColors).toBe(true);
+    expect(normalizeWorkspaceSettings({ dimensionAxisColors: "yes" }).dimensionAxisColors).toBe(false);
     expect(DEFAULT_WORKPLANE_WORKSPACE.clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({}).clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({ clickToPlaceShapes: false }).clickToPlaceShapes).toBe(false);

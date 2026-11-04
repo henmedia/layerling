@@ -140,7 +140,7 @@ const LINE_PER_TOLERANCE = 4;
 /** Two straights that meet without a corner leave this many steps either side for the rounding between them. */
 const LINE_GAP = 2;
 
-type Cubic = { from: TracePoint; c1: TracePoint; c2: TracePoint; to: TracePoint };
+export type Cubic = { from: TracePoint; c1: TracePoint; c2: TracePoint; to: TracePoint };
 /** A piece of an outline: straight when it has no handles. */
 type Piece = { from: TracePoint; to: TracePoint; c1?: TracePoint; c2?: TracePoint; cornerAtStart: boolean };
 /** One outline of the picture, walked in even steps, with what does not change with the number of points. */
@@ -884,7 +884,7 @@ function improvedParameters(points: readonly TracePoint[], parameters: readonly 
 }
 
 /** Whether every point of the run lies within `tolerance` of the straight line from its first point to its last. */
-function runsStraight(points: readonly TracePoint[], tolerance: number) {
+export function runsStraight(points: readonly TracePoint[], tolerance: number) {
   const from = points[0];
   const to = points[points.length - 1];
   const direction = sub(to, from);
@@ -904,7 +904,7 @@ function runDirection(points: readonly TracePoint[], index: number, toward: 1 | 
  * Curves through a run of points from one end to the other, each within `tolerance` of them: one
  * cubic if it fits, else split where it strays most, the two halves meeting smoothly there.
  */
-function fittedCurves(points: readonly TracePoint[], startDirection: TracePoint, endDirection: TracePoint, tolerance: number, out: Cubic[]) {
+export function fittedCurves(points: readonly TracePoint[], startDirection: TracePoint, endDirection: TracePoint, tolerance: number, out: Cubic[]) {
   if (points.length <= 2) {
     const third = distance(points[0], points[points.length - 1]) / 3;
     out.push({

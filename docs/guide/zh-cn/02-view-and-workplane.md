@@ -18,6 +18,10 @@ summary: 在场景中移动、正对着观察，以及把新形状放到任意�
 
 滚轮缩放的速度在设置的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 设定：滑块范围 1 到 14，初始为 5。它只作用于滚轮和触控板：按钮以及 [[+]] 和 [[−]] 键始终按同样的小步距缩放。鼠标滚轮的一格在任何浏览器里缩放幅度都相同，触控板则按你滑过的距离缩放。
 
+**与切片软件一致的鼠标按键。** 如果你习惯了 Bambu Studio 或 OrcaSlicer，在设置的 {{ui:workspace.appearance}} 下把 {{ui:workspace.mouseScheme}} 设为 {{ui:workspace.mouseSchemeSlicer}}。这样在空白处左键拖动会旋转视图，右键像中键一样平移视图，Shift 加左键拖动会画出选择框。拖动实体仍会移动它，短按右键仍会打开菜单。在草图中右键同样平移视图。
+
+**3D 鼠标。** SpaceMouse 或其他 3D 鼠标可以旋转、平移和缩放 3D 视图：把帽往前推即可放大，滑动它平移视图，倾斜它倾斜视图，扭转它旋转视图。在设置的 {{ui:workspace.appearance}} 下点击 {{ui:workspace.spaceMouseConnect}}，并在浏览器打开的窗口中选择设备；浏览器会记住这个选择，所以只需做一次。这在能访问此类设备的 Chrome 和 Edge 中可用；Firefox 和 Safari 不行。
+
 平板或手机上，两根手指缩放（张开和捏合）并平移视图（并拢滑动）。一根手指在空白处会转动视图，在那里轻点会清除选择；落在形状或控制柄上时，则像鼠标左键那样操作设计。要让从形状上开始的手指也能转动视图，请打开视图栏中的 {{ui:camera.touchRotate}}。这个开关只在带触摸屏的设备上显示。
 
 带笔的绘图板用起来像鼠标：笔尖是左键，笔杆上的按键是右键，用于转动视图和打开菜单。绘图板的热键可以在其驱动中设为 layerling 的[键盘快捷键](chapter:shortcuts)。
@@ -40,9 +44,12 @@ summary: 在场景中移动、正对着观察，以及把新形状放到任意�
 - {{ui:camera.focusSelection}} 缩放到选中项（[[F]] 或 [[Shift]]+[[F]]）。
 - {{ui:camera.zoomIn}} 和 {{ui:camera.zoomOut}} 按步缩放，[[+]] 和 [[−]] 键也是如此。
 - {{ui:camera.orthographic}} 切换到平面视图，平行边保持平行。对于测量和对齐边，这通常比透视视图更舒服。[[O]] 来回切换，再点一次也会返回。
+- {{ui:camera.secondView}} 在单独的窗口中打开设计的第二视图，详见下文。再点一次将其关闭。
 - {{ui:camera.showScrollbars}} 会在视图底部和右边缘各显示一条滚动条。拖动滚动条可平滑地移动视图，点击两端的箭头可小幅移动（按住会持续移动），点击滑块旁边则移动几乎整个视图。视图不会旋转，而且与方向键不同，选中零件时滚动条照样可用——在近处处理小细节时很方便。再次点击可隐藏它们；此浏览器会记住你的选择。
 - {{ui:camera.hideWorkplane}}（网格上方的眼睛）连同网格一起隐藏平台，让你可以从下方查看设计的底面。改变的只是视图：新形状仍然落在工作平面上。再点一次会重新显示。
 - {{ui:camera.placeWorkplane}}、卷尺和直角尺是各自的工具，下文以及[测量与注释](chapter:measuring-and-notes)中会介绍。
+
+{{ui:camera.secondView}} 会打开一个窗口，用它自己的相机显示同一个设计，让你同时从两个方向观察——比如你从上方操作时，从前方看它。你在编辑器里做的每处更改都会立即显示在那里；设计只在主窗口中修改，手柄也只留在主窗口。在第二窗口中，鼠标和视图立方体像这里一样旋转它的视图，按键也一样：[[1]] 到 [[6]]、[[F]]、[[Home]]、[[O]]、[[+]] 和 [[−]]，方向键旋转，[[Ctrl]] 加方向键平移。在那里 [[F]] 会缩放到编辑器中选中的对象。设计的四个已保存视图在那里也可用：[[7]]、[[8]]、[[9]] 和 [[0]] 调出它们，[[Shift]] 加其中一个键会把该窗口的视图保存到这个键下——两个窗口共用。它自己的视图栏有 {{ui:camera.home}}、{{ui:camera.focusSelection}}、{{ui:camera.zoomIn}}、{{ui:camera.zoomOut}}、{{ui:camera.orthographic}} 和 {{ui:camera.hideWorkplane}}，只作用于该窗口。窗口会在你上次离开的位置以相同大小打开，并随编辑器一起关闭。在手机和平板上不显示此按钮。
 
 栏最顶部的小箭头会在它挡路时把它收起。
 
@@ -94,13 +101,15 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 ### 设置窗口
 
-标题行中的齿轮（{{ui:editor.workspaceSettings}}）打开设置。左侧有五个区域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 和 {{ui:workspace.history}}。改动立即生效。底部的 {{ui:workspace.makeDefault}} 把当前设置保存为默认值，让新设计从这些设置开始；右上角的 {{ui:workspace.close}} 关闭窗口。本节逐项介绍这些设置。
+标题行中的齿轮（{{ui:editor.workspaceSettings}}）打开设置。左侧有五个区域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 和 {{ui:workspace.history}}。改动立即生效。底部的 {{ui:workspace.makeDefault}} 把当前设置保存为默认值，让新设计从这些设置开始。打开的文件会带着它自己的设置；旁边的 {{ui:workspace.useMyDefault}} 会把你保存的颜色、网格等应用到打开的设计上，同时保留它的单位。如果你的默认设置里有打印机，这台打印机连同它的平台尺寸也会一起带过来；没有的话，设计保留原有的平台和打印机。右上角的 {{ui:workspace.close}} 关闭窗口。本节逐项介绍这些设置。
 
 ### 外观：主题、工具栏与视图立方体
 
 {{ui:workspace.theme}} 设定整个程序的配色：{{ui:workspace.themeSystem}} 跟随电脑，其余为 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 和 {{ui:workspace.themeGraphite}}。也可以在编辑器右上角更改。
 
 {{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧视图栏和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸保存在这个浏览器中，对所有设计生效。
+
+{{ui:workspace.shapeColors}} 会把新形状的初始颜色（其类型的颜色，或你用 {{ui:inspector.saveDefaults}} 保存的颜色）显示在形状库的图片上。如果你更喜欢灰色图片，就把它关掉；浏览器会记住你的选择。
 
 {{ui:workspace.viewCubePosition}} 把视图立方体放到工作平面的另一个角：{{ui:workspace.viewCubePositionTopLeft}}（一直以来的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角，视图栏都会上移到立方体让出的位置。在右下角时，立方体正好位于 {{ui:inspector.snapGrid}} 控件上方。右侧打开形状属性时，右侧的立方体会让到属性面板左边。这个角保存在浏览器中，对所有设计生效。窗口很窄时（例如手机上），该设置会隐藏，立方体留在左上角。
 
@@ -132,7 +141,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 ### 外观：光照与阴影
 
-{{ui:workspace.showShadows}} 打开或关闭投射阴影。两个滑块设定实体的受光方式。{{ui:workspace.shadowStrength}} 决定投射阴影的深浅，{{ui:workspace.shadeContrast}} 把光从均匀的环境光转向主光：偏向“强烈”时，背光面更暗、阴影更明显；偏向“柔和”时，整体更平。对比度拉到最高会非常强，背光面和阴影会变得很暗。{{ui:workspace.shadowSoftness}} 让阴影边缘变柔和而不是锐利。{{ui:workspace.lightAzimuth}} 让主光绕平台旋转（0° 从前方，90° 从右方），{{ui:workspace.lightElevation}} 把它抬高；90° 时它像 Tinkercad 那样位于平台正上方，阴影正好落在实体下方。{{ui:workspace.lightReset}} 恢复全部设置。
+{{ui:workspace.showShadows}} 打开或关闭投射阴影。两个滑块设定实体的受光方式。{{ui:workspace.shadowStrength}} 决定投射阴影的深浅，{{ui:workspace.shadeContrast}} 把光从均匀的环境光转向主光：偏向“强烈”时，背光面更暗、阴影更明显；偏向“柔和”时，整体更平。对比度拉到最高会非常强，背光面和阴影会变得很暗。{{ui:workspace.shadowSoftness}} 让阴影边缘变柔和而不是锐利。{{ui:workspace.lightAzimuth}} 让主光绕平台旋转（0° 从前方，90° 从右方），{{ui:workspace.lightElevation}} 把它抬高；90° 时它像 Tinkercad 那样位于平台正上方，阴影正好落在实体下方。{{ui:workspace.softLighting}} 让大部分光线来自你观察的方向，并随视图转动：没有哪个面会留在暗处，朝上的深色面也不再被照得发白。主光仍保留一点用于阴影，对比度滑块依然有效。如果光线放低后仍能看到明亮的反光，把 {{ui:workspace.lightElevation}} 抬到 90°：这时看起来就像 Tinkercad。{{ui:workspace.lightReset}} 恢复全部设置。
 
 ### 外观：工作平面上的测量
 
@@ -147,6 +156,8 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 {{ui:workspace.doubleClickOpensSketch}} 决定双击拉伸出的草图是否会重新打开草图，与 Tinkercad 相同；{{ui:workspace.doubleClickOpensGroup}} 决定双击分组或捆绑是否会打开它进行编辑。{{ui:workspace.doubleClickCentersView}} 决定双击工作平面上的空白处是否会把视图移到该处。
 
 {{ui:workspace.objectSnap}} 让形状的边和中心在拖动时吸附到其他形状；右下角的网格菜单有同样的开关。{{ui:workspace.cruise}} 让新形状挂在鼠标指针上，并落在其下方的面上，类似 Tinkercad 的 Cruise；关闭时，新形状出现在平台中央。更多内容见[选择与排列](chapter:select-and-arrange)。
+
+{{ui:workspace.startView}} 设定新设计打开时的角度，也是 {{ui:camera.home}} 返回的角度。把视图转动、缩放到你喜欢的样子，然后点击 {{ui:workspace.startViewUseCurrent}}；{{ui:workspace.startViewStandard}} 恢复通常的右前方视图。它对此浏览器中的所有设计都有效。再次打开的设计仍按你离开时的样子打开。
 
 ### 外观：视图
 

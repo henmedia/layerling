@@ -18,6 +18,10 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 
 滾輪縮放的速度在設定的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 設定：滑桿範圍 1 到 14，初始值為 5。它只影響滾輪與觸控式軌跡板：按鈕與 [[+]]、[[−]] 鍵一律以相同的小步距縮放。滑鼠滾輪的一格在任何瀏覽器中的縮放幅度都相同，觸控式軌跡板則依你滑過的距離縮放。
 
+**與切片軟體一致的滑鼠按鍵。** 如果你習慣了 Bambu Studio 或 OrcaSlicer，在設定的 {{ui:workspace.appearance}} 下把 {{ui:workspace.mouseScheme}} 設為 {{ui:workspace.mouseSchemeSlicer}}。這樣在空白處左鍵拖曳會轉動檢視，右鍵像中鍵一樣平移檢視，Shift 加左鍵拖曳會畫出選取框。拖曳實體仍會移動它，短按右鍵仍會開啟選單。在草圖中右鍵同樣平移檢視。
+
+**3D 滑鼠。** SpaceMouse 或其他 3D 滑鼠可以轉動、平移和縮放 3D 檢視：把帽往前推即可放大，滑動它平移檢視，傾斜它傾斜檢視，扭轉它轉動檢視。在設定的 {{ui:workspace.appearance}} 下點擊 {{ui:workspace.spaceMouseConnect}}，並在瀏覽器開啟的視窗中選擇裝置；瀏覽器會記住這個選擇，所以只需做一次。這在能存取此類裝置的 Chrome 與 Edge 中可用；Firefox 與 Safari 不行。
+
 在平板或手機上，兩根手指可縮放（張開與捏合）並平移檢視（併攏滑動）。一根手指在空白處會轉動檢視，在那裡輕點則清除選取；落在形狀或控制點上時，則如同滑鼠左鍵般操作設計。若要讓從形狀上開始的手指也能轉動檢視，請開啟檢視列中的 {{ui:camera.touchRotate}}。這個開關只會在具有觸控螢幕的裝置上顯示。
 
 搭配筆的繪圖板用起來像滑鼠：筆尖是左鍵，筆身側鍵是右鍵，可用來轉動檢視與開啟選單。繪圖板的快速鍵可在其驅動程式中設為 layerling 的[鍵盤快速鍵](chapter:shortcuts)。
@@ -40,9 +44,12 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 - {{ui:camera.focusSelection}} 縮放至選取項目（[[F]] 或 [[Shift]]+[[F]]）。
 - {{ui:camera.zoomIn}} 與 {{ui:camera.zoomOut}} 逐步縮放，[[+]] 與 [[−]] 鍵也是如此。
 - {{ui:camera.orthographic}} 切換到平面檢視，平行邊會保持平行。對於量測與對齊邊，這通常比透視檢視更順手。[[O]] 可來回切換，再點一次也會返回。
+- {{ui:camera.secondView}} 在獨立的視窗中開啟設計的第二檢視，詳見下文。再點一次將其關閉。
 - {{ui:camera.showScrollbars}} 會在視圖底部和右側邊緣各顯示一條捲動軸。拖曳捲動軸可平順地移動視圖，按一下兩端的箭頭可小幅移動（按住會持續移動），按一下滑塊旁邊則移動幾乎整個視圖。視圖不會旋轉，而且與方向鍵不同，選取零件時捲動軸照樣可用——在近處處理小細節時很方便。再按一下即可隱藏；此瀏覽器會記住你的選擇。
 - {{ui:camera.hideWorkplane}}（網格上方的眼睛）會連同網格一起隱藏平台，讓你從下方查看設計的底面。改變的只有檢視：新形狀仍會落在工作平面上。再點一次就會重新顯示。
 - {{ui:camera.placeWorkplane}}、捲尺與角尺是各自的工具，下文以及[量測與備註](chapter:measuring-and-notes)中會介紹。
+
+{{ui:camera.secondView}} 會開啟一個視窗，用它自己的相機顯示同一個設計，讓你同時從兩個方向觀察——例如你從上方操作時，從前方看它。你在編輯器裡做的每處變更都會立即顯示在那裡；設計只在主視窗中修改，控制點也只留在主視窗。在第二視窗中，滑鼠與視圖立方體像這裡一樣轉動它的檢視，按鍵也一樣：[[1]] 到 [[6]]、[[F]]、[[Home]]、[[O]]、[[+]] 與 [[−]]，方向鍵轉動，[[Ctrl]] 加方向鍵平移。在那裡 [[F]] 會縮放到編輯器中選取的物件。設計的四個已儲存檢視在那裡也可用：[[7]]、[[8]]、[[9]] 與 [[0]] 叫出它們，[[Shift]] 加其中一個鍵會把該視窗的檢視儲存到這個鍵下——兩個視窗共用。它自己的檢視列有 {{ui:camera.home}}、{{ui:camera.focusSelection}}、{{ui:camera.zoomIn}}、{{ui:camera.zoomOut}}、{{ui:camera.orthographic}} 與 {{ui:camera.hideWorkplane}}，只作用於該視窗。視窗會在你上次離開的位置以相同大小開啟，並隨編輯器一起關閉。在手機與平板上不顯示此按鈕。
 
 列最頂端的小箭頭可在它擋住畫面時將它收起。
 
@@ -94,13 +101,15 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 ### 設定視窗
 
-標題列中的齒輪（{{ui:editor.workspaceSettings}}）會開啟設定。左側有五個區域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 與 {{ui:workspace.history}}。變更會立即生效。底部的 {{ui:workspace.makeDefault}} 會將目前設定儲存為預設值，讓新設計從這些設定開始；右上角的 {{ui:workspace.close}} 則關閉視窗。本節會逐一說明這些設定。
+標題列中的齒輪（{{ui:editor.workspaceSettings}}）會開啟設定。左側有五個區域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 與 {{ui:workspace.history}}。變更會立即生效。底部的 {{ui:workspace.makeDefault}} 會將目前設定儲存為預設值，讓新設計從這些設定開始。開啟的檔案會帶著它自己的設定；旁邊的 {{ui:workspace.useMyDefault}} 會把你儲存的顏色、網格等套用到開啟的設計上，同時保留它的單位。如果你的預設設定裡有印表機，這台印表機連同它的平台尺寸也會一起帶過來；沒有的話，設計保留原有的平台與印表機。右上角的 {{ui:workspace.close}} 則關閉視窗。本節會逐一說明這些設定。
 
 ### 外觀：主題、工具列與視圖立方體
 
 {{ui:workspace.theme}} 設定整個程式的配色方案：{{ui:workspace.themeSystem}} 跟隨你的電腦，其餘為 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 與 {{ui:workspace.themeGraphite}}。也可以在編輯器右上角變更。
 
 {{ui:workspace.toolbarSize}} 會讓頂部功能區的按鈕、其形狀選單、左側的檢視列與右側的屬性面板變小或變大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以來的樣子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在筆記型電腦上能為工作平面留出更多空間；大尺寸在大螢幕上或用手點按時更容易命中。使用大按鈕時，若視窗太窄，功能區的各群組會排到第二列。尺寸會儲存在這個瀏覽器中，並套用於所有設計。
+
+{{ui:workspace.shapeColors}} 會把新形狀的初始顏色（其類型的顏色，或你用 {{ui:inspector.saveDefaults}} 儲存的顏色）顯示在形狀庫的圖片上。如果你比較喜歡灰色圖片，就把它關掉；瀏覽器會記住你的選擇。
 
 {{ui:workspace.viewCubePosition}} 會將視圖立方體放到工作平面的另一個角：{{ui:workspace.viewCubePositionTopLeft}}（一直以來的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角以外，檢視列都會上移到立方體讓出的位置。在右下角時，立方體會正好位於 {{ui:inspector.snapGrid}} 控制項上方。右側開啟形狀屬性時，位於右側的立方體會讓到屬性面板左邊。這個角會儲存在瀏覽器中，並套用於所有設計。視窗較窄時（例如手機），此設定會隱藏，立方體則留在左上角。
 
@@ -132,7 +141,7 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 ### 外觀：光線與陰影
 
-{{ui:workspace.showShadows}} 開啟或關閉投射陰影。兩個滑桿設定實體的受光方式。{{ui:workspace.shadowStrength}} 決定投射陰影的深淺，{{ui:workspace.shadeContrast}} 則將光線從均勻的環境光轉向主光源：偏向「強烈」時，背光面會更暗、陰影更明顯；偏向「柔和」時，整體會更平坦。對比拉到最高時會非常強烈，背光面與陰影會變得非常暗。{{ui:workspace.shadowSoftness}} 讓陰影邊緣變得柔和而不是銳利。{{ui:workspace.lightAzimuth}} 讓主光源繞著平台旋轉（0° 從前方，90° 從右方），{{ui:workspace.lightElevation}} 則將它抬高；在 90° 時它會像 Tinkercad 那樣位於平台正上方，陰影正好落在實體下方。{{ui:workspace.lightReset}} 會還原所有設定。
+{{ui:workspace.showShadows}} 開啟或關閉投射陰影。兩個滑桿設定實體的受光方式。{{ui:workspace.shadowStrength}} 決定投射陰影的深淺，{{ui:workspace.shadeContrast}} 則將光線從均勻的環境光轉向主光源：偏向「強烈」時，背光面會更暗、陰影更明顯；偏向「柔和」時，整體會更平坦。對比拉到最高時會非常強烈，背光面與陰影會變得非常暗。{{ui:workspace.shadowSoftness}} 讓陰影邊緣變得柔和而不是銳利。{{ui:workspace.lightAzimuth}} 讓主光源繞著平台旋轉（0° 從前方，90° 從右方），{{ui:workspace.lightElevation}} 則將它抬高；在 90° 時它會像 Tinkercad 那樣位於平台正上方，陰影正好落在實體下方。{{ui:workspace.softLighting}} 讓大部分光線來自你觀察的方向，並隨檢視轉動：沒有哪個面會留在暗處，朝上的深色面也不再被照得發白。主光源仍保留一點用於陰影，對比度滑桿依然有效。如果光線放低後仍能看到明亮的反光，把 {{ui:workspace.lightElevation}} 抬到 90°：這時看起來就像 Tinkercad。{{ui:workspace.lightReset}} 會還原所有設定。
 
 ### 外觀：工作平面上的量測
 
@@ -147,6 +156,8 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 {{ui:workspace.doubleClickOpensSketch}} 決定雙擊擠出的草圖是否會重新開啟草圖，與 Tinkercad 相同；{{ui:workspace.doubleClickOpensGroup}} 則決定雙擊群組或綁定是否會開啟它進行編輯。{{ui:workspace.doubleClickCentersView}} 決定按兩下工作平面上的空白處是否會把檢視移到該處。
 
 {{ui:workspace.objectSnap}} 讓形狀的邊與中心在拖曳時吸附到其他形狀；右下角的網格選單有同樣的開關。{{ui:workspace.cruise}} 讓新形狀掛在滑鼠指標上，並落在其下方的面，類似 Tinkercad 的 Cruise；關閉時，新形狀會出現在平台中央。更多內容見[選取與排列](chapter:select-and-arrange)。
+
+{{ui:workspace.startView}} 設定新設計開啟時的角度，也是 {{ui:camera.home}} 返回的角度。把檢視轉動、縮放到你喜歡的樣子，然後點擊 {{ui:workspace.startViewUseCurrent}}；{{ui:workspace.startViewStandard}} 恢復一般的右前方檢視。它對此瀏覽器中的所有設計都有效。再次開啟的設計仍依你離開時的樣子開啟。
 
 ### 外觀：檢視
 

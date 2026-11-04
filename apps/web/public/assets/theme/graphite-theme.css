@@ -2524,6 +2524,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .sketch-shape-options .
   stroke: #ff8a00;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-freehand-preview {
+  fill: none;
+  stroke: #ce7416;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .sketch-preview-line {
   stroke: #ce7416;
 }
@@ -3505,6 +3510,35 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 :where(html[data-theme="dark"][data-palette="graphite"]) .dimension-label.armed {
   border-color: rgba(166, 86, 0, 0.85);
   box-shadow: 0 0 0 3px rgba(173, 89, 0, 0.22), 0 1px 4px rgba(44, 44, 44, 0.09);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workplane-wrap.dimension-axis-colors .dimension-label[data-axis],
+:where(html[data-theme="dark"][data-palette="graphite"]) .workplane-wrap.dimension-axis-colors .dimension-input[data-axis] {
+  background: var(--dimension-axis-tint);
+  border: 1px solid var(--dimension-axis-edge);
+  color: var(--dimension-axis-text);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workplane-wrap.dimension-axis-colors [data-axis="x"] {
+  --dimension-axis-tint: #fde4e4;
+  --dimension-axis-edge: #d6363c;
+  --dimension-axis-text: #6e1418;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workplane-wrap.dimension-axis-colors [data-axis="y"] {
+  --dimension-axis-tint: #dff3e4;
+  --dimension-axis-edge: #2f9a4b;
+  --dimension-axis-text: #144a24;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workplane-wrap.dimension-axis-colors [data-axis="z"] {
+  --dimension-axis-tint: #e0eafc;
+  --dimension-axis-edge: #2f6fe0;
+  --dimension-axis-text: #12357a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workplane-wrap.dimension-axis-colors .dimension-label[data-axis].armed {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dimension-axis-edge) 30%, transparent), 0 1px 4px rgba(44, 44, 44, 0.09);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .dimension-input {

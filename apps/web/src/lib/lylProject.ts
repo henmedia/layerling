@@ -63,7 +63,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.139.0";
+export const LYL_CREATED_WITH_VERSION = "1.140.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -81,7 +81,7 @@ export const LYL_LIMITS = {
 
 const SHAPE_KINDS = new Set([
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ]);
 
 const FEATURE_TYPES = new Set([
@@ -532,9 +532,19 @@ function encodedAssetPayload(resource: object, encode: () => Uint8Array) {
 // The exact-CAD text of a body (its B-rep) is a string, which a WeakMap cannot
 // key, yet every undo state of an unchanged body carries the very same string.
 // Without this each state encoded and hashed it again on every autosave. The
-// cache is small and keeps the most recently used few.
-const TEXT_PAYLOAD_CACHE_LIMIT = 6;
+// cache keeps the most recently used ones. It once held only six: an autosave
+// walks the bodies of the new state in the same order every time, so with seven
+// exact bodies or more each one had pushed out the next before it was asked for,
+// and nothing was ever found. Now it holds as many as fit in a budget of text,
+// so a design full of large bodies does not keep copies of all of them either.
+const TEXT_PAYLOAD_CACHE_LIMIT = 256;
+const TEXT_PAYLOAD_CACHE_CHARS = 48 * 1024 * 1024;
 const encodedTextPayloads = new Map<string, Promise<EncodedAssetPayload>>();
+let encodedTextChars = 0;
+
+function forgetTextPayload(text: string) {
+  if (encodedTextPayloads.delete(text)) encodedTextChars -= text.length;
+}
 
 function encodedTextPayload(text: string) {
   const cached = encodedTextPayloads.get(text);
@@ -548,15 +558,17 @@ function encodedTextPayload(text: string) {
       const bytes = strToU8(text);
       return { bytes, sha256: await sha256Hex(bytes) };
     } catch (error) {
-      encodedTextPayloads.delete(text);
+      forgetTextPayload(text);
       throw error;
     }
   })();
   encodedTextPayloads.set(text, pending);
-  while (encodedTextPayloads.size > TEXT_PAYLOAD_CACHE_LIMIT) {
+  encodedTextChars += text.length;
+  // The newest stays even when it alone is over the budget: it is the one being written.
+  while (encodedTextPayloads.size > 1 && (encodedTextPayloads.size > TEXT_PAYLOAD_CACHE_LIMIT || encodedTextChars > TEXT_PAYLOAD_CACHE_CHARS)) {
     const oldest = encodedTextPayloads.keys().next();
     if (oldest.done) break;
-    encodedTextPayloads.delete(oldest.value);
+    forgetTextPayload(oldest.value);
   }
   return pending;
 }
@@ -569,6 +581,8 @@ const serializedStateCache = new WeakMap<object, {
   sourceKey: string;
   json: string;
   used: Array<{ record: LylAssetRecordV1; bytes: Uint8Array }>;
+  /** The indexes of the project file when this state is the active one, worked out the first time it is. */
+  indexes?: ReturnType<typeof activeProjectIndexes>;
 }>();
 
 class LylArchiveBuilder {
@@ -1093,6 +1107,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
   const freshStates = new Map<string, LylStateV1>();
   const stateIdByFingerprint = new Map<string, string>();
   const historyEntries: LylProjectDocumentV1["history"]["entries"] = [];
+  const reusedStates = new Map<string, NonNullable<ReturnType<typeof serializedStateCache.get>>>();
 
   for (const entry of exportEntries) {
     let stateId = stateIdByFingerprint.get(entry.fingerprint);
@@ -1102,6 +1117,7 @@ export async function exportLylProject(input: LylProjectExportInput) {
       if (cached && cached.stateId === stateId && cached.sourceKey === sourceKey) {
         builder.adopt(cached.used);
         stateTexts.push(cached.json);
+        reusedStates.set(stateId, cached);
       } else {
         const { result: state, used } = await builder.recording(() => serializeState(stateId as string, entry.shapes, builder, sourceAssetsByArchiveId, normalizeNotes(entry.notes)));
         const json = JSON.stringify(state);
@@ -1121,11 +1137,15 @@ export async function exportLylProject(input: LylProjectExportInput) {
 
   const sceneStateId = historyEntries[hydrated.index]?.stateId;
   const activeStateIndex = sceneStateId ? Number(sceneStateId.slice("state-".length)) - 1 : -1;
-  const activeState = sceneStateId && stateTexts[activeStateIndex] !== undefined
-    ? (freshStates.get(sceneStateId) ?? (JSON.parse(stateTexts[activeStateIndex]) as LylStateV1))
-    : undefined;
-  if (!activeState) throw new Error("Could not identify the active project state");
-  const indexes = activeProjectIndexes(activeState);
+  if (!sceneStateId || stateTexts[activeStateIndex] === undefined) throw new Error("Could not identify the active project state");
+  // A state kept from an earlier save (after an undo, say) is not parsed again on every autosave: its indexes are kept with it.
+  const freshActive = freshStates.get(sceneStateId);
+  const reusedActive = freshActive ? undefined : reusedStates.get(sceneStateId);
+  const indexes = freshActive
+    ? activeProjectIndexes(freshActive)
+    : reusedActive
+      ? (reusedActive.indexes ??= activeProjectIndexes(JSON.parse(reusedActive.json) as LylStateV1))
+      : activeProjectIndexes(JSON.parse(stateTexts[activeStateIndex]) as LylStateV1);
   const now = Date.now();
   const sketchPlacementWorkplane = normalizePlacementWorkplane(input.sketchPlacementWorkplane);
   const view = input.view === undefined ? readDesignView(input.projectId) : normalizeDesignView(input.view);
@@ -1688,6 +1708,14 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (kind === "curvedCone") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
     for (const key of ["curvedConeTop", "curvedConeBend"] as const) {
+      if (definition[key] === undefined) continue;
+      const value = finiteNumber(definition[key], `${label}.${key}`);
+      if (value < -1e6 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
+    }
+  }
+  if (kind === "screwBoss" || kind === "snapFit") {
+    // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
+    for (const key of ["screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussets", "screwBossGussetHeight", "screwBossGussetThickness", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitLeadAngle", "snapFitRetainAngle", "snapFitFoot"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       if (value < -1e6 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);

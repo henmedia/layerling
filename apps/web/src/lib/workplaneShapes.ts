@@ -136,10 +136,11 @@ export function shapeTaperDimensions(shape: WorkplaneShape) {
  * Lineal haben feste Masse, die eine Verjuengung nur verdurbe. Der Tropfen ist
  * der Querschnitt eines waagerechten Lochs; oben und unten gibt es fuer ihn
  * nicht. Seit #111 nehmen Kapsel, abgerundeter Quader, Stern, Herz, Halbmond,
- * Wabe und Schwalbenschwanz sie an. Die Liste steht hier, damit das Merkmalsfeld, die
+ * Wabe und Schwalbenschwanz sie an. Schraubdom, Schnapphaken und Rippe (#1246)
+ * haben feste Masse fuer Einsatz, Haken und Fuss. Die Liste steht hier, damit das Merkmalsfeld, die
  * Vorschau und die MCP-Bruecke nicht je ihre eigene fuehren.
  */
-const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity"]);
+const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity", "screwBoss", "snapFit", "rib"]);
 
 export function shapeSupportsTaper(kind: WorkplaneShape["kind"]) {
   return !SHAPES_WITHOUT_TAPER.has(kind);
@@ -644,6 +645,23 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.topRadius === b.topRadius &&
     a.curvedConeTop === b.curvedConeTop &&
     a.curvedConeBend === b.curvedConeBend &&
+    a.screwBossFastener === b.screwBossFastener &&
+    a.screwBossSize === b.screwBossSize &&
+    a.screwBossHole === b.screwBossHole &&
+    a.screwBossHoleDepth === b.screwBossHoleDepth &&
+    a.screwBossDiameter === b.screwBossDiameter &&
+    a.screwBossGussets === b.screwBossGussets &&
+    a.screwBossGussetHeight === b.screwBossGussetHeight &&
+    a.screwBossGussetThickness === b.screwBossGussetThickness &&
+    a.snapFitPart === b.snapFitPart &&
+    a.snapFitThickness === b.snapFitThickness &&
+    a.snapFitUndercut === b.snapFitUndercut &&
+    a.snapFitClearance === b.snapFitClearance &&
+    a.snapFitLeadAngle === b.snapFitLeadAngle &&
+    a.snapFitRetainAngle === b.snapFitRetainAngle &&
+    a.snapFitFoot === b.snapFitFoot &&
+    a.ribStyle === b.ribStyle &&
+    a.ribTop === b.ribTop &&
     a.baseRadius === b.baseRadius &&
     a.topWidth === b.topWidth &&
     a.topDepth === b.topDepth &&

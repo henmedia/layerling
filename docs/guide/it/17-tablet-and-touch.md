@@ -36,6 +36,8 @@ Trascina il cubo di orientamento in alto a sinistra per ruotare la vista. Toccan
 
 La punta del dito copre ciò che vuoi selezionare. layerling permette di raggiungere maniglie, punti, linee e spigoli anche con un po’ più di margine rispetto al puntatore del mouse, ma uno stilo è più preciso. Questo vale per uno stilo riconosciuto dal tablet come penna, come Apple Pencil o S Pen. Uno stilo semplice con punta di gomma viene rilevato come un dito e non è più preciso: usalo come useresti un dito. Su iPad, se Apple Pencil supporta il rilevamento quando è sollevata dallo schermo, dopo un momento compare anche il nome del controllo in un piccolo fumetto, come il suggerimento mostrato dal puntatore del mouse.
 
+In modalità schizzo, {{ui:sketch.freehand}} disegna con la penna o un dito come sulla carta; quando lo sollevi, la linea diventa punti dello schizzo che puoi modificare, vedi [Schizzi](chapter:sketches).
+
 Se i bambini o chi ha fretta spostano i corpi per errore, attiva {{ui:workspace.selectBeforeMoving}} nelle impostazioni: prima dovrai selezionare il corpo; solo un trascinamento successivo lo sposterà.
 
 ## Su iPad e iPhone

@@ -24,6 +24,8 @@ layerling draait in de browser van een tablet en als app vanaf het beginscherm. 
 
 Zonder Shift-toets doet {{ui:contextMenu.selectMultiple}} in het menu van een lange druk wat Shift+klik op een computer doet. Zolang het aan staat, zegt een melding dat, en elke tik op een lichaam voegt het toe aan de selectie of haalt het er weer uit. Een tik op de lege ruimte, of [[Esc]] op een toetsenbord, beëindigt het en laat de selectie zoals ze is. Een vinger op de lege ruimte draait intussen nog steeds het beeld. Daarna werken {{ui:editor.tool.group}}, {{ui:editor.tool.align}} of een verplaatsing op alle gekozen lichamen.
 
+Hetzelfde menu heeft {{ui:contextMenu.carry}}, de toets [[C]] voor een touchscreen. De selectie volgt dan de vinger over de vlakken van andere lichamen; een tik zet haar neer op het vlak dat je aantikt, ook een schuin vlak, en de eerste tik is genoeg. Het menu-item vind je ook door te zoeken op "neerzetten" of "cruise" (de opdrachtzoeker, [[Ctrl]]+[[K]] op een toetsenbord).
+
 ## Het beeld draaien en zoomen
 
 Eén vinger op de lege ruimte draait het beeld, twee vingers zoomen en verschuiven het. Een vinger die op een lichaam begint, werkt aan het lichaam, niet aan het beeld. Wil je dat hij liever het beeld draait, zet dan {{ui:camera.touchRotate}} aan in de weergavebalk: één vinger draait dan het beeld in plaats van te selecteren, waar hij ook begint. Die schakelaar verschijnt alleen op een apparaat met een aanraakscherm.
@@ -33,6 +35,8 @@ De beeldkubus linksboven draait het beeld als je eraan sleept, en een tik op een
 ## Hendels, kleine punten en een stylus
 
 Een vingertop bedekt waar hij op mikt. layerling laat een vinger iets verder naar hendels, punten, lijnen en randen reiken dan een muisaanwijzer, maar een stylus is fijner. Dat geldt voor een pen die de tablet als pen kent, zoals een Apple Pencil of een S Pen. Een gewone stylus met rubberen punt geldt voor het scherm als vinger en is niet fijner dan een vinger; werk er dus mee als met een vinger. Zweeft een Apple Pencil op de iPad boven een knop, dan verschijnt na een moment de naam in een klein tekstballonnetje, zoals bij de muis de tooltip.
+
+In schetsmodus tekent {{ui:sketch.freehand}} met pen of vinger zoals op papier; als je loslaat, wordt de lijn schetspunten die je kunt bewerken, zie [Schetsen](chapter:schetsen).
 
 Verschuiven lichamen doordat kinderen of haastige handen ze aanraken, zet dan in de instellingen {{ui:workspace.selectBeforeMoving}} aan: een lichaam moet dan eerst geselecteerd zijn, en pas de volgende sleep verplaatst het.
 
@@ -46,3 +50,5 @@ Verschuiven lichamen doordat kinderen of haastige handen ze aanraken, zet dan in
 ## Werkplaatsen met kinderen
 
 Vingers en rubberen stylussen werken hier hetzelfde. Twee instellingen maken een groep makkelijker: {{ui:workspace.selectBeforeMoving}}, zodat een aanraking geen lichaam per ongeluk verschuift, en {{ui:camera.touchRotate}}, zodat één vinger altijd het beeld draait. De vraagtekenknop in de groep Help van het lint zet de {{ui:interactiveHelp.title}} aan: een tik op een willekeurige knop, een veld of een hendel legt hem dan uit, en dezelfde knop of [[Esc]] beëindigt haar.
+
+Voor een hele klas zet je {{ui:workspace.simpleMode}} aan in de instellingen. Het lint houdt dan alleen de gereedschappen die een werkplaats gebruikt (kopiëren, plakken, dupliceren, verwijderen, ongedaan maken, groeperen, spiegelen, afschuinen, afronden, uithollen, uitlijnen, exporteren), de vormenbibliotheek een korte lijst, de knoppen zijn groter, en de startpagina toont de ontwerpen en verder niets: geen nieuws, geen welkomsttekst, geen hulpknoppen en geen links buiten layerling. Aanzetten is één tik; uitzetten is twee seconden drukken op de knop die dan zijn plaats inneemt. Een link die eindigt op `?mode=simple` zet het aan voor het apparaat dat hem opent, `?mode=full` zet het weer uit. Wie layerling op een server draait, kan iedereen erin laten beginnen met `LAYERLING_SIMPLE_MODE=true`, of het voor iedereen vastzetten met `always`, zodat het programma geen schakelaar heeft om eruit te komen; zie de README.

@@ -42,12 +42,12 @@ describe("saving an export file on the server", () => {
   it("writes the file into the folder and says where", async () => {
     await fs.mkdir(path.join(sharedProjectsRoot, "Prints"));
 
-    const response = await POST(exportRequest("Bracket.3mf", "3mf bytes", { folder: "Prints" }));
+    const response = await POST(exportRequest("Bracket.3mf", "PK\u0003\u00043mf", { folder: "Prints" }));
 
     expect(response.status).toBe(201);
     const payload = await response.json() as { file: { fileName: string; path: string; size: number } };
-    expect(payload.file).toEqual({ fileName: "Bracket.3mf", path: "Prints", size: 9 });
-    expect(await fs.readFile(path.join(sharedProjectsRoot, "Prints", "Bracket.3mf"), "utf8")).toBe("3mf bytes");
+    expect(payload.file).toEqual({ fileName: "Bracket.3mf", path: "Prints", size: 7 });
+    expect(await fs.readFile(path.join(sharedProjectsRoot, "Prints", "Bracket.3mf"), "utf8")).toBe("PK\u0003\u00043mf");
   });
 
   it("leaves a file of the same name alone until the request asks to replace it", async () => {
@@ -64,7 +64,7 @@ describe("saving an export file on the server", () => {
   });
 
   it("does not show the file in the list of designs", async () => {
-    await POST(exportRequest("Part.step", "step bytes"));
+    await POST(exportRequest("Part.step", "ISO-10303-21;\nHEADER;"));
 
     const listing = await (await GET(new Request("http://localhost/api/shared-projects"))).json() as { projects: unknown[] };
 
@@ -91,5 +91,34 @@ describe("saving an export file on the server", () => {
     expect(refused.status).toBe(409);
     expect(await refused.json()).toMatchObject({ files: 1 });
     expect(await fs.readdir(path.join(sharedProjectsRoot, "Prints"))).toContain("Part.stl");
+  });
+
+  // As store.php: a lock left by a request that died does not keep the name locked for good.
+  it("takes over a lock older than a minute, but not a fresh one", async () => {
+    const lockPath = path.join(sharedProjectsRoot, "Part.stl.lock");
+    await fs.writeFile(lockPath, "");
+    expect((await POST(exportRequest("Part.stl", "solid a"))).status).toBe(409);
+
+    const old = new Date(Date.now() - 120_000);
+    await fs.utimes(lockPath, old, old);
+    expect((await POST(exportRequest("Part.stl", "solid a"))).status).toBe(201);
+    expect(await fs.readdir(sharedProjectsRoot)).toEqual(["Part.stl"]);
+  });
+
+  // The same check store.php makes (GHSA-wj5x-5r5v-89r3): a file is what its name says and nothing a browser could run.
+  it("refuses a file that is not what its name says", async () => {
+    const drawing = '<svg xmlns="http://www.w3.org/2000/svg"><g><path d="M0 0L10 10"/><text>A</text></g></svg>';
+    expect((await POST(exportRequest("Plan.svg", drawing))).status).toBe(201);
+    expect((await POST(exportRequest("Bad.svg", '<svg><script>alert(1)</script></svg>'))).status).toBe(400);
+    expect((await POST(exportRequest("Bad2.svg", '<svg onload="alert(1)"><path/></svg>'))).status).toBe(400);
+    expect((await POST(exportRequest("Bad3.svg", '<svg><a href="javascript:alert(1)"><path/></a></svg>'))).status).toBe(400);
+    expect((await POST(exportRequest("Page.stl", "<html><script>alert(1)</script></html>"))).status).toBe(400);
+    expect((await POST(exportRequest("Fake.png", "not a picture"))).status).toBe(400);
+    expect((await POST(exportRequest("Fake.pdf", "not a pdf"))).status).toBe(400);
+    expect((await POST(exportRequest("Fake.step", "<html>"))).status).toBe(400);
+    expect((await POST(exportRequest("Real.step", "\uFEFF ISO-10303-21;"))).status).toBe(201);
+    expect((await POST(exportRequest("Real.pdf", "%PDF-1.7"))).status).toBe(201);
+    expect((await POST(exportRequest("Real.dxf", "0\nSECTION"))).status).toBe(201);
+    expect(await fs.readdir(sharedProjectsRoot)).toEqual(expect.not.arrayContaining(["Bad.svg", "Bad2.svg", "Bad3.svg", "Page.stl", "Fake.png", "Fake.pdf", "Fake.step"]));
   });
 });

@@ -36,6 +36,8 @@ Visningskuben øverst til venstre drejer visningen når du trækker i den, og et
 
 En fingertip dækker det, den sigter efter. layerling lader en finger nå lidt længere ud til håndtag, punkter, linjer og kanter end en musemarkør gør, men en pen er finere. Det gælder en pen, som tabletten kender som en pen, for eksempel en Apple Pencil eller en S Pen. En almindelig pen med gummispids tæller for skærmen som en finger og er ikke finere end en, så arbejd med den som med en finger. En Apple Pencil der svæver over skærmen på en iPad viser også navnet på en kontrol efter et øjeblik, i en lille boble, som musemarkøren gør med et værktøjstip.
 
+I skitsetilstand tegner {{ui:sketch.freehand}} med pen eller finger som på papir; når du løfter, bliver linjen til skitsepunkter, du kan redigere, se [Skitser](chapter:sketches).
+
 Skrider legemer, når børn eller travle hænder rører ved dem, slår du {{ui:workspace.selectBeforeMoving}} til i indstillingerne: et legeme skal så vælges først, og først det næste træk flytter det.
 
 ## På en iPad eller iPhone

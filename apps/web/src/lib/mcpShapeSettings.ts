@@ -25,6 +25,7 @@ import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, t
 export const MCP_SHAPE_SETTING_KEYS = [
   "steps", "sides", "bevel", "segments",
   "topRadius", "baseRadius", "curvedConeTop", "curvedConeBend", "topWidth", "topDepth",
+  "screwBossFastener", "screwBossSize", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussets", "screwBossGussetHeight", "screwBossGussetThickness", "snapFitPart", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitLeadAngle", "snapFitRetainAngle", "snapFitFoot", "ribStyle", "ribTop",
   "taperTopWidth", "taperTopDepth", "taperBottomWidth", "taperBottomDepth",
   "extrudeTwist", "extrudeTopOffsetX", "extrudeTopOffsetZ", "slopeEnd", "slopeSide", "slopeCurve", "narrowEnd", "narrowSide", "narrowCurve", "narrowStart",
   "teeth", "toothSize", "toothWidth", "centerHoleSize", "gearType", "helixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",

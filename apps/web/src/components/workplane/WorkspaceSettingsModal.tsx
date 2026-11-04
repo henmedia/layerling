@@ -934,6 +934,12 @@ export function WorkspaceSettingsModal({
                     onChange={(dimensionsAlwaysVisible) => patchWorkspace({ dimensionsAlwaysVisible })}
                   />
                   <WorkspaceToggle
+                    label={t("workspace.dimensionAxisColors")}
+                    description={t("workspace.dimensionAxisColorsHint")}
+                    checked={workspace.dimensionAxisColors}
+                    onChange={(dimensionAxisColors) => patchWorkspace({ dimensionAxisColors })}
+                  />
+                  <WorkspaceToggle
                     label={t("workspace.showRotationAngles")}
                     checked={workspace.showRotationAngles}
                     onChange={(showRotationAngles) => patchWorkspace({ showRotationAngles })}

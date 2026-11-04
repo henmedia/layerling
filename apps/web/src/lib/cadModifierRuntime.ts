@@ -1,5 +1,6 @@
 import { CONCAVE_FILLET_STRAIGHT_MESSAGE } from "@/lib/cadConcaveFillet";
 import { t } from "@/lib/i18n";
+import { isKernelMemoryFault, isWasmMemoryFaultMessage } from "@/lib/kernelFault";
 import { localizedError } from "@/lib/userErrors";
 import type { CadModifierDeflection, CadModifierEdge, CadModifierQuality } from "@/lib/cadModifierTypes";
 import type { OcctKernel, ShapeHandle } from "occt-wasm";
@@ -141,7 +142,8 @@ export function applyCadTransform(cad: OcctKernel, shape: ShapeHandle, transform
   }
   try {
     return cad.transform(shape, transform);
-  } catch {
+  } catch (error) {
+    if (isKernelMemoryFault(error)) throw error;
     return cad.generalTransform(shape, transform);
   }
 }
@@ -169,10 +171,7 @@ export function isCadModifierKernelExhausted(message: string, errorName = "") {
 }
 
 export function isCadModifierWasmMemoryFault(message: string, errorName = "") {
-  return (
-    /memory access out of bounds|out of bounds memory access|\babort(?:ed)?\b/i.test(message) ||
-    /^(?:WebAssembly\.)?RuntimeError$/i.test(errorName)
-  );
+  return isWasmMemoryFaultMessage(message, errorName);
 }
 
 /**
@@ -356,6 +355,9 @@ export function cadModifierUserErrorMessage(rawError: string | null | undefined)
   }
   if (rawError.includes("The edge preview timed out")) {
     return t("edge.errorPreviewTimeout");
+  }
+  if (rawError.includes("Select at least one highlighted edge")) {
+    return t("edge.selectAtLeastOne");
   }
   if (rawError.includes(VARIABLE_FILLET_ONE_EDGE_MESSAGE)) {
     return t("edge.variableOneEdge");

@@ -61,12 +61,12 @@ describe("the shape library in sections (#1170)", () => {
     const panel = library();
     const headings = [...panel.querySelectorAll(".shape-library-toggle")].map((button) => button.textContent);
     expect(headings).toEqual([
-      "Basic shapes15", "Vessels, tubes & transitions4", "Holes & cut-outs4", "Connections4", "Mechanics & moving parts3",
+      "Basic shapes15", "Vessels, tubes & transitions4", "Holes & cut-outs4", "Connections4", "Enclosure parts3", "Mechanics & moving parts3",
       "Systems & templates2", "Lettering & signs4", "Decorative outlines4", "Helpers1",
     ]);
     expect([...panel.querySelectorAll(".shape-library-toggle")].every((button) => button.getAttribute("aria-expanded") === "true")).toBe(true);
-    expect(tiles(panel)).toHaveLength(41);
-    expect(new Set(tiles(panel)).size).toBe(41);
+    expect(tiles(panel)).toHaveLength(44);
+    expect(new Set(tiles(panel)).size).toBe(44);
     expect(panel.querySelector(".custom-stand-in")).not.toBeNull();
     // Nothing put in yet: no "Recently used".
     expect(section(panel, "Recently used")).toBeNull();
@@ -114,7 +114,7 @@ describe("the shape library in sections (#1170)", () => {
     });
     expect(escape.defaultPrevented).toBe(true);
     expect(input.value).toBe("");
-    expect(tiles(panel)).toHaveLength(41);
+    expect(tiles(panel)).toHaveLength(44);
   });
 
   it("lists the last four shapes put in on top, newest first, also while the library stays open", () => {

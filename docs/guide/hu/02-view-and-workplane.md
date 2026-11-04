@@ -18,6 +18,10 @@ Egérrel:
 
 Hogy a görgő milyen gyorsan nagyít, azt a beállításokban a {{ui:workspace.appearance}} alatt a {{ui:workspace.zoomSpeed}} adja meg: egy csúszka 1-től 14-ig, kezdetben 5-ön; 10 fölött csak a görgő gyorsul.
 
+**Egérgombok, mint a szeletelőben.** Ha a Bambu Studióhoz vagy az OrcaSlicerhez szoktál, a beállításokban, a(z) {{ui:workspace.appearance}} alatt állítsd a(z) {{ui:workspace.mouseScheme}} értékét erre: {{ui:workspace.mouseSchemeSlicer}}. A bal gombbal üres helyen húzva ilyenkor a nézet forog, a jobb gomb a középsőhöz hasonlóan eltolja, a Shift és a bal gombos húzás pedig kijelölőkeretet rajzol. Egy test húzása továbbra is mozgatja, és egy rövid jobb kattintás továbbra is megnyitja a menüt. Vázlatban a jobb gomb is eltolja a nézetet.
+
+**3D egér.** Egy SpaceMouse vagy más 3D egér forgatja, eltolja és nagyítja a 3D nézetet: told el magadtól a sapkáját a nagyításhoz, csúsztasd a nézet eltolásához, billentsd a nézet döntéséhez, és csavard el a nézet elforgatásához. A beállításokban, a(z) {{ui:workspace.appearance}} alatt kattints a(z) {{ui:workspace.spaceMouseConnect}} gombra, és válaszd ki az eszközt a böngésző által megnyitott ablakban; a választást megjegyzi, így ezt csak egyszer kell megtenned. Chrome-ban és Edge-ben működik, amelyek elérik az ilyen eszközöket; Firefoxban és Safariban nem.
+
 Táblagépen vagy telefonon két ujjal nagyítasz (széthúzás és összecsípés) és mozgatod a nézetet (együtt csúsztatva). Egy ujjal üres helyen a nézetet forgatod, egy koppintás ott pedig megszünteti a kijelölést; egy alakzaton vagy fogantyún a terven dolgozol, pont mint a bal egérgombbal. Ha akkor is forgatnád a nézetet, amikor az ujjad egy alakzaton indul, kapcsold be a nézetsávon az {{ui:camera.touchRotate}} kapcsolót. Ez a kapcsoló érintőképernyős eszközökön jelenik meg.
 
 A tollas digitalizáló tábla egérként viselkedik: a toll hegye a bal gomb, a tollon lévő gomb a jobb, a nézet forgatásához és a menühöz. A tábla gyorsgombjait a meghajtójában a layerling [billentyűparancsaira](chapter:shortcuts) állíthatod.
@@ -69,7 +73,7 @@ A {{ui:camera.sectionView}}, a sáv utolsó gombja (a vágás eszköz), egy sík
 
 Az eszközablak a gombjához kapcsolódik. Ha eltakar valamit, húzd a címsoránál fogva bárhová a munkasíkon; legközelebb is ott nyílik meg. Kattints duplán a címsorára, vagy ejtsd a gombra, hogy visszakerüljön.
 
-A {{ui:camera.sectionConfirm}} bezárja az ablakot, és megtartja a vágást, a {{ui:camera.sectionBack}} pedig előbb a mérést fejezi be, aztán bezárja az ablakot – ez olyan táblagéphez való, amelyen nincs [[Enter]] vagy [[Esc]]. Az [[Esc]] is bezárja az ablakot; a vágás megmarad, amíg ki nem kapcsolod, vagy vissza nem mész a tervek áttekintéséhez. Amíg be van kapcsolva, a gombja kiemelve marad. Ami a levágott oldalra kerül, csak akkor látszik, ha kikapcsolod a vágást.
+A kereszt és az [[Esc]] bezárja az eszközablakot; ha mérés fut, az [[Esc]] előbb azt fejezi be. A vágás megmarad, amíg ki nem kapcsolod a(z) {{ui:camera.sectionActive}} kapcsolóval, rá nem kattintasz a gombjára a sávban, amíg az ablak nyitva van, vagy vissza nem mész a tervek áttekintéséhez. Amíg be van kapcsolva, a gombja kiemelve marad. Ami a levágott oldalra kerül, csak akkor látszik, ha kikapcsolod a vágást. Táblagépen nincs [[Esc]], ezért ott az eszközablaknak két további gombja van: a(z) {{ui:camera.sectionBack}} befejezi a mérést, ha fut, egyébként bezárja az eszközablakot, a(z) {{ui:camera.sectionConfirm}} pedig egy lépésben bezárja az eszközablakot. Számítógépen ezek nem látszanak.
 
 ## A munkasík
 
@@ -93,29 +97,107 @@ Ha merőlegesen akarsz a munkasíkra nézni, nyomd meg a [[P]] billentyűt, vagy
 
 A rács a tárgyasztal méretét mutatja. Jobbra lent van az **illesztési lépés**: a mozgatás és a méretezés ekkora lépésekben illeszkedik, például 1 mm-esekben. Finom munkához vedd kisebbre, durva elrendezéshez nagyobbra. A szalagon a {{ui:editor.tool.snapToGrid}} utólag a legközelebbi rácspontra helyezi a kijelölt alakzatokat. Mozgatás közben az alakzatok más alakzatokhoz is illeszkednek, lásd a [Kijelölés és elrendezés](chapter:select-and-arrange) fejezetet.
 
+> **Tipp:** Amikor részeket pontosan illesztesz egymáshoz, ne forgasd a nézetet. A számbillentyűkkel válts felül- vagy elölnézetre, és nyomd meg az [[O]] billentyűt a lapos megjelenítéshez. Így azonnal látod, hogy két él tényleg egy síkban van-e.
+
+### A beállítások ablaka
+
+A címsorban lévő fogaskerék ({{ui:editor.workspaceSettings}}) megnyitja a beállításokat. Balra öt terület van: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} és {{ui:workspace.history}}. Egy változtatás azonnal érvényes. Alul a(z) {{ui:workspace.makeDefault}} a jelenlegi beállításokat menti alapértelmezésként, így egy új terv ezekkel indul. Egy megnyitott fájl a saját beállításait hozza magával; a mellette lévő {{ui:workspace.useMyDefault}} a mentett színeidet, rácsodat és a többit alkalmazza a nyitott tervre, a mértékegységeit pedig megtartja. Ha az alapértelmezéseid nyomtatót is tartalmaznak, annak tárgyasztal-mérete is jön vele; nyomtató nélkül a terv megtartja a saját tárgyasztalát és nyomtatóját. A jobb felső sarokban a(z) {{ui:workspace.close}} bezárja az ablakot. Ez a rész sorban végigmegy a beállításokon.
+
+### Megjelenés: téma, szalag és nézetkocka
+
+A(z) {{ui:workspace.theme}} az egész program színsémáját választja ki: a(z) {{ui:workspace.themeSystem}} a számítógépet követi, ezenkívül van {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} és {{ui:workspace.themeGraphite}}. A szerkesztő jobb felső sarkában is átállíthatod.
+
+Az {{ui:workspace.toolbarSize}} a {{ui:workspace.appearance}} alatt kisebbé vagy nagyobbá teszi a felső szalag gombjait, az alakzatmenüjét, a bal oldali nézetsávot és a jobb oldali tulajdonságpanelt: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (ahogy mindig is volt) vagy {{ui:workspace.toolbarSizeLarge}}. A kicsi laptopon több helyet hagy a munkasíknak; a nagyot könnyebb eltalálni nagy képernyőn vagy ujjal. Nagy gombokkal a szalag csoportjai egy második sorba kerülnek, ha az ablak túl keskeny hozzájuk. A méret ebben a böngészőben megmarad, és minden tervre érvényes.
+
+A(z) {{ui:workspace.shapeColors}} az alakzattár képein azt a színt mutatja, amellyel egy új alakzat indul (a fajtája színét, vagy azt, amelyet a(z) {{ui:inspector.saveDefaults}} gombbal mentettél). Ha inkább szürke képeket szeretnél, kapcsold ki; a böngésző megjegyzi a választásodat.
+
+A {{ui:workspace.viewCubePosition}} a {{ui:workspace.appearance}} alatt a nézetkockát a munkaterület egy másik sarkába teszi: {{ui:workspace.viewCubePositionTopLeft}} (ahogy mindig is volt), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} vagy {{ui:workspace.viewCubePositionBottomRight}}. A bal felső sarkon kívül minden sarokban a nézetsáv feljebb kerül, a kocka által szabadon hagyott helyre. Jobb alul a kocka közvetlenül a {{ui:inspector.snapGrid}} vezérlő fölött áll. Amíg jobb oldalon egy alakzat tulajdonságai nyitva vannak, a jobb oldali kocka balra kitér előlük. A sarok ebben a böngészőben megmarad, és minden tervre érvényes. Keskeny ablakban, például telefonon, a beállítás rejtve van, és a kocka a bal felső sarokban marad.
+
+### Megjelenés: gyors mód
+
+A(z) {{ui:workspace.fastMode}} lassabb számítógépekhez való. Kikapcsolja az árnyékokat, az élvonalakat minden testen és a kamera tehetetlenségét, és a nézetet csak a képernyő felbontásában rajzolja. A saját beállításaid későbbre elmentve maradnak, az általa átvett kapcsolók pedig a(z) {{ui:workspace.offInFastMode}} feliratot mutatják, amíg be van kapcsolva. Hogy mi segít még egy lassú gépen, azt lent, „Ha a layerling lassúnak tűnik” alatt találod.
+
+### Megjelenés: a munkaterület és a vázlat színei
+
+A munkaterület színeit a(z) {{ui:workspace.appearance}} alatt állítod: {{ui:workspace.backgroundColor}} és {{ui:workspace.surfaceColor}} a világos témához (a sötét témák megtartják a sajátjukat), a rács színe mellett a(z) {{ui:workspace.workplane}} alatt. Minden szín egy gomb, amely mutatja. Egy kattintás kis ablakot nyit színmezővel, kész színek sorával, egy hexadecimális értéknek való mezővel és egy nyíllal, amely a színt a layerling alapértékére állítja vissza. Az [[Enter]] átveszi a begépelt hexadecimális értéket, ahogy az ablakon kívüli kattintás is.
+
+A vázlatnézetnek saját színei vannak: {{ui:workspace.sketchBackground}} a lap körüli ablakhoz, {{ui:workspace.sketchPlateColor}} a rács alatti laphoz és {{ui:workspace.sketchGridColor}}, mind a világos témához. A(z) {{ui:workspace.sketchMatch}} egy kattintással átveszi a munkaterület három színét.
+
+A(z) {{ui:workspace.classicLook}} úgy állítja be a munkaterületet, ahogy a Tinkercad mutatja: fehér háttér, világoskék milliméterrács minden centiméternél erősebb vonallal, fekete élvonalak, felülről jövő fény lágy árnyékokkal. Utána minden értéket külön is módosíthatsz. Mind úgy indul, ahogy a layerling mindig is kinézett, és hogy mi a jó, az a monitorodon is múlik.
+
+![A Megjelenés alatti beállítások: háttér- és munkasíkszínek a világos témához, és az élvonalak kapcsolója minden testhez.](shot:settings-appearance)
+
+![A szerkesztő sötét színsémában. A színsémát a jobb felső sarokban állítod: Rendszer, Világos, Sötét vagy Grafit.](shot:editor-dark)
+
+### Megjelenés: tengelynyilak és élvonalak
+
+A {{ui:workspace.showAxes}} (alapból bekapcsolva) három nyilat rajzol a tárgyasztal bal hátsó sarkába: az **X** pirosan jobbra, az **Y** zölden hátra, a **Z** kéken felfelé mutat, ahogy a helyzetmezők számolnak. Ez a jobbkéz-szabály, amelyet a Tinkercad, a CAD-programok és a szeletelők is használnak. Ha a munkasík egy lapon van, követik. Itt kapcsolhatod ki őket, ha útban vannak.
+
+A(z) {{ui:workspace.edgeLines}} minden testre körvonalat rajzol {{ui:workspace.edgeColor}} színnel (először feketével, mint a Tinkercad): segít, ha a sötét színek összefolynak. Alapból ki van kapcsolva, a nagyon nagy importált hálók pedig kimaradnak.
+
+![Három sötét test bekapcsolt élvonalakkal: a körvonalak elválasztják őket.](shot:edge-lines)
+
+A {{ui:workspace.strongHoles}} a lyukakat sötétebb szürkével, kevésbé átlátszóan és sötét körvonallal rajzolja. Segít, ha egy lyukat nehéz megtalálni az átlátszó testek között. Az élvonalakkal ellentétben gyors módban is bekapcsolva marad.
+
+### Megjelenés: fény és árnyékok
+
+A(z) {{ui:workspace.showShadows}} be- és kikapcsolja a vetett árnyékokat. Két csúszka állítja, hogyan világítódnak meg a testek. A(z) {{ui:workspace.shadowStrength}} azt adja meg, mennyire sötétek a vetett árnyékok, a(z) {{ui:workspace.shadeContrast}} pedig a fényt az egyenletes környezeti fénytől a fő fény felé tolja: az „erős” felé az árnyékos oldalak sötétebbek és az árnyékok jobban látszanak, a „lágy” felé minden laposabb. A legfelső végén a kontraszt nagyon erős, így az árnyékos oldalak és az árnyékok tényleg sötétek. A(z) {{ui:workspace.shadowSoftness}} élesek helyett lágyakká teszi az árnyékok széleit. A(z) {{ui:workspace.lightAzimuth}} a tárgyasztal körül forgatja a fő fényt (0° elölről, 90° jobbról), a(z) {{ui:workspace.lightElevation}} pedig megemeli; 90°-nál a Tinkercadhez hasonlóan függőlegesen a tárgyasztal fölött áll, és az árnyékok pontosan a testek alá esnek. A(z) {{ui:workspace.softLighting}} a fény nagy részét onnan hozza, ahonnan nézel, és a nézettel együtt forog: egyetlen lap sem marad sötét, és egy sötét színű, felfelé néző lap sem ég ki fehérré. A fő fény az árnyékokhoz kicsit megmarad, és a kontrasztcsúszka továbbra is működik. Ha alacsony fénynél még látszik egy világos csillogás, emeld a(z) {{ui:workspace.lightElevation}} értékét 90°-ra: akkor olyan, mint a Tinkercad. A(z) {{ui:workspace.lightReset}} mindent visszaállít.
+
+### Megjelenés: méretek a munkasíkon
+
+A(z) {{ui:workspace.showMoveDimensions}} húzás közben mutatja, mennyit mozgatsz, a(z) {{ui:workspace.showOriginDimensions}} pedig a kijelölés távolságait a tárgyasztal origójától, több kijelölt testnél is. A(z) {{ui:workspace.dimensionsAlwaysVisible}} beállítással ezek a méretek folyamatosan látszanak, nem csak húzás közben. Amíg egy elforgatott test ki van jelölve, a szögei alatta, a munkasíkon látszanak; a(z) {{ui:workspace.showRotationAngles}} ezt kikapcsolja. Bővebben a [Mérés és jegyzetek](chapter:measuring-and-notes) fejezetben.
+
+### Megjelenés: kijelölés és mozgatás
+
+{{ui:workspace.selectBeforeMoving}}: egy testet ilyenkor előbb ki kell jelölni, és csak a következő húzás mozgatja. Segít, ha gyerekek vagy sietős kezek nyúlnak a testekhez, és érintőképernyőn.
+
+{{ui:workspace.frameByDirection}}: a jobbra húzott keret csak azt jelöli ki, ami teljesen benne van, a balra húzott mindent, amihez hozzáér (szaggatott vonallal rajzolódik), mint a SketchUpban.
+
+A(z) {{ui:workspace.doubleClickOpensSketch}} azt állítja, hogy egy kihúzott vázlatra duplán kattintva újra megnyílik-e a vázlat, mint a Tinkercadben, a(z) {{ui:workspace.doubleClickOpensGroup}} pedig azt, hogy egy csoportra vagy kötegre duplán kattintva megnyílik-e a szerkesztése. A(z) {{ui:workspace.doubleClickCentersView}} azt állítja, hogy az üres munkasíkra duplán kattintva a nézet arra a helyre ugrik-e.
+
+A(z) {{ui:workspace.objectSnap}} húzás közben más alakzatokhoz illeszti egy alakzat széleit és közepét; a jobb alsó rácsmenüben ugyanez a kapcsoló van. A(z) {{ui:workspace.cruise}} az új alakzatot az egérmutatón lógatja, és a mutató alatti lapra fekteti, mint a Cruise a Tinkercadben; kikapcsolva az új alakzat a tárgyasztal közepén jelenik meg. Bővebben a [Kijelölés és elrendezés](chapter:select-and-arrange) fejezetben.
+
+### Megjelenés: a nézet
+
+{{ui:workspace.startInPerspective}}: a szerkesztő ilyenkor perspektivikus nézetben nyílik meg a lapos helyett.
+
+A(z) {{ui:workspace.startView}} azt a szöget adja meg, amelyben egy új terv megnyílik, és amelyhez a(z) {{ui:camera.home}} visszatér. Forgasd és nagyítsd a nézetet, ahogy tetszik, majd kattints a(z) {{ui:workspace.startViewUseCurrent}} gombra; a(z) {{ui:workspace.startViewStandard}} visszahozza a szokásos elölről-jobbról nézetet. Ebben a böngészőben minden tervre érvényes. Egy újra megnyitott terv továbbra is úgy nyílik meg, ahogy otthagytad.
+
+A(z) {{ui:workspace.zoomSpeed}} egy csúszka lassútól gyorsig: milyen gyorsan nagyít a görgő és az érintőpad; a nagyítás gombjai és billentyűi megtartják a saját kis lépéseiket. {{ui:workspace.cameraInertia}}: ha elengeded az egeret, a nézet még egy pillanatig forog, és finoman lelassul. Kikapcsolva azonnal megáll, mint a Tinkercadben és a Fusion 360-ban.
+
+A(z) {{ui:workspace.overhangAngle}} az a szög, amelytől egy lap túlnyúlásnak számít, ha a láthatósági menüben bekapcsolod a túlnyúlások megjelenítését: az ilyen lapok piros-fehér sraffozást kapnak. A 30° óvatos, a 70° jó nyomtatási hűtéssel számol; a 45° a szokásos kiindulás. Amíg látszanak, a nézet alatti sor megadja a legmeredekebb túlnyúlást, és hogy hány cm² igényel támaszt.
+
+A(z) {{ui:workspace.booleanTriangleLimit}} korlátozza, hány háromszöge lehet egy importált hálónak, amikor vágod, egyesíted vagy metszed, mert ez a böngésződben számolódik. A korlát fölötti háló nem kerül feldolgozásra; előbb egyszerűsítsd a hálót, vagy emeld a korlátot, ha a számítógéped bírja. Egy magasabb korlát néhány másodpercre lefagyaszthatja a szerkesztőt.
+
+### Mérés: mértékegységek, lépték és illesztési lépések
+
+A(z) {{ui:workspace.measurement}} alatt állítod be a(z) {{ui:workspace.units}} értékét, azt a mértékegységet, amelyben a méretek látszanak ({{ui:workspace.scale}}: milliméter, centiméter vagy méter a metrikus, col vagy láb az angolszász rendszerben), hogy egy szám hány tizedesjegyet mutat ({{ui:workspace.accuracy}}), a(z) {{ui:workspace.snapGrid}} értékét, amelyhez a mozgatás és a méretezés illeszkedik, és saját illesztési lépéseket a(z) {{ui:workspace.customSnapGrids}} alatt.
+
 A beállításokban a {{ui:workspace.measurement}} alatt adod meg a {{ui:workspace.units}} értékét. {{ui:units.imperial}} beállítással a layerling minden méretet colban mutat: az alakzaton, a tulajdonságpanelen, a mérőszalagon és a vonalzón. Az illesztőrács ilyenkor 1/64 és 1 col közötti lépéseket kínál, a tárgyasztal rácsa pedig colban rajzolódik (1/8 és 1 col között, alapból 1/4 col), minden egész colnál erősebb vonallal. A {{ui:workspace.inchFormat}} alatt választod ki, hogy a colok törtként jelenjenek meg, mint a Tinkercadben (1 5/8, 1/64 colra kerekítve), vagy tizedes törtként (1,625), annyi tizedesjeggyel, amennyit a {{ui:workspace.accuracy}} alatt beállítottál. Bármelyiket begépelheted, az „1 5/8” alakot is. Gyorsabban váltasz milliméter és hüvelyk között a Tulajdonságok ablak alján a {{ui:inspector.snapGrid}} melletti kis **mm | in** kapcsolóval: ugyanúgy változtatja a mértékegységet, a lap rácsát és a rögzítési lépést, mint a beállítások, ennél a tervnél.
 
 Ugyanitt a {{ui:workspace.customSnapGrids}} alatt saját illesztési lépéseket adhatsz hozzá: egy nevet és egy méretet milliméterben, például „Tűosztás 2,54 mm” a DIP chipek, tüskesorok és próbapanel-furatok osztásához, vagy „MX Key Unit” 19,05 mm-rel a billentyűzetgombok osztásához. Az illesztési lépés menüje ezután ezt a méretet egészben, felezve és negyedelve kínálja fel (1 ×, ½ × és ¼ ×), így az alakzatokat egy, fél vagy negyed osztással mozgathatod. Ha csak magát a méretet szeretnéd, vedd ki mellette a pipát a {{ui:workspace.customSnapGridParts}} elől; a menüben ekkor csak ez az egy lépés lesz. A saját lépések a tervvel együtt mentődnek, és a {{ui:workspace.makeDefault}} gombbal is továbbvihetők.
 
-A tárgyasztal méretét, rácsosztását és színét a beállításokban (a fogaskerék a szalagon) változtatod meg: a részek {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} és {{ui:workspace.history}}. A {{ui:workspace.appearance}} alatt olyan kapcsolókat találsz, mint az {{ui:workspace.startInPerspective}} és az {{ui:workspace.showShadows}}, a {{ui:workspace.workplane}} alatt pedig a {{ui:workspace.showGrid}} kapcsolót. A munkaterület színeit is a {{ui:workspace.appearance}} alatt állítod: {{ui:workspace.backgroundColor}} és {{ui:workspace.surfaceColor}} a világos témához (a sötét témák megtartják a sajátjukat), a rács színe mellett, amely a {{ui:workspace.workplane}} alatt van. Ott választod ki azt is, hogy a sötétebb rácsvonal minden 5. vagy minden 10. rácslépésnél legyen ({{ui:workspace.gridMajorEvery}}), és a {{ui:workspace.gridMajorColor}} mezővel saját színt adhatsz neki; a középkereszt és a tárgyasztal szegélye is ezt veszi át. A rács minden vonala vastagodik, ahogy ránagyítasz, mint a Tinkercadben, és kicsinyítéskor is látható marad; ha ez neked sok, kapcsold ki az {{ui:workspace.gridLinesGrow}} kapcsolót, és a vonalak minden nagyításnál egy pixel szélesek maradnak, mint a vázlatban. A színmezőben az [[Enter]] átveszi a begépelt hexa értéket. Az {{ui:workspace.edgeLines}} minden testre körvonalat rajzol, az {{ui:workspace.edgeColor}} színével (kezdetben fekete, mint a Tinkercadben): segít, ha a sötét színek egybefolynak. Alapból ki van kapcsolva, és a nagyon nagy importált hálók kimaradnak. A rács mindig átmegy az origón, így az erősebb vonalak a tengelyekre esnek, akármekkora is a tárgyasztal. Ha a rács eltűnt, például mert egy színt a lemez színére állítottak, a {{ui:workspace.resetGrid}} a {{ui:workspace.workplane}} terület végén visszaállítja a láthatóságot, a színeket, a távolságot és a vonalvastagságot az alapértelmezettre, itt és a {{ui:workspace.makeDefault}} gombbal mentett alapértelmezésben is.
+### Munkasík: tárgyasztal és nyomtató
 
-A {{ui:workspace.strongHoles}} a lyukakat sötétebb szürkével, kevésbé átlátszóan és sötét körvonallal rajzolja. Segít, ha egy lyukat nehéz megtalálni az átlátszó testek között. Az élvonalakkal ellentétben gyors módban is bekapcsolva marad.
+A(z) {{ui:workspace.printer}} a munkasíkot a nyomtatód tárgyasztalához igazítja, és megjelöli azokat a testeket, amelyek túlnyúlnak rajta, lásd [Nyomtatás](chapter:printing). A(z) {{ui:workspace.showPlateLabels}} ráírja a tárgyasztalra a terv nevét, kiválasztott nyomtatónál pedig annak nevét és nyomtatási terét is.
 
-A {{ui:workspace.showAxes}} (alapból bekapcsolva) három nyilat rajzol a tárgyasztal bal hátsó sarkába: az **X** pirosan jobbra, az **Y** zölden hátra, a **Z** kéken felfelé mutat, ahogy a helyzetmezők számolnak. Ez a jobbkéz-szabály, amelyet a Tinkercad, a CAD-programok és a szeletelők is használnak. Ha a munkasík egy lapon van, követik. Itt kapcsolhatod ki őket, ha útban vannak.
+A(z) {{ui:workspace.size}} saját méretet ad a tárgyasztalnak, {{ui:workspace.width}} és {{ui:workspace.length}} milliméterben vagy a választott mértékegységben. A rács mindig átmegy az origón, így az erősebb vonalak a tengelyeken vannak, bármekkora is a tárgyasztal.
 
-A {{ui:workspace.appearance}} alatt két csúszka állítja, hogyan világítódnak meg a testek. Az {{ui:workspace.shadowStrength}} azt adja meg, mennyire sötétek a vetett árnyékok, az {{ui:workspace.shadeContrast}} pedig az egyenletes környezeti fényből a fő fénybe tolja át a fényt: az „erőteljes” felé az árnyékos oldalak sötétebbek lesznek, és az árnyékok jobban látszanak, a „lágy” felé minden laposabb lesz. A felső végén a kontraszt nagyon erős, így az árnyékos oldalak és az árnyékok igazán sötétek. Az {{ui:workspace.shadowSoftness}} élesek helyett lágyakká teszi az árnyékok széleit. A {{ui:workspace.lightAzimuth}} a fő fényt a tárgyasztal körül forgatja (0° elölről, 90° jobbról), a {{ui:workspace.lightElevation}} pedig megemeli; 90°-nál egyenesen a tárgyasztal fölött áll, mint a Tinkercadben, és az árnyékok közvetlenül a testek alá esnek. A {{ui:workspace.lightReset}} mindent visszaállít. A {{ui:workspace.classicLook}} úgy állítja be a munkaterületet, ahogy a Tinkercad mutatja: fehér alap, halványkék milliméterrács centiméterenként sötétebb vonallal, fekete élvonalak, felülről jövő fény lágy árnyékokkal. Utána minden érték külön is módosítható. Mindegyik úgy indul, ahogy a layerling mindig is kinézett, és hogy neked mi tetszik, az a monitorodtól is függ. A vázlatnézetnek saját színei vannak: {{ui:workspace.sketchBackground}} a lap körüli ablakhoz, {{ui:workspace.sketchPlateColor}} a rács alatti laphoz és {{ui:workspace.sketchGridColor}}, mind a világos témához. A {{ui:workspace.sketchMatch}} egy kattintással átveszi a munkaterület három színét.
+### Munkasík: rács
 
-![A Megjelenés alatti beállítások: háttér- és munkasíkszínek a világos témához, és az élvonalak kapcsolója minden testhez.](shot:settings-appearance)
+A(z) {{ui:workspace.showGrid}} megjeleníti vagy elrejti a rácsot a tárgyasztalon. A(z) {{ui:workspace.gridBlockSize}} a vonalai távolságát állítja, a(z) {{ui:workspace.gridMajorEvery}} pedig azt, hogy minden 5. vagy 10. rácslépésnél jön-e egy erősebb vonal; a(z) {{ui:workspace.gridMajorColor}} saját színt ad ennek a vonalnak, amelyet a középső kereszt és a tárgyasztal széle is átvesz. A(z) {{ui:workspace.gridColor}} a szokásos vonalak színe.
 
-![Három sötét test bekapcsolt élvonalakkal: a körvonalak elválasztják őket.](shot:edge-lines)
+Minden rácsvonal vastagodik nagyításkor, mint a Tinkercadben, és látható marad kicsinyítéskor. Ha ez sok neked, kapcsold ki a(z) {{ui:workspace.gridLinesGrow}} kapcsolót, és a vonalak minden nagyításnál egy pixel szélesek maradnak, mint a vázlatban.
 
-![A szerkesztő sötét színsémában. A színsémát a jobb felső sarokban állítod: Rendszer, Világos, Sötét vagy Grafit.](shot:editor-dark)
+Ha a rács eltűnt, például mert a színe a tárgyasztal színére lett állítva, a(z) {{ui:workspace.workplane}} terület végén lévő {{ui:workspace.resetGrid}} visszaállítja a láthatóságát, színeit, osztását és vonalvastagságát a szabványra, itt és a(z) {{ui:workspace.makeDefault}} gombbal mentett alapértelmezésben is.
 
-Az {{ui:workspace.toolbarSize}} a {{ui:workspace.appearance}} alatt kisebbé vagy nagyobbá teszi a felső szalag gombjait, az alakzatmenüjét, a bal oldali nézetsávot és a jobb oldali tulajdonságpanelt: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (ahogy mindig is volt) vagy {{ui:workspace.toolbarSizeLarge}}. A kicsi laptopon több helyet hagy a munkasíknak; a nagyot könnyebb eltalálni nagy képernyőn vagy ujjal. Nagy gombokkal a szalag csoportjai egy második sorba kerülnek, ha az ablak túl keskeny hozzájuk. A méret ebben a böngészőben megmarad, és minden tervre érvényes.
+### Alakzatok alapértékei
 
-A {{ui:workspace.viewCubePosition}} a {{ui:workspace.appearance}} alatt a nézetkockát a munkaterület egy másik sarkába teszi: {{ui:workspace.viewCubePositionTopLeft}} (ahogy mindig is volt), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} vagy {{ui:workspace.viewCubePositionBottomRight}}. A bal felső sarkon kívül minden sarokban a nézetsáv feljebb kerül, a kocka által szabadon hagyott helyre. Jobb alul a kocka közvetlenül a {{ui:inspector.snapGrid}} vezérlő fölött áll. Amíg jobb oldalon egy alakzat tulajdonságai nyitva vannak, a jobb oldali kocka balra kitér előlük. A sarok ebben a böngészőben megmarad, és minden tervre érvényes. Keskeny ablakban, például telefonon, a beállítás rejtve van, és a kocka a bal felső sarokban marad.
+A(z) {{ui:workspace.shapeDefaults}} alatt kiválasztasz egy alakzatot a(z) {{ui:workspace.shape}} mezőben, és beállítod, mivel indul, amikor hozzáadod: a szélességét, hosszát és magasságát. A(z) {{ui:workspace.useAppDefaults}} visszaállítja az alakzatot azokra az értékekre, amelyekkel az alkalmazás indítja. A saját beállításokkal rendelkező alakzatok ezeket a(z) {{ui:workspace.shapeDetails}} alatt mutatják. Az értékek az új alakzatokra érvényesek, nem a tárgyasztalon már állókra. A(z) {{ui:workspace.customLimit}} saját felső határt szab annak, mekkorára tehetik ezt az alakzatot a fogantyúk és a tulajdonságok; üresen a szokásos határok érvényesek.
 
-> **Tipp:** Amikor részeket pontosan illesztesz egymáshoz, ne forgasd a nézetet. A számbillentyűkkel válts felül- vagy elölnézetre, és nyomd meg az [[O]] billentyűt a lapos megjelenítéshez. Így azonnal látod, hogy két él tényleg egy síkban van-e.
+### Mentett előzmények
+
+A(z) {{ui:workspace.history}} alatt a(z) {{ui:workspace.savedHistory}} csúszka azt adja meg, hány befejezett művelet marad visszavonható, miután mentetted vagy újra megnyitottad a tervet. Az alapérték tervenként 100 művelet. Egy alacsonyabb korlát a terv régebbi visszavonási lépéseit végleg elveti.
 
 ## Ha a layerling lassúnak tűnik
 

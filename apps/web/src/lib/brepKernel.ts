@@ -25,6 +25,15 @@ export function occtKernel() {
   return rawKernel;
 }
 
+/**
+ * Forgets a kernel whose WebAssembly memory broke (out of bounds, unreachable): every later call on it would read
+ * garbage, so the next loadBrepWithOcct starts a fresh one.
+ */
+export function dropOcctKernel() {
+  brepReady = null;
+  rawKernel = null;
+}
+
 export async function loadBrepWithOcct(): Promise<Brep> {
   // An engine without WebAssembly SIMD cannot compile the kernel; say so up front (#350).
   assertCadKernelRunnable();

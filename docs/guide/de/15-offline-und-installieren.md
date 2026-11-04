@@ -16,7 +16,7 @@ Auf der Startseite erscheint dafür ein Hinweis mit {{ui:installHint.install}}, 
 
 Den Hinweis auf der Startseite kannst du mit {{ui:installHint.dismiss}} schließen. Startest du die installierte App in Chrome oder Edge ein zweites Mal, holt sie das offene Fenster nach vorn, statt ein weiteres zu öffnen.
 
-Auf einem Computer meldet sich eine installierte App in Chrome oder Edge außerdem als Programm für `.lyl`-Dateien an: Ein Doppelklick auf einen Entwurf im Dateimanager öffnet ihn in layerling, und [[Strg]]+[[S]] speichert wieder in diese Datei. Auf Android geht das nicht, dort bietet der Browser für installierte Web-Apps keine Dateizuordnung; öffne einen Entwurf dort auf der Startseite mit {{ui:dashboard.importGeometry}}.
+Auf einem Computer meldet sich eine installierte App in Chrome oder Edge außerdem als Programm für `.lyl`-Dateien an: Ein Doppelklick auf einen Entwurf im Dateimanager öffnet ihn in layerling, und [[Strg]]+[[S]] speichert wieder in diese Datei. Dasselbe gilt für `.stl`- und `.3mf`-Dateien: Sie öffnen sich als neuer Entwurf, wie mit {{ui:dashboard.importGeometry}} auf der Startseite. Damit layerling sie immer öffnet, wähle es unter „Öffnen mit“ und lass das System es immer verwenden. Auf Android geht das nicht, dort bietet der Browser für installierte Web-Apps keine Dateizuordnung; öffne einen Entwurf dort auf der Startseite mit {{ui:dashboard.importGeometry}}.
 
 ## Aktualisierungen
 

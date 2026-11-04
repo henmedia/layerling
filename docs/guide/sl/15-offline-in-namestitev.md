@@ -16,6 +16,8 @@ Na začetni strani se za to pokaže opomba z {{ui:installHint.install}}, če tvo
 
 Opombo na začetni strani lahko zapreš z {{ui:installHint.dismiss}}. Če nameščeno aplikacijo v Chromu ali Edgeu zaženeš drugič, prinese odprto okno naprej, namesto da bi odprla novo.
 
+Na računalniku se nameščen layerling v Chromu ali Edgeu registrira tudi kot program za datoteke `.lyl`: dvoklik na načrt v upravitelju datotek ga odpre v layerlingu, [[Ctrl]]+[[S]] pa shranjuje nazaj v to datoteko. Na Androidu to ne deluje, tam brskalnik za nameščene spletne aplikacije ne ponuja povezave datotek; načrt odpri z {{ui:dashboard.importGeometry}} na začetni strani.
+
 ## Posodobitve
 
 Če obstaja novejša različica, layerling to pokaže na začetni strani. Prek {{ui:dashboard.updateBannerLink}} prebereš, kaj se je spremenilo. Številka različice je spodaj desno. Po ponovnem nalaganju strani imaš novo različico.

@@ -61,6 +61,7 @@ V nastavitvah pod {{ui:workspace.appearance}} sta dve stikali za tekoče mere:
 - {{ui:workspace.showOriginDimensions}} pokaže razdalje izbora do ničle plošče, tudi pri več označenih telesih.
 
 Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne. Če telo ne stoji na delovni ravnini, je prikazana tudi njegova višina nad njo; klikni številko, da vneseš novo.
+Z {{ui:workspace.dimensionAxisColors}} dobi vsako polje barvo svoje osi, kot ročaji: rdečo za X, zeleno za Y in modro za Z. Tako tudi pri majhnem delu na prvi pogled vidiš, katero število je katero.
 
 Če vas za trenutek motijo, pritisnite [[Q]]: mere in razdalje okoli izbora izginejo, zato je del, ki ga premikate, dobro viden. Ponovni [[Q]] jih vrne. Ročica, na katero pokažete, svojo mero vseeno pokaže.
 

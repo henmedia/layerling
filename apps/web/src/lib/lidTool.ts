@@ -909,7 +909,10 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     let body = parts.length === 1 ? parts[0] : runtime.Manifold.union(parts);
     created.push(body);
     if (cutters.length) {
-      body = body.subtract(runtime.Manifold.union(cutters));
+      // The holes joined into one are a body of their own in the kernel's memory, let go with the rest.
+      const holesTogether = runtime.Manifold.union(cutters);
+      created.push(holesTogether);
+      body = body.subtract(holesTogether);
       created.push(body);
     }
     const result = lidForSolid(runtime, body, given);

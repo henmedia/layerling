@@ -20,7 +20,7 @@ export const editorTargetSchema = {
 export const creatableShapeKinds = [
   "box", "roundedBox", "cube", "cylinder", "slot", "ellipse", "polygon", "sphere", "cone", "pyramid", "wedge",
   "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "text", "thread", "spring", "gridfinity", "gear", "hirth",
-  "hinge", "knurl", "dovetail", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
+  "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
 ];
 
 /**
@@ -69,6 +69,23 @@ export const shapeSettingSchema = {
   baseRadius: { type: "number", description: "Cone only: radius at the base." },
   curvedConeTop: { type: "number", description: "Curved cone only: the top's diameter as a share of the bottom's (the width), 0 to 1; 0 runs to a point, 1 is a cylinder. Default 0.25." },
   curvedConeBend: { type: "number", description: "Curved cone only: how far the side bends, -1 to 1. Negative bends it inward into a trumpet like a pseudosphere, 0 is a straight cone, positive bulges it outward into a dome with a flat top. Default -0.8." },
+  screwBossFastener: { type: "string", enum: ["insert", "selfTapping", "custom"], description: "Screw boss only: what goes into its hole - a heat-set insert (default), a self-tapping screw for plastics, or a hole of your own (screwBossHole and screwBossHoleDepth)." },
+  screwBossSize: { type: "string", description: "Screw boss only: the size from the fastener's list. Inserts: M2, M2.5, M3, M3S (short), M4, M5, #2-56, #4-40, #6-32, #8-32, #10-24, 1/4-20 (M3: hole 4.0 mm, insert 5.7 mm). Self-tapping screws: ST2.2, K25, ST2.9, K30, ST3.5, K40, ST4.2, K50, #2, #4, #6, #8, #10 (pilot hole 0.8 times the screw). Default M3, or K30 for screws." },
+  screwBossHole: { type: "number", description: "Screw boss only: the hole's diameter in mm, instead of the size's." },
+  screwBossHoleDepth: { type: "number", description: "Screw boss only: the hole's depth from the top in mm, instead of the size's (an insert's length + 1); as deep as the post goes through." },
+  screwBossDiameter: { type: "number", description: "Screw boss only: the post's outer diameter in mm (about twice an insert's hole, 2.5 times a screw). With gussets the width and depth are the footprint they reach to." },
+  screwBossGussets: { type: "number", description: "Screw boss only: thin ribs from the post down to the floor, 0 to 6 (default 0); they reach out to the footprint (width), screwBossGussetHeight high (default 0.6 of the post) and screwBossGussetThickness thick (1.6 mm)." },
+  screwBossGussetHeight: { type: "number", description: "Screw boss only: how high the gussets reach up the post, mm." },
+  screwBossGussetThickness: { type: "number", description: "Screw boss only: the gussets' thickness, mm." },
+  snapFitPart: { type: "string", enum: ["both", "hook", "catch"], description: "Snap-fit only: both (default) puts the hook and its catch where they sit snapped in under a lid on top - the hook's foot at the top (under the lid), its barb at the bottom, the catch's back at +z (the inside of the wall it goes on); hook or catch makes one of them. separate_parts splits both into two bodies." },
+  snapFitThickness: { type: "number", description: "Snap-fit only: the arm's thickness, mm (1.6). The answer's strain at the root is 1.5 * thickness * undercut / length^2: PLA up to about 2 %, PETG and ABS about 4 %." },
+  snapFitUndercut: { type: "number", description: "Snap-fit only: how far the barb reaches under the catch, mm (1)." },
+  snapFitClearance: { type: "number", description: "Snap-fit only: the play between barb and catch, mm (0.2)." },
+  snapFitLeadAngle: { type: "number", description: "Snap-fit only: the barb's entry slope, degrees from the direction it goes in, 10-60 (30 slides in easily)." },
+  snapFitRetainAngle: { type: "number", description: "Snap-fit only: the angle of the face that holds, 30-90: 90 holds for good, 45 lets it be pulled apart again." },
+  snapFitFoot: { type: "number", description: "Snap-fit only: the foot's thickness under the arm, mm (1.6; 0: no foot)." },
+  ribStyle: { type: "string", enum: ["straight", "gusset"], description: "Rib only: a straight rib (width its length, depth its thickness) or a gusset, a right triangle that braces a wall against the floor (width along the floor, height up the wall at -x, depth its thickness)." },
+  ribTop: { type: "string", enum: ["flat", "round", "chamfer"], description: "Straight rib only: its top." },
   topWidth: { type: "number", description: "Pyramid only: width of the flat top. 0 runs to a point." },
   topDepth: { type: "number", description: "Pyramid only: depth of the flat top. 0 runs to a point." },
   taperTopWidth: { type: "number", description: "Taper, on every shape except gear, hirth, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the top face. Setting one value of a face pins the other." },
@@ -329,7 +346,8 @@ export const shapeSettingSchema = {
     description: "Bent tube only: the chain of segments, each a straight run followed by an arc bend. The tube starts along +X; roll 0 bends within the workplane, roll 90 bends upward. layerling_read_scene reports this list as JSON text, which is accepted here as well.",
   },
   vase: {
-    type: ["object", "string"],
+    // anyOf, not a list of types: some MCP clients drop a tool whose schema has one (#1285).
+    anyOf: [{ type: "object" }, { type: "string" }],
     description: "Vase only: its settings, by the vase tool's own (German) names, for example { profile: \"bauchig\" (or flasche, schale, fass, zylinder, trichter), section: \"vieleck\" (or kreis, welle), polySides: 6, sectionWaves: 12, sectionWaveStyle: \"weich\" (or spitz, bogen, lamellen), twist: 90, swayAngle: 10, body: \"voll\" (one wall for the slicer's vase mode) or \"hohl\" with wall and bottom in mm (bottom 0: no bottom, a tube open at both ends, for bells and mouthpieces), effect: \"rillen\" (or keine, streifen, voronoi, lowpoly), ribCount: 48, ribDepth: 1.6, stripeCount, voronoiCell, lowpolyAround, zoneFrom/zoneTo in % of the height, quality: \"entwurf\", \"standard\" or \"fein\" }. Also: section2 (a second cross-section the first blends into, between section2From and section2To %), waveAmplitude/waveCount (winding grooves), and bottom and wall: watertight: \"ja\", drainHoles, drainDiameter, floorSlope, footHeight, rubberFeet, cutout (keine, voronoi, waben, rauten, kreise; cutoutSize, cutoutWeb, cutoutFrom, cutoutTo) and lamp (keine, haengend, stehend, puck; lampSocket e27, e14 or eigen with lampHole) for a hollow vase, reinforce (keine, rippen, doppelwand; reinforceCount, reinforceDepth) for a solid one. Drawn shapes: profile \"gezeichnet\" with profilePoints [[height 0..1, radius 0..1, kind?, slope?], ...] (kind 1 a corner, 2 a handle with its slope; the widest point is the diameter), section or section2 \"gezeichnet\" with drawSymmetry (halb, viertel, windmuehle with drawRepeat blades, frei) and drawPoints [{ x, y, corner, tx?, ty? }, ...] in the unit circle (the part the symmetry repeats), twistMode \"kurve\" with twistPoints [[height 0..1, angle in degrees, kind?, slope?], ...]. Accessories: legMode (keine, stecken = legs to plug in, angeformt = moulded on, staender = a stand; legCount, legHeight, legDiameter, legShape kegel/zylinder/kantig, legSplay, legInset), saucerMode (keine, schale = a saucer, versteckt = hidden in the foot; saucerHeight, saucerGap, saucerWall, saucerRibs/saucerSpout/saucerGrip \"ja\" or \"nein\"), insertMode (keine, pflanze, bewaesserung, stecker, roehrchen; insertWall, insertStandoff, reservoirHeight, frogHole, tubeDiameter) for a hollow vase, lidMode (keiner, stuelp, schnapp, schraube, kanne = a teapot lid: the top lidHeight mm of a hollow vase is the lid, its pattern and twist running on, a lip into the opening, lidKnob \"ja\" a knob apart; lidClearance, lidThickness, lidDepth, threadPitch, lidGrip) and fitClearance; vaseParts lays them out as objects. For printing: material (pla, petg, abs, asa, tpu) and lineWidth (the slicer's line in vase mode, mm), which the editor's Print card weighs. Settings not given stay as they were (when creating: the vase tool's defaults). The height is the object's height and the widest diameter its larger side; the other side follows the outline. layerling_read_scene reports the settings that differ from the defaults as JSON text, which is accepted here as well.",
   },
   text: { type: "string", description: "Text only: the lettering itself." },
@@ -1531,13 +1549,18 @@ export const tools = [
         },
         locked: { type: "boolean", description: "true locks it (it stays put and lets clicks through), false unlocks it." },
         trace: {
-          type: ["object", "boolean"],
           description: "Trace the picture into a sketch body standing on it (#1060), as Trace on the sketch's reference image does: true, or { part, threshold, height }. Only a reference image lying flat (on the plate or a level face).",
-          properties: {
-            part: { type: "string", enum: ["dark", "light"], description: "Which part of the picture becomes the body (default dark)." },
-            threshold: { type: "number", minimum: 0.05, maximum: 0.95, description: "Where dark turns light, 0.05 to 0.95 (default 0.5)." },
-            height: { type: "number", minimum: 0.2, maximum: 500, description: "How high the body is in mm (default 2)." },
-          },
+          anyOf: [
+            {
+              type: "object",
+              properties: {
+                part: { type: "string", enum: ["dark", "light"], description: "Which part of the picture becomes the body (default dark)." },
+                threshold: { type: "number", minimum: 0.05, maximum: 0.95, description: "Where dark turns light, 0.05 to 0.95 (default 0.5)." },
+                height: { type: "number", minimum: 0.2, maximum: 500, description: "How high the body is in mm (default 2)." },
+              },
+            },
+            { type: "boolean" },
+          ],
         },
       },
     },

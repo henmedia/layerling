@@ -18,6 +18,10 @@ Met de muis:
 
 Hoe snel het muiswiel zoomt, stel je in bij de instellingen onder {{ui:workspace.appearance}} met {{ui:workspace.zoomSpeed}}: een schuifregelaar van 1 tot 14, eerst 5; boven 10 wordt alleen het wiel sneller.
 
+**Muisknoppen zoals in je slicer.** Ben je Bambu Studio of OrcaSlicer gewend, zet dan {{ui:workspace.mouseScheme}} in de instellingen, onder {{ui:workspace.appearance}}, op {{ui:workspace.mouseSchemeSlicer}}. Links slepen in een lege ruimte draait dan de weergave, de rechterknop verschuift hem zoals de middelste, en Shift met links slepen tekent het selectiekader. Slepen aan een lichaam verplaatst het nog steeds, en een korte rechtsklik opent nog steeds het menu. In een schets verschuift de rechterknop de weergave ook.
+
+**3D-muis.** Een SpaceMouse of een andere 3D-muis draait, verschuift en zoomt de 3D-weergave: duw de kap van je af om in te zoomen, schuif hem om de weergave te verschuiven, kantel hem om de weergave te kantelen en draai hem om de weergave rond te draaien. Klik in de instellingen, onder {{ui:workspace.appearance}}, op {{ui:workspace.spaceMouseConnect}} en kies het apparaat in het venster dat de browser opent; die onthoudt de keuze, dus dit hoeft maar één keer. Het werkt in Chrome en Edge, die zulke apparaten kunnen bereiken; Firefox en Safari niet.
+
 Op een tablet of telefoon zoomen twee vingers (spreiden en knijpen) en verschuiven ze de weergave (samen schuiven). Eén vinger werkt op het ontwerp, net als de linkermuisknop. Om met één vinger te draaien, zet je {{ui:camera.touchRotate}} aan in de weergavebalk. Die schakelaar verschijnt alleen op apparaten met een touchscreen.
 
 Een tekentablet met pen gedraagt zich als een muis: de punt is de linkerknop, de knop op de pen de rechter, voor het draaien van de weergave en voor het menu. De sneltoetsen van het tablet kun je in de driver instellen op de [sneltoetsen](chapter:sneltoetsen) van layerling.
@@ -67,6 +71,8 @@ Je kunt in elk ontwerp ook vier eigen weergaven bewaren. [[Shift]]+[[7]], [[Shif
 - {{ui:camera.sectionMeasure}} meet direct op de snede: de omtrek wordt blauw, en twee klikken erop geven de afstand, plus de delen daarvan langs de twee assen van het vlak. Beide punten klikken vast aan de omtrek, hoeken eerst. Komt de tweede klik ergens op de tegenoverliggende wand terecht, dan klikt hij haaks op het eerste punt vast - zo lees je wanddikte, spleten en speling af zonder precies te hoeven mikken. Een derde klik begint de volgende meting, [[Esc]] stopt met meten. Het vlak verschuiven wist de meting. Op een ronde omtrek, zoals de doorsnede door een cilinder of een gat, markeert een klein kruisje het middelpunt, en ook het middelpunt klikt vast. Klik een punt op de cirkel aan en ga dan in de buurt van het punt aan de overkant: de tweede klik landt precies recht tegenover, dwars door het middelpunt, en het getal krijgt een Ø, de diameter. Van het middelpunt naar een punt op de cirkel lees je R, de straal.
 - {{ui:camera.sectionExportSvg}} slaat de omtrekken op het snijvlak op als SVG op schaal 1:1, voor een laser, een plotter, een mal of een pakking. Een X-snede wordt van rechts gezien, een Y-snede van voren, een Z-snede van boven. Net als bij de export gaan alleen zichtbare lichamen mee, zijn gaten al afgetrokken, en worden lichamen met dezelfde kleur samengevoegd tot één omtrek. Elke kleur blijft een eigen pad zonder vulling, zodat lasersoftware ze als lagen uit elkaar houdt.
 
+Het kruisje en [[Esc]] sluiten het gereedschapsvenster; loopt er een meting, dan beëindigt [[Esc]] eerst die. De doorsnede blijft tot je hem uitzet met {{ui:camera.sectionActive}}, op zijn knop in de balk klikt terwijl het venster open is, of teruggaat naar het ontwerpoverzicht. Zolang hij aan staat, blijft zijn knop gemarkeerd. Wat je neerzet aan de kant die weggesneden is, verschijnt pas als je de doorsnede uitzet. Een tablet heeft geen [[Esc]], dus daar heeft het gereedschapsvenster twee knoppen meer: {{ui:camera.sectionBack}} beëindigt de meting als er een loopt en sluit anders het gereedschapsvenster, en {{ui:camera.sectionConfirm}} sluit het gereedschapsvenster in één stap. Een computer toont ze niet.
+
 Het gereedschapsvenster hangt aan zijn knop. Zit het iets in de weg, sleep het dan aan de titelbalk naar een willekeurige plek op het werkvlak; de volgende keer opent het daar ook. Dubbelklik op de titelbalk of zet het neer bij de knop om het terug te zetten.
 
 [[Esc]] sluit het venster; de snede blijft tot je hem uitzet of teruggaat naar het ontwerpoverzicht. Zolang hij aan staat, blijft de knop gemarkeerd. Wat je neerzet aan de kant die weggesneden is, verschijnt pas als je de snede uitzet.
@@ -93,29 +99,107 @@ Om recht op het werkvlak te kijken, druk je op [[P]] of klik je in de weergaveba
 
 Het raster toont de grootte van de plaat. Rechtsonder staat de **snapstap**: verplaatsen en schalen klikken vast in stappen van die grootte, bijvoorbeeld 1 mm. Maak hem kleiner voor fijn werk en groter voor grof schikken. {{ui:editor.tool.snapToGrid}} in het lint verplaatst de geselecteerde vormen achteraf naar het dichtstbijzijnde rasterkruispunt. Tijdens het verplaatsen klikken vormen ook vast aan andere vormen, zie [Selecteren en schikken](chapter:selecteren-en-schikken). Zonder muis: [[Alt]]+[[1]] tot [[Alt]]+[[0]] kiezen het item met dat nummer in het menu ([[Alt]]+[[1]] zet vastklikken uit), en [[,]] en [[.]] maken de stap een maat fijner of grover. Dat werkt ook in een schets.
 
-Onder {{ui:workspace.measurement}} in de instellingen stel je de {{ui:workspace.units}} in. Met {{ui:units.imperial}} toont layerling elke maat in inches: op de vorm, in het eigenschappenpaneel, op het meetlint en op de liniaal. Het uitlijnraster biedt dan stappen van 1/64 tot 1 inch, en het raster op de plaat wordt in inches getekend (1/8 tot 1 inch, standaard 1/4 inch) met een dikkere lijn bij elke hele inch. Onder {{ui:workspace.inchFormat}} kies je of inches als breuk verschijnen zoals in Tinkercad (1 5/8, afgerond op 1/64 inch) of als decimaal getal (1,625), met zoveel decimalen als ingesteld onder {{ui:workspace.accuracy}}. Je kunt beide typen, "1 5/8" inbegrepen. Sneller wisselen tussen millimeters en inches kan met de kleine schakelaar **mm | in** naast het {{ui:inspector.snapGrid}} onderaan het eigenschappenvenster: hij verandert de eenheid, het raster van de plaat en de vangstap zoals de instellingen, voor dit ontwerp.
+> **Tip:** Stop met draaien als je onderdelen precies op elkaar laat aansluiten. Ga met de cijfertoetsen naar het rechte aanzicht van boven of voren en druk op [[O]] voor de platte weergave. Dan zie je meteen of twee randen echt gelijk liggen.
 
-Onder {{ui:workspace.customSnapGrids}} op dezelfde plek voeg je eigen snapstappen toe: een naam en een grootte in millimeters, bijvoorbeeld "Pinafstand 2,54 mm" voor de steek van DIP-chips, pinheaders en gaatjesprint, of "MX Key Unit" met 19,05 mm voor de afstand tussen toetsenbordtoetsen. Het snapstapmenu biedt die maat dan heel, gehalveerd en in vieren (1 ×, ½ × en ¼ ×), zodat je vormen een hele, halve of kwart steek kunt verplaatsen. Wil je alleen de maat zelf, haal dan het vinkje bij {{ui:workspace.customSnapGridParts}} ernaast weg; het menu heeft dan alleen die ene stap. Eigen stappen worden bij het ontwerp bewaard en gaan mee met {{ui:workspace.makeDefault}}.
+### Het instellingenvenster
 
-Grootte, rasterbreedte en kleur van de plaat wijzig je in de instellingen (het tandwiel in het lint): de onderdelen zijn {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} en {{ui:workspace.history}}. Onder {{ui:workspace.appearance}} vind je schakelaars zoals {{ui:workspace.startInPerspective}} en {{ui:workspace.showShadows}}, onder {{ui:workspace.workplane}} {{ui:workspace.showGrid}}. De kleuren van het werkgebied stel je ook onder {{ui:workspace.appearance}} in: {{ui:workspace.backgroundColor}} en {{ui:workspace.surfaceColor}} voor het lichte thema (de donkere thema's houden hun eigen kleuren), naast de rasterkleur onder {{ui:workspace.workplane}}. Daar kies je ook of de donkerdere rasterlijn elke 5 of elke 10 rasterstappen komt ({{ui:workspace.gridMajorEvery}}) en geef je hem een eigen kleur met {{ui:workspace.gridMajorColor}}; het middenkruis en de plaatrand nemen die ook over. Elke lijn van het raster wordt breder naarmate je inzoomt, zoals in Tinkercad, en blijft zichtbaar als je uitzoomt; vind je dat te veel, zet dan {{ui:workspace.gridLinesGrow}} uit en de lijnen blijven bij elke zoom één pixel breed, zoals in de schets. In het kleurveld neemt [[Enter]] een getypte hexwaarde over. {{ui:workspace.edgeLines}} tekent een omtrek om elk lichaam, in de kleur van {{ui:workspace.edgeColor}} (in het begin zwart, zoals in Tinkercad): dat helpt als donkere kleuren in elkaar overlopen. Het staat standaard uit, en zeer grote geïmporteerde meshes worden overgeslagen. Het raster loopt altijd door de oorsprong, zodat de dikkere lijnen op de assen liggen, wat de plaat ook meet. Is het raster verdwenen, bijvoorbeeld omdat een kleur op die van het werkvlak is gezet, dan brengt {{ui:workspace.resetGrid}} onderaan het gebied {{ui:workspace.workplane}} zichtbaarheid, kleuren, afstand en lijndikte terug naar de standaard, hier en in de standaard die met {{ui:workspace.makeDefault}} is bewaard.
+Het tandwiel in de titelregel ({{ui:editor.workspaceSettings}}) opent de instellingen. Links staan vijf onderdelen: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} en {{ui:workspace.history}}. Een wijziging telt meteen. {{ui:workspace.makeDefault}} onderaan bewaart de huidige instellingen als standaard, zodat een nieuw ontwerp ermee begint. Een bestand dat je opent, brengt zijn eigen instellingen mee; {{ui:workspace.useMyDefault}} ernaast zet je bewaarde kleuren, raster en de rest op het geopende ontwerp en houdt daarbij zijn eenheden. Heeft je standaard een printer, dan komt die printer mee met zijn plaatgrootte; zonder printer houdt het ontwerp zijn plaat en printer. {{ui:workspace.close}} rechtsboven sluit het venster. Dit deel loopt de instellingen een voor een door.
 
-{{ui:workspace.strongHoles}} tekent gaten in een donkerder grijs, minder doorzichtig en met een donkere lijn eromheen. Dat helpt als een gat tussen doorzichtige lichamen moeilijk te vinden is. Anders dan de randlijnen blijft het in de snelle modus aan.
+### Weergave: thema, werkbalk en kubus
 
-{{ui:workspace.showAxes}} (standaard aan) tekent drie pijlen in de linkerachterhoek van de plaat: **X** in rood naar rechts, **Y** in groen naar achteren en **Z** in blauw omhoog, zoals de positievelden tellen. Dat is de rechterhandregel die ook Tinkercad, CAD-programma's en de slicers gebruiken. Met het werkvlak op een vlak volgen ze dat. Zet ze hier uit als ze je in de weg zitten.
-
-Twee schuifregelaars onder {{ui:workspace.appearance}} bepalen hoe de lichamen belicht worden. {{ui:workspace.shadowStrength}} bepaalt hoe donker de slagschaduwen zijn, en {{ui:workspace.shadeContrast}} verschuift licht van het gelijkmatige omgevingslicht naar het hoofdlicht: richting "krachtig" worden de schaduwzijden donkerder en vallen de schaduwen meer op, richting "zacht" wordt alles vlakker. Aan de bovenkant wordt het contrast heel sterk, zodat schaduwzijden en schaduwen echt donker worden. {{ui:workspace.shadowSoftness}} maakt de randen van de schaduwen zacht in plaats van scherp. {{ui:workspace.lightAzimuth}} draait het hoofdlicht rond de plaat (0° van voren, 90° van rechts), en {{ui:workspace.lightElevation}} tilt het op; bij 90° staat het recht boven de plaat zoals in Tinkercad, en vallen de schaduwen recht onder de lichamen. {{ui:workspace.lightReset}} zet alles terug. {{ui:workspace.classicLook}} richt het werkgebied in zoals Tinkercad het toont: witte ondergrond, een lichtblauw millimeterraster met een donkerdere lijn elke centimeter, zwarte randlijnen, licht van boven met zachte schaduwen. Elke waarde kun je daarna nog los aanpassen. Ze beginnen allemaal zoals layerling er altijd uitzag, en wat bij je past hangt af van je beeldscherm. De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor het venster rond het vel, {{ui:workspace.sketchPlateColor}} voor het vel onder het raster, en {{ui:workspace.sketchGridColor}}, allemaal voor het lichte thema. {{ui:workspace.sketchMatch}} neemt in één klik de drie kleuren van het werkgebied over.
-
-![De instellingen onder Weergave: achtergrond- en werkvlakkleuren voor het lichte thema, en de schakelaar voor randlijnen op alle lichamen.](shot:settings-appearance)
-
-![Drie donkere lichamen met randlijnen aan: de omtrekken houden ze uit elkaar.](shot:edge-lines)
-
-![De editor in het donkere kleurenschema. Het kleurenschema stel je rechtsboven in: Systeem, Licht, Donker of Grafiet.](shot:editor-dark)
+{{ui:workspace.theme}} bepaalt het kleurenschema van het hele programma: {{ui:workspace.themeSystem}} volgt je computer, de andere zijn {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} en {{ui:workspace.themeGraphite}}. Je kunt het ook rechtsboven in de editor wisselen.
 
 {{ui:workspace.toolbarSize}} onder {{ui:workspace.appearance}} maakt de knoppen van het lint bovenaan, het vormenmenu daarvan, de weergavebalk links en het eigenschappenpaneel rechts kleiner of groter: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (zoals het altijd was) of {{ui:workspace.toolbarSizeLarge}}. Klein laat op een laptop meer ruimte voor het werkvlak; groot is makkelijker te raken op een groot scherm of met een vinger. Met grote knoppen gaan de groepen van het lint naar een tweede rij als het venster er te smal voor is. De grootte wordt in deze browser bewaard en geldt voor elk ontwerp.
 
+{{ui:workspace.shapeColors}} zet de kleur waarmee een nieuwe vorm begint op de plaatjes van de vormenbibliotheek (de kleur van zijn soort, of die je met {{ui:inspector.saveDefaults}} bewaarde). Zet het uit als je liever grijze plaatjes hebt; je browser onthoudt de keuze.
+
 {{ui:workspace.viewCubePosition}} onder {{ui:workspace.appearance}} zet de richtingskubus in een andere hoek van het werkvlak: {{ui:workspace.viewCubePositionTopLeft}} (zoals het altijd was), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} of {{ui:workspace.viewCubePositionBottomRight}}. In elke hoek behalve linksboven schuift de weergavebalk omhoog naar de plek die de kubus vrijliet. Rechtsonder staat de kubus net boven de {{ui:inspector.snapGrid}}-knop. Zolang rechts de eigenschappen van een vorm open zijn, wijkt een kubus aan de rechterkant links ervan uit. De hoek wordt in deze browser bewaard en geldt voor elk ontwerp. In een smal venster, zoals op een telefoon, is de instelling verborgen en blijft de kubus linksboven.
 
-> **Tip:** Stop met draaien als je onderdelen precies op elkaar laat aansluiten. Ga met de cijfertoetsen naar het rechte aanzicht van boven of voren en druk op [[O]] voor de platte weergave. Dan zie je meteen of twee randen echt gelijk liggen.
+### Weergave: snelle modus
+
+{{ui:workspace.fastMode}} is voor tragere computers. Het zet schaduwen, randlijnen op alle lichamen en de naloop van de camera uit en tekent de weergave alleen op schermresolutie. Je eigen instellingen blijven bewaard voor later, en de schakelaars die het overneemt, zeggen {{ui:workspace.offInFastMode}} zolang het aan staat. Wat verder helpt op een trage computer, staat hieronder bij "Als layerling traag aanvoelt".
+
+### Weergave: kleuren van het werkgebied en de schets
+
+De kleuren van het werkgebied stel je in onder {{ui:workspace.appearance}}: {{ui:workspace.backgroundColor}} en {{ui:workspace.surfaceColor}} voor het lichte thema (de donkere thema's houden hun eigen), naast de rasterkleur onder {{ui:workspace.workplane}}. Elke kleur is een knop die de kleur toont. Een klik opent een klein venster met het kleurvlak, een rij kant-en-klare kleuren, een veld voor de hexwaarde en een pijl die de kleur terugzet naar waarmee layerling begon. [[Enter]] neemt een getypte hexwaarde over, net als een klik buiten het venster.
+
+De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor het venster rond het blad, {{ui:workspace.sketchPlateColor}} voor het blad onder het raster en {{ui:workspace.sketchGridColor}}, allemaal voor het lichte thema. {{ui:workspace.sketchMatch}} neemt de drie kleuren van het werkgebied in één klik over.
+
+{{ui:workspace.classicLook}} richt het werkgebied in zoals Tinkercad het toont: witte ondergrond, een lichtblauw millimeterraster met elke centimeter een donkerdere lijn, zwarte randlijnen, licht van boven met zachte schaduwen. Elke waarde kun je daarna nog los wijzigen. Ze beginnen allemaal zoals layerling er altijd uitzag, en wat bij je past, hangt af van je monitor.
+
+![De instellingen onder Weergave: achtergrond- en werkvlakkleuren voor het lichte thema, en de schakelaar voor randlijnen op alle lichamen.](shot:settings-appearance)
+
+![De editor in het donkere kleurenschema. Het kleurenschema stel je rechtsboven in: Systeem, Licht, Donker of Grafiet.](shot:editor-dark)
+
+### Weergave: aspijlen en randlijnen
+
+{{ui:workspace.showAxes}} (standaard aan) tekent drie pijlen in de linkerachterhoek van de plaat: **X** in rood naar rechts, **Y** in groen naar achteren en **Z** in blauw omhoog, zoals de positievelden tellen. Dat is de rechterhandregel die ook Tinkercad, CAD-programma's en de slicers gebruiken. Met het werkvlak op een vlak volgen ze dat. Zet ze hier uit als ze je in de weg zitten.
+
+{{ui:workspace.edgeLines}} tekent een omtrek op elk lichaam, in de kleur van {{ui:workspace.edgeColor}} (eerst zwart, zoals in Tinkercad): dat helpt als donkere kleuren in elkaar overlopen. Het staat standaard uit, en zeer grote geïmporteerde meshes worden overgeslagen.
+
+![Drie donkere lichamen met randlijnen aan: de omtrekken houden ze uit elkaar.](shot:edge-lines)
+
+{{ui:workspace.strongHoles}} tekent gaten in een donkerder grijs, minder doorzichtig en met een donkere lijn eromheen. Dat helpt als een gat tussen doorzichtige lichamen moeilijk te vinden is. Anders dan de randlijnen blijft het in de snelle modus aan.
+
+### Weergave: licht en schaduwen
+
+{{ui:workspace.showShadows}} zet de slagschaduwen aan en uit. Twee schuifregelaars bepalen hoe de lichamen belicht worden. {{ui:workspace.shadowStrength}} bepaalt hoe donker de slagschaduwen zijn, en {{ui:workspace.shadeContrast}} verschuift licht van het gelijkmatige omgevingslicht naar het hoofdlicht: richting "krachtig" worden de schaduwkanten donkerder en tekenen de schaduwen zich sterker af, richting "zacht" wordt alles vlakker. Helemaal bovenaan wordt het contrast heel sterk, zodat schaduwkanten en schaduwen echt donker worden. {{ui:workspace.shadowSoftness}} maakt de randen van de schaduwen zacht in plaats van scherp. {{ui:workspace.lightAzimuth}} draait het hoofdlicht rond de plaat (0° van voren, 90° van rechts), en {{ui:workspace.lightElevation}} tilt het op; bij 90° staat het recht boven de plaat zoals in Tinkercad, en vallen de schaduwen recht onder de lichamen. {{ui:workspace.softLighting}} laat het meeste licht komen van waar je kijkt en draait mee met de weergave: geen vlak blijft donker, en een naar boven gericht vlak in een donkere kleur wordt niet meer wit overbelicht. Het hoofdlicht blijft een beetje voor de schaduwen, en de contrastregelaar werkt nog steeds. Zie je met laag ingesteld licht nog een heldere reflectie, zet {{ui:workspace.lightElevation}} dan op 90°: dan lijkt het op Tinkercad. {{ui:workspace.lightReset}} zet alles terug.
+
+### Weergave: maten op het werkvlak
+
+{{ui:workspace.showMoveDimensions}} toont hoeveel je verschuift tijdens het slepen, {{ui:workspace.showOriginDimensions}} de afstanden van de selectie tot de oorsprong van de plaat, ook met meerdere lichamen geselecteerd. Met {{ui:workspace.dimensionsAlwaysVisible}} blijven deze maten altijd zichtbaar, niet alleen tijdens het slepen. Zolang een gedraaid lichaam geselecteerd is, staan zijn hoeken eronder op het werkvlak; {{ui:workspace.showRotationAngles}} zet dat uit. Meer in [Meten en notities](chapter:meten-en-notities).
+
+### Weergave: selecteren en verplaatsen
+
+{{ui:workspace.selectBeforeMoving}}: een lichaam moet dan eerst geselecteerd zijn, en pas het volgende slepen verplaatst het. Dat helpt als kinderen of gehaaste handen lichamen aanraken, en op een touchscreen.
+
+{{ui:workspace.frameByDirection}}: een kader dat je naar rechts trekt, selecteert alleen wat er helemaal binnen ligt, een kader naar links alles wat het raakt (gestippeld getekend), zoals in SketchUp.
+
+{{ui:workspace.doubleClickOpensSketch}} bepaalt of een dubbelklik op een geëxtrudeerde schets de schets weer opent, zoals in Tinkercad, en {{ui:workspace.doubleClickOpensGroup}} of een dubbelklik op een groep of bundel die opent om te bewerken. {{ui:workspace.doubleClickCentersView}} bepaalt of een dubbelklik op het lege werkvlak de weergave naar die plek verschuift.
+
+{{ui:workspace.objectSnap}} laat de randen en het midden van een vorm vastklikken aan andere vormen terwijl je hem sleept; het rastermenu rechtsonder heeft dezelfde schakelaar. {{ui:workspace.cruise}} laat een nieuwe vorm aan de muisaanwijzer hangen en neerkomen op het vlak eronder, zoals Cruise in Tinkercad; uitgeschakeld verschijnt een nieuwe vorm in het midden van de plaat. Meer in [Selecteren en schikken](chapter:selecteren-en-schikken).
+
+### Weergave: het beeld
+
+{{ui:workspace.startInPerspective}}: de editor opent dan in het perspectiefaanzicht, niet in het vlakke.
+
+{{ui:workspace.startView}} bepaalt de hoek waarin een nieuw ontwerp opent en waarnaar {{ui:camera.home}} teruggaat. Draai en zoom de weergave zoals je hem graag hebt en klik dan op {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brengt het gewone aanzicht van rechtsvoor terug. Het geldt voor elk ontwerp in deze browser. Een ontwerp dat je opnieuw opent, opent nog steeds zoals je het achterliet.
+
+{{ui:workspace.zoomSpeed}} is een schuifregelaar van langzaam naar snel: hoe snel het wieltje en het trackpad zoomen; de zoomknoppen en -toetsen houden hun eigen kleine stappen. {{ui:workspace.cameraInertia}}: als je de muis loslaat, draait de weergave nog even door en remt zacht af. Uitgeschakeld stopt hij meteen, zoals in Tinkercad en Fusion 360.
+
+{{ui:workspace.overhangAngle}} is de hoek vanaf welke een vlak als overhang telt als je Overhangen tonen in het zichtbaarheidsmenu aanzet: die vlakken worden rood-wit gearceerd. 30° is voorzichtig, 70° rekent op goede koeling van de print; 45° is het gebruikelijke begin. Zolang ze getoond worden, zegt een regel onder de weergave wat de steilste overhang is en hoeveel cm² steun nodig heeft.
+
+{{ui:workspace.booleanTriangleLimit}} beperkt hoeveel driehoeken een geïmporteerde mesh mag hebben als je hem snijdt, samenvoegt of doorsnijdt, omdat dat in je browser berekend wordt. Een mesh boven de grens wordt niet verwerkt; vereenvoudig de mesh eerst, of verhoog de grens als je computer het aankan. Een hogere grens kan de editor een paar seconden laten vastlopen.
+
+### Maten: eenheden, schaal en snapstappen
+
+Onder {{ui:workspace.measurement}} stel je de {{ui:workspace.units}} in, de eenheid waarin maten getoond worden ({{ui:workspace.scale}}: millimeter, centimeter of meter metrisch, inch of voet imperiaal), hoeveel decimalen een getal toont ({{ui:workspace.accuracy}}), de {{ui:workspace.snapGrid}} waarop verplaatsen en schalen vastklikken en je eigen snapstappen onder {{ui:workspace.customSnapGrids}}.
+
+Onder {{ui:workspace.measurement}} in de instellingen stel je de {{ui:workspace.units}} in. Met {{ui:units.imperial}} toont layerling elke maat in inches: op de vorm, in het eigenschappenpaneel, op het meetlint en op de liniaal. Het uitlijnraster biedt dan stappen van 1/64 tot 1 inch, en het raster op de plaat wordt in inches getekend (1/8 tot 1 inch, standaard 1/4 inch) met een dikkere lijn bij elke hele inch. Onder {{ui:workspace.inchFormat}} kies je of inches als breuk verschijnen zoals in Tinkercad (1 5/8, afgerond op 1/64 inch) of als decimaal getal (1,625), met zoveel decimalen als ingesteld onder {{ui:workspace.accuracy}}. Je kunt beide typen, "1 5/8" inbegrepen. Sneller wisselen tussen millimeters en inches kan met de kleine schakelaar **mm | in** naast het {{ui:inspector.snapGrid}} onderaan het eigenschappenvenster: hij verandert de eenheid, het raster van de plaat en de vangstap zoals de instellingen, voor dit ontwerp.
+
+Onder {{ui:workspace.customSnapGrids}} op dezelfde plek voeg je eigen snapstappen toe: een naam en een grootte in millimeters, bijvoorbeeld "Pinafstand 2,54 mm" voor de steek van DIP-chips, pinheaders en gaatjesprint, of "MX Key Unit" met 19,05 mm voor de afstand tussen toetsenbordtoetsen. Het snapstapmenu biedt die maat dan heel, gehalveerd en in vieren (1 ×, ½ × en ¼ ×), zodat je vormen een hele, halve of kwart steek kunt verplaatsen. Wil je alleen de maat zelf, haal dan het vinkje bij {{ui:workspace.customSnapGridParts}} ernaast weg; het menu heeft dan alleen die ene stap. Eigen stappen worden bij het ontwerp bewaard en gaan mee met {{ui:workspace.makeDefault}}. Wil je alleen de maat zelf, vink dan {{ui:workspace.customSnapGridParts}} ernaast uit; het menu heeft dan alleen die ene stap.
+
+### Werkvlak: plaat en printer
+
+{{ui:workspace.printer}} maakt het werkvlak zo groot als de bouwplaat van je printer en markeert lichamen die erbuiten steken, zie [Printen](chapter:printen). {{ui:workspace.showPlateLabels}} schrijft de naam van het ontwerp op de plaat, en de naam en het bouwvolume van de printer als er een printer gekozen is.
+
+{{ui:workspace.size}} geeft de plaat een eigen grootte, met {{ui:workspace.width}} en {{ui:workspace.length}} in millimeters of de eenheid die je koos. Het raster loopt altijd door de oorsprong, zodat de sterkere lijnen op de assen liggen, hoe groot de plaat ook is.
+
+### Werkvlak: raster
+
+{{ui:workspace.showGrid}} toont of verbergt het raster op de plaat. {{ui:workspace.gridBlockSize}} bepaalt de afstand tussen de lijnen, en {{ui:workspace.gridMajorEvery}} of de donkerdere lijn om de 5 of om de 10 rasterstappen komt; {{ui:workspace.gridMajorColor}} geeft die lijn een eigen kleur, en het middenkruis en de plaatrand nemen die ook over. {{ui:workspace.gridColor}} is de kleur van de gewone lijnen.
+
+Elke lijn van het raster wordt breder als je inzoomt, zoals in Tinkercad, en blijft zichtbaar als je uitzoomt. Is dat je te veel, zet dan {{ui:workspace.gridLinesGrow}} uit en de lijnen blijven bij elke zoom één pixel breed, zoals in de schets.
+
+Is het raster verdwenen, bijvoorbeeld omdat een kleur op die van de plaat gezet werd, dan brengt {{ui:workspace.resetGrid}} aan het eind van het onderdeel {{ui:workspace.workplane}} zijn zichtbaarheid, kleuren, afstand en lijndikte terug naar de standaard, hier en in de standaard die met {{ui:workspace.makeDefault}} bewaard is.
+
+### Standaardwaarden van vormen
+
+Onder {{ui:workspace.shapeDefaults}} kies je met {{ui:workspace.shape}} een vorm en stel je in hoe hij begint als je hem toevoegt: zijn breedte, lengte en hoogte. {{ui:workspace.useAppDefaults}} zet de vorm terug naar waarmee de app hem laat beginnen. Vormen met eigen instellingen tonen die onder {{ui:workspace.shapeDetails}}. De waarden gelden voor nieuwe vormen, niet voor die al op de plaat staan. {{ui:workspace.customLimit}} zet een eigen bovengrens voor hoe groot de grepen en de eigenschappen die vorm mogen maken; leeg gelaten blijven de gewone grenzen.
+
+### Bewaarde geschiedenis
+
+Onder {{ui:workspace.history}} bepaalt de schuifregelaar {{ui:workspace.savedHistory}} hoeveel afgeronde handelingen beschikbaar blijven voor Ongedaan maken nadat je een ontwerp opslaat of opnieuw opent. Standaard zijn dat 100 handelingen per ontwerp. Een lagere grens gooit de oudere ongedaan-maakstappen van het ontwerp definitief weg.
 
 ## Als layerling traag aanvoelt
 

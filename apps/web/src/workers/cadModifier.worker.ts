@@ -27,6 +27,7 @@ import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, 
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
 import { buildMessage } from "@/lib/buildStamp";
 import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 const HASH_UPPER_BOUND = 2_147_483_647;
 const CAD_EDGE_WIREFRAME_DEFLECTION = 0.035;
@@ -629,40 +630,55 @@ function faceCount(cad: OcctKernel, shape: ShapeHandle) {
 }
 
 function plainMeshSolid(cad: OcctKernel, part: CadModifierMeshPart) {
-  const imported = cad.importStl(meshPartToAsciiStl(part));
-  let shape = cad.fixShape(imported);
-  if (cad.isSolid(shape)) {
-    try {
-      shape = cad.healSolid(shape, 1e-4);
-      shape = cad.fixFaceOrientations(shape);
-      shape = cad.removeDegenerateEdges(shape);
-      shape = cad.unifySameDomain(shape);
-    } catch {
-      // Fall through to face sewing when the imported solid cannot be healed directly.
+  // Every handle made on the way is let go at the end, all but the one handed back: the imported mesh, its faces and
+  // the candidates of the tolerances that did not close took kernel memory until the next prepare.
+  const made: ShapeHandle[] = [];
+  const kept = (handle: ShapeHandle) => {
+    made.push(handle);
+    return handle;
+  };
+  let result: ShapeHandle | null = null;
+  try {
+    const imported = kept(cad.importStl(meshPartToAsciiStl(part)));
+    let shape = kept(cad.fixShape(imported));
+    if (cad.isSolid(shape)) {
+      try {
+        shape = kept(cad.healSolid(shape, 1e-4));
+        shape = kept(cad.fixFaceOrientations(shape));
+        shape = kept(cad.removeDegenerateEdges(shape));
+        shape = kept(cad.unifySameDomain(shape));
+      } catch (error) {
+        // A kernel out of memory is restarted, not tried on; anything else falls through to face sewing.
+        if (isFatalKernelFault(error)) throw error;
+      }
+      if (cad.isSolid(shape) && cadShapeIsValid(cad, shape)) return (result = shape);
     }
-    if (cad.isSolid(shape) && cadShapeIsValid(cad, shape)) return shape;
-  }
 
-  const faces = cad.getSubShapes(imported, "face");
-  if (faces.length === 0) throw new Error("The selected object has no closed faces");
-  for (const tolerance of [1e-5, 1e-4, 1e-3, 1e-2]) {
-    try {
-      let candidate = cad.sewAndSolidify(faces, tolerance);
-      candidate = cad.fixShape(candidate);
-      if (cad.isSolid(candidate)) candidate = cad.healSolid(candidate, tolerance);
-      candidate = cad.fixFaceOrientations(candidate);
-      candidate = cad.removeDegenerateEdges(candidate);
-      candidate = cad.unifySameDomain(candidate);
-      if (cad.isSolid(candidate) && cadShapeIsValid(cad, candidate)) return candidate;
-      // A mesh of several loose pieces (a group of holes, two bodies grouped side by side) sews to one
-      // shell per piece, which is no single solid; each piece becomes a solid and they are joined (#394).
-      const joined = joinedShellSolids(cad, candidate);
-      if (joined) return joined;
-    } catch {
-      // Try the next tolerance. Curved tessellations can need looser vertex sewing.
+    const faces = cad.getSubShapes(imported, "face");
+    made.push(...faces);
+    if (faces.length === 0) throw new Error("The selected object has no closed faces");
+    for (const tolerance of [1e-5, 1e-4, 1e-3, 1e-2]) {
+      try {
+        let candidate = kept(cad.sewAndSolidify(faces, tolerance));
+        candidate = kept(cad.fixShape(candidate));
+        if (cad.isSolid(candidate)) candidate = kept(cad.healSolid(candidate, tolerance));
+        candidate = kept(cad.fixFaceOrientations(candidate));
+        candidate = kept(cad.removeDegenerateEdges(candidate));
+        candidate = kept(cad.unifySameDomain(candidate));
+        if (cad.isSolid(candidate) && cadShapeIsValid(cad, candidate)) return (result = candidate);
+        // A mesh of several loose pieces (a group of holes, two bodies grouped side by side) sews to one
+        // shell per piece, which is no single solid; each piece becomes a solid and they are joined (#394).
+        const joined = joinedShellSolids(cad, candidate);
+        if (joined) return (result = joined);
+      } catch (error) {
+        if (isFatalKernelFault(error)) throw error;
+        // Try the next tolerance. Curved tessellations can need looser vertex sewing.
+      }
     }
+    throw new Error("The selected mesh is open or non-manifold. Repair it before adding edge treatments.");
+  } finally {
+    releaseHandles(cad, [...new Set(made)].filter((handle) => handle !== result));
   }
-  throw new Error("The selected mesh is open or non-manifold. Repair it before adding edge treatments.");
 }
 
 /**
@@ -765,7 +781,8 @@ function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
     try {
       const untouched = cad.unifySameDomain(cad.simplify(combined));
       result = cadShapeIsValid(cad, untouched) ? untouched : combined;
-    } catch {
+    } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       result = combined;
     }
   }
@@ -841,7 +858,8 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
         let area = 0;
         try {
           area = Math.abs(cad.getSurfaceArea(face));
-        } catch {
+        } catch (error) {
+          if (isKernelMemoryFault(error)) throw error;
           area = 0;
         }
         faceAreaByHash.set(hash, area);
@@ -858,7 +876,8 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
           const face = faceByHash.get(hash);
           try {
             type = face === undefined ? "unknown" : cad.surfaceType(face);
-          } catch {
+          } catch (error) {
+            if (isKernelMemoryFault(error)) throw error;
             type = "unknown";
           }
           surfaceTypeByHash.set(hash, type);
@@ -886,7 +905,8 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
       let curveType = "line";
       try {
         curveType = cad.curveType(handle);
-      } catch {
+      } catch (error) {
+        if (isKernelMemoryFault(error)) throw error;
         curveType = "unknown";
       }
       return { id, points, ...classification, curveType, surfaceTypes, faceAreas };

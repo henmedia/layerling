@@ -2,6 +2,7 @@ import { JoinType, type OcctKernel, type ShapeHandle } from "occt-wasm";
 import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { shellOpenSides } from "@/lib/shellLimits";
 import type { ShellEdges, ShellOpenings, ShellSide } from "@/types/layerling";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 // Hollowing ("shell") for the CAD modifier worker. It lives outside the worker
 // so the end-to-end tests can run it against the real OCCT kernel.
@@ -18,7 +19,8 @@ export function orientedFaceNormal(cad: OcctKernel, face: ShapeHandle, point: { 
 function shapeIsValid(cad: OcctKernel, shape: ShapeHandle) {
   try {
     return Boolean(cad.isValid(shape));
-  } catch {
+  } catch (error) {
+    if (isKernelMemoryFault(error)) throw error;
     return false;
   }
 }

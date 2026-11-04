@@ -26,7 +26,7 @@ import {
   cadModifierUserErrorMessage,
   VARIABLE_FILLET_ONE_EDGE_MESSAGE,
 } from "@/lib/cadModifierRuntime";
-import { setLanguage } from "@/lib/i18n";
+import { setLanguage, t } from "@/lib/i18n";
 
 describe("CAD modifier runtime state", () => {
   it("uses the build-managed OCCT runtime", () => {
@@ -227,6 +227,7 @@ describe("cadModifierUserErrorMessage", () => {
     expect(cadModifierUserErrorMessage("The edge preview timed out. Cancel the tool and try again.")).toContain("Vorschau-Berechnung");
     expect(cadModifierUserErrorMessage("Edge preparation timed out. This mesh needs more CAD processing than the interactive limit allows. Try a repaired or lower-detail STL.")).toContain("Vorbereitung der Kanten");
     expect(cadModifierUserErrorMessage("The group has no solid body to modify")).toContain("keinen festen Körper");
+    expect(cadModifierUserErrorMessage("Select at least one highlighted edge")).toBe(t("edge.selectAtLeastOne"));
     expect(cadModifierUserErrorMessage("The CAD worker could not start. Update to Firefox 121+, Chrome/Brave 114+, or Safari 17.2+, then try again.")).toContain("CAD-Rechenkern");
   });
 

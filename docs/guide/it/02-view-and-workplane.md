@@ -18,6 +18,10 @@ Con il mouse:
 
 La velocità dello zoom con la rotellina si imposta con {{ui:workspace.zoomSpeed}} nelle impostazioni, sotto {{ui:workspace.appearance}}: è un cursore da 1 a 14, impostato inizialmente su 5; sopra 10 aumenta la velocità solo della rotellina. Un singolo scatto della rotellina ingrandisce allo stesso modo in tutti i browser; con il trackpad lo zoom dipende da quanto fai scorrere le dita.
 
+**Pulsanti del mouse come nel tuo slicer.** Se sei abituato a Bambu Studio o OrcaSlicer, imposta {{ui:workspace.mouseScheme}} nelle impostazioni, sotto {{ui:workspace.appearance}}, su {{ui:workspace.mouseSchemeSlicer}}. Trascinando con il tasto sinistro su uno spazio vuoto la vista ruota, il tasto destro la sposta come quello centrale, e Maiusc con un trascinamento sinistro disegna il riquadro di selezione. Trascinando un corpo lo sposti ancora, e un breve clic destro apre ancora il menu. In uno schizzo anche il tasto destro sposta la vista.
+
+**Mouse 3D.** Uno SpaceMouse o un altro mouse 3D ruota, sposta e ingrandisce la vista 3D: spingi il cappuccio in avanti per avvicinarti, fallo scorrere per spostare la vista, inclinalo per inclinare la vista e giralo per ruotarla. Nelle impostazioni, sotto {{ui:workspace.appearance}}, fai clic su {{ui:workspace.spaceMouseConnect}} e scegli il dispositivo nella finestra che il browser apre; il browser ricorda la scelta, quindi basta farlo una volta. Funziona in Chrome ed Edge, che possono raggiungere questi dispositivi; Firefox e Safari no.
+
 Su tablet o telefono, due dita ingrandiscono (allontanandole) o rimpiccioliscono (avvicinandole) la vista e la spostano (facendole scorrere insieme). Un dito nello spazio vuoto ruota la vista e un tocco lì deseleziona tutto; su una forma o una maniglia agisce sul progetto, proprio come il tasto sinistro del mouse. Per ruotare la vista anche iniziando il gesto sopra una forma, attiva {{ui:camera.touchRotate}} nella barra della vista. Questo interruttore è disponibile sui dispositivi con schermo tattile.
 
 Una tavoletta grafica con penna funziona come un mouse: la punta corrisponde al tasto sinistro, il pulsante sul fusto della penna al tasto destro, utile per ruotare la vista e aprire il menu. Puoi configurare i tasti rapidi della tavoletta nel relativo driver per richiamare le [scorciatoie da tastiera](chapter:shortcuts) di layerling.
@@ -98,7 +102,7 @@ La griglia mostra le dimensioni della piastra. In basso a destra trovi il **pass
 
 ### La finestra delle impostazioni
 
-L’ingranaggio nella riga del titolo ({{ui:editor.workspaceSettings}}) apre le impostazioni. A sinistra trovi cinque sezioni: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} e {{ui:workspace.history}}. Ogni modifica viene applicata subito. {{ui:workspace.makeDefault}} in fondo salva le impostazioni correnti come predefinite, così i nuovi progetti iniziano con quelle; {{ui:workspace.close}} in alto a destra chiude la finestra. Di seguito sono descritte le opzioni una per una.
+L’ingranaggio nella riga del titolo ({{ui:editor.workspaceSettings}}) apre le impostazioni. A sinistra trovi cinque sezioni: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} e {{ui:workspace.history}}. Ogni modifica viene applicata subito. {{ui:workspace.makeDefault}} in fondo salva le impostazioni correnti come predefinite, così i nuovi progetti iniziano con quelle. Un file che apri porta con sé le sue impostazioni; {{ui:workspace.useMyDefault}} accanto applica al progetto aperto i colori, la griglia e il resto che hai salvato, mantenendo le sue unità. Se le tue impostazioni predefinite hanno una stampante, questa arriva con le dimensioni del suo piano; senza, il progetto mantiene piano e stampante. {{ui:workspace.close}} in alto a destra chiude la finestra. Di seguito sono descritte le opzioni una per una.
 
 ### Aspetto: tema, barra degli strumenti e cubo di visualizzazione
 
@@ -138,7 +142,7 @@ La vista dello schizzo ha colori propri: {{ui:workspace.sketchBackground}} per l
 
 ### Aspetto: luce e ombre
 
-{{ui:workspace.showShadows}} attiva o disattiva le ombre proiettate. Due cursori regolano l’illuminazione dei corpi. {{ui:workspace.shadowStrength}} determina quanto sono scure le ombre; {{ui:workspace.shadeContrast}} sposta l’equilibrio tra la luce ambientale uniforme e la luce principale: verso “deciso”, le facce in ombra diventano più scure e le ombre più evidenti; verso “morbido”, l’illuminazione è più uniforme. Al valore massimo il contrasto è molto forte e le facce in ombra, come le ombre, diventano davvero scure. {{ui:workspace.shadowSoftness}} rende morbidi i bordi delle ombre invece di lasciarli netti. {{ui:workspace.lightAzimuth}} ruota la luce principale intorno alla piastra (0° dal davanti, 90° da destra); {{ui:workspace.lightElevation}} ne modifica l’altezza: a 90° la luce si trova direttamente sopra la piastra, come in Tinkercad, e le ombre cadono sotto i corpi. {{ui:workspace.lightReset}} ripristina tutti i valori.
+{{ui:workspace.showShadows}} attiva o disattiva le ombre proiettate. Due cursori regolano l’illuminazione dei corpi. {{ui:workspace.shadowStrength}} determina quanto sono scure le ombre; {{ui:workspace.shadeContrast}} sposta l’equilibrio tra la luce ambientale uniforme e la luce principale: verso “deciso”, le facce in ombra diventano più scure e le ombre più evidenti; verso “morbido”, l’illuminazione è più uniforme. Al valore massimo il contrasto è molto forte e le facce in ombra, come le ombre, diventano davvero scure. {{ui:workspace.shadowSoftness}} rende morbidi i bordi delle ombre invece di lasciarli netti. {{ui:workspace.lightAzimuth}} ruota la luce principale intorno alla piastra (0° dal davanti, 90° da destra); {{ui:workspace.lightElevation}} ne modifica l’altezza: a 90° la luce si trova direttamente sopra la piastra, come in Tinkercad, e le ombre cadono sotto i corpi. {{ui:workspace.softLighting}} porta la maggior parte della luce da dove guardi, girando con la vista: nessuna faccia resta scura, e una faccia di colore scuro rivolta verso l'alto non viene più bruciata in bianco. La luce principale resta un po' per le ombre, e il cursore del contrasto funziona ancora. Se con la luce bassa si vede ancora un riflesso chiaro, alza {{ui:workspace.lightElevation}} a 90°: allora sembra Tinkercad. {{ui:workspace.lightReset}} ripristina tutti i valori.
 
 ### Aspetto: misure sul piano di lavoro
 
@@ -157,6 +161,8 @@ Con {{ui:workspace.frameByDirection}}, trascinando un riquadro verso destra sele
 ### Aspetto: vista
 
 Con {{ui:workspace.startInPerspective}} l’editor si apre nella vista prospettica invece che in quella piatta.
+
+{{ui:workspace.startView}} fissa l'angolo da cui si apre un nuovo progetto e a cui torna {{ui:camera.home}}. Ruota e ingrandisci la vista come ti piace, poi fai clic su {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} riporta la vista consueta da davanti a destra. Vale per ogni progetto in questo browser. Un progetto che riapri si apre comunque come lo hai lasciato.
 
 {{ui:workspace.zoomSpeed}} è un cursore da lento a veloce e regola la velocità dello zoom con rotellina e trackpad; i pulsanti e i tasti dello zoom mantengono i propri piccoli incrementi. Con {{ui:workspace.cameraInertia}}, dopo che rilasci il mouse la vista continua a ruotare per un momento e poi rallenta gradualmente. Se disattivi l’opzione, si ferma subito, come in Tinkercad e Fusion 360.
 

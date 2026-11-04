@@ -16,6 +16,8 @@ Op de startpagina verschijnt een hint met {{ui:installHint.install}} als je brow
 
 De hint op de startpagina kun je sluiten met {{ui:installHint.dismiss}}. Start je de geïnstalleerde app in Chrome of Edge een tweede keer, dan komt het geopende venster naar voren in plaats van dat er een nieuw opent.
 
+Op een computer meldt een in Chrome of Edge geïnstalleerd layerling zich ook aan als programma voor `.lyl`-bestanden: een dubbelklik op een ontwerp in de bestandsbeheerder opent het in layerling, en [[Ctrl]]+[[S]] slaat weer op in dat bestand. Op Android werkt dit niet, daar biedt de browser geen bestandskoppeling voor geïnstalleerde webapps; open een ontwerp met {{ui:dashboard.importGeometry}} op de startpagina.
+
 ## Updates
 
 Als er een nieuwere versie is, toont layerling dat op de startpagina. Via {{ui:dashboard.updateBannerLink}} lees je wat er veranderd is. Het versienummer staat rechtsonder. Na het herladen van de pagina heb je de nieuwe versie.

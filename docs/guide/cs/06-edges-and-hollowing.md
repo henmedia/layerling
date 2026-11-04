@@ -22,6 +22,8 @@ Okno nabízí:
 
 - {{ui:edge.allSharpEdges}} vybere všechny hrany, {{ui:edge.clear}} výběr vyprázdní.
 - **{{ui:edge.radius}}** určuje poloměr zaoblení. U zkosení zadáváte {{ui:edge.distance}} nebo {{ui:edge.angle}}.
+- {{ui:edge.variableRadius}} (jen zaoblení) nechá poloměr měnit se podél jedné hrany: malý na jednom konci, větší na druhém, rovnoměrně mezi nimi, jako tam, kde rovná stěna potkává šikmou. Klikněte na jednu hranu a nastavte {{ui:edge.radiusStart}} a {{ui:edge.radiusEnd}}. Který konec je začátek, vyplývá z toho, jak byla hrana postavena; vyjde-li větší poloměr na špatném konci, {{ui:edge.swapEnds}} ho obrátí. Funguje to vždy na jedné hraně, proto zaoblujte více hran jednu po druhé. {{ui:edge.editAction}} vrátí obě hodnoty.
+- {{ui:edge.concave}} (jen zaoblení) zaoblení obrátí: místo zakulacení hrany z ní vyřízne žlábek ve tvaru čtvrtkruhu, jako vyřezané rohy krabičky. Žlábek je válec zvoleného {{ui:edge.radius}} ležící podél hrany, takže funguje při jakémkoli úhlu mezi plochami, ale jen na rovných hranách a ne spolu s {{ui:edge.variableRadius}}. {{ui:edge.editAction}} ho vrátí.
 - {{ui:edge.sharpThreshold}} rozhoduje, které hrany se považují za ostré. Hodnota 25° zachytí zřetelné zlomy a vynechá téměř rovinné přechody.
 - {{ui:edge.topEdges}} vybere pouze hrany na horním obvodu tělesa. Hodí se pro vykrajovátko: vytvořte obrys náčrtem jako rozšířenou čáru a pak zkoste jeho horní hrany. {{ui:edge.angle}} určuje sklon zkosení; to nesmí zasahovat dále než do tloušťky stěny.
 - {{ui:edge.bottomEdges}} vybere pouze hrany úplně dole na tělese, protějšek tlačítka {{ui:edge.topEdges}}. Je to rychlý způsob, jak zaoblit nebo zkosit jen patu součásti.
@@ -123,6 +125,8 @@ Každou plochu tělesa lze posunout o stejnou vzdálenost ven nebo dovnitř. To 
 Zaškrtni {{ui:offset.sideways}}, když se má zvětšit nebo zmenšit jen obrys: boky se posunou o vzdálenost, každá rovná horní a spodní plocha zůstane ve své výšce. Cedule dostane okraj dokola, podstavec se rozšíří a těleso nebude vyšší. U stupňovitého tělesa si každý stupeň ponechá svou výšku. Text, který se odsazuje přes své obrysy, si pak také ponechá svou výšku.
 
 Bez zaškrtnutí se odsadí samotné těleso. Stane se pevným přesným tělesem, jako po zkosení: seznam nahoře v okně odsazení vezme zpět a {{ui:edge.editAction}} znovu otevře nástroj se starou vzdáleností. Odsadit lze jen přesná CAD tělesa - kvádry, válce a další tvary, jejich skupiny, importované díly STEP. Těleso, které je jen trojúhelníková síť, jako mnoho importů STL, často nejde. Vzdálenost příliš velká pro těleso, například zmenšení za nejtenčí stěnu, se odmítne.
+
+Text, jehož písmena jádro nedokáže odsadit jako těleso - v některých písmech A, B, M, N, W nebo 9 -, se místo toho odsadí přes své obrysy: dostane výplň {{ui:prop.textWider}} o danou vzdálenost (užší, když se zmenšuje) a o stejně tolik naroste nahoře i dole. Zůstane textem, který můžete dál upravovat. Funguje to pro text s plnými písmeny bez zaoblení; text, který už režim výplně má, se odmítne jako dosud.
 
 ## Mazání ploch
 
