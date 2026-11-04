@@ -1,6 +1,7 @@
 import { JoinType, type OcctKernel, type ShapeHandle } from "occt-wasm";
 import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import type { LidType } from "@/lib/lidTool";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 /*
  * The lid as an exact body (#1154). The mesh lid (lidTool.ts) is worked out first, with every check and the magnets'
@@ -57,7 +58,8 @@ function moved(cad: OcctKernel, wire: ShapeHandle, distance: number): ShapeHandl
       const face = cad.makeFace(cad.offsetWire2D(wire, sign * distance, JoinType.Arc));
       const area = cad.getSurfaceArea(face);
       if (area > 1e-9 && (distance > 0 ? area > base + 1e-9 : area < base - 1e-9)) return face;
-    } catch {
+    } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       // The other way round, or nothing.
     }
   }

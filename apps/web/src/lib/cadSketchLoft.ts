@@ -2,6 +2,7 @@ import { JoinType, type OcctKernel, type ShapeHandle } from "occt-wasm";
 import { cadSketchRegions, orderedCadSketchPaths, type OrderedCadSketchPath } from "@/lib/sketchCadProfile";
 import { pathWire } from "@/lib/sketchCadWire";
 import type { SketchProfile, SketchStroke } from "@/types/layerling";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 /**
  * A loft between two sketches: the outline of one sketch body at the bottom, the outline of another at the top,
@@ -74,7 +75,8 @@ function movedWire(cad: OcctKernel, wire: ShapeHandle, delta: number, join: numb
       const moved = cad.offsetWire2D(wire, sign * delta, join);
       const movedArea = cad.getSurfaceArea(cad.makeFace(moved));
       if (movedArea > 1e-9 && (delta > 0 ? movedArea > area : movedArea < area)) return moved;
-    } catch {
+    } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       // The other way, or the straight pieces.
     }
   }

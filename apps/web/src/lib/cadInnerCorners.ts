@@ -1,5 +1,6 @@
 import type { OcctKernel, ShapeHandle, Vec3 } from "occt-wasm";
 import { cadHasSolidBody } from "@/lib/cadSolidBody";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 /*
  * A fillet or chamfer along edges that meet at a sharp inner corner: the top of a cloud of fused discs, where two
@@ -61,7 +62,8 @@ export function edgesAlong(cad: OcctKernel, body: ShapeHandle, picked: ShapeHand
   const distanceToPicked = (point: Vec3) => Math.min(...picked.map((edge) => {
     try {
       return distance(cad.projectPointOnEdge(edge, point).point, point);
-    } catch {
+    } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       return Infinity;
     }
   }));

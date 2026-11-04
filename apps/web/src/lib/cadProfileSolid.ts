@@ -1,6 +1,7 @@
 import { loftEaseShare, LOFT_SMOOTH_SECTIONS } from "@/lib/loftEase";
 import { JoinType, type OcctKernel, type ShapeHandle } from "occt-wasm";
 import type { CadModifierProfileLoop, CadModifierProfilePart, CadModifierProfileSegment } from "@/lib/cadModifierTypes";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 /*
  * Exact solids for catalog shapes that are an outline pushed straight up
@@ -796,7 +797,8 @@ function offsetFaces(cad: OcctKernel, wire: ShapeHandle, delta: number, wider: b
         const face = validFace(cad, cad.makeFace(piece));
         return { face, area: cad.getSurfaceArea(face) };
       }).sort((a, b) => b.area - a.area);
-    } catch {
+    } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       continue;
     }
     if (!pieces.length) continue;
@@ -1001,7 +1003,8 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
   const isValid = (candidate: ShapeHandle) => {
     try {
       return Boolean(cad.isValid(candidate));
-    } catch {
+    } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       return false;
     }
   };

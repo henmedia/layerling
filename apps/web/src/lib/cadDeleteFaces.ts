@@ -3,6 +3,7 @@ import { cadTriangleFaces } from "@/lib/cadFacePick";
 import type { CadFaceInfo } from "@/lib/cadModifierTypes";
 import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { orientedFaceNormal } from "@/lib/cadShell";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 // Deleting faces of an exact body (#451) for the CAD modifier worker: the
 // faces around the deleted ones grow until they close the gap. It lives
@@ -29,7 +30,8 @@ function releaseAll(cad: OcctKernel, handles: ShapeHandle[]) {
 function shapeIsValid(cad: OcctKernel, shape: ShapeHandle) {
   try {
     return Boolean(cad.isValid(shape));
-  } catch {
+  } catch (error) {
+    if (isKernelMemoryFault(error)) throw error;
     return false;
   }
 }

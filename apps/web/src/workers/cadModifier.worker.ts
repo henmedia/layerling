@@ -27,6 +27,7 @@ import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, 
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
 import { buildMessage } from "@/lib/buildStamp";
 import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 const HASH_UPPER_BOUND = 2_147_483_647;
 const CAD_EDGE_WIREFRAME_DEFLECTION = 0.035;
@@ -780,7 +781,8 @@ function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
     try {
       const untouched = cad.unifySameDomain(cad.simplify(combined));
       result = cadShapeIsValid(cad, untouched) ? untouched : combined;
-    } catch {
+    } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       result = combined;
     }
   }
@@ -856,7 +858,8 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
         let area = 0;
         try {
           area = Math.abs(cad.getSurfaceArea(face));
-        } catch {
+        } catch (error) {
+          if (isKernelMemoryFault(error)) throw error;
           area = 0;
         }
         faceAreaByHash.set(hash, area);
@@ -873,7 +876,8 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
           const face = faceByHash.get(hash);
           try {
             type = face === undefined ? "unknown" : cad.surfaceType(face);
-          } catch {
+          } catch (error) {
+            if (isKernelMemoryFault(error)) throw error;
             type = "unknown";
           }
           surfaceTypeByHash.set(hash, type);
@@ -901,7 +905,8 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
       let curveType = "line";
       try {
         curveType = cad.curveType(handle);
-      } catch {
+      } catch (error) {
+        if (isKernelMemoryFault(error)) throw error;
         curveType = "unknown";
       }
       return { id, points, ...classification, curveType, surfaceTypes, faceAreas };

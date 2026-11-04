@@ -15,6 +15,7 @@ import {
 import { defaultTolerance, freeformShare, meshDiagonal, type MeshSegmentation, segmentMesh, summarizeSegmentation, type SegmentationSummary, weldMesh } from "@/lib/meshSurfaceSegments";
 import { angleRound, buildTopology, type ForcedCuts, type MeshTopology, type Piece, solveOnto } from "@/lib/meshSurfaceTopology";
 import { EXACT_MESH_FREEFORM_MESSAGE } from "@/lib/cadMeshExactMessages";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 export { EXACT_MESH_FAILED_MESSAGE, EXACT_MESH_FREEFORM_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
 
@@ -206,6 +207,7 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
       edgesOf.set(chain.id, made);
       debug?.(`chain ${chain.id} ${topo.pieces[chain.left].surface.kind}${chain.left}/${topo.pieces[chain.right].surface.kind}${chain.right}${chain.closed ? " closed" : ""}${chain.cut ? " cut" : ""}: ${made.map((e) => cad.curveType(e)).join(",")} pts ${topo.chainPoints.get(chain.id)!.length}`);
     } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       debug?.(`chain ${chain.id} (${topo.pieces[chain.left].surface.kind}/${topo.pieces[chain.right].surface.kind}): ${String(error)}`);
       edgeFailed.add(chain.id);
       const a = topo.pieces[chain.left], b = topo.pieces[chain.right];
@@ -235,7 +237,8 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
       if (piece.surface.kind === "plane") {
         try {
           face = cad.makeFace(outer.wire);
-        } catch {
+        } catch (error) {
+          if (isKernelMemoryFault(error)) throw error;
           // Spline or ellipse edges a hair off the plane: build on the plane itself.
           face = cad.makeFaceOnSurface(planeFace(cad, piece.surface, piece, seg), outer.wire);
         }
@@ -246,7 +249,8 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
         const sized = (f: ShapeHandle) => {
           try {
             return cad.getSurfaceArea(cad.fixShape(f));
-          } catch {
+          } catch (error) {
+            if (isKernelMemoryFault(error)) throw error;
             return NaN;
           }
         };
@@ -271,6 +275,7 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
       }
       faces.push(face);
     } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       debug?.(`piece ${piece.id} ${piece.surface.kind} (${loops.length} loops): ${String(error)}`);
       if (piece.surface.kind !== "plane" && !piece.facet) failedRegions.add(piece.region);
       else return { solid: null, failedRegions };
@@ -288,6 +293,7 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
       const free = edges.filter((_, i) => (counts.get(hashes[i]) ?? 0) < 2);
       debug(`sewn shell: ${cad.subShapeCount(shell, "face")} faces, ${edges.length} edges, map ${map.length}, free ${free.length}: ${free.slice(0, 6).map((e) => { const q = cad.curveParameters(e); const a = cad.curvePointAtParam(e, q.first), b = cad.curvePointAtParam(e, q.last); return `${cad.curveType(e)} ${a.x.toFixed(2)},${a.y.toFixed(2)},${a.z.toFixed(2)}->${b.x.toFixed(2)},${b.y.toFixed(2)},${b.z.toFixed(2)}`; }).join(" ; ")}`);
     } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       debug(`sew check failed: ${String(error)}`);
     }
   }
@@ -327,6 +333,7 @@ function buildSolid(cad: OcctKernel, seg: MeshSegmentation, topo: MeshTopology, 
       }
       return { solid, failedRegions };
     } catch (error) {
+      if (isKernelMemoryFault(error)) throw error;
       debug?.(`sew ${sewTolerance}: ${String(error)}`);
     }
   }
@@ -625,7 +632,8 @@ function facingOut(cad: OcctKernel, face: ShapeHandle, piece: Piece, seg: MeshSe
     const uv = cad.uvFromPoint(face, vec(middle));
     const n = cad.surfaceNormal(face, uv.u, uv.v);
     if (n.x * seg.normals[best][0] + n.y * seg.normals[best][1] + n.z * seg.normals[best][2] < 0) return cad.reverseShape(face);
-  } catch {
+  } catch (error) {
+    if (isKernelMemoryFault(error)) throw error;
     // keep it as built
   }
   return face;
