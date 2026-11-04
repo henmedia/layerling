@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "3MF/OBJ-Export: keine Teile mehr verloren",
+      "en": "3MF/OBJ export: no more parts lost"
+    },
+    "body": {
+      "de": "Bei Entwürfen mit mehreren Farben fehlten im 3MF- oder OBJ-Export manchmal kleine Teile, etwa Punkte oder Bretter eines Logos, die für winzige Reste gehalten wurden. Jetzt bleiben alle Teile mit etwas Volumen erhalten, und nur echte Splitter werden weggelassen.",
+      "en": "In designs with several colours, the 3MF or OBJ export sometimes left out small parts, such as the dots or planks of a logo, taking them for tiny leftovers. Now every part with some volume is kept and only real slivers are left out."
+    }
+  },
+  {
+    "title": {
       "de": "Haarfeine Flächen bei „Fläche löschen“",
       "en": "Hair-thin faces in Delete face"
     },
