@@ -16,6 +16,8 @@ Podporuje-li to prohlížeč, zobrazí se na úvodní stránce nabídka {{ui:ins
 
 Nabídku instalace zavřete pomocí {{ui:installHint.dismiss}}. Opětovné spuštění nainstalované aplikace v Chrome nebo Edge přenese dopředu její otevřené okno místo vytváření dalšího.
 
+Na počítači se nainstalovaný layerling v Chrome nebo Edge také zaregistruje jako program pro soubory `.lyl`: dvojklik na projekt ve správci souborů ho otevře v layerlingu a [[Ctrl]]+[[S]] ukládá zpět do tohoto souboru. Na Androidu to nefunguje, tam prohlížeč pro nainstalované webové aplikace přiřazení souborů nenabízí; projekt otevřete přes {{ui:dashboard.importGeometry}} na úvodní stránce.
+
 ## Aktualizace
 
 Novou verzi Layerling oznámí na úvodní stránce. Přes {{ui:dashboard.updateBannerLink}} si přečtete změny. Číslo verze je vpravo dole. Nová verze se načte obnovením stránky.

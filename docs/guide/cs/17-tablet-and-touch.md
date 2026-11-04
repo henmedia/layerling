@@ -24,6 +24,8 @@ layerling běží v prohlížeči tabletu i jako aplikace z domovské obrazovky.
 
 Bez klávesy Shift dělá {{ui:contextMenu.selectMultiple}} v nabídce dlouhého stisku to, co na počítači Shift+kliknutí. Dokud je zapnuto, hlásí to zpráva a každé klepnutí na těleso ho přidá do výběru nebo z něj vyjme. Klepnutí na prázdné místo, na klávesnici [[Esc]], ho ukončí a výběr nechá, jaký je. Prst na prázdném místě mezitím dál otáčí pohled. Potom působí {{ui:editor.tool.group}}, {{ui:editor.tool.align}} nebo přesun na všechna vybraná tělesa.
 
+Stejná nabídka má {{ui:contextMenu.carry}}, klávesu [[C]] pro dotykovou obrazovku. Výběr pak sleduje prst přes plochy jiných těles; klepnutí ho položí na plochu, na kterou klepnete, i na šikmou, a stačí první klepnutí. Položku nabídky najdete i hledáním „položit“ nebo „cruise“ (hledání příkazů, na klávesnici [[Ctrl]]+[[K]]).
+
 ## Otáčení a přibližování pohledu
 
 Jeden prst na prázdném místě otáčí pohled, dva prsty ho přibližují a posouvají. Prst, který začne na tělese, pracuje s tělesem, ne s pohledem. Pokud chcete, aby místo toho otáčel pohled, zapněte {{ui:camera.touchRotate}} v liště pohledu: jeden prst pak otáčí pohled místo výběru, ať začne kdekoli. Tento přepínač se zobrazuje jen na zařízení s dotykovou obrazovkou.
@@ -48,3 +50,5 @@ Pokud se tělesa posouvají, protože se jich dotknou děti nebo spěchající r
 ## Dílny s dětmi
 
 Prsty a styly s gumovým hrotem fungují stejně. Dvě nastavení práci třídy usnadní: {{ui:workspace.selectBeforeMoving}}, aby dotyk těleso omylem neposunul, a {{ui:camera.touchRotate}}, aby jeden prst vždy otáčel pohled. Tlačítko s otazníkem ve skupině Nápověda na pásu karet zapne {{ui:interactiveHelp.title}}: klepnutí na libovolné tlačítko, pole nebo úchyt ho pak vysvětlí a stejné tlačítko nebo [[Esc]] nápovědu ukončí.
+
+Pro celou třídu zapněte v nastavení {{ui:workspace.simpleMode}}. Pás nástrojů si pak ponechá jen nástroje, které dílna používá (kopírovat, vložit, duplikovat, smazat, zpět, sloučit, zrcadlit, zkosit, zaoblit, vytvořit dutinu, zarovnat, exportovat), knihovna tvarů krátký seznam, tlačítka jsou větší a úvodní stránka ukazuje projekty a nic jiného: žádné novinky, žádný uvítací text, žádná tlačítka nápovědy a žádné odkazy mimo layerling. Zapnutí je jedno klepnutí; vypnutí je stisk podržený dvě sekundy na tlačítku, které pak stojí na jeho místě. Odkaz končící na `?mode=simple` ho zapne pro zařízení, které ho otevře, `?mode=full` ho zase vypne. Kdo provozuje layerling na serveru, může v něm všechny spustit s `LAYERLING_SIMPLE_MODE=true`, nebo ho pro všechny pevně nastavit s `always`, takže program nemá přepínač, jak ho opustit; viz README.
