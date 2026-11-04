@@ -4908,6 +4908,19 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   max-height: calc(var(--shape-menu-height) - 46px);
 }
 
+/* Pinned, the 3D editor's Shapes panel lies in the workplane under the inspector (#1283), at the spot it hung
+   from its button (window pixels, divided by the zoom like every length of the panel). */
+.shape-menu-home {
+  display: contents;
+}
+
+.shape-menu-dropdown.shape-menu-under-inspector {
+  position: fixed;
+  z-index: 7;
+  top: calc(var(--shape-menu-home-top) / var(--toolbar-scale));
+  left: calc(var(--shape-menu-home-left) / var(--toolbar-scale));
+}
+
 /* Narrow: only the pictures stay, as in Tinkercad. The name is in each tile's tooltip. */
 .shape-menu-dropdown.shape-menu-icons-only .shape-menu-list {
   grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));

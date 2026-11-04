@@ -5,6 +5,7 @@ import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
 import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { useWheelField } from "@/lib/useWheelField";
 import { wheelNextValue } from "@/lib/wheelValueStep";
 import type { ComponentType, ReactNode, SVGProps } from "react";
@@ -194,6 +195,19 @@ export function missingForTool(tool: { id: string; enabled: boolean; needs?: Too
   if (historyViewActive && tool.id !== "history") return t("editor.needs.historyView");
   if (!tool.needs) return null;
   return facts.locked && onlyLockMissing(tool.needs, facts) ? t("editor.needs.locked") : needText(tool.needs);
+}
+
+/**
+ * Where the Shapes panel hangs below its button, in window pixels: the stylesheet puts it the tool row's height
+ * below the top of its section, and on a narrow window under the whole bar, 10 px from the left edge (#1283).
+ */
+function pinnedShapesPanelHome(section: HTMLElement) {
+  if (window.matchMedia("(max-width: 1240px)").matches) {
+    return { left: 10, top: section.closest(".secondary-toolbar")?.getBoundingClientRect().bottom ?? 0 };
+  }
+  const rect = section.getBoundingClientRect();
+  const tools = Number.parseFloat(getComputedStyle(section).getPropertyValue("--editor-toolbar-tools-height")) || rect.height;
+  return { left: rect.left, top: rect.top + tools };
 }
 
 export function SecondaryToolbar({
@@ -594,6 +608,49 @@ export function SecondaryToolbar({
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [visibilityMenuPosition, setVisibilityMenuPosition] = useState({ top: 0, left: 0 });
   const shapesMenuRef = useRef<HTMLDivElement>(null);
+  // A pinned Shapes panel stays open beside the work, so it lies under the inspector, not over it (#1283). The
+  // toolbar's layer is above the inspector's; the pinned panel moves out of it into the workplane, where the
+  // inspector is, and stands where it hung below its button.
+  const [pinnedShapesHome, setPinnedShapesHome] = useState<{ stage: HTMLElement; left: number; top: number } | null>(null);
+  const shapesUnderInspector = shapesOpen && geometryShapesPinned && toolbarMode !== "sketch";
+  useLayoutEffect(() => {
+    if (!shapesUnderInspector) {
+      setPinnedShapesHome(null);
+      return;
+    }
+    const measure = () => {
+      const section = shapesMenuRef.current;
+      const stage = section?.closest(".layerling-editor")?.querySelector<HTMLElement>(".workplane-stage") ?? null;
+      if (!section || !stage) {
+        setPinnedShapesHome(null);
+        return;
+      }
+      const home = pinnedShapesPanelHome(section);
+      setPinnedShapesHome((current) => current && current.stage === stage && current.left === home.left && current.top === home.top ? current : { stage, ...home });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    const toolbar = shapesMenuRef.current?.closest(".secondary-toolbar");
+    const observer = typeof ResizeObserver === "undefined" || !toolbar ? null : new ResizeObserver(measure);
+    if (toolbar) observer?.observe(toolbar);
+    return () => {
+      window.removeEventListener("resize", measure);
+      observer?.disconnect();
+    };
+  }, [shapesUnderInspector]);
+  /** The Shapes panel where it hangs from the toolbar, or, pinned, in the workplane at the same spot. */
+  const inPinnedShapesHome = (panel: ReactNode) => pinnedShapesHome
+    ? createPortal(
+        <div
+          className="shape-menu-home"
+          inert={historyViewActive}
+          style={{ "--shape-menu-home-left": `${pinnedShapesHome.left}px`, "--shape-menu-home-top": `${pinnedShapesHome.top}px` } as CSSProperties}
+        >
+          {panel}
+        </div>,
+        pinnedShapesHome.stage,
+      )
+    : panel;
   const visibilityMenuRef = useRef<HTMLDivElement>(null);
   const touchShapeStartRef = useRef<{ id: string; x: number; y: number } | null>(null);
   const suppressNextShapeClickRef = useRef(false);
@@ -1147,10 +1204,11 @@ export function SecondaryToolbar({
               <ToolbarShapeAddIcon />
             </button>
           </div>
-          {shapesOpen ? (
+          {shapesOpen ? inPinnedShapesHome(
             <ShapeMenuPanel
               title={t("shape.basicShapes")}
               helpSection="addShape"
+              className={pinnedShapesHome ? "shape-menu-under-inspector" : ""}
               pinned={shapesPinned}
               onTogglePinned={toggleShapesPinned}
               resizable
@@ -1168,7 +1226,7 @@ export function SecondaryToolbar({
                 />
               )}
               </div>
-            </ShapeMenuPanel>
+            </ShapeMenuPanel>,
           ) : null}
         </div>
       </div>
