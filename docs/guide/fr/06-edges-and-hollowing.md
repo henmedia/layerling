@@ -22,6 +22,8 @@ Dans la fenêtre d'outil vous trouvez :
 
 - {{ui:edge.allSharpEdges}} sélectionne chaque arête à la fois, {{ui:edge.clear}} vide la sélection.
 - **{{ui:edge.radius}}** pour le congé. Pour le chanfrein, vous définissez {{ui:edge.distance}} ou {{ui:edge.angle}}.
+- {{ui:edge.variableRadius}} (congé seulement) fait varier le rayon le long d'une arête : petit à un bout, plus grand à l'autre, régulièrement entre les deux, comme là où une paroi droite rencontre une paroi inclinée. Cliquez sur une seule arête, puis réglez {{ui:edge.radiusStart}} et {{ui:edge.radiusEnd}}. Le bout qui compte comme début découle de la façon dont l'arête a été construite ; si le plus grand rayon arrive au mauvais bout, {{ui:edge.swapEnds}} l'inverse. Cela fonctionne sur une arête à la fois, arrondissez donc plusieurs arêtes l'une après l'autre. {{ui:edge.editAction}} ramène les deux valeurs.
+- {{ui:edge.concave}} (congé seulement) retourne le congé : au lieu d'arrondir l'arête, il y creuse une gorge en quart de cercle, comme les coins entaillés d'une boîte. La gorge est un cylindre du {{ui:edge.radius}} choisi couché le long de l'arête, elle fonctionne donc pour n'importe quel angle entre les faces, mais seulement sur des arêtes droites, et pas avec {{ui:edge.variableRadius}}. {{ui:edge.editAction}} la ramène.
 - {{ui:edge.sharpThreshold}} décide quels bords sont considérés comme nets. Une valeur de 25° traite uniquement les plis nets comme des bords et laisse les transitions plates seules.
 - {{ui:edge.topEdges}} sélectionne uniquement les bords tout en haut du corps. C'est la méthode rapide pour un emporte-pièce : tracez le contour d'une esquisse sous forme d'un trait, puis chanfreinez les bords supérieurs. {{ui:edge.angle}} définit la pente du chanfrein ; il ne peut pas aller plus loin que l'épaisseur du mur.
 - {{ui:edge.bottomEdges}} ne sélectionne que les bords tout en bas du corps, le pendant de {{ui:edge.topEdges}}. C'est le moyen rapide d'arrondir ou de chanfreiner seulement le pied d'une pièce.
@@ -119,6 +121,8 @@ Chaque face d'un corps peut être déplacée de la même distance, vers l'extér
 3. Les {{ui:offset.edges}} décident des coins extérieurs : arrondi garde la surface décalée ronde, vif laisse les faces se prolonger jusqu'à ce qu'elles se rencontrent.
 4. Coche {{ui:offset.copy}} pour garder la pièce telle quelle et obtenir le corps agrandi comme copie qui est déjà un trou. Groupe ce trou avec la pièce complémentaire, il coupe exactement le jeu choisi.
 5. Clique sur {{ui:offset.apply}}.
+
+Un texte dont le noyau ne peut pas décaler les lettres comme corps - dans certaines polices un A, B, M, N, W ou 9 - est décalé à la place par ses contours : il reçoit le remplissage {{ui:prop.textWider}} de la distance (plus étroit quand il rétrécit) et grandit d'autant en haut et en bas. Il reste un texte que vous pouvez continuer à modifier. Cela fonctionne pour un texte aux lettres pleines et sans arrondi ; un texte qui a déjà un mode de remplissage est refusé comme avant.
 
 Coche {{ui:offset.sideways}} quand seul le contour doit grandir ou rétrécir : les côtés se déplacent de la distance, et chaque face plane du dessus et du dessous garde sa hauteur. Un panneau reçoit une bordure tout autour, un socle s'élargit, et le corps ne devient pas plus haut. Sur un corps en gradins, chaque marche garde sa propre hauteur. Un texte décalé par ses contours garde alors lui aussi sa hauteur.
 

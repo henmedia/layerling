@@ -24,6 +24,8 @@ layerling fonctionne dans le navigateur d'une tablette, et comme application dep
 
 Sans touche Maj, {{ui:contextMenu.selectMultiple}} dans le menu de l'appui long fait ce que fait Maj+clic sur un ordinateur. Tant qu'il est actif, un message le dit, et chaque toucher sur un corps l'ajoute à la sélection ou le retire. Toucher l'espace vide, ou [[Esc]] sur un clavier, y met fin et laisse la sélection telle qu'elle est. Un doigt sur l'espace vide continue de tourner la vue entre-temps. Ensuite {{ui:editor.tool.group}}, {{ui:editor.tool.align}} ou un déplacement agissent sur tous les corps choisis.
 
+Le même menu a {{ui:contextMenu.carry}}, la touche [[C]] pour un écran tactile. La sélection suit alors le doigt sur les faces d'autres corps ; un toucher la pose sur la face touchée, même inclinée, et le premier toucher suffit. L'entrée de menu se trouve aussi en cherchant « poser » ou « cruise » (la recherche de commandes, [[Ctrl]]+[[K]] sur un clavier).
+
 ## Tourner et zoomer la vue
 
 Un doigt sur l'espace vide tourne la vue, deux doigts la zooment et la déplacent. Un doigt qui commence sur un corps travaille sur le corps, pas sur la vue. Si vous préférez qu'il tourne la vue, activez {{ui:camera.touchRotate}} dans la barre de vue : un doigt tourne alors la vue au lieu de sélectionner, où qu'il commence. Ce commutateur n'apparaît que sur un appareil à écran tactile.
@@ -48,3 +50,5 @@ Si des corps glissent parce que des enfants ou des mains pressées les touchent,
 ## Ateliers avec des enfants
 
 Les doigts et les stylets à pointe en caoutchouc fonctionnent ici de la même façon. Deux réglages facilitent une classe : {{ui:workspace.selectBeforeMoving}}, pour qu'un toucher ne déplace pas un corps par erreur, et {{ui:camera.touchRotate}}, pour qu'un doigt tourne toujours la vue. Le bouton point d'interrogation du groupe Aide du ruban active l'{{ui:interactiveHelp.title}} : un toucher sur n'importe quel bouton, champ ou poignée l'explique alors, et le même bouton, ou [[Esc]], la quitte.
+
+Pour toute une classe, activez {{ui:workspace.simpleMode}} dans les réglages. Le ruban ne garde alors que les outils dont se sert un atelier (copier, coller, dupliquer, supprimer, annuler, grouper, symétrie, chanfrein, congé, évider, aligner, exporter), la bibliothèque de formes une courte liste, les boutons sont plus grands, et la page d'accueil montre les conceptions et rien d'autre : pas de nouveautés, pas de texte de bienvenue, pas de boutons d'aide ni de liens hors de layerling. L'activer est un toucher ; le désactiver est un appui maintenu deux secondes sur le bouton qui prend alors sa place. Un lien finissant par `?mode=simple` l'active pour l'appareil qui l'ouvre, `?mode=full` le désactive de nouveau. Qui fait tourner layerling sur un serveur peut y faire démarrer tout le monde avec `LAYERLING_SIMPLE_MODE=true`, ou l'imposer à tous avec `always`, pour que le programme n'ait aucun commutateur pour en sortir ; voir le README.
