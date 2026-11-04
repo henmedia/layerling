@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { writeFileSync } from "node:fs";
 import Module from "manifold-3d";
 import { hingeKnuckleRadius, lidForSolid, normalizeLidOptions } from "@/lib/lidTool";
 
@@ -95,7 +94,6 @@ describe("a flush hinge, in the back wall (real Manifold kernel)", () => {
       const onPin = [closed.intersect(filament), whole.intersect(filament)];
       created.push(...onPin);
       onPin.forEach((part) => expect(part.volume()).toBeLessThan(0.001));
-      writeFileSync(`${process.env.LW_WIDEST ?? "/dev/null"}`, `flush ${widest}\n`, { flag: "a" });
     } finally {
       dispose(created);
     }
@@ -145,7 +143,6 @@ describe("a pivot lid, on two pins through the side walls (real Manifold kernel)
       }
       const widest = widestOpening(closed, whole, axisY, axisZ, created);
       expect(widest).toBeGreaterThanOrEqual(90);
-      writeFileSync(`${process.env.LW_WIDEST ?? "/dev/null"}`, `pivot ${widest}\n`, { flag: "a" });
     } finally {
       dispose(created);
     }
