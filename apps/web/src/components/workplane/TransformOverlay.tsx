@@ -42,6 +42,7 @@ export {
   type TransformHandleKind,
   type TransformOverlayState,
 } from "@/components/workplane/transformOverlayTypes";
+import { sizeDimensionAxis } from "@/lib/dimensionAxisColors";
 import { selectWholeValue } from "@/lib/numberField";
 import { useTouchSecondTap } from "@/lib/touchSecondTap";
 import { visibleWorkArea, type VisibleWorkArea } from "@/lib/visibleWorkArea";
@@ -223,6 +224,7 @@ export function TransformOverlay({
         <button
           key={`${mark.key}-label`}
           className={armed === mark.key ? "dimension-label armed" : "dimension-label"}
+          data-axis={sizeDimensionAxis(mark.axis)}
           type="button"
           style={overlayPoint(keepVisible, mark.labelX, mark.labelY)}
           disabled={locked || sizeLocked}
@@ -235,6 +237,7 @@ export function TransformOverlay({
       {editingDimension ? (
         <input
           className="dimension-input"
+          data-axis={sizeDimensionAxis(editingDimension.axis)}
           style={overlayPoint(keepVisible, editingDimension.x, editingDimension.y)}
           value={editingDimension.value}
           autoFocus
@@ -262,6 +265,7 @@ export function TransformOverlay({
           key={entry.key}
           className="dimension-input"
           data-corner-input="true"
+          data-axis={sizeDimensionAxis(entry.axis)}
           style={overlayPoint(keepVisible, entry.x, entry.y)}
           value={entry.value}
           autoFocus={index === 0}

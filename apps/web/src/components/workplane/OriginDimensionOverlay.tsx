@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import type { OriginDimensionOverlayData } from "@/lib/originDimensionLines";
+import { sceneDimensionAxis } from "@/lib/dimensionAxisColors";
 import { t } from "@/lib/i18n";
 
 /** Rein ablesbare Anzeige - das Eintippen ist bewusst ein spaeterer Schritt, siehe layerling-lineal.md. */
@@ -17,6 +18,7 @@ export function OriginDimensionOverlay({ overlay }: { overlay: OriginDimensionOv
         <span
           key={line.axis}
           className="dimension-label origin-dimension-value"
+          data-axis={sceneDimensionAxis(line.axis)}
           style={styleForLine(line)}
         >
           {line.label}

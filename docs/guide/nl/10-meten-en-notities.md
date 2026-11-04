@@ -61,6 +61,7 @@ In de instellingen onder {{ui:workspace.appearance}} staan twee schakelaars voor
 - {{ui:workspace.showOriginDimensions}} toont de afstanden van de selectie tot de oorsprong van de plaat, ook bij meerdere geselecteerde lichamen.
 
 Met {{ui:workspace.dimensionsAlwaysVisible}} blijven de maten altijd zichtbaar. Staat een lichaam niet op het werkvlak, dan staat ook zijn hoogte erboven erbij; klik op het getal om een nieuwe waarde te typen.
+Met {{ui:workspace.dimensionAxisColors}} krijgt elk vakje de kleur van zijn as, net als de grepen: rood voor X, groen voor Y en blauw voor Z. Zo zie je ook bij een klein onderdeel in één oogopslag welk getal welk is.
 
 Zitten ze even in de weg, druk dan op [[Q]]: de maten en afstanden rond de selectie verdwijnen, zodat een deel dat je verschuift goed te zien is. Nog eens [[Q]] haalt ze terug. Een greep waar je naar wijst, toont zijn maat toch.
 

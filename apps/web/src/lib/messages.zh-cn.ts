@@ -3996,6 +3996,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "显示移动尺寸",
   "workspace.showOriginDimensions": "显示到原点的距离",
   "workspace.dimensionsAlwaysVisible": "尺寸始终可见",
+  "workspace.dimensionAxisColors": "尺寸框使用坐标轴颜色",
+  "workspace.dimensionAxisColorsHint": "选区旁的每个数值框使用其坐标轴的颜色：X 红色、Y 绿色、Z 蓝色。",
   "workspace.showRotationAngles": "显示旋转后实体的角度",
   "workspace.startInPerspective": "编辑器以透视视图启动",
   "workspace.startView": "起始视图",

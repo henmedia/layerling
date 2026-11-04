@@ -3885,6 +3885,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "Vis flyttemål",
   "workspace.showOriginDimensions": "Vis afstande til nulpunktet",
   "workspace.dimensionsAlwaysVisible": "Mål altid synlige",
+  "workspace.dimensionAxisColors": "Målfelter i aksefarver",
+  "workspace.dimensionAxisColorsHint": "Hvert værdifelt ved markeringen får farven på sin akse: X rød, Y grøn, Z blå.",
   "workspace.showRotationAngles": "Vis vinkler på vendte former",
   "workspace.startInPerspective": "Start editoren i perspektivvisning",
   "workspace.startView": "Startvisning",

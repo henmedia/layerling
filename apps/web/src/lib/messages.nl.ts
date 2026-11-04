@@ -4007,6 +4007,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.showMoveDimensions": "Verplaatsingsmaten tonen",
   "workspace.showOriginDimensions": "Afstanden tot de oorsprong tonen",
   "workspace.dimensionsAlwaysVisible": "Maten altijd zichtbaar",
+  "workspace.dimensionAxisColors": "Maatvakjes in askleuren",
+  "workspace.dimensionAxisColorsHint": "Elk waardevakje naast de selectie krijgt de kleur van zijn as: X rood, Y groen, Z blauw.",
   "workspace.showRotationAngles": "Hoeken van gedraaide lichamen tonen",
   "workspace.startInPerspective": "Editor starten in perspectiefweergave",
   "workspace.startView": "Startweergave",

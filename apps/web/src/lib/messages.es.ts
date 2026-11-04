@@ -4009,6 +4009,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "Mostrar medidas al mover",
   "workspace.showOriginDimensions": "Mostrar distancias al origen",
   "workspace.dimensionsAlwaysVisible": "Medidas siempre visibles",
+  "workspace.dimensionAxisColors": "Casillas de medidas con los colores de los ejes",
+  "workspace.dimensionAxisColorsHint": "Cada casilla de valor junto a la selección toma el color de su eje: X rojo, Y verde, Z azul.",
   "workspace.showRotationAngles": "Mostrar los ángulos de los cuerpos girados",
   "workspace.startInPerspective": "Abrir el editor en vista en perspectiva",
   "workspace.startView": "Vista de arranque",

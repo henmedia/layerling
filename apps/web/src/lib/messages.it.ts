@@ -3992,6 +3992,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "Mostra le dimensioni durante lo spostamento",
   "workspace.showOriginDimensions": "Mostra le distanze dall'origine",
   "workspace.dimensionsAlwaysVisible": "Dimensioni sempre visibili",
+  "workspace.dimensionAxisColors": "Caselle delle quote nei colori degli assi",
+  "workspace.dimensionAxisColorsHint": "Ogni casella di valore accanto alla selezione prende il colore del suo asse: X rosso, Y verde, Z blu.",
   "workspace.showRotationAngles": "Mostra gli angoli di rotazione dei corpi",
   "workspace.startInPerspective": "Avvia l'editor in vista prospettica",
   "workspace.startView": "Vista di avvio",

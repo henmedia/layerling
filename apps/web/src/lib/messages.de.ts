@@ -4006,6 +4006,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.showMoveDimensions": "Maße beim Verschieben zeigen",
   "workspace.showOriginDimensions": "Abstände zum Nullpunkt zeigen",
   "workspace.dimensionsAlwaysVisible": "Maße immer sichtbar",
+  "workspace.dimensionAxisColors": "Maßkästchen in Achsenfarben",
+  "workspace.dimensionAxisColorsHint": "Jedes Maßkästchen neben der Auswahl bekommt die Farbe seiner Achse: X rot, Y grün, Z blau.",
   "workspace.showRotationAngles": "Drehwinkel gedrehter Körper anzeigen",
   "workspace.startInPerspective": "Editor in perspektivischer Ansicht starten",
   "workspace.startView": "Startansicht",

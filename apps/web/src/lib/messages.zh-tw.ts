@@ -3996,6 +3996,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "顯示移動尺寸",
   "workspace.showOriginDimensions": "顯示到原點的距離",
   "workspace.dimensionsAlwaysVisible": "尺寸一律顯示",
+  "workspace.dimensionAxisColors": "尺寸框使用座標軸顏色",
+  "workspace.dimensionAxisColorsHint": "選取範圍旁的每個數值框使用其座標軸的顏色：X 紅色、Y 綠色、Z 藍色。",
   "workspace.showRotationAngles": "顯示旋轉後實體的角度",
   "workspace.startInPerspective": "編輯器以透視視圖啟動",
   "workspace.startView": "起始視圖",

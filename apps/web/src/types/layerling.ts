@@ -487,6 +487,8 @@ export type WorkplaneWorkspaceSettings = {
   /** The browser asks "Leave site?" when a design is open and the tab is closed or reloaded; off by default (#683 mail). */
   confirmTabClose: boolean;
   dimensionsAlwaysVisible: boolean;
+  /** The value boxes beside a selection take the colour of their axis, red X, green Y, blue Z; off by default (#1279). */
+  dimensionAxisColors: boolean;
   /** A turned body shows its angles about X, Y and Z beside it while it is selected. */
   showRotationAngles: boolean;
   zoomSpeed: number;

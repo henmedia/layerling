@@ -4012,6 +4012,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "Pokazuj wymiary przesunięcia",
   "workspace.showOriginDimensions": "Pokazuj odległości od początku układu",
   "workspace.dimensionsAlwaysVisible": "Wymiary zawsze widoczne",
+  "workspace.dimensionAxisColors": "Pola wymiarów w kolorach osi",
+  "workspace.dimensionAxisColorsHint": "Każde pole z wartością przy zaznaczeniu ma kolor swojej osi: X czerwony, Y zielony, Z niebieski.",
   "workspace.showRotationAngles": "Pokazuj kąty obróconych brył",
   "workspace.startInPerspective": "Uruchamiaj edytor w widoku perspektywicznym",
   "workspace.startView": "Widok startowy",

@@ -3991,6 +3991,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "Afficher les dimensions du mouvement",
   "workspace.showOriginDimensions": "Afficher les distances d'origine",
   "workspace.dimensionsAlwaysVisible": "Dimensions toujours visibles",
+  "workspace.dimensionAxisColors": "Cases de cotes aux couleurs des axes",
+  "workspace.dimensionAxisColorsHint": "Chaque case de valeur près de la sélection prend la couleur de son axe : X rouge, Y vert, Z bleu.",
   "workspace.showRotationAngles": "Afficher les angles des corps tournés",
   "workspace.startInPerspective": "Démarrer l'éditeur en vue perspective",
   "workspace.startView": "Vue de départ",

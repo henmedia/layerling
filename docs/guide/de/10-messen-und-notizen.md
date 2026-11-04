@@ -63,6 +63,7 @@ In den Einstellungen unter {{ui:workspace.appearance}} gibt es zwei Schalter fü
 - {{ui:workspace.showOriginDimensions}} zeigt die Abstände der Auswahl zum Nullpunkt der Platte, auch bei mehreren markierten Körpern.
 
 Mit {{ui:workspace.dimensionsAlwaysVisible}} bleiben die Maße dauerhaft sichtbar. Steht ein Körper nicht auf der Arbeitsebene, steht auch seine Höhe darüber dabei; ein Klick auf die Zahl nimmt einen neuen Wert.
+Mit {{ui:workspace.dimensionAxisColors}} bekommt jedes Kästchen die Farbe seiner Achse, wie die Griffe: rot für X, grün für Y und blau für Z. So siehst du auch an einem kleinen Teil auf einen Blick, welche Zahl welche ist.
 
 Wenn sie kurz stören, drück [[Q]]: Die Maße und Abstände um die Auswahl verschwinden, und ein Teil, das du verschiebst, ist gut zu sehen. Noch einmal [[Q]] holt sie zurück. Ein Griff, auf den du zeigst, zeigt sein Maß trotzdem.
 

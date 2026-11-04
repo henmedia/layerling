@@ -3998,6 +3998,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "Показывать размеры перемещения",
   "workspace.showOriginDimensions": "Показывать расстояния до начала координат",
   "workspace.dimensionsAlwaysVisible": "Размеры видны всегда",
+  "workspace.dimensionAxisColors": "Поля размеров в цветах осей",
+  "workspace.dimensionAxisColorsHint": "Каждое поле значения рядом с выделением получает цвет своей оси: X красный, Y зелёный, Z синий.",
   "workspace.showRotationAngles": "Показывать углы повёрнутых тел",
   "workspace.startInPerspective": "Открывать редактор в перспективном виде",
   "workspace.startView": "Начальный вид",

@@ -3999,6 +3999,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.showMoveDimensions": "Zobrazit rozměry posunu",
   "workspace.showOriginDimensions": "Zobrazit vzdálenosti od počátku souřadnic",
   "workspace.dimensionsAlwaysVisible": "Rozměry vždy viditelné",
+  "workspace.dimensionAxisColors": "Políčka rozměrů v barvách os",
+  "workspace.dimensionAxisColorsHint": "Každé políčko s hodnotou u výběru dostane barvu své osy: X červeně, Y zeleně, Z modře.",
   "workspace.showRotationAngles": "Zobrazit úhly natočených těles",
   "workspace.startInPerspective": "Spouštět editor v perspektivním pohledu",
   "workspace.startView": "Úvodní pohled",

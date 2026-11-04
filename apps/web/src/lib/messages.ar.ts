@@ -4015,6 +4015,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.showMoveDimensions": "إظهار أبعاد الحركة",
   "workspace.showOriginDimensions": "إظهار المسافات عن نقطة الأصل",
   "workspace.dimensionsAlwaysVisible": "الأبعاد مرئية دائمًا",
+  "workspace.dimensionAxisColors": "مربعات الأبعاد بألوان المحاور",
+  "workspace.dimensionAxisColorsHint": "يأخذ كل مربع قيمة بجانب التحديد لون محوره: X أحمر، وY أخضر، وZ أزرق.",
   "workspace.showRotationAngles": "إظهار زوايا الأجسام المدارة",
   "workspace.startInPerspective": "بدء المحرر في عرض المنظور (Perspective)",
   "workspace.startView": "عرض البداية",

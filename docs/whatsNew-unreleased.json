@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Maßkästchen in Achsenfarben",
+      "en": "Dimension boxes in axis colours"
+    },
+    "body": {
+      "de": "In den Arbeitsbereich-Einstellungen gibt es einen neuen Schalter: Damit bekommt jedes Maßkästchen neben der Auswahl die Farbe seiner Achse, wie die Griffe, X rot, Y grün und Z blau. So siehst du auch an kleinen Teilen auf einen Blick, welche Zahl welche ist. Er ist anfangs aus.",
+      "en": "A new switch in the workspace settings gives each value box beside the selection the colour of its axis, as the handles have: red X, green Y and blue Z. So even on small parts you see at a glance which number is which. It is off to begin with."
+    }
+  }
+]

@@ -4007,6 +4007,8 @@ export const MESSAGES_EN = {
   "workspace.showMoveDimensions": "Show movement dimensions",
   "workspace.showOriginDimensions": "Show origin distances",
   "workspace.dimensionsAlwaysVisible": "Dimensions always visible",
+  "workspace.dimensionAxisColors": "Dimension boxes in axis colours",
+  "workspace.dimensionAxisColorsHint": "Each value box beside a selection takes the colour of its axis: red X, green Y, blue Z.",
   "workspace.showRotationAngles": "Show the angles of turned bodies",
   "workspace.startInPerspective": "Start editor in perspective view",
   "workspace.startView": "Start view",

@@ -61,6 +61,7 @@ Dans les paramètres sous {{ui:workspace.appearance}}, il y a deux commutateurs 
 - {{ui:workspace.showOriginDimensions}} montre les distances de la sélection à l'origine de la plaque, également avec plusieurs corps sélectionnés.
 
 Avec {{ui:workspace.dimensionsAlwaysVisible}} les cotes restent visibles en permanence. Un corps qui ne repose pas sur le plan de travail affiche aussi sa hauteur au-dessus ; cliquez sur le nombre pour en saisir une nouvelle.
+Avec {{ui:workspace.dimensionAxisColors}}, chaque case prend la couleur de son axe, comme les poignées : rouge pour X, vert pour Y et bleu pour Z. Ainsi, même sur une petite pièce, vous voyez d'un coup d'œil quel nombre est lequel.
 
 Pour vous en passer un instant, appuyez sur [[Q]] : les cotes et distances autour de la sélection disparaissent, et la pièce que vous déplacez se voit bien. Un nouvel appui sur [[Q]] les ramène. Une poignée que vous survolez affiche quand même sa cote.
 

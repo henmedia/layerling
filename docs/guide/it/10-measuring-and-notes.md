@@ -63,6 +63,7 @@ Nelle impostazioni, sotto {{ui:workspace.appearance}}, trovi due interruttori pe
 - {{ui:workspace.showOriginDimensions}} mostra la distanza della selezione dall’origine della piastra, anche quando sono selezionati più corpi.
 
 Con {{ui:workspace.dimensionsAlwaysVisible}} le misure restano sempre visibili. Un corpo che non poggia sul piano di lavoro mostra anche la sua altezza sopra di esso; fai clic sul numero per scriverne una nuova.
+Con {{ui:workspace.dimensionAxisColors}} ogni casella prende il colore del suo asse, come le maniglie: rosso per X, verde per Y e blu per Z. Così anche su un pezzo piccolo vedi a colpo d'occhio quale numero è quale.
 
 Se per un momento danno fastidio, premi [[Q]]: le misure e le distanze attorno alla selezione spariscono e il pezzo che sposti si vede bene. Di nuovo [[Q]] le riporta. Una maniglia su cui punti mostra comunque la sua misura.
 
