@@ -256,15 +256,38 @@ async function removeFolderTree(folder: string) {
   await fs.rmdir(folder);
 }
 
+/** A lock older than this is a leftover of a request that died (a crash, a server stopped mid-save), as store.php has it. */
+const STALE_LOCK_MS = 60_000;
+
 async function acquireLock(filePath: string) {
   const lockPath = `${filePath}.lock`;
+  const open = async () => ({ handle: await fs.open(lockPath, "wx"), lockPath });
   try {
-    return { handle: await fs.open(lockPath, "wx"), lockPath };
+    return await open();
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "EEXIST") {
-      throw new RequestFailure("This shared project is currently being changed by someone else", 409);
+    if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+  }
+  // Without this a project whose save was cut off stayed "being changed by someone else" for good.
+  const lockStat = await fs.stat(lockPath).catch(() => null);
+  if (lockStat && Date.now() - lockStat.mtimeMs > STALE_LOCK_MS) {
+    await fs.unlink(lockPath).catch(() => undefined);
+    try {
+      return await open();
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
     }
-    throw error;
+  }
+  throw new RequestFailure("This shared project is currently being changed by someone else", 409);
+}
+
+type HeldLock = Awaited<ReturnType<typeof acquireLock>>;
+
+/** Lets the locks go, the last taken first. */
+async function releaseLocks(...locks: Array<HeldLock | null>) {
+  for (const lock of locks.reverse()) {
+    if (!lock) continue;
+    await lock.handle.close().catch(() => undefined);
+    await fs.unlink(lock.lockPath).catch(() => undefined);
   }
 }
 
@@ -528,6 +551,7 @@ async function moveProject(root: string, folder: string, requestedTarget: string
 
   const filePath = path.join(folder, fileName);
   const sourceLock = await acquireLock(filePath);
+  let targetLock: HeldLock | null = null;
   try {
     const currentStat = await regularFileStat(filePath);
     if (!currentStat) throw new RequestFailure("Shared project was not found", 404);
@@ -541,6 +565,9 @@ async function moveProject(root: string, folder: string, requestedTarget: string
     }
 
     const targetPath = path.join(target, fileName);
+    // The target name is locked too, as store.php and copying do: a save under that name in the target folder
+    // could otherwise land between the question below and the rename, and be overwritten by it.
+    targetLock = await acquireLock(targetPath);
     if (await fs.stat(targetPath).then(() => true, () => false)) {
       throw new RequestFailure("A project of that name is already in that folder", 409);
     }
@@ -560,8 +587,7 @@ async function moveProject(root: string, folder: string, requestedTarget: string
       { headers: { "Cache-Control": "no-store", ETag: `"${record.revision}"` } },
     );
   } finally {
-    await sourceLock.handle.close().catch(() => undefined);
-    await fs.unlink(sourceLock.lockPath).catch(() => undefined);
+    await releaseLocks(sourceLock, targetLock);
   }
 }
 
@@ -582,6 +608,7 @@ async function renameProjectFile(root: string, folder: string, requestedName: st
   const filePath = path.join(folder, fileName);
   const newPath = path.join(folder, newFileName);
   const sourceLock = await acquireLock(filePath);
+  let newLock: HeldLock | null = null;
   try {
     const currentStat = await regularFileStat(filePath);
     if (!currentStat) throw new RequestFailure("Shared project was not found", 404);
@@ -593,6 +620,7 @@ async function renameProjectFile(root: string, folder: string, requestedName: st
     if (expectedRevision !== currentRevision) {
       throw new RequestFailure("The shared project changed after you loaded it. Refresh the shared projects list and try again.", 409, { currentRevision });
     }
+    newLock = await acquireLock(newPath);
     if (await fs.stat(newPath).then(() => true, () => false)) {
       throw new RequestFailure("A project of that name is already in this folder", 409);
     }
@@ -611,8 +639,7 @@ async function renameProjectFile(root: string, folder: string, requestedName: st
       { headers: { "Cache-Control": "no-store", ETag: `"${record.revision}"` } },
     );
   } finally {
-    await sourceLock.handle.close().catch(() => undefined);
-    await fs.unlink(sourceLock.lockPath).catch(() => undefined);
+    await releaseLocks(sourceLock, newLock);
   }
 }
 
@@ -637,7 +664,7 @@ async function copyProject(root: string, folder: string, requestedName: string, 
 
   const filePath = path.join(folder, fileName);
   const sourceLock = await acquireLock(filePath);
-  let copyLock: Awaited<ReturnType<typeof acquireLock>> | null = null;
+  let copyLock: HeldLock | null = null;
   try {
     const currentStat = await regularFileStat(filePath);
     if (!currentStat) throw new RequestFailure("Shared project was not found", 404);
@@ -675,11 +702,7 @@ async function copyProject(root: string, folder: string, requestedName: string, 
       { status: 201, headers: { "Cache-Control": "no-store", ETag: `"${record.revision}"` } },
     );
   } finally {
-    for (const lock of [sourceLock, copyLock]) {
-      if (!lock) continue;
-      await lock.handle.close().catch(() => undefined);
-      await fs.unlink(lock.lockPath).catch(() => undefined);
-    }
+    await releaseLocks(sourceLock, copyLock);
   }
 }
 
@@ -713,7 +736,43 @@ function exportFileName(requestedName: string) {
 }
 
 /**
- * An export file - STL, 3MF, OBJ, STEP, SVG, PNG or PDF - written into a folder of the store (#779), so a
+ * Whether an export file is what its name says and nothing a browser could run, the same check store.php makes
+ * (GHSA-wj5x-5r5v-89r3). Here the store lies outside the web root, so this keeps the two servers alike rather
+ * than closing a hole: an SVG may hold only plain drawing elements and no event handler, link, script URL or
+ * DOCTYPE; the binary formats start with their signature, STEP with its header; STL, OBJ and DXF may not start
+ * with a tag.
+ */
+function exportBytesAcceptable(extension: string, bytes: Uint8Array): boolean {
+  const startsWith = (signature: number[]) => signature.every((byte, index) => bytes[index] === byte);
+  // The bytes as they are (latin1), as PHP reads them; a BOM, blanks and NULs in front are skipped.
+  const head = Buffer.from(bytes.subarray(0, 4096)).toString("latin1").replace(/^[\xEF\xBB\xBF \t\r\n\0]+/, "");
+  switch (extension) {
+    case "png":
+      return startsWith([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    case "pdf":
+      return startsWith([0x25, 0x50, 0x44, 0x46, 0x2d]);
+    case "3mf":
+      return startsWith([0x50, 0x4b, 0x03, 0x04]);
+    case "step":
+    case "stp":
+      return head.startsWith("ISO-10303-21");
+    case "svg":
+      return svgIsPlainDrawing(Buffer.from(bytes).toString("latin1"));
+    default:
+      return head !== "" && head[0] !== "<";
+  }
+}
+
+/** An SVG made only of shapes, text and their descriptions, with nothing in it that runs or loads. */
+function svgIsPlainDrawing(svg: string) {
+  if (/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet|javascript\s*:|\son[a-z]+\s*=|href\s*=|url\s*\(/i.test(svg)) return false;
+  const allowed = new Set(["svg", "g", "path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "text", "tspan", "title", "desc", "metadata"]);
+  const tags = Array.from(svg.matchAll(/<\s*([A-Za-z_][\w:.\-]*)/g), (match) => match[1].toLowerCase());
+  return tags.every((tag) => allowed.has(tag)) && tags.includes("svg");
+}
+
+/**
+ * An export file - STL, 3MF, OBJ, STEP, SVG, DXF, PNG or PDF - written into a folder of the store (#779), so a
  * slicer that shares the folder can open it. It is no project: the list does not show it. A file of that
  * name is replaced only when the request says so (`overwrite=1`); otherwise the answer is 409 with `exists`.
  */
@@ -727,6 +786,10 @@ async function saveExportFile(root: string, folder: string, requestedName: strin
   const bytes = new Uint8Array(await request.arrayBuffer());
   if (bytes.byteLength === 0) throw new RequestFailure("The file was empty", 400);
   if (bytes.byteLength > LYL_LIMITS.archiveBytes) throw new RequestFailure("The file exceeds the shared storage size limit", 413);
+  const extension = path.extname(fileName).slice(1).toLowerCase();
+  if (!exportBytesAcceptable(extension, bytes)) {
+    throw new RequestFailure(`That is not a ${extension.toUpperCase()} file layerling would write`, 400);
+  }
 
   const filePath = path.join(folder, fileName);
   const temporaryPath = path.join(folder, `.${fileName}.${randomUUID()}.tmp`);
