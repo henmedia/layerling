@@ -253,7 +253,7 @@ Gør formen til et hul og gruppér den med delen. Lad dens øverste ende nå lid
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} og {{ui:prop.screwBossDiameter}} kan ændres i hånden; under diameteren står, hvor tyk væggen om hullet er, med en advarsel, hvis den er tyndere, end fastgørelsen vil have. Et hul så dybt som tappen går igennem. Hullets munding har en lille affasning, så indsatsen eller skruen finder vej. {{ui:prop.screwBossGussets}} sætter to til seks tynde ribber fra tappen ned til bunden; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} og {{ui:prop.screwBossGussetThickness}} bestemmer, hvor langt, hvor højt og hvor tykt.
 
-Stil tappen på bunden af en udhulet kasse og gruppér den med kassen; i låget tager en {{ui:shape.counterbore}} som hul over den skruehovedet. Printede huller bliver lidt mindre end tegnet: print først én tap som prøve og justér {{ui:prop.screwBossHole}} en eller to tiendedele.
+Stil tappen på bunden af en udhulet kasse og gruppér den med kassen; i låget tager en {{ui:shape.counterbore}} som hul over den skruehovedet. Sat som hul og grupperet med en massiv del skærer den kun sit hul – lommen til indsatsen eller skruen, med sin affasning – så en egen blok eller stolpe får et blindhul til en indsats; hullet åbner sig, hvor dens top er. Printede huller bliver lidt mindre end tegnet: print først én tap som prøve og justér {{ui:prop.screwBossHole}} en eller to tiendedele.
 
 ## Snaplås
 

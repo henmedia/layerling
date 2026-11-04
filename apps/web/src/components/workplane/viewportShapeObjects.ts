@@ -263,6 +263,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     curvedConeTop: shape.curvedConeTop,
     curvedConeBend: shape.curvedConeBend,
     screwBossFastener: shape.screwBossFastener,
+    // A boss grouped as a hole is drawn as its hole alone (see screwBossCavityMesh).
+    screwBossAsHole: shape.kind === "screwBoss" && shape.hole ? true : undefined,
     screwBossSize: shape.screwBossSize,
     screwBossHole: shape.screwBossHole,
     screwBossHoleDepth: shape.screwBossHoleDepth,
@@ -649,6 +651,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     curvedConeTop: shape.curvedConeTop,
     curvedConeBend: shape.curvedConeBend,
     screwBossFastener: shape.screwBossFastener,
+    // A boss grouped as a hole is drawn as its hole alone (see screwBossCavityMesh).
+    screwBossAsHole: shape.kind === "screwBoss" && shape.hole ? true : undefined,
     screwBossSize: shape.screwBossSize,
     screwBossHole: shape.screwBossHole,
     screwBossHoleDepth: shape.screwBossHoleDepth,

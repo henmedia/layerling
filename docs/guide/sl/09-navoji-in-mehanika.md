@@ -241,7 +241,7 @@ Obliko naredi za luknjo in jo združi v skupino z delom. Njeno zgornjo stran pus
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} in {{ui:prop.screwBossDiameter}} lahko spremeniš ročno; pod premerom piše, kako debela je stena okoli luknje, z opozorilom, če je tanjša, kot jo potrebuje pritrditev. Luknja, globoka kot steber, gre skozi. Ustje luknje ima majhen posnetek, da vložek ali vijak najde pot. {{ui:prop.screwBossGussets}} doda dve do šest tankih reber od stebra do dna; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} in {{ui:prop.screwBossGussetThickness}} določajo, kako daleč, kako visoka in kako debela so.
 
-Postavi steber na dno izdolbljene škatle in ga združi z njo; v pokrovu nad njim sprejme glavo vijaka {{ui:shape.counterbore}} kot luknja. Natisnjene luknje so nekoliko manjše, kot so narisane: najprej natisni en steber za preizkus in {{ui:prop.screwBossHole}} popravi za desetinko ali dve.
+Postavi steber na dno izdolbljene škatle in ga združi z njo; v pokrovu nad njim sprejme glavo vijaka {{ui:shape.counterbore}} kot luknja. Nastavljen kot luknja in združen s polnim delom izreže le svojo luknjo – ležišče za vložek ali vijak, s posnetim robom –, tako dobi lasten blok ali steber slepo luknjo za vložek; luknja se začne tam, kjer je njegov vrh. Natisnjene luknje so nekoliko manjše, kot so narisane: najprej natisni en steber za preizkus in {{ui:prop.screwBossHole}} popravi za desetinko ali dve.
 
 ## Zaskočna kljukica
 

@@ -243,7 +243,7 @@ The {{ui:shape.screwBoss}} is the post a lid or a board is screwed to in an encl
 
 {{ui:prop.screwBossHole}}, {{ui:prop.screwBossHoleDepth}} and {{ui:prop.screwBossDiameter}} can be changed by hand; below the diameter the panel says how thick the wall round the hole is, and warns when it is thinner than the fastener wants. A hole as deep as the post goes through. The hole's mouth has a small chamfer, so the insert or the screw finds its way in. {{ui:prop.screwBossGussets}} adds two to six thin ribs from the post down to the floor; {{ui:prop.screwBossReach}}, {{ui:prop.screwBossGussetHeight}} and {{ui:prop.screwBossGussetThickness}} set how far out, how high and how thick they are.
 
-Stand the boss on the floor of a hollowed box and group it with the box; in the lid, a {{ui:shape.counterbore}} as a hole over it takes the screw head. Printed holes come out a little smaller than drawn: print one boss first and adjust {{ui:prop.screwBossHole}} by a tenth or two.
+Stand the boss on the floor of a hollowed box and group it with the box; in the lid, a {{ui:shape.counterbore}} as a hole over it takes the screw head. Set as a hole and grouped with a solid part, the boss cuts only its hole – the pocket for the insert or the screw, with its chamfer – so a block or a post of your own gets a blind hole for an insert; the hole opens where the boss's top is. Printed holes come out a little smaller than drawn: print one boss first and adjust {{ui:prop.screwBossHole}} by a tenth or two.
 
 ## Snap-fit
 
