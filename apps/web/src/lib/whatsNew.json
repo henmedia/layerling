@@ -1,5 +1,90 @@
 [
   {
+    "version": "1.141.0",
+    "items": [
+      {
+        "title": {
+          "de": "Maße beim Verschieben auch mit den Pfeiltasten",
+          "en": "Movement dimensions with the arrow keys too"
+        },
+        "body": {
+          "de": "Ist „Maße beim Verschieben zeigen“ an, zeigen jetzt auch die Pfeiltasten, um wie viel du die Auswahl verschiebst, wie beim Ziehen mit der Maus. Die Tastendrücke zählen zusammen, bis du etwas anderes auswählst oder ziehst; Strg+↑ und Strg+↓ zeigen den Weg nach oben oder unten. Danach kannst du die Zahl anklicken und den genauen Weg eintippen.",
+          "en": "With \"Show movement dimensions\" on, the arrow keys now show by how much you move the selection too, as a drag with the mouse does. The presses add up until you select something else or drag; Ctrl+↑ and Ctrl+↓ show the way up or down. Then click the number to type the exact distance."
+        }
+      },
+      {
+        "title": {
+          "de": "Swallowtail-Verbinder, die passen",
+          "en": "Swallowtail keys that fit"
+        },
+        "body": {
+          "de": "Die Verbinder für Swallowtail-Bodenplatten gehen leichter hinein: Die Fuge ist offen, und der Absatz hält nur noch die geschlitzten Enden. Mit „Spiel der Verbinder“ unter „Swallowtail“ im Eigenschaften-Fenster machst du sie für deinen Drucker lockerer oder strammer; klicke danach noch einmal auf „Verbinder anlegen“.",
+          "en": "The keys for Swallowtail baseplates go in more easily: the seam is open, and the lip only holds their slotted ends. With \"Key clearance\" under \"Swallowtail\" in the Properties panel you make them looser or tighter for your printer; click \"Add keys\" again afterwards."
+        }
+      },
+      {
+        "title": {
+          "de": "Deckel mit Klicknoppen und Griff",
+          "en": "Lids with click bumps and a handle"
+        },
+        "body": {
+          "de": "Das Deckelwerkzeug kann den Deckel jetzt einrasten lassen: kleine Noppen am Deckelrand klicken in Mulden der Gehäusewand. Dazu gibt es unter „Griff“ eine Zugzunge oder eine Fingermulde. So hält ein Deckel ohne Magnete, und du bekommst ihn wieder auf.",
+          "en": "The Lid tool can now click the lid in: small bumps on the lid's rim snap into dimples in the box's wall. Under \"Handle\" there is also a pull tab or a finger notch. So a lid stays shut without magnets, and you can still get it off."
+        }
+      },
+      {
+        "title": {
+          "de": "Scharnier bündig in der Wand oder als Drehdeckel",
+          "en": "Hinge flush in the wall, or a pivot lid"
+        },
+        "body": {
+          "de": "Unter „Scharnier“ wählst du die Art: außen wie bisher, bündig in der Rückwand, damit die Box ihre Größe behält, oder ein Drehdeckel auf zwei Stiften. Das Spiel des Stifts stellst du jetzt selbst ein, falls er sich schwer einschieben lässt.",
+          "en": "Under \"Hinge\" you pick the type: outside as before, flush in the back wall so the box keeps its size, or a pivot lid on two pins. You set the pin's play yourself now, in case it is hard to push in."
+        }
+      },
+      {
+        "title": {
+          "de": "Schraubdom als Loch schneidet nur die Tasche",
+          "en": "A screw boss as a hole cuts only its pocket"
+        },
+        "body": {
+          "de": "Ein Schraubdom, der als Loch in einen Block gruppiert wird, schneidet jetzt nur noch die Tasche für den Gewindeeinsatz und nicht mehr den ganzen Pfosten.",
+          "en": "A screw boss grouped into a block as a hole now cuts only the pocket for the threaded insert, no longer the whole post."
+        }
+      },
+      {
+        "title": {
+          "de": "Vase: Ansicht bleibt beim Feinjustieren stehen",
+          "en": "Vase: the view stays put while you fine-tune"
+        },
+        "body": {
+          "de": "Im Zeichenfenster der Vase springt die Ansicht nicht mehr heraus, wenn du hineingezoomt einen Punkt oder Griff loslässt. Der Doppelklick auf die Linie fügt wieder einen Punkt ein.",
+          "en": "In the vase drawing window the view no longer jumps back out when you drop a point or a handle zoomed in. A double-click on the line adds a point again."
+        }
+      },
+      {
+        "title": {
+          "de": "Bildtextur „Einmal“ ohne Löcher auf runden Körpern",
+          "en": "Image texture \"Once\" without holes on round bodies"
+        },
+        "body": {
+          "de": "Ein einmal aufgesetztes Bild reißt keine Stücke aus Kugeln mehr und lässt sich auf abgerundeten Platten speichern. Sind Flächen gewählt, landet es auf ihnen.",
+          "en": "An image pressed on once no longer tears pieces out of spheres and can be saved on rounded plates. With faces picked, it lands on them."
+        }
+      },
+      {
+        "title": {
+          "de": "3D-Maus: Richtungen umdrehbar",
+          "en": "3D mouse: directions can be reversed"
+        },
+        "body": {
+          "de": "Seitlich schieben, hoch und runter schieben, Kippen und Drehen der SpaceMouse laufen jetzt andersherum als vorher. Unter „3D-Maus“ in den Einstellungen kannst du jede Richtung einzeln umdrehen.",
+          "en": "Shifting sideways, shifting up and down, tilting and twisting on the SpaceMouse now run the other way than before. Under \"3D mouse\" in the settings you can reverse each direction on its own."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.140.0",
     "items": [
       {
