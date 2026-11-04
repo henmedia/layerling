@@ -22,6 +22,8 @@ In het venster vind je:
 
 - {{ui:edge.allSharpEdges}} selecteert alle randen tegelijk, {{ui:edge.clear}} maakt de selectie leeg.
 - **{{ui:edge.radius}}** voor de afronding. Voor de afschuining stel je {{ui:edge.distance}} of {{ui:edge.angle}} in.
+- {{ui:edge.variableRadius}} (alleen afronding) laat de straal langs één rand veranderen: klein aan het ene eind, groter aan het andere, gelijkmatig ertussen, zoals waar een rechte wand een schuine ontmoet. Klik één rand aan en stel dan {{ui:edge.radiusStart}} en {{ui:edge.radiusEnd}} in. Welk eind als begin telt, volgt uit hoe de rand gebouwd is; komt de grotere straal aan het verkeerde eind uit, dan draait {{ui:edge.swapEnds}} het om. Het werkt op één rand tegelijk, rond dus meerdere randen na elkaar af. {{ui:edge.editAction}} brengt beide waarden terug.
+- {{ui:edge.concave}} (alleen afronding) keert de afronding om: in plaats van de rand af te ronden, snijdt hij er een holle kwartronde uit, zoals de ingekeepte hoeken van een doos. De holte is een cilinder met de gekozen {{ui:edge.radius}} die langs de rand ligt, dus het werkt bij elke hoek tussen de vlakken, maar alleen op rechte randen, en niet samen met {{ui:edge.variableRadius}}. {{ui:edge.editAction}} brengt hem terug.
 - {{ui:edge.sharpThreshold}} bepaalt welke randen überhaupt als scherp gelden. Een waarde van 25° behandelt alleen duidelijke knikken als rand en laat vloeiende overgangen met rust.
 - {{ui:edge.topEdges}} kiest alleen de randen langs de bovenkant van het lichaam. Dat is de snelle manier voor een koekjesvorm: bouw de omtrek in een schets als lijn, en schuin dan de bovenranden af. {{ui:edge.angle}} bepaalt hoe steil de afschuining is; die kan niet verder reiken dan de wand dik is.
 - {{ui:edge.bottomEdges}} kiest alleen de randen helemaal onderaan het lichaam, het tegenstuk van {{ui:edge.topEdges}}. Zo rond je snel alleen de voet van een onderdeel af of geef je die een afschuining.
@@ -123,6 +125,8 @@ Elk vlak van een lichaam kan over dezelfde afstand naar buiten of naar binnen wo
 Vink {{ui:offset.sideways}} aan als alleen de omtrek moet groeien of krimpen: de zijkanten schuiven de afstand op, terwijl elke vlakke boven- en onderkant op zijn hoogte blijft. Een bord krijgt rondom een rand, een sokkel wordt breder en het lichaam wordt niet hoger. Bij een getrapt lichaam houdt elke trede zijn eigen hoogte. Een tekst die via zijn omtrekken wordt verschoven, houdt dan ook zijn hoogte.
 
 Zonder vinkje wordt het lichaam zelf verschoven. Het wordt een vast exact lichaam, zoals na een afschuining: de lijst bovenin het venster neemt de offset terug en {{ui:edge.editAction}} opent het gereedschap opnieuw met de oude afstand. Alleen exacte CAD-lichamen kunnen worden verschoven - blokken, cilinders en de andere vormen, groepen daarvan, geïmporteerde STEP-onderdelen. Een lichaam dat alleen een driehoeksnet is, zoals veel STL-imports, lukt vaak niet. Een afstand die te groot is voor het lichaam, bijvoorbeeld verkleinen voorbij de dunste wand, wordt geweigerd.
+
+Een tekst waarvan de kern de letters niet als lichaam kan verschuiven - in sommige lettertypen een A, B, M, N, W of 9 - wordt in plaats daarvan via zijn omtrekken verschoven: hij krijgt de vulling {{ui:prop.textWider}} met de afstand (smaller als hij krimpt) en groeit evenveel aan de boven- en onderkant. Hij blijft een tekst die je verder kunt bewerken. Dit werkt voor een tekst met gevulde letters en zonder afronding; een tekst die al een vulmodus heeft, wordt zoals eerder geweigerd.
 
 ## Vlakken verwijderen
 
