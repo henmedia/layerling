@@ -193,6 +193,12 @@ function drawingBoard(api) {
     view = { x0: (bx0 + bx1) / 2 - w / 2, y0: (by0 + by1) / 2 - h / 2, w }
     render()
   }
+  // Whether the whole shape lies inside the view: only a view that shows all of it follows the shape as it grows.
+  function shapeInView() {
+    if (!view) return false
+    const [bx0, by0, bx1, by1] = api.bounds()
+    return bx0 >= view.x0 && by0 >= view.y0 && bx1 <= view.x0 + view.w && by1 <= view.y0 + view.h
+  }
   function zoomAt(factor, mx, my) {
     const w = clamp(view.w * factor, 5, 3000)
     const f = w / view.w
@@ -827,17 +833,11 @@ function drawingBoard(api) {
     const pts = api.pointsMm()
     if (selected !== null && selected >= pts.length) selected = null
     if (ro) selected = null
-    // Double-click on the line: insert a point.
+    // Double-click on the line: insert a point (the svg's 'dblclick' below does it).
     const curve = api.editCurve?.()
     // While the lasso is laid, clicks belong to it: the points lie on the vase's edge, just where it is clicked.
     const editable = !ro && !lasso
-    if (curve && editable) {
-      const hitPath = svgEl('path', { class: 'vz-curve-hit', d: pathOf(curve, false) }, shapeG)
-      hitPath.addEventListener('dblclick', (event) => {
-        const at = api.insertNear(mmOf(event))
-        if (at !== null) { selected = at; render() }
-      })
-    }
+    if (curve && editable) svgEl('path', { class: 'vz-curve-hit', d: pathOf(curve, false) }, shapeG)
     const r = 6 / ppm
     if (editable) {
       pts.forEach((pt, i) => {
@@ -848,7 +848,7 @@ function drawingBoard(api) {
           event.preventDefault()
           event.stopPropagation()
           selected = i
-          drag = { kind: 'point', index: i }
+          drag = { kind: 'point', index: i, whole: shapeInView() }
           svg.setPointerCapture(event.pointerId)
           svg.focus({ preventScroll: true })
           render()
@@ -868,7 +868,7 @@ function drawingBoard(api) {
           hit.addEventListener('pointerdown', (event) => {
             event.preventDefault()
             event.stopPropagation()
-            drag = { kind: 'tangent', index: selected, sign }
+            drag = { kind: 'tangent', index: selected, sign, whole: shapeInView() }
             svg.setPointerCapture(event.pointerId)
           })
         }
@@ -904,7 +904,8 @@ function drawingBoard(api) {
       const [a, b] = [...pointers.values()]
       drag = { kind: 'pinch', dist: Math.hypot(a[0] - b[0], a[1] - b[1]), center: mmOf({ clientX: (a[0] + b[0]) / 2, clientY: (a[1] + b[1]) / 2 }) }
     } else {
-      drag = { kind: 'pan', start: [event.clientX, event.clientY], view: { ...view }, moved: false }
+      // `line`: pressed on the line - the pointer capture sends the click and the double click to the svg, not to it.
+      drag = { kind: 'pan', start: [event.clientX, event.clientY], view: { ...view }, moved: false, line: event.target.classList.contains('vz-curve-hit') }
       svg.classList.add('vz-panning')
     }
   })
@@ -930,23 +931,27 @@ function drawingBoard(api) {
       api.moveTangent(drag.index, mmOf(event), drag.sign, pxPerMm(), true)
     }
   })
+  // Whether the last click (a press let go without dragging) was on the line, for the double click.
+  let lineClick = false
   const end = (event) => {
     pointers.delete(event.pointerId)
     if (!drag) return
     const was = drag
     drag = null
+    lineClick = false
     svg.classList.remove('vz-panning')
     if (was.kind === 'pan' && !was.moved) {
       if (lassoClick(event)) return
       if (calibClick(event)) return
+      lineClick = was.line
       selected = null
       render()
     }
     if (was.kind === 'point' || was.kind === 'tangent') {
       api.finish() // recompute finely
-      // If the shape has grown beyond the view (diameter, height), let the view follow.
-      const [bx0, by0, bx1, by1] = api.bounds()
-      if (bx0 < view.x0 || by0 < view.y0 || bx1 > view.x0 + view.w || by1 > view.y0 + view.h) fit()
+      // If the shape has grown beyond a view that showed all of it (diameter, height), let the view follow; zoomed in
+      // on a part, the view stays where it was put (Discussion #1278).
+      if (was.whole && !shapeInView()) fit()
     }
   }
   svg.addEventListener('pointerup', end)
@@ -956,8 +961,16 @@ function drawingBoard(api) {
     const [mx, my] = mmOf(event)
     zoomAt(Math.exp(event.deltaY * 0.0015), mx, my)
   }, { passive: false })
-  // The lasso: a double click closes the line too.
-  svg.addEventListener('dblclick', () => { if (lasso?.anchors.length >= 3) closeLasso() })
+  // The lasso: a double click closes the line too. Otherwise a double click on the line inserts a point there. It
+  // has to be caught here: it comes to the svg, which holds the pointer from the press on, never to the line's path,
+  // which the first click has redrawn by then anyway (Discussion #1252).
+  svg.addEventListener('dblclick', (event) => {
+    if (lasso?.anchors.length >= 3) closeLasso()
+    else if (lineClick) {
+      const at = api.insertNear(mmOf(event))
+      if (at !== null) { selected = at; render() }
+    }
+  })
   svg.addEventListener('keydown', (event) => {
     // The lasso: Enter closes the line, Escape throws it away (and then the lasso), ahead of the window, which would close.
     if (lasso && (event.key === 'Enter' || event.key === 'Escape')) {
