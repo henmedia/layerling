@@ -95,7 +95,7 @@ import { disposeBoundsTree } from "three-mesh-bvh";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { bedOverhangs, keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
-import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, platePitch, plateCount as buildPlateCount } from "@/lib/buildPlates";
+import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateIndexAt, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, platePitch, plateCount as buildPlateCount } from "@/lib/buildPlates";
 import { plateDisplayLabel, useBuildPlates } from "@/components/workplane/useBuildPlates";
 import { zipSync } from "fflate";
 import { PlateBar } from "@/components/workplane/PlateBar";
@@ -10014,7 +10014,11 @@ export function LayerlingEditor({
       );
       return;
     }
-    const offset = workplaneCenteringOffset(boundsForShapes(movable));
+    // With several build plates the middle is that of the plate the selection stands on, not always the first one.
+    const selectionBounds = boundsForShapes(movable);
+    const plates = workspaceSettingsRef.current;
+    const plateX = Number.isFinite(selectionBounds.minX + selectionBounds.maxX) ? plateCenterX(plates, plateIndexAt(plates, (selectionBounds.minX + selectionBounds.maxX) / 2)) : 0;
+    const offset = workplaneCenteringOffset(selectionBounds, { x: plateX, z: 0 });
     if (!offset) {
       setNotice(t("status.nothingMeasurable"));
       return;
