@@ -37,6 +37,7 @@ import { createSpringGeometry } from "@/lib/springGeometry";
 import { textDisplayGeometry } from "@/lib/textFill";
 import { loadedManifoldRuntime, manifoldRevision, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { buildGroupDisplayMesh } from "@/lib/editorBooleans";
+import { boundsForShapesOfVertices } from "@/lib/editorMeshCore";
 import { customFontRevision } from "@/lib/textFonts";
 import { rulerTicks } from "@/lib/rulerDimensions";
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -1847,6 +1848,14 @@ export function createShapeObject(
     // Measured on the real vertices: the box of a turned part's own bounding box is wider than
     // the part, which stretched the content to a smaller size (a bundle shrank, #152).
     const contentBox = new THREE.Box3().setFromObject(content, true);
+    // A hidden part still counts for the group's size, as it does when the group is measured,
+    // exported or aligned (meshForShape): measured without it, the parts left were stretched
+    // to fill the group's box (#1323).
+    const hiddenParts = shape.groupedShapes.filter((child) => child.hidden);
+    if (hiddenParts.length) {
+      const hidden = boundsForShapesOfVertices(hiddenParts);
+      contentBox.union(new THREE.Box3(new THREE.Vector3(hidden.minX, hidden.minY, hidden.minZ), new THREE.Vector3(hidden.maxX, hidden.maxY, hidden.maxZ)));
+    }
     const contentSize = contentBox.getSize(new THREE.Vector3());
     content.scale.set(
       shapeWidth(shape) / Math.max(0.001, contentSize.x),
