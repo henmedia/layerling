@@ -1430,6 +1430,89 @@ function textField(U: Float64Array, V: Float64Array, rings: number[][], turn: nu
   return out;
 }
 
+/** About how many points lettersWhole samples over a text's box. */
+const WHOLE_SAMPLES = 8000;
+
+/** How much more whole the letters must lie one way to count: less is within the sampling, and the way that tears less wins. */
+const WHOLE_MARGIN = 0.02;
+
+/**
+ * How whole a text's letters lie on the body, at most 1: the share of points sampled across the letters that land on
+ * the body through a triangle unrolled in its shape, less those that land on two places. A triangle counts as in its
+ * shape while no edge is unrolled longer or shorter than in space by more than 0.2 mm plus 10 % of its length: one whose
+ * corners took different ways round a corner (a tear) is far off that.
+ */
+export function lettersWhole(mesh: { vertices: ArrayLike<number>; indices: ArrayLike<number> }, U: Float64Array, V: Float64Array, rings: number[][], turn: number) {
+  const box = outlineBox(rings);
+  if (!box || !(box.maxX > box.minX && box.maxY > box.minY)) return 0;
+  const { minX: x0, maxX: x1, minY: y0, maxY: y1 } = box;
+  const v = mesh.vertices, I = mesh.indices;
+  const a = (turn * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a);
+  // The points turned into the letters' plane, once for all samples.
+  const X = new Float64Array(U.length), Y = new Float64Array(U.length);
+  for (let i = 0; i < U.length; i += 1) {
+    X[i] = U[i] * c + V[i] * sn;
+    Y[i] = -U[i] * sn + V[i] * c;
+  }
+  // A cell of the grid holds about 16 sample points.
+  const step = Math.sqrt(((x1 - x0) * (y1 - y0)) / WHOLE_SAMPLES), cell = 4 * step;
+  const cols = Math.floor((x1 - x0) / cell) + 1, rows = Math.floor((y1 - y0) / cell) + 1;
+  // The triangles in the letters' plane, by cell.
+  const byCell = new Map<number, number[]>();
+  for (let t = 0; t < I.length; t += 3) {
+    if (Number.isNaN(U[I[t]]) || Number.isNaN(U[I[t + 1]]) || Number.isNaN(U[I[t + 2]])) continue;
+    let shaped = true;
+    for (let k = 0; k < 3 && shaped; k += 1) {
+      const i = I[t + k], j = I[t + ((k + 1) % 3)];
+      const space = Math.hypot(v[i * 3] - v[j * 3], v[i * 3 + 1] - v[j * 3 + 1], v[i * 3 + 2] - v[j * 3 + 2]);
+      shaped = Math.abs(Math.hypot(U[i] - U[j], V[i] - V[j]) - space) <= 0.2 + 0.1 * space;
+    }
+    if (!shaped) continue;
+    const a0 = I[t], a1 = I[t + 1], a2 = I[t + 2];
+    const c0 = Math.max(0, Math.floor((Math.min(X[a0], X[a1], X[a2]) - x0) / cell)), c1 = Math.min(cols - 1, Math.floor((Math.max(X[a0], X[a1], X[a2]) - x0) / cell));
+    const r0 = Math.max(0, Math.floor((Math.min(Y[a0], Y[a1], Y[a2]) - y0) / cell)), r1 = Math.min(rows - 1, Math.floor((Math.max(Y[a0], Y[a1], Y[a2]) - y0) / cell));
+    for (let r = r0; r <= r1; r += 1) {
+      for (let col = c0; col <= c1; col += 1) {
+        const list = byCell.get(r * cols + col);
+        if (list) list.push(t);
+        else byCell.set(r * cols + col, [t]);
+      }
+    }
+  }
+  const inside = textDistance(rings, step);
+  let points = 0, landed = 0, twice = 0;
+  for (let x = x0; x <= x1; x += step) {
+    for (let y = y0; y <= y1; y += step) {
+      if (inside(x, y) >= 0) continue;
+      points += 1;
+      // Where it lands on the body: the first triangle that holds it, and whether another puts it more than 0.5 mm away.
+      let qx = NaN, qy = NaN, qz = NaN;
+      for (const t of byCell.get(Math.floor((y - y0) / cell) * cols + Math.floor((x - x0) / cell)) ?? []) {
+        const ax = X[I[t]], ay = Y[I[t]], bx = X[I[t + 1]] - ax, by = Y[I[t + 1]] - ay, ex = X[I[t + 2]] - ax, ey = Y[I[t + 2]] - ay;
+        const d = bx * ey - ex * by;
+        if (d === 0) continue;
+        const w1 = ((x - ax) * ey - ex * (y - ay)) / d;
+        const w2 = (bx * (y - ay) - (x - ax) * by) / d;
+        const w0 = 1 - w1 - w2;
+        if (w0 < 0 || w1 < 0 || w2 < 0) continue;
+        const px = w0 * v[I[t] * 3] + w1 * v[I[t + 1] * 3] + w2 * v[I[t + 2] * 3];
+        const py = w0 * v[I[t] * 3 + 1] + w1 * v[I[t + 1] * 3 + 1] + w2 * v[I[t + 2] * 3 + 1];
+        const pz = w0 * v[I[t] * 3 + 2] + w1 * v[I[t + 1] * 3 + 2] + w2 * v[I[t + 2] * 3 + 2];
+        if (Number.isNaN(qx)) {
+          qx = px;
+          qy = py;
+          qz = pz;
+          landed += 1;
+        } else if (Math.hypot(px - qx, py - qy, pz - qz) > 0.5) {
+          twice += 1;
+          break;
+        }
+      }
+    }
+  }
+  return points ? (landed - twice) / points : 0;
+}
+
 /** Half the width of a letter's wall, mm: the mesh is cut this far either side of the outline, the wall between. */
 const TEXT_WALL = 0.05;
 
@@ -5030,8 +5113,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
    * Unroll the surface round a text's anchor, only in its window (see surfaceTextureUnfold.ts). The face under the anchor is
    * looked for anew in a refined mesh: its triangles are numbered differently.
    */
-  function unrolled(mesh: { vertices: Float64Array; indices: Uint32Array }, place: SurfaceTextPlacement, s: SurfaceTextureSettings, face = -1) {
-    return unfoldSurface(mesh, place.point, { axis: s.axis, face, reach: place.reach, window: { halfW: place.halfW, halfH: place.halfH, turn: stuckTurn(s) } });
+  function unrolled(mesh: { vertices: Float64Array; indices: Uint32Array }, place: SurfaceTextPlacement, s: SurfaceTextureSettings, face = -1, fold = false) {
+    return unfoldSurface(mesh, place.point, { axis: s.axis, face, reach: place.reach, window: { halfW: place.halfW, halfH: place.halfH, turn: stuckTurn(s) }, fold });
   }
 
   /**
@@ -5325,29 +5408,47 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
           const fine2 = (fineEdge * 1.01) ** 2;
           const cap = Math.max(1.5 * edge, 4 * TEXT_WALL);
           const crosses = (F: Float64Array, a: number, b: number) => (F[a] < TEXT_WALL) !== (F[b] < TEXT_WALL) || (F[a] > -TEXT_WALL) !== (F[b] > -TEXT_WALL);
-          let uv = unrolled(mesh, place, s);
-          for (let round = 0; round < FLANK_ROUNDS && !mesh.limited; round += 1) {
-            const F = textField(uv.U, uv.V, s.textOutline, s.textTurn, cap);
-            const v = mesh.vertices, I = mesh.indices;
-            const flags = new Uint8Array(v.length / 3);
-            let any = false;
-            for (let t = 0; t < I.length; t += 3) {
-              for (const [a, b] of [[I[t], I[t + 1]], [I[t + 1], I[t + 2]], [I[t + 2], I[t]]]) {
-                if (!crosses(F, a, b)) continue;
-                const dx = v[a * 3] - v[b * 3], dy = v[a * 3 + 1] - v[b * 3 + 1], dz = v[a * 3 + 2] - v[b * 3 + 2];
-                if (dx * dx + dy * dy + dz * dz <= fine2) continue;
-                flags[a] = 1;
-                flags[b] = 1;
-                any = true;
+          // Laid over the creases and, where one was met, straight on as well: not every body comes out better over them (a
+          // rod lying across the axis tears). The one whose letters lie clearly more whole is kept (see WHOLE_MARGIN); else
+          // the one that tears less, and on a tie the one straight on.
+          const lay = (start: SurfaceMesh, fold: boolean) => {
+            let mesh = start;
+            let uv = unrolled(mesh, place, s, -1, fold);
+            const creased = uv.creased;
+            for (let round = 0; round < FLANK_ROUNDS && !mesh.limited; round += 1) {
+              const F = textField(uv.U, uv.V, s.textOutline, s.textTurn, cap);
+              const v = mesh.vertices, I = mesh.indices;
+              const flags = new Uint8Array(v.length / 3);
+              let any = false;
+              for (let t = 0; t < I.length; t += 3) {
+                for (const [a, b] of [[I[t], I[t + 1]], [I[t + 1], I[t + 2]], [I[t + 2], I[t]]]) {
+                  if (!crosses(F, a, b)) continue;
+                  const dx = v[a * 3] - v[b * 3], dy = v[a * 3 + 1] - v[b * 3 + 1], dz = v[a * 3 + 2] - v[b * 3 + 2];
+                  if (dx * dx + dy * dy + dz * dz <= fine2) continue;
+                  flags[a] = 1;
+                  flags[b] = 1;
+                  any = true;
+                }
               }
+              if (!any) break;
+              const next = subdivide(mesh, fineEdge, maxTriangles, null, flags);
+              if (next.indices.length === mesh.indices.length) break;
+              const parents = Uint32Array.from(next.parents, (f) => mesh.parents[f]);
+              mesh = { vertices: next.vertices, indices: next.indices, parents, limited: Boolean(mesh.limited || next.limited) };
+              uv = unrolled(mesh, place, s, -1, fold);
             }
-            if (!any) break;
-            const next = subdivide(mesh, fineEdge, maxTriangles, null, flags);
-            if (next.indices.length === mesh.indices.length) break;
-            const parents = Uint32Array.from(next.parents, (f) => mesh.parents[f]);
-            mesh = { vertices: next.vertices, indices: next.indices, parents, limited: Boolean(mesh.limited || next.limited) };
-            uv = unrolled(mesh, place, s);
+            return { mesh, uv, creased };
+          };
+          const over = lay(mesh, true);
+          let kept = over;
+          if (over.creased) {
+            const straightOn = lay(mesh, false);
+            const wholeOver = lettersWhole(over.mesh, over.uv.U, over.uv.V, s.textOutline, s.textTurn);
+            const wholeStraight = lettersWhole(straightOn.mesh, straightOn.uv.U, straightOn.uv.V, s.textOutline, s.textTurn);
+            if (wholeOver < wholeStraight - WHOLE_MARGIN || (wholeOver <= wholeStraight + WHOLE_MARGIN && over.uv.torn >= straightOn.uv.torn)) kept = straightOn;
           }
+          mesh = kept.mesh;
+          const uv = kept.uv;
           // Then cut along both sides of every wall: the letters' edges become edges of the mesh, following the outlines
           // instead of the grid (on the grid they came out as steps). Between the cuts the wall rises; points carry the
           // distance they were cut at.

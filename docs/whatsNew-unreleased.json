@@ -8,5 +8,15 @@
       "de": "Schnitt ein Loch durch einen Quader und ein importiertes oder ausgehöhltes Teil dahinter, blieb an der Fuge manchmal eine Haut ohne Dicke stehen, die als dünne Wand zu sehen war. Jetzt treffen sich die Teile genau, und das Loch geht sauber durch.",
       "en": "When a hole cut through a box and an imported or hollowed part behind it, a skin of no thickness sometimes stayed at the joint and showed as a thin wall. Now the parts meet exactly and the hole goes cleanly through."
     }
+  },
+  {
+    "title": {
+      "de": "„Schrift (angeheftet)“ bleibt um die Zacken eines Sterns aufrecht",
+      "en": "\"Text (stuck on)\" stays upright round a star's points"
+    },
+    "body": {
+      "de": "Auf einem Stern läuft „Schrift (angeheftet)“ jetzt aufrecht und in der richtigen Reihenfolge um die Zacken; bisher waren Teile davon verdreht oder fehlten ganz.",
+      "en": "On a star, \"Text (stuck on)\" now runs upright and in order round its points, where parts of it came out turned or missing."
+    }
   }
 ]
