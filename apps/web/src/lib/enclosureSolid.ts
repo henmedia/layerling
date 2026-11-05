@@ -13,7 +13,7 @@ import { ribGussetOutline, ribProfile, ribSize, type RibFields } from "@/lib/rib
  *
  * The screw boss is a cylinder with its gussets joined to it, each a prism standing out from inside the post, and
  * the hole cut last: a solid of revolution with the chamfer at its mouth, run on past the top so no face of it lies
- * on the post's. Set as a hole, the boss is that pocket alone (#1288), standing where the editor draws it. The
+ * on the post's. Set as a hole, the boss is that pocket alone (#1288), opening at the boss's top. The
  * snap-fit and the rib are their side outlines pushed straight across, as the mesh pushes them; the snap-fit's hook
  * and catch stay two bodies, as Separate Parts splits them.
  *
@@ -111,11 +111,9 @@ function screwBossGusset(cad: OcctKernel, plan: ScrewBossPlan, angle: number) {
 function screwBossSolid(cad: OcctKernel, fields: ScrewBossFields) {
   const plan = screwBossPlan(fields);
   if (fields.hole) {
-    // Grouped as a hole, the boss is its pocket, as its mesh is (screwBossCavityMesh), and stands where the editor
-    // puts that mesh: on the bottom of the shape's box, as it puts every mesh (putGeometryOnBase).
-    const pocket = oneSolid(cad, screwBossCavity(cad, plan, 0), "screw boss's pocket");
-    const floor = plan.through ? 0 : plan.height - plan.holeDepth;
-    return floor > 0 ? cad.translate(pocket, 0, -floor, 0) : pocket;
+    // Grouped as a hole, the boss is its pocket, as its mesh is (screwBossCavityMesh): from its floor up to the
+    // boss's top, where the post's hole opens.
+    return oneSolid(cad, screwBossCavity(cad, plan, 0), "screw boss's pocket");
   }
   const post = cad.transform(cad.makeCylinder(plan.radius, plan.height), Z_TO_Y_UP);
   const gussets = screwBossGussetAngles(plan).map((angle) => screwBossGusset(cad, plan, angle));
