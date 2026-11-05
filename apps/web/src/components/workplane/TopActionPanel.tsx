@@ -36,6 +36,7 @@ export function TopActionPanel({
   shapeCount,
   scopeLabel,
   selectionLeavesOut,
+  plateScope,
   onSelectAll,
   onlyHoles,
   hiddenCount = 0,
@@ -71,6 +72,8 @@ export function TopActionPanel({
   scopeLabel: "selected" | "total";
   /** Set when a selection is exported that leaves out visible bodies: how many are selected, how many are visible. */
   selectionLeavesOut?: { selected: number; total: number } | null;
+  /** With several build plates and nothing selected (#456): what to write - all plates, one file per plate, or one plate. */
+  plateScope?: { plates: readonly string[]; value: "all" | "each" | number; onChange: (value: "all" | "each" | number) => void } | null;
   onSelectAll?: () => void;
   onlyHoles?: boolean;
   /** Ausgeblendete Teile, die der Export auslaesst - gesagt, bevor er laeuft. */
@@ -466,6 +469,27 @@ export function TopActionPanel({
                 </select>
               </label>
               <StencilBridgeControls on={bridgesOn} options={bridges} onToggle={setBridgesOn} onChange={setBridges} />
+            </section>
+          ) : null}
+
+          {exportsBodies && plateScope ? (
+            <section className="export-setting-section export-plate-scope">
+              <label>
+                <strong>{t("export.plates")}</strong>{" "}
+                <select
+                  aria-label={t("export.plates")}
+                  value={String(plateScope.value === "each" && !(exportFormat === "stl" || exportFormat === "3mf" || exportFormat === "obj") ? "all" : plateScope.value)}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    plateScope.onChange(value === "all" || value === "each" ? value : Number(value));
+                  }}
+                >
+                  <option value="all">{t("export.platesAll", { count: plateScope.plates.length })}</option>
+                  {exportFormat === "stl" || exportFormat === "3mf" || exportFormat === "obj" ? <option value="each">{t("export.platesEach")}</option> : null}
+                  {plateScope.plates.map((label, index) => <option key={index} value={String(index)}>{label}</option>)}
+                </select>
+              </label>
+              <p className="export-plate-scope-hint">{t("export.platesHint")}</p>
             </section>
           ) : null}
 

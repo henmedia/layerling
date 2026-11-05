@@ -587,6 +587,19 @@ export function ToolbarMateFacesIcon(props: IconProps) {
   );
 }
 
+/** Build plates (Discussion #456): two plates side by side, a body on each. */
+export function ToolbarBuildPlatesIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <rect x="3" y="12" width="19" height="26" rx="3" {...SOLID} />
+      <rect x="3" y="12" width="19" height="26" rx="3" />
+      <rect x="26" y="12" width="19" height="26" rx="3" />
+      <rect x="8" y="20" width="9" height="9" rx="1.5" />
+      <path d="M35.5 19v12M29.5 25h12" />
+    </ToolbarVectorIcon>
+  );
+}
+
 export function ToolbarCenterOnWorkplaneIcon(props: IconProps) {
   return (
     <ToolbarVectorIcon {...props}>

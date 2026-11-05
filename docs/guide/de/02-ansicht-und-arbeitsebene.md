@@ -95,6 +95,19 @@ Solange die Arbeitsebene auf einer Fläche liegt, erscheint neben {{ui:camera.pl
 
 Um gerade auf die Arbeitsebene zu schauen, drücke [[P]] oder klicke in der Ansichtsleiste neben {{ui:camera.placeWorkplane}} auf {{ui:camera.lookOntoWorkplane}}. Die Ansicht dreht sich, bis du die Ebene von vorn siehst, von der Seite, zu der neue Formen wachsen, mit ihrem Ursprung in der Mitte. Auf der Grundplatte ist das die Ansicht von oben.
 
+## Druckplatten
+
+Passt ein Entwurf nicht auf eine Platte, etwa eine Dose mit Deckel und Einsätzen, bekommt er mehrere Druckplatten. Klicke {{ui:editor.tool.buildPlates}} in der Gruppe {{ui:editor.group.arrange}} oder wähle {{ui:plates.moveTo}} im Menü eines Rechtsklicks auf einen Körper. Am unteren Rand der Ansicht erscheint eine Leiste mit einem Knopf je Platte; die Zahl darauf sagt, wie viele Körper auf der Platte stehen.
+
+- Jede Platte ist so groß wie die Arbeitsfläche, die Platten liegen rechts neben der ersten, 20 mm auseinander. Ein Körper gehört zu der Platte, auf der die Mitte seiner Grundfläche steht; zieht man ihn hinüber, steht er auf der anderen Platte. Ein Entwurf hat bis zu 12 Platten.
+- Ein Klick auf eine Platte in der Leiste zeigt sie, und neue Formen landen dann auf ihr. {{ui:plates.showAll}} zeigt alle. Ein Doppelklick auf eine Platte oder {{ui:plates.rename}} gibt ihr einen Namen wie „Deckel“, der auf der Platte steht.
+- {{ui:plates.moveLeft}} und {{ui:plates.moveRight}} ändern die Reihenfolge, die Körper wandern mit ihrer Platte. {{ui:plates.remove}} nimmt die aktive Platte weg; ihre Körper kommen an derselben Stelle auf die erste Platte.
+- {{ui:plates.arrange}} legt die ausgewählten Körper, oder alle, Reihe für Reihe auf die Platten, die größten zuerst, 5 mm auseinander, und fügt Platten hinzu, solange sie gebraucht werden. Ein Körper, der größer als eine Platte ist, bleibt stehen.
+- Mit gewähltem Drucker wird jeder Körper gegen seine eigene Platte geprüft, und die Bauhöhe zählt ab dem tiefsten Körper dieser Platte. Eine Platte mit einem Körper, der nicht passt, zeigt ihre Zahl rot.
+- In den Eigenschaften zählt X ab der Mitte der eigenen Platte des Körpers.
+
+Das Exportfenster bietet dann {{ui:export.plates}}: alle Platten in einer Datei, nebeneinander wie im Entwurf; je Platte eine Datei, zusammen in einer ZIP (STL, 3MF und OBJ); oder eine einzelne Platte, an die Stelle der ersten gesetzt. Ein Slicer öffnet jede Datei als eine Platte; wer die Platten nacheinander druckt, nimmt also die Dateien je Platte. Körper zwischen Platten verschieben und verteilen lässt sich rückgängig machen; Platten hinzufügen, benennen, umsortieren und entfernen wird mit dem Entwurf gespeichert, aber nicht rückgängig gemacht.
+
 ## Gitter und Raster
 
 Das Gitter zeigt die Größe der Platte. Unten rechts steht das **Raster**: Verschieben und Skalieren rasten in Schritten dieser Größe ein, zum Beispiel 1 mm. Für Feinarbeit stellst du es kleiner, für grobes Anordnen größer. {{ui:editor.tool.snapToGrid}} im Menüband rückt die ausgewählten Formen nachträglich auf das nächste Rasterkreuz. Beim Verschieben rasten Formen außerdem an anderen Formen ein, siehe [Auswählen und Anordnen](chapter:auswaehlen-und-anordnen). Ohne Maus: [[Alt]]+[[1]] bis [[Alt]]+[[0]] wählen den Eintrag mit dieser Nummer im Menü ([[Alt]]+[[1]] schaltet das Einrasten aus), [[,]] und [[.]] machen den Schritt eine Stufe feiner oder gröber. Das geht auch in einer Skizze.

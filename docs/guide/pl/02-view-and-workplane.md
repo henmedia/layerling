@@ -96,6 +96,19 @@ Dopóki płaszczyzna robocza leży na ścianie, obok {{ui:camera.placeWorkplane}
 
 Aby spojrzeć prostopadle na płaszczyznę roboczą, naciśnij [[P]] albo kliknij {{ui:camera.lookOntoWorkplane}} obok {{ui:camera.placeWorkplane}} na pasku widoku. Widok obraca się, aż zobaczysz płaszczyznę na wprost, od strony, w którą rosną nowe kształty, z jej początkiem pośrodku. Na płycie bazowej to widok z góry.
 
+## Stoły robocze
+
+Gdy projekt zawiera więcej, niż zmieści jeden stół, na przykład pudełko z pokrywką i wkładkami, może mieć kilka stołów roboczych. Kliknij {{ui:editor.tool.buildPlates}} w grupie {{ui:editor.group.arrange}} albo wybierz {{ui:plates.moveTo}} w menu prawego kliknięcia na bryłę. U dołu widoku pojawia się pasek z jednym przyciskiem na stół; liczba na nim mówi, ile brył stoi na stole.
+
+- Każdy stół jest tak duży jak płaszczyzna robocza, a stoły leżą obok siebie na prawo od pierwszego, 20 mm od siebie. Bryła należy do stołu, na którym stoi środek jej podstawy, więc po przeciągnięciu na drugą stronę trafia na inny stół. Projekt ma do 12 stołów.
+- Kliknięcie stołu na pasku pokazuje go, a nowe kształty trafiają potem na niego. {{ui:plates.showAll}} pokazuje wszystkie. Dwukrotne kliknięcie stołu lub {{ui:plates.rename}} nadaje mu nazwę, np. „Pokrywka”, która jest napisana na stole.
+- {{ui:plates.moveLeft}} i {{ui:plates.moveRight}} zmieniają kolejność, a bryły przesuwają się ze swoim stołem. {{ui:plates.remove}} usuwa aktywny stół; jego bryły trafiają na pierwszy stół w to samo miejsce.
+- {{ui:plates.arrange}} układa zaznaczone bryły, albo wszystkie, rząd po rzędzie na stołach, największe najpierw, 5 mm od siebie, i dodaje stoły, dopóki są potrzebne. Bryła większa niż stół zostaje na miejscu.
+- Przy wybranej drukarce każda bryła jest sprawdzana względem własnego stołu, a wysokość druku liczy się od najniższej bryły na tym stole. Stół z bryłą, która się nie mieści, pokazuje swoją liczbę na czerwono.
+- We właściwościach X liczy się od środka własnego stołu bryły.
+
+Okno eksportu oferuje wtedy {{ui:export.plates}}: wszystkie stoły w jednym pliku, obok siebie jak w projekcie; jeden plik na stół, spakowane w ZIP (STL, 3MF i OBJ); albo pojedynczy stół, ustawiony w miejscu pierwszego. Slicer otwiera każdy plik jako jeden stół, więc aby drukować stoły po kolei, użyj plików na stół. Przenoszenie brył między stołami i ich rozkładanie można cofnąć; dodawanie, nazywanie, porządkowanie i usuwanie stołów zapisuje się z projektem, ale się nie cofa.
+
 ## Siatka i przyciąganie
 
 Siatka pokazuje rozmiar płyty. W prawym dolnym rogu jest **krok przyciągania**: przesuwanie i skalowanie przyciągają się co tyle, na przykład co 1 mm. Zmniejsz go do precyzyjnej pracy, zwiększ do zgrubnego rozmieszczania. {{ui:editor.tool.snapToGrid}} na wstążce przesuwa potem zaznaczone kształty na najbliższe przecięcie siatki. Podczas przesuwania kształty przyciągają się też do innych kształtów, zobacz [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange). Bez myszy: [[Alt]]+[[1]] do [[Alt]]+[[0]] wybierają tę pozycję menu ([[Alt]]+[[1]] wyłącza przyciąganie), a [[,]] i [[.]] zmieniają krok o jeden rozmiar na drobniejszy albo grubszy. Działa to też w szkicu.

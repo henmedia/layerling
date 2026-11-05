@@ -4,6 +4,7 @@ import { normalizeScaleForUnits } from "@/lib/measurementUnits";
 import { DEFAULT_IMPERIAL_GRID_BLOCK_PRESET, DEFAULT_METRIC_GRID_BLOCK_PRESET, DEFAULT_EDGE_LINE_COLOR, DEFAULT_LIGHT_AZIMUTH, DEFAULT_LIGHT_ELEVATION, DEFAULT_SKETCH_BACKGROUND, DEFAULT_SKETCH_GRID_COLOR, DEFAULT_SKETCH_PLATE_COLOR, DEFAULT_WORKPLANE_BACKGROUND, DEFAULT_WORKPLANE_GRID_COLOR, DEFAULT_WORKPLANE_SURFACE_COLOR, inchGridPresetMm } from "@/lib/workplaneGrid";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { normalizeHexColor } from "@/lib/coloredImport";
+import { normalizePlateNames } from "@/lib/buildPlateNames";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO } from "@/lib/torusShape";
 import { MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT } from "@/lib/hirthGeometry";
 import { PORT_PROFILES } from "@/lib/portGeometry";
@@ -786,6 +787,8 @@ export function normalizeWorkspaceSettings(value: unknown, fallback: WorkplaneWo
     sizePreset: stringOrDefault(candidate.sizePreset, fallback.sizePreset),
     // Older settings have no printer; that is "none", not the fallback's choice.
     printer: typeof candidate.printer === "string" ? candidate.printer : candidate.sizePreset === undefined ? fallback.printer : "",
+    // The plates belong to the design: they come only from its own settings, never from a fallback (#456).
+    ...(normalizePlateNames(candidate.plates) ? { plates: normalizePlateNames(candidate.plates) } : {}),
     ...gridBlockForUnits(
       units,
       stringOrDefault(candidate.gridBlockPreset, fallback.gridBlockPreset),
@@ -929,6 +932,8 @@ export function workspaceWithSavedDefault(current: WorkplaneWorkspaceSettings, s
     depth: plate.depth,
     sizePreset: plate.sizePreset,
     printer: plate.printer,
+    // The design keeps its plates (#456).
+    plates: current.plates,
     units: current.units,
     inchFormat: current.inchFormat,
     scale: current.scale,
@@ -986,7 +991,8 @@ export function saveWorkspaceDefault(
   }
   try {
     storage.setItem(WORKSPACE_DEFAULT_STORAGE_KEY, JSON.stringify({
-      workspace: normalizeWorkspaceSettings(workspace),
+      // A design's plates are its own: the default workplane has one plate (#456).
+      workspace: { ...normalizeWorkspaceSettings(workspace), plates: undefined },
       snap: normalizeSnapGrid(snap, DEFAULT_SNAP_GRID),
     }));
     // The server store keeps a copy for every browser (serverWorkspaceDefault.ts).

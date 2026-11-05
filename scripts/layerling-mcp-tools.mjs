@@ -1813,6 +1813,21 @@ export const tools = [
     },
   },
   {
+    name: "layerling_build_plates",
+    description: "Several build plates in one design (Discussion #456), as the plate bar under the view handles them. The plates lie side by side along x, each as large as the workplane, 20 mm apart: plate 1 is centred on the origin as the one plate always was, plate 2 at x = width + 20, and so on, at most 12. An object belongs to the plate under the middle of its footprint, so moving it along x moves it between plates; objects keep their world x and z, and layerling_read_scene gives each a plate number while there are several. Plates count from 1. action list (default) only reads; add appends a plate (name optional); rename sets a plate's name (\"\" takes it away); remove takes plate away and puts its objects on the first remaining plate at the same spot, the later plates moving up one; move puts plate at the place of to, its objects with it; move_objects puts ids onto plate (or \"new\" for a new plate) at the same spot on it; arrange lays ids, or every object, out row by row on the plates, the largest first, 5 mm apart, adding plates while they are needed (objects larger than a plate stay and come back as leftOver); show looks at plate, or at all plates without one, and makes it the plate new shapes land on. Moving and arranging objects go into the undo history; the plates themselves (add, rename, remove, move) are kept with the design and are not undone. Returns the plates with their name, label, centerX, the ids on each and outsideIds (past the plate or above the build height, when a printer is chosen), plus what the action did. layerling_export_mesh takes plate to write one plate on its own.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        action: { type: "string", enum: ["list", "add", "rename", "remove", "move", "move_objects", "arrange", "show"] },
+        plate: { description: "The plate, counted from 1; for move_objects also \"new\".", anyOf: [{ type: "number" }, { type: "string", enum: ["new"] }] },
+        to: { type: "number", description: "move only: the place the plate goes to, counted from 1." },
+        name: { type: "string", description: "add and rename: the plate's name, at most 60 characters." },
+        ids: { type: "array", items: { type: "string" }, description: "move_objects: the objects to move. arrange: the objects to lay out; left out, every object." },
+      },
+    },
+  },
+  {
     name: "layerling_set_section_view",
     description: "Cut the view open along a plane to look inside: walls, cavities, threads in their nuts, parts fitting into each other. Only the view is cut; the design and every export stay whole. Call with no settings to read the current state. axis uses the editor's own coordinates, the same as an object's x, z and elevation: \"x\" cuts across left-right (offset is an x position), \"z\" across front-back (a z position), \"y\" horizontally (offset is a height above the plate, like elevation). The editor's panel names them like its position fields instead: X, Y for the depth (z here) and Z for the height (y here). Switching on, changing the axis or center: true puts the plane in the middle of the design unless offset is given. By default the part on the far side of the plane (greater x, z or height) stays visible; flipped shows the other side. Returns the settings and the plane's useful range (min, max, center). Combine with layerling_capture_image to see the cut.",
     inputSchema: {
@@ -1918,6 +1933,7 @@ export const tools = [
         format: { type: "string", enum: ["stl", "3mf", "obj", "svg", "dxf"], description: "The file format. Defaults to stl." },
         view: { type: "string", enum: ["silhouette", "footprint", "edges"], description: "For svg and dxf: silhouette from above (default), the footprint on the workplane, or (svg only) the edges seen from above as lines in each body's colour, every area closed (a design with too many edges gets the silhouette, and the answer says fellBack)." },
         ids: { type: "array", items: { type: "string" }, description: "Objects to export. Defaults to the whole design." },
+        plate: { type: "number", description: "With several build plates (layerling_build_plates): only the objects on this plate, counted from 1, moved onto the first plate's spot as the export window writes one plate. ids then limit it further." },
         path: { type: "string", description: "Where to write the file, e.g. C:/print/part.stl. Directories are made as needed. Omit it to get the file as base64." },
       },
     },

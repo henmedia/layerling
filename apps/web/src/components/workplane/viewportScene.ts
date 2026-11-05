@@ -12,6 +12,7 @@ import { pinchWheelDelta, wheelZoomDelta } from "@/lib/wheelZoom";
 import { CAMERA_FOV, CAMERA_MAX_DISTANCE, CAMERA_MIN_DISTANCE, CAMERA_TARGET, updateCameraViewport } from "@/components/workplane/cameraRig";
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneLiesOnBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { printerPresetById } from "@/lib/printBed";
+import { plateCenterX, plateCount } from "@/lib/buildPlates";
 import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed } from "@/lib/workplaneSettings";
 import { workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -400,6 +401,8 @@ export function rebuildWorkplane(
   theme: ResolvedAppTheme = "light",
   placementWorkplane: PlacementWorkplane = horizontalPlacementWorkplane(),
   projectName = "",
+  /** The label written on each further build plate (Discussion #456), by its index from 1; plate 0 shows the design's name. */
+  plateLabel: (index: number) => string = (index) => `${index + 1}`,
 ) {
   if (!state) {
     return;
@@ -436,9 +439,9 @@ export function rebuildWorkplane(
   const plateOutlineOnly = !activeIsBase && placementWorkplaneLiesOnBase(placementWorkplane);
   // A delta printer's plate is round (#1024): the plate itself, not a workplane laid on a face.
   const roundPlate = printerPresetById(workspace.printer)?.round === true && workspace.width === workspace.depth;
-  const addPlane = (workplane: PlacementWorkplane, muted: boolean, showMarker: boolean, outlineOnly = false, round = false) => {
+  const addPlane = (workplane: PlacementWorkplane, muted: boolean, showMarker: boolean, outlineOnly = false, round = false, extraPlate: { label: string } | null = null) => {
     const group = new THREE.Group();
-    group.name = muted ? "ReferenceWorkplane" : "ActiveWorkplane";
+    group.name = extraPlate ? "BuildPlate" : muted ? "ReferenceWorkplane" : "ActiveWorkplane";
     // The name and the printer, and the axis arrows, sit in the corners of the square inside a round plate.
     const cornerWidth = round ? workspace.width * Math.SQRT1_2 : workspace.width;
     const cornerDepth = round ? workspace.depth * Math.SQRT1_2 : workspace.depth;
@@ -506,7 +509,7 @@ export function rebuildWorkplane(
         cornerDepth,
         labelPalette.color,
         muted ? labelPalette.opacity * 0.5 : labelPalette.opacity,
-        projectName,
+        extraPlate ? extraPlate.label : projectName,
         "",
         { outline: muted ? undefined : palette.surface.color },
       );
@@ -514,7 +517,7 @@ export function rebuildWorkplane(
         group.add(label);
       }
       // Only on the real plate, and hidden together with the design name.
-      const printer = muted || workspace.showPlateLabels === false ? null : printerPresetById(workspace.printer);
+      const printer = muted || extraPlate || workspace.showPlateLabels === false ? null : printerPresetById(workspace.printer);
       if (printer) {
         const printerLabel = createWorkplaneLabel(
           cornerWidth,
@@ -531,7 +534,7 @@ export function rebuildWorkplane(
         }
       }
     }
-    if (!muted && workspace.showAxes) {
+    if (!muted && !extraPlate && workspace.showAxes) {
       group.add(createAxisArrows(cornerWidth, cornerDepth));
     }
     if (showMarker) {
@@ -556,6 +559,11 @@ export function rebuildWorkplane(
   };
 
   addPlane(horizontalPlacementWorkplane(), !activeIsBase, false, plateOutlineOnly, roundPlate);
+  // The further build plates to the right of the first (Discussion #456): the same plate with its grid and its name.
+  for (let index = 1; index < plateCount(workspace); index += 1) {
+    const plate = horizontalPlacementWorkplane();
+    addPlane({ ...plate, origin: { ...plate.origin, x: plateCenterX(workspace, index) } }, !activeIsBase, false, false, roundPlate, { label: plateLabel(index) });
+  }
   if (!activeIsBase) {
     addPlane(placementWorkplane, false, true);
   }

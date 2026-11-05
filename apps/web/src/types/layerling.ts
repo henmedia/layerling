@@ -451,6 +451,12 @@ export type WorkplaneWorkspaceSettings = {
   sizePreset: string;
   /** Id of the chosen printer preset (printerPresets.generated.ts), or "" for none. */
   printer: string;
+  /**
+   * The design's build plates by name, "" for a plate without one, side by side along X as large as the
+   * workplane (Discussion #456, buildPlates.ts). Left out, the design has one plate. A design's own, never
+   * part of the default workplane.
+   */
+  plates?: string[];
   gridBlockSize: number;
   gridBlockPreset: string;
   /** The grid preset of the unit system left by the last switch between mm and in, so switching back finds it again (#442). */

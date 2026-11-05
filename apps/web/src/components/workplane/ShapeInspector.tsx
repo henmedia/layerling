@@ -300,6 +300,7 @@ import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
+import { plateOffsetOfShape } from "@/lib/buildPlates";
 import { isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
@@ -4187,12 +4188,14 @@ export function ShapeInspector({
    * wie das Ziehen, eine Plattengroesse ueber jeden Rand.
    */
   const undersideBelow = useMemo(() => undersideOffset(shape), [shape]);
+  const plateOffsetX = useMemo(() => plateOffsetOfShape(workspace, shape), [shape, workspace]);
   const reachX = workspace.width * 1.5;
   const reachY = workspace.depth * 1.5;
   // Up, the slider reaches as far as the plate does and the printer is high; any number can be typed (#425).
   const reachZ = positionReach(workspace, printerPresetById(workspace.printer)?.height);
   const positionProperties: RangePropertyConfig[] = [
-    { id: "positionX", label: t("prop.positionX"), value: shape.x, min: -reachX, max: reachX, step: 0.5, onChange: (x) => onUpdate({ x }) },
+    // X counts from the middle of the body's own build plate (Discussion #456); on the first plate, as always.
+    { id: "positionX", label: t("prop.positionX"), value: shape.x - plateOffsetX, min: -reachX, max: reachX, step: 0.5, onChange: (x) => onUpdate({ x: x + plateOffsetX }) },
     // Y counts towards the back, right-handed (#182); inside, z runs towards the viewer.
     { id: "positionY", label: t("prop.positionY"), value: displayY(shape.z), min: -reachY, max: reachY, step: 0.5, onChange: (y) => onUpdate({ z: insideZ(y) }) },
     // Z is the height of the underside as the body stands, also tilted (Discussion #1303).
@@ -4248,7 +4251,7 @@ export function ShapeInspector({
     ? positionProperties.map((property): RangePropertyConfig => {
         if (property.id === "positionX") {
           const offset = shape.x - edges.minX;
-          return { ...property, label: t("prop.positionXEdge"), value: edges.minX, onChange: (x) => onUpdate({ x: x + offset }) };
+          return { ...property, label: t("prop.positionXEdge"), value: edges.minX - plateOffsetX, onChange: (x) => onUpdate({ x: x + plateOffsetX + offset }) };
         }
         if (property.id === "positionY") {
           // Y runs towards the back, so the front edge is the smaller Y.

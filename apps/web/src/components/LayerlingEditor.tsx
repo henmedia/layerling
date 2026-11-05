@@ -95,6 +95,10 @@ import { disposeBoundsTree } from "three-mesh-bvh";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { bedOverhangs, keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
+import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, platePitch, plateCount as buildPlateCount } from "@/lib/buildPlates";
+import { plateDisplayLabel, useBuildPlates } from "@/components/workplane/useBuildPlates";
+import { zipSync } from "fflate";
+import { PlateBar } from "@/components/workplane/PlateBar";
 import { SplitPanel, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
 import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitOrientationForNormal, splitAxisFromLabel, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
 import { AttachmentViewer } from "./workplane/AttachmentViewer";
@@ -3030,8 +3034,9 @@ export function LayerlingEditor({
   const [workspaceSettings, setWorkspaceSettings] = useState<WorkplaneWorkspaceSettings>(() => normalizeWorkspaceSettings(initialWorkspace));
   const bedPrinter = printerPresetById(workspaceSettings.printer);
   const overhangs = useMemo(
-    () => bedPrinter ? bedOverhangs(shapes, bedPrinter.width, bedPrinter.depth, bedPrinter.height, bedPrinter.round) : [],
-    [bedPrinter, shapes],
+    // Each body against the build plate it stands on (Discussion #456); with one plate, as before.
+    () => bedPrinter ? plateOverhangs(shapes, workspaceSettings, bedPrinter) : [],
+    [bedPrinter, shapes, workspaceSettings],
   );
   // Bodies whose warning was clicked away (#640), for this session only. A body drops out of the
   // list once it fits again, so moving it out a second time warns again; a new body always warns.
@@ -3306,6 +3311,8 @@ export function LayerlingEditor({
   const projectAttachmentsRef = useRef(projectAttachments);
   const selectedIdsRef = useRef(selectedIds);
   const workspaceSettingsRef = useRef(workspaceSettings);
+  /** Moves the bodies on the later build plates when the plates change size; set where the plates are kept (#456). */
+  const plateResizeRef = useRef<((before: WorkplaneWorkspaceSettings, after: WorkplaneWorkspaceSettings) => void) | null>(null);
 
   // "Ask before closing the tab" (a setting, off): the browser's own "Leave site?" question while a design is open. The design is saved
   // after every change anyway, so this is only a reminder; the wording is the browser's.
@@ -4843,7 +4850,10 @@ export function LayerlingEditor({
   const updateProjectWorkspaceSettings = useCallback(
     (settings: { workspace: WorkplaneWorkspaceSettings; snap: GridSize }) => {
       const nextWorkspace = normalizeWorkspaceSettings(settings.workspace);
+      const workspaceBefore = workspaceSettingsRef.current;
       workspaceSettingsRef.current = nextWorkspace;
+      // Plates of another size (another printer): the bodies on the later plates keep their spot on theirs (#456).
+      if (buildPlateCount(workspaceBefore) > 1 && platePitch(workspaceBefore) !== platePitch(nextWorkspace)) plateResizeRef.current?.(workspaceBefore, nextWorkspace);
       if (!nextWorkspace.clickToPlaceShapes && cruiseAssetRef.current) {
         setCruiseAsset(null);
         setNotice("");
@@ -4943,6 +4953,23 @@ export function LayerlingEditor({
     },
     [appendHistorySnapshot, notes, selectedIds, setOpenGroupLevels, syncProjectShapes],
   );
+
+  // Several build plates side by side (Discussion #456): the bar, the active plate and what its buttons do.
+  const buildPlates = useBuildPlates({
+    workspace: workspaceSettings,
+    workspaceRef: workspaceSettingsRef,
+    snapGridRef,
+    shapes,
+    shapesRef,
+    selectedIdsRef,
+    selectedCount: selectedIds.length,
+    overhangs,
+    roundPlate: bedPrinter?.round === true,
+    commitShapes,
+    updateWorkspace: updateProjectWorkspaceSettings,
+    setNotice,
+  });
+  plateResizeRef.current = (before, after) => commitShapes(shapesAfterPlateResize(before, after, shapesRef.current), selectedIdsRef.current);
 
   /**
    * Notizen aendern sich wie Koerper: ueber den Verlauf. Deshalb liegt hier
@@ -6341,11 +6368,12 @@ export function LayerlingEditor({
       const workplane = onFace ?? placementWorkplane;
       const nextShape = prepareNewShape(asset, {
         ...shape,
-        ...placementPatchForNewShape(shape, workplane, point ?? workplane.origin, sunk && onFace !== undefined),
+        // Put in without a spot, it lands on the active build plate (#456).
+        ...placementPatchForNewShape(shape, workplane, point ?? buildPlates.newShapeOrigin(workplane), sunk && onFace !== undefined),
       });
       commitShapes([...shapes, nextShape], nextShape.id, t("status.shapeAdded", { name: shapeAssetLabel(asset) }));
     },
-    [commitShapes, placementWorkplane, shapes],
+    [buildPlates, commitShapes, placementWorkplane, shapes],
   );
 
   /** Sets the parts picked up with C down on the face (or the workplane) that was clicked, as one step. */
@@ -11373,7 +11401,10 @@ export function LayerlingEditor({
       shapeCount: currentShapes.length,
       workspace: workspaceSettingsRef.current,
       snap: initialSnap ?? null,
-      shapes: currentShapes.map(mcpShapeSummary),
+      // With several build plates (#456) each object says which one it stands on, counted from 1.
+      shapes: buildPlateCount(workspaceSettingsRef.current) > 1
+        ? currentShapes.map((shape) => ({ ...mcpShapeSummary(shape), plate: plateOfShape(workspaceSettingsRef.current, shape) + 1 }))
+        : currentShapes.map(mcpShapeSummary),
       // The innermost level, as before nesting existed; openGroups has every level, outermost first.
       openGroup: openGroupsRef.current.length ? mcpOpenGroupSummary(openGroupsRef.current.at(-1)!) : null,
       openGroups: openGroupsRef.current.map(mcpOpenGroupSummary),
@@ -13870,6 +13901,71 @@ export function LayerlingEditor({
         return result;
       }
 
+      if (command.action === "build_plates") {
+        // The build plates of the design (Discussion #456), as the plate bar handles them. Plates count from 1 here.
+        const op = params.action === undefined ? "list" : mcpString(params.action, "list");
+        const plateArg = (value: unknown, name: string) => {
+          const number = Number(value);
+          if (!Number.isInteger(number) || number < 1 || number > buildPlateCount(workspaceSettingsRef.current)) throw new Error(`${name} must be a plate number from 1 to ${buildPlateCount(workspaceSettingsRef.current)}`);
+          return number - 1;
+        };
+        const objectIds = () => {
+          const ids = Array.isArray(params.ids) ? params.ids.filter((id): id is string => typeof id === "string") : [];
+          const known = ids.filter((id) => shapesRef.current.some((shape) => shape.id === id));
+          if (ids.length && !known.length) throw new Error("None of the ids is an object in this design");
+          return known;
+        };
+        let extra: Record<string, unknown> = {};
+        if (op === "add") {
+          const index = buildPlates.add();
+          if (index === null) throw new Error(t("plates.full", { max: MAX_BUILD_PLATES }));
+          if (typeof params.name === "string" && params.name.trim()) buildPlates.rename(index, params.name);
+          extra = { added: index + 1 };
+        } else if (op === "rename") {
+          buildPlates.rename(plateArg(params.plate, "plate"), typeof params.name === "string" ? params.name : "");
+        } else if (op === "remove") {
+          if (buildPlateCount(workspaceSettingsRef.current) <= 1) throw new Error(t("plates.removeLast"));
+          buildPlates.remove(plateArg(params.plate, "plate"));
+        } else if (op === "move") {
+          buildPlates.move(plateArg(params.plate, "plate"), plateArg(params.to, "to"));
+        } else if (op === "move_objects") {
+          const ids = objectIds();
+          if (!ids.length) throw new Error("ids must name the objects to move");
+          const target = params.plate === "new" ? -1 : plateArg(params.plate, "plate");
+          const index = buildPlates.moveSelectionToPlate(target, ids);
+          if (index === null) throw new Error(t("plates.full", { max: MAX_BUILD_PLATES }));
+          extra = { movedTo: index + 1 };
+        } else if (op === "arrange") {
+          const result = buildPlates.arrange(objectIds());
+          extra = { arranged: result.arranged, leftOver: result.leftOver };
+        } else if (op === "show") {
+          const from = params.plate === undefined ? 0 : plateArg(params.plate, "plate");
+          const to = params.plate === undefined ? buildPlateCount(workspaceSettingsRef.current) - 1 : from;
+          if (params.plate !== undefined) buildPlates.select(from);
+          else window.layerlingFramePlates?.(from, to);
+        } else if (op !== "list") {
+          throw new Error("action must be list, add, rename, remove, move, move_objects, arrange or show");
+        }
+        const workspaceNow = workspaceSettingsRef.current;
+        const count = buildPlateCount(workspaceNow);
+        const bed = printerPresetById(workspaceNow.printer);
+        const outside = bed ? plateOverhangs(shapesRef.current, workspaceNow, bed) : [];
+        return {
+          ...extra,
+          width: workspaceNow.width,
+          depth: workspaceNow.depth,
+          gap: PLATE_GAP,
+          plates: Array.from({ length: count }, (_, index) => ({
+            plate: index + 1,
+            name: plateName(workspaceNow, index),
+            label: plateDisplayLabel(workspaceNow, index),
+            centerX: plateCenterX(workspaceNow, index),
+            ids: shapesRef.current.filter((shape) => plateOfShape(workspaceNow, shape) === index).map((shape) => shape.id),
+            outsideIds: outside.filter((overhang) => plateOfShape(workspaceNow, overhang.shape) === index).map((overhang) => overhang.shape.id),
+          })),
+        };
+      }
+
       if (command.action === "saved_view") {
         if (!window.layerlingSavedViews) throw new Error("Saved views are not available in this editor");
         const slotOf = (value: unknown) => {
@@ -14041,7 +14137,10 @@ export function LayerlingEditor({
         if (svgView !== "silhouette" && svgView !== "footprint" && svgView !== "edges") throw new Error("view must be silhouette, footprint or edges");
         if (format === "dxf" && svgView === "edges") throw new Error("A DXF for laser cutting has no edges view: inner edges would be cut. Use silhouette or footprint");
         const ids = Array.isArray(params.ids) ? params.ids.filter((id): id is string => typeof id === "string") : [];
-        const all = currentShapes();
+        // plate: only that build plate (#456), counted from 1, moved onto the first plate's spot as the export window writes it.
+        const platesNow = buildPlateCount(workspaceSettingsRef.current);
+        if (params.plate !== undefined && (!Number.isInteger(Number(params.plate)) || Number(params.plate) < 1 || Number(params.plate) > platesNow)) throw new Error(`plate must be a plate number from 1 to ${platesNow}`);
+        const all = params.plate !== undefined ? shapesOnPlateFrame(workspaceSettingsRef.current, currentShapes(), Number(params.plate) - 1) : currentShapes();
         const chosen = ids.length ? all.filter((shape) => ids.includes(shape.id)) : all;
         if (ids.length && chosen.length === 0) throw new Error("None of the ids is an object in this design");
         const scoped = ids.length ? [...chosen, ...all.filter((shape) => shape.hole && !chosen.some((picked) => picked.id === shape.id))] : chosen;
@@ -14608,12 +14707,50 @@ export function LayerlingEditor({
   const exportSource = useCallback(() => {
     const view = historyViewStateRef.current;
     if (view) return { shapes: view.shapes, selection: false };
+    // One build plate chosen in the export window (#456): its bodies, moved onto the first plate's spot.
+    const plate = buildPlates.exportPlate;
+    if (!hasSelection && typeof plate === "number" && buildPlates.count > 1) return { shapes: shapesOnPlateFrame(workspaceSettingsRef.current, shapes, plate), selection: false };
     return { shapes: hasSelection ? selectedShapes : shapes, selection: hasSelection };
-  }, [hasSelection, selectedShapes, shapes]);
+  }, [buildPlates.count, buildPlates.exportPlate, hasSelection, selectedShapes, shapes]);
 
   /** `chooseFile` asks for a new STL even when the design already has one (Save as). `svgView` picks what an SVG shows (#692). */
-  const exportDesign = useCallback(async (format: DirectExportFormat, exportName: string, chooseFile = false, svgView: SvgExportView = "silhouette", toServer = false, bridges: StencilBridgeOptions | null = null) => {
-    const source = exportSource();
+  const exportDesign = useCallback(async (
+    format: DirectExportFormat,
+    exportName: string,
+    chooseFile = false,
+    svgView: SvgExportView = "silhouette",
+    toServer = false,
+    bridges: StencilBridgeOptions | null = null,
+    /** One plate of "One file per plate" (#456): its bodies, and where the finished file goes instead of a download. */
+    plateRun: { shapes: WorkplaneShape[]; collect: (fileName: string, content: Blob | string) => Promise<void> } | null = null,
+  ): Promise<void> => {
+    // "One file per plate" (#456): every plate with something to print as a file of its own, in one ZIP.
+    if (!plateRun && buildPlates.exportPlate === "each" && buildPlates.count > 1 && !historyViewStateRef.current && !hasSelection && (format === "stl" || format === "3mf" || format === "obj")) {
+      const files: Record<string, Uint8Array> = {};
+      const workspaceNow = workspaceSettingsRef.current;
+      const baseName = exportName.trim() || projectName;
+      for (let index = 0; index < buildPlates.count; index += 1) {
+        const onPlate = shapesOnPlateFrame(workspaceNow, shapesRef.current, index);
+        if (!onPlate.some((shape) => !shape.hole && !shape.hidden && !isNonSolidShape(shape))) continue;
+        await exportDesignRef.current?.(format, `${baseName} - ${plateDisplayLabel(workspaceNow, index)}`, false, svgView, false, null, {
+          shapes: onPlate,
+          collect: async (fileName, content) => {
+            files[fileName] = new Uint8Array(await (typeof content === "string" ? new Blob([content]) : content).arrayBuffer());
+          },
+        });
+      }
+      const count = Object.keys(files).length;
+      if (count === 0) {
+        setNotice(t("status.addSolidBeforeExport"));
+        return;
+      }
+      const zipped = zipSync(files, { level: 0 });
+      const savedOn = await deliverExportFile(projectExportFileName(exportName, "zip"), new Blob([zipped as BlobPart], { type: "application/zip" }), "application/zip", toServer);
+      setTopPanel(null);
+      setNotice(savedOn ?? t("status.exportedPlates", { count, label: format.toUpperCase() }));
+      return;
+    }
+    const source = plateRun ? { shapes: plateRun.shapes, selection: false } : exportSource();
     const selectionScoped = source.selection;
     // Ausgeblendetes bleibt draussen, wie bei vergleichbaren Programmen: ein beiseitegelegtes
     // Teil soll nicht unbemerkt mitgedruckt werden (Discussion #80).
@@ -14640,6 +14777,10 @@ export function LayerlingEditor({
         : t("status.exportedAs", { label }))) + hiddenNote + note, note !== "");
     };
     const deliver = async (fileName: string, content: Blob | string, type: string) => {
+      if (plateRun) {
+        await plateRun.collect(fileName, content);
+        return;
+      }
       savedOn = await deliverExportFile(fileName, content, type, toServer);
     };
     const failNotice = (label: string, error: unknown) => {
@@ -14722,7 +14863,7 @@ export function LayerlingEditor({
     const designId = projectId ?? "";
     let target: LylFileHandle | "download" = "download";
     // With "Save STL as a download" the browser hands out the files, and numbers them (#731).
-    if (format === "stl" && !toServer && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
+    if (format === "stl" && !toServer && !plateRun && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
       try {
         const linkedBefore = linkedStlFile(designId);
         // A name typed in the window that is not the linked file's asks for a file of its own (reported by mail, 15.10.2026).
@@ -14740,7 +14881,8 @@ export function LayerlingEditor({
       }
     }
     const savedFile = target === "download" ? null : target;
-    void exportBodiesWithLooseHoles(sourceShapes)
+    // Awaited, so "One file per plate" (#456) writes the plates one after the other.
+    await exportBodiesWithLooseHoles(sourceShapes)
       .then(async ({ solids: cutSolids, meshes, cut: wasCut, holeCutsFailed }) => {
         bodiesWritten = cutSolids;
         const joined = await (format === "stl" ? unionOverlappingExportMeshes(cutSolids, meshes, wasCut) : colorSeparatedExportMeshes(cutSolids, meshes, wasCut));
@@ -14772,7 +14914,8 @@ export function LayerlingEditor({
         }
         // The file is written either way; the notice below only adds a caveat.
         setTopPanel(null);
-        const exportOverhangs = bedPrinter ? bedOverhangs(exportable, bedPrinter.width, bedPrinter.depth, bedPrinter.height) : [];
+        // Each body against its own build plate (#456).
+        const exportOverhangs = bedPrinter ? plateOverhangs(exportable, workspaceSettingsRef.current, bedPrinter) : [];
         // Tiny loose pieces a cut left behind are not written (#352); the notice says how many.
         const splinterNote = splinters > 0 ? ` ${t("status.exportSplinters", { count: splinters })}` : "";
         if (gescheitert > 0) setNotice(t("status.exportUnionFailed"), true);
@@ -14783,7 +14926,9 @@ export function LayerlingEditor({
         else finishNotice(label);
       })
       .catch((error: unknown) => failNotice(label, error));
-  }, [bedPrinter, deliverExportFile, exportSource, projectId, projectName]);
+  }, [bedPrinter, buildPlates.count, buildPlates.exportPlate, deliverExportFile, exportSource, hasSelection, projectId, projectName]);
+  const exportDesignRef = useRef<typeof exportDesign | null>(null);
+  exportDesignRef.current = exportDesign;
 
   /**
    * The drawing of a set of bodies, from the same bodies as the export (visible solids, holes taken
@@ -15991,7 +16136,7 @@ export function LayerlingEditor({
    * Auswahl - der Viewport hat den angeklickten Koerper schon ausgewaehlt.
    */
   // `stack`: every body under the pointer, front to back; `listing`: the menu shows them for "Select other" (#804).
-  const [shapeContextMenu, setShapeContextMenu] = useState<{ x: number; y: number; onShape: boolean; stack: string[]; listing?: boolean; facePoint?: { x: number; y: number; z: number } } | null>(null);
+  const [shapeContextMenu, setShapeContextMenu] = useState<{ x: number; y: number; onShape: boolean; stack: string[]; listing?: boolean; plateListing?: boolean; facePoint?: { x: number; y: number; z: number } } | null>(null);
   const [menuHighlightIds, setMenuHighlightIds] = useState<string[]>([]);
   const closeShapeContextMenu = useCallback(() => {
     setShapeContextMenu(null);
@@ -16072,6 +16217,16 @@ export function LayerlingEditor({
     const stack = shapeContextMenu.stack
       .map((id) => shapes.find((shape) => shape.id === id))
       .filter((shape): shape is WorkplaneShape => Boolean(shape));
+    // "Onto plate" (Discussion #456): every other plate, and a new one while the design can hold more.
+    if (shapeContextMenu.plateListing) {
+      const here = new Set(selectedShapes.map((shape) => plateOfShape(workspaceSettings, shape)));
+      const targets: ShapeContextMenuItem[] = buildPlates.plates
+        .map((plate, index) => ({ plate, index }))
+        .filter(({ index }) => !(here.size === 1 && here.has(index)))
+        .map(({ plate, index }) => ({ key: `plate-${index}`, label: plate.label, onSelect: () => buildPlates.moveSelectionToPlate(index) }));
+      if (buildPlates.count < MAX_BUILD_PLATES) targets.push({ key: "plate-new", label: t("plates.moveToNew"), separated: targets.length > 0, onSelect: () => buildPlates.moveSelectionToPlate(-1) });
+      return targets;
+    }
     if (shapeContextMenu.listing) {
       return stack.map((shape) => ({
         key: `other-${shape.id}`,
@@ -16161,6 +16316,7 @@ export function LayerlingEditor({
       ...(selectionLocked ? [] : [{ key: "lockShape", label: t(allShapeLocked ? "contextMenu.unlockShape" : "contextMenu.lockShape"), shortcut: "Ctrl+Shift+L", onSelect: toggleShapeLocked }]),
       ...(selectionLocked ? [] : [{ key: "carry", label: t("contextMenu.carry"), shortcut: "C", onSelect: startCarry }]),
       ...(selectionLocked ? [] : [{ key: "drop", label: t("contextMenu.drop"), shortcut: "D", onSelect: dropSelectedToWorkplane }]),
+      ...(selectionLocked ? [] : [{ key: "ontoPlate", label: t("plates.moveTo"), keepOpen: true, onSelect: () => setShapeContextMenu((current) => current ? { ...current, plateListing: true } : current) }]),
       ...(bodyHeld ? [] : [{ key: "delete", label: t("common.delete"), shortcut: t("contextMenu.deleteKey"), danger: true, separated: true, onSelect: deleteSelected }]),
     );
     return items;
@@ -16264,6 +16420,8 @@ export function LayerlingEditor({
         onDelete={deleteSelected}
         onDuplicate={duplicateSelected}
         onCenterOnWorkplane={centerSelectionOnWorkplane}
+        onBuildPlates={buildPlates.toggleBar}
+        buildPlatesActive={buildPlates.barOpen}
         onDropToWorkplane={dropSelectedToWorkplane}
         onLayFlat={toggleLayFlat}
         layFlatActive={layFlatPickMode}
@@ -16640,6 +16798,22 @@ export function LayerlingEditor({
           onNoteRemove={removeNote}
           onNoteModeChange={setNoteMode}
           onWorkspaceSettingsChange={updateProjectWorkspaceSettings}
+          plateBar={buildPlates.barOpen ? (
+            <PlateBar
+              plates={buildPlates.plates}
+              active={buildPlates.active}
+              selectionCount={selectedIds.length}
+              disabled={Boolean(historyViewState)}
+              onSelect={buildPlates.select}
+              onAdd={buildPlates.add}
+              onShowAll={buildPlates.showAll}
+              onRename={buildPlates.rename}
+              onMove={buildPlates.move}
+              onRemove={buildPlates.remove}
+              onArrange={buildPlates.arrange}
+              onClose={buildPlates.closeBar}
+            />
+          ) : null}
           onWorkplaneModeChange={closeViewportWorkplaneMode}
           onNotice={setNotice}
           modifierActive={Boolean(edgeModifier)}
@@ -17156,6 +17330,9 @@ export function LayerlingEditor({
           projectName={historyViewName}
           shapeCount={exportableShapeCount}
           scopeLabel={exportScopeLabel}
+          plateScope={buildPlates.count > 1 && !exportSelectionScoped && !historyViewState
+            ? { plates: buildPlates.plates.map((plate) => plate.label), value: buildPlates.exportPlate, onChange: buildPlates.setExportPlate }
+            : null}
           selectionLeavesOut={exportSelectionScoped && exportSelectedVisibleCount < exportVisibleCount ? { selected: selectedShapes.length, total: exportVisibleCount } : null}
           onSelectAll={selectAllVisible}
           onlyHoles={exportHolesOnly}

@@ -134,6 +134,7 @@ export {
   SketchHalfCircleIcon,
   SketchPieSliceIcon,
   ToolbarAttachmentsIcon,
+  ToolbarBuildPlatesIcon,
   ToolbarCenterOnWorkplaneIcon,
   ToolbarChamferIcon,
   ToolbarCookieCutterIcon,

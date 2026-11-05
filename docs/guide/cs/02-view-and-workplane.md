@@ -95,6 +95,19 @@ Při umístění na ploše se vedle {{ui:camera.placeWorkplane}} objeví oko. Sk
 
 Chceš-li se na pracovní rovinu podívat kolmo, stiskni [[P]] nebo klikni na {{ui:camera.lookOntoWorkplane}} vedle {{ui:camera.placeWorkplane}} v liště pohledu. Pohled se otočí, až rovinu vidíš zpříma, ze strany, kam rostou nové tvary, s jejím počátkem uprostřed. Na základní desce je to pohled shora.
 
+## Tiskové podložky
+
+Když se návrh nevejde na jednu podložku, třeba krabička s víkem a vložkami, může mít více tiskových podložek. Klikněte na {{ui:editor.tool.buildPlates}} ve skupině {{ui:editor.group.arrange}} nebo zvolte {{ui:plates.moveTo}} v nabídce pravého kliknutí na těleso. Dole v pohledu se objeví lišta s tlačítkem pro každou podložku; číslo na něm udává, kolik těles na podložce stojí.
+
+- Každá podložka je velká jako pracovní plocha a podložky leží vedle sebe vpravo od první, 20 mm od sebe. Těleso patří k podložce, na které stojí střed jeho půdorysu, takže přetažením na druhou stranu se dostane na jinou podložku. Návrh má nejvýše 12 podložek.
+- Kliknutí na podložku v liště ji ukáže a nové tvary pak přistanou na ní. {{ui:plates.showAll}} ukáže všechny. Dvojklik na podložku nebo {{ui:plates.rename}} jí dá název, třeba „Víko“, který je na podložce napsán.
+- {{ui:plates.moveLeft}} a {{ui:plates.moveRight}} mění pořadí, tělesa se posouvají se svou podložkou. {{ui:plates.remove}} odebere aktivní podložku; její tělesa přejdou na první podložku na stejné místo.
+- {{ui:plates.arrange}} rozloží vybraná tělesa, nebo všechna, řadu po řadě na podložky, největší první, 5 mm od sebe, a přidává podložky, dokud jsou potřeba. Těleso větší než podložka zůstane na místě.
+- Se zvolenou tiskárnou se každé těleso kontroluje proti své podložce a výška tisku se počítá od nejnižšího tělesa na ní. Podložka s tělesem, které se nevejde, ukáže své číslo červeně.
+- Ve vlastnostech se X počítá od středu vlastní podložky tělesa.
+
+Okno exportu pak nabízí {{ui:export.plates}}: všechny podložky v jednom souboru, vedle sebe jako v návrhu; jeden soubor na podložku, zabalené v ZIP (STL, 3MF a OBJ); nebo jedinou podložku, umístěnou na místo první. Slicer otevře každý soubor jako jednu podložku, takže pro tisk podložek jedné po druhé použijte soubory po podložkách. Přesun těles mezi podložkami a jejich rozmístění lze vrátit zpět; přidání, pojmenování, řazení a odebrání podložek se ukládá s návrhem, ale nevrací se.
+
 ## Mřížka a přichytávání
 
 Mřížka usnadňuje odhad rozměrů podložky. Vpravo dole se nastavuje **krok přichytávání**: posun a změna velikosti se provádějí v násobcích tohoto rozměru, například 1 mm. Pro jemnou práci krok zmenšete, pro hrubé rozmístění zvětšete. {{ui:editor.tool.snapToGrid}} dodatečně přesune vybrané tvary na nejbližší průsečík mřížky. Při přesouvání se přichytávají také k jiným tvarům, viz [Výběr a uspořádání](chapter:select-and-arrange). Bez myši: [[Alt]]+[[1]] až [[Alt]]+[[0]] vyberou položku s tímto číslem v nabídce ([[Alt]]+[[1]] přichytávání vypne) a [[,]] a [[.]] krok o stupeň zjemní nebo zhrubí. Funguje to i v náčrtu.

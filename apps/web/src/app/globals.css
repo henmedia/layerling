@@ -16407,3 +16407,171 @@ html[data-theme="dark"] .guide-videos a:hover,
 html[data-theme="dark"] .interactive-help-more a:hover {
   color: #ffc784;
 }
+
+/* The bar of build plates (Discussion #456): at the foot of the view, in the middle, like the camera column in look. */
+.plate-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100% - 140px);
+  padding: 4px 6px;
+  transform: translateX(-50%);
+  color: #5a3917;
+  background: #faf7f3;
+  border: 1px solid rgba(219, 207, 194, 0.9);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(84, 59, 32, 0.14), 0 2px 6px rgba(84, 59, 32, 0.08);
+  font-size: 13px;
+}
+
+.plate-bar-chips,
+.plate-bar-tools {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.plate-bar-chips {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.plate-bar-chip,
+.plate-bar-icon,
+.plate-bar-text {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.plate-bar-icon {
+  justify-content: center;
+  width: 32px;
+  padding: 0;
+}
+
+.plate-bar-chip:hover:not(:disabled),
+.plate-bar-icon:hover:not(:disabled),
+.plate-bar-text:hover:not(:disabled) {
+  background: #f1e6d9;
+  border-color: #e3d2bf;
+}
+
+.plate-bar-chip.active {
+  color: #fff;
+  background: #bf6508;
+  border-color: #bf6508;
+}
+
+.plate-bar-chip-count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(90, 57, 23, 0.12);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.plate-bar-chip.active .plate-bar-chip-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Something on the plate reaches past it or above the build height. */
+.plate-bar-chip.has-overhangs .plate-bar-chip-count {
+  color: #fff;
+  background: #c2410c;
+}
+
+.plate-bar-chip:disabled,
+.plate-bar-icon:disabled,
+.plate-bar-text:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.plate-bar-rename {
+  width: 150px;
+  height: 32px;
+  padding: 0 8px;
+  color: inherit;
+  background: #fff;
+  border: 1px solid #bf6508;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.plate-bar-separator {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 22px;
+  margin: 0 3px;
+  background: rgba(90, 57, 23, 0.18);
+}
+
+.export-plate-scope-hint {
+  margin: 6px 0 0;
+  opacity: 0.75;
+  font-size: 12px;
+}
+
+html[data-theme="dark"] .plate-bar {
+  color: #ede4d4;
+  background: rgba(40, 30, 20, 0.97);
+  border-color: #655340;
+}
+
+html[data-theme="dark"] .plate-bar-chip:hover:not(:disabled),
+html[data-theme="dark"] .plate-bar-icon:hover:not(:disabled),
+html[data-theme="dark"] .plate-bar-text:hover:not(:disabled) {
+  background: rgba(84, 66, 46, 0.9);
+  border-color: #79634c;
+}
+
+html[data-theme="dark"] .plate-bar-chip-count {
+  background: rgba(237, 228, 212, 0.14);
+}
+
+html[data-theme="dark"] .plate-bar-rename {
+  background: #2a2017;
+}
+
+html[data-theme="dark"] .plate-bar-separator {
+  background: rgba(237, 228, 212, 0.2);
+}
+
+@media (max-width: 700px) {
+  .plate-bar {
+    max-width: calc(100% - 20px);
+    bottom: 8px;
+  }
+
+  .plate-bar-text span {
+    display: none;
+  }
+}
+
+.plate-bar-help {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: inherit;
+}

@@ -93,6 +93,19 @@ Amíg a munkasík egy lapon van, a {{ui:camera.placeWorkplane}} mellett megjelen
 
 Ha merőlegesen akarsz a munkasíkra nézni, nyomd meg a [[P]] billentyűt, vagy kattints a nézetsávban a {{ui:camera.placeWorkplane}} melletti {{ui:camera.lookOntoWorkplane}} gombra. A nézet addig fordul, amíg szemből látod a síkot, arról az oldalról, amerre az új alakzatok nőnek, a kezdőpontjával középen. Az alaplapon ez a felülnézet.
 
+## Nyomtatótálcák
+
+Ha egy terv több alkatrészt tartalmaz, mint amennyi egy tálcára fér, például egy doboz a fedelével és betéteivel, több nyomtatótálcája is lehet. Kattints a {{ui:editor.tool.buildPlates}} gombra az {{ui:editor.group.arrange}} csoportban, vagy válaszd a {{ui:plates.moveTo}} pontot egy testen jobb kattintással nyíló menüben. A nézet alján megjelenik egy sáv, tálcánként egy gombbal; a rajta lévő szám megmutatja, hány test áll a tálcán.
+
+- Minden tálca akkora, mint a munkasík, és a tálcák egymás mellett fekszenek az első jobb oldalán, 20 mm-re egymástól. Egy test ahhoz a tálcához tartozik, amelyen az alapterülete közepe áll, így áthúzva a másik tálcára kerül. Egy tervnek legfeljebb 12 tálcája lehet.
+- A sávban egy tálcára kattintva az megjelenik, és az új alakzatok ezután rá kerülnek. A {{ui:plates.showAll}} mindet megmutatja. Dupla kattintás egy tálcán vagy a {{ui:plates.rename}} nevet ad neki, például „Fedél”, ami a tálcára is kiíródik.
+- A {{ui:plates.moveLeft}} és a {{ui:plates.moveRight}} a sorrendet változtatja, a testek a tálcájukkal mozognak. A {{ui:plates.remove}} eltávolítja az aktív tálcát; a testei ugyanarra a helyre kerülnek az első tálcán.
+- Az {{ui:plates.arrange}} a kijelölt testeket, vagy mindet, sorról sorra a tálcákra rakja, a legnagyobbat először, 5 mm-re egymástól, és tálcákat ad hozzá, amíg kell. A tálcánál nagyobb test a helyén marad.
+- Kiválasztott nyomtatóval minden test a saját tálcájához mérve ellenőrződik, és a nyomtatási magasság a tálca legalsó testétől számít. Az a tálca, amelyen egy test nem fér el, pirosan mutatja a számát.
+- A tulajdonságokban az X a test saját tálcájának közepétől számít.
+
+Az exportálási ablak ekkor felkínálja: {{ui:export.plates}}: minden tálca egy fájlban, egymás mellett, mint a tervben; tálcánként egy fájl, egy ZIP-be csomagolva (STL, 3MF és OBJ); vagy egyetlen tálca, az első tálca helyére téve. A szeletelő minden fájlt egy tálcaként nyit meg, így ha a tálcákat egymás után nyomtatod, a tálcánkénti fájlokat válaszd. A testek tálcák közötti áthelyezése és elrendezése visszavonható; a tálcák hozzáadása, elnevezése, sorrendje és eltávolítása a tervvel együtt mentődik, de nem vonható vissza.
+
 ## Rács és illesztés
 
 A rács a tárgyasztal méretét mutatja. Jobbra lent van az **illesztési lépés**: a mozgatás és a méretezés ekkora lépésekben illeszkedik, például 1 mm-esekben. Finom munkához vedd kisebbre, durva elrendezéshez nagyobbra. A szalagon a {{ui:editor.tool.snapToGrid}} utólag a legközelebbi rácspontra helyezi a kijelölt alakzatokat. Mozgatás közben az alakzatok más alakzatokhoz is illeszkednek, lásd a [Kijelölés és elrendezés](chapter:select-and-arrange) fejezetet.

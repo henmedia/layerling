@@ -95,6 +95,19 @@ Dokler delovna ravnina leži na ploskvi, se ob {{ui:camera.placeWorkplane}} poka
 
 Če želiš na delovno ravnino pogledati naravnost, pritisni [[P]] ali klikni {{ui:camera.lookOntoWorkplane}} poleg {{ui:camera.placeWorkplane}} v vrstici pogleda. Pogled se zasuka, dokler ravnine ne vidiš naravnost, s strani, proti kateri rastejo nove oblike, z njenim izhodiščem na sredini. Na osnovni plošči je to pogled od zgoraj.
 
+## Tiskalne plošče
+
+Ko načrt vsebuje več, kot se natisne na eno ploščo, na primer škatlo s pokrovom in vložki, ima lahko več tiskalnih plošč. Kliknite {{ui:editor.tool.buildPlates}} v skupini {{ui:editor.group.arrange}} ali izberite {{ui:plates.moveTo}} v meniju desnega klika na telo. Na dnu pogleda se pojavi vrstica z gumbom za vsako ploščo; število na njem pove, koliko teles stoji na plošči.
+
+- Vsaka plošča je velika kot delovna ravnina, plošče pa ležijo druga ob drugi desno od prve, 20 mm narazen. Telo spada k plošči, na kateri stoji sredina njegovega tlorisa, zato ga z vlečenjem na drugo stran postavite na drugo ploščo. Načrt ima do 12 plošč.
+- Klik na ploščo v vrstici jo pokaže in nove oblike nato pristanejo na njej. {{ui:plates.showAll}} pokaže vse. Dvojni klik na ploščo ali {{ui:plates.rename}} ji da ime, na primer »Pokrov«, ki je napisano na plošči.
+- {{ui:plates.moveLeft}} in {{ui:plates.moveRight}} spremenita vrstni red, telesa se premikajo s svojo ploščo. {{ui:plates.remove}} odstrani dejavno ploščo; njena telesa gredo na prvo ploščo na isto mesto.
+- {{ui:plates.arrange}} razporedi izbrana telesa, ali vsa, vrsto za vrsto po ploščah, največja najprej, 5 mm narazen, in dodaja plošče, dokler so potrebne. Telo, večje od plošče, ostane na mestu.
+- Z izbranim tiskalnikom se vsako telo preveri glede na svojo ploščo, višina tiska pa se šteje od najnižjega telesa na tej plošči. Plošča s telesom, ki ne gre nanjo, pokaže svoje število rdeče.
+- V lastnostih se X šteje od sredine lastne plošče telesa.
+
+Okno za izvoz nato ponudi {{ui:export.plates}}: vse plošče v eni datoteki, druga ob drugi kot v načrtu; eno datoteko na ploščo, zbrane v ZIP (STL, 3MF in OBJ); ali eno samo ploščo, postavljeno na mesto prve. Rezalnik odpre vsako datoteko kot eno ploščo, zato za tisk plošč eno za drugo vzemite datoteke po ploščah. Premikanje teles med ploščami in razporejanje je mogoče razveljaviti; dodajanje, poimenovanje, razvrščanje in odstranjevanje plošč se shrani z načrtom, a se ne razveljavi.
+
 ## Mreža in pripenjanje
 
 Mreža kaže velikost plošče. Spodaj desno je **pripenjanje**: premikanje in spreminjanje velikosti se zaskočita v korakih te velikosti, na primer 1 mm. Za drobno delo ga nastaviš manjšega, za grobo razporejanje večjega. {{ui:editor.tool.snapToGrid}} v orodni vrstici naknadno pomakne izbrane oblike na najbližje presečišče mreže. Pri premikanju se oblike poleg tega zaskočijo na druge oblike, glej [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje).

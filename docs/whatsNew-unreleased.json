@@ -48,5 +48,15 @@
       "de": "Sicherst du auf der Startseite mit „Auswählen“ und „Sichern“ nur einen Entwurf, heißt die ZIP-Datei jetzt nach ihm, etwa „layerling-Laterne-2026-11-05.zip“, so wie die Sicherung eines Ordners nach dem Ordner heißt.",
       "en": "When you back up just one design with \"Select\" and \"Back up\" on the start page, the ZIP file is now named after it, such as \"layerling-Lantern-2026-11-05.zip\", the way a folder's backup is named after the folder."
     }
+  },
+  {
+    "title": {
+      "de": "Mehrere Druckplatten",
+      "en": "Several build plates"
+    },
+    "body": {
+      "de": "Passt ein Entwurf nicht auf eine Platte, bekommt er weitere Platten nebeneinander (Anordnen > Druckplatten oder Rechtsklick > Auf Platte …). Ein Körper gehört zu der Platte, auf der er steht; „Auf Platten verteilen“ legt die Teile aus, jede Platte wird für sich geprüft, und der Export schreibt eine Platte oder je Platte eine Datei.",
+      "en": "When a design does not fit one plate, it gets more plates side by side (Arrange > Build plates, or right-click > Onto plate…). A body belongs to the plate it stands on; \"Arrange on plates\" lays the parts out, each plate is checked on its own, and the export writes one plate or one file per plate."
+    }
   }
 ]
