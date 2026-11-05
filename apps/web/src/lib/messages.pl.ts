@@ -3144,7 +3144,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "Inna liczba rozkłada komórki albo ziarna od nowa.",
   "inspector.surfaceImage": "Obraz",
   "inspector.surfaceImageLoad": "Wczytaj własny obraz…",
-  "inspector.surfaceImageHint": "Jasne miejsca dostają pełną głębokość, ciemne zostają bez zmian. Własny obraz jest przechowywany z projektem w odcieniach szarości, najwyżej 256 punktów na bok. Kafel ma ustawioną szerokość i taką wysokość, jaką ma obraz przy tej szerokości.",
+  "inspector.surfaceImageHint": "Jasne miejsca dostają pełną głębokość, ciemne zostają bez zmian. Ciemny rysunek na przezroczystym tle, na przykład czarne linie w SVG, liczy się według swoich linii: to one dostają pełną głębokość. Własny obraz jest przechowywany z projektem w odcieniach szarości, najwyżej 256 punktów na bok. Kafel ma ustawioną szerokość i taką wysokość, jaką ma obraz przy tej szerokości.",
   "inspector.surfaceTileHeight": "Wysokość kafla (0 = jak obraz)",
   "inspector.surfaceImageHeight": "Wysokość obrazu",
   "inspector.surfaceImageOnceHint": "Obraz zostaje odciśnięty raz, jak naklejka: „Dookoła” i „Wysokość” ustawiają jego środek, jak przy tekście. Poza nim powierzchnia pozostaje gładka; „Głębokość” i „Kierunek” określają, jak bardzo wystaje lub jest wciśnięty. Wysokość obrazu 0 zachowuje jego proporcje. Gdy wybrano ściany, obraz zawsze trafia na nie.",
