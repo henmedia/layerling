@@ -3148,6 +3148,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "Lunghezza ripiano (%)",
   "gridfinity.compartmentLabelLengthHint": "Con 100 il ripiano occupa tutta la lunghezza del lato.",
   "gridfinity.compartmentLabelTooShortHint": "Questo ripiano è più corto di 4 mm e viene omesso.",
+  "gridfinity.labelTextTooSmallHint": "Su questo ripiano le maiuscole sarebbero alte meno di 3 mm, quindi il testo viene omesso. Usa un testo più corto, o un ripiano più largo o più lungo.",
   "gridfinity.compartmentLabelOpenHint": "Questo lato del contenitore è aperto e non ha una parete per il ripiano, che quindi viene omesso.",
   "gridfinity.compartmentLabelSwitchedHint": "Questo lato del contenitore è impostato come aperto, quindi il ripiano viene omesso.",
   "gridfinity.alignLeft": "Sinistra",

@@ -3149,6 +3149,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "طول الرف (%)",
   "gridfinity.compartmentLabelLengthHint": "عند 100 يمتد الرف على طول الجانب كله.",
   "gridfinity.compartmentLabelTooShortHint": "هذا الرف أقصر من 4 مم فيُترك.",
+  "gridfinity.labelTextTooSmallHint": "على هذا الرف سيكون ارتفاع الأحرف الكبيرة أقل من 3 مم، لذا يُترك النص. استخدم نصًا أقصر، أو رفًا أعرض أو أطول.",
   "gridfinity.compartmentLabelOpenHint": "هذا الجانب من العلبة مفتوح وليس فيه جدار للرف، فيُترك الرف.",
   "gridfinity.compartmentLabelSwitchedHint": "هذا الجانب من العلبة مضبوط على أنه مفتوح، فيُترك الرف.",
   "gridfinity.alignLeft": "يسار",

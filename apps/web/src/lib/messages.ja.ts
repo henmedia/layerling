@@ -2479,6 +2479,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "棚の長さ（%）",
   "gridfinity.compartmentLabelLengthHint": "100にすると、棚はその側のはしからはしまでつながります。",
   "gridfinity.compartmentLabelTooShortHint": "この棚は4 mmより短いので付けません。",
+  "gridfinity.labelTextTooSmallHint": "この棚では大文字の高さが3 mmに満たないので、文字を付けません。文字を短くするか、棚を広く、または長くしてください。",
   "gridfinity.compartmentLabelOpenHint": "ビンのこの側は開いていて壁がないので、棚は付けません。",
   "gridfinity.compartmentLabelSwitchedHint": "ビンのこの側は「開ける」がオンなので、棚は付けません。",
   "gridfinity.alignLeft": "左",

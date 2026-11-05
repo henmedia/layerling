@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Text auf Gridfinity-Etikettenleisten",
+      "en": "Text on Gridfinity label shelves"
+    },
+    "body": {
+      "de": "Jede Etikettenleiste eines Gridfinity-Behälters, an der Wand oder in einem Fach, kann jetzt einen Text mit bis zu 24 Zeichen tragen, 0,4 mm erhaben als Teil des Behälters. Die Buchstaben werden so groß, wie die Leiste es zulässt, und ein darauf gestapelter Behälter bleibt frei von ihnen. Tipp den Text im Eigenschaften-Fenster unter „Text“ ein.",
+      "en": "Every label shelf of a Gridfinity bin, along a wall or in a compartment, now takes a text of up to 24 characters, raised 0.4 mm as part of the bin. The letters are as large as the shelf lets them be, and a bin stacked on top stays clear of them. Type the text under \"Text\" in the Properties panel."
+    }
+  }
+]

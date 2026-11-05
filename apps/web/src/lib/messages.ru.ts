@@ -3154,6 +3154,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "Длина полки (%)",
   "gridfinity.compartmentLabelLengthHint": "При 100 полка идёт по всей длине стороны.",
   "gridfinity.compartmentLabelTooShortHint": "Эта полка короче 4 мм и не строится.",
+  "gridfinity.labelTextTooSmallHint": "На этой полке заглавные буквы были бы ниже 3 мм, поэтому текст не строится. Сократите текст или сделайте полку шире или длиннее.",
   "gridfinity.compartmentLabelOpenHint": "Эта сторона контейнера открыта: стенки для полки нет, поэтому полка не строится.",
   "gridfinity.compartmentLabelSwitchedHint": "Эта сторона контейнера включена как открытая, поэтому полка не строится.",
   "gridfinity.alignLeft": "Слева",

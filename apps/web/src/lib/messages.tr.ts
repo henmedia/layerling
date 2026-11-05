@@ -2336,6 +2336,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "Raf uzunluğu (%)",
   "gridfinity.compartmentLabelLengthHint": "100 iken raf kenarın tüm uzunluğu boyunca uzanır.",
   "gridfinity.compartmentLabelTooShortHint": "Bu raf 4 mm'den kısa olduğu için yapılmaz.",
+  "gridfinity.labelTextTooSmallHint": "Bu rafta büyük harfler 3 mm'den kısa olacağı için metin yapılmaz. Daha kısa bir metin ya da daha geniş veya daha uzun bir raf kullan.",
   "gridfinity.compartmentLabelOpenHint": "Kutunun bu tarafı açık, raf için duvar olmadığından raf yapılmaz.",
   "gridfinity.compartmentLabelSwitchedHint": "Kutunun bu tarafı açık olarak işaretli, bu yüzden raf yapılmaz.",
   "gridfinity.alignLeft": "Sol",
