@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Simplify mesh says why it stops above the count (#1335):** With "Keep edges and holes" on, a body of flat faces and sharp edges, such as a group of boxes and wedges, keeps every edge point, so the simplifier stopped at the same count whatever was asked for and the result looked as if the preview did not follow the slider. When the result stays more than a tenth above the count (`simplifyStoppedShort`), the panel now says so: with the box ticked, that the kept edges and holes allow no fewer and that unticking it goes lower; without it, that fewer would close a hole or merge two walls. All languages, guide chapter 12. Reported by @uninteressant2026.
 - **Grouping leaves no skin where a hole cuts across a box and a mesh (#1334):** The kernel built a plain box, sphere or cylinder from its own numbers but every mesh from 32-bit ones, so a face at a position 32 bits cannot hold, such as -58.45, lay half a millionth of a millimetre apart in the two. A plate grouped with a hollowed shell behind it and a hull hole through the plate kept that gap as a skin of no thickness over the display window, which showed as thin walls (1013 mm² of extra surface at the same volume). The kernel's own solids now have their corners rounded to 32 bits too before they are cut, so they meet the meshes exactly. Reported by @uninteressant2026.
 
 ## 1.143.0

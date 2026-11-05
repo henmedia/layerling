@@ -2271,6 +2271,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "simplify.triangles": "Dreiecke",
   "simplify.keepEdges": "Kanten und Bohrungen beibehalten",
   "simplify.keepEdgesHint": "Scharfe Kanten und die Ränder von Bohrungen bleiben genau, wo sie sind, während ebene Flächen trotzdem die meisten Dreiecke verlieren. Ausgeschaltet dürfen sie für weniger Dreiecke abgerundet werden.",
+  "simplify.stoppedEdges": "Hält bei {count} Dreiecken an: Die Kanten und Bohrungen, die erhalten bleiben, lassen nicht weniger zu. Ohne „Kanten und Bohrungen beibehalten“ geht es weiter herunter.",
+  "simplify.stoppedShape": "Hält bei {count} Dreiecken an: Weniger würden ein Loch schließen oder zwei Wände verschmelzen.",
   "simplify.apply": "Vereinfachen",
   "status.meshSimplified": "Von {before} auf {after} Dreiecke vereinfacht",
   "status.meshSimplifiedEdgesKept": "Von {before} auf {after} Dreiecke vereinfacht, scharfe Kanten und Bohrungen behalten",

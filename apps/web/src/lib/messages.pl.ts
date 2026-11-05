@@ -2237,6 +2237,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "simplify.triangles": "trójkąty",
   "simplify.keepEdges": "Zachowaj krawędzie i otwory",
   "simplify.keepEdgesHint": "Ostre krawędzie i brzegi otworów zostają dokładnie tam, gdzie są, a płaskie ściany i tak tracą większość trójkątów. Po wyłączeniu mogą zostać zaokrąglone, by zejść niżej.",
+  "simplify.stoppedEdges": "Zatrzymuje się na {count} trójkątach: zachowane krawędzie i otwory nie pozwalają na mniej. Wyłącz „Zachowaj krawędzie i otwory”, aby zejść niżej.",
+  "simplify.stoppedShape": "Zatrzymuje się na {count} trójkątach: mniej zamknęłoby otwór lub połączyło dwie ścianki.",
   "simplify.apply": "Uprość",
   "status.meshSimplified": "Uproszczono z {before} do {after} trójkątów",
   "status.meshSimplifiedEdgesKept": "Uproszczono z {before} do {after} trójkątów, ostre krawędzie i otwory zachowane",

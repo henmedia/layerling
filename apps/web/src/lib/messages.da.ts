@@ -2763,6 +2763,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "simplify.triangles": "trekanter",
   "simplify.keepEdges": "Bevar kanter og huller",
   "simplify.keepEdgesHint": "Skarpe kanter og kanterne af huller bliver præcis, hvor de er, mens plane flader stadig mister de fleste af deres trekanter. Slået fra må de rundes af for et lavere antal.",
+  "simplify.stoppedEdges": "Stopper ved {count} trekanter: de kanter og huller, der bevares, tillader ikke færre. Slå \"Bevar kanter og huller\" fra for at komme længere ned.",
+  "simplify.stoppedShape": "Stopper ved {count} trekanter: færre ville lukke et hul eller smelte to vægge sammen.",
   "simplify.apply": "Anvend",
   "status.meshSimplified": "Forenklet fra {before} til {after} trekanter",
   "status.meshSimplifiedEdgesKept": "Forenklet fra {before} til {after} trekanter, skarpe kanter og huller bevaret",

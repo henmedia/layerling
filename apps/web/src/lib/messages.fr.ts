@@ -2258,6 +2258,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "simplify.triangles": "triangles",
   "simplify.keepEdges": "Conserver arêtes et trous",
   "simplify.keepEdgesHint": "Les arêtes vives et les bords des trous restent exactement à leur place, tandis que les faces planes perdent quand même la plupart de leurs triangles. Désactivé, ils peuvent être arrondis pour descendre plus bas.",
+  "simplify.stoppedEdges": "S'arrête à {count} triangles : les arêtes et les trous conservés n'en permettent pas moins. Désactivez « Conserver arêtes et trous » pour descendre plus bas.",
+  "simplify.stoppedShape": "S'arrête à {count} triangles : moins fermerait un trou ou fusionnerait deux parois.",
   "simplify.apply": "Simplifier",
   "status.meshSimplified": "Simplifié des triangles {before} aux triangles {after}",
   "status.meshSimplifiedEdgesKept": "Simplifié de {before} à {after} triangles, arêtes vives et trous conservés",

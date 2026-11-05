@@ -115,6 +115,7 @@ Template pictures are added in sketch mode, see [Sketches](chapter:sketches).
 ## Simplifying an imported mesh
 
 A scanned or sculpted mesh often has far more triangles than its shape needs, and every one of them is carried along while you move, cut and save. {{ui:simplify.title}} in the Modify group (or in the right-click menu of the body) shows the mesh as it is next to what a chosen share of its triangles would leave of it; both views turn and zoom together with the mouse buttons of the workplane. Set how much to keep as a percentage or a number of triangles, and {{ui:simplify.apply}} takes the lighter mesh. The result is a plain mesh: for the result of a cut or merge, {{ui:group.edit}} and its original parts are given up. With {{ui:simplify.keepEdges}} switched on, as it is to begin with, sharp edges and the rims of holes stay exactly where they are while flat faces still lose most of their triangles; switched off, the simplifier may round them off to reach a lower count.
+If the simplifier stops above the number you asked for, the window says so and why: with {{ui:simplify.keepEdges}} on, a body made of flat faces and sharp edges, such as boxes and wedges, often cannot lose more.
 
 Cutting, merging and intersecting an imported mesh is calculated in your browser, so the workspace settings limit how many triangles such a mesh may have ({{ui:workspace.booleanTriangleLimit}}). A mesh above the limit is not processed, and the message names its triangle count; simplify the mesh first, or raise the limit if your computer can take it.
 

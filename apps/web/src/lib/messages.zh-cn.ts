@@ -2223,6 +2223,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "simplify.triangles": "个三角形",
   "simplify.keepEdges": "保留边缘和孔",
   "simplify.keepEdgesHint": "锐边和孔的边缘会精确保持原位，而平面仍会去掉大部分三角形。关闭后，为了更少的三角形，它们可能被磨圆。",
+  "simplify.stoppedEdges": "停在 {count} 个三角形：保留的边缘和孔不允许更少。关闭“保留边缘和孔”即可继续减少。",
+  "simplify.stoppedShape": "停在 {count} 个三角形：再少就会封闭孔或合并两面壁。",
   "simplify.apply": "简化",
   "status.meshSimplified": "已从 {before} 个三角形简化为 {after} 个",
   "status.meshSimplifiedEdgesKept": "已从 {before} 个三角形简化到 {after} 个，保留了锐边和孔",

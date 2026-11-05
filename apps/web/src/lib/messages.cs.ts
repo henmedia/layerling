@@ -2339,6 +2339,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "simplify.triangles": "trojúhelníků",
   "simplify.keepEdges": "Zachovat hrany a otvory",
   "simplify.keepEdgesHint": "Ostré hrany a okraje otvorů zůstanou přesně na místě, zatímco rovné plochy i tak přijdou o většinu trojúhelníků. Vypnuté je smí zaoblit kvůli menšímu počtu.",
+  "simplify.stoppedEdges": "Zastaví se na {count} trojúhelnících: zachované hrany a otvory nedovolí méně. Vypněte „Zachovat hrany a otvory“ a půjde to níž.",
+  "simplify.stoppedShape": "Zastaví se na {count} trojúhelnících: méně by uzavřelo otvor nebo spojilo dvě stěny.",
   "simplify.apply": "Zjednodušit",
   "status.meshSimplified": "Síť zjednodušena z {before} na {after} trojúhelníků",
   "status.meshSimplifiedEdgesKept": "Zjednodušeno z {before} na {after} trojúhelníků, ostré hrany a otvory zachovány",

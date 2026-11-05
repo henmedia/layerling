@@ -2274,6 +2274,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "simplify.triangles": "triángulos",
   "simplify.keepEdges": "Conservar aristas y agujeros",
   "simplify.keepEdgesHint": "Las aristas vivas y los bordes de los agujeros se quedan exactamente donde están, mientras que las caras planas pierden igualmente la mayoría de sus triángulos. Desactivado, pueden redondearse para bajar más.",
+  "simplify.stoppedEdges": "Se detiene en {count} triángulos: las aristas y los agujeros que conserva no permiten menos. Desactiva «Conservar aristas y agujeros» para bajar más.",
+  "simplify.stoppedShape": "Se detiene en {count} triángulos: menos cerraría un agujero o uniría dos paredes.",
   "simplify.apply": "Simplificar",
   "status.meshSimplified": "Simplificada de {before} a {after} triángulos",
   "status.meshSimplifiedEdgesKept": "Simplificada de {before} a {after} triángulos, conservando aristas vivas y agujeros",

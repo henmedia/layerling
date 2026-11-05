@@ -15,6 +15,17 @@ export type SimplifyOptions = {
   keepEdges?: boolean;
 };
 
+/** A result this much above the asked count (plus a few triangles) has stopped short. */
+const STOPPED_SHORT_MARGIN = 1.1;
+
+/**
+ * Whether the simplifier stopped well above the count asked for: kept edges, or holes and walls it
+ * will not close, leave it no more to take, and the result then looks the same whatever is asked (#1335).
+ */
+export function simplifyStoppedShort(resultTriangles: number, targetTriangles: number) {
+  return resultTriangles > targetTriangles * STOPPED_SHORT_MARGIN + 4;
+}
+
 /** Two faces meeting at more than this angle (degrees) make an edge to keep. */
 export const SIMPLIFY_EDGE_ANGLE = 30;
 /** With keepEdges, how far a round face may move, as a share of the mesh's largest extent (0.04 mm on an 80 mm part). */

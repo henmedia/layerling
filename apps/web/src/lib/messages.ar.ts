@@ -2280,6 +2280,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "simplify.triangles": "مثلثات",
   "simplify.keepEdges": "الحفاظ على الحواف والثقوب",
   "simplify.keepEdgesHint": "تبقى الحواف الحادة وحواف الثقوب في مكانها تمامًا، بينما تفقد الأوجه المستوية معظم مثلثاتها. عند الإيقاف يمكن تدويرها للوصول إلى عدد أقل.",
+  "simplify.stoppedEdges": "يتوقف عند {count} مثلث: الحواف والثقوب المحفوظة لا تسمح بأقل من ذلك. أوقف \"الحفاظ على الحواف والثقوب\" للنزول أكثر.",
+  "simplify.stoppedShape": "يتوقف عند {count} مثلث: الأقل من ذلك سيغلق ثقبًا أو يدمج جدارين.",
   "simplify.apply": "تبسيط",
   "status.meshSimplified": "تم التبسيط من {before} إلى {after} مثلث",
   "status.meshSimplifiedEdgesKept": "بُسّطت من {before} إلى {after} مثلثًا مع الحفاظ على الحواف الحادة والثقوب",

@@ -8,7 +8,7 @@ import { AlertTriangle, Check, LoaderCircle, X } from "lucide-react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { numberLocale, t } from "@/lib/i18n";
 import { simplifyTrianglePositionsOffThread } from "@/lib/geometryWorker";
-import type { SimplifiedMesh } from "@/lib/meshSimplify";
+import { simplifyStoppedShort, type SimplifiedMesh } from "@/lib/meshSimplify";
 import { displayShapeName } from "@/lib/shapeCatalog";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -312,6 +312,9 @@ export function MeshSimplifyPanel({
   const locale = numberLocale();
   const count = (triangles: number) => triangles.toLocaleString(locale);
   const reduces = Boolean(result && result.triangleCount < sourceTriangles);
+  // The count is a target: kept edges or the mesh's holes and walls can stop the simplifier well above it,
+  // and the result then looks the same whatever is asked for, so the panel says why (#1335).
+  const stoppedShort = Boolean(!busy && result && simplifyStoppedShort(result.triangleCount, target));
   // A cut or merge keeps its parts for "Edit group"; the simplified mesh cannot, and should say so beforehand.
   const dissolvesGroup = Boolean(shape.groupedShapes?.length);
   const commitTargetDraft = () => {
@@ -366,6 +369,12 @@ export function MeshSimplifyPanel({
           <p className="mesh-compare-warning" role="status">
             <AlertTriangle size={17} strokeWidth={2.4} aria-hidden="true" />
             <span>{t("simplify.groupNote")}</span>
+          </p>
+        ) : null}
+        {stoppedShort && result ? (
+          <p className="mesh-compare-warning" role="status">
+            <AlertTriangle size={17} strokeWidth={2.4} aria-hidden="true" />
+            <span>{t(keepEdges ? "simplify.stoppedEdges" : "simplify.stoppedShape", { count: count(result.triangleCount) })}</span>
           </p>
         ) : null}
         <label className="mesh-compare-check keep-edges" title={t("simplify.keepEdgesHint")}>

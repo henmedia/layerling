@@ -2259,6 +2259,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "simplify.triangles": "triangoli",
   "simplify.keepEdges": "Mantieni spigoli e fori",
   "simplify.keepEdgesHint": "Gli spigoli vivi e i bordi dei fori restano esattamente dove sono, mentre le facce piane perdono comunque la maggior parte dei triangoli. Disattivato, possono essere arrotondati per scendere di più.",
+  "simplify.stoppedEdges": "Si ferma a {count} triangoli: gli spigoli e i fori mantenuti non ne permettono meno. Disattiva \"Mantieni spigoli e fori\" per scendere ancora.",
+  "simplify.stoppedShape": "Si ferma a {count} triangoli: meno chiuderebbero un foro o unirebbero due pareti.",
   "simplify.apply": "Semplifica",
   "status.meshSimplified": "Mesh semplificata da {before} a {after} triangoli",
   "status.meshSimplifiedEdgesKept": "Semplificata da {before} a {after} triangoli, spigoli vivi e fori mantenuti",

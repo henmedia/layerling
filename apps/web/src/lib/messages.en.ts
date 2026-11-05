@@ -2272,6 +2272,8 @@ export const MESSAGES_EN = {
   "simplify.triangles": "triangles",
   "simplify.keepEdges": "Keep edges and holes",
   "simplify.keepEdgesHint": "Sharp edges and the rims of holes stay exactly where they are, while flat faces still lose most of their triangles. Switched off, they may be rounded off for a lower count.",
+  "simplify.stoppedEdges": "Stops at {count} triangles: the edges and holes it keeps allow no fewer. Switch off \"Keep edges and holes\" to go lower.",
+  "simplify.stoppedShape": "Stops at {count} triangles: fewer would close a hole or merge two walls.",
   "simplify.apply": "Simplify",
   "status.meshSimplified": "Simplified from {before} to {after} triangles",
   "status.meshSimplifiedEdgesKept": "Simplified from {before} to {after} triangles, sharp edges and holes kept",

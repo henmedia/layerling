@@ -1811,6 +1811,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "simplify.triangles": "trikotnikov",
   "simplify.keepEdges": "Ohrani robove in luknje",
   "simplify.keepEdgesHint": "Ostri robovi in robovi lukenj ostanejo natanko tam, kjer so, ravne ploskve pa vseeno izgubijo večino trikotnikov. Izklopljeno jih sme zaobliti za manjše število.",
+  "simplify.stoppedEdges": "Ustavi se pri {count} trikotnikih: ohranjeni robovi in luknje ne dovolijo manj. Izklopi »Ohrani robove in luknje«, da greš nižje.",
+  "simplify.stoppedShape": "Ustavi se pri {count} trikotnikih: manj bi zaprlo luknjo ali združilo dve steni.",
   "simplify.apply": "Poenostavi",
   "status.meshSimplified": "Poenostavljeno s {before} na {after} trikotnikov",
   "status.meshSimplifiedEdgesKept": "Poenostavljeno s {before} na {after} trikotnikov, ostri robovi in luknje ohranjeni",

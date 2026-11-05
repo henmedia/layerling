@@ -2272,6 +2272,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "simplify.triangles": "driehoeken",
   "simplify.keepEdges": "Randen en gaten behouden",
   "simplify.keepEdgesHint": "Scherpe randen en de randen van gaten blijven precies waar ze zijn, terwijl vlakke delen toch de meeste driehoeken verliezen. Uit mogen ze worden afgerond voor minder driehoeken.",
+  "simplify.stoppedEdges": "Stopt bij {count} driehoeken: de randen en gaten die behouden blijven laten er niet minder toe. Zet \"Randen en gaten behouden\" uit om lager te gaan.",
+  "simplify.stoppedShape": "Stopt bij {count} driehoeken: minder zou een gat sluiten of twee wanden samenvoegen.",
   "simplify.apply": "Vereenvoudigen",
   "status.meshSimplified": "Vereenvoudigd van {before} naar {after} driehoeken",
   "status.meshSimplifiedEdgesKept": "Vereenvoudigd van {before} naar {after} driehoeken, scherpe randen en gaten behouden",

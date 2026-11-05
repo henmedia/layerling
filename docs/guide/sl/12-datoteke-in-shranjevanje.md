@@ -109,6 +109,7 @@ Slike kot predlogo vstaviš v skicirnem načinu, glej [Skice](chapter:skice).
 ## Poenostavitev uvožene mreže
 
 Skenirana ali modelirana mreža ima pogosto bistveno več trikotnikov, kot jih njena oblika potrebuje, in vsakega se vleče zraven pri premikanju, rezanju in shranjevanju. {{ui:simplify.title}} v skupini Spreminjanje (ali v meniju z desnim klikom na telo) pokaže mrežo, kakršna je, ob tistem, kar od nje ostane pri izbranem deležu njenih trikotnikov; oba pogleda se vrtita in zumirata skupaj, z miškinimi gumbi delovne ravnine. Določiš, koliko naj ostane, kot odstotek ali kot število trikotnikov, in {{ui:simplify.apply}} prevzame lažjo mrežo. Rezultat je preprosta mreža: pri rezultatu reza ali združitve odpadeta {{ui:group.edit}} in prvotni deli. Z vklopljenim {{ui:simplify.keepEdges}}, kot je na začetku, ostanejo ostri robovi in robovi lukenj natanko tam, kjer so, ravne ploskve pa vseeno izgubijo večino trikotnikov; izklopljeno jih poenostavitev sme zaobliti za manjše število.
+Če se poenostavitev ustavi nad želenim številom, okno to pove in zakaj: z vklopljenim {{ui:simplify.keepEdges}} telo iz ravnih ploskev in ostrih robov, na primer iz kvadrov in klinov, pogosto ne more izgubiti več.
 
 Rezanje, združevanje in preseki z uvoženo mrežo se izračunajo v tvojem brskalniku, zato nastavitve delovnega prostora omejujejo, koliko trikotnikov lahko taka mreža ima ({{ui:workspace.booleanTriangleLimit}}). Mreža čez mejo se ne obdela in sporočilo navede število njenih trikotnikov; mrežo najprej poenostavi ali mejo dvigni, če tvoj računalnik to zmore.
 

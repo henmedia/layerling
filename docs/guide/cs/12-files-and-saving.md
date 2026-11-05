@@ -109,6 +109,7 @@ Obrázkové podklady se přidávají v režimu náčrtu, viz [Náčrty](chapter:
 ## Zjednodušení importované sítě
 
 Skenovaná či sochařsky vytvořená síť mívá zbytečně mnoho trojúhelníků, které se zpracovávají při přesunu, řezání i ukládání. {{ui:simplify.title}} v části Úpravy nebo nabídce pravého tlačítka zobrazí vedle sebe originál a zjednodušený náhled. Oba se současně otáčejí a přibližují stejnými tlačítky jako pracovní plocha. Zadejte zachované procento nebo počet trojúhelníků a potvrďte {{ui:simplify.apply}}. Výsledkem je obyčejná síť. U výsledku řezu či sloučení tím přijdete o původní části a {{ui:group.edit}}. Se zapnutým {{ui:simplify.keepEdges}}, jak je nastaveno na začátku, zůstanou ostré hrany a okraje otvorů přesně na místě, zatímco rovné plochy i tak přijdou o většinu trojúhelníků; vypnuté je zjednodušení smí zaoblit kvůli menšímu počtu.
+Když se zjednodušení zastaví nad požadovaným počtem, okno to řekne i proč: se zapnutým {{ui:simplify.keepEdges}} těleso z rovných ploch a ostrých hran, třeba z kvádrů a klínů, často nemůže ztratit víc.
 
 Řezání, slučování a průnik importovaných sítí se počítají v prohlížeči. Nastavení {{ui:workspace.booleanTriangleLimit}} omezuje povolený počet trojúhelníků. Nad limitem se operace neprovede a hlášení uvede velikost sítě. Nejprve ji zjednodušte nebo limit přiměřeně výkonu počítače zvyšte.
 

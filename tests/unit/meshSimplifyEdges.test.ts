@@ -1,6 +1,6 @@
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
-import { simplifyTrianglePositions } from "@/lib/meshSimplify";
+import { simplifyStoppedShort, simplifyTrianglePositions } from "@/lib/meshSimplify";
 import { validateClosedSolidTriangleSoup } from "@/lib/svgImport";
 
 let runtime: ManifoldToplevel;
@@ -67,5 +67,44 @@ describe("simplifying a mesh with its edges kept", () => {
     const source = plateWithBore();
     const free = await simplifyTrianglePositions(source, source.length / 9 * 0.02);
     expect(rimPoints(free.positions).size).toBeLessThan(192);
+  });
+});
+
+describe("a simplification that stops short of the count asked for (#1335)", () => {
+  /** The plate with its bore as a CAD export leaves it: no faces divided, almost every point on an edge. */
+  function coarsePlate() {
+    const { Manifold } = runtime;
+    const plate = Manifold.cube([40, 40, 5], true);
+    const bore = Manifold.cylinder(8, 5, 5, 96, true);
+    const solid = plate.subtract(bore);
+    const mesh = solid.getMesh();
+    const soup: number[] = [];
+    for (let index = 0; index < mesh.triVerts.length; index += 1) {
+      const vertex = mesh.triVerts[index];
+      for (let axis = 0; axis < 3; axis += 1) soup.push(mesh.vertProperties[vertex * mesh.numProp + axis]);
+    }
+    plate.delete();
+    bore.delete();
+    solid.delete();
+    return soup;
+  }
+
+  it("is told when the kept edges leave the simplifier nothing to take, whatever the count", async () => {
+    const source = coarsePlate();
+    const sourceTriangles = source.length / 9;
+    const half = await simplifyTrianglePositions(source, sourceTriangles / 2, { keepEdges: true });
+    const tenth = await simplifyTrianglePositions(source, sourceTriangles / 10, { keepEdges: true });
+    // The same result for half and a tenth: the preview cannot change, and the panel says why.
+    expect(tenth.triangleCount).toBe(half.triangleCount);
+    expect(simplifyStoppedShort(tenth.triangleCount, sourceTriangles / 10)).toBe(true);
+  });
+
+  it("is not told when the result reaches the count", async () => {
+    const source = plateWithBore();
+    const target = source.length / 9 / 2;
+    const free = await simplifyTrianglePositions(source, target);
+    expect(simplifyStoppedShort(free.triangleCount, target)).toBe(false);
+    expect(simplifyStoppedShort(target * 1.1, target)).toBe(false);
+    expect(simplifyStoppedShort(target * 1.1 + 5, target)).toBe(true);
   });
 });
