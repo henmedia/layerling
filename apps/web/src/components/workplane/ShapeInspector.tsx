@@ -308,7 +308,7 @@ import { roundSideCount } from "@/lib/roundSideCount";
 import { normalizeCurvedConeBend, normalizeCurvedConeTop } from "@/lib/curvedCone";
 import { screwBossFootprint, screwBossPlan, screwBossSize, screwBossSizes, normalizeScrewBossFastener, MAX_SCREW_BOSS_GUSSETS, type ScrewBossFastener } from "@/lib/screwBoss";
 import { snapFitCatchBox, snapFitPlan, SNAP_FIT_STRAIN_PLA, SNAP_FIT_STRAIN_TOUGH, type SnapFitPart } from "@/lib/snapFit";
-import { MIN_RIB_FOOT_OVERHANG, MIN_RIB_FOOT_THICKNESS, normalizeRibStyle, normalizeRibTop, ribFootSwitch, ribSize, ribThicknessOnFootPatch } from "@/lib/rib";
+import { MIN_RIB_FOOT_OVERHANG, MIN_RIB_FOOT_THICKNESS, normalizeRibFootShape, normalizeRibStyle, normalizeRibTop, ribBoxWidth, ribFootSwitch, ribGussetWallKeepingPlace, ribLengthKeepingPatch, ribSize, ribThicknessOnFootPatch } from "@/lib/rib";
 import { torusTessellation } from "@/lib/torusTessellation";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO, torusTubeRatio, torusTubeThickness } from "@/lib/torusShape";
 import { normalizePyramidTop } from "@/lib/pyramidGeometry";
@@ -587,7 +587,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -2179,8 +2179,19 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     // On its foot (Discussion #1307) the box's depth is the foot's width, the rib's thickness a field of its own; the
     // depth's field id ("length") goes with the depth, so the dimension on the work area stays the same field.
     const onFoot = shape.ribFoot === true;
-    const size = ribSize({ ...shape, width, depth });
-    const footPatch = (patch: Partial<WorkplaneShape>): Partial<WorkplaneShape> => (patch.depth === undefined ? patch : { ...patch, size: resizedShapeSize(width, patch.depth) });
+    const rib = { ...shape, width, depth };
+    const size = ribSize(rib);
+    // On an oval foot the box's width is the foot's length in the same way, the rib's own length a field of its own
+    // ("ribLength", the width's id staying with the box) that sets the box's width round it.
+    const onOval = size.foot?.shape === "oval";
+    // A change to the foot or the rib's thickness: the box follows it, an oval foot's length too, so the rib stays as
+    // long as it was; it grows round its middle, but a gusset's away from its wall, so the gusset stays where it stands.
+    const footPatch = (change: Partial<WorkplaneShape>): Partial<WorkplaneShape> => {
+      const patch = { ...change, ...ribLengthKeepingPatch(rib, { ...rib, ...change }) };
+      if (patch.width === undefined && patch.depth === undefined) return patch;
+      const sized = { ...patch, size: resizedShapeSize(patch.width ?? width, patch.depth ?? depth) };
+      return style === "gusset" && patch.width !== undefined && Math.abs(patch.width - width) > 1e-9 ? { ...sized, ...ribGussetWallKeepingPlace(rib, patch.width) } : sized;
+    };
     const properties: ShapePropertyConfig[] = [
       {
         type: "select",
@@ -2189,13 +2200,15 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         value: style,
         options: [{ value: "straight", label: t("rib.straight") }, { value: "gusset", label: t("rib.gusset") }],
         hint: t(style === "gusset" ? "rib.gussetHint" : "rib.straightHint"),
-        // A gusset starts as a square corner piece, a rib as a long strip.
-        onChange: (value) => onUpdate(value === "gusset" ? { ribStyle: "gusset", width: 10, height: 10 } : { ribStyle: "straight", width: 40, height: 8 }),
+        // A gusset starts as a square corner piece, a rib as a long strip (on an oval foot, its box the foot's length).
+        onChange: (value) => onUpdate(value === "gusset" ? { ribStyle: "gusset", width: ribBoxWidth(rib, 10), height: 10 } : { ribStyle: "straight", width: ribBoxWidth(rib, 40), height: 8 }),
       },
-      { id: "width", label: t(style === "gusset" ? "prop.ribGussetFoot" : "prop.ribLength"), value: width, min: 0.2, max: 500, onChange: setWidth },
+      onOval
+        ? { id: "ribLength", label: t(style === "gusset" ? "prop.ribGussetFoot" : "prop.ribLength"), value: Math.round(size.width * 100) / 100, min: 0.2, max: 500, onChange: (value) => onUpdate(widthPatch(ribBoxWidth(rib, value)), { resizeAxis: "width" }) }
+        : { id: "width", label: t(style === "gusset" ? "prop.ribGussetFoot" : "prop.ribLength"), value: width, min: 0.2, max: 500, onChange: setWidth },
       { id: "height", label: t(style === "gusset" ? "prop.ribGussetLeg" : "prop.height"), value: shape.height, min: 0.2, max: 300, onChange: setHeight },
       onFoot
-        ? { id: "ribThickness", label: t("prop.ribThickness"), value: size.thickness, min: 0.2, max: 50, step: 0.1, hint: t("rib.thicknessHint"), onChange: (value) => onUpdate(footPatch(ribThicknessOnFootPatch({ ...shape, width, depth }, value))) }
+        ? { id: "ribThickness", label: t("prop.ribThickness"), value: size.thickness, min: 0.2, max: 50, step: 0.1, hint: t("rib.thicknessHint"), onChange: (value) => onUpdate(footPatch(ribThicknessOnFootPatch(rib, value))) }
         : { id: "length", label: t("prop.ribThickness"), value: depth, min: 0.2, max: 50, step: 0.1, hint: t("rib.thicknessHint"), onChange: setDepth },
     ];
     if (style === "straight") {
@@ -2208,10 +2221,20 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         onChange: (value) => onUpdate({ ribTop: normalizeRibTop(value) }),
       });
     }
-    // Switched on or off the box follows the foot, centred on the rib, so the rib stays where it stands.
-    properties.push({ type: "toggle", id: "ribFoot", label: t("prop.ribFoot"), value: onFoot, onChange: (value) => onUpdate(footPatch(ribFootSwitch({ ...shape, width, depth }, value))) });
+    // Switched on or off the box follows the foot, centred on the rib (an oval one under a gusset from its wall), so the
+    // rib stays where it stands.
+    properties.push({ type: "toggle", id: "ribFoot", label: t("prop.ribFoot"), value: onFoot, onChange: (value) => onUpdate(footPatch(ribFootSwitch(rib, value))) });
     if (onFoot) {
       properties.push(
+        {
+          type: "select",
+          id: "ribFootShape",
+          label: t("prop.ribFootShape"),
+          value: normalizeRibFootShape(shape.ribFootShape),
+          options: [{ value: "square", label: t("rib.footSquare") }, { value: "oval", label: t("rib.footOval") }],
+          hint: t("rib.footShapeHint"),
+          onChange: (value) => onUpdate(footPatch({ ribFootShape: normalizeRibFootShape(value) })),
+        },
         { id: "length", label: t("prop.ribFootWidth"), value: depth, min: Math.round((size.thickness + 2 * MIN_RIB_FOOT_OVERHANG) * 100) / 100, max: 100, step: 0.1, hint: t("rib.footHint"), onChange: (value) => onUpdate(footPatch({ depth: value })) },
         { id: "ribFootThickness", label: t("prop.ribFootThickness"), value: size.foot?.thickness ?? MIN_RIB_FOOT_THICKNESS, min: MIN_RIB_FOOT_THICKNESS, max: Math.max(MIN_RIB_FOOT_THICKNESS, shape.height / 2), step: 0.1, hint: t("rib.footThicknessHint"), onChange: (value) => onUpdate({ ribFootThickness: value }) },
       );

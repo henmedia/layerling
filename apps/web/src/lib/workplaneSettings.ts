@@ -549,6 +549,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.ribFoot = typeof source.ribFoot === "boolean" ? source.ribFoot : fallbackEntry?.ribFoot;
       entry.ribThickness = optionalShapeNumber(source.ribThickness, fallbackEntry?.ribThickness, 0.2, 50);
       entry.ribFootThickness = optionalShapeNumber(source.ribFootThickness, fallbackEntry?.ribFootThickness, 0.2, 50);
+      entry.ribFootShape = source.ribFootShape === "square" || source.ribFootShape === "oval" ? source.ribFootShape : fallbackEntry?.ribFootShape;
     }
     if (kind === "dovetail") {
       entry.dovetailNeckWidth = optionalShapeNumber(source.dovetailNeckWidth, fallbackEntry?.dovetailNeckWidth, 0.1, MAX_CUSTOM_SHAPE_DIMENSION);

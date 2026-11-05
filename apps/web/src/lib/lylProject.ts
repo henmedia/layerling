@@ -1737,6 +1737,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (kind === "rib") {
     // The foot (Discussion #1307). Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
     if (definition.ribFoot !== undefined && typeof definition.ribFoot !== "boolean") throw new Error(`${label}.ribFoot must be true or false`);
+    if (definition.ribFootShape !== undefined && definition.ribFootShape !== "square" && definition.ribFootShape !== "oval") throw new Error(`${label}.ribFootShape must be "square" or "oval"`);
     for (const key of ["ribThickness", "ribFootThickness"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);

@@ -3,7 +3,7 @@ import type { CadModifierEnclosurePart } from "@/lib/cadModifierTypes";
 import type { ProfilePoint } from "@/lib/enclosureMesh";
 import { screwBossGussetAngles, screwBossGussetTip, screwBossPlan, type ScrewBossFields, type ScrewBossPlan } from "@/lib/screwBoss";
 import { snapFitCatchFor, snapFitHookOutline, snapFitPlan, type SnapFitFields } from "@/lib/snapFit";
-import { ribGussetOutline, ribProfile, ribSize, type RibFields } from "@/lib/rib";
+import { ribGussetOutline, ribProfile, ribProfileOnFoot, ribSize, type RibFields, type RibFoot } from "@/lib/rib";
 
 /*
  * The exact bodies of the enclosure parts (#1246), from the same plans and outlines as their display meshes
@@ -15,8 +15,9 @@ import { ribGussetOutline, ribProfile, ribSize, type RibFields } from "@/lib/rib
  * the hole cut last: a solid of revolution with the chamfer at its mouth, run on past the top so no face of it lies
  * on the post's. Set as a hole, the boss is that pocket alone (#1288), opening at the boss's top. The
  * snap-fit and the rib are their side outlines pushed straight across, as the mesh pushes them, a straight rib's foot
- * (Discussion #1307) in its outline; a gusset on its foot is joined to the foot's plate. The snap-fit's hook and catch
- * stay two bodies, as Separate Parts splits them.
+ * (Discussion #1307) in its outline; a gusset on its foot is joined to the foot's plate, and so is a rib on an oval
+ * foot, whose plate is a true ellipse pushed up (half of one under a gusset). The snap-fit's hook and catch stay two
+ * bodies, as Separate Parts splits them.
  *
  * Built in the shape's own frame (y up, the bottom at y = 0, centred on x and z).
  */
@@ -26,6 +27,7 @@ type Vec3 = { x: number; y: number; z: number };
 /** z up to y up: (x, y, z) -> (x, z, -y). */
 const Z_TO_Y_UP = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
 const Y_AXIS = { point: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 1, z: 0 } };
+const UP = { x: 0, y: 1, z: 0 };
 /** How far the hole's cutter runs on past the top and, for a hole that goes through, below the floor. */
 const CUTTER_REACH = 1;
 
@@ -136,16 +138,57 @@ function snapFitSolid(cad: OcctKernel, fields: SnapFitFields) {
   return bodies.length === 1 ? bodies[0] : cad.makeCompound(bodies);
 }
 
+/**
+ * An oval foot's plate: the ellipse round (cx, 0, 0) with the semi-axes a along x and b along z, as a true ellipse,
+ * pushed up by the foot's thickness. `half` keeps the half beyond x = cx, closed along that line: a gusset's against
+ * its wall. The kernel's ellipse wants its major axis first, so a foot wider than long lays it across.
+ */
+function ovalPlate(cad: OcctKernel, cx: number, a: number, b: number, thickness: number, half: boolean) {
+  const center = { x: cx, y: 0, z: 0 };
+  const along = a >= b;
+  const major = Math.max(a, b), minor = Math.min(a, b);
+  // With the normal up the second axis is up x the first: -z after x, x after z. The half beyond cx is cos t >= 0 along
+  // x, sin t >= 0 along z.
+  const [start, end] = half ? (along ? [-Math.PI / 2, Math.PI / 2] : [0, Math.PI]) : [0, 2 * Math.PI];
+  const arc = Math.abs(a - b) <= 1e-9 * major && !half
+    ? cad.makeCircleEdge(center, UP, a)
+    : cad.makeEllipseArc(center, UP, major, minor, start, end, along ? { x: 1, y: 0, z: 0 } : { x: 0, y: 0, z: 1 });
+  const edges = [arc];
+  if (half) {
+    const ends = cad.getSubShapes(arc, "vertex").map((vertex) => cad.vertexPosition(vertex));
+    const { first, last } = cad.curveParameters(arc) as { first: number; last: number };
+    const middle = cad.curvePointAtParam(arc, (first + last) / 2);
+    // The half beyond the wall, from one end of the wall's line to the other: anything else would be a wrong body.
+    if (ends.length !== 2 || !ends.every((point) => Math.abs(point.x - cx) <= 1e-6 * major && Math.abs(Math.abs(point.z) - b) <= 1e-6 * major) || !(Math.abs(middle.x - (cx + a)) <= 1e-6 * major)) {
+      throw new Error("The kernel laid out the oval foot's half ellipse differently than expected");
+    }
+    edges.push(cad.makeLineEdge(ends[1], ends[0]));
+  }
+  return cad.extrude(cad.makeFace(cad.makeWire(edges)), 0, thickness, 0);
+}
+
+/** The rib standing on its oval foot (`rib`, from the floor up through the plate) joined to the plate, one solid. */
+function onOvalFoot(cad: OcctKernel, rib: ShapeHandle, foot: RibFoot, half: boolean, what: string) {
+  const plate = half ? ovalPlate(cad, -foot.length / 2, foot.length, foot.width / 2, foot.thickness, true) : ovalPlate(cad, 0, foot.length / 2, foot.width / 2, foot.thickness, false);
+  return oneSolid(cad, cad.unifySameDomain(cad.fuse(rib, plate)), what);
+}
+
 function ribSolid(cad: OcctKernel, fields: RibFields) {
   const { style, top, width, height, thickness, foot } = ribSize(fields);
   if (style === "gusset") {
-    // Seen from the side along z, as the mesh turns it: the outline in x-y, the thickness across z.
-    const gusset = cad.extrude(outlineFace(cad, ribGussetOutline(width, height), (p) => ({ x: p.u, y: p.v, z: -thickness / 2 })), 0, 0, thickness);
+    // Seen from the side along z, as the mesh turns it: the outline in x-y, the thickness across z. On an oval foot
+    // the box is the foot's, the gusset's wall at its back.
+    const shift = foot?.shape === "oval" ? (width - foot.length) / 2 : 0;
+    const gusset = cad.extrude(outlineFace(cad, ribGussetOutline(width, height), (p) => ({ x: p.u + shift, y: p.v, z: -thickness / 2 })), 0, 0, thickness);
     if (!foot) return gusset;
+    if (foot.shape === "oval") return onOvalFoot(cad, gusset, foot, true, "gusset on its oval foot");
     // Its foot a plate under its whole leg along the floor, joined to it; the faces they share are one again.
     const plate = cad.makeBoxFromCorners({ x: -width / 2, y: 0, z: -foot.width / 2 }, { x: width / 2, y: foot.thickness, z: foot.width / 2 });
     return oneSolid(cad, cad.unifySameDomain(cad.fuse(gusset, plate)), "gusset on its foot");
   }
-  // A straight rib on its foot is still one cross-section pushed along: the foot is part of the outline.
-  return cad.extrude(outlineFace(cad, ribProfile(thickness, height, top, foot), (p) => ({ x: -width / 2, y: p.v, z: p.u })), width, 0, 0);
+  // A straight rib on its square foot is still one cross-section pushed along: the foot is part of the outline. On an
+  // oval one the rib runs down into the plate, so the two overlap where they are joined rather than only touch.
+  const along = (outline: ProfilePoint[]) => cad.extrude(outlineFace(cad, outline, (p) => ({ x: -width / 2, y: p.v, z: p.u })), width, 0, 0);
+  if (foot?.shape === "oval") return onOvalFoot(cad, along(ribProfileOnFoot(thickness, height, top, foot.thickness, 0)), foot, false, "rib on its oval foot");
+  return along(ribProfile(thickness, height, top, foot));
 }

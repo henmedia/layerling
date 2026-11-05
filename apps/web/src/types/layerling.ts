@@ -169,6 +169,8 @@ export type ShapeCustomization = {
   /** Rib on its foot: the rib's own thickness, and the foot's thickness from the bottom, in mm. */
   ribThickness?: number;
   ribFootThickness?: number;
+  /** Rib on its foot: square (missing) or an ellipse seen from above; on an oval foot the width is the foot's length. */
+  ribFootShape?: "square" | "oval";
   topWidth?: number;
   topDepth?: number;
   teeth?: number;
@@ -1001,6 +1003,8 @@ export type WorkplaneShape = {
   /** Rib on its foot: the rib's own thickness, and the foot's thickness from the bottom, in mm. */
   ribThickness?: number;
   ribFootThickness?: number;
+  /** Rib on its foot: square (missing) or an ellipse seen from above; on an oval foot the width is the foot's length. */
+  ribFootShape?: "square" | "oval";
   topWidth?: number;
   topDepth?: number;
   taperTopWidth?: number;

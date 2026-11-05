@@ -110,7 +110,7 @@ import { InteractiveHelp } from "./InteractiveHelp";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
 import { nextSelectionTransparency } from "@/lib/selectionTransparency";
 import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, resizedShapeSize, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
-import { ribFootSwitch, ribThicknessOnFootPatch } from "@/lib/rib";
+import { normalizeRibStyle, ribFootSwitch, ribGussetWallKeepingPlace, ribLengthKeepingPatch, ribThicknessOnFootPatch } from "@/lib/rib";
 import { pasteCenteringShift, pasteNudged } from "@/lib/pasteCentering";
 import { faceWorkplaneCenteringShift, workplaneCenteringOffset } from "@/lib/workplaneCentering";
 import { projectShapesExtent } from "@/components/workplane/ViewportOverlays";
@@ -2648,8 +2648,9 @@ function mcpBentTubePatch(shape: WorkplaneShape, params: Record<string, unknown>
 /**
  * A rib's foot (Discussion #1307) moves its box, as the settings panel does: switched on, the rib keeps its thickness
  * (or takes ribThickness) and the depth becomes the foot's width, three times the rib; switched off, the depth is the
- * rib's thickness again. A thicker rib on its foot widens the foot where it would no longer reach out beside it. A
- * depth given in the same call wins.
+ * rib's thickness again. A thicker rib on its foot widens the foot where it would no longer reach out beside it. On an
+ * oval foot the width, the foot's length, follows a new shape, foot, foot width or thickness, so the rib stays as long
+ * as it was, and a gusset's box grows away from its wall. A depth, a width or a place given in the same call wins.
  */
 function mcpRibFootPatch(target: WorkplaneShape, patch: Partial<WorkplaneShape>, params: Record<string, unknown>): Partial<WorkplaneShape> {
   const rib = { ...target, width: shapeWidth(target), depth: shapeDepth(target) };
@@ -2658,12 +2659,15 @@ function mcpRibFootPatch(target: WorkplaneShape, patch: Partial<WorkplaneShape>,
   const thickness = patch.ribThickness;
   const wasOn = target.ribFoot === true;
   const on = typeof params.ribFoot === "boolean" ? params.ribFoot : wasOn;
-  const change = on !== wasOn
+  const change: Partial<WorkplaneShape> = on !== wasOn
     ? ribFootSwitch(rib, on, on ? { thickness, depth } : { depth: depth ?? thickness })
-    : on && thickness !== undefined && depth === undefined ? ribThicknessOnFootPatch(rib, thickness) : null;
-  if (!change) return {};
-  const nextDepth = change.depth ?? rib.depth;
-  return { ...change, size: Math.max(patch.width ?? rib.width, nextDepth) };
+    : on && thickness !== undefined && depth === undefined ? ribThicknessOnFootPatch(rib, thickness) : {};
+  const length = mcpOptionalNumber(params.width) === undefined ? ribLengthKeepingPatch(rib, { ...rib, ...patch, ...change }) : {};
+  if (change.depth === undefined && length.width === undefined) return change;
+  const nextWidth = length.width ?? patch.width ?? rib.width;
+  const placed = [params.x, params.z, params.elevation].every((value) => value === undefined);
+  const keepWall = placed && normalizeRibStyle(patch.ribStyle ?? target.ribStyle) === "gusset" && length.width !== undefined && Math.abs(length.width - rib.width) > 1e-9;
+  return { ...change, ...length, ...(keepWall ? ribGussetWallKeepingPlace(rib, length.width!) : {}), size: Math.max(nextWidth, change.depth ?? patch.depth ?? rib.depth) };
 }
 
 function mcpShapeCustomization(kind: ShapeKind, params: Record<string, unknown>): ShapeCustomization {

@@ -684,6 +684,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.ribFoot === b.ribFoot &&
     a.ribThickness === b.ribThickness &&
     a.ribFootThickness === b.ribFootThickness &&
+    a.ribFootShape === b.ribFootShape &&
     a.baseRadius === b.baseRadius &&
     a.topWidth === b.topWidth &&
     a.topDepth === b.topDepth &&

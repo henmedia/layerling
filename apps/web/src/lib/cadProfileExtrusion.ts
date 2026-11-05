@@ -1960,7 +1960,7 @@ export function cadModifierEnclosureForShape(shape: WorkplaneShape): CadModifier
   }
   return {
     kind: "rib",
-    fields: { width, depth, height, ribStyle: shape.ribStyle, ribTop: shape.ribTop, ribFoot: shape.ribFoot, ribThickness: shape.ribThickness, ribFootThickness: shape.ribFootThickness },
+    fields: { width, depth, height, ribStyle: shape.ribStyle, ribTop: shape.ribTop, ribFoot: shape.ribFoot, ribThickness: shape.ribThickness, ribFootThickness: shape.ribFootThickness, ribFootShape: shape.ribFootShape },
     transform,
   };
 }
