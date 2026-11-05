@@ -138,6 +138,7 @@ import { composedShapeRotation, geometryRotationDegreesForShortcut, geometryRota
 import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapePivotFromWorld, shapePivotWorld, type PivotPoint } from "@/lib/rotationPivot";
 import { createLocalId } from "@/lib/localIds";
 import { canEditGroupAtLevel, mcpOpenGroupSummary, openGroupLevelsStillOpen, trackOpenGroupLevels, type OpenGroupLevel } from "@/lib/openGroupParts";
+import type { TapeMeasurementsAnswer, TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
 import { projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
 import { exportMeshesToObj } from "@/lib/objExport";
 import { useEditorNotice } from "@/components/workplane/useEditorNotice";
@@ -434,7 +435,7 @@ declare global {
     /** "Hide workplane" in the camera bar for MCP: sets it when given, returns whether the plate is shown. */
     layerlingWorkplaneDisplay?: (visible?: boolean) => { visible: boolean };
     /** The tape measure's measurements for MCP: shows or hides them when asked, returns what is there (#881). */
-    layerlingMeasurements?: (request?: { visible?: boolean; dimensions?: boolean }) => { visible: boolean; dimensions: boolean; measurements: Array<{ id: string; length: number }> };
+    layerlingMeasurements?: (request?: TapeMeasurementsRequest) => TapeMeasurementsAnswer;
     /** The four saved views (keys 7, 8, 9, 0) for MCP: saves or shows one when asked, returns which keys hold a view. */
     layerlingSavedViews?: (request?: { save?: number; show?: number; startView?: "save" | "reset"; ontoWorkplane?: boolean }) => { keys: { key: string; saved: boolean }[]; shown?: boolean; startView: boolean };
   }
@@ -14026,9 +14027,18 @@ export function LayerlingEditor({
         if (!window.layerlingMeasurements) throw new Error("The tape measure is not available in this editor (a sketch is open, or the second view)");
         if (params.visible !== undefined && typeof params.visible !== "boolean") throw new Error("visible must be true or false");
         if (params.dimensions !== undefined && typeof params.dimensions !== "boolean") throw new Error("dimensions must be true or false");
+        // A length typed for a measurement moves a body (Discussion #610), which the history view does not allow.
+        const typesLength = params.id !== undefined || params.length !== undefined || params.axis !== undefined;
+        if (typesLength) {
+          if (historyViewStateRef.current) throw new Error("The history view is open. Close it with layerling_set_history_view (open: false) before changing the design.");
+          if (typeof params.id !== "string" || !params.id) throw new Error("id must be the id of a measurement, as layerling_measurements lists them");
+          if (typeof params.length !== "number" || !Number.isFinite(params.length)) throw new Error("length must be a number of millimetres");
+          if (params.axis !== undefined && params.axis !== "x" && params.axis !== "y" && params.axis !== "z") throw new Error('axis must be "x", "y" or "z"');
+        }
         return window.layerlingMeasurements({
           ...(typeof params.visible === "boolean" ? { visible: params.visible } : {}),
           ...(typeof params.dimensions === "boolean" ? { dimensions: params.dimensions } : {}),
+          ...(typesLength ? { typeLength: { id: params.id as string, length: params.length as number, ...(params.axis ? { axis: params.axis as "x" | "y" | "z" } : {}) } } : {}),
         });
       }
 
