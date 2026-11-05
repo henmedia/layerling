@@ -12,9 +12,10 @@ import { normalizeVaseSettings } from "@/lib/vaseSettings";
   matrixTransform() { return { x: this.x, y: -this.y }; }
 };
 
-function pointer(type: string, target: Element, x: number, y: number, detail = 0) {
+function pointer(type: string, target: Element, x: number, y: number, detail = 0, time?: number) {
   const event = new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y, detail });
   Object.defineProperty(event, "pointerId", { value: 1 });
+  if (time !== undefined) Object.defineProperty(event, "timeStamp", { value: time });
   target.dispatchEvent(event);
 }
 
@@ -36,16 +37,16 @@ function board() {
 
 /**
  * A double-click at (x, y) mm as a browser sends it: each press lands on what lies under the pointer (`under` finds
- * it anew, the first click redraws the board), and as the board holds the pointer from the press on, the release,
- * the click and the double click go to the svg.
+ * it anew, the first click redraws the board), and as the board holds the pointer from the press on, the release goes
+ * to the svg. No 'click' and no 'dblclick' follow: letting go redraws the line, the path pressed on is gone, and
+ * Chrome then sends neither (Discussion #1252 - the first fix waited for a 'dblclick' that never came). `gap` is the
+ * time between the two clicks in ms.
  */
-function doubleClick(svg: SVGSVGElement, under: () => Element, x: number, y: number) {
-  for (const detail of [1, 2]) {
-    pointer("pointerdown", under(), x, -y, detail);
-    pointer("pointerup", svg, x, -y, detail);
-    pointer("click", svg, x, -y, detail);
+function doubleClick(svg: SVGSVGElement, under: () => Element, x: number, y: number, gap = 150) {
+  for (const [detail, time] of [[1, 1000], [2, 1000 + gap]]) {
+    pointer("pointerdown", under(), x, -y, detail, time);
+    pointer("pointerup", svg, x, -y, detail, time + 60);
   }
-  pointer("dblclick", svg, x, -y, 2);
 }
 
 describe("the vase drawing: a double-click on the line adds a point (Discussion #1252)", () => {
@@ -77,6 +78,17 @@ describe("the vase drawing: a double-click on the line adds a point (Discussion 
     const [[, y0], [, y1]] = before;
     // Left of the axis lies only the mirrored half, which is not edited.
     doubleClick(svg, () => svg, -5, (y0 + y1) / 2);
+    expect(points()).toEqual(before);
+  });
+
+  it("adds nothing for two single clicks on the line a second apart", () => {
+    const { svg, points } = board();
+    const before = points();
+    const [[, y0], [, y1]] = before;
+    const line = svg.querySelector(".vz-curve-hit")!;
+    const curve = [...line.getAttribute("d")!.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    const [x, y] = curve.reduce((a, b) => (Math.abs(b[1] - (y0 + y1) / 2) < Math.abs(a[1] - (y0 + y1) / 2) ? b : a));
+    doubleClick(svg, () => svg.querySelector(".vz-curve-hit")!, x, y, 1000);
     expect(points()).toEqual(before);
   });
 });
