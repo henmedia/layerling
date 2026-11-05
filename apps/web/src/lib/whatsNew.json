@@ -1,5 +1,60 @@
 [
   {
+    "version": "1.144.0",
+    "items": [
+      {
+        "title": {
+          "de": "Scharnier, das flach zuklappt",
+          "en": "A hinge that closes flat"
+        },
+        "body": {
+          "de": "Ein Scharnier hat unter „Blattform“ jetzt „Erhöhtes Blatt“: Das zweite Blatt liegt höher, sodass es zugeklappt flach auf dem ersten liegt, und das Scharnier klappt weit über die flache Lage hinaus. Gedruckt wird es mit Stützen unter dem erhöhten Blatt. Der Öffnungswinkel geht jetzt auch unter 0°, bis -180°.",
+          "en": "Under \"Leaf shape\" a hinge now has \"Raised leaf\": the second leaf lies higher, so that, closed, it lies flat on the first, and the hinge folds far past lying flat. It prints with supports under the raised leaf. The opening angle now also goes below 0°, down to -180°."
+        }
+      },
+      {
+        "title": {
+          "de": "Rippe mit Fuß",
+          "en": "A rib on a foot"
+        },
+        "body": {
+          "de": "Eine Gehäuserippe kann jetzt auf einem Fuß stehen: eine dünne Platte unter der ganzen Rippe, breiter als sie, für mehr Halt auf dem Druckbett und am Boden. Einschalten unter „Fuß“ in den Einstellungen der Rippe; Breite und Dicke lassen sich einstellen.",
+          "en": "An enclosure rib can now stand on a foot: a thin plate under the whole rib, wider than it, for more hold on the print bed and on the floor. Switch it on under \"Foot\" in the rib's settings; its width and thickness can be set."
+        }
+      },
+      {
+        "title": {
+          "de": "Formen in eine Gruppe ziehen",
+          "en": "Drag shapes into a group"
+        },
+        "body": {
+          "de": "In der Objektliste lässt sich eine Form jetzt an ihrem Griff auf eine aufgeklappte Gruppe ziehen und kommt in diese Gruppe, ohne dass Form oder Gruppe ihren Namen verlieren. Umgekehrt zieht man ein Teil an seinem Griff wieder aus der Gruppe heraus.",
+          "en": "In the object list, a shape dragged by its handle onto a folded-open group now goes into that group, and neither the shape nor the group loses its name. The other way round, a part dragged by its handle out of the group lies loose again."
+        }
+      },
+      {
+        "title": {
+          "de": "„Schrift (angeheftet)“ bleibt um die Zacken eines Sterns aufrecht",
+          "en": "\"Text (stuck on)\" stays upright round a star's points"
+        },
+        "body": {
+          "de": "Auf einem Stern läuft „Schrift (angeheftet)“ jetzt aufrecht und in der richtigen Reihenfolge um die Zacken; bisher waren Teile davon verdreht oder fehlten ganz.",
+          "en": "On a star, \"Text (stuck on)\" now runs upright and in order round its points, where parts of it came out turned or missing."
+        }
+      },
+      {
+        "title": {
+          "de": "Gruppieren ohne dünne Häute",
+          "en": "Grouping without thin skins"
+        },
+        "body": {
+          "de": "Schnitt ein Loch durch einen Quader und ein importiertes oder ausgehöhltes Teil dahinter, blieb an der Fuge manchmal eine Haut ohne Dicke stehen, die als dünne Wand zu sehen war. Jetzt treffen sich die Teile genau, und das Loch geht sauber durch.",
+          "en": "When a hole cut through a box and an imported or hollowed part behind it, a skin of no thickness sometimes stayed at the joint and showed as a thin wall. Now the parts meet exactly and the hole goes cleanly through."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.143.0",
     "items": [
       {
