@@ -6,7 +6,13 @@ import type { WorkplaneShape } from "@/types/layerling";
  * worker, the work is done on the page instead, and the editor neither crashes nor waits forever.
  * A stand-in Worker plays each case; the page's own functions are stand-ins too.
  */
-const page = vi.hoisted(() => ({ calls: 0, faceReads: 0 }));
+const page = vi.hoisted(() => ({ calls: 0, faceReads: 0, stepExports: 0 }));
+vi.mock("@/lib/stepExport", () => ({
+  exportShapesToStep: async () => {
+    page.stepExports += 1;
+    return { blob: new Blob(["step"]), exportedCount: 1, skipped: [] };
+  },
+}));
 vi.mock("@/lib/editorBooleans", () => ({
   buildGroupedShapeFromSelection: async () => {
     page.calls += 1;
@@ -69,6 +75,7 @@ async function load(build = "") {
 beforeEach(() => {
   page.calls = 0;
   page.faceReads = 0;
+  page.stepExports = 0;
   FakeWorker.instances = [];
   FakeWorker.failOnCreate = false;
   dispatched.length = 0;
@@ -104,6 +111,15 @@ describe("geometry worker on the page's side", () => {
     await buildGroupedShapeOffThread([...solidAndHole, { id: "t", kind: "text" } as unknown as WorkplaneShape], 1000);
     expect(FakeWorker.instances).toHaveLength(0);
     expect(page.calls).toBe(2);
+  });
+
+  it("writes a STEP file with text in it on the page, where the fonts are (#1337)", async () => {
+    const { exportShapesToStepOffThread } = await load();
+    const tag = { id: "tag", kind: "box", groupedShapes: [{ id: "plate", kind: "box" }, { id: "words", kind: "text" }] } as unknown as WorkplaneShape;
+    const result = await exportShapesToStepOffThread([tag]);
+    expect(FakeWorker.instances).toHaveLength(0);
+    expect(page.stepExports).toBe(1);
+    expect(result.exportedCount).toBe(1);
   });
 
   it("works on the page when no worker can be made", async () => {
