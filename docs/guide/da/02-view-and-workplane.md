@@ -151,7 +151,7 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 ### Udseende: mål på arbejdsplanet
 
-{{ui:workspace.showMoveDimensions}} viser hvor meget du flytter, mens du drager, {{ui:workspace.showOriginDimensions}} afstandene fra markeringen til pladens nulpunkt, også når flere legemer er valgt. Med {{ui:workspace.dimensionsAlwaysVisible}} forbliver målene synlige hele tiden, og ikke kun mens du drager. Mens en vendt legeme er valgt, vises dens vinkler under den på arbejdsplanet; {{ui:workspace.showRotationAngles}} slår det fra. Mere i [Måling og noter](chapter:measuring-and-notes).
+{{ui:workspace.showMoveDimensions}} viser hvor meget du flytter, mens du drager eller med piletasterne, {{ui:workspace.showOriginDimensions}} afstandene fra markeringen til pladens nulpunkt, også når flere legemer er valgt. Med {{ui:workspace.dimensionsAlwaysVisible}} forbliver målene synlige hele tiden, og ikke kun mens du drager. Mens en vendt legeme er valgt, vises dens vinkler under den på arbejdsplanet; {{ui:workspace.showRotationAngles}} slår det fra. Mere i [Måling og noter](chapter:measuring-and-notes).
 
 ### Udseende: markering og flytning
 
