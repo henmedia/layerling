@@ -1325,7 +1325,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "historyStep.changed": "Terv módosítva",
   "status.edgeCancelledUndo": "Élművelet megszakítva · Visszavonás",
   "status.edgeCancelledRedo": "Élművelet megszakítva · Mégis",
-  "status.alignStart": "Igazítás: válassz egy pontot, vagy kattints egy kijelölt alakzatra, hogy az legyen a horgony. Alttal egy ponton a méretet igazítod helyette. A vonalak melletti pont egyenlő közökkel osztja el őket",
+  "status.alignStart": "Igazítás: válassz egy pontot, vagy kattints egy kijelölt alakzatra, hogy az legyen a horgony. Alttal egy ponton a méretet igazítod helyette. A vonalak melletti pont egyenlő közökkel osztja el őket. Az L vagy az Esc befejezi az igazítást",
   "status.alignCancelled": "Igazítás megszakítva",
   "status.alignAnchorSet": "Igazítási horgony beállítva",
   "status.alignAnchorNamed": "Igazítási horgony: {name}",

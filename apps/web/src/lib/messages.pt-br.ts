@@ -3127,7 +3127,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "historyStep.changed": "Projeto alterado",
   "status.edgeCancelledUndo": "Tratamento de aresta cancelado · Desfazer",
   "status.edgeCancelledRedo": "Tratamento de aresta cancelado · Refazer",
-  "status.alignStart": "Alinhar: escolha um ponto, ou clique numa forma selecionada para usá-la como âncora. Com Alt sobre um ponto, o tamanho é igualado. O ponto ao lado de cada linha as distribui com espaços iguais",
+  "status.alignStart": "Alinhar: escolha um ponto, ou clique numa forma selecionada para usá-la como âncora. Com Alt sobre um ponto, o tamanho é igualado. O ponto ao lado de cada linha as distribui com espaços iguais. L ou Esc encerra o alinhamento",
   "status.alignCancelled": "Alinhamento cancelado",
   "status.alignAnchorSet": "Âncora do alinhamento definida",
   "status.alignAnchorNamed": "Âncora do alinhamento: {name}",

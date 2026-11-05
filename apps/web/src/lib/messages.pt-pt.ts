@@ -1304,7 +1304,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "historyStep.changed": "Projeto alterado",
   "status.edgeCancelledUndo": "Modificação de arestas cancelada · Anular",
   "status.edgeCancelledRedo": "Modificação de arestas cancelada · Refazer",
-  "status.alignStart": "Alinhar: escolhe um ponto ou clica numa forma selecionada para a fixar como referência. O ponto ao lado de cada linha distribui-as com espaços iguais",
+  "status.alignStart": "Alinhar: escolhe um ponto ou clica numa forma selecionada para a fixar como referência. O ponto ao lado de cada linha distribui-as com espaços iguais. L ou Esc termina o alinhamento",
   "status.alignCancelled": "Alinhamento cancelado",
   "status.alignAnchorSet": "Referência de alinhamento definida",
   "status.alignAnchorNamed": "Referência de alinhamento: {name}",

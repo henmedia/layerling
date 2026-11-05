@@ -1461,7 +1461,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "historyStep.changed": "デザインを変更",
   "status.edgeCancelledUndo": "エッジ処理をキャンセルしました · 元に戻す",
   "status.edgeCancelledRedo": "エッジ処理をキャンセルしました · やり直す",
-  "status.alignStart": "整列: 点を選ぶか、選択したシェイプをクリックして基準にしてください。点の上で Alt を押すとサイズを揃えます。各ラインの横の点で等間隔に並べます",
+  "status.alignStart": "整列: 点を選ぶか、選択したシェイプをクリックして基準にしてください。点の上で Alt を押すとサイズを揃えます。各ラインの横の点で等間隔に並べます。L か Esc で整列を終了します",
   "status.alignCancelled": "整列をキャンセルしました",
   "status.alignAnchorSet": "整列の基準を設定しました",
   "status.alignAnchorNamed": "整列の基準: {name}",

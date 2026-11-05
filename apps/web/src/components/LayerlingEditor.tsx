@@ -1974,8 +1974,10 @@ function sizeAlignmentLabel(axis: AlignAxis, target: AlignTarget) {
 }
 
 /** Why equal gaps cannot spread the parts, for the dot's tooltip and the message (alignDistribute.ts). */
-function spreadProblemMessage(problem: DistributeProblem) {
-  return problem === "noRoom" ? t("status.spreadNoRoom") : problem === "lockedBetween" ? t("status.spreadLocked") : t("status.spreadTooFew");
+function spreadProblemMessage(problem: DistributeProblem, plateHint = false) {
+  // Parts stacked on one spot have no room between the outer ones; the plate as reference gives them room (#1332).
+  if (problem === "noRoom") return plateHint ? t("status.spreadNoRoomPlate") : t("status.spreadNoRoom");
+  return problem === "lockedBetween" ? t("status.spreadLocked") : t("status.spreadTooFew");
 }
 
 /** What equal gaps say when done: the gap, or in how many rows the parts were spread. */
@@ -1996,7 +1998,7 @@ function spreadStatus(selection: WorkplaneShape[], anchorId: string | null, axis
   return {
     disabled: !state.wouldMove,
     aligned: state.equal,
-    title: state.problem ? spreadProblemMessage(state.problem) : state.equal ? t("align.spreadAlready", { label }) : t("align.spreadDo", { label }),
+    title: state.problem ? spreadProblemMessage(state.problem, anchorId !== ALIGN_PLATE_ID) : state.equal ? t("align.spreadAlready", { label }) : t("align.spreadDo", { label }),
     gapDisabled,
     gapTitle: gapDisabled && typed ? spreadProblemMessage(typed) : t("align.spreadGap", { label }),
   };

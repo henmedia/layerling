@@ -1346,7 +1346,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "historyStep.changed": "Tasarım değişti",
   "status.edgeCancelledUndo": "Kenar işlemi iptal edildi · Geri al",
   "status.edgeCancelledRedo": "Kenar işlemi iptal edildi · Yinele",
-  "status.alignStart": "Hizala: bir nokta seç veya sabitlemek için seçili bir şekle tıkla. Bir noktada Alt basılıyken boyut eşitlenir. Her çizginin yanındaki nokta onları eşit aralıklarla dağıtır",
+  "status.alignStart": "Hizala: bir nokta seç veya sabitlemek için seçili bir şekle tıkla. Bir noktada Alt basılıyken boyut eşitlenir. Her çizginin yanındaki nokta onları eşit aralıklarla dağıtır. L veya Esc hizalamayı bitirir",
   "status.alignCancelled": "Hizalama iptal edildi",
   "status.alignAnchorSet": "Hizalama referansı ayarlandı",
   "status.alignAnchorNamed": "Hizalama referansı: {name}",
