@@ -14,6 +14,7 @@ import { profileExtrusionSolid } from "@/lib/cadProfileSolid";
 import { applyCadTransform, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { hingeWorldParts } from "@/lib/hingeParts";
 import { restoreGroupedChildren } from "@/lib/editorBooleans";
+import { groupShowsPartColors } from "@/lib/groupColors";
 import { meshForShape } from "@/lib/editorMeshCore";
 import { exactMeshFreeformShare, exactSolidFromMesh } from "@/lib/cadMeshExact";
 
@@ -583,7 +584,9 @@ async function buildScope(brep: Brep, shapes: WorkplaneShape[], skipped: Skipped
     const source = stepSourceForShape(shape);
     if (source === "unsupported" && isOpenableGroup(shape)) {
       // Its holes were cut inside; the holes around it still reach its bodies below.
-      parts.push(...await buildScope(brep, restoreGroupedChildren(shape).filter((child) => !child.hidden), skipped, budget));
+      const inner = await buildScope(brep, restoreGroupedChildren(shape).filter((child) => !child.hidden), skipped, budget);
+      // A group shown in one colour gives it to all its parts, as the editor draws it; with Multicolor they keep their own (#1305).
+      parts.push(...(groupShowsPartColors(shape) ? inner : inner.map((part) => ({ ...part, color: shape.color }))));
       continue;
     }
     if (shape.kind === "hinge" && !shape.cadBrep && !shapeHasShapeDeform(shape)) {

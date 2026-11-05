@@ -3155,6 +3155,12 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.appDefault": "アプリ：{value}",
   "workspace.shapeNote": "カスタム値は新しいシェイプに反映されます。カスタムのサイズ上限は、このシェイプの今あるサイズ変更の上限も置き換えます（最大{max} mm）。",
   "prop.helixQuality": "らせんの品質",
+  "prop.hirthProfile": "歯形",
+  "hirth.profileSymmetric": "対称",
+  "hirth.profileSaw": "のこぎり歯",
+  "prop.hirthSteepFlank": "急な歯面",
+  "prop.hirthReverse": "急な歯面を反対側に",
+  "inspector.hirthSawHint": "緩い歯面は外周で面に対して{angle}°。前後に裏返したコピー（X軸まわりに180°）が{step}°ごとにかみ合います。",
 
   "workspace.unlimited": "無制限",
   "workspace.historyNote": "初期値は{count}操作です。上限を下げると、このデザインの古い「元に戻す」の状態が完全に取り消されます。",

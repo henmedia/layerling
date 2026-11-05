@@ -95,6 +95,19 @@ Zolang een werkvlak op een vlak ligt, verschijnt er een oog naast {{ui:camera.pl
 
 Om recht op het werkvlak te kijken, druk je op [[P]] of klik je in de weergavebalk naast {{ui:camera.placeWorkplane}} op {{ui:camera.lookOntoWorkplane}}. De weergave draait tot je het vlak recht van voren ziet, vanaf de kant waar nieuwe vormen naartoe groeien, met de oorsprong in het midden. Op de basisplaat is dat het bovenaanzicht.
 
+## Bouwplaten
+
+Als een ontwerp meer bevat dan één plaat kan printen, bijvoorbeeld een doos met deksel en inzetstukken, kan het meerdere bouwplaten krijgen. Klik op {{ui:editor.tool.buildPlates}} in de groep {{ui:editor.group.arrange}}, of kies {{ui:plates.moveTo}} in het menu van een rechtsklik op een lichaam. Onderaan de weergave verschijnt een balk met één knop per plaat; het getal erop zegt hoeveel lichamen op de plaat staan.
+
+- Elke plaat is zo groot als het werkvlak, en de platen liggen naast elkaar rechts van de eerste, 20 mm uit elkaar. Een lichaam hoort bij de plaat waarop het midden van zijn voetafdruk staat; sleep je het naar de overkant, dan staat het op de andere plaat. Een ontwerp heeft tot 12 platen.
+- Een klik op een plaat in de balk toont die, en nieuwe vormen komen er dan op. {{ui:plates.showAll}} toont ze allemaal. Een dubbelklik op een plaat, of {{ui:plates.rename}}, geeft haar een naam zoals "Deksel", die op de plaat staat.
+- {{ui:plates.moveLeft}} en {{ui:plates.moveRight}} veranderen de volgorde, de lichamen gaan mee met hun plaat. {{ui:plates.remove}} haalt de actieve plaat weg; haar lichamen komen op dezelfde plek op de eerste plaat.
+- {{ui:plates.arrange}} legt de geselecteerde lichamen, of alle, rij voor rij op de platen, de grootste eerst, 5 mm uit elkaar, en voegt platen toe zolang die nodig zijn. Een lichaam dat groter is dan een plaat blijft staan.
+- Met een gekozen printer wordt elk lichaam tegen zijn eigen plaat gecontroleerd, en de bouwhoogte telt vanaf het laagste lichaam op die plaat. Een plaat met een lichaam dat niet past, toont haar getal in rood.
+- In de eigenschappen telt X vanaf het midden van de eigen plaat van het lichaam.
+
+Het exportvenster biedt dan {{ui:export.plates}}: alle platen in één bestand, naast elkaar zoals in het ontwerp; één bestand per plaat, samen in een ZIP (STL, 3MF en OBJ); of één enkele plaat, gezet waar de eerste plaat ligt. Een slicer opent elk bestand als één plaat; wie de platen na elkaar print, neemt dus de bestanden per plaat. Lichamen tussen platen verplaatsen en verdelen kun je ongedaan maken; platen toevoegen, benoemen, ordenen en verwijderen wordt met het ontwerp bewaard, maar niet ongedaan gemaakt.
+
 ## Raster en vastklikken
 
 Het raster toont de grootte van de plaat. Rechtsonder staat de **snapstap**: verplaatsen en schalen klikken vast in stappen van die grootte, bijvoorbeeld 1 mm. Maak hem kleiner voor fijn werk en groter voor grof schikken. {{ui:editor.tool.snapToGrid}} in het lint verplaatst de geselecteerde vormen achteraf naar het dichtstbijzijnde rasterkruispunt. Tijdens het verplaatsen klikken vormen ook vast aan andere vormen, zie [Selecteren en schikken](chapter:selecteren-en-schikken). Zonder muis: [[Alt]]+[[1]] tot [[Alt]]+[[0]] kiezen het item met dat nummer in het menu ([[Alt]]+[[1]] zet vastklikken uit), en [[,]] en [[.]] maken de stap een maat fijner of grover. Dat werkt ook in een schets.

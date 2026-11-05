@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest";
+import { editorHistoryEntry } from "@/lib/editorHistory";
+import { exportLylProject, importLylProject } from "@/lib/lylProject";
 import {
   createHirthGeometry,
   hirthCrestAngle,
   hirthFlankAngle,
+  hirthGentleFlankAngle,
   hirthMeasures,
   hirthRightAngleToothHeight,
   hirthRootAngle,
+  hirthSplit,
   hirthSurfaceY,
   normalizeHirthToothHeight,
 } from "@/lib/hirthGeometry";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
+import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
 
 function triangles(geometry: ReturnType<typeof createHirthGeometry>) {
@@ -96,12 +101,13 @@ describe("Hirth joint geometry (#1016)", () => {
     }
   });
 
-  it("starts with right-angled teeth and keeps a base under the roots", () => {
+  it("starts with right-angled teeth and lets the roots reach the bottom at the rim (Discussion #1320)", () => {
     const toothHeight = hirthRightAngleToothHeight(40, 40, 24);
     expect(toothHeight).toBeCloseTo(2.6, 6);
     expect(hirthFlankAngle(40, 40, 24, Math.PI * 20 / 24)).toBeCloseTo(90, 6);
     expect(normalizeHirthToothHeight(undefined, 40, 40, 10, 24)).toBeCloseTo(2.6, 6);
-    expect(normalizeHirthToothHeight(9.9, 40, 40, 10, 24)).toBeCloseTo(9.6, 6);
+    expect(normalizeHirthToothHeight(2.9, 40, 40, 3, 24)).toBeCloseTo(2.9, 6);
+    expect(normalizeHirthToothHeight(3.5, 40, 40, 3, 24)).toBeCloseTo(3, 6);
   });
 
   it("stretches the teeth on an oval footprint and keeps the bore round", () => {
@@ -111,6 +117,100 @@ describe("Hirth joint geometry (#1016)", () => {
     const innermost = Math.min(...points.map((p) => Math.hypot(p[0], p[2])));
     expect(innermost).toBeCloseTo(5, 4);
     expect(isClosed(createHirthGeometry(50, 10, 30, shape))).toBe(true);
+  });
+});
+
+describe("Hirth joint with saw teeth (Discussion #1320)", () => {
+  const saw = { teeth: 24, toothSize: 2.6, centerHoleSize: 10, hirthSteepFlank: 90 };
+
+  it("puts each root right under its crest for a 90 degree flank, half a tooth on for symmetric teeth", () => {
+    expect(hirthSplit(40, 40, 24, 2.6)).toBe(0.5);
+    expect(hirthSplit(40, 40, 24, 2.6, 90)).toBe(0);
+    expect(hirthSplit(40, 40, 24, 2.6, 90, true)).toBe(1);
+    // A 60 degree flank runs 2.6 / tan 60 at the rim, of a tooth 2 pi 20 / 24 long.
+    expect(hirthSplit(40, 40, 24, 2.6, 60)).toBeCloseTo(2.6 / Math.tan(Math.PI / 3) / ((2 * Math.PI * 20) / 24), 9);
+    // A steep flank that would take more than half a tooth gives symmetric teeth.
+    expect(hirthSplit(40, 40, 24, 5, 45)).toBe(0.5);
+    // The gentle flank takes the whole tooth beside a step.
+    expect(hirthGentleFlankAngle(40, 40, 24, 2.6, 0)).toBeCloseTo((Math.atan2(2.6, (2 * Math.PI * 20) / 24) * 180) / Math.PI, 9);
+  });
+
+  it("is closed and faces outwards, with a step or a steep flank, either way round, with a bore and without, and with the roots at the bottom", () => {
+    for (const hirthSteepFlank of [90, 70, 45]) {
+      for (const hirthReverse of [false, true]) {
+        for (const centerHoleSize of [10, 0]) {
+          for (const [height, toothSize] of [[10, 2.6], [3, 3]]) {
+            const geometry = createHirthGeometry(40, height, 40, { ...saw, hirthSteepFlank, hirthReverse, centerHoleSize, toothSize });
+            expect(isClosed(geometry), `${hirthSteepFlank} ${hirthReverse} ${centerHoleSize} ${height}`).toBe(true);
+            expect(signedVolume(geometry)).toBeGreaterThan(0);
+          }
+        }
+      }
+    }
+  });
+
+  it("holds the same volume as symmetric teeth: half the space between crests and roots", () => {
+    const measures = hirthMeasures({ ...saw, height: 10 }, 40, 40);
+    const expected = Math.PI * (20 * 20 - 5 * 5) * measures.apexY;
+    for (const hirthReverse of [false, true]) {
+      expect(signedVolume(createHirthGeometry(40, 10, 40, { ...saw, hirthReverse }))).toBeCloseTo(expected, -1);
+    }
+  });
+
+  it("has a step from crest to root, rising the whole tooth to the next crest, or falling that way when reversed", () => {
+    for (const hirthReverse of [false, true]) {
+      const measures = hirthMeasures({ ...saw, hirthReverse, height: 10 }, 40, 40);
+      const step = (2 * Math.PI) / 24;
+      const crest = hirthCrestAngle(24, 3, measures.split);
+      const at = (angle: number) => hirthSurfaceY(measures, 20 * Math.cos(angle), 20 * Math.sin(angle));
+      // The step stands at the crest: the top rises slowly up to it and drops there, or (reversed) climbs there and falls slowly.
+      expect(at(crest - 1e-6)).toBeCloseTo(hirthReverse ? 7.4 : 10, 3);
+      expect(at(crest + 1e-6)).toBeCloseTo(hirthReverse ? 10 : 7.4, 3);
+      expect(at(crest + step / 2)).toBeCloseTo(8.7, 3);
+    }
+  });
+
+  it("keeps the steep flank between 45 and 90 degrees in saved defaults and AI commands, and 0 as symmetric teeth", () => {
+    const hirth = (source: Record<string, unknown>) => normalizeShapeCustomizations({ hirth: source }).hirth ?? {};
+    expect(hirth({ hirthSteepFlank: 30 }).hirthSteepFlank).toBe(45);
+    expect(hirth({ hirthSteepFlank: 120 }).hirthSteepFlank).toBe(90);
+    expect(hirth({ hirthSteepFlank: 75, hirthReverse: true })).toMatchObject({ hirthSteepFlank: 75, hirthReverse: true });
+    expect(hirth({ hirthSteepFlank: 0 }).hirthSteepFlank).toBe(0);
+    expect(hirthSplit(40, 40, 24, 2.6, 0)).toBe(0.5);
+  });
+
+  it("keeps its saw teeth through a saved design file", async () => {
+    const base = { name: "Hirth Joint", kind: "hirth", color: "#7d8f9e", x: 0, z: 0, elevation: 0, size: 40, width: 40, depth: 40, height: 3, rotation: 0, teeth: 24, toothSize: 3, centerHoleSize: 10 };
+    const shapes = [
+      canonicalizeShape({ ...base, id: "saw", hirthSteepFlank: 90 } as WorkplaneShape),
+      canonicalizeShape({ ...base, id: "back", x: 50, hirthSteepFlank: 70, hirthReverse: true } as WorkplaneShape),
+    ];
+    const exported = await exportLylProject({
+      projectId: "hirth", projectName: "Hirth", createdAt: 1_700_000_000_000, modifiedAt: 1_700_000_100_000,
+      shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [],
+      workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0,
+    });
+    const restored = await importLylProject(exported);
+    const byId = new Map(restored.shapes.map((shape) => [shape.id, shape]));
+    expect(byId.get("saw")).toMatchObject({ hirthSteepFlank: 90, toothSize: 3, height: 3 });
+    expect(byId.get("back")).toMatchObject({ hirthSteepFlank: 70, hirthReverse: true });
+  });
+
+  it("locks into itself turned over front to back, any steep flank, either way round", () => {
+    for (const teeth of [6, 23, 24, 60]) {
+      for (const hirthSteepFlank of [90, 75, 60]) {
+        for (const hirthReverse of [false, true]) {
+          const measures = hirthMeasures({ teeth, hirthSteepFlank, hirthReverse, height: 8 }, 30, 30);
+          for (let step = 0; step < 200; step += 1) {
+            const angle = (step / 200) * 2 * Math.PI + 0.0013;
+            const radius = 3 + (step % 12);
+            const x = radius * Math.cos(angle);
+            const z = radius * Math.sin(angle);
+            expect(hirthSurfaceY(measures, x, z) + hirthSurfaceY(measures, x, -z)).toBeCloseTo(2 * measures.apexY, 6);
+          }
+        }
+      }
+    }
   });
 });
 

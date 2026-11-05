@@ -1,6 +1,7 @@
 "use client";
 
 import { requestPersistentStorage } from "@/lib/persistentStorage";
+import { clearDesignOpening, forgetDesignOpening, markDesignOpening, takeUnfinishedOpening } from "@/lib/openingDesignGuard";
 import { keepShownSelection, localDesignKey, selectionHasStale, serverDesignKey, toggleDesignSelection } from "@/lib/designSelection";
 import { Archive, ArchiveRestore, Check, CheckSquare, Clock3, Copy, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
@@ -68,7 +69,7 @@ import {
 import { dedupeProjectAssets } from "@/lib/projectAssets";
 import { formatFileSize } from "@/lib/formatFileSize";
 import { hydrateProjectShapeState, reconcileLoadedProjectShapeCacheEntry, type ImportedMeshResource } from "@/lib/projectShapePersistence";
-import { ToolbarImportIcon } from "@/components/toolbarIcons";
+import { ToolbarHistoryIcon, ToolbarImportIcon } from "@/components/toolbarIcons";
 import { writeDesignView, writeSavedViews } from "@/lib/designView";
 import { writeCornerRulers } from "@/lib/cornerRulerStore";
 import { readTape, writeTape } from "@/lib/tapeStore";
@@ -76,7 +77,7 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { lylFileAccessSupported, onLylFilesLaunched, pickFilesToImport, rememberLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
-import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
+import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
 import { downloadBackup, pngDataUrl, projectThumbnailBlob, projectThumbnailPngBytes, serverCustomShapesBackupEntries, writeServerBackup } from "@/lib/backupDownload";
 import { customShapesBackupEntries, restoreCustomShapesFromBackup } from "@/lib/myShapes";
@@ -157,6 +158,9 @@ function sharedProjectKey(project: Pick<SharedProject, "fileName" | "path">) {
 }
 
 /** Joins a folder path with a name, without leaving a stray slash at the front. */
+/** How long a design must have been open before its opening counts as done (#1157, lib/openingDesignGuard.ts). */
+const DESIGN_OPENED_AFTER_MS = 10_000;
+
 function joinStorePath(path: string, name: string) {
   return path ? `${path}/${name}` : name;
 }
@@ -432,7 +436,7 @@ function projectResourceRecordId(projectId: string, kind: ProjectShapeResourceRe
 /** The kernel's worker is only loaded for a design that has a body to mesh lighter (lib/cadMeshRelief.ts). */
 const remeshCadBrepLater: RemeshCadBrep = (brep, deflection, capped) => import("@/lib/editorSketchCad").then(({ remeshCadBrep }) => remeshCadBrep(brep, deflection, capped));
 
-async function loadProjectShapes(projectId: string) {
+async function loadProjectShapes(projectId: string, options: { currentStateOnly?: boolean } = {}) {
   const database = await openProjectShapesDb();
   const record = await new Promise<ProjectShapeRecord | null>((resolve, reject) => {
     const transaction = database.transaction(PROJECT_SHAPES_STORE_NAME, "readonly");
@@ -448,7 +452,7 @@ async function loadProjectShapes(projectId: string) {
   const storedPackage = record.lylPackage ?? record.skfPackage;
   if (storedPackage) {
     database.close();
-    const { project: restored, relieved } = await relieveOverFineCadMeshes(await importLylProject(storedPackage), remeshCadBrepLater);
+    const { project: restored, relieved } = await relieveOverFineCadMeshes(await importLylProject(storedPackage, options), remeshCadBrepLater);
     return {
       ...record,
       shapes: restored.shapes,
@@ -1209,10 +1213,16 @@ export default function Home() {
     }
 
     const params = new URLSearchParams(window.location.search);
-    if (params.has("codexBooleanCase") || params.get("editor") === "1") {
-      const requestedProjectId = params.get("project");
-      if (requestedProjectId && storedProjects.some((project) => project.id === requestedProjectId)) {
-        setActiveProjectId(requestedProjectId);
+    const requestedProjectId = params.get("project");
+    const requestedProject = requestedProjectId ? storedProjects.find((project) => project.id === requestedProjectId) : undefined;
+    if (params.get("editor") === "1" && requestedProject && takeUnfinishedOpening(window.localStorage, requestedProject.id)) {
+      // The last opening of this design never finished, most likely the browser ran out of memory:
+      // reopening it straight away would crash the page again, so the start page comes first (#1157).
+      setDashboardNotice(t("notice.designDidNotOpen", { name: requestedProject.name }));
+      window.history.replaceState(null, "", "/");
+    } else if (params.has("codexBooleanCase") || params.get("editor") === "1") {
+      if (requestedProject) {
+        setActiveProjectId(requestedProject.id);
       }
       startEditorTransition();
       setEditorStarted(true);
@@ -1223,6 +1233,13 @@ export default function Home() {
 
   // And a default saved here goes to the store, for the other browsers.
   useEffect(() => sendSavedWorkspaceDefaultsToServer(window.localStorage), []);
+
+  // Closed or reloaded in the usual way: nothing crashed while a design opened (#1157).
+  useEffect(() => {
+    const forget = () => forgetDesignOpening(window.localStorage);
+    window.addEventListener("pagehide", forget);
+    return () => window.removeEventListener("pagehide", forget);
+  }, []);
 
   useEffect(() => {
     return subscribeToAppTheme(() => {
@@ -1361,8 +1378,11 @@ export default function Home() {
     if (cached && cached.revision >= (activeProject.revision ?? 0)) return;
 
     let canceled = false;
+    // Taken away once the design has opened; still there after a crash, it keeps a reload from opening it again (#1157).
+    markDesignOpening(window.localStorage, activeProjectId);
     void loadProjectShapes(activeProjectId)
       .then((record) => {
+        window.setTimeout(() => clearDesignOpening(window.localStorage, activeProjectId), DESIGN_OPENED_AFTER_MS);
         if (canceled) return;
         const loadedRevision = record?.revision ?? 0;
         const revision = Math.max(activeProject.revision ?? 0, loadedRevision, 1);
@@ -1395,6 +1415,8 @@ export default function Home() {
         }
       })
       .catch((error) => {
+        // A design that could not be read did not crash the page.
+        clearDesignOpening(window.localStorage, activeProjectId);
         if (!canceled) {
           setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.projectShapesLoadFailed"));
           setProjectShapesById((current) => {
@@ -2330,9 +2352,12 @@ export default function Home() {
       const foldersAlong = !scope ? designFolders : "folderId" in scope ? designFolders.filter((folder) => inFolder(scope.folderId, folder.id)) : [];
       const emptyFolders = foldersAlong.filter((folder) => !holding.has(folder.id) && !designFolders.some((other) => other.parentId === folder.id));
       backupFolderPaths(emptyFolders.map((folder) => folderPathNames(designFolders, folder.id))).forEach((name) => writer.add(name, new Uint8Array()));
-      // A folder's backup is named after it, so several of them stay apart in the downloads.
+      // A folder's backup is named after it, and so is the backup of one chosen design (Discussion #1317), so several of
+      // them stay apart in the downloads.
       const folder = scope && "folderId" in scope ? designFolders.find((entry) => entry.id === scope.folderId) : undefined;
-      const fileName = backupFileName(new Date(), folder ? `layerling-${folder.name.replace(/[\\/:*?"<>|\s]+/g, "-")}` : undefined);
+      const single = scope && "designIds" in scope && designs.length === 1 ? designs[0] : undefined;
+      const named = folder?.name ?? single?.name;
+      const fileName = backupFileName(new Date(), named ? backupNamePrefix(named) : undefined);
       downloadBackup(writer.finish(), fileName);
       writeBackupProgress(null);
       const saved = designs.length - skipped.length;
@@ -2675,6 +2700,38 @@ export default function Home() {
    * Bindung an eine Serverdatei, denn die gehoert dem Original, und das
    * Kartenbild als blosse Adresse - das bekommt sie als eigenes Bild.
    */
+  /**
+   * Opens a design without its undo history (#1157). Only the current state is read from the
+   * stored package, written back as the design with a history of one entry, and then opened.
+   * A design whose history grew too large to open in the browser opens again this way.
+   */
+  const openProjectWithoutHistory = async (projectId: string) => {
+    const project = projects.find((candidate) => candidate.id === projectId);
+    if (!project) return;
+    setDashboardNotice(t("notice.openingWithoutHistory", { name: project.name }));
+    try {
+      // A save still writing on the way out would bring the old history back over the cut one.
+      await (projectShapeSaveQueuesRef.current[projectId] ?? Promise.resolve()).catch(() => undefined);
+      markDesignOpening(window.localStorage, projectId);
+      const stored = await loadProjectShapes(projectId, { currentStateOnly: true });
+      if (!stored) throw new Error(t("notice.projectShapesLoadFailed"));
+      // A package comes back with one entry already; an older record still carries its whole history.
+      const history = stored.history ?? [];
+      const current = history[Math.min(Math.max(0, stored.historyIndex ?? history.length - 1), history.length - 1)];
+      const revision = Math.max(Date.now(), (project.revision ?? 0) + 1);
+      const entry = projectShapeCacheEntry(revision, current?.shapes ?? stored.shapes ?? [], current ? [current] : undefined, 0, stored.assets ?? [], stored.attachments);
+      await saveProjectShapes(projectId, entry, projectShapeSaveContext(project));
+      // The cut entry is newer than any stored revision, so the editor takes it instead of reading the package again.
+      setProjectShapesById((existing) => ({ ...existing, [projectId]: entry }));
+      setDashboardNotice("");
+      openEditor(projectId);
+      window.setTimeout(() => clearDesignOpening(window.localStorage, projectId), DESIGN_OPENED_AFTER_MS);
+    } catch (error) {
+      clearDesignOpening(window.localStorage, projectId);
+      setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.openWithoutHistoryFailed"));
+    }
+  };
+
   const duplicateProject = async (projectId: string) => {
     const source = projects.find((project) => project.id === projectId);
     if (!source) return;
@@ -2900,6 +2957,7 @@ export default function Home() {
           onDeleteSharedProject={(project) => void deleteSharedProject(project)}
           onDeleteSharedProjects={(sharedList) => void deleteSharedProjectsInTurn(sharedList)}
           onDuplicateProject={(projectId) => void duplicateProject(projectId)}
+          onOpenProjectWithoutHistory={(projectId) => void openProjectWithoutHistory(projectId)}
           onDuplicateSharedProject={(project) => void duplicateSharedProject(project)}
           onImportFile={() => void pickDashboardImport()}
           onBackupAll={() => void backupAllProjects()}
@@ -3119,6 +3177,7 @@ function Dashboard({
   onDeleteSharedProject,
   onDeleteSharedProjects,
   onDuplicateProject,
+  onOpenProjectWithoutHistory,
   onDuplicateSharedProject,
   onImportFile,
   onBackupAll,
@@ -3183,6 +3242,8 @@ function Dashboard({
   onDeleteSharedProject: (project: SharedProject) => void;
   onDeleteSharedProjects: (projects: SharedProject[]) => void;
   onDuplicateProject: (projectId: string) => void;
+  /** Opens a design with only its current state, without the undo history (#1157). */
+  onOpenProjectWithoutHistory: (projectId: string) => void;
   onDuplicateSharedProject: (project: SharedProject) => void;
   onImportFile: () => void;
   onBackupAll: () => void;
@@ -3224,6 +3285,7 @@ function Dashboard({
   const [openProjectMenuId, setOpenProjectMenuId] = useState<string | null>(null);
   const [openSharedProjectMenuKey, setOpenSharedProjectMenuKey] = useState<string | null>(null);
   const [projectPendingDeleteId, setProjectPendingDeleteId] = useState<string | null>(null);
+  const [projectPendingHistoryCutId, setProjectPendingHistoryCutId] = useState<string | null>(null);
   const [sharedProjectPendingDeleteKey, setSharedProjectPendingDeleteKey] = useState<string | null>(null);
   // Choosing several designs to delete them together (#886): the keys of what is chosen (designSelection.ts).
   const [selecting, setSelecting] = useState(false);
@@ -3276,6 +3338,7 @@ function Dashboard({
     onOpenStoreFolder(folderPath);
   };
   const projectPendingDelete = projects.find((project) => project.id === projectPendingDeleteId) ?? null;
+  const projectPendingHistoryCut = projects.find((project) => project.id === projectPendingHistoryCutId) ?? null;
   const sharedProjectPendingDelete = shownSharedProjects.find((project) => sharedProjectKey(project) === sharedProjectPendingDeleteKey) ?? null;
   const projectPendingRename = projects.find((project) => project.id === projectPendingRenameId) ?? null;
 
@@ -3354,6 +3417,12 @@ function Dashboard({
     if (shownSharedProjects.some((project) => sharedProjectKey(project) === sharedProjectPendingDeleteKey)) return;
     setSharedProjectPendingDeleteKey(null);
   }, [sharedProjectPendingDeleteKey, shownSharedProjects]);
+
+  const confirmOpenWithoutHistory = () => {
+    if (!projectPendingHistoryCut) return;
+    onOpenProjectWithoutHistory(projectPendingHistoryCut.id);
+    setProjectPendingHistoryCutId(null);
+  };
 
   const confirmProjectDelete = () => {
     if (!projectPendingDelete) return;
@@ -4246,6 +4315,18 @@ function Dashboard({
                           <button
                             type="button"
                             role="menuitem"
+                            title={t("dashboard.openWithoutHistoryTitle")}
+                            onClick={() => {
+                              setOpenProjectMenuId(null);
+                              setProjectPendingHistoryCutId(project.id);
+                            }}
+                          >
+                            <ToolbarHistoryIcon width={16} height={16} />
+                            <span>{t("dashboard.openWithoutHistory")}</span>
+                          </button>
+                          <button
+                            type="button"
+                            role="menuitem"
                             onClick={() => {
                               setOpenProjectMenuId(null);
                               setDesignPendingMoveId(project.id);
@@ -4320,6 +4401,28 @@ function Dashboard({
               </button>
               <button className="dashboard-confirm-delete" type="button" onClick={confirmSelectionDelete}>
                 {t("confirm.delete")}
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {projectPendingHistoryCut ? (
+        <section className="dashboard-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="history-cut-project-title">
+          <div className="dashboard-confirm-dialog">
+            <header>
+              <strong id="history-cut-project-title">{t("confirm.openWithoutHistoryTitle")}</strong>
+              <button type="button" aria-label={t("confirm.cancel")} onClick={() => setProjectPendingHistoryCutId(null)}>
+                <X size={18} />
+              </button>
+            </header>
+            <p>{t("confirm.openWithoutHistoryBody", { name: projectPendingHistoryCut.name })}</p>
+            <div className="dashboard-confirm-actions">
+              <button className="dashboard-confirm-cancel" type="button" onClick={() => setProjectPendingHistoryCutId(null)}>
+                {t("confirm.cancel")}
+              </button>
+              <button className="dashboard-confirm-delete" type="button" onClick={confirmOpenWithoutHistory}>
+                {t("confirm.openWithoutHistory")}
               </button>
             </div>
           </div>

@@ -63,7 +63,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.141.0";
+export const LYL_CREATED_WITH_VERSION = "1.142.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -327,6 +327,12 @@ export type LylSourceImporter = (asset: ProjectAsset) => Promise<NonNullable<Wor
 
 export type ImportLylOptions = {
   sourceImporter?: LylSourceImporter;
+  /**
+   * Only the current state, without the undo history (#1157). The earlier states are neither
+   * unpacked nor rebuilt, so a design whose history grew too large to open in the browser
+   * opens again; it comes back with a history of one entry, as after "Delete history".
+   */
+  currentStateOnly?: boolean;
 };
 
 type ArchiveFiles = Record<string, Uint8Array>;
@@ -1406,6 +1412,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.textVertical !== undefined && typeof definition.textVertical !== "boolean") {
     throw new Error(`${label}.textVertical must be true or false`);
   }
+  if (definition.textKerning !== undefined && typeof definition.textKerning !== "boolean") {
+    throw new Error(`${label}.textKerning must be true or false`);
+  }
   // The space between a text's letters (#594), in per cent of the letter size.
   if (definition.textSpacing !== undefined && !(typeof definition.textSpacing === "number" && Number.isFinite(definition.textSpacing) && definition.textSpacing >= -50 && definition.textSpacing <= 300)) {
     throw new Error(`${label}.textSpacing must be a number from -50 to 300`);
@@ -1626,6 +1635,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.helixAngle !== undefined) {
       const helixAngle = finiteNumber(definition.helixAngle, `${label}.helixAngle`);
       if (helixAngle < -45 || helixAngle > 45) throw new Error(`${label}.helixAngle is outside the supported range`);
+    }
+    if (definition.bevelHelixAngle !== undefined) {
+      const bevelHelixAngle = finiteNumber(definition.bevelHelixAngle, `${label}.bevelHelixAngle`);
+      if (bevelHelixAngle < -45 || bevelHelixAngle > 45) throw new Error(`${label}.bevelHelixAngle is outside the supported range`);
     }
     if (definition.helixQuality !== undefined) {
       const helixQuality = finiteNumber(definition.helixQuality, `${label}.helixQuality`);
@@ -2433,19 +2446,79 @@ function newerDesignError(saved: unknown, error: unknown) {
   return new Error(`This design was saved with layerling ${saved as string}, newer than this layerling ${LYL_CREATED_WITH_VERSION}, and holds something this version does not know yet (${detail})`);
 }
 
-async function readPackagedLyl(bytes: Uint8Array) {
+/** Every string anywhere in a value: the asset ids a state refers to, whatever field holds them. */
+function collectStrings(value: unknown, into: Set<string>) {
+  if (typeof value === "string") into.add(value);
+  else if (Array.isArray(value)) value.forEach((item) => collectStrings(item, into));
+  else if (value && typeof value === "object") Object.values(value).forEach((item) => collectStrings(item, into));
+}
+
+/**
+ * The document cut down to its current state (#1157): one state, one history entry, and only the
+ * assets that state, the attached files and the editor settings refer to. Null when the document
+ * is not shaped well enough to cut; it is then read whole and checked as usual.
+ */
+function sceneOnlyLylDocument(raw: unknown): { document: Record<string, unknown>; paths: Set<string> } | null {
+  if (!raw || typeof raw !== "object") return null;
+  const document = raw as Partial<LylProjectDocumentV1>;
+  if (!Array.isArray(document.states) || !Array.isArray(document.assets) || !Array.isArray(document.history?.entries)) return null;
+  const scene = document.states.find((state) => state?.id === document.sceneStateId);
+  if (!scene) return null;
+  const entries = document.history.entries;
+  const atIndex = entries[document.history.index];
+  const entry = atIndex?.stateId === scene.id ? atIndex : [...entries].reverse().find((candidate) => candidate?.stateId === scene.id);
+  const referenced = new Set<string>();
+  collectStrings(scene, referenced);
+  collectStrings(document.attachments, referenced);
+  collectStrings(document.editor, referenced);
+  const assets = document.assets.filter((asset) => typeof asset?.id === "string" && referenced.has(asset.id));
+  return {
+    document: {
+      ...document,
+      assets,
+      states: [scene],
+      history: { entries: [entry ? { ...entry, stateId: scene.id } : { stateId: scene.id, selectedObjectIds: [] }], index: 0 },
+    },
+    paths: new Set(assets.map((asset) => asset.path)),
+  };
+}
+
+function unzipOnly(bytes: Uint8Array, paths: Set<string>) {
+  return new Promise<ArchiveFiles>((resolve, reject) => {
+    unzip(bytes, { filter: (file) => paths.has(file.name) }, (error, files) => {
+      if (error) reject(error);
+      else resolve(files);
+    });
+  });
+}
+
+async function readPackagedLyl(bytes: Uint8Array, currentStateOnly = false) {
   inspectZipBeforeExpansion(bytes);
   let files: ArchiveFiles;
+  let raw: unknown;
   try {
-    files = await unzipAsync(bytes);
+    if (currentStateOnly) {
+      // project.json first: it says which files the current state needs, and only those are unpacked.
+      files = await unzipOnly(bytes, new Set(["project.json"]));
+    } else {
+      files = await unzipAsync(bytes);
+    }
   } catch (error) {
     throw new Error(`Could not expand .lyl package: ${error instanceof Error ? error.message : "corrupt ZIP data"}`);
   }
-  let raw: unknown;
   try {
     raw = JSON.parse(strFromU8(files["project.json"]));
   } catch {
     throw new Error("project.json is malformed");
+  }
+  if (currentStateOnly) {
+    const cut = sceneOnlyLylDocument(raw);
+    try {
+      files = cut ? await unzipOnly(bytes, cut.paths) : await unzipAsync(bytes);
+    } catch (error) {
+      throw new Error(`Could not expand .lyl package: ${error instanceof Error ? error.message : "corrupt ZIP data"}`);
+    }
+    if (cut) raw = cut.document;
   }
   try {
     return { files, validated: await validateDocumentAndAssets(raw, files) };
@@ -2533,7 +2606,7 @@ export async function importLylProject(input: ArrayBuffer | Uint8Array, options:
     throw new Error("This legacy project version is not supported");
   }
 
-  const { files, validated } = await readPackagedLyl(bytes);
+  const { files, validated } = await readPackagedLyl(bytes, options.currentStateOnly === true);
   // The letters a design brought along: its texts draw in their own font, even where the font
   // is not installed. A complete font kept in this browser wins over them.
   validateFonts(validated.document.fonts).forEach((font) => registerCustomFont(font, false));

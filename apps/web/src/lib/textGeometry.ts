@@ -6,6 +6,7 @@ import { shapeText, textNeedsShaping } from "@/lib/arabicShaping";
 import { normalizeSketchStroke } from "@/lib/sketchStroke";
 import { customFontRevision, ensureJapaneseGlyphs, textFont } from "@/lib/textFonts";
 import { shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
+import { kernBetween, kernedFont } from "@/lib/textKerning";
 import type { FreeKeyring, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
 /** Font size the straight text is laid out at before it is fitted into its box. */
@@ -85,11 +86,14 @@ export function spacedFont(font: Font, percent: number): Font {
   return made;
 }
 
-/** The typeface a shape's text is laid out with: its font, with its spacing. */
-export function textLayoutFont(shape: Pick<WorkplaneShape, "font" | "text" | "textSpacing">): Font {
+/** The typeface a shape's text is laid out with: its font, with its spacing and, when switched on, its kerning (#1297). */
+export function textLayoutFont(shape: Pick<WorkplaneShape, "font" | "text" | "textSpacing" | "textKerning">): Font {
   // Arabic and Hebrew letters join up and read from the right: a gap between them would break the words (#594).
-  const spaced = textNeedsShaping(shape.text ?? "") ? 0 : textSpacingOf(shape);
-  return spacedFont(textFont(shape.font ?? "Multilanguage"), spaced);
+  const shaped = textNeedsShaping(shape.text ?? "");
+  const base = textFont(shape.font ?? "Multilanguage");
+  const spaced = spacedFont(base, shaped ? 0 : textSpacingOf(shape));
+  // Kerned on the font's own advances, so the spacing stays as set on top of it; without it the font is as before.
+  return shape.textKerning && !shaped ? kernedFont(spaced, base) : spaced;
 }
 
 /** The gap between two letters of vertical text, in parts of a capital's height, with no spacing set. */
@@ -116,7 +120,7 @@ function translateGlyph(glyph: THREE.Shape, dx: number, dy: number) {
  * them plus the spacing in per cent of the letter size. A space leaves the room of a capital. Everything that
  * draws or measures straight text takes its outlines from here.
  */
-export function straightTextShapes(shape: Pick<WorkplaneShape, "text" | "font" | "textSpacing" | "textVertical">, size: number): THREE.Shape[] {
+export function straightTextShapes(shape: Pick<WorkplaneShape, "text" | "font" | "textSpacing" | "textKerning" | "textVertical">, size: number): THREE.Shape[] {
   const font = textLayoutFont(shape);
   const text = displayTextOf(shape);
   if (!shape.textVertical) return font.generateShapes(text, size);
@@ -484,7 +488,7 @@ export function curvedTextLayout(shape: WorkplaneShape) {
   const advanceAt = (char: string, letterSize: number) => advanceOf(font, char, letterSize) + (stretch - 1) * advanceOf(baseFont, char, letterSize);
 
   // Too long for the circle: shrink the letters rather than let the ends overlap.
-  const naturalLength = chars.reduce((sum, char) => sum + advanceAt(char, size), 0);
+  const naturalLength = chars.reduce((sum, char, index) => sum + advanceAt(char, size) + (index + 1 < chars.length ? kernBetween(font, char, chars[index + 1], size) : 0), 0);
   const maxLength = 2 * Math.PI * radius * MAX_ARC_SHARE;
   if (naturalLength > maxLength) size *= maxLength / naturalLength;
 
@@ -494,7 +498,13 @@ export function curvedTextLayout(shape: WorkplaneShape) {
   const flipped = Boolean(shape.textFlipped);
   const ordered = flipped ? [...chars].reverse() : chars;
   const advances = ordered.map((char) => advanceAt(char, size));
-  const totalLength = advances.reduce((sum, advance) => sum + advance, 0);
+  // Kerning (#1297) between neighbours, taken in reading order: upside down the line runs the other way round.
+  const kerns = ordered.map((char, index) => {
+    const next = ordered[index + 1];
+    if (next === undefined) return 0;
+    return flipped ? kernBetween(font, next, char, size) : kernBetween(font, char, next, size);
+  });
+  const totalLength = advances.reduce((sum, advance) => sum + advance, 0) + kerns.reduce((sum, kern) => sum + kern, 0);
   const bandMiddle = capHeightOf(font, size) / 2;
   const inward = Boolean(shape.textInward);
   const options = textOptions(shape, size);
@@ -504,7 +514,7 @@ export function curvedTextLayout(shape: WorkplaneShape) {
   ordered.forEach((char, index) => {
     const advance = advances[index];
     const angle = (run + advance / 2) / radius;
-    run += advance;
+    run += advance + kerns[index];
     if (!char.trim()) return;
 
     // Built right to left: the first factor is the last step.
@@ -630,7 +640,7 @@ const footprintCache = new Map<string, { width: number; depth: number }>();
 
 /** The width and depth curved text takes at its own radius and letter size. */
 export function curvedTextFootprint(shape: WorkplaneShape): { width: number; depth: number } {
-  const key = JSON.stringify([textOf(shape), shape.font ?? "Multilanguage", customFontRevision(shape.font), curvedSize(shape), curvedRadius(shape), Boolean(shape.textInward), Boolean(shape.textFlipped), Boolean(shape.textVertical), shape.bevel ?? 0, textSpacingOf(shape), textLetterWidthOf(shape)]);
+  const key = JSON.stringify([textOf(shape), shape.font ?? "Multilanguage", customFontRevision(shape.font), curvedSize(shape), curvedRadius(shape), Boolean(shape.textInward), Boolean(shape.textFlipped), Boolean(shape.textVertical), shape.bevel ?? 0, textSpacingOf(shape), Boolean(shape.textKerning), textLetterWidthOf(shape)]);
   const cached = footprintCache.get(key);
   if (cached) return cached;
   const geometry = buildCurvedText({ ...shape, height: 1 });
@@ -653,7 +663,7 @@ function straightTextExtent(shape: WorkplaneShape) {
   return extent;
 }
 
-const CURVE_KEYS = ["textCurved", "textVertical", "textRadius", "textInward", "textFlipped", "textSize", "text", "font", "bevel", "textStroke", "textSpacing", "textLetterWidth"] as const;
+const CURVE_KEYS = ["textCurved", "textVertical", "textRadius", "textInward", "textFlipped", "textSize", "text", "font", "bevel", "textStroke", "textSpacing", "textKerning", "textLetterWidth"] as const;
 
 /**
  * Keeps curved text and its box in step. Straight text simply fills its box;

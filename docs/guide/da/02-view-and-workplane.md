@@ -100,6 +100,19 @@ Mens et arbejdsplan ligger på en flade, dukker et øje op ved siden af {{ui:cam
 
 Vil du se lige ind på arbejdsplanet, så tryk [[P]] eller klik på {{ui:camera.lookOntoWorkplane}} ved siden af {{ui:camera.placeWorkplane}} i visningslinjen. Visningen drejer, til du ser planet lige forfra, fra den side nye former vokser mod, med dets nulpunkt i midten. På grundpladen er det visningen ovenfra.
 
+## Byggeplader
+
+Når et design rummer mere, end én plade kan printe, for eksempel en æske med låg og indsatser, kan det få flere byggeplader. Klik på {{ui:editor.tool.buildPlates}} i gruppen {{ui:editor.group.arrange}}, eller vælg {{ui:plates.moveTo}} i menuen ved et højreklik på et legeme. Nederst i visningen kommer en linje med én knap pr. plade; tallet på den siger, hvor mange legemer der står på pladen.
+
+- Hver plade er lige så stor som arbejdsfladen, og pladerne ligger side om side til højre for den første, 20 mm fra hinanden. Et legeme hører til den plade, midten af dets grundflade står på, så trækker man det over, står det på den anden plade. Et design har op til 12 plader.
+- Et klik på en plade i linjen viser den, og nye former lander så på den. {{ui:plates.showAll}} viser dem alle. Et dobbeltklik på en plade eller {{ui:plates.rename}} giver den et navn som "Låg", der står skrevet på pladen.
+- {{ui:plates.moveLeft}} og {{ui:plates.moveRight}} ændrer rækkefølgen, og legemerne følger med deres plade. {{ui:plates.remove}} fjerner den aktive plade; dens legemer kommer på den første plade samme sted.
+- {{ui:plates.arrange}} lægger de markerede legemer, eller alle, ud række for række på pladerne, de største først, 5 mm fra hinanden, og tilføjer plader, så længe der er brug for dem. Et legeme, der er større end en plade, bliver stående.
+- Med en valgt printer kontrolleres hvert legeme mod sin egen plade, og byggehøjden regnes fra det laveste legeme på den plade. En plade med et legeme, der ikke passer, viser sit tal med rødt.
+- I egenskaberne regnes X fra midten af legemets egen plade.
+
+Eksportvinduet tilbyder så {{ui:export.plates}}: alle plader i én fil, side om side som i designet; én fil pr. plade, samlet i en ZIP (STL, 3MF og OBJ); eller en enkelt plade, sat hvor den første plade er. En slicer åbner hver fil som én plade, så vil man printe pladerne efter hinanden, tager man filerne pr. plade. At flytte legemer mellem plader og fordele dem kan fortrydes; at tilføje, navngive, ordne og fjerne plader gemmes med designet, men fortrydes ikke.
+
 ## Gitter og snap
 
 Gitteret viser pladens størrelse. Nederst til højre er **snap-trinnet**: flytning og skalering snapper i trin af den størrelse, for eksempel 1 mm. Gør det mindre til fint arbejde og større til grov arrangering. {{ui:editor.tool.snapToGrid}} i båndet flytter de valgte former bagefter hen på det nærmeste gitterkryds. Mens der flyttes, snapper former også til andre former, se [Valg og arrangering](chapter:select-and-arrange). Uden musen: [[Alt]]+[[1]] til [[Alt]]+[[0]] vælger den post i menuen med det nummer ([[Alt]]+[[1]] slår snapping fra), og [[,]] og [[.]] gør trinnet ét trin finere eller grovere. Det virker i en skitse også.
@@ -151,7 +164,7 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 ### Udseende: mål på arbejdsplanet
 
-{{ui:workspace.showMoveDimensions}} viser hvor meget du flytter, mens du drager, {{ui:workspace.showOriginDimensions}} afstandene fra markeringen til pladens nulpunkt, også når flere legemer er valgt. Med {{ui:workspace.dimensionsAlwaysVisible}} forbliver målene synlige hele tiden, og ikke kun mens du drager. Mens en vendt legeme er valgt, vises dens vinkler under den på arbejdsplanet; {{ui:workspace.showRotationAngles}} slår det fra. Mere i [Måling og noter](chapter:measuring-and-notes).
+{{ui:workspace.showMoveDimensions}} viser hvor meget du flytter, mens du drager eller med piletasterne, {{ui:workspace.showOriginDimensions}} afstandene fra markeringen til pladens nulpunkt, også når flere legemer er valgt. Med {{ui:workspace.dimensionsAlwaysVisible}} forbliver målene synlige hele tiden, og ikke kun mens du drager. Mens en vendt legeme er valgt, vises dens vinkler under den på arbejdsplanet; {{ui:workspace.showRotationAngles}} slår det fra. Mere i [Måling og noter](chapter:measuring-and-notes).
 
 ### Udseende: markering og flytning
 

@@ -328,6 +328,8 @@ export type CadModifierHirthPart = {
   teeth: number;
   toothHeight: number;
   boreRadius: number;
+  /** Saw teeth (Discussion #1320): how far past its crest a root lies, as a share of one tooth; missing means 0.5, symmetric teeth. */
+  split?: number;
   transform?: number[];
   expected?: { bounds: number[]; volume: number };
 };

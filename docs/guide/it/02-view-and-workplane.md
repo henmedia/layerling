@@ -94,6 +94,19 @@ Quando il piano di lavoro è posizionato su una faccia, accanto a {{ui:camera.pl
 
 Per guardare il piano di lavoro di fronte, premi [[P]] o fai clic su {{ui:camera.lookOntoWorkplane}} accanto a {{ui:camera.placeWorkplane}} nella barra della vista. La vista ruota finché vedi il piano di fronte, dal lato verso cui crescono le nuove forme, con la sua origine al centro. Sulla piastra di base è la vista dall'alto.
 
+## Piatti di stampa
+
+Quando un progetto contiene più di quanto un piatto possa stampare, per esempio una scatola con il coperchio e gli inserti, può avere più piatti di stampa. Fai clic su {{ui:editor.tool.buildPlates}} nel gruppo {{ui:editor.group.arrange}}, oppure scegli {{ui:plates.moveTo}} nel menu del clic destro su un corpo. In fondo alla vista compare una barra con un pulsante per piatto; il numero indica quanti corpi ci sono sopra.
+
+- Ogni piatto è grande quanto il piano di lavoro, e i piatti stanno uno accanto all'altro a destra del primo, a 20 mm di distanza. Un corpo appartiene al piatto su cui si trova il centro della sua base, quindi trascinandolo dall'altra parte passa sull'altro piatto. Un progetto ha fino a 12 piatti.
+- Un clic su un piatto nella barra lo mostra, e le nuove forme finiscono poi su di esso. {{ui:plates.showAll}} li mostra tutti. Un doppio clic su un piatto, o {{ui:plates.rename}}, gli dà un nome come «Coperchio», scritto sul piatto.
+- {{ui:plates.moveLeft}} e {{ui:plates.moveRight}} cambiano l'ordine, e i corpi seguono il loro piatto. {{ui:plates.remove}} toglie il piatto attivo; i suoi corpi passano sul primo piatto nello stesso punto.
+- {{ui:plates.arrange}} dispone i corpi selezionati, o tutti, fila per fila sui piatti, i più grandi per primi, a 5 mm di distanza, e aggiunge piatti finché servono. Un corpo più grande di un piatto resta dov'è.
+- Con una stampante scelta, ogni corpo viene controllato rispetto al proprio piatto, e l'altezza di stampa conta dal corpo più basso di quel piatto. Un piatto con un corpo che non ci sta mostra il suo numero in rosso.
+- Nelle proprietà, X conta dal centro del piatto del corpo stesso.
+
+La finestra di esportazione offre allora {{ui:export.plates}}: tutti i piatti in un file, uno accanto all'altro come nel progetto; un file per piatto, raccolti in uno ZIP (STL, 3MF e OBJ); oppure un solo piatto, messo al posto del primo. Uno slicer apre ogni file come un solo piatto, quindi per stampare i piatti uno dopo l'altro conviene usare i file per piatto. Spostare corpi tra i piatti e distribuirli si può annullare; aggiungere, nominare, ordinare e togliere piatti viene salvato con il progetto, ma non annullato.
+
 ## Griglia e aggancio
 
 La griglia mostra le dimensioni della piastra. In basso a destra trovi il **passo di aggancio**: spostamento e ridimensionamento procedono a scatti della misura impostata, per esempio 1 mm. Riducila per lavorare con precisione e aumentala per disporre gli elementi in modo approssimativo. {{ui:editor.tool.snapToGrid}} nella barra multifunzione sposta le forme selezionate sull’incrocio della griglia più vicino. Durante lo spostamento, le forme possono anche agganciarsi ad altre forme; vedi [Selezionare e disporre](chapter:select-and-arrange).

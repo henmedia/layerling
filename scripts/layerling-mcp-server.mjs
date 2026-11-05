@@ -252,6 +252,8 @@ async function callTool(name, args) {
       return bridgeCommand("measure_angle", args, 30000);
     case "layerling_saved_view":
       return bridgeCommand("saved_view", args);
+    case "layerling_build_plates":
+      return bridgeCommand("build_plates", args);
     case "layerling_export_section_svg":
       return bridgeCommand("export_section_svg", args);
     case "layerling_sketch_from_section":

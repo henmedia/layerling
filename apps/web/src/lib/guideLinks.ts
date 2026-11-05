@@ -38,6 +38,7 @@ export const GUIDE_SECTIONS = {
   sectionView: { chapter: "view", de: "ins-innere-schauen-die-schnittansicht", en: "looking-inside-the-section-view", nl: "naar-binnen-kijken-de-doorsnede", ru: "zaglyanut-vnutr-vid-v-razreze", cs: "pohled-dovnitr-rez", sl: "pogled-v-notranjost-prerezni-pogled", hu: "belelatni-a-metszeti-nezet", es: "mirar-por-dentro-la-vista-de-seccion" },
   viewCube: { chapter: "view", de: "der-ansichtswuerfel", en: "the-view-cube", nl: "de-weergavekubus", ru: "kub-orientatsii", cs: "orientacni-krychle", sl: "orientacijska-kocka", hu: "a-nezetkocka", es: "el-cubo-de-vista" },
   cameraBar: { chapter: "view", de: "die-ansichtsleiste", en: "the-view-bar", nl: "de-weergavebalk", ru: "panel-vida", cs: "lista-pohledu", sl: "vrstica-pogleda", hu: "a-nezetsav", es: "la-barra-de-vista" },
+  buildPlates: { chapter: "view", de: "druckplatten", en: "build-plates", nl: "bouwplaten", ru: "stoly-pechati", cs: "tiskove-podlozky", sl: "tiskalne-plosce", hu: "nyomtatotalcak", es: "placas-de-impresion", fr: "plateaux-d-impression", it: "piatti-di-stampa", pl: "stoly-robocze", da: "byggeplader", ar: "build-plates" },
   gridAndSnapping: { chapter: "view", de: "gitter-und-raster", en: "grid-and-snapping", nl: "raster-en-vastklikken", ru: "setka-i-privyazka", cs: "mrizka-a-prichytavani", sl: "mreza-in-pripenjanje", hu: "racs-es-illesztes", es: "cuadricula-y-ajuste" },
   // The tabs of the settings window. Languages whose chapter explains the window in one go, under
   // "Grid and snapping", land there.

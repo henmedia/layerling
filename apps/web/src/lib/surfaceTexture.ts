@@ -1127,10 +1127,12 @@ function textureImage(s: SurfaceTextureSettings, edge = 0, tileWidth = 1): GreyI
   // Softening counts in points of an image 256 wide, so it softens a ready image (512 wide) as much as one's own.
   const asked = s.imageBlur * Math.max(1, plain.width / 256);
   const radius = Math.min(16, Math.round(Math.max(asked, (SOFTEN_TO_MESH * edge * plain.width) / tileWidth)));
-  const key = `${own ? ownImageKey(own) : s.image}|${radius}`;
+  // Pressed on once, the image has no neighbour beyond its border to soften into.
+  const once = s.imageTiling === "once";
+  const key = `${own ? ownImageKey(own) : s.image}|${radius}|${once}`;
   const cached = imageCache.get(key);
   if (cached) return cached;
-  const image = blurGreyImage(plain, radius);
+  const image = blurGreyImage(plain, radius, once);
   if (imageCache.size > 8) imageCache.clear();
   imageCache.set(key, image);
   return image;
@@ -2087,6 +2089,27 @@ function onceValues(U: Float64Array, V: Float64Array, s: SurfaceTextureSettings,
     values[i] = s.imageInvert ? 1 - grey : grey;
   }
   return { values, inside };
+}
+
+/**
+ * Whether the image once changes by ONCE_JUMP along the edge from point a to point b of the rolled-out surface, seen
+ * about every point of the image: a line drawn thinner than the edge crosses it with both ends on the ground.
+ */
+function onceJumpsAlong(U: Float64Array, V: Float64Array, a: number, b: number, from: number, s: SurfaceTextureSettings, image: GreyImage, size: { width: number; height: number }) {
+  if (!Number.isFinite(U[a]) || !Number.isFinite(U[b])) return false;
+  const du = U[b] - U[a], dv = V[b] - V[a];
+  const steps = Math.min(32, Math.ceil(Math.hypot((du / size.width) * image.width, (dv / size.height) * image.height)));
+  if (steps < 2) return false;
+  const ang = (s.imageTurn * Math.PI) / 180, c = Math.cos(ang), sn = Math.sin(ang);
+  for (let k = 1; k < steps; k += 1) {
+    const u = U[a] + (du * k) / steps, v = V[a] + (dv * k) / steps;
+    const x = u * c + v * sn, y = -u * sn + v * c;
+    const tu = x / size.width + 0.5, tv = y / size.height + 0.5;
+    if (tu < 0 || tu > 1 || tv < 0 || tv > 1) continue;
+    const grey = sampleGreyImage(image, tu, tv, true);
+    if (Math.abs((s.imageInvert ? 1 - grey : grey) - from) >= ONCE_JUMP) return true;
+  }
+  return false;
 }
 
 /**
@@ -4827,14 +4850,15 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         mesh = { ...split, parents: Uint32Array.from(split.parents, (f) => mesh.parents[f]) };
         if (once) {
           // The image: finer where its grey value jumps (an outline drawn in it), rolled out anew each round. Softened to
-          // the mesh as a tile is (see textureImage), over its width.
-          const image = textureImage(s, edge, place.width);
+          // the finest mesh its outlines get, as a tile is to its mesh (see textureImage), over its width: softened to
+          // the coarser grid, a thin line drawn in it faded to a faint groove or to nothing (#1268).
+          const fineEdge = Math.max(edge / 2.5, ONCE_MIN_EDGE / 2);
+          const fine2 = (fineEdge * 1.01) ** 2;
+          const image = textureImage(s, fineEdge, place.width);
           layout.image = image;
           const size = { width: place.width, height: place.height };
           let uv = unrolled(mesh, place, s);
           let got = image ? onceValues(uv.U, uv.V, s, image, size) : null;
-          const fineEdge = Math.max(edge / 2.5, ONCE_MIN_EDGE / 2);
-          const fine2 = (fineEdge * 1.01) ** 2;
           for (let round = 0; image && got && round < FLANK_ROUNDS && !mesh.limited; round += 1) {
             const F = got.values;
             const v = mesh.vertices, I = mesh.indices;
@@ -4842,9 +4866,10 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
             let any = false;
             for (let t = 0; t < I.length; t += 3) {
               for (const [a, b] of [[I[t], I[t + 1]], [I[t + 1], I[t + 2]], [I[t + 2], I[t]]]) {
-                if (Math.abs(F[a] - F[b]) < ONCE_JUMP) continue;
                 const dx = v[a * 3] - v[b * 3], dy = v[a * 3 + 1] - v[b * 3 + 1], dz = v[a * 3 + 2] - v[b * 3 + 2];
                 if (dx * dx + dy * dy + dz * dz <= fine2) continue;
+                // A line thinner than the edge can lie between its ends, both on the ground: the image along it counts too.
+                if (Math.abs(F[a] - F[b]) < ONCE_JUMP && !onceJumpsAlong(uv.U, uv.V, a, b, F[a], s, image, size)) continue;
                 flags[a] = 1;
                 flags[b] = 1;
                 any = true;

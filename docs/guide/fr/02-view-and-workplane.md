@@ -93,6 +93,19 @@ Lorsqu'un plan de travail repose sur une face, un œil apparaît à côté de {{
 
 Pour regarder le plan de travail de face, appuie sur [[P]] ou clique sur {{ui:camera.lookOntoWorkplane}} à côté de {{ui:camera.placeWorkplane}} dans la barre de vue. La vue tourne jusqu'à ce que tu voies le plan de face, du côté vers lequel poussent les nouvelles formes, avec son origine au milieu. Sur la plaque de base, c'est la vue de dessus.
 
+## Plateaux d'impression
+
+Quand un design contient plus qu'un plateau ne peut imprimer, une boîte avec son couvercle et ses inserts par exemple, il peut avoir plusieurs plateaux d'impression. Cliquez sur {{ui:editor.tool.buildPlates}} dans le groupe {{ui:editor.group.arrange}}, ou choisissez {{ui:plates.moveTo}} dans le menu du clic droit sur un corps. Une barre apparaît au pied de la vue, avec un bouton par plateau ; le nombre indique combien de corps s'y trouvent.
+
+- Chaque plateau est aussi grand que le plan de travail, et les plateaux sont côte à côte à droite du premier, à 20 mm l'un de l'autre. Un corps appartient au plateau sur lequel se trouve le milieu de son empreinte ; en le faisant glisser de l'autre côté, il passe sur l'autre plateau. Un design compte jusqu'à 12 plateaux.
+- Un clic sur un plateau dans la barre l'affiche, et les nouvelles formes s'y posent alors. {{ui:plates.showAll}} les affiche tous. Un double-clic sur un plateau, ou {{ui:plates.rename}}, lui donne un nom comme « Couvercle », écrit sur le plateau.
+- {{ui:plates.moveLeft}} et {{ui:plates.moveRight}} changent l'ordre, les corps suivant leur plateau. {{ui:plates.remove}} retire le plateau actif ; ses corps passent sur le premier plateau au même endroit.
+- {{ui:plates.arrange}} dispose les corps sélectionnés, ou tous, rangée par rangée sur les plateaux, les plus grands d'abord, à 5 mm l'un de l'autre, et ajoute des plateaux tant qu'il en faut. Un corps plus grand qu'un plateau reste en place.
+- Avec une imprimante choisie, chaque corps est contrôlé par rapport à son propre plateau, et la hauteur d'impression compte à partir du corps le plus bas de ce plateau. Un plateau avec un corps qui ne tient pas affiche son nombre en rouge.
+- Dans les propriétés, X compte à partir du milieu du plateau du corps.
+
+La fenêtre d'export propose alors {{ui:export.plates}} : tous les plateaux dans un fichier, côte à côte comme dans le design ; un fichier par plateau, réunis dans un ZIP (STL, 3MF et OBJ) ; ou un seul plateau, placé à l'endroit du premier. Un trancheur ouvre chaque fichier comme un seul plateau ; pour imprimer les plateaux l'un après l'autre, prenez donc les fichiers par plateau. Déplacer des corps entre plateaux et les répartir peut être annulé ; ajouter, nommer, ordonner et retirer des plateaux est enregistré avec le design, mais pas annulé.
+
 ## Grille et capture
 
 La grille montre la taille de la plaque. En bas à droite se trouve l'**étape d'accrochage** : déplacer et mettre à l'échelle l'accrochage par pas de cette taille, par exemple 1 mm. Réduisez-le pour un travail fin et plus grand pour un arrangement grossier. {{ui:editor.tool.snapToGrid}} dans le ruban déplace ensuite les formes sélectionnées sur le croisement de grille le plus proche. Lors du déplacement, les formes s'alignent également sur d'autres formes, voir [Sélection et organisation] (chapter:select-and-arrange).

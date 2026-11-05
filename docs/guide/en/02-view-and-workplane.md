@@ -95,6 +95,19 @@ While a workplane sits on a face, an eye appears next to {{ui:camera.placeWorkpl
 
 To look straight at the workplane, press [[P]] or click {{ui:camera.lookOntoWorkplane}} next to {{ui:camera.placeWorkplane}} in the view bar. The view turns until you see the workplane square, from the side new shapes grow towards, with its origin in the middle. On the base plate that is the view from above.
 
+## Build plates
+
+When a design holds more than one plate can print, a box with its lid and inserts for example, it can have several build plates. Click {{ui:editor.tool.buildPlates}} in the {{ui:editor.group.arrange}} group, or choose {{ui:plates.moveTo}} in the menu of a right click on a body. A bar appears at the foot of the view with one button per plate; the number on it says how many bodies stand on the plate.
+
+- Every plate is as large as the workplane, and the plates lie side by side to the right of the first one, 20 mm apart. A body belongs to the plate the middle of its footprint stands on, so dragging it across puts it on the other plate. A design holds up to 12 plates.
+- A click on a plate in the bar looks at it, and new shapes then land on it. {{ui:plates.showAll}} looks at all of them. A double click on a plate, or {{ui:plates.rename}}, gives it a name such as "Lid", which is written on the plate.
+- {{ui:plates.moveLeft}} and {{ui:plates.moveRight}} change the order, the bodies moving with their plate. {{ui:plates.remove}} takes the active plate away; its bodies go onto the first plate at the same spot.
+- {{ui:plates.arrange}} lays the selected bodies, or all of them, out row by row on the plates, the largest first, 5 mm apart, and adds plates while they are needed. A body larger than a plate stays where it is.
+- With a printer chosen, every body is checked against its own plate, and the build height counts from the lowest body on that plate. A plate with a body that does not fit shows its number in red.
+- In the properties, X counts from the middle of the body's own plate.
+
+The export window then offers {{ui:export.plates}}: all plates in one file, side by side as in the design; one file per plate, packed in a ZIP (STL, 3MF and OBJ); or a single plate, set where the first plate is. A slicer opens every file as one plate, so to print the plates one after another, take the files per plate. Moving bodies between plates and arranging them can be undone; adding, naming, ordering and removing plates is kept with the design but not undone.
+
 ## Grid and snapping
 
 The grid shows the size of the plate. At the bottom right is the **snap step**: moving and scaling snap in steps of that size, for example 1 mm. Make it smaller for fine work and larger for rough arranging. {{ui:editor.tool.snapToGrid}} in the ribbon moves the selected shapes afterwards onto the nearest grid crossing. While moving, shapes also snap to other shapes, see [Selecting and arranging](chapter:select-and-arrange). Without the mouse: [[Alt]]+[[1]] to [[Alt]]+[[0]] pick that entry of the menu ([[Alt]]+[[1]] turns snapping off), and [[,]] and [[.]] make the step one size finer or coarser. This works in a sketch too.

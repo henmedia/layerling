@@ -271,18 +271,23 @@ export function sampleGreyImage(image: GreyImage, u: number, v: number, clamp = 
   return (top * (1 - fy) + bottom * fy) / 255;
 }
 
-/** Softened over `radius` points (three box filters, close to a Gaussian), without a seam over the tile's borders. */
-export function blurGreyImage(image: GreyImage, radius: number): GreyImage {
+/**
+ * Softened over `radius` points (three box filters, close to a Gaussian), without a seam over the tile's borders. An
+ * image pressed on once has no neighbour beyond its border (`clampEdges`): softened round the tile, its left edge ran
+ * over into its right one and drew a line there (#1268).
+ */
+export function blurGreyImage(image: GreyImage, radius: number, clampEdges = false): GreyImage {
   const r = Math.round(radius);
   if (r <= 0) return image;
   const { width: w, height: h } = image;
+  const index = clampEdges ? (i: number, n: number) => Math.min(n - 1, Math.max(0, i)) : wrap;
   let a = Float64Array.from(image.data);
   let b = new Float64Array(a.length);
   for (let pass = 0; pass < 3; pass += 1) {
     for (let y = 0; y < h; y += 1) {
       for (let x = 0; x < w; x += 1) {
         let sum = 0;
-        for (let k = -r; k <= r; k += 1) sum += a[y * w + wrap(x + k, w)];
+        for (let k = -r; k <= r; k += 1) sum += a[y * w + index(x + k, w)];
         b[y * w + x] = sum / (2 * r + 1);
       }
     }
@@ -290,7 +295,7 @@ export function blurGreyImage(image: GreyImage, radius: number): GreyImage {
     for (let y = 0; y < h; y += 1) {
       for (let x = 0; x < w; x += 1) {
         let sum = 0;
-        for (let k = -r; k <= r; k += 1) sum += a[wrap(y + k, h) * w + x];
+        for (let k = -r; k <= r; k += 1) sum += a[index(y + k, h) * w + x];
         b[y * w + x] = sum / (2 * r + 1);
       }
     }
@@ -338,17 +343,32 @@ export function normalizeSurfaceTextureOwnImage(input: unknown): SurfaceTextureO
 /**
  * Pixels of a picture (RGBA, as a canvas gives them) as one's own image: grey by brightness, transparent counted as
  * dark, made smaller to SURFACE_TEXTURE_OWN_IMAGE_SIZE on its longer side by averaging.
+ *
+ * A dark drawing on a transparent ground - black lines, a black logo, as an SVG often is - would come out all dark
+ * that way, the drawing as dark as its ground, and the texture showed nothing (#1268). On a transparent ground a dark
+ * drawing counts by how dark it is: its ink becomes the full depth and the ground stays.
  */
 export function surfaceTextureOwnImage(rgba: ArrayLike<number>, width: number, height: number): SurfaceTextureOwnImage {
   const scale = Math.min(1, SURFACE_TEXTURE_OWN_IMAGE_SIZE / Math.max(width, height));
   const w = Math.max(2, Math.round(width * scale)), h = Math.max(2, Math.round(height * scale));
   const sum = new Float64Array(w * h), count = new Float64Array(w * h);
+  const brightness = (o: number) => 0.299 * rgba[o] + 0.587 * rgba[o + 1] + 0.114 * rgba[o + 2];
+  // Whether the picture has a transparent ground (some of it see-through), and how bright what is drawn on it is.
+  let clear = 0, ink = 0, opacity = 0;
+  for (let o = 0; o < width * height * 4; o += 4) {
+    const alpha = rgba[o + 3] / 255;
+    if (alpha < 0.5) clear += 1;
+    ink += brightness(o) * alpha;
+    opacity += alpha;
+  }
+  // Clearly dark (a quarter of white at most, as black or navy ink is): a picture of all tones keeps its own.
+  const darkDrawing = clear > 0 && opacity > 0 && ink / opacity < 64;
   for (let y = 0; y < height; y += 1) {
     const ty = Math.min(h - 1, Math.floor((y * h) / height));
     for (let x = 0; x < width; x += 1) {
       const tx = Math.min(w - 1, Math.floor((x * w) / width));
       const o = (y * width + x) * 4;
-      const grey = (0.299 * rgba[o] + 0.587 * rgba[o + 1] + 0.114 * rgba[o + 2]) * (rgba[o + 3] / 255);
+      const grey = (darkDrawing ? 255 - brightness(o) : brightness(o)) * (rgba[o + 3] / 255);
       sum[ty * w + tx] += grey;
       count[ty * w + tx] += 1;
     }

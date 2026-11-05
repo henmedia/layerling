@@ -1,5 +1,70 @@
 [
   {
+    "version": "1.142.0",
+    "items": [
+      {
+        "title": {
+          "de": "Mehrere Druckplatten",
+          "en": "Several build plates"
+        },
+        "body": {
+          "de": "Passt ein Entwurf nicht auf eine Platte, bekommt er weitere Platten nebeneinander (Anordnen > Druckplatten oder Rechtsklick > Auf Platte …). Ein Körper gehört zu der Platte, auf der er steht; „Auf Platten verteilen“ legt die Teile aus, jede Platte wird für sich geprüft, und der Export schreibt eine Platte oder je Platte eine Datei.",
+          "en": "When a design does not fit one plate, it gets more plates side by side (Arrange > Build plates, or right-click > Onto plate…). A body belongs to the plate it stands on; \"Arrange on plates\" lays the parts out, each plate is checked on its own, and the export writes one plate or one file per plate."
+        }
+      },
+      {
+        "title": {
+          "de": "Kegelrad mit schrägen Zähnen",
+          "en": "Bevel gear with spiral teeth"
+        },
+        "body": {
+          "de": "Das Kegelrad hat jetzt einen eigenen Schrägungswinkel: Seine Zähne drehen sich, während sie zur Oberseite hin kleiner werden, wie bei einem Spiralkegelrad. Bei 0 bleiben sie gerade wie bisher. So ein Rad bleibt ein Dreiecksnetz, Kantenwerkzeug und STEP-Export nehmen es nicht.",
+          "en": "The bevel gear now has its own helix angle: its teeth turn while they get smaller towards the top, like a spiral bevel gear. At 0 they stay straight as before. Such a gear stays a triangle mesh, so the edge tool and the STEP export leave it out."
+        }
+      },
+      {
+        "title": {
+          "de": "Entwürfe ohne Verlauf öffnen",
+          "en": "Open a design without its history"
+        },
+        "body": {
+          "de": "Geht ein Entwurf nur noch sehr langsam oder gar nicht mehr auf, weil sein Verlauf riesig geworden ist, wähle in seinem Menü auf der Startseite „Ohne Verlauf öffnen“. layerling liest dann nur den aktuellen Stand und löscht die früheren Schritte. Stürzt die Seite beim Öffnen eines Entwurfs ab, öffnet ihn das Neuladen nicht gleich wieder, sondern bleibt auf der Startseite.",
+          "en": "If a design opens only very slowly or not at all because its history has grown huge, choose \"Open without history\" in its menu on the start page. layerling then reads only the current state and deletes the earlier steps. If the page crashes while a design opens, reloading no longer opens it straight away but stays on the start page."
+        }
+      },
+      {
+        "title": {
+          "de": "STEP-Datei mit der Farbe der Gruppe",
+          "en": "STEP files with the group's colour"
+        },
+        "body": {
+          "de": "Eine Gruppe, die in einer Farbe erscheint, gibt diese Farbe jetzt auch in der STEP-Datei an alle ihre Teile weiter, statt dass jedes Teil seine alte Farbe mitnimmt. Ist „Mehrfarbig“ an, behält jedes Teil seine eigene Farbe, so wie du es im Editor siehst.",
+          "en": "A group shown in one colour now gives that colour to all its parts in a STEP file too, instead of each part taking along its old colour. With \"Multicolor\" on, each part keeps its own colour, as you see it in the editor."
+        }
+      },
+      {
+        "title": {
+          "de": "Automatisches Kerning für Text",
+          "en": "Automatic kerning for text"
+        },
+        "body": {
+          "de": "Buchstabenpaare wie AY, AV, LT oder To stehen nicht mehr mit einer Lücke da: Neue Texte rücken sie von selbst zusammen, in jeder Schrift, auch in eigenen. Bei älteren Texten schaltest du es unter „Mehr“ in den Eigenschaften mit „Automatisches Kerning“ ein. Die Buchstaben behalten ihre Größe.",
+          "en": "Pairs of letters such as AY, AV, LT or To no longer stand with a gap between them: new texts move them closer by themselves, in every font, your own too. For older texts, switch on \"Automatic kerning\" under \"More\" in the properties. The letters keep their size."
+        }
+      },
+      {
+        "title": {
+          "de": "Sicherung eines Entwurfs mit seinem Namen",
+          "en": "A single design's backup carries its name"
+        },
+        "body": {
+          "de": "Sicherst du auf der Startseite mit „Auswählen“ und „Sichern“ nur einen Entwurf, heißt die ZIP-Datei jetzt nach ihm, etwa „layerling-Laterne-2026-11-05.zip“, so wie die Sicherung eines Ordners nach dem Ordner heißt.",
+          "en": "When you back up just one design with \"Select\" and \"Back up\" on the start page, the ZIP file is now named after it, such as \"layerling-Lantern-2026-11-05.zip\", the way a folder's backup is named after the folder."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.141.0",
     "items": [
       {

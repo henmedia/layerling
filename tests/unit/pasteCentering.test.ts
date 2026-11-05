@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { meshAabb } from "@/lib/editorMeshCore";
-import { pasteCenteringShift } from "@/lib/pasteCentering";
+import { PASTE_NUDGE, pasteCenteringShift, pasteNudged } from "@/lib/pasteCentering";
 import { horizontalPlacementWorkplane } from "@/lib/placementWorkplane";
 import { DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -32,5 +32,17 @@ describe("pasting in the middle and dropping (#876)", () => {
 
   it("has nothing to move for parts with nothing to measure", () => {
     expect(pasteCenteringShift([], plate)).toBeNull();
+  });
+});
+
+// #1304: a plain paste beyond the edge of the plate kept a cylinder in the corner of a box only on the plate.
+describe("plain paste keeps the parts together (#1304)", () => {
+  it("sets every copy the same step from its original, also far beyond the plate", () => {
+    const parts = [box("box", 220, 180, 0, 20, 20, 20), box("pin", 225, 185, 20, 10, 10, 10)];
+    const pasted = pasteNudged(parts, parts);
+    expect(pasted.map((part) => [part.x, part.z])).toEqual([[220 + PASTE_NUDGE, 180 + PASTE_NUDGE], [225 + PASTE_NUDGE, 185 + PASTE_NUDGE]]);
+    expect(pasted[1].x - pasted[0].x).toBe(5);
+    expect(pasted[1].z - pasted[0].z).toBe(5);
+    expect(pasted[1].elevation).toBe(20);
   });
 });

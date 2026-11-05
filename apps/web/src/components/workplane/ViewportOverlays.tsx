@@ -24,6 +24,7 @@ import { NOTE_TEXT_LIMIT } from "@/lib/workplaneNotes";
 import { measurementMiddle } from "@/lib/referencePoints";
 import type { MoveDimensionLift } from "@/lib/moveDimensionLines";
 import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeLabelSize } from "@/lib/tapeLabels";
+import { roundEdgeMeasure } from "@/lib/tapeCircle";
 
 /** Light-blue chrome for origin-distance lines, matching `.origin-dimension-value`. */
 const ORIGIN_DIMENSION_LINE_COLOR = { light: "#6ec4e8", dark: "#8fd4f0" } as const;
@@ -643,6 +644,13 @@ export function syncTapeOverlay(
     const midScreen = middle ? projectToScreen(new THREE.Vector3(middle.x, middle.y, middle.z), state) : screenPolylineMiddle(screenLine).point;
     // A measurement across one body (its thickness, one of its edges) runs inside or along it and is not hidden by it.
     const ownShapeId = segment.edge?.shapeId ?? (start.attachment && start.attachment.shapeId === end.attachment?.shapeId ? start.attachment.shapeId : undefined);
+    // A whole round edge says its diameter, an arc its radius; the length along it shows over the label.
+    const round = attachedEdgePoints.length >= 4 ? roundEdgeMeasure(attachedEdgePoints) : null;
+    if (round) {
+      const label = round.full ? `Ø ${formatMeasure(round.diameter, accuracy)}` : `R ${formatMeasure(round.radius, accuracy)}`;
+      const deltas = `${round.full ? `${t("edge.radius")} ${formatMeasure(round.radius, accuracy)}   ` : ""}${t("prop.length")} ${formatMeasure(round.length, accuracy)}`;
+      return [{ segment, startScreen, endScreen, worldPoints, screenLine, midScreen, ownShapeId, label, axes: "", deltas }];
+    }
     return [{ segment, startScreen, endScreen, worldPoints, screenLine, midScreen, ownShapeId, label: formatMeasure(tapePolylineLength(worldPoints), accuracy), ...tapeAxesText(worldPoints, accuracy) }];
   });
   // Labels go beside their line, clear of the other lines, the points, the middle marks and the labels placed before.

@@ -213,7 +213,7 @@ import {
 import { t, type MessageKey } from "@/lib/i18n";
 import { torusTubeRatio } from "@/lib/torusShape";
 import type { ShapeAsset, ShapeCustomization, ShapeKind, WorkplaneShape } from "@/types/layerling";
-import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_DIAMETER, DEFAULT_HIRTH_HEIGHT, DEFAULT_HIRTH_TEETH, hirthRightAngleToothHeight, normalizeHirthBore, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
+import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_DIAMETER, DEFAULT_HIRTH_HEIGHT, DEFAULT_HIRTH_TEETH, hirthRightAngleToothHeight, normalizeHirthBore, normalizeHirthSteepFlank, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
 const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   box: "shape.box",
@@ -745,9 +745,12 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     toothSize: shape.toothSize,
     toothWidth: shape.toothWidth,
     centerHoleSize: shape.centerHoleSize,
+    hirthSteepFlank: shape.hirthSteepFlank,
+    hirthReverse: shape.hirthReverse,
     gearType: shape.gearType,
     gearRim: shape.gearRim,
     helixAngle: shape.helixAngle,
+    bevelHelixAngle: shape.bevelHelixAngle,
     helixQuality: shape.helixQuality,
     gearProfile: shape.gearProfile,
     gearPressureAngle: shape.gearPressureAngle,
@@ -1102,6 +1105,8 @@ export function makeShapeFromAsset(
     textSize: asset.kind === "text" ? customization.textSize : undefined,
     textInward: asset.kind === "text" ? customization.textInward : undefined,
     textFlipped: asset.kind === "text" ? customization.textFlipped : undefined,
+    // New texts are kerned (#1297); a text saved without the field keeps its spacing.
+    textKerning: asset.kind === "text" ? customization.textKerning ?? true : undefined,
     steps: asset.kind === "box" ? 10 : asset.kind === "sphere" ? customization.steps ?? 24 : asset.kind === "halfSphere" || asset.kind === "paraboloid" ? customization.steps ?? 32 : asset.kind === "torus" ? customization.steps : undefined,
     torusTubeRatio: asset.kind === "torus" ? customization.torusTubeRatio ?? torusTubeRatio({ width, depth, height }) : undefined,
     sides: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" || asset.kind === "cone" || asset.kind === "curvedCone" || asset.kind === "tube" || asset.kind === "ring" || asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "finishingWasher" || asset.kind === "teardrop" || asset.kind === "torus" ? customization.sides : asset.kind === "roundRoof" ? customization.sides ?? 64 : asset.kind === "pyramid" ? customization.sides ?? 4 : asset.kind === "polygon" ? customization.sides ?? 6 : undefined,
@@ -1138,6 +1143,8 @@ export function makeShapeFromAsset(
     centerHoleSize: asset.kind === "gear"
       ? normalizeGearCenterHoleSize(customization.centerHoleSize ?? DEFAULT_GEAR_CENTER_HOLE_SIZE, width, depth, gearToothSize, { teeth: gearTeeth, gearProfile })
       : asset.kind === "hirth" ? normalizeHirthBore(customization.centerHoleSize, width, depth) : undefined,
+    hirthSteepFlank: asset.kind === "hirth" ? normalizeHirthSteepFlank(customization.hirthSteepFlank) : undefined,
+    hirthReverse: asset.kind === "hirth" && normalizeHirthSteepFlank(customization.hirthSteepFlank) !== undefined && customization.hirthReverse === true ? true : undefined,
     gearType,
     gearRim,
     helixAngle: asset.kind === "gear" ? normalizeGearHelixAngle(customization.helixAngle ?? DEFAULT_GEAR_HELIX_ANGLE) : undefined,

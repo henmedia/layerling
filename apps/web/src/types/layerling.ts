@@ -169,9 +169,15 @@ export type ShapeCustomization = {
   toothSize?: number;
   toothWidth?: number;
   centerHoleSize?: number;
+  /** Hirth joint with saw teeth (Discussion #1320): the steep flank's angle to the face, 45 to 90 degrees; missing or 0 means symmetric teeth. */
+  hirthSteepFlank?: number;
+  /** Hirth joint with saw teeth: the steep flank on the other side of each tooth. */
+  hirthReverse?: boolean;
   gearType?: GearType;
   helixAngle?: number;
   helixQuality?: number;
+  /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
+  bevelHelixAngle?: number;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -437,6 +443,8 @@ export type ShapeCustomization = {
   textInward?: boolean;
   /** Curved text: same place on the circle, letters turned upside down (read from the other side). */
   textFlipped?: boolean;
+  /** Automatic kerning (#1297); a new text has it on unless this says false. */
+  textKerning?: boolean;
 };
 
 export type ShapeCustomizationMap = Partial<Record<ShapeKind, ShapeCustomization>>;
@@ -447,6 +455,12 @@ export type WorkplaneWorkspaceSettings = {
   sizePreset: string;
   /** Id of the chosen printer preset (printerPresets.generated.ts), or "" for none. */
   printer: string;
+  /**
+   * The design's build plates by name, "" for a plate without one, side by side along X as large as the
+   * workplane (Discussion #456, buildPlates.ts). Left out, the design has one plate. A design's own, never
+   * part of the default workplane.
+   */
+  plates?: string[];
   gridBlockSize: number;
   gridBlockPreset: string;
   /** The grid preset of the unit system left by the last switch between mm and in, so switching back finds it again (#442). */
@@ -1005,9 +1019,15 @@ export type WorkplaneShape = {
   toothSize?: number;
   toothWidth?: number;
   centerHoleSize?: number;
+  /** Hirth joint with saw teeth (Discussion #1320): the steep flank's angle to the face, 45 to 90 degrees; missing or 0 means symmetric teeth. */
+  hirthSteepFlank?: number;
+  /** Hirth joint with saw teeth: the steep flank on the other side of each tooth. */
+  hirthReverse?: boolean;
   gearType?: GearType;
   helixAngle?: number;
   helixQuality?: number;
+  /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
+  bevelHelixAngle?: number;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -1319,6 +1339,12 @@ export type WorkplaneShape = {
    * advance - 0 or left out as the font has it, above it wider, below it (down to -50) tighter. Straight and curved text.
    */
   textSpacing?: number;
+  /**
+   * Text only (#1297): automatic kerning - pairs of letters that leave too much room between them, such as AY, AV, LT
+   * or To, move closer. New texts start with it on; a text without the field (saved before it existed) has it off, so
+   * nothing moves in a saved design. Straight and curved text; not vertical text, Arabic, Hebrew or Japanese.
+   */
+  textKerning?: boolean;
   /**
    * Curved text only (#1196): how wide each letter is drawn, in per cent of its own width - 100 or left out as the
    * font has it, below narrower, above wider (25 to 400). The letters keep their height; the arc and the box follow.

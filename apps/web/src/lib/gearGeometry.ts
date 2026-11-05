@@ -784,6 +784,16 @@ export function gearTypeHasHelix(value?: string) {
   return type === "helical" || type === "herringbone";
 }
 
+/** A bevel gear's helix angle, 0 (straight teeth) when missing; -45 to 45 degrees like a helical gear's. */
+export function normalizeBevelHelixAngle(value?: number) {
+  return Number.isFinite(value) ? clamp(value as number, MIN_GEAR_HELIX_ANGLE, MAX_GEAR_HELIX_ANGLE) : 0;
+}
+
+/** Whether a bevel gear's teeth turn (Discussion #1299): such a spiral bevel gear stays a triangle mesh. */
+export function bevelGearIsSpiral(value?: number) {
+  return Math.abs(normalizeBevelHelixAngle(value)) > 1e-9;
+}
+
 /** A ring gear (teeth pointing in) and a rack (#201) are set by module like involute gears, whatever profile is stored. */
 export function gearTypeIsModular(value?: string) {
   const type = normalizeGearType(value);
@@ -929,6 +939,7 @@ type GearGeometryOptions = {
   gearType?: GearType;
   helixAngle?: number;
   helixQuality?: number;
+  bevelHelixAngle?: number;
   gearProfile?: GearProfile;
   gearPressureAngle?: number;
   gearBacklash?: number;
@@ -960,6 +971,7 @@ export function createGearGeometry({
   gearType: requestedType,
   helixAngle: requestedHelixAngle,
   helixQuality: requestedHelixQuality,
+  bevelHelixAngle: requestedBevelHelixAngle,
   gearProfile,
   gearPressureAngle,
   gearBacklash,
@@ -994,8 +1006,12 @@ export function createGearGeometry({
   const outlineCount = corners.length;
   const herringbone = gearType === "herringbone";
   // A herringbone gear has a ring exactly in the middle, where the teeth turn round.
-  const ringCount = herringbone ? helixQuality + (helixQuality % 2 === 0 ? 1 : 0) : gearType === "helical" ? helixQuality : 2;
-  const twist = gearTypeHasHelix(gearType) ? gearHelixTwist(safeWidth, safeDepth, safeHeight, { ...profile, helixAngle: requestedHelixAngle }) : 0;
+  // A spiral bevel gear (Discussion #1299) turns its teeth while they taper, in as many rings as a helical gear.
+  const spiralBevel = gearType === "bevel" && bevelGearIsSpiral(requestedBevelHelixAngle);
+  const ringCount = herringbone ? helixQuality + (helixQuality % 2 === 0 ? 1 : 0) : gearType === "helical" || spiralBevel ? helixQuality : 2;
+  const twist = gearTypeHasHelix(gearType)
+    ? gearHelixTwist(safeWidth, safeDepth, safeHeight, { ...profile, helixAngle: requestedHelixAngle })
+    : spiralBevel ? gearHelixTwist(safeWidth, safeDepth, safeHeight, { ...profile, helixAngle: requestedBevelHelixAngle }) : 0;
   const topScale = gearType === "bevel" ? BEVEL_GEAR_TOP_SCALE : 1;
   const boreX = centerHoleSize / 2;
   const boreZ = centerHoleSize / 2;

@@ -12,7 +12,7 @@ import type { ShapeCustomization, ShapeCustomizationMap, WorkplaneShape } from "
  */
 const SHAPE_DEFAULT_FIELDS = [
   "cornerFillet", "topBottomFillet", "roundedBoxQuality", "steps", "sides", "bevel", "segments", "topRadius", "baseRadius", "curvedConeTop", "curvedConeBend", "screwBossFastener", "screwBossSize", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussets", "screwBossGussetHeight", "screwBossGussetThickness", "snapFitPart", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitLeadAngle", "snapFitRetainAngle", "snapFitFoot", "ribStyle", "ribTop",
-  "topWidth", "topDepth", "teeth", "toothSize", "toothWidth", "centerHoleSize", "gearType", "helixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
+  "topWidth", "topDepth", "teeth", "toothSize", "toothWidth", "centerHoleSize", "hirthSteepFlank", "hirthReverse", "gearType", "helixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
   "threadRole", "threadHead", "threadHand", "threadProfile", "threadDiameter", "threadPitch", "threadClearance",
   "threadBoltClearance", "threadAxialClearance", "threadDepth", "threadFlankAngle", "threadQuality", "threadHeadHeight", "threadChamfer", "threadChamferBottom", "threadHeadChamfer", "threadDrive", "springTurns",
   "springWire", "springHand", "springQuality", "springForm", "springPattern", "springEnds", "starPoints", "starInnerSize", "starOuterFillet", "starInnerFillet",

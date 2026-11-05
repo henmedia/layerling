@@ -1,3 +1,4 @@
+import { restoreShapeBeforeEdgeTreatment } from "@/lib/edgeTreatmentHistory";
 import { describe, expect, it } from "vitest";
 import type { WorkplaneShape } from "@/types/layerling";
 import {
@@ -490,6 +491,39 @@ describe("workplane shape helpers", () => {
     const reference = shellRebuildReference(resized, entry!);
     expect(reference.appliedFrame).toEqual(filletFrame);
     expect(hollowStretchSincePicture(resized, reference)).toEqual({ x: 0.5, z: 1, height: 1 });
+  });
+
+  it("keeps a filleted hollow body where it is when it was moved between the hollowing and the fillets (#1314)", () => {
+    // Hollowed at -31.75 / 237.75 on the plate, moved to -51.5 / 92 and 2.5 up, filleted there, then copied to -267.5 / -1.2.
+    const shellFrame = { x: -31.75, z: 237.75, elevation: 0, width: 30, depth: 30, height: 2, rotation: 0, rotationX: 0, rotationZ: 0, mirrorX: false, mirrorY: false, mirrorZ: false };
+    const filletFrame = { ...shellFrame, x: -51.5, z: 92, elevation: 2.5 };
+    const shell = { kind: "shell" as const, amount: 1.5, edgeCount: 0, openings: "top-bottom" as const };
+    const fillet = { kind: "fillet" as const, amount: 0.33, edgeCount: 4, edgeIds: [16, 22, 23, 17] };
+    const box = shape({ kind: "box", x: -31.75, z: 237.75, width: 30, depth: 30, height: 2 });
+    const body = shape({
+      kind: "mesh",
+      x: -267.5,
+      z: -1.2,
+      elevation: 2.5,
+      width: 30,
+      depth: 30,
+      height: 4,
+      edgeResizeMode: "preserve",
+      edgeTreatments: [shell, fillet],
+      edgeTreatmentHistory: [
+        { id: "h", createdAt: 1, feature: shell, before: box, appliedFrame: shellFrame },
+        { id: "f", createdAt: 2, feature: fillet, before: shape({ kind: "mesh", x: -51.5, z: 92, elevation: 2.5, width: 30, depth: 30, height: 2 }), appliedFrame: filletFrame },
+      ],
+      importedMesh: { positions: [-15, 0, -15, 15, 2, 15], baseWidth: 30, baseDepth: 30, baseHeight: 2, triangleCount: 1, sourceFormat: "json" },
+    });
+    const entry = shellNeedingRebuild(body);
+    expect(entry?.id).toBe("h");
+    const before = restoreShapeBeforeEdgeTreatment(body, shellRebuildReference(body, entry!));
+    expect(before.kind).toBe("box");
+    expect(before.x).toBeCloseTo(-267.5, 6);
+    expect(before.z).toBeCloseTo(-1.2, 6);
+    expect(before.elevation).toBeCloseTo(2.5, 6);
+    expect(before.height).toBeCloseTo(4, 6);
   });
 
   it("reads the stretch of a hollow body in the axes of the shape it was hollowed from, a quarter turn apart (#729)", () => {

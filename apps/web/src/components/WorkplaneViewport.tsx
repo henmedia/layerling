@@ -59,6 +59,7 @@ import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDim
 import { horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
 import { printerPresetById } from "@/lib/printBed";
+import { plateCenterX, plateCount, plateName, platesExtentX } from "@/lib/buildPlates";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { heightWithFaceOnGrid, liftDeltaOnGrid, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { projectThumbnailDimensions } from "@/lib/projectThumbnail";
@@ -296,6 +297,8 @@ type WorkplaneViewportProps = {
   onNoteRemove?: (id: string) => void;
   onNoteModeChange?: (active: boolean) => void;
   onWorkspaceSettingsChange?: (settings: { workspace: WorkplaneWorkspaceSettings; snap: GridSize }) => void;
+  /** The bar of build plates (Discussion #456), drawn at the foot of the view. */
+  plateBar?: ReactNode;
   projectName?: string;
   /** The design on screen, null behind the overview. The viewport outlives a design, so its tools reset when this changes. */
   projectId?: string | null;
@@ -486,6 +489,8 @@ declare global {
     }) => { shown: boolean; angle?: number; other?: number; text?: string };
     /** The four saved views (keys 7, 8, 9, 0) for MCP: saves or shows one when asked, returns which keys hold a view. */
     layerlingSavedViews?: (request?: { save?: number; show?: number; startView?: "save" | "reset"; ontoWorkplane?: boolean }) => { keys: { key: string; saved: boolean }[]; shown?: boolean; startView: boolean };
+    /** Looks at the build plates `from` to `to` (Discussion #456), from the plate bar; false while the view is not ready. */
+    layerlingFramePlates?: (from: number, to: number) => boolean;
   }
 }
 
@@ -1549,6 +1554,7 @@ export function WorkplaneViewport({
   onNoteRemove,
   onNoteModeChange,
   onWorkspaceSettingsChange,
+  plateBar,
   projectName = "",
   projectId = null,
   onWorkplaneModeChange,
@@ -2416,7 +2422,7 @@ export function WorkplaneViewport({
     workspaceRef.current = nextWorkspace;
     setMeasureUnit(nextWorkspace);
     if (threeRef.current) {
-      rebuildWorkplane(threeRef.current, nextWorkspace, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current);
+      rebuildWorkplane(threeRef.current, nextWorkspace, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(nextWorkspace, index));
       constrainCamera(threeRef.current, nextWorkspace);
       threeRef.current.needsRender = true;
     }
@@ -2935,7 +2941,7 @@ export function WorkplaneViewport({
     if (setEdgeLineStyle(effectiveViewSettings(workspace).edgeLines, workspace.edgeColor) || holesChanged) {
       rebuildShapes(threeRef.current, shapesRef.current, shapeOutlineIds(), modifierActiveRef.current, placementWorkplaneRef.current);
     }
-    rebuildWorkplane(threeRef.current, workspace, resolvedTheme, workplaneHidden ? horizontalPlacementWorkplane() : placementWorkplane, projectName);
+    rebuildWorkplane(threeRef.current, workspace, resolvedTheme, workplaneHidden ? horizontalPlacementWorkplane() : placementWorkplane, projectName, (index) => plateLabel(workspace, index));
     rebuildSelectionHelpers(threeRef.current, shapesRef.current, renderSelectionIds(), placementWorkplane);
     if (threeRef.current) {
       syncTransformOverlay(
@@ -3002,7 +3008,7 @@ export function WorkplaneViewport({
     const state = createThreeScene(host);
     state.palette = themePaletteRef.current;
     threeRef.current = state;
-    rebuildWorkplane(state, workspaceRef.current, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current);
+    rebuildWorkplane(state, workspaceRef.current, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(workspaceRef.current, index));
     state.workplaneLayer.visible = !workplaneLayerHiddenRef.current;
     window.layerlingCaptureCanvas = () => {
       state.camera.updateMatrixWorld();
@@ -3335,6 +3341,30 @@ export function WorkplaneViewport({
   const resetStartView = useCallback(() => {
     writeStartView(null);
     setHasStartView(false);
+  }, []);
+
+  // The plate bar looks at one build plate or at all of them (Discussion #456), keeping the camera's direction.
+  useEffect(() => {
+    window.layerlingFramePlates = (from, to) => {
+      const state = threeRef.current;
+      if (!state) return false;
+      const workspace = workspaceRef.current;
+      const first = Math.max(0, Math.min(from, to));
+      const last = Math.min(plateCount(workspace) - 1, Math.max(from, to));
+      const bounds = new THREE.Box3(
+        new THREE.Vector3(plateCenterX(workspace, first) - workspace.width / 2, 0, -workspace.depth / 2),
+        new THREE.Vector3(plateCenterX(workspace, last) + workspace.width / 2, 0, workspace.depth / 2),
+      );
+      constrainCamera(state, workspace);
+      frameBounds(state, bounds);
+      constrainCamera(state, workspace);
+      syncViewCube(state, viewCubeRef.current);
+      state.needsRender = true;
+      return true;
+    };
+    return () => {
+      delete window.layerlingFramePlates;
+    };
   }, []);
 
   // The same keys for MCP (layerling_saved_view), through the functions the keys use.
@@ -8490,6 +8520,7 @@ export function WorkplaneViewport({
             onPointerLeave={handlePointerLeave}
           />
           {!workplaneMode && !splitActive ? <SelectionCounter count={selectedIds.length} hostRef={hostRef} /> : null}
+          {!workplaneMode && !splitActive && !pickOnly ? plateBar : null}
           {!workplaneMode && !splitActive && marqueeRect ? <div className={marqueeTouching ? "selection-marquee touching" : "selection-marquee"} style={marqueeRect} /> : null}
           {!workplaneMode && !splitActive && moveDimensionsEnabled && !dimensionsHidden && moveDimensionOverlay ? (
             <MoveDimensionOverlay
@@ -8854,6 +8885,12 @@ export function WorkplaneViewport({
   );
 }
 
+/** What a further build plate says on its corner (Discussion #456): "Plate 2", or "Plate 2: Lid" when it has a name. */
+function plateLabel(workspace: WorkspaceSettings, index: number) {
+  const name = plateName(workspace, index);
+  return name ? t("plates.named", { number: index + 1, name }) : t("plates.plate", { number: index + 1 });
+}
+
 function constrainCamera(state: ThreeState, workspace: WorkspaceSettings) {
   // The pivot stays on the plate, but as far out as the part "Center view" went to, so that part can be centred (#352).
   const reach = state.focusReach;
@@ -8861,7 +8898,8 @@ function constrainCamera(state: ThreeState, workspace: WorkspaceSettings) {
   // Sideways the pivot reaches the farthest body too, not only the part "Center view" last went to: parts
   // parked far beside the plate could not be panned to with the mouse (#502).
   const { halfWidth, halfDepth } = pivotPlateReach(bodies, {
-    halfWidth: Math.max(workspace.width / 2, reach ? Math.max(Math.abs(reach.min.x), Math.abs(reach.max.x)) : 0),
+    // With several build plates the pivot reaches the last one too (Discussion #456).
+    halfWidth: Math.max(workspace.width / 2, platesExtentX(workspace).maxX, reach ? Math.max(Math.abs(reach.min.x), Math.abs(reach.max.x)) : 0),
     halfDepth: Math.max(workspace.depth / 2, reach ? Math.max(Math.abs(reach.min.z), Math.abs(reach.max.z)) : 0),
   });
   // The pivot may rise to the top of the highest body (and sink to the foot of the lowest): a body

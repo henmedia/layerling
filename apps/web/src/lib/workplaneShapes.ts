@@ -409,7 +409,23 @@ export function edgeTreatmentsAfterShell(shape: WorkplaneShape) {
 export function shellRebuildReference(shape: WorkplaneShape, entry: NonNullable<WorkplaneShape["edgeTreatmentHistory"]>[number]) {
   const history = shape.edgeTreatmentHistory ?? [];
   const lastFrame = history[history.length - 1]?.appliedFrame;
-  return lastFrame && history[history.length - 1] !== entry ? { ...entry, appliedFrame: lastFrame } : entry;
+  if (!lastFrame || history[history.length - 1] === entry) return entry;
+  // The place, though, goes from the hollowing's frame plus only what each fillet itself moved the middle by. A body
+  // moved between the hollowing and its fillets otherwise came back where it was hollowed, shifted by the current
+  // move: a copy of a copy with its height changed jumped across the plate and down to it (#1314).
+  const shellFrame = entry.appliedFrame;
+  if (!shellFrame) return { ...entry, appliedFrame: lastFrame };
+  const middle = (frame: { elevation?: number; height: number }) => (frame.elevation ?? 0) + frame.height / 2;
+  let x = shellFrame.x;
+  let z = shellFrame.z;
+  let height = middle(shellFrame);
+  for (const later of history.slice(history.indexOf(entry) + 1)) {
+    if (!later.appliedFrame) continue;
+    x += later.appliedFrame.x - later.before.x;
+    z += later.appliedFrame.z - later.before.z;
+    height += middle(later.appliedFrame) - middle(later.before);
+  }
+  return { ...entry, appliedFrame: { ...lastFrame, x, z, elevation: height - lastFrame.height / 2 } };
 }
 
 export function shellRebuildEntry(shape: WorkplaneShape) {
@@ -686,8 +702,11 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.toothSize === b.toothSize &&
     a.toothWidth === b.toothWidth &&
     a.centerHoleSize === b.centerHoleSize &&
+    a.hirthSteepFlank === b.hirthSteepFlank &&
+    a.hirthReverse === b.hirthReverse &&
     a.gearType === b.gearType &&
     a.helixAngle === b.helixAngle &&
+    a.bevelHelixAngle === b.bevelHelixAngle &&
     a.helixQuality === b.helixQuality &&
     a.gearProfile === b.gearProfile &&
     a.gearPressureAngle === b.gearPressureAngle &&
@@ -878,6 +897,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     Boolean(a.textStretch) === Boolean(b.textStretch) &&
     Boolean(a.textVertical) === Boolean(b.textVertical) &&
     (a.textSpacing ?? 0) === (b.textSpacing ?? 0) &&
+    Boolean(a.textKerning) === Boolean(b.textKerning) &&
     (a.textLetterWidth ?? 100) === (b.textLetterWidth ?? 100) &&
     JSON.stringify(a.textKeyring ?? null) === JSON.stringify(b.textKeyring ?? null) &&
     JSON.stringify(a.textEdge ?? null) === JSON.stringify(b.textEdge ?? null) &&

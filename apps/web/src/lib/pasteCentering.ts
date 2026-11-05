@@ -42,3 +42,15 @@ export function pasteCenteringShift(shapes: WorkplaneShape[], workplane: Placeme
     z: xAxis.z * moveX + yAxis.z * moveY + zAxis.z * moveZ,
   };
 }
+
+/** How far a plain paste sets the copies from the originals, along x and z. */
+export const PASTE_NUDGE = 12;
+
+/**
+ * A plain paste: every copy sits the same little step from its original, so the parts keep their places to each
+ * other wherever they lie, also beyond the edge of the plate (#1304; each part used to be held to 110 mm on its own,
+ * which pulled parts out there onto each other).
+ */
+export function pasteNudged<T extends { x: number; z: number }>(copies: T[], originals: { x: number; z: number }[]): T[] {
+  return copies.map((copy, index) => ({ ...copy, x: (originals[index] ?? copy).x + PASTE_NUDGE, z: (originals[index] ?? copy).z + PASTE_NUDGE }));
+}

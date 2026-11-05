@@ -158,6 +158,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_measurements` | viser eller skjuler målebåndets målinger og viser dem med deres længder, og skjuler eller viser målene omkring markeringen som [[Q]] |
 | `layerling_measure_angle` | måler en vinkel som gradskiven: i hjørnet af tre punkter eller mellem to plane flader, og viser den i visningen |
 | `layerling_saved_view` | gemmer den aktuelle visning under tasten 7, 8, 9 eller 0 og går tilbage til den, som Shift+tast og tasten (kun visningen); sætter også startvisningen for nye designs |
+| `layerling_build_plates` | viser, tilføjer, navngiver, ordner og fjerner byggepladerne, flytter objekter til en plade og fordeler dem på pladerne, som pladelinjen |
 | `layerling_clear_history` | sletter hvert fortryd-trin for evigt, som historikvisningens "Slet historik"-knap; kræver `confirm: true` |
 | `layerling_set_history_view` | ser tilbage på en tidligere tilstand af projektet, som historikvisningen (det rigtige design forbliver urørt; ændringsværktøjer venter indtil den er lukket) |
 | `layerling_restore_from_history` | henter objekter (også dele i grupper) fra en tidligere tilstand tilbage i designet som kopier, som historikvisningens knap til at hente ind i designet - ét trin, som fortryd tager tilbage |

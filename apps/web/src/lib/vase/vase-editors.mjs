@@ -904,7 +904,7 @@ function drawingBoard(api) {
       const [a, b] = [...pointers.values()]
       drag = { kind: 'pinch', dist: Math.hypot(a[0] - b[0], a[1] - b[1]), center: mmOf({ clientX: (a[0] + b[0]) / 2, clientY: (a[1] + b[1]) / 2 }) }
     } else {
-      // `line`: pressed on the line - the pointer capture sends the click and the double click to the svg, not to it.
+      // `line`: pressed on the line - two such clicks are a double click, which adds a point there (see `end`).
       drag = { kind: 'pan', start: [event.clientX, event.clientY], view: { ...view }, moved: false, line: event.target.classList.contains('vz-curve-hit') }
       svg.classList.add('vz-panning')
     }
@@ -931,19 +931,28 @@ function drawingBoard(api) {
       api.moveTangent(drag.index, mmOf(event), drag.sign, pxPerMm(), true)
     }
   })
-  // Whether the last click (a press let go without dragging) was on the line, for the double click.
-  let lineClick = false
+  // The last click on the line (a press let go without dragging): time and place, for the double click. The browser
+  // sends no 'click' and no 'dblclick' for it: letting go redraws the line, so the path pressed on is gone, and a click
+  // needs it (Discussion #1252). Two such clicks close together in time and place are the double click.
+  let lineClick = null
   const end = (event) => {
     pointers.delete(event.pointerId)
     if (!drag) return
     const was = drag
     drag = null
-    lineClick = false
+    const prev = lineClick
+    lineClick = null
     svg.classList.remove('vz-panning')
     if (was.kind === 'pan' && !was.moved) {
       if (lassoClick(event)) return
       if (calibClick(event)) return
-      lineClick = was.line
+      if (was.line) {
+        const now = { t: event.timeStamp, x: event.clientX, y: event.clientY }
+        if (prev && now.t - prev.t <= 500 && Math.hypot(now.x - prev.x, now.y - prev.y) <= 6) {
+          const at = api.insertNear(mmOf(event))
+          if (at !== null) { selected = at; render(); return }
+        } else lineClick = now
+      }
       selected = null
       render()
     }
@@ -961,16 +970,8 @@ function drawingBoard(api) {
     const [mx, my] = mmOf(event)
     zoomAt(Math.exp(event.deltaY * 0.0015), mx, my)
   }, { passive: false })
-  // The lasso: a double click closes the line too. Otherwise a double click on the line inserts a point there. It
-  // has to be caught here: it comes to the svg, which holds the pointer from the press on, never to the line's path,
-  // which the first click has redrawn by then anyway (Discussion #1252).
-  svg.addEventListener('dblclick', (event) => {
-    if (lasso?.anchors.length >= 3) closeLasso()
-    else if (lineClick) {
-      const at = api.insertNear(mmOf(event))
-      if (at !== null) { selected = at; render() }
-    }
-  })
+  // The lasso: a double click closes the line too. (A double click on the line is counted in `end` above.)
+  svg.addEventListener('dblclick', () => { if (lasso?.anchors.length >= 3) closeLasso() })
   svg.addEventListener('keydown', (event) => {
     // The lasso: Enter closes the line, Escape throws it away (and then the lasso), ahead of the window, which would close.
     if (lasso && (event.key === 'Enter' || event.key === 'Escape')) {

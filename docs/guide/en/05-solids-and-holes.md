@@ -73,7 +73,7 @@ To cut the outline of one body straight through another, select the punch first 
 
 ## Editing a group
 
-If a bore turned out too small, you do not have to dissolve the group and rebuild. Select the group and click {{ui:group.edit}} in its settings, the folder icon in the object list, or press [[E]]. A double click on the group does the same, as in Tinkercad, on a bundle too; if you would rather not, switch off {{ui:workspace.doubleClickOpensGroup}} in the settings. A part only starts to move once the pointer has been dragged a few pixels, so a shaky click or double click does not nudge it. The parts now lie separately and you change them with every tool: make a hole larger, move a body, add a hole.
+If a bore turned out too small, you do not have to dissolve the group and rebuild. Select the group and click {{ui:group.edit}} in its settings, the folder icon in the object list, or press [[E]]. In the object list you can also open the group with its arrow and click one of its parts: the group opens with that part selected. A double click on the group does the same, as in Tinkercad, on a bundle too; if you would rather not, switch off {{ui:workspace.doubleClickOpensGroup}} in the settings. A part only starts to move once the pointer has been dragged a few pixels, so a shaky click or double click does not nudge it. The parts now lie separately and you change them with every tool: make a hole larger, move a body, add a hole.
 
 ![The group being edited: the bar at the bottom holds Cancel and Done, and the object list shows the parts.](shot:open-group)
 
