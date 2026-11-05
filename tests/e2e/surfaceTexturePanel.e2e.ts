@@ -91,12 +91,12 @@ function choose(select: HTMLSelectElement, value: string) {
 }
 
 describe("the surface texture card in a shape's settings", () => {
-  it("lists the sixteen patterns, knurling first chosen", () => {
+  it("lists the eighteen patterns, knurling first chosen", () => {
     const { panel } = mount(cylinder);
     const pattern = selectWith(panel, "knurl")!;
     expect(pattern.value).toBe("knurl");
     expect([...pattern.options].map((option) => option.textContent)).toEqual([
-      "Grooves", "Knurling", "Honeycomb", "Bumps", "Cells", "Bricks", "Knitting", "Rope", "Basket weave", "Bark", "Wood grain", "Carbon (twill)", "Grain", "Image", "Cracks (kintsugi)", "Text (stuck on)",
+      "Grooves", "Knurling", "Honeycomb", "Bumps", "Cells", "Bricks", "Squares", "Triangles", "Knitting", "Rope", "Basket weave", "Bark", "Wood grain", "Carbon (twill)", "Grain", "Image", "Cracks (kintsugi)", "Text (stuck on)",
     ]);
   });
 
@@ -168,6 +168,29 @@ describe("the surface texture card in a shape's settings", () => {
     // Leaving bricks gives the next pattern its own spacing and profile back.
     choose(selectWith(panel, "bricks")!, "knurl");
     expect(rangeNamed(panel, "Spacing")?.value).toBe("3.00");
+  });
+
+  it("lays squares and triangles with a gap in mm, from the bottom edge if asked, and hands them to the editor", async () => {
+    const { panel, calls } = mount(cylinder);
+    choose(selectWith(panel, "knurl")!, "squares");
+    expect(rangeNamed(panel, "Square size")?.value).toBe("4.00");
+    expect(rangeNamed(panel, "Gap")?.value).toBe("2.00");
+    expect(selectWith(panel, "outward")?.value).toBe("outward");
+    const fromBottom = [...card(panel).querySelectorAll<HTMLLabelElement>("label.check-property")].find((row) => row.textContent === "From the bottom edge")!.querySelector("input")!;
+    expect(fromBottom.checked).toBe(false);
+    act(() => fromBottom.click());
+    // A tile has no width of its own share: no groove width under More, and the profile tells what it makes of a tile.
+    act(() => button(panel, "More")!.click());
+    expect(rangeNamed(panel, "Groove width (%)")).toBeUndefined();
+    expect(card(panel).textContent).toContain("pointed makes pyramids");
+    choose(selectWith(panel, "squares")!, "triangles");
+    expect(rangeNamed(panel, "Triangle size")?.value).toBe("6.00");
+    await act(async () => button(panel, "Apply texture")!.click());
+    expect(calls.applied[0]).toMatchObject({ pattern: "triangles", spacing: 6, tileGap: 2, tileFromBottom: true, profile: "flat", direction: "outward" });
+    // Leaving them gives knurling its own spacing and direction back.
+    choose(selectWith(panel, "triangles")!, "knurl");
+    expect(rangeNamed(panel, "Spacing")?.value).toBe("3.00");
+    expect(selectWith(panel, "outward")?.value).toBe("inward");
   });
 
   it("starts a bark at its tree's size and depth, with the annual rings on the ends", () => {
