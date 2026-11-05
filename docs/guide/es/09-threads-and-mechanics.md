@@ -221,6 +221,8 @@ Una caja para electrónica necesita una abertura para el cable. La {{ui:shape.po
 
 Para baterías y motores de modelismo, la lista tiene {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} y {{ui:port.mpx}}, tumbados y unos 0,25 mm más grandes que el conector por todos lados, para que éste pase - las medidas de los planos de Amass y de Multiplex. {{ui:port.dsub9}} es el recorte de panel para el conector del puerto serie (RS-232 o RS-485), con los lados inclinados como el conector. Sus dos agujeros de tornillo (3,18 mm) vienen con él, a 24,99 mm uno de otro, a media altura de la abertura: la abertura y los agujeros forman un grupo, así que se mueven y giran juntos, y agrupados con una pared se cortan los tres.
 
+Para los Anderson Powerpole (PP15, PP30 y PP45), la lista tiene de {{ui:port.powerpole1}} a {{ui:port.powerpole4}}: las carcasas encajadas una junto a otra, 7,9 mm por polo, con sitio para sus lengüetas de cola de milano y unos 0,25 mm de holgura alrededor - las medidas del plano de Anderson.
+
 Llega como orificio y mirando al frente. Pon la {{ui:prop.portDepth}} un poco mayor que el grosor de la pared, muévela adonde está el conector en la placa y agrúpala con la caja. Para una pared lateral, gírala 90° alrededor del eje vertical.
 
 ### Placas SBC

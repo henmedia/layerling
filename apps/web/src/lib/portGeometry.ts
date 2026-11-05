@@ -61,7 +61,7 @@ export const PORT_PROFILE_POLYGONS: Record<PolygonProfile, (width: number, heigh
   },
 };
 
-export type PortPreset = "usbC" | "usbCPlug" | "microUsb" | "usbA" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort" | "rj45" | "xt30" | "xt60" | "mt60" | "mpx" | "dsub9";
+export type PortPreset = "usbC" | "usbCPlug" | "microUsb" | "usbA" | "hdmi" | "miniHdmi" | "microHdmi" | "displayPort" | "miniDisplayPort" | "rj45" | "xt30" | "xt60" | "mt60" | "mpx" | "dsub9" | "powerpole1" | "powerpole2" | "powerpole3" | "powerpole4";
 
 /** Screw holes beside an opening: two, this far apart centre to centre, at the opening's middle height. */
 export type PortScrewHoles = { spacing: number; diameter: number };
@@ -99,9 +99,17 @@ export const PORT_PRESETS: Record<PortPreset, { width: number; height: number; c
   // D-Sub 9 (the serial port's plug): the panel cut-out itself, corners about R 0.5, and its two
   // screw holes, 3.18 mm across and 24.99 mm apart (Spectrum Control).
   dsub9: { width: 19.74, height: 11.18, corner: 0.5, profile: "dsub9", screwHoles: { spacing: 24.99, diameter: 3.18 } },
+  // Anderson Powerpole PP15/30/45 (Discussion #1190), housings stacked side by side: each 7.90 x 7.90 mm
+  // at the front and 7.90 mm apart, with a dovetail tongue 0.50 mm proud on one side and on top (8.40 mm
+  // in the maker's drawing, 1327 series). The opening takes the block with its tongues, plus about
+  // 0.25 mm of room on every side: 7.90 per pole + 1.00 wide, 8.90 high, corners about R 0.5.
+  powerpole1: { width: 8.9, height: 8.9, corner: 0.5, profile: "rounded" },
+  powerpole2: { width: 16.8, height: 8.9, corner: 0.5, profile: "rounded" },
+  powerpole3: { width: 24.7, height: 8.9, corner: 0.5, profile: "rounded" },
+  powerpole4: { width: 32.6, height: 8.9, corner: 0.5, profile: "rounded" },
 };
 
-export const PORT_PRESET_ORDER: PortPreset[] = ["usbC", "usbCPlug", "microUsb", "usbA", "hdmi", "miniHdmi", "microHdmi", "displayPort", "miniDisplayPort", "rj45", "xt30", "xt60", "mt60", "mpx", "dsub9"];
+export const PORT_PRESET_ORDER: PortPreset[] = ["usbC", "usbCPlug", "microUsb", "usbA", "hdmi", "miniHdmi", "microHdmi", "displayPort", "miniDisplayPort", "rj45", "xt30", "xt60", "mt60", "mpx", "dsub9", "powerpole1", "powerpole2", "powerpole3", "powerpole4"];
 export const PORT_PROFILES: PortProfile[] = ["rounded", "hdmi", "miniHdmi", "microHdmi", "displayPort", "miniDisplayPort", "xt60", "xt30", "mt60", "dsub9"];
 export const DEFAULT_PORT_PRESET: PortPreset = "usbC";
 /** How far a new opening reaches through: more than most walls, so it cuts through when placed on one. */

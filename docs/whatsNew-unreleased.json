@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Anderson-Powerpole-Stecker in der Port-Öffnung",
+      "en": "Anderson Powerpole plugs in the port opening"
+    },
+    "body": {
+      "de": "Die Port-Öffnung kennt jetzt Powerpole-Blöcke (PP15, PP30, PP45) mit 1 bis 4 Polen, nebeneinander gesteckt: 7,9 mm je Pol, mit Platz für die Schwalbenschwanz-Federn und etwa 0,25 mm Luft rundum.",
+      "en": "The port opening now knows Powerpole blocks (PP15, PP30, PP45) of 1 to 4 poles side by side: 7.9 mm per pole, with room for the dovetail tongues and about 0.25 mm all round."
+    }
+  }
+]

@@ -225,6 +225,8 @@ En kasse til elektronik skal have en åbning til kablet. {{ui:shape.port}} er ne
 
 Til modelbatterier og motorer har listen {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} og {{ui:port.mpx}}, liggende og cirka 0,25 mm større end stikket hele vejen rundt, så stikket kan komme igennem - målene fra tegningerne fra Amass og Multiplex. {{ui:port.dsub9}} er paneludskæringen til stikket på den serielle port (RS-232 eller RS-485), med skrå sider som stikket. Dets to skruehuller (3,18 mm) følger med, 24,99 mm fra hinanden i åbningens midte: åbningen og hullerne er én gruppe, så de flyttes og drejes sammen, og grupperet med en væg skæres alle tre ud.
 
+Til Anderson Powerpole (PP15, PP30 og PP45) har listen {{ui:port.powerpole1}} til {{ui:port.powerpole4}}: husene sat side om side, 7,9 mm pr. pol, med plads til deres svalehaler og cirka 0,25 mm luft hele vejen rundt - målene fra Andersons tegning.
+
 Den kommer som udskæring og vender fremad. Sæt {{ui:prop.portDepth}} lidt større end vægtykkelsen, flyt den hen, hvor stikket sidder på printet, og gruppér den med kassen. Til en sidevæg drejer du den 90° om den lodrette akse.
 
 ### SBC-print

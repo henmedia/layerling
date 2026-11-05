@@ -221,6 +221,8 @@ Obudowa do elektroniki potrzebuje otworu na kabel. {{ui:shape.port}} to właśni
 
 Dla akumulatorów i silników modelarskich lista ma {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} i {{ui:port.mpx}}, leżące i dookoła o około 0,25 mm większe od wtyku, żeby wtyk przeszedł - wymiary z rysunków Amass i Multiplex. {{ui:port.dsub9}} to wycięcie w panelu na wtyk portu szeregowego (RS-232 lub RS-485), z bokami skośnymi jak we wtyku. Jego dwa otwory na śruby (3,18 mm) dochodzą od razu, w odstępie 24,99 mm na połowie wysokości otworu: otwór i dziury tworzą jedną grupę, przesuwają się i obracają razem, a zgrupowane ze ścianą wycinają się wszystkie trzy.
 
+Dla złączy Anderson Powerpole (PP15, PP30 i PP45) lista ma od {{ui:port.powerpole1}} do {{ui:port.powerpole4}}: obudowy złożone obok siebie, 7,9 mm na biegun, z miejscem na ich wypusty na jaskółczy ogon i luzem około 0,25 mm dookoła - wymiary z rysunku Andersona.
+
 Otwór pojawia się jako wycięcie skierowane do przodu. Ustaw {{ui:prop.portDepth}} nieco większą niż grubość ścianki, przesuń go tam, gdzie złącze siedzi na płytce, i zgrupuj z obudową. Dla ścianki bocznej obróć go o 90° wokół osi pionowej.
 
 ### Płytki SBC

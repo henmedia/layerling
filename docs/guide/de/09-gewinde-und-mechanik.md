@@ -221,6 +221,8 @@ Ein Gehäuse für Elektronik braucht eine Öffnung für das Kabel. Die {{ui:shap
 
 Für Modellakkus und -motoren hat die Liste {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} und {{ui:port.mpx}}, liegend und rundum etwa 0,25 mm größer als der Stecker, damit er hindurchpasst - die Maße aus den Zeichnungen von Amass und von Multiplex. {{ui:port.dsub9}} ist der Gehäuseausschnitt für den Stecker der seriellen Schnittstelle (RS-232 oder RS-485), die Seiten schräg wie beim Stecker. Seine zwei Schraublöcher (3,18 mm) kommen mit, 24,99 mm auseinander auf halber Höhe der Öffnung: Öffnung und Löcher sind eine Gruppe, bewegen und drehen sich zusammen, und mit einer Wand gruppiert werden alle drei ausgeschnitten.
 
+Für Anderson Powerpole (PP15, PP30 und PP45) hat die Liste {{ui:port.powerpole1}} bis {{ui:port.powerpole4}}: die Gehäuse nebeneinander gesteckt, 7,9 mm je Pol, mit Platz für ihre Schwalbenschwanz-Federn und rundum etwa 0,25 mm Luft - die Maße aus der Zeichnung von Anderson.
+
 Sie kommt als Aussparung und zeigt nach vorn. Stelle die {{ui:prop.portDepth}} etwas größer ein als die Wand dick ist, schiebe sie dorthin, wo die Buchse auf der Platine sitzt, und gruppiere sie mit dem Gehäuse. Für eine Seitenwand drehst du sie um 90° um die senkrechte Achse.
 
 ### SBC-Platinen

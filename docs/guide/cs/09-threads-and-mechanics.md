@@ -221,6 +221,8 @@ Krabička pro elektroniku potřebuje otvor pro kabel. {{ui:shape.port}} je přes
 
 Pro modelářské akumulátory a motory má seznam {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} a {{ui:port.mpx}}, ležící a kolem dokola asi o 0,25 mm větší než zástrčka, aby prošla - rozměry z výkresů Amass a Multiplex. {{ui:port.dsub9}} je výřez v panelu pro zástrčku sériového portu (RS-232 nebo RS-485), jeho boky jsou našikmo jako u zástrčky. Jeho dva šroubové otvory (3,18 mm) přijdou s ním, 24,99 mm od sebe ve střední výšce otvoru: otvor a díry tvoří jednu skupinu, hýbou se a otáčejí společně, a seskupené se stěnou se vyříznou všechny tři.
 
+Pro Anderson Powerpole (PP15, PP30 a PP45) má seznam {{ui:port.powerpole1}} až {{ui:port.powerpole4}}: pouzdra zasunutá vedle sebe, 7,9 mm na pól, s místem pro jejich rybinové výstupky a kolem dokola asi 0,25 mm vůle - rozměry z výkresu Anderson.
+
 Otvor přichází jako výřez a míří dopředu. Nastavte {{ui:prop.portDepth}} o něco větší, než je tloušťka stěny, posuňte ho tam, kde konektor sedí na desce, a seskupte ho s krabičkou. Pro boční stěnu ho otočte o 90° kolem svislé osy.
 
 ### Desky SBC

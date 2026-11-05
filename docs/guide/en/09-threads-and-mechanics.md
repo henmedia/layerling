@@ -221,6 +221,8 @@ A box for electronics needs an opening for the cable. The {{ui:shape.port}} is t
 
 For model batteries and motors the list has {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} and {{ui:port.mpx}}, lying and about 0.25 mm wider than the plug all round, so the plug goes through - the sizes from the Amass drawings and Multiplex. {{ui:port.dsub9}} is the panel cut-out for the serial port's plug (RS-232 or RS-485), its sides slanting like the plug. Its two 3.18 mm screw holes come with it, 24.99 mm apart at the opening's middle height: the opening and the holes are one group, so they move and turn together, and grouped with a wall all three are cut.
 
+For Anderson Powerpole (PP15, PP30 and PP45) the list has {{ui:port.powerpole1}} to {{ui:port.powerpole4}}: the housings stacked side by side, 7.9 mm per pole, with room for their dovetail tongues and about 0.25 mm all round - the sizes from the Anderson drawing.
+
 It comes as a hole, facing front. Set the {{ui:prop.portDepth}} a little more than the wall is thick, move it to where the socket sits on the board and group it with the box. For a side wall, turn it by 90° around the vertical axis.
 
 ### SBC boards

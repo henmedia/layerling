@@ -221,6 +221,8 @@ Egy elektronikai doboznak nyílás kell a kábelhez. A {{ui:shape.port}} pontosa
 
 Modellakkukhoz és motorokhoz a listában van {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} és {{ui:port.mpx}}, fekve, és körben kb. 0,25 mm-rel nagyobb a dugónál, hogy átférjen rajta - a méretek az Amass rajzaiból és a Multiplextől. A {{ui:port.dsub9}} a soros port (RS-232 vagy RS-485) dugójának panelkivágása, az oldalai a dugóhoz hasonlóan ferdék. A két 3,18 mm-es csavarfurata vele jön, 24,99 mm-re egymástól, a nyílás közepének magasságában: a nyílás és a furatok egy csoport, így együtt mozognak és fordulnak, és a fallal csoportosítva mind kivágódik.
 
+Az Anderson Powerpole csatlakozókhoz (PP15, PP30 és PP45) a listában {{ui:port.powerpole1}}–{{ui:port.powerpole4}} van: a házak egymás mellé tolva, pólusonként 7,9 mm, helyet hagyva a fecskefarkas nyelveknek, körben kb. 0,25 mm hézaggal - a méretek az Anderson rajzáról.
+
 Kivágásként érkezik, előre nézve. A {{ui:prop.portDepth}} legyen kicsit nagyobb a fal vastagságánál, told oda, ahol az aljzat a panelen ül, és csoportosítsd a dobozzal. Oldalfalhoz forgasd el 90°-kal a függőleges tengely körül.
 
 ### SBC lapok

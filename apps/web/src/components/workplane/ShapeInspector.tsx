@@ -414,6 +414,7 @@ const PORT_PRESET_LABELS: Record<PortPreset, MessageKey> = {
   usbC: "port.usbC", usbCPlug: "port.usbCPlug", microUsb: "port.microUsb", usbA: "port.usbA",
   hdmi: "port.hdmi", miniHdmi: "port.miniHdmi", microHdmi: "port.microHdmi", displayPort: "port.displayPort", miniDisplayPort: "port.miniDisplayPort", rj45: "port.rj45",
   xt30: "port.xt30", xt60: "port.xt60", mt60: "port.mt60", mpx: "port.mpx", dsub9: "port.dsub9",
+  powerpole1: "port.powerpole1", powerpole2: "port.powerpole2", powerpole3: "port.powerpole3", powerpole4: "port.powerpole4",
 };
 
 const VASE_CHOICES: Partial<Record<VaseChoiceKey, Record<string, MessageKey>>> = {

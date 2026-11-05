@@ -221,6 +221,8 @@ Een behuizing voor elektronica heeft een opening voor de kabel nodig. De {{ui:sh
 
 Voor modelaccu's en motoren heeft de lijst {{ui:port.xt30}}, {{ui:port.xt60}}, {{ui:port.mt60}} en {{ui:port.mpx}}, liggend en rondom ongeveer 0,25 mm groter dan de stekker, zodat de stekker erdoor past - de maten uit de tekeningen van Amass en Multiplex. {{ui:port.dsub9}} is de paneeluitsnijding voor de stekker van de seriële poort (RS-232 of RS-485), met schuine zijden zoals de stekker. De twee schroefgaten (3,18 mm) komen erbij, 24,99 mm uit elkaar op halve hoogte van de opening: de opening en de gaten zijn één groep, ze verplaatsen en draaien samen, en gegroepeerd met een wand worden alle drie uitgesneden.
 
+Voor Anderson Powerpole (PP15, PP30 en PP45) heeft de lijst {{ui:port.powerpole1}} tot {{ui:port.powerpole4}}: de behuizingen naast elkaar geschoven, 7,9 mm per pool, met ruimte voor hun zwaluwstaartlippen en rondom ongeveer 0,25 mm speling - de maten uit de tekening van Anderson.
+
 Hij komt als gat en wijst naar voren. Zet de {{ui:prop.portDepth}} iets groter dan de wand dik is, schuif hem naar de plek van de aansluiting op de printplaat en groepeer hem met de behuizing. Voor een zijwand draai je hem 90° om de verticale as.
 
 ### SBC-borden
