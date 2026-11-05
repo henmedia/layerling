@@ -10084,6 +10084,13 @@ html[data-theme="dark"] .property-defaults-actions button {
   font-weight: 650;
 }
 
+/* The board's number fields keep their width and a long label wraps instead: "Reach through the wall (mm)" squeezed its field until the last digit was cut off (#1344). */
+.sbc-board-clearance,
+.sbc-board-reach,
+.sbc-board-up-reach {
+  grid-template-columns: minmax(0, 1fr) 76px;
+}
+
 .text-property input,
 .select-property select {
   width: 100%;
