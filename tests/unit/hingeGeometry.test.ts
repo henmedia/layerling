@@ -3,8 +3,14 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
+import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { editorHistoryEntry } from "@/lib/editorHistory";
+import { exportLylProject, importLylProject } from "@/lib/lylProject";
+import { canonicalizeShape } from "@/lib/workplaneShapes";
+import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations } from "@/lib/workplaneSettings";
+import type { WorkplaneShape } from "@/types/layerling";
 import { automaticSideCount } from "@/lib/roundSideCount";
-import { hingeLeaves, normalizeHingeNutWidth, normalizeHingeScrewHead, hingeSections, hingeConeRadius, hingeKnucklesForWidth, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
+import { hingeLeaves, minimumHingeDepth, normalizeHingeAngle, normalizeHingeNutWidth, normalizeHingeScrewHead, hingeSections, hingeConeRadius, hingeKnucklesForWidth, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
 
 type V = [number, number, number];
 
@@ -140,9 +146,9 @@ describe("hinge geometry", () => {
     if (hingeAngle === 90) expect(top).toBeCloseTo(plan.radius + plan.depth / 2, 6);
   });
 
-  it("places B's exact boxes where the folded display mesh has its leaf (#699)", () => {
-    for (const hingeAngle of [0, 45, 90, 135, 180]) {
-      const fields = { ...shape, hingeAngle };
+  it("places B's exact boxes where the folded display mesh has its leaf (#699), raised or not, folded either way", () => {
+    for (const hingeLeafStyle of ["plate", "raised"]) for (const hingeAngle of [-90, 0, 45, 90, 135, 180]) {
+      const fields = { ...shape, hingeLeafStyle, hingeAngle };
       const mesh = hingeTriangles(fields).flat();
       const corners: V[] = [];
       hingeLocalParts(fields).filter((part) => part.kind === "box").forEach((part) => {
@@ -330,6 +336,11 @@ describe("the two parts keep the clearance apart in every section (#907)", () =>
     { width: 40, height: 6, hingeStyle: "cone", hingeLeafThickness: 6 },
     { width: 40, height: 2, hingeStyle: "cone", hingeLeafThickness: 2 },
     { width: 40, height: 12, hingeStyle: "cone", hingeLeafThickness: 12, hingeClearance: 0.6 },
+    { width: 40, height: 6, hingePinDiameter: 3, hingeLeafThickness: 1.1, hingeLeafStyle: "raised" },
+    { width: 40, height: 6, hingeStyle: "cone", hingeLeafThickness: 1.1, hingeLeafStyle: "raised" },
+    { width: 40, height: 6, hingeStyle: "cone", hingeLeafThickness: 6, hingeLeafStyle: "raised" },
+    { width: 40, height: 8, hingeLeafStyle: "raised" },
+    { width: 40, height: 12, hingePinDiameter: 4, hingeLeafThickness: 3, hingeClearance: 0.25, hingeLeafStyle: "raised" },
   ];
   it("holds the clearance between A's and B's sections", () => {
     cases.forEach((shape) => {
@@ -784,5 +795,176 @@ describe("the cone hinge as exact parts (#1007)", () => {
     expect(editor.match(/cadModifierSourceParts\((?:entry\.)?shape\)\.map\(\(part\) => \(\{ part, scope: hingePartScope\((?:entry\.)?scope, part\) \}\)\)/g)).toHaveLength(2);
     // Set as a hole, its parts would be joined as solids; its mesh is cut out whole.
     expect(editor).toMatch(/if \(shape\.kind === "hinge" && !shape\.hole && [^;]*\) return hingeWorldParts\(shape\);/);
+  });
+});
+
+describe("a raised leaf that closes flat on the other (#1259)", () => {
+  // As gramar-bot's hinge: a 6 mm knuckle, a 3 mm pin, leaves 1.1 mm thick, the default clearance of 0.4.
+  const raised = { width: 40, depth: 40, height: 6, hingePinDiameter: 3, hingeLeafThickness: 1.1, hingeLeafStyle: "raised" };
+
+  it("lifts B's leaf so that closed it lies on A's with the clearance between", () => {
+    const plan = hingePlan(raised);
+    // 6 - 2 * 1.1 - 0.4.
+    expect(plan.lift).toBeCloseTo(3.4, 9);
+    // A's leaf beside B's knuckles as before; B's band is 0.4 above the axis at its lowest, so it starts further out.
+    expect(plan.leafStart).toBeCloseTo(Math.sqrt(3.4 ** 2 - 1.9 ** 2), 9);
+    expect(plan.leafStartB).toBeCloseTo(Math.sqrt(3.4 ** 2 - 0.4 ** 2), 9);
+    expect(hingePlan({ ...raised, hingeLeafStyle: "plate" }).lift).toBe(0);
+    // With the default 8 mm knuckle and 2 mm leaf, B's band straddles the axis: it starts the radius and clearance out.
+    expect(hingePlan({ width: 40, height: 8, hingeLeafStyle: "raised" }).leafStartB).toBeCloseTo(4.4, 9);
+  });
+
+  it.each([-140, -90, 0, 90, 180])("is closed in two parts at %i degrees, in every style, with holes and nuts", (hingeAngle) => {
+    for (const extra of [{}, { hingeStyle: "pinless" }, { hingeStyle: "liftOff" }, { hingeStyle: "cone" }, { hingeScrewHoles: 2, hingeCornerRadius: 3 }, { hingeScrewHoles: 2, hingeScrewHead: "countersunkNut" }]) {
+      const fields = { ...raised, ...extra, hingeAngle };
+      const triangles = hingeTriangles(fields);
+      expect(edgeProblems(triangles), JSON.stringify(fields)).toBe(0);
+      expect(components(triangles), JSON.stringify(fields)).toBe(2);
+      expect(signedVolume(triangles)).toBeCloseTo(signedVolume(hingeTriangles({ ...fields, hingeAngle: 0 })), 6);
+    }
+  });
+
+  it("closed, B lies on A's leaf with the clearance between, beside the knuckles", () => {
+    const plan = hingePlan(raised);
+    const flat = hingeTriangles(raised).flat();
+    const closed = hingeTriangles({ ...raised, hingeAngle: 180 }).flat();
+    // Lying open, B's leaf is lifted; closed, it lies over A's leaf (z < 0), from 1.5 to 2.6 above the plate.
+    const beside = (points: V[], sign: number) => points.filter(([, , z]) => sign * z > plan.leafStartB + 0.1);
+    expect(Math.min(...beside(flat, 1).map(([, y]) => y))).toBeCloseTo(3.4, 6);
+    const bOver = beside(closed, -1).filter(([, y]) => y > plan.leaf + 0.01);
+    expect(Math.min(...bOver.map(([, y]) => y))).toBeCloseTo(1.1 + 0.4, 6);
+    expect(Math.max(...bOver.map(([, y]) => y))).toBeCloseTo(2 * 1.1 + 0.4, 6);
+  });
+
+  it("stays closed with a cone hinge's leaf at its most, whatever the knuckle and clearance", () => {
+    // There the lift is 0 but for rounding, which must not tear B's knuckle open.
+    for (const height of [2, 3, 6, 9, 15, 30]) for (const hingeClearance of [0.1, 0.25, 0.4, 0.7, 1]) for (const hingeLeafThickness of [999, (height - hingeClearance) / 2]) {
+      const fields = { width: 40, depth: 40, height, hingeStyle: "cone", hingeLeafStyle: "raised", hingeClearance, hingeLeafThickness };
+      expect(hingePlan(fields).lift, JSON.stringify(fields)).toBe(0);
+      const triangles = hingeTriangles(fields);
+      expect(edgeProblems(triangles), JSON.stringify(fields)).toBe(0);
+      expect(components(triangles), JSON.stringify(fields)).toBe(2);
+    }
+  });
+
+  it("keeps B's exact strip under its knuckle out of the bore, on its lift", () => {
+    for (const extra of [{}, { hingeStyle: "pinless" }, { hingeStyle: "liftOff" }]) {
+      const plan = hingePlan({ ...raised, ...extra });
+      const under = hingeLocalParts({ ...raised, ...extra }).filter((part) => part.kind === "box" && (part.z ?? 0) > 0 && part.width === plan.knuckleLength);
+      expect(under.length, JSON.stringify(extra)).toBe(plan.segments.filter((segment) => segment.owner === "b").length);
+      // Each starts where the bore ends 0.4 above the axis's level, B's band's lowest, so the pin turns freely, and stands
+      // where B's leaf does.
+      under.forEach((part) => expect((part.z ?? 0) - (part.depth ?? 0) / 2, JSON.stringify(extra)).toBeCloseTo(Math.sqrt(plan.boreRadius ** 2 - 0.4 ** 2), 9));
+      under.forEach((part) => expect(part.elevation).toBeCloseTo(plan.lift, 9));
+    }
+  });
+
+  it("starts B's exact strip where the bore ends at the raised leaf's height, touching the knuckle, even with a large pin", () => {
+    for (const fields of [raised, { ...raised, hingePinDiameter: 4.4 }, { ...raised, height: 8, hingePinDiameter: 6.4, hingeLeafThickness: 2 }, { ...raised, height: 8, hingePinDiameter: 5.2, hingeLeafThickness: 0.4, hingeClearance: 1 }]) {
+      const plan = hingePlan(fields);
+      const near = Math.max(0, plan.lift - plan.radius, plan.radius - plan.lift - plan.leaf);
+      const under = hingeLocalParts(fields).filter((part) => part.kind === "box" && (part.z ?? 0) > 0 && part.width === plan.knuckleLength);
+      expect(under.length).toBeGreaterThan(0);
+      under.forEach((part) => {
+        const from = (part.z ?? 0) - (part.depth ?? 0) / 2;
+        expect(from ** 2 + near ** 2, JSON.stringify(fields)).toBeGreaterThanOrEqual(plan.boreRadius ** 2 - 1e-9);
+        expect(from, JSON.stringify(fields)).toBeLessThan(Math.sqrt(plan.radius ** 2 - near ** 2));
+      });
+    }
+  });
+
+  it("stands B's exact leaf, strips and nut pockets on its lift, the leaf from B's start", () => {
+    for (const extra of [{}, { hingeStyle: "cone" }, { hingeScrewHoles: 2, hingeScrewHead: "countersunkNut" }, { hingeScrewHoles: 2, hingeScrewHead: "straight" }]) {
+      const fields = { ...raised, ...extra }, plan = hingePlan(fields), parts = hingeLocalParts(fields).filter((part) => (part.z ?? 0) > 0);
+      parts.filter((part) => part.kind === "box").forEach((part) => expect(part.elevation, JSON.stringify(extra)).toBeCloseTo(plan.lift, 9));
+      // Every box reaches out to B's leaf start at least, the strips under the knuckles included.
+      parts.filter((part) => part.kind === "box").forEach((part) => expect((part.z ?? 0) + (part.depth ?? 0) / 2).toBeGreaterThanOrEqual(plan.leafStartB - 1e-9));
+      parts.filter((part) => part.kind === "cylinder" && part.hole).forEach((part) => expect((part.elevation ?? 0) + part.height / 2).toBeCloseTo(plan.lift + plan.leaf / 2, 9));
+      const leafBoxes = parts.filter((part) => part.kind === "box" && part.width !== plan.knuckleLength);
+      expect(Math.min(...leafBoxes.map((part) => (part.z ?? 0) - (part.depth ?? 0) / 2))).toBeCloseTo(plan.leafStartB, 9);
+      parts.filter((part) => part.kind === "polygon").forEach((part) => expect(part.elevation).toBeCloseTo(plan.lift + plan.leaf - plan.nutDepth, 9));
+    }
+  });
+
+  it("keeps the holes clear of B's leaf start, cuts them through B where it stands, B's heads facing A when closed", () => {
+    // A narrow hinge, where the holes only just fit: each keeps its wall to B's leaf start, which lies further out than A's,
+    // so at 10.5 mm a plate hinge has its holes and a raised one none yet.
+    const narrow = (depth: number, hingeLeafStyle: string) => hingePlan({ ...raised, depth, hingeLeafStyle, hingeScrewHoles: 2, hingeScrewHead: "straight", hingeScrewDiameter: 1 });
+    expect(narrow(10.5, "plate").screwXs).toHaveLength(2);
+    expect(narrow(10.5, "raised").screwXs).toHaveLength(0);
+    const wide = narrow(11, "raised");
+    expect(wide.screwXs).toHaveLength(2);
+    expect(wide.screwZ - wide.screwRadius).toBeGreaterThanOrEqual(wide.leafStartB + 0.5 - 1e-9);
+    const fields = { ...raised, hingeScrewHoles: 2 };
+    const plan = hingePlan(fields);
+    expect(plan.screwZ - plan.screwHeadRadius).toBeGreaterThanOrEqual(plan.leafStartB + 0.5 - 1e-9);
+    const base = { id: "h", name: "H", kind: "hinge", color: "#fff", x: 0, z: 0, elevation: 0, size: 40, rotation: 0, ...fields };
+    const heads = (extra: object) => hingeWorldParts({ ...base, ...extra } as never).filter((part) => part.kind === "countersink").map((part) => {
+      const up = new THREE.Vector3(0, 1, 0).applyEuler(new THREE.Euler(THREE.MathUtils.degToRad(part.rotationX ?? 0), THREE.MathUtils.degToRad(part.rotation), THREE.MathUtils.degToRad(part.rotationZ ?? 0), "XYZ"));
+      return { middle: (part.elevation ?? 0) + part.height / 2, up: Math.round(up.y) };
+    });
+    // Lying open: A's cutters through A's leaf, B's through B's raised one.
+    heads({}).forEach((head, k) => expect(head.middle).toBeCloseTo(k < 2 ? plan.leaf / 2 : plan.lift + plan.leaf / 2, 9));
+    expect(heads({}).map((head) => head.up)).toEqual([1, 1, 1, 1]);
+    expect(heads({ hingeAngle: 180 }).map((head) => head.up)).toEqual([1, 1, -1, -1]);
+  });
+
+  it("is as deep as B's raised leaf needs at the least", () => {
+    const plan = hingePlan({ ...raised, depth: 1 });
+    expect(plan.depth).toBeCloseTo(minimumHingeDepth(6, 1.1, 0.4, 3.4), 9);
+    expect(plan.depth / 2 - plan.leafStartB).toBeCloseTo(0.5, 9);
+    expect(edgeProblems(hingeTriangles({ ...raised, depth: 1 }))).toBe(0);
+    // Its corners stay within B's leaf, which starts further out than A's.
+    const tight = hingePlan({ ...raised, depth: 1, hingeCornerRadius: 99 });
+    expect(tight.cornerRadius).toBeCloseTo(tight.depth / 2 - tight.leafStartB - 0.05, 9);
+    expect(edgeProblems(hingeTriangles({ ...raised, depth: 1, hingeCornerRadius: 99 }))).toBe(0);
+  });
+
+  it("limits a raised cone hinge's leaf so B stays above the plate", () => {
+    const plan = hingePlan({ ...raised, hingeStyle: "cone", hingeLeafThickness: 6 });
+    expect(plan.leaf).toBeCloseTo((6 - 0.4) / 2, 9);
+    // A knuckle with no room for two leaves keeps both on the plate, at the leaf they were asked for.
+    const small = { width: 40, height: 1.5, hingeClearance: 1, hingeStyle: "cone" };
+    expect(hingePlan({ ...small, hingeLeafStyle: "raised" })).toMatchObject({ raised: false, lift: 0, leaf: hingePlan(small).leaf });
+  });
+
+  it("keeps the raised leaf in saved defaults, AI commands, new hinges and a saved design file", async () => {
+    expect(normalizeShapeCustomizations({ hinge: { hingeLeafStyle: "raised" } }).hinge?.hingeLeafStyle).toBe("raised");
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "hinge")!;
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { hingeLeafStyle: "raised" }).hingeLeafStyle).toBe("raised");
+    const base = { name: "Hinge", kind: "hinge", color: "#9aa5b1", x: 0, z: 0, elevation: 0, size: 40, width: 40, depth: 40, height: 6, rotation: 0 };
+    const shapes = [canonicalizeShape({ ...base, id: "raised", hingeLeafStyle: "raised", hingeAngle: -120 } as WorkplaneShape)];
+    const exported = await exportLylProject({
+      projectId: "hinge", projectName: "Hinge", createdAt: 1_700_000_000_000, modifiedAt: 1_700_000_100_000,
+      shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [],
+      workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0,
+    });
+    const restored = await importLylProject(exported);
+    expect(restored.shapes.find((shape) => shape.id === "raised")).toMatchObject({ hingeLeafStyle: "raised", hingeAngle: -120 });
+  });
+});
+
+describe("the opening angle below lying flat (#1259)", () => {
+  it("takes an angle from -180 to 180 and folds B down past lying flat, closed, the volume kept", () => {
+    expect(normalizeHingeAngle(-90)).toBe(-90);
+    expect(normalizeHingeAngle(-200)).toBe(-180);
+    expect(normalizeHingeAngle(undefined)).toBe(0);
+    expect(normalizeHingeAngle(270)).toBe(180);
+    const folded = hingeTriangles({ ...shape, hingeAngle: -90 });
+    expect(edgeProblems(folded)).toBe(0);
+    expect(signedVolume(folded)).toBeCloseTo(signedVolume(hingeTriangles(shape)), 6);
+    // Folded straight down, B's outer edge is half the depth below the axis.
+    const plan = hingePlan(shape);
+    expect(Math.min(...folded.flat().map(([, y]) => y))).toBeCloseTo(plan.radius - plan.depth / 2, 6);
+  });
+
+  it("keeps the angle in saved defaults and AI commands, and gives it to a new hinge", () => {
+    const hinge = (source: Record<string, unknown>) => normalizeShapeCustomizations({ hinge: source }).hinge ?? {};
+    expect(hinge({ hingeAngle: -90 }).hingeAngle).toBe(-90);
+    expect(hinge({ hingeAngle: -500 }).hingeAngle).toBe(-180);
+    expect(hinge({ hingeAngle: 270 }).hingeAngle).toBe(180);
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "hinge")!;
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { hingeAngle: -90 }).hingeAngle).toBe(-90);
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }).hingeAngle).toBeUndefined();
   });
 });

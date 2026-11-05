@@ -2974,6 +2974,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "Płytka",
   "hinge.leafFingers": "Palce",
   "hinge.leafFingersHint": "Każda tuleja ma własny palec, a palce obu stron przeplatają się jak dwa grzebienie. Dzięki temu zawias składa się całkowicie, a przy stożkach i palcach grubych jak tuleja zamyka się na płasko. Palców jednej strony nie łączy żadne skrzydełko: połącz je z modelem, na przykład z pudełkiem i jego pokrywką.",
+  "hinge.leafRaised": "Podniesione skrzydełko",
+  "hinge.leafRaisedHint": "Drugie skrzydełko leży wyżej, więc po zamknięciu leży płasko na pierwszym z luzem pomiędzy, a zawias otwiera się daleko poza położenie płaskie. Drukuj go z podporami pod podniesionym skrzydełkiem.",
   "prop.hingeScrewHoles": "Otwory na śruby na skrzydełko",
   "prop.hingeScrewHolesHint": "0 zostawia skrzydełka bez otworów.",
   "prop.hingeScrewHolesFewer": "Na skrzydełku mieści się tylko: {count}.",

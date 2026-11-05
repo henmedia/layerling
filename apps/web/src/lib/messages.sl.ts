@@ -2274,6 +2274,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "Polna",
   "hinge.leafFingers": "Prsti",
   "hinge.leafFingersHint": "Vsak členek nosi svoj prst; prsti obeh strani se izmenjujejo kot dva glavnika. Tako se tečaj zavrti povsem naokoli, s stožci in prsti, debelimi kot členek, pa se zapre ravno. Prstov ene strani ne povezuje krilo: povežite jih s svojim modelom, na primer s škatlo in pokrovom.",
+  "hinge.leafRaised": "Dvignjeno krilo",
+  "hinge.leafRaisedHint": "Drugo krilo leži višje, zato zaprto leži ravno na prvem z zračnostjo vmes, tečaj pa se odpre daleč čez ravno lego. Natisnite ga s podporami pod dvignjenim krilom.",
   "hinge.styleLiftOff": "Snemljiv",
   "hinge.styleLiftOffHint": "Dva členka: spodnji nosi trn do konca, zgornji je tulec, ki ga snamete z njega. Loči dele da oba dela; za tisk pokonci postavite del s trnom na njegov členek in drugega na njegov tulec.",
   "hinge.screwNut": "Ležišče za matico",

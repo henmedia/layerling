@@ -2960,6 +2960,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "板式",
   "hinge.leafFingers": "指扣",
   "hinge.leafFingersHint": "每個鉸鏈節都帶自己的指扣；兩側的指扣像兩把梳子一樣交錯。這樣鉸鏈可以一直折到底，用錐體和與鉸鏈節同樣粗的指扣時，合上後仍然平整。沒有葉片把一側的指扣連起來：請把它們連到你的模型上，例如盒子及其蓋子。",
+  "hinge.leafRaised": "抬高葉片",
+  "hinge.leafRaisedHint": "第二片葉片位置更高，合上時平貼在第一片上，中間留有間隙，鉸鏈還能越過平放位置再翻折很多。列印時請在抬高的葉片下加支撐。",
   "prop.hingeScrewHoles": "每片葉片的螺絲孔數",
   "prop.hingeScrewHolesHint": "0 表示葉片上不開孔。",
   "prop.hingeScrewHolesFewer": "葉片上只放得下 {count} 個。",

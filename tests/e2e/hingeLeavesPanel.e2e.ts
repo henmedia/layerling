@@ -43,6 +43,7 @@ function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<Workpl
 
 const row = (panel: HTMLElement, name: string) => [...panel.querySelectorAll<HTMLLabelElement>("label.range-property")].find((label) => label.querySelector(".range-property-name")?.textContent === name);
 const field = (panel: HTMLElement, name: string) => row(panel, name)!.querySelector<HTMLInputElement>("input:not([type=range])")!;
+const slider = (panel: HTMLElement, name: string) => row(panel, name)!.querySelector<HTMLInputElement>("input[type=range]")!;
 const select = (panel: HTMLElement, option: string) => [...panel.querySelectorAll<HTMLSelectElement>("select")].find((one) => [...one.options].some((entry) => entry.value === option))!;
 
 function type(input: HTMLInputElement, value: string) {
@@ -111,6 +112,31 @@ describe("the hinge's leaves in its settings", () => {
     expect(row(nuts, "Nut width (across flats)")!.nextElementSibling?.textContent).toBe("0 takes it from the hole (M3 5.8, M4 7.3, with play). Now 5.8 mm; the pocket is 1.4 mm deep, as far as the leaf allows.");
     // An old hinge without the choice reads its countersink switch.
     expect(select(mount({ hingeScrewHoles: 2, hingeScrewCountersink: false }), "countersunk").value).toBe("straight");
+  });
+
+  it("raises the second leaf, says it needs supports, and folds the hinge down past lying flat (#1259)", () => {
+    const patches: Partial<WorkplaneShape>[] = [];
+    const panel = mount({}, (patch) => patches.push(patch));
+    choose(select(panel, "raised"), "raised");
+    type(field(panel, "Opening angle"), "-90");
+    expect(patches).toEqual([{ hingeLeafStyle: "raised" }, { hingeAngle: -90 }]);
+    const raised = mount({ hingeLeafStyle: "raised" });
+    expect(select(raised, "raised").value).toBe("raised");
+    expect(raised.textContent).toContain("Print it with supports under the raised leaf.");
+    expect(field(mount({ hingeAngle: -500 }), "Opening angle").value).toBe("-180");
+  });
+
+  it("limits a raised hinge's leaf, width and corners by where the raised leaf starts (#1259)", () => {
+    const sizes = { width: 40, depth: 40, height: 6, hingePinDiameter: 3, hingeLeafThickness: 1.1, hingeScrewHoles: 2 };
+    // B's leaf starts sqrt(3.4² - 0.4²) from the axis, 0.4 above its level, where A's starts sqrt(3.4² - 1.9²).
+    const startB = Math.sqrt(3.4 ** 2 - 0.4 ** 2);
+    const raised = mount({ ...sizes, hingeLeafStyle: "raised" });
+    expect(Number(slider(raised, "Width opened").min)).toBeCloseTo(2 * (startB + 0.5), 6);
+    expect(Number(slider(raised, "Corner radius").max)).toBeCloseTo(20 - startB - 0.05, 6);
+    expect(Number(slider(raised, "Corner radius").max)).toBeLessThan(Number(slider(mount(sizes), "Corner radius").max));
+    // A cone hinge's leaves both fit within the knuckle, the clearance between: at most (6 - 0.4) / 2 thick.
+    expect(Number(slider(mount({ ...sizes, hingeStyle: "cone", hingeLeafStyle: "raised" }), "Leaf thickness").max)).toBeCloseTo(2.8, 6);
+    expect(Number(slider(mount({ ...sizes, hingeStyle: "cone" }), "Leaf thickness").max)).toBeCloseTo(6, 6);
   });
 
   it("has a lift-off style with two knuckles and no count to set", () => {

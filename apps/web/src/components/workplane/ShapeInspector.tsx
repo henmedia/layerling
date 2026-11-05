@@ -295,7 +295,7 @@ import {
   gridfinityWallThickness,
   normalizeGridfinityType,
 } from "@/lib/gridfinityGeometry";
-import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, MAX_HINGE_NUT_WIDTH } from "@/lib/hingeGeometry";
+import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MIN_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, MAX_HINGE_NUT_WIDTH } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
@@ -1719,7 +1719,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const plan = hingePlan({ ...shape, depth });
     return [
       { id: "width", label: t("prop.hingeLength"), value: width, min: MIN_SHAPE_SIZE, max: 300, onChange: setWidth },
-      { id: "length", label: t("prop.hingeOpenWidth"), value: depth, min: minimumHingeDepth(shape.height, plan.leaf, plan.clearance), max: 300, onChange: setDepth },
+      { id: "length", label: t("prop.hingeOpenWidth"), value: depth, min: minimumHingeDepth(shape.height, plan.leaf, plan.clearance, plan.lift), max: 300, onChange: setDepth },
       { id: "height", label: t("prop.hingeKnuckleDiameter"), value: shape.height, min: 2, max: 60, onChange: setHeight },
       {
         type: "select",
@@ -1780,7 +1780,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         label: t("prop.hingeLeafThickness"),
         value: plan.leaf,
         min: 0.4,
-        max: plan.style === "cone" ? shape.height : Math.max(0.5, plan.radius - plan.boreRadius),
+        max: plan.style === "cone" ? (plan.raised ? (shape.height - plan.clearance) / 2 : shape.height) : Math.max(0.5, plan.radius - plan.boreRadius),
         step: 0.1,
         onChange: (value) => onUpdate({ hingeLeafThickness: normalizeHingeLeafThickness(value, shape.height, plan.pinRadius * 2, plan.clearance, plan.style) }),
       },
@@ -1788,17 +1788,17 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         type: "select",
         id: "hingeLeafStyle",
         label: t("prop.hingeLeafStyle"),
-        value: plan.fingers ? "fingers" : "plate",
-        options: [{ value: "plate", label: t("hinge.leafPlate") }, { value: "fingers", label: t("hinge.leafFingers") }],
-        hint: plan.fingers ? t("hinge.leafFingersHint") : undefined,
-        onChange: (value) => onUpdate({ hingeLeafStyle: value === "fingers" ? "fingers" : undefined }),
+        value: plan.fingers ? "fingers" : plan.raised ? "raised" : "plate",
+        options: [{ value: "plate", label: t("hinge.leafPlate") }, { value: "fingers", label: t("hinge.leafFingers") }, { value: "raised", label: t("hinge.leafRaised") }],
+        hint: plan.fingers ? t("hinge.leafFingersHint") : plan.raised ? t("hinge.leafRaisedHint") : undefined,
+        onChange: (value) => onUpdate({ hingeLeafStyle: value === "fingers" || value === "raised" ? value : undefined }),
       },
       {
         id: "hingeCornerRadius",
         label: t("prop.hingeCornerRadius"),
         value: plan.cornerRadius,
         min: 0,
-        max: Math.max(0.5, hingeLargestCornerRadius(plan.fingers ? plan.knuckleLength : width, depth, plan.leafStart)),
+        max: Math.max(0.5, hingeLargestCornerRadius(plan.fingers ? plan.knuckleLength : width, depth, plan.leafStartB)),
         step: 0.5,
         onChange: (value) => onUpdate({ hingeCornerRadius: value > 0 ? value : undefined }),
       },
@@ -1873,7 +1873,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           onChange: (value: number) => onUpdate({ hingeScrewAcross: value > 0 ? value : undefined }),
         },
       ] : []),
-      { id: "hingeAngle", label: t("prop.hingeAngle"), value: plan.angle, min: 0, max: MAX_HINGE_ANGLE, step: 1, onChange: (value) => onUpdate({ hingeAngle: normalizeHingeAngle(value) }) },
+      { id: "hingeAngle", label: t("prop.hingeAngle"), value: plan.angle, min: MIN_HINGE_ANGLE, max: MAX_HINGE_ANGLE, step: 1, onChange: (value) => onUpdate({ hingeAngle: normalizeHingeAngle(value) }) },
       {
         id: "hingeClearance",
         label: t("prop.hingeClearance"),

@@ -913,6 +913,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "Placa",
   "hinge.leafFingers": "Dedos",
   "hinge.leafFingersHint": "Cada nó tem seu próprio dedo; os dedos dos dois lados se alternam como dois pentes. Assim a dobradiça dá a volta completa e, com cones e dedos da espessura do nó, fecha com os dedos no mesmo plano. Nenhuma aba une os dedos de cada lado: una-os ao seu modelo, por exemplo uma caixa e sua tampa.",
+  "hinge.leafRaised": "Aba elevada",
+  "hinge.leafRaisedHint": "A segunda aba fica mais alta, de modo que, fechada, fica plana sobre a primeira, com a folga entre elas, e a dobradiça abre bem além da posição plana. Imprima-a com suportes sob a aba elevada.",
   "prop.hingeScrewHoles": "Furos de parafuso por aba",
   "prop.hingeScrewHolesHint": "Com 0, as abas ficam sem furos.",
   "prop.hingeScrewHolesFewer": "Furos que cabem na aba: {count}.",

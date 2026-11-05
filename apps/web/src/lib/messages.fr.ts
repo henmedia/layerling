@@ -2995,6 +2995,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "Pleine",
   "hinge.leafFingers": "Doigts",
   "hinge.leafFingersHint": "Chaque articulation porte son propre doigt ; les doigts des deux côtés alternent comme deux peignes. La charnière se replie ainsi complètement, et avec des cônes et des doigts aussi épais que l'articulation, elle se ferme à plat. Aucune feuille ne relie les doigts d'un côté : reliez-les à votre modèle, par exemple une boîte et son couvercle.",
+  "hinge.leafRaised": "Feuille surélevée",
+  "hinge.leafRaisedHint": "La seconde feuille est plus haute : fermée, elle repose à plat sur la première, avec le jeu entre les deux, et la charnière se replie bien au-delà de la position à plat. Imprimez-la avec des supports sous la feuille surélevée.",
   "hinge.styleLiftOff": "Dégondable",
   "hinge.styleLiftOffHint": "Deux articulations : celle du bas porte l'axe jusqu'au bout, celle du haut est un manchon qui s'en soulève. Séparer les pièces donne les deux pièces ; pour les imprimer debout, posez la pièce à l'axe sur son articulation et l'autre sur son manchon.",
   "hinge.screwNut": "Logement d'écrou",

@@ -3463,6 +3463,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "Hel plade",
   "hinge.leafFingers": "Fingre",
   "hinge.leafFingersHint": "Hvert led har sin egen finger; fingrene fra de to sider skiftes som to kamme. Så kan hængslet foldes hele vejen rundt, og med kegler og fingre så tykke som leddet lukker det fladt. Intet blad forbinder fingrene på en side: forbind dem med din model, for eksempel en kasse og dens låg.",
+  "hinge.leafRaised": "Hævet blad",
+  "hinge.leafRaisedHint": "Det andet blad ligger højere, så det lukket ligger fladt på det første med frirummet imellem, og hængslet kan foldes et godt stykke forbi fladt. Print det med support under det hævede blad.",
   "hinge.styleLiftOff": "Aftagelig",
   "hinge.styleLiftOffHint": "To led: det nederste bærer stiften helt ud, det øverste er en bøsning, der løftes af den. Adskil dele giver de to dele; for at printe dem stående sættes delen med stiften på sit led og den anden på sin bøsning.",
   "hinge.screwNut": "Møtrikleje",
