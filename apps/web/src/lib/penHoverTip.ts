@@ -5,21 +5,23 @@
  * A mouse pointer hangs down from its tip and covers the text under the control, all the more when it
  * is made larger in the system settings, so for the mouse the text goes above whenever there is room.
  * Above, `top` is where the bubble's bottom edge goes: the bubble moves up by its own height.
+ * `height` is the bubble's measured height: a long name runs over several lines, and a bubble of
+ * several lines at the top of the window has to go below its control, or its first lines are cut off (#1333).
  */
 export const PEN_TIP_HALF_WIDTH = 130;
 const PEN_TIP_GAP = 8;
-const PEN_TIP_HEIGHT = 44;
+export const PEN_TIP_HEIGHT = 44;
 
 export type PenTipRect = { left: number; right: number; top: number; bottom: number };
 
-export function penTipPosition(rect: PenTipRect, viewport: { width: number; height: number }, preferAbove = false) {
+export function penTipPosition(rect: PenTipRect, viewport: { width: number; height: number }, preferAbove = false, height = PEN_TIP_HEIGHT) {
   const centre = (rect.left + rect.right) / 2;
   const left = Math.min(Math.max(centre, PEN_TIP_HALF_WIDTH + 8), Math.max(viewport.width - PEN_TIP_HALF_WIDTH - 8, PEN_TIP_HALF_WIDTH + 8));
   const below = rect.bottom + PEN_TIP_GAP;
-  const fitsBelow = below + PEN_TIP_HEIGHT <= viewport.height;
-  const fitsAbove = rect.top - PEN_TIP_GAP - PEN_TIP_HEIGHT >= 8;
+  const fitsBelow = below + height <= viewport.height;
+  const fitsAbove = rect.top - PEN_TIP_GAP - height >= 8;
   const above = preferAbove ? fitsAbove || !fitsBelow : !fitsBelow;
-  return { left, top: above ? Math.max(rect.top - PEN_TIP_GAP, PEN_TIP_HEIGHT + 8) : below, above };
+  return { left, top: above ? Math.max(rect.top - PEN_TIP_GAP, height + 8) : below, above };
 }
 
 /**

@@ -37,6 +37,22 @@ describe("penTipPosition", () => {
     expect(place.top).toBe(68);
   });
 
+  it("puts a tall bubble below a control near the top, where its first lines would be cut off (#1333)", () => {
+    const control = { left: 1000, right: 1030, top: 120, bottom: 150 };
+    // One line fits above ...
+    expect(penTipPosition(control, screen, true).above).toBe(true);
+    // ... a long name over five lines does not.
+    const place = penTipPosition(control, screen, true, 120);
+    expect(place.above).toBe(false);
+    expect(place.top).toBe(158);
+  });
+
+  it("puts a tall bubble above a control near the bottom, with room for all of it", () => {
+    const place = penTipPosition({ left: 500, right: 540, top: 700, bottom: 730 }, screen, false, 120);
+    expect(place.above).toBe(true);
+    expect(place.top - 120).toBeGreaterThanOrEqual(8);
+  });
+
   it("stays usable on a screen narrower than the text", () => {
     const place = penTipPosition({ left: 10, right: 40, top: 100, bottom: 140 }, { width: 200, height: 500 });
     expect(place.left).toBeGreaterThan(0);

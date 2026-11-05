@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { isAppleTouchDevice } from "@/lib/fileAccept";
-import { holdTitle, hoverTipFor, hoverTitled, hoverTitleOf, penTipPosition } from "@/lib/penHoverTip";
+import { holdTitle, hoverTipFor, hoverTitled, hoverTitleOf, PEN_TIP_HEIGHT, penTipPosition, type PenTipRect } from "@/lib/penHoverTip";
 
 /** The pointer has to rest on a control this long before its name appears, as a mouse waits for a tooltip. */
 const SHOW_DELAY_MS = 350;
 
-type Tip = { text: string; left: number; top: number; above: boolean };
+/** `height` is the bubble's height the place was worked out for; `anchor` and `preferAbove` work it out again. */
+type Tip = { text: string; left: number; top: number; above: boolean; height: number; anchor: PenTipRect; preferAbove: boolean };
 
 function runsAsInstalledApp() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -59,12 +60,11 @@ export function PenHoverTips() {
         // The text is read now: a control may have changed its title while the pointer waited.
         const text = hoverTitleOf(found.element);
         if (!text || !found.element.isConnected) return;
-        const position = penTipPosition(
-          found.element.getBoundingClientRect(),
-          { width: window.innerWidth, height: window.innerHeight },
-          event.pointerType === "mouse",
-        );
-        setTip({ text, left: position.left, top: position.top, above: position.above });
+        const box = found.element.getBoundingClientRect();
+        const anchor = { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+        const preferAbove = event.pointerType === "mouse";
+        const position = penTipPosition(anchor, { width: window.innerWidth, height: window.innerHeight }, preferAbove);
+        setTip({ text, left: position.left, top: position.top, above: position.above, height: PEN_TIP_HEIGHT, anchor, preferAbove });
       }, SHOW_DELAY_MS);
     };
     // A click or a key only puts the bubble away: like the browser's tooltip it stays away until the
@@ -90,9 +90,20 @@ export function PenHoverTips() {
     };
   }, []);
 
+  // A long name runs over several lines: its place is worked out again with the height it really has,
+  // before it is painted, so a tall bubble at the top of the window goes below its control (#1333).
+  const bubble = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (!tip || !bubble.current) return;
+    const height = Math.ceil(bubble.current.getBoundingClientRect().height);
+    if (!height || height === tip.height) return;
+    const position = penTipPosition(tip.anchor, { width: window.innerWidth, height: window.innerHeight }, tip.preferAbove, height);
+    setTip({ ...tip, left: position.left, top: position.top, above: position.above, height });
+  }, [tip]);
+
   if (!tip) return null;
   return (
-    <div className={tip.above ? "pen-hover-tip pen-hover-tip-above" : "pen-hover-tip"} role="tooltip" style={{ left: tip.left, top: tip.top }}>
+    <div ref={bubble} className={tip.above ? "pen-hover-tip pen-hover-tip-above" : "pen-hover-tip"} role="tooltip" style={{ left: tip.left, top: tip.top }}>
       {tip.text}
     </div>
   );

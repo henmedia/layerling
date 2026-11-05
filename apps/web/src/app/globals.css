@@ -1517,6 +1517,8 @@ a.install-app-hint-button {
   position: fixed;
   z-index: 3000;
   box-sizing: border-box;
+  /* Its full width also near the right edge, where a fixed box would shrink to the room left and grow tall (#1333). */
+  width: max-content;
   max-width: 260px;
   padding: 6px 10px;
   border-radius: 6px;
