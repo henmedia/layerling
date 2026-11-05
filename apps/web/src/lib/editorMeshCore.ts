@@ -309,7 +309,8 @@ function bufferGeometryToMeshData(name: string, geometry: THREE.BufferGeometry):
   prepared.computeVertexNormals();
   prepared.computeBoundingBox();
   const minY = prepared.boundingBox?.min.y ?? 0;
-  if (Math.abs(minY) > 0.000001) {
+  // A screw boss grouped as a hole stands where it is drawn in its box (see createScrewBossGeometry).
+  if (Math.abs(minY) > 0.000001 && !geometry.userData.keepsItsHeight) {
     prepared.translate(0, -minY, 0);
     prepared.computeBoundingBox();
   }
