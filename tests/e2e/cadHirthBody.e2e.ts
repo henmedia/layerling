@@ -62,6 +62,12 @@ describe("the Hirth joint's exact body (#1016)", () => {
     ["joint deeper than wide", { width: 30, depth: 50, size: 50 }],
     ["joint turned, tipped and lifted", { rotation: 30, rotationX: 90, rotationZ: 15, elevation: 4, x: 12, z: -5 }],
     ["mirrored joint", { mirrorX: true }],
+    ["joint with saw teeth (Discussion #1320)", { hirthSteepFlank: 90 }],
+    ["joint with saw teeth the other way", { hirthSteepFlank: 90, hirthReverse: true }],
+    ["joint with a 70 degree steep flank", { hirthSteepFlank: 70 }],
+    ["joint with saw teeth without a bore", { hirthSteepFlank: 90, centerHoleSize: 0 }],
+    ["joint with its roots at the bottom", { height: 3, toothSize: 3 }],
+    ["joint with saw teeth down to the bottom", { height: 3, toothSize: 3, hirthSteepFlank: 90 }],
   ])("matches the drawn %s", (_name, extra) => {
     const shape = hirth(extra);
     const solid = body(shape);
@@ -97,6 +103,40 @@ describe("the Hirth joint's exact body (#1016)", () => {
     // Turned by half a tooth more, crest stands on crest: they overlap.
     const clash = body({ ...shape, rotationX: 180, elevation: lift, rotation: 180 / teeth });
     expect(cad.getVolume(cad.common(lower, clash))).toBeGreaterThan(volume * 1e-3);
+  });
+
+  it.each<[string, Partial<WorkplaneShape>]>([
+    ["saw teeth", { hirthSteepFlank: 90 }],
+    ["saw teeth the other way", { hirthSteepFlank: 90, hirthReverse: true }],
+    ["a 75 degree steep flank", { hirthSteepFlank: 75 }],
+  ])("locks into a copy turned over front to back with %s (Discussion #1320)", (_name, extra) => {
+    const shape = hirth({ toothSize: 3, ...extra });
+    const lower = body(shape);
+    const lift = shape.height - 3;
+    const upper = body({ ...shape, rotationX: 180, elevation: lift });
+    const volume = cad.getVolume(lower);
+    expect(cad.getVolume(cad.common(lower, upper))).toBeLessThan(volume * 1e-6);
+    const joined = cad.fuse(lower, upper);
+    expect(Math.abs(cad.getVolume(joined) - 2 * volume) / volume).toBeLessThan(1e-6);
+  });
+
+  it.each<[string, Partial<WorkplaneShape>]>([
+    ["symmetric teeth", {}],
+    ["saw teeth", { hirthSteepFlank: 90 }],
+    ["saw teeth the other way", { hirthSteepFlank: 90, hirthReverse: true }],
+  ])("with %s down to the bottom, fuses onto a tube below it into one solid (Discussion #1320)", (_name, extra) => {
+    // Roman's case: teeth as tall as the joint, on top of a tube of the same size.
+    const shape = hirth({ height: 3, toothSize: 3, ...extra });
+    const joint = body(shape);
+    const tube = cad.translate(cad.cut(
+      cad.transform(cad.makeCylinder(20, 10), [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0]),
+      cad.transform(cad.translate(cad.makeCylinder(5, 12), 0, 0, -1), [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0]),
+    ), 0, -10, 0);
+    const fused = cad.fuse(joint, tube);
+    expect(cad.isValid(fused)).toBe(true);
+    const solids = cad.isSolid(fused) ? [fused] : cad.getSubShapes(fused, "solid");
+    expect(solids.length).toBe(1);
+    expect(Math.abs(cad.getVolume(fused) - cad.getVolume(joint) - cad.getVolume(tube)) / cad.getVolume(fused)).toBeLessThan(1e-6);
   });
 
   it("takes edge treatment on its bottom rim and its bore", () => {

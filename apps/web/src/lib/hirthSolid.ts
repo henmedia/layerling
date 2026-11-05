@@ -10,6 +10,10 @@ import { hirthCrestAngle, hirthRootAngle } from "@/lib/hirthGeometry";
  * straight down past the bottom. That crown, kept within the rim's cylinder
  * from y = 0 up, is the joint; the round bore is cut through it last.
  *
+ * Saw teeth (Discussion #1320) put a root right under its crest where a flank
+ * stands at 90 degrees: that triangle of the crown stands upright, and the
+ * crown's sides beside it run down through the root to the foot.
+ *
  * Built in the shape's own frame (y up, the bottom at y = 0, centred on x and z).
  */
 
@@ -23,7 +27,8 @@ type Point = { x: number; y: number; z: number };
 /** The Hirth joint part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */
 export function hirthPartSolid(cad: OcctKernel, part: CadModifierHirthPart): ShapeHandle {
   const { rx, rz, height, teeth, toothHeight, boreRadius } = part;
-  if (!(rx > 0 && rz > 0 && height > toothHeight && toothHeight > 0 && teeth >= 3 && boreRadius >= 0 && boreRadius < Math.min(rx, rz))) {
+  const split = part.split ?? 0.5;
+  if (!(rx > 0 && rz > 0 && height >= toothHeight && toothHeight > 0 && teeth >= 3 && boreRadius >= 0 && boreRadius < Math.min(rx, rz) && split >= 0 && split <= 1)) {
     throw new Error("The Hirth joint's measures are out of range");
   }
   const half = toothHeight / 2;
@@ -36,19 +41,31 @@ export function hirthPartSolid(cad: OcctKernel, part: CadModifierHirthPart): Sha
     z: CROWN_REACH * rz * Math.sin(angle),
   });
   // Crest, root, crest ... round the crown, each with its foot below the bottom.
-  const corners: Point[] = [];
+  const corners: Array<{ point: Point; angle: number }> = [];
   for (let index = 0; index < teeth; index += 1) {
-    corners.push(rimPoint(hirthCrestAngle(teeth, index), 1), rimPoint(hirthRootAngle(teeth, index), -1));
+    const crest = hirthCrestAngle(teeth, index, split);
+    const root = hirthRootAngle(teeth, index, split);
+    corners.push({ point: rimPoint(crest, 1), angle: crest }, { point: rimPoint(root, -1), angle: root });
   }
+  const at = (index: number) => corners[(index + corners.length) % corners.length];
+  const sameAngle = (a: number, b: number) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) < 1e-9;
+  // A step: two corners at the same angle. The lower of them lies on the upper one's way down to its foot.
+  const lowerBeside = (index: number): Point[] => {
+    const corner = at(index);
+    return [at(index - 1), at(index + 1)].filter((other) => sameAngle(other.angle, corner.angle) && other.point.y < corner.point.y).map((other) => other.point);
+  };
   const foot = (point: Point): Point => ({ ...point, y: bottom });
   const polygon = (points: Point[]) => cad.makeFace(cad.makeWire(points.map((point, index) => cad.makeLineEdge(point, points[(index + 1) % points.length]))));
   const faces: ShapeHandle[] = [];
+  const feet: Point[] = [];
   corners.forEach((corner, index) => {
-    const next = corners[(index + 1) % corners.length];
-    faces.push(polygon([apex, corner, next]));
-    faces.push(polygon([corner, foot(corner), foot(next), next]));
+    const next = at(index + 1);
+    faces.push(polygon([apex, corner.point, next.point]));
+    if (sameAngle(corner.angle, next.angle)) return;
+    feet.push(foot(corner.point));
+    faces.push(polygon([corner.point, ...lowerBeside(index), foot(corner.point), foot(next.point), ...lowerBeside(index + 1), next.point]));
   });
-  faces.push(polygon(corners.map(foot)));
+  faces.push(polygon(feet));
   const size = Math.max(rx, rz, height);
   const shells = cad.getSubShapes(cad.sew(faces, size * 1e-6), "shell");
   if (shells.length !== 1) throw new Error(`The Hirth joint's crown sewed into ${shells.length} shells`);

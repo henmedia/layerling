@@ -702,6 +702,8 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.toothSize === b.toothSize &&
     a.toothWidth === b.toothWidth &&
     a.centerHoleSize === b.centerHoleSize &&
+    a.hirthSteepFlank === b.hirthSteepFlank &&
+    a.hirthReverse === b.hirthReverse &&
     a.gearType === b.gearType &&
     a.helixAngle === b.helixAngle &&
     a.bevelHelixAngle === b.bevelHelixAngle &&

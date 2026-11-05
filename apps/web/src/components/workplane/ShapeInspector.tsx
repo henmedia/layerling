@@ -356,7 +356,7 @@ import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from
 import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
 import { finishingWasherMeasures, finishingWasherSeatDepthFor } from "@/lib/finishingWasherGeometry";
 import { NUT_POCKET_SIZE_ORDER, isNutPocketSize, nutPocketFields, nutPocketSizeFor } from "@/lib/nutPocketSizes";
-import { MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
+import { DEFAULT_HIRTH_STEEP_FLANK, MAX_HIRTH_STEEP_FLANK, MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_STEEP_FLANK, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthGentleFlankAngle, hirthSplit, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthSteepFlank, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
 /**
  * Docked at the right edge, full height. Moved away, it floats: no longer
@@ -3159,6 +3159,27 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const teeth = normalizeHirthTeeth(shape.teeth);
     const toothHeight = normalizeHirthToothHeight(shape.toothSize, baseWidth, baseDepth, shape.height, teeth);
     const bore = normalizeHirthBore(shape.centerHoleSize, baseWidth, baseDepth);
+    // Saw teeth (Discussion #1320): one flank steep, up to a straight step, the other the rest of the tooth.
+    const steepFlank = normalizeHirthSteepFlank(shape.hirthSteepFlank);
+    const split = hirthSplit(baseWidth, baseDepth, teeth, toothHeight, steepFlank, shape.hirthReverse);
+    const sawProperties: ShapePropertyConfig[] = steepFlank === undefined ? [] : [
+      {
+        id: "hirthSteepFlank",
+        label: t("prop.hirthSteepFlank"),
+        value: steepFlank,
+        min: MIN_HIRTH_STEEP_FLANK,
+        max: MAX_HIRTH_STEEP_FLANK,
+        step: 1,
+        onChange: (value) => onUpdate({ hirthSteepFlank: normalizeHirthSteepFlank(value) ?? DEFAULT_HIRTH_STEEP_FLANK }),
+      },
+      {
+        type: "toggle",
+        id: "hirthReverse",
+        label: t("prop.hirthReverse"),
+        value: shape.hirthReverse === true,
+        onChange: (value) => onUpdate({ hirthReverse: value || undefined }),
+      },
+    ];
     const keepAngle = (patch: Partial<WorkplaneShape>, nextTeeth = teeth, options?: ShapeInspectorUpdateOptions) => {
       const nextWidth = patch.width ?? baseWidth;
       const nextDepth = patch.depth ?? baseDepth;
@@ -3177,7 +3198,9 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         min: MIN_HIRTH_TEETH,
         max: MAX_HIRTH_TEETH,
         step: 1,
-        hint: t("inspector.hirthHint", { angle: plainNumber(hirthFlankAngle(baseWidth, baseDepth, teeth, toothHeight)), step: plainNumber(360 / teeth) }),
+        hint: steepFlank === undefined || split === 0.5
+          ? t("inspector.hirthHint", { angle: plainNumber(hirthFlankAngle(baseWidth, baseDepth, teeth, toothHeight)), step: plainNumber(360 / teeth) })
+          : t("inspector.hirthSawHint", { angle: plainNumber(hirthGentleFlankAngle(baseWidth, baseDepth, teeth, toothHeight, split)), step: plainNumber(360 / teeth) }),
         onChange: (value) => {
           const nextTeeth = normalizeHirthTeeth(value);
           keepAngle({ teeth: nextTeeth }, nextTeeth);
@@ -3192,6 +3215,15 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         step: 0.1,
         onChange: (value) => onUpdate({ toothSize: normalizeHirthToothHeight(value, baseWidth, baseDepth, shape.height, teeth) }),
       },
+      {
+        type: "select",
+        id: "hirthProfile",
+        label: t("prop.hirthProfile"),
+        value: steepFlank === undefined ? "symmetric" : "saw",
+        options: [{ value: "symmetric", label: t("hirth.profileSymmetric") }, { value: "saw", label: t("hirth.profileSaw") }],
+        onChange: (value) => onUpdate({ hirthSteepFlank: value === "saw" ? steepFlank ?? DEFAULT_HIRTH_STEEP_FLANK : undefined }),
+      },
+      ...sawProperties,
       {
         id: "centerHole",
         label: t("prop.centerHole"),
@@ -3219,7 +3251,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         value: shape.height,
         min: MIN_HIRTH_BASE + MIN_HIRTH_TOOTH_HEIGHT,
         max: 160,
-        // A lower joint keeps a base under the roots: the teeth give way first.
+        // The teeth reach down to the bottom at most: on a lower joint they give way first.
         onChange: (height) => onUpdate({ height, toothSize: normalizeHirthToothHeight(toothHeight, baseWidth, baseDepth, height, teeth) }, { resizeAxis: "height" }),
       },
     ];

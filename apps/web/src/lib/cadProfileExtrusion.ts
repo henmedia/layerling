@@ -1872,8 +1872,8 @@ export function cadModifierHirthForShape(shape: WorkplaneShape): CadModifierHirt
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const { rx, rz, height, teeth, toothHeight, boreRadius } = hirthMeasures(shape, width, depth);
-  return { rx, rz, height, teeth, toothHeight, boreRadius, transform: profileTransformForShape(shape) };
+  const { rx, rz, height, teeth, toothHeight, boreRadius, split } = hirthMeasures(shape, width, depth);
+  return { rx, rz, height, teeth, toothHeight, boreRadius, ...(split !== 0.5 ? { split } : {}), transform: profileTransformForShape(shape) };
 }
 
 /** Outline pieces of a profile, the measure its kernel cost grows with. */
