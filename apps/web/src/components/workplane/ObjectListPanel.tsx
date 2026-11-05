@@ -2,7 +2,7 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactElement } from "react";
-import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, GripVertical, ListTree, Lock, Pencil, Search, Unlock, X } from "lucide-react";
+import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, GripVertical, ListTree, Lock, Pencil, Search, ShieldCheck, Unlock, X } from "lucide-react";
 import { ToolbarBundleIcon, ToolbarGroupIcon } from "@/components/toolbarIcons";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -27,6 +27,8 @@ export interface ObjectListPanelProps {
   selectedIds: string[];
   onSelectShape: (id: string | string[], mode?: "replace" | "toggle") => void;
   onToggleLock: (id: string) => void;
+  /** Takes the shape lock off a part; the list shows its shield only while the shape is locked (#1277). */
+  onUnlockShapeLock?: (id: string) => void;
   onToggleHidden: (id: string) => void;
   onRenameShape?: (id: string, name: string) => void;
   /** Starts editing a group, so its parts can be changed one by one. */
@@ -52,6 +54,7 @@ export function ObjectListPanel({
   selectedIds,
   onSelectShape,
   onToggleLock,
+  onUnlockShapeLock,
   onToggleHidden,
   onRenameShape,
   onOpenGroup,
@@ -469,6 +472,23 @@ export function ObjectListPanel({
                             onClick={(e) => startRename(shape, e)}
                           >
                             <Pencil size={13} />
+                          </button>
+                        ) : null}
+                        {shape.shapeLocked ? (
+                          // A locked shape shows its shield here as well as in the settings (#1277); a click takes it off.
+                          <button
+                            type="button"
+                            className="outliner-action-btn active-locked"
+                            title={t("contextMenu.unlockShape")}
+                            aria-label={t("contextMenu.unlockShape")}
+                            data-testid="outliner-shape-lock"
+                            disabled={!onUnlockShapeLock}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onUnlockShapeLock?.(shape.id);
+                            }}
+                          >
+                            <ShieldCheck size={14} />
                           </button>
                         ) : null}
                         <button

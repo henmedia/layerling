@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The object list shows the shape lock (Discussion #1277):** A part whose shape is locked carried its shield only in the settings of the selected part, so in the object list it looked like any other part, and the lock seemed not to work. The list now shows the shield beside the padlock of every part with a locked shape, and a click on it unlocks the shape.
 - **Paste beyond the plate keeps the parts where they are to each other (Issue #1304):** A plain paste set each copy 12 mm from its original but held every part to 110 mm on its own, a cap left over from 1.0.0. Parts lying further out were pulled onto the same spot, so a cylinder in the corner of a box came out in its middle, also on a larger plate. All copies now move together by the same 12 mm, wherever they lie; "Paste in the middle and drop" was not affected.
 
 ## 1.141.0
