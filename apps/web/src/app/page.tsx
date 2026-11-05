@@ -77,7 +77,7 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { lylFileAccessSupported, onLylFilesLaunched, pickFilesToImport, rememberLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
-import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
+import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
 import { downloadBackup, pngDataUrl, projectThumbnailBlob, projectThumbnailPngBytes, serverCustomShapesBackupEntries, writeServerBackup } from "@/lib/backupDownload";
 import { customShapesBackupEntries, restoreCustomShapesFromBackup } from "@/lib/myShapes";
@@ -2352,9 +2352,12 @@ export default function Home() {
       const foldersAlong = !scope ? designFolders : "folderId" in scope ? designFolders.filter((folder) => inFolder(scope.folderId, folder.id)) : [];
       const emptyFolders = foldersAlong.filter((folder) => !holding.has(folder.id) && !designFolders.some((other) => other.parentId === folder.id));
       backupFolderPaths(emptyFolders.map((folder) => folderPathNames(designFolders, folder.id))).forEach((name) => writer.add(name, new Uint8Array()));
-      // A folder's backup is named after it, so several of them stay apart in the downloads.
+      // A folder's backup is named after it, and so is the backup of one chosen design (Discussion #1317), so several of
+      // them stay apart in the downloads.
       const folder = scope && "folderId" in scope ? designFolders.find((entry) => entry.id === scope.folderId) : undefined;
-      const fileName = backupFileName(new Date(), folder ? `layerling-${folder.name.replace(/[\\/:*?"<>|\s]+/g, "-")}` : undefined);
+      const single = scope && "designIds" in scope && designs.length === 1 ? designs[0] : undefined;
+      const named = folder?.name ?? single?.name;
+      const fileName = backupFileName(new Date(), named ? backupNamePrefix(named) : undefined);
       downloadBackup(writer.finish(), fileName);
       writeBackupProgress(null);
       const saved = designs.length - skipped.length;

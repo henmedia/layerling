@@ -42,6 +42,15 @@ export function backupFileName(date: Date, prefix = "layerling-backup") {
   return `${prefix}-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}.zip`;
 }
 
+/**
+ * The start of a backup's file name after what it holds - a folder, or the one design chosen (Discussion #1317) -
+ * so several backups stay apart in the downloads: `layerling-` and the name, made safe for every system.
+ */
+export function backupNamePrefix(name: string) {
+  const safe = name.replace(/[\\/:*?"<>|\s\u0000-\u001f]+/g, "-").replace(/^[-.]+|-+$/g, "").slice(0, 100);
+  return safe ? `layerling-${safe}` : "layerling-backup";
+}
+
 /** File names for the designs: readable, safe on every system, never twice the same. */
 export function backupEntryNames(projectNames: string[], fallback = "design") {
   const used = new Set<string>();

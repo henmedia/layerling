@@ -1,10 +1,18 @@
 import { strToU8, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
-import { backupDesignAlreadyThere, backupEntryNames, backupFileName, backupThumbnailPath, createBackupWriter, packBackup, unpackBackup, unpackBackupFolders } from "@/lib/projectBackup";
+import { backupDesignAlreadyThere, backupEntryNames, backupFileName, backupNamePrefix, backupThumbnailPath, createBackupWriter, packBackup, unpackBackup, unpackBackupFolders } from "@/lib/projectBackup";
 
 describe("backing up all designs", () => {
   it("names the backup after the day", () => {
     expect(backupFileName(new Date(2026, 8, 28, 23, 59))).toBe("layerling-backup-2026-09-28.zip");
+  });
+
+  it("names the backup of a folder or of one chosen design after it, safe for every system (Discussion #1317)", () => {
+    expect(backupFileName(new Date(2026, 10, 5), backupNamePrefix("Lantern"))).toBe("layerling-Lantern-2026-11-05.zip");
+    expect(backupNamePrefix("My lantern: v2/final?")).toBe("layerling-My-lantern-v2-final");
+    expect(backupNamePrefix("  ..hidden  ")).toBe("layerling-hidden");
+    expect(backupNamePrefix(" /?* ")).toBe("layerling-backup");
+    expect(backupNamePrefix("x".repeat(300))).toBe(`layerling-${"x".repeat(100)}`);
   });
 
   it("gives every design a safe, unique file name", () => {

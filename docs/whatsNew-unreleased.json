@@ -38,5 +38,15 @@
       "de": "Buchstabenpaare wie AY, AV, LT oder To stehen nicht mehr mit einer Lücke da: Neue Texte rücken sie von selbst zusammen, in jeder Schrift, auch in eigenen. Bei älteren Texten schaltest du es unter „Mehr“ in den Eigenschaften mit „Automatisches Kerning“ ein. Die Buchstaben behalten ihre Größe.",
       "en": "Pairs of letters such as AY, AV, LT or To no longer stand with a gap between them: new texts move them closer by themselves, in every font, your own too. For older texts, switch on \"Automatic kerning\" under \"More\" in the properties. The letters keep their size."
     }
+  },
+  {
+    "title": {
+      "de": "Sicherung eines Entwurfs mit seinem Namen",
+      "en": "A single design's backup carries its name"
+    },
+    "body": {
+      "de": "Sicherst du auf der Startseite mit „Auswählen“ und „Sichern“ nur einen Entwurf, heißt die ZIP-Datei jetzt nach ihm, etwa „layerling-Laterne-2026-11-05.zip“, so wie die Sicherung eines Ordners nach dem Ordner heißt.",
+      "en": "When you back up just one design with \"Select\" and \"Back up\" on the start page, the ZIP file is now named after it, such as \"layerling-Lantern-2026-11-05.zip\", the way a folder's backup is named after the folder."
+    }
   }
 ]
