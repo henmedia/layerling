@@ -33,6 +33,7 @@ Im Fenster findest du:
 - {{ui:edge.tangentChains}}: Ein Klick wählt dann auch die Kanten, die sanft ineinander übergehen, zum Beispiel alle Kanten rund um eine Fläche mit gerundeten Ecken. Der Schalter bestimmt nur, was ein Klick auswählt: Der CAD-Kern führt eine Fase oder Rundung immer an solchen glatt anschließenden Kanten weiter. Das Werkzeugfenster sagt dir dann, an wie vielen weiteren Kanten das geschieht.
 - {{ui:edge.keepSize}} hält Fase oder Rundung so groß, wie sie sind, auch wenn du den Körper später skalierst.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} oder {{ui:edge.fine}}) bestimmt, wie fein die Vorschau gerechnet wird. Bei schwierigen Teilen ist {{ui:edge.draft}} schneller.
+- Das Fenster merkt sich seine Einstellungen in diesem Browser, je eine für Fase, Verrundung und Fase mit Verrundung: Größe, Winkel, Schwelle, Vorschauqualität und die Schalter bleiben nach {{ui:edge.apply}}, nach einem Rückgängig und beim nächsten Öffnen so, wie du sie verlassen hast. Eine Größe, die der Körper nicht hergibt, weicht der aus dem Körper berechneten. Nur {{ui:edge.tangentChains}} beginnt neu: an bei der ersten Fase oder Verrundung eines Körpers, danach aus.
 
 Während du am Maß drehst, rechnet layerling die Vorschau nach. Sie kann einen Moment brauchen. Du darfst weiter einstellen, gerechnet wird immer der zuletzt gewählte Wert.
 

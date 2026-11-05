@@ -33,6 +33,7 @@ W oknie znajdziesz:
 - {{ui:edge.tangentChains}}: kliknięcie wybiera wtedy także krawędzie, które płynnie w siebie przechodzą, na przykład wszystkie krawędzie wokół ściany z zaokrąglonymi narożnikami. Ten przełącznik decyduje tylko o tym, co wybiera kliknięcie: jądro CAD i tak zawsze przeciąga fazkę albo zaokrąglenie wzdłuż takich płynnie przedłużających się krawędzi. Okno mówi, na ile kolejnych krawędzi tak się dzieje.
 - {{ui:edge.keepSize}} zachowuje fazkę albo zaokrąglenie w obecnym rozmiarze, nawet jeśli później przeskalujesz bryłę.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} albo {{ui:edge.fine}}) decyduje, jak dokładnie liczony jest podgląd. Przy trudnych częściach {{ui:edge.draft}} jest szybsza.
+- Okno zapamiętuje swoje ustawienia w tej przeglądarce, osobno dla fazy, zaokrąglenia i fazy z zaokrągleniem: rozmiar, kąt, próg, jakość podglądu i przełączniki zostają takie, jak je zostawiłeś, po {{ui:edge.apply}}, po cofnięciu i przy następnym otwarciu narzędzia. Rozmiar, którego bryła nie zmieści, ustępuje rozmiarowi obliczonemu z bryły. Od nowa zaczyna tylko {{ui:edge.tangentChains}}: włączone przy pierwszej fazie lub zaokrągleniu bryły, potem wyłączone.
 
 Gdy zmieniasz rozmiar, layerling przelicza podgląd. Może to chwilę potrwać. Możesz dalej zmieniać wartość, a liczona będzie ostatnia wybrana.
 

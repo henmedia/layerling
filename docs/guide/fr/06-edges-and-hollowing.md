@@ -32,6 +32,7 @@ Dans la fenêtre d'outil vous trouvez :
 - {{ui:edge.tangentChains}} : un clic sélectionne alors également les arêtes qui s'enchaînent doucement les unes dans les autres, par exemple toutes les arêtes autour d'une face aux coins arrondis. Le commutateur décide uniquement ce qu'un clic sélectionne : le noyau de CAO comporte toujours un chanfrein ou un congé le long de ces bords continus et fluides. La fenêtre vous indique le nombre d'arêtes supplémentaires qui se produisent.
 - {{ui:edge.keepSize}} conserve le chanfrein ou le congé aussi grand qu'il est, même si vous mettez le corps à l'échelle ultérieurement.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} ou {{ui:edge.fine}}) décide de la précision avec laquelle l'aperçu est calculé. Pour les pièces difficiles, {{ui:edge.draft}} est plus rapide.
+- La fenêtre garde ses réglages dans ce navigateur, un jeu pour le chanfrein, un pour le congé et un pour le chanfrein avec congé : taille, angle, seuil, qualité de l'aperçu et interrupteurs restent comme vous les avez laissés après {{ui:edge.apply}}, après une annulation et à la prochaine ouverture de l'outil. Une taille que le corps ne peut pas prendre cède la place à celle calculée d'après le corps. Seul {{ui:edge.tangentChains}} repart de zéro : activé pour le premier chanfrein ou congé d'un corps, désactivé ensuite.
 
 Pendant que vous ajustez la taille, layerling recalcule l'aperçu. Cela peut prendre un moment. Vous pouvez continuer à vous adapter ; la dernière valeur que vous avez choisie est celle qui est calculée.
 

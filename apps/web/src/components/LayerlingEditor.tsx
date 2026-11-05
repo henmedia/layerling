@@ -122,6 +122,7 @@ import { bodyOverhang, overhangBodies, overhangFigures, overhangFiguresText, typ
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
 import { matchingEdgeIds } from "@/lib/edgeMatching";
+import { readEdgeModifierSettings, rememberEdgeModifierSetting, startingEdgeModifierAmount, type EdgeModifierSettings } from "@/lib/edgeModifierMemory";
 import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
@@ -7461,6 +7462,12 @@ export function LayerlingEditor({
     setNotice(t("status.edgeCancelled"));
   }, [invalidateCadModifierSession]);
 
+  // A setting the user changed in the edge panel stays for the next start of the same tool (#1342).
+  const keepEdgeSetting = useCallback((patch: EdgeModifierSettings) => {
+    const current = edgeModifierRef.current;
+    if (current?.prepared) rememberEdgeModifierSetting(current.kind, patch);
+  }, []);
+
   const startEdgeModifier = useCallback((kind: CadModifierKind) => {
     setShellTool(null);
     if (refuseBodyLockedSelection()) return;
@@ -7561,7 +7568,14 @@ export function LayerlingEditor({
         return;
       }
     }
-    const amount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(1, shapeWidth(selectedShape) / 6, shapeDepth(selectedShape) / 6, selectedShape.height / 6));
+    // The settings last chosen for this tool in this browser, so Apply, Undo and the next start keep them (#1342).
+    const kept = readEdgeModifierSettings(kind);
+    const largestDimension = Math.max(shapeWidth(selectedShape), shapeDepth(selectedShape), selectedShape.height);
+    const amount = startingEdgeModifierAmount(
+      kept,
+      Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(1, shapeWidth(selectedShape) / 6, shapeDepth(selectedShape) / 6, selectedShape.height / 6)),
+      Math.max(MIN_EDGE_MODIFIER_AMOUNT, largestDimension * 0.99),
+    );
     cadModifierBaseShapeRef.current = selectedShape;
     cadModifierBaseFingerprintRef.current = projectShapesFingerprint([selectedShape]);
     cadModifierSourcePartsRef.current = sourceParts;
@@ -7574,10 +7588,12 @@ export function LayerlingEditor({
       edges: [],
       selectedEdgeIds: [],
       amount,
-      sharpAngle: 25,
-      chamferAngle: 45,
-      quality: "standard",
+      sharpAngle: kept.sharpAngle ?? 25,
+      chamferAngle: kept.chamferAngle ?? 45,
+      quality: kept.quality ?? "standard",
       tangentChain: defaultCadModifierTangentChain(appliedEdgeTreatmentCount),
+      ...(kept.onlyVisibleEdges !== undefined ? { onlyVisibleEdges: kept.onlyVisibleEdges } : {}),
+      ...(kind === "fillet" && kept.concave !== undefined ? { concave: kept.concave } : {}),
       preserveEdgeSize: selectedShape.edgeResizeMode === "preserve",
       busy: true,
       prepared: false,
@@ -17438,18 +17454,18 @@ export function LayerlingEditor({
           error={edgeModifier.error}
           // The same value again changes nothing: dropping the preview for it left Apply
           // waiting on a computation nobody started (#204).
-          onAmountChange={(value) => setEdgeModifier((current) => {
+          onAmountChange={(value) => { keepEdgeSetting({ amount: value }); setEdgeModifier((current) => {
             if (!current?.prepared) return current;
             const amount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(edgeModifierMaxAmount, value));
             return amount === current.amount ? current : { ...current, amount, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
-          })}
+          }); }}
           endAmount={edgeModifier.endAmount ?? null}
           concave={edgeModifier.concave === true}
-          onConcaveChange={(value) => setEdgeModifier((current) => {
+          onConcaveChange={(value) => { keepEdgeSetting({ concave: value }); setEdgeModifier((current) => {
             if (!current?.prepared || (current.concave === true) === value) return current;
             // A scoop has one radius: the variable one goes out with it.
             return { ...current, concave: value, endAmount: value ? null : current.endAmount, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
-          })}
+          }); }}
           // Switching it on starts the end at twice the start, so the change shows at once (#687).
           onEndAmountChange={(value) => setEdgeModifier((current) => {
             if (!current?.prepared) return current;
@@ -17460,18 +17476,18 @@ export function LayerlingEditor({
             if (!current?.prepared || current.endAmount == null || current.endAmount === current.amount) return current;
             return { ...current, amount: current.endAmount, endAmount: current.amount, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
           })}
-          onChamferAngleChange={(value) => setEdgeModifier((current) => {
+          onChamferAngleChange={(value) => { keepEdgeSetting({ chamferAngle: value }); setEdgeModifier((current) => {
             if (!current?.prepared) return current;
             const chamferAngle = Math.max(current.kind === "chamfillet" ? 15 : 5, Math.min(current.kind === "chamfillet" ? 75 : 85, value));
             return chamferAngle === current.chamferAngle ? current : { ...current, chamferAngle, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
-          })}
+          }); }}
           onKindChange={(kind) => setEdgeModifier((current) => {
             if (!current?.prepared || current.kind === kind) return current;
             const chamferAngle = kind === "chamfillet" ? Math.max(15, Math.min(75, current.chamferAngle)) : current.chamferAngle;
             return { ...current, kind, chamferAngle, preview: null, busy: current.selectedEdgeIds.length > 0, error: null };
           })}
-          onQualityChange={(quality) => setEdgeModifier((current) => !current?.prepared || quality === current.quality ? current : { ...current, quality, preview: null, busy: current.selectedEdgeIds.length > 0, error: null })}
-          onSharpAngleChange={(sharpAngle) => setEdgeModifier((current) => {
+          onQualityChange={(quality) => { keepEdgeSetting({ quality }); setEdgeModifier((current) => !current?.prepared || quality === current.quality ? current : { ...current, quality, preview: null, busy: current.selectedEdgeIds.length > 0, error: null }); }}
+          onSharpAngleChange={(sharpAngle) => { keepEdgeSetting({ sharpAngle: Math.max(1, Math.min(CAD_MODIFIER_MAX_SHARP_ANGLE, sharpAngle)) }); setEdgeModifier((current) => {
             if (!current?.prepared) return current;
             const nextAngle = Math.max(1, Math.min(CAD_MODIFIER_MAX_SHARP_ANGLE, sharpAngle));
             const availableIds = new Set(current.edges
@@ -17486,9 +17502,9 @@ export function LayerlingEditor({
               busy: selectedEdgeIds.length > 0,
               error: availableIds.size === 0 ? t("edge.noEdgeAtThreshold") : selectedEdgeIds.length ? null : t("edge.selectAtLeastOne"),
             };
-          })}
+          }); }}
           onTangentChainChange={(tangentChain) => setEdgeModifier((current) => current?.prepared ? { ...current, tangentChain } : current)}
-          onOnlyVisibleEdgesChange={(onlyVisibleEdges) => setEdgeModifier((current) => current?.prepared ? { ...current, onlyVisibleEdges } : current)}
+          onOnlyVisibleEdgesChange={(onlyVisibleEdges) => { keepEdgeSetting({ onlyVisibleEdges }); setEdgeModifier((current) => current?.prepared ? { ...current, onlyVisibleEdges } : current); }}
           onPreserveEdgeSizeChange={(preserveEdgeSize) => setEdgeModifier((current) => current?.prepared ? { ...current, preserveEdgeSize } : current)}
           onSelectAll={() => setEdgeModifier((current) => current?.prepared ? { ...current, selectedEdgeIds: modifierAvailableEdgeIds, preview: null, busy: modifierAvailableEdgeIds.length > 0, error: modifierAvailableEdgeIds.length ? null : current.error } : current)}
           onSelectTop={(add) => selectQuickEdges("top", topCadModifierEdgeIds, "edge.noTopEdges", add)}

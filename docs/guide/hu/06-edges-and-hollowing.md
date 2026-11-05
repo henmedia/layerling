@@ -32,6 +32,7 @@ Az ablakban ezeket találod:
 - {{ui:edge.tangentChains}}: egy kattintás ilyenkor azokat az éleket is kiválasztja, amelyek simán egymásba folynak, például egy lekerekített sarkú lap körüli összes élt. A kapcsoló csak azt dönti el, mit választ ki egy kattintás: a CAD-mag az élletörést vagy a lekerekítést mindig továbbviszi az ilyen simán folytatódó éleken. Az ablak megmondja, hány további élen történik ez meg.
 - Az {{ui:edge.keepSize}} megtartja az élletörés vagy a lekerekítés méretét akkor is, ha később átméretezed a testet.
 - Az {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} vagy {{ui:edge.fine}}) dönti el, milyen finoman számolódik az előnézet. Nehéz alkatrészeknél a {{ui:edge.draft}} gyorsabb.
+- Az ablak ebben a böngészőben megjegyzi a beállításait, külön a letöréshez, a lekerekítéshez és a letörés lekerekítéssel változathoz: a méret, a szög, a küszöb, az előnézet minősége és a kapcsolók úgy maradnak, ahogy hagytad őket, a(z) {{ui:edge.apply}} után, visszavonás után és az eszköz következő megnyitásakor is. Ha a test nem bírja el a méretet, a testből számolt méret lép a helyébe. Csak a(z) {{ui:edge.tangentChains}} indul újra: egy test első letörésénél vagy lekerekítésénél be, utána ki.
 
 Amíg a méretet állítod, a layerling újraszámolja az előnézetet. Ez eltarthat egy pillanatig. Nyugodtan állíts tovább; az utoljára választott érték számolódik ki.
 

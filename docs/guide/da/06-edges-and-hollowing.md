@@ -33,6 +33,7 @@ I vinduet finder du:
 - {{ui:edge.tangentChains}}: et klik vælger så også kanter der glat flyder ind i hinanden, for eksempel alle kanter rundt om en flade med rundede hjørner. Kontakten bestemmer kun hvad et klik vælger: CAD-kernen fører altid en fas eller rund med videre langs sådanne glat fortsættende kanter. Vinduet fortæller dig langs hvor mange flere kanter det sker.
 - {{ui:edge.keepSize}} bevarer fasen eller runding som den er, selvom du skalerer formen senere.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} eller {{ui:edge.fine}}) bestemmer hvor fint forhåndsvisningen beregnes. For vanskelige dele er {{ui:edge.draft}} hurtigere.
+- Vinduet husker sine indstillinger i denne browser, ét sæt hver for affasning, afrunding og affasning med afrunding: størrelse, vinkel, tærskel, forhåndsvisningens kvalitet og kontakterne bliver, som du forlod dem, efter {{ui:edge.apply}}, efter en fortrydelse og næste gang du åbner værktøjet. En størrelse, kroppen ikke kan rumme, viger for den, der regnes ud fra kroppen. Kun {{ui:edge.tangentChains}} starter forfra: til ved en krops første affasning eller afrunding, derefter fra.
 
 Mens du justerer størrelsen, genberegner layerling forhåndsvisningen. Det kan tage et øjeblik. Du må blive ved med at justere; den sidste værdi du valgte er det der beregnes.
 

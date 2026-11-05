@@ -33,6 +33,7 @@ En la ventana encontrarás:
 - {{ui:edge.tangentChains}}: un clic elige también las aristas que se continúan suavemente unas en otras, por ejemplo todas las aristas alrededor de una cara con esquinas redondeadas. El interruptor solo decide qué elige un clic: el núcleo CAD siempre prolonga un chaflán o un redondeo por esas aristas que continúan suavemente. La ventana te dice por cuántas aristas más pasa.
 - {{ui:edge.keepSize}} mantiene el chaflán o el redondeo con el tamaño que tiene, aunque luego escales el cuerpo.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} o {{ui:edge.fine}}) decide con qué detalle se calcula la vista previa. Para piezas difíciles, {{ui:edge.draft}} es más rápido.
+- La ventana guarda sus ajustes en este navegador, uno para el chaflán, otro para el redondeo y otro para el chaflán con redondeo: tamaño, ángulo, umbral, calidad de la vista previa y los interruptores quedan como los dejaste tras {{ui:edge.apply}}, tras deshacer y la próxima vez que abras la herramienta. Un tamaño que el cuerpo no admite deja paso al calculado a partir del cuerpo. Solo {{ui:edge.tangentChains}} empieza de nuevo: activado en el primer chaflán o redondeo de un cuerpo, desactivado después.
 
 Mientras ajustas el tamaño, layerling recalcula la vista previa. Puede tardar un momento. Puedes seguir ajustando: lo que se calcula es el último valor que hayas elegido.
 

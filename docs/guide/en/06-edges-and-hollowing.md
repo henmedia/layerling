@@ -33,6 +33,7 @@ In the tool window you find:
 - {{ui:edge.tangentChains}}: a click then also picks edges that flow smoothly into each other, for example all edges around a face with rounded corners. The switch only decides what a click picks: the CAD kernel always carries a chamfer or fillet on along such smoothly continuing edges. The tool window tells you along how many more edges that happens.
 - {{ui:edge.keepSize}} keeps the chamfer or fillet as large as it is, even if you scale the body later.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} or {{ui:edge.fine}}) decides how finely the preview is calculated. For difficult parts {{ui:edge.draft}} is faster.
+- The window keeps its settings in this browser, one set each for chamfer, fillet and chamfer-fillet: size, angle, threshold, preview quality and the switches stay as you left them after {{ui:edge.apply}}, after an undo and the next time you open the tool. A size the body cannot take gives way to the one worked out from the body. Only {{ui:edge.tangentChains}} starts anew: on for a body's first chamfer or fillet, off after that.
 
 While you adjust the size, layerling recalculates the preview. It can take a moment. You may keep adjusting; the last value you chose is what gets calculated.
 

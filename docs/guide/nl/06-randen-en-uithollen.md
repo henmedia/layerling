@@ -32,6 +32,7 @@ In het venster vind je:
 - {{ui:edge.tangentChains}}: een klik kiest dan ook randen die vloeiend in elkaar overlopen, bijvoorbeeld alle randen rond een vlak met afgeronde hoeken. De schakelaar bepaalt alleen wat een klik kiest: de CAD-kernel zet een afschuining of afronding altijd door langs zulke vloeiend doorlopende randen. Het venster meldt langs hoeveel randen extra dat gebeurt.
 - {{ui:edge.keepSize}} houdt de afschuining of afronding even groot, ook als je het lichaam later schaalt.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} of {{ui:edge.fine}}) bepaalt hoe fijn het voorbeeld wordt berekend. Voor lastige onderdelen is {{ui:edge.draft}} sneller.
+- Het venster onthoudt zijn instellingen in deze browser, één set elk voor afschuinen, afronden en afschuinen met afronding: maat, hoek, drempel, kwaliteit van het voorbeeld en de schakelaars blijven zoals je ze liet na {{ui:edge.apply}}, na ongedaan maken en de volgende keer dat je het gereedschap opent. Een maat die het lichaam niet aankan, maakt plaats voor de maat die uit het lichaam volgt. Alleen {{ui:edge.tangentChains}} begint opnieuw: aan bij de eerste afschuining of afronding van een lichaam, daarna uit.
 
 Terwijl je de maat aanpast, berekent layerling het voorbeeld opnieuw. Dat kan even duren. Je mag gewoon doorgaan met aanpassen; de laatste waarde die je kiest wordt berekend.
 

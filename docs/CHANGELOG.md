@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The chamfer and fillet window keeps its settings (#1342):** Every start of the edge tool set its settings back, and Apply and Undo start it anew on the changed body, so size, angle, threshold, preview quality and the switches had to be set again after every step. The settings a user changes are now kept in this browser, one set each for chamfer, fillet and chamfer-fillet (`lib/edgeModifierMemory.ts`), and the next start takes them: after Apply, after an undo and when the tool is opened again. A kept size the body cannot take gives way to the one worked out from the body; the threshold the tool lowers by itself to reach an edge is not kept, nor are the picked edges or the chain switch, which starts on for a body's first treatment and off after that. The MCP bridge passes its own values and is unchanged. Guide chapter 6 in 15 languages.
 - **A click on empty space ends Align again; Shift-click makes the plate the reference (#1340):** Since 1.139.0 a click on the empty plate in Align made the plate the reference for equal gaps and a second click let it go, so Align could no longer be left by clicking beside the parts, as before and as in Tinkercad. A plain click on empty space now clears the selection and ends Align again; the plate becomes the reference with Shift held (a second Shift-click lets it go). The start message, the hint of the greyed equal-gaps dot and the guide (chapter 4, 15 languages) say so; messages in 19 languages.
 
 ## 1.144.0

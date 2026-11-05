@@ -32,6 +32,7 @@ Okno nabízí:
 - {{ui:edge.tangentChains}} přidává po kliknutí i plynule navazující hrany, například celý obvod plochy se zaoblenými rohy. Volba ovlivňuje jen výběr kliknutím. CAD jádro vždy pokračuje v úpravě podél tečně navazujících hran. Okno uvádí, kolik dalších hran se tím upraví.
 - {{ui:edge.keepSize}} zachová velikost zkosení či zaoblení i při pozdější změně velikosti tělesa.
 - {{ui:edge.previewQuality}} nabízí {{ui:edge.draft}}, {{ui:edge.standard}} nebo {{ui:edge.fine}}. U složitých dílů poskytuje {{ui:edge.draft}} rychlejší výpočet.
+- Okno si pamatuje svá nastavení v tomto prohlížeči, zvlášť pro sražení, zaoblení a sražení se zaoblením: velikost, úhel, práh, kvalita náhledu a přepínače zůstanou po {{ui:edge.apply}}, po vrácení zpět i při dalším otevření nástroje tak, jak jste je nechali. Velikost, kterou těleso nepojme, ustoupí velikosti spočtené z tělesa. Znovu začíná jen {{ui:edge.tangentChains}}: zapnuto při prvním sražení nebo zaoblení tělesa, potom vypnuto.
 
 Při změně velikosti se náhled přepočítává. Výpočet může chvíli trvat. Hodnotu můžete dál upravovat; použije se poslední zadaná.
 

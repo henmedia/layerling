@@ -32,6 +32,7 @@ V oknu najdeš:
 - {{ui:edge.tangentChains}}: Klik potem izbere tudi robove, ki mehko prehajajo drug v drugega, na primer vse robove okoli ploskve z zaobljenimi vogali. Stikalo določa samo, kaj klik izbere: jedro CAD posnetje ali zaokrožitev vedno nadaljuje na takih gladko povezanih robovih. Tabla ti potem pove, na koliko dodatnih robovih se to zgodi.
 - {{ui:edge.keepSize}} ohrani posnetje ali zaokrožitev tako veliko, kot sta, tudi če telo pozneje povečaš.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} ali {{ui:edge.fine}}) določa, kako fino se izračuna predogled. Pri zahtevnih delih je {{ui:edge.draft}} hitrejši.
+- Okno si v tem brskalniku zapomni svoje nastavitve, za posnetje, zaokrožitev in posnetje z zaokrožitvijo vsakega posebej: velikost, kot, prag, kakovost predogleda in stikala ostanejo, kot si jih pustil, po {{ui:edge.apply}}, po razveljavitvi in ob naslednjem odprtju orodja. Velikost, ki je telo ne prenese, se umakne velikosti, izračunani iz telesa. Na novo začne le {{ui:edge.tangentChains}}: vklopljeno ob prvem posnetju ali zaokrožitvi telesa, nato izklopljeno.
 
 Medtem ko vrtiš mero, layerling predogled preračuna. To lahko traja trenutek. Lahko nastavljaš naprej, izračuna se vedno nazadnje izbrana vrednost.
 

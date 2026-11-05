@@ -33,6 +33,7 @@ Nella finestra trovi:
 - {{ui:edge.tangentChains}} fa sì che un clic selezioni anche gli spigoli che proseguono in modo uniforme, per esempio tutti quelli attorno a una faccia con angoli arrotondati. L’opzione decide solo quali spigoli vengono selezionati con il clic: il kernel CAD estende comunque smussi e raccordi agli spigoli che proseguono senza interruzioni. La finestra indica quanti altri spigoli vengono coinvolti.
 - {{ui:edge.keepSize}} mantiene inalterata la dimensione dello smusso o del raccordo anche se in seguito ridimensioni il corpo.
 - {{ui:edge.previewQuality}} ({{ui:edge.draft}}, {{ui:edge.standard}} o {{ui:edge.fine}}) regola il livello di dettaglio dell’anteprima. Per i pezzi complessi, {{ui:edge.draft}} è più veloce.
+- La finestra conserva le sue impostazioni in questo browser, una serie ciascuno per smusso, raccordo e smusso con raccordo: dimensione, angolo, soglia, qualità dell'anteprima e interruttori restano come li hai lasciati dopo {{ui:edge.apply}}, dopo un annullamento e alla prossima apertura dello strumento. Una dimensione che il corpo non può accogliere lascia il posto a quella calcolata dal corpo. Solo {{ui:edge.tangentChains}} riparte da capo: attivo al primo smusso o raccordo di un corpo, disattivo dopo.
 
 Mentre modifichi la dimensione, layerling ricalcola l’anteprima. Può volerci qualche istante; puoi continuare a cambiare i valori e verrà calcolato quello scelto per ultimo.
 
