@@ -297,6 +297,7 @@ import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MAX_HI
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
+import { undersideOffset } from "@/lib/positionUnderside";
 import { isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
@@ -4161,6 +4162,7 @@ export function ShapeInspector({
    * Arbeitsflaeche), Z als Hoehe seiner Unterkante. Die Regler reichen so weit
    * wie das Ziehen, eine Plattengroesse ueber jeden Rand.
    */
+  const undersideBelow = useMemo(() => undersideOffset(shape), [shape]);
   const reachX = workspace.width * 1.5;
   const reachY = workspace.depth * 1.5;
   // Up, the slider reaches as far as the plate does and the printer is high; any number can be typed (#425).
@@ -4169,7 +4171,8 @@ export function ShapeInspector({
     { id: "positionX", label: t("prop.positionX"), value: shape.x, min: -reachX, max: reachX, step: 0.5, onChange: (x) => onUpdate({ x }) },
     // Y counts towards the back, right-handed (#182); inside, z runs towards the viewer.
     { id: "positionY", label: t("prop.positionY"), value: displayY(shape.z), min: -reachY, max: reachY, step: 0.5, onChange: (y) => onUpdate({ z: insideZ(y) }) },
-    { id: "positionZ", label: t("prop.positionZ"), value: shape.elevation ?? 0, min: -Math.max(180, reachZ), max: reachZ, step: 0.5, onChange: (elevation) => onUpdate({ elevation }) },
+    // Z is the height of the underside as the body stands, also tilted (Discussion #1303).
+    { id: "positionZ", label: t("prop.positionZ"), value: (shape.elevation ?? 0) + undersideBelow, min: -Math.max(180, reachZ), max: reachZ, step: 0.5, onChange: (z) => onUpdate({ elevation: z - undersideBelow }) },
   ];
   // The body's turn about X, Y and Z, as it is drawn. A new angle turns it
   // about its centre, or about its own pivot if it has one.
