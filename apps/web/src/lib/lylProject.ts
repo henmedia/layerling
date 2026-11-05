@@ -1412,6 +1412,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.textVertical !== undefined && typeof definition.textVertical !== "boolean") {
     throw new Error(`${label}.textVertical must be true or false`);
   }
+  if (definition.textKerning !== undefined && typeof definition.textKerning !== "boolean") {
+    throw new Error(`${label}.textKerning must be true or false`);
+  }
   // The space between a text's letters (#594), in per cent of the letter size.
   if (definition.textSpacing !== undefined && !(typeof definition.textSpacing === "number" && Number.isFinite(definition.textSpacing) && definition.textSpacing >= -50 && definition.textSpacing <= 300)) {
     throw new Error(`${label}.textSpacing must be a number from -50 to 300`);
@@ -1633,13 +1636,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const helixAngle = finiteNumber(definition.helixAngle, `${label}.helixAngle`);
       if (helixAngle < -45 || helixAngle > 45) throw new Error(`${label}.helixAngle is outside the supported range`);
     }
-    if (definition.helixQuality !== undefined) {
-      const helixQuality = finiteNumber(definition.helixQuality, `${label}.helixQuality`);
-      if (!Number.isInteger(helixQuality) || helixQuality < 4 || helixQuality > 32) {
     if (definition.bevelHelixAngle !== undefined) {
       const bevelHelixAngle = finiteNumber(definition.bevelHelixAngle, `${label}.bevelHelixAngle`);
       if (bevelHelixAngle < -45 || bevelHelixAngle > 45) throw new Error(`${label}.bevelHelixAngle is outside the supported range`);
     }
+    if (definition.helixQuality !== undefined) {
+      const helixQuality = finiteNumber(definition.helixQuality, `${label}.helixQuality`);
+      if (!Number.isInteger(helixQuality) || helixQuality < 4 || helixQuality > 32) {
         throw new Error(`${label}.helixQuality is outside the supported range`);
       }
     }

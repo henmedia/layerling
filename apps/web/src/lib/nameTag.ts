@@ -66,7 +66,7 @@ const measuresCache = new Map<string, { width: number; depth: number; cap: numbe
  */
 function layoutMeasures(shape: WorkplaneShape) {
   const fontName = shape.font ?? "Multilanguage";
-  const key = JSON.stringify([wordsOf(shape), fontName, customFontRevision(shape.font), textSpacingOf(shape), Boolean(shape.textVertical)]);
+  const key = JSON.stringify([wordsOf(shape), fontName, customFontRevision(shape.font), textSpacingOf(shape), Boolean(shape.textKerning), Boolean(shape.textVertical)]);
   const cached = measuresCache.get(key);
   if (cached) return cached;
   // The spacing between the letters (#594) is part of the line, so it is part of its measure.
@@ -181,6 +181,18 @@ export function textSpacingPatch(shape: WorkplaneShape, percent: number): Partia
   const patch: Partial<WorkplaneShape> = { textSpacing: spacing === 0 ? undefined : spacing };
   if (shape.textCurved) return curvedTextPatch(shape, patch);
   // A stretched text fills its box whatever the spacing is, and a text with no letters to measure keeps its box.
+  if (shape.textStretch) return patch;
+  const size = textLetterSize(shape);
+  return { ...patch, ...textLetterSizePatch({ ...shape, ...patch } as WorkplaneShape, size) };
+}
+
+/**
+ * The change that switches a text's automatic kerning (#1297) and keeps the letters as tall as they were: pairs such as
+ * AY move closer, the line gets shorter, so a straight text's box follows it and curved text re-measures its box.
+ */
+export function textKerningPatch(shape: WorkplaneShape, kerning: boolean): Partial<WorkplaneShape> {
+  const patch: Partial<WorkplaneShape> = { textKerning: kerning };
+  if (shape.textCurved) return curvedTextPatch(shape, patch);
   if (shape.textStretch) return patch;
   const size = textLetterSize(shape);
   return { ...patch, ...textLetterSizePatch({ ...shape, ...patch } as WorkplaneShape, size) };

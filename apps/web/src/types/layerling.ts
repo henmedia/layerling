@@ -439,6 +439,8 @@ export type ShapeCustomization = {
   textInward?: boolean;
   /** Curved text: same place on the circle, letters turned upside down (read from the other side). */
   textFlipped?: boolean;
+  /** Automatic kerning (#1297); a new text has it on unless this says false. */
+  textKerning?: boolean;
 };
 
 export type ShapeCustomizationMap = Partial<Record<ShapeKind, ShapeCustomization>>;
@@ -1010,10 +1012,10 @@ export type WorkplaneShape = {
   gearType?: GearType;
   helixAngle?: number;
   helixQuality?: number;
-  /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
-  gearProfile?: GearProfile;
   /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
   bevelHelixAngle?: number;
+  /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
+  gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
   gearPressureAngle?: number;
   /** Involute teeth: play of a meshing pair in mm, half taken off each gear. */
@@ -1323,6 +1325,12 @@ export type WorkplaneShape = {
    * advance - 0 or left out as the font has it, above it wider, below it (down to -50) tighter. Straight and curved text.
    */
   textSpacing?: number;
+  /**
+   * Text only (#1297): automatic kerning - pairs of letters that leave too much room between them, such as AY, AV, LT
+   * or To, move closer. New texts start with it on; a text without the field (saved before it existed) has it off, so
+   * nothing moves in a saved design. Straight and curved text; not vertical text, Arabic, Hebrew or Japanese.
+   */
+  textKerning?: boolean;
   /**
    * Curved text only (#1196): how wide each letter is drawn, in per cent of its own width - 100 or left out as the
    * font has it, below narrower, above wider (25 to 400). The letters keep their height; the arc and the box follow.

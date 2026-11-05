@@ -2778,6 +2778,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.textCurved": "Op boog",
   "prop.textSpacing": "Letterafstand (%)",
   "prop.textSpacingHint": "Ruimte tussen de letters bovenop die van het lettertype, in procent van de lettergrootte; onder 0 smaller. De letters behouden hun grootte, het kader volgt.",
+  "prop.textKerning": "Automatische kerning",
   "prop.textLetterWidth": "Letterbreedte (%)",
   "prop.textLetterWidthHint": "Hoe breed elke letter op de boog wordt getekend, in procent van de eigen breedte; onder 100 smaller, erboven breder. De letters behouden hun hoogte, de boog en het kader volgen.",
   "prop.textStretch": "Letters uitrekken tot het kader",

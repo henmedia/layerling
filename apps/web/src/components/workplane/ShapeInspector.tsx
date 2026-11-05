@@ -200,7 +200,7 @@ import { MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, nameTagKey
 import { iconKeyringAlongLimit } from "@/lib/sketchKeyring";
 import { DEFAULT_KEYRING_DIAMETER, curvedRadiusPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_KEYRING_DIAMETER, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING, TEXT_KEYRING_SIDES } from "@/lib/textGeometry";
 import { DEFAULT_TEXT_BLOCK_GAP, MAX_TEXT_BLOCK_GAP, MAX_TEXT_BLOCK_LINES, MAX_TEXT_BLOCK_STEP, MIN_TEXT_BLOCK_STEP, TEXT_BLOCK_ALIGNS, textBlockLines, type TextBlockAlign, type TextBlockOptions } from "@/lib/textBlock";
-import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, removeTextLayer, textBaselineKeepShift, textLetterSize, textLetterSizePatch, textSpacingPatch, type NameTagStack } from "@/lib/nameTag";
+import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, removeTextLayer, textBaselineKeepShift, textLetterSize, textLetterSizePatch, textKerningPatch, textSpacingPatch, type NameTagStack } from "@/lib/nameTag";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
@@ -3489,6 +3489,14 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         hint: t("prop.textSpacingHint"),
         onChange: (spacing: number) => onUpdate(textSpacingPatch(shape, spacing)),
       },
+      // Automatic kerning (#1297): pairs such as AY or To move closer; the letters keep their size and the box follows.
+      ...(shape.textVertical ? [] : [{
+        type: "toggle",
+        id: "textKerning",
+        label: t("prop.textKerning"),
+        value: Boolean(shape.textKerning),
+        onChange: (kerning: boolean) => onUpdate(textKerningPatch(shape, kerning)),
+      } satisfies ShapePropertyConfig]),
       // The letters stacked top to bottom (#981). Straight: the box turns upright and the letters keep their size. Curved: the
       // column runs along the circle at its left side, the letters standing upright; the box follows in curvedTextPatch.
       {

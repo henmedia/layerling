@@ -2780,6 +2780,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.textCurved": "En arco",
   "prop.textSpacing": "Espaciado (%)",
   "prop.textSpacingHint": "Espacio entre las letras, además del que ya trae la fuente, en porcentaje del tamaño de letra; por debajo de 0, más juntas. Las letras conservan su tamaño y el cuadro se adapta.",
+  "prop.textKerning": "Interletraje automático",
   "prop.textLetterWidth": "Ancho de letra (%)",
   "prop.textLetterWidthHint": "Qué tan ancha se dibuja cada letra en el arco, en porcentaje de su propio ancho; por debajo de 100, más estrecha; por encima, más ancha. Las letras conservan su altura; el arco y el cuadro se adaptan.",
   "prop.textStretch": "Estirar las letras hasta el marco",

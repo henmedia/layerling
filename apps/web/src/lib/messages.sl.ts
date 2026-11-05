@@ -2061,6 +2061,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.textCurved": "Po loku",
   "prop.textSpacing": "Razmik med črkami (%)",
   "prop.textSpacingHint": "Razmik med črkami poleg razmika pisave, v odstotkih velikosti črk; pod 0 ožje. Črke ohranijo velikost, okvir jim sledi.",
+  "prop.textKerning": "Samodejni kerning",
   "prop.textLetterWidth": "Širina črk (%)",
   "prop.textLetterWidthHint": "Kako široko je vsaka črka narisana na loku, v odstotkih njene lastne širine; pod 100 ožje, nad 100 širše. Črke ohranijo višino, lok in okvir jim sledita.",
   "prop.textStretch": "Raztegni črke na okvir",

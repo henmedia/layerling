@@ -22,7 +22,7 @@ import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
 import { normalizeTextEdge } from "@/lib/textEdge";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, type NameTagKeyring } from "@/lib/textLayers";
-import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
+import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { LID_DEFAULTS, groupedWithMagnets, lidClickBumpsFit, lidHandleFits, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
@@ -11981,6 +11981,8 @@ export function LayerlingEditor({
             if (!Number.isFinite(spacing) || spacing < MIN_TEXT_SPACING || spacing > MAX_TEXT_SPACING) throw new Error(`spacing must be a number from ${MIN_TEXT_SPACING} to ${MAX_TEXT_SPACING} (per cent of the letter size)`);
             Object.assign(patch, textSpacingPatch({ ...target, ...patch } as WorkplaneShape, spacing));
           }
+          // Automatic kerning (#1297): pairs such as AY or To move closer; the letters keep their size and the box follows.
+          if (typeof params.kerning === "boolean") Object.assign(patch, textKerningPatch({ ...target, ...patch } as WorkplaneShape, params.kerning));
           // Curved text (#1196): how wide the letters are drawn, in per cent of their own width; the box follows in curvedTextPatch.
           if (params.letterWidth !== undefined) {
             const letterWidth = Number(params.letterWidth);

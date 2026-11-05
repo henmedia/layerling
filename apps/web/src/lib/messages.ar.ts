@@ -2786,6 +2786,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.textCurved": "على قوس",
   "prop.textSpacing": "تباعد الحروف (%)",
   "prop.textSpacingHint": "مسافة بين الحروف تُضاف إلى مسافة الخط نفسه، بالنسبة المئوية من حجم الحرف؛ وأقل من 0 أضيق. تحتفظ الحروف بحجمها، ويتبعها الصندوق.",
+  "prop.textKerning": "ضبط المسافة بين أزواج الحروف تلقائيًا",
   "prop.textLetterWidth": "عرض الحروف (%)",
   "prop.textLetterWidthHint": "مدى عرض كل حرف على القوس، بالنسبة المئوية من عرضه الأصلي؛ أقل من 100 أضيق، وأكثر منه أعرض. تحتفظ الحروف بارتفاعها، ويتبعها القوس والصندوق.",
   "prop.textStretch": "مط الحروف لتملأ الإطار",

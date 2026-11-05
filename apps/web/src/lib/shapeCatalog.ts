@@ -1103,6 +1103,8 @@ export function makeShapeFromAsset(
     textSize: asset.kind === "text" ? customization.textSize : undefined,
     textInward: asset.kind === "text" ? customization.textInward : undefined,
     textFlipped: asset.kind === "text" ? customization.textFlipped : undefined,
+    // New texts are kerned (#1297); a text saved without the field keeps its spacing.
+    textKerning: asset.kind === "text" ? customization.textKerning ?? true : undefined,
     steps: asset.kind === "box" ? 10 : asset.kind === "sphere" ? customization.steps ?? 24 : asset.kind === "halfSphere" || asset.kind === "paraboloid" ? customization.steps ?? 32 : asset.kind === "torus" ? customization.steps : undefined,
     torusTubeRatio: asset.kind === "torus" ? customization.torusTubeRatio ?? torusTubeRatio({ width, depth, height }) : undefined,
     sides: asset.kind === "cylinder" || asset.kind === "ellipse" || asset.kind === "slot" || asset.kind === "cone" || asset.kind === "curvedCone" || asset.kind === "tube" || asset.kind === "ring" || asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "finishingWasher" || asset.kind === "teardrop" || asset.kind === "torus" ? customization.sides : asset.kind === "roundRoof" ? customization.sides ?? 64 : asset.kind === "pyramid" ? customization.sides ?? 4 : asset.kind === "polygon" ? customization.sides ?? 6 : undefined,

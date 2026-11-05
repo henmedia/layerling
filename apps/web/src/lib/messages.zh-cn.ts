@@ -2729,6 +2729,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "prop.textCurved": "沿圆弧",
   "prop.textSpacing": "字距（%）",
   "prop.textSpacingHint": "在字体自带间距之上额外增加的字母间距，以字母大小的百分比表示；小于 0 则更紧。字母大小不变，外框随之调整。",
+  "prop.textKerning": "自动字距调整",
   "prop.textLetterWidth": "字宽（%）",
   "prop.textLetterWidthHint": "弧线上每个字母的绘制宽度，以其自身宽度的百分比表示；小于 100 更窄，大于 100 更宽。字母高度不变，弧线和外框随之调整。",
   "prop.textStretch": "将字母拉伸到外框",

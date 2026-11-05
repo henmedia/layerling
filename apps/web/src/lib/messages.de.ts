@@ -2777,6 +2777,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.textCurved": "Auf Kreisbogen",
   "prop.textSpacing": "Zeichenabstand (%)",
   "prop.textSpacingHint": "Abstand zwischen den Buchstaben zusätzlich zu dem der Schrift, in Prozent der Buchstabengröße; unter 0 enger. Die Buchstaben behalten ihre Größe, der Rahmen folgt.",
+  "prop.textKerning": "Automatisches Kerning",
   "prop.textLetterWidth": "Buchstabenbreite (%)",
   "prop.textLetterWidthHint": "Wie breit jeder Buchstabe auf dem Bogen gezeichnet wird, in Prozent seiner eigenen Breite; unter 100 schmaler, darüber breiter. Die Buchstaben behalten ihre Höhe, Bogen und Rahmen folgen.",
   "prop.textStretch": "Buchstaben auf den Rahmen strecken",

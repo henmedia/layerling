@@ -28,5 +28,15 @@
       "de": "Eine Gruppe, die in einer Farbe erscheint, gibt diese Farbe jetzt auch in der STEP-Datei an alle ihre Teile weiter, statt dass jedes Teil seine alte Farbe mitnimmt. Ist „Mehrfarbig“ an, behält jedes Teil seine eigene Farbe, so wie du es im Editor siehst.",
       "en": "A group shown in one colour now gives that colour to all its parts in a STEP file too, instead of each part taking along its old colour. With \"Multicolor\" on, each part keeps its own colour, as you see it in the editor."
     }
+  },
+  {
+    "title": {
+      "de": "Automatisches Kerning für Text",
+      "en": "Automatic kerning for text"
+    },
+    "body": {
+      "de": "Buchstabenpaare wie AY, AV, LT oder To stehen nicht mehr mit einer Lücke da: Neue Texte rücken sie von selbst zusammen, in jeder Schrift, auch in eigenen. Bei älteren Texten schaltest du es unter „Mehr“ in den Eigenschaften mit „Automatisches Kerning“ ein. Die Buchstaben behalten ihre Größe.",
+      "en": "Pairs of letters such as AY, AV, LT or To no longer stand with a gap between them: new texts move them closer by themselves, in every font, your own too. For older texts, switch on \"Automatic kerning\" under \"More\" in the properties. The letters keep their size."
+    }
   }
 ]

@@ -2778,6 +2778,7 @@ export const MESSAGES_EN = {
   "prop.textCurved": "On arc",
   "prop.textSpacing": "Letter spacing (%)",
   "prop.textSpacingHint": "Space between the letters on top of the font's own, in per cent of the letter size; below 0 tighter. The letters keep their size, the box follows.",
+  "prop.textKerning": "Automatic kerning",
   "prop.textLetterWidth": "Letter width (%)",
   "prop.textLetterWidthHint": "How wide each letter is drawn on the arc, in per cent of its own width; below 100 narrower, above wider. The letters keep their height, the arc and the box follow.",
   "prop.textStretch": "Stretch letters to the frame",
