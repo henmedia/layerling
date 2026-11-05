@@ -110,6 +110,8 @@ export type LayerlingMcpCommandName =
   | "mate_faces"
   | "open_group"
   | "close_group"
+  | "add_to_group"
+  | "take_out_of_group"
   | "group_objects"
   | "ungroup_objects"
   | "intersect_objects"

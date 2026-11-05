@@ -100,6 +100,8 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_mate_faces` | brengt een vlak van het ene object tegen een vlak van een ander, vlak tegen vlak of gelijk |
 | `layerling_open_group` | opent een groep zodat de onderdelen een voor een kunnen worden gewijzigd, ook een groep binnen een geopende groep |
 | `layerling_close_group` | sluit hem weer ("Klaar") of annuleert |
+| `layerling_add_to_group` | legt losse objecten in een groep zonder die te openen |
+| `layerling_take_out_of_group` | haalt één deel uit een groep zonder die te openen |
 | `layerling_group_objects` | groepeert objecten |
 | `layerling_ungroup_objects` | heft groepen op |
 | `layerling_boolean_cut` | snijdt lichamen met gaten |

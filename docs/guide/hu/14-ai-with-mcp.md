@@ -100,6 +100,8 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_mate_faces` | egy objektum lapját egy másik lapjához illeszti, laptól lapig vagy egy síkba |
 | `layerling_open_group` | megnyit egy csoportot, hogy a részei egyenként módosíthatók legyenek, egy nyitott csoporton belüli csoportot is |
 | `layerling_close_group` | újra bezárja („Kész”) vagy megszakítja |
+| `layerling_add_to_group` | különálló objektumokat tesz egy csoportba annak megnyitása nélkül |
+| `layerling_take_out_of_group` | egy részt kivesz egy csoportból annak megnyitása nélkül |
 | `layerling_group_objects` | objektumokat csoportosít |
 | `layerling_ungroup_objects` | csoportokat bont fel |
 | `layerling_boolean_cut` | tömör testeket vág lyukakkal |

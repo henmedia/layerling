@@ -37,10 +37,17 @@ export interface ObjectListPanelProps {
   onOpenGroupPart?: (groupId: string, partId: string) => void;
   /** Moves a shape in front of another one, or to the end when `beforeId` is null (#1233). */
   onMoveShape?: (id: string, beforeId: string | null) => void;
+  /** Puts loose shapes into a group, dropped on it while it is expanded (Discussion #1338). */
+  onAddToGroup?: (shapeIds: string[], groupId: string, joinPreviousStep?: boolean) => Promise<unknown> | void;
+  /** Takes a part out of an expanded group, in front of `beforeId` (null: last); `partIds` names it loose (#1338). */
+  onTakeOutOfGroup?: (groupId: string, partId: string, beforeId: string | null) => Promise<{ ok: boolean; partIds?: string[] }>;
   /** The loose parts of the innermost group being edited; only groups among them can be edited next. */
   openGroupPartIds?: string[];
   onClose: () => void;
 }
+
+/** Where a dragged row would land: in front of a shape (null: last), or into an expanded group. */
+type DropTarget = { before: string | null } | { into: string };
 
 const COLLAPSED_STORAGE_KEY = "layerling.editor.objectListCollapsed";
 const ORDER_STORAGE_KEY = "layerling.editor.objectListOrder";
@@ -62,6 +69,8 @@ export function ObjectListPanel({
   onOpenGroup,
   onOpenGroupPart,
   onMoveShape,
+  onAddToGroup,
+  onTakeOutOfGroup,
   openGroupPartIds,
   onClose,
 }: ObjectListPanelProps) {
@@ -200,39 +209,75 @@ export function ObjectListPanel({
   // The handle on each row puts a shape elsewhere in the design's own order; a sorted or filtered list has no such order to change.
   const canReorder = Boolean(onMoveShape) && order === "added" && !query && listedShapes.length > 1;
   const [draggedId, setDraggedId] = useState<string | null>(null);
-  // The shape the dragged one would go in front of; null is the end of the list, undefined none yet.
-  const [dropBeforeId, setDropBeforeId] = useState<string | null | undefined>(undefined);
-  // The same id as a ref, so a quick press and release still finds it before the next render.
-  const draggedRef = useRef<string | null>(null);
+  // The group a dragged part comes from: dropped back on it, it stays where it is.
+  const [draggedFrom, setDraggedFrom] = useState<string | undefined>(undefined);
+  // Where the dragged one would go: in front of a shape (null is the end of the list) or into an expanded group.
+  const [dropTarget, setDropTarget] = useState<DropTarget | undefined>(undefined);
+  const dropBeforeId = dropTarget && "before" in dropTarget ? dropTarget.before : undefined;
+  const dropIntoId = dropTarget && "into" in dropTarget ? dropTarget.into : undefined;
+  // The same as a ref, so a quick press and release still finds it before the next render; `fromGroup` for a group's part.
+  const draggedRef = useRef<{ id: string; fromGroup?: string } | null>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  const dropTargetAt = (clientY: number): string | null => {
+  /**
+   * The upper half of a row's own line puts the dragged shape in front of it; below that, an expanded group
+   * takes it in, down to its last part (Discussion #1338).
+   */
+  const dropTargetAt = (clientY: number): DropTarget => {
     const rows = Array.from(listRef.current?.querySelectorAll<HTMLElement>(":scope > li[data-shape-id]") ?? []);
-    const row = rows.find((candidate) => {
-      const box = candidate.getBoundingClientRect();
-      return clientY < box.top + box.height / 2;
-    });
-    return row?.dataset.shapeId ?? null;
+    for (const row of rows) {
+      const line = (row.querySelector<HTMLElement>(":scope > .outliner-row-main") ?? row).getBoundingClientRect();
+      if (clientY < line.top + line.height / 2) return { before: row.dataset.shapeId ?? null };
+      if (row.dataset.takesParts && clientY < row.getBoundingClientRect().bottom) return { into: row.dataset.shapeId ?? "" };
+    }
+    return { before: null };
   };
 
-  const startDrag = (id: string, e: PointerEvent<HTMLElement>) => {
+  const startDrag = (id: string, e: PointerEvent<HTMLElement>, fromGroup?: string) => {
     if (e.button !== 0) return;
     e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
-    draggedRef.current = id;
+    draggedRef.current = { id, fromGroup };
     setDraggedId(id);
-    setDropBeforeId(undefined);
+    setDraggedFrom(fromGroup);
+    setDropTarget(undefined);
   };
 
   const moveDrag = (e: PointerEvent<HTMLElement>) => {
-    if (draggedRef.current) setDropBeforeId(dropTargetAt(e.clientY));
+    if (draggedRef.current) setDropTarget(dropTargetAt(e.clientY));
   };
 
   const endDrag = (e: PointerEvent<HTMLElement>, drop: boolean) => {
-    if (draggedRef.current && drop) onMoveShape?.(draggedRef.current, dropTargetAt(e.clientY));
+    const dragged = draggedRef.current;
     draggedRef.current = null;
     setDraggedId(null);
-    setDropBeforeId(undefined);
+    setDraggedFrom(undefined);
+    setDropTarget(undefined);
+    if (!dragged || !drop) return;
+    const target = dropTargetAt(e.clientY);
+    const { id, fromGroup } = dragged;
+    if (!fromGroup) {
+      if ("into" in target) {
+        if (target.into !== id) void onAddToGroup?.([id], target.into);
+      } else {
+        onMoveShape?.(id, target.before);
+      }
+      return;
+    }
+    // A part dropped back on its own group stays in it.
+    if ("into" in target && target.into === fromGroup) return;
+    if (!onTakeOutOfGroup) return;
+    if ("before" in target) {
+      void onTakeOutOfGroup(fromGroup, id, target.before);
+      return;
+    }
+    // Onto another expanded group: out of the one, into the other.
+    const into = target.into;
+    void onTakeOutOfGroup(fromGroup, id, into).then((outcome) => {
+      const loose = outcome.ok ? outcome.partIds?.[0] : undefined;
+      // One step to undo for the whole move.
+      if (loose) return onAddToGroup?.([loose], into, true);
+    });
   };
 
   /** Arrow keys on a focused handle move the shape one place. */
@@ -259,10 +304,12 @@ export function ObjectListPanel({
       // A part of a group in the list opens the group with that part selected (Discussion #1316); Done puts it back.
       const openPart = group && onOpenGroupPart && child.id ? () => onOpenGroupPart(group.id, child.id) : undefined;
       const openTitle = group ? t(group.groupOperation === "bundle" ? "group.editBundle" : "group.edit") : undefined;
+      // A part of an editable group has a handle too: dragged out, it lies loose again (Discussion #1338).
+      const canTakeOut = Boolean(group && order === "added" && !query && onTakeOutOfGroup && child.id && !depth && !openParts.size && !group.shapeLocked);
       const row = (
         <li
           key={child.id || `${depth}-${index}`}
-          className={`outliner-child-item ${openPart ? "opens-group" : ""}`}
+          className={`outliner-child-item ${openPart ? "opens-group" : ""} ${draggedId && draggedId === child.id ? "dragging" : ""}`}
           style={depth ? { paddingLeft: depth * 14 } : undefined}
           {...(openPart ? {
             role: "button",
@@ -278,6 +325,23 @@ export function ObjectListPanel({
             },
           } : {})}
         >
+          {canTakeOut && group ? (
+            <button
+              type="button"
+              className="outliner-drag-handle"
+              title={t("outliner.takeOutOfGroup")}
+              aria-label={t("outliner.takeOutOfGroup")}
+              data-testid="outliner-part-handle"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+              onPointerDown={(e) => startDrag(child.id, e, group.id)}
+              onPointerMove={moveDrag}
+              onPointerUp={(e) => endDrag(e, true)}
+              onPointerCancel={(e) => endDrag(e, false)}
+            >
+              <GripVertical size={12} />
+            </button>
+          ) : null}
           <span
             className={`outliner-swatch small ${child.hole ? "swatch-hole" : ""}`}
             style={{ backgroundColor: child.hole ? undefined : child.color }}
@@ -384,12 +448,15 @@ export function ObjectListPanel({
                   : Boolean(expandedGroups[shape.id]);
                 const displayName = getShapeDisplayName(shape);
                 const subtitle = getShapeKindSubtitle(shape);
+                // An expanded group takes in a shape dropped on its parts (Discussion #1338); a collapsed one is only a place in the order.
+                const takesParts = isGroup && isExpanded && canReorder && Boolean(onAddToGroup) && !openParts.size && !shape.locked && !shape.shapeLocked;
 
                 return (
                   <li
                     key={shape.id}
                     data-shape-id={shape.id}
-                    className={`outliner-item ${draggedId === shape.id ? "dragging" : ""} ${draggedId && dropBeforeId === shape.id ? "drop-before" : ""} ${draggedId && dropBeforeId === null && shape.id === listedShapes[listedShapes.length - 1].id ? "drop-after" : ""} ${isSelected ? "selected" : ""} ${shape.hidden ? "hidden-shape" : ""} ${shape.locked ? "locked-shape" : ""} ${openParts.has(shape.id) ? "open-group-part" : ""}`}
+                    data-takes-parts={takesParts ? "true" : undefined}
+                    className={`outliner-item ${draggedId === shape.id ? "dragging" : ""} ${draggedId && dropIntoId === shape.id && draggedId !== shape.id && draggedFrom !== shape.id ? "drop-into" : ""} ${draggedId && dropBeforeId === shape.id ? "drop-before" : ""} ${draggedId && dropBeforeId === null && shape.id === listedShapes[listedShapes.length - 1].id ? "drop-after" : ""} ${isSelected ? "selected" : ""} ${shape.hidden ? "hidden-shape" : ""} ${shape.locked ? "locked-shape" : ""} ${openParts.has(shape.id) ? "open-group-part" : ""}`}
                     role="option"
                     aria-selected={isSelected}
                     onMouseDown={(e) => {

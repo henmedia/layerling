@@ -104,6 +104,8 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_mate_faces` | 把一个对象的面贴到另一个对象的面，可面对面或齐平 |
 | `layerling_open_group` | 打开分组，以便逐个修改其部件，打开的分组内也可再打开分组 |
 | `layerling_close_group` | 再次关闭分组（“完成”）或取消 |
+| `layerling_add_to_group` | 不打开组就把单独的对象放进组里 |
+| `layerling_take_out_of_group` | 不打开组就从组中取出一个部件 |
 | `layerling_group_objects` | 对对象分组 |
 | `layerling_ungroup_objects` | 解散分组 |
 | `layerling_boolean_cut` | 用孔切割实体 |

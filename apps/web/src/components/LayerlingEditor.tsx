@@ -10667,6 +10667,41 @@ export function LayerlingEditor({
     return { ok: true, message, groupId: session.original.id };
   }, [commitOpenGroupTransition, refuseOpenGroupStep]);
 
+  /**
+   * A group built again from these parts, as Done builds an opened one: the same group, not a new one - its id stays,
+   * so anything holding it (MCP, the object list, the level around it) still finds it, with its name, see-through,
+   * hidden, solid or hole, its own colour and its pivot (#807). Adding to or taking from it in the list does the same (#1338).
+   */
+  const rebuildGroupFromParts = useCallback(async (original: WorkplaneShape, parts: WorkplaneShape[]): Promise<{ group: WorkplaneShape; mergeWarning: string } | { group: null; failure: string }> => {
+    const operation = original.groupOperation === "intersection" || original.groupOperation === "hull" || original.groupOperation === "bundle" || original.groupOperation === "loft" ? original.groupOperation : "group";
+    const result = operation === "intersection"
+      ? await buildIntersectionShapeFromSelection(parts, workspaceSettingsRef.current.booleanTriangleLimit)
+      : operation === "hull"
+        ? await buildHullShapeFromSelection(parts, workspaceSettingsRef.current.booleanTriangleLimit)
+        : operation === "loft"
+        ? await buildSketchLoftFromSelection(parts)
+        : operation === "bundle"
+        ? { group: groupedShape(parts) }
+        : await buildGroupedShapeOffThread(parts, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+    if (!result.group) {
+      return { group: null, failure: "failureNotice" in result && result.failureNotice ? result.failureNotice : t("status.groupChanged") };
+    }
+    // Its colour stays if it had been given one apart from its first part.
+    const firstSolid = original.groupedShapes?.find((child) => !child.hole) ?? original.groupedShapes?.[0];
+    const ownColour = Boolean(firstSolid && firstSolid.color !== original.color);
+    const rebuilt = canonicalizeShape({ ...result.group, groupOperation: operation });
+    const group = canonicalizeShape(carryShapePivot(original, withHoleMode({
+      ...rebuilt,
+      id: original.id,
+      name: original.name,
+      color: ownColour ? original.color : rebuilt.color,
+      transparent: original.transparent,
+      hidden: original.hidden,
+    }, Boolean(original.hole))));
+    const mergeWarning = "mergeWarning" in result && typeof result.mergeWarning === "string" ? result.mergeWarning : "";
+    return { group, mergeWarning };
+  }, []);
+
   const finishOpenGroup = useCallback(async (): Promise<OpenGroupOutcome> => {
     const levels = openGroupsRef.current;
     const session = levels.at(-1);
@@ -10700,16 +10735,7 @@ export function LayerlingEditor({
     openGroupBusyRef.current = true;
     setOpenGroupBusy(true);
     try {
-      const operation = original.groupOperation === "intersection" || original.groupOperation === "hull" || original.groupOperation === "bundle" || original.groupOperation === "loft" ? original.groupOperation : "group";
-      const result = operation === "intersection"
-        ? await buildIntersectionShapeFromSelection(parts, workspaceSettingsRef.current.booleanTriangleLimit)
-        : operation === "hull"
-          ? await buildHullShapeFromSelection(parts, workspaceSettingsRef.current.booleanTriangleLimit)
-          : operation === "loft"
-          ? await buildSketchLoftFromSelection(parts)
-          : operation === "bundle"
-          ? { group: groupedShape(parts) }
-          : await buildGroupedShapeOffThread(parts, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+      const result = await rebuildGroupFromParts(original, parts);
       if (
         projectInfoRef.current.projectId !== sourceProjectId ||
         projectShapesFingerprint(shapesRef.current) !== sourceFingerprint ||
@@ -10717,28 +10743,10 @@ export function LayerlingEditor({
       ) {
         return refuseOpenGroupStep(t("status.groupChanged"));
       }
-      if (!result.group) {
-        return refuseOpenGroupStep("failureNotice" in result && result.failureNotice ? result.failureNotice : t("status.groupChanged"));
-      }
-      // The group keeps what was its own: name, solid or hole, see-through, hidden -
-      // and its colour, if it had been given one apart from its first part.
-      const firstSolid = original.groupedShapes?.find((child) => !child.hole) ?? original.groupedShapes?.[0];
-      const ownColour = Boolean(firstSolid && firstSolid.color !== original.color);
-      const rebuilt = canonicalizeShape({ ...result.group, groupOperation: operation });
-      // The same group, not a new one: its id stays, so anything holding that id
-      // (MCP, the object list, the level around it) still finds it.
-      // Its own pivot stays on the same spot, however the parts moved while it was open (#807).
-      const regrouped = canonicalizeShape(carryShapePivot(original, withHoleMode({
-        ...rebuilt,
-        id: original.id,
-        name: original.name,
-        color: ownColour ? original.color : rebuilt.color,
-        transparent: original.transparent,
-        hidden: original.hidden,
-      }, Boolean(original.hole))));
+      if (!result.group) return refuseOpenGroupStep(result.failure);
+      const regrouped = result.group;
       const partIds = new Set(parts.map((shape) => shape.id));
-      const mergeWarning = "mergeWarning" in result && typeof result.mergeWarning === "string" ? result.mergeWarning : "";
-      const message = mergeWarning || t("status.groupClosed", { name: displayShapeName(regrouped) });
+      const message = result.mergeWarning || t("status.groupClosed", { name: displayShapeName(regrouped) });
       commitOpenGroupTransition(
         openGroupsRef.current.slice(0, -1),
         [...shapesRef.current.filter((shape) => !partIds.has(shape.id)), regrouped],
@@ -10750,7 +10758,117 @@ export function LayerlingEditor({
       openGroupBusyRef.current = false;
       setOpenGroupBusy(false);
     }
-  }, [commitNotes, commitOpenGroupTransition, endOpenGroupLevelsWithoutStep, refuseOpenGroupStep]);
+  }, [commitNotes, commitOpenGroupTransition, endOpenGroupLevelsWithoutStep, refuseOpenGroupStep, rebuildGroupFromParts]);
+
+  /** Why a part cannot go into or out of a group from the object list right now, or null (Discussion #1338). */
+  const groupPartsStepRefused = useCallback((): string | null => {
+    if (historyViewStateRef.current) return t("status.historyViewBlocksEdits");
+    if (openGroupBusyRef.current) return t("group.busy");
+    const open = openGroupsRef.current.at(-1);
+    return open ? t("group.finishOpenFirst", { name: displayShapeName(open.original) }) : null;
+  }, []);
+
+  /**
+   * Commits a part put into or taken out of a group, or says why not: a group holding a part of locked shape keeps
+   * its size (#1277), and the commit would refuse it without a word to the caller. `amendNewest` joins the step before.
+   */
+  const commitGroupPartsStep = useCallback((next: WorkplaneShape[], selection: string, message: string, amendNewest = false): string | null => {
+    const held = shapeLockBroken(shapesRef.current, next.map(canonicalizeShape));
+    if (held) return t("status.shapeLockHeld", { name: displayShapeName(held) });
+    commitShapes(next, selection, message, undefined, amendNewest);
+    return shapesRef.current.some((shape) => shape.id === selection) ? null : t("status.groupChanged");
+  }, [commitShapes]);
+
+  /**
+   * Loose shapes dragged onto an expanded group in the object list go into it (Discussion #1338): the group is built
+   * again with them, as Done builds an opened one, so it keeps its id, name and pivot, and the parts keep theirs.
+   */
+  const addShapesToGroup = useCallback(async (shapeIds: string[], groupId: string, amendNewest = false): Promise<OpenGroupOutcome> => {
+    const refused = groupPartsStepRefused();
+    if (refused) return refuseOpenGroupStep(refused);
+    const group = shapesRef.current.find((shape) => shape.id === groupId);
+    if (!group?.groupedShapes?.length) return refuseOpenGroupStep(t("status.selectGroupFirst"));
+    if (groupHeld(group)) return refuseOpenGroupStep(t("status.objectLocked"));
+    const wanted = new Set(shapeIds.filter((id) => id !== groupId));
+    const added = shapesRef.current.filter((shape) => wanted.has(shape.id));
+    if (!added.length || added.length !== wanted.size) return refuseOpenGroupStep(t("status.selectShapeFirst"));
+    // A part of locked shape may join a group, as it may be grouped; a locked one stays where it is.
+    if (added.some((shape) => shape.locked)) return refuseOpenGroupStep(t("status.objectLocked"));
+    if (added.some((shape) => isNonSolidShape(shape))) return refuseOpenGroupStep(t("status.rulerNotSolid"));
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    openGroupBusyRef.current = true;
+    setOpenGroupBusy(true);
+    try {
+      const result = await rebuildGroupFromParts(group, [...restoreGroupedChildren(group), ...added]);
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
+        return refuseOpenGroupStep(t("status.groupChanged"));
+      }
+      if (!result.group) return refuseOpenGroupStep(result.failure);
+      const regrouped = result.group;
+      const message = result.mergeWarning || (added.length === 1
+        ? t("status.addedToGroup", { name: displayShapeName(added[0]), group: displayShapeName(regrouped) })
+        : t("status.addedManyToGroup", { count: added.length, group: displayShapeName(regrouped) }));
+      // The group stays where it stood in the list.
+      const held = commitGroupPartsStep(
+        shapesRef.current.filter((shape) => !wanted.has(shape.id)).map((shape) => (shape.id === group.id ? regrouped : shape)),
+        regrouped.id,
+        message,
+        amendNewest,
+      );
+      if (held) return refuseOpenGroupStep(held);
+      return { ok: true, message, groupId: regrouped.id };
+    } finally {
+      openGroupBusyRef.current = false;
+      setOpenGroupBusy(false);
+    }
+  }, [commitGroupPartsStep, groupPartsStepRefused, rebuildGroupFromParts, refuseOpenGroupStep]);
+
+  /**
+   * One part dragged out of an expanded group in the object list (Discussion #1338) lies loose again where it was,
+   * in front of `beforeId` (null: last); the group is built again without it. A group left with one part is that part.
+   */
+  const takePartOutOfGroup = useCallback(async (groupId: string, partId: string, beforeId: string | null): Promise<OpenGroupOutcome> => {
+    const refused = groupPartsStepRefused();
+    if (refused) return refuseOpenGroupStep(refused);
+    const group = shapesRef.current.find((shape) => shape.id === groupId);
+    if (!group?.groupedShapes?.length) return refuseOpenGroupStep(t("status.selectGroupFirst"));
+    if (groupHeld(group)) return refuseOpenGroupStep(t("status.objectLocked"));
+    const index = group.groupedShapes.findIndex((part) => part.id === partId);
+    if (index < 0) return refuseOpenGroupStep(t("status.groupChanged"));
+    const parts = restoreGroupedChildren(group);
+    const taken = parts[index];
+    const rest = parts.filter((_, at) => at !== index);
+    // A group left with one part is that part, under another id: in front of the group is in front of it.
+    const before = beforeId === group.id && rest.length < 2 ? (rest[0]?.id ?? null) : beforeId;
+    const place = (list: WorkplaneShape[]) => [...moveShapeBefore([...list, taken], taken.id, before)];
+    const message = t("status.takenOutOfGroup", { name: displayShapeName(taken), group: displayShapeName(group) });
+    if (rest.length < 2) {
+      // Nothing left to group: the other part takes the group's place.
+      const left = rest[0];
+      const held = commitGroupPartsStep(place(shapesRef.current.flatMap((shape) => (shape.id === group.id ? (left ? [left] : []) : [shape]))), taken.id, `${message} ${t("status.groupOnePartLeft")}`);
+      if (held) return refuseOpenGroupStep(held);
+      return { ok: true, message, partIds: left ? [taken.id, left.id] : [taken.id] };
+    }
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    openGroupBusyRef.current = true;
+    setOpenGroupBusy(true);
+    try {
+      const result = await rebuildGroupFromParts(group, rest);
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
+        return refuseOpenGroupStep(t("status.groupChanged"));
+      }
+      if (!result.group) return refuseOpenGroupStep(result.failure);
+      const regrouped = result.group;
+      const held = commitGroupPartsStep(place(shapesRef.current.map((shape) => (shape.id === group.id ? regrouped : shape))), taken.id, result.mergeWarning || message);
+      if (held) return refuseOpenGroupStep(held);
+      return { ok: true, message, partIds: [taken.id], groupId: regrouped.id };
+    } finally {
+      openGroupBusyRef.current = false;
+      setOpenGroupBusy(false);
+    }
+  }, [commitGroupPartsStep, groupPartsStepRefused, rebuildGroupFromParts, refuseOpenGroupStep]);
 
   // Undo past an opening brings that group back, and deleting every part leaves
   // nothing to close: in both cases that level is over, with every level inside it.
@@ -12148,6 +12266,27 @@ export function LayerlingEditor({
         if (!outcome.ok) throw new Error(outcome.message);
         const group = outcome.groupId ? findShape(outcome.groupId) : null;
         return { message: outcome.message, object: group ? mcpShapeSummary(group) : null, partIds: outcome.partIds ?? [] };
+      }
+
+      if (command.action === "add_to_group") {
+        if (typeof params.groupId !== "string") throw new Error("add_to_group needs groupId");
+        const ids = mcpStringArray(params.ids);
+        if (!ids.length) throw new Error("add_to_group needs the ids of the objects to put into the group");
+        const outcome = await addShapesToGroup(ids, params.groupId);
+        if (!outcome.ok) throw new Error(outcome.message);
+        const group = outcome.groupId ? findShape(outcome.groupId) : null;
+        return { message: outcome.message, object: group ? mcpShapeSummary(group) : null };
+      }
+
+      if (command.action === "take_out_of_group") {
+        if (typeof params.groupId !== "string" || typeof params.partId !== "string") throw new Error("take_out_of_group needs groupId and partId");
+        const outcome = await takePartOutOfGroup(params.groupId, params.partId, typeof params.beforeId === "string" ? params.beforeId : null);
+        if (!outcome.ok) throw new Error(outcome.message);
+        const part = outcome.partIds?.[0] ? findShape(outcome.partIds[0]) : null;
+        const group = outcome.groupId ? findShape(outcome.groupId) : null;
+        // A group left with one part is gone: that part comes back in its place.
+        const left = !group && outcome.partIds?.[1] ? findShape(outcome.partIds[1]) : null;
+        return { message: outcome.message, object: part ? mcpShapeSummary(part) : null, group: group ? mcpShapeSummary(group) : null, ...(left ? { remainingPart: mcpShapeSummary(left) } : {}) };
       }
 
       if (command.action === "mate_faces") {
@@ -14388,6 +14527,8 @@ export function LayerlingEditor({
     cancelOpenGroup,
     commitShapes,
     moveShapeInList,
+    addShapesToGroup,
+    takePartOutOfGroup,
     finishOpenGroup,
     initialSnap,
     openGroupForEditing,
@@ -16610,6 +16751,8 @@ export function LayerlingEditor({
             onToggleHidden={toggleShapeHiddenById}
             onRenameShape={renameShapeById}
             onMoveShape={moveShapeInList}
+            onAddToGroup={addShapesToGroup}
+            onTakeOutOfGroup={takePartOutOfGroup}
             onOpenGroup={openGroupForEditing}
             onOpenGroupPart={openGroupPartForEditing}
             openGroupPartIds={openGroup?.childIds}

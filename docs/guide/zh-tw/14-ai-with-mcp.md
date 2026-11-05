@@ -104,6 +104,8 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_mate_faces` | 把一個物件的面貼到另一個物件的面，可面對面或齊平 |
 | `layerling_open_group` | 開啟群組，以便逐一修改其中的部件，開啟中的群組內還能再開啟群組 |
 | `layerling_close_group` | 再次關閉群組（「完成」）或取消 |
+| `layerling_add_to_group` | 不開啟群組就把單獨的物件放進群組 |
+| `layerling_take_out_of_group` | 不開啟群組就從群組取出一個零件 |
 | `layerling_group_objects` | 群組物件 |
 | `layerling_ungroup_objects` | 取消群組 |
 | `layerling_boolean_cut` | 用孔切割實體 |

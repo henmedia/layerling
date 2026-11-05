@@ -100,6 +100,8 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_mate_faces` | amène la face d'un objet contre la face d'un autre, face à face ou à fleur |
 | `layerling_open_group` | ouvre un groupe pour que ses parties puissent être modifiées une par une, également un groupe à l'intérieur d'un groupe ouvert |
 | `layerling_close_group` | le referme ("Terminé") ou annule |
+| `layerling_add_to_group` | met des objets libres dans un groupe sans l'ouvrir |
+| `layerling_take_out_of_group` | sort une pièce d'un groupe sans l'ouvrir |
 | `layerling_group_objects` | groupes d'objets |
 | `layerling_ungroup_objects` | dissout les groupes |
 | `layerling_boolean_cut` | coupe les solides avec des trous |

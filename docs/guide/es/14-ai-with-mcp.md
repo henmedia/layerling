@@ -104,6 +104,8 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_mate_faces` | lleva una cara de un objeto contra una cara de otro, cara contra cara o a ras, o pone dos caras redondas en un mismo eje |
 | `layerling_open_group` | abre un grupo para poder cambiar sus piezas una a una, también un grupo dentro de otro abierto |
 | `layerling_close_group` | lo vuelve a cerrar («Listo») o cancela |
+| `layerling_add_to_group` | mete objetos sueltos en un grupo sin abrirlo |
+| `layerling_take_out_of_group` | saca una pieza de un grupo sin abrirlo |
 | `layerling_group_objects` | agrupa objetos |
 | `layerling_ungroup_objects` | desagrupa grupos |
 | `layerling_boolean_cut` | corta sólidos con orificios |

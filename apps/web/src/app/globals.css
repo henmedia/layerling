@@ -14704,6 +14704,19 @@ html[data-theme="dark"] .theme-check {
   box-shadow: inset 0 -2px 0 #d9832b;
 }
 
+/* An expanded group that takes in the dragged shape (Discussion #1338). */
+.outliner-item.drop-into {
+  box-shadow: inset 0 0 0 2px #d9832b;
+}
+
+.outliner-child-item .outliner-drag-handle {
+  margin-left: -4px;
+}
+
+.outliner-child-item.dragging {
+  opacity: 0.5;
+}
+
 .outliner-expand-spacer {
   width: 18px;
   flex: none;

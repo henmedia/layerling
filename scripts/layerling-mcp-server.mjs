@@ -130,6 +130,10 @@ async function callTool(name, args) {
       return bridgeCommand("open_group", args);
     case "layerling_close_group":
       return bridgeCommand("close_group", args, 45000);
+    case "layerling_add_to_group":
+      return bridgeCommand("add_to_group", args, 45000);
+    case "layerling_take_out_of_group":
+      return bridgeCommand("take_out_of_group", args, 45000);
     case "layerling_group_objects":
       return bridgeCommand("group_objects", args, 30000);
     case "layerling_intersect_objects":

@@ -100,6 +100,8 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_mate_faces` | přiloží plochy dvou objektů proti sobě nebo do společné roviny |
 | `layerling_open_group` | otevře sloučený celek k úpravě částí, i uvnitř jiného otevřeného celku |
 | `layerling_close_group` | potvrdí úpravu celku nebo ji zruší |
+| `layerling_add_to_group` | vloží samostatné objekty do skupiny, aniž by ji otevřel |
+| `layerling_take_out_of_group` | vyjme jeden díl ze skupiny, aniž by ji otevřel |
 | `layerling_group_objects` | sloučí objekty |
 | `layerling_ungroup_objects` | rozloží sloučení |
 | `layerling_boolean_cut` | odečte výřezy od plných těles |

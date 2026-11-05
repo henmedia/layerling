@@ -104,6 +104,8 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_mate_faces` | تضع وجه جسم مقابل وجه جسم آخر، وجهًا لوجه أو على استواء واحد، أو تضع وجهين دائريين على محور واحد |
 | `layerling_open_group` | تفتح مجموعة حتى يمكن تغيير أجزائها واحدًا واحدًا، وكذلك مجموعة داخل مجموعة مفتوحة |
 | `layerling_close_group` | تغلقها مجددًا ("تم") أو تلغي |
+| `layerling_add_to_group` | يضع كائنات منفردة في مجموعة دون فتحها |
+| `layerling_take_out_of_group` | يُخرج جزءًا واحدًا من مجموعة دون فتحها |
 | `layerling_group_objects` | تجمّع أجسامًا |
 | `layerling_ungroup_objects` | تفكّ المجموعات |
 | `layerling_boolean_cut` | تقطع الأجسام الصلبة بالثقوب |

@@ -100,6 +100,8 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_mate_faces` | položi ploskev enega objekta na ploskev drugega, drugo proti drugemu ali poravnano |
 | `layerling_open_group` | odpre skupino, da so njeni deli posamezno spremenljivi, tudi skupino v odprti |
 | `layerling_close_group` | jo spet zapre (»Končano«) ali prekine |
+| `layerling_add_to_group` | doda samostojne predmete v skupino, ne da bi jo odprl |
+| `layerling_take_out_of_group` | vzame en del iz skupine, ne da bi jo odprl |
 | `layerling_group_objects` | združi objekte v skupino |
 | `layerling_ungroup_objects` | razpusti skupine |
 | `layerling_boolean_cut` | reže telesa z luknjami |

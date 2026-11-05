@@ -104,6 +104,8 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_mate_faces` | brings a face of one object against a face of another, face to face or flush, or puts two round faces on one axis |
 | `layerling_open_group` | opens a group so its parts can be changed one by one, also a group inside an open one |
 | `layerling_close_group` | closes it again ("Done") or cancels |
+| `layerling_add_to_group` | puts loose objects into a group without opening it |
+| `layerling_take_out_of_group` | takes one part out of a group without opening it |
 | `layerling_group_objects` | groups objects |
 | `layerling_ungroup_objects` | dissolves groups |
 | `layerling_boolean_cut` | cuts solids with holes |

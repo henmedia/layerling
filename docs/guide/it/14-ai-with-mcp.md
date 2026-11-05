@@ -104,6 +104,8 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_mate_faces` | Accosta una faccia di un oggetto a quella di un altro, facendole combaciare o allineandole a filo. |
 | `layerling_open_group` | Apre un gruppo per modificare le parti singolarmente, anche se si trova dentro un altro gruppo già aperto. |
 | `layerling_close_group` | Chiude il gruppo (con «Fine») oppure annulla l’operazione. |
+| `layerling_add_to_group` | mette oggetti sciolti in un gruppo senza aprirlo |
+| `layerling_take_out_of_group` | toglie una parte da un gruppo senza aprirlo |
 | `layerling_group_objects` | Raggruppa gli oggetti. |
 | `layerling_ungroup_objects` | Scioglie i gruppi. |
 | `layerling_boolean_cut` | Sottrae i fori dai solidi. |

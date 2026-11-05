@@ -104,6 +104,8 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_mate_faces` | bringer en flade på et objekt mod en flade på et andet, flade mod flade eller flugtende, eller lægger to runde flader på én akse |
 | `layerling_open_group` | åbner en gruppe så dens dele kan ændres én ad gangen, også en gruppe inden i en åben |
 | `layerling_close_group` | lukker den igen ("Udført") eller annullerer |
+| `layerling_add_to_group` | lægger løse objekter i en gruppe uden at åbne den |
+| `layerling_take_out_of_group` | tager én del ud af en gruppe uden at åbne den |
 | `layerling_group_objects` | grupperer objekter |
 | `layerling_ungroup_objects` | opløser grupper |
 | `layerling_boolean_cut` | skærer solider med huller |

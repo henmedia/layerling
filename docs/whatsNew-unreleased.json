@@ -21,6 +21,16 @@
   },
   {
     "title": {
+      "de": "Formen in eine Gruppe ziehen",
+      "en": "Drag shapes into a group"
+    },
+    "body": {
+      "de": "In der Objektliste lässt sich eine Form jetzt an ihrem Griff auf eine aufgeklappte Gruppe ziehen und kommt in diese Gruppe, ohne dass Form oder Gruppe ihren Namen verlieren. Umgekehrt zieht man ein Teil an seinem Griff wieder aus der Gruppe heraus.",
+      "en": "In the object list, a shape dragged by its handle onto a folded-open group now goes into that group, and neither the shape nor the group loses its name. The other way round, a part dragged by its handle out of the group lies loose again."
+    }
+  },
+  {
+    "title": {
       "de": "„Schrift (angeheftet)“ bleibt um die Zacken eines Sterns aufrecht",
       "en": "\"Text (stuck on)\" stays upright round a star's points"
     },

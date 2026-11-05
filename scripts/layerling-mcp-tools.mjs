@@ -809,6 +809,33 @@ export const tools = [
     },
   },
   {
+    name: "layerling_add_to_group",
+    description: "Put loose objects into an existing group without opening it, like dragging them onto an expanded group in the object list (Discussion #1338). The objects stay where they are and keep their names; the group is built again with them as the same group, keeping its id, name, colour, pivot and solid/hole state (a merged group is merged again, a bundle just takes them in). Refused while a group is open, for a locked group or locked objects, and for rulers. One undo step.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["groupId", "ids"],
+      properties: {
+        ...editorTargetSchema.properties,
+        groupId: { type: "string", description: "The group that takes the objects in." },
+        ids: { type: "array", items: { type: "string" }, description: "The loose objects to put into it." },
+      },
+    },
+  },
+  {
+    name: "layerling_take_out_of_group",
+    description: "Take one part out of a group without opening it, like dragging it out of an expanded group in the object list (Discussion #1338). The part lies loose again where it was, with a new id (returned as object); the group is built again without it as the same group. A group left with one part is gone: that part lies loose in its place (returned as remainingPart). Refused while a group is open and for a locked group. One undo step.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["groupId", "partId"],
+      properties: {
+        ...editorTargetSchema.properties,
+        groupId: { type: "string", description: "The group to take the part from." },
+        partId: { type: "string", description: "The part's id, as layerling_read_scene lists it among the group's children." },
+        beforeId: { type: "string", description: "The object to put it in front of in the object list; left out, it goes last." },
+      },
+    },
+  },
+  {
     name: "layerling_group_objects",
     description: "Group objects by id using Layerling's normal grouping/boolean pipeline.",
     inputSchema: {
