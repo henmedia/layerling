@@ -33,6 +33,8 @@ export interface ObjectListPanelProps {
   onRenameShape?: (id: string, name: string) => void;
   /** Starts editing a group, so its parts can be changed one by one. */
   onOpenGroup?: (id: string) => void;
+  /** Opens the group and selects this one of its parts (Discussion #1316): a click on a part in the expanded list. */
+  onOpenGroupPart?: (groupId: string, partId: string) => void;
   /** Moves a shape in front of another one, or to the end when `beforeId` is null (#1233). */
   onMoveShape?: (id: string, beforeId: string | null) => void;
   /** The loose parts of the innermost group being edited; only groups among them can be edited next. */
@@ -58,6 +60,7 @@ export function ObjectListPanel({
   onToggleHidden,
   onRenameShape,
   onOpenGroup,
+  onOpenGroupPart,
   onMoveShape,
   openGroupPartIds,
   onClose,
@@ -248,16 +251,32 @@ export function ObjectListPanel({
    * A group's parts; while searching, only the matches and the groups that lead to them, nested as deep as needed.
    * A group found by its own name shows all its parts, or opening it would show nothing.
    */
-  const renderGroupParts = (parts: WorkplaneShape[], depth: number, showAll: boolean): ReactElement[] =>
+  const renderGroupParts = (parts: WorkplaneShape[], depth: number, showAll: boolean, group?: WorkplaneShape): ReactElement[] =>
     sortShapes(parts).flatMap((child, index) => {
       const leadsToMatch = hasMatchingPart(child);
       if (!showAll && !shapeMatches(child) && !leadsToMatch) return [];
       const childDisplayName = getShapeDisplayName(child);
+      // A part of a group in the list opens the group with that part selected (Discussion #1316); Done puts it back.
+      const openPart = group && onOpenGroupPart && child.id ? () => onOpenGroupPart(group.id, child.id) : undefined;
+      const openTitle = group ? t(group.groupOperation === "bundle" ? "group.editBundle" : "group.edit") : undefined;
       const row = (
         <li
           key={child.id || `${depth}-${index}`}
-          className="outliner-child-item"
+          className={`outliner-child-item ${openPart ? "opens-group" : ""}`}
           style={depth ? { paddingLeft: depth * 14 } : undefined}
+          {...(openPart ? {
+            role: "button",
+            tabIndex: 0,
+            title: openTitle,
+            "data-testid": "outliner-group-part",
+            onClick: (event: MouseEvent) => { event.stopPropagation(); openPart(); },
+            onKeyDown: (event: KeyboardEvent) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              event.stopPropagation();
+              openPart();
+            },
+          } : {})}
         >
           <span
             className={`outliner-swatch small ${child.hole ? "swatch-hole" : ""}`}
@@ -520,7 +539,7 @@ export function ObjectListPanel({
 
                     {isGroup && isExpanded && shape.groupedShapes ? (
                       <ul className="outliner-children-list">
-                        {renderGroupParts(shape.groupedShapes, 0, !query || shapeMatches(shape))}
+                        {renderGroupParts(shape.groupedShapes, 0, !query || shapeMatches(shape), (!openParts.size || openParts.has(shape.id)) && !shape.locked ? shape : undefined)}
                       </ul>
                     ) : null}
                   </li>

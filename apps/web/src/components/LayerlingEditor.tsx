@@ -10549,7 +10549,8 @@ export function LayerlingEditor({
     }
   }, [commitShapes, setOpenGroupLevels]);
 
-  const openGroupForEditing = useCallback((id: string): OpenGroupOutcome => {
+  // `selectPart`: the index of the one part to select, a click on it in the object list (Discussion #1316); else all.
+  const openGroupForEditing = useCallback((id: string, selectPart?: number): OpenGroupOutcome => {
     if (openGroupBusyRef.current) return refuseOpenGroupStep(t("group.busy"));
     const levels = openGroupsRef.current;
     const innermost = levels.at(-1);
@@ -10565,11 +10566,19 @@ export function LayerlingEditor({
     commitOpenGroupTransition(
       [...levels, { original: group, childIds, notes: notesPinnedTo(notesRef.current, group) }],
       [...shapesRef.current.filter((shape) => shape.id !== group.id), ...parts],
-      childIds,
+      selectPart !== undefined && childIds[selectPart] ? [childIds[selectPart]] : childIds,
       message,
     );
     return { ok: true, message, partIds: childIds };
   }, [commitOpenGroupTransition, refuseOpenGroupStep]);
+
+  // A click on a part in the object list opens its group and selects that part (Discussion #1316).
+  const openGroupPartForEditing = useCallback((groupId: string, partId: string) => {
+    const group = shapesRef.current.find((shape) => shape.id === groupId);
+    const index = group?.groupedShapes?.findIndex((part) => part.id === partId) ?? -1;
+    // A refusal (another group open, a locked one) says why itself.
+    openGroupForEditing(groupId, index >= 0 ? index : undefined);
+  }, [openGroupForEditing]);
 
   const cancelOpenGroup = useCallback((): OpenGroupOutcome => {
     const levels = openGroupsRef.current;
@@ -16402,6 +16411,7 @@ export function LayerlingEditor({
             onRenameShape={renameShapeById}
             onMoveShape={moveShapeInList}
             onOpenGroup={openGroupForEditing}
+            onOpenGroupPart={openGroupPartForEditing}
             openGroupPartIds={openGroup?.childIds}
             onClose={() => setOutlinerOpen(false)}
           />

@@ -14874,6 +14874,16 @@ html[data-theme="dark"] .theme-check {
   font-size: 11px;
 }
 
+.outliner-child-item.opens-group {
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.outliner-child-item.opens-group:hover,
+.outliner-child-item.opens-group:focus-visible {
+  background: rgba(86, 62, 36, 0.08);
+}
+
 .outliner-child-name {
   flex: 1;
   min-width: 0;
@@ -15026,6 +15036,11 @@ html[data-theme="dark"] .outliner-children-list {
 
 html[data-theme="dark"] .outliner-child-name {
   color: #cbd5e0;
+}
+
+html[data-theme="dark"] .outliner-child-item.opens-group:hover,
+html[data-theme="dark"] .outliner-child-item.opens-group:focus-visible {
+  background: rgba(255, 255, 255, 0.07);
 }
 
 html[data-theme="dark"] .inspector-rename-button {
