@@ -179,24 +179,30 @@ export function snapFitCatchOutline(wall: number, reach: number, top: number, ri
   ];
 }
 
+/**
+ * Where the catch stands, as its side outline measured from the hook's foot, or null for none: alone it fills its
+ * box, its back at the front; with the hook, where it sits snapped in, the clearance under the holding face and in
+ * front of the arm, left out where the box has no room for it under the barb.
+ */
+export function snapFitCatchFor(plan: SnapFitPlan): ProfilePoint[] | null {
+  const rise = snapFitHoldRise(plan.undercut, plan.retain);
+  if (plan.part === "catch") {
+    // Turned over, its holding face at the bottom, the slope on top.
+    const reach = Math.min(plan.depth, plan.undercut);
+    const top = Math.max(0.6 + reach, plan.height - rise * (reach / plan.undercut));
+    return snapFitCatchOutline(plan.depth / 2, reach, top, rise * (reach / plan.undercut));
+  }
+  if (plan.part !== "both") return null;
+  const top = plan.holdY - plan.clearance;
+  return top - 0.6 - plan.undercut > 0 ? snapFitCatchOutline(plan.depth / 2, plan.undercut, top, rise) : null;
+}
+
 export function snapFitMesh(shape: SnapFitFields) {
   const plan = snapFitPlan(shape);
   const mesh = new IndexedMesh();
-  const rise = snapFitHoldRise(plan.undercut, plan.retain);
-  if (plan.part === "catch") {
-    // The catch alone fills its box: its back at the front; turned over, its holding face at the bottom, the slope on top.
-    const reach = Math.min(plan.depth, plan.undercut);
-    const top = Math.max(0.6 + reach, plan.height - rise * (reach / plan.undercut));
-    addPrismAlongX(mesh, snapFitCatchOutline(plan.depth / 2, reach, top, rise * (reach / plan.undercut)), plan.width);
-    turnOver(mesh, plan.height);
-    return { mesh, plan };
-  }
-  addPrismAlongX(mesh, snapFitHookOutline(plan), plan.width);
-  if (plan.part === "both") {
-    // Where it sits snapped in: the clearance under the holding face and in front of the arm.
-    const top = plan.holdY - plan.clearance;
-    if (top - 0.6 - plan.undercut > 0) addPrismAlongX(mesh, snapFitCatchOutline(plan.depth / 2, plan.undercut, top, rise), plan.width);
-  }
+  if (plan.part !== "catch") addPrismAlongX(mesh, snapFitHookOutline(plan), plan.width);
+  const catchOutline = snapFitCatchFor(plan);
+  if (catchOutline) addPrismAlongX(mesh, catchOutline, plan.width);
   turnOver(mesh, plan.height);
   return { mesh, plan };
 }

@@ -178,6 +178,16 @@ export function screwBossPlan(shape: ScrewBossFields): ScrewBossPlan {
   };
 }
 
+/** The height of a gusset's short upright end out at the footprint, so it prints and does not end in a feather. */
+export function screwBossGussetTip(plan: Pick<ScrewBossPlan, "gussetHeight">) {
+  return Math.min(0.6, plan.gussetHeight / 2);
+}
+
+/** The directions the gussets point in, round the post from +x towards +z. */
+export function screwBossGussetAngles(plan: Pick<ScrewBossPlan, "gussets">) {
+  return Array.from({ length: plan.gussets }, (_, k) => (2 * Math.PI * k) / plan.gussets);
+}
+
 /** The footprint a boss's fields ask for: the post, and with gussets as far as they reach. */
 export function screwBossFootprint(outer: number, gussets: number, reach: number) {
   return gussets > 0 ? Math.max(outer + 1, 2 * reach) : outer;
@@ -195,7 +205,7 @@ export function screwBossMesh(shape: ScrewBossFields, sides = 48) {
   const n = Math.max(12, Math.round(sides));
   // The angles round the post: regular, with each gusset's two sides on the post among them and nothing between.
   const delta = gussets ? Math.asin(a / R) : 0;
-  const gussetAngles = Array.from({ length: gussets }, (_, k) => (2 * Math.PI * k) / gussets);
+  const gussetAngles = screwBossGussetAngles(plan);
   const inside = (angle: number) => gussetAngles.some((phi) => Math.abs(Math.atan2(Math.sin(angle - phi), Math.cos(angle - phi))) < delta + 1e-6);
   type Station = { angle: number; gusset: number; side: -1 | 0 | 1 };
   const stations: Station[] = [];
@@ -223,7 +233,7 @@ export function screwBossMesh(shape: ScrewBossFields, sides = 48) {
     } else mesh.quad(bottom[i], bottom[j], top[j], top[i]);
   }
   // The gussets, and the floor's outline with them: the post's ring with each gusset's end put in.
-  const tip = Math.min(0.6, hg / 2);
+  const tip = screwBossGussetTip(plan);
   const floorOutline: number[] = [];
   const floorPoints: THREE.Vector2[] = [];
   const pushFloor = (index: number) => {

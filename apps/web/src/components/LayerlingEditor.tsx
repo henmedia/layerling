@@ -115,7 +115,7 @@ import { faceWorkplaneCenteringShift, workplaneCenteringOffset } from "@/lib/wor
 import { projectShapesExtent } from "@/components/workplane/ViewportOverlays";
 import { bakeCadMetadataForShapeTransform, cadBrepTransformForShape, cadModifierPrimitiveForAnalyticShape, cadModifierPrimitiveForBakedShape, importedStepPartForShape } from "@/lib/cadBakeMetadata";
 import { hasOneToOneCadComponentMapping } from "@/lib/cadModifierGroups";
-import { cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape, cadProfileExpectation, cadProfileSegmentCount, textGlyphProfiles, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
+import { cadModifierEnclosureForShape, cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape, cadProfileExpectation, cadProfileSegmentCount, textGlyphProfiles, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
 import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle } from "@/lib/overhang";
 import { bodyOverhang, overhangBodies, overhangFigures, overhangFiguresText, type OverhangFigures } from "@/lib/overhangFigures";
 import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib/sectionMeasure";
@@ -224,7 +224,7 @@ import { sceneWithVaseAccessories, vaseAccessoryKindName, vaseAccessoryName, vas
 import { screenAlignedNudge } from "@/lib/keyboardNudge";
 import { LAYERLING_MCP_HEARTBEAT_MS, LAYERLING_MCP_POLL_RETRY_MS, LAYERLING_MCP_ROUTE, type LayerlingMcpCommand, type LayerlingMcpSceneSummary, type LayerlingMcpViewFace } from "@/lib/layerlingMcpProtocol";
 import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare } from "@/lib/cadMeshExactMessages";
-import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierExactReport, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
+import type { CadFaceInfo, CadModifierComponentMesh, CadModifierDeflection, CadModifierDisplayEdge, CadModifierEdge, CadModifierEnclosurePart, CadModifierExactReport, CadModifierFaces, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierKind, CadModifierMeshPart, CadModifierPrimitivePart, CadModifierProfilePart, CadModifierQuality, CadModifierSpringPart, CadModifierThreadPart, CadModifierWorkerRequest, CadModifierWorkerResponse } from "@/lib/cadModifierTypes";
 import { getSectionBounds, sectionAxisLetter, sectionMeshInFrame, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
 import { SECTION_CUT_FACES, type SectionCutFace } from "@/lib/sectionCaps";
 import { MAX_SECTION_SKETCH_SEGMENTS, sectionSketchProfile } from "@/lib/sectionSketch";
@@ -631,6 +631,16 @@ function cadModifierHirthMeshPart(hirth: CadModifierHirthPart, mesh: MeshData | 
   const expected = mesh && mesh.faces.length > 0 ? cadProfileExpectation(mesh.vertices, mesh.faces) : undefined;
   return {
     hirth: expected ? { ...hirth, expected } : hirth,
+    ...(sendMesh && mesh ? meshDataToCadTransfer(mesh) : {}),
+    hole,
+  };
+}
+
+/** A screw boss's, snap-fit's or rib's exact body for the worker, with the display mesh's bounds and volume to check it against and, when it fits, the mesh to fall back on. */
+function cadModifierEnclosureMeshPart(enclosure: CadModifierEnclosurePart, mesh: MeshData | undefined, sendMesh: boolean, hole: boolean): CadModifierMeshPart {
+  const expected = mesh && mesh.faces.length > 0 ? cadProfileExpectation(mesh.vertices, mesh.faces) : undefined;
+  return {
+    enclosure: expected ? { ...enclosure, expected } : enclosure,
     ...(sendMesh && mesh ? meshDataToCadTransfer(mesh) : {}),
     hole,
   };
@@ -7447,7 +7457,7 @@ export function LayerlingEditor({
       ? restoreGroupedChildrenForEdges(selectedShape)
       : [{ shape: selectedShape, scope: [] }]).flatMap(({ shape, scope }) => cadModifierSourceParts(shape).map((part) => ({ part, scope: hingePartScope(scope, part) })));
     const sourceParts = sourceEntries.map((entry) => entry.part);
-    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; hirth?: CadModifierHirthPart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((shape) => {
+    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; hirth?: CadModifierHirthPart; enclosure?: CadModifierEnclosurePart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((shape) => {
       const frame = shape.cadBrepFrame;
       const preserveNeedsRetessellation = preservesEdgeTreatmentSize(shape) && Boolean(frame) && (
         Math.abs(shapeWidth(shape) - (frame?.width ?? shapeWidth(shape))) > 1e-6 ||
@@ -7478,6 +7488,9 @@ export function LayerlingEditor({
       // A Hirth joint likewise.
       const exactHirth = cadModifierHirthForShape(shape);
       if (exactHirth) return { shape, hirth: exactHirth, profileMesh: meshForShape(shape) };
+      // A screw boss, snap-fit or rib likewise (a boss set as a hole as its pocket).
+      const exactEnclosure = cadModifierEnclosureForShape(shape);
+      if (exactEnclosure) return { shape, enclosure: exactEnclosure, profileMesh: meshForShape(shape) };
       // A STEP import brought its exact body along; the display mesh only checks it, and stands in if it fails.
       const importedStep = importedStepPartForShape(shape);
       if (importedStep) return { shape, ...importedStep, profileMesh: meshForShape(shape) };
@@ -7487,17 +7500,17 @@ export function LayerlingEditor({
     }));
     const triangleCount = partInputs.reduce((total, part) => total + (part.mesh?.faces.length ?? 0), 0);
     const profileTriangleCount = partInputs.reduce((total, part) => total + (part.profileMesh?.faces.length ?? 0), 0);
-    const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth).length;
+    const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth || part.enclosure).length;
     // An outline plate's slab has a side face for each edge of its outline (#1061), as a profile has for each segment.
     const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0) + (part.gridfinity?.gridfinityOutline?.length ?? 0), 0);
     const sendProfileMeshes = triangleCount + profileTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
     // A STEP import's, a thread's, a spring's or a helical gear's mesh went
     // along as the part itself until it had its own body; it still goes along
     // whenever it would have fitted then. A Gridfinity part's goes the same way.
-    const stepTriangleCount = partInputs.reduce((total, part) => total + (part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth ? part.profileMesh?.faces.length ?? 0 : 0), 0);
+    const stepTriangleCount = partInputs.reduce((total, part) => total + (part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth || part.enclosure ? part.profileMesh?.faces.length ?? 0 : 0), 0);
     const sendStepMeshes = sendProfileMeshes || triangleCount + stepTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
     const prepareTimeoutMs = cadModifierPrepareTimeoutMs(triangleCount + (sendProfileMeshes ? profileTriangleCount : sendStepMeshes ? stepTriangleCount : 0), profilePartCount, profileSegmentCount);
-    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.step && !part.thread && !part.spring && !part.helicalGear && !part.gridfinity && !part.hirth && !part.primitive && !part.profile)) {
+    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.step && !part.thread && !part.spring && !part.helicalGear && !part.gridfinity && !part.hirth && !part.enclosure && !part.primitive && !part.profile)) {
       setNotice(t("status.noPrintableSurface"));
       return;
     }
@@ -7556,6 +7569,7 @@ export function LayerlingEditor({
       if (part.helicalGear) return cadModifierHelicalGearMeshPart(part.helicalGear, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.gridfinity) return cadModifierGridfinityMeshPart(part.gridfinity, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.hirth) return cadModifierHirthMeshPart(part.hirth, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
+      if (part.enclosure) return cadModifierEnclosureMeshPart(part.enclosure, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.step) return cadModifierImportedStepMeshPart(part.step, part.brepTransform, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.primitive) return { primitive: part.primitive, hole: Boolean(part.shape.hole) };
       if (part.profile) return cadModifierProfileMeshPart(part.profile, part.profileMesh, sendProfileMeshes, Boolean(part.shape.hole));
@@ -7603,7 +7617,7 @@ export function LayerlingEditor({
       ? restoreGroupedChildrenForEdges(shape)
       : [{ shape, scope: [] }]).flatMap((entry) => cadModifierSourceParts(entry.shape).map((part) => ({ part, scope: hingePartScope(entry.scope, part) })));
     const sourceParts = sourceEntries.map((entry) => entry.part);
-    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; hirth?: CadModifierHirthPart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((partShape) => {
+    const partInputs: Array<{ shape: WorkplaneShape; mesh?: MeshData; brep?: string; step?: string; thread?: CadModifierThreadPart; spring?: CadModifierSpringPart; helicalGear?: CadModifierHelicalGearPart; gridfinity?: CadModifierGridfinityPart; hirth?: CadModifierHirthPart; enclosure?: CadModifierEnclosurePart; brepTransform?: number[]; primitive?: CadModifierPrimitivePart; profile?: CadModifierProfilePart; profileMesh?: MeshData }> = withinExactProfileLimit(sourceParts.map((partShape) => {
       const frame = partShape.cadBrepFrame;
       const preserveNeedsRetessellation = preservesEdgeTreatmentSize(partShape) && Boolean(frame) && (
         Math.abs(shapeWidth(partShape) - (frame?.width ?? shapeWidth(partShape))) > 1e-6 ||
@@ -7633,6 +7647,8 @@ export function LayerlingEditor({
       if (exactGridfinity) return { shape: partShape, gridfinity: exactGridfinity, profileMesh: meshForShape(partShape) };
       const exactHirth = cadModifierHirthForShape(partShape);
       if (exactHirth) return { shape: partShape, hirth: exactHirth, profileMesh: meshForShape(partShape) };
+      const exactEnclosure = cadModifierEnclosureForShape(partShape);
+      if (exactEnclosure) return { shape: partShape, enclosure: exactEnclosure, profileMesh: meshForShape(partShape) };
       // A STEP import brought its exact body along; the display mesh only checks it, and stands in if it fails.
       const importedStep = importedStepPartForShape(partShape);
       if (importedStep) return { shape: partShape, ...importedStep, profileMesh: meshForShape(partShape) };
@@ -7642,17 +7658,17 @@ export function LayerlingEditor({
     }));
     const triangleCount = partInputs.reduce((total, part) => total + (part.mesh?.faces.length ?? 0), 0);
     const profileTriangleCount = partInputs.reduce((total, part) => total + (part.profileMesh?.faces.length ?? 0), 0);
-    const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth).length;
+    const profilePartCount = partInputs.filter((part) => part.profile || part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth || part.enclosure).length;
     // An outline plate's slab has a side face for each edge of its outline (#1061), as a profile has for each segment.
     const profileSegmentCount = partInputs.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0) + (part.gridfinity?.gridfinityOutline?.length ?? 0), 0);
     const sendProfileMeshes = !options.faces && triangleCount + profileTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT;
     // A STEP import's, a thread's, a spring's or a helical gear's mesh went
     // along as the part itself until it had its own body; it still goes along
     // whenever it would have fitted then. A Gridfinity part's goes the same way.
-    const stepTriangleCount = partInputs.reduce((total, part) => total + (part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth ? part.profileMesh?.faces.length ?? 0 : 0), 0);
+    const stepTriangleCount = partInputs.reduce((total, part) => total + (part.step || part.thread || part.spring || part.helicalGear || part.gridfinity || part.hirth || part.enclosure ? part.profileMesh?.faces.length ?? 0 : 0), 0);
     const sendStepMeshes = !options.faces && (sendProfileMeshes || triangleCount + stepTriangleCount <= CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT);
     const prepareTimeoutMs = cadModifierPrepareTimeoutMs(triangleCount + (sendProfileMeshes ? profileTriangleCount : sendStepMeshes ? stepTriangleCount : 0), profilePartCount, profileSegmentCount);
-    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.step && !part.thread && !part.spring && !part.helicalGear && !part.gridfinity && !part.hirth && !part.primitive && !part.profile)) {
+    if (triangleCount === 0 && partInputs.every((part) => !part.brep && !part.step && !part.thread && !part.spring && !part.helicalGear && !part.gridfinity && !part.hirth && !part.enclosure && !part.primitive && !part.profile)) {
       throw new Error("The selected object has no printable surface");
     }
     // A body revolved before the exact revolve is a mesh; hollowing or rounding it fails in confusing ways.
@@ -7683,6 +7699,7 @@ export function LayerlingEditor({
       if (part.helicalGear) return cadModifierHelicalGearMeshPart(part.helicalGear, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.gridfinity) return cadModifierGridfinityMeshPart(part.gridfinity, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.hirth) return cadModifierHirthMeshPart(part.hirth, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
+      if (part.enclosure) return cadModifierEnclosureMeshPart(part.enclosure, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.step) return cadModifierImportedStepMeshPart(part.step, part.brepTransform, part.profileMesh, sendStepMeshes, Boolean(part.shape.hole));
       if (part.primitive) return { primitive: part.primitive, hole: Boolean(part.shape.hole) };
       if (part.profile) return cadModifierProfileMeshPart(part.profile, part.profileMesh, sendProfileMeshes, Boolean(part.shape.hole));

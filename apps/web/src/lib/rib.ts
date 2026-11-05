@@ -49,24 +49,38 @@ export function ribProfile(thickness: number, height: number, top: RibTop): Prof
   return [{ u: -half, v: 0 }, { u: half, v: 0 }, { u: half, v: height }, { u: -half, v: height }];
 }
 
+/** The rib's measures as its fields give them: its kind, length (or foot), height and thickness. */
+export function ribSize(shape: RibFields) {
+  return {
+    style: normalizeRibStyle(shape.ribStyle),
+    top: normalizeRibTop(shape.ribTop),
+    width: Math.max(0.2, shape.width),
+    height: Math.max(0.2, shape.height),
+    thickness: Math.max(0.2, shape.depth ?? shape.width),
+  };
+}
+
+/**
+ * The gusset seen from the side along z (u = x, v = y), counter-clockwise: the leg up the wall at x = -width/2, the
+ * foot along the floor, both ends cut short.
+ */
+export function ribGussetOutline(width: number, height: number): ProfilePoint[] {
+  const e = gussetEnd(width, height);
+  return [
+    { u: -width / 2, v: 0 },
+    { u: width / 2, v: 0 },
+    { u: width / 2, v: e },
+    { u: -width / 2 + e, v: height },
+    { u: -width / 2, v: height },
+  ];
+}
+
 export function ribMesh(shape: RibFields) {
-  const style = normalizeRibStyle(shape.ribStyle);
-  const width = Math.max(0.2, shape.width);
-  const height = Math.max(0.2, shape.height);
-  const thickness = Math.max(0.2, shape.depth ?? shape.width);
+  const { style, top, width, height, thickness } = ribSize(shape);
   const mesh = new IndexedMesh();
   if (style === "gusset") {
-    // Seen from the side along z: the leg up the wall at x = -width/2, the foot along the floor. Pushed along x in the
-    // builder, so the outline is drawn in (z, y) and turned: here u is x.
-    const e = gussetEnd(width, height);
-    const outline: ProfilePoint[] = [
-      { u: -width / 2, v: 0 },
-      { u: width / 2, v: 0 },
-      { u: width / 2, v: e },
-      { u: -width / 2 + e, v: height },
-      { u: -width / 2, v: height },
-    ];
-    addPrismAlongX(mesh, outline, thickness);
+    // Pushed along x in the builder, so the outline is drawn in (z, y) and turned: here u is x.
+    addPrismAlongX(mesh, ribGussetOutline(width, height), thickness);
     // The builder pushes along x: turn the result so the outline lies in x-y and the thickness runs along z.
     for (let i = 0; i < mesh.positions.length; i += 3) {
       const x = mesh.positions[i], z = mesh.positions[i + 2];
@@ -75,7 +89,7 @@ export function ribMesh(shape: RibFields) {
     }
     return mesh;
   }
-  addPrismAlongX(mesh, ribProfile(thickness, height, normalizeRibTop(shape.ribTop)), width);
+  addPrismAlongX(mesh, ribProfile(thickness, height, top), width);
   return mesh;
 }
 
