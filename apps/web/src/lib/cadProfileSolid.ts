@@ -973,6 +973,7 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
     return solids[0];
   }
   validateCadProfile(profile);
+  if (profile.kind === "extrusion" && profile.pulley) return pulleySolid(cad, profile, profile.pulley);
   if (profile.kind === "extrusion" && profile.grow) {
     try {
       return grownProfileSolid(cad, profile);
@@ -1052,6 +1053,32 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
     if (solids.length !== 1 || !isValid(solids[0]) || !(cad.getVolume(solids[0]) > 0)) throw new Error("The chamfered ends of the profile solid are not valid");
     return solids[0];
   }
+  return solid;
+}
+
+/** z up to y up: (x, y, z) -> (x, z, -y). */
+const Z_TO_Y_UP = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
+
+/**
+ * A GT2 pulley (Discussion #1319): the toothed band pushed up between its two heights, the flanges
+ * and the hub as cylinders on the y axis joined to it, the bore cut through all of it last.
+ */
+function pulleySolid(cad: OcctKernel, profile: CadModifierProfilePart, pulley: NonNullable<CadModifierProfilePart["pulley"]>): ShapeHandle {
+  const { teethBottom, teethTop, discs, boreRadius } = pulley;
+  if (!(teethTop > teethBottom && teethBottom >= 0 && boreRadius >= 0 && discs.every((disc) => disc.top > disc.bottom && disc.radius > 0))) {
+    throw new Error("The pulley's measures are out of range");
+  }
+  const one = (shape: ShapeHandle, what: string) => {
+    const solids = cad.isSolid(shape) ? [shape] : cad.getSubShapes(shape, "solid");
+    if (solids.length !== 1) throw new Error(`The pulley ${what} came out as ${solids.length} solids`);
+    return solids[0];
+  };
+  const cylinder = (radius: number, bottom: number, top: number) => cad.translate(cad.transform(cad.makeCylinder(radius, top - bottom), Z_TO_Y_UP), 0, bottom, 0);
+  const face = cad.makeFace(loopWire(cad, profile.loops[0], profileExtent(profile) * 1e-6));
+  let solid = one(cad.translate(cad.extrude(face, 0, teethTop - teethBottom, 0), 0, teethBottom, 0), "teeth");
+  for (const disc of discs) solid = one(cad.fuse(solid, cylinder(disc.radius, disc.bottom, disc.top)), "with its flanges and hub");
+  if (boreRadius > 0) solid = one(cad.cut(solid, cylinder(boreRadius, -1, profile.height + 1)), "with its bore");
+  if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The pulley body is not a valid solid");
   return solid;
 }
 

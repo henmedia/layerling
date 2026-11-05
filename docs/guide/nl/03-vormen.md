@@ -26,7 +26,7 @@ Wat de bibliotheek te bieden heeft:
 - **{{ui:library.section.holes}}:** de {{ui:shape.counterbore}} en {{ui:shape.countersink}} voor schroefkoppen, het {{ui:shape.teardrop}} voor horizontale gaten en de {{ui:shape.port}} voor USB-, HDMI-, DisplayPort- en RJ45-aansluitingen.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (draadstang, schroef, moer en getapt gat), de {{ui:shape.finishingWasher}} onder een verzonken schroef, het in één keer te printen {{ui:shape.hinge}} en de {{ui:shape.dovetail}}. Meer in [Schroefdraad en mechanica](chapter:schroefdraad-en-mechanica).
 - **{{ui:library.section.enclosure}}:** de {{ui:shape.screwBoss}} voor inzetmoeren en zelftappende schroeven, de {{ui:shape.snapFit}} met zijn nok en de {{ui:shape.rib}} of knoopplaat. Meer in [Schroefdraad en mechanica](chapter:schroefdraad-en-mechanica).
-- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} en de {{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, de {{ui:shape.hirth}} en de {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}}-bakken en -draagplaten, en het {{ui:shape.sbcBoard}}, een singleboardcomputer op ware grootte om een behuizing omheen te bouwen.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, ook langs een cirkelboog, het {{ui:shape.nameTag}}, het {{ui:shape.iconTag}} en de {{ui:shape.qrCode}}. Meer in [Tekst](chapter:tekst).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} en de {{ui:shape.knurl}} voor handgrepen.

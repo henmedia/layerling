@@ -1,4 +1,4 @@
-﻿import type { MessageKey } from "@/lib/messages.en";
+import type { MessageKey } from "@/lib/messages.en";
 
 export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "common.cancel": "Annullér",
@@ -306,6 +306,10 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.broughtBackMany": "Tog {count} objekter med ind fra {time}",
   "inspector.hirthHint": "{angle}° mellem flankerne ved kanten. En kopi, der er vendt front mod bag (180° om X), låser sig ind i den, for hver {step}°.",
   "inspector.hirthSawHint": "Flad flanke {angle}° mod fladen ved kanten. En kopi vendt forfra og bagud (180° om X) griber ind i den, for hver {step}°.",
+  "inspector.pulleyHint": "Udvendig {outside} mm, delecirkel {pitch} mm: 2 mm rem pr. tand.",
+  "inspector.pulleyBeltHint": "Den fortandede del mellem flangerne: ca. 7 mm til en 6 mm rem, 11 mm til en 10 mm rem.",
+  "inspector.pulleyFlangeHint": "Kanterne på begge sider, der holder remmen på plads. 0 for ingen.",
+  "inspector.pulleyHubHint": "Et nav foroven til en pinolskrue: læg en hulcylinder igennem det. 0 for intet.",
   "inspector.surfaceTexture": "Overfladestruktur",
   "inspector.surfacePattern": "Mønster",
   "inspector.surfaceSpacing": "Afstand",
@@ -403,6 +407,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "surfaceTexture.maskOnly": "Mønster kun her",
   "shape.vase": "Vase",
   "shape.hirth": "Hirth-led",
+  "shape.pulley": "GT2-remskive",
   "shape.paraboloid": "Paraboloid",
   "shape.curvedCone": "Buet kegle",
   "prop.hirthToothHeight": "Tandhøjde",
@@ -411,6 +416,11 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "hirth.profileSaw": "Savtakker",
   "prop.hirthSteepFlank": "Stejl flanke",
   "prop.hirthReverse": "Stejl flanke på den anden side",
+  "prop.pulleyBeltWidth": "Rembredde",
+  "prop.pulleyFlange": "Flangetykkelse",
+  "prop.pulleyFlangeRise": "Flangehøjde",
+  "prop.pulleyHubHeight": "Navhøjde",
+  "prop.pulleyHubDiameter": "Navdiameter",
   "prop.sketchCuttingEdge": "Skærekant",
   "prop.sketchCuttingEdgeHint": "Hvor bred toppen af væggen er: den løber ind til denne bredde med en 45° affasning på begge sider, en skarp kant til en småkageudstikker. 0 efterlader toppen flad.",
   "prop.textSpacingHint": "Afstanden mellem bogstaverne oven på skrifttypens egen, i procent af bogstavstørrelsen; under 0 tættere. Bogstaverne beholder deres størrelse, feltet følger med.",
@@ -1151,7 +1161,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "welcome.moreSketchTitle": "Skitser",
   "welcome.moreSketchBody": "tegn omrids, tegn på frihånd med pen eller finger og få få punkter, du kan redigere, læg en ægte bue gennem tre punkter, krum en lige side (et dobbeltklik på formen åbner dens skitse igen), indtast en linjes længde og vinkel mens du tegner (\"50<30\") eller snap den i 15°-trin, indtast linjer til en nøjagtig længde, hjørner til en nøjagtig vinkel og en form, et punkt eller et kurvehåndtag til en nøjagtig position, rund eller fase hjørner, spejl en markering om en akse eller en linje, tegn konstruktionslinjer som punkter snapper til, luk et hul ved at trække en åben ende hen på den anden, og ekstrudér dem eller revolverér dem omkring en akse – eller byg blot linjen med en bredde, som en ramme eller en stribe. Et billede under skitsen optegnes til linjer med ét klik.",
   "welcome.moreLibraryTitle": "Formbibliotek",
-  "welcome.moreLibraryBody": "gevind (metrisk, UNC/UNF, G- og koniske NPT-rørgevind), skruer med hex-, Torx-, Phillips-, rille- eller Robertson-drev (firkantet), vingehoveder og stjernegreb, en krave under hovedet, møtrikker (sekskant, firkant, flange eller vinge), spændskiver til ISO 7089 (et rør i skruestørrelsen), rosetskiver under undersænkede skruer, tandhjul, ringgear og tandstænger med evolvente eller runde tænder der griber ind i hinanden, Hirth-led der låser to dele sammen ved ethvert multiplum af én tand, skrue- og flade fjedre, bøjede rør, lofts fra ét omrids til et andet, snoet eller vippet også, kapsler med én mindre ende, paraboloider, buede kegler (som en trompet eller en kuppel), tekst (også buet langs en bue med bogstaverne smallere eller bredere, stablet top til bund eller som en tekstblok med flere linjer venstre-, midter- eller højrejusteret, i dine egne fonte, arabisk og hebraisk højre-mod-venstre også, som omrids, silhuet eller i lag som navneskilt til flerfarvet print, med nøgleringshul - på en side eller hvor du vil placere det - og rundede kantbogstaver hvis du vil; et SVG-ikon som lagret ikonmærke også), QR-koder fra en tekst eller en webadresse (alene, hævet på en plade eller graveret), print-in-place-hængsler, Gridfinity-bakker (med rum hvis du vil) og -bundplader, rillede greb (lige, krydsede eller runde), svalehale-samlinger, skruetappe til varmeindsatser eller selvskærende skruer, snaplåse med modstykke, ribber og knudeplader, dråbeformede huller til vandrette boringer, stikåbninger til USB-, HDMI-, DisplayPort- og RJ45-stik, forsænkninger, undersænkninger og dobbelte forsænkninger til skruehoveder (skaft og hoved til den skruestørrelse du vælger), møtriklommer fra sekskanten og mere – alt justerbart bagefter. Former du skal bruge igen og igen gemmes som egne former – i browseren eller på din egen server – og kommer ind i ethvert design med ét klik.",
+  "welcome.moreLibraryBody": "gevind (metrisk, UNC/UNF, G- og koniske NPT-rørgevind), skruer med hex-, Torx-, Phillips-, rille- eller Robertson-drev (firkantet), vingehoveder og stjernegreb, en krave under hovedet, møtrikker (sekskant, firkant, flange eller vinge), spændskiver til ISO 7089 (et rør i skruestørrelsen), rosetskiver under undersænkede skruer, tandhjul, ringgear og tandstænger med evolvente eller runde tænder der griber ind i hinanden, Hirth-led der låser to dele sammen ved ethvert multiplum af én tand, GT2-remskiver med et vilkårligt antal tænder, skrue- og flade fjedre, bøjede rør, lofts fra ét omrids til et andet, snoet eller vippet også, kapsler med én mindre ende, paraboloider, buede kegler (som en trompet eller en kuppel), tekst (også buet langs en bue med bogstaverne smallere eller bredere, stablet top til bund eller som en tekstblok med flere linjer venstre-, midter- eller højrejusteret, i dine egne fonte, arabisk og hebraisk højre-mod-venstre også, som omrids, silhuet eller i lag som navneskilt til flerfarvet print, med nøgleringshul - på en side eller hvor du vil placere det - og rundede kantbogstaver hvis du vil; et SVG-ikon som lagret ikonmærke også), QR-koder fra en tekst eller en webadresse (alene, hævet på en plade eller graveret), print-in-place-hængsler, Gridfinity-bakker (med rum hvis du vil) og -bundplader, rillede greb (lige, krydsede eller runde), svalehale-samlinger, skruetappe til varmeindsatser eller selvskærende skruer, snaplåse med modstykke, ribber og knudeplader, dråbeformede huller til vandrette boringer, stikåbninger til USB-, HDMI-, DisplayPort- og RJ45-stik, forsænkninger, undersænkninger og dobbelte forsænkninger til skruehoveder (skaft og hoved til den skruestørrelse du vælger), møtriklommer fra sekskanten og mere – alt justerbart bagefter. Former du skal bruge igen og igen gemmes som egne former – i browseren eller på din egen server – og kommer ind i ethvert design med ét klik.",
   "welcome.moreSbcTitle": "SBC-print",
   "welcome.moreSbcBody": "Raspberry Pi 5, 4, 3 B+ og Zero 2 W og BIGTREETECH Pi i fuld størrelse, med monteringshuller, stik og større chips - til at bygge en kasse omkring. Grupperet med kassen som hul skærer printet åbningerne til sine stik, med den frigang du giver dem.",
   "welcome.morePatternTitle": "Mønstre",

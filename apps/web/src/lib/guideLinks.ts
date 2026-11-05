@@ -190,6 +190,7 @@ export function guideSectionForShape(shape: GuideShape): GuideSection | undefine
       return "threads";
     case "gear":
     case "hirth":
+    case "pulley":
       return "gears";
     case "spring":
       return "springs";
@@ -245,6 +246,7 @@ export function guideChapterForShape(shape: GuideShape): GuideChapter {
     case "spring":
     case "gear":
     case "hirth":
+    case "pulley":
     case "bentTube":
     case "loft":
     case "gridfinity":

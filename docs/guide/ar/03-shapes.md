@@ -26,7 +26,7 @@ summary: مكتبة الأشكال، الأبعاد بالأرقام وبالم�
 - **{{ui:library.section.holes}}:** {{ui:shape.counterbore}} و{{ui:shape.countersink}} لرؤوس البراغي، و{{ui:shape.teardrop}} للثقوب الأفقية، و{{ui:shape.port}} لمقابس USB وHDMI وDisplayPort وRJ45.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (قضيب ملولب، برغي، صامولة وثقب ملولب)، و{{ui:shape.finishingWasher}} تحت برغي غاطس الرأس، و{{ui:shape.hinge}} التي تُطبع جاهزة للحركة، و{{ui:shape.dovetail}}. المزيد في [الأسنان اللولبية والميكانيكا](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} للحشوات الملولبة التي تُثبَّت بالحرارة وللبراغي ذاتية التنصيص، و{{ui:shape.snapFit}} مع نتوء الإمساك المقابل له، و{{ui:shape.rib}} أو الدعامة الزاوية. المزيد في [الأسنان اللولبية والميكانيكا](chapter:threads-and-mechanics).
-- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}} و{{ui:shape.gear}} و{{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}} و{{ui:shape.gear}} و{{ui:shape.hirth}} و{{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** علب وألواح {{ui:shape.gridfinity}}، و{{ui:shape.sbcBoard}}، حاسوب أحادي اللوحة بمقاسه الحقيقي لتبني حوله علبة.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}، وأيضًا على طول قوس دائري، و{{ui:shape.nameTag}} و{{ui:shape.iconTag}} و{{ui:shape.qrCode}}. المزيد في [النص](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}} و{{ui:shape.heart}} و{{ui:shape.crescent}} و{{ui:shape.knurl}} للمقابض.

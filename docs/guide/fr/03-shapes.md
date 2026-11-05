@@ -26,7 +26,7 @@ Ce que propose la bibliothèque :
 - **{{ui:library.section.holes}} :** le {{ui:shape.counterbore}} et le {{ui:shape.countersink}} pour les têtes de vis, la {{ui:shape.teardrop}} pour les trous horizontaux et l'{{ui:shape.port}} pour les prises USB, HDMI, DisplayPort et RJ45.
 - **{{ui:library.section.connections}} :** {{ui:shape.thread}} (tige filetée, vis, écrou et trou taraudé), la {{ui:shape.finishingWasher}} sous une vis à tête fraisée, la {{ui:shape.hinge}} imprimée d'un seul tenant et le {{ui:shape.dovetail}}. Plus d'informations dans [Threads et mécanique](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}} :** le {{ui:shape.screwBoss}} pour inserts filetés à chaud et vis autotaraudeuses, le {{ui:shape.snapFit}} avec sa butée et la {{ui:shape.rib}} ou le gousset. Plus dans [Threads et mécanique](chapter:threads-and-mechanics).
-- **{{ui:library.section.mechanics}} :** {{ui:shape.spring}}, {{ui:shape.gear}} et la {{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}} :** {{ui:shape.spring}}, {{ui:shape.gear}}, la {{ui:shape.hirth}} et la {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}} :** des bacs et socles {{ui:shape.gridfinity}}, et la {{ui:shape.sbcBoard}}, un ordinateur monocarte en vraie grandeur autour duquel construire un boîtier.
 - **{{ui:library.section.lettering}} :** {{ui:shape.text}}, également selon un arc de cercle, le {{ui:shape.nameTag}}, le {{ui:shape.iconTag}} et le {{ui:shape.qrCode}}. Plus dans [Texte](chapter:text).
 - **{{ui:library.section.decorative}} :** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} et le {{ui:shape.knurl}} pour les poignées.

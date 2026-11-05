@@ -26,7 +26,7 @@ Hvad biblioteket tilbyder:
 - **{{ui:library.section.holes}}:** {{ui:shape.counterbore}} og {{ui:shape.countersink}} til skruehoveder, {{ui:shape.teardrop}} til vandrette huller og {{ui:shape.port}} til USB-, HDMI-, DisplayPort- og RJ45-stik.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (gevindstang, skrue, møtrik og gevindhul), {{ui:shape.finishingWasher}} under en undersænket skrue, det print-in-place {{ui:shape.hinge}} og {{ui:shape.dovetail}}. Mere i [Gevind og mekanik](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} til varmeindsatser og selvskærende skruer, {{ui:shape.snapFit}} med sin lås og {{ui:shape.rib}} eller knudepladen. Mere i [Gevind og mekanik](chapter:threads-and-mechanics).
-- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} og {{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} og {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** Gridfinity-bakke og -grundplader med {{ui:shape.gridfinity}}, og {{ui:shape.sbcBoard}}, en enkortscomputer i fuld størrelse at bygge et kabinet omkring.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, også langs en cirkelbue, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} og {{ui:shape.qrCode}}. Mere i [Tekst](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} og {{ui:shape.knurl}} til greb.

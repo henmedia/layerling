@@ -26,7 +26,7 @@ Amit a tár kínál:
 - **{{ui:library.section.holes}}:** a csavarfejekhez való {{ui:shape.counterbore}} és {{ui:shape.countersink}}, a vízszintes lyukakhoz való {{ui:shape.teardrop}}, valamint az USB-, HDMI-, DisplayPort- és RJ45-aljzatokhoz való {{ui:shape.port}}.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (menetes szár, csavar, anya és menetes furat), a süllyesztett fejű csavar alá való {{ui:shape.finishingWasher}}, az egyben nyomtatható {{ui:shape.hinge}} és a(z) {{ui:shape.dovetail}}. Bővebben a [Menetek és mechanika](chapter:threads-and-mechanics) fejezetben.
 - **{{ui:library.section.enclosure}}:** a {{ui:shape.screwBoss}} beolvasztható menetes betétekhez és lemezcsavarokhoz, a {{ui:shape.snapFit}} a hozzá tartozó retesszel, valamint a {{ui:shape.rib}} vagy merevítő sarokborda. Bővebben a [Menetek és mechanika](chapter:threads-and-mechanics) fejezetben.
-- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} és a(z) {{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, a(z) {{ui:shape.hirth}} és a(z) {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}}-rekeszek és -alapkeretek, valamint a(z) {{ui:shape.sbcBoard}}, egy valódi méretű egykártyás számítógép, amely köré házat építhetsz.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, körív mentén is, a(z) {{ui:shape.nameTag}}, a(z) {{ui:shape.iconTag}} és a(z) {{ui:shape.qrCode}}. Bővebben a [Szöveg](chapter:text) fejezetben.
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} és a fogantyúkhoz való {{ui:shape.knurl}}.

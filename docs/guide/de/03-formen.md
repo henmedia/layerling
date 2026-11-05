@@ -26,7 +26,7 @@ Was die Bibliothek bietet:
 - **{{ui:library.section.holes}}:** die {{ui:shape.counterbore}} und {{ui:shape.countersink}} für Schraubenköpfe, die {{ui:shape.teardrop}} für waagerechte Löcher und die {{ui:shape.port}} für USB-, HDMI-, DisplayPort- und RJ45-Buchsen.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (Gewindestange, Schraube, Mutter und Gewindeloch), die {{ui:shape.finishingWasher}} unter einer Senkschraube, das druckbare {{ui:shape.hinge}} und der {{ui:shape.dovetail}}. Mehr im Kapitel [Gewinde und Mechanik](chapter:gewinde-und-mechanik).
 - **{{ui:library.section.enclosure}}:** der {{ui:shape.screwBoss}} für Einschmelzmuttern und Schneidschrauben, der {{ui:shape.snapFit}} mit seiner Raste und die {{ui:shape.rib}} oder das Knotenblech. Mehr im Kapitel [Gewinde und Mechanik](chapter:gewinde-und-mechanik).
-- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} und die {{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, die {{ui:shape.hirth}} und die {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** {{ui:shape.gridfinity}}-Behälter und -Bodenplatten und die {{ui:shape.sbcBoard}}, ein Einplatinencomputer in echter Größe, um ein Gehäuse darum zu bauen.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, auch auf einem Kreisbogen, das {{ui:shape.nameTag}}, das {{ui:shape.iconTag}} und der {{ui:shape.qrCode}}. Mehr im Kapitel [Text](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} und die {{ui:shape.knurl}} für Griffe.

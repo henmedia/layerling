@@ -26,7 +26,7 @@ La libreria contiene:
 - **{{ui:library.section.holes}}:** {{ui:shape.counterbore}} e {{ui:shape.countersink}} per le teste delle viti, {{ui:shape.teardrop}} per fori orizzontali e {{ui:shape.port}} per prese USB, HDMI, DisplayPort e RJ45.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (asta filettata, vite, dado e foro filettato), la {{ui:shape.finishingWasher}} sotto una vite svasata, la cerniera stampabile già assemblata {{ui:shape.hinge}} e {{ui:shape.dovetail}}. Altre informazioni in [Filettature e meccanica](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** il {{ui:shape.screwBoss}} per inserti filettati a caldo e viti autofilettanti, lo {{ui:shape.snapFit}} con il suo dente di arresto e la {{ui:shape.rib}} o il fazzoletto di rinforzo. Altre informazioni in [Filettature e meccanica](chapter:threads-and-mechanics).
-- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} e {{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} e {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** contenitori e piastre {{ui:shape.gridfinity}}, e {{ui:shape.sbcBoard}}, un computer a scheda singola in scala reale attorno a cui costruire un case.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, anche disposto lungo un arco circolare, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} e {{ui:shape.qrCode}}. Altre informazioni in [Testo](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} e {{ui:shape.knurl}} per le impugnature.

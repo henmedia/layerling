@@ -26,7 +26,7 @@ Knihovna nabízí:
 - **{{ui:library.section.holes}}:** {{ui:shape.counterbore}} a {{ui:shape.countersink}} pro hlavy šroubů, {{ui:shape.teardrop}} pro vodorovné otvory a {{ui:shape.port}} pro zásuvky USB, HDMI, DisplayPort a RJ45.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} jako závitová tyč, šroub, matice a závitový otvor, {{ui:shape.finishingWasher}} pod šroub se zápustnou hlavou, {{ui:shape.hinge}} tisknutelný vcelku a {{ui:shape.dovetail}}. Viz [Závity a mechanické díly](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} pro zatavovací matice a samořezné šrouby, {{ui:shape.snapFit}} se západkou a {{ui:shape.rib}} nebo výztuha. Více v kapitole [Závity a mechanické díly](chapter:threads-and-mechanics).
-- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} a {{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} a {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** krabičky a nosné desky {{ui:shape.gridfinity}} a {{ui:shape.sbcBoard}}, jednodeskový počítač ve skutečné velikosti, kolem kterého postavíte krabičku.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, i po oblouku, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} a {{ui:shape.qrCode}}, viz [Text](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} a {{ui:shape.knurl}} pro úchopy.

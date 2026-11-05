@@ -112,6 +112,7 @@ import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protract
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
 import { MIN_ELEVATION, MAX_ELEVATION, ResizeSigns, ResizeAnchorMemory, TransformDragState, TransformDragItem, snapValue, selectionWorldYBounds, resizeSignsForHandle, resizeAnchorPointForFrame, resizeCenterFromAnchor, resizeSignsForDimension, patchWithResizeAnchor, patchWithUniformHeightScale, resizeShapeFromFrameHandle, resizeShapeAlongFrameNormal, resizeSelectionFromHandle, scaleSelectionItems } from "./workplane/viewportResize";
+import { pulleySizedPatch } from "@/lib/pulleyGeometry";
 
 const WORKSPACE_DEFAULTS_STORAGE_PREFIX = "layerling.workspaceDefault.";
 const MOVE_DIMENSIONS_ENABLED_STORAGE_KEY = "layerling.editor.moveDimensionsEnabled";
@@ -4895,7 +4896,7 @@ export function WorkplaneViewport({
       } else {
         // A cylinder is always circular - the diameter mark writes both
         // fields, the same as the inspector's diameter field does.
-        const patch: Partial<WorkplaneShape> = shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "finishingWasher"
+        const patch: Partial<WorkplaneShape> = shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "pulley" || shape.kind === "finishingWasher"
           ? { width: nextValue, depth: nextValue, size: nextValue }
           : { width: nextValue, size: resizedShapeSize(nextValue, shapeDepth(shape)) };
         if (shape.kind === "cone") {
@@ -4924,7 +4925,7 @@ export function WorkplaneViewport({
         // Defense in depth: the cylinder's dimension mark never offers this
         // axis (see makeFootprintDimensionMark above), but keep it circular
         // regardless of how the patch got here.
-        const patch: Partial<WorkplaneShape> = shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "finishingWasher"
+        const patch: Partial<WorkplaneShape> = shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "pulley" || shape.kind === "finishingWasher"
           ? { width: nextValue, depth: nextValue, size: nextValue }
           : { depth: nextValue, size: resizedShapeSize(shapeWidth(shape), nextValue) };
         return patchWithResizeAnchor(shape, kept(patch, axis), axis, anchor);
@@ -4943,8 +4944,10 @@ export function WorkplaneViewport({
   }, []);
 
   const dimensionPatchFor = useCallback((shape: WorkplaneShape, axis: "width" | "depth" | "height", text: string, keepProportions = false): Partial<WorkplaneShape> | null => {
-    const patch = dimensionSizePatchFor(shape, axis, text, keepProportions);
-    if (!patch) return null;
+    const sized = dimensionSizePatchFor(shape, axis, text, keepProportions);
+    if (!sized) return null;
+    // A GT2 pulley (Discussion #1319) takes a typed size as teeth and belt width.
+    const patch = pulleySizedPatch(shape, sized);
     // The calculation rides along with the size it set, in the same change (#180); a plain number clears it.
     const formula = formulaToRemember(text);
     return shape.formulas || formula ? { ...patch, formulas: withFieldFormula(shape.formulas, DIMENSION_FORMULA_FIELDS[axis], formula) } : patch;

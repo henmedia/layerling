@@ -26,7 +26,7 @@ Co oferuje biblioteka:
 - **{{ui:library.section.holes}}:** {{ui:shape.counterbore}} i {{ui:shape.countersink}} pod łby śrub, {{ui:shape.teardrop}} na otwory poziome oraz {{ui:shape.port}} na gniazda USB, HDMI, DisplayPort i RJ45.
 - **{{ui:library.section.connections}}:** {{ui:shape.thread}} (pręt gwintowany, śruba, nakrętka i otwór gwintowany), {{ui:shape.finishingWasher}} pod śrubę z łbem stożkowym, drukowany w całości {{ui:shape.hinge}} oraz {{ui:shape.dovetail}}. Więcej w rozdziale [Gwinty i mechanika](chapter:threads-and-mechanics).
 - **{{ui:library.section.enclosure}}:** {{ui:shape.screwBoss}} do wtapianych wkładek gwintowanych i wkrętów samogwintujących, {{ui:shape.snapFit}} z zaczepem oraz {{ui:shape.rib}} lub węzłówka. Więcej w rozdziale [Gwinty i mechanika](chapter:threads-and-mechanics).
-- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}} i {{ui:shape.hirth}}.
+- **{{ui:library.section.mechanics}}:** {{ui:shape.spring}}, {{ui:shape.gear}}, {{ui:shape.hirth}} i {{ui:shape.pulley}}.
 - **{{ui:library.section.systems}}:** pojemniki i podstawy {{ui:shape.gridfinity}} oraz {{ui:shape.sbcBoard}}, komputer jednopłytkowy w prawdziwym rozmiarze, wokół którego budujesz obudowę.
 - **{{ui:library.section.lettering}}:** {{ui:shape.text}}, także wzdłuż łuku okręgu, {{ui:shape.nameTag}}, {{ui:shape.iconTag}} i {{ui:shape.qrCode}}. Więcej w rozdziale [Tekst](chapter:text).
 - **{{ui:library.section.decorative}}:** {{ui:shape.star}}, {{ui:shape.heart}}, {{ui:shape.crescent}} i {{ui:shape.knurl}} na uchwyty.

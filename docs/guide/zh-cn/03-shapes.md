@@ -26,7 +26,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 - **{{ui:library.section.holes}}：** 用于螺钉头的 {{ui:shape.counterbore}} 和 {{ui:shape.countersink}}、用于水平孔的 {{ui:shape.teardrop}}，以及用于 USB、HDMI、DisplayPort 和 RJ45 插座的 {{ui:shape.port}}。
 - **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺杆、螺钉、螺母和螺纹孔）、沉头螺钉下的 {{ui:shape.finishingWasher}}、一体打印的 {{ui:shape.hinge}} 和 {{ui:shape.dovetail}}。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.enclosure}}：** 用于热熔螺母和自攻螺钉的 {{ui:shape.screwBoss}}、带卡座的 {{ui:shape.snapFit}}，以及 {{ui:shape.rib}} 或角撑板。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
-- **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}} 和 {{ui:shape.hirth}}。
+- **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}}、{{ui:shape.hirth}} 和 {{ui:shape.pulley}}。
 - **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收纳盒和底板，以及 {{ui:shape.sbcBoard}}，一块按实际尺寸做的单板计算机，用来围绕它设计外壳。
 - **{{ui:library.section.lettering}}：** {{ui:shape.text}}，也可沿圆弧排列，以及 {{ui:shape.nameTag}}、{{ui:shape.iconTag}} 和 {{ui:shape.qrCode}}。更多见[文字](chapter:text)。
 - **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用于握持的 {{ui:shape.knurl}}。

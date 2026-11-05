@@ -356,6 +356,7 @@ import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from
 import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
 import { finishingWasherMeasures, finishingWasherSeatDepthFor } from "@/lib/finishingWasherGeometry";
 import { NUT_POCKET_SIZE_ORDER, isNutPocketSize, nutPocketFields, nutPocketSizeFor } from "@/lib/nutPocketSizes";
+import { MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_PULLEY_HUB_HEIGHT, MAX_PULLEY_TEETH, MIN_PULLEY_BELT_WIDTH, MIN_PULLEY_FLANGE_RISE, MIN_PULLEY_TEETH, normalizePulleyTeeth, pulleyFootprint, pulleyMeasures, pulleyPitchDiameter } from "@/lib/pulleyGeometry";
 import { DEFAULT_HIRTH_STEEP_FLANK, MAX_HIRTH_STEEP_FLANK, MAX_HIRTH_TEETH, MIN_HIRTH_BASE, MIN_HIRTH_STEEP_FLANK, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthFlankAngle, hirthGentleFlankAngle, hirthSplit, hirthToothHeightLimit, normalizeHirthBore, normalizeHirthSteepFlank, normalizeHirthTeeth, normalizeHirthToothHeight } from "@/lib/hirthGeometry";
 
 /**
@@ -3151,6 +3152,90 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       onChange: (quality) => applyThread({ quality }),
     });
     return properties;
+  }
+
+  if (shape.kind === "pulley") {
+    // A GT2 pulley (Discussion #1319): the teeth set the size (2 mm of belt each), the belt width, the
+    // flanges and the hub the height. Every change carries the box it gives, so nothing else rescales it.
+    const measures = pulleyMeasures(shape);
+    const applyPulley = (patch: Partial<WorkplaneShape>) => onUpdate({ ...patch, ...pulleyFootprint({ ...shape, ...patch }) });
+    // A bore or hub asked far too wide: what the pulley then allows is its limit.
+    const boreLimit = 2 * pulleyMeasures({ ...shape, centerHoleSize: 1e6 }).boreRadius;
+    const hubLimit = 2 * pulleyMeasures({ ...shape, pulleyHubDiameter: 1e6 }).hubRadius;
+    const pulleyProperties: ShapePropertyConfig[] = [
+      {
+        id: "teeth",
+        label: t("prop.teeth"),
+        value: measures.teeth,
+        min: MIN_PULLEY_TEETH,
+        max: MAX_PULLEY_TEETH,
+        step: 1,
+        hint: t("inspector.pulleyHint", { outside: plainNumber(Math.round(measures.outsideRadius * 200) / 100), pitch: plainNumber(Math.round(pulleyPitchDiameter(measures.teeth) * 100) / 100) }),
+        onChange: (value) => applyPulley({ teeth: normalizePulleyTeeth(value) }),
+      },
+      {
+        id: "pulleyBeltWidth",
+        label: t("prop.pulleyBeltWidth"),
+        value: measures.beltWidth,
+        min: MIN_PULLEY_BELT_WIDTH,
+        max: MAX_PULLEY_BELT_WIDTH,
+        step: 0.5,
+        hint: t("inspector.pulleyBeltHint"),
+        onChange: (value) => applyPulley({ pulleyBeltWidth: value }),
+      },
+      {
+        id: "centerHole",
+        label: t("prop.centerHole"),
+        value: 2 * measures.boreRadius,
+        min: 0,
+        max: boreLimit,
+        step: 0.1,
+        onChange: (value) => applyPulley({ centerHoleSize: Math.min(value, boreLimit) }),
+      },
+      {
+        id: "pulleyFlange",
+        label: t("prop.pulleyFlange"),
+        value: measures.flange,
+        min: 0,
+        max: MAX_PULLEY_FLANGE,
+        step: 0.1,
+        hint: t("inspector.pulleyFlangeHint"),
+        onChange: (value) => applyPulley({ pulleyFlange: value }),
+      },
+    ];
+    if (measures.flange > 0) {
+      pulleyProperties.push({
+        id: "pulleyFlangeRise",
+        label: t("prop.pulleyFlangeRise"),
+        value: measures.flangeRadius - measures.outsideRadius,
+        min: MIN_PULLEY_FLANGE_RISE,
+        max: MAX_PULLEY_FLANGE_RISE,
+        step: 0.1,
+        onChange: (value) => applyPulley({ pulleyFlangeRise: value }),
+      });
+    }
+    pulleyProperties.push({
+      id: "pulleyHubHeight",
+      label: t("prop.pulleyHubHeight"),
+      value: measures.hubHeight,
+      min: 0,
+      max: MAX_PULLEY_HUB_HEIGHT,
+      step: 0.5,
+      hint: t("inspector.pulleyHubHint"),
+      onChange: (value) => applyPulley({ pulleyHubHeight: value }),
+    });
+    if (measures.hubHeight > 0) {
+      pulleyProperties.push({
+        id: "pulleyHubDiameter",
+        label: t("prop.pulleyHubDiameter"),
+        value: 2 * measures.hubRadius,
+        min: MIN_SHAPE_SIZE,
+        max: hubLimit,
+        step: 0.1,
+        onChange: (value) => applyPulley({ pulleyHubDiameter: Math.min(value, hubLimit) }),
+      });
+    }
+    return pulleyProperties;
   }
 
   if (shape.kind === "hirth") {

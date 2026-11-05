@@ -45,13 +45,13 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /Finish the current action before opening the history view/i, key: "error.finishBeforeHistory" },
   // CAD kernel: stored and rebuilt bodies
   { pattern: /could not be restored as a valid solid/i, key: "error.storedBodyRestore" },
-  { pattern: /The exact (profile body|thread body|spring body|gear body|Hirth joint|Gridfinity body) (is not|does not)|The imported STEP body does not match/i, key: "error.exactBodyInvalid" },
+  { pattern: /The exact (profile body|thread body|spring body|gear body|Hirth joint|Gridfinity body) (is not|does not)|The pulley body is not a valid solid|The imported STEP body does not match/i, key: "error.exactBodyInvalid" },
   // No exact body, and the mesh too dense to stand in for it (cadModifier.worker.ts).
   { pattern: /could not be (re)?built as an exact( CAD)? body, and its mesh is too dense|could not be restored for edge treatment, and its mesh is too dense/i, key: "error.solidNotValid" },
   { pattern: /The (thread|gear|spring) body is not a valid solid|The (Hirth joint|Gridfinity body) is not a valid solid/i, key: "error.solidNotValid" },
   { pattern: /The (thread|gear|spring|Hirth joint)'s .* (came out as|sewed into|did not close|did not sweep)/i, key: "error.solidNotValid" },
-  { pattern: /The (thread|gear|spring|Hirth joint)'s measures are out of range/i, key: "error.measuresOutOfRange" },
-  { pattern: /(gear|Hirth joint)( with its bore)? came out as/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|spring|Hirth joint|pulley)'s measures are out of range/i, key: "error.measuresOutOfRange" },
+  { pattern: /(gear|Hirth joint)( with its bore)? came out as|The pulley [\w ]{1,40} came out as/i, key: "error.solidNotValid" },
   // Measures a profile cannot be built from (cadProfileSolid.ts): an outline, a loft or a sweep path that does not hold together.
   { pattern: /The profile (has no height|has no outline|outline (is incomplete|has an invalid|has a zero-length|is not closed))|A profile arc does not meet|The loft's (point is not a number|top does not match)|A section of the loft does not match|A loft to a point (needs|cannot)|The sweep has no centre line|A sweep (piece|bend)|A straight sweep piece has no length/i, key: "error.primitiveDimensions" },
   { pattern: /(loft|sweep|swept|tapered)[\w' ]{0,40} did not (become|close|make)|moved outlines are not a valid face|elliptical arc differently than expected|The profile did not become one solid|^sweep:invalid|letter could not be widened|widened text (has no letters|is not a valid solid|does not keep)/i, key: "error.solidNotValid" },

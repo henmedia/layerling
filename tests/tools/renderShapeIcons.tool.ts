@@ -30,6 +30,7 @@ import { createThreadGeometry } from "@/lib/threadGeometry";
 import { bentTubeNaturalDimensions, createBentTubeGeometry } from "@/lib/bentTubeGeometry";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
+import { createPulleyGeometry } from "@/lib/pulleyGeometry";
 import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import manifoldModule from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
@@ -423,6 +424,15 @@ describe("palette icons", () => {
       build: () => createHirthGeometry(30, 10, 30, { teeth: 12, toothSize: 4.5, centerHoleSize: 9 }),
     });
     render({
+      // A GT2 pulley (Discussion #1319) with few teeth, so the grooves show at the icon's size; from above, for the hub and bore.
+      name: "apps/web/public/assets/editor/shape-icons-gray/pulley.png",
+      height: 15,
+      lay: false,
+      azimuth: 35,
+      elevation: 32,
+      build: () => createPulleyGeometry({ teeth: 16, pulleyBeltWidth: 7, pulleyFlange: 1.2, pulleyFlangeRise: 2, pulleyHubHeight: 6, pulleyHubDiameter: 9, centerHoleSize: 4 }),
+    });
+    render({
       name: "apps/web/public/assets/editor/shape-icons-gray/paraboloid.png",
       height: 22,
       lay: false,
@@ -641,7 +651,8 @@ describe("palette icons", () => {
         build: () => createBentTubeGeometry({ ...fields, ...natural }),
       });
     }
-  });
+  // Every icon in one go: well past the default five seconds on a busy machine.
+  }, 60_000);
 });
 
 describe("palette icon of the name tag (#215)", () => {

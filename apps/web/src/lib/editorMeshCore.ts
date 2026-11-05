@@ -9,6 +9,7 @@ import { torusTessellation } from "@/lib/torusTessellation";
 import { torusRadii, torusTubeRatio } from "@/lib/torusShape";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
+import { createPulleyGeometry } from "@/lib/pulleyGeometry";
 import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
 import { createHeartGeometry } from "@/lib/heartGeometry";
@@ -643,6 +644,9 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       break;
     case "hirth":
       geometry = createHirthGeometry(width, height, depth, shape);
+      break;
+    case "pulley":
+      geometry = createPulleyGeometry(shape);
       break;
     case "honeycomb":
       geometry = createHoneycombGeometry({
