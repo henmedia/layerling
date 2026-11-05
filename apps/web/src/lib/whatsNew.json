@@ -1,5 +1,120 @@
 [
   {
+    "version": "1.143.0",
+    "items": [
+      {
+        "title": {
+          "de": "GT2-Riemenscheiben",
+          "en": "GT2 pulleys"
+        },
+        "body": {
+          "de": "Neu bei den Formen unter Mechanik: eine Riemenscheibe für GT2-Zahnriemen mit der echten GT2-Zahnform. Zähnezahl frei von 10 bis 200, dazu Riemenbreite, Bordscheiben, Nabe und Bohrung.",
+          "en": "New among the shapes under Mechanics: a pulley for GT2 timing belts with the true GT2 tooth shape. Any number of teeth from 10 to 200, with belt width, flanges, hub and bore."
+        }
+      },
+      {
+        "title": {
+          "de": "Oberflächentextur: Quadrate und Dreiecke",
+          "en": "Surface texture: squares and triangles"
+        },
+        "body": {
+          "de": "Zwei neue Muster legen gleich große Kacheln in einem Raster auf, erhaben oder vertieft: Quadrate und Dreiecke. Größe und Abstand bleiben genau so, wie du sie einstellst, etwa ein Vielfaches deiner Düse. „Ab der Unterkante“ lässt die erste Reihe ganz unten beginnen, für einen Brim.",
+          "en": "Two new patterns lay tiles of one size in a grid, raised or pressed in: squares and triangles. Size and gap stay exactly as you set them, for example a multiple of your nozzle. \"From the bottom edge\" starts the first row right at the bottom, for a brim."
+        }
+      },
+      {
+        "title": {
+          "de": "Hirth-Verzahnung mit Sägezähnen",
+          "en": "Hirth joint with saw teeth"
+        },
+        "body": {
+          "de": "Die Hirth-Verzahnung kann jetzt Sägezähne wie eine Ratsche haben: Eine Flanke steht steil, bis 90°, die andere flach, auf Wunsch auf der anderen Seite. Eine umgedrehte Kopie greift weiter hinein. Die Zahnhöhe reicht jetzt bis zum Boden.",
+          "en": "The Hirth joint can now have saw teeth like a ratchet: one flank steep, up to 90°, the other gentle, on either side. A copy turned over still locks into it. The tooth height now goes all the way down to the bottom."
+        }
+      },
+      {
+        "title": {
+          "de": "Gehäuseteile als exakte Körper",
+          "en": "Enclosure parts as exact bodies"
+        },
+        "body": {
+          "de": "Schraubdom, Schnapphaken und Rippe sind jetzt exakte Körper: Verrunden, Fasen, Aushöhlen und der STEP-Export nehmen sie. Ein Schraubdom als Loch ist nur seine Tasche, genau dort, wo der Editor sie zeigt.",
+          "en": "Screw boss, snap-fit and rib are now exact bodies: fillet, chamfer, hollow and the STEP export take them. A screw boss set as a hole is just its pocket, right where the editor shows it."
+        }
+      },
+      {
+        "title": {
+          "de": "Große Schrägzahnräder im STEP-Export",
+          "en": "Large helical gears in STEP"
+        },
+        "body": {
+          "de": "Schräg- und Pfeilzahnräder mit mehr als etwa 30 Zähnen fehlten in der STEP-Datei. Jetzt gehen sie mit jeder Zähnezahl hinein.",
+          "en": "Helical and herringbone gears with more than about 30 teeth were missing from the STEP file. Now they go in at any number of teeth."
+        }
+      },
+      {
+        "title": {
+          "de": "Ausgeblendete Teile in Gruppen",
+          "en": "Hidden parts in groups"
+        },
+        "body": {
+          "de": "Blendest du in einer offenen Gruppe ein Teil aus, behalten die übrigen Teile nach „Fertig“ ihre Form, statt gestreckt zu werden. Beim Ausrichten zählt das ausgeblendete Teil weiter mit.",
+          "en": "If you hide a part in an open group, the other parts keep their shape after Done instead of being stretched. Aligning still counts the hidden part."
+        }
+      },
+      {
+        "title": {
+          "de": "Ausrichten: gleiche Abstände bei gestapelten Teilen",
+          "en": "Align: equal gaps on stacked parts"
+        },
+        "body": {
+          "de": "Liegen Teile übereinander, sagt der ausgegraute Punkt für gleiche Abstände jetzt, dass ein Klick auf die leere Platte sie zur Bezugsgröße macht. Die Startmeldung nennt L oder Esc zum Beenden.",
+          "en": "When parts lie on one spot, the greyed equal-gaps dot now says that a click on the empty plate makes the plate the reference. The start message names L or Esc to end Align."
+        }
+      },
+      {
+        "title": {
+          "de": "Maßband am Zylinderrand",
+          "en": "Tape measure on a cylinder's rim"
+        },
+        "body": {
+          "de": "Mit „Ganze Kanten messen“ zeigt ein Klick auf den oberen Rand eines Zylinders jetzt seinen Durchmesser, wie schon bei einer Halbkugel, statt nur einen Punkt zu setzen.",
+          "en": "With \"Measure whole edges\" on, a click on the top rim of a cylinder now gives its diameter, as on a half sphere, instead of only setting a point."
+        }
+      },
+      {
+        "title": {
+          "de": "Vasenzeichnung: Punkt per Doppelklick",
+          "en": "Vase drawing: a point by double-click"
+        },
+        "body": {
+          "de": "Ein Doppelklick auf die Linie im Vasen-Zeichenfenster fügt dort wieder einen Punkt ein, jetzt auch im Browser.",
+          "en": "A double-click on the line in the vase drawing window adds a point there again, now in the browser too."
+        }
+      },
+      {
+        "title": {
+          "de": "Deckel-Scharnier bündig: kein Splitter mehr",
+          "en": "Flush lid hinge: no more sliver"
+        },
+        "body": {
+          "de": "Bei einer Box mit runden Ecken stand an beiden Enden des bündigen Scharniers ein dünner Splitter. Er ist weg.",
+          "en": "On a box with rounded corners a thin sliver stood at both ends of the flush hinge. It is gone."
+        }
+      },
+      {
+        "title": {
+          "de": "Lange Knopfnamen in der App",
+          "en": "Long button names in the app"
+        },
+        "body": {
+          "de": "In der installierten App lief der Name eines Knopfs oben am Fenster über den Rand hinaus. Jetzt bleibt er breit genug und erscheint unter dem Knopf, wenn darüber kein Platz ist.",
+          "en": "In the installed app a button's name near the top of the window ran off the edge. Now it keeps its width and shows below the button when there is no room above."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.142.0",
     "items": [
       {
