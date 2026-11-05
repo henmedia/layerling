@@ -133,3 +133,23 @@ export function tapeLengthShift(start: THREE.Vector3, end: THREE.Vector3, length
   const shift = end.clone().sub(start).multiplyScalar((length - current) / current);
   return movesEnd ? shift : shift.negate();
 }
+
+/**
+ * What a whole round edge measures (asked for in the Facebook group): a full circle its diameter, an arc its radius,
+ * each with the length along the edge. A circle's polyline may stop one side short of where it began, so a gap no
+ * longer than its longest side still counts as closed. Null for any edge that is not round.
+ */
+export function roundEdgeMeasure(points: readonly THREE.Vector3[]) {
+  const circle = circleOfEdgePoints(points);
+  if (!circle) return null;
+  let length = 0;
+  let longestSide = 0;
+  for (let index = 0; index + 1 < points.length; index += 1) {
+    const side = points[index].distanceTo(points[index + 1]);
+    length += side;
+    longestSide = Math.max(longestSide, side);
+  }
+  const gap = points[0].distanceTo(points[points.length - 1]);
+  const full = gap <= longestSide * 1.01 + Math.max(1e-6, circle.radius * 1e-4);
+  return { full, diameter: circle.radius * 2, radius: circle.radius, length: full ? length + gap : length };
+}
