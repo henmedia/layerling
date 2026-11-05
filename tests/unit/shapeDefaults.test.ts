@@ -24,6 +24,12 @@ describe("saving a shape's values as its defaults", () => {
     expect(star).toMatchObject({ starPoints: 8 });
   });
 
+  it("leaves a hinge's opening angle out, so new hinges start flat (#1336)", () => {
+    const hinge = shapeDefaultsFromShape(shapeOf("hinge", { hingeAngle: -90, hingeLeafStyle: "raised" }));
+    expect(hinge).toMatchObject({ hingeLeafStyle: "raised" });
+    expect(hinge).not.toHaveProperty("hingeAngle");
+  });
+
   it("keeps the size limit that was set in the settings", () => {
     const entry = shapeDefaultsFromShape(shapeOf("box", { height: 33 }), { box: { maxDimension: 500 } });
     expect(entry).toMatchObject({ height: 33, maxDimension: 500 });

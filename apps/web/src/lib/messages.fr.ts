@@ -2991,7 +2991,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.hingeLeafThickness": "Épaisseur des feuilles",
   "prop.hingePinless": "Sans broche (votre propre broche)",
   "prop.hingeAngle": "Angle d'ouverture",
-  "prop.hingeClearance": "Liquidation",
+  "prop.hingeClearance": "Jeu",
   "prop.hingeCornerRadius": "Rayon des coins",
   "prop.hingeLeafStyle": "Forme des feuilles",
   "hinge.leafPlate": "Pleine",
