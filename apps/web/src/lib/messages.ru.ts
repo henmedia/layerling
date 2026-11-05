@@ -4183,6 +4183,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "Каждое поле значения рядом с выделением получает цвет своей оси: X красный, Y зелёный, Z синий.",
   "workspace.showRotationAngles": "Показывать углы повёрнутых тел",
   "workspace.startInPerspective": "Открывать редактор в перспективном виде",
+  "workspace.startWithScrollbars": "Открывать редактор с полосами прокрутки",
   "workspace.startView": "Начальный вид",
   "workspace.startViewHint": "Ракурс, в котором открываются новые проекты и к которому возвращает «Домой». Поверните вид как вам нравится и возьмите текущий вид. Действует для всех проектов в этом браузере.",
   "workspace.startViewUseCurrent": "Взять текущий вид",

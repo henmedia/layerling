@@ -332,7 +332,7 @@ export function SecondViewWindow({ popup, threeRef, projectId, getSelectedIds, o
         return;
       }
       const face = viewFaceForKey(event.key, event.code, event.shiftKey);
-      const key = event.key.toLowerCase();
+      const key = (event.key ?? "").toLowerCase();
       let move: ((view: CameraRig) => void) | null = null;
       if (face) {
         move = (view) => {

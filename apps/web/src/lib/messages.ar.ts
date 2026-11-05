@@ -4200,6 +4200,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "يأخذ كل مربع قيمة بجانب التحديد لون محوره: X أحمر، وY أخضر، وZ أزرق.",
   "workspace.showRotationAngles": "إظهار زوايا الأجسام المدارة",
   "workspace.startInPerspective": "بدء المحرر في عرض المنظور (Perspective)",
+  "workspace.startWithScrollbars": "بدء المحرر مع أشرطة التمرير",
   "workspace.startView": "عرض البداية",
   "workspace.startViewHint": "الزاوية التي تُفتح بها التصاميم الجديدة ويعود إليها زر «المشهد كاملًا». أدِر العرض كما تحب ثم استخدم العرض الحالي. ينطبق على كل التصاميم في هذا المتصفح.",
   "workspace.startViewUseCurrent": "استخدام العرض الحالي",

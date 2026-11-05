@@ -4177,6 +4177,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "Ogni casella di valore accanto alla selezione prende il colore del suo asse: X rosso, Y verde, Z blu.",
   "workspace.showRotationAngles": "Mostra gli angoli di rotazione dei corpi",
   "workspace.startInPerspective": "Avvia l'editor in vista prospettica",
+  "workspace.startWithScrollbars": "Avvia l'editor con le barre di scorrimento",
   "workspace.startView": "Vista di avvio",
   "workspace.startViewHint": "L’angolazione in cui si aprono i nuovi progetti e a cui torna Vista iniziale. Ruota la vista come preferisci, poi usa la vista attuale. Vale per tutti i progetti in questo browser.",
   "workspace.startViewUseCurrent": "Usa la vista attuale",

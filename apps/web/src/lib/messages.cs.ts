@@ -4184,6 +4184,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.dimensionAxisColorsHint": "Každé políčko s hodnotou u výběru dostane barvu své osy: X červeně, Y zeleně, Z modře.",
   "workspace.showRotationAngles": "Zobrazit úhly natočených těles",
   "workspace.startInPerspective": "Spouštět editor v perspektivním pohledu",
+  "workspace.startWithScrollbars": "Spouštět editor s posuvníky",
   "workspace.startView": "Úvodní pohled",
   "workspace.startViewHint": "Úhel, ve kterém se otevírají nové návrhy a na který se vrací Domů. Natočte pohled podle sebe a pak použijte aktuální pohled. Platí pro všechny návrhy v tomto prohlížeči.",
   "workspace.startViewUseCurrent": "Použít aktuální pohled",

@@ -130,7 +130,7 @@ export function CommandPalette({ commands, onClose }: { commands: PaletteCommand
         // window is open every key stops here.
         onKeyDown={(event) => {
           event.stopPropagation();
-          if (event.key === "Escape" || ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "k")) {
+          if (event.key === "Escape" || ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && (event.key ?? "").toLowerCase() === "k")) {
             event.preventDefault();
             onClose();
           } else if (event.key === "ArrowDown") {

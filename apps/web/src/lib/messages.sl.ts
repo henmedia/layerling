@@ -3363,6 +3363,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "Polja mer v barvah osi",
   "workspace.dimensionAxisColorsHint": "Vsako polje z vrednostjo ob izboru dobi barvo svoje osi: X rdeče, Y zeleno, Z modro.",
   "workspace.startInPerspective": "Zaženi urejevalnik v perspektivnem pogledu",
+  "workspace.startWithScrollbars": "Zaženi urejevalnik z drsniki",
   "workspace.startView": "Začetni pogled",
   "workspace.startViewHint": "Kot, v katerem se odprejo novi osnutki in kamor se vrne Domov. Zasukajte pogled po svoje in nato uporabite trenutni pogled. Velja za vse osnutke v tem brskalniku.",
   "workspace.startViewUseCurrent": "Uporabi trenutni pogled",

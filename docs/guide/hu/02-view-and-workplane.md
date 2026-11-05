@@ -43,7 +43,7 @@ A bal szélen egy keskeny sáv van. Felülről lefelé:
 - A {{ui:camera.zoomIn}} és a {{ui:camera.zoomOut}} lépésenként nagyít és kicsinyít, ahogy a [[+]] és a [[−]] billentyű is.
 - Az {{ui:camera.orthographic}} lapos nézetre vált, amelyben a párhuzamos élek párhuzamosak maradnak. Méréshez és élek egymáshoz igazításához ez gyakran kényelmesebb, mint a perspektivikus nézet. Az [[O]] oda-vissza vált, és egy második kattintás visszavált.
 - A {{ui:camera.secondView}} a terv második nézetét nyitja meg egy saját ablakban, lásd lent. Egy második kattintás bezárja.
-- A {{ui:camera.showScrollbars}} egy görgetősávot tesz a nézet aljára és egyet a jobb szélére. Húzd a sávot, és a nézet egyenletesen csúszik; a végén lévő nyílra kattintva egy kicsit mozdul (nyomva tartva tovább megy), a sáv mellé kattintva pedig majdnem egy egész nézetnyit. Semmi sem fordul el, és a nyílbillentyűkkel ellentétben a sávok akkor is működnek, ha egy alkatrész ki van jelölve - közelről, apró részleteknél hasznos. Egy második kattintás elrejti őket; ez a böngésző megjegyzi a választást.
+- A {{ui:camera.showScrollbars}} egy görgetősávot tesz a nézet aljára és egyet a jobb szélére. Húzd a sávot, és a nézet egyenletesen csúszik; a végén lévő nyílra kattintva egy kicsit mozdul (nyomva tartva tovább megy), a sáv mellé kattintva pedig majdnem egy egész nézetnyit. Semmi sem fordul el, és a nyílbillentyűkkel ellentétben a sávok akkor is működnek, ha egy alkatrész ki van jelölve - közelről, apró részleteknél hasznos. Egy második kattintás elrejti őket; hogy egy terv velük nyíljon-e meg, azt a beállítások {{ui:workspace.startWithScrollbars}} kapcsolója dönti el.
 - A {{ui:camera.hideWorkplane}} (a rács fölötti szem) elrejti a tárgyasztalt a rácsával együtt, így alulról is megnézheted egy terv alját. Csak a nézet változik: az új alakzatok továbbra is a munkasíkra kerülnek. Egy második kattintás újra megmutatja.
 - A {{ui:camera.placeWorkplane}}, a mérőszalag és a derékszögvonalzó önálló eszközök, ezekről lentebb és a [Mérés és jegyzetek](chapter:measuring-and-notes) fejezetben olvashatsz.
 
@@ -173,6 +173,8 @@ A(z) {{ui:workspace.objectSnap}} húzás közben más alakzatokhoz illeszti egy 
 ### Megjelenés: a nézet
 
 {{ui:workspace.startInPerspective}}: a szerkesztő ilyenkor perspektivikus nézetben nyílik meg a lapos helyett.
+
+{{ui:workspace.startWithScrollbars}}: a terv ilyenkor a nézet görgetősávjaival nyílik meg. A beállítás a tervvel és a {{ui:workspace.makeDefault}} gombbal is mentődik.
 
 A(z) {{ui:workspace.startView}} azt a szöget adja meg, amelyben egy új terv megnyílik, és amelyhez a(z) {{ui:camera.home}} visszatér. Forgasd és nagyítsd a nézetet, ahogy tetszik, majd kattints a(z) {{ui:workspace.startViewUseCurrent}} gombra; a(z) {{ui:workspace.startViewStandard}} visszahozza a szokásos elölről-jobbról nézetet. Ebben a böngészőben minden tervre érvényes. Egy újra megnyitott terv továbbra is úgy nyílik meg, ahogy otthagytad.
 

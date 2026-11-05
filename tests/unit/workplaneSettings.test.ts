@@ -79,6 +79,9 @@ describe("workplane settings helpers", () => {
     expect(normalizeWorkspaceSettings({}).dimensionAxisColors).toBe(false);
     expect(normalizeWorkspaceSettings({ dimensionAxisColors: true }).dimensionAxisColors).toBe(true);
     expect(normalizeWorkspaceSettings({ dimensionAxisColors: "yes" }).dimensionAxisColors).toBe(false);
+    expect(DEFAULT_WORKPLANE_WORKSPACE.startWithScrollbars).toBe(false);
+    expect(normalizeWorkspaceSettings({ startWithScrollbars: true }).startWithScrollbars).toBe(true);
+    expect(normalizeWorkspaceSettings({ startWithScrollbars: "yes" }).startWithScrollbars).toBe(false);
     expect(DEFAULT_WORKPLANE_WORKSPACE.clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({}).clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({ clickToPlaceShapes: false }).clickToPlaceShapes).toBe(false);
@@ -351,6 +354,12 @@ describe("reset grid (#503)", () => {
     expect(saved.workspace.gridBlockSize).toBe(5);
     expect(saved.workspace.width).toBe(300);
     expect(saved.snap).toBe("0.5 mm");
+  });
+
+  it("keeps Start editor with scrollbars in the default saved with Make default", () => {
+    const storage = fakeStorage();
+    saveWorkspaceDefault({ ...DEFAULT_WORKPLANE_WORKSPACE, startWithScrollbars: true }, "0.5 mm", storage);
+    expect(readWorkspaceDefault(storage)!.workspace.startWithScrollbars).toBe(true);
   });
 
   it("does nothing when no default was ever saved", () => {

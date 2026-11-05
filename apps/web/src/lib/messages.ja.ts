@@ -2915,6 +2915,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionsAlwaysVisible": "寸法を常に表示",
   "workspace.showRotationAngles": "回転したボディの角度を表示",
   "workspace.startInPerspective": "エディターを透視投影表示で開始",
+  "workspace.startWithScrollbars": "スクロールバーを表示してエディターを開始",
   "workspace.startView": "開始ビュー",
   "workspace.startViewHint": "新しいデザインを開くときの角度で、ホームで戻る角度です。好みの向きにビューを回してから、現在のビューを使ってください。このブラウザーのすべてのデザインに適用されます。",
   "workspace.startViewUseCurrent": "現在のビューを使う",

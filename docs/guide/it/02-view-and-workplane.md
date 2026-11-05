@@ -44,7 +44,7 @@ Sul bordo sinistro trovi una barra sottile. Dall’alto:
 - {{ui:camera.focusSelection}} ingrandisce la selezione ([[F]] o [[Shift]]+[[F]]).
 - {{ui:camera.zoomIn}} e {{ui:camera.zoomOut}} ingrandiscono o rimpiccioliscono a scatti, come i tasti [[+]] e [[−]].
 - {{ui:camera.orthographic}} attiva una vista piatta, in cui gli spigoli paralleli restano paralleli. Per misurare e allineare gli spigoli è spesso più comoda della prospettiva. Premi [[O]] per alternare le due viste; un secondo clic torna alla vista precedente.
-- {{ui:camera.showScrollbars}} mostra una barra di scorrimento in basso nella vista e una lungo il bordo destro. Trascina una barra per spostare la vista in modo fluido, fai clic su una freccia all’estremità per spostarla di poco (tienila premuta per continuare), oppure fai clic accanto alla barra per avanzare di quasi tutta la vista. Non ruota nulla e, a differenza dei tasti freccia, le barre funzionano anche con una parte selezionata: comodo da vicino sui piccoli dettagli. Un secondo clic le nasconde; questo browser ricorda la scelta.
+- {{ui:camera.showScrollbars}} mostra una barra di scorrimento in basso nella vista e una lungo il bordo destro. Trascina una barra per spostare la vista in modo fluido, fai clic su una freccia all’estremità per spostarla di poco (tienila premuta per continuare), oppure fai clic accanto alla barra per avanzare di quasi tutta la vista. Non ruota nulla e, a differenza dei tasti freccia, le barre funzionano anche con una parte selezionata: comodo da vicino sui piccoli dettagli. Un secondo clic le nasconde; {{ui:workspace.startWithScrollbars}} nelle impostazioni decide se un progetto si apre con le barre.
 - {{ui:camera.hideWorkplane}} (l’occhio sopra una griglia) nasconde il piano con la griglia, così puoi guardare da sotto il lato inferiore del progetto. Cambia solo la vista: le nuove forme continuano a essere posizionate sul piano di lavoro. Fai di nuovo clic per mostrarlo.
 - {{ui:camera.placeWorkplane}}, il metro a nastro e la squadra sono strumenti separati, descritti qui sotto e in [Misurazioni e annotazioni](chapter:measuring-and-notes).
 
@@ -174,6 +174,8 @@ Con {{ui:workspace.frameByDirection}}, trascinando un riquadro verso destra sele
 ### Aspetto: vista
 
 Con {{ui:workspace.startInPerspective}} l’editor si apre nella vista prospettica invece che in quella piatta.
+
+Con {{ui:workspace.startWithScrollbars}} un progetto si apre con le barre di scorrimento della vista. L’impostazione si salva con il progetto e con {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.startView}} fissa l'angolo da cui si apre un nuovo progetto e a cui torna {{ui:camera.home}}. Ruota e ingrandisci la vista come ti piace, poi fai clic su {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} riporta la vista consueta da davanti a destra. Vale per ogni progetto in questo browser. Un progetto che riapri si apre comunque come lo hai lasciato.
 

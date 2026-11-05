@@ -2,9 +2,11 @@
    edge, one along the bottom, each with an arrow at both ends. Thin and see-through until the pointer is on them,
    so the view stays the view; colours from the theme, so the dark and graphite themes follow. */
 
-/* Spans the view; the properties panel's width, measured by the component, keeps the bars clear of it. */
+/* Spans the view; the properties panel's place, measured by the component, keeps each bar clear of it. */
 .view-scrollbars {
   --view-scrollbar-right: 0px;
+  --view-scrollbar-x-right: 0px;
+  --view-scrollbar-top: 4px;
   --view-scrollbar-size: 14px;
   position: absolute;
   inset: 0;
@@ -34,22 +36,47 @@
   opacity: 1;
 }
 
-/* Along the bottom, leaving the corner to the upright bar. */
+/* Along the bottom, from the left edge, leaving the right corner to the upright bar. */
 .view-scrollbar-x {
-  left: 64px;
-  right: calc(var(--view-scrollbar-right) + var(--view-scrollbar-size) + 12px);
+  left: 4px;
+  right: calc(var(--view-scrollbar-x-right) + var(--view-scrollbar-size) + 12px);
   bottom: 4px;
   height: var(--view-scrollbar-size);
   flex-direction: row;
 }
 
-/* Down the right edge, below the hints at the top. */
+/* Down the right edge, from the top or below a minimised panel's header. */
 .view-scrollbar-y {
-  top: 64px;
+  top: var(--view-scrollbar-top);
   bottom: calc(var(--view-scrollbar-size) + 12px);
   right: calc(var(--view-scrollbar-right) + 4px);
   width: var(--view-scrollbar-size);
   flex-direction: column;
+}
+
+/* The snap grid control steps up over the bottom bar and left of the upright one, and a view cube in the right corners
+   stands just left of the upright bar, wherever the panel puts it; the bar runs to the top. The second selector outweighs
+   the docked panel's rule in viewCube.css. A minimised docked panel's header keeps a top-right cube where it was. */
+.workplane-stage:has(> .view-scrollbars) .grid-settings {
+  right: 26px;
+  bottom: 26px;
+}
+
+@media (min-width: 641px) {
+  html[data-view-cube-position$="-right"] .workplane-stage:has(> .view-scrollbars) .view-cube,
+  html[data-view-cube-position$="-right"] .workplane-stage:has(> .view-scrollbars):has(.shape-inspector:not(.floating):not(.minimized)) .view-cube {
+    right: calc(var(--view-scrollbar-right, 0px) + 26px);
+  }
+
+  /* At the bottom the cube stands above the bar, and above the snap grid control when that is in the view, not in the
+     docked panel. */
+  html[data-view-cube-position^="bottom-"] .workplane-stage:has(> .view-scrollbars) .view-cube {
+    bottom: 26px;
+  }
+
+  html[data-view-cube-position="bottom-right"] .workplane-stage:has(> .view-scrollbars):has(> .grid-settings) .view-cube {
+    bottom: 51px;
+  }
 }
 
 .view-scrollbar-arrow {

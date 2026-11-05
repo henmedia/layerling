@@ -45,7 +45,7 @@ En el borde izquierdo hay una barra estrecha. De arriba abajo:
 - {{ui:camera.zoomIn}} y {{ui:camera.zoomOut}} hacen zoom paso a paso, igual que las teclas [[+]] y [[−]].
 - {{ui:camera.orthographic}} cambia a una vista plana en la que las aristas paralelas siguen siendo paralelas. Para medir y alinear aristas suele ser más cómoda que la vista en perspectiva. [[O]] alterna entre las dos, y un segundo clic vuelve a la de antes.
 - {{ui:camera.secondView}} abre una segunda vista del diseño en una ventana propia, descrita más abajo. Un segundo clic la cierra.
-- {{ui:camera.showScrollbars}} pone una barra de desplazamiento en la parte inferior de la vista y otra a lo largo de su borde derecho. Arrastra una barra para desplazar la vista con suavidad, haz clic en una flecha de su extremo para moverla un poco (mantenla pulsada para seguir), o haz clic junto a la barra para avanzar casi una vista entera. Nada gira y, a diferencia de las teclas de flecha, las barras funcionan con una pieza seleccionada: útil de cerca, en detalles pequeños. Un segundo clic las oculta; este navegador recuerda la elección.
+- {{ui:camera.showScrollbars}} pone una barra de desplazamiento en la parte inferior de la vista y otra a lo largo de su borde derecho. Arrastra una barra para desplazar la vista con suavidad, haz clic en una flecha de su extremo para moverla un poco (mantenla pulsada para seguir), o haz clic junto a la barra para avanzar casi una vista entera. Nada gira y, a diferencia de las teclas de flecha, las barras funcionan con una pieza seleccionada: útil de cerca, en detalles pequeños. Un segundo clic las oculta; {{ui:workspace.startWithScrollbars}} en los ajustes decide si un diseño se abre con ellas.
 - {{ui:camera.hideWorkplane}} (el ojo sobre una cuadrícula) oculta la placa con su cuadrícula, para que puedas mirar desde abajo la parte inferior de un diseño. Solo cambia la vista: las formas nuevas siguen apareciendo en el plano de trabajo. Un segundo clic vuelve a mostrarla.
 - {{ui:camera.placeWorkplane}}, la cinta métrica y la escuadra son herramientas aparte; se explican más abajo y en [Medidas y notas](chapter:measuring-and-notes).
 
@@ -175,6 +175,8 @@ La vista de boceto tiene sus propios colores: {{ui:workspace.sketchBackground}} 
 ### Aspecto: la vista
 
 {{ui:workspace.startInPerspective}}: el editor se abre entonces en la vista en perspectiva, no en la plana.
+
+{{ui:workspace.startWithScrollbars}}: un diseño se abre entonces con las barras de desplazamiento de la vista. Se guarda con el diseño y con {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.startView}} fija el ángulo en que se abre un diseño nuevo y al que vuelve {{ui:camera.home}}. Gira la vista y haz zoom hasta que te guste, y haz clic en {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} recupera la vista habitual, desde delante a la derecha. Vale para todos los diseños de este navegador. Un diseño que vuelves a abrir se sigue abriendo tal como lo dejaste.
 
