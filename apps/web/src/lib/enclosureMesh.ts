@@ -105,8 +105,12 @@ export class IndexedMesh {
   }
 }
 
-/** A point of a profile: across (`u`) and up (`v`). */
-export type ProfilePoint = { u: number; v: number };
+/**
+ * A point of a profile: across (`u`) and up (`v`). `arc` marks a point the outline reaches along a circle: the mesh
+ * runs straight from point to point, the exact body (enclosureSolid.ts) draws the true arc through them.
+ */
+export type ProfilePoint = { u: number; v: number; arc?: ProfileArc };
+export type ProfileArc = { center: { u: number; v: number }; radius: number };
 
 /**
  * A closed outline pushed straight along x from -length/2 to length/2: `u` becomes z, `v` becomes y. Every outline
@@ -135,12 +139,16 @@ export function addPrismAlongX(mesh: IndexedMesh, outline: ProfilePoint[], lengt
   }
 }
 
-/** Points along a quarter circle from `from` to `to` (both included), the centre given, `steps` pieces. */
+/**
+ * Points along a circle from `from` to `to` (both included), the centre given, `steps` pieces. Every point after the
+ * first is marked as reached along the arc; the first is where the arc starts.
+ */
 export function arcPoints(center: ProfilePoint, radius: number, fromAngle: number, toAngle: number, steps: number): ProfilePoint[] {
   const out: ProfilePoint[] = [];
+  const arc: ProfileArc = { center: { u: center.u, v: center.v }, radius };
   for (let k = 0; k <= steps; k += 1) {
     const a = fromAngle + ((toAngle - fromAngle) * k) / steps;
-    out.push({ u: center.u + radius * Math.cos(a), v: center.v + radius * Math.sin(a) });
+    out.push(k === 0 ? { u: center.u + radius * Math.cos(a), v: center.v + radius * Math.sin(a) } : { u: center.u + radius * Math.cos(a), v: center.v + radius * Math.sin(a), arc });
   }
   return out;
 }

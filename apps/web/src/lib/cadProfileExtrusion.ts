@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { taperedSlotOutline } from "@/lib/slotGeometry";
 import { weldOnGrid } from "@/lib/gridWeld";
 import type { WorkplaneShape } from "@/types/layerling";
-import type { CadModifierProfileLoop, CadModifierProfilePart, CadModifierProfileSegment, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierSpringPart, CadModifierSweepPiece, CadModifierThreadPart } from "@/lib/cadModifierTypes";
+import type { CadModifierProfileLoop, CadModifierProfilePart, CadModifierProfileSegment, CadModifierEnclosurePart, CadModifierGridfinityPart, CadModifierHelicalGearPart, CadModifierHirthPart, CadModifierSpringPart, CadModifierSweepPiece, CadModifierThreadPart } from "@/lib/cadModifierTypes";
 import { hirthMeasures } from "@/lib/hirthGeometry";
 import { profileArcPoint, profileLoopBounds, TWIST_SECTION_STEP, validateCadProfile } from "@/lib/cadProfileSolid";
 import { cadTransformFromMatrix } from "@/lib/cadBakeMetadata";
@@ -1873,6 +1873,61 @@ export function cadModifierHirthForShape(shape: WorkplaneShape): CadModifierHirt
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
   const { rx, rz, height, teeth, toothHeight, boreRadius } = hirthMeasures(shape, width, depth);
   return { rx, rz, height, teeth, toothHeight, boreRadius, transform: profileTransformForShape(shape) };
+}
+
+/**
+ * A screw boss, snap-fit or rib (#1246) as the exact body its display mesh draws, or null for one that has to stay its
+ * mesh. The shape's fields go to `enclosureSolid.ts`, which builds the body from the same plan as the mesh; a screw
+ * boss set as a hole takes that along, so its body is its pocket alone (#1288). They take no taper or extrude deform.
+ */
+export function cadModifierEnclosureForShape(shape: WorkplaneShape): CadModifierEnclosurePart | null {
+  if (shape.kind !== "screwBoss" && shape.kind !== "snapFit" && shape.kind !== "rib") return null;
+  if (shape.importedMesh || shape.groupedShapes?.length || shape.cadBrep || shape.imagePlate || shapeHasShapeDeform(shape)) return null;
+  const width = shapeWidth(shape);
+  const depth = shapeDepth(shape);
+  const height = shape.height;
+  if (![width, depth, height].every((value) => Number.isFinite(value) && value > 0)) return null;
+  // The mesh is built at the shape's size in its own frame, unstretched; the body is placed the same way.
+  const transform = profileTransformForShape(shape);
+  if (shape.kind === "screwBoss") {
+    return {
+      kind: "screwBoss",
+      fields: {
+        hole: Boolean(shape.hole),
+        width,
+        depth,
+        height,
+        screwBossFastener: shape.screwBossFastener,
+        screwBossSize: shape.screwBossSize,
+        screwBossHole: shape.screwBossHole,
+        screwBossHoleDepth: shape.screwBossHoleDepth,
+        screwBossDiameter: shape.screwBossDiameter,
+        screwBossGussets: shape.screwBossGussets,
+        screwBossGussetHeight: shape.screwBossGussetHeight,
+        screwBossGussetThickness: shape.screwBossGussetThickness,
+      },
+      transform,
+    };
+  }
+  if (shape.kind === "snapFit") {
+    return {
+      kind: "snapFit",
+      fields: {
+        width,
+        depth,
+        height,
+        snapFitPart: shape.snapFitPart,
+        snapFitThickness: shape.snapFitThickness,
+        snapFitUndercut: shape.snapFitUndercut,
+        snapFitLeadAngle: shape.snapFitLeadAngle,
+        snapFitRetainAngle: shape.snapFitRetainAngle,
+        snapFitClearance: shape.snapFitClearance,
+        snapFitFoot: shape.snapFitFoot,
+      },
+      transform,
+    };
+  }
+  return { kind: "rib", fields: { width, depth, height, ribStyle: shape.ribStyle, ribTop: shape.ribTop }, transform };
 }
 
 /** Outline pieces of a profile, the measure its kernel cost grows with. */
