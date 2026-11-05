@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Paste beyond the plate keeps the parts where they are to each other (Issue #1304):** A plain paste set each copy 12 mm from its original but held every part to 110 mm on its own, a cap left over from 1.0.0. Parts lying further out were pulled onto the same spot, so a cylinder in the corner of a box came out in its middle, also on a larger plate. All copies now move together by the same 12 mm, wherever they lie; "Paste in the middle and drop" was not affected.
+
 ## 1.141.0
 
 - **Lid hinge: flush in the wall, a pivot lid on two pins, and the pin's play to set (PR #1291, Discussion #1220):** The hinge sat behind the back wall, so its knuckles made the box about 5.5 mm deeper. Under **Hinge** the lid panel now has a **Hinge type**: Outside (as before), **Flush** (the knuckles go into the back wall, flush with its outer face and the lid's top, so the box keeps its size; the body's knuckles grow out of a thin wall on a 45° slope so the box still prints upright without support; it opens to about 140°) and **Pivot pins** (the lid lies in the opening and turns on two pins through the side walls; it opens to about 95°). **Pin play (per side)**, 0.05 to 0.5 mm and 0.2 mm to begin with where it was a fixed 0.15 mm, lets you loosen the pin for your printer: two people printed a 3 mm pin and had to force it in. Reported by @makinglayerschannel and @smussadi in #1220.
