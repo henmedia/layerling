@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Kegelrad mit schrägen Zähnen",
+      "en": "Bevel gear with spiral teeth"
+    },
+    "body": {
+      "de": "Das Kegelrad hat jetzt einen eigenen Schrägungswinkel: Seine Zähne drehen sich, während sie zur Oberseite hin kleiner werden, wie bei einem Spiralkegelrad. Bei 0 bleiben sie gerade wie bisher. So ein Rad bleibt ein Dreiecksnetz, Kantenwerkzeug und STEP-Export nehmen es nicht.",
+      "en": "The bevel gear now has its own helix angle: its teeth turn while they get smaller towards the top, like a spiral bevel gear. At 0 they stay straight as before. Such a gear stays a triangle mesh, so the edge tool and the STEP export leave it out."
+    }
+  },
+  {
+    "title": {
       "de": "Entwürfe ohne Verlauf öffnen",
       "en": "Open a design without its history"
     },

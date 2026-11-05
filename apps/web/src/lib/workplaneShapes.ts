@@ -704,6 +704,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.centerHoleSize === b.centerHoleSize &&
     a.gearType === b.gearType &&
     a.helixAngle === b.helixAngle &&
+    a.bevelHelixAngle === b.bevelHelixAngle &&
     a.helixQuality === b.helixQuality &&
     a.gearProfile === b.gearProfile &&
     a.gearPressureAngle === b.gearPressureAngle &&

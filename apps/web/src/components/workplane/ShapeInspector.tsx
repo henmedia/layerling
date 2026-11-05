@@ -19,12 +19,14 @@ import {
   MIN_GEAR_HELIX_QUALITY,
   gearCenterHoleLimits,
   normalizeGearHelixAngle,
+  normalizeBevelHelixAngle,
   normalizeGearHelixQuality,
   normalizeGearCenterHoleSize,
   normalizeGearToothSize,
   normalizeGearToothWidth,
   normalizeGearType,
   gearTypeHasHelix,
+  bevelGearIsSpiral,
   gearToothPitch,
   DEFAULT_GEAR_BACKLASH,
   involuteGearModule,
@@ -3400,6 +3402,20 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         step: 1,
         onChange: (helixAngle) => onUpdate({ helixAngle }),
       });
+    }
+    // A bevel gear's teeth can turn while they taper, a spiral bevel gear (Discussion #1299); 0 keeps them straight.
+    if (normalizeGearType(shape.gearType) === "bevel") {
+      properties.push({
+        id: "bevelHelixAngle",
+        label: t("prop.helixAngle"),
+        value: normalizeBevelHelixAngle(shape.bevelHelixAngle),
+        min: MIN_GEAR_HELIX_ANGLE,
+        max: MAX_GEAR_HELIX_ANGLE,
+        step: 1,
+        onChange: (bevelHelixAngle) => onUpdate({ bevelHelixAngle: bevelHelixAngle || undefined }),
+      });
+    }
+    if (gearTypeHasHelix(shape.gearType) || (normalizeGearType(shape.gearType) === "bevel" && bevelGearIsSpiral(shape.bevelHelixAngle))) {
       properties.push({
         id: "quality",
       label: t("prop.quality"),
@@ -3961,7 +3977,7 @@ export function ShapeInspector({
     ? properties.filter((property) => ["gearProfile", "teeth", "gearModule", "gearPressureAngle", "gearBacklash", "gearRim", "toothSize", "toothWidth"].includes(property.id))
     : [];
   const gearHelixProperties = shape.kind === "gear"
-    ? properties.filter((property) => ["helixAngle", "quality"].includes(property.id))
+    ? properties.filter((property) => ["helixAngle", "bevelHelixAngle", "quality"].includes(property.id))
     : [];
   const taper = shapeTaperDimensions(shape);
   const taperDimensionMax = shapeDimensionLimit(workspace, shape.kind, DEFAULT_TAPER_DIMENSION_MAX);
@@ -4971,7 +4987,7 @@ export function ShapeInspector({
           ) : null}
         </div>
       ) : null}
-      {gearTypeHasHelix(gearType ?? undefined) ? (
+      {gearHelixProperties.length ? (
         <div className={`property-card ${gearHelixOpen ? "" : "collapsed"}`}>
           <button
             className="property-card-header"

@@ -306,6 +306,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gearType: shape.gearType,
     gearRim: shape.gearRim,
     helixAngle: shape.helixAngle,
+    bevelHelixAngle: shape.bevelHelixAngle,
     threadRole: shape.threadRole,
     threadHead: shape.threadHead,
     threadHand: shape.threadHand,
@@ -695,6 +696,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gearRim: shape.gearRim,
     helixAngle: shape.helixAngle,
     threadRole: shape.threadRole,
+    bevelHelixAngle: shape.bevelHelixAngle,
     threadHead: shape.threadHead,
     threadHand: shape.threadHand,
     threadProfile: shape.threadProfile,
@@ -2123,6 +2125,7 @@ export function createShapeObject(
         helixAngle: shape.helixAngle,
         helixQuality: shape.helixQuality,
         gearProfile: shape.gearProfile,
+        bevelHelixAngle: shape.bevelHelixAngle,
         gearPressureAngle: shape.gearPressureAngle,
         gearBacklash: shape.gearBacklash,
       })), material, shape);

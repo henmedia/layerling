@@ -172,6 +172,8 @@ export type ShapeCustomization = {
   gearType?: GearType;
   helixAngle?: number;
   helixQuality?: number;
+  /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
+  bevelHelixAngle?: number;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -1010,6 +1012,8 @@ export type WorkplaneShape = {
   helixQuality?: number;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
+  /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
+  bevelHelixAngle?: number;
   /** Involute teeth: pressure angle in degrees (20 by default). */
   gearPressureAngle?: number;
   /** Involute teeth: play of a meshing pair in mm, half taken off each gear. */

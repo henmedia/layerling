@@ -37,7 +37,7 @@ import { springBuildPlan, springRingSectionShare } from "@/lib/springGeometry";
 import { flatSpringProfileLoops } from "@/lib/flatSpringGeometry";
 import { gridfinityHasPieces, gridfinityPlan } from "@/lib/gridfinityGeometry";
 import { knurlCorners, knurlSettings, roundKnurlWave } from "@/lib/knurlGeometry";
-import { BEVEL_GEAR_TOP_SCALE, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearType, rackMeasures, rackOutlinePoints, rackToothArcs, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
+import { BEVEL_GEAR_TOP_SCALE, bevelGearIsSpiral, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearType, rackMeasures, rackOutlinePoints, rackToothArcs, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
 
 /*
  * The outlines below follow the display geometry of each shape
@@ -1574,7 +1574,8 @@ export function cadModifierProfileForShape(shape: WorkplaneShape, options: { des
   }
   if (!CAD_PROFILE_SHAPE_KINDS.has(shape.kind)) return null;
   try {
-    if (shape.kind === "gear" && normalizeGearType(shape.gearType) === "bevel") return bevelGearProfile(shape, width, depth);
+    // A spiral bevel gear (Discussion #1299) has twisted flanks the loft cannot build: it stays its mesh.
+    if (shape.kind === "gear" && normalizeGearType(shape.gearType) === "bevel") return bevelGearIsSpiral(shape.bevelHelixAngle) ? null : bevelGearProfile(shape, width, depth);
     if (shape.kind === "loft") return loftShapeProfile(shape);
     if (shape.kind === "pyramid") return pyramidProfile(shape, width, depth);
     const profile = cadProfileForShapeKind(shape, options.designedRound);
