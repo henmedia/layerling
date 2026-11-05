@@ -3187,7 +3187,7 @@ export const MESSAGES_EN = {
   "inspector.surfaceSeedHint": "Another number lays the cells or grains out anew.",
   "inspector.surfaceImage": "Image",
   "inspector.surfaceImageLoad": "Load your own image…",
-  "inspector.surfaceImageHint": "Light becomes the full depth, dark stays as it is. Your own image is kept with the design in grey, at most 256 points a side; a tile is as wide as set and as high as the image is for that width.",
+  "inspector.surfaceImageHint": "Light becomes the full depth, dark stays as it is. A dark drawing on a transparent ground, such as black lines in an SVG, counts by its lines: they become the full depth. Your own image is kept with the design in grey, at most 256 points a side; a tile is as wide as set and as high as the image is for that width.",
   "inspector.surfaceTileHeight": "Tile height (0 = as the image)",
   "inspector.surfaceImageHeight": "Image height",
   "inspector.surfaceImageOnceHint": "The image is pressed on once, like a label: Around and Height place its middle, as for a text. Outside it the surface stays smooth; Depth and Direction set how far it stands out or is cut in. An image height of 0 keeps the image's proportions. With faces picked, it always lands on them.",

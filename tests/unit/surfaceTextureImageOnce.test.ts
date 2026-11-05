@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { applySurfaceTexture, normalizeSurfaceTexture, surfaceTexturePositions, type SurfaceTextureResult } from "@/lib/surfaceTexture";
 import { surfaceTextureLayerPlaced } from "@/lib/surfaceTextureShape";
+import { surfaceTextureOwnImage } from "@/lib/surfaceTextureImages";
 import { surfaceMeshReport } from "@/lib/surfaceTextureMesh";
 import { analyzeTriangleSoup } from "@/lib/svgImport";
 
@@ -208,5 +209,54 @@ describe("an image pressed on once", () => {
         expectClosed(result);
       }
     }
+  }, 60_000);
+
+  /**
+   * A line drawing as an SVG often is: 400 points a side, transparent, black lines - 3 points wide at 150 (0.45 mm on a
+   * 60 mm image), 2 at 250 (0.3 mm), and, if asked, 4 along the left border - made one's own image as the inspector does.
+   */
+  function lineDrawing(leftBorder = false) {
+    const n = 400, rgba = new Uint8ClampedArray(n * n * 4);
+    for (let y = 0; y < n; y += 1) {
+      for (let x = 0; x < n; x += 1) {
+        if ((x >= 150 && x < 153) || (x >= 250 && x < 252) || (leftBorder && x < 4)) rgba.set([0, 0, 0, 255], (y * n + x) * 4);
+      }
+    }
+    return surfaceTextureOwnImage(rgba, n, n);
+  }
+
+  /** The points of a textured cylinder of radius 25, halfway up, by where they lie along its wall (mm round the front) and how deep they are cut in. */
+  function cutIn(result: SurfaceTextureResult) {
+    const out: { along: number; depth: number }[] = [];
+    const v = result.vertices;
+    for (let i = 0; i < v.length; i += 3) {
+      const [x, y, z] = [v[i], v[i + 1], v[i + 2]];
+      if (y > 25 && y < 45) out.push({ along: Math.atan2(x, z) * 25, depth: 25 - Math.hypot(x, z) });
+    }
+    return out;
+  }
+
+  it("cuts a thin black line drawing on a transparent ground in sharply, to the full depth (#1268)", () => {
+    const result = applySurfaceTexture(cylinder(25, 70), { pattern: "image", image: "own", imageOwn: lineDrawing(), imageTiling: "once", spacing: 60, depth: 3, direction: "inward" });
+    expect(result.stats.image?.placed).toBe(true);
+    expectClosed(result);
+    const points = cutIn(result);
+    // The 0.45 mm line, 7.3 mm left of the middle, goes in by the full 3 mm, and no wider than about a millimetre there.
+    const first = points.filter((p) => Math.abs(p.along + 7.27) < 2);
+    expect(Math.max(...first.map((p) => p.depth))).toBeGreaterThan(2.8);
+    const deep = first.filter((p) => p.depth > 1.5).map((p) => p.along);
+    expect(Math.max(...deep) - Math.min(...deep)).toBeLessThan(1);
+    // The 0.3 mm line, 7.35 mm right of it, goes in too.
+    expect(Math.max(...points.filter((p) => Math.abs(p.along - 7.35) < 1.5).map((p) => p.depth))).toBeGreaterThan(1.5);
+    // The ground between them stays as it was.
+    expect(Math.max(...points.filter((p) => Math.abs(p.along) < 3).map((p) => p.depth))).toBeLessThan(0.05);
+  }, 60_000);
+
+  it("softens a once image without its left border running over into its right one (#1268)", () => {
+    const result = applySurfaceTexture(cylinder(25, 70), { pattern: "image", image: "own", imageOwn: lineDrawing(true), imageTiling: "once", spacing: 60, depth: 3, direction: "inward", imageBlur: 6 });
+    const points = cutIn(result);
+    // The line along the left border is cut in there; along the right border, where the drawing has nothing, nothing is.
+    expect(Math.max(...points.filter((p) => p.along < -28 && p.along > -30).map((p) => p.depth))).toBeGreaterThan(0.05);
+    expect(Math.max(...points.filter((p) => p.along > 27 && p.along < 30.5).map((p) => p.depth))).toBeLessThan(0.05);
   }, 60_000);
 });

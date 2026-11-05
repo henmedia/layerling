@@ -3173,7 +3173,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "Un autre nombre dispose les cellules ou les grains autrement.",
   "inspector.surfaceImage": "Image",
   "inspector.surfaceImageLoad": "Charger votre image…",
-  "inspector.surfaceImageHint": "Le clair prend toute la profondeur, le sombre reste tel quel. Votre image est gardée avec le design en niveaux de gris, 256 points par côté au plus ; une tuile est aussi large que réglé et aussi haute que l'image le demande pour cette largeur.",
+  "inspector.surfaceImageHint": "Le clair prend toute la profondeur, le sombre reste tel quel. Un dessin sombre sur fond transparent, comme les traits noirs d'un SVG, compte par ses traits : ils prennent toute la profondeur. Votre image est gardée avec le design en niveaux de gris, 256 points par côté au plus ; une tuile est aussi large que réglé et aussi haute que l'image le demande pour cette largeur.",
   "inspector.surfaceTileHeight": "Hauteur de tuile (0 = comme l'image)",
   "inspector.surfaceImageHeight": "Hauteur de l'image",
   "inspector.surfaceImageOnceHint": "L'image est appliquée une seule fois, comme une étiquette : « Autour » et « Hauteur » placent son centre, comme pour un texte. En dehors, la surface reste lisse ; « Profondeur » et « Sens » règlent de combien elle ressort ou est gravée. Une hauteur d'image de 0 garde les proportions de l'image. Si des faces sont choisies, elle se pose toujours sur elles.",

@@ -171,6 +171,33 @@ describe("the patterns from the surface tool", () => {
 });
 
 describe("an image as the pattern", () => {
+  it("takes a dark drawing on a transparent ground by its ink: the lines become the full depth, the ground stays (#1268)", () => {
+    // 40 x 40, transparent, a black line 4 points wide down the middle and a navy one across.
+    const n = 40;
+    const picture = (ink: [number, number, number]) => {
+      const rgba = new Uint8ClampedArray(n * n * 4);
+      for (let y = 0; y < n; y += 1) for (let x = 0; x < n; x += 1) {
+        if (x >= 18 && x < 22) rgba.set([...ink, 255], (y * n + x) * 4);
+        else if (y >= 30 && y < 32) rgba.set([20, 30, 90, 255], (y * n + x) * 4);
+      }
+      return base64ToBytes(surfaceTextureOwnImage(rgba, n, n).data);
+    };
+    const dark = picture([0, 0, 0]);
+    expect(dark[5 * n + 20]).toBe(255);
+    expect(dark[31 * n + 5]).toBeGreaterThan(200);
+    expect(dark[5 * n + 5]).toBe(0);
+    // A light drawing on a transparent ground stays as it was: light is the full depth, and so is the white line.
+    const light = picture([255, 255, 255]);
+    expect(light[5 * n + 20]).toBe(255);
+    expect(light[5 * n + 5]).toBe(0);
+    // Without a transparent ground nothing changes: black stays black.
+    const opaque = new Uint8ClampedArray(n * n * 4).fill(255);
+    for (let y = 0; y < n; y += 1) for (let x = 18; x < 22; x += 1) opaque.set([0, 0, 0, 255], (y * n + x) * 4);
+    const plain = base64ToBytes(surfaceTextureOwnImage(opaque, n, n).data);
+    expect(plain[5 * n + 20]).toBe(0);
+    expect(plain[5 * n + 5]).toBe(255);
+  });
+
   it("takes one's own picture as grey values, made smaller, and refuses one that does not fit", () => {
     // A picture 600 x 300, dark on the left and light on the right, half transparent at the bottom.
     const width = 600, height = 300;

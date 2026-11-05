@@ -3233,7 +3233,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "inspector.surfaceSeedHint": "Jiné číslo rozmístí buňky nebo zrna znovu.",
   "inspector.surfaceImage": "Obrázek",
   "inspector.surfaceImageLoad": "Načíst vlastní obrázek…",
-  "inspector.surfaceImageHint": "Světlá místa dostanou plnou hloubku, tmavá zůstanou, jak jsou. Vlastní obrázek se uloží s návrhem ve stupních šedi, nejvýš 256 bodů na stranu; dlaždice je široká, jak je nastaveno, a vysoká, jak k tomu obrázek pasuje.",
+  "inspector.surfaceImageHint": "Světlá místa dostanou plnou hloubku, tmavá zůstanou, jak jsou. Tmavá kresba na průhledném pozadí, třeba černé čáry v SVG, se počítá podle svých čar: ty dostanou plnou hloubku. Vlastní obrázek se uloží s návrhem ve stupních šedi, nejvýš 256 bodů na stranu; dlaždice je široká, jak je nastaveno, a vysoká, jak k tomu obrázek pasuje.",
   "inspector.surfaceTileHeight": "Výška dlaždice (0 = podle obrázku)",
   "inspector.surfaceImageHeight": "Výška obrázku",
   "inspector.surfaceImageOnceHint": "Obrázek se otiskne jednou, jako nálepka: „Dokola“ a „Výška“ určují jeho střed, stejně jako u textu. Mimo něj zůstává plocha hladká; „Hloubka“ a „Směr“ určují, jak moc vystupuje nebo je vtlačený. Výška obrázku 0 zachová jeho poměr stran. Jsou-li vybrané plochy, obrázek vždy dopadne na ně.",

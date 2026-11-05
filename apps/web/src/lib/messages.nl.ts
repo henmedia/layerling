@@ -3187,7 +3187,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "inspector.surfaceSeedHint": "Een ander getal legt de cellen of korrels opnieuw neer.",
   "inspector.surfaceImage": "Afbeelding",
   "inspector.surfaceImageLoad": "Eigen afbeelding laden…",
-  "inspector.surfaceImageHint": "Licht krijgt de volle diepte, donker blijft zoals het is. Een eigen afbeelding wordt in grijstinten met het ontwerp bewaard, hoogstens 256 punten per zijde; een tegel is zo breed als ingesteld en zo hoog als de afbeelding daarbij past.",
+  "inspector.surfaceImageHint": "Licht krijgt de volle diepte, donker blijft zoals het is. Een donkere tekening op een doorzichtige achtergrond, zoals zwarte lijnen in een SVG, telt naar haar lijnen: die krijgen de volle diepte. Een eigen afbeelding wordt in grijstinten met het ontwerp bewaard, hoogstens 256 punten per zijde; een tegel is zo breed als ingesteld en zo hoog als de afbeelding daarbij past.",
   "inspector.surfaceTileHeight": "Tegelhoogte (0 = zoals de afbeelding)",
   "inspector.surfaceImageHeight": "Afbeeldingshoogte",
   "inspector.surfaceImageOnceHint": "De afbeelding wordt één keer opgedrukt, als een etiket: „Rondom” en „Hoogte” plaatsen haar midden, zoals bij een tekst. Daarbuiten blijft het oppervlak glad; „Diepte” en „Richting” bepalen hoe ver ze uitsteekt of erin gedrukt is. Een afbeeldingshoogte van 0 houdt de verhoudingen van de afbeelding. Zijn er vlakken gekozen, dan komt de afbeelding altijd daarop.",

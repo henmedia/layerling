@@ -2457,7 +2457,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "Drugo število na novo razporedi celice ali zrna.",
   "inspector.surfaceImage": "Slika",
   "inspector.surfaceImageLoad": "Naloži lastno sliko …",
-  "inspector.surfaceImageHint": "Svetlo dobi polno globino, temno ostane, kot je. Lastna slika se shrani z načrtom v sivinah, največ 256 točk na stranico; ploščica je široka, kot je nastavljeno, in visoka, kot se ji slika prilega.",
+  "inspector.surfaceImageHint": "Svetlo dobi polno globino, temno ostane, kot je. Temna risba na prosojnem ozadju, na primer črne črte v SVG, šteje po svojih črtah: te dobijo polno globino. Lastna slika se shrani z načrtom v sivinah, največ 256 točk na stranico; ploščica je široka, kot je nastavljeno, in visoka, kot se ji slika prilega.",
   "inspector.surfaceTileHeight": "Višina ploščice (0 = kot slika)",
   "inspector.surfaceImageHeight": "Višina slike",
   "inspector.surfaceImageOnceHint": "Slika se odtisne enkrat, kot nalepka: »Naokoli« in »Višina« določita njeno sredino, kot pri besedilu. Zunaj nje ostane ploskev gladka; »Globina« in »Smer« določita, koliko izstopa ali je vtisnjena. Višina slike 0 ohrani njeno razmerje. Če so izbrane ploskve, slika vedno pristane na njih.",

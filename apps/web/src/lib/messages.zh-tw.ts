@@ -3130,7 +3130,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "換一個數字會重新排布胞格或木紋。",
   "inspector.surfaceImage": "圖片",
   "inspector.surfaceImageLoad": "載入你自己的圖片……",
-  "inspector.surfaceImageHint": "亮的部分變成最大深度，暗的部分保持不變。你自己的圖片以灰階儲存在設計裡，每邊最多 256 個點；貼片寬度依設定，高度依圖片在該寬度下的比例。",
+  "inspector.surfaceImageHint": "亮的部分變成最大深度，暗的部分保持不變。透明背景上的深色圖畫（例如 SVG 裡的黑色線條）按其線條計算：線條變成最大深度。你自己的圖片以灰階儲存在設計裡，每邊最多 256 個點；貼片寬度依設定，高度依圖片在該寬度下的比例。",
   "inspector.surfaceTileHeight": "貼片高度（0 = 依圖片）",
   "inspector.surfaceImageHeight": "圖片高度",
   "inspector.surfaceImageOnceHint": "圖片像標籤一樣只壓印一次：「環繞」和「高度」決定它的中心，和文字一樣。圖片之外的表面保持平滑；「深度」和「方向」決定它凸出或壓入多少。圖片高度為 0 時保持圖片比例。選了面時，圖像總是落在這些面上。",
