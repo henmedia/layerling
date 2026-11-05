@@ -953,14 +953,16 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
         }
       });
       // Where the back runs on past the straight stretch into rounded corners, plate and wall are both cut round the axis
-      // there, so neither stands in the other's way.
+      // there, so neither stands in the other's way: the plate on into the room round the body's knuckle at that end, the
+      // wall right up to that knuckle. Ending a gap short of the knuckle, each left a sliver standing there, a hair thin in
+      // the plate and a fin as thick as the gap in the wall.
       const across = acrossAt(turnedOutline, plan.axisY);
       if (across) {
-        for (const [from, to] of [[across[0] - 1, plan.start - options.hingeGap], [plan.end + options.hingeGap, across[1] + 1]] as const) {
-          if (to - from < 1.01) continue;
-          const room = along(from, to, clearance, plan.axisY, plan.axisZ);
-          slots.push(room);
-          notches.push(room);
+        for (const [outer, knuckle, toward] of [[across[0] - 1, plan.start, -1], [across[1] + 1, plan.end, 1]] as const) {
+          if ((outer - knuckle) * toward - options.hingeGap < 1.01) continue;
+          const span = (end: number) => along(Math.min(outer, end), Math.max(outer, end), clearance, plan.axisY, plan.axisZ);
+          notches.push(span(knuckle + toward * (options.hingeGap - 0.02)));
+          slots.push(span(knuckle + toward * 0.01));
         }
       }
       const lipCut = keep(created, keep(created, runtime.Manifold.cube([plan.end - plan.start + 2 * options.hingeGap + 1, plan.backY - (plan.axisY - clearance) + 1, top - box.min[2] + 1])).translate([plan.start - options.hingeGap - 0.5, plan.axisY - clearance, box.min[2] - 1]));
