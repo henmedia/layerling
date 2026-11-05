@@ -777,12 +777,24 @@ function primitiveManifoldForShape(runtime: ManifoldToplevel, shape: WorkplaneSh
   return null;
 }
 
+/**
+ * The kernel's own box, sphere or cylinder with its corners rounded to 32 bits, as every mesh is on its way into the
+ * kernel. Built from its own numbers, a face at -58.45, which 32 bits cannot hold, lay a millionth of a millimetre
+ * away from the same face of a mesh, and a hole through both left that gap standing as a skin of no thickness (#1334).
+ */
+function onMeshGrid(runtime: ManifoldToplevel, solid: ManifoldSolid | null, created: ManifoldSolid[]) {
+  if (!solid || solid.status() !== "NoError" || solid.numTri() < 1) return solid;
+  const snapped = runtime.Manifold.ofMesh(solid.getMesh());
+  created.push(snapped);
+  return snapped.status() === "NoError" && snapped.numTri() > 0 ? snapped : solid;
+}
+
 export function shapeToManifoldSolid(runtime: ManifoldToplevel, shape: WorkplaneShape, created: ManifoldSolid[], useBoxPrimitive = false) {
   if (useBoxPrimitive && isAxisAlignedBoxCutter(shape)) {
-    return primitiveManifoldForShape(runtime, shape, created) ?? boxBoundsToManifold(runtime, meshAabb(shape), created);
+    return onMeshGrid(runtime, primitiveManifoldForShape(runtime, shape, created) ?? boxBoundsToManifold(runtime, meshAabb(shape), created), created);
   }
 
-  const primitive = primitiveManifoldForShape(runtime, shape, created);
+  const primitive = onMeshGrid(runtime, primitiveManifoldForShape(runtime, shape, created), created);
   if (primitive) {
     return primitive;
   }
