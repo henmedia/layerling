@@ -129,9 +129,11 @@ function meshVolumeRounded(part: CadModifierEnclosurePart) {
     const fillet = filleted ? 6 * segment(plan.fillet, Math.PI / 12) * plan.width : 0;
     return snapFitMesh(part.fields as SnapFitFields).mesh.volume() - fillet;
   }
-  const { style, top, width, height, thickness } = ribSize(part.fields as RibFields);
-  const round = style === "straight" && top === "round" && height > thickness / 2 + 0.1 ? 12 * segment(thickness / 2, Math.PI / 12) * width : 0;
-  return Math.abs(ribMesh(part.fields as RibFields).volume()) + round;
+  const { style, top, width, height, thickness, foot } = ribSize(part.fields as RibFields);
+  // The round top stands on the foot's top, where there is one.
+  const round = style === "straight" && top === "round" && height - (foot?.thickness ?? 0) > thickness / 2 + 0.1 ? 12 * segment(thickness / 2, Math.PI / 12) * width : 0;
+  // Turned outward first: a gusset on its foot is built face by face, each face's turn left to orient().
+  return ribMesh(part.fields as RibFields).orient().volume() + round;
 }
 
 function solidsOf(shape: ShapeHandle) {
@@ -165,6 +167,9 @@ function edgesWhere(ready: CadModifierWorkerResponse, on: (x: number, y: number,
 
 const near = (a: number, b: number) => Math.abs(a - b) < 1e-3;
 const GUSSETED = { width: 18, depth: 18, size: 18, height: 12, screwBossDiameter: 8 };
+/** A rib on its foot (Discussion #1307): 0.8 mm thick on a foot 2.4 mm wide, the foot as thick as it starts. */
+const ON_FOOT = { ribFoot: true, ribThickness: 0.8, depth: 2.4 };
+const GUSSET_ON_FOOT = { ribStyle: "gusset", width: 10, height: 12, ribFoot: true, ribThickness: 1.6, depth: 4.8 } as const;
 const K30 = { screwBossFastener: "selfTapping", screwBossSize: "K30" } as const;
 
 describe("the enclosure parts as exact bodies (#1246)", () => {
@@ -192,6 +197,11 @@ describe("the enclosure parts as exact bodies (#1246)", () => {
     ["rib with a chamfered top", "rib", { ribTop: "chamfer" }, 1],
     ["gusset", "rib", { ribStyle: "gusset", width: 10, height: 12 }, 1],
     ["gusset mirrored front to back and turned", "rib", { ribStyle: "gusset", width: 10, height: 12, mirrorX: true, rotation: 90 }, 1],
+    ["thin rib on its foot", "rib", ON_FOOT, 1],
+    ["rib on its foot with a round top", "rib", { ...ON_FOOT, ribTop: "round", ribThickness: 1.2, depth: 4 }, 1],
+    ["rib on a thick foot with a chamfered top, turned and lifted", "rib", { ...ON_FOOT, ribTop: "chamfer", ribFootThickness: 2, rotation: 30, elevation: 3 }, 1],
+    ["gusset ending in its foot", "rib", GUSSET_ON_FOOT, 1],
+    ["gusset standing on a thin foot to its tip, mirrored and turned", "rib", { ...GUSSET_ON_FOOT, ribFootThickness: 0.4, mirrorX: true, rotation: 90 }, 1],
   ])("builds the %s as a valid closed solid of its mesh's volume", (_name, kind, extra, count) => {
     const shape = make(kind, extra);
     const part = enclosurePart(shape);
@@ -249,6 +259,19 @@ describe("the edge tool on the enclosure parts' exact bodies", () => {
     expect(hollow).toBeCloseTo(512 - 39.2 * 7.6 * 0.8, 3);
   });
 
+  it("rounds the corners where a rib meets its foot", async () => {
+    // The 45 degree fillet one might want there: the edge tool makes it on the exact body, a round one too.
+    const shape = make("rib", ON_FOOT);
+    const ready = await ask({ type: "prepare", parts: [exactOnly(shape)], sharpAngle: 25 });
+    const roots = edgesWhere(ready, (_x, y, z) => near(y, 0.8) && near(Math.abs(z), 0.4)).filter((edge) => Math.abs(edge.points[0] - edge.points[edge.points.length - 3]) > 39);
+    expect(roots).toHaveLength(2);
+    const before = cad.getVolume(enclosurePartSolid(cad, enclosurePart(shape)));
+    expect(before).toBeCloseTo(40 * (0.8 * 7.2 + 2.4 * 0.8), 6);
+    const rounded = previewVolume(await ask({ type: "preview", kind: "fillet", edgeIds: roots.map((edge) => edge.id), amount: 0.4, quality: "standard", chamferAngle: 45 }));
+    // A concave rounding fills (1 - pi/4) r^2 of the section along each corner.
+    expect(rounded).toBeCloseTo(before + 2 * (1 - Math.PI / 4) * 0.16 * 40, 3);
+  });
+
   it("chamfers the back of the snap-fit hook's foot", async () => {
     const shape = make("snapFit");
     const ready = await ask({ type: "prepare", parts: [exactOnly(shape)], sharpAngle: 25 });
@@ -285,6 +308,8 @@ describe("the enclosure parts in a STEP file", () => {
     ["hook and catch", "snapFit", {}, 2],
     ["rib with a round top", "rib", { ribTop: "round" }, 1],
     ["gusset", "rib", { ribStyle: "gusset", width: 10, height: 12, rotation: 30, x: 5 }, 1],
+    ["rib on its foot with a round top", "rib", { ...ON_FOOT, ribTop: "round" }, 1],
+    ["gusset on its foot", "rib", { ...GUSSET_ON_FOOT, rotation: 30, x: 5 }, 1],
   ])("writes the %s as exact solids", async (_name, kind, extra, count) => {
     const shape = make(kind, extra);
     const { blob, exportedCount, skipped } = await exportShapesToStep([shape]);
