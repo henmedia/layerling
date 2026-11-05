@@ -3797,7 +3797,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "export.obj.description": "通用 3D 網格",
   "export.obj.note": "相容性廣泛的網格格式，用於建模、算圖與資料交換。顏色儲存在頂點上，Bambu Studio 和 OrcaSlicer 可讀取。",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "將方塊、圓柱、球體和圓錐保留為精確的 CAD 幾何，邊緣做過圓角或倒角的物件，以及以 STEP 匯入的實體也一樣。螺紋、彈簧和齒輪同樣以精確實體匯出。錐形、傾斜和扭曲的形狀也能精確匯出。匯入的網格會轉為精確實體一同匯出，其平面、圓柱面、圓錐面、球面和圓環面成為真正的面；自由曲面的網格（如公仔）則以 STL 匯出。",
+  "export.step.note": "將方塊、圓柱、球體和圓錐保留為精確的 CAD 幾何，邊緣做過圓角或倒角的物件，以及以 STEP 匯入的實體也一樣。螺紋、彈簧和齒輪同樣以精確實體匯出。錐形、傾斜和扭曲的形狀也能精確匯出。文字也依字型本身的曲線逐字精確匯出。匯入的網格會轉為精確實體一同匯出，其平面、圓柱面、圓錐面、球面和圓環面成為真正的面；自由曲面的網格（如公仔）則以 STL 匯出。",
   "export.svg.description": "俯視向量圖",
   "export.svg.note": "匯出乾淨的俯視剪影，單位為公釐，包含孔與曲線輪廓。",
   "export.svg.noteFootprint": "僅匯出物件在工作平面上的著地輪廓，以公釐為單位的線條，用於雷射切割與模板。",

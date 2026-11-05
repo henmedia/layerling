@@ -3861,7 +3861,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "export.obj.description": "Mesh 3D universale",
   "export.obj.note": "Formato mesh ampiamente compatibile per modellazione, rendering e scambio di dati. I colori sono memorizzati nei vertici e vengono letti da Bambu Studio e OrcaSlicer.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "Mantiene scatole, cilindri, sfere e coni come geometrie CAD precise, insieme agli elementi con spigoli raccordati o smussati e ai corpi importati da file STEP. Anche filettature, molle e ingranaggi vengono esportati come corpi esatti. Lo stesso vale per le forme rastremate, inclinate e attorcigliate. Le mesh importate vengono esportate rese esatte, con piani, cilindri, coni, sfere e tori come facce reali; una mesh a forma libera, come una figura, va come STL.",
+  "export.step.note": "Mantiene scatole, cilindri, sfere e coni come geometrie CAD precise, insieme agli elementi con spigoli raccordati o smussati e ai corpi importati da file STEP. Anche filettature, molle e ingranaggi vengono esportati come corpi esatti. Lo stesso vale per le forme rastremate, inclinate e attorcigliate. Anche il testo va esatto, lettera per lettera con le curve del font. Le mesh importate vengono esportate rese esatte, con piani, cilindri, coni, sfere e tori come facce reali; una mesh a forma libera, come una figura, va come STL.",
   "export.svg.description": "Vettoriale vista dall'alto",
   "export.svg.note": "Esporta un contorno vettoriale pulito visto dall'alto, in millimetri, includendo fori e profili curvi.",
   "export.svg.noteFootprint": "Esporta solo i contorni con cui gli oggetti poggiano sul piano di lavoro, come linee in millimetri, per il taglio laser e le dime.",

@@ -3916,7 +3916,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "export.obj.description": "Univerzální 3D polygonová síť",
   "export.obj.note": "Široce podporovaný formát pro modelování, vykreslování a výměnu dat. Barvy jsou uložené ve vrcholech, což čtou Bambu Studio a OrcaSlicer.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "Zachovává přesnou CAD geometrii kvádrů, válců, koulí, kuželů, těles s upravenými hranami i modelů importovaných jako STEP. Přesně se exportují i závity, pružiny, ozubená kola a zúžené, naklopené či zkroucené tvary. Importované polygonové sítě se převedou na přesná tělesa (roviny, válce, kužele, koule a toroidy jako skutečné plochy); síť volného tvaru, třeba figurku, exportujte jako STL.",
+  "export.step.note": "Zachovává přesnou CAD geometrii kvádrů, válců, koulí, kuželů, těles s upravenými hranami i modelů importovaných jako STEP. Přesně se exportují i závity, pružiny, ozubená kola a zúžené, naklopené či zkroucené tvary. Přesně jde i text, písmeno po písmenu s křivkami písma. Importované polygonové sítě se převedou na přesná tělesa (roviny, válce, kužele, koule a toroidy jako skutečné plochy); síť volného tvaru, třeba figurku, exportujte jako STL.",
   "export.svg.description": "Vektorový pohled shora",
   "export.svg.note": "Exportuje čistou siluetu shora v milimetrech, včetně otvorů a zakřivených obrysů.",
   "export.svg.noteFootprint": "Exportuje jen obrysy, kterými objekty stojí na pracovní rovině, jako čáry v milimetrech, pro laser a šablony.",

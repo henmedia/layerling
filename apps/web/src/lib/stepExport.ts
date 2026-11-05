@@ -3,7 +3,7 @@ import type { WorkplaneShape } from "@/types/layerling";
 import { shapeDepth, shapeHasShapeDeform, shapeWidth } from "@/lib/workplaneShapes";
 import { cadBrepTransformForShape } from "@/lib/cadBakeMetadata";
 import { dropOcctKernel, loadBrepWithOcct, occtKernel, type Brep, type BrepSolid } from "@/lib/brepKernel";
-import { asDesignedRound, cadModifierEnclosureForShape, cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape } from "@/lib/cadProfileExtrusion";
+import { asDesignedRound, cadModifierEnclosureForShape, cadModifierGridfinityForShape, cadModifierHelicalGearForShape, cadModifierHirthForShape, cadModifierProfileForShape, cadModifierSpringForShape, cadModifierThreadForShape, textGlyphProfiles } from "@/lib/cadProfileExtrusion";
 import { threadPartSolid } from "@/lib/threadSolid";
 import { springPartSolid } from "@/lib/springSolid";
 import { helicalGearPartSolid } from "@/lib/gearSolid";
@@ -53,7 +53,7 @@ export class StepExportEmptyError extends Error {
 }
 
 // Only primitives that OCCT can represent as exact analytic surfaces under a
-// rigid placement are mapped to B-Rep. Everything else (swept/tessellated/text
+// rigid placement are mapped to B-Rep. Everything else (swept/tessellated
 // shapes) is reported as skipped rather than faceted into a low-fidelity STEP.
 //
 // Cones are exact: the multi-solid STEP writer that used to drop a cone's lateral
@@ -479,6 +479,27 @@ function buildHingeBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
   return cut.ok ? { solid: cut.value as BrepSolid } : { skip: "the hinge's screw holes could not be cut" };
 }
 
+/**
+ * A raised text of several letters as its exact body (#1337): each letter (or each loose piece of a filled text) built
+ * from the font's own curves, as the edge tool gets them, and fused into one. A text of one letter already goes as a
+ * profile. Null when the text has no exact outline: a bevel, a rounded top edge, a taper or twist, or fonts that are not
+ * loaded - where the export runs, they are (exportShapesToStepOffThread keeps a text on the page).
+ */
+function buildTextBody(brep: Brep, shape: WorkplaneShape): BuildOutcome | null {
+  if (shape.kind !== "text") return null;
+  const glyphs = textGlyphProfiles(shape);
+  if (!glyphs?.length || glyphs.some((glyph) => !glyph.profile)) return null;
+  const solids: BrepSolid[] = [];
+  for (const { profile } of glyphs) {
+    const built = buildPlacedBody(brep, profile, (kernel) => profileExtrusionSolid(kernel, profile!), "letter");
+    if ("skip" in built) return built;
+    solids.push(built.solid);
+  }
+  if (solids.length === 1) return { solid: solids[0] };
+  const fused = brep.fuseAll(solids as Parameters<Brep["fuseAll"]>[0]);
+  return fused.ok ? { solid: fused.value as BrepSolid } : { skip: "the letters could not be joined" };
+}
+
 export function skipCodeFor(shape: WorkplaneShape, reason: string): SkipCode {
   if (reason.startsWith("hole subtraction")) return "holeCut";
   if (reason.startsWith(FREEFORM_REASON)) return "freeform";
@@ -558,8 +579,13 @@ function collectHoles(brep: Brep, shapes: WorkplaneShape[], skipped: SkippedShap
       collectHoles(brep, restoreGroupedChildren(shape).filter((child) => !child.hidden), skipped, holes);
       continue;
     }
+    const text = source === "unsupported" ? buildTextBody(brep, shape) : null;
+    if (text && "solid" in text) {
+      holes.push({ box: worldAabb(shape), solid: text.solid });
+      continue;
+    }
     if (source === "unsupported") {
-      skipped.push(describe(shape, `hole ${unsupportedReason()}; cut omitted`));
+      skipped.push(describe(shape, `hole ${text?.skip ?? unsupportedReason()}; cut omitted`));
       continue;
     }
     // Eine Aussparung wird hier nur aus dem gebaut, was ohne Warten geht; eine
@@ -589,7 +615,10 @@ async function buildScope(brep: Brep, shapes: WorkplaneShape[], skipped: Skipped
       parts.push(...(groupShowsPartColors(shape) ? inner : inner.map((part) => ({ ...part, color: shape.color }))));
       continue;
     }
-    if (shape.kind === "hinge" && !shape.cadBrep && !shapeHasShapeDeform(shape)) {
+    const text = source === "unsupported" ? buildTextBody(brep, shape) : null;
+    if (text) {
+      built = text;
+    } else if (shape.kind === "hinge" && !shape.cadBrep && !shapeHasShapeDeform(shape)) {
       built = buildHingeBody(brep, shape);
     } else if (source === "imported") {
       built = await buildImportedBody(brep, shape);

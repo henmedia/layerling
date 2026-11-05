@@ -3765,7 +3765,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "export.obj.description": "Universelt 3D-mesh",
   "export.obj.note": "Et bredt kompatibelt meshformat til modellering, rendering og udveksling. Farver gemmes ved hjørnerne, som Bambu Studio og OrcaSlicer læser.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "Bevarer kasser, cylindre, kugler og kegler som præcis CAD-geometri, sammen med alt hvad der er rundet eller faset, og former der kom ind som STEP. Gevind, fjedre og tandhjul går også som deres eksakte form. Spidsede, hældende og snoede former går eksakt også. Importerede meshes går med gjort eksakte, med deres planer, cylindre, kegler, kugler og tori som rigtige flader; et mesh i fri form, som en figur, går som STL.",
+  "export.step.note": "Bevarer kasser, cylindre, kugler og kegler som præcis CAD-geometri, sammen med alt hvad der er rundet eller faset, og former der kom ind som STEP. Gevind, fjedre og tandhjul går også som deres eksakte form. Spidsede, hældende og snoede former går eksakt også. Tekst går også eksakt, bogstav for bogstav med skrifttypens egne kurver. Importerede meshes går med gjort eksakte, med deres planer, cylindre, kegler, kugler og tori som rigtige flader; et mesh i fri form, som en figur, går som STL.",
   "export.svg.description": "Topvisnings-vektor",
   "export.svg.note": "Eksportér en ren topvisnings-silhuet i millimeter, inklusive huller og buede konturer.",
   "export.svg.noteFootprint": "Eksporterer kun de omrids, objekterne står med på arbejdsfladen, som linjer i millimeter, til laserskæring og skabeloner.",

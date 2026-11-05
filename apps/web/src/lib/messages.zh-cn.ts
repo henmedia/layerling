@@ -3797,7 +3797,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "export.obj.description": "通用 3D 网格",
   "export.obj.note": "兼容性广的网格格式，用于建模、渲染和数据交换。颜色存储在顶点上，Bambu Studio 和 OrcaSlicer 可读取。",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "将长方体、圆柱体、球体和圆锥体保留为精确的 CAD 几何体，边缘做过圆角或倒角的物体以及以 STEP 导入的实体也一样。螺纹、弹簧和齿轮也按精确实体导出。锥形、倾斜和扭曲的形状同样精确导出。导入的网格会转为精确实体一同导出，其平面、圆柱面、圆锥面、球面和圆环面成为真正的面；自由曲面的网格（如人偶）则以 STL 导出。",
+  "export.step.note": "将长方体、圆柱体、球体和圆锥体保留为精确的 CAD 几何体，边缘做过圆角或倒角的物体以及以 STEP 导入的实体也一样。螺纹、弹簧和齿轮也按精确实体导出。锥形、倾斜和扭曲的形状同样精确导出。文字也按字体本身的曲线逐字精确导出。导入的网格会转为精确实体一同导出，其平面、圆柱面、圆锥面、球面和圆环面成为真正的面；自由曲面的网格（如人偶）则以 STL 导出。",
   "export.svg.description": "俯视矢量图",
   "export.svg.note": "导出干净的俯视剪影，单位为毫米，包含孔和曲线轮廓。",
   "export.svg.noteFootprint": "仅导出物体在工作平面上的着地轮廓，以毫米为单位的线条，用于激光切割和模板。",

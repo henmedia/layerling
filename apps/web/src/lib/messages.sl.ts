@@ -3134,7 +3134,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "export.obj.description": "Univerzalna 3D mreža",
   "export.obj.note": "Široko združljiv format mreže za modeliranje, upodabljanje in izmenjavo. Barve so shranjene v ogliščih, kar Bambu Studio in OrcaSlicer prebereta.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "Ohrani kvadre, valje, krogle in stožce kot natančno CAD geometrijo, prav tako vse z zaokroženimi ali posnetimi robovi in telesa, uvožena kot STEP. Navoji, vzmeti in zobniki se izvozijo kot natančno telo. Zožene, nagnjene in zvite oblike gredo prav tako natančno. Uvožene mreže gredo kot natančna telesa, njihove ravnine, valji, stožci, krogle in torusi kot prave ploskve; prostooblikovano mrežo, kot je figura, izvozi kot STL.",
+  "export.step.note": "Ohrani kvadre, valje, krogle in stožce kot natančno CAD geometrijo, prav tako vse z zaokroženimi ali posnetimi robovi in telesa, uvožena kot STEP. Navoji, vzmeti in zobniki se izvozijo kot natančno telo. Zožene, nagnjene in zvite oblike gredo prav tako natančno. Tudi besedilo gre natančno, črko za črko s krivuljami pisave. Uvožene mreže gredo kot natančna telesa, njihove ravnine, valji, stožci, krogle in torusi kot prave ploskve; prostooblikovano mrežo, kot je figura, izvozi kot STL.",
   "export.svg.description": "Vektor pogleda od zgoraj",
   "export.svg.note": "Izvozi čisto silhueto pogleda od zgoraj v milimetrih, vključno z luknjami in ukrivljenimi konturami.",
   "export.svg.noteFootprint": "Izvozi samo obrise, s katerimi predmeti stojijo na delovni ravnini, kot črte v milimetrih, za lasersko rezanje in šablone.",

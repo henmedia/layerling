@@ -2241,7 +2241,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "export.obj.description": "Malha 3D universal",
   "export.obj.note": "Um formato de malha amplamente compatível para modelação, renderização e troca de ficheiros. As cores são guardadas nos vértices e podem ser lidas pelo Bambu Studio e pelo OrcaSlicer.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "Preserva blocos, cilindros, esferas e cones como geometria CAD exata, assim como as peças com arestas arredondadas ou chanfradas e os sólidos importados em STEP. As roscas, molas e engrenagens também são exportadas como sólidos exatos. As formas afuniladas, inclinadas e torcidas também mantêm a geometria exata. As malhas importadas, por exemplo, não podem ser exportadas em STEP; usa STL para essas peças.",
+  "export.step.note": "Preserva blocos, cilindros, esferas e cones como geometria CAD exata, assim como as peças com arestas arredondadas ou chanfradas e os sólidos importados em STEP. As roscas, molas e engrenagens também são exportadas como sólidos exatos. As formas afuniladas, inclinadas e torcidas também mantêm a geometria exata. O texto também é exportado exato, letra a letra com as curvas do tipo de letra. As malhas importadas, por exemplo, não podem ser exportadas em STEP; usa STL para essas peças.",
   "export.svg.description": "Vista de cima vetorial",
   "export.svg.note": "Exporta uma silhueta limpa da vista de cima, em milímetros, incluindo furos e contornos curvos.",
   "export.svg.noteFootprint": "Exporta apenas os contornos de contacto dos objetos com o plano de trabalho, como linhas em milímetros, para corte a laser e moldes.",

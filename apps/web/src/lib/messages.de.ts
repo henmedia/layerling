@@ -3874,7 +3874,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "export.obj.description": "Universelles 3D-Netz",
   "export.obj.note": "Ein breit unterstütztes Netzformat für Modellierung, Bildberechnung und Austausch. Die Farben stehen an den Eckpunkten, Bambu Studio und OrcaSlicer lesen sie.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "Behält Quader, Zylinder, Kugeln und Kegel als exakte CAD-Geometrie, dazu alles mit verrundeten oder gefasten Kanten und Körper, die als STEP hereingekommen sind. Gewinde, Federn und Zahnräder gehen ebenfalls als exakter Körper. Verjüngte, geneigte und verdrehte Formen gehen exakt mit. Eingelesene Netze gehen exakt gemacht mit, ihre Ebenen, Zylinder, Kegel, Kugeln und Tori als echte Flächen; ein Freiform-Netz wie eine Figur geht als STL.",
+  "export.step.note": "Behält Quader, Zylinder, Kugeln und Kegel als exakte CAD-Geometrie, dazu alles mit verrundeten oder gefasten Kanten und Körper, die als STEP hereingekommen sind. Gewinde, Federn und Zahnräder gehen ebenfalls als exakter Körper. Verjüngte, geneigte und verdrehte Formen gehen exakt mit. Text geht ebenfalls exakt mit, Buchstabe für Buchstabe mit den Kurven der Schrift. Eingelesene Netze gehen exakt gemacht mit, ihre Ebenen, Zylinder, Kegel, Kugeln und Tori als echte Flächen; ein Freiform-Netz wie eine Figur geht als STL.",
   "export.svg.description": "Vektor-Draufsicht",
   "export.svg.note": "Gibt eine saubere Draufsicht in Millimetern aus, samt Löchern und gekrümmten Umrissen.",
   "export.svg.noteFootprint": "Gibt nur die Umrisse aus, mit denen die Objekte auf der Arbeitsebene stehen, als Linien in Millimetern, für Laser und Schablonen.",

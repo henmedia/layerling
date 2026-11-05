@@ -3875,7 +3875,7 @@ export const MESSAGES_EN = {
   "export.obj.description": "Universal 3D mesh",
   "export.obj.note": "A broadly compatible mesh format for modeling, rendering, and interchange. Colours are stored at the vertices, which Bambu Studio and OrcaSlicer read.",
   "export.step.description": "CAD / B-Rep",
-  "export.step.note": "Keeps boxes, cylinders, spheres and cones as precise CAD geometry, along with anything whose edges were rounded or chamfered and bodies that came in as STEP. Threads, springs and gears go as their exact body too. Tapered, leaning and twisted shapes go exactly too. Imported meshes go along made exact, their planes, cylinders, cones, spheres and tori as real faces; a free-form mesh, such as a figure, goes as STL.",
+  "export.step.note": "Keeps boxes, cylinders, spheres and cones as precise CAD geometry, along with anything whose edges were rounded or chamfered and bodies that came in as STEP. Threads, springs and gears go as their exact body too. Tapered, leaning and twisted shapes go exactly too. Text goes exactly too, letter by letter with the font's own curves. Imported meshes go along made exact, their planes, cylinders, cones, spheres and tori as real faces; a free-form mesh, such as a figure, goes as STL.",
   "export.svg.description": "Top-view vector",
   "export.svg.note": "Exports a clean top-view silhouette in millimeters, including holes and curved contours.",
   "export.svg.noteFootprint": "Exports only the outlines where the objects stand on the workplane, as lines in millimeters, for laser cutting and templates.",
