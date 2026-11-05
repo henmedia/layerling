@@ -81,6 +81,8 @@ export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeS
       if (next === last) return;
       last = next;
       box.style.setProperty("--view-scrollbar-right", `${yRight}px`);
+      // A view cube in a right corner keeps beside the upright bar (viewScrollbars.css).
+      stage.style.setProperty("--view-scrollbar-right", `${yRight}px`);
       box.style.setProperty("--view-scrollbar-top", `${yTop}px`);
       box.style.setProperty("--view-scrollbar-x-right", `${xRight}px`);
     };
@@ -106,6 +108,7 @@ export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeS
     panelComesAndGoes.observe(stage, { childList: true });
     watchPanel();
     return () => {
+      stage.style.removeProperty("--view-scrollbar-right");
       sizes.disconnect();
       panelPlace.disconnect();
       panelComesAndGoes.disconnect();

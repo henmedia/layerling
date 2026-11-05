@@ -2456,6 +2456,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionsAlwaysVisible": "Cotas sempre visíveis",
   "workspace.showRotationAngles": "Mostrar os ângulos dos sólidos rodados",
   "workspace.startInPerspective": "Iniciar o editor na vista em perspetiva",
+  "workspace.startWithScrollbars": "Iniciar o editor com barras de deslocamento",
   "workspace.doubleClickOpensSketch": "Duplo clique abre o esboço",
   "workspace.doubleClickOpensGroup": "Duplo clique abre um grupo ou conjunto",
   "workspace.selectBeforeMoving": "Selecionar antes de mover",

@@ -45,7 +45,7 @@ summary: 在场景中移动、正对着观察，以及把新形状放到任意�
 - {{ui:camera.zoomIn}} 和 {{ui:camera.zoomOut}} 按步缩放，[[+]] 和 [[−]] 键也是如此。
 - {{ui:camera.orthographic}} 切换到平面视图，平行边保持平行。对于测量和对齐边，这通常比透视视图更舒服。[[O]] 来回切换，再点一次也会返回。
 - {{ui:camera.secondView}} 在单独的窗口中打开设计的第二视图，详见下文。再点一次将其关闭。
-- {{ui:camera.showScrollbars}} 会在视图底部和右边缘各显示一条滚动条。拖动滚动条可平滑地移动视图，点击两端的箭头可小幅移动（按住会持续移动），点击滑块旁边则移动几乎整个视图。视图不会旋转，而且与方向键不同，选中零件时滚动条照样可用——在近处处理小细节时很方便。再次点击可隐藏它们；此浏览器会记住你的选择。
+- {{ui:camera.showScrollbars}} 会在视图底部和右边缘各显示一条滚动条。拖动滚动条可平滑地移动视图，点击两端的箭头可小幅移动（按住会持续移动），点击滑块旁边则移动几乎整个视图。视图不会旋转，而且与方向键不同，选中零件时滚动条照样可用——在近处处理小细节时很方便。再次点击可隐藏它们；设置中的 {{ui:workspace.startWithScrollbars}} 决定设计打开时是否显示它们。
 - {{ui:camera.hideWorkplane}}（网格上方的眼睛）连同网格一起隐藏平台，让你可以从下方查看设计的底面。改变的只是视图：新形状仍然落在工作平面上。再点一次会重新显示。
 - {{ui:camera.placeWorkplane}}、卷尺和直角尺是各自的工具，下文以及[测量与注释](chapter:measuring-and-notes)中会介绍。
 
@@ -175,6 +175,8 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 ### 外观：视图
 
 {{ui:workspace.startInPerspective}}：编辑器随即以透视视图打开，而不是平面视图。
+
+{{ui:workspace.startWithScrollbars}}：设计打开时即显示视图的滚动条。此设置随设计一起保存，也会随 {{ui:workspace.makeDefault}} 保存。
 
 {{ui:workspace.zoomSpeed}} 是一个从慢到快的滑块：滚轮和触控板缩放的速度；缩放按钮和按键仍保持自己的小步距。{{ui:workspace.cameraInertia}}：松开鼠标后，视图会继续转一小会儿并平缓减速。关闭后它会立刻停住，与 Tinkercad 和 Fusion 360 相同。
 

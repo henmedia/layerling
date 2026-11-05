@@ -36,9 +36,9 @@
   opacity: 1;
 }
 
-/* Along the bottom, leaving the corner to the upright bar. */
+/* Along the bottom, from the left edge, leaving the right corner to the upright bar. */
 .view-scrollbar-x {
-  left: 64px;
+  left: 4px;
   right: calc(var(--view-scrollbar-x-right) + var(--view-scrollbar-size) + 12px);
   bottom: 4px;
   height: var(--view-scrollbar-size);
@@ -54,20 +54,27 @@
   flex-direction: column;
 }
 
-/* The snap grid control steps up over the bottom bar and left of the upright one; so does a view cube in the right
-   corners, which the upright bar starts below at the top. The docked panel still moves the cube aside (viewCube.css). */
+/* The snap grid control steps up over the bottom bar and left of the upright one, and a view cube in the right corners
+   stands just left of the upright bar, wherever the panel puts it; the bar runs to the top. The second selector outweighs
+   the docked panel's rule in viewCube.css. A minimised docked panel's header keeps a top-right cube where it was. */
 .workplane-stage:has(> .view-scrollbars) .grid-settings {
   right: 26px;
   bottom: 26px;
 }
 
 @media (min-width: 641px) {
-  html[data-view-cube-position="top-right"] .view-scrollbar-y {
-    top: max(112px, var(--view-scrollbar-top));
+  html[data-view-cube-position$="-right"] .workplane-stage:has(> .view-scrollbars) .view-cube,
+  html[data-view-cube-position$="-right"] .workplane-stage:has(> .view-scrollbars):has(.shape-inspector:not(.floating):not(.minimized)) .view-cube {
+    right: calc(var(--view-scrollbar-right, 0px) + 26px);
   }
 
-  html[data-view-cube-position="bottom-right"] .workplane-stage:has(> .view-scrollbars) .view-cube {
-    right: 26px;
+  /* At the bottom the cube stands above the bar, and above the snap grid control when that is in the view, not in the
+     docked panel. */
+  html[data-view-cube-position^="bottom-"] .workplane-stage:has(> .view-scrollbars) .view-cube {
+    bottom: 26px;
+  }
+
+  html[data-view-cube-position="bottom-right"] .workplane-stage:has(> .view-scrollbars):has(> .grid-settings) .view-cube {
     bottom: 51px;
   }
 }

@@ -45,7 +45,7 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 - {{ui:camera.zoomIn}} 與 {{ui:camera.zoomOut}} 逐步縮放，[[+]] 與 [[−]] 鍵也是如此。
 - {{ui:camera.orthographic}} 切換到平面檢視，平行邊會保持平行。對於量測與對齊邊，這通常比透視檢視更順手。[[O]] 可來回切換，再點一次也會返回。
 - {{ui:camera.secondView}} 在獨立的視窗中開啟設計的第二檢視，詳見下文。再點一次將其關閉。
-- {{ui:camera.showScrollbars}} 會在視圖底部和右側邊緣各顯示一條捲動軸。拖曳捲動軸可平順地移動視圖，按一下兩端的箭頭可小幅移動（按住會持續移動），按一下滑塊旁邊則移動幾乎整個視圖。視圖不會旋轉，而且與方向鍵不同，選取零件時捲動軸照樣可用——在近處處理小細節時很方便。再按一下即可隱藏；此瀏覽器會記住你的選擇。
+- {{ui:camera.showScrollbars}} 會在視圖底部和右側邊緣各顯示一條捲動軸。拖曳捲動軸可平順地移動視圖，按一下兩端的箭頭可小幅移動（按住會持續移動），按一下滑塊旁邊則移動幾乎整個視圖。視圖不會旋轉，而且與方向鍵不同，選取零件時捲動軸照樣可用——在近處處理小細節時很方便。再按一下即可隱藏；設定中的 {{ui:workspace.startWithScrollbars}} 決定設計開啟時是否顯示它們。
 - {{ui:camera.hideWorkplane}}（網格上方的眼睛）會連同網格一起隱藏平台，讓你從下方查看設計的底面。改變的只有檢視：新形狀仍會落在工作平面上。再點一次就會重新顯示。
 - {{ui:camera.placeWorkplane}}、捲尺與角尺是各自的工具，下文以及[量測與備註](chapter:measuring-and-notes)中會介紹。
 
@@ -175,6 +175,8 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 ### 外觀：檢視
 
 {{ui:workspace.startInPerspective}}：編輯器接著會以透視檢視開啟，而不是平面檢視。
+
+{{ui:workspace.startWithScrollbars}}：設計開啟時即顯示視圖的捲動軸。此設定會隨設計一起儲存，也會隨 {{ui:workspace.makeDefault}} 儲存。
 
 {{ui:workspace.zoomSpeed}} 是一個從慢到快的滑桿：滾輪與觸控式軌跡板的縮放速度；縮放按鈕與按鍵仍維持自己的小步距。{{ui:workspace.cameraInertia}}：放開滑鼠後，檢視會繼續轉一下子並平緩減速。關閉後它會立刻停住，與 Tinkercad 和 Fusion 360 相同。
 

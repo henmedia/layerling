@@ -49,7 +49,7 @@ Ved venstre kant er en smal bjælke. Fra toppen:
 - {{ui:camera.zoomIn}} og {{ui:camera.zoomOut}} zoomer skridt for skridt, ligesom tasterne [[+]] og [[−]].
 - {{ui:camera.orthographic}} skifter til en flad visning hvor parallelle kanter forbliver parallelle. Til måling og justering af kanter er det ofte mere behageligt end perspektivvisningen. [[O]] skifter frem og tilbage, og endnu et klik vender tilbage.
 - {{ui:camera.secondView}} åbner en anden visning af designet i sit eget vindue, beskrevet nedenfor. Et klik mere lukker det.
-- {{ui:camera.showScrollbars}} viser et rullepanel langs bunden af visningen og et langs dens højre kant. Træk i et panel for at skubbe visningen jævnt, klik på en pil i enden for at flytte den en smule (hold for at fortsætte), eller klik ved siden af panelet for at flytte næsten en hel visning. Intet drejer, og i modsætning til piletasterne virker panelerne også, mens en del er valgt - praktisk tæt på små detaljer. Et klik mere skjuler dem; denne browser husker valget.
+- {{ui:camera.showScrollbars}} viser et rullepanel langs bunden af visningen og et langs dens højre kant. Træk i et panel for at skubbe visningen jævnt, klik på en pil i enden for at flytte den en smule (hold for at fortsætte), eller klik ved siden af panelet for at flytte næsten en hel visning. Intet drejer, og i modsætning til piletasterne virker panelerne også, mens en del er valgt - praktisk tæt på små detaljer. Et klik mere skjuler dem; {{ui:workspace.startWithScrollbars}} i indstillingerne afgør, om et design åbner med dem.
 - {{ui:camera.hideWorkplane}} (øjet over et gitter) skjuler pladen med sit gitter, så du kan se undersiden af et design nedefra. Kun visningen ændres: nye former lander stadig på arbejdsplanet. Endnu et klik viser den igen.
 - {{ui:camera.placeWorkplane}}, målebåndet og vinkelmåleren er deres egne værktøjer, dækket nedenfor og i [Måling og noter](chapter:measuring-and-notes).
 
@@ -179,6 +179,8 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 ### Udseende: visningen
 
 {{ui:workspace.startInPerspective}}: editoren åbner så i perspektivvisning, ikke i den flade.
+
+{{ui:workspace.startWithScrollbars}}: et design åbner så med visningens rullepaneler. Indstillingen gemmes med designet og med {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.startView}} bestemmer den vinkel, et nyt design åbner i, og som {{ui:camera.home}} vender tilbage til. Drej og zoom visningen, som du kan lide den, og klik så {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} giver den sædvanlige visning forfra til højre igen. Det gælder alle designs i denne browser. Et design, du åbner igen, åbner stadig, som du forlod det.
 

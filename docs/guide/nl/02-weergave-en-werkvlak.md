@@ -43,7 +43,7 @@ Aan de linkerrand staat een smalle balk. Van boven naar beneden:
 - {{ui:camera.zoomIn}} en {{ui:camera.zoomOut}} zoomen stap voor stap, net als de toetsen [[+]] en [[−]].
 - {{ui:camera.orthographic}} schakelt naar een platte weergave waarin evenwijdige randen evenwijdig blijven. Voor meten en randen uitlijnen is dat vaak prettiger dan de perspectiefweergave. [[O]] schakelt heen en weer, en een tweede klik zet het terug.
 - {{ui:camera.secondView}} opent een tweede weergave van het ontwerp in een eigen venster, zie hieronder. Een tweede klik sluit het.
-- {{ui:camera.showScrollbars}} zet een schuifbalk onderaan de weergave en een langs de rechterrand. Sleep een balk om de weergave vloeiend te verschuiven, klik op een pijl aan het eind om een klein stukje te schuiven (ingedrukt houden gaat door), of klik naast de balk om bijna een hele weergave verder te gaan. Er draait niets, en anders dan de pijltoetsen werken de balken ook terwijl een onderdeel geselecteerd is - handig van dichtbij bij kleine details. Een tweede klik verbergt ze; deze browser onthoudt de keuze.
+- {{ui:camera.showScrollbars}} zet een schuifbalk onderaan de weergave en een langs de rechterrand. Sleep een balk om de weergave vloeiend te verschuiven, klik op een pijl aan het eind om een klein stukje te schuiven (ingedrukt houden gaat door), of klik naast de balk om bijna een hele weergave verder te gaan. Er draait niets, en anders dan de pijltoetsen werken de balken ook terwijl een onderdeel geselecteerd is - handig van dichtbij bij kleine details. Een tweede klik verbergt ze; {{ui:workspace.startWithScrollbars}} in de instellingen bepaalt of een ontwerp ermee opent.
 - {{ui:camera.hideWorkplane}} (het oog boven een raster) verbergt de plaat met het raster, zodat je een ontwerp van onderen kunt bekijken. Alleen de weergave verandert: nieuwe vormen komen nog steeds op het werkvlak terecht. Een tweede klik toont de plaat weer.
 - {{ui:camera.placeWorkplane}}, het meetlint en de winkelhaak zijn gereedschappen op zich, die hieronder en in [Meten en notities](chapter:meten-en-notities) aan bod komen.
 
@@ -175,6 +175,8 @@ De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor he
 ### Weergave: het beeld
 
 {{ui:workspace.startInPerspective}}: de editor opent dan in het perspectiefaanzicht, niet in het vlakke.
+
+{{ui:workspace.startWithScrollbars}}: een ontwerp opent dan met de schuifbalken van de weergave. De instelling wordt met het ontwerp en met {{ui:workspace.makeDefault}} bewaard.
 
 {{ui:workspace.startView}} bepaalt de hoek waarin een nieuw ontwerp opent en waarnaar {{ui:camera.home}} teruggaat. Draai en zoom de weergave zoals je hem graag hebt en klik dan op {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brengt het gewone aanzicht van rechtsvoor terug. Het geldt voor elk ontwerp in deze browser. Een ontwerp dat je opnieuw opent, opent nog steeds zoals je het achterliet.
 

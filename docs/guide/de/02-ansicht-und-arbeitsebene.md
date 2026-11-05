@@ -45,7 +45,7 @@ Am linken Rand liegt eine schmale Leiste. Von oben nach unten:
 - {{ui:camera.zoomIn}} und {{ui:camera.zoomOut}} zoomen schrittweise, ebenso die Tasten [[+]] und [[−]].
 - {{ui:camera.orthographic}} schaltet auf eine flache Ansicht um, in der parallele Kanten parallel bleiben. Das ist zum Messen und zum Ausrichten von Kanten oft angenehmer als die perspektivische Ansicht. Mit [[O]] wechselst du hin und her, ein zweiter Klick geht zurück.
 - {{ui:camera.secondView}} öffnet eine zweite Ansicht des Entwurfs in einem eigenen Fenster, siehe unten. Ein zweiter Klick schließt es.
-- {{ui:camera.showScrollbars}} blendet unten und am rechten Rand der Ansicht je eine Bildlaufleiste ein. Ziehst du den Balken, gleitet die Ansicht stufenlos mit; ein Klick auf einen Pfeil am Ende schiebt sie ein kleines Stück (gehalten läuft sie weiter), ein Klick neben den Balken fast um eine ganze Bildbreite. Dabei dreht sich nichts, und anders als die Pfeiltasten gehen die Leisten auch, während ein Teil ausgewählt ist - praktisch, wenn du nah an kleinen Details arbeitest. Ein zweiter Klick blendet sie aus; dieser Browser merkt sich die Wahl.
+- {{ui:camera.showScrollbars}} blendet unten und am rechten Rand der Ansicht je eine Bildlaufleiste ein. Ziehst du den Balken, gleitet die Ansicht stufenlos mit; ein Klick auf einen Pfeil am Ende schiebt sie ein kleines Stück (gehalten läuft sie weiter), ein Klick neben den Balken fast um eine ganze Bildbreite. Dabei dreht sich nichts, und anders als die Pfeiltasten gehen die Leisten auch, während ein Teil ausgewählt ist - praktisch, wenn du nah an kleinen Details arbeitest. Ein zweiter Klick blendet sie aus; ob ein Entwurf mit ihnen öffnet, entscheidet {{ui:workspace.startWithScrollbars}} in den Einstellungen.
 - {{ui:camera.hideWorkplane}} (das Auge über dem Gitter) blendet die Platte mit ihrem Gitter aus, damit du die Unterseite eines Entwurfs von unten ansehen kannst. Es ändert sich nur die Ansicht: Neue Formen landen weiter auf der Arbeitsebene. Ein zweiter Klick blendet sie wieder ein.
 - {{ui:camera.placeWorkplane}}, das Maßband und das Winkellineal sind eigene Werkzeuge, sie kommen weiter unten und im Kapitel [Messen und Notizen](chapter:messen-und-notizen) vor.
 
@@ -175,6 +175,8 @@ Die Skizzenansicht hat eigene Farben: {{ui:workspace.sketchBackground}} für das
 ### Darstellung: die Ansicht
 
 {{ui:workspace.startInPerspective}}: Der Editor öffnet dann in der perspektivischen Ansicht, nicht in der flachen.
+
+{{ui:workspace.startWithScrollbars}}: Ein Entwurf öffnet dann mit den Bildlaufleisten der Ansicht. Die Einstellung wird mit dem Entwurf und mit {{ui:workspace.makeDefault}} gespeichert.
 
 {{ui:workspace.startView}} legt den Blickwinkel fest, in dem ein neuer Entwurf öffnet und zu dem {{ui:camera.home}} zurückkehrt. Dreh und zoome die Ansicht, wie du sie magst, und klicke dann {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} bringt den gewohnten Blick von vorne rechts zurück. Das gilt für alle Entwürfe in diesem Browser. Ein Entwurf, den du wieder öffnest, öffnet weiter so, wie du ihn verlassen hast.
 

@@ -4181,6 +4181,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "選取範圍旁的每個數值框使用其座標軸的顏色：X 紅色、Y 綠色、Z 藍色。",
   "workspace.showRotationAngles": "顯示旋轉後實體的角度",
   "workspace.startInPerspective": "編輯器以透視視圖啟動",
+  "workspace.startWithScrollbars": "編輯器啟動時顯示捲軸",
   "workspace.startView": "起始視圖",
   "workspace.startViewHint": "新設計開啟時的角度，也是「回到預設視角」返回的角度。先把視圖轉到你喜歡的樣子，再使用目前視圖。適用於此瀏覽器中的所有設計。",
   "workspace.startViewUseCurrent": "使用目前視圖",

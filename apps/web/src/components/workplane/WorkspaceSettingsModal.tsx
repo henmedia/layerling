@@ -963,6 +963,11 @@ export function WorkspaceSettingsModal({
                     checked={startInPerspective}
                     onChange={onStartInPerspectiveChange}
                   />
+                  <WorkspaceToggle
+                    label={t("workspace.startWithScrollbars")}
+                    checked={workspace.startWithScrollbars}
+                    onChange={(startWithScrollbars) => patchWorkspace({ startWithScrollbars })}
+                  />
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
                     <div className="property-defaults-actions">

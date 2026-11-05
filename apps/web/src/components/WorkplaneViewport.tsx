@@ -34,7 +34,6 @@ import { viewDirectionFromName, viewFaceForKey, type ViewCubeFace } from "@/lib/
 import { ViewCube } from "@/components/workplane/ViewCube";
 import { ViewScrollbars } from "@/components/workplane/ViewScrollbars";
 import { ViewScrollbarsIcon } from "@/components/ViewScrollbarsIcon";
-import { readViewScrollbars, storeViewScrollbars } from "@/lib/viewScroll";
 import { openSecondViewWindow, SecondViewWindow, useSecondViewSupported } from "@/components/workplane/SecondViewWindow";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
@@ -1585,15 +1584,10 @@ export function WorkplaneViewport({
   const [snap, setSnap] = useState<GridSize>(() => normalizeSnapGrid(initialSnap, DEFAULT_SNAP_GRID));
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [workspace, setWorkspace] = useState<WorkspaceSettings>(() => normalizeWorkspaceSettings(initialWorkspace));
-  // The scrollbars of the 3D view (Discussion #1241), switched in the view bar; read after mounting, as the page is built without storage.
+  // The scrollbars of the 3D view (Discussion #1241), switched in the view bar; a design opens with them as its settings ask.
   const [viewScrollbarsOn, setViewScrollbarsOn] = useState(false);
-  useEffect(() => setViewScrollbarsOn(readViewScrollbars()), []);
-  const toggleViewScrollbars = useCallback(() => {
-    setViewScrollbarsOn((on) => {
-      storeViewScrollbars(!on);
-      return !on;
-    });
-  }, []);
+  useEffect(() => setViewScrollbarsOn(workspace.startWithScrollbars), [workspaceSettingsKey, workspace.startWithScrollbars]);
+  const toggleViewScrollbars = useCallback(() => setViewScrollbarsOn((on) => !on), []);
   const [transformOverlay, setTransformOverlay] = useState<TransformOverlayState | null>(null);
   const [alignOverlay, setAlignOverlay] = useState<AlignOverlayState | null>(null);
   const [mirrorOverlay, setMirrorOverlay] = useState<MirrorOverlayState | null>(null);

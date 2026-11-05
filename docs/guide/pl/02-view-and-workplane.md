@@ -46,7 +46,7 @@ Przy lewej krawędzi jest wąski pasek. Od góry:
 - {{ui:camera.zoomIn}} i {{ui:camera.zoomOut}} przybliżają krok po kroku, podobnie jak klawisze [[+]] i [[−]].
 - {{ui:camera.orthographic}} przełącza na płaski widok, w którym równoległe krawędzie zostają równoległe. Do mierzenia i wyrównywania krawędzi bywa wygodniejszy od widoku perspektywicznego. [[O]] przełącza w obie strony, a drugie kliknięcie przywraca poprzedni widok.
 - {{ui:camera.secondView}} otwiera drugi widok projektu we własnym oknie, opisanym niżej. Drugie kliknięcie je zamyka.
-- {{ui:camera.showScrollbars}} pokazuje pasek przewijania u dołu widoku i drugi wzdłuż jego prawej krawędzi. Przeciągnij pasek, aby płynnie przesuwać widok, kliknij strzałkę na jego końcu, aby przesunąć go odrobinę (przytrzymaj, aby przesuwać dalej), albo kliknij obok paska, aby przesunąć o prawie cały widok. Nic się nie obraca, a w przeciwieństwie do klawiszy strzałek paski działają także przy zaznaczonej części - przydatne z bliska przy drobnych szczegółach. Drugie kliknięcie je ukrywa; ta przeglądarka zapamiętuje wybór.
+- {{ui:camera.showScrollbars}} pokazuje pasek przewijania u dołu widoku i drugi wzdłuż jego prawej krawędzi. Przeciągnij pasek, aby płynnie przesuwać widok, kliknij strzałkę na jego końcu, aby przesunąć go odrobinę (przytrzymaj, aby przesuwać dalej), albo kliknij obok paska, aby przesunąć o prawie cały widok. Nic się nie obraca, a w przeciwieństwie do klawiszy strzałek paski działają także przy zaznaczonej części - przydatne z bliska przy drobnych szczegółach. Drugie kliknięcie je ukrywa; to, czy projekt otwiera się z nimi, decyduje {{ui:workspace.startWithScrollbars}} w ustawieniach.
 - {{ui:camera.hideWorkplane}} (oko nad siatką) ukrywa płytę z siatką, żeby obejrzeć projekt od spodu. Zmienia się tylko widok: nowe kształty dalej trafiają na płaszczyznę roboczą. Drugie kliknięcie pokazuje ją z powrotem.
 - {{ui:camera.placeWorkplane}}, narzędzie Zmierz i kątownik to osobne narzędzia, opisane niżej i w rozdziale [Pomiary i notatki](chapter:measuring-and-notes).
 
@@ -176,6 +176,8 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 ### Wygląd: widok
 
 {{ui:workspace.startInPerspective}}: edytor otwiera się wtedy w widoku perspektywicznym, a nie płaskim.
+
+{{ui:workspace.startWithScrollbars}}: projekt otwiera się wtedy z paskami przewijania widoku. Ustawienie zapisuje się z projektem i przez {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.startView}} ustawia kąt, pod jakim otwiera się nowy projekt i do którego wraca {{ui:camera.home}}. Obróć i przybliż widok tak, jak lubisz, a potem kliknij {{ui:workspace.startViewUseCurrent}}. {{ui:workspace.startViewStandard}} przywraca zwykły widok z prawego przodu. Obowiązuje dla każdego projektu w tej przeglądarce. Projekt otwierany ponownie nadal otwiera się tak, jak go zostawiłeś.
 
