@@ -10837,6 +10837,29 @@ html[data-theme="dark"] .property-hint {
   padding-right: 8px;
 }
 
+/* What a group does when it is resized (Discussion #526): the two choices are long, so they sit under the label and may wrap. */
+.name-tag-sides.group-resize-choice {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.name-tag-sides.group-resize-choice > span {
+  grid-column: 1 / -1;
+}
+
+.name-tag-sides.group-resize-choice button {
+  height: auto;
+  min-height: 30px;
+  padding: 6px 8px;
+  line-height: 1.2;
+  border-radius: 15px;
+}
+
+.name-tag-sides.group-resize-choice button:disabled {
+  cursor: default;
+  opacity: 0.52;
+}
+
 .name-tag-sides.name-tag-edge button {
   padding: 0 2px;
   font-size: 12.5px;

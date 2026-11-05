@@ -10,7 +10,7 @@ import { vaseSettingsEqual } from "@/lib/vaseSettings";
 import { qrSettingsEqual } from "@/lib/qrCode";
 import { torusTubeRatio } from "@/lib/torusShape";
 import { shapeHasAlongDeform } from "@/lib/slopeAlong";
-import type { EdgeTreatmentHistoryEntry, SketchStroke, WorkplaneShape } from "@/types/layerling";
+import type { EdgeTreatmentHistoryEntry, GroupResizeMode, SketchStroke, WorkplaneShape } from "@/types/layerling";
 
 /** Bauwerte der Wabengitter, die es nur noch in alten Entwuerfen gibt: Die Form wird nicht mehr angeboten (#223), bleibt aber bearbeitbar. */
 const LEGACY_BODY_PARAMETER_KEYS = ["honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth"] as const;
@@ -552,6 +552,14 @@ export function mirroredAxisCount(shape: WorkplaneShape) {
   return [shape.mirrorX, shape.mirrorY, shape.mirrorZ].filter(Boolean).length;
 }
 
+/**
+ * A group's setting for resizing as it is kept (Discussion #526): "keepParts", or left out for the stretch every
+ * group makes - "stretch" and anything unknown are left out too, so a group that stretches is saved as before.
+ */
+export function normalizeGroupResize(value: unknown): GroupResizeMode | undefined {
+  return value === "keepParts" ? "keepParts" : undefined;
+}
+
 export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
   const shape = repairClampedMeshBase(unrepaired);
   const next: WorkplaneShape = {
@@ -594,6 +602,11 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
   }
   if (shape.groupedShapes) {
     next.groupedShapes = shape.groupedShapes.map(canonicalizeShape);
+  }
+  if ("groupResize" in shape) {
+    const groupResize = normalizeGroupResize(shape.groupResize);
+    if (groupResize) next.groupResize = groupResize;
+    else delete next.groupResize;
   }
   if (shape.sketchRevolve) {
     next.sketchRevolve = {
@@ -940,6 +953,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.groupedBaseHeight === b.groupedBaseHeight &&
     a.groupOperation === b.groupOperation &&
     a.multicolor === b.multicolor &&
+    a.groupResize === b.groupResize &&
     a.rotationPivot === b.rotationPivot &&
     fieldFormulasEqual(a.formulas, b.formulas) &&
     a.locked === b.locked &&

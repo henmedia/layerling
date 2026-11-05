@@ -39,6 +39,17 @@ Auch eine ganze Gruppe kann ein Körper oder eine Aussparung sein. Dabei gilt ei
 - Besteht die Gruppe nur aus Körpern (oder nur aus Aussparungen), schaltest du sie als Ganzes um, und ihre Teile gehen mit.
 - Enthält sie beides, etwa einen Würfel mit Bohrung, behält jedes Teil seinen eigenen Zustand. Die ganze Gruppe wird dann zum Werkzeug, aber die Bohrung bleibt eine Bohrung.
 
+### Größe ändern: Aussparungen und kleine Teile behalten
+
+Machst du eine Gruppe länger, breiter oder höher, dehnen sich ihre Teile mit, als wären sie auf Gummi gezeichnet: Die runden Löcher einer Platte werden oval und rücken nach innen. Damit sie bleiben, wie sie sind, wählst du in den Einstellungen der Gruppe unter {{ui:inspector.groupResize}} die Möglichkeit {{ui:inspector.groupResizeKeepParts}}; ohne diese Wahl gilt {{ui:inspector.groupResizeStretch}}, wie bisher bei jeder Gruppe. Von da an wird die Gruppe bei jeder Größenänderung - mit den Griffen, in den Maßfeldern oder mit {{ui:scalePercent.title}} - nach einer einzigen Regel neu aus ihren Teilen gebaut, für jede Richtung für sich:
+
+- Ein Teil, das fast über die ganze Gruppe reicht, neun Zehntel davon oder mehr, wächst oder schrumpft mit ihr und behält seinen Abstand zu beiden Seiten: die Platte selbst, eine Wand oder das Innere eines Kastens, dessen Wände so dick bleiben, wie sie waren.
+- Jedes andere Teil behält seine eigene Größe und seinen Abstand zur näheren Seite. Ein Teil in der Mitte bleibt in der Mitte.
+
+Eine Platte mit einem Loch 5 mm vor jeder Ecke und einem Langloch in der Mitte, um 40 mm verlängert, behält also ihre Löcher rund und 5 mm vor den Ecken und das Langloch in der Mitte. Bedingungen, die du Teil für Teil festlegen müsstest, gibt es dabei nicht: Für jedes Teil gilt dieselbe Regel, so weißt du vorher, was passiert. Ein gedrehtes Teil zählt mit dem Kasten, den es in der Gruppe einnimmt, und bleibt gedreht; eine Gruppe in der Gruppe zählt als ein Teil. Während du an einem Griff ziehst, dehnt sich die Gruppe als Ganzes; lässt du los, wird sie neu gebaut, im selben Rückgängig-Schritt. Wird sie kleiner, als ein Teil mit seinem Abstand braucht, schrumpft dieses Teil wie bisher mit, und eine Meldung sagt es dir. Eine gespiegelte, verjüngte oder verdrehte Gruppe und eine mit eigenen Rundungen, Fasen oder einer Oberfläche dehnt immer alles. Wählst du die Einstellung für eine schon gedehnte Gruppe, ordnet sie deren Teile sofort neu an.
+
+![Eine Platte mit einem Loch 5 mm vor jeder Ecke und einem Langloch in der Mitte, mit „Aussparungen und kleine Teile behalten“ um 40 mm verlängert: Die Löcher sind noch rund und 5 mm vor den Ecken, das Langloch ist noch in der Mitte.](shot:group-keep-parts)
+
 ## Bündeln
 
 Manchmal sollen Teile nur zusammenbleiben, ohne eins zu werden – etwa ein weißes Logo auf einer schwarzen Platte für den Mehrfarbdruck. Dafür gibt es {{ui:editor.tool.bundle}} ([[Strg]]+[[B]]), wie in Tinkercad. Ein Bündel lässt sich verschieben, drehen und in der Größe ändern wie eine Form, aber nichts wird verrechnet:

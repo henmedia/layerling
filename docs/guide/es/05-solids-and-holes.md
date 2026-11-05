@@ -39,6 +39,17 @@ Un grupo entero también puede ser un sólido o un orificio. Para eso hay una re
 - Si el grupo solo tiene sólidos (o solo orificios), lo cambias entero y sus piezas cambian con él.
 - Si tiene de las dos cosas, como un cubo con un taladro, cada pieza conserva su propio estado. El grupo entero pasa a ser una herramienta, pero el taladro sigue siendo un taladro.
 
+### Cambiar el tamaño de un grupo: mantener orificios y piezas pequeñas
+
+Cuando un grupo se hace más largo, más ancho o más alto, sus piezas se estiran con él como si estuvieran dibujadas sobre goma: los orificios redondos de una placa se vuelven óvalos y se desplazan hacia dentro. Para que se queden como están, elige {{ui:inspector.groupResizeKeepParts}} en {{ui:inspector.groupResize}} en los ajustes del grupo; {{ui:inspector.groupResizeStretch}} es lo que hace todo grupo mientras no lo cambies. A partir de ahí, cada vez que el grupo cambia de tamaño - con los tiradores, en los campos de medidas o con {{ui:scalePercent.title}} - se reconstruye a partir de sus piezas según una sola regla, en cada dirección por separado:
+
+- Una pieza que atraviesa casi todo el grupo, nueve décimas partes o más, crece o se encoge con él y conserva su distancia a ambos lados: la propia placa, una pared o el interior de una caja, cuyas paredes conservan su grosor.
+- Cualquier otra pieza conserva su propio tamaño y su distancia al lado más cercano. Una pieza en el centro se queda en el centro.
+
+Así, una placa con un orificio a 5 mm de cada esquina y una ranura en el centro, alargada 40 mm, mantiene los orificios redondos y a 5 mm de las esquinas, y la ranura en el centro. Detrás no hay ningún resolvedor de restricciones ni nada que ajustar pieza por pieza: la misma regla vale para todas las piezas, así que sabes de antemano lo que va a pasar. Una pieza girada cuenta con la caja que ocupa en el grupo y sigue girada; un grupo dentro del grupo cuenta como una sola pieza. Mientras arrastras un tirador, el grupo se estira entero; al soltarlo, se reconstruye, en el mismo paso de deshacer. Si el grupo queda más pequeño de lo que una pieza necesita con su distancia, esa pieza se encoge con él como antes, y un mensaje lo indica. Un grupo reflejado, estrechado o retorcido, o con redondeos, chaflanes o una textura propios, siempre lo estira todo. Elegido para un grupo que ya está estirado, el ajuste vuelve a colocar sus piezas al instante.
+
+![Una placa con un orificio a 5 mm de cada esquina y una ranura en el centro, alargada 40 mm con «Mantener orificios y piezas pequeñas»: los orificios siguen redondos y a 5 mm de las esquinas, la ranura sigue en el centro.](shot:group-keep-parts)
+
 ## Crear conjuntos
 
 A veces las piezas solo tienen que ir juntas sin convertirse en una sola: por ejemplo, un logotipo blanco sobre una placa negra para una impresión multicolor. Para eso está {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), como en Tinkercad. Un conjunto se mueve, gira y cambia de tamaño como una forma, pero no se fusiona nada:
