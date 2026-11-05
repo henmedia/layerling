@@ -64,7 +64,7 @@ Ob srednji točki vsake črte stoji širša točka s črtico na vsaki strani. Ra
 
 Če je med izbranimi oblikami plošča, ki je v tej smeri daljša od vseh drugih, se oblike razporedijo po njej: razmik do njenih robov je enak razmiku med oblikami, ena sama oblika pa pride na sredino. Oblike v več vrstah, kot živali sestavljanke z gumbki, se razporedijo vrsto za vrsto; oblike, katerih škatle se prekrivajo prečno na smer, tvorijo eno vrsto. Kjer oblike ne stojijo v čistih stolpcih, kot živali od spredaj nazaj, se oblike, ki stojijo druga ob drugi, premaknejo kot cela vrsta.
 
-Brez plošče najprej klikni prazno mesto podlage: podlaga je nato fiksna oblika, enaki razmiki razporedijo oblike po vsej podlagi z enakim razmikom do robov, druge točke pa jih poravnajo na njene robove ali sredino. Ponoven klik na prazno podlago jo izpusti.
+Brez plošče najprej drži [[Shift]] in klikni prazno mesto podlage: podlaga je nato fiksna oblika, enaki razmiki razporedijo oblike po vsej podlagi z enakim razmikom do robov, druge točke pa jih poravnajo na njene robove ali sredino. Ponoven klik s [[Shift]] na prazno podlago jo izpusti. Klik na prazno mesto brez [[Shift]] konča poravnavo, tako kot [[L]] in [[Esc]].
 
 Drži [[Alt]] in klikni točko, da sam vpišeš razmik, na primer 5 mm: oblike se postavijo tako daleč narazen, od prve oblike ali od tiste, ki si jo kliknil najprej; na plošči pride vrsta na sredino. Zaklenjena oblika ostane na mestu, zato ena med zunanjima oblikama prepreči enake razmike.
 

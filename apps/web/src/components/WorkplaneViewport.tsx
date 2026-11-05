@@ -7135,10 +7135,10 @@ export function WorkplaneViewport({
       const slicerEmptyPress = slicerEmptyPressRef.current;
       if (slicerEmptyPress && slicerEmptyPress.pointerId === event.pointerId) {
         slicerEmptyPressRef.current = null;
-        // A click on empty space that did not turn the view clears the selection, as a click there always did.
+        // A click on empty space that did not turn the view clears the selection, as a click there always did;
+        // in Align that ends it too (#1340). The plate becomes Align's reference with Shift, which draws the box here.
         if (Math.hypot(event.clientX - slicerEmptyPress.x, event.clientY - slicerEmptyPress.y) < 5) {
           if (multiSelectRef.current) onMultiSelectEndRef.current?.();
-          else if (alignModeRef.current) onAlignAnchorChange(ALIGN_PLATE_ID);
           else onSelectShape(null);
         }
         return;
@@ -7215,9 +7215,12 @@ export function WorkplaneViewport({
           } else {
             onSelectShape(selected);
           }
+        } else if (alignModeRef.current && marquee.additive) {
+          // Shift-click on empty space in Align: the plate becomes the reference, a second one lets it go.
+          // A plain click there clears the selection and so ends Align, as people expect (#1340).
+          onAlignAnchorChange(ALIGN_PLATE_ID);
         } else if (!marquee.additive) {
-          if (alignModeRef.current) onAlignAnchorChange(ALIGN_PLATE_ID);
-          else onSelectShape(null);
+          onSelectShape(null);
         }
         if (state) {
           state.controls.enabled = true;

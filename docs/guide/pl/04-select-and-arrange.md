@@ -70,7 +70,7 @@ Obok środkowego punktu każdej linii stoi szerszy punkt z kreską po każdej st
 
 Jeśli wśród zaznaczonych kształtów jest płyta (kształt bazowy, na którym stoją pozostałe, np. płaskie pudełko) dłuższa w tym kierunku niż wszystkie inne, kształty rozkładają się na niej: odstęp od jej brzegów jest taki sam jak między kształtami, a pojedynczy kształt trafia na jej środek. Kształty w kilku rzędach, jak zwierzęta z układanki z uchwytami, są rozkładane rząd po rzędzie; kształty, których prostopadłościany zachodzą na siebie w poprzek kierunku, tworzą jeden rząd. Gdzie kształty nie stoją w równych kolumnach, jak zwierzęta od przodu do tyłu, kształty stojące obok siebie przesuwają się zamiast tego jako cały rząd.
 
-Bez płyty kliknij najpierw wolne miejsce stołu: stół staje się wtedy stałym kształtem, równe odstępy rozkładają kształty na całym stole z takim samym odstępem od brzegów, a pozostałe punkty wyrównują je do jego brzegów lub środka. Ponowne kliknięcie wolnego miejsca zwalnia go.
+Bez płyty przytrzymaj [[Shift]] i kliknij najpierw wolne miejsce stołu: stół staje się wtedy stałym kształtem, równe odstępy rozkładają kształty na całym stole z takim samym odstępem od brzegów, a pozostałe punkty wyrównują je do jego brzegów lub środka. Ponowne kliknięcie z [[Shift]] wolnego miejsca zwalnia go. Kliknięcie w puste miejsce bez [[Shift]] kończy wyrównywanie, tak jak [[L]] i [[Esc]].
 
 Przytrzymaj [[Alt]] i kliknij punkt, żeby samemu wpisać odstęp, np. 5 mm: kształty ustawią się w takiej odległości, od pierwszego kształtu albo od tego, który kliknięto najpierw; na płycie rząd trafia na jej środek. Zablokowany kształt zostaje na miejscu, więc taki między skrajnymi kształtami uniemożliwia równe odstępy.
 

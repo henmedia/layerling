@@ -64,7 +64,7 @@ Accanto al punto centrale di ogni linea c'è un punto più largo con una barrett
 
 Se tra le forme selezionate c'è una base più lunga di tutte le altre in quella direzione, le forme si distribuiscono su di essa: la distanza dai suoi bordi è uguale a quella tra le forme, e una forma sola va al suo centro. Le forme su più file, come gli animali di un puzzle a incastro, vengono distribuite fila per fila; le forme i cui riquadri si sovrappongono di traverso formano una fila. Dove le forme non stanno in colonne pulite, come gli animali dal davanti al retro, le forme affiancate si spostano invece come una fila intera.
 
-Senza base, fai prima clic su un punto libero del piano: il piano diventa la forma fissa, la spaziatura uguale distribuisce le forme su tutto il piano con la stessa distanza dai bordi, e gli altri punti le allineano ai suoi bordi o al suo centro. Un altro clic sul piano libero lo rilascia.
+Senza base, tieni premuto [[Shift]] e fai prima clic su un punto libero del piano: il piano diventa la forma fissa, la spaziatura uguale distribuisce le forme su tutto il piano con la stessa distanza dai bordi, e gli altri punti le allineano ai suoi bordi o al suo centro. Un altro clic con [[Shift]] sul piano libero lo rilascia. Un clic in un punto vuoto senza [[Shift]] termina l'allineamento, come [[L]] ed [[Esc]].
 
 Tieni premuto [[Alt]] e fai clic sul punto per digitare tu la distanza, per esempio 5 mm: le forme si allineano a quella distanza, a partire dalla prima forma o da quella cliccata per prima; su una base la fila va al suo centro. Una forma bloccata resta ferma, quindi una tra le forme esterne impedisce la spaziatura uguale.
 

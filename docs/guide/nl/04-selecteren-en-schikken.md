@@ -64,7 +64,7 @@ Naast de middelste punt van elke lijn staat een bredere punt met een streepje aa
 
 Zit er tussen de gekozen vormen een plaat die in die richting langer is dan alle andere, dan worden de vormen daarop verdeeld: de ruimte tot de randen is even groot als die tussen de vormen, en één vorm komt in het midden. Vormen in meerdere rijen, zoals de dieren van een insteekpuzzel, worden rij voor rij verdeeld; vormen waarvan de kaders dwars op de richting overlappen, vormen één rij. Staan de vormen niet in nette kolommen, zoals de dieren van voor naar achter, dan schuiven de vormen naast elkaar als een hele rij.
 
-Zonder plaat klik je eerst op een lege plek van het bouwplatform: dat is dan de vaste vorm, gelijke tussenruimte verdeelt de vormen over het hele platform met dezelfde ruimte tot de randen, en de andere punten lijnen ze uit op de randen of het midden. Nog een klik op de lege plek laat het weer los.
+Zonder plaat houd je [[Shift]] ingedrukt en klik je eerst op een lege plek van het bouwplatform: dat is dan de vaste vorm, gelijke tussenruimte verdeelt de vormen over het hele platform met dezelfde ruimte tot de randen, en de andere punten lijnen ze uit op de randen of het midden. Nog een klik met [[Shift]] op de lege plek laat het weer los. Een klik op een lege plek zonder [[Shift]] beëindigt het uitlijnen, net als [[L]] en [[Esc]].
 
 Houd [[Alt]] ingedrukt en klik op de punt om de tussenruimte zelf in te typen, bijvoorbeeld 5 mm: de vormen komen dan zo ver uit elkaar te staan, vanaf de eerste vorm of vanaf de vorm die je eerst aanklikte; op een plaat komt de rij in het midden. Een vergrendelde vorm blijft staan, dus een tussen de buitenste vormen verhindert gelijke tussenruimte.
 

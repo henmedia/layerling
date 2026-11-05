@@ -70,7 +70,7 @@ Junto al punto central de cada línea hay un punto más ancho con una barra a ca
 
 Si entre las formas seleccionadas hay una base (una forma sobre la que están las demás, por ejemplo una caja plana) más larga en esa dirección que todas las demás, las formas se reparten sobre ella: la separación a sus bordes es igual a la que hay entre las formas, y una sola forma queda en su centro. Las formas en varias filas, como los animales de un puzle de encajar, se reparten fila por fila; las formas cuyas cajas se solapan en sentido transversal forman una fila. Donde las formas no están en columnas limpias, como los animales de delante hacia atrás, las formas que están una al lado de otra se mueven como una fila entera.
 
-Sin base, haz clic primero en un sitio libre de la placa: la placa pasa a ser la forma fija, el espaciado igual reparte las formas por toda la placa con la misma separación a sus bordes, y los demás puntos las alinean con sus bordes o su centro. Otro clic en la placa libre la suelta.
+Sin base, mantén [[Shift]] y haz clic primero en un sitio libre de la placa: la placa pasa a ser la forma fija, el espaciado igual reparte las formas por toda la placa con la misma separación a sus bordes, y los demás puntos las alinean con sus bordes o su centro. Otro clic con [[Shift]] en la placa libre la suelta. Un clic en un lugar vacío sin [[Shift]] termina la alineación, igual que [[L]] y [[Esc]].
 
 Mantén [[Alt]] y haz clic en el punto para escribir tú la separación, por ejemplo 5 mm: las formas se alinean a esa distancia, desde la primera forma o desde la que pulsaste primero; sobre una base, la fila queda en su centro. Una forma bloqueada no se mueve, así que una entre las formas exteriores impide el espaciado igual.
 
