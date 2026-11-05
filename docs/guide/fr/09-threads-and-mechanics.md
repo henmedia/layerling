@@ -255,4 +255,6 @@ Placez la paire là où le couvercle rencontre la paroi : le socle du crochet so
 
 La {{ui:shape.rib}} rigidifie un fond ou une paroi. En {{ui:rib.straight}}, elle a la longueur, la hauteur et l'épaisseur que vous réglez, son {{ui:prop.ribTop}} plat, arrondi ou chanfreiné. En {{ui:rib.gusset}}, c'est un triangle qui renforce une paroi contre le fond : {{ui:prop.ribGussetFoot}} le long du fond, {{ui:prop.ribGussetLeg}} le long de la paroi, les deux bouts coupés court pour s'imprimer proprement.
 
+Si vous activez {{ui:prop.ribFoot}}, la nervure repose sur toute sa longueur sur une plaque mince, centrée dessus et plus étroite qu'elle (celle d'un gousset passe sous son côté au sol) ; la plaque tient la nervure sur le plateau ou le fond, si bien qu'une nervure plus fine tient aussi. Le pied commence trois fois plus large que la nervure et épais de 0,8 mm ; {{ui:prop.ribFootWidth}} se mesure d'un bord à l'autre, la forme est donc aussi large que le pied, et {{ui:prop.ribFootThickness}} depuis le bas.
+
 Une nervure à peu près aussi épaisse que la paroi ou un peu moins, multiple de la largeur de ligne (0,8 ou 1,6 mm avec une buse de 0,4 mm) et quelques fois plus haute qu'épaisse rigidifie sans déformer la paroi. Plusieurs à la suite avec {{ui:editor.tool.array}} ; groupez-les avec la boîte.

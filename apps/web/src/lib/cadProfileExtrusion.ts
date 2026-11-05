@@ -1928,7 +1928,11 @@ export function cadModifierEnclosureForShape(shape: WorkplaneShape): CadModifier
       transform,
     };
   }
-  return { kind: "rib", fields: { width, depth, height, ribStyle: shape.ribStyle, ribTop: shape.ribTop }, transform };
+  return {
+    kind: "rib",
+    fields: { width, depth, height, ribStyle: shape.ribStyle, ribTop: shape.ribTop, ribFoot: shape.ribFoot, ribThickness: shape.ribThickness, ribFootThickness: shape.ribFootThickness },
+    transform,
+  };
 }
 
 /** Outline pieces of a profile, the measure its kernel cost grows with. */

@@ -257,4 +257,6 @@ Tedd a párt oda, ahol a fedél a doboz falával találkozik: a kampó talpát a
 
 A {{ui:shape.rib}} egy alapot vagy falat merevít. {{ui:rib.straight}} formájában olyan hosszú, magas és vastag, amilyenre állítod, a {{ui:prop.ribTop}} lapos, kerek vagy letört. {{ui:rib.gusset}} formájában háromszög, amely a falat az aljhoz támasztja: {{ui:prop.ribGussetFoot}} az alj mentén, {{ui:prop.ribGussetLeg}} fel a falon, mindkét vége röviden levágva, hogy szépen nyomtatódjon.
 
+Ha bekapcsolod a {{ui:prop.ribFoot}} kapcsolót, a borda teljes hosszában egy vékony lemezen áll, annak közepén, és a lemez szélesebb nála ({{ui:rib.gusset}} formájában az alj mentén futó oldala alatt); a lemez a tárgyasztalon vagy az aljon tartja a bordát, így a vékonyabb borda is megáll. A talp kezdetben háromszor olyan széles, mint a borda, és 0,8 mm vastag; a {{ui:prop.ribFootWidth}} a teljes szélességet méri, így az alakzat olyan széles, mint a talp, a {{ui:prop.ribFootThickness}} pedig alulról felfelé értendő.
+
 A falnál alig vékonyabb, a vonalszélesség többszörösének megfelelő (0,4 mm-es fúvókával 0,8 vagy 1,6 mm), és vastagságánál néhányszor magasabb borda merevít anélkül, hogy a falat elhúzná. Többet sorban a {{ui:editor.tool.array}} készít; csoportosítsd őket a dobozzal.

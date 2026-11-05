@@ -110,6 +110,7 @@ import { InteractiveHelp } from "./InteractiveHelp";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
 import { nextSelectionTransparency } from "@/lib/selectionTransparency";
 import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, resizedShapeSize, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
+import { ribFootSwitch, ribThicknessOnFootPatch } from "@/lib/rib";
 import { pasteCenteringShift, pasteNudged } from "@/lib/pasteCentering";
 import { faceWorkplaneCenteringShift, workplaneCenteringOffset } from "@/lib/workplaneCentering";
 import { projectShapesExtent } from "@/components/workplane/ViewportOverlays";
@@ -2638,6 +2639,27 @@ function mcpBentTubePatch(shape: WorkplaneShape, params: Record<string, unknown>
   const depth = mcpOptionalNumber(params.depth ?? params.size) ?? natural.depth;
   const height = mcpOptionalNumber(params.height ?? params.size) ?? natural.height;
   return { ...fields, width, depth, height, size: Math.max(width, depth) };
+}
+
+/**
+ * A rib's foot (Discussion #1307) moves its box, as the settings panel does: switched on, the rib keeps its thickness
+ * (or takes ribThickness) and the depth becomes the foot's width, three times the rib; switched off, the depth is the
+ * rib's thickness again. A thicker rib on its foot widens the foot where it would no longer reach out beside it. A
+ * depth given in the same call wins.
+ */
+function mcpRibFootPatch(target: WorkplaneShape, patch: Partial<WorkplaneShape>, params: Record<string, unknown>): Partial<WorkplaneShape> {
+  const rib = { ...target, width: shapeWidth(target), depth: shapeDepth(target) };
+  const depth = mcpOptionalNumber(params.depth);
+  // As the shape defaults took it, within their limits.
+  const thickness = patch.ribThickness;
+  const wasOn = target.ribFoot === true;
+  const on = typeof params.ribFoot === "boolean" ? params.ribFoot : wasOn;
+  const change = on !== wasOn
+    ? ribFootSwitch(rib, on, on ? { thickness, depth } : { depth: depth ?? thickness })
+    : on && thickness !== undefined && depth === undefined ? ribThicknessOnFootPatch(rib, thickness) : null;
+  if (!change) return {};
+  const nextDepth = change.depth ?? rib.depth;
+  return { ...change, size: Math.max(patch.width ?? rib.width, nextDepth) };
 }
 
 function mcpShapeCustomization(kind: ShapeKind, params: Record<string, unknown>): ShapeCustomization {
@@ -11941,6 +11963,7 @@ export function LayerlingEditor({
         Object.assign(patch, mcpTaperPatch({ ...target, ...patch }, params, shapeDimensionLimit(workspaceSettingsRef.current, target.kind, DEFAULT_TAPER_DIMENSION_MAX)));
         Object.assign(patch, mcpExtrudeDeformPatch({ ...target, ...patch }, params));
         Object.assign(patch, mcpSlopePatch(target, params));
+        if (target.kind === "rib") Object.assign(patch, mcpRibFootPatch(target, patch, params));
         if (target.kind === "loft") {
           // The stored ends were set above as they came; the frame and the place follow from them here.
           const change = mcpLoftChange(params);

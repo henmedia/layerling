@@ -542,6 +542,10 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
     if (kind === "rib") {
       entry.ribStyle = source.ribStyle === "straight" || source.ribStyle === "gusset" ? source.ribStyle : fallbackEntry?.ribStyle;
       entry.ribTop = source.ribTop === "flat" || source.ribTop === "round" || source.ribTop === "chamfer" ? source.ribTop : fallbackEntry?.ribTop;
+      // The foot (Discussion #1307): false is kept, so a command can switch it off again.
+      entry.ribFoot = typeof source.ribFoot === "boolean" ? source.ribFoot : fallbackEntry?.ribFoot;
+      entry.ribThickness = optionalShapeNumber(source.ribThickness, fallbackEntry?.ribThickness, 0.2, 50);
+      entry.ribFootThickness = optionalShapeNumber(source.ribFootThickness, fallbackEntry?.ribFootThickness, 0.2, 50);
     }
     if (kind === "dovetail") {
       entry.dovetailNeckWidth = optionalShapeNumber(source.dovetailNeckWidth, fallbackEntry?.dovetailNeckWidth, 0.1, MAX_CUSTOM_SHAPE_DIMENSION);

@@ -257,4 +257,6 @@ Postaw parę tam, gdzie pokrywa spotyka się ze ścianką: podstawę haczyka pod
 
 {{ui:shape.rib}} usztywnia dno albo ściankę. Jako {{ui:rib.straight}} ma długość, wysokość i grubość, jakie ustawisz, {{ui:prop.ribTop}} płaską, zaokrągloną albo fazowaną. Jako {{ui:rib.gusset}} jest trójkątem, który podpiera ściankę o dno: {{ui:prop.ribGussetFoot}} wzdłuż dna, {{ui:prop.ribGussetLeg}} w górę ścianki, oba końce krótko ścięte, żeby ładnie się drukowały.
 
+Gdy włączysz {{ui:prop.ribFoot}}, żebro stoi na całej długości na cienkiej płytce, pośrodku niej i węższe od niej (przy węzłówce pod bokiem leżącym na dnie); płytka trzyma żebro na stole drukarki albo na dnie, więc stoi też cieńsze żebro. Stopka jest na początku trzy razy szersza od żebra i ma 0,8 mm grubości; {{ui:prop.ribFootWidth}} liczy się na całą szerokość, więc kształt jest tak szeroki jak stopka, a {{ui:prop.ribFootThickness}} od dołu w górę.
+
 Żebro mniej więcej tak grube jak ścianka albo trochę cieńsze, wielokrotność szerokości linii (0,8 lub 1,6 mm przy dyszy 0,4 mm) i kilka razy wyższe niż grube usztywnia, nie wykrzywiając ścianki. Kilka w rzędzie robi {{ui:editor.tool.array}}; zgrupuj je z pudełkiem.

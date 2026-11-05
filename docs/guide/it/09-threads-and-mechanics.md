@@ -256,4 +256,6 @@ Metti la coppia dove il coperchio incontra la parete: la base del gancio sotto i
 
 La {{ui:shape.rib}} irrigidisce un fondo o una parete. Come {{ui:rib.straight}} è lunga, alta e spessa quanto imposti, la {{ui:prop.ribTop}} piatta, arrotondata o smussata. Come {{ui:rib.gusset}} è un triangolo che sostiene una parete contro il fondo: {{ui:prop.ribGussetFoot}} lungo il fondo, {{ui:prop.ribGussetLeg}} su per la parete, entrambe le estremità tagliate corte perché si stampino pulite.
 
+Se attivi {{ui:prop.ribFoot}}, la nervatura poggia per tutta la lunghezza su una piastra sottile, centrata sopra e più stretta di essa (in un fazzoletto, sotto il lato sul fondo); la piastra tiene la nervatura sul piano di stampa o sul fondo, così sta in piedi anche una nervatura più sottile. Il piede parte tre volte più largo della nervatura e spesso 0,8 mm; {{ui:prop.ribFootWidth}} si misura da un bordo all'altro, quindi la forma è larga quanto il piede, e {{ui:prop.ribFootThickness}} dal basso verso l'alto.
+
 Una nervatura circa spessa come la parete o poco meno, multipla della larghezza di linea (0,8 o 1,6 mm con un ugello da 0,4 mm) e qualche volta più alta che spessa irrigidisce senza deformare la parete. Più di una in fila la fa {{ui:editor.tool.array}}; raggruppale con la scatola.

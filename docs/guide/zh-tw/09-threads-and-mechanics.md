@@ -253,4 +253,6 @@ microSD 卡槽也是左邊緣的接頭，位於電路板下方（Zero 2 W 上在
 
 {{ui:shape.rib}} 用來加強底面或側壁。作為 {{ui:rib.straight}}，長度、高度和厚度都依你的設定，{{ui:prop.ribTop}} 可以是平的、圓的或倒角的。作為 {{ui:rib.gusset}}，它是把側壁撐在底面上的三角形：{{ui:prop.ribGussetFoot}} 沿底面，{{ui:prop.ribGussetLeg}} 沿壁面向上，兩端都切短一點，方便乾淨地列印。
 
+開啟 {{ui:prop.ribFoot}} 後，加強肋沿整條長度立在一塊薄板上，位於板的中間，板比肋寬（{{ui:rib.gusset}} 的底腳在沿底面的那條邊下方）；薄板讓肋牢牢附著在列印平台或底面上，更薄的肋也能立得住。底腳起初是肋的三倍寬、0.8 mm 厚；{{ui:prop.ribFootWidth}} 依整個寬度計算，所以形狀和底腳一樣寬，{{ui:prop.ribFootThickness}} 從底部往上算。
+
 厚度與壁厚相當或略薄、為線寬整數倍（0.4 mm 噴嘴用 0.8 或 1.6 mm）、高度為厚度幾倍的加強肋，既能加強又不會讓壁面變形。多條排成一列用 {{ui:editor.tool.array}}；把它們與盒子群組。

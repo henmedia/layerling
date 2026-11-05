@@ -163,6 +163,11 @@ export type ShapeCustomization = {
   /** Rib: a straight rib or a gusset, and a straight rib's top. */
   ribStyle?: "straight" | "gusset";
   ribTop?: "flat" | "round" | "chamfer";
+  /** Rib: a thin, wider plate under it (Discussion #1307); missing means none. With it the depth is the foot's width. */
+  ribFoot?: boolean;
+  /** Rib on its foot: the rib's own thickness, and the foot's thickness from the bottom, in mm. */
+  ribThickness?: number;
+  ribFootThickness?: number;
   topWidth?: number;
   topDepth?: number;
   teeth?: number;
@@ -978,6 +983,11 @@ export type WorkplaneShape = {
   /** Rib: a straight rib or a gusset, and a straight rib's top. */
   ribStyle?: "straight" | "gusset";
   ribTop?: "flat" | "round" | "chamfer";
+  /** Rib: a thin, wider plate under it (Discussion #1307); missing means none. With it the depth is the foot's width. */
+  ribFoot?: boolean;
+  /** Rib on its foot: the rib's own thickness, and the foot's thickness from the bottom, in mm. */
+  ribThickness?: number;
+  ribFootThickness?: number;
   topWidth?: number;
   topDepth?: number;
   taperTopWidth?: number;

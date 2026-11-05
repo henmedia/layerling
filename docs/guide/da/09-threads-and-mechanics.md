@@ -267,4 +267,6 @@ Sæt parret, hvor låget møder kassens væg: krogens fod under låget, låsens 
 
 {{ui:shape.rib}} afstiver en bund eller en væg. Som {{ui:rib.straight}} er den så lang, høj og tyk, som du indstiller, {{ui:prop.ribTop}} flad, rund eller affaset. Som {{ui:rib.gusset}} er den en trekant, der afstiver en væg mod bunden: {{ui:prop.ribGussetFoot}} langs bunden, {{ui:prop.ribGussetLeg}} op ad væggen, begge ender skåret kort af, så de printes pænt.
 
+Slår du {{ui:prop.ribFoot}} til, står ribben i hele sin længde på en tynd plade, midt på den og smallere end den (på en knudeplade under siden langs bunden); pladen holder ribben fast på printpladen eller bunden, så også en tyndere ribbe står. Foden starter tre gange så bred som ribben og 0,8 mm tyk; {{ui:prop.ribFootWidth}} måles hele vejen på tværs, så formen er lige så bred som foden, og {{ui:prop.ribFootThickness}} nedefra og op.
+
 En ribbe omtrent så tyk som væggen eller lidt tyndere, et multiplum af linjebredden (0,8 eller 1,6 mm med en 0,4 mm dyse) og et par gange så høj som tyk afstiver uden at trække væggen skæv. Flere på række laver {{ui:editor.tool.array}}; gruppér dem med kassen.

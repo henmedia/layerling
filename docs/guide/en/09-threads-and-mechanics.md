@@ -257,4 +257,6 @@ Put the pair where the lid meets the box wall: the hook's foot under the lid, th
 
 The {{ui:shape.rib}} stiffens a floor or a wall. As a {{ui:rib.straight}} it is as long, high and thick as you set, its {{ui:prop.ribTop}} flat, round or chamfered. As a {{ui:rib.gusset}} it is a triangle that braces a wall against the floor: {{ui:prop.ribGussetFoot}} along the floor, {{ui:prop.ribGussetLeg}} up the wall, both ends cut off short so they print cleanly.
 
+With {{ui:prop.ribFoot}} switched on, the rib stands on a thin plate along its whole length, centred under it and wider than it (a gusset's lies under its side along the floor), which holds it on the bed or the floor, so a thinner rib still stands. The foot starts three times as wide as the rib and 0.8 mm thick; {{ui:prop.ribFootWidth}} is measured all the way across, so the shape is as wide as the foot, and {{ui:prop.ribFootThickness}} from the bottom up.
+
 A rib about as thick as the wall or a little thinner, a multiple of the line width (0.8 or 1.6 mm with a 0.4 mm nozzle), and a few times as high as it is thick stiffens without pulling the wall out of shape. Several in a row come from {{ui:editor.tool.array}}; group them with the box.

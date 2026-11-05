@@ -257,4 +257,6 @@ Setz das Paar dorthin, wo Deckel und Kastenwand sich treffen: den Sockel des Hak
 
 Die {{ui:shape.rib}} versteift einen Boden oder eine Wand. Als {{ui:rib.straight}} ist sie so lang, hoch und stark, wie du sie einstellst, {{ui:prop.ribTop}} flach, rund oder angefast. Als {{ui:rib.gusset}} ist sie ein Dreieck, das eine Wand gegen den Boden stützt: {{ui:prop.ribGussetFoot}} entlang des Bodens, {{ui:prop.ribGussetLeg}} die Wand hinauf, beide Enden kurz abgeschnitten, damit sie sauber drucken.
 
+Schaltest du {{ui:prop.ribFoot}} ein, steht die Rippe über ihre ganze Länge auf einer dünnen Platte, mittig darauf und schmaler als sie (beim Knotenblech liegt sie unter der Seite am Boden); die Platte hält die Rippe auf dem Druckbett oder dem Boden, so steht auch eine dünnere Rippe. Der Fuß ist zu Beginn dreimal so breit wie die Rippe und 0,8 mm stark; {{ui:prop.ribFootWidth}} misst über die ganze Breite, die Form ist also so breit wie der Fuß, {{ui:prop.ribFootThickness}} von unten nach oben.
+
 Eine Rippe etwa so stark wie die Wand oder etwas dünner, ein Vielfaches der Linienbreite (0,8 oder 1,6 mm bei einer 0,4-mm-Düse) und ein paarmal so hoch wie stark versteift, ohne die Wand zu verziehen. Mehrere in Reihe macht {{ui:editor.tool.array}}; gruppiere sie mit der Kiste.

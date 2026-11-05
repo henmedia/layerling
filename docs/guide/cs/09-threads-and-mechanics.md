@@ -257,4 +257,6 @@ Dejte pár tam, kde se víko potkává se stěnou: patku háčku pod víko, zád
 
 {{ui:shape.rib}} vyztuží dno nebo stěnu. Jako {{ui:rib.straight}} je tak dlouhé, vysoké a silné, jak nastavíte, {{ui:prop.ribTop}} rovná, zaoblená nebo zkosená. Jako {{ui:rib.gusset}} je to trojúhelník, který podepře stěnu proti dnu: {{ui:prop.ribGussetFoot}} podél dna, {{ui:prop.ribGussetLeg}} nahoru po stěně, oba konce krátce useknuté, aby se čistě tiskly.
 
+Když zapnete {{ui:prop.ribFoot}}, stojí žebro po celé délce na tenké desce, uprostřed na ní a užší než ona (u výztuhy pod stranou na dně); deska drží žebro na podložce nebo na dně, takže obstojí i tenčí žebro. Patka je zpočátku třikrát širší než žebro a 0,8 mm tlustá; {{ui:prop.ribFootWidth}} se měří přes celou šířku, tvar je tedy stejně široký jako patka, a {{ui:prop.ribFootThickness}} odspodu nahoru.
+
 Žebro zhruba tak silné jako stěna nebo trochu tenčí, násobek šířky linky (0,8 nebo 1,6 mm s tryskou 0,4 mm) a několikrát vyšší než silné vyztuží, aniž by stěnu zkroutilo. Několik vedle sebe udělá {{ui:editor.tool.array}}; seskupte je s krabičkou.

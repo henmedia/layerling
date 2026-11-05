@@ -255,4 +255,6 @@ Postavi par tja, kjer se pokrov sreča s steno: podnožje kljukice pod pokrov, h
 
 {{ui:shape.rib}} ojača dno ali steno. Kot {{ui:rib.straight}} je dolgo, visoko in debelo, kot nastaviš, {{ui:prop.ribTop}} raven, zaobljen ali posnet. Kot {{ui:rib.gusset}} je trikotnik, ki podpre steno ob dno: {{ui:prop.ribGussetFoot}} vzdolž dna, {{ui:prop.ribGussetLeg}} navzgor po steni, oba konca na kratko odrezana, da se lepo natisneta.
 
+Če vklopiš {{ui:prop.ribFoot}}, stoji rebro po vsej dolžini na tanki plošči, na sredini nje in ožje od nje (pri vozlovni pločevini pod stranico ob dnu); plošča drži rebro na tiskalni podlagi ali dnu, zato stoji tudi tanjše rebro. Podnožje je na začetku trikrat širše od rebra in debelo 0,8 mm; {{ui:prop.ribFootWidth}} se meri čez vso širino, zato je oblika enako široka kot podnožje, {{ui:prop.ribFootThickness}} pa od spodaj navzgor.
+
 Rebro približno tako debelo kot stena ali nekoliko tanjše, mnogokratnik širine linije (0,8 ali 1,6 mm pri šobi 0,4 mm) in nekajkrat višje kot debelo ojača, ne da bi steno zvilo. Več v vrsti naredi {{ui:editor.tool.array}}; združi jih s škatlo.

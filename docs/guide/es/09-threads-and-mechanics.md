@@ -257,4 +257,6 @@ Pon la pareja donde la tapa se encuentra con la pared: la base del gancho bajo l
 
 El {{ui:shape.rib}} refuerza un fondo o una pared. Como {{ui:rib.straight}} tiene la longitud, altura y grosor que ajustes, su {{ui:prop.ribTop}} plana, redonda o achaflanada. Como {{ui:rib.gusset}} es un triángulo que apuntala una pared contra el fondo: {{ui:prop.ribGussetFoot}} a lo largo del fondo, {{ui:prop.ribGussetLeg}} por la pared, con ambos extremos recortados para que se impriman limpios.
 
+Si activas {{ui:prop.ribFoot}}, el nervio se apoya en toda su longitud sobre una placa fina, centrado encima y más estrecho que ella (en una cartela, bajo su lado en el suelo); la placa lo sujeta a la cama o al fondo, así que también se sostiene un nervio más fino. El pie empieza tres veces más ancho que el nervio y con 0,8 mm de grosor; {{ui:prop.ribFootWidth}} se mide de lado a lado, así que la forma es tan ancha como el pie, y {{ui:prop.ribFootThickness}} desde abajo.
+
 Un nervio más o menos tan grueso como la pared o algo menos, múltiplo del ancho de línea (0,8 o 1,6 mm con una boquilla de 0,4 mm) y unas cuantas veces más alto que grueso refuerza sin deformar la pared. Varios en fila salen de {{ui:editor.tool.array}}; agrúpalos con la caja.

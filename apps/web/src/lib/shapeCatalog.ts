@@ -5,7 +5,7 @@ import { createLocalId } from "@/lib/localIds";
 import { DEFAULT_CURVED_CONE_BEND, DEFAULT_CURVED_CONE_TOP, normalizeCurvedConeBend, normalizeCurvedConeTop } from "@/lib/curvedCone";
 import { DEFAULT_SCREW_BOSS_FASTENER, DEFAULT_SCREW_BOSS_SIZE, normalizeScrewBossFastener } from "@/lib/screwBoss";
 import { DEFAULT_SNAP_FIT_CLEARANCE, DEFAULT_SNAP_FIT_FOOT, DEFAULT_SNAP_FIT_LEAD_ANGLE, DEFAULT_SNAP_FIT_RETAIN_ANGLE, DEFAULT_SNAP_FIT_THICKNESS, DEFAULT_SNAP_FIT_UNDERCUT, normalizeSnapFitPart } from "@/lib/snapFit";
-import { normalizeRibStyle, normalizeRibTop } from "@/lib/rib";
+import { DEFAULT_RIB_THICKNESS, normalizeRibStyle, normalizeRibTop, ribFootWidthFor } from "@/lib/rib";
 import {
   DEFAULT_GEAR_BACKLASH,
   DEFAULT_GEAR_CENTER_HOLE_SIZE,
@@ -518,7 +518,7 @@ export function shapeAssetDefaultDimensions(kind: ShapeKind) {
   // An M3 heat-set insert's boss, a hook with its catch that bends about 1.6 %, a rib 1.6 mm (four lines) thick.
   if (kind === "screwBoss") return { width: 8, depth: 8, height: 10 };
   if (kind === "snapFit") return { width: 8, depth: 9, height: 16 };
-  if (kind === "rib") return { width: 40, depth: 1.6, height: 8 };
+  if (kind === "rib") return { width: 40, depth: DEFAULT_RIB_THICKNESS, height: 8 };
   const roundProfile = kind === "sphere" || kind === "torus" || kind === "ring" || kind === "halfSphere" || kind === "paraboloid";
   const flatProfile = kind === "torus" || kind === "ring" || kind === "text" || kind === "gear";
   // A gear starts as 12 involute teeth of module 2 (#201).
@@ -732,6 +732,9 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     snapFitFoot: shape.snapFitFoot,
     ribStyle: shape.ribStyle,
     ribTop: shape.ribTop,
+    ribFoot: shape.ribFoot,
+    ribThickness: shape.ribThickness,
+    ribFootThickness: shape.ribFootThickness,
     topWidth: shape.topWidth,
     topDepth: shape.topDepth,
     taperTopWidth: shape.taperTopWidth,
@@ -1066,10 +1069,15 @@ export function makeShapeFromAsset(
     })
     : null;
   const width = gearSize?.width ?? gridfinityFootprint?.width ?? loftFootprint?.width ?? bentTubeFootprint?.width ?? threadFootprint?.width ?? customization.width ?? defaults.width;
+  // A rib on its foot (Discussion #1307) keeps its own thickness, a new one's four lines; its box is the foot's width,
+  // three times the rib unless a depth was asked for.
+  const ribOnFoot = asset.kind === "rib" && customization.ribFoot === true;
+  const ribThickness = ribOnFoot ? customization.ribThickness ?? DEFAULT_RIB_THICKNESS : undefined;
+  const ribFootDepth = ribThickness !== undefined && customization.depth === undefined ? ribFootWidthFor(ribThickness) : undefined;
   // A cylinder is always circular - depth follows width here too, so it never
   // snaps between insert and first render (canonicalizeShape enforces this
   // again afterwards as the actual safety net).
-  const depth = asset.kind === "cylinder" ? width : gearSize?.depth ?? gridfinityFootprint?.depth ?? loftFootprint?.depth ?? bentTubeFootprint?.depth ?? threadFootprint?.depth ?? customization.depth ?? defaults.depth;
+  const depth = asset.kind === "cylinder" ? width : gearSize?.depth ?? gridfinityFootprint?.depth ?? loftFootprint?.depth ?? bentTubeFootprint?.depth ?? threadFootprint?.depth ?? ribFootDepth ?? customization.depth ?? defaults.depth;
   const height = gridfinityFootprint?.height ?? bentTubeFootprint?.height ?? customization.height ?? (threadDefaults ? threadNaturalHeight(threadDefaults) : defaults.height);
   const size = Math.max(width, depth);
   const hirthTeeth = asset.kind === "hirth" ? normalizeHirthTeeth(customization.teeth) : undefined;
@@ -1133,6 +1141,9 @@ export function makeShapeFromAsset(
     snapFitFoot: asset.kind === "snapFit" ? customization.snapFitFoot ?? DEFAULT_SNAP_FIT_FOOT : undefined,
     ribStyle: asset.kind === "rib" ? normalizeRibStyle(customization.ribStyle) : undefined,
     ribTop: asset.kind === "rib" ? normalizeRibTop(customization.ribTop) : undefined,
+    ribFoot: ribOnFoot ? true : undefined,
+    ribThickness,
+    ribFootThickness: asset.kind === "rib" ? customization.ribFootThickness : undefined,
     topWidth: asset.kind === "pyramid" ? normalizePyramidTop(customization.topWidth, width) : undefined,
     topDepth: asset.kind === "pyramid" ? normalizePyramidTop(customization.topDepth, depth) : undefined,
     teeth: gearTeeth,

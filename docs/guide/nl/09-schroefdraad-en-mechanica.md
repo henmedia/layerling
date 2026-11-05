@@ -257,4 +257,6 @@ Zet het paar waar deksel en doos elkaar raken: de voet van de haak onder het dek
 
 De {{ui:shape.rib}} verstijft een bodem of een wand. Als {{ui:rib.straight}} is hij zo lang, hoog en dik als je instelt, de {{ui:prop.ribTop}} vlak, rond of afgeschuind. Als {{ui:rib.gusset}} is het een driehoek die een wand tegen de bodem steunt: {{ui:prop.ribGussetFoot}} over de bodem, {{ui:prop.ribGussetLeg}} tegen de wand, beide uiteinden kort afgesneden zodat ze netjes printen.
 
+Zet je {{ui:prop.ribFoot}} aan, dan staat de rib over zijn hele lengte op een dunne plaat, in het midden erop en smaller dan die plaat (bij een knoopplaat onder de kant langs de bodem); de plaat houdt de rib vast op het printbed of de bodem, zodat ook een dunnere rib blijft staan. De voet begint drie keer zo breed als de rib en 0,8 mm dik; {{ui:prop.ribFootWidth}} meet je over de hele breedte, dus de vorm is zo breed als de voet, en {{ui:prop.ribFootThickness}} van onderen naar boven.
+
 Een rib ongeveer zo dik als de wand of iets dunner, een veelvoud van de lijnbreedte (0,8 of 1,6 mm met een 0,4-mm-mondstuk) en een paar keer zo hoog als dik verstijft zonder de wand te vervormen. Meerdere op een rij komen uit {{ui:editor.tool.array}}; groepeer ze met de doos.
