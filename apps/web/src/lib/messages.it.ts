@@ -2998,6 +2998,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "Piastra",
   "hinge.leafFingers": "Dita",
   "hinge.leafFingersHint": "Ogni perno è dotato di una propria aletta; le alette dei due lati si alternano come i denti di due pettini. In questo modo la cerniera può ruotare completamente e, con coni e dita dello stesso spessore del perno, può chiudersi completamente in piano. Le alette di ciascun lato non sono unite tra loro: dovrai collegarle al tuo modello, ad esempio alla scatola e al relativo coperchio.",
+  "hinge.leafRaised": "Aletta rialzata",
+  "hinge.leafRaisedHint": "La seconda aletta è più alta, così che, chiusa, poggi in piano sulla prima con il gioco tra le due, e la cerniera si apre ben oltre la posizione piana. Stampala con supporti sotto l'aletta rialzata.",
   "hinge.styleLiftOff": "Sfilabile",
   "hinge.styleLiftOffHint": "Due cerniere: quella inferiore porta il perno fino all'estremità, quella superiore è un manicotto che si sfila. «Parti separate» crea i due pezzi; per stamparli in verticale, appoggia il pezzo col perno sulla cerniera e l'altro sul manicotto.",
   "hinge.screwNut": "Sede del dado",

@@ -3010,6 +3010,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "hinge.leafPlate": "Durchgehend",
   "hinge.leafFingers": "Finger",
   "hinge.leafFingersHint": "Jeder Knöchel trägt seinen eigenen Finger, die Finger beider Seiten wechseln sich ab wie zwei Kämme. So klappt das Scharnier ganz herum, und mit Kegeln und Fingern so dick wie der Knöchel liegt es zugeklappt flach. Kein Blatt verbindet die Finger einer Seite: Verbinde sie mit deinem Modell, etwa mit Kasten und Deckel.",
+  "hinge.leafRaised": "Erhöhtes Blatt",
+  "hinge.leafRaisedHint": "Das zweite Blatt liegt höher, sodass es zugeklappt flach auf dem ersten liegt, mit dem Spiel dazwischen, und das Scharnier klappt weit über die flache Lage hinaus. Drucke es mit Stützen unter dem erhöhten Blatt.",
   "hinge.styleLiftOff": "Abnehmbar",
   "hinge.styleLiftOffHint": "Zwei Knöchel: Der untere trägt den Stift bis ans Ende, der obere ist eine Hülse, die man davon abhebt. Teile trennen ergibt die beiden Teile; stehend gedruckt steht das Teil mit dem Stift auf seinem Knöchel und das andere auf seiner Hülse.",
   "hinge.screwNut": "Mutternfalle",

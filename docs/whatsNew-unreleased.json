@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Scharnier, das flach zuklappt",
+      "en": "A hinge that closes flat"
+    },
+    "body": {
+      "de": "Ein Scharnier hat unter „Blattform“ jetzt „Erhöhtes Blatt“: Das zweite Blatt liegt höher, sodass es zugeklappt flach auf dem ersten liegt, und das Scharnier klappt weit über die flache Lage hinaus. Gedruckt wird es mit Stützen unter dem erhöhten Blatt. Der Öffnungswinkel geht jetzt auch unter 0°, bis -180°.",
+      "en": "Under \"Leaf shape\" a hinge now has \"Raised leaf\": the second leaf lies higher, so that, closed, it lies flat on the first, and the hinge folds far past lying flat. It prints with supports under the raised leaf. The opening angle now also goes below 0°, down to -180°."
+    }
+  },
+  {
+    "title": {
       "de": "Gruppieren ohne dünne Häute",
       "en": "Grouping without thin skins"
     },

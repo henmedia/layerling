@@ -30,6 +30,12 @@ import { automaticSideCount, roundSideCount } from "@/lib/roundSideCount";
  * Statt Senkungen koennen die Schraubenloecher Sechskant-Taschen fuer Muttern
  * haben, auf beiden Blaettern oder auf B allein.
  *
+ * Erhoeht liegt Blatt B um Hoehe - 2 Staerken - Spiel ueber der Platte
+ * (#1259): Zugeklappt liegt es dann flach auf A, das Spiel dazwischen, und das
+ * Scharnier klappt weit ueber die flache Lage hinaus nach unten. Es beginnt
+ * weiter aussen, so bleibt das Spiel zu den Knoecheln von A; gedruckt wird es
+ * mit Stuetzen darunter.
+ *
  * Statt zweier Blaetter gibt es auch Finger: Jeder Knoechel traegt seinen
  * eigenen, so breit wie er, und die Finger beider Seiten wechseln sich ab wie
  * zwei Kaemme. Keiner liegt unter einem Knoechel der anderen Seite, so klappt
@@ -51,6 +57,8 @@ export const MAX_HINGE_KNUCKLES = 15;
 export const MAX_HINGE_KNUCKLES_BY_WIDTH = 31;
 export const MIN_HINGE_CLEARANCE = 0.1;
 export const MAX_HINGE_CLEARANCE = 1;
+/** Folded down past lying flat, as far as a full turn from closed. */
+export const MIN_HINGE_ANGLE = -180;
 export const MAX_HINGE_ANGLE = 180;
 const MIN_LEAF = 0.4;
 const MIN_KNUCKLE_LENGTH = 1;
@@ -140,9 +148,9 @@ export function normalizeHingeClearance(value?: number) {
   return clamp(finite(value, DEFAULT_HINGE_CLEARANCE), MIN_HINGE_CLEARANCE, MAX_HINGE_CLEARANCE);
 }
 
-/** How far the second leaf is folded up from lying flat, in degrees: 0 is open, 180 is closed. */
+/** How far the second leaf is folded up from lying flat, in degrees: 0 is open, 180 is closed, below 0 folded down. */
 export function normalizeHingeAngle(value?: number) {
-  return clamp(finite(value, 0), 0, MAX_HINGE_ANGLE);
+  return clamp(finite(value, 0), MIN_HINGE_ANGLE, MAX_HINGE_ANGLE);
 }
 
 /** An odd count between 3 and 15, fewer when the knuckles would get shorter than 1 mm. */
@@ -184,17 +192,18 @@ export function normalizeHingeLeafThickness(value: number | undefined, height: n
 }
 
 /**
- * How far from the axis a leaf ends beside the other part's knuckle, so that the clearance holds: where its top corner comes
- * closest to the round knuckle, or, for a leaf thicker than the radius, its edge level with the axis.
+ * How far from the axis a leaf from `low` to `high` above the plate ends beside the other part's knuckle, so that the
+ * clearance holds: where its corner nearest the axis's level comes closest to the round knuckle, or, for a leaf across that
+ * level, its edge level with the axis.
  */
-function leafReach(radius: number, leaf: number, clearance: number) {
-  if (leaf > radius) return radius + clearance;
-  return Math.sqrt((radius + clearance) * (radius + clearance) - (radius - leaf) * (radius - leaf));
+function leafReach(radius: number, low: number, high: number, clearance: number) {
+  const level = Math.max(0, low - radius, radius - high);
+  return Math.sqrt((radius + clearance) * (radius + clearance) - level * level);
 }
 
-/** The depth below which a leaf would not reach past the other part's knuckles. */
-export function minimumHingeDepth(height: number, leaf: number, clearance: number) {
-  return 2 * (leafReach(height / 2, leaf, clearance) + 0.5);
+/** The depth below which a leaf would not reach past the other part's knuckles; `lift`: B's leaf raised by it (see hingePlan). */
+export function minimumHingeDepth(height: number, leaf: number, clearance: number, lift = 0) {
+  return 2 * (leafReach(height / 2, lift, lift + leaf, clearance) + 0.5);
 }
 
 /** The largest cone diameter that fits knuckles `length` long on a hinge `height` high, for the size field. */
@@ -202,11 +211,14 @@ export function hingeLargestConeSize(length: number, height: number, clearance: 
   return 2 * Math.max(0.3, hingeConeRadius(length, height, clearance));
 }
 
-export type HingeLeafStyle = "plate" | "fingers";
+export type HingeLeafStyle = "plate" | "fingers" | "raised";
 
-/** The leaves as one plate each (default), or as fingers: each knuckle carries its own, the two sides' alternating like two combs. */
+/**
+ * The leaves as one plate each (default), as fingers: each knuckle carries its own, the two sides' alternating like two
+ * combs, or with B's plate raised (#1259): closed, it lies flat on A's.
+ */
 export function normalizeHingeLeafStyle(value?: string): HingeLeafStyle {
-  return value === "fingers" ? "fingers" : "plate";
+  return value === "fingers" || value === "raised" ? value : "plate";
 }
 
 /** How many screw holes each leaf gets along the axis: 0 (none) to 6. */
@@ -262,7 +274,7 @@ export type HingeShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   hingeStyle?: string;
   /** The cone hinge: the diameter of a cone where it grows from its knuckle, in mm; left out, the largest that fits. */
   hingeConeSize?: number;
-  /** Part B folded up about the pin's axis, in degrees (0 = lying flat, 180 = closed). */
+  /** Part B folded up about the pin's axis, in degrees (0 = lying flat, 180 = closed, below 0 folded down). */
   hingeAngle?: number;
   /** Screw holes in each leaf along the axis; 0 or left out, none. */
   hingeScrewHoles?: number;
@@ -280,7 +292,10 @@ export type HingeShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   hingeNutWidth?: number;
   /** The leaves' four outer corners rounded with this radius in mm; with fingers, each finger's two. */
   hingeCornerRadius?: number;
-  /** "plate" (default): a leaf each side; "fingers": each knuckle carries its own finger, the two sides' alternating. No screw holes on fingers. */
+  /**
+   * "plate" (default): a leaf each side; "fingers": each knuckle carries its own finger, the two sides' alternating. No
+   * screw holes on fingers. "raised": B's plate lifted so that it closes flat on A's.
+   */
   hingeLeafStyle?: string;
   sides?: number;
 };
@@ -295,7 +310,16 @@ export function hingePlan(shape: HingeShapeFields) {
   const pinRadius = pinDiameter / 2;
   const boreRadius = pinRadius + clearance;
   const style = normalizeHingeStyle(shape.hingeStyle, shape.hingePinless);
-  const leaf = normalizeHingeLeafThickness(shape.hingeLeafThickness, height, pinDiameter, clearance, style);
+  const leafStyle = normalizeHingeLeafStyle(shape.hingeLeafStyle);
+  const asked = normalizeHingeLeafThickness(shape.hingeLeafThickness, height, pinDiameter, clearance, style);
+  // A raised leaf B lies on A's when closed, the clearance between, so both leaves and the clearance fit within the
+  // knuckle: a thicker leaf (a cone hinge's may be as thick as the knuckle) is made thinner, and a knuckle too small for
+  // two leaves keeps both on the plate. A lift of a rounding error is none, or B's knuckle would tear open.
+  const most = (height - clearance) / 2;
+  const raised = leafStyle === "raised" && most >= MIN_LEAF;
+  const leaf = raised ? Math.min(asked, most) : asked;
+  const above = height - 2 * leaf - clearance;
+  const lift = raised && above > 1e-6 ? above : 0;
   const knuckleWidth = normalizeHingeKnuckleWidth(shape.hingeKnuckleWidth);
   // A lift-off hinge has two knuckles: the lower one with the pin, the upper one that comes off it.
   let knuckles = style === "liftOff" ? 2 : knuckleWidth ? hingeKnucklesForWidth(width, knuckleWidth, clearance) : normalizeHingeKnuckles(shape.hingeKnuckles, width, clearance);
@@ -315,9 +339,12 @@ export function hingePlan(shape: HingeShapeFields) {
   const chord = Math.sqrt(Math.max(0, radius * radius - (radius - leaf) * (radius - leaf)));
   // The leaf's top corner is where it comes closest to the round knuckle:
   // the clearance has to hold there, not just level with the leaf.
-  const leafStart = leafReach(radius, leaf, clearance);
+  const leafStart = leafReach(radius, 0, leaf, clearance);
+  // B's leaf comes at least as near the axis's level as A's, so it starts as far out or further: the screw holes, which
+  // lie alike on both leaves, keep their wall to B's start.
+  const leafStartB = leafReach(radius, lift, lift + leaf, clearance);
   // Each leaf keeps at least half a millimetre beyond the other's knuckles.
-  const depth = Math.max(minimumHingeDepth(height, leaf, clearance), shape.depth ?? shape.width);
+  const depth = Math.max(minimumHingeDepth(height, leaf, clearance, lift), shape.depth ?? shape.width);
   const segments = Array.from({ length: knuckles }, (_, index) => {
     const x0 = -width / 2 + index * (knuckleLength + clearance);
     return { x0, x1: x0 + knuckleLength, owner: index % 2 === 0 ? "a" as const : "b" as const };
@@ -326,8 +353,8 @@ export function hingePlan(shape: HingeShapeFields) {
   const sides = Math.max(16, Math.ceil(roundSideCount(shape.sides, height, height) / 4) * 4);
   const pinless = style === "pinless";
   const angle = normalizeHingeAngle(shape.hingeAngle);
-  const fingers = normalizeHingeLeafStyle(shape.hingeLeafStyle) === "fingers";
-  const cornerRadius = clamp(finite(shape.hingeCornerRadius, 0), 0, hingeLargestCornerRadius(fingers ? knuckleLength : width, depth, leafStart));
+  const fingers = leafStyle === "fingers";
+  const cornerRadius = clamp(finite(shape.hingeCornerRadius, 0), 0, hingeLargestCornerRadius(fingers ? knuckleLength : width, depth, leafStartB));
   // A countersink at 90 degrees is as deep as it widens; it leaves some straight hole, and one too shallow to hold a head is left out.
   const screwRadius = normalizeHingeScrewDiameter(shape.hingeScrewDiameter) / 2;
   const screwHead = normalizeHingeScrewHead(shape.hingeScrewHead, shape.hingeScrewCountersink);
@@ -346,9 +373,9 @@ export function hingePlan(shape: HingeShapeFields) {
   };
   // The holes lie alike on both leaves, so they keep their walls by the wider top of the two.
   const footprint = Math.max(...[screwTops.a, screwTops.b].map((kind) => (kind === "countersunk" ? screwHeadRadius : kind === "nut" ? nutRadius : screwRadius)));
-  const screws = screwHolePlaces(fingers ? 0 : normalizeHingeScrewHoles(shape.hingeScrewHoles), width, depth / 2, leafStart, cornerRadius, footprint, finite(shape.hingeScrewSpacing, 0), finite(shape.hingeScrewAcross, 0));
+  const screws = screwHolePlaces(fingers ? 0 : normalizeHingeScrewHoles(shape.hingeScrewHoles), width, depth / 2, leafStartB, cornerRadius, footprint, finite(shape.hingeScrewSpacing, 0), finite(shape.hingeScrewAcross, 0));
   return {
-    width, depth, height, radius, clearance, pinless, angle, style, coneRadius, recessRadius, recessDepth, pinRadius, boreRadius, leaf, knuckles, knuckleLength, chord, leafStart, segments, sides,
+    width, depth, height, radius, clearance, pinless, angle, style, coneRadius, recessRadius, recessDepth, pinRadius, boreRadius, leaf, raised, lift, knuckles, knuckleLength, chord, leafStart, leafStartB, segments, sides,
     fingers, cornerRadius, screwRadius, screwSink, screwHeadRadius, screwHead, screwTops, nutWidth, nutDepth, nutRadius, screwZ: screws.z, screwXs: screws.xs,
   };
 }
@@ -387,13 +414,20 @@ function arc(plan: HingePlan, from: number, to: number): P[] {
 
 /** The sections every body is made of, counter-clockwise in (u = z, v = y). */
 export function hingeSections(plan: HingePlan) {
-  const { depth, leaf, chord, leafStart: e } = plan;
+  const { depth, leaf, chord, leafStart: e, leafStartB: eB, lift } = plan;
   const half = depth / 2;
-  const right = Math.asin((leaf - plan.radius) / plan.radius); // where a leaf top meets the knuckle on +z
+  // Where a leaf's face at height v meets the knuckle on +z. B's arc runs round the knuckle from where its leaf's top
+  // meets it to where its bottom does; not raised, the bottom meets it at the bottom and the top where A's does.
+  const meet = (v: number) => {
+    const level = v - plan.radius;
+    return { angle: Math.asin(level / plan.radius), at: { u: Math.sqrt(Math.max(0, plan.radius * plan.radius - level * level)), v } };
+  };
+  const right = meet(leaf).angle; // where a leaf top meets the knuckle on +z
   const left = Math.PI - right;
   const bottom = { u: 0, v: 0 };
   const arcA = arc(plan, -Math.PI / 2, left);
-  const arcB = arc(plan, right, (3 * Math.PI) / 2);
+  const low = meet(lift), high = meet(lift + leaf);
+  const arcB = arc(plan, high.angle, low.angle + 2 * Math.PI);
   return {
     // A's knuckle with its leaf, the pin inside it.
     aFull: [{ u: -half, v: 0 }, { u: -e, v: 0 }, bottom, ...arcA, { u: -chord, v: leaf }, { u: -e, v: leaf }, { u: -half, v: leaf }],
@@ -402,11 +436,11 @@ export function hingeSections(plan: HingePlan) {
     pin: circle(plan, plan.pinRadius),
     coneBase: circle(plan, plan.coneRadius),
     recess: circle(plan, plan.recessRadius),
-    bFull: [bottom, { u: e, v: 0 }, { u: half, v: 0 }, { u: half, v: leaf }, { u: e, v: leaf }, { u: chord, v: leaf }, ...arcB],
-    bCap: [bottom, { u: e, v: 0 }, { u: e, v: leaf }, { u: chord, v: leaf }, ...arcB],
-    // B's knuckle as bCap, starting so that the side towards the leaf (u = e) closes the loop, as aCap's does.
-    bKnuckle: [{ u: e, v: leaf }, { u: chord, v: leaf }, ...arcB, bottom, { u: e, v: 0 }],
-    bLeaf: [{ u: e, v: 0 }, { u: half, v: 0 }, { u: half, v: leaf }, { u: e, v: leaf }],
+    bFull: [low.at, { u: eB, v: lift }, { u: half, v: lift }, { u: half, v: lift + leaf }, { u: eB, v: lift + leaf }, high.at, ...arcB],
+    bCap: [low.at, { u: eB, v: lift }, { u: eB, v: lift + leaf }, high.at, ...arcB],
+    // B's knuckle as bCap, starting so that the side towards the leaf (u = eB) closes the loop, as aCap's does.
+    bKnuckle: [{ u: eB, v: lift + leaf }, high.at, ...arcB, low.at, { u: eB, v: lift }],
+    bLeaf: [{ u: eB, v: lift }, { u: half, v: lift }, { u: half, v: lift + leaf }, { u: eB, v: lift + leaf }],
     bore: circle(plan, plan.boreRadius),
   };
 }
@@ -417,11 +451,11 @@ type Vec3 = [number, number, number];
 type Q = { x: number; w: number };
 
 /**
- * A leaf's outline from x0 to x1: along the axis at the leaf's start (w = `leafStart`, with a point at each of `breaks`),
+ * A leaf's outline from x0 to x1: along the axis at the leaf's start (w = `e`, with a point at each of `breaks`),
  * out at both ends and along the outer edge, its two outer corners rounded.
  */
-function leafOutline(plan: HingePlan, x0: number, x1: number, breaks: number[]): Q[] {
-  const { leafStart: e, cornerRadius: r } = plan;
+function leafOutline(plan: HingePlan, x0: number, x1: number, breaks: number[], e: number): Q[] {
+  const { cornerRadius: r } = plan;
   const half = plan.depth / 2;
   const points: Q[] = [{ x: x0, w: e }];
   [...new Set(breaks)].filter((x) => x > x0 + 1e-9 && x < x1 - 1e-9).sort((p, q) => p - q).forEach((x) => points.push({ x, w: e }));
@@ -494,14 +528,16 @@ export function hingeTriangles(shape: HingeShapeFields) {
   const rightEnd = plan.width / 2;
 
   /**
-   * A leaf or finger (`side` -1 for A, 1 for B, from x0 to x1): a plate from y = 0 up to its thickness over its outline,
-   * with the screw holes through it, countersunk on top. Along the axis it is open where its own knuckles (`joins`)
-   * stand on it: their sections close it there. The top and bottom are triangulated over the outline, which leaves out
+   * A leaf or finger (`side` -1 for A, 1 for B, from x0 to x1): a plate from y = 0 up by its thickness over its outline,
+   * B's raised leaf from its lift, with the screw holes through it, countersunk on top. Along the axis it is open where
+   * its own knuckles (`joins`) stand on it: their sections close it there. The top and bottom are triangulated over the outline, which leaves out
    * points on a straight side; a triangle that passes such a point is split there, so the plate meets its walls and the
    * knuckles without gaps.
    */
   const plate = ({ side, x0, x1, joins }: ReturnType<typeof hingeLeaves>[number]) => {
-    const outline = leafOutline(plan, x0, x1, joins.flat());
+    const start = side < 0 ? plan.leafStart : plan.leafStartB;
+    const bottom = side < 0 ? 0 : plan.lift, top = bottom + plan.leaf;
+    const outline = leafOutline(plan, x0, x1, joins.flat(), start);
     const p3 = (q: Q, y: number): Vec3 => [q.x, y, side * q.w];
     const sides = automaticSideCount(2 * plan.screwHeadRadius, 2 * plan.screwHeadRadius);
     const ring = (x: number, r: number): Q[] => Array.from({ length: sides }, (_, k) => ({ x: x + r * Math.cos((2 * Math.PI * k) / sides), w: plan.screwZ + r * Math.sin((2 * Math.PI * k) / sides) }));
@@ -528,24 +564,24 @@ export function hingeTriangles(shape: HingeShapeFields) {
         loop.forEach((q, n) => push(p3(q, y), p3(loop[(n + 1) % loop.length], y), p3(middle, y), want));
       });
     };
-    face(plan.screwXs.map(topHole), plan.leaf, 1);
-    face(plan.screwXs.map((x) => ring(x, plan.screwRadius)), 0, -1);
+    face(plan.screwXs.map(topHole), top, 1);
+    face(plan.screwXs.map((x) => ring(x, plan.screwRadius)), bottom, -1);
     // A nut's pocket has a floor round the hole, facing up.
-    if (kind === "nut") plan.screwXs.forEach((x) => face([ring(x, plan.screwRadius)], plan.leaf - plan.nutDepth, 1, hexagon(x)));
+    if (kind === "nut") plan.screwXs.forEach((x) => face([ring(x, plan.screwRadius)], top - plan.nutDepth, 1, hexagon(x)));
     outline.forEach((p, n) => {
       const q = outline[(n + 1) % outline.length];
       // Along the axis under its own knuckle, the leaf goes on into the knuckle.
-      if (p.w === plan.leafStart && q.w === plan.leafStart && joins.some(([x0, x1]) => Math.min(p.x, q.x) >= x0 - 1e-9 && Math.max(p.x, q.x) <= x1 + 1e-9)) return;
+      if (p.w === start && q.w === start && joins.some(([x0, x1]) => Math.min(p.x, q.x) >= x0 - 1e-9 && Math.max(p.x, q.x) <= x1 + 1e-9)) return;
       // Counter-clockwise in (x, w): outwards is to the right of the way round.
       const want: Vec3 = [q.w - p.w, 0, side * (p.x - q.x)];
-      push(p3(p, 0), p3(q, 0), p3(q, plan.leaf), want);
-      push(p3(p, 0), p3(q, plan.leaf), p3(p, plan.leaf), want);
+      push(p3(p, bottom), p3(q, bottom), p3(q, top), want);
+      push(p3(p, bottom), p3(q, top), p3(p, top), want);
     });
     // Each hole: straight up from the bottom, then, countersunk, widening to its head at the top, or for a nut up to the
     // pocket's floor, the pocket's six walls above it.
     const levels = kind === "countersunk"
-      ? [{ r: plan.screwRadius, y: 0 }, { r: plan.screwRadius, y: plan.leaf - plan.screwSink }, { r: plan.screwHeadRadius, y: plan.leaf }]
-      : [{ r: plan.screwRadius, y: 0 }, { r: plan.screwRadius, y: kind === "nut" ? plan.leaf - plan.nutDepth : plan.leaf }];
+      ? [{ r: plan.screwRadius, y: bottom }, { r: plan.screwRadius, y: top - plan.screwSink }, { r: plan.screwHeadRadius, y: top }]
+      : [{ r: plan.screwRadius, y: bottom }, { r: plan.screwRadius, y: kind === "nut" ? top - plan.nutDepth : top }];
     const tube = (x: number, lower: Q[], y0: number, upper: Q[], y1: number) => {
       lower.forEach((p, k) => {
         const l = (k + 1) % lower.length;
@@ -557,7 +593,7 @@ export function hingeTriangles(shape: HingeShapeFields) {
     };
     plan.screwXs.forEach((x) => {
       for (let level = 0; level + 1 < levels.length; level += 1) tube(x, ring(x, levels[level].r), levels[level].y, ring(x, levels[level + 1].r), levels[level + 1].y);
-      if (kind === "nut") tube(x, hexagon(x), plan.leaf - plan.nutDepth, hexagon(x), plan.leaf);
+      if (kind === "nut") tube(x, hexagon(x), top - plan.nutDepth, hexagon(x), top);
     });
   };
 
@@ -610,8 +646,8 @@ export function hingeTriangles(shape: HingeShapeFields) {
     }
   });
   leaves.filter((leaf) => leaf.side > 0).forEach(plate);
-  if (plan.angle > 0) {
-    // B folds up about the axis through the middle of the pin (y = radius, z = 0).
+  if (plan.angle !== 0) {
+    // B folds up (or down) about the axis through the middle of the pin (y = radius, z = 0).
     const turn = (plan.angle * Math.PI) / 180;
     const sin = Math.sin(turn);
     const cos = Math.cos(turn);
@@ -654,20 +690,21 @@ export type HingeLocalPart = Pick<WorkplaneShape, "kind" | "x" | "z" | "elevatio
  */
 export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
   const plan = hingePlan(shape);
-  const { width, depth, radius, leaf, leafStart: e, knuckleLength, pinRadius, boreRadius, cornerRadius: r } = plan;
+  const { width, depth, radius, leaf, leafStart: e, leafStartB: eB, lift, knuckleLength, pinRadius, boreRadius, cornerRadius: r } = plan;
   const half = depth / 2;
   // A cylinder or tube lies along x when turned 90 degrees about z; its height is then its length.
   const lying = (x: number, diameter: number, length: number) => ({ x, z: 0, elevation: radius - length / 2, width: diameter, depth: diameter, height: length, rotationZ: 90 });
   // A leaf or finger (`side` -1 for A, 1 for B, from x0 to x1) from the leaf's start out: one box, or with rounded corners
-  // two boxes and a cylinder in each corner.
+  // two boxes and a cylinder in each corner. B's raised leaf stands on its lift.
   const leafParts = ({ side, x0, x1 }: ReturnType<typeof hingeLeaves>[number]): HingeLocalPart[] => {
     const x = (x0 + x1) / 2, long = x1 - x0;
+    const start = side < 0 ? e : eB, bottom = side < 0 ? 0 : lift;
     return r <= 0
-      ? [{ kind: "box", x, z: (side * (half + e)) / 2, elevation: 0, width: long, depth: half - e, height: leaf }]
+      ? [{ kind: "box", x, z: (side * (half + start)) / 2, elevation: bottom, width: long, depth: half - start, height: leaf }]
       : [
-        { kind: "box", x, z: (side * (half - r + e)) / 2, elevation: 0, width: long, depth: half - r - e, height: leaf },
-        { kind: "box", x, z: side * (half - r / 2), elevation: 0, width: long - 2 * r, depth: r, height: leaf },
-        ...[-1, 1].map((end): HingeLocalPart => ({ kind: "cylinder", x: x + end * (long / 2 - r), z: side * (half - r), elevation: 0, width: 2 * r, depth: 2 * r, height: leaf })),
+        { kind: "box", x, z: (side * (half - r + start)) / 2, elevation: bottom, width: long, depth: half - r - start, height: leaf },
+        { kind: "box", x, z: side * (half - r / 2), elevation: bottom, width: long - 2 * r, depth: r, height: leaf },
+        ...[-1, 1].map((end): HingeLocalPart => ({ kind: "cylinder", x: x + end * (long / 2 - r), z: side * (half - r), elevation: bottom, width: 2 * r, depth: 2 * r, height: leaf })),
       ];
   };
   // The screw holes as cutters reaching a little past both faces: countersunk with the head on top, or straight.
@@ -675,10 +712,11 @@ export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
   const screwParts = (side: 1 | -1): HingeLocalPart[] => plan.screwXs.flatMap((x): HingeLocalPart[] => {
     const kind = side < 0 ? plan.screwTops.a : plan.screwTops.b;
     const z = side * plan.screwZ;
-    if (kind === "countersunk") return [{ kind: "countersink", x, z, elevation: -SCREW_OVERCUT, width: 2 * (plan.screwHeadRadius + SCREW_OVERCUT), depth: 2 * (plan.screwHeadRadius + SCREW_OVERCUT), height: leaf + 2 * SCREW_OVERCUT, screwHoleShaft: 2 * plan.screwRadius, screwHoleAngle: 90, hole: true }];
-    const hole: HingeLocalPart = { kind: "cylinder", x, z, elevation: -SCREW_OVERCUT, width: 2 * plan.screwRadius, depth: 2 * plan.screwRadius, height: leaf + 2 * SCREW_OVERCUT, hole: true };
+    const bottom = side < 0 ? 0 : lift;
+    if (kind === "countersunk") return [{ kind: "countersink", x, z, elevation: bottom - SCREW_OVERCUT, width: 2 * (plan.screwHeadRadius + SCREW_OVERCUT), depth: 2 * (plan.screwHeadRadius + SCREW_OVERCUT), height: leaf + 2 * SCREW_OVERCUT, screwHoleShaft: 2 * plan.screwRadius, screwHoleAngle: 90, hole: true }];
+    const hole: HingeLocalPart = { kind: "cylinder", x, z, elevation: bottom - SCREW_OVERCUT, width: 2 * plan.screwRadius, depth: 2 * plan.screwRadius, height: leaf + 2 * SCREW_OVERCUT, hole: true };
     if (kind !== "nut") return [hole];
-    return [hole, { kind: "polygon", sides: 6, x, z, elevation: leaf - plan.nutDepth, width: plan.nutWidth, depth: 2 * plan.nutRadius, height: plan.nutDepth + SCREW_OVERCUT, hole: true }];
+    return [hole, { kind: "polygon", sides: 6, x, z, elevation: bottom + leaf - plan.nutDepth, width: plan.nutWidth, depth: 2 * plan.nutRadius, height: plan.nutDepth + SCREW_OVERCUT, hole: true }];
   });
   const leaves = hingeLeaves(plan);
   const aLeaf = leaves.filter((one) => one.side < 0).flatMap(leafParts);
@@ -709,12 +747,16 @@ export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
         { ...cone(segment.x0 - CONE_OVERCUT, plan.recessRadius + CONE_OVERCUT, segment.x0 + plan.recessDepth), hole: true, knuckle: index },
         { ...cone(segment.x1 + CONE_OVERCUT, plan.recessRadius + CONE_OVERCUT, segment.x1 - plan.recessDepth), hole: true, knuckle: index },
       );
-      const under: HingeLocalPart = { kind: "box", x: center, z: e / 2, elevation: 0, width: knuckleLength, depth: e, height: leaf, knuckle: index };
+      const under: HingeLocalPart = { kind: "box", x: center, z: eB / 2, elevation: lift, width: knuckleLength, depth: eB, height: leaf, knuckle: index };
       parts.push(under);
       folding.add(under);
     } else {
       parts.push({ kind: "tube", ...lying(center, radius * 2, knuckleLength), bevel: radius - boreRadius });
-      const under: HingeLocalPart = { kind: "box", x: center, z: e / 2, elevation: 0, width: knuckleLength, depth: e, height: leaf };
+      // Raised, the strip under the knuckle starts in the tube's wall where the bore ends at the leaf's height nearest the
+      // axis, so the pin stays free and the leaf still reaches the knuckle.
+      const near = Math.max(0, lift - radius, radius - lift - leaf);
+      const from = lift > 0 ? Math.sqrt(Math.max(0, boreRadius * boreRadius - near * near)) : 0;
+      const under: HingeLocalPart = { kind: "box", x: center, z: (from + eB) / 2, elevation: lift, width: knuckleLength, depth: eB - from, height: leaf };
       parts.push(under);
       folding.add(under);
     }
@@ -722,8 +764,8 @@ export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
   const bScrews = screwParts(1);
   parts.push(...screwParts(-1), ...bScrews);
   bScrews.forEach((part) => folding.add(part));
-  if (plan.angle > 0) {
-    // B's leaf, holes and all, folds up about the axis and turns with it.
+  if (plan.angle !== 0) {
+    // B's leaf, holes and all, folds up (or down) about the axis and turns with it.
     const turn = (plan.angle * Math.PI) / 180;
     folding.forEach((part) => {
       const dy = (part.elevation ?? 0) + part.height / 2 - radius;

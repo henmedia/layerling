@@ -3057,6 +3057,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "hinge.leafPlate": "Celistvé",
   "hinge.leafFingers": "Prsty",
   "hinge.leafFingersHint": "Každý kloub nese vlastní prst; prsty obou stran se střídají jako dva hřebeny. Pant se tak otočí úplně dokola a s kužely a prsty tlustými jako kloub se zavře naplocho. Prsty jedné strany nespojuje žádné křídlo: spojte je se svým modelem, například s krabičkou a víkem.",
+  "hinge.leafRaised": "Zvýšené křídlo",
+  "hinge.leafRaisedHint": "Druhé křídlo leží výš, takže zavřené leží naplocho na prvním s vůlí mezi nimi a pant se otevře daleko za polohu naplocho. Tiskněte ho s podpěrami pod zvýšeným křídlem.",
   "hinge.styleLiftOff": "Snímatelný",
   "hinge.styleLiftOffHint": "Dva klouby: dolní nese čep až na konec, horní je pouzdro, které se z něj sundá. Oddělit části dá oba díly; chcete-li je tisknout nastojato, postavte díl s čepem na jeho kloub a druhý na jeho pouzdro.",
   "hinge.screwNut": "Lůžko pro matici",

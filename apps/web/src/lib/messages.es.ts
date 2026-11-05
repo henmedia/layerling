@@ -3013,6 +3013,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "Placa",
   "hinge.leafFingers": "Dedos",
   "hinge.leafFingersHint": "Cada nudillo lleva su propio dedo; los dedos de los dos lados se alternan como dos peines. Así la bisagra da la vuelta completa, y con conos y dedos tan gruesos como el nudillo queda plana al cerrarla. Ninguna hoja une los dedos de un lado: únelos a tu modelo, por ejemplo a una caja y a su tapa.",
+  "hinge.leafRaised": "Hoja elevada",
+  "hinge.leafRaisedHint": "La segunda hoja queda más alta, de modo que al cerrarse queda plana sobre la primera, con la holgura entre ambas, y la bisagra se abre mucho más allá de la posición plana. Imprímela con soportes bajo la hoja elevada.",
   "hinge.styleLiftOff": "Desmontable",
   "hinge.styleLiftOffHint": "Dos nudillos: el de abajo lleva el pasador hasta el final, el de arriba es un casquillo que se saca de él. Separar piezas da las dos piezas; para imprimirlas de pie, apoya la del pasador sobre su nudillo y la otra sobre su casquillo.",
   "hinge.screwNut": "Alojamiento de tuerca",

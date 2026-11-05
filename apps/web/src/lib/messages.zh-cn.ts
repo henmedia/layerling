@@ -2962,6 +2962,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "hinge.leafPlate": "板式",
   "hinge.leafFingers": "指扣",
   "hinge.leafFingersHint": "每个铰链节都带自己的指扣；两侧的指扣像两把梳子一样交错。这样铰链可以一直折到底，用锥体和与铰链节同样粗的指扣时，合上后仍然平整。没有叶片把一侧的指扣连起来：请把它们连到你的模型上，比如盒子及其盖子。",
+  "hinge.leafRaised": "抬高叶片",
+  "hinge.leafRaisedHint": "第二片叶片位置更高，合上时平贴在第一片上，中间留有间隙，铰链还能越过平放位置再翻折很多。打印时请在抬高的叶片下加支撑。",
   "prop.hingeScrewHoles": "每片叶片的螺钉孔数",
   "prop.hingeScrewHolesHint": "0 表示叶片上不开孔。",
   "prop.hingeScrewHolesFewer": "叶片上只放得下 {count} 个。",

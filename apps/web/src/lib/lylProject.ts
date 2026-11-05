@@ -1840,7 +1840,8 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     for (const key of ["hingeKnuckles", "hingeKnuckleWidth", "hingeConeSize", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeCornerRadius", "hingeNutWidth"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
-      if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
+      // The opening angle may fold the leaf down below lying flat (#1259).
+      if ((key !== "hingeAngle" && value < 0) || Math.abs(value) > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
     }
   }
   if (kind === "torus" && definition.torusTubeRatio !== undefined) {

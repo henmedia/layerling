@@ -3011,6 +3011,8 @@ export const MESSAGES_EN = {
   "hinge.leafPlate": "Plate",
   "hinge.leafFingers": "Fingers",
   "hinge.leafFingersHint": "Each knuckle carries its own finger; the two sides' fingers alternate like two combs. So the hinge folds all the way round, and with cones and fingers as thick as the knuckle it closes flat. No leaf joins the fingers of a side: join them to your model, such as a box and its lid.",
+  "hinge.leafRaised": "Raised leaf",
+  "hinge.leafRaisedHint": "The second leaf lies higher, so that, closed, it lies flat on the first with the clearance between, and the hinge folds well past lying flat. Print it with supports under the raised leaf.",
   "hinge.styleLiftOff": "Lift-off",
   "hinge.styleLiftOffHint": "Two knuckles: the lower one carries the pin to the end, the upper one is a sleeve that lifts off it. Separate Parts gives the two pieces; to print them standing, stand the pin's piece on its knuckle and the other on its sleeve.",
   "hinge.screwNut": "Nut pocket",

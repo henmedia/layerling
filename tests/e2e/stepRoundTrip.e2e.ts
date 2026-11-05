@@ -119,6 +119,23 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     }
   });
 
+  it("exports a raised leaf, folded up and down, with the display mesh's volume (#1259)", async () => {
+    const { hingeTriangles } = await import("@/lib/hingeGeometry");
+    for (const [hingeStyle, hingeAngle, extra] of [["pin", 0, {}], ["pin", 180, {}], ["pin", -120, { hingeScrewHoles: 2, hingeCornerRadius: 3 }], ["liftOff", 90, { hingeScrewHoles: 2, hingeScrewHead: "countersunkNut" }], ["pinless", -60, {}], ["cone", 0, {}], ["pin", 0, { height: 8, hingePinDiameter: 6.4, hingeLeafThickness: 2 }], ["liftOff", 45, { hingePinDiameter: 4.4 }], ["pinless", 0, { height: 8, hingePinDiameter: 5.2, hingeLeafThickness: 0.4, hingeClearance: 1 }]] as const) {
+      // The last three with a pin near its largest, where the bore reaches above the raised leaf's lowest level.
+      const fields = { width: 40, depth: 40, height: 6, sides: 96, hingePinDiameter: 3, hingeLeafThickness: 1.1, hingeLeafStyle: "raised" as const, hingeStyle, hingeAngle, ...extra };
+      const hinge = shape({ kind: "hinge", name: "Hinge", size: 40, rotation: 30, x: 12, z: -7, elevation: 3, ...fields });
+      const { blob, exportedCount, skipped } = await exportShapesToStep([hinge]);
+      expect(skipped).toEqual([]);
+      expect(exportedCount).toBe(1);
+      const meshVolume = hingeTriangles(fields).reduce(
+        (sum, [a, b, c]) => sum + (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6,
+        0,
+      );
+      expect(near(await reimportVolume(blob), meshVolume, 0.01), `${hingeStyle} ${hingeAngle}`).toBe(true);
+    }
+  });
+
   it("exports a lift-off hinge and nut pockets, turned, folded and mirrored, with the display mesh's volume", async () => {
     const { hingeTriangles } = await import("@/lib/hingeGeometry");
     const volume = (fields: Parameters<typeof hingeTriangles>[0]) => hingeTriangles(fields).reduce(

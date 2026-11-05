@@ -3011,6 +3011,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "hinge.leafPlate": "Doorlopend",
   "hinge.leafFingers": "Vingers",
   "hinge.leafFingersHint": "Elke knokkel draagt zijn eigen vinger; de vingers van beide kanten wisselen elkaar af als twee kammen. Zo klapt het scharnier helemaal rond, en met kegels en vingers zo dik als de knokkel sluit het plat. Geen blad verbindt de vingers van een kant: verbind ze met je model, bijvoorbeeld een doos en het deksel.",
+  "hinge.leafRaised": "Verhoogd blad",
+  "hinge.leafRaisedHint": "Het tweede blad ligt hoger, zodat het dichtgeklapt plat op het eerste ligt met de speling ertussen, en het scharnier klapt ver voorbij de platte stand. Print het met support onder het verhoogde blad.",
   "hinge.styleLiftOff": "Uitneembaar",
   "hinge.styleLiftOffHint": "Twee knokkels: de onderste draagt de pen tot het eind, de bovenste is een huls die je ervan aftilt. Delen scheiden geeft de twee delen; om ze staand te printen zet je het deel met de pen op zijn knokkel en het andere op zijn huls.",
   "hinge.screwNut": "Moeropname",
