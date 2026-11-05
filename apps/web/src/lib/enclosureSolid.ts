@@ -14,8 +14,9 @@ import { ribGussetOutline, ribProfile, ribSize, type RibFields } from "@/lib/rib
  * The screw boss is a cylinder with its gussets joined to it, each a prism standing out from inside the post, and
  * the hole cut last: a solid of revolution with the chamfer at its mouth, run on past the top so no face of it lies
  * on the post's. Set as a hole, the boss is that pocket alone (#1288), opening at the boss's top. The
- * snap-fit and the rib are their side outlines pushed straight across, as the mesh pushes them; the snap-fit's hook
- * and catch stay two bodies, as Separate Parts splits them.
+ * snap-fit and the rib are their side outlines pushed straight across, as the mesh pushes them, a straight rib's foot
+ * (Discussion #1307) in its outline; a gusset on its foot is joined to the foot's plate. The snap-fit's hook and catch
+ * stay two bodies, as Separate Parts splits them.
  *
  * Built in the shape's own frame (y up, the bottom at y = 0, centred on x and z).
  */
@@ -136,10 +137,15 @@ function snapFitSolid(cad: OcctKernel, fields: SnapFitFields) {
 }
 
 function ribSolid(cad: OcctKernel, fields: RibFields) {
-  const { style, top, width, height, thickness } = ribSize(fields);
+  const { style, top, width, height, thickness, foot } = ribSize(fields);
   if (style === "gusset") {
     // Seen from the side along z, as the mesh turns it: the outline in x-y, the thickness across z.
-    return cad.extrude(outlineFace(cad, ribGussetOutline(width, height), (p) => ({ x: p.u, y: p.v, z: -thickness / 2 })), 0, 0, thickness);
+    const gusset = cad.extrude(outlineFace(cad, ribGussetOutline(width, height), (p) => ({ x: p.u, y: p.v, z: -thickness / 2 })), 0, 0, thickness);
+    if (!foot) return gusset;
+    // Its foot a plate under its whole leg along the floor, joined to it; the faces they share are one again.
+    const plate = cad.makeBoxFromCorners({ x: -width / 2, y: 0, z: -foot.width / 2 }, { x: width / 2, y: foot.thickness, z: foot.width / 2 });
+    return oneSolid(cad, cad.unifySameDomain(cad.fuse(gusset, plate)), "gusset on its foot");
   }
-  return cad.extrude(outlineFace(cad, ribProfile(thickness, height, top), (p) => ({ x: -width / 2, y: p.v, z: p.u })), width, 0, 0);
+  // A straight rib on its foot is still one cross-section pushed along: the foot is part of the outline.
+  return cad.extrude(outlineFace(cad, ribProfile(thickness, height, top, foot), (p) => ({ x: -width / 2, y: p.v, z: p.u })), width, 0, 0);
 }

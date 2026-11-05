@@ -1734,6 +1734,15 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       if (value < -1e6 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
     }
   }
+  if (kind === "rib") {
+    // The foot (Discussion #1307). Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
+    if (definition.ribFoot !== undefined && typeof definition.ribFoot !== "boolean") throw new Error(`${label}.ribFoot must be true or false`);
+    for (const key of ["ribThickness", "ribFootThickness"] as const) {
+      if (definition[key] === undefined) continue;
+      const value = finiteNumber(definition[key], `${label}.${key}`);
+      if (value < -1e6 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
+    }
+  }
   if (kind === "knurl") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
     for (const key of ["knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer"] as const) {
