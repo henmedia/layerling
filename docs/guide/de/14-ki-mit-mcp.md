@@ -138,6 +138,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_show_overhangs` | schaltet die Überhang-Schraffur ein oder aus, setzt den Winkel und nennt je Körper die Fläche, die Stützen bräuchte |
 | `layerling_estimate_print` | schätzt Volumen, Gewicht und Filament für die Auswahl oder den ganzen Entwurf: für einen massiven Körper und als grobe Schätzung mit Wänden und Füllung wie im Exportfenster |
 | `layerling_check_clearance` | prüft vor dem Druck, welche Teile sich überschneiden, berühren oder näher kommen als ein Mindestspiel (Spiel prüfen), auch die getrennten Teile eines Objekts |
+| `layerling_check_print` | prüft vor dem Druck, was schiefginge: zu dünne Wände für die Düse, schwebende Teile, wenig Halt auf der Platte, Überhänge und offene Netze (Druck prüfen) |
 | `layerling_add_reference_points` | setzt Bezugspunkte - auf Mitte, Ecken oder Kantenmitten von Objekten oder an genauen Stellen -, an denen Formen einrasten |
 | `layerling_list_reference_points` | listet die Bezugspunkte mit Kennung und Lage auf |
 | `layerling_remove_reference_points` | löscht Bezugspunkte nach Kennung oder alle |

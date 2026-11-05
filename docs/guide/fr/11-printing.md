@@ -52,6 +52,20 @@ La pente que gère votre imprimante est définie dans les paramètres sous {{ui:
 - Lorsque deux pièces s'emboîtent, vous avez besoin d'un jeu : généralement 0,2 à 0,4 mm, selon l'imprimante. Faites une petite paire de tests avant d'imprimer la grande partie.
 - De nombreuses personnes chanfreinent légèrement le bord inférieur qui repose sur la plaque. Cela empêche la première couche de s'étendre (« pied d'éléphant »).
 
+## Vérifier l'impression
+
+{{ui:editor.tool.printCheck}}, à côté de {{ui:editor.tool.clearance}} dans {{ui:editor.group.combine}}, examine les objets sélectionnés, ou tous les objets visibles si rien n'est sélectionné, et dit dans une fenêtre ce qui raterait à l'impression. Chacune de ses cinq lignes est verte quand elle n'a rien trouvé, et orange avec quoi et où dans le cas contraire :
+
+- **{{ui:printCheck.thin.title}}** : les endroits plus fins que deux lignes de la buse - 0,8 mm avec une buse de 0,4 mm. Le trancheur omet une telle paroi ou l'imprime en une seule ligne fragile. Choisissez votre buse sous {{ui:printCheck.nozzle}} en haut de la fenêtre (de 0,2 à 0,8 en un clic, toute autre dans le champ). Les endroits fins sont peints en rouge avec une grille claire sur les corps, et la ligne indique l'endroit le plus fin et la surface trop fine. Les endroits de moins de 1 mm² et les arêtes vives, comme celle d'un coin, sont ignorés.
+- **{{ui:printCheck.floating.title}}** : un corps, ou une pièce séparée d'un corps, qui ne touche ni le plateau ni une autre pièce (à 0,05 mm près). Il serait imprimé dans le vide. Une pièce posée sur une pièce qui tient debout ne pose pas de problème.
+- **{{ui:printCheck.contact.title}}** : une pièce sur le plateau dont la première couche est très petite pour sa hauteur, comme une sphère ou un cône sur sa pointe. Elle peut se décoller pendant l'impression. L'avertissement vient sous 0,5 mm² d'appui, mesuré à 0,1 mm au-dessus du plateau, par millimètre de hauteur : une sphère est toujours en dessous, un cube de 10 mm a 10.
+- **{{ui:printCheck.overhang.title}}** : les mêmes chiffres que **Afficher les surplombs**, avec l'angle réglé là.
+- **{{ui:printCheck.openMesh.title}}** : un maillage importé avec des arêtes ouvertes, ou des arêtes partagées par trois faces ou plus. Le trancheur doit alors deviner où est l'intérieur.
+
+![Un bac dont la paroi droite ne fait que 0,6 mm : Vérifier l'impression la peint en rouge et la signale dans la fenêtre.](shot:print-check)
+
+{{ui:printCheck.show}} sur une ligne y amène la caméra ; il sélectionne les pièces en l'air, celles qui reposent sur trop peu et les maillages ouverts, et pour les surplombs il active **Afficher les surplombs**. Les corps qui se chevauchent sont vérifiés réunis, comme le trancheur les réunit. Si vous modifiez le modèle pendant que la fenêtre est ouverte, elle affiche {{ui:printCheck.stale}} ; cliquez dessus ou sur {{ui:printCheck.checkAgain}}. [[Esc]] ferme la fenêtre. Rien ne change dans le modèle. Une IA fait la même vérification avec `layerling_check_print`.
+
 ## Quand tu es prêt
 
 Choisissez {{ui:editor.export}} puis **STL** ou **3MF**. STL est le format le plus simple. 3MF conserve les noms et les couleurs des corps individuels et est donc pratique lorsque vous imprimez en plusieurs couleurs. La fenêtre d'exportation indique également combien de grammes et de mètres de filament la pièce nécessiterait pour être imprimée. Plus d'informations dans [Fichiers et sauvegarde](chapter:files-and-saving).

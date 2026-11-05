@@ -109,6 +109,7 @@ import { pointInsideOutline } from "@/lib/screenHull";
 import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
+import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
@@ -200,6 +201,8 @@ type WorkplaneViewportProps = {
   highlightIds?: readonly string[];
   /** The place a row of the clearance check stands for: a line with the gap, or the middle of an overlap; the camera goes there. */
   clearanceMark?: ClearanceMark | null;
+  /** The print check's thin walls, painted red on the bodies, and the place its Show brings the camera to. */
+  printCheckView?: PrintCheckView | null;
   onSetPlacementWorkplane: (workplane: PlacementWorkplane, source: "shape" | "base") => void;
   onToggleWorkplaneTool: () => void;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -1492,6 +1495,7 @@ export function WorkplaneViewport({
   onShapeContextMenu,
   highlightIds,
   clearanceMark = null,
+  printCheckView = null,
   onSetPlacementWorkplane,
   onToggleWorkplaneTool,
   onInteractionActiveChange,
@@ -3194,6 +3198,7 @@ export function WorkplaneViewport({
         syncSectionMeasureOverlay(state, sectionMeasureModeRef.current && sectionSettingsRef.current.enabled, sectionMeasureRef.current, sectionMeasureOverlayRef, setSectionMeasureOverlay, workspaceRef.current.accuracy);
         syncProtractorOverlay(state, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
         syncClearanceMarkOverlay(state, clearanceMarkRef.current, clearanceMarkOverlayRef, setClearanceMarkOverlay);
+        clipThinWallOverlay(state);
         syncRulerDimensionOverlay(state, previewShapes, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspaceRef.current.accuracy);
         syncCornerRulerToolOverlay(state, cornerRulerModelRef.current, previewShapes, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspaceRef.current.accuracy);
         syncNoteOverlay(state, notesRef.current, notesVisibleRef.current, noteOverlayRef, setNoteOverlay);
@@ -5411,6 +5416,26 @@ export function WorkplaneViewport({
   useEffect(() => {
     if (threeRef.current) threeRef.current.needsRender = true;
   }, [clearanceMark]);
+  // The print check: its thin walls painted while its result is fresh, and the camera to a line's place on Show.
+  const printCheckThin = printCheckView?.thin ?? null;
+  useEffect(() => {
+    const state = threeRef.current;
+    if (state) syncThinWallOverlay(state, printCheckThin);
+  }, [printCheckThin]);
+  useEffect(() => () => {
+    if (threeRef.current) syncThinWallOverlay(threeRef.current, null);
+  }, []);
+  const printCheckRequest = printCheckView?.request ?? 0;
+  const printCheckFocusRef = useRef<PrintCheckView["focus"]>(null);
+  printCheckFocusRef.current = printCheckView?.focus ?? null;
+  useEffect(() => {
+    const state = threeRef.current;
+    const focus = printCheckFocusRef.current;
+    if (!state || !focus || !printCheckRequest) return;
+    frameBounds(state, clearanceFocusBox({ box: focus }));
+    syncViewCube(state, viewCubeRef.current);
+    state.needsRender = true;
+  }, [printCheckRequest]);
   const pickOnlyPointer = usePickOnlyPointer(pickOnly, pickShape);
   useViewportKeyboardHooks(threeRef);
   const pickOnlyKey = pickOnly ? pickOnly.ids.join("\0") : null;

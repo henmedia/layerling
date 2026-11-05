@@ -1668,6 +1668,18 @@ export const tools = [
     },
   },
   {
+    name: "layerling_check_print",
+    description: "Check what would go wrong when printing, as the editor's Print check does: thin walls (below two lines of the nozzle, so 0.8 mm with a 0.4 mm nozzle: the slicer leaves them out or prints them weak), floating parts (touching neither the plate nor another part within 0.05 mm, printed in the air), small contact with the plate (less than 0.5 mm² of footprint per mm of height: a sphere, a cone on its tip), overhangs (the figures of Show overhangs at its angle) and imported meshes with open or non-manifold edges. Takes ids, else the selection, else every visible body, as an export does; overlapping bodies are joined first, as the slicer joins them. Changes nothing. Returns minimumWallMm, warnings (how many of the five checks found something), thinWalls (thinnestMm, areaMm2, places with id, name and `at`), floating, smallContact, overhangs, openMeshes, pieces and unchecked.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" }, description: "Objects to check. Left out: the selection, or every visible object." },
+        nozzle: { type: "number", minimum: 0.1, maximum: 2, description: "Nozzle width in mm; walls thinner than twice this are thin. Default 0.4." },
+      },
+    },
+  },
+  {
     name: "layerling_add_reference_points",
     description: "Mark reference points - bare marks in space that shapes snap to when they are dragged, like pencil marks and layout points in a workshop. They are not part of any body, are never printed or exported, and are saved with the design. Mark the centre, the four corners or the four edge middles of objects (on their top face), or pass exact positions with `points`. Points already marked are not added twice. Returns the new points with their ids; shapes can then be placed on them with layerling_update_object.",
     inputSchema: {

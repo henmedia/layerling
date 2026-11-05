@@ -6,11 +6,17 @@ import type { WorkplaneShape } from "@/types/layerling";
  * worker, the work is done on the page instead, and the editor neither crashes nor waits forever.
  * A stand-in Worker plays each case; the page's own functions are stand-ins too.
  */
-const page = vi.hoisted(() => ({ calls: 0, faceReads: 0, stepExports: 0 }));
+const page = vi.hoisted(() => ({ calls: 0, faceReads: 0, stepExports: 0, printChecks: 0 }));
 vi.mock("@/lib/stepExport", () => ({
   exportShapesToStep: async () => {
     page.stepExports += 1;
     return { blob: new Blob(["step"]), exportedCount: 1, skipped: [] };
+  },
+}));
+vi.mock("@/lib/printCheck", () => ({
+  checkPrint: async (_source: unknown, options: { nozzle?: number }) => {
+    page.printChecks += 1;
+    return { nozzleMm: options.nozzle ?? 0.4, checkedOn: "page" };
   },
 }));
 vi.mock("@/lib/editorBooleans", () => ({
@@ -76,6 +82,7 @@ beforeEach(() => {
   page.calls = 0;
   page.faceReads = 0;
   page.stepExports = 0;
+  page.printChecks = 0;
   FakeWorker.instances = [];
   FakeWorker.failOnCreate = false;
   dispatched.length = 0;
@@ -120,6 +127,40 @@ describe("geometry worker on the page's side", () => {
     expect(FakeWorker.instances).toHaveLength(0);
     expect(page.stepExports).toBe(1);
     expect(result.exportedCount).toBe(1);
+  });
+
+  it("checks a print in the worker with the nozzle asked for, and one with text in it on the page", async () => {
+    const { checkPrintOffThread } = await load();
+    const result = checkPrintOffThread([{ id: "box", kind: "box" }] as unknown as WorkplaneShape[], { nozzle: 0.6, overhangAngle: 50 });
+    const worker = FakeWorker.instances[0];
+    worker.hello();
+    await flush();
+    const posted = worker.posted[0] as unknown as { requestId: number; task: string; payload: { options: unknown } };
+    expect(posted.task).toBe("printCheck");
+    expect(posted.payload.options).toEqual({ nozzle: 0.6, overhangAngle: 50 });
+    worker.answer(posted.requestId, { nozzleMm: 0.6, checkedOn: "worker" });
+    expect(await result).toEqual({ nozzleMm: 0.6, checkedOn: "worker" });
+    expect(page.printChecks).toBe(0);
+    // The fonts of a text live on the page.
+    const tag = { id: "tag", kind: "box", groupedShapes: [{ id: "plate", kind: "box" }, { id: "words", kind: "text" }] } as unknown as WorkplaneShape;
+    expect(await checkPrintOffThread([tag], {})).toEqual({ nozzleMm: 0.4, checkedOn: "page" });
+    expect(page.printChecks).toBe(1);
+    expect(worker.posted).toHaveLength(1);
+  });
+
+  it("calls off a print check that a new one replaced: it never answers", async () => {
+    const { checkPrintOffThread } = await load();
+    const controller = new AbortController();
+    let settled = false;
+    void checkPrintOffThread([{ id: "box", kind: "box" }] as unknown as WorkplaneShape[], {}, controller.signal).then(() => { settled = true; });
+    const worker = FakeWorker.instances[0];
+    worker.hello();
+    await flush();
+    controller.abort();
+    worker.answer(worker.posted[0].requestId, { nozzleMm: 0.4 });
+    await flush();
+    expect(settled).toBe(false);
+    expect(page.printChecks).toBe(0);
   });
 
   it("works on the page when no worker can be made", async () => {

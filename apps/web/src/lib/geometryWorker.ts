@@ -4,6 +4,7 @@ import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceR
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
 import { lidForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
+import { checkPrint, type PrintCheckOptions, type PrintCheckResult } from "@/lib/printCheck";
 import { resultMeshes, type GeometryTask, type GeometryWorkerRequest, type GeometryWorkerResponse } from "@/lib/geometryWorkerTypes";
 import { rememberPreparedDisplay } from "@/lib/importedMeshDisplay";
 import { getLanguage, t } from "@/lib/i18n";
@@ -277,6 +278,18 @@ export function checkClearanceOffThread(source: readonly WorkplaneShape[], optio
   const onPage = () => checkClearance([...source], options);
   if (containsText([...source])) return onPage();
   return runGeometryTask<ClearanceResult>("clearance", { source: [...source], options }, onPage, () => {
+    throw new Error(t("status.computeTimedOut"));
+  }, signal);
+}
+
+/**
+ * checkPrint (lib/printCheck.ts) off the page: the walls of a 200,000-triangle body take a ray each, about a second in
+ * the worker. A check the signal calls off (a new one started) never answers; text is checked on the page.
+ */
+export function checkPrintOffThread(source: readonly WorkplaneShape[], options: Partial<PrintCheckOptions>, signal?: AbortSignal): Promise<PrintCheckResult> {
+  const onPage = () => checkPrint([...source], options);
+  if (containsText([...source])) return onPage();
+  return runGeometryTask<PrintCheckResult>("printCheck", { source: [...source], options }, onPage, () => {
     throw new Error(t("status.computeTimedOut"));
   }, signal);
 }
