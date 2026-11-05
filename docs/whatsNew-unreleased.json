@@ -8,5 +8,15 @@
       "de": "Geht ein Entwurf nur noch sehr langsam oder gar nicht mehr auf, weil sein Verlauf riesig geworden ist, wähle in seinem Menü auf der Startseite „Ohne Verlauf öffnen“. layerling liest dann nur den aktuellen Stand und löscht die früheren Schritte. Stürzt die Seite beim Öffnen eines Entwurfs ab, öffnet ihn das Neuladen nicht gleich wieder, sondern bleibt auf der Startseite.",
       "en": "If a design opens only very slowly or not at all because its history has grown huge, choose \"Open without history\" in its menu on the start page. layerling then reads only the current state and deletes the earlier steps. If the page crashes while a design opens, reloading no longer opens it straight away but stays on the start page."
     }
+  },
+  {
+    "title": {
+      "de": "STEP-Datei mit der Farbe der Gruppe",
+      "en": "STEP files with the group's colour"
+    },
+    "body": {
+      "de": "Eine Gruppe, die in einer Farbe erscheint, gibt diese Farbe jetzt auch in der STEP-Datei an alle ihre Teile weiter, statt dass jedes Teil seine alte Farbe mitnimmt. Ist „Mehrfarbig“ an, behält jedes Teil seine eigene Farbe, so wie du es im Editor siehst.",
+      "en": "A group shown in one colour now gives that colour to all its parts in a STEP file too, instead of each part taking along its old colour. With \"Multicolor\" on, each part keeps its own colour, as you see it in the editor."
+    }
   }
 ]

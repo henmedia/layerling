@@ -125,6 +125,19 @@ describe("a STEP file with several solids", () => {
     expect(legBundle.height).toBeCloseTo(20, 2);
   }, 60000);
 
+  it("gives the parts of a group shown in one colour that colour, and keeps their own with Multicolor (#1305)", async () => {
+    const left = shape({ kind: "box", name: "Left", color: "#d12a2a", x: -10, width: 10, depth: 6, height: 4 });
+    const right = shape({ kind: "box", name: "Right", color: "#2a8f3c", x: 10, width: 10, depth: 6, height: 4 });
+    const group = (multicolor: boolean) => shape({ kind: "mesh", name: "Group", color: "#3355aa", width: 30, depth: 6, height: 4, multicolor, groupedShapes: [left, right] });
+    const colours = async (source: WorkplaneShape) => {
+      const { blob } = await exportShapesToStep([source]);
+      const result = await importedShapesFromStepAssembly("group.step", await blob.arrayBuffer());
+      return Object.fromEntries(result!.shapes.map((part) => [part.name, part.color]));
+    };
+    expect(await colours(group(false))).toEqual({ Left: "#3355aa", Right: "#3355aa" });
+    expect(await colours(group(true))).toEqual({ Left: "#d12a2a", Right: "#2a8f3c" });
+  }, 60000);
+
   it("stays one body when it holds one solid", async () => {
     const { blob } = await exportShapesToStep([shape({ kind: "box", name: "Only", width: 10, depth: 6, height: 4 })]);
     expect(await importedShapesFromStepAssembly("one.step", await blob.arrayBuffer())).toBeNull();
