@@ -153,3 +153,21 @@ export function roundEdgeMeasure(points: readonly THREE.Vector3[]) {
   const full = gap <= longestSide * 1.01 + Math.max(1e-6, circle.radius * 1e-4);
   return { full, diameter: circle.radius * 2, radius: circle.radius, length: full ? length + gap : length };
 }
+
+/**
+ * A closed round edge (a whole circle, the rim of a cylinder or a hole) and how close a point has to come to one of
+ * its points to lie on it; null for any other edge.
+ */
+export function closedRoundEdge(points: readonly THREE.Vector3[]) {
+  const round = roundEdgeMeasure(points);
+  return round?.full ? { points, tolerance: Math.max(1e-6, round.radius * 1e-4) } : null;
+}
+
+/**
+ * Whether a corner only sits on a closed round edge: where the side lines of a faceted cylinder end on its rim, each
+ * end is a corner of its line, but on the rim it is just one of its points. A click there means the rim, so its
+ * diameter comes in one click on a cylinder too, not only on a half sphere (Making Layers, 1.142.0).
+ */
+export function cornerOnRoundEdge(corner: THREE.Vector3, edge: { points: readonly THREE.Vector3[]; tolerance: number }) {
+  return edge.points.some((point) => point.distanceTo(corner) <= edge.tolerance);
+}

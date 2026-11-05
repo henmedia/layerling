@@ -86,6 +86,9 @@ const result = spawnSync(
     "--disable-gpu",
     "--disable-extensions",
     "--no-first-run",
+    // A fresh profile otherwise downloads about 500 MB of Edge components on every start.
+    "--disable-component-update",
+    "--disable-background-networking",
     "--hide-scrollbars",
     "--force-device-scale-factor=1",
     `--user-data-dir=${join(work, "profile")}`,

@@ -2,6 +2,7 @@ import { createLocalId } from "@/lib/localIds";
 import { repairClampedMeshBase } from "@/lib/importedMeshBase";
 import { fieldFormulasEqual } from "@/lib/fieldFormulas";
 import { threadFootprintPatch } from "@/lib/threadGeometry";
+import { pulleyFootprint } from "@/lib/pulleyGeometry";
 import { GRIDFINITY_PADDING_KEYS, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
@@ -140,7 +141,7 @@ export function shapeTaperDimensions(shape: WorkplaneShape) {
  * haben feste Masse fuer Einsatz, Haken und Fuss. Die Liste steht hier, damit das Merkmalsfeld, die
  * Vorschau und die MCP-Bruecke nicht je ihre eigene fuehren.
  */
-const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity", "screwBoss", "snapFit", "rib"]);
+const SHAPES_WITHOUT_TAPER = new Set<WorkplaneShape["kind"]>(["gear", "hirth", "pulley", "thread", "spring", "pyramid", "ruler", "hinge", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "bentTube", "loft", "vase", "gridfinity", "screwBoss", "snapFit", "rib"]);
 
 export function shapeSupportsTaper(kind: WorkplaneShape["kind"]) {
   return !SHAPES_WITHOUT_TAPER.has(kind);
@@ -575,6 +576,8 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
     Object.assign(next, footprint);
     next.size = resizedShapeSize(footprint.width, footprint.depth);
   }
+  // A GT2 pulley (Discussion #1319): the teeth, the belt width, the flanges and the hub set its box.
+  if (shape.kind === "pulley") Object.assign(next, pulleyFootprint(next));
   // A cylinder's cross-section must always stay circular - width is
   // authoritative, depth follows. This is the single enforcement point: every
   // creation, edit and project load runs through canonicalizeShape.
@@ -707,6 +710,11 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.centerHoleSize === b.centerHoleSize &&
     a.hirthSteepFlank === b.hirthSteepFlank &&
     a.hirthReverse === b.hirthReverse &&
+    a.pulleyBeltWidth === b.pulleyBeltWidth &&
+    a.pulleyFlange === b.pulleyFlange &&
+    a.pulleyFlangeRise === b.pulleyFlangeRise &&
+    a.pulleyHubHeight === b.pulleyHubHeight &&
+    a.pulleyHubDiameter === b.pulleyHubDiameter &&
     a.gearType === b.gearType &&
     a.helixAngle === b.helixAngle &&
     a.bevelHelixAngle === b.bevelHelixAngle &&

@@ -67,15 +67,16 @@ describe("shape catalog", () => {
     expect(kinds.indexOf("gridfinity")).toBe(kinds.indexOf("spring") + 1);
   });
 
-  it("exposes the Hirth joint, knurl, hinge, dovetail and the enclosure parts between gear and the decorative shapes in the toolbar catalog", () => {
+  it("exposes the Hirth joint, GT2 pulley, knurl, hinge, dovetail and the enclosure parts between gear and the decorative shapes in the toolbar catalog", () => {
     const kinds = toolbarShapeAssets.map((asset) => asset.kind);
 
     const gearIndex = kinds.indexOf("gear");
     const dovetailIndex = kinds.indexOf("dovetail");
     expect(kinds.indexOf("hirth")).toBe(gearIndex + 1);
-    expect(kinds.indexOf("knurl")).toBe(gearIndex + 2);
-    expect(kinds.indexOf("hinge")).toBe(gearIndex + 3);
-    expect(dovetailIndex).toBe(gearIndex + 4);
+    expect(kinds.indexOf("pulley")).toBe(gearIndex + 2);
+    expect(kinds.indexOf("knurl")).toBe(gearIndex + 3);
+    expect(kinds.indexOf("hinge")).toBe(gearIndex + 4);
+    expect(dovetailIndex).toBe(gearIndex + 5);
     // The enclosure parts come next, then the decorative shapes.
     expect(kinds.slice(dovetailIndex + 1, dovetailIndex + 4)).toEqual(["screwBoss", "snapFit", "rib"]);
     expect(kinds.indexOf("star")).toBe(dovetailIndex + 4);

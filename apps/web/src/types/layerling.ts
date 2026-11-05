@@ -26,6 +26,7 @@ export type ShapeKind =
   | "crescent"
   | "gear"
   | "hirth"
+  | "pulley"
   | "honeycomb"
   | "hinge"
   | "knurl"
@@ -178,6 +179,16 @@ export type ShapeCustomization = {
   hirthSteepFlank?: number;
   /** Hirth joint with saw teeth: the steep flank on the other side of each tooth. */
   hirthReverse?: boolean;
+  /** GT2 pulley (Discussion #1319): the toothed band's width along the axis, the belt's width plus a little play. */
+  pulleyBeltWidth?: number;
+  /** GT2 pulley: each flange's thickness, 0 for none. */
+  pulleyFlange?: number;
+  /** GT2 pulley: how far a flange reaches past the teeth. */
+  pulleyFlangeRise?: number;
+  /** GT2 pulley: the hub's height on top, 0 for none. */
+  pulleyHubHeight?: number;
+  /** GT2 pulley: the hub's diameter. */
+  pulleyHubDiameter?: number;
   gearType?: GearType;
   helixAngle?: number;
   helixQuality?: number;
@@ -1033,6 +1044,16 @@ export type WorkplaneShape = {
   hirthSteepFlank?: number;
   /** Hirth joint with saw teeth: the steep flank on the other side of each tooth. */
   hirthReverse?: boolean;
+  /** GT2 pulley (Discussion #1319): the toothed band's width along the axis, the belt's width plus a little play. */
+  pulleyBeltWidth?: number;
+  /** GT2 pulley: each flange's thickness, 0 for none. */
+  pulleyFlange?: number;
+  /** GT2 pulley: how far a flange reaches past the teeth. */
+  pulleyFlangeRise?: number;
+  /** GT2 pulley: the hub's height on top, 0 for none. */
+  pulleyHubHeight?: number;
+  /** GT2 pulley: the hub's diameter. */
+  pulleyHubDiameter?: number;
   gearType?: GearType;
   helixAngle?: number;
   helixQuality?: number;

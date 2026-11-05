@@ -24,6 +24,9 @@
  *   in a bond (running, stack, English, English cross, Flemish) and along the
  *   creases where two joints meet; the faces of the bricks stay as coarse as
  *   the body's own grid.
+ * - Squares and triangles: tiles of one size with one gap in a grid, cut
+ *   along the lines where their walls begin and end and along the creases
+ *   at their corners, as bricks are; their size and gap stay as set.
  * - Knitting, rope, basket weave, carbon (twill), grain and an image (a grey
  *   height map, see surfaceTextureImages.ts): refined evenly, finer where the
  *   value jumps; round the axis a weave and carbon are cut along their bands too.
@@ -93,7 +96,7 @@ import {
   type SurfaceTextureOwnImage,
 } from "@/lib/surfaceTextureImages";
 
-export const SURFACE_TEXTURE_PATTERNS = ["grooves", "knurl", "honeycomb", "bumps", "cells", "bricks", "knit", "rope", "weave", "bark", "wood", "carbon", "grain", "image", "cracks", "text"] as const;
+export const SURFACE_TEXTURE_PATTERNS = ["grooves", "knurl", "honeycomb", "bumps", "cells", "bricks", "squares", "triangles", "knit", "rope", "weave", "bark", "wood", "carbon", "grain", "image", "cracks", "text"] as const;
 export type SurfaceTexturePattern = (typeof SURFACE_TEXTURE_PATTERNS)[number];
 /** Cross-section of a groove or joint: round (cosine), pointed (V) or flat (a flat floor with steep flanks). */
 /** round: a soft bell; pointed: a V (a cone on a bump); flat: a flat floor or top; dome: a half circle (half a ball on a bump). */
@@ -299,6 +302,14 @@ export type SurfaceTextureSettings = {
   brickBond: SurfaceTextureBrickBond;
   /** Bricks: how unevenly they lie, 0 to 1 - at 1 a brick sinks by up to half the depth, each its own way. */
   brickVary: number;
+  /**
+   * Squares and triangles: the gap between two of them, mm, from side to side (the spacing is a square's or a triangle's
+   * side). Size and gap stay as set; round a body the gap is rounded so that a whole number goes round (see fitTiles).
+   * Triangles stand in rows, pointing up and down in turn.
+   */
+  tileGap: number;
+  /** Squares and triangles: the first row starts right at the bottom edge and reaches down to the first layer (for a brim). */
+  tileFromBottom: boolean;
   /** Bark: which tree's (the spacing is the size of its pieces or marks). */
   barkType: SurfaceTextureBarkType;
   /** Wood grain: which wood, and how the piece was cut from the trunk. */
@@ -385,6 +396,8 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   brickJoint: 0.8,
   brickBond: "running",
   brickVary: 0,
+  tileGap: 2,
+  tileFromBottom: false,
   barkType: "oak",
   woodType: "oak",
   woodCut: "log",
@@ -432,6 +445,7 @@ export const SURFACE_TEXTURE_LIMITS: Record<NumberKey, [number, number]> = {
   brickHeight: [0.5, 100],
   brickJoint: [0.1, 10],
   brickVary: [0, 1],
+  tileGap: [0.2, 50],
   ringWidth: [0.3, 20],
   woodKnots: [0, 12],
   woodWobble: [0, 1],
@@ -509,8 +523,27 @@ const DETAIL_STEPS: Record<SurfaceTextureDetail, number> = { coarse: 3, medium: 
 export const SURFACE_TEXTURE_MAX_TRIANGLES = 600_000;
 export const SURFACE_TEXTURE_PREVIEW_TRIANGLES = 200_000;
 
-/** Cut along their cell borders (see sliceCells; bricks: sliceBricks). */
-const CELL_PATTERNS: readonly SurfaceTexturePattern[] = ["honeycomb", "bumps", "cells", "bricks"];
+/** Cut along their cell borders (see sliceCells; bricks: sliceBricks; squares and triangles: sliceTiles). */
+const CELL_PATTERNS: readonly SurfaceTexturePattern[] = ["honeycomb", "bumps", "cells", "bricks", "squares", "triangles"];
+/** Tiles of one size with one gap in a grid (see fitTiles, tileValue and sliceTiles). */
+const TILE_PATTERNS: readonly SurfaceTexturePattern[] = ["squares", "triangles"];
+/**
+ * A flat square's or triangle's wall, mm across: as steep as a print shows it cleanly, as a brick's flat joint is. It
+ * lies in the gap, so the tile's face keeps its size; in a narrow gap it takes at most TILE_WALL_SHARE of it.
+ */
+const TILE_WALL = 0.1;
+const TILE_WALL_SHARE = 0.45;
+/**
+ * A point this close to a tile's wall line, mm, lies on it (see tileRise): a little more than the cuts' SURFACE_MIN_EDGE,
+ * as a point left at just that distance came out on either side of it, by a rounding error.
+ */
+const TILE_SNAP = 1.25 * SURFACE_MIN_EDGE;
+/**
+ * About how many triangles cutting a square or a triangle makes (flat, before short edges and flat points are merged),
+ * and by how much the cut may go beyond the budget at most (merging brings it down to about half).
+ */
+const TILE_COST = 160;
+const TILE_CUT_LIMIT = 2;
 /** Around a cylinder a whole number of cells, stitches, strands, stakes or tiles goes round. */
 const ROUND_PATTERNS: readonly SurfaceTexturePattern[] = ["honeycomb", "bumps", "cells", "knit", "rope", "weave", "carbon", "bark", "image"];
 const SQRT3 = Math.sqrt(3);
@@ -589,6 +622,9 @@ export const SURFACE_TEXTURE_STARTERS: Partial<Record<SurfaceTexturePattern, Par
   cells: { spacing: 9, depth: 0.8, width: 0.22, profile: "round" },
   // Bricks run into a box's corners: kept smooth there, the corner stood in a strip of its own between two walls.
   bricks: { spacing: 12, depth: 0.6, profile: "flat", keepEdges: false },
+  // Squares and triangles stand out as tiles with steep walls (see TILE_WALL), sizes a 0.4 mm nozzle draws in whole lines.
+  squares: { spacing: 4, depth: 0.6, profile: "flat", direction: "outward" },
+  triangles: { spacing: 6, depth: 0.6, profile: "flat", direction: "outward" },
   knit: { spacing: 5, depth: 1.2, width: 0.85, profile: "round", direction: "outward" },
   rope: { spacing: 6, depth: 3, width: 0.6, profile: "round", direction: "outward" },
   weave: { spacing: 10, depth: 1.6, width: 0.6, profile: "round", direction: "outward" },
@@ -1055,6 +1091,105 @@ function brickValue(u: number, v: number, s: SurfaceTextureSettings, layout: Sur
   return sunk + (1 - sunk) * joint;
 }
 
+/** Whether the pattern is tiles of one size in a grid: squares or triangles. */
+function tilePattern(s: Pick<SurfaceTextureSettings, "pattern">) {
+  return TILE_PATTERNS.includes(s.pattern);
+}
+
+/** Squares and triangles as laid on a body (see SurfaceTextureLayout.tiles). */
+export type SurfaceTiles = {
+  size: number;
+  gap: number;
+  /** Along a row: a square and a gap, or (triangles) an upward and a downward one; across the rows, a row's height. */
+  period: number;
+  rowHeight: number;
+  /** A flat tile's wall across (see TILE_WALL), and how far from its border its middle lies. */
+  wall: number;
+  inradius: number;
+  /** Where the grid begins: round the axis, and per axis x, y, z along the rows (u) and across them (v). */
+  around: number;
+  u: number[];
+  v: number[];
+};
+
+/** Squares or triangles of this size and gap, the grid beginning at 0: what the layout fits (see fitTiles). */
+function tilesOf(s: SurfaceTextureSettings, gap = s.tileGap): SurfaceTiles {
+  const triangles = s.pattern === "triangles";
+  // A triangle row's lattice: its lines lie half a gap outside the triangles' sides, so its side is the triangle's and,
+  // at either end, half the gap over tan 30 degrees.
+  const period = triangles ? s.spacing + SQRT3 * gap : s.spacing + gap;
+  return {
+    size: s.spacing,
+    gap,
+    period,
+    rowHeight: triangles ? (period * SQRT3) / 2 : period,
+    wall: Math.min(TILE_WALL, TILE_WALL_SHARE * gap),
+    inradius: triangles ? s.spacing / (2 * SQRT3) : s.spacing / 2,
+    around: 0,
+    u: [0, 0, 0],
+    v: [0, 0, 0],
+  };
+}
+
+/** Across a square's side at `w` along a row of squares `a` wide, `P` apart: how far inside the square, mm (negative in the gap). */
+function squareAcross(w: number, P: number, a: number) {
+  const m = w - Math.floor(w / P) * P;
+  return m <= a ? Math.min(m, a - m) : -Math.min(m - a, P - m);
+}
+
+/** How far from the nearest of a family of lines `H` apart a point is, at `f` across them. */
+function lineDistance(f: number, H: number) {
+  const m = f - Math.floor(f / H) * H;
+  return Math.min(m, H - m);
+}
+
+/** The three families of lines a triangle row's lattice is made of: across them at (x, y) from where the grid begins. */
+function triangleLines(x: number, y: number): [number, number, number] {
+  return [y, (SQRT3 / 2) * x - y / 2, -(SQRT3 / 2) * x - y / 2];
+}
+
+/**
+ * How far inside its tile a point lies, mm, the grid beginning at (0, 0) (negative in the gap): squares the nearer of
+ * the distances to its sides across both ways; triangles, in rows pointing up and down in turn, the distance to the
+ * nearest line of their lattice less half the gap (the lines run along the rows and at 60 degrees to them, `rowHeight`
+ * apart, half a gap outside the triangles' sides).
+ */
+function tileInside(x: number, y: number, s: SurfaceTextureSettings, t: SurfaceTiles) {
+  if (s.pattern === "squares") return Math.min(squareAcross(x, t.period, t.size), squareAcross(y, t.period, t.size));
+  const [f1, f2, f3] = triangleLines(x, y);
+  return Math.min(lineDistance(f1, t.rowHeight), lineDistance(f2, t.rowHeight), lineDistance(f3, t.rowHeight)) - t.gap / 2;
+}
+
+/**
+ * A tile's height, 0 to 1, `d` mm inside its border (negative in the gap). Flat: the tile's face at the full depth, a
+ * steep wall in the gap round it (see TILE_WALL); pointed, round and half round: a pyramid or a cushion from the border
+ * to the middle. A point closer to the wall's top or foot than TILE_SNAP lies on it: the cuts come no closer to a point
+ * than SURFACE_MIN_EDGE (see sliceByField), nor do short edges stay, and a tile's face is often one long triangle that
+ * the least depth at a corner would tilt.
+ */
+function tileRise(d: number, t: SurfaceTiles, profile: SurfaceTextureProfile) {
+  if (profile === "flat") return d >= -TILE_SNAP ? 1 : d <= TILE_SNAP - t.wall ? 0 : 1 + d / t.wall;
+  return d <= TILE_SNAP ? 0 : surfaceFalloff(1 - d / t.inradius, profile);
+}
+
+/**
+ * Squares and triangles at (u, v): `axis` as for patternValue - the axis u runs along, -1 round a cylinder, 3 to 5 on a
+ * top or bottom; v runs along the axis round a cylinder, up z on a side all round, else along the second axis across.
+ */
+function tileValue(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number) {
+  const t = layout.tiles ?? tilesOf(s);
+  let ou: number, ov: number;
+  if (axis < 0) {
+    ou = t.around;
+    ov = t.v[AXIS_INDEX[s.axis]];
+  } else {
+    ou = t.u[axis >= 3 ? axis - 3 : axis];
+    // A top or bottom all round is seen along z; round a body and flat along the axis.
+    ov = t.v[axis >= 3 ? (layout.projection === "allRound" ? 1 : acrossAxes(s.axis)[1]) : layout.projection === "flat" ? acrossAxes(s.axis)[1] : 2];
+  }
+  return tileRise(tileInside(u - ou, v - ov, s, t), t, s.profile);
+}
+
 function valueNoise(x: number, y: number, z: number) {
   const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
   const f = (t: number) => t * t * (3 - 2 * t);
@@ -1174,6 +1309,8 @@ export type SurfaceTextureLayout = {
    * to its own size, ending in a brick at an edge to a side with bricks (see fitBrickCourses).
    */
   capBricks?: { along: { origin: number; cell: number }; rowHeight: number; rowOrigin: number };
+  /** Squares and triangles: their size and gap as made and where their grid begins (see fitTiles). */
+  tiles?: SurfaceTiles;
   /** Wood grain, and the ends of a log with bark: where the pith runs, and the knots. */
   wood?: WoodFrame | null;
   /**
@@ -1519,8 +1656,9 @@ function aroundAngle(layout: SurfaceTextureLayout, a: number, b: number) {
 
 /** (u, v) on a face seen along the axis, the pattern turned there by `faceTurn` degrees round the layout's middle (`back`: undone). */
 function turnOnFace(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, back = false): [number, number] {
-  // Bricks lie in courses fitted to the body's edges (see fitBrickCourses), not turned.
-  if (!s.faceTurn || s.pattern === "bricks") return [u, v];
+  // Bricks lie in courses fitted to the body's edges (see fitBrickCourses), not turned; squares and triangles in rows
+  // along them, cut along straight lines in the plane (see sliceTiles).
+  if (!s.faceTurn || s.pattern === "bricks" || tilePattern(s)) return [u, v];
   const a = ((back ? -s.faceTurn : s.faceTurn) * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a);
   const [c1, c2] = layout.center;
   const du = u - c1, dv = v - c2;
@@ -1544,6 +1682,9 @@ function patternValue(u: number, v: number, s: SurfaceTextureSettings, layout: S
       return surfaceFalloff(cellEdge(u, v, layout.cell, layout.around, s.seed) / ((layout.cell / 2) * s.width), s.profile);
     case "bricks":
       return brickValue(u, v, s, layout, axis);
+    case "squares":
+    case "triangles":
+      return tileValue(u, v, s, layout, axis);
     case "knit":
       return knit(u, v, layout.cell, s);
     case "rope":
@@ -1835,6 +1976,7 @@ export function makeSurfaceTextureLayout(base: SurfaceBase, asked: SurfaceTextur
   const layout: SurfaceTextureLayout = { projection: s.projection as SurfaceTextureLayout["projection"], period: s.spacing, cell: s.spacing, around: null, angle: s.angle, center: [c1, c2], radius, rMin, rMax, outline: shape };
   if (s.pattern === "image") layout.image = textureImage(s);
   if (s.pattern === "bricks") fitBrickCourses(base, s, kept, layout);
+  if (tilePattern(s)) fitTiles(base, s, kept, layout);
   if (s.pattern === "wood" || s.pattern === "bark") {
     const cut = s.pattern === "wood" ? s.woodCut : "log";
     layout.wood = woodFrame(cut, AXIS_INDEX[s.axis], [c1, c2], base.min, base.max, s.ringWidth, s.pattern === "wood" ? s.woodKnots : 0, s.seed);
@@ -1946,6 +2088,66 @@ function fitBrickCourses(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uin
 }
 
 /**
+ * Squares and triangles: their gap and where their grid begins (see SurfaceTextureLayout.tiles). Size and gap stay as
+ * set, unlike a brick's, which is fitted to the edges: tiles are made to a size, often a printer's line width (3.2 mm
+ * squares 3.2 mm apart are eight lines of a 0.4 mm nozzle). The grid is centred on what gets the pattern along every
+ * axis - a square or an upward triangle in the middle of each side of a box, the tiles cut alike at both its edges, round
+ * a body a square in front. With tileFromBottom the first row starts at the bottom of it instead: round a body along its
+ * axis, all round up z (the bottom of the height band when that lies higher), flat along the second axis across. Round
+ * a body a whole number goes round: the size stays and the gap is rounded, to no less than half of it - along the axis
+ * as well, so every gap is the same. `kept`: the points that count.
+ */
+function fitTiles(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array, layout: SurfaceTextureLayout) {
+  const triangles = s.pattern === "triangles";
+  let t = tilesOf(s);
+  if (s.projection === "cylinder") {
+    const C = 2 * Math.PI * layout.radius;
+    const gapFor = (k: number) => (triangles ? (C / k - s.spacing) / SQRT3 : C / k - s.spacing);
+    let k = Math.max(1, Math.round(C / t.period));
+    if (k > 1 && gapFor(k) < s.tileGap / 2) k -= 1;
+    // A body too thin for a single tile and half a gap round it keeps the gap as set, with a seam.
+    if (gapFor(k) >= s.tileGap / 2) {
+      t = tilesOf(s, gapFor(k));
+      layout.around = k;
+      layout.cell = t.period;
+    }
+  }
+  const v = base.vertices;
+  const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < kept.length; i += 1) {
+    if (!kept[i]) continue;
+    for (let k = 0; k < 3; k += 1) {
+      lo[k] = Math.min(lo[k], v[i * 3 + k]);
+      hi[k] = Math.max(hi[k], v[i * 3 + k]);
+    }
+  }
+  // The height band up z, where it counts (not with picked faces, see weightsFor).
+  if (!s.faces.length && Number.isFinite(lo[2])) {
+    const zH = base.size[2] || 1;
+    lo[2] = Math.max(lo[2], base.min[2] + (s.zoneFrom / 100) * zH);
+    hi[2] = Math.max(lo[2], Math.min(hi[2], base.min[2] + (s.zoneTo / 100) * zH));
+  }
+  const middle = (k: number) => (Number.isFinite(lo[k]) ? (lo[k] + hi[k]) / 2 : 0);
+  // From the middle of a square or of an upward triangle's row to where the grid begins along a row, and across.
+  const alongRow = triangles ? t.period / 2 : t.size / 2;
+  const acrossRow = triangles ? t.rowHeight / 2 : t.size / 2;
+  t.u = [0, 1, 2].map((k) => middle(k) - alongRow);
+  t.v = [0, 1, 2].map((k) => middle(k) - acrossRow);
+  if (s.tileFromBottom) {
+    const up = s.projection === "cylinder" ? AXIS_INDEX[s.axis] : s.projection === "flat" ? acrossAxes(s.axis)[1] : 2;
+    // An upward triangle's base lies half a gap above its lattice line.
+    if (Number.isFinite(lo[up])) t.v[up] = lo[up] - (triangles ? t.gap / 2 : 0);
+  }
+  if (s.projection === "cylinder") {
+    const [front] = TEXT_FRONT[s.axis];
+    const [i1, i2] = acrossAxes(s.axis);
+    const [c1, c2] = layout.center;
+    t.around = aroundAngle(layout, c1 + front[i1] * layout.radius, c2 + front[i2] * layout.radius) * layout.radius - alongRow;
+  }
+  layout.tiles = t;
+}
+
+/**
  * Whether a body is round about `axis`: on its side faces the normal points away from the fitted axis at every corner of
  * the triangle (a cylinder of 16 segments: 11 degrees off; an octagon 22, a hexagon 30, a cube's face 45 at its corners).
  * Round when that holds within 25 degrees on three quarters of the side area. A body without side faces (a plate lying
@@ -1991,7 +2193,8 @@ function wrapsOutline(s: SurfaceTextureSettings, outline: SurfaceOutline) {
   // Bricks are fitted to each face's edges (see fitBrickCourses) - where the sides face along x and y, as a box's do.
   // Any other side (a hexagon's slanted ones) saw them projected from aside, stretched, and their joints cut in teeth:
   // there they go round the outline. Bark and wood belong to a log or a board.
-  if (s.pattern === "bricks") return !sidesAlongAxes(outline);
+  // Squares and triangles likewise: each side of a box holds them in its own plane, as set.
+  if (s.pattern === "bricks" || tilePattern(s)) return !sidesAlongAxes(outline);
   return !stuckOn(s) && !["cracks", "grain", "bark", "wood"].includes(s.pattern);
 }
 
@@ -2136,6 +2339,7 @@ function patternExtras(s: SurfaceTextureSettings, layout: SurfaceTextureLayout) 
   if (s.pattern === "bumps") return [s.bumpGrid];
   if (s.pattern === "carbon") return [s.carbonWeave, s.carbonCross];
   if (s.pattern === "bricks") return [s.brickBond, s.brickJoint, layout.rowHeight ?? s.brickHeight, layout.rowOrigin ?? 0, layout.brickAxes ?? null, layout.capBricks ?? null];
+  if (tilePattern(s)) return [s.tileGap, s.tileFromBottom, layout.tiles ?? null];
   if (s.pattern === "bark") return [s.barkType, s.seed, s.ringWidth];
   if (s.pattern === "wood") return [s.woodType, s.woodCut, s.ringWidth, s.woodKnots, s.woodWobble, s.seed];
   if (s.pattern === "image") return [s.image === "own" && s.imageOwn ? ownImageKey(s.imageOwn) : s.image, s.tileHeight, s.imageTurn, s.imageInvert, s.imageBlur, s.imageTiling];
@@ -2145,11 +2349,16 @@ function patternExtras(s: SurfaceTextureSettings, layout: SurfaceTextureLayout) 
 /** Edge length at which the pattern is cleanly resolved. */
 function targetEdge(s: SurfaceTextureSettings) {
   // Honeycomb, cells and bumps that are cut (see sliceCells) get their detail from the cuts: the grid only has to follow
-  // the body's roundness (a 1.2 mm chord on 30 mm radius: 0.006 mm). Bricks' faces are flat: their cuts are all they need.
-  if (cellsAreCut(s)) return s.pattern === "bricks" ? 10 : s.spacing / 2.5;
+  // the body's roundness (a 1.2 mm chord on 30 mm radius: 0.006 mm). Bricks' faces are flat: their cuts are all they
+  // need, and so are the faces of squares and triangles.
+  if (cellsAreCut(s)) return s.pattern === "bricks" || tilePattern(s) ? 10 : s.spacing / 2.5;
   const steps = DETAIL_STEPS[s.detail];
   // An image: about 14 points per tile and step of detail (its tile has 256 image points and more).
   if (s.pattern === "image") return Math.min(s.spacing, s.tileHeight > 0 ? s.tileHeight : s.spacing) / (steps * 14);
+  // Squares and triangles not cut (all round, off the straight faces): half the narrower of tile and gap, their walls
+  // refined after (see refineFlanks). Finer, the estimate of the budget counted a box's straight faces too, which are cut
+  // and not refined, and called a box's top coarser than asked.
+  if (tilePattern(s)) return Math.min(s.spacing, s.tileGap) / 2;
   const narrow = s.width < 0.35 && s.pattern !== "grain" && s.pattern !== "bricks" && s.pattern !== "bark" && s.pattern !== "wood" ? 0.65 : 1;
   // Knitting: a stitch has two loops of about a quarter of its width each; a rope's strands, the weave's rows and a carbon
   // band's edges are narrower than the spacing too (round the axis those are cut along, see carbonCuts).
@@ -3263,6 +3472,181 @@ function sliceBricks(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfa
   return { mesh: out, reduced: count < wanted, fixed: null };
 }
 
+/**
+ * Where a tile's wall is cut, as distances inside its border, mm (see tileRise): flat, the wall's top on the border and
+ * its foot in the gap; else the border, the profile's levels (see profileLevels) and the middle, where the sides' ridges
+ * meet.
+ */
+function tilePlaces(t: SurfaceTiles, profile: SurfaceTextureProfile, steps: number) {
+  if (profile === "flat") return [0, -t.wall];
+  return [...new Set([0, ...profileLevels(profile, steps).map((level) => t.inradius * (1 - level)), t.inradius])];
+}
+
+/**
+ * Squares and triangles: cut instead of refined, as bricks are along their joints (see sliceBricks) - each family of
+ * lines in one cut over its period, so that no fans are cut again. In two steps:
+ * 1. Along the places of the wall (see tilePlaces): squares along their rows and across them, on both sides of every
+ *    square; triangles along each of their lattice's three families of lines (along the rows and at 60 degrees to
+ *    them), half a gap off each line and the wall's places further. A line cut before stays: no quad is laid anew over
+ *    it. Then every triangle lies in one band of the wall of each family, where the distance to that side is linear.
+ * 2. Where two sides of a tile are about as near - the wall's mitre at a corner, and a pyramid's or a cushion's ridges
+ *    to its middle - the height follows the nearer: cut along the line where both are as near, in the triangles near
+ *    both. Then the height is linear in every triangle.
+ * A round profile gets half of `steps` levels (as bricks), fewer down to 2 when the triangles would not fit `maxTriangles`.
+ * `skipBase`: input triangles that surely stay smooth. Parents point at the input mesh.
+ */
+function sliceTiles(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, steps: number, maxTriangles: number, skipBase: Uint8Array): { mesh: SurfaceMesh; reduced: boolean; fixed: null } {
+  const ax = AXIS_INDEX[s.axis];
+  const [i1, i2] = acrossAxes(s.axis);
+  const cyl = s.projection === "cylinder";
+  const R = layout.radius, [c1, c2] = layout.center;
+  const round = cyl ? 2 * Math.PI * R : 0;
+  const t = layout.tiles ?? tilesOf(s);
+  const triangles = s.pattern === "triangles";
+  // Where the grid begins in this plane, as the values take it (see tileValue): round the axis and along it, or along
+  // the two axes across the one a flat face is seen along.
+  const ou = cyl ? t.around : t.u[i1], ov = cyl ? t.v[ax] : t.v[i2];
+  // Every point's place in the unrolled surface from where the grid begins, the change from one point to another across
+  // the seam too.
+  const unrolled = (m: SurfaceMesh) => {
+    const v = m.vertices, n = v.length / 3;
+    const U = new Float64Array(n), V = new Float64Array(n), pole = new Uint8Array(n);
+    for (let i = 0; i < n; i += 1) {
+      if (cyl) {
+        if (Math.hypot(v[i * 3 + i1] - c1, v[i * 3 + i2] - c2) < 1e-6) pole[i] = 1;
+        U[i] = aroundAngle(layout, v[i * 3 + i1], v[i * 3 + i2]) * R - ou;
+        V[i] = v[i * 3 + ax] - ov;
+      } else {
+        U[i] = v[i * 3 + i1] - ou;
+        V[i] = v[i * 3 + i2] - ov;
+      }
+    }
+    const du = (i: number, j: number) => {
+      const d = U[j] - U[i];
+      return round ? d - round * Math.round(d / round) : d;
+    };
+    return { U, V, pole, du, dv: (i: number, j: number) => V[j] - V[i] };
+  };
+  // Not cut: faces that surely stay smooth, triangles at the axis and - around a cylinder - top and bottom.
+  const cuttable = (m: SurfaceMesh, F: ReturnType<typeof unrolled>) => {
+    const I = m.indices, T = I.length / 3;
+    const out = new Uint8Array(T);
+    for (let f = 0; f < T; f += 1) {
+      const a = I[f * 3], b = I[f * 3 + 1], c = I[f * 3 + 2];
+      if (skipBase[m.parents[f]] || F.pole[a] || F.pole[b] || F.pole[c]) continue;
+      if (cyl) {
+        const n = faceCross(m.vertices, a, b, c);
+        const l = Math.hypot(n[0], n[1], n[2]);
+        if (l === 0 || Math.abs(n[ax]) / l > 0.8) continue;
+      }
+      out[f] = 1;
+    }
+    return out;
+  };
+  // The families of lines with a unit normal (a, b) in (U, V): across them and along them, per point and from point to
+  // point. Squares: across the rows, then along them; triangles: along the rows and at 60 degrees either way.
+  const normals: [number, number][] = triangles ? [[0, 1], [SQRT3 / 2, -0.5], [-SQRT3 / 2, -0.5]] : [[0, 1], [1, 0]];
+  const family = (F: ReturnType<typeof unrolled>, [a, b]: [number, number]) => {
+    const n = F.U.length;
+    const across = new Float64Array(n);
+    for (let i = 0; i < n; i += 1) across[i] = a * F.U[i] + b * F.V[i];
+    return {
+      across,
+      diff: (p: number, q: number) => a * F.du(p, q) + b * F.dv(p, q),
+      along: (p: number, q: number) => -b * F.du(p, q) + a * F.dv(p, q),
+    };
+  };
+  const modulo = (x: number, m: number) => ((x % m) + m) % m;
+  const unique = (places: number[], P: number) => {
+    const out: number[] = [];
+    for (const place of places) {
+      const o = modulo(place, P);
+      if (!out.some((known) => Math.abs(known - o) < 1e-9 * P || Math.abs(known - o) > P * (1 - 1e-9))) out.push(o);
+    }
+    return out.sort((x, y) => x - y);
+  };
+  // Distances inside a tile's border for a wall, as places across a family's lines within their period: a square's
+  // sides at 0 and its size, a triangle's half a gap off the lattice's lines on either side.
+  const P = triangles ? t.rowHeight : t.period;
+  const placesFor = (D: number[]) => unique(D.flatMap((d) => (triangles ? [d + t.gap / 2, -(d + t.gap / 2)] : [d, t.size - d])), P);
+  // How near a side of each family a point is, as the distance inside the tile takes it (see tileInside).
+  const nearness = (F: ReturnType<typeof unrolled>, k: number) => {
+    const n = F.U.length;
+    const out = new Float64Array(n);
+    const [a, b] = normals[k];
+    for (let i = 0; i < n; i += 1) {
+      const across = a * F.U[i] + b * F.V[i];
+      out[i] = triangles ? lineDistance(across, t.rowHeight) - t.gap / 2 : squareAcross(across, t.period, t.size);
+    }
+    return out;
+  };
+  // Where the height follows a side's distance: the wall (flat), or the tile's inside up to its middle.
+  const zone: [number, number] = s.profile === "flat" ? [-t.wall, 0] : [0, t.inradius];
+  const inZone = (d: number) => d >= zone[0] - TILE_SNAP && d <= zone[1] + TILE_SNAP;
+  const cut = (D: number[]) => {
+    let cur: SurfaceMesh = mesh;
+    const places = placesFor(D);
+    // 1. The families of lines, each in one cut; the edges along lines cut before stay.
+    for (let k = 0; k < normals.length; k += 1) {
+      const F = unrolled(cur);
+      const fam = family(F, normals[k]);
+      const before = normals.slice(0, k).map((normal) => family(F, normal).diff);
+      const keep = before.length ? (p: number, q: number) => before.some((diff) => Math.abs(diff(p, q)) < 1e-9) : null;
+      cur = sliceByField(cur, fam.across, fam.diff, P, places, cuttable(cur, F), fam.along, false, keep);
+    }
+    // 2. The creases where two sides are as near, each pair of families in turn.
+    for (let k = 0; k < normals.length; k += 1) {
+      for (let j = k + 1; j < normals.length; j += 1) {
+        const F = unrolled(cur);
+        const dk = nearness(F, k), dj = nearness(F, j);
+        const crease = Float64Array.from(dk, (value, i) => value - dj[i]);
+        const I = cur.indices;
+        const sliced = cuttable(cur, F);
+        for (let f = 0; f < sliced.length; f += 1) {
+          if (!sliced[f]) continue;
+          for (let c = 0; c < 3; c += 1) {
+            const i = I[f * 3 + c];
+            if (!inZone(dk[i]) || !inZone(dj[i])) {
+              sliced[f] = 0;
+              break;
+            }
+          }
+        }
+        cur = sliceByField(cur, crease, (p, q) => crease[q] - crease[p], 1e6, [0], sliced);
+      }
+    }
+    return cur;
+  };
+  // What a cut costs, estimated from how many tiles the faces to cut hold: a flat tile about TILE_COST triangles (its
+  // walls, and the body's own grid running through it), more with every level of a round profile.
+  const open = cuttable(mesh, unrolled(mesh));
+  let area = 0;
+  for (let f = 0; f < open.length; f += 1) if (open[f]) area += Math.hypot(...faceCross(mesh.vertices, mesh.indices[f * 3], mesh.indices[f * 3 + 1], mesh.indices[f * 3 + 2])) / 2;
+  const tiles = area / (triangles ? (t.period * t.rowHeight) / 2 : t.period * t.period);
+  const cost = (D: number[]) => tiles * TILE_COST * (D.length / 2) ** 2;
+  const rounded = s.profile === "round" || s.profile === "dome";
+  const wanted = rounded ? Math.max(2, Math.round(steps / 2)) : steps;
+  let count = wanted;
+  while (rounded && count > 2 && cost(tilePlaces(t, s.profile, count)) > maxTriangles) count = Math.max(2, Math.floor(count / 2));
+  // Far more tiles than the budget holds are not cut at all - the cut ran out of memory on a large vase: the grid stays
+  // as it is, coarse.
+  if (cost(tilePlaces(t, s.profile, count)) > TILE_CUT_LIMIT * maxTriangles) return { mesh: { ...mesh, limited: true }, reduced: true, fixed: null };
+  let out = cut(tilePlaces(t, s.profile, count));
+  while (rounded && count > 2 && out.indices.length / 3 > maxTriangles) {
+    count = Math.max(2, Math.floor(count / 2));
+    out = cut(tilePlaces(t, s.profile, count));
+  }
+  // Short edges (levels close to a corner) are pulled together here already, once for all depths.
+  for (let pass = 0; pass < 12; pass += 1) {
+    const c = collapseShortEdges(out.vertices, out.indices, SURFACE_MIN_EDGE);
+    if (c.merged === 0 || !c.faces) break;
+    const parents = out.parents;
+    out = { vertices: out.vertices, indices: c.indices, parents: Uint32Array.from(c.faces, (f) => parents[f]) };
+  }
+  out.limited = Boolean(mesh.limited || out.indices.length / 3 > maxTriangles);
+  return { mesh: out, reduced: count < wanted, fixed: null };
+}
+
 const FLANK_JUMP = 0.3;
 const FLANK_ROUNDS = 3;
 /** An image once is refined finer across an edge whose ends' grey values differ by this much (an outline in the image). */
@@ -3483,6 +3867,8 @@ export type SurfaceTextureStats = {
   image: { placed: boolean; torn: number } | null;
   /** Bricks: how many courses fit the height and how high each is as made, mm; null for the other patterns. */
   bricks: { courses: number; height: number } | null;
+  /** Squares and triangles: their size and their gap as made (rounded round a body), mm; null for the other patterns. */
+  tiles: { size: number; gap: number } | null;
   /** How the pattern was laid on: what "auto" chose, or what was asked for. */
   projection: Exclude<SurfaceTextureProjection, "auto">;
 };
@@ -4721,6 +5107,54 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     return rims;
   }
 
+  let bedCache: { mesh: SurfaceMesh; key: string; bed: Uint8Array } | null = null;
+  /**
+   * Squares and triangles from the bottom edge (tileFromBottom): the points of the bed's rim round the faces that get
+   * them - where such a face meets a bottom staying smooth, at the body's lowest level. There the bottom alone would keep
+   * a point smooth, and the first row would end in a slope above the bed instead of reaching down into the first layer:
+   * the point moves with the side, the bottom staying on the bed (see apply). 1: a point between the side and the bottom;
+   * 2: a sharp edge between two sides meets the rim there (a box's corner), which keeps it smooth as any sharp edge when
+   * edges are kept. 0 for every other point, and for one on a face that neither is the bed nor gets the pattern.
+   */
+  function bedRimPoints(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
+    const key = JSON.stringify([s.faces, s.exceptFaces, s.bottomFree, s.topFree, s.outside, s.inside, s.edgeAngle, layout.center]);
+    if (bedCache?.mesh === mesh && bedCache.key === key) return bedCache.bed;
+    const bv = base.vertices, BI = base.indices;
+    const chosen = chosenFaces(s);
+    const smooth = chosen ? null : smoothBaseVertices(s, layout).faces;
+    const gets = (f: number) => (chosen ? chosen[f] === 1 : !smooth![f]);
+    const T0 = BI.length / 3;
+    const unit = new Float64Array(T0 * 3);
+    // The bed: input faces looking straight down at the body's lowest level that stay smooth.
+    const bedFace = new Uint8Array(T0);
+    for (let f = 0; f < T0; f += 1) {
+      const [x, y, z] = faceCross(bv, BI[f * 3], BI[f * 3 + 1], BI[f * 3 + 2]);
+      const l = Math.hypot(x, y, z);
+      if (l === 0) continue;
+      unit[f * 3] = x / l;
+      unit[f * 3 + 1] = y / l;
+      unit[f * 3 + 2] = z / l;
+      if (!gets(f) && z / l < -0.99 && [0, 1, 2].every((k) => Math.abs(bv[BI[f * 3 + k] * 3 + 2] - base.min[2]) <= RIM_LEVEL)) bedFace[f] = 1;
+    }
+    const v = mesh.vertices, I = mesh.indices, n = v.length / 3;
+    const onBed = new Uint8Array(n), other = new Uint8Array(n), bent = new Uint8Array(n);
+    const side = new Int32Array(n).fill(-1);
+    const cosEdge = Math.cos((s.edgeAngle * Math.PI) / 180);
+    for (let t = 0; t < I.length; t += 1) {
+      const i = I[t], P = mesh.parents[(t - (t % 3)) / 3];
+      if (bedFace[P]) onBed[i] = 1;
+      else if (!gets(P)) other[i] = 1;
+      else if (side[i] < 0) side[i] = P;
+      else if (unit[P * 3] * unit[side[i] * 3] + unit[P * 3 + 1] * unit[side[i] * 3 + 1] + unit[P * 3 + 2] * unit[side[i] * 3 + 2] < cosEdge) bent[i] = 1;
+    }
+    const bed = new Uint8Array(n);
+    for (let i = 0; i < n; i += 1) {
+      if (onBed[i] && side[i] >= 0 && !other[i] && Math.abs(v[i * 3 + 2] - base.min[2]) <= RIM_LEVEL) bed[i] = bent[i] ? 2 : 1;
+    }
+    bedCache = { mesh, key, bed };
+    return bed;
+  }
+
   /** Area (mm²) of the input triangles that can get the pattern (a point not surely smooth). */
   function texturableArea(smooth: Uint8Array) {
     const I = base.indices;
@@ -5000,9 +5434,10 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // the strips gave them a grid finer than asked for along the axis, and a weave's strands lost their straight edges
       // on the even one.
       if (s.pattern === "bark" && s.projection === "cylinder" && !layout.outline) start = cutStrips(start, s, layout, edge, smooth.faces);
-      // Grooves and bricks on straight faces are cut, not refined: points only on such faces (or smooth ones) stay as they are.
+      // Grooves, bricks, squares and triangles on straight faces are cut, not refined: points only on such faces (or smooth
+      // ones) stay as they are.
       let keep = smooth.points;
-      if (straight && (striped || s.pattern === "bricks")) {
+      if (straight && (striped || s.pattern === "bricks" || tilePattern(s))) {
         const other = new Uint8Array(smooth.points.length);
         for (let f = 0; f < straight.length; f += 1) {
           if (straight[f] !== 255 || smooth.faces[f]) continue;
@@ -5048,7 +5483,11 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       return scale > 1 ? Math.ceil(full / 2) : full;
     };
     if (cellsAreCut(s) && !mesh.limited) {
-      const cut = s.pattern === "bricks" ? sliceBricks(mesh, s, layout, cellSteps(), maxTriangles, roundSkip) : sliceCells(mesh, s, layout, cellSteps(), maxTriangles, roundSkip);
+      const cut = s.pattern === "bricks"
+        ? sliceBricks(mesh, s, layout, cellSteps(), maxTriangles, roundSkip)
+        : tilePattern(s)
+          ? sliceTiles(mesh, s, layout, cellSteps(), maxTriangles, roundSkip)
+          : sliceCells(mesh, s, layout, cellSteps(), maxTriangles, roundSkip);
       if (cut.reduced) raised = true;
       fixed = cut.fixed ?? null;
       mesh = { ...cut.mesh, limited: Boolean(mesh.limited || cut.mesh.indices.length / 3 > maxTriangles) };
@@ -5098,8 +5537,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
             mesh = rayCuts(mesh, s, layout, maxTriangles, smooth.faces, skip);
           } else mesh = capRingCuts(mesh, sk, layout, layout.period, stripeOffsets(layout.period, s, CROSS_STEPS[s.detail] / 2), skip, maxTriangles, smooth.faces);
         } else if (striped) mesh = cutRows(mesh, sk, skip);
-        else if (s.pattern === "bricks") {
-          const cut = sliceBricks(mesh, sk, layout, cellSteps(), maxTriangles, skip);
+        else if (s.pattern === "bricks" || tilePattern(s)) {
+          const cut = s.pattern === "bricks" ? sliceBricks(mesh, sk, layout, cellSteps(), maxTriangles, skip) : sliceTiles(mesh, sk, layout, cellSteps(), maxTriangles, skip);
           if (cut.reduced) raised = true;
           mesh = cut.mesh;
         } else {
@@ -5392,6 +5831,13 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       for (let i = 0; i < baseSkip.length; i += 1) baseSkip[i] = maskFree(base.vertices[i * 3], base.vertices[i * 3 + 1], base.vertices[i * 3 + 2]) ? 1 : 0;
     }
     const layout = makeSurfaceTextureLayout(base, s, baseSkip, s.projection === "cylinder" ? outline : null);
+    // Squares and triangles centred on, or starting at the bottom of, the faces that get them - picked ones too, not the
+    // whole body (see fitTiles).
+    if (tilePattern(s)) {
+      const smooth = smoothBaseVertices(s, layout).points;
+      const kept = Uint8Array.from(smooth, (sm, i) => (sm || baseSkip?.[i] ? 0 : 1));
+      if (kept.includes(1)) fitTiles(base, s, kept, layout);
+    }
     // A top or bottom round the axis with the pattern (picked, or not kept smooth): the pattern lies flat there or runs
     // in rings (see SurfaceTextureLayout.flatCaps). With only such faces picked, nothing goes round the axis.
     let goesRound = layout.around !== null;
@@ -5422,6 +5868,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // A text goes where it was put, and so does an image once: what stays smooth for a pattern all over (bottom, top, a
     // wall, the height band, sharp edges) does not hold it back - masks do.
     const placed = stuckOn(s);
+    // Squares and triangles from the bottom edge: their first row reaches down onto the bed (see bedRimPoints).
+    const fromBed = tilePattern(s) && s.tileFromBottom;
     const sidePoints = (mesh: SurfaceMesh) => sidePointsFor(mesh, AXIS_INDEX[s.axis]);
     /** Weight per point: 0 = smooth, 1 = the full pattern, faded in over `fade` mm (straight faces: see BORDER_WALL). */
     const weightsFor = (state: RefinedState) => {
@@ -5464,6 +5912,10 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // rim stays smooth, as with keepEdges (a rim whose top or bottom stays smooth is smooth anyway).
       const brickRims = s.pattern === "bricks" && !keepsEdges ? (kinds ?? pointKindsFor(mesh, AXIS_INDEX[s.axis])) : null;
       const kept = (i: number) => (keepsEdges || (brickRims !== null && (brickRims[i] & 3) === 3)) && crease[i] === 1 && !(wrapped && wrapped[i]) && !overRim(i);
+      // Squares and triangles from the bottom edge reach down onto the bed: its rim round their faces is not kept smooth
+      // by the bottom, only by a sharp edge between two sides there (see bedRimPoints).
+      const bed = fromBed ? bedRimPoints(mesh, s, layout) : null;
+      const keptAt = (i: number) => (bed && bed[i] ? bed[i] === 2 && keepsEdges && !(wrapped && wrapped[i]) : kept(i));
       // Whether the body stands across from a point on a wall facing the axis (see bodyAcross): as its input triangles say
       // where they agree (a cup's inner wall), else seen from the point itself (where a wall across ends).
       let ofPoint: { start: Uint32Array; faces: Uint32Array } | null = null;
@@ -5495,9 +5947,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         let free = false;
         if (maskFree && maskFree(v[i * 3], v[i * 3 + 1], z)) free = true;
         else if (placed) free = false;
-        else if (notChosen) free = notChosen[i] === 1 || kept(i);
-        else if (kept(i)) free = true;
-        else if (s.bottomFree > 0 && down[i] >= cosBottom) free = true;
+        else if (notChosen) free = (notChosen[i] === 1 && !bed?.[i]) || keptAt(i);
+        else if (keptAt(i)) free = true;
+        else if (s.bottomFree > 0 && down[i] >= cosBottom && !bed?.[i]) free = true;
         else if (s.topFree > 0 && up[i] >= cosTop) free = true;
         else if ((s.zoneFrom > 0 && z < zFrom - 1e-9) || (s.zoneTo < 100 && z > zTo + 1e-9)) free = true;
         else if (!s.outside || !s.inside) {
@@ -5669,7 +6121,11 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // Bricks, bark and wood on a sharp edge: each side moved as deep as its own pattern lies there, the point where they
     // meet. With one move for both (see creaseMoves), a joint on the top beside a brick on the side pulled the edge into
     // the top, and its brick faces down into fans; a log's rim took the bark's deep furrows for its end too, in spikes.
-    const sides = s.pattern === "bricks" || s.pattern === "bark" || s.pattern === "wood" ? creaseSides(base, mesh, s.edgeAngle) : null;
+    // Squares and triangles too: a box's edge between a tile on one side and a gap on the other.
+    const sides = s.pattern === "bricks" || tilePattern(s) || s.pattern === "bark" || s.pattern === "wood" ? creaseSides(base, mesh, s.edgeAngle) : null;
+    // The bed's rim under squares and triangles from the bottom edge (see bedRimPoints): the side moves, the bottom stays
+    // on the bed - moved along both faces' normals the point went below it, and the bed held it back where it was.
+    const bed = fromBed ? bedRimPoints(mesh, s, layout) : null;
     for (let i = 0; i < n; i += 1) {
       const x = v[i * 3], y = v[i * 3 + 1], z = v[i * 3 + 2];
       const nx = directions[i * 3], ny = directions[i * 3 + 1], nz = directions[i * 3 + 2];
@@ -5695,18 +6151,19 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         if (roundCorner(i, x, y, z, d, out, footDepth)) continue;
       }
       const meet = wi > 0 && sides?.get(i);
+      const onBed = Boolean(bed && bed[i]);
       if (meet) {
-        const m = creaseMeet(meet, Array.from({ length: meet.length / 3 }, (_, k) => wi * moveFor(circleValue(x, y, z, meet[k * 3], meet[k * 3 + 1], meet[k * 3 + 2], s, layout, smoothedValue ? blur : 0))));
+        const m = creaseMeet(meet, Array.from({ length: meet.length / 3 }, (_, k) => (onBed && meet[k * 3 + 2] < -0.9 ? 0 : wi * moveFor(circleValue(x, y, z, meet[k * 3], meet[k * 3 + 1], meet[k * 3 + 2], s, layout, smoothedValue ? blur : 0)))));
         if (m) {
           out[i * 3] = x + m[0];
           out[i * 3 + 1] = y + m[1];
-          out[i * 3 + 2] = z + m[2];
+          out[i * 3 + 2] = onBed ? z : z + m[2];
           continue;
         }
       }
       out[i * 3] = x + moves[i * 3] * d;
       out[i * 3 + 1] = y + moves[i * 3 + 1] * d;
-      out[i * 3 + 2] = z + moves[i * 3 + 2] * d;
+      out[i * 3 + 2] = onBed ? z : z + moves[i * 3 + 2] * d;
     }
     // With the bottom kept smooth, nothing belongs below the bed (the slicer would cut it off, or the first layer stick
     // badly). With a patterned bottom it sinks on purpose, as does a text put on the bottom itself - and a picked face
@@ -5746,7 +6203,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     indices = mergeFlatPoints(out, indices).indices;
     const inwardDepth = s.direction === "inward" ? s.depth : s.direction === "both" ? s.depth / 2 : 0;
     const smallest = Math.min(...base.size.filter((size) => size > 0));
-    const spacing = s.projection === "cylinder" ? (CELL_PATTERNS.includes(s.pattern) ? layout.cell : layout.period) : s.spacing;
+    // Squares and triangles keep their size round a body too; their gap is rounded instead (see stats.tiles).
+    const spacing = s.projection === "cylinder" && !tilePattern(s) ? (CELL_PATTERNS.includes(s.pattern) ? layout.cell : layout.period) : s.spacing;
     return {
       vertices: screenToInsidePositions(out),
       indices,
@@ -5765,6 +6223,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         text: s.pattern === "text" ? { placed: lettered > 0, torn: state.text?.torn ?? 0 } : null,
         image: imageOnce(s) ? { placed: lettered > 0, torn: state.text?.torn ?? 0 } : null,
         bricks: s.pattern === "bricks" && layout.rows && layout.rowHeight ? { courses: layout.rows, height: layout.rowHeight } : null,
+        tiles: tilePattern(s) && layout.tiles ? { size: layout.tiles.size, gap: layout.tiles.gap } : null,
         projection: s.projection as Exclude<SurfaceTextureProjection, "auto">,
       },
       fill,

@@ -94,6 +94,7 @@ import type { BentTubeProfile, CustomSnapGrid, GearProfile, GearType, GridSize, 
 import { DEFAULT_LOFT } from "@/lib/loftGeometry";
 import { DEFAULT_GRIDFINITY_TRAY_SIZE, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
 import { selectWholeValue } from "@/lib/numberField";
+import { DEFAULT_PULLEY_BELT_WIDTH, DEFAULT_PULLEY_BORE, DEFAULT_PULLEY_FLANGE, DEFAULT_PULLEY_FLANGE_RISE, DEFAULT_PULLEY_HUB_DIAMETER, DEFAULT_PULLEY_HUB_HEIGHT, DEFAULT_PULLEY_TEETH, MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_PULLEY_HUB_HEIGHT, MAX_PULLEY_TEETH, MIN_PULLEY_BELT_WIDTH, MIN_PULLEY_FLANGE_RISE, MIN_PULLEY_TEETH } from "@/lib/pulleyGeometry";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_TEETH, MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthToothHeightLimit } from "@/lib/hirthGeometry";
 
 type WorkspaceSettings = WorkplaneWorkspaceSettings;
@@ -206,7 +207,8 @@ const BENT_TUBE_PROFILE_OPTIONS: Array<{ value: BentTubeProfile; label: MessageK
 ];
 
 type ShapeSpecialNumberKey = "steps" | "sides" | "bevel" | "segments" | "topRadius" | "baseRadius" | "teeth" | "toothSize" | "toothWidth" | "centerHoleSize" | "helixAngle" | "helixQuality" | "gearPressureAngle" | "gearBacklash" | "gearRim" | "threadDiameter" | "threadPitch" | "threadClearance" | "threadBoltClearance" | "threadAxialClearance" | "threadQuality" | "threadChamfer" | "threadHeadChamfer" | "springTurns" | "springWire" | "springQuality" | "topWidth" | "topDepth" | "starPoints" | "starInnerSize" | "starOuterFillet" | "starInnerFillet" | "starQuality" | "heartTipFillet" | "heartQuality" | "crescentThickness" | "crescentTipFillet" | "crescentQuality" | "honeycombCellSize" | "honeycombWallThickness" | "honeycombFrameWidth" | "dovetailNeckWidth" | "dovetailClearance" | "hingeKnuckles" | "hingePinDiameter" | "hingeLeafThickness" | "hingeClearance" | "screwHoleShaft" | "screwHoleHeadDepth" | "screwHoleAngle" | "cornerFillet" | "topBottomFillet" | "roundedBoxQuality" | "bentTubeSize" | "bentTubeWall" | "bentTubeQuality" | "knurlCount" | "knurlDepth" | "knurlAngle" | "knurlChamfer"
-  | "loftBottomWidth" | "loftBottomDepth" | "loftTopWidth" | "loftTopDepth" | "loftWall";
+  | "loftBottomWidth" | "loftBottomDepth" | "loftTopWidth" | "loftTopDepth" | "loftWall"
+  | "pulleyBeltWidth" | "pulleyFlange" | "pulleyFlangeRise" | "pulleyHubHeight" | "pulleyHubDiameter";
 type ShapeSpecialField =
   | { type: "number"; key: ShapeSpecialNumberKey; label: string; defaultValue: number; min: number; max: number; step?: number; unit?: string }
   | { type: "select"; key: "font" | "gearType" | "gearProfile" | "threadRole" | "threadHead" | "threadHand" | "threadProfile" | "springHand" | "springForm" | "springPattern" | "springEnds" | "bentTubeProfile" | "bentTubeInnerProfile" | "knurlPattern" | "gridfinityType" | "loftBottomOutline" | "loftTopOutline"; label: string; defaultValue: string; options: Array<{ value: string; label: string }> }
@@ -371,6 +373,17 @@ function specialFieldsForShape(
       );
     }
     return fields;
+  }
+  if (kind === "pulley") {
+    return [
+      { type: "number", key: "teeth", label: t("prop.teeth"), defaultValue: defaults.teeth ?? DEFAULT_PULLEY_TEETH, min: MIN_PULLEY_TEETH, max: MAX_PULLEY_TEETH, step: 1 },
+      { type: "number", key: "pulleyBeltWidth", label: t("prop.pulleyBeltWidth"), defaultValue: defaults.pulleyBeltWidth ?? DEFAULT_PULLEY_BELT_WIDTH, min: MIN_PULLEY_BELT_WIDTH, max: MAX_PULLEY_BELT_WIDTH, unit: "mm" },
+      { type: "number", key: "centerHoleSize", label: t("prop.centerHole"), defaultValue: defaults.centerHoleSize ?? DEFAULT_PULLEY_BORE, min: 0, max: MAX_PULLEY_BELT_WIDTH, unit: "mm" },
+      { type: "number", key: "pulleyFlange", label: t("prop.pulleyFlange"), defaultValue: defaults.pulleyFlange ?? DEFAULT_PULLEY_FLANGE, min: 0, max: MAX_PULLEY_FLANGE, unit: "mm" },
+      { type: "number", key: "pulleyFlangeRise", label: t("prop.pulleyFlangeRise"), defaultValue: defaults.pulleyFlangeRise ?? DEFAULT_PULLEY_FLANGE_RISE, min: MIN_PULLEY_FLANGE_RISE, max: MAX_PULLEY_FLANGE_RISE, unit: "mm" },
+      { type: "number", key: "pulleyHubHeight", label: t("prop.pulleyHubHeight"), defaultValue: defaults.pulleyHubHeight ?? DEFAULT_PULLEY_HUB_HEIGHT, min: 0, max: MAX_PULLEY_HUB_HEIGHT, unit: "mm" },
+      { type: "number", key: "pulleyHubDiameter", label: t("prop.pulleyHubDiameter"), defaultValue: defaults.pulleyHubDiameter ?? DEFAULT_PULLEY_HUB_DIAMETER, min: 1, max: MAX_PULLEY_BELT_WIDTH, unit: "mm" },
+    ];
   }
   if (kind === "hirth") {
     return [
@@ -586,7 +599,8 @@ export function WorkspaceSettingsModal({
   // nur ein Durchmesser- (= Breiten-)Feld statt Breite und Tiefe getrennt.
   // Ein gebogenes Rohr bekommt seinen Rahmen ganz aus Profil und Segmenten.
   // Ein Uebergang bekommt Breite und Tiefe aus seinen beiden Enden, nur die Hoehe ist frei.
-  const selectedShapeDimensionKeys: Array<"width" | "depth" | "height"> = selectedShapeKind === "bentTube"
+  // A GT2 pulley's box follows from its teeth, belt width, flanges and hub.
+  const selectedShapeDimensionKeys: Array<"width" | "depth" | "height"> = selectedShapeKind === "bentTube" || selectedShapeKind === "pulley"
     ? []
     : selectedShapeKind === "loft"
     ? ["height"]

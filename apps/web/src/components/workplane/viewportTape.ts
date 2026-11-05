@@ -8,7 +8,7 @@ import * as THREE from "three";
 import type { MeasurementAccuracy } from "@/types/layerling";
 import { pointerReach } from "@/lib/pointerReach";
 import { outwardFaceNormal } from "@/lib/layFlat";
-import { axisLockedPoint, circleOfEdgePoints, perpendicularFootOnPlane, perpendicularFootOnSegment, perpendicularPointsOnCircle, pointAcrossCircle } from "@/lib/tapeCircle";
+import { axisLockedPoint, circleOfEdgePoints, closedRoundEdge, cornerOnRoundEdge, perpendicularFootOnPlane, perpendicularFootOnSegment, perpendicularPointsOnCircle, pointAcrossCircle } from "@/lib/tapeCircle";
 import { aimPickRay, RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { type ThreeState, type TapeAttachment, type TapeEdgeAttachment, type TapeCandidate, projectToScreen, tapeShapeDimensions, formatMeasure, findShapeObject, worldPointHidden } from "@/components/workplane/ViewportOverlays";
 import { clamp } from "./viewportShapeObjects";
@@ -235,6 +235,8 @@ export function pickModelTapeCandidate(
   shiftKey = false,
   /** Leave out corners and edges a body hides, so a click lands on what is seen (the protractor, #1228). */
   skipHidden = false,
+  /** Measuring whole edges: a round rim wins over a corner that only sits on it (the end of a cylinder's side line). */
+  preferRoundRim = false,
 ): TapeCandidate | null {
   const rect = state.renderer.domElement.getBoundingClientRect();
   const pointerX = clientX - rect.left;
@@ -252,7 +254,7 @@ export function pickModelTapeCandidate(
   state.camera.updateMatrixWorld();
   targets.forEach((target) => target.updateWorldMatrix(true, true));
   const vertexCandidates: Array<{ distance: number; candidate: TapeCandidate }> = [];
-  const edgeCandidates: Array<{ distance: number; perpendicular?: boolean; candidate: TapeCandidate }> = [];
+  const edgeCandidates: Array<{ distance: number; perpendicular?: boolean; candidate: TapeCandidate; round?: ReturnType<typeof closedRoundEdge> }> = [];
   const projected = new THREE.Vector3();
 
   targets.forEach((target) => {
@@ -391,6 +393,7 @@ export function pickModelTapeCandidate(
 
         if (snappedPerpendicular) return;
 
+        const round = preferRoundRim ? closedRoundEdge(worldPoints) : null;
         for (let index = 0; index + 1 < worldPoints.length; index += 1) {
           const aScreen = screens[index];
           const bScreen = screens[index + 1];
@@ -420,6 +423,7 @@ export function pickModelTapeCandidate(
                 },
                 edge,
               },
+              round,
             });
           }
         }
@@ -432,7 +436,12 @@ export function pickModelTapeCandidate(
   const inView = (entry: { candidate: TapeCandidate }) => !skipHidden || !worldPointHidden(new THREE.Vector3(entry.candidate.x, entry.candidate.y, entry.candidate.z), state);
   if (shiftKey && edgeCandidates[0]?.perpendicular && inView(edgeCandidates[0])) return edgeCandidates[0].candidate;
   const vertex = vertexCandidates.find(inView);
-  if (vertex) return vertex.candidate;
+  if (vertex) {
+    // A corner that only sits on a round rim within reach (the end of a cylinder's side line) gives way to the rim.
+    const corner = new THREE.Vector3(vertex.candidate.x, vertex.candidate.y, vertex.candidate.z);
+    const rim = preferRoundRim ? edgeCandidates.find((entry) => entry.round && inView(entry) && cornerOnRoundEdge(corner, entry.round)) : undefined;
+    return (rim ?? vertex).candidate;
+  }
   const edgeCandidate = edgeCandidates.find(inView);
   if (edgeCandidate) return edgeCandidate.candidate;
 

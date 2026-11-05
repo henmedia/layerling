@@ -175,6 +175,12 @@ export type CadModifierProfilePart = {
   /** Extrusion only: round every edge of the two flat ends by this radius (a rounded box). */
   capFillet?: number;
   /**
+   * Extrusion only, a GT2 pulley (Discussion #1319): `loops` is the toothed band alone, pushed up
+   * from `teethBottom` to `teethTop`; the round discs (flanges, hub) on the y axis are joined to it
+   * and the bore is cut through the whole height.
+   */
+  pulley?: { teethBottom: number; teethTop: number; discs: Array<{ bottom: number; top: number; radius: number }>; boreRadius: number };
+  /**
    * Extrusion only: chamfer a round body at both ends at 45 degrees - keep
    * what lies within `radius` less `size` plus the distance from the nearer
    * end, measured from the axis through the outline's origin (knurling).

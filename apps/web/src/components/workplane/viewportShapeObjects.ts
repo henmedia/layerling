@@ -9,6 +9,7 @@ import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeome
 import { type ResolvedAppTheme } from "@/lib/appTheme";
 import { createGearGeometry } from "@/lib/gearGeometry";
 import { createHirthGeometry } from "@/lib/hirthGeometry";
+import { createPulleyGeometry } from "@/lib/pulleyGeometry";
 import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
 import { createHeartGeometry } from "@/lib/heartGeometry";
@@ -36,6 +37,7 @@ import { createSpringGeometry } from "@/lib/springGeometry";
 import { textDisplayGeometry } from "@/lib/textFill";
 import { loadedManifoldRuntime, manifoldRevision, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { buildGroupDisplayMesh } from "@/lib/editorBooleans";
+import { boundsForShapesOfVertices } from "@/lib/editorMeshCore";
 import { customFontRevision } from "@/lib/textFonts";
 import { rulerTicks } from "@/lib/rulerDimensions";
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -308,6 +310,11 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     centerHoleSize: shape.centerHoleSize,
     hirthSteepFlank: shape.hirthSteepFlank,
     hirthReverse: shape.hirthReverse,
+    pulleyBeltWidth: shape.pulleyBeltWidth,
+    pulleyFlange: shape.pulleyFlange,
+    pulleyFlangeRise: shape.pulleyFlangeRise,
+    pulleyHubHeight: shape.pulleyHubHeight,
+    pulleyHubDiameter: shape.pulleyHubDiameter,
     gearType: shape.gearType,
     gearRim: shape.gearRim,
     helixAngle: shape.helixAngle,
@@ -703,6 +710,11 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     centerHoleSize: shape.centerHoleSize,
     hirthSteepFlank: shape.hirthSteepFlank,
     hirthReverse: shape.hirthReverse,
+    pulleyBeltWidth: shape.pulleyBeltWidth,
+    pulleyFlange: shape.pulleyFlange,
+    pulleyFlangeRise: shape.pulleyFlangeRise,
+    pulleyHubHeight: shape.pulleyHubHeight,
+    pulleyHubDiameter: shape.pulleyHubDiameter,
     gearType: shape.gearType,
     gearRim: shape.gearRim,
     helixAngle: shape.helixAngle,
@@ -1842,6 +1854,14 @@ export function createShapeObject(
     // Measured on the real vertices: the box of a turned part's own bounding box is wider than
     // the part, which stretched the content to a smaller size (a bundle shrank, #152).
     const contentBox = new THREE.Box3().setFromObject(content, true);
+    // A hidden part still counts for the group's size, as it does when the group is measured,
+    // exported or aligned (meshForShape): measured without it, the parts left were stretched
+    // to fill the group's box (#1323).
+    const hiddenParts = shape.groupedShapes.filter((child) => child.hidden);
+    if (hiddenParts.length) {
+      const hidden = boundsForShapesOfVertices(hiddenParts);
+      contentBox.union(new THREE.Box3(new THREE.Vector3(hidden.minX, hidden.minY, hidden.minZ), new THREE.Vector3(hidden.maxX, hidden.maxY, hidden.maxZ)));
+    }
     const contentSize = contentBox.getSize(new THREE.Vector3());
     content.scale.set(
       shapeWidth(shape) / Math.max(0.001, contentSize.x),
@@ -2144,6 +2164,9 @@ export function createShapeObject(
       break;
     case "hirth":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createHirthGeometry(width, height, depth, shape)), material, shape);
+      break;
+    case "pulley":
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createPulleyGeometry(shape)), material, shape);
       break;
     case "honeycomb":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createHoneycombGeometry({
@@ -2578,7 +2601,7 @@ export function addShapeEdgeDecorations(group: THREE.Group, mesh: THREE.Mesh, pr
   const complexEdges =
     shape.kind === "mesh" ||
     Boolean(shape.importedMesh) ||
-    ["cone", "pyramid", "roof", "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "ring", "star", "gear", "hirth", "wedge", "polygon", "heart", "crescent", "slot", "dovetail", "screwBoss", "snapFit", "rib", "hinge", "gridfinity", "knurl", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "honeycomb", "loft"].includes(shape.kind);
+    ["cone", "pyramid", "roof", "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "ring", "star", "gear", "hirth", "pulley", "wedge", "polygon", "heart", "crescent", "slot", "dovetail", "screwBoss", "snapFit", "rib", "hinge", "gridfinity", "knurl", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "honeycomb", "loft"].includes(shape.kind);
   const importedTriangleCount = shape.importedMesh?.triangleCount ?? 0;
   // A vase's relief has an edge at every rib: drawn like a heavy imported mesh, without the lines.
   const skipHeavyImportedEdges = (Boolean(shape.importedMesh) && importedTriangleCount > IMPORTED_SELECTED_EDGE_TRIANGLE_LIMIT)

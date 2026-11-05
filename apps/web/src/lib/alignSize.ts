@@ -57,6 +57,23 @@ function axesKey(axes: AlignAxes | null) {
   return axes ? [axes.x, axes.y, axes.z].map((axis) => `${axis.x},${axis.y},${axis.z}`).join(";") : "world";
 }
 
+/**
+ * A part hidden inside a group still counts for the group's size, as its selection frame shows it: a wide
+ * hidden cylinder on an axle keeps the group centred on the axle when it is aligned (#1323). Only the
+ * alignment measures it so; the export and the display mesh leave a hidden part out.
+ */
+function withHiddenGroupPartsShown(shape: WorkplaneShape): WorkplaneShape {
+  if (!shape.groupedShapes?.length || shape.importedMesh) return shape;
+  let changed = false;
+  const groupedShapes = shape.groupedShapes.map((part) => {
+    const inner = withHiddenGroupPartsShown(part);
+    if (!part.hidden && inner === part) return part;
+    changed = true;
+    return { ...inner, hidden: false };
+  });
+  return changed ? { ...shape, groupedShapes } : shape;
+}
+
 /** The box of a part as the alignment measures it, along a workplane's axes or the world's, measured once per part. */
 export function alignBounds(shape: WorkplaneShape, axes: AlignAxes | null = null): Cuboid {
   let byAxes = measuredBounds.get(shape);
@@ -67,7 +84,8 @@ export function alignBounds(shape: WorkplaneShape, axes: AlignAxes | null = null
   const key = axesKey(axes);
   const known = byAxes.get(key);
   if (known) return { ...known };
-  const bounds = axes ? frameAabb(shape, axes) : meshAabb(shape);
+  const measured = withHiddenGroupPartsShown(shape);
+  const bounds = axes ? frameAabb(measured, axes) : meshAabb(measured);
   byAxes.set(key, { ...bounds });
   return bounds;
 }

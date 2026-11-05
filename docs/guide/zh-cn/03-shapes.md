@@ -26,7 +26,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 - **{{ui:library.section.holes}}：** 用于螺钉头的 {{ui:shape.counterbore}} 和 {{ui:shape.countersink}}、用于水平孔的 {{ui:shape.teardrop}}，以及用于 USB、HDMI、DisplayPort 和 RJ45 插座的 {{ui:shape.port}}。
 - **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺杆、螺钉、螺母和螺纹孔）、沉头螺钉下的 {{ui:shape.finishingWasher}}、一体打印的 {{ui:shape.hinge}} 和 {{ui:shape.dovetail}}。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.enclosure}}：** 用于热熔螺母和自攻螺钉的 {{ui:shape.screwBoss}}、带卡座的 {{ui:shape.snapFit}}，以及 {{ui:shape.rib}} 或角撑板。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
-- **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}} 和 {{ui:shape.hirth}}。
+- **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}}、{{ui:shape.hirth}} 和 {{ui:shape.pulley}}。
 - **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收纳盒和底板，以及 {{ui:shape.sbcBoard}}，一块按实际尺寸做的单板计算机，用来围绕它设计外壳。
 - **{{ui:library.section.lettering}}：** {{ui:shape.text}}，也可沿圆弧排列，以及 {{ui:shape.nameTag}}、{{ui:shape.iconTag}} 和 {{ui:shape.qrCode}}。更多见[文字](chapter:text)。
 - **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用于握持的 {{ui:shape.knurl}}。
@@ -186,6 +186,8 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 {{ui:surfaceTexture.carbon}} 在实体上铺斜纹编织的碳纤维：竖向带和横向带互相上下穿插，每条带错开一条带的位置，于是出现熟悉的斜纹。{{ui:inspector.surfaceCarbonWeave}} 可选 {{ui:surfaceTexture.carbonTwill22}}（大多数碳纤维件的均匀编织），或 {{ui:surfaceTexture.carbonTwill21}} 和 {{ui:surfaceTexture.carbonTwill31}}，后两者竖向带显得长、横向带显得短。{{ui:inspector.surfaceSpacingCarbon}} 设定竖向带的宽度；{{ui:inspector.surfaceCarbonCross}} 让横向带更宽或更窄，得到不均匀的编织（0：一样宽）。绕实体一圈时，带宽会略作取整，使编织无接缝地闭合。单根纤维对打印来说太细了：看得见的是带和它们的交叉。
 
 {{ui:surfaceTexture.bricks}} 在实体上铺一面砖墙，接缝像砂浆一样凹下。{{ui:inspector.surfaceBrickBond}} 选择砖的砌法：大多数墙用的 {{ui:surfaceTexture.bondRunning}}、{{ui:surfaceTexture.bondStack}}，或在长砖之间夹短砖（{{ui:surfaceTexture.bondEnglish}}、{{ui:surfaceTexture.bondEnglishCross}}、{{ui:surfaceTexture.bondFlemish}}）。{{ui:inspector.surfaceSpacingBricks}} 和 {{ui:inspector.surfaceBrickHeight}} 从接缝量到接缝，并略作取整，使整块砖正好排下：绕杯子一圈、盒子侧面从棱到棱、从底到顶；{{ui:inspector.surfaceBrickJoint}} 设定接缝宽度。在 {{ui:inspector.more}} 下，{{ui:inspector.surfaceBrickVary}} 让每块砖凹得深浅略有不同，像旧墙一样。
+
+{{ui:surfaceTexture.squares}} 和 {{ui:surfaceTexture.triangles}} 在实体上铺出大小相同的网格瓷砖，凸起或压入，侧壁陡直、切得干净；三角形排成行，尖角轮流朝上和朝下。{{ui:inspector.surfaceSpacingSquares}} 或 {{ui:inspector.surfaceSpacingTriangles}} 以及 {{ui:inspector.surfaceTileGap}} 严格保持你设定的值 – 3.2 mm 的正方形、间距 3.2 mm，各是 0.4 mm 喷嘴的八条线，打印得很干净。网格在每个面上居中；绕圆形实体时间距会略微取整，好让整数个正好绕一圈。打开 {{ui:inspector.surfaceTileFromBottom}} 后，第一排紧贴底边开始，一直延伸到第一层，由裙边（Brim）固定。若只想在两个侧面的下半部分铺瓷砖，请选中这两个面，并在上半部分放一个辅助实体，在 {{ui:inspector.surfaceMask}} 下选 {{ui:surfaceTexture.maskExclude}}（见下文）。在 {{ui:inspector.more}} 下，{{ui:inspector.surfaceProfile}} 选 {{ui:surfaceTexture.pointed}} 会做成金字塔，选 {{ui:surfaceTexture.round}} 或 {{ui:surfaceTexture.dome}} 则做成软垫。
 
 {{ui:surfaceTexture.cracks}} 图案让裂纹像金缮那样在表面蔓延，带有转折、分叉，宽度向末端逐渐变细。{{ui:inspector.surfaceCrackStart}} 决定裂纹从哪里开始：花瓶或杯子的上沿、底部、从盘子边缘向中心，或任意位置；在 {{ui:inspector.surfaceCrackStyle}} 下它们会变成闪电。选 {{ui:inspector.surfaceCrackGold}} 时，凹痕由一个单独的金色零件填满，可用第二种耗材打印；更改或移除纹理时它会一起变化。在 {{ui:inspector.more}} 下设置分叉、锯齿和崩边，换一个 {{ui:inspector.surfaceCrackSeed}} 就重新生成裂纹。
 

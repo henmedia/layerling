@@ -107,7 +107,7 @@ function hasExactSpring(shape: WorkplaneShape) {
 
 function hasExactHelicalGear(shape: WorkplaneShape) {
   try {
-    return cadModifierHelicalGearForShape(shape) !== null;
+    return cadModifierHelicalGearForShape(shape, { anySize: true }) !== null;
   } catch {
     return false;
   }
@@ -427,7 +427,7 @@ function buildSpringBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
 
 /** A helical gear as its exact body, built and placed as the CAD worker does. */
 function buildHelicalGearBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
-  const part = cadModifierHelicalGearForShape(shape);
+  const part = cadModifierHelicalGearForShape(shape, { anySize: true });
   return buildPlacedBody(brep, part, (kernel) => helicalGearPartSolid(kernel, part!));
 }
 

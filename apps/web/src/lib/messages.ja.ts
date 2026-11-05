@@ -3160,7 +3160,16 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "hirth.profileSaw": "のこぎり歯",
   "prop.hirthSteepFlank": "急な歯面",
   "prop.hirthReverse": "急な歯面を反対側に",
+  "prop.pulleyBeltWidth": "ベルト幅",
+  "prop.pulleyFlange": "フランジの厚さ",
+  "prop.pulleyFlangeRise": "フランジの高さ",
+  "prop.pulleyHubHeight": "ハブの高さ",
+  "prop.pulleyHubDiameter": "ハブの直径",
   "inspector.hirthSawHint": "緩い歯面は外周で面に対して{angle}°。前後に裏返したコピー（X軸まわりに180°）が{step}°ごとにかみ合います。",
+  "inspector.pulleyHint": "外径 {outside} mm、ピッチ円 {pitch} mm：1歯あたりベルト2 mm。",
+  "inspector.pulleyBeltHint": "フランジ間の歯の部分：6 mmベルトなら約7 mm、10 mmベルトなら11 mm。",
+  "inspector.pulleyFlangeHint": "ベルトが外れないようにする両側の縁。0でなし。",
+  "inspector.pulleyHubHint": "止めねじ用の上部ハブ：穴の円柱を通してください。0でなし。",
 
   "workspace.unlimited": "無制限",
   "workspace.historyNote": "初期値は{count}操作です。上限を下げると、このデザインの古い「元に戻す」の状態が完全に取り消されます。",
@@ -3509,4 +3518,5 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "notice.movedToRoot": "{name}をいちばん上に移しました。",
   "notice.importing": "{total}件中{index}件目を読み込み中：{name}",
   "notice.importProjectFailed": "読み込んだファイルからデザインを作れませんでした",
+  "shape.pulley": "GT2プーリー",
 };

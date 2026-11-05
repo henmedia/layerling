@@ -37,6 +37,7 @@ import { springBuildPlan, springRingSectionShare } from "@/lib/springGeometry";
 import { flatSpringProfileLoops } from "@/lib/flatSpringGeometry";
 import { gridfinityHasPieces, gridfinityPlan } from "@/lib/gridfinityGeometry";
 import { knurlCorners, knurlSettings, roundKnurlWave } from "@/lib/knurlGeometry";
+import { pulleyArcPoint, pulleyMeasures, pulleyToothArcs } from "@/lib/pulleyGeometry";
 import { BEVEL_GEAR_TOP_SCALE, bevelGearIsSpiral, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearType, rackMeasures, rackOutlinePoints, rackToothArcs, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
 
 /*
@@ -51,7 +52,7 @@ type Point = { x: number; z: number };
 type Arc = { cx: number; cz: number; rx: number; rz: number; start: number; end: number };
 type Corner = { start: Point; end: Point; arc?: Arc };
 
-export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "curvedCone", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
+export const CAD_PROFILE_SHAPE_KINDS = new Set<WorkplaneShape["kind"]>(["polygon", "star", "heart", "crescent", "slot", "honeycomb", "gear", "pulley", "knurl", "dovetail", "teardrop", "port", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "ellipse", "cylinder", "tube", "ring", "halfSphere", "paraboloid", "curvedCone", "sphere", "cone", "pyramid", "wedge", "roundRoof", "roundedBox", "text", "bentTube", "loft", "spring"]);
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = to - from;
@@ -1578,6 +1579,7 @@ export function cadModifierProfileForShape(shape: WorkplaneShape, options: { des
     if (shape.kind === "gear" && normalizeGearType(shape.gearType) === "bevel") return bevelGearIsSpiral(shape.bevelHelixAngle) ? null : bevelGearProfile(shape, width, depth);
     if (shape.kind === "loft") return loftShapeProfile(shape);
     if (shape.kind === "pyramid") return pyramidProfile(shape, width, depth);
+    if (shape.kind === "pulley") return pulleyProfile(shape);
     const profile = cadProfileForShapeKind(shape, options.designedRound);
     if (!profile) return null;
     const part: CadModifierProfilePart = {
@@ -1822,12 +1824,15 @@ function turningReach(radius: number, angle: number, twist: number) {
  */
 /**
  * Every corner of a helical ring becomes a twisted face of its own, so an involute ring -
- * about fifteen corners a tooth - is built exactly only up to this many; a bigger one stays
- * the display mesh.
+ * about fifteen corners a tooth - is built exactly for the edge tool only up to this many,
+ * so its preview stays inside the timeout; a bigger one stays the display mesh there.
+ * The STEP export takes any size (`anySize`, #1321): it runs in the geometry worker, and
+ * measured with the kernel in Node a herringbone gear of 96 involute teeth builds in 3.7 s
+ * and writes in 0.9 s, one of 500 teeth (the most a gear can have) in 36 s and 11 s.
  */
 const HELICAL_GEAR_CORNER_LIMIT = 480;
 
-export function cadModifierHelicalGearForShape(shape: WorkplaneShape): CadModifierHelicalGearPart | null {
+export function cadModifierHelicalGearForShape(shape: WorkplaneShape, options: { anySize?: boolean } = {}): CadModifierHelicalGearPart | null {
   if (shape.kind !== "gear" || !gearTypeHasHelix(shape.gearType)) return null;
   if (shape.importedMesh || shape.groupedShapes?.length || shape.cadBrep || shape.imagePlate || shapeHasShapeDeform(shape)) return null;
   const width = shapeWidth(shape);
@@ -1838,7 +1843,7 @@ export function cadModifierHelicalGearForShape(shape: WorkplaneShape): CadModifi
   const corners = gearOutlineCorners(width, depth, shape).map((corner) => ({ angle: corner.angle, radius: corner.radiusX }));
   // Involute teeth keep their tip circle on width x depth instead of what the turn spans (#201).
   const involute = involuteOutlineStretch(width, depth, shape);
-  if (involute && corners.length > HELICAL_GEAR_CORNER_LIMIT) return null;
+  if (involute && !options.anySize && corners.length > HELICAL_GEAR_CORNER_LIMIT) return null;
   const herringbone = normalizeGearType(shape.gearType) === "herringbone";
   const turn = herringbone ? twist / 2 : twist;
   let minX = Infinity;
@@ -1863,6 +1868,31 @@ export function cadModifierHelicalGearForShape(shape: WorkplaneShape): CadModifi
     if (!(boreRadius < outlineClearance(ring) * Math.min(stretch.x, stretch.z) * 0.999)) return null;
   }
   return { corners, twist, ...(herringbone ? { herringbone } : {}), height: shape.height, stretch, boreRadius, transform: profileTransformForShape(shape) };
+}
+
+/**
+ * A GT2 pulley (Discussion #1319) as the kernel builds it: the toothed band's true arcs
+ * (pulleyToothArcs, which the display mesh samples) pushed up between the flanges, the
+ * flanges and the hub as discs, the bore through all of it.
+ */
+function pulleyProfile(shape: WorkplaneShape): CadModifierProfilePart {
+  const measures = pulleyMeasures(shape);
+  const { flange, beltWidth, hubHeight, flangeRadius, hubRadius, boreRadius, height } = measures;
+  const arcs = pulleyToothArcs(measures);
+  const segments = arcs.map((arc) => arcSegment({ cx: arc.cx, cz: arc.cz, rx: arc.radius, rz: arc.radius, start: arc.start, end: arc.end }));
+  const loop: CadModifierProfileLoop = { ...pulleyArcPoint(arcs[0], arcs[0].start), segments };
+  const discs: Array<{ bottom: number; top: number; radius: number }> = [];
+  if (flange > 0) discs.push({ bottom: 0, top: flange, radius: flangeRadius }, { bottom: flange + beltWidth, top: 2 * flange + beltWidth, radius: flangeRadius });
+  if (hubHeight > 0) discs.push({ bottom: 2 * flange + beltWidth, top: height, radius: hubRadius });
+  const part: CadModifierProfilePart = {
+    kind: "extrusion",
+    loops: [loop],
+    height,
+    transform: profileTransformForShape(shape),
+    pulley: { teethBottom: flange, teethTop: flange + beltWidth, discs, boreRadius },
+  };
+  validateCadProfile(part);
+  return part;
 }
 
 /** A Hirth joint (#1016) as the exact body its display mesh draws, or null for one that has to stay its mesh. */

@@ -32,7 +32,9 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function session(language, port) {
   const profile = mkdtempSync(join(tmpdir(), "edge-guide-"));
   const edge = spawn(EDGE, [
-    "--headless=new", "--disable-gpu", "--disable-extensions", "--no-first-run", `--lang=${language === "de" ? "de-DE" : "en-US"}`,
+    // A fresh profile otherwise downloads about 500 MB of Edge components on every start.
+    "--headless=new", "--disable-gpu", "--disable-extensions", "--no-first-run",
+    "--disable-component-update", "--disable-background-networking", `--lang=${language === "de" ? "de-DE" : "en-US"}`,
     `--window-size=${WIDTH},${HEIGHT}`, `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "about:blank",
   ], { stdio: "ignore" });
   for (let i = 0; i < 60; i += 1) {

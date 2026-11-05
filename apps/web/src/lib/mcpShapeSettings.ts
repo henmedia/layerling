@@ -28,7 +28,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "screwBossFastener", "screwBossSize", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussets", "screwBossGussetHeight", "screwBossGussetThickness", "snapFitPart", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitLeadAngle", "snapFitRetainAngle", "snapFitFoot", "ribStyle", "ribTop", "ribFoot", "ribThickness", "ribFootThickness",
   "taperTopWidth", "taperTopDepth", "taperBottomWidth", "taperBottomDepth",
   "extrudeTwist", "extrudeTopOffsetX", "extrudeTopOffsetZ", "slopeEnd", "slopeSide", "slopeCurve", "narrowEnd", "narrowSide", "narrowCurve", "narrowStart",
-  "teeth", "toothSize", "toothWidth", "centerHoleSize", "hirthSteepFlank", "hirthReverse", "gearType", "helixAngle", "bevelHelixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
+  "teeth", "toothSize", "toothWidth", "centerHoleSize", "hirthSteepFlank", "hirthReverse", "pulleyBeltWidth", "pulleyFlange", "pulleyFlangeRise", "pulleyHubHeight", "pulleyHubDiameter", "gearType", "helixAngle", "bevelHelixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
   "threadRole", "threadHead", "threadHand", "threadProfile", "threadTaper", "threadDiameter", "threadPitch",
   "threadClearance", "threadBoltClearance", "threadAxialClearance", "threadDepth", "threadFlankAngle", "threadQuality", "threadHeadHeight", "threadChamfer", "threadChamferBottom",
   "threadHeadChamfer", "threadHeadDiameter", "threadDrive", "threadDriveSize", "threadDriveDepth", "threadCollarHeight", "threadCollarDiameter",

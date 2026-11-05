@@ -100,6 +100,60 @@ describe("a flush hinge, in the back wall (real Manifold kernel)", () => {
   });
 });
 
+describe("a flush hinge on a box with rounded corners (real Manifold kernel)", () => {
+  it("cuts plate and wall round the axis right up to the end knuckles: no sliver left standing at either end", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      // As openBox, its upright edges rounded by 6 mm outside (4 mm inside): the back runs straight from x -24 to 24.
+      const rounded = (width: number, depth: number, radius: number) => kernel.CrossSection.square([width - 2 * radius, depth - 2 * radius], true).offset(radius, "Round", 2, 64);
+      const outline = rounded(60, 40, 6);
+      const hollow = rounded(56, 36, 4);
+      const outer = outline.extrude(30).rotate([-90, 0, 0]);
+      const inner = hollow.extrude(30).rotate([-90, 0, 0]).translate([0, 2, 0]);
+      const body = outer.subtract(inner);
+      created.push(outline, hollow, outer, inner, body);
+      const result = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeStyle: "flush" }));
+      if ("error" in result) throw new Error(JSON.stringify(result.error));
+      const { knuckles, cuts, count } = result.hinge!;
+      created.push(result.lid, knuckles, cuts!);
+      expect(count).toBe(5);
+      const whole = body.add(knuckles).subtract(cuts!);
+      const turned = result.lid.rotate([180, 0, 0]);
+      created.push(whole, turned);
+      const lidBox = turned.boundingBox();
+      const closed = turned.translate([-30 - lidBox.min[0], 32 - lidBox.max[1], 20 - lidBox.max[2]]);
+      created.push(closed);
+      expect(whole.decompose().length).toBe(1);
+      expect(closed.decompose().length).toBe(1);
+      const axisY = 32 - RADIUS;
+      const axisZ = -20 + RADIUS;
+      // Round the axis beside each end knuckle (the body's, where the knuckles start and end), out into the corner:
+      // nothing of the lid, and nothing of the box. (A sliver of the plate 0.01 mm thin stood here, and a fin of the wall
+      // as thick as the gap.)
+      const ends = knuckles.boundingBox();
+      expect(ends.min[0]).toBeGreaterThan(-26);
+      expect(ends.max[0]).toBeLessThan(26);
+      const room = RADIUS + 0.3 - 0.05;
+      for (const [from, to] of [[ends.min[0] - 2, ends.min[0] - 0.02], [ends.max[0] + 0.02, ends.max[0] + 2]]) {
+        const zone = kernel.Manifold.cylinder(to - from, room, room, 48).rotate([0, 90, 0]).translate([from, axisY, axisZ]);
+        const inLid = closed.intersect(zone);
+        const inBox = whole.intersect(zone);
+        created.push(zone, inLid, inBox);
+        expect(inLid.volume()).toBeLessThan(1e-4);
+        expect(inBox.volume()).toBeLessThan(1e-4);
+      }
+      // And it still closes without overlap and opens well past upright.
+      const overlap = closed.intersect(whole);
+      created.push(overlap);
+      expect(overlap.volume()).toBeLessThan(0.01);
+      expect(widestOpening(closed, whole, axisY, axisZ, created)).toBeGreaterThanOrEqual(110);
+    } finally {
+      dispose(created);
+    }
+  });
+});
+
 describe("a pivot lid, on two pins through the side walls (real Manifold kernel)", () => {
   it("lies in the opening on a ledge, takes a pin through each side wall into its bar and opens to upright", async () => {
     const kernel = await runtime();

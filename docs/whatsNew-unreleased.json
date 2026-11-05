@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "GT2-Riemenscheiben",
+      "en": "GT2 pulleys"
+    },
+    "body": {
+      "de": "Neu bei den Formen unter Mechanik: eine Riemenscheibe für GT2-Zahnriemen mit der echten GT2-Zahnform. Zähnezahl frei von 10 bis 200, dazu Riemenbreite, Bordscheiben, Nabe und Bohrung.",
+      "en": "New among the shapes under Mechanics: a pulley for GT2 timing belts with the true GT2 tooth shape. Any number of teeth from 10 to 200, with belt width, flanges, hub and bore."
+    }
+  },
+  {
+    "title": {
       "de": "Hirth-Verzahnung mit Sägezähnen",
       "en": "Hirth joint with saw teeth"
     },

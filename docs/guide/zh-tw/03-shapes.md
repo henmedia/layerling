@@ -26,7 +26,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 - **{{ui:library.section.holes}}：** 用於螺絲頭的 {{ui:shape.counterbore}} 與 {{ui:shape.countersink}}、用於水平孔的 {{ui:shape.teardrop}}，以及用於 USB、HDMI、DisplayPort 與 RJ45 插座的 {{ui:shape.port}}。
 - **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺桿、螺絲、螺帽與螺紋孔）、沉頭螺絲下的 {{ui:shape.finishingWasher}}、可一體列印的 {{ui:shape.hinge}} 與 {{ui:shape.dovetail}}。更多內容見[螺紋與機械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.enclosure}}：** 用於熱熔螺母與自攻螺絲的 {{ui:shape.screwBoss}}、附卡座的 {{ui:shape.snapFit}}，以及 {{ui:shape.rib}} 或角撐板。更多內容見[螺紋與機械件](chapter:threads-and-mechanics)。
-- **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}} 與 {{ui:shape.hirth}}。
+- **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}}、{{ui:shape.hirth}} 與 {{ui:shape.pulley}}。
 - **{{ui:library.section.systems}}：** {{ui:shape.gridfinity}} 收納盒與底板，以及 {{ui:shape.sbcBoard}}，一塊依實際尺寸製作的單板電腦，用來圍繞它設計外殼。
 - **{{ui:library.section.lettering}}：** {{ui:shape.text}}，也可沿圓弧排列，以及 {{ui:shape.nameTag}}、{{ui:shape.iconTag}} 與 {{ui:shape.qrCode}}。更多內容見[文字](chapter:text)。
 - **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用於握持的 {{ui:shape.knurl}}。
@@ -186,6 +186,8 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 {{ui:surfaceTexture.carbon}} 在實體上鋪斜紋編織的碳纖維：直向帶和橫向帶互相上下穿插，每條帶錯開一條帶的位置，於是出現熟悉的斜紋。{{ui:inspector.surfaceCarbonWeave}} 可選 {{ui:surfaceTexture.carbonTwill22}}（大多數碳纖維件的均勻編織），或 {{ui:surfaceTexture.carbonTwill21}} 和 {{ui:surfaceTexture.carbonTwill31}}，後兩者直向帶顯得長、橫向帶顯得短。{{ui:inspector.surfaceSpacingCarbon}} 設定直向帶的寬度；{{ui:inspector.surfaceCarbonCross}} 讓橫向帶更寬或更窄，得到不均勻的編織（0：一樣寬）。繞實體一圈時，帶寬會略作取整，使編織無接縫地閉合。單根纖維對列印來說太細了：看得見的是帶和它們的交叉。
 
 {{ui:surfaceTexture.bricks}} 在實體上鋪一面磚牆，接縫像砂漿一樣凹下。{{ui:inspector.surfaceBrickBond}} 選擇磚的砌法：大多數牆用的 {{ui:surfaceTexture.bondRunning}}、{{ui:surfaceTexture.bondStack}}，或在長磚之間夾短磚（{{ui:surfaceTexture.bondEnglish}}、{{ui:surfaceTexture.bondEnglishCross}}、{{ui:surfaceTexture.bondFlemish}}）。{{ui:inspector.surfaceSpacingBricks}} 和 {{ui:inspector.surfaceBrickHeight}} 從接縫量到接縫，並略作取整，使整塊磚正好排下：繞杯子一圈、盒子側面從稜到稜、從底到頂；{{ui:inspector.surfaceBrickJoint}} 設定接縫寬度。在 {{ui:inspector.more}} 下，{{ui:inspector.surfaceBrickVary}} 讓每塊磚凹得深淺略有不同，像舊牆一樣。
+
+{{ui:surfaceTexture.squares}} 和 {{ui:surfaceTexture.triangles}} 在實體上鋪出大小相同的網格磁磚，凸起或壓入，側壁陡直、切得乾淨；三角形排成列，尖角輪流朝上和朝下。{{ui:inspector.surfaceSpacingSquares}} 或 {{ui:inspector.surfaceSpacingTriangles}} 以及 {{ui:inspector.surfaceTileGap}} 嚴格保持你設定的值 – 3.2 mm 的正方形、間距 3.2 mm，各是 0.4 mm 噴嘴的八條線，列印得很乾淨。網格在每個面上置中；繞圓形實體時間距會略微取整，好讓整數個剛好繞一圈。開啟 {{ui:inspector.surfaceTileFromBottom}} 後，第一排緊貼底邊開始，一直延伸到第一層，由裙邊（Brim）固定。若只想在兩個側面的下半部分鋪磁磚，請選取這兩個面，並在上半部分放一個輔助實體，在 {{ui:inspector.surfaceMask}} 下選 {{ui:surfaceTexture.maskExclude}}（見下文）。在 {{ui:inspector.more}} 下，{{ui:inspector.surfaceProfile}} 選 {{ui:surfaceTexture.pointed}} 會做成金字塔，選 {{ui:surfaceTexture.round}} 或 {{ui:surfaceTexture.dome}} 則做成軟墊。
 
 {{ui:surfaceTexture.cracks}} 圖案讓裂紋像金繕那樣在表面蔓延，帶有轉折、分岔，寬度往末端逐漸變細。{{ui:inspector.surfaceCrackStart}} 決定裂紋從哪裡開始：花瓶或杯子的上緣、底部、從盤子邊緣往中心，或任意位置；在 {{ui:inspector.surfaceCrackStyle}} 下它們會變成閃電。選 {{ui:inspector.surfaceCrackGold}} 時，凹痕由一個獨立的金色零件填滿，可用第二種線材列印；更改或移除紋理時它會一起變化。在 {{ui:inspector.more}} 下設定分岔、鋸齒和崩邊，換一個 {{ui:inspector.surfaceCrackSeed}} 就重新產生裂紋。
 

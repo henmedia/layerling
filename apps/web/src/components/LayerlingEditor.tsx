@@ -13131,7 +13131,7 @@ export function LayerlingEditor({
         Object.keys(SURFACE_TEXTURE_LIMITS).forEach((key) => {
           if (params[key] !== undefined && !Number.isFinite(mcpNumber(params[key], Number.NaN))) throw new Error(`${key} must be a number`);
         });
-        ["keepEdges", "outside", "inside", "crackGold", "imageInvert"].forEach((key) => {
+        ["keepEdges", "outside", "inside", "crackGold", "imageInvert", "tileFromBottom"].forEach((key) => {
           if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
         });
         if (params.imageOwn !== undefined && !normalizeSurfaceTextureOwnImage(params.imageOwn)) {
@@ -13214,7 +13214,7 @@ export function LayerlingEditor({
           [textured.id],
           t("status.surfaceTextured", { pattern: [settings.pattern, ...layerSettings.map((layer) => layer.pattern)].map(surfacePatternLabel).join(" + "), triangles: formatTriangleCount(outcome.stats.triangles) }),
         );
-        const { triangles, around, spacing, limited, tooDeep, bedClamped, cracks, text, bricks, projection } = outcome.stats;
+        const { triangles, around, spacing, limited, tooDeep, bedClamped, cracks, text, bricks, tiles, projection } = outcome.stats;
         // One's own image is told by its size, not its grey values.
         const { masks: _planes, textOutline: _outline, imageOwn, ...rest } = settings;
         const shown = { ...rest, imageOwn: imageOwn ? { width: imageOwn.width, height: imageOwn.height } : null };
@@ -13225,7 +13225,7 @@ export function LayerlingEditor({
           settings: shown,
           layers: layerSettings.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length })),
           masks: masks.length,
-          texture: { triangles, projection, around, spacing, limited, tooDeep, bedClamped, ...(cracks ? { cracks } : {}), ...(text ? { text } : {}), ...(bricks ? { bricks } : {}) },
+          texture: { triangles, projection, around, spacing, limited, tooDeep, bedClamped, ...(cracks ? { cracks } : {}), ...(text ? { text } : {}), ...(bricks ? { bricks } : {}), ...(tiles ? { tiles } : {}) },
         };
       }
 

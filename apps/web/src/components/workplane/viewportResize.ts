@@ -5,6 +5,7 @@ import { type ShapeInspectorUpdateOptions } from "@/components/workplane/ShapeIn
 import { cadModifierPrimitiveForBakedShape, cadTransformFromMatrix, cadTransformToMatrix } from "@/lib/cadBakeMetadata";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { gridfinityFootprintPatch } from "@/lib/gridfinityGeometry";
+import { pulleyFootprint, pulleyFromSize, pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { type SelectionFrame } from "@/lib/liftGeometry";
 import { scaledHorizontalShapePatch } from "@/lib/scaleByPercent";
 import { POSITION_TYPED_LIMIT } from "@/lib/workplaneSettings";
@@ -271,6 +272,19 @@ export function resizeShapeFromFrameHandle(
   step: number,
   maxSize: number,
 ): Partial<WorkplaneShape> {
+  // A GT2 pulley (Discussion #1319) takes the size as teeth and belt width.
+  return pulleySizedPatch(transform.startShape, resizeShapeFromFrameHandleBox(transform, point, handleKey, shiftKey, altKey, step, maxSize));
+}
+
+function resizeShapeFromFrameHandleBox(
+  transform: TransformDragState,
+  point: THREE.Vector3,
+  handleKey: string,
+  shiftKey: boolean,
+  altKey: boolean,
+  step: number,
+  maxSize: number,
+): Partial<WorkplaneShape> {
   const shape = transform.startShape;
   const frame = transform.selectionFrame;
   const width = frame.width;
@@ -299,10 +313,15 @@ export function resizeShapeFromFrameHandle(
   // drives the one shared diameter instead of stretching width and depth
   // independently into an ellipse.
   // A Hirth joint too: stretched, its teeth no longer interlock all round (#1016).
-  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "finishingWasher") && (signs.x || signs.z)) {
+  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "pulley" || shape.kind === "finishingWasher") && (signs.x || signs.z)) {
     const diameter = signs.x && signs.z ? (nextWidth + nextDepth) / 2 : signs.x ? nextWidth : nextDepth;
     nextWidth = diameter;
     nextDepth = diameter;
+  }
+  // A GT2 pulley is whole teeth: its width is rounded to them before the middle is placed.
+  if (shape.kind === "pulley" && (signs.x || signs.z)) {
+    nextWidth = pulleyFootprint({ ...shape, ...pulleyFromSize(shape, { width: nextWidth }) }).width;
+    nextDepth = nextWidth;
   }
 
   // Shift on a corner keeps every proportion, height included.
@@ -484,6 +503,20 @@ export function resizeImportedShapeAlongFrameNormal(
 }
 
 export function resizeShapeAlongFrameNormal(
+  shape: WorkplaneShape,
+  frame: SelectionFrame,
+  nextFrameHeight: number,
+  resizingFromBottom: boolean,
+): Partial<WorkplaneShape> {
+  // A GT2 pulley (Discussion #1319) standing up takes its height as the belt width, rounded to what it allows.
+  if (shape.kind === "pulley" && !shape.rotationX && !shape.rotationZ) {
+    const height = pulleyFootprint({ ...shape, ...pulleyFromSize(shape, { height: Math.abs(nextFrameHeight) }) }).height;
+    return pulleySizedPatch(shape, resizeShapeAlongFrameNormalBox(shape, frame, Math.sign(nextFrameHeight || 1) * height, resizingFromBottom));
+  }
+  return pulleySizedPatch(shape, resizeShapeAlongFrameNormalBox(shape, frame, nextFrameHeight, resizingFromBottom));
+}
+
+function resizeShapeAlongFrameNormalBox(
   shape: WorkplaneShape,
   frame: SelectionFrame,
   nextFrameHeight: number,

@@ -6,6 +6,7 @@ import { isThreadProfile } from "@/lib/threadProfiles";
 import { normalizeHexColor } from "@/lib/coloredImport";
 import { normalizePlateNames } from "@/lib/buildPlateNames";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO } from "@/lib/torusShape";
+import { MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_PULLEY_HUB_HEIGHT, MAX_PULLEY_TEETH, MIN_PULLEY_BELT_WIDTH, MIN_PULLEY_FLANGE_RISE, MIN_PULLEY_TEETH } from "@/lib/pulleyGeometry";
 import { MAX_HIRTH_STEEP_FLANK, MAX_HIRTH_TEETH, MIN_HIRTH_STEEP_FLANK, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT } from "@/lib/hirthGeometry";
 import { PORT_PROFILES } from "@/lib/portGeometry";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
@@ -295,7 +296,7 @@ export function snapGridForUnits(units: string, snap: GridSize): GridSize {
 }
 const customizableShapeKinds: ShapeKind[] = [
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ];
 
 function numberOrDefault(value: unknown, fallback: number) {
@@ -670,6 +671,14 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
         ? 0
         : optionalShapeNumber(source.hirthSteepFlank, fallbackEntry?.hirthSteepFlank, MIN_HIRTH_STEEP_FLANK, MAX_HIRTH_STEEP_FLANK);
       entry.hirthReverse = typeof source.hirthReverse === "boolean" ? source.hirthReverse || undefined : fallbackEntry?.hirthReverse;
+    }    if (kind === "pulley") {
+      entry.teeth = optionalShapeNumber(source.teeth, fallbackEntry?.teeth, MIN_PULLEY_TEETH, MAX_PULLEY_TEETH, true);
+      entry.centerHoleSize = optionalShapeNumber(source.centerHoleSize, fallbackEntry?.centerHoleSize, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.pulleyBeltWidth = optionalShapeNumber(source.pulleyBeltWidth, fallbackEntry?.pulleyBeltWidth, MIN_PULLEY_BELT_WIDTH, MAX_PULLEY_BELT_WIDTH);
+      entry.pulleyFlange = optionalShapeNumber(source.pulleyFlange, fallbackEntry?.pulleyFlange, 0, MAX_PULLEY_FLANGE);
+      entry.pulleyFlangeRise = optionalShapeNumber(source.pulleyFlangeRise, fallbackEntry?.pulleyFlangeRise, MIN_PULLEY_FLANGE_RISE, MAX_PULLEY_FLANGE_RISE);
+      entry.pulleyHubHeight = optionalShapeNumber(source.pulleyHubHeight, fallbackEntry?.pulleyHubHeight, 0, MAX_PULLEY_HUB_HEIGHT);
+      entry.pulleyHubDiameter = optionalShapeNumber(source.pulleyHubDiameter, fallbackEntry?.pulleyHubDiameter, MIN_CUSTOM_SHAPE_DIMENSION, MAX_CUSTOM_SHAPE_DIMENSION);
     }
     const compact = Object.fromEntries(Object.entries(entry).filter(([, entryValue]) => entryValue !== undefined)) as ShapeCustomization;
     if (Object.keys(compact).length > 0) normalized[kind] = compact;
