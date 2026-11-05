@@ -3615,6 +3615,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "Listens længde (%)",
   "gridfinity.compartmentLabelLengthHint": "Ved 100 går listen langs hele siden.",
   "gridfinity.compartmentLabelTooShortHint": "Denne liste er kortere end 4 mm og udelades.",
+  "gridfinity.labelTextTooSmallHint": "På denne liste ville de store bogstaver blive under 3 mm høje, så teksten udelades. Brug en kortere tekst eller en bredere eller længere liste.",
   "gridfinity.compartmentLabelOpenHint": "Denne side af bakken er åben og har ingen væg til listen, så listen udelades.",
   "gridfinity.compartmentLabelSwitchedHint": "Denne side af bakken er slået åben, så listen udelades.",
   "gridfinity.alignLeft": "Venstre",

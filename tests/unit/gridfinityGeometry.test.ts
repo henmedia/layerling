@@ -115,6 +115,8 @@ import {
   normalizeGridfinityDividerPositions,
   normalizeGridfinityType,
 } from "@/lib/gridfinityGeometry";
+import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
+import { loadTextFonts } from "@/lib/textFonts";
 
 type V = [number, number, number];
 
@@ -4282,5 +4284,29 @@ describe("gridfinity swallowtail", () => {
     expect(at(0.3, 3.2)).toEqual([-42, -41.3, -35, 35, 41.3, 42]);
     expect(at(1, 4.9)).toEqual([-42, -35.35, -35, 35, 35.35, 42]);
     expect(at(0.3, 4.9)).toEqual([-42, 42]);
+  });
+});
+
+describe("gridfinity label shelf text", { timeout: 60_000 }, () => {
+  let runtime: ManifoldToplevel;
+
+  beforeAll(async () => {
+    await loadTextFonts();
+    runtime = await manifoldModule();
+    runtime.setup();
+  });
+
+  it("joins the letters on the shelves into the bin as one closed body (#1308)", () => {
+    // Letters that stood on the shelf without touching it would be pieces of their own.
+    for (const fields of [
+      { gridfinityLabelBack: true, gridfinityLabelLeft: true, gridfinityLabelBackText: "Lij 08", gridfinityLabelLeftText: "Nuts" },
+      { gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "M3" }, { column: 1, row: 0, side: "right", text: "i:j" }] },
+    ]) {
+      const shape = bin(fields);
+      const triangles = gridfinityLabelledTriangles(runtime, shape, gridfinityLabelLetters(shape));
+      expect(edgeProblems(triangles), JSON.stringify(fields)).toBe(0);
+      expect(components(triangles), JSON.stringify(fields)).toBe(1);
+      expect(signedVolume(triangles), JSON.stringify(fields)).toBeGreaterThan(signedVolume(gridfinityLabelledTriangles(runtime, shape)));
+    }
   });
 });

@@ -3207,6 +3207,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.gridfinityCompartmentLabelLength": "Délka poličky (%)",
   "gridfinity.compartmentLabelLengthHint": "Při 100 vede polička po celé délce strany.",
   "gridfinity.compartmentLabelTooShortHint": "Tato polička je kratší než 4 mm a vynechá se.",
+  "gridfinity.labelTextTooSmallHint": "Na této poličce by velká písmena byla nižší než 3 mm, a proto se text vynechá. Zkraťte text, nebo poličku rozšiřte či prodlužte.",
   "gridfinity.compartmentLabelOpenHint": "Tato strana krabičky je otevřená a nemá stěnu pro poličku, proto se polička vynechá.",
   "gridfinity.compartmentLabelSwitchedHint": "Tato strana krabičky je přepnutá na otevřenou, proto se polička vynechá.",
   "gridfinity.alignLeft": "Vlevo",

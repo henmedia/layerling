@@ -402,6 +402,11 @@ export type CadModifierGridfinityPart = {
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   gridfinityOpeningCornerSize?: number;
   gridfinityOutline?: GridfinityOutlinePoint[];
+  /**
+   * The letters on its shelves (#1308), made on the page from the fonts: for each shelf its top, and each glyph as its
+   * outline and holes with the font's own curves, in the shape's x and z.
+   */
+  gridfinityLetters?: Array<{ top: number; glyphs: CadModifierProfileLoop[][] }>;
   transform?: number[];
   expected?: { bounds: number[]; volume: number };
 };
