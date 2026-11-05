@@ -63,6 +63,7 @@ describe("the GT2 pulley's exact body (Discussion #1319)", () => {
     ["bare toothed band", { pulleyFlange: 0, pulleyHubHeight: 0, centerHoleSize: 0 }],
     ["pulley of 10 teeth", { teeth: 10, centerHoleSize: 3 }],
     ["pulley of 60 teeth", { teeth: 60, centerHoleSize: 8, pulleyHubDiameter: 22 }],
+    ["pulley of 200 teeth", { teeth: 200, centerHoleSize: 8, pulleyHubDiameter: 30 }],
     ["pulley with a hub as wide as the flanges", { pulleyHubDiameter: 100 }],
     ["pulley turned, tipped and lifted", { rotation: 30, rotationX: 90, rotationZ: 15, elevation: 4, x: 12, z: -5 }],
     ["mirrored pulley", { mirrorX: true }],
