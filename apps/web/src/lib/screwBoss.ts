@@ -334,5 +334,9 @@ export function screwBossCavityMesh(shape: ScrewBossFields, sides = 48) {
 }
 
 export function createScrewBossGeometry(shape: ScrewBossFields, sides = 48): THREE.BufferGeometry {
-  return (shape.hole ? screwBossCavityMesh(shape, sides) : screwBossMesh(shape, sides)).mesh.geometry(35);
+  const geometry = (shape.hole ? screwBossCavityMesh(shape, sides) : screwBossMesh(shape, sides)).mesh.geometry(35);
+  // As a hole the boss is its pocket alone, which opens at the boss's top and need not reach its floor. It keeps its
+  // height in the box: set down on the floor like every other shape, it opened at the bottom of the part instead.
+  if (shape.hole) geometry.userData.keepsItsHeight = true;
+  return geometry;
 }

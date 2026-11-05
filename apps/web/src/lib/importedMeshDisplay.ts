@@ -13,6 +13,8 @@ export function putGeometryOnBase(geometry: THREE.BufferGeometry, preserveNormal
     geometry.computeVertexNormals();
   }
   geometry.computeBoundingBox();
+  // A screw boss grouped as a hole stands where it is drawn in its box (see createScrewBossGeometry).
+  if (geometry.userData.keepsItsHeight) return geometry;
   const minY = geometry.boundingBox?.min.y ?? 0;
   geometry.translate(0, -minY, 0);
   return geometry;
