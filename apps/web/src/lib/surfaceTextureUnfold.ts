@@ -7,6 +7,8 @@ type Vec3 = number[];
 type Mesh = { vertices: ArrayLike<number>; indices: ArrayLike<number> };
 
 const AXIS_INDEX = { x: 0, y: 1, z: 2 };
+/** A fold is a crease when it turns by more than 2 degrees (see unfoldSurface): less is one face, as the facets of a fine rounding are. */
+const CREASE_COS = Math.cos((2 * Math.PI) / 180);
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -135,6 +137,8 @@ export type UnfoldOptions = {
   face?: number;
   /** Only within this window round the anchor (half width and height in mm, turned by `turn` degrees). */
   window?: { halfW: number; halfH: number; turn?: number } | null;
+  /** Over creases (see unfoldSurface); without, straight on over every edge. */
+  fold?: boolean;
 };
 
 /**
@@ -148,16 +152,21 @@ export type UnfoldOptions = {
  * smooths the seams on doubly curved surfaces). Developable surfaces (flat, a cylinder, a cone, a box over its
  * edge) keep their lengths this way; a sphere is slightly distorted, as any sticker on it is. `torn`: points
  * where two ways round a corner met and do not agree.
+ *
+ * With `fold`, where the label bends over an edge across the axis (onto a top, a bottom, a chamfer or a rounding),
+ * that edge is a crease: nothing laid beyond it comes back in front of it, as a label cannot fold back. What is
+ * reached without a crease is laid first; the way over the creases follows from there. `creased`: a crease was met
+ * inside the area, so without `fold` it may come out differently.
  */
-export function unfoldSurface(mesh: Mesh, anchor: Vec3, { up = null, axis = "z", reach = Infinity, face = -1, window = null }: UnfoldOptions = {}) {
+export function unfoldSurface(mesh: Mesh, anchor: Vec3, { up = null, axis = "z", reach = Infinity, face = -1, window = null, fold = false }: UnfoldOptions = {}) {
   const v = mesh.vertices, I = mesh.indices;
   const n = v.length / 3, T = I.length / 3;
   const U = new Float64Array(n).fill(NaN), V = new Float64Array(n).fill(NaN);
   const hit = face >= 0 && face < T ? { face, point: closestOnTriangle(anchor, v, I[face * 3], I[face * 3 + 1], I[face * 3 + 2]) } : nearestSurfacePoint(mesh, anchor);
-  if (!hit) return { U, V, reached: 0, torn: 0, face: -1, point: anchor, normal: [0, 0, 1], up: [0, 1, 0], right: [1, 0, 0] };
+  if (!hit) return { U, V, reached: 0, torn: 0, face: -1, point: anchor, normal: [0, 0, 1], up: [0, 1, 0], right: [1, 0, 0], creased: false };
   // Only the triangles reached get a place (slot) in the lists - the mesh can be large.
   const slot = new Int32Array(T).fill(-1);
-  const FN: number[] = [], fnOk: number[] = [], M: number[] = [], t2: number[] = [], CN: number[] = [], PM: number[] = [], PT: number[] = [], PN: number[] = [], prio: number[] = [], done: number[] = [];
+  const FN: number[] = [], fnOk: number[] = [], crease: number[] = [], M: number[] = [], t2: number[] = [], CN: number[] = [], PM: number[] = [], PT: number[] = [], PN: number[] = [], prio: number[] = [], done: number[] = [];
   const slotOf = (f: number) => {
     let k = slot[f];
     if (k >= 0) return k;
@@ -166,6 +175,7 @@ export function unfoldSurface(mesh: Mesh, anchor: Vec3, { up = null, axis = "z",
     prio.push(Infinity);
     done.push(0);
     fnOk.push(0);
+    crease.push(0, 0, 0, 0);
     for (let j = 0; j < 3; j++) {
       FN.push(0);
       CN.push(0);
@@ -201,7 +211,8 @@ export function unfoldSurface(mesh: Mesh, anchor: Vec3, { up = null, axis = "z",
   const f0 = hit.face, q = hit.point;
   const s0 = slotOf(f0);
   const normal = unitInto(f0) ? [FN[s0 * 3], FN[s0 * 3 + 1], FN[s0 * 3 + 2]] : [0, 0, 1];
-  const upT = tangentUp(normal, up, AXIS_INDEX[axis] ?? 2);
+  const ai = AXIS_INDEX[axis] ?? 2;
+  const upT = tangentUp(normal, up, ai);
   // right = up x normal: seen from outside (looking against the normal) it points to the right.
   const right = [upT[1] * normal[2] - upT[2] * normal[1], upT[2] * normal[0] - upT[0] * normal[2], upT[0] * normal[1] - upT[1] * normal[0]];
   // A map per triangle (slot k): uv = M x + t (M: 2 x 3, its rows right and up in the unrolled plane), beside it
@@ -321,9 +332,70 @@ export function unfoldSurface(mesh: Mesh, anchor: Vec3, { up = null, axis = "z",
       ng0, ng1, ng2,
     ];
   };
+  /** A crease: g turns away from f's map by more than 2 degrees and the edge a-b runs more than 60 degrees from the axis. */
+  const creaseFold = (sf: number, sg: number, a: number, b: number) => {
+    if (!fold || fnOk[sg] !== 1 || CN[sf * 3] * FN[sg * 3] + CN[sf * 3 + 1] * FN[sg * 3 + 1] + CN[sf * 3 + 2] * FN[sg * 3 + 2] > CREASE_COS) return false;
+    const ex = v[b * 3] - v[a * 3], ey = v[b * 3 + 1] - v[a * 3 + 1], ez = v[b * 3 + 2] - v[a * 3 + 2];
+    return Math.abs(v[b * 3 + ai] - v[a * 3 + ai]) < 0.5 * Math.hypot(ex, ey, ez);
+  };
+  // The offers over a crease, made once all that is reached without one is laid: f, g and the edge a-b, by fours.
+  const later: number[] = [];
+  let creased = false;
+  /** Offers g, over the edge a-b of f (laid), f's map turned into g's plane; `over`: a crease (from `later`). */
+  const offer = (f: number, g: number, a: number, b: number, over: boolean) => {
+    const sf = slot[f];
+    const h = hinge(sf, g, a, b);
+    const sg = slot[g];
+    let cx = crease[sf * 4], cy = crease[sf * 4 + 1], nx = crease[sf * 4 + 2], ny = crease[sf * 4 + 3];
+    if (nx || ny || over) {
+      // g's corner off the edge a-b, where g's map puts it (a and b keep their places from f).
+      const o = (I[g * 3] + I[g * 3 + 1] + I[g * 3 + 2] - a - b) * 3;
+      const ox = tmp[0] * v[o] + tmp[1] * v[o + 1] + tmp[2] * v[o + 2] + h[0], oy = tmp[3] * v[o] + tmp[4] * v[o + 1] + tmp[5] * v[o + 2] + h[1];
+      if (over) {
+        // The crease: a point on it and its normal, towards o.
+        cx = mapX(sf, a);
+        cy = mapY(sf, a);
+        nx = cy - mapY(sf, b);
+        ny = mapX(sf, b) - cx;
+        const l = Math.sign(nx * (ox - cx) + ny * (oy - cy)) / Math.hypot(nx, ny);
+        nx *= l;
+        ny *= l;
+      } else if (nx * (ox - cx) + ny * (oy - cy) < -0.01) {
+        // In front of the crease the map went over (0.01 mm for rounding errors): refused.
+        return;
+      }
+    } else if (creaseFold(sf, sg, a, b)) {
+      // Kept only inside the area: beyond it the offer would come to nothing.
+      if (distOf(g, h[0], h[1]) < Infinity) {
+        creased = true;
+        later.push(f, g, a, b);
+      }
+      return;
+    }
+    const d = distOf(g, h[0], h[1]);
+    if (!(d < prio[sg])) return;
+    prio[sg] = d;
+    for (let k = 0; k < 6; k++) PM[sg * 6 + k] = tmp[k];
+    PT[sg * 2] = h[0];
+    PT[sg * 2 + 1] = h[1];
+    PN[sg * 3] = h[2];
+    PN[sg * 3 + 1] = h[3];
+    PN[sg * 3 + 2] = h[4];
+    crease[sg * 4] = cx;
+    crease[sg * 4 + 1] = cy;
+    crease[sg * 4 + 2] = nx;
+    crease[sg * 4 + 3] = ny;
+    push(d, g);
+  };
   push(0, f0);
   let first = true;
-  while (hk.length) {
+  while (hk.length || later.length) {
+    if (!hk.length) {
+      // Then over the creases, from the triangles laid without one: what is laid already keeps its place.
+      for (let k = 0; k < later.length; k += 4) if (!done[slot[later[k + 1]]]) offer(later[k], later[k + 1], later[k + 2], later[k + 3], true);
+      later.length = 0;
+      continue;
+    }
     const key = hk[0];
     const f = pop();
     const sf = slot[f];
@@ -346,18 +418,7 @@ export function unfoldSurface(mesh: Mesh, anchor: Vec3, { up = null, axis = "z",
         const g = list[e];
         if (g === f || (slot[g] >= 0 && done[slot[g]])) continue;
         if (I[g * 3] !== b && I[g * 3 + 1] !== b && I[g * 3 + 2] !== b) continue;
-        const h = hinge(sf, g, a, b);
-        const d = distOf(g, h[0], h[1]);
-        const sg = slot[g];
-        if (!(d < prio[sg])) continue;
-        prio[sg] = d;
-        for (let kk = 0; kk < 6; kk++) PM[sg * 6 + kk] = tmp[kk];
-        PT[sg * 2] = h[0];
-        PT[sg * 2 + 1] = h[1];
-        PN[sg * 3] = h[2];
-        PN[sg * 3 + 1] = h[3];
-        PN[sg * 3 + 2] = h[4];
-        push(d, g);
+        offer(f, g, a, b, false);
       }
     }
   }
@@ -405,5 +466,5 @@ export function unfoldSurface(mesh: Mesh, anchor: Vec3, { up = null, axis = "z",
       if (!window || (Math.abs(S) <= window.halfW - 1 && Math.abs(R) <= window.halfH - 1)) torn++;
     }
   }
-  return { U, V, reached, torn, face: f0, point: q, normal, up: upT, right };
+  return { U, V, reached, torn, face: f0, point: q, normal, up: upT, right, creased };
 }

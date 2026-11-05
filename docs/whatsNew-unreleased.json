@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "„Schrift (angeheftet)“ bleibt um die Zacken eines Sterns aufrecht",
+      "en": "\"Text (stuck on)\" stays upright round a star's points"
+    },
+    "body": {
+      "de": "Auf einem Stern läuft „Schrift (angeheftet)“ jetzt aufrecht und in der richtigen Reihenfolge um die Zacken; bisher waren Teile davon verdreht oder fehlten ganz.",
+      "en": "On a star, \"Text (stuck on)\" now runs upright and in order round its points, where parts of it came out turned or missing."
+    }
+  },
+  {
+    "title": {
       "de": "Hirth-Verzahnung mit Sägezähnen",
       "en": "Hirth joint with saw teeth"
     },
