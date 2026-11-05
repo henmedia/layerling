@@ -28,6 +28,8 @@ layerling 把所有内容保存在你电脑的浏览器里。没有账号，也�
 
 只备份部分设计：点击 {{ui:dashboard.select}} 后，{{ui:dashboard.backupSelected}} 只把所选设计连同其文件夹打包成一个 ZIP 文件；文件夹菜单中的 {{ui:dashboard.backupSelected}} 会打包该文件夹及其中所有设计和文件夹。两者都不包含自定义形状，{{ui:dashboard.restoreBackup}} 可以像完整备份一样恢复它们。这适用于此浏览器中的设计。
 
+如果某个设计打开很慢或根本打不开，通常是因为它的撤销步骤历史记录变得非常大，请在开始页面该设计的菜单中选择 {{ui:dashboard.openWithoutHistory}}。layerling 随后只读取当前状态，永久删除所有更早的步骤并打开设计；由于无法撤销，会先询问一次。若想保留这些步骤，请先用 {{ui:dashboard.backupSelected}} 备份该设计。
+
 在编辑器里备份单个设计：{{ui:editor.export}}，选择 **LYL** 格式，然后点击 {{ui:export.saveProject}}。LYL 文件是 layerling 自己的设计格式，包含所有内容：形状、分组、草图、CAD 数据、导入的源文件和历史记录，也就是撤销步骤。在 {{ui:export.historyTitle}} 下选择带上前多少步；初始值取自设置（功能区里的齿轮）中 {{ui:workspace.history}} 保留的步数。最后一档 {{ui:export.historyNone}} 只保存设计的当前状态——这是分享不带撤销步骤的文件的办法。导出的是副本，文件名由你在 {{ui:export.fileName}} 中指定；浏览器里的设计仍保留自己的历史记录。旧版本留下的 `.skf` 文件仍可打开，打开后会存成 `.lyl`。
 
 **保存到自己的文件夹（Chrome 和 Edge）。** 在这些浏览器里，按钮会打开系统的保存对话框，你可以自己选择文件夹和文件名，也可以替换已有文件。之后按 [[Ctrl]]+[[S]] 会把设计再次保存到同一个文件，不再弹出对话框。用 {{ui:dashboard.importGeometry}} 或导出窗口的打开按钮从 `.lyl` 文件打开的设计，也会保存回该文件。浏览器可能会询问一次修改文件的权限。页面重新加载后，设计会忘记自己的文件，下次 [[Ctrl]]+[[S]] 时会再次询问；对话框会从你上次使用的文件夹开始。Firefox 和 Safari 不允许网页这样写入文件。在那里，文件仍会下载到“下载”文件夹，[[Ctrl]]+[[S]] 会再次下载；Firefox 可以在“设置 > 常规 > 下载”里设为每次都询问文件夹。如果你在那里给文件起了别的名字，设计会保留自己的名称，因为文件名中的版本号或日期往往是有意为之；保存后的提示会提供 {{ui:status.renameDraftToFile}}。
