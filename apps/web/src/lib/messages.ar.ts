@@ -2177,6 +2177,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "inspector.wrapApply": "لف",
   "inspector.surfaceTexture": "نسيج السطح",
   "inspector.surfacePattern": "النقش",
+  "inspector.surfacePatternSearch": "ابحث عن نقش…",
+  "inspector.surfacePatternNone": "لا يوجد نقش بهذا الاسم.",
   "inspector.surfaceSpacing": "التباعد",
   "inspector.surfaceDepth": "العمق",
   "inspector.surfaceDirection": "الاتجاه",

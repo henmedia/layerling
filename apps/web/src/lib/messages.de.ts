@@ -2168,6 +2168,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "inspector.wrapApply": "Wickeln",
   "inspector.surfaceTexture": "Oberfläche",
   "inspector.surfacePattern": "Muster",
+  "inspector.surfacePatternSearch": "Muster suchen…",
+  "inspector.surfacePatternNone": "Kein Muster mit diesem Namen.",
   "inspector.surfaceSpacing": "Abstand",
   "inspector.surfaceDepth": "Tiefe",
   "inspector.surfaceDirection": "Richtung",

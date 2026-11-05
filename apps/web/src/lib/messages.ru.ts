@@ -2162,6 +2162,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "inspector.wrapApply": "Обернуть",
   "inspector.surfaceTexture": "Текстура поверхности",
   "inspector.surfacePattern": "Узор",
+  "inspector.surfacePatternSearch": "Найти узор…",
+  "inspector.surfacePatternNone": "Нет узора с таким названием.",
   "inspector.surfaceSpacing": "Шаг",
   "inspector.surfaceDepth": "Глубина",
   "inspector.surfaceDirection": "Направление",

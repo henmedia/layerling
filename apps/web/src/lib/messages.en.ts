@@ -2169,6 +2169,8 @@ export const MESSAGES_EN = {
   "inspector.wrapApply": "Wrap",
   "inspector.surfaceTexture": "Surface texture",
   "inspector.surfacePattern": "Pattern",
+  "inspector.surfacePatternSearch": "Search patterns…",
+  "inspector.surfacePatternNone": "No pattern by that name.",
   "inspector.surfaceSpacing": "Spacing",
   "inspector.surfaceDepth": "Depth",
   "inspector.surfaceDirection": "Direction",
