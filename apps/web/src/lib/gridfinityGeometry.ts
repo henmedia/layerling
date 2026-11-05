@@ -89,6 +89,14 @@ import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpeni
  * kernel's cut fails on narrower ones. A bin takes at most 4 compartments a
  * grid unit each way and 40 in all, which keep it quick to build.
  *
+ * A bin's label shelf, a wall's or a compartment's, can carry a text (#1308):
+ * its letters stand 0.4 mm on the shelf's top, 0.1 mm under the feet of a bin
+ * stacked on the lip, fitted into the room the walls, the lip's support leaning
+ * over the shelf, its front and the shelves it meets leave there
+ * (gridfinityLabelTextPlaces). The fonts live on the page, so the letters come
+ * in as outlines (gridfinityLabelText.ts) and are joined last, after every cut.
+ * A tray has none.
+ *
  * A bin can also be open on any of its sides (#682), so that bins standing side
  * by side make one long run: above the floor an open side has no wall and no
  * lip, and the walls beside it run straight out to the outline and end square
@@ -225,6 +233,18 @@ export const DEFAULT_GRIDFINITY_LABEL_WIDTH = 14;
 export const DEFAULT_GRIDFINITY_LABEL_CORNER: GridfinityLabelCorner = "round";
 export const DEFAULT_GRIDFINITY_LABEL_CORNER_SIZE = 2;
 export const MAX_GRIDFINITY_LABEL_CORNER_SIZE = 10;
+/** How high the letters stand on a label shelf (#1308): their top 0.1 mm under the flat underside of the feet of a bin stacked on the lip. */
+export const GRIDFINITY_LABEL_TEXT_HEIGHT = 0.4;
+/** How far the letters reach down into their shelf: the display mesh's shelves sit 0.0017 mm low (LABEL_MESH_NUDGE), and letters standing on the top would float apart from them. */
+export const GRIDFINITY_LABEL_TEXT_SINK = 0.05;
+/** The smallest capital the letters are fitted to, in mm: a shelf with less room for its text leaves the text out. */
+export const MIN_GRIDFINITY_LABEL_TEXT_SIZE = 3;
+/** The most characters a shelf's text takes, as many as a text shape's. */
+export const MAX_GRIDFINITY_LABEL_TEXT_LENGTH = 24;
+/** Kept between the letters and a shelf's front edge or free end. */
+const LABEL_TEXT_EDGE = 0.4;
+/** Kept between the letters and a wall, beyond the lip's support leaning in over them. */
+const LABEL_TEXT_CLEAR = 0.3;
 /** The smallest scoop radius: below about 3.2 mm the floor's 2.8 mm rounding (the inner corners' radius with a wall of 0.95) still shows through the sunk scoop. */
 export const MIN_GRIDFINITY_SCOOP_RADIUS = 3.5;
 /** The lowest floor inside a bin, measured from the underside: the 1.2 mm floor on the feet. */
@@ -306,6 +326,11 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityLabelRightOffset?: number;
   gridfinityLabelCorner?: GridfinityLabelCorner;
   gridfinityLabelCornerSize?: number;
+  gridfinityLabelBackText?: string;
+  gridfinityLabelFrontText?: string;
+  gridfinityLabelLeftText?: string;
+  gridfinityLabelRightText?: string;
+  gridfinityLabelFont?: string;
   gridfinityScoopBack?: boolean;
   gridfinityScoopFront?: boolean;
   gridfinityScoopLeft?: boolean;
@@ -334,6 +359,10 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   gridfinityOpeningCornerSize?: number;
   gridfinityOutline?: GridfinityOutlinePoint[];
+  /** The shape's mirroring, which the letters on its shelves are laid out against so they read the right way round (#1308). */
+  mirrorX?: boolean;
+  mirrorY?: boolean;
+  mirrorZ?: boolean;
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -1182,6 +1211,12 @@ function labelLipLean(wallThickness: number) {
   return Math.max(0, GRIDFINITY_LEDGE_INSET - wallThickness);
 }
 
+/** How far the lip's support leans in over a shelf at the top of its letters (#1308): 1.2 mm with a wall of 0.95, none from 2.15. */
+function labelTextLean(plan: { lip: boolean; wallThickness: number }) {
+  // The support rises at 45 degrees: at the letters' top it leans in as it would over a wall that much thinner.
+  return plan.lip ? labelLipLean(plan.wallThickness - GRIDFINITY_LABEL_TEXT_HEIGHT) : 0;
+}
+
 /**
  * A shelf's cross-section pushed along its wall from u = from to u = to; u runs left to right seen
  * from inside the bin, 0 in the middle. With `strip`, only the band of the straight front strip's
@@ -1227,8 +1262,11 @@ export type GridfinityLabelPieces = {
    * inside on and cuts them off at the outline); only when a side is open, so a closed bin's pieces are as before.
    */
   inside: { hx: number; hz: number; radius: number; open?: Record<GridfinityWall, boolean>; wallThickness?: number };
-  /** Each shelf, with the round corners taken off the front of a shelf that stops short of the walls. */
-  shelves: Array<{ profile: GridfinityLabelProfile; notches: GridfinityLabelCornerShape[] }>;
+  /**
+   * Each shelf, with the round corners taken off the front of a shelf that stops short of the walls, and the room on its
+   * top its letters take (#1308): from and to along its wall as the profile's, near and far out from the wall.
+   */
+  shelves: Array<{ profile: GridfinityLabelProfile; notches: GridfinityLabelCornerShape[]; room: { from: number; to: number; near: number; far: number } }>;
   /** The rounding or chamfer where a shelf meets a wall or another shelf, trimmed to lie under the shelves it joins. */
   corners: Array<GridfinityLabelCornerShape & { under: GridfinityLabelProfile[] }>;
 };
@@ -1355,7 +1393,7 @@ export function gridfinityLabelPieces(shape: GridfinityShapeFields): GridfinityL
     const centre = clamp(sign * offset, -along + length / 2, along - length / 2);
     return { centre, length, short: [centre - length / 2 > -along + snap, centre + length / 2 < along - snap] };
   };
-  return labelPiecesIn({ hx, hz, walls, widthOf, spanOf, size, round, top: plan.dividerTop, floor: plan.floor, open: plan.open, wallThickness: plan.wallThickness });
+  return labelPiecesIn({ hx, hz, walls, widthOf, spanOf, size, round, top: plan.dividerTop, floor: plan.floor, open: plan.open, wallThickness: plan.wallThickness, lean: labelTextLean(plan) });
 }
 
 /** A shelf's middle and length along its wall, and whether each end (0 at u = -along, 1 at u = along) stops short of the wall there. */
@@ -1366,7 +1404,7 @@ type LabelSpan = { centre: number; length: number; short: boolean[] };
  * end, meet one another and the walls, and the corner pieces between them. An end at an open side runs out through it
  * as into a wall, and is cut off at the outline.
  */
-function labelPiecesIn({ hx, hz, walls, widthOf, spanOf, size, round, top, floor, open, wallThickness }: {
+function labelPiecesIn({ hx, hz, walls, widthOf, spanOf, size, round, top, floor, open, wallThickness, lean }: {
   hx: number;
   hz: number;
   walls: GridfinityWall[];
@@ -1378,6 +1416,8 @@ function labelPiecesIn({ hx, hz, walls, widthOf, spanOf, size, round, top, floor
   floor: number;
   open?: Record<GridfinityWall, boolean>;
   wallThickness: number;
+  /** How far the lip's support leans in over the letters at the shelves' wall (labelTextLean). */
+  lean: number;
 }): GridfinityLabelPieces {
   const alongOf = (wall: GridfinityWall) => (wall === "back" || wall === "front" ? hx : hz);
   const spans = new Map(walls.map((wall) => [wall, spanOf(wall, alongOf(wall))]));
@@ -1448,7 +1488,20 @@ function labelPiecesIn({ hx, hz, walls, widthOf, spanOf, size, round, top, floor
     // The cuts reach out past the shelf's end and front, so no sliver of either is left standing.
     if (round && notch > 0 && finished[0]) notches.push({ at: point(from, width), a: direction(wall, 1, 0), b: direction(wall, 0, -1), size: notch, round: true, reachA: LABEL_PAST, reachB: LABEL_PAST });
     if (round && notch > 0 && finished[1]) notches.push({ at: point(to, width), a: direction(wall, -1, 0), b: direction(wall, 0, -1), size: notch, round: true, reachA: LABEL_PAST, reachB: LABEL_PAST });
-    shelves.push({ profile: { wall, width, from, to }, notches });
+    // The letters keep clear of the wall and the lip's support leaning over them, of the inner corners' rounding (wider than
+    // the support leans at an end), of the front, of a free end and its rounding, and of a shelf on the wall at an end that
+    // reaches in front of this one (#1308).
+    const [roomFrom, roomTo] = [0, 1].map((end) => {
+      const sign = end === 0 ? -1 : 1;
+      const { side, sideEnd, on } = across(wall, end);
+      const freeEnd = free(wall, end);
+      const inset = freeEnd ? (finished[end] && round ? Math.max(LABEL_TEXT_EDGE, notch) : LABEL_TEXT_EDGE) : open?.[side] ? LABEL_TEXT_EDGE : Math.max(LABEL_TEXT_CLEAR, gridfinityInnerRadius(wallThickness));
+      let stop = (freeEnd ? sign * (end === 0 ? from : to) : along) - inset;
+      if (on && gap(side, sideEnd) < width) stop = Math.min(stop, along - widthOf(side));
+      return sign * stop;
+    });
+    const room = { from: roomFrom, to: roomTo, near: LABEL_TEXT_CLEAR + lean, far: width - LABEL_TEXT_EDGE };
+    shelves.push({ profile: { wall, width, from, to }, notches, room });
     // Beside a finished end, against the wall: short of its rounding, of the wall there and of a shelf on that wall that comes near.
     const endSize = (end: number) => {
       const { side, sideEnd, on } = across(wall, end);
@@ -1947,7 +2000,8 @@ function compartmentLabelPieces(shape: GridfinityShapeFields, cell: GridfinityCo
     const to = short[1] ? half - snapped(half - centre - length / 2) : centre + length / 2;
     return { centre: (from + to) / 2, length: to - from, short };
   };
-  return labelPiecesIn({ hx: cell.hx, hz: cell.hz, walls: [side], widthOf: () => width, spanOf, size, round, top: plan.dividerTop, floor: plan.floor, open: cell.open, wallThickness: plan.wallThickness });
+  // A divider stops at the shelf's top: only the bin's wall has the lip's support leaning over the letters.
+  return labelPiecesIn({ hx: cell.hx, hz: cell.hz, walls: [side], widthOf: () => width, spanOf, size, round, top: plan.dividerTop, floor: plan.floor, open: cell.open, wallThickness: plan.wallThickness, lean: cell.onWall[side] ? labelTextLean(plan) : 0 });
 }
 
 /**
@@ -1977,6 +2031,118 @@ export function gridfinityCompartmentPieces(shape: GridfinityShapeFields): Gridf
       labels: compartmentLabelPieces(shape, cell),
     })),
   };
+}
+
+/**
+ * The fonts a shelf's letters take (#1308): a copy of SURFACE_TEXT_FONTS, kept here so the worker does not load the fonts;
+ * a font of one's own is not saved with a bin.
+ */
+export const GRIDFINITY_LABEL_FONTS = ["Multilanguage", "Sans", "Serif", "Script", "Monospace", "Rounded", "Stencil", "Japanese"];
+
+/** The font of a bin's letters as they are built: its own when it is a built-in one, else Multilanguage. */
+export function gridfinityLabelFont(shape: Pick<GridfinityShapeFields, "gridfinityLabelFont">) {
+  const font = shape.gridfinityLabelFont;
+  return font !== undefined && GRIDFINITY_LABEL_FONTS.includes(font) ? font : GRIDFINITY_LABEL_FONTS[0];
+}
+
+/** Each wall's text on its label shelf (#1308). */
+export const GRIDFINITY_LABEL_TEXT_KEYS = { back: "gridfinityLabelBackText", front: "gridfinityLabelFrontText", left: "gridfinityLabelLeftText", right: "gridfinityLabelRightText" } as const;
+
+/** A shelf's text as it is built, without the spaces at its ends; empty for none, also when nothing in it draws a letter. */
+function gridfinityLabelText(value: string | undefined) {
+  const text = value?.trim() ?? "";
+  return /[^\s\p{Cf}]/u.test(text) ? text : "";
+}
+
+/**
+ * Whether a bin's settings carry a text (#1308), from the settings only: it builds nothing, so it is quick enough for the
+ * keys the view draws a bin again by. gridfinityHasLabelText says whether a shelf that is built carries it.
+ */
+export function gridfinityLabelTextGiven(shape: GridfinityShapeFields) {
+  return LABEL_WALLS.some((wall) => gridfinityLabelText(shape[GRIDFINITY_LABEL_TEXT_KEYS[wall]]) !== "") || (shape.gridfinityCompartmentLabels ?? []).some((label) => gridfinityLabelText(label.text) !== "");
+}
+
+/**
+ * Whether a shelf that is built carries letters (#1308), which builds the shelves to find out; gridfinityLabelTextGiven
+ * only reads the settings. The letters are drawn with the fonts, which live on the page.
+ */
+export function gridfinityHasLabelText(shape: GridfinityShapeFields) {
+  return gridfinityLabelTextPlaces(shape).length > 0;
+}
+
+/**
+ * Where a shelf's letters go (#1308), in the shape's x and z: the middle of the room on its top, the way the line reads
+ * and the way the letters stand up as unit vectors, and how long and how high that room is. `shelf` is the wall of a
+ * bin's shelf, or the column and row of a compartment's.
+ */
+export type GridfinityLabelTextPlace = {
+  shelf: GridfinityWall | { column: number; row: number };
+  text: string;
+  top: number;
+  centre: FlatPoint;
+  along: FlatPoint;
+  up: FlatPoint;
+  length: number;
+  height: number;
+};
+
+/**
+ * How a shelf's text lies on the finished bin: on the back and front shelves it reads from the bin's front, on a side
+ * shelf along its wall, as seen from inside the bin, the letters standing up towards the wall.
+ */
+const LABEL_TEXT_FRAMES: Record<GridfinityWall, { along: FlatPoint; up: FlatPoint }> = {
+  back: { along: { x: 1, z: 0 }, up: { x: 0, z: -1 } },
+  front: { along: { x: 1, z: 0 }, up: { x: 0, z: -1 } },
+  left: { along: { x: 0, z: -1 }, up: { x: -1, z: 0 } },
+  right: { along: { x: 0, z: 1 }, up: { x: 1, z: 0 } },
+};
+
+/**
+ * Where the letters of each shelf with a text go (#1308): the shelves of a bin, or its compartments', none on a tray,
+ * where they would stand above its top. A mirrored bin has its letters laid out for the wall each shelf ends up on and
+ * mirrored back, so they come out of the mirror the right way round; turned upside down by a mirror, they read from below.
+ */
+export function gridfinityLabelTextPlaces(shape: GridfinityShapeFields): GridfinityLabelTextPlace[] {
+  if (normalizeGridfinityType(shape.gridfinityType) !== "bin" || !gridfinityLabelTextGiven(shape)) return [];
+  const [sx, sz] = [shape.mirrorX ? -1 : 1, shape.mirrorZ ? -1 : 1];
+  const flip = shape.mirrorY ? -1 : 1;
+  const frame = (wall: GridfinityWall) => {
+    // The back and front shelves read the same way; a side shelf mirrored across x ends up on the other side, whose frame is its own turned round.
+    const turn = (wall === "left" || wall === "right") && sx < 0 ? -1 : 1;
+    const { along, up } = LABEL_TEXT_FRAMES[wall];
+    return { along: { x: turn * flip * sx * along.x, z: turn * flip * sz * along.z }, up: { x: turn * sx * up.x, z: turn * sz * up.z } };
+  };
+  const places: GridfinityLabelTextPlace[] = [];
+  const add = (pieces: GridfinityLabelPieces, { profile, room }: GridfinityLabelPieces["shelves"][number], text: string, shelf: GridfinityLabelTextPlace["shelf"], offset: FlatPoint) => {
+    if (!text) return;
+    const middle = labelPoint(profile.wall, pieces.inside.hx, pieces.inside.hz, (room.from + room.to) / 2, (room.near + room.far) / 2);
+    places.push({ shelf, text, top: pieces.top, centre: { x: middle.x + offset.x, z: middle.z + offset.z }, ...frame(profile.wall), length: room.to - room.from, height: room.far - room.near });
+  };
+  const compartments = gridfinityCompartmentPieces(shape);
+  if (compartments) {
+    compartments.cells.forEach((cell) => {
+      if (!cell.labels) return;
+      const label = shape.gridfinityCompartmentLabels?.find((l) => l.column === cell.column && l.row === cell.row);
+      add(cell.labels, cell.labels.shelves[0], gridfinityLabelText(label?.text), { column: cell.column, row: cell.row }, cell.centre);
+    });
+    return places;
+  }
+  const pieces = gridfinityLabelPieces(shape);
+  pieces?.shelves.forEach((shelf) => add(pieces, shelf, gridfinityLabelText(shape[GRIDFINITY_LABEL_TEXT_KEYS[shelf.profile.wall]]), shelf.profile.wall, { x: 0, z: 0 }));
+  return places;
+}
+
+type GridfinityLabelTexts = Partial<Pick<GridfinityShapeFields, (typeof GRIDFINITY_LABEL_TEXT_KEYS)[GridfinityWall]>>;
+
+/** The shelves' texts an MCP action gives (#1308), each kept as the settings window keeps it; an empty one removes it. */
+export function gridfinityLabelTextPatch(params: Record<string, unknown>): GridfinityLabelTexts {
+  const patch: GridfinityLabelTexts = {};
+  LABEL_WALLS.forEach((wall) => {
+    const key = GRIDFINITY_LABEL_TEXT_KEYS[wall];
+    const value = params[key];
+    if (typeof value === "string") patch[key] = value.slice(0, MAX_GRIDFINITY_LABEL_TEXT_LENGTH) || undefined;
+  });
+  return patch;
 }
 
 /** Whether a compartment is too narrow for some of the bin's finger scoops and is built without them, which the settings window says under the radius. */
@@ -2113,7 +2279,8 @@ export function normalizeGridfinityDividerPositions(value: unknown): number[] | 
 
 /**
  * Compartment labels from outside, a list of them: each with its compartment and a known side, its own length,
- * position and width where they are numbers or known words; at most 576, one for each compartment any count could give.
+ * position and width where they are numbers or known words, and its text, at most 24 characters (#1308); at most 576,
+ * one for each compartment any count could give.
  */
 export function normalizeGridfinityCompartmentLabels(value: unknown): GridfinityCompartmentLabel[] | undefined {
   if (!Array.isArray(value)) return undefined;
@@ -2121,7 +2288,7 @@ export function normalizeGridfinityCompartmentLabels(value: unknown): Gridfinity
   const labels: GridfinityCompartmentLabel[] = [];
   (value as unknown[]).forEach((entry) => {
     if (!entry || typeof entry !== "object") return;
-    const { column, row, side, length, align, width } = entry as Record<string, unknown>;
+    const { column, row, side, length, align, width, text } = entry as Record<string, unknown>;
     // No bin has a column or row past MAX_GRIDFINITY_DIVIDERS.
     if (!number(column) || !number(row) || !LABEL_WALLS.includes(side as GridfinityWall)) return;
     const [c, r] = [Math.round(column), Math.round(row)];
@@ -2131,6 +2298,7 @@ export function normalizeGridfinityCompartmentLabels(value: unknown): Gridfinity
     if (number(length)) label.length = clamp(length, MIN_GRIDFINITY_COMPARTMENT_LABEL_LENGTH, 100);
     if (align === "start" || align === "middle" || align === "end") label.align = align;
     if (number(width)) label.width = clamp(width, MIN_GRIDFINITY_LABEL_WIDTH, MAX_SAVED_SETTING);
+    if (typeof text === "string" && text) label.text = text.slice(0, MAX_GRIDFINITY_LABEL_TEXT_LENGTH);
     labels.push(label);
   });
   return labels.slice(0, MAX_GRIDFINITY_COMPARTMENT_LABELS);
@@ -2511,7 +2679,8 @@ export function gridfinityCompartmentLabelsEqual(a: readonly GridfinityCompartme
       && label.side === other.side
       && label.length === other.length
       && label.align === other.align
-      && label.width === other.width;
+      && label.width === other.width
+      && label.text === other.text;
   });
 }
 
@@ -2923,15 +3092,21 @@ const OPENING_MESH_NUDGE: Vec3 = [1.3e-3, 0.9e-3, 0.7e-3];
 const LABEL_OPEN_TRIM = 1e-3;
 /** Slivers thinner than this, left where pieces meet exactly on the bin's own vertices, are removed. */
 const LABEL_SLIVER = 1e-4;
+/**
+ * The letters on a bin's shelves (#1308), made from the fonts on the page (gridfinityLabelText.ts): each glyph's outline
+ * and holes in the shape's x and z, inside by the even-odd rule, standing on `top`.
+ */
+export type GridfinityLabelLetters = Array<{ top: number; glyphs: Array<Array<Array<[x: number, z: number]>>> }>;
 
 /**
  * The bin with its label shelves and finger scoops as closed triangles: the bin's own mesh, and the
  * shelves' convex pieces and the scoops' prisms joined to it by Manifold, which keeps the result
  * closed. Without any of them it is gridfinityTriangles. A bin with dividers is filled up to their top
  * and each compartment taken out of the fill, rounded and with its scoops, as the exact body is cut. A plate
- * fitted into an outline is gridfinityOutlineTriangles, a Swallowtail plate gridfinitySwallowtailTriangles.
+ * fitted into an outline is gridfinityOutlineTriangles, a Swallowtail plate gridfinitySwallowtailTriangles. The letters on
+ * the shelves (#1308) are joined last, each glyph on its own, so letters that run into one another stay whole.
  */
-export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: GridfinityShapeFields): Vec3[][] {
+export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: GridfinityShapeFields, letters: GridfinityLabelLetters = []): Vec3[][] {
   const base = gridfinityTriangles(shape);
   const plan = gridfinityPlan(shape);
   if (plan.outline) return gridfinityOutlineTriangles(runtime, plan, base);
@@ -3040,7 +3215,14 @@ export function gridfinityLabelledTriangles(runtime: ManifoldToplevel, shape: Gr
     });
     const joined = keep(Manifold.union([bin, ...parts]));
     const notched = notchPrisms.length > 0 ? keep(joined.subtract(keep(Manifold.union(notchPrisms)))) : joined;
-    const result = keep(notched.simplify(LABEL_SLIVER));
+    // After every cut, as the exact body fuses them: nothing above the shelves' top would be left of them otherwise.
+    const glyphs = letters.flatMap(({ top, glyphs: outlines }) => outlines.map((rings) => {
+      const section = keep(new runtime.CrossSection(rings.map((ring) => ring.map(([x, z]): [number, number] => [x, -z])), "EvenOdd"));
+      const standing = keep(keep(Manifold.extrude(section, GRIDFINITY_LABEL_TEXT_HEIGHT + GRIDFINITY_LABEL_TEXT_SINK)).rotate([-90, 0, 0]));
+      return keep(standing.translate([0, top - GRIDFINITY_LABEL_TEXT_SINK, 0]));
+    }));
+    const lettered = glyphs.length > 0 ? keep(Manifold.union([notched, ...glyphs])) : notched;
+    const result = keep(lettered.simplify(LABEL_SLIVER));
     return result.status() === "NoError" ? trianglesOfManifold(result) : base;
   } catch {
     // The bin is drawn without its shelves, scoops and notches rather than not at all.
@@ -3139,20 +3321,20 @@ function gridfinitySwallowtailTriangles(runtime: ManifoldToplevel, plan: Gridfin
  * loaded the bin is drawn without them and asks for it, and the viewport draws it again once it is
  * there (manifoldRevision in its cache key).
  */
-function gridfinityDisplayTriangles(shape: GridfinityShapeFields) {
+function gridfinityDisplayTriangles(shape: GridfinityShapeFields, letters?: GridfinityLabelLetters) {
   if (!gridfinityHasPieces(shape)) return gridfinityTriangles(shape);
   const runtime = loadedManifoldRuntime();
   if (!runtime) {
     requestManifoldRuntime();
     return gridfinityTriangles(shape);
   }
-  return gridfinityLabelledTriangles(runtime, shape);
+  return gridfinityLabelledTriangles(runtime, shape, letters);
 }
 
-/** A closed, watertight bin or baseplate from y = 0 up, centred on x and z. */
-export function createGridfinityGeometry(shape: GridfinityShapeFields): THREE.BufferGeometry {
+/** A closed, watertight bin or baseplate from y = 0 up, centred on x and z, with the letters on its shelves (#1308). */
+export function createGridfinityGeometry(shape: GridfinityShapeFields, letters?: GridfinityLabelLetters): THREE.BufferGeometry {
   const positions: number[] = [];
-  gridfinityDisplayTriangles(shape).forEach((triangle) => triangle.forEach((vertex) => positions.push(...vertex)));
+  gridfinityDisplayTriangles(shape, letters).forEach((triangle) => triangle.forEach((vertex) => positions.push(...vertex)));
   const raw = new THREE.BufferGeometry();
   raw.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
   const geometry = toCreasedNormals(raw, THREE.MathUtils.degToRad(30));

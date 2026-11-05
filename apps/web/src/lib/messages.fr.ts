@@ -3147,6 +3147,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "Longueur (%)",
   "gridfinity.compartmentLabelLengthHint": "À 100, la tablette occupe toute la longueur du côté.",
   "gridfinity.compartmentLabelTooShortHint": "Cette tablette fait moins de 4 mm et est omise.",
+  "gridfinity.labelTextTooSmallHint": "Sur cette tablette, les majuscules feraient moins de 3 mm de haut ; le texte est donc omis. Utilisez un texte plus court, ou une tablette plus large ou plus longue.",
   "gridfinity.compartmentLabelOpenHint": "Ce côté du bac est ouvert et n'a pas de paroi pour la tablette, qui est donc omise.",
   "gridfinity.compartmentLabelSwitchedHint": "Ce côté du bac est réglé ouvert, la tablette est donc omise.",
   "gridfinity.alignLeft": "Gauche",

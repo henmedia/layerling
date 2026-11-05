@@ -3160,6 +3160,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.gridfinityCompartmentLabelLength": "Länge der Leiste (%)",
   "gridfinity.compartmentLabelLengthHint": "Bei 100 läuft die Leiste über die ganze Seite.",
   "gridfinity.compartmentLabelTooShortHint": "Diese Leiste ist kürzer als 4 mm und entfällt.",
+  "gridfinity.labelTextTooSmallHint": "Auf dieser Leiste wären die Großbuchstaben unter 3 mm hoch, deshalb entfällt der Text. Nimm einen kürzeren Text oder eine breitere oder längere Leiste.",
   "gridfinity.compartmentLabelOpenHint": "Diese Seite des Behälters ist offen und hat keine Wand, daher entfällt die Leiste.",
   "gridfinity.compartmentLabelSwitchedHint": "Diese Seite des Behälters ist offen geschaltet, daher entfällt die Leiste.",
   "gridfinity.alignLeft": "Links",

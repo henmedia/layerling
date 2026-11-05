@@ -3161,6 +3161,7 @@ export const MESSAGES_EN = {
   "prop.gridfinityCompartmentLabelLength": "Shelf length (%)",
   "gridfinity.compartmentLabelLengthHint": "100 runs the shelf the full length of its side.",
   "gridfinity.compartmentLabelTooShortHint": "This shelf is shorter than 4 mm and is left out.",
+  "gridfinity.labelTextTooSmallHint": "On this shelf the capitals would be under 3 mm high, so the text is left out. Use a shorter text, or a wider or longer shelf.",
   "gridfinity.compartmentLabelOpenHint": "This side of the bin is open and has no wall, so the shelf is left out.",
   "gridfinity.compartmentLabelSwitchedHint": "This side of the bin is switched open, so the shelf is left out.",
   "gridfinity.alignLeft": "Left",

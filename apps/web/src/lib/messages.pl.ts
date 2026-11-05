@@ -3118,6 +3118,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "Długość półki (%)",
   "gridfinity.compartmentLabelLengthHint": "Przy 100 półka biegnie przez całą długość boku.",
   "gridfinity.compartmentLabelTooShortHint": "Ta półka jest krótsza niż 4 mm i zostaje pominięta.",
+  "gridfinity.labelTextTooSmallHint": "Na tej półce wielkie litery miałyby mniej niż 3 mm wysokości, więc tekst zostaje pominięty. Skróć tekst albo poszerz lub wydłuż półkę.",
   "gridfinity.compartmentLabelOpenHint": "Ta strona pojemnika jest otwarta i nie ma ściany na półkę, więc półka zostaje pominięta.",
   "gridfinity.compartmentLabelSwitchedHint": "Ta strona pojemnika jest przełączona na otwartą, więc półka zostaje pominięta.",
   "gridfinity.alignLeft": "Z lewej",

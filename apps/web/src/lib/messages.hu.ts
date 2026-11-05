@@ -2326,6 +2326,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityCompartmentLabelLength": "Polc hossza (%)",
   "gridfinity.compartmentLabelLengthHint": "100 esetén a polc az oldal teljes hosszán fut.",
   "gridfinity.compartmentLabelTooShortHint": "Ez a polc 4 mm-nél rövidebb, ezért elmarad.",
+  "gridfinity.labelTextTooSmallHint": "Ezen a polcon a nagybetűk 3 mm-nél alacsonyabbak lennének, ezért a szöveg elmarad. Rövidítsd a szöveget, vagy szélesítsd, illetve hosszabbítsd meg a polcot.",
   "gridfinity.compartmentLabelOpenHint": "A rekesz ezen oldala nyitott, nincs fala a polcnak, ezért a polc elmarad.",
   "gridfinity.compartmentLabelSwitchedHint": "A rekesz ezen oldala nyitottra van kapcsolva, ezért a polc elmarad.",
   "gridfinity.alignLeft": "Balra",

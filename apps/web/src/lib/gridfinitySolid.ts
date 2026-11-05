@@ -1,5 +1,6 @@
 import type { OcctKernel, ShapeHandle } from "occt-wasm";
-import type { CadModifierGridfinityPart } from "@/lib/cadModifierTypes";
+import type { CadModifierGridfinityPart, CadModifierProfilePart } from "@/lib/cadModifierTypes";
+import { profileArea, profileExtrusionSolid } from "@/lib/cadProfileSolid";
 import {
   GRIDFINITY_BASEPLATE_HEIGHT,
   GRIDFINITY_BASEPLATE_RADIUS,
@@ -9,6 +10,8 @@ import {
   GRIDFINITY_DIVIDER_CUTTER_OVERLAP,
   GRIDFINITY_FOOT,
   GRIDFINITY_GRID,
+  GRIDFINITY_LABEL_TEXT_HEIGHT,
+  GRIDFINITY_LABEL_TEXT_SINK,
   GRIDFINITY_LEDGE_INSET,
   GRIDFINITY_MAGNET_DEPTH,
   GRIDFINITY_MAGNET_DIAMETER,
@@ -82,6 +85,10 @@ import {
  * A tray (#837) is a bin with no feet under it: the block stands on y = 0 and
  * is cut the same way. Its dividers run up to its top, and the box above their
  * cutter is what joins the compartments to a notch cut into the wall.
+ *
+ * The letters on the shelves (#1308) come made on the page, each glyph with the
+ * font's own curves: each is pushed up from 0.05 mm inside its shelf to 0.4 mm
+ * over its top and fused with the finished bin, last, so no cut takes them.
  */
 
 /** z up to y up: (x, y, z) -> (x, z, -y). */
@@ -380,6 +387,25 @@ function labelledCompartments(cad: OcctKernel, standing: ShapeHandle, pieces: Gr
   return labelled;
 }
 
+/** The bin with the letters on its shelves (#1308) fused on; a fuse that loses some of them throws. */
+function letteredSolid(cad: OcctKernel, body: ShapeHandle, part: CadModifierGridfinityPart) {
+  const letters = part.gridfinityLetters ?? [];
+  if (letters.length === 0) return body;
+  const height = GRIDFINITY_LABEL_TEXT_HEIGHT + GRIDFINITY_LABEL_TEXT_SINK;
+  let area = 0;
+  const glyphs = letters.flatMap(({ top, glyphs: outlines }) => outlines.map((loops) => {
+    const profile: CadModifierProfilePart = { kind: "extrusion", loops, height };
+    area += profileArea(profile);
+    return cad.translate(profileExtrusionSolid(cad, profile), 0, top - GRIDFINITY_LABEL_TEXT_SINK, 0);
+  }));
+  const joined = oneSolid(cad, cad.fuseAll([body, ...glyphs]), "bin with letters");
+  // A fuse that lost a tenth of the letters or more, which the STEP export would leave out without a word: letters running
+  // into one another share far less of their area than that.
+  if (cad.getVolume(joined) - cad.getVolume(body) < 0.9 * area * GRIDFINITY_LABEL_TEXT_HEIGHT) throw new Error("The Gridfinity bin's letters could not be joined");
+  if (!cad.isValid(joined)) throw new Error("The Gridfinity body is not a valid solid");
+  return joined;
+}
+
 /** The Gridfinity part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */
 export function gridfinityPartSolid(cad: OcctKernel, part: CadModifierGridfinityPart): ShapeHandle {
   const plan = gridfinityPlan(part);
@@ -390,10 +416,10 @@ export function gridfinityPartSolid(cad: OcctKernel, part: CadModifierGridfinity
   const solid = plan.type === "baseplate" ? baseplateSolid(cad, plan) : binSolid(cad, plan, compartments ? null : scoopPieces, compartments);
   if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The Gridfinity body is not a valid solid");
   const standing = cad.transform(solid, Z_TO_Y_UP);
-  if (compartments) return labelledCompartments(cad, standing, compartments);
+  if (compartments) return letteredSolid(cad, labelledCompartments(cad, standing, compartments), part);
   const pieces = gridfinityLabelPieces(part);
   if (!pieces) return standing;
   const labelled = oneSolid(cad, cad.fuseAll([standing, ...labelSolids(cad, pieces)]), "bin with label shelves");
   if (!cad.isValid(labelled)) throw new Error("The Gridfinity body is not a valid solid");
-  return labelled;
+  return letteredSolid(cad, labelled, part);
 }
