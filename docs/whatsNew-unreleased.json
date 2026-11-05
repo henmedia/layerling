@@ -11,6 +11,26 @@
   },
   {
     "title": {
+      "de": "Rippe mit Fuß",
+      "en": "A rib on a foot"
+    },
+    "body": {
+      "de": "Eine Gehäuserippe kann jetzt auf einem Fuß stehen: eine dünne Platte unter der ganzen Rippe, breiter als sie, für mehr Halt auf dem Druckbett und am Boden. Einschalten unter „Fuß“ in den Einstellungen der Rippe; Breite und Dicke lassen sich einstellen.",
+      "en": "An enclosure rib can now stand on a foot: a thin plate under the whole rib, wider than it, for more hold on the print bed and on the floor. Switch it on under \"Foot\" in the rib's settings; its width and thickness can be set."
+    }
+  },
+  {
+    "title": {
+      "de": "„Schrift (angeheftet)“ bleibt um die Zacken eines Sterns aufrecht",
+      "en": "\"Text (stuck on)\" stays upright round a star's points"
+    },
+    "body": {
+      "de": "Auf einem Stern läuft „Schrift (angeheftet)“ jetzt aufrecht und in der richtigen Reihenfolge um die Zacken; bisher waren Teile davon verdreht oder fehlten ganz.",
+      "en": "On a star, \"Text (stuck on)\" now runs upright and in order round its points, where parts of it came out turned or missing."
+    }
+  },
+  {
+    "title": {
       "de": "Gruppieren ohne dünne Häute",
       "en": "Grouping without thin skins"
     },
