@@ -1824,12 +1824,15 @@ function turningReach(radius: number, angle: number, twist: number) {
  */
 /**
  * Every corner of a helical ring becomes a twisted face of its own, so an involute ring -
- * about fifteen corners a tooth - is built exactly only up to this many; a bigger one stays
- * the display mesh.
+ * about fifteen corners a tooth - is built exactly for the edge tool only up to this many,
+ * so its preview stays inside the timeout; a bigger one stays the display mesh there.
+ * The STEP export takes any size (`anySize`, #1321): it runs in the geometry worker, and
+ * measured with the kernel in Node a herringbone gear of 96 involute teeth builds in 3.7 s
+ * and writes in 0.9 s, one of 500 teeth (the most a gear can have) in 36 s and 11 s.
  */
 const HELICAL_GEAR_CORNER_LIMIT = 480;
 
-export function cadModifierHelicalGearForShape(shape: WorkplaneShape): CadModifierHelicalGearPart | null {
+export function cadModifierHelicalGearForShape(shape: WorkplaneShape, options: { anySize?: boolean } = {}): CadModifierHelicalGearPart | null {
   if (shape.kind !== "gear" || !gearTypeHasHelix(shape.gearType)) return null;
   if (shape.importedMesh || shape.groupedShapes?.length || shape.cadBrep || shape.imagePlate || shapeHasShapeDeform(shape)) return null;
   const width = shapeWidth(shape);
@@ -1840,7 +1843,7 @@ export function cadModifierHelicalGearForShape(shape: WorkplaneShape): CadModifi
   const corners = gearOutlineCorners(width, depth, shape).map((corner) => ({ angle: corner.angle, radius: corner.radiusX }));
   // Involute teeth keep their tip circle on width x depth instead of what the turn spans (#201).
   const involute = involuteOutlineStretch(width, depth, shape);
-  if (involute && corners.length > HELICAL_GEAR_CORNER_LIMIT) return null;
+  if (involute && !options.anySize && corners.length > HELICAL_GEAR_CORNER_LIMIT) return null;
   const herringbone = normalizeGearType(shape.gearType) === "herringbone";
   const turn = herringbone ? twist / 2 : twist;
   let minX = Infinity;
