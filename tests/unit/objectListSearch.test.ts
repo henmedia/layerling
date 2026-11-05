@@ -149,7 +149,8 @@ describe("the object list panel", () => {
   });
 
   it("shows all parts of a group that matches by its own name", () => {
-    expect(panel).toContain("renderGroupParts(shape.groupedShapes, 0, !query || shapeMatches(shape))");
+    // The fourth argument opens the group when one of its parts is clicked (#1316).
+    expect(panel).toContain("renderGroupParts(shape.groupedShapes, 0, !query || shapeMatches(shape), ");
   });
 
   it("sorts its rows and the parts of groups in the chosen order", () => {
