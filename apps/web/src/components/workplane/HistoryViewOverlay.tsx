@@ -271,7 +271,7 @@ export function HistoryViewOverlay({
           event.stopPropagation();
           const target = historyKeyTarget(event.key, index, max, liveIndex);
           if (target !== null && target !== index) onIndexChange(target);
-        } else if (event.key.toLowerCase() === "e" && !event.ctrlKey && !event.metaKey && !event.altKey && canOpenGroup) {
+        } else if ((event.key ?? "").toLowerCase() === "e" && !event.ctrlKey && !event.metaKey && !event.altKey && canOpenGroup) {
           // E opens the selected group, as in the design.
           event.preventDefault();
           event.stopPropagation();

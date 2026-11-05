@@ -162,9 +162,9 @@ export function FontPicker({
       choose(active);
     } else if (event.key === "Tab") {
       setOpen(false);
-    } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    } else if ((event.key ?? "").length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
       // Typing a letter jumps to the next font whose name starts with it.
-      const letter = event.key.toLowerCase();
+      const letter = (event.key ?? "").toLowerCase();
       const next = [...options.keys()].map((offset) => (active + 1 + offset) % options.length).find((index) => options[index].label.toLowerCase().startsWith(letter));
       if (next !== undefined) setActive(next);
     }
