@@ -3771,6 +3771,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "Taśmy w bok przez ściankę",
   "sbcBoard.gpioUp": "Złącze GPIO w górę przez pokrywę",
   "sbcBoard.upReach": "Zasięg w górę",
+  "sbcBoard.buttonReach": "Zasięg przycisków",
+  "sbcBoard.buttonReachHint": "Jak daleko sięgają przyciski (RESET, BOOT, zasilanie) w kierunku, w którym się je naciska: w górę przez pokrywę albo przez ściankę dla naciskanego z boku. Przy 0 zostają bez zmian.",
   "sbcBoard.passagesHint": "Taśmy (kamera, wyświetlacz, PCIe) i złącze GPIO mogą otwierać się w górę przez pokrywę, o zasięg w górę (co najmniej 20 mm), a taśmy także w bok przez bliższą ściankę, o zasięg. Gniazdo microSD jest złączem przy krawędzi.",
   "sbcBoard.building": "Tworzenie płytki…",
   "sbcBoard.failed": "Nie udało się utworzyć płytki.",

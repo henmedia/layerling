@@ -19,7 +19,7 @@ import {
   attachmentsFormatVersion,
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
-import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
+import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
@@ -1451,7 +1451,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   // An SBC board's settings (#1098): a known board, a clearance of 0 to 2 mm and a reach of 0 to 10 mm;
   // the openings up and out as true or false, and how far up as 20 to 100 mm. Old projects have none.
   if (definition.sbcBoard !== undefined) {
-    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; upReach?: unknown } | null;
+    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; upReach?: unknown; buttonReach?: unknown } | null;
     if (!board || typeof board !== "object" || !SBC_BOARD_ORDER.includes(board.board as never)) {
       throw new Error(`${label}.sbcBoard.board must be one of ${SBC_BOARD_ORDER.join(", ")}`);
     }
@@ -1466,6 +1466,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     }
     if (board.upReach !== undefined && (typeof board.upReach !== "number" || !Number.isFinite(board.upReach) || board.upReach < MIN_SBC_UP_REACH || board.upReach > MAX_SBC_UP_REACH)) {
       throw new Error(`${label}.sbcBoard.upReach is outside the supported range`);
+    }
+    if (board.buttonReach !== undefined && (typeof board.buttonReach !== "number" || !Number.isFinite(board.buttonReach) || board.buttonReach < 0 || board.buttonReach > MAX_SBC_BUTTON_REACH)) {
+      throw new Error(`${label}.sbcBoard.buttonReach is outside the supported range`);
     }
   }
   // The corners of a text's line (#215): a layer of a name tag can be bevelled or sharp now, so an

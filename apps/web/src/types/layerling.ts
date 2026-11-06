@@ -1612,7 +1612,7 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
-export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini";
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoNano" | "wemosD1Mini";
 
 export type SbcBoardSettings = {
   board: SbcBoardType;
@@ -1628,6 +1628,8 @@ export type SbcBoardSettings = {
   gpioUp?: boolean;
   /** How far in mm the openings going up reach above their part, 20 to 100 (default 20). */
   upReach?: number;
+  /** How far in mm the buttons reach the way they are pressed (up through a lid, or out of a side), 0 to 100; missing is 0. */
+  buttonReach?: number;
 };
 
 export type QrCodeSettings = {

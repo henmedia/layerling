@@ -3834,6 +3834,8 @@ export const MESSAGES_EN = {
   "sbcBoard.ribbonSide": "Ribbon cables out through the wall",
   "sbcBoard.gpioUp": "GPIO header up through the lid",
   "sbcBoard.upReach": "Reach up",
+  "sbcBoard.buttonReach": "Button reach",
+  "sbcBoard.buttonReachHint": "How far the buttons (RESET, BOOT, power) reach the way they are pressed: up through a lid, or out through the wall for one pressed from the side. At 0 they stay as they are.",
   "sbcBoard.passagesHint": "Ribbon cables (camera, display, PCIe) and the GPIO header can open up through a lid, by Reach up (at least 20 mm), or the cables out through the nearer wall, by the reach. The microSD card slot is a connector at the edge.",
   "sbcBoard.building": "Making the board…",
   "sbcBoard.failed": "The board could not be made.",

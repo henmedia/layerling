@@ -3053,6 +3053,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "Ploščati kabli vstran skozi steno",
   "sbcBoard.gpioUp": "Konektor GPIO navzgor skozi pokrov",
   "sbcBoard.upReach": "Seganje navzgor",
+  "sbcBoard.buttonReach": "Seganje gumbov",
+  "sbcBoard.buttonReachHint": "Kako daleč segajo gumbi (RESET, BOOT, vklop) v smeri, iz katere jih pritisnemo: navzgor skozi pokrov ali skozi steno pri gumbu, ki ga pritisnemo s strani. Pri 0 ostanejo, kot so.",
   "sbcBoard.passagesHint": "Ploščati kabli (kamera, zaslon, PCIe) in konektor GPIO se lahko odprejo navzgor skozi pokrov za seganje navzgor (vsaj 20 mm), kabli tudi vstran skozi bližjo steno za seganje. Reža za kartico microSD je konektor na robu.",
   "sbcBoard.building": "Plošča se izdeluje…",
   "sbcBoard.failed": "Plošče ni bilo mogoče narediti.",

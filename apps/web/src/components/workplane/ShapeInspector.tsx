@@ -209,7 +209,7 @@ import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
-import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -5884,6 +5884,24 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
                 onInteractionActiveChange={onInteractionActiveChange}
               />
             </label>
+          ) : null}
+          {sbcBoardHasButtons(SBC_BOARDS[controls.settings.board]) ? (
+            <>
+              <label className="select-property sbc-board-button-reach">
+                <span>{t("sbcBoard.buttonReach")} ({unit})</span>
+                <CompactMeasureField
+                  label={t("sbcBoard.buttonReach")}
+                  value={controls.settings.buttonReach ?? 0}
+                  min={0}
+                  max={MAX_SBC_BUTTON_REACH}
+                  workspace={workspace}
+                  disabled={disabled || busy}
+                  onChange={(buttonReach) => regenerate({ buttonReach })}
+                  onInteractionActiveChange={onInteractionActiveChange}
+                />
+              </label>
+              <p className="name-tag-hint">{t("sbcBoard.buttonReachHint")}</p>
+            </>
           ) : null}
           <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.passagesHint")}</p>
           {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}

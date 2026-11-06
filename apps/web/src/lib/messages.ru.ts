@@ -3827,6 +3827,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "Шлейфы вбок через стенку",
   "sbcBoard.gpioUp": "Разъём GPIO вверх через крышку",
   "sbcBoard.upReach": "Вынос вверх",
+  "sbcBoard.buttonReach": "Вынос кнопок",
+  "sbcBoard.buttonReachHint": "Насколько кнопки (RESET, BOOT, питание) выносятся в ту сторону, откуда их нажимают: вверх через крышку или через стенку для нажимаемой сбоку. При 0 остаются как есть.",
   "sbcBoard.passagesHint": "Шлейфы (камера, дисплей, PCIe) и разъём GPIO могут выходить вверх через крышку на вынос вверх (не меньше 20 мм), шлейфы также вбок через ближнюю стенку на вынос. Слот microSD — разъём у края.",
   "sbcBoard.building": "Создание платы…",
   "sbcBoard.failed": "Не удалось создать плату.",

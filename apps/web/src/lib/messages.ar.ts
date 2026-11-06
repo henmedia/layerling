@@ -3468,6 +3468,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "الكابلات الشريطية جانبًا عبر الجدار",
   "sbcBoard.gpioUp": "موصل GPIO لأعلى عبر الغطاء",
   "sbcBoard.upReach": "الامتداد لأعلى",
+  "sbcBoard.buttonReach": "امتداد الأزرار",
+  "sbcBoard.buttonReachHint": "مقدار امتداد الأزرار (RESET وBOOT والتشغيل) في الاتجاه الذي تُضغط منه: لأعلى عبر الغطاء، أو عبر الجدار للزر الذي يُضغط من الجانب. عند 0 تبقى كما هي.",
   "sbcBoard.passagesHint": "يمكن أن تنفتح الكابلات الشريطية (الكاميرا، الشاشة، PCIe) وموصل GPIO لأعلى عبر الغطاء بمقدار الامتداد لأعلى (20 مم على الأقل)، والكابلات أيضًا جانبًا عبر الجدار الأقرب بمقدار الامتداد. فتحة بطاقة microSD موصل عند الحافة.",
   "sbcBoard.building": "جارٍ صنع اللوحة…",
   "sbcBoard.failed": "تعذّر صنع اللوحة.",
