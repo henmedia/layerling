@@ -36,6 +36,7 @@ import { threadBuildPlan, WHITWORTH_PROFILE_CONSTANTS } from "@/lib/threadGeomet
 import { springBuildPlan, springRingSectionShare } from "@/lib/springGeometry";
 import { flatSpringProfileLoops } from "@/lib/flatSpringGeometry";
 import { gridfinityHasPieces, gridfinityPlan } from "@/lib/gridfinityGeometry";
+import { gridfinityLabelGlyphs } from "@/lib/gridfinityLabelText";
 import { knurlCorners, knurlSettings, roundKnurlWave } from "@/lib/knurlGeometry";
 import { pulleyArcPoint, pulleyMeasures, pulleyToothArcs } from "@/lib/pulleyGeometry";
 import { BEVEL_GEAR_TOP_SCALE, bevelGearIsSpiral, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearType, rackMeasures, rackOutlinePoints, rackToothArcs, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
@@ -1738,6 +1739,18 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
   const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOutline: shape.gridfinityOutline });
   // Label shelves, finger scoops and dividers, an outline plate's sockets and a Swallowtail plate's pockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
   if (!loadedManifoldRuntime() && gridfinityHasPieces({ ...shape, width, depth })) return null;
+  // The letters on the shelves (#1308) with the font's own curves, laid out where the display mesh has them.
+  const letters = gridfinityLabelGlyphs({ ...shape, width, depth }).map(({ place, layout, map }) => ({
+    top: place.top,
+    glyphs: layout.glyphs.flatMap((glyph) => {
+      const loop = (path: GlyphPath) => glyphLoop(path, (point) => map(point.x, point.y), layout.segments === 1);
+      const outer = loop(glyph);
+      const holes = glyph.holes.map(loop);
+      // A text whose glyph cannot be read goes as its mesh; here the glyph is left out, and the missing-letters check in
+      // gridfinitySolid.ts notices a real loss.
+      return outer && holes.every((hole) => hole !== null) ? [[outer, ...(holes as CadModifierProfileLoop[])]] : [];
+    }),
+  }));
   return {
     width: plan.size.width,
     depth: plan.size.depth,
@@ -1794,6 +1807,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
     gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
     gridfinityOutline: shape.gridfinityOutline,
+    ...(letters.length > 0 ? { gridfinityLetters: letters } : {}),
     // Mesh and body are built at the size of the grid units, which canonicalizeShape
     // keeps the shape's box at; a box that differs anyway stretches the body to it.
     transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / plan.size.width, shape.height / plan.size.height, depth / plan.size.depth)),
@@ -1971,6 +1985,19 @@ export function cadProfileSegmentCount(profile: CadModifierProfilePart) {
   return profile.loops.reduce((total, loop) => total + loop.segments.length, 0) * Math.max(1, profile.path?.length ?? 1);
 }
 
+/** The outline pieces of the letters on a Gridfinity bin's shelves (#1308), which the exact body builds one glyph at a time. */
+export function cadGridfinityLetterSegmentCount(part: CadModifierGridfinityPart) {
+  return (part.gridfinityLetters ?? []).reduce((total, label) => total + label.glyphs.flat().reduce((sum, loop) => sum + loop.segments.length, 0), 0);
+}
+
+/**
+ * What a Gridfinity part adds to a request's outline pieces, for its time budget: an outline plate's slab has a side face
+ * for each edge of its outline (#1061), as a profile has for each segment, and its letters their pieces (#1308).
+ */
+export function cadGridfinitySegmentCount(part: CadModifierGridfinityPart | undefined) {
+  return part ? (part.gridfinityOutline?.length ?? 0) + cadGridfinityLetterSegmentCount(part) : 0;
+}
+
 /**
  * Past CAD_MODIFIER_EXACT_SEGMENT_LIMIT outline pieces in one request the
  * exact bodies would outgrow the preview timeout. Then profile parts go back
@@ -1978,22 +2005,25 @@ export function cadProfileSegmentCount(profile: CadModifierProfilePart) {
  * until the rest fits: first those whose mesh is cheapest for the pieces it
  * saves, so a gear (few triangles per piece) goes before a glyph (many), and
  * one big honeycomb does not send every other shape of the group back too.
+ * The letters on a Gridfinity bin's shelves (#1308) count in the same budget,
+ * and a bin with too many of them goes back to its mesh the same way.
  */
-export function withinExactProfileLimit<M extends { faces: { length: number } }, T extends { profile?: CadModifierProfilePart; profileMesh?: M; mesh?: M }>(parts: T[], limit = CAD_MODIFIER_EXACT_SEGMENT_LIMIT): T[] {
-  let segments = parts.reduce((total, part) => total + (part.profile ? cadProfileSegmentCount(part.profile) : 0), 0);
+export function withinExactProfileLimit<M extends { faces: { length: number } }, T extends { profile?: CadModifierProfilePart; gridfinity?: CadModifierGridfinityPart; profileMesh?: M; mesh?: M }>(parts: T[], limit = CAD_MODIFIER_EXACT_SEGMENT_LIMIT): T[] {
+  const pieces = (part: T) => (part.profile ? cadProfileSegmentCount(part.profile) : part.gridfinity ? cadGridfinityLetterSegmentCount(part.gridfinity) : 0);
+  let segments = parts.reduce((total, part) => total + pieces(part), 0);
   if (segments <= limit) return parts;
-  const cost = (part: T) => (part.profileMesh?.faces.length ?? 0) / Math.max(1, cadProfileSegmentCount(part.profile as CadModifierProfilePart));
+  const cost = (part: T) => (part.profileMesh?.faces.length ?? 0) / Math.max(1, pieces(part));
   const order = parts
     .map((part, index) => ({ part, index }))
-    .filter(({ part }) => part.profile)
-    .sort((a, b) => cost(a.part) - cost(b.part) || cadProfileSegmentCount(b.part.profile as CadModifierProfilePart) - cadProfileSegmentCount(a.part.profile as CadModifierProfilePart));
+    .filter(({ part }) => pieces(part) > 0)
+    .sort((a, b) => cost(a.part) - cost(b.part) || pieces(b.part) - pieces(a.part));
   const toMesh = new Set<number>();
   for (const { part, index } of order) {
     if (segments <= limit) break;
-    segments -= cadProfileSegmentCount(part.profile as CadModifierProfilePart);
+    segments -= pieces(part);
     toMesh.add(index);
   }
-  return parts.map((part, index) => (toMesh.has(index) ? { ...part, profile: undefined, profileMesh: undefined, mesh: part.profileMesh } : part));
+  return parts.map((part, index) => (toMesh.has(index) ? { ...part, profile: undefined, gridfinity: undefined, profileMesh: undefined, mesh: part.profileMesh } : part));
 }
 
 /**

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   CORNER_RULER_FIELD_SIZE,
+  cornerRulerElevationFieldBesideBody,
   spreadCornerRulerFields,
   computeCornerRulerRelativeCoordinates,
   cornerRulerAxisModes,
@@ -467,6 +468,40 @@ describe("spreadCornerRulerFields (#777)", () => {
     const [field] = spreadCornerRulerFields([{ x: 500, y: 400 }], [button]);
     const apart = Math.abs(field.x - button.x) >= button.halfWidth + CORNER_RULER_FIELD_SIZE.width / 2 || Math.abs(field.y - button.y) >= button.halfHeight + CORNER_RULER_FIELD_SIZE.height / 2;
     expect(apart).toBe(true);
+  });
+});
+
+describe("the height number stays off the measured body (#1279)", () => {
+  const half = { w: CORNER_RULER_FIELD_SIZE.width / 2, h: CORNER_RULER_FIELD_SIZE.height / 2 };
+  const onBody = (field: { x: number; y: number }, body: { x: number; y: number; halfWidth: number; halfHeight: number }) =>
+    Math.abs(field.x - body.x) < half.w + body.halfWidth && Math.abs(field.y - body.y) < half.h + body.halfHeight;
+  // The body's outline on the screen, 200 to 300 across and 150 to 260 down.
+  const body = { x: 250, y: 205, halfWidth: 50, halfHeight: 55 };
+
+  it("moves the number at height 0 out of the body, to the side of the arrow", () => {
+    // The arrow stands at the body's near left corner; at height 0 its middle is that corner.
+    const field = cornerRulerElevationFieldBesideBody({ x: 210 + 28, y: 240 }, 210, body);
+    expect(onBody(field, body)).toBe(false);
+    expect(field.x).toBeLessThan(200);
+    expect(field.y).toBe(240);
+  });
+
+  it("goes to the right when the arrow is nearer the body's right edge", () => {
+    const field = cornerRulerElevationFieldBesideBody({ x: 290 + 28, y: 240 }, 290, body);
+    expect(onBody(field, body)).toBe(false);
+    expect(field.x).toBeGreaterThan(300);
+  });
+
+  it("leaves a number that is already clear of the body where it is", () => {
+    const clear = { x: 120, y: 320 };
+    expect(cornerRulerElevationFieldBesideBody(clear, 92, body)).toEqual(clear);
+  });
+
+  it("does not let the spreading push the number back onto the body", () => {
+    const beside = cornerRulerElevationFieldBesideBody({ x: 238, y: 240 }, 210, body);
+    // The X number already sits where the height number went.
+    const [, field] = spreadCornerRulerFields([beside, beside], [], undefined, [undefined, [body]]);
+    expect(onBody(field, body)).toBe(false);
   });
 });
 

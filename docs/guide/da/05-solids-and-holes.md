@@ -86,7 +86,7 @@ For at skære omridset af et legeme lige gennem et andet vælger du først stemp
 
 ## Redigering af en gruppe
 
-Hvis en boring blev for lille, behøver du ikke opløse gruppen og bygge igen. Vælg gruppen og klik på {{ui:group.edit}} i dens indstillinger, mappeikonet i objektlisten, eller tryk [[E]]. Et dobbeltklik på gruppen gør det samme, som i Tinkercad, også på et bundt; vil du hellere ikke, så slå {{ui:workspace.doubleClickOpensGroup}} fra i indstillingerne. En del begynder først at flytte sig når markøren er trukket et par pixels, så et ustabilt klik eller dobbeltklik skubber ikke til den. Delene ligger nu hver for sig og du ændrer dem med alle værktøjer: gør et hul større, flyt en form, tilføj et hul.
+Hvis en boring blev for lille, behøver du ikke opløse gruppen og bygge igen. Vælg gruppen og klik på {{ui:group.edit}} i dens indstillinger, mappeikonet i objektlisten, eller tryk [[E]]. I objektlisten kan du også åbne gruppen med dens pil og klikke på en af dens dele: gruppen åbnes med den del markeret. Et dobbeltklik på gruppen gør det samme, som i Tinkercad, også på et bundt; vil du hellere ikke, så slå {{ui:workspace.doubleClickOpensGroup}} fra i indstillingerne. En del begynder først at flytte sig når markøren er trukket et par pixels, så et ustabilt klik eller dobbeltklik skubber ikke til den. Delene ligger nu hver for sig og du ændrer dem med alle værktøjer: gør et hul større, flyt en form, tilføj et hul.
 
 ![Gruppen der redigeres: bjælken i bunden har Annullér og Udført, og objektlisten viser delene.](shot:open-group)
 
