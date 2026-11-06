@@ -312,6 +312,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "inspector.pulleyHubHint": "Et nav foroven til en pinolskrue: læg en hulcylinder igennem det. 0 for intet.",
   "inspector.surfaceTexture": "Overfladestruktur",
   "inspector.surfacePattern": "Mønster",
+  "inspector.surfacePatternSearch": "Søg efter mønster…",
+  "inspector.surfacePatternNone": "Intet mønster med det navn.",
   "inspector.surfaceSpacing": "Afstand",
   "inspector.surfaceDepth": "Dybde",
   "inspector.surfaceDirection": "Retning",

@@ -2171,6 +2171,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "inspector.wrapApply": "Envolver",
   "inspector.surfaceTexture": "Textura de superficie",
   "inspector.surfacePattern": "Dibujo",
+  "inspector.surfacePatternSearch": "Buscar dibujo…",
+  "inspector.surfacePatternNone": "Ningún dibujo con ese nombre.",
   "inspector.surfaceSpacing": "Espaciado",
   "inspector.surfaceDepth": "Profundidad",
   "inspector.surfaceDirection": "Dirección",
