@@ -1,6 +1,6 @@
 import manifoldModule from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildGroupedShapeFromSelection } from "@/lib/editorBooleans";
+import { buildGroupedShapeFromSelection, restoreGroupedChildren } from "@/lib/editorBooleans";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -34,6 +34,13 @@ describe("a part hidden in a group with a hole stays out of the cut (#1323)", ()
     // The hidden part reached from x 35 to 45; the body ends at x 5.
     expect(maxX(result.group!.importedMesh!)).toBeLessThan(10);
     expect(result.group?.groupedShapes?.map((child) => `${child.name}:${child.hidden === true}`)).toContain("ring:true");
+    // Taken apart again, every part comes back at its own size and place, the hidden one too.
+    const parts = restoreGroupedChildren(result.group!);
+    const byName = new Map(parts.map((child) => [child.name, child]));
+    expect(byName.get("body")?.width).toBeCloseTo(10, 3);
+    expect(byName.get("body")?.x).toBeCloseTo(0, 3);
+    expect(byName.get("ring")?.width).toBeCloseTo(10, 3);
+    expect(byName.get("ring")?.x).toBeCloseTo(40, 3);
   });
 
   it("does not let a hidden hole cut the body", async () => {
