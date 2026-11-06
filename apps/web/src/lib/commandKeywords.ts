@@ -85,13 +85,13 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
 export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   box: ["cube", "block", "quader", "wuerfel", "würfel", "rechteck"],
   roundedBox: ["rounded cube", "abgerundet", "rounded box", "rundquader"],
-  cylinder: ["tube", "pipe", "rod", "zylinder", "rohr", "stab", "walze"],
+  cylinder: ["tube", "pipe", "rod", "zylinder", "rohr", "stab", "walze", "drill point", "drilled hole", "blind hole", "bohrerspitze", "bohrspitze", "bohrung", "sackloch"],
   sphere: ["ball", "kugel"],
   // The French names have left the carpenter's and the machinist's words behind; the old ones still find the shape.
   dovetail: ["queue d'aronde", "schwalbenschwanz", "trapezoid", "trapèze"],
   bentTube: ["tube courbé", "tube plié", "gebogenes rohr", "rohrbogen"],
-  counterbore: ["lamage", "senkbohrung", "zylindersenkung"],
-  countersink: ["fraisage", "kegelsenkung", "senkkopf", "double countersink", "both sides", "double fraisage", "doppelsenkung", "beidseitig"],
+  counterbore: ["lamage", "senkbohrung", "zylindersenkung", "drill point", "bohrerspitze"],
+  countersink: ["fraisage", "kegelsenkung", "senkkopf", "double countersink", "both sides", "double fraisage", "doppelsenkung", "beidseitig", "drill point", "bohrerspitze"],
   finishingWasher: ["rosette", "cup washer", "screw cup", "countersunk washer", "trim washer", "washer", "rondelle", "senkscheibe", "zierscheibe", "unterlegscheibe"],
   knurl: ["moletage", "moleté", "rändel", "rändelung"],
   teardrop: ["trou de larme", "tropfenbohrung", "larme"],

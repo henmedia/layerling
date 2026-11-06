@@ -3,6 +3,7 @@ import type { WorkplaneShape } from "@/types/layerling";
 import type { CadModifierPrimitivePart } from "@/lib/cadModifierTypes";
 import { meshYawDegrees, mirrorSign, preservesEdgeTreatmentSize, resizedImportedCoordinates, shapeDepth, shapeHasShapeDeform, shapeWidth } from "@/lib/workplaneShapes";
 import { drawnRound, ROUND_FROM_SIDES, ROUND_FROM_SPHERE_STEPS, ROUND_FROM_TORUS_SIDES, ROUND_FROM_TORUS_STEPS } from "@/lib/roundness";
+import { shapeDrillPointAngle } from "@/lib/drillPoint";
 import { torusTessellation } from "@/lib/torusTessellation";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { sphereTessellation } from "@/lib/sphereTessellation";
@@ -124,7 +125,8 @@ export function cadModifierPrimitiveForAnalyticShape(shape: WorkplaneShape): Cad
   }
 
   if (shape.kind === "cylinder") {
-    if (Math.abs(width - depth) > 1e-4) {
+    // A drilled hole ends in a cone (Discussion #621): it is turned from its section in cadProfileExtrusion.ts.
+    if (Math.abs(width - depth) > 1e-4 || shapeDrillPointAngle(shape) !== undefined) {
       return null;
     }
     // A cylinder drawn with few sides is a prism (a hexagon bar, say), not a

@@ -566,6 +566,20 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     expect(near(await reimportVolume(blob), expected, 0.001)).toBe(true);
   });
 
+  it("cuts a drilled blind hole out of a plate, the drill point with it (Discussion #621)", async () => {
+    const plate = shape({ kind: "box", name: "Plate", width: 20, depth: 20, height: 20 });
+    const drilled = shape({ kind: "cylinder", name: "Drilled", hole: true, width: 6, depth: 6, height: 12, elevation: 9, drillPointAngle: 118 });
+
+    const { blob, exportedCount, skipped } = await exportShapesToStep([plate, drilled]);
+    expect(exportedCount).toBe(1);
+    expect(skipped).toEqual([]);
+
+    // The wall from 9 up through the top at 20, the tip below 9.
+    const tip = 3 / Math.tan((59 * PI) / 180);
+    const expected = 20 * 20 * 20 - PI * 3 * 3 * (20 - 9) - (PI * 3 * 3 * tip) / 3;
+    expect(near(await reimportVolume(blob), expected, 0.0005)).toBe(true);
+  });
+
   it("keeps the planes and cylinders of an edited body that was moved and turned, and still exports a stretched one", async () => {
     const { occtKernel } = await import("@/lib/brepKernel");
     const kernel = occtKernel()!;

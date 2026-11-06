@@ -12,6 +12,8 @@ import { createScrewHoleGeometry } from "@/lib/screwHoleGeometry";
 import { createPortGeometry, PORT_PROFILE_POLYGONS, portPolygonCorners, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { finishingWasherFields } from "@/lib/screwHoleSizes";
+import { drillPointLength } from "@/lib/drillPoint";
+import { meshForShape } from "@/lib/editorMeshCore";
 
 /*
  * The teardrop, the port opening and the two screw holes as exact bodies against the real
@@ -283,5 +285,54 @@ describe("exact bodies for the bore shapes with the real OCCT kernel", () => {
 
   it("screw holes: an oval footprint keeps the display mesh", () => {
     expect(cadModifierProfileForShape(shape("counterbore", { width: 6.4, depth: 9, height: 12 }))).toBeNull();
+  });
+
+  /** The exact body of a shape against its own display mesh, as the edge tool and STEP get it. */
+  function exactAgainstMesh(source: WorkplaneShape) {
+    const part = cadModifierProfileForShape(source);
+    expect(part).not.toBeNull();
+    const mesh = meshForShape(source);
+    const profile = { ...(part as CadModifierProfilePart), expected: cadProfileExpectation(mesh.vertices, mesh.faces) };
+    const local = profileExtrusionSolid(cad, profile);
+    const solid = profile.transform ? cad.transform(local, profile.transform) : local;
+    expect(cad.isSolid(solid)).toBe(true);
+    expect(cad.isValid(solid)).toBe(true);
+    expect(cadProfileSolidMismatch(cad, solid, profile.expected)).toBeNull();
+    return { solid, meshVolume: profile.expected.volume };
+  }
+
+  it.each([90, 118, 135])("drilled hole at %s degrees: the wall and a real cone below the depth, where its mesh has them (Discussion #621)", (angle) => {
+    const tip = drillPointLength(6, angle);
+    const { solid, meshVolume } = exactAgainstMesh(shape("cylinder", { x: 3, z: -1, elevation: 4, width: 6, depth: 6, height: 10, hole: true, drillPointAngle: angle }));
+    expect(surfaceTypes(solid)).toEqual(["cone", "cylinder", "plane"]);
+    const box = cad.getBoundingBox(solid);
+    // The height counts to the shoulder, as in a drawing: the tip lies below it.
+    expect(box.ymin).toBeCloseTo(4 - tip, 4);
+    expect(box.ymax).toBeCloseTo(14, 4);
+    expect(box.xmin).toBeCloseTo(0, 3);
+    const volume = Math.PI * 9 * 10 + (Math.PI * 9 * tip) / 3;
+    expect(cad.getVolume(solid)).toBeCloseTo(volume, 2);
+    expect(Math.abs(meshVolume - volume) / volume).toBeLessThan(0.005);
+    // Its mouth takes a chamfer, as a drilled hole often has.
+    const rim = cad.getSubShapes(solid, "edge").filter((edge) => {
+      const edgeBox = cad.getBoundingBox(edge);
+      return Math.abs(edgeBox.ymin - 14) < 1e-6 && Math.abs(edgeBox.ymax - 14) < 1e-6;
+    });
+    expect(rim.length).toBeGreaterThan(0);
+    expect(cad.isValid(cad.chamfer(solid, rim, 0.5))).toBe(true);
+  });
+
+  it("drilled counterbore and countersink: the drill point below the shaft as one more cone (Discussion #621)", () => {
+    const tip = drillPointLength(3.4, 118);
+    const tipVolume = (Math.PI * 1.7 ** 2 * tip) / 3;
+    const counterbore = exactAgainstMesh(shape("counterbore", { elevation: 3, width: 6.4, depth: 6.4, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleHeadDepth: 3.2, drillPointAngle: 118 })).solid;
+    expect(surfaceTypes(counterbore)).toEqual(["cone", "cylinder", "cylinder", "plane", "plane"]);
+    expect(cad.getVolume(counterbore)).toBeCloseTo(Math.PI * 1.7 ** 2 * 8.8 + Math.PI * 3.2 ** 2 * 3.2 + tipVolume, 2);
+    expect(cad.getBoundingBox(counterbore).ymin).toBeCloseTo(3 - tip, 4);
+    const countersink = exactAgainstMesh(shape("countersink", { width: 6.6, depth: 6.6, height: 8, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, drillPointAngle: 118 })).solid;
+    expect(surfaceTypes(countersink)).toEqual(["cone", "cone", "cylinder", "plane"]);
+    const cone = (Math.PI * 1.6 / 3) * (1.7 ** 2 + 1.7 * 3.3 + 3.3 ** 2);
+    expect(cad.getVolume(countersink)).toBeCloseTo(Math.PI * 1.7 ** 2 * 6.4 + cone + tipVolume, 2);
+    expect(cad.getBoundingBox(countersink).ymin).toBeCloseTo(-tip, 4);
   });
 });

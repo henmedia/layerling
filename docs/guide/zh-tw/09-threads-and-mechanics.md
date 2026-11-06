@@ -242,6 +242,8 @@ microSD 卡槽也是左邊緣的接頭，位於電路板下方（Zero 2 W 上在
 
 把形狀設為孔，並與零件群組。讓它的頂端略高於頭部應貼合的表面，使沉頭孔開口乾淨。要為六角螺帽做沉頭孔，就用六邊的 {{ui:shape.polygon}} 當作孔。 在{{ui:prop.screwHoleSize}}中可選 M2 到 M30（錐形沉孔到 M20），軸徑（ISO 273 中等通孔）、頭部直徑以及深度或角度即依標準設定（DIN 974-1、ISO 15065），長度不變。對於六角柱，{{ui:prop.nutPocketSize}}依 ISO 4032 設定螺帽的對邊寬度和高度，並留 0.4 mm 列印餘量。
 
+鑽出的盲孔底部不是平的，而是鑽頭尖端留下的錐形（Discussion #621）。{{ui:shape.counterbore}}、{{ui:shape.countersink}}以及設為孔的{{ui:shape.cylinder}}都可以這樣收尾：在{{ui:prop.holeBottom}}中選擇 90°、118°（常見麻花鑽）或 135° 的鑽尖，或選{{ui:holeBottom.drillPointOther}}，再在{{ui:prop.drillPointAngle}}中輸入 60° 到 150° 之間的角度。與圖面相同，深度——圓柱體的{{ui:prop.height}}、螺絲孔的{{ui:prop.screwHoleLength}}——只算到錐形開始的台階處；尖端在它下方，118° 時約為直徑的 0.3 倍，角度下方的一行會寫出具體多深。錐形與孔一樣寬，螺絲孔則與桿部一樣寬。{{ui:holeBottom.flat}}讓孔底保持原樣。實體圓柱體保留平的端面，貫通的雙面錐形沉頭孔也一樣。
+
 {{ui:shape.finishingWasher}}（一種裝飾墊圈，Discussion #1131）是放在沉頭或半沉頭螺絲下面的拱形墊圈，用於在木頭或蓋板上顯得整潔。它是實心件，底面平；從較低的邊緣起，拱頂升到座面，座面是承托螺絲頭的錐面，下面是孔。在 {{ui:prop.screwHoleSize}} 下選擇 M2 到 M20：孔是該規格的過孔，座面是該規格的沉頭孔，{{ui:prop.diameter}} 與 {{ui:prop.height}} 由此得出（M3：10.3 × 2.95 mm，M6：16.6 × 4.5 mm）。你也可以自己設定 {{ui:prop.diameter}}、{{ui:prop.height}}、{{ui:prop.centerHole}}、座面頂部的 {{ui:prop.screwHoleHead}} 及其 {{ui:prop.screwHoleAngle}}。它保持圓形，並且是精確實體，因此邊緣工具與 STEP 都能處理它。
 
 ## 螺絲柱

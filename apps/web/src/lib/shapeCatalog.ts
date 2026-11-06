@@ -125,6 +125,7 @@ import {
   normalizeScrewHoleHeadDepth,
   normalizeScrewHoleShaft,
 } from "@/lib/screwHoleGeometry";
+import { normalizeDrillPointAngle } from "@/lib/drillPoint";
 import {
   DEFAULT_FINISHING_WASHER_HEIGHT,
   DEFAULT_FINISHING_WASHER_SEAT_DEPTH,
@@ -936,6 +937,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     screwHoleShaft: shape.screwHoleShaft,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
+    drillPointAngle: shape.drillPointAngle,
     portProfile: shape.portProfile,
     portClearance: shape.portClearance,
     cornerFillet: shape.cornerFillet,
@@ -1351,6 +1353,8 @@ export function makeShapeFromAsset(
     screwHoleHeadDepth: asset.kind === "counterbore" ? normalizeScrewHoleHeadDepth(customization.screwHoleHeadDepth ?? DEFAULT_SCREW_HOLE_HEAD_DEPTH, height)
       : asset.kind === "finishingWasher" ? customization.screwHoleHeadDepth ?? DEFAULT_FINISHING_WASHER_SEAT_DEPTH : undefined,
     screwHoleAngle: asset.kind === "countersink" || asset.kind === "doubleCountersink" || asset.kind === "finishingWasher" ? normalizeScrewHoleAngle(customization.screwHoleAngle ?? DEFAULT_SCREW_HOLE_ANGLE) : undefined,
+    // A drill point saved with the defaults (Discussion #621); a new cylinder is solid and takes it once it is a hole.
+    drillPointAngle: asset.kind === "cylinder" || asset.kind === "counterbore" || asset.kind === "countersink" ? normalizeDrillPointAngle(customization.drillPointAngle) : undefined,
     cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2)
       : asset.kind === "port" ? normalizePortCorner(customization.cornerFillet, width, height, customization.portProfile) : undefined,
     portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,
