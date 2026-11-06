@@ -58,6 +58,18 @@ function displayColor(color: string | undefined) {
   return color && /^#[0-9a-f]{6}$/i.test(color) ? color.toUpperCase() : DEFAULT_COLOR;
 }
 
+/**
+ * How OrcaSlicer writes a whole triangle painted with a filament (1 to 32): its state, with two bits before it that say
+ * the triangle is not split, in hexadecimal, the last digit first (TriangleSelector::serialize, CONST_FILAMENTS in
+ * Model.cpp). Past 32 it paints nothing.
+ */
+function paintColor(filament: number) {
+  const hex = (value: number) => value.toString(16).toUpperCase();
+  if (filament <= 2) return hex(filament * 4);
+  if (filament <= 17) return `${hex(filament - 3)}C`;
+  return filament <= 32 ? `${hex(filament - 18)}FC` : "";
+}
+
 /** Micrometre precision keeps the file small without moving anything a printer could see. */
 function coordinate(value: number) {
   const rounded = Math.round(value * 1e6) / 1e6;
@@ -72,6 +84,14 @@ function coordinate(value: number) {
  * point at it, and then offer to map the colours onto filaments. So every
  * triangle names the colour group too. A program that knows neither simply
  * sees the geometry.
+ *
+ * OrcaSlicer and the slicers built on it do not read a colour per triangle,
+ * though (#1308), so when a body has several colours, every triangle in the
+ * file is also painted with its colour's filament in their own `paint_color`,
+ * which PrusaSlicer 2.9 reads too, up to 15 colours, and from which Bambu
+ * Studio 2.9 takes the filaments instead of asking. The filaments follow the
+ * colour group's order, up to 32; past that a face is left unpainted and prints
+ * with filament 1. A file without such a body stays as it was.
  */
 export function exportMeshesTo3mf(meshes: readonly ThreeMfExportMesh[], metadata: { title?: string } = {}): Uint8Array {
   return zipSync(threeMfPackageFiles(meshes, metadata), THREE_MF_ZIP_OPTIONS);
@@ -99,6 +119,8 @@ function threeMfPackageFiles(meshes: readonly ThreeMfExportMesh[], metadata: { t
   const objects: string[] = [];
   const items: string[] = [];
   const colorGroupId = meshes.length + 2; // after the material group (1) and the objects (2...)
+  const painted = meshes.some(({ faceColors = [] }) => faceColors.some((color) => color !== faceColors[0] && displayColor(color) !== displayColor(faceColors[0])));
+  const paints = painted ? colors.map((_, index) => paintColor(index + 1)) : [];
 
   meshes.forEach((mesh, index) => {
     const welded = weldMeshVertices(mesh);
@@ -115,7 +137,8 @@ function threeMfPackageFiles(meshes: readonly ThreeMfExportMesh[], metadata: { t
       .map(([a, b, c], index) => {
         const faceColor = mesh.faceColors?.[welded.kept[index]];
         const triangleColor = faceColor ? colors.indexOf(displayColor(faceColor)) : colorIndex;
-        return `<triangle v1="${a}" v2="${b}" v3="${c}" pid="${colorGroupId}" p1="${triangleColor}"/>`;
+        const paint = paints[triangleColor];
+        return `<triangle v1="${a}" v2="${b}" v3="${c}" pid="${colorGroupId}" p1="${triangleColor}"${paint ? ` paint_color="${paint}"` : ""}/>`;
       })
       .join("");
     const name = escapeXml(mesh.name || `Body ${index + 1}`);

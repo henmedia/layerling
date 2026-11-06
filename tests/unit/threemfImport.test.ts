@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { strToU8, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
+import { exportMeshesTo3mf } from "@/lib/threemfExport";
 import { importedShapesFrom3mf } from "@/lib/threemfImport";
 
 const CORE = "http://schemas.microsoft.com/3dmanufacturing/core/2015/02";
@@ -165,5 +166,23 @@ describe("importedShapesFrom3mf", () => {
     expect(result.split).toBe(true);
     expect(result.objects).toBe(1);
     expect(result.shapes.map((shape) => [shape.name, shape.color])).toEqual([["two Red", "#ff0000"], ["two Blue", "#0000ff"]]);
+  });
+
+  it("does not call its own painted export painted in the slicer, but a painting without a colour of the triangle's own", () => {
+    const vertices: Array<[number, number, number]> = [[0, 0, 0], [10, 0, 0], [0, 10, 0], [0, 0, 10]];
+    const faces: Array<[number, number, number]> = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]];
+    const exported = exportMeshesTo3mf([{ name: "Bin", color: "#4f7fa8", vertices, faces, faceColors: ["#f2c200", "#4f7fa8", "#4f7fa8", "#4f7fa8"] }]);
+    const own = importedShapesFrom3mf("bin.3mf", exported.buffer.slice(exported.byteOffset, exported.byteOffset + exported.byteLength) as ArrayBuffer);
+    expect(own.painted).toBe(0);
+    expect(own.shapes.map((shape) => shape.color).sort()).toEqual(["#4f7fa8", "#f2c200"]);
+    const painted = (attributes: string) => importedShapesFrom3mf("painted.3mf", package3mf({
+      "3D/3dmodel.model": model(`<resources>
+        <basematerials id="9"><base name="Red" displaycolor="#FF0000"/></basematerials>
+        <object id="1" type="model" pid="9" pindex="0">${meshXml(cubeMesh(10)).replace('<triangle v1="0"', `<triangle ${attributes} v1="0"`)}</object>
+      </resources><build><item objectid="1"/></build>`),
+    })).painted;
+    expect(painted('paint_color="8"')).toBe(1);
+    // A colour group the file does not have gives the triangle no colour of its own.
+    expect(painted('pid="77" p1="0" paint_color="8"')).toBe(1);
   });
 });

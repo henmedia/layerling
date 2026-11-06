@@ -309,7 +309,8 @@ function extractObjectMesh(
     const p1 = el.getAttribute("p1");
     const own = colorFor(trianglePid ?? objectPid, Number(p1 ?? (trianglePid ? 0 : objectPindex)));
     const found = own ?? extruderFor(volume);
-    if (el.hasAttribute("paint_color") || el.hasAttribute("slic3rpe:mmu_segmentation")) out.painted += 1;
+    // Bemalt zaehlt nur, wo das Dreieck keine eigene Farbe traegt: layerling schreibt zur Farbe auch die Bemalung (#1308).
+    if (!(trianglePid && own) && (el.hasAttribute("paint_color") || el.hasAttribute("slic3rpe:mmu_segmentation"))) out.painted += 1;
     const key = found?.key ?? "";
     out.keys.push(key);
     if (found && !out.colors.has(key)) out.colors.set(key, { color: found.color, label: found.label });
