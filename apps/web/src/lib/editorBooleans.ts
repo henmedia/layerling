@@ -2587,12 +2587,20 @@ function expandGroupsForBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
       return [shape];
     }
     return shape.groupedShapes?.length ? restoreGroupedChildren(shape) : [shape];
-  }).flatMap(splitBoreTube);
+  }).flatMap(splitBoreTube).filter(shownInCut);
+}
+
+/**
+ * A part hidden inside a group stays one of its parts, but it is not cut and not cut with (#1323): the group's
+ * body is what is shown, as the plain group and the export already had it. A hidden ring came back on Done.
+ */
+function shownInCut(shape: WorkplaneShape) {
+  return !shape.hidden;
 }
 
 function expandGroupsForBoxBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
   // An intersection or a hull is not the sum of its parts: opened, a hull of four boxes would be cut as the four boxes (#863).
-  return selection.flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube);
+  return selection.flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube).filter(shownInCut);
 }
 
 function canUseBoxBoolean(selection: WorkplaneShape[]) {
