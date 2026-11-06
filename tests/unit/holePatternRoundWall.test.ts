@@ -105,9 +105,11 @@ describe("the hole pattern on a round wall (#1393)", () => {
     const cylinder = body("cylinder");
     const cap = readHolePatternFace(positionsOf(cylinder), new THREE.Vector3(5, 40, 5), new THREE.Vector3(0, 1, 0));
     expect(cap.ok && !isRoundWallFace(cap.face)).toBe(true);
-    // The face tool keeps to flat faces: on the wall it gets no more than one facet's strip.
+    // The face tool keeps to flat faces: it refuses the wall instead of taking one facet's strip of it.
     const pushed = readPerforableFace(positionsOf(tube), new THREE.Vector3(0, 20, 30), new THREE.Vector3(0, 0, 1));
-    expect(pushed.ok && pushed.face.outline.loops[0].length).toBeLessThanOrEqual(4);
+    expect(pushed).toEqual({ ok: false, reason: "curved" });
+    const flatTop = readPerforableFace(positionsOf(tube), new THREE.Vector3(0, 40, 28.7), new THREE.Vector3(0, 1, 0));
+    expect(flatTop.ok).toBe(true);
   });
 
   it("lights the whole wall under the pointer, not one facet", () => {

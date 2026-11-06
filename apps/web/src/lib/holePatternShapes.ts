@@ -58,6 +58,8 @@ export function readPerforableFace(positions: ArrayLike<number>, point: Vec, nor
 
   const face = planarFaceTriangles(positions, hit);
   if (!face || face.triangles.length < 2) return { ok: false, reason: face ? "curved" : "noFace" };
+  // A facet of a round wall is two triangles in one plane, but the wall is curved: not a flat face (#1393).
+  if (flatOrRoundFaceTriangles(positions, hit)?.round) return { ok: false, reason: "curved" };
 
   const workplane = faceFrameWorkplane(point, n);
   // Lay the origin on the face's plane itself, not on whatever the click was slightly off by.
