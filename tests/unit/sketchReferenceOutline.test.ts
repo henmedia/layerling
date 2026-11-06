@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import manifoldModule from "manifold-3d";
+import { beforeAll, describe, expect, it } from "vitest";
 import { importedMeshFootprint, shapeMeshFootprint } from "@/components/SketchWorkspace";
 import { sketchReferenceShapeOnWorkplane } from "@/lib/editorSketchCad";
 import { meshForShape } from "@/lib/editorMeshCore";
+import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import type { WorkplaneShape } from "@/types/layerling";
 
 // #596: a body under a sketch is drawn with its real outline, not as the rectangle of its width and depth.
@@ -137,5 +139,56 @@ describe("a body with a chamfered bottom edge under a sketch (#1006)", () => {
     const seen = footprintOfPositions(positions, (x, z) => ({ x, z }), 10, 10, true);
     expect(width(bottom?.outlineD ?? null)).toBeCloseTo(8, 3);
     expect(width(seen?.outlineD ?? null)).toBeCloseTo(10, 3);
+  });
+});
+
+describe("an imported mesh under a sketch is shown as it is seen from above (Discussion #1366)", () => {
+  beforeAll(async () => {
+    const runtime = await manifoldModule();
+    runtime.setup();
+    rememberManifoldRuntime(runtime);
+  });
+
+  /** A closed box of 12 triangles, each wound outward. */
+  const box = (x0: number, x1: number, y0: number, y1: number, z0: number, z1: number) => {
+    const c = [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2];
+    const p = (i: number) => [i & 1 ? x1 : x0, i & 2 ? y1 : y0, i & 4 ? z1 : z0];
+    const quads = [[0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 5, 4], [2, 3, 7, 6], [0, 2, 6, 4], [1, 3, 7, 5]];
+    const out: number[] = [];
+    for (const [a, b, d, e] of quads) {
+      for (const tri of [[a, b, d], [a, d, e]].map((t) => t.map(p))) {
+        const [u, v, w] = tri;
+        const n = [(v[1] - u[1]) * (w[2] - u[2]) - (v[2] - u[2]) * (w[1] - u[1]), (v[2] - u[2]) * (w[0] - u[0]) - (v[0] - u[0]) * (w[2] - u[2]), (v[0] - u[0]) * (w[1] - u[1]) - (v[1] - u[1]) * (w[0] - u[0])];
+        const outward = n[0] * (u[0] - c[0]) + n[1] * (u[1] - c[1]) + n[2] * (u[2] - c[2]) > 0;
+        out.push(...(outward ? [u, v, w] : [u, w, v]).flat());
+      }
+    }
+    return out;
+  };
+  // A mushroom: a stem 2 x 2 mm standing on the plate, a cap 10 x 10 mm on it - narrow where it stands, wide seen from above,
+  // as a Benchy on its keel.
+  const mushroom = [...box(-1, 1, 0, 5, -1, 1), ...box(-5, 5, 5, 7, -5, 5)];
+  const imported = (positions: number[]) => shape({
+    kind: "mesh", x: 20, z: 10, width: 10, depth: 10, height: 7, size: 10,
+    importedMesh: { positions, baseWidth: 10, baseDepth: 10, baseHeight: 7, triangleCount: positions.length / 9, sourceFormat: "stl" },
+  });
+  const extent = (d: string | null) => {
+    const points = corners(d);
+    const xs = points.map(([x]) => x);
+    const zs = points.map(([, z]) => z);
+    return [Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)].map((value) => Math.round(value * 1000) / 1000);
+  };
+
+  it("draws the cap seen from above, where the outline was only the stem it stands on", () => {
+    const footprint = importedMeshFootprint(imported(mushroom));
+    // In the plate's coordinates: the body's middle at x 20, z 10, the cap 10 mm across.
+    expect(extent(footprint?.outlineD ?? null)).toEqual([15, 25, 5, 15]);
+    expect(footprint?.fillD).toBe(footprint?.outlineD);
+  });
+
+  it("keeps the face it stands on for a mesh the kernel does not take as closed", () => {
+    // One triangle of the cap's top left out: open, so no outline from above; the stem's bottom, as before.
+    const open = [...box(-1, 1, 0, 5, -1, 1), ...box(-5, 5, 5, 7, -5, 5).slice(0, -9)];
+    expect(extent(importedMeshFootprint(imported(open))?.outlineD ?? null)).toEqual([19, 21, 9, 11]);
   });
 });

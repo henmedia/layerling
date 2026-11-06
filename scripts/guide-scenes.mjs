@@ -464,6 +464,23 @@ scenes["printer-overhang"] = async (ctx) => {
   await ctx.shot("printer-overhang");
 };
 
+scenes["print-check"] = async (ctx) => {
+  await freshEditor(ctx);
+  // A tray open at the top: walls of 2 mm, the one on the right only 0.6 mm - too thin for a 0.4 mm nozzle.
+  const tray = await create(ctx, { kind: "box", x: 0, z: 0, width: 30, depth: 20, height: 20, color: "#c9ced6" });
+  const hollow = await create(ctx, { kind: "box", x: 0.7, z: 0, elevation: 2, width: 27.4, depth: 16, height: 20, hole: true });
+  const group = await ctx.mcp("group_objects", { ids: [tray, hollow] });
+  await ctx.mcp("update_object", { id: group.object?.id ?? group.id, name: ctx.t("shape.box") });
+  await ctx.mcp("select_objects", { ids: [] });
+  await ctx.evaluate(`localStorage.setItem("layerling.printCheck", JSON.stringify({ nozzle: 0.4 })); true`);
+  await ctx.click(ctx.t("editor.tool.printCheck"));
+  await ctx.wait(6000);
+  await ctx.click(`${ctx.t("printCheck.show")}: ${ctx.t("printCheck.thin.title")}`);
+  await quiet(ctx, 3000);
+  await ctx.shot("print-check");
+  await ctx.key("Escape");
+};
+
 scenes["editor-dark"] = async (ctx) => {
   await freshEditor(ctx);
   await sampleParts(ctx);

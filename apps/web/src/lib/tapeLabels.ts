@@ -27,6 +27,16 @@ export function tapeAxisTag(spans: TapeAxisSpans, accuracy: number) {
   return axes.length === 3 ? "3D" : axes.join("");
 }
 
+/**
+ * The axes whose reach the label's tip lists: those a measurement runs along, when it runs along two or three.
+ * Along one axis the length is all there is to say, so the tip, and the field that types it, list none.
+ */
+export function tapeDeltaAxes(spans: TapeAxisSpans, accuracy: number): Array<"X" | "Y" | "Z"> {
+  const tag = tapeAxisTag(spans, accuracy);
+  if (tag.length < 2) return [];
+  return (["X", "Y", "Z"] as const).filter((axis) => tag === "3D" || tag.includes(axis));
+}
+
 /** The point halfway along a line on the screen, and the direction of the line there. */
 export function screenPolylineMiddle(points: readonly ScreenPoint[]): { point: ScreenPoint; direction: ScreenPoint } {
   const gap = (a: ScreenPoint, b: ScreenPoint) => Math.hypot(b.x - a.x, b.y - a.y);

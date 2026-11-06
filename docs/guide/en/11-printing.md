@@ -54,6 +54,20 @@ How steep your printer manages is set in the settings under {{ui:workspace.appea
 - Where two parts fit into each other you need clearance: usually 0.2 to 0.4 mm, depending on the printer. Make a small test pair before you print the big part.
 - Many people lightly chamfer the lower edge that sits on the plate. That keeps the first layer from spreading ("elephant foot").
 
+## Checking the print
+
+{{ui:editor.tool.printCheck}}, next to {{ui:editor.tool.clearance}} in {{ui:editor.group.combine}}, looks at the selected objects, or at every visible object when nothing is selected, and says in one window what would go wrong when printing. Each of its five lines is green when it found nothing, and orange with what and where when it did:
+
+- **{{ui:printCheck.thin.title}}**: places thinner than two lines of the nozzle - 0.8 mm with a 0.4 mm nozzle. The slicer leaves such a wall out or prints it as one weak line. Choose your nozzle under {{ui:printCheck.nozzle}} at the top of the window (0.2 to 0.8 with one click, any other in the field). The thin places are painted red with a light grid on the bodies, and the line names the thinnest place and how much surface is too thin. Places smaller than 1 mm² and sharp edges, such as the edge of a wedge, are left out.
+- **{{ui:printCheck.floating.title}}**: a body, or a separate part of one, that touches neither the plate nor another part (within 0.05 mm). It would be printed in the air. A part resting on a part that stands is fine.
+- **{{ui:printCheck.contact.title}}**: a part on the plate whose first layer is very small for its height, such as a sphere or a cone on its tip. It can come loose while it prints. The check warns below 0.5 mm² of footprint, measured 0.1 mm above the plate, for each millimetre of height: a sphere is always below that, a cube of 10 mm has 10.
+- **{{ui:printCheck.overhang.title}}**: the same figures as **Show overhangs**, at the angle set there.
+- **{{ui:printCheck.openMesh.title}}**: an imported mesh with open edges, or edges that three or more faces share. The slicer has to guess where such a mesh is inside.
+
+![A tray whose right wall is only 0.6 mm thick: Print check paints it red and names it in the window.](shot:print-check)
+
+{{ui:printCheck.show}} on a line takes the camera there; it selects the floating parts, those standing on too little and the open meshes, and for the overhangs it switches **Show overhangs** on. Bodies that overlap are checked joined, as the slicer joins them. If you change the design while the window is open, it shows {{ui:printCheck.stale}}; click that or {{ui:printCheck.checkAgain}}. [[Esc]] closes the window. Nothing in the design changes. An AI runs the same check with `layerling_check_print`.
+
 ## When you are ready
 
 Choose {{ui:editor.export}} and then **STL** or **3MF**. STL is the simplest format. 3MF keeps names and colours of the individual bodies and is therefore handy when you print in several colours. The export window also shows how many grams and metres of filament the part would take printed solid. More in [Files and saving](chapter:files-and-saving).

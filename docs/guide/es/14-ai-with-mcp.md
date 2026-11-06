@@ -138,6 +138,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_show_overhangs` | activa o desactiva el rayado de voladizos, fija el ángulo e indica para cada cuerpo la superficie que necesitaría soportes |
 | `layerling_estimate_print` | calcula el volumen, el peso y el filamento de la selección o del diseño entero: para un cuerpo macizo y, como estimación aproximada, con paredes y relleno, igual que la ventana de exportación |
 | `layerling_check_clearance` | comprueba antes de imprimir qué piezas se solapan, se tocan o quedan más cerca que una holgura mínima, también las piezas separadas de un mismo objeto |
+| `layerling_check_print` | comprueba antes de imprimir qué saldría mal: paredes demasiado finas para la boquilla, piezas flotantes, poco contacto con la placa, voladizos y mallas abiertas |
 | `layerling_add_reference_points` | marca puntos de referencia (en el centro, las esquinas o los puntos medios de las aristas de los objetos, o en posiciones exactas) a los que se ajustan las formas |
 | `layerling_list_reference_points` | lista los puntos de referencia con sus id y posiciones |
 | `layerling_remove_reference_points` | elimina puntos de referencia por id, o todos |
@@ -157,7 +158,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_delete_custom_shape` | elimina una forma personalizada; los cuerpos ya insertados se quedan |
 | `layerling_show_workplane` | oculta y muestra la placa con su cuadrícula, por ejemplo para una captura de la parte de abajo (solo la vista) |
 | `layerling_set_section_view` | abre la vista en corte por un plano para mirar dentro (solo la vista: no se corta nada) |
-| `layerling_measurements` | muestra u oculta las mediciones de la cinta métrica y las lista con sus longitudes, y oculta o muestra las medidas alrededor de la selección como [[Q]] |
+| `layerling_measurements` | muestra u oculta las mediciones de la cinta métrica y las lista con sus longitudes, y oculta o muestra las medidas alrededor de la selección como [[Q]], y escribe una longitud para una de ellas, que mueve el cuerpo de su extremo como un clic en su número |
 | `layerling_measure_angle` | mide un ángulo como el transportador: en el vértice de tres puntos o entre dos caras planas, y lo muestra en la vista |
 | `layerling_saved_view` | guarda la vista actual en la tecla 7, 8, 9 o 0 y vuelve a ella, como Mayús+tecla y la tecla (solo la vista); también fija la vista de arranque de los diseños nuevos |
 | `layerling_build_plates` | lista, añade, nombra, ordena y quita las placas de impresión, mueve objetos a una placa y los reparte en las placas, como la barra de placas |

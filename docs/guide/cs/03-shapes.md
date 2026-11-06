@@ -161,6 +161,8 @@ Pro vzor, logo či nápis na hrnku, plechovce nebo trubce nejprve vytvořte rovi
 2. {{ui:inspector.wrapApply}} obtočí levopravý rozměr kolem válce. Zadní hrana se stane horní a tloušťka vystoupí ven ze stěny.
 3. Vyberte obtočený tvar i válec a vystřeďte je v obou vodorovných směrech. Střed obtočeného tvaru odpovídá ose válce, takže pak přesně dosedne na stěnu.
 
+Ovinout lze každé těleso, i tvar z knihovny: třeba kulatou střechu, která má sedět na stěně kulaté věže. Polož ji na desku tak, jak má vypadat na stěně, zaoblením dozadu.
+
 Pro rytinu zapněte {{ui:inspector.wrapInward}}. Tloušťka se zanoří do stěny. Tvar změňte na výřez, vystřeďte a slučte s válcem.
 
 Již obtočený tvar je polygonová síť a nelze jej obtočit podruhé. Pro jiný průměr vraťte obtočení přes Zpět a znovu použijte rovinný originál.

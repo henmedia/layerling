@@ -99,7 +99,8 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
         created.push(hit);
         expect(hit.volume(), `open ${degrees} degrees`).toBeLessThan(0.01);
       }
-      // A pin of 1.75 mm filament goes through every knuckle without touching one.
+      // A pin of 1.75 mm filament goes through every knuckle without touching one: in the body's only by the 0.05 mm per
+      // side that a printed hole comes out smaller, so it sits tight there (#1220).
       const filament = kernel.Manifold.cylinder(70, 0.875, 0.875, 48).rotate([0, 90, 0]).translate([-35, axisY, axisZ]);
       created.push(filament);
       const onPin = [closed.intersect(filament), whole.intersect(filament)];
@@ -124,7 +125,8 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
       const radius = hingeKnuckleRadius({ hingePin: 1.75 });
       const axisY = 30 + 2 - radius;
       const axisZ = -(20 + radius + 0.3);
-      // Past the round hole (1.075 mm with the pin's 0.2 mm of play) but within its point (1.52 mm).
+      // Past the round holes (0.925 mm in the body's knuckle, where the pin sits tight; 1.075 mm in the lid's, with the
+      // pin's 0.2 mm of play) but within their points (1.31 and 1.52 mm).
       const off = 1.25;
       // The middle of the first knuckle (the body's) and of the second (the lid's) along the 60 mm back.
       const bodyX = -23.7;
@@ -140,16 +142,22 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
         expect(solidAt(knuckles, bodyX, axisY - off, axisZ), `body below, teardrop ${teardrop}`).toBe(true);
         expect(solidAt(closed, lidX, axisY - off, axisZ), `lid below, teardrop ${teardrop}`).toBe(!teardrop);
         expect(solidAt(closed, lidX, axisY + off, axisZ), `lid above, teardrop ${teardrop}`).toBe(true);
-        // The round part is the same either way: the pin's hole with its play.
-        expect(solidAt(knuckles, bodyX, axisY, axisZ + 1)).toBe(false);
-        expect(solidAt(knuckles, bodyX, axisY, axisZ + 1.1)).toBe(true);
+        // The round part is the same either way: the pin's tight hole in the body, its hole with the play in the lid.
+        expect(solidAt(knuckles, bodyX, axisY, axisZ + 0.85)).toBe(false);
+        expect(solidAt(knuckles, bodyX, axisY, axisZ + 1)).toBe(true);
+        expect(solidAt(closed, lidX, axisY, axisZ + 1)).toBe(false);
+        expect(solidAt(closed, lidX, axisY, axisZ + 1.15)).toBe(true);
+        // The body's point is the lower for its smaller round: past it, 1.4 mm above the axis, the knuckle is solid,
+        // where the lid's point still reaches.
+        expect(solidAt(knuckles, bodyX, axisY + 1.4, axisZ), `body's point, teardrop ${teardrop}`).toBe(true);
+        expect(solidAt(closed, lidX, axisY - 1.4, axisZ), `lid's point, teardrop ${teardrop}`).toBe(!teardrop);
       }
     } finally {
       dispose(created);
     }
   });
 
-  it("widens the pin's holes by the play asked for (#1220)", async () => {
+  it("widens the lid's holes by the play asked for, and keeps the body's tight whatever it is (#1220)", async () => {
     const kernel = await runtime();
     const created: Solid[] = [];
     const solidAt = (solid: Body, x: number, y: number, z: number) => {
@@ -168,9 +176,13 @@ describe("a lid with a hinge along the back or another side (real Manifold kerne
         const result = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingePinPlay: play }));
         if ("error" in result) throw new Error(JSON.stringify(result.error));
         created.push(result.lid, result.hinge!.knuckles);
-        // 1.125 mm from the axis, beside it in the first knuckle (the body's): inside the hole with 0.4 mm of play
+        const closed = closing(body, result.lid, 2, created);
+        // 1.125 mm from the axis, beside it in the second knuckle (the lid's): inside the hole with 0.4 mm of play
         // (1.275 mm), in the knuckle's wall with 0.1 mm (0.975 mm).
-        expect(solidAt(result.hinge!.knuckles, -23.7, axisY, axisZ + 1.125), `play ${play}`).toBe(!free);
+        expect(solidAt(closed, -11.9, axisY, axisZ + 1.125), `lid, play ${play}`).toBe(!free);
+        // In the first (the body's) the pin sits tight either way: its hole is 0.925 mm.
+        expect(solidAt(result.hinge!.knuckles, -23.7, axisY, axisZ + 1.125), `body, play ${play}`).toBe(true);
+        expect(solidAt(result.hinge!.knuckles, -23.7, axisY, axisZ + 0.85), `body, play ${play}`).toBe(false);
       }
     } finally {
       dispose(created);

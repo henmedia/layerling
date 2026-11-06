@@ -22,6 +22,8 @@ export const DEFAULT_DOVETAIL_NECK_RATIO = 0.5;
 export const DEFAULT_DOVETAIL_CLEARANCE = 0.2;
 export const MAX_DOVETAIL_CLEARANCE = 2;
 const MIN_DOVETAIL_NECK = 0.1;
+/** How much narrower than the wide end the neck must stay at least, so the flanks still slant (#1360). */
+const MIN_DOVETAIL_NARROWING = 0.1;
 
 type Point2D = { x: number; y: number };
 
@@ -29,11 +31,25 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function minDovetailNeckWidth(width: number) {
+  return Math.min(MIN_DOVETAIL_NECK, width * 0.5);
+}
+
+/**
+ * The widest neck a dovetail of this width can have: 0.1 mm narrower than the wide end, so a long,
+ * gently tapering tail (146 wide, 145 at the neck) is possible too (#1360). It was 95 % of the width,
+ * which left a 146 mm tail no neck above 138.7 mm.
+ */
+export function maxDovetailNeckWidth(width: number) {
+  const safeWidth = Math.max(0.01, width);
+  return Math.max(minDovetailNeckWidth(safeWidth), safeWidth - MIN_DOVETAIL_NARROWING);
+}
+
 /** The neck is narrower than the wide end - otherwise the joint would not hold. */
 export function normalizeDovetailNeckWidth(value: number | undefined, width: number) {
   const safeWidth = Math.max(0.01, width);
   const requested = Number.isFinite(value) ? (value as number) : safeWidth * DEFAULT_DOVETAIL_NECK_RATIO;
-  return clamp(requested, Math.min(MIN_DOVETAIL_NECK, safeWidth * 0.5), safeWidth * 0.95);
+  return clamp(requested, minDovetailNeckWidth(safeWidth), maxDovetailNeckWidth(safeWidth));
 }
 
 export function normalizeDovetailClearance(value?: number) {
