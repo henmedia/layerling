@@ -1399,6 +1399,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       if (typeof text !== "string" || text.length > 80) throw new Error(`${label}.formulas.${field} must be a short text`);
     }
   }
+  // What a group does with its parts when it is resized (Discussion #526).
+  if (definition.groupResize !== undefined && definition.groupResize !== "stretch" && definition.groupResize !== "keepParts") {
+    throw new Error(`${label}.groupResize must be stretch or keepParts`);
+  }
   // A text's fill mode (#215): a stroke like a sketch's, and the silhouette switch.
   if (definition.textStroke !== undefined && !normalizeSketchStroke(definition.textStroke)) {
     throw new Error(`${label}.textStroke must be a stroke with a width above 0`);

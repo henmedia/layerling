@@ -78,6 +78,8 @@ import { DEFAULT_HOLE_PATTERN, normalizeHolePattern, type HolePatternSettings } 
 import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, readPerforableFace, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
 import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
+import { groupsStretchedInstead, groupsToKeepParts, keptPartsForResize, placeKeptPartsGroup } from "@/lib/groupKeepParts";
+import { offersGroupResize } from "@/lib/groupScale";
 import { MeshSimplifyPanel } from "./workplane/MeshSimplifyPanel";
 import { addCustomFontFile, customFontErrorMessage, FontManagerPanel } from "./workplane/FontManagerPanel";
 import { onFontManagerRequested } from "@/lib/fontManagerEvents";
@@ -111,7 +113,7 @@ import { ShortcutsModal } from "./workplane/ShortcutsModal";
 import { InteractiveHelp } from "./InteractiveHelp";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
 import { nextSelectionTransparency } from "@/lib/selectionTransparency";
-import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, resizedShapeSize, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
+import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, normalizeGroupResize, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, resizedShapeSize, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
 import { ribFootSwitch, ribThicknessOnFootPatch } from "@/lib/rib";
 import { pasteCenteringShift, pasteNudged } from "@/lib/pasteCentering";
 import { faceWorkplaneCenteringShift, workplaneCenteringOffset } from "@/lib/workplaneCentering";
@@ -10799,6 +10801,7 @@ export function LayerlingEditor({
    * A group built again from these parts, as Done builds an opened one: the same group, not a new one - its id stays,
    * so anything holding it (MCP, the object list, the level around it) still finds it, with its name, see-through,
    * hidden, solid or hole, its own colour and its pivot (#807). Adding to or taking from it in the list does the same (#1338).
+   * It also keeps what it does with its parts when it is resized (Discussion #526).
    */
   const rebuildGroupFromParts = useCallback(async (original: WorkplaneShape, parts: WorkplaneShape[]): Promise<{ group: WorkplaneShape; mergeWarning: string } | { group: null; failure: string }> => {
     const operation = original.groupOperation === "intersection" || original.groupOperation === "hull" || original.groupOperation === "bundle" || original.groupOperation === "loft" ? original.groupOperation : "group";
@@ -10825,6 +10828,7 @@ export function LayerlingEditor({
       color: ownColour ? original.color : rebuilt.color,
       transparent: original.transparent,
       hidden: original.hidden,
+      groupResize: original.groupResize,
       // Multicolor switched on or off stays so after Done; a group cut into one body lost it and turned one colour (#1323).
       ...(typeof original.multicolor === "boolean" ? { multicolor: original.multicolor } : {}),
     }, Boolean(original.hole))));
@@ -10999,6 +11003,71 @@ export function LayerlingEditor({
       setOpenGroupBusy(false);
     }
   }, [commitGroupPartsStep, groupPartsStepRefused, rebuildGroupFromParts, refuseOpenGroupStep]);
+
+  /**
+   * A group set to keep its holes and small parts (Discussion #526) is built again from its parts once it has been
+   * resized - by the handles, the size fields, Scale in percent or MCP - with each part laid out by its rule
+   * (keptPartsForResize) and built as Done builds an opened group. While the handles are dragged it stretches as
+   * every group does; the rebuild finishes the step that resized it, so one Undo takes both back. The groups found
+   * the same way at once share one run, so MCP can wait for the run the editor starts for the same step.
+   */
+  const keptPartsRunsRef = useRef(new Map<string, Promise<void>>());
+  const rebuildKeepingParts = useCallback((groups: readonly WorkplaneShape[]): Promise<void> => {
+    const key = groups.map((group) => [group.id, shapeWidth(group), group.height, shapeDepth(group), group.groupedBaseWidth, group.groupedBaseHeight, group.groupedBaseDepth].join(":")).join("|");
+    const running = keptPartsRunsRef.current.get(key);
+    if (running) return running;
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const run = (async () => {
+      // A drag writes its step just after it ends: the rebuild finishes that step, not the one before it.
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      const replacements = new Map<string, WorkplaneShape>();
+      let failure = "";
+      let mergeWarning = "";
+      let shrunkName = "";
+      let shrunkCount = 0;
+      for (const group of groups) {
+        const kept = keptPartsForResize(group);
+        const result = await rebuildGroupFromParts(group, kept.parts);
+        if (!result.group) {
+          failure = result.failure;
+          continue;
+        }
+        replacements.set(group.id, placeKeptPartsGroup(result.group, group));
+        mergeWarning ||= result.mergeWarning;
+        if (kept.shrunk > 0) shrunkName ||= displayShapeName(group);
+        shrunkCount += kept.shrunk;
+      }
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return;
+      // A group that could not be built again stays stretched, and the notice says why.
+      const message = failure || mergeWarning || (shrunkCount > 0 ? t("status.groupPartsShrunk", { name: shrunkName, count: shrunkCount }) : "");
+      if (replacements.size === 0) {
+        if (message) setNotice(message);
+        return;
+      }
+      commitShapes(shapesRef.current.map((shape) => replacements.get(shape.id) ?? shape), selectedIdsRef.current, message || undefined, undefined, true);
+    })().finally(() => keptPartsRunsRef.current.delete(key));
+    keptPartsRunsRef.current.set(key, run);
+    return run;
+  }, [commitShapes, rebuildGroupFromParts]);
+
+  // The design as the last finished step left it, by id: a group in it at another size has just been resized, one
+  // that comes in new (a copy, an ungrouped part, another design) is left as it is. So is everything Undo brings back:
+  // only a step at the end of the history is finished, as a rebuild in the middle would cut off the steps to redo.
+  const keptPartsSeenRef = useRef<{ projectId: string | null | undefined; shapes: Map<string, WorkplaneShape> }>({ projectId: undefined, shapes: new Map() });
+  useEffect(() => {
+    if (historyViewState || projectInteractionActive || projectInteractionActiveRef.current) return;
+    const seen = keptPartsSeenRef.current;
+    const projectId = projectInfoRef.current.projectId;
+    const before = seen.projectId === projectId ? seen.shapes : new Map<string, WorkplaneShape>();
+    keptPartsSeenRef.current = { projectId, shapes: new Map(shapes.map((shape) => [shape.id, shape])) };
+    if (historyIndexRef.current !== historyRef.current.length - 1) return;
+    // A mirrored or tapered group set to keep its parts stretches everything instead, and says so.
+    const stretched = groupsStretchedInstead(before, shapes);
+    if (stretched.length) setNotice(t("status.groupStretchedInstead", { name: displayShapeName(stretched[0]) }));
+    const pending = groupsToKeepParts(before, shapes);
+    if (pending.length) void rebuildKeepingParts(pending);
+  }, [historyViewState, projectInteractionActive, rebuildKeepingParts, shapes]);
 
   // Undo past an opening brings that group back, and deleting every part leaves
   // nothing to close: in both cases that level is over, with every level inside it.
@@ -12196,6 +12265,12 @@ export function LayerlingEditor({
         if (typeof params.hidden === "boolean") patch.hidden = params.hidden;
         if (typeof params.transparent === "boolean") patch.transparent = params.transparent || undefined;
         if (typeof params.multicolor === "boolean") patch.multicolor = params.multicolor;
+        // What the group does with its parts when it is resized (Discussion #526).
+        if (params.groupResize !== undefined) {
+          if (params.groupResize !== "stretch" && params.groupResize !== "keepParts") throw new Error("groupResize must be stretch or keepParts");
+          if (!offersGroupResize(target)) throw new Error("groupResize is for groups and bundles only, not for hulls, intersections, lofts, tags, QR codes or boards");
+          patch.groupResize = normalizeGroupResize(params.groupResize);
+        }
         // A filleted tube is a mesh, which the shape's own settings below do not cover; its bore still can cut (#1067).
         if (typeof params.tubeBoreHole === "boolean" && tubeBeforeEdgeTreatments(target)) patch.tubeBoreHole = params.tubeBoreHole;
         if (typeof params.font === "string") patch.font = mcpTextFont(params.font) ?? params.font;
@@ -12349,6 +12424,12 @@ export function LayerlingEditor({
         let updated = nextShapes.find((shape) => shape.id === target.id) as WorkplaneShape;
         if (params.gridfinityKeys === true && gridfinitySwallowtailKeyCount({ ...updated, depth: shapeDepth(updated) }) === 0) throw new Error(MCP_GRIDFINITY_KEYS_NEEDS);
         commitShapes(nextShapes, target.id, t("status.shapeUpdatedMcp", { name: displayShapeName(updated) }));
+        // A group that keeps its holes and small parts is built again at its new size (#526); the answer waits for it.
+        const keepingParts = groupsToKeepParts(new Map([[target.id, target]]), [updated]);
+        if (keepingParts.length) {
+          await rebuildKeepingParts(keepingParts);
+          updated = findShape(target.id) ?? updated;
+        }
         // The fill of an extruded sketch (#197): built again from its sketch, as the inspector does.
         const fillProfile = updated.sketchProfile && updated.sketchOperation !== "revolve" && updated.sketchOperation !== "sweep"
           ? mcpSketchFillProfile(updated.sketchProfile, params)
@@ -12482,8 +12563,12 @@ export function LayerlingEditor({
         const percent = typeof params.percent === "number" ? params.percent : Number.NaN;
         const mode = params.mode === "each" ? "each" : "together";
         if (ids.length === 0) throw new Error("scale_objects needs ids or a selection");
+        const unscaled = new Map(currentShapes().map((shape) => [shape.id, shape]));
         const result = scaleSelectionByPercent(ids, percent, mode);
         if (!result.ok) throw new Error(result.message);
+        // Groups that keep their holes and small parts are built again at their new size (#526) before the answer.
+        const keepingParts = groupsToKeepParts(unscaled, currentShapes());
+        if (keepingParts.length) await rebuildKeepingParts(keepingParts);
         const scaled = new Set(ids);
         return {
           percent,
@@ -14712,6 +14797,7 @@ export function LayerlingEditor({
     moveShapeInList,
     addShapesToGroup,
     takePartOutOfGroup,
+    rebuildKeepingParts,
     finishOpenGroup,
     initialSnap,
     openGroupForEditing,

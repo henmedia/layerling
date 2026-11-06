@@ -195,6 +195,27 @@ export const scenes = {
     await ctx.shot("group-multicolor");
   },
 
+  // A plate made 40 mm longer whose group keeps its holes and small parts (Discussion #526): the corner holes
+  // stay round, 5 mm from the corners, the slot stays in the middle, and the setting shows in the group's card.
+  async "group-keep-parts"(ctx) {
+    await freshEditor(ctx);
+    const plate = await create(ctx, { kind: "box", x: 0, z: 0, width: 100, depth: 60, height: 4, color: BLUE });
+    const holes = [];
+    for (const [x, z] of [[-42, -22], [42, -22], [-42, 22], [42, 22]]) holes.push(await create(ctx, { kind: "cylinder", x, z, width: 6, depth: 6, height: 4, color: GREEN }));
+    holes.push(await create(ctx, { kind: "box", x: 0, z: 0, width: 24, depth: 6, height: 4, color: GREEN }));
+    for (const hole of holes) await ctx.mcp("update_object", { id: hole, hole: true });
+    const group = await ctx.mcp("group_objects", { ids: [plate, ...holes] });
+    const id = group.object?.id ?? group.id;
+    await ctx.mcp("update_object", { id, groupResize: "keepParts", width: 140 });
+    await ctx.wait(2500);
+    await select(ctx, [id]);
+    await ctx.click(ctx.t("view.top"));
+    await ctx.wait(1500);
+    await ctx.click(ctx.t("camera.focusSelection")).catch(() => {});
+    await quiet(ctx, 3000);
+    await ctx.shot("group-keep-parts");
+  },
+
   // Align faces: the part that moves is selected and the tool is open.
   async "mate-faces"(ctx) {
     await freshEditor(ctx);

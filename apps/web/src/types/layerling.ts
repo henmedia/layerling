@@ -944,6 +944,9 @@ export type LoftMiddleSection = {
   offsetZ?: number;
 };
 
+/** What a group does with its parts when it is resized (Discussion #526); see WorkplaneShape.groupResize. */
+export type GroupResizeMode = "stretch" | "keepParts";
+
 export type WorkplaneShape = {
   id: string;
   name: string;
@@ -1547,6 +1550,14 @@ export type WorkplaneShape = {
    * Left out, see groupShowsPartColors() for what a group shows.
    */
   multicolor?: boolean;
+  /**
+   * What a group does with its parts when it is resized (Discussion #526). Left out, it stretches
+   * them all with it, as groups always have. "keepParts" stretches only the parts that reach across
+   * (nearly) the whole group along the axis that changed; every other part keeps its own size there
+   * and its distance to the nearer side, so the holes in a plate stay round and where they were put.
+   * See lib/groupKeepParts.
+   */
+  groupResize?: GroupResizeMode;
   locked?: boolean;
   /**
    * Lock shape (#1277): the part still moves, turns and groups with others, but its size, settings,

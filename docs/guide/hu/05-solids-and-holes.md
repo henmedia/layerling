@@ -39,6 +39,17 @@ Egy egész csoport is lehet tömör vagy lyuk. Egy egyszerű szabály érvényes
 - Ha a csoport csak tömör testekből (vagy csak lyukakból) áll, egészként váltod át, és a részei vele mennek.
 - Ha mindkettőt tartalmazza, mondjuk egy furatos kockát, minden rész megtartja a saját állapotát. Az egész csoport ilyenkor szerszám lesz, de a furat furat marad.
 
+### Csoport átméretezése: a lyukak és kis részek megmaradnak
+
+Ha egy csoportot hosszabbra, szélesebbre vagy magasabbra veszel, a részei vele együtt nyúlnak, mintha gumira rajzolták volna őket: egy lap kerek lyukai oválisak lesznek és befelé csúsznak. Hogy olyanok maradjanak, amilyenek, a csoport beállításaiban a {{ui:inspector.groupResize}} alatt válaszd a {{ui:inspector.groupResizeKeepParts}} lehetőséget; e választás nélkül a {{ui:inspector.groupResizeStretch}} érvényes, mint eddig minden csoportnál. Ettől kezdve a csoport minden átméretezéskor - a fogantyúkkal, a méretmezőkben vagy a {{ui:scalePercent.title}} eszközzel - egyetlen szabály szerint épül újra a részeiből, minden irányban külön:
+
+- Az a rész, amely majdnem az egész csoporton végignyúlik, kilenctizedén vagy annál többön, vele együtt nő vagy zsugorodik, és megtartja a távolságát mindkét oldaltól: maga a lap, egy fal vagy egy doboz belseje, amelynek falai ugyanolyan vastagok maradnak.
+- Minden más rész megtartja a saját méretét és a távolságát a közelebbi oldaltól. A középen álló rész középen marad.
+
+Egy lap, amelyben minden saroktól 5 mm-re van egy lyuk és középen egy horony, 40 mm-rel meghosszabbítva tehát kerek lyukakat tart meg a sarkoktól 5 mm-re, és a horony középen marad. Nincs mögötte kényszermegoldó, és semmit sem kell részenként beállítani: minden részre ugyanaz a szabály érvényes, így előre tudod, mi fog történni. Egy elforgatott rész azzal a dobozzal számít, amelyet a csoportban elfoglal, és elforgatva marad; a csoporton belüli csoport egy résznek számít. Amíg egy fogantyút húzol, a csoport egészében nyúlik; amikor elengeded, újraépül, ugyanabban a visszavonási lépésben. Ha a csoport kisebb lesz annál, amire egy résznek a távolságával együtt szüksége van, az a rész a korábbiakhoz hasonlóan vele együtt zsugorodik, és egy üzenet szól róla. A tükrözött, elvékonyított vagy csavart csoport, valamint a saját lekerekítéssel, élletöréssel vagy textúrával rendelkező csoport mindig mindent megnyújt. Ha egy már megnyújtott csoporthoz választod ezt a beállítást, a részei azonnal újra elrendeződnek.
+
+![Egy lap, amelyben minden saroktól 5 mm-re van egy lyuk és középen egy horony, a „Lyukak és kis részek megtartása” beállítással 40 mm-rel meghosszabbítva: a lyukak még mindig kerekek és 5 mm-re vannak a sarkoktól, a horony még mindig középen van.](shot:group-keep-parts)
+
 ## Kötegbe fogás
 
 Néha a részeknek csak együtt kell maradniuk anélkül, hogy eggyé válnának – mondjuk egy fehér logónak egy fekete lapon, többszínű nyomtatáshoz. Erre való a {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), mint a Tinkercadben. Egy köteg úgy mozog, fordul és méreteződik, mint egy alakzat, de semmi sem egyesül:

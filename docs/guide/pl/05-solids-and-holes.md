@@ -39,6 +39,17 @@ Cała grupa też może być bryłą albo otworem. Obowiązuje prosta zasada:
 - Jeśli grupa składa się tylko z brył (albo tylko z otworów), przełączasz ją w całości, a jej części idą za nią.
 - Jeśli zawiera jedno i drugie, na przykład sześcian z otworem, każda część zachowuje własny stan. Cała grupa staje się wtedy narzędziem, ale otwór zostaje otworem.
 
+### Zmiana rozmiaru grupy: otwory i małe części zostają
+
+Gdy grupa staje się dłuższa, szersza albo wyższa, jej części rozciągają się razem z nią, jakby były narysowane na gumie: okrągłe otwory w płycie stają się owalne i przesuwają się do środka. Aby zostały takie, jakie są, wybierz w ustawieniach grupy w polu {{ui:inspector.groupResize}} opcję {{ui:inspector.groupResizeKeepParts}}; bez tego wyboru obowiązuje {{ui:inspector.groupResizeStretch}}, jak dotąd w każdej grupie. Od tej chwili przy każdej zmianie rozmiaru - uchwytami, w polach wymiarów albo przez {{ui:scalePercent.title}} - grupa jest budowana od nowa ze swoich części według jednej reguły, osobno dla każdego kierunku:
+
+- Część, która sięga prawie przez całą grupę, na dziewięć dziesiątych lub więcej, rośnie albo maleje razem z nią i zachowuje odległość od obu boków: sama płyta, ścianka albo wnętrze pudełka, którego ścianki zostają tak samo grube.
+- Każda inna część zachowuje swój rozmiar i odległość od bliższego boku. Część pośrodku zostaje pośrodku.
+
+Płyta z otworem 5 mm od każdego narożnika i rowkiem pośrodku, wydłużona o 40 mm, zachowuje więc okrągłe otwory 5 mm od narożników i rowek pośrodku. Nie stoi za tym żaden solver więzów i niczego nie ustawiasz część po części: ta sama reguła obowiązuje wszystkie części, więc z góry wiesz, co się stanie. Obrócona część liczy się z prostopadłościanem, który zajmuje w grupie, i pozostaje obrócona; grupa wewnątrz grupy liczy się jako jedna część. Gdy ciągniesz uchwyt, grupa rozciąga się w całości; gdy go puścisz, jest budowana od nowa, w tym samym kroku cofania. Jeśli grupa stanie się mniejsza, niż część potrzebuje razem ze swoją odległością, ta część jak dotąd zmniejsza się razem z nią, a komunikat o tym informuje. Grupa odbita lustrzanie, zwężana lub skręcona oraz grupa z własnymi zaokrągleniami, fazowaniami lub teksturą zawsze rozciąga wszystko. Wybrane dla grupy, która jest już rozciągnięta, ustawienie od razu rozmieszcza jej części na nowo.
+
+![Płyta z otworem 5 mm od każdego narożnika i rowkiem pośrodku, wydłużona o 40 mm z opcją „Zachowaj otwory i małe części”: otwory są nadal okrągłe i 5 mm od narożników, rowek nadal pośrodku.](shot:group-keep-parts)
+
 ## Zestaw
 
 Czasem części mają tylko trzymać się razem, nie stając się jednym, na przykład białe logo na czarnej płytce do druku wielokolorowego. Do tego służy {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), jak w Tinkercadzie. Zestaw przesuwa się, obraca i zmienia rozmiar jak kształt, ale nic się nie scala:

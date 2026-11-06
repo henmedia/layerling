@@ -312,7 +312,7 @@ import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel
 import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
 import { plateOffsetOfShape } from "@/lib/buildPlates";
-import { isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
+import { isNonSolidShape, normalizeGroupResize, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
 import { roundSideCount } from "@/lib/roundSideCount";
@@ -359,6 +359,7 @@ import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFor
 import { useKeptColors, useRecentColors } from "@/lib/recentColors";
 import { ColorKeepRows } from "@/components/workplane/ColorKeepRows";
 import { canToggleGroupColors, groupShowsPartColors } from "@/lib/groupColors";
+import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
@@ -4711,6 +4712,36 @@ export function ShapeInspector({
         <button className="inspector-action-button" type="button" disabled={frozen} onClick={onOpenGroup}>
           {t(shape.groupOperation === "bundle" ? "group.editBundle" : "group.edit")} (E)
         </button>
+      ) : null}
+
+      {/* What the group does with its parts when it is resized (Discussion #526): two long choices, side by side. */}
+      {offersGroupResize(shape) ? (
+        <div className="property-card" data-help-section-all="groupResize">
+          <div className="property-list cylinder-wrap-body">
+            <div className="name-tag-sides group-resize-choice" role="radiogroup" aria-label={t("inspector.groupResize")}>
+              <span>{t("inspector.groupResize")}</span>
+              {(["stretch", "keepParts"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  role="radio"
+                  aria-checked={(shape.groupResize ?? "stretch") === mode}
+                  className={(shape.groupResize ?? "stretch") === mode ? "active" : ""}
+                  disabled={frozen}
+                  onClick={() => onUpdate({ groupResize: normalizeGroupResize(mode) })}
+                >
+                  {t(mode === "keepParts" ? "inspector.groupResizeKeepParts" : "inspector.groupResizeStretch")}
+                </button>
+              ))}
+            </div>
+            {shape.groupResize === "keepParts" ? (
+              <p className="cylinder-wrap-hint">
+                {t(groupCanKeepParts(shape) ? "inspector.groupResizeKeepPartsHint" : "inspector.groupResizeStretchedHint")}
+                <GuideHelpLink section="groupResize" className="inspector-help-link" />
+              </p>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       {canSeparateParts && onSeparateParts ? (
