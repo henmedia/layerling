@@ -11,7 +11,7 @@ import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeome
 import { type AppThemePalette, type ResolvedAppTheme } from "@/lib/appTheme";
 import { t } from "@/lib/i18n";
 import { currentLengthUnitLabel, displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
-import { computeCornerRulerRelativeCoordinates, cornerRulerAxisModes, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
+import { computeCornerRulerRelativeCoordinates, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
 import { type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -1672,16 +1672,24 @@ export function syncCornerRulerToolOverlay(
           y: (handleScreen.y + zEndScreen.y) / 2 + normZ.y * 22 * sideZ,
         };
 
-        const elevationLabelPos = {
+        let elevationLabelPos = {
           x: (elevBaseScreen.x + elevTargetScreen.x) / 2 + 28,
           y: (elevBaseScreen.y + elevTargetScreen.y) / 2,
         };
+        // At height 0 the middle of the height arrow is the body's corner, so the number lay on the body
+        // (#1279). The body's outline on the screen moves it out beside the body and keeps it clear there.
+        const bodyScreen = cornerRulerBodyScreenBox(bounds, corner, xAxis, yAxis, zAxis, state);
+        if (bodyScreen) {
+          elevationLabelPos = cornerRulerElevationFieldBesideBody(elevationLabelPos, (elevBaseScreen.x + elevTargetScreen.x) / 2, bodyScreen);
+        }
 
         // A body at the corner leaves no distance: the three fields would sit on each other and on the ruler's
         // buttons (#777), so they step aside. Where there is room they stay at the middle of their arrows.
         const [xFieldPos, zFieldPos, elevationFieldPos] = spreadCornerRulerFields(
           [xLabelPos, zLabelPos, elevationLabelPos],
           [{ x: handleScreen.x, y: handleScreen.y + 2, halfWidth: 34, halfHeight: 30 }],
+          undefined,
+          [undefined, undefined, bodyScreen ? [bodyScreen] : undefined],
         );
         selectedCoordinate = {
           shapeIds: selectedShapes.map((shape) => shape.id),
@@ -2257,6 +2265,38 @@ export function projectShapeExtent(
 }
 
 /** Gemeinsame Umrissbox mehrerer Formen in denselben Achsen - mehrere markierte Koerper zaehlen am Lineal wie einer. */
+/**
+ * The frame round the measured bodies on the screen: the eight corners of their box in the ruler's
+ * frame, projected. Null when a corner is behind the camera, where the projection means nothing.
+ */
+function cornerRulerBodyScreenBox(
+  bounds: { min: THREE.Vector3; max: THREE.Vector3 },
+  corner: THREE.Vector3,
+  xAxis: THREE.Vector3,
+  yAxis: THREE.Vector3,
+  zAxis: THREE.Vector3,
+  state: ThreeState,
+) {
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (const u of [bounds.min.x, bounds.max.x]) {
+    for (const v of [bounds.min.y, bounds.max.y]) {
+      for (const w of [bounds.min.z, bounds.max.z]) {
+        const point = corner.clone().addScaledVector(xAxis, u).addScaledVector(yAxis, v).addScaledVector(zAxis, w);
+        if (!Number.isFinite(point.x + point.y + point.z) || depthInFrontOfCamera(point, state) <= 0) return null;
+        const screen = projectToScreen(point, state);
+        minX = Math.min(minX, screen.x);
+        maxX = Math.max(maxX, screen.x);
+        minY = Math.min(minY, screen.y);
+        maxY = Math.max(maxY, screen.y);
+      }
+    }
+  }
+  return { x: (minX + maxX) / 2, y: (minY + maxY) / 2, halfWidth: (maxX - minX) / 2, halfHeight: (maxY - minY) / 2 };
+}
+
 export function projectShapesExtent(
   shapes: WorkplaneShape[],
   xAxis: THREE.Vector3,

@@ -216,12 +216,15 @@ import {
   DEFAULT_GRIDFINITY_LABEL_CORNER,
   GRIDFINITY_BASEPLATE_RADIUS,
   GRIDFINITY_BIN_RADIUS,
+  GRIDFINITY_LABEL_FONTS,
+  GRIDFINITY_LABEL_TEXT_KEYS,
   GRIDFINITY_LABEL_WALL_KEYS,
   GRIDFINITY_OPEN_WALL_KEYS,
   GRIDFINITY_PADDING_KEYS,
   GRIDFINITY_SCOOP_WALL_KEYS,
   MAX_GRIDFINITY_DIVIDER_THICKNESS,
   MAX_GRIDFINITY_HEIGHT_UNITS,
+  MAX_GRIDFINITY_LABEL_TEXT_LENGTH,
   MAX_GRIDFINITY_LIP_CHAMFER,
   MAX_GRIDFINITY_PADDING,
   MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE,
@@ -238,6 +241,8 @@ import {
   MIN_GRIDFINITY_UNITS,
   MIN_GRIDFINITY_WALL_THICKNESS,
   type GridfinityAxis,
+  type GridfinityLabelTextPlace,
+  type GridfinityShapeFields,
   type GridfinityWall,
   gridfinityCompartmentCount,
   gridfinityCompartmentCountPatch,
@@ -264,10 +269,12 @@ import {
   gridfinityFloorMinHeight,
   gridfinityLabelCornerSize,
   gridfinityLabelFits,
+  gridfinityLabelFont,
   gridfinityLabelLength,
   gridfinityLabelLimits,
   gridfinityLabelMaxCornerSize,
   gridfinityLabelMaxWidth,
+  gridfinityLabelTextPlaces,
   gridfinityLabelWidth,
   gridfinityLipChamfer,
   gridfinityMaxUnits,
@@ -295,6 +302,7 @@ import {
   gridfinityWallThickness,
   normalizeGridfinityType,
 } from "@/lib/gridfinityGeometry";
+import { gridfinityLabelTextLeftOut } from "@/lib/gridfinityLabelText";
 import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MIN_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, MAX_HINGE_NUT_WIDTH } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -414,6 +422,7 @@ const PORT_PRESET_LABELS: Record<PortPreset, MessageKey> = {
   usbC: "port.usbC", usbCPlug: "port.usbCPlug", microUsb: "port.microUsb", usbA: "port.usbA",
   hdmi: "port.hdmi", miniHdmi: "port.miniHdmi", microHdmi: "port.microHdmi", displayPort: "port.displayPort", miniDisplayPort: "port.miniDisplayPort", rj45: "port.rj45",
   xt30: "port.xt30", xt60: "port.xt60", mt60: "port.mt60", mpx: "port.mpx", dsub9: "port.dsub9",
+  powerpole1: "port.powerpole1", powerpole2: "port.powerpole2", powerpole3: "port.powerpole3", powerpole4: "port.powerpole4",
 };
 
 const VASE_CHOICES: Partial<Record<VaseChoiceKey, Record<string, MessageKey>>> = {
@@ -531,6 +540,8 @@ type TextPropertyConfig = {
   id: string;
   label: string;
   value: string;
+  /** A line under the row, as a range row has. */
+  hint?: string;
   onChange: (value: string) => void;
 };
 
@@ -1676,6 +1687,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         if (limits.offset > 0) {
           properties.push({ id: keys.offset, label: t("prop.gridfinityLabelOffset"), value: clamp(shape[keys.offset] ?? 0, -limits.offset, limits.offset), min: -limits.offset, max: limits.offset, step: 1, onChange: (value) => onUpdate({ [keys.offset]: value }) });
         }
+        // The letters raised on the shelf (#1308); none on a tray, where they would stand above its top.
+        if (plan.type === "bin") properties.push(gridfinityLabelTextProperty(fields, wall, shape[GRIDFINITY_LABEL_TEXT_KEYS[wall]], (text) => onUpdate({ [GRIDFINITY_LABEL_TEXT_KEYS[wall]]: text })));
       });
       const shelves = compartments
         ? compartments.cells.some((cell) => gridfinityCompartmentLabel(fields, cell.column, cell.row))
@@ -1692,6 +1705,20 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           },
           { id: "gridfinityLabelCornerSize", label: t("prop.gridfinityLabelCornerSize"), value: gridfinityLabelCornerSize(fields), min: 0, max: gridfinityLabelMaxCornerSize(plan), step: 0.5, onChange: (value) => onUpdate({ gridfinityLabelCornerSize: value }) },
         );
+      }
+      // One font for the letters on every shelf of the bin, the built-in ones (#1308), once a shelf that is built has a text.
+      const lettered = gridfinityLabelTextPlaces(fields);
+      if (lettered.length > 0) {
+        const builtIn = t("font.builtInGroup");
+        properties.push({
+          type: "select",
+          id: "gridfinityLabelFont",
+          label: t("prop.font"),
+          value: gridfinityLabelFont(fields),
+          options: GRIDFINITY_LABEL_FONTS.map((value) => ({ value, label: value, group: builtIn })),
+          fontSample: lettered[0].text,
+          onChange: (font) => onUpdate({ gridfinityLabelFont: font }),
+        });
       }
     }
     if (gridfinityScoopFits(fields)) {
@@ -3911,6 +3938,21 @@ function textFontProperty(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate)
       if (font === FONT_MANAGER_OPTION) requestFontManager();
       else onUpdate({ font });
     },
+  };
+}
+
+/**
+ * The text raised on a Gridfinity shelf (#1308), the wall's or a compartment's, at most 24 characters; empty is none.
+ * A note under it says when its letters would come out under 3 mm and are left out.
+ */
+function gridfinityLabelTextProperty(fields: GridfinityShapeFields, shelf: GridfinityLabelTextPlace["shelf"], value: string | undefined, onChange: (text: string | undefined) => void): ShapePropertyConfig {
+  return {
+    type: "text",
+    id: typeof shelf === "string" ? GRIDFINITY_LABEL_TEXT_KEYS[shelf] : "gridfinityCompartmentLabelText",
+    label: t("prop.text"),
+    value: value ?? "",
+    hint: gridfinityLabelTextLeftOut(fields, shelf) ? t("gridfinity.labelTextTooSmallHint") : undefined,
+    onChange: (text) => onChange(text.slice(0, MAX_GRIDFINITY_LABEL_TEXT_LENGTH) || undefined),
   };
 }
 
@@ -7158,9 +7200,10 @@ function GridfinityCompartmentsCard({
         const maxWidth = gridfinityCompartmentLabelMaxWidth(fields, cell, built.side);
         const change = (changes: Partial<GridfinityCompartmentLabel>) => {
           const next: GridfinityCompartmentLabel = { ...stored, ...changes };
-          // 100 % and the middle are what a label has unset, so they are written as unset.
+          // 100 % and the middle are what a label has unset, so they are written as unset, and so is no text.
           if (next.length === undefined || next.length >= 100) delete next.length;
           if (next.align === "middle") delete next.align;
+          if (!next.text) delete next.text;
           writeLabel(next);
         };
         // A shelf that comes out shorter than 4 mm is left out, which the row says rather than leave it unexplained.
@@ -7178,6 +7221,7 @@ function GridfinityCompartmentsCard({
           });
         }
         properties.push({ id: "gridfinityCompartmentLabelWidth", label: t("prop.gridfinityLabelWidth"), value: built.width, min: MIN_GRIDFINITY_LABEL_WIDTH, max: Math.max(MIN_GRIDFINITY_LABEL_WIDTH, maxWidth), step: 0.5, onChange: (value) => change({ width: clamp(value, MIN_GRIDFINITY_LABEL_WIDTH, maxWidth) }) });
+        if (normalizeGridfinityType(fields.gridfinityType) === "bin") properties.push(gridfinityLabelTextProperty(fields, { column, row }, stored.text, (text) => change({ text })));
       }
     }
   }
@@ -7784,7 +7828,7 @@ function RangeProperty({
  * field is uncontrolled: the shape's text is written into it only while it is not being edited,
  * and a word being composed (Japanese, Chinese, Korean) is committed once, when it is done.
  */
-function TextProperty({ label, value, disabled, maxLength = 24, onChange, onInteractionActiveChange }: Omit<TextPropertyConfig, "id"> & { id?: string } & { disabled?: boolean; maxLength?: number; onInteractionActiveChange?: (active: boolean) => void }) {
+function TextProperty({ label, value, hint, disabled, maxLength = 24, onChange, onInteractionActiveChange }: Omit<TextPropertyConfig, "id"> & { id?: string } & { disabled?: boolean; maxLength?: number; onInteractionActiveChange?: (active: boolean) => void }) {
   const holdInteraction = useInteractionHold(onInteractionActiveChange);
   const field = useRef<HTMLInputElement>(null);
   const editing = useRef(false);
@@ -7792,7 +7836,7 @@ function TextProperty({ label, value, disabled, maxLength = 24, onChange, onInte
   useEffect(() => {
     if (field.current && !editing.current && field.current.value !== value) field.current.value = value;
   }, [value]);
-  return (
+  const row = (
     <label className="text-property">
       <span>{label}</span>
       <input
@@ -7826,6 +7870,7 @@ function TextProperty({ label, value, disabled, maxLength = 24, onChange, onInte
       />
     </label>
   );
+  return hint ? <>{row}<p className="property-hint">{hint}</p></> : row;
 }
 
 function SelectProperty({ label, value, options, hint, fontSample, disabled, onChange, onReset }: Omit<SelectPropertyConfig, "id"> & { id?: string } & { disabled?: boolean; onReset?: () => void }) {

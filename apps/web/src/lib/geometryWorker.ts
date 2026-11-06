@@ -5,6 +5,7 @@ import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
 import { lidForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
 import { resultMeshes, type GeometryTask, type GeometryWorkerRequest, type GeometryWorkerResponse } from "@/lib/geometryWorkerTypes";
+import { gridfinityHasLabelText } from "@/lib/gridfinityGeometry";
 import { rememberPreparedDisplay } from "@/lib/importedMeshDisplay";
 import { getLanguage, t } from "@/lib/i18n";
 import type { ModelSplitPlane } from "@/lib/modelSplit";
@@ -224,7 +225,8 @@ export function warmGeometryWorker() {
 }
 
 function containsText(shapes: readonly WorkplaneShape[]): boolean {
-  return shapes.some((shape) => shape.kind === "text" || (shape.groupedShapes ? containsText(shape.groupedShapes) : false));
+  // A Gridfinity bin's letters (#1308) are drawn with the fonts too.
+  return shapes.some((shape) => shape.kind === "text" || (shape.kind === "gridfinity" && gridfinityHasLabelText(shape)) || (shape.groupedShapes ? containsText(shape.groupedShapes) : false));
 }
 
 function containsKernelWork(shapes: readonly WorkplaneShape[]): boolean {

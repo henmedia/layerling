@@ -1,5 +1,110 @@
 [
   {
+    "version": "1.145.0",
+    "items": [
+      {
+        "title": {
+          "de": "Anderson-Powerpole-Stecker in der Port-Öffnung",
+          "en": "Anderson Powerpole plugs in the port opening"
+        },
+        "body": {
+          "de": "Die Port-Öffnung kennt jetzt Powerpole-Blöcke (PP15, PP30, PP45) mit 1 bis 4 Polen, nebeneinander gesteckt: 7,9 mm je Pol, mit Platz für die Schwalbenschwanz-Federn und etwa 0,25 mm Luft rundum.",
+          "en": "The port opening now knows Powerpole blocks (PP15, PP30, PP45) of 1 to 4 poles side by side: 7.9 mm per pole, with room for the dovetail tongues and about 0.25 mm all round."
+        }
+      },
+      {
+        "title": {
+          "de": "Text auf Gridfinity-Etikettenleisten",
+          "en": "Text on Gridfinity label shelves"
+        },
+        "body": {
+          "de": "Jede Etikettenleiste eines Gridfinity-Behälters, an der Wand oder in einem Fach, kann jetzt einen Text mit bis zu 24 Zeichen tragen, 0,4 mm erhaben als Teil des Behälters. Die Buchstaben werden so groß, wie die Leiste es zulässt, und ein darauf gestapelter Behälter bleibt frei von ihnen. Tipp den Text im Eigenschaften-Fenster unter „Text“ ein.",
+          "en": "Every label shelf of a Gridfinity bin, along a wall or in a compartment, now takes a text of up to 24 characters, raised 0.4 mm as part of the bin. The letters are as large as the shelf lets them be, and a bin stacked on top stays clear of them. Type the text under \"Text\" in the Properties panel."
+        }
+      },
+      {
+        "title": {
+          "de": "Bildlaufleisten von Anfang an",
+          "en": "Scrollbars from the start"
+        },
+        "body": {
+          "de": "Unter Einstellungen gibt es jetzt „Editor mit Bildlaufleisten starten“, gespeichert mit dem Entwurf und mit „Als Vorgabe sichern“. Die Leisten sitzen jetzt auch neben einem minimierten oder schwebenden Eigenschaften-Fenster und neben einem Ansichtswürfel in der rechten Ecke an der richtigen Stelle.",
+          "en": "Under Settings there is now \"Start editor with scrollbars\", saved with the design and with Make default. The bars now also sit in the right place beside a minimised or floating properties panel and beside a view cube in a right corner."
+        }
+      },
+      {
+        "title": {
+          "de": "Fase und Verrundung merken sich die Einstellungen",
+          "en": "Chamfer and fillet keep their settings"
+        },
+        "body": {
+          "de": "Größe, Winkel, Schwelle, Vorschauqualität und die Schalter bleiben jetzt nach „Anwenden“, nach dem Rückgängigmachen und beim nächsten Öffnen erhalten, je ein Satz für Fase, Verrundung und Fase-Verrundung.",
+          "en": "Size, angle, threshold, preview quality and the switches now stay after Apply, after an undo and the next time the tool opens, one set each for chamfer, fillet and chamfer-fillet."
+        }
+      },
+      {
+        "title": {
+          "de": "Text mit mehreren Buchstaben im STEP-Export",
+          "en": "Text of more than one letter in the STEP export"
+        },
+        "body": {
+          "de": "Ein Text mit mehr als einem Buchstaben kommt jetzt als exakter Körper in die STEP-Datei, erhaben oder als Aussparung. Nur abgeschrägter, oben gerundeter, verjüngter oder verdrehter Text fehlt weiter, und die Meldung nennt ihn.",
+          "en": "A text of more than one letter now goes into the STEP file as an exact body, raised or as a hole. Only a bevelled, top-rounded, tapered or twisted text is still left out, and the message names it."
+        }
+      },
+      {
+        "title": {
+          "de": "BIGTREETECH Pi V1.2 richtig herum",
+          "en": "BIGTREETECH Pi V1.2 the right way round"
+        },
+        "body": {
+          "de": "Das SBC-Board BIGTREETECH Pi V1.2 war spiegelverkehrt. Es sitzt jetzt wie im Modell des Herstellers: USB-C, micro-HDMI und Stromklemme hinten, die GPIO-Leiste vorn, das versetzte Befestigungsloch vorn rechts.",
+          "en": "The BIGTREETECH Pi V1.2 SBC board was a mirror image. It now sits as in the maker's model: the USB-C, micro-HDMI and power terminal at the back, the GPIO header at the front, the off-grid mounting hole at the front right."
+        }
+      },
+      {
+        "title": {
+          "de": "Ausrichten endet wieder mit einem Klick daneben",
+          "en": "A click beside the parts ends Align again"
+        },
+        "body": {
+          "de": "Ein Klick auf eine leere Stelle beendet „Ausrichten“ wieder. Die Arbeitsfläche wird mit Umschalt+Klick zur Bezugsgröße für gleiche Abstände.",
+          "en": "A click on empty space ends Align again. With Shift held, a click makes the plate the reference for equal gaps."
+        }
+      },
+      {
+        "title": {
+          "de": "Bilder mit durchsichtigem Hintergrund vollständig importiert",
+          "en": "Pictures on a transparent background come in whole"
+        },
+        "body": {
+          "de": "Ein Bild mit durchsichtigem Hintergrund kommt jetzt ganz herein: Jeder Bildpunkt, der nicht durchsichtig ist, gehört zur Form, egal in welcher Farbe.",
+          "en": "A picture on a transparent background now comes in whole: every pixel that is not transparent is part of the shape, whatever its colour."
+        }
+      },
+      {
+        "title": {
+          "de": "Auf der Arbeitsebene zentrieren bleibt auf der eigenen Platte",
+          "en": "Center on workplane stays on its own plate"
+        },
+        "body": {
+          "de": "Bei mehreren Druckplatten springt „Auf der Arbeitsebene zentrieren“ nicht mehr auf die erste Platte, sondern in die Mitte der Platte, auf der die Auswahl steht.",
+          "en": "With several build plates, Center on workplane no longer jumps to the first plate but goes to the middle of the plate the selection stands on."
+        }
+      },
+      {
+        "title": {
+          "de": "Maße am Winkellineal und am SBC-Board besser lesbar",
+          "en": "Clearer numbers on the framing square and the SBC board"
+        },
+        "body": {
+          "de": "Steht ein Körper auf Höhe 0, liegt die Höhenzahl des Winkellineals nicht mehr auf ihm, sondern daneben. Die Zahlenfelder des SBC-Boards zeigen ihren ganzen Wert.",
+          "en": "With a body at height 0, the framing square's height number no longer lies on it but beside it. The SBC board's number fields show their whole value."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.144.0",
     "items": [
       {

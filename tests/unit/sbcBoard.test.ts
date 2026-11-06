@@ -82,7 +82,7 @@ describe("SBC board data (#1098)", () => {
     expect([SBC_BOARDS.zero2w.width, SBC_BOARDS.zero2w.depth]).toEqual([65, 30]);
     expect(SBC_BOARDS.zero2w.holes).toEqual([[3.5, 3.5], [61.5, 3.5], [3.5, 26.5], [61.5, 26.5]]);
     // BIGTREETECH Pi V1.2: its holes are not on the Raspberry Pi's grid at the back.
-    expect(SBC_BOARDS.bttPi12.holes).toEqual([[3.3, 3.3], [61.54, 3.3], [3.3, 52.7], [67.35, 52.7]]);
+    expect(SBC_BOARDS.bttPi12.holes).toEqual([[3.3, 52.7], [61.54, 52.7], [3.3, 3.3], [67.35, 3.3]]);
     expect(SBC_BOARDS.bttPi12.holeDiameter).toBe(2.5);
   });
 
@@ -423,7 +423,7 @@ describe("the microSD card slot", () => {
     // Pi 4 and 3 B+ drawings (DXF): the card from x = -2.27, the socket to 13.13.
     for (const type of ["pi4", "pi3bPlus"] as const) expect(slot(type)).toMatchObject({ x0: -2.27, x1: 13.13, y0: 22.11, y1: 34.1, underside: true, estimated: true });
     // BIGTREETECH's model: 1.44 mm under the board.
-    expect(slot("bttPi12")).toMatchObject({ x1: 14.04, y0: 27.31, y1: 38.69, height: 1.44, underside: true });
+    expect(slot("bttPi12")).toMatchObject({ x1: 14.04, y0: 17.31, y1: 28.69, height: 1.44, underside: true });
     // On the Zero 2 W it is on top.
     expect(slot("zero2w").underside).toBeUndefined();
   });

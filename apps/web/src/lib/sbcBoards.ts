@@ -6,6 +6,8 @@
  * Every board is drawn in one frame, seen from above with the HDMI or power edge towards you:
  * x along the long edge from the end without USB, y from that front edge, heights from the top of
  * the board, all in mm. A negative x or y is a part that reaches past the board's edge.
+ * The BIGTREETECH Pi is the other way round: with its USB and Ethernet at the right end, its USB-C and
+ * HDMI edge is at the back and its GPIO header at the front, as in the maker's model.
  *
  * Where the numbers come from:
  * - Raspberry Pi 5: the official 3D model (RP-010083, "rpi-5 3D STEP - No Graphics", Raspberry Pi Ltd),
@@ -235,29 +237,29 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
     thickness: 1.6,
     cornerRadius: 2.1,
     holeDiameter: 2.5,
-    // One hole is 5.9 mm off the Raspberry Pi place (67.35 instead of 61.5); the manual gives 64 x 49.4 mm.
-    holes: [[3.3, 3.3], [61.54, 3.3], [3.3, 52.7], [67.35, 52.7]],
+    // One hole is 5.9 mm off the Raspberry Pi place (67.35 instead of 61.5, at the front edge); the manual gives 64 x 49.4 mm.
+    holes: [[3.3, 52.7], [61.54, 52.7], [3.3, 3.3], [67.35, 3.3]],
     color: "#1b1b1b",
     parts: [
-      { name: "USB-C (UART to USB)", x0: 9.04, x1: 17.98, y0: -1.37, y1: 6.78, height: 3.77, kind: "connector", profile: "usbC" },
-      { name: "audio jack", x0: 22.18, x1: 28.43, y0: -1.4, y1: 12.6, height: 4.3, kind: "connector", profile: "audio" },
-      { name: "micro-HDMI", x0: 32.54, x1: 39.04, y0: -1.44, y1: 6.06, height: 3.05, kind: "connector", profile: "microHdmi" },
-      { name: "CAN connector", x0: 41.75, x1: 54.25, y0: 0.9, y1: 9.9, height: 8.0, kind: "header" },
-      { name: "Ethernet", x0: 67.04, x1: 88.44, y0: 2.4, y1: 18.28, height: 13.5, kind: "connector", profile: "rj45" },
-      { name: "USB 2.0 (middle)", x0: 70.79, x1: 88.38, y0: 21.44, y1: 37.14, height: 16.3, kind: "connector", profile: "usbA2" },
-      { name: "USB 2.0 (back)", x0: 70.77, x1: 88.37, y0: 39.42, y1: 55.12, height: 16.3, kind: "connector", profile: "usbA2" },
-      { name: "GPIO header", x0: 13.47, x1: 64.27, y0: 50.39, y1: 55.47, height: 9.25, kind: "header", pins: [20, 2], gpio: true },
+      { name: "USB-C (UART to USB)", x0: 9.04, x1: 17.98, y0: 49.22, y1: 57.37, height: 3.77, kind: "connector", profile: "usbC" },
+      { name: "audio jack", x0: 22.18, x1: 28.43, y0: 43.4, y1: 57.4, height: 4.3, kind: "connector", profile: "audio" },
+      { name: "micro-HDMI", x0: 32.54, x1: 39.04, y0: 49.94, y1: 57.44, height: 3.05, kind: "connector", profile: "microHdmi" },
+      { name: "CAN connector", x0: 41.75, x1: 54.25, y0: 46.1, y1: 55.1, height: 8.0, kind: "header" },
+      { name: "Ethernet", x0: 67.04, x1: 88.44, y0: 37.72, y1: 53.6, height: 13.5, kind: "connector", profile: "rj45" },
+      { name: "USB 2.0 (middle)", x0: 70.79, x1: 88.38, y0: 18.86, y1: 34.56, height: 16.3, kind: "connector", profile: "usbA2" },
+      { name: "USB 2.0 (back)", x0: 70.77, x1: 88.37, y0: 0.88, y1: 16.58, height: 16.3, kind: "connector", profile: "usbA2" },
+      { name: "GPIO header", x0: 13.47, x1: 64.27, y0: 0.53, y1: 5.61, height: 9.25, kind: "header", pins: [20, 2], gpio: true },
       // The socket from x = 0.54 in the model, 1.44 mm deep under the board; drawn to the edge, where the card goes in.
-      { name: "microSD card slot", x0: 0, x1: 14.04, y0: 27.31, y1: 38.69, height: 1.44, kind: "connector", underside: true },
-      { name: "power terminal", x0: -2.95, x1: 7.35, y0: 38.91, y1: 49.51, height: 14.15, kind: "connector" },
-      { name: "fan connector", x0: 43.07, x1: 53.07, y0: 38.3, y1: 47.3, height: 8.0, kind: "header" },
-      { name: "SPI display connector", x0: 0.97, x1: 5.88, y0: 8.37, y1: 23.77, height: 6.27, kind: "header" },
-      { name: "ADXL345 connector", x0: 1.0, x1: 6.17, y0: 26.75, y1: 36.35, height: 4.72, kind: "header" },
-      { name: "IR receiver", x0: 6.79, x1: 12.81, y0: 51.52, y1: 57.02, height: 6.25, kind: "header" },
-      { name: "SoC", x0: 30.7, x1: 42.93, y0: 20.2, y1: 34.37, height: 1.1, kind: "chip" },
-      { name: "RAM", x0: 46.82, x1: 60.28, y0: 18.87, y1: 26.47, height: 1.0, kind: "chip" },
-      { name: "RAM", x0: 46.82, x1: 60.28, y0: 29.28, y1: 36.88, height: 1.0, kind: "chip" },
-      { name: "capacitor", x0: 11.86, x1: 18.86, y0: 31.61, y1: 38.21, height: 5.2, kind: "chip" },
+      { name: "microSD card slot", x0: 0, x1: 14.04, y0: 17.31, y1: 28.69, height: 1.44, kind: "connector", underside: true },
+      { name: "power terminal", x0: -2.95, x1: 7.35, y0: 6.49, y1: 17.09, height: 14.15, kind: "connector" },
+      { name: "fan connector", x0: 43.07, x1: 53.07, y0: 8.7, y1: 17.7, height: 8.0, kind: "header" },
+      { name: "SPI display connector", x0: 0.97, x1: 5.88, y0: 32.23, y1: 47.63, height: 6.27, kind: "header" },
+      { name: "ADXL345 connector", x0: 1.0, x1: 6.17, y0: 19.65, y1: 29.25, height: 4.72, kind: "header" },
+      { name: "IR receiver", x0: 6.79, x1: 12.81, y0: -1.02, y1: 4.48, height: 6.25, kind: "header" },
+      { name: "SoC", x0: 30.7, x1: 42.93, y0: 21.63, y1: 35.8, height: 1.1, kind: "chip" },
+      { name: "RAM", x0: 46.82, x1: 60.28, y0: 29.53, y1: 37.13, height: 1.0, kind: "chip" },
+      { name: "RAM", x0: 46.82, x1: 60.28, y0: 19.12, y1: 26.72, height: 1.0, kind: "chip" },
+      { name: "capacitor", x0: 11.86, x1: 18.86, y0: 17.79, y1: 24.39, height: 5.2, kind: "chip" },
     ],
   },
   xiaoEsp32c6: {

@@ -21,6 +21,11 @@ export type RasterTraceOptions = {
   part?: RasterPart;
   /** Where dark turns light, 0 to 1. 0.5 by default. */
   threshold?: number;
+  /**
+   * Every pixel that is not transparent is the shape, whatever its colour (`part` is not used): for a
+   * picture on a transparent background, where the transparency already says what the picture is.
+   */
+  byOpacity?: boolean;
   /** At most this many line pieces in the whole outline; the line is straightened until it fits. */
   maxSegments?: number;
   /** How wide the outline comes out, in the SVG's units, its height in proportion. One pixel one unit by default. */
@@ -94,7 +99,7 @@ export function shrinkRaster(pixels: RasterPixels, maxSide = MAX_RASTER_TRACE_SI
  * How much each pixel belongs to the shape, 0 to 1, on a grid one pixel wider on every side (that
  * border is empty, so every line closes). A transparent pixel belongs to nothing.
  */
-export function shapeField(pixels: RasterPixels, part: RasterPart) {
+export function shapeField(pixels: RasterPixels, part: RasterPart, byOpacity = false) {
   const { width, height, data } = pixels;
   const gridWidth = width + 2;
   const field = new Float32Array(gridWidth * (height + 2));
@@ -103,7 +108,7 @@ export function shapeField(pixels: RasterPixels, part: RasterPart) {
       const index = (y * width + x) * 4;
       const lightness = (0.2126 * data[index] + 0.7152 * data[index + 1] + 0.0722 * data[index + 2]) / 255;
       const opacity = data[index + 3] / 255;
-      field[(y + 1) * gridWidth + x + 1] = opacity * (part === "dark" ? 1 - lightness : lightness);
+      field[(y + 1) * gridWidth + x + 1] = byOpacity ? opacity : opacity * (part === "dark" ? 1 - lightness : lightness);
     }
   }
   return softened(field, gridWidth, height + 2);
@@ -274,7 +279,7 @@ export function traceRasterRings(source: RasterPixels, options: RasterTraceOptio
   const { width, height } = pixels;
   const threshold = Math.min(0.95, Math.max(0.05, options.threshold ?? 0.5));
   const maxSegments = Math.max(8, options.maxSegments ?? DEFAULT_RASTER_TRACE_SEGMENTS);
-  const field = shapeField(pixels, options.part ?? "dark");
+  const field = shapeField(pixels, options.part ?? "dark", options.byOpacity === true);
   // A speck: smaller than a few pixels, or than a thousandth of a percent of the picture.
   const speck = Math.max(3, width * height * 1e-5);
   const rings = fieldRings(field, width + 2, height + 2, threshold).filter((ring) => ring.length >= 3 && ringArea(ring) >= speck);
