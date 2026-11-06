@@ -9756,6 +9756,8 @@ export function LayerlingEditor({
     setHolePatternTool(null);
     faceToolPickRunRef.current += 1;
     setFaceTool(null);
+    supportRibPickRunRef.current += 1;
+    setSupportRibTool(null);
     setAlignMode(false);
     setMirrorMode(false);
     setPivotPickMode(false);
@@ -9843,12 +9845,12 @@ export function LayerlingEditor({
     if (
       !source || !canPaintShape(source)
       || selectedIds.length !== 1 || selectedIds[0] !== paintTool.sourceId
-      || mateTool || layFlatPickMode || pivotPickMode || arrayTool || scalePercentTool || holePatternTool || faceTool
+      || mateTool || layFlatPickMode || pivotPickMode || arrayTool || scalePercentTool || holePatternTool || faceTool || supportRibTool
       || shellTool || deleteFaceTool || edgeModifier || splitSession || simplifyToolId
     ) {
       setPaintTool(null);
     }
-  }, [arrayTool, deleteFaceTool, edgeModifier, faceTool, holePatternTool, layFlatPickMode, mateTool, paintTool, pivotPickMode, scalePercentTool, selectedIds, shapes, shellTool, simplifyToolId, splitSession]);
+  }, [arrayTool, deleteFaceTool, edgeModifier, faceTool, holePatternTool, layFlatPickMode, mateTool, paintTool, pivotPickMode, scalePercentTool, selectedIds, shapes, shellTool, simplifyToolId, splitSession, supportRibTool]);
 
   /** The colours the panel offers: those of the design's bodies and of their paint, the one chosen now included. */
   const paintPalette = useMemo(() => {
