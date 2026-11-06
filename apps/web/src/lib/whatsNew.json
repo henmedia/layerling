@@ -1,5 +1,80 @@
 [
   {
+    "version": "1.147.0",
+    "items": [
+      {
+        "title": {
+          "de": "Lochmuster rund um einen Zylinder",
+          "en": "Hole patterns round a cylinder"
+        },
+        "body": {
+          "de": "Das Lochmuster nimmt jetzt auch die runde Wand eines Zylinders, Rohrs oder einer Bohrung: Wand anklicken, und die Löcher gehen in Reihen ganz herum, jedes zeigt auf die Achse. Gut für Stiftebecher, Lampenschirme und Rohre mit Lüftung. „Durch die Wand“ schneidet nur die angeklickte Wand.",
+          "en": "The hole pattern now also takes the round wall of a cylinder, tube or bore: click the wall, and the holes go all the way round in rows, each pointing at the axis. Good for pen holders, lamp shades and tubes with vents. \"Through the wall\" cuts only the wall you clicked."
+        }
+      },
+      {
+        "title": {
+          "de": "Teilen mit Dübeln oder Zapfen",
+          "en": "Split with dowels or plugs"
+        },
+        "body": {
+          "de": "Wenn du ein zu großes Teil teilst, setzt das Fenster „Teilen“ unter „Verbinder“ jetzt auf Wunsch Dübel oder Zapfen, die die Hälften wieder genau zusammenführen: „Dübel“ macht in jede Hälfte ein Loch und legt lose Stifte daneben, „Zapfen“ stellt runde Zapfen auf eine Hälfte und ihre Löcher in die andere. Ringe auf der Schnittebene zeigen vorher, wo sie hinkommen, und das Spiel folgt dem Spiel deines Druckers.",
+          "en": "When you split a part that is too big, \"Connectors\" in the Split panel can now add dowels or plugs that line the halves up again: \"Dowels\" makes a hole in each half and lays loose pins beside them, \"Plugs\" puts round pegs on one half and their holes in the other. Rings on the plane show where they go first, and the fit follows your printer's play."
+        }
+      },
+      {
+        "title": {
+          "de": "Sacklöcher mit Bohrerspitze",
+          "en": "Blind holes with a drill point"
+        },
+        "body": {
+          "de": "Ein Zylinder als Aussparung, eine Senkbohrung und eine Stufenbohrung können jetzt in der Spitze eines Bohrers enden statt flach: Unter „Boden“ stehen 90°, 118° und 135° oder ein eigener Winkel. Die Tiefe zählt wie in einer Zeichnung bis zum Beginn der Spitze, der Hinweis sagt, wie weit sie tiefer reicht.",
+          "en": "A cylinder set as a hole, a counterbore and a countersink can now end in the point of a drill instead of flat: \"Bottom\" offers 90°, 118° and 135° or an angle of your own. As in a drawing the depth counts to where the point begins, and the hint says how much further it reaches."
+        }
+      },
+      {
+        "title": {
+          "de": "Fachwerk und Natursteinmauer als Oberfläche",
+          "en": "Half-timbering and a stone wall as surface textures"
+        },
+        "body": {
+          "de": "Für Modellbahnhäuser und Dioramen hat die Karte Oberfläche zwei neue Muster: „Fachwerk“ mit Balken, Riegeln und Streben über leicht rauem Putz, und „Natursteinmauer“ mit unregelmäßigen Steinen, vom Bruchstein bis zum runden Feldstein. Mit „Muster als eigenes Teil“ druckst du die Balken oder Steine in einer zweiten Farbe.",
+          "en": "For model railway houses and dioramas the Surface texture card has two new patterns: \"Half-timbering\", beams, rails and braces over slightly rough plaster, and \"Stone wall\", irregular stones from broken rubble to round field stones. With \"Pattern as its own part\" the beams or stones print in a second colour."
+        }
+      },
+      {
+        "title": {
+          "de": "Neue Entwürfe mit Winkellineal im Nullpunkt",
+          "en": "New designs with a framing square at the origin"
+        },
+        "body": {
+          "de": "Wer das Winkellineal fast immer braucht, setzt in den Einstellungen unter „Maße“ das Häkchen bei „Neue Entwürfe mit Winkellineal im Nullpunkt beginnen“. Dann liegt in jedem neuen Entwurf dieses Browsers schon eines im Nullpunkt. Vorhandene Entwürfe bleiben, wie sie sind.",
+          "en": "If you use the framing square nearly all the time, tick \"Start new designs with a framing square at the origin\" under Measurement in the settings. Every new design in this browser then starts with one at the origin. Designs you already have stay as they are."
+        }
+      },
+      {
+        "title": {
+          "de": "Ziegel ohne Stummel am Rand",
+          "en": "Bricks without stubs at the edges"
+        },
+        "body": {
+          "de": "Kleine Ziegel zeigten an der Oberkante, an der Unterkante und um Fenster herum kurze Striche statt Mauerwerk, wo der Rand nur einen schmalen Rest einer Reihe übrig ließ. Solche Reste bleiben jetzt glatt; Wände ohne solche Reste sehen aus wie bisher.",
+          "en": "Small bricks showed short ticks instead of brickwork along the top, the bottom and round windows, where the border left only a sliver of a course. Such slivers now stay smooth; walls without them look as before."
+        }
+      },
+      {
+        "title": {
+          "de": "Pfeiltasten bewegen flüssig",
+          "en": "Arrow keys move smoothly"
+        },
+        "body": {
+          "de": "Eine gehaltene Pfeiltaste bewegt die Auswahl jetzt so flüssig wie das Ziehen mit der Maus, auch in großen Entwürfen. Beim Loslassen entsteht ein einziger Schritt, den ein Rückgängig ganz zurücknimmt.",
+          "en": "A held arrow key now moves the selection as smoothly as dragging with the mouse, even in a large design. Letting go makes one step, which one Undo takes back whole."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.146.1",
     "items": [
       {
