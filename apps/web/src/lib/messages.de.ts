@@ -752,7 +752,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.type.cap": "Übergestülpt",
   "lid.type.both": "Beidseitig",
   "lid.type.flat": "Flach",
-  "lid.type.screw": "Schraubdeckel",
+  "lid.type.screw": "Aufgeschraubt",
   "lid.type.plugHint": "Eine Platte so groß wie der Körper, darunter eine Lippe, die in die Öffnung greift.",
   "lid.type.capHint": "Eine Platte eine Wand breiter als der Körper, darunter ein Rand, der außen herum greift.",
   "lid.type.bothHint": "Eine Platte eine Wand breiter als der Körper, darunter eine Lippe in die Öffnung und ein Rand außen herum: Die Wand des Körpers sitzt dazwischen in einer Nut, wie bei einer Frischhaltedose.",
