@@ -493,8 +493,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     bentTubeSegments: shape.bentTubeSegments,
     text: shape.text,
     font: shape.font,
-    // A font of one's own can gain letters (a design's few, then the whole file): draw again then.
-    fontRevision: customFontRevision(shape.font),
+    // A font of one's own can gain letters (a design's few, then the whole file): draw again then; a bin's letters (#1308) by their own font.
+    fontRevision: customFontRevision(shape.kind === "gridfinity" ? shape.gridfinityLabelFont : shape.font),
     textStroke: shape.textStroke,
     textSilhouette: shape.textSilhouette,
     textStretch: shape.textStretch,
@@ -904,8 +904,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     bentTubeSegments: shape.bentTubeSegments,
     text: shape.text,
     font: shape.font,
-    // A font of one's own can gain letters (a design's few, then the whole file): draw again then.
-    fontRevision: customFontRevision(shape.font),
+    // A font of one's own can gain letters (a design's few, then the whole file): draw again then; a bin's letters (#1308) by their own font.
+    fontRevision: customFontRevision(shape.kind === "gridfinity" ? shape.gridfinityLabelFont : shape.font),
     textStroke: shape.textStroke,
     textSilhouette: shape.textSilhouette,
     textStretch: shape.textStretch,

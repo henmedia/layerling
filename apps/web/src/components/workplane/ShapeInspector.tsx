@@ -216,7 +216,6 @@ import {
   DEFAULT_GRIDFINITY_LABEL_CORNER,
   GRIDFINITY_BASEPLATE_RADIUS,
   GRIDFINITY_BIN_RADIUS,
-  GRIDFINITY_LABEL_FONTS,
   GRIDFINITY_LABEL_TEXT_KEYS,
   GRIDFINITY_LABEL_WALL_KEYS,
   GRIDFINITY_OPEN_WALL_KEYS,
@@ -269,7 +268,6 @@ import {
   gridfinityFloorMinHeight,
   gridfinityLabelCornerSize,
   gridfinityLabelFits,
-  gridfinityLabelFont,
   gridfinityLabelLength,
   gridfinityLabelLimits,
   gridfinityLabelMaxCornerSize,
@@ -302,7 +300,7 @@ import {
   gridfinityWallThickness,
   normalizeGridfinityType,
 } from "@/lib/gridfinityGeometry";
-import { gridfinityLabelTextLeftOut } from "@/lib/gridfinityLabelText";
+import { gridfinityLabelFont, gridfinityLabelTextLeftOut } from "@/lib/gridfinityLabelText";
 import { gridfinityLabelColor } from "@/lib/gridfinityLetterColor";
 import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MIN_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, MAX_HINGE_NUT_WIDTH } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
@@ -1719,19 +1717,10 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           { id: "gridfinityLabelCornerSize", label: t("prop.gridfinityLabelCornerSize"), value: gridfinityLabelCornerSize(fields), min: 0, max: gridfinityLabelMaxCornerSize(plan), step: 0.5, onChange: (value) => onUpdate({ gridfinityLabelCornerSize: value }) },
         );
       }
-      // One font for the letters on every shelf of the bin, the built-in ones (#1308), once a shelf that is built has a text.
+      // One font for the letters on every shelf of the bin (#1308), once a shelf that is built has a text: the text's own list.
       const lettered = gridfinityLabelTextPlaces(fields);
       if (lettered.length > 0) {
-        const builtIn = t("font.builtInGroup");
-        properties.push({
-          type: "select",
-          id: "gridfinityLabelFont",
-          label: t("prop.font"),
-          value: gridfinityLabelFont(fields),
-          options: GRIDFINITY_LABEL_FONTS.map((value) => ({ value, label: value, group: builtIn })),
-          fontSample: lettered[0].text,
-          onChange: (font) => onUpdate({ gridfinityLabelFont: font }),
-        });
+        properties.push({ ...textFontProperty({ ...shape, font: gridfinityLabelFont(fields), text: lettered[0].text }, (patch) => onUpdate({ gridfinityLabelFont: patch.font })), id: "gridfinityLabelFont" });
         // The letters in a colour of their own, for a 3MF (#1308); picking the bin's own colour clears it.
         const letterColor = gridfinityLabelColor(shape);
         properties.push({

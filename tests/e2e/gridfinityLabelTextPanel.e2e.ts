@@ -1,10 +1,12 @@
 // @vitest-environment jsdom
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import type { FontData } from "three/examples/jsm/loaders/FontLoader.js";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { ShapeInspector } from "@/components/workplane/ShapeInspector";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
-import { loadTextFonts } from "@/lib/textFonts";
+import { onFontManagerRequested } from "@/lib/fontManagerEvents";
+import { loadTextFonts, registerCustomFont, textFont } from "@/lib/textFonts";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -12,8 +14,8 @@ import type { WorkplaneShape } from "@/types/layerling";
 
 /**
  * Text on a Gridfinity bin's label shelves in its settings (Discussion #1308): a text row under each shelf that is on and
- * in a compartment's label, none on a tray; a font row once a shelf has a text; a note under a text whose letters would
- * be under 3 mm; typing is one change and a locked bin's rows take none.
+ * in a compartment's label, none on a tray; a font row once a shelf has a text, with the fonts of one's own as for a
+ * text; a note under a text whose letters would be under 3 mm; typing is one change and a locked bin's rows take none.
  */
 beforeAll(async () => {
   // jsdom lays nothing out; the panel only scrolls itself back to the top.
@@ -101,6 +103,26 @@ describe("text on a Gridfinity bin's label shelves in its settings", () => {
     const serif = [...document.querySelectorAll<HTMLElement>("[role=option]")].find((option) => option.querySelector("small")?.textContent === "Serif")!;
     act(() => serif.click());
     expect(updates).toEqual([{ gridfinityLabelFont: "Serif" }]);
+  });
+
+  it("offers the fonts of one's own and the window for them, as a text's font row does, and shows a font this browser lacks as missing", () => {
+    registerCustomFont({ id: "custom:0123456789abcdef", name: "Mine", data: textFont("Serif").data as unknown as FontData }, true);
+    const updates: Partial<WorkplaneShape>[] = [];
+    let requested = 0;
+    const stop = onFontManagerRequested(() => {
+      requested += 1;
+    });
+    const panel = mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws" }, (patch) => updates.push(patch));
+    const option = (label: string) => [...document.querySelectorAll<HTMLElement>("[role=option]")].find((entry) => entry.querySelector("small")?.textContent === label)!;
+    act(() => fontRow(panel)!.querySelector<HTMLButtonElement>("button")!.click());
+    act(() => option("Mine").click());
+    act(() => fontRow(panel)!.querySelector<HTMLButtonElement>("button")!.click());
+    act(() => option("Your own fonts …").click());
+    stop();
+    expect(updates).toEqual([{ gridfinityLabelFont: "custom:0123456789abcdef" }]);
+    expect(requested).toBe(1);
+    expect(fontRow(mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws", gridfinityLabelFont: "custom:0123456789abcdef" }))?.textContent).toContain("Mine");
+    expect(fontRow(mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws", gridfinityLabelFont: "custom:fedcba9876543210" }))?.textContent).toContain("Missing font");
   });
 
   it("writes a text typed in as one change, held as one undo step from the field's focus to its blur", () => {

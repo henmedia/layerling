@@ -217,7 +217,7 @@ export const shapeSettingSchema = {
   gridfinityLabelFrontText: { type: "string", description: "Gridfinity bin only: as gridfinityLabelBackText, on the front wall's label shelf." },
   gridfinityLabelLeftText: { type: "string", description: "Gridfinity bin only: as gridfinityLabelBackText, on the left wall's label shelf." },
   gridfinityLabelRightText: { type: "string", description: "Gridfinity bin only: as gridfinityLabelBackText, on the right wall's label shelf." },
-  gridfinityLabelFont: { type: "string", enum: ["Multilanguage", "Sans", "Serif", "Script", "Monospace", "Rounded", "Stencil", "Japanese"], description: "Gridfinity bin only: the font of the letters on all its label shelves and compartment labels (default Multilanguage), one of the built-in fonts." },
+  gridfinityLabelFont: { type: "string", description: "Gridfinity bin only: the font of the letters on all its label shelves and compartment labels (default Multilanguage): a built-in font (Multilanguage, Sans, Serif, Script, Monospace, Rounded, Stencil, Japanese), or a font of one's own by its id (custom:...) or its name, as layerling_list_fonts gives them; any other is refused." },
   gridfinityLabelColor: { type: "string", description: "Gridfinity bin only: the colour of the letters on all its label shelves and compartment labels, as #rrggbb (default none, the bin's own colour; an empty string sets it back). The bin stays one body: a 3MF gives the letters' faces, their tops and sides, this colour, which Bambu Studio reads (OrcaSlicer does not read a colour per face and gives them the bin's filament), and an OBJ gives it to their points. STL and STEP keep one colour, and so do a group or bundle shown in one colour (multicolor false), a group cut by a hole unless multicolor is true, and a bin turned into a mesh (edge tool, hollowing, split, simplify)." },
   gridfinityScoopBack: { type: "boolean", description: "Gridfinity bin only, 2 height units or more and a floor low enough (see gridfinityFloorHeight): a finger scoop along the inside of the back wall (default false). The floor rises along a quarter circle into the wall, from wall to wall, so small parts can be pushed out; scoops on neighbouring walls meet in their corner, gridfinityScoopRadius applies to all of them, and a bin with a scoop has every inner floor edge rounded as much as its inner corners (2.8 mm with the 0.95 mm wall)." },
   gridfinityScoopFront: { type: "boolean", description: "Gridfinity bin only: a finger scoop along the front wall (default false); see gridfinityScoopBack." },
@@ -517,7 +517,7 @@ export const tools = [
   },
   {
     name: "layerling_add_font",
-    description: "Add a font of one's own for the text shape, as the editor's \"Your own fonts\" window does: a TrueType (.ttf), OpenType (.otf) or WOFF (.woff) file as base64. WOFF2 and font collections (.ttc) are refused. The font is kept in this browser, and a design keeps only the outlines of the letters its texts use. Returns its id (\"custom:...\") and name; pass either as `font` to layerling_create_shape or layerling_update_object. With `useOnSelection` true it goes onto the selected texts at once. Installed fonts of the computer can only be picked by hand in the editor (Chrome and Edge).",
+    description: "Add a font of one's own for texts and the letters of Gridfinity bins, as the editor's \"Your own fonts\" window does: a TrueType (.ttf), OpenType (.otf) or WOFF (.woff) file as base64. WOFF2 and font collections (.ttc) are refused. The font is kept in this browser, and a design keeps only the outlines of the letters its texts and bins use. Returns its id (\"custom:...\") and name; pass either as `font` to layerling_create_shape or layerling_update_object, or as `gridfinityLabelFont` for a Gridfinity bin's letters. With `useOnSelection` true it goes onto the selected texts and the letters of the selected Gridfinity bins at once. Installed fonts of the computer can only be picked by hand in the editor (Chrome and Edge).",
     inputSchema: {
       ...editorTargetSchema,
       required: ["fileName", "base64"],
@@ -525,7 +525,7 @@ export const tools = [
         ...editorTargetSchema.properties,
         fileName: { type: "string", description: "The font file's name, e.g. MyFont-Bold.ttf - its name is the fallback when the font names none." },
         base64: { type: "string", description: "The font file as base64." },
-        useOnSelection: { type: "boolean", description: "Put the font on the selected texts straight away." },
+        useOnSelection: { type: "boolean", description: "Put the font on the selected texts, and on the letters of the selected Gridfinity bins with a text, straight away." },
       },
     },
   },

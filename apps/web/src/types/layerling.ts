@@ -1220,7 +1220,7 @@ export type WorkplaneShape = {
   gridfinityLabelLeftText?: string;
   /** Gridfinity bin: the text raised on the right wall's label shelf. */
   gridfinityLabelRightText?: string;
-  /** Gridfinity bin: the font of the letters on its label shelves (#1308), one of the built-in ones; missing is Multilanguage. */
+  /** Gridfinity bin: the font of the letters on its label shelves (#1308), a built-in one or a font of one's own (custom:...); missing is Multilanguage. */
   gridfinityLabelFont?: string;
   /** Gridfinity bin: the colour of the letters on its label shelves (#1308), "#rrggbb"; missing, or the bin's own colour, is the bin's. */
   gridfinityLabelColor?: string;

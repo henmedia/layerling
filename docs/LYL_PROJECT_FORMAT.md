@@ -82,7 +82,7 @@ Version 4 adds more types of attachment and larger limits for them, and nothing 
 - Imported STL, OBJ, 3MF, SVG, and STEP sources, stored once and reused by instances
 - Exact imported STEP data, current exact CAD B-Rep, display edges, chamfer/fillet settings, and reversible edge-treatment history
 - Attachments, the files kept with the design (version 3), in the order they are listed, with their names and their exact bytes
-- Custom fonts used by texts, embedded in `project.json` as a subset of the characters the design's texts use (at most 64 fonts), so the file opens with its lettering on another computer
+- Custom fonts used by texts and Gridfinity bins' letters, embedded in `project.json` (at most 64 fonts) as a subset of the characters they use, and for a bin also the "H" its letters are sized on, so the file opens with its lettering on another computer; 1.145.0 does not open a design with a bin in such a font
 - Undo and redo states according to the export choice: Unlimited, 100, 50, or 30 recent actions, the custom limit set in the workspace settings, or None (the current state only, for sharing a file without its steps). Unlimited means every state still retained by the editor, including available redo states.
 - Workspace units, grid/snap settings, dimensions, and active offset workplane
 

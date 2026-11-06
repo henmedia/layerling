@@ -8,5 +8,15 @@
       "de": "Die Buchstaben auf den Etikettenleisten eines Gridfinity-Behälters können jetzt eine eigene Farbe haben: Wähle sie unter „Buchstabenfarbe“ unterhalb der Schriftart. In einem 3MF bleibt der Behälter ein Körper, und die Flächen der Buchstaben haben diese Farbe, sodass Bambu Studio sie ohne Farbwechsel mit einem eigenen Filament druckt.",
       "en": "The letters on a Gridfinity bin's label shelves can now have a colour of their own: pick it under \"Letter colour\" below the font. A 3MF keeps the bin one body with the letters' faces in that colour, so Bambu Studio prints them with a filament of their own, without a colour change."
     }
+  },
+  {
+    "title": {
+      "de": "Eigene Schriften auf Gridfinity-Etiketten",
+      "en": "Fonts of your own on Gridfinity labels"
+    },
+    "body": {
+      "de": "Die Buchstaben auf den Etikettenleisten eines Gridfinity-Behälters können jetzt in einer eigenen Schrift stehen, die du wie bei einem Text unter „Schriftart“ wählst. Der Entwurf speichert die Umrisse der Buchstaben, die er benutzt, sodass er sich auf einem anderen Computer mit denselben Buchstaben öffnet.",
+      "en": "The letters on a Gridfinity bin's label shelves can now be in a font of your own, picked under \"Font\" as for a text. The design keeps the outlines of the letters it uses, so it opens with the same letters on another computer."
+    }
   }
 ]

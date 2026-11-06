@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { MIN_GRIDFINITY_LABEL_TEXT_SIZE, gridfinityLabelFont, gridfinityLabelTextPlaces, type GridfinityLabelLetters, type GridfinityLabelTextPlace, type GridfinityShapeFields } from "@/lib/gridfinityGeometry";
+import { isCustomFontId } from "@/lib/customFonts";
+import { GRIDFINITY_LABEL_FONTS, MIN_GRIDFINITY_LABEL_TEXT_SIZE, gridfinityLabelTextPlaces, type GridfinityLabelLetters, type GridfinityLabelTextPlace, type GridfinityShapeFields } from "@/lib/gridfinityGeometry";
 import { textFont, textFontsLoaded } from "@/lib/textFonts";
 import { straightTextShapes } from "@/lib/textGeometry";
 
@@ -14,6 +15,16 @@ import { straightTextShapes } from "@/lib/textGeometry";
  * its outline and its holes together, so letters that run into one another, as in Script, are joined rather than cut
  * out of each other.
  */
+
+/**
+ * The font of a bin's letters as they are built: a built-in one or a font of one's own, else Multilanguage. A font of
+ * one's own this browser does not have keeps its id, so the settings say it is missing; textFont draws Multilanguage
+ * meanwhile, as for a text.
+ */
+export function gridfinityLabelFont(shape: Pick<GridfinityShapeFields, "gridfinityLabelFont">) {
+  const font = shape.gridfinityLabelFont;
+  return font !== undefined && (GRIDFINITY_LABEL_FONTS.includes(font) || isCustomFontId(font)) ? font : GRIDFINITY_LABEL_FONTS[0];
+}
 
 /** The size a line is laid out at before it is scaled into its shelf. */
 const LAYOUT_SIZE = 100;
