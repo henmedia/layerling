@@ -1,105 +1,304 @@
 [
   {
+    "version": "1.146.0",
+    "items": [
+      {
+        "title": {
+          "de": "Druckprüfung vor dem Drucken",
+          "en": "Print check before printing"
+        },
+        "body": {
+          "de": "Ein Klick in „Kombinieren“ prüft, was erst am Drucker auffiele: zu dünne Wände, schwebende Teile, zu wenig Auflage auf der Platte, Überhänge und offene Netze. Jede Zeile ist grün oder orange mit der Stelle, dünne Wände werden eingefärbt.",
+          "en": "One click in Combine checks what would only show on the printer: walls too thin, floating parts, too little contact with the plate, overhangs and open meshes. Each line is green, or orange with the place, and thin walls are painted."
+        }
+      },
+      {
+        "title": {
+          "de": "Das Spiel deines Druckers messen",
+          "en": "Measure your printer's play"
+        },
+        "body": {
+          "de": "„Passprobe erstellen“ in den Einstellungen legt eine Platte mit sieben Löchern und einen Stift auf die Platte. Druck sie, trag ein, in welchem Loch sich der Stift noch dreht, und neue Deckel, Schwalbenschwänze, Schnappverbindungen, Muttern und „Abstand prüfen“ beginnen mit diesem Spiel.",
+          "en": "Make fit test in the settings puts a plate with seven holes and a pin on the plate. Print it, enter the hole the pin still turns in, and new lids, dovetails, snap-fits, nuts and Check clearance start from that play."
+        }
+      },
+      {
+        "title": {
+          "de": "Gruppe skalieren, Löcher behalten",
+          "en": "Resize a group, keep its holes"
+        },
+        "body": {
+          "de": "Eine Gruppe hat jetzt die Einstellung „Beim Skalieren“: alles strecken oder Löcher und kleine Teile behalten. Dann bleiben Löcher rund und im selben Abstand zum Rand, Wände behalten ihre Stärke, und nur Platte und Wände wachsen mit.",
+          "en": "A group now has the setting When resized: stretch everything, or keep holes and small parts. Then holes stay round and as far from the edge, walls keep their thickness, and only the plate and the walls grow."
+        }
+      },
+      {
+        "title": {
+          "de": "Maßband: Mitte zu Mitte",
+          "en": "Tape measure: centre to centre"
+        },
+        "body": {
+          "de": "Das Maßband rastet jetzt auf die Mitte einer Fläche und den Mittelpunkt eines Lochs oder runden Rands ein. Mitte anklicken, andere Mitte anklicken, Abstand eintippen, und der zweite Körper rückt, wie in Tinkercad.",
+          "en": "The tape measure now snaps to the centre of a face and of a hole or round edge. Click one centre, then another, type a distance, and the second body moves, as in Tinkercad."
+        }
+      },
+      {
+        "title": {
+          "de": "Maßband: Abstand entlang einer Achse",
+          "en": "Tape measure: a distance along one axis"
+        },
+        "body": {
+          "de": "Beim Eintippen einer Länge gibt es jetzt auch Felder für X, Y und Z: der Körper rückt dann nur entlang dieser Achse. Das Maß sagt vorher, welcher Körper sich bewegt oder warum keiner.",
+          "en": "Typing a length now offers boxes for X, Y and Z too: the body then moves along that axis only. The label says beforehand which body moves, or why none can."
+        }
+      },
+      {
+        "title": {
+          "de": "Rippe mit ovalem Fuß",
+          "en": "Rib with an oval foot"
+        },
+        "body": {
+          "de": "Der Fuß unter einer Rippe kann jetzt auch oval sein. Ohne eckige Ecken hebt sich die erste Schicht beim Abkühlen nicht so leicht vom Druckbett.",
+          "en": "The foot under a rib can now be oval. Without square corners the first layer lifts off the bed less easily as it cools."
+        }
+      },
+      {
+        "title": {
+          "de": "Neue Mikrocontroller-Boards",
+          "en": "New microcontroller boards"
+        },
+        "body": {
+          "de": "Die Form „SBC-Board“ kennt jetzt Adafruit ESP32-S3 Feather, Arduino UNO R3, Arduino Nano und LOLIN D1 mini. Neu ist außerdem die Tastenreichweite: RESET-, BOOT- und Power-Tasten reichen durch Deckel oder Wand, damit man sie im Gehäuse drücken kann.",
+          "en": "The SBC board shape now has the Adafruit ESP32-S3 Feather, Arduino UNO R3, Arduino Nano and LOLIN D1 mini. New too is Button reach: RESET, BOOT and power buttons reach through the lid or wall, so they can be pressed in the case."
+        }
+      },
+      {
+        "title": {
+          "de": "Entwürfe vom Server einfügen",
+          "en": "Insert designs from the server"
+        },
+        "body": {
+          "de": "Das Importfenster hat jetzt „Vom Server einfügen“: Ordner wählen, Entwurf anklicken, und seine Körper kommen samt Notizen und Bezugspunkten in den offenen Entwurf, wie aus einer Datei.",
+          "en": "The import window now has Insert from the server: pick the folder, click the design, and its bodies come into the open design with their notes and reference points, as from a file."
+        }
+      },
+      {
+        "title": {
+          "de": "Deckel-Scharnier: der Stift bleibt drin",
+          "en": "Lid hinge: the pin stays in"
+        },
+        "body": {
+          "de": "Der Stift sitzt jetzt fest im Scharnierteil des Körpers und dreht sich nur im Deckel, so rutscht ein Filamentstück nicht mehr heraus. Die Höhe der Rastnoppen lässt sich nun einstellen, weniger für kleine Dosen.",
+          "en": "The pin now sits tight in the body's part of the hinge and turns only in the lid's, so a piece of filament no longer slides out. The click bumps' height can now be set, less for small boxes."
+        }
+      },
+      {
+        "title": {
+          "de": "Mehrgängige Gewinde für Trapezspindeln",
+          "en": "Threads of several starts for lead screws",
+          "da": "Gevind med flere gænger til trapezspindler"
+        },
+        "body": {
+          "de": "Ein Gewinde hat jetzt bis zu acht Gänge, etwa für eine Trapezspindel T8x8: 4 Gänge mit 2 mm Teilung, jeder steigt 8 mm je Umdrehung. Das gilt für Stange, Schraube, Mutter und Gewindeloch.",
+          "en": "A thread now has up to eight starts, for a lead screw such as T8x8: 4 starts at 2 mm pitch, each climbing 8 mm a turn. For rods, screws, nuts and tapped holes alike.",
+          "da": "Et gevind har nu op til otte gænger, til en trapezspindel som T8x8: 4 gænger på 2 mm, og hver stiger 8 mm pr. omgang. Det gælder stanger, skruer, møtrikker og gevindhuller."
+        }
+      },
+      {
+        "title": {
+          "de": "Größengriffe folgen der Arbeitsebene auf einer Seitenfläche",
+          "en": "Size handles follow a workplane on a side face",
+          "da": "Størrelseshåndtag følger et arbejdsplan på en sideflade"
+        },
+        "body": {
+          "de": "Legst du die Arbeitsebene auf eine Seite eines Quaders, liegen seine Eck- und Kantengriffe jetzt auf dieser Fläche, wie in Tinkercad. Jeder ändert das Maß des Quaders, das an ihm entlangläuft, und der Griff in der Mitte der Fläche das Maß quer dazu. Das hilft vor allem in der Ansicht von der Seite.",
+          "en": "With the workplane on a side of a box, its corner and edge handles now lie on that face, as in Tinkercad. Each one changes the size of the box that runs along it, and the handle in the middle of the face the size across it. That helps most in a view from the side.",
+          "da": "Med arbejdsplanet på en side af en kasse ligger kassens hjørne- og sidehåndtag nu på den flade, som i Tinkercad. Hvert af dem ændrer det mål af kassen, der løber langs det, og håndtaget midt på fladen det mål på tværs. Det hjælper mest i en visning fra siden."
+        }
+      },
+      {
+        "title": {
+          "de": "Oberflächentextur: das Muster wählen, indem man es sieht",
+          "en": "Surface texture: choose the pattern by seeing it",
+          "da": "Overfladestruktur: vælg mønsteret ved at se det"
+        },
+        "body": {
+          "de": "Das Feld „Muster“ zeigt jetzt das Bild des gewählten Musters. Aufgeklappt sind alle 18 Muster als Bilder in einem Raster, mit einer Suche darüber. Statt anzuwenden und am Körper nachzusehen, wählt man ein Muster nach seinem Aussehen, auch mit den Pfeiltasten.",
+          "en": "The Pattern field now shows the picture of the chosen pattern. Opened, it holds all 18 patterns as pictures in a grid, with a search above. Instead of applying and looking at the body, you choose a pattern by how it looks, with the arrow keys too.",
+          "da": "Feltet „Mønster“ viser nu billedet af det valgte mønster. Åbnet rummer det alle 18 mønstre som billeder i et gitter, med en søgning over. I stedet for at anvende mønsteret og kigge på kroppen, vælger du et mønster efter dets udseende, også med piletasterne."
+        }
+      },
+      {
+        "title": {
+          "de": "Bildlaufleisten springen nicht mehr beim Mausrad",
+          "en": "Scrollbars no longer jump with the wheel",
+          "da": "Rullebjælker springer ikke længere med hjulet"
+        },
+        "body": {
+          "de": "Das Mausrad über einer Bildlaufleiste schiebt die Ansicht jetzt so weit, wie es gedreht wurde, wie auf einer Webseite. Auf dem Mac warf eine Magic Mouse oder das Nachgleiten am Trackpad die Ansicht schon beim Überfahren einer Leiste aus dem Bild.",
+          "en": "The wheel over a scrollbar now slides the view as far as it turned, as on a web page. On a Mac a Magic Mouse or the glide after a trackpad swipe threw the view off the screen as the pointer crossed a bar.",
+          "da": "Hjulet over en rullebjælke flytter nu visningen lige så langt som det drejede, som på en webside. På en Mac kastede en Magic Mouse eller gliden efter et trackpad-swipe visningen ud af skærmen, når markøren krydsede en bjælke."
+        }
+      },
+      {
+        "title": {
+          "de": "Schwalbenschwanz fast so breit wie das breite Ende",
+          "en": "A dovetail neck almost as wide as the wide end",
+          "da": "En hals på svalehalen næsten så bred som den brede ende"
+        },
+        "body": {
+          "de": "Der Hals eines Schwalbenschwanzes darf jetzt bis 0,1 mm schmaler sein als das breite Ende, statt höchstens 95 % davon. So geht auch ein langer, leicht verjüngter Zapfen, etwa 146 mm breit mit 145 mm am Hals.",
+          "en": "A dovetail's neck may now be up to 0.1 mm narrower than the wide end, instead of 95 % of it at most. So a long, gently tapering tail works too, say 146 mm wide with 145 mm at the neck.",
+          "da": "En svalehales hals må nu være op til 0,1 mm smallere end den brede ende, i stedet for højst 95 % af den. Så fungerer også en lang, let tilspidset hale, for eksempel 146 mm bred med 145 mm ved halsen."
+        }
+      },
+      {
+        "title": {
+          "de": "Importierte Modelle in der Skizze von oben gesehen",
+          "en": "Imported models seen from above in the sketch",
+          "da": "Importerede modeller set fra oven i skitsen"
+        },
+        "body": {
+          "de": "Unter einer Skizze zeigt ein importiertes Modell jetzt seinen ganzen Umriss von oben, nicht nur die Fläche, auf der es steht. Von einer Benchy war bisher nur ein Streifen des Kiels zu sehen.",
+          "en": "Under a sketch an imported model now shows its whole outline from above, not only the part it stands on. A Benchy showed only a strip of its keel.",
+          "da": "Under en skitse viser et importeret model nu hele sit omrids fra oven, ikke kun den del det står på. En Benchy viste kun en stribe af sin køl."
+        }
+      },
+      {
+        "title": {
+          "de": "Jeder Körper lässt sich um einen Zylinder wickeln",
+          "en": "Every body can be wrapped around a cylinder",
+          "da": "Ethvert legeme kan vikles om en cylinder"
+        },
+        "body": {
+          "de": "Die Karte „Um einen Zylinder wickeln“ steht jetzt bei jedem Körper, auch bei Formen aus der Bibliothek, etwa einem Runden Dach für die Wand eines runden Turms. Bisher gab es sie nur für importierte Modelle, Text und Skizzen.",
+          "en": "The card Wrap around a cylinder is now there for every body, shapes from the library too, such as a round roof for the wall of a round tower. It was only there for imported models, text and sketches.",
+          "da": "Kortet „Vikl rundt om en cylinder“ findes nu ved ethvert legeme, også ved former fra biblioteket, for eksempel et rundt tag til væggen af et rundt tårn. Før var det kun der for importerede modeller, tekst og skitser."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.145.0",
     "items": [
       {
         "title": {
           "de": "Anderson-Powerpole-Stecker in der Port-Öffnung",
-          "en": "Anderson Powerpole plugs in the port opening"
+          "en": "Anderson Powerpole plugs in the port opening",
+          "da": "Anderson Powerpole stikkes ind i stikåbningen"
         },
         "body": {
           "de": "Die Port-Öffnung kennt jetzt Powerpole-Blöcke (PP15, PP30, PP45) mit 1 bis 4 Polen, nebeneinander gesteckt: 7,9 mm je Pol, mit Platz für die Schwalbenschwanz-Federn und etwa 0,25 mm Luft rundum.",
-          "en": "The port opening now knows Powerpole blocks (PP15, PP30, PP45) of 1 to 4 poles side by side: 7.9 mm per pole, with room for the dovetail tongues and about 0.25 mm all round."
+          "en": "The port opening now knows Powerpole blocks (PP15, PP30, PP45) of 1 to 4 poles side by side: 7.9 mm per pole, with room for the dovetail tongues and about 0.25 mm all round.",
+          "da": "Stikåbningen kender nu Powerpole-blokke (PP15, PP30 og PP45) med 1 til 4 poler side om side: 7,9 mm pr. pol, med plads til deres svalehaler og cirka 0,25 mm luft hele vejen rundt."
         }
       },
       {
         "title": {
           "de": "Text auf Gridfinity-Etikettenleisten",
-          "en": "Text on Gridfinity label shelves"
+          "en": "Text on Gridfinity label shelves",
+          "da": "Tekst på Gridfinity-etikethylder"
         },
         "body": {
           "de": "Jede Etikettenleiste eines Gridfinity-Behälters, an der Wand oder in einem Fach, kann jetzt einen Text mit bis zu 24 Zeichen tragen, 0,4 mm erhaben als Teil des Behälters. Die Buchstaben werden so groß, wie die Leiste es zulässt, und ein darauf gestapelter Behälter bleibt frei von ihnen. Tipp den Text im Eigenschaften-Fenster unter „Text“ ein.",
-          "en": "Every label shelf of a Gridfinity bin, along a wall or in a compartment, now takes a text of up to 24 characters, raised 0.4 mm as part of the bin. The letters are as large as the shelf lets them be, and a bin stacked on top stays clear of them. Type the text under \"Text\" in the Properties panel."
+          "en": "Every label shelf of a Gridfinity bin, along a wall or in a compartment, now takes a text of up to 24 characters, raised 0.4 mm as part of the bin. The letters are as large as the shelf lets them be, and a bin stacked on top stays clear of them. Type the text under \"Text\" in the Properties panel.",
+          "da": "Hver etikethylde i en Gridfinity-bakke, langs en væg eller i et rum, tager nu en tekst på op til 24 tegn, der rejser sig 0,4 mm over hyldens top som en del af bakken. Bogstaverne bliver så store som hylden tillader, og en bakke der står ovenpå holder sig fri af dem. Skriv teksten under „Tekst“ i Egenskaber."
         }
       },
       {
         "title": {
           "de": "Bildlaufleisten von Anfang an",
-          "en": "Scrollbars from the start"
+          "en": "Scrollbars from the start",
+          "da": "Rullebjælker fra starten"
         },
         "body": {
           "de": "Unter Einstellungen gibt es jetzt „Editor mit Bildlaufleisten starten“, gespeichert mit dem Entwurf und mit „Als Vorgabe sichern“. Die Leisten sitzen jetzt auch neben einem minimierten oder schwebenden Eigenschaften-Fenster und neben einem Ansichtswürfel in der rechten Ecke an der richtigen Stelle.",
-          "en": "Under Settings there is now \"Start editor with scrollbars\", saved with the design and with Make default. The bars now also sit in the right place beside a minimised or floating properties panel and beside a view cube in a right corner."
+          "en": "Under Settings there is now \"Start editor with scrollbars\", saved with the design and with Make default. The bars now also sit in the right place beside a minimised or floating properties panel and beside a view cube in a right corner.",
+          "da": "Under Indstillinger er der nu „Start editoren med rullebjælker“, som gemmes med designet og med „Gør til standard“. Bjælkerne sidder nu også det rigtige sted ved siden af et minimeret eller flydende egenskabspanel og ved siden af en orienteringskube i et højre hjørne."
         }
       },
       {
         "title": {
           "de": "Fase und Verrundung merken sich die Einstellungen",
-          "en": "Chamfer and fillet keep their settings"
+          "en": "Chamfer and fillet keep their settings",
+          "da": "Affasning og afrunding beholder deres indstillinger"
         },
         "body": {
           "de": "Größe, Winkel, Schwelle, Vorschauqualität und die Schalter bleiben jetzt nach „Anwenden“, nach dem Rückgängigmachen und beim nächsten Öffnen erhalten, je ein Satz für Fase, Verrundung und Fase-Verrundung.",
-          "en": "Size, angle, threshold, preview quality and the switches now stay after Apply, after an undo and the next time the tool opens, one set each for chamfer, fillet and chamfer-fillet."
+          "en": "Size, angle, threshold, preview quality and the switches now stay after Apply, after an undo and the next time the tool opens, one set each for chamfer, fillet and chamfer-fillet.",
+          "da": "Størrelse, vinkel, tærskel, forhåndsvisningens kvalitet og kontakterne bliver nu bevaret efter „Anvend“, efter en fortrydelse og næste gang værktøjet åbnes, ét sæt hver for affasning, afrunding og affasning med afrunding."
         }
       },
       {
         "title": {
           "de": "Text mit mehreren Buchstaben im STEP-Export",
-          "en": "Text of more than one letter in the STEP export"
+          "en": "Text of more than one letter in the STEP export",
+          "da": "Tekst med mere end ét bogstav i STEP-eksporten"
         },
         "body": {
           "de": "Ein Text mit mehr als einem Buchstaben kommt jetzt als exakter Körper in die STEP-Datei, erhaben oder als Aussparung. Nur abgeschrägter, oben gerundeter, verjüngter oder verdrehter Text fehlt weiter, und die Meldung nennt ihn.",
-          "en": "A text of more than one letter now goes into the STEP file as an exact body, raised or as a hole. Only a bevelled, top-rounded, tapered or twisted text is still left out, and the message names it."
+          "en": "A text of more than one letter now goes into the STEP file as an exact body, raised or as a hole. Only a bevelled, top-rounded, tapered or twisted text is still left out, and the message names it.",
+          "da": "En tekst med mere end ét bogstav kommer nu ind i STEP-filen som et eksakt legeme, ophøjet eller som et hul. Kun en faset, topprundet, tilspidset eller snoet tekst er stadig undtaget, og beskeden nævner den."
         }
       },
       {
         "title": {
           "de": "BIGTREETECH Pi V1.2 richtig herum",
-          "en": "BIGTREETECH Pi V1.2 the right way round"
+          "en": "BIGTREETECH Pi V1.2 the right way round",
+          "da": "BIGTREETECH Pi V1.2 den rigtige vej"
         },
         "body": {
           "de": "Das SBC-Board BIGTREETECH Pi V1.2 war spiegelverkehrt. Es sitzt jetzt wie im Modell des Herstellers: USB-C, micro-HDMI und Stromklemme hinten, die GPIO-Leiste vorn, das versetzte Befestigungsloch vorn rechts.",
-          "en": "The BIGTREETECH Pi V1.2 SBC board was a mirror image. It now sits as in the maker's model: the USB-C, micro-HDMI and power terminal at the back, the GPIO header at the front, the off-grid mounting hole at the front right."
+          "en": "The BIGTREETECH Pi V1.2 SBC board was a mirror image. It now sits as in the maker's model: the USB-C, micro-HDMI and power terminal at the back, the GPIO header at the front, the off-grid mounting hole at the front right.",
+          "da": "SBC-printet BIGTREETECH Pi V1.2 var spejlvendt. Det sidder nu som i modellen fra fabrikanten: USB-C, micro-HDMI og strømterminal bagpå, GPIO-stikket forrest og det forskudte monteringshul forrest til højre."
         }
       },
       {
         "title": {
           "de": "Ausrichten endet wieder mit einem Klick daneben",
-          "en": "A click beside the parts ends Align again"
+          "en": "A click beside the parts ends Align again",
+          "da": "Et klik ved siden af delene afslutter „Justér“ igen"
         },
         "body": {
           "de": "Ein Klick auf eine leere Stelle beendet „Ausrichten“ wieder. Die Arbeitsfläche wird mit Umschalt+Klick zur Bezugsgröße für gleiche Abstände.",
-          "en": "A click on empty space ends Align again. With Shift held, a click makes the plate the reference for equal gaps."
+          "en": "A click on empty space ends Align again. With Shift held, a click makes the plate the reference for equal gaps.",
+          "da": "Et klik på tom plads afslutter „Justér“ igen. Med Shift nede gør et klik pladen til justeringsreference, så lige store mellemrum fordeles over den."
         }
       },
       {
         "title": {
           "de": "Bilder mit durchsichtigem Hintergrund vollständig importiert",
-          "en": "Pictures on a transparent background come in whole"
+          "en": "Pictures on a transparent background come in whole",
+          "da": "Billeder med gennemsigtig baggrund kommer ind helt"
         },
         "body": {
           "de": "Ein Bild mit durchsichtigem Hintergrund kommt jetzt ganz herein: Jeder Bildpunkt, der nicht durchsichtig ist, gehört zur Form, egal in welcher Farbe.",
-          "en": "A picture on a transparent background now comes in whole: every pixel that is not transparent is part of the shape, whatever its colour."
+          "en": "A picture on a transparent background now comes in whole: every pixel that is not transparent is part of the shape, whatever its colour.",
+          "da": "Et billede med gennemsigtig baggrund kommer nu ind helt: hvert pixel der ikke er gennemsigtigt, hører til formen, uanset hvilken farve det har."
         }
       },
       {
         "title": {
           "de": "Auf der Arbeitsebene zentrieren bleibt auf der eigenen Platte",
-          "en": "Center on workplane stays on its own plate"
+          "en": "Center on workplane stays on its own plate",
+          "da": "Centrér på arbejdsplan bliver på sin egen plade"
         },
         "body": {
           "de": "Bei mehreren Druckplatten springt „Auf der Arbeitsebene zentrieren“ nicht mehr auf die erste Platte, sondern in die Mitte der Platte, auf der die Auswahl steht.",
-          "en": "With several build plates, Center on workplane no longer jumps to the first plate but goes to the middle of the plate the selection stands on."
+          "en": "With several build plates, Center on workplane no longer jumps to the first plate but goes to the middle of the plate the selection stands on.",
+          "da": "Med flere byggeplader springer „Centrér på arbejdsplan“ ikke længere til den første plade, men til midten af den plade markeringen står på."
         }
       },
       {
         "title": {
           "de": "Maße am Winkellineal und am SBC-Board besser lesbar",
-          "en": "Clearer numbers on the framing square and the SBC board"
+          "en": "Clearer numbers on the framing square and the SBC board",
+          "da": "Tydeligere tal på vinkelmåleren og SBC-printet"
         },
         "body": {
           "de": "Steht ein Körper auf Höhe 0, liegt die Höhenzahl des Winkellineals nicht mehr auf ihm, sondern daneben. Die Zahlenfelder des SBC-Boards zeigen ihren ganzen Wert.",
-          "en": "With a body at height 0, the framing square's height number no longer lies on it but beside it. The SBC board's number fields show their whole value."
+          "en": "With a body at height 0, the framing square's height number no longer lies on it but beside it. The SBC board's number fields show their whole value.",
+          "da": "Står en form på højde 0, ligger vinkelmålerens højdetal ikke længere på den men ved siden af. SBC-printets talfelter viser hele værdien."
         }
       }
     ]

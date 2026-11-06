@@ -155,6 +155,8 @@ Egy mintának, logónak vagy feliratnak egy bögrére, dobozra vagy csőre kelle
 2. Kattints a {{ui:inspector.wrapApply}} gombra. Ami balról jobbra futott, az most a henger körül fut, a hátsó él lesz a teteje, a vastagság pedig kiáll a falból.
 3. Jelöld ki a rátekert alakzatot és a hengert, és igazítsd mindkettőt középre, balról jobbra és elölről hátra. A rátekert alakzat közepe a henger tengelye, így ezután pontosan a falán ül.
 
+Bármely test feltekerhető, a könyvtár formái is: például egy íves tető, amelynek egy kerek torony falán kell ülnie. Fektesd a tálcára úgy, ahogy a falon kell kinéznie, az íves tetejével hátrafelé.
+
 Gravíráshoz kapcsold be a {{ui:inspector.wrapInward}} kapcsolót: ilyenkor a vastagság a falba megy. Tedd lyukká az alakzatot, igazítsd középre, és csoportosítsd a hengerrel.
 
 Egy már rátekert alakzat a rátekert dolog hálója, és nem tekerhető rá újra: vond vissza a tekerést, vagy tekerd újra a lapos eredetit egy másik átmérővel.

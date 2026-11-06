@@ -165,6 +165,8 @@ Wzór, logo albo napis ma trafić na kubek, puszkę albo rurę? Najpierw połó�
 2. Kliknij {{ui:inspector.wrapApply}}. To, co biegło od lewej do prawej, biegnie teraz wokół walca, tylna krawędź staje się górą, a grubość wystaje ze ścianki.
 3. Zaznacz owinięty kształt i walec, a potem wyśrodkuj oba od lewej do prawej i od przodu do tyłu. Środek owiniętego kształtu to oś walca, więc kształt siedzi wtedy dokładnie na jego ściance.
 
+Owinąć można każdą bryłę, także kształt z biblioteki: na przykład okrągły dach, który ma siedzieć na ścianie okrągłej wieży. Połóż go na płycie tak, jak ma wyglądać na ścianie, zaokrągleniem do tyłu.
+
 Do grawerowania włącz {{ui:inspector.wrapInward}}: grubość wchodzi wtedy w ściankę. Zmień kształt w otwór, wyśrodkuj go i zgrupuj z walcem.
 
 Kształtu, który jest już owinięty, nie da się owinąć ponownie, bo jest siatką owiniętego obiektu. Cofnij owinięcie albo owiń jeszcze raz płaski oryginał z inną średnicą.

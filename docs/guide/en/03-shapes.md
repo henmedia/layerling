@@ -165,6 +165,8 @@ Should a pattern, a logo or lettering go onto a cup, a can or a tube? First lay 
 2. Click {{ui:inspector.wrapApply}}. What ran from left to right now runs around the cylinder, the back edge becomes the top, and the thickness stands out of the wall.
 3. Select the wrapped shape and the cylinder and centre both, left to right and front to back. The middle of the wrapped shape is the cylinder's axis, so it then sits right on its wall.
 
+Every body can be wrapped, a shape from the library too: a round roof, say, that should sit on the wall of a round tower. Lay it on the plate the way it should look on the wall, its round top at the back.
+
 For an engraving, switch on {{ui:inspector.wrapInward}}: the thickness then goes into the wall. Make the shape a hole, centre it and group it with the cylinder.
 
 A shape that is wrapped already is a mesh of the wrapped thing and cannot be wrapped again: undo the wrapping, or wrap the flat original once more with another diameter.

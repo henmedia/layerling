@@ -152,7 +152,7 @@ function panelTitleFor(node: Element, name: string): string {
 }
 
 /** The target for a whole part of the program that the guide has a section about, whatever its parts are called. */
-const SECTION_NAMES: Record<string, string> = { addShape: "editor.addShape", objectList: "outliner.title", viewCube: "view.cube", cameraBar: "camera.controls", exporting: "panel.export", colorCard: "inspector.shapeColor", shapeSettings: "inspector.properties", rotating: "inspector.rotation" };
+const SECTION_NAMES: Record<string, string> = { addShape: "editor.addShape", objectList: "outliner.title", viewCube: "view.cube", cameraBar: "camera.controls", exporting: "panel.export", colorCard: "inspector.shapeColor", shapeSettings: "inspector.properties", rotating: "inspector.rotation", groupResize: "inspector.groupResize" };
 
 function sectionTarget(element: Element, section: string): HelpTarget {
   const key = SECTION_NAMES[section];

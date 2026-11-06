@@ -114,9 +114,11 @@ export type ProfileArc = { center: { u: number; v: number }; radius: number };
 
 /**
  * A closed outline pushed straight along x from -length/2 to length/2: `u` becomes z, `v` becomes y. Every outline
- * point is a corner; the two end faces are triangulated, the sides are quads.
+ * point is a corner; the two end faces are triangulated, the sides are quads. The sides along the outline's pieces in
+ * `open` (piece i runs from point i to the next) are left out, for a face of another part to close them: a rib's
+ * bottom on its oval foot. Returns the points of the two ends, outline point by point.
  */
-export function addPrismAlongX(mesh: IndexedMesh, outline: ProfilePoint[], length: number) {
+export function addPrismAlongX(mesh: IndexedMesh, outline: ProfilePoint[], length: number, open: number[] = []) {
   const n = outline.length;
   const half = length / 2;
   const left = outline.map((p) => mesh.point(-half, p.v, p.u));
@@ -133,10 +135,12 @@ export function addPrismAlongX(mesh: IndexedMesh, outline: ProfilePoint[], lengt
     }
   });
   for (let i = 0; i < n; i += 1) {
+    if (open.includes(i)) continue;
     const j = (i + 1) % n;
     if (clockwise) mesh.quad(left[i], right[i], right[j], left[j]);
     else mesh.quad(left[i], left[j], right[j], right[i]);
   }
+  return { left, right };
 }
 
 /**

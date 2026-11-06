@@ -69,12 +69,14 @@ import {
   normalizeThreadClearance,
   normalizeThreadBoltClearance,
   normalizeThreadAxialClearance,
+  normalizeThreadStarts,
   normalizeThreadDepth,
   normalizeThreadFlankAngle,
   threadDepthLimits,
   MIN_THREAD_FLANK_ANGLE,
   MAX_THREAD_FLANK_ANGLE,
   threadAxialClearanceLimit,
+  threadStartsLimit,
   MIN_THREAD_BOLT_CLEARANCE,
   MAX_THREAD_BOLT_CLEARANCE,
   normalizeThreadDiameter,
@@ -187,6 +189,8 @@ import { vaseShapePatchOffThread } from "@/lib/vaseShape";
 import { VaseDrawingWindow } from "@/components/workplane/VaseDrawingWindow";
 import { VasePrintReport } from "@/components/workplane/VasePrintReport";
 import { shapeDefaultsAsset, shapeDefaultsFromShape } from "@/lib/shapeDefaults";
+import { fromPrinterPlay, printerPlayShapeRows, withPrinterPlay } from "@/lib/printerPlay";
+import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, normalizeScrewHoleAngle, normalizeScrewHoleHeadDepth, normalizeScrewHoleShaft } from "@/lib/screwHoleGeometry";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
@@ -205,7 +209,7 @@ import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
-import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -310,14 +314,14 @@ import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel
 import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
 import { plateOffsetOfShape } from "@/lib/buildPlates";
-import { isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
+import { isNonSolidShape, normalizeGroupResize, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { normalizeCurvedConeBend, normalizeCurvedConeTop } from "@/lib/curvedCone";
 import { screwBossFootprint, screwBossPlan, screwBossSize, screwBossSizes, normalizeScrewBossFastener, MAX_SCREW_BOSS_GUSSETS, type ScrewBossFastener } from "@/lib/screwBoss";
 import { snapFitCatchBox, snapFitPlan, SNAP_FIT_STRAIN_PLA, SNAP_FIT_STRAIN_TOUGH, type SnapFitPart } from "@/lib/snapFit";
-import { MIN_RIB_FOOT_OVERHANG, MIN_RIB_FOOT_THICKNESS, normalizeRibStyle, normalizeRibTop, ribFootSwitch, ribSize, ribThicknessOnFootPatch } from "@/lib/rib";
+import { MIN_RIB_FOOT_OVERHANG, MIN_RIB_FOOT_THICKNESS, normalizeRibFootShape, normalizeRibStyle, normalizeRibTop, ribBoxWidth, ribFootSwitch, ribGussetWallKeepingPlace, ribLengthKeepingPatch, ribSize, ribThicknessOnFootPatch } from "@/lib/rib";
 import { torusTessellation } from "@/lib/torusTessellation";
 import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO, torusTubeRatio, torusTubeThickness } from "@/lib/torusShape";
 import { normalizePyramidTop } from "@/lib/pyramidGeometry";
@@ -357,6 +361,7 @@ import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFor
 import { useKeptColors, useRecentColors } from "@/lib/recentColors";
 import { ColorKeepRows } from "@/components/workplane/ColorKeepRows";
 import { canToggleGroupColors, groupShowsPartColors } from "@/lib/groupColors";
+import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
@@ -517,6 +522,8 @@ type RangePropertyConfig = {
   disabled?: boolean;
   /** A line under the row saying what the value measures (#215). */
   hint?: string;
+  /** A line under the row, before the hint, saying where the value came from: the fit test (printerPlay.ts). */
+  note?: string;
   /** Values the row skips, in millimetres for a length (#1126): one inside goes on to the end it moves towards. */
   gap?: { from: number; to: number };
   onChange: (value: number) => void;
@@ -599,7 +606,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -2207,8 +2214,19 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     // On its foot (Discussion #1307) the box's depth is the foot's width, the rib's thickness a field of its own; the
     // depth's field id ("length") goes with the depth, so the dimension on the work area stays the same field.
     const onFoot = shape.ribFoot === true;
-    const size = ribSize({ ...shape, width, depth });
-    const footPatch = (patch: Partial<WorkplaneShape>): Partial<WorkplaneShape> => (patch.depth === undefined ? patch : { ...patch, size: resizedShapeSize(width, patch.depth) });
+    const rib = { ...shape, width, depth };
+    const size = ribSize(rib);
+    // On an oval foot the box's width is the foot's length in the same way, the rib's own length a field of its own
+    // ("ribLength", the width's id staying with the box) that sets the box's width round it.
+    const onOval = size.foot?.shape === "oval";
+    // A change to the foot or the rib's thickness: the box follows it, an oval foot's length too, so the rib stays as
+    // long as it was; it grows round its middle, but a gusset's away from its wall, so the gusset stays where it stands.
+    const footPatch = (change: Partial<WorkplaneShape>): Partial<WorkplaneShape> => {
+      const patch = { ...change, ...ribLengthKeepingPatch(rib, { ...rib, ...change }) };
+      if (patch.width === undefined && patch.depth === undefined) return patch;
+      const sized = { ...patch, size: resizedShapeSize(patch.width ?? width, patch.depth ?? depth) };
+      return style === "gusset" && patch.width !== undefined && Math.abs(patch.width - width) > 1e-9 ? { ...sized, ...ribGussetWallKeepingPlace(rib, patch.width) } : sized;
+    };
     const properties: ShapePropertyConfig[] = [
       {
         type: "select",
@@ -2217,13 +2235,15 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         value: style,
         options: [{ value: "straight", label: t("rib.straight") }, { value: "gusset", label: t("rib.gusset") }],
         hint: t(style === "gusset" ? "rib.gussetHint" : "rib.straightHint"),
-        // A gusset starts as a square corner piece, a rib as a long strip.
-        onChange: (value) => onUpdate(value === "gusset" ? { ribStyle: "gusset", width: 10, height: 10 } : { ribStyle: "straight", width: 40, height: 8 }),
+        // A gusset starts as a square corner piece, a rib as a long strip (on an oval foot, its box the foot's length).
+        onChange: (value) => onUpdate(value === "gusset" ? { ribStyle: "gusset", width: ribBoxWidth(rib, 10), height: 10 } : { ribStyle: "straight", width: ribBoxWidth(rib, 40), height: 8 }),
       },
-      { id: "width", label: t(style === "gusset" ? "prop.ribGussetFoot" : "prop.ribLength"), value: width, min: 0.2, max: 500, onChange: setWidth },
+      onOval
+        ? { id: "ribLength", label: t(style === "gusset" ? "prop.ribGussetFoot" : "prop.ribLength"), value: Math.round(size.width * 100) / 100, min: 0.2, max: 500, onChange: (value) => onUpdate(widthPatch(ribBoxWidth(rib, value)), { resizeAxis: "width" }) }
+        : { id: "width", label: t(style === "gusset" ? "prop.ribGussetFoot" : "prop.ribLength"), value: width, min: 0.2, max: 500, onChange: setWidth },
       { id: "height", label: t(style === "gusset" ? "prop.ribGussetLeg" : "prop.height"), value: shape.height, min: 0.2, max: 300, onChange: setHeight },
       onFoot
-        ? { id: "ribThickness", label: t("prop.ribThickness"), value: size.thickness, min: 0.2, max: 50, step: 0.1, hint: t("rib.thicknessHint"), onChange: (value) => onUpdate(footPatch(ribThicknessOnFootPatch({ ...shape, width, depth }, value))) }
+        ? { id: "ribThickness", label: t("prop.ribThickness"), value: size.thickness, min: 0.2, max: 50, step: 0.1, hint: t("rib.thicknessHint"), onChange: (value) => onUpdate(footPatch(ribThicknessOnFootPatch(rib, value))) }
         : { id: "length", label: t("prop.ribThickness"), value: depth, min: 0.2, max: 50, step: 0.1, hint: t("rib.thicknessHint"), onChange: setDepth },
     ];
     if (style === "straight") {
@@ -2236,10 +2256,20 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         onChange: (value) => onUpdate({ ribTop: normalizeRibTop(value) }),
       });
     }
-    // Switched on or off the box follows the foot, centred on the rib, so the rib stays where it stands.
-    properties.push({ type: "toggle", id: "ribFoot", label: t("prop.ribFoot"), value: onFoot, onChange: (value) => onUpdate(footPatch(ribFootSwitch({ ...shape, width, depth }, value))) });
+    // Switched on or off the box follows the foot, centred on the rib (an oval one under a gusset from its wall), so the
+    // rib stays where it stands.
+    properties.push({ type: "toggle", id: "ribFoot", label: t("prop.ribFoot"), value: onFoot, onChange: (value) => onUpdate(footPatch(ribFootSwitch(rib, value))) });
     if (onFoot) {
       properties.push(
+        {
+          type: "select",
+          id: "ribFootShape",
+          label: t("prop.ribFootShape"),
+          value: normalizeRibFootShape(shape.ribFootShape),
+          options: [{ value: "square", label: t("rib.footSquare") }, { value: "oval", label: t("rib.footOval") }],
+          hint: t("rib.footShapeHint"),
+          onChange: (value) => onUpdate(footPatch({ ribFootShape: normalizeRibFootShape(value) })),
+        },
         { id: "length", label: t("prop.ribFootWidth"), value: depth, min: Math.round((size.thickness + 2 * MIN_RIB_FOOT_OVERHANG) * 100) / 100, max: 100, step: 0.1, hint: t("rib.footHint"), onChange: (value) => onUpdate(footPatch({ depth: value })) },
         { id: "ribFootThickness", label: t("prop.ribFootThickness"), value: size.foot?.thickness ?? MIN_RIB_FOOT_THICKNESS, min: MIN_RIB_FOOT_THICKNESS, max: Math.max(MIN_RIB_FOOT_THICKNESS, shape.height / 2), step: 0.1, hint: t("rib.footThicknessHint"), onChange: (value) => onUpdate({ ribFootThickness: value }) },
       );
@@ -2809,6 +2839,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       next.clearance = normalizeThreadClearance(next.clearance);
       next.boltClearance = normalizeThreadBoltClearance(next.boltClearance);
       next.axialClearance = normalizeThreadAxialClearance(next.axialClearance, next.pitch);
+      // A size from the menu is one thread (#1348); otherwise the starts stay, as far as the new measures allow.
+      next.starts = normalizeThreadStarts(patch.starts ?? (patch.taper || next.taper ? 1 : next.starts), next.diameter, next.pitch, next.taper);
       // The own profile keeps its proportions when the pitch changes: the depth goes with it, unless it is set in the same step.
       if (patch.pitch !== undefined && patch.depth === undefined && settings.profile === "custom") next.depth = settings.depth * (next.pitch / settings.pitch);
       next.flankAngle = normalizeThreadFlankAngle(next.flankAngle);
@@ -2855,6 +2887,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         threadTaper: next.taper ? true : undefined,
         threadDiameter: next.diameter,
         threadPitch: next.pitch,
+        threadStarts: next.starts > 1 ? next.starts : undefined,
         threadClearance: next.clearance,
         threadBoltClearance: next.boltClearance,
         threadAxialClearance: next.axialClearance,
@@ -2936,7 +2969,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           // Eine G-Groesse bringt ihr Whitworth-Profil mit, eine M-, UNC- oder
           // UNF-Groesse das Spitzgewinde, ein Flaschenhals sein eigenes Profil;
           // Trapez und Rund bleiben stehen.
-          if (chosen) applyThread(threadSizeSettings(chosen, settings.profile, standard));
+          if (chosen) applyThread({ ...threadSizeSettings(chosen, settings.profile, standard), starts: 1 });
         },
       },
       {
@@ -3062,13 +3095,27 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         }
         : {
           id: "pitch",
-          label: t("prop.pitch"),
+          // With several starts (#1348) this is the distance from thread to thread, not how far one climbs.
+          label: t(settings.starts > 1 ? "prop.threadDivision" : "prop.pitch"),
           value: settings.pitch,
           min: pitchLimits.min,
           max: pitchLimits.max,
           step: 0.05,
           onChange: (pitch) => applyThread({ pitch }),
         },
+      // Starts (#1348): threads side by side, as on a lead screw. A tapered thread has one.
+      ...(settings.taper ? [] : [{
+        id: "threadStarts",
+        label: t("prop.threadStarts"),
+        value: settings.starts,
+        min: 1,
+        max: threadStartsLimit(settings.diameter, settings.pitch),
+        step: 1,
+        hint: settings.starts > 1
+          ? t("thread.startsLeadHint", { lead: (settings.pitch * settings.starts).toLocaleString(numberLocale()), starts: settings.starts, pitch: settings.pitch.toLocaleString(numberLocale()) })
+          : t("thread.startsHint"),
+        onChange: (starts: number) => applyThread({ starts: Math.round(starts) }),
+      }]),
       {
         type: "select",
         id: "threadHand",
@@ -4117,13 +4164,14 @@ export function ShapeInspector({
   // The section of a loft the rows are about (#1034), back to the first for another body.
   const [loftSection, setLoftSection] = useState(0);
   useEffect(() => setLoftSection(0), [shape.id]);
-  const properties = getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles });
+  const printerPlay = usePrinterPlay();
+  const properties = withFitTestNotes(getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles }), shape.kind, printerPlay);
   const tiltedMeasures = orientedMeasures(shape).kind === "tilted";
   // What each value would be on a shape of this kind made new, with the saved defaults: the
   // small arrow next to a changed value takes it back there.
-  const propertyDefaults = useMemo(() => shapePropertyDefaults(shape.kind, workspace, shape.kind === "gridfinity" ? normalizeGridfinityType(shape.gridfinityType) : undefined), [shape.kind, workspace, shape.gridfinityType]);
+  const propertyDefaults = useMemo(() => shapePropertyDefaults(shape.kind, workspace, shape.kind === "gridfinity" ? normalizeGridfinityType(shape.gridfinityType) : undefined, printerPlay), [shape.kind, workspace, shape.gridfinityType, printerPlay]);
   const savedDefaults = workspace.shapeCustomizations[shape.kind];
-  const defaultsToSave = shapeDefaultsFromShape(shape, workspace.shapeCustomizations);
+  const defaultsToSave = shapeDefaultsFromShape(shape, workspace.shapeCustomizations, printerPlay);
   const sameDefaults = JSON.stringify(defaultsToSave ?? null) === JSON.stringify(savedDefaults && Object.keys(savedDefaults).length > 0 ? savedDefaults : null);
   const gearType = shape.kind === "gear" ? normalizeGearType(shape.gearType) : null;
   const isThread = shape.kind === "thread";
@@ -4155,7 +4203,7 @@ export function ShapeInspector({
   const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
   const textFillEnd = primaryProperties.reduce((end, property, index) => (TEXT_FILL_IN_VIEW_IDS.has(property.id) ? index + 1 : end), 0);
   const threadProperties = isThread
-    ? properties.filter((property) => ["pitch", "threadsPerInch", "threadHand", "threadProfile", "threadTaper", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
+    ? properties.filter((property) => ["pitch", "threadsPerInch", "threadStarts", "threadHand", "threadProfile", "threadTaper", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
     : [];
   const gearTeethProperties = shape.kind === "gear"
     ? properties.filter((property) => ["gearProfile", "teeth", "gearModule", "gearPressureAngle", "gearBacklash", "gearRim", "toothSize", "toothWidth"].includes(property.id))
@@ -4692,6 +4740,36 @@ export function ShapeInspector({
         <button className="inspector-action-button" type="button" disabled={frozen} onClick={onOpenGroup}>
           {t(shape.groupOperation === "bundle" ? "group.editBundle" : "group.edit")} (E)
         </button>
+      ) : null}
+
+      {/* What the group does with its parts when it is resized (Discussion #526): two long choices, side by side. */}
+      {offersGroupResize(shape) ? (
+        <div className="property-card" data-help-section-all="groupResize">
+          <div className="property-list cylinder-wrap-body">
+            <div className="name-tag-sides group-resize-choice" role="radiogroup" aria-label={t("inspector.groupResize")}>
+              <span>{t("inspector.groupResize")}</span>
+              {(["stretch", "keepParts"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  role="radio"
+                  aria-checked={(shape.groupResize ?? "stretch") === mode}
+                  className={(shape.groupResize ?? "stretch") === mode ? "active" : ""}
+                  disabled={frozen}
+                  onClick={() => onUpdate({ groupResize: normalizeGroupResize(mode) })}
+                >
+                  {t(mode === "keepParts" ? "inspector.groupResizeKeepParts" : "inspector.groupResizeStretch")}
+                </button>
+              ))}
+            </div>
+            {shape.groupResize === "keepParts" ? (
+              <p className="cylinder-wrap-hint">
+                {t(groupCanKeepParts(shape) ? "inspector.groupResizeKeepPartsHint" : "inspector.groupResizeStretchedHint")}
+                <GuideHelpLink section="groupResize" className="inspector-help-link" />
+              </p>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       {canSeparateParts && onSeparateParts ? (
@@ -5829,6 +5907,24 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
                 onInteractionActiveChange={onInteractionActiveChange}
               />
             </label>
+          ) : null}
+          {sbcBoardHasButtons(SBC_BOARDS[controls.settings.board]) ? (
+            <>
+              <label className="select-property sbc-board-button-reach">
+                <span>{t("sbcBoard.buttonReach")} ({unit})</span>
+                <CompactMeasureField
+                  label={t("sbcBoard.buttonReach")}
+                  value={controls.settings.buttonReach ?? 0}
+                  min={0}
+                  max={MAX_SBC_BUTTON_REACH}
+                  workspace={workspace}
+                  disabled={disabled || busy}
+                  onChange={(buttonReach) => regenerate({ buttonReach })}
+                  onInteractionActiveChange={onInteractionActiveChange}
+                />
+              </label>
+              <p className="name-tag-hint">{t("sbcBoard.buttonReachHint")}</p>
+            </>
           ) : null}
           <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.passagesHint")}</p>
           {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
@@ -7279,13 +7375,27 @@ function GridfinityCompartmentsCard({
 type PropertyDefaultValues = ReadonlyMap<string, number | string | boolean>;
 
 /**
+ * The rows that follow the printer's play (printerPlay.ts) say "from your fit test" under them while their value is the
+ * one the play gives, so it is clear where the number comes from; changed by hand, the line goes.
+ */
+function withFitTestNotes(properties: ShapePropertyConfig[], kind: WorkplaneShape["kind"], printerPlay: number | null): ShapePropertyConfig[] {
+  const rows = printerPlayShapeRows(kind);
+  if (printerPlay === null || rows.length === 0) return properties;
+  return properties.map((property) => {
+    if (property.type !== undefined && property.type !== "range") return property;
+    const row = rows.find((entry) => entry.property === property.id);
+    return row && fromPrinterPlay(row.id, property.value, printerPlay) ? { ...property, note: t("printerPlay.fromFitTest") } : property;
+  });
+}
+
+/**
  * The values a shape of this kind has when it is made new, with the defaults saved in the
  * settings, by property id. The main list, the taper card, the twist card and a Gridfinity
  * bin's compartments card each have their own, as some ids (a pyramid's top width) mean
  * different things in them. Null for a shape that is not made from the toolbar: a sketch,
  * a mesh, a group.
  */
-function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: WorkplaneWorkspaceSettings, gridfinityType?: GridfinityType) {
+function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: WorkplaneWorkspaceSettings, gridfinityType?: GridfinityType, printerPlay: number | null = null) {
   const asset = shapeDefaultsAsset(kind);
   if (!asset) return null;
   try {
@@ -7293,7 +7403,8 @@ function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: Workplan
     // where the defaults make a tray.
     const saved = workspace.shapeCustomizations[kind];
     const tray = gridfinityType === "tray" || (gridfinityType !== undefined && normalizeGridfinityType(saved?.gridfinityType) === "tray");
-    const fresh = makeShapeFromAsset(asset, undefined, tray ? { ...saved, gridfinityType } : saved);
+    // A clearance that follows the printer's play goes back to what the play gives, as a shape made now starts with.
+    const fresh = makeShapeFromAsset(asset, undefined, withPrinterPlay(kind, tray ? { ...saved, gridfinityType } : saved, printerPlay));
     const main = new Map<string, number | string | boolean>();
     getShapeProperties(fresh, () => undefined, workspace).forEach((property) => {
       if (property.type !== "text") main.set(property.id, property.value);
@@ -7558,6 +7669,7 @@ function RangeProperty({
   max,
   step = 0.01,
   hint,
+  note,
   gap,
   workspace,
   disabled,
@@ -7847,7 +7959,7 @@ function RangeProperty({
     </label>
   );
   // Outside the label, so a click on the words does not jump into the field.
-  return hint ? <>{row}<p className="property-hint">{hint}</p></> : row;
+  return hint || note ? <>{row}{note ? <p className="property-hint">{note}</p> : null}{hint ? <p className="property-hint">{hint}</p> : null}</> : row;
 }
 
 /**

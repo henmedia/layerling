@@ -156,6 +156,8 @@ Vzorec, logotip ali napis naj pride na kozarec, škatlo ali cev? Najprej ga polo
 2. Klikni {{ui:inspector.wrapApply}}. Kar je ležalo od leve proti desni, zdaj teče okoli valja, zadnji rob postane zgoraj, debelina pa štrli navzven.
 3. Označi ovito obliko in valj ter ju poravnaj na sredino, levo-desno in spredaj-zadaj. Sredina ovite oblike je os valja, zato potem sedi natanko na njegovi steni.
 
+Oviti je mogoče vsako telo, tudi obliko iz knjižnice: na primer okroglo streho, ki naj sedi na steni okroglega stolpa. Položi jo na ploščo tako, kot naj bo videti na steni, z zaobljenim delom nazaj.
+
 Za gravuro vklopi {{ui:inspector.wrapInward}}: potem gre debelina v steno. Obliko nastavi kot luknjo, jo poravnaj na sredino in združi v skupino z valjem.
 
 Oblika, ki je že ovita, je mreža ovitega predmeta in je ni mogoče ovijati znova: razveljavi ovijanje ali pa ponovno ovij ravno izvirnik z drugim premerom.

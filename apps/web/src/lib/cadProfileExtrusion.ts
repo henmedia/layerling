@@ -1626,6 +1626,7 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     threadClearance: shape.threadClearance,
     threadBoltClearance: shape.threadBoltClearance,
     threadAxialClearance: shape.threadAxialClearance,
+    threadStarts: shape.threadStarts,
     threadDepth: shape.threadDepth,
     threadFlankAngle: shape.threadFlankAngle,
     threadQuality: shape.threadQuality,
@@ -1648,6 +1649,7 @@ export function cadModifierThreadForShape(shape: WorkplaneShape): CadModifierThr
     major: plan.major,
     minor: plan.minor,
     pitch: settings.pitch,
+    ...(settings.starts > 1 ? { starts: settings.starts } : {}),
     hand: plan.handSign === -1 ? -1 : 1,
     height: plan.height,
     shaftBottom: plan.shaftBottom,
@@ -1974,7 +1976,7 @@ export function cadModifierEnclosureForShape(shape: WorkplaneShape): CadModifier
   }
   return {
     kind: "rib",
-    fields: { width, depth, height, ribStyle: shape.ribStyle, ribTop: shape.ribTop, ribFoot: shape.ribFoot, ribThickness: shape.ribThickness, ribFootThickness: shape.ribFootThickness },
+    fields: { width, depth, height, ribStyle: shape.ribStyle, ribTop: shape.ribTop, ribFoot: shape.ribFoot, ribThickness: shape.ribThickness, ribFootThickness: shape.ribFootThickness, ribFootShape: shape.ribFootShape },
     transform,
   };
 }

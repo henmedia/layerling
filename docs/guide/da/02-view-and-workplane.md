@@ -24,9 +24,7 @@ Hvor hurtigt musehjulet zoomer sættes med {{ui:workspace.zoomSpeed}} i indstill
 
 **3D-mus.** En SpaceMouse eller en anden 3D-mus drejer, flytter og zoomer i 3D-visningen: skub kuppelen væk for at zoome ind, glide den for at flytte visningen, vip den for at vippe visningen, og drej den for at dreje visningen rundt. I indstillingerne, under {{ui:workspace.appearance}}, klikker du på {{ui:workspace.spaceMouseConnect}} og vælger enheden i det vindue, browseren åbner; den husker valget, så det skal bare gøres én gang. Det virker i Chrome og Edge, som kan nå sådanne enheder; Firefox og Safari kan ikke. Føles en retning forkert, så sæt kryds ved den under knappen: flyt til siderne, flyt op og ned, zoom, vip eller drej.
 
-På en tablet eller telefon zoomer to fingre (spred og knib) og flytter visningen (glid sammen). Én finger arbejder på designet, ligesom venstre museknap. For at dreje med én finger, slå {{ui:camera.touchRotate}} til i visningsbjælken. Den kontakt vises kun på enheder med en berøringsskærm.
-
-Én finger på tom plads drejer visningen, og et tryk dér rydder markeringen.
+På en tablet eller telefon zoomer to fingre (spred og knib) og flytter visningen (glid sammen). Én finger på tom plads drejer visningen, og et tryk dér rydder markeringen; på en form eller et håndtag arbejder den på designet, ligesom venstre museknap. For at dreje med én finger, slå {{ui:camera.touchRotate}} til i visningsbjælken. Den kontakt vises kun på enheder med en berøringsskærm.
 
 En tegneplade med en pen opfører sig som en mus: spidsen er venstre knap, sideknappen på pennen er højre knap, til at dreje visningen og til menuen. Pladens genvejstaster kan sættes i dens driver til layerlings [tastaturgenveje](chapter:shortcuts).
 
@@ -96,7 +94,7 @@ På en flade snapper arbejdsplanets nulpunkt ellers til gitteret. Klik tæt på 
 
 Et klik ved siden af pladen eller [[Esc]] returnerer arbejdsplanet til grundpladen. Hurtigere er {{ui:camera.resetWorkplane}}: knappen med pilen nedad sidder i visningsbjælken under øjet mens arbejdsplanet ligger på en flade. [[Shift]]+[[W]] lægger det direkte på den aktuelt valgte flade. [[Alt]]+[[W]] lægger det altid tilbage på grundpladen, uanset om noget er valgt. Holder du [[Shift]] mens du klikker, peger planet den anden vej.
 
-Mens et arbejdsplan ligger på en flade, dukker et øje op ved siden af {{ui:camera.placeWorkplane}}. Det skjuler arbejdsplanet uden at droppe det, for et klart blik på designet: nye former lander stadig på den flade, og rotation drejer stadig omkring det. Et klik på øjet viser det igen, og det samme gør et nyt arbejdsplan.
+Mens et arbejdsplan ligger på en flade, dukker et øje op ved siden af {{ui:camera.placeWorkplane}}. Det skjuler arbejdsplanet uden at droppe det, for et klart blik på designet: nye former lander stadig på den flade, og rotation drejer stadig omkring det. Et klik på øjet viser det igen, og det samme gør et nyt arbejdsplan. En kasses størrelseshåndtag følger også et arbejdsplan, der står på en af dens sider: hjørne- og sidehåndtagene ligger på den flade, og hvert af dem ændrer det mål af kassen, der løber langs det. Håndtaget midt på fladen ændrer målet på tværs.
 
 Vil du se lige ind på arbejdsplanet, så tryk [[P]] eller klik på {{ui:camera.lookOntoWorkplane}} ved siden af {{ui:camera.placeWorkplane}} i visningslinjen. Visningen drejer, til du ser planet lige forfra, fra den side nye former vokser mod, med dets nulpunkt i midten. På grundpladen er det visningen ovenfra.
 
@@ -201,6 +199,8 @@ Under {{ui:workspace.customSnapGrids}} samme sted tilføjer du dine egne snap-tr
 ### Arbejdsplan: plade og printer
 
 {{ui:workspace.printer}} tilpasser arbejdsplanet til din printers byggeplade og markerer legemer der rækker ud over den, se [Printning](chapter:printing). {{ui:workspace.showPlateLabels}} skriver designets navn på pladen, og printerens navn og byggevolumen når der er valgt en printer.
+
+{{ui:workspace.printerPlay}} er den plads pr. side, en printet stift har brug for for at dreje i et printet hul på din printer. {{ui:workspace.fitTestMake}} lægger pasprøven, der måler det, på pladen; nye låg, svalehaler, snaplåse, møtrikker og tjek af spillerum starter så med det, se [Printning](chapter:printing). Det gemmes i denne browser, ikke i designet.
 
 {{ui:workspace.size}} giver pladen en størrelse af din egen, med {{ui:workspace.width}} og {{ui:workspace.length}} i millimeter eller den enhed du valgte. Gitteret løber altid gennem nulpunktet, så de stærkere linjer ligger på akserne uanset pladens mål.
 

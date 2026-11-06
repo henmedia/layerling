@@ -28,6 +28,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   loftSketches: ["loft", "transition", "two sketches", "two svgs", "blend", "uebergang", "übergang", "zwei skizzen", "skizzen verbinden", "trichter", "funnel"],
   hull: ["hull", "convex hull", "shrink wrap", "wrap", "hülle", "konvexe hülle", "schrumpffolie", "umhüllen"],
   "clearance-check": ["clearance", "collision", "interference", "gap", "fit", "tolerance", "print in place", "too tight", "fused", "spiel", "passung", "kollision", "abstand", "spalt", "toleranz", "klemmt", "verklebt", "zu eng", "verschmolzen"],
+  "print-check": ["print check", "printability", "check print", "thin wall", "wall thickness", "too thin", "floating", "in the air", "supports", "first layer", "bed adhesion", "comes loose", "open mesh", "non-manifold", "nozzle", "druck prüfen", "druck pruefen", "druckbar", "dünne wand", "duenne wand", "wandstärke", "wandstaerke", "zu dünn", "schwebt", "in der luft", "haftung", "löst sich", "offenes netz", "düse", "duese"],
   align: ["align", "ausrichten", "buendig", "bündig", "mitte", "center", "verteilen", "distribute", "abstand", "abstände", "gleiche abstände", "equal gaps", "gap", "spacing", "space evenly"],
   mirror: ["mirror", "flip", "spiegeln", "spiegelung"],
   pivot: ["pivot", "rotation point", "drehpunkt", "drehen", "rotate"],

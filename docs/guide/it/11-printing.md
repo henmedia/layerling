@@ -54,6 +54,28 @@ Nelle impostazioni, sotto {{ui:workspace.appearance}}, imposta l’inclinazione 
 - Quando due parti devono incastrarsi, occorre lasciare del gioco: in genere da 0,2 a 0,4 mm, in base alla stampante. Prima di stampare il pezzo grande, prova un piccolo incastro di test.
 - Molti smussano leggermente il bordo inferiore appoggiato sul piatto. Questo limita l’allargamento del primo strato (il cosiddetto “piede d’elefante”).
 
+## Il gioco della tua stampante: la prova di accoppiamento
+
+Ogni stampante stampa i fori un po' più piccoli e i perni un po' più spessi di come sono disegnati, ognuna di una misura sua, quindi il gioco che serve a due parti stampate all'inizio è una stima. Misuralo invece una volta: nelle impostazioni, in {{ui:workspace.workplane}}, {{ui:workspace.fitTestMake}} mette una prova di accoppiamento sul piatto. È una piastrina di 60 × 20 × 4 mm con sette fori per un perno da 5 mm, ognuno disegnato da 5 mm più due volte 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 o 0,40 mm, con il valore in rilievo accanto, e il perno da 5 mm stesso, in piedi accanto alla piastrina con un piccolo smusso in cima. È fatta di forme comuni, quindi si stampa con il resto del piatto, senza supporti.
+
+Stampala così com'è, poi infila il perno, con lo smusso davanti, nei fori a partire dal più stretto. **Il foro più stretto in cui il perno gira ancora** dà il gioco della tua stampante. Scrivi il suo numero in {{ui:workspace.printerPlay}} oppure fai clic su di esso tra i valori sotto il campo. Il gioco è per lato, in millimetri, e il browser lo conserva per tutti i progetti; un campo vuoto significa non misurato.
+
+Da quel momento i nuovi utilizzi partono dal gioco invece che dal valore predefinito: {{ui:lid.gap}} e {{ui:lid.hingePinPlay}} nello strumento {{ui:editor.tool.lid}}, il gioco di una nuova {{ui:shape.dovetail}} e di un nuovo {{ui:shape.snapFit}}, {{ui:prop.clearance}} di un nuovo dado o foro filettato – il doppio del gioco, perché è lo spazio su tutto il diametro – e {{ui:clearance.threshold}} in {{ui:editor.tool.clearance}}. Finché un campo così mantiene quel valore, “{{ui:printerPlay.fromFitTest}}” accanto dice da dove viene il numero. Una cerniera stampata in un pezzo e le articolazioni dello strumento {{ui:editor.tool.flexi}} mantengono i loro 0,4 mm: stampate in un pezzo unico, le loro fessure devono restare aperte anche tra gli strati, e questo un perno stampato a parte non lo misura. Lo spazio per inserire a pressione un magnete o una chiave Gridfinity e lo spazio per una presa o una scheda acquistate mantengono anch'essi i propri valori. I corpi già presenti in un progetto non cambiano mai, e nemmeno un progetto che apri.
+
+## Controllare la stampa
+
+{{ui:editor.tool.printCheck}}, accanto a {{ui:editor.tool.clearance}} in {{ui:editor.group.combine}}, esamina gli oggetti selezionati, o tutti quelli visibili se non è selezionato nulla, e dice in una finestra cosa andrebbe storto in stampa. Ognuna delle sue cinque righe è verde se non ha trovato nulla, e arancione con cosa e dove se ha trovato qualcosa:
+
+- **{{ui:printCheck.thin.title}}**: punti più sottili di due linee dell'ugello, cioè 0,8 mm con un ugello da 0,4 mm. Lo slicer tralascia una parete così o la stampa come un'unica linea debole. In alto nella finestra scegli il tuo ugello in {{ui:printCheck.nozzle}} (da 0,2 a 0,8 con un clic, qualsiasi altro nel campo). I punti sottili vengono dipinti di rosso con una griglia chiara sui corpi, e la riga indica il punto più sottile e quanta superficie è troppo sottile. I punti sotto 1 mm² e gli spigoli vivi, come quello di un cuneo, sono esclusi.
+- **{{ui:printCheck.floating.title}}**: un corpo, o una parte separata di un corpo, che non tocca né il piatto né un'altra parte (entro 0,05 mm). Verrebbe stampato nel vuoto. Una parte appoggiata su una parte che sta in piedi va bene.
+- **{{ui:printCheck.contact.title}}**: una parte sul piatto il cui primo strato è molto piccolo per la sua altezza, come una sfera o un cono sulla punta. Può staccarsi durante la stampa. L'avviso compare sotto 0,5 mm² di appoggio, misurato 0,1 mm sopra il piatto, per ogni millimetro di altezza: una sfera è sempre sotto, un cubo di 10 mm ha 10.
+- **{{ui:printCheck.overhang.title}}**: gli stessi numeri di **Mostra sbalzi**, con l'angolo impostato lì.
+- **{{ui:printCheck.openMesh.title}}**: una mesh importata con spigoli aperti, o spigoli condivisi da tre o più facce. Lo slicer deve allora indovinare dov'è l'interno.
+
+![Una vaschetta la cui parete destra è spessa solo 0,6 mm: Controlla la stampa la colora di rosso e la segnala nella finestra.](shot:print-check)
+
+{{ui:printCheck.show}} su una riga porta lì la telecamera; seleziona le parti sospese, quelle con poco appoggio e le mesh aperte, e per le sporgenze attiva **Mostra sbalzi**. I corpi che si sovrappongono vengono controllati uniti, come li unisce lo slicer. Se modifichi il progetto mentre la finestra è aperta, compare {{ui:printCheck.stale}}; fai clic lì o su {{ui:printCheck.checkAgain}}. [[Esc]] chiude la finestra. Il progetto non cambia. Un'IA fa lo stesso controllo con `layerling_check_print`.
+
 ## Quando il pezzo è pronto
 
 Scegli {{ui:editor.export}}, poi **STL** o **3MF**. STL è il formato più semplice. 3MF conserva i nomi e i colori dei singoli corpi, quindi è comodo per la stampa multicolore. La finestra di esportazione mostra anche quanti grammi e metri di filamento servirebbero per stampare il pezzo pieno. Altre informazioni in [File e salvataggio](chapter:files-and-saving).

@@ -4,6 +4,7 @@ import { buildMessage } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions } from "@/lib/clearanceCheck";
 import { articulateShapes, type FlexiOptions } from "@/lib/flexiJoints";
 import { lidForShapes, type LidOptions } from "@/lib/lidTool";
+import { checkPrint, type PrintCheckOptions } from "@/lib/printCheck";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadPositions, splitShapeIfCrossed } from "@/lib/editorBooleans";
 import { getManifoldRuntime, setManifoldAssetBase } from "@/lib/editorMeshCore";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
@@ -49,6 +50,9 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
     } else if (request.task === "clearance") {
       const { source, options } = args as { source: WorkplaneShape[]; options: Partial<ClearanceOptions> };
       result = await checkClearance(source, options);
+    } else if (request.task === "printCheck") {
+      const { source, options } = args as { source: WorkplaneShape[]; options: Partial<PrintCheckOptions> };
+      result = await checkPrint(source, options);
     } else if (request.task === "lid") {
       const { targets, options } = args as { targets: WorkplaneShape[]; options: LidOptions };
       result = await lidForShapes(targets, options);

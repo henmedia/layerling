@@ -35,6 +35,7 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 更多設定：
 
 - **{{ui:prop.threadHand}}：** {{ui:thread.right}} 或 {{ui:thread.left}}。
+- **{{ui:prop.threadStarts}}：** 多條螺紋並排，如導螺桿：T8x8 有 4 頭，每頭 2 mm，每條每轉升高 8 mm。此時螺距欄位顯示為{{ui:prop.threadDivision}}：相鄰兩條螺紋之間的距離，決定牙型深度，下方的提示給出導程。清單中的規格和錐螺紋只有一頭。
 - **{{ui:prop.threadProfile}}：** {{ui:thread.profileV}} 是公制與英吋螺紋的標準牙型，{{ui:thread.profileWhitworth}} 則是 G 管螺紋的牙型：55°，牙頂與牙底為圓角。{{ui:thread.profileTrapezoidal}} 與 {{ui:thread.profileRound}} 的牙頂與牙底是平的。這種牙型通常列印更可靠，因為不會留下細薄的牙尖。
 - **{{ui:prop.threadTaper}}：** 螺紋直徑按 1:16 收窄，就像錐管螺紋一樣；此時{{ui:prop.diameter}}是大端的直徑。{{ui:thread.rod}}或{{ui:thread.screw}}朝頂部的末端變細，{{ui:thread.nut}}或{{ui:thread.bore}}朝頂部的入口變寬，所以把錐形螺桿倒過來就能鎖進去。任何牙型都可以做成錐形，錐形螺紋也是精確實體，可用於邊緣工具和 STEP 匯出。
 - **{{ui:thread.profileCustom}}：** 自行塑造的梯形，牙頂與牙底同寬且平整。{{ui:prop.threadFlankAngle}} 是一顆螺牙兩側牙面之間的夾角：60° 是尖銳的 V 形螺紋，30° 是梯形螺紋；90° 以下時，牙面都不會比 45° 更平，因此螺紋不需支撐即可列印。{{ui:prop.threadDepth}} 與 {{ui:prop.threadCoreDiameter}} 是同一個尺寸的兩種說法：芯徑等於直徑減去兩倍深度，改動其中一個就會改變另一個。新的自訂牙型從 60° 的 V 形螺紋深度開始。深度受角度與螺距限制：不得淺於螺距的十分之一、不得深於直徑的 40%，也不能深到兩側牙面佔去超過十分之九的螺距。改變螺距時，深度按比例跟著變；縮放螺紋時，深度也一樣。間隙與倒角的作用與其他牙型相同。透過 MCP 橋接時，牙型為 `custom`，並帶 `threadFlankAngle` 與 `threadDepth`。
@@ -262,5 +263,7 @@ microSD 卡槽也是左邊緣的接頭，位於電路板下方（Zero 2 W 上在
 {{ui:shape.rib}} 用來加強底面或側壁。作為 {{ui:rib.straight}}，長度、高度和厚度都依你的設定，{{ui:prop.ribTop}} 可以是平的、圓的或倒角的。作為 {{ui:rib.gusset}}，它是把側壁撐在底面上的三角形：{{ui:prop.ribGussetFoot}} 沿底面，{{ui:prop.ribGussetLeg}} 沿壁面向上，兩端都切短一點，方便乾淨地列印。
 
 開啟 {{ui:prop.ribFoot}} 後，加強肋沿整條長度立在一塊薄板上，位於板的中間，板比肋寬（{{ui:rib.gusset}} 的底腳在沿底面的那條邊下方）；薄板讓肋牢牢附著在列印平台或底面上，更薄的肋也能立得住。底腳起初是肋的三倍寬、0.8 mm 厚；{{ui:prop.ribFootWidth}} 依整個寬度計算，所以形狀和底腳一樣寬，{{ui:prop.ribFootThickness}} 從底部往上算。
+
+{{ui:prop.ribFootShape}} 可選 {{ui:rib.footSquare}} 或 {{ui:rib.footOval}}。橢圓形底腳從上面看是一個橢圓，沒有轉角，塑料冷卻收縮時不會從列印平台上翹起。它和底腳一樣寬，長度恰好讓它在肋的兩端仍有肋的兩倍寬，這樣兩端也立在底腳上（三角補強板下方則是半個橢圓，從壁面一直延伸到尖端之外）。底腳比肋的約 2.7 倍還窄時，橢圓會很長：它最長到肋長的 1.5 倍，但絕不會短到讓兩端懸空。形狀會因伸出兩端的部分而變長，肋本身的長度不變。
 
 厚度與壁厚相當或略薄、為線寬整數倍（0.4 mm 噴嘴用 0.8 或 1.6 mm）、高度為厚度幾倍的加強肋，既能加強又不會讓壁面變形。多條排成一列用 {{ui:editor.tool.array}}；把它們與盒子群組。

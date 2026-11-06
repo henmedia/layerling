@@ -166,6 +166,8 @@ Ein Muster, ein Logo oder ein Schriftzug soll auf einen Becher, eine Dose oder e
 2. Klicke auf {{ui:inspector.wrapApply}}. Was von links nach rechts lag, läuft jetzt um den Zylinder herum, der hintere Rand wird oben, und die Dicke steht nach außen ab.
 3. Markiere die gewickelte Form und den Zylinder und richte sie beide mittig aus, links-rechts und vorne-hinten. Die Mitte der gewickelten Form ist die Achse des Zylinders, also sitzt sie dann genau auf seiner Wand.
 
+Wickeln lässt sich jeder Körper, auch eine Form aus der Bibliothek: etwa ein Rundes Dach, das auf der Wand eines runden Turms sitzen soll. Lege es so auf die Platte, wie es auf der Wand aussehen soll, die Rundung nach hinten.
+
 Für eine Gravur schaltest du {{ui:inspector.wrapInward}} ein: Dann geht die Dicke in die Wand hinein. Setze die Form als Aussparung, richte sie mittig aus und gruppiere sie mit dem Zylinder.
 
 Eine Form, die schon gewickelt ist, ist ein Netz des Gewickelten und lässt sich nicht noch einmal wickeln: Nimm das Wickeln zurück oder wickle das flache Original noch einmal mit einem anderen Durchmesser.

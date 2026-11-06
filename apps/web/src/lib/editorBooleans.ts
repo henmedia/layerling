@@ -12,7 +12,7 @@ import { numberLocale, t } from "@/lib/i18n";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
-import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices } from "@/lib/groupScale";
+import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
 import { dropSplitSlivers, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
 import { starSettingsForSize } from "@/lib/starGeometry";
@@ -2409,7 +2409,20 @@ function taperedPartPatch(part: WorkplaneShape, scaleX: number, scaleZ: number):
   return patch;
 }
 
-export function restoreGroupedChildren(group: WorkplaneShape): WorkplaneShape[] {
+/** A part's own x, y and z axes in its group's frame: where its width, height and depth lie there. */
+export function groupPartAxes(child: WorkplaneShape): [[number, number, number], [number, number, number], [number, number, number]] {
+  const childQuaternion = quaternionForShape(child);
+  return [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)]
+    .map((axis) => axis.applyQuaternion(childQuaternion).toArray() as [number, number, number]) as [[number, number, number], [number, number, number], [number, number, number]];
+}
+
+/**
+ * The parts of a group where they stand, at the size the group gives them. Left to itself the group stretches
+ * them all by its own stretch; `placements` (one for each part, in their order) put each part somewhere of its
+ * own instead - its middle in the group's frame, x and z from the group's middle and y from its foot, and its
+ * stretch along the group's axes - for a group that keeps its holes and small parts (Discussion #526).
+ */
+export function restoreGroupedChildren(group: WorkplaneShape, placements?: readonly Pick<GroupPartPlacement, "center" | "stretch">[]): WorkplaneShape[] {
   const children = group.groupedShapes ?? [];
   if (children.length === 0) {
     return [];
@@ -2420,19 +2433,18 @@ export function restoreGroupedChildren(group: WorkplaneShape): WorkplaneShape[] 
   const groupReflection = new THREE.Matrix4().makeScale(mirrorSign(group.mirrorX), mirrorSign(group.mirrorY), mirrorSign(group.mirrorZ));
   const groupCenter = new THREE.Vector3(group.x, (group.elevation ?? 0) + group.height / 2, group.z);
 
-  return children.map((child) => {
+  return children.map((child, index) => {
     // The group stretches along its own axes; a turned part has its width, height and depth on others.
-    const childQuaternion = quaternionForShape(child);
-    const partAxes = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)]
-      .map((axis) => axis.applyQuaternion(childQuaternion).toArray() as [number, number, number]) as [[number, number, number], [number, number, number], [number, number, number]];
-    const partScale = groupedPartSizeScale(partAxes, [sx, sy, sz]);
+    const placement = placements?.[index];
+    const partScale = groupedPartSizeScale(groupPartAxes(child), placement?.stretch ?? [sx, sy, sz]);
     const width = shapeWidth(child) * partScale.width;
     const depth = shapeDepth(child) * partScale.depth;
     const height = child.height * partScale.height;
+    const [localX, localY, localZ] = placement?.center ?? [child.x * sx, ((child.elevation ?? 0) + child.height / 2) * sy, child.z * sz];
     const localCenter = new THREE.Vector3(
-      child.x * sx * mirrorSign(group.mirrorX),
-      (((child.elevation ?? 0) + child.height / 2) * sy - group.height / 2) * mirrorSign(group.mirrorY),
-      child.z * sz * mirrorSign(group.mirrorZ),
+      localX * mirrorSign(group.mirrorX),
+      (localY - group.height / 2) * mirrorSign(group.mirrorY),
+      localZ * mirrorSign(group.mirrorZ),
     ).applyQuaternion(groupQuaternion);
     const worldCenter = groupCenter.clone().add(localCenter);
     const childRotationMatrix = new THREE.Matrix4()
@@ -2544,18 +2556,33 @@ function splitBentTubeBore(shape: WorkplaneShape): WorkplaneShape[] {
   const boreSize = sides === 0 ? 2 * radii.inner : 2 * radii.inner * Math.cos(Math.PI / sides);
   const { tubeBoreHole: _flag, ...rest } = shape;
   const solid = { ...rest, ...bentTubeParameterPatch(shape, { bentTubeInnerProfile: "none" }) };
+  const boreChanges = { bentTubeProfile: settings.innerProfile, bentTubeInnerProfile: "none" as const, bentTubeSize: boreSize };
+  // Where the opening goes is worked out on the pipe lying flat, unturned and unmirrored. There the patch keeps its start
+  // where the pipe starts, and its box shares its middle with the pipe's in height, the thickness of the pipe; otherwise it
+  // lies a wall lower and cuts through the bottom (#892). A standing or tipped pipe has a leg and its bend in its height, so
+  // the middle of its box is not the middle of the pipe: the opening ended short of the top end and closed it (#1367).
+  // The shift found lying flat is turned and mirrored as the pipe is.
+  const { mirrorX: _mirrorX, mirrorY: _mirrorY, mirrorZ: _mirrorZ, ...unmirrored } = rest;
+  const flat: WorkplaneShape = { ...unmirrored, rotation: 0, rotationX: 0, rotationZ: 0 };
+  const flatSolid = { ...flat, ...bentTubeParameterPatch(flat, { bentTubeInnerProfile: "none" }) };
+  const flatBore = { ...flat, ...bentTubeParameterPatch(flat, boreChanges) };
+  const solidBox = boundsForShapesOfVertices([flatSolid]);
+  const boreBox = boundsForShapesOfVertices([flatBore]);
+  const middleOf = (part: WorkplaneShape, centreY: number) => new THREE.Vector3(part.x, centreY, part.z);
+  const shift = middleOf(flatBore, (boreBox.minY + boreBox.maxY) / 2)
+    .sub(middleOf(flatSolid, (solidBox.minY + solidBox.maxY) / 2))
+    .setY(0)
+    .multiply(new THREE.Vector3(mirrorSign(shape.mirrorX), mirrorSign(shape.mirrorY), mirrorSign(shape.mirrorZ)))
+    .applyQuaternion(quaternionForShape(shape));
   const bore = {
     ...rest,
-    ...bentTubeParameterPatch(shape, { bentTubeProfile: settings.innerProfile, bentTubeInnerProfile: "none", bentTubeSize: boreSize }),
+    ...bentTubeParameterPatch(shape, boreChanges),
     id: derivedLocalId(shape.id, "bore"),
     hole: true,
   };
-  // The patch keeps the underside where it was, as it should when the size is changed in the panel; the opening has to sit in
-  // the middle of the pipe instead, or it lies a wall lower and cuts through the bottom of the pipe (#892). Its box and the
-  // pipe's share their middle, lying, standing or tipped.
-  const solidBox = boundsForShapesOfVertices([solid]);
-  const boreBox = boundsForShapesOfVertices([bore]);
-  bore.elevation = (bore.elevation ?? 0) + (solidBox.minY + solidBox.maxY) / 2 - (boreBox.minY + boreBox.maxY) / 2;
+  bore.x = solid.x + shift.x;
+  bore.z = solid.z + shift.z;
+  bore.elevation = (solid.elevation ?? 0) + solid.height / 2 + shift.y - bore.height / 2;
   return [solid, bore];
 }
 

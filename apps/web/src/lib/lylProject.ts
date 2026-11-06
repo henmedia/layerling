@@ -19,7 +19,7 @@ import {
   attachmentsFormatVersion,
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
-import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
+import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
 import { importedShapeFromStl } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
@@ -63,7 +63,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.145.0";
+export const LYL_CREATED_WITH_VERSION = "1.146.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -1399,6 +1399,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       if (typeof text !== "string" || text.length > 80) throw new Error(`${label}.formulas.${field} must be a short text`);
     }
   }
+  // What a group does with its parts when it is resized (Discussion #526).
+  if (definition.groupResize !== undefined && definition.groupResize !== "stretch" && definition.groupResize !== "keepParts") {
+    throw new Error(`${label}.groupResize must be stretch or keepParts`);
+  }
   // A text's fill mode (#215): a stroke like a sketch's, and the silhouette switch.
   if (definition.textStroke !== undefined && !normalizeSketchStroke(definition.textStroke)) {
     throw new Error(`${label}.textStroke must be a stroke with a width above 0`);
@@ -1447,7 +1451,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   // An SBC board's settings (#1098): a known board, a clearance of 0 to 2 mm and a reach of 0 to 10 mm;
   // the openings up and out as true or false, and how far up as 20 to 100 mm. Old projects have none.
   if (definition.sbcBoard !== undefined) {
-    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; upReach?: unknown } | null;
+    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; upReach?: unknown; buttonReach?: unknown } | null;
     if (!board || typeof board !== "object" || !SBC_BOARD_ORDER.includes(board.board as never)) {
       throw new Error(`${label}.sbcBoard.board must be one of ${SBC_BOARD_ORDER.join(", ")}`);
     }
@@ -1462,6 +1466,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     }
     if (board.upReach !== undefined && (typeof board.upReach !== "number" || !Number.isFinite(board.upReach) || board.upReach < MIN_SBC_UP_REACH || board.upReach > MAX_SBC_UP_REACH)) {
       throw new Error(`${label}.sbcBoard.upReach is outside the supported range`);
+    }
+    if (board.buttonReach !== undefined && (typeof board.buttonReach !== "number" || !Number.isFinite(board.buttonReach) || board.buttonReach < 0 || board.buttonReach > MAX_SBC_BUTTON_REACH)) {
+      throw new Error(`${label}.sbcBoard.buttonReach is outside the supported range`);
     }
   }
   // The corners of a text's line (#215): a layer of a name tag can be bevelled or sharp now, so an
@@ -1535,6 +1542,11 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.threadAxialClearance !== undefined) {
       const threadAxialClearance = finiteNumber(definition.threadAxialClearance, `${label}.threadAxialClearance`);
       if (threadAxialClearance < 0 || threadAxialClearance > 1) throw new Error(`${label}.threadAxialClearance is outside the supported range`);
+    }
+    // Starts (#1348): a whole number of threads side by side.
+    if (definition.threadStarts !== undefined) {
+      const threadStarts = finiteNumber(definition.threadStarts, `${label}.threadStarts`);
+      if (!Number.isInteger(threadStarts) || threadStarts < 1 || threadStarts > 8) throw new Error(`${label}.threadStarts is outside the supported range`);
     }
     if (definition.threadDepth !== undefined) {
       const threadDepth = finiteNumber(definition.threadDepth, `${label}.threadDepth`);
@@ -1737,6 +1749,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (kind === "rib") {
     // The foot (Discussion #1307). Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
     if (definition.ribFoot !== undefined && typeof definition.ribFoot !== "boolean") throw new Error(`${label}.ribFoot must be true or false`);
+    if (definition.ribFootShape !== undefined && definition.ribFootShape !== "square" && definition.ribFootShape !== "oval") throw new Error(`${label}.ribFootShape must be "square" or "oval"`);
     for (const key of ["ribThickness", "ribFootThickness"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);

@@ -156,4 +156,24 @@ describe("the SBC board card", () => {
     expect(card(panel).querySelector("[data-testid=sbc-board-ribbon-up]")).toBeNull();
     expect(card(panel).querySelector("[data-testid=sbc-board-gpio-up]")).not.toBeNull();
   });
+
+  it("shows the buttons' reach, 0 at first, kept between 0 and 100 mm", async () => {
+    const asked: SbcBoardSettings[] = [];
+    const panel = mount({ board: "featherEsp32s3", clearance: 0.3 }, async (settings) => { asked.push(settings); });
+    const field = card(panel).querySelector<HTMLInputElement>(".sbc-board-button-reach input")!;
+    expect(card(panel).querySelector(".sbc-board-button-reach")!.textContent).toContain("Button reach");
+    expect(field.value).toBe("0.00");
+    type(field, "15");
+    await act(async () => {});
+    type(field, "250");
+    await act(async () => {});
+    expect(asked).toEqual([{ board: "featherEsp32s3", clearance: 0.3, reach: 0, buttonReach: 15 }, { board: "featherEsp32s3", clearance: 0.3, reach: 0, buttonReach: 100 }]);
+  });
+
+  it("offers the buttons' reach only on a board with buttons", () => {
+    expect(card(mount({ board: "arduinoNano", clearance: 0 }, async () => {})).querySelector(".sbc-board-button-reach")).not.toBeNull();
+    act(() => root?.unmount());
+    container?.remove();
+    expect(card(mount({ board: "pi4", clearance: 0 }, async () => {})).querySelector(".sbc-board-button-reach")).toBeNull();
+  });
 });

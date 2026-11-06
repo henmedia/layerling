@@ -2174,6 +2174,25 @@ html:where([data-theme="dark"][data-palette="graphite"])[data-simple-mode="on"]:
   color: #6b6b6b;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .server-design-picker {
+  background: #fff;
+  border: 1px solid #dddddd;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .server-design-path {
+  color: #6b6b6b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .top-action-body .server-design-row {
+  color: #5a3917;
+  background: #fff;
+  border-color: transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .server-design-note {
+  color: #6b6b6b;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .open-lyl-project-icon {
   color: #9f5508;
   background: #f3f3f3;
@@ -3059,6 +3078,82 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .inspector-bundle-note 
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .clearance-hint {
   color: #656565;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-nozzle-field {
+  background: white;
+  border: 1px solid #c8c8c8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-nozzle-field input {
+  color: #3f3f3f;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-nozzle-field input:focus {
+  outline: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-nozzle-field:focus-within {
+  border-color: #e08a2c;
+  box-shadow: 0 0 0 2px rgba(224, 138, 44, 0.25);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-nozzle-field span {
+  color: #676767;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-nozzle-hint {
+  color: #656565;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row {
+  color: #2d2d2d;
+  background: #f7f7f7;
+  border: 1px solid #e2e2e2;
+  border-left: 4px solid #828282;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row > svg {
+  color: #828282;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row.ok {
+  border-left-color: #2f9e5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row.ok > svg {
+  color: #2f9e5b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row.warning {
+  border-left-color: #e8851a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row.warning > svg {
+  color: #e8851a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row.active {
+  background: #efefef;
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row .clearance-row-text .print-check-meaning {
+  color: #8a5a1c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-show {
+  color: #9f5508;
+  background: #fcfcfc;
+  border: 1px solid #e3bd8f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-show:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-show[aria-pressed="true"] {
+  background: #f0f0f0;
+  border-color: #e08a2c;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .clearance-mark-line {
@@ -4875,6 +4970,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   color: #595959;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-printer-play-field {
+  color: #5a5a5a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-printer-play-field input {
+  color: #4a4a4a;
+  background: #fff;
+  border: 1px solid #cecece;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-printer-play-values button.active {
+  color: #9a520a;
+  background: #eeeeee;
+  border-color: #cf710f;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .bed-overhang-warning {
   color: #8a3b00;
   background: #f2f2f2;
@@ -5842,6 +5953,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-info
   color: #909090;
 }
 
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-play-field {
+  color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-play-field input {
+  color: #cbcbcb;
+  background: #2d2d2d;
+  border-color: #4d4d4d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-play-values button.active {
+  color: #f3b26a;
+  background: #363636;
+  border-color: #cf710f;
+}
+
 html[data-theme="dark"]:where([data-palette="graphite"]) .overhang-figures {
   color: #e2e2e2;
   background: rgba(38, 38, 38, 0.94);
@@ -5904,6 +6031,55 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row.fine {
 html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row:hover:not(:disabled),
 html[data-theme="dark"]:where([data-palette="graphite"]) .clearance-row.active {
   background: #343434;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-field {
+  background: #2d2d2d;
+  border-color: #484848;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-field input {
+  color: #dbdbdb;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-field span,
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-hint {
+  color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-row {
+  color: #dbdbdb;
+  background: #292929;
+  border-color: #434343;
+  border-left-color: #6c6c6c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-row.ok {
+  border-left-color: #4cbf7b;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-row.warning {
+  border-left-color: #f39a3a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-row.active {
+  background: #343434;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-row .clearance-row-text .print-check-meaning {
+  color: #e0b27a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-show {
+  color: #ffb866;
+  background: #2d2d2d;
+  border-color: #7a5428;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-show:hover:not(:disabled),
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-show[aria-pressed="true"] {
+  background: #353535;
+  border-color: #c7772a;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-history-actions {
@@ -8487,6 +8663,25 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-inside {
   fill: rgba(155, 80, 0, 0.28);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-centre circle {
+  fill: rgba(255, 255, 255, 0.55);
+  stroke: #b66108;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-centre path {
+  fill: none;
+  stroke: #b66108;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-centre.snapped {
+  filter: drop-shadow(0 0 3px rgba(173, 89, 0, 0.48));
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-centre.snapped circle {
+  fill: rgba(255, 255, 255, 0.92);
+  stroke: #e17709;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .tape-hover-edge {
   fill: none;
   stroke: #e17709;
@@ -8508,6 +8703,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-inside {
 :where(html[data-theme="dark"][data-palette="graphite"]) .tape-label.editable:focus-visible {
   color: #ad5900;
   border-color: #ad5900;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-length-axes {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(207, 207, 207, 0.96);
+  box-shadow: 0 1px 4px rgba(44, 44, 44, 0.12);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-length-axis {
+  color: #ad5900;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .tape-tip {

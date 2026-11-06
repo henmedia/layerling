@@ -39,6 +39,17 @@ En hel gruppe kan også være en solid eller et hul. En simpel regel gælder:
 - Hvis gruppen kun består af solider (eller kun af huller), skifter du den som helhed og dens dele følger med.
 - Hvis den indeholder begge, for eksempel en kasse med en boring, beholder hver del sin egen tilstand. Hele gruppen bliver så et værktøj, men boringen forbliver en boring.
 
+### Ændre størrelse på en gruppe: huller og små dele bevares
+
+Når en gruppe gøres længere, bredere eller højere, strækkes dens dele med, som var de tegnet på gummi: de runde huller i en plade bliver ovale og rykker indad. For at beholde dem, som de er, vælger du {{ui:inspector.groupResizeKeepParts}} under {{ui:inspector.groupResize}} i gruppens indstillinger; uden det valg gælder {{ui:inspector.groupResizeStretch}}, som hidtil for enhver gruppe. Derefter bygges gruppen, hver gang dens størrelse ændres - med håndtagene, i målfelterne eller med {{ui:scalePercent.title}} - op igen af sine dele efter én regel, for hver retning for sig:
+
+- En del, der går hen over næsten hele gruppen, ni tiendedele eller mere, vokser eller skrumper med og beholder sin afstand til begge sider: selve pladen, en væg eller indersiden af en kasse, hvis vægge forbliver lige tykke.
+- Enhver anden del beholder sin egen størrelse og sin afstand til den nærmeste side. En del i midten bliver i midten.
+
+En plade med et hul 5 mm fra hvert hjørne og en slids i midten, gjort 40 mm længere, beholder altså sine huller runde og 5 mm fra hjørnerne og slidsen i midten. Der er ingen løser bag, og du skal ikke indstille noget del for del: den samme regel gælder for alle dele, så du ved på forhånd, hvad der sker. En drejet del tæller med den kasse, den fylder i gruppen, og forbliver drejet; en gruppe i gruppen tæller som én del. Mens du trækker i et håndtag, strækkes gruppen som helhed; når du slipper, bygges den op igen, i samme fortryd-trin. Bliver gruppen mindre, end en del med sin afstand kræver, skrumper den del med som før, og en meddelelse siger det. En spejlet, tilspidset eller snoet gruppe og en med egne afrundinger, faser eller en overfladestruktur strækker altid alt. Vælger du indstillingen for en gruppe, der allerede er strakt, lægges dens dele ud igen med det samme.
+
+![En plade med et hul 5 mm fra hvert hjørne og en slids i midten, gjort 40 mm længere med "Bevar huller og små dele": hullerne er stadig runde og 5 mm fra hjørnerne, slidsen er stadig i midten.](shot:group-keep-parts)
+
 ## Bundtning
 
 Nogle gange bør dele kun blive sammen uden at blive til én - et hvidt logo på en sort plade til et flerfarvet print for eksempel. Det er det {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]) er til, som i Tinkercad. Et bundt flytter, drejer og skalerer som en form, men intet flettes:
@@ -52,7 +63,6 @@ Nogle gange bør dele kun blive sammen uden at blive til én - et hvidt logo på
 ## Fælles
 
 {{ui:editor.tool.intersect}} beholder kun hvad to eller flere former har til fælles. Læg to overlappende former oven på hinanden, vælg begge og klik det. Det gør en cylinder og en kasse til et stykke med én rund og én lige side. En gruppe tæller som den ser ud, huller inkluderet. Hvis et hul også er valgt, er det der bliver tilbage hvad alle soliderne deler med alle hullerne. Hvis formerne ikke har noget til fælles, ændres der intet, og en besked siger det.
-
 Første klik viser den fælles del, før den anvendes: de valgte former bliver gennemsigtige, og det de har til fælles tegnes i grønt. Vælg og flyt hver form for sig, så følger den grønne del med; et klik mere på {{ui:editor.tool.intersect}} anvender den, og [[Esc]] lukker forhåndsvisningen. Former med for mange trekanter til forhåndsvisningen, som store importerede meshes, skæres allerede ved første klik.
 
 {{ui:editor.tool.hull}} pakker de valgte former ind i ét konvekst legeme, som var de krympefolieret: det mindste legeme uden buler, der rummer dem alle. En halvkugle på en cylinder bliver en kuppel uden trin, fire cylindre i hjørnerne bliver en kasse med rundede hjørner, to kugler en kapsel. Huller i markeringen skæres ud af hylsteret bagefter. Delene bliver i hylsteret: {{ui:group.edit}} åbner det som en gruppe, og flytter du en del derhen og lukker, bygges hylsteret igen. Hylsteret er et mesh, så runde former viser facetter, og kantværktøjerne virker på det som på ethvert mesh. Er der kun valgt huller, er hylsteret selv et hul: to cylinderhuller skærer et langhul.

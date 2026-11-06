@@ -235,6 +235,8 @@ export type CadModifierThreadPart = {
   major: number;
   minor: number;
   pitch: number;
+  /** Threads side by side (#1348), each `pitch` from the next, each climbing `pitch * starts` a turn; 1 when absent. */
+  starts?: number;
   /** 1: the thread climbs as the angle from +x towards +z grows, a left-hand thread about +y; -1 the other way, a right-hand one. */
   hand: 1 | -1;
   height: number;

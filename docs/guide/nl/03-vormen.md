@@ -161,6 +161,8 @@ Moet een patroon, een logo of belettering op een beker, een blik of een buis? Le
 2. Klik op {{ui:inspector.wrapApply}}. Wat van links naar rechts liep, loopt nu rond de cilinder, de achterrand wordt de bovenkant, en de dikte steekt uit de wand.
 3. Selecteer de gewikkelde vorm en de cilinder en centreer beide, van links naar rechts en van voor naar achter. Het midden van de gewikkelde vorm is de as van de cilinder, dus dan zit hij precies op de wand.
 
+Elk lichaam kan worden gewikkeld, ook een vorm uit de bibliotheek: bijvoorbeeld een rond dak dat op de wand van een ronde toren moet zitten. Leg het op de plaat zoals het op de wand moet staan, met de ronding naar achteren.
+
 Voor een gravure zet je {{ui:inspector.wrapInward}} aan: de dikte gaat dan de wand in. Maak de vorm een gat, centreer hem en groepeer hem met de cilinder.
 
 Een vorm die al gewikkeld is, is een net van het gewikkelde en laat zich niet nog eens wikkelen: maak het wikkelen ongedaan of wikkel het platte origineel nog eens met een andere diameter.

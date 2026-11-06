@@ -25,12 +25,12 @@ import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, t
 export const MCP_SHAPE_SETTING_KEYS = [
   "steps", "sides", "bevel", "segments",
   "topRadius", "baseRadius", "curvedConeTop", "curvedConeBend", "topWidth", "topDepth",
-  "screwBossFastener", "screwBossSize", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussets", "screwBossGussetHeight", "screwBossGussetThickness", "snapFitPart", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitLeadAngle", "snapFitRetainAngle", "snapFitFoot", "ribStyle", "ribTop", "ribFoot", "ribThickness", "ribFootThickness",
+  "screwBossFastener", "screwBossSize", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussets", "screwBossGussetHeight", "screwBossGussetThickness", "snapFitPart", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitLeadAngle", "snapFitRetainAngle", "snapFitFoot", "ribStyle", "ribTop", "ribFoot", "ribThickness", "ribFootThickness", "ribFootShape",
   "taperTopWidth", "taperTopDepth", "taperBottomWidth", "taperBottomDepth",
   "extrudeTwist", "extrudeTopOffsetX", "extrudeTopOffsetZ", "slopeEnd", "slopeSide", "slopeCurve", "narrowEnd", "narrowSide", "narrowCurve", "narrowStart",
   "teeth", "toothSize", "toothWidth", "centerHoleSize", "hirthSteepFlank", "hirthReverse", "pulleyBeltWidth", "pulleyFlange", "pulleyFlangeRise", "pulleyHubHeight", "pulleyHubDiameter", "gearType", "helixAngle", "bevelHelixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
   "threadRole", "threadHead", "threadHand", "threadProfile", "threadTaper", "threadDiameter", "threadPitch",
-  "threadClearance", "threadBoltClearance", "threadAxialClearance", "threadDepth", "threadFlankAngle", "threadQuality", "threadHeadHeight", "threadChamfer", "threadChamferBottom",
+  "threadClearance", "threadBoltClearance", "threadAxialClearance", "threadStarts", "threadDepth", "threadFlankAngle", "threadQuality", "threadHeadHeight", "threadChamfer", "threadChamferBottom",
   "threadHeadChamfer", "threadHeadDiameter", "threadDrive", "threadDriveSize", "threadDriveDepth", "threadCollarHeight", "threadCollarDiameter",
   "springTurns", "springWire", "springQuality", "springHand", "springForm", "springPattern", "springEnds",
   "starPoints", "starInnerSize", "starOuterFillet", "starInnerFillet", "starQuality",
@@ -92,6 +92,8 @@ export function mcpThreadSizeParams(params: Record<string, unknown>, currentProf
     // the call sets it.
     ...(params.threadTaper === undefined && size.taper ? { threadTaper: true } : {}),
     ...(params.threadTaper === undefined && !size.taper && currentTaper ? { threadTaper: false } : {}),
+    // A standard size is one thread (#1348), as in the size menu - unless the call sets the starts.
+    ...(params.threadStarts === undefined ? { threadStarts: undefined } : {}),
   };
 }
 

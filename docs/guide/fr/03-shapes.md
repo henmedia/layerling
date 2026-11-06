@@ -157,6 +157,8 @@ Un motif, un logo ou un lettrage doit-il figurer sur une tasse, une canette ou u
 2. Click {{ui:inspector.wrapApply}}. Ce qui courait de gauche à droite contourne maintenant le cylindre, le bord arrière devient le dessus et l'épaisseur dépasse du mur.
 3. Sélectionnez la forme enveloppée, le cylindre et le centre, de gauche à droite et d'avant en arrière. Le milieu de la forme enveloppée est l’axe du cylindre, il repose donc directement sur sa paroi.
 
+Tout corps peut être enroulé, une forme de la bibliothèque aussi : par exemple un toit arrondi qui doit reposer sur le mur d'une tour ronde. Pose-le sur le plateau tel qu'il doit apparaître sur le mur, l'arrondi vers l'arrière.
+
 Pour une gravure, activez {{ui:inspector.wrapInward}} : l'épaisseur va alors dans le mur. Faites un trou dans la forme, centrez-la et regroupez-la avec le cylindre.
 
 Le résultat est un maillage semblable à un modèle importé. Une forme déjà enveloppée est un maillage de la pièce enroulée et ne peut pas être enroulée une deuxième fois : annulez l'enroulement, ou enroulez à nouveau l'original plat avec un autre diamètre. Annuler remet la forme à plat ; pour un autre diamètre, défaire d'abord et enrouler à nouveau. Il ne peut pas faire plus d'un tour du cylindre ; puis layerling indique le plus petit diamètre qui convient.
