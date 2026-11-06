@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Scrollbars of the view: the wheel slides as far as it turned (Discussion #1361):** The wheel over a bar moved the view by a fixed 6 % of what it shows for every wheel event, however small. A Magic Mouse sends dozens of tiny events from a finger resting on it, and a trackpad goes on sending them as the swipe glides out, so the view jumped off the screen as the pointer crossed a bar: forty events of 2 px, 80 px in all, moved it by 2.4 views. It now moves as far as the wheel turned, as a page does, a notch of 100 px by 100 px on the screen (lines and pages counted as Firefox sends them), at most a whole view per event (`wheelScrollFraction` in `lib/viewScroll.ts`). A drag whose pointer the bar loses without a release now ends there too. Test in `viewScroll.test.ts`. Reported by @MartinShake.
+
 ## 1.145.0
 
 - **Port opening: Anderson Powerpole blocks of 1 to 4 poles (Discussion #1190):** The socket list goes on after D-Sub 9 with Powerpole PP15/30/45 housings stacked side by side, for amateur radio, solar and robotics boxes. The sizes come from the maker's drawing (1327 series): 7.90 x 7.90 mm at the front and 7.90 mm apart, the dovetail tongue 0.50 mm proud, and about 0.25 mm of room on every side - 8.9, 16.8, 24.7 and 32.6 mm wide, 8.9 mm high, corners R 0.5 (`portGeometry.ts`). The MCP bridge takes them as `portPreset` `powerpole1` to `powerpole4`. Names in 18 languages, guide chapter 9 in 15 languages, README. Test `portPowerpole.test.ts`. Suggested by @Joepic9.

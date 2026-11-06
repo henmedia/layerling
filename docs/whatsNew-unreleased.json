@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Bildlaufleisten springen nicht mehr beim Mausrad",
+      "en": "Scrollbars no longer jump with the wheel"
+    },
+    "body": {
+      "de": "Das Mausrad über einer Bildlaufleiste schiebt die Ansicht jetzt so weit, wie es gedreht wurde, wie auf einer Webseite. Auf dem Mac warf eine Magic Mouse oder das Nachgleiten am Trackpad die Ansicht schon beim Überfahren einer Leiste aus dem Bild.",
+      "en": "The wheel over a scrollbar now slides the view as far as it turned, as on a web page. On a Mac a Magic Mouse or the glide after a trackpad swipe threw the view off the screen as the pointer crossed a bar."
+    }
+  }
+]
