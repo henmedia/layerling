@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { plateCenterX, plateIndexAt } from "@/lib/buildPlates";
 import { WORKPLANE_CENTER, faceWorkplaneCenteringShift, workplaneCenteringOffset, type WorkplanePlanarBounds } from "@/lib/workplaneCentering";
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): WorkplanePlanarBounds {
@@ -69,5 +70,20 @@ describe("centering on a workplane laid on a face (#805)", () => {
 
   it("does not move what cannot be measured", () => {
     expect(faceWorkplaneCenteringShift(bounds(Number.NaN, 1, 0, 1), xAxis, zAxis)).toBeNull();
+  });
+});
+
+describe("centering on a later build plate", () => {
+  it("goes to the middle of the plate the selection stands on, not the first plate (#1355)", () => {
+    // Two plates 220 mm wide, 20 mm apart: the second one's middle lies 240 mm to the right.
+    const workspace = { width: 220, depth: 220, plates: ["", ""] };
+    const selection = bounds(250, 270, 10, 30);
+    const plateX = plateCenterX(workspace, plateIndexAt(workspace, (selection.minX + selection.maxX) / 2));
+    expect(plateX).toBe(240);
+    const offset = workplaneCenteringOffset(selection, { x: plateX, z: 0 });
+    expect(offset?.x).toBeCloseTo(-20, 10);
+    expect(offset?.z).toBeCloseTo(-20, 10);
+    // Without a plate given it still goes to the origin, the first plate's middle.
+    expect(workplaneCenteringOffset(selection)?.x).toBeCloseTo(-260, 10);
   });
 });

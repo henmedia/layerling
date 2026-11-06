@@ -460,6 +460,36 @@ function boxesOverlap(a: ScreenBox, b: ScreenBox) {
   return Math.abs(a.x - b.x) < a.halfWidth + b.halfWidth && Math.abs(a.y - b.y) < a.halfHeight + b.halfHeight;
 }
 
+/** Space left between the height number and the body's outline, in screen pixels. */
+const ELEVATION_FIELD_GAP = 6;
+/** Half the width of the body's own height box at its corner, which the height number must not cover either. */
+const ELEVATION_ARROW_CLEARANCE = 30;
+
+/**
+ * Where the height number goes when its spot lies on the measured body (#1279). At height 0 its arrow
+ * has no length, so the middle of the arrow is the body's own corner and the field covered the body.
+ * It now moves sideways out of the body's outline on the screen, to the side nearer the arrow, at the
+ * same height on the screen. A field that is already clear of the body stays where it is.
+ */
+export function cornerRulerElevationFieldBesideBody(
+  field: ScreenPoint,
+  arrowX: number,
+  body: ScreenBox,
+  size: { width: number; height: number } = CORNER_RULER_FIELD_SIZE,
+): ScreenPoint {
+  const halfWidth = size.width / 2;
+  const halfHeight = size.height / 2;
+  if (!boxesOverlap({ x: field.x, y: field.y, halfWidth, halfHeight }, body)) return field;
+  const toLeft = arrowX - (body.x - body.halfWidth) <= body.x + body.halfWidth - arrowX;
+  // The arrow's foot is the body's corner, where its grip and its own height box sit: keep clear of them too.
+  const leftEdge = Math.min(body.x - body.halfWidth, arrowX - ELEVATION_ARROW_CLEARANCE);
+  const rightEdge = Math.max(body.x + body.halfWidth, arrowX + ELEVATION_ARROW_CLEARANCE);
+  return {
+    x: toLeft ? leftEdge - halfWidth - ELEVATION_FIELD_GAP : rightEdge + halfWidth + ELEVATION_FIELD_GAP,
+    y: field.y,
+  };
+}
+
 /**
  * Moves the centres of the green number fields apart where they would cover each other or the ruler's
  * own buttons (#777): a body next to the ruler's corner has next to no distance, so all numbers sit
@@ -471,14 +501,19 @@ export function spreadCornerRulerFields(
   fields: ScreenPoint[],
   obstacles: ScreenBox[] = [],
   size: { width: number; height: number } = CORNER_RULER_FIELD_SIZE,
+  /** Places only one field must keep clear of, by its index (the height number and the body, #1279). */
+  fieldObstacles: ReadonlyArray<ScreenBox[] | undefined> = [],
 ): ScreenPoint[] {
   const halfWidth = size.width / 2;
   const halfHeight = size.height / 2;
   const placed: ScreenBox[] = [];
-  return fields.map((field) => {
+  return fields.map((field, index) => {
+    const own = fieldObstacles[index] ?? [];
     const free = (x: number, y: number) => {
       const box = { x, y, halfWidth, halfHeight };
-      return !placed.some((other) => boxesOverlap(box, other)) && !obstacles.some((other) => boxesOverlap(box, other));
+      return !placed.some((other) => boxesOverlap(box, other))
+        && !obstacles.some((other) => boxesOverlap(box, other))
+        && !own.some((other) => boxesOverlap(box, other));
     };
     let best: ScreenPoint = field;
     if (!free(field.x, field.y)) {
