@@ -8,7 +8,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
 import { printerPlayShapeStart } from "@/lib/printerPlay";
-import { usePrinterPlay } from "@/lib/usePrinterPlay";
+import { usePrinterPlayFor } from "@/lib/usePrinterPlay";
 import { PrinterPlaySetting } from "@/components/workplane/PrinterPlaySetting";
 import { createPortal } from "react-dom";
 import { HexColorInput, HexColorPicker } from "react-colorful";
@@ -554,7 +554,8 @@ export function WorkspaceSettingsModal({
   // A default saved earlier or just now: what "Use my default" puts on this design (#754).
   const savedDefault = useMemo(() => readWorkspaceDefault(), [defaultSaved]);
   useLanguage();
-  const printerPlay = usePrinterPlay();
+  // The play of the printer chosen here (Discussion #1406), as a new shape for it starts from.
+  const { play: printerPlay } = usePrinterPlayFor(workspace.printer ?? "");
   const [activeSection, setActiveSection] = useState<WorkspaceSettingsSection>("appearance");
   // A setting of this browser, not of the design: read when the window opens (#1386).
   const [startWithCornerRuler, setStartWithCornerRuler] = useState(readStartWithCornerRuler);
@@ -1350,7 +1351,11 @@ export function WorkspaceSettingsModal({
                         : t("workspace.printerInfo", { width: chosenPrinter.width, depth: chosenPrinter.depth, height: chosenPrinter.height })
                       : t("workspace.printerHint")}
                   </p>
-                  <PrinterPlaySetting onMakeFitTest={onMakeFitTest} />
+                  <PrinterPlaySetting
+                    onMakeFitTest={onMakeFitTest}
+                    printer={chosenPrinter?.id ?? ""}
+                    printerName={chosenPrinter ? `${chosenPrinter.vendor} ${chosenPrinter.model}` : ""}
+                  />
                   <WorkspaceToggle
                     label={t("workspace.showPlateLabels")}
                     description={t("workspace.showPlateLabelsHint")}
