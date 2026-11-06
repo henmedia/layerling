@@ -58,7 +58,8 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * A lid for a body open at the top (#1009): pushed into the opening, put over the outside, gripping the wall from both
  * sides (#1062) or laid flat on it. It comes out as a body of its own beside the one it closes, ready to print. With
  * magnets, it holds by four round magnets in the corners, in pockets in the body's rim and in the lid. With a hinge, it
- * swings open about a pin along the body's back, tight in the body's knuckles and turning in the lid's. With click bumps
+ * swings open about a pin along the body's back, tight in the body's knuckles and turning in the lid's; a flush hinge can
+ * have end plugs that close the pin's hole flush with the body's outside (Discussion #1387). With click bumps
  * it snaps into dimples in the body (#1234), the bumps as high as asked; a handle is a pull tab on the lid or a finger
  * notch in the body (#1230). A screw lid (Discussion #1393) is a cap with a thread inside its rim for a round body, which
  * gets the matching thread on the outside of its top; it holds by that alone.
@@ -419,6 +420,14 @@ export function LidPanel({
           <input type="checkbox" checked={settings.hingePrintPin} disabled={busy} onChange={(event) => onChange({ hingePrintPin: event.target.checked })} />
           <span>{t("lid.hingePrintPin")}</span>
         </label>
+        {/* A flush hinge's pin hole ends in the body's outer face: a plug at each end closes it (Discussion #1387). */}
+        {settings.hingeStyle === "flush" ? (<>
+          <label className="edge-modifier-field offset-copy">
+            <input type="checkbox" checked={settings.hingeEndPlugs} disabled={busy} onChange={(event) => onChange({ hingeEndPlugs: event.target.checked })} />
+            <span>{t("lid.hingeEndPlugs")}</span>
+          </label>
+          {settings.hingeEndPlugs ? <span className="shell-openings-summary">{t("lid.hingeEndPlugsHint")}</span> : null}
+        </>) : null}
         <span className="shell-openings-summary">{t("lid.hingeHint", { diameter: millimetres(Math.round(2 * hingeKnuckleRadius(settings) * 10) / 10) })}</span>
       </>) : null}
 
