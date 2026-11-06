@@ -7677,6 +7677,136 @@ html[data-theme="dark"] .inspector-bundle-note {
   line-height: 1.35;
 }
 
+/* The print check (Druck prüfen): the nozzle as buttons with a field for any other, and a line for each of its five
+   checks - green when it found nothing, amber with what and where, and a Show button that points the view at it. */
+.print-check-nozzles {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.5fr);
+}
+
+.print-check-nozzle-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 30px;
+  padding: 0 7px;
+  background: white;
+  border: 1px solid #d8c8b7;
+  border-radius: 7px;
+}
+
+.print-check-nozzle-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  color: #533d26;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.print-check-nozzle-field input:focus {
+  outline: none;
+}
+
+.print-check-nozzle-field:focus-within {
+  border-color: #e08a2c;
+  box-shadow: 0 0 0 2px rgba(224, 138, 44, 0.25);
+}
+
+.print-check-nozzle-field span {
+  color: #8a7560;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.print-check-nozzle-hint {
+  display: block;
+  margin-top: 6px;
+  color: #867360;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.print-check-list {
+  max-height: none;
+}
+
+.print-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 8px;
+  color: #3a2816;
+  background: #fbf8f3;
+  border: 1px solid #ede5d6;
+  border-left: 4px solid #a39584;
+  border-radius: 7px;
+}
+
+.print-check-row > svg {
+  flex: none;
+  margin-top: 1px;
+  color: #a39584;
+}
+
+.print-check-row .clearance-row-text {
+  flex: 1;
+}
+
+.print-check-row.ok {
+  border-left-color: #2f9e5b;
+}
+
+.print-check-row.ok > svg {
+  color: #2f9e5b;
+}
+
+.print-check-row.warning {
+  border-left-color: #e8851a;
+}
+
+.print-check-row.warning > svg {
+  color: #e8851a;
+}
+
+.print-check-row.active {
+  background: #fff1de;
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+.print-check-row .clearance-row-text .print-check-meaning {
+  color: #8a5a1c;
+}
+
+.print-check-show {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  color: #9f5508;
+  background: #fffdf9;
+  border: 1px solid #e3bd8f;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.print-check-show:hover:not(:disabled),
+.print-check-show[aria-pressed="true"] {
+  background: #fff1e0;
+  border-color: #e08a2c;
+}
+
+.print-check-show:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 .clearance-mark-overlay {
   position: absolute;
   inset: 0;
@@ -13519,6 +13649,55 @@ html[data-theme="dark"] .clearance-row.fine {
 html[data-theme="dark"] .clearance-row:hover:not(:disabled),
 html[data-theme="dark"] .clearance-row.active {
   background: #45311b;
+}
+
+html[data-theme="dark"] .print-check-nozzle-field {
+  background: #35281b;
+  border-color: #5a4633;
+}
+
+html[data-theme="dark"] .print-check-nozzle-field input {
+  color: #ecdcc9;
+}
+
+html[data-theme="dark"] .print-check-nozzle-field span,
+html[data-theme="dark"] .print-check-nozzle-hint {
+  color: #b9a58f;
+}
+
+html[data-theme="dark"] .print-check-row {
+  color: #ecdcc9;
+  background: #2f2418;
+  border-color: #53412f;
+  border-left-color: #8d7c69;
+}
+
+html[data-theme="dark"] .print-check-row.ok {
+  border-left-color: #4cbf7b;
+}
+
+html[data-theme="dark"] .print-check-row.warning {
+  border-left-color: #f39a3a;
+}
+
+html[data-theme="dark"] .print-check-row.active {
+  background: #45311b;
+}
+
+html[data-theme="dark"] .print-check-row .clearance-row-text .print-check-meaning {
+  color: #e0b27a;
+}
+
+html[data-theme="dark"] .print-check-show {
+  color: #ffb866;
+  background: #35281b;
+  border-color: #7a5428;
+}
+
+html[data-theme="dark"] .print-check-show:hover:not(:disabled),
+html[data-theme="dark"] .print-check-show[aria-pressed="true"] {
+  background: #4a3217;
+  border-color: #c7772a;
 }
 
 html[data-theme="dark"] .edge-modifier-history-actions {

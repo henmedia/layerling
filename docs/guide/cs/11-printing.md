@@ -52,6 +52,20 @@ Mezní úhel nastavíte v části {{ui:workspace.appearance}}, od 30° pro opatr
 - Mezi vzájemně zasouvanými díly je potřeba vůle, obvykle 0,2 až 0,4 mm podle tiskárny. Před velkým výtiskem zkuste malý zkušební pár.
 - Spodní hranu položenou na podložce lze lehce zkosit, aby první vrstva nepřesahovala do stran, tedy nevznikala „sloní noha“.
 
+## Kontrola tisku
+
+{{ui:editor.tool.printCheck}} vedle {{ui:editor.tool.clearance}} ve skupině {{ui:editor.group.combine}} projde vybrané objekty, nebo všechny viditelné, když není nic vybráno, a v jednom okně řekne, co by se při tisku pokazilo. Každý z pěti řádků je zelený, když nic nenašel, a oranžový s tím, co a kde, když ano:
+
+- **{{ui:printCheck.thin.title}}**: místa tenčí než dvě linky trysky - 0,8 mm u trysky 0,4 mm. Slicer takovou stěnu vynechá, nebo ji vytiskne jako jednu slabou linku. Nahoře v okně v části {{ui:printCheck.nozzle}} vyberte svou trysku (0,2 až 0,8 jedním kliknutím, jinou do pole). Tenká místa se na tělesech obarví červeně se světlou mřížkou a řádek uvede nejtenčí místo a kolik plochy je příliš tenké. Místa pod 1 mm² a ostré hrany, například hrana klínu, se nepočítají.
+- **{{ui:printCheck.floating.title}}**: těleso nebo oddělený díl tělesa, který se nedotýká podložky ani jiného dílu (s tolerancí 0,05 mm). Tiskl by se ve vzduchu. Díl, který leží na stojícím dílu, je v pořádku.
+- **{{ui:printCheck.contact.title}}**: díl na podložce, jehož první vrstva je na jeho výšku velmi malá, například koule nebo kužel na špičce. Během tisku se může uvolnit. Upozornění přijde pod 0,5 mm² dosedací plochy, měřené 0,1 mm nad podložkou, na každý milimetr výšky: koule je vždy pod tím, krychle 10 mm má 10.
+- **{{ui:printCheck.overhang.title}}**: stejná čísla jako u **zobrazení převisů**, s úhlem, který je tam nastavený.
+- **{{ui:printCheck.openMesh.title}}**: importovaná síť s otevřenými hranami nebo s hranami, které sdílejí tři a více ploch. Slicer pak musí hádat, kde je u takové sítě vnitřek.
+
+![Miska, jejíž pravá stěna má jen 0,6 mm: Zkontrolovat tisk ji obarví červeně a uvede ji v okně.](shot:print-check)
+
+{{ui:printCheck.show}} u řádku tam přenese kameru; vybere díly ve vzduchu, díly s malou opěrou a otevřené sítě, a u převisů zapne **zobrazení převisů**. Tělesa, která se překrývají, se kontrolují sloučená, jak je sloučí slicer. Když model změníte, zatímco je okno otevřené, objeví se {{ui:printCheck.stale}}; klikněte na to nebo na {{ui:printCheck.checkAgain}}. [[Esc]] okno zavře. Na modelu se nic nezmění. AI dělá stejnou kontrolu přes `layerling_check_print`.
+
 ## Dokončení
 
 Zvolte {{ui:editor.export}} a formát **STL** nebo **3MF**. STL je nejjednodušší. 3MF uchovává názvy a barvy jednotlivých těles, a hodí se proto pro vícebarevný tisk. Exportní okno ukazuje také odhad hmotnosti a délky filamentu při plném tisku. Podrobnosti najdete v kapitole [Soubory a ukládání](chapter:files-and-saving).

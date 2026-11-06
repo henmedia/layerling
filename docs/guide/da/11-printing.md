@@ -54,6 +54,20 @@ Hvor stejlt din printer klarer sættes i indstillingerne under {{ui:workspace.ap
 - Hvor to dele passer ind i hinanden har du brug for frirum: normalt 0,2 til 0,4 mm, afhængigt af printeren. Lav et lille testpar før du printer den store del.
 - Mange mennesker faser let den nederste kant der sidder på pladen. Det forhindrer det første lag i at flyde ud ("elefantfod").
 
+## Tjek printet
+
+{{ui:editor.tool.printCheck}} ved siden af {{ui:editor.tool.clearance}} under {{ui:editor.group.combine}} ser på de valgte objekter, eller på alle synlige, når intet er valgt, og fortæller i ét vindue, hvad der ville gå galt ved print. Hver af dets fem linjer er grøn, når den intet fandt, og orange med hvad og hvor, når den fandt noget:
+
+- **{{ui:printCheck.thin.title}}**: steder tyndere end to linjer fra dysen - 0,8 mm med en 0,4 mm dyse. Sliceren udelader sådan en væg eller printer den som én svag linje. Vælg din dyse under {{ui:printCheck.nozzle}} øverst i vinduet (0,2 til 0,8 med ét klik, enhver anden i feltet). De tynde steder males røde med et lyst gitter på legemerne, og linjen nævner det tyndeste sted og hvor meget overflade der er for tyndt. Steder under 1 mm² og skarpe kanter, som kanten på en kile, tælles ikke med.
+- **{{ui:printCheck.floating.title}}**: et legeme, eller en adskilt del af et, der hverken rører pladen eller en anden del (inden for 0,05 mm). Det ville blive printet i luften. En del, der hviler på en stående del, er i orden.
+- **{{ui:printCheck.contact.title}}**: en del på pladen, hvis første lag er meget lille i forhold til dens højde, som en kugle eller en kegle på spidsen. Den kan løsne sig under printet. Tjekket advarer under 0,5 mm² standflade, målt 0,1 mm over pladen, pr. millimeter højde: en kugle ligger altid under, en terning på 10 mm har 10.
+- **{{ui:printCheck.overhang.title}}**: de samme tal som **Vis overhæng**, med den vinkel der er sat der.
+- **{{ui:printCheck.openMesh.title}}**: et importeret mesh med åbne kanter, eller kanter som tre eller flere flader deler. Sliceren må så gætte, hvor indersiden er.
+
+![En bakke, hvis højre væg kun er 0,6 mm tyk: Tjek print maler den rød og nævner den i vinduet.](shot:print-check)
+
+{{ui:printCheck.show}} ved en linje fører kameraet derhen; den vælger de svævende dele, dem med lille kontakt og de åbne mesh, og ved overhængene slår den **Vis overhæng** til. Legemer, der overlapper, tjekkes samlet, som sliceren samler dem. Ændrer du modellen, mens vinduet er åbent, står der {{ui:printCheck.stale}}; klik på det eller på {{ui:printCheck.checkAgain}}. [[Esc]] lukker vinduet. Intet i modellen ændres. En AI laver samme tjek med `layerling_check_print`.
+
 ## Når du er klar
 
 Vælg {{ui:editor.export}} og så **STL** eller **3MF**. STL er det simpleste format. 3MF bevarer navne og farver på de enkelte former og er derfor praktisk når du printer i flere farver. Eksportvinduet viser også hvor mange gram og meter filament delen ville bruge printet som solid. Mere i [Filer og lagring](chapter:files-and-saving).
