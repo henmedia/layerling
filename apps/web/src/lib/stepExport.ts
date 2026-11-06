@@ -345,25 +345,42 @@ function throwIfKernelBroken(error: unknown) {
   throw error;
 }
 
+/** Lets go of every handle made since `mark`; only a broken kernel stops the export there. */
+function releaseKernelSince(kernel: OcctKernel, mark: number) {
+  try {
+    kernel.releaseSince(mark);
+  } catch (error) {
+    throwIfKernelBroken(error);
+  }
+}
+
 /** A part's exact body in its own frame, placed and handed over as the CAD worker does. */
 function buildPlacedBody(brep: Brep, part: { transform?: number[] } | null, build: (kernel: OcctKernel) => ShapeHandle, what = "exact body"): BuildOutcome {
   const kernel = occtKernel();
   if (!kernel || !part) return { skip: unsupportedReason() };
-  let local: ShapeHandle | null = null;
-  let placed: ShapeHandle | null = null;
+  // The kernel is kept for the whole session, so a lost handle stays lost: everything the build makes on the way (a
+  // Hirth joint leaves some 600 faces, edges and wires, a screw boss a dozen) goes at the end, whether the build
+  // worked or not. The body leaves the kernel as BREP text and is read back only after that, as brepjs keeps its
+  // shapes in the same kernel and the release would take the read-back body along.
+  const mark = kernel.checkpoint();
+  let text: string;
   try {
-    local = build(kernel);
-    placed = applyCadTransform(kernel, local, part.transform);
-    const text = kernel.toBREP(placed);
+    const local = build(kernel);
+    const placed = applyCadTransform(kernel, local, part.transform);
+    text = kernel.toBREP(placed);
+  } catch (error) {
+    throwIfKernelBroken(error);
+    return { skip: `${what} could not be built: ${error instanceof Error ? error.message : String(error)}` };
+  } finally {
+    if (occtKernel() === kernel) releaseKernelSince(kernel, mark);
+  }
+  try {
     const restored = brep.fromBREP(text);
     if (!restored.ok) return { skip: `${what} failed to load: ${String(restored.error.message ?? restored.error)}` };
     return { solid: restored.value as unknown as BrepSolid };
   } catch (error) {
     throwIfKernelBroken(error);
-    return { skip: `${what} could not be built: ${error instanceof Error ? error.message : String(error)}` };
-  } finally {
-    // Also when placing or writing failed: the kernel is kept for the whole session, so a lost handle stays lost.
-    if (occtKernel() === kernel) releaseKernelHandles(kernel, [local, placed]);
+    return { skip: `${what} failed to load: ${error instanceof Error ? error.message : String(error)}` };
   }
 }
 
