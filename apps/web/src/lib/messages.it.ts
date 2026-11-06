@@ -826,6 +826,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.error.endPlugsFlush": "I tappi alle estremità vanno solo con una cerniera a filo.",
   "lid.error.endPlugsShort": "Le nocche alle estremità sono troppo corte per i tappi: ognuna deve misurare almeno 3,5 mm. Usa meno nocche.",
   "status.lidMadeHingeFlushPlugs": "Coperchio creato ({type}) con cerniera a filo: {count} nocche nella parete, un foro per un perno da {pin} mm lungo {length} mm e due tappi alle estremità che lo chiudono. Il coperchio e i tappi sono accanto al corpo, pronti per la stampa.",
+  "status.lidMadeHingeFlushCorners": "Coperchio creato ({type}) con cerniera a filo: {count} nocche nella parete, quelle alle estremità riempiono gli angoli arrotondati, e un foro per un perno da {pin} mm lungo {length} mm. Il coperchio è capovolto accanto al corpo, pronto per la stampa.",
   "lid.error.hingeLidType": "Una cerniera va solo con un coperchio a incastro o piatto: un bordo all'esterno urterebbe la parete posteriore durante l'apertura.",
   "lid.error.hingeNoBack": "Il lato scelto non ha spazio per tre nocche: è troppo corto o troppo curvo.",
   "lid.error.hingeTooLow": "Il corpo è troppo basso per la cerniera: sotto le nocche serve spazio per la loro inclinazione. Usa un perno più sottile o un corpo più alto.",

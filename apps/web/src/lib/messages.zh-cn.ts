@@ -790,6 +790,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "lid.error.endPlugsFlush": "两端堵头只能配齐平铰链。",
   "lid.error.endPlugsShort": "两端的铰节太短，放不下堵头：每个至少需要 3.5 mm。请减少铰节数量。",
   "status.lidMadeHingeFlushPlugs": "已制作盖子（{type}），带齐平铰链：墙内 {count} 个铰节，一个 {pin} mm 销钉孔，销钉长 {length} mm，以及两个封住它的堵头。盖子和堵头放在主体旁边，可直接打印。",
+  "status.lidMadeHingeFlushCorners": "已制作盖子（{type}），带齐平铰链：墙内 {count} 个铰节，两端的铰节填满圆角，以及一个 {pin} mm 销钉孔，销钉长 {length} mm。盖子翻转后放在主体旁边，可直接打印。",
   "lid.error.hingeLidType": "铰链只适用于插入式或平盖：外围的边在打开时会撞到后壁。",
   "lid.error.hingeNoBack": "所选一侧放不下三个铰节：太短或弯曲太大。",
   "lid.error.hingeTooLow": "主体太低，放不下铰链：铰节下面需要留出斜面的空间。请用更细的销钉或更高的主体。",

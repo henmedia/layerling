@@ -836,6 +836,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.error.endPlugsFlush": "Los tapones en los extremos solo van con una bisagra enrasada.",
   "lid.error.endPlugsShort": "Los nudillos de los extremos son demasiado cortos para tapones: cada uno necesita al menos 3,5 mm. Usa menos nudillos.",
   "status.lidMadeHingeFlushPlugs": "Tapa hecha ({type}) con bisagra enrasada: {count} nudillos en la pared, un agujero para un pasador de {pin} mm y {length} mm de largo, y dos tapones que lo cierran. La tapa y los tapones quedan junto al cuerpo, listos para imprimir.",
+  "status.lidMadeHingeFlushCorners": "Tapa hecha ({type}) con bisagra enrasada: {count} nudillos en la pared, los de los extremos llenando las esquinas redondeadas, y un agujero para un pasador de {pin} mm y {length} mm de largo. La tapa queda al revés junto al cuerpo, lista para imprimir.",
   "lid.error.hingeLidType": "Una bisagra solo va con una tapa encajada o plana: un borde por fuera chocaría con la pared trasera al abrirse.",
   "lid.error.hingeNoBack": "El lado elegido no tiene sitio para tres nudillos: es demasiado corto o demasiado curvo.",
   "lid.error.hingeTooLow": "El cuerpo es demasiado bajo para la bisagra: bajo los nudillos hace falta sitio para su pendiente. Usa un pasador más fino o un cuerpo más alto.",

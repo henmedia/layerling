@@ -703,6 +703,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.error.endPlugsFlush": "Končni zamaški gredo samo s poravnanim tečajem.",
   "lid.error.endPlugsShort": "Členki na koncih so prekratki za končne zamaške: vsak potrebuje vsaj 3,5 mm. Vzemi manj členkov.",
   "status.lidMadeHingeFlushPlugs": "Pokrov narejen ({type}) s poravnanim tečajem: {count} členkov v steni, luknja za zatič {pin} mm, dolg {length} mm, in dva končna zamaška, ki jo zapreta. Pokrov in zamaška ležita poleg telesa, pripravljena za tisk.",
+  "status.lidMadeHingeFlushCorners": "Pokrov narejen ({type}) s poravnanim tečajem: {count} členkov v steni, skrajna zapolnjujeta zaobljena vogala, in luknja za zatič {pin} mm, dolg {length} mm. Pokrov leži obrnjen poleg telesa, pripravljen za tisk.",
   "lid.error.hingeLidType": "Tečaj gre le z vstavljenim ali ploščatim pokrovom: rob okoli bi ob odpiranju zadel zadnjo steno.",
   "lid.error.hingeNoBack": "Na izbrani strani ni prostora za tri členke: je prekratka ali preveč ukrivljena.",
   "lid.error.hingeTooLow": "Telo je za tečaj prenizko: pod členki je potreben prostor za njihov naklon. Vzemi tanjši zatič ali višje telo.",
