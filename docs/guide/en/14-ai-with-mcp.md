@@ -138,6 +138,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_show_overhangs` | switches the overhang hatching on or off, sets the angle and reports for each body the area that would need supports |
 | `layerling_estimate_print` | estimates volume, weight and filament for the selection or the whole design: for a solid body, and as a rough guess with walls and infill like the export window |
 | `layerling_check_clearance` | checks before printing which parts overlap, touch or come closer than a minimum gap (Check clearance), the separate parts of one object too |
+| `layerling_printer_play` | reads, sets or clears the printer's play ({{ui:workspace.printerPlay}} in the settings) and places the fit test that measures it |
 | `layerling_check_print` | checks before printing what would go wrong: walls too thin for the nozzle, floating parts, small contact with the plate, overhangs and open meshes (Print check) |
 | `layerling_add_reference_points` | marks reference points - on the centre, corners or edge middles of objects, or at exact positions - that shapes snap to |
 | `layerling_list_reference_points` | lists the reference points with their ids and positions |
@@ -158,7 +159,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_delete_custom_shape` | removes a custom shape; inserted bodies stay |
 | `layerling_show_workplane` | hides and shows the plate with its grid, for a picture of the underside for example (only the view) |
 | `layerling_set_section_view` | cuts the view open along a plane to look inside (only the view, nothing is cut apart) |
-| `layerling_measurements` | shows or hides the measurements of the tape measure and lists them with their lengths, and hides or shows the sizes around the selection like [[Q]] |
+| `layerling_measurements` | shows or hides the measurements of the tape measure and lists them with their lengths, hides or shows the sizes around the selection like [[Q]], and types a length for one of them, which moves the body at its end like a click on its number |
 | `layerling_measure_angle` | measures an angle like the protractor: at the corner of three points or between two flat faces, and shows it in the view |
 | `layerling_saved_view` | saves the current view under the key 7, 8, 9 or 0 and goes back to it, like Shift+key and the key (only the view); also sets the start view of new designs |
 | `layerling_build_plates` | lists, adds, names, orders and removes the build plates, moves objects onto a plate and arranges them on the plates, like the plate bar |

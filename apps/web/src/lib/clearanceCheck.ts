@@ -5,6 +5,7 @@ import { disposeManifold, shapeToManifoldSolid, visibleExportShapes } from "@/li
 import { getManifoldRuntime } from "@/lib/editorMeshCore";
 import { t } from "@/lib/i18n";
 import type { ManifoldSolid } from "@/lib/manifoldSplit";
+import { printerPlayStart } from "@/lib/printerPlay";
 import { isNonSolidShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -362,20 +363,51 @@ export function reclassifyClearance(result: ClearanceResult, threshold: number):
 
 const CLEARANCE_SETTINGS_KEY = "layerling.clearanceCheck";
 
-/** The threshold and the split-parts switch as last used in this browser; blocked storage gives the defaults. */
-export function readClearanceSettings(): Pick<ClearanceOptions, "threshold" | "splitParts"> {
+/**
+ * The minimum gap a check starts with when none was chosen: the printer's play when it is measured (printerPlay.ts),
+ * held within the field, otherwise CLEARANCE_DEFAULT_THRESHOLD_MM.
+ */
+export function clearanceStartThreshold(play: number | null) {
+  const start = printerPlayStart("clearance.threshold", play);
+  return start === null ? CLEARANCE_DEFAULT_THRESHOLD_MM : normalizeClearanceOptions({ threshold: start }).threshold;
+}
+
+function storedClearanceSettings(storage: Storage): Partial<ClearanceOptions> {
+  const stored: unknown = JSON.parse(storage.getItem(CLEARANCE_SETTINGS_KEY) ?? "{}");
+  return stored && typeof stored === "object" ? stored as Partial<ClearanceOptions> : {};
+}
+
+/**
+ * The threshold and the split-parts switch as last used in this browser; blocked storage gives the defaults. A
+ * threshold never chosen here starts from the printer's play, so it follows the play until one is.
+ */
+export function readClearanceSettings(play: number | null = null, storage: Storage | null = typeof window === "undefined" ? null : window.localStorage): Pick<ClearanceOptions, "threshold" | "splitParts"> {
+  const start = clearanceStartThreshold(play);
   try {
-    const stored: unknown = JSON.parse(window.localStorage.getItem(CLEARANCE_SETTINGS_KEY) ?? "{}");
-    const { threshold, splitParts } = normalizeClearanceOptions(stored && typeof stored === "object" ? stored as Partial<ClearanceOptions> : {});
+    if (!storage) throw new Error("no storage");
+    const stored = storedClearanceSettings(storage);
+    const { threshold, splitParts } = normalizeClearanceOptions({ threshold: start, ...stored });
     return { threshold, splitParts };
   } catch {
-    return { threshold: CLEARANCE_DEFAULT_THRESHOLD_MM, splitParts: true };
+    return { threshold: start, splitParts: true };
   }
 }
 
-export function writeClearanceSettings(settings: Pick<ClearanceOptions, "threshold" | "splitParts">) {
+/**
+ * Keeps what was changed (the threshold, the switch, or both) beside what this browser kept before. Only a threshold
+ * set by hand is written, so one that was never touched keeps following the printer's play.
+ */
+export function writeClearanceSettings(patch: Partial<Pick<ClearanceOptions, "threshold" | "splitParts">>, storage: Storage | null = typeof window === "undefined" ? null : window.localStorage) {
   try {
-    window.localStorage.setItem(CLEARANCE_SETTINGS_KEY, JSON.stringify(settings));
+    if (!storage) return;
+    let before: Partial<ClearanceOptions> = {};
+    try {
+      before = storedClearanceSettings(storage);
+    } catch {
+      // A kept value that is no JSON is written over.
+    }
+    const next = Object.fromEntries(Object.entries({ ...before, ...patch }).filter(([key, value]) => (key === "threshold" || key === "splitParts") && value !== undefined));
+    storage.setItem(CLEARANCE_SETTINGS_KEY, JSON.stringify(next));
   } catch {
     // Blocked storage: the settings hold until the page is closed.
   }

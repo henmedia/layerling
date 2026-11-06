@@ -54,6 +54,14 @@ Z jak stromymi nawisami radzi sobie Twoja drukarka, ustawiasz w ustawieniach w s
 - Tam, gdzie dwie części w siebie wchodzą, potrzebny jest luz: zwykle od 0,2 do 0,4 mm, zależnie od drukarki. Zanim wydrukujesz dużą część, zrób małą parę próbną.
 - Wiele osób lekko fazuje dolną krawędź, która leży na stole. Dzięki temu pierwsza warstwa się nie rozlewa („stopa słonia”).
 
+## Luz twojej drukarki: test pasowania
+
+Każda drukarka drukuje otwory trochę mniejsze, a sworznie trochę grubsze, niż są narysowane, każda o własną wartość, więc luz potrzebny dwóm wydrukowanym częściom jest na początku zgadywaniem. Zmierz go raz: w ustawieniach w sekcji {{ui:workspace.workplane}} przycisk {{ui:workspace.fitTestMake}} kładzie na stole test pasowania. To płytka 60 × 20 × 4 mm z siedmioma otworami na jeden sworzeń 5 mm, każdy narysowany jako 5 mm plus dwa razy 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 lub 0,40 mm, z wypukłą wartością obok, oraz sam sworzeń 5 mm, stojący obok płytki z małą fazką u góry. Składa się ze zwykłych kształtów, więc drukuje się razem z resztą stołu, bez podpór.
+
+Wydrukuj go tak, jak leży, a potem wsuwaj sworzeń fazką do przodu w otwory, zaczynając od najciaśniejszego. **Najciaśniejszy otwór, w którym sworzeń jeszcze się obraca,** wyznacza luz twojej drukarki. Wpisz jego liczbę w polu {{ui:workspace.printerPlay}} albo kliknij ją wśród wartości pod polem. Luz podaje się na stronę, w milimetrach, a przeglądarka pamięta go dla wszystkich projektów; puste pole oznacza, że nie zmierzono.
+
+Od tej pory nowe użycia zaczynają od luzu zamiast od wbudowanej wartości: {{ui:lid.gap}} i {{ui:lid.hingePinPlay}} w narzędziu {{ui:editor.tool.lid}}, luz nowego kształtu {{ui:shape.dovetail}} i {{ui:shape.snapFit}}, {{ui:prop.clearance}} nowej nakrętki lub otworu gwintowanego – podwójny luz, bo to miejsce na całej średnicy – oraz {{ui:clearance.threshold}} w {{ui:editor.tool.clearance}}. Dopóki takie pole ma tę wartość, napis „{{ui:printerPlay.fromFitTest}}” obok mówi, skąd pochodzi liczba. Zawias drukowany w jednym kawałku i przeguby narzędzia {{ui:editor.tool.flexi}} zachowują swoje 0,4 mm: drukowane w jednym kawałku, ich szczeliny muszą pozostać otwarte także między warstwami, a tego sworzeń wydrukowany osobno nie mierzy. Miejsce na wciśnięcie magnesu lub klucza Gridfinity oraz miejsce na kupione gniazdo lub płytkę także zachowują własne wartości. Bryły, które już są w projekcie, nigdy się nie zmieniają, podobnie jak projekt, który otwierasz.
+
 ## Sprawdzanie wydruku
 
 {{ui:editor.tool.printCheck}} obok {{ui:editor.tool.clearance}} w grupie {{ui:editor.group.combine}} przegląda zaznaczone obiekty, a gdy nic nie jest zaznaczone, wszystkie widoczne, i w jednym oknie mówi, co poszłoby źle przy drukowaniu. Każdy z pięciu wierszy jest zielony, gdy nic nie znalazł, i pomarańczowy z informacją co i gdzie, gdy coś znalazł:

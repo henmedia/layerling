@@ -189,6 +189,8 @@ import { vaseShapePatchOffThread } from "@/lib/vaseShape";
 import { VaseDrawingWindow } from "@/components/workplane/VaseDrawingWindow";
 import { VasePrintReport } from "@/components/workplane/VasePrintReport";
 import { shapeDefaultsAsset, shapeDefaultsFromShape } from "@/lib/shapeDefaults";
+import { fromPrinterPlay, printerPlayShapeRows, withPrinterPlay } from "@/lib/printerPlay";
+import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, normalizeScrewHoleAngle, normalizeScrewHoleHeadDepth, normalizeScrewHoleShaft } from "@/lib/screwHoleGeometry";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
@@ -207,7 +209,7 @@ import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
-import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -312,7 +314,7 @@ import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel
 import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
 import { plateOffsetOfShape } from "@/lib/buildPlates";
-import { isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
+import { isNonSolidShape, normalizeGroupResize, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
 import { roundSideCount } from "@/lib/roundSideCount";
@@ -359,6 +361,7 @@ import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFor
 import { useKeptColors, useRecentColors } from "@/lib/recentColors";
 import { ColorKeepRows } from "@/components/workplane/ColorKeepRows";
 import { canToggleGroupColors, groupShowsPartColors } from "@/lib/groupColors";
+import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
 import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
@@ -519,6 +522,8 @@ type RangePropertyConfig = {
   disabled?: boolean;
   /** A line under the row saying what the value measures (#215). */
   hint?: string;
+  /** A line under the row, before the hint, saying where the value came from: the fit test (printerPlay.ts). */
+  note?: string;
   /** Values the row skips, in millimetres for a length (#1126): one inside goes on to the end it moves towards. */
   gap?: { from: number; to: number };
   onChange: (value: number) => void;
@@ -4159,13 +4164,14 @@ export function ShapeInspector({
   // The section of a loft the rows are about (#1034), back to the first for another body.
   const [loftSection, setLoftSection] = useState(0);
   useEffect(() => setLoftSection(0), [shape.id]);
-  const properties = getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles });
+  const printerPlay = usePrinterPlay();
+  const properties = withFitTestNotes(getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles }), shape.kind, printerPlay);
   const tiltedMeasures = orientedMeasures(shape).kind === "tilted";
   // What each value would be on a shape of this kind made new, with the saved defaults: the
   // small arrow next to a changed value takes it back there.
-  const propertyDefaults = useMemo(() => shapePropertyDefaults(shape.kind, workspace, shape.kind === "gridfinity" ? normalizeGridfinityType(shape.gridfinityType) : undefined), [shape.kind, workspace, shape.gridfinityType]);
+  const propertyDefaults = useMemo(() => shapePropertyDefaults(shape.kind, workspace, shape.kind === "gridfinity" ? normalizeGridfinityType(shape.gridfinityType) : undefined, printerPlay), [shape.kind, workspace, shape.gridfinityType, printerPlay]);
   const savedDefaults = workspace.shapeCustomizations[shape.kind];
-  const defaultsToSave = shapeDefaultsFromShape(shape, workspace.shapeCustomizations);
+  const defaultsToSave = shapeDefaultsFromShape(shape, workspace.shapeCustomizations, printerPlay);
   const sameDefaults = JSON.stringify(defaultsToSave ?? null) === JSON.stringify(savedDefaults && Object.keys(savedDefaults).length > 0 ? savedDefaults : null);
   const gearType = shape.kind === "gear" ? normalizeGearType(shape.gearType) : null;
   const isThread = shape.kind === "thread";
@@ -4734,6 +4740,36 @@ export function ShapeInspector({
         <button className="inspector-action-button" type="button" disabled={frozen} onClick={onOpenGroup}>
           {t(shape.groupOperation === "bundle" ? "group.editBundle" : "group.edit")} (E)
         </button>
+      ) : null}
+
+      {/* What the group does with its parts when it is resized (Discussion #526): two long choices, side by side. */}
+      {offersGroupResize(shape) ? (
+        <div className="property-card" data-help-section-all="groupResize">
+          <div className="property-list cylinder-wrap-body">
+            <div className="name-tag-sides group-resize-choice" role="radiogroup" aria-label={t("inspector.groupResize")}>
+              <span>{t("inspector.groupResize")}</span>
+              {(["stretch", "keepParts"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  role="radio"
+                  aria-checked={(shape.groupResize ?? "stretch") === mode}
+                  className={(shape.groupResize ?? "stretch") === mode ? "active" : ""}
+                  disabled={frozen}
+                  onClick={() => onUpdate({ groupResize: normalizeGroupResize(mode) })}
+                >
+                  {t(mode === "keepParts" ? "inspector.groupResizeKeepParts" : "inspector.groupResizeStretch")}
+                </button>
+              ))}
+            </div>
+            {shape.groupResize === "keepParts" ? (
+              <p className="cylinder-wrap-hint">
+                {t(groupCanKeepParts(shape) ? "inspector.groupResizeKeepPartsHint" : "inspector.groupResizeStretchedHint")}
+                <GuideHelpLink section="groupResize" className="inspector-help-link" />
+              </p>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       {canSeparateParts && onSeparateParts ? (
@@ -5871,6 +5907,24 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
                 onInteractionActiveChange={onInteractionActiveChange}
               />
             </label>
+          ) : null}
+          {sbcBoardHasButtons(SBC_BOARDS[controls.settings.board]) ? (
+            <>
+              <label className="select-property sbc-board-button-reach">
+                <span>{t("sbcBoard.buttonReach")} ({unit})</span>
+                <CompactMeasureField
+                  label={t("sbcBoard.buttonReach")}
+                  value={controls.settings.buttonReach ?? 0}
+                  min={0}
+                  max={MAX_SBC_BUTTON_REACH}
+                  workspace={workspace}
+                  disabled={disabled || busy}
+                  onChange={(buttonReach) => regenerate({ buttonReach })}
+                  onInteractionActiveChange={onInteractionActiveChange}
+                />
+              </label>
+              <p className="name-tag-hint">{t("sbcBoard.buttonReachHint")}</p>
+            </>
           ) : null}
           <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.passagesHint")}</p>
           {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
@@ -7286,13 +7340,27 @@ function GridfinityCompartmentsCard({
 type PropertyDefaultValues = ReadonlyMap<string, number | string | boolean>;
 
 /**
+ * The rows that follow the printer's play (printerPlay.ts) say "from your fit test" under them while their value is the
+ * one the play gives, so it is clear where the number comes from; changed by hand, the line goes.
+ */
+function withFitTestNotes(properties: ShapePropertyConfig[], kind: WorkplaneShape["kind"], printerPlay: number | null): ShapePropertyConfig[] {
+  const rows = printerPlayShapeRows(kind);
+  if (printerPlay === null || rows.length === 0) return properties;
+  return properties.map((property) => {
+    if (property.type !== undefined && property.type !== "range") return property;
+    const row = rows.find((entry) => entry.property === property.id);
+    return row && fromPrinterPlay(row.id, property.value, printerPlay) ? { ...property, note: t("printerPlay.fromFitTest") } : property;
+  });
+}
+
+/**
  * The values a shape of this kind has when it is made new, with the defaults saved in the
  * settings, by property id. The main list, the taper card, the twist card and a Gridfinity
  * bin's compartments card each have their own, as some ids (a pyramid's top width) mean
  * different things in them. Null for a shape that is not made from the toolbar: a sketch,
  * a mesh, a group.
  */
-function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: WorkplaneWorkspaceSettings, gridfinityType?: GridfinityType) {
+function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: WorkplaneWorkspaceSettings, gridfinityType?: GridfinityType, printerPlay: number | null = null) {
   const asset = shapeDefaultsAsset(kind);
   if (!asset) return null;
   try {
@@ -7300,7 +7368,8 @@ function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: Workplan
     // where the defaults make a tray.
     const saved = workspace.shapeCustomizations[kind];
     const tray = gridfinityType === "tray" || (gridfinityType !== undefined && normalizeGridfinityType(saved?.gridfinityType) === "tray");
-    const fresh = makeShapeFromAsset(asset, undefined, tray ? { ...saved, gridfinityType } : saved);
+    // A clearance that follows the printer's play goes back to what the play gives, as a shape made now starts with.
+    const fresh = makeShapeFromAsset(asset, undefined, withPrinterPlay(kind, tray ? { ...saved, gridfinityType } : saved, printerPlay));
     const main = new Map<string, number | string | boolean>();
     getShapeProperties(fresh, () => undefined, workspace).forEach((property) => {
       if (property.type !== "text") main.set(property.id, property.value);
@@ -7565,6 +7634,7 @@ function RangeProperty({
   max,
   step = 0.01,
   hint,
+  note,
   gap,
   workspace,
   disabled,
@@ -7854,7 +7924,7 @@ function RangeProperty({
     </label>
   );
   // Outside the label, so a click on the words does not jump into the field.
-  return hint ? <>{row}<p className="property-hint">{hint}</p></> : row;
+  return hint || note ? <>{row}{note ? <p className="property-hint">{note}</p> : null}{hint ? <p className="property-hint">{hint}</p> : null}</> : row;
 }
 
 /**

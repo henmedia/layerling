@@ -39,6 +39,17 @@ I celý sloučený tvar může být plným tělesem nebo výřezem. Platí jedno
 - Obsahuje-li pouze plná tělesa nebo pouze výřezy, změna se provede u celku i všech jeho částí.
 - Obsahuje-li obojí, například kvádr s otvorem, každá část si zachová svůj režim. Celek se změní na odečítací nástroj, ale jeho otvor zůstane otvorem.
 
+### Změna velikosti sloučení: výřezy a malé díly zůstanou
+
+Když sloučení prodloužíte, rozšíříte nebo zvýšíte, jeho díly se roztáhnou s ním, jako by byly nakreslené na gumě: kulaté otvory v desce se změní v ovály a posunou se dovnitř. Aby zůstaly takové, jaké jsou, zvolte v nastavení sloučení u {{ui:inspector.groupResize}} možnost {{ui:inspector.groupResizeKeepParts}}; bez této volby platí {{ui:inspector.groupResizeStretch}}, jako dosud u každého sloučení. Od té chvíle se sloučení při každé změně velikosti - úchyty, v polích rozměrů nebo pomocí {{ui:scalePercent.title}} - znovu sestaví ze svých dílů podle jediného pravidla, pro každý směr zvlášť:
+
+- Díl, který sahá téměř přes celé sloučení, z devíti desetin nebo víc, roste nebo se zmenšuje s ním a drží si vzdálenost k oběma stranám: samotná deska, stěna nebo vnitřek krabičky, jejíž stěny zůstanou stejně silné.
+- Každý jiný díl si zachová vlastní velikost i vzdálenost k bližší straně. Díl uprostřed zůstane uprostřed.
+
+Deska s otvorem 5 mm od každého rohu a drážkou uprostřed, prodloužená o 40 mm, si tedy zachová kulaté otvory 5 mm od rohů a drážku uprostřed. Nestojí za tím žádný řešič vazeb a nic nenastavujete díl po dílu: pro všechny díly platí stejné pravidlo, takže předem víte, co se stane. Otočený díl se počítá podle kvádru, který ve sloučení zabírá, a zůstane otočený; sloučení uvnitř sloučení se počítá jako jeden díl. Zatímco táhnete úchytem, sloučení se roztahuje jako celek; jakmile pustíte, sestaví se znovu, v tomtéž kroku zpět. Zmenšíte-li sloučení pod to, co díl se svou vzdáleností potřebuje, zmenší se tento díl s ním jako dřív a zpráva vás na to upozorní. Zrcadlené, zúžené nebo zkroucené sloučení a sloučení s vlastním zaoblením, zkosením nebo texturou roztáhne vždy vše. Zvolíte-li toto nastavení u sloučení, které už je roztažené, jeho díly se hned rozmístí znovu.
+
+![Deska s otvorem 5 mm od každého rohu a drážkou uprostřed, prodloužená o 40 mm s volbou „Zachovat výřezy a malé díly“: otvory jsou stále kulaté a 5 mm od rohů, drážka je stále uprostřed.](shot:group-keep-parts)
+
 ## Seskupení
 
 Někdy mají díly jen držet pohromadě, aniž by se spojila jejich geometrie. Příkladem je bílé logo na černé destičce pro vícebarevný tisk. K tomu slouží {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), podobně jako v Tinkercadu. Skupina se přesouvá, otáčí a mění velikost jako jeden tvar, ale její části se neslučují:

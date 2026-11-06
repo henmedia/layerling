@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { portContourPoints } from "@/lib/portGeometry";
-import { SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardSolids, type SbcSolid } from "@/lib/sbcBoards";
+import { SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardSolids, sbcHoleDiameter, type SbcBoard, type SbcSolid } from "@/lib/sbcBoards";
 
 /*
  * The SBC board (#1098) through the REAL STEP exporter and the REAL OpenCascade kernel: every part
@@ -58,6 +58,29 @@ function solidVolume(solid: SbcSolid) {
   return area * length;
 }
 
+/**
+ * The board's outline, without its holes: the rounded rectangle, or for the UNO its rounded plate
+ * (three corners round, the cut one sharp before it is cut) with the step and the cut corner, as
+ * Arduino's PCB file draws them.
+ */
+function plateArea(board: SbcBoard) {
+  if (!board.outline) return board.width * board.depth - (4 - Math.PI) * board.cornerRadius ** 2;
+  if (board.type === "wemosD1Mini") return d1MiniArea();
+  expect(board.type).toBe("arduinoUno");
+  // 66.04 x 53.34 with three corners round, the back right one cut 1.524 mm at 45°; the step from
+  // (66.04, 2.54) over (68.58, 5.08) and (68.58, 37.846) to (66.04, 40.386).
+  return 66.04 * 53.34 - 3 * (1 - Math.PI / 4) - 1.524 ** 2 / 2 + 2.54 * ((40.386 - 2.54) + (37.846 - 5.08)) / 2;
+}
+
+/**
+ * The D1 mini V4.0.0 as Wemos's drawing has it, laid with USB-C at the left: 34.3 x 25.4 mm, the
+ * antenna end's corners 4 mm round, the USB end's 1 mm, and the notch at the RESET button: 6.8 x 1.9 mm
+ * at the back left, its corner 1 mm round, its edge slanting from (6.8, 23.5) to (7.7, 25.4).
+ */
+function d1MiniArea() {
+  return 34.3 * 25.4 - (1 - Math.PI / 4) * (1 + 16 + 16 + 1) - 6.8 * 1.9 - (0.9 * 1.9) / 2;
+}
+
 async function reimportVolume(blob: Blob): Promise<number> {
   const r = await brep.importSTEP(blob);
   if (!r.ok) throw new Error(`reimport failed: ${String(r.error?.message ?? r.error)}`);
@@ -74,7 +97,8 @@ describe("the SBC board as a STEP file", () => {
     expect(skipped).toEqual([]);
     expect(exportedCount).toBeGreaterThanOrEqual(1);
     // The rounded plate less its holes, and every part on it: the parts stand on the board, touching but not overlapping.
-    const plate = (board.width * board.depth - (4 - Math.PI) * board.cornerRadius ** 2 - board.holes.length * Math.PI * (board.holeDiameter / 2) ** 2) * board.thickness;
+    const holes = board.holes.reduce((sum, hole) => sum + Math.PI * (sbcHoleDiameter(board, hole) / 2) ** 2, 0);
+    const plate = (plateArea(board) - holes) * board.thickness;
     const parts = sbcBoardSolids(board, 0.3, 3).reduce((sum, solid) => sum + solidVolume(solid), 0);
     const volume = await reimportVolume(blob);
     expect(Math.abs(volume - (plate + parts)) / (plate + parts)).toBeLessThan(1e-3);

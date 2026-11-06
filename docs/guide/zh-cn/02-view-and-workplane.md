@@ -196,6 +196,8 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.printer}} 把工作平面调整为打印机的打印床大小，并标出超出边界的实体，见[打印](chapter:printing)。{{ui:workspace.showPlateLabels}} 在平台上写设计的名称，选择打印机后还会写上打印机名称和成型体积。
 
+{{ui:workspace.printerPlay}}是在你的打印机上，打印出的销钉要能在打印出的孔中转动所需的每侧余量。{{ui:workspace.fitTestMake}}会把用来测量它的配合测试件放到平台上；之后新的盖子、燕尾、卡扣、螺母和间隙检查都以它为起点，见[打印](chapter:printing)。它保存在这个浏览器中，而不是设计里。
+
 {{ui:workspace.size}} 给平台设定自定义尺寸，用 {{ui:workspace.width}} 和 {{ui:workspace.length}}，单位为毫米或你选择的单位。网格始终穿过原点，所以无论平台多大，较粗的线都位于坐标轴上。
 
 ### 工作平面：网格

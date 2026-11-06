@@ -52,6 +52,14 @@ Hoe steil jouw printer aankan, stel je in bij de instellingen onder {{ui:workspa
 - Waar twee onderdelen in elkaar passen, heb je speling nodig: meestal 0,2 tot 0,4 mm, afhankelijk van de printer. Maak een klein testpaar voordat je het grote onderdeel print.
 - Veel mensen schuinen de onderste rand die op de plaat ligt licht af. Zo loopt de eerste laag niet uit ("olifantenvoet").
 
+## De speling van je printer: de pastest
+
+Elke printer print gaten iets kleiner en pennen iets dikker dan ze getekend zijn, elk met een eigen maat. De speling die twee geprinte onderdelen nodig hebben, is daarom eerst een gok. Meet hem liever één keer: in de instellingen onder {{ui:workspace.workplane}} legt {{ui:workspace.fitTestMake}} een pastest op de plaat. Dat is een plaatje van 60 × 20 × 4 mm met zeven gaten voor één pen van 5 mm, elk getekend als 5 mm plus twee keer 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 of 0,40 mm, met de waarde in reliëf ernaast, en de pen van 5 mm zelf, die naast het plaatje staat met een kleine afschuining bovenop. Hij bestaat uit gewone vormen, dus hij wordt met de rest van de plaat geprint, zonder support.
+
+Print hem zoals hij ligt en steek dan de pen, met de afschuining eerst, in de gaten, te beginnen bij het nauwste. **Het nauwste gat waarin de pen nog draait** geeft de speling van je printer. Typ dat getal in bij {{ui:workspace.printerPlay}} of klik het aan bij de waarden onder het veld. De speling geldt per kant, in millimeters, en de browser bewaart hem voor elk ontwerp; een leeg veld betekent: niet gemeten.
+
+Vanaf dan beginnen nieuwe toepassingen met de speling in plaats van met de ingebouwde waarde: {{ui:lid.gap}} en {{ui:lid.hingePinPlay}} in het gereedschap {{ui:editor.tool.lid}}, de speling van een nieuwe {{ui:shape.dovetail}} en {{ui:shape.snapFit}}, {{ui:prop.clearance}} van een nieuwe moer of een nieuw getapt gat – twee keer de speling, want dat is de ruimte over de hele diameter – en {{ui:clearance.threshold}} bij {{ui:editor.tool.clearance}}. Zolang zo'n veld die waarde nog heeft, zegt "{{ui:printerPlay.fromFitTest}}" ernaast waar het getal vandaan komt. Een scharnier dat in één stuk geprint wordt en de gewrichten van het gereedschap {{ui:editor.tool.flexi}} houden hun 0,4 mm: in één stuk geprint moeten hun spleten ook tussen de lagen open blijven, en dat meet een los geprinte pen niet. Ruimte om een magneet of een Gridfinity-sleutel in te drukken en ruimte voor een gekochte aansluiting of printplaat houden ook hun eigen waarden. Lichamen die al in een ontwerp staan, veranderen nooit, en een ontwerp dat je opent ook niet.
+
 ## De print controleren
 
 {{ui:editor.tool.printCheck}}, naast {{ui:editor.tool.clearance}} onder {{ui:editor.group.combine}}, bekijkt de geselecteerde objecten, of alle zichtbare als niets geselecteerd is, en zegt in één venster wat er bij het printen mis zou gaan. Elk van de vijf regels is groen als hij niets vond, en oranje met wat en waar als hij wel iets vond:

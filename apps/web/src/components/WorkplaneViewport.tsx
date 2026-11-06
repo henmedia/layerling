@@ -63,7 +63,8 @@ import { plateCenterX, plateCount, plateName, platesExtentX } from "@/lib/buildP
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { heightWithFaceOnGrid, liftDeltaOnGrid, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { projectThumbnailDimensions } from "@/lib/projectThumbnail";
-import { makeShapeFromAsset, parseDroppedShapeAsset } from "@/lib/shapeCatalog";
+import { displayShapeName, makeShapeFromAsset, parseDroppedShapeAsset } from "@/lib/shapeCatalog";
+import { getPrinterPlay, withPrinterPlay } from "@/lib/printerPlay";
 import { planarFaceCentre } from "@/lib/faceCentre";
 import { scaledHorizontalShapePatch } from "@/lib/scaleByPercent";
 import { displayYTurn, insideZ } from "@/lib/displayAxes";
@@ -95,14 +96,17 @@ import type { CadModifierEdge } from "@/lib/cadModifierTypes";
 import { type CadFacePick } from "@/lib/cadFacePick";
 import { disposeCadFacePickMesh } from "@/lib/cadFacePickMesh";
 import { latchedDragAxis, type DragAxis } from "@/lib/dragAxisLatch";
-import { axisLockedPoint, circleOfEdgePoints, perpendicularFootOnSegment, pointAcrossCircle, pointOnCircle, tapeLengthShift } from "@/lib/tapeCircle";
+import { axisLockedPoint, circleOfEdgePoints, perpendicularFootOnSegment, pointAcrossCircle, pointOnCircle, tapeAxisLengthShift, tapeLengthShift } from "@/lib/tapeCircle";
+import { TAPE_SCENE_AXIS, tapeLengthMcpRefusal, type TapeAxis, type TapeLengthTypedRefusal, type TapeMeasurementsAnswer, type TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
+import { tapeAxisSpans, tapeDeltaAxes } from "@/lib/tapeLabels";
+import { TapeLengthField, type TapeLengthFieldValue } from "@/components/workplane/TapeLengthField";
 import { syncHistoryPickHighlight, syncPickHighlight } from "@/components/workplane/historyPickHighlight";
 import { orbitViewBy, panViewBy } from "@/lib/viewArrowKeys";
 import { useViewportKeyboardHooks } from "@/components/workplane/viewportKeyboard";
 import { useViewportDoubleClick } from "@/components/workplane/useViewportDoubleClick";
 import { aimPickRay, firstShapeHit, pickImagePoint, pickLayFlatFace, pickMateFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
-import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeMovableShapeId, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
+import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeLengthMoverOf, tapeLengthRefusalText, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
 import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane } from "./workplane/viewportScene";
 import { pointInsideOutline } from "@/lib/screenHull";
@@ -180,6 +184,8 @@ type WorkplaneViewportProps = {
   onCarryDrop?: (target: { point: PlacementPoint; normal: PlacementPoint; workplane: PlacementWorkplane; sunk?: boolean }) => void;
   /** A custom shape dropped on the workplane, by its id. */
   onDropMyShape?: (id: string, point: PlacementPoint) => void;
+  /** Places the fit test that measures the printer's play (fitTest.ts), from the button in the settings window. */
+  onMakeFitTest?: () => void;
   /** Shape following the cursor until a click drops it. Null places immediately. */
   cruiseAsset?: ShapeAsset | null;
   /** Puts down the shape on the pointer when a tool here takes over the click. */
@@ -485,7 +491,7 @@ declare global {
     /** "Hide workplane" in the camera bar for MCP: sets it when given, returns whether the plate is shown. */
     layerlingWorkplaneDisplay?: (visible?: boolean) => { visible: boolean };
     /** The measurements of the tape measure for MCP: shows or hides them when asked, returns what is there (#881). */
-    layerlingMeasurements?: (request?: { visible?: boolean; dimensions?: boolean }) => { visible: boolean; dimensions: boolean; measurements: Array<{ id: string; length: number }> };
+    layerlingMeasurements?: (request?: TapeMeasurementsRequest) => TapeMeasurementsAnswer;
     /** The protractor for MCP (#1228): shows an angle from three world points (the corner first) or two faces, or puts the protractor away. */
     layerlingProtractor?: (request: {
       points?: Array<{ x: number; y: number; z: number }>;
@@ -1480,6 +1486,7 @@ export function WorkplaneViewport({
   workspaceSettingsKey,
   onAddShape,
   onDropMyShape,
+  onMakeFitTest,
   cruiseAsset = null,
   carryIds = null,
   onCarryDrop,
@@ -1684,7 +1691,7 @@ export function WorkplaneViewport({
   const [rulerDuplicatePreview, setRulerDuplicatePreview] = useState<{ x: number; y: number; label: string } | null>(null);
   const [rulerDuplicateEditing, setRulerDuplicateEditing] = useState<{ rulerId: string; shapeId: string; baseAlong: number; x: number; y: number; value: string } | null>(null);
   const [rulerCoordinateEditing, setRulerCoordinateEditing] = useState<{ rulerId: string; shapeIds: string[]; axis: "x" | "z" | "elevation"; x: number; y: number; value: string } | null>(null);
-  const [tapeLengthEditing, setTapeLengthEditing] = useState<{ segmentId: string; x: number; y: number; value: string } | null>(null);
+  const [tapeLengthEditing, setTapeLengthEditing] = useState<{ segmentId: string; x: number; y: number; length: string; axes: Array<{ axis: TapeAxis; text: string }> } | null>(null);
   const [noteOverlay, setNoteOverlay] = useState<NoteOverlayState | null>(null);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [moveDimensionOverlay, setMoveDimensionOverlay] = useState<MoveDimensionOverlayState | null>(null);
@@ -2716,7 +2723,7 @@ export function WorkplaneViewport({
       savedTapeKeyRef.current = key;
     }
     if (threeRef.current) {
-      syncTapeOverlay(threeRef.current, tapeModel, tapeOverlayRef, setTapeOverlay, workspaceRef.current.accuracy);
+      syncTapeOverlay(threeRef.current, tapeModel, tapeOverlayRef, setTapeOverlay, workspaceRef.current.accuracy, { shapes: shapesRef.current, selectedIds: selectedIdsRef.current });
       threeRef.current.needsRender = true;
     }
   }, [tapeModel]);
@@ -2964,7 +2971,7 @@ export function WorkplaneViewport({
         resolvedThemeRef.current,
         workspace.dimensionsAlwaysVisible,
       );
-      syncTapeOverlay(threeRef.current, tapeModelRef.current, tapeOverlayRef, setTapeOverlay, workspace.accuracy);
+      syncTapeOverlay(threeRef.current, tapeModelRef.current, tapeOverlayRef, setTapeOverlay, workspace.accuracy, { shapes: shapesRef.current, selectedIds: selectedIdsRef.current });
       syncProtractorOverlay(threeRef.current, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
       syncRulerDimensionOverlay(threeRef.current, shapesRef.current, rulerDimensionOverlayRef, setRulerDimensionOverlay, workspace.accuracy);
       syncCornerRulerToolOverlay(threeRef.current, cornerRulerModelRef.current, shapesRef.current, selectedIdsRef.current, cornerRulerOverlayRef, setCornerRulerOverlay, workspace.accuracy);
@@ -3194,7 +3201,7 @@ export function WorkplaneViewport({
         );
         syncAlignOverlay(state, alignReferenceShapesRef.current, selectedIdsRef.current, alignModeRef.current, alignAnchorIdRef.current, alignHandlesRef.current, alignOverlayRef, setAlignOverlay);
         syncMirrorOverlay(state, mirrorReferenceShapesRef.current, selectedIdsRef.current, mirrorModeRef.current, mirrorOverlayRef, setMirrorOverlay);
-        syncTapeOverlay(state, tapeModelRef.current, tapeOverlayRef, setTapeOverlay, workspaceRef.current.accuracy);
+        syncTapeOverlay(state, tapeModelRef.current, tapeOverlayRef, setTapeOverlay, workspaceRef.current.accuracy, { shapes: shapesRef.current, selectedIds: selectedIdsRef.current });
         syncSectionMeasureOverlay(state, sectionMeasureModeRef.current && sectionSettingsRef.current.enabled, sectionMeasureRef.current, sectionMeasureOverlayRef, setSectionMeasureOverlay, workspaceRef.current.accuracy);
         syncProtractorOverlay(state, protractorOpenRef.current, protractorModelRef.current, protractorOverlayRef, setProtractorOverlay);
         syncClearanceMarkOverlay(state, clearanceMarkRef.current, clearanceMarkOverlayRef, setClearanceMarkOverlay);
@@ -3622,7 +3629,8 @@ export function WorkplaneViewport({
     }
     const state = threeRef.current;
     if (!state) return;
-    const customization = workspaceRef.current.shapeCustomizations[cruiseAsset.kind];
+    // As the shape will be made when it is put down: the saved defaults, and the printer's play where they say nothing.
+    const customization = withPrinterPlay(cruiseAsset.kind, workspaceRef.current.shapeCustomizations[cruiseAsset.kind], getPrinterPlay());
     const base = makeShapeFromAsset(cruiseAsset, undefined, customization);
     const workplane = placementWorkplaneRef.current;
     const placed = {
@@ -3666,24 +3674,6 @@ export function WorkplaneViewport({
     if (Boolean(current.hidden) === hidden) return;
     storeTapeModel({ ...current, hidden });
   }, [storeTapeModel]);
-
-  // MCP: the eye among the tape measure's buttons, and what is measured (#881).
-  useEffect(() => {
-    window.layerlingMeasurements = (request) => {
-      if (typeof request?.visible === "boolean") {
-        setTapeHidden(!request.visible);
-      }
-      if (typeof request?.dimensions === "boolean") {
-        showDimensions(request.dimensions);
-      }
-      const model = tapeModelRef.current;
-      const state = threeRef.current;
-      return { visible: !model.hidden, dimensions: !dimensionsHiddenRef.current, measurements: state ? tapeSegmentLengths(state, model) : [] };
-    };
-    return () => {
-      delete window.layerlingMeasurements;
-    };
-  }, [setTapeHidden, showDimensions]);
 
   useEffect(() => {
     const current = tapeModelRef.current;
@@ -5855,37 +5845,119 @@ export function WorkplaneViewport({
   // A typed length moves the body at one end of a measurement along the measured line, until the
   // distance is the typed one; the points stay on the body, so the measurement follows (#823). A
   // negative length takes it that far past the other point, from the edge of a box to inside it (#963).
+  // When the label's tip lists the reach along each axis, the field has one for each of those too, and
+  // a number typed there moves the body along that axis only (Discussion #610).
   const beginTapeLengthEdit = useCallback((segmentId: string) => {
     const state = threeRef.current;
     const segment = tapeOverlayRef.current?.segments.find((entry) => entry.id === segmentId);
     if (!state || !segment) return;
     const [start, end] = tapeSegmentWorldPoints(state, tapeModelRef.current, segmentId);
     if (!start || !end) return;
-    setTapeLengthEditing({ segmentId, x: segment.labelX, y: segment.labelY, value: formatMeasure(start.distanceTo(end), workspaceRef.current.accuracy) });
+    const accuracy = workspaceRef.current.accuracy;
+    const spans = tapeAxisSpans([start, end]);
+    setTapeLengthEditing({
+      segmentId,
+      x: segment.labelX,
+      y: segment.labelY,
+      length: formatMeasure(start.distanceTo(end), accuracy),
+      axes: tapeDeltaAxes(spans, accuracy).map((axis) => ({ axis, text: formatMeasure(spans[axis], accuracy) })),
+    });
   }, []);
 
-  const commitTapeLengthEdit = useCallback(() => {
+  /**
+   * Moves the body a typed length moves (tapeLengthMoverOf), in one step of the history: along the
+   * measured line until its two points are `length` millimetres apart or, with `axis` (inside the
+   * scene, y up), along that axis only until they are that far apart on it. The answer is the body
+   * and how far it really went - the height stops at the editor's limits -, or why nothing moved.
+   * The field and MCP both type a length through here.
+   */
+  const typeTapeLength = useCallback((segmentId: string, length: number, axis?: "x" | "y" | "z"): { shapeId: string; name: string; shift: THREE.Vector3 } | { refusal: TapeLengthTypedRefusal; name: string } => {
+    const state = threeRef.current;
+    const model = tapeModelRef.current;
+    const mover = tapeLengthMoverOf(model, segmentId, { shapes: shapesRef.current, selectedIds: selectedIdsRef.current });
+    const [start, end] = state ? tapeSegmentWorldPoints(state, model, segmentId) : [];
+    if (!mover || !start || !end) return { refusal: "missing", name: "" };
+    const shape = mover.shapeId ? shapesRef.current.find((entry) => entry.id === mover.shapeId) : undefined;
+    const name = shape ? displayShapeName(shape) : "";
+    if ("refusal" in mover) return { refusal: mover.refusal, name };
+    if (!shape) return { refusal: "noBody", name };
+    const shift = axis ? tapeAxisLengthShift(start, end, axis, length, mover.movesEnd) : tapeLengthShift(start, end, length, mover.movesEnd);
+    if (!shift) return { refusal: "noDirection", name };
+    const x = cleanNearZero(shape.x + shift.x, 0.0005);
+    const z = cleanNearZero(shape.z + shift.z, 0.0005);
+    const elevation = cleanNearZero(clamp((shape.elevation ?? 0) + shift.y, MIN_ELEVATION, MAX_ELEVATION), 0.0005);
+    const moved = new THREE.Vector3(
+      Math.abs(shift.x) > 1e-9 ? x - shape.x : 0,
+      Math.abs(shift.y) > 1e-9 ? elevation - (shape.elevation ?? 0) : 0,
+      Math.abs(shift.z) > 1e-9 ? z - shape.z : 0,
+    );
+    if (moved.lengthSq() > 0) {
+      onInteractionActiveChange?.(true);
+      onUpdateShape(shape.id, {
+        ...(moved.x !== 0 ? { x } : {}),
+        ...(moved.z !== 0 ? { z } : {}),
+        ...(moved.y !== 0 ? { elevation } : {}),
+      });
+      onInteractionActiveChange?.(false);
+    }
+    return { shapeId: shape.id, name, shift: moved };
+  }, [onInteractionActiveChange, onUpdateShape]);
+
+  // MCP: the eye among the tape measure's buttons, what is measured (#881), and a length typed for a measurement
+  // (Discussion #610). It stands after typeTapeLength, which it calls.
+  useEffect(() => {
+    window.layerlingMeasurements = (request) => {
+      if (typeof request?.visible === "boolean") {
+        setTapeHidden(!request.visible);
+      }
+      if (typeof request?.dimensions === "boolean") {
+        showDimensions(request.dimensions);
+      }
+      let moved: { shapeId: string; name: string; shift: THREE.Vector3 } | undefined;
+      if (request?.typeLength) {
+        const { id, length, axis } = request.typeLength;
+        const result = typeTapeLength(id, length, axis);
+        if ("refusal" in result) throw new Error(tapeLengthMcpRefusal(result.refusal, result.name, axis));
+        moved = result;
+      }
+      const model = tapeModelRef.current;
+      const state = threeRef.current;
+      const bodies = { shapes: shapesRef.current, selectedIds: selectedIdsRef.current };
+      return {
+        visible: !model.hidden,
+        dimensions: !dimensionsHiddenRef.current,
+        measurements: state ? tapeSegmentLengths(state, model, bodies, moved) : [],
+        ...(moved ? { moved: { id: moved.shapeId, name: moved.name, distance: Math.round(moved.shift.length() * 1000) / 1000 } } : {}),
+      };
+    };
+    return () => {
+      delete window.layerlingMeasurements;
+    };
+  }, [setTapeHidden, showDimensions, typeTapeLength]);
+
+  const commitTapeLengthEdit = useCallback((value: TapeLengthFieldValue) => {
     const edit = tapeLengthEditing;
     setTapeLengthEditing(null);
-    const state = threeRef.current;
-    if (!edit || !state) return;
-    const value = parseMeasureMm(edit.value);
-    const shapeId = tapeMovableShapeId(tapeModelRef.current, edit.segmentId, selectedIdsRef.current);
-    const shape = shapeId ? shapesRef.current.find((entry) => entry.id === shapeId) : undefined;
-    const [start, end] = tapeSegmentWorldPoints(state, tapeModelRef.current, edit.segmentId);
-    if (!shape || !start || !end || !Number.isFinite(value)) return;
-    const segment = tapeModelRef.current.segments.find((entry) => entry.id === edit.segmentId);
-    const movesEnd = tapeModelRef.current.points.find((point) => point.id === segment?.endId)?.attachment?.shapeId === shape.id;
-    const shift = tapeLengthShift(start, end, value, movesEnd);
-    if (!shift) return;
-    onInteractionActiveChange?.(true);
-    onUpdateShape(shape.id, {
-      ...(Math.abs(shift.x) > 1e-9 ? { x: cleanNearZero(shape.x + shift.x, 0.0005) } : {}),
-      ...(Math.abs(shift.z) > 1e-9 ? { z: cleanNearZero(shape.z + shift.z, 0.0005) } : {}),
-      ...(Math.abs(shift.y) > 1e-9 ? { elevation: cleanNearZero(clamp((shape.elevation ?? 0) + shift.y, MIN_ELEVATION, MAX_ELEVATION), 0.0005) } : {}),
-    });
-    onInteractionActiveChange?.(false);
-  }, [onInteractionActiveChange, onUpdateShape, tapeLengthEditing]);
+    if (!edit) return;
+    const length = parseMeasureMm(value.text);
+    if (!Number.isFinite(length)) return;
+    const result = typeTapeLength(edit.segmentId, length, value.field === "length" ? undefined : TAPE_SCENE_AXIS[value.field]);
+    if ("refusal" in result) {
+      // Taken from under the field: the body was locked or went while it was open, or the points met.
+      if (result.refusal === "noDirection") onNotice?.(t("status.tapeLengthNoDirection"));
+      else if (result.refusal !== "missing") onNotice?.(tapeLengthRefusalText(result.refusal, result.name));
+      return;
+    }
+    // Says what moved and how far, as the arrow keys do; a number that was right already moves nothing and says nothing.
+    if (result.shift.lengthSq() === 0) return;
+    const distance = `${formatMeasure(result.shift.length(), workspaceRef.current.accuracy)} ${lengthDisplayUnit(workspaceRef.current).label}`;
+    const message = value.field === "length"
+      ? t("status.tapeLengthMoved", { name: result.name, distance })
+      : t("status.tapeAxisMoved", { name: result.name, distance, axis: value.field });
+    // The history takes the step when the interaction has ended, on the next turn; the notice comes after it, so it
+    // carries the Undo button like any other move.
+    window.setTimeout(() => onNotice?.(message), 0);
+  }, [onNotice, tapeLengthEditing, typeTapeLength]);
 
   // The number belongs to the selected bodies: when they are no longer all selected (a click on empty space that
   // leaves the field its focus), the open field goes with them instead of staying in the view (#614).
@@ -6177,8 +6249,9 @@ export function WorkplaneViewport({
       // allein passiert das hier nicht: Mehrere Werkzeuge fangen den
       // Zeigerdruck ab, und damit nimmt der Browser auch den Fokuswechsel
       // zurueck - der Schreibzeiger blinkte in der Notiz weiter.
+      // The field of a tape measurement's length the same: leaving it applies what was typed (#823).
       const typing = document.activeElement;
-      if (typing instanceof HTMLElement && typing.classList.contains("note-text")) {
+      if (typing instanceof HTMLElement && (typing.classList.contains("note-text") || typing.closest(".tape-length-field"))) {
         typing.blur();
       }
       const state = threeRef.current;
@@ -8654,6 +8727,7 @@ export function WorkplaneViewport({
               onSegmentPointerDown={handleTapeSegmentPointerDown}
               onMarkMiddle={onAddReferencePoints ? markTapeMiddle : undefined}
               onEditLength={beginTapeLengthEdit}
+              editingLengthId={tapeLengthEditing?.segmentId ?? null}
             />
           ) : null}
           {!workplaneMode && !splitActive && rulerDimensionOverlay && rulerDimensionOverlay.items.length > 0 ? (
@@ -8732,21 +8806,14 @@ export function WorkplaneViewport({
             />
           ) : null}
           {tapeLengthEditing ? (
-            <input
-              className="dimension-input tape-length-input"
-              style={{ "--overlay-x": `${tapeLengthEditing.x}px`, "--overlay-y": `${tapeLengthEditing.y}px` } as CSSProperties}
-              value={tapeLengthEditing.value}
-              autoFocus
-              inputMode="decimal"
-              aria-label={t("camera.tapeTypeLength")}
-              onPointerDown={(event) => event.stopPropagation()}
-              onFocus={(event) => event.currentTarget.select()}
-              onChange={(event) => setTapeLengthEditing((edit) => edit && { ...edit, value: event.target.value })}
-              onBlur={commitTapeLengthEdit}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") commitTapeLengthEdit();
-                if (event.key === "Escape") setTapeLengthEditing(null);
-              }}
+            <TapeLengthField
+              key={tapeLengthEditing.segmentId}
+              x={tapeLengthEditing.x}
+              y={tapeLengthEditing.y}
+              length={tapeLengthEditing.length}
+              axes={tapeLengthEditing.axes}
+              onApply={commitTapeLengthEdit}
+              onCancel={() => setTapeLengthEditing(null)}
             />
           ) : null}
           {rulerDuplicatePreview ? (
@@ -8867,6 +8934,11 @@ export function WorkplaneViewport({
           onSaveStartView={saveStartView}
           onResetStartView={resetStartView}
           onMakeDefault={makeWorkspaceDefault}
+          onMakeFitTest={onMakeFitTest ? () => {
+            // The window closes so the piece can be seen on the plate, selected.
+            setSettingsOpen(false);
+            onMakeFitTest();
+          } : undefined}
           onClose={() => setSettingsOpen(false)}
         />
       ) : null}

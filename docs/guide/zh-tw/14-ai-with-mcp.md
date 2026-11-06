@@ -138,6 +138,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_show_overhangs` | 開啟或關閉懸垂剖面線、設定角度，並回報每個實體需要支撐的面積 |
 | `layerling_estimate_print` | 估算選取範圍或整個設計的體積、重量與線材用量：以實心實體計算，也像匯出視窗那樣以壁厚與填充做粗略估計 |
 | `layerling_check_clearance` | 列印前檢查哪些零件重疊、接觸或間距小於最小間隙，也檢查同一物件中彼此分離的零件 |
+| `layerling_printer_play` | 讀取、設定或清除印表機間隙（設定中的{{ui:workspace.printerPlay}}），並放置用來測量它的配合測試件 |
 | `layerling_check_print` | 列印前檢查會出什麼問題：對噴嘴來說過薄的壁、懸空的零件、與平台接觸過少、懸垂和開放網格 |
 | `layerling_add_reference_points` | 標記參考點——可落在物件的中心、角落或邊中點，也可指定精確位置——形狀會吸附到這些點 |
 | `layerling_list_reference_points` | 列出參考點及其 id 與位置 |
@@ -158,7 +159,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_delete_custom_shape` | 移除自訂形狀；已插入的實體會保留 |
 | `layerling_show_workplane` | 隱藏或顯示帶格線的平台，例如為了拍攝底面（只影響檢視） |
 | `layerling_set_section_view` | 沿平面剖開檢視以查看內部（只影響檢視，不會真的切開任何東西） |
-| `layerling_measurements` | 顯示或隱藏捲尺的量測，並列出它們及其長度，並像 [[Q]] 一樣隱藏或顯示所選物件周圍的尺寸 |
+| `layerling_measurements` | 顯示或隱藏捲尺的量測，並列出它們及其長度，並像 [[Q]] 一樣隱藏或顯示所選物件周圍的尺寸，並可為其中一個量測輸入長度，像點擊其數字一樣移動其一端的物體 |
 | `layerling_measure_angle` | 像量角器一樣量測角度：三點的頂點處或兩個平面之間，並在檢視中顯示 |
 | `layerling_saved_view` | 把目前檢視儲存到按鍵 7、8、9 或 0，之後可回到該檢視，就像 Shift+按鍵與單按該鍵（只影響檢視）；也可設定新設計的起始視圖 |
 | `layerling_build_plates` | 列出、新增、命名、排序和移除列印板，把物件移到某個列印板並分配到各列印板上，如同列印板列 |

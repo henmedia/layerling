@@ -197,6 +197,8 @@ Nella stessa sezione, in {{ui:workspace.customSnapGrids}}, puoi aggiungere passi
 
 {{ui:workspace.printer}} adatta le dimensioni del piano di lavoro al piatto di stampa della tua stampante e segnala i corpi che lo oltrepassano; vedi [Stampa](chapter:printing). {{ui:workspace.showPlateLabels}} mostra sulla piastra il nome del progetto e, se hai scelto una stampante, il nome della stampante e il volume di stampa.
 
+{{ui:workspace.printerPlay}} è lo spazio per lato che serve a un perno stampato per girare in un foro stampato con la tua stampante. {{ui:workspace.fitTestMake}} mette sul piatto la prova di accoppiamento che lo misura; nuovi coperchi, code di rondine, ganci a scatto, dadi e il controllo del gioco partono poi da lì, vedi [Stampa](chapter:printing). Resta in questo browser, non nel progetto.
+
 {{ui:workspace.size}} permette di impostare dimensioni personalizzate per la piastra, con {{ui:workspace.width}} e {{ui:workspace.length}} in millimetri o nell’unità scelta. La griglia passa sempre per l’origine, quindi le linee più marcate restano sugli assi qualunque siano le dimensioni della piastra.
 
 ### Piano di lavoro: griglia

@@ -946,6 +946,9 @@ export type LoftMiddleSection = {
   offsetZ?: number;
 };
 
+/** What a group does with its parts when it is resized (Discussion #526); see WorkplaneShape.groupResize. */
+export type GroupResizeMode = "stretch" | "keepParts";
+
 export type WorkplaneShape = {
   id: string;
   name: string;
@@ -1551,6 +1554,14 @@ export type WorkplaneShape = {
    * Left out, see groupShowsPartColors() for what a group shows.
    */
   multicolor?: boolean;
+  /**
+   * What a group does with its parts when it is resized (Discussion #526). Left out, it stretches
+   * them all with it, as groups always have. "keepParts" stretches only the parts that reach across
+   * (nearly) the whole group along the axis that changed; every other part keeps its own size there
+   * and its distance to the nearer side, so the holes in a plate stay round and where they were put.
+   * See lib/groupKeepParts.
+   */
+  groupResize?: GroupResizeMode;
   locked?: boolean;
   /**
    * Lock shape (#1277): the part still moves, turns and groups with others, but its size, settings,
@@ -1605,7 +1616,7 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
-export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini";
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoNano" | "wemosD1Mini";
 
 export type SbcBoardSettings = {
   board: SbcBoardType;
@@ -1621,6 +1632,8 @@ export type SbcBoardSettings = {
   gpioUp?: boolean;
   /** How far in mm the openings going up reach above their part, 20 to 100 (default 20). */
   upReach?: number;
+  /** How far in mm the buttons reach the way they are pressed (up through a lid, or out of a side), 0 to 100; missing is 0. */
+  buttonReach?: number;
 };
 
 export type QrCodeSettings = {

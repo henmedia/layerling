@@ -4,6 +4,7 @@ import { getManifoldRuntime, type ManifoldSolid } from "@/lib/editorMeshCore";
 import { numberLocale, t } from "@/lib/i18n";
 import { createLocalId } from "@/lib/localIds";
 import { splitShapeFromWorldPositions } from "@/lib/modelSplit";
+import { printerPlayStart } from "@/lib/printerPlay";
 import { sceneShape } from "@/lib/shapeCatalog";
 import { canonicalizeShape, isNonSolidShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -93,6 +94,15 @@ export const LID_DEFAULTS: LidOptions = {
   hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside",
   clickBumps: false, clickBumpHeight: 0.4, handle: "none",
 };
+/**
+ * What a lid starts from with this printer's play (printerPlay.ts): the gap per side and the hinge pin's play take it,
+ * held within their fields; without a play, or for everything else, the built-in values.
+ */
+export function lidDefaults(play: number | null): LidOptions {
+  const gap = printerPlayStart("lid.gap", play);
+  const hingePinPlay = printerPlayStart("lid.hingePinPlay", play);
+  return normalizeLidOptions({ ...LID_DEFAULTS, ...(gap === null ? {} : { gap }), ...(hingePinPlay === null ? {} : { hingePinPlay }) });
+}
 export const LID_FITS = [0.1, 0.2, 0.3] as const;
 export const MIN_LID_THICKNESS = 0.4;
 export const MAX_LID_THICKNESS = 10;
@@ -221,9 +231,12 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-/** The options with a missing, mistyped or out-of-range value replaced by the nearest allowed one. */
-export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unknown>> | null): LidOptions {
-  const result: LidOptions = { ...LID_DEFAULTS };
+/**
+ * The options with a mistyped or out-of-range value replaced by the nearest allowed one, and a missing one by that of
+ * `defaults` (the built-in ones, or `lidDefaults` with the printer's play).
+ */
+export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unknown>> | null, defaults: LidOptions = LID_DEFAULTS): LidOptions {
+  const result: LidOptions = { ...defaults };
   const type = typeof value?.type === "string" ? value.type.trim().toLowerCase() : "";
   if ((LID_TYPES as readonly string[]).includes(type)) result.type = type as LidType;
   const thickness = finiteNumber(value?.thickness);

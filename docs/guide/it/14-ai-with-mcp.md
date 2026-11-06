@@ -138,6 +138,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_show_overhangs` | Attiva o disattiva la visualizzazione dei sovrasbalzi, ne imposta l’angolo e indica per ogni corpo l’area che richiederebbe supporti. |
 | `layerling_estimate_print` | Stima volume, peso e filamento per la selezione o per l’intero progetto: calcola il corpo pieno e fornisce una stima approssimativa con pareti e riempimento, come nella finestra di esportazione. |
 | `layerling_check_clearance` | Controlla prima della stampa quali parti si sovrappongono, si toccano o sono più vicine di un gioco minimo, anche le parti separate di un oggetto |
+| `layerling_printer_play` | legge, imposta o cancella il gioco della stampante ({{ui:workspace.printerPlay}} nelle impostazioni) e mette la prova di accoppiamento che lo misura |
 | `layerling_check_print` | Controlla prima della stampa cosa andrebbe storto: pareti troppo sottili per l'ugello, parti sospese, poco contatto con il piatto, sporgenze e mesh aperte |
 | `layerling_add_reference_points` | Aggiunge punti di riferimento — al centro, agli angoli o nei punti medi degli spigoli degli oggetti, oppure in posizioni precise — a cui si agganciano le forme. |
 | `layerling_list_reference_points` | Elenca i punti di riferimento con i rispettivi ID e posizioni. |
@@ -158,7 +159,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_delete_custom_shape` | Elimina una forma personalizzata; i corpi già inseriti restano nel progetto. |
 | `layerling_show_workplane` | Nasconde o mostra il piano con la griglia, per esempio per fotografare la parte inferiore (modifica solo la vista). |
 | `layerling_set_section_view` | Apre la vista lungo un piano di sezione per mostrare l’interno; non taglia realmente il pezzo (modifica solo la vista). |
-| `layerling_measurements` | mostra o nasconde le misurazioni del metro a nastro e le elenca con le loro lunghezze, e nasconde o mostra le misure attorno alla selezione come [[Q]] |
+| `layerling_measurements` | mostra o nasconde le misurazioni del metro a nastro e le elenca con le loro lunghezze, e nasconde o mostra le misure attorno alla selezione come [[Q]], e digita una lunghezza per una di esse, che sposta il corpo alla sua estremità come un clic sul numero |
 | `layerling_measure_angle` | misura un angolo come il goniometro: al vertice di tre punti o tra due facce piane, e lo mostra nella vista |
 | `layerling_saved_view` | Salva la vista corrente con il tasto 7, 8, 9 o 0 e la richiama in seguito, come con Maiusc+tasto e poi il tasto (modifica solo la vista). Imposta anche la vista di avvio dei nuovi progetti. |
 | `layerling_build_plates` | Elenca, aggiunge, nomina, ordina e toglie i piatti di stampa, sposta oggetti su un piatto e li distribuisce sui piatti, come la barra dei piatti. |

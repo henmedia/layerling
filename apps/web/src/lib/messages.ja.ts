@@ -2534,6 +2534,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "フラットケーブルを壁の横へ",
   "sbcBoard.gpioUp": "GPIOヘッダーをふたの上へ",
   "sbcBoard.upReach": "上への延長",
+  "sbcBoard.buttonReach": "ボタンの延長",
+  "sbcBoard.buttonReachHint": "ボタン(RESET、BOOT、電源)を押す向きに延ばす長さ: 上へはふたを通して、横から押すボタンは壁を通して。0 ではそのままです。",
   "sbcBoard.passagesHint": "フラットケーブル（カメラ、ディスプレイ、PCIe）とGPIOヘッダーは、上への延長（20 mm以上）だけふたを通して上に開けられ、ケーブルは延長だけ近い壁を通して横にも開けられます。microSDカードスロットは縁のコネクタです。",
   "sbcBoard.building": "ボードを作成中…",
   "sbcBoard.failed": "ボードを作成できませんでした。",

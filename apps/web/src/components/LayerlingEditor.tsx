@@ -25,7 +25,9 @@ import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerText
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { LID_DEFAULTS, groupedWithMagnets, lidClickBumpsFit, lidHandleFits, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidHandleFits, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayStart, setPrinterPlay, withPrinterPlay } from "@/lib/printerPlay";
+import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { CABLE_DEFAULTS, cableChannelShapeFields, cableEndNear, cableGrid, findCableChannel, normalizeCableOptions, type CableChannelError, type CableChannelOptions, type CableChannelResult, type CableEnd, type CableGrid, type Vec3 as CableVec3 } from "@/lib/cableChannel";
 import { CableChannelPanel, type CableChannelEndName, type CableChannelPanelResult } from "./workplane/CableChannelPanel";
 import type { CadLidRequest } from "@/lib/cadLid";
@@ -37,7 +39,7 @@ import { QrCodePanel } from "@/components/workplane/QrCodePanel";
 import { qrCodeOf, qrCodeShape, regeneratedQrCodeShape } from "@/lib/editorQrCode";
 import { regeneratedSbcBoardShape, sbcBoardOf, sbcBoardShape } from "@/lib/editorSbcBoard";
 import { portWithScrewHolesGroup } from "@/lib/editorPortScrewHoles";
-import { DEFAULT_SBC_BOARD, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { DEFAULT_SBC_BOARD, MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { DEFAULT_QR_WIDTH, MAX_QR_HEIGHT, MAX_QR_WIDTH, MIN_QR_HEIGHT, MIN_QR_WIDTH, QR_BYTE_CAPACITY, QR_ERROR_CORRECTIONS, QR_STYLES, normalizeQrSettings, qrByteLength, qrMatrix, qrModuleSize, qrModuleTooSmall, qrTextFits, type QrCodeSettings, type QrErrorCorrection, type QrStyle } from "@/lib/qrCode";
 import { iconSourceFromFile, PICTURE_FILE_ACCEPT, picturePixels, type IconSource } from "@/lib/pictureIcon";
 import { loadedManifoldRuntime, onManifoldReady } from "@/lib/manifoldHandle";
@@ -78,6 +80,8 @@ import { DEFAULT_HOLE_PATTERN, normalizeHolePattern, type HolePatternSettings } 
 import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, readPerforableFace, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
 import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
+import { groupsStretchedInstead, groupsToKeepParts, keptPartsForResize, placeKeptPartsGroup } from "@/lib/groupKeepParts";
+import { offersGroupResize } from "@/lib/groupScale";
 import { MeshSimplifyPanel } from "./workplane/MeshSimplifyPanel";
 import { addCustomFontFile, customFontErrorMessage, FontManagerPanel } from "./workplane/FontManagerPanel";
 import { onFontManagerRequested } from "@/lib/fontManagerEvents";
@@ -87,9 +91,9 @@ import { storedCustomFonts } from "@/lib/customFontStore";
 import { ArrayPanel } from "./workplane/ArrayPanel";
 import { ScalePercentPanel, type ScalePercentSettings } from "./workplane/ScalePercentPanel";
 import { ClearancePanel, clearanceMarkFor, clearanceRowIds, type ClearanceSettings, type ClearanceToolState } from "./workplane/ClearancePanel";
+import { CLEARANCE_THRESHOLD_LIMITS, clearanceMeshShape, clearanceSourceShapes, clearanceStartThreshold, normalizeClearanceOptions, reclassifyClearance, readClearanceSettings, writeClearanceSettings } from "@/lib/clearanceCheck";
 import { PrintCheckPanel, printCheckLineFocus, printCheckLineIds, type PrintCheckLine, type PrintCheckSettings, type PrintCheckToolState } from "./workplane/PrintCheckPanel";
 import { normalizePrintCheckOptions, printCheckFloating, printCheckSmallContacts, printCheckTopLevelId, printCheckWarnings, PRINT_CHECK_NOZZLE_LIMITS, readPrintCheckSettings, writePrintCheckSettings } from "@/lib/printCheck";
-import { CLEARANCE_THRESHOLD_LIMITS, clearanceMeshShape, clearanceSourceShapes, normalizeClearanceOptions, reclassifyClearance, readClearanceSettings, writeClearanceSettings } from "@/lib/clearanceCheck";
 import { scaleShapesByPercent } from "@/lib/scaleByPercent";
 import { isSameSize, resizedCopy, SAME_SIZE, shapeSize, sizeFactorsBetween, type ShapeSize, type SizeFactors } from "@/lib/duplicateResize";
 import { canToggleGroupColors, colorForParts, groupShowsPartColors } from "@/lib/groupColors";
@@ -111,7 +115,7 @@ import { ShortcutsModal } from "./workplane/ShortcutsModal";
 import { InteractiveHelp } from "./InteractiveHelp";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
 import { nextSelectionTransparency } from "@/lib/selectionTransparency";
-import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, resizedShapeSize, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
+import { canonicalizeShape, cloneWorkplaneShapeTreeWithFreshIds, normalizeGroupResize, cleanNearZero, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, preservesEdgeTreatmentSize, serializeShapesForSync, shapeDepth, shapeExtrudeDeformPatch, shapeHasShapeDeform, shapeTaperPatch, resizedShapeSize, shapeTransformShouldRemainEditable, shapeWidth, shapeWithParametricSource, patchTouchesBodyParameters, withHoleMode, workplaneShapesEqual, shellNeedingRebuild, hollowStretchSincePicture, shellRebuildReference, edgeTreatmentsAfterShell } from "@/lib/workplaneShapes";
 import { normalizeRibStyle, ribFootSwitch, ribGussetWallKeepingPlace, ribLengthKeepingPatch, ribThicknessOnFootPatch } from "@/lib/rib";
 import { pasteCenteringShift, pasteNudged } from "@/lib/pasteCentering";
 import { faceWorkplaneCenteringShift, workplaneCenteringOffset } from "@/lib/workplaneCentering";
@@ -140,6 +144,7 @@ import { composedShapeRotation, geometryRotationDegreesForShortcut, geometryRota
 import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapePivotFromWorld, shapePivotWorld, type PivotPoint } from "@/lib/rotationPivot";
 import { createLocalId } from "@/lib/localIds";
 import { canEditGroupAtLevel, mcpOpenGroupSummary, openGroupLevelsStillOpen, trackOpenGroupLevels, type OpenGroupLevel } from "@/lib/openGroupParts";
+import type { TapeMeasurementsAnswer, TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
 import { projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
 import { exportMeshesToObj } from "@/lib/objExport";
 import { useEditorNotice } from "@/components/workplane/useEditorNotice";
@@ -437,7 +442,7 @@ declare global {
     /** "Hide workplane" in the camera bar for MCP: sets it when given, returns whether the plate is shown. */
     layerlingWorkplaneDisplay?: (visible?: boolean) => { visible: boolean };
     /** The tape measure's measurements for MCP: shows or hides them when asked, returns what is there (#881). */
-    layerlingMeasurements?: (request?: { visible?: boolean; dimensions?: boolean }) => { visible: boolean; dimensions: boolean; measurements: Array<{ id: string; length: number }> };
+    layerlingMeasurements?: (request?: TapeMeasurementsRequest) => TapeMeasurementsAnswer;
     /** The four saved views (keys 7, 8, 9, 0) for MCP: saves or shows one when asked, returns which keys hold a view. */
     layerlingSavedViews?: (request?: { save?: number; show?: number; startView?: "save" | "reset"; ontoWorkplane?: boolean }) => { keys: { key: string; saved: boolean }[]; shown?: boolean; startView: boolean };
   }
@@ -6412,7 +6417,8 @@ export function LayerlingEditor({
         void placeSbcBoardRef.current?.(point, onFace);
         return;
       }
-      const shape = makeShapeFromAsset(asset, undefined, workspaceSettingsRef.current.shapeCustomizations[asset.kind]);
+      // The saved defaults of the kind, and where they say nothing, the printer's play (printerPlay.ts).
+      const shape = makeShapeFromAsset(asset, undefined, withPrinterPlay(asset.kind, workspaceSettingsRef.current.shapeCustomizations[asset.kind], getPrinterPlay()));
       // Dropped on a body's face, the shape lies on that face; otherwise on the current workplane.
       const workplane = onFace ?? placementWorkplane;
       const nextShape = prepareNewShape(asset, {
@@ -8505,7 +8511,8 @@ export function LayerlingEditor({
     };
     const targets = (only ?? selectedShapes).filter((shape) => !isNonSolidShape(shape));
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
-    const options = normalizeLidOptions(given);
+    // What is not given starts from the printer's play where it follows it, as the panel does.
+    const options = normalizeLidOptions(given, lidDefaults(getPrinterPlay()));
     // The pockets, the hinge's knuckles, the click bumps' dimples and a finger notch go into the body, so it must be free
     // to change and one body.
     const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch";
@@ -8573,7 +8580,8 @@ export function LayerlingEditor({
     }
     if (edgeModifier) invalidateCadModifierSession();
     closeSplit();
-    setLidTool({ ...LID_DEFAULTS, targetIds: targets.map((shape) => shape.id), busy: false, error: null });
+    // The gap and the hinge pin's play start from the printer's play when it is measured (printerPlay.ts).
+    setLidTool({ ...lidDefaults(getPrinterPlay()), targetIds: targets.map((shape) => shape.id), busy: false, error: null });
   }, [closeSplit, edgeModifier, invalidateCadModifierSession, lidTool, selectedShapes]);
 
   const applyLidTool = useCallback(() => {
@@ -10296,7 +10304,7 @@ export function LayerlingEditor({
       setNotice(t("clearance.nothing"));
       return;
     }
-    const settings = readClearanceSettings();
+    const settings = readClearanceSettings(getPrinterPlay());
     setClearanceTool({ settings, result: null, running: true, error: null, checked: null, scopeIds: null, activeRow: null, request: 0 });
     void runClearanceCheck(settings);
   }, [clearanceTool, closeClearanceCheck, otherToolPanelOpen, runClearanceCheck, selectedShapes, shapes]);
@@ -10305,7 +10313,8 @@ export function LayerlingEditor({
   const changeClearanceSettings = useCallback((patch: Partial<ClearanceSettings>) => {
     if (!clearanceTool) return;
     const settings = { ...clearanceTool.settings, ...patch };
-    writeClearanceSettings(settings);
+    // Only what was changed is kept: a minimum gap never set by hand goes on following the printer's play.
+    writeClearanceSettings(patch);
     if (settings.splitParts !== clearanceTool.settings.splitParts) {
       void runClearanceCheck(settings);
       return;
@@ -10802,6 +10811,7 @@ export function LayerlingEditor({
    * A group built again from these parts, as Done builds an opened one: the same group, not a new one - its id stays,
    * so anything holding it (MCP, the object list, the level around it) still finds it, with its name, see-through,
    * hidden, solid or hole, its own colour and its pivot (#807). Adding to or taking from it in the list does the same (#1338).
+   * It also keeps what it does with its parts when it is resized (Discussion #526).
    */
   const rebuildGroupFromParts = useCallback(async (original: WorkplaneShape, parts: WorkplaneShape[]): Promise<{ group: WorkplaneShape; mergeWarning: string } | { group: null; failure: string }> => {
     const operation = original.groupOperation === "intersection" || original.groupOperation === "hull" || original.groupOperation === "bundle" || original.groupOperation === "loft" ? original.groupOperation : "group";
@@ -10828,6 +10838,7 @@ export function LayerlingEditor({
       color: ownColour ? original.color : rebuilt.color,
       transparent: original.transparent,
       hidden: original.hidden,
+      groupResize: original.groupResize,
       // Multicolor switched on or off stays so after Done; a group cut into one body lost it and turned one colour (#1323).
       ...(typeof original.multicolor === "boolean" ? { multicolor: original.multicolor } : {}),
     }, Boolean(original.hole))));
@@ -11002,6 +11013,71 @@ export function LayerlingEditor({
       setOpenGroupBusy(false);
     }
   }, [commitGroupPartsStep, groupPartsStepRefused, rebuildGroupFromParts, refuseOpenGroupStep]);
+
+  /**
+   * A group set to keep its holes and small parts (Discussion #526) is built again from its parts once it has been
+   * resized - by the handles, the size fields, Scale in percent or MCP - with each part laid out by its rule
+   * (keptPartsForResize) and built as Done builds an opened group. While the handles are dragged it stretches as
+   * every group does; the rebuild finishes the step that resized it, so one Undo takes both back. The groups found
+   * the same way at once share one run, so MCP can wait for the run the editor starts for the same step.
+   */
+  const keptPartsRunsRef = useRef(new Map<string, Promise<void>>());
+  const rebuildKeepingParts = useCallback((groups: readonly WorkplaneShape[]): Promise<void> => {
+    const key = groups.map((group) => [group.id, shapeWidth(group), group.height, shapeDepth(group), group.groupedBaseWidth, group.groupedBaseHeight, group.groupedBaseDepth].join(":")).join("|");
+    const running = keptPartsRunsRef.current.get(key);
+    if (running) return running;
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const run = (async () => {
+      // A drag writes its step just after it ends: the rebuild finishes that step, not the one before it.
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      const replacements = new Map<string, WorkplaneShape>();
+      let failure = "";
+      let mergeWarning = "";
+      let shrunkName = "";
+      let shrunkCount = 0;
+      for (const group of groups) {
+        const kept = keptPartsForResize(group);
+        const result = await rebuildGroupFromParts(group, kept.parts);
+        if (!result.group) {
+          failure = result.failure;
+          continue;
+        }
+        replacements.set(group.id, placeKeptPartsGroup(result.group, group));
+        mergeWarning ||= result.mergeWarning;
+        if (kept.shrunk > 0) shrunkName ||= displayShapeName(group);
+        shrunkCount += kept.shrunk;
+      }
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return;
+      // A group that could not be built again stays stretched, and the notice says why.
+      const message = failure || mergeWarning || (shrunkCount > 0 ? t("status.groupPartsShrunk", { name: shrunkName, count: shrunkCount }) : "");
+      if (replacements.size === 0) {
+        if (message) setNotice(message);
+        return;
+      }
+      commitShapes(shapesRef.current.map((shape) => replacements.get(shape.id) ?? shape), selectedIdsRef.current, message || undefined, undefined, true);
+    })().finally(() => keptPartsRunsRef.current.delete(key));
+    keptPartsRunsRef.current.set(key, run);
+    return run;
+  }, [commitShapes, rebuildGroupFromParts]);
+
+  // The design as the last finished step left it, by id: a group in it at another size has just been resized, one
+  // that comes in new (a copy, an ungrouped part, another design) is left as it is. So is everything Undo brings back:
+  // only a step at the end of the history is finished, as a rebuild in the middle would cut off the steps to redo.
+  const keptPartsSeenRef = useRef<{ projectId: string | null | undefined; shapes: Map<string, WorkplaneShape> }>({ projectId: undefined, shapes: new Map() });
+  useEffect(() => {
+    if (historyViewState || projectInteractionActive || projectInteractionActiveRef.current) return;
+    const seen = keptPartsSeenRef.current;
+    const projectId = projectInfoRef.current.projectId;
+    const before = seen.projectId === projectId ? seen.shapes : new Map<string, WorkplaneShape>();
+    keptPartsSeenRef.current = { projectId, shapes: new Map(shapes.map((shape) => [shape.id, shape])) };
+    if (historyIndexRef.current !== historyRef.current.length - 1) return;
+    // A mirrored or tapered group set to keep its parts stretches everything instead, and says so.
+    const stretched = groupsStretchedInstead(before, shapes);
+    if (stretched.length) setNotice(t("status.groupStretchedInstead", { name: displayShapeName(stretched[0]) }));
+    const pending = groupsToKeepParts(before, shapes);
+    if (pending.length) void rebuildKeepingParts(pending);
+  }, [historyViewState, projectInteractionActive, rebuildKeepingParts, shapes]);
 
   // Undo past an opening brings that group back, and deleting every part leaves
   // nothing to close: in both cases that level is over, with every level inside it.
@@ -11460,6 +11536,30 @@ export function LayerlingEditor({
     }
   }, [commitShapes, setNotice]);
   placeSbcBoardRef.current = placeSbcBoard;
+
+  /**
+   * The fit test (fitTest.ts) that measures the printer's play: on the plate new shapes land on, in front of what stands
+   * there already when its middle is taken, selected. The settings window's button and the MCP tool place it; it returns
+   * the new bundle, or why it could not be made, as the notice says it.
+   */
+  const placeFitTest = useCallback(async (): Promise<{ shape: WorkplaneShape } | { error: string }> => {
+    setNotice(t("fitTest.building"), true);
+    try {
+      const built = await fitTestShape(workspaceSettingsRef.current.booleanTriangleLimit);
+      // Always on the plate, never on a face the workplane was set on: it is printed as it lies.
+      const base = horizontalPlacementWorkplane();
+      const origin = buildPlates.newShapeOrigin(base);
+      const taken = shapesRef.current.filter((shape) => !shape.hidden && !isNonSolidShape(shape)).map((shape) => meshAabb(shape));
+      const spot = fitTestSpot({ width: built.width, depth: built.depth }, origin, taken);
+      const shape = canonicalizeShape({ ...built, ...placementPatchForNewShape(built, base, { ...origin, x: spot.x, z: spot.z }) });
+      commitShapes([...shapesRef.current, shape], [shape.id], t("status.fitTestAdded"));
+      return { shape };
+    } catch (error) {
+      const message = error instanceof Error ? localizedError(error.message) : t("fitTest.failed");
+      setNotice(message, true);
+      return { error: message };
+    }
+  }, [buildPlates, commitShapes, setNotice]);
 
   /** The SBC board card: another board, clearance or reach, made again where the selected board stands. */
   const regenerateSelectedSbcBoard = useCallback(async (settings: SbcBoardSettings) => {
@@ -12004,11 +12104,12 @@ export function LayerlingEditor({
           // `makeShapeFromAsset` genau so, wie es beim Ziehen auf die Ebene
           // geschieht: Ein Gewinde bekommt den Platzbedarf seines Durchmessers,
           // ein Zahnrad seine Zaehne, ein Zylinder seine offene Seitenzahl.
+          // A clearance not asked for starts from the printer's play, as in the editor (printerPlay.ts).
           shape = makeShapeFromAsset(
             { ...asset, name, color },
             { x, z, elevation },
             {
-              ...mcpShapeCustomization(
+              ...withPrinterPlay(asset.kind, mcpShapeCustomization(
                 asset.kind,
                 portPreset ? { cornerFillet: portPreset.corner, portProfile: portPreset.profile, ...shapeParams }
                   : washer ? { bevel: washer.bevel, ...shapeParams }
@@ -12019,7 +12120,7 @@ export function LayerlingEditor({
                     ...shapeParams,
                   }
                   : shapeParams,
-              ),
+              ), getPrinterPlay()),
               width: requestedWidth,
               depth: requestedDepth,
               height: requestedHeight,
@@ -12199,6 +12300,12 @@ export function LayerlingEditor({
         if (typeof params.hidden === "boolean") patch.hidden = params.hidden;
         if (typeof params.transparent === "boolean") patch.transparent = params.transparent || undefined;
         if (typeof params.multicolor === "boolean") patch.multicolor = params.multicolor;
+        // What the group does with its parts when it is resized (Discussion #526).
+        if (params.groupResize !== undefined) {
+          if (params.groupResize !== "stretch" && params.groupResize !== "keepParts") throw new Error("groupResize must be stretch or keepParts");
+          if (!offersGroupResize(target)) throw new Error("groupResize is for groups and bundles only, not for hulls, intersections, lofts, tags, QR codes or boards");
+          patch.groupResize = normalizeGroupResize(params.groupResize);
+        }
         // A filleted tube is a mesh, which the shape's own settings below do not cover; its bore still can cut (#1067).
         if (typeof params.tubeBoreHole === "boolean" && tubeBeforeEdgeTreatments(target)) patch.tubeBoreHole = params.tubeBoreHole;
         if (typeof params.font === "string") patch.font = mcpTextFont(params.font) ?? params.font;
@@ -12352,6 +12459,12 @@ export function LayerlingEditor({
         let updated = nextShapes.find((shape) => shape.id === target.id) as WorkplaneShape;
         if (params.gridfinityKeys === true && gridfinitySwallowtailKeyCount({ ...updated, depth: shapeDepth(updated) }) === 0) throw new Error(MCP_GRIDFINITY_KEYS_NEEDS);
         commitShapes(nextShapes, target.id, t("status.shapeUpdatedMcp", { name: displayShapeName(updated) }));
+        // A group that keeps its holes and small parts is built again at its new size (#526); the answer waits for it.
+        const keepingParts = groupsToKeepParts(new Map([[target.id, target]]), [updated]);
+        if (keepingParts.length) {
+          await rebuildKeepingParts(keepingParts);
+          updated = findShape(target.id) ?? updated;
+        }
         // The fill of an extruded sketch (#197): built again from its sketch, as the inspector does.
         const fillProfile = updated.sketchProfile && updated.sketchOperation !== "revolve" && updated.sketchOperation !== "sweep"
           ? mcpSketchFillProfile(updated.sketchProfile, params)
@@ -12485,8 +12598,12 @@ export function LayerlingEditor({
         const percent = typeof params.percent === "number" ? params.percent : Number.NaN;
         const mode = params.mode === "each" ? "each" : "together";
         if (ids.length === 0) throw new Error("scale_objects needs ids or a selection");
+        const unscaled = new Map(currentShapes().map((shape) => [shape.id, shape]));
         const result = scaleSelectionByPercent(ids, percent, mode);
         if (!result.ok) throw new Error(result.message);
+        // Groups that keep their holes and small parts are built again at their new size (#526) before the answer.
+        const keepingParts = groupsToKeepParts(unscaled, currentShapes());
+        if (keepingParts.length) await rebuildKeepingParts(keepingParts);
         const scaled = new Set(ids);
         return {
           percent,
@@ -13094,6 +13211,8 @@ export function LayerlingEditor({
         }
         const upReach = params.upReach;
         if (upReach !== undefined && (typeof upReach !== "number" || !Number.isFinite(upReach) || upReach < MIN_SBC_UP_REACH || upReach > MAX_SBC_UP_REACH)) throw new Error(`upReach must be ${MIN_SBC_UP_REACH} to ${MAX_SBC_UP_REACH} mm`);
+        const buttonReach = params.buttonReach;
+        if (buttonReach !== undefined && (typeof buttonReach !== "number" || !Number.isFinite(buttonReach) || buttonReach < 0 || buttonReach > MAX_SBC_BUTTON_REACH)) throw new Error(`buttonReach must be 0 to ${MAX_SBC_BUTTON_REACH} mm`);
         for (const axis of ["x", "z"] as const) {
           if (params[axis] !== undefined && (typeof params[axis] !== "number" || !Number.isFinite(params[axis]))) throw new Error(`${axis} must be a number`);
         }
@@ -13105,6 +13224,7 @@ export function LayerlingEditor({
           ...(params.ribbonSide === true ? { ribbonSide: true } : {}),
           ...(params.gpioUp === true ? { gpioUp: true } : {}),
           ...(typeof upReach === "number" ? { upReach } : {}),
+          ...(typeof buttonReach === "number" && buttonReach > 0 ? { buttonReach } : {}),
         }, workspaceSettingsRef.current.booleanTriangleLimit);
         const shape = canonicalizeShape({
           ...built,
@@ -13115,6 +13235,49 @@ export function LayerlingEditor({
         });
         commitShapes([...currentShapes(), shape], shape.id, t("status.sbcBoardAdded", { name: shape.name }));
         return { object: mcpShapeSummary(shape) };
+      }
+
+      if (command.action === "printer_play") {
+        // The printer's play as the settings window keeps it (printerPlay.ts): read, set or forgotten, and the fit test
+        // that measures it placed as the window's button places it.
+        for (const key of ["clear", "makeFitTest"] as const) {
+          if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
+        }
+        if (params.play !== undefined) {
+          if (params.clear === true) throw new Error("Pass play or clear, not both");
+          const play = typeof params.play === "number" && params.play <= MAX_PRINTER_PLAY ? normalizePrinterPlay(params.play) : null;
+          if (play === null) throw new Error(`play must be a number from ${MIN_PRINTER_PLAY} to ${MAX_PRINTER_PLAY} (mm per side)`);
+          setPrinterPlay(play);
+        } else if (params.clear === true) {
+          setPrinterPlay(null);
+        }
+        let fitTest: Record<string, unknown> | null = null;
+        if (params.makeFitTest === true) {
+          const made = await placeFitTest();
+          if ("error" in made) throw new Error(made.error);
+          const placed = made.shape;
+          const [plate, pin] = placed.groupedShapes ?? [];
+          fitTest = {
+            object: mcpShapeSummary(placed),
+            plateId: plate?.id ?? null,
+            pinId: pin?.id ?? null,
+            pinDiameter: FIT_TEST_PIN_DIAMETER,
+            holes: fitTestHoles().map(({ clearance, diameter, label }) => ({ clearance, diameter, label })),
+          };
+        }
+        const play = getPrinterPlay();
+        return {
+          play,
+          measured: play !== null,
+          testedValues: [...FIT_TEST_CLEARANCES],
+          settings: PRINTER_PLAY_SETTINGS.map((setting) => ({
+            setting: setting.id,
+            takes: setting.takes ?? "own",
+            startsAt: printerPlayStart(setting.id, play),
+          })),
+          ...(fitTest ? { fitTest } : {}),
+          note: "play is per side in mm, kept in this browser; null means not measured. New uses of the settings with takes perSide start from it, those with total from twice it (startsAt, before each tool holds it within its own field); takes own keeps its built-in start. Shapes already in a design never change.",
+        };
       }
 
       if (command.action === "layer_icon") {
@@ -14098,7 +14261,8 @@ export function LayerlingEditor({
           if (value !== undefined && !(typeof value === "number" && value >= min && value <= max)) throw new Error(`${key} must be a number from ${min} to ${max}`);
         }
         if (params.splitParts !== undefined && typeof params.splitParts !== "boolean") throw new Error("splitParts must be true or false");
-        const options = normalizeClearanceOptions({ threshold: params.threshold as number | undefined, splitParts: params.splitParts as boolean | undefined, searchLength: params.searchLength as number | undefined });
+        // Without a threshold the check starts as the panel does with none chosen: from the printer's play when it is set.
+        const options = normalizeClearanceOptions({ threshold: (params.threshold as number | undefined) ?? clearanceStartThreshold(getPrinterPlay()), splitParts: params.splitParts as boolean | undefined, searchLength: params.searchLength as number | undefined });
         if (!clearanceSourceShapes(source).length) throw new Error("Nothing to check: no visible solid body");
         const result = await checkClearanceOffThread(source, options);
         const mm = (value: number) => Number(value.toFixed(3));
@@ -14186,9 +14350,18 @@ export function LayerlingEditor({
         if (!window.layerlingMeasurements) throw new Error("The tape measure is not available in this editor (a sketch is open, or the second view)");
         if (params.visible !== undefined && typeof params.visible !== "boolean") throw new Error("visible must be true or false");
         if (params.dimensions !== undefined && typeof params.dimensions !== "boolean") throw new Error("dimensions must be true or false");
+        // A length typed for a measurement moves a body (Discussion #610), which the history view does not allow.
+        const typesLength = params.id !== undefined || params.length !== undefined || params.axis !== undefined;
+        if (typesLength) {
+          if (historyViewStateRef.current) throw new Error("The history view is open. Close it with layerling_set_history_view (open: false) before changing the design.");
+          if (typeof params.id !== "string" || !params.id) throw new Error("id must be the id of a measurement, as layerling_measurements lists them");
+          if (typeof params.length !== "number" || !Number.isFinite(params.length)) throw new Error("length must be a number of millimetres");
+          if (params.axis !== undefined && params.axis !== "x" && params.axis !== "y" && params.axis !== "z") throw new Error('axis must be "x", "y" or "z"');
+        }
         return window.layerlingMeasurements({
           ...(typeof params.visible === "boolean" ? { visible: params.visible } : {}),
           ...(typeof params.dimensions === "boolean" ? { dimensions: params.dimensions } : {}),
+          ...(typesLength ? { typeLength: { id: params.id as string, length: params.length as number, ...(params.axis ? { axis: params.axis as "x" | "y" | "z" } : {}) } } : {}),
         });
       }
 
@@ -14689,6 +14862,7 @@ export function LayerlingEditor({
       throw error;
     }
   }, [
+    placeFitTest,
     alignSizeLimit,
     buildSectionSvg,
     sectionSketchAt,
@@ -14706,6 +14880,7 @@ export function LayerlingEditor({
     moveShapeInList,
     addShapesToGroup,
     takePartOutOfGroup,
+    rebuildKeepingParts,
     finishOpenGroup,
     initialSnap,
     openGroupForEditing,
@@ -17075,6 +17250,7 @@ export function LayerlingEditor({
           onCancelCruise={stopCruise}
           onAddShape={addShape}
           onDropMyShape={(id, point) => void insertMyShape(id, point).catch(noticeError)}
+          onMakeFitTest={() => void placeFitTest()}
           onAlignAnchorChange={chooseAlignAnchor}
           onAlignPreview={previewAlignSelection}
           onAlignPreviewClear={clearAlignPreview}

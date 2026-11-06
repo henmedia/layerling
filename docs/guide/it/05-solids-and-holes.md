@@ -39,6 +39,17 @@ Anche un intero gruppo può essere solido o foro. Si applica una regola semplice
 - Se il gruppo contiene solo solidi (o solo fori), puoi cambiare lo stato dell’intero gruppo e tutte le sue parti lo seguono.
 - Se contiene sia solidi sia fori, come un cubo con un foro passante, ogni parte mantiene il proprio stato. L’intero gruppo diventa uno strumento di sottrazione, ma il foro resta un foro.
 
+### Ridimensionare un gruppo: mantenere fori e parti piccole
+
+Quando un gruppo diventa più lungo, più largo o più alto, le sue parti si allungano con lui come se fossero disegnate sulla gomma: i fori rotondi di una piastra diventano ovali e si spostano verso l'interno. Per lasciarli come sono, scegli {{ui:inspector.groupResizeKeepParts}} in {{ui:inspector.groupResize}} nelle impostazioni del gruppo; {{ui:inspector.groupResizeStretch}} è ciò che fa ogni gruppo finché non lo cambi. Da quel momento, ogni volta che il gruppo cambia dimensione - con le maniglie, nei campi delle misure o con {{ui:scalePercent.title}} - viene ricostruito dalle sue parti secondo un'unica regola, direzione per direzione:
+
+- Una parte che attraversa quasi tutto il gruppo, nove decimi o più, cresce o si riduce con esso e mantiene la distanza da entrambi i lati: la piastra stessa, una parete o l'interno di una scatola, le cui pareti restano spesse come prima.
+- Ogni altra parte mantiene la propria dimensione e la distanza dal lato più vicino. Una parte al centro resta al centro.
+
+Una piastra con un foro a 5 mm da ogni angolo e un'asola al centro, allungata di 40 mm, mantiene quindi i fori rotondi e a 5 mm dagli angoli, e l'asola al centro. Dietro non c'è alcun risolutore di vincoli e non c'è niente da impostare parte per parte: la stessa regola vale per tutte le parti, così sai in anticipo cosa succederà. Una parte ruotata conta con il riquadro che occupa nel gruppo e resta ruotata; un gruppo dentro il gruppo conta come una sola parte. Mentre trascini una maniglia, il gruppo si allunga tutto intero; quando la rilasci, viene ricostruito, nello stesso passo di annullamento. Se il gruppo diventa più piccolo di quanto serve a una parte con la sua distanza, quella parte si riduce con esso come prima, e un messaggio lo segnala. Un gruppo specchiato, rastremato o ritorto, o con raccordi, smussi o una texture propri, allunga sempre tutto. Scelta per un gruppo già allungato, l'impostazione ridispone subito le sue parti.
+
+![Una piastra con un foro a 5 mm da ogni angolo e un'asola al centro, allungata di 40 mm con «Mantieni fori e parti piccole»: i fori sono ancora rotondi e a 5 mm dagli angoli, l'asola è ancora al centro.](shot:group-keep-parts)
+
 ## Creare un insieme
 
 A volte vuoi tenere insieme più parti senza fonderle, per esempio un logo bianco su una piastra nera per una stampa multicolore. A questo serve {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), come in Tinkercad. Un insieme si sposta, ruota e ridimensiona come una forma, ma le sue parti non vengono unite:

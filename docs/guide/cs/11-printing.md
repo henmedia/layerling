@@ -52,6 +52,14 @@ Mezní úhel nastavíte v části {{ui:workspace.appearance}}, od 30° pro opatr
 - Mezi vzájemně zasouvanými díly je potřeba vůle, obvykle 0,2 až 0,4 mm podle tiskárny. Před velkým výtiskem zkuste malý zkušební pár.
 - Spodní hranu položenou na podložce lze lehce zkosit, aby první vrstva nepřesahovala do stran, tedy nevznikala „sloní noha“.
 
+## Vůle vaší tiskárny: test vůle
+
+Každá tiskárna tiskne otvory o něco menší a čepy o něco silnější, než jsou nakreslené, každá o jinou hodnotu. Vůle, kterou dva vytištěné díly potřebují, je proto zpočátku odhad. Změřte ji raději jednou: v nastavení v části {{ui:workspace.workplane}} položí {{ui:workspace.fitTestMake}} na podložku test vůle. Je to destička 60 × 20 × 4 mm se sedmi otvory pro jeden čep 5 mm, každý nakreslený jako 5 mm plus dvakrát 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 nebo 0,40 mm, s vystouplou hodnotou vedle, a k tomu samotný čep 5 mm, který stojí vedle destičky a nahoře má malé sražení. Skládá se z běžných tvarů, takže se tiskne se zbytkem podložky, bez podpěr.
+
+Vytiskněte ho tak, jak leží, a pak zasouvejte čep sraženým koncem napřed do otvorů, od nejužšího. **Nejužší otvor, ve kterém se čep ještě otáčí,** udává vůli vaší tiskárny. Zadejte jeho číslo do pole {{ui:workspace.printerPlay}} nebo ho klikněte mezi hodnotami pod polem. Vůle platí na stranu, v milimetrech, a prohlížeč si ji pamatuje pro všechny projekty; prázdné pole znamená neměřeno.
+
+Od té chvíle začínají nová použití s vůlí místo vestavěné hodnoty: {{ui:lid.gap}} a {{ui:lid.hingePinPlay}} v nástroji {{ui:editor.tool.lid}}, vůle nových tvarů {{ui:shape.dovetail}} a {{ui:shape.snapFit}}, {{ui:prop.clearance}} nové matice nebo závitového otvoru – dvojnásobek vůle, protože jde o místo přes celý průměr – a {{ui:clearance.threshold}} v nástroji {{ui:editor.tool.clearance}}. Dokud takové pole tuto hodnotu drží, říká „{{ui:printerPlay.fromFitTest}}“ vedle něj, odkud číslo pochází. Pant tištěný vcelku a klouby nástroje {{ui:editor.tool.flexi}} si nechávají svých 0,4 mm: při tisku v jednom kuse musí jejich mezery zůstat otevřené i mezi vrstvami, a to čep vytištěný zvlášť neměří. Místo pro zalisování magnetu nebo klíče Gridfinity a místo pro koupenou zásuvku či desku si také nechávají své vlastní hodnoty. Tělesa, která už v projektu jsou, se nikdy nezmění, a stejně tak projekt, který otevřete.
+
 ## Kontrola tisku
 
 {{ui:editor.tool.printCheck}} vedle {{ui:editor.tool.clearance}} ve skupině {{ui:editor.group.combine}} projde vybrané objekty, nebo všechny viditelné, když není nic vybráno, a v jednom okně řekne, co by se při tisku pokazilo. Každý z pěti řádků je zelený, když nic nenašel, a oranžový s tím, co a kde, když ano:
