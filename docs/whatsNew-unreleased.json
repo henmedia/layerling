@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Lochmuster rund um einen Zylinder",
+      "en": "Hole patterns round a cylinder"
+    },
+    "body": {
+      "de": "Das Lochmuster nimmt jetzt auch die runde Wand eines Zylinders, Rohrs oder einer Bohrung: Wand anklicken, und die Löcher gehen in Reihen ganz herum, jedes zeigt auf die Achse. Gut für Stiftebecher, Lampenschirme und Rohre mit Lüftung. „Durch die Wand“ schneidet nur die angeklickte Wand.",
+      "en": "The hole pattern now also takes the round wall of a cylinder, tube or bore: click the wall, and the holes go all the way round in rows, each pointing at the axis. Good for pen holders, lamp shades and tubes with vents. \"Through the wall\" cuts only the wall you clicked."
+    }
+  },
+  {
+    "title": {
       "de": "Neue Entwürfe mit Winkellineal im Nullpunkt",
       "en": "New designs with a framing square at the origin"
     },

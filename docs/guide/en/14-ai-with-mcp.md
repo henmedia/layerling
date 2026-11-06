@@ -98,7 +98,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_scale_objects` | scales objects by a percentage, together or each in place |
 | `layerling_lay_flat` | lays an object with one face on the plate |
 | `layerling_place_on_face` | sets objects down on a face of another, sloped ones too, like the C key |
-| `layerling_perforate_face` | cuts a hole pattern into a flat face; the holes stay as holes grouped with the body |
+| `layerling_perforate_face` | cuts a hole pattern into a flat face or round the wall of a cylinder, tube or bore; the holes stay as holes grouped with the body |
 | `layerling_sweep_sketch` | pulls a rectangular or round cross-section along a path of points as one exact body; a closed path makes a ring |
 | `layerling_push_face` | pushes a flat face out or cuts a pocket into it, with an inset from the edge and a corner radius; the new part is a sketch body grouped with the body, or a free body of its own with `separate` |
 | `layerling_mate_faces` | brings a face of one object against a face of another, face to face or flush, or puts two round faces on one axis |

@@ -98,7 +98,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet |
 | `layerling_lay_flat` | lægger et objekt med én flade på pladen |
 | `layerling_place_on_face` | sætter objekter ned på en flade af en anden, også skrå, som C-tasten |
-| `layerling_perforate_face` | skærer et hulmønster ind i en flad flade; hullerne bliver som huller grupperet med formen |
+| `layerling_perforate_face` | skærer et hulmønster ind i en flad flade eller rundt om væggen på en cylinder, et rør eller en boring; hullerne bliver som huller grupperet med formen |
 | `layerling_sweep_sketch` | trækker et rektangulært eller rundt tværsnit langs en sti af punkter som ét eksakt legeme; en lukket sti giver en ring |
 | `layerling_push_face` | skubber en flad flade ud eller skærer en lomme ind i den, med en indrykning fra kanten og en hjørneradius; den nye del er en skitseform grupperet med formen, eller et frit legeme for sig med `separate` |
 | `layerling_mate_faces` | bringer en flade på et objekt mod en flade på et andet, flade mod flade eller flugtende, eller lægger to runde flader på én akse |

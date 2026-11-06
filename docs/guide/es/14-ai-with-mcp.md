@@ -98,7 +98,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_scale_objects` | escala objetos en un porcentaje, juntos o cada uno en su sitio |
 | `layerling_lay_flat` | apoya un objeto sobre la placa por una de sus caras |
 | `layerling_place_on_face` | posa objetos sobre una cara de otro, aunque esté inclinada, como la tecla C |
-| `layerling_perforate_face` | corta un patrón de orificios en una cara plana; los orificios se quedan como orificios agrupados con el cuerpo |
+| `layerling_perforate_face` | corta un patrón de orificios en una cara plana o alrededor de la pared de un cilindro, un tubo o un taladro; los orificios se quedan como orificios agrupados con el cuerpo |
 | `layerling_sweep_sketch` | hace un barrido de una sección rectangular o redonda a lo largo de una trayectoria de puntos, como un único cuerpo exacto; una trayectoria cerrada da un anillo |
 | `layerling_push_face` | empuja hacia fuera una cara plana o abre un hueco en ella, con un desfase hacia dentro desde la arista y un radio de esquina; la parte nueva es un cuerpo de boceto agrupado con el cuerpo, o un cuerpo independiente con `separate` |
 | `layerling_mate_faces` | lleva una cara de un objeto contra una cara de otro, cara contra cara o a ras, o pone dos caras redondas en un mismo eje |

@@ -378,37 +378,17 @@ export type HolePatternResult = {
  * wins. A staggered pattern shifts every second row by half a spacing and
  * packs the rows closer, so each hole has neighbours one spacing away.
  */
-export function holePatternCenters(outline: FaceOutline, settings: HolePatternSettings): HolePatternResult {
-  const empty: HolePatternResult = { centers: [], tooMany: false, rows: 0 };
-  const footprint = holeFootprintPolygon(settings);
-  const size = holeFootprintSize(settings);
-  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
-  const margin = Math.max(0, settings.margin);
-  const staggered = settings.arrangement === "staggered";
-  const pitchU = spacing;
-  const pitchV = holePatternRowSpacing(settings);
-
-  const loops = outline.loops.filter((loop) => loop.length >= 3);
-  if (loops.length === 0) return empty;
-  let minU = Infinity;
-  let maxU = -Infinity;
-  let minV = Infinity;
-  let maxV = -Infinity;
-  for (const loop of loops) {
-    for (const point of loop) {
-      minU = Math.min(minU, point.u);
-      maxU = Math.max(maxU, point.u);
-      minV = Math.min(minV, point.v);
-      maxV = Math.max(maxV, point.v);
-    }
-  }
-  const segments = loopSegments(loops);
-  const reach = Math.max(size.width, size.height) / 2 + margin;
-
-  const fits = (c: Point2) => {
-    if (!insideRegion(loops, c)) return false;
+/**
+ * Whether a hole of this outline, centred on a point, lies wholly inside the face and keeps the margin to its edges:
+ * `inside` says whether a point lies on the face, `segments` are its edges.
+ */
+function holeFitter(inside: (point: Point2) => boolean, segments: readonly Segment[], footprint: readonly Point2[], margin: number) {
+  let reach = margin;
+  for (const corner of footprint) reach = Math.max(reach, Math.hypot(corner.u, corner.v) + margin);
+  return (c: Point2) => {
+    if (!inside(c)) return false;
     for (const corner of footprint) {
-      if (!insideRegion(loops, { u: c.u + corner.u, v: c.v + corner.v })) return false;
+      if (!inside({ u: c.u + corner.u, v: c.v + corner.v })) return false;
     }
     const placed = footprint.map((corner) => ({ u: c.u + corner.u, v: c.v + corner.v }));
     for (const segment of segments) {
@@ -420,26 +400,24 @@ export function holePatternCenters(outline: FaceOutline, settings: HolePatternSe
     }
     return true;
   };
+}
 
-  if (settings.arrangement === "perimeter") {
-    const runtime = loadedManifoldRuntime();
-    if (!runtime) {
-      // The ring is laid on the edge set in by the kernel; the editor has it loaded long before a face is picked.
-      requestManifoldRuntime();
-      return empty;
-    }
-    const ring = perimeterRing(runtime, loops, settings);
-    if (ring.tooMany) return { ...empty, tooMany: true };
-    const centers = ring.centers.filter(fits);
-    return { centers, tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
-  }
-
-  const centerU = (minU + maxU) / 2;
-  const centerV = (minV + maxV) / 2;
-  const halfSpanU = Math.ceil((maxU - minU) / 2 / pitchU) + 1;
-  const halfSpanV = Math.ceil((maxV - minV) / 2 / pitchV) + 1;
-  if ((halfSpanU * 2 + 1) * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return { ...empty, tooMany: true };
-
+/**
+ * The best of the four ways to centre a lattice on a box of the face (on a hole or between holes, along each axis):
+ * the one that fits most holes. A staggered lattice shifts every second row by half a step.
+ */
+function bestLattice(
+  bounds: { minU: number; maxU: number; minV: number; maxV: number },
+  pitchU: number,
+  pitchV: number,
+  staggered: boolean,
+  fits: (c: Point2) => boolean,
+): { centers: Point2[]; rows: number } | null {
+  const centerU = (bounds.minU + bounds.maxU) / 2;
+  const centerV = (bounds.minV + bounds.maxV) / 2;
+  const halfSpanU = Math.ceil((bounds.maxU - bounds.minU) / 2 / pitchU) + 1;
+  const halfSpanV = Math.ceil((bounds.maxV - bounds.minV) / 2 / pitchV) + 1;
+  if ((halfSpanU * 2 + 1) * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return null;
   let best: Point2[] = [];
   let bestRows = 0;
   const offsets = [
@@ -466,9 +444,190 @@ export function holePatternCenters(outline: FaceOutline, settings: HolePatternSe
       bestRows = rowsUsed.size;
     }
   }
+  return { centers: best, rows: bestRows };
+}
 
-  if (best.length > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { centers: [], tooMany: true, rows: 0 };
-  return { centers: best, tooMany: false, rows: bestRows };
+export function holePatternCenters(outline: FaceOutline, settings: HolePatternSettings): HolePatternResult {
+  const empty: HolePatternResult = { centers: [], tooMany: false, rows: 0 };
+  const footprint = holeFootprintPolygon(settings);
+  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
+  const margin = Math.max(0, settings.margin);
+  const staggered = settings.arrangement === "staggered";
+  const pitchU = spacing;
+  const pitchV = holePatternRowSpacing(settings);
+
+  const loops = outline.loops.filter((loop) => loop.length >= 3);
+  if (loops.length === 0) return empty;
+  let minU = Infinity;
+  let maxU = -Infinity;
+  let minV = Infinity;
+  let maxV = -Infinity;
+  for (const loop of loops) {
+    for (const point of loop) {
+      minU = Math.min(minU, point.u);
+      maxU = Math.max(maxU, point.u);
+      minV = Math.min(minV, point.v);
+      maxV = Math.max(maxV, point.v);
+    }
+  }
+  const segments = loopSegments(loops);
+  const fits = holeFitter((point) => insideRegion(loops, point), segments, footprint, margin);
+
+  if (settings.arrangement === "perimeter") {
+    const runtime = loadedManifoldRuntime();
+    if (!runtime) {
+      // The ring is laid on the edge set in by the kernel; the editor has it loaded long before a face is picked.
+      requestManifoldRuntime();
+      return empty;
+    }
+    const ring = perimeterRing(runtime, loops, settings);
+    if (ring.tooMany) return { ...empty, tooMany: true };
+    const centers = ring.centers.filter(fits);
+    return { centers, tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
+  }
+
+  const lattice = bestLattice({ minU, maxU, minV, maxV }, pitchU, pitchV, staggered, fits);
+  if (!lattice) return { ...empty, tooMany: true };
+  if (lattice.centers.length > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { centers: [], tooMany: true, rows: 0 };
+  return { centers: lattice.centers, tooMany: false, rows: lattice.rows };
+}
+
+/**
+ * A round wall laid flat (#1393): the wall of a cylinder, a tube or a bore, `u` the way round it as a length on the
+ * face, `v` along its axis. A wall that goes all the way round wraps: `u` and `u + circumference` are one place.
+ */
+export type RoundWallOutline = {
+  /** The radius of the face. */
+  radius: number;
+  /** Once round the face, 2 pi times the radius. */
+  circumference: number;
+  /** The face goes all the way round, without an edge along its axis. */
+  closed: boolean;
+  /** The facets of the face laid flat, three corners each. */
+  triangles: Point2[][];
+  /** The edges of the face that border nothing of it: its rims and the edges of any openings. */
+  edges: [Point2, Point2][];
+};
+
+export type RoundWallResult = HolePatternResult & {
+  /** Round a closed wall: how many holes go round in a row, and the step between them that closes the ring. */
+  columns?: number;
+  spacing?: number;
+};
+
+/** How many slices of the way round a wall's facets are filed into, to find the facets under a point quickly. */
+const ROUND_WALL_BINS = 720;
+
+/**
+ * The centres of a hole pattern on a round wall (#1393), in the wall's flat frame. On a wall that goes all the way
+ * round, every row holds a whole number of holes evenly round it, never closer than the spacing asks, so the ring
+ * closes with no gap; the margin then holds only to the rims and to openings. A part of a wall (a rounded edge, a half
+ * cylinder) is filled like a flat face. A hole's room is measured round the wall as the straight hole meets it.
+ * Along the edge is a flat face's arrangement: on a wall it is laid out as a grid.
+ */
+export function roundWallCenters(wall: RoundWallOutline, settings: HolePatternSettings): RoundWallResult {
+  const empty: RoundWallResult = { centers: [], tooMany: false, rows: 0 };
+  const radius = wall.radius;
+  if (!(radius > 0) || wall.triangles.length === 0) return empty;
+  const margin = Math.max(0, settings.margin);
+  const staggered = settings.arrangement === "staggered";
+  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
+  const pitchV = holePatternRowSpacing({ ...settings, arrangement: staggered ? "staggered" : "grid" });
+  // A straight hole meets the wall further round than its half width: at the angle whose sine is that width over the radius.
+  const flat = holeFootprintPolygon(settings);
+  if (flat.some((corner) => Math.abs(corner.u) >= radius * 0.98)) return empty;
+  const footprint = flat.map((corner) => ({ u: radius * Math.asin(corner.u / radius), v: corner.v }));
+
+  const circumference = wall.circumference;
+  const shifts = wall.closed ? [-circumference, 0, circumference] : [0];
+  let minU = Infinity;
+  let maxU = -Infinity;
+  let minV = Infinity;
+  let maxV = -Infinity;
+  for (const triangle of wall.triangles) {
+    for (const point of triangle) {
+      minU = Math.min(minU, point.u);
+      maxU = Math.max(maxU, point.u);
+      minV = Math.min(minV, point.v);
+      maxV = Math.max(maxV, point.v);
+    }
+  }
+  // The facets filed by where they lie round the wall, with a copy one round before and after on a closed wall.
+  const binLow = minU - (wall.closed ? circumference : 0);
+  const binHigh = maxU + (wall.closed ? circumference : 0);
+  const binWidth = Math.max(EPSILON, (binHigh - binLow) / ROUND_WALL_BINS);
+  const bins: Point2[][][] = Array.from({ length: ROUND_WALL_BINS }, () => []);
+  const binOf = (u: number) => Math.min(ROUND_WALL_BINS - 1, Math.max(0, Math.floor((u - binLow) / binWidth)));
+  for (const triangle of wall.triangles) {
+    for (const shift of shifts) {
+      const moved = shift ? triangle.map((point) => ({ u: point.u + shift, v: point.v })) : triangle;
+      const low = binOf(Math.min(moved[0].u, moved[1].u, moved[2].u));
+      const high = binOf(Math.max(moved[0].u, moved[1].u, moved[2].u));
+      for (let bin = low; bin <= high; bin += 1) bins[bin].push(moved);
+    }
+  }
+  const inTriangle = (triangle: Point2[], point: Point2) => {
+    const [a, b, c] = triangle;
+    const d1 = (b.u - a.u) * (point.v - a.v) - (b.v - a.v) * (point.u - a.u);
+    const d2 = (c.u - b.u) * (point.v - b.v) - (c.v - b.v) * (point.u - b.u);
+    const d3 = (a.u - c.u) * (point.v - c.v) - (a.v - c.v) * (point.u - c.u);
+    const tolerance = 1e-9 * Math.max(1, radius * radius);
+    const negative = d1 < -tolerance || d2 < -tolerance || d3 < -tolerance;
+    const positive = d1 > tolerance || d2 > tolerance || d3 > tolerance;
+    return !(negative && positive);
+  };
+  const inside = (point: Point2) => {
+    if (point.u < binLow || point.u > binHigh) return false;
+    return bins[binOf(point.u)].some((triangle) => inTriangle(triangle, point));
+  };
+  const segments: Segment[] = [];
+  for (const [a, b] of wall.edges) {
+    for (const shift of shifts) {
+      const p = { u: a.u + shift, v: a.v };
+      const q = { u: b.u + shift, v: b.v };
+      segments.push({ a: p, b: q, minU: Math.min(p.u, q.u), maxU: Math.max(p.u, q.u), minV: Math.min(p.v, q.v), maxV: Math.max(p.v, q.v) });
+    }
+  }
+  const fits = holeFitter(inside, segments, footprint, margin);
+  const limit = settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES;
+
+  if (!wall.closed) {
+    const lattice = bestLattice({ minU, maxU, minV, maxV }, spacing, pitchV, staggered, fits);
+    if (!lattice) return { ...empty, tooMany: true };
+    if (lattice.centers.length > limit) return { ...empty, tooMany: true };
+    return { centers: lattice.centers, tooMany: false, rows: lattice.rows };
+  }
+
+  // All the way round: a whole number of holes per row, the step evened out upward so neighbours keep the spacing.
+  const columns = Math.max(1, Math.floor(circumference / spacing + 1e-9));
+  const pitchU = circumference / columns;
+  const halfSpanV = Math.ceil((maxV - minV) / 2 / pitchV) + 1;
+  if (columns * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return { ...empty, tooMany: true, columns, spacing: pitchU };
+  const centerV = (minV + maxV) / 2;
+  // Into the window of one round, centred on u = 0 where the wall was picked.
+  const wrap = (u: number) => ((((u + circumference / 2) % circumference) + circumference) % circumference) - circumference / 2;
+  let best: Point2[] = [];
+  let bestRows = 0;
+  for (const offset of [{ u: 0, v: 0 }, { u: 0, v: pitchV / 2 }, { u: pitchU / 2, v: 0 }, { u: pitchU / 2, v: pitchV / 2 }]) {
+    const found: Point2[] = [];
+    const rowsUsed = new Set<number>();
+    for (let row = -halfSpanV; row <= halfSpanV; row += 1) {
+      const shift = staggered && Math.abs(row) % 2 === 1 ? pitchU / 2 : 0;
+      for (let column = 0; column < columns; column += 1) {
+        const c = { u: wrap(offset.u + shift + column * pitchU), v: centerV + offset.v + row * pitchV };
+        if (fits(c)) {
+          found.push(c);
+          rowsUsed.add(row);
+        }
+      }
+    }
+    if (found.length > best.length) {
+      best = found;
+      bestRows = rowsUsed.size;
+    }
+  }
+  if (best.length > limit) return { ...empty, tooMany: true, columns, spacing: pitchU };
+  return { centers: best, tooMany: false, rows: bestRows, columns, spacing: pitchU };
 }
 
 function loopArea(loop: readonly Point2[]) {

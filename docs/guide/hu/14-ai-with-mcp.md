@@ -94,7 +94,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén |
 | `layerling_lay_flat` | egy objektumot az egyik lapjával a tárgyasztalra fektet |
 | `layerling_place_on_face` | objektumokat tesz le egy másik objektum lapjára, a ferdékre is, mint a C billentyű |
-| `layerling_perforate_face` | lyukmintát vág egy sík lapba; a lyukak a testtel csoportosított lyukak maradnak |
+| `layerling_perforate_face` | lyukmintát vág egy sík lapba vagy egy henger, cső vagy furat kerek falára körbe; a lyukak a testtel csoportosított lyukak maradnak |
 | `layerling_sweep_sketch` | téglalap vagy kör keresztmetszetet húz végig egy pontokból álló pályán egyetlen pontos testként; zárt pálya gyűrűt ad |
 | `layerling_push_face` | kihúz egy sík lapot, vagy zsebet vág bele, a lap szélétől mért távolsággal és sarokrádiusszal; az új rész a testtel csoportosított vázlattest |
 | `layerling_mate_faces` | egy objektum lapját egy másik lapjához illeszti, laptól lapig vagy egy síkba |

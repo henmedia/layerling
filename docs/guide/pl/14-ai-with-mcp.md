@@ -98,7 +98,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_scale_objects` | skaluje obiekty o procent, razem albo każdy w miejscu |
 | `layerling_lay_flat` | kładzie obiekt jedną ścianą na płycie |
 | `layerling_place_on_face` | odkłada obiekty na ścianę innego, także skośną, jak klawisz C |
-| `layerling_perforate_face` | wycina wzór otworów w płaskiej ścianie. Otwory zostają otworami zgrupowanymi z bryłą |
+| `layerling_perforate_face` | wycina wzór otworów w płaskiej ścianie albo dookoła ścianki walca, rury lub otworu. Otwory zostają otworami zgrupowanymi z bryłą |
 | `layerling_sweep_sketch` | prowadzi prostokątny albo okrągły przekrój wzdłuż ścieżki z punktów jako jedną dokładną bryłę. Zamknięta ścieżka daje pierścień |
 | `layerling_push_face` | wypycha płaską ścianę na zewnątrz albo wycina w niej kieszeń, z odsunięciem od krawędzi i promieniem narożników. Nowa część to bryła ze szkicu zgrupowana z bryłą albo, z `separate`, osobna wolna bryła |
 | `layerling_mate_faces` | przykłada ścianę jednego obiektu do ściany drugiego, ściana do ściany, na równo albo dwie okrągłe ściany na jednej osi |

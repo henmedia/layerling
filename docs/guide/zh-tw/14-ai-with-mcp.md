@@ -98,7 +98,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_scale_objects` | 依百分比縮放物件，可一起縮放，或各自在原位縮放 |
 | `layerling_lay_flat` | 讓物件以某個面平放在平台上 |
 | `layerling_place_on_face` | 把物件放到另一個物件的面上，斜面也可以，就像 C 鍵 |
-| `layerling_perforate_face` | 在平面上切出孔陣列；孔仍會以孔的形式與實體群組在一起 |
+| `layerling_perforate_face` | 在平面上或繞圓柱、圓管、孔的側壁切出孔陣列；孔仍會以孔的形式與實體群組在一起 |
 | `layerling_sweep_sketch` | 沿著由點構成的路徑，把矩形或圓形斷面掃掠成一個精確實體；封閉路徑會形成圓環 |
 | `layerling_push_face` | 把平面推出，或在其中挖出凹槽，可設定距邊緣的內縮與轉角半徑；新零件是與實體群組在一起的草圖實體 |
 | `layerling_mate_faces` | 把一個物件的面貼到另一個物件的面，可面對面或齊平 |
