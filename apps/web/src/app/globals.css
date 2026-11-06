@@ -10754,6 +10754,16 @@ html[data-theme="dark"] .property-hint {
   cursor: pointer;
 }
 
+/* The pattern part's colour in the surface texture card: the colour card's own-colour pill, in the field's column. */
+.surface-pattern-color .custom-color {
+  grid-column: auto;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 6px;
+  width: 100%;
+  padding-right: 8px;
+  font-size: 12px;
+}
+
 .name-tag-swatch input {
   position: absolute;
   inset: 0;
