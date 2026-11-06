@@ -259,7 +259,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "welcome.moreHistoryBody": "projenin önceki herhangi bir durumuna hiçbir şeyi değiştirmeden bir kaydırıcıyla geri bak - o durumu dışa aktar, ondan yeni bir proje başlat veya tek tek nesneleri ondan geri getir.",
   "welcome.moreDrawingTitle": "Atölye için teknik çizim",
   "welcome.moreDrawingBody": "Dışa aktar → Teknik çizim: ISO kâğıdında 1:1 ön, üst ve yan görünüşler; genel ölçüler, gizli kenarlar ve yuvarlak deliklerin tablosuyla – PDF veya SVG olarak, yazdırmak veya torna ve frezeye götürmek için.",
-  "welcome.moreSearchBody": "Ctrl+K'ye bas ve bir aracın, şeklin veya komutun adını yazarak doğrudan ona git - İngilizce veya Almanca, yanında klavye kısayollarıyla. Tasarımındaki gövdeler de adlarıyla bulunur.",
+  "welcome.moreSearchBody": "Ctrl+K'ye bas ve bir aracın, şeklin veya komutun adını yazarak doğrudan ona git - İngilizce veya Almanca, yanında klavye kısayollarıyla. Tasarımındaki gövdeler de adlarıyla bulunur. Her biri kendi seçtiğin bir tuşa da atanabilir.",
   "welcome.moreHelpTitle": "Etkileşimli yardım",
   "welcome.moreHelpBody": "Shift+F1'e ya da soru işaretine bas, sonra herhangi bir düğmeye, alana veya pencereye tıkla: küçük bir pencere kılavuzun onunla ilgili bölümünü gösterir.",
   "welcome.morePointsBody": "bir gövdeye sağ tıklayıp merkezini, köşelerini veya kenar ortalarını basılmayan ve şekillerin yapıştığı noktalarla işaretle - sonra bir deliği tam olarak başka bir parçanın merkezine yerleştir.",

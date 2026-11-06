@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Eigene Tasten für jeden Befehl",
+      "en": "Your own keys for any command"
+    },
+    "body": {
+      "de": "Unter „Tastenkürzel“ legst du jeden Befehl der Befehlssuche auf eine eigene Taste: „Auf der Arbeitsebene zentrieren“ etwa auf Umschalt+C, die Formenauswahl auf G, deinen liebsten Zylinder auf eine weitere. Ist eine Taste schon belegt, sagt layerling, wofür.",
+      "en": "Under Keyboard shortcuts, put any command of the command search on a key of your own: Center on workplane on Shift+C, say, the shapes panel on G, your favourite cylinder on another. If a key is taken, layerling tells you what for."
+    }
+  },
+  {
+    "title": {
       "de": "Stützrippe für schräg gedruckte Teile",
       "en": "A support rib for parts printed tilted"
     },

@@ -9467,6 +9467,159 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-or {
   color: #787878;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom {
+  background: #f7f7f7;
+  border: 1px solid #e4e4e4;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-intro {
+  color: #595959;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-note {
+  color: #808080;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-elsewhere dt {
+  color: #808080;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-change,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-remove {
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-change:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-change:focus-visible {
+  border-color: #d46b08;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-remove {
+  color: #808080;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-remove:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-remove:focus-visible {
+  color: #9a2f14;
+  background: #ebebeb;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-add,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-reset,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-cancel {
+  color: #464646;
+  background: #ffffff;
+  border: 1px solid #cecece;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-add:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-reset:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-cancel:hover {
+  border-color: #d46b08;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-reset {
+  color: #565656;
+  background: transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-results button {
+  color: #4f4f4f;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-results button:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-results button:focus-visible {
+  background: #ebebeb;
+  border-color: #d8d8d8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-result-group {
+  color: #808080;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-results kbd {
+  color: #464646;
+  background: #f2f2f2;
+  border: 1px solid #cecece;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-record {
+  color: #464646;
+  background: #f2f2f2;
+  border: 1px dashed #d46b08;
+  outline: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-message {
+  color: #3d6b2f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .shortcuts-custom-message.error {
+  color: #9a2f14;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom {
+  background: #232323;
+  border-color: #343434;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-intro {
+  color: #b9b9b9;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-note,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-elsewhere dt,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-result-group {
+  color: #787878;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-add,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-cancel {
+  color: #e7e7e7;
+  background: #202020;
+  border-color: #3d3d3d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-reset {
+  color: #e0b48c;
+  border-color: #3d3d3d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-results button {
+  color: #b9b9b9;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-results button:hover,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-results button:focus-visible,
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-remove:hover {
+  background: #323232;
+  border-color: #3e3e3e;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-results kbd {
+  color: #e7e7e7;
+  background: #2a2a2a;
+  border-color: #535353;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-record {
+  color: #e7e7e7;
+  background: #2c2c2c;
+  border-color: #f6ad55;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-message {
+  color: #9ccc84;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .shortcuts-custom-message.error {
+  color: #f19a7c;
+}
+
 @media print {
   html:where([data-theme="dark"][data-palette="graphite"])[data-print-shortcuts],
   html:where([data-theme="dark"][data-palette="graphite"])[data-print-shortcuts] body {
