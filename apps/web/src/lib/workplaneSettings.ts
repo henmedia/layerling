@@ -471,6 +471,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityLabelCorner = source.gridfinityLabelCorner === "round" || source.gridfinityLabelCorner === "chamfer" ? source.gridfinityLabelCorner : fallbackEntry?.gridfinityLabelCorner;
       entry.gridfinityLabelCornerSize = optionalShapeNumber(source.gridfinityLabelCornerSize, fallbackEntry?.gridfinityLabelCornerSize, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityLabelFont = typeof source.gridfinityLabelFont === "string" && GRIDFINITY_LABEL_FONTS.includes(source.gridfinityLabelFont) ? source.gridfinityLabelFont : fallbackEntry?.gridfinityLabelFont;
+      entry.gridfinityLabelColor = normalizeHexColor(typeof source.gridfinityLabelColor === "string" ? source.gridfinityLabelColor : undefined) ?? fallbackEntry?.gridfinityLabelColor;
       entry.gridfinityScoopBack = typeof source.gridfinityScoopBack === "boolean" ? source.gridfinityScoopBack : fallbackEntry?.gridfinityScoopBack;
       entry.gridfinityScoopFront = typeof source.gridfinityScoopFront === "boolean" ? source.gridfinityScoopFront : fallbackEntry?.gridfinityScoopFront;
       entry.gridfinityScoopLeft = typeof source.gridfinityScoopLeft === "boolean" ? source.gridfinityScoopLeft : fallbackEntry?.gridfinityScoopLeft;

@@ -342,6 +342,8 @@ export type ShapeCustomization = {
   gridfinityLabelCornerSize?: number;
   /** Gridfinity bin: the font of the letters on its label shelves (#1308), one of the built-in ones; missing is Multilanguage. */
   gridfinityLabelFont?: string;
+  /** Gridfinity bin: the colour of the letters on its label shelves (#1308), "#rrggbb"; missing, or the bin's own colour, is the bin's. */
+  gridfinityLabelColor?: string;
   /** Gridfinity bin: a finger scoop along the back wall, the floor rising along a quarter circle into it. */
   gridfinityScoopBack?: boolean;
   /** Gridfinity bin: a finger scoop along the front wall. */
@@ -1220,6 +1222,8 @@ export type WorkplaneShape = {
   gridfinityLabelRightText?: string;
   /** Gridfinity bin: the font of the letters on its label shelves (#1308), one of the built-in ones; missing is Multilanguage. */
   gridfinityLabelFont?: string;
+  /** Gridfinity bin: the colour of the letters on its label shelves (#1308), "#rrggbb"; missing, or the bin's own colour, is the bin's. */
+  gridfinityLabelColor?: string;
   /** Gridfinity bin: a finger scoop along the back wall, the floor rising along a quarter circle into it. */
   gridfinityScoopBack?: boolean;
   /** Gridfinity bin: a finger scoop along the front wall. */

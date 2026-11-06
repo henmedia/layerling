@@ -303,6 +303,7 @@ import {
   normalizeGridfinityType,
 } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelTextLeftOut } from "@/lib/gridfinityLabelText";
+import { gridfinityLabelColor } from "@/lib/gridfinityLetterColor";
 import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MIN_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, MAX_HINGE_NUT_WIDTH } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -565,7 +566,19 @@ type SelectPropertyConfig = {
   onChange: (value: string) => void;
 };
 
-type ShapePropertyConfig = RangePropertyConfig | TextPropertyConfig | SelectPropertyConfig | TogglePropertyConfig;
+type ColorPropertyConfig = {
+  type: "color";
+  id: string;
+  label: string;
+  value: string;
+  /** A line under the row, as a range row has. */
+  hint?: string;
+  onChange: (value: string) => void;
+  /** Its own reset: the row goes back to the bin's colour, not to a default. */
+  onReset?: () => void;
+};
+
+type ShapePropertyConfig = RangePropertyConfig | TextPropertyConfig | SelectPropertyConfig | TogglePropertyConfig | ColorPropertyConfig;
 export type ShapeInspectorUpdateOptions = { resizeAxis?: "width" | "depth" | "height" };
 type ShapeInspectorUpdate = (patch: Partial<WorkplaneShape>, options?: ShapeInspectorUpdateOptions) => void;
 
@@ -1718,6 +1731,17 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           options: GRIDFINITY_LABEL_FONTS.map((value) => ({ value, label: value, group: builtIn })),
           fontSample: lettered[0].text,
           onChange: (font) => onUpdate({ gridfinityLabelFont: font }),
+        });
+        // The letters in a colour of their own, for a 3MF (#1308); picking the bin's own colour clears it.
+        const letterColor = gridfinityLabelColor(shape);
+        properties.push({
+          type: "color",
+          id: "gridfinityLabelColor",
+          label: t("prop.gridfinityLabelColor"),
+          value: letterColor ?? shape.color,
+          hint: letterColor ? undefined : t("gridfinity.labelColorSameHint"),
+          onChange: (color) => onUpdate({ gridfinityLabelColor: gridfinityLabelColor({ ...shape, gridfinityLabelColor: color }) }),
+          onReset: letterColor ? () => onUpdate({ gridfinityLabelColor: undefined }) : undefined,
         });
       }
     }
@@ -7315,6 +7339,9 @@ function ShapePropertyRows({
     if (property.type === "text") {
       return <TextProperty {...property} key={property.id} disabled={disabled} onInteractionActiveChange={onInteractionActiveChange} />;
     }
+    if (property.type === "color") {
+      return <ColorProperty {...property} key={property.id} disabled={disabled} onReset={disabled ? undefined : property.onReset} onInteractionActiveChange={onInteractionActiveChange} />;
+    }
     const fallback = disabled || NO_RESET_PROPERTY_IDS.has(property.id) ? undefined : defaults?.get(property.id);
     if (property.type === "select") {
       const onReset = typeof fallback === "string" && fallback !== property.value ? () => property.onChange(fallback) : undefined;
@@ -7905,6 +7932,18 @@ function SelectProperty({ label, value, options, hint, fontSample, disabled, onC
       </select>
       {hint ? <small className="select-property-hint">{hint}</small> : null}
     </label>
+  );
+}
+
+function ColorProperty({ label, value, hint, disabled, onChange, onReset, onInteractionActiveChange }: Omit<ColorPropertyConfig, "id" | "type"> & { disabled?: boolean; onInteractionActiveChange?: (active: boolean) => void }) {
+  return (
+    <div className="select-property">
+      <span>{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
+      <label className="name-tag-swatch" style={{ "--swatch": value } as CSSProperties} title={label}>
+        <CustomColorInput color={value} disabled={disabled} onCommit={onChange} onInteractionActiveChange={onInteractionActiveChange} />
+      </label>
+      {hint ? <small className="select-property-hint">{hint}</small> : null}
+    </div>
   );
 }
 

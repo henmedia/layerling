@@ -1778,6 +1778,9 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.gridfinityLabelFont !== undefined && !GRIDFINITY_LABEL_FONTS.includes(definition.gridfinityLabelFont as string)) {
       throw new Error(`${label}.gridfinityLabelFont is invalid`);
     }
+    if (definition.gridfinityLabelColor !== undefined && (typeof definition.gridfinityLabelColor !== "string" || !/^#[0-9a-f]{6}$/i.test(definition.gridfinityLabelColor))) {
+      throw new Error(`${label}.gridfinityLabelColor must be a colour as #rrggbb`);
+    }
     if (definition.gridfinityOpeningCorner !== undefined && definition.gridfinityOpeningCorner !== "round" && definition.gridfinityOpeningCorner !== "chamfer") {
       throw new Error(`${label}.gridfinityOpeningCorner is invalid`);
     }
