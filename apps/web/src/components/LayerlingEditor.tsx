@@ -2934,6 +2934,20 @@ function holePatternCustomShape(shapes: readonly WorkplaneShape[], sourceId: str
   return id ? holePatternCustomChoices(shapes, sourceId).find((shape) => shape.id === id) ?? null : null;
 }
 
+/** The shapes with the selected, unlocked ones moved by (dx, dy, dz): y is up. */
+function translateSelectedShapes(shapes: WorkplaneShape[], selected: Set<string>, dx: number, dy: number, dz: number) {
+  return shapes.map((shape) =>
+    selected.has(shape.id) && !shape.locked
+      ? {
+          ...shape,
+          x: cleanNearZero(shape.x + dx),
+          z: cleanNearZero(shape.z + dz),
+          elevation: cleanNearZero((shape.elevation ?? 0) + dy),
+        }
+      : shape,
+  );
+}
+
 export function LayerlingEditor({
   initialAssets = [],
   initialAttachments,
@@ -9362,7 +9376,7 @@ export function LayerlingEditor({
   }, [refuseLockedSelection, commitShapes, hasSelection, selectedIds, selectedShapes, shapes, refuseBodyLockedSelection]);
 
   const raiseSelected = useCallback(
-    (delta: number) => {
+    (delta: number, live = false) => {
       if (!hasSelection) {
         return;
       }
@@ -9375,17 +9389,15 @@ export function LayerlingEditor({
         true,
       );
       // As last committed: a held Ctrl+arrow moves once a frame (keyRepeatBatch).
+      const next = translateSelectedShapes(shapesRef.current, selected, normal.x * delta, normal.y * delta, normal.z * delta);
+      if (live) {
+        shapesRef.current = next;
+        liveRunRef.current = true;
+        setShapes(next);
+        return;
+      }
       commitShapes(
-        shapesRef.current.map((shape) =>
-          selected.has(shape.id) && !shape.locked
-            ? {
-                ...shape,
-                x: cleanNearZero(shape.x + normal.x * delta),
-                z: cleanNearZero(shape.z + normal.z * delta),
-                elevation: cleanNearZero((shape.elevation ?? 0) + normal.y * delta),
-              }
-            : shape,
-        ),
+        next,
         selectedIds,
         t(delta > 0 ? "status.selectionRaisedBy" : "status.selectionLoweredBy", { distance: `${formatLengthMm(Math.abs(delta), workspaceSettingsRef.current.accuracy)} ${lengthDisplayUnit(workspaceSettingsRef.current).label}` }),
         `move:${selectedIds.join(",")}`,
@@ -16194,7 +16206,7 @@ export function LayerlingEditor({
   }, []);
 
   const nudgeSelected = useCallback(
-    (deltaX: number, deltaZ: number, rise = 0) => {
+    (deltaX: number, deltaZ: number, rise = 0, live = false) => {
       if (!hasSelection) {
         return;
       }
@@ -16217,17 +16229,18 @@ export function LayerlingEditor({
       window.layerlingFollowMove?.(movedIds, translation);
       // The shapes as last committed, not as last drawn: a held key moves once a
       // frame, and the next move may come before React has drawn the last one.
+      const next = translateSelectedShapes(shapesRef.current, selected, translation.x, translation.y, translation.z);
+      if (live) {
+        // A held arrow key: show the move as a mouse drag does, and let the key's
+        // release write it to the history (finishLiveRun), so the scene is not rebuilt
+        // and committed on every repeat.
+        shapesRef.current = next;
+        liveRunRef.current = true;
+        setShapes(next);
+        return;
+      }
       commitShapes(
-        shapesRef.current.map((shape) =>
-          selected.has(shape.id) && !shape.locked
-            ? {
-                ...shape,
-                x: cleanNearZero(shape.x + translation.x),
-                z: cleanNearZero(shape.z + translation.z),
-                elevation: cleanNearZero((shape.elevation ?? 0) + translation.y),
-              }
-            : shape,
-        ),
+        next,
         selectedIds,
         selectedShapes.length === 1 ? t("status.movedOneBy", { distance }) : t("status.movedManyBy", { count: selectedShapes.length, distance }),
         `move:${selectedIds.join(",")}`,
@@ -16240,9 +16253,29 @@ export function LayerlingEditor({
   nudgeSelectedRef.current = nudgeSelected;
   const raiseSelectedRef = useRef(raiseSelected);
   raiseSelectedRef.current = raiseSelected;
+  // A held arrow key moves the selection live (no history step per repeat). liveRun is
+  // true while such moves are waiting for their history step; finishLiveRun writes it
+  // as one step, amending the step the key's first press made, so one Undo takes the
+  // whole run back.
+  const liveRunRef = useRef(false);
+  const finishLiveRun = useCallback(() => {
+    if (!liveRunRef.current) return;
+    liveRunRef.current = false;
+    commitShapes(shapesRef.current, selectedIdsRef.current, undefined, undefined, true);
+  }, [commitShapes]);
+  const finishLiveRunRef = useRef(finishLiveRun);
+  finishLiveRunRef.current = finishLiveRun;
   // Repeats of a held arrow key move once a frame, by their sum (#1042).
   const keyRepeatBatchRef = useRef<ReturnType<typeof createKeyRepeatBatch> | null>(null);
-  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z, rise }) => {
+  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z, rise }, live) => {
+    if (live) {
+      // A repeat of a held key: shown at once, committed when the key comes up.
+      if (x || z) nudgeSelectedRef.current(x, z, rise, true);
+      else raiseSelectedRef.current(rise, true);
+      return;
+    }
+    // A fresh press starts a new history step: first the last run is written.
+    finishLiveRunRef.current();
     // Drawn at once, as a key press is: otherwise the effect that keeps
     // shapesRef in step could run late with the shapes before this move,
     // and the next frame's move would start from there and lose this one.
@@ -16252,7 +16285,10 @@ export function LayerlingEditor({
     });
   });
   useEffect(() => {
-    const flush = () => keyRepeatBatchRef.current?.flush();
+    const flush = () => {
+      keyRepeatBatchRef.current?.flush();
+      finishLiveRunRef.current();
+    };
     window.addEventListener("keyup", flush);
     window.addEventListener("blur", flush);
     return () => {
