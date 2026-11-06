@@ -124,6 +124,8 @@ async function callTool(name, args) {
       return bridgeCommand("sweep_sketch", args, 60000);
     case "layerling_push_face":
       return bridgeCommand("push_face", args, 60000);
+    case "layerling_support_rib":
+      return bridgeCommand("support_rib", args, 60000);
     case "layerling_mate_faces":
       return bridgeCommand("mate_faces", args, 30000);
     case "layerling_open_group":

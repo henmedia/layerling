@@ -46,6 +46,18 @@ In het menu naast het oog ({{ui:editor.group.visibility}}) zet **Overhang tonen*
 
 Hoe steil jouw printer aankan, stel je in bij de instellingen onder {{ui:workspace.appearance}}: van 30° (voorzichtig) tot 70° (voor printers met goede koeling). Een vlak dat op een ander lichaam rust, wordt toch gemarkeerd: layerling kijkt alleen naar het vlak zelf.
 
+## Steunribben voor een schuin onderdeel
+
+Een onderdeel dat schuin op een rand wordt geprint, bijvoorbeeld onder 45°, heeft vaak geen steun nodig: de vlakken zijn steil genoeg. Maar het staat op een smalle rand en kan omvallen. De {{ui:supportRib.title}} houdt het vast: onder het onderste vlak staat op kleine afstand een dunne rib op een ovale voet, en piepkleine bruggen houden het onderdeel vast. Kantel het onderdeel eerst op zijn rand en laat het op de plaat staan.
+
+1. Selecteer het onderdeel en klik in het lint in de groep {{ui:editor.group.modify}} op {{ui:supportRib.title}}, klik met rechts op het onderdeel of zoek het met [[Ctrl]]+[[K]].
+2. Klik op het onderste vlak waar de rib moet staan. Het vlak moet naar beneden kijken, tussen 15° en 75° hellen en tot op de plaat reiken; de rib staat vanaf je klik recht langs het vlak omlaag.
+3. Stel {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} en {{ui:supportRib.firstLayer}} in zoals in je slicer. De rib is twee nozzlebanen dik, de spleet tot het onderdeel een halve baan; elke brug is één baan breed en precies één laag hoog en ligt op een laag van de print, zodat de slicer hem als één dunne baan print die er netjes af breekt. {{ui:supportRib.height}} zegt hoe ver de rib langs het vlak omhoog reikt (eerst tot halverwege), {{ui:supportRib.bridgeSpacing}} hoe ver de bruggen uit elkaar liggen, in hele lagen.
+4. Onder {{ui:supportRib.more}} stel je de dikte, de spleet, de breedte van de bruggen en de dikte van de voet met de hand in (tot dan volgen ze de nozzle en de lagen), en ook de breedte van de voet en de afrondingen aan de voet en bovenaan.
+5. {{ui:supportRib.apply}} voegt de rib toe. Met {{ui:supportRib.bundle}} (eerst aan) zijn rib en onderdeel gebundeld: ze bewegen samen en gaan als twee lichamen naast elkaar naar de slicer, in de print verbonden door de bruggen.
+
+De rib is een meshlichaam: om hem te veranderen verwijder je hem en maak je hem opnieuw. Elke klik maakt één rib; voor meer klik je op {{ui:supportRib.repick}} of herhaal je hem met {{ui:editor.tool.array}}. De rib mag nergens in het onderdeel lopen en het onderdeel moet op de plaat staan - anders zegt het venster waarom. Je instellingen blijven in deze browser bewaard voor de volgende rib.
+
 ## Wanddikte, speling en afschuiningen
 
 - Wanden moeten minstens twee extrusielijnen breed zijn, dus 0,8 mm bij een spuitmond van 0,4 mm. Stevige onderdelen hebben 1,2 tot 2 mm nodig.

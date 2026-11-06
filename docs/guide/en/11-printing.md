@@ -48,6 +48,18 @@ In the menu next to the eye ({{ui:editor.group.visibility}}), **Show overhangs**
 
 How steep your printer manages is set in the settings under {{ui:workspace.appearance}}: from 30° (careful) to 70° (for printers with good part cooling). A face resting on another body is still marked - layerling only looks at the face itself.
 
+## Support ribs for a tilted part
+
+A part printed tilted on one edge, at 45° say, often needs no supports: its faces are steep enough. But it stands on a thin edge and can fall over. The {{ui:supportRib.title}} holds it: a thin rib stands under its lower face a small gap away, on an oval foot, and tiny bridges hold the part to it. Turn the part onto its edge first and let it stand on the plate.
+
+1. Select the part and click {{ui:supportRib.title}} in the {{ui:editor.group.modify}} group of the ribbon, right-click the part, or find it with [[Ctrl]]+[[K]].
+2. Click the lower face where the rib should stand. The face must look down, slope between 15° and 75° and reach down to the plate; the rib stands straight down the face from your click.
+3. Set {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} and {{ui:supportRib.firstLayer}} as in your slicer. The rib is two lines of the nozzle thick, the gap to the part half a line; each bridge is one line wide and exactly one layer high and lies on a layer of the print, so the slicer prints it as one thin line that breaks off cleanly. {{ui:supportRib.height}} is how high the rib reaches up the face (half way to start), {{ui:supportRib.bridgeSpacing}} how far apart the bridges are, in whole layers.
+4. Under {{ui:supportRib.more}} the thickness, the gap, the bridges' width and the foot's thickness can be set by hand (until then they follow the nozzle and the layers), as can the foot's width and the roundings where the rib meets the foot and at its top.
+5. {{ui:supportRib.apply}} adds the rib. With {{ui:supportRib.bundle}} (on to start) rib and part are bundled: they move together and go to the slicer as two bodies side by side, joined by the bridges in the print.
+
+The rib is a mesh body: to change it, delete it and make it again. Each click makes one rib; for more, click {{ui:supportRib.repick}} or repeat it with {{ui:editor.tool.array}}. The rib must not run into the part anywhere, and the part must stand on the plate - otherwise the window says why. Your settings are kept in this browser for the next rib.
+
 ## Wall thickness, clearance and chamfers
 
 - Walls should be at least two extrusion lines wide, so 0.8 mm with a 0.4 mm nozzle. Sturdy parts need 1.2 to 2 mm.

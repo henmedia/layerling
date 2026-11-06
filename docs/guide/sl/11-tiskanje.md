@@ -46,6 +46,18 @@ V meniju ob očesu ({{ui:editor.group.visibility}}) **Pokaži previse** vklopi p
 
 Kako strmo zmore tvoj tiskalnik, nastaviš v nastavitvah pod {{ui:workspace.appearance}}: od 30° (previdno) do 70° (za tiskalnike z dobrim hlajenjem dela). Ploskev, ki leži na drugem telesu, se vseeno označi – layerling vidi samo ploskev samo.
 
+## Podporna rebra za poševen del
+
+Del, ki ga tiskaš poševno na robu, na primer pod 45°, pogosto ne potrebuje podpor: njegove ploskve so dovolj strme. Stoji pa na tankem robu in se lahko prevrne. {{ui:supportRib.title}} ga drži: pod njegovo spodnjo ploskvijo z majhno režo stoji tanko rebro na ovalni nogi, drobni mostički pa del pridržijo. Del najprej obrni na rob in naj stoji na podlagi.
+
+1. Izberi del in klikni {{ui:supportRib.title}} v skupini {{ui:editor.group.modify}} na traku, desno klikni del ali ga poišči s [[Ctrl]]+[[K]].
+2. Klikni spodnjo ploskev tam, kjer naj stoji rebro. Ploskev mora gledati navzdol, biti nagnjena med 15° in 75° in segati do podlage; rebro gre od tvojega klika naravnost navzdol po ploskvi.
+3. Nastavi {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} in {{ui:supportRib.firstLayer}} kot v svojem rezalniku. Rebro je debelo dve progi šobe, reža do dela pol proge; vsak mostiček je širok eno progo in visok natanko eno plast ter leži na plasti tiska, da ga rezalnik natisne kot eno tanko progo, ki se čisto odlomi. {{ui:supportRib.height}} pove, kako visoko rebro seže po ploskvi (na začetku do polovice), {{ui:supportRib.bridgeSpacing}} pa, kako narazen so mostički, v celih plasteh.
+4. Pod {{ui:supportRib.more}} lahko ročno nastaviš debelino, režo, širino mostičkov in debelino noge (do takrat sledijo šobi in plastem), pa tudi širino noge in zaobljenji pri nogi in zgoraj.
+5. {{ui:supportRib.apply}} doda rebro. Z {{ui:supportRib.bundle}} (na začetku vklopljeno) sta rebro in del v svežnju: premikata se skupaj in gresta v rezalnik kot dve telesi drug ob drugem, pri tisku povezani z mostički.
+
+Rebro je mrežno telo: če ga želiš spremeniti, ga izbriši in ustvari znova. Vsak klik ustvari eno rebro; za več klikni {{ui:supportRib.repick}} ali ga ponovi z {{ui:editor.tool.array}}. Rebro nikjer ne sme teči v del, del pa mora stati na podlagi - sicer okno pove, zakaj ne gre. Nastavitve si ta brskalnik zapomni za naslednje rebro.
+
 ## Debelina stene, zračnost in posnetja
 
 - Stene naj bodo široke vsaj dve tiskalni poti, pri šobi 0,4 mm torej 0,8 mm. Trdni deli potrebujejo 1,2 do 2 mm.

@@ -761,6 +761,33 @@ export const tools = [
     },
   },
   {
+    name: "layerling_support_rib",
+    description: "Stand a thin support rib under the lower face of a part printed tilted on one edge - the editor's Support rib tool (Discussion #1385). A part standing at 45 degrees on an edge needs no slicer supports but can fall over; the rib holds it: a thin triangle under the face a gap away (its slope parallel to the face, its back upright, its foot on the bed), on an oval foot plate, rounded where it meets the plate and at its top, and small bridges, each one layer high and one line wide and lying exactly on a layer of the print, reaching across the gap into the part so it cannot tip the other way. The face must look down, slope between 15 and 75 degrees and reach down to the bed straight down its slope from the point; the part must stand on the bed (the layers count from there); the rib must not run into the part anywhere - else the command refuses and says why. Name the part and a side of its own box (targetFace, snapped to the nearest real face; the point is the face's middle) or give point and normal on the face. Thickness (two lines), gap (half a line), bridge width (one line) and foot thickness (first layer plus one) follow nozzle and layers unless set. The rib is a mesh body; bundled with the part unless bundle is false. The answer gives the rib, its height and the bridges' heights. One undo step.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        targetId: { type: "string", description: "The tilted part. If omitted, the one selected object (id also works)." },
+        targetFace: { type: "string", enum: ["bottom", "top", "left", "right", "front", "back"], description: "Side of the part's own box, taken in its current turn (default bottom)." },
+        point: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "A point on the lower face, [x, y, z] in world coordinates (y up), where the rib should stand. With normal, wins over targetFace." },
+        normal: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "Outward normal [x, y, z] of the face at point, in world coordinates (it looks down)." },
+        nozzle: { type: "number", minimum: 0.1, maximum: 2, description: "Nozzle width in mm (default 0.4)." },
+        layerHeight: { type: "number", minimum: 0.04, maximum: 1, description: "Layer height in mm (default 0.2)." },
+        firstLayer: { type: "number", minimum: 0.04, maximum: 1.5, description: "First layer height in mm (default 0.2)." },
+        height: { type: "number", minimum: 1, description: "How high the rib's slope reaches, mm above the bed (default half way up the face)." },
+        bridgeSpacing: { type: "number", minimum: 0.2, maximum: 100, description: "Distance between the bridges in mm, rounded to whole layers (default 3)." },
+        thickness: { type: "number", minimum: 0.2, maximum: 20, description: "Rib thickness in mm (default two nozzle widths)." },
+        gap: { type: "number", minimum: 0.05, maximum: 5, description: "Gap between rib and face in mm, measured square to the face (default half a nozzle width)." },
+        bridgeWidth: { type: "number", minimum: 0.1, maximum: 5, description: "Width of each bridge in mm (default one nozzle width)." },
+        footThickness: { type: "number", minimum: 0.1, maximum: 10, description: "Thickness of the oval foot plate in mm (default first layer plus one layer)." },
+        footWidth: { type: "number", minimum: 1, maximum: 200, description: "Width of the oval foot plate across the rib in mm (default 8)." },
+        filletRadius: { type: "number", minimum: 0, maximum: 20, description: "Rounding where the rib meets the foot, mm (default 1.5; 0 for none)." },
+        topRadius: { type: "number", minimum: 0, maximum: 20, description: "Rounding of the rib's top corner, mm (default 1; 0 for none)." },
+        bundle: { type: "boolean", description: "Bundle the rib with the part, so they move together (default true)." },
+      },
+    },
+  },
+  {
     name: "layerling_push_face",
     description: "Push a flat face of a solid body out or cut a pocket into it - the editor's Face tool. out adds a body standing on the face, in cuts a pocket reaching depth into it; inset keeps the new outline that far inside the face's edge (0 takes the whole face, so a wall gets thicker) and openings in the face grow by it; radius rounds every corner of the outline, the inner ones too, and closes a gap narrower than twice the radius. The new part is an ordinary sketch body grouped with the body (nothing is baked: Edit group and Edit sketch reach it). On the top or the bottom of a plain sketch body (one area, not grouped, mirrored, tapered, twisted or leaning, without a stroke, key ring or edge treatment) it keeps that body's own outline, exact where the CAD kernel can set it in, and keeps the inset when resized; on any other face, and on every face of an imported mesh, it follows the face's triangles. A pocket goes no deeper than the body behind the face. Name the body and a side of its own box (targetFace, snapped to the nearest real face) or give point and normal on the face yourself. A curved face is refused. One undo step.",
     inputSchema: {

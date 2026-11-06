@@ -48,6 +48,18 @@ W menu obok oka ({{ui:editor.group.visibility}}) pozycja **Pokaż nawisy** włą
 
 Z jak stromymi nawisami radzi sobie Twoja drukarka, ustawiasz w ustawieniach w sekcji {{ui:workspace.appearance}}: od 30° (ostrożnie) do 70° (dla drukarek z dobrym chłodzeniem wydruku). Ściana opierająca się na innej bryle też jest oznaczana, bo layerling patrzy tylko na samą ścianę.
 
+## Żebra podporowe dla pochylonej części
+
+Część drukowana pochylona na krawędzi, na przykład pod kątem 45°, często nie potrzebuje podpór: jej ściany są wystarczająco strome. Stoi jednak na wąskiej krawędzi i może się przewrócić. {{ui:supportRib.title}} ją trzyma: pod jej dolną ścianą w małej odległości stoi cienkie żebro na owalnej stopie, a maleńkie mostki przytrzymują część. Najpierw obróć część na krawędź i postaw ją na stole.
+
+1. Zaznacz część i kliknij {{ui:supportRib.title}} w grupie {{ui:editor.group.modify}} na wstążce, kliknij część prawym przyciskiem albo znajdź narzędzie przez [[Ctrl]]+[[K]].
+2. Kliknij dolną ścianę tam, gdzie ma stanąć żebro. Ściana musi być skierowana w dół, nachylona od 15° do 75° i sięgać do stołu; żebro biegnie od miejsca kliknięcia prosto w dół ściany.
+3. Ustaw {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} i {{ui:supportRib.firstLayer}} tak jak w slicerze. Żebro ma grubość dwóch ścieżek dyszy, szczelina do części pół ścieżki; każdy mostek ma szerokość jednej ścieżki i wysokość dokładnie jednej warstwy i leży na warstwie wydruku, więc slicer drukuje go jako jedną cienką ścieżkę, która czysto się odłamuje. {{ui:supportRib.height}} określa, jak wysoko żebro sięga po ścianie (na początku do połowy), a {{ui:supportRib.bridgeSpacing}}, jak daleko od siebie są mostki, w całych warstwach.
+4. W {{ui:supportRib.more}} grubość, szczelinę, szerokość mostków i grubość stopy można ustawić ręcznie (do tego czasu wynikają z dyszy i warstw), a także szerokość stopy i zaokrąglenia przy stopie i u góry.
+5. {{ui:supportRib.apply}} dodaje żebro. Z {{ui:supportRib.bundle}} (na początku włączone) żebro i część są zgrupowane: poruszają się razem i trafiają do slicera jako dwie bryły obok siebie, w wydruku połączone mostkami.
+
+Żebro jest bryłą siatkową: żeby je zmienić, usuń je i utwórz ponownie. Każde kliknięcie tworzy jedno żebro; po kolejne kliknij {{ui:supportRib.repick}} albo powtórz je przez {{ui:editor.tool.array}}. Żebro nie może nigdzie wchodzić w część, a część musi stać na stole - inaczej okno powie dlaczego. Ustawienia zostają w tej przeglądarce na następne żebro.
+
 ## Grubość ścianek, luz i fazki
 
 - Ścianki powinny mieć szerokość co najmniej dwóch ścieżek, czyli 0,8 mm przy dyszy 0,4 mm. Solidne części potrzebują od 1,2 do 2 mm.
