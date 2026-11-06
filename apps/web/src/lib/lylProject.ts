@@ -63,7 +63,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.146.0";
+export const LYL_CREATED_WITH_VERSION = "1.146.1";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -1735,6 +1735,11 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const value = finiteNumber(definition[key], `${label}.${key}`);
       if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
     }
+  }
+  if ((kind === "cylinder" || kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") && definition.drillPointAngle !== undefined) {
+    // The drill point (Discussion #621). Lenient on purpose: 0 is a flat bottom and the geometry clamps the rest.
+    const drillPointAngle = finiteNumber(definition.drillPointAngle, `${label}.drillPointAngle`);
+    if (drillPointAngle < 0 || drillPointAngle > 1e6) throw new Error(`${label}.drillPointAngle is outside the supported range`);
   }
   if (kind === "curvedCone") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.

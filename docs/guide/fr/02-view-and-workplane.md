@@ -192,6 +192,8 @@ Sous {{ui:workspace.measurement}} dans les paramètres, vous définissez {{ui:wo
 
 Sous {{ui:workspace.customSnapGrids}}, au même endroit, vous ajoutez vos propres étapes d'accrochage : un nom et une taille en millimètres, par exemple "Pin pitch 2,54 mm" pour l'espacement des puces DIP, des embases à broches et des trous de carte perforée, ou "MX Key Unit" avec 19,05 mm pour l'espacement des touches du clavier. Le menu Snap Step propose ensuite cette mesure entière, divisée en deux et en quatre (1 ×, ½ × et ¼ ×), de sorte que les formes peuvent être déplacées d'un pas, d'un demi-pas ou d'un quart de pas. Les étapes personnalisées sont conservées avec la conception et accompagnent {{ui:workspace.makeDefault}}. Si vous ne voulez que la mesure elle-même, décochez {{ui:workspace.customSnapGridParts}} à côté ; le menu n'a alors que ce seul pas.
 
+{{ui:workspace.startWithCornerRuler}} : chaque nouveau design de ce navigateur commence alors avec un carré de charpente à l’origine, voir [Mesures et notes](chapter:measuring-and-notes). Les designs existants restent tels quels, et un carré que vous retirez d’un design ne revient pas.
+
 ### Plan de travail : plateau et imprimante
 
 {{ui:workspace.printer}} dimensionne le plan de travail au plateau de votre imprimante et signale les corps qui le dépassent, voir [Impression](chapter:printing). {{ui:workspace.showPlateLabels}} écrit le nom de la conception sur le plateau, ainsi que le nom et le volume d'impression de l'imprimante quand une imprimante est choisie.

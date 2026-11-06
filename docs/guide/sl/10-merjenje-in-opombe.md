@@ -27,7 +27,7 @@ Iz knjižnice oblik vzameš {{ui:shape.ruler}}. To je čisto merilno orodje: ne 
 
 ## Kotno ravnilo
 
-Včasih je bolje meriti ob pravem kotu. V vrstici pogleda klikni {{ui:camera.cornerRulerTool}} in nato na delovno površino. Tam se odloži kotno ravnilo z dvema krakoma v pravem kotu, s črticami, kot kotnik. Tudi to nima lastnega telesa. Če klikneš blizu vogala telesa, se njegov vogal tam natanko zaskoči.
+Včasih je bolje meriti ob pravem kotu. V vrstici pogleda klikni {{ui:camera.cornerRulerTool}} in nato na delovno površino. Tam se odloži kotno ravnilo z dvema krakoma v pravem kotu, s črticami, kot kotnik. Tudi to nima lastnega telesa. Če klikneš blizu vogala telesa, se njegov vogal tam natanko zaskoči. Če ga potrebuješ skoraj v vsakem osnutku, v nastavitvah pod {{ui:workspace.measurement}} vklopi {{ui:workspace.startWithCornerRuler}}: vsak nov osnutek se potem začne s kotnikom v izhodišču.
 
 Kotno ravnilo se položi na delovno ravnino. Če leži na strani telesa, torej leži tudi ono na tej strani, glej [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina). Tako izmeriš na navpični steni: položi delovno ravnino na steno, kotno ravnilo postavi v njen zgornji levi vogal in toliko krat klikni na ročaj, da kraka kažeta v desno in navzdol.
 

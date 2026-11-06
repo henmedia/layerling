@@ -105,8 +105,9 @@ import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateIndexAt, plateName, pla
 import { plateDisplayLabel, useBuildPlates } from "@/components/workplane/useBuildPlates";
 import { zipSync } from "fflate";
 import { PlateBar } from "@/components/workplane/PlateBar";
-import { SplitPanel, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
+import { SplitPanel, type SplitConnectorPreviewState, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
 import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitOrientationForNormal, splitAxisFromLabel, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
+import { connectorHoleRadius, normalizeSplitConnectorOptions, splitConnectorDefaults, SPLIT_CONNECTOR_KINDS, type SplitConnectorOptions } from "@/lib/splitConnectors";
 import { AttachmentViewer } from "./workplane/AttachmentViewer";
 import { GuideModal } from "./workplane/GuideModal";
 import { HistoryViewOverlay, historyStateNameSuffix } from "./workplane/HistoryViewOverlay";
@@ -241,12 +242,12 @@ import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_
 import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
-import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, articulateShapesOffThread, lidForShapesOffThread, checkClearanceOffThread, checkPrintOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
+import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, checkClearanceOffThread, checkPrintOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
 import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
-import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
+import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
 import { escapeWasHandled } from "@/lib/escapeHandled";
@@ -389,6 +390,8 @@ type SplitSession = {
   error: string | null;
   /** The next click on a face sets the plane's position. */
   picking: boolean;
+  /** Dowels or plugs to line the halves up again, or none (Discussion #832); each opening starts from none. */
+  connectors: SplitConnectorOptions;
 };
 
 type EdgeModifierComponentPreview = {
@@ -7257,6 +7260,7 @@ export function LayerlingEditor({
       busy: false,
       error: null,
       picking: false,
+      connectors: splitConnectorDefaults(getPrinterPlay()),
     });
     setNotice(t("status.splitReady"));
   }, [refuseLockedSelection, cancelSplit, canSplitSelection, invalidateCadModifierSession, selectedShapes, splitSession, refuseBodyLockedSelection]);
@@ -7326,6 +7330,52 @@ export function LayerlingEditor({
     setNotice(t("status.splitReady"));
   }, [splitTargetPoints]);
 
+  const changeSplitConnectors = useCallback((patch: Partial<SplitConnectorOptions>) => {
+    setSplitSession((current) => current && !current.busy ? { ...current, connectors: normalizeSplitConnectorOptions(patch, current.connectors), error: null } : current);
+  }, []);
+
+  /*
+   * Where the connectors would go, worked out in the worker as the split will work them out, a moment after the plane or
+   * a setting stops moving: the panel says how many fit and the view marks them on the plane. A newer question calls off
+   * the one before; nothing is asked while the split runs or without connectors.
+   */
+  const [splitConnectorPreview, setSplitConnectorPreview] = useState<SplitConnectorPreviewState>({ state: "idle" });
+  const splitConnectorAbortRef = useRef<AbortController | null>(null);
+  const splitConnectorQuestion = splitSession && !splitSession.busy && splitSession.connectors.kind !== "none" && splitPlane
+    ? JSON.stringify([splitSession.connectors, splitPlane.normal, splitPlane.position, splitSession.targetIds, splitSession.sourceFingerprint])
+    : "";
+  useEffect(() => {
+    splitConnectorAbortRef.current?.abort();
+    splitConnectorAbortRef.current = null;
+    if (!splitConnectorQuestion || !splitSession || !splitPlane) {
+      setSplitConnectorPreview({ state: "idle" });
+      return;
+    }
+    setSplitConnectorPreview({ state: "working" });
+    const controller = new AbortController();
+    splitConnectorAbortRef.current = controller;
+    const { connectors } = splitSession;
+    const plane = { axis: splitPlane.axis, normal: splitPlane.normal, position: splitPlane.position };
+    const targets = splitTargetShapes;
+    const timer = window.setTimeout(() => {
+      previewSplitConnectorsOffThread(targets, plane, connectors, controller.signal).then((preview) => {
+        if (!controller.signal.aborted) setSplitConnectorPreview({ state: "done", ...preview });
+      }, () => {
+        if (!controller.signal.aborted) setSplitConnectorPreview({ state: "idle" });
+      });
+    }, 250);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [splitConnectorQuestion]); // eslint-disable-line react-hooks/exhaustive-deps -- the question names everything it reads
+  const splitConnectorMarks = useMemo(
+    () => splitSession && splitSession.connectors.kind !== "none" && splitConnectorPreview.state === "done" && splitConnectorPreview.points.length
+      ? { points: splitConnectorPreview.points, radius: connectorHoleRadius(splitSession.connectors) }
+      : null,
+    [splitConnectorPreview, splitSession],
+  );
+
   const changeSplitRotation = useCallback((index: 0 | 1, rotation: number) => {
     const angle = Math.max(-180, Math.min(180, rotation));
     setSplitSession((current) => {
@@ -7363,11 +7413,13 @@ export function LayerlingEditor({
     const runId = splitRunRef.current + 1;
     splitRunRef.current = runId;
     setSplitSession({ ...session, busy: true, error: null, picking: false });
-    // A new split calls off the one before it, which would be thrown away anyway.
+    // A new split calls off the one before it, which would be thrown away anyway, and the connectors' preview.
     splitAbortRef.current?.abort();
+    splitConnectorAbortRef.current?.abort();
     const splitAbort = new AbortController();
     splitAbortRef.current = splitAbort;
-    const outcome = await splitShapesByPlaneOffThread(splitTargetShapes, plane, () => splitRunRef.current === runId && sourceContextIsCurrent(), splitAbort.signal);
+    const connectors = session.connectors.kind === "none" ? undefined : session.connectors;
+    const outcome = await splitShapesByPlaneOffThread(splitTargetShapes, plane, () => splitRunRef.current === runId && sourceContextIsCurrent(), splitAbort.signal, connectors);
     if (splitRunRef.current !== runId) return;
     if (outcome.status === "stale" || !sourceContextIsCurrent()) {
       splitRunRef.current += 1;
@@ -7398,9 +7450,9 @@ export function LayerlingEditor({
     commitShapes(
       nextShapes,
       nextSelection,
-      withClosedHolesNote(splitCount === 1
+      withConnectorsNote(withClosedHolesNote(splitCount === 1
         ? t("status.splitOne", { count: nextSelection.length })
-        : t("status.splitMany", { count: splitCount, bodies: nextSelection.length }), closedHoles),
+        : t("status.splitMany", { count: splitCount, bodies: nextSelection.length }), closedHoles), session.connectors.kind, outcome.connectors),
     );
   }, [commitShapes, splitPlane, splitSession, splitTargetShapes]);
 
@@ -13780,6 +13832,22 @@ export function LayerlingEditor({
         if (alongWorkplane && (params.axis !== undefined || params.rotationX !== undefined || params.rotationY !== undefined || params.rotationZ !== undefined)) {
           throw new Error("alongWorkplane sets the axis and the tilt itself - leave out axis and rotationX/Y/Z");
         }
+        // Dowels or plugs through the cut face, as the panel's Connectors (Discussion #832); a setting left out starts as it does there.
+        const connectorKind = params.connectors === undefined ? "none" : mcpString(params.connectors, "").trim().toLowerCase();
+        if (!(SPLIT_CONNECTOR_KINDS as readonly string[]).includes(connectorKind)) throw new Error("connectors must be none, dowels or plugs");
+        const connectorFields = ["connectorCount", "connectorDiameter", "connectorDepth", "connectorClearance"] as const;
+        const badConnectorField = connectorFields.find((field) => params[field] !== undefined && !(typeof params[field] === "number" && Number.isFinite(params[field])));
+        if (badConnectorField) throw new Error(`${badConnectorField} must be a number`);
+        if (connectorKind === "none" && connectorFields.some((field) => params[field] !== undefined)) {
+          throw new Error("connectorCount, connectorDiameter, connectorDepth and connectorClearance go with connectors dowels or plugs");
+        }
+        const connectors = normalizeSplitConnectorOptions({
+          kind: connectorKind,
+          count: params.connectorCount,
+          diameter: params.connectorDiameter,
+          depth: params.connectorDepth,
+          clearance: params.connectorClearance,
+        }, splitConnectorDefaults(getPrinterPlay()));
         const workplane = placementWorkplaneRef.current;
         const workplaneDirection = alongWorkplane === "parallel" ? workplane.normal : alongWorkplane === "acrossX" ? workplane.xAxis : alongWorkplane === "acrossY" ? workplane.zAxis : null;
         const workplaneOrientation = workplaneDirection ? splitOrientationForNormal([workplaneDirection.x, workplaneDirection.y, workplaneDirection.z]) : null;
@@ -13812,6 +13880,7 @@ export function LayerlingEditor({
           plane,
           () => projectInfoRef.current.projectId === sourceProjectId && projectShapesFingerprint(currentShapes()) === sourceFingerprint,
           geometryAbortRef.current?.signal,
+          connectors.kind === "none" ? undefined : connectors,
         );
         if (outcome.status === "stale") throw new Error("The scene changed while splitting; run the command again");
         if (outcome.status === "failed") throw new Error(t("split.error.failed", { name: outcome.shape.name, detail: outcome.error }));
@@ -13820,9 +13889,9 @@ export function LayerlingEditor({
         commitShapes(
           currentShapes().flatMap((shape) => outcome.replacements.get(shape.id) ?? [shape]),
           parts.map((shape) => shape.id),
-          withClosedHolesNote(outcome.splitCount === 1
+          withConnectorsNote(withClosedHolesNote(outcome.splitCount === 1
             ? t("status.splitOne", { count: parts.length })
-            : t("status.splitMany", { count: outcome.splitCount, bodies: parts.length }), outcome.closedHoles),
+            : t("status.splitMany", { count: outcome.splitCount, bodies: parts.length }), outcome.closedHoles), connectors.kind, outcome.connectors),
         );
         return {
           axis: splitAxisLabel(axis).toLowerCase(),
@@ -13832,6 +13901,16 @@ export function LayerlingEditor({
           max: plane.max,
           splitIds: [...outcome.replacements.keys()],
           ...(outcome.closedHoles ? { closedHoles: outcome.closedHoles } : {}),
+          ...(connectors.kind === "none" ? {} : {
+            connectors: {
+              kind: connectors.kind,
+              count: connectors.count,
+              diameter: connectors.diameter,
+              depth: connectors.depth,
+              clearance: connectors.clearance,
+              ...(outcome.connectors ?? { placed: 0, faces: 0, tooSmall: 0, tooThin: 0 }),
+            },
+          }),
           objects: parts.map(mcpShapeSummary),
         };
       }
@@ -17262,6 +17341,7 @@ export function LayerlingEditor({
           mirrorReferenceShapes={shapes}
           splitActive={Boolean(splitSession) || historyViewState !== null}
           splitPlane={splitPlane}
+          splitConnectorMarks={splitConnectorMarks}
           onSplitPositionChange={changeSplitPosition}
           splitSurfacePick={Boolean(splitSession?.picking)}
           onSplitSurfacePick={pickSplitSurface}
@@ -17808,11 +17888,14 @@ export function LayerlingEditor({
           busy={splitSession.busy}
           error={splitSession.error}
           picking={splitSession.picking}
+          connectors={splitSession.connectors}
+          connectorPreview={splitConnectorPreview}
           onPickToggle={toggleSplitPick}
           onAxisChange={changeSplitAxis}
           onAlignToWorkplane={alignSplitToWorkplane}
           onRotationChange={changeSplitRotation}
           onPositionChange={changeSplitPosition}
+          onConnectorsChange={changeSplitConnectors}
           onApply={() => void applySplit()}
           onCancel={cancelSplit}
         />

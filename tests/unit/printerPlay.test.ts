@@ -20,6 +20,7 @@ import {
   withPrinterPlay,
 } from "@/lib/printerPlay";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { MAX_CONNECTOR_CLEARANCE, normalizeSplitConnectorOptions, SPLIT_CONNECTOR_DEFAULTS, splitConnectorDefaults } from "@/lib/splitConnectors";
 import { shapeDefaultsFromShape } from "@/lib/shapeDefaults";
 import { DEFAULT_SNAP_FIT_CLEARANCE } from "@/lib/snapFit";
 import { DEFAULT_THREAD_AXIAL_CLEARANCE, DEFAULT_THREAD_BOLT_CLEARANCE, DEFAULT_THREAD_CLEARANCE, MAX_THREAD_CLEARANCE } from "@/lib/threadGeometry";
@@ -130,6 +131,7 @@ describe("which settings follow the play, and how", () => {
       ["snapFit.clearance", "perSide"],
       ["thread.clearance", "total"],
       ["clearance.threshold", "perSide"],
+      ["split.connectorClearance", "perSide"],
     ]);
   });
 
@@ -266,5 +268,26 @@ describe("Check clearance starts from the play", () => {
   it("falls back to the play's start where the browser keeps nothing", () => {
     expect(readClearanceSettings(0.15, blockedStorage())).toEqual({ threshold: 0.15, splitParts: true });
     expect(() => writeClearanceSettings({ threshold: 0.2 }, blockedStorage())).not.toThrow();
+  });
+});
+
+describe("Split's connectors start from the play", () => {
+  it("take it as the holes' clearance per side, and only that", () => {
+    const start = splitConnectorDefaults(0.15);
+    expect(start.clearance).toBe(0.15);
+    expect({ ...start, clearance: SPLIT_CONNECTOR_DEFAULTS.clearance }).toEqual(SPLIT_CONNECTOR_DEFAULTS);
+    expect(fromPrinterPlay("split.connectorClearance", start.clearance, 0.15)).toBe(true);
+    expect(fromPrinterPlay("split.connectorClearance", 0.2, 0.15)).toBe(false);
+  });
+
+  it("start from the built-in 0.2 without a play, and hold a large play within the field", () => {
+    expect(splitConnectorDefaults(null).clearance).toBe(0.2);
+    expect(splitConnectorDefaults(0.9).clearance).toBe(MAX_CONNECTOR_CLEARANCE);
+  });
+
+  it("fill what an AI does not give from the play, and keep what it gives", () => {
+    const start = splitConnectorDefaults(0.25);
+    expect(normalizeSplitConnectorOptions({ kind: "dowels" }, start)).toMatchObject({ kind: "dowels", clearance: 0.25 });
+    expect(normalizeSplitConnectorOptions({ kind: "plugs", clearance: 0.1 }, start)).toMatchObject({ kind: "plugs", clearance: 0.1 });
   });
 });

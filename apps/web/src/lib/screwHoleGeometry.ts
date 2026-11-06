@@ -18,6 +18,10 @@ import { toCreasedNormals } from "@/lib/creasedNormals";
  *                opening to the head diameter, the shaft between them. Where the two
  *                cones would not fit into the length they meet in the middle at the
  *                angle, so the shaft is then wider than set.
+ *
+ * A counterbore or countersink that ends blind may end in a drill point (Discussion #621,
+ * drillPoint.ts): the cone of the drill's tip, as wide as the shaft, below y = 0. The
+ * height still counts to the shoulder, so the tip is all the profile adds.
  */
 
 export type ScrewHoleKind = "counterbore" | "countersink" | "doubleCountersink";
@@ -73,12 +77,24 @@ export type ScrewHoleGeometryOptions = {
   screwHoleShaft?: number;
   screwHoleHeadDepth?: number;
   screwHoleAngle?: number;
+  /** The drill point's angle in degrees (shapeDrillPointAngle), or left out for a flat bottom; the double countersink has none. */
+  drillPointAngle?: number;
   /** Corners around the axis; the automatic count for the diameter when left out. */
   sides?: number;
 };
 
-/** Radius and height of each corner of the outline, from the bottom of the shaft up to the rim of the head. */
-export function screwHoleProfile({ kind, width, height, screwHoleShaft, screwHoleHeadDepth, screwHoleAngle }: Omit<ScrewHoleGeometryOptions, "depth">): ProfilePoint[] {
+/**
+ * Radius and height of each corner of the outline, from the bottom of the shaft up to the rim of the head. With a
+ * drill point the first corner is its tip, on the axis below the shaft.
+ */
+export function screwHoleProfile(options: Omit<ScrewHoleGeometryOptions, "depth">): ProfilePoint[] {
+  const profile = flatScrewHoleProfile(options);
+  if (options.kind === "doubleCountersink" || options.drillPointAngle === undefined) return profile;
+  // The tip is a cone opening from a point to the shaft at the drill's angle, as the countersink opens from the shaft to the head.
+  return [{ r: 0, y: -countersinkDepth(profile[0].r * 2, 0, options.drillPointAngle) }, ...profile];
+}
+
+function flatScrewHoleProfile({ kind, width, height, screwHoleShaft, screwHoleHeadDepth, screwHoleAngle }: Omit<ScrewHoleGeometryOptions, "depth">): ProfilePoint[] {
   const safeHeight = Math.max(0.01, height);
   const headRadius = Math.max(0.005, width / 2);
   const shaftRadius = normalizeScrewHoleShaft(screwHoleShaft, width) / 2;
@@ -119,9 +135,14 @@ export function screwHoleProfile({ kind, width, height, screwHoleShaft, screwHol
   ];
 }
 
-/** A closed, watertight body of revolution: the profile turned around the y axis, capped top and bottom. */
+/**
+ * A closed, watertight body of revolution: the profile turned around the y axis, capped top and bottom. A drill
+ * point's tip is the middle of the bottom cap, so the cap is its cone.
+ */
 export function createScrewHoleGeometry(options: ScrewHoleGeometryOptions): THREE.BufferGeometry {
-  const profile = screwHoleProfile(options);
+  const outline = screwHoleProfile(options);
+  const tip = outline[0].r <= 0 ? outline[0] : null;
+  const profile = tip ? outline.slice(1) : outline;
   const rings = profile.length;
   const SEGMENTS = Math.max(3, Math.round(options.sides ?? DEFAULT_SEGMENTS));
   // Width and depth may differ: the round body is stretched along z.
@@ -136,7 +157,7 @@ export function createScrewHoleGeometry(options: ScrewHoleGeometryOptions): THRE
   });
   const bottomCentre = rings * SEGMENTS;
   const topCentre = bottomCentre + 1;
-  positions.push(0, profile[0].y, 0, 0, profile[rings - 1].y, 0);
+  positions.push(0, (tip ?? profile[0]).y, 0, 0, profile[rings - 1].y, 0);
   for (let s = 0; s < SEGMENTS; s += 1) {
     const next = (s + 1) % SEGMENTS;
     // Bottom cap faces down, top cap up.
@@ -158,5 +179,7 @@ export function createScrewHoleGeometry(options: ScrewHoleGeometryOptions): THRE
   const geometry = toCreasedNormals(indexed, THREE.MathUtils.degToRad(30));
   indexed.dispose();
   geometry.computeBoundingBox();
+  // The tip lies below the bottom: nothing may set the body down on it.
+  if (tip) geometry.userData.keepsItsHeight = true;
   return geometry;
 }

@@ -26,6 +26,7 @@ import { fittedVaseMesh } from "@/lib/vaseShape";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
 import { createPortGeometry } from "@/lib/portGeometry";
 import { createScrewHoleGeometry } from "@/lib/screwHoleGeometry";
+import { shapeDrillPointAngle, shapeDrillPointLength } from "@/lib/drillPoint";
 import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
 import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createBentTubeGeometry } from "@/lib/bentTubeGeometry";
@@ -412,7 +413,8 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       break;
     case "cylinder":
     case "ellipse":
-      geometry = createPrismGeometry(width, height, depth, roundSideCount(shape.sides, width, depth), shape.segments ?? 1);
+      // A cylinder set as a hole may end in a drill point below its bottom (Discussion #621).
+      geometry = createPrismGeometry(width, height, depth, roundSideCount(shape.sides, width, depth), shape.segments ?? 1, shapeDrillPointLength(shape));
       break;
     case "sphere":
       geometry = new THREE.SphereGeometry(1, sphereTessellation(shape.steps).widthSegments, sphereTessellation(shape.steps).heightSegments);
@@ -501,7 +503,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
     case "counterbore":
     case "countersink":
     case "doubleCountersink":
-      geometry = createScrewHoleGeometry({ kind: shape.kind, width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) });
+      geometry = createScrewHoleGeometry({ kind: shape.kind, width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, drillPointAngle: shapeDrillPointAngle(shape), sides: roundSideCount(shape.sides, width, depth) });
       break;
     case "finishingWasher":
       geometry = createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) });

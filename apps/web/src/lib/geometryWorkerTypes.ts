@@ -3,7 +3,7 @@ import type { PreparedImportedMeshDisplay } from "@/lib/importedMeshDisplay";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /** What the page asks the geometry worker (workers/geometry.worker.ts) to work out. */
-export type GeometryTask = "group" | "split" | "stl" | "obj" | "step" | "stepExport" | "estimate" | "simplify" | "face" | "flexi" | "lid" | "clearance" | "printCheck" | "warm";
+export type GeometryTask = "group" | "split" | "splitConnectors" | "stl" | "obj" | "step" | "stepExport" | "estimate" | "simplify" | "face" | "flexi" | "lid" | "clearance" | "printCheck" | "warm";
 
 export interface GeometryWorkerRequest {
   requestId: number;
@@ -30,7 +30,7 @@ export type GeometryWorkerResponse =
 
 type ImportedMesh = NonNullable<WorkplaneShape["importedMesh"]>;
 
-/** The meshes a task's result brings into the view: the new group, the two halves of a split, the links of a flexi body, a lid (and the posts for its magnets), an import. */
+/** The meshes a task's result brings into the view: the new group, the two halves of a split and its dowels, the links of a flexi body, a lid (and the posts for its magnets), an import. */
 export function resultMeshes(task: GeometryTask, result: unknown): Array<ImportedMesh | undefined> {
   if (!result || typeof result !== "object") return [];
   if (task === "group") return [(result as { group?: WorkplaneShape | null }).group?.importedMesh];

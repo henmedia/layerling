@@ -194,6 +194,8 @@ V části {{ui:workspace.measurement}} nastavíte {{ui:workspace.units}}. Při {
 
 V {{ui:workspace.customSnapGrids}} přidáte vlastní pojmenovanou rozteč v milimetrech, například „Rozteč vývodů 2,54 mm“ pro pouzdra DIP, kolíkové lišty a univerzální desky nebo „Jednotka klávesy MX“ s 19,05 mm. Nabídka přichytávání pak obsahuje celý krok, polovinu a čtvrtinu, tedy 1 ×, ½ × a ¼ ×. Chcete-li nabízet pouze celý krok, vypněte u příslušné rozteče {{ui:workspace.customSnapGridParts}}. U již uložených roztečí zůstává volba zapnutá. Vlastní kroky se ukládají s projektem i přes {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.startWithCornerRuler}}: každý nový návrh v tomto prohlížeči pak začne s úhelníkem v počátku souřadnic, viz [Měření a poznámky](chapter:measuring-and-notes). Stávající návrhy zůstanou, jak jsou, a úhelník, který z návrhu odstraníte, se už nevrátí.
+
 ### Pracovní rovina: podložka a tiskárna
 
 {{ui:workspace.printer}} přizpůsobí pracovní rovinu tiskové podložce vaší tiskárny a označí tělesa, která přes ni přesahují, viz [Tisk](chapter:printing). {{ui:workspace.showPlateLabels}} napíše na podložku název projektu, a při zvolené tiskárně i její název a tiskový prostor.

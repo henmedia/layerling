@@ -1922,6 +1922,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionsAlwaysVisible": "Dimensões sempre visíveis",
   "workspace.showRotationAngles": "Mostrar os ângulos de sólidos girados",
   "workspace.startInPerspective": "Abrir o editor na vista em perspectiva",
+  "workspace.startWithCornerRuler": "Começar novos projetos com um esquadro na origem",
+  "workspace.startWithCornerRulerHint": "Vale para cada projeto novo deste navegador. Os projetos que já existem ficam como estão.",
   "workspace.startWithScrollbars": "Abrir o editor com barras de rolagem",
   "workspace.startView": "Vista inicial",
   "workspace.startViewHint": "O ângulo em que novos projetos abrem e ao qual Início volta. Gire a vista como preferir e depois use a vista atual. Vale para todos os projetos deste navegador.",

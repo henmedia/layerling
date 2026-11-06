@@ -27,7 +27,7 @@ You fetch the {{ui:shape.ruler}} from the shape library. It is purely a measurin
 
 ## The framing square
 
-Sometimes you measure better at a right angle. Click {{ui:camera.cornerRulerTool}} in the view bar and then the workplane. A framing square with two arms at a right angle, with tick marks like a try square, is placed there. It has no body of its own either. Click close to the corner of a body, and its corner snaps exactly there. The design keeps the square where you set it, also in a saved .lyl file: when you open the design again, it is in the same place, turned the same way and measuring from the same points, until you remove it.
+Sometimes you measure better at a right angle. Click {{ui:camera.cornerRulerTool}} in the view bar and then the workplane. A framing square with two arms at a right angle, with tick marks like a try square, is placed there. It has no body of its own either. Click close to the corner of a body, and its corner snaps exactly there. The design keeps the square where you set it, also in a saved .lyl file: when you open the design again, it is in the same place, turned the same way and measuring from the same points, until you remove it. If you need it in almost every design, switch on {{ui:workspace.startWithCornerRuler}} under {{ui:workspace.measurement}} in the settings: every new design then starts with a framing square at the origin.
 
 The framing square lies on the workplane. If that sits on the side of a body, the square lies on that side too, see [View and workplane](chapter:view-and-workplane). That is how you dimension on a vertical wall: put the workplane on the wall, place the square at its top left corner and click the handle until the arms point right and down.
 

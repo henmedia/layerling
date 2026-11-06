@@ -194,6 +194,8 @@ Under {{ui:workspace.measurement}} in the settings you set the {{ui:workspace.un
 
 Under {{ui:workspace.customSnapGrids}} in the same place you add snap steps of your own: a name and a size in millimetres, for example "Pin pitch 2.54 mm" for the spacing of DIP chips, pin headers and perfboard holes, or "MX Key Unit" with 19.05 mm for the spacing of keyboard keys. The snap step menu then offers that measure whole, halved and quartered (1 ×, ½ × and ¼ ×), so shapes can be moved by one pitch, half a pitch or a quarter pitch. If you want just the measure itself, untick {{ui:workspace.customSnapGridParts}} beside it; the menu then has only that one step. Custom steps are kept with the design and go along with {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.startWithCornerRuler}}: every new design in this browser then starts with a framing square at the origin, see [Measuring and notes](chapter:measuring-and-notes). Designs you already have stay as they are, and a square you remove from a design stays removed.
+
 ### Workplane: plate and printer
 
 {{ui:workspace.printer}} sizes the workplane to the build plate of your printer and flags bodies that reach past it, see [Printing](chapter:printing). {{ui:workspace.showPlateLabels}} writes the design's name on the plate, and the printer's name and build volume when a printer is chosen.

@@ -380,6 +380,22 @@ describe("the enclosure parts in a STEP file", () => {
     expect(Math.abs((await reimported(blob)) - volume) / volume).toBeLessThan(1e-4);
   });
 
+  it("leaves none of the kernel's handles behind, a Hirth joint's some 600 included", async () => {
+    // The page's kernel lives as long as the page: what an export builds on the way has to go with it.
+    const hirthAsset = toolbarShapeAssets.find((entry) => entry.kind === "hirth")!;
+    const hirth = { ...makeShapeFromAsset(hirthAsset, { x: 40, z: 0 }), id: "hirth", elevation: 0 } as WorkplaneShape;
+    const shapes = [make("screwBoss", { ...GUSSETED, screwBossGussets: 4 }), make("snapFit"), hirth];
+    await exportShapesToStep(shapes);
+    for (let run = 0; run < 3; run += 1) {
+      const before = cad.shapeCount;
+      const { exportedCount, skipped } = await exportShapesToStep(shapes);
+      expect(skipped).toEqual([]);
+      expect(exportedCount).toBe(3);
+      // Only the bodies read back for the file stay, two handles a part (664 before, 06.11.2026).
+      expect(cad.shapeCount - before).toBeLessThanOrEqual(2 * shapes.length);
+    }
+  });
+
   it("cuts only the pocket of a boss set as a hole from the block it is grouped with (#1288)", async () => {
     const block = { id: "block", name: "block", kind: "box", color: "#d41721", x: 0, z: 0, elevation: 0, size: 20, width: 20, depth: 20, height: 10, rotation: 0 } as unknown as WorkplaneShape;
     const boss = make("screwBoss", { hole: true });

@@ -16,6 +16,7 @@ import { hingeWorldParts } from "@/lib/hingeParts";
 import { restoreGroupedChildren } from "@/lib/editorBooleans";
 import { groupShowsPartColors } from "@/lib/groupColors";
 import { meshForShape } from "@/lib/editorMeshCore";
+import { shapeDrillPointAngle, shapeDrillPointLength } from "@/lib/drillPoint";
 import { exactMeshFreeformShare, exactSolidFromMesh } from "@/lib/cadMeshExact";
 
 /**
@@ -149,7 +150,9 @@ export function stepSourceForShape(shape: WorkplaneShape): StepSource {
   }
   if (shape.kind === "mesh" && shape.importedMesh?.brepStep) return "imported";
   const oval = (shape.kind === "cylinder" || shape.kind === "cone") && Math.abs(shapeWidth(shape) - shapeDepth(shape)) >= SIZE_EPS;
-  if (EXACT_KINDS.has(shape.kind) && !oval) return "primitive";
+  // A drilled hole (Discussion #621) is no plain cylinder: it goes out turned from its section, the drill point with it.
+  const drilled = shapeDrillPointAngle(shape) !== undefined;
+  if (EXACT_KINDS.has(shape.kind) && !oval && !drilled) return "primitive";
   if (shape.cadBrep) return "baked";
   if (hasExactProfile(shape)) return "profile";
   if (hasExactThread(shape)) return "thread";
@@ -345,25 +348,42 @@ function throwIfKernelBroken(error: unknown) {
   throw error;
 }
 
+/** Lets go of every handle made since `mark`; only a broken kernel stops the export there. */
+function releaseKernelSince(kernel: OcctKernel, mark: number) {
+  try {
+    kernel.releaseSince(mark);
+  } catch (error) {
+    throwIfKernelBroken(error);
+  }
+}
+
 /** A part's exact body in its own frame, placed and handed over as the CAD worker does. */
 function buildPlacedBody(brep: Brep, part: { transform?: number[] } | null, build: (kernel: OcctKernel) => ShapeHandle, what = "exact body"): BuildOutcome {
   const kernel = occtKernel();
   if (!kernel || !part) return { skip: unsupportedReason() };
-  let local: ShapeHandle | null = null;
-  let placed: ShapeHandle | null = null;
+  // The kernel is kept for the whole session, so a lost handle stays lost: everything the build makes on the way (a
+  // Hirth joint leaves some 600 faces, edges and wires, a screw boss a dozen) goes at the end, whether the build
+  // worked or not. The body leaves the kernel as BREP text and is read back only after that, as brepjs keeps its
+  // shapes in the same kernel and the release would take the read-back body along.
+  const mark = kernel.checkpoint();
+  let text: string;
   try {
-    local = build(kernel);
-    placed = applyCadTransform(kernel, local, part.transform);
-    const text = kernel.toBREP(placed);
+    const local = build(kernel);
+    const placed = applyCadTransform(kernel, local, part.transform);
+    text = kernel.toBREP(placed);
+  } catch (error) {
+    throwIfKernelBroken(error);
+    return { skip: `${what} could not be built: ${error instanceof Error ? error.message : String(error)}` };
+  } finally {
+    if (occtKernel() === kernel) releaseKernelSince(kernel, mark);
+  }
+  try {
     const restored = brep.fromBREP(text);
     if (!restored.ok) return { skip: `${what} failed to load: ${String(restored.error.message ?? restored.error)}` };
     return { solid: restored.value as unknown as BrepSolid };
   } catch (error) {
     throwIfKernelBroken(error);
-    return { skip: `${what} could not be built: ${error instanceof Error ? error.message : String(error)}` };
-  } finally {
-    // Also when placing or writing failed: the kernel is kept for the whole session, so a lost handle stays lost.
-    if (occtKernel() === kernel) releaseKernelHandles(kernel, [local, placed]);
+    return { skip: `${what} failed to load: ${error instanceof Error ? error.message : String(error)}` };
   }
 }
 
@@ -527,21 +547,25 @@ export type Aabb = { min: [number, number, number]; max: [number, number, number
 // Axis-aligned shapes get a tight box. Rotated shapes fall back to the box that
 // encloses the bounding sphere (rotation-invariant, never under-reports), trading
 // tightness for the guarantee that a real intersection is never missed.
+//
+// A drill point (Discussion #621) reaches past the frame by its tip: the box grows by it at the bottom (at the top
+// when the hole is mirrored upside down), and a turned one round a body with a tip at both ends, which holds it however
+// it is turned.
 export function worldAabb(shape: WorkplaneShape): Aabb {
   const w = shapeWidth(shape);
   const d = shapeDepth(shape);
   const h = shape.height;
+  const tip = shapeDrillPointLength(shape);
   const cx = shape.x;
   const cy = (shape.elevation ?? 0) + h / 2;
   const cz = shape.z;
   const rotated = (shape.rotationX ?? 0) !== 0 || (shape.rotationZ ?? 0) !== 0 || shapeYawDegrees(shape) !== 0;
-  const [hx, hy, hz] = rotated
-    ? (() => {
-        const r = 0.5 * Math.sqrt(w * w + h * h + d * d);
-        return [r, r, r];
-      })()
-    : [w / 2, h / 2, d / 2];
-  return { min: [cx - hx, cy - hy, cz - hz], max: [cx + hx, cy + hy, cz + hz] };
+  if (rotated) {
+    const r = 0.5 * Math.sqrt(w * w + (h + 2 * tip) ** 2 + d * d);
+    return { min: [cx - r, cy - r, cz - r], max: [cx + r, cy + r, cz + r] };
+  }
+  const below = shape.mirrorY ? 0 : tip;
+  return { min: [cx - w / 2, cy - h / 2 - below, cz - d / 2], max: [cx + w / 2, cy + h / 2 + tip - below, cz + d / 2] };
 }
 
 export function aabbsOverlap(a: Aabb, b: Aabb): boolean {

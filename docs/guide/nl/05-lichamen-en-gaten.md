@@ -104,6 +104,14 @@ Let op: afrondingen en afschuiningen die je op de **hele** groep had gezet, gaan
 
 {{ui:split.apply}} of [[Enter]] maakt de snede, [[Esc]] annuleert (tijdens het kiezen van een zijvlak stopt de eerste [[Esc]] alleen het kiezen). Elk object dat het vlak doorsnijdt wordt twee gesloten lichamen, genoemd naar hun kant, bijvoorbeeld "Blok (Z+)" en "Blok (Z-)"; objecten die het mist blijven zoals ze zijn. Een gat wordt twee gaten, en een uitgehold lichaam houdt zijn holte. Beide helften blijven waar ze waren; leg voor het printen elke helft op het snijvlak met {{ui:editor.tool.layFlat}}.
 
+{{ui:split.connectors}} lijnen de helften weer uit, zoals de snijgereedschappen van PrusaSlicer, OrcaSlicer en Bambu Studio dat doen. Met {{ui:split.connectors.none}}, de standaard, wordt gesplitst zoals hierboven beschreven. {{ui:split.connectors.dowels}} maakt een gat in elke helft en losse deuvels die in beide gaan: de deuvels komen als derde lichaam, staand naast de helften op hun bodem, om mee te printen – staand worden ze in de lagen rond, net als hun gaten, en dat is wat de pastest meet. {{ui:split.connectors.plugs}} zet ronde tappen op de helft waarvan de naam op een min eindigt, met de gaten ervoor in de andere helft. De verbinders gaan haaks op het vlak naar binnen, hoe het ook gedraaid is, elk met zijn diameter en 1,2 mm materiaal tot elke rand van het snijvlak, en twee ervan twee keer zo ver uit elkaar. Elk los stuk van het snijvlak krijgt zijn eigen, gelijkmatig erover verdeeld: {{ui:split.connectorCount}} zegt hoeveel, en 0 laat het aan de grootte van het stuk over, minstens twee. Een stuk dat te klein is voor één krijgt er geen, en een verbinder valt weg waar een helft dunner is dan zijn gat diep is; het paneel zegt het voordat je splitst, en witte ringen op het vlak tonen waar ze komen. Past er helemaal geen, dan worden de delen zonder gesplitst en zegt de statusbalk dat.
+
+- {{ui:split.connectorDiameter}} is die van de deuvels en tappen, om te beginnen 5 mm.
+- {{ui:split.connectorDepth}} is hoe ver elk gat in zijn helft gaat. Een deuvel is twee keer zo lang min 0,6 mm en een tap 0,3 mm korter dan zijn gat, zodat ze nooit op de bodem van een gat staan en de helften helemaal sluiten. Deuvels en tappen hebben een kleine afschuining aan de uiteinden, en elk gat een aan zijn opening, zodat een uitgelopen eerste laag het niet nauwer maakt.
+- {{ui:split.connectorClearance}} is de ruimte tussen een deuvel of tap en zijn gat. Heb je de speling van je printer met de pastest gemeten (in het hoofdstuk over printen), dan begint die daarmee, anders met 0,2 mm.
+
+Vormen die een gat zijn, worden zonder verbinders gesplitst.
+
 De helften zijn gewone meshes: instellingen zoals het aantal zijden van een cilinder of de letters van een tekst zijn weg, dus stel die eerst in. [[Ctrl]]+[[Z]] haalt het origineel in één stap terug. Vergrendelde en verborgen objecten kun je niet splitsen.
 
 ## Onderdelen scheiden

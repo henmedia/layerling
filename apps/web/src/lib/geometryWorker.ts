@@ -1,6 +1,6 @@
 import { buildsDiffer, BUILD_ID, isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions, type ClearanceResult } from "@/lib/clearanceCheck";
-import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type GroupBuildResult, type SplitShapesOutcome } from "@/lib/editorBooleans";
+import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
 import { lidForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
@@ -10,6 +10,7 @@ import { gridfinityHasLabelText } from "@/lib/gridfinityGeometry";
 import { rememberPreparedDisplay } from "@/lib/importedMeshDisplay";
 import { getLanguage, t } from "@/lib/i18n";
 import type { ModelSplitPlane } from "@/lib/modelSplit";
+import type { SplitConnectorOptions } from "@/lib/splitConnectors";
 import { simplifyTrianglePositions, type SimplifiedMesh, type SimplifyOptions } from "@/lib/meshSimplify";
 import { importedShapesFromObj, type ObjImportResult } from "@/lib/objImport";
 import { importedShapeFromStl } from "@/lib/stlImport";
@@ -254,15 +255,27 @@ export function buildGroupedShapeOffThread(selected: WorkplaneShape[], triangleL
 
 type SplitPlane = Pick<ModelSplitPlane, "axis" | "normal" | "position">;
 
-function splitShapeOffThread(shape: WorkplaneShape, plane: SplitPlane, signal?: AbortSignal) {
-  const onPage = () => splitShapeIfCrossed(shape, plane);
+function splitShapeOffThread(shape: WorkplaneShape, plane: SplitPlane, connectors: SplitConnectorOptions | undefined, signal?: AbortSignal) {
+  const onPage = () => splitShapeIfCrossed(shape, plane, connectors);
   if (containsText([shape])) return onPage();
-  return runGeometryTask<Awaited<ReturnType<typeof splitShapeIfCrossed>>>("split", { shape, plane }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
+  return runGeometryTask<Awaited<ReturnType<typeof splitShapeIfCrossed>>>("split", { shape, plane, ...(connectors ? { connectors } : {}) }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
 }
 
-/** splitShapesByPlane (lib/editorBooleans.ts) with each cut made off the page. */
-export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal): Promise<SplitShapesOutcome> {
-  return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane) => splitShapeOffThread(shape, shapePlane, signal));
+/** splitShapesByPlane (lib/editorBooleans.ts) with each cut made off the page, with connectors when they are asked for. */
+export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal, connectors?: SplitConnectorOptions): Promise<SplitShapesOutcome> {
+  return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane, asked) => splitShapeOffThread(shape, shapePlane, asked, signal), connectors);
+}
+
+/**
+ * previewSplitConnectors (lib/editorBooleans.ts) off the page, quietly: where the Split panel's connectors would go, while
+ * the plane is moved. A preview the signal calls off (the plane moved on) never answers.
+ */
+export function previewSplitConnectorsOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, connectors: SplitConnectorOptions, signal?: AbortSignal): Promise<SplitConnectorPreview> {
+  const onPage = () => previewSplitConnectors([...targets], plane, connectors);
+  if (containsText([...targets])) return onPage();
+  return runGeometryTask<SplitConnectorPreview>("splitConnectors", { targets: [...targets], plane, connectors }, onPage, () => {
+    throw new Error(t("status.computeTimedOut"));
+  }, signal, true);
 }
 
 /** articulateShapes (lib/flexiJoints.ts) off the page: the links of a flexi body. */

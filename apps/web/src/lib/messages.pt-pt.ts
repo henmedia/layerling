@@ -2460,6 +2460,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionsAlwaysVisible": "Cotas sempre visíveis",
   "workspace.showRotationAngles": "Mostrar os ângulos dos sólidos rodados",
   "workspace.startInPerspective": "Iniciar o editor na vista em perspetiva",
+  "workspace.startWithCornerRuler": "Começar os novos projetos com um esquadro na origem",
+  "workspace.startWithCornerRulerHint": "Aplica-se a cada projeto novo deste navegador. Os projetos que já existem ficam como estão.",
   "workspace.startWithScrollbars": "Iniciar o editor com barras de deslocamento",
   "workspace.doubleClickOpensSketch": "Duplo clique abre o esboço",
   "workspace.doubleClickOpensGroup": "Duplo clique abre um grupo ou conjunto",

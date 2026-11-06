@@ -192,6 +192,7 @@ import { shapeDefaultsAsset, shapeDefaultsFromShape } from "@/lib/shapeDefaults"
 import { fromPrinterPlay, printerPlayShapeRows, withPrinterPlay } from "@/lib/printerPlay";
 import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, normalizeScrewHoleAngle, normalizeScrewHoleHeadDepth, normalizeScrewHoleShaft } from "@/lib/screwHoleGeometry";
+import { DEFAULT_DRILL_POINT_ANGLE, DRILL_POINT_ANGLES, MAX_DRILL_POINT_ANGLE, MIN_DRILL_POINT_ANGLE, normalizeDrillPointAngle, shapeDrillPointLength, shapeTakesDrillPoint } from "@/lib/drillPoint";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { MAX_DOVETAIL_CLEARANCE, maxDovetailNeckWidth, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
@@ -656,6 +657,46 @@ function roundSideProperties(
 }
 
 /**
+ * The bottom of a blind hole (Discussion #621): flat, or the drill point a drill leaves, at one of the common angles
+ * or one of one's own. Offered while the shape is a hole that can take one (drillPoint.ts); the hint says where the
+ * depth ends and how far the tip reaches past it.
+ */
+function drillPointProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate): ShapePropertyConfig[] {
+  if (!shapeTakesDrillPoint(shape)) return [];
+  const angle = normalizeDrillPointAngle(shape.drillPointAngle);
+  const preset = angle === undefined ? "flat" : DRILL_POINT_ANGLES.find((value) => Math.abs(value - angle) < 1e-6)?.toString() ?? "custom";
+  const bottom: ShapePropertyConfig = {
+    type: "select",
+    id: "holeBottom",
+    label: t("prop.holeBottom"),
+    value: preset,
+    options: [
+      { value: "flat", label: t("holeBottom.flat") },
+      ...DRILL_POINT_ANGLES.map((value) => ({ value: String(value), label: t("holeBottom.drillPoint", { angle: String(value) }) })),
+      { value: "custom", label: t("holeBottom.drillPointOther") },
+    ],
+    // An angle of one's own keeps the one set; from a flat bottom it starts at the common twist drill's.
+    onChange: (value) => onUpdate({
+      drillPointAngle: value === "flat" ? undefined : value === "custom" ? angle ?? DEFAULT_DRILL_POINT_ANGLE : normalizeDrillPointAngle(Number(value)),
+    }),
+  };
+  if (angle === undefined) return [bottom];
+  return [
+    bottom,
+    {
+      id: "drillPointAngle",
+      label: t("prop.drillPointAngle"),
+      value: angle,
+      min: MIN_DRILL_POINT_ANGLE,
+      max: MAX_DRILL_POINT_ANGLE,
+      step: 1,
+      hint: t("prop.drillPointAngleHint", { tip: plainNumber(shapeDrillPointLength(shape)) }),
+      onChange: (value) => onUpdate({ drillPointAngle: normalizeDrillPointAngle(value) ?? DEFAULT_DRILL_POINT_ANGLE }),
+    },
+  ];
+}
+
+/**
  * Der Torus hat zwei Zahlen: Seiten rund um den Ring, Stufen rund um den Wulst. Beide folgen
  * zusammen der Groesse, bis der Schalter sie festhaelt (#272).
  */
@@ -799,6 +840,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       ...roundSideProperties(shape, width, depth, onUpdate),
       { id: "diameter", label: t("prop.diameter"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setCylinderDiameter },
       { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+      // Set as a hole, its bottom may be a drill point (Discussion #621).
+      ...drillPointProperties(shape, onUpdate),
     ];
   }
 
@@ -1142,6 +1185,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
             onChange: (value) => onUpdate({ screwHoleAngle: normalizeScrewHoleAngle(value) }),
           },
       { id: "height", label: t("prop.screwHoleLength"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+      // A blind one may end in a drill point below its shaft (Discussion #621); the double countersink goes through.
+      ...drillPointProperties(shape, onUpdate),
       // One entry in the library for both: the double countersink is the countersink chamfered on both faces (#621).
       ...(shape.kind === "counterbore"
         ? []

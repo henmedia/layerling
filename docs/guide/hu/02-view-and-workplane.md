@@ -192,6 +192,8 @@ A beállításokban a {{ui:workspace.measurement}} alatt adod meg a {{ui:workspa
 
 Ugyanitt a {{ui:workspace.customSnapGrids}} alatt saját illesztési lépéseket adhatsz hozzá: egy nevet és egy méretet milliméterben, például „Tűosztás 2,54 mm” a DIP chipek, tüskesorok és próbapanel-furatok osztásához, vagy „MX Key Unit” 19,05 mm-rel a billentyűzetgombok osztásához. Az illesztési lépés menüje ezután ezt a méretet egészben, felezve és negyedelve kínálja fel (1 ×, ½ × és ¼ ×), így az alakzatokat egy, fél vagy negyed osztással mozgathatod. Ha csak magát a méretet szeretnéd, vedd ki mellette a pipát a {{ui:workspace.customSnapGridParts}} elől; a menüben ekkor csak ez az egy lépés lesz. A saját lépések a tervvel együtt mentődnek, és a {{ui:workspace.makeDefault}} gombbal is továbbvihetők.
 
+{{ui:workspace.startWithCornerRuler}}: ebben a böngészőben ekkor minden új terv derékszögvonalzóval indul az origóban, lásd [Mérés és jegyzetek](chapter:measuring-and-notes). A meglévő tervek változatlanok maradnak, és ha egy tervből eltávolítod a vonalzót, az nem jön vissza.
+
 ### Munkasík: tárgyasztal és nyomtató
 
 A(z) {{ui:workspace.printer}} a munkasíkot a nyomtatód tárgyasztalához igazítja, és megjelöli azokat a testeket, amelyek túlnyúlnak rajta, lásd [Nyomtatás](chapter:printing). A(z) {{ui:workspace.showPlateLabels}} ráírja a tárgyasztalra a terv nevét, kiválasztott nyomtatónál pedig annak nevét és nyomtatási terét is.

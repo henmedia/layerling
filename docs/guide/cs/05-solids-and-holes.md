@@ -104,6 +104,14 @@ Upozornění: zkosení a zaoblení provedená na **celém** sloučeném tělese 
 
 {{ui:split.apply}} nebo [[Enter]] provede řez, [[Esc]] jej zruší. Při vybírání plochy první [[Esc]] ukončí pouze toto vybírání. Každý protnutý objekt se rozdělí na dvě uzavřená tělesa pojmenovaná podle strany, například „Kvádr (Z+)“ a „Kvádr (Z-)“. Neprotnuté objekty se nezmění. Výřez se rozdělí na dva výřezy a duté těleso si zachová dutinu. Obě poloviny zůstanou na původním místě. Pro tisk je položte řeznou plochou na podložku pomocí {{ui:editor.tool.layFlat}}.
 
+{{ui:split.connectors}} znovu vyrovnají poloviny, jak to dělají nástroje pro řez v PrusaSliceru, OrcaSliceru a Bambu Studiu. S volbou {{ui:split.connectors.none}}, výchozí, se dělí, jak je popsáno výše. {{ui:split.connectors.dowels}} udělají otvor v každé polovině a volné kolíky, které zapadnou do obou: kolíky přibudou jako třetí těleso, stojící vedle polovin na jejich spodku, a tisknou se s nimi – ve stoje vycházejí ve vrstvách kulaté jako jejich otvory, a právě to měří test vůle. {{ui:split.connectors.plugs}} postaví kulaté čepy na polovinu, jejíž název končí mínusem, a otvory pro ně udělají v druhé polovině. Spojovací prvky vedou kolmo k rovině, ať je natočená jakkoli, každý se svým průměrem a 1,2 mm materiálu ke každému okraji plochy řezu a dva od sebe dvakrát tak daleko. Každý samostatný kus plochy řezu dostane vlastní, rovnoměrně po něm rozložené: {{ui:split.connectorCount}} udává kolik a 0 to nechá na velikosti kusu, nejméně dva. Kus, který je i pro jeden příliš malý, nedostane žádný, a spojovací prvek se vynechá tam, kde je polovina tenčí, než je jeho otvor hluboký; panel to řekne ještě před rozdělením a bílé kroužky na rovině ukazují, kam přijdou. Pokud se nevejde žádný, díly se rozdělí bez nich a stavový řádek to oznámí.
+
+- {{ui:split.connectorDiameter}} je průměr kolíků a čepů, zpočátku 5 mm.
+- {{ui:split.connectorDepth}} je, jak hluboko jde každý otvor do své poloviny. Kolík je dvakrát tak dlouhý bez 0,6 mm a čep o 0,3 mm kratší než jeho otvor, aby nikdy nestály na dně otvoru a poloviny se úplně dovřely. Kolíky a čepy mají na koncích malé sražení a každý otvor jedno u svého ústí, aby ho rozteklá první vrstva nezúžila.
+- {{ui:split.connectorClearance}} je místo mezi kolíkem nebo čepem a jeho otvorem. Jakmile změříte vůli své tiskárny testem vůle (v kapitole o tisku), začíná od ní, jinak od 0,2 mm.
+
+Výřezy se rozdělují bez spojovacích prvků.
+
 Poloviny jsou běžné polygonové sítě. Parametry původního tvaru, například počet stran válce nebo text nápisu, už nemají; nastavte je před rozdělením. [[Ctrl]]+[[Z]] obnoví originál jediným krokem. Zamčené a skryté objekty nelze rozdělit.
 
 ## Oddělení částí

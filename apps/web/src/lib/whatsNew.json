@@ -1,5 +1,60 @@
 [
   {
+    "version": "1.146.1",
+    "items": [
+      {
+        "title": {
+          "de": "Oberflächenmuster als eigenes Teil in eigener Farbe",
+          "en": "A surface texture's pattern as a part of its own"
+        },
+        "body": {
+          "de": "Für einen Druck in zwei Farben macht „Muster als eigenes Teil“ in der Karte Oberfläche das Muster zu einem eigenen Teil, bei jedem Muster, und „Farbe des Musters“ gibt ihm seine Farbe. Nach außen ist das Teil das, was herausragt; nach innen füllt es die eingeschnittene Vertiefung bis zur Oberfläche. Körper und Muster bleiben in einem Bündel zusammen und kommen in einer 3MF-Datei als zwei Teile in den Slicer.",
+          "en": "For a print in two colours, \"Pattern as its own part\" in the Surface texture card makes the pattern a part of its own, with any pattern, and \"Colour of the pattern\" gives it its colour. Raised, the part is what stands out; cut in, it fills the cut up to the surface. Body and pattern stay together in a bundle and reach the slicer as two parts in a 3MF."
+        }
+      },
+      {
+        "title": {
+          "de": "Gridfinity-Buchstaben in eigener Farbe",
+          "en": "Gridfinity letters in a colour of their own"
+        },
+        "body": {
+          "de": "Die Buchstaben auf den Etikettenleisten eines Gridfinity-Behälters können jetzt eine eigene Farbe haben: Wähle sie unter „Buchstabenfarbe“ unterhalb der Schriftart. In einem 3MF bleibt der Behälter ein Körper, und die Flächen der Buchstaben haben diese Farbe, sodass Bambu Studio, OrcaSlicer, PrusaSlicer 2.9 und die darauf aufbauenden Slicer sie ohne Farbwechsel mit einem eigenen Filament drucken.",
+          "en": "The letters on a Gridfinity bin's label shelves can now have a colour of their own: pick it under \"Letter colour\" below the font. A 3MF keeps the bin one body with the letters' faces in that colour, so Bambu Studio, OrcaSlicer, PrusaSlicer 2.9 and the slicers built on them print them with a filament of their own, without a colour change."
+        }
+      },
+      {
+        "title": {
+          "de": "Eigene Schriften und eine Buchstabengröße auf Gridfinity-Etiketten",
+          "en": "Fonts of your own and one letter size on Gridfinity labels"
+        },
+        "body": {
+          "de": "Die Buchstaben auf den Etikettenleisten eines Gridfinity-Behälters können jetzt in einer eigenen Schrift stehen, die du wie bei einem Text unter „Schriftart“ wählst. Der Entwurf speichert die Umrisse der Buchstaben, die er benutzt, sodass er sich auf einem anderen Computer mit denselben Buchstaben öffnet. „Buchstabengröße“ macht die Großbuchstaben auf jeder Leiste gleich hoch, soweit sie Platz hat, damit Etiketten verschiedener Länge zusammenpassen.",
+          "en": "The letters on a Gridfinity bin's label shelves can now be in a font of your own, picked under \"Font\" as for a text. The design keeps the outlines of the letters it uses, so it opens with the same letters on another computer. \"Letter size\" makes the capitals the same height on every shelf that has room for them, so labels of different lengths match."
+        }
+      },
+      {
+        "title": {
+          "de": "Mehrfarbige Körper in OrcaSlicer und PrusaSlicer",
+          "en": "Bodies of several colours in OrcaSlicer and PrusaSlicer"
+        },
+        "body": {
+          "de": "Ein Körper in mehreren Farben, etwa eine Gruppe mit „Mehrfarbig“, kam in OrcaSlicer und den darauf aufbauenden Slicern einfarbig an. Die 3MF-Ausfuhr bemalt seine Flächen jetzt zusätzlich so, wie diese Slicer es selbst tun, sodass jede Farbe ihr eigenes Filament bekommt; PrusaSlicer 2.9 liest das ebenso.",
+          "en": "A body of several colours, such as a group with Multicolor on, came into OrcaSlicer and the slicers built on it in one colour. The 3MF export now also paints its faces the way these slicers do themselves, so every colour gets a filament of its own; PrusaSlicer 2.9 reads it too."
+        }
+      },
+      {
+        "title": {
+          "de": "Formen in der Objektliste sperren",
+          "en": "Lock a shape from the object list"
+        },
+        "body": {
+          "de": "Der Schild in der Objektliste sperrt eine Form jetzt auch, statt sie nur zu entsperren: Er zeigt sich an der markierten Zeile und unter der Maus, ein Klick sperrt oder entsperrt. Die Pfeiltasten an einem angeklickten Griff verschieben nur noch den Eintrag in der Liste, nicht mehr zugleich das Teil oder die Ansicht.",
+          "en": "The shield in the object list now locks a shape as well as unlocking it: it shows on the selected row and under the mouse, and a click locks or unlocks. The arrow keys on a clicked grip now move only the entry in the list, no longer the part or the view as well."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.146.0",
     "items": [
       {

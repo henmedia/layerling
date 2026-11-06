@@ -27,7 +27,7 @@ Narzędzie Zmierz jest na dolnym końcu paska widoku przy lewej krawędzi ({{ui:
 
 ## Kątownik
 
-Czasem lepiej mierzyć pod kątem prostym. Kliknij {{ui:camera.cornerRulerTool}} na pasku widoku, a potem płaszczyznę roboczą. Zostanie tam położony kątownik z dwoma ramionami pod kątem prostym, z podziałką jak na kątowniku stolarskim. On też nie ma własnej bryły. Kliknij blisko narożnika bryły, a jego narożnik przyciągnie się dokładnie tam. Projekt zachowuje kątownik tam, gdzie go ustawiłeś, także w zapisanym pliku .lyl: po ponownym otwarciu projektu jest w tym samym miejscu, tak samo obrócony i mierzy od tych samych punktów, dopóki go nie usuniesz.
+Czasem lepiej mierzyć pod kątem prostym. Kliknij {{ui:camera.cornerRulerTool}} na pasku widoku, a potem płaszczyznę roboczą. Zostanie tam położony kątownik z dwoma ramionami pod kątem prostym, z podziałką jak na kątowniku stolarskim. On też nie ma własnej bryły. Kliknij blisko narożnika bryły, a jego narożnik przyciągnie się dokładnie tam. Projekt zachowuje kątownik tam, gdzie go ustawiłeś, także w zapisanym pliku .lyl: po ponownym otwarciu projektu jest w tym samym miejscu, tak samo obrócony i mierzy od tych samych punktów, dopóki go nie usuniesz. Jeśli potrzebujesz go prawie w każdym projekcie, włącz w ustawieniach w {{ui:workspace.measurement}} opcję {{ui:workspace.startWithCornerRuler}}: każdy nowy projekt zacznie się wtedy z kątownikiem w początku układu.
 
 Kątownik leży na płaszczyźnie roboczej. Jeśli ta leży na boku bryły, kątownik też leży na tym boku, zobacz [Widok i płaszczyzna robocza](chapter:view-and-workplane). Tak wymiarujesz na pionowej ściance: połóż płaszczyznę roboczą na ściance, postaw kątownik w jej lewym górnym narożniku i klikaj uchwyt, aż ramiona wskażą w prawo i w dół.
 

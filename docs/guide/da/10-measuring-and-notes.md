@@ -30,7 +30,7 @@ Du henter {{ui:shape.ruler}} fra formbiblioteket. Den er rent et måleværktøj:
 
 ## Vinkelmåleren
 
-Nogle gange måler man bedre i en ret vinkel. Klik på {{ui:camera.cornerRulerTool}} i visningsbjælken og derefter på arbejdsplanet. En vinkelmåler med to arme i en ret vinkel, med takker som en vinkelhage, placeres der. Den har heller ingen egen form. Klik tæt på et hjørne af en form, og dens hjørne snapper præcis der. Designet beholder vinkelmåleren, hvor du satte den, også i en gemt LYL-fil: når du åbner designet igen, er den det samme sted, drejet den samme vej og måler fra de samme punkter, indtil du fjerner den.
+Nogle gange måler man bedre i en ret vinkel. Klik på {{ui:camera.cornerRulerTool}} i visningsbjælken og derefter på arbejdsplanet. En vinkelmåler med to arme i en ret vinkel, med takker som en vinkelhage, placeres der. Den har heller ingen egen form. Klik tæt på et hjørne af en form, og dens hjørne snapper præcis der. Designet beholder vinkelmåleren, hvor du satte den, også i en gemt LYL-fil: når du åbner designet igen, er den det samme sted, drejet den samme vej og måler fra de samme punkter, indtil du fjerner den. Har du brug for den i næsten hvert design, så slå {{ui:workspace.startWithCornerRuler}} til under {{ui:workspace.measurement}} i indstillingerne: så starter hvert nyt design med en vinkelmåler i nulpunktet.
 
 Vinkelmåleren ligger på arbejdsplanet. Ligger det på siden af en form, ligger vinkelmåleren også på den side, se [Visning og arbejdsplan](chapter:view-and-workplane). Sådan målsætter du på en lodret væg: læg arbejdsplanet på væggen, placér måleren i dens øverste venstre hjørne og klik håndtaget indtil armene peger til højre og ned.
 

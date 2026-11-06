@@ -90,6 +90,7 @@ import {
 } from "@/lib/bentTubeGeometry";
 import { numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
+import { readStartWithCornerRuler, writeStartWithCornerRuler } from "@/lib/cornerRulerStore";
 import { measurementOptionLabel, normalizeScaleForUnits, parseMeasurementInput, scaleOptionsForUnits, WORKSPACE_UNIT_OPTIONS } from "@/lib/measurementUnits";
 import { shapeAssetDefaultDimensions, shapeAssetLabel, shapeAssetSpecialDefaults, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { BOOLEAN_TRIANGLE_LIMIT_PRESETS, BOOLEAN_TRIANGLE_LIMIT_STEP, DEFAULT_WORKPLANE_WORKSPACE, ZOOM_SPEED_SLIDER_MAX, MAX_BOOLEAN_TRIANGLE_LIMIT, MAX_CUSTOM_SHAPE_DIMENSION, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, MIN_BOOLEAN_TRIANGLE_LIMIT, MIN_CUSTOM_SHAPE_DIMENSION, booleanTriangleLimitPreset, workspaceForUnits, snapGridForUnits, type BooleanTriangleLimitPreset, DEFAULT_SNAP_GRID, MAX_CUSTOM_SNAP_GRID, MAX_CUSTOM_SNAP_GRID_NAME, MAX_CUSTOM_SNAP_GRIDS, MIN_CUSTOM_SNAP_GRID, customSnapGridDivisors, customSnapGridLabel, customSnapGridSize, parseCustomSnapGrid, readWorkspaceDefault, resetGridInSavedDefault, snapGridOptions, standardGridSettings, workspaceWithSavedDefault } from "@/lib/workplaneSettings";
@@ -555,6 +556,8 @@ export function WorkspaceSettingsModal({
   useLanguage();
   const printerPlay = usePrinterPlay();
   const [activeSection, setActiveSection] = useState<WorkspaceSettingsSection>("appearance");
+  // A setting of this browser, not of the design: read when the window opens (#1386).
+  const [startWithCornerRuler, setStartWithCornerRuler] = useState(readStartWithCornerRuler);
   const toolbarSize = useToolbarSize();
   const shapeColors = useShapeColors();
   const viewCubePosition = useViewCubePosition();
@@ -1307,6 +1310,15 @@ export function WorkspaceSettingsModal({
                       if (owner && !customSnapGridDivisors(owner).includes(current.divisor)) onSnapChange(customSnapGridSize(owner.size, 1));
                       else if (resized && resized.from === current.size) onSnapChange(customSnapGridSize(resized.to, current.divisor));
                       else if (!customSnapGrids.some((grid) => grid.size === current.size)) onSnapChange(workspace.units === "Imperial" ? "1/8 in" : DEFAULT_SNAP_GRID);
+                    }}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.startWithCornerRuler")}
+                    description={t("workspace.startWithCornerRulerHint")}
+                    checked={startWithCornerRuler}
+                    onChange={(on) => {
+                      setStartWithCornerRuler(on);
+                      writeStartWithCornerRuler(on);
                     }}
                   />
                 </>

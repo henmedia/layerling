@@ -24,6 +24,7 @@ import { teardropExactSection } from "@/lib/teardropGeometry";
 import { isPolygonPortProfile, normalizePortCorner, portChamfer, portPolygonCorners } from "@/lib/portGeometry";
 import { normalizePyramidTop, pyramidOutline } from "@/lib/pyramidGeometry";
 import { screwHoleProfile } from "@/lib/screwHoleGeometry";
+import { shapeDrillPointAngle, shapeDrillPointLength } from "@/lib/drillPoint";
 import { curvedConeSection } from "@/lib/curvedCone";
 import { finishingWasherMeasures } from "@/lib/finishingWasherGeometry";
 import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeRoundedBoxQuality, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
@@ -1089,6 +1090,16 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       // stays one. Otherwise a round cylinder is an analytic primitive, and
       // only an oval one, or the ellipse, comes here.
       const count = Math.max(3, Math.round(roundSideCount(shape.sides, width, depth)));
+      // A drilled hole (Discussion #621): the wall and the cone of its drill point below it, turned around the axis
+      // as the screw holes are. Drawn with few sides it is a prism on a pyramid and keeps its display mesh.
+      const drillPoint = shape.kind === "cylinder" ? shapeDrillPointLength(shape) : 0;
+      if (drillPoint > 0) {
+        if (!drawnRound(shape.sides, ROUND_FROM_SIDES, count, width, depth) || Math.abs(width - depth) > 1e-4) return null;
+        const radius = width / 2;
+        const section = polygonLoop([{ x: 0, z: -drillPoint }, { x: radius, z: 0 }, { x: radius, z: shape.height }, { x: 0, z: shape.height }]);
+        // solid (x, y, z) -> local (x, z, -y): the turned body stands along z, the shape's height runs along y
+        return { loops: [section], frame: { kind: "revolution", height: shape.height, local: new THREE.Matrix4().makeRotationX(-Math.PI / 2) } };
+      }
       if (!drawnRound(shape.sides, ROUND_FROM_SIDES, count, width, depth)) return { loops: polygonProfileLoops(width, depth, count) };
       if (shape.kind === "cylinder" && Math.abs(width - depth) <= 1e-4) return null;
       return { loops: [ellipseLoop(width / 2, depth / 2)] };
@@ -1201,8 +1212,9 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     case "doubleCountersink": {
       // Only a round hole is a body of revolution; stretched along z it stays a mesh.
       if (Math.abs(width - depth) > 1e-6) return null;
-      const points = screwHoleProfile({ kind: shape.kind, width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle })
+      const points = screwHoleProfile({ kind: shape.kind, width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, drillPointAngle: shapeDrillPointAngle(shape) })
         .map(({ r, y }) => ({ x: r, z: y }));
+      // A drill point's tip (Discussion #621) lies on the axis already; the loop leaves out the edge of no length to it.
       const section = [{ x: 0, z: points[0].z }, ...points, { x: 0, z: points[points.length - 1].z }];
       // solid (x, y, z) -> local (x, z, -y): the turned body stands along z, the shape's height runs along y
       return { loops: [polygonLoop(section)], frame: { kind: "revolution", height: shape.height, local: new THREE.Matrix4().makeRotationX(-Math.PI / 2) } };

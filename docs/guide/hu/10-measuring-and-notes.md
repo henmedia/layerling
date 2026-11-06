@@ -27,7 +27,7 @@ A {{ui:shape.ruler}} alakzatot az alakzattárból veszed elő. Tisztán mérőes
 
 ## A derékszögvonalzó
 
-Néha derékszögben jobban mérsz. Kattints a nézetsávon a {{ui:camera.cornerRulerTool}} gombra, majd a munkasíkra. Oda egy derékszögvonalzó kerül két, egymásra merőleges szárral, osztásokkal, mint egy asztalos derékszögön. Ennek sincs saját teste. Ha egy test sarka közelébe kattintasz, a sarka pontosan oda illeszkedik.
+Néha derékszögben jobban mérsz. Kattints a nézetsávon a {{ui:camera.cornerRulerTool}} gombra, majd a munkasíkra. Oda egy derékszögvonalzó kerül két, egymásra merőleges szárral, osztásokkal, mint egy asztalos derékszögön. Ennek sincs saját teste. Ha egy test sarka közelébe kattintasz, a sarka pontosan oda illeszkedik. Ha szinte minden tervben szükséged van rá, kapcsold be a beállításokban a {{ui:workspace.measurement}} alatt a {{ui:workspace.startWithCornerRuler}} lehetőséget: ekkor minden új terv derékszögvonalzóval indul az origóban.
 
 A derékszögvonalzó a munkasíkon fekszik. Ha az egy test oldalán van, a derékszögvonalzó is azon az oldalon fekszik, lásd a [Nézet és munkasík](chapter:view-and-workplane) fejezetet. Így méretezel egy függőleges falon: tedd a munkasíkot a falra, helyezd a derékszögvonalzót a bal felső sarkára, és kattints a fogantyúra, amíg a szárak jobbra és lefelé nem mutatnak.
 
