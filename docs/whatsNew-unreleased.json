@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Größengriffe folgen der Arbeitsebene auf einer Seitenfläche",
+      "en": "Size handles follow a workplane on a side face"
+    },
+    "body": {
+      "de": "Legst du die Arbeitsebene auf eine Seite eines Quaders, liegen seine Eck- und Kantengriffe jetzt auf dieser Fläche, wie in Tinkercad. Jeder ändert das Maß des Quaders, das an ihm entlangläuft, und der Griff in der Mitte der Fläche das Maß quer dazu. Das hilft vor allem in der Ansicht von der Seite.",
+      "en": "With the workplane on a side of a box, its corner and edge handles now lie on that face, as in Tinkercad. Each one changes the size of the box that runs along it, and the handle in the middle of the face the size across it. That helps most in a view from the side."
+    }
+  },
+  {
+    "title": {
       "de": "Oberflächentextur: das Muster wählen, indem man es sieht",
       "en": "Surface texture: choose the pattern by seeing it"
     },

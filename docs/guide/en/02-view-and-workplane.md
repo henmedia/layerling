@@ -91,7 +91,7 @@ On a face the origin of the workplane otherwise snaps to the grid. Click close t
 
 A click beside the plate or [[Esc]] returns the workplane to the base plate. Quicker still is {{ui:camera.resetWorkplane}}: the button with the downward arrow sits in the view bar below the eye while the workplane lies on a face. [[Shift]]+[[W]] puts it directly on the currently selected face. [[Alt]]+[[W]] puts it back on the base plate at any time, whether something is selected or not. If you hold [[Shift]] while clicking, the plane points the other way.
 
-While a workplane sits on a face, an eye appears next to {{ui:camera.placeWorkplane}}. It hides the workplane without dropping it, for a clear look at the design: new shapes still land on that face, and rotating still turns about it. A click on the eye shows it again, and so does setting a new workplane.
+While a workplane sits on a face, an eye appears next to {{ui:camera.placeWorkplane}}. It hides the workplane without dropping it, for a clear look at the design: new shapes still land on that face, and rotating still turns about it. A click on the eye shows it again, and so does setting a new workplane. A box's size handles follow a workplane that stands on one of its sides too: the corner and edge handles lie on that face, and each one changes the box's own width, length or height that runs along it. The handle in the middle of the face changes the size across it.
 
 To look straight at the workplane, press [[P]] or click {{ui:camera.lookOntoWorkplane}} next to {{ui:camera.placeWorkplane}} in the view bar. The view turns until you see the workplane square, from the side new shapes grow towards, with its origin in the middle. On the base plate that is the view from above.
 
