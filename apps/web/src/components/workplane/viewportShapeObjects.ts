@@ -2653,11 +2653,13 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
     if (object instanceof THREE.Mesh) {
       releaseSharedShapeGeometry(object);
     }
-    // A picture keeps its texture coordinates, which the bands do not carry; a fat line is drawn
-    // from one template quad. Both are turned at their own vertices as before.
+    // A picture keeps its texture coordinates and a part-coloured body the colours of its corners,
+    // which the bands do not carry; a fat line is drawn from one template quad. They are turned at
+    // their own vertices as before.
     const banded = twistBands !== null
       && !(object.geometry instanceof THREE.InstancedBufferGeometry)
       && sourcePosition.itemSize === 3
+      && !object.geometry.getAttribute("color")
       && !(object instanceof THREE.Mesh && object.geometry.getAttribute("uv") && materialHasMap(object.material));
     let nextGeometry: THREE.BufferGeometry;
     if (banded && object instanceof THREE.Mesh) {

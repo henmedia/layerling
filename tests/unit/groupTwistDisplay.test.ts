@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
 import { groupedShape } from "@/lib/editorBooleans";
-import { createShapeObject, syncShapeObjectAppearance } from "@/components/workplane/viewportShapeObjects";
+import { applyGroupedContentTaper, createShapeObject, syncShapeObjectAppearance } from "@/components/workplane/viewportShapeObjects";
 import { meshAabb } from "@/lib/editorMeshCore";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -94,6 +94,23 @@ describe("a twisted bundle in the viewport (#1419)", () => {
       expect(size.y).toBeCloseTo(5, 2);
       expect(size.z).toBeCloseTo(30, 2);
     });
+  });
+
+  it("keeps the corner colours of a part-coloured part, turned at its own corners as before", () => {
+    const content = new THREE.Group();
+    const plain = new THREE.Mesh(new THREE.BoxGeometry(5, 30, 5), new THREE.MeshStandardMaterial());
+    plain.position.set(-12.5, 15, -12.5);
+    const geometry = new THREE.BoxGeometry(5, 30, 5);
+    geometry.setAttribute("color", new THREE.Float32BufferAttribute(new Array(geometry.getAttribute("position").count * 3).fill(0.5), 3));
+    const coloured = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true }));
+    coloured.position.set(12.5, 15, 12.5);
+    content.add(plain, coloured);
+    const bounds = new THREE.Box3().setFromObject(content, true);
+    applyGroupedContentTaper(content, { ...twistedBundle(), extrudeTwist: 90 }, bounds);
+    // The plain part is cut into bands; the coloured one keeps its colours (lost, it would turn black).
+    expect(plain.geometry.getAttribute("position").count).toBeGreaterThan(36 * 3);
+    expect(coloured.geometry.getAttribute("color")).toBeTruthy();
+    expect(coloured.geometry.getAttribute("color").count).toBe(coloured.geometry.getAttribute("position").count);
   });
 
   it("lights a mirrored leg from outside", () => {
