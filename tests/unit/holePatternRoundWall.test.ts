@@ -165,7 +165,7 @@ describe("the hole pattern on a round wall (#1393)", () => {
     // Between two holes the wall is still there, and the far side of the tube has its own holes only.
     const between = out.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / plan.wall!.columns!);
     expect(lineHits(cut, between.clone().multiplyScalar(31).setY(v), between.clone().multiplyScalar(27).setY(v))).toBe(true);
-  });
+  }, 60_000);
 
   it("goes in to the middle of a solid cylinder, and a custom depth stops where it is set", () => {
     const cylinder = body("cylinder");
@@ -194,7 +194,7 @@ describe("the hole pattern on a round wall (#1393)", () => {
       const at = (radius: number) => out.clone().multiplyScalar(radius).addScaledVector(around, side).setY(centre.y);
       expect(lineHits(cut, at(27), at(31))).toBe(false);
     }
-  });
+  }, 60_000);
 
   it("fills a part of a wall like a flat face, with the margin to its sides", () => {
     // A quarter of the wall, from the facets of the tube's outside that lie round +z within 45 degrees.

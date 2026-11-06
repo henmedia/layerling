@@ -217,7 +217,8 @@ describe("the editor's wiring of a group's joined face", () => {
   });
 
   it("lights the face again whenever the joined read changes, and forgets the pointer when the pick ends", () => {
-    expect(editor.match(/joined: faceJoinPositions \}/g)).toHaveLength(2);
+    // The hole pattern's pick lights a round wall as well (#1393).
+    expect(editor.match(/joined: faceJoinPositions(?:, round: "either")? \}/g)).toHaveLength(2);
     expect(between(viewport, "const mateFaceJoined =", "}, [mateFaceJoined]);")).toContain("pick.round, mateFaceJoined);");
     expect(viewport).toContain("if (!mateFacePick) mateFaceHoverRef.current = null;");
   });

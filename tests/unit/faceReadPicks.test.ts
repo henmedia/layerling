@@ -16,7 +16,8 @@ function body(start: string, end: string) {
 describe("the face tools' reads in the editor", () => {
   it("read every face through faceReadPositionsOffThread, the clicks through faceReadForClick", () => {
     expect(editor.match(/await faceReadForClick\(source, fingerprint, pickAbort\.signal\)/g)).toHaveLength(2);
-    expect(editor.match(/readPerforableFace\(await faceReadPositionsOffThread\(target, geometryAbortRef\.current\?\.signal\), point, normal\)/g)).toHaveLength(2);
+    // push_face reads a flat face, perforate_face a flat face or a round wall (#1393).
+    expect(editor.match(/read(?:Perforable|HolePattern)Face\(await faceReadPositionsOffThread\(target, geometryAbortRef\.current\?\.signal\), point, normal\)/g)).toHaveLength(2);
     expect(editor).not.toMatch(/faceReadMesh|faceReadPositions\(/);
   });
 
