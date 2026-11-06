@@ -1,6 +1,96 @@
 [
   {
     "title": {
+      "de": "Druckprüfung vor dem Drucken",
+      "en": "Print check before printing"
+    },
+    "body": {
+      "de": "Ein Klick in „Kombinieren“ prüft, was erst am Drucker auffiele: zu dünne Wände, schwebende Teile, zu wenig Auflage auf der Platte, Überhänge und offene Netze. Jede Zeile ist grün oder orange mit der Stelle, dünne Wände werden eingefärbt.",
+      "en": "One click in Combine checks what would only show on the printer: walls too thin, floating parts, too little contact with the plate, overhangs and open meshes. Each line is green, or orange with the place, and thin walls are painted."
+    }
+  },
+  {
+    "title": {
+      "de": "Das Spiel deines Druckers messen",
+      "en": "Measure your printer's play"
+    },
+    "body": {
+      "de": "„Passprobe erstellen“ in den Einstellungen legt eine Platte mit sieben Löchern und einen Stift auf die Platte. Druck sie, trag ein, in welchem Loch sich der Stift noch dreht, und neue Deckel, Schwalbenschwänze, Schnappverbindungen, Muttern und „Abstand prüfen“ beginnen mit diesem Spiel.",
+      "en": "Make fit test in the settings puts a plate with seven holes and a pin on the plate. Print it, enter the hole the pin still turns in, and new lids, dovetails, snap-fits, nuts and Check clearance start from that play."
+    }
+  },
+  {
+    "title": {
+      "de": "Gruppe skalieren, Löcher behalten",
+      "en": "Resize a group, keep its holes"
+    },
+    "body": {
+      "de": "Eine Gruppe hat jetzt die Einstellung „Beim Skalieren“: alles strecken oder Löcher und kleine Teile behalten. Dann bleiben Löcher rund und im selben Abstand zum Rand, Wände behalten ihre Stärke, und nur Platte und Wände wachsen mit.",
+      "en": "A group now has the setting When resized: stretch everything, or keep holes and small parts. Then holes stay round and as far from the edge, walls keep their thickness, and only the plate and the walls grow."
+    }
+  },
+  {
+    "title": {
+      "de": "Maßband: Mitte zu Mitte",
+      "en": "Tape measure: centre to centre"
+    },
+    "body": {
+      "de": "Das Maßband rastet jetzt auf die Mitte einer Fläche und den Mittelpunkt eines Lochs oder runden Rands ein. Mitte anklicken, andere Mitte anklicken, Abstand eintippen, und der zweite Körper rückt, wie in Tinkercad.",
+      "en": "The tape measure now snaps to the centre of a face and of a hole or round edge. Click one centre, then another, type a distance, and the second body moves, as in Tinkercad."
+    }
+  },
+  {
+    "title": {
+      "de": "Maßband: Abstand entlang einer Achse",
+      "en": "Tape measure: a distance along one axis"
+    },
+    "body": {
+      "de": "Beim Eintippen einer Länge gibt es jetzt auch Felder für X, Y und Z: der Körper rückt dann nur entlang dieser Achse. Das Maß sagt vorher, welcher Körper sich bewegt oder warum keiner.",
+      "en": "Typing a length now offers boxes for X, Y and Z too: the body then moves along that axis only. The label says beforehand which body moves, or why none can."
+    }
+  },
+  {
+    "title": {
+      "de": "Rippe mit ovalem Fuß",
+      "en": "Rib with an oval foot"
+    },
+    "body": {
+      "de": "Der Fuß unter einer Rippe kann jetzt auch oval sein. Ohne eckige Ecken hebt sich die erste Schicht beim Abkühlen nicht so leicht vom Druckbett.",
+      "en": "The foot under a rib can now be oval. Without square corners the first layer lifts off the bed less easily as it cools."
+    }
+  },
+  {
+    "title": {
+      "de": "Neue Mikrocontroller-Boards",
+      "en": "New microcontroller boards"
+    },
+    "body": {
+      "de": "Die Form „SBC-Board“ kennt jetzt Adafruit ESP32-S3 Feather, Arduino UNO R3, Arduino Nano und LOLIN D1 mini. Neu ist außerdem die Tastenreichweite: RESET-, BOOT- und Power-Tasten reichen durch Deckel oder Wand, damit man sie im Gehäuse drücken kann.",
+      "en": "The SBC board shape now has the Adafruit ESP32-S3 Feather, Arduino UNO R3, Arduino Nano and LOLIN D1 mini. New too is Button reach: RESET, BOOT and power buttons reach through the lid or wall, so they can be pressed in the case."
+    }
+  },
+  {
+    "title": {
+      "de": "Entwürfe vom Server einfügen",
+      "en": "Insert designs from the server"
+    },
+    "body": {
+      "de": "Das Importfenster hat jetzt „Vom Server einfügen“: Ordner wählen, Entwurf anklicken, und seine Körper kommen samt Notizen und Bezugspunkten in den offenen Entwurf, wie aus einer Datei.",
+      "en": "The import window now has Insert from the server: pick the folder, click the design, and its bodies come into the open design with their notes and reference points, as from a file."
+    }
+  },
+  {
+    "title": {
+      "de": "Deckel-Scharnier: der Stift bleibt drin",
+      "en": "Lid hinge: the pin stays in"
+    },
+    "body": {
+      "de": "Der Stift sitzt jetzt fest im Scharnierteil des Körpers und dreht sich nur im Deckel, so rutscht ein Filamentstück nicht mehr heraus. Die Höhe der Rastnoppen lässt sich nun einstellen, weniger für kleine Dosen.",
+      "en": "The pin now sits tight in the body's part of the hinge and turns only in the lid's, so a piece of filament no longer slides out. The click bumps' height can now be set, less for small boxes."
+    }
+  },
+  {
+    "title": {
       "de": "Mehrgängige Gewinde für Trapezspindeln",
       "en": "Threads of several starts for lead screws"
     },
