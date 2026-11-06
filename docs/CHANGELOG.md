@@ -7,6 +7,7 @@ code still carries it - so a lower number further down is older, not newer.
 ## Unreleased
 
 - **Scrollbars of the view: the wheel slides as far as it turned (Discussion #1361):** The wheel over a bar moved the view by a fixed 6 % of what it shows for every wheel event, however small. A Magic Mouse sends dozens of tiny events from a finger resting on it, and a trackpad goes on sending them as the swipe glides out, so the view jumped off the screen as the pointer crossed a bar: forty events of 2 px, 80 px in all, moved it by 2.4 views. It now moves as far as the wheel turned, as a page does, a notch of 100 px by 100 px on the screen (lines and pages counted as Firefox sends them), at most a whole view per event (`wheelScrollFraction` in `lib/viewScroll.ts`). A drag whose pointer the bar loses without a release now ends there too. Test in `viewScroll.test.ts`. Reported by @MartinShake.
+- **Dovetail: a neck up to 0.1 mm narrower than the wide end (#1360):** The neck could be at most 95 % of the width, so a long, gently tapering tail of 146 mm with a neck of 145 mm came out with 138.7 mm. The neck may now be up to 0.1 mm narrower than the wide end, in the properties panel, in the default settings and through the MCP bridge (`maxDovetailNeckWidth` in `dovetailGeometry.ts`); a neck as wide as the wide end or wider still gives way to that. Reported by @UnintendedDeceleration.
 
 ## 1.145.0
 

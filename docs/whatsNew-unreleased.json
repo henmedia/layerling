@@ -8,5 +8,15 @@
       "de": "Das Mausrad über einer Bildlaufleiste schiebt die Ansicht jetzt so weit, wie es gedreht wurde, wie auf einer Webseite. Auf dem Mac warf eine Magic Mouse oder das Nachgleiten am Trackpad die Ansicht schon beim Überfahren einer Leiste aus dem Bild.",
       "en": "The wheel over a scrollbar now slides the view as far as it turned, as on a web page. On a Mac a Magic Mouse or the glide after a trackpad swipe threw the view off the screen as the pointer crossed a bar."
     }
+  },
+  {
+    "title": {
+      "de": "Schwalbenschwanz fast so breit wie das breite Ende",
+      "en": "A dovetail neck almost as wide as the wide end"
+    },
+    "body": {
+      "de": "Der Hals eines Schwalbenschwanzes darf jetzt bis 0,1 mm schmaler sein als das breite Ende, statt höchstens 95 % davon. So geht auch ein langer, leicht verjüngter Zapfen, etwa 146 mm breit mit 145 mm am Hals.",
+      "en": "A dovetail's neck may now be up to 0.1 mm narrower than the wide end, instead of 95 % of it at most. So a long, gently tapering tail works too, say 146 mm wide with 145 mm at the neck."
+    }
   }
 ]
