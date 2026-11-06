@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
 import { groupedShape } from "@/lib/editorBooleans";
-import { createShapeObject } from "@/components/workplane/viewportShapeObjects";
+import { createShapeObject, syncShapeObjectAppearance } from "@/components/workplane/viewportShapeObjects";
 import { meshAabb } from "@/lib/editorMeshCore";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -54,6 +54,25 @@ describe("a twisted bundle in the viewport (#1419)", () => {
     const lines = sizeOf(object, (child) => child instanceof THREE.LineSegments);
     expect(lines.x).toBeCloseTo(30 * Math.SQRT2, 1);
     expect(lines.z).toBeCloseTo(30 * Math.SQRT2, 1);
+  });
+
+  it("outlines only the legs' real edges when it is selected, not a line at every band", () => {
+    const bundle = twistedBundle();
+    const segments = (object: THREE.Object3D) => {
+      let count = 0;
+      object.traverse((child) => {
+        if (child instanceof THREE.LineSegments) count += child.geometry.getAttribute("position").count / 2;
+      });
+      return count;
+    };
+    const builtSelected = segments(createShapeObject(bundle, true, undefined, false));
+    expect(builtSelected).toBeGreaterThan(0);
+    const object = createShapeObject(bundle, false, undefined, false);
+    // Selecting it later draws its lines from the banded legs; at 1 degree every band's fold was a line (5676 instead of 352).
+    syncShapeObjectAppearance(object, bundle, true, false);
+    const synced = segments(object);
+    expect(synced).toBeGreaterThan(0);
+    expect(synced).toBeLessThanOrEqual(builtSelected);
   });
 
   it("keeps the plates of a group at their own size", () => {
