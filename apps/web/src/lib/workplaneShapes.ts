@@ -734,6 +734,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.threadClearance === b.threadClearance &&
     a.threadBoltClearance === b.threadBoltClearance &&
     a.threadAxialClearance === b.threadAxialClearance &&
+    a.threadStarts === b.threadStarts &&
     a.threadDepth === b.threadDepth &&
     a.threadFlankAngle === b.threadFlankAngle &&
     a.threadQuality === b.threadQuality &&

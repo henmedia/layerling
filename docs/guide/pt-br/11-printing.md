@@ -54,6 +54,20 @@ A inclinação que a sua impressora aguenta é definida nas configurações, em 
 - Onde duas peças se encaixam uma na outra, é preciso folga: normalmente de 0,2 a 0,4 mm, dependendo da impressora. Faça um pequeno par de teste antes de imprimir a peça grande.
 - Muita gente faz um chanfro leve na aresta de baixo, a que fica sobre a mesa. Isso evita que a primeira camada se espalhe ("pé de elefante").
 
+## Verificar a impressão
+
+{{ui:editor.tool.printCheck}}, ao lado de {{ui:editor.tool.clearance}} em {{ui:editor.group.combine}}, examina os objetos selecionados, ou todos os visíveis quando nada está selecionado, e diz numa janela o que daria errado na impressão. Cada uma das cinco linhas fica verde quando não encontrou nada, e laranja com o quê e onde quando encontrou:
+
+- **{{ui:printCheck.thin.title}}**: lugares mais finos que duas linhas do bico - 0,8 mm com um bico de 0,4 mm. O fatiador omite uma parede assim ou a imprime como uma única linha fraca. No alto da janela você escolhe o seu bico em {{ui:printCheck.nozzle}} (de 0,2 a 0,8 com um clique, qualquer outro no campo). Os lugares finos são pintados de vermelho com uma grade clara sobre os corpos, e a linha diz o lugar mais fino e quanta superfície está fina demais. Lugares com menos de 1 mm² e arestas vivas, como a de uma cunha, ficam de fora.
+- **{{ui:printCheck.floating.title}}**: um corpo, ou uma parte separada de um corpo, que não toca nem a mesa nem outra peça (com margem de 0,05 mm). Ele seria impresso no ar. Uma peça apoiada numa peça que está de pé não é problema.
+- **{{ui:printCheck.contact.title}}**: uma peça na mesa cuja primeira camada é muito pequena para a sua altura, como uma esfera ou um cone sobre a ponta. Ela pode se soltar durante a impressão. O aviso aparece abaixo de 0,5 mm² de apoio, medido 0,1 mm acima da mesa, por milímetro de altura: uma esfera sempre fica abaixo disso, um cubo de 10 mm tem 10.
+- **{{ui:printCheck.overhang.title}}**: os mesmos números de **Mostrar saliências**, com o ângulo ajustado lá.
+- **{{ui:printCheck.openMesh.title}}**: uma malha importada com arestas abertas, ou arestas compartilhadas por três faces ou mais. O fatiador precisa então adivinhar onde fica o interior.
+
+![Uma bandeja cuja parede direita tem só 0,6 mm: Verificar impressão a pinta de vermelho e a aponta na janela.](shot:print-check)
+
+{{ui:printCheck.show}} numa linha leva a câmera até lá; seleciona as peças flutuantes, as que se apoiam em pouco e as malhas abertas, e nas saliências liga **Mostrar saliências**. Corpos que se sobrepõem são verificados unidos, como o fatiador os une. Se você mudar o desenho com a janela aberta, aparece {{ui:printCheck.stale}}; clique ali ou em {{ui:printCheck.checkAgain}}. [[Esc]] fecha a janela. Nada no desenho muda. Uma IA faz a mesma verificação com `layerling_check_print`.
+
 ## Quando estiver pronto
 
 Escolha {{ui:editor.export}} e depois **STL** ou **3MF**. STL é o formato mais simples. 3MF guarda os nomes e as cores de cada sólido e por isso é prático quando você imprime em várias cores. A janela de exportação também mostra quantos gramas e metros de filamento a peça gastaria impressa maciça. Mais em [Arquivos e salvamento](chapter:files-and-saving).

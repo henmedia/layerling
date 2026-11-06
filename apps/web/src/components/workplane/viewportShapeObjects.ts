@@ -331,6 +331,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     threadClearance: shape.threadClearance,
     threadBoltClearance: shape.threadBoltClearance,
     threadAxialClearance: shape.threadAxialClearance,
+    threadStarts: shape.threadStarts,
     threadDepth: shape.threadDepth,
     threadFlankAngle: shape.threadFlankAngle,
     threadQuality: shape.threadQuality,
@@ -739,6 +740,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     threadClearance: shape.threadClearance,
     threadBoltClearance: shape.threadBoltClearance,
     threadAxialClearance: shape.threadAxialClearance,
+    threadStarts: shape.threadStarts,
     threadDepth: shape.threadDepth,
     threadFlankAngle: shape.threadFlankAngle,
     threadQuality: shape.threadQuality,
@@ -923,6 +925,40 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
 }
 
 
+/** The dimension of a box (its own width, height or depth) that runs along each axis of a frame. */
+export type BoxFrameDimensions = { x: "width" | "height" | "depth"; y: "width" | "height" | "depth"; z: "width" | "height" | "depth" };
+
+/**
+ * For a plain box that stands upright (turned only about its up axis) and three axes that each run along a
+ * different one of the box's own axes, say those of a workplane on one of its side faces: which of the box's own
+ * dimensions runs along each. Null for anything else, where the handles keep the shape's own axes.
+ */
+export function boxDimensionsAlongAxes(
+  shape: WorkplaneShape,
+  axes: { x: PlacementWorkplane["normal"]; y: PlacementWorkplane["normal"]; z: PlacementWorkplane["normal"] },
+): BoxFrameDimensions | null {
+  if (shape.kind !== "box" || shape.importedMesh || shapeHasTaper(shape) || shape.rotationX || shape.rotationZ) return null;
+  const quaternion = quaternionForShape(shape);
+  const own = [
+    { name: "width" as const, vector: new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion) },
+    { name: "height" as const, vector: new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion) },
+    { name: "depth" as const, vector: new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion) },
+  ];
+  const along = (axis: PlacementWorkplane["normal"]) => {
+    const direction = new THREE.Vector3(axis.x, axis.y, axis.z).normalize();
+    return own.find((entry) => Math.abs(entry.vector.dot(direction)) > 0.999)?.name ?? null;
+  };
+  const x = along(axes.x);
+  const y = along(axes.y);
+  const z = along(axes.z);
+  if (!x || !y || !z || new Set([x, y, z]).size !== 3) return null;
+  return { x, y, z };
+}
+
+export function boxDimensionsAlongWorkplane(shape: WorkplaneShape, workplane: PlacementWorkplane): BoxFrameDimensions | null {
+  return boxDimensionsAlongAxes(shape, { x: workplane.xAxis, y: workplane.normal, z: workplane.zAxis });
+}
+
 export function selectionFrameForShapes(
   shapes: WorkplaneShape[],
   selectedIds: string[],
@@ -944,8 +980,15 @@ export function selectionFrameForShapes(
   const singleQuaternion = singleShape ? quaternionForShape(singleShape) : null;
   const alongWorkplane = (axis: THREE.Vector3, workplaneAxis: PlacementWorkplane["normal"]) =>
     Math.abs(axis.applyQuaternion(singleQuaternion!).dot(new THREE.Vector3(workplaneAxis.x, workplaneAxis.y, workplaneAxis.z).normalize())) > 0.999;
+  // A plain box on a workplane that stands on one of its side faces (Discussion #1351): the handles follow that
+  // workplane, as in Tinkercad, and write each size to the box's own dimension that runs along their axis.
+  const onSideFace = Boolean(singleShape && workplane && !placementWorkplaneIsBase(workplane))
+    && (() => {
+      const dimensions = boxDimensionsAlongWorkplane(singleShape!, workplane!);
+      return Boolean(dimensions) && dimensions!.y !== "height";
+    })();
   const useWorkplane = Boolean(workplane) && !placementWorkplaneIsBase(workplane!)
-    && (!singleShape || (alongWorkplane(new THREE.Vector3(0, 1, 0), workplane!.normal) && alongWorkplane(new THREE.Vector3(1, 0, 0), workplane!.xAxis)));
+    && (!singleShape || (alongWorkplane(new THREE.Vector3(0, 1, 0), workplane!.normal) && alongWorkplane(new THREE.Vector3(1, 0, 0), workplane!.xAxis)) || onSideFace);
   const quaternion = useWorkplane
     ? placementWorkplaneQuaternion(workplane!)
     : singleShape ? quaternionForShape(singleShape) : new THREE.Quaternion();
@@ -2233,6 +2276,7 @@ export function createShapeObject(
         threadClearance: shape.threadClearance,
         threadBoltClearance: shape.threadBoltClearance,
         threadAxialClearance: shape.threadAxialClearance,
+        threadStarts: shape.threadStarts,
         threadDepth: shape.threadDepth,
         threadFlankAngle: shape.threadFlankAngle,
         threadQuality: shape.threadQuality,

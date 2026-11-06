@@ -439,7 +439,9 @@ export function threadSizeFor(diameter: number, pitch: number): ThreadSizeSpec |
  * the size, and tapered as it is (#1267) - a straight thread at an NPT size's measures, or a
  * tapered M6, is no standard size.
  */
-export function threadStandardSize(settings: Pick<ThreadSettings, "diameter" | "pitch" | "taper">): ThreadSizeSpec | null {
+export function threadStandardSize(settings: Pick<ThreadSettings, "diameter" | "pitch" | "taper"> & { starts?: number }): ThreadSizeSpec | null {
+  // A thread of several starts (#1348) is no standard size, whatever its pitch.
+  if ((settings.starts ?? 1) > 1) return null;
   const size = threadSizeFor(settings.diameter, settings.pitch);
   return size && Boolean(size.taper) === settings.taper ? size : null;
 }
@@ -599,6 +601,33 @@ export function normalizeThreadPitch(value: number | undefined, diameter: number
   return clamp(finite(value, defaultThreadPitch(normalizeThreadDiameter(diameter))), limits.min, limits.max);
 }
 
+/*
+ * Starts (#1348): a lead screw such as T8x8 has four threads side by side, each one pitch (2 mm)
+ * from the next, and every one of them climbs the lead - starts times the pitch, 8 mm - in a turn.
+ * The pitch stays what sets the profile and its depth; only how far a thread climbs in a turn grows.
+ * Up to eight starts, and a lead of at most half the circumference, so the thread rises at most
+ * about 27 degrees a turn - a lead screw's is far less. A tapered thread has one start.
+ */
+export const DEFAULT_THREAD_STARTS = 1;
+export const MIN_THREAD_STARTS = 1;
+export const MAX_THREAD_STARTS = 8;
+
+export function threadStartsLimit(diameter: number, pitch: number, taper = false) {
+  if (taper) return MIN_THREAD_STARTS;
+  const room = Math.floor((Math.PI * normalizeThreadDiameter(diameter)) / 2 / Math.max(MIN_THREAD_PITCH, pitch) + 1e-9);
+  return clamp(room, MIN_THREAD_STARTS, MAX_THREAD_STARTS);
+}
+
+export function normalizeThreadStarts(value: number | undefined, diameter: number, pitch: number, taper = false) {
+  const whole = Math.round(finite(value, DEFAULT_THREAD_STARTS));
+  return clamp(whole, MIN_THREAD_STARTS, threadStartsLimit(diameter, pitch, taper));
+}
+
+/** How far one thread climbs in a turn: the pitch times the starts. */
+export function threadLead(settings: Pick<ThreadSettings, "pitch" | "starts">) {
+  return settings.pitch * settings.starts;
+}
+
 export function normalizeThreadClearance(value?: number) {
   return clamp(finite(value, LEGACY_THREAD_CLEARANCE), MIN_THREAD_CLEARANCE, MAX_THREAD_CLEARANCE);
 }
@@ -710,6 +739,8 @@ export type ThreadShapeFields = {
   threadTaper?: boolean;
   threadDiameter?: number;
   threadPitch?: number;
+  /** Starts (#1348): threads side by side, each one pitch from the next; 1 when absent. */
+  threadStarts?: number;
   threadClearance?: number;
   threadBoltClearance?: number;
   threadAxialClearance?: number;
@@ -736,7 +767,10 @@ export type ThreadSettings = {
   /** Tapered 1 in 16 on the diameter, as the pipe thread NPT (Discussion #1267); `diameter` is then the wide end's. */
   taper: boolean;
   diameter: number;
+  /** The distance from one thread to the next, which sets the profile; a thread climbs `pitch * starts` in a turn. */
   pitch: number;
+  /** Threads side by side (#1348), 1 to 8. */
+  starts: number;
   clearance: number;
   boltClearance: number;
   /** Play along the axis for a nut or tapped hole, in mm (#256). */
@@ -781,6 +815,7 @@ export function threadSettings(shape: ThreadShapeFields): ThreadSettings {
     hand: normalizeThreadHand(shape.threadHand),
     profile,
     taper: shape.threadTaper === true,
+    starts: normalizeThreadStarts(shape.threadStarts, head.diameter, head.pitch, shape.threadTaper === true),
     clearance: normalizeThreadClearance(shape.threadClearance),
     boltClearance: normalizeThreadBoltClearance(shape.threadBoltClearance),
     axialClearance: normalizeThreadAxialClearance(shape.threadAxialClearance, head.pitch),
@@ -1677,18 +1712,26 @@ function threadWall(
   subdivisions: number,
   bandHeight: number,
   profilePoints: readonly ThreadProfilePoint[],
+  starts = 1,
 ) {
   const profileRadii = profilePoints.map((point) => minor + (major - minor) * point.level);
   const turns = (topY - bottomY) / pitch;
-  const firstTurn = -2;
-  const lastTurn = Math.ceil(turns) + 1;
+  /*
+   * Each column climbs the lead over the turn (#1348): `starts` pitches. The rows still step a
+   * pitch at a time, since the threads side by side are one pitch apart, so the column at 360
+   * degrees meets the first one `starts` rows of turns further up. Its rows must still reach below
+   * the bottom and above the top, hence the turns before and after grow with the starts.
+   */
+  const lead = pitch * Math.max(1, starts);
+  const firstTurn = -1 - Math.max(1, starts);
+  const lastTurn = Math.ceil(turns) + Math.max(1, starts);
   const columns: number[][] = [];
   const bottomEdge: number[] = [];
   const topEdge: number[] = [];
 
   for (let column = 0; column < angles.length; column += 1) {
     const angle = angles[column];
-    const advance = handSign * (column / (angles.length - 1)) * pitch;
+    const advance = handSign * (column / (angles.length - 1)) * lead;
     const bottomRadius = limitRadius(bottomY, profileRadius(-advance / pitch, major, minor, profilePoints));
     const topRadius = limitRadius(topY, profileRadius((topY - bottomY - advance) / pitch, major, minor, profilePoints));
     const bottomVertex = pushVertex(builder, angle, bottomRadius, bottomY);
@@ -1791,6 +1834,7 @@ export function threadFootprintPatch(shape: ThreadShapeFields & { width?: number
       ...settings,
       diameter,
       pitch,
+      starts: normalizeThreadStarts(settings.starts, diameter, pitch, settings.taper),
       axialClearance: normalizeThreadAxialClearance(settings.axialClearance, pitch),
       depth: normalizeThreadDepth(settings.depth * factor, pitch, diameter, settings.flankAngle),
       headHeight,
@@ -1811,6 +1855,8 @@ export function threadFootprintPatch(shape: ThreadShapeFields & { width?: number
     threadProfile: scaled.profile,
     threadDiameter: scaled.diameter,
     threadPitch: scaled.pitch,
+    // One start stays unset, as it always was.
+    ...(scaled.starts > 1 || shape.threadStarts !== undefined ? { threadStarts: scaled.starts } : {}),
     threadClearance: scaled.clearance,
     threadBoltClearance: scaled.boltClearance,
     threadAxialClearance: scaled.axialClearance,
@@ -1973,7 +2019,7 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
         const here = Math.max(0.02, radius + shift(y));
         return here <= cone ? here : Math.min(here, Math.max(0.05, cone));
       };
-  const spanTurns = Math.ceil((height - shaftBottom) / settings.pitch) + 4;
+  const spanTurns = Math.ceil((height - shaftBottom) / settings.pitch) + 2 + 2 * settings.starts;
   const bandHeight = !lowBroken && !topBroken ? 0 : Math.max(topBroken ? chamfer : 0, lowBroken ? chamferLow : 0) + settings.pitch;
   const subdivisions = bandHeight > 0 ? CHAMFER_SUBDIVISIONS : 1;
   const denseSpan = Math.min(spanTurns, Math.ceil(bandHeight / settings.pitch) * 2 + 2);
@@ -1995,7 +2041,7 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
 
   if (settings.role === "nut" && plan.tiers) {
     const { bottom, top } = tierWalls(builder, plan.tiers);
-    const bore = threadWall(builder, angles, 0, height, major, minor, settings.pitch, handSign, true, limitRadius, subdivisions, bandHeight, profile.points);
+    const bore = threadWall(builder, angles, 0, height, major, minor, settings.pitch, handSign, true, limitRadius, subdivisions, bandHeight, profile.points, settings.starts);
     zipRings(builder, bore.bottomEdge, columnOrder, bottom.ring, bottom.order);
     if (plan.collarHeight > 0) {
       // The nut's collar (#1175): a step in from the body's top, its wall, and the top face round the bore.
@@ -2008,7 +2054,7 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
       zipRings(builder, bore.topEdge, columnOrder, top.ring, top.order, true);
     }
   } else if (settings.role === "screw" && plan.tiers) {
-    const shaft = threadWall(builder, angles, shaftBottom, height, major, minor, settings.pitch, handSign, false, limitRadius, subdivisions, bandHeight, profile.points);
+    const shaft = threadWall(builder, angles, shaftBottom, height, major, minor, settings.pitch, handSign, false, limitRadius, subdivisions, bandHeight, profile.points, settings.starts);
     capFan(builder, shaft.topEdge, height, true);
     const { bottom, top } = tierWalls(builder, plan.tiers);
     zipRings(builder, shaft.bottomEdge, columnOrder, top.ring, top.order, true);
@@ -2045,7 +2091,7 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
     } else {
       wall(builder, outerBottom, outerTop);
     }
-    const bore = threadWall(builder, angles, 0, height, major, minor, settings.pitch, handSign, true, limitRadius, subdivisions, bandHeight, profile.points);
+    const bore = threadWall(builder, angles, 0, height, major, minor, settings.pitch, handSign, true, limitRadius, subdivisions, bandHeight, profile.points, settings.starts);
     capRing(builder, bore.bottomEdge, outerBottom, false);
     if (plan.collarHeight > 0) {
       // The nut's collar (#1175), as the screw's: a step in from the top face, its wall, the face round the bore.
@@ -2058,7 +2104,7 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
       capRing(builder, bore.topEdge, outerTop, true);
     }
   } else if (settings.role === "screw") {
-    const shaft = threadWall(builder, angles, shaftBottom, height, major, minor, settings.pitch, handSign, false, limitRadius, subdivisions, bandHeight, profile.points);
+    const shaft = threadWall(builder, angles, shaftBottom, height, major, minor, settings.pitch, handSign, false, limitRadius, subdivisions, bandHeight, profile.points, settings.starts);
     capFan(builder, shaft.topEdge, height, true);
 
     const headRadiusAt = (angle: number, y: number) => {
@@ -2124,7 +2170,7 @@ export function createThreadGeometry(options: ThreadGeometryOptions) {
       capFan(builder, headBottom, 0, false);
     }
   } else {
-    const rod = threadWall(builder, angles, 0, height, major, minor, settings.pitch, handSign, false, limitRadius, subdivisions, bandHeight, profile.points);
+    const rod = threadWall(builder, angles, 0, height, major, minor, settings.pitch, handSign, false, limitRadius, subdivisions, bandHeight, profile.points, settings.starts);
     capFan(builder, rod.bottomEdge, 0, false);
     capFan(builder, rod.topEdge, height, true);
   }

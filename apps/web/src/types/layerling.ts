@@ -216,6 +216,8 @@ export type ShapeCustomization = {
   /** Rod and screw: how much thinner (in diameter) the bolt comes out, for a metal nut. */
   threadBoltClearance?: number;
   threadAxialClearance?: number;
+  /** Starts (#1348): threads side by side, each a pitch from the next; 1 when absent. */
+  threadStarts?: number;
   /** Own profile: the thread depth in mm (outer minus core radius) and the included flank angle in degrees. */
   threadDepth?: number;
   threadFlankAngle?: number;
@@ -1088,6 +1090,8 @@ export type WorkplaneShape = {
   /** Rod and screw: how much thinner (in diameter) the bolt comes out, for a metal nut. */
   threadBoltClearance?: number;
   threadAxialClearance?: number;
+  /** Starts (#1348): threads side by side, each a pitch from the next; 1 when absent. */
+  threadStarts?: number;
   /** Own profile: the thread depth in mm (outer minus core radius) and the included flank angle in degrees. */
   threadDepth?: number;
   threadFlankAngle?: number;

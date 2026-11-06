@@ -200,32 +200,51 @@ function profileEdges(cad: OcctKernel, part: CadModifierThreadPart): ShapeHandle
  */
 function halfTurnFaces(cad: OcctKernel, part: CadModifierThreadPart, climbsCounterClockwise: boolean) {
   const pitch = part.pitch;
+  // With several starts (#1348) the profile is still one pitch tall, but it climbs the lead a turn.
+  const lead = threadPartLead(part);
   // Both ends of the profile lie at the crest radius of its first point.
   const crestRadius = part.curve ? part.major : part.minor + (part.major - part.minor) * part.profile[0].level;
   const edges = profileEdges(cad, part);
   // The profile keeps the axis in its plane (fixed binormal), so every point
   // of it runs on a helix of its own radius and the same pitch - the
   // display's own construction.
-  const helix = cad.makeHelixWireHanded({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 }, pitch, pitch / 2, crestRadius, !climbsCounterClockwise);
+  const helix = cad.makeHelixWireHanded({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 }, lead, lead / 2, crestRadius, !climbsCounterClockwise);
   const flanks = cad.getSubShapes(cad.sweepAdvanced(cad.makeWire(edges), helix, { mode: FIXED_UP, up: { x: 0, y: 0, z: 1 } }), "face");
   // Inside the thread wherever two half turns meet, so only the outermost
   // strips and sections remain - and those are cut away with the ends.
-  const strip = cad.getSubShapes(cad.loft([cad.makeWire([cad.makeLineEdge({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: pitch / 2 })]), helix], false, true), "face");
+  const strip = cad.getSubShapes(cad.loft([cad.makeWire([cad.makeLineEdge({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: lead / 2 })]), helix], false, true), "face");
   const section = cad.makeFace(cad.makeWire([
     lineEdge(cad, [0, 0], [crestRadius, 0]),
     ...edges,
     lineEdge(cad, [crestRadius, pitch], [0, pitch]),
     lineEdge(cad, [0, pitch], [0, 0]),
   ]));
-  const sectionEnd = cad.translate(cad.rotate(section, AXIS, Math.PI), 0, 0, pitch / 2);
+  const sectionEnd = cad.translate(cad.rotate(section, AXIS, Math.PI), 0, 0, lead / 2);
   return [...flanks, ...strip, ...strip.map((face) => cad.translate(face, 0, 0, pitch)), section, sectionEnd];
 }
 
+/** How far the part's thread climbs in a turn: the pitch times its starts (#1348). */
+function threadPartLead(part: CadModifierThreadPart) {
+  return part.pitch * Math.max(1, part.starts ?? 1);
+}
+
+/**
+ * Where half turn `index` starts: an even one on +x, an odd one turned half round. The even ones
+ * stand a pitch apart, one on the next - the strip on top of one is the strip under the next, even
+ * when that is another start (#1348) - and each odd one continues the even one below it, half a
+ * lead up. With one start that is half a pitch for every index, as it always was.
+ */
+function halfTurnBase(index: number, crestZ: number, part: CadModifierThreadPart) {
+  const odd = ((index % 2) + 2) % 2;
+  return crestZ + ((index - odd) / 2) * part.pitch + (odd * threadPartLead(part)) / 2;
+}
+
 /** Half turn `index` (0 starts on +x with its crest at z = `crestZ`), as faces. */
-function halfTurn(cad: OcctKernel, unit: readonly ShapeHandle[], index: number, crestZ: number, pitch: number) {
+function halfTurn(cad: OcctKernel, unit: readonly ShapeHandle[], index: number, crestZ: number, part: CadModifierThreadPart) {
+  const base = halfTurnBase(index, crestZ, part);
   return unit.map((face) => {
     const turned = index % 2 === 0 ? face : cad.rotate(face, AXIS, Math.PI);
-    return cad.translate(turned, 0, 0, crestZ + (index * pitch) / 2);
+    return cad.translate(turned, 0, 0, base);
   });
 }
 
@@ -327,7 +346,7 @@ function taperedHalfTurns(cad: OcctKernel, part: CadModifierThreadPart, crestZ: 
 function halfTurnMaker(cad: OcctKernel, part: CadModifierThreadPart, crestZ: number, climbsCounterClockwise: boolean) {
   if (part.taper) return taperedHalfTurns(cad, part, crestZ, climbsCounterClockwise);
   const unit = halfTurnFaces(cad, part, climbsCounterClockwise);
-  return (index: number) => halfTurn(cad, unit, index, crestZ, part.pitch);
+  return (index: number) => halfTurn(cad, unit, index, crestZ, part);
 }
 
 /** Faces sewn into one solid, less the faces two half turns share: those are inside it. */
@@ -348,17 +367,30 @@ function sewnSolid(cad: OcctKernel, faces: readonly ShapeHandle[], pitch: number
 /**
  * Half turns covering z = `zFrom`..`zTo` at every angle, at least half a
  * pitch past both, crest at z = `crestZ` on +x. Half turn i covers its half
- * of the circle from z = crestZ + i pitch/2 (rising half a pitch across it)
- * to one pitch higher.
+ * of the circle from its base (`halfTurnBase`, rising half a lead across it)
+ * to a pitch above that. With several starts (#1348) a half turn reaches half
+ * a lead up, so the first ones start that much lower.
+ *
+ * With several starts the run also begins on an even half turn and ends on an
+ * odd one: both halves of the circle then have the same layers, half turns
+ * 2m and 2m + 1, and the helicoid at each end runs on across the half way.
+ * Begun on an odd one, the odd half had a layer the even half lacked, and the
+ * steps at the ends met on the axis in staggered pieces: one shell, but no
+ * valid solid (three and five starts; one start climbs a single layer a turn
+ * and never had the gap).
  */
-function halfTurnRange(zFrom: number, zTo: number, crestZ: number, pitch: number) {
-  return { first: 2 * Math.floor((zFrom - crestZ) / pitch) - 3, last: 2 * Math.ceil((zTo - crestZ) / pitch) + 1 };
+function halfTurnRange(zFrom: number, zTo: number, crestZ: number, part: CadModifierThreadPart) {
+  const pitch = part.pitch;
+  const starts = Math.max(1, part.starts ?? 1);
+  const extra = 2 * (starts - 1);
+  const first = 2 * Math.floor((zFrom - crestZ) / pitch) - 3 - extra;
+  return { first: starts > 1 ? first - 1 : first, last: 2 * Math.ceil((zTo - crestZ) / pitch) + 1 };
 }
 
 /** The tap: the thread as a solid from `zFrom` to `zTo` (at least), uncut. */
 function helicalSolid(cad: OcctKernel, part: CadModifierThreadPart, zFrom: number, zTo: number, crestZ: number, climbsCounterClockwise: boolean) {
   const halfTurnAt = halfTurnMaker(cad, part, crestZ, climbsCounterClockwise);
-  const { first, last } = halfTurnRange(zFrom, zTo, crestZ, part.pitch);
+  const { first, last } = halfTurnRange(zFrom, zTo, crestZ, part);
   const faces: ShapeHandle[] = [];
   for (let index = first; index <= last; index += 1) faces.push(...halfTurnAt(index));
   return sewnSolid(cad, faces, part.pitch);
@@ -394,23 +426,36 @@ function outsideThread(cad: OcctKernel, part: CadModifierThreadPart, bottom: num
   const { pitch, height, chamfer, chamferLow } = part;
   const halfTurnAt = halfTurnMaker(cad, part, crestZ, climbsCounterClockwise);
   const bound = outsideThreadBound(cad, part, bottom, part.chamferBottom);
-  const { first, last } = halfTurnRange(bottom, height, crestZ, pitch);
+  const { first, last } = halfTurnRange(bottom, height, crestZ, part);
   const broken = chamfer > 0;
   const clearOfBottom = bottom + (chamferLow > 0 && part.chamferBottom ? chamferLow + Math.max(0.1, pitch) : 0) + pitch * 0.01;
   const clearOfTop = height - (broken ? chamfer + Math.max(0.1, pitch) : 0) - pitch * 0.01;
+  /*
+   * The ends are cut from a run of half turns, the first ones and the last ones by index. With one
+   * start the heights rise with the index, so that is just the half turns that reach the chamfers.
+   * With several (#1348) an odd half turn stands half a lead up, above even ones of higher index:
+   * each group is then whole layers, half turns 2m and 2m + 1, for the reason `halfTurnRange`
+   * gives - picked by height alone, the groups met in pieces and sewed into no solid.
+   */
+  const from = (index: number) => halfTurnBase(index, crestZ, part);
+  const to = (index: number) => from(index) + threadPartLead(part) / 2 + pitch;
+  let lastLow = first - 1;
+  for (let index = first; index <= last; index += 1) if (from(index) < clearOfBottom) lastLow = index;
+  let firstHigh = last + 1;
+  if ((part.starts ?? 1) > 1 && lastLow >= first && ((lastLow % 2) + 2) % 2 === 0) lastLow += 1;
+  for (let index = last; index > lastLow; index -= 1) if (to(index) > clearOfTop) firstHigh = index;
+  if ((part.starts ?? 1) > 1 && firstHigh <= last && ((firstHigh % 2) + 2) % 2 === 1) firstHigh -= 1;
   const low: ShapeHandle[] = [];
   const middle: ShapeHandle[] = [];
   const high: ShapeHandle[] = [];
   for (let index = first; index <= last; index += 1) {
-    const from = crestZ + (index * pitch) / 2;
-    const to = from + 1.5 * pitch;
     const faces = halfTurnAt(index);
-    if (from < clearOfBottom) low.push(...faces);
-    else if (to > clearOfTop) high.push(...faces);
+    if (index <= lastLow) low.push(...faces);
+    else if (index >= firstHigh) high.push(...faces);
     else middle.push(...faces);
   }
   const trimmed = (faces: ShapeHandle[]) => cad.getSubShapes(oneSolid(cad, cad.common(sewnSolid(cad, faces, pitch), bound), "thread end"), "face");
-  if (middle.length === 0) return oneSolid(cad, cad.common(sewnSolid(cad, [...low, ...high], pitch), bound), "thread");
+  if (middle.length === 0) return oneSolid(cad, cad.common(sewnSolid(cad, [...low, ...middle, ...high], pitch), bound), "thread");
   return sewnSolid(cad, [...trimmed(low), ...middle, ...(high.length ? trimmed(high) : [])], pitch);
 }
 

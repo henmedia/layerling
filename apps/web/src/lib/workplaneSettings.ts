@@ -638,6 +638,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.threadClearance = optionalShapeNumber(source.threadClearance, fallbackEntry?.threadClearance, 0, 1.5);
       entry.threadBoltClearance = optionalShapeNumber(source.threadBoltClearance, fallbackEntry?.threadBoltClearance, 0, 1);
       entry.threadAxialClearance = optionalShapeNumber(source.threadAxialClearance, fallbackEntry?.threadAxialClearance, 0, 1);
+      entry.threadStarts = optionalShapeNumber(source.threadStarts, fallbackEntry?.threadStarts, 1, 8);
       entry.threadDepth = optionalShapeNumber(source.threadDepth, fallbackEntry?.threadDepth, 0.01, 40);
       entry.threadFlankAngle = optionalShapeNumber(source.threadFlankAngle, fallbackEntry?.threadFlankAngle, 10, 90);
       entry.threadQuality = optionalShapeNumber(source.threadQuality, fallbackEntry?.threadQuality, 12, 96, true);

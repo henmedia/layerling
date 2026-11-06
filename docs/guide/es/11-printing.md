@@ -54,6 +54,20 @@ La inclinación que aguanta tu impresora se fija en los ajustes, en {{ui:workspa
 - Donde dos piezas encajan una en otra, necesitas holgura: normalmente de 0,2 a 0,4 mm, según la impresora. Haz una pequeña pareja de prueba antes de imprimir la pieza grande.
 - Mucha gente achaflana ligeramente la arista inferior que se apoya en la cama. Así se evita que la primera capa se ensanche («pata de elefante»).
 
+## Comprobar la impresión
+
+{{ui:editor.tool.printCheck}}, junto a {{ui:editor.tool.clearance}} en {{ui:editor.group.combine}}, revisa los objetos seleccionados, o todos los visibles si no hay nada seleccionado, y dice en una ventana lo que saldría mal al imprimir. Cada una de sus cinco líneas sale en verde si no encontró nada, y en naranja con qué y dónde si encontró algo:
+
+- **{{ui:printCheck.thin.title}}**: zonas más finas que dos líneas de la boquilla: 0,8 mm con una boquilla de 0,4 mm. El laminador omite una pared así o la imprime como una sola línea débil. Arriba en la ventana eliges tu boquilla en {{ui:printCheck.nozzle}} (de 0,2 a 0,8 con un clic, cualquier otra en el campo). Las zonas finas se pintan de rojo con una cuadrícula clara sobre los cuerpos, y la línea indica la zona más fina y cuánta superficie es demasiado fina. Se omiten las zonas de menos de 1 mm² y las aristas vivas, como la de una cuña.
+- **{{ui:printCheck.floating.title}}**: un cuerpo, o una pieza separada de uno, que no toca ni la placa ni otra pieza (con 0,05 mm de margen). Se imprimiría en el aire. Una pieza apoyada en otra que está de pie no es problema.
+- **{{ui:printCheck.contact.title}}**: una pieza en la placa cuya primera capa es muy pequeña para su altura, como una esfera o un cono sobre su punta. Puede despegarse mientras se imprime. El aviso salta por debajo de 0,5 mm² de apoyo, medido a 0,1 mm sobre la placa, por cada milímetro de altura: una esfera siempre queda por debajo, un cubo de 10 mm tiene 10.
+- **{{ui:printCheck.overhang.title}}**: las mismas cifras que **Mostrar voladizos**, con el ángulo ajustado allí.
+- **{{ui:printCheck.openMesh.title}}**: una malla importada con aristas abiertas, o aristas que comparten tres caras o más. El laminador tiene que adivinar dónde está el interior.
+
+![Una bandeja cuya pared derecha solo tiene 0,6 mm: Comprobar impresión la pinta de rojo y la indica en la ventana.](shot:print-check)
+
+{{ui:printCheck.show}} en una línea lleva allí la cámara; selecciona las piezas flotantes, las que se apoyan en muy poco y las mallas abiertas, y en los voladizos activa **Mostrar voladizos**. Los cuerpos que se solapan se comprueban unidos, como los une el laminador. Si cambias el diseño con la ventana abierta, aparece {{ui:printCheck.stale}}; haz clic ahí o en {{ui:printCheck.checkAgain}}. [[Esc]] cierra la ventana. El diseño no cambia. Una IA hace la misma comprobación con `layerling_check_print`.
+
 ## Cuando lo tengas listo
 
 Elige {{ui:editor.export}} y luego **STL** o **3MF**. STL es el formato más sencillo. 3MF conserva los nombres y los colores de cada cuerpo, así que es práctico cuando imprimes en varios colores. La ventana de exportación también muestra cuántos gramos y metros de filamento necesitaría la pieza impresa maciza. Más en [Archivos y guardado](chapter:files-and-saving).

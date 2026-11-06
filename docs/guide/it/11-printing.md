@@ -54,6 +54,20 @@ Nelle impostazioni, sotto {{ui:workspace.appearance}}, imposta l’inclinazione 
 - Quando due parti devono incastrarsi, occorre lasciare del gioco: in genere da 0,2 a 0,4 mm, in base alla stampante. Prima di stampare il pezzo grande, prova un piccolo incastro di test.
 - Molti smussano leggermente il bordo inferiore appoggiato sul piatto. Questo limita l’allargamento del primo strato (il cosiddetto “piede d’elefante”).
 
+## Controllare la stampa
+
+{{ui:editor.tool.printCheck}}, accanto a {{ui:editor.tool.clearance}} in {{ui:editor.group.combine}}, esamina gli oggetti selezionati, o tutti quelli visibili se non è selezionato nulla, e dice in una finestra cosa andrebbe storto in stampa. Ognuna delle sue cinque righe è verde se non ha trovato nulla, e arancione con cosa e dove se ha trovato qualcosa:
+
+- **{{ui:printCheck.thin.title}}**: punti più sottili di due linee dell'ugello, cioè 0,8 mm con un ugello da 0,4 mm. Lo slicer tralascia una parete così o la stampa come un'unica linea debole. In alto nella finestra scegli il tuo ugello in {{ui:printCheck.nozzle}} (da 0,2 a 0,8 con un clic, qualsiasi altro nel campo). I punti sottili vengono dipinti di rosso con una griglia chiara sui corpi, e la riga indica il punto più sottile e quanta superficie è troppo sottile. I punti sotto 1 mm² e gli spigoli vivi, come quello di un cuneo, sono esclusi.
+- **{{ui:printCheck.floating.title}}**: un corpo, o una parte separata di un corpo, che non tocca né il piatto né un'altra parte (entro 0,05 mm). Verrebbe stampato nel vuoto. Una parte appoggiata su una parte che sta in piedi va bene.
+- **{{ui:printCheck.contact.title}}**: una parte sul piatto il cui primo strato è molto piccolo per la sua altezza, come una sfera o un cono sulla punta. Può staccarsi durante la stampa. L'avviso compare sotto 0,5 mm² di appoggio, misurato 0,1 mm sopra il piatto, per ogni millimetro di altezza: una sfera è sempre sotto, un cubo di 10 mm ha 10.
+- **{{ui:printCheck.overhang.title}}**: gli stessi numeri di **Mostra sbalzi**, con l'angolo impostato lì.
+- **{{ui:printCheck.openMesh.title}}**: una mesh importata con spigoli aperti, o spigoli condivisi da tre o più facce. Lo slicer deve allora indovinare dov'è l'interno.
+
+![Una vaschetta la cui parete destra è spessa solo 0,6 mm: Controlla la stampa la colora di rosso e la segnala nella finestra.](shot:print-check)
+
+{{ui:printCheck.show}} su una riga porta lì la telecamera; seleziona le parti sospese, quelle con poco appoggio e le mesh aperte, e per le sporgenze attiva **Mostra sbalzi**. I corpi che si sovrappongono vengono controllati uniti, come li unisce lo slicer. Se modifichi il progetto mentre la finestra è aperta, compare {{ui:printCheck.stale}}; fai clic lì o su {{ui:printCheck.checkAgain}}. [[Esc]] chiude la finestra. Il progetto non cambia. Un'IA fa lo stesso controllo con `layerling_check_print`.
+
 ## Quando il pezzo è pronto
 
 Scegli {{ui:editor.export}}, poi **STL** o **3MF**. STL è il formato più semplice. 3MF conserva i nomi e i colori dei singoli corpi, quindi è comodo per la stampa multicolore. La finestra di esportazione mostra anche quanti grammi e metri di filamento servirebbero per stampare il pezzo pieno. Altre informazioni in [File e salvataggio](chapter:files-and-saving).

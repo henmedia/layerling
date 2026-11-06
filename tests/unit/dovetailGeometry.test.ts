@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createDovetailGeometry, dovetailContourPoints, dovetailFlankAngle, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
+import { createDovetailGeometry, dovetailContourPoints, dovetailFlankAngle, maxDovetailNeckWidth, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { cadModifierProfileForShape } from "@/lib/cadProfileExtrusion";
 
@@ -31,7 +31,13 @@ describe("dovetail", () => {
 
   it("keeps the neck narrower than the wide end and the clearance within reason", () => {
     expect(normalizeDovetailNeckWidth(undefined, 30)).toBeCloseTo(15);
-    expect(normalizeDovetailNeckWidth(40, 30)).toBeCloseTo(28.5);
+    expect(normalizeDovetailNeckWidth(40, 30)).toBeCloseTo(29.9);
+    // #1360: a long, gently tapering tail - 146 wide, 145 at the neck - keeps its neck; 0.1 mm narrower is the limit.
+    expect(normalizeDovetailNeckWidth(145, 146)).toBeCloseTo(145);
+    expect(normalizeDovetailNeckWidth(146, 146)).toBeCloseTo(145.9);
+    expect(maxDovetailNeckWidth(146)).toBeCloseTo(145.9);
+    expect(maxDovetailNeckWidth(0.15)).toBeCloseTo(0.075);
+    expect(dovetailFlankAngle(146, 24, 145)).toBeCloseTo(1.19, 1);
     expect(normalizeDovetailNeckWidth(-5, 30)).toBeCloseTo(0.1);
     expect(normalizeDovetailClearance(undefined)).toBe(0.2);
     expect(normalizeDovetailClearance(5)).toBe(2);

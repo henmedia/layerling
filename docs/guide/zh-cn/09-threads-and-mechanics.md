@@ -35,6 +35,7 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 更多设置：
 
 - **{{ui:prop.threadHand}}：** {{ui:thread.right}} 或 {{ui:thread.left}}。
+- **{{ui:prop.threadStarts}}：** 多条螺纹并排，如丝杆：T8x8 有 4 头，每头 2 mm，每条每转升高 8 mm。此时螺距字段显示为{{ui:prop.threadDivision}}：相邻两条螺纹之间的距离，决定牙型深度，下方的提示给出导程。列表中的规格和锥螺纹只有一头。
 - **{{ui:prop.threadProfile}}：** {{ui:thread.profileV}} 是公制和英制螺纹的标准牙型，{{ui:thread.profileWhitworth}} 是 G 管螺纹的牙型：55°，牙顶和牙底为圆角。{{ui:thread.profileTrapezoidal}} 和 {{ui:thread.profileRound}} 的牙顶和牙底是平的。这种牙型通常打印更可靠，因为不会产生细薄的牙尖。
 - **{{ui:prop.threadTaper}}：** 螺纹直径按 1:16 收窄，就像锥管螺纹一样；此时{{ui:prop.diameter}}是大端的直径。{{ui:thread.rod}}或{{ui:thread.screw}}朝顶部的末端变细，{{ui:thread.nut}}或{{ui:thread.bore}}朝顶部的入口变宽，所以把锥形螺杆倒过来就能拧进去。任何牙型都可以做成锥形，锥形螺纹也是精确实体，可用于边缘工具和 STEP 导出。
 - **{{ui:thread.profileCustom}}：** 自行塑造的梯形，带有等宽的平牙顶和平牙底。{{ui:prop.threadFlankAngle}} 是一颗牙两个牙侧之间的夹角：60° 是尖锐的 V 形螺纹，30° 是梯形螺纹；在 90° 或更小时，任何牙侧都不会比 45° 更平，因此螺纹无需支撑即可打印。{{ui:prop.threadDepth}} 和 {{ui:prop.threadCoreDiameter}} 是同一个尺寸的两种说法：芯径等于直径减去两倍深度，改动其中一个就会改变另一个。新的自定义牙型从 60° 的 V 形螺纹深度开始。深度有限制，取决于角度和螺距：不得浅于螺距的十分之一，不得深于直径的 40%，也不得深到两个牙侧占据超过十分之九的螺距。如果改变螺距，深度按比例跟随；如果缩放螺纹，深度也同样跟随。间隙和倒角的作用与其他牙型相同。通过 MCP 桥接时，牙型为 `custom`，并带 `threadFlankAngle` 和 `threadDepth`。

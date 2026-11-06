@@ -6,7 +6,7 @@ import type * as THREE from "three";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
-import { pivotBoxCorners, scrollAxisMetrics, scrollDistance, scrollViewAlong, viewScrollFrame, type ScrollAxisMetrics } from "@/lib/viewScroll";
+import { pivotBoxCorners, scrollAxisMetrics, scrollDistance, scrollViewAlong, viewScrollFrame, wheelScrollFraction, type ScrollAxisMetrics } from "@/lib/viewScroll";
 
 /**
  * Scrollbars along the right and bottom edge of the 3D view (Discussion #1241), switched in the view bar. Dragging
@@ -250,11 +250,21 @@ export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeS
     (event.currentTarget as HTMLElement).classList.remove("dragging");
   };
 
-  // The wheel over a bar scrolls along it, as on a page; it does not zoom there.
+  // A drag whose pointer the bar lost without a release (the window lost focus, say) ends there, so a later move over
+  // the track cannot pick it up again.
+  const onTrackLost = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (drag.current?.pointerId !== event.pointerId) return;
+    drag.current = null;
+    event.currentTarget.classList.remove("dragging");
+  };
+
+  // The wheel over a bar scrolls along it as far as it turned, as on a page; it does not zoom there.
   const onWheel = (axis: Axis) => (event: ReactWheelEvent) => {
     event.stopPropagation();
     const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
-    if (delta) step(axis, Math.sign(delta) * ARROW_STEP * 3);
+    const canvas = threeRef.current?.renderer.domElement;
+    const viewPx = (axis === "x" ? canvas?.clientWidth : canvas?.clientHeight) ?? 0;
+    if (delta) step(axis, wheelScrollFraction(delta, event.deltaMode, viewPx));
   };
 
   const bar = (axis: Axis) => {
@@ -283,6 +293,7 @@ export function ViewScrollbars({ threeRef }: { threeRef: MutableRefObject<ThreeS
           onPointerMove={onTrackMove}
           onPointerUp={onTrackUp}
           onPointerCancel={onTrackUp}
+          onLostPointerCapture={onTrackLost}
         >
           <div ref={horizontal ? thumbX : thumbY} className="view-scrollbar-thumb" />
         </div>
