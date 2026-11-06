@@ -8,5 +8,15 @@
       "de": "Ein Teil schräg auf einer Kante drucken, ohne die Stützen des Slicers: „Stützrippe“ unter „Ändern“, die untere Fläche anklicken, und eine dünne Rippe steht mit etwas Abstand darunter auf einem ovalen Fuß. Winzige Brücken von genau einer Schicht halten das Teil und lassen sich danach abbrechen. Düse und Schichten stellst du wie im Slicer ein.",
       "en": "Print a part tilted on one edge without the slicer's supports: \"Support rib\" under Modify, click the lower face, and a thin rib stands under it a gap away, on an oval foot. Tiny bridges exactly one layer high hold the part and break off afterwards. Set the nozzle and the layers as in your slicer."
     }
+  },
+  {
+    "title": {
+      "de": "Ein Spiel für jeden Drucker",
+      "en": "A play for each printer"
+    },
+    "body": {
+      "de": "Mehrere Drucker, jeder anders eingestellt: In den Einstellungen unter „Drucker“ den Drucker wählen und darunter sein Spiel eintragen. Neue Deckel, Schwalbenschwänze, Muttern und die Verbinder beim Teilen starten dann vom Spiel des Druckers, auf den der Entwurf eingestellt ist.",
+      "en": "Several printers, each tuned differently: choose the printer under Printer in the settings and enter its play below it. New lids, dovetails, nuts and Split's connectors then start from the play of the printer the design is set to."
+    }
   }
 ]

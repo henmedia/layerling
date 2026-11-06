@@ -7,15 +7,24 @@ import {
   FIT_TEST_CLEARANCES,
   fromPrinterPlay,
   getPrinterPlay,
+  getPrinterPlayFor,
   normalizePrinterPlay,
+  normalizePrinterPlays,
   PRINTER_PLAY_SETTINGS,
   PRINTER_PLAY_STORAGE_KEY,
+  PRINTER_PLAYS_STORAGE_KEY,
+  printerPlayPrinter,
   printerPlayShapeRows,
   printerPlayShapeStart,
+  printerPlaySource,
   printerPlayStart,
   readPrinterPlay,
+  readPrinterPlays,
   savePrinterPlay,
+  savePrinterPlays,
   setPrinterPlay,
+  setPrinterPlayFor,
+  setPrinterPlayPrinter,
   subscribeToPrinterPlay,
   withPrinterPlay,
 } from "@/lib/printerPlay";
@@ -116,6 +125,76 @@ describe("the play as typed and kept", () => {
     expect(getPrinterPlay()).toBe(0.2);
     setPrinterPlay(null);
     expect(getPrinterPlay()).toBeNull();
+  });
+});
+
+describe("one play per printer (Discussion #1406)", () => {
+  afterEach(() => {
+    setPrinterPlayPrinter("");
+  });
+
+  it("keeps a play for each printer, and a printer without one uses the play without a printer", () => {
+    const storage = memoryStorage();
+    vi.stubGlobal("window", { localStorage: storage, addEventListener: () => {}, removeEventListener: () => {} });
+    // Measured before there were plays per printer: it stays the play everywhere.
+    setPrinterPlay(0.15);
+    setPrinterPlayPrinter("Bambu Lab P2S");
+    expect(getPrinterPlay()).toBe(0.15);
+    expect(printerPlaySource("Bambu Lab P2S")).toBe("general");
+    // A play set while the P2S is chosen is the P2S's own; the play without a printer stays.
+    expect(setPrinterPlay(0.05)).toBe(0.05);
+    expect(JSON.parse(storage.items.get(PRINTER_PLAYS_STORAGE_KEY)!)).toEqual({ "Bambu Lab P2S": 0.05 });
+    expect(storage.items.get(PRINTER_PLAY_STORAGE_KEY)).toBe("0.15");
+    expect(printerPlaySource("Bambu Lab P2S")).toBe("printer");
+    // Another printer, and no printer at all, still have the play without a printer.
+    setPrinterPlayPrinter("Bambu Lab A1");
+    expect(getPrinterPlay()).toBe(0.15);
+    expect(getPrinterPlayFor("")).toBe(0.15);
+    expect(getPrinterPlayFor("Bambu Lab P2S")).toBe(0.05);
+    setPrinterPlay(0.1);
+    setPrinterPlayPrinter("Bambu Lab P2S");
+    expect(getPrinterPlay()).toBe(0.05);
+    expect(readPrinterPlays(storage)).toEqual({ "Bambu Lab P2S": 0.05, "Bambu Lab A1": 0.1 });
+  });
+
+  it("clears what the field shows: a printer's own play first, then the play without a printer", () => {
+    const storage = memoryStorage();
+    vi.stubGlobal("window", { localStorage: storage, addEventListener: () => {}, removeEventListener: () => {} });
+    setPrinterPlayFor("", 0.2);
+    setPrinterPlayFor("Prusa MK4", 0.1);
+    expect(setPrinterPlayFor("Prusa MK4", null)).toBe(0.2);
+    expect(storage.items.has(PRINTER_PLAYS_STORAGE_KEY)).toBe(false);
+    expect(printerPlaySource("Prusa MK4")).toBe("general");
+    expect(setPrinterPlayFor("Prusa MK4", "")).toBeNull();
+    expect(storage.items.has(PRINTER_PLAY_STORAGE_KEY)).toBe(false);
+    expect(printerPlaySource("Prusa MK4")).toBeNull();
+    expect(printerPlaySource("")).toBeNull();
+  });
+
+  it("tells the windows when the design's printer changes, and only then", () => {
+    vi.stubGlobal("window", { localStorage: memoryStorage(), addEventListener: () => {}, removeEventListener: () => {} });
+    let calls = 0;
+    const stop = subscribeToPrinterPlay(() => calls++);
+    setPrinterPlayPrinter("Creality Ender-3");
+    setPrinterPlayPrinter("Creality Ender-3");
+    expect(printerPlayPrinter()).toBe("Creality Ender-3");
+    setPrinterPlayPrinter(undefined);
+    expect(printerPlayPrinter()).toBe("");
+    stop();
+    expect(calls).toBe(2);
+  });
+
+  it("reads only the plays per printer that hold", () => {
+    expect(normalizePrinterPlays({ a: 0.1, b: "x", "": 0.2, " ": 0.3, c: -1, d: "0,2", e: 5 })).toEqual({ a: 0.1, d: 0.2, e: 1 });
+    for (const nothing of [null, undefined, "x", 3, [0.1]]) expect(normalizePrinterPlays(nothing)).toEqual({});
+    const storage = memoryStorage();
+    storage.setItem(PRINTER_PLAYS_STORAGE_KEY, "{not json");
+    expect(readPrinterPlays(storage)).toEqual({});
+    expect(readPrinterPlays(blockedStorage())).toEqual({});
+    expect(savePrinterPlays({ a: 0.1 }, storage)).toBe(true);
+    expect(readPrinterPlays(storage)).toEqual({ a: 0.1 });
+    expect(savePrinterPlays({}, storage)).toBe(true);
+    expect(storage.items.has(PRINTER_PLAYS_STORAGE_KEY)).toBe(false);
   });
 });
 

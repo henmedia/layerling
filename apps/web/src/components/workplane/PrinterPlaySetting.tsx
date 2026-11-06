@@ -1,28 +1,35 @@
 import { useState } from "react";
 import { fitTestLabel } from "@/lib/fitTest";
 import { numberLocale, t } from "@/lib/i18n";
-import { FIT_TEST_CLEARANCES, normalizePrinterPlay, setPrinterPlay } from "@/lib/printerPlay";
-import { usePrinterPlay } from "@/lib/usePrinterPlay";
+import { FIT_TEST_CLEARANCES, normalizePrinterPlay, setPrinterPlayFor } from "@/lib/printerPlay";
+import { usePrinterPlayFor } from "@/lib/usePrinterPlay";
 
 /**
  * The printer's play in the settings (printerPlay.ts): a field for the play per side in mm, empty while it is not
  * measured; the values the fit test is printed with, to pick the one read off it; and the button that puts the fit
- * test on the plate. Kept in this browser, so it is the same in every design.
+ * test on the plate. Kept in this browser. With a printer chosen above (`printer`, its id; `printerName` to show) the
+ * field is that printer's play (Discussion #1406); a printer with none of its own shows the play without a printer, and
+ * a value set then is kept for the printer alone.
  */
-export function PrinterPlaySetting({ onMakeFitTest }: { onMakeFitTest?: () => void }) {
-  const play = usePrinterPlay();
+export function PrinterPlaySetting({ onMakeFitTest, printer = "", printerName = "" }: { onMakeFitTest?: () => void; printer?: string; printerName?: string }) {
+  const { play, source } = usePrinterPlayFor(printer);
   // What is typed, until the field is left; then it is read, or what was there before comes back.
   const [draft, setDraft] = useState<string | null>(null);
   const shown = draft ?? (play === null ? "" : play.toLocaleString(numberLocale(), { maximumFractionDigits: 3 }));
   const commit = (text: string) => {
     setDraft(null);
     if (!text.trim()) {
-      setPrinterPlay(null);
+      setPrinterPlayFor(printer, null);
       return;
     }
     const typed = normalizePrinterPlay(text);
-    if (typed !== null) setPrinterPlay(typed);
+    if (typed !== null) setPrinterPlayFor(printer, typed);
   };
+  const whose = !printer
+    ? t("workspace.printerPlayNoPrinter")
+    : source === "printer"
+      ? t("workspace.printerPlayOwn", { printer: printerName })
+      : t("workspace.printerPlayGeneral", { printer: printerName });
   return (
     <div className="workspace-select workspace-printer-play" data-help={t("workspace.printerPlay")}>
       <label htmlFor="workspace-printer-play-input">{t("workspace.printerPlay")}</label>
@@ -54,7 +61,7 @@ export function PrinterPlaySetting({ onMakeFitTest }: { onMakeFitTest?: () => vo
               aria-pressed={active}
               onClick={() => {
                 setDraft(null);
-                setPrinterPlay(clearance);
+                setPrinterPlayFor(printer, clearance);
               }}
             >
               {fitTestLabel(clearance)}
@@ -67,6 +74,7 @@ export function PrinterPlaySetting({ onMakeFitTest }: { onMakeFitTest?: () => vo
           {t("workspace.fitTestMake")}
         </button>
       ) : null}
+      <small className="workspace-printer-play-whose">{whose}</small>
       <small>{t(play === null ? "workspace.printerPlayHint" : "workspace.printerPlaySetHint")}</small>
     </div>
   );
