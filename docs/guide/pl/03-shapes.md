@@ -205,6 +205,8 @@ Aby zostawić fragment bryły gładki albo nadać teksturę tylko fragmentowi, u
 
 Wynikiem jest siatka, jak zaimportowany model, która zachowuje bryłę, na której powstała. Zaznacz ją później, także po zapisaniu, a karta pokaże ustawienia, z jakimi powstała: zmień je i kliknij {{ui:inspector.surfaceChange}}, a tekstura powstanie od nowa na tamtej bryle, tam, gdzie stoi teraz bryła z teksturą, i w jej obecnym rozmiarze. {{ui:inspector.surfaceRemove}} przywraca gładką bryłę. Bryły masek liczą się ponownie przy zmianie tekstury, więc jeśli możesz ją jeszcze zmieniać, raczej je ukryj, niż usuń. Cofnij wycofuje też każdy z tych kroków.
 
+Do wydruku w dwóch kolorach włącz {{ui:inspector.surfacePatternPart}}, przy dowolnym wzorze: wzór staje się osobną częścią, a {{ui:inspector.surfacePatternColor}} nadaje jej kolor – na początku taki, który odcina się od bryły, następnym razem ten wybrany ostatnio. Na zewnątrz część to to, co wystaje, a bryła pozostaje taka, jaka była; do wnętrza bryła dostaje wycięty wzór, a część wypełnia wgłębienie aż do powierzchni, jak złoto w pęknięciach. Obie części są razem w zestawie: poruszają się razem, każda zachowuje swój kolor, a plik 3MF zawiera je jako dwie części dla slicera. Teksturę zmieniasz albo zdejmujesz jak dotąd; część wzoru idzie razem z nią. Przy kilku warstwach wszystkie muszą iść w tym samym kierunku, na zewnątrz albo do wnętrza; wzór w obu kierunkach stanowi jedną całość z bryłą.
+
 ## Wazon
 
 {{ui:shape.vase}} to osobna bryła do wazonów, doniczek i abażurów. Jego wymiary są we {{ui:inspector.properties}}, a forma i wzór na karcie {{ui:inspector.vaseForm}}. Wszystko można zmieniać w każdej chwili, także po zapisaniu:

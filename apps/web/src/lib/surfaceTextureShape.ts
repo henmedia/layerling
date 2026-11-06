@@ -42,6 +42,7 @@ import {
   type SurfaceTextureCapEdge,
   type SurfaceTextureCapStyle,
 } from "@/lib/surfaceTexture";
+import { groupedShape } from "@/lib/editorBooleans";
 import { canonicalizeShape, cleanNearZero, isNonSolidShapeKind } from "@/lib/workplaneShapes";
 import type { EdgeTreatmentHistoryEntry, ShapeKind, WorkplaneShape } from "@/types/layerling";
 
@@ -54,14 +55,75 @@ export type SurfaceTextureWorkerRequest = {
 };
 
 export type SurfaceTextureWorkerResponse =
-  | { requestId: number; positions: Float64Array; stats: SurfaceTextureStats; fill: Float64Array | null }
+  | { requestId: number; positions: Float64Array; stats: SurfaceTextureStats; fill: Float64Array | null; part: Float64Array | null }
   | { requestId: number; error: string };
 
-/** The textured body's triangles and, for cracks with gold, the triangles of the gold filling their notch. */
-export type SurfaceTextureOutcome = { positions: Float64Array; stats: SurfaceTextureStats; fill: Float64Array | null };
+/**
+ * The textured body's triangles and, for cracks with gold, the triangles of the gold filling their notch; with the
+ * pattern as a part of its own, the triangles of that part (see SurfaceTextureResult.part).
+ */
+export type SurfaceTextureOutcome = { positions: Float64Array; stats: SurfaceTextureStats; fill: Float64Array | null; part: Float64Array | null };
 
 /** The colour the gold of the cracks comes in. */
 export const SURFACE_TEXTURE_GOLD = "#d4a72c";
+
+/** The pattern part's colour chosen last, in this browser: the next pattern part starts in it. */
+const PATTERN_COLOR_STORAGE_KEY = "layerling.editor.surfacePatternColor";
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
+/** A colour that stands out against the body's: white on a dark or strong colour, near black on a light one. */
+export function contrastingPatternColor(bodyColor: string) {
+  if (!HEX_COLOR.test(bodyColor)) return "#ffffff";
+  const [r, g, b] = [1, 3, 5].map((at) => parseInt(bodyColor.slice(at, at + 2), 16) / 255).map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.45 ? "#111111" : "#ffffff";
+}
+
+/** The colour last chosen for a pattern part, or null. */
+export function rememberedPatternColor(): string | null {
+  try {
+    const stored = window.localStorage.getItem(PATTERN_COLOR_STORAGE_KEY);
+    return stored && HEX_COLOR.test(stored) ? stored.toLowerCase() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Keeps the colour chosen for a pattern part for the next one. */
+export function rememberPatternColor(color: string) {
+  if (!HEX_COLOR.test(color)) return;
+  try {
+    window.localStorage.setItem(PATTERN_COLOR_STORAGE_KEY, color.toLowerCase());
+  } catch {
+    // Not kept for next time; this part has it all the same.
+  }
+}
+
+/**
+ * The colour the pattern part comes in: the one the settings choose, else the one chosen last, else one that stands out
+ * against the body's colour.
+ */
+export function surfacePatternColor(settings: Pick<SurfaceTextureSettings, "patternColor">, bodyColor: string) {
+  return settings.patternColor || rememberedPatternColor() || contrastingPatternColor(bodyColor);
+}
+
+/**
+ * Which way the pattern goes when it becomes a part of its own (SurfaceTextureSettings.patternPart, the first layer's
+ * choice for the whole texture): raised or cut in, the same for every layer that is made - only then is the body under
+ * it one body (as it was, or with every cut). Null when it does not become a part: the choice is off, or the layers go
+ * different ways, or one goes both ways.
+ */
+export function surfacePatternPartWay(first: SurfaceTextureSettings, more: readonly SurfaceTextureSettings[] = []): "outward" | "inward" | null {
+  if (!first.patternPart) return null;
+  const ways = new Set([first, ...more.filter(surfaceTextureLayerPlaced)].map((layer) => layer.direction));
+  if (ways.size !== 1) return null;
+  const [way] = ways;
+  return way === "outward" || way === "inward" ? way : null;
+}
+
+/** A body with its pattern as a part of its own: a bundle carrying the texture (see surfacePatternBundle). */
+export function isSurfacePatternBundle(shape: WorkplaneShape | null | undefined) {
+  return Boolean(shape?.surfaceTexture && shape.groupOperation === "bundle" && shape.groupedShapes?.length);
+}
 
 /** The words for every choice, as the panel and the status line show them. */
 export const SURFACE_TEXTURE_LABELS: {
@@ -200,9 +262,12 @@ export function shapeUnderSurfaceTexture(shape: WorkplaneShape): WorkplaneShape 
   return entry ? restoreShapeBeforeEdgeTreatment(shape, entry) : null;
 }
 
-/** Whether the panel shows the texture card for this shape: for every solid body, textured ones say what they carry. */
+/**
+ * Whether the panel shows the texture card for this shape: for every solid body, textured ones say what they carry - and
+ * for the bundle a body and its pattern as a part of its own make, which carries their texture.
+ */
 export function offersSurfaceTexture(shape: WorkplaneShape | null | undefined) {
-  return Boolean(shape && shape.groupOperation !== "bundle" && !isNonSolidShapeKind(shape.kind));
+  return Boolean(shape && (shape.groupOperation !== "bundle" || isSurfacePatternBundle(shape)) && !isNonSolidShapeKind(shape.kind));
 }
 
 /** Kinds of body that can be a texture mask: convex ones, which the planes of their faces describe exactly. */
@@ -286,7 +351,12 @@ export function surfaceTextureInput(shape: WorkplaneShape) {
 /** Texture a body's triangles here and now (tests, and where no worker can run). */
 export function textureSurfacePositions(positions: Float64Array, settings: SurfaceTextureSettings, maxTriangles?: number): SurfaceTextureOutcome {
   const result = applySurfaceTexture(positions, settings, maxTriangles ? { maxTriangles } : {});
-  return { positions: Float64Array.from(surfaceTexturePositions(result)), stats: result.stats, fill: result.fill ? Float64Array.from(surfaceTexturePositions(result.fill)) : null };
+  return {
+    positions: Float64Array.from(surfaceTexturePositions(result)),
+    stats: result.stats,
+    fill: result.fill ? Float64Array.from(surfaceTexturePositions(result.fill)) : null,
+    part: result.part ? Float64Array.from(surfaceTexturePositions(result.part)) : null,
+  };
 }
 
 /**
@@ -296,9 +366,11 @@ export function textureSurfacePositions(positions: Float64Array, settings: Surfa
  * the triangles the one before left, so a face keeps the pattern of the layer it belongs to.
  */
 export function surfaceTextureLayersToMake(first: SurfaceTextureSettings, more: readonly SurfaceTextureSettings[]) {
-  const others = more.filter(surfaceTextureLayerPlaced);
+  // The pattern as a part of its own is the first layer's choice for all of them, when they all go one way.
+  const patternPart = surfacePatternPartWay(first, more) !== null;
+  const others = more.filter(surfaceTextureLayerPlaced).map((layer) => (layer.patternPart === patternPart ? layer : { ...layer, patternPart }));
   const taken = others.flatMap((layer) => layer.faces);
-  const lead = normalizeSurfaceTexture({ ...first, exceptFaces: first.faces.length ? [] : taken });
+  const lead = normalizeSurfaceTexture({ ...first, exceptFaces: first.faces.length ? [] : taken, patternPart });
   return [lead, ...others];
 }
 
@@ -322,7 +394,7 @@ export function mergedSurfaceTextureStats(all: readonly SurfaceTextureOutcome["s
   };
 }
 
-/** The gold of every layer's cracks in one part, or none. */
+/** The gold of every layer's cracks in one part, or none - and so every layer's pattern part. */
 export function mergedSurfaceTextureFill(all: readonly (Float64Array | null)[]): Float64Array | null {
   const parts = all.filter((fill): fill is Float64Array => Boolean(fill && fill.length));
   if (!parts.length) return null;
@@ -338,6 +410,17 @@ export function mergedSurfaceTextureFill(all: readonly (Float64Array | null)[]):
 /** Whether a further layer has a place of its own: faces picked for it, or a text or an image once, which go where they are put. */
 export function surfaceTextureLayerPlaced(layer: SurfaceTextureSettings) {
   return layer.faces.length > 0 || stuckOn(layer);
+}
+
+/** What several layers made, as one outcome: the last one's body, the stats together, the gold and the pattern parts each in one. */
+export function mergedSurfaceTextureOutcome(outcomes: readonly SurfaceTextureOutcome[]): SurfaceTextureOutcome {
+  if (outcomes.length === 1) return outcomes[0];
+  return {
+    ...outcomes[outcomes.length - 1],
+    stats: mergedSurfaceTextureStats(outcomes.map((each) => each.stats)),
+    fill: mergedSurfaceTextureFill(outcomes.map((each) => each.fill)),
+    part: mergedSurfaceTextureFill(outcomes.map((each) => each.part)),
+  };
 }
 
 /** Several layers made here and now, one after the other (tests, and where no worker can run). */
@@ -476,6 +559,90 @@ export function surfaceTexturedShape(shape: WorkplaneShape, positions: ArrayLike
   });
 }
 
+/**
+ * The texture with its pattern as a part of its own (Discussion #1347): a bundle of the body and the pattern, so they
+ * move, turn and scale together and each keeps its colour - two parts for a second filament, in a 3MF as the bundle's
+ * parts. Raised (`way` outward), the body stays as it was and `part` is what stands out of it; cut in, the body is the
+ * textured mesh (`positions`) and `part` fills the cut up to the surface it had. The bundle carries the texture and the
+ * body under it as surfaceTexturedShape's body does, under the body's id: it is changed or taken off the same way, and
+ * the pattern part goes with it. Null when there is nothing to make, or for a hole, which has no pattern to colour.
+ */
+export function surfacePatternBundle(
+  shape: WorkplaneShape,
+  positions: ArrayLike<number>,
+  part: ArrayLike<number>,
+  settings: SurfaceTextureSettings,
+  look: { color: string; patternName: string },
+  createdAt = Date.now(),
+  layers: readonly SurfaceTextureSettings[] = [],
+): WorkplaneShape | null {
+  const normalized = normalizeSurfaceTexture({ ...settings, exceptFaces: [] });
+  const more = layers.filter(surfaceTextureLayerPlaced).map((layer) => normalizeSurfaceTexture(layer));
+  const way = surfacePatternPartWay(normalized, more);
+  if (!way || shape.hole || positions.length < 9 || part.length < 9) return null;
+  // The body: raised, the very body as it was (still a box, still its own settings); cut in, the textured mesh.
+  const body = way === "outward"
+    ? canonicalizeShape({ ...shape, id: createLocalId(shape.kind), locked: false, hidden: false })
+    : canonicalizeShape({ id: createLocalId("mesh"), name: shape.name, kind: "mesh", color: shape.color, rotation: 0, rotationX: 0, rotationZ: 0, ...placedMesh(positions), locked: false, hidden: false });
+  const pattern = canonicalizeShape({ id: createLocalId("mesh"), name: look.patternName, kind: "mesh", color: look.color, rotation: 0, rotationX: 0, rotationZ: 0, ...placedMesh(part), locked: false, hidden: false });
+  const group = groupedShape([body, pattern]);
+  if (!group) return null;
+  const bundle = canonicalizeShape({
+    ...group,
+    id: shape.id,
+    name: shape.name,
+    color: shape.color,
+    groupOperation: "bundle",
+    surfaceTexture: normalized,
+    ...(more.length ? { surfaceTextureLayers: more } : {}),
+    locked: false,
+    hidden: shape.hidden,
+  });
+  return canonicalizeShape({
+    ...bundle,
+    edgeTreatmentHistory: [
+      ...compactEdgeTreatmentHistory(shape.edgeTreatmentHistory),
+      {
+        id: createLocalId("edge-history"),
+        createdAt,
+        feature: { kind: "surfaceTexture", amount: normalized.depth, edgeCount: 0, surfaceTexture: normalized },
+        before: cloneWorkplaneShapeSnapshot(shape),
+        appliedFrame: edgeTreatmentAppliedFrame(bundle),
+      },
+    ],
+  });
+}
+
+/** The pattern part of such a bundle (its second part), or null. */
+export function surfacePatternPartOf(shape: WorkplaneShape | null | undefined) {
+  return isSurfacePatternBundle(shape) ? shape!.groupedShapes![1] ?? null : null;
+}
+
+/**
+ * The body a texture makes, from the panel or an assistant: the textured mesh - or, with the pattern as a part of its
+ * own, the bundle of the body and its pattern, the pattern in the colour the settings ask for, else the one the pattern
+ * had (`previous`, the shape textured before), else the one chosen last or one that stands out against the body. A
+ * pattern part the settings ask for but cannot have (layers going different ways, a hole) leaves the textured mesh.
+ * Null when the texture left nothing.
+ */
+export function surfaceTextureResultShape(
+  source: WorkplaneShape,
+  previous: WorkplaneShape | null,
+  outcome: SurfaceTextureOutcome,
+  settings: SurfaceTextureSettings,
+  layers: readonly SurfaceTextureSettings[],
+  patternName: string,
+  createdAt = Date.now(),
+): WorkplaneShape | null {
+  if (outcome.stats.nothing) return null;
+  if (outcome.part && surfacePatternPartWay(settings, layers)) {
+    const color = settings.patternColor || surfacePatternPartOf(previous)?.color || surfacePatternColor(settings, source.color);
+    const bundle = surfacePatternBundle(source, outcome.positions, outcome.part, settings, { color, patternName }, createdAt, layers);
+    if (bundle) return bundle;
+  }
+  return surfaceTexturedShape(source, outcome.positions, settings, createdAt, layers);
+}
+
 let worker: Worker | null = null;
 let requestCounter = 0;
 const pending = new Map<number, { resolve: (outcome: SurfaceTextureOutcome) => void; reject: (error: Error) => void; timer: number }>();
@@ -496,7 +663,7 @@ function ensureWorker() {
     window.clearTimeout(entry.timer);
     pending.delete(event.data.requestId);
     if ("error" in event.data) entry.reject(new Error(event.data.error));
-    else entry.resolve({ positions: event.data.positions, stats: event.data.stats, fill: event.data.fill });
+    else entry.resolve({ positions: event.data.positions, stats: event.data.stats, fill: event.data.fill, part: event.data.part });
   };
   next.onerror = () => {
     pending.forEach((entry) => {

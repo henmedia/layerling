@@ -79,7 +79,7 @@ import {
   type SurfaceBase,
   type SurfaceMesh,
 } from "@/lib/surfaceTextureMesh";
-import { crackEdgeNear, crackFillBody, crackNetwork, crackValue, surfaceIndex, type CrackNetwork, type CrackSurfaceIndex } from "@/lib/surfaceTextureCracks";
+import { crackEdgeNear, crackFillBody, crackNetwork, crackValue, surfaceFillBody, surfaceIndex, type CrackNetwork, type CrackSurfaceIndex } from "@/lib/surfaceTextureCracks";
 import { nearestSurfacePoint, unfoldSurface } from "@/lib/surfaceTextureUnfold";
 import { BARK_KINDS, BARK_STARTS, BARK_WOOD, barkValue, WOOD_CUTS, WOOD_KINDS, WOOD_RINGS, woodFrame, woodValue, type WoodFrame } from "@/lib/surfaceTextureWood";
 import { nearestOnOutline, outlineAngle, outlineRing, prismOutline, type SurfaceOutline } from "@/lib/surfaceTextureOutline";
@@ -275,6 +275,15 @@ export type SurfaceTextureSettings = {
   /** Fill the notch with a body of its own (gold, a second filament), its top `crackRecess` mm below the surface. */
   crackGold: boolean;
   crackRecess: number;
+  /**
+   * The pattern as a part of its own, for a second colour (Discussion #1347): raised, what stands out of the body
+   * (the textured body less the body as it was), the body staying as it was; cut in, what was cut away, the body
+   * carrying the cut - the cracks' gold for every pattern, filled up to the surface. Only for a pattern raised or
+   * cut in, not both ways; with the cracks' gold, the gold is their part. See SurfaceTextureResult.part.
+   */
+  patternPart: boolean;
+  /** The pattern part's colour, #rrggbb; empty: the one chosen last, or one that stands out against the body's. */
+  patternColor: string;
   /** Text stuck on: the words, the font (as a text shape names it) and the height of the text's box, mm. */
   textContent: string;
   textFont: string;
@@ -381,6 +390,8 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   crackSeed: 1,
   crackGold: false,
   crackRecess: 0.3,
+  patternPart: false,
+  patternColor: "",
   textContent: "Layerling",
   textFont: "Multilanguage",
   textSize: 10,
@@ -592,6 +603,7 @@ export function normalizeSurfaceTexture(input: unknown): SurfaceTextureSettings 
       if (source[key] === undefined) (target as Record<string, unknown>)[key] = starter[key];
     });
   }
+  out.patternColor = typeof source.patternColor === "string" && /^#[0-9a-f]{6}$/i.test(source.patternColor) ? source.patternColor.toLowerCase() : "";
   out.imageOwn = normalizeSurfaceTextureOwnImage(source.imageOwn);
   // One's own image asked for without one: the first ready image.
   if (out.image === "own" && !out.imageOwn) out.image = SURFACE_TEXTURE_IMAGE_PRESETS[0];
@@ -3963,6 +3975,12 @@ export type SurfaceTextureResult = {
   stats: SurfaceTextureStats;
   /** Cracks with gold: the closed body filling their notch, in the same frame; null otherwise. */
   fill: { vertices: Float64Array; indices: Uint32Array } | null;
+  /**
+   * The pattern as a part of its own (patternPart), closed, in the same frame: raised, what stands out of the body as
+   * it was - its bottom on the body's surface, its top the textured surface -; cut in, what was cut away - its bottom
+   * the notch's floor, its top the surface as it was. Null otherwise, or when nothing moved.
+   */
+  part: { vertices: Float64Array; indices: Uint32Array } | null;
 };
 
 export type SurfaceTextureOptions = {
@@ -6300,6 +6318,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // The gold: a closed body on the bottom of the notch, its top `crackRecess` mm below the surface.
     const fillBody = notch ? crackFillBody(out, indices, notch, moves, s.crackRecess) : null;
     const fill = fillBody && fillBody.indices.length ? { vertices: screenToInsidePositions(fillBody.vertices), indices: fillBody.indices } : null;
+    // The pattern as a part of its own: between the surface as it was and as it is now (the cracks' gold is theirs).
+    const partBody = s.patternPart && !gold && (s.direction === "outward" || s.direction === "inward") ? patternPartBody(v, out, indices, s.direction === "outward") : null;
+    const part = partBody && partBody.indices.length ? { vertices: screenToInsidePositions(partBody.vertices), indices: partBody.indices } : null;
     // Flat pieces (faces kept smooth, the flats between bumps) need no fine grid: their inner points are merged away.
     indices = mergeFlatPoints(out, indices).indices;
     const inwardDepth = s.direction === "inward" ? s.depth : s.direction === "both" ? s.depth / 2 : 0;
@@ -6328,10 +6349,142 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         projection: s.projection as Exclude<SurfaceTextureProjection, "auto">,
       },
       fill,
+      part,
     };
   }
 
   return { base, apply };
+}
+
+/**
+ * How far into the body the part reaches where two of its pieces would only touch along an edge (see patternPartBody),
+ * mm: below anything a print shows.
+ */
+const PART_TOUCH_SINK = 0.01;
+/**
+ * A point that moved by less than this, mm, stays where it was for the part: its two sides would lie on each other, a
+ * slicer or a file would take them for one, and where a pattern runs out the part would end in a skin no print shows,
+ * which the view draws flickering on the body (a long thin triangle from the rim of a side across the top).
+ */
+const PART_STILL = 0.01;
+
+/**
+ * The pattern as a part of its own (SurfaceTextureSettings.patternPart): the closed body between the points as they were
+ * (`before`, on the body's surface) and where they are now (`after`), over the finished triangles. It is the gold's body
+ * (see surfaceFillBody) filled right up to the surface: each point goes the way it moved and as far, so one side lies
+ * exactly on the textured surface and the other on the surface as it was, and the points that did not move are shared
+ * by both - the border, where the part ends on the body without a step. Raised, it goes from the body out to the
+ * relief; cut in, from the notch's floor out to the surface as it was.
+ *
+ * Where an edge whose two ends did not move lies between two triangles that both have a point that did (a knurl's
+ * valley, two joints meeting at a brick's corner), two pieces of the part would meet along it with nothing between
+ * them - four faces on one edge, which a slicer or a boolean takes for a broken mesh. There the side towards the body
+ * sinks PART_TOUCH_SINK into it at those two points, the part's outside staying where it is: the pieces are joined by
+ * a thin web inside the body. Its flat pieces (the bottom of a raised pattern on a flat face, the floor of a joint) are
+ * merged as the body's are.
+ */
+export function patternPartBody(before: ArrayLike<number>, after: ArrayLike<number>, indices: Uint32Array, raised: boolean) {
+  const count = Math.min(before.length, after.length) / 3;
+  // The side towards the body is `from`: the body's surface when raised, the notch's floor when cut in.
+  const from = Array.from((raised ? before : after) as ArrayLike<number>).slice(0, count * 3);
+  const to = Array.from((raised ? after : before) as ArrayLike<number>).slice(0, count * 3);
+  // A point that moved by less than PART_STILL counts as one that did not: its two sides would be two points in one place.
+  // So does one the texture moved the other way, into the body when raised (a corner it rounds): there the part would
+  // be turned inside out; the body keeps its corner. Which way is out: the surface as it was, round the point.
+  const outward = new Float64Array(count * 3);
+  for (let t = 0; t < indices.length; t += 3) {
+    const cross = faceCross(before, indices[t], indices[t + 1], indices[t + 2]);
+    for (let k = 0; k < 3; k += 1) for (let c = 0; c < 3; c += 1) outward[indices[t + k] * 3 + c] += cross[c];
+  }
+  for (let i = 0; i < count; i += 1) {
+    const dx = to[i * 3] - from[i * 3], dy = to[i * 3 + 1] - from[i * 3 + 1], dz = to[i * 3 + 2] - from[i * 3 + 2];
+    if (Math.hypot(dx, dy, dz) < PART_STILL || dx * outward[i * 3] + dy * outward[i * 3 + 1] + dz * outward[i * 3 + 2] <= 0) for (let k = 0; k < 3; k += 1) to[i * 3 + k] = from[i * 3 + k];
+  }
+  const moved = (i: number) => to[i * 3] !== from[i * 3] || to[i * 3 + 1] !== from[i * 3 + 1] || to[i * 3 + 2] !== from[i * 3 + 2];
+  const faces = Uint32Array.from(indices);
+  const inPart = (t: number) => moved(faces[t * 3]) || moved(faces[t * 3 + 1]) || moved(faces[t * 3 + 2]);
+  // The edges between two points that did not move, and the triangles of the part along them.
+  const key = (a: number, b: number) => (a < b ? a * count + b : b * count + a);
+  const along = new Map<number, number[]>();
+  for (let t = 0; t < faces.length / 3; t += 1) {
+    if (!inPart(t)) continue;
+    for (let k = 0; k < 3; k += 1) {
+      const p = faces[t * 3 + k], q = faces[t * 3 + ((k + 1) % 3)];
+      if (!moved(p) && !moved(q)) along.set(key(p, q), [...(along.get(key(p, q)) ?? []), t]);
+    }
+  }
+  // Round each point at such an edge, its triangles in the part come in fans (joined over edges from the point); the fan
+  // with the edge sinks there, along its own normal. Another fan round the same point gets a point of its own, which
+  // stays: sunk too, it would close its own side with walls on the same upright edge.
+  const touching = new Map<number, Set<number>>();
+  along.forEach((tris, edge) => {
+    if (tris.length < 2) return;
+    for (const point of [Math.floor(edge / count), edge % count]) touching.set(point, new Set([...(touching.get(point) ?? []), ...tris]));
+  });
+  const sunk = new Map<number, number[]>();
+  if (touching.size) {
+    const round = new Map<number, number[]>();
+    for (let t = 0; t < faces.length / 3; t += 1) {
+      if (!inPart(t)) continue;
+      for (let k = 0; k < 3; k += 1) if (touching.has(faces[t * 3 + k])) round.set(faces[t * 3 + k], [...(round.get(faces[t * 3 + k]) ?? []), t]);
+    }
+    const copies: number[] = [];
+    round.forEach((tris, point) => {
+      // The fans: triangles sharing an edge from the point.
+      const fan = new Map<number, number>(tris.map((t) => [t, t]));
+      const find = (t: number): number => (fan.get(t) === t ? t : find(fan.get(t)!));
+      const byEdge = new Map<number, number>();
+      for (const t of tris) {
+        for (let k = 0; k < 3; k += 1) {
+          const other = faces[t * 3 + k];
+          if (other === point) continue;
+          const seen = byEdge.get(other);
+          if (seen === undefined) byEdge.set(other, t);
+          else fan.set(find(t), find(seen));
+        }
+      }
+      const fans = new Map<number, number[]>();
+      for (const t of tris) fans.set(find(t), [...(fans.get(find(t)) ?? []), t]);
+      let kept = false;
+      fans.forEach((members) => {
+        const sinks = members.some((t) => touching.get(point)!.has(t));
+        let at = point;
+        if (kept || !sinks) {
+          // A point of its own for this fan, where the point stands.
+          at = count + copies.length / 3;
+          copies.push(from[point * 3], from[point * 3 + 1], from[point * 3 + 2]);
+          for (const t of members) for (let k = 0; k < 3; k += 1) if (faces[t * 3 + k] === point) faces[t * 3 + k] = at;
+        }
+        if (!sinks) return;
+        kept = true;
+        const normal = [0, 0, 0];
+        for (const t of members) {
+          const cross = faceCross(to, indices[t * 3], indices[t * 3 + 1], indices[t * 3 + 2]);
+          for (let k = 0; k < 3; k += 1) normal[k] += cross[k];
+        }
+        const length = Math.hypot(normal[0], normal[1], normal[2]);
+        if (length > 0) sunk.set(at, [0, 1, 2].map((k) => from[point * 3 + k] - (normal[k] / length) * PART_TOUCH_SINK));
+      });
+    });
+    from.push(...copies);
+    to.push(...copies);
+  }
+  const n = from.length / 3;
+  const way = new Float64Array(n * 3);
+  const far = new Float64Array(n);
+  for (let i = 0; i < n; i += 1) {
+    const dx = to[i * 3] - from[i * 3], dy = to[i * 3 + 1] - from[i * 3 + 1], dz = to[i * 3 + 2] - from[i * 3 + 2];
+    const length = Math.hypot(dx, dy, dz);
+    far[i] = length;
+    if (length > 0) {
+      way[i * 3] = dx / length;
+      way[i * 3 + 1] = dy / length;
+      way[i * 3 + 2] = dz / length;
+    }
+  }
+  const body = surfaceFillBody(from, faces, far, way, 0, sunk);
+  const vertices = Float64Array.from(body.vertices);
+  return { vertices, indices: mergeFlatPoints(vertices, body.indices).indices };
 }
 
 /** Texture a body once: its triangles (inside frame) in, the textured triangles out. */

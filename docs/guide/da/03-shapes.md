@@ -210,6 +210,8 @@ For at holde en del af legemet glat, eller for kun at give en del struktur, brug
 
 Resultatet er et mesh som en importeret model, og det bevarer det legeme, det blev lavet på. Vælg det senere, også efter at have gemt, og kortet viser de indstillinger, det blev lavet med: ændr dem, og klik på {{ui:inspector.surfaceChange}}, så laves strukturen igen på det legeme, samme sted og i den størrelse som det har nu. {{ui:inspector.surfaceRemove}} giver det glatte legeme tilbage. Maskelegemer tæller med igen, når strukturen ændres: skjul dem frem for at slette dem, hvis du må ændre den igen senere. Fortryd tager hvert af disse skridt tilbage.
 
+Til et print i to farver slår du {{ui:inspector.surfacePatternPart}} til, med ethvert mønster: mønsteret bliver en selvstændig del, og {{ui:inspector.surfacePatternColor}} giver det dets farve – først en, der skiller sig ud fra legemet, næste gang den, du valgte sidst. Ud af legemet er delen det, der stikker ud, og legemet forbliver, som det var; ind i legemet får legemet mønsteret skåret ind, og delen fylder fordybningen op til overfladen, som guldet i sprækkerne. De to ligger sammen i et bundt: de flytter sammen, hver beholder sin farve, og en 3MF har dem som to dele til sliceren. Ændr eller fjern overfladestrukturen som før; mønsterdelen følger med. Med flere lag skal alle gå samme vej, ud af legemet eller ind i det; et mønster, der går begge veje, forbliver ét med legemet.
+
 ## En vase
 
 {{ui:shape.vase}} er et legeme for sig til vaser, potter og lampeskærme. Dine mål står under {{ui:inspector.properties}}, formen og mønsteret på kortet {{ui:inspector.vaseForm}}; alt sammen kan ændres når som helst, også efter at have gemt:

@@ -582,9 +582,20 @@ export function crackEdgeNear(net: CrackNetwork, verts: ArrayLike<number>, a: nu
  * The body that fills the notch, closed: its bottom lies exactly on the notch's floor (the finished points
  * `out`), its top `recess` mm below the surface without the notch. `g`: the notch's depth per point (mm), `dir`:
  * the way the point was moved. Where the notch is shallower than `recess` there is no fill; the border is cut
- * exactly on each edge, and top and bottom meet there.
+ * exactly on each edge, and top and bottom meet there. The gold of the cracks, in single precision.
  */
 export function crackFillBody(out: ArrayLike<number>, indices: ArrayLike<number>, g: ArrayLike<number>, dir: ArrayLike<number>, recess: number) {
+  const body = surfaceFillBody(out, indices, g, dir, recess);
+  return { vertices: Float32Array.from(body.vertices), indices: body.indices };
+}
+
+/**
+ * The closed body crackFillBody makes, its points as they were worked out: the cracks' gold, and with `recess` 0 the
+ * pattern as a part of its own (see patternPartBody in surfaceTexture.ts), whose points have to meet the body's exactly.
+ * `sunk` (with `recess` 0 only): points on the border whose bottom lies elsewhere, below the surface - the top stays on
+ * the border, and where such a point ends the body on an edge of the border, a wall as high as it sank closes it there.
+ */
+export function surfaceFillBody(out: ArrayLike<number>, indices: ArrayLike<number>, g: ArrayLike<number>, dir: ArrayLike<number>, recess: number, sunk?: ReadonlyMap<number, readonly number[]>) {
   const eps = 1e-6;
   const vert: number[] = [];
   const tris: number[] = [];
@@ -597,13 +608,17 @@ export function crackFillBody(out: ArrayLike<number>, indices: ArrayLike<number>
   const bottom = (i: number) => {
     let id = bottomId.get(i);
     if (id === undefined) {
-      id = add(out[i * 3], out[i * 3 + 1], out[i * 3 + 2]);
+      const low = sunk?.get(i);
+      id = low ? add(low[0], low[1], low[2]) : add(out[i * 3], out[i * 3 + 1], out[i * 3 + 2]);
       bottomId.set(i, id);
-      // On the border: top = bottom.
-      if (Math.abs(g[i] - recess) <= eps) topId.set(i, id);
+      // On the border: top = bottom (but for a point sunk).
+      if (Math.abs(g[i] - recess) <= eps) topId.set(i, low ? add(out[i * 3], out[i * 3 + 1], out[i * 3 + 2]) : id);
     }
     return id;
   };
+  // The edges between two points on the border, as the faces' tops run along them: one face only, and a point sunk at
+  // either end, and a wall closes the body there.
+  const borderEdges = new Map<number, { from: number; to: number; count: number }>();
   const top = (i: number) => {
     let id = topId.get(i);
     if (id === undefined) {
@@ -648,7 +663,24 @@ export function crackFillBody(out: ArrayLike<number>, indices: ArrayLike<number>
       if (A[1] !== B[1] && B[1] !== C[1] && A[1] !== C[1]) tris.push(A[1], B[1], C[1]);
       if (A[0] !== B[0] && B[0] !== C[0] && A[0] !== C[0]) tris.push(A[0], C[0], B[0]);
     }
+    if (sunk?.size) {
+      for (let k = 0; k < 3; k++) {
+        const a = c[k], b = c[(k + 1) % 3];
+        if (Math.abs(s[k]) > eps || Math.abs(s[(k + 1) % 3]) > eps) continue;
+        const key = a < b ? a * SHIFT + b : b * SHIFT + a;
+        const edge = borderEdges.get(key);
+        if (edge) edge.count += 1;
+        else borderEdges.set(key, { from: a, to: b, count: 1 });
+      }
+    }
   }
+  borderEdges.forEach(({ from: a, to: b, count }) => {
+    if (count !== 1 || !(sunk?.has(a) || sunk?.has(b))) return;
+    // The face's top runs a -> b, its bottom b -> a: the wall goes back along both, down at a and up at b.
+    const aTop = top(a), aBottom = bottom(a), bTop = top(b), bBottom = bottom(b);
+    if (aTop !== aBottom) tris.push(aTop, aBottom, bBottom);
+    if (bTop !== bBottom) tris.push(aTop, bBottom, bTop);
+  });
   // Only the points a triangle uses (a corner on the border without deeper neighbours would stay loose).
   const used = new Int32Array(vert.length / 3).fill(-1);
   const vOut: number[] = [];
@@ -661,5 +693,5 @@ export function crackFillBody(out: ArrayLike<number>, indices: ArrayLike<number>
     }
     iOut[k] = used[i];
   }
-  return { vertices: Float32Array.from(vOut), indices: iOut };
+  return { vertices: vOut, indices: iOut };
 }

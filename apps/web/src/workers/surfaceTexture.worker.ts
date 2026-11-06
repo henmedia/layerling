@@ -11,8 +11,9 @@ self.onmessage = (event: MessageEvent<SurfaceTextureWorkerRequest>) => {
   try {
     const result = applySurfaceTexture(positions, settings, maxTriangles ? { maxTriangles } : {});
     const fill = result.fill ? Float64Array.from(surfaceTexturePositions(result.fill)) : null;
-    const response: SurfaceTextureWorkerResponse = { requestId, positions: Float64Array.from(surfaceTexturePositions(result)), stats: result.stats, fill };
-    self.postMessage(response, { transfer: fill ? [response.positions.buffer, fill.buffer] : [response.positions.buffer] });
+    const part = result.part ? Float64Array.from(surfaceTexturePositions(result.part)) : null;
+    const response: SurfaceTextureWorkerResponse = { requestId, positions: Float64Array.from(surfaceTexturePositions(result)), stats: result.stats, fill, part };
+    self.postMessage(response, { transfer: [response.positions, fill, part].flatMap((list) => (list ? [list.buffer] : [])) });
   } catch (error) {
     const response: SurfaceTextureWorkerResponse = { requestId, error: error instanceof Error ? error.message : String(error) };
     self.postMessage(response);

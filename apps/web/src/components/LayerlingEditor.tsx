@@ -227,7 +227,7 @@ import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGE
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { canChangeSurfaceTexture, canTextureSurface, offersSurfaceTexture, offersSurfaceTextureMask, sceneWithSurfaceBody, shapeUnderSurfaceTexture, surfaceTextureEntry, surfaceTextureGoldShape, surfacePatternLabel, surfaceTexturedShape, surfaceTextureInput, surfaceTextureMaskOf, surfaceTextureMasksFor, surfaceTextureLayersToMake, surfaceTextureLayerPlaced, mergedSurfaceTextureStats, mergedSurfaceTextureFill, textureSurfaceOffThread } from "@/lib/surfaceTextureShape";
+import { canChangeSurfaceTexture, canTextureSurface, isSurfacePatternBundle, offersSurfaceTexture, offersSurfaceTextureMask, rememberPatternColor, sceneWithSurfaceBody, shapeUnderSurfaceTexture, surfaceTextureEntry, surfaceTextureGoldShape, surfacePatternLabel, surfacePatternPartOf, surfacePatternPartWay, surfaceTextureResultShape, surfaceTextureInput, surfaceTextureMaskOf, surfaceTextureMasksFor, surfaceTextureLayersToMake, surfaceTextureLayerPlaced, mergedSurfaceTextureOutcome, textureSurfaceOffThread } from "@/lib/surfaceTextureShape";
 import { normalizeVaseSettings, parseVaseSettingsInput } from "@/lib/vaseSettings";
 import { sceneWithVaseAccessories, vaseAccessoryKindName, vaseAccessoryName, vaseShapePatch } from "@/lib/vaseShape";
 import { screenAlignedNudge } from "@/lib/keyboardNudge";
@@ -11220,7 +11220,7 @@ export function LayerlingEditor({
         outcomes.push(made);
         positions = made.positions;
       }
-      outcome = outcomes.length > 1 ? { ...outcomes[outcomes.length - 1], stats: mergedSurfaceTextureStats(outcomes.map((each) => each.stats)), fill: mergedSurfaceTextureFill(outcomes.map((each) => each.fill)) } : outcomes[0];
+      outcome = mergedSurfaceTextureOutcome(outcomes);
     } catch (error) {
       setNotice(t("status.surfaceFailed", { error: error instanceof Error ? error.message : String(error) }));
       return;
@@ -11229,7 +11229,8 @@ export function LayerlingEditor({
       setNotice(t("status.surfaceOutdated"));
       return;
     }
-    const textured = outcome.stats.nothing ? null : surfaceTexturedShape(source, outcome.positions, used, Date.now(), usedLayers);
+    // With the pattern as a part of its own: the body and the pattern in a bundle (Discussion #1347).
+    const textured = surfaceTextureResultShape(source, current, outcome, used, usedLayers, `${displayShapeName(source)} – ${t("surfaceTexture.patternPart")}`);
     if (!textured) {
       setNotice(t("status.surfaceNothing"));
       return;
@@ -11262,6 +11263,8 @@ export function LayerlingEditor({
       masksBefore && !masks.length ? t("status.surfaceMasksGone", { count: masksBefore }) : "",
       stats.cracks ? t("status.surfaceCracks", { count: stats.cracks.lines, length: Math.round(stats.cracks.length) }) : "",
       gold ? t("status.surfaceGold") : "",
+      isSurfacePatternBundle(textured) ? t(surfacePatternPartWay(used, usedLayers) === "outward" ? "status.surfacePatternRaised" : "status.surfacePatternCut") : "",
+      used.patternPart && !surfacePatternPartWay(used, usedLayers) ? t("status.surfacePatternOneBody") : "",
       stats.text?.torn ? t("status.surfaceTextTorn") : "",
       stats.image?.torn ? t("status.surfaceImageTorn") : "",
       stats.limited ? t("status.surfaceCoarser") : "",
@@ -11269,6 +11272,9 @@ export function LayerlingEditor({
     ].filter(Boolean);
     // The first sentence ends without a full stop when it stands alone.
     const message = notes.length ? `${done}. ${notes.join(" ")}` : done;
+    // The pattern part's colour chosen is the next one's.
+    const patternPart = surfacePatternPartOf(textured);
+    if (patternPart && used.patternColor) rememberPatternColor(patternPart.color);
     // The gold of cracks made before gives way; new gold comes in as a part of its own.
     commitShapes(sceneWithSurfaceBody(shapesRef.current, current.id, textured, gold), [textured.id], message);
   }, [commitShapes, selectedShape, selectedShapes.length]);
@@ -13587,9 +13593,10 @@ export function LayerlingEditor({
         Object.keys(SURFACE_TEXTURE_LIMITS).forEach((key) => {
           if (params[key] !== undefined && !Number.isFinite(mcpNumber(params[key], Number.NaN))) throw new Error(`${key} must be a number`);
         });
-        ["keepEdges", "outside", "inside", "crackGold", "imageInvert", "tileFromBottom"].forEach((key) => {
+        ["keepEdges", "outside", "inside", "crackGold", "imageInvert", "tileFromBottom", "patternPart"].forEach((key) => {
           if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
         });
+        if (params.patternColor !== undefined && !(typeof params.patternColor === "string" && /^#[0-9a-f]{6}$/i.test(params.patternColor))) throw new Error("patternColor must be a colour as #rrggbb");
         if (params.imageOwn !== undefined && !normalizeSurfaceTextureOwnImage(params.imageOwn)) {
           throw new Error(`imageOwn must be { width, height, data }: whole numbers from 2 to ${SURFACE_TEXTURE_OWN_IMAGE_SIZE} and width × height grey values (0 to 255, a row at a time from the top) as Base64`);
         }
@@ -13650,6 +13657,8 @@ export function LayerlingEditor({
         } else if (under) {
           layerSettings = (target.surfaceTextureLayers ?? []).map((layer) => ({ ...normalizeSurfaceTexture(layer), masks }));
         }
+        // The pattern as a part of its own: raised or cut in, the same on every layer - else there would be no body under it.
+        if (settings.patternPart && !surfacePatternPartWay(settings, layerSettings)) throw new Error("patternPart needs the pattern raised (direction outward) or cut in (inward), the same on every layer");
         const outcomes: Awaited<ReturnType<typeof textureSurfaceOffThread>>[] = [];
         let layerPositions: Float64Array = surfaceTextureInput(source);
         for (const layer of surfaceTextureLayersToMake(settings, layerSettings)) {
@@ -13657,14 +13666,16 @@ export function LayerlingEditor({
           outcomes.push(made);
           layerPositions = made.positions;
         }
-        const outcome = outcomes.length > 1 ? { ...outcomes[outcomes.length - 1], stats: mergedSurfaceTextureStats(outcomes.map((each) => each.stats)), fill: mergedSurfaceTextureFill(outcomes.map((each) => each.fill)) } : outcomes[0];
+        const outcome = mergedSurfaceTextureOutcome(outcomes);
         if (findShape(target.id) !== target) throw new Error("The object changed while the texture was computed; texture it again");
-        const textured = outcome.stats.nothing ? null : surfaceTexturedShape(source, outcome.positions, settings, Date.now(), layerSettings);
+        const textured = surfaceTextureResultShape(source, target, outcome, settings, layerSettings, `${displayShapeName(source)} – ${t("surfaceTexture.patternPart")}`);
         if (!textured) throw new Error("No part of this body gets the pattern: check faces, outside and inside, bottomFree and topFree, and zoneFrom and zoneTo");
         if (outcome.stats.cracks && outcome.stats.cracks.lines === 0) throw new Error("No crack found a way across this body: try another crackStart (anywhere goes on any body), more crackLength, or let the pattern reach more faces");
         if (outcome.stats.text && !outcome.stats.text.placed) throw new Error("The text came onto no face that may get it (a mask lies over it): move it with textAround and textHeight, or change the masks");
         if (outcome.stats.image && !outcome.stats.image.placed) throw new Error("The image once came onto no face that may get it (a mask lies over it): move it with textAround and textHeight, or change the masks");
         const gold = outcome.fill ? surfaceTextureGoldShape(textured, outcome.fill, `${displayShapeName(textured)} – ${t("surfaceTexture.goldPart")}`) : null;
+        const patternPart = surfacePatternPartOf(textured);
+        if (patternPart && settings.patternColor) rememberPatternColor(patternPart.color);
         commitShapes(
           sceneWithSurfaceBody(currentShapes(), target.id, textured, gold),
           [textured.id],
@@ -13677,6 +13688,8 @@ export function LayerlingEditor({
         return {
           object: mcpShapeSummary(textured),
           ...(gold ? { gold: mcpShapeSummary(gold) } : {}),
+          // The body and the pattern as parts of the bundle, each with its colour.
+          ...(patternPart ? { parts: (textured.groupedShapes ?? []).map((part) => ({ name: part.name, color: part.color })) } : {}),
           changed: Boolean(under),
           settings: shown,
           layers: layerSettings.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length })),

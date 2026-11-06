@@ -201,6 +201,8 @@ Má-li část tělesa zůstat hladká nebo dostat vzor jen část, použijte pom
 
 Výsledek je síť jako importovaný model a ponechává si těleso, na kterém vznikl. Když ho později vyberete, i po uložení, karta ukáže nastavení, se kterým vznikl: změňte je a klikněte na {{ui:inspector.surfaceChange}}; textura se znovu spočítá na tomto tělese, tam a v takové velikosti, jak teď stojí těleso s texturou. {{ui:inspector.surfaceRemove}} vrátí hladké těleso. Maskovací tělesa se při změně uplatní znovu: pokud chcete texturu později ještě měnit, raději je skryjte, než abyste je smazali. Zpět vrátí každý z těchto kroků také.
 
+Pro tisk ve dvou barvách zapněte {{ui:inspector.surfacePatternPart}}, u jakéhokoli vzoru: vzor se stane samostatným dílem a {{ui:inspector.surfacePatternColor}} mu dá barvu – nejprve takovou, která se od tělesa odliší, příště tu, kterou jste zvolili naposledy. Ven je díl to, co vystupuje, a těleso zůstane, jak bylo; dovnitř dostane těleso vzor vyřezaný a díl vyplní prohlubeň až k povrchu, jako zlato v prasklinách. Oba jsou spolu v seskupení: pohybují se společně, každý si drží svou barvu a soubor 3MF je obsahuje jako dva díly pro slicer. Texturu měňte nebo odebírejte jako dosud; díl vzoru jde s ní. U více vrstev musí všechny jít stejným směrem, ven nebo dovnitř; vzor do obou směrů zůstane jedním celkem s tělesem.
+
 ## Váza
 
 {{ui:shape.vase}} je samostatné těleso pro vázy, květináče a stínidla. Její rozměry najdete v {{ui:inspector.properties}}, tvar a vzor na kartě {{ui:inspector.vaseForm}}; vše lze kdykoli změnit, i po uložení:

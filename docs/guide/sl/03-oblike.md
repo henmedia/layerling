@@ -196,6 +196,8 @@ Z vzorcem {{ui:surfaceTexture.text}} nalepiš besedilo na telo kot pritisnjeno n
 
 Rezultat je mreža kot uvožen model in ohrani telo, na katerem je nastal. Če ga pozneje izberete, tudi po shranjevanju, kartica pokaže nastavitve, s katerimi je nastal: spremenite jih in kliknite {{ui:inspector.surfaceChange}}, pa se tekstura znova izračuna na tem telesu, tam in v velikosti, kot zdaj stoji telo s teksturo. {{ui:inspector.surfaceRemove}} vrne gladko telo. Telesa mask se pri spremembi znova upoštevajo: če boste teksturo pozneje morda še spreminjali, jih raje skrijte kot izbrišite. Razveljavi prav tako vrne vsakega od teh korakov.
 
+Za tisk v dveh barvah vklopite {{ui:inspector.surfacePatternPart}}, pri katerem koli vzorcu: vzorec postane samostojen del, {{ui:inspector.surfacePatternColor}} pa mu da barvo – najprej tako, ki izstopa od telesa, naslednjič tisto, ki ste jo izbrali nazadnje. Navzven je del tisto, kar izstopa, telo pa ostane, kakršno je bilo; navznoter dobi telo vrezan vzorec, del pa zapolni vdolbino do površine, kot zlato v razpokah. Oba sta skupaj v svežnju: premikata se skupaj, vsak obdrži svojo barvo, datoteka 3MF pa ju vsebuje kot dva dela za rezalnik. Teksturo spremenite ali odstranite kot doslej; del vzorca gre zraven. Pri več plasteh morajo vse iti v isto smer, navzven ali navznoter; vzorec v obe smeri ostane eno s telesom.
+
 ## Vaza
 
 {{ui:shape.vase}} je samostojno telo za vaze, lonce in senčnike. Njene mere so pod {{ui:inspector.properties}}, oblika in vzorec na kartici {{ui:inspector.vaseForm}}; vse lahko kadar koli spremenite, tudi po shranjevanju:

@@ -195,6 +195,8 @@ Ha a test egy része maradjon sima, vagy csak egy része kapjon textúrát, hasz
 
 Az eredmény egy háló, mint egy importált modell, és megőrzi a testet, amelyen készült. Jelöld ki később, mentés után is, és a kártya megmutatja a beállításokat, amelyekkel készült: módosítsd őket, kattints a {{ui:inspector.surfaceChange}} gombra, és a textúra újra elkészül azon a testen, ott és akkora méretben, ahol és amekkora a textúrázott test most. A {{ui:inspector.surfaceRemove}} visszaadja a sima testet. A maszktestek a textúra módosításakor ismét számítanak: inkább rejtsd el őket, mint hogy töröld, ha később talán módosítod. A visszavonás ezeket a lépéseket is egyenként visszavonja.
 
+Kétszínű nyomtatáshoz kapcsold be a {{ui:inspector.surfacePatternPart}} lehetőséget, bármelyik mintánál: a minta külön alkatrész lesz, és a {{ui:inspector.surfacePatternColor}} adja meg a színét – először olyat, amely elüt a testtől, legközelebb azt, amelyet legutóbb választottál. Kifelé az alkatrész az, ami kiemelkedik, a test pedig olyan marad, amilyen volt; befelé a test bevágva kapja a mintát, az alkatrész pedig a felületig kitölti a bemélyedést, mint a repedések aranya. A kettő együtt van egy kötegben: együtt mozognak, mindkettő megtartja a színét, és egy 3MF fájlban két alkatrészként kerülnek a szeletelőhöz. A textúrát a megszokott módon módosíthatod vagy távolíthatod el; a minta alkatrésze vele együtt változik. Több rétegnél mindnek ugyanarra kell mennie, kifelé vagy befelé; a mindkét irányba menő minta egyben marad a testtel.
+
 ## Váza
 
 A {{ui:shape.vase}} önálló test vázákhoz, cserepekhez és lámpaernyőkhöz. Méretei a {{ui:inspector.properties}} alatt vannak, formája és mintája a {{ui:inspector.vaseForm}} kártyán; mindez bármikor módosítható, mentés után is:

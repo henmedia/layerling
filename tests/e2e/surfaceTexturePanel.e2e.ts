@@ -4,7 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { ShapeInspector } from "@/components/workplane/ShapeInspector";
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_PATTERNS, type SurfaceTextureFace, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
-import { surfaceTexturedShape, surfaceTextureInput, textureSurfacePositions } from "@/lib/surfaceTextureShape";
+import { surfaceTexturedShape, surfaceTextureInput, surfaceTextureResultShape, textureSurfacePositions } from "@/lib/surfaceTextureShape";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -333,4 +333,56 @@ describe("the surface texture card in a shape's settings", () => {
     act(() => button(panel, "Remove this layer")!.click());
     expect(tabs().map((tab) => tab.textContent)).toEqual(["1Grooves"]);
   });
+
+  /** A check box of the card by its words. */
+  const check = (panel: HTMLElement, name: string) => [...card(panel).querySelectorAll<HTMLLabelElement>("label.check-property")].find((row) => row.textContent === name)?.querySelector("input");
+  const swatch = (panel: HTMLElement) => card(panel).querySelector<HTMLInputElement>(".surface-pattern-color input[type=color]");
+
+  it("makes the pattern a part of its own in a colour of its own (Discussion #1347), raised or cut in", async () => {
+    const { panel, calls } = mount(cylinder);
+    expect(check(panel, "Pattern as its own part")?.checked).toBe(false);
+    expect(swatch(panel)).toBeNull();
+    act(() => check(panel, "Pattern as its own part")!.click());
+    // Knurling goes into the body: the part fills the cut. It starts white against the orange body.
+    expect(card(panel).textContent).toContain("fills the cut up to the surface");
+    expect(swatch(panel)?.value).toBe("#ffffff");
+    act(() => {
+      swatch(panel)!.value = "#33983d";
+      swatch(panel)!.dispatchEvent(new Event("change"));
+    });
+    expect(swatch(panel)?.value).toBe("#33983d");
+    // Both ways there is no body under it: it stays one with the body.
+    choose(selectWith(panel, "both")!, "both");
+    expect(card(panel).textContent).toContain("the pattern stays one with the body");
+    choose(selectWith(panel, "both")!, "outward");
+    expect(card(panel).textContent).toContain("the body stays as it was");
+    await act(async () => button(panel, "Apply texture")!.click());
+    expect(calls.applied[0]).toMatchObject({ pattern: "knurl", direction: "outward", patternPart: true, patternColor: "#33983d" });
+  });
+
+  it("lets the cracks have their gold or the pattern part, one or the other", () => {
+    const { panel } = mount(cylinder);
+    choosePattern(panel, "Cracks (kintsugi)");
+    act(() => check(panel, "Gold filling as a part of its own")!.click());
+    expect(check(panel, "Gold filling as a part of its own")?.checked).toBe(true);
+    act(() => check(panel, "Pattern as its own part")!.click());
+    expect(check(panel, "Pattern as its own part")?.checked).toBe(true);
+    expect(check(panel, "Gold filling as a part of its own")?.checked).toBe(false);
+    act(() => check(panel, "Gold filling as a part of its own")!.click());
+    expect(check(panel, "Pattern as its own part")?.checked).toBe(false);
+  });
+
+  it("shows a body with its pattern part as it was made, to change or to remove", async () => {
+    const settings = normalizeSurfaceTexture({ pattern: "grooves", spacing: 4, depth: 0.5, direction: "outward", patternPart: true, patternColor: "#111111" });
+    const bundle = surfaceTextureResultShape(cylinder, null, textureSurfacePositions(surfaceTextureInput(cylinder), settings, 150_000), settings, [], "Cylinder – Pattern")!;
+    expect(bundle.groupOperation).toBe("bundle");
+    const { panel, calls } = mount(bundle);
+    expect(patternShown(panel)).toBe("Grooves");
+    expect(check(panel, "Pattern as its own part")?.checked).toBe(true);
+    expect(swatch(panel)?.value).toBe("#111111");
+    await act(async () => button(panel, "Change texture")!.click());
+    expect(calls.applied[0]).toMatchObject({ pattern: "grooves", patternPart: true, patternColor: "#111111" });
+    act(() => button(panel, "Remove texture")!.click());
+    expect(calls.removed).toBe(1);
+  }, 30_000);
 });

@@ -205,6 +205,8 @@ To keep part of the body smooth, or to texture only a part, use a helper body: p
 
 The result is a mesh like an imported model, and it keeps the body it was made on. Select it later, also after saving, and the card shows the settings it was made with: change them and click {{ui:inspector.surfaceChange}}, and the texture is made again on that body, where and as large as the textured body stands now. {{ui:inspector.surfaceRemove}} gives the plain body back. Mask bodies count again when the texture is changed: hide them rather than delete them if you may change it later. Undo takes back each of these steps as well.
 
+For a print in two colours, switch on {{ui:inspector.surfacePatternPart}}, with any pattern: the pattern becomes a part of its own, and {{ui:inspector.surfacePatternColor}} gives it its colour – to begin with one that stands out against the body, the next time the one you chose last. Out of the body, the part is what stands out, and the body stays as it was; into the body, the body gets the pattern cut in and the part fills the cut up to the surface, like the gold of the cracks. Both go together in a bundle: they move together, each keeps its colour, and a 3MF has them as two parts for the slicer. Change or remove the texture as before; the pattern part goes along. With several layers, all have to go the same way, out of the body or into it; a pattern going both ways stays one with the body.
+
 ## A vase
 
 The {{ui:shape.vase}} is a body of its own for vases, pots and lampshades. Its measures are under {{ui:inspector.properties}}, its form and pattern on the card {{ui:inspector.vaseForm}}; all of it can be changed at any time, also after saving:
