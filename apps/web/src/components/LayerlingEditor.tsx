@@ -87,6 +87,8 @@ import { storedCustomFonts } from "@/lib/customFontStore";
 import { ArrayPanel } from "./workplane/ArrayPanel";
 import { ScalePercentPanel, type ScalePercentSettings } from "./workplane/ScalePercentPanel";
 import { ClearancePanel, clearanceMarkFor, clearanceRowIds, type ClearanceSettings, type ClearanceToolState } from "./workplane/ClearancePanel";
+import { PrintCheckPanel, printCheckLineFocus, printCheckLineIds, type PrintCheckLine, type PrintCheckSettings, type PrintCheckToolState } from "./workplane/PrintCheckPanel";
+import { normalizePrintCheckOptions, printCheckFloating, printCheckSmallContacts, printCheckTopLevelId, printCheckWarnings, PRINT_CHECK_NOZZLE_LIMITS, readPrintCheckSettings, writePrintCheckSettings } from "@/lib/printCheck";
 import { CLEARANCE_THRESHOLD_LIMITS, clearanceMeshShape, clearanceSourceShapes, normalizeClearanceOptions, reclassifyClearance, readClearanceSettings, writeClearanceSettings } from "@/lib/clearanceCheck";
 import { scaleShapesByPercent } from "@/lib/scaleByPercent";
 import { isSameSize, resizedCopy, SAME_SIZE, shapeSize, sizeFactorsBetween, type ShapeSize, type SizeFactors } from "@/lib/duplicateResize";
@@ -234,7 +236,7 @@ import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_
 import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
-import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, articulateShapesOffThread, lidForShapesOffThread, checkClearanceOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
+import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, articulateShapesOffThread, lidForShapesOffThread, checkClearanceOffThread, checkPrintOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
@@ -269,6 +271,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "inspect_errors",
   "estimate_print",
   "check_clearance",
+  "check_print",
   "list_reference_points",
   "list_notes",
   "show_overhangs",
@@ -10322,6 +10325,103 @@ export function LayerlingEditor({
   clearanceToolOpenRef.current = Boolean(clearanceTool);
   const canCheckClearance = useMemo(() => clearanceSourceShapes(selectedShapes.length ? selectedShapes : shapes).length > 0, [selectedShapes, shapes]);
 
+  // The print check (Druck prüfen): it only reads the design. Its thin walls are painted red on the bodies while its
+  // result is fresh; it stands where the clearance check stands, so only one of the two is open.
+  const [printCheckTool, setPrintCheckTool] = useState<PrintCheckToolState | null>(null);
+  const printCheckAbortRef = useRef<AbortController | null>(null);
+  const printCheckStale = useMemo(() => {
+    const checked = printCheckTool?.checked;
+    if (!checked) return false;
+    const scope = printCheckTool.scopeIds;
+    const current = scope ? shapes.filter((shape) => scope.includes(shape.id)) : shapes;
+    return current.length !== checked.size || current.some((shape) => checked.get(shape.id) !== shape);
+  }, [printCheckTool?.checked, printCheckTool?.scopeIds, shapes]);
+  /**
+   * Checks what the panel was opened for: the selection then, or every visible object. A new check stops the one still
+   * running; its result belongs to the design as it was, and the panel says when that changes. The overhangs are
+   * counted at the angle "Show overhangs" uses.
+   */
+  const runPrintCheck = useCallback(async (settings: PrintCheckSettings, scopeIds: readonly string[] | null) => {
+    const source = scopeIds ? shapesRef.current.filter((shape) => scopeIds.includes(shape.id)) : shapesRef.current;
+    printCheckAbortRef.current?.abort();
+    const controller = new AbortController();
+    printCheckAbortRef.current = controller;
+    setPrintCheckTool((current) => current ? { ...current, settings, running: true, error: null } : current);
+    try {
+      const result = await checkPrintOffThread(source, { nozzle: settings.nozzle, overhangAngle: workspaceSettingsRef.current.overhangAngle }, controller.signal);
+      if (printCheckAbortRef.current !== controller) return;
+      setPrintCheckTool((current) => current ? { ...current, result, running: false, error: null, checked: new Map(source.map((shape) => [shape.id, shape])), active: null, focus: null } : current);
+    } catch (error) {
+      if (printCheckAbortRef.current !== controller) return;
+      const message = error instanceof Error ? localizedError(error.message) : String(error);
+      setPrintCheckTool((current) => current ? { ...current, running: false, error: t("printCheck.failed", { message }) } : current);
+    }
+  }, []);
+
+  const closePrintCheck = useCallback(() => {
+    printCheckAbortRef.current?.abort();
+    printCheckAbortRef.current = null;
+    setPrintCheckTool(null);
+  }, []);
+
+  const togglePrintCheck = useCallback(() => {
+    if (printCheckTool) {
+      closePrintCheck();
+      return;
+    }
+    if (otherToolPanelOpen) {
+      setNotice(t("printCheck.otherTool"));
+      return;
+    }
+    const scope = selectedShapes.length ? selectedShapes : shapes;
+    if (!clearanceSourceShapes(scope).length) {
+      setNotice(t("printCheck.nothing"));
+      return;
+    }
+    closeClearanceCheck();
+    const settings = readPrintCheckSettings();
+    const scopeIds = selectedIds.length ? [...selectedIds] : null;
+    setPrintCheckTool({ settings, result: null, running: true, error: null, checked: null, scopeIds, active: null, focus: null, request: 0 });
+    void runPrintCheck(settings, scopeIds);
+  }, [closeClearanceCheck, closePrintCheck, otherToolPanelOpen, printCheckTool, runPrintCheck, selectedIds, selectedShapes, shapes]);
+
+  /** Another nozzle is another minimum wall: the walls are measured again. */
+  const changePrintCheckSettings = useCallback((patch: Partial<PrintCheckSettings>) => {
+    if (!printCheckTool) return;
+    const settings = { ...printCheckTool.settings, ...patch };
+    writePrintCheckSettings(settings);
+    void runPrintCheck(settings, printCheckTool.scopeIds);
+  }, [printCheckTool, runPrintCheck]);
+
+  /**
+   * Show for a line: the camera goes to what it found. The parts in the air, on too little of the plate or with an
+   * open mesh are selected as well (a bundle's part by its bundle); the overhangs switch "Show overhangs" on.
+   */
+  const showPrintCheckLine = useCallback((line: PrintCheckLine) => {
+    const result = printCheckTool?.result;
+    if (!result) return;
+    if (line === "overhang" && !overhangsVisible) toggleOverhangsVisible();
+    const ids = [...new Set(printCheckLineIds(result, line).map((id) => printCheckTopLevelId(shapesRef.current, id)).filter((id): id is string => Boolean(id)))];
+    if (ids.length) setSelectedIds(ids);
+    const focus = printCheckLineFocus(result, line);
+    setPrintCheckTool((current) => current ? { ...current, active: line, focus, request: focus ? current.request + 1 : current.request } : current);
+  }, [overhangsVisible, printCheckTool?.result, toggleOverhangsVisible]);
+
+  const printCheckView = useMemo(
+    () => (printCheckTool?.result && !printCheckStale ? { thin: printCheckTool.result.thinWalls?.positions ?? null, focus: printCheckTool.focus, request: printCheckTool.request } : null),
+    [printCheckStale, printCheckTool?.focus, printCheckTool?.request, printCheckTool?.result],
+  );
+  useEffect(() => () => printCheckAbortRef.current?.abort(), []);
+  useEffect(() => {
+    if (otherToolPanelOpen) closePrintCheck();
+  }, [closePrintCheck, otherToolPanelOpen]);
+  const clearanceOpen = Boolean(clearanceTool);
+  useEffect(() => {
+    if (clearanceOpen) closePrintCheck();
+  }, [clearanceOpen, closePrintCheck]);
+  const printCheckToolOpenRef = useRef(false);
+  printCheckToolOpenRef.current = Boolean(printCheckTool);
+
   const intersectSelected = useCallback(async () => {
     if (refuseLockedSelection()) return;
     // While the preview shows, its shapes are the ones that are intersected, whatever is selected.
@@ -14011,6 +14111,50 @@ export function LayerlingEditor({
         };
       }
 
+      if (command.action === "check_print") {
+        // The same check as the panel: it only reads the design. The overhangs at the angle "Show overhangs" uses.
+        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const pickIds = requestedIds.length ? requestedIds : selectedIdsRef.current;
+        const source = pickIds.length ? currentShapes().filter((shape) => pickIds.includes(shape.id)) : currentShapes();
+        if (requestedIds.length && source.length === 0) throw new Error("No matching objects to check");
+        const [minNozzle, maxNozzle] = PRINT_CHECK_NOZZLE_LIMITS;
+        if (params.nozzle !== undefined && !(typeof params.nozzle === "number" && params.nozzle >= minNozzle && params.nozzle <= maxNozzle)) throw new Error(`nozzle must be a number from ${minNozzle} to ${maxNozzle} (mm)`);
+        if (!clearanceSourceShapes(source).length) throw new Error("Nothing to check: no visible solid body");
+        const options = normalizePrintCheckOptions({ nozzle: params.nozzle as number | undefined, overhangAngle: workspaceSettingsRef.current.overhangAngle });
+        const result = await checkPrintOffThread(source, options);
+        const mm = (value: number) => Number(value.toFixed(3));
+        const mm2 = (value: number) => Number(value.toFixed(2));
+        const point = (p: readonly number[]) => ({ x: mm(p[0]), z: mm(p[2]), elevation: mm(p[1]) });
+        const places = result.thinWalls?.places ?? [];
+        return {
+          scope: requestedIds.length ? "ids" : pickIds.length ? "selection" : "design",
+          nozzleMm: result.nozzleMm,
+          minimumWallMm: mm(result.minimumWallMm),
+          warnings: printCheckWarnings(result),
+          thinWalls: result.thinWalls
+            ? {
+              measured: true,
+              thinnestMm: places.length ? mm(places[0].thinnestMm) : null,
+              areaMm2: mm2(places.reduce((sum, place) => sum + place.areaMm2, 0)),
+              places: places.map((place) => ({ id: place.id, name: place.name, thinnestMm: mm(place.thinnestMm), areaMm2: mm2(place.areaMm2), at: point(place.point) })),
+            }
+            : { measured: false, triangles: result.wallTriangles },
+          floating: printCheckFloating(result).map((piece) => ({ ids: piece.ids, name: piece.name, aboveMm: mm(Math.max(0, piece.box.min[1])) })),
+          smallContact: printCheckSmallContacts(result).map((piece) => ({ ids: piece.ids, name: piece.name, footprintMm2: mm2(piece.footprintMm2 ?? 0), heightMm: mm(piece.heightMm) })),
+          overhangs: {
+            angle: result.overhang.angle,
+            areaMm2: mm2(result.overhang.areaMm2),
+            steepestDegrees: result.overhang.steepest ? Number(result.overhang.steepest.degrees.toFixed(1)) : null,
+            steepestOn: result.overhang.steepest?.name ?? null,
+          },
+          openMeshes: result.openMeshes.map(({ id, name, openEdges, nonManifoldEdges }) => ({ id, name, openEdges, nonManifoldEdges })),
+          pieces: result.pieces.map((piece) => ({ key: piece.key, ids: piece.ids, name: piece.name, onPlate: piece.onPlate, floating: piece.floating, heightMm: mm(piece.heightMm), footprintMm2: piece.footprintMm2 === null ? null : mm2(piece.footprintMm2) })),
+          unchecked: result.unchecked,
+          joined: result.joined,
+          note: "Measured on the triangle meshes the slicer gets, overlapping bodies joined. A wall below minimumWallMm (two lines of the nozzle) is thin; thin places under 1 mm² and sharp edges are left out. A piece within 0.05 mm of the plate or of a piece that stands stands; smallContact: under 0.5 mm² of footprint (its cross-section 0.1 mm above the plate) per mm of height. Points: x, z (towards the front) and elevation in mm.",
+        };
+      }
+
       if (command.action === "inspect_errors") {
         return {
           notice: noticeRef.current || t("status.ready"),
@@ -15970,6 +16114,11 @@ export function LayerlingEditor({
           closeClearanceCheck();
           return;
         }
+        if (printCheckToolOpenRef.current) {
+          event.preventDefault();
+          closePrintCheck();
+          return;
+        }
         if (carryIdsRef.current) {
           event.preventDefault();
           setCarryIds(null);
@@ -16253,6 +16402,7 @@ export function LayerlingEditor({
   }, [
     closeHistoryView,
     closeClearanceCheck,
+    closePrintCheck,
     historyView.openPickedGroup,
     historyViewIndex,
     stepHistoryView,
@@ -16638,6 +16788,8 @@ export function LayerlingEditor({
         onClearanceCheck={toggleClearanceCheck}
         clearanceActive={Boolean(clearanceTool)}
         canCheckClearance={canCheckClearance}
+        onPrintCheck={togglePrintCheck}
+        printCheckActive={Boolean(printCheckTool)}
         onFillet={() => edgeModifier?.kind === "fillet" ? cancelEdgeModifier() : startEdgeModifier("fillet")}
         onHollow={startShellTool}
         hollowActive={Boolean(shellTool && shellTool.mode !== "offset")}
@@ -16923,6 +17075,7 @@ export function LayerlingEditor({
           onShapeContextMenu={historyViewState ? undefined : openShapeContextMenu}
           highlightIds={clearanceHighlightIds ?? menuHighlightIds}
           clearanceMark={clearanceMark}
+          printCheckView={printCheckView}
           onSetPlacementWorkplane={setViewportPlacementWorkplane}
           onToggleWorkplaneTool={activateWorkplaneTool}
           onInteractionActiveChange={updateProjectInteractionActive}
@@ -17126,6 +17279,27 @@ export function LayerlingEditor({
           onCheck={() => void runClearanceCheck(clearanceTool.settings)}
           onRow={showClearanceRow}
           onClose={closeClearanceCheck}
+        />
+      ) : null}
+      {printCheckTool ? (
+        <PrintCheckPanel
+          scope={!printCheckTool.scopeIds
+            ? t("printCheck.scope.all")
+            : printCheckTool.scopeIds.length === 1
+              ? shapes.find((shape) => shape.id === printCheckTool.scopeIds?.[0])?.name ?? t("printCheck.scope.all")
+              : t("printCheck.scope.selection", { count: printCheckTool.scopeIds.length })}
+          settings={printCheckTool.settings}
+          workspace={workspaceSettings}
+          result={printCheckTool.result}
+          running={printCheckTool.running}
+          stale={printCheckStale && !printCheckTool.running}
+          error={printCheckTool.error}
+          active={printCheckTool.active}
+          overhangsShown={overhangsVisible}
+          onChange={changePrintCheckSettings}
+          onCheck={() => void runPrintCheck(printCheckTool.settings, printCheckTool.scopeIds)}
+          onShow={showPrintCheckLine}
+          onClose={closePrintCheck}
         />
       ) : null}
       {scalePercentTool && selectedShapes.length > 0 ? (
