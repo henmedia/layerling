@@ -1,10 +1,12 @@
 // @vitest-environment jsdom
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import type { FontData } from "three/examples/jsm/loaders/FontLoader.js";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { ShapeInspector } from "@/components/workplane/ShapeInspector";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
-import { loadTextFonts } from "@/lib/textFonts";
+import { onFontManagerRequested } from "@/lib/fontManagerEvents";
+import { loadTextFonts, registerCustomFont, textFont } from "@/lib/textFonts";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -12,8 +14,9 @@ import type { WorkplaneShape } from "@/types/layerling";
 
 /**
  * Text on a Gridfinity bin's label shelves in its settings (Discussion #1308): a text row under each shelf that is on and
- * in a compartment's label, none on a tray; a font row once a shelf has a text; a note under a text whose letters would
- * be under 3 mm; typing is one change and a locked bin's rows take none.
+ * in a compartment's label, none on a tray; a font row once a shelf has a text, with the fonts of one's own as for a
+ * text, and a letter size below the letter colour; a note under a text whose letters would be under 3 mm; typing is one
+ * change and a locked bin's rows take none.
  */
 beforeAll(async () => {
   // jsdom lays nothing out; the panel only scrolls itself back to the top.
@@ -33,19 +36,20 @@ afterEach(() => {
   root = null;
 });
 
-function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}, onInteractionActiveChange?: (active: boolean) => void) {
+function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}, onInteractionActiveChange?: (active: boolean) => void, workspace = DEFAULT_WORKPLANE_WORKSPACE) {
   const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
   const shape = { ...makeShapeFromAsset(asset, { x: 0, z: 0 }), ...fields } as WorkplaneShape;
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
   act(() => {
-    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace: DEFAULT_WORKPLANE_WORKSPACE, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {}, onInteractionActiveChange }));
+    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {}, onInteractionActiveChange }));
   });
   return container;
 }
 
 const textRows = (panel: HTMLElement) => [...panel.querySelectorAll<HTMLLabelElement>("label.text-property")].filter((row) => row.querySelector("span")?.textContent === "Text");
+const sizeRow = (panel: HTMLElement) => [...panel.querySelectorAll<HTMLLabelElement>("label.range-property")].find((row) => row.querySelector(".range-property-name")?.textContent === "Letter size");
 const fontRow = (panel: HTMLElement) => [...panel.querySelectorAll<HTMLElement>("label, .font-picker, div")].find((row) => row.textContent?.startsWith("Font") && row.querySelector("button, select"));
 
 function type(input: HTMLInputElement, value: string) {
@@ -103,6 +107,26 @@ describe("text on a Gridfinity bin's label shelves in its settings", () => {
     expect(updates).toEqual([{ gridfinityLabelFont: "Serif" }]);
   });
 
+  it("offers the fonts of one's own and the window for them, as a text's font row does, and shows a font this browser lacks as missing", () => {
+    registerCustomFont({ id: "custom:0123456789abcdef", name: "Mine", data: textFont("Serif").data as unknown as FontData }, true);
+    const updates: Partial<WorkplaneShape>[] = [];
+    let requested = 0;
+    const stop = onFontManagerRequested(() => {
+      requested += 1;
+    });
+    const panel = mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws" }, (patch) => updates.push(patch));
+    const option = (label: string) => [...document.querySelectorAll<HTMLElement>("[role=option]")].find((entry) => entry.querySelector("small")?.textContent === label)!;
+    act(() => fontRow(panel)!.querySelector<HTMLButtonElement>("button")!.click());
+    act(() => option("Mine").click());
+    act(() => fontRow(panel)!.querySelector<HTMLButtonElement>("button")!.click());
+    act(() => option("Your own fonts …").click());
+    stop();
+    expect(updates).toEqual([{ gridfinityLabelFont: "custom:0123456789abcdef" }]);
+    expect(requested).toBe(1);
+    expect(fontRow(mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws", gridfinityLabelFont: "custom:0123456789abcdef" }))?.textContent).toContain("Mine");
+    expect(fontRow(mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws", gridfinityLabelFont: "custom:fedcba9876543210" }))?.textContent).toContain("Missing font");
+  });
+
   it("writes a text typed in as one change, held as one undo step from the field's focus to its blur", () => {
     const held: boolean[] = [];
     const updates: Partial<WorkplaneShape>[] = [];
@@ -123,6 +147,59 @@ describe("text on a Gridfinity bin's label shelves in its settings", () => {
     expect(fontRow(mount({ ...bin, gridfinityLabelBack: true }))).toBeUndefined();
     const panel = mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws", gridfinityLabelFont: "Serif" });
     expect(fontRow(panel)?.textContent).toContain("Serif");
+  });
+
+  it("has a letter size row below the letter colour, 0 for as large as each shelf lets them, up to the shelf with the most room", () => {
+    expect(sizeRow(mount({ ...bin, gridfinityLabelBack: true }))).toBeUndefined();
+    const panel = mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws" });
+    const row = sizeRow(panel)!;
+    const color = [...panel.querySelectorAll<HTMLElement>(".select-property")].find((entry) => entry.querySelector("span")?.textContent === "Letter colour")!;
+    expect(color.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(Number(row.querySelector<HTMLInputElement>("input:not([type=range])")!.value)).toBe(0);
+    expect(Number(row.querySelector<HTMLInputElement>("input[type=range]")!.max)).toBeCloseTo(12.1, 6);
+    expect(row.nextElementSibling?.textContent).toBe("The capitals' height on every shelf; 0 makes them as large as each shelf lets them.");
+    expect(Number(sizeRow(mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws", gridfinityLabelTextSize: 6.5 }))!.querySelector<HTMLInputElement>("input:not([type=range])")!.value)).toBe(6.5);
+  });
+
+  it("writes a letter size typed in as one change, 0 as none, one under 3 mm as 3 mm and one past the shelf with the most room as that room", () => {
+    const held: boolean[] = [];
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws" }, (patch) => updates.push(patch), (active) => held.push(active));
+    const input = () => sizeRow(panel)!.querySelector<HTMLInputElement>("input:not([type=range])")!;
+    type(input(), "5");
+    expect(held).toEqual([true, false]);
+    type(input(), "2");
+    type(input(), "50");
+    type(input(), "0");
+    expect(updates.map((patch) => patch.gridfinityLabelTextSize)).toEqual([5, 3, 12.1, undefined]);
+    expect(updates[3]).toHaveProperty("gridfinityLabelTextSize", undefined);
+  });
+
+  it("writes a letter size typed under 3 mm as 3 mm, also coming down from a larger one", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws", gridfinityLabelTextSize: 5 }, (patch) => updates.push(patch));
+    type(sizeRow(panel)!.querySelector<HTMLInputElement>("input:not([type=range])")!, "2");
+    expect(updates.map((patch) => patch.gridfinityLabelTextSize)).toEqual([3]);
+  });
+
+  it("offers a letter size up to 3 mm where no shelf has that much room", () => {
+    const panel = mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackWidth: 4.5, gridfinityLabelBackText: "H" });
+    expect(Number(sizeRow(panel)!.querySelector<HTMLInputElement>("input[type=range]")!.max)).toBe(3);
+  });
+
+  it("shows and takes the letter size in inches in an inch workspace", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const inches = { ...DEFAULT_WORKPLANE_WORKSPACE, units: "Imperial", scale: "1:1 (inches)", inchFormat: "decimal" as const };
+    const panel = mount({ ...bin, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws", gridfinityLabelTextSize: 6.35 }, (patch) => updates.push(patch), undefined, inches);
+    const row = sizeRow(panel)!;
+    expect(row.querySelector(".range-value-unit")?.textContent).toBe("in");
+    expect(row.querySelector<HTMLInputElement>("input:not([type=range])")!.value).toBe("0.25");
+    type(row.querySelector<HTMLInputElement>("input:not([type=range])")!, "0.2");
+    expect(updates[0].gridfinityLabelTextSize).toBeCloseTo(5.08, 9);
+  });
+
+  it("locks the letter size row of a locked bin", () => {
+    expect(sizeRow(mount({ ...bin, locked: true, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws" }))!.querySelector<HTMLInputElement>("input:not([type=range])")!.disabled).toBe(true);
   });
 
   it("says under a text that its letters are left out, on that shelf only", () => {

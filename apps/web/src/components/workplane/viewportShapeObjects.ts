@@ -25,6 +25,7 @@ import { createLoftGeometry } from "@/lib/loftGeometry";
 import { createHingeGeometry } from "@/lib/hingeGeometry";
 import { createGridfinityGeometry, gridfinityLabelTextGiven } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
+import { gridfinityLabelColor, gridfinityLetterGroups } from "@/lib/gridfinityLetterColor";
 import { createKnurlGeometry } from "@/lib/knurlGeometry";
 import { createVaseGeometry, fittedVaseMesh } from "@/lib/vaseShape";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
@@ -416,6 +417,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityLabelLeftText: shape.gridfinityLabelLeftText,
     gridfinityLabelRightText: shape.gridfinityLabelRightText,
     gridfinityLabelFont: shape.gridfinityLabelFont,
+    gridfinityLabelTextSize: shape.gridfinityLabelTextSize,
     // The letters on the shelves are laid out against the mirroring, so they come out of it the right way round (#1308).
     gridfinityLabelMirror: shape.kind === "gridfinity" && gridfinityLabelTextGiven(shape) ? [shape.mirrorX, shape.mirrorY, shape.mirrorZ] : undefined,
     gridfinityScoopBack: shape.gridfinityScoopBack,
@@ -494,8 +496,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     bentTubeSegments: shape.bentTubeSegments,
     text: shape.text,
     font: shape.font,
-    // A font of one's own can gain letters (a design's few, then the whole file): draw again then.
-    fontRevision: customFontRevision(shape.font),
+    // A font of one's own can gain letters (a design's few, then the whole file): draw again then; a bin's letters (#1308) by their own font.
+    fontRevision: customFontRevision(shape.kind === "gridfinity" ? shape.gridfinityLabelFont : shape.font),
     textStroke: shape.textStroke,
     textSilhouette: shape.textSilhouette,
     textStretch: shape.textStretch,
@@ -568,6 +570,8 @@ export function shapeMaterialSignature(shape: WorkplaneShape): string {
   return JSON.stringify({
     edgeLines: edgeLineStyle.enabled ? edgeLineStyle.color : "",
     color: shape.color,
+    // A bin's letters in a colour of their own (#1308) are drawn in a second material; the mesh stays as it is.
+    letterColor: gridfinityLabelColor(shape),
     hole: shape.hole ? (strongHoles ? "strong" : true) : false,
     transparent: Boolean(shape.transparent),
     multicolor: shape.groupedShapes?.length ? groupShowsPartColors(shape) : undefined,
@@ -825,8 +829,11 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityLabelLeftText: shape.gridfinityLabelLeftText,
     gridfinityLabelRightText: shape.gridfinityLabelRightText,
     gridfinityLabelFont: shape.gridfinityLabelFont,
+    gridfinityLabelTextSize: shape.gridfinityLabelTextSize,
     // The letters on the shelves are laid out against the mirroring, so they come out of it the right way round (#1308).
     gridfinityLabelMirror: shape.kind === "gridfinity" && gridfinityLabelTextGiven(shape) ? [shape.mirrorX, shape.mirrorY, shape.mirrorZ] : undefined,
+    // The letters' faces are sorted into a group of their own once they have a colour of their own (#1308); which colour is the material's.
+    gridfinityLetterGroups: gridfinityLabelColor(shape) !== undefined,
     gridfinityScoopBack: shape.gridfinityScoopBack,
     gridfinityScoopFront: shape.gridfinityScoopFront,
     gridfinityScoopLeft: shape.gridfinityScoopLeft,
@@ -903,8 +910,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     bentTubeSegments: shape.bentTubeSegments,
     text: shape.text,
     font: shape.font,
-    // A font of one's own can gain letters (a design's few, then the whole file): draw again then.
-    fontRevision: customFontRevision(shape.font),
+    // A font of one's own can gain letters (a design's few, then the whole file): draw again then; a bin's letters (#1308) by their own font.
+    fontRevision: customFontRevision(shape.kind === "gridfinity" ? shape.gridfinityLabelFont : shape.font),
     textStroke: shape.textStroke,
     textSilhouette: shape.textSilhouette,
     textStretch: shape.textStretch,
@@ -1158,7 +1165,7 @@ export function syncShapeObjectAppearance(
     const material = sharedShapeMaterial(shape, Boolean(surface.geometry.getAttribute("color")) && !shape.hole);
     const nextMaterial = shape.kind === "box" && shape.imagePlate && !shape.hole
       ? createImagePlateMaterials(shape, material, onTextureReady)
-      : material;
+      : shape.kind === "gridfinity" ? gridfinityMaterials(shape, material, surface.geometry) : material;
     const currentMaterials = Array.isArray(surface.material) ? surface.material : null;
     const sameMaterial = Array.isArray(nextMaterial)
       ? Boolean(currentMaterials && nextMaterial.every((entry, index) => currentMaterials[index] === entry))
@@ -1717,7 +1724,7 @@ export function retainSharedShapeGeometry(mesh: THREE.Mesh, geometry: THREE.Buff
 export function groupChildAppearance(group: WorkplaneShape, child: WorkplaneShape): WorkplaneShape {
   if (group.hole) return { ...child, hole: true, color: "#b8c2cc" };
   // One colour for the whole group, nested groups included.
-  const tinted = groupShowsPartColors(group) ? child : { ...child, color: group.color, multicolor: false };
+  const tinted = groupShowsPartColors(group) ? child : { ...child, color: group.color, multicolor: false, gridfinityLabelColor: undefined };
   if (group.transparent) return { ...tinted, transparent: true };
   return tinted;
 }
@@ -1730,6 +1737,12 @@ export const TRANSPARENT_SOLID_OPACITY = 0.4;
 export function holeOpacity(shape: WorkplaneShape) {
   if (strongHoles) return shape.importedMesh ? 0.6 : 0.72;
   return shape.importedMesh ? 0.34 : 0.52;
+}
+
+/** A bin's material, and a second one in its letters' colour when they have one of their own (#1308), for the second group of its mesh, which holds their faces. */
+function gridfinityMaterials(shape: WorkplaneShape, material: THREE.MeshStandardMaterial, geometry: THREE.BufferGeometry) {
+  const letterColor = geometry.groups.length > 1 ? gridfinityLabelColor(shape) : undefined;
+  return letterColor ? [material, sharedShapeMaterial({ ...shape, color: letterColor })] : material;
 }
 
 export function sharedShapeMaterial(shape: WorkplaneShape, vertexColors = false) {
@@ -2041,8 +2054,8 @@ export function createShapeObject(
         sides: shape.sides,
       })), material, shape);
       break;
-    case "gridfinity":
-      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createGridfinityGeometry({
+    case "gridfinity": {
+      const fields = {
         width,
         depth,
         height,
@@ -2098,8 +2111,15 @@ export function createShapeObject(
         gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
         gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
         gridfinityOutline: shape.gridfinityOutline,
-      }, gridfinityLabelLetters({ ...shape, width, depth, height }))), material, shape);
+      };
+      const geometry = sharedShapeGeometry(geometryCacheKey, () => {
+        const letters = gridfinityLabelLetters({ ...shape, width, depth, height });
+        // Letters in a colour of their own (#1308): their faces come last, as a group drawn in that colour.
+        return gridfinityLetterGroups(createGridfinityGeometry(fields, letters), gridfinityLabelColor(shape) ? letters : []);
+      });
+      addMesh(group, geometry, gridfinityMaterials(shape, material, geometry), shape);
       break;
+    }
     case "loft":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createLoftGeometry({ ...shape, width, depth, height })), material, shape);
       break;
@@ -2800,17 +2820,24 @@ export function buildPartColoredMeshGeometry(
       object.updateMatrixWorld(true);
       object.traverse((node) => {
         if (!(node instanceof THREE.Mesh) || !node.visible) return;
-        const material = Array.isArray(node.material) ? node.material[0] : node.material;
         const source = node.geometry as THREE.BufferGeometry;
         if (!source.getAttribute("position")) return;
-        const geometry = source.index ? source.toNonIndexed() : source.clone();
-        geometry.applyMatrix4(node.matrixWorld);
-        geometry.computeBoundingBox();
-        computeBoundsTree.call(geometry, { targetLeafSize: 12 });
-        const probe = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
-        probe.raycast = acceleratedRaycast;
-        const color = material instanceof THREE.MeshStandardMaterial ? material.color.clone() : new THREE.Color(part.color);
-        solids.push({ probe, box: geometry.boundingBox ?? new THREE.Box3(), color, partKey: part.id, mirrored: node.matrixWorld.determinant() < 0 });
+        // A bin's letters in a colour of their own (#1308) are the faces of its mesh's second group: each colour's faces
+        // are a surface of their own, so a face of the merged body matches the letters' or the bin's, never both.
+        const ranges = part.kind === "gridfinity" && Array.isArray(node.material) ? source.groups : [null];
+        ranges.forEach((range) => {
+          const material = Array.isArray(node.material) ? node.material[range?.materialIndex ?? 0] : node.material;
+          const geometry = range
+            ? new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(source.getAttribute("position").array.slice(range.start * 3, (range.start + range.count) * 3), 3))
+            : source.index ? source.toNonIndexed() : source.clone();
+          geometry.applyMatrix4(node.matrixWorld);
+          geometry.computeBoundingBox();
+          computeBoundsTree.call(geometry, { targetLeafSize: 12 });
+          const probe = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+          probe.raycast = acceleratedRaycast;
+          const color = material instanceof THREE.MeshStandardMaterial ? material.color.clone() : new THREE.Color(part.color);
+          solids.push({ probe, box: geometry.boundingBox ?? new THREE.Box3(), color, partKey: part.id, mirrored: node.matrixWorld.determinant() < 0 });
+        });
       });
       disposeObject(object);
     });

@@ -839,7 +839,7 @@ export function meshForShape(shape: WorkplaneShape): MeshData {
 // exported or split. The mesh before transformMesh does not depend on where the shape stands, so
 // the last ones are kept and found by the other fields. Text is left out: it builds a stand-in
 // until its font has loaded.
-const PLACEMENT_FIELDS = new Set(["id", "name", "color", "x", "z", "elevation", "rotation", "rotationX", "rotationZ"]);
+const PLACEMENT_FIELDS = new Set(["id", "name", "color", "gridfinityLabelColor", "x", "z", "elevation", "rotation", "rotationX", "rotationZ"]);
 const MAX_UNPLACED_MESHES = 24;
 const MAX_UNPLACED_MESH_VERTICES = 1_500_000;
 const unplacedMeshCache: Array<{ shape: WorkplaneShape; mesh: MeshData; fontRevision: number }> = [];

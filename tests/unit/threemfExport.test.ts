@@ -124,3 +124,57 @@ describe("exportMeshesTo3mf with a colour per face (#153)", () => {
     expect(used.filter((color) => color === "#0000FFFF")).toHaveLength(6);
   });
 });
+
+/** Each triangle's painting for OrcaSlicer and the slicers built on it, in the order the triangles are written; null where there is none. */
+function paintings(model: string) {
+  return [...model.matchAll(/<triangle [^>]*?\/>/g)].map((match) => /paint_color="([^"]*)"/.exec(match[0])?.[1] ?? null);
+}
+
+/** A cube whose first `count` triangles have another colour, as a group cut into one body shows its parts (#153). */
+function twoColours(mesh: ThreeMfExportMesh, other: string, count = 4): ThreeMfExportMesh {
+  return { ...mesh, faceColors: mesh.faces.map((_, index) => (index < count ? other : mesh.color!)) };
+}
+
+describe("exportMeshesTo3mf painting a body of several colours for OrcaSlicer (Discussion #1308)", () => {
+  it("paints a body of two colours with each colour's filament, numbered in the order of the colour group", () => {
+    const { model } = readPackage(exportMeshesTo3mf([twoColours(cube("Bin", "#4f7fa8"), "#f2c200")]));
+    // Filament 1 is "4" and 2 is "8", as OrcaSlicer writes a whole triangle of that state.
+    expect(paintings(model)).toEqual([...Array(4).fill("8"), ...Array(8).fill("4")]);
+  });
+
+  it("then paints every triangle of every body, the bodies of one colour too", () => {
+    const { model } = readPackage(exportMeshesTo3mf([twoColours(cube("Bin", "#4f7fa8"), "#f2c200"), cube("Box", "#ff0000", 3)]));
+    // Filament 3 is "0C".
+    expect(paintings(model)).toEqual([...Array(4).fill("8"), ...Array(8).fill("4"), ...Array(12).fill("0C")]);
+  });
+
+  it("gives a colour the same filament in every body", () => {
+    const { model } = readPackage(exportMeshesTo3mf([twoColours(cube("A", "#4f7fa8"), "#f2c200", 2), twoColours(cube("B", "#ff0000", 3), "#f2c200", 2)]));
+    const painted = paintings(model);
+    // Blue 1, yellow 2, red 3.
+    expect(painted.slice(0, 2)).toEqual(["8", "8"]);
+    expect(painted.slice(12, 14)).toEqual(["8", "8"]);
+    expect(new Set(painted.slice(14))).toEqual(new Set(["0C"]));
+  });
+
+  it("numbers the filaments past 2, past 17 and up to 32 as OrcaSlicer does, and leaves those beyond unpainted", () => {
+    const colours = Array.from({ length: 33 }, (_, index) => `#0000${index.toString(16).padStart(2, "0")}`);
+    // The first body has the second colour on its last six faces, which keeps the colours in their order.
+    const meshes = colours.map((color, index) => cube(`Box ${index}`, color, index * 2));
+    meshes[0] = { ...meshes[0], faceColors: meshes[0].faces.map((_, index) => colours[index < 6 ? 0 : 1]) };
+    const painted = paintings(readPackage(exportMeshesTo3mf(meshes)).model);
+    const first = (filament: number) => painted[(filament - 1) * 12];
+    expect([1, 2, 3, 4, 16, 17, 18, 19, 32].map(first)).toEqual(["4", "8", "0C", "1C", "DC", "EC", "0FC", "1FC", "EFC"]);
+    expect(first(33)).toBeNull();
+  });
+
+  it("paints nothing when every body has one colour, also in several colours, and writes the triangles as before", () => {
+    // The last body has one colour written in capitals on some of its faces.
+    for (const meshes of [[cube("A", "#4f7fa8"), cube("B", "#4f7fa8", 3)], [cube("A", "#4f7fa8"), cube("B", "#ff0000", 3)], [twoColours(cube("A", "#4f7fa8"), "#4f7fa8")], [twoColours(cube("A", "#4f7fa8"), "#4F7FA8")]]) {
+      const { model } = readPackage(exportMeshesTo3mf(meshes));
+      expect(model).not.toContain("paint_color");
+      const triangles = model.match(/<triangle [^>]*\/>/g)!;
+      expect(triangles.every((triangle) => /^<triangle v1="\d+" v2="\d+" v3="\d+" pid="\d+" p1="\d+"\/>$/.test(triangle)), triangles[0]).toBe(true);
+    }
+  });
+});

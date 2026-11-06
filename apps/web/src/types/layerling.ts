@@ -346,6 +346,10 @@ export type ShapeCustomization = {
   gridfinityLabelCornerSize?: number;
   /** Gridfinity bin: the font of the letters on its label shelves (#1308), one of the built-in ones; missing is Multilanguage. */
   gridfinityLabelFont?: string;
+  /** Gridfinity bin: the colour of the letters on its label shelves (#1308), "#rrggbb"; missing, or the bin's own colour, is the bin's. */
+  gridfinityLabelColor?: string;
+  /** Gridfinity bin: how high the capitals on its label shelves are, in mm (#1308), the same on every shelf as far as each lets them; missing or 0 is as large as each shelf lets them. */
+  gridfinityLabelTextSize?: number;
   /** Gridfinity bin: a finger scoop along the back wall, the floor rising along a quarter circle into it. */
   gridfinityScoopBack?: boolean;
   /** Gridfinity bin: a finger scoop along the front wall. */
@@ -1229,8 +1233,12 @@ export type WorkplaneShape = {
   gridfinityLabelLeftText?: string;
   /** Gridfinity bin: the text raised on the right wall's label shelf. */
   gridfinityLabelRightText?: string;
-  /** Gridfinity bin: the font of the letters on its label shelves (#1308), one of the built-in ones; missing is Multilanguage. */
+  /** Gridfinity bin: the font of the letters on its label shelves (#1308), a built-in one or a font of one's own (custom:...); missing is Multilanguage. */
   gridfinityLabelFont?: string;
+  /** Gridfinity bin: the colour of the letters on its label shelves (#1308), "#rrggbb"; missing, or the bin's own colour, is the bin's. */
+  gridfinityLabelColor?: string;
+  /** Gridfinity bin: how high the capitals on its label shelves are, in mm (#1308), the same on every shelf as far as each lets them; missing or 0 is as large as each shelf lets them. */
+  gridfinityLabelTextSize?: number;
   /** Gridfinity bin: a finger scoop along the back wall, the floor rising along a quarter circle into it. */
   gridfinityScoopBack?: boolean;
   /** Gridfinity bin: a finger scoop along the front wall. */

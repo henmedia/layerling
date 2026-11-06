@@ -16,7 +16,7 @@ import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/l
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
-import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys } from "@/lib/gridfinityGeometry";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
@@ -253,7 +253,7 @@ import { escapeWasHandled } from "@/lib/escapeHandled";
 import { handleSketchEditorKey } from "@/lib/sketchEditorKeys";
 import { sketchEscapeAction } from "@/lib/sketchEscape";
 import { booleanAutomationScene } from "@/lib/editorAutomation";
-import { debugShapeSummary, mcpPivotRequest, compactShapeSummary, mcpShapeSummary, mcpSketchFillProfile, mcpTextFont } from "@/lib/editorMcpSummary";
+import { debugShapeSummary, mcpPivotRequest, compactShapeSummary, mcpGridfinityLabelFont, mcpShapeSummary, mcpSketchFillProfile, mcpTextFont } from "@/lib/editorMcpSummary";
 import { sweepAnchorFromParams, sweepPathFromParams, sweepSectionFromParams, sweepSketchProfile } from "@/lib/sweepSketch";
 import { emptySketchProfile, cadShapeFromSketchProfile, cadShapeFromSketchSweep, revolveBuildProfile, shapeFromRevolvedSketchProfile, shapeFromCadMesh, sketchBodyAsOperation, sketchBodyOperation, sketchProfileLeftOfAxis, sketchReferenceShapeOnWorkplane, defaultMcpSketchProfile, type SketchMirrorAbout } from "@/lib/editorSketchCad";
 import { drawingLabelsInLanguage } from "@/lib/drawingLabels";
@@ -2349,6 +2349,11 @@ function prepareNewShape(asset: ShapeAsset, shape: WorkplaneShape): WorkplaneSha
  */
 function offersCylinderWrap(shape: WorkplaneShape | null | undefined) {
   return canWrapAroundCylinder(shape);
+}
+
+/** Whether the font window's font can go onto a shape: a text, or the letters of a Gridfinity bin with a text on a shelf that is built (#1308). */
+function takesCustomFont(shape: WorkplaneShape) {
+  return shape.kind === "text" || (shape.kind === "gridfinity" && gridfinityHasLabelText(shape));
 }
 
 /** Simplifying is for meshes dense enough to be worth it; a plate from an SVG has nothing to give. */
@@ -11688,18 +11693,19 @@ export function LayerlingEditor({
     if (simplifyToolId && !simplifyToolShape) setSimplifyToolId(null);
   }, [simplifyToolId, simplifyToolShape]);
 
-  /** Puts a font of one's own on every selected text, as one step. */
+  /** Puts a font of one's own on every selected text and on the letters of every selected bin with a text, as one step. */
   const applyCustomFontToSelection = useCallback((fontId: string) => {
+    if (refuseBodyLockedSelection()) return;
     const selected = new Set(selectedIdsRef.current);
-    const texts = shapesRef.current.filter((shape) => selected.has(shape.id) && shape.kind === "text");
-    if (!texts.length) return;
+    const targets = shapesRef.current.filter((shape) => selected.has(shape.id) && takesCustomFont(shape));
+    if (!targets.length) return;
     const name = textFontLabel(fontId) ?? fontId;
     commitShapes(
-      shapesRef.current.map((shape) => (selected.has(shape.id) && shape.kind === "text" ? canonicalizeShape({ ...shape, font: fontId }) : shape)),
+      shapesRef.current.map((shape) => (selected.has(shape.id) && takesCustomFont(shape) ? canonicalizeShape(shape.kind === "text" ? { ...shape, font: fontId } : { ...shape, gridfinityLabelFont: fontId }) : shape)),
       selectedIdsRef.current,
       t("font.usedOnText", { name }),
     );
-  }, [commitShapes]);
+  }, [commitShapes, refuseBodyLockedSelection]);
 
   const startSimplifyTool = useCallback(() => {
     if (simplifyToolShape) {
@@ -12163,6 +12169,8 @@ export function LayerlingEditor({
           if (shape.kind === "gridfinity") {
             shape = { ...shape, ...mcpGridfinityPatch(params) };
             shape = { ...shape, ...mcpGridfinityOutlinePatch(shape, params) };
+            // A font of one's own passes the shape defaults by, as a text's does; it is set here, and an unknown one is refused.
+            if (params.gridfinityLabelFont !== undefined) shape = { ...shape, gridfinityLabelFont: mcpGridfinityLabelFont(params.gridfinityLabelFont) };
           }
           if (shape.kind === "text" && shape.textCurved) {
             shape = { ...shape, ...curvedTextPatch({ ...shape, textCurved: false }, { textCurved: true, textRadius: shape.textRadius, textSize: shape.textSize }) };
@@ -12346,6 +12354,7 @@ export function LayerlingEditor({
           Object.assign(patch, vaseShapePatch({ width: shapeWidth(withSettings), depth: shapeDepth(withSettings), height: withSettings.height }, normalizeVaseSettings({ ...target.vase, ...requested })));
         }
         if (target.kind === "gridfinity") Object.assign(patch, mcpGridfinityPatch(params));
+        if (target.kind === "gridfinity" && params.gridfinityLabelFont !== undefined) patch.gridfinityLabelFont = mcpGridfinityLabelFont(params.gridfinityLabelFont);
         // A padding given without a size keeps a baseplate's units (#455).
         Object.assign(patch, mcpGridfinityPaddingPatch(target, patch, params));
         // An outline (#1061) sets the plate's box and place after everything else that sizes it.
@@ -14527,6 +14536,7 @@ export function LayerlingEditor({
       if (command.action === "add_font") {
         const fileName = mcpString(params.fileName, "font.ttf").trim() || "font.ttf";
         if (typeof params.base64 !== "string" || !params.base64) throw new Error("base64 is required: the font file as base64");
+        if (params.useOnSelection === true && shapesRef.current.some((shape) => selectedIdsRef.current.includes(shape.id) && bodyLocked(shape))) throw new Error("Unlock the selected objects before putting a font on them, or leave out useOnSelection");
         const bytes = Uint8Array.from(atob(params.base64), (char) => char.charCodeAt(0));
         let typeface;
         try {
@@ -17519,7 +17529,7 @@ export function LayerlingEditor({
       ) : null}
       {fontManagerOpen ? (
         <FontManagerPanel
-          canApply={selectedShapes.some((shape) => shape.kind === "text")}
+          canApply={selectedShapes.some(takesCustomFont)}
           loadRuntime={getManifoldRuntime}
           onUse={applyCustomFontToSelection}
           onNotice={(message) => setNotice(message)}

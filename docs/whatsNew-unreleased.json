@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "title": {
+      "de": "Gridfinity-Buchstaben in eigener Farbe",
+      "en": "Gridfinity letters in a colour of their own"
+    },
+    "body": {
+      "de": "Die Buchstaben auf den Etikettenleisten eines Gridfinity-Behälters können jetzt eine eigene Farbe haben: Wähle sie unter „Buchstabenfarbe“ unterhalb der Schriftart. In einem 3MF bleibt der Behälter ein Körper, und die Flächen der Buchstaben haben diese Farbe, sodass Bambu Studio, OrcaSlicer, PrusaSlicer 2.9 und die darauf aufbauenden Slicer sie ohne Farbwechsel mit einem eigenen Filament drucken.",
+      "en": "The letters on a Gridfinity bin's label shelves can now have a colour of their own: pick it under \"Letter colour\" below the font. A 3MF keeps the bin one body with the letters' faces in that colour, so Bambu Studio, OrcaSlicer, PrusaSlicer 2.9 and the slicers built on them print them with a filament of their own, without a colour change."
+    }
+  },
+  {
+    "title": {
+      "de": "Eigene Schriften und eine Buchstabengröße auf Gridfinity-Etiketten",
+      "en": "Fonts of your own and one letter size on Gridfinity labels"
+    },
+    "body": {
+      "de": "Die Buchstaben auf den Etikettenleisten eines Gridfinity-Behälters können jetzt in einer eigenen Schrift stehen, die du wie bei einem Text unter „Schriftart“ wählst. Der Entwurf speichert die Umrisse der Buchstaben, die er benutzt, sodass er sich auf einem anderen Computer mit denselben Buchstaben öffnet. „Buchstabengröße“ macht die Großbuchstaben auf jeder Leiste gleich hoch, soweit sie Platz hat, damit Etiketten verschiedener Länge zusammenpassen.",
+      "en": "The letters on a Gridfinity bin's label shelves can now be in a font of your own, picked under \"Font\" as for a text. The design keeps the outlines of the letters it uses, so it opens with the same letters on another computer. \"Letter size\" makes the capitals the same height on every shelf that has room for them, so labels of different lengths match."
+    }
+  }
+]

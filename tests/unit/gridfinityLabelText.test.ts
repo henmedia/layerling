@@ -1,15 +1,18 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { strFromU8, unzipSync } from "fflate";
 import * as THREE from "three";
 import type { FontData } from "three/examples/jsm/loaders/FontLoader.js";
 import manifoldModule, { type ManifoldToplevel } from "manifold-3d";
 import { createShapeObject, shapeGeometrySignature, tapeShapeTopologyKey } from "@/components/workplane/viewportShapeObjects";
 import { cadGridfinityLetterSegmentCount, cadGridfinitySegmentCount, cadModifierGridfinityForShape, withinExactProfileLimit } from "@/lib/cadProfileExtrusion";
 import { CAD_MODIFIER_EXACT_SEGMENT_LIMIT } from "@/lib/cadModifierRuntime";
+import { buildGroupedShapeFromSelection } from "@/lib/editorBooleans";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { meshForShape } from "@/lib/editorMeshCore";
-import { mcpShapeSummary } from "@/lib/editorMcpSummary";
+import { mcpGridfinityLabelFont, mcpShapeSummary } from "@/lib/editorMcpSummary";
 import {
   GRIDFINITY_LABEL_FONTS,
   GRIDFINITY_LABEL_TEXT_HEIGHT,
@@ -21,15 +24,16 @@ import {
   gridfinityListPatch,
   normalizeGridfinityCompartmentLabels,
 } from "@/lib/gridfinityGeometry";
-import { gridfinityLabelGlyphs, gridfinityLabelLetters, gridfinityLabelTextLeftOut } from "@/lib/gridfinityLabelText";
-import { exportLylProject, importLylProject } from "@/lib/lylProject";
+import { gridfinityLabelFont, gridfinityLabelGlyphs, gridfinityLabelLetters, gridfinityLabelTextLeftOut } from "@/lib/gridfinityLabelText";
+import { typefaceFromFontFile } from "@/lib/customFonts";
+import { exportLylProject, importLylProject, type LylProjectDocumentV1 } from "@/lib/lylProject";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import { mcpGridfinityListParams, mcpGridfinityPatch } from "@/lib/mcpShapeSettings";
 import { makeShapeFromAsset, sceneShape, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { shapeDefaultsFromShape } from "@/lib/shapeDefaults";
 import { SURFACE_TEXT_FONTS } from "@/lib/surfaceTextOutline";
 import { straightTextShapes } from "@/lib/textGeometry";
-import { loadJapaneseTypeface, loadTextFonts, registerCustomFont, resetJapaneseTypefaceForTests, setJapaneseTypefaceFetcherForTests, textFont } from "@/lib/textFonts";
+import { customFontEntry, loadJapaneseTypeface, loadTextFonts, registerCustomFont, resetCustomFontsForTests, resetJapaneseTypefaceForTests, setJapaneseTypefaceFetcherForTests, textFont } from "@/lib/textFonts";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations } from "@/lib/workplaneSettings";
 import { canonicalizeShape, workplaneShapesEqual } from "@/lib/workplaneShapes";
 import type { GridfinityCompartmentLabel, WorkplaneShape } from "@/types/layerling";
@@ -233,13 +237,39 @@ describe("letters fitted to a Gridfinity label shelf", () => {
     expect(holes).toEqual([2, 3, 2]);
   });
 
-  it("takes only the built-in fonts, the text shape's own list", () => {
+  it("takes the built-in fonts, the text shape's own list, and fonts of one's own, as a text does", () => {
     expect(GRIDFINITY_LABEL_FONTS).toEqual(SURFACE_TEXT_FONTS);
     const area = (font: string) => lettersArea(bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "Ag", gridfinityLabelFont: font }));
     expect(area("Serif")).not.toBeCloseTo(area("Multilanguage"), 1);
-    // A font of one's own is not offered here and is not saved with a bin: even one this browser knows draws Multilanguage.
+    // A font of one's own draws its own outlines; one this browser does not have draws Multilanguage meanwhile and keeps its id.
     registerCustomFont({ id: "custom:0123456789abcdef", name: "Mine", data: textFont("Serif").data as unknown as FontData }, true);
-    expect(area("custom:0123456789abcdef")).toBeCloseTo(area("Multilanguage"), 9);
+    expect(area("custom:0123456789abcdef")).toBeCloseTo(area("Serif"), 9);
+    expect(area("custom:fedcba9876543210")).toBeCloseTo(area("Multilanguage"), 9);
+    expect(gridfinityLabelFont({ gridfinityLabelFont: "custom:fedcba9876543210" })).toBe("custom:fedcba9876543210");
+    expect(gridfinityLabelFont({ gridfinityLabelFont: "Comic" })).toBe("Multilanguage");
+  });
+
+  it("makes the capitals as high as the letter size, never higher than the shelf lets them nor under 3 mm", () => {
+    // The back shelf's room is 12.1 mm high, and an H fills it; 0 is no letter size.
+    const size = (letterSize?: number) => gridfinityLabelGlyphs(bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "H", gridfinityLabelTextSize: letterSize }))[0].size;
+    close(size(), 12.1);
+    close(size(0), 12.1);
+    close(size(5), 5);
+    close(size(2), 3);
+    close(size(20), 12.1);
+  });
+
+  it("gives shelves of different lengths the same capitals under a letter size, and still leaves out a text under 3 mm", () => {
+    const shape = (letterSize?: number) => bin({ gridfinityLabelBack: true, gridfinityLabelLeft: true, gridfinityLabelBackText: "Screws M3", gridfinityLabelLeftText: "M3 nuts", gridfinityLabelTextSize: letterSize });
+    const [back, left] = gridfinityLabelGlyphs(shape()).map((glyphs) => glyphs.size);
+    expect(back - left).toBeGreaterThan(1);
+    const capped = gridfinityLabelGlyphs(shape(left - 0.5));
+    expect(capped).toHaveLength(2);
+    capped.forEach((glyphs) => close(glyphs.size, left - 0.5));
+    // A shelf whose text would be under 3 mm stays without it; a letter size makes no letters larger than the shelf lets them.
+    const narrow = bin({ width: 41.5, gridfinityLabelBack: true, gridfinityLabelLeft: true, gridfinityLabelBackText: "AB", gridfinityLabelLeftText: "W".repeat(24), gridfinityLabelTextSize: 5 });
+    expect(gridfinityLabelGlyphs(narrow).map((glyphs) => glyphs.place.shelf)).toEqual(["back"]);
+    expect(gridfinityLabelTextLeftOut(narrow, "left")).toBe(true);
   });
 
   it("leaves a text out from just under a capital of 3 mm, measured on the box round the letters, descenders and all", () => {
@@ -426,9 +456,9 @@ describe("a Gridfinity bin with letters on its shelves", { timeout: 60_000 }, ()
     expect(withinExactProfileLimit([{ gridfinity: bare, profileMesh: mesh }, ...Array.from({ length: 4 }, () => ({ gridfinity: part("Screws M3 x 8"), profileMesh: mesh }))])[0].gridfinity).toBe(bare);
   });
 
-  it("draws the bin again when a text, the font or the mirroring of its letters changes", () => {
+  it("draws the bin again when a text, the font, the letter size or the mirroring of its letters changes", () => {
     const shape = canonicalizeShape(binShape({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB", gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "x" }] }));
-    for (const change of [{ gridfinityLabelBackText: "AC" }, { gridfinityLabelFrontText: "AB" }, { gridfinityLabelLeftText: "AB" }, { gridfinityLabelRightText: "AB" }, { gridfinityLabelFont: "Serif" }, { mirrorX: true }, { mirrorY: true }, { mirrorZ: true }, { gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back" as const, text: "y" }] }]) {
+    for (const change of [{ gridfinityLabelBackText: "AC" }, { gridfinityLabelFrontText: "AB" }, { gridfinityLabelLeftText: "AB" }, { gridfinityLabelRightText: "AB" }, { gridfinityLabelFont: "Serif" }, { gridfinityLabelTextSize: 5 }, { mirrorX: true }, { mirrorY: true }, { mirrorZ: true }, { gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back" as const, text: "y" }] }]) {
       const changed = { ...shape, ...change };
       expect(shapeGeometrySignature(changed), JSON.stringify(change)).not.toBe(shapeGeometrySignature(shape));
       expect(tapeShapeTopologyKey(changed), JSON.stringify(change)).not.toBe(tapeShapeTopologyKey(shape));
@@ -437,6 +467,14 @@ describe("a Gridfinity bin with letters on its shelves", { timeout: 60_000 }, ()
     // A bin without text draws the same mirrored or not: the mirror is the view's.
     const plain = canonicalizeShape(binShape({ gridfinityLabelBack: true }));
     expect(shapeGeometrySignature({ ...plain, mirrorX: true })).toBe(shapeGeometrySignature(plain));
+  });
+
+  it("draws a bin in a font of one's own again when the font arrives", () => {
+    const shape = canonicalizeShape(binShape({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB", gridfinityLabelFont: "custom:00000000000000aa" }));
+    const [signature, topology] = [shapeGeometrySignature(shape), tapeShapeTopologyKey(shape)];
+    registerCustomFont({ id: "custom:00000000000000aa", name: "Late", data: textFont("Serif").data as unknown as FontData }, false);
+    expect(shapeGeometrySignature(shape)).not.toBe(signature);
+    expect(tapeShapeTopologyKey(shape)).not.toBe(topology);
   });
 });
 
@@ -466,6 +504,10 @@ describe("text on Gridfinity label shelves through the project, the defaults and
     await expect(roundTrip([{ ...shape, gridfinityLabelBackText: "x".repeat(25) }])).rejects.toThrow(/gridfinityLabelBackText/);
     await expect(roundTrip([{ ...shape, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "x".repeat(25) }] }])).rejects.toThrow(/text/);
     await expect(roundTrip([{ ...shape, gridfinityLabelFont: "custom:abc" }])).rejects.toThrow(/gridfinityLabelFont/);
+    expect((await roundTrip([{ ...shape, gridfinityLabelTextSize: 6.5 }])).shapes[0].gridfinityLabelTextSize).toBe(6.5);
+    expect(sceneShape({ ...shape, gridfinityLabelTextSize: 6.5 }).gridfinityLabelTextSize).toBe(6.5);
+    await expect(roundTrip([{ ...shape, gridfinityLabelTextSize: -1 }])).rejects.toThrow(/gridfinityLabelTextSize/);
+    expect((await roundTrip([{ ...shape, gridfinityLabelFont: "custom:0123456789abcdef" }])).shapes[0].gridfinityLabelFont).toBe("custom:0123456789abcdef");
     await expect(roundTrip([{ ...shape, gridfinityLabelLeftText: 3 } as unknown as WorkplaneShape])).rejects.toThrow(/gridfinityLabelLeftText/);
   });
 
@@ -476,8 +518,18 @@ describe("text on Gridfinity label shelves through the project, the defaults and
     expect(defaults).not.toHaveProperty("gridfinityLabelBackText");
     expect(normalizeShapeCustomizations({ gridfinity: { gridfinityLabelFont: "Script" } }, {})).toMatchObject({ gridfinity: { gridfinityLabelFont: "Script" } });
     expect(normalizeShapeCustomizations({ gridfinity: { gridfinityLabelFont: "custom:abc" } }, {}).gridfinity?.gridfinityLabelFont).toBeUndefined();
+    // A font of one's own is not a default, as for a text: another computer may not have it.
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinityLabelFont: "custom:0123456789abcdef" } }, {}).gridfinity?.gridfinityLabelFont).toBeUndefined();
+    expect(shapeDefaultsFromShape(binShape({ ...texts, gridfinityLabelFont: "custom:0123456789abcdef" }))?.gridfinityLabelFont).toBeUndefined();
     const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
     expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityLabelFont: "Script" })).toMatchObject({ gridfinityLabelFont: "Script" });
+    // The letter size is a style too, kept for new bins, and MCP reads it back.
+    expect(shapeDefaultsFromShape(binShape({ ...texts, gridfinityLabelTextSize: 6 }))).toMatchObject({ gridfinityLabelTextSize: 6 });
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinityLabelTextSize: -2 } }, {}).gridfinity?.gridfinityLabelTextSize).toBe(0);
+    // Under 3 mm it is stored as 3, as the settings row stores it, also when MCP sets it.
+    expect([0.5, 2.9, 3, 4.5].map((size) => normalizeShapeCustomizations({ gridfinity: { gridfinityLabelTextSize: size } }, {}).gridfinity?.gridfinityLabelTextSize)).toEqual([3, 3, 3, 4.5]);
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityLabelTextSize: 6 })).toMatchObject({ gridfinityLabelTextSize: 6 });
+    expect(mcpShapeSummary(binShape({ ...texts, gridfinityLabelTextSize: 7.5 }))).toMatchObject({ settings: { gridfinityLabelTextSize: 7.5 } });
   });
 
   it("writes the texts create_shape and update_object give, with the lists, in one patch", () => {
@@ -495,6 +547,49 @@ describe("text on Gridfinity label shelves through the project, the defaults and
     expect(normalizeGridfinityCompartmentLabels([{ column: 0, row: 0, side: "back", text: "y".repeat(30) }, { column: 1, row: 0, side: "back", text: 5 }])).toEqual([{ column: 0, row: 0, side: "back", text: "y".repeat(24) }, { column: 1, row: 0, side: "back" }]);
     const summary = JSON.stringify(mcpShapeSummary(binShape({ ...texts, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "Washers" }] })));
     for (const value of ["Screws M3", "Serif", "Washers", "gridfinityLabelRightText"]) expect(summary).toContain(value);
+  });
+
+  it("takes a built-in font or a font of one's own by its name or id from MCP, and refuses any other", () => {
+    registerCustomFont({ id: "custom:0123456789abcdef", name: "Mine", data: textFont("Serif").data as unknown as FontData }, true);
+    expect(mcpGridfinityLabelFont("Serif")).toBe("Serif");
+    expect(mcpGridfinityLabelFont("mine")).toBe("custom:0123456789abcdef");
+    expect(mcpGridfinityLabelFont("custom:fedcba9876543210")).toBe("custom:fedcba9876543210");
+    expect(() => mcpGridfinityLabelFont("Comic")).toThrow("gridfinityLabelFont must be one of Multilanguage, Sans, Serif, Script, Monospace, Rounded, Stencil, Japanese, or a font of one's own by its name or id (layerling_list_fonts)");
+    expect(() => mcpGridfinityLabelFont(3)).toThrow(/gridfinityLabelFont must be one of/);
+  });
+
+  it("brings the letters of a bin's font of one's own along in a saved project, the H that sizes them too, in a group and in every undo state, so they come out the same elsewhere", async () => {
+    const buffer = readFileSync(join(process.cwd(), "node_modules/three/examples/fonts/ttf/kenpixel.ttf"));
+    const typeface = await typefaceFromFontFile(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer, "kenpixel.ttf", runtime);
+    registerCustomFont(typeface, true);
+    const shape = canonicalizeShape(binShape({ gridfinityLabelBack: true, gridfinityLabelFront: true, gridfinityLabelBackText: "Abc", gridfinityLabelFrontText: "Zug", gridfinityLabelFont: typeface.id, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "Nuts" }] }));
+    const [glyphs, letters] = [gridfinityLabelGlyphs(shape), gridfinityLabelLetters(shape)];
+    expect(glyphs).toHaveLength(2);
+    // Now in a group, and before that alone with a back text whose Q, i and z it no longer has.
+    const group = (await buildGroupedShapeFromSelection([shape, { ...shape, id: "plain", gridfinityLabelFont: undefined, x: 120 }], 250_000)).group!;
+    const earlier = { ...shape, gridfinityLabelBackText: "Quiz" };
+    const bytes = await exportLylProject({
+      projectName: "Labels",
+      createdAt: 1_700_000_000_000,
+      modifiedAt: 1_700_000_100_000,
+      shapes: [group],
+      history: [editorHistoryEntry([earlier], []), editorHistoryEntry([group], [])],
+      historyIndex: 1,
+      assets: [],
+      workspace: DEFAULT_WORKPLANE_WORKSPACE,
+      snapGrid: DEFAULT_SNAP_GRID,
+      placementElevation: 0,
+    });
+    const document = JSON.parse(strFromU8(unzipSync(bytes)["project.json"])) as LylProjectDocumentV1;
+    expect(document.fonts?.map((font) => font.id)).toEqual([typeface.id]);
+    expect(Object.keys((document.fonts![0].typeface as { glyphs: object }).glyphs).sort()).toEqual([" ", "A", "H", "N", "Q", "Z", "b", "c", "g", "i", "s", "t", "u", "z"]);
+
+    resetCustomFontsForTests();
+    const loaded = (await importLylProject(bytes)).shapes[0].groupedShapes!.find((part) => part.gridfinityLabelFont)!;
+    expect(customFontEntry(typeface.id)?.complete).toBe(false);
+    expect(loaded.gridfinityLabelFont).toBe(typeface.id);
+    expect(gridfinityLabelGlyphs(loaded).map((entry) => entry.size)).toEqual(glyphs.map((entry) => entry.size));
+    expect(gridfinityLabelLetters(loaded)).toEqual(letters);
   });
 });
 
@@ -557,6 +652,23 @@ describe("the editor's calls for letters on Gridfinity label shelves", () => {
 
   it("counts a bin's letters in the time budget of both of the edge tool's requests", () => {
     expect(editor.match(/\+ cadGridfinitySegmentCount\(part\.gridfinity\), 0\);/g)).toHaveLength(2);
+  });
+
+  it("sets the font create_shape and update_object give through mcpGridfinityLabelFont, past the shape defaults", () => {
+    expect(editor).toContain("shape = { ...shape, gridfinityLabelFont: mcpGridfinityLabelFont(params.gridfinityLabelFont) }");
+    expect(editor).toContain("patch.gridfinityLabelFont = mcpGridfinityLabelFont(params.gridfinityLabelFont)");
+  });
+
+  it("puts a font from the font window on a selected bin's letters, and on nothing while a selected object is locked or has its shape locked", () => {
+    const apply = editor.slice(editor.indexOf("const applyCustomFontToSelection = useCallback("), editor.indexOf("const startSimplifyTool = useCallback("));
+    expect(apply).toContain("(fontId: string) => { if (refuseBodyLockedSelection()) return;");
+    expect(apply).toContain("}, [commitShapes, refuseBodyLockedSelection]);");
+    expect(apply).toContain("{ ...shape, gridfinityLabelFont: fontId }");
+    expect(editor).toContain("canApply={selectedShapes.some(takesCustomFont)}");
+    // Only a shelf that is built takes letters, as the Font row shows.
+    expect(editor).toContain("shape.kind === \"gridfinity\" && gridfinityHasLabelText(shape)");
+    // layerling_add_font's useOnSelection refuses as Use does.
+    expect(editor).toContain("params.useOnSelection === true && shapesRef.current.some((shape) => selectedIdsRef.current.includes(shape.id) && bodyLocked(shape))");
   });
 });
 

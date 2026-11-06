@@ -1,5 +1,6 @@
 import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
+import { normalizeHexColor } from "@/lib/coloredImport";
 import { GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
 import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings, threadStandardSize } from "@/lib/threadGeometry";
 
@@ -39,7 +40,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "tubeBoreHole", "hingeKnuckles", "hingeKnuckleWidth", "hingeStyle", "hingeConeSize", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingePinless", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeScrewCountersink", "hingeCornerRadius", "hingeLeafStyle", "hingeScrewHead", "hingeNutWidth",
   "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinitySwallowtailClearance",
   "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCorner", "gridfinityLabelCornerSize",
-  "gridfinityLabelBackText", "gridfinityLabelFrontText", "gridfinityLabelLeftText", "gridfinityLabelRightText", "gridfinityLabelFont",
+  "gridfinityLabelBackText", "gridfinityLabelFrontText", "gridfinityLabelLeftText", "gridfinityLabelRightText", "gridfinityLabelFont", "gridfinityLabelColor", "gridfinityLabelTextSize",
   "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
   "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize", "gridfinityOutline",
   "knurlPattern", "knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer",
@@ -159,10 +160,20 @@ export function mcpGridfinityOutlinePatch(shape: WorkplaneShape, params: Record<
 /**
  * What create_shape and update_object write for a Gridfinity part's own lists and texts: the dividers, the compartment
  * labels and the openings as gridfinityListPatch keeps them, and the shelves' texts (#1308), which belong to
- * one bin and so do not come through the shape defaults.
+ * one bin and so do not come through the shape defaults. The letters' colour comes through the defaults too, which drop
+ * a value that is no colour, so every value is checked and written here, an empty one as the bin's colour, and one that
+ * is no colour refused rather than dropped without a word.
  */
 export function mcpGridfinityPatch(params: Record<string, unknown>) {
-  return { ...gridfinityListPatch(mcpGridfinityListParams(params)), ...gridfinityLabelTextPatch(params) };
+  return { ...gridfinityListPatch(mcpGridfinityListParams(params)), ...gridfinityLabelTextPatch(params), ...mcpGridfinityLabelColorPatch(params.gridfinityLabelColor) };
+}
+
+function mcpGridfinityLabelColorPatch(value: unknown): Partial<Pick<WorkplaneShape, "gridfinityLabelColor">> {
+  if (value === undefined) return {};
+  if (value === "") return { gridfinityLabelColor: undefined };
+  const color = typeof value === "string" ? normalizeHexColor(value) : undefined;
+  if (!color) throw new Error("gridfinityLabelColor must be a hex colour, for example #d41721, or an empty string for the bin's own colour");
+  return { gridfinityLabelColor: color };
 }
 
 /**

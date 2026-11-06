@@ -11,7 +11,7 @@ import { DEFAULT_SKETCH_STROKE, normalizeSketchStroke } from "@/lib/sketchStroke
 import { surfaceTextureEntry } from "@/lib/surfaceTextureShape";
 import { type LayerlingMcpShapeSummary } from "@/lib/layerlingMcpProtocol";
 import { vaseSettingsChanges } from "@/lib/vaseSettings";
-import { gridfinityOutlinePoints } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_LABEL_FONTS, gridfinityOutlinePoints } from "@/lib/gridfinityGeometry";
 import type { ShapeKind, SketchProfile, WorkplaneShape } from "@/types/layerling";
 
 export function debugShapeSummary(shape: WorkplaneShape): Record<string, unknown> {
@@ -211,6 +211,16 @@ export function mcpTextFont(value: string) {
   if (isCustomFontId(value)) return value;
   const wanted = value.trim().toLowerCase();
   return customFontList().find((font) => font.name.toLowerCase() === wanted)?.id ?? null;
+}
+
+/**
+ * The font an MCP command names for a Gridfinity bin's letters (#1308): a built-in one, or a font of one's own by its name
+ * or id. The shape defaults would drop any other without a word, so it is refused here.
+ */
+export function mcpGridfinityLabelFont(value: unknown) {
+  const font = typeof value !== "string" ? null : GRIDFINITY_LABEL_FONTS.includes(value) ? value : mcpTextFont(value);
+  if (!font) throw new Error(`gridfinityLabelFont must be one of ${GRIDFINITY_LABEL_FONTS.join(", ")}, or a font of one's own by its name or id (layerling_list_fonts)`);
+  return font;
 }
 
 /** The transition's values as the body shows them, under the names a command sets them by. */

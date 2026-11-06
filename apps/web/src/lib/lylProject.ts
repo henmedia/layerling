@@ -166,17 +166,23 @@ export type LylFontV1 = { id: string; name: string; typeface: unknown };
 const LYL_MAX_FONTS = 64;
 
 /**
- * The letters each font of one's own needs in these states: every character of every text that
- * uses it, in every undo state, so going back in the history still finds its letters.
+ * The letters each font of one's own needs in these states: every character of every text and of
+ * every Gridfinity bin's shelves that use it, in every undo state, so going back in the history
+ * still finds its letters.
  */
 function embeddedFonts(states: WorkplaneShape[][]): LylFontV1[] {
   const characters = new Map<string, Set<string>>();
+  const use = (font: string, texts: string[]) => {
+    const used = characters.get(font) ?? new Set<string>();
+    const glyphs = customFontEntry(font)?.data.glyphs as Record<string, unknown> | undefined;
+    texts.forEach((text) => textCharacters(text.trim() || " ", glyphs).forEach((character) => used.add(character)));
+    characters.set(font, used);
+  };
   const visit = (shape: WorkplaneShape) => {
-    if (isCustomFontId(shape.font) && shape.kind === "text") {
-      const used = characters.get(shape.font) ?? new Set<string>();
-      const glyphs = customFontEntry(shape.font)?.data.glyphs as Record<string, unknown> | undefined;
-      textCharacters((shape.text ?? "TEXT").trim() || " ", glyphs).forEach((character) => used.add(character));
-      characters.set(shape.font, used);
+    if (isCustomFontId(shape.font) && shape.kind === "text") use(shape.font, [shape.text ?? "TEXT"]);
+    // A bin's letters (#1308) and the H their size is measured on: without it they would come out another size elsewhere.
+    if (isCustomFontId(shape.gridfinityLabelFont) && shape.kind === "gridfinity") {
+      use(shape.gridfinityLabelFont, ["H", ...Object.values(GRIDFINITY_LABEL_TEXT_KEYS).map((key) => shape[key] ?? ""), ...(shape.gridfinityCompartmentLabels ?? []).map((label) => label.text ?? "")]);
     }
     shape.groupedShapes?.forEach(visit);
   };
@@ -233,9 +239,9 @@ export type LylProjectDocumentV1 = {
   /** The files kept with the design (#820), in the order they are listed; a version 3 package only. */
   attachments?: LylAttachmentV3[];
   /**
-   * Fonts of one's own the texts use (#customFonts): only the letters they use, as outlines in the
-   * three.js typeface format - never the font file. Older readers pass over them and draw those
-   * texts in the default font.
+   * Fonts of one's own the texts and Gridfinity bins' letters use (#customFonts): only the letters
+   * they use, as outlines in the three.js typeface format - never the font file. Older readers pass
+   * over them and draw those texts in the default font; 1.145.0 refuses a bin in such a font.
    */
   fonts?: LylFontV1[];
   editor: {
@@ -1775,7 +1781,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     for (const key of ["gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "hingePinless"] as const) {
       if (definition[key] !== undefined && typeof definition[key] !== "boolean") throw new Error(`${label}.${key} must be true or false`);
     }
-    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness"] as const) {
+    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       // Only an offset runs both ways along a wall.
@@ -1784,12 +1790,15 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.gridfinityLabelCorner !== undefined && definition.gridfinityLabelCorner !== "round" && definition.gridfinityLabelCorner !== "chamfer") {
       throw new Error(`${label}.gridfinityLabelCorner is invalid`);
     }
-    // The letters on the shelves (#1308): a text as long as a text shape's, in a built-in font, as a bin does not bring a font of its own along.
+    // The letters on the shelves (#1308): a text as long as a text shape's, in a built-in font or a font of one's own, whose letters the design brings along.
     for (const key of Object.values(GRIDFINITY_LABEL_TEXT_KEYS)) {
       if (definition[key] !== undefined && (typeof definition[key] !== "string" || definition[key].length > MAX_GRIDFINITY_LABEL_TEXT_LENGTH)) throw new Error(`${label}.${key} must be a string of at most ${MAX_GRIDFINITY_LABEL_TEXT_LENGTH} characters`);
     }
-    if (definition.gridfinityLabelFont !== undefined && !GRIDFINITY_LABEL_FONTS.includes(definition.gridfinityLabelFont as string)) {
+    if (definition.gridfinityLabelFont !== undefined && !GRIDFINITY_LABEL_FONTS.includes(definition.gridfinityLabelFont as string) && !isCustomFontId(definition.gridfinityLabelFont)) {
       throw new Error(`${label}.gridfinityLabelFont is invalid`);
+    }
+    if (definition.gridfinityLabelColor !== undefined && (typeof definition.gridfinityLabelColor !== "string" || !/^#[0-9a-f]{6}$/i.test(definition.gridfinityLabelColor))) {
+      throw new Error(`${label}.gridfinityLabelColor must be a colour as #rrggbb`);
     }
     if (definition.gridfinityOpeningCorner !== undefined && definition.gridfinityOpeningCorner !== "round" && definition.gridfinityOpeningCorner !== "chamfer") {
       throw new Error(`${label}.gridfinityOpeningCorner is invalid`);

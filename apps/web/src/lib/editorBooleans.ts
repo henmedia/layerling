@@ -11,6 +11,7 @@ import * as THREE from "three";
 import { numberLocale, t } from "@/lib/i18n";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
+import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
 import { dropSplitSlivers, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
@@ -1260,11 +1261,11 @@ export const SECTION_SEEN_FROM_KEYS = {
 } as const;
 
 /** Die sichtbaren Teile fuer einen Export, dazu der Satz, der die ausgeblendeten nennt. */
-/** A bundle goes out as its parts, each a body of its own with its own colour (or the bundle's, with Multicolor off); its holes cut nothing. */
+/** A bundle goes out as its parts, each a body of its own with its own colour (or the bundle's, letters included, with Multicolor off); its holes cut nothing. */
 export function expandBundles(source: readonly WorkplaneShape[]): WorkplaneShape[] {
   return source.flatMap((shape) => (
     shape.groupOperation === "bundle" && shape.groupedShapes?.length
-      ? expandBundles(restoreGroupedChildren(shape).map((part) => (shape.multicolor === false ? { ...part, color: shape.color } : part))).filter((part) => !part.hidden)
+      ? expandBundles(restoreGroupedChildren(shape).map((part) => (shape.multicolor === false ? { ...part, color: shape.color, gridfinityLabelColor: undefined } : part))).filter((part) => !part.hidden)
       : [shape]
   ));
 }
@@ -1283,21 +1284,29 @@ export type PartColorSolid = { probe: THREE.Mesh; box: THREE.Box3; color: string
 
 /**
  * The parts of a group that shows each part in its own colour (Multicolor), as solids in the
- * world, ready to ask "which part is this point in" (#153). A group cut into one mesh keeps its
+ * world, ready to ask "which part is this point in" (#153), and a Gridfinity bin's letters in a
+ * colour of their own, then the bin (#1308). A group cut into one mesh keeps its
  * parts in the frame of that mesh, standing on its lowest point; a group of separate parts in
  * the frame its children have before the group's own size and place are applied.
  */
 export function multicolorExportSolids(shape: WorkplaneShape): PartColorSolid[] | null {
+  // The first solid a point lies in gives its colour, so the letters come first. The box round the bin keeps the
+  // nearest-box fallback from giving the faces beside the letters their colour.
+  const letterColor = gridfinityLabelColor(shape);
+  if (letterColor) {
+    const letters = gridfinityLetterMeshes(shape).map((letter) => partColorSolid(transformMesh(letter, shape), letterColor));
+    const bounds = meshBounds(meshForShape(shape).vertices);
+    return letters.length && bounds ? [...letters, partColorSolid(cuboidsToMesh("bin", [bounds], 0, 0), shape.color)] : null;
+  }
   if (shape.hole || !shape.groupedShapes?.length || !groupShowsPartColors(shape)) return null;
   const parts = shape.groupedShapes.filter((part) => !part.hole && !part.hidden);
-  if (parts.length === 0 || new Set(parts.map((part) => part.color)).size < 2) return null;
+  if (parts.length === 0 || new Set(parts.flatMap((part) => [part.color, gridfinityLabelColor(part) ?? part.color])).size < 2) return null;
   const imported = shape.importedMesh;
   let lowest = Number.POSITIVE_INFINITY;
   if (imported) for (let index = 1; index < imported.positions.length; index += 3) lowest = Math.min(lowest, imported.positions[index]);
   const scale = imported ? null : groupedContentScale(shape, localGroupBounds(shape.groupedShapes));
   const solids: PartColorSolid[] = [];
-  parts.forEach((part) => {
-    const local = meshForShape(part);
+  const add = (local: MeshData, color: string) => {
     if (local.faces.length === 0) return;
     let vertices: Vec3[];
     if (imported) {
@@ -1308,21 +1317,32 @@ export function multicolorExportSolids(shape: WorkplaneShape): PartColorSolid[] 
     } else {
       vertices = scaleGroupedVertices(local.vertices, scale!) as Vec3[];
     }
-    const world = transformMesh({ name: local.name, vertices, faces: local.faces }, shape);
-    const positions = new Float32Array(world.faces.length * 9);
-    world.faces.forEach((face, faceIndex) => face.forEach((point, corner) => {
-      const vertex = world.vertices[point];
-      positions.set([vertex[0], vertex[1], vertex[2]], faceIndex * 9 + corner * 3);
-    }));
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.computeBoundingBox();
-    computeBoundsTree.call(geometry, { targetLeafSize: 12 });
-    const probe = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
-    probe.raycast = acceleratedRaycast;
-    solids.push({ probe, box: geometry.boundingBox ?? new THREE.Box3(), color: part.color });
+    solids.push(partColorSolid(transformMesh({ name: local.name, vertices, faces: local.faces }, shape), color));
+  };
+  parts.forEach((part) => {
+    // A bin's letters in their own colour come before the bin, as for a bin on its own; here the bin stays its mesh, as
+    // the group's other parts lie in its box.
+    const color = gridfinityLabelColor(part);
+    if (color) gridfinityLetterMeshes(part).forEach((letter) => add(transformMesh(letter, part), color));
+    add(meshForShape(part), part.color);
   });
   return solids.length ? solids : null;
+}
+
+/** A body in the world as a solid to ask "is this point in it". */
+function partColorSolid(world: MeshData, color: string): PartColorSolid {
+  const positions = new Float32Array(world.faces.length * 9);
+  world.faces.forEach((face, faceIndex) => face.forEach((point, corner) => {
+    const vertex = world.vertices[point];
+    positions.set([vertex[0], vertex[1], vertex[2]], faceIndex * 9 + corner * 3);
+  }));
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.computeBoundingBox();
+  computeBoundsTree.call(geometry, { targetLeafSize: 12 });
+  const probe = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+  probe.raycast = acceleratedRaycast;
+  return { probe, box: geometry.boundingBox ?? new THREE.Box3(), color };
 }
 
 const PART_COLOR_PROBE = new THREE.Vector3(0.5773, 0.5774, 0.5775).normalize();

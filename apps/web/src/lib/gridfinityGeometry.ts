@@ -331,6 +331,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityLabelLeftText?: string;
   gridfinityLabelRightText?: string;
   gridfinityLabelFont?: string;
+  gridfinityLabelTextSize?: number;
   gridfinityScoopBack?: boolean;
   gridfinityScoopFront?: boolean;
   gridfinityScoopLeft?: boolean;
@@ -2034,16 +2035,10 @@ export function gridfinityCompartmentPieces(shape: GridfinityShapeFields): Gridf
 }
 
 /**
- * The fonts a shelf's letters take (#1308): a copy of SURFACE_TEXT_FONTS, kept here so the worker does not load the fonts;
- * a font of one's own is not saved with a bin.
+ * The built-in fonts a shelf's letters take (#1308): a copy of SURFACE_TEXT_FONTS, kept here so the worker does not load
+ * the fonts. A font of one's own is taken too (gridfinityLabelFont), but never as a shape default.
  */
 export const GRIDFINITY_LABEL_FONTS = ["Multilanguage", "Sans", "Serif", "Script", "Monospace", "Rounded", "Stencil", "Japanese"];
-
-/** The font of a bin's letters as they are built: its own when it is a built-in one, else Multilanguage. */
-export function gridfinityLabelFont(shape: Pick<GridfinityShapeFields, "gridfinityLabelFont">) {
-  const font = shape.gridfinityLabelFont;
-  return font !== undefined && GRIDFINITY_LABEL_FONTS.includes(font) ? font : GRIDFINITY_LABEL_FONTS[0];
-}
 
 /** Each wall's text on its label shelf (#1308). */
 export const GRIDFINITY_LABEL_TEXT_KEYS = { back: "gridfinityLabelBackText", front: "gridfinityLabelFrontText", left: "gridfinityLabelLeftText", right: "gridfinityLabelRightText" } as const;
