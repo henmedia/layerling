@@ -337,8 +337,11 @@ export type SurfaceTextureSettings = {
   /** Half-timbering: how many rails run across each storey between sill and plate, 0 to 2 (they split it evenly). */
   timberRails: number;
   timberBracing: SurfaceTextureTimberBracing;
-  /** Half-timbering: faint grain along the beams. */
-  timberGrain: boolean;
+  /**
+   * Half-timbering: the grain along the beams, 0 (none) through fine to 1 (strong); 0.5 is the grain it had when it was
+   * only on or off (see timberGrooves). Saved as true or false before: true is 0.5, false 0.
+   */
+  timberGrain: number;
   /**
    * Natural stone wall (the spacing is a stone's size: a course's height on average): how much the stones and courses
    * differ in size, 0 to 1 (1: from small stones to ones twice as large, now and then two small ones in one course).
@@ -448,7 +451,7 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   timberBeam: 2.4,
   timberRails: 1,
   timberBracing: "mixed",
-  timberGrain: true,
+  timberGrain: 0.5,
   stoneVary: 0.5,
   stoneRound: 0.5,
   stoneJoint: 0.8,
@@ -504,6 +507,7 @@ export const SURFACE_TEXTURE_LIMITS: Record<NumberKey, [number, number]> = {
   timberHeight: [3, 300],
   timberBeam: [0.3, 30],
   timberRails: [0, 2],
+  timberGrain: [0, 1],
   stoneVary: [0, 1],
   stoneRound: [0, 1],
   stoneJoint: [0.1, 10],
@@ -640,6 +644,9 @@ export function normalizeSurfaceTexture(input: unknown): SurfaceTextureSettings 
       target[key] = String(value);
     }
   });
+  // The grain was only on or off: a design saved then keeps it as it was (true the grain it had, see timberGrooves).
+  const grain = source.timberGrain;
+  if (typeof grain === "boolean" || grain === "true" || grain === "false") out.timberGrain = grain === true || grain === "true" ? TIMBER_GRAIN_AS_BEFORE : 0;
   (Object.keys(SURFACE_TEXTURE_LIMITS) as NumberKey[]).forEach((key) => {
     out[key] = clamp(out[key], ...SURFACE_TEXTURE_LIMITS[key]);
   });
@@ -1189,12 +1196,37 @@ const TIMBER_OPEN = 0, TIMBER_RISING = 1, TIMBER_FALLING = 2, TIMBER_CROSS = 3, 
 const TIMBER_KNEE_REACH = 0.35;
 /** A beam's wall, mm across: steep, as a flat tile's (see TILE_WALL), and in a narrow beam at most a fifth of its half width. */
 const TIMBER_WALL = TILE_WALL;
-/** The grain: two shallow grooves along every beam, at this share of its half width from its middle and this share wide either side. */
+/**
+ * The grain as it was when it was only on or off (timberGrain 0.5, see timberGrooves): two shallow grooves along every
+ * beam, at this share of its half width from its middle and this share wide either side.
+ */
 const TIMBER_GRAIN_AT = 0.45;
 const TIMBER_GRAIN_HALF = 0.2;
-/** How deep the grain is, as a share of the beams' height, and how far apart along a beam it comes and goes, mm. */
+/** How deep that grain is, as a share of the beams' height, and how far apart along a beam it comes and goes, mm. */
 const TIMBER_GRAIN_DEPTH = 0.08;
 const TIMBER_GRAIN_RUN = 2.5;
+/** The grain's setting that is the grain as it was, between none (0) and strong (1). */
+const TIMBER_GRAIN_AS_BEFORE = 0.5;
+
+/**
+ * The grooves of the grain along a beam for its setting (timberGrain), null without grain: where their middles lie on
+ * each side of the beam's middle line and how wide either side, as shares of its half width, and how deep, as a share
+ * of the beams' height. At 0.5 the grain as it was - one groove each side, 0.2 wide either side, 8 % deep. Towards 1 it
+ * grows strong: the two grooves wider (up to 1.4 times) and deeper (up to twice, 16 %), as a coarse plank's. Below 0.5 it
+ * grows fine: two grooves each side, half as wide, from 0.25 down, and three a third as wide below that, spread evenly
+ * over the face, and shallower towards none (down to half as deep): fine lines as on planed wood. The lines change in
+ * steps (a groove is there or not), their depth and width smoothly.
+ */
+function timberGrooves(grain: number) {
+  if (!(grain > 0)) return null;
+  const strength = grain / TIMBER_GRAIN_AS_BEFORE;
+  const lines = strength >= 1 ? 1 : strength >= 0.5 ? 2 : 3;
+  return {
+    at: Array.from({ length: lines }, (_, j) => (TIMBER_GRAIN_AT * (2 * j + 1)) / lines),
+    half: lines === 1 ? TIMBER_GRAIN_HALF * Math.sqrt(strength) : TIMBER_GRAIN_HALF / lines,
+    depth: TIMBER_GRAIN_DEPTH * (strength >= 1 ? strength : 0.5 + 0.5 * strength),
+  };
+}
 /** The plaster in the fields: how rough, as a share of the beams' height, and how large its lumps, mm. */
 const TIMBER_PLASTER = 0.08;
 const TIMBER_PLASTER_SIZE = 5;
@@ -1283,8 +1315,8 @@ function timberHalf(s: SurfaceTextureSettings, W: number, h: number) {
  * plate at every storey (one beam where two storeys meet) and the rails splitting a storey evenly, then in each field what
  * timberStyle says - braces from corner to corner of each part between sill, rails and plate (rising or falling), a St
  * Andrew's cross in the part under the lowest rail, knee braces in the top part's corners, parallel to its diagonals. A
- * beam's face is flat, with a steep wall round it (see TIMBER_WALL), the faint grain of two grooves along it coming and
- * going (timberGrain); the plaster is a little rough (not with the pattern as a part of its own: the body under the beams
+ * beam's face is flat, with a steep wall round it (see TIMBER_WALL), the grain's grooves along it coming and going
+ * (timberGrain, see timberGrooves); the plaster is a little rough (not with the pattern as a part of its own: the body under the beams
  * stays as it was, and roughness raised from it would be a skin no print shows). Round a body the grain's and the
  * plaster's lumps repeat after one round, so nothing jumps at the seam.
  */
@@ -1334,16 +1366,22 @@ function timberValue(u: number, v: number, s: SurfaceTextureSettings, layout: Su
   const rise = d <= r + TILE_SNAP ? 1 : d >= r + wall - TILE_SNAP ? 0 : 1 - (d - r) / wall;
   const period = round ? W * posts.count : 0;
   let top = 1;
-  if (s.timberGrain && rise > 0) {
+  const grooves = timberGrooves(s.timberGrain);
+  if (grooves && rise > 0) {
     const t = Math.abs(across) / r;
-    const groove = Math.max(0, 1 - Math.abs(t - TIMBER_GRAIN_AT) / TIMBER_GRAIN_HALF);
+    // The groove the point lies in (they do not overlap), each coming and going its own way.
+    let groove = 0, line = 0;
+    grooves.at.forEach((at, j) => {
+      const g = 1 - Math.abs(t - at) / grooves.half;
+      if (g > groove) [groove, line] = [g, j];
+    });
     if (groove > 0) {
       // Along a level beam round a body the grain repeats after one round; along the others it needs not.
       // Round a body a field's number counts round once, the same from both sides of the seam.
       const field = round && posts.count > 0 ? ((i % posts.count) + posts.count) % posts.count : i;
-      const key = 17 * beam + (across < 0 ? 5 : 0) + 31 * (beam === 2 ? q + parts * k : field);
+      const key = 17 * beam + (across < 0 ? 5 : 0) + 31 * (beam === 2 ? q + parts * k : field) + 7919 * line;
       const come = loopNoise(along, 0, beam === 2 ? period : 0, TIMBER_GRAIN_RUN, key);
-      top = 1 - TIMBER_GRAIN_DEPTH * groove * clamp((come - 0.42) / 0.3, 0, 1);
+      top = 1 - grooves.depth * groove * clamp((come - 0.42) / 0.3, 0, 1);
     }
   }
   if (rise >= 1) return top;
@@ -3120,7 +3158,7 @@ function targetEdge(s: SurfaceTextureSettings) {
  * own) as coarse as bricks', its faces flat.
  */
 function timberEdge(s: SurfaceTextureSettings) {
-  if (s.patternPart && !s.timberGrain) return 10;
+  if (s.patternPart && !(s.timberGrain > 0)) return 10;
   return Math.min(s.spacing, s.timberHeight) / (0.6 * DETAIL_STEPS[s.detail]);
 }
 
@@ -4549,7 +4587,8 @@ function sliceTimber(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfa
   };
   const cuttable = (m: SurfaceMesh, F: ReturnType<typeof unrolled>) => cuttableFaces(m, F.pole, skipBase, cyl ? ax : -1);
   // Across a beam from its middle line: its face's border, its wall's foot and the grain's grooves.
-  const across = [r, r + wall, ...(s.timberGrain ? [TIMBER_GRAIN_AT - TIMBER_GRAIN_HALF, TIMBER_GRAIN_AT, TIMBER_GRAIN_AT + TIMBER_GRAIN_HALF].map((t) => t * r) : [])];
+  const grooves = timberGrooves(s.timberGrain);
+  const across = [r, r + wall, ...(grooves ? grooves.at.flatMap((at) => [at - grooves.half, at, at + grooves.half]).map((t) => t * r) : [])];
   const modulo = (x: number, m: number) => ((x % m) + m) % m;
   const placesAt = (lines: number[], period: number) => {
     const out: number[] = [];
