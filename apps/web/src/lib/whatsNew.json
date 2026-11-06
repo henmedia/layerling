@@ -5,91 +5,109 @@
       {
         "title": {
           "de": "Druckprüfung vor dem Drucken",
-          "en": "Print check before printing"
+          "en": "Print check before printing",
+          "da": "Tjek printet før du printer"
         },
         "body": {
           "de": "Ein Klick in „Kombinieren“ prüft, was erst am Drucker auffiele: zu dünne Wände, schwebende Teile, zu wenig Auflage auf der Platte, Überhänge und offene Netze. Jede Zeile ist grün oder orange mit der Stelle, dünne Wände werden eingefärbt.",
-          "en": "One click in Combine checks what would only show on the printer: walls too thin, floating parts, too little contact with the plate, overhangs and open meshes. Each line is green, or orange with the place, and thin walls are painted."
+          "en": "One click in Combine checks what would only show on the printer: walls too thin, floating parts, too little contact with the plate, overhangs and open meshes. Each line is green, or orange with the place, and thin walls are painted.",
+          "da": "Ét klik i „Kombinér“ tjekker, hvad der ellers kun ville vise sig på printeren: for tynde vægge, svævende dele, for lille kontakt med pladen, overhæng og åbne mesh. Hver linje er grøn, eller orange med stedet, og tynde vægge males."
         }
       },
       {
         "title": {
           "de": "Das Spiel deines Druckers messen",
-          "en": "Measure your printer's play"
+          "en": "Measure your printer's play",
+          "da": "Mål din printers spillerum"
         },
         "body": {
           "de": "„Passprobe erstellen“ in den Einstellungen legt eine Platte mit sieben Löchern und einen Stift auf die Platte. Druck sie, trag ein, in welchem Loch sich der Stift noch dreht, und neue Deckel, Schwalbenschwänze, Schnappverbindungen, Muttern und „Abstand prüfen“ beginnen mit diesem Spiel.",
-          "en": "Make fit test in the settings puts a plate with seven holes and a pin on the plate. Print it, enter the hole the pin still turns in, and new lids, dovetails, snap-fits, nuts and Check clearance start from that play."
+          "en": "Make fit test in the settings puts a plate with seven holes and a pin on the plate. Print it, enter the hole the pin still turns in, and new lids, dovetails, snap-fits, nuts and Check clearance start from that play.",
+          "da": "„Lav pasprøve“ i indstillingerne lægger en plade med syv huller og en stift på pladen. Print den, indtast det hul stiften stadig kan dreje i, og nye låg, svalehaler, snaplåse, møtrikker og „Tjek spillerum“ starter med det spillerum."
         }
       },
       {
         "title": {
           "de": "Gruppe skalieren, Löcher behalten",
-          "en": "Resize a group, keep its holes"
+          "en": "Resize a group, keep its holes",
+          "da": "Skaler en gruppe, behold dens huller"
         },
         "body": {
           "de": "Eine Gruppe hat jetzt die Einstellung „Beim Skalieren“: alles strecken oder Löcher und kleine Teile behalten. Dann bleiben Löcher rund und im selben Abstand zum Rand, Wände behalten ihre Stärke, und nur Platte und Wände wachsen mit.",
-          "en": "A group now has the setting When resized: stretch everything, or keep holes and small parts. Then holes stay round and as far from the edge, walls keep their thickness, and only the plate and the walls grow."
+          "en": "A group now has the setting When resized: stretch everything, or keep holes and small parts. Then holes stay round and as far from the edge, walls keep their thickness, and only the plate and the walls grow.",
+          "da": "En gruppe har nu indstillingen „Ved ændring af størrelse“: „Stræk alt“ eller „Bevar huller og små dele“. Så forbliver hullerne runde og lige så langt fra kanten, væggene beholder deres tykkelse, og kun pladen og væggene vokser."
         }
       },
       {
         "title": {
           "de": "Maßband: Mitte zu Mitte",
-          "en": "Tape measure: centre to centre"
+          "en": "Tape measure: centre to centre",
+          "da": "Målebånd: fra midte til midte"
         },
         "body": {
           "de": "Das Maßband rastet jetzt auf die Mitte einer Fläche und den Mittelpunkt eines Lochs oder runden Rands ein. Mitte anklicken, andere Mitte anklicken, Abstand eintippen, und der zweite Körper rückt, wie in Tinkercad.",
-          "en": "The tape measure now snaps to the centre of a face and of a hole or round edge. Click one centre, then another, type a distance, and the second body moves, as in Tinkercad."
+          "en": "The tape measure now snaps to the centre of a face and of a hole or round edge. Click one centre, then another, type a distance, and the second body moves, as in Tinkercad.",
+          "da": "Målebåndet snapper nu til midten af en flade og af et hul eller en rund kant. Klik én midte og derefter en anden, skriv en afstand, så flytter den anden krop sig, som i Tinkercad."
         }
       },
       {
         "title": {
           "de": "Maßband: Abstand entlang einer Achse",
-          "en": "Tape measure: a distance along one axis"
+          "en": "Tape measure: a distance along one axis",
+          "da": "Målebånd: en afstand langs én akse"
         },
         "body": {
           "de": "Beim Eintippen einer Länge gibt es jetzt auch Felder für X, Y und Z: der Körper rückt dann nur entlang dieser Achse. Das Maß sagt vorher, welcher Körper sich bewegt oder warum keiner.",
-          "en": "Typing a length now offers boxes for X, Y and Z too: the body then moves along that axis only. The label says beforehand which body moves, or why none can."
+          "en": "Typing a length now offers boxes for X, Y and Z too: the body then moves along that axis only. The label says beforehand which body moves, or why none can.",
+          "da": "Når du skriver en længde, får du også felter til X, Y og Z: kroppen flytter sig så kun langs den akse. Etiketten siger på forhånd, hvilken krop der flytter sig, eller hvorfor ingen kan det."
         }
       },
       {
         "title": {
           "de": "Rippe mit ovalem Fuß",
-          "en": "Rib with an oval foot"
+          "en": "Rib with an oval foot",
+          "da": "Ribbe med oval fod"
         },
         "body": {
           "de": "Der Fuß unter einer Rippe kann jetzt auch oval sein. Ohne eckige Ecken hebt sich die erste Schicht beim Abkühlen nicht so leicht vom Druckbett.",
-          "en": "The foot under a rib can now be oval. Without square corners the first layer lifts off the bed less easily as it cools."
+          "en": "The foot under a rib can now be oval. Without square corners the first layer lifts off the bed less easily as it cools.",
+          "da": "Foden under en ribbe kan nu være oval. Uden firkantede hjørner løfter det første lag sig mindre let fra printpladen, mens det køler af."
         }
       },
       {
         "title": {
           "de": "Neue Mikrocontroller-Boards",
-          "en": "New microcontroller boards"
+          "en": "New microcontroller boards",
+          "da": "Nye mikrocontroller-print"
         },
         "body": {
           "de": "Die Form „SBC-Board“ kennt jetzt Adafruit ESP32-S3 Feather, Arduino UNO R3, Arduino Nano und LOLIN D1 mini. Neu ist außerdem die Tastenreichweite: RESET-, BOOT- und Power-Tasten reichen durch Deckel oder Wand, damit man sie im Gehäuse drücken kann.",
-          "en": "The SBC board shape now has the Adafruit ESP32-S3 Feather, Arduino UNO R3, Arduino Nano and LOLIN D1 mini. New too is Button reach: RESET, BOOT and power buttons reach through the lid or wall, so they can be pressed in the case."
+          "en": "The SBC board shape now has the Adafruit ESP32-S3 Feather, Arduino UNO R3, Arduino Nano and LOLIN D1 mini. New too is Button reach: RESET, BOOT and power buttons reach through the lid or wall, so they can be pressed in the case.",
+          "da": "SBC-printet har nu Adafruit ESP32-S3 Feather, Arduino UNO R3, Arduino Nano og LOLIN D1 mini. Ny er også „Knappernes rækkevidde“: RESET-, BOOT- og strømknapperne når gennem låget eller væggen, så de kan trykkes i kassen."
         }
       },
       {
         "title": {
           "de": "Entwürfe vom Server einfügen",
-          "en": "Insert designs from the server"
+          "en": "Insert designs from the server",
+          "da": "Sæt designs ind fra serveren"
         },
         "body": {
           "de": "Das Importfenster hat jetzt „Vom Server einfügen“: Ordner wählen, Entwurf anklicken, und seine Körper kommen samt Notizen und Bezugspunkten in den offenen Entwurf, wie aus einer Datei.",
-          "en": "The import window now has Insert from the server: pick the folder, click the design, and its bodies come into the open design with their notes and reference points, as from a file."
+          "en": "The import window now has Insert from the server: pick the folder, click the design, and its bodies come into the open design with their notes and reference points, as from a file.",
+          "da": "Importvinduet har nu „Indsæt fra serveren“: vælg mappen, klik på designet, og dets legemer kommer ind i det åbne design med deres noter og referencepunkter, som fra en fil."
         }
       },
       {
         "title": {
           "de": "Deckel-Scharnier: der Stift bleibt drin",
-          "en": "Lid hinge: the pin stays in"
+          "en": "Lid hinge: the pin stays in",
+          "da": "Låghængsel: stiften bliver sidende"
         },
         "body": {
           "de": "Der Stift sitzt jetzt fest im Scharnierteil des Körpers und dreht sich nur im Deckel, so rutscht ein Filamentstück nicht mehr heraus. Die Höhe der Rastnoppen lässt sich nun einstellen, weniger für kleine Dosen.",
-          "en": "The pin now sits tight in the body's part of the hinge and turns only in the lid's, so a piece of filament no longer slides out. The click bumps' height can now be set, less for small boxes."
+          "en": "The pin now sits tight in the body's part of the hinge and turns only in the lid's, so a piece of filament no longer slides out. The click bumps' height can now be set, less for small boxes.",
+          "da": "Stiften sidder nu fast i kassens del af hængslet og drejer kun i lågets, så et stykke filament ikke længere skrider ud. Klikknoppernes højde kan nu sættes, mindre til små kasser."
         }
       },
       {
