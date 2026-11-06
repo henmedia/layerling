@@ -161,6 +161,8 @@ Vuoi applicare un motivo, un logo o una scritta su una tazza, una lattina o un t
 2. Fai clic su {{ui:inspector.wrapApply}}. Ciò che andava da sinistra a destra ora gira attorno al cilindro, il bordo posteriore diventa quello superiore e lo spessore sporge dalla parete.
 3. Seleziona la forma avvolta e il cilindro e centra entrambi in orizzontale e in profondità. Il centro della forma avvolta coincide con l’asse del cilindro, così aderisce alla parete.
 
+Si può avvolgere qualsiasi corpo, anche una forma della libreria: per esempio un tetto tondo che deve poggiare sulla parete di una torre rotonda. Mettilo sul piano come deve apparire sulla parete, con la parte tonda verso il retro.
+
 Per un’incisione, attiva {{ui:inspector.wrapInward}}: lo spessore penetrerà nella parete. Imposta la forma come foro, centrala e raggruppala con il cilindro.
 
 Una forma già avvolta diventa una mesh e non può essere avvolta di nuovo. Annulla l’operazione oppure riparti dall’originale piatto e avvolgilo di nuovo con un diametro diverso.

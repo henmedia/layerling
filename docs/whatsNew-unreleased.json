@@ -48,5 +48,15 @@
       "de": "Unter einer Skizze zeigt ein importiertes Modell jetzt seinen ganzen Umriss von oben, nicht nur die Fläche, auf der es steht. Von einer Benchy war bisher nur ein Streifen des Kiels zu sehen.",
       "en": "Under a sketch an imported model now shows its whole outline from above, not only the part it stands on. A Benchy showed only a strip of its keel."
     }
+  },
+  {
+    "title": {
+      "de": "Jeder Körper lässt sich um einen Zylinder wickeln",
+      "en": "Every body can be wrapped around a cylinder"
+    },
+    "body": {
+      "de": "Die Karte „Um einen Zylinder wickeln“ steht jetzt bei jedem Körper, auch bei Formen aus der Bibliothek, etwa einem Runden Dach für die Wand eines runden Turms. Bisher gab es sie nur für importierte Modelle, Text und Skizzen.",
+      "en": "The card Wrap around a cylinder is now there for every body, shapes from the library too, such as a round roof for the wall of a round tower. It was only there for imported models, text and sketches."
+    }
   }
 ]

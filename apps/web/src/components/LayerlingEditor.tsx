@@ -2334,9 +2334,13 @@ function prepareNewShape(asset: ShapeAsset, shape: WorkplaneShape): WorkplaneSha
 }
 
 
+/**
+ * The wrap card, folded until opened, for every body that can be wrapped (Discussion #1354). It was kept to imported
+ * meshes, text and sketches, so a round roof from the library could not be bent onto a tower's wall from the panel,
+ * though the MCP bridge wrapped any body.
+ */
 function offersCylinderWrap(shape: WorkplaneShape | null | undefined) {
-  if (!canWrapAroundCylinder(shape) || !shape) return false;
-  return Boolean(shape.importedMesh && !shape.groupedShapes?.length) || shape.kind === "text" || Boolean(shape.sketchProfile);
+  return canWrapAroundCylinder(shape);
 }
 
 /** Simplifying is for meshes dense enough to be worth it; a plate from an SVG has nothing to give. */
