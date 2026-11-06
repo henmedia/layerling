@@ -31,6 +31,7 @@ import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
 import { isReferenceImageOpacity } from "@/lib/referenceImage";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { PORT_PROFILES } from "@/lib/portGeometry";
+import { normalizePaintStroke, PAINT_MAX_STROKES } from "@/lib/paint";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
 import { GRIDFINITY_LABEL_FONTS, GRIDFINITY_LABEL_TEXT_KEYS, MAX_GRIDFINITY_LABEL_TEXT_LENGTH, MAX_GRIDFINITY_OUTLINE_POINTS } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
@@ -1403,6 +1404,12 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     const formulas = objectRecord(definition.formulas, `${label}.formulas`);
     for (const [field, text] of Object.entries(formulas)) {
       if (typeof text !== "string" || text.length > 80) throw new Error(`${label}.formulas.${field} must be a short text`);
+    }
+  }
+  // Paint on the body (paint.ts): strokes, each of which must be one.
+  if (definition.paint !== undefined) {
+    if (!Array.isArray(definition.paint) || definition.paint.length > PAINT_MAX_STROKES || definition.paint.some((stroke) => !normalizePaintStroke(stroke))) {
+      throw new Error(`${label}.paint must be a list of at most ${PAINT_MAX_STROKES} paint strokes`);
     }
   }
   // What a group does with its parts when it is resized (Discussion #526).

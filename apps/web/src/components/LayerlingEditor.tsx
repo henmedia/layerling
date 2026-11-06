@@ -73,6 +73,10 @@ import { concentricMotion, mateMotion, type FacePick, type MateMode } from "@/li
 import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
+import { PAINT_VIEW_SIDES, paintedBodyMesh, paintedExportFaceColors, paintLassoStroke, paintSideLasso, paintStrokeAt, paintSurfaceNormalAt, rebasePaintStrokes, type PaintLassoView } from "@/lib/paintMesh";
+import { canPaintShape, DEFAULT_PAINT_TOOL, designPaintColors, normalizePaintTool, paintColors, paintStartColor, PAINT_MAX_STROKES, type PaintStroke, type PaintToolSettings } from "@/lib/paint";
+import { normalizeHexColor } from "@/lib/coloredImport";
+import { PaintPanel } from "./workplane/PaintPanel";
 import { FaceToolPanel } from "./workplane/FaceToolPanel";
 import { DEFAULT_FACE_TOOL, faceToolSettingsOn, normalizeFaceTool, type FaceToolSettings } from "@/lib/faceTool";
 import { faceToolBody } from "@/lib/faceToolBody";
@@ -3251,6 +3255,12 @@ export function LayerlingEditor({
     busy: boolean;
   } | null>(null);
   const [faceToolPreview, setFaceToolPreview] = useState<{ shape: WorkplaneShape | null; empty: boolean } | null>(null);
+  // "Paint" (paint.ts): strokes of colour on the selected body, made in the view while the panel is open. The settings
+  // stay as they were last used, for the next body in this session.
+  const [paintTool, setPaintTool] = useState<{ sourceId: string; settings: PaintToolSettings } | null>(null);
+  const paintSettingsRef = useRef<PaintToolSettings>(DEFAULT_PAINT_TOOL);
+  // Whether a colour was chosen in the panel this session: then a new body starts with it.
+  const paintColorChosenRef = useRef(false);
   const faceToolPreviewRunRef = useRef(0);
   const faceToolPickRunRef = useRef(0);
   const faceToolPickAbortRef = useRef<AbortController | null>(null);
@@ -9688,6 +9698,134 @@ export function LayerlingEditor({
     if (holePatternTool?.step !== "pick") holePatternPickAbortRef.current?.abort();
   }, [holePatternTool]);
 
+  // "Paint": colours on parts of the selected body's surface, for printing in several colours (paint.ts).
+  const togglePaint = useCallback(() => {
+    if (paintTool) {
+      setPaintTool(null);
+      setNotice(t("status.paintClosed"));
+      return;
+    }
+    // Paint is the body's look, as its colour: a locked body refuses it, one of locked shape takes it.
+    if (refuseLockedSelection()) return;
+    const source = selectedShapes.length === 1 ? selectedShapes[0] : null;
+    if (!source) {
+      setNotice(t("status.paintSelectOne"));
+      return;
+    }
+    if (!canPaintShape(source)) {
+      setNotice(t("status.paintNeedsSolid"));
+      return;
+    }
+    if (edgeModifier || shellTool || deleteFaceTool || splitSession || simplifyToolId) {
+      setNotice(t("status.paintOtherTool"));
+      return;
+    }
+    stopCruise();
+    holePatternPickRunRef.current += 1;
+    setHolePatternTool(null);
+    faceToolPickRunRef.current += 1;
+    setFaceTool(null);
+    setAlignMode(false);
+    setMirrorMode(false);
+    setPivotPickMode(false);
+    setLayFlatPickMode(false);
+    setMateTool(null);
+    setArrayTool(null);
+    setScalePercentTool(null);
+    // The colour last painted with, unless it is hardly the body's own: then one that stands out against it.
+    const last = paintSettingsRef.current;
+    const color = paintStartColor(source.color, designPaintColors(shapesRef.current), paintColorChosenRef.current ? last.color : null);
+    setPaintTool({ sourceId: source.id, settings: normalizePaintTool({ ...last, color }) });
+    setNotice(t("status.paintStart"));
+    // The kernel cuts circles and lassos in: asked for now, it is there by the first stroke.
+    void getManifoldRuntime().catch(() => null);
+  }, [deleteFaceTool, edgeModifier, paintTool, refuseLockedSelection, selectedShapes, shellTool, simplifyToolId, splitSession, stopCruise]);
+
+  const changePaintSettings = useCallback((patch: Partial<PaintToolSettings>) => {
+    setPaintTool((current) => {
+      if (!current) return current;
+      const settings = normalizePaintTool({ ...current.settings, ...patch });
+      paintSettingsRef.current = settings;
+      if (patch.color) paintColorChosenRef.current = true;
+      return { ...current, settings };
+    });
+  }, []);
+
+  /** A stroke onto the painted body, as a step of the history; one that finds nothing on the body is not kept. */
+  const addPaintStroke = useCallback(async (stroke: PaintStroke | null) => {
+    const tool = paintTool;
+    if (!tool || !stroke) return;
+    // A circle or a lasso is cut in by the kernel; without it, it would colour whole faces, and a small one find none.
+    if (stroke.mode !== "fill" && !loadedManifoldRuntime()) await getManifoldRuntime().catch(() => null);
+    const source = shapesRef.current.find((shape) => shape.id === tool.sourceId);
+    if (!source) return;
+    if (source.locked) {
+      refuseLockedSelection();
+      return;
+    }
+    const strokes = source.paint ?? [];
+    if (strokes.length >= PAINT_MAX_STROKES) {
+      setNotice(t("status.paintTooMany", { count: PAINT_MAX_STROKES }), true);
+      return;
+    }
+    const next = { ...source, paint: [...strokes, stroke] };
+    // Laid now, the painted mesh is ready for the view; a stroke that found nothing would only sit in the file.
+    if ((paintedBodyMesh(next)?.skipped ?? 0) > (paintedBodyMesh(source)?.skipped ?? 0)) {
+      setNotice(t("status.paintNothing"));
+      return;
+    }
+    commitShapes(shapesRef.current.map((shape) => (shape.id === source.id ? next : shape)), source.id, t(stroke.color ? "status.paintAdded" : "status.paintErased"));
+  }, [commitShapes, paintTool, refuseLockedSelection]);
+
+  const paintAtPick = useCallback((pick: LayFlatPick | null) => {
+    const tool = paintTool;
+    const source = tool ? shapesRef.current.find((shape) => shape.id === tool.sourceId) : null;
+    if (!tool || !source) return;
+    if (!pick || pick.shapeId !== source.id) {
+      setNotice(t("status.paintMissed"));
+      return;
+    }
+    void addPaintStroke(paintStrokeAt(source, pick.point, pick.normal, tool.settings));
+  }, [addPaintStroke, paintTool]);
+
+  const paintLasso = useCallback((view: PaintLassoView, outline: Array<[number, number]>) => {
+    const tool = paintTool;
+    const source = tool ? shapesRef.current.find((shape) => shape.id === tool.sourceId) : null;
+    if (!tool || !source) return;
+    void addPaintStroke(paintLassoStroke(source, view, outline, tool.settings));
+  }, [addPaintStroke, paintTool]);
+
+  const clearPaint = useCallback(() => {
+    const source = paintTool ? shapesRef.current.find((shape) => shape.id === paintTool.sourceId) : null;
+    if (!source?.paint?.length) return;
+    if (source.locked) {
+      refuseLockedSelection();
+      return;
+    }
+    commitShapes(shapesRef.current.map((shape) => (shape.id === source.id ? { ...shape, paint: undefined } : shape)), source.id, t("status.paintCleared"));
+  }, [commitShapes, paintTool, refuseLockedSelection]);
+
+  // The tool belongs to the body it was started for, and gives way to the tools that pick faces or open panels of their own.
+  useEffect(() => {
+    if (!paintTool) return;
+    const source = shapes.find((shape) => shape.id === paintTool.sourceId);
+    if (
+      !source || !canPaintShape(source)
+      || selectedIds.length !== 1 || selectedIds[0] !== paintTool.sourceId
+      || mateTool || layFlatPickMode || pivotPickMode || arrayTool || scalePercentTool || holePatternTool || faceTool
+      || shellTool || deleteFaceTool || edgeModifier || splitSession || simplifyToolId
+    ) {
+      setPaintTool(null);
+    }
+  }, [arrayTool, deleteFaceTool, edgeModifier, faceTool, holePatternTool, layFlatPickMode, mateTool, paintTool, pivotPickMode, scalePercentTool, selectedIds, shapes, shellTool, simplifyToolId, splitSession]);
+
+  /** The colours the panel offers: those of the design's bodies and of their paint, the one chosen now included. */
+  const paintPalette = useMemo(() => {
+    if (!paintTool) return [];
+    const colors = designPaintColors(shapes, 20);
+    return colors.includes(paintTool.settings.color) ? colors : [...colors, paintTool.settings.color];
+  }, [paintTool, shapes]);
+
   // "Face" (#404): pick a flat face of the selected body, then push it out or cut a pocket in, with an inset from its edge.
   const toggleFaceTool = useCallback(() => {
     if (faceTool) {
@@ -10928,6 +11066,8 @@ export function LayerlingEditor({
       // Multicolor switched on or off stays so after Done; a group cut into one body lost it and turned one colour (#1323).
       ...(typeof original.multicolor === "boolean" ? { multicolor: original.multicolor } : {}),
     }, Boolean(original.hole))));
+    // The group's own paint (paint.ts) goes over to the group built again, where it lay in the world.
+    if (original.paint?.length && canPaintShape(group)) group.paint = rebasePaintStrokes(original.paint, original, group);
     const mergeWarning = "mergeWarning" in result && typeof result.mergeWarning === "string" ? result.mergeWarning : "";
     return { group, mergeWarning };
   }, []);
@@ -12888,6 +13028,73 @@ export function LayerlingEditor({
             },
           } : {}),
           normal: [normal.x, normal.y, normal.z].map((value) => Number(value.toFixed(4))),
+        };
+      }
+
+      if (command.action === "paint_object") {
+        // The paint tool's strokes (paint.ts), given in the world: a point on the surface for a fill or a circle, a
+        // shape drawn in a flat view from one side for a lasso. One step of the history for the whole call.
+        const all = currentShapes();
+        const selectedNow = selectedIdsRef.current;
+        const targetId = typeof params.id === "string" ? params.id : selectedNow.length === 1 ? selectedNow[0] : null;
+        const target = all.find((shape) => shape.id === targetId);
+        if (!target) throw new Error("paint_object needs id (or exactly one selected object)");
+        if (target.locked) throw new Error("Unlock the object before painting it");
+        if (!canPaintShape(target)) throw new Error("Only a single solid body, or a group cut into one body in one colour, can be painted - not a hole, a sketch, a bundle or a group of separate parts (paint its parts instead)");
+        const requested = params.strokes === undefined ? [] : Array.isArray(params.strokes) ? params.strokes : null;
+        if (!requested) throw new Error("paint_object strokes must be a list");
+        const vec3 = (value: unknown) => (Array.isArray(value) && value.length === 3 && value.every((entry) => typeof entry === "number" && Number.isFinite(entry))
+          ? new THREE.Vector3(value[0] as number, value[1] as number, value[2] as number)
+          : null);
+        // The kernel first: the circles and lassos are cut into the mesh, not laid on whole faces.
+        await getManifoldRuntime().catch(() => null);
+        let strokes: PaintStroke[] = params.clear === true ? [] : [...(target.paint ?? [])];
+        let skipped = 0;
+        for (const [index, entry] of requested.entries()) {
+          if (!entry || typeof entry !== "object") throw new Error(`strokes[${index}] must be an object`);
+          const raw = entry as Record<string, unknown>;
+          const mode = raw.mode === "circle" || raw.mode === "lasso" || raw.mode === "fill" ? raw.mode : null;
+          if (!mode) throw new Error(`strokes[${index}].mode must be fill, circle or lasso`);
+          const erase = raw.erase === true || raw.color === null;
+          const color = erase ? DEFAULT_PAINT_TOOL.color : normalizeHexColor(typeof raw.color === "string" ? raw.color : undefined);
+          if (!color) throw new Error(`strokes[${index}].color must be a colour as #rrggbb (or erase: true)`);
+          const settings = normalizePaintTool({ mode, color, erase, angle: mcpOptionalNumber(raw.angle), diameter: mcpOptionalNumber(raw.diameter) });
+          let stroke: PaintStroke | null;
+          if (mode === "lasso") {
+            const side = PAINT_VIEW_SIDES.find((name) => name === raw.view);
+            if (!side) throw new Error(`strokes[${index}].view must be one of ${PAINT_VIEW_SIDES.join(", ")}`);
+            const outline = Array.isArray(raw.outline)
+              ? raw.outline.filter((point): point is [number, number] => Array.isArray(point) && point.length === 2 && point.every((value) => typeof value === "number" && Number.isFinite(value)))
+              : [];
+            if (outline.length < 3) throw new Error(`strokes[${index}].outline needs at least three points`);
+            const lasso = paintSideLasso(side, outline);
+            stroke = paintLassoStroke(target, lasso.view, lasso.outline, settings);
+          } else {
+            const point = vec3(raw.point);
+            if (!point) throw new Error(`strokes[${index}].point must be [x, y, z] on the body's surface (y is the height)`);
+            const normal = vec3(raw.normal) ?? paintSurfaceNormalAt(target, point);
+            if (!normal || normal.lengthSq() < 1e-12) throw new Error(`strokes[${index}].point is not on the body's surface`);
+            stroke = paintStrokeAt(target, point, normal, settings);
+          }
+          if (!stroke) throw new Error(`strokes[${index}] could not be made into a stroke`);
+          const before = paintedBodyMesh({ ...target, paint: strokes })?.skipped ?? 0;
+          const next = [...strokes, stroke];
+          if ((paintedBodyMesh({ ...target, paint: next })?.skipped ?? 0) > before) {
+            skipped += 1;
+            continue;
+          }
+          strokes = next;
+        }
+        if (strokes.length > PAINT_MAX_STROKES) throw new Error(`A body carries ${PAINT_MAX_STROKES} strokes at most; pass clear: true to start again`);
+        const painted = { ...target, paint: strokes.length ? strokes : undefined };
+        commitShapes(currentShapes().map((shape) => (shape.id === target.id ? painted : shape)), target.id, t(strokes.length ? "status.paintAdded" : "status.paintCleared"));
+        const laid = strokes.length ? paintedBodyMesh(painted) : null;
+        return {
+          object: mcpShapeSummary(painted),
+          strokes: strokes.length,
+          colors: paintColors(painted),
+          skipped,
+          ...(laid ? { cut: laid.cut || !strokes.some((stroke) => stroke.mode !== "fill"), paintedFaces: laid.colors.filter(Boolean).length } : {}),
         };
       }
 
@@ -14854,11 +15061,13 @@ export function LayerlingEditor({
           for (let index = 0; index < svgBytes.length; index += 8192) svgBinary += String.fromCharCode(...svgBytes.subarray(index, index + 8192));
           return { format, view: svgView, fileName: projectExportFileName(projectName, "svg"), bytes: svgBytes.length, ...(outlines === undefined ? {} : { outlines }), ...(fellBack ? { fellBack } : {}), base64: btoa(svgBinary) };
         }
-        const { solids: cutSolids, meshes, cut: wasCut, holeCutsFailed } = await exportBodiesWithLooseHoles(visible);
+        const { solids: cutSolids, meshes, cut: wasCut, holeCutsFailed } = await exportBodiesWithLooseHoles(visible, { painted: format !== "stl" });
         const joined = await (format === "stl" ? unionOverlappingExportMeshes(cutSolids, meshes, wasCut) : colorSeparatedExportMeshes(cutSolids, meshes, wasCut));
-        // A group showing its parts in their own colours keeps them in 3MF and OBJ (#153).
+        // A group showing its parts in their own colours keeps them in 3MF and OBJ (#153), a painted body its paint.
         const partFaceColors = (mesh: MeshData, sourceIndex: number) => {
           const source = cutSolids[sourceIndex];
+          const painted = paintedExportFaceColors(mesh, source);
+          if (painted) return painted;
           const solids = source ? multicolorExportSolids(source) : null;
           if (!source || !solids) return undefined;
           const colors = exportFaceColors(mesh, solids, source.color);
@@ -15521,9 +15730,11 @@ export function LayerlingEditor({
     const label = format === "stl" ? "STL" : format === "3mf" ? "3MF" : "OBJ";
     // Loose holes cut the bodies they reach first (#203); a body cut away entirely drops out.
     let bodiesWritten: WorkplaneShape[] = exportable;
-    // A group showing its parts in their own colours keeps them in 3MF and OBJ (#153).
+    // A group showing its parts in their own colours keeps them in 3MF and OBJ (#153), a painted body its paint.
     const partFaceColors = (mesh: MeshData, sourceIndex: number) => {
       const source = bodiesWritten[sourceIndex];
+      const painted = paintedExportFaceColors(mesh, source);
+      if (painted) return painted;
       const solids = source ? multicolorExportSolids(source) : null;
       if (!source || !solids) return undefined;
       const colors = exportFaceColors(mesh, solids, source.color);
@@ -15559,7 +15770,7 @@ export function LayerlingEditor({
     }
     const savedFile = target === "download" ? null : target;
     // Awaited, so "One file per plate" (#456) writes the plates one after the other.
-    await exportBodiesWithLooseHoles(sourceShapes)
+    await exportBodiesWithLooseHoles(sourceShapes, { painted: format !== "stl" })
       .then(async ({ solids: cutSolids, meshes, cut: wasCut, holeCutsFailed }) => {
         bodiesWritten = cutSolids;
         const joined = await (format === "stl" ? unionOverlappingExportMeshes(cutSolids, meshes, wasCut) : colorSeparatedExportMeshes(cutSolids, meshes, wasCut));
@@ -16509,6 +16720,11 @@ export function LayerlingEditor({
           setNotice(t("status.holePatternCancelled"));
           return;
         }
+        if (paintTool) {
+          setPaintTool(null);
+          setNotice(t("status.paintClosed"));
+          return;
+        }
         if (faceTool) {
           faceToolPickRunRef.current += 1;
           setFaceTool(null);
@@ -17163,6 +17379,9 @@ export function LayerlingEditor({
         canSurfaceTexture={canSurfaceTexture}
         onSurfaceTextureTool={toggleSurfaceTextureTool}
         surfaceTextureActive={canSurfaceTexture && surfaceTextureOpen}
+        canPaint={!selectionLocked && selectedShapes.length === 1 && canPaintShape(selectedShapes[0])}
+        onPaint={togglePaint}
+        paintActive={Boolean(paintTool)}
         onMirror={toggleMirrorMode}
         onRotationPivot={toggleRotationPivot}
         onArray={toggleArrayTool}
@@ -17491,6 +17710,9 @@ export function LayerlingEditor({
                 ? { shapeIds: [faceTool.sourceId], joined: faceJoinPositions }
                 : null}
           onMateFacePick={mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : (pick) => void pickHolePatternFace(pick)}
+          paintPick={paintTool && !historyViewState ? { shapeId: paintTool.sourceId, mode: paintTool.settings.mode } : null}
+          onPaintPick={paintAtPick}
+          onPaintLasso={paintLasso}
           cadFacePick={historyViewState ? null : cadFacePick}
           onCadFacePick={deleteFaceTool ? toggleDeleteFace : toggleSurfaceFace}
           onNoteAdd={addNote}
@@ -17716,6 +17938,22 @@ export function LayerlingEditor({
             holePatternPickRunRef.current += 1;
             setHolePatternTool(null);
             setNotice(t("status.holePatternCancelled"));
+          }}
+        />
+      ) : null}
+      {paintTool && selectedShape?.id === paintTool.sourceId ? (
+        <PaintPanel
+          targetName={displayShapeName(selectedShape)}
+          settings={paintTool.settings}
+          colors={paintPalette}
+          strokes={selectedShape.paint?.length ?? 0}
+          wholeFaces={Boolean(loadedManifoldRuntime() && selectedShape.paint?.some((stroke) => stroke.mode !== "fill") && paintedBodyMesh(selectedShape)?.cut === false)}
+          workspace={workspaceSettings}
+          onChange={changePaintSettings}
+          onClear={clearPaint}
+          onClose={() => {
+            setPaintTool(null);
+            setNotice(t("status.paintClosed"));
           }}
         />
       ) : null}

@@ -199,6 +199,22 @@ Le résultat est un maillage comme un modèle importé, et il garde le corps sur
 
 Pour une impression en deux couleurs, activez {{ui:inspector.surfacePatternPart}}, avec n'importe quel motif : le motif devient une pièce à part, et {{ui:inspector.surfacePatternColor}} lui donne sa couleur – d'abord une couleur qui ressort sur le corps, la fois suivante celle que vous avez choisie en dernier. Vers l'extérieur, la pièce est ce qui ressort, et le corps reste tel qu'il était ; vers l'intérieur, le motif est creusé dans le corps et la pièce remplit le creux jusqu'à la surface, comme l'or des fissures. Les deux forment un lot : ils se déplacent ensemble, chacun garde sa couleur, et un fichier 3MF les contient en deux pièces pour le trancheur. Modifiez ou retirez la texture comme d'habitude ; la pièce du motif suit. Avec plusieurs calques, tous doivent aller dans le même sens, vers l'extérieur ou vers l'intérieur ; un motif dans les deux sens reste d'un seul tenant avec le corps.
 
+## Peindre en plusieurs couleurs
+
+Pour une impression en plusieurs couleurs, {{ui:paint.title}} colore des parties d'un corps directement dans le projet : une face, une paroi ronde, l'intérieur d'un trou, une tache ronde ou une zone que vous entourez. Cela fonctionne comme les outils de peinture des slicers, mais la peinture est enregistrée avec le projet. Sélectionnez un corps et cliquez sur {{ui:paint.title}} dans le groupe {{ui:editor.group.modify}}, à côté de {{ui:inspector.surfaceTexture}}. Le panneau propose les couleurs de votre projet, et {{ui:paint.customColor}} en mélange une à vous. Peignez ensuite dans la vue, avec l'un des trois outils :
+
+- {{ui:paint.mode.fill}} : un clic remplit la face jusqu'à ses arêtes vives, comme le pot de peinture d'un logiciel de dessin : le dessus d'un pavé, la paroi d'un cylindre, le fond d'une poche ou l'intérieur d'un trou, chacun d'un seul clic. {{ui:paint.angle}} indique à partir de quel angle une arête arrête le remplissage ; à 90°, il passe par-dessus les arêtes d'un pavé.
+- {{ui:paint.mode.circle}} : un clic pose sur la surface une tache ronde du {{ui:paint.diameter}} choisi, centrée là où vous cliquez, aussi sur une surface courbe. Elle s'arrête aux arêtes vives du corps et ne traverse jamais au dos d'une paroi.
+- {{ui:paint.mode.lasso}} : maintenez le bouton de la souris et entourez une zone. Ce que vous voyez à l'intérieur de la forme est peint ; le dos du corps derrière ne l'est pas.
+
+![Un pavé peint avec les trois outils : le dessus rempli de jaune, un cercle blanc devant et une étoile verte entourée au lasso sur le côté, avec le panneau Peindre à côté.](shot:paint)
+
+La {{ui:paint.eraser}} retire la peinture avec les mêmes outils, {{ui:paint.clear}} la retire toute d'un coup. Chaque trait est une étape à part : [[Ctrl]]+[[Z]] annule le dernier. Entre deux traits, le bouton droit de la souris fait tourner la vue comme d'habitude ; {{ui:paint.done}} ou [[Esc]] ferme le panneau.
+
+Les bords d'un cercle ou d'un lasso sont découpés dans le maillage du corps : un cercle sur la face d'un pavé est rond, pas quelques triangles, et le corps reste fermé. La peinture appartient au corps : elle se déplace et tourne avec lui, s'étire avec lui quand vous changez sa taille, et un trait qui ne trouve plus rien après une modification est laissé de côté. L'export 3MF écrit la peinture sous forme de faces peintes, qu'OrcaSlicer, Bambu Studio et PrusaSlicer impriment avec leurs filaments (voir [Fichiers et enregistrement](chapter:files-and-saving)) ; un OBJ garde aussi les couleurs, un STL reste d'une seule couleur.
+
+Un groupe découpé en un seul corps, par exemple un pavé avec ses trous, se peint comme un seul corps : peignez-le une fois les trous découpés, et sa peinture reste quand vous modifiez le groupe ouvert. Les parties d'un ensemble se peignent une à une. Un corps peint que vous groupez avec d'autres garde sa peinture comme partie et la montre de nouveau quand vous dissociez le groupe. Un maillage importé qui n'est pas fermé est peint sur ses propres triangles.
+
 ## Un vase
 
 Le {{ui:shape.vase}} est un corps à part pour les vases, pots et abat-jour. Ses mesures se trouvent sous {{ui:inspector.properties}}, sa forme et son motif sur la carte {{ui:inspector.vaseForm}} ; tout peut être modifié à tout moment, même après l'enregistrement :

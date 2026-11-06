@@ -205,6 +205,22 @@ Výsledek je síť jako importovaný model a ponechává si těleso, na kterém 
 
 Pro tisk ve dvou barvách zapněte {{ui:inspector.surfacePatternPart}}, u jakéhokoli vzoru: vzor se stane samostatným dílem a {{ui:inspector.surfacePatternColor}} mu dá barvu – nejprve takovou, která se od tělesa odliší, příště tu, kterou jste zvolili naposledy. Ven je díl to, co vystupuje, a těleso zůstane, jak bylo; dovnitř dostane těleso vzor vyřezaný a díl vyplní prohlubeň až k povrchu, jako zlato v prasklinách. Oba jsou spolu v seskupení: pohybují se společně, každý si drží svou barvu a soubor 3MF je obsahuje jako dva díly pro slicer. Texturu měňte nebo odebírejte jako dosud; díl vzoru jde s ní. U více vrstev musí všechny jít stejným směrem, ven nebo dovnitř; vzor do obou směrů zůstane jedním celkem s tělesem.
 
+## Malování více barvami
+
+Pro tisk více barvami obarví {{ui:paint.title}} části tělesa přímo v návrhu: plochu, kulatou stěnu, vnitřek otvoru, kulatou skvrnu nebo oblast, kterou obtáhnete. Funguje to jako malovací nástroje sliceru, jen barva zůstane uložená v návrhu. Vyberte jedno těleso a klikněte ve skupině {{ui:editor.group.modify}} na {{ui:paint.title}}, vedle {{ui:inspector.surfaceTexture}}. Panel nabízí barvy vašeho návrhu a {{ui:paint.customColor}} namíchá vlastní. Pak malujte v pohledu jedním ze tří nástrojů:
+
+- {{ui:paint.mode.fill}}: kliknutí vyplní plochu až k jejím ostrým hranám, jako kyblík barvy v kreslicím programu: horní stranu kvádru, stěnu válce, dno kapsy nebo vnitřek otvoru, vždy jedním kliknutím. {{ui:paint.angle}} říká, jak ostrá musí hrana být, aby výplň zastavila; při 90° přejde přes hrany kvádru.
+- {{ui:paint.mode.circle}}: kliknutí položí na povrch kulatou skvrnu nastaveného průměru ({{ui:paint.diameter}}), se středem tam, kam kliknete, i na zakřivený povrch. Zastaví se na ostrých hranách tělesa a nikdy neprojde na zadní stranu stěny.
+- {{ui:paint.mode.lasso}}: podržte tlačítko myši a obtáhněte oblast. Obarví se to, co uvnitř tvaru vidíte; zadní strana tělesa za ním ne.
+
+![Kvádr obarvený třemi nástroji: horní strana vyplněná žlutě, vpředu bílý kruh a na boku zelená hvězda obtažená lasem; vedle panel Malování.](shot:paint)
+
+{{ui:paint.eraser}} barvu stejnými nástroji zase sejme, {{ui:paint.clear}} všechnu najednou. Každý tah je samostatný krok, takže [[Ctrl]]+[[Z]] vezme poslední zpět. Mezi tahy otáčí pohledem jako vždy pravé tlačítko myši; {{ui:paint.done}} nebo [[Esc]] panel zavře.
+
+Okraje kruhu nebo lasa se vyříznou do sítě tělesa: kruh na stěně kvádru je kulatý, ne pár trojúhelníků, a těleso zůstane uzavřené. Barva patří k tělesu: posouvá se a otáčí s ním, natáhne se s ním, když změníte jeho velikost, a tah, který po změně už nic nenajde, se vynechá. Export do 3MF zapíše barvu jako obarvené plochy, které OrcaSlicer, Bambu Studio a PrusaSlicer tisknou svými filamenty (viz [Soubory a ukládání](chapter:files-and-saving)); OBJ barvy také zachová, STL zůstane jednobarevné.
+
+Skupina vyříznutá do jednoho tělesa, třeba kvádr s otvory, se maluje jako jedno těleso: obarvěte ji až po vyříznutí otvorů a barva zůstane, i když skupinu otevřete a změníte. Části svazku se malují jednotlivě. Obarvené těleso, které seskupíte s jinými, si barvu ponechá jako část a znovu ji ukáže, když skupinu rozdělíte. Importovaná síť, která není uzavřená, se maluje po vlastních trojúhelnících.
+
 ## Váza
 
 {{ui:shape.vase}} je samostatné těleso pro vázy, květináče a stínidla. Její rozměry najdete v {{ui:inspector.properties}}, tvar a vzor na kartě {{ui:inspector.vaseForm}}; vše lze kdykoli změnit, i po uložení:

@@ -210,6 +210,22 @@ Das Ergebnis ist ein Netz wie ein importiertes Modell, und es behält den Körpe
 
 Für einen Druck in zwei Farben schalte {{ui:inspector.surfacePatternPart}} ein, bei jedem Muster: Das Muster wird ein eigenes Teil, und unter {{ui:inspector.surfacePatternColor}} bekommt es seine Farbe – zuerst eine, die sich vom Körper abhebt, beim nächsten Mal die, die du zuletzt gewählt hast. Nach außen ist das Teil das, was herausragt, und der Körper bleibt, wie er war; nach innen bekommt der Körper das Muster eingeschnitten, und das Teil füllt die Vertiefung bis zur Oberfläche, wie das Gold der Risse. Beide liegen zusammen in einem Bündel: Sie bewegen sich zusammen, jedes behält seine Farbe, und in einer 3MF-Datei sind es zwei Teile für den Slicer. Ändern oder entfernen kannst du die Oberfläche wie gewohnt; das Muster-Teil geht mit. Bei mehreren Ebenen müssen alle in dieselbe Richtung gehen, nach außen oder nach innen; ein Muster in beide Richtungen bleibt eins mit dem Körper.
 
+## In mehreren Farben bemalen
+
+Für den Druck in mehreren Farben färbt {{ui:paint.title}} Teile eines Körpers direkt im Entwurf ein: eine Fläche, eine runde Wand, das Innere eines Lochs, einen runden Fleck oder einen Bereich, den du umfährst. Das geht wie mit den Malwerkzeugen der Slicer, nur bleibt die Farbe im Entwurf gespeichert. Wähle einen Körper und klicke oben in der Gruppe {{ui:editor.group.modify}} auf {{ui:paint.title}}, neben {{ui:inspector.surfaceTexture}}. Das Fenster bietet die Farben deines Entwurfs an, {{ui:paint.customColor}} mischt eine eigene. Dann malst du in der Ansicht, mit einem von drei Werkzeugen:
+
+- {{ui:paint.mode.fill}}: Ein Klick füllt die Fläche bis an ihre scharfen Kanten, wie der Farbeimer eines Malprogramms: die Oberseite eines Quaders, die Wand eines Zylinders, den Boden einer Tasche oder das Innere eines Lochs, jeweils mit einem Klick. {{ui:paint.angle}} sagt, wie scharf eine Kante sein muss, damit die Füllung dort anhält; bei 90° läuft sie über die Kanten eines Quaders.
+- {{ui:paint.mode.circle}}: Ein Klick legt einen runden Fleck mit dem eingestellten {{ui:paint.diameter}} auf die Oberfläche, mittig dort, wo du klickst, auch auf eine gewölbte. Er hält an den scharfen Kanten des Körpers an und kommt nie auf der Rückseite einer Wand durch.
+- {{ui:paint.mode.lasso}}: Halte die Maustaste gedrückt und umfahre einen Bereich. Bemalt wird, was du innerhalb der Form siehst; die Rückseite des Körpers dahinter bleibt, wie sie ist.
+
+![Ein Quader, mit den drei Werkzeugen bemalt: oben gelb gefüllt, vorn ein weißer Kreis und an der Seite ein grüner Stern, mit dem Lasso umfahren; daneben das Fenster Bemalen.](shot:paint)
+
+Der {{ui:paint.eraser}} nimmt die Farbe mit denselben Werkzeugen wieder ab, {{ui:paint.clear}} alles auf einmal. Jeder Strich ist ein Schritt für sich, [[Strg]]+[[Z]] nimmt also den letzten zurück. Zwischen den Strichen dreht die rechte Maustaste die Ansicht wie immer; {{ui:paint.done}} oder [[Esc]] schließt das Fenster.
+
+Die Ränder eines Kreises oder eines Lassos werden in das Netz des Körpers geschnitten: Ein Kreis auf der Seite eines Quaders ist rund und nicht ein paar Dreiecke, und der Körper bleibt geschlossen. Die Farbe gehört zum Körper: Sie wandert und dreht sich mit ihm, dehnt sich mit, wenn du seine Größe änderst, und ein Strich, der nach einer Änderung nichts mehr findet, fällt weg. Der 3MF-Export schreibt die Farbe als bemalte Flächen, die OrcaSlicer, Bambu Studio und PrusaSlicer mit ihren Filamenten drucken (siehe [Dateien und Speichern](chapter:dateien-und-speichern)); ein OBJ behält die Farben auch, eine STL bleibt einfarbig.
+
+Eine Gruppe, die zu einem Körper geschnitten ist, etwa ein Quader mit seinen Löchern, wird als ein Körper bemalt: Bemale sie, nachdem die Löcher geschnitten sind; ihre Farbe bleibt, wenn du die Gruppe geöffnet änderst. Die Teile eines Bündels bemalst du einzeln. Ein bemalter Körper, den du mit anderen gruppierst, behält seine Farbe als Teil und zeigt sie wieder, wenn du die Gruppe auflöst. Ein importiertes Netz, das nicht geschlossen ist, wird auf seinen eigenen Dreiecken bemalt.
+
 ## Eine Vase
 
 Die {{ui:shape.vase}} ist ein eigener Körper für Vasen, Töpfe und Lampenschirme. Ihre Maße stehen unter {{ui:inspector.properties}}, Form und Muster auf der Karte {{ui:inspector.vaseForm}}; alles lässt sich jederzeit ändern, auch nach dem Speichern:

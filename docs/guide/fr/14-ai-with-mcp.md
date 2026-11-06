@@ -97,6 +97,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_perforate_face` | découpe un motif de trous dans une face plate ou autour de la paroi d'un cylindre, d'un tube ou d'un alésage ; les trous restent groupés avec le corps |
 | `layerling_sweep_sketch` | tire une section rectangulaire ou ronde le long d'un chemin de points, comme un seul corps exact ; un chemin fermé donne un anneau |
 | `layerling_push_face` | tire une face plane vers l'extérieur ou y creuse une poche, avec un retrait depuis le bord et un rayon des coins ; la nouvelle pièce est un corps d'esquisse regroupé avec le corps |
+| `layerling_paint` | peint des parties d'un corps dans leurs propres couleurs pour une impression en plusieurs couleurs (Peindre) : remplir une face jusqu'à ses arêtes vives, une tache ronde ou un lasso tracé dans une vue à plat ; gommer, tout retirer ; enregistré avec le corps et écrit dans un 3MF sous forme de faces peintes |
 | `layerling_mate_faces` | amène la face d'un objet contre la face d'un autre, face à face ou à fleur |
 | `layerling_open_group` | ouvre un groupe pour que ses parties puissent être modifiées une par une, également un groupe à l'intérieur d'un groupe ouvert |
 | `layerling_close_group` | le referme ("Terminé") ou annule |

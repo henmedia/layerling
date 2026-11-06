@@ -205,6 +205,22 @@ Il risultato è una mesh come un modello importato, e conserva il corpo su cui �
 
 Per una stampa in due colori attiva {{ui:inspector.surfacePatternPart}}, con qualsiasi motivo: il motivo diventa una parte separata, e {{ui:inspector.surfacePatternColor}} gli dà il suo colore – all'inizio uno che risalta sul corpo, la volta successiva quello che hai scelto per ultimo. Verso l'esterno, la parte è ciò che sporge, e il corpo resta com'era; verso l'interno, il motivo viene inciso nel corpo e la parte riempie l'incavo fino alla superficie, come l'oro delle crepe. Le due parti sono raccolte in un insieme: si spostano unite, ognuna mantiene il suo colore, e un file 3MF le contiene come due parti per lo slicer. Modifica o rimuovi la texture come sempre; la parte del motivo la segue. Con più strati, tutti devono andare nella stessa direzione, verso l'esterno o verso l'interno; un motivo in entrambe le direzioni resta tutt'uno con il corpo.
 
+## Dipingere in più colori
+
+Per una stampa in più colori, {{ui:paint.title}} colora parti di un corpo direttamente nel progetto: una faccia, una parete rotonda, l'interno di un foro, una macchia rotonda o un'area che contorni. Funziona come gli strumenti di pittura degli slicer, ma la vernice resta salvata nel progetto. Seleziona un corpo e fai clic su {{ui:paint.title}} nel gruppo {{ui:editor.group.modify}}, accanto a {{ui:inspector.surfaceTexture}}. Il pannello propone i colori del tuo progetto, e {{ui:paint.customColor}} ne mescola uno tuo. Poi dipingi nella vista con uno dei tre strumenti:
+
+- {{ui:paint.mode.fill}}: un clic riempie la faccia fino ai suoi spigoli vivi, come il secchiello di un programma di disegno: la parte superiore di un parallelepipedo, la parete di un cilindro, il fondo di una tasca o l'interno di un foro, ciascuno con un clic. {{ui:paint.angle}} dice quanto vivo deve essere uno spigolo per fermare il riempimento; a 90° passa sopra gli spigoli di un parallelepipedo.
+- {{ui:paint.mode.circle}}: un clic posa sulla superficie una macchia rotonda del {{ui:paint.diameter}} impostato, centrata dove fai clic, anche su una superficie curva. Si ferma agli spigoli vivi del corpo e non passa mai sul retro di una parete.
+- {{ui:paint.mode.lasso}}: tieni premuto il pulsante del mouse e contorna un'area. Viene dipinto ciò che vedi dentro la forma; il retro del corpo dietro di essa no.
+
+![Un parallelepipedo dipinto con i tre strumenti: la parte superiore riempita di giallo, un cerchio bianco davanti e una stella verde contornata con il lazo sul lato; accanto il pannello Dipingi.](shot:paint)
+
+La {{ui:paint.eraser}} toglie la vernice con gli stessi strumenti, {{ui:paint.clear}} la toglie tutta in una volta. Ogni tratto è un passo a sé, quindi [[Ctrl]]+[[Z]] annulla l'ultimo. Tra un tratto e l'altro il pulsante destro del mouse ruota la vista come sempre; {{ui:paint.done}} o [[Esc]] chiude il pannello.
+
+I bordi di un cerchio o di un lazo vengono tagliati nella mesh del corpo: un cerchio sulla faccia di un parallelepipedo è rotondo, non qualche triangolo, e il corpo resta chiuso. La vernice appartiene al corpo: si sposta e ruota con esso, si allunga con esso quando ne cambi le dimensioni, e un tratto che dopo una modifica non trova più nulla viene tralasciato. L'esportazione 3MF scrive la vernice come facce dipinte, che OrcaSlicer, Bambu Studio e PrusaSlicer stampano con i loro filamenti (vedi [File e salvataggio](chapter:files-and-saving)); anche un OBJ conserva i colori, un STL resta di un colore.
+
+Un gruppo tagliato in un unico corpo, per esempio un parallelepipedo con i suoi fori, si dipinge come un unico corpo: dipingilo dopo aver tagliato i fori, e la vernice resta quando modifichi il gruppo aperto. Le parti di un insieme si dipingono una per una. Un corpo dipinto che raggruppi con altri conserva la vernice come parte e la mostra di nuovo quando separi il gruppo. Una mesh importata che non è chiusa viene dipinta sui suoi triangoli.
+
 ## Un vaso
 
 Il {{ui:shape.vase}} è un corpo a sé per vasi, vasi da fiori e paralumi. Le sue misure sono in {{ui:inspector.properties}}, la sua forma e il suo motivo nella scheda {{ui:inspector.vaseForm}}; tutto si può cambiare in qualsiasi momento, anche dopo aver salvato:

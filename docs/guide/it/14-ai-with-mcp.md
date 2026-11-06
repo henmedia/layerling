@@ -101,6 +101,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_perforate_face` | Crea un motivo di fori su una faccia piana o intorno alla parete di un cilindro, un tubo o un foro; i fori restano tali e vengono raggruppati con il corpo. |
 | `layerling_sweep_sketch` | Estende una sezione rettangolare o circolare lungo un percorso di punti, creando un corpo esatto; se il percorso è chiuso, crea un anello. |
 | `layerling_push_face` | Estende una faccia piana o crea una tasca al suo interno, impostando un margine dal bordo e il raggio degli angoli; la nuova parte è un corpo da schizzo raggruppato con il corpo originale. |
+| `layerling_paint` | dipinge parti di un corpo in colori propri per stampare in più colori (Dipingi): riempire una faccia fino agli spigoli vivi, una macchia rotonda o un lazo tracciato in una vista piana; cancellare, togliere tutto; salvato con il corpo e scritto in un 3MF come facce dipinte |
 | `layerling_mate_faces` | Accosta una faccia di un oggetto a quella di un altro, facendole combaciare o allineandole a filo. |
 | `layerling_open_group` | Apre un gruppo per modificare le parti singolarmente, anche se si trova dentro un altro gruppo già aperto. |
 | `layerling_close_group` | Chiude il gruppo (con «Fine») oppure annulla l’operazione. |

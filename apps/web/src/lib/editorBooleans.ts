@@ -15,6 +15,7 @@ import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLe
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
 import { applySplitConnectors, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { paintedWorldMesh } from "@/lib/paintMesh";
 import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally } from "@/lib/splitConnectors";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
 import { starSettingsForSize } from "@/lib/starGeometry";
@@ -1257,9 +1258,12 @@ async function unionOverlappingExportMeshesRaw(shapes: WorkplaneShape[], meshes:
  * already did. Only the holes that go along count: with a selection, the selected ones.
  * A body cut away entirely drops out; one whose cut fails stays whole and is counted.
  */
-export async function exportBodiesWithLooseHoles(visible: readonly WorkplaneShape[]) {
+export async function exportBodiesWithLooseHoles(visible: readonly WorkplaneShape[], options: { painted?: boolean } = {}) {
   const solids = visible.filter((shape) => !shape.hole && !isNonSolidShape(shape));
-  const meshes = solids.map(meshForShape);
+  // A file that keeps colours (3MF, OBJ) takes a painted body cut along its paint (paintMesh.ts), the kernel loaded
+  // first so the strokes are cut in rather than coloured on whole faces. An STL stays one colour and as it was.
+  if (options.painted && solids.some((shape) => shape.paint?.length)) await getManifoldRuntime().catch(() => null);
+  const meshes = solids.map((shape) => (options.painted ? paintedWorldMesh(shape)?.mesh : undefined) ?? meshForShape(shape));
   const holes = visible.filter((shape) => shape.hole && !isNonSolidShape(shape));
   const untouched = { solids, meshes, cut: solids.map(() => false), holeCutsFailed: 0 };
   if (holes.length === 0 || solids.length === 0) return untouched;

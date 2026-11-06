@@ -473,6 +473,20 @@ export function ToolbarSurfaceTextureIcon(props: IconProps) {
   );
 }
 
+/** A block with a round patch of paint on its face and a brush over it: parts of a body painted in a colour of their own. */
+export function ToolbarPaintIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M5 20h28v22H5Z" {...SOLID} />
+      <path d="M5 20h28v22H5Z" />
+      <circle cx="16" cy="31" r="6" fill="currentColor" stroke="none" opacity="0.55" />
+      <path d="M43 5 33 15" strokeWidth="3.2" />
+      <path d="m31 14 3 3" strokeWidth="2.4" />
+      <path d="M30.5 16.5c-3.5.2-5.2 2.5-5.5 6.5 3.8-.2 6.2-2 6.5-5.5Z" fill="currentColor" />
+    </ToolbarVectorIcon>
+  );
+}
+
 /** Three links of a print-in-place chain in a gentle bend, held by the round joints between them. */
 export function ToolbarFlexiIcon(props: IconProps) {
   return (

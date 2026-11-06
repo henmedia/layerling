@@ -209,6 +209,22 @@ Wynikiem jest siatka, jak zaimportowany model, która zachowuje bryłę, na któ
 
 Do wydruku w dwóch kolorach włącz {{ui:inspector.surfacePatternPart}}, przy dowolnym wzorze: wzór staje się osobną częścią, a {{ui:inspector.surfacePatternColor}} nadaje jej kolor – na początku taki, który odcina się od bryły, następnym razem ten wybrany ostatnio. Na zewnątrz część to to, co wystaje, a bryła pozostaje taka, jaka była; do wnętrza bryła dostaje wycięty wzór, a część wypełnia wgłębienie aż do powierzchni, jak złoto w pęknięciach. Obie części są razem w zestawie: poruszają się razem, każda zachowuje swój kolor, a plik 3MF zawiera je jako dwie części dla slicera. Teksturę zmieniasz albo zdejmujesz jak dotąd; część wzoru idzie razem z nią. Przy kilku warstwach wszystkie muszą iść w tym samym kierunku, na zewnątrz albo do wnętrza; wzór w obu kierunkach stanowi jedną całość z bryłą.
 
+## Malowanie w wielu kolorach
+
+Do druku w wielu kolorach {{ui:paint.title}} koloruje części bryły bezpośrednio w projekcie: ścianę, okrągłą ściankę, wnętrze otworu, okrągłą plamę albo obszar, który obrysujesz. Działa to jak narzędzia do malowania w slicerach, ale farba zostaje zapisana w projekcie. Zaznacz jedną bryłę i kliknij {{ui:paint.title}} w grupie {{ui:editor.group.modify}}, obok {{ui:inspector.surfaceTexture}}. Panel podsuwa kolory twojego projektu, a {{ui:paint.customColor}} pozwala zmieszać własny. Potem maluj w widoku jednym z trzech narzędzi:
+
+- {{ui:paint.mode.fill}}: kliknięcie wypełnia ścianę aż do jej ostrych krawędzi, jak wiaderko farby w programie graficznym: wierzch prostopadłościanu, ściankę walca, dno kieszeni albo wnętrze otworu, każde jednym kliknięciem. {{ui:paint.angle}} mówi, jak ostra musi być krawędź, żeby zatrzymać wypełnienie; przy 90° przechodzi ono przez krawędzie prostopadłościanu.
+- {{ui:paint.mode.circle}}: kliknięcie kładzie na powierzchni okrągłą plamę o ustawionej średnicy ({{ui:paint.diameter}}), ze środkiem tam, gdzie klikniesz, także na zakrzywionej powierzchni. Zatrzymuje się na ostrych krawędziach bryły i nigdy nie przechodzi na tył ścianki.
+- {{ui:paint.mode.lasso}}: przytrzymaj przycisk myszy i obrysuj obszar. Malowane jest to, co widzisz wewnątrz kształtu; tył bryły za nim nie.
+
+![Prostopadłościan pomalowany trzema narzędziami: wierzch wypełniony na żółto, z przodu białe koło, a z boku zielona gwiazda obrysowana lassem; obok panel Malowanie.](shot:paint)
+
+{{ui:paint.eraser}} zdejmuje farbę tymi samymi narzędziami, {{ui:paint.clear}} zdejmuje ją całą naraz. Każde pociągnięcie to osobny krok, więc [[Ctrl]]+[[Z]] cofa ostatnie. Między pociągnięciami prawy przycisk myszy jak zawsze obraca widok; {{ui:paint.done}} albo [[Esc]] zamyka panel.
+
+Brzegi koła albo lassa są wcinane w siatkę bryły: koło na ścianie prostopadłościanu jest okrągłe, a nie złożone z kilku trójkątów, a bryła pozostaje zamknięta. Farba należy do bryły: przesuwa się i obraca razem z nią, rozciąga się, gdy zmieniasz jej rozmiar, a pociągnięcie, które po zmianie niczego już nie znajduje, jest pomijane. Eksport do 3MF zapisuje farbę jako pomalowane ściany, które OrcaSlicer, Bambu Studio i PrusaSlicer drukują swoimi filamentami (zobacz [Pliki i zapisywanie](chapter:files-and-saving)); OBJ też zachowuje kolory, STL pozostaje jednokolorowy.
+
+Grupę wyciętą w jedną bryłę, na przykład prostopadłościan z otworami, maluje się jak jedną bryłę: pomaluj ją po wycięciu otworów, a farba zostanie, gdy zmienisz otwartą grupę. Części pakietu maluje się pojedynczo. Pomalowana bryła, którą zgrupujesz z innymi, zachowuje farbę jako część i pokazuje ją znowu po rozgrupowaniu. Zaimportowana siatka, która nie jest zamknięta, jest malowana na własnych trójkątach.
+
 ## Wazon
 
 {{ui:shape.vase}} to osobna bryła do wazonów, doniczek i abażurów. Jego wymiary są we {{ui:inspector.properties}}, a forma i wzór na karcie {{ui:inspector.vaseForm}}. Wszystko można zmieniać w każdej chwili, także po zapisaniu:

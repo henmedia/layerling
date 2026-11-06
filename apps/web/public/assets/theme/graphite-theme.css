@@ -1137,6 +1137,23 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-quick-ac
   border: 1px solid #c8c8c8;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-eraser {
+  color: #515151;
+  background: #f8f8f8;
+  border: 1px solid #c8c8c8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-eraser.active {
+  color: #9f5508;
+  background: #f0f0f0;
+  border-color: #e08a2c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .paint-lasso-overlay polygon {
+  fill: rgba(211, 113, 12, 0.16);
+  stroke: #d3710c;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .shell-opening-options button.active {
   color: #9f5508;
   background: #f0f0f0;
@@ -5992,6 +6009,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-opening-options 
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .shell-opening-options button.active {
+  color: #ffb866;
+  background: #353535;
+  border-color: #c7772a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .paint-eraser {
+  color: #cbcbcb;
+  background: #2d2d2d;
+  border-color: #484848;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .paint-eraser.active {
   color: #ffb866;
   background: #353535;
   border-color: #c7772a;

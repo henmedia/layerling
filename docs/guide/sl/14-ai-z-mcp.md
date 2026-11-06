@@ -97,6 +97,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_perforate_face` | vreže vzorec lukenj v ravno ploskev ali okrog stene valja, cevi ali izvrtine, luknje ostanejo kot luknje, združene v skupino s telesom |
 | `layerling_sweep_sketch` | povleče pravokoten ali okrogel prerez vzdolž poti iz točk kot eno natančno telo; sklenjena pot da obroč |
 | `layerling_push_face` | ravno ploskev potegne navzven ali vanjo izreže žep, z odmikom od roba in polmerom vogalov; nov del je telo iz skice, združeno v skupino s telesom |
+| `layerling_paint` | pobarva dele telesa v lastnih barvah za tisk v več barvah (Barvanje): zapolni ploskev do ostrih robov, okrogla lisa ali laso v ravnem pogledu; radiranje, odstrani vse; shrani se s telesom in se v 3MF zapiše kot pobarvane ploskve |
 | `layerling_mate_faces` | položi ploskev enega objekta na ploskev drugega, drugo proti drugemu ali poravnano |
 | `layerling_open_group` | odpre skupino, da so njeni deli posamezno spremenljivi, tudi skupino v odprti |
 | `layerling_close_group` | jo spet zapre (»Končano«) ali prekine |

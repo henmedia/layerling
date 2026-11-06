@@ -200,6 +200,22 @@ Rezultat je mreža kot uvožen model in ohrani telo, na katerem je nastal. Če g
 
 Za tisk v dveh barvah vklopite {{ui:inspector.surfacePatternPart}}, pri katerem koli vzorcu: vzorec postane samostojen del, {{ui:inspector.surfacePatternColor}} pa mu da barvo – najprej tako, ki izstopa od telesa, naslednjič tisto, ki ste jo izbrali nazadnje. Navzven je del tisto, kar izstopa, telo pa ostane, kakršno je bilo; navznoter dobi telo vrezan vzorec, del pa zapolni vdolbino do površine, kot zlato v razpokah. Oba sta skupaj v svežnju: premikata se skupaj, vsak obdrži svojo barvo, datoteka 3MF pa ju vsebuje kot dva dela za rezalnik. Teksturo spremenite ali odstranite kot doslej; del vzorca gre zraven. Pri več plasteh morajo vse iti v isto smer, navzven ali navznoter; vzorec v obe smeri ostane eno s telesom.
 
+## Barvanje v več barvah
+
+Za tisk v več barvah {{ui:paint.title}} pobarva dele telesa kar v načrtu: ploskev, okroglo steno, notranjost luknje, okroglo liso ali območje, ki ga obkrožite. Deluje kot orodja za barvanje v rezalnikih, le da barva ostane shranjena v načrtu. Izberite eno telo in v skupini {{ui:editor.group.modify}} kliknite {{ui:paint.title}}, poleg {{ui:inspector.surfaceTexture}}. Okno ponudi barve vašega načrta, {{ui:paint.customColor}} pa zmeša vašo lastno. Nato barvajte v pogledu z enim od treh orodij:
+
+- {{ui:paint.mode.fill}}: klik zapolni ploskev do njenih ostrih robov, kot vedro barve v risalnem programu: zgornjo stran kvadra, steno valja, dno žepa ali notranjost luknje, vsakič z enim klikom. {{ui:paint.angle}} pove, kako oster mora biti rob, da ustavi polnilo; pri 90° gre čez robove kvadra.
+- {{ui:paint.mode.circle}}: klik položi na površino okroglo liso nastavljene velikosti ({{ui:paint.diameter}}), s središčem tam, kjer kliknete, tudi na ukrivljeno površino. Ustavi se na ostrih robovih telesa in nikoli ne pride skozi na zadnjo stran stene.
+- {{ui:paint.mode.lasso}}: držite gumb miške in obkrožite območje. Pobarva se, kar vidite znotraj oblike; zadnja stran telesa za njo ne.
+
+![Kvader, pobarvan s tremi orodji: zgoraj zapolnjen z rumeno, spredaj bel krog in ob strani zelena zvezda, obkrožena z lasom; ob njem okno Barvanje.](shot:paint)
+
+{{ui:paint.eraser}} z istimi orodji barvo spet odstrani, {{ui:paint.clear}} vso naenkrat. Vsaka poteza je svoj korak, zato [[Ctrl]]+[[Z]] vzame zadnjo nazaj. Med potezami desni gumb miške kot vedno vrti pogled; {{ui:paint.done}} ali [[Esc]] zapre okno.
+
+Robovi kroga ali lasa se vrežejo v mrežo telesa: krog na ploskvi kvadra je okrogel, ne nekaj trikotnikov, telo pa ostane zaprto. Barva pripada telesu: premika in vrti se z njim, raztegne se z njim, ko spremenite velikost, poteza, ki po spremembi ne najde ničesar več, pa izpade. Izvoz v 3MF zapiše barvo kot pobarvane ploskve, ki jih OrcaSlicer, Bambu Studio in PrusaSlicer natisnejo s svojimi filamenti (glejte [Datoteke in shranjevanje](chapter:datoteke-in-shranjevanje)); OBJ barve prav tako ohrani, STL ostane enobarven.
+
+Skupina, izrezana v eno telo, na primer kvader z luknjami, se barva kot eno telo: pobarvajte jo, ko so luknje izrezane, in barva ostane, ko skupino spremenite odprto. Dele svežnja barvate enega za drugim. Pobarvano telo, ki ga združite z drugimi, ohrani barvo kot del in jo spet pokaže, ko skupino razdružite. Uvožena mreža, ki ni zaprta, se barva po svojih trikotnikih.
+
 ## Vaza
 
 {{ui:shape.vase}} je samostojno telo za vaze, lonce in senčnike. Njene mere so pod {{ui:inspector.properties}}, oblika in vzorec na kartici {{ui:inspector.vaseForm}}; vse lahko kadar koli spremenite, tudi po shranjevanju:

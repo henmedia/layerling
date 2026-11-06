@@ -73,7 +73,8 @@ function changeKind(before: WorkplaneShape, after: WorkplaneShape, fields: Set<s
   if (treatments.length === (before.edgeTreatments?.length ?? 0) + 1) return FEATURE_KINDS[treatments[treatments.length - 1].kind] ?? "edges";
   const only = (group: Set<string>) => meaningful.every((field) => group.has(field));
   if (only(new Set(["name"]))) return "renamed";
-  if (only(new Set(["color"]))) return "color";
+  // Paint (paint.ts) colours parts of the body: a step of it reads as a change of colour.
+  if (only(new Set(["color", "paint"]))) return "color";
   if (only(new Set(["hole"]))) return after.hole ? "hole" : "solid";
   if (only(new Set(["hidden"]))) return after.hidden ? "hidden" : "shown";
   if (only(new Set(["locked"]))) return after.locked ? "locked" : "unlocked";

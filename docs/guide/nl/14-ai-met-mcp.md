@@ -97,6 +97,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_perforate_face` | snijdt een gatenpatroon in een plat vlak of rond de wand van een cilinder, buis of boring; de gaten blijven gaten, gegroepeerd met het lichaam |
 | `layerling_sweep_sketch` | trekt een rechthoekige of ronde dwarsdoorsnede langs een pad van punten als één exact lichaam; een gesloten pad geeft een ring |
 | `layerling_push_face` | trekt een plat vlak naar buiten of snijdt er een kamer in, met inspringing vanaf de rand en hoekradius; het nieuwe deel is een schetslichaam, gegroepeerd met het lichaam |
+| `layerling_paint` | beschildert delen van een lichaam in eigen kleuren om in meerdere kleuren te printen (Beschilderen): een vlak vullen tot aan de scherpe randen, een ronde vlek of een lasso in een vlakke weergave; gummen, alles verwijderen; met het lichaam opgeslagen en in een 3MF als beschilderde vlakken geschreven |
 | `layerling_mate_faces` | brengt een vlak van het ene object tegen een vlak van een ander, vlak tegen vlak of gelijk |
 | `layerling_open_group` | opent een groep zodat de onderdelen een voor een kunnen worden gewijzigd, ook een groep binnen een geopende groep |
 | `layerling_close_group` | sluit hem weer ("Klaar") of annuleert |

@@ -205,6 +205,22 @@ Het resultaat is een mesh zoals een geïmporteerd model, en het houdt het lichaa
 
 Voor een print in twee kleuren zet je {{ui:inspector.surfacePatternPart}} aan, bij elk patroon: het patroon wordt een eigen onderdeel, en {{ui:inspector.surfacePatternColor}} geeft het zijn kleur – eerst een die afsteekt tegen het lichaam, de volgende keer de kleur die je het laatst koos. Naar buiten is het onderdeel wat uitsteekt, en het lichaam blijft zoals het was; naar binnen krijgt het lichaam het patroon ingesneden en vult het onderdeel de uitsparing tot aan het oppervlak, zoals het goud van de barsten. Beide zitten samen in een bundel: ze bewegen samen, elk houdt zijn kleur, en een 3MF bevat ze als twee onderdelen voor de slicer. Wijzig of verwijder de structuur zoals altijd; het patroononderdeel gaat mee. Bij meerdere lagen moeten ze allemaal dezelfde kant op gaan, naar buiten of naar binnen; een patroon naar beide kanten blijft één met het lichaam.
 
+## In meerdere kleuren beschilderen
+
+Voor een print in meerdere kleuren kleurt {{ui:paint.title}} delen van een lichaam rechtstreeks in het ontwerp: een vlak, een ronde wand, de binnenkant van een gat, een ronde vlek of een gebied dat je omcirkelt. Het werkt zoals de schildergereedschappen van de slicers, maar de verf wordt met het ontwerp opgeslagen. Selecteer één lichaam en klik in de groep {{ui:editor.group.modify}} op {{ui:paint.title}}, naast {{ui:inspector.surfaceTexture}}. Het venster biedt de kleuren van je ontwerp aan, en {{ui:paint.customColor}} mengt een kleur van jezelf. Schilder dan in de weergave, met een van drie gereedschappen:
+
+- {{ui:paint.mode.fill}}: een klik vult het vlak tot aan de scherpe randen, zoals de verfemmer van een tekenprogramma: de bovenkant van een balk, de wand van een cilinder, de bodem van een kamer of de binnenkant van een gat, elk met één klik. {{ui:paint.angle}} zegt hoe scherp een rand moet zijn om het vullen te stoppen; bij 90° loopt het over de randen van een balk.
+- {{ui:paint.mode.circle}}: een klik legt een ronde vlek met de ingestelde {{ui:paint.diameter}} op het oppervlak, gecentreerd waar je klikt, ook op een gebogen oppervlak. Hij stopt bij de scherpe randen van het lichaam en komt nooit door op de achterkant van een wand.
+- {{ui:paint.mode.lasso}}: houd de muisknop ingedrukt en omcirkel een gebied. Wat je binnen de vorm ziet, wordt beschilderd; de achterkant van het lichaam erachter niet.
+
+![Een balk beschilderd met de drie gereedschappen: de bovenkant geel gevuld, vooraan een witte cirkel en opzij een groene ster, met de lasso omcirkeld; ernaast het venster Beschilderen.](shot:paint)
+
+De {{ui:paint.eraser}} haalt de verf met dezelfde gereedschappen weer weg, {{ui:paint.clear}} alles in één keer. Elke streek is een eigen stap, dus [[Ctrl]]+[[Z]] haalt de laatste terug. Tussen de streken draait de rechtermuisknop de weergave zoals altijd; {{ui:paint.done}} of [[Esc]] sluit het venster.
+
+De randen van een cirkel of een lasso worden in het net van het lichaam gesneden: een cirkel op het vlak van een balk is rond en niet een paar driehoeken, en het lichaam blijft gesloten. De verf hoort bij het lichaam: ze beweegt en draait mee, rekt mee als je de maat verandert, en een streek die na een wijziging niets meer vindt, valt weg. De 3MF-export schrijft de verf als beschilderde vlakken, die OrcaSlicer, Bambu Studio en PrusaSlicer met hun filamenten printen (zie [Bestanden en opslaan](chapter:bestanden-en-opslaan)); een OBJ houdt de kleuren ook, een STL blijft één kleur.
+
+Een groep die tot één lichaam is gesneden, bijvoorbeeld een balk met zijn gaten, wordt als één lichaam beschilderd: beschilder hem nadat de gaten gesneden zijn; de verf blijft als je de groep geopend wijzigt. De delen van een bundel beschilder je een voor een. Een beschilderd lichaam dat je met andere groepeert, houdt zijn verf als deel en toont die weer als je de groep opheft. Een geïmporteerd net dat niet gesloten is, wordt op zijn eigen driehoeken beschilderd.
+
 ## Een vaas
 
 De {{ui:shape.vase}} is een eigen lichaam voor vazen, potten en lampenkappen. De maten staan onder {{ui:inspector.properties}}, vorm en patroon op de kaart {{ui:inspector.vaseForm}}; alles is altijd te wijzigen, ook na het opslaan:

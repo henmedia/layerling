@@ -101,6 +101,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_perforate_face` | schneidet ein Lochmuster in eine ebene Fläche oder rund um die Wand eines Zylinders, Rohrs oder einer Bohrung, die Löcher bleiben als Aussparungen mit dem Körper gruppiert |
 | `layerling_sweep_sketch` | zieht einen rechteckigen oder runden Querschnitt entlang eines Pfades aus Punkten als einen exakten Körper; ein geschlossener Pfad ergibt einen Ring |
 | `layerling_push_face` | zieht eine ebene Fläche heraus oder schneidet eine Tasche hinein, mit Rand zur Kante und Eckenradius; das neue Teil ist ein Skizzenkörper, mit dem Körper gruppiert, oder mit `separate` ein freier eigener Körper |
+| `layerling_paint` | bemalt Teile eines Körpers in eigenen Farben für den Mehrfarbdruck (Bemalen): eine Fläche bis an ihre scharfen Kanten füllen, ein runder Fleck oder ein Lasso in einer flachen Ansicht; radieren, alles abnehmen; mit dem Körper gespeichert und im 3MF als bemalte Flächen |
 | `layerling_mate_faces` | legt eine Fläche eines Objekts an die Fläche eines anderen, gegeneinander oder bündig, oder bringt zwei runde Flächen auf eine Achse |
 | `layerling_open_group` | öffnet eine Gruppe, damit ihre Teile einzeln änderbar sind, auch eine Gruppe in einer geöffneten |
 | `layerling_close_group` | schließt sie wieder („Fertig“) oder bricht ab |

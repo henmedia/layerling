@@ -780,6 +780,37 @@ export const tools = [
     },
   },
   {
+    name: "layerling_paint",
+    description: "Paint parts of a body's surface in colours of their own, for printing in several colours - the editor's Paint tool (Modify, Surface). Each stroke is a region and a colour, laid in order, a later one over an earlier one: fill spreads from point over the surface up to edges sharper than angle (a flat face, the wall of a cylinder, the floor of a pocket, the inside of a hole); circle lays a round patch diameter mm across onto the surface, centred on point and stopping at the body's sharp edges, never on the back of a wall; lasso paints what a flat view from one side sees inside outline, not the back of the body. A stroke without a colour (erase: true) takes the paint off its region again. The edges of circles and lassos are cut into the body's mesh, which stays closed, so a circle on a box face is round. The strokes are kept with the body in its own frame: they move and turn with it and stretch when it is resized; one that finds nothing on the body is left out (counted in skipped). A 3MF export writes the paint as painted faces (paint_color) for OrcaSlicer, Bambu Studio and PrusaSlicer, an OBJ as face colours; an STL stays one colour. Works on one solid body, or a group cut into one body in one colour; not on a hole, a sketch, a bundle or a group of separate parts (paint its parts). One undo step for the call. Returns object (with paint: strokes and colours), strokes, colors, skipped, cut (false when an open mesh was painted on whole triangles) and paintedFaces.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The body to paint. If omitted, the one selected object." },
+        clear: { type: "boolean", description: "true takes all paint off the body first; with no strokes it only clears." },
+        strokes: {
+          type: "array",
+          description: "The strokes to add, in order.",
+          items: {
+            type: "object",
+            properties: {
+              mode: { type: "string", enum: ["fill", "circle", "lasso"], description: "fill, circle or lasso." },
+              color: { type: "string", description: "The colour as #rrggbb. Left out with erase: true (or null): the stroke takes the paint off." },
+              erase: { type: "boolean", description: "true: the stroke takes the paint off its region, the body's own colour shows again." },
+              point: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "fill and circle: a point on the body's surface, [x, y, z] in world coordinates (y up), e.g. the middle of a face." },
+              normal: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "fill and circle: the surface's outward normal at point; left out, the normal of the nearest face is taken." },
+              angle: { type: "number", minimum: 1, maximum: 90, description: "fill: edges sharper than this many degrees stop the fill (default 30; 90 runs over a box's edges)." },
+              diameter: { type: "number", minimum: 0.2, maximum: 1000, description: "circle: diameter in mm (default 10)." },
+              view: { type: "string", enum: ["top", "bottom", "front", "back", "left", "right"], description: "lasso: the side the flat view looks from." },
+              outline: { type: "array", items: { type: "array", items: { type: "number" }, minItems: 2, maxItems: 2 }, description: "lasso: the shape, at least three points [a, b] in mm along the world's two axes across the view: [x, z] (z positive towards the front) from top or bottom, [x, height] from front or back, [z, height] from left or right." },
+            },
+            required: ["mode"],
+          },
+        },
+      },
+    },
+  },
+  {
     name: "layerling_mate_faces",
     description: "Move one object so a face of it meets a face of another object - the editor's Align faces tool. The moving object is turned the shortest way until the faces are parallel (not at all if they already are), then slid along the target face's normal only, so it keeps its place sideways. mode against puts the faces face to face (touching, back to back), flush lays them in one plane side by side. gap leaves that much room, measured out of the target face. Faces are named as sides of each object's own box and snap to the nearest real face. mode concentric instead puts a round face of the object (the inside of a hole, the outside of a pin) on the axis of a round face of the target - a hole over a hole, a pin into a hole: give facePoint and targetFacePoint, a point on or near each round face (a point on the hole's axis works too); the object turns the shortest way until the axes are parallel, then slides across onto the target axis and keeps its depth along it. One undo step.",
     inputSchema: {
