@@ -119,6 +119,8 @@ Siatka pokazuje rozmiar płyty. W prawym dolnym rogu jest **krok przyciągania**
 
 Koło zębate w wierszu tytułu ({{ui:editor.workspaceSettings}}) otwiera ustawienia. Po lewej jest pięć sekcji: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} i {{ui:workspace.history}}. Każda zmiana działa od razu. {{ui:workspace.makeDefault}} na dole zapisuje bieżące ustawienia jako domyślne, żeby nowy projekt z nimi zaczynał. Otwierany plik przynosi własne ustawienia, a {{ui:workspace.useMyDefault}} obok nakłada na otwarty projekt Twoje zapisane kolory, siatkę i resztę, zachowując jego jednostki. Jeśli Twoje ustawienia domyślne mają drukarkę, przychodzi ona razem z rozmiarem swojego stołu, a bez niej projekt zachowuje swoją płytę i drukarkę. {{ui:workspace.close}} w prawym górnym rogu zamyka okno. Ta część omawia ustawienia po kolei.
 
+{{ui:workspace.exportSettings}} zapisuje ustawienia okna w pliku (layerling-settings-<data>.json): kolory, siatkę, cienie, kamerę i domyślne wartości kształtów, razem z motywem, rozmiarem paska narzędzi, rogiem kostki widoku, kolorami kształtów i luzem każdej drukarki. Na innym komputerze lub po utracie danych przeglądarki {{ui:workspace.importSettings}} wczytuje plik ponownie: staje się Twoją wartością domyślną dla nowych projektów i jest nakładany na otwarty projekt jak {{ui:workspace.useMyDefault}}.
+
 ### Wygląd: motyw, pasek narzędzi i kostka widoku
 
 {{ui:workspace.theme}} ustawia kolory całego programu: {{ui:workspace.themeSystem}} podąża za komputerem, pozostałe to {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} i {{ui:workspace.themeGraphite}}. Możesz go też zmienić w prawym górnym rogu edytora.
