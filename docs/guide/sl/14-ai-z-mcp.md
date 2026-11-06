@@ -154,7 +154,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_delete_custom_shape` | odstrani lastno obliko; vstavljena telesa ostanejo |
 | `layerling_show_workplane` | skrije ploščo z njeno mrežo in jo spet prikaže, na primer za sliko spodnje strani (samo pogled) |
 | `layerling_set_section_view` | prereže pogled vzdolž ravnine, da se vidi notranjost (samo pogled, nič se ne razreže) |
-| `layerling_measurements` | prikaže ali skrije meritve merilnega traku in jih našteje z njihovimi dolžinami, ter skrije ali prikaže mere okoli izbora kot [[Q]] |
+| `layerling_measurements` | prikaže ali skrije meritve merilnega traku in jih našteje z njihovimi dolžinami, ter skrije ali prikaže mere okoli izbora kot [[Q]], in vnese dolžino za eno od njih, kar premakne telo na njenem koncu kot klik na število |
 | `layerling_measure_angle` | izmeri kot, kakor kotomer: v oglišču treh točk ali med dvema ravnima ploskvama, in ga pokaže v pogledu |
 | `layerling_saved_view` | shrani trenutni pogled pod tipko 7, 8, 9 ali 0 in se vrne nanj, kot Shift+tipka in tipka (samo pogled); nastavi tudi začetni pogled novih osnutkov |
 | `layerling_build_plates` | našteje, doda, poimenuje, razvrsti in odstrani tiskalne plošče, premakne predmete na ploščo in jih razporedi po ploščah, kot vrstica plošč |

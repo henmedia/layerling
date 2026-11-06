@@ -154,7 +154,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_delete_custom_shape` | supprime une forme personnalisée ; les corps insérés restent |
 | `layerling_show_workplane` | cache et affiche la plaque avec sa grille, pour une photo du dessous par exemple (uniquement la vue) |
 | `layerling_set_section_view` | coupe la vue ouverte le long d'un plan pour regarder à l'intérieur (seulement la vue, rien n'est coupé) |
-| `layerling_measurements` | affiche ou masque les mesures du ruban à mesurer et les liste avec leurs longueurs, et masque ou affiche les cotes autour de la sélection comme [[Q]] |
+| `layerling_measurements` | affiche ou masque les mesures du ruban à mesurer et les liste avec leurs longueurs, et masque ou affiche les cotes autour de la sélection comme [[Q]], et saisit une longueur pour l'une d'elles, ce qui déplace le corps à son extrémité comme un clic sur son nombre |
 | `layerling_measure_angle` | mesure un angle comme le rapporteur : au sommet de trois points ou entre deux faces planes, et l'affiche dans la vue |
 | `layerling_saved_view` | enregistre la vue actuelle sous la touche 7, 8, 9 ou 0 et y revient, comme Maj+touche et la touche (seulement la vue); règle aussi la vue de départ des nouveaux designs |
 | `layerling_build_plates` | liste, ajoute, nomme, ordonne et retire les plateaux d'impression, déplace des objets sur un plateau et les répartit sur les plateaux, comme la barre des plateaux |

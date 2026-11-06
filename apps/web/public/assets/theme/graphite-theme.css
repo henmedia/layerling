@@ -8635,6 +8635,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-inside {
   border-color: #ad5900;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-length-axes {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(207, 207, 207, 0.96);
+  box-shadow: 0 1px 4px rgba(44, 44, 44, 0.12);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-length-axis {
+  color: #ad5900;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .tape-tip {
   color: #ffffff;
   background: rgba(36, 36, 36, 0.92);

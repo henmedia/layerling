@@ -158,7 +158,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_delete_custom_shape` | fjerner en egen form; indsatte former bevares |
 | `layerling_show_workplane` | skjuler og viser pladen med sit gitter, for et billede af undersiden for eksempel (kun visningen) |
 | `layerling_set_section_view` | skærer visningen op langs et plan for at kigge indeni (kun visningen, intet skæres fra hinanden) |
-| `layerling_measurements` | viser eller skjuler målebåndets målinger og viser dem med deres længder, og skjuler eller viser målene omkring markeringen som [[Q]] |
+| `layerling_measurements` | viser eller skjuler målebåndets målinger og viser dem med deres længder, og skjuler eller viser målene omkring markeringen som [[Q]], og skriver en længde for en af dem, som flytter legemet i dens ende som et klik på tallet |
 | `layerling_measure_angle` | måler en vinkel som gradskiven: i hjørnet af tre punkter eller mellem to plane flader, og viser den i visningen |
 | `layerling_saved_view` | gemmer den aktuelle visning under tasten 7, 8, 9 eller 0 og går tilbage til den, som Shift+tast og tasten (kun visningen); sætter også startvisningen for nye designs |
 | `layerling_build_plates` | viser, tilføjer, navngiver, ordner og fjerner byggepladerne, flytter objekter til en plade og fordeler dem på pladerne, som pladelinjen |

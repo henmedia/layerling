@@ -158,7 +158,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_delete_custom_shape` | usuwa własny kształt. Wstawione bryły zostają |
 | `layerling_show_workplane` | ukrywa i pokazuje płytę z siatką, na przykład do zdjęcia spodu (tylko widok) |
 | `layerling_set_section_view` | rozcina widok wzdłuż płaszczyzny, żeby zajrzeć do środka (tylko widok, nic nie jest cięte) |
-| `layerling_measurements` | pokazuje lub ukrywa pomiary narzędzia Zmierz i wypisuje je z ich długościami, oraz ukrywa lub pokazuje wymiary wokół zaznaczenia jak [[Q]] |
+| `layerling_measurements` | pokazuje lub ukrywa pomiary narzędzia Zmierz i wypisuje je z ich długościami, oraz ukrywa lub pokazuje wymiary wokół zaznaczenia jak [[Q]], a także wpisuje długość dla jednego z nich, co przesuwa bryłę na jego końcu jak kliknięcie liczby |
 | `layerling_measure_angle` | mierzy kąt jak kątomierz: w wierzchołku z trzech punktów lub między dwiema płaskimi ścianami, i pokazuje go w widoku |
 | `layerling_saved_view` | zapisuje bieżący widok pod klawiszem 7, 8, 9 lub 0 i do niego wraca, jak Shift+klawisz i sam klawisz (tylko widok); ustawia też widok startowy nowych projektów |
 | `layerling_build_plates` | wyświetla, dodaje, nazywa, porządkuje i usuwa stoły robocze, przenosi obiekty na stół i rozkłada je na stołach, jak pasek stołów |
