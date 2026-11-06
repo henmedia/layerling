@@ -3668,6 +3668,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "Fladkabler ud gennem væggen",
   "sbcBoard.gpioUp": "GPIO-stik op gennem låget",
   "sbcBoard.upReach": "Rækkevidde op",
+  "sbcBoard.buttonReach": "Knappernes rækkevidde",
+  "sbcBoard.buttonReachHint": "Så langt når knapperne (RESET, BOOT, tænd) i den retning, de trykkes: op gennem et låg, eller ud gennem væggen for en knap, der trykkes fra siden. Ved 0 forbliver de, som de er.",
   "sbcBoard.passagesHint": "Fladkabler (kamera, skærm, PCIe) og GPIO-stikket kan åbne op gennem et låg med rækkevidden op (mindst 20 mm), kablerne også ud gennem den nærmeste væg med rækkevidden. MicroSD-kortholderen er et stik ved kanten.",
   "sbcBoard.building": "Laver printet…",
   "sbcBoard.failed": "Printet kunne ikke laves.",

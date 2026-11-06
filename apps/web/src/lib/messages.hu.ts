@@ -2376,6 +2376,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "Szalagkábelek oldalra, a falon át",
   "sbcBoard.gpioUp": "Tüskesor (GPIO) felfelé, a fedélen át",
   "sbcBoard.upReach": "Átnyúlás felfelé",
+  "sbcBoard.buttonReach": "Gombok átnyúlása",
+  "sbcBoard.buttonReachHint": "Ennyivel nyúlnak tovább a gombok (RESET, BOOT, bekapcsoló) abba az irányba, amerről megnyomhatók: felfelé a fedélen át, az oldalról nyomhatók a falon át. 0-nál maradnak, ahogy vannak.",
   "sbcBoard.passagesHint": "A szalagkábelek (kamera, kijelző, PCIe) és a tüskesor felfelé nyílhat a fedélen át, az Átnyúlás felfelé szerint (legalább 20 mm), a kábelek oldalra is, a közelebbi falon át, a kinyúlás szerint. A microSD foglalat szélső csatlakozó.",
   "sbcBoard.building": "A lap készül…",
   "sbcBoard.failed": "A lapot nem sikerült elkészíteni.",

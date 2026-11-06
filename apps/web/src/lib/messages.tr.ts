@@ -2386,6 +2386,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "Şerit kablolar duvardan yana",
   "sbcBoard.gpioUp": "GPIO başlığı kapaktan yukarı",
   "sbcBoard.upReach": "Yukarı uzanma",
+  "sbcBoard.buttonReach": "Düğme uzanması",
+  "sbcBoard.buttonReachHint": "Düğmelerin (RESET, BOOT, güç) basıldıkları yöne ne kadar uzandığı: kapaktan yukarı ya da yandan basılan için duvardan dışarı. 0'da oldukları gibi kalırlar.",
   "sbcBoard.passagesHint": "Şerit kablolar (kamera, ekran, PCIe) ve GPIO başlığı, yukarı uzanma kadar (en az 20 mm) kapaktan yukarı açılabilir; kablolar ayrıca uzanma kadar en yakın duvardan yana açılabilir. microSD kart yuvası kenardaki bir bağlantıdır.",
   "sbcBoard.building": "Kart yapılıyor…",
   "sbcBoard.failed": "Kart yapılamadı.",

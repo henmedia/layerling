@@ -3822,6 +3822,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "sbcBoard.ribbonSide": "Plochý kabel do strany stěnou",
   "sbcBoard.gpioUp": "GPIO lišta nahoru víkem",
   "sbcBoard.upReach": "Přesah nahoru",
+  "sbcBoard.buttonReach": "Přesah tlačítek",
+  "sbcBoard.buttonReachHint": "Jak daleko tlačítka (RESET, BOOT, zapnutí) sahají ve směru, ze kterého se mačkají: nahoru víkem, nebo stěnou u tlačítka mačkaného z boku. Při 0 zůstanou, jak jsou.",
   "sbcBoard.passagesHint": "Ploché kabely (kamera, displej, PCIe) a GPIO lišta se mohou otevřít nahoru víkem o přesah nahoru (nejméně 20 mm), kabely také do strany bližší stěnou o přesah. Slot na kartu microSD je konektor na okraji.",
   "sbcBoard.building": "Vytváří se deska…",
   "sbcBoard.failed": "Desku se nepodařilo vytvořit.",

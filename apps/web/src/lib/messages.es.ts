@@ -3778,6 +3778,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "Cables planos hacia el lado por la pared",
   "sbcBoard.gpioUp": "Conector GPIO hacia arriba por la tapa",
   "sbcBoard.upReach": "Alcance hacia arriba",
+  "sbcBoard.buttonReach": "Alcance de los botones",
+  "sbcBoard.buttonReachHint": "Cuánto se extienden los botones (RESET, BOOT, encendido) en la dirección en que se pulsan: hacia arriba por una tapa, o por la pared el que se pulsa de lado. Con 0 quedan como están.",
   "sbcBoard.passagesHint": "Los cables planos (cámara, pantalla, PCIe) y el conector GPIO pueden abrirse hacia arriba por una tapa, según el alcance hacia arriba (al menos 20 mm), y los cables también hacia el lado por la pared más cercana, según el alcance. La ranura microSD es un conector del borde.",
   "sbcBoard.building": "Creando la placa…",
   "sbcBoard.failed": "No se pudo crear la placa.",

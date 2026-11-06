@@ -3776,6 +3776,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "sbcBoard.ribbonSide": "Lintkabels opzij door de wand",
   "sbcBoard.gpioUp": "GPIO-header omhoog door het deksel",
   "sbcBoard.upReach": "Reikwijdte omhoog",
+  "sbcBoard.buttonReach": "Reikwijdte knoppen",
+  "sbcBoard.buttonReachHint": "Zo ver reiken de knoppen (RESET, BOOT, aan/uit) in de richting waarin je ze indrukt: omhoog door een deksel, of door de wand voor een knop die je van opzij indrukt. Bij 0 blijven ze zoals ze zijn.",
   "sbcBoard.passagesHint": "Lintkabels (camera, display, PCIe) en de GPIO-header kunnen omhoog door een deksel openen, met de reikwijdte omhoog (minstens 20 mm), de kabels ook opzij door de dichtstbijzijnde wand, met de reikwijdte. De microSD-kaartsleuf is een aansluiting aan de rand.",
   "sbcBoard.building": "Bord wordt gemaakt…",
   "sbcBoard.failed": "Het bord kon niet worden gemaakt.",

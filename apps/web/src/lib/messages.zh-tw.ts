@@ -3699,6 +3699,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonSide": "排線向側面穿過壁",
   "sbcBoard.gpioUp": "GPIO 排針向上穿過蓋子",
   "sbcBoard.upReach": "向上延伸",
+  "sbcBoard.buttonReach": "按鈕延伸",
+  "sbcBoard.buttonReachHint": "按鈕(RESET、BOOT、電源)沿按壓方向延伸的距離:向上穿過蓋子,側按的按鈕穿過側壁。為 0 時保持原樣。",
   "sbcBoard.passagesHint": "排線（相機、顯示器、PCIe）和 GPIO 排針可按向上延伸（至少 20 公釐）向上穿過蓋子開口，排線也可按延伸向側面穿過較近的壁。microSD 卡槽是邊緣的接頭。",
   "sbcBoard.building": "正在產生主機板…",
   "sbcBoard.failed": "無法產生主機板。",

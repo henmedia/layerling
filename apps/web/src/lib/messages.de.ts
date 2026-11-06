@@ -3775,6 +3775,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "sbcBoard.ribbonSide": "Flachbandkabel seitlich durch die Wand",
   "sbcBoard.gpioUp": "GPIO-Leiste nach oben durch den Deckel",
   "sbcBoard.upReach": "Reichweite nach oben",
+  "sbcBoard.buttonReach": "Reichweite der Tasten",
+  "sbcBoard.buttonReachHint": "So weit reichen die Tasten (RESET, BOOT, Ein/Aus) in die Richtung, in der man sie drückt: nach oben durch einen Deckel, eine seitlich gedrückte durch die Wand. Bei 0 bleiben sie, wie sie sind.",
   "sbcBoard.passagesHint": "Flachbandkabel (Kamera, Display, PCIe) und die GPIO-Leiste können nach oben durch einen Deckel öffnen, um die Reichweite nach oben (mindestens 20 mm), die Kabel auch seitlich durch die nähere Wand, um die Reichweite. Der microSD-Kartenslot ist ein Anschluss am Rand.",
   "sbcBoard.building": "Platine wird gebaut…",
   "sbcBoard.failed": "Die Platine ließ sich nicht bauen.",
