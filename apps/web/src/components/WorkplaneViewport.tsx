@@ -110,7 +110,7 @@ import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
-import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
+import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
 import { MIN_ELEVATION, MAX_ELEVATION, ResizeSigns, ResizeAnchorMemory, TransformDragState, TransformDragItem, snapValue, selectionWorldYBounds, resizeSignsForHandle, resizeAnchorPointForFrame, resizeCenterFromAnchor, resizeSignsForDimension, patchWithResizeAnchor, patchWithUniformHeightScale, resizeShapeFromFrameHandle, resizeShapeAlongFrameNormal, resizeSelectionFromHandle, scaleSelectionItems } from "./workplane/viewportResize";
 import { pulleySizedPatch } from "@/lib/pulleyGeometry";
@@ -3900,9 +3900,13 @@ export function WorkplaneViewport({
       const selectedShapeIds = selectedIdsRef.current.filter((id) => shapesRef.current.some((shape) => shape.id === id && !shape.hidden));
       const targetShapeIds = selectedShapeIds.length > 0 ? selectedShapeIds : shapesRef.current.filter((shape) => !shape.hidden).map((shape) => shape.id);
       const measuresWholeEdge = wholeEdges && !activeStartPoint && !ignoredPointId;
-      const modelCandidate = pickModelTapeCandidate(state, targetShapeIds, clientX, clientY, startWorld, startNormal, shiftKey, false, measuresWholeEdge);
+      // The middle of the face under the pointer and of a round edge near it (Discussion #610), each with its mark;
+      // while Shift holds the second point square or straight, that wins and the centres stay out of the way.
+      const centres = shiftKey && startWorld ? null : tapeCentresNear(state, targetShapeIds, clientX, clientY);
+      const offered = (candidate: TapeCandidate): TapeCandidate => (centres?.offers.length ? { ...candidate, centres: centres.offers } : candidate);
+      const modelCandidate = pickModelTapeCandidate(state, targetShapeIds, clientX, clientY, startWorld, startNormal, shiftKey, false, measuresWholeEdge, centres?.snap ?? null);
       if (modelCandidate) {
-        if (!modelCandidate.edge) return modelCandidate;
+        if (!modelCandidate.edge) return offered(modelCandidate);
         const onEdge = { ...modelCandidate, circleEdge: modelCandidate.edge, edge: measuresWholeEdge ? modelCandidate.edge : undefined };
         // With whole edges off (or when placing the second point of a measurement) the edge is only where a
         // point goes. On a circle it goes on the true circle, not on a side of the polygon the edge is drawn
@@ -3912,10 +3916,10 @@ export function WorkplaneViewport({
           if (circle) {
             const placed = pointOnCircle(circle, new THREE.Vector3(modelCandidate.x, modelCandidate.y, modelCandidate.z));
             const attachment = tapeAttachmentFromWorld(state, modelCandidate.edge.shapeId, placed, "edge");
-            if (attachment) return { ...onEdge, x: placed.x, y: placed.y, z: placed.z, attachment };
+            if (attachment) return offered({ ...onEdge, x: placed.x, y: placed.y, z: placed.z, attachment });
           }
         }
-        return onEdge;
+        return offered(onEdge);
       }
 
       const raw = toRawPlanePoint(clientX, clientY, state.dragPlane);
@@ -3936,7 +3940,7 @@ export function WorkplaneViewport({
         };
       }
       const existing = model.points.find((point) => Math.hypot(point.x - snapped.x, point.y, point.z - snapped.z) < 0.001 && !point.attachment);
-      return { ...snapped, pointId: existing?.id };
+      return offered({ ...snapped, pointId: existing?.id });
     },
     [toRawPlanePoint],
   );
@@ -4047,6 +4051,8 @@ export function WorkplaneViewport({
       const hover = candidate;
       if ((!current.hover && !hover) || (current.hover && hover
         && current.hover.edge?.key === hover.edge?.key
+        && current.hover.centre === hover.centre
+        && sameTapeCentres(current.hover.centres, hover.centres)
         && Math.hypot(current.hover.x - hover.x, current.hover.y - hover.y, current.hover.z - hover.z) < 0.0001)) {
         return;
       }

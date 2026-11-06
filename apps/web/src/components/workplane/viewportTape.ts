@@ -8,9 +8,10 @@ import * as THREE from "three";
 import type { MeasurementAccuracy } from "@/types/layerling";
 import { pointerReach } from "@/lib/pointerReach";
 import { outwardFaceNormal } from "@/lib/layFlat";
-import { axisLockedPoint, circleOfEdgePoints, closedRoundEdge, cornerOnRoundEdge, perpendicularFootOnPlane, perpendicularFootOnSegment, perpendicularPointsOnCircle, pointAcrossCircle } from "@/lib/tapeCircle";
+import { axisLockedPoint, circleOfEdgePoints, closedRoundEdge, cornerOnRoundEdge, perpendicularFootOnPlane, perpendicularFootOnSegment, perpendicularPointsOnCircle, pointAcrossCircle, roundEdgeMeasure } from "@/lib/tapeCircle";
+import { planarFaces } from "@/lib/faceCentre";
 import { aimPickRay, RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
-import { type ThreeState, type TapeAttachment, type TapeEdgeAttachment, type TapeCandidate, projectToScreen, tapeShapeDimensions, formatMeasure, findShapeObject, worldPointHidden } from "@/components/workplane/ViewportOverlays";
+import { type ThreeState, type TapeAttachment, type TapeEdgeAttachment, type TapeCandidate, type TapeCentre, type TapeCentreKind, projectToScreen, tapeShapeDimensions, formatMeasure, findShapeObject, worldPointHidden } from "@/components/workplane/ViewportOverlays";
 import { clamp } from "./viewportShapeObjects";
 
 export function tapeAttachmentFromWorld(state: ThreeState, shapeId: string, world: THREE.Vector3, kind: TapeAttachment["kind"] = "surface"): TapeAttachment | null {
@@ -225,6 +226,214 @@ export function snapSurfacePerpendicularPoint(
   return null;
 }
 
+/** How close, in pixels, the pointer has to come to the centre of a face or of a round edge for it to catch (Discussion #610). */
+export const TAPE_CENTRE_SNAP_PIXELS = 14;
+/**
+ * A mesh with more triangles than this has its faces' centres left out. Its faces are found once, the first time the
+ * pointer is over it, as the picking tree of a large mesh is built on the first ray: about a third of a second at a
+ * million triangles, and more the bigger the mesh.
+ */
+const TAPE_FACE_MAX_TRIANGLES = 1_000_000;
+
+const tapeFaceCache = new WeakMap<THREE.BufferGeometry, {
+  position: THREE.BufferAttribute;
+  positionVersion: number;
+  index: THREE.BufferAttribute | null;
+  indexVersion: number;
+  faces: ReturnType<typeof planarFaces>;
+}>();
+
+/**
+ * The flat faces of a body's mesh, found the first time the tape measure points at it and kept while the mesh stays
+ * as it is, so the pointer can go from face to face on a large mesh without it being searched again (Discussion #610).
+ * Read in the mesh's own triangle order, the one a ray's hit names: a picking tree puts an index in front of an
+ * imported mesh, or reorders the one there, the first time a ray is cast against it.
+ */
+export function tapeMeshFaces(mesh: THREE.Mesh) {
+  const geometry = mesh.geometry as THREE.BufferGeometry;
+  const position = geometry.getAttribute("position") as THREE.BufferAttribute | undefined;
+  if (!position || position.itemSize !== 3 || (position as unknown as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute) return null;
+  const index = geometry.index;
+  const cached = tapeFaceCache.get(geometry);
+  if (cached && cached.position === position && cached.positionVersion === position.version && cached.index === index && cached.indexVersion === (index?.version ?? -1)) {
+    return cached.faces;
+  }
+  const faces = planarFaces(position.array, index?.array ?? null, TAPE_FACE_MAX_TRIANGLES);
+  tapeFaceCache.set(geometry, { position, positionVersion: position.version, index, indexVersion: index?.version ?? -1, faces });
+  return faces;
+}
+
+/** A closed round edge in the room: the rim of a hole, of a cylinder, of a boss. `open` is worked out when it is first offered. */
+export type TapeRim = { center: THREE.Vector3; radius: number; normal: THREE.Vector3; open?: boolean };
+
+const tapeRimCache = new WeakMap<THREE.Vector3[][], Array<TapeRim | null>>();
+
+/** The closed round edges among a line's edge paths, kept with the paths, which stay while the line and its matrix do. */
+function tapePathRims(paths: THREE.Vector3[][]) {
+  const cached = tapeRimCache.get(paths);
+  if (cached) return cached;
+  const rims = paths.map((points) => {
+    if (points.length < 4 || !roundEdgeMeasure(points)?.full) return null;
+    const circle = circleOfEdgePoints(points);
+    return circle ? { center: circle.center, radius: circle.radius, normal: circle.normal } : null;
+  });
+  tapeRimCache.set(paths, rims);
+  return rims;
+}
+
+/**
+ * Whether the middle of a round edge is open, as in a hole, or filled, as on the top of a cylinder or at the foot of
+ * a boss standing on a plate: a face across the middle fills it, and so does the body itself when the middle lies
+ * inside it, behind an odd number of its faces along the axis. The faces are counted once where the ray meets
+ * several at one spot (the middle of a fan of triangles).
+ */
+export function tapeRimOpen(body: THREE.Object3D, rim: TapeRim) {
+  const raycaster = new THREE.Raycaster();
+  raycaster.layers.set(RENDER_LAYER_SHAPES);
+  const distances = (origin: THREE.Vector3, direction: THREE.Vector3) => {
+    raycaster.set(origin, direction);
+    const found = raycaster.intersectObject(body, true).filter((entry) => entry.object instanceof THREE.Mesh).map((entry) => entry.distance).sort((a, b) => a - b);
+    return found.filter((distance, index) => index === 0 || distance - found[index - 1] > 1e-4);
+  };
+  const along = distances(rim.center.clone().addScaledVector(rim.normal, -0.05), rim.normal);
+  const back = distances(rim.center.clone().addScaledVector(rim.normal, 0.05), rim.normal.clone().negate());
+  if ((along[0] ?? Infinity) <= 0.1 || (back[0] ?? Infinity) <= 0.1) return false;
+  return along.length % 2 === 0;
+}
+
+export type TapeCentreSnap = { candidate: TapeCandidate; distance: number };
+
+/**
+ * The centres the tape measure offers near the pointer (Discussion #610): the middle of the flat face under it - the
+ * centre of its area, which on a round face such as a cylinder's top is the centre of the circle - and the centre of
+ * a closed round edge the pointer is inside or near, the rim of a hole, of a cylinder or of a boss, as tapeCircle
+ * finds it. A facet of a round surface is no face with a middle, and a centre a body hides is not offered. `snap` is
+ * the nearest within reach: a point fixed to its body like a corner, so a length typed for a measurement from one
+ * centre to another moves the body centre to centre. A hole cut into a group counts as the group's, whose edges are
+ * the ones drawn.
+ */
+export function tapeCentresNear(state: ThreeState, shapeIds: string[], clientX: number, clientY: number): { offers: TapeCentre[]; snap: TapeCentreSnap | null } {
+  const rect = state.renderer.domElement.getBoundingClientRect();
+  const pointerX = clientX - rect.left;
+  const pointerY = clientY - rect.top;
+  const reach = pointerReach(TAPE_CENTRE_SNAP_PIXELS);
+  const edgeReach = pointerReach(12);
+  const targets = shapeIds.flatMap((id) => {
+    const object = findShapeObject(state, id);
+    return object ? [object] : [];
+  });
+  if (targets.length === 0) return { offers: [], snap: null };
+  state.camera.updateMatrixWorld();
+  targets.forEach((target) => target.updateWorldMatrix(true, true));
+  const projected = new THREE.Vector3();
+  const screenOf = (point: THREE.Vector3) => {
+    projected.copy(point).project(state.camera);
+    if (!Number.isFinite(projected.x) || !Number.isFinite(projected.y) || projected.z < -1 || projected.z > 1) return null;
+    return { x: ((projected.x + 1) / 2) * rect.width, y: ((1 - projected.y) / 2) * rect.height };
+  };
+  const notClipped = (point: THREE.Vector3) => !state.sectionPlane || state.sectionPlane.distanceToPoint(point) >= -0.001;
+  const cameraPosition = state.camera.getWorldPosition(new THREE.Vector3());
+  type Found = { point: THREE.Vector3; kind: TapeCentreKind; shapeId: string; normal: THREE.Vector3 | null; distance: number; depth: number };
+
+  // The rims around or near the pointer, the nearest first; of two the same distance away, the one in front.
+  const cameraRight = new THREE.Vector3().setFromMatrixColumn(state.camera.matrixWorld, 0).normalize();
+  const rims: Array<{ rim: TapeRim; target: THREE.Object3D; distance: number; depth: number }> = [];
+  targets.forEach((target) => {
+    target.traverse((child) => {
+      if (!(child instanceof THREE.Line) || !child.visible) return;
+      const position = child.geometry.getAttribute("position");
+      if (!position || position.count < 4) return;
+      tapePathRims(tapeWorldPaths(child, position)).forEach((rim) => {
+        if (!rim || !notClipped(rim.center)) return;
+        const centre = screenOf(rim.center);
+        const side = screenOf(rim.center.clone().addScaledVector(cameraRight, rim.radius));
+        if (!centre || !side) return;
+        const distance = Math.hypot(pointerX - centre.x, pointerY - centre.y);
+        if (distance > Math.hypot(side.x - centre.x, side.y - centre.y) + edgeReach) return;
+        rims.push({ rim, target, distance, depth: rim.center.distanceTo(cameraPosition) });
+      });
+    });
+  });
+  rims.sort((a, b) => Math.round(a.distance) - Math.round(b.distance) || a.depth - b.depth);
+  let rimFound: Found | null = null;
+  for (const entry of rims.slice(0, 4)) {
+    if (worldPointHidden(entry.rim.center, state)) continue;
+    entry.rim.open ??= tapeRimOpen(entry.target, entry.rim);
+    rimFound = {
+      point: entry.rim.center,
+      kind: entry.rim.open ? "hole" : "circle",
+      shapeId: entry.target.userData.shapeId as string,
+      normal: entry.rim.normal,
+      distance: entry.distance,
+      depth: entry.depth,
+    };
+    break;
+  }
+
+  // The flat face under the pointer.
+  let faceFound: Found | null = null;
+  aimPickRay(state, clientX, clientY, RENDER_LAYER_SHAPES);
+  const hit = state.raycaster.intersectObjects(targets, true).find((entry) => entry.object instanceof THREE.Mesh && notClipped(entry.point));
+  if (hit && hit.faceIndex !== undefined && hit.faceIndex !== null) {
+    const mesh = hit.object as THREE.Mesh;
+    const face = tapeMeshFaces(mesh)?.faceOf(hit.faceIndex);
+    if (face && !face.curved) {
+      mesh.updateWorldMatrix(true, false);
+      const point = new THREE.Vector3(...face.centre).applyMatrix4(mesh.matrixWorld);
+      const screen = notClipped(point) ? screenOf(point) : null;
+      const normal = surfaceHitWorldNormal(state, hit);
+      if (screen && !worldPointHidden(point, state)) {
+        faceFound = {
+          point,
+          kind: "face",
+          shapeId: mesh.userData.shapeId as string,
+          normal,
+          distance: Math.hypot(pointerX - screen.x, pointerY - screen.y),
+          depth: point.distanceTo(cameraPosition),
+        };
+      }
+    }
+  }
+
+  // The top of a cylinder has its middle twice, as a face and as a rim: shown once, a hole's first.
+  const found: Found[] = [];
+  if (faceFound && rimFound && faceFound.point.distanceTo(rimFound.point) <= 1e-3) {
+    found.push(rimFound.kind === "hole" ? rimFound : { ...faceFound, distance: Math.min(faceFound.distance, rimFound.distance) });
+  } else {
+    if (faceFound) found.push(faceFound);
+    if (rimFound) found.push(rimFound);
+  }
+  const offers = found.map((entry) => ({ x: entry.point.x, y: entry.point.y, z: entry.point.z, kind: entry.kind }));
+  const nearest = found
+    .filter((entry) => entry.distance <= reach)
+    .sort((a, b) => Math.round(a.distance) - Math.round(b.distance) || a.depth - b.depth)[0];
+  const attachment = nearest ? tapeAttachmentFromWorld(state, nearest.shapeId, nearest.point) : null;
+  if (!nearest || !attachment) return { offers, snap: null };
+  const normal = nearest.normal;
+  return {
+    offers,
+    snap: {
+      distance: nearest.distance,
+      candidate: {
+        x: nearest.point.x,
+        y: nearest.point.y,
+        z: nearest.point.z,
+        attachment,
+        centre: nearest.kind,
+        ...(normal ? { surfaceNormal: [normal.x, normal.y, normal.z] as [number, number, number] } : {}),
+      },
+    },
+  };
+}
+
+/** Whether two lists of centres on offer are the same, so a move of the pointer that changes nothing redraws nothing. */
+export function sameTapeCentres(a: readonly TapeCentre[] | undefined, b: readonly TapeCentre[] | undefined) {
+  const first = a ?? [];
+  const second = b ?? [];
+  return first.length === second.length && first.every((centre, index) => centre.kind === second[index].kind
+    && Math.hypot(centre.x - second[index].x, centre.y - second[index].y, centre.z - second[index].z) < 0.0001);
+}
+
 export function pickModelTapeCandidate(
   state: ThreeState,
   shapeIds: string[],
@@ -237,6 +446,8 @@ export function pickModelTapeCandidate(
   skipHidden = false,
   /** Measuring whole edges: a round rim wins over a corner that only sits on it (the end of a cylinder's side line). */
   preferRoundRim = false,
+  /** The centre of a face or a round edge within reach (Discussion #610), from tapeCentresNear. */
+  centre: TapeCentreSnap | null = null,
 ): TapeCandidate | null {
   const rect = state.renderer.domElement.getBoundingClientRect();
   const pointerX = clientX - rect.left;
@@ -254,7 +465,7 @@ export function pickModelTapeCandidate(
   state.camera.updateMatrixWorld();
   targets.forEach((target) => target.updateWorldMatrix(true, true));
   const vertexCandidates: Array<{ distance: number; candidate: TapeCandidate }> = [];
-  const edgeCandidates: Array<{ distance: number; perpendicular?: boolean; candidate: TapeCandidate; round?: ReturnType<typeof closedRoundEdge> }> = [];
+  const edgeCandidates: Array<{ distance: number; perpendicular?: boolean; pointerDistance?: number; candidate: TapeCandidate; round?: ReturnType<typeof closedRoundEdge> }> = [];
   const projected = new THREE.Vector3();
 
   targets.forEach((target) => {
@@ -375,6 +586,7 @@ export function pickModelTapeCandidate(
             edgeCandidates.push({
               distance: bestPerp.edgeDistance,
               perpendicular: true,
+              pointerDistance: bestPerp.screenDistance,
               candidate: {
                 x: bestPerp.world.x,
                 y: bestPerp.world.y,
@@ -436,6 +648,11 @@ export function pickModelTapeCandidate(
   const inView = (entry: { candidate: TapeCandidate }) => !skipHidden || !worldPointHidden(new THREE.Vector3(entry.candidate.x, entry.candidate.y, entry.candidate.z), state);
   if (shiftKey && edgeCandidates[0]?.perpendicular && inView(edgeCandidates[0])) return edgeCandidates[0].candidate;
   const vertex = vertexCandidates.find(inView);
+  // A centre wins over a corner or an edge farther from the pointer: in a small hole the rim lies close round its middle.
+  if (centre) {
+    const edgeDistance = Math.min(Infinity, ...edgeCandidates.filter(inView).map((entry) => entry.pointerDistance ?? entry.distance));
+    if (centre.distance <= (vertex?.distance ?? Infinity) && centre.distance <= edgeDistance) return centre.candidate;
+  }
   if (vertex) {
     // A corner that only sits on a round rim within reach (the end of a cylinder's side line) gives way to the rim.
     const corner = new THREE.Vector3(vertex.candidate.x, vertex.candidate.y, vertex.candidate.z);
