@@ -1,5 +1,150 @@
 [
   {
+    "version": "1.148.0",
+    "items": [
+      {
+        "title": {
+          "de": "Körper bemalen für den Mehrfarbdruck",
+          "en": "Paint a body for printing in several colours"
+        },
+        "body": {
+          "de": "„Bemalen“ unter „Ändern“, gleich neben der Oberfläche, färbt Teile eines Körpers direkt im Entwurf: „Füllen“ füllt eine Fläche bis an ihre scharfen Kanten, „Kreis“ setzt einen runden Fleck, „Lasso“ bemalt, was du in einem umfahrenen Bereich siehst. Der Radierer nimmt Farbe wieder ab. 3MF und OBJ bringen die Farben in Bambu Studio, OrcaSlicer und PrusaSlicer, ohne dass du im Slicer neu malen musst.",
+          "en": "\"Paint\" under Modify, next to Surface texture, colours parts of a body right in the design: \"Fill\" fills a face up to its sharp edges, \"Circle\" lays a round patch, \"Lasso\" paints what you see inside a shape you draw. The eraser takes paint off again. 3MF and OBJ bring the colours to Bambu Studio, OrcaSlicer and PrusaSlicer, with no painting again in the slicer."
+        }
+      },
+      {
+        "title": {
+          "de": "Stützrippe für schräg gedruckte Teile",
+          "en": "A support rib for parts printed tilted"
+        },
+        "body": {
+          "de": "Ein Teil schräg auf einer Kante drucken, ohne die Stützen des Slicers: „Stützrippe“ unter „Ändern“, die untere Fläche anklicken, und eine dünne Rippe steht mit etwas Abstand darunter auf einem ovalen Fuß. Winzige Brücken von genau einer Schicht halten das Teil und lassen sich danach abbrechen. Düse und Schichten stellst du wie im Slicer ein.",
+          "en": "Print a part tilted on one edge without the slicer's supports: \"Support rib\" under Modify, click the lower face, and a thin rib stands under it a gap away, on an oval foot. Tiny bridges exactly one layer high hold the part and break off afterwards. Set the nozzle and the layers as in your slicer."
+        }
+      },
+      {
+        "title": {
+          "de": "Schraubdeckel für runde Dosen",
+          "en": "Screw lids for round boxes"
+        },
+        "body": {
+          "de": "Das Deckel-Werkzeug hat die neue Art „Aufgeschraubt“: Der Körper bekommt oben außen ein Gewinde, der Deckel dasselbe innen im Rand, wie bei einem Schraubglas. Die Flanken stehen auf 45°, so druckt beides ohne Stützen. Gewindesteigung und Umdrehungen stellst du ein, das Spiel kommt von deinem Drucker. Für Zylinder, Rohre und runde Töpfe.",
+          "en": "The Lid tool has a new kind, \"Screw on\": the body gets a thread on the outside of its top and the lid the same one inside its rim, as on a jar. The flanks are at 45°, so both print without supports. Set the thread pitch and the turns; the fit comes from your printer's play. For cylinders, tubes and round pots."
+        }
+      },
+      {
+        "title": {
+          "de": "Endstopfen für das bündige Scharnier",
+          "en": "End plugs for the flush hinge"
+        },
+        "body": {
+          "de": "„Endstopfen“ beim bündigen Scharnier verschließt beide Enden des Stiftlochs bündig mit der Kiste, auch an runden Ecken: Der Stift bleibt verborgen und kann nicht herausrutschen. Erst den Stift einschieben, dann die beiden quadratischen Stopfen eindrücken.",
+          "en": "\"End plugs\" on a flush hinge close both ends of the pin's hole flush with the box, also on rounded corners: the pin stays hidden and cannot slide out. Push the pin in first, then press in the two square plugs."
+        }
+      },
+      {
+        "title": {
+          "de": "Einstellungen in eine Datei und zurück",
+          "en": "Settings to a file and back"
+        },
+        "body": {
+          "de": "Im Einstellungsfenster speichert „Einstellungen exportieren“ Farben, Raster, Kamera, Formvorgaben, Werkzeugleiste und das Spiel jedes Druckers in eine Datei. „Einstellungen importieren“ holt sie in einem anderen Browser oder auf einem anderen Rechner zurück.",
+          "en": "In the settings window, \"Export settings\" saves the colours, grid, camera, shape defaults, toolbar and each printer's play to a file. \"Import settings\" brings them back in another browser or on another computer."
+        }
+      },
+      {
+        "title": {
+          "de": "Eigene Tasten für jeden Befehl",
+          "en": "Your own keys for any command"
+        },
+        "body": {
+          "de": "Unter „Tastenkürzel“ legst du jeden Befehl der Befehlssuche auf eine eigene Taste: „Auf der Arbeitsebene zentrieren“ etwa auf Umschalt+C, die Formenauswahl auf G, deinen liebsten Zylinder auf eine weitere. Ist eine Taste schon belegt, sagt layerling, wofür.",
+          "en": "Under Keyboard shortcuts, put any command of the command search on a key of your own: Center on workplane on Shift+C, say, the shapes panel on G, your favourite cylinder on another. If a key is taken, layerling tells you what for."
+        }
+      },
+      {
+        "title": {
+          "de": "Ein Spiel für jeden Drucker",
+          "en": "A play for each printer"
+        },
+        "body": {
+          "de": "Mehrere Drucker, jeder anders eingestellt: In den Einstellungen unter „Drucker“ den Drucker wählen und darunter sein Spiel eintragen. Neue Deckel, Schwalbenschwänze, Muttern und die Verbinder beim Teilen starten dann vom Spiel des Druckers, auf den der Entwurf eingestellt ist.",
+          "en": "Several printers, each tuned differently: choose the printer under Printer in the settings and enter its play below it. New lids, dovetails, nuts and Split's connectors then start from the play of the printer the design is set to."
+        }
+      },
+      {
+        "title": {
+          "de": "Neue Mikrocontroller-Boards: Pico, MEGA, ESP32",
+          "en": "New microcontroller boards: Pico, MEGA, ESP32"
+        },
+        "body": {
+          "de": "Die Form „SBC-Board“ kennt jetzt Raspberry Pi Pico, Pico W, Pico 2 und Pico 2 W, den Arduino MEGA 2560, ESP32-DevKitC V4 und ESP32 DevKit V1 sowie die Kamera-Boards ESP32-CAM und ESP32-S3-CAM. Bei den Kameras reicht die Linse auf Wunsch durch den Deckel.",
+          "en": "The SBC board shape now knows the Raspberry Pi Pico, Pico W, Pico 2 and Pico 2 W, the Arduino MEGA 2560, the ESP32-DevKitC V4 and ESP32 DevKit V1, and the camera boards ESP32-CAM and ESP32-S3-CAM, whose lens can reach up through the lid."
+        }
+      },
+      {
+        "title": {
+          "de": "Fachwerk: Holzmaserung von fein bis kräftig",
+          "en": "Half-timbering: wood grain from fine to strong"
+        },
+        "body": {
+          "de": "Die Holzmaserung auf den Balken ist jetzt ein Regler statt an oder aus: von 0 % (keine) über fein, wie gehobeltes Holz für kleine Maßstäbe, bis 100 %, grob wie ein rohes Brett. Bisherige Entwürfe behalten ihre Maserung.",
+          "en": "The wood grain on the beams is now a slider instead of on or off: from 0 % (none) through fine, like planed wood for small scales, to 100 %, coarse like a rough plank. Your designs keep the grain they have."
+        }
+      },
+      {
+        "title": {
+          "de": "Saubere Ränder bei Oberflächenmustern",
+          "en": "Clean rims on surface textures"
+        },
+        "body": {
+          "de": "Mit „Einblenden über“ auf 0 enden eingedrückte Muster am Rand jetzt in einer sauberen, steilen Kante statt in Fächern und Splittern. Fachwerk auf einem Quader hat ganze Ecken ohne Gruben.",
+          "en": "With \"Fade in over\" at 0, patterns pressed in now end at the rim in a clean steep wall instead of fans and splinters. Half-timbering on a box has whole corners, without pits."
+        }
+      },
+      {
+        "title": {
+          "de": "Mehrere Körper gleichmäßig skalieren",
+          "en": "Scale several bodies evenly"
+        },
+        "body": {
+          "de": "Skalierst du mehrere Körper zusammen bei eingeschaltetem Raster, wächst jetzt jeder um denselben Faktor. Vorher rundete jeder Körper seine Größe einzeln aufs Raster, sodass die Ebenen importierter Zeichnungen verrutschten und kleine Körper wuchsen.",
+          "en": "Scaling several bodies together with snapping on now grows each by the same factor. Before, each body rounded its size to the grid on its own, so the layers of imported drawings slipped and small bodies grew."
+        }
+      },
+      {
+        "title": {
+          "de": "Verdrehte Bündel richtig gezeichnet",
+          "en": "Twisted bundles drawn right"
+        },
+        "body": {
+          "de": "Ein verdrehtes Bündel, etwa vier Tischbeine, windet sich in der Ansicht jetzt so, wie es exportiert und gedruckt wird. Vorher zeigte es gerade Stäbe, und beim Gruppieren mit Strg+G wurden die Teile daneben größer.",
+          "en": "A twisted bundle, four table legs say, now winds round in the view as it is exported and printed. Before, it showed straight bars, and grouping it with Ctrl+G made the parts beside it grow."
+        }
+      },
+      {
+        "title": {
+          "de": "Symbolschild behält seine Farben im 3MF",
+          "en": "Icon tags keep their colours in 3MF"
+        },
+        "body": {
+          "de": "Ein Symbolschild in einer mehrfarbigen Gruppe, etwa mit einem QR-Code darunter, kommt in 3MF und OBJ jetzt mit den Farben seiner Schichten heraus, so wie die Ansicht es zeigt.",
+          "en": "An Icon tag in a Multicolor group, with a QR code under it say, now reaches 3MF and OBJ with its layers' colours, as the view shows it."
+        }
+      },
+      {
+        "title": {
+          "de": "Formen-Fenster bleibt erreichbar",
+          "en": "The Shapes panel stays within reach"
+        },
+        "body": {
+          "de": "Das Formen-Fenster lässt sich nicht mehr unter die Werkzeugleiste schieben, wo seine Titelleiste nicht mehr zu greifen war. Ein Fenster, das dort hängt, kommt beim Öffnen von selbst wieder hervor.",
+          "en": "The Shapes panel can no longer be dragged under the toolbar, where its title bar could not be grabbed. A panel stuck there comes back down by itself when it opens."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.147.0",
     "items": [
       {
