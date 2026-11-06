@@ -1290,7 +1290,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "welcome.videosHint": "Lavet af andre, ikke af dette projekt. Linkene åbner YouTube i en ny fane; intet indlæses derfra før du klikker.",
   "welcome.help": "I editoren rummer Hjælpe-gruppen en kort vejledning og listen over alle tastaturgenveje. I sidefoden gemmer \"Fejlrapport\" dit design med alt det der skal bruges til en rapport i forumet eller på GitHub.",
   "welcome.guideLink": "Læs hele brugervejledningen, med billeder",
-  "welcome.guideUrl": "/guide/index.html",
+  "welcome.guideUrl": "/vejledning/index.html",
   "guide.helpLink": "Læs om dette i brugervejledningen",
   "guide.fullGuide": "Åbn hele brugervejledningen, med billeder",
   "guide.videos": "Videoer af andre:",

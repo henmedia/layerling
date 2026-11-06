@@ -113,6 +113,7 @@ En revolvet form er en eksakt form, ligesom en ekstruderet: den tager fas og run
 Du tegner to ting på det samme ark:
 
 - **Tværsnittet** som et lukket omrids, som sædvanlig. Tegn det som du ville se det, når du ser langs stien fra dens start: på tværs af stien er skitsens venstre og højre, op er op på den færdige form. Et hult tværsnit, en kanal eller et rør, er et omrids med et andet indeni. Som udgangspunkt ligger tværsnittet centreret på stien. Menuen ved siden af mærket øverst lader dig lægge dets venstre eller højre kant på stien i stedet ({{ui:sketch.sweepAnchorLeft}}, {{ui:sketch.sweepAnchorRight}}, set når man ser langs stien), så et skinne kan sidde på den ene side af linjen eller følge kanten af en del. Formen står på skitseplanet med tværsnittets laveste punkt.
+
 - **Stien** som en {{ui:sketch.construction}}: slå den til og tegn linjer eller kurver, én kæde, åben eller lukket (en lukket kæde giver en ring). Stien ligger fladt i skitseplanet.
 
 Tegn tværsnittet tæt på den ende af stien hvor den skal begynde; stien starter ved den ende der ligger tættest på. Klik så på {{ui:sketch.finishSweep}}. Et hjørne af lige stykker bliver en skråsting, en kurve bliver jævn, og tværsnittet står lodret hele vejen. Formen er eksakt, ligesom en ekstruderet: rund, fas og STEP-eksporten virker på den. Mangler et lukket omrids eller en sti, eller er der flere adskilte stier, siger layerling det. Med {{ui:inspector.editSketch}} kan du vende tilbage til skitsen og ændre tværsnittet eller stien.
