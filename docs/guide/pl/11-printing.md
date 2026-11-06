@@ -48,6 +48,18 @@ W menu obok oka ({{ui:editor.group.visibility}}) pozycja **Pokaż nawisy** włą
 
 Z jak stromymi nawisami radzi sobie Twoja drukarka, ustawiasz w ustawieniach w sekcji {{ui:workspace.appearance}}: od 30° (ostrożnie) do 70° (dla drukarek z dobrym chłodzeniem wydruku). Ściana opierająca się na innej bryle też jest oznaczana, bo layerling patrzy tylko na samą ścianę.
 
+## Żebra podporowe dla pochylonej części
+
+Część drukowana pochylona na krawędzi, na przykład pod kątem 45°, często nie potrzebuje podpór: jej ściany są wystarczająco strome. Stoi jednak na wąskiej krawędzi i może się przewrócić. {{ui:supportRib.title}} ją trzyma: pod jej dolną ścianą w małej odległości stoi cienkie żebro na owalnej stopie, a maleńkie mostki przytrzymują część. Najpierw obróć część na krawędź i postaw ją na stole.
+
+1. Zaznacz część i kliknij {{ui:supportRib.title}} w grupie {{ui:editor.group.modify}} na wstążce, kliknij część prawym przyciskiem albo znajdź narzędzie przez [[Ctrl]]+[[K]].
+2. Kliknij dolną ścianę tam, gdzie ma stanąć żebro. Ściana musi być skierowana w dół, nachylona od 15° do 75° i sięgać do stołu; żebro biegnie od miejsca kliknięcia prosto w dół ściany.
+3. Ustaw {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} i {{ui:supportRib.firstLayer}} tak jak w slicerze. Żebro ma grubość dwóch ścieżek dyszy, szczelina do części pół ścieżki; każdy mostek ma szerokość jednej ścieżki i wysokość dokładnie jednej warstwy i leży na warstwie wydruku, więc slicer drukuje go jako jedną cienką ścieżkę, która czysto się odłamuje. {{ui:supportRib.height}} określa, jak wysoko żebro sięga po ścianie (na początku do połowy), a {{ui:supportRib.bridgeSpacing}}, jak daleko od siebie są mostki, w całych warstwach.
+4. W {{ui:supportRib.more}} grubość, szczelinę, szerokość mostków i grubość stopy można ustawić ręcznie (do tego czasu wynikają z dyszy i warstw), a także szerokość stopy i zaokrąglenia przy stopie i u góry.
+5. {{ui:supportRib.apply}} dodaje żebro. Z {{ui:supportRib.bundle}} (na początku włączone) żebro i część są zgrupowane: poruszają się razem i trafiają do slicera jako dwie bryły obok siebie, w wydruku połączone mostkami.
+
+Żebro jest bryłą siatkową: żeby je zmienić, usuń je i utwórz ponownie. Każde kliknięcie tworzy jedno żebro; po kolejne kliknij {{ui:supportRib.repick}} albo powtórz je przez {{ui:editor.tool.array}}. Żebro nie może nigdzie wchodzić w część, a część musi stać na stole - inaczej okno powie dlaczego. Ustawienia zostają w tej przeglądarce na następne żebro.
+
 ## Grubość ścianek, luz i fazki
 
 - Ścianki powinny mieć szerokość co najmniej dwóch ścieżek, czyli 0,8 mm przy dyszy 0,4 mm. Solidne części potrzebują od 1,2 do 2 mm.
@@ -60,7 +72,7 @@ Każda drukarka drukuje otwory trochę mniejsze, a sworznie trochę grubsze, ni�
 
 Wydrukuj go tak, jak leży, a potem wsuwaj sworzeń fazką do przodu w otwory, zaczynając od najciaśniejszego. **Najciaśniejszy otwór, w którym sworzeń jeszcze się obraca,** wyznacza luz twojej drukarki. Wpisz jego liczbę w polu {{ui:workspace.printerPlay}} albo kliknij ją wśród wartości pod polem. Luz podaje się na stronę, w milimetrach, a przeglądarka pamięta go dla wszystkich projektów; puste pole oznacza, że nie zmierzono.
 
-Od tej pory nowe użycia zaczynają od luzu zamiast od wbudowanej wartości: {{ui:lid.gap}} i {{ui:lid.hingePinPlay}} w narzędziu {{ui:editor.tool.lid}}, luz nowego kształtu {{ui:shape.dovetail}} i {{ui:shape.snapFit}}, {{ui:prop.clearance}} nowej nakrętki lub otworu gwintowanego – podwójny luz, bo to miejsce na całej średnicy – oraz {{ui:clearance.threshold}} w {{ui:editor.tool.clearance}}. Tak samo {{ui:split.connectorClearance}} kołków i czopów w {{ui:editor.tool.split}}. Dopóki takie pole ma tę wartość, napis „{{ui:printerPlay.fromFitTest}}” obok mówi, skąd pochodzi liczba. Zawias drukowany w jednym kawałku i przeguby narzędzia {{ui:editor.tool.flexi}} zachowują swoje 0,4 mm: drukowane w jednym kawałku, ich szczeliny muszą pozostać otwarte także między warstwami, a tego sworzeń wydrukowany osobno nie mierzy. Miejsce na wciśnięcie magnesu lub klucza Gridfinity oraz miejsce na kupione gniazdo lub płytkę także zachowują własne wartości. Bryły, które już są w projekcie, nigdy się nie zmieniają, podobnie jak projekt, który otwierasz.
+Od tej pory nowe użycia zaczynają od luzu zamiast od wbudowanej wartości: {{ui:lid.gap}} i {{ui:lid.hingePinPlay}} w narzędziu {{ui:editor.tool.lid}}, luz nowego kształtu {{ui:shape.dovetail}} i {{ui:shape.snapFit}}, {{ui:prop.clearance}} nowej nakrętki lub otworu gwintowanego (podwójny luz, bo to miejsce na całej średnicy) oraz {{ui:clearance.threshold}} w {{ui:editor.tool.clearance}}. Tak samo {{ui:split.connectorClearance}} kołków i czopów w {{ui:editor.tool.split}}. Dopóki takie pole ma tę wartość, napis „{{ui:printerPlay.fromFitTest}}” obok mówi, skąd pochodzi liczba. Zawias drukowany w jednym kawałku i przeguby narzędzia {{ui:editor.tool.flexi}} zachowują swoje 0,4 mm: drukowane w jednym kawałku, ich szczeliny muszą pozostać otwarte także między warstwami, a tego sworzeń wydrukowany osobno nie mierzy. Miejsce na wciśnięcie magnesu lub klucza Gridfinity oraz miejsce na kupione gniazdo lub płytkę także zachowują własne wartości. Bryły, które już są w projekcie, nigdy się nie zmieniają, podobnie jak projekt, który otwierasz.
 
 ## Sprawdzanie wydruku
 

@@ -48,6 +48,18 @@ En el menú que hay junto al ojo ({{ui:editor.group.visibility}}), **Mostrar vol
 
 La inclinación que aguanta tu impresora se fija en los ajustes, en {{ui:workspace.appearance}}: de 30° (prudente) a 70° (para impresoras con buena refrigeración de capa). Una cara que se apoya sobre otro cuerpo se marca igualmente: layerling solo mira la propia cara.
 
+## Nervios de soporte para una pieza inclinada
+
+Una pieza impresa inclinada sobre una arista, a 45° por ejemplo, a menudo no necesita soportes: sus caras son lo bastante empinadas. Pero se apoya en una arista fina y puede volcarse. El {{ui:supportRib.title}} la sujeta: un nervio fino queda bajo su cara inferior a poca distancia, sobre un pie ovalado, y pequeños puentes la sostienen. Gira primero la pieza sobre su arista y deja que se apoye en la cama.
+
+1. Selecciona la pieza y haz clic en {{ui:supportRib.title}} en el grupo {{ui:editor.group.modify}} de la cinta, haz clic derecho en la pieza o búscalo con [[Ctrl]]+[[K]].
+2. Haz clic en la cara inferior donde debe ir el nervio. La cara debe mirar hacia abajo, estar inclinada entre 15° y 75° y llegar hasta la cama; el nervio baja recto por la cara desde tu clic.
+3. Ajusta {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} y {{ui:supportRib.firstLayer}} como en tu laminador. El nervio tiene dos líneas de boquilla de grosor y la separación con la pieza media línea; cada puente tiene una línea de ancho y exactamente una capa de alto y está sobre una capa de la impresión, para que el laminador lo imprima como una sola línea fina que se rompe limpiamente. {{ui:supportRib.height}} indica hasta dónde sube el nervio por la cara (hasta la mitad al principio) y {{ui:supportRib.bridgeSpacing}} la distancia entre puentes, en capas enteras.
+4. En {{ui:supportRib.more}} se ajustan a mano el grosor, la separación, el ancho de los puentes y el grosor del pie (hasta entonces siguen a la boquilla y las capas), además del ancho del pie y los redondeos en el pie y arriba.
+5. {{ui:supportRib.apply}} añade el nervio. Con {{ui:supportRib.bundle}} (activado al principio) nervio y pieza quedan agrupados: se mueven juntos y llegan al laminador como dos cuerpos uno junto al otro, unidos por los puentes en la impresión.
+
+El nervio es un cuerpo de malla: para cambiarlo, bórralo y vuelve a hacerlo. Cada clic hace un nervio; para más, haz clic en {{ui:supportRib.repick}} o repítelo con {{ui:editor.tool.array}}. El nervio no debe entrar en la pieza por ningún lado y la pieza debe estar sobre la cama; si no, la ventana dice por qué. Tus ajustes se guardan en este navegador para el siguiente nervio.
+
 ## Grosor de pared, holgura y chaflanes
 
 - Las paredes deberían tener como mínimo dos líneas de extrusión de ancho, es decir, 0,8 mm con una boquilla de 0,4 mm. Las piezas resistentes necesitan de 1,2 a 2 mm.

@@ -25,7 +25,7 @@ import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerText
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidHandleFits, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidHandleFits, lidTakesExtras, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayStart, setPrinterPlay, withPrinterPlay } from "@/lib/printerPlay";
 import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { CABLE_DEFAULTS, cableChannelShapeFields, cableEndNear, cableGrid, findCableChannel, normalizeCableOptions, type CableChannelError, type CableChannelOptions, type CableChannelResult, type CableEnd, type CableGrid, type Vec3 as CableVec3 } from "@/lib/cableChannel";
@@ -74,10 +74,12 @@ import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
 import { FaceToolPanel } from "./workplane/FaceToolPanel";
+import { SupportRibPanel } from "./workplane/SupportRibPanel";
 import { DEFAULT_FACE_TOOL, faceToolSettingsOn, normalizeFaceTool, type FaceToolSettings } from "@/lib/faceTool";
+import { buildSupportRib, normalizeSupportRib, readSupportRibSettings, supportRibFace, supportRibShape, writeSupportRibSettings, type SupportRibFace, type SupportRibPlan, type SupportRibSettings } from "@/lib/supportRib";
 import { faceToolBody } from "@/lib/faceToolBody";
 import { DEFAULT_HOLE_PATTERN, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
-import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, readPerforableFace, type PerforableFace } from "@/lib/holePatternShapes";
+import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, isRoundWallFace, readHolePatternFace, readPerforableFace, type HolePatternFace, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
 import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
 import { groupsStretchedInstead, groupsToKeepParts, keptPartsForResize, placeKeptPartsGroup } from "@/lib/groupKeepParts";
@@ -224,7 +226,7 @@ import { BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportE
 import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
-import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
+import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_TIMBER_BRACINGS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
 import { useInspectorCard } from "@/lib/inspectorCards";
@@ -2934,6 +2936,20 @@ function holePatternCustomShape(shapes: readonly WorkplaneShape[], sourceId: str
   return id ? holePatternCustomChoices(shapes, sourceId).find((shape) => shape.id === id) ?? null : null;
 }
 
+/** The shapes with the selected, unlocked ones moved by (dx, dy, dz): y is up. */
+function translateSelectedShapes(shapes: WorkplaneShape[], selected: Set<string>, dx: number, dy: number, dz: number) {
+  return shapes.map((shape) =>
+    selected.has(shape.id) && !shape.locked
+      ? {
+          ...shape,
+          x: cleanNearZero(shape.x + dx),
+          z: cleanNearZero(shape.z + dz),
+          elevation: cleanNearZero((shape.elevation ?? 0) + dy),
+        }
+      : shape,
+  );
+}
+
 export function LayerlingEditor({
   initialAssets = [],
   initialAttachments,
@@ -3217,11 +3233,11 @@ export function LayerlingEditor({
     mode: MateMode;
     gap: number;
   } | null>(null);
-  // "Hole pattern": a flat face of the selected body, then the holes that fit it (#223).
+  // "Hole pattern": a flat face or a round wall (#1393) of the selected body, then the holes that fit it (#223).
   const [holePatternTool, setHolePatternTool] = useState<{
     sourceId: string;
     step: "pick" | "ready";
-    face: PerforableFace | null;
+    face: HolePatternFace | null;
     settings: HolePatternSettings;
     busy: boolean;
   } | null>(null);
@@ -3237,6 +3253,18 @@ export function LayerlingEditor({
     busy: boolean;
   } | null>(null);
   const [faceToolPreview, setFaceToolPreview] = useState<{ shape: WorkplaneShape | null; empty: boolean } | null>(null);
+  // "Support rib" (Discussion #1385): the lower face of a tilted part, then a thin rib under it with bridges on the layers.
+  const [supportRibTool, setSupportRibTool] = useState<{
+    sourceId: string;
+    step: "pick" | "ready";
+    face: SupportRibFace | null;
+    settings: SupportRibSettings;
+    busy: boolean;
+  } | null>(null);
+  const [supportRibPreview, setSupportRibPreview] = useState<{ shape: WorkplaneShape | null; plan: SupportRibPlan | null; problem: string | null } | null>(null);
+  const supportRibPreviewRunRef = useRef(0);
+  const supportRibPickRunRef = useRef(0);
+  const supportRibPickAbortRef = useRef<AbortController | null>(null);
   const faceToolPreviewRunRef = useRef(0);
   const faceToolPickRunRef = useRef(0);
   const faceToolPickAbortRef = useRef<AbortController | null>(null);
@@ -3293,6 +3321,7 @@ export function LayerlingEditor({
       splitAbortRef.current?.abort();
       holePatternPickAbortRef.current?.abort();
       faceToolPickAbortRef.current?.abort();
+      supportRibPickAbortRef.current?.abort();
       pivotPickAbortRef.current?.abort();
     };
   }, [dismissNotice, setNotice]);
@@ -3912,7 +3941,7 @@ export function LayerlingEditor({
   const selectedShape = selectedShapes.at(-1) ?? null;
   const hasSelection = selectedShapes.length > 0;
 
-  const faceJoinSourceId = faceTool?.step === "pick" ? faceTool.sourceId : holePatternTool?.step === "pick" ? holePatternTool.sourceId : null;
+  const faceJoinSourceId = faceTool?.step === "pick" ? faceTool.sourceId : holePatternTool?.step === "pick" ? holePatternTool.sourceId : supportRibTool?.step === "pick" ? supportRibTool.sourceId : null;
   const faceJoinSource = faceJoinSourceId ? shapes.find((shape) => shape.id === faceJoinSourceId) : undefined;
   // Only a read that runs in the geometry worker is made ahead: one on the page would hold the page as the tool opens.
   const faceJoinFingerprint = useMemo(
@@ -4204,6 +4233,8 @@ export function LayerlingEditor({
         ? [...shapes, ...holePatternPreview.holes]
         : faceToolPreview?.shape
         ? [...shapes, faceToolPreview.shape]
+        : supportRibPreview?.shape
+        ? [...shapes, supportRibPreview.shape]
         : edgeModifier?.preview && cadModifierBaseShapeRef.current
         ? shapes.map((shape) => shape.id === cadModifierBaseShapeRef.current?.id ? edgeModifier.preview as WorkplaneShape : shape)
         : alignMode && alignPreview?.spread
@@ -4215,7 +4246,7 @@ export function LayerlingEditor({
         : mirrorMode && mirrorPreviewAxis
           ? mirroredShapesForSelection(shapes, selectedIds, selectedShapes, mirrorPreviewAxis).nextShapes
           : shapes,
-    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, holePatternPreview, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
+    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, holePatternPreview, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
   );
   // The preview of an intersection (#372): the operands see-through, and what they share as a body of its own on top.
   const [intersectPreviewIds, setIntersectPreviewIds] = useState<string[] | null>(null);
@@ -8528,8 +8559,8 @@ export function LayerlingEditor({
    * and with posts for the magnets, which the lip has to go round: the mesh lid stays then.
    */
   const exactLid = useCallback(async (targets: readonly WorkplaneShape[], options: LidOptions, meshLid: WorkplaneShape, magnets?: { posts: WorkplaneShape[]; pockets: WorkplaneShape[] }): Promise<WorkplaneShape | null> => {
-    // A hinged lid stays the mesh lid for now: the exact one has no knuckles, nor click bumps or a pull tab.
-    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge || options.clickBumps || options.handle === "tab") return null;
+    // A hinged lid stays the mesh lid for now: the exact one has no knuckles, nor click bumps or a pull tab; nor a thread.
+    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge || options.clickBumps || options.handle === "tab" || options.type === "screw") return null;
     const pocketDepth = magnetPocketDepth(options);
     const request: CadLidRequest = {
       type: options.type,
@@ -8570,9 +8601,9 @@ export function LayerlingEditor({
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
     // What is not given starts from the printer's play where it follows it, as the panel does.
     const options = normalizeLidOptions(given, lidDefaults(getPrinterPlay()));
-    // The pockets, the hinge's knuckles, the click bumps' dimples and a finger notch go into the body, so it must be free
-    // to change and one body.
-    const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch";
+    // The pockets, the hinge's knuckles, the click bumps' dimples, a finger notch and a screw lid's thread go into the
+    // body, so it must be free to change and one body.
+    const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch" || options.type === "screw";
     if (changesBody && targets.some((shape) => bodyLocked(shape))) return fail(t("status.objectLocked"));
     if (changesBody && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
@@ -8586,6 +8617,7 @@ export function LayerlingEditor({
     if (changed()) return fail(t("lid.error.changed"));
     const type = t(`lid.type.${options.type}`);
     const hinge = result.hinge;
+    const screw = result.screw;
     // What else the lid has, said after what it is: its click bumps, its tab, or the notch in the body.
     const extras = [
       ...(result.clickBumps ? [t("status.lidClickBumps", { count: result.clickBumps.count })] : []),
@@ -8595,23 +8627,26 @@ export function LayerlingEditor({
     const handle = result.handle?.style ?? "none";
     // The click bumps' dimples and the finger notch are cut into the body as the magnets' pockets are.
     const bodyCuts = [...(result.clickBumps ? [result.clickBumps.dimples] : []), ...(result.handle?.notch ? [result.handle.notch] : [])];
-    if (!result.magnets && !hinge && !bodyCuts.length) {
+    if (!result.magnets && !hinge && !bodyCuts.length && !screw) {
       commitShapes([...shapesRef.current, lid], lid.id, withExtras(t("status.lidMade", { type })));
       return { ok: true as const, id: lid.id, type: options.type, handle };
     }
     const posts = result.magnets?.posts ?? [];
     // A flush hinge's slots and a pivot lid's pin holes are cut into the body as the magnets' pockets are.
     const pockets = [...(result.magnets?.pockets ?? []), ...(hinge?.cuts ? [hinge.cuts] : []), ...bodyCuts];
-    // The body's knuckles are grouped with it as the magnets' posts are.
-    const grouped = await groupedWithMagnets(targets, { posts: [...posts, ...(hinge ? [hinge.knuckles] : [])], pockets }, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
+    // The body's knuckles, and a screw lid's thread, are grouped with it as the magnets' posts are.
+    const grouped = await groupedWithMagnets(targets, { posts: [...posts, ...(hinge ? [hinge.knuckles] : []), ...(screw ? [screw.thread] : [])], pockets }, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
     if (changed()) return fail(t("lid.error.changed"));
-    if (!grouped.group) return fail(grouped.failureNotice || t(hinge ? "lid.error.hingeKernel" : result.magnets ? "lid.error.magnetsKernel" : "lid.error.cutsKernel"));
+    if (!grouped.group) return fail(grouped.failureNotice || t(screw ? "lid.error.screwKernel" : hinge ? "lid.error.hingeKernel" : result.magnets ? "lid.error.magnetsKernel" : "lid.error.cutsKernel"));
     const body = canonicalizeShape({ ...grouped.group, groupOperation: "group", name: targets.find((shape) => !shape.hole)?.name ?? grouped.group.name });
     const consumed = new Set(targets.map((shape) => shape.id));
     const remaining = shapesRef.current.filter((shape) => !consumed.has(shape.id));
     const pin = options.hingePin.toLocaleString(numberLocale());
     const magnetCount = result.magnets?.pockets.length ?? 0;
-    const message = hinge
+    const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
+    const message = screw
+      ? t("status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) })
+      : hinge
       ? hinge.style === "pivot"
         ? t("status.lidMadePivot", { pin })
         : hinge.pinLength !== null
@@ -8628,6 +8663,7 @@ export function LayerlingEditor({
         knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null,
         plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
       } } : {}),
+      ...(screw ? { screw: { pitch: screw.pitch, turns: screw.turns, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000 } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);
 
@@ -8654,14 +8690,15 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush) are not
-    // asked for.
+    // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
+    // are not asked for, nor magnets and a hinge with a screw lid.
+    const extras = lidTakesExtras(lidTool);
     void makeLid({
-      type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
+      type, thickness, gap, depth, wall, magnets: magnets && extras, magnetDiameter, magnetHeight, magnetGap, hinge: hinge && extras, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
       hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
-      clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none",
+      clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns,
     }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
@@ -9370,7 +9407,7 @@ export function LayerlingEditor({
   }, [refuseLockedSelection, commitShapes, hasSelection, selectedIds, selectedShapes, shapes, refuseBodyLockedSelection]);
 
   const raiseSelected = useCallback(
-    (delta: number) => {
+    (delta: number, live = false) => {
       if (!hasSelection) {
         return;
       }
@@ -9383,17 +9420,15 @@ export function LayerlingEditor({
         true,
       );
       // As last committed: a held Ctrl+arrow moves once a frame (keyRepeatBatch).
+      const next = translateSelectedShapes(shapesRef.current, selected, normal.x * delta, normal.y * delta, normal.z * delta);
+      if (live) {
+        shapesRef.current = next;
+        liveRunRef.current = true;
+        setShapes(next);
+        return;
+      }
       commitShapes(
-        shapesRef.current.map((shape) =>
-          selected.has(shape.id) && !shape.locked
-            ? {
-                ...shape,
-                x: cleanNearZero(shape.x + normal.x * delta),
-                z: cleanNearZero(shape.z + normal.z * delta),
-                elevation: cleanNearZero((shape.elevation ?? 0) + normal.y * delta),
-              }
-            : shape,
-        ),
+        next,
         selectedIds,
         t(delta > 0 ? "status.selectionRaisedBy" : "status.selectionLoweredBy", { distance: `${formatLengthMm(Math.abs(delta), workspaceSettingsRef.current.accuracy)} ${lengthDisplayUnit(workspaceSettingsRef.current).label}` }),
         `move:${selectedIds.join(",")}`,
@@ -9584,15 +9619,22 @@ export function LayerlingEditor({
       if (holePatternPickRunRef.current === run) setNotice(localizedError(error instanceof Error ? error.message : String(error)), true);
       return;
     }
-    const read = readPerforableFace(triangles, pick.point, pick.normal);
+    const read = readHolePatternFace(triangles, pick.point, pick.normal);
     const latest = shapesRef.current.find((shape) => shape.id === source.id);
     if (holePatternPickRunRef.current !== run || !latest || projectShapesFingerprint([latest]) !== fingerprint) return;
     if (!read.ok) {
       setNotice(t(read.reason === "curved" ? "status.holePatternCurved" : "status.holePatternMissed"));
       return;
     }
-    setHolePatternTool((current) => current && current.sourceId === source.id && current.step === "pick" ? { ...current, step: "ready", face: read.face } : current);
-    setNotice(t("status.holePatternReady"));
+    const round = isRoundWallFace(read.face);
+    setHolePatternTool((current) => {
+      if (!current || current.sourceId !== source.id || current.step !== "pick") return current;
+      // A ring along the edge is a flat face's arrangement; round a wall the holes are spread staggered instead.
+      const settings = round && current.settings.arrangement === "perimeter" ? normalizeHolePattern({ ...current.settings, arrangement: "staggered" }) : current.settings;
+      holePatternSettingsRef.current = settings;
+      return { ...current, step: "ready", face: read.face, settings };
+    });
+    setNotice(t(round ? "status.holePatternRoundReady" : "status.holePatternReady"));
   }, [faceReadForClick, holePatternTool]);
 
   const changeHolePatternSettings = useCallback((patch: Partial<HolePatternSettings>) => {
@@ -9842,7 +9884,7 @@ export function LayerlingEditor({
       selectedIds.length !== 1
       || selectedIds[0] !== faceTool.sourceId
       || mateTool || layFlatPickMode || pivotPickMode || arrayTool || scalePercentTool
-      || shellTool || deleteFaceTool || edgeModifier || splitSession || simplifyToolId || holePatternTool
+      || shellTool || deleteFaceTool || edgeModifier || splitSession || simplifyToolId || holePatternTool || supportRibTool
     ) {
       faceToolPickRunRef.current += 1;
       setFaceTool(null);
@@ -9852,6 +9894,171 @@ export function LayerlingEditor({
   useEffect(() => {
     if (faceTool?.step !== "pick") faceToolPickAbortRef.current?.abort();
   }, [faceTool]);
+
+  // "Support rib" (Discussion #1385): pick the lower face of a part standing tilted on one edge; a thin rib stands under
+  // it a gap away, on an oval foot, held to the part by bridges one layer high.
+  const toggleSupportRib = useCallback(() => {
+    if (supportRibTool) {
+      supportRibPickRunRef.current += 1;
+      setSupportRibTool(null);
+      setNotice(t("status.supportRibCancelled"));
+      return;
+    }
+    if (refuseBodyLockedSelection()) return;
+    const source = selectedShapes.length === 1 ? selectedShapes[0] : null;
+    if (!source) {
+      setNotice(t("status.supportRibSelectOne"));
+      return;
+    }
+    if (source.hole || isNonSolidShape(source)) {
+      setNotice(t("status.supportRibNeedsSolid"));
+      return;
+    }
+    if (edgeModifier || shellTool || deleteFaceTool || splitSession || simplifyToolId) {
+      setNotice(t("status.faceToolOtherTool"));
+      return;
+    }
+    stopCruise();
+    holePatternPickRunRef.current += 1;
+    setHolePatternTool(null);
+    faceToolPickRunRef.current += 1;
+    setFaceTool(null);
+    setAlignMode(false);
+    setMirrorMode(false);
+    setPivotPickMode(false);
+    setLayFlatPickMode(false);
+    setMateTool(null);
+    setArrayTool(null);
+    setScalePercentTool(null);
+    supportRibPickRunRef.current += 1;
+    setSupportRibTool({ sourceId: source.id, step: "pick", face: null, settings: readSupportRibSettings(readPrintCheckSettings().nozzle), busy: false });
+    setNotice(t("status.supportRibStart"));
+  }, [deleteFaceTool, edgeModifier, refuseBodyLockedSelection, selectedShapes, shellTool, simplifyToolId, splitSession, stopCruise, supportRibTool]);
+
+  const pickSupportRibFace = useCallback(async (pick: LayFlatPick | null) => {
+    if (!supportRibTool || supportRibTool.step !== "pick") return;
+    const source = shapesRef.current.find((shape) => shape.id === supportRibTool.sourceId);
+    const run = supportRibPickRunRef.current + 1;
+    supportRibPickRunRef.current = run;
+    supportRibPickAbortRef.current?.abort();
+    if (!pick || !source || pick.shapeId !== source.id) {
+      setNotice(t("status.supportRibMissed"));
+      return;
+    }
+    const fingerprint = projectShapesFingerprint([source]);
+    const pickAbort = new AbortController();
+    supportRibPickAbortRef.current = pickAbort;
+    let triangles: ArrayLike<number>;
+    try {
+      triangles = await faceReadForClick(source, fingerprint, pickAbort.signal);
+    } catch (error) {
+      if (supportRibPickRunRef.current === run) setNotice(localizedError(error instanceof Error ? error.message : String(error)), true);
+      return;
+    }
+    const read = readPerforableFace(triangles, pick.point, pick.normal);
+    const latest = shapesRef.current.find((shape) => shape.id === source.id);
+    if (supportRibPickRunRef.current !== run || !latest || projectShapesFingerprint([latest]) !== fingerprint) return;
+    if (!read.ok) {
+      setNotice(t(read.reason === "curved" ? "status.supportRibCurved" : "status.supportRibMissed"));
+      return;
+    }
+    const face = supportRibFace(read.face);
+    if (!face.ok) {
+      setNotice(t(`supportRib.reason.${face.reason}`));
+      return;
+    }
+    setSupportRibTool((current) => current && current.sourceId === source.id && current.step === "pick" ? { ...current, step: "ready", face: face.face, settings: { ...current.settings, height: null } } : current);
+    setNotice(t("status.supportRibReady"));
+  }, [faceReadForClick, supportRibTool]);
+
+  const changeSupportRibSettings = useCallback((patch: Partial<SupportRibSettings>) => {
+    setSupportRibTool((current) => {
+      if (!current) return current;
+      // Another nozzle or other layers: the measures that follow them follow again, unless they were set by hand.
+      const settings = normalizeSupportRib({ ...current.settings, ...patch });
+      writeSupportRibSettings(settings);
+      return { ...current, settings };
+    });
+  }, []);
+
+  // The rib is built with the kernel a moment after the numbers change, as the face tool's body is.
+  useEffect(() => {
+    const run = ++supportRibPreviewRunRef.current;
+    const face = supportRibTool?.face;
+    const source = supportRibTool ? shapesRef.current.find((shape) => shape.id === supportRibTool.sourceId) : null;
+    if (!face || !supportRibTool || !source) {
+      setSupportRibPreview(null);
+      return;
+    }
+    const settings = supportRibTool.settings;
+    const timer = window.setTimeout(() => {
+      void getManifoldRuntime()
+        .then((runtime) => {
+          if (supportRibPreviewRunRef.current !== run) return;
+          const built = buildSupportRib(runtime, face, settings, source);
+          if (!built.ok) {
+            setSupportRibPreview({ shape: null, plan: null, problem: `supportRib.reason.${built.reason}` });
+            return;
+          }
+          setSupportRibPreview({ shape: supportRibShape("support-rib-preview", t("supportRib.name"), source.color, built.positions), plan: built.plan, problem: null });
+        })
+        .catch(() => {
+          if (supportRibPreviewRunRef.current === run) setSupportRibPreview({ shape: null, plan: null, problem: "supportRib.reason.failed" });
+        });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [supportRibTool?.face, supportRibTool?.settings, supportRibTool?.sourceId]);
+
+  const applySupportRib = useCallback(async () => {
+    const tool = supportRibTool;
+    if (!tool?.face || tool.busy) return;
+    const source = shapesRef.current.find((shape) => shape.id === tool.sourceId);
+    if (!source) return;
+    setSupportRibTool({ ...tool, busy: true });
+    const runtime = await getManifoldRuntime();
+    const built = buildSupportRib(runtime, tool.face, tool.settings, source);
+    if (!built.ok) {
+      setSupportRibTool((current) => (current ? { ...current, busy: false } : current));
+      setNotice(t(`supportRib.reason.${built.reason}`));
+      return;
+    }
+    const rib = supportRibShape(createLocalId("support-rib"), t("supportRib.name"), source.color, built.positions);
+    if (!rib) {
+      setSupportRibTool((current) => (current ? { ...current, busy: false } : current));
+      setNotice(t("supportRib.reason.failed"));
+      return;
+    }
+    const message = t("status.supportRibCreated", { count: built.plan.bridges.length });
+    setSupportRibTool(null);
+    if (tool.settings.bundle) {
+      // Bundled with the part: they move together and reach the slicer side by side, the bridges joining them there.
+      const group = groupedShape([source, rib]);
+      if (group) {
+        const bundle = canonicalizeShape({ ...group, name: source.name, groupOperation: "bundle" });
+        commitShapes([...shapesRef.current.filter((shape) => shape.id !== source.id), bundle], bundle.id, message);
+        return;
+      }
+    }
+    commitShapes([...shapesRef.current, rib], rib.id, message);
+  }, [commitShapes, supportRibTool]);
+
+  // The tool belongs to the body it was started for and gives way to the other tools, as the face tool does.
+  useEffect(() => {
+    if (!supportRibTool) return;
+    if (
+      selectedIds.length !== 1
+      || selectedIds[0] !== supportRibTool.sourceId
+      || mateTool || layFlatPickMode || pivotPickMode || arrayTool || scalePercentTool
+      || shellTool || deleteFaceTool || edgeModifier || splitSession || simplifyToolId || holePatternTool || faceTool
+    ) {
+      supportRibPickRunRef.current += 1;
+      setSupportRibTool(null);
+    }
+  }, [arrayTool, deleteFaceTool, edgeModifier, faceTool, holePatternTool, layFlatPickMode, mateTool, pivotPickMode, scalePercentTool, selectedIds, shellTool, simplifyToolId, splitSession, supportRibTool]);
+
+  useEffect(() => {
+    if (supportRibTool?.step !== "pick") supportRibPickAbortRef.current?.abort();
+  }, [supportRibTool]);
 
   // The worker reads the body's faces for picking; the tool starts empty and fills in when they come.
   // `error`: a refusal that is still to be read stays in the panel while the faces come again.
@@ -10334,7 +10541,7 @@ export function LayerlingEditor({
   // Another tool opens its panel where this one stands, and what it applies changes the design anyway: the check gives way,
   // and does not open over it.
   const otherToolPanelOpen = Boolean(
-    arrayTool || scalePercentTool || simplifyToolId || holePatternTool || faceTool || mateTool || cookieCutterTool || flexiTool
+    arrayTool || scalePercentTool || simplifyToolId || holePatternTool || faceTool || supportRibTool || mateTool || cookieCutterTool || flexiTool
     || lidTool || cableTool || cutOutTool || punchTool || shellTool || deleteFaceTool || splitSession || edgeModifier,
   );
   /**
@@ -12844,8 +13051,10 @@ export function LayerlingEditor({
         // Taken before the face is read: joining a group's or bundle's parts takes a moment, and the scene may change meanwhile.
         const sourceFingerprint = projectShapesFingerprint(currentShapes());
         const sourceProjectId = projectInfoRef.current.projectId;
-        const read = readPerforableFace(await faceReadPositionsOffThread(target, geometryAbortRef.current?.signal), point, normal);
-        if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved; perforate_face needs a flat face" : "perforate_face found no flat face there");
+        // A flat face, or the round wall of a cylinder, tube or bore (#1393).
+        const read = readHolePatternFace(await faceReadPositionsOffThread(target, geometryAbortRef.current?.signal), point, normal);
+        if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved but not a round wall; perforate_face needs a flat face or the wall of a cylinder, tube or bore" : "perforate_face found no face there");
+        if (isRoundWallFace(read.face) && arrangement === "perimeter") throw new Error("arrangement perimeter needs a flat face; on a round wall use grid or staggered");
         const plan = holePatternShapes(read.face, settings, t("holePattern.holeName"), undefined, custom);
         if (plan.tooMany) throw new Error("That would be too many holes; make them bigger or the spacing wider");
         if (plan.holes.length === 0) throw new Error("No hole fits on that face with this size and margin");
@@ -12865,6 +13074,102 @@ export function LayerlingEditor({
           holes: plan.holes.length,
           settings,
           ...(plan.ring ? { ring: { length: Number(plan.ring.length.toFixed(2)), onCorners: plan.ring.onCorners } } : {}),
+          ...(plan.wall ? {
+            wall: {
+              diameter: Number(plan.wall.diameter.toFixed(2)),
+              closed: plan.wall.closed,
+              outside: isRoundWallFace(read.face) ? read.face.round.outside : true,
+              thickness: Number(read.face.thickness.toFixed(2)),
+              ...(plan.wall.columns !== undefined ? { columns: plan.wall.columns, spacing: Number((plan.wall.spacing ?? 0).toFixed(2)) } : {}),
+            },
+          } : {}),
+          normal: [normal.x, normal.y, normal.z].map((value) => Number(value.toFixed(4))),
+        };
+      }
+
+      if (command.action === "support_rib") {
+        // The same code as the support rib tool in the view (Discussion #1385).
+        const all = currentShapes();
+        const selectedNow = selectedIdsRef.current;
+        const targetId = typeof params.targetId === "string"
+          ? params.targetId
+          : typeof params.id === "string" ? params.id : selectedNow.length === 1 ? selectedNow[0] : null;
+        const target = all.find((shape) => shape.id === targetId);
+        if (!target) throw new Error("support_rib needs targetId (or exactly one selected object)");
+        if (bodyLocked(target)) throw new Error("Unlock the object before adding a support rib");
+        if (target.hole || isNonSolidShape(target)) throw new Error("support_rib needs a solid body, not a hole");
+        const vec3 = (value: unknown) => (Array.isArray(value) && value.length === 3 && value.every((entry) => typeof entry === "number" && Number.isFinite(entry))
+          ? new THREE.Vector3(value[0] as number, value[1] as number, value[2] as number)
+          : null);
+        let point = vec3(params.point);
+        let normal = vec3(params.normal);
+        if (!point || !normal || normal.lengthSq() < 1e-12) {
+          const side = typeof params.targetFace === "string" && params.targetFace in LAY_FLAT_SIDES ? params.targetFace as LayFlatSide : "bottom";
+          const [x, y, z] = LAY_FLAT_SIDES[side];
+          const faceNormal = nearestFaceNormal(target, new THREE.Vector3(x, y, z).applyQuaternion(quaternionForShape(target)));
+          if (!faceNormal) throw new Error("support_rib found no face on that object");
+          normal = faceNormal.clone().normalize();
+          const center = new THREE.Vector3(target.x, (target.elevation ?? 0) + target.height / 2, target.z);
+          const reach = meshReachAlong(meshForShape(target), normal as THREE.Vector3);
+          point = center.clone().addScaledVector(normal, reach - center.dot(normal));
+        }
+        const given = (key: string) => mcpOptionalNumber(params[key]);
+        const settings = normalizeSupportRib({
+          ...readSupportRibSettings(readPrintCheckSettings().nozzle),
+          height: given("height") ?? null,
+          ...(given("nozzle") !== undefined ? { nozzle: given("nozzle") } : {}),
+          ...(given("layerHeight") !== undefined ? { layerHeight: given("layerHeight") } : {}),
+          ...(given("firstLayer") !== undefined ? { firstLayer: given("firstLayer") } : {}),
+          ...(given("bridgeSpacing") !== undefined ? { bridgeSpacing: given("bridgeSpacing") } : {}),
+          ...(given("footWidth") !== undefined ? { footWidth: given("footWidth") } : {}),
+          ...(given("filletRadius") !== undefined ? { filletRadius: given("filletRadius") } : {}),
+          ...(given("topRadius") !== undefined ? { topRadius: given("topRadius") } : {}),
+          thickness: given("thickness") ?? null,
+          gap: given("gap") ?? null,
+          bridgeWidth: given("bridgeWidth") ?? null,
+          footThickness: given("footThickness") ?? null,
+          bundle: params.bundle !== false,
+        });
+        const reasons: Record<string, string> = {
+          notDown: "That face does not look down; support_rib needs the lower face of a tilted part",
+          tooFlat: "That face is almost level; a rib cannot stand under it",
+          tooSteep: "That face is almost upright and needs no rib",
+          offBed: "That face does not reach down to the bed straight down its slope from the point; the part must stand tilted on one edge",
+          tooLow: "The rib would be too low; give a greater height",
+          collides: "The rib would run into the part; pick another point on the face or a lower height",
+          partOffBed: "The part does not stand on the bed; drop it onto the workplane first so the bridges meet their layers",
+          failed: "The rib could not be built there",
+        };
+        const sourceFingerprint = projectShapesFingerprint(currentShapes());
+        const sourceProjectId = projectInfoRef.current.projectId;
+        const read = readPerforableFace(await faceReadPositionsOffThread(target, geometryAbortRef.current?.signal), point, normal);
+        if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved; support_rib needs a flat lower face" : "support_rib found no flat face there");
+        const face = supportRibFace(read.face);
+        if (!face.ok) throw new Error(reasons[face.reason]);
+        const built = buildSupportRib(await getManifoldRuntime(), face.face, settings, target);
+        if (!built.ok) throw new Error(reasons[built.reason]);
+        const rib = supportRibShape(createLocalId("support-rib"), t("supportRib.name"), target.color, built.positions);
+        if (!rib) throw new Error(reasons.failed);
+        if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(currentShapes()) !== sourceFingerprint) {
+          throw new Error("The scene changed while building the rib; run the command again");
+        }
+        writeSupportRibSettings(settings);
+        const message = t("status.supportRibCreated", { count: built.plan.bridges.length });
+        const group = settings.bundle ? groupedShape([target, rib]) : null;
+        const bundle = group ? canonicalizeShape({ ...group, name: target.name, groupOperation: "bundle" }) : null;
+        if (bundle) commitShapes([...currentShapes().filter((shape) => shape.id !== target.id), bundle], bundle.id, message);
+        else commitShapes([...currentShapes(), rib], rib.id, message);
+        const round = (value: number) => Number(value.toFixed(4));
+        return {
+          object: mcpShapeSummary(bundle ?? rib),
+          rib: mcpShapeSummary(rib),
+          bundled: Boolean(bundle),
+          angle: Number(face.face.angle.toFixed(2)),
+          height: round(built.plan.height),
+          length: round(built.plan.length),
+          bridges: built.plan.bridges.map(round),
+          measures: Object.fromEntries(Object.entries(built.plan.measures).map(([key, value]) => [key, round(value)])),
+          settings,
           normal: [normal.x, normal.y, normal.z].map((value) => Number(value.toFixed(4))),
         };
       }
@@ -13291,7 +13596,7 @@ export function LayerlingEditor({
         if (typeof clearance !== "number" || !Number.isFinite(clearance) || clearance < 0 || clearance > MAX_SBC_CLEARANCE) throw new Error(`clearance must be 0 to ${MAX_SBC_CLEARANCE} mm`);
         const reach = params.reach ?? 0;
         if (typeof reach !== "number" || !Number.isFinite(reach) || reach < 0 || reach > MAX_SBC_REACH) throw new Error(`reach must be 0 to ${MAX_SBC_REACH} mm`);
-        for (const key of ["ribbonUp", "ribbonSide", "gpioUp"] as const) {
+        for (const key of ["ribbonUp", "ribbonSide", "gpioUp", "lensUp"] as const) {
           if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
         }
         const upReach = params.upReach;
@@ -13308,6 +13613,7 @@ export function LayerlingEditor({
           ...(params.ribbonUp === true ? { ribbonUp: true } : {}),
           ...(params.ribbonSide === true ? { ribbonSide: true } : {}),
           ...(params.gpioUp === true ? { gpioUp: true } : {}),
+          ...(params.lensUp === true ? { lensUp: true } : {}),
           ...(typeof upReach === "number" ? { upReach } : {}),
           ...(typeof buttonReach === "number" && buttonReach > 0 ? { buttonReach } : {}),
         }, workspaceSettingsRef.current.booleanTriangleLimit);
@@ -13497,6 +13803,8 @@ export function LayerlingEditor({
           clickBumps: params.clickBumps,
           clickBumpHeight: params.clickBumpHeight,
           handle: params.handle,
+          threadPitch: params.threadPitch,
+          threadTurns: params.threadTurns,
         }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
@@ -13511,6 +13819,7 @@ export function LayerlingEditor({
             knuckles: result.hinge.knuckles, pins: result.hinge.pins, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, style: result.hinge.style, pin: pin ? mcpShapeSummary(pin) : null,
             ...(result.hinge.pinLength !== null ? { endPlugs: plugs ? mcpShapeSummary(plugs) : { id: result.hinge.plugsId }, pinLength: Math.round(result.hinge.pinLength * 100) / 100 } : {}),
           } } : {}),
+          ...("screw" in result && result.screw ? { screw: result.screw } : {}),
         };
       }
 
@@ -13651,11 +13960,13 @@ export function LayerlingEditor({
         ["textContent", "textFont"].forEach((key) => {
           if (params[key] !== undefined && typeof params[key] !== "string") throw new Error(`${key} must be text`);
         });
-        const choices: Record<string, readonly string[]> = { pattern: SURFACE_TEXTURE_PATTERNS, profile: SURFACE_TEXTURE_PROFILES, direction: SURFACE_TEXTURE_DIRECTIONS, projection: SURFACE_TEXTURE_PROJECTIONS, axis: SURFACE_TEXTURE_AXES, detail: SURFACE_TEXTURE_DETAILS, crackStyle: SURFACE_TEXTURE_CRACK_STYLES, crackStart: SURFACE_TEXTURE_CRACK_STARTS, carbonWeave: SURFACE_TEXTURE_CARBON_WEAVES, brickBond: SURFACE_TEXTURE_BRICK_BONDS, barkType: SURFACE_TEXTURE_BARK_TYPES, woodType: SURFACE_TEXTURE_WOOD_TYPES, woodCut: SURFACE_TEXTURE_WOOD_CUTS, image: SURFACE_TEXTURE_IMAGES, imageTiling: SURFACE_TEXTURE_TILINGS, bumpGrid: SURFACE_TEXTURE_BUMP_GRIDS, capStyle: SURFACE_TEXTURE_CAP_STYLES, capEdge: SURFACE_TEXTURE_CAP_EDGES };
+        const choices: Record<string, readonly string[]> = { pattern: SURFACE_TEXTURE_PATTERNS, profile: SURFACE_TEXTURE_PROFILES, direction: SURFACE_TEXTURE_DIRECTIONS, projection: SURFACE_TEXTURE_PROJECTIONS, axis: SURFACE_TEXTURE_AXES, detail: SURFACE_TEXTURE_DETAILS, crackStyle: SURFACE_TEXTURE_CRACK_STYLES, crackStart: SURFACE_TEXTURE_CRACK_STARTS, carbonWeave: SURFACE_TEXTURE_CARBON_WEAVES, brickBond: SURFACE_TEXTURE_BRICK_BONDS, timberBracing: SURFACE_TEXTURE_TIMBER_BRACINGS, barkType: SURFACE_TEXTURE_BARK_TYPES, woodType: SURFACE_TEXTURE_WOOD_TYPES, woodCut: SURFACE_TEXTURE_WOOD_CUTS, image: SURFACE_TEXTURE_IMAGES, imageTiling: SURFACE_TEXTURE_TILINGS, bumpGrid: SURFACE_TEXTURE_BUMP_GRIDS, capStyle: SURFACE_TEXTURE_CAP_STYLES, capEdge: SURFACE_TEXTURE_CAP_EDGES };
         Object.entries(choices).forEach(([key, allowed]) => {
           if (params[key] !== undefined && !allowed.includes(String(params[key]))) throw new Error(`${key} must be one of ${allowed.join(", ")}`);
         });
         Object.keys(SURFACE_TEXTURE_LIMITS).forEach((key) => {
+          // The grain was only on or off once: true and false are still taken (see normalizeSurfaceTexture).
+          if (key === "timberGrain" && typeof params[key] === "boolean") return;
           if (params[key] !== undefined && !Number.isFinite(mcpNumber(params[key], Number.NaN))) throw new Error(`${key} must be a number`);
         });
         ["keepEdges", "outside", "inside", "crackGold", "imageInvert", "tileFromBottom", "patternPart"].forEach((key) => {
@@ -13746,7 +14057,7 @@ export function LayerlingEditor({
           [textured.id],
           t("status.surfaceTextured", { pattern: [settings.pattern, ...layerSettings.map((layer) => layer.pattern)].map(surfacePatternLabel).join(" + "), triangles: formatTriangleCount(outcome.stats.triangles) }),
         );
-        const { triangles, around, spacing, limited, tooDeep, bedClamped, cracks, text, bricks, tiles, projection } = outcome.stats;
+        const { triangles, around, spacing, limited, tooDeep, bedClamped, cracks, text, bricks, tiles, timber, projection } = outcome.stats;
         // One's own image is told by its size, not its grey values.
         const { masks: _planes, textOutline: _outline, imageOwn, ...rest } = settings;
         const shown = { ...rest, imageOwn: imageOwn ? { width: imageOwn.width, height: imageOwn.height } : null };
@@ -13759,7 +14070,7 @@ export function LayerlingEditor({
           settings: shown,
           layers: layerSettings.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length })),
           masks: masks.length,
-          texture: { triangles, projection, around, spacing, limited, tooDeep, bedClamped, ...(cracks ? { cracks } : {}), ...(text ? { text } : {}), ...(bricks ? { bricks } : {}), ...(tiles ? { tiles } : {}) },
+          texture: { triangles, projection, around, spacing, limited, tooDeep, bedClamped, ...(cracks ? { cracks } : {}), ...(text ? { text } : {}), ...(bricks ? { bricks } : {}), ...(tiles ? { tiles } : {}), ...(timber ? { timber } : {}) },
         };
       }
 
@@ -16207,7 +16518,7 @@ export function LayerlingEditor({
   }, []);
 
   const nudgeSelected = useCallback(
-    (deltaX: number, deltaZ: number, rise = 0) => {
+    (deltaX: number, deltaZ: number, rise = 0, live = false) => {
       if (!hasSelection) {
         return;
       }
@@ -16230,17 +16541,18 @@ export function LayerlingEditor({
       window.layerlingFollowMove?.(movedIds, translation);
       // The shapes as last committed, not as last drawn: a held key moves once a
       // frame, and the next move may come before React has drawn the last one.
+      const next = translateSelectedShapes(shapesRef.current, selected, translation.x, translation.y, translation.z);
+      if (live) {
+        // A held arrow key: show the move as a mouse drag does, and let the key's
+        // release write it to the history (finishLiveRun), so the scene is not rebuilt
+        // and committed on every repeat.
+        shapesRef.current = next;
+        liveRunRef.current = true;
+        setShapes(next);
+        return;
+      }
       commitShapes(
-        shapesRef.current.map((shape) =>
-          selected.has(shape.id) && !shape.locked
-            ? {
-                ...shape,
-                x: cleanNearZero(shape.x + translation.x),
-                z: cleanNearZero(shape.z + translation.z),
-                elevation: cleanNearZero((shape.elevation ?? 0) + translation.y),
-              }
-            : shape,
-        ),
+        next,
         selectedIds,
         selectedShapes.length === 1 ? t("status.movedOneBy", { distance }) : t("status.movedManyBy", { count: selectedShapes.length, distance }),
         `move:${selectedIds.join(",")}`,
@@ -16253,9 +16565,29 @@ export function LayerlingEditor({
   nudgeSelectedRef.current = nudgeSelected;
   const raiseSelectedRef = useRef(raiseSelected);
   raiseSelectedRef.current = raiseSelected;
+  // A held arrow key moves the selection live (no history step per repeat). liveRun is
+  // true while such moves are waiting for their history step; finishLiveRun writes it
+  // as one step, amending the step the key's first press made, so one Undo takes the
+  // whole run back.
+  const liveRunRef = useRef(false);
+  const finishLiveRun = useCallback(() => {
+    if (!liveRunRef.current) return;
+    liveRunRef.current = false;
+    commitShapes(shapesRef.current, selectedIdsRef.current, undefined, undefined, true);
+  }, [commitShapes]);
+  const finishLiveRunRef = useRef(finishLiveRun);
+  finishLiveRunRef.current = finishLiveRun;
   // Repeats of a held arrow key move once a frame, by their sum (#1042).
   const keyRepeatBatchRef = useRef<ReturnType<typeof createKeyRepeatBatch> | null>(null);
-  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z, rise }) => {
+  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z, rise }, live) => {
+    if (live) {
+      // A repeat of a held key: shown at once, committed when the key comes up.
+      if (x || z) nudgeSelectedRef.current(x, z, rise, true);
+      else raiseSelectedRef.current(rise, true);
+      return;
+    }
+    // A fresh press starts a new history step: first the last run is written.
+    finishLiveRunRef.current();
     // Drawn at once, as a key press is: otherwise the effect that keeps
     // shapesRef in step could run late with the shapes before this move,
     // and the next frame's move would start from there and lose this one.
@@ -16265,7 +16597,10 @@ export function LayerlingEditor({
     });
   });
   useEffect(() => {
-    const flush = () => keyRepeatBatchRef.current?.flush();
+    const flush = () => {
+      keyRepeatBatchRef.current?.flush();
+      finishLiveRunRef.current();
+    };
     window.addEventListener("keyup", flush);
     window.addEventListener("blur", flush);
     return () => {
@@ -16472,6 +16807,12 @@ export function LayerlingEditor({
           faceToolPickRunRef.current += 1;
           setFaceTool(null);
           setNotice(t("status.faceToolCancelled"));
+          return;
+        }
+        if (supportRibTool) {
+          supportRibPickRunRef.current += 1;
+          setSupportRibTool(null);
+          setNotice(t("status.supportRibCancelled"));
           return;
         }
         if (deleteFaceTool) {
@@ -16776,6 +17117,7 @@ export function LayerlingEditor({
     mateTool,
     holePatternTool,
     faceTool,
+    supportRibTool,
     deleteFaceTool,
     applyDeleteFaceTool,
     surfaceFacePick,
@@ -16940,6 +17282,7 @@ export function LayerlingEditor({
       if (!single.hole && !isNonSolidShape(single)) {
         items.push({ key: "holePattern", label: t("holePattern.title"), onSelect: toggleHolePattern });
         items.push({ key: "faceTool", label: t("faceTool.title"), onSelect: toggleFaceTool });
+        items.push({ key: "supportRib", label: t("supportRib.title"), onSelect: toggleSupportRib });
       }
     }
     // Align from the menu at the pointer (Discussion #1275): with two or more parts, as the L key; locked parts stay put as there.
@@ -17086,6 +17429,8 @@ export function LayerlingEditor({
         canHolePattern={selectedShapes.length === 1 && Boolean(selectedShape && !bodyLocked(selectedShape) && !selectedShape.hole && !isNonSolidShape(selectedShape))}
         onFaceTool={toggleFaceTool}
         faceToolActive={Boolean(faceTool)}
+        onSupportRib={toggleSupportRib}
+        supportRibActive={Boolean(supportRibTool)}
         canFaceTool={selectedShapes.length === 1 && Boolean(selectedShape && !bodyLocked(selectedShape) && !selectedShape.hole && !isNonSolidShape(selectedShape))}
         onGroup={groupSelected}
         onBundle={bundleSelected}
@@ -17445,11 +17790,13 @@ export function LayerlingEditor({
           mateFacePick={mateTool && mateTool.step !== "ready"
             ? { shapeIds: mateTool.step === "source" ? [mateTool.sourceId] : shapes.filter((shape) => shape.id !== mateTool.sourceId && !shape.hidden).map((shape) => shape.id), round: mateTool.mode === "concentric" }
             : holePatternTool?.step === "pick"
-              ? { shapeIds: [holePatternTool.sourceId], joined: faceJoinPositions }
+              ? { shapeIds: [holePatternTool.sourceId], joined: faceJoinPositions, round: "either" }
               : faceTool?.step === "pick"
                 ? { shapeIds: [faceTool.sourceId], joined: faceJoinPositions }
-                : null}
-          onMateFacePick={mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : (pick) => void pickHolePatternFace(pick)}
+                : supportRibTool?.step === "pick"
+                  ? { shapeIds: [supportRibTool.sourceId], joined: faceJoinPositions }
+                  : null}
+          onMateFacePick={mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : supportRibTool ? (pick) => void pickSupportRibFace(pick) : (pick) => void pickHolePatternFace(pick)}
           cadFacePick={historyViewState ? null : cadFacePick}
           onCadFacePick={deleteFaceTool ? toggleDeleteFace : toggleSurfaceFace}
           onNoteAdd={addNote}
@@ -17660,6 +18007,7 @@ export function LayerlingEditor({
           holeCount={holePatternPreview?.holes.length ?? 0}
           tooMany={Boolean(holePatternPreview?.tooMany)}
           ring={holePatternPreview?.ring}
+          wall={holePatternTool.face && isRoundWallFace(holePatternTool.face) ? holePatternPreview?.wall ?? { diameter: holePatternTool.face.round.radius * 2, closed: holePatternTool.face.round.outline.closed } : undefined}
           customChoices={holePatternCustomChoices(shapes, holePatternTool.sourceId).map((shape) => ({ id: shape.id, name: displayShapeName(shape) }))}
           customIsHole={Boolean(holePatternCustom?.hole)}
           busy={holePatternTool.busy}
@@ -17674,6 +18022,30 @@ export function LayerlingEditor({
             holePatternPickRunRef.current += 1;
             setHolePatternTool(null);
             setNotice(t("status.holePatternCancelled"));
+          }}
+        />
+      ) : null}
+      {supportRibTool && selectedShape?.id === supportRibTool.sourceId ? (
+        <SupportRibPanel
+          targetName={displayShapeName(selectedShape)}
+          step={supportRibTool.step}
+          settings={supportRibTool.settings}
+          workspace={workspaceSettings}
+          face={supportRibTool.face}
+          plan={supportRibPreview?.plan ?? null}
+          problem={supportRibPreview?.problem ?? null}
+          busy={supportRibTool.busy}
+          onChange={changeSupportRibSettings}
+          onRepick={() => {
+            supportRibPickRunRef.current += 1;
+            setSupportRibTool({ ...supportRibTool, step: "pick", face: null });
+            setNotice(t("status.supportRibStart"));
+          }}
+          onApply={() => void applySupportRib()}
+          onCancel={() => {
+            supportRibPickRunRef.current += 1;
+            setSupportRibTool(null);
+            setNotice(t("status.supportRibCancelled"));
           }}
         />
       ) : null}

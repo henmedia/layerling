@@ -98,9 +98,10 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_scale_objects` | 按百分比缩放对象，可整体缩放或各自在原位缩放 |
 | `layerling_lay_flat` | 让对象的一个面贴在平台上 |
 | `layerling_place_on_face` | 把对象放到另一个对象的某个面上，斜面也可以，如同 C 键 |
-| `layerling_perforate_face` | 在平面上切出孔阵列；孔仍作为孔与实体分组在一起 |
+| `layerling_perforate_face` | 在平面上或绕圆柱、圆管、孔的侧壁切出孔阵列；孔仍作为孔与实体分组在一起 |
 | `layerling_sweep_sketch` | 沿一条由点构成的路径拉出矩形或圆形截面，成为一个精确实体；闭合路径会形成圆环 |
 | `layerling_push_face` | 把平面推出，或在其中挖出凹槽，可设置距边缘的内缩和圆角半径；新部分是一个与实体分组的草图实体 |
+| `layerling_support_rib` | 在以一条棱边倾斜打印的零件下表面下方立一条薄支撑肋，带一层高的连接桥（支撑肋） |
 | `layerling_mate_faces` | 把一个对象的面贴到另一个对象的面，可面对面或齐平 |
 | `layerling_open_group` | 打开分组，以便逐个修改其部件，打开的分组内也可再打开分组 |
 | `layerling_close_group` | 再次关闭分组（“完成”）或取消 |

@@ -1,55 +1,140 @@
 [
   {
+    "version": "1.147.0",
+    "items": [
+      {
+        "title": {
+          "de": "Lochmuster rund um einen Zylinder",
+          "en": "Hole patterns round a cylinder"
+        },
+        "body": {
+          "de": "Das Lochmuster nimmt jetzt auch die runde Wand eines Zylinders, Rohrs oder einer Bohrung: Wand anklicken, und die Löcher gehen in Reihen ganz herum, jedes zeigt auf die Achse. Gut für Stiftebecher, Lampenschirme und Rohre mit Lüftung. „Durch die Wand“ schneidet nur die angeklickte Wand.",
+          "en": "The hole pattern now also takes the round wall of a cylinder, tube or bore: click the wall, and the holes go all the way round in rows, each pointing at the axis. Good for pen holders, lamp shades and tubes with vents. \"Through the wall\" cuts only the wall you clicked."
+        }
+      },
+      {
+        "title": {
+          "de": "Teilen mit Dübeln oder Zapfen",
+          "en": "Split with dowels or plugs"
+        },
+        "body": {
+          "de": "Wenn du ein zu großes Teil teilst, setzt das Fenster „Teilen“ unter „Verbinder“ jetzt auf Wunsch Dübel oder Zapfen, die die Hälften wieder genau zusammenführen: „Dübel“ macht in jede Hälfte ein Loch und legt lose Stifte daneben, „Zapfen“ stellt runde Zapfen auf eine Hälfte und ihre Löcher in die andere. Ringe auf der Schnittebene zeigen vorher, wo sie hinkommen, und das Spiel folgt dem Spiel deines Druckers.",
+          "en": "When you split a part that is too big, \"Connectors\" in the Split panel can now add dowels or plugs that line the halves up again: \"Dowels\" makes a hole in each half and lays loose pins beside them, \"Plugs\" puts round pegs on one half and their holes in the other. Rings on the plane show where they go first, and the fit follows your printer's play."
+        }
+      },
+      {
+        "title": {
+          "de": "Sacklöcher mit Bohrerspitze",
+          "en": "Blind holes with a drill point"
+        },
+        "body": {
+          "de": "Ein Zylinder als Aussparung, eine Senkbohrung und eine Stufenbohrung können jetzt in der Spitze eines Bohrers enden statt flach: Unter „Boden“ stehen 90°, 118° und 135° oder ein eigener Winkel. Die Tiefe zählt wie in einer Zeichnung bis zum Beginn der Spitze, der Hinweis sagt, wie weit sie tiefer reicht.",
+          "en": "A cylinder set as a hole, a counterbore and a countersink can now end in the point of a drill instead of flat: \"Bottom\" offers 90°, 118° and 135° or an angle of your own. As in a drawing the depth counts to where the point begins, and the hint says how much further it reaches."
+        }
+      },
+      {
+        "title": {
+          "de": "Fachwerk und Natursteinmauer als Oberfläche",
+          "en": "Half-timbering and a stone wall as surface textures"
+        },
+        "body": {
+          "de": "Für Modellbahnhäuser und Dioramen hat die Karte Oberfläche zwei neue Muster: „Fachwerk“ mit Balken, Riegeln und Streben über leicht rauem Putz, und „Natursteinmauer“ mit unregelmäßigen Steinen, vom Bruchstein bis zum runden Feldstein. Mit „Muster als eigenes Teil“ druckst du die Balken oder Steine in einer zweiten Farbe.",
+          "en": "For model railway houses and dioramas the Surface texture card has two new patterns: \"Half-timbering\", beams, rails and braces over slightly rough plaster, and \"Stone wall\", irregular stones from broken rubble to round field stones. With \"Pattern as its own part\" the beams or stones print in a second colour."
+        }
+      },
+      {
+        "title": {
+          "de": "Neue Entwürfe mit Winkellineal im Nullpunkt",
+          "en": "New designs with a framing square at the origin"
+        },
+        "body": {
+          "de": "Wer das Winkellineal fast immer braucht, setzt in den Einstellungen unter „Maße“ das Häkchen bei „Neue Entwürfe mit Winkellineal im Nullpunkt beginnen“. Dann liegt in jedem neuen Entwurf dieses Browsers schon eines im Nullpunkt. Vorhandene Entwürfe bleiben, wie sie sind.",
+          "en": "If you use the framing square nearly all the time, tick \"Start new designs with a framing square at the origin\" under Measurement in the settings. Every new design in this browser then starts with one at the origin. Designs you already have stay as they are."
+        }
+      },
+      {
+        "title": {
+          "de": "Ziegel ohne Stummel am Rand",
+          "en": "Bricks without stubs at the edges"
+        },
+        "body": {
+          "de": "Kleine Ziegel zeigten an der Oberkante, an der Unterkante und um Fenster herum kurze Striche statt Mauerwerk, wo der Rand nur einen schmalen Rest einer Reihe übrig ließ. Solche Reste bleiben jetzt glatt; Wände ohne solche Reste sehen aus wie bisher.",
+          "en": "Small bricks showed short ticks instead of brickwork along the top, the bottom and round windows, where the border left only a sliver of a course. Such slivers now stay smooth; walls without them look as before."
+        }
+      },
+      {
+        "title": {
+          "de": "Pfeiltasten bewegen flüssig",
+          "en": "Arrow keys move smoothly"
+        },
+        "body": {
+          "de": "Eine gehaltene Pfeiltaste bewegt die Auswahl jetzt so flüssig wie das Ziehen mit der Maus, auch in großen Entwürfen. Beim Loslassen entsteht ein einziger Schritt, den ein Rückgängig ganz zurücknimmt.",
+          "en": "A held arrow key now moves the selection as smoothly as dragging with the mouse, even in a large design. Letting go makes one step, which one Undo takes back whole."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.146.1",
     "items": [
       {
         "title": {
           "de": "Oberflächenmuster als eigenes Teil in eigener Farbe",
-          "en": "A surface texture's pattern as a part of its own"
+          "en": "A surface texture's pattern as a part of its own",
+          "da": "En overfladestrukturs mønster som en selvstændig del"
         },
         "body": {
           "de": "Für einen Druck in zwei Farben macht „Muster als eigenes Teil“ in der Karte Oberfläche das Muster zu einem eigenen Teil, bei jedem Muster, und „Farbe des Musters“ gibt ihm seine Farbe. Nach außen ist das Teil das, was herausragt; nach innen füllt es die eingeschnittene Vertiefung bis zur Oberfläche. Körper und Muster bleiben in einem Bündel zusammen und kommen in einer 3MF-Datei als zwei Teile in den Slicer.",
-          "en": "For a print in two colours, \"Pattern as its own part\" in the Surface texture card makes the pattern a part of its own, with any pattern, and \"Colour of the pattern\" gives it its colour. Raised, the part is what stands out; cut in, it fills the cut up to the surface. Body and pattern stay together in a bundle and reach the slicer as two parts in a 3MF."
+          "en": "For a print in two colours, \"Pattern as its own part\" in the Surface texture card makes the pattern a part of its own, with any pattern, and \"Colour of the pattern\" gives it its colour. Raised, the part is what stands out; cut in, it fills the cut up to the surface. Body and pattern stay together in a bundle and reach the slicer as two parts in a 3MF.",
+          "da": "Til et print i to farver gør „Mønster som en selvstændig del“ i Overfladestruktur-kortet mønsteret til en selvstændig del, med hvilket mønster som helst, og „Mønsterets farve“ giver den sin farve. Stikker den ud, er det den del, der stikker ud; skæres den ind, fylder den fordybningen op til overfladen. Legeme og mønster bliver sammen i et bundt og kommer til sliceren som to dele i en 3MF."
         }
       },
       {
         "title": {
           "de": "Gridfinity-Buchstaben in eigener Farbe",
-          "en": "Gridfinity letters in a colour of their own"
+          "en": "Gridfinity letters in a colour of their own",
+          "da": "Gridfinity-bogstaver i en farve af eget valg"
         },
         "body": {
           "de": "Die Buchstaben auf den Etikettenleisten eines Gridfinity-Behälters können jetzt eine eigene Farbe haben: Wähle sie unter „Buchstabenfarbe“ unterhalb der Schriftart. In einem 3MF bleibt der Behälter ein Körper, und die Flächen der Buchstaben haben diese Farbe, sodass Bambu Studio, OrcaSlicer, PrusaSlicer 2.9 und die darauf aufbauenden Slicer sie ohne Farbwechsel mit einem eigenen Filament drucken.",
-          "en": "The letters on a Gridfinity bin's label shelves can now have a colour of their own: pick it under \"Letter colour\" below the font. A 3MF keeps the bin one body with the letters' faces in that colour, so Bambu Studio, OrcaSlicer, PrusaSlicer 2.9 and the slicers built on them print them with a filament of their own, without a colour change."
+          "en": "The letters on a Gridfinity bin's label shelves can now have a colour of their own: pick it under \"Letter colour\" below the font. A 3MF keeps the bin one body with the letters' faces in that colour, so Bambu Studio, OrcaSlicer, PrusaSlicer 2.9 and the slicers built on them print them with a filament of their own, without a colour change.",
+          "da": "Bogstaverne på en Gridfinity-bakkes etiketlister kan nu have en farve af eget valg: vælg den under „Bogstavfarve“ under fonten. En 3MF holder bakken som ét legeme med bogstavernes flader i den farve, så Bambu Studio, OrcaSlicer, PrusaSlicer 2.9 og de slicere, der er bygget på dem, printer dem med et filament af eget valg uden farveændring."
         }
       },
       {
         "title": {
           "de": "Eigene Schriften und eine Buchstabengröße auf Gridfinity-Etiketten",
-          "en": "Fonts of your own and one letter size on Gridfinity labels"
+          "en": "Fonts of your own and one letter size on Gridfinity labels",
+          "da": "Egne fonte og én bogstavstørrelse på Gridfinity-etiketter"
         },
         "body": {
           "de": "Die Buchstaben auf den Etikettenleisten eines Gridfinity-Behälters können jetzt in einer eigenen Schrift stehen, die du wie bei einem Text unter „Schriftart“ wählst. Der Entwurf speichert die Umrisse der Buchstaben, die er benutzt, sodass er sich auf einem anderen Computer mit denselben Buchstaben öffnet. „Buchstabengröße“ macht die Großbuchstaben auf jeder Leiste gleich hoch, soweit sie Platz hat, damit Etiketten verschiedener Länge zusammenpassen.",
-          "en": "The letters on a Gridfinity bin's label shelves can now be in a font of your own, picked under \"Font\" as for a text. The design keeps the outlines of the letters it uses, so it opens with the same letters on another computer. \"Letter size\" makes the capitals the same height on every shelf that has room for them, so labels of different lengths match."
+          "en": "The letters on a Gridfinity bin's label shelves can now be in a font of your own, picked under \"Font\" as for a text. The design keeps the outlines of the letters it uses, so it opens with the same letters on another computer. \"Letter size\" makes the capitals the same height on every shelf that has room for them, so labels of different lengths match.",
+          "da": "Bogstaverne på en Gridfinity-bakkes etiketlister kan nu være i en font af eget valg, valgt under „Font“ som for en tekst. Designet beholder omridset af de bogstaver, det bruger, så det åbner med de samme bogstaver på en anden computer. „Bogstavstørrelse“ gør de store bogstaver lige høje på hver liste, der har plads til dem, så etiketter af forskellig længde passer til hinanden."
         }
       },
       {
         "title": {
           "de": "Mehrfarbige Körper in OrcaSlicer und PrusaSlicer",
-          "en": "Bodies of several colours in OrcaSlicer and PrusaSlicer"
+          "en": "Bodies of several colours in OrcaSlicer and PrusaSlicer",
+          "da": "Legemer i flere farver i OrcaSlicer og PrusaSlicer"
         },
         "body": {
           "de": "Ein Körper in mehreren Farben, etwa eine Gruppe mit „Mehrfarbig“, kam in OrcaSlicer und den darauf aufbauenden Slicern einfarbig an. Die 3MF-Ausfuhr bemalt seine Flächen jetzt zusätzlich so, wie diese Slicer es selbst tun, sodass jede Farbe ihr eigenes Filament bekommt; PrusaSlicer 2.9 liest das ebenso.",
-          "en": "A body of several colours, such as a group with Multicolor on, came into OrcaSlicer and the slicers built on it in one colour. The 3MF export now also paints its faces the way these slicers do themselves, so every colour gets a filament of its own; PrusaSlicer 2.9 reads it too."
+          "en": "A body of several colours, such as a group with Multicolor on, came into OrcaSlicer and the slicers built on it in one colour. The 3MF export now also paints its faces the way these slicers do themselves, so every colour gets a filament of its own; PrusaSlicer 2.9 reads it too.",
+          "da": "Et legeme i flere farver, som en gruppe med Multifarve slået til, kom ind i OrcaSlicer og de slicere, der er bygget på det, i én farve. 3MF-eksporten maler nu også dets flader, som disse slicere selv gør, så hver farve får et filament af eget valg; PrusaSlicer 2.9 læser det også."
         }
       },
       {
         "title": {
           "de": "Formen in der Objektliste sperren",
-          "en": "Lock a shape from the object list"
+          "en": "Lock a shape from the object list",
+          "da": "Lås en form fra objektlisten"
         },
         "body": {
           "de": "Der Schild in der Objektliste sperrt eine Form jetzt auch, statt sie nur zu entsperren: Er zeigt sich an der markierten Zeile und unter der Maus, ein Klick sperrt oder entsperrt. Die Pfeiltasten an einem angeklickten Griff verschieben nur noch den Eintrag in der Liste, nicht mehr zugleich das Teil oder die Ansicht.",
-          "en": "The shield in the object list now locks a shape as well as unlocking it: it shows on the selected row and under the mouse, and a click locks or unlocks. The arrow keys on a clicked grip now move only the entry in the list, no longer the part or the view as well."
+          "en": "The shield in the object list now locks a shape as well as unlocking it: it shows on the selected row and under the mouse, and a click locks or unlocks. The arrow keys on a clicked grip now move only the entry in the list, no longer the part or the view as well.",
+          "da": "Skjoldet i objektlisten låser nu også en form, ud over at låse den op: det vises på den valgte række og under musen, og et klik låser eller låser op. Piletasterne på et klikket greb flytter nu kun den post i listen, ikke længere delen eller visningen med."
         }
       }
     ]

@@ -48,6 +48,18 @@ No menu ao lado do olho ({{ui:editor.group.visibility}}), **Mostrar saliências*
 
 A inclinação que a sua impressora aguenta é definida nas configurações, em {{ui:workspace.appearance}}: de 30° (cuidadoso) a 70° (para impressoras com boa refrigeração da peça). Uma face apoiada em outro sólido continua marcada: layerling só olha para a própria face.
 
+## Nervuras de suporte para uma peça inclinada
+
+Uma peça impressa inclinada sobre uma aresta, a 45° por exemplo, muitas vezes não precisa de suportes: as faces são íngremes o bastante. Mas ela se apoia numa aresta fina e pode tombar. A {{ui:supportRib.title}} a segura: uma nervura fina fica sob a face inferior a uma pequena distância, sobre um pé oval, e pontes minúsculas prendem a peça. Gire primeiro a peça sobre a aresta e deixe-a apoiada na mesa.
+
+1. Selecione a peça e clique em {{ui:supportRib.title}} no grupo {{ui:editor.group.modify}} da faixa, clique com o botão direito na peça ou encontre-a com [[Ctrl]]+[[K]].
+2. Clique na face inferior onde a nervura deve ficar. A face precisa estar voltada para baixo, inclinada entre 15° e 75° e chegar até a mesa; a nervura desce reta pela face a partir do seu clique.
+3. Ajuste {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} e {{ui:supportRib.firstLayer}} como no seu fatiador. A nervura tem duas linhas de bico de espessura e a folga até a peça meia linha; cada ponte tem uma linha de largura e exatamente uma camada de altura e fica sobre uma camada da impressão, para que o fatiador a imprima como uma única linha fina que se quebra de forma limpa. {{ui:supportRib.height}} diz até onde a nervura sobe pela face (até a metade no início) e {{ui:supportRib.bridgeSpacing}} a distância entre as pontes, em camadas inteiras.
+4. Em {{ui:supportRib.more}} dá para ajustar à mão a espessura, a folga, a largura das pontes e a espessura do pé (até lá eles seguem o bico e as camadas), além da largura do pé e dos arredondamentos no pé e em cima.
+5. {{ui:supportRib.apply}} adiciona a nervura. Com {{ui:supportRib.bundle}} (ligado no início) nervura e peça ficam agrupadas: movem-se juntas e vão para o fatiador como dois sólidos lado a lado, unidos pelas pontes na impressão.
+
+A nervura é um sólido de malha: para mudá-la, apague-a e faça de novo. Cada clique faz uma nervura; para mais, clique em {{ui:supportRib.repick}} ou repita-a com {{ui:editor.tool.array}}. A nervura não pode entrar na peça em lugar nenhum, e a peça precisa estar sobre a mesa - senão a janela diz por quê. Seus ajustes ficam guardados neste navegador para a próxima nervura.
+
 ## Espessura de parede, folga e chanfros
 
 - As paredes devem ter pelo menos a largura de duas linhas de extrusão, ou seja, 0,8 mm com um bico de 0,4 mm. Peças resistentes precisam de 1,2 a 2 mm.

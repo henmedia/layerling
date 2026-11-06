@@ -17,7 +17,12 @@ const frameScheduler: Scheduler = {
  * fresh press moves at once, as it always did, and `flush` hands over what is
  * left when the key comes up.
  */
-export function createKeyRepeatBatch(apply: (nudge: KeyNudge) => void, scheduler: Scheduler = frameScheduler) {
+/**
+ * `live` tells `apply` the move belongs to a held key that is still going: only
+ * the first press of a run and the last move before the key comes up are
+ * committed to the history, the moves in between just show on the screen.
+ */
+export function createKeyRepeatBatch(apply: (nudge: KeyNudge, live: boolean) => void, scheduler: Scheduler = frameScheduler) {
   let pending: KeyNudge | null = null;
   let handle: number | null = null;
 
@@ -28,13 +33,13 @@ export function createKeyRepeatBatch(apply: (nudge: KeyNudge) => void, scheduler
     }
     const nudge = pending;
     pending = null;
-    if (nudge && (nudge.x || nudge.z || nudge.rise)) apply(nudge);
+    if (nudge && (nudge.x || nudge.z || nudge.rise)) apply(nudge, true);
   };
 
   const add = (nudge: KeyNudge, repeat: boolean) => {
     if (!repeat) {
       flush();
-      apply(nudge);
+      apply(nudge, false);
       return;
     }
     pending = pending

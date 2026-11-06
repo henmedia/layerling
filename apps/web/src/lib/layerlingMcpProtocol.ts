@@ -108,6 +108,7 @@ export type LayerlingMcpCommandName =
   | "perforate_face"
   | "sweep_sketch"
   | "push_face"
+  | "support_rib"
   | "scale_objects"
   | "mate_faces"
   | "open_group"

@@ -46,6 +46,18 @@ V nabídce vedle oka v části {{ui:editor.group.visibility}} zapněte **zobraze
 
 Mezní úhel nastavíte v části {{ui:workspace.appearance}}, od 30° pro opatrnější tisk po 70° pro tiskárny s dobrým chlazením výtisku. Plocha podepřená jiným tělesem se stále označuje, protože Layerling posuzuje pouze samotnou plochu.
 
+## Podpěrná žebra pro šikmý díl
+
+Díl tištěný šikmo na hraně, třeba pod 45°, často žádné podpěry nepotřebuje: jeho plochy jsou dost strmé. Stojí ale na úzké hraně a může se převrhnout. {{ui:supportRib.title}} ho drží: pod jeho spodní plochou stojí s malou mezerou tenké žebro na oválné patce a drobné můstky díl přidržují. Díl nejdřív otočte na hranu a nechte ho stát na podložce.
+
+1. Vyberte díl a klikněte na {{ui:supportRib.title}} ve skupině {{ui:editor.group.modify}} na pásu, klikněte na díl pravým tlačítkem nebo nástroj najděte přes [[Ctrl]]+[[K]].
+2. Klikněte na spodní plochu tam, kde má žebro stát. Plocha musí mířit dolů, být skloněná mezi 15° a 75° a sahat až na podložku; žebro vede od místa kliknutí rovně dolů po ploše.
+3. Nastavte {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} a {{ui:supportRib.firstLayer}} jako ve svém sliceru. Žebro je silné dvě dráhy trysky, mezera k dílu půl dráhy; každý můstek je široký jednu dráhu a vysoký přesně jednu vrstvu a leží na vrstvě tisku, takže ho slicer vytiskne jako jednu tenkou dráhu, která se čistě odlomí. {{ui:supportRib.height}} udává, jak vysoko žebro sahá po ploše (zpočátku do poloviny), {{ui:supportRib.bridgeSpacing}}, jak daleko od sebe jsou můstky, v celých vrstvách.
+4. V {{ui:supportRib.more}} lze ručně nastavit tloušťku, mezeru, šířku můstků a tloušťku patky (do té doby se řídí tryskou a vrstvami), a také šířku patky a zaoblení u patky a nahoře.
+5. {{ui:supportRib.apply}} žebro přidá. S {{ui:supportRib.bundle}} (zpočátku zapnuto) jsou žebro a díl sdružené: pohybují se spolu a jdou do sliceru jako dvě tělesa vedle sebe, při tisku spojená můstky.
+
+Žebro je síťové těleso: chcete-li ho změnit, smažte ho a vytvořte znovu. Každé kliknutí vytvoří jedno žebro; pro další klikněte na {{ui:supportRib.repick}} nebo ho opakujte pomocí {{ui:editor.tool.array}}. Žebro nesmí nikde vniknout do dílu a díl musí stát na podložce - jinak okno řekne proč. Nastavení si tento prohlížeč pamatuje pro další žebro.
+
 ## Tloušťka stěn, vůle a zkosení
 
 - Stěna by měla mít nejméně dvě šířky extruzní čáry, tedy přibližně 0,8 mm při trysce 0,4 mm. Pevnější díly potřebují 1,2 až 2 mm.

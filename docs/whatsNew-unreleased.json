@@ -1,12 +1,12 @@
 [
   {
     "title": {
-      "de": "Neue Entwürfe mit Winkellineal im Nullpunkt",
-      "en": "New designs with a framing square at the origin"
+      "de": "Stützrippe für schräg gedruckte Teile",
+      "en": "A support rib for parts printed tilted"
     },
     "body": {
-      "de": "Wer das Winkellineal fast immer braucht, setzt in den Einstellungen unter „Maße“ das Häkchen bei „Neue Entwürfe mit Winkellineal im Nullpunkt beginnen“. Dann liegt in jedem neuen Entwurf dieses Browsers schon eines im Nullpunkt. Vorhandene Entwürfe bleiben, wie sie sind.",
-      "en": "If you use the framing square nearly all the time, tick \"Start new designs with a framing square at the origin\" under Measurement in the settings. Every new design in this browser then starts with one at the origin. Designs you already have stay as they are."
+      "de": "Ein Teil schräg auf einer Kante drucken, ohne die Stützen des Slicers: „Stützrippe“ unter „Ändern“, die untere Fläche anklicken, und eine dünne Rippe steht mit etwas Abstand darunter auf einem ovalen Fuß. Winzige Brücken von genau einer Schicht halten das Teil und lassen sich danach abbrechen. Düse und Schichten stellst du wie im Slicer ein.",
+      "en": "Print a part tilted on one edge without the slicer's supports: \"Support rib\" under Modify, click the lower face, and a thin rib stands under it a gap away, on an oval foot. Tiny bridges exactly one layer high hold the part and break off afterwards. Set the nozzle and the layers as in your slicer."
     }
   }
 ]

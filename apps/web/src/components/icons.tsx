@@ -169,6 +169,7 @@ export {
   ToolbarPatternIcon,
   ToolbarHolePatternIcon,
   ToolbarFaceToolIcon,
+  ToolbarSupportRibIcon,
   ToolbarConstructionLineIcon,
   ToolbarMiddleLineIcon,
   ToolbarLayFlatIcon,

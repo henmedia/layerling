@@ -21,6 +21,7 @@ import {
   sbcBoardBlocks,
   sbcBoardHasButtons,
   sbcBoardHasGpio,
+  sbcBoardHasLens,
   sbcBoardHasRibbon,
   sbcBoardExtent,
   sbcBoardSolids,
@@ -36,7 +37,9 @@ import type { SbcBoardSettings, SbcBoardType, WorkplaneShape } from "@/types/lay
 /** The small ESP32 boards: no mounting holes, USB-C at the right end, castellated pins. */
 const ESP32_BOARDS: SbcBoardType[] = ["xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini"];
 /** The microcontroller boards: no microSD card slot, no ribbon cables, no GPIO header to open up. */
-const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoNano", "wemosD1Mini"];
+/** The camera boards: their microSD card slot is on top, by the camera. */
+const CAMERA_BOARDS: SbcBoardType[] = ["esp32CamMb", "esp32s3Cam"];
+const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"];
 
 /** A body carrying board settings; what carries them does not matter to the project file. */
 function boardBody(id: string, sbcBoard: SbcBoardSettings = { board: "pi4", clearance: 0.3 }): WorkplaneShape {
@@ -70,7 +73,7 @@ async function withDefinition(patch: Record<string, unknown>) {
 
 describe("SBC board data (#1098)", () => {
   it("has every board in the list, the Raspberry Pi 5 first", () => {
-    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoNano", "wemosD1Mini"]);
+    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"]);
     expect(DEFAULT_SBC_BOARD).toBe("pi5");
     for (const type of SBC_BOARD_ORDER) expect(SBC_BOARDS[type].type).toBe(type);
   });
@@ -417,7 +420,7 @@ describe("the microSD card slot", () => {
 
   it("is on every board, at the left edge where the card goes in, as the makers' models and drawings have it", () => {
     // The microcontroller boards have none.
-    for (const type of MICRO_BOARDS) expect(slot(type), type).toBeUndefined();
+    for (const type of MICRO_BOARDS.filter((entry) => !CAMERA_BOARDS.includes(entry))) expect(slot(type), type).toBeUndefined();
     for (const type of SBC_BOARD_ORDER.filter((entry) => !MICRO_BOARDS.includes(entry))) {
       const board = SBC_BOARDS[type];
       const part = slot(type);
@@ -463,6 +466,23 @@ describe("the openings up and out", () => {
       expect(sbcBoardHasRibbon(SBC_BOARDS[type]) || sbcBoardHasGpio(SBC_BOARDS[type]), type).toBe(false);
     }
     for (const type of ["pi5", "pi4", "pi3bPlus", "bttPi12"] as const) expect(SBC_BOARDS[type].parts.filter((part) => part.gpio).map((part) => part.name)).toEqual(["GPIO header"]);
+  });
+
+  it("take a camera board's lens up through the lid by the reach up, only when asked for", () => {
+    for (const type of CAMERA_BOARDS) {
+      const board = SBC_BOARDS[type];
+      expect(sbcBoardHasLens(board), type).toBe(true);
+      const at = index(type, "camera");
+      const part = board.parts[at];
+      expect(sbcBoardBlocks(board, 0.3, 0)[at].top, type).toBeCloseTo(board.thickness + part.height, 9);
+      const up = sbcBoardBlocks(board, 0.3, 0, { lensUp: true, upReach: 30 })[at];
+      expect(up.top, type).toBeCloseTo(board.thickness + part.height + 0.3 + 30, 9);
+      expect(up.x0).toBeCloseTo(part.x0 - 0.3, 9);
+      expect(up.bottom).toBe(board.thickness);
+    }
+    for (const type of SBC_BOARD_ORDER.filter((entry) => !CAMERA_BOARDS.includes(entry))) expect(sbcBoardHasLens(SBC_BOARDS[type]), type).toBe(false);
+    expect(normalizeSbcBoardSettings({ board: "esp32s3Cam", lensUp: true, upReach: 25 })).toEqual({ board: "esp32s3Cam", clearance: 0, reach: 0, lensUp: true, upReach: 25 });
+    expect(Object.keys((tools.find((entry) => entry.name === "layerling_create_sbc_board")!.inputSchema as { properties: object }).properties)).toContain("lensUp");
   });
 
   it("take the ribbon cable connectors and the GPIO header up by the reach up, grown by the clearance", () => {
@@ -635,7 +655,7 @@ describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano an
     // Arduino's Nano file: 43.18 x 17.78 mm, square corners, four 1.651 mm holes 1.27 mm in.
     expect(SBC_BOARDS.arduinoNano).toMatchObject({ width: 43.18, depth: 17.78, cornerRadius: 0, holeDiameter: 1.651 });
     expect(SBC_BOARDS.arduinoNano.holes).toEqual([[1.27, 1.27], [41.91, 1.27], [1.27, 16.51], [41.91, 16.51]]);
-    for (const type of ["featherEsp32s3", "arduinoUno", "arduinoNano"] as const) expect(sbcHoleDiameter(SBC_BOARDS[type], SBC_BOARDS[type].holes[0])).toBe(SBC_BOARDS[type].holeDiameter);
+    for (const type of ["featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano"] as const) expect(sbcHoleDiameter(SBC_BOARDS[type], SBC_BOARDS[type].holes[0])).toBe(SBC_BOARDS[type].holeDiameter);
   });
 
   it("give the UNO its stepped right edge and the cut back corner, with the 45° cuts where the file has them", () => {
@@ -653,6 +673,80 @@ describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano an
       [68.58, 40.386, 45, expect.closeTo(2.54, 9)],
       [66.04, 53.34, 45, expect.closeTo(1.524, 9)],
     ]);
+  });
+
+  it("give the MEGA 2560 the outline, holes and headers of Arduino's PCB file", () => {
+    const board = SBC_BOARDS.arduinoMega;
+    expect(board).toMatchObject({ width: 101.6, depth: 53.34, cornerRadius: 1, holeDiameter: 3.2 });
+    expect(board.holes).toEqual([[13.97, 2.54], [15.24, 50.8], [66.04, 7.62], [66.04, 35.56], [90.17, 50.8], [96.52, 2.54]]);
+    const outline = board.outline!;
+    expect(outline.plateWidth).toBe(99.06);
+    const step = outline.add[0];
+    expect([step.x - step.width / 2, step.x + step.width / 2]).toEqual([expect.closeTo(99.06, 9), expect.closeTo(101.6, 9)]);
+    expect([step.y - step.depth / 2, step.y + step.depth / 2]).toEqual([expect.closeTo(2.54, 9), expect.closeTo(40.386, 9)]);
+    expect(outline.cut.map((entry) => [entry.x, entry.y, entry.turn, entry.width * Math.SQRT1_2])).toEqual([
+      [101.6, 2.54, 45, expect.closeTo(2.54, 9)],
+      [101.6, 40.386, 45, expect.closeTo(2.54, 9)],
+      [99.06, 53.34, 45, expect.closeTo(1.524, 9)],
+    ]);
+    // USB-B and the jack at the left end, the double row at the right end, 2 x 18 pins.
+    expect(part("arduinoMega", "USB-B").x0).toBeLessThan(0);
+    expect(part("arduinoMega", "power jack").x0).toBeLessThan(0);
+    const double = pinDots("arduinoMega", "header (digital 22 to 53)");
+    expect(double).toHaveLength(36);
+    expect(middles(double, "x")).toEqual([93.98, 96.52]);
+    expect(middles(pinDots("arduinoMega", "header (digital 0 to 7)"), "y")).toEqual([50.8]);
+    expect(middles(pinDots("arduinoMega", "header (analog 8 to 15)"), "y")).toEqual([2.54]);
+    for (const entry of board.parts.filter((item) => item.kind === "header" && !item.name.startsWith("ICSP"))) {
+      expect(entry.height, entry.name).toBe(8.5);
+      expect(entry.estimated, entry.name).toBeUndefined();
+    }
+    expect(part("arduinoMega", "RESET button").y0).toBeGreaterThan(40);
+    expect(sbcBoardHasButtons(board)).toBe(true);
+    expect(board.estimated).toEqual(["thickness"]);
+  });
+
+  it("give the ESP32-CAM AI-Thinker's size, the MB under it with its micro-USB at the left end", () => {
+    const board = SBC_BOARDS.esp32CamMb;
+    expect(board).toMatchObject({ width: 40.5, depth: 27, holes: [], holeDiameter: 0 });
+    expect(part("esp32CamMb", "microSD card slot").x1).toBe(40.5);
+    expect(part("esp32CamMb", "micro-USB (MB)")).toMatchObject({ x0: -0.7, underside: true, kind: "connector" });
+    expect(board.parts.filter((entry) => entry.underside).every((entry) => entry.name.includes("MB"))).toBe(true);
+    expect(board.parts.every((entry) => entry.estimated)).toBe(true);
+    expect(part("esp32CamMb", "RESET button (MB)")).toMatchObject({ press: "front", underside: true, y0: 0 });
+    expect(sbcBoardHasButtons(board)).toBe(true);
+  });
+
+  it("give the nulllab ESP32-S3-CAM the size and holes of nulllab's drawing, USB-C at the left end", () => {
+    const board = SBC_BOARDS.esp32s3Cam;
+    expect(board).toMatchObject({ width: 38.4, depth: 30.4 });
+    expect(board.holes).toEqual([[3.2, 3.2], [35.2, 3.2], [3.2, 27.2], [35.2, 27.2]]);
+    expect(part("esp32s3Cam", "USB-C").x0).toBeLessThan(0);
+    expect(part("esp32s3Cam", "BOOT button").y0).toBeGreaterThan(part("esp32s3Cam", "RESET button").y1);
+    expect(pinDots("esp32s3Cam", "pins (GPIO0 to 5V)")).toHaveLength(8);
+    expect(sbcBoardHasButtons(board)).toBe(true);
+    expect(board.estimated).toEqual(["thickness", "cornerRadius", "holeDiameter"]);
+  });
+
+  it("give the ESP32-DevKitC V4 Espressif's outline, 2 x 19 pins 25.4 mm apart and the module past the right end", () => {
+    const board = SBC_BOARDS.esp32DevKitC;
+    expect(board).toMatchObject({ width: 48.26, depth: 27.94, cornerRadius: 1, holes: [] });
+    expect(pinDots("esp32DevKitC", "pins (5V to 3V3)")).toHaveLength(19);
+    expect(middles(pinDots("esp32DevKitC", "pins (CLK to GND)"), "y")[0]).toBeCloseTo(1.3, 6);
+    expect(middles(pinDots("esp32DevKitC", "pins (5V to 3V3)"), "y")[0]).toBeCloseTo(26.7, 6);
+    expect(part("esp32DevKitC", "ESP32-WROOM-32E")).toMatchObject({ x1: 54.3, height: 3.1 });
+    expect(part("esp32DevKitC", "ESP32-WROOM-32E").x1 - part("esp32DevKitC", "ESP32-WROOM-32E").x0).toBeCloseTo(25.5, 6);
+    expect(part("esp32DevKitC", "micro-USB").x0).toBeLessThan(0);
+    expect(part("esp32DevKitC", "EN button").y0).toBeGreaterThan(part("esp32DevKitC", "Boot button").y1);
+  });
+
+  it("give the 30-pin ESP32 DevKit V1 its four holes, 2 x 15 pins 25.4 mm apart, all estimated", () => {
+    const board = SBC_BOARDS.esp32DevKitV1;
+    expect(board).toMatchObject({ width: 51.8, depth: 28.2, holeDiameter: 2.8 });
+    expect(board.holes).toEqual([[2.2, 2.2], [2.2, 26.0], [49.6, 2.2], [49.6, 26.0]]);
+    expect(pinDots("esp32DevKitV1", "pins (EN to VIN)")).toHaveLength(15);
+    expect(board.parts.every((entry) => entry.estimated)).toBe(true);
+    expect(part("esp32DevKitV1", "EN button").y0).toBeGreaterThan(part("esp32DevKitV1", "BOOT button").y1);
   });
 
   it("give the D1 mini V4.0.0 the outline and pins of Wemos's drawing, laid with USB-C at the left", () => {
@@ -790,11 +884,60 @@ describe("the buttons' reach", () => {
     expect(reset.x0).toBeCloseTo(1.0 - 0.3, 9);
     expect(reset.height).toBeCloseTo(2.0 + 0.3, 9);
     const pressedFromSide = SBC_BOARD_ORDER.flatMap((type) => SBC_BOARDS[type].parts.filter((part) => part.press).map((part) => `${type} ${part.name} ${part.press}`));
-    expect(pressedFromSide).toEqual(["pi5 power button left", "wemosD1Mini RESET button back"]);
+    expect(pressedFromSide).toEqual(["pi5 power button left", "wemosD1Mini RESET button back", "esp32CamMb RESET button (MB) front"]);
   });
 
   it("offers the reach on every board with buttons", () => {
     expect(SBC_BOARD_ORDER.filter((type) => sbcBoardHasButtons(SBC_BOARDS[type]))).toEqual(SBC_BOARD_ORDER.filter((type) => SBC_BOARDS[type].parts.some((part) => part.kind === "button")));
     expect(sbcBoardHasButtons(SBC_BOARDS.arduinoUno)).toBe(true);
+  });
+});
+
+describe("the Raspberry Pi Pico series", () => {
+  const PICOS = ["pico", "picoW", "pico2", "pico2W"] as const;
+  const part = (type: SbcBoardType, name: string) => SBC_BOARDS[type].parts.find((entry) => entry.name === name)!;
+
+  it("match Raspberry Pi's STEP models: 51 x 21 mm, four 2.1 mm holes 2 mm from the ends and 11.4 mm apart", () => {
+    for (const type of PICOS) {
+      expect(SBC_BOARDS[type], type).toMatchObject({ width: 51, depth: 21, cornerRadius: 0, holeDiameter: 2.1 });
+      expect(SBC_BOARDS[type].holes, type).toEqual([[2, 4.8], [2, 16.2], [49, 4.8], [49, 16.2]]);
+    }
+  });
+
+  it("put micro-USB at the left end, BOOTSEL and pin 1 at the front by it, as the official pinout drawings show", () => {
+    for (const type of PICOS) {
+      const board = SBC_BOARDS[type];
+      expect(sbcPartEdges(board, part(type, "micro-USB")), type).toEqual({ left: true, right: false, front: false, back: false });
+      expect(part(type, "micro-USB").profile).toBe("microUsb");
+      // Not mirrored: BOOTSEL nearer the front (GP0's side) than the back, and near the USB end.
+      const bootsel = part(type, "BOOTSEL button");
+      expect(bootsel.kind).toBe("button");
+      expect((bootsel.y0 + bootsel.y1) / 2, type).toBeLessThan(board.depth / 2);
+      expect(bootsel.x1, type).toBeLessThan(board.width / 3);
+      expect(part(type, "pins (GP0 to GP15)").y1, type).toBeLessThan(5);
+      expect(part(type, "pins (VBUS to GP16)").y0, type).toBeGreaterThan(15);
+    }
+    // The W boards' Wi-Fi module at the far end from the USB.
+    for (const type of ["picoW", "pico2W"] as const) expect(part(type, "Wi-Fi module").x0, type).toBeGreaterThan(30);
+  });
+
+  it("show 2 x 20 pins 2.54 mm apart, 17.78 mm across", () => {
+    for (const type of PICOS) {
+      const dots = sbcBoardSolids(SBC_BOARDS[type], 0, 0).filter((solid) => solid.role === "pin");
+      expect(dots, type).toHaveLength(40);
+      const ys = [...new Set(dots.map((dot) => Math.round(((dot.y0 + dot.y1) / 2) * 1000) / 1000))].sort((a, b) => a - b);
+      expect(ys, type).toEqual([1.61, 19.39]);
+      const xs = [...new Set(dots.map((dot) => Math.round(((dot.x0 + dot.x1) / 2) * 1000) / 1000))].sort((a, b) => a - b);
+      expect(xs[0], type).toBeCloseTo(1.37, 6);
+      expect(xs[1] - xs[0], type).toBeCloseTo(2.54, 6);
+    }
+  });
+
+  it("mark only the loose pins' pads as estimated, but the Pico 2 W, which has no model of its own", () => {
+    for (const type of ["pico", "picoW", "pico2"] as const) {
+      expect(SBC_BOARDS[type].parts.filter((entry) => entry.estimated).map((entry) => entry.name), type).toEqual(["pins (GP0 to GP15)", "pins (VBUS to GP16)"]);
+    }
+    expect(SBC_BOARDS.pico2W.parts.every((entry) => entry.estimated)).toBe(true);
+    expect(SBC_BOARDS.pico2W.estimated).toEqual(["thickness"]);
   });
 });
