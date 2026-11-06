@@ -27,6 +27,12 @@
  * - Squares and triangles: tiles of one size with one gap in a grid, cut
  *   along the lines where their walls begin and end and along the creases
  *   at their corners, as bricks are; their size and gap stay as set.
+ * - Half-timbering (for model buildings): posts, sills, plates, rails and
+ *   the braces in its fields cut along their walls as tiles are, over a
+ *   coarse grid for the plaster between them (see sliceTimber).
+ * - A natural stone wall: refined evenly, finer at the stones' edges, then
+ *   cut along every stone's outline and the rounding of its edge (see
+ *   stoneCuts); another seed, other stones.
  * - Knitting, rope, basket weave, carbon (twill), grain and an image (a grey
  *   height map, see surfaceTextureImages.ts): refined evenly, finer where the
  *   value jumps; round the axis a weave and carbon are cut along their bands too.
@@ -96,7 +102,7 @@ import {
   type SurfaceTextureOwnImage,
 } from "@/lib/surfaceTextureImages";
 
-export const SURFACE_TEXTURE_PATTERNS = ["grooves", "knurl", "honeycomb", "bumps", "cells", "bricks", "squares", "triangles", "knit", "rope", "weave", "bark", "wood", "carbon", "grain", "image", "cracks", "text"] as const;
+export const SURFACE_TEXTURE_PATTERNS = ["grooves", "knurl", "honeycomb", "bumps", "cells", "bricks", "timber", "stones", "squares", "triangles", "knit", "rope", "weave", "bark", "wood", "carbon", "grain", "image", "cracks", "text"] as const;
 export type SurfaceTexturePattern = (typeof SURFACE_TEXTURE_PATTERNS)[number];
 /** Cross-section of a groove or joint: round (cosine), pointed (V) or flat (a flat floor with steep flanks). */
 /** round: a soft bell; pointed: a V (a cone on a bump); flat: a flat floor or top; dome: a half circle (half a ball on a bump). */
@@ -136,6 +142,15 @@ export type SurfaceTextureCarbonWeave = (typeof SURFACE_TEXTURE_CARBON_WEAVES)[n
  */
 export const SURFACE_TEXTURE_BRICK_BONDS = ["running", "stack", "english", "englishCross", "flemish"] as const;
 export type SurfaceTextureBrickBond = (typeof SURFACE_TEXTURE_BRICK_BONDS)[number];
+
+/**
+ * Half-timbering: what the panels between the posts hold - nothing, braces (a diagonal in every field, leaning towards
+ * the middle of the wall from both ends, so the frame is the same from either side), a St Andrew's cross in the field
+ * under the lowest rail, knee braces in the top corners, or mixed: braces at both ends, crosses and knee braces in
+ * turn towards the middle, as on many old houses (see timberStyle).
+ */
+export const SURFACE_TEXTURE_TIMBER_BRACINGS = ["none", "braces", "cross", "knee", "mixed"] as const;
+export type SurfaceTextureTimberBracing = (typeof SURFACE_TEXTURE_TIMBER_BRACINGS)[number];
 
 /** Bark: oak, pine, spruce, birch or beech (see surfaceTextureWood.ts). */
 export const SURFACE_TEXTURE_BARK_TYPES = BARK_KINDS;
@@ -295,7 +310,7 @@ export type SurfaceTextureSettings = {
   textHeight: number;
   /** Turned on the surface, degrees. */
   textTurn: number;
-  /** Cells, grain, bark and wood: another number, another arrangement; bricks: other bricks lie deeper. */
+  /** Cells, grain, bark, wood and a stone wall: another number, another arrangement; bricks: other bricks lie deeper. */
   seed: number;
   /** Carbon: the weave (the spacing is the width of the upright bands). */
   carbonWeave: SurfaceTextureCarbonWeave;
@@ -311,6 +326,28 @@ export type SurfaceTextureSettings = {
   brickBond: SurfaceTextureBrickBond;
   /** Bricks: how unevenly they lie, 0 to 1 - at 1 a brick sinks by up to half the depth, each its own way. */
   brickVary: number;
+  /**
+   * Half-timbering (the spacing is a panel's width, from post to post; the depth how far the beams stand out): a storey's
+   * height, mm, from sill to plate. Both are fitted as bricks are (see fitTimber): whole panels round a round body and
+   * from edge to edge of a flat side, whole storeys from the bottom edge up.
+   */
+  timberHeight: number;
+  /** Half-timbering: a beam's width, mm, the same for posts, sills, rails and braces. */
+  timberBeam: number;
+  /** Half-timbering: how many rails run across each storey between sill and plate, 0 to 2 (they split it evenly). */
+  timberRails: number;
+  timberBracing: SurfaceTextureTimberBracing;
+  /** Half-timbering: faint grain along the beams. */
+  timberGrain: boolean;
+  /**
+   * Natural stone wall (the spacing is a stone's size: a course's height on average): how much the stones and courses
+   * differ in size, 0 to 1 (1: from small stones to ones twice as large, now and then two small ones in one course).
+   */
+  stoneVary: number;
+  /** Natural stone wall: 0 broken stone with sharp edges (irregular polygons), 1 rounded field stones, between in between. */
+  stoneRound: number;
+  /** Natural stone wall: the mortar joint's width, mm. The seed lays the stones out anew. */
+  stoneJoint: number;
   /**
    * Squares and triangles: the gap between two of them, mm, from side to side (the spacing is a square's or a triangle's
    * side). Size and gap stay as set; round a body the gap is rounded so that a whole number goes round (see fitTiles).
@@ -407,6 +444,14 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   brickJoint: 0.8,
   brickBond: "running",
   brickVary: 0,
+  timberHeight: 30,
+  timberBeam: 2.4,
+  timberRails: 1,
+  timberBracing: "mixed",
+  timberGrain: true,
+  stoneVary: 0.5,
+  stoneRound: 0.5,
+  stoneJoint: 0.8,
   tileGap: 2,
   tileFromBottom: false,
   barkType: "oak",
@@ -456,6 +501,12 @@ export const SURFACE_TEXTURE_LIMITS: Record<NumberKey, [number, number]> = {
   brickHeight: [0.5, 100],
   brickJoint: [0.1, 10],
   brickVary: [0, 1],
+  timberHeight: [3, 300],
+  timberBeam: [0.3, 30],
+  timberRails: [0, 2],
+  stoneVary: [0, 1],
+  stoneRound: [0, 1],
+  stoneJoint: [0.1, 10],
   tileGap: [0.2, 50],
   ringWidth: [0.3, 20],
   woodKnots: [0, 12],
@@ -476,6 +527,7 @@ const CHOICES = {
   crackStart: SURFACE_TEXTURE_CRACK_STARTS,
   carbonWeave: SURFACE_TEXTURE_CARBON_WEAVES,
   brickBond: SURFACE_TEXTURE_BRICK_BONDS,
+  timberBracing: SURFACE_TEXTURE_TIMBER_BRACINGS,
   barkType: SURFACE_TEXTURE_BARK_TYPES,
   woodType: SURFACE_TEXTURE_WOOD_TYPES,
   woodCut: SURFACE_TEXTURE_WOOD_CUTS,
@@ -534,8 +586,8 @@ const DETAIL_STEPS: Record<SurfaceTextureDetail, number> = { coarse: 3, medium: 
 export const SURFACE_TEXTURE_MAX_TRIANGLES = 600_000;
 export const SURFACE_TEXTURE_PREVIEW_TRIANGLES = 200_000;
 
-/** Cut along their cell borders (see sliceCells; bricks: sliceBricks; squares and triangles: sliceTiles). */
-const CELL_PATTERNS: readonly SurfaceTexturePattern[] = ["honeycomb", "bumps", "cells", "bricks", "squares", "triangles"];
+/** Cut along their cell borders (see sliceCells; bricks: sliceBricks; squares and triangles: sliceTiles; half-timbering: sliceTimber). */
+const CELL_PATTERNS: readonly SurfaceTexturePattern[] = ["honeycomb", "bumps", "cells", "bricks", "timber", "squares", "triangles"];
 /** Tiles of one size with one gap in a grid (see fitTiles, tileValue and sliceTiles). */
 const TILE_PATTERNS: readonly SurfaceTexturePattern[] = ["squares", "triangles"];
 /**
@@ -596,6 +648,7 @@ export function normalizeSurfaceTexture(input: unknown): SurfaceTextureSettings 
   out.crackSeed = Math.round(out.crackSeed);
   out.seed = Math.round(out.seed);
   out.woodKnots = Math.round(out.woodKnots);
+  out.timberRails = Math.round(out.timberRails);
   // What a pattern is not told starts as it looks right (see SURFACE_TEXTURE_STARTERS), not as the knurling would.
   const starter = SURFACE_TEXTURE_STARTERS[out.pattern];
   if (starter) {
@@ -625,7 +678,8 @@ export function normalizeSurfaceTexture(input: unknown): SurfaceTextureSettings 
 /**
  * Where a pattern starts when it is chosen, for what it is not told: bumps as half balls (the V a groove gets by default
  * would make them cones), knitting, rope and weave raised and round as their models, at the size those were measured
- * at, and bricks three times as long as a course is high, with the joints' flat floor sunk in as mortar.
+ * at, and bricks three times as long as a course is high, with the joints' flat floor sunk in as mortar. Half-timbering
+ * and the stone wall stand out (beams and stones), at sizes for model buildings of about 1:87, up to the corners.
  */
 export const SURFACE_TEXTURE_STARTERS: Partial<Record<SurfaceTexturePattern, Partial<SurfaceTextureSettings>>> = {
   // Grooves upright, along the axis; knurling keeps its slant (its two families cross at it).
@@ -634,6 +688,9 @@ export const SURFACE_TEXTURE_STARTERS: Partial<Record<SurfaceTexturePattern, Par
   cells: { spacing: 9, depth: 0.8, width: 0.22, profile: "round" },
   // Bricks run into a box's corners: kept smooth there, the corner stood in a strip of its own between two walls.
   bricks: { spacing: 12, depth: 0.6, profile: "flat", keepEdges: false },
+  // A panel about a metre wide and beams of 20 cm at 1:87; a corner post on both sides of a corner, as on a house.
+  timber: { spacing: 12, depth: 0.8, direction: "outward", keepEdges: false },
+  stones: { spacing: 8, depth: 0.8, direction: "outward", keepEdges: false },
   // Squares and triangles stand out as tiles with steep walls (see TILE_WALL), sizes a 0.4 mm nozzle draws in whole lines.
   squares: { spacing: 4, depth: 0.6, profile: "flat", direction: "outward" },
   triangles: { spacing: 6, depth: 0.6, profile: "flat", direction: "outward" },
@@ -1124,6 +1181,388 @@ function brickValue(u: number, v: number, s: SurfaceTextureSettings, layout: Sur
   return sunk + (1 - sunk) * joint;
 }
 
+/* Half-timbering and a natural stone wall, for model buildings. */
+
+/** What a field of half-timbering holds (see timberStyle): nothing, a brace rising to the right or to the left, a cross, knee braces. */
+const TIMBER_OPEN = 0, TIMBER_RISING = 1, TIMBER_FALLING = 2, TIMBER_CROSS = 3, TIMBER_KNEE = 4;
+/** Knee braces reach this share of a field's width along the plate and of its height down the post. */
+const TIMBER_KNEE_REACH = 0.35;
+/** A beam's wall, mm across: steep, as a flat tile's (see TILE_WALL), and in a narrow beam at most a fifth of its half width. */
+const TIMBER_WALL = TILE_WALL;
+/** The grain: two shallow grooves along every beam, at this share of its half width from its middle and this share wide either side. */
+const TIMBER_GRAIN_AT = 0.45;
+const TIMBER_GRAIN_HALF = 0.2;
+/** How deep the grain is, as a share of the beams' height, and how far apart along a beam it comes and goes, mm. */
+const TIMBER_GRAIN_DEPTH = 0.08;
+const TIMBER_GRAIN_RUN = 2.5;
+/** The plaster in the fields: how rough, as a share of the beams' height, and how large its lumps, mm. */
+const TIMBER_PLASTER = 0.08;
+const TIMBER_PLASTER_SIZE = 5;
+
+/** Half-timbering as laid on a body (see fitTimber). */
+export type SurfaceTimber = {
+  /** Along x, y and z: where the first post's middle lies, from post to post, and how many fields fill the faces between their edges. */
+  posts: { origin: number; cell: number; count: number }[];
+  /** Round the axis: the same round the body, a whole number of fields (0: not round a body). */
+  around: { origin: number; cell: number; count: number };
+  /** Along x, y and z: where the bottom sill's middle lies, a storey's height and how many storeys there are. */
+  storeys: { origin: number; height: number; count: number }[];
+};
+
+/** Half-timbering at its own sizes, the first post and sill at 0: what the layout fits (see fitTimber). */
+function timberOf(s: SurfaceTextureSettings): SurfaceTimber {
+  return {
+    posts: [0, 1, 2].map(() => ({ origin: 0, cell: s.spacing, count: 0 })),
+    around: { origin: 0, cell: s.spacing, count: 0 },
+    storeys: [0, 1, 2].map(() => ({ origin: 0, height: s.timberHeight, count: 0 })),
+  };
+}
+
+/**
+ * The axes of a pattern's plane (u along the first, v along the second) for `axis` as patternValue takes it: x, y or z;
+ * 3 to 5 the same on a top or bottom (all round: seen along z; round a body and flat: along its axis); -1 round the axis
+ * (null: u runs round, v along the axis).
+ */
+function planeAxes(axis: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout): [number, number] | null {
+  if (axis < 0) return null;
+  if (axis >= 3) return [axis - 3, layout.projection === "allRound" ? 1 : acrossAxes(s.axis)[1]];
+  return [axis, layout.projection === "flat" ? acrossAxes(s.axis)[1] : 2];
+}
+
+/**
+ * What field `i` holds, of `count` from edge to edge (round a body: of `count` round, with no ends). Braces lean towards
+ * the middle of the wall from both ends, rising to the right in the left half and to the left in the right half, so the
+ * frame looks the same from either end (an odd number's middle field stays open); mixed: braces at both ends, then a
+ * cross and knee braces in turn towards the middle (one field alone: a cross). Round a body, with no ends, braces lean
+ * against each other in pairs and mixed repeats a brace rising, a cross, a brace falling and knee braces - the same
+ * either way round as well (see fitTimber for the whole numbers that needs).
+ */
+function timberStyle(i: number, count: number, bracing: SurfaceTextureTimberBracing, round: boolean) {
+  if (bracing === "none") return TIMBER_OPEN;
+  if (bracing === "cross") return TIMBER_CROSS;
+  if (bracing === "knee") return TIMBER_KNEE;
+  if (round) {
+    const k = count > 0 ? ((i % count) + count) % count : i;
+    if (bracing === "braces") return ((k % 2) + 2) % 2 === 0 ? TIMBER_RISING : TIMBER_FALLING;
+    return [TIMBER_RISING, TIMBER_CROSS, TIMBER_FALLING, TIMBER_KNEE][((k % 4) + 4) % 4];
+  }
+  if (i < 0 || i >= count) return TIMBER_OPEN;
+  const left = 2 * i < count - 1, right = 2 * i > count - 1;
+  if (bracing === "braces") return left ? TIMBER_RISING : right ? TIMBER_FALLING : TIMBER_OPEN;
+  if (count === 1) return TIMBER_CROSS;
+  const fromEnd = Math.min(i, count - 1 - i);
+  if (fromEnd === 0) return left ? TIMBER_RISING : TIMBER_FALLING;
+  return fromEnd % 2 === 1 ? TIMBER_CROSS : TIMBER_KNEE;
+}
+
+/** Noise along a line, 0 to 1, about `size` mm a lump; with `period` (round a body) repeating exactly after it. */
+function loopNoise(a: number, b: number, period: number, size: number, key: number) {
+  if (!(period > 0)) return valueNoise(a / size, b / size, key);
+  const turn = (2 * Math.PI * a) / period, rho = period / (2 * Math.PI * size);
+  return valueNoise(rho * Math.cos(turn) + key, rho * Math.sin(turn), b / size);
+}
+
+/**
+ * Half-timbering in the plane at `axis` (as patternValue takes it): where the fields lie, how many, and whether they go
+ * round the body.
+ */
+function timberFrame(s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number) {
+  const t = layout.timber ?? timberOf(s);
+  const plane = planeAxes(axis, s, layout);
+  if (!plane) return { posts: t.around.count ? t.around : { ...t.around, cell: layout.cell }, storeys: t.storeys[AXIS_INDEX[s.axis]], round: true };
+  return { posts: t.posts[plane[0]], storeys: t.storeys[plane[1]], round: false };
+}
+
+/** A beam's half width as made, mm: as asked, but at most 45 % of a field's width or height, so the field stays. */
+function timberHalf(s: SurfaceTextureSettings, W: number, h: number) {
+  return Math.min(s.timberBeam / 2, 0.45 * Math.min(W, h));
+}
+
+/**
+ * Half-timbering at (u, v), 1 on a beam's face and 0 in the plaster between them: posts `posts.cell` apart, a sill and a
+ * plate at every storey (one beam where two storeys meet) and the rails splitting a storey evenly, then in each field what
+ * timberStyle says - braces from corner to corner of each part between sill, rails and plate (rising or falling), a St
+ * Andrew's cross in the part under the lowest rail, knee braces in the top part's corners, parallel to its diagonals. A
+ * beam's face is flat, with a steep wall round it (see TIMBER_WALL), the faint grain of two grooves along it coming and
+ * going (timberGrain); the plaster is a little rough (not with the pattern as a part of its own: the body under the beams
+ * stays as it was, and roughness raised from it would be a skin no print shows). Round a body the grain's and the
+ * plaster's lumps repeat after one round, so nothing jumps at the seam.
+ */
+function timberValue(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number) {
+  const { posts, storeys, round } = timberFrame(s, layout, axis);
+  const W = posts.cell, Hs = storeys.height;
+  const parts = s.timberRails + 1, h = Hs / parts;
+  const r = timberHalf(s, W, h), wall = Math.min(TIMBER_WALL, 0.2 * r);
+  let x = u - posts.origin;
+  const i = Math.floor(x / W);
+  x -= i * W;
+  let y = v - storeys.origin;
+  const k = Math.floor(y / Hs);
+  y -= k * Hs;
+  const q = Math.min(parts - 1, Math.floor(y / h));
+  const yq = y - q * h;
+  // The nearest beam: how far from its middle line (signed, for the grain), and where along it.
+  let d = Infinity, across = 0, along = 0, beam = 0;
+  const take = (signed: number, at: number, which: number) => {
+    if (Math.abs(signed) < d) {
+      d = Math.abs(signed);
+      across = signed;
+      along = at;
+      beam = which;
+    }
+  };
+  // Beyond the storeys (below the sill, above the plate) no post runs on, and beyond the end posts of a flat side no level
+  // beam: a point there lies past the faces the frame was fitted to, in the fade towards what stays smooth.
+  const inStoreys = !(storeys.count > 0) || (k >= 0 && k < storeys.count) || (k === storeys.count && y === 0);
+  const inFields = round || !(posts.count > 0) || (i >= 0 && i < posts.count) || (i === posts.count && x === 0);
+  if (inStoreys) take(x < W / 2 ? x : x - W, v, 1);
+  if (inFields) take(yq < h / 2 ? yq : yq - h, u, 2);
+  if (!inStoreys && !inFields) return 0;
+  const style = inStoreys ? timberStyle(i, posts.count, s.timberBracing, round) : TIMBER_OPEN;
+  if (style !== TIMBER_OPEN) {
+    const L = Math.hypot(W, h);
+    const rising = style === TIMBER_RISING || (style === TIMBER_CROSS && q === 0);
+    const falling = style === TIMBER_FALLING || (style === TIMBER_CROSS && q === 0);
+    if (rising) take((x * h - yq * W) / L, (x * W + yq * h) / L, 3);
+    if (falling) take((x * h + yq * W - W * h) / L, (yq * h - x * W) / L, 4);
+    if (style === TIMBER_KNEE && q === parts - 1) {
+      // Reaching from a post to the plate: within the field's top part that is the whole of each line.
+      take((x * h - yq * W + (1 - TIMBER_KNEE_REACH) * W * h) / L, (x * W + yq * h) / L, 5);
+      take((x * h + yq * W - (2 - TIMBER_KNEE_REACH) * W * h) / L, (yq * h - x * W) / L, 6);
+    }
+  }
+  const rise = d <= r + TILE_SNAP ? 1 : d >= r + wall - TILE_SNAP ? 0 : 1 - (d - r) / wall;
+  const period = round ? W * posts.count : 0;
+  let top = 1;
+  if (s.timberGrain && rise > 0) {
+    const t = Math.abs(across) / r;
+    const groove = Math.max(0, 1 - Math.abs(t - TIMBER_GRAIN_AT) / TIMBER_GRAIN_HALF);
+    if (groove > 0) {
+      // Along a level beam round a body the grain repeats after one round; along the others it needs not.
+      // Round a body a field's number counts round once, the same from both sides of the seam.
+      const field = round && posts.count > 0 ? ((i % posts.count) + posts.count) % posts.count : i;
+      const key = 17 * beam + (across < 0 ? 5 : 0) + 31 * (beam === 2 ? q + parts * k : field);
+      const come = loopNoise(along, 0, beam === 2 ? period : 0, TIMBER_GRAIN_RUN, key);
+      top = 1 - TIMBER_GRAIN_DEPTH * groove * clamp((come - 0.42) / 0.3, 0, 1);
+    }
+  }
+  if (rise >= 1) return top;
+  const plaster = s.patternPart ? 0 : TIMBER_PLASTER * (0.65 * loopNoise(u, v, period, TIMBER_PLASTER_SIZE, 3) + 0.35 * loopNoise(u, v, period, TIMBER_PLASTER_SIZE / 2, 11));
+  return rise * top + (1 - rise) * plaster;
+}
+
+/** A stone of a natural stone wall (see stoneWallFor): its middle, half its width and height, and its shape. */
+type Stone = {
+  cx: number;
+  cy: number;
+  ha: number;
+  hb: number;
+  /** Its sides as broken stone: per side a direction (x, y) and how far out it lies that way (inside: x·dx + y·dy < far). */
+  sides: Float64Array;
+  /** As a field stone: a rounded box, (|x/ha|^p + |y/hb|^p)^(1/p) < 1. */
+  p: number;
+  /** How high it stands, 0.6 to 1 of the depth, and a number of its own for its lumps. */
+  height: number;
+  key: number;
+};
+/** A course of a stone wall: where it begins and how high it is, where its stones' places begin along it (and end), and the stones. */
+type StoneCourse = { v0: number; height: number; starts: Float64Array; places: Stone[][] };
+/** A natural stone wall in one plane: its courses from the bottom up, where they begin, and how long a course is (round a body, once round). */
+type StoneWall = { courses: StoneCourse[]; starts: Float64Array; u0: number; length: number; round: boolean };
+
+/** Natural stone wall: a stone's shape blends from broken stone to field stone; its lumps on its face; its edge rounded. */
+const STONE_WOBBLE = [0.05, 0.1];
+const STONE_BUMPS = 0.06;
+/** How much of a stone's half size its edge is rounded over, at full roundness; and at least, mm (a sharp edge, but one a print shows). */
+const STONE_ROUNDING = 0.45;
+const STONE_EDGE = 0.15;
+/** How often two smaller stones lie in one course's height, at full size variation. */
+const STONE_STACKED = 0.45;
+
+/**
+ * Lengths for a course or a wall: drawn by `size(k)` until they fill `total`, the number whose sum comes nearest to it,
+ * then all stretched so they fill it exactly - as bricks' courses are fitted. Returns where each begins and where the last ends.
+ */
+function fillWith(total: number, size: (k: number) => number) {
+  const lengths: number[] = [];
+  let sum = 0;
+  while (sum < total && lengths.length < 4096) {
+    const next = size(lengths.length);
+    if (lengths.length && Math.abs(sum + next - total) > Math.abs(sum - total)) break;
+    lengths.push(next);
+    sum += next;
+  }
+  const stretch = total / sum;
+  const starts = new Float64Array(lengths.length + 1);
+  for (let k = 0; k < lengths.length; k += 1) starts[k + 1] = starts[k] + lengths[k] * stretch;
+  starts[lengths.length] = total;
+  return starts;
+}
+
+/**
+ * A natural stone wall over the plane at `axis` (as patternValue takes it), made once per plane and kept in the layout.
+ * Courses of rough height (the stone size, more or less by stoneVary) fill the height from the bottom edge to the top as
+ * bricks' courses do, the stones of a course of rough length fill it from edge to edge (round a body: once round, from a
+ * place of its own), now and then two smaller ones in one course's height. Every stone sits in its place a joint's half
+ * and a little more from its borders, a polygon with a few corners broken off (broken stone) or a rounded box (field
+ * stone), standing out by its own height. The same seed, the same wall.
+ */
+function stoneWallFor(s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number): StoneWall {
+  const fit = layout.stones ?? { ranges: [0, 1, 2].map(() => [-50, 50] as [number, number]), walls: new Map<number, StoneWall>() };
+  layout.stones = fit;
+  const known = fit.walls.get(axis);
+  if (known) return known;
+  const plane = planeAxes(axis, s, layout);
+  const round = !plane;
+  const joint = s.stoneJoint;
+  const [vLo, vHi] = fit.ranges[plane ? plane[1] : AXIS_INDEX[s.axis]];
+  const [uLo, uHi] = plane ? fit.ranges[plane[0]] : [0, 2 * Math.PI * layout.radius];
+  const size = s.spacing, vary = s.stoneVary, seed = s.seed;
+  const rnd = (a: number, b: number, c: number) => hash3(a + 7919 * seed, b, c);
+  // From the middle of the joint below the bottom edge to the middle of the one above the top.
+  const height = Math.max(vHi - vLo + joint, 0.1 * size);
+  const courseStarts = fillWith(height, (m) => size * (1 + 0.6 * vary * (2 * rnd(m, 1, 11) - 1)));
+  const length = round ? uHi - uLo : Math.max(uHi - uLo + joint, 0.1 * size);
+  // Round a body each course begins at a place of its own (see stoneValue); on a flat face at its edge.
+  const u0 = round ? 0 : uLo - joint / 2;
+  const courses: StoneCourse[] = [];
+  for (let m = 0; m + 1 < courseStarts.length; m += 1) {
+    const v0 = vLo - joint / 2 + courseStarts[m], H = courseStarts[m + 1] - courseStarts[m];
+    const stacked = (j: number) => H > 0.9 * size && rnd(m, j, 29) < STONE_STACKED * vary;
+    const starts = fillWith(length, (j) => (stacked(j) ? H * (0.8 + 0.5 * rnd(m, j, 31)) : H * Math.max(0.6, 1.6 + 1.3 * vary * (2 * rnd(m, j, 23) - 1)))).map((at) => at + u0);
+    const places: Stone[][] = [];
+    for (let j = 0; j + 1 < starts.length; j += 1) {
+      const a = starts[j], b = starts[j + 1];
+      const split = stacked(j) ? [0, 0.4 + 0.2 * rnd(m, j, 37), 1] : [0, 1];
+      const stones: Stone[] = [];
+      for (let p = 0; p + 1 < split.length; p += 1) {
+        const key = (m * 4096 + j) * 2 + p;
+        // Set in from its place's borders by a joint's half and a little more, each side its own way.
+        const inset = (side: number) => joint / 2 + 0.025 * size * rnd(key, side, 41);
+        const left = a + inset(0), right = b - inset(1);
+        const bottom = H * split[p] + inset(2), topSide = H * split[p + 1] - inset(3);
+        const ha = Math.max(0.05 * size, (right - left) / 2), hb = Math.max(0.05 * size, (topSide - bottom) / 2);
+        // Broken stone: four sides about along the place's, a little aslant, and one to three corners broken off.
+        const cuts: number[] = [];
+        for (let side = 0; side < 4; side += 1) {
+          const turn = (side * Math.PI) / 2 + 0.25 * (rnd(key, side, 43) - 0.5);
+          const dx = Math.cos(turn), dy = Math.sin(turn);
+          cuts.push(dx, dy, (Math.abs(ha * dx) + Math.abs(hb * dy)) * (0.96 + 0.04 * rnd(key, side, 47)));
+        }
+        const corners = 1 + Math.floor(3 * rnd(key, 4, 53));
+        for (let c = 0; c < corners; c += 1) {
+          const turn = ((Math.floor(4 * rnd(key, c, 59)) + 0.5) * Math.PI) / 2 + 0.6 * (rnd(key, c, 61) - 0.5);
+          const dx = Math.cos(turn), dy = Math.sin(turn);
+          cuts.push(dx, dy, (Math.abs(ha * dx) + Math.abs(hb * dy)) * (0.72 + 0.16 * rnd(key, c, 67)));
+        }
+        stones.push({ cx: (left + right) / 2, cy: v0 + (bottom + topSide) / 2, ha, hb, sides: Float64Array.from(cuts), p: 2.4 + 0.6 * rnd(key, 5, 71), height: 0.6 + 0.4 * rnd(key, 6, 73), key });
+      }
+      places.push(stones);
+    }
+    courses.push({ v0, height: H, starts, places });
+  }
+  const wall: StoneWall = {
+    courses,
+    starts: courseStarts.map((at) => at + vLo - joint / 2),
+    u0,
+    length,
+    round,
+  };
+  fit.walls.set(axis, wall);
+  return wall;
+}
+
+/** The last place in `starts` (sorted) at or before `x`, between 0 and starts.length - 2. */
+function placeIn(starts: Float64Array, x: number) {
+  let lo = 0, hi = starts.length - 2;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (starts[mid] <= x) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
+}
+
+/** How far inside a stone's outline (x, y) from its middle lies, as stonePoint measures it, and the outline's measure f there. */
+function stoneRise(stone: Stone, x: number, y: number, s: SurfaceTextureSettings) {
+  const roundness = s.stoneRound;
+  let broken = -Infinity;
+  for (let k = 0; k < stone.sides.length; k += 3) broken = Math.max(broken, (x * stone.sides[k] + y * stone.sides[k + 1]) / stone.sides[k + 2]);
+  const field = (Math.abs(x / stone.ha) ** stone.p + Math.abs(y / stone.hb) ** stone.p) ** (1 / stone.p);
+  const wobble = (STONE_WOBBLE[0] + (STONE_WOBBLE[1] - STONE_WOBBLE[0]) * roundness) * valueNoise(x / (0.35 * s.spacing) + 13 * stone.key, y / (0.35 * s.spacing), 5);
+  const f = (1 - roundness) * broken + roundness * field + wobble;
+  const small = Math.min(stone.ha, stone.hb);
+  const edge = Math.max(STONE_EDGE, roundness * STONE_ROUNDING * small);
+  return { f, rise: ((1 - f) * small) / edge };
+}
+
+/**
+ * Where (u, v) lies in a natural stone wall: the stone it lies on, where in it, and how far inside its outline as a share
+ * of how far its edge is rounded over (`rise`: negative in the mortar, 1 where the edge has risen to the face). In the
+ * mortar the stone whose outline is nearest counts, in the places beside and in the courses above and below too: the
+ * stone of the point's own place alone jumped at the places' borders in the middle of a joint, and the cuts along the
+ * outlines (see stoneCuts), placed between points of two stones there, came out in teeth. Roundness blends the outline
+ * from broken stone (an irregular polygon) to field stone (a rounded box) and rounds the edge over up to STONE_ROUNDING
+ * of its half size; at 0 the edge is sharp (STONE_EDGE). Beyond the wall's height or length (a point past the faces it
+ * was laid on) it repeats.
+ */
+function stonePoint(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number) {
+  const wall = stoneWallFor(s, layout, axis);
+  const count = wall.courses.length;
+  const total = wall.starts[count] - wall.starts[0];
+  const turns = Math.floor((v - wall.starts[0]) / total);
+  const vv = v - turns * total;
+  const m = placeIn(wall.starts, vv);
+  let best: { stone: Stone; x: number; y: number; f: number; rise: number } | null = null;
+  /** The stones in course `k` (beyond the wall: as it repeats) at u, and the places beside the one there (`side` -1, 0, 1). */
+  const tryCourse = (k: number, side: number) => {
+    const wrapped = ((k % count) + count) % count, lift = (k - wrapped) / count * total;
+    const course = wall.courses[wrapped];
+    // Round a body every course begins elsewhere, so the joints do not line up.
+    const shift = wall.round ? hash3(wrapped + 7919 * s.seed, 3, 83) * wall.length : 0;
+    let uu = u - wall.u0 - shift;
+    uu = uu - Math.floor(uu / wall.length) * wall.length + wall.u0;
+    const places = course.places.length;
+    let j = placeIn(course.starts, uu) + side;
+    let along = uu;
+    if (j < 0 || j >= places) {
+      // Over the end of a course: round a body its first or last place, on a flat face the course repeats.
+      along += j < 0 ? wall.length : -wall.length;
+      j = ((j % places) + places) % places;
+    }
+    for (const stone of course.places[j]) {
+      const x = along - stone.cx, y = vv - lift - stone.cy;
+      const { f, rise } = stoneRise(stone, x, y, s);
+      if (!best || rise > best.rise) best = { stone, x, y, f, rise };
+    }
+  };
+  tryCourse(m, 0);
+  if (best!.rise > 0) return best!;
+  for (const [k, side] of [[m, -1], [m, 1], [m - 1, 0], [m + 1, 0]]) tryCourse(k, side);
+  return best!;
+}
+
+/**
+ * A natural stone wall at (u, v): 0 in the mortar, rising over a stone's edge (see stonePoint) to its own height and
+ * bulging a little towards its middle, with small lumps on its face. The edge rises as a parabola, steepest at the
+ * outline but not upright: a quarter circle's upright start made a point cut a hair beside the outline (the cut follows
+ * it in straight pieces, see stoneCuts) stand a fifth of the height up, in spikes.
+ */
+function stoneValue(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number) {
+  const point = stonePoint(u, v, s, layout, axis);
+  return stoneHeight(point, point.rise, s);
+}
+
+/** A stone's height at a point of it (see stonePoint), its edge risen as far as `rise` says: the point's own, or a cut's (see stoneCuts). */
+function stoneHeight({ stone, x, y, f }: ReturnType<typeof stonePoint>, rise: number, s: SurfaceTextureSettings) {
+  if (!(rise > 0)) return 0;
+  const e = Math.min(1, rise);
+  const shoulder = e * (2 - e);
+  const bulge = 0.85 + 0.15 * (1 - f * f);
+  const lumps = STONE_BUMPS * (valueNoise(x / (0.3 * s.spacing) + 29 * stone.key, y / (0.3 * s.spacing), 9) - 0.5);
+  return shoulder * clamp(stone.height * bulge + lumps, 0, 1);
+}
+
 /** Whether the pattern is tiles of one size in a grid: squares or triangles. */
 function tilePattern(s: Pick<SurfaceTextureSettings, "pattern">) {
   return TILE_PATTERNS.includes(s.pattern);
@@ -1346,6 +1785,13 @@ export type SurfaceTextureLayout = {
   brickJointsOff?: Set<string>;
   /** Squares and triangles: their size and gap as made and where their grid begins (see fitTiles). */
   tiles?: SurfaceTiles;
+  /** Half-timbering: its posts and storeys as fitted (see fitTimber). */
+  timber?: SurfaceTimber;
+  /**
+   * A natural stone wall: per axis x, y, z from where to where the faces that get it reach (see fitStones), and the walls
+   * made from that per plane (see stoneWallFor).
+   */
+  stones?: { ranges: [number, number][]; walls: Map<number, StoneWall> };
   /** Wood grain, and the ends of a log with bark: where the pith runs, and the knots. */
   wood?: WoodFrame | null;
   /**
@@ -1775,8 +2221,9 @@ function aroundAngle(layout: SurfaceTextureLayout, a: number, b: number) {
 /** (u, v) on a face seen along the axis, the pattern turned there by `faceTurn` degrees round the layout's middle (`back`: undone). */
 function turnOnFace(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, back = false): [number, number] {
   // Bricks lie in courses fitted to the body's edges (see fitBrickCourses), not turned; squares and triangles in rows
-  // along them, cut along straight lines in the plane (see sliceTiles).
-  if (!s.faceTurn || s.pattern === "bricks" || tilePattern(s)) return [u, v];
+  // along them, cut along straight lines in the plane (see sliceTiles); half-timbering and stone walls stand on their
+  // bottom edge as bricks do.
+  if (!s.faceTurn || s.pattern === "bricks" || s.pattern === "timber" || s.pattern === "stones" || tilePattern(s)) return [u, v];
   const a = ((back ? -s.faceTurn : s.faceTurn) * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a);
   const [c1, c2] = layout.center;
   const du = u - c1, dv = v - c2;
@@ -1803,6 +2250,10 @@ function patternValue(u: number, v: number, s: SurfaceTextureSettings, layout: S
       return surfaceFalloff(cellEdge(u, v, layout.cell, layout.around, s.seed) / ((layout.cell / 2) * s.width), s.profile);
     case "bricks":
       return brickValue(u, v, s, layout, axis, face);
+    case "timber":
+      return timberValue(u, v, s, layout, axis);
+    case "stones":
+      return stoneValue(u, v, s, layout, axis);
     case "squares":
     case "triangles":
       return tileValue(u, v, s, layout, axis);
@@ -2183,6 +2634,8 @@ export function makeSurfaceTextureLayout(base: SurfaceBase, asked: SurfaceTextur
   if (s.pattern === "image") layout.image = textureImage(s);
   if (s.pattern === "bricks") fitBrickCourses(base, s, kept, layout);
   if (tilePattern(s)) fitTiles(base, s, kept, layout);
+  if (s.pattern === "timber") fitTimber(base, s, kept, layout);
+  if (s.pattern === "stones") fitStones(base, s, kept, layout);
   if (s.pattern === "wood" || s.pattern === "bark") {
     const cut = s.pattern === "wood" ? s.woodCut : "log";
     layout.wood = woodFrame(cut, AXIS_INDEX[s.axis], [c1, c2], base.min, base.max, s.ringWidth, s.pattern === "wood" ? s.woodKnots : 0, s.seed);
@@ -2205,6 +2658,10 @@ export function makeSurfaceTextureLayout(base: SurfaceBase, asked: SurfaceTextur
       const k = Math.round((C * cos) / s.spacing);
       layout.angle = ((s.angle < 0 ? -1 : 1) * (Math.acos(Math.min(1, (k * s.spacing) / C)) * 180)) / Math.PI;
     }
+  } else if (s.pattern === "timber" && layout.timber) {
+    // Fitted with the posts (see fitTimber): a whole number of fields round, as the bracing needs.
+    layout.cell = layout.timber.around.cell;
+    layout.around = layout.timber.around.count;
   } else if (s.pattern === "bricks") {
     // A whole number of the bond's repeats goes round, so the courses close at the seam.
     const repeat = BRICK_PERIOD[s.brickBond];
@@ -2354,6 +2811,82 @@ function fitTiles(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array
 }
 
 /**
+ * Per axis x, y, z: from where to where the `kept` points reach, z within the height band where it counts (no picked
+ * faces). Half-timbering and stone walls stand out, and run out over the fade next to what stays smooth (see weightsFor):
+ * the ranges end the fade and margin short of it - up the walls at a top and bottom kept smooth, the height band's
+ * ends, and every edge where sharp edges stay smooth - so a sill, a plate and the stones there stay whole.
+ */
+function keptRanges(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array): [number, number][] {
+  const v = base.vertices;
+  const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < kept.length; i += 1) {
+    if (!kept[i]) continue;
+    for (let k = 0; k < 3; k += 1) {
+      lo[k] = Math.min(lo[k], v[i * 3 + k]);
+      hi[k] = Math.max(hi[k], v[i * 3 + k]);
+    }
+  }
+  if (!s.faces.length && Number.isFinite(lo[2])) {
+    const zH = base.size[2] || 1;
+    lo[2] = Math.max(lo[2], base.min[2] + (s.zoneFrom / 100) * zH);
+    hi[2] = Math.max(lo[2], Math.min(hi[2], base.min[2] + (s.zoneTo / 100) * zH));
+  }
+  const reach = s.fade + s.margin;
+  const up = s.projection === "cylinder" ? AXIS_INDEX[s.axis] : s.projection === "flat" ? acrossAxes(s.axis)[1] : 2;
+  const picked = s.faces.length > 0;
+  return [0, 1, 2].map((k) => {
+    if (!Number.isFinite(lo[k])) return [0, 0] as [number, number];
+    const below = s.keepEdges || (k === up && ((s.bottomFree > 0 && !picked) || s.zoneFrom > 0));
+    const above = s.keepEdges || (k === up && ((s.topFree > 0 && !picked) || s.zoneTo < 100));
+    const from = lo[k] + (below ? reach : 0), to = hi[k] - (above ? reach : 0);
+    return (to > from ? [from, to] : [lo[k], hi[k]]) as [number, number];
+  });
+}
+
+/**
+ * Half-timbering: its posts and storeys fitted as bricks' courses are (see fitBrickCourses). Along every axis whole fields
+ * from edge to edge, a post's outer face on each edge - on a box a post on both sides of every corner, as on a house -
+ * the width rounded to the nearest whole number of fields; up every axis whole storeys from the bottom edge, the sill on
+ * the bottom edge and the plate on the top one. Round a body a whole number of fields goes round: an even number for
+ * braces, which lean against each other in pairs there, four in turn for mixed (see timberStyle).
+ */
+function fitTimber(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array, layout: SurfaceTextureLayout) {
+  const ranges = keptRanges(base, s, kept);
+  const t = timberOf(s);
+  const half = s.timberBeam / 2;
+  const fill = ([lo, hi]: [number, number], size: number) => {
+    const span = hi - lo - 2 * half;
+    if (!(span > 1e-6)) return { origin: (lo + hi) / 2, cell: size, count: 1 };
+    const count = Math.max(1, Math.round(span / size));
+    return { origin: lo + half, cell: span / count, count };
+  };
+  t.posts = ranges.map((range) => fill(range, s.spacing));
+  t.storeys = ranges.map((range) => {
+    const { origin, cell, count } = fill(range, s.timberHeight);
+    return { origin, height: cell, count };
+  });
+  if (s.projection === "cylinder") {
+    const C = 2 * Math.PI * layout.radius;
+    const step = s.timberBracing === "mixed" ? 4 : s.timberBracing === "braces" ? 2 : 1;
+    const count = Math.max(step, step * Math.round(C / (step * s.spacing)));
+    t.around = { origin: 0, cell: C / count, count };
+  }
+  layout.timber = t;
+}
+
+/** Half-timbering as made, for the stats: the storeys up the walls and a panel's width (see SurfaceTextureStats.timber). */
+function timberStats(s: SurfaceTextureSettings, t: SurfaceTimber) {
+  const up = t.storeys[s.projection === "cylinder" ? AXIS_INDEX[s.axis] : s.projection === "flat" ? acrossAxes(s.axis)[1] : 2];
+  const panel = s.projection === "cylinder" ? t.around.cell : t.posts[s.projection === "flat" ? acrossAxes(s.axis)[0] : 0].cell;
+  return { storeys: up.count, height: up.height, panel };
+}
+
+/** A natural stone wall: per axis from where to where the faces reach that get it; its courses and stones are laid from that (see stoneWallFor). */
+function fitStones(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array, layout: SurfaceTextureLayout) {
+  layout.stones = { ranges: keptRanges(base, s, kept), walls: new Map() };
+}
+
+/**
  * Whether a body is round about `axis`: on its side faces the normal points away from the fitted axis at every corner of
  * the triangle (a cylinder of 16 segments: 11 degrees off; an octagon 22, a hexagon 30, a cube's face 45 at its corners).
  * Round when that holds within 25 degrees on three quarters of the side area. A body without side faces (a plate lying
@@ -2400,7 +2933,8 @@ function wrapsOutline(s: SurfaceTextureSettings, outline: SurfaceOutline) {
   // Any other side (a hexagon's slanted ones) saw them projected from aside, stretched, and their joints cut in teeth:
   // there they go round the outline. Bark and wood belong to a log or a board.
   // Squares and triangles likewise: each side of a box holds them in its own plane, as set.
-  if (s.pattern === "bricks" || tilePattern(s)) return !sidesAlongAxes(outline);
+  // Half-timbering and stone walls too: posts on both sides of a box's corners, stones that end at them.
+  if (s.pattern === "bricks" || s.pattern === "timber" || s.pattern === "stones" || tilePattern(s)) return !sidesAlongAxes(outline);
   return !stuckOn(s) && !["cracks", "grain", "bark", "wood"].includes(s.pattern);
 }
 
@@ -2546,6 +3080,8 @@ function patternExtras(s: SurfaceTextureSettings, layout: SurfaceTextureLayout) 
   if (s.pattern === "carbon") return [s.carbonWeave, s.carbonCross];
   if (s.pattern === "bricks") return [s.brickBond, s.brickJoint, layout.rowHeight ?? s.brickHeight, layout.rowOrigin ?? 0, layout.brickAxes ?? null, layout.capBricks ?? null];
   if (tilePattern(s)) return [s.tileGap, s.tileFromBottom, layout.tiles ?? null];
+  if (s.pattern === "timber") return [s.timberHeight, s.timberBeam, s.timberRails, s.timberBracing, s.timberGrain, s.patternPart, layout.timber ?? null];
+  if (s.pattern === "stones") return [s.seed, s.stoneVary, s.stoneRound, s.stoneJoint, layout.stones?.ranges ?? null];
   if (s.pattern === "bark") return [s.barkType, s.seed, s.ringWidth];
   if (s.pattern === "wood") return [s.woodType, s.woodCut, s.ringWidth, s.woodKnots, s.woodWobble, s.seed];
   if (s.pattern === "image") return [s.image === "own" && s.imageOwn ? ownImageKey(s.imageOwn) : s.image, s.tileHeight, s.imageTurn, s.imageInvert, s.imageBlur, s.imageTiling];
@@ -2557,8 +3093,10 @@ function targetEdge(s: SurfaceTextureSettings) {
   // Honeycomb, cells and bumps that are cut (see sliceCells) get their detail from the cuts: the grid only has to follow
   // the body's roundness (a 1.2 mm chord on 30 mm radius: 0.006 mm). Bricks' faces are flat: their cuts are all they
   // need, and so are the faces of squares and triangles.
-  if (cellsAreCut(s)) return s.pattern === "bricks" || tilePattern(s) ? 10 : s.spacing / 2.5;
+  if (cellsAreCut(s)) return s.pattern === "bricks" || tilePattern(s) ? 10 : s.pattern === "timber" ? timberEdge(s) : s.spacing / 2.5;
   const steps = DETAIL_STEPS[s.detail];
+  // Half-timbering not cut (all round, off the straight faces): its beams refined after (see refineFlanks).
+  if (s.pattern === "timber") return Math.min(timberEdge(s), s.timberBeam);
   // An image: about 14 points per tile and step of detail (its tile has 256 image points and more).
   if (s.pattern === "image") return Math.min(s.spacing, s.tileHeight > 0 ? s.tileHeight : s.spacing) / (steps * 14);
   // Squares and triangles not cut (all round, off the straight faces): half the narrower of tile and gap, their walls
@@ -2569,8 +3107,21 @@ function targetEdge(s: SurfaceTextureSettings) {
   // Knitting: a stitch has two loops of about a quarter of its width each; a rope's strands, the weave's rows and a carbon
   // band's edges are narrower than the spacing too (round the axis those are cut along, see carbonCuts).
   // Bark: its marks are a share of its size (a birch's lenticels are thin); wood: a ring (flanks refined after).
-  const size = s.pattern === "bricks" ? Math.min(s.spacing, s.brickHeight) : s.pattern === "bark" ? s.spacing / BARK_STARTS[s.barkType].detail : s.pattern === "wood" ? s.ringWidth : s.pattern === "grain" ? s.spacing / 2 : s.pattern === "knit" ? s.spacing / 2.2 : s.pattern === "rope" ? s.spacing / 1.5 : s.pattern === "weave" ? s.spacing / 2 : s.pattern === "carbon" ? Math.min(s.spacing, s.carbonCross || s.spacing) * (s.projection === "cylinder" ? 2 : 0.5) : s.spacing;
+  // A stone wall: its faces' bulge and lumps a quarter of a stone at medium detail; the edges are refined and cut after
+  // (see stoneCuts), finer, every grid triangle cost as many more there.
+  const size = s.pattern === "stones" ? s.spacing / 0.8 : s.pattern === "bricks" ? Math.min(s.spacing, s.brickHeight) : s.pattern === "bark" ? s.spacing / BARK_STARTS[s.barkType].detail : s.pattern === "wood" ? s.ringWidth : s.pattern === "grain" ? s.spacing / 2 : s.pattern === "knit" ? s.spacing / 2.2 : s.pattern === "rope" ? s.spacing / 1.5 : s.pattern === "weave" ? s.spacing / 2 : s.pattern === "carbon" ? Math.min(s.spacing, s.carbonCross || s.spacing) * (s.projection === "cylinder" ? 2 : 0.5) : s.spacing;
   return (size / steps) * narrow;
+}
+
+/**
+ * Half-timbering's grid before its beams are cut (see sliceTimber): as fine as the plaster's lumps (TIMBER_PLASTER_SIZE)
+ * and the grain's coming and going need, 1.2 points a field's width per step of detail (2 mm for a 12 mm field) - finer,
+ * every cut line through it cost as many triangles more; with neither (the grain off, the pattern as a part of its
+ * own) as coarse as bricks', its faces flat.
+ */
+function timberEdge(s: SurfaceTextureSettings) {
+  if (s.patternPart && !s.timberGrain) return 10;
+  return Math.min(s.spacing, s.timberHeight) / (0.6 * DETAIL_STEPS[s.detail]);
 }
 
 function cellsAreCut(s: SurfaceTextureSettings) {
@@ -3853,6 +4404,233 @@ function sliceTiles(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfac
   return { mesh: out, reduced: count < wanted, fixed: null };
 }
 
+/**
+ * The plane a cut works in, as surfaceTextureValueAt sees the faces it cuts: round the axis (code -1, plane null), or a
+ * straight face cut as a flat one along its axis (see refined: `s` then looks along it) - all round its projection, round
+ * a body a top or bottom's. The code is the axis patternValue takes, the plane the axes u and v run along.
+ */
+function cutPlane(s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
+  if (s.projection === "cylinder") return { code: -1, plane: null };
+  const k = AXIS_INDEX[s.axis], [i1] = acrossAxes(s.axis);
+  const code = layout.projection === "allRound" ? (k === 0 ? 1 : k === 1 ? 0 : 3) : layout.projection === "cylinder" ? i1 + 3 : i1;
+  return { code, plane: planeAxes(code, s, layout)! };
+}
+
+/** The triangles a cut may go through: not of faces that surely stay smooth (`skipBase`), none at the axis, round a body (`ax`) none on a top or bottom. */
+function cuttableFaces(m: SurfaceMesh, pole: Uint8Array, skipBase: Uint8Array, ax: number) {
+  const I = m.indices, T = I.length / 3;
+  const out = new Uint8Array(T);
+  for (let f = 0; f < T; f += 1) {
+    const a = I[f * 3], b = I[f * 3 + 1], c = I[f * 3 + 2];
+    if (skipBase[m.parents[f]] || pole[a] || pole[b] || pole[c]) continue;
+    if (ax >= 0) {
+      const n = faceCross(m.vertices, a, b, c);
+      const l = Math.hypot(n[0], n[1], n[2]);
+      if (l === 0 || Math.abs(n[ax]) / l > 0.8) continue;
+    }
+    out[f] = 1;
+  }
+  return out;
+}
+
+/** Where a stone's edge is cut (see stoneCuts): as a share of its rounding, the outline and places on the parabola it rises in, closer at the steep outline. */
+function stoneLevels(s: SurfaceTextureSettings, steps: number) {
+  const count = s.stoneRound > 0.1 ? Math.max(2, Math.round(steps / 4)) : 1;
+  return [0, ...Array.from({ length: count }, (_, j) => ((j + 1) / count) ** 1.5)];
+}
+
+/**
+ * A natural stone wall, after the grid was refined at the stones' edges (see refineFlanks): cut along every stone's
+ * outline and the places of its edge's rounding, as a text is along its letters' walls - on the grid the outline came
+ * out in teeth, a point either in the mortar or on the stone. The places are levels of how far inside the outline a point
+ * lies over how far its edge is rounded (see stonePoint), which is about linear in the fine triangles at the edge.
+ * Only triangles reaching an outline are cut. The points' heights come back with it (`fixed`, NaN off these faces),
+ * their edge's rise taken from the cut, not from where the point lies: at a broken stone's corner the measure bends,
+ * its straight cut across a triangle runs a little inside the corner, and a point just beyond the cut stood up from it in
+ * a spike. `skipBase`: input triangles that surely stay smooth.
+ */
+function stoneCuts(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, steps: number, maxTriangles: number, skipBase: Uint8Array): { mesh: SurfaceMesh; fixed: Float32Array } {
+  const ax = AXIS_INDEX[s.axis];
+  const [i1, i2] = acrossAxes(s.axis);
+  const { code, plane } = cutPlane(s, layout);
+  const v = mesh.vertices, n = v.length / 3;
+  const rise = new Float64Array(n), pole = new Uint8Array(n);
+  for (let i = 0; i < n; i += 1) {
+    let u: number, w: number;
+    if (plane) {
+      u = v[i * 3 + plane[0]];
+      w = v[i * 3 + plane[1]];
+    } else {
+      if (Math.hypot(v[i * 3 + i1] - layout.center[0], v[i * 3 + i2] - layout.center[1]) < 1e-6) pole[i] = 1;
+      u = aroundAngle(layout, v[i * 3 + i1], v[i * 3 + i2]) * layout.radius;
+      w = v[i * 3 + ax];
+    }
+    rise[i] = stonePoint(u, w, s, layout, code).rise;
+  }
+  const levels = stoneLevels(s, steps);
+  const top = levels[levels.length - 1];
+  const sliced = cuttableFaces(mesh, pole, skipBase, plane ? -1 : ax);
+  const I = mesh.indices;
+  for (let f = 0; f < sliced.length; f += 1) {
+    if (!sliced[f]) continue;
+    const a = rise[I[f * 3]], b = rise[I[f * 3 + 1]], c = rise[I[f * 3 + 2]];
+    if (Math.max(a, b, c) < 0 || Math.min(a, b, c) > top) sliced[f] = 0;
+  }
+  const cut = sliceByField(mesh, rise, (p, q) => rise[q] - rise[p], 1e6, levels, sliced, null, true);
+  const field = cut.field ?? rise;
+  let out: SurfaceMesh = { vertices: cut.vertices, indices: cut.indices, parents: cut.parents };
+  for (let pass = 0; pass < 12; pass += 1) {
+    const c = collapseShortEdges(out.vertices, out.indices, SURFACE_MIN_EDGE);
+    if (c.merged === 0 || !c.faces) break;
+    const parents = out.parents;
+    out = { vertices: out.vertices, indices: c.indices, parents: Uint32Array.from(c.faces, (f) => parents[f]) };
+  }
+  out.limited = Boolean(mesh.limited || out.indices.length / 3 > maxTriangles);
+  // The heights of the points on these faces, from the cut's rise.
+  const w = out.vertices, m = w.length / 3;
+  const fixed = new Float32Array(m).fill(NaN);
+  const on = cuttableFaces(out, new Uint8Array(m), skipBase, plane ? -1 : ax);
+  for (let f = 0; f < on.length; f += 1) {
+    if (!on[f]) continue;
+    for (let k = 0; k < 3; k += 1) {
+      const i = out.indices[f * 3 + k];
+      if (!Number.isNaN(fixed[i])) continue;
+      const u = plane ? w[i * 3 + plane[0]] : aroundAngle(layout, w[i * 3 + i1], w[i * 3 + i2]) * layout.radius;
+      const at = plane ? w[i * 3 + plane[1]] : w[i * 3 + ax];
+      fixed[i] = stoneHeight(stonePoint(u, at, s, layout, code), field[i], s);
+    }
+  }
+  return { mesh: out, fixed };
+}
+
+/** At most about this many times the budget may cutting half-timbering cost before it is left uncut (see sliceTimber). */
+const TIMBER_CUT_LIMIT = 2;
+
+/**
+ * Half-timbering: cut along its beams instead of refined, as tiles are (see sliceTiles) - each family of lines in one
+ * cut over its period, so no fans are cut again: the posts, the level beams (sills, plates and rails, all a part's
+ * height apart) and the two families of diagonals (braces, crosses and knee braces, each parallel to a part's
+ * diagonal: those rising to the right lie `W h / L` apart across them, as do those falling, every knee brace a share of
+ * that from a brace's line). Each beam is cut at its face's border and its wall's foot, and along the grain's grooves.
+ * The diagonals are cut only near the fields that hold them. The grid the plaster asked for (see targetEdge) stays in
+ * between. Far more lines than the budget holds are not cut at all. `skipBase`: input triangles that surely stay
+ * smooth. Parents point at the input mesh.
+ */
+function sliceTimber(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, _steps: number, maxTriangles: number, skipBase: Uint8Array): { mesh: SurfaceMesh; reduced: boolean; fixed: null } {
+  const ax = AXIS_INDEX[s.axis];
+  const [i1, i2] = acrossAxes(s.axis);
+  const cyl = s.projection === "cylinder";
+  const R = layout.radius, [c1, c2] = layout.center;
+  const round = cyl ? 2 * Math.PI * R : 0;
+  // The plane as the values take it (see surfaceTextureValueAt): round the axis, or a straight face's.
+  const { code, plane } = cutPlane(s, layout);
+  const { posts, storeys, round: around } = timberFrame(s, layout, code);
+  const W = posts.cell, parts = s.timberRails + 1, h = storeys.height / parts;
+  const r = timberHalf(s, W, h), wall = Math.min(TIMBER_WALL, 0.2 * r);
+  const L = Math.hypot(W, h), P = (W * h) / L;
+  const unrolled = (m: SurfaceMesh) => {
+    const v = m.vertices, n = v.length / 3;
+    const U = new Float64Array(n), V = new Float64Array(n), pole = new Uint8Array(n);
+    for (let i = 0; i < n; i += 1) {
+      if (cyl) {
+        if (Math.hypot(v[i * 3 + i1] - c1, v[i * 3 + i2] - c2) < 1e-6) pole[i] = 1;
+        U[i] = aroundAngle(layout, v[i * 3 + i1], v[i * 3 + i2]) * R - posts.origin;
+        V[i] = v[i * 3 + ax] - storeys.origin;
+      } else {
+        U[i] = v[i * 3 + plane![0]] - posts.origin;
+        V[i] = v[i * 3 + plane![1]] - storeys.origin;
+      }
+    }
+    const du = (i: number, j: number) => {
+      const d = U[j] - U[i];
+      return round ? d - round * Math.round(d / round) : d;
+    };
+    return { U, V, pole, du, dv: (i: number, j: number) => V[j] - V[i] };
+  };
+  const cuttable = (m: SurfaceMesh, F: ReturnType<typeof unrolled>) => cuttableFaces(m, F.pole, skipBase, cyl ? ax : -1);
+  // Across a beam from its middle line: its face's border, its wall's foot and the grain's grooves.
+  const across = [r, r + wall, ...(s.timberGrain ? [TIMBER_GRAIN_AT - TIMBER_GRAIN_HALF, TIMBER_GRAIN_AT, TIMBER_GRAIN_AT + TIMBER_GRAIN_HALF].map((t) => t * r) : [])];
+  const modulo = (x: number, m: number) => ((x % m) + m) % m;
+  const placesAt = (lines: number[], period: number) => {
+    const out: number[] = [];
+    for (const line of lines) {
+      for (const d of across.flatMap((value) => [-value, value])) {
+        const o = modulo(line + d, period);
+        if (!out.some((known) => Math.abs(known - o) < 1e-9 * period || Math.abs(known - o) > period * (1 - 1e-9))) out.push(o);
+      }
+    }
+    return out.sort((a, b) => a - b);
+  };
+  const knees = s.timberBracing === "knee" || s.timberBracing === "mixed";
+  // Families: a unit normal in (U, V), the period across, where the lines lie within it, and (diagonals) the fields that hold them.
+  const families: { normal: [number, number]; period: number; places: number[]; rising: boolean | null }[] = [
+    { normal: [1, 0], period: W, places: placesAt([0], W), rising: null },
+    { normal: [0, 1], period: h, places: placesAt([0], h), rising: null },
+  ];
+  if (s.timberBracing !== "none") {
+    families.push({ normal: [h / L, -W / L], period: P, places: placesAt(knees ? [0, TIMBER_KNEE_REACH * P] : [0], P), rising: true });
+    families.push({ normal: [h / L, W / L], period: P, places: placesAt(knees ? [0, (1 - TIMBER_KNEE_REACH) * P] : [0], P), rising: false });
+  }
+  /** How far a point is from the nearest diagonal its field holds, rising or falling (Infinity: none). */
+  const diagonal = (u: number, v: number, rising: boolean) => {
+    const i = Math.floor(u / W), x = u - i * W;
+    const k = Math.floor(v / storeys.height), y = v - k * storeys.height;
+    const q = Math.min(parts - 1, Math.floor(y / h)), yq = y - q * h;
+    const style = storeys.count > 0 && (k < 0 || k >= storeys.count) ? TIMBER_OPEN : timberStyle(i, posts.count, s.timberBracing, around);
+    let d = Infinity;
+    if (rising && (style === TIMBER_RISING || (style === TIMBER_CROSS && q === 0))) d = Math.abs(x * h - yq * W) / L;
+    if (!rising && (style === TIMBER_FALLING || (style === TIMBER_CROSS && q === 0))) d = Math.abs(x * h + yq * W - W * h) / L;
+    if (style === TIMBER_KNEE && q === parts - 1) {
+      d = Math.min(d, rising ? Math.abs(x * h - yq * W + (1 - TIMBER_KNEE_REACH) * W * h) / L : Math.abs(x * h + yq * W - (2 - TIMBER_KNEE_REACH) * W * h) / L);
+    }
+    return d;
+  };
+  // What cutting costs, estimated: the lines' length over the faces to cut, about three triangles per grid edge along them.
+  const open = cuttable(mesh, unrolled(mesh));
+  let area = 0, count = 0;
+  for (let f = 0; f < open.length; f += 1) {
+    if (!open[f]) continue;
+    area += Math.hypot(...faceCross(mesh.vertices, mesh.indices[f * 3], mesh.indices[f * 3 + 1], mesh.indices[f * 3 + 2])) / 2;
+    count += 1;
+  }
+  const grid = count ? Math.min(Math.sqrt(area / (0.433 * count)), Math.min(W, h)) : W;
+  const lines = families.reduce((sum, family) => sum + (family.places.length / family.period) * (family.rising === null ? 1 : 0.5), 0);
+  if ((3 * area * lines) / grid > TIMBER_CUT_LIMIT * maxTriangles) return { mesh: { ...mesh, limited: true }, reduced: true, fixed: null };
+  let out: SurfaceMesh = mesh;
+  for (let k = 0; k < families.length; k += 1) {
+    const F = unrolled(out);
+    const [a, b] = families[k].normal;
+    const field = new Float64Array(F.U.length);
+    for (let i = 0; i < field.length; i += 1) field[i] = a * F.U[i] + b * F.V[i];
+    const diff = (p: number, q: number) => a * F.du(p, q) + b * F.dv(p, q);
+    const sliced = cuttable(out, F);
+    const rising = families[k].rising;
+    if (rising !== null) {
+      // Diagonals only near the fields that hold them: a triangle within a beam and its longest edge of one.
+      const v = out.vertices, I = out.indices;
+      const near = Float64Array.from(F.U, (u, i) => diagonal(u, F.V[i], rising));
+      for (let f = 0; f < sliced.length; f += 1) {
+        if (!sliced[f]) continue;
+        const [p, q, c] = [I[f * 3], I[f * 3 + 1], I[f * 3 + 2]];
+        const longest = Math.sqrt(Math.max(...[[p, q], [q, c], [c, p]].map(([e, g]) => (v[e * 3] - v[g * 3]) ** 2 + (v[e * 3 + 1] - v[g * 3 + 1]) ** 2 + (v[e * 3 + 2] - v[g * 3 + 2]) ** 2)));
+        if (Math.min(near[p], near[q], near[c]) > r + wall + longest) sliced[f] = 0;
+      }
+    }
+    const before = families.slice(0, k).map(({ normal: [x, y] }) => (p: number, q: number) => x * F.du(p, q) + y * F.dv(p, q));
+    const keep = before.length ? (p: number, q: number) => before.some((d) => Math.abs(d(p, q)) < 1e-9) : null;
+    out = sliceByField(out, field, diff, families[k].period, families[k].places, sliced, (p, q) => -b * F.du(p, q) + a * F.dv(p, q), false, keep);
+  }
+  // Short edges (lines close to each other where beams meet) are pulled together here already, once for all depths.
+  for (let pass = 0; pass < 12; pass += 1) {
+    const c = collapseShortEdges(out.vertices, out.indices, SURFACE_MIN_EDGE);
+    if (c.merged === 0 || !c.faces) break;
+    const parents = out.parents;
+    out = { vertices: out.vertices, indices: c.indices, parents: Uint32Array.from(c.faces, (f) => parents[f]) };
+  }
+  out.limited = Boolean(mesh.limited || out.indices.length / 3 > maxTriangles);
+  return { mesh: out, reduced: false, fixed: null };
+}
+
 const FLANK_JUMP = 0.3;
 const FLANK_ROUNDS = 3;
 /** An image once is refined finer across an edge whose ends' grey values differ by this much (an outline in the image). */
@@ -4075,6 +4853,11 @@ export type SurfaceTextureStats = {
   bricks: { courses: number; height: number } | null;
   /** Squares and triangles: their size and their gap as made (rounded round a body), mm; null for the other patterns. */
   tiles: { size: number; gap: number } | null;
+  /**
+   * Half-timbering: how many storeys fit the height and how high each is, and a panel's width as made (round the body; else
+   * along x all round, along the first axis across flat), mm; null for the other patterns.
+   */
+  timber: { storeys: number; height: number; panel: number } | null;
   /** How the pattern was laid on: what "auto" chose, or what was asked for. */
   projection: Exclude<SurfaceTextureProjection, "auto">;
 };
@@ -5391,7 +6174,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const smooth = smoothBaseVertices(s, layout);
     // All round on straight faces (a box's sides): cut per axis as flat, the rest refined as before.
     const striped = s.pattern === "grooves" || s.pattern === "knurl";
-    const cutsFlat = striped || CELL_PATTERNS.includes(s.pattern);
+    // Stone walls are refined at their edges first, then cut along the stones' outlines like the straight faces' cuts.
+    const stones = s.pattern === "stones";
+    const cutsFlat = striped || stones || CELL_PATTERNS.includes(s.pattern);
     // Around a cylinder, a picked top or bottom lies flat (see SurfaceTextureLayout.flatCaps): cut like a straight face.
     const caps = layout.flatCaps ? capFaces(base, smooth.faces, AXIS_INDEX[s.axis]) : null;
     const straight = s.projection === "allRound" && cutsFlat ? straightFaces(base, smooth.faces) : cutsFlat ? caps : null;
@@ -5662,8 +6447,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       if (caps && s.pattern === "rope") start = capRingCuts(start, s, layout, s.spacing, [0], Uint8Array.from(caps, (k) => (k === 255 ? 1 : 0)), budget, smooth.faces);
       // Bark's side round a cylinder in long strips: cut across first (see cutStrips). Not yet the other patterns': halving
       // the strips gave them a grid finer than asked for along the axis, and a weave's strands lost their straight edges
-      // on the even one.
-      if (s.pattern === "bark" && s.projection === "cylinder" && !layout.outline) start = cutStrips(start, s, layout, edge, smooth.faces);
+      // on the even one. Half-timbering's plaster grid and a stone wall's likewise: halved, a tower 100 mm across came out
+      // in three times the triangles, which the beams' and stones' cuts then cut again.
+      if ((s.pattern === "bark" || s.pattern === "timber" || s.pattern === "stones") && s.projection === "cylinder" && !layout.outline) start = cutStrips(start, s, layout, edge, smooth.faces);
       // Grooves, bricks, squares and triangles on straight faces are cut, not refined: points only on such faces (or smooth
       // ones) stay as they are.
       let keep = smooth.points;
@@ -5708,6 +6494,21 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // preview with half as many levels: each level cuts along the whole joint or round every bump.
     let cellSliced = false;
     let fixed: Float32Array | null = null;
+    // A stone wall: its edges refined everywhere (also on straight faces, cut after), then cut round the axis or flat.
+    if (stones && !mesh.limited) {
+      // Finer than other flanks: a triangle wider than a joint reached from one stone's outline to the next, where the
+      // cuts along them, placed by the nearer stone's measure (see stonePoint), came out a little off, in teeth. But not
+      // finer than the budget holds, the outlines' length estimated (about 3.25 per stone size and mm² of wall), each mm
+      // costing about 14 triangles per mm of the fine edge with its cuts: over it, the cuts on the last faces were left out.
+      const outlines = (3.25 * texturableArea(smooth.points)) / s.spacing;
+      const room = Math.max(1, 0.6 * maxTriangles - mesh.indices.length / 3);
+      mesh = refineFlanks(mesh, s, layout, Math.max(Math.min(edge / 2.5, s.stoneJoint * 0.75), (14 * outlines) / room), maxTriangles, smooth.faces);
+      if (s.projection !== "allRound" && !mesh.limited) {
+        const cut = stoneCuts(mesh, s, layout, CROSS_STEPS[s.detail] / 2, maxTriangles, roundSkip);
+        mesh = cut.mesh;
+        fixed = cut.fixed;
+      }
+    }
     const cellSteps = () => {
       const full = s.pattern === "bumps" ? BUMP_RINGS[s.detail] : CROSS_STEPS[s.detail];
       return scale > 1 ? Math.ceil(full / 2) : full;
@@ -5715,7 +6516,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     if (cellsAreCut(s) && !mesh.limited) {
       const cut = s.pattern === "bricks"
         ? sliceBricks(mesh, s, layout, cellSteps(), maxTriangles, roundSkip)
-        : tilePattern(s)
+        : s.pattern === "timber"
+          ? sliceTimber(mesh, s, layout, cellSteps(), maxTriangles, roundSkip)
+          : tilePattern(s)
           ? sliceTiles(mesh, s, layout, cellSteps(), maxTriangles, roundSkip)
           : sliceCells(mesh, s, layout, cellSteps(), maxTriangles, roundSkip);
       if (cut.reduced) raised = true;
@@ -5767,9 +6570,15 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
             mesh = rayCuts(mesh, s, layout, maxTriangles, smooth.faces, skip);
           } else mesh = capRingCuts(mesh, sk, layout, layout.period, stripeOffsets(layout.period, s, CROSS_STEPS[s.detail] / 2), skip, maxTriangles, smooth.faces);
         } else if (striped) mesh = cutRows(mesh, sk, skip);
-        else if (s.pattern === "bricks" || tilePattern(s)) {
-          const cut = s.pattern === "bricks" ? sliceBricks(mesh, sk, layout, cellSteps(), maxTriangles, skip) : sliceTiles(mesh, sk, layout, cellSteps(), maxTriangles, skip);
+        else if (s.pattern === "bricks" || s.pattern === "timber" || tilePattern(s)) {
+          const cut = s.pattern === "bricks" ? sliceBricks(mesh, sk, layout, cellSteps(), maxTriangles, skip) : s.pattern === "timber" ? sliceTimber(mesh, sk, layout, cellSteps(), maxTriangles, skip) : sliceTiles(mesh, sk, layout, cellSteps(), maxTriangles, skip);
           if (cut.reduced) raised = true;
+          mesh = cut.mesh;
+        } else if (stones) {
+          const cut = stoneCuts(mesh, sk, layout, CROSS_STEPS[s.detail] / 2, maxTriangles, skip);
+          const merged = new Float32Array(cut.fixed.length);
+          for (let i = 0; i < merged.length; i += 1) merged[i] = Number.isNaN(cut.fixed[i]) && fixed && i < fixed.length ? fixed[i] : cut.fixed[i];
+          fixed = merged;
           mesh = cut.mesh;
         } else {
           const cut = sliceCells(mesh, sk, layout, cellSteps(), maxTriangles, skip);
@@ -5795,7 +6604,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     if (s.pattern === "weave" && s.projection === "cylinder" && !mesh.limited) mesh = weaveCuts(mesh, s, layout, maxTriangles, smooth.faces);
     if (s.pattern === "carbon" && s.projection === "cylinder" && !mesh.limited) mesh = carbonCuts(mesh, s, layout, maxTriangles, smooth.faces);
     if (s.projection === "cylinder" && layout.outline?.corners.length && standsOut(s) && !mesh.limited) mesh = cornerCuts(mesh, s, layout, maxTriangles, smooth.faces);
-    if (!slice && !cracks && !stuckOn(s) && !mesh.limited && !cellSliced) mesh = refineFlanks(mesh, s, layout, edge / 2.5, maxTriangles, cutFaces);
+    if (!slice && !cracks && !stones && !stuckOn(s) && !mesh.limited && !cellSliced) mesh = refineFlanks(mesh, s, layout, edge / 2.5, maxTriangles, cutFaces);
     // Cut even where the budget stopped refining (a long log): as long as the cuts still fit in (see barkLevelCuts).
     if (s.pattern === "bark") {
       const cut = barkLevelCuts(mesh, s, layout, BARK_BLUR * edge, maxTriangles, cutFaces);
@@ -6354,7 +7163,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // meet. With one move for both (see creaseMoves), a joint on the top beside a brick on the side pulled the edge into
     // the top, and its brick faces down into fans; a log's rim took the bark's deep furrows for its end too, in spikes.
     // Squares and triangles too: a box's edge between a tile on one side and a gap on the other.
-    const sides = s.pattern === "bricks" || tilePattern(s) || s.pattern === "bark" || s.pattern === "wood" ? creaseSides(base, mesh, s.edgeAngle) : null;
+    // Half-timbering and stone walls too: a corner post or stone on one side, plaster or mortar on the other.
+    const sides = s.pattern === "bricks" || s.pattern === "timber" || s.pattern === "stones" || tilePattern(s) || s.pattern === "bark" || s.pattern === "wood" ? creaseSides(base, mesh, s.edgeAngle) : null;
     // The bed's rim under squares and triangles from the bottom edge (see bedRimPoints): the side moves, the bottom stays
     // on the bed - moved along both faces' normals the point went below it, and the bed held it back where it was.
     const bed = fromBed ? bedRimPoints(mesh, s, layout) : null;
@@ -6459,6 +7269,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         image: imageOnce(s) ? { placed: lettered > 0, torn: state.text?.torn ?? 0 } : null,
         bricks: s.pattern === "bricks" && layout.rows && layout.rowHeight ? { courses: layout.rows, height: layout.rowHeight } : null,
         tiles: tilePattern(s) && layout.tiles ? { size: layout.tiles.size, gap: layout.tiles.gap } : null,
+        timber: s.pattern === "timber" && layout.timber ? timberStats(s, layout.timber) : null,
         projection: s.projection as Exclude<SurfaceTextureProjection, "auto">,
       },
       fill,
