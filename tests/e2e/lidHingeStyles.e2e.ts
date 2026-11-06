@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Module from "manifold-3d";
-import { hingeKnuckleRadius, lidForSolid, normalizeLidOptions } from "@/lib/lidTool";
+import { HINGE_PIN_GRIP, hingeKnuckleRadius, lidForSolid, normalizeLidOptions } from "@/lib/lidTool";
 
 type Solid = { delete?: () => void };
 
@@ -225,6 +225,83 @@ describe("a pivot lid's pins and sides", () => {
       const holes = right.hinge!.cuts!.boundingBox();
       expect(holes.max[2] - holes.min[2]).toBeGreaterThan(40);
       expect(holes.min[0]).toBeGreaterThan(20);
+    } finally {
+      dispose(created);
+    }
+  });
+});
+
+describe("the pin's holes: tight in the body's part of the hinge, with the play in the lid's (#1220)", () => {
+  it("measure about 0.925 mm round in the body and 1.075 mm in the lid, outside, flush and with pivot pins", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    // Whether a round rod of `radius` along the axis, from x `from` to `to`, runs into the solid.
+    const rodHits = (solid: Body, radius: number, from: number, to: number, y: number, z: number) => {
+      const rod = kernel.Manifold.cylinder(to - from, radius, radius, 48).rotate([0, 90, 0]).translate([from, y, z]);
+      const hit = solid.intersect(rod);
+      created.push(rod, hit);
+      const volume = hit.volume();
+      if (volume > 1e-3) return true;
+      if (volume < 1e-4) return false;
+      throw new Error(`a rod of ${radius} mm only grazes the solid: ${volume} mm³`);
+    };
+    // The hole's radius lies between the largest rod that goes through and the smallest that does not.
+    const holeBetween = (solid: Body, low: number, high: number, from: number, to: number, y: number, z: number, what: string) => {
+      expect(rodHits(solid, low, from, to, y, z), `${what}: a rod of ${low} mm goes through`).toBe(false);
+      expect(rodHits(solid, high, from, to, y, z), `${what}: a rod of ${high} mm does not`).toBe(true);
+    };
+    try {
+      expect(HINGE_PIN_GRIP).toBe(0.05);
+      // A 1.75 mm pin: 0.925 mm round in the body (0.05 mm per side), 1.075 mm in the lid (0.2 mm of play).
+      const tight: [number, number] = [0.9, 0.95];
+      const free: [number, number] = [1.05, 1.1];
+      for (const hingeTeardrop of [true, false]) {
+        // Outside: the body's knuckles on the back wall, the lid's between them.
+        const body = openBox(kernel, created);
+        const outside = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeTeardrop }));
+        if ("error" in outside) throw new Error(JSON.stringify(outside.error));
+        created.push(outside.lid, outside.hinge!.knuckles);
+        const outsideBody = body.add(outside.hinge!.knuckles);
+        const outsideTurned = outside.lid.rotate([180, 0, 0]);
+        const outsideBox = outsideTurned.boundingBox();
+        const outsideLid = outsideTurned.translate([-30 - outsideBox.min[0], 32 - outsideBox.max[1], 20 - outsideBox.max[2]]);
+        created.push(outsideBody, outsideTurned, outsideLid);
+        const outsideAxis = [32 - RADIUS, -(20 + RADIUS + 0.3)] as const;
+        holeBetween(outsideBody, ...tight, -35, 35, ...outsideAxis, `outside, body, teardrop ${hingeTeardrop}`);
+        holeBetween(outsideLid, ...free, -35, 35, ...outsideAxis, `outside, lid, teardrop ${hingeTeardrop}`);
+        // The rod the body holds turns freely in the lid.
+        expect(rodHits(outsideLid, tight[1], -35, 35, ...outsideAxis)).toBe(false);
+
+        // Flush: the body's knuckles in the wall, and the hole through the wall where they reach into it, all tight.
+        const flush = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeStyle: "flush", hingeTeardrop }));
+        if ("error" in flush) throw new Error(JSON.stringify(flush.error));
+        created.push(flush.lid, flush.hinge!.knuckles, flush.hinge!.cuts!);
+        const flushBody = body.add(flush.hinge!.knuckles).subtract(flush.hinge!.cuts!);
+        const flushTurned = flush.lid.rotate([180, 0, 0]);
+        const flushBox = flushTurned.boundingBox();
+        const flushLid = flushTurned.translate([-30 - flushBox.min[0], 32 - flushBox.max[1], 20 - flushBox.max[2]]);
+        created.push(flushBody, flushTurned, flushLid);
+        const flushAxis = [32 - RADIUS, -20 + RADIUS] as const;
+        holeBetween(flushBody, ...tight, -35, 35, ...flushAxis, `flush, body, teardrop ${hingeTeardrop}`);
+        holeBetween(flushLid, ...free, -35, 35, ...flushAxis, `flush, lid, teardrop ${hingeTeardrop}`);
+        // The knuckles alone are as tight as with the cuts grouped with the body, which cut them too.
+        holeBetween(flush.hinge!.knuckles, ...tight, -35, 35, ...flushAxis, `flush, knuckles, teardrop ${hingeTeardrop}`);
+
+        // Pivot pins: tight through the side walls (x from ±28 to ±30), with the play in the bar's ends.
+        const pivot = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeStyle: "pivot", hingeTeardrop }));
+        if ("error" in pivot) throw new Error(JSON.stringify(pivot.error));
+        created.push(pivot.lid, pivot.hinge!.knuckles, pivot.hinge!.cuts!);
+        const pivotBody = body.add(pivot.hinge!.knuckles).subtract(pivot.hinge!.cuts!);
+        const pivotTurned = pivot.lid.rotate([180, 0, 0]);
+        const pivotBox = pivotTurned.boundingBox();
+        const pivotLid = pivotTurned.translate([-(pivotBox.min[0] + pivotBox.max[0]) / 2, 30 - pivotBox.max[1], 18 - 0.2 - pivotBox.max[2]]);
+        created.push(pivotBody, pivotTurned, pivotLid);
+        const pivotAxis = [30 - RADIUS, -(18 - 0.3 - RADIUS)] as const;
+        for (const [wallFrom, wallTo, barFrom, barTo] of [[-31, -28.05, -27.6, -22], [28.05, 31, 22, 27.6]] as const) {
+          holeBetween(pivotBody, ...tight, wallFrom, wallTo, ...pivotAxis, `pivot, wall at ${wallFrom}, teardrop ${hingeTeardrop}`);
+          holeBetween(pivotLid, ...free, barFrom, barTo, ...pivotAxis, `pivot, bar at ${barFrom}, teardrop ${hingeTeardrop}`);
+        }
+      }
     } finally {
       dispose(created);
     }

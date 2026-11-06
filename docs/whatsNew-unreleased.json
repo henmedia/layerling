@@ -1,6 +1,26 @@
 [
   {
     "title": {
+      "de": "Mehrgängige Gewinde für Trapezspindeln",
+      "en": "Threads of several starts for lead screws"
+    },
+    "body": {
+      "de": "Ein Gewinde hat jetzt bis zu acht Gänge, etwa für eine Trapezspindel T8x8: 4 Gänge mit 2 mm Teilung, jeder steigt 8 mm je Umdrehung. Das gilt für Stange, Schraube, Mutter und Gewindeloch.",
+      "en": "A thread now has up to eight starts, for a lead screw such as T8x8: 4 starts at 2 mm pitch, each climbing 8 mm a turn. For rods, screws, nuts and tapped holes alike."
+    }
+  },
+  {
+    "title": {
+      "de": "Größengriffe folgen der Arbeitsebene auf einer Seitenfläche",
+      "en": "Size handles follow a workplane on a side face"
+    },
+    "body": {
+      "de": "Legst du die Arbeitsebene auf eine Seite eines Quaders, liegen seine Eck- und Kantengriffe jetzt auf dieser Fläche, wie in Tinkercad. Jeder ändert das Maß des Quaders, das an ihm entlangläuft, und der Griff in der Mitte der Fläche das Maß quer dazu. Das hilft vor allem in der Ansicht von der Seite.",
+      "en": "With the workplane on a side of a box, its corner and edge handles now lie on that face, as in Tinkercad. Each one changes the size of the box that runs along it, and the handle in the middle of the face the size across it. That helps most in a view from the side."
+    }
+  },
+  {
+    "title": {
       "de": "Oberflächentextur: das Muster wählen, indem man es sieht",
       "en": "Surface texture: choose the pattern by seeing it"
     },
@@ -37,6 +57,16 @@
     "body": {
       "de": "Unter einer Skizze zeigt ein importiertes Modell jetzt seinen ganzen Umriss von oben, nicht nur die Fläche, auf der es steht. Von einer Benchy war bisher nur ein Streifen des Kiels zu sehen.",
       "en": "Under a sketch an imported model now shows its whole outline from above, not only the part it stands on. A Benchy showed only a strip of its keel."
+    }
+  },
+  {
+    "title": {
+      "de": "Jeder Körper lässt sich um einen Zylinder wickeln",
+      "en": "Every body can be wrapped around a cylinder"
+    },
+    "body": {
+      "de": "Die Karte „Um einen Zylinder wickeln“ steht jetzt bei jedem Körper, auch bei Formen aus der Bibliothek, etwa einem Runden Dach für die Wand eines runden Turms. Bisher gab es sie nur für importierte Modelle, Text und Skizzen.",
+      "en": "The card Wrap around a cylinder is now there for every body, shapes from the library too, such as a round roof for the wall of a round tower. It was only there for imported models, text and sketches."
     }
   }
 ]

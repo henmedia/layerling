@@ -249,6 +249,93 @@ describe("click bumps that snap the lid in (real Manifold kernel, #1234)", () =>
     }
   });
 
+  it("reach as far into the wall as asked, 0.2 to 0.8 mm, and the dimples follow, 0.1 mm deeper (#1220)", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      expect(normalizeLidOptions({ clickBumps: true }).clickBumpHeight).toBe(0.4);
+      const body = openBox(kernel, created);
+      const plain = lidForSolid(kernel, body, normalizeLidOptions(PLUG));
+      if ("error" in plain) throw new Error(JSON.stringify(plain.error));
+      created.push(plain.lid);
+      let before = 0;
+      for (const height of [0.2, 0.4, 0.6, 0.8]) {
+        const result = lidForSolid(kernel, body, normalizeLidOptions({ ...PLUG, clickBumps: true, clickBumpHeight: height }));
+        if ("error" in result) throw new Error(JSON.stringify(result.error));
+        created.push(result.lid, result.clickBumps!.dimples);
+        expect(result.clickBumps!.count).toBe(4);
+        // Each bump stands out of the lip's face across the 0.2 mm gap and as far again as asked.
+        const added = result.lid.subtract(plain.lid);
+        const pieces = added.decompose();
+        created.push(added, ...pieces);
+        expect(pieces.length).toBe(4);
+        for (const piece of pieces) {
+          const { min, max } = piece.boundingBox();
+          expect(Math.min(max[0] - min[0], max[2] - min[2]), `height ${height}`).toBeCloseTo(0.2 + height, 2);
+        }
+        // Closed, the front one reaches that far into the front wall (its inner face at z = 18), its dimple 0.1 mm further.
+        const closed = closing(body, result.lid, 2, created);
+        const cut = body.subtract(result.clickBumps!.dimples);
+        created.push(cut);
+        expect(solidAt(kernel, closed, [0, MIDDLE, 18 + height - 0.07], created), `bump, height ${height}`).toBe(true);
+        expect(solidAt(kernel, closed, [0, MIDDLE, 18 + height + 0.07], created), `bump, height ${height}`).toBe(false);
+        expect(solidAt(kernel, cut, [0, MIDDLE, 18 + height + 0.05], created), `dimple, height ${height}`).toBe(false);
+        expect(solidAt(kernel, cut, [0, MIDDLE, 18 + height + 0.16], created), `dimple, height ${height}`).toBe(true);
+        // The bumps sit in their dimples, and the higher they are, the more of them is in the wall.
+        const overlap = closed.intersect(cut);
+        const into = closed.intersect(body);
+        created.push(overlap, into);
+        expect(overlap.volume(), `height ${height}`).toBeLessThan(0.01);
+        expect(into.volume(), `height ${height}`).toBeGreaterThan(before);
+        before = into.volume();
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("keep a thin wall's skin and a divider whole at the lowest and the highest bumps", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      // 1.2 mm walls and bumps of 0.8 mm: the dimple, 0.9 mm deep, would leave 0.3 mm; it stops at 0.4 mm of the wall,
+      // and the bump the play short of it, 0.7 mm into the wall (its inner face at z = 18.8).
+      const thin = openBox(kernel, created, 60, 40, 1.2);
+      const high = lidForSolid(kernel, thin, normalizeLidOptions({ ...PLUG, clickBumps: true, clickBumpHeight: 0.8 }));
+      if ("error" in high) throw new Error(JSON.stringify(high.error));
+      created.push(high.lid, high.clickBumps!.dimples);
+      const closed = closing(thin, high.lid, 2, created);
+      const cut = thin.subtract(high.clickBumps!.dimples);
+      const overlap = closed.intersect(cut);
+      created.push(cut, overlap);
+      expect(solidAt(kernel, closed, [0, MIDDLE, 19.45], created)).toBe(true);
+      expect(solidAt(kernel, closed, [0, MIDDLE, 19.55], created)).toBe(false);
+      expect(solidAt(kernel, cut, [0, MIDDLE, 19.55], created)).toBe(false);
+      expect(solidAt(kernel, cut, [0, MIDDLE, 19.65], created)).toBe(true);
+      expect(overlap.volume()).toBeLessThan(0.01);
+      // A wall between two parts of the opening takes dimples from both sides where it keeps 0.4 mm between them: a
+      // 1.2 mm one with bumps of 0.2 mm (0.3 mm deep dimples), not a 1.6 mm one with bumps of 0.8 mm (0.9 mm deep).
+      for (const [thickness, height, count] of [[1.2, 0.2, 8], [1.2, 0.4, 6], [1.6, 0.4, 8], [1.6, 0.8, 6]] as const) {
+        const divider = kernel.Manifold.cube([thickness, 30, 40], true).translate([0, 15, 0]);
+        const parted = openBox(kernel, created).add(divider);
+        created.push(divider, parted);
+        const result = lidForSolid(kernel, parted, normalizeLidOptions({ ...PLUG, clickBumps: true, clickBumpHeight: height }));
+        if ("error" in result) throw new Error(JSON.stringify(result.error));
+        created.push(result.lid, result.clickBumps!.dimples);
+        expect(result.clickBumps!.count, `wall ${thickness}, height ${height}`).toBe(count);
+        const partedCut = parted.subtract(result.clickBumps!.dimples);
+        const partedClosed = closing(parted, result.lid, 2, created);
+        const partedOverlap = partedClosed.intersect(partedCut);
+        created.push(partedCut, partedOverlap);
+        expect(partedCut.decompose().length).toBe(1);
+        expect(solidAt(kernel, partedCut, [0, MIDDLE, 0], created), `wall ${thickness}, height ${height}`).toBe(true);
+        expect(partedOverlap.volume()).toBeLessThan(0.01);
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
   it("leaves out the hinge's side, where the lid turns", async () => {
     const kernel = await runtime();
     const created: Solid[] = [];

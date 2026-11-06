@@ -165,6 +165,8 @@ La carpeta `Custom shapes` también aparece en la página de inicio. Abre ahí u
 2. Haz clic en {{ui:inspector.wrapApply}}. Lo que iba de izquierda a derecha ahora rodea el cilindro, el lado de atrás pasa a quedar arriba y el grosor sobresale de la pared.
 3. Selecciona la forma envuelta y el cilindro, y céntralos los dos de izquierda a derecha y de delante atrás. El centro de la forma envuelta es el eje del cilindro, así que entonces queda justo sobre su pared.
 
+Se puede envolver cualquier cuerpo, también una forma de la biblioteca: por ejemplo, un tejado redondo que debe asentarse sobre la pared de una torre redonda. Colócalo en la placa tal como debe verse en la pared, con la parte redonda hacia atrás.
+
 Para un grabado, activa {{ui:inspector.wrapInward}}: el grosor se mete entonces en la pared. Convierte la forma en orificio, céntrala y agrúpala con el cilindro.
 
 Una forma ya envuelta es una malla del resultado y no se puede volver a envolver: deshaz el envoltorio o vuelve a envolver el original plano con otro diámetro.

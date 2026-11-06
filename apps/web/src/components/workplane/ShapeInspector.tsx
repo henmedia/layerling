@@ -69,12 +69,14 @@ import {
   normalizeThreadClearance,
   normalizeThreadBoltClearance,
   normalizeThreadAxialClearance,
+  normalizeThreadStarts,
   normalizeThreadDepth,
   normalizeThreadFlankAngle,
   threadDepthLimits,
   MIN_THREAD_FLANK_ANGLE,
   MAX_THREAD_FLANK_ANGLE,
   threadAxialClearanceLimit,
+  threadStartsLimit,
   MIN_THREAD_BOLT_CLEARANCE,
   MAX_THREAD_BOLT_CLEARANCE,
   normalizeThreadDiameter,
@@ -2809,6 +2811,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       next.clearance = normalizeThreadClearance(next.clearance);
       next.boltClearance = normalizeThreadBoltClearance(next.boltClearance);
       next.axialClearance = normalizeThreadAxialClearance(next.axialClearance, next.pitch);
+      // A size from the menu is one thread (#1348); otherwise the starts stay, as far as the new measures allow.
+      next.starts = normalizeThreadStarts(patch.starts ?? (patch.taper || next.taper ? 1 : next.starts), next.diameter, next.pitch, next.taper);
       // The own profile keeps its proportions when the pitch changes: the depth goes with it, unless it is set in the same step.
       if (patch.pitch !== undefined && patch.depth === undefined && settings.profile === "custom") next.depth = settings.depth * (next.pitch / settings.pitch);
       next.flankAngle = normalizeThreadFlankAngle(next.flankAngle);
@@ -2855,6 +2859,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         threadTaper: next.taper ? true : undefined,
         threadDiameter: next.diameter,
         threadPitch: next.pitch,
+        threadStarts: next.starts > 1 ? next.starts : undefined,
         threadClearance: next.clearance,
         threadBoltClearance: next.boltClearance,
         threadAxialClearance: next.axialClearance,
@@ -2936,7 +2941,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           // Eine G-Groesse bringt ihr Whitworth-Profil mit, eine M-, UNC- oder
           // UNF-Groesse das Spitzgewinde, ein Flaschenhals sein eigenes Profil;
           // Trapez und Rund bleiben stehen.
-          if (chosen) applyThread(threadSizeSettings(chosen, settings.profile, standard));
+          if (chosen) applyThread({ ...threadSizeSettings(chosen, settings.profile, standard), starts: 1 });
         },
       },
       {
@@ -3062,13 +3067,27 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         }
         : {
           id: "pitch",
-          label: t("prop.pitch"),
+          // With several starts (#1348) this is the distance from thread to thread, not how far one climbs.
+          label: t(settings.starts > 1 ? "prop.threadDivision" : "prop.pitch"),
           value: settings.pitch,
           min: pitchLimits.min,
           max: pitchLimits.max,
           step: 0.05,
           onChange: (pitch) => applyThread({ pitch }),
         },
+      // Starts (#1348): threads side by side, as on a lead screw. A tapered thread has one.
+      ...(settings.taper ? [] : [{
+        id: "threadStarts",
+        label: t("prop.threadStarts"),
+        value: settings.starts,
+        min: 1,
+        max: threadStartsLimit(settings.diameter, settings.pitch),
+        step: 1,
+        hint: settings.starts > 1
+          ? t("thread.startsLeadHint", { lead: (settings.pitch * settings.starts).toLocaleString(numberLocale()), starts: settings.starts, pitch: settings.pitch.toLocaleString(numberLocale()) })
+          : t("thread.startsHint"),
+        onChange: (starts: number) => applyThread({ starts: Math.round(starts) }),
+      }]),
       {
         type: "select",
         id: "threadHand",
@@ -4155,7 +4174,7 @@ export function ShapeInspector({
   const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
   const textFillEnd = primaryProperties.reduce((end, property, index) => (TEXT_FILL_IN_VIEW_IDS.has(property.id) ? index + 1 : end), 0);
   const threadProperties = isThread
-    ? properties.filter((property) => ["pitch", "threadsPerInch", "threadHand", "threadProfile", "threadTaper", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
+    ? properties.filter((property) => ["pitch", "threadsPerInch", "threadStarts", "threadHand", "threadProfile", "threadTaper", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
     : [];
   const gearTeethProperties = shape.kind === "gear"
     ? properties.filter((property) => ["gearProfile", "teeth", "gearModule", "gearPressureAngle", "gearBacklash", "gearRim", "toothSize", "toothWidth"].includes(property.id))

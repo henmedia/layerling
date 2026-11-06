@@ -176,7 +176,7 @@ export function clearanceSourceShapes(source: readonly WorkplaneShape[]) {
 type Part = ClearancePart & { solid: ManifoldSolid; geometry: THREE.BufferGeometry | null };
 
 function partGeometry(part: Part) {
-  return (part.geometry ??= geometryOf(part.solid));
+  return (part.geometry ??= closestPointGeometry(part.solid));
 }
 
 function boxOf(solid: ManifoldSolid): ClearanceBox {
@@ -184,8 +184,11 @@ function boxOf(solid: ManifoldSolid): ClearanceBox {
   return { min: [box.min[0], box.min[1], box.min[2]], max: [box.max[0], box.max[1], box.max[2]] };
 }
 
-/** The part's triangles with a bounding-volume tree, for the closest points. */
-function geometryOf(solid: ManifoldSolid) {
+/**
+ * The part's triangles with a bounding-volume tree, for the closest points. The print check (lib/printCheck.ts) asks
+ * the same of its bodies, whether one rests on another; whoever builds it frees it (boundsTree undefined, dispose).
+ */
+export function closestPointGeometry(solid: ManifoldSolid) {
   const mesh = solid.getMesh();
   try {
     const count = mesh.vertProperties.length / mesh.numProp;
@@ -205,9 +208,10 @@ function geometryOf(solid: ManifoldSolid) {
 
 /**
  * The separate parts of one object: its outer skins, each with the cavities inside it (a ball printed in a cage lies
- * in the cage's cavity, not in the cage). A skin's cavities are cut back out of it.
+ * in the cage's cavity, not in the cage). A skin's cavities are cut back out of it. The print check takes the same
+ * parts as the pieces that print, so a cavity never counts as a part of its own.
  */
-function separateParts(runtime: ManifoldToplevel, solid: ManifoldSolid, created: ManifoldSolid[]): ManifoldSolid[] {
+export function separateParts(runtime: ManifoldToplevel, solid: ManifoldSolid, created: ManifoldSolid[]): ManifoldSolid[] {
   const components = solid.decompose();
   created.push(...components);
   const bodies = components.filter((component) => component.volume() > 0);
