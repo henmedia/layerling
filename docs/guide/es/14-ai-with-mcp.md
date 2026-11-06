@@ -102,6 +102,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_sweep_sketch` | hace un barrido de una sección rectangular o redonda a lo largo de una trayectoria de puntos, como un único cuerpo exacto; una trayectoria cerrada da un anillo |
 | `layerling_push_face` | empuja hacia fuera una cara plana o abre un hueco en ella, con un desfase hacia dentro desde la arista y un radio de esquina; la parte nueva es un cuerpo de boceto agrupado con el cuerpo, o un cuerpo independiente con `separate` |
 | `layerling_paint` | pinta partes de un cuerpo en colores propios para imprimir en varios colores (Pintar): rellenar una cara hasta sus aristas vivas, una mancha redonda o un lazo trazado en una vista plana; borrar, quitar todo; se guarda con el cuerpo y se escribe en un 3MF como caras pintadas |
+| `layerling_support_rib` | pone un nervio de soporte fino bajo la cara inferior de una pieza impresa inclinada sobre una arista, con puentes de una capa de alto (Nervio de soporte) |
 | `layerling_mate_faces` | lleva una cara de un objeto contra una cara de otro, cara contra cara o a ras, o pone dos caras redondas en un mismo eje |
 | `layerling_open_group` | abre un grupo para poder cambiar sus piezas una a una, también un grupo dentro de otro abierto |
 | `layerling_close_group` | lo vuelve a cerrar («Listo») o cancela |

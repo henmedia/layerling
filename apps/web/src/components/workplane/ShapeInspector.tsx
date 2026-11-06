@@ -210,7 +210,7 @@ import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
-import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -5955,7 +5955,13 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
               <span>{t("sbcBoard.gpioUp")}</span>
             </label>
           ) : null}
-          {controls.settings.ribbonUp || controls.settings.gpioUp ? (
+          {sbcBoardHasLens(SBC_BOARDS[controls.settings.board]) ? (
+            <label className="check-property sbc-board-lens-up">
+              <input type="checkbox" checked={controls.settings.lensUp === true} disabled={disabled || busy} data-testid="sbc-board-lens-up" onChange={(event) => regenerate({ lensUp: event.currentTarget.checked })} />
+              <span>{t("sbcBoard.lensUp")}</span>
+            </label>
+          ) : null}
+          {controls.settings.ribbonUp || controls.settings.gpioUp || controls.settings.lensUp ? (
             <label className="select-property sbc-board-up-reach">
               <span>{t("sbcBoard.upReach")} ({unit})</span>
               <CompactMeasureField
@@ -6845,7 +6851,8 @@ export function SurfaceTextureCard({
                       {range("surfaceTimberHeight", t("inspector.surfaceTimberHeight"), settings.timberHeight, [SURFACE_TEXTURE_LIMITS.timberHeight[0], 100], 0.5, (timberHeight) => set({ timberHeight }))}
                       {range("surfaceTimberBeam", t("inspector.surfaceTimberBeam"), settings.timberBeam, [SURFACE_TEXTURE_LIMITS.timberBeam[0], 10], 0.1, (timberBeam) => set({ timberBeam }))}
                       {range("surfaceTimberRails", t("inspector.surfaceTimberRails"), settings.timberRails, SURFACE_TEXTURE_LIMITS.timberRails, 1, (timberRails) => set({ timberRails }))}
-                      <ToggleProperty label={t("inspector.surfaceTimberGrain")} value={settings.timberGrain} disabled={disabled || busy} onChange={(timberGrain) => set({ timberGrain })} />
+                      {percent("surfaceTimberGrain", t("inspector.surfaceTimberGrain"), settings.timberGrain, (timberGrain) => set({ timberGrain }))}
+                      <p className="cylinder-wrap-hint">{t("inspector.surfaceTimberGrainHint")}</p>
                       <p className="cylinder-wrap-hint">{t("inspector.surfaceTimberHint")}</p>
                     </>
                   ) : null}

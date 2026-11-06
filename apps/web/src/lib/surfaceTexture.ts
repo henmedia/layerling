@@ -337,8 +337,11 @@ export type SurfaceTextureSettings = {
   /** Half-timbering: how many rails run across each storey between sill and plate, 0 to 2 (they split it evenly). */
   timberRails: number;
   timberBracing: SurfaceTextureTimberBracing;
-  /** Half-timbering: faint grain along the beams. */
-  timberGrain: boolean;
+  /**
+   * Half-timbering: the grain along the beams, 0 (none) through fine to 1 (strong); 0.5 is the grain it had when it was
+   * only on or off (see timberGrooves). Saved as true or false before: true is 0.5, false 0.
+   */
+  timberGrain: number;
   /**
    * Natural stone wall (the spacing is a stone's size: a course's height on average): how much the stones and courses
    * differ in size, 0 to 1 (1: from small stones to ones twice as large, now and then two small ones in one course).
@@ -448,7 +451,7 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   timberBeam: 2.4,
   timberRails: 1,
   timberBracing: "mixed",
-  timberGrain: true,
+  timberGrain: 0.5,
   stoneVary: 0.5,
   stoneRound: 0.5,
   stoneJoint: 0.8,
@@ -504,6 +507,7 @@ export const SURFACE_TEXTURE_LIMITS: Record<NumberKey, [number, number]> = {
   timberHeight: [3, 300],
   timberBeam: [0.3, 30],
   timberRails: [0, 2],
+  timberGrain: [0, 1],
   stoneVary: [0, 1],
   stoneRound: [0, 1],
   stoneJoint: [0.1, 10],
@@ -555,6 +559,11 @@ const CROSS_STEPS: Record<SurfaceTextureDetail, number> = { coarse: 6, medium: 1
  * the long cut triangles there showed it in teeth; this way everything up to the border is flat or the pattern itself.
  */
 const BORDER_WALL = 0.15;
+/**
+ * With no fade that wall is this wide, mm, the pattern's border this far from what stays smooth (see borderFade): far
+ * below anything a nozzle draws, and wide enough that its cut is not merged into the rim (see SURFACE_MIN_EDGE).
+ */
+const BORDER_LEAST = 0.05;
 /**
  * A pattern standing out of the body runs out over the fade right up to the edge of what stays smooth, not cut off at a
  * border with a wall (see BORDER_WALL): a flat frame stayed round it. The run-out is refined to this share of the fade,
@@ -640,6 +649,9 @@ export function normalizeSurfaceTexture(input: unknown): SurfaceTextureSettings 
       target[key] = String(value);
     }
   });
+  // The grain was only on or off: a design saved then keeps it as it was (true the grain it had, see timberGrooves).
+  const grain = source.timberGrain;
+  if (typeof grain === "boolean" || grain === "true" || grain === "false") out.timberGrain = grain === true || grain === "true" ? TIMBER_GRAIN_AS_BEFORE : 0;
   (Object.keys(SURFACE_TEXTURE_LIMITS) as NumberKey[]).forEach((key) => {
     out[key] = clamp(out[key], ...SURFACE_TEXTURE_LIMITS[key]);
   });
@@ -1189,12 +1201,37 @@ const TIMBER_OPEN = 0, TIMBER_RISING = 1, TIMBER_FALLING = 2, TIMBER_CROSS = 3, 
 const TIMBER_KNEE_REACH = 0.35;
 /** A beam's wall, mm across: steep, as a flat tile's (see TILE_WALL), and in a narrow beam at most a fifth of its half width. */
 const TIMBER_WALL = TILE_WALL;
-/** The grain: two shallow grooves along every beam, at this share of its half width from its middle and this share wide either side. */
+/**
+ * The grain as it was when it was only on or off (timberGrain 0.5, see timberGrooves): two shallow grooves along every
+ * beam, at this share of its half width from its middle and this share wide either side.
+ */
 const TIMBER_GRAIN_AT = 0.45;
 const TIMBER_GRAIN_HALF = 0.2;
-/** How deep the grain is, as a share of the beams' height, and how far apart along a beam it comes and goes, mm. */
+/** How deep that grain is, as a share of the beams' height, and how far apart along a beam it comes and goes, mm. */
 const TIMBER_GRAIN_DEPTH = 0.08;
 const TIMBER_GRAIN_RUN = 2.5;
+/** The grain's setting that is the grain as it was, between none (0) and strong (1). */
+const TIMBER_GRAIN_AS_BEFORE = 0.5;
+
+/**
+ * The grooves of the grain along a beam for its setting (timberGrain), null without grain: where their middles lie on
+ * each side of the beam's middle line and how wide either side, as shares of its half width, and how deep, as a share
+ * of the beams' height. At 0.5 the grain as it was - one groove each side, 0.2 wide either side, 8 % deep. Towards 1 it
+ * grows strong: the two grooves wider (up to 1.4 times) and deeper (up to twice, 16 %), as a coarse plank's. Below 0.5 it
+ * grows fine: two grooves each side, half as wide, from 0.25 down, and three a third as wide below that, spread evenly
+ * over the face, and shallower towards none (down to half as deep): fine lines as on planed wood. The lines change in
+ * steps (a groove is there or not), their depth and width smoothly.
+ */
+function timberGrooves(grain: number) {
+  if (!(grain > 0)) return null;
+  const strength = grain / TIMBER_GRAIN_AS_BEFORE;
+  const lines = strength >= 1 ? 1 : strength >= 0.5 ? 2 : 3;
+  return {
+    at: Array.from({ length: lines }, (_, j) => (TIMBER_GRAIN_AT * (2 * j + 1)) / lines),
+    half: lines === 1 ? TIMBER_GRAIN_HALF * Math.sqrt(strength) : TIMBER_GRAIN_HALF / lines,
+    depth: TIMBER_GRAIN_DEPTH * (strength >= 1 ? strength : 0.5 + 0.5 * strength),
+  };
+}
 /** The plaster in the fields: how rough, as a share of the beams' height, and how large its lumps, mm. */
 const TIMBER_PLASTER = 0.08;
 const TIMBER_PLASTER_SIZE = 5;
@@ -1283,8 +1320,8 @@ function timberHalf(s: SurfaceTextureSettings, W: number, h: number) {
  * plate at every storey (one beam where two storeys meet) and the rails splitting a storey evenly, then in each field what
  * timberStyle says - braces from corner to corner of each part between sill, rails and plate (rising or falling), a St
  * Andrew's cross in the part under the lowest rail, knee braces in the top part's corners, parallel to its diagonals. A
- * beam's face is flat, with a steep wall round it (see TIMBER_WALL), the faint grain of two grooves along it coming and
- * going (timberGrain); the plaster is a little rough (not with the pattern as a part of its own: the body under the beams
+ * beam's face is flat, with a steep wall round it (see TIMBER_WALL), the grain's grooves along it coming and going
+ * (timberGrain, see timberGrooves); the plaster is a little rough (not with the pattern as a part of its own: the body under the beams
  * stays as it was, and roughness raised from it would be a skin no print shows). Round a body the grain's and the
  * plaster's lumps repeat after one round, so nothing jumps at the seam.
  */
@@ -1317,7 +1354,21 @@ function timberValue(u: number, v: number, s: SurfaceTextureSettings, layout: Su
   const inFields = round || !(posts.count > 0) || (i >= 0 && i < posts.count) || (i === posts.count && x === 0);
   if (inStoreys) take(x < W / 2 ? x : x - W, v, 1);
   if (inFields) take(yq < h / 2 ? yq : yq - h, u, 2);
-  if (!inStoreys && !inFields) return 0;
+  if (!inStoreys && !inFields) {
+    // Where an end post meets the sill or the plate - on a box at every corner, the frames of three faces meeting there -
+    // the square beyond both their middle lines belongs to both: the post runs out to the sill's or plate's outer face
+    // and they to its, as each does beside the square, and beyond both faces their walls meet square round it. Left as
+    // plaster, the corner of the frame was missing - a pit a beam wide and as deep as the beams at a box's corner, its
+    // floor cut into fans, as the grid is not cut along the middle lines.
+    const end = (from: number, cell: number, count: number) => (from < 0 ? from : from - count * cell);
+    const sideways = end(u - posts.origin, W, posts.count), upwards = end(v - storeys.origin, Hs, storeys.count);
+    if (Math.abs(upwards) <= r) take(sideways, v, 1);
+    if (Math.abs(sideways) <= r) take(upwards, u, 2);
+    if (!(d < Infinity)) {
+      if (Math.abs(sideways) >= Math.abs(upwards)) take(sideways, v, 1);
+      else take(upwards, u, 2);
+    }
+  }
   const style = inStoreys ? timberStyle(i, posts.count, s.timberBracing, round) : TIMBER_OPEN;
   if (style !== TIMBER_OPEN) {
     const L = Math.hypot(W, h);
@@ -1334,16 +1385,22 @@ function timberValue(u: number, v: number, s: SurfaceTextureSettings, layout: Su
   const rise = d <= r + TILE_SNAP ? 1 : d >= r + wall - TILE_SNAP ? 0 : 1 - (d - r) / wall;
   const period = round ? W * posts.count : 0;
   let top = 1;
-  if (s.timberGrain && rise > 0) {
+  const grooves = timberGrooves(s.timberGrain);
+  if (grooves && rise > 0) {
     const t = Math.abs(across) / r;
-    const groove = Math.max(0, 1 - Math.abs(t - TIMBER_GRAIN_AT) / TIMBER_GRAIN_HALF);
+    // The groove the point lies in (they do not overlap), each coming and going its own way.
+    let groove = 0, line = 0;
+    grooves.at.forEach((at, j) => {
+      const g = 1 - Math.abs(t - at) / grooves.half;
+      if (g > groove) [groove, line] = [g, j];
+    });
     if (groove > 0) {
       // Along a level beam round a body the grain repeats after one round; along the others it needs not.
       // Round a body a field's number counts round once, the same from both sides of the seam.
       const field = round && posts.count > 0 ? ((i % posts.count) + posts.count) % posts.count : i;
-      const key = 17 * beam + (across < 0 ? 5 : 0) + 31 * (beam === 2 ? q + parts * k : field);
+      const key = 17 * beam + (across < 0 ? 5 : 0) + 31 * (beam === 2 ? q + parts * k : field) + 7919 * line;
       const come = loopNoise(along, 0, beam === 2 ? period : 0, TIMBER_GRAIN_RUN, key);
-      top = 1 - TIMBER_GRAIN_DEPTH * groove * clamp((come - 0.42) / 0.3, 0, 1);
+      top = 1 - grooves.depth * groove * clamp((come - 0.42) / 0.3, 0, 1);
     }
   }
   if (rise >= 1) return top;
@@ -1503,35 +1560,37 @@ function stoneRise(stone: Stone, x: number, y: number, s: SurfaceTextureSettings
  * stone of the point's own place alone jumped at the places' borders in the middle of a joint, and the cuts along the
  * outlines (see stoneCuts), placed between points of two stones there, came out in teeth. Roundness blends the outline
  * from broken stone (an irregular polygon) to field stone (a rounded box) and rounds the edge over up to STONE_ROUNDING
- * of its half size; at 0 the edge is sharp (STONE_EDGE). Beyond the wall's height or length (a point past the faces it
- * was laid on) it repeats.
+ * of its half size; at 0 the edge is sharp (STONE_EDGE). Beyond the wall's height, and on a flat face beyond its length,
+ * lies no stone: a point there lies past the faces the wall was laid on, in the fade towards what stays smooth, and the
+ * nearest stones of the wall's last course or place count, their mortar running on. The wall repeated there once, and
+ * the courses of its other end stood in the fade by a smooth top or bottom in pieces - splinters along the rim of a
+ * tower, the stones there no longer whole.
  */
 function stonePoint(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number) {
   const wall = stoneWallFor(s, layout, axis);
   const count = wall.courses.length;
-  const total = wall.starts[count] - wall.starts[0];
-  const turns = Math.floor((v - wall.starts[0]) / total);
-  const vv = v - turns * total;
-  const m = placeIn(wall.starts, vv);
+  const m = placeIn(wall.starts, v);
   let best: { stone: Stone; x: number; y: number; f: number; rise: number } | null = null;
-  /** The stones in course `k` (beyond the wall: as it repeats) at u, and the places beside the one there (`side` -1, 0, 1). */
+  /** The stones in course `k` (none beyond the wall) at u, and the places beside the one there (`side` -1, 0, 1). */
   const tryCourse = (k: number, side: number) => {
-    const wrapped = ((k % count) + count) % count, lift = (k - wrapped) / count * total;
-    const course = wall.courses[wrapped];
+    if (k < 0 || k >= count) return;
+    const course = wall.courses[k];
     // Round a body every course begins elsewhere, so the joints do not line up.
-    const shift = wall.round ? hash3(wrapped + 7919 * s.seed, 3, 83) * wall.length : 0;
+    const shift = wall.round ? hash3(k + 7919 * s.seed, 3, 83) * wall.length : 0;
     let uu = u - wall.u0 - shift;
-    uu = uu - Math.floor(uu / wall.length) * wall.length + wall.u0;
+    if (wall.round) uu -= Math.floor(uu / wall.length) * wall.length;
+    uu += wall.u0;
     const places = course.places.length;
     let j = placeIn(course.starts, uu) + side;
     let along = uu;
     if (j < 0 || j >= places) {
-      // Over the end of a course: round a body its first or last place, on a flat face the course repeats.
+      // Over the end of a course: round a body its first or last place; a flat face has none beyond its end.
+      if (!wall.round) return;
       along += j < 0 ? wall.length : -wall.length;
       j = ((j % places) + places) % places;
     }
     for (const stone of course.places[j]) {
-      const x = along - stone.cx, y = vv - lift - stone.cy;
+      const x = along - stone.cx, y = v - stone.cy;
       const { f, rise } = stoneRise(stone, x, y, s);
       if (!best || rise > best.rise) best = { stone, x, y, f, rise };
     }
@@ -2814,9 +2873,10 @@ function fitTiles(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array
  * Per axis x, y, z: from where to where the `kept` points reach, z within the height band where it counts (no picked
  * faces). Half-timbering and stone walls stand out, and run out over the fade next to what stays smooth (see weightsFor):
  * the ranges end the fade and margin short of it - up the walls at a top and bottom kept smooth, the height band's
- * ends, and every edge where sharp edges stay smooth - so a sill, a plate and the stones there stay whole.
+ * ends, and every edge where sharp edges stay smooth - so a sill, a plate and the stones there stay whole. At least
+ * `least` short of it (see fitTimber).
  */
-function keptRanges(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array): [number, number][] {
+function keptRanges(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array, least = 0): [number, number][] {
   const v = base.vertices;
   const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i < kept.length; i += 1) {
@@ -2831,7 +2891,7 @@ function keptRanges(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Arr
     lo[2] = Math.max(lo[2], base.min[2] + (s.zoneFrom / 100) * zH);
     hi[2] = Math.max(lo[2], Math.min(hi[2], base.min[2] + (s.zoneTo / 100) * zH));
   }
-  const reach = s.fade + s.margin;
+  const reach = Math.max(s.fade + s.margin, least);
   const up = s.projection === "cylinder" ? AXIS_INDEX[s.axis] : s.projection === "flat" ? acrossAxes(s.axis)[1] : 2;
   const picked = s.faces.length > 0;
   return [0, 1, 2].map((k) => {
@@ -2849,9 +2909,15 @@ function keptRanges(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Arr
  * the width rounded to the nearest whole number of fields; up every axis whole storeys from the bottom edge, the sill on
  * the bottom edge and the plate on the top one. Round a body a whole number of fields goes round: an even number for
  * braces, which lean against each other in pairs there, four in turn for mixed (see timberStyle).
+ *
+ * Next to what stays smooth the frame ends at least a beam's wall short of it, even with no fade: a sill or plate whose
+ * outer face lay on the rim of a top or bottom kept smooth stood up from the rim's points, which do not move, to
+ * whichever points of the wall lay nearest - some a hundredth of a millimetre below, some half a millimetre - and its
+ * top came out in a saw-tooth fringe all along the rim. A wall's width short of it, the beam ends in its own steep wall
+ * there, cut straight along the rim as everywhere else in the frame.
  */
 function fitTimber(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array, layout: SurfaceTextureLayout) {
-  const ranges = keptRanges(base, s, kept);
+  const ranges = keptRanges(base, s, kept, Math.min(TIMBER_WALL, 0.1 * s.timberBeam));
   const t = timberOf(s);
   const half = s.timberBeam / 2;
   const fill = ([lo, hi]: [number, number], size: number) => {
@@ -2992,6 +3058,16 @@ function standsOut(s: SurfaceTextureSettings) {
   return s.direction !== "inward" && s.pattern !== "bumps" && !stuckOn(s) && s.pattern !== "cracks";
 }
 
+/**
+ * How far a pattern pressed in fades out next to what stays smooth where it ends at a border with a wall (see BORDER_WALL):
+ * the fade, and with none at least BORDER_LEAST. At 0 the wall had no width: the pattern went to its full depth at
+ * whichever points lay nearest the rim - a groove's end hung from the rim in fans, knurling's in splinters, a brick's
+ * head joint at a box's bottom edge in needles. A pattern standing out runs out over the fade as it is (see RUN_OUT_STEPS).
+ */
+function borderFade(s: SurfaceTextureSettings) {
+  return standsOut(s) ? s.fade : Math.max(s.fade, BORDER_LEAST);
+}
+
 /** An image pressed on a single time (its tiles "once"): it goes where it is put, as a text does, and nowhere else. */
 export function imageOnce(s: Pick<SurfaceTextureSettings, "pattern" | "imageTiling">) {
   return s.pattern === "image" && s.imageTiling === "once";
@@ -3120,7 +3196,7 @@ function targetEdge(s: SurfaceTextureSettings) {
  * own) as coarse as bricks', its faces flat.
  */
 function timberEdge(s: SurfaceTextureSettings) {
-  if (s.patternPart && !s.timberGrain) return 10;
+  if (s.patternPart && !(s.timberGrain > 0)) return 10;
   return Math.min(s.spacing, s.timberHeight) / (0.6 * DETAIL_STEPS[s.detail]);
 }
 
@@ -4503,6 +4579,71 @@ function stoneCuts(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surface
   return { mesh: out, fixed };
 }
 
+/**
+ * A natural stone wall's heights at the points refining the fade added after the cuts (see refineTransitions): as the
+ * cuts made them over the triangle each was put in (see stoneCuts), not from its own measure. A cut's point on a
+ * stone's edge has the cut's rise, which can lie a little off the measure at the point itself; a point put next to it
+ * by the fade, measured itself, came out in the mortar - where a broken stone's corner reached into the fade by a smooth
+ * top or bottom, it stood up in spikes from the points round it. Splitting and cutting put the new points on the old triangles
+ * (behind the old points, see refineTransitions), so the heights there are those of the triangle's corners, in between:
+ * the wall keeps the shape it was cut to and the fade only lowers it. A point on a triangle whose corners are not all
+ * known (a face not cut) keeps none, as before.
+ */
+function carryStoneHeights(before: SurfaceMesh, fixed: Float32Array, after: SurfaceMesh): Float32Array {
+  const v = after.vertices, n = v.length / 3, n0 = Math.min(fixed.length, before.vertices.length / 3);
+  if (n <= n0) return fixed;
+  const out = new Float32Array(n).fill(NaN);
+  out.set(fixed.subarray(0, n0));
+  // The new points by the 1 mm cell they lie in; then every old triangle with heights at its corners looks in its cells.
+  const cell = (x: number) => Math.floor(x) + 4096;
+  const key = (a: number, b: number, c: number) => (a * 8192 + b) * 8192 + c;
+  const waiting = new Map<number, number[]>();
+  for (let j = n0; j < n; j += 1) {
+    const k = key(cell(v[j * 3]), cell(v[j * 3 + 1]), cell(v[j * 3 + 2]));
+    const list = waiting.get(k);
+    if (list) list.push(j);
+    else waiting.set(k, [j]);
+  }
+  const bv = before.vertices, I = before.indices;
+  for (let f = 0; f < I.length / 3 && waiting.size; f += 1) {
+    const a = I[f * 3], b = I[f * 3 + 1], c = I[f * 3 + 2];
+    // Points added after the cuts and before the fade (a corner's cuts) have none either.
+    const ha = a < n0 ? fixed[a] : NaN, hb = b < n0 ? fixed[b] : NaN, hc = c < n0 ? fixed[c] : NaN;
+    if (Number.isNaN(ha) || Number.isNaN(hb) || Number.isNaN(hc)) continue;
+    const ax = bv[a * 3], ay = bv[a * 3 + 1], az = bv[a * 3 + 2];
+    const e0 = [bv[b * 3] - ax, bv[b * 3 + 1] - ay, bv[b * 3 + 2] - az], e1 = [bv[c * 3] - ax, bv[c * 3 + 1] - ay, bv[c * 3 + 2] - az];
+    const d00 = e0[0] * e0[0] + e0[1] * e0[1] + e0[2] * e0[2], d01 = e0[0] * e1[0] + e0[1] * e1[1] + e0[2] * e1[2], d11 = e1[0] * e1[0] + e1[1] * e1[1] + e1[2] * e1[2];
+    const denom = d00 * d11 - d01 * d01;
+    if (!(denom > 0)) continue;
+    const size = Math.sqrt(Math.max(d00, d11));
+    const lo = [0, 1, 2].map((k) => cell(Math.min(bv[a * 3 + k], bv[b * 3 + k], bv[c * 3 + k]) - 1e-6));
+    const hi = [0, 1, 2].map((k) => cell(Math.max(bv[a * 3 + k], bv[b * 3 + k], bv[c * 3 + k]) + 1e-6));
+    for (let x = lo[0]; x <= hi[0]; x += 1) {
+      for (let y = lo[1]; y <= hi[1]; y += 1) {
+        for (let z = lo[2]; z <= hi[2]; z += 1) {
+          const k = key(x, y, z);
+          const list = waiting.get(k);
+          if (!list) continue;
+          for (let m = list.length - 1; m >= 0; m -= 1) {
+            const j = list[m];
+            const p = [v[j * 3] - ax, v[j * 3 + 1] - ay, v[j * 3 + 2] - az];
+            const d20 = p[0] * e0[0] + p[1] * e0[1] + p[2] * e0[2], d21 = p[0] * e1[0] + p[1] * e1[1] + p[2] * e1[2];
+            const wb = (d11 * d20 - d01 * d21) / denom, wc = (d00 * d21 - d01 * d20) / denom, wa = 1 - wb - wc;
+            if (wa < -1e-6 || wb < -1e-6 || wc < -1e-6) continue;
+            // On the triangle itself, not beside it in space (the other side of a thin wall).
+            const off = [p[0] - wb * e0[0] - wc * e1[0], p[1] - wb * e0[1] - wc * e1[1], p[2] - wb * e0[2] - wc * e1[2]];
+            if (Math.hypot(off[0], off[1], off[2]) > 1e-6 * Math.max(1, size)) continue;
+            out[j] = wa * ha + wb * hb + wc * hc;
+            list.splice(m, 1);
+          }
+          if (!list.length) waiting.delete(k);
+        }
+      }
+    }
+  }
+  return out;
+}
+
 /** At most about this many times the budget may cutting half-timbering cost before it is left uncut (see sliceTimber). */
 const TIMBER_CUT_LIMIT = 2;
 
@@ -4549,7 +4690,8 @@ function sliceTimber(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfa
   };
   const cuttable = (m: SurfaceMesh, F: ReturnType<typeof unrolled>) => cuttableFaces(m, F.pole, skipBase, cyl ? ax : -1);
   // Across a beam from its middle line: its face's border, its wall's foot and the grain's grooves.
-  const across = [r, r + wall, ...(s.timberGrain ? [TIMBER_GRAIN_AT - TIMBER_GRAIN_HALF, TIMBER_GRAIN_AT, TIMBER_GRAIN_AT + TIMBER_GRAIN_HALF].map((t) => t * r) : [])];
+  const grooves = timberGrooves(s.timberGrain);
+  const across = [r, r + wall, ...(grooves ? grooves.at.flatMap((at) => [at - grooves.half, at, at + grooves.half]).map((t) => t * r) : [])];
   const modulo = (x: number, m: number) => ((x % m) + m) % m;
   const placesAt = (lines: number[], period: number) => {
     const out: number[] = [];
@@ -6726,8 +6868,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // the face. The nearest of several lines is not: over a long fan from a box's corner to its edge the border came
       // out in the wrong place, and the grooves ran up to the edge there.
       // A pattern standing out runs out up to the edge instead (see RUN_OUT_STEPS): cut where its run-out begins and ends.
-      const reach = s.fade + s.margin;
-      const wall = Math.min(BORDER_WALL, s.fade);
+      const fade = borderFade(s);
+      const reach = fade + s.margin;
+      const wall = Math.min(BORDER_WALL, fade);
       const levels = standsOut(s) ? [s.margin, reach].filter((level) => level > 0) : wall > 0 ? [reach - wall, reach] : [reach];
       {
         const I = mesh.indices;
@@ -6794,8 +6937,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // Round the axis the grooves end at a border with a wall too (see endsInWall): cut along it and the foot of the wall,
       // on the faces that get the pattern (the distance to a rim changes linearly over a triangle there). A pattern
       // standing out runs out up to the rim (see RUN_OUT_STEPS): cut at its steps.
-      const reach = s.fade + s.margin;
-      const wall = Math.min(BORDER_WALL, s.fade);
+      const fade = borderFade(s);
+      const reach = fade + s.margin;
+      const wall = Math.min(BORDER_WALL, fade);
       const levels = standsOut(s) ? Array.from({ length: RUN_OUT_STEPS }, (_, k) => s.margin + ((k + 1) * s.fade) / RUN_OUT_STEPS) : wall > 0 ? [reach - wall, reach] : [reach];
       const I = mesh.indices;
       const sliced = new Uint8Array(I.length / 3);
@@ -6842,7 +6986,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     } else fine = cutMesh;
     if (fine.indices.length === mesh.indices.length) return state;
     // Splitting and cutting add points behind the others: the bumps' values keep their numbers.
-    return { ...withNormals(state.key, fine, state.edge, state.crossMax, state.limited || Boolean(fine.limited), state.slice, s.edgeAngle), fixed: state.fixed, straightAxis: state.straightAxis };
+    // A stone wall's points added here take its heights from the cuts' triangles they were put in (see carryStoneHeights).
+    const fixed = s.pattern === "stones" && state.fixed ? carryStoneHeights(mesh, state.fixed, fine) : state.fixed;
+    return { ...withNormals(state.key, fine, state.edge, state.crossMax, state.limited || Boolean(fine.limited), state.slice, s.edgeAngle), fixed, straightAxis: state.straightAxis };
   }
 
   // Whether the body is round, per axis: asked once, not on every change of a setting.
@@ -7006,13 +7152,16 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       }
       // Round the axis with a flat top or bottom (cut as a straight face), the side ends at a border with a wall as well.
       const walled = endsInWall(s) || (Boolean(state.straightAxis) && s.projection === "cylinder");
-      const faded = fadeWeights(v, mesh.indices, adj, w0, s.fade, s.margin, state.straightAxis || walled ? FADE_BEYOND : 0);
+      // Where the pattern ends at a border with a wall, its distance is needed even with no fade (see borderFade).
+      const bordered = Boolean(state.straightAxis || walled) && !standsOut(s);
+      const faded = fadeWeights(v, mesh.indices, adj, w0, bordered ? borderFade(s) : s.fade, s.margin, state.straightAxis || walled ? FADE_BEYOND : 0);
       // Straight faces cut along their pattern: a border with a short wall instead of the fade (see BORDER_WALL) - unless
       // the pattern stands out, which runs out up to the edge. Grooves and knurling round the axis likewise (see endsInWall).
       const axisOf = state.straightAxis;
       if ((axisOf || walled) && faded.distance && !standsOut(s)) {
-        const reach = s.fade + s.margin;
-        const wall = Math.min(BORDER_WALL, s.fade);
+        const fade = borderFade(s);
+        const reach = fade + s.margin;
+        const wall = Math.min(BORDER_WALL, fade);
         // Per point the axis of a straight face it lies on (255: none).
         const axisAt = new Uint8Array(n).fill(255);
         const I = mesh.indices;

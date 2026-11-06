@@ -1464,7 +1464,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   // An SBC board's settings (#1098): a known board, a clearance of 0 to 2 mm and a reach of 0 to 10 mm;
   // the openings up and out as true or false, and how far up as 20 to 100 mm. Old projects have none.
   if (definition.sbcBoard !== undefined) {
-    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; upReach?: unknown; buttonReach?: unknown } | null;
+    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; lensUp?: unknown; upReach?: unknown; buttonReach?: unknown } | null;
     if (!board || typeof board !== "object" || !SBC_BOARD_ORDER.includes(board.board as never)) {
       throw new Error(`${label}.sbcBoard.board must be one of ${SBC_BOARD_ORDER.join(", ")}`);
     }
@@ -1474,7 +1474,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (board.reach !== undefined && (typeof board.reach !== "number" || !Number.isFinite(board.reach) || board.reach < 0 || board.reach > MAX_SBC_REACH)) {
       throw new Error(`${label}.sbcBoard.reach is outside the supported range`);
     }
-    for (const key of ["ribbonUp", "ribbonSide", "gpioUp"] as const) {
+    for (const key of ["ribbonUp", "ribbonSide", "gpioUp", "lensUp"] as const) {
       if (board[key] !== undefined && typeof board[key] !== "boolean") throw new Error(`${label}.sbcBoard.${key} must be true or false`);
     }
     if (board.upReach !== undefined && (typeof board.upReach !== "number" || !Number.isFinite(board.upReach) || board.upReach < MIN_SBC_UP_REACH || board.upReach > MAX_SBC_UP_REACH)) {

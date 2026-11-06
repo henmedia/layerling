@@ -48,6 +48,18 @@ I menuen ved siden af øjet ({{ui:editor.group.visibility}}) slår **Vis overhæ
 
 Hvor stejlt din printer klarer sættes i indstillingerne under {{ui:workspace.appearance}}: fra 30° (forsigtig) til 70° (for printere med god delkøling). En flade der hviler på en anden form markeres stadig - layerling kigger kun på selve fladen.
 
+## Støtteribber til en skrå del
+
+En del, der printes skråt på en kant, for eksempel ved 45°, behøver ofte ingen støtter: dens flader er stejle nok. Men den står på en smal kant og kan vælte. {{ui:supportRib.title}} holder den: under dens nederste flade står en tynd ribbe med lidt afstand på en oval fod, og bittesmå broer holder delen fast. Vend først delen om på kanten, og lad den stå på pladen.
+
+1. Vælg delen og klik {{ui:supportRib.title}} i gruppen {{ui:editor.group.modify}} i båndet, højreklik på delen, eller find den med [[Ctrl]]+[[K]].
+2. Klik den nederste flade, hvor ribben skal stå. Fladen skal vende nedad, hælde mellem 15° og 75° og nå ned til pladen; ribben står fra dit klik lige ned ad fladen.
+3. Indstil {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} og {{ui:supportRib.firstLayer}} som i din slicer. Ribben er to dysebaner tyk, afstanden til delen en halv bane; hver bro er én bane bred og præcis ét lag høj og ligger på et lag i printet, så sliceren printer den som én tynd bane, der knækker rent af. {{ui:supportRib.height}} er, hvor højt ribben når op ad fladen (først halvvejs), {{ui:supportRib.bridgeSpacing}}, hvor langt broerne ligger fra hinanden, i hele lag.
+4. Under {{ui:supportRib.more}} kan tykkelsen, afstanden, broernes bredde og fodens tykkelse sættes i hånden (indtil da følger de dysen og lagene), og også fodens bredde og afrundingerne ved foden og foroven.
+5. {{ui:supportRib.apply}} tilføjer ribben. Med {{ui:supportRib.bundle}} (først slået til) er ribbe og del bundtet: de flytter sig sammen og kommer som to former side om side i sliceren, forbundet af broerne i printet.
+
+Ribben er en mesh-form: for at ændre den sletter du den og laver den igen. Hvert klik laver én ribbe; for flere klik {{ui:supportRib.repick}} eller gentag den med {{ui:editor.tool.array}}. Ribben må ingen steder gå ind i delen, og delen skal stå på pladen - ellers siger vinduet hvorfor. Dine indstillinger gemmes i denne browser til den næste ribbe.
+
 ## Vægtykkelse, frirum og faser
 
 - Vægge bør være mindst to ekstruderingslinjer brede, så 0,8 mm med en 0,4 mm dyse. Robuste dele har brug for 1,2 til 2 mm.

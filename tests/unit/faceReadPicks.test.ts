@@ -15,15 +15,17 @@ function body(start: string, end: string) {
 
 describe("the face tools' reads in the editor", () => {
   it("read every face through faceReadPositionsOffThread, the clicks through faceReadForClick", () => {
-    expect(editor.match(/await faceReadForClick\(source, fingerprint, pickAbort\.signal\)/g)).toHaveLength(2);
-    // push_face reads a flat face, perforate_face a flat face or a round wall (#1393).
-    expect(editor.match(/read(?:Perforable|HolePattern)Face\(await faceReadPositionsOffThread\(target, geometryAbortRef\.current\?\.signal\), point, normal\)/g)).toHaveLength(2);
+    // The hole pattern, the Face tool and the support rib (#1385).
+    expect(editor.match(/await faceReadForClick\(source, fingerprint, pickAbort\.signal\)/g)).toHaveLength(3);
+    // push_face and support_rib read a flat face, perforate_face a flat face or a round wall (#1393).
+    expect(editor.match(/read(?:Perforable|HolePattern)Face\(await faceReadPositionsOffThread\(target, geometryAbortRef\.current\?\.signal\), point, normal\)/g)).toHaveLength(3);
     expect(editor).not.toMatch(/faceReadMesh|faceReadPositions\(/);
   });
 
   for (const [name, start, tool, run, abort, missed] of [
     ["hole pattern", "const pickHolePatternFace", "holePatternTool", "holePatternPickRunRef", "holePatternPickAbortRef", "status.holePatternMissed"],
     ["Face tool", "const pickFaceToolFace", "faceTool", "faceToolPickRunRef", "faceToolPickAbortRef", "status.faceToolMissed"],
+    ["support rib", "const pickSupportRibFace", "supportRibTool", "supportRibPickRunRef", "supportRibPickAbortRef", "status.supportRibMissed"],
   ]) {
     const end = `}, [faceReadForClick, ${tool}]);`;
     it(`stops the ${name}'s click before it waiting on any new click, keeps its own to stop, and drops a stale answer`, () => {

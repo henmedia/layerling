@@ -328,6 +328,20 @@ export function ToolbarFaceToolIcon(props: IconProps) {
   );
 }
 
+/** A part standing tilted on one edge, a thin triangle under its lower face with two small bridges (#1385). */
+export function ToolbarSupportRibIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M4 42h40" />
+      <path d="M8 40 22 26l12 12-14 14Z" transform="translate(-4 -12)" {...SOLID} />
+      <path d="M8 40 22 26l12 12-14 14Z" transform="translate(-4 -12)" />
+      <path d="M22 41 38 25v16Z" {...SOLID} />
+      <path d="M22 41 38 25v16Z" />
+      <path d="M26 32h3M31 27h3" />
+    </ToolbarVectorIcon>
+  );
+}
+
 /** A dashed line with a dot at each end: a construction line in a sketch (#229). */
 export function ToolbarConstructionLineIcon(props: IconProps) {
   return (

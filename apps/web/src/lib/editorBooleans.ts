@@ -1409,14 +1409,44 @@ export function multicolorExportSolids(shape: WorkplaneShape): PartColorSolid[] 
     const bounds = meshBounds(meshForShape(shape).vertices);
     return letters.length && bounds ? [...letters, partColorSolid(cuboidsToMesh("bin", [bounds], 0, 0), shape.color)] : null;
   }
-  if (shape.hole || !shape.groupedShapes?.length || !groupShowsPartColors(shape)) return null;
-  const parts = shape.groupedShapes.filter((part) => !part.hole && !part.hidden);
-  if (parts.length === 0 || new Set(parts.flatMap((part) => [part.color, gridfinityLabelColor(part) ?? part.color])).size < 2) return null;
+  if (!showsOwnPartColors(shape)) return null;
+  const colors = new Set<string>();
+  collectPartColors(shape, colors);
+  if (colors.size < 2) return null;
+  const meshes = partColorMeshes(shape);
+  return meshes.length ? meshes.map(({ mesh, color }) => partColorSolid(mesh, color)) : null;
+}
+
+/**
+ * Whether a group's parts keep their own colours, as the view draws them. A part of such a group that is a group or
+ * bundle itself - an Icon tag is a bundle of its layers - shows its own parts' colours in turn (#1398).
+ */
+function showsOwnPartColors(shape: WorkplaneShape) {
+  return !shape.hole && Boolean(shape.groupedShapes?.length) && groupShowsPartColors(shape);
+}
+
+/** The colours a group shows, down through the groups and bundles inside it that show their parts' colours too. */
+function collectPartColors(shape: WorkplaneShape, into: Set<string>) {
+  (shape.groupedShapes ?? []).filter((part) => !part.hole && !part.hidden).forEach((part) => {
+    const letters = gridfinityLabelColor(part);
+    if (letters) into.add(letters);
+    if (showsOwnPartColors(part)) collectPartColors(part, into);
+    else into.add(part.color);
+  });
+}
+
+/**
+ * The parts of a group as meshes in their own colours, placed as `meshForShape` places the group: in the world for a
+ * group on the plate, in its group's frame for a group inside another one. A part that shows its own parts' colours
+ * gives those parts instead of one mesh in its own colour, so an Icon tag in a Multicolor group keeps its layers (#1398).
+ */
+function partColorMeshes(shape: WorkplaneShape): Array<{ mesh: MeshData; color: string }> {
+  const parts = (shape.groupedShapes ?? []).filter((part) => !part.hole && !part.hidden);
   const imported = shape.importedMesh;
   let lowest = Number.POSITIVE_INFINITY;
   if (imported) for (let index = 1; index < imported.positions.length; index += 3) lowest = Math.min(lowest, imported.positions[index]);
-  const scale = imported ? null : groupedContentScale(shape, localGroupBounds(shape.groupedShapes));
-  const solids: PartColorSolid[] = [];
+  const scale = imported ? null : groupedContentScale(shape, localGroupBounds(shape.groupedShapes ?? []));
+  const meshes: Array<{ mesh: MeshData; color: string }> = [];
   const add = (local: MeshData, color: string) => {
     if (local.faces.length === 0) return;
     let vertices: Vec3[];
@@ -1428,16 +1458,17 @@ export function multicolorExportSolids(shape: WorkplaneShape): PartColorSolid[] 
     } else {
       vertices = scaleGroupedVertices(local.vertices, scale!) as Vec3[];
     }
-    solids.push(partColorSolid(transformMesh({ name: local.name, vertices, faces: local.faces }, shape), color));
+    meshes.push({ mesh: transformMesh({ name: local.name, vertices, faces: local.faces }, shape), color });
   };
   parts.forEach((part) => {
     // A bin's letters in their own colour come before the bin, as for a bin on its own; here the bin stays its mesh, as
     // the group's other parts lie in its box.
     const color = gridfinityLabelColor(part);
     if (color) gridfinityLetterMeshes(part).forEach((letter) => add(transformMesh(letter, part), color));
-    add(meshForShape(part), part.color);
+    if (showsOwnPartColors(part)) partColorMeshes(part).forEach((inner) => add(inner.mesh, inner.color));
+    else add(meshForShape(part), part.color);
   });
-  return solids.length ? solids : null;
+  return meshes;
 }
 
 /** A body in the world as a solid to ask "is this point in it". */

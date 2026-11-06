@@ -48,6 +48,18 @@ Im Menü neben dem Auge ({{ui:editor.group.visibility}}) schaltet **Überhänge 
 
 Wie steil dein Drucker schafft, stellst du in den Einstellungen unter {{ui:workspace.appearance}} ein: von 30° (vorsichtig) bis 70° (für Drucker mit guter Bauteilkühlung). Eine Fläche, die auf einem anderen Körper aufliegt, wird trotzdem markiert – layerling sieht nur die Fläche selbst.
 
+## Stützrippen für ein schräges Teil
+
+Ein Teil, das schräg auf einer Kante gedruckt wird, etwa mit 45°, braucht oft gar keine Stützen: Seine Flächen sind steil genug. Es steht aber auf einer schmalen Kante und kann umkippen. Die {{ui:supportRib.title}} hält es: Unter seiner unteren Fläche steht mit etwas Abstand eine dünne Rippe auf einem ovalen Fuß, und winzige Brücken halten das Teil an ihr fest. Dreh das Teil vorher auf seine Kante und lass es auf der Platte stehen.
+
+1. Wähle das Teil und klicke im Menüband in der Gruppe {{ui:editor.group.modify}} auf {{ui:supportRib.title}}, mach einen Rechtsklick auf das Teil oder finde es mit [[Ctrl]]+[[K]].
+2. Klicke die untere Fläche dort an, wo die Rippe stehen soll. Die Fläche muss nach unten zeigen, zwischen 15° und 75° geneigt sein und bis zur Platte hinunterreichen; die Rippe steht von deinem Klick aus gerade die Fläche hinunter.
+3. Stelle {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} und {{ui:supportRib.firstLayer}} so ein wie in deinem Slicer. Die Rippe ist zwei Düsenbahnen dick, der Spalt zum Teil eine halbe Bahn; jede Brücke ist eine Bahn breit und genau eine Schicht hoch und liegt auf einer Schicht des Drucks, damit der Slicer sie als eine dünne Bahn druckt, die sich sauber abbrechen lässt. {{ui:supportRib.height}} sagt, wie weit die Rippe an der Fläche hinaufreicht (zu Beginn bis zur Hälfte), {{ui:supportRib.bridgeSpacing}}, wie weit die Brücken auseinanderliegen, in ganzen Schichten.
+4. Unter {{ui:supportRib.more}} lassen sich Dicke, Spalt, Breite der Brücken und Dicke des Fußes von Hand einstellen (bis dahin folgen sie Düse und Schichten), dazu die Breite des Fußes und die Rundungen am Fuß und oben an der Rippe.
+5. {{ui:supportRib.apply}} legt die Rippe an. Mit {{ui:supportRib.bundle}} (zu Beginn an) sind Rippe und Teil gebündelt: Sie bewegen sich zusammen und kommen als zwei Körper nebeneinander in den Slicer, im Druck durch die Brücken verbunden.
+
+Die Rippe ist ein Netzkörper: Um sie zu ändern, lösche sie und leg sie neu an. Jeder Klick macht eine Rippe; für weitere klicke {{ui:supportRib.repick}} oder wiederhole sie mit {{ui:editor.tool.array}}. Die Rippe darf nirgends in das Teil laufen, und das Teil muss auf der Platte stehen - sonst sagt das Fenster, warum es nicht geht. Deine Einstellungen merkt sich dieser Browser für die nächste Rippe.
+
 ## Wandstärke, Spiel und Fasen
 
 - Wände sollten mindestens zwei Druckbahnen breit sein, bei einer 0,4-mm-Düse also 0,8 mm. Robuste Teile brauchen 1,2 bis 2 mm.
