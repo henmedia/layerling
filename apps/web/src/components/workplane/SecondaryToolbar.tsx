@@ -762,7 +762,7 @@ export function SecondaryToolbar({
     // while a field has the focus - the browsers' own use of the key (a search
     // bar) is not worth keeping here.
     const openOnShortcut = (event: KeyboardEvent) => {
-      if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey || event.key.toLowerCase() !== "k") return;
+      if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey || (event.key ?? "").toLowerCase() !== "k") return;
       event.preventDefault();
       openPaletteRef.current();
     };

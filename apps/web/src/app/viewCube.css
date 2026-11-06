@@ -217,8 +217,9 @@ html[data-theme="dark"] .cube-zone:hover {
     bottom: 12px;
   }
 
-  /* Bottom right stands on the snap grid control (bottom 11px, 22px tall). */
-  html[data-view-cube-position="bottom-right"] .view-cube {
+  /* Bottom right stands on the snap grid control (bottom 11px, 22px tall) while it is in the view, not in the docked
+     inspector. */
+  html[data-view-cube-position="bottom-right"] .workplane-stage:has(> .grid-settings) .view-cube {
     bottom: 36px;
   }
 
@@ -241,10 +242,11 @@ html[data-theme="dark"] .cube-zone:hover {
   }
 
   /* The docked inspector covers the right edge, so a cube there steps left of
-     it. A minimized inspector covers only the top. */
+     it, as far as the toolbar size makes the panel wide (320px, zoomed). A
+     minimized inspector covers only the top. */
   html[data-view-cube-position="top-right"] .workplane-stage:has(.shape-inspector:not(.floating)) .view-cube,
   html[data-view-cube-position="bottom-right"] .workplane-stage:has(.shape-inspector:not(.floating):not(.minimized)) .view-cube {
-    right: 330px;
+    right: calc(320px * var(--toolbar-scale) + 10px);
   }
 
   /* The loading screen shows the cube and the controls where they will be. */

@@ -78,7 +78,11 @@ export function scrollViewAlong(view: ViewCamera, direction: THREE.Vector3, dist
   view.controls.update();
 }
 
-/** Whether the scrollbars are on: one choice for this browser, as the view cube's corner is, not saved in a design. */
+/**
+ * The view bar's switch, remembered for this browser as before #1346, so whoever had the bars on keeps them. The
+ * setting "Start editor with scrollbars" turns them on for a design as well; switched off in the view bar, the choice
+ * here is forgotten.
+ */
 export const VIEW_SCROLLBARS_STORAGE_KEY = "layerling.viewScrollbars";
 
 export function readViewScrollbars(): boolean {

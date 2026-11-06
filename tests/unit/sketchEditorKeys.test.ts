@@ -46,4 +46,10 @@ describe("sketch editor keys", () => {
     handleSketchEditorKey(press("w", { ctrlKey: true, code: "KeyZ" }), spies);
     expect(called(spies)).toEqual([]);
   });
+
+  it("ignores a keydown without a key, as Chrome sends when an autofill suggestion is picked", () => {
+    const spies = actions();
+    handleSketchEditorKey({ ...press("a"), key: undefined } as unknown as KeyboardEvent, spies);
+    expect(called(spies)).toEqual([]);
+  });
 });

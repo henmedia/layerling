@@ -106,6 +106,7 @@ import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveD
 import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
 import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane } from "./workplane/viewportScene";
 import { pointInsideOutline } from "@/lib/screenHull";
+import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
@@ -1584,9 +1585,10 @@ export function WorkplaneViewport({
   const [snap, setSnap] = useState<GridSize>(() => normalizeSnapGrid(initialSnap, DEFAULT_SNAP_GRID));
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [workspace, setWorkspace] = useState<WorkspaceSettings>(() => normalizeWorkspaceSettings(initialWorkspace));
-  // The scrollbars of the 3D view (Discussion #1241), switched in the view bar; read after mounting, as the page is built without storage.
+  // The scrollbars of the 3D view (Discussion #1241), switched in the view bar: a design opens with them as its settings
+  // ask, or as this browser remembers the switch (read after mounting, as the page is built without storage).
   const [viewScrollbarsOn, setViewScrollbarsOn] = useState(false);
-  useEffect(() => setViewScrollbarsOn(readViewScrollbars()), []);
+  useEffect(() => setViewScrollbarsOn(workspace.startWithScrollbars || readViewScrollbars()), [workspaceSettingsKey, workspace.startWithScrollbars]);
   const toggleViewScrollbars = useCallback(() => {
     setViewScrollbarsOn((on) => {
       storeViewScrollbars(!on);
@@ -7816,13 +7818,6 @@ export function WorkplaneViewport({
   );
 
   useEffect(() => {
-    const isTypingTarget = (target: EventTarget | null) => {
-      if (!(target instanceof HTMLElement)) {
-        return false;
-      }
-      return target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
-    };
-
     const handleKeyDown = (event: KeyboardEvent) => {
       // Shift turns the digit into "!" and the like on most layouts, so the
       // view comes from the key's position then.
@@ -7837,7 +7832,7 @@ export function WorkplaneViewport({
         return;
       }
 
-      const key = event.key.toLowerCase();
+      const key = (event.key ?? "").toLowerCase();
       let nextSnap: GridSize | null;
       if (event.key === "Escape" && (transformRef.current || dragRef.current || marqueeRef.current)) {
         event.preventDefault();

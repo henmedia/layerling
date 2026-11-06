@@ -1,6 +1,6 @@
 import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
-import { GRIDFINITY_PADDING_KEYS, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
 import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings, threadStandardSize } from "@/lib/threadGeometry";
 
 /**
@@ -39,6 +39,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "tubeBoreHole", "hingeKnuckles", "hingeKnuckleWidth", "hingeStyle", "hingeConeSize", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingePinless", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeScrewCountersink", "hingeCornerRadius", "hingeLeafStyle", "hingeScrewHead", "hingeNutWidth",
   "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinitySwallowtailClearance",
   "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCorner", "gridfinityLabelCornerSize",
+  "gridfinityLabelBackText", "gridfinityLabelFrontText", "gridfinityLabelLeftText", "gridfinityLabelRightText", "gridfinityLabelFont",
   "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
   "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize", "gridfinityOutline",
   "knurlPattern", "knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer",
@@ -151,6 +152,15 @@ export function mcpGridfinityOutlinePatch(shape: WorkplaneShape, params: Record<
   }
   const place = gridfinityPlateToWorld(fit.centre, shape);
   return { ...fit.patch, x: place.x, z: place.z };
+}
+
+/**
+ * What create_shape and update_object write for a Gridfinity part's own lists and texts: the dividers, the compartment
+ * labels and the openings as gridfinityListPatch keeps them, and the shelves' texts (#1308), which belong to
+ * one bin and so do not come through the shape defaults.
+ */
+export function mcpGridfinityPatch(params: Record<string, unknown>) {
+  return { ...gridfinityListPatch(mcpGridfinityListParams(params)), ...gridfinityLabelTextPatch(params) };
 }
 
 /**

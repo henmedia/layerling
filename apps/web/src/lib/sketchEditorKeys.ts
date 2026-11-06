@@ -29,7 +29,7 @@ const SKETCH_SWALLOWED_CTRL_KEYS = new Set(["h", "g", "e"]);
 
 /** The editor's keys in sketch mode, as in the 3D editor where the two share a meaning. */
 export function handleSketchEditorKey(event: KeyboardEvent, actions: SketchEditorKeyActions) {
-  const key = event.key.toLowerCase();
+  const key = (event.key ?? "").toLowerCase();
   const shortcut = event.ctrlKey || event.metaKey;
   const run = (action: () => void) => {
     event.preventDefault();

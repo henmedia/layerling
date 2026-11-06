@@ -19,7 +19,7 @@ export function geometryRotationDegreesForShortcut(event: GeometryRotationShortc
   if (event.ctrlKey || event.metaKey || event.altKey) {
     return null;
   }
-  if (event.code !== "KeyR" && event.key.toLowerCase() !== "r") {
+  if (event.code !== "KeyR" && (event.key ?? "").toLowerCase() !== "r") {
     return null;
   }
   return event.shiftKey ? GEOMETRY_FINE_ROTATION_STEP_DEGREES : GEOMETRY_ROTATION_STEP_DEGREES;

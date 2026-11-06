@@ -1948,10 +1948,10 @@ export function SketchWorkspace({
         });
         return;
       }
-      if (event.key.toLowerCase() === "f" && event.shiftKey) {
+      if ((event.key ?? "").toLowerCase() === "f" && event.shiftKey) {
         event.preventDefault();
         focusSelection();
-      } else if (event.key.toLowerCase() === "f") {
+      } else if ((event.key ?? "").toLowerCase() === "f") {
         // As in the 3D view: F looks at the selection, and at the whole sketch when nothing is selected (#465).
         event.preventDefault();
         if (!focusSelection()) resetView();

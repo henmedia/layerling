@@ -340,6 +340,8 @@ export type ShapeCustomization = {
   gridfinityLabelCorner?: GridfinityLabelCorner;
   /** Gridfinity bin: the size of that rounding or chamfer in mm; 0 leaves the corner sharp. */
   gridfinityLabelCornerSize?: number;
+  /** Gridfinity bin: the font of the letters on its label shelves (#1308), one of the built-in ones; missing is Multilanguage. */
+  gridfinityLabelFont?: string;
   /** Gridfinity bin: a finger scoop along the back wall, the floor rising along a quarter circle into it. */
   gridfinityScoopBack?: boolean;
   /** Gridfinity bin: a finger scoop along the front wall. */
@@ -553,6 +555,8 @@ export type WorkplaneWorkspaceSettings = {
   dimensionAxisColors: boolean;
   /** A turned body shows its angles about X, Y and Z beside it while it is selected. */
   showRotationAngles: boolean;
+  /** The editor opens a design with the view's scrollbars shown (Discussion #1241); the view bar still switches them. */
+  startWithScrollbars: boolean;
   zoomSpeed: number;
   /**
    * Which mouse buttons steer the view (#1013): layerling's own (right turns, middle shifts, a left drag on empty space draws
@@ -721,7 +725,7 @@ export type GridfinityLabelCorner = "round" | "chamfer";
  * against one side of the compartment, the bin's wall or a divider; `length` is a share of that side in per cent (10 to
  * 100, missing the full length), `align` where a shorter one sits along it (start towards -x on a back or front side and
  * towards -z on a left or right one; missing the middle), `width` how far it reaches out in mm (missing 14, within what
- * the compartment takes).
+ * the compartment takes), `text` the letters raised on it (#1308), up to 24 characters.
  */
 export type GridfinityCompartmentLabel = {
   column: number;
@@ -730,6 +734,7 @@ export type GridfinityCompartmentLabel = {
   length?: number;
   align?: "start" | "middle" | "end";
   width?: number;
+  text?: string;
 };
 
 /**
@@ -1205,6 +1210,16 @@ export type WorkplaneShape = {
   gridfinityLabelCorner?: GridfinityLabelCorner;
   /** Gridfinity bin: the size of that rounding or chamfer in mm; 0 leaves the corner sharp. */
   gridfinityLabelCornerSize?: number;
+  /** Gridfinity bin: the text raised on the back wall's label shelf (#1308), up to 24 characters; missing or blank has none. */
+  gridfinityLabelBackText?: string;
+  /** Gridfinity bin: the text raised on the front wall's label shelf. */
+  gridfinityLabelFrontText?: string;
+  /** Gridfinity bin: the text raised on the left wall's label shelf. */
+  gridfinityLabelLeftText?: string;
+  /** Gridfinity bin: the text raised on the right wall's label shelf. */
+  gridfinityLabelRightText?: string;
+  /** Gridfinity bin: the font of the letters on its label shelves (#1308), one of the built-in ones; missing is Multilanguage. */
+  gridfinityLabelFont?: string;
   /** Gridfinity bin: a finger scoop along the back wall, the floor rising along a quarter circle into it. */
   gridfinityScoopBack?: boolean;
   /** Gridfinity bin: a finger scoop along the front wall. */
