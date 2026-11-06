@@ -448,6 +448,12 @@ export type ShapeCustomization = {
   screwHoleHeadDepth?: number;
   /** Countersink and double countersink: opening angle of the cone in degrees. */
   screwHoleAngle?: number;
+  /**
+   * Drill point (Discussion #621): the point angle in degrees of the cone a drill leaves at the bottom of a blind
+   * hole, 60 to 150 (118 for a common twist drill); missing or 0 means a flat bottom. A cylinder, counterbore and
+   * countersink take it while they are holes. The height still counts to the shoulder, the tip lies below it.
+   */
+  drillPointAngle?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
@@ -1355,6 +1361,12 @@ export type WorkplaneShape = {
   screwHoleHeadDepth?: number;
   /** Countersink and double countersink: opening angle of the cone in degrees. */
   screwHoleAngle?: number;
+  /**
+   * Drill point (Discussion #621): the point angle in degrees of the cone a drill leaves at the bottom of a blind
+   * hole, 60 to 150 (118 for a common twist drill); missing or 0 means a flat bottom. A cylinder, counterbore and
+   * countersink take it while they are holes. The height still counts to the shoulder, the tip lies below it.
+   */
+  drillPointAngle?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */

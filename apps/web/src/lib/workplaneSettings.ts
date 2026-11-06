@@ -9,6 +9,7 @@ import { TORUS_MAX_TUBE_RATIO, TORUS_MIN_TUBE_RATIO } from "@/lib/torusShape";
 import { MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_PULLEY_HUB_HEIGHT, MAX_PULLEY_TEETH, MIN_PULLEY_BELT_WIDTH, MIN_PULLEY_FLANGE_RISE, MIN_PULLEY_TEETH } from "@/lib/pulleyGeometry";
 import { MAX_HIRTH_STEEP_FLANK, MAX_HIRTH_TEETH, MIN_HIRTH_STEEP_FLANK, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT } from "@/lib/hirthGeometry";
 import { PORT_PROFILES } from "@/lib/portGeometry";
+import { MAX_DRILL_POINT_ANGLE, MIN_DRILL_POINT_ANGLE } from "@/lib/drillPoint";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
 import { GRIDFINITY_LABEL_FONTS, MIN_GRIDFINITY_LABEL_TEXT_SIZE } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
@@ -423,6 +424,12 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.screwHoleShaft = optionalShapeNumber(source.screwHoleShaft, fallbackEntry?.screwHoleShaft, 0.1, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.screwHoleHeadDepth = optionalShapeNumber(source.screwHoleHeadDepth, fallbackEntry?.screwHoleHeadDepth, 0.1, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.screwHoleAngle = optionalShapeNumber(source.screwHoleAngle, fallbackEntry?.screwHoleAngle, 30, 150);
+    }
+    if (kind === "cylinder" || kind === "counterbore" || kind === "countersink") {
+      // A drill point at the bottom of a blind hole (Discussion #621); 0 or less stands for a flat bottom, so a patch can switch it back.
+      entry.drillPointAngle = typeof source.drillPointAngle === "number" && source.drillPointAngle <= 0
+        ? 0
+        : optionalShapeNumber(source.drillPointAngle, fallbackEntry?.drillPointAngle, MIN_DRILL_POINT_ANGLE, MAX_DRILL_POINT_ANGLE);
     }
     if (kind === "hinge") {
       entry.hingeKnuckles = optionalShapeNumber(source.hingeKnuckles, fallbackEntry?.hingeKnuckles, 3, 15, true);

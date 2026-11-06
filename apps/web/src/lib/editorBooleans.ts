@@ -25,6 +25,7 @@ import { createLocalId, derivedLocalId } from "@/lib/localIds";
 import { boundsOverlap, exportColorGroups, meshBounds, overlappingExportClusters } from "@/lib/exportUnion";
 import type { WorkplaneShape } from "@/types/layerling";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
+import { pointInDrillPoint, shapeDrillPointAngle } from "@/lib/drillPoint";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, CUTTER_PADDING, CUTTER_LATERAL_PADDING, POINT_TOLERANCE, CUTTER_RESIDUAL_INSET, MIN_SHAPE_DIMENSION, IMPORTED_FALLBACK_BOOLEAN_TRIANGLE_LIMIT, COPLANAR_BOOLEAN_RESCUE_DEGREES, cleanModelDimension, getManifoldRuntime, transformMesh, meshForShape, appendMeshData, formatTriangleCount, shapeAabb, boundsForShapesOfVertices, boundsForCuboids, meshAabb, geometryFromMeshData, positionsFromGeometryDrawRange, boundsForPositions, positionsDifferFromMeshData, geometryDiffersFromMeshData, positionsBoundaryEdges, meshDataPositions, midpoint, localGroupBounds } from "@/lib/editorMeshCore";
 
@@ -239,7 +240,9 @@ function pointInsideHoleShape(point: Vec3, shape: WorkplaneShape, strictInterior
 
   const insideHeight = localY >= -POINT_TOLERANCE && localY <= shape.height + POINT_TOLERANCE;
   if (!insideHeight) {
-    return false;
+    // A drill point reaches below the bottom (Discussion #621). The strict test above leaves it out, so a face on
+    // its cone is never counted as a piece left inside the hole.
+    return localY < 0 && pointInDrillPoint(shape, local.x, localY, local.z, POINT_TOLERANCE);
   }
 
   if (shape.kind === "cylinder" || shape.kind === "ellipse" || shape.kind === "sphere" || shape.kind === "halfSphere" || shape.kind === "paraboloid" || shape.kind === "curvedCone" || shape.kind === "cone" || shape.kind === "torus" || shape.kind === "tube" || shape.kind === "ring") {
@@ -761,7 +764,8 @@ function primitiveManifoldForShape(runtime: ManifoldToplevel, shape: WorkplaneSh
     );
   }
 
-  if (shape.kind === "cylinder" || shape.kind === "ellipse" || shape.kind === "cone") {
+  // A drilled hole ends in a cone (Discussion #621), which the kernel's cylinder has not: it takes its mesh.
+  if ((shape.kind === "cylinder" && shapeDrillPointAngle(shape) === undefined) || shape.kind === "ellipse" || shape.kind === "cone") {
     const sides = shape.sides ?? 96;
     const topRadiusScale =
       shape.kind === "cone"

@@ -893,6 +893,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.screwHoleShaft === b.screwHoleShaft &&
     a.screwHoleHeadDepth === b.screwHoleHeadDepth &&
     a.screwHoleAngle === b.screwHoleAngle &&
+    a.drillPointAngle === b.drillPointAngle &&
     a.portProfile === b.portProfile &&
     a.portClearance === b.portClearance &&
     a.cornerFillet === b.cornerFillet &&

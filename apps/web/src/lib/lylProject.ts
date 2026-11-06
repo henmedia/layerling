@@ -1736,6 +1736,11 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
     }
   }
+  if ((kind === "cylinder" || kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") && definition.drillPointAngle !== undefined) {
+    // The drill point (Discussion #621). Lenient on purpose: 0 is a flat bottom and the geometry clamps the rest.
+    const drillPointAngle = finiteNumber(definition.drillPointAngle, `${label}.drillPointAngle`);
+    if (drillPointAngle < 0 || drillPointAngle > 1e6) throw new Error(`${label}.drillPointAngle is outside the supported range`);
+  }
   if (kind === "curvedCone") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
     for (const key of ["curvedConeTop", "curvedConeBend"] as const) {

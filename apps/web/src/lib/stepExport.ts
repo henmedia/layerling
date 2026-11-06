@@ -16,6 +16,7 @@ import { hingeWorldParts } from "@/lib/hingeParts";
 import { restoreGroupedChildren } from "@/lib/editorBooleans";
 import { groupShowsPartColors } from "@/lib/groupColors";
 import { meshForShape } from "@/lib/editorMeshCore";
+import { shapeDrillPointAngle, shapeDrillPointLength } from "@/lib/drillPoint";
 import { exactMeshFreeformShare, exactSolidFromMesh } from "@/lib/cadMeshExact";
 
 /**
@@ -149,7 +150,9 @@ export function stepSourceForShape(shape: WorkplaneShape): StepSource {
   }
   if (shape.kind === "mesh" && shape.importedMesh?.brepStep) return "imported";
   const oval = (shape.kind === "cylinder" || shape.kind === "cone") && Math.abs(shapeWidth(shape) - shapeDepth(shape)) >= SIZE_EPS;
-  if (EXACT_KINDS.has(shape.kind) && !oval) return "primitive";
+  // A drilled hole (Discussion #621) is no plain cylinder: it goes out turned from its section, the drill point with it.
+  const drilled = shapeDrillPointAngle(shape) !== undefined;
+  if (EXACT_KINDS.has(shape.kind) && !oval && !drilled) return "primitive";
   if (shape.cadBrep) return "baked";
   if (hasExactProfile(shape)) return "profile";
   if (hasExactThread(shape)) return "thread";
@@ -544,21 +547,25 @@ export type Aabb = { min: [number, number, number]; max: [number, number, number
 // Axis-aligned shapes get a tight box. Rotated shapes fall back to the box that
 // encloses the bounding sphere (rotation-invariant, never under-reports), trading
 // tightness for the guarantee that a real intersection is never missed.
+//
+// A drill point (Discussion #621) reaches past the frame by its tip: the box grows by it at the bottom (at the top
+// when the hole is mirrored upside down), and a turned one round a body with a tip at both ends, which holds it however
+// it is turned.
 export function worldAabb(shape: WorkplaneShape): Aabb {
   const w = shapeWidth(shape);
   const d = shapeDepth(shape);
   const h = shape.height;
+  const tip = shapeDrillPointLength(shape);
   const cx = shape.x;
   const cy = (shape.elevation ?? 0) + h / 2;
   const cz = shape.z;
   const rotated = (shape.rotationX ?? 0) !== 0 || (shape.rotationZ ?? 0) !== 0 || shapeYawDegrees(shape) !== 0;
-  const [hx, hy, hz] = rotated
-    ? (() => {
-        const r = 0.5 * Math.sqrt(w * w + h * h + d * d);
-        return [r, r, r];
-      })()
-    : [w / 2, h / 2, d / 2];
-  return { min: [cx - hx, cy - hy, cz - hz], max: [cx + hx, cy + hy, cz + hz] };
+  if (rotated) {
+    const r = 0.5 * Math.sqrt(w * w + (h + 2 * tip) ** 2 + d * d);
+    return { min: [cx - r, cy - r, cz - r], max: [cx + r, cy + r, cz + r] };
+  }
+  const below = shape.mirrorY ? 0 : tip;
+  return { min: [cx - w / 2, cy - h / 2 - below, cz - d / 2], max: [cx + w / 2, cy + h / 2 + tip - below, cz + d / 2] };
 }
 
 export function aabbsOverlap(a: Aabb, b: Aabb): boolean {

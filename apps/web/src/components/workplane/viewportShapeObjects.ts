@@ -31,6 +31,8 @@ import { createVaseGeometry, fittedVaseMesh } from "@/lib/vaseShape";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
 import { createPortGeometry } from "@/lib/portGeometry";
 import { createScrewHoleGeometry } from "@/lib/screwHoleGeometry";
+import { shapeDrillPointAngle, shapeDrillPointLength } from "@/lib/drillPoint";
+import { createPrismGeometry } from "@/lib/prismGeometry";
 import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
 import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createBentTubeGeometry, createBentTubeSegmentGeometry } from "@/lib/bentTubeGeometry";
@@ -482,6 +484,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     screwHoleShaft: shape.screwHoleShaft,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
+    // The drill point as built: a solid, the double countersink and a tapered body keep a flat end (drillPoint.ts).
+    drillPoint: shapeDrillPointAngle(shape),
     portProfile: shape.portProfile,
     // A dovetail cut-out grows by its clearance, so body and socket differ.
     dovetailHole: shape.kind === "dovetail" ? Boolean(shape.hole) : undefined,
@@ -652,7 +656,9 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     return JSON.stringify({ kind: "box", taper, deform, size });
   }
   if (shape.kind === "cylinder" || shape.kind === "ellipse") {
-    return JSON.stringify({ kind: shape.kind, sides: polygonSidesForShape(shape), segments: shape.segments, taper, deform, size });
+    // A drilled hole is built at its size (Discussion #621): its tip follows the diameter, not the height.
+    const drillPoint = shapeDrillPointAngle(shape);
+    return JSON.stringify({ kind: shape.kind, sides: polygonSidesForShape(shape), segments: shape.segments, taper, deform, size: drillPoint === undefined ? size : [shapeWidth(shape), shapeDepth(shape), shape.height], drillPoint });
   }
   if (shape.kind === "polygon") {
     return JSON.stringify({ kind: "polygon", sides: shape.sides, segments: shape.segments, taper, deform, size });
@@ -896,6 +902,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     screwHoleShaft: shape.screwHoleShaft,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
+    // The drill point as built: a solid, the double countersink and a tapered body keep a flat end (drillPoint.ts).
+    drillPoint: shapeDrillPointAngle(shape),
     portProfile: shape.portProfile,
     // A dovetail cut-out grows by its clearance, so body and socket differ.
     dovetailHole: shape.kind === "dovetail" ? Boolean(shape.hole) : undefined,
@@ -1089,7 +1097,8 @@ export function syncShapeObjectDimensions(object: THREE.Group, shape: WorkplaneS
     );
   } else if (shape.kind === "box" && !(shape.radius && shape.radius > 0)) {
     scale = new THREE.Vector3(width, shape.height, depth);
-  } else if (shape.kind === "cylinder" || shape.kind === "ellipse" || shape.kind === "polygon") {
+  } else if ((shape.kind === "cylinder" && shapeDrillPointLength(shape) === 0) || shape.kind === "ellipse" || shape.kind === "polygon") {
+    // A drilled hole is no unit body (Discussion #621): it was built at its size and is built again when that changes.
     const fit = regularPolygonFootprintScale(width, depth, polygonSidesForShape(shape));
     scale = new THREE.Vector3(fit.x, shape.height, fit.z);
     offsetX = fit.offsetX;
@@ -1996,6 +2005,13 @@ export function createShapeObject(
       // und wird ueber die Maschenskalierung in den Rahmen gesetzt - so baut
       // ein Zug am Anfasser nicht jedes Mal ein neues Vieleck.
       const sides = polygonSidesForShape(shape);
+      const drillPoint = shape.kind === "cylinder" ? shapeDrillPointLength(shape) : 0;
+      if (drillPoint > 0) {
+        // A cylinder set as a hole may end in a drill point (Discussion #621). The tip follows the diameter, so the
+        // body is built at its size: stretched along the height, the tip would grow with it.
+        addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createPrismGeometry(width, height, depth, sides, shape.segments ?? 1, drillPoint)), material, shape);
+        break;
+      }
       const fit = regularPolygonFootprintScale(width, depth, sides);
       addMesh(
         group,
@@ -2011,7 +2027,7 @@ export function createShapeObject(
     case "counterbore":
     case "countersink":
     case "doubleCountersink":
-      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, drillPointAngle: shapeDrillPointAngle(shape), sides: roundSideCount(shape.sides, width, depth) })), material, shape);
       break;
     case "finishingWasher":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
