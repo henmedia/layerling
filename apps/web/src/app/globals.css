@@ -11113,6 +11113,238 @@ html[data-theme="dark"] .font-picker-option.action {
   margin-top: 2px;
 }
 
+/* The surface texture's pattern, chosen by its picture: like the gear type's pictures, it takes the card's whole width
+   under its label. The field shows the chosen pattern; opened, a grid of all of them with a search above. */
+.select-property.pattern-picker {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.pattern-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 36px;
+  padding: 3px 12px 3px 3px;
+  color: #746352;
+  font: 600 15px/1.2 var(--font-ui);
+  text-align: left;
+  background: #fff;
+  border: 1px solid #daccbe;
+  border-radius: 999px;
+  outline: 0;
+  cursor: pointer;
+  box-shadow: inset 0 1px 1px rgba(65, 46, 25, 0.04);
+}
+
+.pattern-picker-trigger > span:not(.pattern-thumbnail) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pattern-picker-trigger > svg {
+  flex: none;
+}
+
+.pattern-picker-trigger:focus-visible,
+.pattern-picker-trigger[aria-expanded="true"] {
+  border-color: #ea953d;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
+.pattern-picker-trigger:disabled {
+  cursor: default;
+  opacity: 0.52;
+}
+
+.pattern-thumbnail {
+  display: block;
+  flex: none;
+  width: 40px;
+  height: 30px;
+  object-fit: cover;
+  background: #ebe4da;
+  border-radius: 5px;
+}
+
+/* In the round field the picture is rounded at its ends like the field. */
+.pattern-picker-trigger .pattern-thumbnail {
+  width: 46px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.pattern-picker-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+  padding: 5px;
+  color: #5d4731;
+  background: #fff;
+  border: 1px solid #daccbe;
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(65, 46, 25, 0.22);
+}
+
+.pattern-picker-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 31px;
+  padding: 0 12px;
+  color: #9a8874;
+  background: #fff;
+  border: 1px solid #daccbe;
+  border-radius: 999px;
+}
+
+.pattern-picker-search:focus-within {
+  border-color: #ea953d;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
+.pattern-picker-search input {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  color: #746352;
+  font: 600 14px/1 var(--font-ui);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+}
+
+.pattern-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  max-height: 330px;
+  overflow-y: auto;
+  scrollbar-color: #cdbfa9 transparent;
+  scrollbar-width: thin;
+}
+
+.pattern-picker-grid button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 3px 4px 3px 3px;
+  color: #6d5133;
+  font: 600 12px/1.2 var(--font-ui);
+  text-align: left;
+  background: #fbf8f4;
+  border: 1px solid #e0d4c6;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.pattern-picker-grid button > span:not(.pattern-thumbnail) {
+  min-width: 0;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.pattern-picker-grid button:hover {
+  border-color: #cd9860;
+}
+
+.pattern-picker-grid button.selected {
+  color: #8a4504;
+  background: #ffe7cc;
+  border-color: #d97813;
+  box-shadow: inset 0 0 0 1px #d97813;
+}
+
+.pattern-picker-grid button:focus-visible {
+  outline: 2px solid #ea953d;
+  outline-offset: 1px;
+}
+
+.pattern-picker-check {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  padding: 2px;
+  color: #fff;
+  background: #d97813;
+  border-radius: 50%;
+}
+
+.pattern-picker-empty {
+  grid-column: 1 / -1;
+  margin: 6px 4px;
+  color: #8d7b68;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+html[data-theme="dark"] .pattern-picker-trigger,
+html[data-theme="dark"] .pattern-picker-search {
+  color: #e6d8c6;
+  background: #21180f;
+  border-color: #5c4b3a;
+}
+
+html[data-theme="dark"] .pattern-picker-search input {
+  color: #e6d8c6;
+}
+
+html[data-theme="dark"] .pattern-thumbnail {
+  background: #3b2c1d;
+}
+
+html[data-theme="dark"] .pattern-picker-popover {
+  color: #e6d8c6;
+  background: #2b2016;
+  border-color: #5c4b3a;
+}
+
+html[data-theme="dark"] .pattern-picker-grid {
+  scrollbar-color: #5a4a3a transparent;
+}
+
+html[data-theme="dark"] .pattern-picker-grid button {
+  color: #ede4d4;
+  background: #2f2418;
+  border-color: #53412f;
+}
+
+html[data-theme="dark"] .pattern-picker-grid button:hover {
+  border-color: #81684f;
+}
+
+html[data-theme="dark"] .pattern-picker-grid button.selected {
+  color: #ffc27a;
+  background: #4a3214;
+  border-color: #e08a2c;
+  box-shadow: inset 0 0 0 1px #e08a2c;
+}
+
+html[data-theme="dark"] .pattern-picker-check {
+  color: #2b2016;
+  background: #e08a2c;
+}
+
+html[data-theme="dark"] .pattern-picker-empty {
+  color: #a08a72;
+}
+
 .text-property input:focus,
 .select-property select:focus {
   border-color: #ea953d;

@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "title": {
+      "de": "Oberflächentextur: das Muster wählen, indem man es sieht",
+      "en": "Surface texture: choose the pattern by seeing it"
+    },
+    "body": {
+      "de": "Das Feld „Muster“ zeigt jetzt das Bild des gewählten Musters. Aufgeklappt sind alle 18 Muster als Bilder in einem Raster, mit einer Suche darüber. Statt anzuwenden und am Körper nachzusehen, wählt man ein Muster nach seinem Aussehen, auch mit den Pfeiltasten.",
+      "en": "The Pattern field now shows the picture of the chosen pattern. Opened, it holds all 18 patterns as pictures in a grid, with a search above. Instead of applying and looking at the body, you choose a pattern by how it looks, with the arrow keys too."
+    }
+  },
+  {
+    "title": {
+      "de": "Bildlaufleisten springen nicht mehr beim Mausrad",
+      "en": "Scrollbars no longer jump with the wheel"
+    },
+    "body": {
+      "de": "Das Mausrad über einer Bildlaufleiste schiebt die Ansicht jetzt so weit, wie es gedreht wurde, wie auf einer Webseite. Auf dem Mac warf eine Magic Mouse oder das Nachgleiten am Trackpad die Ansicht schon beim Überfahren einer Leiste aus dem Bild.",
+      "en": "The wheel over a scrollbar now slides the view as far as it turned, as on a web page. On a Mac a Magic Mouse or the glide after a trackpad swipe threw the view off the screen as the pointer crossed a bar."
+    }
+  },
+  {
+    "title": {
+      "de": "Schwalbenschwanz fast so breit wie das breite Ende",
+      "en": "A dovetail neck almost as wide as the wide end"
+    },
+    "body": {
+      "de": "Der Hals eines Schwalbenschwanzes darf jetzt bis 0,1 mm schmaler sein als das breite Ende, statt höchstens 95 % davon. So geht auch ein langer, leicht verjüngter Zapfen, etwa 146 mm breit mit 145 mm am Hals.",
+      "en": "A dovetail's neck may now be up to 0.1 mm narrower than the wide end, instead of 95 % of it at most. So a long, gently tapering tail works too, say 146 mm wide with 145 mm at the neck."
+    }
+  },
+  {
+    "title": {
+      "de": "Importierte Modelle in der Skizze von oben gesehen",
+      "en": "Imported models seen from above in the sketch"
+    },
+    "body": {
+      "de": "Unter einer Skizze zeigt ein importiertes Modell jetzt seinen ganzen Umriss von oben, nicht nur die Fläche, auf der es steht. Von einer Benchy war bisher nur ein Streifen des Kiels zu sehen.",
+      "en": "Under a sketch an imported model now shows its whole outline from above, not only the part it stands on. A Benchy showed only a strip of its keel."
+    }
+  }
+]

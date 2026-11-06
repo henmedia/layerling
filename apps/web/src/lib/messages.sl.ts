@@ -1715,6 +1715,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "inspector.wrapApply": "Ovij",
   "inspector.surfaceTexture": "Površinska tekstura",
   "inspector.surfacePattern": "Vzorec",
+  "inspector.surfacePatternSearch": "Išči vzorec…",
+  "inspector.surfacePatternNone": "Ni vzorca s tem imenom.",
   "inspector.surfaceSpacing": "Razmik",
   "inspector.surfaceDepth": "Globina",
   "inspector.surfaceDirection": "Smer",

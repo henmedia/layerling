@@ -2163,6 +2163,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "inspector.wrapApply": "Avvolgi",
   "inspector.surfaceTexture": "Texture della superficie",
   "inspector.surfacePattern": "Motivo",
+  "inspector.surfacePatternSearch": "Cerca un motivo…",
+  "inspector.surfacePatternNone": "Nessun motivo con questo nome.",
   "inspector.surfaceSpacing": "Spaziatura",
   "inspector.surfaceDepth": "Profondità",
   "inspector.surfaceDirection": "Direzione",

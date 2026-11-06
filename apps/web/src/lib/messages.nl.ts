@@ -2176,6 +2176,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "inspector.wrapApply": "Wikkelen",
   "inspector.surfaceTexture": "Oppervlaktestructuur",
   "inspector.surfacePattern": "Patroon",
+  "inspector.surfacePatternSearch": "Patronen zoeken…",
+  "inspector.surfacePatternNone": "Geen patroon met die naam.",
   "inspector.surfaceSpacing": "Afstand",
   "inspector.surfaceDepth": "Diepte",
   "inspector.surfaceDirection": "Richting",

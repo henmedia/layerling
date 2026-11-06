@@ -2127,6 +2127,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "inspector.wrapApply": "包覆",
   "inspector.surfaceTexture": "表面紋理",
   "inspector.surfacePattern": "圖樣",
+  "inspector.surfacePatternSearch": "搜尋圖樣…",
+  "inspector.surfacePatternNone": "找不到這個名稱的圖樣。",
   "inspector.surfaceSpacing": "間距",
   "inspector.surfaceDepth": "深度",
   "inspector.surfaceDirection": "方向",

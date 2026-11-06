@@ -4573,6 +4573,135 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .font-picker-option.act
   color: #f0b36a;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-trigger {
+  color: #575757;
+  background: #fff;
+  border: 1px solid #cccccc;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(49, 49, 49, 0.04);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-trigger:focus-visible,
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-trigger[aria-expanded="true"] {
+  border-color: #ea953d;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-thumbnail {
+  background: #e3e3e3;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-popover {
+  color: #494949;
+  background: #fff;
+  border: 1px solid #cccccc;
+  box-shadow: 0 10px 28px rgba(49, 49, 49, 0.22);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-search {
+  color: #777777;
+  background: #fff;
+  border: 1px solid #cccccc;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-search:focus-within {
+  border-color: #ea953d;
+  box-shadow: 0 0 0 3px rgba(161, 83, 0, 0.14);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-search input {
+  color: #575757;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-grid {
+  scrollbar-color: #bbbbbb transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-grid button {
+  color: #515151;
+  background: #f8f8f8;
+  border: 1px solid #d3d3d3;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-grid button:hover {
+  border-color: #cd9860;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-grid button.selected {
+  color: #8a4504;
+  background: #e6e6e6;
+  border-color: #d97813;
+  box-shadow: inset 0 0 0 1px #d97813;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-grid button:focus-visible {
+  outline: 2px solid #ea953d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-check {
+  color: #fff;
+  background: #d97813;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .pattern-picker-empty {
+  color: #6c6c6c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-trigger,
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-search {
+  color: #d6d6d6;
+  background: #1f1f1f;
+  border-color: #4c4c4c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-search input {
+  color: #d6d6d6;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-thumbnail {
+  background: #313131;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-popover {
+  color: #d6d6d6;
+  background: #262626;
+  border-color: #4c4c4c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-grid {
+  scrollbar-color: #4c4c4c transparent;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-grid button {
+  color: #e1e1e1;
+  background: #292929;
+  border-color: #434343;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-grid button:hover {
+  border-color: #5c5c5c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-grid button.selected {
+  color: #ffc27a;
+  background: #333333;
+  border-color: #e08a2c;
+  box-shadow: inset 0 0 0 1px #e08a2c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-check {
+  color: #262626;
+  background: #e08a2c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
+  color: #797979;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .text-property input:focus,
 :where(html[data-theme="dark"][data-palette="graphite"]) .select-property select:focus {
   border-color: #ea953d;

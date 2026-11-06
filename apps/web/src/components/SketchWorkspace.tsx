@@ -32,6 +32,8 @@ import { pickTouchTarget, type TouchCandidate } from "@/lib/sketchTouch";
 import { isSketchPrimitive, type SketchPrimitive } from "@/lib/sketchPrimitives";
 import { meshForShape } from "@/lib/editorMeshCore";
 import { mirrorSign, resizedImportedMeshPositions } from "@/lib/workplaneShapes";
+import { loadedManifoldRuntime, manifoldRevision, onManifoldReady, requestManifoldRuntime } from "@/lib/manifoldHandle";
+import { meshTopSilhouette, silhouettePath, type SilhouetteLoop } from "@/lib/meshSilhouette";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeSnapGrid, normalizeWorkspaceSettings, snapGridForShortcut, snapGridOptions, snapGridStep as snapStep, orbitControlsZoomSpeed, zoomDistanceScale, ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
 import type { GridSize, SketchImage, SketchNote, SketchOperation, SketchPoint, SketchProfile, SketchSegment, SketchStroke, SketchStrokeAlign, SketchStrokeCap, SketchStrokeJoin, SweepAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { resizePointerOnGrid } from "@/lib/sketchFrameResize";
@@ -532,12 +534,40 @@ function boundaryPath(points: Array<{ x: number; z: number }>, triangles: number
   return commands.join(" ");
 }
 
+/** Each imported mesh's outline from above, kept until the mesh or its size changes: the kernel works it out once. */
+const silhouetteCache = new WeakMap<object, { key: string; edges: unknown; loops: SilhouetteLoop[] | null }>();
+
+/** The outline of an imported mesh seen from above, in its own frame (Discussion #1366); null before the kernel is there or when it refuses the mesh. */
+function importedMeshSilhouette(shape: WorkplaneShape): SilhouetteLoop[] | null {
+  const mesh = shape.importedMesh;
+  if (!mesh) return null;
+  const key = `${shape.width}|${shape.depth}|${shape.height}|${shape.size}`;
+  const cached = silhouetteCache.get(mesh);
+  if (cached && cached.key === key && cached.edges === shape.edgeTreatments) return cached.loops;
+  const runtime = loadedManifoldRuntime();
+  if (!runtime) {
+    requestManifoldRuntime();
+    return null;
+  }
+  const loops = meshTopSilhouette(runtime, resizedImportedMeshPositions(shape));
+  silhouetteCache.set(mesh, { key, edges: shape.edgeTreatments, loops });
+  return loops;
+}
+
 export function importedMeshFootprint(shape: WorkplaneShape): SketchReferenceFootprint | null {
   if (!shape.importedMesh) return null;
-  const positions = resizedImportedMeshPositions(shape);
   const project = (x: number, z: number) => sketchReferencePoint(shape, x, z);
-  const size = Math.max(shape.width, shape.depth, shape.height);
   const counts = shape.importedMesh.partTriangleCounts;
+  if (!counts?.length) {
+    // The mesh as it is seen from above, not only the part it stands on (#1366): an imported Benchy showed the strip of its keel.
+    const silhouette = importedMeshSilhouette(shape);
+    if (silhouette) {
+      const d = silhouettePath(silhouette.map((loop) => loop.map((point) => project(point.x, point.z))));
+      return { fillD: d, outlineD: d };
+    }
+  }
+  const positions = resizedImportedMeshPositions(shape);
+  const size = Math.max(shape.width, shape.depth, shape.height);
   if (!counts?.length) return footprintOfPositions(positions, project, size, shape.height);
   // On a workplane set on a face (#778) each part shows as it is seen from the plane: the face on the plane alone was a thin
   // strip when the plane stood a little askew, and a group left out its parts behind the plane.
@@ -2234,9 +2264,13 @@ export function SketchWorkspace({
   })();
   // The corner whose angle is being typed, for the line that will turn.
   const editingCorner = editingAngle ? sketchCornerAt(displayProfile, editingAngle.pointId) : null;
+  // An imported mesh's outline from above needs the kernel: drawn again when it has loaded.
+  const [kernelRevision, setKernelRevision] = useState(() => manifoldRevision());
+  useEffect(() => onManifoldReady(() => setKernelRevision(manifoldRevision())), []);
   const referenceFootprints = useMemo(
     () => new Map(referenceShapes.map((shape) => [shape.id, importedMeshFootprint(shape) ?? shapeMeshFootprint(shape)])),
-    [referenceShapes],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- kernelRevision only asks for the outlines again
+    [referenceShapes, kernelRevision],
   );
   // The corners of the bodies shown underneath, in sketch coordinates: where a point snaps to them.
   const referenceSnapPoints = useMemo(() => {
