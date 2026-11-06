@@ -71,6 +71,12 @@
  * - nulllab ESP32-S3-CAM: nulllab's size drawing (esp32s3_cam_size.png, github.com/nulllaborg/esp32s3-cam):
  *   38.4 x 30.4 mm, the four holes 32 x 24 mm apart, 3.2 mm from the edges, and the pins' pads; the
  *   parts' places read off that drawing and nulllab's photo, their sizes and heights `estimated`.
+ * - Espressif ESP32-DevKitC V4 (38 pins): Espressif's dimension drawing (dl.espressif.com, esp32_devkitc_v4_dimensions.dxf):
+ *   48.26 x 27.94 mm, 1 mm corners, no holes, the pins' and the parts' pads; the ESP32-WROOM-32E's size from
+ *   Espressif's datasheet (18 x 25.5 x 3.1 mm), its antenna 6.04 mm past the board's end. The other heights `estimated`.
+ * - ESP32 DevKit V1 (DOIT, 30 pins): sold unbranded, no maker's drawing. From the published true-size drawing
+ *   (mischianti.org, DOIT-ESP32-DevKit-v1.svg; 28.2 x 51.8 mm, four 2.8 mm holes, as a real board was measured
+ *   in the Fritzing forum); all of it `estimated`.
  * Every board was checked against the maker's own picture of its top, so none is a mirror image.
  * A value the maker does not give is marked `estimated`. A board without mounting holes has `holes: []`.
  *
@@ -743,10 +749,65 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "pins (RST to 3V3)", x0: 7.37, x1: 26.75, y0: 0.42, y1: 2.02, height: 0.05, kind: "header", pins: [8, 1], estimated: true },
     ],
   },
+  esp32DevKitC: {
+    type: "esp32DevKitC",
+    name: "Espressif ESP32-DevKitC V4 (38 pins)",
+    width: 48.26,
+    depth: 27.94,
+    thickness: 1.6,
+    cornerRadius: 1,
+    holeDiameter: 0,
+    holes: [],
+    color: "#1a1a1a",
+    estimated: ["thickness"],
+    // Espressif's dimension drawing (esp32_devkitc_v4_dimensions.dxf) turned a quarter, as Espressif's own
+    // photo shows it: micro-USB at the left end, EN behind and Boot in front of it, the module's antenna
+    // 6.04 mm out past the right end.
+    parts: [
+      { name: "micro-USB", x0: -0.6, x1: 5.0, y0: 10.25, y1: 17.75, height: 2.7, kind: "connector", profile: "microUsb", estimated: true },
+      { name: "EN button", x0: 1.36, x1: 6.36, y0: 20.19, y1: 23.69, height: 2.0, kind: "button", estimated: true },
+      { name: "Boot button", x0: 1.36, x1: 6.36, y0: 4.25, y1: 7.75, height: 2.0, kind: "button", estimated: true },
+      { name: "LED (5V)", x0: 12.0, x1: 14.2, y0: 21.3, y1: 22.1, height: 0.6, kind: "chip", estimated: true },
+      { name: "USB chip (CP2102N)", x0: 9.75, x1: 14.75, y0: 11.44, y1: 16.44, height: 0.9, kind: "chip", estimated: true },
+      { name: "voltage regulator", x0: 15.93, x1: 22.43, y0: 12.09, y1: 15.59, height: 1.8, kind: "chip", estimated: true },
+      // The ESP32-WROOM-32E: 18 x 25.5 x 3.1 mm (Espressif's datasheet).
+      { name: "ESP32-WROOM-32E", x0: 28.8, x1: 54.3, y0: 4.97, y1: 22.97, height: 3.1, kind: "shield" },
+      // The pins' pads, 19 a side, 25.4 mm apart; the headers point down.
+      { name: "pins (CLK to GND)", x0: 0.49, x1: 47.81, y0: 0.5, y1: 2.1, height: 0.05, kind: "header", pins: [19, 1], estimated: true },
+      { name: "pins (5V to 3V3)", x0: 0.49, x1: 47.81, y0: 25.9, y1: 27.5, height: 0.05, kind: "header", pins: [19, 1], estimated: true },
+    ],
+  },
+  esp32DevKitV1: {
+    type: "esp32DevKitV1",
+    name: "ESP32 DevKit V1 (DOIT, 30 pins)",
+    width: 51.8,
+    depth: 28.2,
+    thickness: 1.6,
+    cornerRadius: 1.1,
+    holeDiameter: 2.8,
+    holes: [[2.2, 2.2], [2.2, 26.0], [49.6, 2.2], [49.6, 26.0]],
+    color: "#2b2b2b",
+    estimated: ["thickness", "cornerRadius", "holeDiameter"],
+    // No maker's drawing: from the published true-size drawing (mischianti.org, DOIT-ESP32-DevKit-v1.svg),
+    // which matches a board measured in the Fritzing forum, turned a quarter: micro-USB at the left end,
+    // EN behind and BOOT in front of it, the module at the right end.
+    parts: [
+      { name: "micro-USB", x0: -0.6, x1: 5.32, y0: 10.74, y1: 17.52, height: 2.7, kind: "connector", profile: "microUsb", estimated: true },
+      { name: "EN button", x0: 1.64, x1: 5.47, y0: 20.86, y1: 23.8, height: 2.0, kind: "button", estimated: true },
+      { name: "BOOT button", x0: 1.64, x1: 5.47, y0: 4.31, y1: 7.25, height: 2.0, kind: "button", estimated: true },
+      { name: "USB chip (CP2102)", x0: 7.6, x1: 12.58, y0: 11.62, y1: 16.69, height: 0.9, kind: "chip", estimated: true },
+      { name: "voltage regulator", x0: 15.14, x1: 21.18, y0: 6.89, y1: 11.77, height: 1.8, kind: "chip", estimated: true },
+      { name: "capacitor", x0: 17.14, x1: 20.44, y0: 14.79, y1: 17.45, height: 2.0, kind: "chip", estimated: true },
+      { name: "ESP32-WROOM-32", x0: 25.55, x1: 50.93, y0: 4.92, y1: 23.29, height: 3.1, kind: "shield", estimated: true },
+      // The pins' pads, 15 a side, 25.4 mm apart; the headers point down.
+      { name: "pins (D23 to 3V3)", x0: 9.41, x1: 46.57, y0: 0.61, y1: 2.21, height: 0.05, kind: "header", pins: [15, 1], estimated: true },
+      { name: "pins (EN to VIN)", x0: 9.41, x1: 46.57, y0: 26.0, y1: 27.6, height: 0.05, kind: "header", pins: [15, 1], estimated: true },
+    ],
+  },
 
 };
 
-export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam"];
+export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"];
 export const DEFAULT_SBC_BOARD: SbcBoardType = "pi5";
 /** Extra room for the connectors at the edge, so a case wall cut with the board leaves them a gap: 0 to 2 mm. */
 export const MAX_SBC_CLEARANCE = 2;

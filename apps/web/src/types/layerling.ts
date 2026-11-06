@@ -1636,7 +1636,7 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
-export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam";
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1";
 
 export type SbcBoardSettings = {
   board: SbcBoardType;
