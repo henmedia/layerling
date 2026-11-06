@@ -1073,16 +1073,28 @@ function brickAt(u: number, v: number, s: SurfaceTextureSettings, layout: Surfac
   const cx = origin + (course.offset + p * period + left) * L + hl;
   const cy = v0 + (j + 0.5) * H;
   let n = p * lengths.length + k;
-  if (layout.around) {
-    const perRound = Math.round(((layout.around * BRICK_PERIOD[s.brickBond]) / period) * lengths.length);
-    n = ((n % perRound) + perRound) % perRound;
-  }
+  // Round a cylinder the bricks of a course are numbered round once: the last one's right joint is the first one's left.
+  const perRound = layout.around ? Math.round(((layout.around * BRICK_PERIOD[s.brickBond]) / period) * lengths.length) : 0;
+  if (perRound) n = ((n % perRound) + perRound) % perRound;
   const right = cx + hl - u, top = cy + hh - v, leftSide = u - (cx - hl), bottom = v - (cy - hh);
   let edge = right, side = 0;
   if (top < edge) [edge, side] = [top, 1];
   if (leftSide < edge) [edge, side] = [leftSide, 2];
   if (bottom < edge) [edge, side] = [bottom, 3];
-  return { key: (n + 50000) * 100000 + (j + 50000), n, j, cx, cy, hl, hh, edge, side };
+  return { key: (n + 50000) * 100000 + (j + 50000), n, j, cx, cy, hl, hh, edge, side, perRound };
+}
+
+/**
+ * A border that leaves a course less than this share of its height (see brickJointsOff) leaves no head joints in it there,
+ * and a piece of a brick shorter than that share of the course's height keeps none towards the brick beside it: their
+ * joints were stubs shorter than half a course.
+ */
+const BRICK_SLIVER = 0.5;
+
+/** The head joint at a brick's left (its own number) or right end (the next), as brickJointsOff keys it. */
+function headJointKey(brick: ReturnType<typeof brickAt>, rightEnd: boolean, axis: number, face: number) {
+  const n = rightEnd ? (brick.perRound ? (brick.n + 1) % brick.perRound : brick.n + 1) : brick.n;
+  return `${axis}|${face}|${brick.j}|${n}`;
 }
 
 /** Half a brick joint's width, mm: as asked, but at most 45 % of the shortest brick or the course, so a brick stays. */
@@ -1091,13 +1103,22 @@ function brickJointHalf(s: SurfaceTextureSettings, layout: SurfaceTextureLayout,
   return Math.min(s.brickJoint / 2, 0.45 * Math.min(H, BRICK_SHORTEST[s.brickBond] * brickAlong(layout, axis).cell));
 }
 
-/** Bricks: 1 in the middle of a joint, 0 on a brick's face - or, laid unevenly, as deep as that brick lies. */
-function brickValue(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number) {
+/**
+ * Bricks: 1 in the middle of a joint, 0 on a brick's face - or, laid unevenly, as deep as that brick lies. `face` tells the
+ * faces of one axis apart (see brickFrame); a head joint a border left as a stub (see brickJointsOff) is not there.
+ */
+function brickValue(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number, face = 0) {
   const brick = brickAt(u, v, s, layout, axis);
   const hw = brickJointHalf(s, layout, axis);
+  let edge = brick.edge;
+  const off = layout.brickJointsOff;
+  if (off && off.size && (brick.side === 0 || brick.side === 2) && edge < hw && off.has(headJointKey(brick, brick.side === 0, axis, face))) {
+    // Only the joints between the courses count there.
+    edge = Math.min(brick.cy + brick.hh - v, v - (brick.cy - brick.hh));
+  }
   // A point closer to the joint's edge than the cuts come to a point (SURFACE_MIN_EDGE, see sliceByField) lies on it: a
   // brick's face is often one long triangle, and the least depth at one of its corners tilted it.
-  const joint = brick.edge >= hw - SURFACE_MIN_EDGE ? 0 : surfaceFalloff(brick.edge / hw, s.profile);
+  const joint = edge >= hw - SURFACE_MIN_EDGE ? 0 : surfaceFalloff(edge / hw, s.profile);
   if (!(s.brickVary > 0)) return joint;
   const sunk = s.brickVary * BRICK_VARY_DEPTH * hash3(brick.n, brick.j, s.seed);
   return sunk + (1 - sunk) * joint;
@@ -1321,6 +1342,8 @@ export type SurfaceTextureLayout = {
    * to its own size, ending in a brick at an edge to a side with bricks (see fitBrickCourses).
    */
   capBricks?: { along: { origin: number; cell: number }; rowHeight: number; rowOrigin: number };
+  /** Bricks: the head joints a border would leave as stubs, which are not there (set by the session, see brickJointsOff). */
+  brickJointsOff?: Set<string>;
   /** Squares and triangles: their size and gap as made and where their grid begins (see fitTiles). */
   tiles?: SurfaceTiles;
   /** Wood grain, and the ends of a log with bark: where the pith runs, and the knots. */
@@ -1760,8 +1783,11 @@ function turnOnFace(u: number, v: number, s: SurfaceTextureSettings, layout: Sur
   return [c1 + du * c + dv * sn, c2 - du * sn + dv * c];
 }
 
-/** The pattern's value at (u, v) of its plane; `axis`: the axis u runs along, x, y or z (-1 round a cylinder). */
-function patternValue(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number) {
+/**
+ * The pattern's value at (u, v) of its plane; `axis`: the axis u runs along, x, y or z (-1 round a cylinder). `face` tells
+ * the faces seen the same way apart, for bricks (see brickFrame).
+ */
+function patternValue(u: number, v: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout, axis: number, face = 0) {
   switch (s.pattern) {
     case "grooves":
       return stripe(u, v, layout.angle, layout.period, s);
@@ -1776,7 +1802,7 @@ function patternValue(u: number, v: number, s: SurfaceTextureSettings, layout: S
     case "cells":
       return surfaceFalloff(cellEdge(u, v, layout.cell, layout.around, s.seed) / ((layout.cell / 2) * s.width), s.profile);
     case "bricks":
-      return brickValue(u, v, s, layout, axis);
+      return brickValue(u, v, s, layout, axis, face);
     case "squares":
     case "triangles":
       return tileValue(u, v, s, layout, axis);
@@ -1880,23 +1906,108 @@ export function surfaceTextureValueAt(x: number, y: number, z: number, nx: numbe
     if (layout.flatCaps && Math.abs(nAx) > 0.8) {
       const rim = rimAt(layout, pos[ax], Math.sign(nAx));
       if (rim && (layout.capEdge === "over" || layout.capEdge === "fold")) return overValue(pos[i1], pos[i2], pos[ax], rim, s, layout);
-      value = ringsOnCaps(s, layout) ? capRingValue(pos[i1], pos[i2], s, layout) : patternValue(...turnOnFace(pos[i1], pos[i2], s, layout), s, layout, i1 + 3);
-    } else value = patternValue(aroundAngle(layout, pos[i1], pos[i2]) * layout.radius, pos[ax], s, layout, -1);
+      value = ringsOnCaps(s, layout) ? capRingValue(pos[i1], pos[i2], s, layout) : patternValue(...turnOnFace(pos[i1], pos[i2], s, layout), s, layout, i1 + 3, planeKey(pos[ax]));
+    } else value = patternValue(aroundAngle(layout, pos[i1], pos[i2]) * layout.radius, pos[ax], s, layout, -1, wallSide(pos, [nx, ny, nz], s, layout));
     if (layout.capEdge !== "bead") return value;
     return beadOver(value, surfaceTextureBeadAt(x, y, z, nAx, s, layout));
   }
   if (projection === "flat") {
     const [i1, i2] = acrossAxes(s.axis);
-    return patternValue(...turnOnFace(pos[i1], pos[i2], s, layout), s, layout, i1);
+    return patternValue(...turnOnFace(pos[i1], pos[i2], s, layout), s, layout, i1, planeKey(pos[AXIS_INDEX[s.axis]]));
   }
   // All round: three projections, weighted by the normal; the one along the axis turned (see faceTurn).
   const wx = nx ** 4, wy = ny ** 4, wz = nz ** 4;
   const sum = wx + wy + wz || 1;
   const ax = AXIS_INDEX[s.axis];
-  const along = (k: number, u: number, v: number, uAxis: number) => (k === ax ? patternValue(...turnOnFace(u, v, s, layout), s, layout, uAxis) : patternValue(u, v, s, layout, uAxis));
+  const along = (k: number, u: number, v: number, uAxis: number) => (k === ax ? patternValue(...turnOnFace(u, v, s, layout), s, layout, uAxis, planeKey(pos[k])) : patternValue(u, v, s, layout, uAxis, planeKey(pos[k])));
   // Seen along z, a top or bottom: its bricks fitted of its own (see SurfaceTextureLayout.capBricks).
   // A projection without weight is not asked for (on a box's face two of three).
   return ((wx > 0 ? wx * along(0, y, z, 1) : 0) + (wy > 0 ? wy * along(1, x, z, 0) : 0) + (wz > 0 ? wz * along(2, x, y, 3) : 0)) / sum;
+}
+
+/** A face seen along an axis, told apart from the others seen that way by where it lies along it (to a thousandth of a mm). */
+function planeKey(at: number) {
+  return Math.round(at * 1000);
+}
+
+/** Round the axis: 1 on a wall facing away from it, -1 on one facing it (a cup's inside). */
+function wallSide(pos: number[], normal: number[], s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
+  const [i1, i2] = acrossAxes(s.axis);
+  return (pos[i1] - layout.center[0]) * normal[i1] + (pos[i2] - layout.center[1]) * normal[i2] >= 0 ? 1 : -1;
+}
+
+/**
+ * Where a point lies in the bricks' plane, as surfaceTextureValueAt sees it: (u, v), the axis u runs along and the face
+ * (see planeKey, wallSide) - all round in the projection its normal looks along most.
+ */
+function brickFrame(x: number, y: number, z: number, nx: number, ny: number, nz: number, s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
+  const pos = [x, y, z], normal = [nx, ny, nz];
+  const projection = s.projection === "auto" ? layout.projection : s.projection;
+  if (projection === "cylinder") {
+    const ax = AXIS_INDEX[s.axis];
+    const [i1, i2] = acrossAxes(s.axis);
+    if (layout.flatCaps && Math.abs(normal[ax]) > 0.8) return { u: pos[i1], v: pos[i2], axis: i1 + 3, face: planeKey(pos[ax]) };
+    return { u: aroundAngle(layout, pos[i1], pos[i2]) * layout.radius, v: pos[ax], axis: -1, face: wallSide(pos, normal, s, layout) };
+  }
+  if (projection === "flat") {
+    const [i1, i2] = acrossAxes(s.axis);
+    return { u: pos[i1], v: pos[i2], axis: i1, face: planeKey(pos[AXIS_INDEX[s.axis]]) };
+  }
+  const k = Math.abs(nx) >= Math.abs(ny) && Math.abs(nx) >= Math.abs(nz) ? 0 : Math.abs(ny) >= Math.abs(nz) ? 1 : 2;
+  return k === 0 ? { u: y, v: z, axis: 1, face: planeKey(x) } : k === 1 ? { u: x, v: z, axis: 0, face: planeKey(y) } : { u: x, v: y, axis: 3, face: planeKey(z) };
+}
+
+/**
+ * Bricks: the head joints a border would leave as stubs (reported in the Facebook group: short ticks along the top under
+ * a roof, above the bottom and round windows). The courses are fitted from the body's bottom to its top (see
+ * fitBrickCourses), but the pattern ends a border's width away from what stays smooth - the top and the bottom, a
+ * window's lintel and sill, a picked face's edge (see weightsFor). A course the border cuts to less than BRICK_SLIVER of
+ * its height there showed its head joints as ticks with no joint above them: those are not there, it stays a plain strip
+ * beside the border, and the joint between the courses marks where the bricks end. Likewise a piece of a brick the border
+ * leaves shorter than BRICK_SLIVER of the course's height (the ticks were the joints above and below it) keeps no head
+ * joint towards the brick beside it, which runs on to the border; a longer piece stays as it is, as at a round top's rim.
+ * Measured per head joint and per brick from the points the pattern reaches (`weights` of at least a half) and those it
+ * does not; where it reaches all of them, nothing changes. Keys as headJointKey; `directions`: the normals the values are
+ * taken with.
+ */
+function brickJointsOff(mesh: SurfaceMesh, weights: Float32Array | Float64Array, directions: Float64Array, s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
+  const v = mesh.vertices;
+  const n = v.length / 3;
+  /** Per head joint how far up the course the pattern reaches along it, and whether a border cuts it; per brick along it. */
+  const joints = new Map<string, { cut: boolean; lo: number; hi: number; H: number }>();
+  const bricks = new Map<string, { cut: boolean; lo: number; hi: number; brick: ReturnType<typeof brickAt>; frame: ReturnType<typeof brickFrame>; hw: number }>();
+  const note = <T extends { cut: boolean; lo: number; hi: number }>(map: Map<string, T>, key: string, make: () => T, at: number, seen: boolean) => {
+    let entry = map.get(key);
+    if (!entry) map.set(key, (entry = make()));
+    if (!seen) entry.cut = true;
+    else {
+      entry.lo = Math.min(entry.lo, at);
+      entry.hi = Math.max(entry.hi, at);
+    }
+  };
+  for (let i = 0; i < n; i += 1) {
+    const frame = brickFrame(v[i * 3], v[i * 3 + 1], v[i * 3 + 2], directions[i * 3], directions[i * 3 + 1], directions[i * 3 + 2], s, layout);
+    const brick = brickAt(frame.u, frame.v, s, layout, frame.axis);
+    const hw = brickJointHalf(s, layout, frame.axis);
+    const seen = weights[i] >= 0.5;
+    const up = clamp(frame.v, brick.cy - brick.hh, brick.cy + brick.hh);
+    const make = () => ({ cut: false, lo: Infinity, hi: -Infinity, H: 2 * brick.hh });
+    if (frame.u - (brick.cx - brick.hl) <= hw) note(joints, headJointKey(brick, false, frame.axis, frame.face), make, up, seen);
+    if (brick.cx + brick.hl - frame.u <= hw) note(joints, headJointKey(brick, true, frame.axis, frame.face), make, up, seen);
+    const along = clamp(frame.u, brick.cx - brick.hl, brick.cx + brick.hl);
+    note(bricks, `${frame.axis}|${frame.face}|${brick.key}`, () => ({ cut: false, lo: Infinity, hi: -Infinity, brick, frame, hw }), along, seen);
+  }
+  const off = new Set<string>();
+  joints.forEach((joint, key) => {
+    if (joint.cut && joint.hi >= joint.lo && joint.hi - joint.lo < BRICK_SLIVER * joint.H) off.add(key);
+  });
+  bricks.forEach(({ cut, lo, hi, brick, frame, hw }) => {
+    if (!cut || !(hi >= lo) || hi - lo >= BRICK_SLIVER * 2 * brick.hh) return;
+    // The end the pattern reaches: the joint there goes, the brick beside running on into this piece.
+    if (lo <= brick.cx - brick.hl + hw) off.add(headJointKey(brick, false, frame.axis, frame.face));
+    else if (hi >= brick.cx + brick.hl - hw) off.add(headJointKey(brick, true, frame.axis, frame.face));
+  });
+  return off;
 }
 
 /* ------------------------------------------------------------------ */
@@ -6204,6 +6315,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     }
 
     const { mesh, directions, moves } = state;
+    // Bricks: no stubs of head joints where a border cuts a course or a brick down to a sliver (see brickJointsOff).
+    layout.brickJointsOff = s.pattern === "bricks" ? brickJointsOff(mesh, weights, directions, s, layout) : undefined;
     const v = mesh.vertices;
     const n = v.length / 3;
     const out = new Float64Array(v.length);
