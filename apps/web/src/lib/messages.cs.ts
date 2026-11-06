@@ -2236,6 +2236,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "inspector.wrapApply": "Obtočit",
   "inspector.surfaceTexture": "Povrchová textura",
   "inspector.surfacePattern": "Vzor",
+  "inspector.surfacePatternSearch": "Hledat vzor…",
+  "inspector.surfacePatternNone": "Žádný vzor s tímto názvem.",
   "inspector.surfaceSpacing": "Rozteč",
   "inspector.surfaceDepth": "Hloubka",
   "inspector.surfaceDirection": "Směr",
