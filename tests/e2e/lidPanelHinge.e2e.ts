@@ -43,6 +43,9 @@ const checkbox = (panel: HTMLElement, name: string) => [...panel.querySelectorAl
   .find((label) => label.textContent?.trim() === name)
   ?.querySelector<HTMLInputElement>("input[type=checkbox]") ?? null;
 const texts = (panel: HTMLElement) => panel.textContent ?? "";
+const slider = (panel: HTMLElement, name: string) => [...panel.querySelectorAll<HTMLLabelElement>("label.range-property")]
+  .find((row) => row.querySelector(".range-property-name")?.textContent === name)
+  ?.querySelector<HTMLInputElement>("input[type=range]") ?? null;
 
 describe("the lid's panel with a hinge", () => {
   it("offers a hinge and asks for its side, pin, clearance, pin play, knuckles and a printed pin once it is on", () => {
@@ -56,6 +59,8 @@ describe("the lid's panel with a hinge", () => {
     act(() => root?.unmount());
     const on = mount({ hinge: true });
     for (const label of ["Hinge side", "Pin diameter", "Hinge clearance", "Pin play (per side)", "Knuckles (0 = automatic)"]) expect(texts(on.panel)).toContain(label);
+    // The play is the lid's: in the body's knuckles the pin sits tight (#1220).
+    expect(texts(on.panel)).toContain("Only the lid's holes have this play, so the lid turns freely; in the body's holes the pin sits tight");
     expect(checkbox(on.panel, "Print the pin too")).not.toBeNull();
     // Teardrop holes are on to start with, and can be turned off.
     const teardrop = checkbox(on.panel, "Teardrop pin holes (no droop when printed)")!;
@@ -138,6 +143,29 @@ describe("the lid's panel with click bumps and a handle (#1234, #1230)", () => {
       expect(texts(refused.panel)).toContain("Not for a flat lid or pivot pins.");
       act(() => root?.unmount());
     }
+  });
+
+  it("asks how far the bumps reach into the wall only while they are on, 0.4 mm to begin with (#1220)", () => {
+    const off = mount();
+    expect(slider(off.panel, "Bump height")).toBeNull();
+    expect(texts(off.panel)).not.toContain("Less for a small box or a stiff lip");
+    act(() => root?.unmount());
+    const on = mount({ clickBumps: true });
+    const height = slider(on.panel, "Bump height")!;
+    expect(height).not.toBeNull();
+    expect(Number(height.value)).toBeCloseTo(0.4, 9);
+    expect([Number(height.min), Number(height.max), Number(height.step)]).toEqual([0.2, 0.8, 0.05]);
+    expect(texts(on.panel)).toContain("How far each bump reaches into the body's wall. Less for a small box or a stiff lip, more for a firmer click.");
+    act(() => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(height, "0.25");
+      height.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(Object.keys(on.changes.at(-1)!)).toEqual(["clickBumpHeight"]);
+    expect(on.changes.at(-1)!.clickBumpHeight).toBeCloseTo(0.25, 9);
+    act(() => root?.unmount());
+    // Not where the bumps are refused, though they are asked for.
+    const flat = mount({ type: "flat", clickBumps: true });
+    expect(slider(flat.panel, "Bump height")).toBeNull();
   });
 
   it("offers no handle, a pull tab or a finger notch, and none for a pivot lid", () => {

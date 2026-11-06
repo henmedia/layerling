@@ -60,6 +60,20 @@ Natisni ga, kot leži, nato potiskaj zatič s posnetim koncem naprej v luknje, o
 
 Od takrat nove uporabe začnejo z zračnostjo namesto z vgrajeno vrednostjo: {{ui:lid.gap}} in {{ui:lid.hingePinPlay}} v orodju {{ui:editor.tool.lid}}, zračnost novih oblik {{ui:shape.dovetail}} in {{ui:shape.snapFit}}, {{ui:prop.clearance}} nove matice ali navojne luknje – dvojna zračnost, saj je to prostor čez ves premer – in {{ui:clearance.threshold}} pri {{ui:editor.tool.clearance}}. Dokler tako polje še ima to vrednost, »{{ui:printerPlay.fromFitTest}}« ob njem pove, od kod je številka. Tečaj, natisnjen v enem kosu, in zgibi orodja {{ui:editor.tool.flexi}} obdržijo svojih 0,4 mm: ko so natisnjeni v enem kosu, morajo njihove reže ostati odprte tudi med plastmi, tega pa zatič, natisnjen posebej, ne izmeri. Prostor za vtis magneta ali ključa Gridfinity in prostor za kupljeno vtičnico ali ploščo prav tako obdržita svoje vrednosti. Telesa, ki so že v projektu, se nikoli ne spremenijo, in tudi projekt, ki ga odpreš, ne.
 
+## Preverjanje tiska
+
+{{ui:editor.tool.printCheck}} ob {{ui:editor.tool.clearance}} v skupini {{ui:editor.group.combine}} pregleda izbrane predmete ali vse vidne, če ni nič izbrano, in v enem oknu pove, kaj bi šlo pri tiskanju narobe. Vsaka od petih vrstic je zelena, če ni našla ničesar, in oranžna s tem, kaj in kje, če je:
+
+- **{{ui:printCheck.thin.title}}**: mesta, tanjša od dveh linij šobe - 0,8 mm pri šobi 0,4 mm. Slicer tako steno izpusti ali jo natisne kot eno šibko linijo. Na vrhu okna pri {{ui:printCheck.nozzle}} izberite svojo šobo (0,2 do 0,8 z enim klikom, katero koli drugo v polju). Tanka mesta se na telesih pobarvajo rdeče s svetlo mrežo, vrstica pa navede najtanjše mesto in koliko površine je pretanke. Mesta pod 1 mm² in ostri robovi, na primer rob klina, se ne štejejo.
+- **{{ui:printCheck.floating.title}}**: telo ali ločen del telesa, ki se ne dotika ne plošče ne drugega dela (do 0,05 mm natančno). Tiskal bi se v zraku. Del, ki leži na stoječem delu, je v redu.
+- **{{ui:printCheck.contact.title}}**: del na plošči, katerega prva plast je za njegovo višino zelo majhna, na primer krogla ali stožec na konici. Med tiskanjem se lahko odlepi. Opozorilo se pokaže pod 0,5 mm² naležne površine, izmerjene 0,1 mm nad ploščo, na vsak milimeter višine: krogla je vedno pod tem, kocka z 10 mm ima 10.
+- **{{ui:printCheck.overhang.title}}**: iste številke kot pri **Pokaži previse**, s kotom, ki je nastavljen tam.
+- **{{ui:printCheck.openMesh.title}}**: uvožena mreža z odprtimi robovi ali z robovi, ki si jih delijo tri ali več ploskev. Slicer mora pri taki mreži ugibati, kje je notranjost.
+
+![Pladenj, katerega desna stena je debela le 0,6 mm: Preveri tisk jo pobarva rdeče in jo navede v oknu.](shot:print-check)
+
+{{ui:printCheck.show}} v vrstici pripelje kamero tja; izbere lebdeče dele, dele z majhnim stikom in odprte mreže, pri previsih pa vklopi **Pokaži previse**. Telesa, ki se prekrivajo, se preverijo združena, kot jih združi slicer. Če model spremenite, medtem ko je okno odprto, se pokaže {{ui:printCheck.stale}}; kliknite to ali {{ui:printCheck.checkAgain}}. [[Esc]] zapre okno. Na modelu se nič ne spremeni. UI naredi isto preverjanje z `layerling_check_print`.
+
 ## Ko gre zares
 
 Izberi {{ui:editor.export}} in potem **STL** ali **3MF**. STL je najpreprostejša oblika. 3MF obdrži imena in barve posameznih teles, zato je praktičen, če tiskaš z več barvami. V oknu za izvoz vidiš tudi, koliko gramov in metrov filamenta bi del potreboval, če bi bil poln. Več v poglavju [Datoteke in shranjevanje](chapter:datoteke-in-shranjevanje).

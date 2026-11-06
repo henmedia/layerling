@@ -60,6 +60,20 @@ Nyomtasd ki úgy, ahogy fekszik, aztán told a csapot letört végével előre a
 
 Ettől kezdve az új használatok a beépített érték helyett ebből a hézagból indulnak: a(z) {{ui:lid.gap}} és a(z) {{ui:lid.hingePinPlay}} a(z) {{ui:editor.tool.lid}} eszközben, egy új {{ui:shape.dovetail}} és {{ui:shape.snapFit}} hézaga, egy új anya vagy menetes furat {{ui:prop.clearance}} értéke – a hézag kétszerese, mert az a teljes átmérőre jutó hely –, valamint a(z) {{ui:clearance.threshold}} a(z) {{ui:editor.tool.clearance}} eszközben. Amíg egy ilyen mező még ezt az értéket tartja, a mellette álló „{{ui:printerPlay.fromFitTest}}” megmondja, honnan jön a szám. Az egyben nyomtatott zsanér és a(z) {{ui:editor.tool.flexi}} eszköz ízületei megtartják a 0,4 mm-t: egy darabban nyomtatva a réseiknek a rétegek között is nyitva kell maradniuk, ezt pedig egy külön nyomtatott csap nem méri. A mágnes vagy Gridfinity-kulcs bepréseléséhez szükséges hely és a megvásárolt aljzatnak vagy lapnak hagyott hely is megtartja a saját értékét. A tervben már meglévő testek sosem változnak, és az a terv sem, amelyet megnyitsz.
 
+## A nyomtatás ellenőrzése
+
+A {{ui:editor.tool.printCheck}} a {{ui:editor.group.combine}} csoportban, a {{ui:editor.tool.clearance}} mellett megnézi a kijelölt objektumokat, vagy ha nincs kijelölés, az összes láthatót, és egy ablakban megmondja, mi romlana el nyomtatáskor. Öt sora közül az zöld, amelyik nem talált semmit, és narancssárga, azzal együtt, hogy mit és hol, amelyik talált:
+
+- **{{ui:printCheck.thin.title}}**: a fúvóka két vonalánál vékonyabb helyek - 0,4 mm-es fúvókánál 0,8 mm. A szeletelő az ilyen falat kihagyja, vagy egyetlen gyenge vonalként nyomtatja ki. Az ablak tetején, a {{ui:printCheck.nozzle}} résznél válaszd ki a fúvókádat (0,2-től 0,8-ig egy kattintással, bármely mást a mezőben). A vékony helyeket a testeken piros színnel, világos ráccsal jelöli, a sor pedig megadja a legvékonyabb helyet és azt, mekkora felület túl vékony. Az 1 mm²-nél kisebb helyek és az éles élek, például egy ék éle, kimaradnak.
+- **{{ui:printCheck.floating.title}}**: egy test vagy egy test különálló része, amely sem a tálcához, sem más alkatrészhez nem ér hozzá (0,05 mm-en belül). A levegőben nyomtatódna. Az az alkatrész, amely egy álló alkatrészen fekszik, rendben van.
+- **{{ui:printCheck.contact.title}}**: a tálcán álló alkatrész, amelynek első rétege a magasságához képest nagyon kicsi, például egy gömb vagy egy hegyén álló kúp. Nyomtatás közben leválhat. A figyelmeztetés 0,5 mm² alatti talpfelületnél jelenik meg magasságmilliméterenként, a tálca felett 0,1 mm-rel mérve: egy gömb mindig ez alatt van, egy 10 mm-es kocka 10-et ad.
+- **{{ui:printCheck.overhang.title}}**: ugyanazok a számok, mint a **Túlnyúlások mutatása** esetén, az ott beállított szöggel.
+- **{{ui:printCheck.openMesh.title}}**: importált háló nyitott élekkel, vagy olyan élekkel, amelyeken három vagy több lap osztozik. A szeletelőnek ilyenkor találgatnia kell, hol van a belseje.
+
+![Egy tálca, amelynek jobb fala csak 0,6 mm vastag: a nyomtatás ellenőrzése pirosra festi, és megnevezi az ablakban.](shot:print-check)
+
+Egy sor {{ui:printCheck.show}} gombja odaviszi a kamerát; kijelöli a lebegő alkatrészeket, a kevés felületen állókat és a nyitott hálókat, a túlnyúlásoknál pedig bekapcsolja a **Túlnyúlások mutatása** nézetet. Az egymásba érő testeket egyesítve ellenőrzi, ahogy a szeletelő is egyesíti őket. Ha az ablak nyitva van, miközben a tervet módosítod, megjelenik a {{ui:printCheck.stale}} felirat; kattints rá vagy a {{ui:printCheck.checkAgain}} gombra. Az [[Esc]] bezárja az ablakot. A tervben semmi sem változik. Egy MI ugyanezt az ellenőrzést a `layerling_check_print` eszközzel végzi.
+
 ## Ha kész vagy
 
 Válaszd az {{ui:editor.export}} lehetőséget, majd az **STL** vagy a **3MF** formátumot. Az STL a legegyszerűbb formátum. A 3MF megtartja az egyes testek nevét és színét, ezért hasznos, ha több színnel nyomtatsz. Az exportálási ablak azt is mutatja, hány gramm és méter filament kellene az alkatrészhez tömören nyomtatva. Bővebben a [Fájlok és mentés](chapter:files-and-saving) fejezetben.

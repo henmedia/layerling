@@ -139,6 +139,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_estimate_print` | schätzt Volumen, Gewicht und Filament für die Auswahl oder den ganzen Entwurf: für einen massiven Körper und als grobe Schätzung mit Wänden und Füllung wie im Exportfenster |
 | `layerling_check_clearance` | prüft vor dem Druck, welche Teile sich überschneiden, berühren oder näher kommen als ein Mindestspiel (Spiel prüfen), auch die getrennten Teile eines Objekts |
 | `layerling_printer_play` | liest, setzt oder löscht das Spiel deines Druckers ({{ui:workspace.printerPlay}} in den Einstellungen) und legt die Passprobe an, die es misst |
+| `layerling_check_print` | prüft vor dem Druck, was schiefginge: zu dünne Wände für die Düse, schwebende Teile, wenig Halt auf der Platte, Überhänge und offene Netze (Druck prüfen) |
 | `layerling_add_reference_points` | setzt Bezugspunkte - auf Mitte, Ecken oder Kantenmitten von Objekten oder an genauen Stellen -, an denen Formen einrasten |
 | `layerling_list_reference_points` | listet die Bezugspunkte mit Kennung und Lage auf |
 | `layerling_remove_reference_points` | löscht Bezugspunkte nach Kennung oder alle |
@@ -158,7 +159,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_delete_custom_shape` | entfernt eine eigene Form; eingesetzte Körper bleiben |
 | `layerling_show_workplane` | blendet die Platte mit ihrem Gitter aus und wieder ein, etwa für ein Bild der Unterseite (nur die Ansicht) |
 | `layerling_set_section_view` | schneidet die Ansicht entlang einer Ebene auf, um ins Innere zu sehen (nur die Ansicht, nichts wird zerteilt) |
-| `layerling_measurements` | blendet die Messungen des Maßbands ein oder aus und listet sie mit ihren Längen auf; dazu die Maße um die Auswahl, wie [[Q]] |
+| `layerling_measurements` | blendet die Messungen des Maßbands ein oder aus und listet sie mit ihren Längen auf; dazu die Maße um die Auswahl, wie [[Q]]; tippt auch eine Länge für eine Messung ein, die den Körper an ihrem Ende verschiebt wie ein Klick auf ihre Zahl |
 | `layerling_measure_angle` | misst einen Winkel wie der Winkelmesser: an der Ecke von drei Punkten oder zwischen zwei ebenen Flächen, und zeigt ihn in der Ansicht |
 | `layerling_saved_view` | speichert die aktuelle Ansicht unter der Taste 7, 8, 9 oder 0 und holt sie zurück, wie Umschalt+Taste und die Taste (nur die Ansicht); setzt auch die Startansicht neuer Entwürfe |
 | `layerling_build_plates` | listet, fügt hinzu, benennt, sortiert und entfernt die Druckplatten, setzt Objekte auf eine Platte und verteilt sie auf die Platten, wie die Plattenleiste |

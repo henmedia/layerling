@@ -169,6 +169,8 @@ Skal et mønster, en logo eller bogstaver på en kop, en dåse eller et rør? L�
 2. Klik på {{ui:inspector.wrapApply}}. Hvad der løb fra venstre til højre løber nu rundt om cylinderen, bagkanten bliver toppen, og tykkelsen står ud af væggen.
 3. Vælg den viklede form og cylinderen og centrér begge, venstre mod højre og for mod bag. Midten af den viklede form er cylinderens akse, så det sidder så præcis på væggen.
 
+Ethvert legeme kan vikles, også en form fra biblioteket: for eksempel et rundt tag, der skal sidde på væggen af et rundt tårn. Læg det på pladen, som det skal se ud på væggen, med den runde top bagud.
+
 Til en gravering, slå {{ui:inspector.wrapInward}} til: tykkelsen går så ind i væggen. Gør formen til et hul, centrér den og gruppér den med cylinderen.
 
 En form der allerede er viklet, er et mesh af det viklede og kan ikke vikles igen: fortryd viklingen, eller vikl den flade original igen med en anden diameter.

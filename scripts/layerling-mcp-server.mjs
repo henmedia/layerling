@@ -220,6 +220,8 @@ async function callTool(name, args) {
       return bridgeCommand("check_clearance", args, 180000);
     case "layerling_printer_play":
       return bridgeCommand("printer_play", args, 60000);
+    case "layerling_check_print":
+      return bridgeCommand("check_print", args, 180000);
     case "layerling_add_reference_points":
       return bridgeCommand("add_reference_points", args);
     case "layerling_list_reference_points":

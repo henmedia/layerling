@@ -26,6 +26,7 @@ import { automaticSideCount } from "@/lib/roundSideCount";
 import { torusTessellation } from "@/lib/torusTessellation";
 import { printerPresetById } from "@/lib/printBed";
 import { PRINTER_PRESETS } from "@/lib/printerPresets.generated";
+import { maxDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import {
   DEFAULT_THREAD_CLEARANCE,
   DEFAULT_THREAD_BOLT_CLEARANCE,
@@ -451,7 +452,7 @@ function specialFieldsForShape(
   }
   if (kind === "dovetail") {
     return [
-      { type: "number", key: "dovetailNeckWidth", label: t("prop.dovetailNeckWidth"), defaultValue: defaults.dovetailNeckWidth ?? dimensions.width / 2, min: 0.1, max: Math.max(0.2, dimensions.width * 0.95), unit: "mm" },
+      { type: "number", key: "dovetailNeckWidth", label: t("prop.dovetailNeckWidth"), defaultValue: defaults.dovetailNeckWidth ?? dimensions.width / 2, min: 0.1, max: maxDovetailNeckWidth(dimensions.width), unit: "mm" },
       { type: "number", key: "dovetailClearance", label: t("prop.dovetailClearance"), defaultValue: defaults.dovetailClearance ?? 0.2, min: 0, max: 2, step: 0.05, unit: "mm" },
     ];
   }

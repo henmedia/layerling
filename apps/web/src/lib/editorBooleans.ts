@@ -2544,18 +2544,33 @@ function splitBentTubeBore(shape: WorkplaneShape): WorkplaneShape[] {
   const boreSize = sides === 0 ? 2 * radii.inner : 2 * radii.inner * Math.cos(Math.PI / sides);
   const { tubeBoreHole: _flag, ...rest } = shape;
   const solid = { ...rest, ...bentTubeParameterPatch(shape, { bentTubeInnerProfile: "none" }) };
+  const boreChanges = { bentTubeProfile: settings.innerProfile, bentTubeInnerProfile: "none" as const, bentTubeSize: boreSize };
+  // Where the opening goes is worked out on the pipe lying flat, unturned and unmirrored. There the patch keeps its start
+  // where the pipe starts, and its box shares its middle with the pipe's in height, the thickness of the pipe; otherwise it
+  // lies a wall lower and cuts through the bottom (#892). A standing or tipped pipe has a leg and its bend in its height, so
+  // the middle of its box is not the middle of the pipe: the opening ended short of the top end and closed it (#1367).
+  // The shift found lying flat is turned and mirrored as the pipe is.
+  const { mirrorX: _mirrorX, mirrorY: _mirrorY, mirrorZ: _mirrorZ, ...unmirrored } = rest;
+  const flat: WorkplaneShape = { ...unmirrored, rotation: 0, rotationX: 0, rotationZ: 0 };
+  const flatSolid = { ...flat, ...bentTubeParameterPatch(flat, { bentTubeInnerProfile: "none" }) };
+  const flatBore = { ...flat, ...bentTubeParameterPatch(flat, boreChanges) };
+  const solidBox = boundsForShapesOfVertices([flatSolid]);
+  const boreBox = boundsForShapesOfVertices([flatBore]);
+  const middleOf = (part: WorkplaneShape, centreY: number) => new THREE.Vector3(part.x, centreY, part.z);
+  const shift = middleOf(flatBore, (boreBox.minY + boreBox.maxY) / 2)
+    .sub(middleOf(flatSolid, (solidBox.minY + solidBox.maxY) / 2))
+    .setY(0)
+    .multiply(new THREE.Vector3(mirrorSign(shape.mirrorX), mirrorSign(shape.mirrorY), mirrorSign(shape.mirrorZ)))
+    .applyQuaternion(quaternionForShape(shape));
   const bore = {
     ...rest,
-    ...bentTubeParameterPatch(shape, { bentTubeProfile: settings.innerProfile, bentTubeInnerProfile: "none", bentTubeSize: boreSize }),
+    ...bentTubeParameterPatch(shape, boreChanges),
     id: derivedLocalId(shape.id, "bore"),
     hole: true,
   };
-  // The patch keeps the underside where it was, as it should when the size is changed in the panel; the opening has to sit in
-  // the middle of the pipe instead, or it lies a wall lower and cuts through the bottom of the pipe (#892). Its box and the
-  // pipe's share their middle, lying, standing or tipped.
-  const solidBox = boundsForShapesOfVertices([solid]);
-  const boreBox = boundsForShapesOfVertices([bore]);
-  bore.elevation = (bore.elevation ?? 0) + (solidBox.minY + solidBox.maxY) / 2 - (boreBox.minY + boreBox.maxY) / 2;
+  bore.x = solid.x + shift.x;
+  bore.z = solid.z + shift.z;
+  bore.elevation = (solid.elevation ?? 0) + solid.height / 2 + shift.y - bore.height / 2;
   return [solid, bore];
 }
 
@@ -2587,12 +2602,20 @@ function expandGroupsForBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
       return [shape];
     }
     return shape.groupedShapes?.length ? restoreGroupedChildren(shape) : [shape];
-  }).flatMap(splitBoreTube);
+  }).flatMap(splitBoreTube).filter(shownInCut);
+}
+
+/**
+ * A part hidden inside a group stays one of its parts, but it is not cut and not cut with (#1323): the group's
+ * body is what is shown, as the plain group and the export already had it. A hidden ring came back on Done.
+ */
+function shownInCut(shape: WorkplaneShape) {
+  return !shape.hidden;
 }
 
 function expandGroupsForBoxBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
   // An intersection or a hull is not the sum of its parts: opened, a hull of four boxes would be cut as the four boxes (#863).
-  return selection.flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube);
+  return selection.flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube).filter(shownInCut);
 }
 
 function canUseBoxBoolean(selection: WorkplaneShape[]) {

@@ -69,12 +69,14 @@ import {
   normalizeThreadClearance,
   normalizeThreadBoltClearance,
   normalizeThreadAxialClearance,
+  normalizeThreadStarts,
   normalizeThreadDepth,
   normalizeThreadFlankAngle,
   threadDepthLimits,
   MIN_THREAD_FLANK_ANGLE,
   MAX_THREAD_FLANK_ANGLE,
   threadAxialClearanceLimit,
+  threadStartsLimit,
   MIN_THREAD_BOLT_CLEARANCE,
   MAX_THREAD_BOLT_CLEARANCE,
   normalizeThreadDiameter,
@@ -177,7 +179,7 @@ import { numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { displayShapeName, makeShapeFromAsset, renamedShapeName, shapeAssetDefaultDimensions } from "@/lib/shapeCatalog";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
-import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
+import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { SURFACE_TEXTURE_OWN_IMAGE_SIZE, surfaceTextureOwnImage } from "@/lib/surfaceTextureImages";
 import { BARK_STARTS, WOOD_RINGS } from "@/lib/surfaceTextureWood";
 import { offersSurfaceTextureMask, SURFACE_TEXTURE_LABELS, surfacePatternLabel, surfaceTextureEntry, surfaceTextureLayerPlaced } from "@/lib/surfaceTextureShape";
@@ -192,7 +194,7 @@ import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, normalizeScrewHoleAngle, normalizeScrewHoleHeadDepth, normalizeScrewHoleShaft } from "@/lib/screwHoleGeometry";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
-import { MAX_DOVETAIL_CLEARANCE, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
+import { MAX_DOVETAIL_CLEARANCE, maxDovetailNeckWidth, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_EDGE, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { MAX_TEXT_EDGE, MIN_TEXT_EDGE, normalizeTextEdge } from "@/lib/textEdge";
 import { wheelBaseStep, wheelNextValue, wheelTurn } from "@/lib/wheelValueStep";
@@ -205,6 +207,7 @@ import { DEFAULT_TEXT_BLOCK_GAP, MAX_TEXT_BLOCK_GAP, MAX_TEXT_BLOCK_LINES, MAX_T
 import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, removeTextLayer, textBaselineKeepShift, textLetterSize, textLetterSizePatch, textKerningPatch, textSpacingPatch, type NameTagStack } from "@/lib/nameTag";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { FontPicker } from "@/components/workplane/FontPicker";
+import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
 import { MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
@@ -2259,7 +2262,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         label: t("prop.dovetailNeckWidth"),
         value: neck,
         min: 0.1,
-        max: Math.max(0.2, width * 0.95),
+        max: maxDovetailNeckWidth(width),
         step: 0.1,
         onChange: (value) => onUpdate({ dovetailNeckWidth: normalizeDovetailNeckWidth(value, width) }),
       },
@@ -2812,6 +2815,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       next.clearance = normalizeThreadClearance(next.clearance);
       next.boltClearance = normalizeThreadBoltClearance(next.boltClearance);
       next.axialClearance = normalizeThreadAxialClearance(next.axialClearance, next.pitch);
+      // A size from the menu is one thread (#1348); otherwise the starts stay, as far as the new measures allow.
+      next.starts = normalizeThreadStarts(patch.starts ?? (patch.taper || next.taper ? 1 : next.starts), next.diameter, next.pitch, next.taper);
       // The own profile keeps its proportions when the pitch changes: the depth goes with it, unless it is set in the same step.
       if (patch.pitch !== undefined && patch.depth === undefined && settings.profile === "custom") next.depth = settings.depth * (next.pitch / settings.pitch);
       next.flankAngle = normalizeThreadFlankAngle(next.flankAngle);
@@ -2858,6 +2863,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         threadTaper: next.taper ? true : undefined,
         threadDiameter: next.diameter,
         threadPitch: next.pitch,
+        threadStarts: next.starts > 1 ? next.starts : undefined,
         threadClearance: next.clearance,
         threadBoltClearance: next.boltClearance,
         threadAxialClearance: next.axialClearance,
@@ -2939,7 +2945,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           // Eine G-Groesse bringt ihr Whitworth-Profil mit, eine M-, UNC- oder
           // UNF-Groesse das Spitzgewinde, ein Flaschenhals sein eigenes Profil;
           // Trapez und Rund bleiben stehen.
-          if (chosen) applyThread(threadSizeSettings(chosen, settings.profile, standard));
+          if (chosen) applyThread({ ...threadSizeSettings(chosen, settings.profile, standard), starts: 1 });
         },
       },
       {
@@ -3065,13 +3071,27 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         }
         : {
           id: "pitch",
-          label: t("prop.pitch"),
+          // With several starts (#1348) this is the distance from thread to thread, not how far one climbs.
+          label: t(settings.starts > 1 ? "prop.threadDivision" : "prop.pitch"),
           value: settings.pitch,
           min: pitchLimits.min,
           max: pitchLimits.max,
           step: 0.05,
           onChange: (pitch) => applyThread({ pitch }),
         },
+      // Starts (#1348): threads side by side, as on a lead screw. A tapered thread has one.
+      ...(settings.taper ? [] : [{
+        id: "threadStarts",
+        label: t("prop.threadStarts"),
+        value: settings.starts,
+        min: 1,
+        max: threadStartsLimit(settings.diameter, settings.pitch),
+        step: 1,
+        hint: settings.starts > 1
+          ? t("thread.startsLeadHint", { lead: (settings.pitch * settings.starts).toLocaleString(numberLocale()), starts: settings.starts, pitch: settings.pitch.toLocaleString(numberLocale()) })
+          : t("thread.startsHint"),
+        onChange: (starts: number) => applyThread({ starts: Math.round(starts) }),
+      }]),
       {
         type: "select",
         id: "threadHand",
@@ -4159,7 +4179,7 @@ export function ShapeInspector({
   const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
   const textFillEnd = primaryProperties.reduce((end, property, index) => (TEXT_FILL_IN_VIEW_IDS.has(property.id) ? index + 1 : end), 0);
   const threadProperties = isThread
-    ? properties.filter((property) => ["pitch", "threadsPerInch", "threadHand", "threadProfile", "threadTaper", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
+    ? properties.filter((property) => ["pitch", "threadsPerInch", "threadStarts", "threadHand", "threadProfile", "threadTaper", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
     : [];
   const gearTeethProperties = shape.kind === "gear"
     ? properties.filter((property) => ["gearProfile", "teeth", "gearModule", "gearPressureAngle", "gearBacklash", "gearRim", "toothSize", "toothWidth"].includes(property.id))
@@ -6472,14 +6492,7 @@ export function SurfaceTextureCard({
                 </div>
               ) : null}
               {layers.length > 1 ? <p className="cylinder-wrap-hint">{t("inspector.surfaceLayersHint")}</p> : null}
-              <SelectProperty
-                type="select"
-                label={t("inspector.surfacePattern")}
-                value={settings.pattern}
-                options={options(SURFACE_TEXTURE_PATTERNS, (value) => t(SURFACE_TEXTURE_LABELS.pattern[value]))}
-                disabled={disabled || busy}
-                onChange={(value) => set(surfaceSettingsForPattern(settings, value as SurfaceTexturePattern))}
-              />
+              <SurfacePatternPicker value={settings.pattern} disabled={disabled || busy} onChange={(value) => set(surfaceSettingsForPattern(settings, value))} />
               {cracks ? (
                 <>
                   <SelectProperty
