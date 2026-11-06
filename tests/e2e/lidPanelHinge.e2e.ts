@@ -106,6 +106,28 @@ describe("the lid's panel with a hinge", () => {
     expect(texts(pivot.panel)).not.toContain("Knuckles (0 = automatic)");
   });
 
+  it("offers end plugs with a flush hinge only, off to begin with, and says what they do once on (Discussion #1387)", () => {
+    for (const hingeStyle of ["outside", "pivot"] as const) {
+      const other = mount({ hinge: true, hingeStyle, hingeEndPlugs: true });
+      expect(checkbox(other.panel, "End plugs"), hingeStyle).toBeNull();
+      expect(texts(other.panel)).not.toContain("so the pin stays hidden and cannot slide out");
+      act(() => root?.unmount());
+    }
+    const off = mount({ hinge: true, hingeStyle: "flush" });
+    const plugs = checkbox(off.panel, "End plugs")!;
+    expect(plugs).not.toBeNull();
+    expect(plugs.checked).toBe(false);
+    expect(texts(off.panel)).not.toContain("so the pin stays hidden and cannot slide out");
+    act(() => plugs.click());
+    expect(off.changes.at(-1)).toEqual({ hingeEndPlugs: true });
+    act(() => root?.unmount());
+    const on = mount({ hinge: true, hingeStyle: "flush", hingeEndPlugs: true });
+    expect(checkbox(on.panel, "End plugs")!.checked).toBe(true);
+    expect(texts(on.panel)).toContain("A square plug closes each end of the pin's hole, flush with the outside of the box, so the pin stays hidden and cannot slide out. Push the pin in first, then press in the plugs.");
+    act(() => checkbox(on.panel, "End plugs")!.click());
+    expect(on.changes.at(-1)).toEqual({ hingeEndPlugs: false });
+  });
+
   it("goes with a lid that pushes in or a flat one, and says so for one with a rim round the outside", () => {
     const cap = mount({ type: "cap", hinge: true });
     const hinge = checkbox(cap.panel, "Hinge")!;

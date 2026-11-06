@@ -8654,14 +8654,20 @@ export function LayerlingEditor({
       : hinge
       ? hinge.style === "pivot"
         ? t("status.lidMadePivot", { pin })
-        : t(magnetCount ? "status.lidMadeHingeMagnets" : hinge.style === "flush" ? "status.lidMadeHingeFlush" : "status.lidMadeHinge", { type, count: hinge.count, pin, magnets: magnetCount })
+        : hinge.pinLength !== null
+          // With end plugs the pin is shorter than the hinge: how long it is, for a piece of filament cut to fit.
+          ? t("status.lidMadeHingeFlushPlugs", { type, count: hinge.count, pin, length: (Math.round(hinge.pinLength * 10) / 10).toLocaleString(numberLocale()) })
+          : t(magnetCount ? "status.lidMadeHingeMagnets" : hinge.style === "flush" ? "status.lidMadeHingeFlush" : "status.lidMadeHinge", { type, count: hinge.count, pin, magnets: magnetCount })
       : magnetCount
         ? t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: magnetCount })
         : t("status.lidMade", { type });
-    commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : [])], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
+    commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : []), ...(hinge?.plugs ? [hinge.plugs] : [])], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
     return {
       ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: magnetCount, posts: posts.length > 0, clickBumps: result.clickBumps?.count ?? 0, handle,
-      ...(hinge ? { hinge: { knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null } } : {}),
+      ...(hinge ? { hinge: {
+        knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null,
+        plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
+      } } : {}),
       ...(screw ? { screw: { pitch: screw.pitch, turns: screw.turns, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000 } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);
@@ -8689,13 +8695,14 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    // Click bumps and a handle the panel shows switched off (a flat lid, a pivot lid) are not asked for, nor magnets and
-    // a hinge with a screw lid.
+    // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
+    // are not asked for, nor magnets and a hinge with a screw lid.
     const extras = lidTakesExtras(lidTool);
     void makeLid({
       type, thickness, gap, depth, wall, magnets: magnets && extras, magnetDiameter, magnetHeight, magnetGap, hinge: hinge && extras, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
+      hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
       clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns,
     }, targets).then((result) => {
       if (result.ok) setLidTool(null);
@@ -13802,6 +13809,7 @@ export function LayerlingEditor({
           hingeSide: params.hingeSide,
           hingeTeardrop: params.hingeTeardrop,
           hingeStyle: params.hingeStyle,
+          hingeEndPlugs: params.hingeEndPlugs,
           clickBumps: params.clickBumps,
           clickBumpHeight: params.clickBumpHeight,
           handle: params.handle,
@@ -13813,10 +13821,14 @@ export function LayerlingEditor({
         if (!("bodyId" in result)) return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, ...(result.handle !== "none" ? { handle: result.handle } : {}) };
         const body = currentShapes().find((shape) => shape.id === result.bodyId);
         const pin = "hinge" in result && result.hinge?.pinId ? currentShapes().find((shape) => shape.id === result.hinge!.pinId) : null;
+        const plugs = "hinge" in result && result.hinge?.plugsId ? currentShapes().find((shape) => shape.id === result.hinge!.plugsId) : null;
         return {
           object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, body: body ? mcpShapeSummary(body) : { id: result.bodyId }, magnets: result.magnets, posts: result.posts,
           ...(result.clickBumps ? { clickBumps: result.clickBumps } : {}), ...(result.handle !== "none" ? { handle: result.handle } : {}),
-          ...("hinge" in result && result.hinge ? { hinge: { knuckles: result.hinge.knuckles, pins: result.hinge.pins, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, style: result.hinge.style, pin: pin ? mcpShapeSummary(pin) : null } } : {}),
+          ...("hinge" in result && result.hinge ? { hinge: {
+            knuckles: result.hinge.knuckles, pins: result.hinge.pins, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, style: result.hinge.style, pin: pin ? mcpShapeSummary(pin) : null,
+            ...(result.hinge.pinLength !== null ? { endPlugs: plugs ? mcpShapeSummary(plugs) : { id: result.hinge.plugsId }, pinLength: Math.round(result.hinge.pinLength * 100) / 100 } : {}),
+          } } : {}),
           ...("screw" in result && result.screw ? { screw: result.screw } : {}),
         };
       }
