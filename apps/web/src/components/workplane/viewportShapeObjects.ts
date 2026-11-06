@@ -49,7 +49,7 @@ import { groundFootprintForFrame, type SelectionFrame } from "@/lib/liftGeometry
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
-import { positionsForTwist, twistBandCount } from "@/lib/heightSlices";
+import { bandLevels, positionsForTwist, twistBandCount, twistEdgeLength } from "@/lib/heightSlices";
 import { toCreasedNormals } from "@/lib/creasedNormals";
 import { shapeHasAlongDeform, slopePositions } from "@/lib/slopeAlong";
 import { DEFAULT_EDGE_LINE_COLOR } from "@/lib/workplaneGrid";
@@ -2607,6 +2607,39 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
   const centerX = (baseBounds.min.x + baseBounds.max.x) / 2;
   const centerZ = (baseBounds.min.z + baseBounds.max.z) / 2;
   const deformed = shapeHasExtrudeDeform(shape);
+  const deformPoint = (point: THREE.Vector3) => {
+    const normalizedHeight = (point.y - baseBounds.min.y) / height;
+    const widthScale = shapeTaperScaleAt(shape, normalizedHeight, "width");
+    const depthScale = shapeTaperScaleAt(shape, normalizedHeight, "depth");
+    point.x = centerX + (point.x - centerX) * widthScale;
+    point.z = centerZ + (point.z - centerZ) * depthScale;
+    if (deformed) {
+      const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
+      const cos = Math.cos(deform.twistRadians);
+      const sin = Math.sin(deform.twistRadians);
+      const relativeX = point.x - centerX;
+      const relativeZ = point.z - centerZ;
+      point.x = centerX + relativeX * cos - relativeZ * sin + deform.offsetX;
+      point.z = centerZ + relativeX * sin + relativeZ * cos + deform.offsetZ;
+    }
+  };
+  // A twist needs vertices partway up to turn, as on a single body (#184): the parts are cut into
+  // the same bands as the group's mesh (meshForShape). Turned at their ends only, the legs of a
+  // twisted bundle stayed straight bars, the bundle was drawn narrower than it is, and grouped
+  // with plates the plates were stretched to fill its true width (#1419).
+  const twist = deformed ? shape.extrudeTwist ?? 0 : 0;
+  const bands = twistBandCount(twist);
+  const twistBands: GroupedTwistBands | null = bands > 1
+    ? {
+        minY: baseBounds.min.y,
+        maxY: baseBounds.max.y,
+        twist,
+        levels: bandLevels(baseBounds.min.y, baseBounds.max.y, bands),
+        // Lengths across are judged in millimetres: the content is stretched to the group's size.
+        mm: [content.scale.x, content.scale.y, content.scale.z],
+        edgeLength: twistEdgeLength(twist, height * content.scale.y),
+      }
+    : null;
   content.updateMatrixWorld(true);
   const contentWorldInverse = content.matrixWorld.clone().invert();
   content.traverse((object) => {
@@ -2620,32 +2653,32 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
     if (object instanceof THREE.Mesh) {
       releaseSharedShapeGeometry(object);
     }
-    const nextGeometry = object.geometry.clone();
-    nextGeometry.userData = {};
-    const position = nextGeometry.getAttribute("position");
-    const point = new THREE.Vector3();
-    for (let index = 0; index < position.count; index += 1) {
-      point.fromBufferAttribute(position, index).applyMatrix4(localToContent);
-      const normalizedHeight = (point.y - baseBounds.min.y) / height;
-      const widthScale = shapeTaperScaleAt(shape, normalizedHeight, "width");
-      const depthScale = shapeTaperScaleAt(shape, normalizedHeight, "depth");
-      point.x = centerX + (point.x - centerX) * widthScale;
-      point.z = centerZ + (point.z - centerZ) * depthScale;
-      if (deformed) {
-        const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
-        const cos = Math.cos(deform.twistRadians);
-        const sin = Math.sin(deform.twistRadians);
-        const relativeX = point.x - centerX;
-        const relativeZ = point.z - centerZ;
-        point.x = centerX + relativeX * cos - relativeZ * sin + deform.offsetX;
-        point.z = centerZ + relativeX * sin + relativeZ * cos + deform.offsetZ;
+    // A picture keeps its texture coordinates, which the bands do not carry; a fat line is drawn
+    // from one template quad. Both are turned at their own vertices as before.
+    const banded = twistBands !== null
+      && !(object.geometry instanceof THREE.InstancedBufferGeometry)
+      && sourcePosition.itemSize === 3
+      && !(object instanceof THREE.Mesh && object.geometry.getAttribute("uv") && materialHasMap(object.material));
+    let nextGeometry: THREE.BufferGeometry;
+    if (banded && object instanceof THREE.Mesh) {
+      nextGeometry = bandedMeshGeometry(object.geometry, localToContent, contentToLocal, twistBands, deformPoint);
+    } else if (banded && object instanceof THREE.Line) {
+      nextGeometry = bandedLineGeometry(object.geometry, object, localToContent, contentToLocal, twistBands, deformPoint);
+    } else {
+      nextGeometry = object.geometry.clone();
+      nextGeometry.userData = {};
+      const position = nextGeometry.getAttribute("position");
+      const point = new THREE.Vector3();
+      for (let index = 0; index < position.count; index += 1) {
+        point.fromBufferAttribute(position, index).applyMatrix4(localToContent);
+        deformPoint(point);
+        point.applyMatrix4(contentToLocal);
+        position.setXYZ(index, point.x, point.y, point.z);
       }
-      point.applyMatrix4(contentToLocal);
-      position.setXYZ(index, point.x, point.y, point.z);
-    }
-    position.needsUpdate = true;
-    if (object instanceof THREE.Mesh) {
-      nextGeometry.computeVertexNormals();
+      position.needsUpdate = true;
+      if (object instanceof THREE.Mesh) {
+        nextGeometry.computeVertexNormals();
+      }
     }
     nextGeometry.computeBoundingBox();
     nextGeometry.computeBoundingSphere();
@@ -2654,6 +2687,135 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
       enableAcceleratedMeshPicking(object, nextGeometry, Boolean(shape.importedMesh));
     }
   });
+}
+
+type GroupedTwistBands = {
+  minY: number;
+  maxY: number;
+  twist: number;
+  levels: number[];
+  mm: [number, number, number];
+  edgeLength: number;
+};
+
+function materialHasMap(material: THREE.Material | THREE.Material[]) {
+  return (Array.isArray(material) ? material : [material]).some((entry) => Boolean((entry as THREE.MeshStandardMaterial).map));
+}
+
+/** A part's mesh cut into the group's twist bands in the group's space, turned there, and handed back in the part's own space. */
+function bandedMeshGeometry(
+  source: THREE.BufferGeometry,
+  localToContent: THREE.Matrix4,
+  contentToLocal: THREE.Matrix4,
+  bands: GroupedTwistBands,
+  deformPoint: (point: THREE.Vector3) => void,
+) {
+  const flat = source.index ? source.toNonIndexed() : source;
+  const position = flat.getAttribute("position");
+  const point = new THREE.Vector3();
+  const inContent = new Float32Array(position.count * 3);
+  for (let index = 0; index < position.count; index += 1) {
+    point.fromBufferAttribute(position, index).applyMatrix4(localToContent);
+    inContent[index * 3] = point.x;
+    inContent[index * 3 + 1] = point.y;
+    inContent[index * 3 + 2] = point.z;
+  }
+  // Each material group is cut on its own, so a part of several colours keeps them.
+  const ranges = flat.groups.length ? flat.groups : [{ start: 0, count: position.count, materialIndex: 0 }];
+  const pieces: Float32Array[] = [];
+  const groups: Array<{ start: number; count: number; materialIndex: number }> = [];
+  let total = 0;
+  ranges.forEach((range) => {
+    const end = Math.min(position.count, range.start + range.count);
+    const piece = positionsForTwist(inContent.subarray(range.start * 3, end * 3), bands.minY, bands.maxY, bands.twist, bands.mm);
+    pieces.push(piece);
+    groups.push({ start: total, count: piece.length / 3, materialIndex: range.materialIndex ?? 0 });
+    total += piece.length / 3;
+  });
+  const keepGroups = flat.groups.length > 0;
+  if (flat !== source) flat.dispose();
+  const positions = new Float32Array(total * 3);
+  let offset = 0;
+  pieces.forEach((piece) => {
+    positions.set(piece, offset);
+    offset += piece.length;
+  });
+  for (let index = 0; index < total; index += 1) {
+    point.set(positions[index * 3], positions[index * 3 + 1], positions[index * 3 + 2]);
+    deformPoint(point);
+    positions[index * 3] = point.x;
+    positions[index * 3 + 1] = point.y;
+    positions[index * 3 + 2] = point.z;
+  }
+  const turned = new THREE.BufferGeometry();
+  turned.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  if (keepGroups) groups.forEach((group) => turned.addGroup(group.start, group.count, group.materialIndex));
+  // Smooth across the small folds between the bands, sharp at the parts' own edges - judged in the
+  // group's space, where a part drawn as a stretched unit body has its true proportions.
+  const normals = toCreasedNormals(turned, Math.PI / 6);
+  // A mirrored part's corners run the other way round in the group's space.
+  if (localToContent.determinant() < 0) {
+    const normal = normals.getAttribute("normal");
+    for (let index = 0; index < normal.count; index += 1) normal.setXYZ(index, -normal.getX(index), -normal.getY(index), -normal.getZ(index));
+  }
+  normals.applyMatrix4(contentToLocal);
+  return normals;
+}
+
+/** A part's edge lines cut at the same bands (and as short across) as its mesh, so they follow the turned sides. */
+function bandedLineGeometry(
+  source: THREE.BufferGeometry,
+  line: THREE.Line,
+  localToContent: THREE.Matrix4,
+  contentToLocal: THREE.Matrix4,
+  bands: GroupedTwistBands,
+  deformPoint: (point: THREE.Vector3) => void,
+) {
+  const flat = source.index ? source.toNonIndexed() : source;
+  const position = flat.getAttribute("position");
+  const points: THREE.Vector3[] = [];
+  for (let index = 0; index < position.count; index += 1) points.push(new THREE.Vector3().fromBufferAttribute(position, index).applyMatrix4(localToContent));
+  if (flat !== source) flat.dispose();
+  // The points along a-b where it crosses a band or runs too far across, a and b included.
+  const along = (a: THREE.Vector3, b: THREE.Vector3) => {
+    const cuts = [0, 1];
+    bands.levels.forEach((level) => {
+      if ((a.y - level) * (b.y - level) < 0) cuts.push((level - a.y) / (b.y - a.y));
+    });
+    cuts.sort((left, right) => left - right);
+    const result: THREE.Vector3[] = [a.clone()];
+    for (let index = 1; index < cuts.length; index += 1) {
+      const from = new THREE.Vector3().lerpVectors(a, b, cuts[index - 1]);
+      const to = new THREE.Vector3().lerpVectors(a, b, cuts[index]);
+      const across = Math.hypot((to.x - from.x) * bands.mm[0], (to.z - from.z) * bands.mm[2]);
+      const steps = Math.min(64, Math.max(1, Math.ceil(across / bands.edgeLength)));
+      for (let step = 1; step <= steps; step += 1) result.push(new THREE.Vector3().lerpVectors(from, to, step / steps));
+    }
+    return result;
+  };
+  const out: THREE.Vector3[] = [];
+  if (line instanceof THREE.LineSegments) {
+    for (let index = 0; index + 1 < points.length; index += 2) {
+      const run = along(points[index], points[index + 1]);
+      for (let step = 1; step < run.length; step += 1) out.push(run[step - 1], run[step]);
+    }
+  } else if (points.length) {
+    out.push(points[0]);
+    for (let index = 1; index < points.length; index += 1) out.push(...along(points[index - 1], points[index]).slice(1));
+    // A loop closes itself from its last point back to its first: that stretch is cut too.
+    if (line instanceof THREE.LineLoop && points.length > 2) out.push(...along(points[points.length - 1], points[0]).slice(1, -1));
+  }
+  const positions = new Float32Array(out.length * 3);
+  out.forEach((point, index) => {
+    deformPoint(point);
+    point.applyMatrix4(contentToLocal);
+    positions[index * 3] = point.x;
+    positions[index * 3 + 1] = point.y;
+    positions[index * 3 + 2] = point.z;
+  });
+  const turned = new THREE.BufferGeometry();
+  turned.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  return turned;
 }
 
 export function addMesh(
