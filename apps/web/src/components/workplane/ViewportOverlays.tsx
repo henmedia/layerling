@@ -9,7 +9,7 @@ import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { type AppThemePalette, type ResolvedAppTheme } from "@/lib/appTheme";
-import { t } from "@/lib/i18n";
+import { t, type MessageKey } from "@/lib/i18n";
 import { currentLengthUnitLabel, displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
 import { computeCornerRulerRelativeCoordinates, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
 import { type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -225,9 +225,28 @@ export type TapeOverlayState = {
     x1: number; y1: number; x2: number; y2: number; screenPoints?: string; labelX: number; labelY: number; label: string; editable: boolean;
     lengthHint: string; axes: string; deltas: string; midX: number; midY: number; occluded: boolean;
   }>;
-  /** `preview`: what the measurement would read while its second point is placed. */
-  hover: { screenX: number; screenY: number; edgeScreenPoints?: string; preview?: string } | null;
+  /**
+   * `preview`: what the measurement would read while its second point is placed. `centre`: what the point sits in the
+   * middle of (Discussion #610); `centres`: the other middles of a face or a round edge on offer near the pointer.
+   */
+  hover: {
+    screenX: number;
+    screenY: number;
+    edgeScreenPoints?: string;
+    preview?: string;
+    centre?: TapeCentreKind;
+    centres?: Array<{ screenX: number; screenY: number }>;
+  } | null;
 };
+
+/**
+ * What a centre the tape measure snaps to is the middle of (Discussion #610): a flat face, a round hole, or a round
+ * edge whose middle is filled, such as the rim of a cylinder or the foot of a boss.
+ */
+export type TapeCentreKind = "face" | "hole" | "circle";
+
+/** A centre on offer near the pointer, in the room. */
+export type TapeCentre = { x: number; y: number; z: number; kind: TapeCentreKind };
 
 export type TapeCandidate = {
   x: number;
@@ -239,8 +258,15 @@ export type TapeCandidate = {
   edge?: TapeEdgeAttachment;
   /** The edge the point lies on, whether or not a click measures all of it. */
   circleEdge?: TapeEdgeAttachment;
-  /** Unit normal of the surface face under the point, so the second point can snap perpendicular to it (#589). */
+  /**
+   * Unit normal of the surface face under the point, so the second point can snap perpendicular to it (#589); for the
+   * centre of a round edge, the normal of the circle's plane, along the axis of the hole.
+   */
   surfaceNormal?: [number, number, number];
+  /** Set when the point sits on the centre of a face or a round edge (Discussion #610). */
+  centre?: TapeCentreKind;
+  /** The centres on offer near the pointer, the one the point sits on included, each shown with a mark. */
+  centres?: TapeCentre[];
 };
 
 export type RotationHandleSide = "near" | "right" | "far" | "left";
@@ -733,6 +759,15 @@ export function syncTapeOverlay(
     const { axes, deltas } = tapeAxesText([startWorld, hoverWorld], accuracy);
     preview = `${axes} ${formatMeasure(startWorld.distanceTo(hoverWorld), accuracy)}${deltas ? `\n${deltas}` : ""}`;
   }
+  // The centres on offer near the pointer besides the one the point sits on, each with its mark.
+  const centres = hoverWorld && model.hover?.centres?.length
+    ? model.hover.centres.flatMap((centre) => {
+        const world = new THREE.Vector3(centre.x, centre.y, centre.z);
+        if (model.hover?.centre && world.distanceTo(hoverWorld) < 1e-3) return [];
+        const screen = projectToScreen(world, state);
+        return [{ screenX: screen.x, screenY: screen.y }];
+      })
+    : [];
   const next: TapeOverlayState = {
     points,
     segments,
@@ -741,6 +776,8 @@ export function syncTapeOverlay(
       screenY: hoverScreen.y,
       edgeScreenPoints: hoverEdgePoints.length >= 2 ? tapeScreenPointList(hoverEdgePoints, state) : undefined,
       preview,
+      ...(model.hover?.centre ? { centre: model.hover.centre } : {}),
+      ...(centres.length ? { centres } : {}),
     } : null,
   };
   const previous = overlayRef.current;
@@ -775,6 +812,12 @@ export function syncTapeOverlay(
       (previous.hover && next.hover
         && previous.hover.edgeScreenPoints === next.hover.edgeScreenPoints
         && previous.hover.preview === next.hover.preview
+        && previous.hover.centre === next.hover.centre
+        && (previous.hover.centres?.length ?? 0) === (next.hover.centres?.length ?? 0)
+        && (previous.hover.centres ?? []).every((centre, index) => {
+          const candidate = (next.hover?.centres ?? [])[index];
+          return Math.abs(centre.screenX - candidate.screenX) < 0.2 && Math.abs(centre.screenY - candidate.screenY) < 0.2;
+        })
         && Math.abs(previous.hover.screenX - next.hover.screenX) < 0.2
         && Math.abs(previous.hover.screenY - next.hover.screenY) < 0.2));
   if (!unchanged) {
@@ -1165,6 +1208,22 @@ export function NoteOverlay({
   );
 }
 
+function TapeCentreMark({ x, y, snapped = false }: { x: number; y: number; snapped?: boolean }) {
+  return (
+    <g className={`tape-centre ${snapped ? "snapped" : ""}`}>
+      <circle cx={x} cy={y} r="7" />
+      <path d={`M${x - 4.5},${y} h9 M${x},${y - 4.5} v9`} />
+    </g>
+  );
+}
+
+/** What the hint beside a snapped centre says it is the middle of. */
+const TAPE_CENTRE_HINTS: Record<TapeCentreKind, MessageKey> = {
+  face: "camera.tapeCentreFace",
+  hole: "camera.tapeCentreHole",
+  circle: "camera.tapeCentreCircle",
+};
+
 export function TapeOverlay({
   overlay,
   startPointId,
@@ -1253,7 +1312,13 @@ export function TapeOverlay({
           />
         ))}
         {active && overlay.hover?.edgeScreenPoints ? <polyline className="tape-hover-edge" points={overlay.hover.edgeScreenPoints} fill="none" /> : null}
-        {active && overlay.hover ? <circle className="tape-hover-point" cx={overlay.hover.screenX} cy={overlay.hover.screenY} r="5" /> : null}
+        {/* A centre on offer is a cross in a circle, unlike a corner; the one the point sits on is drawn in full (Discussion #610). */}
+        {active ? overlay.hover?.centres?.map((centre, index) => <TapeCentreMark key={`centre-${index}`} x={centre.screenX} y={centre.screenY} />) : null}
+        {active && overlay.hover ? (
+          overlay.hover.centre
+            ? <TapeCentreMark x={overlay.hover.screenX} y={overlay.hover.screenY} snapped />
+            : <circle className="tape-hover-point" cx={overlay.hover.screenX} cy={overlay.hover.screenY} r="5" />
+        ) : null}
       </svg>
       {overlay.segments.map((segment) => {
         if (segment.id === editingLengthId) return null;
@@ -1301,6 +1366,11 @@ export function TapeOverlay({
           style={{ left: hoveredSegment.labelX, top: hoveredSegment.labelY + (hoveredSegment.labelY <= hoveredSegment.midY ? -16 : 16) }}
         >
           {hoveredSegment.deltas}
+        </span>
+      ) : null}
+      {active && overlay.hover?.centre ? (
+        <span className="tape-tip above tape-centre-hint" style={{ left: overlay.hover.screenX, top: overlay.hover.screenY - 12 }}>
+          {t(TAPE_CENTRE_HINTS[overlay.hover.centre])}
         </span>
       ) : null}
       {active && overlay.hover?.preview ? (
