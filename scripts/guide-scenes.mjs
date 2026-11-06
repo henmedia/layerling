@@ -502,6 +502,27 @@ scenes["print-check"] = async (ctx) => {
   await ctx.key("Escape");
 };
 
+scenes.paint = async (ctx) => {
+  await freshEditor(ctx);
+  // A box painted with the three tools: its top filled, a round patch on the front, a star drawn round on the side.
+  const box = await create(ctx, { kind: "box", x: 0, z: 0, width: 40, depth: 40, height: 30, color: "#1c7ed6" });
+  const star = Array.from({ length: 24 }, (_, index) => {
+    const angle = (index / 24) * Math.PI * 2;
+    const reach = index % 2 ? 4 : 10;
+    return [Math.cos(angle) * reach, 15 + Math.sin(angle) * reach];
+  });
+  await ctx.mcp("paint_object", { id: box, strokes: [
+    { mode: "fill", color: "#f2cf10", point: [0, 30, 0] },
+    { mode: "circle", color: "#ffffff", point: [0, 15, 20], diameter: 14 },
+    { mode: "lasso", color: "#2f9e44", view: "right", outline: star },
+  ] });
+  await select(ctx, [box]);
+  await ctx.click(ctx.t("paint.title"));
+  await quiet(ctx, 4500);
+  await ctx.shot("paint");
+  await ctx.key("Escape");
+};
+
 scenes["editor-dark"] = async (ctx) => {
   await freshEditor(ctx);
   await sampleParts(ctx);

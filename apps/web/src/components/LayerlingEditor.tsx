@@ -25,7 +25,7 @@ import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerText
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidHandleFits, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidHandleFits, lidTakesExtras, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
 import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { CABLE_DEFAULTS, cableChannelShapeFields, cableEndNear, cableGrid, findCableChannel, normalizeCableOptions, type CableChannelError, type CableChannelOptions, type CableChannelResult, type CableEnd, type CableGrid, type Vec3 as CableVec3 } from "@/lib/cableChannel";
@@ -73,6 +73,10 @@ import { concentricMotion, mateMotion, type FacePick, type MateMode } from "@/li
 import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
+import { PAINT_VIEW_SIDES, paintedBodyMesh, paintedExportFaceColors, paintLassoStroke, paintSideLasso, paintStrokeAt, paintSurfaceNormalAt, rebasePaintStrokes, type PaintLassoView } from "@/lib/paintMesh";
+import { canPaintShape, DEFAULT_PAINT_TOOL, designPaintColors, normalizePaintTool, paintColors, paintStartColor, PAINT_MAX_STROKES, type PaintStroke, type PaintToolSettings } from "@/lib/paint";
+import { normalizeHexColor } from "@/lib/coloredImport";
+import { PaintPanel } from "./workplane/PaintPanel";
 import { FaceToolPanel } from "./workplane/FaceToolPanel";
 import { SupportRibPanel } from "./workplane/SupportRibPanel";
 import { DEFAULT_FACE_TOOL, faceToolSettingsOn, normalizeFaceTool, type FaceToolSettings } from "@/lib/faceTool";
@@ -3253,6 +3257,12 @@ export function LayerlingEditor({
     busy: boolean;
   } | null>(null);
   const [faceToolPreview, setFaceToolPreview] = useState<{ shape: WorkplaneShape | null; empty: boolean } | null>(null);
+  // "Paint" (paint.ts): strokes of colour on the selected body, made in the view while the panel is open. The settings
+  // stay as they were last used, for the next body in this session.
+  const [paintTool, setPaintTool] = useState<{ sourceId: string; settings: PaintToolSettings } | null>(null);
+  const paintSettingsRef = useRef<PaintToolSettings>(DEFAULT_PAINT_TOOL);
+  // Whether a colour was chosen in the panel this session: then a new body starts with it.
+  const paintColorChosenRef = useRef(false);
   // "Support rib" (Discussion #1385): the lower face of a tilted part, then a thin rib under it with bridges on the layers.
   const [supportRibTool, setSupportRibTool] = useState<{
     sourceId: string;
@@ -8564,8 +8574,8 @@ export function LayerlingEditor({
    * and with posts for the magnets, which the lip has to go round: the mesh lid stays then.
    */
   const exactLid = useCallback(async (targets: readonly WorkplaneShape[], options: LidOptions, meshLid: WorkplaneShape, magnets?: { posts: WorkplaneShape[]; pockets: WorkplaneShape[] }): Promise<WorkplaneShape | null> => {
-    // A hinged lid stays the mesh lid for now: the exact one has no knuckles, nor click bumps or a pull tab.
-    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge || options.clickBumps || options.handle === "tab") return null;
+    // A hinged lid stays the mesh lid for now: the exact one has no knuckles, nor click bumps or a pull tab; nor a thread.
+    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge || options.clickBumps || options.handle === "tab" || options.type === "screw") return null;
     const pocketDepth = magnetPocketDepth(options);
     const request: CadLidRequest = {
       type: options.type,
@@ -8606,9 +8616,9 @@ export function LayerlingEditor({
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
     // What is not given starts from the printer's play where it follows it, as the panel does.
     const options = normalizeLidOptions(given, lidDefaults(getPrinterPlay()));
-    // The pockets, the hinge's knuckles, the click bumps' dimples and a finger notch go into the body, so it must be free
-    // to change and one body.
-    const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch";
+    // The pockets, the hinge's knuckles, the click bumps' dimples, a finger notch and a screw lid's thread go into the
+    // body, so it must be free to change and one body.
+    const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch" || options.type === "screw";
     if (changesBody && targets.some((shape) => bodyLocked(shape))) return fail(t("status.objectLocked"));
     if (changesBody && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
@@ -8622,6 +8632,7 @@ export function LayerlingEditor({
     if (changed()) return fail(t("lid.error.changed"));
     const type = t(`lid.type.${options.type}`);
     const hinge = result.hinge;
+    const screw = result.screw;
     // What else the lid has, said after what it is: its click bumps, its tab, or the notch in the body.
     const extras = [
       ...(result.clickBumps ? [t("status.lidClickBumps", { count: result.clickBumps.count })] : []),
@@ -8631,33 +8642,43 @@ export function LayerlingEditor({
     const handle = result.handle?.style ?? "none";
     // The click bumps' dimples and the finger notch are cut into the body as the magnets' pockets are.
     const bodyCuts = [...(result.clickBumps ? [result.clickBumps.dimples] : []), ...(result.handle?.notch ? [result.handle.notch] : [])];
-    if (!result.magnets && !hinge && !bodyCuts.length) {
+    if (!result.magnets && !hinge && !bodyCuts.length && !screw) {
       commitShapes([...shapesRef.current, lid], lid.id, withExtras(t("status.lidMade", { type })));
       return { ok: true as const, id: lid.id, type: options.type, handle };
     }
     const posts = result.magnets?.posts ?? [];
     // A flush hinge's slots and a pivot lid's pin holes are cut into the body as the magnets' pockets are.
     const pockets = [...(result.magnets?.pockets ?? []), ...(hinge?.cuts ? [hinge.cuts] : []), ...bodyCuts];
-    // The body's knuckles are grouped with it as the magnets' posts are.
-    const grouped = await groupedWithMagnets(targets, { posts: [...posts, ...(hinge ? [hinge.knuckles] : [])], pockets }, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
+    // The body's knuckles, and a screw lid's thread, are grouped with it as the magnets' posts are.
+    const grouped = await groupedWithMagnets(targets, { posts: [...posts, ...(hinge ? [hinge.knuckles] : []), ...(screw ? [screw.thread] : [])], pockets }, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
     if (changed()) return fail(t("lid.error.changed"));
-    if (!grouped.group) return fail(grouped.failureNotice || t(hinge ? "lid.error.hingeKernel" : result.magnets ? "lid.error.magnetsKernel" : "lid.error.cutsKernel"));
+    if (!grouped.group) return fail(grouped.failureNotice || t(screw ? "lid.error.screwKernel" : hinge ? "lid.error.hingeKernel" : result.magnets ? "lid.error.magnetsKernel" : "lid.error.cutsKernel"));
     const body = canonicalizeShape({ ...grouped.group, groupOperation: "group", name: targets.find((shape) => !shape.hole)?.name ?? grouped.group.name });
     const consumed = new Set(targets.map((shape) => shape.id));
     const remaining = shapesRef.current.filter((shape) => !consumed.has(shape.id));
     const pin = options.hingePin.toLocaleString(numberLocale());
     const magnetCount = result.magnets?.pockets.length ?? 0;
-    const message = hinge
+    const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
+    const message = screw
+      ? t("status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) })
+      : hinge
       ? hinge.style === "pivot"
         ? t("status.lidMadePivot", { pin })
-        : t(magnetCount ? "status.lidMadeHingeMagnets" : hinge.style === "flush" ? "status.lidMadeHingeFlush" : "status.lidMadeHinge", { type, count: hinge.count, pin, magnets: magnetCount })
+        : hinge.pinLength !== null
+          // With end plugs the pin is shorter than the hinge: how long it is, for a piece of filament cut to fit.
+          ? t("status.lidMadeHingeFlushPlugs", { type, count: hinge.count, pin, length: (Math.round(hinge.pinLength * 10) / 10).toLocaleString(numberLocale()) })
+          : t(magnetCount ? "status.lidMadeHingeMagnets" : hinge.style === "flush" ? "status.lidMadeHingeFlush" : "status.lidMadeHinge", { type, count: hinge.count, pin, magnets: magnetCount })
       : magnetCount
         ? t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: magnetCount })
         : t("status.lidMade", { type });
-    commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : [])], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
+    commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : []), ...(hinge?.plugs ? [hinge.plugs] : [])], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
     return {
       ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: magnetCount, posts: posts.length > 0, clickBumps: result.clickBumps?.count ?? 0, handle,
-      ...(hinge ? { hinge: { knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null } } : {}),
+      ...(hinge ? { hinge: {
+        knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null,
+        plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
+      } } : {}),
+      ...(screw ? { screw: { pitch: screw.pitch, turns: screw.turns, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000 } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);
 
@@ -8684,12 +8705,15 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, clickBumps, clickBumpHeight, handle } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
-    // Click bumps and a handle the panel shows switched off (a flat lid, a pivot lid) are not asked for.
+    // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
+    // are not asked for, nor magnets and a hinge with a screw lid.
+    const extras = lidTakesExtras(lidTool);
     void makeLid({
-      type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
-      clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none",
+      type, thickness, gap, depth, wall, magnets: magnets && extras, magnetDiameter, magnetHeight, magnetGap, hinge: hinge && extras, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
+      hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
+      clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns,
     }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
@@ -9709,6 +9733,136 @@ export function LayerlingEditor({
   useEffect(() => {
     if (holePatternTool?.step !== "pick") holePatternPickAbortRef.current?.abort();
   }, [holePatternTool]);
+
+  // "Paint": colours on parts of the selected body's surface, for printing in several colours (paint.ts).
+  const togglePaint = useCallback(() => {
+    if (paintTool) {
+      setPaintTool(null);
+      setNotice(t("status.paintClosed"));
+      return;
+    }
+    // Paint is the body's look, as its colour: a locked body refuses it, one of locked shape takes it.
+    if (refuseLockedSelection()) return;
+    const source = selectedShapes.length === 1 ? selectedShapes[0] : null;
+    if (!source) {
+      setNotice(t("status.paintSelectOne"));
+      return;
+    }
+    if (!canPaintShape(source)) {
+      setNotice(t("status.paintNeedsSolid"));
+      return;
+    }
+    if (edgeModifier || shellTool || deleteFaceTool || splitSession || simplifyToolId) {
+      setNotice(t("status.paintOtherTool"));
+      return;
+    }
+    stopCruise();
+    holePatternPickRunRef.current += 1;
+    setHolePatternTool(null);
+    faceToolPickRunRef.current += 1;
+    setFaceTool(null);
+    supportRibPickRunRef.current += 1;
+    setSupportRibTool(null);
+    setAlignMode(false);
+    setMirrorMode(false);
+    setPivotPickMode(false);
+    setLayFlatPickMode(false);
+    setMateTool(null);
+    setArrayTool(null);
+    setScalePercentTool(null);
+    // The colour last painted with, unless it is hardly the body's own: then one that stands out against it.
+    const last = paintSettingsRef.current;
+    const color = paintStartColor(source.color, designPaintColors(shapesRef.current), paintColorChosenRef.current ? last.color : null);
+    setPaintTool({ sourceId: source.id, settings: normalizePaintTool({ ...last, color }) });
+    setNotice(t("status.paintStart"));
+    // The kernel cuts circles and lassos in: asked for now, it is there by the first stroke.
+    void getManifoldRuntime().catch(() => null);
+  }, [deleteFaceTool, edgeModifier, paintTool, refuseLockedSelection, selectedShapes, shellTool, simplifyToolId, splitSession, stopCruise]);
+
+  const changePaintSettings = useCallback((patch: Partial<PaintToolSettings>) => {
+    setPaintTool((current) => {
+      if (!current) return current;
+      const settings = normalizePaintTool({ ...current.settings, ...patch });
+      paintSettingsRef.current = settings;
+      if (patch.color) paintColorChosenRef.current = true;
+      return { ...current, settings };
+    });
+  }, []);
+
+  /** A stroke onto the painted body, as a step of the history; one that finds nothing on the body is not kept. */
+  const addPaintStroke = useCallback(async (stroke: PaintStroke | null) => {
+    const tool = paintTool;
+    if (!tool || !stroke) return;
+    // A circle or a lasso is cut in by the kernel; without it, it would colour whole faces, and a small one find none.
+    if (stroke.mode !== "fill" && !loadedManifoldRuntime()) await getManifoldRuntime().catch(() => null);
+    const source = shapesRef.current.find((shape) => shape.id === tool.sourceId);
+    if (!source) return;
+    if (source.locked) {
+      refuseLockedSelection();
+      return;
+    }
+    const strokes = source.paint ?? [];
+    if (strokes.length >= PAINT_MAX_STROKES) {
+      setNotice(t("status.paintTooMany", { count: PAINT_MAX_STROKES }), true);
+      return;
+    }
+    const next = { ...source, paint: [...strokes, stroke] };
+    // Laid now, the painted mesh is ready for the view; a stroke that found nothing would only sit in the file.
+    if ((paintedBodyMesh(next)?.skipped ?? 0) > (paintedBodyMesh(source)?.skipped ?? 0)) {
+      setNotice(t("status.paintNothing"));
+      return;
+    }
+    commitShapes(shapesRef.current.map((shape) => (shape.id === source.id ? next : shape)), source.id, t(stroke.color ? "status.paintAdded" : "status.paintErased"));
+  }, [commitShapes, paintTool, refuseLockedSelection]);
+
+  const paintAtPick = useCallback((pick: LayFlatPick | null) => {
+    const tool = paintTool;
+    const source = tool ? shapesRef.current.find((shape) => shape.id === tool.sourceId) : null;
+    if (!tool || !source) return;
+    if (!pick || pick.shapeId !== source.id) {
+      setNotice(t("status.paintMissed"));
+      return;
+    }
+    void addPaintStroke(paintStrokeAt(source, pick.point, pick.normal, tool.settings));
+  }, [addPaintStroke, paintTool]);
+
+  const paintLasso = useCallback((view: PaintLassoView, outline: Array<[number, number]>) => {
+    const tool = paintTool;
+    const source = tool ? shapesRef.current.find((shape) => shape.id === tool.sourceId) : null;
+    if (!tool || !source) return;
+    void addPaintStroke(paintLassoStroke(source, view, outline, tool.settings));
+  }, [addPaintStroke, paintTool]);
+
+  const clearPaint = useCallback(() => {
+    const source = paintTool ? shapesRef.current.find((shape) => shape.id === paintTool.sourceId) : null;
+    if (!source?.paint?.length) return;
+    if (source.locked) {
+      refuseLockedSelection();
+      return;
+    }
+    commitShapes(shapesRef.current.map((shape) => (shape.id === source.id ? { ...shape, paint: undefined } : shape)), source.id, t("status.paintCleared"));
+  }, [commitShapes, paintTool, refuseLockedSelection]);
+
+  // The tool belongs to the body it was started for, and gives way to the tools that pick faces or open panels of their own.
+  useEffect(() => {
+    if (!paintTool) return;
+    const source = shapes.find((shape) => shape.id === paintTool.sourceId);
+    if (
+      !source || !canPaintShape(source)
+      || selectedIds.length !== 1 || selectedIds[0] !== paintTool.sourceId
+      || mateTool || layFlatPickMode || pivotPickMode || arrayTool || scalePercentTool || holePatternTool || faceTool || supportRibTool
+      || shellTool || deleteFaceTool || edgeModifier || splitSession || simplifyToolId
+    ) {
+      setPaintTool(null);
+    }
+  }, [arrayTool, deleteFaceTool, edgeModifier, faceTool, holePatternTool, layFlatPickMode, mateTool, paintTool, pivotPickMode, scalePercentTool, selectedIds, shapes, shellTool, simplifyToolId, splitSession, supportRibTool]);
+
+  /** The colours the panel offers: those of the design's bodies and of their paint, the one chosen now included. */
+  const paintPalette = useMemo(() => {
+    if (!paintTool) return [];
+    const colors = designPaintColors(shapes, 20);
+    return colors.includes(paintTool.settings.color) ? colors : [...colors, paintTool.settings.color];
+  }, [paintTool, shapes]);
 
   // "Face" (#404): pick a flat face of the selected body, then push it out or cut a pocket in, with an inset from its edge.
   const toggleFaceTool = useCallback(() => {
@@ -11115,6 +11269,8 @@ export function LayerlingEditor({
       // Multicolor switched on or off stays so after Done; a group cut into one body lost it and turned one colour (#1323).
       ...(typeof original.multicolor === "boolean" ? { multicolor: original.multicolor } : {}),
     }, Boolean(original.hole))));
+    // The group's own paint (paint.ts) goes over to the group built again, where it lay in the world.
+    if (original.paint?.length && canPaintShape(group)) group.paint = rebasePaintStrokes(original.paint, original, group);
     const mergeWarning = "mergeWarning" in result && typeof result.mergeWarning === "string" ? result.mergeWarning : "";
     return { group, mergeWarning };
   }, []);
@@ -13078,6 +13234,73 @@ export function LayerlingEditor({
         };
       }
 
+      if (command.action === "paint_object") {
+        // The paint tool's strokes (paint.ts), given in the world: a point on the surface for a fill or a circle, a
+        // shape drawn in a flat view from one side for a lasso. One step of the history for the whole call.
+        const all = currentShapes();
+        const selectedNow = selectedIdsRef.current;
+        const targetId = typeof params.id === "string" ? params.id : selectedNow.length === 1 ? selectedNow[0] : null;
+        const target = all.find((shape) => shape.id === targetId);
+        if (!target) throw new Error("paint_object needs id (or exactly one selected object)");
+        if (target.locked) throw new Error("Unlock the object before painting it");
+        if (!canPaintShape(target)) throw new Error("Only a single solid body, or a group cut into one body in one colour, can be painted - not a hole, a sketch, a bundle or a group of separate parts (paint its parts instead)");
+        const requested = params.strokes === undefined ? [] : Array.isArray(params.strokes) ? params.strokes : null;
+        if (!requested) throw new Error("paint_object strokes must be a list");
+        const vec3 = (value: unknown) => (Array.isArray(value) && value.length === 3 && value.every((entry) => typeof entry === "number" && Number.isFinite(entry))
+          ? new THREE.Vector3(value[0] as number, value[1] as number, value[2] as number)
+          : null);
+        // The kernel first: the circles and lassos are cut into the mesh, not laid on whole faces.
+        await getManifoldRuntime().catch(() => null);
+        let strokes: PaintStroke[] = params.clear === true ? [] : [...(target.paint ?? [])];
+        let skipped = 0;
+        for (const [index, entry] of requested.entries()) {
+          if (!entry || typeof entry !== "object") throw new Error(`strokes[${index}] must be an object`);
+          const raw = entry as Record<string, unknown>;
+          const mode = raw.mode === "circle" || raw.mode === "lasso" || raw.mode === "fill" ? raw.mode : null;
+          if (!mode) throw new Error(`strokes[${index}].mode must be fill, circle or lasso`);
+          const erase = raw.erase === true || raw.color === null;
+          const color = erase ? DEFAULT_PAINT_TOOL.color : normalizeHexColor(typeof raw.color === "string" ? raw.color : undefined);
+          if (!color) throw new Error(`strokes[${index}].color must be a colour as #rrggbb (or erase: true)`);
+          const settings = normalizePaintTool({ mode, color, erase, angle: mcpOptionalNumber(raw.angle), diameter: mcpOptionalNumber(raw.diameter) });
+          let stroke: PaintStroke | null;
+          if (mode === "lasso") {
+            const side = PAINT_VIEW_SIDES.find((name) => name === raw.view);
+            if (!side) throw new Error(`strokes[${index}].view must be one of ${PAINT_VIEW_SIDES.join(", ")}`);
+            const outline = Array.isArray(raw.outline)
+              ? raw.outline.filter((point): point is [number, number] => Array.isArray(point) && point.length === 2 && point.every((value) => typeof value === "number" && Number.isFinite(value)))
+              : [];
+            if (outline.length < 3) throw new Error(`strokes[${index}].outline needs at least three points`);
+            const lasso = paintSideLasso(side, outline);
+            stroke = paintLassoStroke(target, lasso.view, lasso.outline, settings);
+          } else {
+            const point = vec3(raw.point);
+            if (!point) throw new Error(`strokes[${index}].point must be [x, y, z] on the body's surface (y is the height)`);
+            const normal = vec3(raw.normal) ?? paintSurfaceNormalAt(target, point);
+            if (!normal || normal.lengthSq() < 1e-12) throw new Error(`strokes[${index}].point is not on the body's surface`);
+            stroke = paintStrokeAt(target, point, normal, settings);
+          }
+          if (!stroke) throw new Error(`strokes[${index}] could not be made into a stroke`);
+          const before = paintedBodyMesh({ ...target, paint: strokes })?.skipped ?? 0;
+          const next = [...strokes, stroke];
+          if ((paintedBodyMesh({ ...target, paint: next })?.skipped ?? 0) > before) {
+            skipped += 1;
+            continue;
+          }
+          strokes = next;
+        }
+        if (strokes.length > PAINT_MAX_STROKES) throw new Error(`A body carries ${PAINT_MAX_STROKES} strokes at most; pass clear: true to start again`);
+        const painted = { ...target, paint: strokes.length ? strokes : undefined };
+        commitShapes(currentShapes().map((shape) => (shape.id === target.id ? painted : shape)), target.id, t(strokes.length ? "status.paintAdded" : "status.paintCleared"));
+        const laid = strokes.length ? paintedBodyMesh(painted) : null;
+        return {
+          object: mcpShapeSummary(painted),
+          strokes: strokes.length,
+          colors: paintColors(painted),
+          skipped,
+          ...(laid ? { cut: laid.cut || !strokes.some((stroke) => stroke.mode !== "fill"), paintedFaces: laid.colors.filter(Boolean).length } : {}),
+        };
+      }
+
       if (command.action === "support_rib") {
         // The same code as the support rib tool in the view (Discussion #1385).
         const all = currentShapes();
@@ -13795,19 +14018,27 @@ export function LayerlingEditor({
           hingeSide: params.hingeSide,
           hingeTeardrop: params.hingeTeardrop,
           hingeStyle: params.hingeStyle,
+          hingeEndPlugs: params.hingeEndPlugs,
           clickBumps: params.clickBumps,
           clickBumpHeight: params.clickBumpHeight,
           handle: params.handle,
+          threadPitch: params.threadPitch,
+          threadTurns: params.threadTurns,
         }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
         if (!("bodyId" in result)) return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, ...(result.handle !== "none" ? { handle: result.handle } : {}) };
         const body = currentShapes().find((shape) => shape.id === result.bodyId);
         const pin = "hinge" in result && result.hinge?.pinId ? currentShapes().find((shape) => shape.id === result.hinge!.pinId) : null;
+        const plugs = "hinge" in result && result.hinge?.plugsId ? currentShapes().find((shape) => shape.id === result.hinge!.plugsId) : null;
         return {
           object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, body: body ? mcpShapeSummary(body) : { id: result.bodyId }, magnets: result.magnets, posts: result.posts,
           ...(result.clickBumps ? { clickBumps: result.clickBumps } : {}), ...(result.handle !== "none" ? { handle: result.handle } : {}),
-          ...("hinge" in result && result.hinge ? { hinge: { knuckles: result.hinge.knuckles, pins: result.hinge.pins, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, style: result.hinge.style, pin: pin ? mcpShapeSummary(pin) : null } } : {}),
+          ...("hinge" in result && result.hinge ? { hinge: {
+            knuckles: result.hinge.knuckles, pins: result.hinge.pins, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, style: result.hinge.style, pin: pin ? mcpShapeSummary(pin) : null,
+            ...(result.hinge.pinLength !== null ? { endPlugs: plugs ? mcpShapeSummary(plugs) : { id: result.hinge.plugsId }, pinLength: Math.round(result.hinge.pinLength * 100) / 100 } : {}),
+          } } : {}),
+          ...("screw" in result && result.screw ? { screw: result.screw } : {}),
         };
       }
 
@@ -13953,9 +14184,11 @@ export function LayerlingEditor({
           if (params[key] !== undefined && !allowed.includes(String(params[key]))) throw new Error(`${key} must be one of ${allowed.join(", ")}`);
         });
         Object.keys(SURFACE_TEXTURE_LIMITS).forEach((key) => {
+          // The grain was only on or off once: true and false are still taken (see normalizeSurfaceTexture).
+          if (key === "timberGrain" && typeof params[key] === "boolean") return;
           if (params[key] !== undefined && !Number.isFinite(mcpNumber(params[key], Number.NaN))) throw new Error(`${key} must be a number`);
         });
-        ["keepEdges", "outside", "inside", "crackGold", "imageInvert", "tileFromBottom", "timberGrain", "patternPart"].forEach((key) => {
+        ["keepEdges", "outside", "inside", "crackGold", "imageInvert", "tileFromBottom", "patternPart"].forEach((key) => {
           if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
         });
         if (params.patternColor !== undefined && !(typeof params.patternColor === "string" && /^#[0-9a-f]{6}$/i.test(params.patternColor))) throw new Error("patternColor must be a colour as #rrggbb");
@@ -15134,11 +15367,13 @@ export function LayerlingEditor({
           for (let index = 0; index < svgBytes.length; index += 8192) svgBinary += String.fromCharCode(...svgBytes.subarray(index, index + 8192));
           return { format, view: svgView, fileName: projectExportFileName(projectName, "svg"), bytes: svgBytes.length, ...(outlines === undefined ? {} : { outlines }), ...(fellBack ? { fellBack } : {}), base64: btoa(svgBinary) };
         }
-        const { solids: cutSolids, meshes, cut: wasCut, holeCutsFailed } = await exportBodiesWithLooseHoles(visible);
+        const { solids: cutSolids, meshes, cut: wasCut, holeCutsFailed } = await exportBodiesWithLooseHoles(visible, { painted: format !== "stl" });
         const joined = await (format === "stl" ? unionOverlappingExportMeshes(cutSolids, meshes, wasCut) : colorSeparatedExportMeshes(cutSolids, meshes, wasCut));
-        // A group showing its parts in their own colours keeps them in 3MF and OBJ (#153).
+        // A group showing its parts in their own colours keeps them in 3MF and OBJ (#153), a painted body its paint.
         const partFaceColors = (mesh: MeshData, sourceIndex: number) => {
           const source = cutSolids[sourceIndex];
+          const painted = paintedExportFaceColors(mesh, source);
+          if (painted) return painted;
           const solids = source ? multicolorExportSolids(source) : null;
           if (!source || !solids) return undefined;
           const colors = exportFaceColors(mesh, solids, source.color);
@@ -15801,9 +16036,11 @@ export function LayerlingEditor({
     const label = format === "stl" ? "STL" : format === "3mf" ? "3MF" : "OBJ";
     // Loose holes cut the bodies they reach first (#203); a body cut away entirely drops out.
     let bodiesWritten: WorkplaneShape[] = exportable;
-    // A group showing its parts in their own colours keeps them in 3MF and OBJ (#153).
+    // A group showing its parts in their own colours keeps them in 3MF and OBJ (#153), a painted body its paint.
     const partFaceColors = (mesh: MeshData, sourceIndex: number) => {
       const source = bodiesWritten[sourceIndex];
+      const painted = paintedExportFaceColors(mesh, source);
+      if (painted) return painted;
       const solids = source ? multicolorExportSolids(source) : null;
       if (!source || !solids) return undefined;
       const colors = exportFaceColors(mesh, solids, source.color);
@@ -15839,7 +16076,7 @@ export function LayerlingEditor({
     }
     const savedFile = target === "download" ? null : target;
     // Awaited, so "One file per plate" (#456) writes the plates one after the other.
-    await exportBodiesWithLooseHoles(sourceShapes)
+    await exportBodiesWithLooseHoles(sourceShapes, { painted: format !== "stl" })
       .then(async ({ solids: cutSolids, meshes, cut: wasCut, holeCutsFailed }) => {
         bodiesWritten = cutSolids;
         const joined = await (format === "stl" ? unionOverlappingExportMeshes(cutSolids, meshes, wasCut) : colorSeparatedExportMeshes(cutSolids, meshes, wasCut));
@@ -16789,6 +17026,11 @@ export function LayerlingEditor({
           setNotice(t("status.holePatternCancelled"));
           return;
         }
+        if (paintTool) {
+          setPaintTool(null);
+          setNotice(t("status.paintClosed"));
+          return;
+        }
         if (faceTool) {
           faceToolPickRunRef.current += 1;
           setFaceTool(null);
@@ -17453,6 +17695,9 @@ export function LayerlingEditor({
         canSurfaceTexture={canSurfaceTexture}
         onSurfaceTextureTool={toggleSurfaceTextureTool}
         surfaceTextureActive={canSurfaceTexture && surfaceTextureOpen}
+        canPaint={!selectionLocked && selectedShapes.length === 1 && canPaintShape(selectedShapes[0])}
+        onPaint={togglePaint}
+        paintActive={Boolean(paintTool)}
         onMirror={toggleMirrorMode}
         onRotationPivot={toggleRotationPivot}
         onArray={toggleArrayTool}
@@ -17783,6 +18028,9 @@ export function LayerlingEditor({
                   ? { shapeIds: [supportRibTool.sourceId], joined: faceJoinPositions }
                   : null}
           onMateFacePick={mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : supportRibTool ? (pick) => void pickSupportRibFace(pick) : (pick) => void pickHolePatternFace(pick)}
+          paintPick={paintTool && !historyViewState ? { shapeId: paintTool.sourceId, mode: paintTool.settings.mode } : null}
+          onPaintPick={paintAtPick}
+          onPaintLasso={paintLasso}
           cadFacePick={historyViewState ? null : cadFacePick}
           onCadFacePick={deleteFaceTool ? toggleDeleteFace : toggleSurfaceFace}
           onNoteAdd={addNote}
@@ -18008,6 +18256,22 @@ export function LayerlingEditor({
             holePatternPickRunRef.current += 1;
             setHolePatternTool(null);
             setNotice(t("status.holePatternCancelled"));
+          }}
+        />
+      ) : null}
+      {paintTool && selectedShape?.id === paintTool.sourceId ? (
+        <PaintPanel
+          targetName={displayShapeName(selectedShape)}
+          settings={paintTool.settings}
+          colors={paintPalette}
+          strokes={selectedShape.paint?.length ?? 0}
+          wholeFaces={Boolean(loadedManifoldRuntime() && selectedShape.paint?.some((stroke) => stroke.mode !== "fill") && paintedBodyMesh(selectedShape)?.cut === false)}
+          workspace={workspaceSettings}
+          onChange={changePaintSettings}
+          onClear={clearPaint}
+          onClose={() => {
+            setPaintTool(null);
+            setNotice(t("status.paintClosed"));
           }}
         />
       ) : null}

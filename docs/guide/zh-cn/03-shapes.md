@@ -191,7 +191,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 {{ui:surfaceTexture.squares}} 和 {{ui:surfaceTexture.triangles}} 在实体上铺出大小相同的网格瓷砖，凸起或压入，侧壁陡直、切得干净；三角形排成行，尖角轮流朝上和朝下。{{ui:inspector.surfaceSpacingSquares}} 或 {{ui:inspector.surfaceSpacingTriangles}} 以及 {{ui:inspector.surfaceTileGap}} 严格保持你设定的值 – 3.2 mm 的正方形、间距 3.2 mm，各是 0.4 mm 喷嘴的八条线，打印得很干净。网格在每个面上居中；绕圆形实体时间距会略微取整，好让整数个正好绕一圈。打开 {{ui:inspector.surfaceTileFromBottom}} 后，第一排紧贴底边开始，一直延伸到第一层，由裙边（Brim）固定。若只想在两个侧面的下半部分铺瓷砖，请选中这两个面，并在上半部分放一个辅助实体，在 {{ui:inspector.surfaceMask}} 下选 {{ui:surfaceTexture.maskExclude}}（见下文）。在 {{ui:inspector.more}} 下，{{ui:inspector.surfaceProfile}} 选 {{ui:surfaceTexture.pointed}} 会做成金字塔，选 {{ui:surfaceTexture.round}} 或 {{ui:surfaceTexture.dome}} 则做成软垫。
 
-{{ui:surfaceTexture.timber}}和{{ui:surfaceTexture.stones}}是为模型制作准备的，例如铁路模型或场景模型里的房子。{{ui:surfaceTexture.timber}}让木梁凸出墙面，梁间的灰泥较低：立柱间距为{{ui:inspector.surfaceSpacingTimber}}，每层（{{ui:inspector.surfaceTimberHeight}}）都有底梁和顶梁，中间横穿{{ui:inspector.surfaceTimberRails}}。{{ui:inspector.surfaceTimberBracing}}决定格里放多少木料：{{ui:surfaceTexture.timberBraces}}从两端向中间倾斜，{{ui:surfaceTexture.timberCross}}位于最低横档下面，{{ui:surfaceTexture.timberKnee}}在上方两角，{{ui:surfaceTexture.timberMixed}}则在两端放斜撑、中间放交叉撑和角撑，就像许多老房子那样。{{ui:inspector.surfaceTimberBeam}}和{{ui:inspector.surfaceDepthTimber}}决定梁的宽度和凸出高度，{{ui:inspector.surfaceTimberGrain}}给梁加上淡淡的木纹。和砖纹一样，格宽和层高会略微取整，好让整格放得下，从底边开始向上。{{ui:surfaceTexture.stones}}砌出一面老墙：大小不一的石块排成粗略的层，灰缝较低，每块石头都略微隆起，各不相同。{{ui:inspector.surfaceStoneRound}}从棱角锋利的碎石（0 %）到圆润的卵石（100 %）；{{ui:inspector.surfaceStoneVary}}、{{ui:inspector.surfaceBrickJoint}}和{{ui:inspector.surfaceSeed}}决定石块差异多大、缝有多宽以及怎样排列。两者都只是形状、只有一种颜色，所以{{ui:inspector.surfacePatternPart}}可以把木梁或石块做成单独的部件，用第二种颜色打印。
+{{ui:surfaceTexture.timber}}和{{ui:surfaceTexture.stones}}是为模型制作准备的，例如铁路模型或场景模型里的房子。{{ui:surfaceTexture.timber}}让木梁凸出墙面，梁间的灰泥较低：立柱间距为{{ui:inspector.surfaceSpacingTimber}}，每层（{{ui:inspector.surfaceTimberHeight}}）都有底梁和顶梁，中间横穿{{ui:inspector.surfaceTimberRails}}。{{ui:inspector.surfaceTimberBracing}}决定格里放多少木料：{{ui:surfaceTexture.timberBraces}}从两端向中间倾斜，{{ui:surfaceTexture.timberCross}}位于最低横档下面，{{ui:surfaceTexture.timberKnee}}在上方两角，{{ui:surfaceTexture.timberMixed}}则在两端放斜撑、中间放交叉撑和角撑，就像许多老房子那样。{{ui:inspector.surfaceTimberBeam}}和{{ui:inspector.surfaceDepthTimber}}决定梁的宽度和凸出高度，{{ui:inspector.surfaceTimberGrain}}给梁加上木纹：0 % 没有，低于 50 % 纹线更多更细，高于 50 % 是两道又宽又深的纹槽——从刨光的木料到粗糙的厚板。和砖纹一样，格宽和层高会略微取整，好让整格放得下，从底边开始向上。{{ui:surfaceTexture.stones}}砌出一面老墙：大小不一的石块排成粗略的层，灰缝较低，每块石头都略微隆起，各不相同。{{ui:inspector.surfaceStoneRound}}从棱角锋利的碎石（0 %）到圆润的卵石（100 %）；{{ui:inspector.surfaceStoneVary}}、{{ui:inspector.surfaceBrickJoint}}和{{ui:inspector.surfaceSeed}}决定石块差异多大、缝有多宽以及怎样排列。两者都只是形状、只有一种颜色，所以{{ui:inspector.surfacePatternPart}}可以把木梁或石块做成单独的部件，用第二种颜色打印。
 
 {{ui:surfaceTexture.cracks}} 图案让裂纹像金缮那样在表面蔓延，带有转折、分叉，宽度向末端逐渐变细。{{ui:inspector.surfaceCrackStart}} 决定裂纹从哪里开始：花瓶或杯子的上沿、底部、从盘子边缘向中心，或任意位置；在 {{ui:inspector.surfaceCrackStyle}} 下它们会变成闪电。选 {{ui:inspector.surfaceCrackGold}} 时，凹痕由一个单独的金色零件填满，可用第二种耗材打印；更改或移除纹理时它会一起变化。在 {{ui:inspector.more}} 下设置分叉、锯齿和崩边，换一个 {{ui:inspector.surfaceCrackSeed}} 就重新生成裂纹。
 
@@ -204,6 +204,22 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 结果是一个网格，就像导入的模型一样，并保留生成它时所用的实体。之后再选中它（保存后也可以），卡片会显示生成时的设置：修改后单击 {{ui:inspector.surfaceChange}}，纹理会在该实体上重新生成，位置和大小与纹理实体现在的一致。{{ui:inspector.surfaceRemove}} 恢复光滑的实体。更改纹理时遮罩实体会再次起作用：如果以后可能还要改，请隐藏而不是删除它们。撤销同样可以撤回其中每一步。
 
 要用两种颜色打印，请打开 {{ui:inspector.surfacePatternPart}}，适用于任何图案：图案会成为独立零件，{{ui:inspector.surfacePatternColor}} 决定它的颜色——第一次是与实体形成对比的颜色，下一次是你上次选的颜色。凸出实体时，零件就是凸出的部分，实体保持原样；凹入实体时，实体被刻入图案，零件把凹槽一直填到表面，就像裂纹里的金色填充。两者一起放在捆绑中：它们一起移动，各自保留颜色，3MF 文件中它们是交给切片软件的两个零件。像往常一样修改或取下纹理；图案零件会随之一起变化。有多个图层时，它们必须朝同一方向，凸出或凹入实体；两侧居中的图案仍与实体为一体。
+
+## 多色上色
+
+为了多色打印，{{ui:paint.title}} 直接在设计中给实体的部分表面上色：一个面、一圈圆柱壁、孔的内壁、一个圆斑，或者你圈出的一块区域。它和切片软件里的上色工具类似，但颜色随设计一起保存。选择一个实体，在 {{ui:editor.group.modify}} 组中点击 {{ui:paint.title}}（在 {{ui:inspector.surfaceTexture}} 旁边）。面板会列出设计中用到的颜色，{{ui:paint.customColor}} 可以调出自己的颜色。然后在视图中用三种工具之一上色：
+
+- {{ui:paint.mode.fill}}：点击一下，把面一直填充到它的锐利边缘，就像画图软件里的油漆桶：长方体的顶面、圆柱的侧壁、凹槽的底面或孔的内壁，各点一下即可。{{ui:paint.angle}} 决定边缘要多锐利才会让填充停下；设为 90° 时会越过长方体的棱边。
+- {{ui:paint.mode.circle}}：点击一下，在表面上放一个设定 {{ui:paint.diameter}} 的圆斑，圆心就在点击处，曲面上也可以。它会在实体的锐利边缘停下，也不会透到壁的背面。
+- {{ui:paint.mode.lasso}}：按住鼠标键圈出一块区域。区域内看得见的部分会被上色，实体背后的背面不会。
+
+![用三种工具上色的长方体：顶面填充为黄色，正面一个白色圆，侧面一个用套索圈出的绿色星形；旁边是上色面板。](shot:paint)
+
+{{ui:paint.eraser}} 用同样的工具把颜色去掉，{{ui:paint.clear}} 一次去掉全部颜色。每一笔都是单独的一步，所以 [[Ctrl]]+[[Z]] 会撤销最后一笔。两笔之间仍然可以像平时一样用鼠标右键旋转视图；{{ui:paint.done}} 或 [[Esc]] 关闭面板。
+
+圆和套索的边缘会切进实体的网格：长方体面上的圆是圆的，而不是几个三角形，实体也保持封闭。颜色属于实体：它随实体移动和旋转，调整尺寸时随之拉伸；修改后找不到位置的笔画会被跳过。导出 3MF 时颜色会写成已上色的面，OrcaSlicer、Bambu Studio 和 PrusaSlicer 会用各自的耗材打印（见[文件和保存](chapter:files-and-saving)）；OBJ 也保留颜色，STL 仍是单色。
+
+切成一个实体的组合（例如带孔的长方体）按一个实体上色：请在切出孔之后再上色，打开组合修改后颜色仍会保留。束中的部件要逐个上色。把已上色的实体和其他实体组合后，它作为部件保留颜色，取消分组后会再次显示。不封闭的导入网格会按它自己的三角形上色。
 
 ## 花瓶
 

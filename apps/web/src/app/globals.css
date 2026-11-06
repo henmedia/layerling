@@ -3102,6 +3102,72 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* Paint: fill, circle and lasso side by side. */
+.paint-panel .shell-opening-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* The colours to paint with, a colour of one's own under them, and the eraser beside it. */
+.paint-color-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 7px;
+}
+
+.paint-color-row .color-grid {
+  grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
+  gap: 6px;
+}
+
+.paint-color-row .custom-color {
+  grid-column: auto;
+  justify-self: start;
+}
+
+.paint-eraser {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  margin-top: 8px;
+  padding: 0 10px;
+  color: #6d5133;
+  font-size: 12px;
+  font-weight: 700;
+  background: #fbf8f4;
+  border: 1px solid #d8c8b7;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.paint-eraser.active {
+  color: #9f5508;
+  background: #fff1e0;
+  border-color: #e08a2c;
+}
+
+.paint-panel .paint-count {
+  margin-top: 8px;
+}
+
+/* The shape a lasso of the paint tool is drawing, over the view. */
+.paint-lasso-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.paint-lasso-overlay polygon {
+  fill: rgba(211, 113, 12, 0.16);
+  stroke: #d3710c;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
 .shell-opening-options button.active {
   color: #9f5508;
   background: #fff1e0;
@@ -13778,6 +13844,18 @@ html[data-theme="dark"] .shell-opening-options button {
 }
 
 html[data-theme="dark"] .shell-opening-options button.active {
+  color: #ffb866;
+  background: #4a3217;
+  border-color: #c7772a;
+}
+
+html[data-theme="dark"] .paint-eraser {
+  color: #ddccb9;
+  background: #35281b;
+  border-color: #5a4633;
+}
+
+html[data-theme="dark"] .paint-eraser.active {
   color: #ffb866;
   background: #4a3217;
   border-color: #c7772a;

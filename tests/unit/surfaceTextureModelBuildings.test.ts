@@ -78,13 +78,48 @@ function roundCylinder(settings: Record<string, unknown>, radius = 20, height = 
   return { s, layout, R, at: (u: number, z: number) => surfaceTextureValueAt(R * Math.cos(u / R), R * Math.sin(u / R), z, Math.cos(u / R), Math.sin(u / R), 0, s, layout) };
 }
 
+/** Per point of a textured body the points it shares an edge with. */
+function neighbours(body: Pick<SurfaceTextureResult, "vertices" | "indices">) {
+  const out: Set<number>[] = Array.from({ length: body.vertices.length / 3 }, () => new Set());
+  const I = body.indices;
+  for (let t = 0; t < I.length; t += 3) {
+    for (let k = 0; k < 3; k += 1) {
+      out[I[t + k]].add(I[t + ((k + 1) % 3)]);
+      out[I[t + k]].add(I[t + ((k + 2) % 3)]);
+    }
+  }
+  return out;
+}
+
+/**
+ * Points of a textured body standing out from all the points round them, or sunk below them, by more than `limit` mm as
+ * `offset` measures how far each lies outside the body as it was: spikes a beam's or a stone's face does not have. Only
+ * the points `where` says.
+ */
+function spikes(body: Pick<SurfaceTextureResult, "vertices" | "indices">, offset: (x: number, y: number, z: number) => number, limit: number, where: (x: number, y: number, z: number) => boolean = () => true) {
+  const v = body.vertices;
+  const off = Array.from({ length: v.length / 3 }, (_, i) => offset(v[i * 3], v[i * 3 + 1], v[i * 3 + 2]));
+  return neighbours(body).filter((around, i) => {
+    if (!around.size || !where(v[i * 3], v[i * 3 + 1], v[i * 3 + 2])) return false;
+    const near = [...around].map((j) => off[j]);
+    return off[i] - Math.max(...near) > limit || Math.min(...near) - off[i] > limit;
+  }).length;
+}
+
 describe("half-timbering", () => {
   it("knows its settings, starts standing out at model-building sizes, and keeps them within their limits", () => {
     expect(normalizeSurfaceTexture({ pattern: "timber" })).toMatchObject({
-      spacing: 12, depth: 0.8, direction: "outward", keepEdges: false, timberHeight: 30, timberBeam: 2.4, timberRails: 1, timberBracing: "mixed", timberGrain: true,
+      spacing: 12, depth: 0.8, direction: "outward", keepEdges: false, timberHeight: 30, timberBeam: 2.4, timberRails: 1, timberBracing: "mixed", timberGrain: 0.5,
     });
     expect(normalizeSurfaceTexture({ pattern: "timber", timberRails: 3.7, timberBracing: "diagonal", timberBeam: 0, timberHeight: 1000, timberGrain: "false" }))
-      .toMatchObject({ timberRails: 2, timberBracing: "mixed", timberBeam: 0.3, timberHeight: 300, timberGrain: false });
+      .toMatchObject({ timberRails: 2, timberBracing: "mixed", timberBeam: 0.3, timberHeight: 300, timberGrain: 0 });
+    // The grain was only on or off before: a design saved then keeps its grain (on is the middle, 0.5), or none.
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: true }).timberGrain).toBe(0.5);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: "true" }).timberGrain).toBe(0.5);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: false }).timberGrain).toBe(0);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: 0.3 }).timberGrain).toBe(0.3);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: 1.7 }).timberGrain).toBe(1);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: -1 }).timberGrain).toBe(0);
     expect(normalizeSurfaceTexture({ pattern: "timber", timberRails: 1.4 }).timberRails).toBe(1);
     expect(normalizeSurfaceTexture({ pattern: "timber", timberRails: -2 }).timberRails).toBe(0);
     expect(SURFACE_TEXTURE_TIMBER_BRACINGS.map((bracing) => normalizeSurfaceTexture({ pattern: "timber", timberBracing: bracing }).timberBracing)).toEqual([...SURFACE_TEXTURE_TIMBER_BRACINGS]);
@@ -184,6 +219,64 @@ describe("half-timbering", () => {
     expect(lowest).toBeGreaterThanOrEqual(1 - 0.08 - 1e-9);
     expect(along(grained.at).filter((value) => value === 1).length).toBeGreaterThan(30);
     expect(along(plain.at).every((value) => value === 1)).toBe(true);
+    // Saved with the grain on, as it was: the same grain.
+    const saved = onFront({ pattern: "timber", timberBracing: "none", timberGrain: true });
+    expect(along(saved.at)).toEqual(along(grained.at));
+  });
+
+  it("makes the grain fine or strong: more, thinner, shallower grooves below the middle, two wider, deeper ones above it", () => {
+    /** Across a post from its middle to its edge (shares of its half width): the lowest the beam's face comes along it. */
+    const profile = (timberGrain: number) => {
+      const { at, layout } = onFront({ pattern: "timber", timberBracing: "none", timberGrain });
+      const { origin: x0 } = layout.timber!.posts[0];
+      // From above the sill to below the rail, which has a grain of its own.
+      const { origin: z0, height: H } = layout.timber!.storeys[2];
+      return Array.from({ length: 96 }, (_, k) => {
+        const x = x0 + ((k + 0.5) / 96) * 1.2;
+        let lowest = 1;
+        for (let z = z0 + 3; z < z0 + H / 2 - 3; z += 0.05) lowest = Math.min(lowest, at(x, z));
+        return lowest;
+      });
+    };
+    /** The grooves seen across it: how many, where the middle of each lies, how wide and how deep. */
+    const grooves = (values: number[]) => {
+      const found: { at: number; width: number; depth: number }[] = [];
+      let start = -1;
+      values.forEach((value, k) => {
+        const inside = value < 1 - 1e-9;
+        if (inside && start < 0) start = k;
+        if ((!inside || k === values.length - 1) && start >= 0) {
+          const end = inside ? k + 1 : k;
+          const part = values.slice(start, end);
+          found.push({ at: (start + end) / 2 / values.length, width: (end - start) / values.length, depth: 1 - Math.min(...part) });
+          start = -1;
+        }
+      });
+      return found;
+    };
+    // As it starts: one groove each side, at 0.45 of the half width, 0.2 wide either side, at most 8 % of the beams' height.
+    const middle = grooves(profile(0.5));
+    expect(middle).toHaveLength(1);
+    expect(middle[0].at).toBeCloseTo(0.45, 1);
+    expect(middle[0].width).toBeCloseTo(0.4, 1);
+    expect(middle[0].depth).toBeGreaterThan(0.06);
+    expect(middle[0].depth).toBeLessThanOrEqual(0.08 + 1e-9);
+    // Finer: two each side, then three, each thinner and shallower than before; at 0 none.
+    const finer = grooves(profile(0.35)), finest = grooves(profile(0.1));
+    expect(finer).toHaveLength(2);
+    expect(finest).toHaveLength(3);
+    for (const groove of [...finer, ...finest]) {
+      expect(groove.width).toBeLessThan(0.6 * middle[0].width);
+      expect(groove.depth).toBeLessThan(middle[0].depth);
+    }
+    expect(Math.max(...finest.map((groove) => groove.depth))).toBeLessThan(Math.min(...finer.map((groove) => groove.depth)));
+    expect(grooves(profile(0))).toHaveLength(0);
+    // Stronger: still one each side, wider and deeper - twice as deep at 100 %.
+    const strong = grooves(profile(1));
+    expect(strong).toHaveLength(1);
+    expect(strong[0].width).toBeGreaterThan(1.3 * middle[0].width);
+    expect(strong[0].depth).toBeGreaterThan(1.8 * middle[0].depth);
+    expect(strong[0].depth).toBeLessThanOrEqual(0.16 + 1e-9);
   });
 
   it("goes round a cylinder in whole fields, as many as the bracing needs, with nothing jumping at the seam", () => {
@@ -200,10 +293,100 @@ describe("half-timbering", () => {
     }
   });
 
+  it("frames a box's corners whole: a corner post meets the sill and the plate, beside it and beyond their middle lines", () => {
+    // The front's frame, the top and bottom kept smooth (as they start) and with them patterned, no fade: at its four
+    // corners the end post and the sill or plate overlap in a square beyond both their middle lines. It belongs to both.
+    // Without grain, and as a part of its own the plaster is flat: the beams' faces and walls alone.
+    for (const settings of [{}, { topFree: 0, bottomFree: 0, fade: 0 }]) {
+      const { at, layout } = onFront({ pattern: "timber", timberGrain: false, patternPart: true, ...settings }, [78.8, 58.6, 42.9]);
+      const { origin: x0, cell: W, count: fields } = layout.timber!.posts[0];
+      const { origin: z0, height: H, count: storeys } = layout.timber!.storeys[2];
+      const x1 = x0 + fields * W, z1 = z0 + storeys * H;
+      for (const [x, z] of [[x0, z0], [x1, z0], [x0, z1], [x1, z1]]) {
+        const outX = Math.sign(x - (x0 + x1) / 2), outZ = Math.sign(z - (z0 + z1) / 2);
+        for (const f of [0.05, 0.5, 0.95]) for (const g of [0.05, 0.5, 0.95]) expect(at(x + outX * f * 1.2, z + outZ * g * 1.2)).toBe(1);
+        // Beyond the post's or the plate's outer face their walls run on round the corner, as beside it.
+        expect(at(x + outX * 1.25, z + outZ * 0.6)).toBeCloseTo(0.5, 9);
+        expect(at(x - outX * 0.6, z + outZ * 1.25)).toBeCloseTo(0.5, 9);
+        expect(at(x + outX * 1.25, z + outZ * 1.25)).toBeCloseTo(0.5, 9);
+        expect(at(x + outX * 1.26, z + outZ * 1.25)).toBeCloseTo(0.4, 9);
+      }
+    }
+  });
+
+  it("stands out by the beams' height all along a box's edges, its corners too (reported on a 78.8 x 42.9 x 58.6 box)", () => {
+    // In the inside frame (y up): 78.8 long, 58.6 high, 42.9 deep. Every point within a millimetre of an edge lies on a
+    // corner post, a sill or a plate (a beam is 2.4 mm wide): it stands out by the depth, less the grain's 8 % at most.
+    const [w, h, d] = [78.8, 58.6, 42.9];
+    const outside = (x: number, y: number, z: number) => Math.max(Math.abs(x) - w / 2, y - h, -y, Math.abs(z) - d / 2);
+    for (const [settings, smooth] of [[{ topFree: 0, bottomFree: 0, fade: 0 }, 0], [{}, 1.05]] as const) {
+      const result = applySurfaceTexture(box(w, h, d), { pattern: "timber", ...settings });
+      expectClosed(result);
+      const v = result.vertices;
+      const used = new Uint8Array(v.length / 3);
+      for (const i of result.indices) used[i] = 1;
+      const heights: number[] = [];
+      for (let i = 0; i < v.length / 3; i += 1) {
+        if (!used[i]) continue;
+        const [x, y, z] = [v[i * 3], v[i * 3 + 1], v[i * 3 + 2]];
+        const near = [Math.abs(x) > w / 2 - 1, y < 1 || y > h - 1, Math.abs(z) > d / 2 - 1];
+        // Kept smooth, the top and bottom have no frame: there the upright edges between the sill and the plate.
+        const counts = smooth ? near[0] && near[2] && y > smooth && y < h - smooth : near.filter(Boolean).length >= 2;
+        if (counts) heights.push(outside(x, y, z));
+      }
+      expect(heights.length).toBeGreaterThan(1000);
+      expect(Math.min(...heights)).toBeGreaterThan(0.8 * (1 - 0.08) - 1e-6);
+      expect(Math.max(...heights)).toBeLessThan(0.8 + 1e-6);
+    }
+  }, 60_000);
+
+  it("ends its sill and plate in a steep wall at a smooth top or bottom with no fade, not in a saw-tooth fringe", () => {
+    // Reported round a cylinder 32.9 mm across and 45.5 mm high, the top and bottom smooth, no fade: the plate's top came
+    // out ragged all round the rim. The frame ends a beam's wall (0.1 mm) short of the rim: the plate's face begins there.
+    const R = 16.45, H = 45.5;
+    const { layout } = roundCylinder({ pattern: "timber", fade: 0 }, R, H);
+    const { origin, height, count } = layout.timber!.storeys[2];
+    expect(origin).toBeCloseTo(0.1 + 1.2, 9);
+    expect(origin + count * height).toBeCloseTo(H - 0.1 - 1.2, 9);
+    // Patterned top and bottom: the frame's edges are the rims, sill and plate on them (see the box's corners).
+    const patterned = roundCylinder({ pattern: "timber", fade: 0, topFree: 0, bottomFree: 0 }, R, H).layout.timber!.storeys[2];
+    expect(patterned.origin).toBeCloseTo(1.2, 9);
+    // Round the cylinder and along a box's top edge: within the wall's width of the rim a point stands out no more than
+    // the wall rises there (and the plaster's roughness), from the wall's top down the plate's face stands out whole -
+    // less the grain, and round the cylinder the hundredth of a millimetre its flat segments lie inside the circle.
+    const walls = [
+      { input: cylinder(R, H), height: H, out: (x: number, z: number) => Math.hypot(x, z) - R, side: (x: number, z: number) => Math.hypot(x, z) > R - 0.05 },
+      { input: box(78.8, 58.6, 42.9), height: 58.6, out: (_x: number, z: number) => Math.abs(z) - 42.9 / 2, side: (x: number, z: number) => Math.abs(z) > 42.9 / 2 - 0.05 && Math.abs(x) < 36 },
+    ];
+    for (const { input, height: top, out, side } of walls) {
+      const result = applySurfaceTexture(input, { pattern: "timber", fade: 0 });
+      expectClosed(result);
+      const v = result.vertices;
+      const used = new Uint8Array(v.length / 3);
+      for (const i of result.indices) used[i] = 1;
+      let face = 0;
+      for (let i = 0; i < v.length / 3; i += 1) {
+        const [x, y, z] = [v[i * 3], v[i * 3 + 1], v[i * 3 + 2]];
+        if (!used[i] || !side(x, z)) continue;
+        for (const below of [top - y, y]) {
+          if (below < 0.1 - 0.03) expect(out(x, z)).toBeLessThanOrEqual(0.8 * (below / 0.1) + 0.08 * 0.8 + 1e-6);
+          else if (below > 0.1 + 0.03 && below < 2.3) {
+            expect(out(x, z)).toBeGreaterThan(0.8 * (1 - 0.08) - 0.01);
+            face += 1;
+          }
+        }
+      }
+      expect(face).toBeGreaterThan(100);
+      expect(spikes(result, (x, y, z) => (y > 0.5 && y < top - 0.5 ? out(x, z) : 0), 0.15)).toBe(0);
+    }
+  }, 60_000);
+
   it("makes a closed body with the beams standing out by the depth, and a part of its own of them", () => {
     const input = box(72, 45, 10);
     const result = applySurfaceTexture(input, { pattern: "timber" });
     expectClosed(result);
+    // Cut along the grain's grooves however fine or strong.
+    for (const timberGrain of [0.1, 0.35, 1]) expectClosed(applySurfaceTexture(input, { pattern: "timber", timberGrain }));
     expect(result.stats.timber).toMatchObject({ storeys: 1, panel: (72 - 2.4) / 6 });
     expect(result.stats.timber!.height).toBeCloseTo(40.6, 9);
     let front = -Infinity;
@@ -315,6 +498,35 @@ describe("a natural stone wall", () => {
       expect(stone).toBeGreaterThan(50);
     }
   });
+
+  it("lays no stones beyond the wall's height or a flat face's length: no pieces of its other end in the fade", () => {
+    // Up to half the height of a cylinder, as the height band says: above it the wall had begun again with its first
+    // courses, and by a smooth top their pieces stood in the fade as splinters. Now mortar, as between the stones.
+    const R = 16.45, H = 45.5;
+    for (const stoneRound of [0, 0.5]) {
+      const { at } = roundCylinder({ pattern: "stones", stoneRound, zoneTo: 50 }, R, H);
+      const below: number[] = [], above: number[] = [];
+      for (let z = 2; z < H; z += 0.3) for (let u = -Math.PI * R; u < Math.PI * R; u += 0.7) (z < H / 2 - 3 ? below : z > H / 2 + 2 ? above : []).push(at(u, z));
+      expect(below.filter((value) => value > 0.3).length / below.length).toBeGreaterThan(0.3);
+      expect(Math.max(...above)).toBe(0);
+    }
+    // Beyond the ends of a flat face's courses as well (a point past the box's edge).
+    const { at } = onFront({ pattern: "stones" }, [60, 40, 10]);
+    for (let z = 2; z < 38; z += 0.3) for (const x of [-40, -36, 36, 40]) expect(at(x, z)).toBe(0);
+  });
+
+  it("keeps a stone's edge by a smooth top or bottom as it was cut, without spikes where the fade is refined", () => {
+    // Round a cylinder 32.9 mm across and 45.5 mm high, as the half-timbering was reported on, broken stones with sharp
+    // corners and the stones as they start: where a stone reaches into the fade by the rims, the points refining the fade
+    // adds there take the heights of the cuts round them, and none stands up alone from the mortar. (Far from the rims a
+    // broken stone's sharp corner may still end in one point of the grid: only the bands by the rims count here.)
+    const R = 16.45, H = 45.5;
+    for (const settings of [{}, { seed: 2, stoneRound: 0 }, { seed: 7, stoneRound: 0 }]) {
+      const result = applySurfaceTexture(cylinder(R, H), { pattern: "stones", ...settings });
+      expectClosed(result);
+      expect(spikes(result, (x, y, z) => (y > 0.02 && y < H - 0.02 ? Math.hypot(x, z) - R : 0), 0.15, (_x, y) => y < 1.5 || y > H - 1.5)).toBe(0);
+    }
+  }, 60_000);
 
   it("makes a closed body, and a part of its own of the stones", () => {
     const input = box(40, 30, 10);

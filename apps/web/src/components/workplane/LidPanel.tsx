@@ -22,6 +22,8 @@ import {
   MAX_LID_DEPTH,
   MAX_LID_GAP,
   MAX_LID_THICKNESS,
+  MAX_LID_THREAD_PITCH,
+  MAX_LID_THREAD_TURNS,
   MAX_LID_WALL,
   MAX_MAGNET_DIAMETER,
   MAX_MAGNET_GAP,
@@ -32,13 +34,17 @@ import {
   MIN_HINGE_PIN_PLAY,
   MIN_LID_DEPTH,
   MIN_LID_THICKNESS,
+  MIN_LID_THREAD_PITCH,
+  MIN_LID_THREAD_TURNS,
   MIN_LID_WALL,
   MIN_MAGNET_DIAMETER,
   MIN_MAGNET_HEIGHT,
   hingeKnuckleRadius,
   lidClickBumpsFit,
   lidHandleFits,
+  lidTakesExtras,
   lidThicknessForMagnets,
+  lidThread,
   normalizeLidOptions,
   type LidOptions,
 } from "@/lib/lidTool";
@@ -52,9 +58,11 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * A lid for a body open at the top (#1009): pushed into the opening, put over the outside, gripping the wall from both
  * sides (#1062) or laid flat on it. It comes out as a body of its own beside the one it closes, ready to print. With
  * magnets, it holds by four round magnets in the corners, in pockets in the body's rim and in the lid. With a hinge, it
- * swings open about a pin along the body's back, tight in the body's knuckles and turning in the lid's. With click bumps
+ * swings open about a pin along the body's back, tight in the body's knuckles and turning in the lid's; a flush hinge can
+ * have end plugs that close the pin's hole flush with the body's outside (Discussion #1387). With click bumps
  * it snaps into dimples in the body (#1234), the bumps as high as asked; a handle is a pull tab on the lid or a finger
- * notch in the body (#1230).
+ * notch in the body (#1230). A screw lid (Discussion #1393) is a cap with a thread inside its rim for a round body, which
+ * gets the matching thread on the outside of its top; it holds by that alone.
  */
 export function LidPanel({
   targetName,
@@ -98,6 +106,10 @@ export function LidPanel({
   const bumpsFit = lidClickBumpsFit(settings);
   const handleFits = lidHandleFits(settings);
   const handle = handleFits ? settings.handle : "none";
+  // A screw lid holds by its thread: the magnets, hinge, click bumps and handle stay switched off, with one line saying why.
+  const extras = lidTakesExtras(settings);
+  const screw = settings.type === "screw";
+  const thread = lidThread(settings);
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -189,19 +201,45 @@ export function LidPanel({
           onChange={(value) => onChange({ gap: value })}
         />
         {fromPrinterPlay("lid.gap", settings.gap, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
+        {/* A screw lid's rim reaches down as far as its thread goes: the pitch times the turns. */}
+        {screw ? (<>
+          <EdgeModifierSlider
+            label={t("lid.threadPitch")}
+            value={settings.threadPitch}
+            min={MIN_LID_THREAD_PITCH}
+            max={MAX_LID_THREAD_PITCH}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onChange({ threadPitch: value })}
+          />
+          <EdgeModifierSlider
+            label={t("lid.threadTurns")}
+            value={settings.threadTurns}
+            min={MIN_LID_THREAD_TURNS}
+            max={MAX_LID_THREAD_TURNS}
+            step={0.5}
+            workspace={workspace}
+            decimals={1}
+            disabled={busy}
+            onChange={(value) => onChange({ threadTurns: value })}
+          />
+        </>) : (
+          <EdgeModifierSlider
+            label={t(settings.type === "cap" ? "lid.depthCap" : settings.type === "both" ? "lid.depthBoth" : "lid.depth")}
+            value={settings.depth}
+            min={MIN_LID_DEPTH}
+            max={MAX_LID_DEPTH}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onChange({ depth: value })}
+          />
+        )}
         <EdgeModifierSlider
-          label={t(settings.type === "cap" ? "lid.depthCap" : settings.type === "both" ? "lid.depthBoth" : "lid.depth")}
-          value={settings.depth}
-          min={MIN_LID_DEPTH}
-          max={MAX_LID_DEPTH}
-          step={0.5}
-          workspace={workspace}
-          length
-          disabled={busy}
-          onChange={(value) => onChange({ depth: value })}
-        />
-        <EdgeModifierSlider
-          label={t(settings.type === "cap" ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
+          label={t(settings.type === "cap" || screw ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
           value={settings.wall}
           min={MIN_LID_WALL}
           max={MAX_LID_WALL}
@@ -211,13 +249,17 @@ export function LidPanel({
           disabled={busy}
           onChange={(value) => onChange({ wall: value })}
         />
+        {screw ? (
+          <span className="shell-openings-summary">{t("lid.screwHint", { depth: millimetres(Math.round(thread.depth * 100) / 100), height: millimetres(Math.round(thread.height * 10) / 10) })}</span>
+        ) : null}
       </>)}
 
+      {!extras ? <span className="shell-openings-summary" role="status">{t("lid.error.screwExtras")}</span> : null}
       <label className="edge-modifier-field offset-copy">
-        <input type="checkbox" checked={settings.magnets} disabled={busy} onChange={(event) => withMagnet({ magnets: event.target.checked })} />
+        <input type="checkbox" checked={settings.magnets && extras} disabled={busy || !extras} onChange={(event) => withMagnet({ magnets: event.target.checked })} />
         <span>{t("lid.magnets")}</span>
       </label>
-      {settings.magnets ? (<>
+      {settings.magnets && extras ? (<>
         <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.magnetSize")}>
           <span>{t("lid.magnetSize")}</span>
           <div className="shell-opening-options">
@@ -279,7 +321,7 @@ export function LidPanel({
         <input type="checkbox" checked={settings.hinge && hingeFits} disabled={busy || !hingeFits} onChange={(event) => onChange({ hinge: event.target.checked })} />
         <span>{t("lid.hinge")}</span>
       </label>
-      {!hingeFits ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
+      {!hingeFits && extras ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
       {settings.hinge && hingeFits ? (<>
         {/* Where it sits: behind the back, in the wall (the box keeps its size), or a lid that turns on two pins. */}
         <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.hingeStyle")}>
@@ -378,6 +420,14 @@ export function LidPanel({
           <input type="checkbox" checked={settings.hingePrintPin} disabled={busy} onChange={(event) => onChange({ hingePrintPin: event.target.checked })} />
           <span>{t("lid.hingePrintPin")}</span>
         </label>
+        {/* A flush hinge's pin hole ends in the body's outer face: a plug at each end closes it (Discussion #1387). */}
+        {settings.hingeStyle === "flush" ? (<>
+          <label className="edge-modifier-field offset-copy">
+            <input type="checkbox" checked={settings.hingeEndPlugs} disabled={busy} onChange={(event) => onChange({ hingeEndPlugs: event.target.checked })} />
+            <span>{t("lid.hingeEndPlugs")}</span>
+          </label>
+          {settings.hingeEndPlugs ? <span className="shell-openings-summary">{t("lid.hingeEndPlugsHint")}</span> : null}
+        </>) : null}
         <span className="shell-openings-summary">{t("lid.hingeHint", { diameter: millimetres(Math.round(2 * hingeKnuckleRadius(settings) * 10) / 10) })}</span>
       </>) : null}
 
@@ -385,7 +435,7 @@ export function LidPanel({
         <input type="checkbox" checked={settings.clickBumps && bumpsFit} disabled={busy || !bumpsFit} onChange={(event) => onChange({ clickBumps: event.target.checked })} />
         <span>{t("lid.clickBumps")}</span>
       </label>
-      {settings.clickBumps || !bumpsFit ? <span className="shell-openings-summary">{t("lid.clickBumpsHint")}</span> : null}
+      {(settings.clickBumps || !bumpsFit) && extras ? <span className="shell-openings-summary">{t("lid.clickBumpsHint")}</span> : null}
       {/* How far they reach into the body's wall: a small box or a stiff lip wants less (#1220). */}
       {settings.clickBumps && bumpsFit ? (<>
         <EdgeModifierSlider
@@ -420,7 +470,7 @@ export function LidPanel({
             </button>
           ))}
         </div>
-        {!handleFits ? (
+        {!handleFits && !extras ? null : !handleFits ? (
           <span className="shell-openings-summary">{t("lid.error.handlePivot")}</span>
         ) : handle !== "none" ? (
           <span className="shell-openings-summary">{t(`lid.handleHint.${handle}`)}</span>
