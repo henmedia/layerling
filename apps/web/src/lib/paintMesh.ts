@@ -60,11 +60,6 @@ function size3(shape: WorkplaneShape): PaintVec3 {
   return [Math.max(1e-6, shapeWidth(shape)), Math.max(1e-6, shape.height), Math.max(1e-6, shapeDepth(shape))];
 }
 
-/** The body's size as a stroke keeps it: width, height and depth in mm. */
-export function paintBodySize(shape: WorkplaneShape): PaintVec3 {
-  return size3(shape);
-}
-
 /**
  * From the body's own frame to the world: as the 3D view places the body's object, turned by its own
  * yaw (also a round body's, whose mesh does not show it), mirrored, standing at its place.

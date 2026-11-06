@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { setAppTheme } from "@/lib/appTheme";
+import { writeCustomShortcuts } from "@/lib/customShortcuts";
 import { t } from "@/lib/i18n";
 import { setPrinterPlayFor } from "@/lib/printerPlay";
 import {
@@ -65,6 +66,8 @@ export function SettingsFileButtons({
     setViewCubePosition(parsed.browser.viewCubePosition);
     setShapeColors(parsed.browser.shapeColors);
     for (const [printer, play] of Object.entries(parsed.browser.printerPlays)) setPrinterPlayFor(printer, play);
+    // A file from before your own keys existed has none and leaves this browser's keys as they are.
+    if (parsed.browser.customShortcuts) writeCustomShortcuts(parsed.browser.customShortcuts);
     setMessage(t("workspace.importSettingsDone"));
   };
 

@@ -212,7 +212,6 @@ export function buildSupportRib(runtime: ManifoldToplevel, face: SupportRibFace,
   const { thickness, gap, bridgeWidth, footThickness } = measures;
   const frame = ribFrame(face);
   const { sine, cosine } = frame;
-  const tangent = sine / cosine;
   const height = supportRibHeight(face, settings);
   if (height < footThickness + 0.5) return { ok: false, reason: "tooLow" };
   // The face's plane and the plane a gap off it, as distances along the bed at a height y.

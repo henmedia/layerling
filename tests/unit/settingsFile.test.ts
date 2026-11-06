@@ -24,6 +24,7 @@ describe("settings file (Discussion #1407)", () => {
       "layerling.viewCubePosition": "bottom-left",
       "layerling.shapeColors": "off",
       "layerling.printerPlays": JSON.stringify({ "some-printer": 0.15, broken: "x" }),
+      "layerling.customShortcuts": JSON.stringify({ center: { combo: "Shift+C", label: "Center on workplane" }, "object-1": { combo: "J", label: "a body" } }),
     }));
     expect(browser).toEqual({
       theme: "dark",
@@ -31,6 +32,7 @@ describe("settings file (Discussion #1407)", () => {
       viewCubePosition: "bottom-left",
       shapeColors: false,
       printerPlays: { "some-printer": 0.15 },
+      customShortcuts: { center: { combo: "Shift+C", label: "Center on workplane" } },
     });
     const parsed = parseSettingsFile(settingsFileText(buildSettingsFile(workspace, "2.0 mm", browser, NOW)));
     expect(parsed).not.toBeNull();
@@ -47,6 +49,7 @@ describe("settings file (Discussion #1407)", () => {
       viewCubePosition: "top-left",
       shapeColors: true,
       printerPlays: {},
+      customShortcuts: {},
     });
     expect(readBrowserSettings(null).shapeColors).toBe(true);
   });
@@ -75,6 +78,26 @@ describe("settings file (Discussion #1407)", () => {
     expect(parsed!.browser.toolbarSize).toBe("medium");
     expect(parsed!.browser.shapeColors).toBe(true);
     expect(parsed!.browser.printerPlays).toEqual({ b: 0.2 });
+  });
+
+  it("carries your own keys (Discussion #1399), and a file from before them leaves the keys alone", () => {
+    const withKeys = parseSettingsFile(JSON.stringify({
+      format: SETTINGS_FILE_FORMAT,
+      version: 1,
+      workspace: {},
+      browser: { customShortcuts: { "shapes-panel": { combo: "shift+ctrl+k", label: "Shapes" }, center: { combo: "Space", label: "no key" } } },
+    }));
+    // Modifiers in the wrong case or order are not ours to guess; a key that cannot carry a command is dropped.
+    expect(withKeys!.browser.customShortcuts).toEqual({});
+    const sound = parseSettingsFile(JSON.stringify({
+      format: SETTINGS_FILE_FORMAT,
+      version: 1,
+      workspace: {},
+      browser: { customShortcuts: { "shapes-panel": { combo: "Shift+Ctrl+K", label: "Shapes" } } },
+    }));
+    expect(sound!.browser.customShortcuts).toEqual({ "shapes-panel": { combo: "Ctrl+Shift+K", label: "Shapes" } });
+    const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
+    expect(older!.browser.customShortcuts).toBeUndefined();
   });
 
   it("names the download after the day", () => {

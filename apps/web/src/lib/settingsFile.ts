@@ -1,4 +1,5 @@
 import { normalizeAppThemePreference, type AppThemePreference } from "@/lib/appTheme";
+import { CUSTOM_SHORTCUTS_STORAGE_KEY, normalizeCustomShortcuts, type CustomShortcuts } from "@/lib/customShortcuts";
 import { normalizePrinterPlay, PRINTER_PLAYS_STORAGE_KEY } from "@/lib/printerPlay";
 import { normalizeShapeColors, SHAPE_COLORS_STORAGE_KEY } from "@/lib/shapeColors";
 import { normalizeToolbarSize, TOOLBAR_SIZE_STORAGE_KEY, type ToolbarSize } from "@/lib/toolbarSize";
@@ -10,7 +11,7 @@ import type { GridSize, WorkplaneWorkspaceSettings } from "@/types/layerling";
 /**
  * The settings of the settings window in a file (Discussion #1407): the colours, grid, shadows, camera and shape
  * starts of the window, and the few choices of this browser that sit beside them (theme, toolbar size, view cube,
- * shape colours, the play of each printer). It is what a person sets up once and wants back on another computer or
+ * shape colours, the play of each printer, your own keys of #1399). It is what a person sets up once and wants back on another computer or
  * after the browser's data went. Nothing of a design is in it: not its plates, not its objects.
  */
 export const SETTINGS_FILE_FORMAT = "layerling-settings";
@@ -25,6 +26,11 @@ export type BrowserSettings = {
   shapeColors: boolean;
   /** The play of each printer, from the printer's id to millimetres. */
   printerPlays: Record<string, number>;
+  /**
+   * Your own keys (Discussion #1399), by command. Always written; read from a file only when it has them, so a file
+   * saved before they existed leaves the keys of this browser alone.
+   */
+  customShortcuts?: CustomShortcuts;
 };
 
 export type SettingsFile = {
@@ -67,12 +73,19 @@ export function readBrowserSettings(storage: Pick<Storage, "getItem"> | null): B
   } catch {
     printerPlays = {};
   }
+  let customShortcuts: CustomShortcuts = {};
+  try {
+    customShortcuts = normalizeCustomShortcuts(JSON.parse(readText(storage, CUSTOM_SHORTCUTS_STORAGE_KEY) ?? "{}"));
+  } catch {
+    customShortcuts = {};
+  }
   return {
     theme: normalizeAppThemePreference(readText(storage, APP_THEME_STORAGE_KEY)),
     toolbarSize: normalizeToolbarSize(readText(storage, TOOLBAR_SIZE_STORAGE_KEY)),
     viewCubePosition: normalizeViewCubePosition(readText(storage, VIEW_CUBE_POSITION_STORAGE_KEY)),
     shapeColors: normalizeShapeColors(readText(storage, SHAPE_COLORS_STORAGE_KEY)),
     printerPlays,
+    customShortcuts,
   };
 }
 
@@ -127,6 +140,7 @@ export function parseSettingsFile(text: string): SettingsFile | null {
       viewCubePosition: normalizeViewCubePosition(browser.viewCubePosition),
       shapeColors: typeof browser.shapeColors === "boolean" ? browser.shapeColors : true,
       printerPlays: normalizePrinterPlays(browser.printerPlays),
+      ...("customShortcuts" in browser ? { customShortcuts: normalizeCustomShortcuts(browser.customShortcuts) } : {}),
     },
   };
 }
