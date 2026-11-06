@@ -135,6 +135,20 @@ export function tapeLengthShift(start: THREE.Vector3, end: THREE.Vector3, length
 }
 
 /**
+ * The same for the reach along one axis, as the label's tip lists it (Discussion #610): the body moves
+ * along that axis only, until the two points are `length` apart on it, and stays where it was on the
+ * other two. It stays on the side of the other point it was on; a negative length takes it that far
+ * to the other side. `axis` is the axis inside the scene (y up). Null when the points are level on it.
+ */
+export function tapeAxisLengthShift(start: THREE.Vector3, end: THREE.Vector3, axis: "x" | "y" | "z", length: number, movesEnd: boolean) {
+  const current = end[axis] - start[axis];
+  if (Math.abs(current) < 1e-6) return null;
+  const shift = new THREE.Vector3();
+  shift[axis] = Math.sign(current) * length - current;
+  return movesEnd ? shift : shift.negate();
+}
+
+/**
  * What a whole round edge measures (asked for in the Facebook group): a full circle its diameter, an arc its radius,
  * each with the length along the edge. A circle's polyline may stop one side short of where it began, so a gap no
  * longer than its longest side still counts as closed. Null for any edge that is not round.

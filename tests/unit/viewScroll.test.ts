@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
-import { pivotBoxCorners, scrollAxisMetrics, scrollDistance, scrollViewAlong } from "@/lib/viewScroll";
+import { pivotBoxCorners, scrollAxisMetrics, scrollDistance, scrollViewAlong, wheelScrollFraction } from "@/lib/viewScroll";
 
 /** Scrollbars for the 3D view (Discussion #1241): what the thumbs show and how far a drag moves the view. */
 describe("view scrollbars", () => {
@@ -57,5 +57,23 @@ describe("view scrollbars", () => {
     expect(updates).toBe(1);
     scrollViewAlong(view, right, 0);
     expect(updates).toBe(1);
+  });
+
+  it("slides the view as far as the wheel turned over a bar, so a Mac's tiny wheel events do not throw it away (Discussion #1361)", () => {
+    // A view 700 px high: forty events of 2 px, as a resting finger on a Magic Mouse sends, move it 80 px, not 40 fixed steps.
+    let moved = 0;
+    for (let i = 0; i < 40; i += 1) moved += wheelScrollFraction(2, 0, 700);
+    expect(moved).toBeCloseTo(80 / 700, 9);
+    // A mouse notch of 100 px moves 100 px, up as well as down.
+    expect(wheelScrollFraction(100, 0, 700)).toBeCloseTo(100 / 700, 9);
+    expect(wheelScrollFraction(-100, 0, 700)).toBeCloseTo(-100 / 700, 9);
+    // Firefox counts lines (16 px each) or pages (the whole view).
+    expect(wheelScrollFraction(3, 1, 800)).toBeCloseTo(48 / 800, 9);
+    expect(wheelScrollFraction(1, 2, 800)).toBe(1);
+    // One event moves at most a whole view, and nothing comes of a canvas without size or a broken delta.
+    expect(wheelScrollFraction(5000, 0, 700)).toBe(1);
+    expect(wheelScrollFraction(-5000, 0, 700)).toBe(-1);
+    expect(wheelScrollFraction(10, 0, 0)).toBe(1);
+    expect(wheelScrollFraction(Number.NaN, 0, 700)).toBe(0);
   });
 });

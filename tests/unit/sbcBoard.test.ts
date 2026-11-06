@@ -7,6 +7,7 @@ import { guideSectionForShape } from "@/lib/guideLinks";
 import { exportLylProject, importLylProject, type LylProjectDocumentV1 } from "@/lib/lylProject";
 import {
   DEFAULT_SBC_BOARD,
+  MAX_SBC_BUTTON_REACH,
   MAX_SBC_CLEARANCE,
   MAX_SBC_REACH,
   MAX_SBC_UP_REACH,
@@ -18,10 +19,12 @@ import {
   normalizeSbcReach,
   normalizeSbcUpReach,
   sbcBoardBlocks,
+  sbcBoardHasButtons,
   sbcBoardHasGpio,
   sbcBoardHasRibbon,
   sbcBoardExtent,
   sbcBoardSolids,
+  sbcHoleDiameter,
   sbcPartAtEdge,
   sbcPartEdges,
 } from "@/lib/sbcBoards";
@@ -32,6 +35,8 @@ import type { SbcBoardSettings, SbcBoardType, WorkplaneShape } from "@/types/lay
 
 /** The small ESP32 boards: no mounting holes, USB-C at the right end, castellated pins. */
 const ESP32_BOARDS: SbcBoardType[] = ["xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini"];
+/** The microcontroller boards: no microSD card slot, no ribbon cables, no GPIO header to open up. */
+const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoNano", "wemosD1Mini"];
 
 /** A body carrying board settings; what carries them does not matter to the project file. */
 function boardBody(id: string, sbcBoard: SbcBoardSettings = { board: "pi4", clearance: 0.3 }): WorkplaneShape {
@@ -65,7 +70,7 @@ async function withDefinition(patch: Record<string, unknown>) {
 
 describe("SBC board data (#1098)", () => {
   it("has every board in the list, the Raspberry Pi 5 first", () => {
-    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini"]);
+    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoNano", "wemosD1Mini"]);
     expect(DEFAULT_SBC_BOARD).toBe("pi5");
     for (const type of SBC_BOARD_ORDER) expect(SBC_BOARDS[type].type).toBe(type);
   });
@@ -89,11 +94,13 @@ describe("SBC board data (#1098)", () => {
   it("keeps every hole on its board and every part over or at it", () => {
     for (const type of SBC_BOARD_ORDER) {
       const board = SBC_BOARDS[type];
-      for (const [x, y] of board.holes) {
-        expect(x - board.holeDiameter / 2, `${type} hole`).toBeGreaterThan(0);
-        expect(x + board.holeDiameter / 2, `${type} hole`).toBeLessThan(board.width);
-        expect(y - board.holeDiameter / 2, `${type} hole`).toBeGreaterThan(0);
-        expect(y + board.holeDiameter / 2, `${type} hole`).toBeLessThan(board.depth);
+      for (const hole of board.holes) {
+        const [x, y] = hole;
+        const radius = sbcHoleDiameter(board, hole) / 2;
+        expect(x - radius, `${type} hole`).toBeGreaterThan(0);
+        expect(x + radius, `${type} hole`).toBeLessThan(board.width);
+        expect(y - radius, `${type} hole`).toBeGreaterThan(0);
+        expect(y + radius, `${type} hole`).toBeLessThan(board.depth);
       }
       for (const part of board.parts) {
         expect(part.x1, `${type} ${part.name}`).toBeGreaterThan(part.x0);
@@ -409,9 +416,9 @@ describe("the microSD card slot", () => {
   const slot = (type: keyof typeof SBC_BOARDS) => SBC_BOARDS[type].parts.find((part) => part.name === "microSD card slot")!;
 
   it("is on every board, at the left edge where the card goes in, as the makers' models and drawings have it", () => {
-    // The small ESP32 boards have none.
-    for (const type of ESP32_BOARDS) expect(slot(type), type).toBeUndefined();
-    for (const type of SBC_BOARD_ORDER.filter((entry) => !ESP32_BOARDS.includes(entry))) {
+    // The microcontroller boards have none.
+    for (const type of MICRO_BOARDS) expect(slot(type), type).toBeUndefined();
+    for (const type of SBC_BOARD_ORDER.filter((entry) => !MICRO_BOARDS.includes(entry))) {
       const board = SBC_BOARDS[type];
       const part = slot(type);
       expect(part, type).toBeDefined();
@@ -451,7 +458,7 @@ describe("the openings up and out", () => {
     expect(ribbons("pi3bPlus")).toEqual(["camera", "display"]);
     expect(ribbons("zero2w")).toEqual(["camera"]);
     expect(ribbons("bttPi12")).toEqual([]);
-    for (const type of ESP32_BOARDS) {
+    for (const type of MICRO_BOARDS) {
       expect(ribbons(type), type).toEqual([]);
       expect(sbcBoardHasRibbon(SBC_BOARDS[type]) || sbcBoardHasGpio(SBC_BOARDS[type]), type).toBe(false);
     }
@@ -609,5 +616,185 @@ describe("the small ESP32 boards", () => {
       expect(grown.x1, type).toBeCloseTo(plain.x1 + 0.3 + 4, 9);
       expect(sbcBoardExtent(board, 0.3, 4).maxX, type).toBeCloseTo(usb.x1 + 4.3, 9);
     }
+  });
+});
+
+describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano and the D1 mini", () => {
+  const part = (type: SbcBoardType, name: string) => SBC_BOARDS[type].parts.find((entry) => entry.name === name)!;
+  const pinDots = (type: SbcBoardType, name: string) => sbcBoardSolids(SBC_BOARDS[type], 0, 0).filter((solid) => solid.name === `${name} pin`);
+  const middles = (dots: ReturnType<typeof pinDots>, axis: "x" | "y") => [...new Set(dots.map((dot) => Math.round(((axis === "x" ? dot.x0 + dot.x1 : dot.y0 + dot.y1) / 2) * 1000) / 1000))].sort((a, b) => a - b);
+
+  it("match the makers' PCB files: outline and mounting holes", () => {
+    // Adafruit's PCB file: 50.8 x 22.86 mm, corners 2.54 mm round, two plated 2.5 mm holes and two bare 2.2 mm ones.
+    expect(SBC_BOARDS.featherEsp32s3).toMatchObject({ width: 50.8, depth: 22.86, cornerRadius: 2.54, holeDiameter: 2.5 });
+    expect(SBC_BOARDS.featherEsp32s3.holes.map((hole) => [hole[0], hole[1], sbcHoleDiameter(SBC_BOARDS.featherEsp32s3, hole)])).toEqual([[2.54, 2.54, 2.5], [2.54, 20.32, 2.5], [48.26, 1.8415, 2.2], [48.26, 20.955, 2.2]]);
+    // Arduino's UNO file: 68.58 x 53.34 mm over all, the plate 66.04 wide, 1 mm corners, four 3.2 mm holes.
+    expect(SBC_BOARDS.arduinoUno).toMatchObject({ width: 68.58, depth: 53.34, cornerRadius: 1, holeDiameter: 3.2 });
+    expect(SBC_BOARDS.arduinoUno.holes).toEqual([[13.97, 2.54], [15.24, 50.8], [66.04, 7.62], [66.04, 35.56]]);
+    expect(SBC_BOARDS.arduinoUno.outline?.plateWidth).toBe(66.04);
+    // Arduino's Nano file: 43.18 x 17.78 mm, square corners, four 1.651 mm holes 1.27 mm in.
+    expect(SBC_BOARDS.arduinoNano).toMatchObject({ width: 43.18, depth: 17.78, cornerRadius: 0, holeDiameter: 1.651 });
+    expect(SBC_BOARDS.arduinoNano.holes).toEqual([[1.27, 1.27], [41.91, 1.27], [1.27, 16.51], [41.91, 16.51]]);
+    for (const type of ["featherEsp32s3", "arduinoUno", "arduinoNano"] as const) expect(sbcHoleDiameter(SBC_BOARDS[type], SBC_BOARDS[type].holes[0])).toBe(SBC_BOARDS[type].holeDiameter);
+  });
+
+  it("give the UNO its stepped right edge and the cut back corner, with the 45° cuts where the file has them", () => {
+    const outline = SBC_BOARDS.arduinoUno.outline!;
+    // The step: a strip from x = 66.04 to 68.58, y = 2.54 to 40.386, beside the plate.
+    expect(outline.add).toHaveLength(1);
+    const step = outline.add[0];
+    expect(step.turn).toBeFalsy();
+    expect([step.x - step.width / 2, step.x + step.width / 2]).toEqual([expect.closeTo(66.04, 9), expect.closeTo(68.58, 9)]);
+    expect([step.y - step.depth / 2, step.y + step.depth / 2]).toEqual([expect.closeTo(2.54, 9), expect.closeTo(40.386, 9)]);
+    // Its outer corners cut at 45° from (66.04, 2.54) to (68.58, 5.08) and from (68.58, 37.846) to (66.04, 40.386),
+    // and the plate's back right corner from (64.516, 53.34) to (66.04, 51.816): squares turned about the corners.
+    expect(outline.cut.map((entry) => [entry.x, entry.y, entry.turn, entry.width * Math.SQRT1_2])).toEqual([
+      [68.58, 2.54, 45, expect.closeTo(2.54, 9)],
+      [68.58, 40.386, 45, expect.closeTo(2.54, 9)],
+      [66.04, 53.34, 45, expect.closeTo(1.524, 9)],
+    ]);
+  });
+
+  it("give the D1 mini V4.0.0 the outline and pins of Wemos's drawing, laid with USB-C at the left", () => {
+    const board = SBC_BOARDS.wemosD1Mini;
+    expect(board).toMatchObject({ width: 34.3, depth: 25.4, cornerRadius: 1, holes: [] });
+    // The antenna end's corners 4 mm round, the notch's outer corner 1 mm.
+    expect(board.outline!.round).toEqual([{ x: 34.3, y: 0, radius: 4 }, { x: 34.3, y: 25.4, radius: 4 }, { x: 0, y: 23.5, radius: 1 }]);
+    // The notch: x below 6.8 at y above 23.5, then the edge slanting to (7.7, 25.4).
+    const [notch, slant] = board.outline!.cut;
+    expect([notch.x + notch.width / 2, notch.y - notch.depth / 2]).toEqual([expect.closeTo(6.8, 9), expect.closeTo(23.5, 9)]);
+    const turn = (slant.turn! * Math.PI) / 180;
+    // The slanted piece's corner at (6.8, 23.5), its long side running towards (7.7, 25.4).
+    const corner = [slant.x + (Math.sin(turn) * slant.depth + Math.cos(turn) * slant.width) / 2, slant.y + (Math.sin(turn) * slant.width - Math.cos(turn) * slant.depth) / 2];
+    expect(corner).toEqual([expect.closeTo(6.8, 9), expect.closeTo(23.5, 9)]);
+    expect([-Math.sin(turn), Math.cos(turn)].map((v) => v * Math.hypot(0.9, 1.9))).toEqual([expect.closeTo(0.9, 9), expect.closeTo(1.9, 9)]);
+    // 2 x 8 pins, 2.54 mm apart, the rows 22.86 mm apart, the first 8.815 mm from the USB end.
+    const dots = sbcBoardSolids(board, 0, 0).filter((solid) => solid.role === "pin");
+    expect(dots).toHaveLength(16);
+    expect(middles(dots, "y")).toEqual([1.27, 24.13]);
+    expect(middles(dots, "x")[0]).toBeCloseTo(8.815, 6);
+    expect(middles(dots, "x")[1] - middles(dots, "x")[0]).toBeCloseTo(2.54, 6);
+    expect(sbcPartEdges(board, part("wemosD1Mini", "USB-C"))).toEqual({ left: true, right: false, front: false, back: false });
+    expect(part("wemosD1Mini", "USB-C").profile).toBe("usbC");
+    expect(board.parts.every((entry) => entry.estimated)).toBe(true);
+  });
+
+  it("put each board's USB socket at its left end, as the makers' top views show, so a wall opening finds it", () => {
+    for (const [type, name] of [["featherEsp32s3", "USB-C"], ["arduinoUno", "USB-B"], ["arduinoUno", "power jack"], ["arduinoNano", "mini-USB"], ["wemosD1Mini", "USB-C"]] as const) {
+      const board = SBC_BOARDS[type];
+      expect(sbcPartEdges(board, part(type, name)), `${type} ${name}`).toEqual({ left: true, right: false, front: false, back: false });
+      expect(part(type, name).kind).toBe("connector");
+      const index = board.parts.indexOf(part(type, name));
+      expect(sbcBoardBlocks(board, 0.3, 4)[index].x0, `${type} ${name}`).toBeCloseTo(part(type, name).x0 - 4.3, 9);
+    }
+    // Not mirrored: the UNO's USB-B behind its power jack, its digital pins at the back, power and analog at the front.
+    expect(part("arduinoUno", "USB-B").y0).toBeGreaterThan(part("arduinoUno", "power jack").y1);
+    expect(part("arduinoUno", "header (digital 0 to 7)").y0).toBeGreaterThan(40);
+    expect(part("arduinoUno", "header (power)").y1).toBeLessThan(5);
+    // The Feather's battery connector at the back, its RESET button nearer the USB end than BOOT, the module at the far end.
+    expect(part("featherEsp32s3", "battery connector (JST PH)").y1).toBeGreaterThan(20);
+    expect(part("featherEsp32s3", "RESET button").x1).toBeLessThan(part("featherEsp32s3", "BOOT button").x0);
+    expect(part("featherEsp32s3", "module antenna").x1).toBeGreaterThan(50);
+    // Only the Feather's USB-C has a socket outline; the UNO's and the Nano's sockets are boxes.
+    expect(part("featherEsp32s3", "USB-C").profile).toBe("usbC");
+    expect(part("arduinoUno", "USB-B").profile).toBeUndefined();
+    expect(part("arduinoNano", "mini-USB").profile).toBeUndefined();
+  });
+
+  it("show the pins as dots 2.54 mm apart, where the PCB files have them", () => {
+    // Feather: 16 pins from x = 6.35 at y = 1.27, 12 from x = 16.51 at y = 21.59.
+    const front = pinDots("featherEsp32s3", "pins (RST to DB)");
+    const back = pinDots("featherEsp32s3", "pins (BAT to SDA)");
+    expect(front).toHaveLength(16);
+    expect(back).toHaveLength(12);
+    expect(middles(front, "x")[0]).toBeCloseTo(6.35, 6);
+    expect(middles(back, "x")[0]).toBeCloseTo(16.51, 6);
+    expect(middles(front, "y")).toEqual([1.27]);
+    expect(middles(back, "y")).toEqual([21.59]);
+    // UNO: the digital pins at y = 50.8 from x = 18.8, the power and analog ones at 2.54; the ICSP 2 x 3.
+    const digital = [...pinDots("arduinoUno", "header (digital 0 to 7)"), ...pinDots("arduinoUno", "header (digital 8 to 13)")];
+    expect(digital).toHaveLength(18);
+    expect(middles(digital, "y")).toEqual([50.8]);
+    expect(middles(pinDots("arduinoUno", "header (digital 0 to 7)"), "x")[0]).toBeCloseTo(18.8, 6);
+    expect(middles(pinDots("arduinoUno", "header (digital 8 to 13)"), "x")[0]).toBeCloseTo(45.72, 6);
+    expect(middles([...pinDots("arduinoUno", "header (power)"), ...pinDots("arduinoUno", "header (analog)")], "y")).toEqual([2.54]);
+    expect(middles(pinDots("arduinoUno", "header (power)"), "x")[0]).toBeCloseTo(27.94, 6);
+    expect(middles(pinDots("arduinoUno", "header (analog)"), "x")[0]).toBeCloseTo(50.8, 6);
+    expect(middles(pinDots("arduinoUno", "ICSP header"), "x")).toEqual([63.63, 66.17]);
+    expect(middles(pinDots("arduinoUno", "ICSP header"), "y")).toEqual([25.4, 27.94, 30.48]);
+    // Nano: two rows of 15 from x = 3.81 at y = 1.27 and 16.51, 15.24 mm apart.
+    const nano = [...pinDots("arduinoNano", "pins (front row)"), ...pinDots("arduinoNano", "pins (back row)")];
+    expect(nano).toHaveLength(30);
+    expect(middles(nano, "x")[0]).toBeCloseTo(3.81, 6);
+    expect(middles(nano, "y")).toEqual([1.27, 16.51]);
+    expect(pinDots("arduinoNano", "ICSP pads")).toHaveLength(6);
+  });
+
+  it("mark what the PCB files do not give as estimated, and keep the UNO's female headers at the file's 8.5 mm", () => {
+    for (const name of ["header (digital 8 to 13)", "header (digital 0 to 7)", "header (power)", "header (analog)"]) {
+      expect(part("arduinoUno", name)).toMatchObject({ height: 8.5 });
+      expect(part("arduinoUno", name).estimated).toBeUndefined();
+    }
+    for (const name of ["USB-B", "power jack", "ATmega328P (in its socket)", "ICSP header"]) expect(part("arduinoUno", name).estimated, name).toBe(true);
+    expect(SBC_BOARDS.arduinoNano.parts.every((entry) => entry.estimated)).toBe(true);
+    expect(SBC_BOARDS.arduinoUno.estimated).toEqual(["thickness"]);
+    expect(SBC_BOARDS.arduinoNano.estimated).toEqual(["thickness"]);
+    // The Feather's heights come from Adafruit's 3D model: only the loose header pins' pads are estimated.
+    expect(SBC_BOARDS.featherEsp32s3.estimated).toBeUndefined();
+    expect(SBC_BOARDS.featherEsp32s3.parts.filter((entry) => entry.estimated).map((entry) => entry.name)).toEqual(["pins (RST to DB)", "pins (BAT to SDA)"]);
+    expect(part("featherEsp32s3", "USB-C").height).toBe(3.22);
+  });
+});
+
+describe("the buttons' reach", () => {
+  const block = (type: SbcBoardType, name: string, clearance: number, buttonReach?: number) => {
+    const board = SBC_BOARDS[type];
+    return sbcBoardBlocks(board, clearance, 3, buttonReach === undefined ? {} : { buttonReach })[board.parts.findIndex((part) => part.name === name)];
+  };
+
+  it("leaves the buttons as they are by default, and stores no reach of 0", () => {
+    expect(block("featherEsp32s3", "RESET button", 0.3)).toMatchObject({ x0: 8.546, x1: 13.044, y0: 3.544, y1: 6.744, height: 2.51 });
+    expect(normalizeSbcBoardSettings({ board: "featherEsp32s3", clearance: 0, buttonReach: 0 })).toEqual({ board: "featherEsp32s3", clearance: 0, reach: 0 });
+    expect(normalizeSbcBoardSettings({ board: "featherEsp32s3", clearance: 0, buttonReach: 250 })?.buttonReach).toBe(MAX_SBC_BUTTON_REACH);
+    expect(normalizeSbcBoardSettings({ board: "featherEsp32s3", clearance: 0, buttonReach: -1 })).not.toHaveProperty("buttonReach");
+  });
+
+  it("makes a button pressed from above reach up, grown by the clearance, and nothing else", () => {
+    const reset = block("featherEsp32s3", "RESET button", 0.3, 12);
+    expect(reset.x0).toBeCloseTo(8.546 - 0.3, 9);
+    expect(reset.x1).toBeCloseTo(13.044 + 0.3, 9);
+    expect(reset.y0).toBeCloseTo(3.544 - 0.3, 9);
+    expect(reset.y1).toBeCloseTo(6.744 + 0.3, 9);
+    expect(reset.height).toBeCloseTo(2.51 + 0.3 + 12, 9);
+    expect(reset.bottom).toBe(SBC_BOARDS.featherEsp32s3.thickness);
+    // Every board's buttons pressed from above alike; the other parts do not move.
+    for (const type of SBC_BOARD_ORDER) {
+      const board = SBC_BOARDS[type];
+      const before = sbcBoardBlocks(board, 0.3, 3);
+      const after = sbcBoardBlocks(board, 0.3, 3, { buttonReach: 12 });
+      board.parts.forEach((part, index) => {
+        if (part.kind !== "button") expect(after[index], `${type} ${part.name}`).toEqual(before[index]);
+        else if (!part.press) expect(after[index].height, `${type} ${part.name}`).toBeCloseTo(part.height + 0.3 + 12, 9);
+      });
+    }
+  });
+
+  it("makes a button pressed from the side reach out of that side only: the Pi 5's power button left, the D1 mini's RESET back", () => {
+    const power = block("pi5", "power button", 0.3, 5);
+    expect(power.x0).toBeCloseTo(-0.5 - 0.3 - 5, 9);
+    expect(power.x1).toBeCloseTo(3.1 + 0.3, 9);
+    expect(power.height).toBeCloseTo(3.3 + 0.3, 9);
+    const reset = block("wemosD1Mini", "RESET button", 0.3, 5);
+    expect(reset.y1).toBeCloseTo(23.5 + 0.3 + 5, 9);
+    expect(reset.y0).toBeCloseTo(20.56 - 0.3, 9);
+    expect(reset.x0).toBeCloseTo(1.0 - 0.3, 9);
+    expect(reset.height).toBeCloseTo(2.0 + 0.3, 9);
+    const pressedFromSide = SBC_BOARD_ORDER.flatMap((type) => SBC_BOARDS[type].parts.filter((part) => part.press).map((part) => `${type} ${part.name} ${part.press}`));
+    expect(pressedFromSide).toEqual(["pi5 power button left", "wemosD1Mini RESET button back"]);
+  });
+
+  it("offers the reach on every board with buttons", () => {
+    expect(SBC_BOARD_ORDER.filter((type) => sbcBoardHasButtons(SBC_BOARDS[type]))).toEqual(SBC_BOARD_ORDER.filter((type) => SBC_BOARDS[type].parts.some((part) => part.kind === "button")));
+    expect(sbcBoardHasButtons(SBC_BOARDS.arduinoUno)).toBe(true);
   });
 });

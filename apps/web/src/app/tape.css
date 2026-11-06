@@ -94,6 +94,45 @@
   pointer-events: none;
 }
 
+/* A centre on offer, the middle of a face or of a round edge: a cross in a circle, unlike the ring of a corner (Discussion #610). */
+.tape-centre {
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.tape-centre circle {
+  fill: rgba(255, 255, 255, 0.55);
+  stroke: #b66108;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.tape-centre path {
+  fill: none;
+  stroke: #b66108;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The centre the point sits on. */
+.tape-centre.snapped {
+  opacity: 1;
+  filter: drop-shadow(0 0 3px rgba(173, 89, 0, 0.48));
+}
+
+.tape-centre.snapped circle {
+  fill: rgba(255, 255, 255, 0.92);
+  stroke: #e17709;
+  stroke-width: 2.4;
+  stroke-dasharray: none;
+}
+
+.tape-centre.snapped path {
+  stroke-width: 2;
+}
+
 .tape-hover-edge {
   fill: none;
   stroke: #e17709;
@@ -128,8 +167,10 @@
   transform: translate(-50%, -50%);
 }
 
-/* Hovering the label shows the reach along each axis, or brings a faded one back; any other label lets clicks through to the view. */
+/* Hovering the label shows the reach along each axis, says why its length cannot be typed (Discussion #610), or brings a
+   faded one back; any other label lets clicks through to the view. */
 .tape-label.has-deltas,
+.tape-label.has-hint,
 .tape-label.occluded {
   pointer-events: auto;
   cursor: default;
@@ -169,6 +210,57 @@
 .tape-label.editable:focus-visible {
   color: #ad5900;
   border-color: #ad5900;
+}
+
+/* The field a click on the number opens (#823): the length where the number was and, when the label's tip lists the reach
+   along each axis, a field for each of those under it, so the body can move along one axis only (Discussion #610). */
+.tape-length-field {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
+  /* The length field stands where the number stood: half its height above the label's middle. */
+  transform: translate3d(var(--overlay-x, 0), var(--overlay-y, 0), 0) translate(-50%, -12px);
+}
+
+.tape-length-field .dimension-input {
+  position: static;
+  transform: none;
+  will-change: auto;
+}
+
+.tape-length-axes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(224, 208, 190, 0.96);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(58, 40, 20, 0.12);
+}
+
+.tape-length-axis {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #ad5900;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.tape-length-axis .dimension-input {
+  width: 58px;
+  padding: 3px 5px;
+  font-size: 13px;
+  letter-spacing: normal;
 }
 
 /* Hover tips: a measurement's reach along each axis, a point's coordinates. */

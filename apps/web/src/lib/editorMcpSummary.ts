@@ -4,6 +4,7 @@ import { roundSideCount } from "@/lib/roundSideCount";
 import { customFontList } from "@/lib/textFonts";
 import { isCustomFontId } from "@/lib/customFonts";
 import { shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
+import { offersGroupResize } from "@/lib/groupScale";
 import { shapePivotWorld, type PivotPoint } from "@/lib/rotationPivot";
 import { MCP_SHAPE_SETTING_KEYS, mcpThreadSizeName } from "@/lib/mcpShapeSettings";
 import { DEFAULT_SKETCH_STROKE, normalizeSketchStroke } from "@/lib/sketchStroke";
@@ -154,6 +155,8 @@ export function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary
     edgeTreatments: shape.edgeTreatments ?? [],
     settings: mcpShapeSettings(shape),
     groupedCount: shape.groupedShapes?.length ?? 0,
+    // What a group does with its parts when it is resized (Discussion #526).
+    ...(offersGroupResize(shape) ? { groupResize: shape.groupResize ?? "stretch" } : {}),
     importedTriangles: shape.importedMesh?.triangleCount ?? 0,
     cadDisplayEdgeCount: shape.cadDisplayEdges?.length ?? null,
     sketchPointCount: shape.sketchProfile?.points.length ?? 0,

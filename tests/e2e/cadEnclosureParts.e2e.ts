@@ -12,7 +12,7 @@ import { cadMeshHasOpenEdges } from "@/lib/cadMeshAccuracy";
 import { enclosurePartSolid } from "@/lib/enclosureSolid";
 import { screwBossCavityMesh, screwBossMesh, screwBossPlan, type ScrewBossFields } from "@/lib/screwBoss";
 import { snapFitMesh, snapFitPlan, type SnapFitFields } from "@/lib/snapFit";
-import { ribMesh, ribSize, type RibFields } from "@/lib/rib";
+import { RIB_OVAL_FOOT_SEGMENTS, ribMesh, ribSize, type RibFields } from "@/lib/rib";
 import { meshForShape } from "@/lib/editorMeshCore";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { stepSourceForShape } from "@/lib/stepExport";
@@ -25,8 +25,8 @@ import { stepSourceForShape } from "@/lib/stepExport";
  *
  * The mesh has chords where the body is round. The boss's post and hole are drawn here with 1440 sides, which leaves
  * the one chord the mesh flattens the post with at each gusset's foot, all the way up from the gusset's top; the
- * rib's round top and the hook's fillet are a few chords. What those chords take or add is worked out, and the
- * volumes agree once it is counted in.
+ * rib's round top and the hook's fillet are a few chords, and so is a rib's oval foot (Discussion #1307), whose body
+ * is a true ellipse. What those chords take or add is worked out, and the volumes agree once it is counted in.
  */
 
 // The exact kernel (Manifold) loads its files relative to the page; in node they are the public folder.
@@ -132,8 +132,16 @@ function meshVolumeRounded(part: CadModifierEnclosurePart) {
   const { style, top, width, height, thickness, foot } = ribSize(part.fields as RibFields);
   // The round top stands on the foot's top, where there is one.
   const round = style === "straight" && top === "round" && height - (foot?.thickness ?? 0) > thickness / 2 + 0.1 ? 12 * segment(thickness / 2, Math.PI / 12) * width : 0;
+  // An oval foot's outline is a polygon round the ellipse, its corners on it: an ellipse is a circle stretched, so each
+  // chord leaves out of it what the chord leaves of the circle, stretched alike (half the pieces under a gusset).
+  let oval = 0;
+  if (foot?.shape === "oval") {
+    const [a, b] = style === "gusset" ? [foot.length, foot.width / 2] : [foot.length / 2, foot.width / 2];
+    const pieces = style === "gusset" ? RIB_OVAL_FOOT_SEGMENTS / 2 : RIB_OVAL_FOOT_SEGMENTS;
+    oval = pieces * segment(1, (style === "gusset" ? Math.PI : 2 * Math.PI) / pieces) * a * b * foot.thickness;
+  }
   // Turned outward first: a gusset on its foot is built face by face, each face's turn left to orient().
-  return ribMesh(part.fields as RibFields).orient().volume() + round;
+  return ribMesh(part.fields as RibFields).orient().volume() + round + oval;
 }
 
 function solidsOf(shape: ShapeHandle) {
@@ -170,6 +178,9 @@ const GUSSETED = { width: 18, depth: 18, size: 18, height: 12, screwBossDiameter
 /** A rib on its foot (Discussion #1307): 0.8 mm thick on a foot 2.4 mm wide, the foot as thick as it starts. */
 const ON_FOOT = { ribFoot: true, ribThickness: 0.8, depth: 2.4 };
 const GUSSET_ON_FOOT = { ribStyle: "gusset", width: 10, height: 12, ribFoot: true, ribThickness: 1.6, depth: 4.8 } as const;
+/** A 1.6 mm rib 40 mm long on its oval foot 4.8 mm wide, the box the ellipse's 53.67 mm; and a gusset 10 mm along the floor on one. */
+const ON_OVAL = { ribFoot: true, ribFootShape: "oval", ribThickness: 1.6, depth: 4.8, width: 53.67 } as const;
+const GUSSET_ON_OVAL = { ...GUSSET_ON_FOOT, ribFootShape: "oval", width: 13.42 } as const;
 const K30 = { screwBossFastener: "selfTapping", screwBossSize: "K30" } as const;
 
 describe("the enclosure parts as exact bodies (#1246)", () => {
@@ -202,6 +213,14 @@ describe("the enclosure parts as exact bodies (#1246)", () => {
     ["rib on a thick foot with a chamfered top, turned and lifted", "rib", { ...ON_FOOT, ribTop: "chamfer", ribFootThickness: 2, rotation: 30, elevation: 3 }, 1],
     ["gusset ending in its foot", "rib", GUSSET_ON_FOOT, 1],
     ["gusset standing on a thin foot to its tip, mirrored and turned", "rib", { ...GUSSET_ON_FOOT, ribFootThickness: 0.4, mirrorX: true, rotation: 90 }, 1],
+    ["rib on an oval foot", "rib", ON_OVAL, 1],
+    ["rib on an oval foot with a round top", "rib", { ...ON_OVAL, ribTop: "round" }, 1],
+    ["rib on an oval foot cut short, chamfered, turned and lifted", "rib", { ...ON_OVAL, depth: 4, width: 60, ribTop: "chamfer", rotation: 30, elevation: 3 }, 1],
+    ["rib on a narrow oval foot that stays long", "rib", { ...ON_OVAL, depth: 2.4, width: 72.37 }, 1],
+    ["short rib on an oval foot wider than long", "rib", { ...ON_OVAL, width: 3.2, depth: 10, ribFootThickness: 1.2 }, 1],
+    ["gusset ending in its oval foot", "rib", GUSSET_ON_OVAL, 1],
+    ["gusset on a thin oval foot to its tip, mirrored and turned", "rib", { ...GUSSET_ON_OVAL, ribFootThickness: 0.4, mirrorX: true, rotation: 90 }, 1],
+    ["short gusset on an oval foot wider than long, tipped", "rib", { ...GUSSET_ON_OVAL, width: 3.2, depth: 10, height: 6, rotationZ: 90, elevation: 5 }, 1],
   ])("builds the %s as a valid closed solid of its mesh's volume", (_name, kind, extra, count) => {
     const shape = make(kind, extra);
     const part = enclosurePart(shape);
@@ -215,6 +234,22 @@ describe("the enclosure parts as exact bodies (#1246)", () => {
     // Placed as the editor places the mesh, it agrees with what the editor draws: the worker's own check.
     expect(cadProfileSolidMismatch(cad, applyCadTransform(cad, local, part.transform), displayExpectation(shape))).toBeNull();
     expect(stepSourceForShape(shape)).toBe("enclosure");
+  });
+
+  it("makes a rib's oval foot a true ellipse, half of one against a gusset's wall", () => {
+    for (const [extra, ellipses, straight] of [[ON_OVAL, 2, false], [GUSSET_ON_OVAL, 2, true], [{ ...ON_OVAL, width: 3.2, depth: 10 }, 2, false]] as const) {
+      const solid = enclosurePartSolid(cad, enclosurePart(make("rib", extra)));
+      const edges = cad.getSubShapes(solid, "edge");
+      // The foot's outline round its bottom and its top: every curved edge an ellipse, nothing else curved.
+      expect(edges.filter((edge) => cad.curveType(edge) === "ellipse")).toHaveLength(ellipses);
+      expect(edges.every((edge) => cad.curveType(edge) === "line" || cad.curveType(edge) === "ellipse")).toBe(true);
+      // The gusset's half ellipse ends at the wall, where its side and the gusset's end are one flat face, up the wall
+      // as high as the gusset.
+      const faces = cad.getSubShapes(solid, "face");
+      const wall = faces.filter((face) => cad.surfaceType(face) === "plane" && near(cad.getBoundingBox(face).xmin, cad.getBoundingBox(face).xmax) && near(cad.getBoundingBox(face).xmin, -extra.width / 2));
+      expect(wall, String(extra.width)).toHaveLength(straight ? 1 : 0);
+      if (straight) expect(cad.getBoundingBox(wall[0]).ymax).toBeCloseTo(extra.height, 6);
+    }
   });
 
   it("makes the boss's post, hole and chamfer true cylinders and a cone, and its gussets flat", () => {
@@ -272,6 +307,28 @@ describe("the edge tool on the enclosure parts' exact bodies", () => {
     expect(rounded).toBeCloseTo(before + 2 * (1 - Math.PI / 4) * 0.16 * 40, 3);
   });
 
+  it("rounds the corners where a rib meets its oval foot, and hollows it", async () => {
+    const shape = make("rib", ON_OVAL);
+    const ready = await ask({ type: "prepare", parts: [exactOnly(shape)], sharpAngle: 25 });
+    const { width: length } = ribSize(enclosurePart(shape).fields as RibFields);
+    const roots = edgesWhere(ready, (_x, y, z) => near(y, 0.8) && near(Math.abs(z), 0.8)).filter((edge) => Math.abs(edge.points[0] - edge.points[edge.points.length - 3]) > length - 1e-3);
+    expect(roots).toHaveLength(2);
+    const before = cad.getVolume(enclosurePartSolid(cad, enclosurePart(shape)));
+    const rounded = previewVolume(await ask({ type: "preview", kind: "fillet", edgeIds: roots.map((edge) => edge.id), amount: 0.4, quality: "standard", chamferAngle: 45 }));
+    // A concave rounding fills (1 - pi/4) r^2 of the section along each corner, from one end of the rib to the other.
+    expect(rounded).toBeCloseTo(before + 2 * (1 - Math.PI / 4) * 0.16 * length, 2);
+    // Hollowed open at the bottom. An ellipse is round at its ends by b^2 / a: 0.21 mm for this long, narrow foot, so
+    // a wall no thicker than that follows it inward there; a short, wide one (2.1 mm) takes a thicker wall.
+    for (const [extra, wall] of [[ON_OVAL, 0.2], [{ ...ON_OVAL, width: 15, depth: 8 }, 0.5]] as const) {
+      const body = make("rib", extra);
+      await ask({ type: "prepare", parts: [exactOnly(body)], sharpAngle: 25 });
+      const full = cad.getVolume(enclosurePartSolid(cad, enclosurePart(body)));
+      const hollow = previewVolume(await ask({ type: "preview", kind: "shell", edgeIds: [], amount: wall, quality: "standard", chamferAngle: 45, shellOpenings: "bottom" }));
+      expect(hollow, String(wall)).toBeLessThan(full * 0.8);
+      expect(hollow, String(wall)).toBeGreaterThan(full * 0.1);
+    }
+  });
+
   it("chamfers the back of the snap-fit hook's foot", async () => {
     const shape = make("snapFit");
     const ready = await ask({ type: "prepare", parts: [exactOnly(shape)], sharpAngle: 25 });
@@ -310,6 +367,8 @@ describe("the enclosure parts in a STEP file", () => {
     ["gusset", "rib", { ribStyle: "gusset", width: 10, height: 12, rotation: 30, x: 5 }, 1],
     ["rib on its foot with a round top", "rib", { ...ON_FOOT, ribTop: "round" }, 1],
     ["gusset on its foot", "rib", { ...GUSSET_ON_FOOT, rotation: 30, x: 5 }, 1],
+    ["rib on an oval foot with a round top", "rib", { ...ON_OVAL, ribTop: "round" }, 1],
+    ["gusset on an oval foot", "rib", { ...GUSSET_ON_OVAL, rotation: 30, x: 5 }, 1],
   ])("writes the %s as exact solids", async (_name, kind, extra, count) => {
     const shape = make(kind, extra);
     const { blob, exportedCount, skipped } = await exportShapesToStep([shape]);

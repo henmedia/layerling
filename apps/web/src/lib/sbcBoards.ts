@@ -36,6 +36,23 @@
  *   SuperMini.step" (SolidWorks, github.com/mistic100/Nixie-Clock-IN2): 18 x 26 x 1.15 mm, square
  *   corners, 2 x 10 pins, each part's box read from it. All of it is `estimated`; the model does not
  *   say which button is BOOT and which RESET.
+ * - Adafruit ESP32-S3 Feather (PIDs 5323, 5477 and 5885 share one board): the outline, the holes and the pins
+ *   from Adafruit's EagleCAD PCB file ("Adafruit ESP32-S3 8MB No PSRAM.brd", github.com/adafruit/Adafruit-Feather-ESP32-S3-PCB),
+ *   every part's box and height from Adafruit's own 3D model ("5323 Feather ESP32-S3.step/.stl",
+ *   github.com/adafruit/Adafruit_CAD_Parts), which matches the PCB file. The header pins come loose, so
+ *   only their pads are drawn, `estimated` as on the XIAO.
+ * - Arduino UNO R3 and Arduino Nano: Arduino's own Eagle PCB files (docs.arduino.cc, "CAD Files":
+ *   UNO-TH_Rev3e.brd for the UNO, NanoV3.3.brd for the Nano, A000005): the outline, the holes, and the
+ *   parts' places and sizes from their footprints' outlines. The files give no heights, so all are
+ *   `estimated`, but the UNO's female headers, which the file names 8.5 mm high (8x1F-H8.5). Both
+ *   keep the file's own view: USB at the left end. The Nano's parts under the board (USB chip,
+ *   regulator) and its headers, which hang under it, are not drawn.
+ * - LOLIN (WEMOS) D1 mini V4.0.0: Wemos's dimension drawing (dim_d1_mini_v4.0.0.pdf, wemos.cc): the outline
+ *   (25.4 x 34.3 mm, the antenna end's corners 4 mm round, the notch at the RESET button) and the pins'
+ *   pads; laid with its USB-C at the left end. The drawing's two holes beside the antenna are left out.
+ *   The parts' places come from their pads, their sizes and heights are `estimated`. Wemos gives no
+ *   drawing for the older V3.0.0.
+ * Every board was checked against the maker's own picture of its top, so none is a mirror image.
  * A value the maker does not give is marked `estimated`. A board without mounting holes has `holes: []`.
  *
  * The microSD card slot: on the Raspberry Pi 5 and the BIGTREETECH Pi read from the same 3D models;
@@ -65,9 +82,14 @@ export type SbcPartKind = "connector" | "header" | "chip" | "shield" | "button";
  */
 export type SbcConnectorProfile = "usbC" | "microUsb" | "microHdmi" | "miniHdmi" | "hdmi" | "usbA2" | "rj45" | "audio";
 
+/** The way a button is pressed: from above, or from one side of the board. */
+export type SbcPress = "up" | "left" | "right" | "front" | "back";
+
 export type SbcPart = {
   /** English name, for the code and the MCP. */
   name: string;
+  /** A button pressed from the side, not from above: the way its reach goes. */
+  press?: Exclude<SbcPress, "up">;
   x0: number;
   x1: number;
   y0: number;
@@ -101,14 +123,50 @@ export type SbcBoard = {
   cornerRadius: number;
   /** 0 for a board without mounting holes. */
   holeDiameter: number;
-  /** The mounting holes' middles; empty for a board without them (the ESP32 boards). */
-  holes: Array<[number, number]>;
+  /**
+   * The mounting holes' middles; empty for a board without them (the ESP32 boards). A third number
+   * is that hole's own diameter, where the holes are not all alike (the Feather).
+   */
+  holes: Array<[number, number] | [number, number, number]>;
+  /**
+   * A board that is not a plain rounded rectangle (the Arduino UNO, the D1 mini): the rounded plate
+   * is then `plateWidth` wide (missing: `width`), and boxes are added to it and cut from it, each
+   * turned by `turn` degrees about its middle (a square turned 45° cuts a corner at 45°); `round`
+   * rounds a corner of the plate further, to its own radius. `width` stays the whole board's, for its edges.
+   */
+  outline?: { plateWidth?: number; add: SbcOutlinePiece[]; cut: SbcOutlinePiece[]; round?: SbcRoundCorner[] };
   /** The board's colour: green for a Raspberry Pi, black for the BTT Pi and the ESP32 boards. */
   color: string;
   parts: SbcPart[];
   /** Values that are estimated, besides the parts marked so (hole diameter, thickness). */
   estimated?: Array<"holeDiameter" | "thickness" | "cornerRadius">;
 };
+
+/**
+ * A piece of a board's outline: a box by its middle and size, turned `turn` degrees about its middle,
+ * counter-clockwise seen from above in the board's frame (x right, y away from you).
+ */
+export type SbcOutlinePiece = { x: number; y: number; width: number; depth: number; turn?: number };
+/** A corner of the plate, (x, y), rounded to `radius` instead of the board's corner radius. */
+export type SbcRoundCorner = { x: number; y: number; radius: number };
+
+/** A square turned 45° about (x, y), its corners `half` mm from the middle along x and y. */
+const diamond = (x: number, y: number, half: number): SbcOutlinePiece => ({ x, y, width: half * Math.SQRT2, depth: half * Math.SQRT2, turn: 45 });
+
+/**
+ * A box with one corner at (x, y), `length` mm along the direction (dx, dy) and `width` mm to its
+ * left: to cut beside an edge that runs from (x, y) that way, at any angle.
+ */
+function alongEdge(x: number, y: number, dx: number, dy: number, length: number, width: number): SbcOutlinePiece {
+  const size = Math.hypot(dx, dy);
+  const [ux, uy] = [dx / size, dy / size];
+  return { x: x + (ux * length - uy * width) / 2, y: y + (uy * length + ux * width) / 2, width, depth: length, turn: (Math.atan2(uy, ux) * 180) / Math.PI - 90 };
+}
+
+/** A mounting hole's diameter: its own, or the board's. */
+export function sbcHoleDiameter(board: SbcBoard, hole: SbcBoard["holes"][number]) {
+  return hole[2] ?? board.holeDiameter;
+}
 
 const piHoles = (depth: number): Array<[number, number]> => [[3.5, 3.5], [61.5, 3.5], [3.5, depth - 3.5], [61.5, depth - 3.5]];
 
@@ -138,7 +196,8 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "PCIe connector", x0: 1.1, x1: 4.7, y0: 23.2, y1: 36.8, height: 4.0, kind: "header", ribbon: true },
       // The socket from x = 2.25 in the model, 1.42 mm deep under the board; drawn to the edge, where the card goes in.
       { name: "microSD card slot", x0: 0, x1: 13.65, y0: 22.11, y1: 34.06, height: 1.42, kind: "connector", underside: true },
-      { name: "power button", x0: -0.5, x1: 3.1, y0: 16.2, y1: 20.7, height: 3.3, kind: "button" },
+      // Pressed from the side, out of the board's left edge.
+      { name: "power button", x0: -0.5, x1: 3.1, y0: 16.2, y1: 20.7, height: 3.3, kind: "button", press: "left" },
       { name: "SoC", x0: 24.7, x1: 41.7, y0: 14.3, y1: 31.3, height: 2.4, kind: "chip" },
       { name: "chip", x0: 52.5, x1: 64.5, y0: 29.1, y1: 41.1, height: 1.2, kind: "chip" },
       { name: "chip", x0: 25.9, x1: 40.4, y0: 34.2, y1: 44.2, height: 1.0, kind: "chip" },
@@ -335,9 +394,140 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "ceramic antenna", x0: 0.33, x1: 2.33, y0: 7.82, y1: 13.57, height: 0.76, kind: "chip", estimated: true },
     ],
   },
+  featherEsp32s3: {
+    type: "featherEsp32s3",
+    name: "Adafruit ESP32-S3 Feather",
+    width: 50.8,
+    depth: 22.86,
+    thickness: 1.57,
+    cornerRadius: 2.54,
+    holeDiameter: 2.5,
+    // The two at the USB end are plated, 2.5 mm; the two at the antenna end bare, 2.2 mm.
+    holes: [[2.54, 2.54], [2.54, 20.32], [48.26, 1.8415, 2.2], [48.26, 20.955, 2.2]],
+    color: "#1b1b1b",
+    // USB-C at the left end, the 16 pins at the front, the 12 at the back, the module's antenna at the right end.
+    parts: [
+      { name: "USB-C", x0: -1.083, x1: 6.817, y0: 6.96, y1: 15.9, height: 3.22, kind: "connector", profile: "usbC" },
+      // The battery's cable plugs in from the back, inside the case: no opening through the wall.
+      { name: "battery connector (JST PH)", x0: 6.972, x1: 14.872, y0: 14.968, y1: 22.568, height: 4.8, kind: "header" },
+      { name: "STEMMA QT connector", x0: 20.902, x1: 24.502, y0: 8.39, y1: 14.39, height: 4.3, kind: "header" },
+      { name: "RESET button", x0: 8.546, x1: 13.044, y0: 3.544, y1: 6.744, height: 2.51, kind: "button" },
+      { name: "BOOT button", x0: 18.706, x1: 23.204, y0: 3.607, y1: 6.807, height: 2.51, kind: "button" },
+      { name: "ESP32-S3 module", x0: 31.14, x1: 44.69, y0: 4.43, y1: 18.43, height: 2.55, kind: "shield" },
+      { name: "module antenna", x0: 44.69, x1: 51.14, y0: 3.73, y1: 19.13, height: 0.8, kind: "chip" },
+      { name: "RGB LED (NeoPixel)", x0: 28.65, x1: 30.15, y0: 7.378, y1: 8.878, height: 0.48, kind: "chip" },
+      { name: "charge LED", x0: 0.66, x1: 2.26, y0: 5.067, y1: 5.855, height: 0.71, kind: "chip" },
+      { name: "user LED", x0: 0.66, x1: 2.26, y0: 17.132, y1: 17.92, height: 0.71, kind: "chip" },
+      // The header pins come loose: their pads, 2.54 mm apart (JP1 and JP3 in the PCB file).
+      { name: "pins (RST to DB)", x0: 5.08, x1: 45.72, y0: 0.47, y1: 2.07, height: 0.05, kind: "header", pins: [16, 1], estimated: true },
+      { name: "pins (BAT to SDA)", x0: 15.24, x1: 45.72, y0: 20.79, y1: 22.39, height: 0.05, kind: "header", pins: [12, 1], estimated: true },
+    ],
+  },
+  arduinoUno: {
+    type: "arduinoUno",
+    name: "Arduino UNO R3",
+    width: 68.58,
+    depth: 53.34,
+    thickness: 1.6,
+    cornerRadius: 1,
+    holeDiameter: 3.2,
+    holes: [[13.97, 2.54], [15.24, 50.8], [66.04, 7.62], [66.04, 35.56]],
+    color: "#00878f",
+    estimated: ["thickness"],
+    // The board 66.04 mm wide, its right edge out to 68.58 between y = 5.08 and 37.846, the steps
+    // and the back right corner cut at 45° (the PCB file's outline). The step is a strip beside the
+    // plate, touching it, its two outer corners cut off; no piece overlaps another.
+    outline: {
+      plateWidth: 66.04,
+      add: [{ x: 67.31, y: 21.463, width: 2.54, depth: 37.846 }],
+      cut: [diamond(68.58, 2.54, 2.54), diamond(68.58, 40.386, 2.54), diamond(66.04, 53.34, 1.524)],
+    },
+    // USB-B and the power jack at the left end, the digital pins at the back, power and analog at the front.
+    parts: [
+      { name: "USB-B", x0: -6.34, x1: 9.41, y0: 32.2, y1: 44.0, height: 11.0, kind: "connector", estimated: true },
+      { name: "power jack", x0: -1.81, x1: 11.68, y0: 3.3, y1: 12.29, height: 11.0, kind: "connector", estimated: true },
+      // Female headers 8.5 mm high, as the PCB file names them (8x1F-H8.5).
+      { name: "header (digital 8 to 13)", x0: 44.45, x1: 64.77, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [8, 1] },
+      { name: "header (digital 0 to 7)", x0: 17.53, x1: 42.93, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [10, 1] },
+      { name: "header (power)", x0: 26.67, x1: 46.99, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [8, 1] },
+      { name: "header (analog)", x0: 49.53, x1: 64.77, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [6, 1] },
+      { name: "ICSP header", x0: 62.36, x1: 67.44, y0: 24.13, y1: 31.75, height: 8.5, kind: "header", pins: [3, 2], estimated: true },
+      { name: "ICSP header (USB chip)", x0: 14.48, x1: 22.1, y0: 43.69, y1: 48.77, height: 8.5, kind: "header", pins: [3, 2], estimated: true },
+      { name: "ATmega328P (in its socket)", x0: 27.81, x1: 64.9, y0: 13.59, y1: 19.18, height: 7.6, kind: "chip", estimated: true },
+      { name: "ATmega16U2", x0: 17.44, x1: 22.44, y0: 32.17, y1: 37.17, height: 1.0, kind: "chip", estimated: true },
+      { name: "crystal", x0: 15.49, x1: 22.35, y0: 23.88, y1: 28.45, height: 3.5, kind: "chip", estimated: true },
+      { name: "capacitor", x0: 22.28, x1: 28.78, y0: 5.49, y1: 12.79, height: 5.8, kind: "chip", estimated: true },
+      { name: "capacitor", x0: 15.16, x1: 21.66, y0: 5.49, y1: 12.79, height: 5.8, kind: "chip", estimated: true },
+      { name: "voltage regulator", x0: 4.09, x1: 11.4, y0: 14.12, y1: 20.68, height: 1.8, kind: "chip", estimated: true },
+      { name: "RESET button", x0: 3.25, x1: 9.2, y0: 47.2, y1: 51.6, height: 2.5, kind: "button", estimated: true },
+      { name: "LED (ON)", x0: 57.795, x1: 59.045, y0: 35.58, y1: 37.58, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (L)", x0: 27.315, x1: 28.565, y0: 41.16, y1: 43.16, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (TX)", x0: 27.315, x1: 28.565, y0: 35.58, y1: 37.58, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (RX)", x0: 27.315, x1: 28.565, y0: 33.29, y1: 35.29, height: 0.8, kind: "chip", estimated: true },
+    ],
+  },
+  wemosD1Mini: {
+    type: "wemosD1Mini",
+    name: "LOLIN (WEMOS) D1 mini V4.0.0",
+    width: 34.3,
+    depth: 25.4,
+    thickness: 1.6,
+    cornerRadius: 1,
+    // The drawing has two holes beside the antenna; left out, as asked for this board.
+    holeDiameter: 0,
+    holes: [],
+    color: "#1f4fa3",
+    estimated: ["thickness"],
+    // The drawing turned a quarter clockwise: USB-C at the left end, the antenna at the right end with its
+    // corners 4 mm round, the notch for the RESET button at the back left, its edge slanting to (7.7, 25.4).
+    outline: {
+      add: [],
+      cut: [{ x: 2.9, y: 24.95, width: 7.8, depth: 2.9 }, alongEdge(6.8, 23.5, 0.9, 1.9, 2.5, 2)],
+      round: [{ x: 34.3, y: 0, radius: 4 }, { x: 34.3, y: 25.4, radius: 4 }, { x: 0, y: 23.5, radius: 1 }],
+    },
+    parts: [
+      // Its place from the drawing's pads, its length and height estimated.
+      { name: "USB-C", x0: 0, x1: 7.35, y0: 8.23, y1: 17.17, height: 3.26, kind: "connector", profile: "usbC", estimated: true },
+      // Pressed from the side, into the notch at the back edge.
+      { name: "RESET button", x0: 1.0, x1: 6.3, y0: 20.56, y1: 23.5, height: 2.0, kind: "button", press: "back", estimated: true },
+      // The LOLIN I2C port: its cable plugs in inside the case, so no opening through the wall.
+      { name: "I2C connector (JST SH)", x0: 0.25, x1: 7.15, y0: 0.3, y1: 5.1, height: 2.9, kind: "header", estimated: true },
+      { name: "USB chip (CH340)", x0: 10.7, x1: 14.5, y0: 3.2, y1: 13.2, height: 1.6, kind: "chip", estimated: true },
+      { name: "ESP8266", x0: 18.3, x1: 23.3, y0: 7.5, y1: 12.5, height: 0.9, kind: "chip", estimated: true },
+      // The pins' pads from the drawing, 22.86 mm apart; the headers come loose.
+      { name: "pins (front row)", x0: 7.545, x1: 27.865, y0: 0.47, y1: 2.07, height: 0.05, kind: "header", pins: [8, 1], estimated: true },
+      { name: "pins (back row)", x0: 7.545, x1: 27.865, y0: 23.33, y1: 24.93, height: 0.05, kind: "header", pins: [8, 1], estimated: true },
+    ],
+  },
+  arduinoNano: {
+    type: "arduinoNano",
+    name: "Arduino Nano",
+    width: 43.18,
+    depth: 17.78,
+    thickness: 1.6,
+    cornerRadius: 0,
+    holeDiameter: 1.651,
+    holes: [[1.27, 1.27], [41.91, 1.27], [1.27, 16.51], [41.91, 16.51]],
+    color: "#1c4f9c",
+    estimated: ["thickness"],
+    // Mini-USB at the left end, the ICSP pads at the right end; the FT232RL and the regulator are under the board, not drawn.
+    parts: [
+      { name: "mini-USB", x0: -1.83, x1: 8.58, y0: 3.23, y1: 14.53, height: 3.9, kind: "connector", estimated: true },
+      { name: "ATmega328P", x0: 12.99, x1: 17.99, y0: 6.34, y1: 11.34, height: 1.0, kind: "chip", estimated: true },
+      { name: "RESET button", x0: 23.24, x1: 25.78, y0: 6.93, y1: 10.92, height: 2.5, kind: "button", estimated: true },
+      { name: "LED (L)", x0: 28.335, x1: 29.585, y0: 3.32, y1: 5.32, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (PWR)", x0: 28.335, x1: 29.585, y0: 6.37, y1: 8.37, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (RX)", x0: 28.335, x1: 29.585, y0: 9.41, y1: 11.41, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (TX)", x0: 28.335, x1: 29.585, y0: 12.46, y1: 14.46, height: 0.8, kind: "chip", estimated: true },
+      // The pins' pads, 2.54 mm apart (J1, J2 and J4 in the PCB file); the headers hang under the board.
+      { name: "pins (front row)", x0: 2.54, x1: 40.64, y0: 0.47, y1: 2.07, height: 0.05, kind: "header", pins: [15, 1], estimated: true },
+      { name: "pins (back row)", x0: 2.54, x1: 40.64, y0: 15.71, y1: 17.31, height: 0.05, kind: "header", pins: [15, 1], estimated: true },
+      { name: "ICSP pads", x0: 38.0, x1: 43.08, y0: 5.08, y1: 12.7, height: 0.05, kind: "header", pins: [3, 2], estimated: true },
+    ],
+  },
 };
 
-export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini"];
+export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoNano", "wemosD1Mini"];
 export const DEFAULT_SBC_BOARD: SbcBoardType = "pi5";
 /** Extra room for the connectors at the edge, so a case wall cut with the board leaves them a gap: 0 to 2 mm. */
 export const MAX_SBC_CLEARANCE = 2;
@@ -361,8 +551,18 @@ export function normalizeSbcUpReach(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) ? Math.min(MAX_SBC_UP_REACH, Math.max(MIN_SBC_UP_REACH, value)) : MIN_SBC_UP_REACH;
 }
 
-/** The openings asked for besides the connectors at the edge: ribbon cables up or out, the GPIO header up, and how far up. */
-export type SbcPassages = { ribbonUp?: boolean; ribbonSide?: boolean; gpioUp?: boolean; upReach?: number };
+/** How far the buttons reach the way they are pressed, so they pass a lid or a wall: 0 (default) to 100 mm. */
+export const MAX_SBC_BUTTON_REACH = 100;
+
+export function normalizeSbcButtonReach(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.min(MAX_SBC_BUTTON_REACH, Math.max(0, value)) : 0;
+}
+
+/**
+ * The openings asked for besides the connectors at the edge: ribbon cables up or out, the GPIO header up, and how far
+ * up; the buttons, the way they are pressed, by `buttonReach`.
+ */
+export type SbcPassages = { ribbonUp?: boolean; ribbonSide?: boolean; gpioUp?: boolean; upReach?: number; buttonReach?: number };
 
 /** The stored settings made safe, or null when they name no known board. Openings not asked for are left out. */
 export function normalizeSbcBoardSettings(input: unknown): SbcBoardSettings | null {
@@ -377,6 +577,7 @@ export function normalizeSbcBoardSettings(input: unknown): SbcBoardSettings | nu
     ...(raw.ribbonSide === true ? { ribbonSide: true } : {}),
     ...(raw.gpioUp === true ? { gpioUp: true } : {}),
     ...(raw.upReach !== undefined ? { upReach: normalizeSbcUpReach(raw.upReach) } : {}),
+    ...(normalizeSbcButtonReach(raw.buttonReach) > 0 ? { buttonReach: normalizeSbcButtonReach(raw.buttonReach) } : {}),
   };
 }
 
@@ -386,6 +587,10 @@ export function sbcBoardHasRibbon(board: SbcBoard) {
 }
 export function sbcBoardHasGpio(board: SbcBoard) {
   return board.parts.some((part) => part.gpio);
+}
+/** The board has buttons: whether the card offers their reach. */
+export function sbcBoardHasButtons(board: SbcBoard) {
+  return board.parts.some((part) => part.kind === "button");
 }
 
 /** How close to the board's edge a part must come to count as standing at it, in mm. */
@@ -427,26 +632,32 @@ function opensUp(part: SbcPart, passages: SbcPassages) {
  * bottom, which stays on the board (its top, for one under the board), and then reaches further
  * out by the reach on each edge it stands at, so it cuts through a case wall. A ribbon cable's
  * connector or the GPIO header asked to open up is grown the same and reaches `upReach` higher,
- * through a lid. The rest stay as they are. Works the same for every board. Heights are from the
+ * through a lid. A button, when `buttonReach` is asked for, is grown the same and reaches that far
+ * the way it is pressed: up through a lid, or out through a wall for one pressed from the side
+ * (`press`). The rest stay as they are. Works the same for every board. Heights are from the
  * bottom of the board; a part under it lies below 0.
  */
 export function sbcBoardBlocks(board: SbcBoard, clearance = 0, reach = 0, passages: SbcPassages = {}): SbcBlock[] {
   const extra = normalizeSbcClearance(clearance);
   const further = normalizeSbcReach(reach);
   const up = normalizeSbcUpReach(passages.upReach);
+  const buttonReach = normalizeSbcButtonReach(passages.buttonReach);
   return board.parts.map((part) => {
     const edges = sbcPartEdges(board, part);
     const atEdge = part.kind === "connector" && (edges.left || edges.right || edges.front || edges.back);
     const rising = opensUp(part, passages);
-    const grow = atEdge || rising ? extra : 0;
+    // A button reaches only the way it is pressed: up, or out of the side it is pressed from.
+    const pressed = part.kind === "button" && buttonReach > 0 ? part.press ?? "up" : null;
+    const grow = atEdge || rising || pressed ? extra : 0;
     const out = atEdge ? further : 0;
+    const push = (side: SbcPress) => (pressed === side ? buttonReach : 0);
     const box = {
       ...part,
-      x0: part.x0 - grow - (edges.left ? out : 0),
-      x1: part.x1 + grow + (edges.right ? out : 0),
-      y0: part.y0 - grow - (edges.front ? out : 0),
-      y1: part.y1 + grow + (edges.back ? out : 0),
-      height: part.height + grow + (rising ? up : 0),
+      x0: part.x0 - grow - (edges.left ? out : 0) - push("left"),
+      x1: part.x1 + grow + (edges.right ? out : 0) + push("right"),
+      y0: part.y0 - grow - (edges.front ? out : 0) - push("front"),
+      y1: part.y1 + grow + (edges.back ? out : 0) + push("back"),
+      height: part.height + grow + (rising ? up : 0) + push("up"),
     };
     return part.underside
       ? { ...box, bottom: -(part.height + grow), top: 0 }

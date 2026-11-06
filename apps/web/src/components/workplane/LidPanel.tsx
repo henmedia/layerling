@@ -14,6 +14,7 @@ import {
   LID_HINGE_TYPES,
   LID_MAGNET_SIZES,
   LID_TYPES,
+  MAX_CLICK_BUMP_HEIGHT,
   MAX_HINGE_GAP,
   MAX_HINGE_KNUCKLES,
   MAX_HINGE_PIN,
@@ -25,6 +26,7 @@ import {
   MAX_MAGNET_DIAMETER,
   MAX_MAGNET_GAP,
   MAX_MAGNET_HEIGHT,
+  MIN_CLICK_BUMP_HEIGHT,
   MIN_HINGE_GAP,
   MIN_HINGE_PIN,
   MIN_HINGE_PIN_PLAY,
@@ -41,15 +43,18 @@ import {
   type LidOptions,
 } from "@/lib/lidTool";
 import { numberLocale, t } from "@/lib/i18n";
+import { fromPrinterPlay } from "@/lib/printerPlay";
 import { useLanguage } from "@/lib/useLanguage";
+import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 /**
  * A lid for a body open at the top (#1009): pushed into the opening, put over the outside, gripping the wall from both
  * sides (#1062) or laid flat on it. It comes out as a body of its own beside the one it closes, ready to print. With
  * magnets, it holds by four round magnets in the corners, in pockets in the body's rim and in the lid. With a hinge, it
- * swings open about a pin along the body's back. With click bumps it snaps into dimples in the body (#1234); a handle is
- * a pull tab on the lid or a finger notch in the body (#1230).
+ * swings open about a pin along the body's back, tight in the body's knuckles and turning in the lid's. With click bumps
+ * it snaps into dimples in the body (#1234), the bumps as high as asked; a handle is a pull tab on the lid or a finger
+ * notch in the body (#1230).
  */
 export function LidPanel({
   targetName,
@@ -71,6 +76,8 @@ export function LidPanel({
   onCancel: () => void;
 }) {
   useLanguage();
+  // The gap and the pin's play say when they are still what the printer's play gave them (printerPlay.ts).
+  const printerPlay = usePrinterPlay();
   const title = t("lid.title");
   // A magnet needs its pocket and a skin above it in the plate: a thinner plate is made thick enough for it.
   // Raised, it says so under the plate's thickness until that is set by hand; set thinner by hand, it says what is needed.
@@ -181,6 +188,7 @@ export function LidPanel({
           disabled={busy}
           onChange={(value) => onChange({ gap: value })}
         />
+        {fromPrinterPlay("lid.gap", settings.gap, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
         <EdgeModifierSlider
           label={t(settings.type === "cap" ? "lid.depthCap" : settings.type === "both" ? "lid.depthBoth" : "lid.depth")}
           value={settings.depth}
@@ -345,6 +353,9 @@ export function LidPanel({
           disabled={busy}
           onChange={(value) => onChange({ hingePinPlay: value })}
         />
+        {fromPrinterPlay("lid.hingePinPlay", settings.hingePinPlay, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
+        {/* The play is only in the lid's holes: in the body's the pin sits tight, so it does not slide out (#1220). */}
+        <span className="shell-openings-summary">{t("lid.hingePinPlayHint")}</span>
         {/* A pivot lid turns on two pins and has no knuckles to count. */}
         {settings.hingeStyle === "pivot" ? null : (
           <EdgeModifierSlider
@@ -375,6 +386,21 @@ export function LidPanel({
         <span>{t("lid.clickBumps")}</span>
       </label>
       {settings.clickBumps || !bumpsFit ? <span className="shell-openings-summary">{t("lid.clickBumpsHint")}</span> : null}
+      {/* How far they reach into the body's wall: a small box or a stiff lip wants less (#1220). */}
+      {settings.clickBumps && bumpsFit ? (<>
+        <EdgeModifierSlider
+          label={t("lid.clickBumpHeight")}
+          value={settings.clickBumpHeight}
+          min={MIN_CLICK_BUMP_HEIGHT}
+          max={MAX_CLICK_BUMP_HEIGHT}
+          step={0.05}
+          workspace={workspace}
+          length
+          disabled={busy}
+          onChange={(value) => onChange({ clickBumpHeight: value })}
+        />
+        <span className="shell-openings-summary">{t("lid.clickBumpHeightHint")}</span>
+      </>) : null}
 
       {/* On the side the lid opens at: the front, or opposite the hinge. */}
       <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.handle")}>

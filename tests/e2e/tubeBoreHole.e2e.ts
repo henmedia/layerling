@@ -167,6 +167,30 @@ describe("a bent tube whose opening cuts as a hole (#892)", () => {
     expect(volume).toBeGreaterThan(4.8 * 0.95);
   });
 
+  it("runs the opening of a bent pipe out at both ends however the pipe is turned (#1367)", () => {
+    // The pipe of the report: outer 10, wall 1.5, a sharp 90° bend. Along each leg the opening reaches the open end (no gap)
+    // and leaves the wall of the bend (1.5); across the pipe it sits in the middle (1.5 either side). Stood up or tipped,
+    // the opening stopped 0.75 short of the top end and closed it.
+    const fields = normalizedBentTubeFields({
+      bentTubeSize: 10,
+      bentTubeWall: 1.5,
+      bentTubeSegments: [{ length: 25, bendAngle: 90, bendRadius: 5.1, roll: 0 }, { length: 25, bendAngle: 0, bendRadius: 15, roll: 0 }],
+    });
+    const natural = bentTubeNaturalDimensions(fields);
+    const corner = { ...bentPipe(true), ...fields, width: natural.width, depth: natural.depth, height: natural.height, size: natural.size } as WorkplaneShape;
+    for (const turn of [{}, { rotationZ: 270 }, { rotationZ: 90 }, { rotationX: 90 }, { rotationX: 270, rotation: 90 }, { rotationZ: 270, mirrorX: true }]) {
+      const [solid, bore] = splitBoreTube({ ...corner, ...turn } as WorkplaneShape);
+      const solidBox = boundsForShapesOfVertices([solid]);
+      const boreBox = boundsForShapesOfVertices([bore]);
+      for (const [low, high] of [["minX", "maxX"], ["minY", "maxY"], ["minZ", "maxZ"]] as const) {
+        const gaps = [boreBox[low] - solidBox[low], solidBox[high] - boreBox[high]].sort((a, b) => a - b);
+        const acrossThePipe = Math.abs(gaps[0] - 1.5) < 0.02;
+        if (acrossThePipe) expect(gaps[1], `${JSON.stringify(turn)} ${low}`).toBeCloseTo(1.5, 1);
+        else expect(gaps, `${JSON.stringify(turn)} ${low}`).toEqual([expect.closeTo(0, 2), expect.closeTo(1.5, 1)]);
+      }
+    }
+  });
+
   it("is cut as a solid pipe and an opening that is a hole, and stays one shape otherwise", () => {
     const parts = splitBoreTube(bentPipe(true));
     expect(parts.map((part) => [part.bentTubeInnerProfile, part.hole === true])).toEqual([["none", false], ["none", true]]);

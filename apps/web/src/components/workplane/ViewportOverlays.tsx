@@ -9,8 +9,8 @@ import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { type AppThemePalette, type ResolvedAppTheme } from "@/lib/appTheme";
-import { t } from "@/lib/i18n";
-import { displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
+import { t, type MessageKey } from "@/lib/i18n";
+import { currentLengthUnitLabel, displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
 import { computeCornerRulerRelativeCoordinates, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
 import { type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
@@ -23,8 +23,10 @@ import type { MeasurementAccuracy, MouseScheme, WorkplaneNote, WorkplaneShape, W
 import { NOTE_TEXT_LIMIT } from "@/lib/workplaneNotes";
 import { measurementMiddle } from "@/lib/referencePoints";
 import type { MoveDimensionLift } from "@/lib/moveDimensionLines";
-import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeLabelSize } from "@/lib/tapeLabels";
+import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeDeltaAxes, tapeLabelSize } from "@/lib/tapeLabels";
 import { roundEdgeMeasure } from "@/lib/tapeCircle";
+import { tapeLengthMover, type TapeLengthMover, type TapeLengthRefusal } from "@/lib/tapeLengthEdit";
+import { displayShapeName } from "@/lib/shapeCatalog";
 
 /** Light-blue chrome for origin-distance lines, matching `.origin-dimension-value`. */
 const ORIGIN_DIMENSION_LINE_COLOR = { light: "#6ec4e8", dark: "#8fd4f0" } as const;
@@ -214,17 +216,37 @@ export type TapeOverlayState = {
   /** `coordinates`: where the point is, as X, Y and Z read in the editor, for its hover tip. */
   points: Array<TapePoint & { screenX: number; screenY: number; coordinates: string }>;
   /**
-   * `editable`: a straight measurement with a body at one end at least, so typing a length can move that body (#823).
+   * `editable`: a straight measurement with a body at one end at least that typing a length can move (#823).
+   * `lengthHint`: what pointing at the label says about that: which body a typed length moves, or why none does (Discussion #610).
    * `axes`: the axes it runs along ("X", "XZ", "3D"); `deltas`: its reach along each of them, when there are two or more.
    * `midX`/`midY`: where a reference point in its middle would go. `occluded`: mostly behind a body, so its label fades.
    */
   segments: Array<TapeSegment & {
     x1: number; y1: number; x2: number; y2: number; screenPoints?: string; labelX: number; labelY: number; label: string; editable: boolean;
-    axes: string; deltas: string; midX: number; midY: number; occluded: boolean;
+    lengthHint: string; axes: string; deltas: string; midX: number; midY: number; occluded: boolean;
   }>;
-  /** `preview`: what the measurement would read while its second point is placed. */
-  hover: { screenX: number; screenY: number; edgeScreenPoints?: string; preview?: string } | null;
+  /**
+   * `preview`: what the measurement would read while its second point is placed. `centre`: what the point sits in the
+   * middle of (Discussion #610); `centres`: the other middles of a face or a round edge on offer near the pointer.
+   */
+  hover: {
+    screenX: number;
+    screenY: number;
+    edgeScreenPoints?: string;
+    preview?: string;
+    centre?: TapeCentreKind;
+    centres?: Array<{ screenX: number; screenY: number }>;
+  } | null;
 };
+
+/**
+ * What a centre the tape measure snaps to is the middle of (Discussion #610): a flat face, a round hole, or a round
+ * edge whose middle is filled, such as the rim of a cylinder or the foot of a boss.
+ */
+export type TapeCentreKind = "face" | "hole" | "circle";
+
+/** A centre on offer near the pointer, in the room. */
+export type TapeCentre = { x: number; y: number; z: number; kind: TapeCentreKind };
 
 export type TapeCandidate = {
   x: number;
@@ -236,8 +258,15 @@ export type TapeCandidate = {
   edge?: TapeEdgeAttachment;
   /** The edge the point lies on, whether or not a click measures all of it. */
   circleEdge?: TapeEdgeAttachment;
-  /** Unit normal of the surface face under the point, so the second point can snap perpendicular to it (#589). */
+  /**
+   * Unit normal of the surface face under the point, so the second point can snap perpendicular to it (#589); for the
+   * centre of a round edge, the normal of the circle's plane, along the axis of the hole.
+   */
   surfaceNormal?: [number, number, number];
+  /** Set when the point sits on the centre of a face or a round edge (Discussion #610). */
+  centre?: TapeCentreKind;
+  /** The centres on offer near the pointer, the one the point sits on included, each shown with a mark. */
+  centres?: TapeCentre[];
 };
 
 export type RotationHandleSide = "near" | "right" | "far" | "left";
@@ -543,18 +572,42 @@ export function tapeSegmentWorldPoints(state: ThreeState, model: TapeModel, segm
   return start && end ? [tapePointWorld(state, start), tapePointWorld(state, end)] : [];
 }
 
+/** The bodies on the workplane and the selection, which decide what a typed length moves (#823). */
+export type TapeLengthBodies = { shapes: readonly WorkplaneShape[]; selectedIds: readonly string[] };
+
 /**
  * The body a typed length moves: the one at the second point, as in Tinkercad, unless only the
- * body at the first point is selected. A whole edge, or both ends on the same body, moves nothing (#823).
+ * body at the first point is selected. A whole edge, both ends on the same body or on none, or a
+ * locked body moves nothing, and the answer says which (#823, Discussion #610). Null without the measurement.
  */
-export function tapeMovableShapeId(model: TapeModel, segmentId: string, selectedIds: readonly string[]) {
+export function tapeLengthMoverOf(model: TapeModel, segmentId: string, bodies: TapeLengthBodies): TapeLengthMover | null {
   const segment = model.segments.find((candidate) => candidate.id === segmentId);
-  if (!segment || segment.edge) return null;
-  const startShapeId = model.points.find((point) => point.id === segment.startId)?.attachment?.shapeId ?? null;
-  const endShapeId = model.points.find((point) => point.id === segment.endId)?.attachment?.shapeId ?? null;
-  if (startShapeId === endShapeId) return null;
-  if (startShapeId && selectedIds.includes(startShapeId) && !(endShapeId && selectedIds.includes(endShapeId))) return startShapeId;
-  return endShapeId ?? startShapeId;
+  if (!segment) return null;
+  return tapeLengthMover(
+    {
+      startShapeId: model.points.find((point) => point.id === segment.startId)?.attachment?.shapeId ?? null,
+      endShapeId: model.points.find((point) => point.id === segment.endId)?.attachment?.shapeId ?? null,
+      wholeEdge: Boolean(segment.edge),
+    },
+    (id) => bodies.shapes.find((shape) => shape.id === id),
+    bodies.selectedIds,
+  );
+}
+
+/** Why a typed length moves nothing, as the label says it when pointed at and the notice when a typed one is refused. */
+export function tapeLengthRefusalText(refusal: TapeLengthRefusal, name: string) {
+  if (refusal === "locked") return t("camera.tapeLengthLocked", { name });
+  if (refusal === "sameBody") return t("camera.tapeLengthSameBody");
+  if (refusal === "noBody") return t("camera.tapeLengthNoBody");
+  return t("camera.tapeLengthEdge");
+}
+
+/** What pointing at a measurement's label says: the body a typed length moves, or why it cannot be typed. */
+function tapeLengthHint(mover: TapeLengthMover | null, bodies: TapeLengthBodies) {
+  if (!mover) return "";
+  const shape = mover.shapeId ? bodies.shapes.find((entry) => entry.id === mover.shapeId) : undefined;
+  const name = shape ? displayShapeName(shape) : "";
+  return "refusal" in mover ? tapeLengthRefusalText(mover.refusal, name) : t("camera.tapeLengthMoves", { name });
 }
 
 function tapePolylineLength(points: THREE.Vector3[]) {
@@ -574,7 +627,7 @@ function tapeScreenPointList(points: THREE.Vector3[], state: ThreeState) {
 function tapeAxesText(points: THREE.Vector3[], accuracy: MeasurementAccuracy) {
   const spans = tapeAxisSpans(points);
   const axes = tapeAxisTag(spans, accuracy);
-  const deltas = axes.length > 1 ? (["X", "Y", "Z"] as const).filter((axis) => axes === "3D" || axes.includes(axis)).map((axis) => `Δ${axis} ${formatMeasure(spans[axis], accuracy)}`).join("   ") : "";
+  const deltas = tapeDeltaAxes(spans, accuracy).map((axis) => `Δ${axis} ${formatMeasure(spans[axis], accuracy)}`).join("   ");
   return { axes, deltas };
 }
 
@@ -599,15 +652,25 @@ function tapeCoordinates(world: THREE.Vector3, accuracy: MeasurementAccuracy) {
   return `X ${formatMeasure(world.x, accuracy)}   Y ${formatMeasure(displayY(world.z), accuracy)}   Z ${formatMeasure(world.y, accuracy)}`;
 }
 
-/** The length of every measurement in millimetres, for MCP: a measured edge counts along the edge. */
-export function tapeSegmentLengths(state: ThreeState, model: TapeModel): Array<{ id: string; length: number }> {
+/**
+ * The length of every measurement in millimetres, for MCP: a measured edge counts along the edge.
+ * `moves`: the body a typed length would move, when there is one (Discussion #610). `moved`: a body
+ * MCP has just moved by a typed length, by `shift`; the scene shows it there only once it is drawn
+ * again, so the points on it are counted where they are going.
+ */
+export function tapeSegmentLengths(state: ThreeState, model: TapeModel, bodies?: TapeLengthBodies, moved?: { shapeId: string; shift: THREE.Vector3 }): Array<{ id: string; length: number; moves?: string }> {
+  const world = (point: TapePoint) => {
+    const position = tapePointWorld(state, point);
+    return moved && point.attachment?.shapeId === moved.shapeId ? position.add(moved.shift) : position;
+  };
   return model.segments.flatMap((segment) => {
     const start = model.points.find((point) => point.id === segment.startId);
     const end = model.points.find((point) => point.id === segment.endId);
     if (!start || !end) return [];
     const edgePoints = segment.edge ? tapeEdgeWorldPoints(state, segment.edge) : [];
-    const worldPoints = edgePoints.length >= 2 ? edgePoints : [tapePointWorld(state, start), tapePointWorld(state, end)];
-    return [{ id: segment.id, length: Math.round(tapePolylineLength(worldPoints) * 1000) / 1000 }];
+    const worldPoints = edgePoints.length >= 2 ? edgePoints : [world(start), world(end)];
+    const mover = bodies ? tapeLengthMoverOf(model, segment.id, bodies) : null;
+    return [{ id: segment.id, length: Math.round(tapePolylineLength(worldPoints) * 1000) / 1000, ...(mover && !("refusal" in mover) ? { moves: mover.shapeId } : {}) }];
   });
 }
 
@@ -617,6 +680,7 @@ export function syncTapeOverlay(
   overlayRef: MutableRefObject<TapeOverlayState | null>,
   setOverlay: Dispatch<SetStateAction<TapeOverlayState | null>>,
   accuracy: MeasurementAccuracy,
+  bodies: TapeLengthBodies,
 ) {
   const projectedPoints = new Map<string, { screenX: number; screenY: number }>();
   // Hidden measurements stay in the model; nothing of them is drawn or can be hit.
@@ -664,6 +728,7 @@ export function syncTapeOverlay(
     const size = tapeLabelSize(label, axes);
     const labelScreen = placeTapeLabel(point, direction, size, lines, taken);
     taken.push({ ...labelScreen, ...size });
+    const mover = tapeLengthMoverOf(model, segment.id, bodies);
     return {
       ...segment,
       x1: startScreen.screenX,
@@ -674,7 +739,8 @@ export function syncTapeOverlay(
       labelX: labelScreen.x,
       labelY: labelScreen.y,
       label,
-      editable: tapeMovableShapeId(model, segment.id, []) !== null,
+      editable: Boolean(mover && !("refusal" in mover)),
+      lengthHint: tapeLengthHint(mover, bodies),
       axes,
       deltas,
       midX: midScreen.x,
@@ -693,6 +759,15 @@ export function syncTapeOverlay(
     const { axes, deltas } = tapeAxesText([startWorld, hoverWorld], accuracy);
     preview = `${axes} ${formatMeasure(startWorld.distanceTo(hoverWorld), accuracy)}${deltas ? `\n${deltas}` : ""}`;
   }
+  // The centres on offer near the pointer besides the one the point sits on, each with its mark.
+  const centres = hoverWorld && model.hover?.centres?.length
+    ? model.hover.centres.flatMap((centre) => {
+        const world = new THREE.Vector3(centre.x, centre.y, centre.z);
+        if (model.hover?.centre && world.distanceTo(hoverWorld) < 1e-3) return [];
+        const screen = projectToScreen(world, state);
+        return [{ screenX: screen.x, screenY: screen.y }];
+      })
+    : [];
   const next: TapeOverlayState = {
     points,
     segments,
@@ -701,6 +776,8 @@ export function syncTapeOverlay(
       screenY: hoverScreen.y,
       edgeScreenPoints: hoverEdgePoints.length >= 2 ? tapeScreenPointList(hoverEdgePoints, state) : undefined,
       preview,
+      ...(model.hover?.centre ? { centre: model.hover.centre } : {}),
+      ...(centres.length ? { centres } : {}),
     } : null,
   };
   const previous = overlayRef.current;
@@ -718,6 +795,8 @@ export function syncTapeOverlay(
         && segment.label === candidate.label
         && segment.deltas === candidate.deltas
         && segment.axes === candidate.axes
+        && segment.editable === candidate.editable
+        && segment.lengthHint === candidate.lengthHint
         && segment.occluded === candidate.occluded
         && Math.abs(segment.midX - candidate.midX) < 0.2
         && Math.abs(segment.midY - candidate.midY) < 0.2
@@ -733,6 +812,12 @@ export function syncTapeOverlay(
       (previous.hover && next.hover
         && previous.hover.edgeScreenPoints === next.hover.edgeScreenPoints
         && previous.hover.preview === next.hover.preview
+        && previous.hover.centre === next.hover.centre
+        && (previous.hover.centres?.length ?? 0) === (next.hover.centres?.length ?? 0)
+        && (previous.hover.centres ?? []).every((centre, index) => {
+          const candidate = (next.hover?.centres ?? [])[index];
+          return Math.abs(centre.screenX - candidate.screenX) < 0.2 && Math.abs(centre.screenY - candidate.screenY) < 0.2;
+        })
         && Math.abs(previous.hover.screenX - next.hover.screenX) < 0.2
         && Math.abs(previous.hover.screenY - next.hover.screenY) < 0.2));
   if (!unchanged) {
@@ -1123,6 +1208,22 @@ export function NoteOverlay({
   );
 }
 
+function TapeCentreMark({ x, y, snapped = false }: { x: number; y: number; snapped?: boolean }) {
+  return (
+    <g className={`tape-centre ${snapped ? "snapped" : ""}`}>
+      <circle cx={x} cy={y} r="7" />
+      <path d={`M${x - 4.5},${y} h9 M${x},${y - 4.5} v9`} />
+    </g>
+  );
+}
+
+/** What the hint beside a snapped centre says it is the middle of. */
+const TAPE_CENTRE_HINTS: Record<TapeCentreKind, MessageKey> = {
+  face: "camera.tapeCentreFace",
+  hole: "camera.tapeCentreHole",
+  circle: "camera.tapeCentreCircle",
+};
+
 export function TapeOverlay({
   overlay,
   startPointId,
@@ -1136,6 +1237,7 @@ export function TapeOverlay({
   onSegmentPointerDown,
   onMarkMiddle,
   onEditLength,
+  editingLengthId = null,
 }: {
   overlay: TapeOverlayState;
   startPointId: string | null;
@@ -1151,6 +1253,8 @@ export function TapeOverlay({
   onMarkMiddle?: (segmentId: string) => void;
   /** Opens the field to type a length, which moves the body at one end (#823). */
   onEditLength?: (segmentId: string) => void;
+  /** The measurement whose field is open: the field stands where its number was, so the number goes meanwhile. */
+  editingLengthId?: string | null;
 }) {
   // The line or the label under the pointer: either brings a faded measurement back; only the label shows the deltas.
   const [hovered, setHovered] = useState<{ segmentId: string; onLabel: boolean } | null>(null);
@@ -1160,7 +1264,8 @@ export function TapeOverlay({
     onPointerEnter: () => setHovered({ segmentId, onLabel }),
     onPointerLeave: () => setHovered((current) => (current?.segmentId === segmentId && current.onLabel === onLabel ? null : current)),
   });
-  const hoveredSegment = hovered?.onLabel ? overlay.segments.find((segment) => segment.id === hovered.segmentId && segment.deltas) : undefined;
+  // The field that stands in for a label shows the reach along each axis itself.
+  const hoveredSegment = hovered?.onLabel ? overlay.segments.find((segment) => segment.id === hovered.segmentId && segment.id !== editingLengthId && segment.deltas) : undefined;
   const hoverClass = (segment: { id: string; occluded: boolean }) => `${segment.id === hoveredSegmentId ? "hovered" : ""} ${segment.occluded ? "occluded" : ""}`;
   const hoveredPoint = overlay.points.find((point) => point.id === hoveredPointId);
   return (
@@ -1207,22 +1312,34 @@ export function TapeOverlay({
           />
         ))}
         {active && overlay.hover?.edgeScreenPoints ? <polyline className="tape-hover-edge" points={overlay.hover.edgeScreenPoints} fill="none" /> : null}
-        {active && overlay.hover ? <circle className="tape-hover-point" cx={overlay.hover.screenX} cy={overlay.hover.screenY} r="5" /> : null}
+        {/* A centre on offer is a cross in a circle, unlike a corner; the one the point sits on is drawn in full (Discussion #610). */}
+        {active ? overlay.hover?.centres?.map((centre, index) => <TapeCentreMark key={`centre-${index}`} x={centre.screenX} y={centre.screenY} />) : null}
+        {active && overlay.hover ? (
+          overlay.hover.centre
+            ? <TapeCentreMark x={overlay.hover.screenX} y={overlay.hover.screenY} snapped />
+            : <circle className="tape-hover-point" cx={overlay.hover.screenX} cy={overlay.hover.screenY} r="5" />
+        ) : null}
       </svg>
       {overlay.segments.map((segment) => {
+        if (segment.id === editingLengthId) return null;
         const content = (
           <>
             {segment.axes ? <span className="tape-label-axes">{segment.axes}</span> : null}
             {segment.label}
           </>
         );
+        // What pointing at the label says: the body a typed length moves, or why it cannot be typed (Discussion #610).
+        const hint = onEditLength && !deleteMode ? segment.lengthHint : "";
+        // A button, so the keyboard reaches it too: Enter or Space opens the field. Its name is the distance with its
+        // unit, the hint its description.
         return segment.editable && onEditLength && !deleteMode ? (
           <button
             key={`${segment.id}-label`}
             type="button"
             className={`tape-label editable ${hoverClass(segment)}`}
             style={{ left: segment.labelX, top: segment.labelY }}
-            title={t("camera.tapeTypeLength")}
+            title={hint}
+            aria-label={t("camera.tapeDistance", { length: `${segment.label} ${currentLengthUnitLabel()}` })}
             onPointerDown={(event) => event.stopPropagation()}
             onClick={() => onEditLength(segment.id)}
             {...hoverSegment(segment.id, true)}
@@ -1230,7 +1347,14 @@ export function TapeOverlay({
             {content}
           </button>
         ) : (
-          <span key={`${segment.id}-label`} className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""}`} style={{ left: segment.labelX, top: segment.labelY }} {...hoverSegment(segment.id, true)}>
+          // A label that cannot be typed says why when it is pointed at, so it catches the pointer like one with a tip.
+          <span
+            key={`${segment.id}-label`}
+            className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""} ${hint ? "has-hint" : ""}`}
+            style={{ left: segment.labelX, top: segment.labelY }}
+            title={hint || undefined}
+            {...hoverSegment(segment.id, true)}
+          >
             {content}
           </span>
         );
@@ -1242,6 +1366,11 @@ export function TapeOverlay({
           style={{ left: hoveredSegment.labelX, top: hoveredSegment.labelY + (hoveredSegment.labelY <= hoveredSegment.midY ? -16 : 16) }}
         >
           {hoveredSegment.deltas}
+        </span>
+      ) : null}
+      {active && overlay.hover?.centre ? (
+        <span className="tape-tip above tape-centre-hint" style={{ left: overlay.hover.screenX, top: overlay.hover.screenY - 12 }}>
+          {t(TAPE_CENTRE_HINTS[overlay.hover.centre])}
         </span>
       ) : null}
       {active && overlay.hover?.preview ? (

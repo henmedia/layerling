@@ -195,6 +195,27 @@ export const scenes = {
     await ctx.shot("group-multicolor");
   },
 
+  // A plate made 40 mm longer whose group keeps its holes and small parts (Discussion #526): the corner holes
+  // stay round, 5 mm from the corners, the slot stays in the middle, and the setting shows in the group's card.
+  async "group-keep-parts"(ctx) {
+    await freshEditor(ctx);
+    const plate = await create(ctx, { kind: "box", x: 0, z: 0, width: 100, depth: 60, height: 4, color: BLUE });
+    const holes = [];
+    for (const [x, z] of [[-42, -22], [42, -22], [-42, 22], [42, 22]]) holes.push(await create(ctx, { kind: "cylinder", x, z, width: 6, depth: 6, height: 4, color: GREEN }));
+    holes.push(await create(ctx, { kind: "box", x: 0, z: 0, width: 24, depth: 6, height: 4, color: GREEN }));
+    for (const hole of holes) await ctx.mcp("update_object", { id: hole, hole: true });
+    const group = await ctx.mcp("group_objects", { ids: [plate, ...holes] });
+    const id = group.object?.id ?? group.id;
+    await ctx.mcp("update_object", { id, groupResize: "keepParts", width: 140 });
+    await ctx.wait(2500);
+    await select(ctx, [id]);
+    await ctx.click(ctx.t("view.top"));
+    await ctx.wait(1500);
+    await ctx.click(ctx.t("camera.focusSelection")).catch(() => {});
+    await quiet(ctx, 3000);
+    await ctx.shot("group-keep-parts");
+  },
+
   // Align faces: the part that moves is selected and the tool is open.
   async "mate-faces"(ctx) {
     await freshEditor(ctx);
@@ -462,6 +483,23 @@ scenes["printer-overhang"] = async (ctx) => {
   await ctx.wait(1500);
   await ctx.mcp("select_objects", { ids: [] });
   await ctx.shot("printer-overhang");
+};
+
+scenes["print-check"] = async (ctx) => {
+  await freshEditor(ctx);
+  // A tray open at the top: walls of 2 mm, the one on the right only 0.6 mm - too thin for a 0.4 mm nozzle.
+  const tray = await create(ctx, { kind: "box", x: 0, z: 0, width: 30, depth: 20, height: 20, color: "#c9ced6" });
+  const hollow = await create(ctx, { kind: "box", x: 0.7, z: 0, elevation: 2, width: 27.4, depth: 16, height: 20, hole: true });
+  const group = await ctx.mcp("group_objects", { ids: [tray, hollow] });
+  await ctx.mcp("update_object", { id: group.object?.id ?? group.id, name: ctx.t("shape.box") });
+  await ctx.mcp("select_objects", { ids: [] });
+  await ctx.evaluate(`localStorage.setItem("layerling.printCheck", JSON.stringify({ nozzle: 0.4 })); true`);
+  await ctx.click(ctx.t("editor.tool.printCheck"));
+  await ctx.wait(6000);
+  await ctx.click(`${ctx.t("printCheck.show")}: ${ctx.t("printCheck.thin.title")}`);
+  await quiet(ctx, 3000);
+  await ctx.shot("print-check");
+  await ctx.key("Escape");
 };
 
 scenes["editor-dark"] = async (ctx) => {

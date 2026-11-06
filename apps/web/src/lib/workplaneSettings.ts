@@ -555,6 +555,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.ribFoot = typeof source.ribFoot === "boolean" ? source.ribFoot : fallbackEntry?.ribFoot;
       entry.ribThickness = optionalShapeNumber(source.ribThickness, fallbackEntry?.ribThickness, 0.2, 50);
       entry.ribFootThickness = optionalShapeNumber(source.ribFootThickness, fallbackEntry?.ribFootThickness, 0.2, 50);
+      entry.ribFootShape = source.ribFootShape === "square" || source.ribFootShape === "oval" ? source.ribFootShape : fallbackEntry?.ribFootShape;
     }
     if (kind === "dovetail") {
       entry.dovetailNeckWidth = optionalShapeNumber(source.dovetailNeckWidth, fallbackEntry?.dovetailNeckWidth, 0.1, MAX_CUSTOM_SHAPE_DIMENSION);
@@ -641,6 +642,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.threadClearance = optionalShapeNumber(source.threadClearance, fallbackEntry?.threadClearance, 0, 1.5);
       entry.threadBoltClearance = optionalShapeNumber(source.threadBoltClearance, fallbackEntry?.threadBoltClearance, 0, 1);
       entry.threadAxialClearance = optionalShapeNumber(source.threadAxialClearance, fallbackEntry?.threadAxialClearance, 0, 1);
+      entry.threadStarts = optionalShapeNumber(source.threadStarts, fallbackEntry?.threadStarts, 1, 8);
       entry.threadDepth = optionalShapeNumber(source.threadDepth, fallbackEntry?.threadDepth, 0.01, 40);
       entry.threadFlankAngle = optionalShapeNumber(source.threadFlankAngle, fallbackEntry?.threadFlankAngle, 10, 90);
       entry.threadQuality = optionalShapeNumber(source.threadQuality, fallbackEntry?.threadQuality, 12, 96, true);

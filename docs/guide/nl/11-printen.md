@@ -52,6 +52,28 @@ Hoe steil jouw printer aankan, stel je in bij de instellingen onder {{ui:workspa
 - Waar twee onderdelen in elkaar passen, heb je speling nodig: meestal 0,2 tot 0,4 mm, afhankelijk van de printer. Maak een klein testpaar voordat je het grote onderdeel print.
 - Veel mensen schuinen de onderste rand die op de plaat ligt licht af. Zo loopt de eerste laag niet uit ("olifantenvoet").
 
+## De speling van je printer: de pastest
+
+Elke printer print gaten iets kleiner en pennen iets dikker dan ze getekend zijn, elk met een eigen maat. De speling die twee geprinte onderdelen nodig hebben, is daarom eerst een gok. Meet hem liever één keer: in de instellingen onder {{ui:workspace.workplane}} legt {{ui:workspace.fitTestMake}} een pastest op de plaat. Dat is een plaatje van 60 × 20 × 4 mm met zeven gaten voor één pen van 5 mm, elk getekend als 5 mm plus twee keer 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 of 0,40 mm, met de waarde in reliëf ernaast, en de pen van 5 mm zelf, die naast het plaatje staat met een kleine afschuining bovenop. Hij bestaat uit gewone vormen, dus hij wordt met de rest van de plaat geprint, zonder support.
+
+Print hem zoals hij ligt en steek dan de pen, met de afschuining eerst, in de gaten, te beginnen bij het nauwste. **Het nauwste gat waarin de pen nog draait** geeft de speling van je printer. Typ dat getal in bij {{ui:workspace.printerPlay}} of klik het aan bij de waarden onder het veld. De speling geldt per kant, in millimeters, en de browser bewaart hem voor elk ontwerp; een leeg veld betekent: niet gemeten.
+
+Vanaf dan beginnen nieuwe toepassingen met de speling in plaats van met de ingebouwde waarde: {{ui:lid.gap}} en {{ui:lid.hingePinPlay}} in het gereedschap {{ui:editor.tool.lid}}, de speling van een nieuwe {{ui:shape.dovetail}} en {{ui:shape.snapFit}}, {{ui:prop.clearance}} van een nieuwe moer of een nieuw getapt gat – twee keer de speling, want dat is de ruimte over de hele diameter – en {{ui:clearance.threshold}} bij {{ui:editor.tool.clearance}}. Zolang zo'n veld die waarde nog heeft, zegt "{{ui:printerPlay.fromFitTest}}" ernaast waar het getal vandaan komt. Een scharnier dat in één stuk geprint wordt en de gewrichten van het gereedschap {{ui:editor.tool.flexi}} houden hun 0,4 mm: in één stuk geprint moeten hun spleten ook tussen de lagen open blijven, en dat meet een los geprinte pen niet. Ruimte om een magneet of een Gridfinity-sleutel in te drukken en ruimte voor een gekochte aansluiting of printplaat houden ook hun eigen waarden. Lichamen die al in een ontwerp staan, veranderen nooit, en een ontwerp dat je opent ook niet.
+
+## De print controleren
+
+{{ui:editor.tool.printCheck}}, naast {{ui:editor.tool.clearance}} onder {{ui:editor.group.combine}}, bekijkt de geselecteerde objecten, of alle zichtbare als niets geselecteerd is, en zegt in één venster wat er bij het printen mis zou gaan. Elk van de vijf regels is groen als hij niets vond, en oranje met wat en waar als hij wel iets vond:
+
+- **{{ui:printCheck.thin.title}}**: plekken dunner dan twee lijnen van de nozzle - 0,8 mm bij een nozzle van 0,4 mm. De slicer laat zo'n wand weg of print hem als één zwakke lijn. Kies bovenaan het venster onder {{ui:printCheck.nozzle}} je nozzle (0,2 tot 0,8 met één klik, elke andere in het veld). De dunne plekken worden rood met een licht raster op de lichamen geschilderd, en de regel noemt de dunste plek en hoeveel oppervlak te dun is. Plekken kleiner dan 1 mm² en scherpe randen, zoals die van een wig, tellen niet mee.
+- **{{ui:printCheck.floating.title}}**: een lichaam, of een los deel ervan, dat de plaat noch een ander deel raakt (op 0,05 mm na). Het zou in de lucht geprint worden. Een deel dat op een staand deel ligt, is in orde.
+- **{{ui:printCheck.contact.title}}**: een deel op de plaat waarvan de eerste laag erg klein is voor zijn hoogte, zoals een bol of een kegel op zijn punt. Het kan tijdens het printen loskomen. De controle waarschuwt onder 0,5 mm² standvlak, 0,1 mm boven de plaat gemeten, per millimeter hoogte: een bol zit daar altijd onder, een kubus van 10 mm heeft 10.
+- **{{ui:printCheck.overhang.title}}**: dezelfde getallen als bij **Overhang tonen**, met de hoek die daar is ingesteld.
+- **{{ui:printCheck.openMesh.title}}**: een geïmporteerde mesh met open randen, of randen waar drie of meer vlakken aan zitten. De slicer moet dan raden waar binnen is.
+
+![Een bak waarvan de rechterwand maar 0,6 mm dik is: Print controleren kleurt hem rood en noemt hem in het venster.](shot:print-check)
+
+{{ui:printCheck.show}} bij een regel brengt de camera erheen; het selecteert de zwevende delen, die met weinig houvast en de open meshes, en bij de overhangen zet het **Overhang tonen** aan. Lichamen die overlappen worden samengevoegd gecontroleerd, zoals de slicer ze samenvoegt. Verander je het ontwerp terwijl het venster open is, dan staat er {{ui:printCheck.stale}}; klik daarop of op {{ui:printCheck.checkAgain}}. [[Esc]] sluit het venster. Aan het ontwerp verandert niets. Een AI doet dezelfde controle met `layerling_check_print`.
+
 ## Als je klaar bent
 
 Kies {{ui:editor.export}} en daarna **STL** of **3MF**. STL is het eenvoudigste formaat. 3MF bewaart namen en kleuren van de afzonderlijke lichamen en is daarom handig als je in meerdere kleuren print. Het exportvenster laat ook zien hoeveel gram en meter filament het onderdeel massief geprint zou kosten. Meer in [Bestanden en opslaan](chapter:bestanden-en-opslaan).

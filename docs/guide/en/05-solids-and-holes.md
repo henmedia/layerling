@@ -39,6 +39,17 @@ A whole group can also be a solid or a hole. A simple rule applies:
 - If the group consists only of solids (or only of holes), you switch it as a whole and its parts go along.
 - If it contains both, say a cube with a bore, each part keeps its own state. The whole group then becomes a tool, but the bore stays a bore.
 
+### Resizing a group: keeping holes and small parts
+
+When a group is made longer, wider or taller, its parts stretch with it as if they were drawn on rubber: the round holes in a plate become ovals and move inwards. To keep them as they are, choose {{ui:inspector.groupResizeKeepParts}} under {{ui:inspector.groupResize}} in the group's settings; {{ui:inspector.groupResizeStretch}} is what every group does until you change it. From then on, each time the group is resized - with the handles, the size fields or {{ui:scalePercent.title}} - it is built again from its parts by one rule, along each direction on its own:
+
+- A part that reaches across nearly the whole group, nine tenths of it or more, grows or shrinks with it and keeps its distance to both sides: the plate itself, a wall, or the inside of a box, whose walls stay as thick as they were.
+- Every other part keeps its own size and its distance to the nearer side. A part in the middle stays in the middle.
+
+So a plate with a hole 5 mm in from each corner and a slot in the middle, made 40 mm longer, keeps its holes round and 5 mm from the corners, and the slot in the middle. There is no solver behind it and nothing to set up part by part: the same rule holds for every part, so you can tell beforehand what will happen. A turned part counts with the box it takes up in the group and stays turned; a group inside the group counts as one part. While you drag a handle, the group stretches as a whole; when you let go, it is built again, in the same undo step. Made smaller than a part needs with its distance, that part shrinks with the group as before, and a message says so. A mirrored, tapered or twisted group, and one with fillets, chamfers or a texture of its own, always stretches everything. Chosen for a group that is stretched already, the setting lays its parts out again at once.
+
+![A plate with a hole 5 mm in from each corner and a slot in the middle, made 40 mm longer with Keep holes and small parts: the holes are still round and 5 mm from the corners, the slot is still in the middle.](shot:group-keep-parts)
+
 ## Bundling
 
 Sometimes parts should only stay together without becoming one - a white logo on a black plate for a multicolour print, say. That is what {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]) is for, as in Tinkercad. A bundle moves, turns and resizes like a shape, but nothing is merged:

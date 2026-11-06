@@ -28,6 +28,27 @@ function cylinder(radius: number, height: number, segments = 96, rings = 8): num
   return out;
 }
 
+/** A closed capsule standing on the plate (inside frame, y up), half spheres on a cylinder `straight` mm long, wound outward. */
+function capsule(radius: number, straight: number, segments = 64, rings = 16): number[] {
+  const out: number[] = [];
+  const tri = (a: Vec3, b: Vec3, c: Vec3) => out.push(...a, ...b, ...c);
+  const profile: Array<[number, number]> = [];
+  for (let j = 0; j <= rings; j += 1) profile.push([radius * Math.cos((Math.PI / 2) * (j / rings - 1)), radius + radius * Math.sin((Math.PI / 2) * (j / rings - 1))]);
+  for (let j = 1; j <= 4; j += 1) profile.push([radius, radius + (straight * j) / 4]);
+  for (let j = 1; j <= rings; j += 1) profile.push([radius * Math.cos((Math.PI / 2) * (j / rings)), radius + straight + radius * Math.sin((Math.PI / 2) * (j / rings))]);
+  // The poles lie on the axis exactly, so the triangles round each meet in one point.
+  profile[0][0] = profile[profile.length - 1][0] = 0;
+  const at = (k: number, [r, y]: [number, number]): Vec3 => [r * Math.cos((2 * Math.PI * k) / segments), y, r * Math.sin((2 * Math.PI * k) / segments)];
+  for (let k = 0; k < segments; k += 1) {
+    for (let j = 0; j < profile.length - 1; j += 1) {
+      // At a pole the two triangles of a quad shrink to one.
+      if (profile[j + 1][0] > 0) tri(at(k, profile[j]), at(k, profile[j + 1]), at(k + 1, profile[j + 1]));
+      if (profile[j][0] > 0) tri(at(k, profile[j]), at(k + 1, profile[j + 1]), at(k + 1, profile[j]));
+    }
+  }
+  return out;
+}
+
 /** A closed box on the plate (inside frame, y up), two triangles a face, wound outward. */
 function box(w: number, h: number, d: number): number[] {
   const p = (x: number, y: number, z: number): Vec3 => [(x - 0.5) * w, y * h, (z - 0.5) * d];
@@ -445,6 +466,15 @@ describe("text stuck on", () => {
     }
     const textOutline = await surfaceTextOutline({ content: "Layerling", font: "Multilanguage", size: 8 });
     const result = applySurfaceTexture(rod, { ...TEXT, textOutline });
+    expect(result.stats.text).toEqual({ placed: true, torn: 0 });
+    expectClosed(result);
+  }, 30000);
+
+  it("lays a text straight on over a capsule's round top, where folding at its creases would tear it", async () => {
+    // Turned on end near the top: as whole either way (0.718), but over the creases the letters tear at 36 points, straight
+    // on at none, so the way that tears less is kept.
+    const textOutline = await surfaceTextOutline({ content: "Layerling", font: "Multilanguage", size: 8 });
+    const result = applySurfaceTexture(capsule(10, 20), { ...TEXT, textOutline, textHeight: 95, textTurn: 90 });
     expect(result.stats.text).toEqual({ placed: true, torn: 0 });
     expectClosed(result);
   }, 30000);

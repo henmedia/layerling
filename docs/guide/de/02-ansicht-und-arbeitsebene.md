@@ -91,7 +91,7 @@ Auf einer Fläche rastet der Ursprung der Arbeitsebene sonst am Raster ein. Klic
 
 Ein Klick neben die Platte oder [[Esc]] holt die Arbeitsebene zurück auf die Grundplatte. Schneller geht es mit {{ui:camera.resetWorkplane}}: Der Knopf mit dem Pfeil nach unten steht in der Ansichtsleiste unter dem Auge, solange die Ebene auf einer Fläche liegt. Mit [[Umschalt]]+[[W]] legst du sie direkt auf die gerade ausgewählte Fläche. [[Alt]]+[[W]] legt sie jederzeit zurück auf die Grundplatte, ob etwas ausgewählt ist oder nicht. Hältst du beim Klicken [[Umschalt]] gedrückt, zeigt die Ebene in die andere Richtung.
 
-Solange die Arbeitsebene auf einer Fläche liegt, erscheint neben {{ui:camera.placeWorkplane}} ein Auge. Es blendet die Ebene aus, ohne sie aufzuheben, damit du freie Sicht auf den Entwurf hast: Neue Formen landen weiter auf dieser Fläche, und gedreht wird weiter um sie. Ein Klick auf das Auge blendet sie wieder ein, ebenso das Setzen einer neuen Arbeitsebene.
+Solange die Arbeitsebene auf einer Fläche liegt, erscheint neben {{ui:camera.placeWorkplane}} ein Auge. Es blendet die Ebene aus, ohne sie aufzuheben, damit du freie Sicht auf den Entwurf hast: Neue Formen landen weiter auf dieser Fläche, und gedreht wird weiter um sie. Ein Klick auf das Auge blendet sie wieder ein, ebenso das Setzen einer neuen Arbeitsebene. Die Größengriffe eines Quaders folgen auch einer Arbeitsebene, die auf einer seiner Seiten steht: Die Eck- und Kantengriffe liegen auf dieser Fläche, und jeder ändert die eigene Breite, Länge oder Höhe des Quaders, die an ihm entlangläuft. Der Griff in der Mitte der Fläche ändert das Maß quer dazu.
 
 Um gerade auf die Arbeitsebene zu schauen, drücke [[P]] oder klicke in der Ansichtsleiste neben {{ui:camera.placeWorkplane}} auf {{ui:camera.lookOntoWorkplane}}. Die Ansicht dreht sich, bis du die Ebene von vorn siehst, von der Seite, zu der neue Formen wachsen, mit ihrem Ursprung in der Mitte. Auf der Grundplatte ist das die Ansicht von oben.
 
@@ -197,6 +197,8 @@ Unter {{ui:workspace.customSnapGrids}} an derselben Stelle legst du eigene Raste
 ### Arbeitsebene: Platte und Drucker
 
 {{ui:workspace.printer}} stellt die Arbeitsebene auf die Druckplatte deines Druckers ein und markiert Körper, die darüber hinausragen, siehe [Drucken](chapter:drucken). {{ui:workspace.showPlateLabels}} schreibt den Namen des Designs auf die Platte und, wenn ein Drucker gewählt ist, seinen Namen und sein Bauvolumen.
+
+{{ui:workspace.printerPlay}} ist der Raum je Seite, den ein gedruckter Stift braucht, um sich in einem gedruckten Loch deines Druckers zu drehen. {{ui:workspace.fitTestMake}} legt die Passprobe auf die Platte, die es misst; neue Deckel, Schwalbenschwänze, Schnapphaken, Muttern und die Spielprüfung beginnen dann damit, siehe [Drucken](chapter:drucken). Es bleibt in diesem Browser, nicht im Entwurf.
 
 {{ui:workspace.size}} gibt der Platte eine eigene Größe, mit {{ui:workspace.width}} und {{ui:workspace.length}} in Millimetern oder der gewählten Einheit. Das Gitter läuft immer durch den Nullpunkt, sodass die kräftigen Linien auf den Achsen liegen, wie groß die Platte auch ist.
 

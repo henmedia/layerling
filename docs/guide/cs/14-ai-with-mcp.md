@@ -134,6 +134,8 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_show_overhangs` | zapne šrafování převisů, nastaví úhel a oznámí plochu vyžadující podpěry pro každé těleso |
 | `layerling_estimate_print` | odhadne objem, hmotnost a délku filamentu výběru nebo projektu, pro plný tisk i přibližně se stěnami a výplní |
 | `layerling_check_clearance` | před tiskem zkontroluje, které díly se překrývají, dotýkají nebo jsou blíž než minimální vůle (Zkontrolovat vůli), i oddělené díly jednoho objektu |
+| `layerling_printer_play` | načte, nastaví nebo smaže vůli tiskárny ({{ui:workspace.printerPlay}} v nastavení) a položí test vůle, který ji změří |
+| `layerling_check_print` | před tiskem zkontroluje, co by se pokazilo: příliš tenké stěny pro trysku, díly ve vzduchu, malou opěru na podložce, převisy a otevřené sítě (Zkontrolovat tisk) |
 | `layerling_add_reference_points` | vytvoří referenční body na středech, rozích, středech hran nebo zadaných souřadnicích |
 | `layerling_list_reference_points` | vypíše referenční body s identifikátory a polohami |
 | `layerling_remove_reference_points` | odstraní vybrané nebo všechny referenční body |
@@ -153,7 +155,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_delete_custom_shape` | odstraní uložený vlastní tvar; vložená tělesa zůstanou |
 | `layerling_show_workplane` | skryje nebo zobrazí podložku s mřížkou, pouze změna pohledu |
 | `layerling_set_section_view` | zapne pohled v řezu, aniž by skutečně rozdělil tělesa |
-| `layerling_measurements` | zobrazí nebo skryje měření měřicího nástroje a vypíše je s jejich délkami, a skryje nebo zobrazí rozměry kolem výběru jako [[Q]] |
+| `layerling_measurements` | zobrazí nebo skryje měření měřicího nástroje a vypíše je s jejich délkami, a skryje nebo zobrazí rozměry kolem výběru jako [[Q]], a zadá délku pro jedno z nich, což posune těleso na jeho konci jako kliknutí na číslo |
 | `layerling_measure_angle` | měří úhel jako úhloměr: ve vrcholu ze tří bodů nebo mezi dvěma rovnými plochami, a ukáže ho v pohledu |
 | `layerling_saved_view` | uloží aktuální pohled pod klávesu 7, 8, 9 nebo 0 a vrátí se k němu, jako Shift+klávesa a klávesa (jen pohled); nastaví také úvodní pohled nových návrhů |
 | `layerling_build_plates` | vypíše, přidá, pojmenuje, seřadí a odebere tiskové podložky, přesune objekty na podložku a rozmístí je na podložky, jako lišta podložek |

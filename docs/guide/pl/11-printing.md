@@ -54,6 +54,28 @@ Z jak stromymi nawisami radzi sobie Twoja drukarka, ustawiasz w ustawieniach w s
 - Tam, gdzie dwie części w siebie wchodzą, potrzebny jest luz: zwykle od 0,2 do 0,4 mm, zależnie od drukarki. Zanim wydrukujesz dużą część, zrób małą parę próbną.
 - Wiele osób lekko fazuje dolną krawędź, która leży na stole. Dzięki temu pierwsza warstwa się nie rozlewa („stopa słonia”).
 
+## Luz twojej drukarki: test pasowania
+
+Każda drukarka drukuje otwory trochę mniejsze, a sworznie trochę grubsze, niż są narysowane, każda o własną wartość, więc luz potrzebny dwóm wydrukowanym częściom jest na początku zgadywaniem. Zmierz go raz: w ustawieniach w sekcji {{ui:workspace.workplane}} przycisk {{ui:workspace.fitTestMake}} kładzie na stole test pasowania. To płytka 60 × 20 × 4 mm z siedmioma otworami na jeden sworzeń 5 mm, każdy narysowany jako 5 mm plus dwa razy 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 lub 0,40 mm, z wypukłą wartością obok, oraz sam sworzeń 5 mm, stojący obok płytki z małą fazką u góry. Składa się ze zwykłych kształtów, więc drukuje się razem z resztą stołu, bez podpór.
+
+Wydrukuj go tak, jak leży, a potem wsuwaj sworzeń fazką do przodu w otwory, zaczynając od najciaśniejszego. **Najciaśniejszy otwór, w którym sworzeń jeszcze się obraca,** wyznacza luz twojej drukarki. Wpisz jego liczbę w polu {{ui:workspace.printerPlay}} albo kliknij ją wśród wartości pod polem. Luz podaje się na stronę, w milimetrach, a przeglądarka pamięta go dla wszystkich projektów; puste pole oznacza, że nie zmierzono.
+
+Od tej pory nowe użycia zaczynają od luzu zamiast od wbudowanej wartości: {{ui:lid.gap}} i {{ui:lid.hingePinPlay}} w narzędziu {{ui:editor.tool.lid}}, luz nowego kształtu {{ui:shape.dovetail}} i {{ui:shape.snapFit}}, {{ui:prop.clearance}} nowej nakrętki lub otworu gwintowanego – podwójny luz, bo to miejsce na całej średnicy – oraz {{ui:clearance.threshold}} w {{ui:editor.tool.clearance}}. Dopóki takie pole ma tę wartość, napis „{{ui:printerPlay.fromFitTest}}” obok mówi, skąd pochodzi liczba. Zawias drukowany w jednym kawałku i przeguby narzędzia {{ui:editor.tool.flexi}} zachowują swoje 0,4 mm: drukowane w jednym kawałku, ich szczeliny muszą pozostać otwarte także między warstwami, a tego sworzeń wydrukowany osobno nie mierzy. Miejsce na wciśnięcie magnesu lub klucza Gridfinity oraz miejsce na kupione gniazdo lub płytkę także zachowują własne wartości. Bryły, które już są w projekcie, nigdy się nie zmieniają, podobnie jak projekt, który otwierasz.
+
+## Sprawdzanie wydruku
+
+{{ui:editor.tool.printCheck}} obok {{ui:editor.tool.clearance}} w grupie {{ui:editor.group.combine}} przegląda zaznaczone obiekty, a gdy nic nie jest zaznaczone, wszystkie widoczne, i w jednym oknie mówi, co poszłoby źle przy drukowaniu. Każdy z pięciu wierszy jest zielony, gdy nic nie znalazł, i pomarańczowy z informacją co i gdzie, gdy coś znalazł:
+
+- **{{ui:printCheck.thin.title}}**: miejsca cieńsze niż dwie ścieżki dyszy - 0,8 mm przy dyszy 0,4 mm. Slicer pominie taką ściankę albo wydrukuje ją jako jedną słabą ścieżkę. U góry okna w polu {{ui:printCheck.nozzle}} wybierz swoją dyszę (od 0,2 do 0,8 jednym kliknięciem, każdą inną wpisz). Cienkie miejsca są malowane na bryłach na czerwono z jasną siatką, a wiersz podaje najcieńsze miejsce i ile powierzchni jest za cienkie. Miejsca poniżej 1 mm² i ostre krawędzie, jak krawędź klina, są pomijane.
+- **{{ui:printCheck.floating.title}}**: bryła albo osobna część bryły, która nie dotyka ani płyty, ani innej części (z dokładnością do 0,05 mm). Drukowałaby się w powietrzu. Część leżąca na stojącej części jest w porządku.
+- **{{ui:printCheck.contact.title}}**: część na płycie, której pierwsza warstwa jest bardzo mała jak na jej wysokość, na przykład kula albo stożek na czubku. Może się oderwać podczas drukowania. Ostrzeżenie pojawia się poniżej 0,5 mm² podstawy, mierzonej 0,1 mm nad płytą, na każdy milimetr wysokości: kula zawsze jest poniżej, sześcian 10 mm ma 10.
+- **{{ui:printCheck.overhang.title}}**: te same liczby co w **Pokaż nawisy**, z ustawionym tam kątem.
+- **{{ui:printCheck.openMesh.title}}**: zaimportowana siatka z otwartymi krawędziami albo z krawędziami, które dzielą trzy lub więcej ścian. Slicer musi wtedy zgadywać, gdzie jest wnętrze.
+
+![Tacka, której prawa ścianka ma tylko 0,6 mm: Sprawdź wydruk maluje ją na czerwono i podaje w oknie.](shot:print-check)
+
+{{ui:printCheck.show}} przy wierszu przenosi tam kamerę; zaznacza części w powietrzu, te z małym stykiem i otwarte siatki, a przy nawisach włącza **Pokaż nawisy**. Bryły, które się nakładają, są sprawdzane połączone, tak jak łączy je slicer. Jeśli zmienisz projekt, gdy okno jest otwarte, pojawi się {{ui:printCheck.stale}}; kliknij to albo {{ui:printCheck.checkAgain}}. [[Esc]] zamyka okno. W projekcie nic się nie zmienia. AI wykonuje to samo sprawdzenie przez `layerling_check_print`.
+
 ## Gdy wszystko gotowe
 
 Wybierz {{ui:editor.export}}, a potem **STL** albo **3MF**. STL to najprostszy format. 3MF zachowuje nazwy i kolory poszczególnych brył, więc przydaje się, gdy drukujesz w kilku kolorach. Okno eksportu pokazuje też, ile gramów i metrów filamentu zużyłaby część wydrukowana jako pełna. Więcej w rozdziale [Pliki i zapis](chapter:files-and-saving).

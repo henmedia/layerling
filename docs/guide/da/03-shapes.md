@@ -65,6 +65,7 @@ Spids og snoing virker på næsten alle former. Kun tandhjulet, gevindet, fjeder
 {{ui:inspector.saveDefaults}} husker det, du har ændret på denne form, som start for hver ny form af samme slags: målene, formens indstillinger og dens farve. Farv en cylinder grøn og tryk på knappen, så er hver cylinder, du tilføjer bagefter, grøn; de andre slags beholder deres egne farver. {{ui:inspector.resetDefaults}} stiller slagsen tilbage til det, programmet starter den med. Hvilke slags der har egne standarder, er markeret i indstillingerne under {{ui:workspace.shapeDefaults}}. Et nyt design, du starter fra startsiden, begynder også med dem; værdierne huskes i denne browser.
 
 En spids eller hældende kasse, cylinder, ellipse, polygon, rør eller ring bevarer sin eksakte form, og det samme gør kapslen, stjernen, hjertet, halvmånen, svalehalen, en rundet kasse uden rundede top- og bundkanter og en lige eller rund rifling (dens fasede ender smalles med den): fas og rund virker på den som på den almindelige form, og STEP-eksporten skriver den. Det samme gælder for en snoet form: dens tværsnit drejer nøjagtigt når det stiger, og siderne snor sig jævnt fra bund til top.
+
 {{ui:inspector.slope}} får du på kassen, den rundede kasse, cylinderen, ellipsen, polygonet, røret, ringen, kilen og det runde tag. Kilen og det runde tag ligger langs deres dybde, så de hælder kun mod forsiden eller bagsiden. Det hældede legeme bevarer sin eksakte form, så fas og rund og STEP-eksporten virker på det som på den almindelige form; kun en rundet kasse med rundede top- og bundkanter, og en hældning sammen med en spids, en snoing eller et hældende legeme, bliver kun et mesh i visningen.
 
 {{ui:inspector.narrow}} får du på de samme former, bortset fra røret og ringen, hvis væg ellers ville blive tyndere på tværs end langs. En indsnævret kasse, og en kile eller et rundt tag der indsnævres, hældes eller begge dele, bevarer deres eksakte form på samme måde. For nu bliver resten kun et mesh i visningen: en indsnævret cylinder, ellipse, polygon eller rundet kasse, og en kasse der både hælder og indsnævres. Fas og rund og STEP-eksporten virker så på det mesh i stedet for på et eksakt legeme.
@@ -168,6 +169,8 @@ Skal et mønster, en logo eller bogstaver på en kop, en dåse eller et rør? L�
 1. Åbn {{ui:inspector.wrapCylinder}} og indtast {{ui:inspector.wrapDiameter}} på cylindervæggen, såsom yderdiameteren på din kop. Tiendedele millimeter virker også, såsom 63,5.
 2. Klik på {{ui:inspector.wrapApply}}. Hvad der løb fra venstre til højre løber nu rundt om cylinderen, bagkanten bliver toppen, og tykkelsen står ud af væggen.
 3. Vælg den viklede form og cylinderen og centrér begge, venstre mod højre og for mod bag. Midten af den viklede form er cylinderens akse, så det sidder så præcis på væggen.
+
+Ethvert legeme kan vikles, også en form fra biblioteket: for eksempel et rundt tag, der skal sidde på væggen af et rundt tårn. Læg det på pladen, som det skal se ud på væggen, med den runde top bagud.
 
 Til en gravering, slå {{ui:inspector.wrapInward}} til: tykkelsen går så ind i væggen. Gør formen til et hul, centrér den og gruppér den med cylinderen.
 
