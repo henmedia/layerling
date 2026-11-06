@@ -10718,6 +10718,8 @@ export function LayerlingEditor({
       color: ownColour ? original.color : rebuilt.color,
       transparent: original.transparent,
       hidden: original.hidden,
+      // Multicolor switched on or off stays so after Done; a group cut into one body lost it and turned one colour (#1323).
+      ...(typeof original.multicolor === "boolean" ? { multicolor: original.multicolor } : {}),
     }, Boolean(original.hole))));
     const mergeWarning = "mergeWarning" in result && typeof result.mergeWarning === "string" ? result.mergeWarning : "";
     return { group, mergeWarning };
