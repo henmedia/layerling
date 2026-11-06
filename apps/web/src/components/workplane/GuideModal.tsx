@@ -79,7 +79,7 @@ function guideSections(sharedStore: boolean): GuideSection[] {
     {
       title: "guide.group.search",
       chapter: "shortcuts",
-      lines: ["guide.search.palette"],
+      lines: ["guide.search.palette", "guide.search.ownKeys"],
     },
     {
       title: "guide.group.settings",

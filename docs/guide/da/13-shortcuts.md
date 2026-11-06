@@ -25,6 +25,21 @@ Vejledningen du læser har også en søgeboks, øverst på hver side: tast et or
 - Navnet på en form i dit design finder den form og vælger den, hvilket hjælper i et design med mange dele. Former vises først når du taster.
 - Det virker også i skitsetilstand, med skitseværktøjerne.
 
+## Dine egne taster
+
+Enhver kommando fra kommandosøgningen kan lægges på din egen tast: et værktøj, du bruger hele tiden, en form, {{ui:editor.tool.centerOnWorkplane}} eller {{ui:palette.openShapes}}.
+
+1. Åbn {{ui:editor.keyboardShortcuts}} og klik på {{ui:customKeys.add}} under {{ui:customKeys.title}} øverst i vinduet.
+2. Skriv nogle bogstaver af kommandoen og klik på den, eller tryk [[Enter]] for den første.
+3. Tryk på den tast, du vil have, alene eller med [[Ctrl]], [[Alt]] eller [[Shift]]. Bogstaver, tal og F1 til F12 kan bære en kommando.
+
+En tast, som editoren allerede bruger, en som browseren holder for sig selv (som [[Ctrl]]+[[W]]), eller en af dine egne taster bliver afvist, og vinduet siger, hvad den gør. Klik på en tast i listen for at ændre den, på X’et ved siden af for at fjerne den, eller på {{ui:customKeys.removeAll}} for at starte forfra.
+
+- Tasten kører kommandoen præcis som kommandosøgningen. Kan den ikke køre lige nu, oftest fordi intet er valgt, siger statuslinjen det.
+- Dine taster står ved siden af deres kommandoer i kommandosøgningen og på den udskrevne liste.
+- De bliver i denne browser, ligesom temaet. En tast til et skitseværktøj virker i skitsetilstand, en til 3D-editoren uden for den.
+- Mens du skriver i et felt, holder dine taster sig væk ligesom alle de andre.
+
 ## Interaktiv hjælp
 
 Kan du ikke finde hvor du skal læse om en knap eller et felt? Lad programmet tage dig derhen. Klik på spørgsmålstegnet i området {{ui:editor.group.help}}, eller tryk [[Shift]]+[[F1]]. Markøren bliver til et spørgsmålstegn, og alt der ligger under det bliver markeret med en ramme.

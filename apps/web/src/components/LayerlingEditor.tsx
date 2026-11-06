@@ -17732,6 +17732,8 @@ export function LayerlingEditor({
         }}
         objects={shapes.map((shape) => ({ id: shape.id, name: displayShapeName(shape), kind: shape.kind, hidden: Boolean(shape.hidden) }))}
         onSelectObject={(id) => selectShape(id)}
+        onNotice={(text) => setNotice(text)}
+        splitActive={Boolean(splitSession)}
         renderMyShapes={(close) => (
           <MyShapesSection
             shapes={customShapeEntries}

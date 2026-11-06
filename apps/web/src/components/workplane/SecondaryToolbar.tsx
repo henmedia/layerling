@@ -19,6 +19,7 @@ import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPi
 import { type SketchPrimitive, type SketchTool } from "../SketchWorkspace";
 import { CommandPalette, type PaletteCommand } from "./CommandPalette";
 import { COMMAND_KEYWORDS, COMMAND_SHORTCUTS, SHAPE_KEYWORDS } from "@/lib/commandKeywords";
+import { readCustomShortcuts, runCustomShortcutKey, setCustomShortcutCommandSource } from "@/lib/customShortcuts";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { libraryShapeAssets, shapeAssetColor, shapeAssetLabel, shapeAssetMenuLabel, type ToolbarShapeAsset } from "@/lib/shapeCatalog";
@@ -378,6 +379,8 @@ export function SecondaryToolbar({
   shapeCustomizations,
   objects,
   onSelectObject,
+  onNotice,
+  splitActive,
 }: {
   toolbarMode: ToolbarMode;
   projectName: string;
@@ -568,6 +571,10 @@ export function SecondaryToolbar({
   /** The bodies of the design, so the command search can find them by name. */
   objects: ReadonlyArray<{ id: string; name: string; kind: string; hidden: boolean }>;
   onSelectObject: (id: string) => void;
+  /** Shows a line in the status bar - here: that a command on a key of your own cannot run right now. */
+  onNotice?: (text: string) => void;
+  /** While a body is being split the editor keeps every key; keys of your own wait too. */
+  splitActive?: boolean;
 }) {
   const [shapesOpen, setShapesOpen] = useState(false);
   // The name of the clip button: with the number of files once there are some, so a screen reader hears what the dot shows.
@@ -786,6 +793,31 @@ export function SecondaryToolbar({
     };
     window.addEventListener("keydown", openOnShortcut);
     return () => window.removeEventListener("keydown", openOnShortcut);
+  }, []);
+  // Keys of your own (Discussion #1399): the shortcut list puts a command of the search on a key, and the key runs it
+  // here, through the same entry the search would run. The listener sits before every other one (capture on the
+  // window) and stops the key when it is one of yours, so nothing else answers it as well. It keeps out of the way
+  // where the editor's own keys do: in a text field, behind a window that holds the keys, behind the project overview,
+  // while a body is split, and while the list waits for a key to set.
+  const buildPaletteCommandsRef = useRef<() => PaletteCommand[]>(() => []);
+  const onNoticeRef = useRef(onNotice);
+  onNoticeRef.current = onNotice;
+  const splitActiveRef = useRef(Boolean(splitActive));
+  splitActiveRef.current = Boolean(splitActive);
+  useEffect(() => {
+    const runOwnKey = (event: KeyboardEvent) => {
+      runCustomShortcutKey(event, () => buildPaletteCommandsRef.current(), {
+        blocked: splitActiveRef.current,
+        unavailable: (command) => onNoticeRef.current?.(t("customKeys.unavailable", { command: command.label })),
+      });
+    };
+    window.addEventListener("keydown", runOwnKey, true);
+    // The shortcut list reads the commands from here to offer them for a key.
+    setCustomShortcutCommandSource(() => buildPaletteCommandsRef.current().filter((command) => !command.transient));
+    return () => {
+      window.removeEventListener("keydown", runOwnKey, true);
+      setCustomShortcutCommandSource(null);
+    };
   }, []);
   // Leaving the sketch closes the sketch's shape palette; at the start there is nothing to close (a pinned panel opens then).
   const sketchWasActiveRef = useRef(sketchActive);
@@ -1067,9 +1099,19 @@ export function SecondaryToolbar({
   // Everything the toolbar and its menus can do, as entries of the command
   // search. Built from the same lists as the buttons, so a new tool shows up in
   // both without a second place to remember; only built while the search is open.
-  const buildPaletteCommands = (): PaletteCommand[] => buildAllPaletteCommands().map((command) =>
-    historyViewActive && !HISTORY_VIEW_COMMANDS.has(command.id) ? { ...command, enabled: false } : command,
-  );
+  const buildPaletteCommands = (): PaletteCommand[] => {
+    // A key of your own is shown where the command's usual key would be.
+    const ownKeys = readCustomShortcuts();
+    return buildAllPaletteCommands().map((command) => {
+      const shown = ownKeys[command.id] ? { ...command, shortcut: ownKeys[command.id].combo } : command;
+      return historyViewActive && !HISTORY_VIEW_COMMANDS.has(command.id) ? { ...shown, enabled: false } : shown;
+    });
+  };
+  // Opens or closes the shapes panel, as its button does: a command of its own, so it can go on a key (#1399).
+  const toggleShapesPanel = () => {
+    setVisibilityOpen(false);
+    setShapesOpen((open) => !open);
+  };
   const buildAllPaletteCommands = (): PaletteCommand[] => {
     const fromTool = (
       tool: { id: string; label: string; icon: PaletteCommand["icon"]; action: () => void; enabled: boolean; active?: boolean },
@@ -1134,6 +1176,7 @@ export function SecondaryToolbar({
           () => onSketchPrimitive(primitive),
           { icon, keywords: [primitive] },
         )),
+        plain("shapes-panel", t("palette.openShapes"), t("sketch.group.shapes"), true, toggleShapesPanel, { icon: ToolbarShapeAddIcon, active: shapesOpen }),
         plain("sketch-select", t("sketch.select"), selectGroup, true, () => onSketchTool("select"), { icon: SKETCH_PALETTE_ICONS.select, active: sketchTool === "select" }),
         plain("sketch-image", t("sketch.addImage"), selectGroup, true, onSketchImage, { icon: SKETCH_PALETTE_ICONS.image }),
         plain("sketch-refine", t("sketch.refine"), selectGroup, true, () => onSketchTool("refine"), { icon: SKETCH_PALETTE_ICONS.refine, active: sketchTool === "refine" }),
@@ -1164,6 +1207,7 @@ export function SecondaryToolbar({
         () => addShapeFromMenu(shape),
         { image: shape.menuIcon, keywords: [shape.id, shape.name, ...(SHAPE_KEYWORDS[shape.id] ?? [])] },
       )),
+      plain("shapes-panel", t("palette.openShapes"), shapesGroup, true, toggleShapesPanel, { icon: ToolbarShapeAddIcon, active: shapesOpen }),
       ...visibilityTools.map((tool) => fromTool(tool, visibilityGroup)),
       plain(
         "show-hidden",
@@ -1198,6 +1242,7 @@ export function SecondaryToolbar({
       )),
     ];
   };
+  buildPaletteCommandsRef.current = buildPaletteCommands;
 
   return (
     <div className="secondary-toolbar">

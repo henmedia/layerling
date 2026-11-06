@@ -25,6 +25,21 @@ Instrukcja, którą czytasz, też ma pole wyszukiwania, na górze każdej strony
 - Nazwa bryły w Twoim projekcie znajduje tę bryłę i ją zaznacza, co pomaga w projekcie z wieloma częściami. Bryły pojawiają się dopiero, gdy zaczniesz pisać.
 - Działa też w trybie szkicu, z narzędziami szkicu.
 
+## Własne klawisze
+
+Każde polecenie z wyszukiwania poleceń możesz przypisać do własnego klawisza: narzędzie, którego używasz bez przerwy, kształt, {{ui:editor.tool.centerOnWorkplane}} albo {{ui:palette.openShapes}}.
+
+1. Otwórz {{ui:editor.keyboardShortcuts}} i kliknij {{ui:customKeys.add}} pod {{ui:customKeys.title}} u góry okna.
+2. Wpisz kilka liter polecenia i kliknij je albo naciśnij [[Enter]], aby wybrać pierwsze.
+3. Naciśnij wybrany klawisz, sam albo z [[Ctrl]], [[Alt]] lub [[Shift]]. Polecenie mogą mieć litery, cyfry oraz F1–F12.
+
+Klawisz, którego edytor już używa, klawisz zarezerwowany przez przeglądarkę (np. [[Ctrl]]+[[W]]) albo jeden z twoich własnych klawiszy zostaje odrzucony, a okno mówi, do czego służy. Kliknij klawisz na liście, aby go zmienić, X obok, aby go usunąć, albo {{ui:customKeys.removeAll}}, aby zacząć od nowa.
+
+- Klawisz uruchamia polecenie dokładnie tak jak wyszukiwanie poleceń. Jeśli teraz nie da się go uruchomić, najczęściej dlatego, że nic nie jest zaznaczone, mówi o tym pasek stanu.
+- Twoje klawisze widać obok poleceń w wyszukiwaniu poleceń i na wydrukowanej liście.
+- Zostają w tej przeglądarce, tak jak motyw. Klawisz dla narzędzia szkicu działa w trybie szkicu, klawisz dla edytora 3D poza nim.
+- Gdy piszesz w polu, twoje klawisze nie przeszkadzają, tak jak wszystkie inne.
+
 ## Pomoc interaktywna
 
 Nie wiesz, gdzie przeczytać o przycisku albo polu? Niech program sam Cię tam zaprowadzi. Kliknij znak zapytania w sekcji {{ui:editor.group.help}} albo naciśnij [[Shift]]+[[F1]]. Wskaźnik zmienia się w znak zapytania, a to, co leży pod nim, dostaje obramowanie.

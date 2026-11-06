@@ -269,7 +269,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "welcome.moreHistoryBody": "consultar qualquer estado anterior do projeto com um controlo deslizante, sem alterar nada. Podes exportar esse estado, criar um novo projeto a partir dele ou recuperar objetos individuais.",
   "welcome.moreDrawingTitle": "Desenho técnico para a oficina",
   "welcome.moreDrawingBody": "Exportar → Desenho: vistas de frente, de cima e de lado à escala 1:1 numa folha de formato ISO, com dimensões gerais, arestas ocultas e uma tabela dos furos circulares. Disponível em PDF ou SVG, para imprimir ou levar para o torno e a fresadora.",
-  "welcome.moreSearchBody": "Prime Ctrl+K e escreve o nome de uma ferramenta, forma ou comando para lhe acederes diretamente, em inglês ou alemão, com os atalhos de teclado apresentados ao lado de cada opção. Também podes encontrar os sólidos do teu projeto pelo nome.",
+  "welcome.moreSearchBody": "Prime Ctrl+K e escreve o nome de uma ferramenta, forma ou comando para lhe acederes diretamente, em inglês ou alemão, com os atalhos de teclado apresentados ao lado de cada opção. Também podes encontrar os sólidos do teu projeto pelo nome. Qualquer um deles também pode ficar numa tecla sua.",
   "welcome.moreHelpTitle": "Ajuda interativa",
   "welcome.moreHelpBody": "carrega em Shift+F1 ou no ponto de interrogação e clica em qualquer botão, campo ou janela: uma pequena janela mostra a parte do guia sobre ele.",
   "welcome.morePointsBody": "clicar com o botão direito num sólido para assinalar o centro, os vértices ou os pontos médios das arestas com pontos de referência que não são impressos e aos quais as formas se ajustam. Assim, podes colocar um furo exatamente no centro de outra peça.",
