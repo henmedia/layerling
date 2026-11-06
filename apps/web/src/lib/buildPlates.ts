@@ -1,4 +1,4 @@
-import { bedOverhangs, shapeBedFootprint, type BedFootprint, type BedOverhang } from "@/lib/printBed";
+import { bedOverhangs, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
 import { isNonSolidShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { MAX_BUILD_PLATES, MAX_PLATE_NAME_LENGTH, normalizePlateNames } from "@/lib/buildPlateNames";
@@ -272,13 +272,5 @@ export function packOntoPlates(
     plateCount: Math.min(MAX_BUILD_PLATES, usedPlates),
     leftOver,
   };
-}
-
-/** A footprint moved into the frame of its own plate, for messages that say where on the plate a body stands. */
-export function footprintOnItsPlate(workspace: PlateWorkspace, shape: WorkplaneShape): BedFootprint & { plate: number } {
-  const footprint = shapeBedFootprint(shape);
-  const plate = plateIndexAt(workspace, (footprint.minX + footprint.maxX) / 2);
-  const offset = plateCenterX(workspace, plate);
-  return { minX: footprint.minX - offset, maxX: footprint.maxX - offset, minZ: footprint.minZ, maxZ: footprint.maxZ, plate };
 }
 

@@ -54,6 +54,14 @@ A inclinação que a sua impressora aguenta é definida nas configurações, em 
 - Onde duas peças se encaixam uma na outra, é preciso folga: normalmente de 0,2 a 0,4 mm, dependendo da impressora. Faça um pequeno par de teste antes de imprimir a peça grande.
 - Muita gente faz um chanfro leve na aresta de baixo, a que fica sobre a mesa. Isso evita que a primeira camada se espalhe ("pé de elefante").
 
+## A folga da sua impressora: o teste de encaixe
+
+Toda impressora imprime furos um pouco menores e pinos um pouco mais grossos do que foram desenhados, cada uma na sua medida, então a folga de que duas peças impressas precisam é, no início, um palpite. Meça-a uma vez. Nas configurações, em {{ui:workspace.workplane}}, {{ui:workspace.fitTestMake}} coloca um teste de encaixe na mesa: uma placa de 60 × 20 × 4 mm com sete furos para um único pino de 5 mm, cada um desenhado com 5 mm mais duas vezes 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 ou 0,40 mm, com o valor em relevo ao lado, e o próprio pino de 5 mm, em pé ao lado da placa, com um pequeno chanfro em cima. É feito de formas comuns, então imprime junto com o resto da mesa, sem suportes.
+
+Imprima-o como está e depois empurre o pino, com a ponta chanfrada primeiro, nos furos, começando pelo mais apertado. **O furo mais justo em que o pino ainda gira** dá a folga da sua impressora. Digite o número dele em {{ui:workspace.printerPlay}} ou clique nele entre os valores abaixo do campo. A folga é por lado, em milímetros, e o navegador a guarda para todos os projetos; um campo vazio significa que ainda não foi medida.
+
+A partir daí, os novos usos partem da folga em vez do valor embutido: {{ui:lid.gap}} e {{ui:lid.hingePinPlay}} na ferramenta {{ui:editor.tool.lid}}, a folga de um novo {{ui:shape.dovetail}} e {{ui:shape.snapFit}}, {{ui:prop.clearance}} de uma nova porca ou furo roscado - o dobro da folga, porque essa é a folga em todo o diâmetro - e {{ui:clearance.threshold}} em {{ui:editor.tool.clearance}}. Enquanto um desses campos ainda tiver esse valor, "{{ui:printerPlay.fromFitTest}}" ao lado dele diz de onde vem o número. Uma dobradiça impressa no lugar e as articulações da ferramenta {{ui:editor.tool.flexi}} mantêm os seus 0,4 mm: impressas numa peça só, as suas folgas também precisam ficar abertas entre as camadas, o que um pino impresso à parte não mede. A folga para encaixar um ímã ou uma chave Gridfinity, e a folga para um soquete ou uma placa comprados, também mantêm os seus próprios valores. Os sólidos que já estão num projeto nunca mudam, nem um projeto que você abre.
+
 ## Verificar a impressão
 
 {{ui:editor.tool.printCheck}}, ao lado de {{ui:editor.tool.clearance}} em {{ui:editor.group.combine}}, examina os objetos selecionados, ou todos os visíveis quando nada está selecionado, e diz numa janela o que daria errado na impressão. Cada uma das cinco linhas fica verde quando não encontrou nada, e laranja com o quê e onde quando encontrou:

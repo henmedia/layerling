@@ -2081,7 +2081,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "welcome.moreFaceTitle": "Skub en flade",
   "welcome.moreFaceBody": "skub en plan flade på et legeme ud eller skær en lomme ind i den, med indryk fra kanten, runde hjørner og en dybde, vist som forhåndsvisning - også på importerede STL-filer.",
   "welcome.moreTextureTitle": "Overfladestruktur",
-  "welcome.moreTextureBody": "læg et relief på et hvilket som helst legeme, for greb eller udseende – rifling, riller, bikube, korn, reb, et billede som topografi eller tekst, omkring runde legemer eller fladt langs en aksen. Op til seks mønstre på ét legeme, hvert på sine egne flader.",
+  "welcome.moreTextureBody": "læg et relief på et hvilket som helst legeme, for greb eller udseende – rifling, riller, bikube, korn, reb, et billede som topografi eller tekst, omkring runde legemer eller fladt langs en aksen. Op til seks mønstre på ét legeme, hvert på sine egne flader. Til et print i to farver kan mønstret også blive en del for sig, i sin egen farve.",
   "welcome.moreVaseTitle": "Vaser og krukker",
   "welcome.moreVaseBody": "en egen form til vaser, krukker og lykter: kropsform, tværsnit, drejning, mønstre, drænhuller, en under-skål og et låg – solid til slicerens vasemodus eller hul. Et tekandelåg er vasens egen top, og mønsteret løber videre hen over samlingen.",
   "welcome.moreOffsetTitle": "Forskydning og udskæring",

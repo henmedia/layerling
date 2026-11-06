@@ -39,6 +39,17 @@ Um grupo de união inteiro também pode ser um sólido ou um buraco. Vale uma re
 - Se o grupo de união tem só sólidos (ou só buracos), você o troca por inteiro e as peças acompanham.
 - Se tem os dois, por exemplo um cubo com um furo, cada peça mantém o seu próprio estado. O grupo de união inteiro vira então uma ferramenta, mas o furo continua sendo um furo.
 
+### Redimensionando um grupo de união: mantendo furos e peças pequenas
+
+Quando um grupo de união fica mais comprido, mais largo ou mais alto, as peças se esticam junto, como se estivessem desenhadas em borracha: os furos redondos de uma placa viram ovais e se deslocam para dentro. Para mantê-los como estão, escolha {{ui:inspector.groupResizeKeepParts}} em {{ui:inspector.groupResize}} nas configurações do grupo; {{ui:inspector.groupResizeStretch}} é o que todo grupo faz até você mudar. A partir daí, cada vez que o grupo é redimensionado - pelas alças, pelos campos de tamanho ou por {{ui:scalePercent.title}} - ele é montado de novo a partir das peças por uma única regra, em cada direção separadamente:
+
+- Uma peça que atravessa quase o grupo inteiro, nove décimos dele ou mais, cresce ou encolhe junto e mantém a distância aos dois lados: a própria placa, uma parede ou o interior de uma caixa, cujas paredes continuam com a mesma espessura.
+- Todas as outras peças mantêm o próprio tamanho e a distância ao lado mais próximo. Uma peça no meio continua no meio.
+
+Assim, uma placa com um furo a 5 mm de cada canto e uma fenda no meio, aumentada em 40 mm de comprimento, mantém os furos redondos e a 5 mm dos cantos, e a fenda no meio. Não há nenhum solver por trás e nada para configurar peça por peça: a mesma regra vale para todas as peças, então dá para saber antes o que vai acontecer. Uma peça girada conta com a caixa que ocupa no grupo e continua girada; um grupo dentro do grupo conta como uma peça. Enquanto você arrasta uma alça, o grupo se estica por inteiro; ao soltar, ele é montado de novo, no mesmo passo de desfazer. Se ficar menor do que uma peça precisa com a sua distância, essa peça encolhe com o grupo como antes, e uma mensagem avisa. Um grupo espelhado, afunilado ou torcido, e um com arredondamentos, chanfros ou uma textura própria, sempre estica tudo. Escolhida para um grupo que já está esticado, a configuração reorganiza as peças na hora.
+
+![Uma placa com um furo a 5 mm de cada canto e uma fenda no meio, aumentada em 40 mm de comprimento com a opção de manter furos e peças pequenas: os furos continuam redondos e a 5 mm dos cantos, a fenda continua no meio.](shot:group-keep-parts)
+
 ## Criando conjuntos
 
 Às vezes as peças só devem ficar juntas, sem virar uma só, por exemplo um logotipo branco sobre uma placa preta para uma impressão multicolorida. É para isso que serve {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), como no Tinkercad. Um conjunto se move, gira e muda de tamanho como uma forma, mas nada é fundido:

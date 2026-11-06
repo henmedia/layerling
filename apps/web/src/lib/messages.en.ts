@@ -1476,7 +1476,7 @@ export const MESSAGES_EN = {
   "welcome.moreFaceTitle": "Push a face",
   "welcome.moreFaceBody": "pull a flat face of a body out or cut a pocket into it, with an inset from the edge, rounded corners and a depth, shown as a preview - on imported STLs too.",
   "welcome.moreTextureTitle": "Surface texture",
-  "welcome.moreTextureBody": "lay a relief onto any body, for grip or for looks - knurling, grooves, honeycomb, bricks, carbon fibre, tree bark, wood grain, rope, a picture as a height map or text, around round bodies or flat along an axis. Up to six patterns go on one body, each on faces of its own.",
+  "welcome.moreTextureBody": "lay a relief onto any body, for grip or for looks - knurling, grooves, honeycomb, bricks, carbon fibre, tree bark, wood grain, rope, a picture as a height map or text, around round bodies or flat along an axis. Up to six patterns go on one body, each on faces of its own. For a print in two colours, the pattern can also become a part of its own, in a colour of its own.",
   "welcome.moreVaseTitle": "Vases and pots",
   "welcome.moreVaseBody": "a shape of its own for vases, pots and lampshades: body form, cross-section, twist, patterns, drain holes, a saucer and a lid - solid for the slicer's vase mode or hollow. A teapot lid takes the vase's own top, the pattern running on across the joint.",
   "welcome.moreOffsetTitle": "Offset and cut out",

@@ -1478,7 +1478,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "welcome.moreFaceTitle": "Empujar una cara",
   "welcome.moreFaceBody": "saca una cara plana de un cuerpo o corta un hueco en ella, con un margen desde el borde, esquinas redondeadas y una profundidad, con vista previa; también en STL importados.",
   "welcome.moreTextureTitle": "Textura de superficie",
-  "welcome.moreTextureBody": "pon un relieve sobre cualquier cuerpo, para agarrarlo mejor o por estética: moleteado, estrías, panal, ladrillos, fibra de carbono, corteza de árbol, veta de madera, cuerda, una imagen como mapa de alturas o un texto, alrededor de cuerpos redondos o en plano a lo largo de un eje. Hasta seis dibujos en un mismo cuerpo, cada uno en sus propias caras.",
+  "welcome.moreTextureBody": "pon un relieve sobre cualquier cuerpo, para agarrarlo mejor o por estética: moleteado, estrías, panal, ladrillos, fibra de carbono, corteza de árbol, veta de madera, cuerda, una imagen como mapa de alturas o un texto, alrededor de cuerpos redondos o en plano a lo largo de un eje. Hasta seis dibujos en un mismo cuerpo, cada uno en sus propias caras. Para imprimir en dos colores, el patrón también puede convertirse en una pieza propia, con su propio color.",
   "welcome.moreVaseTitle": "Jarrones y macetas",
   "welcome.moreVaseBody": "una forma propia para jarrones, macetas y pantallas de lámpara: forma del cuerpo, sección, giro, patrones, orificios de drenaje, un plato y una tapa; maciza para el modo jarrón del laminador o hueca. Una tapa de tetera es la parte de arriba del propio jarrón, y el dibujo sigue a través de la junta.",
   "welcome.moreOffsetTitle": "Desfasar y recortar",

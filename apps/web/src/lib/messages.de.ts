@@ -1475,7 +1475,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "welcome.moreFaceTitle": "Fläche herausziehen",
   "welcome.moreFaceBody": "eine ebene Fläche eines Körpers herausziehen oder eine Tasche hineinschneiden, mit Abstand zum Rand, gerundeten Ecken und Tiefe, als Vorschau - auch bei importierten STLs.",
   "welcome.moreTextureTitle": "Oberflächentextur",
-  "welcome.moreTextureBody": "ein Relief auf jeden Körper legen, für Griff oder Aussehen - Rändel, Rillen, Waben, Ziegel, Carbon, Baumrinde, Holzmaserung, Seil, ein Bild als Höhenkarte oder Text, rund um runde Körper oder flach entlang einer Achse. Bis zu sechs Muster auf einem Körper, jedes auf eigenen Flächen.",
+  "welcome.moreTextureBody": "ein Relief auf jeden Körper legen, für Griff oder Aussehen - Rändel, Rillen, Waben, Ziegel, Carbon, Baumrinde, Holzmaserung, Seil, ein Bild als Höhenkarte oder Text, rund um runde Körper oder flach entlang einer Achse. Bis zu sechs Muster auf einem Körper, jedes auf eigenen Flächen. Für einen Druck in zwei Farben wird das Muster auf Wunsch ein eigenes Teil in eigener Farbe.",
   "welcome.moreVaseTitle": "Vasen und Töpfe",
   "welcome.moreVaseBody": "eine eigene Form für Vasen, Töpfe und Lampenschirme: Körperform, Querschnitt, Verdrehung, Muster, Abflusslöcher, Untersetzer und Deckel - massiv für den Vasenmodus des Slicers oder hohl. Ein Teekannendeckel ist das Oberteil der Vase selbst, das Muster läuft über die Fuge weiter.",
   "welcome.moreOffsetTitle": "Versetzen und Ausschneiden",

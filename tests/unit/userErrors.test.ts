@@ -50,6 +50,13 @@ describe("error messages for people", () => {
       ["OpenCascade produced invalid sketch topology", "error.revolveNotValid"],
       ["Drawing source contains no usable triangles", "error.drawingNoGeometry"],
       ["The lid cannot be built as an exact body", "lid.error.kernelUnknown"],
+      ["The exact screw boss is not valid after placing it", "error.exactBodyInvalid"],
+      ["The exact snap-fit does not match the shape (height)", "error.exactBodyInvalid"],
+      ["The rib is not a valid solid", "error.solidNotValid"],
+      ["The screw boss with its hole came out as 2 solids", "error.solidNotValid"],
+      ["The gusset on its oval foot came out as 3 solids", "error.solidNotValid"],
+      ["The snap-fit has neither hook nor catch", "error.solidNotValid"],
+      ["The kernel laid out the oval foot's half ellipse differently than expected", "error.solidNotValid"],
     ];
     for (const [raw, key] of cases) expect(localizedError(raw), raw).toBe(MESSAGES_DE[key]);
   });
