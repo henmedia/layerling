@@ -43,6 +43,7 @@ import { mcpShapeSummary } from "@/lib/editorMcpSummary";
 import { dedupeProjectAssets } from "@/lib/projectAssets";
 import { displayShapeName } from "@/lib/shapeCatalog";
 import { packBackup, unpackBackup } from "@/lib/projectBackup";
+import { dropBackupTarget, pickBackupTarget, writeBackupTarget } from "@/lib/lylFileAccess";
 import { CUSTOM_SHAPE_FOLDER_DEPTH, FOLDER_PATH_SEPARATOR, folderAncestry, folderPathName, joinFolderPath, parentFolderPath } from "@/lib/customShapeFolders";
 import { storeFolderNameProblem } from "@/lib/storeFolderName";
 import { localizedError } from "@/lib/userErrors";
@@ -368,15 +369,20 @@ export function useCustomShapes(options: CustomShapesOptions) {
   }, [refreshMyShapes, refreshServerShapes]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const backUpMyShapes = useCallback(async () => {
+    // Where it goes is asked first, while the click still counts: in Chrome and Edge a save dialog that remembers its
+    // folder, elsewhere a download, as for the backups of the start page.
+    const target = await pickBackupTarget(myShapesBackupFileName(new Date()));
+    if (!target) return;
     const entries = await customShapesBackupEntries();
     const count = entries.length - 1;
     if (count <= 0) {
+      await dropBackupTarget(target);
       setNotice(t("status.myShapesNoneToBackUp"));
       return;
     }
     const zipped = packBackup(entries);
     const buffer = zipped.buffer.slice(zipped.byteOffset, zipped.byteOffset + zipped.byteLength) as ArrayBuffer;
-    await downloadBlob(myShapesBackupFileName(new Date()), new Blob([buffer], { type: "application/zip" }));
+    await writeBackupTarget(target, new Blob([buffer], { type: "application/zip" }), downloadBlob);
     setNotice(t("status.myShapesBackedUp", { count }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

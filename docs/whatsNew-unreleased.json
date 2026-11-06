@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Sicherungen in einen eigenen Ordner",
+      "en": "Backups into a folder of your own"
+    },
+    "body": {
+      "de": "In Chrome und Edge fragen „Alle sichern“, „Sichern“ und „Eigene Formen sichern“ jetzt, wohin die ZIP-Datei soll, und merken sich den Ordner für das nächste Mal – etwa einen Ordner auf deinem Cloud-Laufwerk statt der Downloads. Andere Browser laden die Sicherung wie bisher herunter.",
+      "en": "In Chrome and Edge, \"Back up all\", \"Back up\" and \"Back up custom shapes\" now ask where the ZIP file should go, and remember the folder for next time - a folder on your cloud drive, say, instead of Downloads. Other browsers download the backup as before."
+    }
+  }
+]
