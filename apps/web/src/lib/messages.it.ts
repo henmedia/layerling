@@ -3872,6 +3872,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "Cavi piatti in su attraverso il coperchio",
   "sbcBoard.ribbonSide": "Cavi piatti di lato attraverso la parete",
   "sbcBoard.gpioUp": "Connettore GPIO in su attraverso il coperchio",
+  "sbcBoard.lensUp": "Obiettivo della fotocamera in su attraverso il coperchio",
   "sbcBoard.upReach": "Portata verso l'alto",
   "sbcBoard.buttonReach": "Portata dei pulsanti",
   "sbcBoard.buttonReachHint": "Quanto si estendono i pulsanti (RESET, BOOT, accensione) nella direzione in cui si premono: in su attraverso un coperchio, o attraverso la parete quello premuto di lato. A 0 restano come sono.",

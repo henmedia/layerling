@@ -3942,6 +3942,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "sbcBoard.ribbonUp": "Plochý kabel nahoru víkem",
   "sbcBoard.ribbonSide": "Plochý kabel do strany stěnou",
   "sbcBoard.gpioUp": "GPIO lišta nahoru víkem",
+  "sbcBoard.lensUp": "Objektiv kamery nahoru víkem",
   "sbcBoard.upReach": "Přesah nahoru",
   "sbcBoard.buttonReach": "Přesah tlačítek",
   "sbcBoard.buttonReachHint": "Jak daleko tlačítka (RESET, BOOT, zapnutí) sahají ve směru, ze kterého se mačkají: nahoru víkem, nebo stěnou u tlačítka mačkaného z boku. Při 0 zůstanou, jak jsou.",

@@ -3871,6 +3871,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "Nappes vers le haut à travers le couvercle",
   "sbcBoard.ribbonSide": "Nappes sur le côté à travers la paroi",
   "sbcBoard.gpioUp": "Connecteur GPIO vers le haut à travers le couvercle",
+  "sbcBoard.lensUp": "Objectif de la caméra vers le haut à travers le couvercle",
   "sbcBoard.upReach": "Portée vers le haut",
   "sbcBoard.buttonReach": "Portée des boutons",
   "sbcBoard.buttonReachHint": "Jusqu'où les boutons (RESET, BOOT, marche) s'étendent dans le sens où on les presse : vers le haut à travers un couvercle, ou à travers la paroi pour celui qu'on presse de côté. À 0, ils restent tels quels.",

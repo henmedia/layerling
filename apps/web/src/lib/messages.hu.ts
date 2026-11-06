@@ -2399,6 +2399,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "Szalagkábelek felfelé, a fedélen át",
   "sbcBoard.ribbonSide": "Szalagkábelek oldalra, a falon át",
   "sbcBoard.gpioUp": "Tüskesor (GPIO) felfelé, a fedélen át",
+  "sbcBoard.lensUp": "Kamera objektív felfelé, a fedélen át",
   "sbcBoard.upReach": "Átnyúlás felfelé",
   "sbcBoard.buttonReach": "Gombok átnyúlása",
   "sbcBoard.buttonReachHint": "Ennyivel nyúlnak tovább a gombok (RESET, BOOT, bekapcsoló) abba az irányba, amerről megnyomhatók: felfelé a fedélen át, az oldalról nyomhatók a falon át. 0-nál maradnak, ahogy vannak.",

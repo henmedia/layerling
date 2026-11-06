@@ -1360,6 +1360,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "Cabos flat para cima pela tampa",
   "sbcBoard.ribbonSide": "Cabos flat para o lado pela parede",
   "sbcBoard.gpioUp": "Conector GPIO para cima pela tampa",
+  "sbcBoard.lensUp": "Lente da câmera para cima pela tampa",
   "sbcBoard.upReach": "Alcance para cima",
   "sbcBoard.buttonReach": "Alcance dos botões",
   "sbcBoard.buttonReachHint": "Quanto os botões (RESET, BOOT, liga) se estendem na direção em que são apertados: para cima pela tampa, ou pela parede o que se aperta de lado. Em 0 ficam como estão.",

@@ -3100,6 +3100,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "Ploščati kabli navzgor skozi pokrov",
   "sbcBoard.ribbonSide": "Ploščati kabli vstran skozi steno",
   "sbcBoard.gpioUp": "Konektor GPIO navzgor skozi pokrov",
+  "sbcBoard.lensUp": "Objektiv kamere navzgor skozi pokrov",
   "sbcBoard.upReach": "Seganje navzgor",
   "sbcBoard.buttonReach": "Seganje gumbov",
   "sbcBoard.buttonReachHint": "Kako daleč segajo gumbi (RESET, BOOT, vklop) v smeri, iz katere jih pritisnemo: navzgor skozi pokrov ali skozi steno pri gumbu, ki ga pritisnemo s strani. Pri 0 ostanejo, kot so.",

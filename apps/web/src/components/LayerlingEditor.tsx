@@ -13313,7 +13313,7 @@ export function LayerlingEditor({
         if (typeof clearance !== "number" || !Number.isFinite(clearance) || clearance < 0 || clearance > MAX_SBC_CLEARANCE) throw new Error(`clearance must be 0 to ${MAX_SBC_CLEARANCE} mm`);
         const reach = params.reach ?? 0;
         if (typeof reach !== "number" || !Number.isFinite(reach) || reach < 0 || reach > MAX_SBC_REACH) throw new Error(`reach must be 0 to ${MAX_SBC_REACH} mm`);
-        for (const key of ["ribbonUp", "ribbonSide", "gpioUp"] as const) {
+        for (const key of ["ribbonUp", "ribbonSide", "gpioUp", "lensUp"] as const) {
           if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
         }
         const upReach = params.upReach;
@@ -13330,6 +13330,7 @@ export function LayerlingEditor({
           ...(params.ribbonUp === true ? { ribbonUp: true } : {}),
           ...(params.ribbonSide === true ? { ribbonSide: true } : {}),
           ...(params.gpioUp === true ? { gpioUp: true } : {}),
+          ...(params.lensUp === true ? { lensUp: true } : {}),
           ...(typeof upReach === "number" ? { upReach } : {}),
           ...(typeof buttonReach === "number" && buttonReach > 0 ? { buttonReach } : {}),
         }, workspaceSettingsRef.current.booleanTriangleLimit);

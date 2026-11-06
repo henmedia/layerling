@@ -2396,6 +2396,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "Şerit kablolar kapaktan yukarı",
   "sbcBoard.ribbonSide": "Şerit kablolar duvardan yana",
   "sbcBoard.gpioUp": "GPIO başlığı kapaktan yukarı",
+  "sbcBoard.lensUp": "Kamera merceği kapaktan yukarı",
   "sbcBoard.upReach": "Yukarı uzanma",
   "sbcBoard.buttonReach": "Düğme uzanması",
   "sbcBoard.buttonReachHint": "Düğmelerin (RESET, BOOT, güç) basıldıkları yöne ne kadar uzandığı: kapaktan yukarı ya da yandan basılan için duvardan dışarı. 0'da oldukları gibi kalırlar.",
