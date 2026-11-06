@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Oberflächentextur: das Muster wählen, indem man es sieht",
+      "en": "Surface texture: choose the pattern by seeing it"
+    },
+    "body": {
+      "de": "Das Feld „Muster“ zeigt jetzt das Bild des gewählten Musters. Aufgeklappt sind alle 18 Muster als Bilder in einem Raster, mit einer Suche darüber. Statt anzuwenden und am Körper nachzusehen, wählt man ein Muster nach seinem Aussehen, auch mit den Pfeiltasten.",
+      "en": "The Pattern field now shows the picture of the chosen pattern. Opened, it holds all 18 patterns as pictures in a grid, with a search above. Instead of applying and looking at the body, you choose a pattern by how it looks, with the arrow keys too."
+    }
+  },
+  {
+    "title": {
       "de": "Bildlaufleisten springen nicht mehr beim Mausrad",
       "en": "Scrollbars no longer jump with the wheel"
     },
