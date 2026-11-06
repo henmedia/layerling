@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { LID_DEFAULTS, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_MAGNET_GAP, MIN_LID_WALL, MIN_MAGNET_DIAMETER, clickBumpPlaces, lidClickBumpsFit, lidHandleFits, lidThicknessForMagnets, magnetPlaces, magnetPocketDepth, normalizeLidOptions } from "@/lib/lidTool";
+import { HINGE_PIN_GRIP, LID_DEFAULTS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_WALL, MIN_MAGNET_DIAMETER, clickBumpPlaces, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidThicknessForMagnets, magnetPlaces, magnetPocketDepth, normalizeLidOptions } from "@/lib/lidTool";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", clickBumps: false, handle: "none" });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", clickBumps: false, clickBumpHeight: 0.4, handle: "none" });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -52,6 +52,18 @@ describe("lid options (#1009)", () => {
     expect(normalizeLidOptions({ handle: 2 }).handle).toBe("none");
   });
 
+  it("makes the click bumps reach 0.4 mm into the wall unless told otherwise, 0.2 to 0.8 mm (#1220)", () => {
+    expect(normalizeLidOptions().clickBumpHeight).toBe(0.4);
+    expect(normalizeLidOptions({ clickBumpHeight: 0.25 }).clickBumpHeight).toBe(0.25);
+    expect(normalizeLidOptions({ clickBumpHeight: "0.6" }).clickBumpHeight).toBe(0.6);
+    expect(normalizeLidOptions({ clickBumpHeight: 0 }).clickBumpHeight).toBe(MIN_CLICK_BUMP_HEIGHT);
+    expect(normalizeLidOptions({ clickBumpHeight: -1 }).clickBumpHeight).toBe(0.2);
+    expect(normalizeLidOptions({ clickBumpHeight: 2 }).clickBumpHeight).toBe(MAX_CLICK_BUMP_HEIGHT);
+    expect(MAX_CLICK_BUMP_HEIGHT).toBe(0.8);
+    expect(normalizeLidOptions({ clickBumpHeight: "x" }).clickBumpHeight).toBe(0.4);
+    expect(normalizeLidOptions({ clickBumpHeight: null }).clickBumpHeight).toBe(0.4);
+  });
+
   it("knows where click bumps and a handle go: bumps need a lip or a rim, and a pivot lid takes neither", () => {
     const options = (patch: Record<string, unknown>) => normalizeLidOptions(patch);
     expect(lidClickBumpsFit(options({}))).toBe(true);
@@ -65,6 +77,31 @@ describe("lid options (#1009)", () => {
     expect(lidHandleFits(options({ type: "flat" }))).toBe(true);
     expect(lidHandleFits(options({ hinge: true }))).toBe(true);
     expect(lidHandleFits(options({ hinge: true, hingeStyle: "pivot" }))).toBe(false);
+  });
+
+  it("holds the pin tight in the body's holes and gives it its play only in the lid's (#1220)", () => {
+    expect(HINGE_PIN_GRIP).toBe(0.05);
+    const holes = hingePinHoles(normalizeLidOptions({ hingePin: 1.75 }));
+    expect(holes.lidHole).toBeCloseTo(0.875 + 0.2, 9);
+    expect(holes.bodyHole).toBeCloseTo(0.875 + 0.05, 9);
+    // The play changes the lid's holes only.
+    const wide = hingePinHoles(normalizeLidOptions({ hingePin: 3, hingePinPlay: 0.4 }));
+    expect(wide.lidHole).toBeCloseTo(1.9, 9);
+    expect(wide.bodyHole).toBeCloseTo(1.55, 9);
+    // The least play is the grip: then both are as tight.
+    const least = hingePinHoles(normalizeLidOptions({ hingePin: 1.75, hingePinPlay: 0 }));
+    expect(least.lidHole).toBeCloseTo(least.bodyHole, 9);
+    // The knuckles keep their size, so the body's keep at least the 1.6 mm wall the lid's have round their hole, more
+    // round their tighter one, for every pin and play.
+    for (const hingePin of [MIN_HINGE_PIN, 1.75, 3, MAX_HINGE_PIN]) {
+      for (const hingePinPlay of [MIN_HINGE_PIN_PLAY, 0.2, MAX_HINGE_PIN_PLAY]) {
+        const radius = hingeKnuckleRadius({ hingePin, hingePinPlay });
+        const { lidHole, bodyHole } = hingePinHoles({ hingePin, hingePinPlay });
+        expect(radius - lidHole).toBeCloseTo(1.6, 9);
+        expect(radius - bodyHole).toBeGreaterThanOrEqual(1.6 - 1e-9);
+        expect(bodyHole).toBeLessThanOrEqual(lidHole + 1e-9);
+      }
+    }
   });
 
   it("brings sizes into range and ignores what is not a number", () => {

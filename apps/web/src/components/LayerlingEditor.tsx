@@ -8570,12 +8570,12 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, clickBumps, handle } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, clickBumps, clickBumpHeight, handle } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps and a handle the panel shows switched off (a flat lid, a pivot lid) are not asked for.
     void makeLid({
       type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
-      clickBumps: clickBumps && lidClickBumpsFit(lidTool), handle: lidHandleFits(lidTool) ? handle : "none",
+      clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none",
     }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
@@ -13135,6 +13135,7 @@ export function LayerlingEditor({
           hingeTeardrop: params.hingeTeardrop,
           hingeStyle: params.hingeStyle,
           clickBumps: params.clickBumps,
+          clickBumpHeight: params.clickBumpHeight,
           handle: params.handle,
         }, targets);
         if (!result.ok) throw new Error(result.message);
