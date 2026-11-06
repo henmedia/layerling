@@ -556,6 +556,11 @@ const CROSS_STEPS: Record<SurfaceTextureDetail, number> = { coarse: 6, medium: 1
  */
 const BORDER_WALL = 0.15;
 /**
+ * With no fade that wall is this wide, mm, the pattern's border this far from what stays smooth (see borderFade): far
+ * below anything a nozzle draws, and wide enough that its cut is not merged into the rim (see SURFACE_MIN_EDGE).
+ */
+const BORDER_LEAST = 0.05;
+/**
  * A pattern standing out of the body runs out over the fade right up to the edge of what stays smooth, not cut off at a
  * border with a wall (see BORDER_WALL): a flat frame stayed round it. The run-out is refined to this share of the fade,
  * or rope 3 mm high came down over a few long triangles, frayed.
@@ -2990,6 +2995,16 @@ function capFaces(base: SurfaceBase, smoothFace: Uint8Array, ax: number) {
 /** Whether the pattern stands out of the body and so runs out right up to the edge (see RUN_OUT_STEPS); bumps are left off whole at a border instead. */
 function standsOut(s: SurfaceTextureSettings) {
   return s.direction !== "inward" && s.pattern !== "bumps" && !stuckOn(s) && s.pattern !== "cracks";
+}
+
+/**
+ * How far a pattern pressed in fades out next to what stays smooth where it ends at a border with a wall (see BORDER_WALL):
+ * the fade, and with none at least BORDER_LEAST. At 0 the wall had no width: the pattern went to its full depth at
+ * whichever points lay nearest the rim - a groove's end hung from the rim in fans, knurling's in splinters, a brick's
+ * head joint at a box's bottom edge in needles. A pattern standing out runs out over the fade as it is (see RUN_OUT_STEPS).
+ */
+function borderFade(s: SurfaceTextureSettings) {
+  return standsOut(s) ? s.fade : Math.max(s.fade, BORDER_LEAST);
 }
 
 /** An image pressed on a single time (its tiles "once"): it goes where it is put, as a text does, and nowhere else. */
@@ -6726,8 +6741,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // the face. The nearest of several lines is not: over a long fan from a box's corner to its edge the border came
       // out in the wrong place, and the grooves ran up to the edge there.
       // A pattern standing out runs out up to the edge instead (see RUN_OUT_STEPS): cut where its run-out begins and ends.
-      const reach = s.fade + s.margin;
-      const wall = Math.min(BORDER_WALL, s.fade);
+      const fade = borderFade(s);
+      const reach = fade + s.margin;
+      const wall = Math.min(BORDER_WALL, fade);
       const levels = standsOut(s) ? [s.margin, reach].filter((level) => level > 0) : wall > 0 ? [reach - wall, reach] : [reach];
       {
         const I = mesh.indices;
@@ -6794,8 +6810,9 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // Round the axis the grooves end at a border with a wall too (see endsInWall): cut along it and the foot of the wall,
       // on the faces that get the pattern (the distance to a rim changes linearly over a triangle there). A pattern
       // standing out runs out up to the rim (see RUN_OUT_STEPS): cut at its steps.
-      const reach = s.fade + s.margin;
-      const wall = Math.min(BORDER_WALL, s.fade);
+      const fade = borderFade(s);
+      const reach = fade + s.margin;
+      const wall = Math.min(BORDER_WALL, fade);
       const levels = standsOut(s) ? Array.from({ length: RUN_OUT_STEPS }, (_, k) => s.margin + ((k + 1) * s.fade) / RUN_OUT_STEPS) : wall > 0 ? [reach - wall, reach] : [reach];
       const I = mesh.indices;
       const sliced = new Uint8Array(I.length / 3);
@@ -7006,13 +7023,16 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       }
       // Round the axis with a flat top or bottom (cut as a straight face), the side ends at a border with a wall as well.
       const walled = endsInWall(s) || (Boolean(state.straightAxis) && s.projection === "cylinder");
-      const faded = fadeWeights(v, mesh.indices, adj, w0, s.fade, s.margin, state.straightAxis || walled ? FADE_BEYOND : 0);
+      // Where the pattern ends at a border with a wall, its distance is needed even with no fade (see borderFade).
+      const bordered = Boolean(state.straightAxis || walled) && !standsOut(s);
+      const faded = fadeWeights(v, mesh.indices, adj, w0, bordered ? borderFade(s) : s.fade, s.margin, state.straightAxis || walled ? FADE_BEYOND : 0);
       // Straight faces cut along their pattern: a border with a short wall instead of the fade (see BORDER_WALL) - unless
       // the pattern stands out, which runs out up to the edge. Grooves and knurling round the axis likewise (see endsInWall).
       const axisOf = state.straightAxis;
       if ((axisOf || walled) && faded.distance && !standsOut(s)) {
-        const reach = s.fade + s.margin;
-        const wall = Math.min(BORDER_WALL, s.fade);
+        const fade = borderFade(s);
+        const reach = fade + s.margin;
+        const wall = Math.min(BORDER_WALL, fade);
         // Per point the axis of a straight face it lies on (255: none).
         const axisAt = new Uint8Array(n).fill(255);
         const I = mesh.indices;
