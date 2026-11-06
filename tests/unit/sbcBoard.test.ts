@@ -39,7 +39,7 @@ const ESP32_BOARDS: SbcBoardType[] = ["xiaoEsp32c6", "esp32c3SuperMini", "esp32c
 /** The microcontroller boards: no microSD card slot, no ribbon cables, no GPIO header to open up. */
 /** The camera boards: their microSD card slot is on top, by the camera. */
 const CAMERA_BOARDS: SbcBoardType[] = ["esp32CamMb", "esp32s3Cam"];
-const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam"];
+const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"];
 
 /** A body carrying board settings; what carries them does not matter to the project file. */
 function boardBody(id: string, sbcBoard: SbcBoardSettings = { board: "pi4", clearance: 0.3 }): WorkplaneShape {
@@ -73,7 +73,7 @@ async function withDefinition(patch: Record<string, unknown>) {
 
 describe("SBC board data (#1098)", () => {
   it("has every board in the list, the Raspberry Pi 5 first", () => {
-    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam"]);
+    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"]);
     expect(DEFAULT_SBC_BOARD).toBe("pi5");
     for (const type of SBC_BOARD_ORDER) expect(SBC_BOARDS[type].type).toBe(type);
   });
@@ -726,6 +726,27 @@ describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano an
     expect(pinDots("esp32s3Cam", "pins (GPIO0 to 5V)")).toHaveLength(8);
     expect(sbcBoardHasButtons(board)).toBe(true);
     expect(board.estimated).toEqual(["thickness", "cornerRadius", "holeDiameter"]);
+  });
+
+  it("give the ESP32-DevKitC V4 Espressif's outline, 2 x 19 pins 25.4 mm apart and the module past the right end", () => {
+    const board = SBC_BOARDS.esp32DevKitC;
+    expect(board).toMatchObject({ width: 48.26, depth: 27.94, cornerRadius: 1, holes: [] });
+    expect(pinDots("esp32DevKitC", "pins (5V to 3V3)")).toHaveLength(19);
+    expect(middles(pinDots("esp32DevKitC", "pins (CLK to GND)"), "y")[0]).toBeCloseTo(1.3, 6);
+    expect(middles(pinDots("esp32DevKitC", "pins (5V to 3V3)"), "y")[0]).toBeCloseTo(26.7, 6);
+    expect(part("esp32DevKitC", "ESP32-WROOM-32E")).toMatchObject({ x1: 54.3, height: 3.1 });
+    expect(part("esp32DevKitC", "ESP32-WROOM-32E").x1 - part("esp32DevKitC", "ESP32-WROOM-32E").x0).toBeCloseTo(25.5, 6);
+    expect(part("esp32DevKitC", "micro-USB").x0).toBeLessThan(0);
+    expect(part("esp32DevKitC", "EN button").y0).toBeGreaterThan(part("esp32DevKitC", "Boot button").y1);
+  });
+
+  it("give the 30-pin ESP32 DevKit V1 its four holes, 2 x 15 pins 25.4 mm apart, all estimated", () => {
+    const board = SBC_BOARDS.esp32DevKitV1;
+    expect(board).toMatchObject({ width: 51.8, depth: 28.2, holeDiameter: 2.8 });
+    expect(board.holes).toEqual([[2.2, 2.2], [2.2, 26.0], [49.6, 2.2], [49.6, 26.0]]);
+    expect(pinDots("esp32DevKitV1", "pins (EN to VIN)")).toHaveLength(15);
+    expect(board.parts.every((entry) => entry.estimated)).toBe(true);
+    expect(part("esp32DevKitV1", "EN button").y0).toBeGreaterThan(part("esp32DevKitV1", "BOOT button").y1);
   });
 
   it("give the D1 mini V4.0.0 the outline and pins of Wemos's drawing, laid with USB-C at the left", () => {
