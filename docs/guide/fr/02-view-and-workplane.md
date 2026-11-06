@@ -196,6 +196,8 @@ Sous {{ui:workspace.customSnapGrids}}, au même endroit, vous ajoutez vos propre
 
 {{ui:workspace.printer}} dimensionne le plan de travail au plateau de votre imprimante et signale les corps qui le dépassent, voir [Impression](chapter:printing). {{ui:workspace.showPlateLabels}} écrit le nom de la conception sur le plateau, ainsi que le nom et le volume d'impression de l'imprimante quand une imprimante est choisie.
 
+{{ui:workspace.printerPlay}} est la place par côté dont une goupille imprimée a besoin pour tourner dans un trou imprimé sur votre imprimante. {{ui:workspace.fitTestMake}} pose sur le plateau le test d'ajustement qui le mesure ; les nouveaux couvercles, queues d'aronde, clips, écrous et la vérification du jeu partent alors de cette valeur, voir [Impression](chapter:printing). Il est gardé dans ce navigateur, pas dans le motif.
+
 {{ui:workspace.size}} donne au plateau une taille à vous, avec {{ui:workspace.width}} et {{ui:workspace.length}} en millimètres ou dans l'unité choisie. La grille passe toujours par l'origine, si bien que les lignes plus fortes se trouvent sur les axes, quelle que soit la mesure du plateau.
 
 ### Plan de travail : grille

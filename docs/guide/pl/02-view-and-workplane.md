@@ -199,6 +199,8 @@ W {{ui:workspace.customSnapGrids}} w tym samym miejscu dodajesz własne kroki pr
 
 {{ui:workspace.printer}} dopasowuje płaszczyznę roboczą do stołu Twojej drukarki i oznacza bryły, które poza niego wystają, zobacz [Drukowanie](chapter:printing). {{ui:workspace.showPlateLabels}} wypisuje na płycie nazwę projektu, a gdy wybrana jest drukarka, także jej nazwę i przestrzeń roboczą.
 
+{{ui:workspace.printerPlay}} to miejsce na stronę, którego wydrukowany sworzeń potrzebuje, by obracać się w wydrukowanym otworze na twojej drukarce. {{ui:workspace.fitTestMake}} kładzie na stole test pasowania, który go mierzy; nowe pokrywki, jaskółcze ogony, zatrzaski, nakrętki i sprawdzanie luzów zaczynają wtedy od niego, zobacz [Drukowanie](chapter:printing). Jest przechowywany w tej przeglądarce, nie w projekcie.
+
 {{ui:workspace.size}} nadaje płycie własny rozmiar, z {{ui:workspace.width}} i {{ui:workspace.length}} w milimetrach albo w wybranej jednostce. Siatka zawsze przechodzi przez początek układu, więc mocniejsze linie leżą na osiach niezależnie od wymiarów płyty.
 
 ### Płaszczyzna robocza: siatka

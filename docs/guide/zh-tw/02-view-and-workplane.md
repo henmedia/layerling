@@ -196,6 +196,8 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.printer}} 會將工作平面調整為印表機的列印平台大小，並標出超出範圍的實體，參見[列印](chapter:printing)。{{ui:workspace.showPlateLabels}} 會在平台上寫出設計名稱；選擇印表機後，還會寫上印表機名稱與建構體積。
 
+{{ui:workspace.printerPlay}}是在你的印表機上，列印出的銷釘要能在列印出的孔中轉動所需的每側餘量。{{ui:workspace.fitTestMake}}會把用來測量它的配合測試件放到平台上；之後新的蓋子、燕尾、卡扣、螺帽和間隙檢查都以它為起點，見[列印](chapter:printing)。它保存在這個瀏覽器中，而不是設計裡。
+
 {{ui:workspace.size}} 可為平台設定自訂尺寸，使用 {{ui:workspace.width}} 與 {{ui:workspace.length}}，單位為公釐或你選擇的單位。網格一律穿過原點，所以無論平台多大，較粗的線都會位於座標軸上。
 
 ### 工作平面：網格

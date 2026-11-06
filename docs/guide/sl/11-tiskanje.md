@@ -52,6 +52,14 @@ Kako strmo zmore tvoj tiskalnik, nastaviš v nastavitvah pod {{ui:workspace.appe
 - Kjer se dva dela prilegata, potrebuješ zračnost: običajno 0,2 do 0,4 mm, odvisno od tiskalnika. Zgradi majhen preizkusni par, preden natisneš velik del.
 - Spodnji rob, ki leži na plošči, mnogi rahlo posnamejo. To prepreči, da bi se prva plast razlezla (»slonja noga«).
 
+## Zračnost tvojega tiskalnika: preizkus ujemanja
+
+Vsak tiskalnik natisne luknje malo manjše in zatiče malo debelejše, kot so narisani, vsak za svojo mero. Zračnost, ki jo potrebujeta dva natisnjena dela, je zato sprva ugibanje. Raje jo enkrat izmeri: v nastavitvah pod {{ui:workspace.workplane}} gumb {{ui:workspace.fitTestMake}} položi preizkus ujemanja na ploščo. To je ploščica 60 × 20 × 4 mm s sedmimi luknjami za en zatič 5 mm, vsaka narisana kot 5 mm in dvakrat 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 ali 0,40 mm, ob njej pa je izbočena vrednost, in še sam zatič 5 mm, ki stoji ob ploščici in ima zgoraj majhno posnetje. Sestavljen je iz navadnih oblik, zato se natisne skupaj z ostalim na plošči, brez podpor.
+
+Natisni ga, kot leži, nato potiskaj zatič s posnetim koncem naprej v luknje, od najožje naprej. **Najožja luknja, v kateri se zatič še vrti,** pove zračnost tvojega tiskalnika. Vpiši njeno številko pod {{ui:workspace.printerPlay}} ali jo klikni med vrednostmi pod poljem. Zračnost velja na stran, v milimetrih, in brskalnik jo hrani za vse projekte; prazno polje pomeni, da ni izmerjena.
+
+Od takrat nove uporabe začnejo z zračnostjo namesto z vgrajeno vrednostjo: {{ui:lid.gap}} in {{ui:lid.hingePinPlay}} v orodju {{ui:editor.tool.lid}}, zračnost novih oblik {{ui:shape.dovetail}} in {{ui:shape.snapFit}}, {{ui:prop.clearance}} nove matice ali navojne luknje – dvojna zračnost, saj je to prostor čez ves premer – in {{ui:clearance.threshold}} pri {{ui:editor.tool.clearance}}. Dokler tako polje še ima to vrednost, »{{ui:printerPlay.fromFitTest}}« ob njem pove, od kod je številka. Tečaj, natisnjen v enem kosu, in zgibi orodja {{ui:editor.tool.flexi}} obdržijo svojih 0,4 mm: ko so natisnjeni v enem kosu, morajo njihove reže ostati odprte tudi med plastmi, tega pa zatič, natisnjen posebej, ne izmeri. Prostor za vtis magneta ali ključa Gridfinity in prostor za kupljeno vtičnico ali ploščo prav tako obdržita svoje vrednosti. Telesa, ki so že v projektu, se nikoli ne spremenijo, in tudi projekt, ki ga odpreš, ne.
+
 ## Preverjanje tiska
 
 {{ui:editor.tool.printCheck}} ob {{ui:editor.tool.clearance}} v skupini {{ui:editor.group.combine}} pregleda izbrane predmete ali vse vidne, če ni nič izbrano, in v enem oknu pove, kaj bi šlo pri tiskanju narobe. Vsaka od petih vrstic je zelena, če ni našla ničesar, in oranžna s tem, kaj in kje, če je:

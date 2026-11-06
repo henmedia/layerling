@@ -198,6 +198,8 @@ Pod {{ui:workspace.customSnapGrids}} na istem mestu ustvariš lastne korake prip
 
 {{ui:workspace.printer}} prilagodi delovno ravnino tiskalni plošči tvojega tiskalnika in označi telesa, ki segajo čeznjo, glej [Tiskanje](chapter:tiskanje). {{ui:workspace.showPlateLabels}} napiše na ploščo ime načrta, pri izbranem tiskalniku pa tudi njegovo ime in tiskalni prostor.
 
+{{ui:workspace.printerPlay}} je prostor na stran, ki ga natisnjen zatič potrebuje, da se vrti v natisnjeni luknji na tvojem tiskalniku. {{ui:workspace.fitTestMake}} položi na ploščo preizkus ujemanja, ki jo izmeri; novi pokrovi, lastovičji repi, zaskočne kljukice, matice in preverjanje zračnosti potem začnejo z njo, glej [Tiskanje](chapter:tiskanje). Hrani se v tem brskalniku, ne v projektu.
+
 {{ui:workspace.size}} da plošči lastno velikost, {{ui:workspace.width}} in {{ui:workspace.length}} v milimetrih ali izbrani enoti. Mreža vedno teče skozi ničlo, tako da močnejše črte ležijo na oseh, ne glede na velikost plošče.
 
 ### Delovna ravnina: mreža

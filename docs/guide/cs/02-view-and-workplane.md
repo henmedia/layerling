@@ -198,6 +198,8 @@ V {{ui:workspace.customSnapGrids}} přidáte vlastní pojmenovanou rozteč v mil
 
 {{ui:workspace.printer}} přizpůsobí pracovní rovinu tiskové podložce vaší tiskárny a označí tělesa, která přes ni přesahují, viz [Tisk](chapter:printing). {{ui:workspace.showPlateLabels}} napíše na podložku název projektu, a při zvolené tiskárně i její název a tiskový prostor.
 
+{{ui:workspace.printerPlay}} je místo na stranu, které vytištěný čep potřebuje, aby se otáčel ve vytištěném otvoru na vaší tiskárně. {{ui:workspace.fitTestMake}} položí na podložku test vůle, který ji změří; nová víka, rybinové spoje, zaklapávací háčky, matice a kontrola vůle pak začínají s ní, viz [Tisk](chapter:printing). Ukládá se v tomto prohlížeči, ne v projektu.
+
 {{ui:workspace.size}} dá podložce vlastní velikost, {{ui:workspace.width}} a {{ui:workspace.length}} v milimetrech nebo zvolené jednotce. Mřížka vždy prochází počátkem, takže silnější čáry leží na osách bez ohledu na rozměr podložky.
 
 ### Pracovní rovina: mřížka

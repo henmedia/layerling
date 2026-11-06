@@ -189,6 +189,8 @@ import { vaseShapePatchOffThread } from "@/lib/vaseShape";
 import { VaseDrawingWindow } from "@/components/workplane/VaseDrawingWindow";
 import { VasePrintReport } from "@/components/workplane/VasePrintReport";
 import { shapeDefaultsAsset, shapeDefaultsFromShape } from "@/lib/shapeDefaults";
+import { fromPrinterPlay, printerPlayShapeRows, withPrinterPlay } from "@/lib/printerPlay";
+import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, normalizeScrewHoleAngle, normalizeScrewHoleHeadDepth, normalizeScrewHoleShaft } from "@/lib/screwHoleGeometry";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
@@ -520,6 +522,8 @@ type RangePropertyConfig = {
   disabled?: boolean;
   /** A line under the row saying what the value measures (#215). */
   hint?: string;
+  /** A line under the row, before the hint, saying where the value came from: the fit test (printerPlay.ts). */
+  note?: string;
   /** Values the row skips, in millimetres for a length (#1126): one inside goes on to the end it moves towards. */
   gap?: { from: number; to: number };
   onChange: (value: number) => void;
@@ -4137,13 +4141,14 @@ export function ShapeInspector({
   // The section of a loft the rows are about (#1034), back to the first for another body.
   const [loftSection, setLoftSection] = useState(0);
   useEffect(() => setLoftSection(0), [shape.id]);
-  const properties = getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles });
+  const printerPlay = usePrinterPlay();
+  const properties = withFitTestNotes(getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles }), shape.kind, printerPlay);
   const tiltedMeasures = orientedMeasures(shape).kind === "tilted";
   // What each value would be on a shape of this kind made new, with the saved defaults: the
   // small arrow next to a changed value takes it back there.
-  const propertyDefaults = useMemo(() => shapePropertyDefaults(shape.kind, workspace, shape.kind === "gridfinity" ? normalizeGridfinityType(shape.gridfinityType) : undefined), [shape.kind, workspace, shape.gridfinityType]);
+  const propertyDefaults = useMemo(() => shapePropertyDefaults(shape.kind, workspace, shape.kind === "gridfinity" ? normalizeGridfinityType(shape.gridfinityType) : undefined, printerPlay), [shape.kind, workspace, shape.gridfinityType, printerPlay]);
   const savedDefaults = workspace.shapeCustomizations[shape.kind];
-  const defaultsToSave = shapeDefaultsFromShape(shape, workspace.shapeCustomizations);
+  const defaultsToSave = shapeDefaultsFromShape(shape, workspace.shapeCustomizations, printerPlay);
   const sameDefaults = JSON.stringify(defaultsToSave ?? null) === JSON.stringify(savedDefaults && Object.keys(savedDefaults).length > 0 ? savedDefaults : null);
   const gearType = shape.kind === "gear" ? normalizeGearType(shape.gearType) : null;
   const isThread = shape.kind === "thread";
@@ -7294,13 +7299,27 @@ function GridfinityCompartmentsCard({
 type PropertyDefaultValues = ReadonlyMap<string, number | string | boolean>;
 
 /**
+ * The rows that follow the printer's play (printerPlay.ts) say "from your fit test" under them while their value is the
+ * one the play gives, so it is clear where the number comes from; changed by hand, the line goes.
+ */
+function withFitTestNotes(properties: ShapePropertyConfig[], kind: WorkplaneShape["kind"], printerPlay: number | null): ShapePropertyConfig[] {
+  const rows = printerPlayShapeRows(kind);
+  if (printerPlay === null || rows.length === 0) return properties;
+  return properties.map((property) => {
+    if (property.type !== undefined && property.type !== "range") return property;
+    const row = rows.find((entry) => entry.property === property.id);
+    return row && fromPrinterPlay(row.id, property.value, printerPlay) ? { ...property, note: t("printerPlay.fromFitTest") } : property;
+  });
+}
+
+/**
  * The values a shape of this kind has when it is made new, with the defaults saved in the
  * settings, by property id. The main list, the taper card, the twist card and a Gridfinity
  * bin's compartments card each have their own, as some ids (a pyramid's top width) mean
  * different things in them. Null for a shape that is not made from the toolbar: a sketch,
  * a mesh, a group.
  */
-function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: WorkplaneWorkspaceSettings, gridfinityType?: GridfinityType) {
+function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: WorkplaneWorkspaceSettings, gridfinityType?: GridfinityType, printerPlay: number | null = null) {
   const asset = shapeDefaultsAsset(kind);
   if (!asset) return null;
   try {
@@ -7308,7 +7327,8 @@ function shapePropertyDefaults(kind: WorkplaneShape["kind"], workspace: Workplan
     // where the defaults make a tray.
     const saved = workspace.shapeCustomizations[kind];
     const tray = gridfinityType === "tray" || (gridfinityType !== undefined && normalizeGridfinityType(saved?.gridfinityType) === "tray");
-    const fresh = makeShapeFromAsset(asset, undefined, tray ? { ...saved, gridfinityType } : saved);
+    // A clearance that follows the printer's play goes back to what the play gives, as a shape made now starts with.
+    const fresh = makeShapeFromAsset(asset, undefined, withPrinterPlay(kind, tray ? { ...saved, gridfinityType } : saved, printerPlay));
     const main = new Map<string, number | string | boolean>();
     getShapeProperties(fresh, () => undefined, workspace).forEach((property) => {
       if (property.type !== "text") main.set(property.id, property.value);
@@ -7573,6 +7593,7 @@ function RangeProperty({
   max,
   step = 0.01,
   hint,
+  note,
   gap,
   workspace,
   disabled,
@@ -7862,7 +7883,7 @@ function RangeProperty({
     </label>
   );
   // Outside the label, so a click on the words does not jump into the field.
-  return hint ? <>{row}<p className="property-hint">{hint}</p></> : row;
+  return hint || note ? <>{row}{note ? <p className="property-hint">{note}</p> : null}{hint ? <p className="property-hint">{hint}</p> : null}</> : row;
 }
 
 /**
