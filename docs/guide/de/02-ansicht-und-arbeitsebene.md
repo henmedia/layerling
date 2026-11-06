@@ -198,6 +198,8 @@ Unter {{ui:workspace.customSnapGrids}} an derselben Stelle legst du eigene Raste
 
 {{ui:workspace.printer}} stellt die Arbeitsebene auf die Druckplatte deines Druckers ein und markiert Körper, die darüber hinausragen, siehe [Drucken](chapter:drucken). {{ui:workspace.showPlateLabels}} schreibt den Namen des Designs auf die Platte und, wenn ein Drucker gewählt ist, seinen Namen und sein Bauvolumen.
 
+{{ui:workspace.printerPlay}} ist der Raum je Seite, den ein gedruckter Stift braucht, um sich in einem gedruckten Loch deines Druckers zu drehen. {{ui:workspace.fitTestMake}} legt die Passprobe auf die Platte, die es misst; neue Deckel, Schwalbenschwänze, Schnapphaken, Muttern und die Spielprüfung beginnen dann damit, siehe [Drucken](chapter:drucken). Es bleibt in diesem Browser, nicht im Entwurf.
+
 {{ui:workspace.size}} gibt der Platte eine eigene Größe, mit {{ui:workspace.width}} und {{ui:workspace.length}} in Millimetern oder der gewählten Einheit. Das Gitter läuft immer durch den Nullpunkt, sodass die kräftigen Linien auf den Achsen liegen, wie groß die Platte auch ist.
 
 ### Arbeitsebene: Gitter

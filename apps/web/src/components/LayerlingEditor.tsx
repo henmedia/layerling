@@ -25,7 +25,9 @@ import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerText
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { LID_DEFAULTS, groupedWithMagnets, lidClickBumpsFit, lidHandleFits, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidHandleFits, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayStart, setPrinterPlay, withPrinterPlay } from "@/lib/printerPlay";
+import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { CABLE_DEFAULTS, cableChannelShapeFields, cableEndNear, cableGrid, findCableChannel, normalizeCableOptions, type CableChannelError, type CableChannelOptions, type CableChannelResult, type CableEnd, type CableGrid, type Vec3 as CableVec3 } from "@/lib/cableChannel";
 import { CableChannelPanel, type CableChannelEndName, type CableChannelPanelResult } from "./workplane/CableChannelPanel";
 import type { CadLidRequest } from "@/lib/cadLid";
@@ -87,7 +89,7 @@ import { storedCustomFonts } from "@/lib/customFontStore";
 import { ArrayPanel } from "./workplane/ArrayPanel";
 import { ScalePercentPanel, type ScalePercentSettings } from "./workplane/ScalePercentPanel";
 import { ClearancePanel, clearanceMarkFor, clearanceRowIds, type ClearanceSettings, type ClearanceToolState } from "./workplane/ClearancePanel";
-import { CLEARANCE_THRESHOLD_LIMITS, clearanceMeshShape, clearanceSourceShapes, normalizeClearanceOptions, reclassifyClearance, readClearanceSettings, writeClearanceSettings } from "@/lib/clearanceCheck";
+import { CLEARANCE_THRESHOLD_LIMITS, clearanceMeshShape, clearanceSourceShapes, clearanceStartThreshold, normalizeClearanceOptions, reclassifyClearance, readClearanceSettings, writeClearanceSettings } from "@/lib/clearanceCheck";
 import { scaleShapesByPercent } from "@/lib/scaleByPercent";
 import { isSameSize, resizedCopy, SAME_SIZE, shapeSize, sizeFactorsBetween, type ShapeSize, type SizeFactors } from "@/lib/duplicateResize";
 import { canToggleGroupColors, colorForParts, groupShowsPartColors } from "@/lib/groupColors";
@@ -6399,7 +6401,8 @@ export function LayerlingEditor({
         void placeSbcBoardRef.current?.(point, onFace);
         return;
       }
-      const shape = makeShapeFromAsset(asset, undefined, workspaceSettingsRef.current.shapeCustomizations[asset.kind]);
+      // The saved defaults of the kind, and where they say nothing, the printer's play (printerPlay.ts).
+      const shape = makeShapeFromAsset(asset, undefined, withPrinterPlay(asset.kind, workspaceSettingsRef.current.shapeCustomizations[asset.kind], getPrinterPlay()));
       // Dropped on a body's face, the shape lies on that face; otherwise on the current workplane.
       const workplane = onFace ?? placementWorkplane;
       const nextShape = prepareNewShape(asset, {
@@ -8492,7 +8495,8 @@ export function LayerlingEditor({
     };
     const targets = (only ?? selectedShapes).filter((shape) => !isNonSolidShape(shape));
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
-    const options = normalizeLidOptions(given);
+    // What is not given starts from the printer's play where it follows it, as the panel does.
+    const options = normalizeLidOptions(given, lidDefaults(getPrinterPlay()));
     // The pockets, the hinge's knuckles, the click bumps' dimples and a finger notch go into the body, so it must be free
     // to change and one body.
     const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch";
@@ -8560,7 +8564,8 @@ export function LayerlingEditor({
     }
     if (edgeModifier) invalidateCadModifierSession();
     closeSplit();
-    setLidTool({ ...LID_DEFAULTS, targetIds: targets.map((shape) => shape.id), busy: false, error: null });
+    // The gap and the hinge pin's play start from the printer's play when it is measured (printerPlay.ts).
+    setLidTool({ ...lidDefaults(getPrinterPlay()), targetIds: targets.map((shape) => shape.id), busy: false, error: null });
   }, [closeSplit, edgeModifier, invalidateCadModifierSession, lidTool, selectedShapes]);
 
   const applyLidTool = useCallback(() => {
@@ -10283,7 +10288,7 @@ export function LayerlingEditor({
       setNotice(t("clearance.nothing"));
       return;
     }
-    const settings = readClearanceSettings();
+    const settings = readClearanceSettings(getPrinterPlay());
     setClearanceTool({ settings, result: null, running: true, error: null, checked: null, scopeIds: null, activeRow: null, request: 0 });
     void runClearanceCheck(settings);
   }, [clearanceTool, closeClearanceCheck, otherToolPanelOpen, runClearanceCheck, selectedShapes, shapes]);
@@ -10292,7 +10297,8 @@ export function LayerlingEditor({
   const changeClearanceSettings = useCallback((patch: Partial<ClearanceSettings>) => {
     if (!clearanceTool) return;
     const settings = { ...clearanceTool.settings, ...patch };
-    writeClearanceSettings(settings);
+    // Only what was changed is kept: a minimum gap never set by hand goes on following the printer's play.
+    writeClearanceSettings(patch);
     if (settings.splitParts !== clearanceTool.settings.splitParts) {
       void runClearanceCheck(settings);
       return;
@@ -11349,6 +11355,30 @@ export function LayerlingEditor({
   }, [commitShapes, setNotice]);
   placeSbcBoardRef.current = placeSbcBoard;
 
+  /**
+   * The fit test (fitTest.ts) that measures the printer's play: on the plate new shapes land on, in front of what stands
+   * there already when its middle is taken, selected. The settings window's button and the MCP tool place it; it returns
+   * the new bundle, or why it could not be made, as the notice says it.
+   */
+  const placeFitTest = useCallback(async (): Promise<{ shape: WorkplaneShape } | { error: string }> => {
+    setNotice(t("fitTest.building"), true);
+    try {
+      const built = await fitTestShape(workspaceSettingsRef.current.booleanTriangleLimit);
+      // Always on the plate, never on a face the workplane was set on: it is printed as it lies.
+      const base = horizontalPlacementWorkplane();
+      const origin = buildPlates.newShapeOrigin(base);
+      const taken = shapesRef.current.filter((shape) => !shape.hidden && !isNonSolidShape(shape)).map((shape) => meshAabb(shape));
+      const spot = fitTestSpot({ width: built.width, depth: built.depth }, origin, taken);
+      const shape = canonicalizeShape({ ...built, ...placementPatchForNewShape(built, base, { ...origin, x: spot.x, z: spot.z }) });
+      commitShapes([...shapesRef.current, shape], [shape.id], t("status.fitTestAdded"));
+      return { shape };
+    } catch (error) {
+      const message = error instanceof Error ? localizedError(error.message) : t("fitTest.failed");
+      setNotice(message, true);
+      return { error: message };
+    }
+  }, [buildPlates, commitShapes, setNotice]);
+
   /** The SBC board card: another board, clearance or reach, made again where the selected board stands. */
   const regenerateSelectedSbcBoard = useCallback(async (settings: SbcBoardSettings) => {
     const current = selectedShapes.length === 1 ? selectedShape : null;
@@ -11892,11 +11922,12 @@ export function LayerlingEditor({
           // `makeShapeFromAsset` genau so, wie es beim Ziehen auf die Ebene
           // geschieht: Ein Gewinde bekommt den Platzbedarf seines Durchmessers,
           // ein Zahnrad seine Zaehne, ein Zylinder seine offene Seitenzahl.
+          // A clearance not asked for starts from the printer's play, as in the editor (printerPlay.ts).
           shape = makeShapeFromAsset(
             { ...asset, name, color },
             { x, z, elevation },
             {
-              ...mcpShapeCustomization(
+              ...withPrinterPlay(asset.kind, mcpShapeCustomization(
                 asset.kind,
                 portPreset ? { cornerFillet: portPreset.corner, portProfile: portPreset.profile, ...shapeParams }
                   : washer ? { bevel: washer.bevel, ...shapeParams }
@@ -11907,7 +11938,7 @@ export function LayerlingEditor({
                     ...shapeParams,
                   }
                   : shapeParams,
-              ),
+              ), getPrinterPlay()),
               width: requestedWidth,
               depth: requestedDepth,
               height: requestedHeight,
@@ -13004,6 +13035,49 @@ export function LayerlingEditor({
         return { object: mcpShapeSummary(shape) };
       }
 
+      if (command.action === "printer_play") {
+        // The printer's play as the settings window keeps it (printerPlay.ts): read, set or forgotten, and the fit test
+        // that measures it placed as the window's button places it.
+        for (const key of ["clear", "makeFitTest"] as const) {
+          if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
+        }
+        if (params.play !== undefined) {
+          if (params.clear === true) throw new Error("Pass play or clear, not both");
+          const play = typeof params.play === "number" && params.play <= MAX_PRINTER_PLAY ? normalizePrinterPlay(params.play) : null;
+          if (play === null) throw new Error(`play must be a number from ${MIN_PRINTER_PLAY} to ${MAX_PRINTER_PLAY} (mm per side)`);
+          setPrinterPlay(play);
+        } else if (params.clear === true) {
+          setPrinterPlay(null);
+        }
+        let fitTest: Record<string, unknown> | null = null;
+        if (params.makeFitTest === true) {
+          const made = await placeFitTest();
+          if ("error" in made) throw new Error(made.error);
+          const placed = made.shape;
+          const [plate, pin] = placed.groupedShapes ?? [];
+          fitTest = {
+            object: mcpShapeSummary(placed),
+            plateId: plate?.id ?? null,
+            pinId: pin?.id ?? null,
+            pinDiameter: FIT_TEST_PIN_DIAMETER,
+            holes: fitTestHoles().map(({ clearance, diameter, label }) => ({ clearance, diameter, label })),
+          };
+        }
+        const play = getPrinterPlay();
+        return {
+          play,
+          measured: play !== null,
+          testedValues: [...FIT_TEST_CLEARANCES],
+          settings: PRINTER_PLAY_SETTINGS.map((setting) => ({
+            setting: setting.id,
+            takes: setting.takes ?? "own",
+            startsAt: printerPlayStart(setting.id, play),
+          })),
+          ...(fitTest ? { fitTest } : {}),
+          note: "play is per side in mm, kept in this browser; null means not measured. New uses of the settings with takes perSide start from it, those with total from twice it (startsAt, before each tool holds it within its own field); takes own keeps its built-in start. Shapes already in a design never change.",
+        };
+      }
+
       if (command.action === "layer_icon") {
         const svg = typeof params.svg === "string" && params.svg.trim() ? params.svg : null;
         const id = typeof params.id === "string" ? params.id : null;
@@ -13984,7 +14058,8 @@ export function LayerlingEditor({
           if (value !== undefined && !(typeof value === "number" && value >= min && value <= max)) throw new Error(`${key} must be a number from ${min} to ${max}`);
         }
         if (params.splitParts !== undefined && typeof params.splitParts !== "boolean") throw new Error("splitParts must be true or false");
-        const options = normalizeClearanceOptions({ threshold: params.threshold as number | undefined, splitParts: params.splitParts as boolean | undefined, searchLength: params.searchLength as number | undefined });
+        // Without a threshold the check starts as the panel does with none chosen: from the printer's play when it is set.
+        const options = normalizeClearanceOptions({ threshold: (params.threshold as number | undefined) ?? clearanceStartThreshold(getPrinterPlay()), splitParts: params.splitParts as boolean | undefined, searchLength: params.searchLength as number | undefined });
         if (!clearanceSourceShapes(source).length) throw new Error("Nothing to check: no visible solid body");
         const result = await checkClearanceOffThread(source, options);
         const mm = (value: number) => Number(value.toFixed(3));
@@ -14531,6 +14606,7 @@ export function LayerlingEditor({
       throw error;
     }
   }, [
+    placeFitTest,
     alignSizeLimit,
     buildSectionSvg,
     sectionSketchAt,
@@ -16909,6 +16985,7 @@ export function LayerlingEditor({
           onCancelCruise={stopCruise}
           onAddShape={addShape}
           onDropMyShape={(id, point) => void insertMyShape(id, point).catch(noticeError)}
+          onMakeFitTest={() => void placeFitTest()}
           onAlignAnchorChange={chooseAlignAnchor}
           onAlignPreview={previewAlignSelection}
           onAlignPreviewClear={clearAlignPreview}

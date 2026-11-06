@@ -54,6 +54,14 @@ Hvor stejlt din printer klarer sættes i indstillingerne under {{ui:workspace.ap
 - Hvor to dele passer ind i hinanden har du brug for frirum: normalt 0,2 til 0,4 mm, afhængigt af printeren. Lav et lille testpar før du printer den store del.
 - Mange mennesker faser let den nederste kant der sidder på pladen. Det forhindrer det første lag i at flyde ud ("elefantfod").
 
+## Din printers spillerum: pasprøven
+
+Hver printer printer huller lidt mindre og stifter lidt tykkere, end de er tegnet, hver med sit eget mål. Det spillerum, to printede dele har brug for, er derfor først et gæt. Mål det hellere én gang: i indstillingerne under {{ui:workspace.workplane}} lægger {{ui:workspace.fitTestMake}} en pasprøve på pladen. Det er en plade på 60 × 20 × 4 mm med syv huller til én stift på 5 mm, hvert tegnet som 5 mm plus to gange 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 eller 0,40 mm, med værdien hævet ved siden af, og selve stiften på 5 mm, der står ved siden af pladen med en lille fas foroven. Den består af almindelige former, så den printes sammen med resten af pladen, uden support.
+
+Print den, som den ligger, og stik så stiften med fasen forrest ind i hullerne, det snævreste først. **Det snævreste hul, som stiften stadig kan dreje i,** giver din printers spillerum. Skriv tallet under {{ui:workspace.printerPlay}}, eller klik på det blandt værdierne under feltet. Spillerummet gælder pr. side, i millimeter, og browseren gemmer det for alle designs; et tomt felt betyder ikke målt.
+
+Fra da af starter nye anvendelser med spillerummet i stedet for den indbyggede værdi: {{ui:lid.gap}} og {{ui:lid.hingePinPlay}} i værktøjet {{ui:editor.tool.lid}}, spillerummet for en ny {{ui:shape.dovetail}} og {{ui:shape.snapFit}}, {{ui:prop.clearance}} for en ny møtrik eller et nyt gevindhul – det dobbelte spillerum, da det er pladsen over hele diameteren – og {{ui:clearance.threshold}} i {{ui:editor.tool.clearance}}. Så længe et sådant felt stadig har den værdi, siger "{{ui:printerPlay.fromFitTest}}" ved siden af, hvor tallet kommer fra. Et hængsel, der printes i ét stykke, og leddene fra værktøjet {{ui:editor.tool.flexi}} beholder deres 0,4 mm: printet i ét stykke skal deres spalter også holdes åbne mellem lagene, og det måler en stift, der er printet for sig, ikke. Plads til at presse en magnet eller en Gridfinity-nøgle i og plads til et købt stik eller print beholder også deres egne værdier. Legemer, der allerede er i et design, ændrer sig aldrig, og det gør et design, du åbner, heller ikke.
+
 ## Når du er klar
 
 Vælg {{ui:editor.export}} og så **STL** eller **3MF**. STL er det simpleste format. 3MF bevarer navne og farver på de enkelte former og er derfor praktisk når du printer i flere farver. Eksportvinduet viser også hvor mange gram og meter filament delen ville bruge printet som solid. Mere i [Filer og lagring](chapter:files-and-saving).

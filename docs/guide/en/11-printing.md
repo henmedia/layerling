@@ -54,6 +54,14 @@ How steep your printer manages is set in the settings under {{ui:workspace.appea
 - Where two parts fit into each other you need clearance: usually 0.2 to 0.4 mm, depending on the printer. Make a small test pair before you print the big part.
 - Many people lightly chamfer the lower edge that sits on the plate. That keeps the first layer from spreading ("elephant foot").
 
+## Your printer's play: the fit test
+
+Every printer prints holes a little smaller and pins a little thicker than they are drawn, each by its own amount, so the clearance two printed parts need is a guess at first. Measure it once instead. In the settings under {{ui:workspace.workplane}}, {{ui:workspace.fitTestMake}} puts a fit test on the plate: a 60 × 20 × 4 mm plate with seven holes for one 5 mm pin, each drawn 5 mm plus twice 0.05, 0.10, 0.15, 0.20, 0.25, 0.30 or 0.40 mm, the value raised beside it, and the 5 mm pin itself, standing beside the plate with a small chamfer on top. It is made of ordinary shapes, so it prints with the rest of the plate, without supports.
+
+Print it as it lies, then push the pin, chamfered end first, into the holes from the tightest on. **The snuggest hole the pin still turns in** gives your printer's play. Type its number under {{ui:workspace.printerPlay}}, or click it among the values below the field. The play is per side, in millimetres, and the browser keeps it for every design; an empty field means not measured.
+
+From then on, new uses start from the play instead of the built-in value: {{ui:lid.gap}} and {{ui:lid.hingePinPlay}} in the {{ui:editor.tool.lid}} tool, the clearance of a new {{ui:shape.dovetail}} and {{ui:shape.snapFit}}, {{ui:prop.clearance}} of a new nut or tapped hole - twice the play, as that is the room across the whole diameter - and {{ui:clearance.threshold}} in {{ui:editor.tool.clearance}}. While such a field still holds that value, "{{ui:printerPlay.fromFitTest}}" beside it says where the number comes from. A hinge printed in place and the joints of the {{ui:editor.tool.flexi}} tool keep their 0.4 mm: printed in one piece, their gaps also have to stay open between the layers, which a pin printed apart does not measure. Room for pressing in a magnet or a Gridfinity key, and room for a bought socket or board, keep their own values too. Bodies already in a design never change, nor does a design you open.
+
 ## When you are ready
 
 Choose {{ui:editor.export}} and then **STL** or **3MF**. STL is the simplest format. 3MF keeps names and colours of the individual bodies and is therefore handy when you print in several colours. The export window also shows how many grams and metres of filament the part would take printed solid. More in [Files and saving](chapter:files-and-saving).

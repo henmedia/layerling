@@ -11513,6 +11513,65 @@ html[data-theme="dark"] .font-picker-option.action {
   line-height: 1.4;
 }
 
+/* The printer's play (printerPlay.ts): the field in mm, the values the fit test is printed with, its button and a line. */
+.workspace-printer-play {
+  align-items: start;
+}
+
+.workspace-printer-play > label {
+  padding-top: 4px;
+}
+
+.workspace-printer-play-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #756657;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.workspace-printer-play-field input {
+  width: 110px;
+  height: 26px;
+  padding: 0 8px;
+  color: #61482f;
+  background: #fff;
+  border: 1px solid #dacfc2;
+  border-radius: 2px;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-printer-play-values {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.workspace-printer-play-values button {
+  padding: 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-printer-play-values button.active {
+  color: #9a520a;
+  background: #fbefe1;
+  border-color: #cf710f;
+}
+
+.workspace-printer-play-make {
+  grid-column: 2;
+}
+
+.workspace-printer-play > small {
+  display: block;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
 .bed-overhang-warning {
   position: fixed;
   bottom: 44px;
@@ -13223,6 +13282,22 @@ html[data-theme="dark"] .split-panel-footer .secondary {
 
 html[data-theme="dark"] .workspace-printer-info {
   color: #b9a58f;
+}
+
+html[data-theme="dark"] .workspace-printer-play-field {
+  color: #b9a58f;
+}
+
+html[data-theme="dark"] .workspace-printer-play-field input {
+  color: #ddccb9;
+  background: #35281b;
+  border-color: #5e4c3a;
+}
+
+html[data-theme="dark"] .workspace-printer-play-values button.active {
+  color: #f3b26a;
+  background: #4a321b;
+  border-color: #cf710f;
 }
 
 html[data-theme="dark"] .overhang-figures {

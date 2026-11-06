@@ -4746,6 +4746,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .font-picker-option.act
   color: #595959;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-printer-play-field {
+  color: #5a5a5a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-printer-play-field input {
+  color: #4a4a4a;
+  background: #fff;
+  border: 1px solid #cecece;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-printer-play-values button.active {
+  color: #9a520a;
+  background: #eeeeee;
+  border-color: #cf710f;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .bed-overhang-warning {
   color: #8a3b00;
   background: #f2f2f2;
@@ -5711,6 +5727,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .split-panel-footer .se
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-info {
   color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-play-field {
+  color: #909090;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-play-field input {
+  color: #cbcbcb;
+  background: #2d2d2d;
+  border-color: #4d4d4d;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .workspace-printer-play-values button.active {
+  color: #f3b26a;
+  background: #363636;
+  border-color: #cf710f;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .overhang-figures {

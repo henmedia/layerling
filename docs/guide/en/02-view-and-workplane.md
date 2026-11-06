@@ -198,6 +198,8 @@ Under {{ui:workspace.customSnapGrids}} in the same place you add snap steps of y
 
 {{ui:workspace.printer}} sizes the workplane to the build plate of your printer and flags bodies that reach past it, see [Printing](chapter:printing). {{ui:workspace.showPlateLabels}} writes the design's name on the plate, and the printer's name and build volume when a printer is chosen.
 
+{{ui:workspace.printerPlay}} is the room per side a printed pin needs to turn in a printed hole on your printer. {{ui:workspace.fitTestMake}} puts the fit test that measures it on the plate, and new lids, dovetails, snap-fits, nuts and the clearance check then start from it, see [Printing](chapter:printing). It is kept in this browser, not in the design.
+
 {{ui:workspace.size}} gives the plate a size of your own, with {{ui:workspace.width}} and {{ui:workspace.length}} in millimetres or the unit you chose. The grid always runs through the origin, so the stronger lines lie on the axes whatever the plate measures.
 
 ### Workplane: grid

@@ -7,6 +7,9 @@ import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, Plus, RotateCcw
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
+import { printerPlayShapeStart } from "@/lib/printerPlay";
+import { usePrinterPlay } from "@/lib/usePrinterPlay";
+import { PrinterPlaySetting } from "@/components/workplane/PrinterPlaySetting";
 import { createPortal } from "react-dom";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { APP_THEME_OPTIONS, type AppThemePreference } from "@/lib/appTheme";
@@ -233,8 +236,10 @@ function specialFieldsForShape(
   kind: ShapeKind,
   dimensions: { width: number; depth: number; height: number },
   customization: ShapeCustomization,
+  printerPlay: number | null = null,
 ): ShapeSpecialField[] {
-  const defaults = shapeAssetSpecialDefaults(kind, dimensions);
+  // A clearance that follows the printer's play starts from it here too, as a new shape of the kind does.
+  const defaults = { ...shapeAssetSpecialDefaults(kind, dimensions), ...printerPlayShapeStart(kind, printerPlay) };
   // Ohne eigene Angabe folgt die Seitenzahl der Groesse; hier steht, was das
   // bei den Vorgabemassen ergibt. Eine eingetragene Zahl haelt sie fest.
   // The curved cone's top and bend are kept as shares; "Save as default" on its card keeps them.
@@ -519,6 +524,7 @@ export function WorkspaceSettingsModal({
   onSaveStartView,
   onResetStartView,
   onMakeDefault,
+  onMakeFitTest,
   onClose,
 }: {
   workspace: WorkspaceSettings;
@@ -538,12 +544,15 @@ export function WorkspaceSettingsModal({
   onSaveStartView: () => void;
   onResetStartView: () => void;
   onMakeDefault: () => void;
+  /** Puts the fit test on the plate (fitTest.ts); the window closes for it. */
+  onMakeFitTest?: () => void;
   onClose: () => void;
 }) {
   const [defaultSaved, setDefaultSaved] = useState(false);
   // A default saved earlier or just now: what "Use my default" puts on this design (#754).
   const savedDefault = useMemo(() => readWorkspaceDefault(), [defaultSaved]);
   useLanguage();
+  const printerPlay = usePrinterPlay();
   const [activeSection, setActiveSection] = useState<WorkspaceSettingsSection>("appearance");
   const toolbarSize = useToolbarSize();
   const shapeColors = useShapeColors();
@@ -593,7 +602,9 @@ export function WorkspaceSettingsModal({
     depth: selectedShapeCustomization.depth ?? selectedShapeAppDefaults.depth,
     height: selectedShapeCustomization.height ?? selectedShapeAppDefaults.height,
   };
-  const selectedShapeSpecialFields = specialFieldsForShape(selectedShapeKind, selectedShapeEffectiveDimensions, selectedShapeCustomization);
+  const selectedShapeSpecialFields = specialFieldsForShape(selectedShapeKind, selectedShapeEffectiveDimensions, selectedShapeCustomization, printerPlay);
+  // The fields whose starting value comes from the fit test: their line says so instead of "App".
+  const selectedShapePlayStart = printerPlayShapeStart(selectedShapeKind, printerPlay) as Record<string, number | undefined>;
   // Breite und Tiefe eines Gewindes folgen dem Durchmesser; nur die Hoehe
   // laesst sich sinnvoll vorgeben. Ein Zylinder ist immer kreisrund, daher
   // nur ein Durchmesser- (= Breiten-)Feld statt Breite und Tiefe getrennt.
@@ -1326,6 +1337,7 @@ export function WorkspaceSettingsModal({
                         : t("workspace.printerInfo", { width: chosenPrinter.width, depth: chosenPrinter.depth, height: chosenPrinter.height })
                       : t("workspace.printerHint")}
                   </p>
+                  <PrinterPlaySetting onMakeFitTest={onMakeFitTest} />
                   <WorkspaceToggle
                     label={t("workspace.showPlateLabels")}
                     description={t("workspace.showPlateLabelsHint")}
@@ -1547,7 +1559,7 @@ export function WorkspaceSettingsModal({
                                     if (event.key === "Enter") event.currentTarget.blur();
                                   }}
                                 />
-                                <small>{t("workspace.appDefault", {
+                                <small>{t(selectedShapePlayStart[field.key] !== undefined ? "workspace.fitTestDefault" : "workspace.appDefault", {
                                     value: `${field.step === 1 ? Math.round(field.defaultValue) : Number(field.defaultValue.toFixed(workspace.accuracy))}${field.unit ? ` ${field.unit}` : ""}`,
                                   })}</small>
                               </label>
