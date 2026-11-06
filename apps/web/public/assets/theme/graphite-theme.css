@@ -1339,6 +1339,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .cable-channel-status.w
   color: #656565;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .split-connector-summary {
+  color: #515151;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .split-panel-error {
   color: #9f2730;
   background: #fff0f1;
@@ -6098,6 +6102,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .split-panel-target {
   color: #bfbfbf;
   background: #252525;
   border-color: #434343;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .split-connector-summary {
+  color: #bfbfbf;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-axis-control button.active,

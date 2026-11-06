@@ -3614,6 +3614,21 @@ html[data-theme="dark"] .cable-channel-status.warning {
   color: #867360;
 }
 
+/* Under the connectors' settings: how many fit, and why a cut face got none (Discussion #832). */
+.split-connector-summary {
+  display: grid;
+  gap: 3px;
+  margin-top: 10px;
+  color: #6d5133;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.split-connector-summary:empty {
+  display: none;
+}
+
 .split-panel-error {
   margin-top: 12px;
   padding: 8px 9px;
@@ -13873,6 +13888,10 @@ html[data-theme="dark"] .split-panel-target {
   color: #e7c896;
   background: #2a2015;
   border-color: #53412f;
+}
+
+html[data-theme="dark"] .split-connector-summary {
+  color: #e7c896;
 }
 
 html[data-theme="dark"] .split-axis-control button.active,

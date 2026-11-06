@@ -36,7 +36,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   holePattern: ["hole pattern", "perforate", "perforation", "perforated", "holes", "vent", "ventilation", "grille", "honeycomb", "hexagon holes", "slots", "lochmuster", "lochraster", "perforieren", "locher", "löcher", "loecher", "lüftung", "lueftung", "gitter", "wabe", "langloch", "luftschlitze"],
   faceTool: ["face", "push", "pull", "push pull", "extrude", "pad", "boss", "pocket", "recess", "thicken", "thicker", "wall", "inset", "flaeche", "fläche", "herausziehen", "hineinziehen", "tasche", "vertiefung", "aufdicken", "verdicken", "erhebung"],
   array: ["array", "pattern", "repeat", "muster", "reihe", "kreis", "wiederholen", "vervielfachen"],
-  split: ["split", "cut", "slice", "teilen", "schneiden", "trennen", "saegen", "sägen", "ebene"],
+  split: ["split", "cut", "slice", "teilen", "schneiden", "trennen", "saegen", "sägen", "ebene", "dowel", "dowels", "plug", "peg", "pin", "connector", "connectors", "dübel", "duebel", "zapfen", "passstift", "verbinder"],
   snap: ["snap", "grid", "raster", "einrasten", "gitter"],
   chamfer: ["chamfer", "chamfillet", "bevel", "fase", "abschraegen", "abschrägen", "kante", "afschuinen", "rand"],
   fillet: ["fillet", "round", "radius", "verrunden", "abrunden", "runden", "kante", "afronden", "rand", "concave", "scoop", "cove", "konkav", "hohlkehle", "auskehlen"],
