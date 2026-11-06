@@ -1,4 +1,4 @@
-import type { GridSize, ShapeKind, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { GridSize, GroupResizeMode, ShapeKind, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 export const LAYERLING_MCP_ROUTE = "/api/layerling-mcp";
 export const LAYERLING_MCP_STALE_MS = 15_000;
@@ -51,6 +51,8 @@ export type LayerlingMcpShapeSummary = {
    */
   settings?: Record<string, string | number | boolean>;
   groupedCount: number;
+  /** Groups and bundles: what the group does with its parts when it is resized (Discussion #526). */
+  groupResize?: GroupResizeMode;
   importedTriangles: number;
   cadDisplayEdgeCount: number | null;
   sketchPointCount: number;
@@ -144,6 +146,7 @@ export type LayerlingMcpCommandName =
   | "inspect_errors"
   | "estimate_print"
   | "check_clearance"
+  | "printer_play"
   | "check_print"
   | "add_reference_points"
   | "list_reference_points"

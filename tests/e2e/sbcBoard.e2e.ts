@@ -61,10 +61,18 @@ describe("the SBC board as a group", () => {
     expect(pcb.name).toBe("Board");
     expect(pcb.color).toBe(board.color);
     // A board without mounting holes is the plate itself, a plain box when its corners are square.
-    const pcbParts = pcb.groupedShapes?.length ? pcb.groupedShapes : [pcb];
+    // A board with corners rounded further is the cut plate and its quarter rounds beside it.
+    const rounds = board.outline?.round?.length ?? 0;
+    if (rounds > 0) expect(pcb.groupedShapes!.slice(1).map((part) => part.name)).toEqual(Array(rounds).fill("Corner"));
+    const plateShape = rounds > 0 ? pcb.groupedShapes![0] : pcb;
+    const pcbParts = plateShape.groupedShapes?.length ? plateShape.groupedShapes : [plateShape];
     expect(pcbParts.filter((part) => part.hole && part.kind === "cylinder")).toHaveLength(board.holes.length);
-    expect(pcbParts.filter((part) => !part.hole && part.kind === (board.cornerRadius > 0 ? "roundedBox" : "box"))).toHaveLength(1);
-    if (board.holes.length === 0) expect(pcb.groupedShapes ?? []).toEqual([]);
+    // The plate, and the pieces of its own outline (the UNO) added to it and cut from it.
+    expect(pcbParts.filter((part) => !part.hole && part.kind === (board.cornerRadius > 0 ? "roundedBox" : "box"))).toHaveLength(board.cornerRadius > 0 ? 1 : 1 + (board.outline?.add.length ?? 0));
+    // A corner rounded further has a square cut off the plate, where its quarter round goes.
+    expect(pcbParts.filter((part) => !part.hole)).toHaveLength(1 + (board.outline?.add.length ?? 0));
+    expect(pcbParts.filter((part) => part.hole && part.kind === "box")).toHaveLength((board.outline?.cut.length ?? 0) + (board.outline?.round?.length ?? 0));
+    if (board.holes.length === 0 && !board.outline) expect(pcb.groupedShapes ?? []).toEqual([]);
     expect(children.slice(1).map((child) => child.name)).toEqual(solids.map((solid) => solid.name));
     // A socket is a solid Port opening in its outline, everything else a box.
     children.slice(1).forEach((child, index) => {
@@ -105,6 +113,43 @@ describe("the SBC board as a group", () => {
     expect(power.z + shape.z).toBeGreaterThan(0);
     const ethernet = shape.groupedShapes!.find((child) => child.name === "Ethernet")!;
     expect(ethernet.x + shape.x).toBeGreaterThan(0);
+  });
+
+  it("gives the Arduino UNO the outline of Arduino's PCB file: the step, the 45° ends and the cut corner", async () => {
+    const board = SBC_BOARDS.arduinoUno;
+    const shape = await sbcBoardShape({ board: "arduinoUno", clearance: 0 }, LIMIT);
+    const pcb = shape.groupedShapes![0];
+    // The file's outline: 66.04 x 53.34 mm, three corners 1 mm round, the back right one cut 1.524 mm at 45°,
+    // and the step out to 68.58 mm from (66.04, 2.54) over (68.58, 5.08) and (68.58, 37.846) to (66.04, 40.386).
+    const area = 66.04 * 53.34 - 3 * (1 - Math.PI / 4) - 1.524 ** 2 / 2 + 2.54 * (37.846 - 2.54 + (37.846 - 5.08)) / 2 - 4 * Math.PI * 1.6 ** 2;
+    expect(meshVolume(pcb.importedMesh!.positions) / (area * board.thickness)).toBeCloseTo(1, 2);
+    expect(pcb.width).toBeCloseTo(68.58, 3);
+    expect(pcb.depth).toBeCloseTo(53.34, 3);
+    // The mounting holes in the step: where the file has them.
+    const extent = sbcBoardExtent(board, 0);
+    const midX = (extent.minX + extent.maxX) / 2;
+    const midY = (extent.minY + extent.maxY) / 2;
+    const holes = pcb.groupedShapes!.filter((part) => part.hole && part.kind === "cylinder");
+    const world = holes.map((hole) => [hole.x + pcb.x + shape.x, hole.z + pcb.z + shape.z]);
+    for (const [x, y] of board.holes) expect(world.some(([wx, wz]) => Math.abs(wx - (x - midX)) < 1e-3 && Math.abs(wz - (midY - y)) < 1e-3), `${x}, ${y}`).toBe(true);
+  });
+
+  it("gives the D1 mini the outline of Wemos's drawing: round antenna corners, the notch and its slant", async () => {
+    const board = SBC_BOARDS.wemosD1Mini;
+    const shape = await sbcBoardShape({ board: "wemosD1Mini", clearance: 0 }, LIMIT);
+    const pcb = shape.groupedShapes![0];
+    const area = 34.3 * 25.4 - (1 - Math.PI / 4) * (1 + 16 + 16 + 1) - 6.8 * 1.9 - (0.9 * 1.9) / 2;
+    expect(meshVolume(pcb.importedMesh!.positions) / (area * board.thickness)).toBeCloseTo(1, 2);
+    expect(pcb.width).toBeCloseTo(34.3, 3);
+    expect(pcb.depth).toBeCloseTo(25.4, 3);
+    // No mounting holes: the drawing's two beside the antenna are left out.
+    expect(pcb.groupedShapes![0].groupedShapes!.filter((part) => part.hole && part.kind === "cylinder")).toEqual([]);
+  });
+
+  it("cuts the Feather's holes each at its own diameter", async () => {
+    const shape = await sbcBoardShape({ board: "featherEsp32s3", clearance: 0 }, LIMIT);
+    const holes = shape.groupedShapes![0].groupedShapes!.filter((part) => part.hole);
+    expect(holes.map((hole) => hole.width).sort()).toEqual([2.2, 2.2, 2.5, 2.5]);
   });
 
   it("grows the edge connectors by the clearance and keeps the board as it is", async () => {

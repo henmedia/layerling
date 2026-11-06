@@ -39,6 +39,17 @@ Ook een hele groep kan een lichaam of een gat zijn. Daarbij geldt een eenvoudige
 - Bestaat de groep alleen uit lichamen (of alleen uit gaten), dan schakel je hem als geheel om en gaan de onderdelen mee.
 - Bevat hij allebei, bijvoorbeeld een blok met een boring, dan houdt elk onderdeel zijn eigen stand. De hele groep wordt dan gereedschap, maar de boring blijft een boring.
 
+### Een groep van formaat veranderen: gaten en kleine onderdelen behouden
+
+Maak je een groep langer, breder of hoger, dan rekken de onderdelen mee alsof ze op rubber getekend zijn: de ronde gaten in een plaat worden ovaal en schuiven naar binnen. Om ze te houden zoals ze zijn, kies je in de instellingen van de groep onder {{ui:inspector.groupResize}} voor {{ui:inspector.groupResizeKeepParts}}; zonder die keuze geldt {{ui:inspector.groupResizeStretch}}, zoals tot nu toe bij elke groep. Vanaf dan wordt de groep bij elke formaatwijziging - met de grepen, in de maatvelden of met {{ui:scalePercent.title}} - volgens één regel opnieuw uit zijn onderdelen opgebouwd, voor elke richting apart:
+
+- Een onderdeel dat over bijna de hele groep reikt, negen tiende of meer, groeit of krimpt mee en houdt zijn afstand tot beide zijden: de plaat zelf, een wand, of de binnenkant van een doos, waarvan de wanden even dik blijven.
+- Elk ander onderdeel houdt zijn eigen maat en zijn afstand tot de dichtstbijzijnde zijde. Een onderdeel in het midden blijft in het midden.
+
+Een plaat met een gat 5 mm van elke hoek en een sleuf in het midden, 40 mm langer gemaakt, houdt dus zijn gaten rond en 5 mm van de hoeken, en de sleuf in het midden. Er zit geen oplosser achter en je hoeft niets per onderdeel in te stellen: voor elk onderdeel geldt dezelfde regel, zodat je vooraf weet wat er gebeurt. Een gedraaid onderdeel telt met de doos die het in de groep inneemt en blijft gedraaid; een groep in de groep telt als één onderdeel. Terwijl je aan een greep trekt, rekt de groep als geheel; laat je los, dan wordt hij opnieuw opgebouwd, in dezelfde ongedaan-maakstap. Wordt de groep kleiner dan een onderdeel met zijn afstand nodig heeft, dan krimpt dat onderdeel zoals vroeger mee, en een melding zegt het. Een gespiegelde, taps toelopende of gedraaide groep, en een met eigen afrondingen, afschuiningen of een oppervlaktestructuur, rekt altijd alles uit. Kies je de instelling voor een groep die al uitgerekt is, dan legt hij zijn onderdelen meteen opnieuw neer.
+
+![Een plaat met een gat 5 mm van elke hoek en een sleuf in het midden, met ‘Gaten en kleine onderdelen behouden’ 40 mm langer gemaakt: de gaten zijn nog rond en 5 mm van de hoeken, de sleuf zit nog in het midden.](shot:group-keep-parts)
+
 ## Bundelen
 
 Soms moeten onderdelen alleen bij elkaar blijven zonder één te worden, bijvoorbeeld een wit logo op een zwarte plaat voor een meerkleurenprint. Daarvoor is {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), net als in Tinkercad. Een bundel verplaats, draai en schaal je als een vorm, maar er wordt niets samengevoegd:

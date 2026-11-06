@@ -39,6 +39,17 @@ Un groupe entier peut aussi être un solide ou un trou. Une règle simple s'appl
 - Si le groupe est constitué uniquement de solides (ou uniquement de trous), vous le permutez dans son ensemble et ses parties suivent.
 - S'il contient les deux, disons un cube avec un alésage, chaque partie garde son propre état. Le groupe tout entier devient alors un outil, mais l'ennui reste un ennui.
 
+### Redimensionner un groupe : garder trous et petites pièces
+
+Quand un groupe est allongé, élargi ou rehaussé, ses pièces s'étirent avec lui comme si elles étaient dessinées sur du caoutchouc : les trous ronds d'une plaque deviennent ovales et se rapprochent du centre. Pour les garder tels quels, choisissez {{ui:inspector.groupResizeKeepParts}} sous {{ui:inspector.groupResize}} dans les réglages du groupe ; {{ui:inspector.groupResizeStretch}} est ce que fait tout groupe tant que vous n'y changez rien. Dès lors, chaque fois que le groupe change de taille - avec les poignées, les champs de dimensions ou {{ui:scalePercent.title}} - il est reconstruit à partir de ses pièces selon une seule règle, direction par direction :
+
+- Une pièce qui traverse presque tout le groupe, neuf dixièmes ou plus, grandit ou rétrécit avec lui et garde sa distance aux deux côtés : la plaque elle-même, une paroi, ou l'intérieur d'une boîte, dont les parois gardent leur épaisseur.
+- Toute autre pièce garde sa propre taille et sa distance au côté le plus proche. Une pièce au milieu reste au milieu.
+
+Une plaque avec un trou à 5 mm de chaque coin et une fente au milieu, allongée de 40 mm, garde donc ses trous ronds et à 5 mm des coins, et la fente au milieu. Il n'y a pas de solveur de contraintes derrière, rien à régler pièce par pièce : la même règle vaut pour toutes les pièces, on sait d'avance ce qui va se passer. Une pièce tournée compte avec la boîte qu'elle occupe dans le groupe et reste tournée ; un groupe dans le groupe compte comme une seule pièce. Pendant que vous tirez une poignée, le groupe s'étire en entier ; quand vous relâchez, il est reconstruit, dans la même étape d'annulation. Si le groupe devient plus petit qu'une pièce avec sa distance, cette pièce rétrécit avec lui comme avant, et un message le signale. Un groupe mis en miroir, effilé ou tordu, ou qui porte ses propres congés, chanfreins ou une texture, étire toujours tout. Choisi pour un groupe déjà étiré, le réglage replace aussitôt ses pièces.
+
+![Une plaque avec un trou à 5 mm de chaque coin et une fente au milieu, allongée de 40 mm avec « Garder trous et petites pièces » : les trous sont toujours ronds et à 5 mm des coins, la fente toujours au milieu.](shot:group-keep-parts)
+
 ## Regroupement
 
 Parfois, les pièces doivent simplement rester ensemble sans ne former qu'une seule pièce – un logo blanc sur une plaque noire pour une impression multicolore, par exemple. C'est à cela que sert {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), comme dans Tinkercad. Un bundle bouge, tourne et se redimensionne comme une forme, mais rien n'est fusionné :

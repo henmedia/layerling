@@ -39,6 +39,17 @@ Tudi cela skupina je lahko telo ali luknja. Pri tem velja preprosto pravilo:
 - Če skupina vsebuje samo telesa (ali samo luknje), jo preklopiš kot celoto in njeni deli gredo zraven.
 - Če vsebuje oboje, na primer kocko z izvrtino, vsak del obdrži svoje stanje. Cela skupina potem postane orodje, a izvrtina ostane izvrtina.
 
+### Spreminjanje velikosti skupine: luknje in majhni deli ostanejo
+
+Ko skupino podaljšaš, razširiš ali zvišaš, se njeni deli raztegnejo z njo, kot bi bili narisani na gumi: okrogle luknje v plošči postanejo ovalne in se pomaknejo navznoter. Da ostanejo take, kot so, v nastavitvah skupine pri {{ui:inspector.groupResize}} izberi {{ui:inspector.groupResizeKeepParts}}; brez te izbire velja {{ui:inspector.groupResizeStretch}}, kot doslej pri vsaki skupini. Odtlej se skupina ob vsaki spremembi velikosti - z ročaji, v poljih za mere ali s {{ui:scalePercent.title}} - znova sestavi iz svojih delov po enem samem pravilu, za vsako smer posebej:
+
+- Del, ki sega skoraj čez vso skupino, devet desetin ali več, raste ali se krči z njo in ohrani razdaljo do obeh stranic: sama plošča, stena ali notranjost škatle, katere stene ostanejo enako debele.
+- Vsak drug del ohrani svojo velikost in razdaljo do bližje stranice. Del na sredini ostane na sredini.
+
+Plošča z luknjo 5 mm od vsakega vogala in utorom na sredini, podaljšana za 40 mm, tako obdrži luknje okrogle in 5 mm od vogalov ter utor na sredini. Za tem ni nobenega reševalnika omejitev in ničesar ti ni treba nastavljati del za delom: za vse dele velja isto pravilo, zato vnaprej veš, kaj se bo zgodilo. Zavrten del šteje s kvadrom, ki ga zavzema v skupini, in ostane zavrten; skupina v skupini šteje kot en del. Medtem ko vlečeš ročaj, se skupina raztegne kot celota; ko spustiš, se znova sestavi, v istem koraku razveljavitve. Če skupino zmanjšaš pod to, kar del s svojo razdaljo potrebuje, se ta del kot doslej skrči z njo in sporočilo te na to opozori. Zrcaljena, zožena ali zasukana skupina in skupina z lastnimi zaokrožitvami, posnetji ali teksturo vedno raztegne vse. Če nastavitev izbereš za skupino, ki je že raztegnjena, se njeni deli takoj znova razporedijo.
+
+![Plošča z luknjo 5 mm od vsakega vogala in utorom na sredini, z izbiro »Ohrani luknje in majhne dele« podaljšana za 40 mm: luknje so še vedno okrogle in 5 mm od vogalov, utor je še vedno na sredini.](shot:group-keep-parts)
+
 ## Povezovanje v sveženj
 
 Včasih naj deli samo ostanejo skupaj, ne da bi postali eno – na primer bel logotip na črni plošči za večbarvni tisk. Za to je {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]), kot v Tinkercadu. Sveženj lahko premikaš, vrtiš in mu spreminjaš velikost kot obliki, a nič se ne izračuna:
