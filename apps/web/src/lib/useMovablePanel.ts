@@ -31,6 +31,13 @@ export type MovablePanelOptions = {
   handleIgnores?: string;
   /** The whole panel stays inside the area, not only its title bar - for a bar of buttons, where a hidden button is lost. */
   keepInside?: boolean;
+  /**
+   * A bar lying over the top of the area that the panel's top stays below. The shape library hangs from the toolbar
+   * and moves in the whole editor: dragged up past the toolbar, its title bar slipped under it and could not be
+   * grabbed again, and the remembered spot brought it back there every time (#1418). A spot remembered up there is
+   * pulled back below the bar when the panel opens.
+   */
+  below?: (panel: HTMLElement) => HTMLElement | null;
 };
 
 /** Where the panel stands in its area, and what that means for its own offset parent. */
@@ -44,7 +51,7 @@ type Placement = { position: PanelPosition; origin: PanelPosition; scale: number
  * docks it again. Spread `handleProps` on the title bar, put `panelRef` and
  * `style` on the panel.
  */
-export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageKey: string, { floatingStyle, dockedAt, area, handleIgnores = NOT_A_HANDLE, keepInside = false }: MovablePanelOptions = {}) {
+export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageKey: string, { floatingStyle, dockedAt, area, handleIgnores = NOT_A_HANDLE, keepInside = false, below }: MovablePanelOptions = {}) {
   const panelRef = useRef<T>(null);
   const [placement, setPlacement] = useState<Placement | null>(null);
   const placementRef = useRef(placement);
@@ -55,6 +62,8 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
   const [dragging, setDragging] = useState(false);
   const areaRef = useRef(area);
   areaRef.current = area;
+  const belowRef = useRef(below);
+  belowRef.current = below;
 
   /**
    * The area, where the panel stands in it, and where the corner its own
@@ -108,7 +117,9 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
     const measured = measure();
     if (!measured) return null;
     const { panel, area: areaElement, origin, scale } = measured;
-    const position = clampPanelPosition(next, { width: screenWidth ?? panel.offsetWidth * scale, height: keepInside ? panel.getBoundingClientRect().height : undefined }, { width: areaElement.clientWidth, height: areaElement.clientHeight });
+    const bar = belowRef.current?.(panel);
+    const minTop = bar ? bar.getBoundingClientRect().bottom - (areaElement.getBoundingClientRect().top + areaElement.clientTop) : 0;
+    const position = clampPanelPosition(next, { width: screenWidth ?? panel.offsetWidth * scale, height: keepInside ? panel.getBoundingClientRect().height : undefined }, { width: areaElement.clientWidth, height: areaElement.clientHeight }, minTop);
     return { position, origin, scale, areaHeight: areaElement.clientHeight };
   }, [measure, keepInside]);
 
