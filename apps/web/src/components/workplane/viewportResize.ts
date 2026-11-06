@@ -674,8 +674,11 @@ export function scaleSelectionItems(
       .add(frame.xAxis.clone().multiplyScalar(localCenter.x * nextX.scale))
       .add(frame.yAxis.clone().multiplyScalar(localCenter.y))
       .add(frame.zAxis.clone().multiplyScalar(localCenter.z * nextZ.scale));
-    const width = snapDimension(shapeWidth(item.startShape) * Math.abs(nextX.scale), step, MIN_SHAPE_SIZE, maxSize);
-    const depth = snapDimension(shapeDepth(item.startShape) * Math.abs(nextZ.scale), step, MIN_SHAPE_SIZE, maxSize);
+    // Only the selection as a whole lies on the grid. A body of several is not snapped on its own: each would round
+    // to a different factor and the layers of an imported drawing no longer fitted into one another (Discussion #1416).
+    const sized = (size: number) => (items.length === 1 ? snapDimension(size, step, MIN_SHAPE_SIZE, maxSize) : clamp(size, MIN_SHAPE_SIZE, maxSize));
+    const width = sized(shapeWidth(item.startShape) * Math.abs(nextX.scale));
+    const depth = sized(shapeDepth(item.startShape) * Math.abs(nextZ.scale));
     const actualScaleX = width / Math.max(MIN_SHAPE_SIZE, shapeWidth(item.startShape));
     const actualScaleZ = depth / Math.max(MIN_SHAPE_SIZE, shapeDepth(item.startShape));
     const patch = {
