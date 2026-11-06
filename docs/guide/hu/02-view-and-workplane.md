@@ -196,6 +196,8 @@ Ugyanitt a {{ui:workspace.customSnapGrids}} alatt saját illesztési lépéseket
 
 A(z) {{ui:workspace.printer}} a munkasíkot a nyomtatód tárgyasztalához igazítja, és megjelöli azokat a testeket, amelyek túlnyúlnak rajta, lásd [Nyomtatás](chapter:printing). A(z) {{ui:workspace.showPlateLabels}} ráírja a tárgyasztalra a terv nevét, kiválasztott nyomtatónál pedig annak nevét és nyomtatási terét is.
 
+A(z) {{ui:workspace.printerPlay}} az az oldalankénti hely, amelyre egy nyomtatott csapnak szüksége van, hogy a nyomtatódon nyomtatott furatban forogjon. A(z) {{ui:workspace.fitTestMake}} a tárgyasztalra teszi az illesztési próbát, amely ezt méri; az új fedelek, fecskefarkak, pattintós kampók, anyák és a hézagellenőrzés ezután ebből indulnak, lásd [Nyomtatás](chapter:printing). Ebben a böngészőben marad, nem a tervben.
+
 A(z) {{ui:workspace.size}} saját méretet ad a tárgyasztalnak, {{ui:workspace.width}} és {{ui:workspace.length}} milliméterben vagy a választott mértékegységben. A rács mindig átmegy az origón, így az erősebb vonalak a tengelyeken vannak, bármekkora is a tárgyasztal.
 
 ### Munkasík: rács

@@ -157,6 +157,22 @@ describe("layerling .lyl project packages", () => {
     expect(restored.shapes.map((entry) => entry.multicolor)).toEqual([false, true]);
   });
 
+  it("keeps what a group does with its parts when it is resized, and refuses another word (#526)", async () => {
+    const keeping = shape("box", "group-1", { groupResize: "keepParts" });
+    const stretching = shape("box", "group-2");
+    const bytes = await exportLylProject(input([keeping, stretching]));
+    const restored = await importLylProject(bytes);
+    expect(restored.shapes.map((entry) => entry.groupResize)).toEqual(["keepParts", undefined]);
+    const broken = mutateProject(bytes, (document) => {
+      expect(JSON.stringify(document)).toContain("keepParts");
+      document.states.forEach((state) => state.nodes.forEach((node) => {
+        const definition = node.definition as Record<string, unknown>;
+        if (definition.groupResize) definition.groupResize = "sideways";
+      }));
+    });
+    await expect(importLylProject(broken)).rejects.toThrow(/groupResize/);
+  });
+
   it("loads an old cylinder with mismatched width and depth as circular instead of refusing it", async () => {
     const legacyCylinder = shape("cylinder", "legacy-cylinder", { width: 24, depth: 15 });
     const exported = await exportLylProject(input([legacyCylinder]));

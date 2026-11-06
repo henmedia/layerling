@@ -43,7 +43,9 @@ import {
   type LidOptions,
 } from "@/lib/lidTool";
 import { numberLocale, t } from "@/lib/i18n";
+import { fromPrinterPlay } from "@/lib/printerPlay";
 import { useLanguage } from "@/lib/useLanguage";
+import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 /**
@@ -74,6 +76,8 @@ export function LidPanel({
   onCancel: () => void;
 }) {
   useLanguage();
+  // The gap and the pin's play say when they are still what the printer's play gave them (printerPlay.ts).
+  const printerPlay = usePrinterPlay();
   const title = t("lid.title");
   // A magnet needs its pocket and a skin above it in the plate: a thinner plate is made thick enough for it.
   // Raised, it says so under the plate's thickness until that is set by hand; set thinner by hand, it says what is needed.
@@ -184,6 +188,7 @@ export function LidPanel({
           disabled={busy}
           onChange={(value) => onChange({ gap: value })}
         />
+        {fromPrinterPlay("lid.gap", settings.gap, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
         <EdgeModifierSlider
           label={t(settings.type === "cap" ? "lid.depthCap" : settings.type === "both" ? "lid.depthBoth" : "lid.depth")}
           value={settings.depth}
@@ -348,6 +353,7 @@ export function LidPanel({
           disabled={busy}
           onChange={(value) => onChange({ hingePinPlay: value })}
         />
+        {fromPrinterPlay("lid.hingePinPlay", settings.hingePinPlay, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
         {/* The play is only in the lid's holes: in the body's the pin sits tight, so it does not slide out (#1220). */}
         <span className="shell-openings-summary">{t("lid.hingePinPlayHint")}</span>
         {/* A pivot lid turns on two pins and has no knuckles to count. */}

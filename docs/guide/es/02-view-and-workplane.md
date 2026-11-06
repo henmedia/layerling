@@ -198,6 +198,8 @@ En {{ui:workspace.customSnapGrids}}, en ese mismo sitio, añades pasos de ajuste
 
 {{ui:workspace.printer}} adapta el plano de trabajo a la cama de tu impresora y señala los cuerpos que se salen de ella; consulta [Impresión](chapter:printing). {{ui:workspace.showPlateLabels}} escribe en la placa el nombre del diseño y, si has elegido una impresora, su nombre y su volumen de impresión.
 
+{{ui:workspace.printerPlay}} es la holgura por lado que necesita un pasador impreso para girar en un agujero impreso en tu impresora. {{ui:workspace.fitTestMake}} pone en la cama la prueba de ajuste que la mide; las nuevas tapas, colas de milano, clips, tuercas y la comprobación de holguras empiezan entonces con ella, consulta [Impresión](chapter:printing). Se guarda en este navegador, no en el diseño.
+
 {{ui:workspace.size}} da a la placa un tamaño propio, con {{ui:workspace.width}} y {{ui:workspace.length}} en milímetros o en la unidad que hayas elegido. La cuadrícula siempre pasa por el origen, así que las líneas más marcadas caen sobre los ejes, mida lo que mida la placa.
 
 ### Plano de trabajo: cuadrícula

@@ -6,8 +6,10 @@ import {
   SBC_BOARDS,
   normalizeSbcBoardSettings,
   sbcBoardSolids,
+  sbcHoleDiameter,
   sbcSolidsExtent,
   type SbcBoardSettings,
+  type SbcOutlinePiece,
   type SbcSolid,
   type SbcSolidRole,
 } from "@/lib/sbcBoards";
@@ -80,23 +82,55 @@ export async function sbcBoardShape(input: SbcBoardSettings, triangleLimit: numb
   const toX = (x: number) => x - midX;
   const toZ = (y: number) => midY - y;
 
-  // Square corners (the ESP32 boards) make a plain box.
-  const plateAt = { x: toX(board.width / 2), z: toZ(board.depth / 2), elevation: 0 };
-  const plateSize = { width: board.width, depth: board.depth, height: board.thickness };
+  // Square corners (the ESP32 boards) make a plain box; a board with its own outline (the UNO) a narrower plate.
+  const plateWidth = board.outline?.plateWidth ?? board.width;
+  const plateAt = { x: toX(plateWidth / 2), z: toZ(board.depth / 2), elevation: 0 };
+  const plateSize = { width: plateWidth, depth: board.depth, height: board.thickness };
   const plate = board.cornerRadius > 0
     ? makeShapeFromAsset(asset("roundedBox"), plateAt, { ...plateSize, cornerFillet: board.cornerRadius, topBottomFillet: 0 })
     : makeShapeFromAsset(asset("box"), plateAt, plateSize);
-  const holes = board.holes.map(([hx, hy]) => makeShapeFromAsset(asset("cylinder"), { x: toX(hx), z: toZ(hy), elevation: -HOLE_OVERSHOOT }, {
-    width: board.holeDiameter,
-    depth: board.holeDiameter,
+  // The outline's pieces: added as solids, cut as holes through the board like the mounting holes.
+  const piece = (entry: SbcOutlinePiece, overshoot: number) => ({
+    ...makeShapeFromAsset(asset("box"), { x: toX(entry.x), z: toZ(entry.y), elevation: -overshoot }, { width: entry.width, depth: entry.depth, height: board.thickness + 2 * overshoot }),
+    rotation: entry.turn ?? 0,
+  });
+  const added = (board.outline?.add ?? []).map((entry) => ({ ...piece(entry, 0), color: board.color }));
+  const cuts: WorkplaneShape[] = (board.outline?.cut ?? []).map((entry) => ({ ...piece(entry, HOLE_OVERSHOOT), hole: true }));
+  // A corner rounded further: the square from the corner in by the radius cut off the plate, and the
+  // quarter of a round put back in its place - a round less the two halves away from the corner, a
+  // body of its own beside the plate, so the two never overlap.
+  const rounds: WorkplaneShape[] = [];
+  for (const corner of board.outline?.round ?? []) {
+    const inX = corner.x < plateWidth / 2 ? 1 : -1;
+    const inY = corner.y < board.depth / 2 ? 1 : -1;
+    const r = corner.radius;
+    const middle = { x: corner.x + inX * r, y: corner.y + inY * r };
+    const square = (x0: number, x1: number, y0: number, y1: number, overshoot: number) => makeShapeFromAsset(asset("box"), { x: toX((x0 + x1) / 2), z: toZ((y0 + y1) / 2), elevation: -overshoot }, { width: Math.abs(x1 - x0), depth: Math.abs(y1 - y0), height: board.thickness + 2 * overshoot });
+    cuts.push({ ...square(corner.x - inX * HOLE_OVERSHOOT, middle.x, corner.y - inY * HOLE_OVERSHOOT, middle.y, HOLE_OVERSHOOT), hole: true });
+    const round = makeShapeFromAsset(asset("cylinder"), { x: toX(middle.x), z: toZ(middle.y), elevation: 0 }, { width: 2 * r, depth: 2 * r, height: board.thickness });
+    const awayX = { ...square(middle.x, middle.x + inX * (r + 1), middle.y - r - 1, middle.y + r + 1, HOLE_OVERSHOOT), hole: true };
+    const awayY = { ...square(middle.x - r - 1, middle.x + r + 1, middle.y, middle.y + inY * (r + 1), HOLE_OVERSHOOT), hole: true };
+    const quarter = await buildGroupedShapeFromSelection([{ ...round, color: board.color }, awayX, awayY], triangleLimit);
+    if (!quarter.group) throw new Error(quarter.failureNotice || t("sbcBoard.failed"));
+    rounds.push(canonicalizeShape({ ...quarter.group, id: createLocalId("sbc-corner"), name: "Corner", color: board.color, groupOperation: "group" }));
+  }
+  const holes = board.holes.map((hole) => makeShapeFromAsset(asset("cylinder"), { x: toX(hole[0]), z: toZ(hole[1]), elevation: -HOLE_OVERSHOOT }, {
+    width: sbcHoleDiameter(board, hole),
+    depth: sbcHoleDiameter(board, hole),
     height: board.thickness + 2 * HOLE_OVERSHOOT,
   })).map((hole) => ({ ...hole, hole: true }));
   // A board without mounting holes (the ESP32 boards) is the plate itself; there is nothing to cut.
   let pcb: WorkplaneShape;
-  if (holes.length > 0) {
-    const drilled = await buildGroupedShapeFromSelection([{ ...plate, color: board.color }, ...holes], triangleLimit);
+  if (holes.length > 0 || added.length > 0 || cuts.length > 0) {
+    const drilled = await buildGroupedShapeFromSelection([{ ...plate, color: board.color }, ...added, ...cuts, ...holes], triangleLimit);
     if (!drilled.group) throw new Error(drilled.failureNotice || t("sbcBoard.failed"));
     pcb = canonicalizeShape({ ...drilled.group, id: createLocalId("sbc-pcb"), name: "Board", color: board.color, groupOperation: "group" });
+    // The quarter rounds beside the cut plate, outside its cuts: the board is the two together.
+    if (rounds.length > 0) {
+      const whole = await buildGroupedShapeFromSelection([{ ...pcb, name: "Plate" }, ...rounds], triangleLimit);
+      if (!whole.group) throw new Error(whole.failureNotice || t("sbcBoard.failed"));
+      pcb = canonicalizeShape({ ...whole.group, id: createLocalId("sbc-pcb"), name: "Board", color: board.color, groupOperation: "group" });
+    }
   } else {
     pcb = canonicalizeShape({ ...plate, id: createLocalId("sbc-pcb"), name: "Board", color: board.color });
   }

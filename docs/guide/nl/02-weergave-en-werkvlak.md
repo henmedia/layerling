@@ -198,6 +198,8 @@ Onder {{ui:workspace.customSnapGrids}} op dezelfde plek voeg je eigen snapstappe
 
 {{ui:workspace.printer}} maakt het werkvlak zo groot als de bouwplaat van je printer en markeert lichamen die erbuiten steken, zie [Printen](chapter:printen). {{ui:workspace.showPlateLabels}} schrijft de naam van het ontwerp op de plaat, en de naam en het bouwvolume van de printer als er een printer gekozen is.
 
+{{ui:workspace.printerPlay}} is de ruimte per kant die een geprinte pen nodig heeft om in een geprint gat van je printer te draaien. {{ui:workspace.fitTestMake}} legt de pastest die hem meet op de plaat; nieuwe deksels, zwaluwstaarten, klikhaken, moeren en de spelingcontrole beginnen er dan mee, zie [Printen](chapter:printen). Hij blijft in deze browser, niet in het ontwerp.
+
 {{ui:workspace.size}} geeft de plaat een eigen grootte, met {{ui:workspace.width}} en {{ui:workspace.length}} in millimeters of de eenheid die je koos. Het raster loopt altijd door de oorsprong, zodat de sterkere lijnen op de assen liggen, hoe groot de plaat ook is.
 
 ### Werkvlak: raster

@@ -202,6 +202,8 @@ Under {{ui:workspace.customSnapGrids}} samme sted tilføjer du dine egne snap-tr
 
 {{ui:workspace.printer}} tilpasser arbejdsplanet til din printers byggeplade og markerer legemer der rækker ud over den, se [Printning](chapter:printing). {{ui:workspace.showPlateLabels}} skriver designets navn på pladen, og printerens navn og byggevolumen når der er valgt en printer.
 
+{{ui:workspace.printerPlay}} er den plads pr. side, en printet stift har brug for for at dreje i et printet hul på din printer. {{ui:workspace.fitTestMake}} lægger pasprøven, der måler det, på pladen; nye låg, svalehaler, snaplåse, møtrikker og tjek af spillerum starter så med det, se [Printning](chapter:printing). Det gemmes i denne browser, ikke i designet.
+
 {{ui:workspace.size}} giver pladen en størrelse af din egen, med {{ui:workspace.width}} og {{ui:workspace.length}} i millimeter eller den enhed du valgte. Gitteret løber altid gennem nulpunktet, så de stærkere linjer ligger på akserne uanset pladens mål.
 
 ### Arbejdsplan: gitter

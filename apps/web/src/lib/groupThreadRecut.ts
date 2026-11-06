@@ -1,6 +1,6 @@
 import { restoreGroupedChildren } from "@/lib/editorBooleans";
 import { localGroupBounds } from "@/lib/editorMeshCore";
-import { groupedContentScale } from "@/lib/groupScale";
+import { groupedContentScale, groupKeepsPartsOnResize } from "@/lib/groupScale";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /** A group stretched by less than this along every axis counts as its own size. */
@@ -21,6 +21,8 @@ export function groupNeedsThreadRecut(shape: WorkplaneShape): boolean {
   // Only a plain group is cut as Group cuts it; an intersection, a hull or a loft is made another way.
   if (!parts?.length || (shape.groupOperation && shape.groupOperation !== "group") || shape.locked) return false;
   if (shape.edgeTreatments?.length || shape.surfaceTexture) return false;
+  // A group that keeps its holes and small parts is built again from its parts anyway, its threads as chosen (#526).
+  if (groupKeepsPartsOnResize(shape)) return false;
   if (!holdsThread(parts)) return false;
   const stretch = groupedContentScale(shape, localGroupBounds(parts));
   return stretch.some((value) => Math.abs(value - 1) > STRETCH_TOLERANCE);
@@ -34,25 +36,30 @@ export function groupNeedsThreadRecut(shape: WorkplaneShape): boolean {
 export function threadRecutParts(shape: WorkplaneShape): WorkplaneShape[] {
   const children = shape.groupedShapes ?? [];
   const restored = restoreGroupedChildren({ ...shape, rotation: 0, rotationX: 0, rotationZ: 0, mirrorX: false, mirrorY: false, mirrorZ: false });
-  return restored.map((part, index) => {
-    const original = children[index];
-    if (part.kind !== "thread" || original?.kind !== "thread") return part;
-    // Ungroup also scales the thread's depth, chamfers and head with the stretch; here all of it stays as it was chosen.
-    return {
-      ...original,
-      id: part.id,
-      x: part.x,
-      z: part.z,
-      elevation: part.elevation,
-      height: part.height,
-      rotation: part.rotation,
-      rotationX: part.rotationX,
-      rotationZ: part.rotationZ,
-      mirrorX: part.mirrorX,
-      mirrorY: part.mirrorY,
-      mirrorZ: part.mirrorZ,
-    };
-  });
+  return restored.map((part, index) => threadAsChosen(part, children[index]));
+}
+
+/**
+ * A thread of a group as Ungroup gives it (`part`), with everything it was given in the group (`original`) back:
+ * Ungroup also scales the thread's depth, chamfers and head with the stretch; here all of it stays as it was
+ * chosen, and only its place, turn and length come from `part`. Any other part comes back as it is.
+ */
+export function threadAsChosen(part: WorkplaneShape, original: WorkplaneShape | undefined): WorkplaneShape {
+  if (part.kind !== "thread" || original?.kind !== "thread") return part;
+  return {
+    ...original,
+    id: part.id,
+    x: part.x,
+    z: part.z,
+    elevation: part.elevation,
+    height: part.height,
+    rotation: part.rotation,
+    rotationX: part.rotationX,
+    rotationZ: part.rotationZ,
+    mirrorX: part.mirrorX,
+    mirrorY: part.mirrorY,
+    mirrorZ: part.mirrorZ,
+  };
 }
 
 /**

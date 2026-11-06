@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { createShapeObject, updateShapeObjectTransform } from "@/components/workplane/viewportShapeObjects";
 import { RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { pickModelTapeCandidate, tapeCentresNear, tapeMeshFaces, tapeRimOpen } from "@/components/workplane/viewportTape";
-import { syncTapeOverlay, TapeOverlay, tapeMovableShapeId, tapePointWorld, type TapeModel, type TapeOverlayState, type ThreeState } from "@/components/workplane/ViewportOverlays";
+import { syncTapeOverlay, TapeOverlay, tapeLengthMoverOf, tapePointWorld, type TapeModel, type TapeOverlayState, type ThreeState } from "@/components/workplane/ViewportOverlays";
 import { planarFaces } from "@/lib/faceCentre";
 import { tapeLengthShift } from "@/lib/tapeCircle";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -306,7 +306,7 @@ describe("the tape measure snaps to centres (Discussion #610)", () => {
       startPointId: null,
       hover: null,
     };
-    expect(tapeMovableShapeId(model, "tape-segment-3", [])).toBe("pin");
+    expect(tapeLengthMoverOf(model, "tape-segment-3", { shapes, selectedIds: [] })).toEqual({ shapeId: "pin", movesEnd: true });
     const shift = tapeLengthShift(tapePointWorld(state, model.points[0]), tapePointWorld(state, model.points[1]), 25, true)!;
     // What the field does with the typed length: the pin goes along the line, up or down as well.
     const pin = shapes[1];

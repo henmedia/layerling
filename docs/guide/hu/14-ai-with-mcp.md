@@ -134,6 +134,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_show_overhangs` | be- vagy kikapcsolja a túlnyúlások sraffozását, beállítja a szöget, és minden testnél megadja azt a területet, amelyhez támasz kellene |
 | `layerling_estimate_print` | megbecsüli a térfogatot, a tömeget és a filamentet a kijelöléshez vagy a teljes tervhez: tömör testre, és durva becslésként falakkal és kitöltéssel, mint az exportálási ablak |
 | `layerling_check_clearance` | nyomtatás előtt ellenőrzi, mely alkatrészek fedik át egymást, érnek össze vagy kerülnek közelebb egy minimális hézagnál, egy objektum különálló részeit is |
+| `layerling_printer_play` | kiolvassa, beállítja vagy törli a nyomtató hézagát ({{ui:workspace.printerPlay}} a beállításokban), és elhelyezi az illesztési próbát, amely ezt méri |
 | `layerling_check_print` | nyomtatás előtt ellenőrzi, mi romlana el: a fúvókához túl vékony falak, lebegő alkatrészek, kevés érintkezés a tálcával, túlnyúlások és nyitott hálók |
 | `layerling_add_reference_points` | referenciapontokat jelöl meg – objektumok középpontján, sarkain vagy élfelezőin, vagy pontos helyeken –, amelyekhez az alakzatok illeszkednek |
 | `layerling_list_reference_points` | felsorolja a referenciapontokat az azonosítójukkal és a helyzetükkel |

@@ -64,6 +64,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { heightWithFaceOnGrid, liftDeltaOnGrid, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { projectThumbnailDimensions } from "@/lib/projectThumbnail";
 import { displayShapeName, makeShapeFromAsset, parseDroppedShapeAsset } from "@/lib/shapeCatalog";
+import { getPrinterPlay, withPrinterPlay } from "@/lib/printerPlay";
 import { planarFaceCentre } from "@/lib/faceCentre";
 import { scaledHorizontalShapePatch } from "@/lib/scaleByPercent";
 import { displayYTurn, insideZ } from "@/lib/displayAxes";
@@ -183,6 +184,8 @@ type WorkplaneViewportProps = {
   onCarryDrop?: (target: { point: PlacementPoint; normal: PlacementPoint; workplane: PlacementWorkplane; sunk?: boolean }) => void;
   /** A custom shape dropped on the workplane, by its id. */
   onDropMyShape?: (id: string, point: PlacementPoint) => void;
+  /** Places the fit test that measures the printer's play (fitTest.ts), from the button in the settings window. */
+  onMakeFitTest?: () => void;
   /** Shape following the cursor until a click drops it. Null places immediately. */
   cruiseAsset?: ShapeAsset | null;
   /** Puts down the shape on the pointer when a tool here takes over the click. */
@@ -1483,6 +1486,7 @@ export function WorkplaneViewport({
   workspaceSettingsKey,
   onAddShape,
   onDropMyShape,
+  onMakeFitTest,
   cruiseAsset = null,
   carryIds = null,
   onCarryDrop,
@@ -3625,7 +3629,8 @@ export function WorkplaneViewport({
     }
     const state = threeRef.current;
     if (!state) return;
-    const customization = workspaceRef.current.shapeCustomizations[cruiseAsset.kind];
+    // As the shape will be made when it is put down: the saved defaults, and the printer's play where they say nothing.
+    const customization = withPrinterPlay(cruiseAsset.kind, workspaceRef.current.shapeCustomizations[cruiseAsset.kind], getPrinterPlay());
     const base = makeShapeFromAsset(cruiseAsset, undefined, customization);
     const workplane = placementWorkplaneRef.current;
     const placed = {
@@ -8935,6 +8940,11 @@ export function WorkplaneViewport({
           onSaveStartView={saveStartView}
           onResetStartView={resetStartView}
           onMakeDefault={makeWorkspaceDefault}
+          onMakeFitTest={onMakeFitTest ? () => {
+            // The window closes so the piece can be seen on the plate, selected.
+            setSettingsOpen(false);
+            onMakeFitTest();
+          } : undefined}
           onClose={() => setSettingsOpen(false)}
         />
       ) : null}
