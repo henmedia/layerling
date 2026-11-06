@@ -60,7 +60,7 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）印表機以及 Anycubic Predat
 
 依它擺放的樣子列印，然後把銷釘有倒角的一端朝前，從最緊的孔開始依序插入。**銷釘仍能轉動的最緊的那個孔**就是你的印表機的間隙。在{{ui:workspace.printerPlay}}中輸入這個數字，或在輸入框下方的數值中點選它。間隙以每側計，單位為公釐，瀏覽器會為所有設計保存它；輸入框空白表示尚未測量。
 
-從此以後，新的使用都會以這個間隙而不是內建數值為起點：{{ui:editor.tool.lid}}工具中的{{ui:lid.gap}}和{{ui:lid.hingePinPlay}}，新建{{ui:shape.dovetail}}和{{ui:shape.snapFit}}的間隙，新建螺帽或螺紋孔的{{ui:prop.clearance}}——取間隙的兩倍，因為它是整個直徑上的餘量——以及{{ui:editor.tool.clearance}}中的{{ui:clearance.threshold}}。只要這樣的欄位仍保持該數值，旁邊的「{{ui:printerPlay.fromFitTest}}」就會說明這個數字的來源。一體列印的鉸鏈和{{ui:editor.tool.flexi}}工具的關節保持 0.4 mm：一體列印時，它們的縫隙在層與層之間也必須保持開啟，而單獨列印的銷釘量不出這一點。壓入磁鐵或 Gridfinity 鍵的餘量，以及為買來的插座或電路板留的餘量，也都保持各自的數值。設計中已有的實體永遠不會改變，你開啟的設計也不會。
+從此以後，新的使用都會以這個間隙而不是內建數值為起點：{{ui:editor.tool.lid}}工具中的{{ui:lid.gap}}和{{ui:lid.hingePinPlay}}，新建{{ui:shape.dovetail}}和{{ui:shape.snapFit}}的間隙，新建螺帽或螺紋孔的{{ui:prop.clearance}}——取間隙的兩倍，因為它是整個直徑上的餘量——以及{{ui:editor.tool.clearance}}中的{{ui:clearance.threshold}}。{{ui:editor.tool.split}}中銷釘和凸柱的{{ui:split.connectorClearance}}也是如此。只要這樣的欄位仍保持該數值，旁邊的「{{ui:printerPlay.fromFitTest}}」就會說明這個數字的來源。一體列印的鉸鏈和{{ui:editor.tool.flexi}}工具的關節保持 0.4 mm：一體列印時，它們的縫隙在層與層之間也必須保持開啟，而單獨列印的銷釘量不出這一點。壓入磁鐵或 Gridfinity 鍵的餘量，以及為買來的插座或電路板留的餘量，也都保持各自的數值。設計中已有的實體永遠不會改變，你開啟的設計也不會。
 
 ## 檢查列印
 

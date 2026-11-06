@@ -14,7 +14,8 @@ import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
-import { dropSplitSlivers, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { applySplitConnectors, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally } from "@/lib/splitConnectors";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { canonicalizeShape, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, mirrorSign, normalizeDegrees, resizedImportedCoordinates, resizedShapeSize, shapeDepth, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth, withHoleMode } from "@/lib/workplaneShapes";
@@ -836,40 +837,72 @@ function shapesToManifoldUnion(runtime: ManifoldToplevel, shapes: WorkplaneShape
   return union.status() === "NoError" && union.numTri() > 0 ? union : null;
 }
 
-export async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<ModelSplitPlane, "axis" | "normal" | "position">) {
+type SplitPlaneArgs = Pick<ModelSplitPlane, "axis" | "normal" | "position">;
+
+/**
+ * The two halves of a shape's solid, cut by the plane with the skins of no thickness dropped, and the solid they were cut
+ * from; or why there are none. What it makes goes into `created`, for the caller to free.
+ */
+async function splitShapeHalves(shape: WorkplaneShape, plane: SplitPlaneArgs, created: ManifoldSolid[]) {
+  const runtime = await getManifoldRuntime();
+  let solid = shapeToManifoldSolid(runtime, shape, created);
+  if (!solid || solid.status() !== "NoError" || solid.numTri() < 1) {
+    return { error: openHolesError() ?? t("split.error.notClosed", { status: solid?.status() ?? "empty" }) };
+  }
+  const { closed: closedHoles } = takeHoleFillTally();
+  created.push(solid);
+  const normalized = unionSplitManifoldComponents(runtime, solid);
+  created.push(...normalized.created);
+  if (!normalized.solid) {
+    return { error: t("split.error.overlapping") };
+  }
+  solid = normalized.solid;
+  const [rawPositive, rawNegative] = splitByPlaneClearOfFaces(solid, plane.normal, plane.position);
+  created.push(rawPositive, rawNegative);
+  const trimmedPositive = dropSplitSlivers(runtime, rawPositive);
+  const trimmedNegative = dropSplitSlivers(runtime, rawNegative);
+  created.push(...trimmedPositive.created, ...trimmedNegative.created);
+  const positive = trimmedPositive.solid;
+  const negative = trimmedNegative.solid;
+  if (
+    !positive || !negative
+    || positive.status() !== "NoError" || negative.status() !== "NoError"
+    || positive.numTri() < 1 || negative.numTri() < 1
+  ) {
+    return { error: t("split.error.emptyHalf") };
+  }
+  return { runtime, solid, positive, negative, closedHoles };
+}
+
+/**
+ * Splits a shape in two with the plane: the two halves, named after their side, and with `connectors` (Discussion #832)
+ * the holes, pegs and loose dowels that line them up again (splitConnectors.ts) - the dowels as a third body beside them.
+ * A hole is split without: it has nothing to line up.
+ */
+export async function splitShapeByPlane(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions) {
   const created: ManifoldSolid[] = [];
   takeHoleFillTally();
   try {
-    const runtime = await getManifoldRuntime();
-    let solid = shapeToManifoldSolid(runtime, shape, created);
-    if (!solid || solid.status() !== "NoError" || solid.numTri() < 1) {
-      return { parts: null, error: openHolesError() ?? t("split.error.notClosed", { status: solid?.status() ?? "empty" }) };
+    const halves = await splitShapeHalves(shape, plane, created);
+    if ("error" in halves) {
+      return { parts: null, error: halves.error };
     }
-    const { closed: closedHoles } = takeHoleFillTally();
-    created.push(solid);
-    const normalized = unionSplitManifoldComponents(runtime, solid);
-    created.push(...normalized.created);
-    if (!normalized.solid) {
-      return { parts: null, error: t("split.error.overlapping") };
-    }
-    solid = normalized.solid;
-    const [rawPositive, rawNegative] = splitByPlaneClearOfFaces(solid, plane.normal, plane.position);
-    created.push(rawPositive, rawNegative);
-    const trimmedPositive = dropSplitSlivers(runtime, rawPositive);
-    const trimmedNegative = dropSplitSlivers(runtime, rawNegative);
-    created.push(...trimmedPositive.created, ...trimmedNegative.created);
-    const positive = trimmedPositive.solid;
-    const negative = trimmedNegative.solid;
-    if (
-      !positive || !negative
-      || positive.status() !== "NoError" || negative.status() !== "NoError"
-      || positive.numTri() < 1 || negative.numTri() < 1
-    ) {
-      return { parts: null, error: t("split.error.emptyHalf") };
+    const { runtime, closedHoles } = halves;
+    let { positive, negative } = halves;
+    let pins: ManifoldSolid | null = null;
+    let tally: SplitConnectorTally | null = null;
+    if (connectors && connectors.kind !== "none" && !shape.hole) {
+      const plan = planSplitConnectors(runtime, positive, negative, plane.normal, plane.position, connectors, created);
+      ({ positive, negative, pins } = applySplitConnectors(runtime, positive, negative, plan, connectors, halves.solid.boundingBox(), created));
+      tally = plan.tally;
+      if (positive.status() !== "NoError" || negative.status() !== "NoError" || positive.numTri() < 1 || negative.numTri() < 1) {
+        return { parts: null, error: t("split.error.emptyHalf") };
+      }
     }
 
     const positiveMesh = positive.getMesh();
     const negativeMesh = negative.getMesh();
+    const pinsMesh = pins?.getMesh() ?? null;
     try {
       const label = splitAxisLabel(plane.axis);
       const positiveShape = splitShapeFromWorldPositions(
@@ -884,12 +917,18 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<Model
         createLocalId(`${shape.id}-split-negative`),
         `${shape.name} (${label}-)`,
       );
-      return positiveShape && negativeShape
-        ? { parts: [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape)] as [WorkplaneShape, WorkplaneShape], closedHoles }
-        : { parts: null, error: t("split.error.store") };
+      const pinsShape = pinsMesh
+        ? splitShapeFromWorldPositions(shape, manifoldMeshToPositions(pinsMesh), createLocalId(`${shape.id}-split-dowels`), t("split.dowelsName", { name: shape.name }))
+        : null;
+      if (!positiveShape || !negativeShape || (pinsMesh && !pinsShape)) {
+        return { parts: null, error: t("split.error.store") };
+      }
+      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(pinsShape ? [canonicalizeShape(pinsShape)] : [])];
+      return { parts, closedHoles, ...(tally ? { connectors: tally } : {}) };
     } finally {
       disposeManifold(positiveMesh);
       disposeManifold(negativeMesh);
+      disposeManifold(pinsMesh);
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error ?? "");
@@ -899,10 +938,63 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<Model
   }
 }
 
+/** Where the connectors would go, for the Split panel to show before the cut: what they come to, and their middles in the world. */
+export type SplitConnectorPreview = { tally: SplitConnectorTally; points: Array<[number, number, number]>; holes: number };
+
+/**
+ * The connectors the split would make, worked out as the split works them out, without making them: for each solid the
+ * plane crosses, its halves, the pieces of its cut face and what fits there. Holes are counted apart; a body that cannot
+ * be split adds nothing, the split itself says why.
+ */
+export async function previewSplitConnectors(targets: readonly WorkplaneShape[], plane: SplitPlaneArgs, connectors: SplitConnectorOptions): Promise<SplitConnectorPreview> {
+  let tally = NO_CONNECTORS;
+  const points: Array<[number, number, number]> = [];
+  let holes = 0;
+  if (connectors.kind === "none") return { tally, points, holes };
+  for (const shape of targets) {
+    if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) continue;
+    if (shape.hole) {
+      holes += 1;
+      continue;
+    }
+    const created: ManifoldSolid[] = [];
+    takeHoleFillTally();
+    try {
+      const halves = await splitShapeHalves(shape, plane, created);
+      if ("error" in halves) continue;
+      const plan = planSplitConnectors(halves.runtime, halves.positive, halves.negative, plane.normal, plane.position, connectors, created);
+      tally = addConnectorTallies(tally, plan.tally);
+      points.push(...plan.points.map((point) => splitFramePoint(plan.frame, point, plan.position)));
+    } catch {
+      // The split will say what went wrong with this body.
+    } finally {
+      takeHoleFillTally();
+      Array.from(new Set(created)).forEach(disposeManifold);
+    }
+  }
+  return { tally, points, holes };
+}
+
 /** A status message with the note that small holes of the mesh were closed first (#791). */
 export function withClosedHolesNote(message: string, closedHoles = 0) {
   if (closedHoles < 1) return message;
   const note = closedHoles === 1 ? t("status.holeClosedOne") : t("status.holesClosedMany", { count: closedHoles });
+  return `${/[.!?。]$/.test(message) ? message : `${message}.`} ${note}`;
+}
+
+/**
+ * A split's status message with what its connectors came to (Discussion #832): the dowels to print beside the halves,
+ * the plugs that line them up, or that none fit and the parts were split without. Nothing for a split without
+ * connectors, or one that only cut holes.
+ */
+export function withConnectorsNote(message: string, kind: SplitConnectorKind, tally?: SplitConnectorTally) {
+  if (kind === "none" || !tally || tally.faces === 0) return message;
+  const count = tally.placed;
+  const note = count === 0
+    ? t("status.splitNoConnectors")
+    : kind === "dowels"
+      ? (count === 1 ? t("status.splitDowelsOne") : t("status.splitDowelsMany", { count }))
+      : (count === 1 ? t("status.splitPlugsOne") : t("status.splitPlugsMany", { count }));
   return `${/[.!?。]$/.test(message) ? message : `${message}.`} ${note}`;
 }
 
@@ -915,12 +1007,19 @@ function openHolesError() {
 export type SplitShapesOutcome =
   | { status: "stale" }
   | { status: "failed"; shape: WorkplaneShape; error: string }
-  | { status: "done"; replacements: Map<string, WorkplaneShape[]>; splitCount: number; closedHoles: number };
+  | {
+    status: "done";
+    replacements: Map<string, WorkplaneShape[]>;
+    splitCount: number;
+    closedHoles: number;
+    /** What the connectors came to, when the split was asked for them. */
+    connectors?: SplitConnectorTally;
+  };
 
 /** The cut of one target, or `missed` when the plane does not go through it. */
-export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: Pick<ModelSplitPlane, "axis" | "normal" | "position">) {
+export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions) {
   if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) return { missed: true as const };
-  return splitShapeByPlane(shape, plane);
+  return splitShapeByPlane(shape, plane, connectors);
 }
 
 /**
@@ -930,23 +1029,27 @@ export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: Pick<Mod
  */
 export async function splitShapesByPlane(
   targets: readonly WorkplaneShape[],
-  plane: Pick<ModelSplitPlane, "axis" | "normal" | "position">,
+  plane: SplitPlaneArgs,
   stillCurrent: () => boolean,
   splitOne: typeof splitShapeIfCrossed = splitShapeIfCrossed,
+  connectors?: SplitConnectorOptions,
 ): Promise<SplitShapesOutcome> {
   const replacements = new Map<string, WorkplaneShape[]>();
   let splitCount = 0;
   let closedHoles = 0;
+  const asked = connectors && connectors.kind !== "none" ? connectors : undefined;
+  let tally: SplitConnectorTally | undefined = asked ? NO_CONNECTORS : undefined;
   for (const shape of targets) {
-    const result = await splitOne(shape, plane);
+    const result = await splitOne(shape, plane, asked);
     if ("missed" in result) continue;
     if (!stillCurrent()) return { status: "stale" };
     if (!result.parts) return { status: "failed", shape, error: result.error ?? t("split.error.failedDefault") };
     replacements.set(shape.id, result.parts);
     splitCount += 1;
     closedHoles += result.closedHoles ?? 0;
+    if (tally && "connectors" in result && result.connectors) tally = addConnectorTallies(tally, result.connectors);
   }
-  return { status: "done", replacements, splitCount, closedHoles };
+  return { status: "done", replacements, splitCount, closedHoles, ...(tally ? { connectors: tally } : {}) };
 }
 
 function manifoldMeshToPositions(mesh: InstanceType<ManifoldToplevel["Mesh"]>) {

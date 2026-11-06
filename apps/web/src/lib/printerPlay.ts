@@ -70,7 +70,8 @@ export type PrinterPlaySettingId =
   | "cutOut.clearance"
   | "punch.clearance"
   | "vase.fitClearance"
-  | "vase.lidClearance";
+  | "vase.lidClearance"
+  | "split.connectorClearance";
 
 /** Where a shape keeps the setting (`key`) and what the inspector calls its row (`property`). */
 type PrinterPlayShapeField = { kind: ShapeKind; key: keyof ShapeCustomization; property: string };
@@ -125,6 +126,8 @@ export const PRINTER_PLAY_SETTINGS: readonly PrinterPlaySetting[] = [
   { id: "vase.fitClearance", takes: null },
   // A vase's lid serves a lip and a screw thread with one value, wider than a plain fit (0.35), for a lip round a whole rim.
   { id: "vase.lidClearance", takes: null },
+  // Split's dowels and plugs (Discussion #832): a pin or peg printed apart from the hole it goes into, room per side.
+  { id: "split.connectorClearance", takes: "perSide" },
 ];
 
 function settingOf(id: PrinterPlaySettingId) {
