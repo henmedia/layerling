@@ -8644,6 +8644,25 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-inside {
   fill: rgba(155, 80, 0, 0.28);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-centre circle {
+  fill: rgba(255, 255, 255, 0.55);
+  stroke: #b66108;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-centre path {
+  fill: none;
+  stroke: #b66108;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-centre.snapped {
+  filter: drop-shadow(0 0 3px rgba(173, 89, 0, 0.48));
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-centre.snapped circle {
+  fill: rgba(255, 255, 255, 0.92);
+  stroke: #e17709;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .tape-hover-edge {
   fill: none;
   stroke: #e17709;
