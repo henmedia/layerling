@@ -1536,6 +1536,11 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const threadAxialClearance = finiteNumber(definition.threadAxialClearance, `${label}.threadAxialClearance`);
       if (threadAxialClearance < 0 || threadAxialClearance > 1) throw new Error(`${label}.threadAxialClearance is outside the supported range`);
     }
+    // Starts (#1348): a whole number of threads side by side.
+    if (definition.threadStarts !== undefined) {
+      const threadStarts = finiteNumber(definition.threadStarts, `${label}.threadStarts`);
+      if (!Number.isInteger(threadStarts) || threadStarts < 1 || threadStarts > 8) throw new Error(`${label}.threadStarts is outside the supported range`);
+    }
     if (definition.threadDepth !== undefined) {
       const threadDepth = finiteNumber(definition.threadDepth, `${label}.threadDepth`);
       if (threadDepth <= 0 || threadDepth > 480) throw new Error(`${label}.threadDepth is outside the supported range`);

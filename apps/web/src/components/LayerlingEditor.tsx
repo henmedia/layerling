@@ -2782,6 +2782,8 @@ function applyMcpThreadSettings(
     threadTaper: settings.taper ? true : undefined,
     threadDiameter: settings.diameter,
     threadPitch: settings.pitch,
+    // Starts (#1348): one stays unset, as it always was.
+    threadStarts: settings.starts > 1 ? settings.starts : undefined,
     threadClearance: settings.clearance,
     threadBoltClearance: settings.boltClearance,
     threadAxialClearance: settings.axialClearance,
@@ -12156,6 +12158,7 @@ export function LayerlingEditor({
             threadClearance: threaded.threadClearance,
             threadBoltClearance: threaded.threadBoltClearance,
             threadAxialClearance: threaded.threadAxialClearance,
+            threadStarts: threaded.threadStarts,
             threadDepth: threaded.threadDepth,
             threadFlankAngle: threaded.threadFlankAngle,
             threadQuality: threaded.threadQuality,

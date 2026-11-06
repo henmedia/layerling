@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Mehrgängige Gewinde für Trapezspindeln",
+      "en": "Threads of several starts for lead screws"
+    },
+    "body": {
+      "de": "Ein Gewinde hat jetzt bis zu acht Gänge, etwa für eine Trapezspindel T8x8: 4 Gänge mit 2 mm Teilung, jeder steigt 8 mm je Umdrehung. Das gilt für Stange, Schraube, Mutter und Gewindeloch.",
+      "en": "A thread now has up to eight starts, for a lead screw such as T8x8: 4 starts at 2 mm pitch, each climbing 8 mm a turn. For rods, screws, nuts and tapped holes alike."
+    }
+  },
+  {
+    "title": {
       "de": "Größengriffe folgen der Arbeitsebene auf einer Seitenfläche",
       "en": "Size handles follow a workplane on a side face"
     },
