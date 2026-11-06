@@ -3731,6 +3731,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "Fladkabler op gennem låget",
   "sbcBoard.ribbonSide": "Fladkabler ud gennem væggen",
   "sbcBoard.gpioUp": "GPIO-stik op gennem låget",
+  "sbcBoard.lensUp": "Kameralinse op gennem låget",
   "sbcBoard.upReach": "Rækkevidde op",
   "sbcBoard.buttonReach": "Knappernes rækkevidde",
   "sbcBoard.buttonReachHint": "Så langt når knapperne (RESET, BOOT, tænd) i den retning, de trykkes: op gennem et låg, eller ud gennem væggen for en knap, der trykkes fra siden. Ved 0 forbliver de, som de er.",

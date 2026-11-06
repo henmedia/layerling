@@ -2540,6 +2540,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "フラットケーブルをふたの上へ",
   "sbcBoard.ribbonSide": "フラットケーブルを壁の横へ",
   "sbcBoard.gpioUp": "GPIOヘッダーをふたの上へ",
+  "sbcBoard.lensUp": "カメラのレンズをふたの上へ",
   "sbcBoard.upReach": "上への延長",
   "sbcBoard.buttonReach": "ボタンの延長",
   "sbcBoard.buttonReachHint": "ボタン(RESET、BOOT、電源)を押す向きに延ばす長さ: 上へはふたを通して、横から押すボタンは壁を通して。0 ではそのままです。",

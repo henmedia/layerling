@@ -3885,6 +3885,7 @@ export const MESSAGES_EN = {
   "sbcBoard.ribbonUp": "Ribbon cables up through the lid",
   "sbcBoard.ribbonSide": "Ribbon cables out through the wall",
   "sbcBoard.gpioUp": "GPIO header up through the lid",
+  "sbcBoard.lensUp": "Camera lens up through the lid",
   "sbcBoard.upReach": "Reach up",
   "sbcBoard.buttonReach": "Button reach",
   "sbcBoard.buttonReachHint": "How far the buttons (RESET, BOOT, power) reach the way they are pressed: up through a lid, or out through the wall for one pressed from the side. At 0 they stay as they are.",

@@ -3884,6 +3884,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "sbcBoard.ribbonUp": "Flachbandkabel nach oben durch den Deckel",
   "sbcBoard.ribbonSide": "Flachbandkabel seitlich durch die Wand",
   "sbcBoard.gpioUp": "GPIO-Leiste nach oben durch den Deckel",
+  "sbcBoard.lensUp": "Kameraobjektiv nach oben durch den Deckel",
   "sbcBoard.upReach": "Reichweite nach oben",
   "sbcBoard.buttonReach": "Reichweite der Tasten",
   "sbcBoard.buttonReachHint": "So weit reichen die Tasten (RESET, BOOT, Ein/Aus) in die Richtung, in der man sie drückt: nach oben durch einen Deckel, eine seitlich gedrückte durch die Wand. Bei 0 bleiben sie, wie sie sind.",

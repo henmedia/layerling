@@ -3878,6 +3878,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "Шлейфы вверх через крышку",
   "sbcBoard.ribbonSide": "Шлейфы вбок через стенку",
   "sbcBoard.gpioUp": "Разъём GPIO вверх через крышку",
+  "sbcBoard.lensUp": "Объектив камеры вверх через крышку",
   "sbcBoard.upReach": "Вынос вверх",
   "sbcBoard.buttonReach": "Вынос кнопок",
   "sbcBoard.buttonReachHint": "Насколько кнопки (RESET, BOOT, питание) выносятся в ту сторону, откуда их нажимают: вверх через крышку или через стенку для нажимаемой сбоку. При 0 остаются как есть.",

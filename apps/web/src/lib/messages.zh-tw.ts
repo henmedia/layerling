@@ -3808,6 +3808,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "排線向上穿過蓋子",
   "sbcBoard.ribbonSide": "排線向側面穿過壁",
   "sbcBoard.gpioUp": "GPIO 排針向上穿過蓋子",
+  "sbcBoard.lensUp": "相機鏡頭向上穿過蓋子",
   "sbcBoard.upReach": "向上延伸",
   "sbcBoard.buttonReach": "按鈕延伸",
   "sbcBoard.buttonReachHint": "按鈕(RESET、BOOT、電源)沿按壓方向延伸的距離:向上穿過蓋子,側按的按鈕穿過側壁。為 0 時保持原樣。",

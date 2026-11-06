@@ -3885,6 +3885,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "sbcBoard.ribbonUp": "Lintkabels omhoog door het deksel",
   "sbcBoard.ribbonSide": "Lintkabels opzij door de wand",
   "sbcBoard.gpioUp": "GPIO-header omhoog door het deksel",
+  "sbcBoard.lensUp": "Cameralens omhoog door het deksel",
   "sbcBoard.upReach": "Reikwijdte omhoog",
   "sbcBoard.buttonReach": "Reikwijdte knoppen",
   "sbcBoard.buttonReachHint": "Zo ver reiken de knoppen (RESET, BOOT, aan/uit) in de richting waarin je ze indrukt: omhoog door een deksel, of door de wand voor een knop die je van opzij indrukt. Bij 0 blijven ze zoals ze zijn.",

@@ -3519,6 +3519,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "sbcBoard.ribbonUp": "الكابلات الشريطية لأعلى عبر الغطاء",
   "sbcBoard.ribbonSide": "الكابلات الشريطية جانبًا عبر الجدار",
   "sbcBoard.gpioUp": "موصل GPIO لأعلى عبر الغطاء",
+  "sbcBoard.lensUp": "عدسة الكاميرا لأعلى عبر الغطاء",
   "sbcBoard.upReach": "الامتداد لأعلى",
   "sbcBoard.buttonReach": "امتداد الأزرار",
   "sbcBoard.buttonReachHint": "مقدار امتداد الأزرار (RESET وBOOT والتشغيل) في الاتجاه الذي تُضغط منه: لأعلى عبر الغطاء، أو عبر الجدار للزر الذي يُضغط من الجانب. عند 0 تبقى كما هي.",
