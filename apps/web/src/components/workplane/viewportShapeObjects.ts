@@ -2853,6 +2853,9 @@ function bandedMeshGeometry(
     for (let index = 0; index < normal.count; index += 1) normal.setXYZ(index, -normal.getX(index), -normal.getY(index), -normal.getZ(index));
   }
   normals.applyMatrix4(contentToLocal);
+  // Its sides fold a little at every band: lines drawn from it later (when it is selected) take
+  // only its real edges, as on a twisted body of its own.
+  normals.userData.twistBanded = true;
   return normals;
 }
 
@@ -2980,7 +2983,8 @@ export function addShapeEdgeDecorations(group: THREE.Group, mesh: THREE.Mesh, pr
       // deshalb nur seine echten Kanten, etwa Deckel- und Bodenrand.
       // A twisted side folds a little at every band (#184): only its real edges get a line, as on a thread.
       // A slope along folds its curved top in short pieces the same way.
-      const twisted = Math.abs(shape.extrudeTwist ?? 0) > 1e-6 || shapeHasAlongDeform(shape);
+      // A part of a twisted group or bundle is cut into the group's bands (applyGroupedContentTaper) and folds the same way.
+      const twisted = Math.abs(shape.extrudeTwist ?? 0) > 1e-6 || shapeHasAlongDeform(shape) || Boolean(prepared.userData.twistBanded);
       const selectedThreshold = shape.importedMesh ? NORMAL_IMPORTED_SELECTION_EDGE_ANGLE : shape.kind === "thread" || twisted || (shape.transparent && !shape.hole) ? 25 : 1;
       // A part-coloured group's surface can carry extra corners for its colour boundaries; its lines follow the plain mesh.
       const edgeSource = (prepared.userData.edgesSource as THREE.BufferGeometry | undefined) ?? prepared;
