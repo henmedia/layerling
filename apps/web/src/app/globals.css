@@ -5759,6 +5759,55 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.s
   line-height: 1.35;
 }
 
+.server-design-picker {
+  display: grid;
+  gap: 4px;
+  max-height: 220px;
+  padding: 8px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ebe1cf;
+  border-radius: 8px;
+}
+
+.server-design-path {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8e7a66;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.top-action-body .server-design-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 30px;
+  padding: 4px 8px;
+  color: #5a3917;
+  background: #fff;
+  border-color: transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.top-action-body .server-design-up {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  place-items: center;
+}
+
+.server-design-note {
+  margin: 0;
+  color: #8e7a66;
+  font-size: 11px;
+}
+
 .open-lyl-project-icon {
   display: grid;
   width: 34px;

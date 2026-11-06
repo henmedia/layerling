@@ -17740,6 +17740,7 @@ export function LayerlingEditor({
           onPickFile={() => fileInputRef.current?.click()}
           onPickProjectFile={() => void pickProjectFile()}
           onPickInsertProjectFile={() => insertProjectFileInputRef.current?.click()}
+          onInsertDesignFile={insertLylDesign}
           onPickReferenceImage={() => referenceImageInputRef.current?.click()}
           workspaceHistoryLimit={workspaceSettings.historyLimit}
           attachments={projectAttachments}

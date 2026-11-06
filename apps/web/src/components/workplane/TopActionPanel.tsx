@@ -3,12 +3,13 @@
 import { DEFAULT_STENCIL_BRIDGES, MAX_BRIDGE_COUNT, normalizedStencilBridges, type StencilBridgeOptions } from "@/lib/stencilBridges";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, X } from "lucide-react";
+import { CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { ToolbarImportIcon } from "../icons";
 import { AttachmentsPanel } from "./AttachmentsPanel";
+import { ServerDesignPicker } from "./ServerDesignPicker";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_PRINT_MATERIAL, DEFAULT_WALLS, INFILL_CHOICES, PRINT_MATERIALS, WALL_CHOICES, normalizeInfillPercent, normalizePrintMaterial, normalizeWalls, printEstimateWithInfill, type PrintMaterial } from "@/lib/printEstimate";
 import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
 import { projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
@@ -57,6 +58,7 @@ export function TopActionPanel({
   onPickFile,
   onPickProjectFile,
   onPickInsertProjectFile,
+  onInsertDesignFile,
   onPickReferenceImage,
   workspaceHistoryLimit,
   attachments,
@@ -97,6 +99,8 @@ export function TopActionPanel({
   onPickFile: () => void;
   onPickProjectFile: () => void;
   onPickInsertProjectFile: () => void;
+  /** A design file fetched from the server, to insert like one picked on the computer (Discussion #1378). */
+  onInsertDesignFile: (file: File) => void | Promise<void>;
   /** A reference image to line parts up on (#680). */
   onPickReferenceImage: () => void;
   workspaceHistoryLimit: LylHistoryLimit;
@@ -108,6 +112,7 @@ export function TopActionPanel({
   onAttachmentView: (attachment: ProjectAttachment) => void;
   onAttachmentNotice: (message: string) => void;
 }) {
+  const [serverDesignsOpen, setServerDesignsOpen] = useState(false);
   const [keepSvgPage, setKeepSvgPage] = useState(false);
   useEffect(() => setKeepSvgPage(readKeepSvgPage()), []);
   // The width a picture or an SVG comes in at; empty keeps its own size, and it counts for the next import only.
@@ -330,6 +335,18 @@ export function TopActionPanel({
               <small>{t("import.insertProjectHint")}</small>
             </span>
           </button>
+          {sharedProjectsEnabled ? (
+            <>
+              <button className="open-lyl-project-button" type="button" onClick={() => setServerDesignsOpen((open) => !open)} aria-expanded={serverDesignsOpen} data-testid="import-insert-from-server">
+                <span className="open-lyl-project-icon"><Server size={18} /></span>
+                <span>
+                  <strong>{t("import.insertFromServer")}</strong>
+                  <small>{t("import.insertFromServerHint")}</small>
+                </span>
+              </button>
+              {serverDesignsOpen ? <ServerDesignPicker onInsertFile={onInsertDesignFile} /> : null}
+            </>
+          ) : null}
           <button className="open-lyl-project-button" type="button" onClick={onPickReferenceImage} data-testid="import-reference-image">
             <span className="open-lyl-project-icon"><ImagePlus size={18} /></span>
             <span>
