@@ -16,7 +16,7 @@ Se o seu navegador permitir, aparece na página inicial uma dica com {{ui:instal
 
 Você pode fechar a dica na página inicial com {{ui:installHint.dismiss}}. No Chrome ou no Edge, abrir o app instalado uma segunda vez traz a janela já aberta para a frente, em vez de abrir outra.
 
-No computador, o layerling instalado no Chrome ou no Edge também se registra como programa para arquivos `.lyl`: no gerenciador de arquivos, um clique duplo num projeto abre o projeto no layerling, e [[Ctrl]]+[[S]] salva de volta nesse arquivo. No Android isso não funciona, porque lá o navegador não associa arquivos a web apps instalados; abra o projeto com {{ui:dashboard.importGeometry}} na página inicial.
+No computador, o layerling instalado no Chrome ou no Edge também se registra como programa para arquivos `.lyl`: no gerenciador de arquivos, um clique duplo num projeto abre o projeto no layerling, e [[Ctrl]]+[[S]] salva de volta nesse arquivo. O app instalado também se registra para abrir arquivos `.stl` e `.3mf`. Cada arquivo abre como um projeto novo, assim como quando você usa {{ui:dashboard.importGeometry}} na página inicial. Para abrir esses arquivos sempre com o layerling, escolha-o em "Abrir com" e defina-o como programa padrão. No Android isso não funciona, porque lá o navegador não associa arquivos a web apps instalados; abra o projeto com {{ui:dashboard.importGeometry}} na página inicial.
 
 ## Atualizações
 
