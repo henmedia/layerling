@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { GUIDE_SECTIONS, guideHref, type GuideSection } from "@/lib/guideLinks";
 // @ts-expect-error the guide build is a plain .mjs module
-import { effectiveChapters, headingIds, loadMessages, loadValues, readChapters, renderBlocks } from "../../scripts/build-guide.mjs";
+import { effectiveChapters, englishHeadingPairs, headingIds, loadMessages, loadValues, readChapters, readToolIcons, renderBlocks } from "../../scripts/build-guide.mjs";
 // @ts-expect-error the tool list is a plain .mjs module
 import { tools } from "../../scripts/layerling-mcp-tools.mjs";
 
@@ -44,11 +44,13 @@ describe("the guide in every language", () => {
     const english = (await readChapters("en")) as Chapter[];
     for (const language of LANGUAGES) {
       for (const chapter of (await readChapters(language)) as Chapter[]) {
-        // As the build names them: a heading whose text gives no id takes the English one in its place.
+        // As the build names them: a heading whose text gives no id takes the English one it stands
+        // for (englishHeadingPairs, section by section), and every English id it stands for is an
+        // anchor on the page as well.
         const own: string[] = headingIds(chapter.body);
         const source = english.find((entry) => entry.number === chapter.number);
-        const fallback: string[] | null = source && headingIds(source.body).length === own.length ? headingIds(source.body) : null;
-        const ids = new Set(own.map((id, position) => id || fallback?.[position] || `section-${position + 1}`));
+        const pairs: string[][] | null = source && language !== "en" ? englishHeadingPairs(chapter.body, source.body) : null;
+        const ids = new Set([...own.map((id, position) => id || pairs?.[position]?.[0] || `section-${position + 1}`), ...(pairs ?? []).flat()]);
         for (const match of chapter.body.matchAll(/\]\(#([^)]+)\)/g)) {
           expect(ids.has(match[1]), `${language}/${chapter.file}: #${match[1]}`).toBe(true);
         }
@@ -77,10 +79,11 @@ describe("the guide in every language", () => {
 
   it("uses only interface names that exist", async () => {
     const values = await loadValues();
+    const toolIcons = await readToolIcons();
     for (const language of LANGUAGES) {
       const messages = await loadMessages(language);
       for (const chapter of (await readChapters(language)) as Chapter[]) {
-        const context = { language, messages, values, imageSize: () => null, shortcutsHtml: "", references: { uiKeys: new Set(), shots: new Set(), chapters: new Set() } };
+        const context = { language, messages, values, toolIcons, imageSize: () => null, shortcutsHtml: "", references: { uiKeys: new Set(), shots: new Set(), chapters: new Set() } };
         const { html } = renderBlocks(chapter.body, context);
         expect(html, `${language}/${chapter.file}`).not.toMatch(/\{\{|\}\}/);
         expect(html, `${language}/${chapter.file}`).not.toContain("{count}");
