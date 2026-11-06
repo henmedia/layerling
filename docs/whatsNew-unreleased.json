@@ -28,5 +28,15 @@
       "de": "Der Hals eines Schwalbenschwanzes darf jetzt bis 0,1 mm schmaler sein als das breite Ende, statt höchstens 95 % davon. So geht auch ein langer, leicht verjüngter Zapfen, etwa 146 mm breit mit 145 mm am Hals.",
       "en": "A dovetail's neck may now be up to 0.1 mm narrower than the wide end, instead of 95 % of it at most. So a long, gently tapering tail works too, say 146 mm wide with 145 mm at the neck."
     }
+  },
+  {
+    "title": {
+      "de": "Importierte Modelle in der Skizze von oben gesehen",
+      "en": "Imported models seen from above in the sketch"
+    },
+    "body": {
+      "de": "Unter einer Skizze zeigt ein importiertes Modell jetzt seinen ganzen Umriss von oben, nicht nur die Fläche, auf der es steht. Von einer Benchy war bisher nur ein Streifen des Kiels zu sehen.",
+      "en": "Under a sketch an imported model now shows its whole outline from above, not only the part it stands on. A Benchy showed only a strip of its keel."
+    }
   }
 ]
