@@ -32,7 +32,7 @@ import { isReferenceImageOpacity } from "@/lib/referenceImage";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { PORT_PROFILES } from "@/lib/portGeometry";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
-import { MAX_GRIDFINITY_OUTLINE_POINTS } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_LABEL_FONTS, GRIDFINITY_LABEL_TEXT_KEYS, MAX_GRIDFINITY_LABEL_TEXT_LENGTH, MAX_GRIDFINITY_OUTLINE_POINTS } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
 import { normalizeSnapGrid, normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 import type { CadDisplayEdge, GridSize, ProjectAsset, ProjectAssetSourceFormat, ProjectAttachment, SketchOperation, SketchRevolveSettings, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -63,7 +63,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.144.0";
+export const LYL_CREATED_WITH_VERSION = "1.145.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -1772,6 +1772,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.gridfinityLabelCorner !== undefined && definition.gridfinityLabelCorner !== "round" && definition.gridfinityLabelCorner !== "chamfer") {
       throw new Error(`${label}.gridfinityLabelCorner is invalid`);
     }
+    // The letters on the shelves (#1308): a text as long as a text shape's, in a built-in font, as a bin does not bring a font of its own along.
+    for (const key of Object.values(GRIDFINITY_LABEL_TEXT_KEYS)) {
+      if (definition[key] !== undefined && (typeof definition[key] !== "string" || definition[key].length > MAX_GRIDFINITY_LABEL_TEXT_LENGTH)) throw new Error(`${label}.${key} must be a string of at most ${MAX_GRIDFINITY_LABEL_TEXT_LENGTH} characters`);
+    }
+    if (definition.gridfinityLabelFont !== undefined && !GRIDFINITY_LABEL_FONTS.includes(definition.gridfinityLabelFont as string)) {
+      throw new Error(`${label}.gridfinityLabelFont is invalid`);
+    }
     if (definition.gridfinityOpeningCorner !== undefined && definition.gridfinityOpeningCorner !== "round" && definition.gridfinityOpeningCorner !== "chamfer") {
       throw new Error(`${label}.gridfinityOpeningCorner is invalid`);
     }
@@ -1803,6 +1810,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
           if (value < 0 || value > 1e6) throw new Error(`${entryLabel}.${key} is outside the supported range`);
         }
         if (entry.align !== undefined && entry.align !== "start" && entry.align !== "middle" && entry.align !== "end") throw new Error(`${entryLabel}.align is invalid`);
+        if (entry.text !== undefined && (typeof entry.text !== "string" || entry.text.length > MAX_GRIDFINITY_LABEL_TEXT_LENGTH)) throw new Error(`${entryLabel}.text must be a string of at most ${MAX_GRIDFINITY_LABEL_TEXT_LENGTH} characters`);
       });
     }
     if (definition.gridfinityOpenings !== undefined) {

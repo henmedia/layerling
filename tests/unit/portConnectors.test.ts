@@ -41,8 +41,8 @@ function port(preset: PortPreset, fields: Partial<WorkplaneShape> = {}, clearanc
 }
 
 describe("the new sockets of the Port opening", () => {
-  it("come after RJ45, in this order", () => {
-    expect(PORT_PRESET_ORDER.slice(PORT_PRESET_ORDER.indexOf("rj45") + 1)).toEqual(NEW);
+  it("come after RJ45, in this order, before the Powerpole blocks", () => {
+    expect(PORT_PRESET_ORDER.slice(PORT_PRESET_ORDER.indexOf("rj45") + 1, PORT_PRESET_ORDER.indexOf("powerpole1"))).toEqual(NEW);
   });
 
   it("are the makers' sizes with about 0.25 mm of room, the D-Sub its panel cut-out", () => {

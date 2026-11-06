@@ -23,7 +23,8 @@ import { createSnapFitGeometry } from "@/lib/snapFit";
 import { createRibGeometry } from "@/lib/rib";
 import { createLoftGeometry } from "@/lib/loftGeometry";
 import { createHingeGeometry } from "@/lib/hingeGeometry";
-import { createGridfinityGeometry } from "@/lib/gridfinityGeometry";
+import { createGridfinityGeometry, gridfinityLabelTextGiven } from "@/lib/gridfinityGeometry";
+import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
 import { createKnurlGeometry } from "@/lib/knurlGeometry";
 import { createVaseGeometry, fittedVaseMesh } from "@/lib/vaseShape";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
@@ -409,6 +410,13 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityLabelRightOffset: shape.gridfinityLabelRightOffset,
     gridfinityLabelCorner: shape.gridfinityLabelCorner,
     gridfinityLabelCornerSize: shape.gridfinityLabelCornerSize,
+    gridfinityLabelBackText: shape.gridfinityLabelBackText,
+    gridfinityLabelFrontText: shape.gridfinityLabelFrontText,
+    gridfinityLabelLeftText: shape.gridfinityLabelLeftText,
+    gridfinityLabelRightText: shape.gridfinityLabelRightText,
+    gridfinityLabelFont: shape.gridfinityLabelFont,
+    // The letters on the shelves are laid out against the mirroring, so they come out of it the right way round (#1308).
+    gridfinityLabelMirror: shape.kind === "gridfinity" && gridfinityLabelTextGiven(shape) ? [shape.mirrorX, shape.mirrorY, shape.mirrorZ] : undefined,
     gridfinityScoopBack: shape.gridfinityScoopBack,
     gridfinityScoopFront: shape.gridfinityScoopFront,
     gridfinityScoopLeft: shape.gridfinityScoopLeft,
@@ -810,6 +818,13 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityLabelRightOffset: shape.gridfinityLabelRightOffset,
     gridfinityLabelCorner: shape.gridfinityLabelCorner,
     gridfinityLabelCornerSize: shape.gridfinityLabelCornerSize,
+    gridfinityLabelBackText: shape.gridfinityLabelBackText,
+    gridfinityLabelFrontText: shape.gridfinityLabelFrontText,
+    gridfinityLabelLeftText: shape.gridfinityLabelLeftText,
+    gridfinityLabelRightText: shape.gridfinityLabelRightText,
+    gridfinityLabelFont: shape.gridfinityLabelFont,
+    // The letters on the shelves are laid out against the mirroring, so they come out of it the right way round (#1308).
+    gridfinityLabelMirror: shape.kind === "gridfinity" && gridfinityLabelTextGiven(shape) ? [shape.mirrorX, shape.mirrorY, shape.mirrorZ] : undefined,
     gridfinityScoopBack: shape.gridfinityScoopBack,
     gridfinityScoopFront: shape.gridfinityScoopFront,
     gridfinityScoopLeft: shape.gridfinityScoopLeft,
@@ -2040,7 +2055,7 @@ export function createShapeObject(
         gridfinityOpeningCorner: shape.gridfinityOpeningCorner,
         gridfinityOpeningCornerSize: shape.gridfinityOpeningCornerSize,
         gridfinityOutline: shape.gridfinityOutline,
-      })), material, shape);
+      }, gridfinityLabelLetters({ ...shape, width, depth, height }))), material, shape);
       break;
     case "loft":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createLoftGeometry({ ...shape, width, depth, height })), material, shape);
