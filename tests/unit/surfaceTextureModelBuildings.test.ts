@@ -109,10 +109,17 @@ function spikes(body: Pick<SurfaceTextureResult, "vertices" | "indices">, offset
 describe("half-timbering", () => {
   it("knows its settings, starts standing out at model-building sizes, and keeps them within their limits", () => {
     expect(normalizeSurfaceTexture({ pattern: "timber" })).toMatchObject({
-      spacing: 12, depth: 0.8, direction: "outward", keepEdges: false, timberHeight: 30, timberBeam: 2.4, timberRails: 1, timberBracing: "mixed", timberGrain: true,
+      spacing: 12, depth: 0.8, direction: "outward", keepEdges: false, timberHeight: 30, timberBeam: 2.4, timberRails: 1, timberBracing: "mixed", timberGrain: 0.5,
     });
     expect(normalizeSurfaceTexture({ pattern: "timber", timberRails: 3.7, timberBracing: "diagonal", timberBeam: 0, timberHeight: 1000, timberGrain: "false" }))
-      .toMatchObject({ timberRails: 2, timberBracing: "mixed", timberBeam: 0.3, timberHeight: 300, timberGrain: false });
+      .toMatchObject({ timberRails: 2, timberBracing: "mixed", timberBeam: 0.3, timberHeight: 300, timberGrain: 0 });
+    // The grain was only on or off before: a design saved then keeps its grain (on is the middle, 0.5), or none.
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: true }).timberGrain).toBe(0.5);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: "true" }).timberGrain).toBe(0.5);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: false }).timberGrain).toBe(0);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: 0.3 }).timberGrain).toBe(0.3);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: 1.7 }).timberGrain).toBe(1);
+    expect(normalizeSurfaceTexture({ pattern: "timber", timberGrain: -1 }).timberGrain).toBe(0);
     expect(normalizeSurfaceTexture({ pattern: "timber", timberRails: 1.4 }).timberRails).toBe(1);
     expect(normalizeSurfaceTexture({ pattern: "timber", timberRails: -2 }).timberRails).toBe(0);
     expect(SURFACE_TEXTURE_TIMBER_BRACINGS.map((bracing) => normalizeSurfaceTexture({ pattern: "timber", timberBracing: bracing }).timberBracing)).toEqual([...SURFACE_TEXTURE_TIMBER_BRACINGS]);
@@ -212,6 +219,64 @@ describe("half-timbering", () => {
     expect(lowest).toBeGreaterThanOrEqual(1 - 0.08 - 1e-9);
     expect(along(grained.at).filter((value) => value === 1).length).toBeGreaterThan(30);
     expect(along(plain.at).every((value) => value === 1)).toBe(true);
+    // Saved with the grain on, as it was: the same grain.
+    const saved = onFront({ pattern: "timber", timberBracing: "none", timberGrain: true });
+    expect(along(saved.at)).toEqual(along(grained.at));
+  });
+
+  it("makes the grain fine or strong: more, thinner, shallower grooves below the middle, two wider, deeper ones above it", () => {
+    /** Across a post from its middle to its edge (shares of its half width): the lowest the beam's face comes along it. */
+    const profile = (timberGrain: number) => {
+      const { at, layout } = onFront({ pattern: "timber", timberBracing: "none", timberGrain });
+      const { origin: x0 } = layout.timber!.posts[0];
+      // From above the sill to below the rail, which has a grain of its own.
+      const { origin: z0, height: H } = layout.timber!.storeys[2];
+      return Array.from({ length: 96 }, (_, k) => {
+        const x = x0 + ((k + 0.5) / 96) * 1.2;
+        let lowest = 1;
+        for (let z = z0 + 3; z < z0 + H / 2 - 3; z += 0.05) lowest = Math.min(lowest, at(x, z));
+        return lowest;
+      });
+    };
+    /** The grooves seen across it: how many, where the middle of each lies, how wide and how deep. */
+    const grooves = (values: number[]) => {
+      const found: { at: number; width: number; depth: number }[] = [];
+      let start = -1;
+      values.forEach((value, k) => {
+        const inside = value < 1 - 1e-9;
+        if (inside && start < 0) start = k;
+        if ((!inside || k === values.length - 1) && start >= 0) {
+          const end = inside ? k + 1 : k;
+          const part = values.slice(start, end);
+          found.push({ at: (start + end) / 2 / values.length, width: (end - start) / values.length, depth: 1 - Math.min(...part) });
+          start = -1;
+        }
+      });
+      return found;
+    };
+    // As it starts: one groove each side, at 0.45 of the half width, 0.2 wide either side, at most 8 % of the beams' height.
+    const middle = grooves(profile(0.5));
+    expect(middle).toHaveLength(1);
+    expect(middle[0].at).toBeCloseTo(0.45, 1);
+    expect(middle[0].width).toBeCloseTo(0.4, 1);
+    expect(middle[0].depth).toBeGreaterThan(0.06);
+    expect(middle[0].depth).toBeLessThanOrEqual(0.08 + 1e-9);
+    // Finer: two each side, then three, each thinner and shallower than before; at 0 none.
+    const finer = grooves(profile(0.35)), finest = grooves(profile(0.1));
+    expect(finer).toHaveLength(2);
+    expect(finest).toHaveLength(3);
+    for (const groove of [...finer, ...finest]) {
+      expect(groove.width).toBeLessThan(0.6 * middle[0].width);
+      expect(groove.depth).toBeLessThan(middle[0].depth);
+    }
+    expect(Math.max(...finest.map((groove) => groove.depth))).toBeLessThan(Math.min(...finer.map((groove) => groove.depth)));
+    expect(grooves(profile(0))).toHaveLength(0);
+    // Stronger: still one each side, wider and deeper - twice as deep at 100 %.
+    const strong = grooves(profile(1));
+    expect(strong).toHaveLength(1);
+    expect(strong[0].width).toBeGreaterThan(1.3 * middle[0].width);
+    expect(strong[0].depth).toBeGreaterThan(1.8 * middle[0].depth);
+    expect(strong[0].depth).toBeLessThanOrEqual(0.16 + 1e-9);
   });
 
   it("goes round a cylinder in whole fields, as many as the bracing needs, with nothing jumping at the seam", () => {
@@ -320,6 +385,8 @@ describe("half-timbering", () => {
     const input = box(72, 45, 10);
     const result = applySurfaceTexture(input, { pattern: "timber" });
     expectClosed(result);
+    // Cut along the grain's grooves however fine or strong.
+    for (const timberGrain of [0.1, 0.35, 1]) expectClosed(applySurfaceTexture(input, { pattern: "timber", timberGrain }));
     expect(result.stats.timber).toMatchObject({ storeys: 1, panel: (72 - 2.4) / 6 });
     expect(result.stats.timber!.height).toBeCloseTo(40.6, 9);
     let front = -Infinity;

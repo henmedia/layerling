@@ -104,6 +104,16 @@ function choose(select: HTMLSelectElement, value: string) {
   });
 }
 
+/** Types a value into a field and leaves it, as a user does. */
+function type(input: HTMLInputElement, value: string) {
+  act(() => input.focus());
+  act(() => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, value);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  act(() => input.blur());
+}
+
 describe("the surface texture card in a shape's settings", () => {
   it("shows the twenty patterns by their pictures, knurling first chosen", () => {
     const { panel } = mount(cylinder);
@@ -190,7 +200,7 @@ describe("the surface texture card in a shape's settings", () => {
     expect(rangeNamed(panel, "Spacing")?.value).toBe("3.00");
   });
 
-  it("lays half-timbering: its bracing, a storey's height, the beams' width and height, rails and grain", async () => {
+  it("lays half-timbering: its bracing, a storey's height, the beams' width and height, rails and how strong the grain is", async () => {
     const { panel, calls } = mount(cylinder);
     choosePattern(panel, "Half-timbering");
     const bracing = selectWith(panel, "knee")!;
@@ -205,16 +215,18 @@ describe("the surface texture card in a shape's settings", () => {
     expect(rangeNamed(panel, "Beam height")?.value).toBe("0.80");
     expect(rangeNamed(panel, "Depth")).toBeUndefined();
     expect(selectWith(panel, "outward")?.value).toBe("outward");
-    const grain = [...card(panel).querySelectorAll<HTMLLabelElement>("label.check-property")].find((row) => row.textContent === "Wood grain")!.querySelector("input")!;
-    expect(grain.checked).toBe(true);
-    act(() => grain.click());
+    // The grain from none through fine to strong, starting as it was when it was only on or off.
+    const grain = rangeNamed(panel, "Wood grain (%)")!;
+    expect(grain.value).toBe("50");
+    expect(card(panel).textContent).toContain("0 %: none. Below 50 % finer: more grooves, thinner and shallower. Above 50 % stronger: two wide, deep ones.");
+    type(grain, "20");
     choose(bracing, "cross");
     expect(card(panel).textContent).toContain("An X in the panel under the lowest rail.");
     act(() => button(panel, "More")!.click());
     expect(rangeNamed(panel, "Groove width (%)")).toBeUndefined();
     expect(selectWith(panel, "pointed")).toBeUndefined();
     await act(async () => button(panel, "Apply texture")!.click());
-    expect(calls.applied[0]).toMatchObject({ pattern: "timber", timberBracing: "cross", spacing: 12, timberHeight: 30, timberBeam: 2.4, timberRails: 1, timberGrain: false, depth: 0.8, direction: "outward", keepEdges: false });
+    expect(calls.applied[0]).toMatchObject({ pattern: "timber", timberBracing: "cross", spacing: 12, timberHeight: 30, timberBeam: 2.4, timberRails: 1, timberGrain: 0.2, depth: 0.8, direction: "outward", keepEdges: false });
     // Leaving it gives knurling its own spacing, depth and direction back.
     choosePattern(panel, "Knurling");
     expect(rangeNamed(panel, "Spacing")?.value).toBe("3.00");
