@@ -2174,6 +2174,25 @@ html:where([data-theme="dark"][data-palette="graphite"])[data-simple-mode="on"]:
   color: #6b6b6b;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .server-design-picker {
+  background: #fff;
+  border: 1px solid #dddddd;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .server-design-path {
+  color: #6b6b6b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .top-action-body .server-design-row {
+  color: #5a3917;
+  background: #fff;
+  border-color: transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .server-design-note {
+  color: #6b6b6b;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .open-lyl-project-icon {
   color: #9f5508;
   background: #f3f3f3;
