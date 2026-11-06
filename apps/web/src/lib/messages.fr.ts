@@ -4278,6 +4278,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "Chaque case de valeur près de la sélection prend la couleur de son axe : X rouge, Y vert, Z bleu.",
   "workspace.showRotationAngles": "Afficher les angles des corps tournés",
   "workspace.startInPerspective": "Démarrer l'éditeur en vue perspective",
+  "workspace.startWithCornerRuler": "Commencer les nouveaux designs avec un carré de charpente à l’origine",
+  "workspace.startWithCornerRulerHint": "Vaut pour chaque nouveau design de ce navigateur. Les designs existants restent tels quels.",
   "workspace.startWithScrollbars": "Démarrer l'éditeur avec les barres de défilement",
   "workspace.startView": "Vue de départ",
   "workspace.startViewHint": "L’angle dans lequel s’ouvrent les nouveaux designs et auquel revient Accueil. Tournez la vue comme vous l’aimez, puis prenez la vue actuelle. Vaut pour tous les designs de ce navigateur.",

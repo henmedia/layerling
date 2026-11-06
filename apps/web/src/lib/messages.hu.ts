@@ -2766,6 +2766,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionsAlwaysVisible": "Méretek mindig láthatók",
   "workspace.showRotationAngles": "Elforgatott testek szögeinek mutatása",
   "workspace.startInPerspective": "A szerkesztő perspektivikus nézetben induljon",
+  "workspace.startWithCornerRuler": "Az új tervek derékszögvonalzóval induljanak az origóban",
+  "workspace.startWithCornerRulerHint": "Minden új tervre érvényes ebben a böngészőben. A meglévő tervek változatlanok maradnak.",
   "workspace.startWithScrollbars": "A szerkesztő görgetősávokkal induljon",
   "workspace.startView": "Indulási nézet",
   "workspace.startViewHint": "Az a szög, amelyben az új tervek megnyílnak, és ahová a Kezdőnézet visszatér. Forgasd a nézetet tetszés szerint, majd vedd át az aktuális nézetet. Minden tervre érvényes ebben a böngészőben.",

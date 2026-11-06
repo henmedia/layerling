@@ -4294,6 +4294,8 @@ export const MESSAGES_EN = {
   "workspace.dimensionAxisColorsHint": "Each value box beside a selection takes the colour of its axis: red X, green Y, blue Z.",
   "workspace.showRotationAngles": "Show the angles of turned bodies",
   "workspace.startInPerspective": "Start editor in perspective view",
+  "workspace.startWithCornerRuler": "Start new designs with a framing square at the origin",
+  "workspace.startWithCornerRulerHint": "Applies to every new design in this browser. Designs you already have stay as they are.",
   "workspace.startWithScrollbars": "Start editor with scrollbars",
   "workspace.startView": "Start view",
   "workspace.startViewHint": "The angle new designs open in and Home goes back to. Turn the view the way you like it, then use the current view. Applies to every design in this browser.",

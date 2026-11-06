@@ -4293,6 +4293,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.dimensionAxisColorsHint": "Jedes Maßkästchen neben der Auswahl bekommt die Farbe seiner Achse: X rot, Y grün, Z blau.",
   "workspace.showRotationAngles": "Drehwinkel gedrehter Körper anzeigen",
   "workspace.startInPerspective": "Editor in perspektivischer Ansicht starten",
+  "workspace.startWithCornerRuler": "Neue Entwürfe mit Winkellineal im Nullpunkt beginnen",
+  "workspace.startWithCornerRulerHint": "Gilt für jeden neuen Entwurf in diesem Browser. Vorhandene Entwürfe bleiben, wie sie sind.",
   "workspace.startWithScrollbars": "Editor mit Bildlaufleisten starten",
   "workspace.startView": "Startansicht",
   "workspace.startViewHint": "Der Blickwinkel, in dem neue Entwürfe öffnen und zu dem die Ausgangsansicht zurückkehrt. Dreh die Ansicht, wie du sie magst, und übernimm dann die aktuelle Ansicht. Gilt für alle Entwürfe in diesem Browser.",

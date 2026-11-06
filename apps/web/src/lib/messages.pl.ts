@@ -4299,6 +4299,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "Każde pole z wartością przy zaznaczeniu ma kolor swojej osi: X czerwony, Y zielony, Z niebieski.",
   "workspace.showRotationAngles": "Pokazuj kąty obróconych brył",
   "workspace.startInPerspective": "Uruchamiaj edytor w widoku perspektywicznym",
+  "workspace.startWithCornerRuler": "Zaczynaj nowe projekty z kątownikiem w początku układu",
+  "workspace.startWithCornerRulerHint": "Dotyczy każdego nowego projektu w tej przeglądarce. Istniejące projekty pozostają bez zmian.",
   "workspace.startWithScrollbars": "Uruchamiaj edytor z paskami przewijania",
   "workspace.startView": "Widok startowy",
   "workspace.startViewHint": "Kąt, w jakim otwierają się nowe projekty i do którego wraca Widok początkowy. Obróć widok tak, jak lubisz, a potem użyj bieżącego widoku. Dotyczy wszystkich projektów w tej przeglądarce.",

@@ -192,6 +192,8 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 在同一处的 {{ui:workspace.customSnapGrids}} 下，可以添加自己的吸附步距：一个名称和一个以毫米为单位的大小，例如用“Pin pitch 2.54 mm”表示 DIP 芯片、排针和洞洞板孔的间距，或用 19.05 mm 的“MX Key Unit”表示键盘按键的间距。吸附步距菜单随后会提供该尺寸的整份、一半和四分之一（1 ×、½ × 和 ¼ ×），因此形状可以按一个间距、半个间距或四分之一个间距移动。如果你只想要该尺寸本身，取消勾选旁边的 {{ui:workspace.customSnapGridParts}}；菜单就只剩这一个步距。自定义步距随设计保存，也会随 {{ui:workspace.makeDefault}} 一起保存。
 
+{{ui:workspace.startWithCornerRuler}}：此浏览器中的每个新设计都会在原点自带一把直角尺，见 [测量与备注](chapter:measuring-and-notes)。已有的设计保持不变；你从某个设计中移除的直角尺也不会再出现。
+
 ### 工作平面：平台与打印机
 
 {{ui:workspace.printer}} 把工作平面调整为打印机的打印床大小，并标出超出边界的实体，见[打印](chapter:printing)。{{ui:workspace.showPlateLabels}} 在平台上写设计的名称，选择打印机后还会写上打印机名称和成型体积。

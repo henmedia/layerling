@@ -27,7 +27,7 @@ Seleziona {{ui:shape.ruler}} nella libreria delle forme. È solo uno strumento d
 
 ## La squadra
 
-A volte è più semplice misurare perpendicolarmente. Fai clic su {{ui:camera.cornerRulerTool}} nella barra della vista, poi sul piano di lavoro. Qui viene posizionata una squadra con due bracci ad angolo retto e tacche come quelle di una squadra da falegname. Anche la squadra non è un corpo vero e proprio. Fai clic vicino all’angolo di un corpo e l’angolo della squadra vi si aggancia con precisione.
+A volte è più semplice misurare perpendicolarmente. Fai clic su {{ui:camera.cornerRulerTool}} nella barra della vista, poi sul piano di lavoro. Qui viene posizionata una squadra con due bracci ad angolo retto e tacche come quelle di una squadra da falegname. Anche la squadra non è un corpo vero e proprio. Fai clic vicino all’angolo di un corpo e l’angolo della squadra vi si aggancia con precisione. Se ti serve in quasi ogni progetto, attiva {{ui:workspace.startWithCornerRuler}} in {{ui:workspace.measurement}} nelle impostazioni: ogni nuovo progetto parte così con una squadra all’origine.
 
 La squadra poggia sul piano di lavoro. Se questo si trova sul lato di un corpo, anche la squadra si appoggia a quel lato; vedi [Vista e piano di lavoro](chapter:view-and-workplane). Così puoi quotare una parete verticale: posiziona il piano di lavoro sulla parete, metti la squadra nell’angolo superiore sinistro e fai clic sulla maniglia finché i bracci puntano a destra e verso il basso.
 

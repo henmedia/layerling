@@ -27,7 +27,7 @@ Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. M�
 
 ## Úhelník
 
-Pro měření v pravém úhlu použijte {{ui:camera.cornerRulerTool}} v liště pohledu a klikněte na pracovní rovinu. Vloží se dvě kolmá ramena s ryskami. Ani úhelník není tělesem. Kliknete-li blízko rohu objektu, jeho počátek se přesně přichytí k tomuto rohu.
+Pro měření v pravém úhlu použijte {{ui:camera.cornerRulerTool}} v liště pohledu a klikněte na pracovní rovinu. Vloží se dvě kolmá ramena s ryskami. Ani úhelník není tělesem. Kliknete-li blízko rohu objektu, jeho počátek se přesně přichytí k tomuto rohu. Pokud ho potřebujete skoro v každém návrhu, zapněte v nastavení pod {{ui:workspace.measurement}} volbu {{ui:workspace.startWithCornerRuler}}: každý nový návrh pak začne s úhelníkem v počátku souřadnic.
 
 Úhelník leží na pracovní rovině. Je-li rovina umístěna na boku tělesa, leží tam i úhelník, viz [Pohled a pracovní rovina](chapter:view-and-workplane). Pro kótování na svislé stěně na ni nejprve položte pracovní rovinu, úhelník přiložte k levému hornímu rohu a klikáním na úchyt natočte ramena doprava a dolů.
 

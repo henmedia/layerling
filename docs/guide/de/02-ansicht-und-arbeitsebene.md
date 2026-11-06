@@ -194,6 +194,8 @@ Unter {{ui:workspace.measurement}} in den Einstellungen stellst du die {{ui:work
 
 Unter {{ui:workspace.customSnapGrids}} an derselben Stelle legst du eigene Rasterschritte an: einen Namen und eine Größe in Millimetern, zum Beispiel „Rastermaß 2,54 mm" für den Abstand von DIP-Chips, Stiftleisten und Lochrasterplatinen oder „MX Key Unit" mit 19,05 mm für den Abstand von Tastaturtasten. Das Rastermenü bietet dieses Maß dann ganz, halbiert und geviertelt an (1 ×, ½ × und ¼ ×), sodass sich Formen um ein ganzes, ein halbes oder ein viertel Rastermaß verschieben lassen. Willst du nur das Maß selbst, nimm den Haken bei {{ui:workspace.customSnapGridParts}} daneben weg; das Menü hat dann nur diesen einen Schritt. Eigene Schritte bleiben beim Entwurf und gehen mit {{ui:workspace.makeDefault}} mit.
 
+{{ui:workspace.startWithCornerRuler}}: Jeder neue Entwurf in diesem Browser beginnt dann mit einem Winkellineal im Nullpunkt, siehe [Messen und Notizen](chapter:messen-und-notizen). Vorhandene Entwürfe bleiben, wie sie sind, und ein Winkellineal, das du aus einem Entwurf entfernst, bleibt weg.
+
 ### Arbeitsebene: Platte und Drucker
 
 {{ui:workspace.printer}} stellt die Arbeitsebene auf die Druckplatte deines Druckers ein und markiert Körper, die darüber hinausragen, siehe [Drucken](chapter:drucken). {{ui:workspace.showPlateLabels}} schreibt den Namen des Designs auf die Platte und, wenn ein Drucker gewählt ist, seinen Namen und sein Bauvolumen.

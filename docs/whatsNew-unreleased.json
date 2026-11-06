@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Neue Entwürfe mit Winkellineal im Nullpunkt",
+      "en": "New designs with a framing square at the origin"
+    },
+    "body": {
+      "de": "Wer das Winkellineal fast immer braucht, setzt in den Einstellungen unter „Maße“ das Häkchen bei „Neue Entwürfe mit Winkellineal im Nullpunkt beginnen“. Dann liegt in jedem neuen Entwurf dieses Browsers schon eines im Nullpunkt. Vorhandene Entwürfe bleiben, wie sie sind.",
+      "en": "If you use the framing square nearly all the time, tick \"Start new designs with a framing square at the origin\" under Measurement in the settings. Every new design in this browser then starts with one at the origin. Designs you already have stay as they are."
+    }
+  }
+]

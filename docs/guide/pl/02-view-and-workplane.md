@@ -195,6 +195,8 @@ W sekcji {{ui:workspace.measurement}} w ustawieniach wybierasz {{ui:workspace.un
 
 W {{ui:workspace.customSnapGrids}} w tym samym miejscu dodajesz własne kroki przyciągania: nazwę i rozmiar w milimetrach, na przykład „Raster 2,54 mm” dla rozstawu wyprowadzeń układów DIP, listew goldpin i otworów płytek uniwersalnych albo „MX Key Unit” z 19,05 mm dla rozstawu klawiszy klawiatury. Menu kroku przyciągania oferuje wtedy tę miarę w całości, w połowie i w ćwiartce (1 ×, ½ × i ¼ ×), więc kształty da się przesuwać o cały raster, pół albo ćwierć rastra. Jeśli chcesz tylko samą miarę, odznacz obok {{ui:workspace.customSnapGridParts}}, a menu będzie miało tylko ten jeden krok. Własne kroki zapisują się z projektem i przechodzą dalej przez {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.startWithCornerRuler}}: każdy nowy projekt w tej przeglądarce zaczyna się wtedy z kątownikiem w początku układu, zobacz [Pomiary i notatki](chapter:measuring-and-notes). Istniejące projekty pozostają bez zmian, a kątownik, który usuniesz z projektu, już nie wraca.
+
 ### Płaszczyzna robocza: płyta i drukarka
 
 {{ui:workspace.printer}} dopasowuje płaszczyznę roboczą do stołu Twojej drukarki i oznacza bryły, które poza niego wystają, zobacz [Drukowanie](chapter:printing). {{ui:workspace.showPlateLabels}} wypisuje na płycie nazwę projektu, a gdy wybrana jest drukarka, także jej nazwę i przestrzeń roboczą.

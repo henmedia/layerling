@@ -4294,6 +4294,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.dimensionAxisColorsHint": "Elk waardevakje naast de selectie krijgt de kleur van zijn as: X rood, Y groen, Z blauw.",
   "workspace.showRotationAngles": "Hoeken van gedraaide lichamen tonen",
   "workspace.startInPerspective": "Editor starten in perspectiefweergave",
+  "workspace.startWithCornerRuler": "Nieuwe ontwerpen starten met een winkelhaak in de oorsprong",
+  "workspace.startWithCornerRulerHint": "Geldt voor elk nieuw ontwerp in deze browser. Bestaande ontwerpen blijven zoals ze zijn.",
   "workspace.startWithScrollbars": "Editor starten met schuifbalken",
   "workspace.startView": "Startweergave",
   "workspace.startViewHint": "De hoek waarin nieuwe ontwerpen openen en waar Startpositie naar terugkeert. Draai de weergave zoals je wilt en neem dan de huidige weergave. Geldt voor alle ontwerpen in deze browser.",

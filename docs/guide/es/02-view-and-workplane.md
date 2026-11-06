@@ -194,6 +194,8 @@ En {{ui:workspace.measurement}}, dentro de los ajustes, eliges las {{ui:workspac
 
 En {{ui:workspace.customSnapGrids}}, en ese mismo sitio, añades pasos de ajuste propios: un nombre y un tamaño en milímetros, por ejemplo «Paso de pines 2,54 mm» para la separación de los chips DIP, las tiras de pines y los orificios de las placas perforadas, o «MX Key Unit» con 19,05 mm para la separación de las teclas de un teclado. El menú del paso de ajuste ofrece entonces esa medida entera, a la mitad y a un cuarto (1 ×, ½ × y ¼ ×), para que puedas mover formas un paso entero, medio paso o un cuarto de paso. Si solo quieres la medida tal cual, desmarca {{ui:workspace.customSnapGridParts}}, al lado; el menú tendrá entonces solo ese paso. Los pasos propios se guardan con el diseño y se incluyen al usar {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.startWithCornerRuler}}: cada diseño nuevo de este navegador empieza entonces con una escuadra en el origen, consulta [Medidas y notas](chapter:measuring-and-notes). Los diseños que ya tienes se quedan como están, y una escuadra que quitas de un diseño no vuelve.
+
 ### Plano de trabajo: placa e impresora
 
 {{ui:workspace.printer}} adapta el plano de trabajo a la cama de tu impresora y señala los cuerpos que se salen de ella; consulta [Impresión](chapter:printing). {{ui:workspace.showPlateLabels}} escribe en la placa el nombre del diseño y, si has elegido una impresora, su nombre y su volumen de impresión.

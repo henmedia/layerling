@@ -2737,6 +2737,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionsAlwaysVisible": "Ölçüler her zaman görünür",
   "workspace.showRotationAngles": "Döndürülmüş gövdelerin açılarını göster",
   "workspace.startInPerspective": "Editörü perspektif görünümde başlat",
+  "workspace.startWithCornerRuler": "Yeni tasarımlara orijinde bir gönyeyle başla",
+  "workspace.startWithCornerRulerHint": "Bu tarayıcıdaki her yeni tasarım için geçerlidir. Mevcut tasarımlar olduğu gibi kalır.",
   "workspace.startWithScrollbars": "Editörü kaydırma çubuklarıyla başlat",
   "workspace.startView": "Başlangıç görünümü",
   "workspace.startViewHint": "Yeni tasarımların açıldığı ve Başlangıç düğmesinin döndüğü açı. Görünümü istediğin gibi çevir, sonra mevcut görünümü kullan. Bu tarayıcıdaki tüm tasarımlar için geçerlidir.",

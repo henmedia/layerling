@@ -71,7 +71,7 @@ import { formatFileSize } from "@/lib/formatFileSize";
 import { hydrateProjectShapeState, reconcileLoadedProjectShapeCacheEntry, type ImportedMeshResource } from "@/lib/projectShapePersistence";
 import { ToolbarHistoryIcon, ToolbarImportIcon } from "@/components/toolbarIcons";
 import { writeDesignView, writeSavedViews } from "@/lib/designView";
-import { writeCornerRulers } from "@/lib/cornerRulerStore";
+import { seedStartCornerRuler, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { readTape, writeTape } from "@/lib/tapeStore";
 import { useFileAccept } from "@/lib/fileAccept";
 import { lylFileAccessSupported, onLylFilesLaunched, pickFilesToImport, rememberLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
@@ -1739,6 +1739,7 @@ export default function Home() {
 
   const createAndOpenProject = (name?: string) => {
     const project = newProject(name ?? t("dashboard.untitledDesign", { number: projects.length + 1 }), projects.length, 0, openFolderId);
+    seedStartCornerRuler(project.id);
     setProjectShapesById((current) => ({
       ...current,
       [project.id]: projectShapeCacheEntry(project.revision ?? project.updatedAt, []),
@@ -2194,6 +2195,8 @@ export default function Home() {
     }
 
     const project = newProject(name, projects.length);
+    // Before the first upload, so the file on the server carries the square from the start (#1386).
+    seedStartCornerRuler(project.id);
     const entry = projectShapeCacheEntry(project.revision ?? project.updatedAt, []);
     setProjectShapesById((current) => ({ ...current, [project.id]: entry }));
     await saveProjectShapes(project.id, entry, projectShapeSaveContext(project)).catch(() => {

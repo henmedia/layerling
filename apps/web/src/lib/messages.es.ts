@@ -4296,6 +4296,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "Cada casilla de valor junto a la selección toma el color de su eje: X rojo, Y verde, Z azul.",
   "workspace.showRotationAngles": "Mostrar los ángulos de los cuerpos girados",
   "workspace.startInPerspective": "Abrir el editor en vista en perspectiva",
+  "workspace.startWithCornerRuler": "Empezar los diseños nuevos con una escuadra en el origen",
+  "workspace.startWithCornerRulerHint": "Vale para cada diseño nuevo de este navegador. Los diseños que ya existen se quedan como están.",
   "workspace.startWithScrollbars": "Abrir el editor con barras de desplazamiento",
   "workspace.startView": "Vista de arranque",
   "workspace.startViewHint": "El ángulo en que se abren los diseños nuevos y al que vuelve Vista inicial. Gira la vista como te guste y luego usa la vista actual. Vale para todos los diseños de este navegador.",

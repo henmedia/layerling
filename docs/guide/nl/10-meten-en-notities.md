@@ -27,7 +27,7 @@ De {{ui:shape.ruler}} haal je uit de vormenbibliotheek. Het is puur een meetinst
 
 ## De winkelhaak
 
-Soms meet je beter in een rechte hoek. Klik op {{ui:camera.cornerRulerTool}} in de weergavebalk en dan op het werkvlak. Daar wordt een winkelhaak geplaatst met twee armen in een rechte hoek, met maatstreepjes zoals op een blokhaak. Ook die heeft geen eigen lichaam. Klik je dicht bij de hoek van een lichaam, dan klikt zijn hoek precies daar vast.
+Soms meet je beter in een rechte hoek. Klik op {{ui:camera.cornerRulerTool}} in de weergavebalk en dan op het werkvlak. Daar wordt een winkelhaak geplaatst met twee armen in een rechte hoek, met maatstreepjes zoals op een blokhaak. Ook die heeft geen eigen lichaam. Klik je dicht bij de hoek van een lichaam, dan klikt zijn hoek precies daar vast. Heb je hem in bijna elk ontwerp nodig, zet dan in de instellingen onder {{ui:workspace.measurement}} {{ui:workspace.startWithCornerRuler}} aan: elk nieuw ontwerp begint dan met een winkelhaak in de oorsprong.
 
 De winkelhaak ligt op het werkvlak. Ligt dat op de zijkant van een lichaam, dan ligt de winkelhaak ook op die zijkant, zie [Weergave en werkvlak](chapter:weergave-en-werkvlak). Zo maat je op een verticale wand: zet het werkvlak op de wand, plaats de winkelhaak in de linkerbovenhoek en klik op de greep tot de armen naar rechts en naar beneden wijzen.
 

@@ -4283,6 +4283,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "选区旁的每个数值框使用其坐标轴的颜色：X 红色、Y 绿色、Z 蓝色。",
   "workspace.showRotationAngles": "显示旋转后实体的角度",
   "workspace.startInPerspective": "编辑器以透视视图启动",
+  "workspace.startWithCornerRuler": "新设计在原点自带直角尺",
+  "workspace.startWithCornerRulerHint": "适用于此浏览器中的每个新设计。已有的设计保持不变。",
   "workspace.startWithScrollbars": "编辑器启动时显示滚动条",
   "workspace.startView": "起始视图",
   "workspace.startViewHint": "新设计打开时的角度，也是“复位”返回的角度。先把视图转到你喜欢的样子，再使用当前视图。适用于此浏览器中的所有设计。",

@@ -4132,6 +4132,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColorsHint": "Hvert værdifelt ved markeringen får farven på sin akse: X rød, Y grøn, Z blå.",
   "workspace.showRotationAngles": "Vis vinkler på vendte former",
   "workspace.startInPerspective": "Start editoren i perspektivvisning",
+  "workspace.startWithCornerRuler": "Start nye designs med vinkelmåler i nulpunktet",
+  "workspace.startWithCornerRulerHint": "Gælder hvert nyt design i denne browser. Eksisterende designs forbliver, som de er.",
   "workspace.startWithScrollbars": "Start editoren med rullebjælker",
   "workspace.startView": "Startvisning",
   "workspace.startViewHint": "Den vinkel nye designs åbner i, og som Hjem vender tilbage til. Drej visningen, som du kan lide den, og brug så den aktuelle visning. Gælder alle designs i denne browser.",

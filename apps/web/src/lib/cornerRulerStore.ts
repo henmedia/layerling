@@ -1,5 +1,5 @@
-import { normalizePlacementWorkplane, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
-import type { CornerRulerAxisModes, CornerRulerFrame, CornerRulerMode } from "@/lib/rulerDimensions";
+import { horizontalPlacementWorkplane, normalizePlacementWorkplane, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
+import { cornerRulerFrameForWorkplane, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode } from "@/lib/rulerDimensions";
 
 /**
  * The framing square a design keeps (#829): where it was set, on which workplane, which way its arms point and how it
@@ -20,6 +20,7 @@ export type SavedCornerRuler = {
 };
 
 const CORNER_RULERS_STORAGE_PREFIX = "layerling.cornerRulers.";
+const START_WITH_CORNER_RULER_STORAGE_KEY = "layerling.editor.startWithCornerRuler";
 const DEFAULT_ARM_X = 100;
 const DEFAULT_ARM_Z = 80;
 const MODES: readonly CornerRulerMode[] = ["endpoint", "midpoint"];
@@ -96,4 +97,44 @@ export function writeCornerRulers(projectId: string | null | undefined, rulers: 
   } catch {
     // Without storage the framing square lasts until the design is left.
   }
+}
+
+/** Whether a new design starts with a framing square at the origin (#1386): a setting of this browser, off until it is switched on. */
+export function readStartWithCornerRuler(): boolean {
+  try {
+    return window.localStorage.getItem(START_WITH_CORNER_RULER_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function writeStartWithCornerRuler(on: boolean) {
+  try {
+    if (on) window.localStorage.setItem(START_WITH_CORNER_RULER_STORAGE_KEY, "true");
+    else window.localStorage.removeItem(START_WITH_CORNER_RULER_STORAGE_KEY);
+  } catch {
+    // Without storage new designs start without one, as before.
+  }
+}
+
+/** The framing square a new design starts with: its corner at the origin of the base plate, turned as a click there places it. */
+export function startCornerRuler(): SavedCornerRuler {
+  const workplane = horizontalPlacementWorkplane(0);
+  return {
+    corner: { x: 0, y: 0, z: 0 },
+    workplane,
+    frame: cornerRulerFrameForWorkplane(workplane),
+    armLengthX: DEFAULT_ARM_X,
+    armLengthZ: DEFAULT_ARM_Z,
+    mode: "endpoint",
+  };
+}
+
+/**
+ * Gives a design just made its framing square at the origin, when the setting asks for one (#1386). Only a new design
+ * gets it: a design that had one and lost it keeps it removed, and one that has a square keeps its own.
+ */
+export function seedStartCornerRuler(projectId: string) {
+  if (!readStartWithCornerRuler() || readCornerRulers(projectId).length) return;
+  writeCornerRulers(projectId, [startCornerRuler()]);
 }

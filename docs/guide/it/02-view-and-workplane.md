@@ -193,6 +193,8 @@ Nelle impostazioni, sotto {{ui:workspace.measurement}}, scegli {{ui:workspace.un
 
 Nella stessa sezione, in {{ui:workspace.customSnapGrids}}, puoi aggiungere passi di aggancio personalizzati: indica un nome e una misura in millimetri. Per esempio, puoi creare “Passo pin 2,54 mm” per la distanza tra i piedini dei chip DIP, delle strip e dei fori delle basette millefori, oppure “Unità tasto MX” con una distanza di 19,05 mm per la spaziatura dei tasti di una tastiera. Il menu del passo di aggancio offrirà allora quella misura intera, dimezzata e divisa per quattro (1×, ½× e ¼×), così potrai spostare le forme di un passo, mezzo passo o un quarto di passo. Se vuoi usare soltanto la misura intera, deseleziona {{ui:workspace.customSnapGridParts}} accanto al nome: il menu mostrerà solo quel passo. I passi personalizzati vengono salvati con il progetto e inclusi in {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.startWithCornerRuler}}: ogni nuovo progetto in questo browser parte allora con una squadra all’origine, vedi [Misurazioni e annotazioni](chapter:measuring-and-notes). I progetti che hai già restano come sono, e una squadra che togli da un progetto non torna.
+
 ### Piano di lavoro: piastra e stampante
 
 {{ui:workspace.printer}} adatta le dimensioni del piano di lavoro al piatto di stampa della tua stampante e segnala i corpi che lo oltrepassano; vedi [Stampa](chapter:printing). {{ui:workspace.showPlateLabels}} mostra sulla piastra il nome del progetto e, se hai scelto una stampante, il nome della stampante e il volume di stampa.
