@@ -2,71 +2,85 @@
   {
     "title": {
       "de": "Mehrgängige Gewinde für Trapezspindeln",
-      "en": "Threads of several starts for lead screws"
+      "en": "Threads of several starts for lead screws",
+      "da": "Gevind med flere gænger til trapezspindler"
     },
     "body": {
       "de": "Ein Gewinde hat jetzt bis zu acht Gänge, etwa für eine Trapezspindel T8x8: 4 Gänge mit 2 mm Teilung, jeder steigt 8 mm je Umdrehung. Das gilt für Stange, Schraube, Mutter und Gewindeloch.",
-      "en": "A thread now has up to eight starts, for a lead screw such as T8x8: 4 starts at 2 mm pitch, each climbing 8 mm a turn. For rods, screws, nuts and tapped holes alike."
+      "en": "A thread now has up to eight starts, for a lead screw such as T8x8: 4 starts at 2 mm pitch, each climbing 8 mm a turn. For rods, screws, nuts and tapped holes alike.",
+      "da": "Et gevind har nu op til otte gænger, til en trapezspindel som T8x8: 4 gænger på 2 mm, og hver stiger 8 mm pr. omgang. Det gælder stanger, skruer, møtrikker og gevindhuller."
     }
   },
   {
     "title": {
       "de": "Größengriffe folgen der Arbeitsebene auf einer Seitenfläche",
-      "en": "Size handles follow a workplane on a side face"
+      "en": "Size handles follow a workplane on a side face",
+      "da": "Størrelseshåndtag følger et arbejdsplan på en sideflade"
     },
     "body": {
       "de": "Legst du die Arbeitsebene auf eine Seite eines Quaders, liegen seine Eck- und Kantengriffe jetzt auf dieser Fläche, wie in Tinkercad. Jeder ändert das Maß des Quaders, das an ihm entlangläuft, und der Griff in der Mitte der Fläche das Maß quer dazu. Das hilft vor allem in der Ansicht von der Seite.",
-      "en": "With the workplane on a side of a box, its corner and edge handles now lie on that face, as in Tinkercad. Each one changes the size of the box that runs along it, and the handle in the middle of the face the size across it. That helps most in a view from the side."
+      "en": "With the workplane on a side of a box, its corner and edge handles now lie on that face, as in Tinkercad. Each one changes the size of the box that runs along it, and the handle in the middle of the face the size across it. That helps most in a view from the side.",
+      "da": "Med arbejdsplanet på en side af en kasse ligger kassens hjørne- og sidehåndtag nu på den flade, som i Tinkercad. Hvert af dem ændrer det mål af kassen, der løber langs det, og håndtaget midt på fladen det mål på tværs. Det hjælper mest i en visning fra siden."
     }
   },
   {
     "title": {
       "de": "Oberflächentextur: das Muster wählen, indem man es sieht",
-      "en": "Surface texture: choose the pattern by seeing it"
+      "en": "Surface texture: choose the pattern by seeing it",
+      "da": "Overfladestruktur: vælg mønsteret ved at se det"
     },
     "body": {
       "de": "Das Feld „Muster“ zeigt jetzt das Bild des gewählten Musters. Aufgeklappt sind alle 18 Muster als Bilder in einem Raster, mit einer Suche darüber. Statt anzuwenden und am Körper nachzusehen, wählt man ein Muster nach seinem Aussehen, auch mit den Pfeiltasten.",
-      "en": "The Pattern field now shows the picture of the chosen pattern. Opened, it holds all 18 patterns as pictures in a grid, with a search above. Instead of applying and looking at the body, you choose a pattern by how it looks, with the arrow keys too."
+      "en": "The Pattern field now shows the picture of the chosen pattern. Opened, it holds all 18 patterns as pictures in a grid, with a search above. Instead of applying and looking at the body, you choose a pattern by how it looks, with the arrow keys too.",
+      "da": "Feltet „Mønster“ viser nu billedet af det valgte mønster. Åbnet rummer det alle 18 mønstre som billeder i et gitter, med en søgning over. I stedet for at anvende mønsteret og kigge på kroppen, vælger du et mønster efter dets udseende, også med piletasterne."
     }
   },
   {
     "title": {
       "de": "Bildlaufleisten springen nicht mehr beim Mausrad",
-      "en": "Scrollbars no longer jump with the wheel"
+      "en": "Scrollbars no longer jump with the wheel",
+      "da": "Rullebjælker springer ikke længere med hjulet"
     },
     "body": {
       "de": "Das Mausrad über einer Bildlaufleiste schiebt die Ansicht jetzt so weit, wie es gedreht wurde, wie auf einer Webseite. Auf dem Mac warf eine Magic Mouse oder das Nachgleiten am Trackpad die Ansicht schon beim Überfahren einer Leiste aus dem Bild.",
-      "en": "The wheel over a scrollbar now slides the view as far as it turned, as on a web page. On a Mac a Magic Mouse or the glide after a trackpad swipe threw the view off the screen as the pointer crossed a bar."
+      "en": "The wheel over a scrollbar now slides the view as far as it turned, as on a web page. On a Mac a Magic Mouse or the glide after a trackpad swipe threw the view off the screen as the pointer crossed a bar.",
+      "da": "Hjulet over en rullebjælke flytter nu visningen lige så langt som det drejede, som på en webside. På en Mac kastede en Magic Mouse eller gliden efter et trackpad-swipe visningen ud af skærmen, når markøren krydsede en bjælke."
     }
   },
   {
     "title": {
       "de": "Schwalbenschwanz fast so breit wie das breite Ende",
-      "en": "A dovetail neck almost as wide as the wide end"
+      "en": "A dovetail neck almost as wide as the wide end",
+      "da": "En hals på svalehalen næsten så bred som den brede ende"
     },
     "body": {
       "de": "Der Hals eines Schwalbenschwanzes darf jetzt bis 0,1 mm schmaler sein als das breite Ende, statt höchstens 95 % davon. So geht auch ein langer, leicht verjüngter Zapfen, etwa 146 mm breit mit 145 mm am Hals.",
-      "en": "A dovetail's neck may now be up to 0.1 mm narrower than the wide end, instead of 95 % of it at most. So a long, gently tapering tail works too, say 146 mm wide with 145 mm at the neck."
+      "en": "A dovetail's neck may now be up to 0.1 mm narrower than the wide end, instead of 95 % of it at most. So a long, gently tapering tail works too, say 146 mm wide with 145 mm at the neck.",
+      "da": "En svalehales hals må nu være op til 0,1 mm smallere end den brede ende, i stedet for højst 95 % af den. Så fungerer også en lang, let tilspidset hale, for eksempel 146 mm bred med 145 mm ved halsen."
     }
   },
   {
     "title": {
       "de": "Importierte Modelle in der Skizze von oben gesehen",
-      "en": "Imported models seen from above in the sketch"
+      "en": "Imported models seen from above in the sketch",
+      "da": "Importerede modeller set fra oven i skitsen"
     },
     "body": {
       "de": "Unter einer Skizze zeigt ein importiertes Modell jetzt seinen ganzen Umriss von oben, nicht nur die Fläche, auf der es steht. Von einer Benchy war bisher nur ein Streifen des Kiels zu sehen.",
-      "en": "Under a sketch an imported model now shows its whole outline from above, not only the part it stands on. A Benchy showed only a strip of its keel."
+      "en": "Under a sketch an imported model now shows its whole outline from above, not only the part it stands on. A Benchy showed only a strip of its keel.",
+      "da": "Under en skitse viser et importeret model nu hele sit omrids fra oven, ikke kun den del det står på. En Benchy viste kun en stribe af sin køl."
     }
   },
   {
     "title": {
       "de": "Jeder Körper lässt sich um einen Zylinder wickeln",
-      "en": "Every body can be wrapped around a cylinder"
+      "en": "Every body can be wrapped around a cylinder",
+      "da": "Ethvert legeme kan vikles om en cylinder"
     },
     "body": {
       "de": "Die Karte „Um einen Zylinder wickeln“ steht jetzt bei jedem Körper, auch bei Formen aus der Bibliothek, etwa einem Runden Dach für die Wand eines runden Turms. Bisher gab es sie nur für importierte Modelle, Text und Skizzen.",
-      "en": "The card Wrap around a cylinder is now there for every body, shapes from the library too, such as a round roof for the wall of a round tower. It was only there for imported models, text and sketches."
+      "en": "The card Wrap around a cylinder is now there for every body, shapes from the library too, such as a round roof for the wall of a round tower. It was only there for imported models, text and sketches.",
+      "da": "Kortet „Vikl rundt om en cylinder“ findes nu ved ethvert legeme, også ved former fra biblioteket, for eksempel et rundt tag til væggen af et rundt tårn. Før var det kun der for importerede modeller, tekst og skitser."
     }
   }
 ]
