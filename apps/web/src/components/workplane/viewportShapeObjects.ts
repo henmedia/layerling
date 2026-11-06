@@ -415,6 +415,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityLabelLeftText: shape.gridfinityLabelLeftText,
     gridfinityLabelRightText: shape.gridfinityLabelRightText,
     gridfinityLabelFont: shape.gridfinityLabelFont,
+    gridfinityLabelTextSize: shape.gridfinityLabelTextSize,
     // The letters on the shelves are laid out against the mirroring, so they come out of it the right way round (#1308).
     gridfinityLabelMirror: shape.kind === "gridfinity" && gridfinityLabelTextGiven(shape) ? [shape.mirrorX, shape.mirrorY, shape.mirrorZ] : undefined,
     gridfinityScoopBack: shape.gridfinityScoopBack,
@@ -824,6 +825,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityLabelLeftText: shape.gridfinityLabelLeftText,
     gridfinityLabelRightText: shape.gridfinityLabelRightText,
     gridfinityLabelFont: shape.gridfinityLabelFont,
+    gridfinityLabelTextSize: shape.gridfinityLabelTextSize,
     // The letters on the shelves are laid out against the mirroring, so they come out of it the right way round (#1308).
     gridfinityLabelMirror: shape.kind === "gridfinity" && gridfinityLabelTextGiven(shape) ? [shape.mirrorX, shape.mirrorY, shape.mirrorZ] : undefined,
     // The letters' faces are sorted into a group of their own once they have a colour of their own (#1308); which colour is the material's.

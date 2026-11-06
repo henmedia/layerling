@@ -3166,6 +3166,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "gridfinity.compartmentLabelTooShortHint": "Esta repisa mide menos de 4 mm y se omite.",
   "gridfinity.labelTextTooSmallHint": "En esta repisa las mayúsculas medirían menos de 3 mm de alto, así que el texto se omite. Usa un texto más corto, o una repisa más ancha o más larga.",
   "gridfinity.labelColorSameHint": "Igual que la caja",
+  "gridfinity.labelTextSizeHint": "La altura de las mayúsculas en cada repisa; con 0 son tan grandes como deja cada repisa.",
   "gridfinity.compartmentLabelOpenHint": "Este lado de la caja está abierto y no tiene pared, así que la repisa se omite.",
   "gridfinity.compartmentLabelSwitchedHint": "Este lado de la caja está marcado como abierto, así que la repisa se omite.",
   "gridfinity.alignLeft": "Izquierda",

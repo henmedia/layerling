@@ -3164,6 +3164,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "gridfinity.compartmentLabelTooShortHint": "Deze plank is korter dan 4 mm en valt weg.",
   "gridfinity.labelTextTooSmallHint": "Op deze plank zouden de hoofdletters lager dan 3 mm worden, dus valt de tekst weg. Gebruik een kortere tekst, of een bredere of langere plank.",
   "gridfinity.labelColorSameHint": "Zelfde als de bak",
+  "gridfinity.labelTextSizeHint": "De hoogte van de hoofdletters op elke plank; bij 0 worden ze zo groot als elke plank toelaat.",
   "gridfinity.compartmentLabelOpenHint": "Deze zijde van de bak is open en heeft geen wand voor de plank, dus de plank valt weg.",
   "gridfinity.compartmentLabelSwitchedHint": "Deze zijde van de bak staat open geschakeld, dus de plank valt weg.",
   "gridfinity.alignLeft": "Links",

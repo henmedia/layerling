@@ -7,8 +7,8 @@ import { straightTextShapes } from "@/lib/textGeometry";
 /**
  * The letters on a Gridfinity bin's label shelves (#1308). A shelf's text is laid out as a text shape lays out one line,
  * with its kerning, and fitted into the room on the shelf's top (gridfinityLabelTextPlaces): the box round the letters,
- * descenders and accents included, as large as the room's length and height let it. Below a capital of 3 mm the text is
- * left out; the settings window says so.
+ * descenders and accents included, as large as the room's length and height let it, its capitals at most the bin's
+ * letter size where it has one. Below a capital of 3 mm the text is left out; the settings window says so.
  *
  * The fonts live on the page, so the letters are made here and handed to the display mesh (gridfinityLabelledTriangles)
  * and, with the font's own curves, to the exact body (gridfinitySolid.ts) - the worker never reads a font. Each glyph keeps
@@ -72,11 +72,15 @@ type GridfinityLabelGlyphs = {
   map: (x: number, y: number) => { x: number; z: number };
 };
 
-/** A place's letters as large as its room lets them. */
-function fitted(place: GridfinityLabelTextPlace, font: string): GridfinityLabelGlyphs {
+/**
+ * A place's letters as large as its room lets them, or with capitals no higher than the bin's letter size where it has
+ * one, so shelves of different lengths match; never under 3 mm on that account, and never larger than the room.
+ */
+function fitted(place: GridfinityLabelTextPlace, font: string, letterSize = 0): GridfinityLabelGlyphs {
   const layout = layoutOf(place.text, font);
   const { box } = layout;
-  const scale = Math.min(place.length / (box.maxX - box.minX), place.height / (box.maxY - box.minY));
+  const fit = Math.min(place.length / (box.maxX - box.minX), place.height / (box.maxY - box.minY));
+  const scale = letterSize > 0 ? Math.min(fit, Math.max(MIN_GRIDFINITY_LABEL_TEXT_SIZE, letterSize) / layout.capital) : fit;
   const [cx, cy] = [(box.minX + box.maxX) / 2, (box.minY + box.maxY) / 2];
   const { centre, along, up } = place;
   const map = (x: number, y: number) => {
@@ -95,7 +99,7 @@ function largeEnough(glyphs: GridfinityLabelGlyphs) {
 export function gridfinityLabelGlyphs(shape: GridfinityShapeFields): GridfinityLabelGlyphs[] {
   if (!textFontsLoaded()) return [];
   const font = gridfinityLabelFont(shape);
-  return gridfinityLabelTextPlaces(shape).map((place) => fitted(place, font)).filter(largeEnough);
+  return gridfinityLabelTextPlaces(shape).map((place) => fitted(place, font, shape.gridfinityLabelTextSize)).filter(largeEnough);
 }
 
 /** The letters as the display mesh joins them: each glyph's rings in the shape's x and z. */

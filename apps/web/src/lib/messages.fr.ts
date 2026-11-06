@@ -3150,6 +3150,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "gridfinity.compartmentLabelTooShortHint": "Cette tablette fait moins de 4 mm et est omise.",
   "gridfinity.labelTextTooSmallHint": "Sur cette tablette, les majuscules feraient moins de 3 mm de haut ; le texte est donc omis. Utilisez un texte plus court, ou une tablette plus large ou plus longue.",
   "gridfinity.labelColorSameHint": "Comme le bac",
+  "gridfinity.labelTextSizeHint": "La hauteur des majuscules sur chaque tablette ; à 0, elles sont aussi grandes que chaque tablette le permet.",
   "gridfinity.compartmentLabelOpenHint": "Ce côté du bac est ouvert et n'a pas de paroi pour la tablette, qui est donc omise.",
   "gridfinity.compartmentLabelSwitchedHint": "Ce côté du bac est réglé ouvert, la tablette est donc omise.",
   "gridfinity.alignLeft": "Gauche",

@@ -3107,6 +3107,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "gridfinity.compartmentLabelTooShortHint": "此標籤台短於 4 mm，將被略過。",
   "gridfinity.labelTextTooSmallHint": "在此標籤台上，大寫字母將低於 3 mm，因此略過文字。請縮短文字，或加寬、加長標籤台。",
   "gridfinity.labelColorSameHint": "與收納盒相同",
+  "gridfinity.labelTextSizeHint": "每個標籤台上大寫字母的高度；設為 0 時，大寫字母在每個標籤台允許的範圍內盡量放大。",
   "gridfinity.compartmentLabelOpenHint": "收納盒的這一側是開口的，沒有壁，因此省略標籤台。",
   "gridfinity.compartmentLabelSwitchedHint": "收納盒的這一側被設為開口，因此省略標籤台。",
   "gridfinity.alignLeft": "左",

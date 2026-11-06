@@ -249,6 +249,29 @@ describe("letters fitted to a Gridfinity label shelf", () => {
     expect(gridfinityLabelFont({ gridfinityLabelFont: "Comic" })).toBe("Multilanguage");
   });
 
+  it("makes the capitals as high as the letter size, never higher than the shelf lets them nor under 3 mm", () => {
+    // The back shelf's room is 12.1 mm high, and an H fills it; 0 is no letter size.
+    const size = (letterSize?: number) => gridfinityLabelGlyphs(bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "H", gridfinityLabelTextSize: letterSize }))[0].size;
+    close(size(), 12.1);
+    close(size(0), 12.1);
+    close(size(5), 5);
+    close(size(2), 3);
+    close(size(20), 12.1);
+  });
+
+  it("gives shelves of different lengths the same capitals under a letter size, and still leaves out a text under 3 mm", () => {
+    const shape = (letterSize?: number) => bin({ gridfinityLabelBack: true, gridfinityLabelLeft: true, gridfinityLabelBackText: "Screws M3", gridfinityLabelLeftText: "M3 nuts", gridfinityLabelTextSize: letterSize });
+    const [back, left] = gridfinityLabelGlyphs(shape()).map((glyphs) => glyphs.size);
+    expect(back - left).toBeGreaterThan(1);
+    const capped = gridfinityLabelGlyphs(shape(left - 0.5));
+    expect(capped).toHaveLength(2);
+    capped.forEach((glyphs) => close(glyphs.size, left - 0.5));
+    // A shelf whose text would be under 3 mm stays without it; a letter size makes no letters larger than the shelf lets them.
+    const narrow = bin({ width: 41.5, gridfinityLabelBack: true, gridfinityLabelLeft: true, gridfinityLabelBackText: "AB", gridfinityLabelLeftText: "W".repeat(24), gridfinityLabelTextSize: 5 });
+    expect(gridfinityLabelGlyphs(narrow).map((glyphs) => glyphs.place.shelf)).toEqual(["back"]);
+    expect(gridfinityLabelTextLeftOut(narrow, "left")).toBe(true);
+  });
+
   it("leaves a text out from just under a capital of 3 mm, measured on the box round the letters, descenders and all", () => {
     // A back shelf 4.5 mm wide has 4.5 - 0.4 - 1.5 = 2.6 mm of room up, 5 mm wide 3.1 mm: an H fills it.
     const shelf = (width: number, text: string) => bin({ gridfinityLabelBack: true, gridfinityLabelBackWidth: width, gridfinityLabelBackText: text });
@@ -433,9 +456,9 @@ describe("a Gridfinity bin with letters on its shelves", { timeout: 60_000 }, ()
     expect(withinExactProfileLimit([{ gridfinity: bare, profileMesh: mesh }, ...Array.from({ length: 4 }, () => ({ gridfinity: part("Screws M3 x 8"), profileMesh: mesh }))])[0].gridfinity).toBe(bare);
   });
 
-  it("draws the bin again when a text, the font or the mirroring of its letters changes", () => {
+  it("draws the bin again when a text, the font, the letter size or the mirroring of its letters changes", () => {
     const shape = canonicalizeShape(binShape({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB", gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "x" }] }));
-    for (const change of [{ gridfinityLabelBackText: "AC" }, { gridfinityLabelFrontText: "AB" }, { gridfinityLabelLeftText: "AB" }, { gridfinityLabelRightText: "AB" }, { gridfinityLabelFont: "Serif" }, { mirrorX: true }, { mirrorY: true }, { mirrorZ: true }, { gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back" as const, text: "y" }] }]) {
+    for (const change of [{ gridfinityLabelBackText: "AC" }, { gridfinityLabelFrontText: "AB" }, { gridfinityLabelLeftText: "AB" }, { gridfinityLabelRightText: "AB" }, { gridfinityLabelFont: "Serif" }, { gridfinityLabelTextSize: 5 }, { mirrorX: true }, { mirrorY: true }, { mirrorZ: true }, { gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back" as const, text: "y" }] }]) {
       const changed = { ...shape, ...change };
       expect(shapeGeometrySignature(changed), JSON.stringify(change)).not.toBe(shapeGeometrySignature(shape));
       expect(tapeShapeTopologyKey(changed), JSON.stringify(change)).not.toBe(tapeShapeTopologyKey(shape));
@@ -481,6 +504,9 @@ describe("text on Gridfinity label shelves through the project, the defaults and
     await expect(roundTrip([{ ...shape, gridfinityLabelBackText: "x".repeat(25) }])).rejects.toThrow(/gridfinityLabelBackText/);
     await expect(roundTrip([{ ...shape, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "x".repeat(25) }] }])).rejects.toThrow(/text/);
     await expect(roundTrip([{ ...shape, gridfinityLabelFont: "custom:abc" }])).rejects.toThrow(/gridfinityLabelFont/);
+    expect((await roundTrip([{ ...shape, gridfinityLabelTextSize: 6.5 }])).shapes[0].gridfinityLabelTextSize).toBe(6.5);
+    expect(sceneShape({ ...shape, gridfinityLabelTextSize: 6.5 }).gridfinityLabelTextSize).toBe(6.5);
+    await expect(roundTrip([{ ...shape, gridfinityLabelTextSize: -1 }])).rejects.toThrow(/gridfinityLabelTextSize/);
     expect((await roundTrip([{ ...shape, gridfinityLabelFont: "custom:0123456789abcdef" }])).shapes[0].gridfinityLabelFont).toBe("custom:0123456789abcdef");
     await expect(roundTrip([{ ...shape, gridfinityLabelLeftText: 3 } as unknown as WorkplaneShape])).rejects.toThrow(/gridfinityLabelLeftText/);
   });
@@ -497,6 +523,13 @@ describe("text on Gridfinity label shelves through the project, the defaults and
     expect(shapeDefaultsFromShape(binShape({ ...texts, gridfinityLabelFont: "custom:0123456789abcdef" }))?.gridfinityLabelFont).toBeUndefined();
     const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
     expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityLabelFont: "Script" })).toMatchObject({ gridfinityLabelFont: "Script" });
+    // The letter size is a style too, kept for new bins, and MCP reads it back.
+    expect(shapeDefaultsFromShape(binShape({ ...texts, gridfinityLabelTextSize: 6 }))).toMatchObject({ gridfinityLabelTextSize: 6 });
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinityLabelTextSize: -2 } }, {}).gridfinity?.gridfinityLabelTextSize).toBe(0);
+    // Under 3 mm it is stored as 3, as the settings row stores it, also when MCP sets it.
+    expect([0.5, 2.9, 3, 4.5].map((size) => normalizeShapeCustomizations({ gridfinity: { gridfinityLabelTextSize: size } }, {}).gridfinity?.gridfinityLabelTextSize)).toEqual([3, 3, 3, 4.5]);
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityLabelTextSize: 6 })).toMatchObject({ gridfinityLabelTextSize: 6 });
+    expect(mcpShapeSummary(binShape({ ...texts, gridfinityLabelTextSize: 7.5 }))).toMatchObject({ settings: { gridfinityLabelTextSize: 7.5 } });
   });
 
   it("writes the texts create_shape and update_object give, with the lists, in one patch", () => {

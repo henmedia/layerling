@@ -2139,6 +2139,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "gridfinity.compartmentLabelTooShortHint": "Este suporte tem menos de 4 mm de comprimento e não será criado.",
   "gridfinity.labelTextTooSmallHint": "Neste suporte as maiúsculas teriam menos de 3 mm de altura, por isso o texto não é criado. Usa um texto mais curto, ou um suporte mais largo ou mais comprido.",
   "gridfinity.labelColorSameHint": "Igual à caixa",
+  "gridfinity.labelTextSizeHint": "A altura das maiúsculas em cada suporte; com 0 ficam tão grandes quanto cada suporte permite.",
   "gridfinity.compartmentLabelOpenHint": "Este lado da caixa está aberto e não tem parede, pelo que o suporte não será criado.",
   "gridfinity.alignLeft": "Esquerda",
   "gridfinity.alignMiddle": "Meio",

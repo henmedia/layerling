@@ -331,6 +331,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityLabelLeftText?: string;
   gridfinityLabelRightText?: string;
   gridfinityLabelFont?: string;
+  gridfinityLabelTextSize?: number;
   gridfinityScoopBack?: boolean;
   gridfinityScoopFront?: boolean;
   gridfinityScoopLeft?: boolean;

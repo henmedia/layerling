@@ -3618,6 +3618,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "gridfinity.compartmentLabelTooShortHint": "Denne liste er kortere end 4 mm og udelades.",
   "gridfinity.labelTextTooSmallHint": "På denne liste ville de store bogstaver blive under 3 mm høje, så teksten udelades. Brug en kortere tekst eller en bredere eller længere liste.",
   "gridfinity.labelColorSameHint": "Som bakken",
+  "gridfinity.labelTextSizeHint": "De store bogstavers højde på hver liste; ved 0 bliver de så store, som hver liste tillader.",
   "gridfinity.compartmentLabelOpenHint": "Denne side af bakken er åben og har ingen væg til listen, så listen udelades.",
   "gridfinity.compartmentLabelSwitchedHint": "Denne side af bakken er slået åben, så listen udelades.",
   "gridfinity.alignLeft": "Venstre",

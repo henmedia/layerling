@@ -2429,6 +2429,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "gridfinity.compartmentLabelTooShortHint": "Ta polička je krajša od 4 mm in odpade.",
   "gridfinity.labelTextTooSmallHint": "Na tej polički bi bile velike črke nižje od 3 mm, zato besedilo odpade. Skrajšaj besedilo ali poličko razširi ali podaljšaj.",
   "gridfinity.labelColorSameHint": "Enaka kot posoda",
+  "gridfinity.labelTextSizeHint": "Višina velikih črk na vsaki polički; pri 0 so tako velike, kot dopušča vsaka polička.",
   "gridfinity.compartmentLabelOpenHint": "Ta stran posode je odprta in nima stene za poličko, zato polička odpade.",
   "gridfinity.compartmentLabelSwitchedHint": "Ta stran posode je preklopljena na odprto, zato polička odpade.",
   "gridfinity.alignLeft": "Levo",
