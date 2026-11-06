@@ -163,6 +163,26 @@ describe("geometry worker on the page's side", () => {
     expect(page.printChecks).toBe(0);
   });
 
+  it("keeps a Gridfinity bin with letters on its shelves on the page, where the fonts are (#1308)", async () => {
+    const { buildGroupedShapeOffThread } = await load();
+    const bin = (fields: Record<string, unknown>) => ({ id: "g", kind: "gridfinity", gridfinityType: "bin", width: 83.5, depth: 41.5, height: 25.4, ...fields }) as unknown as WorkplaneShape;
+    await buildGroupedShapeOffThread([...solidAndHole, bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "M3" })], 1000);
+    await buildGroupedShapeOffThread([...solidAndHole, bin({ gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "M3" }] })], 1000);
+    expect(FakeWorker.instances).toHaveLength(0);
+    expect(page.calls).toBe(2);
+    // Its STEP file is written on the page too, as one with a text in it (#1337).
+    const { exportShapesToStepOffThread } = await load();
+    await exportShapesToStepOffThread([bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "M3" })]);
+    expect(FakeWorker.instances).toHaveLength(0);
+    expect(page.stepExports).toBe(1);
+    // A text no shelf carries, its shelf switched off, or one that draws nothing goes to the worker as before.
+    void buildGroupedShapeOffThread([...solidAndHole, bin({ gridfinityLabelBackText: "M3" })], 1000);
+    expect(FakeWorker.instances).toHaveLength(1);
+    void buildGroupedShapeOffThread([...solidAndHole, bin({ gridfinityLabelBack: true, gridfinityLabelBackText: " \u200b " })], 1000);
+    expect(FakeWorker.instances).toHaveLength(1);
+    expect(page.calls).toBe(2);
+  });
+
   it("works on the page when no worker can be made", async () => {
     FakeWorker.failOnCreate = true;
     const { buildGroupedShapeOffThread } = await load();

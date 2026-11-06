@@ -10,6 +10,7 @@ import { MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_P
 import { MAX_HIRTH_STEEP_FLANK, MAX_HIRTH_TEETH, MIN_HIRTH_STEEP_FLANK, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT } from "@/lib/hirthGeometry";
 import { PORT_PROFILES } from "@/lib/portGeometry";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
+import { GRIDFINITY_LABEL_FONTS } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
 
 export const DEFAULT_SNAP_GRID: GridSize = "1.0 mm";
@@ -469,6 +470,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityLabelRightOffset = optionalShapeNumber(source.gridfinityLabelRightOffset, fallbackEntry?.gridfinityLabelRightOffset, -MAX_CUSTOM_SHAPE_DIMENSION, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityLabelCorner = source.gridfinityLabelCorner === "round" || source.gridfinityLabelCorner === "chamfer" ? source.gridfinityLabelCorner : fallbackEntry?.gridfinityLabelCorner;
       entry.gridfinityLabelCornerSize = optionalShapeNumber(source.gridfinityLabelCornerSize, fallbackEntry?.gridfinityLabelCornerSize, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityLabelFont = typeof source.gridfinityLabelFont === "string" && GRIDFINITY_LABEL_FONTS.includes(source.gridfinityLabelFont) ? source.gridfinityLabelFont : fallbackEntry?.gridfinityLabelFont;
       entry.gridfinityScoopBack = typeof source.gridfinityScoopBack === "boolean" ? source.gridfinityScoopBack : fallbackEntry?.gridfinityScoopBack;
       entry.gridfinityScoopFront = typeof source.gridfinityScoopFront === "boolean" ? source.gridfinityScoopFront : fallbackEntry?.gridfinityScoopFront;
       entry.gridfinityScoopLeft = typeof source.gridfinityScoopLeft === "boolean" ? source.gridfinityScoopLeft : fallbackEntry?.gridfinityScoopLeft;
