@@ -4511,7 +4511,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "outliner.rename": "Zmień nazwę",
   "outliner.sortByName": "Sortuj nazwane kształty A–Z",
   "outliner.sortAsAdded": "Pokaż w kolejności dodania",
-  "outliner.moveShape": "Przenieś na liście: przeciągnij lub naciśnij strzałki w górę i w dół. Upuszczony na rozwiniętą grupę trafia do niej",
+  "outliner.moveShape": "Przenieś na liście: przeciągnij albo kliknij tutaj i naciśnij strzałkę w górę lub w dół. Upuszczony na rozwiniętą grupę trafia do niej",
   "outliner.takeOutOfGroup": "Przeciągnij poza grupę lub na inną rozwiniętą grupę",
   "outliner.children": "Części: {count}",
   "outliner.lock": "Zablokuj obiekt",

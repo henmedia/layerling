@@ -4490,7 +4490,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "outliner.rename": "Rinomina",
   "outliner.sortByName": "Ordina le forme con nome dalla A alla Z",
   "outliner.sortAsAdded": "Mostra nell'ordine di aggiunta",
-  "outliner.moveShape": "Sposta nell'elenco: trascina o premi le frecce su e giù. Rilasciato su un gruppo espanso, entra nel gruppo",
+  "outliner.moveShape": "Sposta nell'elenco: trascina, oppure fai clic qui e premi la freccia su o giù. Rilasciato su un gruppo espanso, entra nel gruppo",
   "outliner.takeOutOfGroup": "Trascina fuori dal gruppo, o su un altro gruppo espanso",
   "outliner.children": "{count} parti",
   "outliner.lock": "Blocca oggetto",

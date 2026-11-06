@@ -4494,7 +4494,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "outliner.rename": "重命名",
   "outliner.sortByName": "将已命名的形状按名称排序",
   "outliner.sortAsAdded": "按添加顺序显示",
-  "outliner.moveShape": "在列表中移动:拖动,或按上、下方向键。放到展开的组上即加入该组",
+  "outliner.moveShape": "在列表中移动:拖动,或点击此处后按上、下方向键。放到展开的组上即加入该组",
   "outliner.takeOutOfGroup": "拖出组,或拖到另一个展开的组上",
   "outliner.children": "{count} 个部件",
   "outliner.lock": "锁定对象",

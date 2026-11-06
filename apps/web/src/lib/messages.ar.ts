@@ -4514,7 +4514,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "outliner.rename": "إعادة تسمية",
   "outliner.sortByName": "رتّب الأشكال المسمّاة أبجديًا",
   "outliner.sortAsAdded": "اعرض بترتيب الإضافة",
-  "outliner.moveShape": "انقل في القائمة: اسحب أو اضغط مفتاحي السهم لأعلى ولأسفل. إذا أفلتّه على مجموعة مفتوحة يدخل فيها",
+  "outliner.moveShape": "انقل في القائمة: اسحب، أو انقر هنا ثم اضغط مفتاح السهم لأعلى أو لأسفل. إذا أفلتّه على مجموعة مفتوحة يدخل فيها",
   "outliner.takeOutOfGroup": "اسحب خارج المجموعة، أو إلى مجموعة مفتوحة أخرى",
   "outliner.children": "الأجزاء: {count}",
   "outliner.lock": "قفل الجسم",

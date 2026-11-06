@@ -4491,7 +4491,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "outliner.rename": "Přejmenovat",
   "outliner.sortByName": "Seřadit pojmenované tvary A–Z",
   "outliner.sortAsAdded": "Zobrazit v pořadí přidání",
-  "outliner.moveShape": "Přesunout v seznamu: přetáhněte nebo stiskněte šipky nahoru a dolů. Puštěno na rozbalenou skupinu, přidá se do ní",
+  "outliner.moveShape": "Přesunout v seznamu: přetáhněte, nebo sem klikněte a stiskněte šipku nahoru či dolů. Puštěno na rozbalenou skupinu, přidá se do ní",
   "outliner.takeOutOfGroup": "Vytáhnout ze skupiny, nebo na jinou rozbalenou skupinu",
   "outliner.children": "Počet částí: {count}",
   "outliner.lock": "Zamknout objekt",

@@ -4508,7 +4508,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "outliner.rename": "Cambiar nombre",
   "outliner.sortByName": "Ordenar las formas con nombre de la A a la Z",
   "outliner.sortAsAdded": "Mostrar en el orden en que se añadieron",
-  "outliner.moveShape": "Mover en la lista: arrastra o pulsa las flechas arriba y abajo. Soltado sobre un grupo desplegado, entra en el grupo",
+  "outliner.moveShape": "Mover en la lista: arrastra, o haz clic aquí y pulsa la flecha arriba o abajo. Soltado sobre un grupo desplegado, entra en el grupo",
   "outliner.takeOutOfGroup": "Arrastra fuera del grupo, o a otro grupo desplegado",
   "outliner.children": "{count} piezas",
   "outliner.lock": "Bloquear objeto",

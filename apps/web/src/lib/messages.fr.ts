@@ -4489,7 +4489,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "outliner.rename": "Renommer",
   "outliner.sortByName": "Trier les formes nommées de A à Z",
   "outliner.sortAsAdded": "Afficher dans l'ordre d'ajout",
-  "outliner.moveShape": "Déplacer dans la liste : glissez ou appuyez sur les flèches haut et bas. Déposé sur un groupe déplié, il entre dans le groupe",
+  "outliner.moveShape": "Déplacer dans la liste : glissez, ou cliquez ici puis appuyez sur la flèche haut ou bas. Déposé sur un groupe déplié, il entre dans le groupe",
   "outliner.takeOutOfGroup": "Glissez hors du groupe, ou sur un autre groupe déplié",
   "outliner.children": "{count} pièces",
   "outliner.lock": "Verrouiller l'objet",

@@ -15438,6 +15438,16 @@ html[data-theme="dark"] .theme-check {
   opacity: 1;
 }
 
+/* The open shield (#1277) shows only where it is wanted, so the list does not grow wider. */
+.outliner-action-btn.shape-lock-btn {
+  display: none;
+}
+
+.outliner-item:hover > .outliner-row-main .outliner-action-btn.shape-lock-btn,
+.outliner-item.selected > .outliner-row-main .outliner-action-btn.shape-lock-btn {
+  display: flex;
+}
+
 .outliner-children-list {
   list-style: none;
   margin: 0;

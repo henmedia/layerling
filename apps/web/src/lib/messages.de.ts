@@ -4505,7 +4505,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "outliner.rename": "Umbenennen",
   "outliner.sortByName": "Benannte Formen A–Z sortieren",
   "outliner.sortAsAdded": "In der Reihenfolge des Anlegens zeigen",
-  "outliner.moveShape": "In der Liste verschieben: ziehen oder die Pfeiltasten nach oben und unten drücken. Auf einer aufgeklappten Gruppe abgelegt, kommt es in die Gruppe",
+  "outliner.moveShape": "In der Liste verschieben: ziehen, oder hier klicken und dann Pfeil nach oben oder unten drücken. Auf einer aufgeklappten Gruppe abgelegt, kommt es in die Gruppe",
   "outliner.takeOutOfGroup": "Aus der Gruppe ziehen, oder auf eine andere aufgeklappte Gruppe",
   "outliner.children": "{count} Teile",
   "outliner.lock": "Objekt sperren",

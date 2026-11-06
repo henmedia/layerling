@@ -4506,7 +4506,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "outliner.rename": "Hernoemen",
   "outliner.sortByName": "Benoemde vormen sorteren van A tot Z",
   "outliner.sortAsAdded": "Tonen in de volgorde van toevoegen",
-  "outliner.moveShape": "Verplaatsen in de lijst: slepen of de pijltjestoetsen omhoog en omlaag gebruiken. Losgelaten op een uitgeklapte groep, komt het in de groep",
+  "outliner.moveShape": "Verplaatsen in de lijst: slepen, of hier klikken en dan pijl omhoog of omlaag drukken. Losgelaten op een uitgeklapte groep, komt het in de groep",
   "outliner.takeOutOfGroup": "Uit de groep slepen, of naar een andere uitgeklapte groep",
   "outliner.children": "{count} delen",
   "outliner.lock": "Object vergrendelen",

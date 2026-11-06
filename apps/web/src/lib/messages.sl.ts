@@ -3606,7 +3606,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "outliner.rename": "Preimenuj",
   "outliner.sortByName": "Razvrsti poimenovane oblike od A do Ž",
   "outliner.sortAsAdded": "Prikaži v vrstnem redu dodajanja",
-  "outliner.moveShape": "Premakni na seznamu: povleci ali pritisni puščici gor in dol. Spuščeno na razprto skupino, gre v skupino",
+  "outliner.moveShape": "Premakni na seznamu: povleci ali klikni sem in pritisni puščico gor ali dol. Spuščeno na razprto skupino, gre v skupino",
   "outliner.takeOutOfGroup": "Povleci iz skupine ali na drugo razprto skupino",
   "outliner.children": "Delov: {count}",
   "outliner.lock": "Zakleni objekt",

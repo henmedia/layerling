@@ -4303,7 +4303,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "outliner.rename": "Omdøb",
   "outliner.sortByName": "Sortér navngivne figurer A–Å",
   "outliner.sortAsAdded": "Vis i den rækkefølge, de blev tilføjet",
-  "outliner.moveShape": "Flyt i listen: træk eller tryk på piletasterne op og ned. Slippes den på en udfoldet gruppe, kommer den i gruppen",
+  "outliner.moveShape": "Flyt i listen: træk, eller klik her og tryk på pil op eller ned. Slippes den på en udfoldet gruppe, kommer den i gruppen",
   "outliner.takeOutOfGroup": "Træk ud af gruppen, eller over på en anden udfoldet gruppe",
   "outliner.children": "{count} dele",
   "outliner.lock": "Lås objekt",

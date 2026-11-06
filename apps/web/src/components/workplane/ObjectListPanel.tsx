@@ -2,7 +2,7 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { useMemo, useState, useRef, useEffect, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactElement } from "react";
-import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, GripVertical, ListTree, Lock, Pencil, Search, ShieldCheck, Unlock, X } from "lucide-react";
+import { ArrowDownAZ, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, FolderOpen, GripVertical, ListTree, Lock, Pencil, Search, Shield, ShieldCheck, Unlock, X } from "lucide-react";
 import { ToolbarBundleIcon, ToolbarGroupIcon } from "@/components/toolbarIcons";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -27,8 +27,8 @@ export interface ObjectListPanelProps {
   selectedIds: string[];
   onSelectShape: (id: string | string[], mode?: "replace" | "toggle") => void;
   onToggleLock: (id: string) => void;
-  /** Takes the shape lock off a part; the list shows its shield only while the shape is locked (#1277). */
-  onUnlockShapeLock?: (id: string) => void;
+  /** Puts the shape lock on a part or takes it off with the shield in its row (#1277). */
+  onToggleShapeLock?: (id: string) => void;
   onToggleHidden: (id: string) => void;
   onRenameShape?: (id: string, name: string) => void;
   /** Starts editing a group, so its parts can be changed one by one. */
@@ -63,7 +63,7 @@ export function ObjectListPanel({
   selectedIds,
   onSelectShape,
   onToggleLock,
-  onUnlockShapeLock,
+  onToggleShapeLock,
   onToggleHidden,
   onRenameShape,
   onOpenGroup,
@@ -280,8 +280,12 @@ export function ObjectListPanel({
     });
   };
 
-  /** Arrow keys on a focused handle move the shape one place. */
+  /**
+   * Arrow keys on a focused handle move the shape one place. They stay with the handle: the editor
+   * would otherwise move the selected part or turn the view at the same time (#1277).
+   */
   const handleKeyDown = (id: string, e: KeyboardEvent<HTMLElement>) => {
+    if (e.key.startsWith("Arrow")) e.stopPropagation();
     const index = listedShapes.findIndex((shape) => shape.id === id);
     if (e.key === "ArrowUp" && index > 0) {
       e.preventDefault();
@@ -560,21 +564,23 @@ export function ObjectListPanel({
                             <Pencil size={13} />
                           </button>
                         ) : null}
-                        {shape.shapeLocked ? (
-                          // A locked shape shows its shield here as well as in the settings (#1277); a click takes it off.
+                        {shape.shapeLocked || onToggleShapeLock ? (
+                          // The shield locks the shape and unlocks it, as in the settings (#1277). A locked shape always
+                          // shows it; the open one only on the selected row and under the mouse, so the list stays narrow.
                           <button
                             type="button"
-                            className="outliner-action-btn active-locked"
-                            title={t("contextMenu.unlockShape")}
-                            aria-label={t("contextMenu.unlockShape")}
+                            className={`outliner-action-btn ${shape.shapeLocked ? "active-locked" : "shape-lock-btn"}`}
+                            title={shape.shapeLocked ? t("contextMenu.unlockShape") : t("contextMenu.lockShapeHint")}
+                            aria-label={shape.shapeLocked ? t("contextMenu.unlockShape") : t("contextMenu.lockShape")}
+                            aria-pressed={Boolean(shape.shapeLocked)}
                             data-testid="outliner-shape-lock"
-                            disabled={!onUnlockShapeLock}
+                            disabled={!onToggleShapeLock}
                             onClick={(e) => {
                               e.stopPropagation();
-                              onUnlockShapeLock?.(shape.id);
+                              onToggleShapeLock?.(shape.id);
                             }}
                           >
-                            <ShieldCheck size={14} />
+                            {shape.shapeLocked ? <ShieldCheck size={14} /> : <Shield size={14} />}
                           </button>
                         ) : null}
                         <button

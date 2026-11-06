@@ -4506,7 +4506,7 @@ export const MESSAGES_EN = {
   "outliner.rename": "Rename",
   "outliner.sortByName": "Sort named shapes A–Z",
   "outliner.sortAsAdded": "Show in the order added",
-  "outliner.moveShape": "Move in the list: drag, or press the up and down arrow keys. Dropped on an expanded group, it goes into the group",
+  "outliner.moveShape": "Move in the list: drag, or click here and press the up or down arrow key. Dropped on an expanded group, it goes into the group",
   "outliner.takeOutOfGroup": "Drag out of the group, or onto another expanded group",
   "outliner.children": "{count} parts",
   "outliner.lock": "Lock object",
